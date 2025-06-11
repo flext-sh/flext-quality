@@ -1,0 +1,5 @@
+nohup: ignorando entrada
+INFO Watching for file changes with StatReloader
+INFO "GET / HTTP/1.1" 200 14130
+INFO "GET /charts/quality-trends/?days=30 HTTP/1.1" 200 550
+INFO "GET /charts/security-issues-distribution/ HTTP/1.1" 200 208

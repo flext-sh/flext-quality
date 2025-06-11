@@ -1,0 +1,79 @@
+<!-- Quality Overview Component -->
+<div class="metrics-grid">
+    <div class="score-display">
+        <div class="score-value badge-{{ grade_color }}">{{ quality_metrics.overall_score|floatformat:1 }}</div>
+        <div class="score-label">Overall Score</div>
+        <div class="badge badge-{{ grade_color }}">{{ session.quality_grade }}</div>
+    </div>
+
+    <div class="metric-card">
+        <h3>🔒 Security Score</h3>
+        <p class="score-value">{{ quality_metrics.security_score|floatformat:1 }}/100</p>
+        <p>{{ quality_metrics.security_issues_count }} issues found</p>
+    </div>
+
+    <div class="metric-card">
+        <h3>⚡ Complexity Score</h3>
+        <p class="score-value">{{ quality_metrics.complexity_score|floatformat:1 }}/100</p>
+        <p>{{ quality_metrics.complex_functions_count }} complex functions</p>
+    </div>
+
+    <div class="metric-card">
+        <h3>🔧 Maintainability</h3>
+        <p class="score-value">{{ quality_metrics.maintainability_score|floatformat:1 }}/100</p>
+        <p>Average complexity: {{ quality_metrics.avg_complexity|floatformat:1 }}</p>
+    </div>
+
+    <div class="metric-card">
+        <h3>📚 Documentation</h3>
+        <p class="score-value">{{ quality_metrics.documentation_score|floatformat:1 }}/100</p>
+        <p>{{ quality_metrics.documented_functions }}/{{ quality_metrics.total_functions }} functions documented</p>
+    </div>
+
+    <div class="metric-card">
+        <h3>🔁 Code Duplication</h3>
+        <p class="score-value">{{ quality_metrics.duplication_score|floatformat:1 }}/100</p>
+        <p>{{ quality_metrics.duplicate_blocks_count }} duplicate blocks</p>
+    </div>
+</div>
+
+<h2>📊 Project Statistics</h2>
+<div class="metrics-grid">
+    <div class="metric-card">
+        <h3>📁 Files</h3>
+        <p class="score-value">{{ quality_metrics.total_files }}</p>
+        <p>Python files analyzed</p>
+    </div>
+
+    <div class="metric-card">
+        <h3>📄 Lines of Code</h3>
+        <p class="score-value">{{ quality_metrics.total_lines|floatformat:0 }}</p>
+        <p>Total lines</p>
+    </div>
+
+    <div class="metric-card">
+        <h3>⚙️ Functions</h3>
+        <p class="score-value">{{ quality_metrics.total_functions }}</p>
+        <p>Total functions</p>
+    </div>
+
+    <div class="metric-card">
+        <h3>🏗️ Classes</h3>
+        <p class="score-value">{{ quality_metrics.total_classes }}</p>
+        <p>Total classes</p>
+    </div>
+</div>
+
+{% if quality_metrics.technical_debt_ratio > 0 %}
+<div class="alert alert-warning">
+    <strong>Technical Debt:</strong>
+    Estimated {{ quality_metrics.estimated_debt_hours|floatformat:0 }} hours of technical debt.
+    Debt ratio: {{ quality_metrics.technical_debt_ratio|floatformat:2 }}
+</div>
+{% endif %}
+
+{% if session.duration %}
+<div class="alert alert-info">
+    <strong>Analysis Duration:</strong> {{ session.duration }}
+</div>
+{% endif %}
