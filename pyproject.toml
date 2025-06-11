@@ -1,14 +1,14 @@
 [tool.poetry]
-name = "dc-code-analyzer"
+name = "dc_code_analyzer"
 version = "0.1.0"
 description = "Advanced Python code analysis tool for quality assessment, complexity analysis, and codebase insights"
 authors = ["Code Analysis Team <team@codeanalyzer.dev>"]
 maintainers = ["Code Analysis Team <team@codeanalyzer.dev>"]
 license = "MIT"
 readme = "README.md"
-homepage = "https://github.com/codeanalyzer/dc-code-analyzer"
-repository = "https://github.com/codeanalyzer/dc-code-analyzer.git"
-documentation = "https://dc-code-analyzer.readthedocs.io"
+homepage = "https://github.com/codeanalyzer/dc_code_analyzer"
+repository = "https://github.com/codeanalyzer/dc_code_analyzer.git"
+documentation = "https://dc_code_analyzer.readthedocs.io"
 keywords = [
     "code-analysis",
     "python",
