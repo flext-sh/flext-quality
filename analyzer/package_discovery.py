@@ -40,9 +40,7 @@ class PackageDiscovery:
                 (
                     0
                     if x["package_type"] == "source"
-                    else 1
-                    if x["package_type"] == "wheel"
-                    else 2
+                    else 1 if x["package_type"] == "wheel" else 2
                 ),
                 x["name"].lower(),
             ),
@@ -81,8 +79,7 @@ class PackageDiscovery:
                 "has_python_files": True,  # Assume true to avoid file system checks
                 "estimated_size": 0,  # Skip size estimation for performance
             }
-        except Exception as e:
-            print(f"Error analyzing package {getattr(dist, 'name', 'unknown')}: {e}")
+        except Exception:
             return None
 
     def _analyze_package(
@@ -124,8 +121,7 @@ class PackageDiscovery:
                 "has_python_files": self._has_python_files(source_path),
                 "estimated_size": self._estimate_package_size(source_path),
             }
-        except Exception as e:
-            print(f"Error analyzing package {getattr(dist, 'name', 'unknown')}: {e}")
+        except Exception:
             return None
 
     def _determine_package_type(

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING
 
 from django.contrib import messages
 from django.db.models import Avg
@@ -17,7 +18,6 @@ from django_filters.rest_framework import (
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.request import Request
 from rest_framework.response import Response
 
 from .analysis_engine import CodeAnalysisEngine
@@ -45,6 +45,9 @@ from .serializers import (
     SecurityIssueSerializer,
 )
 from .tasks import run_code_analysis
+
+if TYPE_CHECKING:
+    from rest_framework.request import Request
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +78,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
             return ProjectSummarySerializer
         return ProjectSerializer
 
-    def perform_create(self, serializer):
+    def perform_create(self, serializer) -> None:
         """Save the project (no created_by field in Project model)."""
         serializer.save()
 
@@ -115,7 +118,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def start_analysis(self, request: Request, pk=None) -> Response:
         """Start analysis for a project."""
         flx_project = self.get_object()
-        
+
         # Create analysis session
         data = {
             "flx_project": flx_project.id,
@@ -124,32 +127,37 @@ class ProjectViewSet(viewsets.ModelViewSet):
             "include_duplicates": request.data.get("include_duplicates", True),
             "backends": request.data.get("backends", ["ast", "external"]),
         }
-        
+
         serializer = CreateAnalysisSessionSerializer(data=data)
         if serializer.is_valid():
             session = serializer.save()
-            
+
             # Start the analysis
             try:
                 # Update status to running
                 session.status = "running"
                 session.started_at = timezone.now()
                 session.save()
-                
+
                 # Start analysis task (would be Celery task in production)
                 run_code_analysis.delay(session.id)  # type: ignore[attr-defined]
-                
-                return Response({
-                    "session_id": session.id,
-                    "message": "Analysis started successfully"
-                }, status=status.HTTP_202_ACCEPTED)
-                
+
+                return Response(
+                    {
+                        "session_id": session.id,
+                        "message": "Analysis started successfully",
+                    },
+                    status=status.HTTP_202_ACCEPTED,
+                )
+
             except Exception as e:
-                logger.exception(f"Failed to start analysis for session {session.id}: {e}")
+                logger.exception(
+                    f"Failed to start analysis for session {session.id}: {e}",
+                )
                 session.status = "failed"
                 session.error_message = str(e)
                 session.save()
-                
+
                 return Response(
                     {"error": "Failed to start analysis"},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -235,21 +243,23 @@ class AnalysisSessionViewSet(viewsets.ModelViewSet):
     def status(self, _request: Request, pk=None) -> Response:
         """Get analysis session status."""
         session = self.get_object()
-        
+
         progress = 0
         if session.status == "completed":
             progress = 100
         elif session.status == "running":
             progress = 50  # Estimate for running state
-        
-        return Response({
-            "session_id": session.id,
-            "status": session.status,
-            "progress": progress,
-            "started_at": session.started_at,
-            "completed_at": session.completed_at,
-            "error_message": session.error_message or "",
-        })
+
+        return Response(
+            {
+                "session_id": session.id,
+                "status": session.status,
+                "progress": progress,
+                "started_at": session.started_at,
+                "completed_at": session.completed_at,
+                "error_message": session.error_message or "",
+            },
+        )
 
     @action(detail=True, methods=["get"])
     def results(self, _request: Request, pk=None) -> Response:

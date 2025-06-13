@@ -3,16 +3,18 @@
 from __future__ import annotations
 
 import ast
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .base import AnalysisBackend, AnalysisResult
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class ASTVisitor(ast.NodeVisitor):
     """AST visitor to extract detailed code structure information."""
 
-    def __init__(self, file_path: Path, package_name: str):
+    def __init__(self, file_path: Path, package_name: str) -> None:
         self.file_path = file_path
         self.package_name = package_name
         self.current_class: dict[str, Any] | None = None
@@ -88,7 +90,7 @@ class ASTVisitor(ast.NodeVisitor):
         return base_classes
 
     def _analyze_class_decorators(
-        self, node: ast.ClassDef
+        self, node: ast.ClassDef,
     ) -> tuple[list[str], bool, bool]:
         """Analyze class decorators and special patterns."""
         decorators = [ast.unparse(d) for d in node.decorator_list]
@@ -278,7 +280,7 @@ class ASTVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def _analyze_variable(
-        self, name: str, node: ast.AST, has_annotation: bool = False
+        self, name: str, node: ast.AST, has_annotation: bool = False,
     ) -> None:
         """Analyze a variable assignment."""
         # Determine variable type and scope
@@ -411,7 +413,7 @@ class ASTVisitor(ast.NodeVisitor):
     def _check_naming_convention(self, name: str, var_type: str) -> bool:
         """Check if variable follows Python naming conventions."""
         if var_type == "constant":
-            return name.isupper() and "_" in name or len(name) <= 3
+            return (name.isupper() and "_" in name) or len(name) <= 3
         if var_type in {"class_var", "instance_var"}:
             return name.islower() or name.startswith("_")
         return name.islower() or "_" in name
@@ -533,7 +535,7 @@ class ASTBackend(AnalysisBackend):
                 )
 
         # Process package data
-        for _pkg_name, pkg_data in packages.items():
+        for pkg_data in packages.values():
             pkg_data["python_files_count"] = len(pkg_data["files"])
             pkg_data["avg_complexity"] = sum(pkg_data["complexity_scores"]) / max(
                 len(pkg_data["complexity_scores"]),

@@ -4,8 +4,10 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -62,8 +64,7 @@ class AnalysisBackend(ABC):
 
     @abstractmethod
     def analyze(self, python_files: list[Path]) -> AnalysisResult:
-        """
-        Perform analysis on the given Python files.
+        """Perform analysis on the given Python files.
 
         Args:
             python_files: List of Python files to analyze

@@ -30,7 +30,7 @@ logger = logging.getLogger(__name__)
 class CodeAnalysisEngine:
     """Comprehensive code analysis engine."""
 
-    def __init__(self, session: AnalysisSession):
+    def __init__(self, session: AnalysisSession) -> None:
         self.session = session
         self.flx_project = session.flx_project
         self.project_path = Path(self.flx_project.path)
@@ -105,14 +105,16 @@ class CodeAnalysisEngine:
 
     def _raise_no_files_error(self) -> None:
         """Raise error when no Python files are found."""
-        raise ValueError("No Python files found in flx_project path")
+        msg = "No Python files found in flx_project path"
+        raise ValueError(msg)
 
     def _find_python_files(self) -> list[Path]:
         """Find all Python files in the flx_project."""
         python_files = []
 
         if not self.project_path.exists():
-            raise FileNotFoundError(f"Project path does not exist: {self.project_path}")
+            msg = f"Project path does not exist: {self.project_path}"
+            raise FileNotFoundError(msg)
 
         for py_file in self.project_path.rglob("*.py"):
             # Skip hidden files and directories
@@ -194,7 +196,7 @@ class CodeAnalysisEngine:
 
             self.results["files_analyzed"] = self.results.get("files_analyzed", 0) + 1
             self.results["total_lines"] = self.results.get("total_lines", 0) + len(
-                lines
+                lines,
             )
 
         except Exception as e:

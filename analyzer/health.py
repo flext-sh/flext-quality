@@ -1,6 +1,4 @@
-"""
-Health check utilities for the dc-code-analyzer application.
-"""
+"""Health check utilities for the dc-code-analyzer application."""
 
 import time
 from typing import Any
@@ -37,7 +35,7 @@ def check_database() -> dict[str, Any]:
     except Exception as e:
         return {
             "status": "unhealthy",
-            "details": f"Database connection failed: {str(e)}",
+            "details": f"Database connection failed: {e!s}",
         }
 
 
@@ -53,10 +51,9 @@ def check_cache() -> dict[str, Any]:
         if cached_value == test_value:
             cache.delete(test_key)
             return {"status": "healthy", "details": "Cache working properly"}
-        else:
-            return {"status": "unhealthy", "details": "Cache test failed"}
+        return {"status": "unhealthy", "details": "Cache test failed"}
     except Exception as e:
-        return {"status": "unhealthy", "details": f"Cache connection failed: {str(e)}"}
+        return {"status": "unhealthy", "details": f"Cache connection failed: {e!s}"}
 
 
 def check_redis() -> dict[str, Any]:
@@ -70,7 +67,7 @@ def check_redis() -> dict[str, Any]:
         r.ping()
         return {"status": "healthy", "details": "Redis connection successful"}
     except Exception as e:
-        return {"status": "unhealthy", "details": f"Redis connection failed: {str(e)}"}
+        return {"status": "unhealthy", "details": f"Redis connection failed: {e!s}"}
 
 
 def check_celery() -> dict[str, Any]:
@@ -89,18 +86,16 @@ def check_celery() -> dict[str, Any]:
                 "status": "healthy",
                 "details": f"Celery has {active_workers} active workers",
             }
-        else:
-            return {"status": "unhealthy", "details": "No active Celery workers found"}
+        return {"status": "unhealthy", "details": "No active Celery workers found"}
     except Exception as e:
-        return {"status": "unhealthy", "details": f"Celery check failed: {str(e)}"}
+        return {"status": "unhealthy", "details": f"Celery check failed: {e!s}"}
 
 
 @csrf_exempt
 @never_cache
 @require_http_methods(["GET", "HEAD"])
 def health_check(request):
-    """
-    Comprehensive health check endpoint.
+    """Comprehensive health check endpoint.
     Returns the health status of all critical services.
     """
     start_time = time.time()
@@ -118,7 +113,7 @@ def health_check(request):
         if check_result["status"] == "unhealthy":
             overall_status = "unhealthy"
             break
-        elif check_result["status"] == "unknown" and overall_status == "healthy":
+        if check_result["status"] == "unknown" and overall_status == "healthy":
             overall_status = "degraded"
 
     response_time = time.time() - start_time
@@ -131,9 +126,11 @@ def health_check(request):
         "checks": checks,
         "environment": {
             "debug": settings.DEBUG,
-            "python_version": f"{settings.PYTHON_VERSION}"
-            if hasattr(settings, "PYTHON_VERSION")
-            else "unknown",
+            "python_version": (
+                f"{settings.PYTHON_VERSION}"
+                if hasattr(settings, "PYTHON_VERSION")
+                else "unknown"
+            ),
         },
     }
 
@@ -147,8 +144,7 @@ def health_check(request):
 @never_cache
 @require_http_methods(["GET", "HEAD"])
 def readiness_check(request):
-    """
-    Readiness check for Kubernetes/container orchestration.
+    """Readiness check for Kubernetes/container orchestration.
     Returns 200 if the application is ready to serve traffic.
     """
     # Check critical services only
@@ -156,18 +152,16 @@ def readiness_check(request):
 
     if db_check["status"] == "healthy":
         return JsonResponse({"status": "ready"}, status=200)
-    else:
-        return JsonResponse(
-            {"status": "not ready", "reason": db_check["details"]}, status=503
-        )
+    return JsonResponse(
+        {"status": "not ready", "reason": db_check["details"]}, status=503,
+    )
 
 
 @csrf_exempt
 @never_cache
 @require_http_methods(["GET", "HEAD"])
 def liveness_check(request):
-    """
-    Liveness check for Kubernetes/container orchestration.
+    """Liveness check for Kubernetes/container orchestration.
     Returns 200 if the application is alive (basic functionality works).
     """
     return JsonResponse({"status": "alive", "timestamp": time.time()}, status=200)

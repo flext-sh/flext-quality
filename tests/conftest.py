@@ -1,6 +1,4 @@
-"""
-Pytest configuration and fixtures for the dc-code-analyzer project.
-"""
+"""Pytest configuration and fixtures for the dc-code-analyzer project."""
 
 import os
 import tempfile
@@ -23,14 +21,14 @@ def pytest_configure(config: Any) -> None:
 
 
 @pytest.fixture(scope="session")
-def django_db_setup(django_db_setup, django_db_blocker):
+def django_db_setup(django_db_setup, django_db_blocker) -> None:
     """Set up the test database."""
     with django_db_blocker.unblock():
         call_command("migrate", "--run-syncdb")
 
 
 @pytest.fixture
-def temp_project_dir() -> Generator[Path, None, None]:
+def temp_project_dir() -> Generator[Path]:
     """Create a temporary directory with some Python files for testing."""
     with tempfile.TemporaryDirectory() as temp_dir:
         project_path = Path(temp_dir)
@@ -100,7 +98,7 @@ def unused_function():
 if __name__ == "__main__":
     test_obj = TestClass("test")
     print(test_obj.simple_method())
-'''
+''',
         )
 
         # Create a package with __init__.py
@@ -144,7 +142,7 @@ def method_with_complexity(x: int) -> str:
             return "medium-high"
         return "medium"
     return "low"
-'''
+''',
         )
 
         yield project_path
@@ -161,12 +159,12 @@ def mock_session() -> Any:
     """Create a mock analysis session."""
 
     class MockSession:
-        def __init__(self):
+        def __init__(self) -> None:
             self.id = 1
             self.flx_project = MockProject()
 
     class MockProject:
-        def __init__(self):
+        def __init__(self) -> None:
             self.id = 1
             self.name = "test_project"
 
@@ -175,27 +173,24 @@ def mock_session() -> Any:
 
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 @pytest.fixture
-def celery_settings():
+def celery_settings() -> None:
     """Configure Celery for testing."""
-    pass
 
 
 @pytest.fixture(autouse=True)
-def enable_db_access_for_all_tests(db):
-    """
-    Give all tests access to the database.
+def enable_db_access_for_all_tests(db) -> None:
+    """Give all tests access to the database.
 
     By default, pytest-django only allows database access in tests marked with
     @pytest.mark.django_db. This fixture enables it for all tests.
     """
-    pass
 
 
 # Remove the migrate_database fixture - let pytest-django handle it
 
 
 @pytest.fixture
-def populate_backends():
+def populate_backends() -> None:
     """Populate the database with backend and issue type data."""
     call_command("populate_backends", force=True, verbosity=0)
 
@@ -236,8 +231,8 @@ def sample_analysis_result():
                 "max_complexity": 8.0,
                 "total_functions": 4,
                 "total_classes": 2,
-            }
-        ]
+            },
+        ],
     )
 
     # Add sample files
@@ -265,7 +260,7 @@ def sample_analysis_result():
                 "function_count": 3,
                 "class_count": 1,
             },
-        ]
+        ],
     )
 
     # Add sample classes
@@ -289,8 +284,8 @@ def sample_analysis_result():
                 "docstring_length": 15,
                 "is_abstract": False,
                 "is_dataclass": False,
-            }
-        ]
+            },
+        ],
     )
 
     # Add sample functions
@@ -313,8 +308,8 @@ def sample_analysis_result():
                 "has_docstring": True,
                 "has_type_hints": True,
                 "docstring_length": 30,
-            }
-        ]
+            },
+        ],
     )
 
     # Add sample security issues
@@ -330,8 +325,8 @@ def sample_analysis_result():
                 "description": "subprocess call with shell=True identified, security issue.",
                 "recommendation": "Use subprocess with shell=False or consider using shlex.quote().",
                 "code_snippet": 'subprocess.call("echo test", shell=True)',
-            }
-        ]
+            },
+        ],
     )
 
     return result

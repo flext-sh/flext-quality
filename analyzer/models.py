@@ -46,7 +46,7 @@ class Project(models.Model):
             models.Index(fields=["package_name"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self.name
 
 
@@ -115,7 +115,7 @@ class AnalysisSession(models.Model):
             models.Index(fields=["created_at"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.flx_project.name} - {self.name} ({self.status})"
 
     @property
@@ -155,7 +155,7 @@ class FileAnalysis(models.Model):
             models.Index(fields=["complexity_score"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.file_name} (LOC: {self.lines_of_code})"
 
     @property
@@ -207,7 +207,7 @@ class SecurityIssue(models.Model):
             models.Index(fields=["file_path"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.severity} - {self.issue_type} in {self.file_path}:{self.line_number}"
 
 
@@ -245,7 +245,7 @@ class DeadCodeIssue(models.Model):
             models.Index(fields=["file_path"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.dead_type} - {self.name} in {self.file_path}:{self.line_number}"
 
 
@@ -272,7 +272,7 @@ class DuplicateCodeBlock(models.Model):
             models.Index(fields=["session", "similarity_score"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Duplicate block ({self.lines_count} lines, {self.similarity_score:.2f} similarity)"
 
 
@@ -294,7 +294,7 @@ class DuplicateLocation(models.Model):
             models.Index(fields=["duplicate_block", "file_path"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.file_path}:{self.start_line}-{self.end_line}"
 
 
@@ -345,7 +345,7 @@ class QualityMetrics(models.Model):
     class Meta:
         db_table = "analyzer_quality_metrics"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"Quality Metrics for {self.session} (Score: {self.overall_score:.1f})"
 
 
@@ -387,7 +387,7 @@ class AnalysisReport(models.Model):
             models.Index(fields=["created_at"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.report_type})"
 
 
@@ -435,7 +435,7 @@ class PackageAnalysis(models.Model):
             models.Index(fields=["maintainability_score"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} (Files: {self.python_files_count})"
 
 
@@ -504,7 +504,7 @@ class ClassAnalysis(models.Model):
             models.Index(fields=["method_count"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} (Methods: {self.method_count})"
 
 
@@ -599,7 +599,7 @@ class FunctionAnalysis(models.Model):
             models.Index(fields=["complexity_level"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.function_type}, CC: {self.cyclomatic_complexity})"
 
 
@@ -679,7 +679,7 @@ class VariableAnalysis(models.Model):
             models.Index(fields=["is_constant"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.name} ({self.variable_type})"
 
 
@@ -734,7 +734,7 @@ class ImportAnalysis(models.Model):
             models.Index(fields=["is_circular"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.import_name:
             return f"from {self.module_name} import {self.import_name}"
         return f"import {self.module_name}"
@@ -771,7 +771,7 @@ class AnalysisBackendModel(models.Model):
             models.Index(fields=["execution_order"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.display_name} ({'Active' if self.is_active else 'Inactive'})"
 
 
@@ -832,7 +832,7 @@ class IssueType(models.Model):
             models.Index(fields=["is_active"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.backend.name}:{self.code} - {self.name}"
 
 
@@ -893,7 +893,7 @@ class DetectedIssue(models.Model):
             models.Index(fields=["detected_at"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.issue_type.code} in {self.file_path}:{self.line_number}"
 
     @property
@@ -958,5 +958,5 @@ class BackendStatistics(models.Model):
             models.Index(fields=["backend", "created_at"]),
         ]
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f"{self.backend.name} - {self.session} ({self.status})"

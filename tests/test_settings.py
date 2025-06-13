@@ -1,6 +1,4 @@
-"""
-Test-specific Django settings.
-"""
+"""Test-specific Django settings."""
 
 import sys
 from pathlib import Path
@@ -20,7 +18,7 @@ DATABASES = {
         "TEST": {
             "NAME": ":memory:",
         },
-    }
+    },
 }
 
 # Disable foreign key checks for SQLite in tests
@@ -69,5 +67,5 @@ CELERY_TASK_EAGER_PROPAGATES = True
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-    }
+    },
 }

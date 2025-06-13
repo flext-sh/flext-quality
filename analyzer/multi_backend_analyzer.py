@@ -31,7 +31,7 @@ logger = logging.getLogger(__name__)
 class MultiBackendAnalyzer:
     """Orchestrates analysis across multiple backends."""
 
-    def __init__(self, flx_project, backend_names: list[str] | None = None):
+    def __init__(self, flx_project, backend_names: list[str] | None = None) -> None:
         self.flx_project = flx_project
         self.backend_names = backend_names or ["ast", "external", "quality"]
         self.session: AnalysisSession | None = None
@@ -146,15 +146,20 @@ class MultiBackendAnalyzer:
 
             # Update session
             assert self.session is not None
-            
+
             # Check if all backends failed - if so, mark analysis as failed
             successful_backends = [
-                name for name, stats in backend_stats.items() 
+                name
+                for name, stats in backend_stats.items()
                 if stats["status"] == "success"
             ]
-            
+
             # Only mark as failed if ALL backends failed AND we attempted multiple backends
-            if not successful_backends and backend_stats and len(self.backend_names) > 1:
+            if (
+                not successful_backends
+                and backend_stats
+                and len(self.backend_names) > 1
+            ):
                 self.session.status = "failed"
                 self.session.error_message = "All backends failed to execute"
             else:
@@ -163,7 +168,7 @@ class MultiBackendAnalyzer:
                     self.session.error_message = (
                         f"Analysis completed with {len(combined_result.errors)} errors"
                     )
-            
+
             self.session.completed_at = timezone.now()
             self.session.files_analyzed = len(python_files)
             self.session.save()
@@ -202,7 +207,7 @@ class MultiBackendAnalyzer:
         """Get or create backend model for tracking."""
         # Format display name: capitalize first letter only, keep underscores as-is
         display_name = backend_name.capitalize()
-        
+
         backend_model, _created = AnalysisBackendModel.objects.get_or_create(
             name=backend_name,
             defaults={
@@ -215,7 +220,7 @@ class MultiBackendAnalyzer:
         return backend_model
 
     def _save_results(
-        self, result: AnalysisResult, backend_stats: dict | None = None
+        self, result: AnalysisResult, backend_stats: dict | None = None,
     ) -> None:
         """Save analysis results to the database."""
         assert self.session is not None
@@ -436,7 +441,9 @@ class MultiBackendAnalyzer:
             session=self.session,
             overall_score=result.quality_metrics.get("overall_score", 0.0),
             complexity_score=result.quality_metrics.get("complexity_score", 0.0),
-            maintainability_score=result.quality_metrics.get("maintainability_score", 0.0),
+            maintainability_score=result.quality_metrics.get(
+                "maintainability_score", 0.0,
+            ),
             security_score=result.quality_metrics.get("security_score", 0.0),
             documentation_score=result.quality_metrics.get("documentation_score", 0.0),
             duplication_score=result.quality_metrics.get("duplication_score", 0.0),
@@ -446,15 +453,27 @@ class MultiBackendAnalyzer:
             total_classes=len(result.classes),
             avg_complexity=result.quality_metrics.get("avg_complexity", 0.0),
             max_complexity=result.quality_metrics.get("max_complexity", 0.0),
-            complex_functions_count=result.quality_metrics.get("complex_functions_count", 0),
+            complex_functions_count=result.quality_metrics.get(
+                "complex_functions_count", 0,
+            ),
             docstring_coverage=result.quality_metrics.get("docstring_coverage", 0.0),
             documented_functions=result.quality_metrics.get("documented_functions", 0),
             security_issues_count=len(result.security_issues),
-            dead_code_items_count=result.quality_metrics.get("dead_code_items_count", 0),
-            duplicate_blocks_count=result.quality_metrics.get("duplicate_blocks_count", 0),
-            duplicate_lines_ratio=result.quality_metrics.get("duplicate_lines_ratio", 0.0),
-            technical_debt_ratio=result.quality_metrics.get("technical_debt_ratio", 0.0),
-            estimated_debt_hours=result.quality_metrics.get("estimated_debt_hours", 0.0),
+            dead_code_items_count=result.quality_metrics.get(
+                "dead_code_items_count", 0,
+            ),
+            duplicate_blocks_count=result.quality_metrics.get(
+                "duplicate_blocks_count", 0,
+            ),
+            duplicate_lines_ratio=result.quality_metrics.get(
+                "duplicate_lines_ratio", 0.0,
+            ),
+            technical_debt_ratio=result.quality_metrics.get(
+                "technical_debt_ratio", 0.0,
+            ),
+            estimated_debt_hours=result.quality_metrics.get(
+                "estimated_debt_hours", 0.0,
+            ),
         )
 
     def _find_file_object(self, file_objects: dict, data: dict) -> FileAnalysis | None:
@@ -508,11 +527,11 @@ class MultiBackendAnalyzer:
         # Default to __main__ package if available
         if "__main__" in package_objects:
             return package_objects["__main__"]
-        
+
         # Return any available package as fallback
         return next(iter(package_objects.values())) if package_objects else None
 
-    def _save_detected_issues(self, result: AnalysisResult, file_objects: dict):
+    def _save_detected_issues(self, result: AnalysisResult, file_objects: dict) -> None:
         """Save detected issues using the new DetectedIssue model."""
         self.logger.info("Saving detected issues to database")
 
@@ -541,7 +560,7 @@ class MultiBackendAnalyzer:
         backend_name: str,
         file_objects: dict,
         issue_category: str,
-    ):
+    ) -> None:
         """Create a DetectedIssue record with proper issue type mapping."""
         try:
             # Get or create backend model
@@ -632,7 +651,7 @@ class MultiBackendAnalyzer:
 
         return issue_type
 
-    def _save_backend_statistics(self, backend_stats: dict):
+    def _save_backend_statistics(self, backend_stats: dict) -> None:
         """Save backend execution statistics."""
         self.logger.info("Saving backend statistics to database")
 

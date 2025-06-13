@@ -1,12 +1,9 @@
-"""
-Unit tests for analysis backends.
-"""
+"""Unit tests for analysis backends."""
 
 from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
-
 from analyzer.backends import (
     AVAILABLE_BACKENDS,
     AnalysisBackend,
@@ -23,7 +20,7 @@ from analyzer.backends import (
 class TestAnalysisResult:
     """Test the AnalysisResult class."""
 
-    def test_init(self):
+    def test_init(self) -> None:
         """Test AnalysisResult initialization."""
         result = AnalysisResult()
 
@@ -37,7 +34,7 @@ class TestAnalysisResult:
         assert result.quality_metrics == {}
         assert result.errors == []
 
-    def test_merge(self):
+    def test_merge(self) -> None:
         """Test merging two AnalysisResult objects."""
         result1 = AnalysisResult()
         result1.packages = [{"name": "pkg1"}]
@@ -65,12 +62,12 @@ class TestAnalysisResult:
 class TestBackendRegistry:
     """Test backend registry functions."""
 
-    def test_available_backends(self):
+    def test_available_backends(self) -> None:
         """Test that all expected backends are available."""
         expected_backends = {"ast", "external", "quality"}
         assert set(AVAILABLE_BACKENDS.keys()) == expected_backends
 
-    def test_get_backend(self):
+    def test_get_backend(self) -> None:
         """Test getting a backend by name."""
         ast_backend = get_backend("ast")
         assert ast_backend == ASTBackend
@@ -81,12 +78,12 @@ class TestBackendRegistry:
         quality_backend = get_backend("quality")
         assert quality_backend == QualityBackend
 
-    def test_get_backend_invalid(self):
+    def test_get_backend_invalid(self) -> None:
         """Test getting an invalid backend raises ValueError."""
         with pytest.raises(ValueError, match="Backend 'invalid' not found"):
             get_backend("invalid")
 
-    def test_get_all_backends(self):
+    def test_get_all_backends(self) -> None:
         """Test getting all available backends."""
         backends = get_all_backends()
         assert len(backends) == 3
@@ -94,7 +91,7 @@ class TestBackendRegistry:
         assert ExternalToolsBackend in backends
         assert QualityBackend in backends
 
-    def test_get_default_backends(self):
+    def test_get_default_backends(self) -> None:
         """Test getting default backends."""
         backends = get_default_backends()
         assert len(backends) == 3
@@ -106,22 +103,22 @@ class TestBackendRegistry:
 class TestBaseAnalysisBackend:
     """Test the base AnalysisBackend class."""
 
-    def test_abstract_methods(self):
+    def test_abstract_methods(self) -> None:
         """Test that AnalysisBackend cannot be instantiated directly."""
         with pytest.raises(TypeError):
             AnalysisBackend(None, Path("/test"))
 
-    def test_find_python_files(self, temp_project_dir):
+    def test_find_python_files(self, temp_project_dir) -> None:
         """Test finding Python files in a directory."""
 
         # Create a concrete backend for testing
         class TestBackend(AnalysisBackend):
             @property
-            def name(self):
+            def name(self) -> str:
                 return "test"
 
             @property
-            def description(self):
+            def description(self) -> str:
                 return "Test backend"
 
             @property
@@ -138,16 +135,16 @@ class TestBaseAnalysisBackend:
         assert all(f.suffix == ".py" for f in python_files)
         assert all("__pycache__" not in str(f) for f in python_files)
 
-    def test_get_relative_path(self, temp_project_dir):
+    def test_get_relative_path(self, temp_project_dir) -> None:
         """Test getting relative path from project root."""
 
         class TestBackend(AnalysisBackend):
             @property
-            def name(self):
+            def name(self) -> str:
                 return "test"
 
             @property
-            def description(self):
+            def description(self) -> str:
                 return "Test backend"
 
             @property
@@ -167,16 +164,16 @@ class TestBaseAnalysisBackend:
         relative_path = backend._get_relative_path(nested_file)
         assert relative_path == "test_package/module.py"
 
-    def test_get_package_name(self, temp_project_dir):
+    def test_get_package_name(self, temp_project_dir) -> None:
         """Test extracting package name from file path."""
 
         class TestBackend(AnalysisBackend):
             @property
-            def name(self):
+            def name(self) -> str:
                 return "test"
 
             @property
-            def description(self):
+            def description(self) -> str:
                 return "Test backend"
 
             @property
@@ -198,16 +195,16 @@ class TestBaseAnalysisBackend:
         package_name = backend._get_package_name(package_file)
         assert package_name == "test_package"
 
-    def test_is_available_default(self):
+    def test_is_available_default(self) -> None:
         """Test default is_available implementation."""
 
         class TestBackend(AnalysisBackend):
             @property
-            def name(self):
+            def name(self) -> str:
                 return "test"
 
             @property
-            def description(self):
+            def description(self) -> str:
                 return "Test backend"
 
             @property
@@ -220,16 +217,16 @@ class TestBaseAnalysisBackend:
         backend = TestBackend(Mock(), Path("/test"))
         assert backend.is_available() is True
 
-    def test_get_configuration_default(self):
+    def test_get_configuration_default(self) -> None:
         """Test default get_configuration implementation."""
 
         class TestBackend(AnalysisBackend):
             @property
-            def name(self):
+            def name(self) -> str:
                 return "test"
 
             @property
-            def description(self):
+            def description(self) -> str:
                 return "Test backend"
 
             @property
@@ -243,16 +240,16 @@ class TestBaseAnalysisBackend:
         config = backend.get_configuration()
         assert config == {}
 
-    def test_validate_configuration_default(self):
+    def test_validate_configuration_default(self) -> None:
         """Test default validate_configuration implementation."""
 
         class TestBackend(AnalysisBackend):
             @property
-            def name(self):
+            def name(self) -> str:
                 return "test"
 
             @property
-            def description(self):
+            def description(self) -> str:
                 return "Test backend"
 
             @property
@@ -269,7 +266,7 @@ class TestBaseAnalysisBackend:
 class TestASTBackend:
     """Test the AST analysis backend."""
 
-    def test_properties(self):
+    def test_properties(self) -> None:
         """Test AST backend properties."""
         backend = ASTBackend(Mock(), Path("/test"))
 
@@ -279,7 +276,7 @@ class TestASTBackend:
         assert "function_analysis" in backend.capabilities
         assert "variable_analysis" in backend.capabilities
 
-    def test_analyze_with_files(self, temp_project_dir, sample_python_files):
+    def test_analyze_with_files(self, temp_project_dir, sample_python_files) -> None:
         """Test AST analysis with real Python files."""
         session = Mock()
         backend = ASTBackend(session, temp_project_dir)
@@ -299,7 +296,7 @@ class TestASTBackend:
         function_names = [func["name"] for func in result.functions]
         assert len(function_names) > 0
 
-    def test_analyze_empty_files(self):
+    def test_analyze_empty_files(self) -> None:
         """Test AST analysis with empty file list."""
         backend = ASTBackend(Mock(), Path("/test"))
         result = backend.analyze([])
@@ -309,7 +306,7 @@ class TestASTBackend:
         assert len(result.classes) == 0
         assert len(result.functions) == 0
 
-    def test_analyze_invalid_python_file(self, temp_project_dir):
+    def test_analyze_invalid_python_file(self, temp_project_dir) -> None:
         """Test AST analysis with invalid Python file."""
         # Create a file with invalid Python syntax
         invalid_file = temp_project_dir / "invalid.py"
@@ -326,7 +323,7 @@ class TestASTBackend:
 class TestExternalToolsBackend:
     """Test the external tools backend."""
 
-    def test_properties(self):
+    def test_properties(self) -> None:
         """Test external tools backend properties."""
         backend = ExternalToolsBackend(Mock(), Path("/test"))
 
@@ -335,7 +332,7 @@ class TestExternalToolsBackend:
         assert "security_analysis" in backend.capabilities
         assert "dead_code_analysis" in backend.capabilities
 
-    def test_is_available_when_tools_missing(self):
+    def test_is_available_when_tools_missing(self) -> None:
         """Test is_available when external tools are missing."""
         backend = ExternalToolsBackend(Mock(), Path("/test"))
 
@@ -344,7 +341,7 @@ class TestExternalToolsBackend:
             # but might skip some analysis
             assert backend.is_available() is True
 
-    def test_analyze_with_files(self, temp_project_dir, sample_python_files):
+    def test_analyze_with_files(self, temp_project_dir, sample_python_files) -> None:
         """Test external tools analysis."""
         session = Mock()
         backend = ExternalToolsBackend(session, temp_project_dir)
@@ -375,7 +372,7 @@ class TestExternalToolsBackend:
             # Should have found at least one security issue
             assert len(result.security_issues) >= 0  # May be 0 if tools not available
 
-    def test_analyze_empty_files(self):
+    def test_analyze_empty_files(self) -> None:
         """Test external tools analysis with empty file list."""
         backend = ExternalToolsBackend(Mock(), Path("/test"))
         result = backend.analyze([])
@@ -387,7 +384,7 @@ class TestExternalToolsBackend:
 class TestQualityBackend:
     """Test the quality metrics backend."""
 
-    def test_properties(self):
+    def test_properties(self) -> None:
         """Test quality backend properties."""
         backend = QualityBackend(Mock(), Path("/test"))
 
@@ -396,7 +393,7 @@ class TestQualityBackend:
         assert "complexity_analysis" in backend.capabilities
         assert "maintainability_analysis" in backend.capabilities
 
-    def test_is_available_when_radon_missing(self):
+    def test_is_available_when_radon_missing(self) -> None:
         """Test is_available when radon is missing."""
         backend = QualityBackend(Mock(), Path("/test"))
 
@@ -404,7 +401,7 @@ class TestQualityBackend:
             # Backend should still be available even if radon is missing
             assert backend.is_available() is True
 
-    def test_analyze_with_files(self, temp_project_dir, sample_python_files):
+    def test_analyze_with_files(self, temp_project_dir, sample_python_files) -> None:
         """Test quality analysis."""
         session = Mock()
         backend = QualityBackend(session, temp_project_dir)
@@ -425,7 +422,7 @@ main.py:
             # Quality metrics might be empty if tools not available
             assert isinstance(result.quality_metrics, dict)
 
-    def test_analyze_empty_files(self):
+    def test_analyze_empty_files(self) -> None:
         """Test quality analysis with empty file list."""
         backend = QualityBackend(Mock(), Path("/test"))
         result = backend.analyze([])
@@ -438,8 +435,8 @@ class TestBackendIntegration:
     """Integration tests for backends working together."""
 
     def test_all_backends_analyze_same_files(
-        self, temp_project_dir, sample_python_files
-    ):
+        self, temp_project_dir, sample_python_files,
+    ) -> None:
         """Test that all backends can analyze the same set of files."""
         session = Mock()
 
@@ -453,8 +450,8 @@ class TestBackendIntegration:
             assert isinstance(result, AnalysisResult)
 
     def test_backends_produce_mergeable_results(
-        self, temp_project_dir, sample_python_files
-    ):
+        self, temp_project_dir, sample_python_files,
+    ) -> None:
         """Test that backend results can be merged together."""
         session = Mock()
         combined_result = AnalysisResult()

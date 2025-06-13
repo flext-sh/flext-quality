@@ -123,8 +123,9 @@ manage = "manage:main"
 
 [tool.black]
 line-length = 88
-target-version = ["py312"]
+target-version = ["py313"]
 include = "\\.pyi?$"
+extend-exclude = "/(\n  # Directories\n  \\.eggs\n  | \\.git\n  | \\.hg\n  | \\.mypy_cache\n  | \\.tox\n  | \\.venv\n  | build\n  | dist\n  | htmlcov\n  | node_modules\n  | __pycache__\n)/\n"
 
 [tool.isort]
 profile = "black"
@@ -134,11 +135,25 @@ include_trailing_comma = true
 force_grid_wrap = 0
 use_parentheses = true
 ensure_newline_before_comments = true
+skip_gitignore = true
+skip = ["__pycache__", ".venv", "build", "dist"]
 
 [tool.ruff]
-target-version = "py312"
-line-length = 120
+target-version = "py313"
+line-length = 88
 src = ["src", "tests"]
+exclude = [".git", "__pycache__", ".mypy_cache", ".pytest_cache", ".ruff_cache", ".venv", "venv", "build", "dist", "htmlcov"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "UP", "N", "B", "C4", "DTZ", "T20", "ISC", "PIE", "PT", "RET", "SIM", "ARG", "PL", "RUF"]
+ignore = ["E501", "PLR0913", "PLR2004"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "PLR2004", "ARG001"]
+"scripts/*" = ["T201", "T203"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
 
 [tool.mypy]
 python_version = "3.13"
@@ -147,61 +162,29 @@ warn_return_any = true
 warn_unused_configs = true
 warn_redundant_casts = true
 warn_unused_ignores = true
+disallow_untyped_defs = true
+disallow_any_unimported = true
+no_implicit_optional = true
+check_untyped_defs = true
 show_error_codes = true
+show_error_context = true
 pretty = true
 
 [tool.django-stubs]
 django_settings_module = "code_analyzer_web.settings"
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "tests.test_settings"
-addopts = [
-    "--strict-markers",
-    "--strict-config",
-    "--ds=tests.test_settings",
-    "--reuse-db",
-    "--cov=analyzer",
-    "--cov=dashboard",
-    "--cov-report=term-missing",
-    "--cov-report=html:htmlcov",
-    "--cov-report=xml:coverage.xml",
-]
+minversion = "8.0"
+addopts = ["-ra", "--strict-markers", "--strict-config", "--cov-fail-under=85", "--cov-report=term-missing:skip-covered", "--cov-report=html:reports/coverage", "--cov-report=xml:reports/coverage.xml"]
 testpaths = ["tests"]
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests",
-    "django_db: mark test to use database",
-]
+markers = ["unit: Unit tests", "integration: Integration tests", "e2e: End-to-end tests", "slow: Slow tests"]
 
 [tool.coverage.run]
-source = ["analyzer", "dashboard"]
-omit = [
-    "*/tests/*",
-    "*/test_*",
-    "*/conftest.py",
-    "*/__main__.py",
-    "*/migrations/*",
-    "*/venv/*",
-    "*/.venv/*",
-]
+source = ["src"]
+omit = ["*/tests/*", "*/__init__.py", "*/migrations/*", "*/__pycache__/*", "*/venv/*", "*/.venv/*"]
 
 [tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if 0:",
-    "if __name__ == .__main__.:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
-]
+exclude_lines = ["pragma: no cover", "def __repr__", "if self.debug:", "if settings.DEBUG", "raise AssertionError", "raise NotImplementedError", "if 0:", "if __name__ == .__main__.:", "class .*\\bProtocol\\):", "@(abc\\.)?abstractmethod"]
 
 [tool.bandit]
 exclude_dirs = ["tests", "docs", "examples"]
