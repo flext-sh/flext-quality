@@ -220,7 +220,9 @@ class MultiBackendAnalyzer:
         return backend_model
 
     def _save_results(
-        self, result: AnalysisResult, backend_stats: dict | None = None,
+        self,
+        result: AnalysisResult,
+        backend_stats: dict | None = None,
     ) -> None:
         """Save analysis results to the database."""
         assert self.session is not None
@@ -442,7 +444,8 @@ class MultiBackendAnalyzer:
             overall_score=result.quality_metrics.get("overall_score", 0.0),
             complexity_score=result.quality_metrics.get("complexity_score", 0.0),
             maintainability_score=result.quality_metrics.get(
-                "maintainability_score", 0.0,
+                "maintainability_score",
+                0.0,
             ),
             security_score=result.quality_metrics.get("security_score", 0.0),
             documentation_score=result.quality_metrics.get("documentation_score", 0.0),
@@ -454,25 +457,31 @@ class MultiBackendAnalyzer:
             avg_complexity=result.quality_metrics.get("avg_complexity", 0.0),
             max_complexity=result.quality_metrics.get("max_complexity", 0.0),
             complex_functions_count=result.quality_metrics.get(
-                "complex_functions_count", 0,
+                "complex_functions_count",
+                0,
             ),
             docstring_coverage=result.quality_metrics.get("docstring_coverage", 0.0),
             documented_functions=result.quality_metrics.get("documented_functions", 0),
             security_issues_count=len(result.security_issues),
             dead_code_items_count=result.quality_metrics.get(
-                "dead_code_items_count", 0,
+                "dead_code_items_count",
+                0,
             ),
             duplicate_blocks_count=result.quality_metrics.get(
-                "duplicate_blocks_count", 0,
+                "duplicate_blocks_count",
+                0,
             ),
             duplicate_lines_ratio=result.quality_metrics.get(
-                "duplicate_lines_ratio", 0.0,
+                "duplicate_lines_ratio",
+                0.0,
             ),
             technical_debt_ratio=result.quality_metrics.get(
-                "technical_debt_ratio", 0.0,
+                "technical_debt_ratio",
+                0.0,
             ),
             estimated_debt_hours=result.quality_metrics.get(
-                "estimated_debt_hours", 0.0,
+                "estimated_debt_hours",
+                0.0,
             ),
         )
 

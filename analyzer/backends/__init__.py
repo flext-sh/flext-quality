@@ -25,7 +25,9 @@ DEFAULT_BACKENDS = ["ast", "external", "quality"]
 def get_backend(name: str) -> type[AnalysisBackend]:
     """Get a backend by name."""
     if name not in AVAILABLE_BACKENDS:
-        msg = f"Backend '{name}' not found. Available: {list(AVAILABLE_BACKENDS.keys())}"
+        msg = (
+            f"Backend '{name}' not found. Available: {list(AVAILABLE_BACKENDS.keys())}"
+        )
         raise ValueError(
             msg,
         )

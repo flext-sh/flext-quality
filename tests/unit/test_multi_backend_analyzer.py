@@ -72,7 +72,10 @@ class TestMultiBackendAnalyzer:
 
     @patch("analyzer.multi_backend_analyzer.get_backend")
     def test_analyze_successful(
-        self, mock_get_backend, project_factory, temp_project_dir,
+        self,
+        mock_get_backend,
+        project_factory,
+        temp_project_dir,
     ) -> None:
         """Test successful analysis with all backends."""
         project = project_factory(path=str(temp_project_dir))
@@ -104,7 +107,10 @@ class TestMultiBackendAnalyzer:
 
     @patch("analyzer.multi_backend_analyzer.get_backend")
     def test_analyze_backend_not_available(
-        self, mock_get_backend, project_factory, temp_project_dir,
+        self,
+        mock_get_backend,
+        project_factory,
+        temp_project_dir,
     ) -> None:
         """Test analysis when backend is not available."""
         project = project_factory(path=str(temp_project_dir))
@@ -131,7 +137,10 @@ class TestMultiBackendAnalyzer:
 
     @patch("analyzer.multi_backend_analyzer.get_backend")
     def test_analyze_backend_failure(
-        self, mock_get_backend, project_factory, temp_project_dir,
+        self,
+        mock_get_backend,
+        project_factory,
+        temp_project_dir,
     ) -> None:
         """Test analysis when backend fails."""
         project = project_factory(path=str(temp_project_dir))
@@ -173,7 +182,10 @@ class TestMultiBackendAnalyzer:
 
     @patch("analyzer.multi_backend_analyzer.get_backend")
     def test_analyze_general_failure(
-        self, mock_get_backend, project_factory, temp_project_dir,
+        self,
+        mock_get_backend,
+        project_factory,
+        temp_project_dir,
     ) -> None:
         """Test analysis when general error occurs."""
         project = project_factory(path=str(temp_project_dir))
@@ -235,7 +247,9 @@ class TestMultiBackendAnalyzer:
         package_objects = analyzer._save_packages(sample_analysis_result)
         file_objects = analyzer._save_files(sample_analysis_result, package_objects)
         class_objects = analyzer._save_classes(
-            sample_analysis_result, file_objects, package_objects,
+            sample_analysis_result,
+            file_objects,
+            package_objects,
         )
 
         assert len(class_objects) == len(sample_analysis_result.classes)
@@ -257,12 +271,17 @@ class TestMultiBackendAnalyzer:
         package_objects = analyzer._save_packages(sample_analysis_result)
         file_objects = analyzer._save_files(sample_analysis_result, package_objects)
         class_objects = analyzer._save_classes(
-            sample_analysis_result, file_objects, package_objects,
+            sample_analysis_result,
+            file_objects,
+            package_objects,
         )
 
         # Save functions
         analyzer._save_functions(
-            sample_analysis_result, file_objects, package_objects, class_objects,
+            sample_analysis_result,
+            file_objects,
+            package_objects,
+            class_objects,
         )
 
         # Verify functions were saved
@@ -279,7 +298,9 @@ class TestMultiBackendAnalyzer:
         assert function.cyclomatic_complexity == 4
         assert function.has_type_hints is True
 
-    def test_save_security_issues(self, project_factory, sample_analysis_result) -> None:
+    def test_save_security_issues(
+        self, project_factory, sample_analysis_result
+    ) -> None:
         """Test saving security issues."""
         project = project_factory()
         analyzer = MultiBackendAnalyzer(project)
@@ -301,7 +322,9 @@ class TestMultiBackendAnalyzer:
         assert issue.severity == "HIGH"
         assert issue.line_number == 32
 
-    def test_save_quality_metrics(self, project_factory, sample_analysis_result) -> None:
+    def test_save_quality_metrics(
+        self, project_factory, sample_analysis_result
+    ) -> None:
         """Test saving quality metrics."""
         project = project_factory()
         analyzer = MultiBackendAnalyzer(project)
@@ -376,7 +399,10 @@ class TestMultiBackendAnalyzer:
         assert result == package_objects["__main__"]
 
     def test_save_detected_issues(
-        self, project_factory, sample_analysis_result, populate_backends,
+        self,
+        project_factory,
+        sample_analysis_result,
+        populate_backends,
     ) -> None:
         """Test saving detected issues with new DetectedIssue model."""
         project = project_factory()
@@ -514,7 +540,8 @@ class TestMultiBackendAnalyzer:
 
         # Verify statistics were saved
         stats = BackendStatistics.objects.filter(
-            session=analyzer.session, backend=backend_model,
+            session=analyzer.session,
+            backend=backend_model,
         )
 
         assert stats.count() == 1

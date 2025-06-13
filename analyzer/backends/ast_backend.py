@@ -90,7 +90,8 @@ class ASTVisitor(ast.NodeVisitor):
         return base_classes
 
     def _analyze_class_decorators(
-        self, node: ast.ClassDef,
+        self,
+        node: ast.ClassDef,
     ) -> tuple[list[str], bool, bool]:
         """Analyze class decorators and special patterns."""
         decorators = [ast.unparse(d) for d in node.decorator_list]
@@ -280,7 +281,10 @@ class ASTVisitor(ast.NodeVisitor):
         self.generic_visit(node)
 
     def _analyze_variable(
-        self, name: str, node: ast.AST, has_annotation: bool = False,
+        self,
+        name: str,
+        node: ast.AST,
+        has_annotation: bool = False,
     ) -> None:
         """Analyze a variable assignment."""
         # Determine variable type and scope

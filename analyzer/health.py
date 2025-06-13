@@ -153,7 +153,8 @@ def readiness_check(request):
     if db_check["status"] == "healthy":
         return JsonResponse({"status": "ready"}, status=200)
     return JsonResponse(
-        {"status": "not ready", "reason": db_check["details"]}, status=503,
+        {"status": "not ready", "reason": db_check["details"]},
+        status=503,
     )
 
 
