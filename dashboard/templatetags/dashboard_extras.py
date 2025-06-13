@@ -1,6 +1,4 @@
-"""
-Custom template filters for the dashboard app.
-"""
+"""Custom template filters for the dashboard app."""
 
 from django import template
 from django.utils.safestring import mark_safe
@@ -95,7 +93,7 @@ def status_badge(status):
 
 
 @register.filter
-def format_duration(duration):
+def format_duration(duration) -> str:
     """Format duration in a human-readable way."""
     if not duration:
         return "N/A"

@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 
 
 @receiver(post_save, sender=AnalysisSession)
-def update_session_timestamps(sender, instance, created, **kwargs):
+def update_session_timestamps(sender, instance, created, **kwargs) -> None:
     """Update session timestamps based on status changes."""
     if not created:  # Only for updates
         if instance.status == "running" and not instance.started_at:
@@ -33,7 +33,7 @@ def update_session_timestamps(sender, instance, created, **kwargs):
 
 
 @receiver(post_save, sender=QualityMetrics)
-def update_session_scores(sender, instance, created, **kwargs):
+def update_session_scores(sender, instance, created, **kwargs) -> None:
     """Update session overall score when quality metrics are saved."""
     if created or instance.session.overall_score != instance.overall_score:
         grade = _calculate_grade(instance.overall_score)
@@ -44,7 +44,7 @@ def update_session_scores(sender, instance, created, **kwargs):
 
 
 @receiver(pre_delete, sender=AnalysisSession)
-def cleanup_analysis_files(sender, instance, **kwargs):
+def cleanup_analysis_files(sender, instance, **kwargs) -> None:
     """Clean up analysis files when session is deleted."""
     # This would clean up any generated files or reports
     logger.info(f"Cleaning up files for analysis session {instance.id}")

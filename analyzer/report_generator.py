@@ -27,7 +27,7 @@ logger = logging.getLogger(__name__)
 class WebReportGenerator:
     """Web-based report generator for analysis results."""
 
-    def __init__(self, session: AnalysisSession):
+    def __init__(self, session: AnalysisSession) -> None:
         self.session = session
         self.flx_project = session.flx_project
 
@@ -49,7 +49,8 @@ class WebReportGenerator:
             elif format == "pdf":
                 final_content = self._render_pdf_template("summary", content)
             else:
-                raise ValueError(f"Unsupported format: {format}")
+                msg = f"Unsupported format: {format}"
+                raise ValueError(msg)
 
             # Save report
             report = AnalysisReport.objects.create(
@@ -80,7 +81,8 @@ class WebReportGenerator:
             elif format == "pdf":
                 final_content = self._render_pdf_template("detailed", content)
             else:
-                raise ValueError(f"Unsupported format: {format}")
+                msg = f"Unsupported format: {format}"
+                raise ValueError(msg)
 
             # Save report
             report = AnalysisReport.objects.create(
@@ -111,7 +113,8 @@ class WebReportGenerator:
             elif format == "pdf":
                 final_content = self._render_pdf_template("security", content)
             else:
-                raise ValueError(f"Unsupported format: {format}")
+                msg = f"Unsupported format: {format}"
+                raise ValueError(msg)
 
             # Save report
             report = AnalysisReport.objects.create(
@@ -279,7 +282,8 @@ class WebReportGenerator:
 
         if not pdf.err:
             return result.getvalue().decode("latin1")  # Store as string
-        raise Exception("PDF generation failed")
+        msg = "PDF generation failed"
+        raise Exception(msg)
 
     def _generate_basic_markdown(
         self,
@@ -296,7 +300,7 @@ class WebReportGenerator:
 
 """
 
-        if "quality_metrics" in content and content["quality_metrics"]:
+        if content.get("quality_metrics"):
             qm = content["quality_metrics"]
             md_content += f"""## Quality Overview
 

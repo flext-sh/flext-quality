@@ -4,10 +4,6 @@ from __future__ import annotations
 
 from datetime import timedelta
 
-from django.db.models import Avg, Count
-from django.http import JsonResponse
-from django.utils import timezone
-
 from analyzer.models import (
     AnalysisSession,
     DeadCodeIssue,
@@ -16,6 +12,9 @@ from analyzer.models import (
     QualityMetrics,
     SecurityIssue,
 )
+from django.db.models import Avg, Count
+from django.http import JsonResponse
+from django.utils import timezone
 
 
 def quality_trends_chart(request):
@@ -463,9 +462,9 @@ def dashboard_summary_stats(_request):
                 "project_name": session.flx_project.name,
                 "session_id": str(session.id),
                 "score": float(session.overall_score or 0),
-                "created_at": session.completed_at.isoformat()
-                if session.completed_at
-                else "",
+                "created_at": (
+                    session.completed_at.isoformat() if session.completed_at else ""
+                ),
             },
         )
 

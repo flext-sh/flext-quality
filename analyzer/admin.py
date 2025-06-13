@@ -77,9 +77,7 @@ class ProjectAdmin(admin.ModelAdmin):
             color = (
                 "green"
                 if latest.overall_score >= 80
-                else "orange"
-                if latest.overall_score >= 60
-                else "red"
+                else "orange" if latest.overall_score >= 60 else "red"
             )
             return format_html(
                 '<span style="color: {}; font-weight: bold;">{:.1f} ({})</span>',
@@ -216,9 +214,7 @@ class AnalysisSessionAdmin(admin.ModelAdmin):
         color = (
             "green"
             if obj.overall_score >= 80
-            else "orange"
-            if obj.overall_score >= 60
-            else "red"
+            else "orange" if obj.overall_score >= 60 else "red"
         )
         return format_html(
             '<span style="color: {}; font-weight: bold;">{:.1f}</span>',

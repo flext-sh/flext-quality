@@ -1,5 +1,4 @@
-"""
-Analysis backends for the code analyzer.
+"""Analysis backends for the code analyzer.
 
 This module provides a pluggable architecture for different code analysis backends.
 Each backend can provide different analysis capabilities.
@@ -26,8 +25,9 @@ DEFAULT_BACKENDS = ["ast", "external", "quality"]
 def get_backend(name: str) -> type[AnalysisBackend]:
     """Get a backend by name."""
     if name not in AVAILABLE_BACKENDS:
+        msg = f"Backend '{name}' not found. Available: {list(AVAILABLE_BACKENDS.keys())}"
         raise ValueError(
-            f"Backend '{name}' not found. Available: {list(AVAILABLE_BACKENDS.keys())}",
+            msg,
         )
     return AVAILABLE_BACKENDS[name]
 
@@ -43,13 +43,13 @@ def get_default_backends() -> list[type[AnalysisBackend]]:
 
 
 __all__ = [
+    "AVAILABLE_BACKENDS",
+    "ASTBackend",
     "AnalysisBackend",
     "AnalysisResult",
-    "ASTBackend",
     "ExternalToolsBackend",
     "QualityBackend",
-    "get_backend",
     "get_all_backends",
+    "get_backend",
     "get_default_backends",
-    "AVAILABLE_BACKENDS",
 ]

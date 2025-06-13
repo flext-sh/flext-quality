@@ -1,35 +1,30 @@
-"""
-Integration tests for the REST API.
-"""
+"""Integration tests for the REST API."""
 
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
 
+from analyzer.models import AnalysisSession, Project
 from django.contrib.auth.models import User
 from django.test import TransactionTestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
-from analyzer.models import AnalysisSession, Project
-
 
 class TestProjectAPI(TransactionTestCase):
     """Test the Project API endpoints."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test client."""
         self.client = APIClient()
-        
+
         # Create test user and authenticate
         self.user = User.objects.create_user(
-            username='testuser',
-            email='test@example.com',
-            password='testpass123'
+            username="testuser", email="test@example.com", password="testpass123",
         )
         self.client.force_authenticate(user=self.user)
-        
+
         self.project = Project.objects.create(
             name="api_test_project",
             path="/tmp/api_test",
@@ -39,7 +34,7 @@ class TestProjectAPI(TransactionTestCase):
             package_type="local",
         )
 
-    def test_list_projects(self):
+    def test_list_projects(self) -> None:
         """Test listing projects."""
         url = reverse("project-list")
         response = self.client.get(url)
@@ -52,13 +47,13 @@ class TestProjectAPI(TransactionTestCase):
 
         # Find our test project
         project_data = next(
-            (p for p in data["results"] if p["name"] == "api_test_project"), None
+            (p for p in data["results"] if p["name"] == "api_test_project"), None,
         )
         assert project_data is not None
         assert project_data["name"] == "api_test_project"
         assert project_data["package_name"] == "api_test"
 
-    def test_create_project(self):
+    def test_create_project(self) -> None:
         """Test creating a project via API."""
         url = reverse("project-list")
         data = {
@@ -79,7 +74,7 @@ class TestProjectAPI(TransactionTestCase):
         assert created_project.path == "/tmp/new_project"
         assert created_project.package_version == "2.0.0"
 
-    def test_get_project_detail(self):
+    def test_get_project_detail(self) -> None:
         """Test getting project details."""
         url = reverse("project-detail", kwargs={"pk": self.project.pk})
         response = self.client.get(url)
@@ -91,7 +86,7 @@ class TestProjectAPI(TransactionTestCase):
         assert data["name"] == "api_test_project"
         assert data["path"] == "/tmp/api_test"
 
-    def test_update_project(self):
+    def test_update_project(self) -> None:
         """Test updating a project."""
         url = reverse("project-detail", kwargs={"pk": self.project.pk})
         data = {
@@ -110,7 +105,7 @@ class TestProjectAPI(TransactionTestCase):
         assert self.project.description == "Updated description"
         assert self.project.package_version == "1.1.0"
 
-    def test_delete_project(self):
+    def test_delete_project(self) -> None:
         """Test deleting a project."""
         project_id = self.project.pk
         url = reverse("project-detail", kwargs={"pk": project_id})
@@ -122,7 +117,7 @@ class TestProjectAPI(TransactionTestCase):
         # Verify deletion
         assert not Project.objects.filter(pk=project_id).exists()
 
-    def test_project_validation(self):
+    def test_project_validation(self) -> None:
         """Test project validation."""
         url = reverse("project-list")
 
@@ -138,7 +133,7 @@ class TestProjectAPI(TransactionTestCase):
         response = self.client.post(url, data, format="json")
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
-    def test_project_analysis_sessions_relationship(self):
+    def test_project_analysis_sessions_relationship(self) -> None:
         """Test that project includes related analysis sessions."""
         # Create a session for the project
         session = AnalysisSession.objects.create(
@@ -162,18 +157,16 @@ class TestProjectAPI(TransactionTestCase):
 class TestAnalysisSessionAPI(TransactionTestCase):
     """Test the AnalysisSession API endpoints."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test data."""
         self.client = APIClient()
-        
+
         # Create test user and authenticate
         self.user = User.objects.create_user(
-            username='testuser',
-            email='test@example.com',
-            password='testpass123'
+            username="testuser", email="test@example.com", password="testpass123",
         )
         self.client.force_authenticate(user=self.user)
-        
+
         self.project = Project.objects.create(
             name="session_test_project",
             path="/tmp/session_test",
@@ -185,7 +178,7 @@ class TestAnalysisSessionAPI(TransactionTestCase):
             quality_grade="B",
         )
 
-    def test_list_sessions(self):
+    def test_list_sessions(self) -> None:
         """Test listing analysis sessions."""
         url = reverse("analysissession-list")
         response = self.client.get(url)
@@ -201,7 +194,7 @@ class TestAnalysisSessionAPI(TransactionTestCase):
         assert session_data["status"] == "completed"
         assert session_data["overall_score"] == 75.0
 
-    def test_create_session(self):
+    def test_create_session(self) -> None:
         """Test creating an analysis session."""
         url = reverse("analysissession-list")
         data = {
@@ -222,7 +215,7 @@ class TestAnalysisSessionAPI(TransactionTestCase):
         assert created_session.include_security is True
         assert created_session.include_dead_code is False
 
-    def test_get_session_detail(self):
+    def test_get_session_detail(self) -> None:
         """Test getting session details."""
         url = reverse("analysissession-detail", kwargs={"pk": self.session.pk})
         response = self.client.get(url)
@@ -235,7 +228,7 @@ class TestAnalysisSessionAPI(TransactionTestCase):
         assert data["overall_score"] == 75.0
         assert data["quality_grade"] == "B"
 
-    def test_update_session(self):
+    def test_update_session(self) -> None:
         """Test updating an analysis session."""
         url = reverse("analysissession-detail", kwargs={"pk": self.session.pk})
         data = {
@@ -252,7 +245,7 @@ class TestAnalysisSessionAPI(TransactionTestCase):
         assert self.session.overall_score == 80.0
         assert self.session.quality_grade == "B+"
 
-    def test_filter_sessions_by_project(self):
+    def test_filter_sessions_by_project(self) -> None:
         """Test filtering sessions by project."""
         # Create another project and session
         other_project = Project.objects.create(
@@ -274,7 +267,7 @@ class TestAnalysisSessionAPI(TransactionTestCase):
         assert len(data["results"]) == 1
         assert data["results"][0]["flx_project"] == self.project.pk
 
-    def test_filter_sessions_by_status(self):
+    def test_filter_sessions_by_status(self) -> None:
         """Test filtering sessions by status."""
         # Create a pending session
         AnalysisSession.objects.create(
@@ -296,15 +289,13 @@ class TestAnalysisSessionAPI(TransactionTestCase):
 class TestAnalysisAPI(TransactionTestCase):
     """Test the analysis execution API."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test data."""
         self.client = APIClient()
-        
+
         # Create test user and authenticate
         self.user = User.objects.create_user(
-            username='testuser',
-            email='test@example.com',
-            password='testpass123'
+            username="testuser", email="test@example.com", password="testpass123",
         )
         self.client.force_authenticate(user=self.user)
 
@@ -327,7 +318,7 @@ class TestClass:
     def method(self):
         """A simple method."""
         return 42
-'''
+''',
             )
 
             # Create project in database
@@ -339,7 +330,7 @@ class TestClass:
 
             yield project
 
-    def test_start_analysis_api(self):
+    def test_start_analysis_api(self) -> None:
         """Test starting analysis via API."""
         with self.create_test_project_with_files() as project:
             url = reverse("project-start-analysis", kwargs={"pk": project.pk})
@@ -364,7 +355,7 @@ class TestClass:
             assert session.include_security is True
             assert session.include_dead_code is True
 
-    def test_analysis_status_api(self):
+    def test_analysis_status_api(self) -> None:
         """Test checking analysis status via API."""
         with self.create_test_project_with_files() as project:
             # Create a session
@@ -383,7 +374,7 @@ class TestClass:
             assert data["session_id"] == session.id
             assert "progress" in data
 
-    def test_analysis_results_api(self):
+    def test_analysis_results_api(self) -> None:
         """Test getting analysis results via API."""
         with self.create_test_project_with_files() as project:
             # Create a completed session
@@ -407,7 +398,7 @@ class TestClass:
             assert "security_issues" in data
             assert "quality_metrics" in data
 
-    def test_invalid_project_analysis(self):
+    def test_invalid_project_analysis(self) -> None:
         """Test starting analysis on non-existent project."""
         url = reverse("project-start-analysis", kwargs={"pk": 99999})
 
@@ -415,7 +406,7 @@ class TestClass:
 
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
-    def test_analysis_with_invalid_backends(self):
+    def test_analysis_with_invalid_backends(self) -> None:
         """Test starting analysis with invalid backends."""
         with self.create_test_project_with_files() as project:
             url = reverse("project-start-analysis", kwargs={"pk": project.pk})
@@ -427,33 +418,31 @@ class TestClass:
 
             # Should handle gracefully - might accept and filter invalid backends
             # or return 400 depending on implementation
-            assert response.status_code in [
+            assert response.status_code in {
                 status.HTTP_400_BAD_REQUEST,
                 status.HTTP_202_ACCEPTED,
-            ]
+            }
 
 
 class TestAPIResponseFormats(TransactionTestCase):
     """Test API response formats and serialization."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test data."""
         self.client = APIClient()
-        
+
         # Create test user and authenticate
         self.user = User.objects.create_user(
-            username='testuser',
-            email='test@example.com',
-            password='testpass123'
+            username="testuser", email="test@example.com", password="testpass123",
         )
         self.client.force_authenticate(user=self.user)
-        
+
         self.project = Project.objects.create(
             name="format_test_project",
             path="/tmp/format_test",
         )
 
-    def test_project_serialization(self):
+    def test_project_serialization(self) -> None:
         """Test project serialization format."""
         url = reverse("project-detail", kwargs={"pk": self.project.pk})
         response = self.client.get(url)
@@ -472,7 +461,7 @@ class TestAPIResponseFormats(TransactionTestCase):
         assert isinstance(data["total_files"], int)
         assert isinstance(data["python_files"], int)
 
-    def test_session_serialization(self):
+    def test_session_serialization(self) -> None:
         """Test session serialization format."""
         session = AnalysisSession.objects.create(
             flx_project=self.project,
@@ -496,7 +485,7 @@ class TestAPIResponseFormats(TransactionTestCase):
         assert isinstance(data["backends_used"], list)
         assert data["backends_used"] == ["ast", "external"]
 
-    def test_pagination_format(self):
+    def test_pagination_format(self) -> None:
         """Test pagination response format."""
         # Create multiple projects (more than PAGE_SIZE=50 to trigger pagination)
         for i in range(55):
@@ -521,7 +510,7 @@ class TestAPIResponseFormats(TransactionTestCase):
         assert isinstance(data["results"], list)
         assert data["count"] > len(data["results"])  # Should be paginated
 
-    def test_api_error_format(self):
+    def test_api_error_format(self) -> None:
         """Test API error response format."""
         # Try to create project with invalid data
         url = reverse("project-list")
@@ -537,7 +526,7 @@ class TestAPIResponseFormats(TransactionTestCase):
             key in data for key in ["detail", "name", "path", "non_field_errors"]
         )
 
-    def test_content_type_headers(self):
+    def test_content_type_headers(self) -> None:
         """Test that API returns correct content-type headers."""
         url = reverse("project-list")
         response = self.client.get(url)
@@ -545,7 +534,7 @@ class TestAPIResponseFormats(TransactionTestCase):
         assert response.status_code == status.HTTP_200_OK
         assert response["Content-Type"].startswith("application/json")
 
-    def test_cors_headers(self):
+    def test_cors_headers(self) -> None:
         """Test CORS headers are present."""
         url = reverse("project-list")
         response = self.client.get(url)

@@ -1,12 +1,8 @@
-"""
-Integration tests for the complete analysis flow.
-"""
+"""Integration tests for the complete analysis flow."""
 
 import tempfile
 from contextlib import contextmanager
 from pathlib import Path
-
-from django.test import TransactionTestCase
 
 from analyzer.models import (
     BackendStatistics,
@@ -16,12 +12,13 @@ from analyzer.models import (
     SecurityIssue,
 )
 from analyzer.multi_backend_analyzer import MultiBackendAnalyzer
+from django.test import TransactionTestCase
 
 
 class TestCompleteAnalysisFlow(TransactionTestCase):
     """Integration tests for the complete analysis workflow."""
 
-    def setUp(self):
+    def setUp(self) -> None:
         """Set up test data."""
         self.project = Project.objects.create(
             name="integration_test_project",
@@ -140,7 +137,7 @@ if __name__ == "__main__":
     function_with_security_issue()
     another_function_with_issue()
     complex_function([{"test": ["data"]}])
-'''
+''',
             )
 
             # Create a package with multiple modules
@@ -155,7 +152,7 @@ from .utils import utility_function
 from .models import DataModel
 
 __all__ = ["utility_function", "DataModel"]
-'''
+''',
             )
 
             (package_dir / "utils.py").write_text(
@@ -205,7 +202,7 @@ def complex_function_duplicate(data):
         else:
             result.append(str(item))
     return result
-'''
+''',
             )
 
             (package_dir / "models.py").write_text(
@@ -251,12 +248,12 @@ class LegacyModel:
 
     def __str__(self) -> str:
         return f"LegacyModel({self.name})"
-'''
+''',
             )
 
             yield project_path
 
-    def test_complete_analysis_workflow(self):
+    def test_complete_analysis_workflow(self) -> None:
         """Test the complete analysis workflow from start to finish."""
         with self.create_test_project():
             # Initialize the analyzer
@@ -268,10 +265,10 @@ class LegacyModel:
             # Verify the session was created and completed
             assert session is not None
             assert session.flx_project == self.project
-            assert session.status in [
+            assert session.status in {
                 "completed",
                 "failed",
-            ]  # May fail if external tools missing
+            }  # May fail if external tools missing
             assert session.files_analyzed > 0
             assert session.created_at is not None
 
@@ -307,7 +304,7 @@ class LegacyModel:
                 assert metrics.total_functions > 0
                 assert metrics.total_classes > 0
 
-    def test_analysis_with_security_issues(self):
+    def test_analysis_with_security_issues(self) -> None:
         """Test that security issues are properly detected and saved."""
         with self.create_test_project():
             analyzer = MultiBackendAnalyzer(self.project, ["ast", "external"])
@@ -324,10 +321,10 @@ class LegacyModel:
                 issue = security_issues.first()
                 assert issue.file_path is not None
                 assert issue.line_number > 0
-                assert issue.severity in ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
+                assert issue.severity in {"LOW", "MEDIUM", "HIGH", "CRITICAL"}
                 assert issue.description is not None
 
-    def test_analysis_error_handling(self):
+    def test_analysis_error_handling(self) -> None:
         """Test analysis error handling with invalid project path."""
         # Set invalid path
         self.project.path = "/nonexistent/invalid/path"
@@ -341,7 +338,7 @@ class LegacyModel:
         assert session.files_analyzed == 0
         assert "No Python files found" in session.error_message
 
-    def test_analysis_with_custom_backends(self):
+    def test_analysis_with_custom_backends(self) -> None:
         """Test analysis with custom backend selection."""
         with self.create_test_project():
             # Run analysis with only AST backend
@@ -357,7 +354,7 @@ class LegacyModel:
             assert backend_stats.count() == 1
             assert backend_stats.first().backend.name == "ast"
 
-    def test_multiple_analysis_sessions(self):
+    def test_multiple_analysis_sessions(self) -> None:
         """Test creating multiple analysis sessions for the same project."""
         with self.create_test_project():
             # Run first analysis
@@ -377,9 +374,9 @@ class LegacyModel:
 
             # Both should be completed
             assert session1.status == "completed"
-            assert session2.status in ["completed", "failed"]
+            assert session2.status in {"completed", "failed"}
 
-    def test_session_timing_calculation(self):
+    def test_session_timing_calculation(self) -> None:
         """Test that session timing is properly calculated."""
         with self.create_test_project():
             analyzer = MultiBackendAnalyzer(self.project, ["ast"])

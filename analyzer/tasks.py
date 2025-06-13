@@ -376,7 +376,7 @@ try:
             flx_project = session.flx_project
 
             logger.info(
-                f"Starting background analysis for session {session_id}, flx_project: {flx_project.name}"
+                f"Starting background analysis for session {session_id}, flx_project: {flx_project.name}",
             )
 
             # Update session status
@@ -435,7 +435,7 @@ try:
             return {"status": "failed", "error": error_msg}
 
         except Exception as e:
-            error_msg = f"Analysis failed for session {session_id}: {str(e)}"
+            error_msg = f"Analysis failed for session {session_id}: {e!s}"
             logger.exception(error_msg)
 
             # Update session status on failure
@@ -465,7 +465,7 @@ try:
 
             logger.info(f"Cleaned up {count} old analysis sessions")
         except Exception as e:
-            error_msg = f"Cleanup failed: {str(e)}"
+            error_msg = f"Cleanup failed: {e!s}"
             logger.exception(error_msg)
             return {"status": "failed", "error": error_msg}
         else:

@@ -1,11 +1,6 @@
-"""
-Unit tests for Django models.
-"""
+"""Unit tests for Django models."""
 
 import pytest
-from django.db import IntegrityError
-from django.utils import timezone
-
 from analyzer.models import (
     AnalysisBackendModel,
     AnalysisSession,
@@ -20,13 +15,15 @@ from analyzer.models import (
     QualityMetrics,
     SecurityIssue,
 )
+from django.db import IntegrityError
+from django.utils import timezone
 
 
 @pytest.mark.django_db
 class TestProject:
     """Test the Project model."""
 
-    def test_create_project(self):
+    def test_create_project(self) -> None:
         """Test creating a project."""
         project = Project.objects.create(
             name="test_project",
@@ -52,19 +49,19 @@ class TestProject:
         assert project.created_at is not None
         assert project.updated_at is not None
 
-    def test_project_str_representation(self):
+    def test_project_str_representation(self) -> None:
         """Test project string representation."""
         project = Project.objects.create(name="test_project", path="/test")
         assert str(project) == "test_project"
 
-    def test_project_unique_name(self):
+    def test_project_unique_name(self) -> None:
         """Test that project names must be unique."""
         Project.objects.create(name="duplicate", path="/test1")
 
         with pytest.raises(IntegrityError):
             Project.objects.create(name="duplicate", path="/test2")
 
-    def test_project_package_type_choices(self):
+    def test_project_package_type_choices(self) -> None:
         """Test package type choices."""
         valid_types = ["source", "wheel", "system", "local"]
 
@@ -80,7 +77,7 @@ class TestProject:
 class TestAnalysisSession:
     """Test the AnalysisSession model."""
 
-    def test_create_session(self, project_factory):
+    def test_create_session(self, project_factory) -> None:
         """Test creating an analysis session."""
         project = project_factory()
 
@@ -105,7 +102,7 @@ class TestAnalysisSession:
         assert session.quality_grade == "B+"
         assert session.created_at is not None
 
-    def test_session_status_choices(self, project_factory):
+    def test_session_status_choices(self, project_factory) -> None:
         """Test session status choices."""
         project = project_factory()
         valid_statuses = ["pending", "running", "completed", "failed"]
@@ -117,7 +114,7 @@ class TestAnalysisSession:
             )
             assert session.status == status
 
-    def test_session_grade_choices(self, project_factory):
+    def test_session_grade_choices(self, project_factory) -> None:
         """Test session grade choices."""
         project = project_factory()
         valid_grades = [
@@ -142,7 +139,7 @@ class TestAnalysisSession:
             )
             assert session.quality_grade == grade
 
-    def test_session_duration_property(self, project_factory):
+    def test_session_duration_property(self, project_factory) -> None:
         """Test session duration calculation."""
         project = project_factory()
 
@@ -161,7 +158,7 @@ class TestAnalysisSession:
         )
         assert session.duration == timezone.timedelta(seconds=120)
 
-    def test_session_backends_used_json_field(self, project_factory):
+    def test_session_backends_used_json_field(self, project_factory) -> None:
         """Test backends_used JSON field."""
         project = project_factory()
 
@@ -173,7 +170,7 @@ class TestAnalysisSession:
 
         assert session.backends_used == backends
 
-    def test_session_cascade_delete(self):
+    def test_session_cascade_delete(self) -> None:
         """Test that sessions are deleted when project is deleted."""
         project = Project.objects.create(name="test_project", path="/test")
         session = AnalysisSession.objects.create(flx_project=project)
@@ -190,7 +187,7 @@ class TestAnalysisSession:
 class TestAnalysisBackendModel:
     """Test the AnalysisBackendModel."""
 
-    def test_create_backend(self):
+    def test_create_backend(self) -> None:
         """Test creating a backend model."""
         backend = AnalysisBackendModel.objects.create(
             name="test_backend",
@@ -214,14 +211,14 @@ class TestAnalysisBackendModel:
         assert backend.execution_order == 10
         assert backend.capabilities == ["test_analysis"]
 
-    def test_backend_unique_name(self):
+    def test_backend_unique_name(self) -> None:
         """Test that backend names must be unique."""
         AnalysisBackendModel.objects.create(name="duplicate", display_name="First")
 
         with pytest.raises(IntegrityError):
             AnalysisBackendModel.objects.create(name="duplicate", display_name="Second")
 
-    def test_backend_str_representation(self):
+    def test_backend_str_representation(self) -> None:
         """Test backend string representation."""
         backend = AnalysisBackendModel.objects.create(
             name="test",
@@ -233,7 +230,7 @@ class TestAnalysisBackendModel:
 class TestIssueType:
     """Test the IssueType model."""
 
-    def test_create_issue_type(self, populate_backends):
+    def test_create_issue_type(self, populate_backends) -> None:
         """Test creating an issue type."""
         backend = AnalysisBackendModel.objects.get(name="ast")
 
@@ -253,7 +250,7 @@ class TestIssueType:
         assert issue_type.category == "testing"
         assert issue_type.severity == "MEDIUM"
 
-    def test_issue_type_unique_constraint(self, populate_backends):
+    def test_issue_type_unique_constraint(self, populate_backends) -> None:
         """Test that backend+code combination must be unique."""
         backend = AnalysisBackendModel.objects.get(name="ast")
 
@@ -262,7 +259,7 @@ class TestIssueType:
         with pytest.raises(IntegrityError):
             IssueType.objects.create(backend=backend, code="DUP001", name="Second")
 
-    def test_issue_type_severity_choices(self, populate_backends):
+    def test_issue_type_severity_choices(self, populate_backends) -> None:
         """Test issue type severity choices."""
         backend = AnalysisBackendModel.objects.get(name="ast")
         valid_severities = ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
@@ -280,7 +277,7 @@ class TestIssueType:
 class TestFileAnalysis:
     """Test the FileAnalysis model."""
 
-    def test_create_file_analysis(self, session_factory):
+    def test_create_file_analysis(self, session_factory) -> None:
         """Test creating a file analysis."""
         session = session_factory()
 
@@ -304,7 +301,7 @@ class TestFileAnalysis:
         assert file_analysis.complexity_score == 75.5
         assert file_analysis.function_count == 5
 
-    def test_file_analysis_str_representation(self, session_factory):
+    def test_file_analysis_str_representation(self, session_factory) -> None:
         """Test file analysis string representation."""
         session = session_factory()
         file_analysis = FileAnalysis.objects.create(
@@ -325,7 +322,7 @@ class TestFileAnalysis:
 class TestSecurityIssue:
     """Test the SecurityIssue model."""
 
-    def test_create_security_issue(self, session_factory):
+    def test_create_security_issue(self, session_factory) -> None:
         """Test creating a security issue."""
         session = session_factory()
 
@@ -350,7 +347,7 @@ class TestSecurityIssue:
         assert issue.confidence == "HIGH"
         assert issue.is_resolved is False
 
-    def test_security_issue_severity_choices(self, session_factory):
+    def test_security_issue_severity_choices(self, session_factory) -> None:
         """Test security issue severity choices."""
         session = session_factory()
         valid_severities = ["LOW", "MEDIUM", "HIGH", "CRITICAL"]
@@ -369,7 +366,7 @@ class TestSecurityIssue:
             )
             assert issue.severity == severity
 
-    def test_security_issue_resolution(self, session_factory):
+    def test_security_issue_resolution(self, session_factory) -> None:
         """Test security issue resolution."""
         session = session_factory()
         issue = SecurityIssue.objects.create(
@@ -401,7 +398,7 @@ class TestSecurityIssue:
 class TestQualityMetrics:
     """Test the QualityMetrics model."""
 
-    def test_create_quality_metrics(self, session_factory):
+    def test_create_quality_metrics(self, session_factory) -> None:
         """Test creating quality metrics."""
         session = session_factory()
 
@@ -436,7 +433,7 @@ class TestQualityMetrics:
         assert metrics.avg_complexity == 3.5
         assert metrics.docstring_coverage == 0.6
 
-    def test_quality_metrics_one_per_session(self, session_factory):
+    def test_quality_metrics_one_per_session(self, session_factory) -> None:
         """Test that only one QualityMetrics per session is allowed."""
         session = session_factory()
 
@@ -495,7 +492,7 @@ class TestQualityMetrics:
 class TestPackageAnalysis:
     """Test the PackageAnalysis model."""
 
-    def test_create_package_analysis(self, session_factory):
+    def test_create_package_analysis(self, session_factory) -> None:
         """Test creating a package analysis."""
         session = session_factory()
 
@@ -519,7 +516,7 @@ class TestPackageAnalysis:
         assert package.avg_complexity == 4.5
         assert package.total_functions == 20
 
-    def test_package_analysis_str_representation(self, session_factory):
+    def test_package_analysis_str_representation(self, session_factory) -> None:
         """Test package analysis string representation."""
         session = session_factory()
         package = PackageAnalysis.objects.create(
@@ -532,7 +529,7 @@ class TestPackageAnalysis:
 class TestClassAnalysis:
     """Test the ClassAnalysis model."""
 
-    def test_create_class_analysis(self, session_factory):
+    def test_create_class_analysis(self, session_factory) -> None:
         """Test creating a class analysis."""
         session = session_factory()
         file_analysis = FileAnalysis.objects.create(
@@ -574,7 +571,7 @@ class TestClassAnalysis:
 class TestFunctionAnalysis:
     """Test the FunctionAnalysis model."""
 
-    def test_create_function_analysis(self, session_factory):
+    def test_create_function_analysis(self, session_factory) -> None:
         """Test creating a function analysis."""
         session = session_factory()
         file_analysis = FileAnalysis.objects.create(
@@ -613,7 +610,7 @@ class TestFunctionAnalysis:
         assert function.cyclomatic_complexity == 2
         assert function.has_type_hints is True
 
-    def test_function_type_choices(self, session_factory):
+    def test_function_type_choices(self, session_factory) -> None:
         """Test function type choices."""
         session = session_factory()
         file_analysis = FileAnalysis.objects.create(
@@ -647,7 +644,7 @@ class TestFunctionAnalysis:
 class TestDetectedIssue:
     """Test the DetectedIssue model."""
 
-    def test_create_detected_issue(self, session_factory, populate_backends):
+    def test_create_detected_issue(self, session_factory, populate_backends) -> None:
         """Test creating a detected issue."""
         session = session_factory()
         backend = AnalysisBackendModel.objects.get(name="ast")
@@ -678,7 +675,7 @@ class TestDetectedIssue:
         assert detected_issue.confidence == "HIGH"
         assert detected_issue.context == {"extra": "data"}
 
-    def test_detected_issue_properties(self, session_factory, populate_backends):
+    def test_detected_issue_properties(self, session_factory, populate_backends) -> None:
         """Test detected issue computed properties."""
         session = session_factory()
         backend = AnalysisBackendModel.objects.get(name="external")
@@ -707,7 +704,7 @@ class TestDetectedIssue:
 class TestBackendStatistics:
     """Test the BackendStatistics model."""
 
-    def test_create_backend_statistics(self, session_factory, populate_backends):
+    def test_create_backend_statistics(self, session_factory, populate_backends) -> None:
         """Test creating backend statistics."""
         session = session_factory()
         backend = AnalysisBackendModel.objects.get(name="ast")
@@ -731,8 +728,8 @@ class TestBackendStatistics:
         assert stats.issues_by_severity == {"HIGH": 2, "MEDIUM": 3}
 
     def test_backend_statistics_status_choices(
-        self, session_factory, populate_backends
-    ):
+        self, session_factory, populate_backends,
+    ) -> None:
         """Test backend statistics status choices."""
         backend = AnalysisBackendModel.objects.get(name="ast")
         valid_statuses = ["success", "failed", "skipped"]

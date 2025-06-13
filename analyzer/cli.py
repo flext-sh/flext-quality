@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
-"""
-Command-line interface for dc-code-analyzer.
-"""
+"""Command-line interface for dc-code-analyzer."""
 
 import sys
 from pathlib import Path
@@ -9,9 +7,6 @@ from pathlib import Path
 
 def main() -> None:
     """Main CLI entry point."""
-    print("DC Code Analyzer CLI")
-    print("Starting Django management commands...")
-
     # Add the current directory to Python path
     current_dir = Path(__file__).parent.parent
     sys.path.insert(0, str(current_dir))
@@ -24,10 +19,13 @@ def main() -> None:
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
-        raise ImportError(
+        msg = (
             "Couldn't import Django. Are you sure it's installed and "
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
+        )
+        raise ImportError(
+            msg,
         ) from exc
 
     execute_from_command_line(sys.argv)

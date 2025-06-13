@@ -125,8 +125,8 @@ class QualityMetricsSerializer(serializers.ModelSerializer):
 class AnalysisSessionSerializer(serializers.ModelSerializer):
     """Serializer for AnalysisSession model."""
 
-    flx_project = serializers.IntegerField(source='flx_project.id', read_only=True)
-    project_detail = ProjectSerializer(source='flx_project', read_only=True)
+    flx_project = serializers.IntegerField(source="flx_project.id", read_only=True)
+    project_detail = ProjectSerializer(source="flx_project", read_only=True)
     quality_metrics = QualityMetricsSerializer(read_only=True)
     duration = serializers.ReadOnlyField()
 
@@ -216,7 +216,7 @@ class CreateAnalysisSessionSerializer(serializers.ModelSerializer):
             return super().create(validated_data)  # type: ignore[no-any-return]
         except Project.DoesNotExist as e:
             raise serializers.ValidationError(
-                {"flx_project": "Project not found"}
+                {"flx_project": "Project not found"},
             ) from e
 
 
@@ -224,7 +224,7 @@ class FileAnalysisSerializer(serializers.ModelSerializer):
     """Serializer for FileAnalysis model."""
 
     session: serializers.StringRelatedField = serializers.StringRelatedField(
-        read_only=True
+        read_only=True,
     )
     security_issues_count = serializers.SerializerMethodField()
     dead_code_issues_count = serializers.SerializerMethodField()
@@ -269,10 +269,10 @@ class SecurityIssueSerializer(serializers.ModelSerializer):
     """Serializer for SecurityIssue model."""
 
     session: serializers.StringRelatedField = serializers.StringRelatedField(
-        read_only=True
+        read_only=True,
     )
     file_analysis: serializers.StringRelatedField = serializers.StringRelatedField(
-        read_only=True
+        read_only=True,
     )
 
     class Meta:
@@ -302,10 +302,10 @@ class DeadCodeIssueSerializer(serializers.ModelSerializer):
     """Serializer for DeadCodeIssue model."""
 
     session: serializers.StringRelatedField = serializers.StringRelatedField(
-        read_only=True
+        read_only=True,
     )
     file_analysis: serializers.StringRelatedField = serializers.StringRelatedField(
-        read_only=True
+        read_only=True,
     )
 
     class Meta:
@@ -331,7 +331,7 @@ class DuplicateLocationSerializer(serializers.ModelSerializer):
     """Serializer for DuplicateLocation model."""
 
     file_analysis: serializers.StringRelatedField = serializers.StringRelatedField(
-        read_only=True
+        read_only=True,
     )
 
     class Meta:
@@ -352,7 +352,7 @@ class DuplicateCodeBlockSerializer(serializers.ModelSerializer):
     """Serializer for DuplicateCodeBlock model."""
 
     session: serializers.StringRelatedField = serializers.StringRelatedField(
-        read_only=True
+        read_only=True,
     )
     locations = DuplicateLocationSerializer(many=True, read_only=True)
     locations_count = serializers.SerializerMethodField()

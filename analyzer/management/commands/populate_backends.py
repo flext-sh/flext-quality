@@ -1,6 +1,4 @@
-"""
-Django management command to populate backend and issue type data.
-"""
+"""Django management command to populate backend and issue type data."""
 
 from django.core.management.base import BaseCommand
 from django.utils import timezone
@@ -11,14 +9,14 @@ from analyzer.models import AnalysisBackendModel, IssueType
 class Command(BaseCommand):
     help = "Populate backend and issue type data automatically"
 
-    def add_arguments(self, parser):
+    def add_arguments(self, parser) -> None:
         parser.add_argument(
             "--force",
             action="store_true",
             help="Force update existing data",
         )
 
-    def handle(self, *_args, **options):
+    def handle(self, *_args, **options) -> None:
         self.stdout.write(
             self.style.SUCCESS("🚀 Populating backend and issue type data..."),
         )
@@ -32,10 +30,12 @@ class Command(BaseCommand):
         self._create_issue_types(force_update)
 
         self.stdout.write(
-            self.style.SUCCESS("✅ Backend and issue type data populated successfully!"),
+            self.style.SUCCESS(
+                "✅ Backend and issue type data populated successfully!",
+            ),
         )
 
-    def _create_backends(self, force_update):
+    def _create_backends(self, force_update) -> None:
         """Create or update backend definitions."""
         backends_data = [
             {
@@ -97,9 +97,8 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(f"  ℹ️  Backend exists: {backend.display_name}")
 
-    def _create_issue_types(self, force_update):
+    def _create_issue_types(self, force_update) -> None:
         """Create or update issue type definitions."""
-
         # Get backend objects
         try:
             ast_backend = AnalysisBackendModel.objects.get(name="ast")

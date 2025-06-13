@@ -78,7 +78,7 @@ class Migration(migrations.Migration):
                 (
                     "backends_used",
                     models.JSONField(
-                        default=list, help_text="List of analysis backends used"
+                        default=list, help_text="List of analysis backends used",
                     ),
                 ),
                 ("overall_score", models.FloatField(blank=True, null=True)),
@@ -566,7 +566,7 @@ class Migration(migrations.Migration):
                 (
                     "path",
                     models.CharField(
-                        help_text="Path to the flx_project directory", max_length=500
+                        help_text="Path to the flx_project directory", max_length=500,
                     ),
                 ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
@@ -606,10 +606,10 @@ class Migration(migrations.Migration):
                 "db_table": "analyzer_project",
                 "indexes": [
                     models.Index(
-                        fields=["created_at"], name="analyzer_pr_created_482c88_idx"
+                        fields=["created_at"], name="analyzer_pr_created_482c88_idx",
                     ),
                     models.Index(
-                        fields=["package_name"], name="analyzer_pr_package_9e3f34_idx"
+                        fields=["package_name"], name="analyzer_pr_package_9e3f34_idx",
                     ),
                 ],
             },
@@ -869,7 +869,7 @@ class Migration(migrations.Migration):
                 (
                     "size_estimate",
                     models.IntegerField(
-                        help_text="Lines of code that could be removed"
+                        help_text="Lines of code that could be removed",
                     ),
                 ),
                 ("is_fixed", models.BooleanField(default=False)),
@@ -1034,25 +1034,25 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name="analysisbackendmodel",
             index=models.Index(
-                fields=["execution_order"], name="analyzer_ba_executi_1625fb_idx"
+                fields=["execution_order"], name="analyzer_ba_executi_1625fb_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="variableanalysis",
             index=models.Index(
-                fields=["variable_type"], name="analyzer_va_variabl_e244a4_idx"
+                fields=["variable_type"], name="analyzer_va_variabl_e244a4_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="variableanalysis",
             index=models.Index(
-                fields=["is_unused"], name="analyzer_va_is_unus_47c6b7_idx"
+                fields=["is_unused"], name="analyzer_va_is_unus_47c6b7_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="variableanalysis",
             index=models.Index(
-                fields=["is_constant"], name="analyzer_va_is_cons_3419eb_idx"
+                fields=["is_constant"], name="analyzer_va_is_cons_3419eb_idx",
             ),
         ),
         migrations.AlterUniqueTogether(
@@ -1062,25 +1062,25 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name="securityissue",
             index=models.Index(
-                fields=["session", "severity"], name="analyzer_se_session_620766_idx"
+                fields=["session", "severity"], name="analyzer_se_session_620766_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="securityissue",
             index=models.Index(
-                fields=["file_path"], name="analyzer_se_file_pa_595eed_idx"
+                fields=["file_path"], name="analyzer_se_file_pa_595eed_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="packageanalysis",
             index=models.Index(
-                fields=["session", "name"], name="analyzer_pa_session_bc0f9e_idx"
+                fields=["session", "name"], name="analyzer_pa_session_bc0f9e_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="packageanalysis",
             index=models.Index(
-                fields=["maintainability_score"], name="analyzer_pa_maintai_0ee9d4_idx"
+                fields=["maintainability_score"], name="analyzer_pa_maintai_0ee9d4_idx",
             ),
         ),
         migrations.AlterUniqueTogether(
@@ -1090,19 +1090,19 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name="issuetype",
             index=models.Index(
-                fields=["backend", "category"], name="analyzer_is_backend_5ac653_idx"
+                fields=["backend", "category"], name="analyzer_is_backend_5ac653_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="issuetype",
             index=models.Index(
-                fields=["severity", "category"], name="analyzer_is_severit_9a2cc7_idx"
+                fields=["severity", "category"], name="analyzer_is_severit_9a2cc7_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="issuetype",
             index=models.Index(
-                fields=["is_active"], name="analyzer_is_is_acti_42aa7d_idx"
+                fields=["is_active"], name="analyzer_is_is_acti_42aa7d_idx",
             ),
         ),
         migrations.AlterUniqueTogether(
@@ -1112,49 +1112,49 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name="importanalysis",
             index=models.Index(
-                fields=["import_type"], name="analyzer_im_import__96cda9_idx"
+                fields=["import_type"], name="analyzer_im_import__96cda9_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="importanalysis",
             index=models.Index(
-                fields=["is_unused"], name="analyzer_im_is_unus_64af73_idx"
+                fields=["is_unused"], name="analyzer_im_is_unus_64af73_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="importanalysis",
             index=models.Index(
-                fields=["is_circular"], name="analyzer_im_is_circ_b45ca2_idx"
+                fields=["is_circular"], name="analyzer_im_is_circ_b45ca2_idx",
             ),
         ),
         migrations.AlterUniqueTogether(
             name="importanalysis",
             unique_together={
-                ("file_analysis", "module_name", "import_name", "line_number")
+                ("file_analysis", "module_name", "import_name", "line_number"),
             },
         ),
         migrations.AddIndex(
             model_name="functionanalysis",
             index=models.Index(
-                fields=["file_analysis", "name"], name="analyzer_fu_file_an_344695_idx"
+                fields=["file_analysis", "name"], name="analyzer_fu_file_an_344695_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="functionanalysis",
             index=models.Index(
-                fields=["function_type"], name="analyzer_fu_functio_d7711f_idx"
+                fields=["function_type"], name="analyzer_fu_functio_d7711f_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="functionanalysis",
             index=models.Index(
-                fields=["cyclomatic_complexity"], name="analyzer_fu_cycloma_683dc7_idx"
+                fields=["cyclomatic_complexity"], name="analyzer_fu_cycloma_683dc7_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="functionanalysis",
             index=models.Index(
-                fields=["complexity_level"], name="analyzer_fu_complex_623a29_idx"
+                fields=["complexity_level"], name="analyzer_fu_complex_623a29_idx",
             ),
         ),
         migrations.AlterUniqueTogether(
@@ -1164,13 +1164,13 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name="fileanalysis",
             index=models.Index(
-                fields=["session", "file_path"], name="analyzer_fi_session_46f47f_idx"
+                fields=["session", "file_path"], name="analyzer_fi_session_46f47f_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="fileanalysis",
             index=models.Index(
-                fields=["complexity_score"], name="analyzer_fi_complex_ab2698_idx"
+                fields=["complexity_score"], name="analyzer_fi_complex_ab2698_idx",
             ),
         ),
         migrations.AddIndex(
@@ -1190,7 +1190,7 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name="detectedissue",
             index=models.Index(
-                fields=["session", "issue_type"], name="analyzer_de_session_171259_idx"
+                fields=["session", "issue_type"], name="analyzer_de_session_171259_idx",
             ),
         ),
         migrations.AddIndex(
@@ -1210,37 +1210,37 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name="detectedissue",
             index=models.Index(
-                fields=["detected_at"], name="analyzer_de_detecte_7830f7_idx"
+                fields=["detected_at"], name="analyzer_de_detecte_7830f7_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="deadcodeissue",
             index=models.Index(
-                fields=["session", "dead_type"], name="analyzer_de_session_67b449_idx"
+                fields=["session", "dead_type"], name="analyzer_de_session_67b449_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="deadcodeissue",
             index=models.Index(
-                fields=["file_path"], name="analyzer_de_file_pa_c0cacc_idx"
+                fields=["file_path"], name="analyzer_de_file_pa_c0cacc_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="classanalysis",
             index=models.Index(
-                fields=["file_analysis", "name"], name="analyzer_cl_file_an_bc1910_idx"
+                fields=["file_analysis", "name"], name="analyzer_cl_file_an_bc1910_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="classanalysis",
             index=models.Index(
-                fields=["complexity_score"], name="analyzer_cl_complex_a9c599_idx"
+                fields=["complexity_score"], name="analyzer_cl_complex_a9c599_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="classanalysis",
             index=models.Index(
-                fields=["method_count"], name="analyzer_cl_method__957b69_idx"
+                fields=["method_count"], name="analyzer_cl_method__957b69_idx",
             ),
         ),
         migrations.AlterUniqueTogether(
@@ -1250,13 +1250,13 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name="backendstatistics",
             index=models.Index(
-                fields=["session", "status"], name="analyzer_ba_session_a85e9a_idx"
+                fields=["session", "status"], name="analyzer_ba_session_a85e9a_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="backendstatistics",
             index=models.Index(
-                fields=["backend", "created_at"], name="analyzer_ba_backend_d1fa05_idx"
+                fields=["backend", "created_at"], name="analyzer_ba_backend_d1fa05_idx",
             ),
         ),
         migrations.AlterUniqueTogether(
@@ -1270,19 +1270,19 @@ class Migration(migrations.Migration):
         migrations.AddIndex(
             model_name="analysissession",
             index=models.Index(
-                fields=["created_at"], name="analyzer_an_created_253686_idx"
+                fields=["created_at"], name="analyzer_an_created_253686_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="analysisreport",
             index=models.Index(
-                fields=["session", "report_type"], name="analyzer_an_session_9fb349_idx"
+                fields=["session", "report_type"], name="analyzer_an_session_9fb349_idx",
             ),
         ),
         migrations.AddIndex(
             model_name="analysisreport",
             index=models.Index(
-                fields=["created_at"], name="analyzer_an_created_aee3bf_idx"
+                fields=["created_at"], name="analyzer_an_created_aee3bf_idx",
             ),
         ),
     ]
