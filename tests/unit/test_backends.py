@@ -435,7 +435,9 @@ class TestBackendIntegration:
     """Integration tests for backends working together."""
 
     def test_all_backends_analyze_same_files(
-        self, temp_project_dir, sample_python_files,
+        self,
+        temp_project_dir,
+        sample_python_files,
     ) -> None:
         """Test that all backends can analyze the same set of files."""
         session = Mock()
@@ -450,7 +452,9 @@ class TestBackendIntegration:
             assert isinstance(result, AnalysisResult)
 
     def test_backends_produce_mergeable_results(
-        self, temp_project_dir, sample_python_files,
+        self,
+        temp_project_dir,
+        sample_python_files,
     ) -> None:
         """Test that backend results can be merged together."""
         session = Mock()

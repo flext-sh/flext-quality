@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 from django.contrib import admin
 from django.utils.html import format_html
 
@@ -30,7 +32,7 @@ from .models import (
 class ProjectAdmin(admin.ModelAdmin):
     """Admin interface for Project model."""
 
-    list_display = [
+    list_display: ClassVar[list[str]] = [
         "name",
         "package_name",
         "package_version",
@@ -41,10 +43,10 @@ class ProjectAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at",
     ]
-    list_filter = ["package_type", "is_installed_package", "created_at", "updated_at"]
-    search_fields = ["name", "description", "path", "package_name"]
-    readonly_fields = ["created_at", "updated_at"]
-    ordering = ["-updated_at"]
+    list_filter: ClassVar[list[str]] = ["package_type", "is_installed_package", "created_at", "updated_at"]
+    search_fields: ClassVar[list[str]] = ["name", "description", "path", "package_name"]
+    readonly_fields: ClassVar[list[str]] = ["created_at", "updated_at"]
+    ordering: ClassVar[list[str]] = ["-updated_at"]
 
     fieldsets = (
         (

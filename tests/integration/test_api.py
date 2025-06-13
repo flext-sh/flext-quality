@@ -21,7 +21,9 @@ class TestProjectAPI(TransactionTestCase):
 
         # Create test user and authenticate
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123",
+            username="testuser",
+            email="test@example.com",
+            password="testpass123",
         )
         self.client.force_authenticate(user=self.user)
 
@@ -47,7 +49,8 @@ class TestProjectAPI(TransactionTestCase):
 
         # Find our test project
         project_data = next(
-            (p for p in data["results"] if p["name"] == "api_test_project"), None,
+            (p for p in data["results"] if p["name"] == "api_test_project"),
+            None,
         )
         assert project_data is not None
         assert project_data["name"] == "api_test_project"
@@ -163,7 +166,9 @@ class TestAnalysisSessionAPI(TransactionTestCase):
 
         # Create test user and authenticate
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123",
+            username="testuser",
+            email="test@example.com",
+            password="testpass123",
         )
         self.client.force_authenticate(user=self.user)
 
@@ -295,7 +300,9 @@ class TestAnalysisAPI(TransactionTestCase):
 
         # Create test user and authenticate
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123",
+            username="testuser",
+            email="test@example.com",
+            password="testpass123",
         )
         self.client.force_authenticate(user=self.user)
 
@@ -433,7 +440,9 @@ class TestAPIResponseFormats(TransactionTestCase):
 
         # Create test user and authenticate
         self.user = User.objects.create_user(
-            username="testuser", email="test@example.com", password="testpass123",
+            username="testuser",
+            email="test@example.com",
+            password="testpass123",
         )
         self.client.force_authenticate(user=self.user)
 

@@ -675,7 +675,9 @@ class TestDetectedIssue:
         assert detected_issue.confidence == "HIGH"
         assert detected_issue.context == {"extra": "data"}
 
-    def test_detected_issue_properties(self, session_factory, populate_backends) -> None:
+    def test_detected_issue_properties(
+        self, session_factory, populate_backends
+    ) -> None:
         """Test detected issue computed properties."""
         session = session_factory()
         backend = AnalysisBackendModel.objects.get(name="external")
@@ -704,7 +706,9 @@ class TestDetectedIssue:
 class TestBackendStatistics:
     """Test the BackendStatistics model."""
 
-    def test_create_backend_statistics(self, session_factory, populate_backends) -> None:
+    def test_create_backend_statistics(
+        self, session_factory, populate_backends
+    ) -> None:
         """Test creating backend statistics."""
         session = session_factory()
         backend = AnalysisBackendModel.objects.get(name="ast")
@@ -728,7 +732,9 @@ class TestBackendStatistics:
         assert stats.issues_by_severity == {"HIGH": 2, "MEDIUM": 3}
 
     def test_backend_statistics_status_choices(
-        self, session_factory, populate_backends,
+        self,
+        session_factory,
+        populate_backends,
     ) -> None:
         """Test backend statistics status choices."""
         backend = AnalysisBackendModel.objects.get(name="ast")

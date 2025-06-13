@@ -236,7 +236,8 @@ def start_analysis(request: HttpRequest, project_id: str) -> HttpResponse:
                 from analyzer.multi_backend_analyzer import MultiBackendAnalyzer
 
                 analyzer = MultiBackendAnalyzer(
-                    flx_project, ["ast", "external", "quality"],
+                    flx_project,
+                    ["ast", "external", "quality"],
                 )
                 session = analyzer.analyze()
 
