@@ -39,7 +39,7 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.13"
+python = "^3.9,<4.0"
 Django = "^4.2.0"
 djangorestframework = "^3.14.0"
 django-cors-headers = "^4.0.0"
@@ -142,10 +142,40 @@ skip = ["__pycache__", ".venv", "build", "dist"]
 target-version = "py313"
 line-length = 88
 src = ["src", "tests"]
-exclude = [".git", "__pycache__", ".mypy_cache", ".pytest_cache", ".ruff_cache", ".venv", "venv", "build", "dist", "htmlcov"]
+exclude = [
+    ".git",
+    "__pycache__",
+    ".mypy_cache",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    "venv",
+    "build",
+    "dist",
+    "htmlcov",
+]
 
 [tool.ruff.lint]
-select = ["E", "W", "F", "I", "UP", "N", "B", "C4", "DTZ", "T20", "ISC", "PIE", "PT", "RET", "SIM", "ARG", "PL", "RUF"]
+select = [
+    "E",
+    "W",
+    "F",
+    "I",
+    "UP",
+    "N",
+    "B",
+    "C4",
+    "DTZ",
+    "T20",
+    "ISC",
+    "PIE",
+    "PT",
+    "RET",
+    "SIM",
+    "ARG",
+    "PL",
+    "RUF",
+]
 ignore = ["E501", "PLR0913", "PLR2004"]
 
 [tool.ruff.lint.per-file-ignores]
@@ -175,16 +205,47 @@ django_settings_module = "code_analyzer_web.settings"
 
 [tool.pytest.ini_options]
 minversion = "8.0"
-addopts = ["-ra", "--strict-markers", "--strict-config", "--cov-fail-under=85", "--cov-report=term-missing:skip-covered", "--cov-report=html:reports/coverage", "--cov-report=xml:reports/coverage.xml"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--cov-fail-under=85",
+    "--cov-report=term-missing:skip-covered",
+    "--cov-report=html:reports/coverage",
+    "--cov-report=xml:reports/coverage.xml",
+]
 testpaths = ["tests"]
-markers = ["unit: Unit tests", "integration: Integration tests", "e2e: End-to-end tests", "slow: Slow tests"]
+markers = [
+    "unit: Unit tests",
+    "integration: Integration tests",
+    "e2e: End-to-end tests",
+    "slow: Slow tests",
+]
 
 [tool.coverage.run]
 source = ["src"]
-omit = ["*/tests/*", "*/__init__.py", "*/migrations/*", "*/__pycache__/*", "*/venv/*", "*/.venv/*"]
+omit = [
+    "*/tests/*",
+    "*/__init__.py",
+    "*/migrations/*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/.venv/*",
+]
 
 [tool.coverage.report]
-exclude_lines = ["pragma: no cover", "def __repr__", "if self.debug:", "if settings.DEBUG", "raise AssertionError", "raise NotImplementedError", "if 0:", "if __name__ == .__main__.:", "class .*\\bProtocol\\):", "@(abc\\.)?abstractmethod"]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
 
 [tool.bandit]
 exclude_dirs = ["tests", "docs", "examples"]
