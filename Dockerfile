@@ -62,8 +62,8 @@ WORKDIR /app
 COPY --chown=appuser:appuser . .
 
 # Create necessary directories
-RUN mkdir -p /app/logs /app/media /app/staticfiles /app/analysis_outputs && \
-    chown -R appuser:appuser /app
+RUN mkdir -p /app/logs /app/media /app/staticfiles /app/analysis_outputs \
+    && chown -R appuser:appuser /app
 
 # Collect static files
 RUN python manage.py collectstatic --noinput

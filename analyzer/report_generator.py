@@ -293,8 +293,8 @@ class WebReportGenerator:
         """Generate basic Markdown when template is not available."""
         md_content = f"""# {report_type.title()} Report
 
-**Project:** {content.get('project_name', 'Unknown')}
-**Generated:** {content.get('generated_at', timezone.now()).strftime('%Y-%m-%d %H:%M:%S')}
+**Project:** {content.get("project_name", "Unknown")}
+**Generated:** {content.get("generated_at", timezone.now()).strftime("%Y-%m-%d %H:%M:%S")}
 
 ---
 
@@ -304,7 +304,7 @@ class WebReportGenerator:
             qm = content["quality_metrics"]
             md_content += f"""## Quality Overview
 
-- **Overall Score:** {qm.overall_score:.1f}/100 ({getattr(content.get('session'), 'quality_grade', 'N/A')})
+- **Overall Score:** {qm.overall_score:.1f}/100 ({getattr(content.get("session"), "quality_grade", "N/A")})
 - **Total Files:** {qm.total_files}
 - **Total Lines:** {qm.total_lines:,}
 - **Security Issues:** {qm.security_issues_count}
@@ -323,7 +323,7 @@ class WebReportGenerator:
         if "error_message" in content:
             md_content += f"""## Error
 
-{content['error_message']}
+{content["error_message"]}
 """
 
         return md_content
