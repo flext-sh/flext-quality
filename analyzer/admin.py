@@ -43,7 +43,12 @@ class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         "created_at",
         "updated_at",
     ]
-    list_filter: ClassVar[list[str]] = ["package_type", "is_installed_package", "created_at", "updated_at"]
+    list_filter: ClassVar[list[str]] = [
+        "package_type",
+        "is_installed_package",
+        "created_at",
+        "updated_at",
+    ]
     search_fields: ClassVar[list[str]] = ["name", "description", "path", "package_name"]
     readonly_fields: ClassVar[list[str]] = ["created_at", "updated_at"]
     ordering: ClassVar[list[str]] = ["-updated_at"]
@@ -79,7 +84,9 @@ class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
             color = (
                 "green"
                 if latest.overall_score >= 80
-                else "orange" if latest.overall_score >= 60 else "red"
+                else "orange"
+                if latest.overall_score >= 60
+                else "red"
             )
             return format_html(
                 '<span style="color: {}; font-weight: bold;">{:.1f} ({})</span>',
@@ -216,7 +223,9 @@ class AnalysisSessionAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         color = (
             "green"
             if obj.overall_score >= 80
-            else "orange" if obj.overall_score >= 60 else "red"
+            else "orange"
+            if obj.overall_score >= 60
+            else "red"
         )
         return format_html(
             '<span style="color: {}; font-weight: bold;">{:.1f}</span>',
