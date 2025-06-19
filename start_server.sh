@@ -3,7 +3,7 @@
 # Django Code Analyzer - Server Startup Script
 # This script starts the Django development server with autoreload enabled
 
-cd "$(dirname "$0")"
+cd "$(dirname "$0")" || exit
 
 echo "🚀 Starting Django Code Analyzer Server..."
 echo "📝 Server will automatically reload when files change"

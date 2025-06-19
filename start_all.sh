@@ -10,7 +10,7 @@ command_exists() {
 
 # Function to check if port is in use
 port_in_use() {
-	nc -z localhost $1 2>/dev/null
+	nc -z localhost "$1" 2>/dev/null
 }
 
 # Check Python environment
