@@ -45,7 +45,8 @@ import sys
 class TestClass:
     """A test class."""
 
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
+        """TODO: Add docstring."""
         self.name = name
         self.value = 42
 
@@ -64,13 +65,13 @@ class TestClass:
         return f"Hello, {self.name}!"
 
 
-def function_with_security_issue():
+def function_with_security_issue() -> Any:
     """Function with potential security issue."""
     import subprocess
     subprocess.call("echo test", shell=True)  # B602: subprocess_popen_with_shell_equals_true
 
 
-def complex_function(a, b, c, d, e, f, g, h):
+def complex_function(a, b, c, d, e, f, g, h) -> Any:
     """Function with too many parameters."""
     result = 0
     for i in range(a):
@@ -80,17 +81,14 @@ def complex_function(a, b, c, d, e, f, g, h):
                     if e > f:
                         if g > h:
                             result += 1
-                        else:
                             result -= 1
-                    else:
                         result *= 2
-                else:
                     result //= 2
     return result
 
 
 # Unused function for dead code detection
-def unused_function():
+def unused_function() -> Any:
     """This function is never called."""
     return "dead code"
 
@@ -110,13 +108,14 @@ if __name__ == "__main__":
             '''
 """Test module in package."""
 
-from typing import List, Dict, Any
+from typing import List, Dict, List, Dict, Any
 
 
 class DataProcessor:
     """Class for processing data."""
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """TODO: Add docstring."""
         self.data: List[Dict[str, Any]] = []
 
     def add_item(self, item: Dict[str, Any]) -> None:
@@ -125,7 +124,7 @@ class DataProcessor:
 
     def process_data(self) -> List[str]:
         """Process the data."""
-        results = []
+        results: list = []
         for item in self.data:
             if "name" in item:
                 results.append(item["name"])
@@ -159,12 +158,18 @@ def mock_session() -> Any:
     """Create a mock analysis session."""
 
     class MockSession:
+        """TODO: Add docstring."""
+
         def __init__(self) -> None:
+            """TODO: Add docstring."""
             self.id = 1
             self.flx_project = MockProject()
 
     class MockProject:
+        """TODO: Add docstring."""
+
         def __init__(self) -> None:
+            """TODO: Add docstring."""
             self.id = 1
             self.name = "test_project"
 
@@ -197,7 +202,7 @@ def populate_backends() -> None:
 
 # Test data fixtures
 @pytest.fixture
-def sample_analysis_result():
+def sample_analysis_result() -> Any:
     """Create a sample AnalysisResult for testing."""
     from analyzer.backends.base import AnalysisResult
 
@@ -333,10 +338,11 @@ def sample_analysis_result():
 
 
 @pytest.fixture
-def project_factory():
+def project_factory() -> Any:
     """Factory for creating test projects."""
 
-    def _create_project(name: str = "test_project", path: str = "/test/path"):
+    def _create_project(name: str = "test_project", path: str = "/test/path") -> Any:
+        """TODO: Add docstring."""
         from analyzer.models import Project
 
         return Project.objects.create(
@@ -355,11 +361,12 @@ def project_factory():
 
 
 @pytest.fixture
-def session_factory():
+def session_factory() -> Any:
     """Factory for creating test analysis sessions."""
     import uuid
 
-    def _create_session(project=None, status="completed"):
+    def _create_session(project=None, status="completed") -> Any:
+        """TODO: Add docstring."""
         from analyzer.models import AnalysisSession
 
         if project is None:

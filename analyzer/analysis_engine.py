@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 import logging
+from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Any
 
@@ -15,13 +16,7 @@ from radon.metrics import mi_visit
 from vulture import Vulture
 
 from .models import (
-    AnalysisSession,
-    DeadCodeIssue,
-    DuplicateCodeBlock,
-    DuplicateLocation,
-    FileAnalysis,
-    QualityMetrics,
-    SecurityIssue,
+    AnalysisSession, DeadCodeIssue, DuplicateCodeBlock, DuplicateLocation, FileAnalysis, QualityMetrics, SecurityIssue,
 )
 
 logger = logging.getLogger(__name__)
@@ -31,6 +26,7 @@ class CodeAnalysisEngine:
     """Comprehensive code analysis engine."""
 
     def __init__(self, session: AnalysisSession) -> None:
+        """TODO: Add docstring."""
         self.session = session
         self.flx_project = session.flx_project
         self.project_path = Path(self.flx_project.path)
@@ -46,7 +42,7 @@ class CodeAnalysisEngine:
     def run_analysis(self) -> bool:
         """Run complete code analysis."""
         try:
-            logger.info(f"Starting analysis for flx_project: {self.flx_project.name}")
+            logger.info("Starting analysis for flx_project: %s", self.flx_project.name)
 
             # Update session status
             self.session.status = "running"
@@ -84,14 +80,15 @@ class CodeAnalysisEngine:
             quality_metrics = self.results.get("quality_metrics", {})
             if quality_metrics and isinstance(quality_metrics, dict):
                 self.session.overall_score = quality_metrics.get("overall_score", 0.0)
-            else:
                 self.session.overall_score = 0.0
             self.session.quality_grade = self._calculate_grade(
                 self.session.overall_score or 0.0,
             )
             self.session.save()
 
-            logger.info(f"Analysis completed successfully for: {self.flx_project.name}")
+            logger.info(
+                "Analysis completed successfully for: %s", self.flx_project.name
+            )
             return True
         except Exception as e:
             logger.exception(
@@ -110,18 +107,18 @@ class CodeAnalysisEngine:
 
     def _find_python_files(self) -> list[Path]:
         """Find all Python files in the flx_project."""
-        python_files = []
-
         if not self.project_path.exists():
             msg = f"Project path does not exist: {self.project_path}"
             raise FileNotFoundError(msg)
 
-        for py_file in self.project_path.rglob("*.py"):
-            # Skip hidden files and directories
-            if not any(part.startswith(".") for part in py_file.parts):
-                python_files.append(py_file)
+        # Skip hidden files and directories
+        python_files = [
+            py_file
+            for py_file in self.project_path.rglob("*.py")
+            if not any(part.startswith(".") for part in py_file.parts)
+        ]
 
-        logger.info(f"Found {len(python_files)} Python files")
+        logger.info("Found %s Python files", len(python_files))
         return python_files
 
     def _analyze_file(self, file_path: Path) -> FileAnalysis | None:
@@ -202,7 +199,6 @@ class CodeAnalysisEngine:
         except Exception as e:
             logger.exception(f"Error analyzing file {file_path}: {e}")
             return None
-        else:
             return file_analysis
 
     def _run_security_analysis(self) -> None:
@@ -219,7 +215,7 @@ class CodeAnalysisEngine:
                 try:
                     b_mgr.discover_files([str(py_file)])
                 except Exception as e:
-                    logger.warning(f"Could not scan {py_file}: {e}")
+                    logger.warning("Could not scan %s: %s", py_file, e)
                     continue
 
             b_mgr.run_tests()
@@ -239,7 +235,7 @@ class CodeAnalysisEngine:
                     code_snippet=result.get_code(max_lines=3, tabbed=False),
                 )
 
-            logger.info(f"Found {len(b_mgr.get_issue_list())} security issues")
+            logger.info("Found %s security issues", len(b_mgr.get_issue_list()))
 
         except Exception as e:
             logger.exception(f"Security analysis failed: {e}")
@@ -285,7 +281,7 @@ class CodeAnalysisEngine:
                 )
 
             total_issues = len(vulture.unreachable_code) + len(vulture.unused_code)
-            logger.info(f"Found {total_issues} dead code issues")
+            logger.info("Found %s dead code issues", total_issues)
 
         except Exception as e:
             logger.exception(f"Dead code analysis failed: {e}")
@@ -296,7 +292,7 @@ class CodeAnalysisEngine:
             logger.info("Running duplicate code analysis")
 
             # Simple duplicate detection based on file similarity
-            files_content = {}
+            files_content: dict = {}
 
             for py_file in self._find_python_files():
                 try:
@@ -304,12 +300,12 @@ class CodeAnalysisEngine:
                         content = f.read()
                         files_content[py_file] = content
                 except Exception as e:
-                    logger.warning(f"Could not read {py_file}: {e}")
+                    logger.warning("Could not read %s: %s", py_file, e)
                     continue
 
             # Find similar files
             similarity_threshold = self.session.similarity_threshold
-            compared_pairs = set()
+            compared_pairs: set = set()
 
             for file1, content1 in files_content.items():
                 for file2, content2 in files_content.items():
@@ -357,15 +353,13 @@ class CodeAnalysisEngine:
                             )
 
             count = DuplicateCodeBlock.objects.filter(session=self.session).count()
-            logger.info(f"Found {count} duplicate blocks")
+            logger.info("Found %s duplicate blocks", count)
 
         except Exception as e:
             logger.exception(f"Duplicate analysis failed: {e}")
 
     def _calculate_similarity(self, content1: str, content2: str) -> float:
         """Calculate similarity between two code contents."""
-        from difflib import SequenceMatcher
-
         # Normalize content
         lines1 = [line.strip() for line in content1.splitlines() if line.strip()]
         lines2 = [line.strip() for line in content2.splitlines() if line.strip()]

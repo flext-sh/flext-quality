@@ -2,29 +2,13 @@
 
 from __future__ import annotations
 
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from django.contrib import REDACTED_LDAP_BIND_PASSWORD
 from django.utils.html import format_html
 
 from .models import (
-    AnalysisBackendModel,
-    AnalysisSession,
-    BackendStatistics,
-    ClassAnalysis,
-    DeadCodeIssue,
-    DetectedIssue,
-    DuplicateCodeBlock,
-    DuplicateLocation,
-    FileAnalysis,
-    FunctionAnalysis,
-    ImportAnalysis,
-    IssueType,
-    PackageAnalysis,
-    Project,
-    QualityMetrics,
-    SecurityIssue,
-    VariableAnalysis,
+    from typing import List, Dict, Optional, Any AnalysisBackendModel, AnalysisSession, BackendStatistics, ClassAnalysis, DeadCodeIssue, DetectedIssue, DuplicateCodeBlock, DuplicateLocation, FileAnalysis, FunctionAnalysis, ImportAnalysis, IssueType, PackageAnalysis, Project, QualityMetrics, SecurityIssue, VariableAnalysis,
 )
 
 
@@ -84,9 +68,7 @@ class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
             color = (
                 "green"
                 if latest.overall_score >= 80
-                else "orange"
-                if latest.overall_score >= 60
-                else "red"
+                else "orange" if latest.overall_score >= 60 else "red"
             )
             return format_html(
                 '<span style="color: {}; font-weight: bold;">{:.1f} ({})</span>',
@@ -223,9 +205,7 @@ class AnalysisSessionAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         color = (
             "green"
             if obj.overall_score >= 80
-            else "orange"
-            if obj.overall_score >= 60
-            else "red"
+            else "orange" if obj.overall_score >= 60 else "red"
         )
         return format_html(
             '<span style="color: {}; font-weight: bold;">{:.1f}</span>',
@@ -552,6 +532,8 @@ class QualityMetricsAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(PackageAnalysis)
 class PackageAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = (
         "name",
         "session",
@@ -567,6 +549,8 @@ class PackageAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(ClassAnalysis)
 class ClassAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = (
         "name",
         "package_analysis",
@@ -581,6 +565,8 @@ class ClassAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(FunctionAnalysis)
 class FunctionAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = (
         "name",
         "function_type",
@@ -600,6 +586,8 @@ class FunctionAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(VariableAnalysis)
 class VariableAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = ("name", "variable_type", "scope_type", "is_constant", "is_unused")
     list_filter = ("variable_type", "scope_type", "is_constant", "is_unused")
     search_fields = ("name", "full_name")
@@ -608,6 +596,8 @@ class VariableAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(ImportAnalysis)
 class ImportAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = (
         "module_name",
         "import_name",
@@ -625,6 +615,8 @@ class ImportAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(AnalysisBackendModel)
 class AnalysisBackendModelAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = [
         "name",
         "display_name",
@@ -669,6 +661,8 @@ class AnalysisBackendModelAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(IssueType)
 class IssueTypeAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = ["code", "name", "backend", "category", "severity", "is_active"]
     list_filter = ["backend", "category", "severity", "is_active", "created_at"]
     search_fields = ["code", "name", "description"]
@@ -707,6 +701,8 @@ class IssueTypeAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(DetectedIssue)
 class DetectedIssueAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = [
         "issue_type_code",
         "file_path",
@@ -729,13 +725,15 @@ class DetectedIssueAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
     date_hierarchy = "detected_at"
     ordering = ["-detected_at"]
 
-    def issue_type_code(self, obj):
+    def issue_type_code(self, obj) -> Any:
+        """TODO: Add docstring."""
         return obj.issue_type.code
 
     issue_type_code.short_description = "Issue Code"
     issue_type_code.REDACTED_LDAP_BIND_PASSWORD_order_field = "issue_type__code"
 
-    def severity(self, obj):
+    def severity(self, obj) -> Any:
+        """TODO: Add docstring."""
         return obj.issue_type.severity
 
     severity.short_description = "Severity"
@@ -797,6 +795,8 @@ class DetectedIssueAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(BackendStatistics)
 class BackendStatisticsAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = [
         "backend",
         "session",

@@ -11,15 +11,11 @@ from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 
-try:
-    import redis
-    from celery import current_app
+import redis
+from celery import current_app
 
-    REDIS_AVAILABLE = True
-    CELERY_AVAILABLE = True
-except ImportError:
-    REDIS_AVAILABLE = False
-    CELERY_AVAILABLE = False
+REDIS_AVAILABLE = True
+CELERY_AVAILABLE = True
 
 
 def check_database() -> dict[str, Any]:
@@ -94,7 +90,7 @@ def check_celery() -> dict[str, Any]:
 @csrf_exempt
 @never_cache
 @require_http_methods(["GET", "HEAD"])
-def health_check(request):
+def health_check(request) -> Any:
     """Comprehensive health check endpoint.
     Returns the health status of all critical services.
     """
@@ -143,7 +139,7 @@ def health_check(request):
 @csrf_exempt
 @never_cache
 @require_http_methods(["GET", "HEAD"])
-def readiness_check(request):
+def readiness_check(request) -> Any:
     """Readiness check for Kubernetes/container orchestration.
     Returns 200 if the application is ready to serve traffic.
     """
@@ -161,7 +157,7 @@ def readiness_check(request):
 @csrf_exempt
 @never_cache
 @require_http_methods(["GET", "HEAD"])
-def liveness_check(request):
+def liveness_check(request) -> Any:
     """Liveness check for Kubernetes/container orchestration.
     Returns 200 if the application is alive (basic functionality works).
     """

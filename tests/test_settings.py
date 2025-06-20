@@ -3,8 +3,6 @@
 import sys
 from pathlib import Path
 
-from code_analyzer_web.settings import *
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Override database settings for testing

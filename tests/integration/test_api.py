@@ -1,3 +1,7 @@
+"""Module test_api."""
+
+from typing import Any
+
 """Integration tests for the REST API."""
 
 import tempfile
@@ -307,7 +311,7 @@ class TestAnalysisAPI(TransactionTestCase):
         self.client.force_authenticate(user=self.user)
 
     @contextmanager
-    def create_test_project_with_files(self):
+    def create_test_project_with_files(self) -> Any:
         """Create a test project with actual Python files."""
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
@@ -315,14 +319,14 @@ class TestAnalysisAPI(TransactionTestCase):
             # Create a simple Python file
             (project_path / "test_file.py").write_text(
                 '''
-def test_function():
+def test_function() -> Any:
     """A simple test function."""
     return "Hello, World!"
 
 class TestClass:
     """A simple test class."""
 
-    def method(self):
+    def method(self) -> Any:
         """A simple method."""
         return 42
 ''',

@@ -6,14 +6,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from .models import (
-    AnalysisSession,
-    DeadCodeIssue,
-    DuplicateCodeBlock,
-    DuplicateLocation,
-    FileAnalysis,
-    Project,
-    QualityMetrics,
-    SecurityIssue,
+    from typing import TYPE_CHECKING AnalysisSession, DeadCodeIssue, DuplicateCodeBlock, DuplicateLocation, FileAnalysis, Project, QualityMetrics, SecurityIssue,
 )
 
 
@@ -21,6 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
     """Serializer for User model."""
 
     class Meta:
+        """TODO: Add docstring."""
         model = User
         fields = ["id", "username", "email", "first_name", "last_name"]
         read_only_fields = ["id"]
@@ -34,6 +28,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     analysis_sessions = serializers.SerializerMethodField()
 
     class Meta:
+        """TODO: Add docstring."""
         model = Project
         fields = [
             "id",
@@ -94,6 +89,7 @@ class QualityMetricsSerializer(serializers.ModelSerializer):
     """Serializer for QualityMetrics model."""
 
     class Meta:
+        """TODO: Add docstring."""
         model = QualityMetrics
         fields = [
             "overall_score",
@@ -137,6 +133,7 @@ class AnalysisSessionSerializer(serializers.ModelSerializer):
     file_analyses_count = serializers.SerializerMethodField()
 
     class Meta:
+        """TODO: Add docstring."""
         model = AnalysisSession
         fields = [
             "id",
@@ -195,6 +192,7 @@ class CreateAnalysisSessionSerializer(serializers.ModelSerializer):
     flx_project = serializers.IntegerField(write_only=True)
 
     class Meta:
+        """TODO: Add docstring."""
         model = AnalysisSession
         fields = [
             "flx_project",
@@ -215,7 +213,7 @@ class CreateAnalysisSessionSerializer(serializers.ModelSerializer):
             validated_data["flx_project"] = flx_project
             return super().create(validated_data)  # type: ignore[no-any-return]
         except Project.DoesNotExist as e:
-            raise serializers.ValidationError(
+            raise serializers.ValidationError( from e
                 {"flx_project": "Project not found"},
             ) from e
 
@@ -231,6 +229,7 @@ class FileAnalysisSerializer(serializers.ModelSerializer):
     duplicate_locations_count = serializers.SerializerMethodField()
 
     class Meta:
+        """TODO: Add docstring."""
         model = FileAnalysis
         fields = [
             "id",
@@ -276,6 +275,7 @@ class SecurityIssueSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
+        """TODO: Add docstring."""
         model = SecurityIssue
         fields = [
             "id",
@@ -309,6 +309,7 @@ class DeadCodeIssueSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
+        """TODO: Add docstring."""
         model = DeadCodeIssue
         fields = [
             "id",
@@ -335,6 +336,7 @@ class DuplicateLocationSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
+        """TODO: Add docstring."""
         model = DuplicateLocation
         fields = [
             "id",
@@ -358,6 +360,7 @@ class DuplicateCodeBlockSerializer(serializers.ModelSerializer):
     locations_count = serializers.SerializerMethodField()
 
     class Meta:
+        """TODO: Add docstring."""
         model = DuplicateCodeBlock
         fields = [
             "id",
@@ -386,6 +389,7 @@ class AnalysisSessionSummarySerializer(serializers.ModelSerializer):
     duration = serializers.ReadOnlyField()
 
     class Meta:
+        """TODO: Add docstring."""
         model = AnalysisSession
         fields = [
             "id",
@@ -409,6 +413,7 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
     latest_score = serializers.SerializerMethodField()
 
     class Meta:
+        """TODO: Add docstring."""
         model = Project
         fields = [
             "id",

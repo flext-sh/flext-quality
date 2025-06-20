@@ -449,7 +449,7 @@ class TestMultiBackendAnalyzer:
         assert code == "CUSTOM001"
 
         # Test fallback for external backend
-        issue_data = {}
+        issue_data: dict = {}
         code = analyzer._extract_issue_code(issue_data, "external")
         assert code == "EXT001"
 

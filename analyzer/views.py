@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING
+from typing import Any
 
 from django.contrib import messages
 from django.db.models import Avg
@@ -12,9 +12,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django_filters.rest_framework import (
-    DjangoFilterBackend,  # type: ignore[import-untyped]
-)
+from django_filters.rest_framework import DjangoFilterBackend  # type: ignore[import-untyped]
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -45,9 +43,7 @@ from .serializers import (
     SecurityIssueSerializer,
 )
 from .tasks import run_code_analysis
-
-if TYPE_CHECKING:
-    from rest_framework.request import Request
+from rest_framework.request import Request
 
 logger = logging.getLogger(__name__)
 
@@ -68,11 +64,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
     ordering_fields = ["name", "created_at", "updated_at"]
     ordering = ["-updated_at"]
 
-    def get_queryset(self):
+    def get_queryset(self) -> Any:
         """Get all projects (no user filtering since Project doesn't have created_by field)."""
         return Project.objects.all()
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> Any:
         """Return appropriate serializer based on action."""
         if self.action == "list":
             return ProjectSummarySerializer
@@ -162,7 +158,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     {"error": "Failed to start analysis"},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
-        else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -177,11 +172,11 @@ class AnalysisSessionViewSet(viewsets.ModelViewSet):
     ordering_fields = ["created_at", "started_at", "completed_at", "overall_score"]
     ordering = ["-created_at"]
 
-    def get_queryset(self):
+    def get_queryset(self) -> Any:
         """Get all analysis sessions (no user filtering since Project doesn't have created_by field)."""
         return AnalysisSession.objects.all()
 
-    def get_serializer_class(self):
+    def get_serializer_class(self) -> Any:
         """Return appropriate serializer based on action."""
         if self.action == "create":
             return CreateAnalysisSessionSerializer
@@ -341,7 +336,7 @@ class FileAnalysisViewSet(viewsets.ReadOnlyModelViewSet):
     ordering_fields = ["file_path", "complexity_score", "lines_of_code"]
     ordering = ["file_path"]
 
-    def get_queryset(self):
+    def get_queryset(self) -> Any:
         """Filter file analyses by sessions owned by current user."""
         return FileAnalysis.objects.filter(
             session__project__created_by=self.request.user,
@@ -366,7 +361,7 @@ class SecurityIssueViewSet(viewsets.ModelViewSet):
     ordering_fields = ["severity", "line_number", "created_at"]
     ordering = ["-severity", "line_number"]
 
-    def get_queryset(self):
+    def get_queryset(self) -> Any:
         """Filter security issues by sessions owned by current user."""
         return SecurityIssue.objects.filter(
             session__project__created_by=self.request.user,
@@ -411,7 +406,7 @@ class DeadCodeIssueViewSet(viewsets.ModelViewSet):
     ordering_fields = ["confidence", "size_estimate", "created_at"]
     ordering = ["-confidence", "-size_estimate"]
 
-    def get_queryset(self):
+    def get_queryset(self) -> Any:
         """Filter dead code issues by sessions owned by current user."""
         return DeadCodeIssue.objects.filter(
             session__project__created_by=self.request.user,
@@ -455,7 +450,7 @@ class DuplicateCodeBlockViewSet(viewsets.ModelViewSet):
     ordering_fields = ["lines_count", "similarity_score", "created_at"]
     ordering = ["-lines_count", "-similarity_score"]
 
-    def get_queryset(self):
+    def get_queryset(self) -> Any:
         """Filter duplicate blocks by sessions owned by current user."""
         return DuplicateCodeBlock.objects.filter(
             session__project__created_by=self.request.user,
@@ -492,7 +487,7 @@ class QualityMetricsViewSet(viewsets.ReadOnlyModelViewSet):
     ordering_fields = ["overall_score", "created_at"]
     ordering = ["-overall_score"]
 
-    def get_queryset(self):
+    def get_queryset(self) -> Any:
         """Filter quality metrics by sessions owned by current user."""
         return QualityMetrics.objects.filter(
             session__project__created_by=self.request.user,
@@ -503,18 +498,17 @@ class QualityMetricsViewSet(viewsets.ReadOnlyModelViewSet):
         """Get quality trends over time."""
         metrics = self.get_queryset().order_by("created_at")
 
-        trends = []
-        for metric in metrics:
-            trends.append(
-                {
-                    "date": metric.created_at.date(),
-                    "overall_score": metric.overall_score,
-                    "complexity_score": metric.complexity_score,
-                    "security_score": metric.security_score,
-                    "maintainability_score": metric.maintainability_score,
-                    "project_name": metric.session.flx_project.name,
-                },
-            )
+        trends = [
+            {
+                "date": metric.created_at.date(),
+                "overall_score": metric.overall_score,
+                "complexity_score": metric.complexity_score,
+                "security_score": metric.security_score,
+                "maintainability_score": metric.maintainability_score,
+                "project_name": metric.session.flx_project.name,
+            }
+            for metric in metrics
+        ]
 
         return Response(trends)
 
@@ -563,7 +557,6 @@ def packages_discovery(request: HttpRequest) -> HttpResponse:
         packages = discovery.get_installed_packages()
         # Cache for 5 minutes
         cache.set(cache_key, packages, 300)
-    else:
         packages = cache.get(cache_key, [])
 
     # Filter by type if provided
@@ -692,7 +685,6 @@ def start_analysis(request: HttpRequest, project_id: int) -> HttpResponse:
 
         if success:
             messages.success(request, "Analysis completed successfully")
-        else:
             messages.error(request, f"Analysis failed: {session.error_message}")
 
         return redirect("analysis_session_detail", session_id=session.id)
@@ -718,7 +710,6 @@ def generate_report(request: HttpRequest, session_id: int) -> HttpResponse:
             report = generator.generate_detailed_report(format)
         elif report_type == "security":
             report = generator.generate_security_report(format)
-        else:
             messages.error(request, f"Unknown report type: {report_type}")
             return redirect("analysis_session_detail", session_id=session_id)
 
@@ -745,7 +736,6 @@ def view_report(request: HttpRequest, session_id: int) -> HttpResponse:
             report = generator.generate_detailed_report("html")
         elif report_type == "security":
             report = generator.generate_security_report("html")
-        else:
             messages.error(request, f"Unknown report type: {report_type}")
             return redirect("analysis_session_detail", session_id=session_id)
 

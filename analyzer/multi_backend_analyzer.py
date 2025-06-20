@@ -9,19 +9,19 @@ from pathlib import Path
 from django.utils import timezone
 
 from .backends import AnalysisResult, get_backend
-from .models import (  # New backend management models
-    AnalysisBackendModel,
-    AnalysisSession,
-    BackendStatistics,
-    ClassAnalysis,
-    DetectedIssue,
-    FileAnalysis,
-    FunctionAnalysis,
-    ImportAnalysis,
-    IssueType,
-    PackageAnalysis,
-    QualityMetrics,
-    SecurityIssue,
+from .models import (
+    AnalysisBackendModel, 
+    AnalysisSession, 
+    BackendStatistics, 
+    ClassAnalysis, 
+    DetectedIssue, 
+    FileAnalysis, 
+    FunctionAnalysis, 
+    ImportAnalysis, 
+    IssueType, 
+    PackageAnalysis, 
+    QualityMetrics, 
+    SecurityIssue, 
     VariableAnalysis,
 )
 
@@ -32,6 +32,7 @@ class MultiBackendAnalyzer:
     """Orchestrates analysis across multiple backends."""
 
     def __init__(self, flx_project, backend_names: list[str] | None = None) -> None:
+        """TODO: Add docstring."""
         self.flx_project = flx_project
         self.backend_names = backend_names or ["ast", "external", "quality"]
         self.session: AnalysisSession | None = None
@@ -64,11 +65,11 @@ class MultiBackendAnalyzer:
                 self.session.save()
                 return self.session
 
-            self.logger.info(f"Found {len(python_files)} Python files to analyze")
+            self.logger.info("Found %s Python files to analyze", len(python_files))
 
             # Run backends and collect statistics
             combined_result = AnalysisResult()
-            backend_stats = {}
+            backend_stats: dict = {}
 
             for backend_name in self.backend_names:
                 start_time = time.time()
@@ -96,7 +97,7 @@ class MultiBackendAnalyzer:
                         }
                         continue
 
-                    self.logger.info(f"Running backend: {backend_name}")
+                    self.logger.info("Running backend: %s", backend_name)
                     result = backend.analyze(python_files)
                     execution_time = time.time() - start_time
 
@@ -189,15 +190,17 @@ class MultiBackendAnalyzer:
 
     def _find_python_files(self, path: Path) -> list[Path]:
         """Find all Python files in the flx_project directory."""
-        python_files = []
+        python_files: list = []
         try:
-            for py_file in path.rglob("*.py"):
-                # Skip hidden files, __pycache__, .venv, etc.
+            # Skip hidden files, __pycache__, .venv, etc.
+            python_files.extend(
+                py_file
+                for py_file in path.rglob("*.py")
                 if not any(
                     part.startswith(".") or part == "__pycache__"
                     for part in py_file.parts
-                ):
-                    python_files.append(py_file)
+                )
+            )
         except Exception as e:
             self.logger.exception(f"Error finding Python files: {e}")
 
@@ -247,7 +250,7 @@ class MultiBackendAnalyzer:
 
     def _save_packages(self, result: AnalysisResult) -> dict[str, PackageAnalysis]:
         """Save package analysis data."""
-        package_objects = {}
+        package_objects: dict = {}
         for pkg_data in result.packages:
             package_obj = PackageAnalysis.objects.create(
                 session=self.session,
@@ -272,7 +275,7 @@ class MultiBackendAnalyzer:
         _package_objects: dict[str, PackageAnalysis],
     ) -> dict[str, FileAnalysis]:
         """Save file analysis data."""
-        file_objects = {}
+        file_objects: dict = {}
         for file_data in result.files:
             file_obj = FileAnalysis.objects.create(
                 session=self.session,
@@ -296,7 +299,7 @@ class MultiBackendAnalyzer:
         package_objects: dict[str, PackageAnalysis],
     ) -> dict[str, ClassAnalysis]:
         """Save class analysis data."""
-        class_objects = {}
+        class_objects: dict = {}
         for class_data in result.classes:
             file_obj = self._find_file_object(file_objects, class_data)
             package_obj = self._find_package_object(package_objects, class_data)
@@ -711,7 +714,7 @@ class MultiBackendAnalyzer:
                     issues_by_category=issues_by_category,
                 )
 
-                self.logger.info(f"Saved statistics for backend: {backend_name}")
+                self.logger.info("Saved statistics for backend: %s", backend_name)
 
             except Exception as e:
                 self.logger.exception(

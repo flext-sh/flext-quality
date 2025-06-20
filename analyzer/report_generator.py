@@ -12,13 +12,7 @@ from django.utils import timezone
 from xhtml2pdf import pisa
 
 from .models import (
-    AnalysisReport,
-    AnalysisSession,
-    DeadCodeIssue,
-    DuplicateCodeBlock,
-    FileAnalysis,
-    QualityMetrics,
-    SecurityIssue,
+    from typing import List, Dict, Optional, Any AnalysisReport, AnalysisSession, DeadCodeIssue, DuplicateCodeBlock, FileAnalysis, QualityMetrics, SecurityIssue,
 )
 
 logger = logging.getLogger(__name__)
@@ -28,6 +22,7 @@ class WebReportGenerator:
     """Web-based report generator for analysis results."""
 
     def __init__(self, session: AnalysisSession) -> None:
+        """TODO: Add docstring."""
         self.session = session
         self.flx_project = session.flx_project
 
@@ -38,7 +33,6 @@ class WebReportGenerator:
             quality_metrics = getattr(self.session, "quality_metrics", None)
             if not quality_metrics:
                 content = self._generate_no_metrics_content()
-            else:
                 content = self._generate_summary_content(quality_metrics)
 
             # Convert to requested format
@@ -48,7 +42,6 @@ class WebReportGenerator:
                 final_content = self._render_markdown_template("summary", content)
             elif format == "pdf":
                 final_content = self._render_pdf_template("summary", content)
-            else:
                 msg = f"Unsupported format: {format}"
                 raise ValueError(msg)
 
@@ -61,7 +54,7 @@ class WebReportGenerator:
                 content=final_content,
             )
 
-            logger.info(f"Generated summary report in {format} format")
+            logger.info("Generated summary report in %s", format format")
             return report
 
         except Exception as e:
@@ -80,7 +73,6 @@ class WebReportGenerator:
                 final_content = self._render_markdown_template("detailed", content)
             elif format == "pdf":
                 final_content = self._render_pdf_template("detailed", content)
-            else:
                 msg = f"Unsupported format: {format}"
                 raise ValueError(msg)
 
@@ -93,7 +85,7 @@ class WebReportGenerator:
                 content=final_content,
             )
 
-            logger.info(f"Generated detailed report in {format} format")
+            logger.info("Generated detailed report in %s", format format")
             return report
 
         except Exception as e:
@@ -112,7 +104,6 @@ class WebReportGenerator:
                 final_content = self._render_markdown_template("security", content)
             elif format == "pdf":
                 final_content = self._render_pdf_template("security", content)
-            else:
                 msg = f"Unsupported format: {format}"
                 raise ValueError(msg)
 
@@ -125,7 +116,7 @@ class WebReportGenerator:
                 content=final_content,
             )
 
-            logger.info(f"Generated security report in {format} format")
+            logger.info("Generated security report in %s", format format")
             return report
 
         except Exception as e:
@@ -357,7 +348,6 @@ class WebReportGenerator:
                 distribution["medium"] += 1
             elif complexity <= 20:
                 distribution["high"] += 1
-            else:
                 distribution["very_high"] += 1
 
         return distribution

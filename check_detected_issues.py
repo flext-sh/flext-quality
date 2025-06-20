@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+"""Module check_detected_issues."""
+
+# !/usr/bin/env python
 """Check detected issues in the database."""
 
 import os

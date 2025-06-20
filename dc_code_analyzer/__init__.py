@@ -4,6 +4,7 @@ __version__ = "0.1.0"
 __author__ = "Code Analysis Team"
 __email__ = "team@codeanalyzer.dev"
 
+
 # Import main components
 try:
     from . import analyzer, code_analyzer_web, dashboard

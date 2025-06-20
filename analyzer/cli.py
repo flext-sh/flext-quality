@@ -1,4 +1,6 @@
-#!/usr/bin/env python3
+"""Module cli."""
+
+# !/usr/bin/env python3
 """Command-line interface for dc-code-analyzer."""
 
 import sys

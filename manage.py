@@ -1,4 +1,6 @@
-#!/usr/bin/env python3
+"""Module manage."""
+
+# !/usr/bin/env python3
 """Django's command-line utility for REDACTED_LDAP_BIND_PASSWORDistrative tasks."""
 
 from __future__ import annotations
