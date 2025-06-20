@@ -14,14 +14,17 @@ class ExternalToolsBackend(AnalysisBackend):
 
     @property
     def name(self) -> str:
+        """TODO: Add docstring."""
         return "external"
 
     @property
     def description(self) -> str:
+        """TODO: Add docstring."""
         return "External tools for security and dead code analysis"
 
     @property
     def capabilities(self) -> list[str]:
+        """TODO: Add docstring."""
         return [
             "security_analysis",
             "dead_code_analysis",
@@ -44,7 +47,7 @@ class ExternalToolsBackend(AnalysisBackend):
                 FileNotFoundError,
                 subprocess.TimeoutExpired,
             ):
-                self.logger.warning(f"Tool {tool} not available")
+                self.logger.warning("Tool %s not available", tool)
                 return False
         return True
 

@@ -9,6 +9,7 @@ from django.dispatch import receiver
 from django.utils import timezone
 
 from .models import AnalysisSession, QualityMetrics
+from typing import TYPE_CHECKING
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +48,7 @@ def update_session_scores(sender, instance, created, **kwargs) -> None:
 def cleanup_analysis_files(sender, instance, **kwargs) -> None:
     """Clean up analysis files when session is deleted."""
     # This would clean up any generated files or reports
-    logger.info(f"Cleaning up files for analysis session {instance.id}")
+    logger.info("Cleaning up files for analysis session %s", instance.id")
 
 
 def _calculate_grade(score: float) -> str:

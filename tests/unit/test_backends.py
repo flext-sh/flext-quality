@@ -1,3 +1,7 @@
+"""Module test_backends."""
+
+from typing import Any
+
 """Unit tests for analysis backends."""
 
 from pathlib import Path
@@ -113,19 +117,25 @@ class TestBaseAnalysisBackend:
 
         # Create a concrete backend for testing
         class TestBackend(AnalysisBackend):
+            """TODO: Add docstring."""
+
             @property
             def name(self) -> str:
+                """TODO: Add docstring."""
                 return "test"
 
             @property
             def description(self) -> str:
+                """TODO: Add docstring."""
                 return "Test backend"
 
             @property
-            def capabilities(self):
+            def capabilities(self) -> Any:
+                """TODO: Add docstring."""
                 return []
 
-            def analyze(self, python_files):
+            def analyze(self, python_files) -> Any:
+                """TODO: Add docstring."""
                 return AnalysisResult()
 
         backend = TestBackend(Mock(), temp_project_dir)
@@ -139,19 +149,25 @@ class TestBaseAnalysisBackend:
         """Test getting relative path from project root."""
 
         class TestBackend(AnalysisBackend):
+            """TODO: Add docstring."""
+
             @property
             def name(self) -> str:
+                """TODO: Add docstring."""
                 return "test"
 
             @property
             def description(self) -> str:
+                """TODO: Add docstring."""
                 return "Test backend"
 
             @property
-            def capabilities(self):
+            def capabilities(self) -> Any:
+                """TODO: Add docstring."""
                 return []
 
-            def analyze(self, python_files):
+            def analyze(self, python_files) -> Any:
+                """TODO: Add docstring."""
                 return AnalysisResult()
 
         backend = TestBackend(Mock(), temp_project_dir)
@@ -168,19 +184,25 @@ class TestBaseAnalysisBackend:
         """Test extracting package name from file path."""
 
         class TestBackend(AnalysisBackend):
+            """TODO: Add docstring."""
+
             @property
             def name(self) -> str:
+                """TODO: Add docstring."""
                 return "test"
 
             @property
             def description(self) -> str:
+                """TODO: Add docstring."""
                 return "Test backend"
 
             @property
-            def capabilities(self):
+            def capabilities(self) -> Any:
+                """TODO: Add docstring."""
                 return []
 
-            def analyze(self, python_files):
+            def analyze(self, python_files) -> Any:
+                """TODO: Add docstring."""
                 return AnalysisResult()
 
         backend = TestBackend(Mock(), temp_project_dir)
@@ -199,19 +221,25 @@ class TestBaseAnalysisBackend:
         """Test default is_available implementation."""
 
         class TestBackend(AnalysisBackend):
+            """TODO: Add docstring."""
+
             @property
             def name(self) -> str:
+                """TODO: Add docstring."""
                 return "test"
 
             @property
             def description(self) -> str:
+                """TODO: Add docstring."""
                 return "Test backend"
 
             @property
-            def capabilities(self):
+            def capabilities(self) -> Any:
+                """TODO: Add docstring."""
                 return []
 
-            def analyze(self, python_files):
+            def analyze(self, python_files) -> Any:
+                """TODO: Add docstring."""
                 return AnalysisResult()
 
         backend = TestBackend(Mock(), Path("/test"))
@@ -221,19 +249,25 @@ class TestBaseAnalysisBackend:
         """Test default get_configuration implementation."""
 
         class TestBackend(AnalysisBackend):
+            """TODO: Add docstring."""
+
             @property
             def name(self) -> str:
+                """TODO: Add docstring."""
                 return "test"
 
             @property
             def description(self) -> str:
+                """TODO: Add docstring."""
                 return "Test backend"
 
             @property
-            def capabilities(self):
+            def capabilities(self) -> Any:
+                """TODO: Add docstring."""
                 return []
 
-            def analyze(self, python_files):
+            def analyze(self, python_files) -> Any:
+                """TODO: Add docstring."""
                 return AnalysisResult()
 
         backend = TestBackend(Mock(), Path("/test"))
@@ -244,19 +278,25 @@ class TestBaseAnalysisBackend:
         """Test default validate_configuration implementation."""
 
         class TestBackend(AnalysisBackend):
+            """TODO: Add docstring."""
+
             @property
             def name(self) -> str:
+                """TODO: Add docstring."""
                 return "test"
 
             @property
             def description(self) -> str:
+                """TODO: Add docstring."""
                 return "Test backend"
 
             @property
-            def capabilities(self):
+            def capabilities(self) -> Any:
+                """TODO: Add docstring."""
                 return []
 
-            def analyze(self, python_files):
+            def analyze(self, python_files) -> Any:
+                """TODO: Add docstring."""
                 return AnalysisResult()
 
         backend = TestBackend(Mock(), Path("/test"))

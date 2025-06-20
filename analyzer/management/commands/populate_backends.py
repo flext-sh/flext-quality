@@ -1,15 +1,17 @@
 """Django management command to populate backend and issue type data."""
 
+from analyzer.models import AnalysisBackendModel, IssueType
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from analyzer.models import AnalysisBackendModel, IssueType
-
 
 class Command(BaseCommand):
+    """TODO: Add docstring."""
+
     help = "Populate backend and issue type data automatically"
 
     def add_arguments(self, parser) -> None:
+        """TODO: Add docstring."""
         parser.add_argument(
             "--force",
             action="store_true",
@@ -17,6 +19,7 @@ class Command(BaseCommand):
         )
 
     def handle(self, *_args, **options) -> None:
+        """TODO: Add docstring."""
         self.stdout.write(
             self.style.SUCCESS("🚀 Populating backend and issue type data..."),
         )
@@ -94,7 +97,6 @@ class Command(BaseCommand):
                 backend.updated_at = timezone.now()
                 backend.save()
                 self.stdout.write(f"  🔄 Updated backend: {backend.display_name}")
-            else:
                 self.stdout.write(f"  ℹ️  Backend exists: {backend.display_name}")
 
     def _create_issue_types(self, force_update) -> None:
@@ -399,7 +401,7 @@ class Command(BaseCommand):
             if created:
                 created_count += 1
             elif force_update:
-                for key, value in issue_data.items():
+                for value in issue_data.values():
                     if key not in {"backend", "code"}:
                         setattr(issue_type, key, value)
                 issue_type.updated_at = timezone.now()

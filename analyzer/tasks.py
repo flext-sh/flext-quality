@@ -10,13 +10,7 @@ from django.conf import settings
 from django.utils import timezone
 
 from .models import (
-    AnalysisSession,
-    DeadCodeIssue,
-    DuplicateCodeBlock,
-    DuplicateLocation,
-    FileAnalysis,
-    QualityMetrics,
-    SecurityIssue,
+    import sys from typing import List, Dict, Optional, Any AnalysisSession, DeadCodeIssue, DuplicateCodeBlock, DuplicateLocation, FileAnalysis, QualityMetrics, SecurityIssue,
 )
 
 # Import the existing code analyzer
@@ -46,7 +40,7 @@ def run_code_analysis(session_id: str) -> None:
     """
     try:
         session = AnalysisSession.objects.get(id=session_id)
-        logger.info(f"Starting analysis for session {session_id}")
+        logger.info("Starting analysis for session %s", session_id")
 
         # Update session status
         session.status = "running"
@@ -60,7 +54,6 @@ def run_code_analysis(session_id: str) -> None:
         if AdvancedCodeAnalyzer is None:
             # Fallback to mock analysis for testing
             _run_mock_analysis(session)
-        else:
             _run_real_analysis(session, config)
 
         # Mark as completed
@@ -68,7 +61,7 @@ def run_code_analysis(session_id: str) -> None:
         session.completed_at = timezone.now()
         session.save()
 
-        logger.info(f"Analysis completed for session {session_id}")
+        logger.info("Analysis completed for session %s", session_id")
 
     except AnalysisSession.DoesNotExist:
         logger.exception(f"Analysis session {session_id} not found")
@@ -414,7 +407,7 @@ try:
             # Run the analysis (this will update the session)
             completed_session = analyzer.analyze()
 
-            logger.info(f"Background analysis completed for session {session_id}")
+            logger.info("Background analysis completed for session %s", session_id")
 
             return {
                 "status": "completed",
@@ -451,7 +444,7 @@ try:
             return {"status": "failed", "error": error_msg}
 
     @shared_task(bind=True, name="analyzer.cleanup_old_sessions")
-    def cleanup_old_sessions(_self):
+    def cleanup_old_sessions(_self) -> Any:
         """Clean up old analysis sessions and their data."""
         from datetime import timedelta
 
@@ -463,18 +456,19 @@ try:
             count = old_sessions.count()
             old_sessions.delete()
 
-            logger.info(f"Cleaned up {count} old analysis sessions")
+            logger.info("Cleaned up %s", count old analysis sessions")
         except Exception as e:
             error_msg = f"Cleanup failed: {e!s}"
             logger.exception(error_msg)
             return {"status": "failed", "error": error_msg}
-        else:
             return {"status": "completed", "cleaned_sessions": count}
 
 except ImportError:
     # Celery not available, create a mock delay function
     class MockTask:
+        """TODO: Add docstring."""
         def delay(self, session_id: str) -> None:
+            """TODO: Add docstring."""
             # Run synchronously if Celery is not available
             run_code_analysis(session_id)
 

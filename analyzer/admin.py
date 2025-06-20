@@ -2,29 +2,13 @@
 
 from __future__ import annotations
 
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from django.contrib import admin
 from django.utils.html import format_html
 
 from .models import (
-    AnalysisBackendModel,
-    AnalysisSession,
-    BackendStatistics,
-    ClassAnalysis,
-    DeadCodeIssue,
-    DetectedIssue,
-    DuplicateCodeBlock,
-    DuplicateLocation,
-    FileAnalysis,
-    FunctionAnalysis,
-    ImportAnalysis,
-    IssueType,
-    PackageAnalysis,
-    Project,
-    QualityMetrics,
-    SecurityIssue,
-    VariableAnalysis,
+    from typing import List, Dict, Optional, Any AnalysisBackendModel, AnalysisSession, BackendStatistics, ClassAnalysis, DeadCodeIssue, DetectedIssue, DuplicateCodeBlock, DuplicateLocation, FileAnalysis, FunctionAnalysis, ImportAnalysis, IssueType, PackageAnalysis, Project, QualityMetrics, SecurityIssue, VariableAnalysis,
 )
 
 
@@ -84,9 +68,7 @@ class ProjectAdmin(admin.ModelAdmin):
             color = (
                 "green"
                 if latest.overall_score >= 80
-                else "orange"
-                if latest.overall_score >= 60
-                else "red"
+                else "orange" if latest.overall_score >= 60 else "red"
             )
             return format_html(
                 '<span style="color: {}; font-weight: bold;">{:.1f} ({})</span>',
@@ -223,9 +205,7 @@ class AnalysisSessionAdmin(admin.ModelAdmin):
         color = (
             "green"
             if obj.overall_score >= 80
-            else "orange"
-            if obj.overall_score >= 60
-            else "red"
+            else "orange" if obj.overall_score >= 60 else "red"
         )
         return format_html(
             '<span style="color: {}; font-weight: bold;">{:.1f}</span>',
@@ -552,6 +532,8 @@ class QualityMetricsAdmin(admin.ModelAdmin):
 
 @admin.register(PackageAnalysis)
 class PackageAnalysisAdmin(admin.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = (
         "name",
         "session",
@@ -567,6 +549,8 @@ class PackageAnalysisAdmin(admin.ModelAdmin):
 
 @admin.register(ClassAnalysis)
 class ClassAnalysisAdmin(admin.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = (
         "name",
         "package_analysis",
@@ -581,6 +565,8 @@ class ClassAnalysisAdmin(admin.ModelAdmin):
 
 @admin.register(FunctionAnalysis)
 class FunctionAnalysisAdmin(admin.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = (
         "name",
         "function_type",
@@ -600,6 +586,8 @@ class FunctionAnalysisAdmin(admin.ModelAdmin):
 
 @admin.register(VariableAnalysis)
 class VariableAnalysisAdmin(admin.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = ("name", "variable_type", "scope_type", "is_constant", "is_unused")
     list_filter = ("variable_type", "scope_type", "is_constant", "is_unused")
     search_fields = ("name", "full_name")
@@ -608,6 +596,8 @@ class VariableAnalysisAdmin(admin.ModelAdmin):
 
 @admin.register(ImportAnalysis)
 class ImportAnalysisAdmin(admin.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = (
         "module_name",
         "import_name",
@@ -625,6 +615,8 @@ class ImportAnalysisAdmin(admin.ModelAdmin):
 
 @admin.register(AnalysisBackendModel)
 class AnalysisBackendModelAdmin(admin.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = [
         "name",
         "display_name",
@@ -669,6 +661,8 @@ class AnalysisBackendModelAdmin(admin.ModelAdmin):
 
 @admin.register(IssueType)
 class IssueTypeAdmin(admin.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = ["code", "name", "backend", "category", "severity", "is_active"]
     list_filter = ["backend", "category", "severity", "is_active", "created_at"]
     search_fields = ["code", "name", "description"]
@@ -707,6 +701,8 @@ class IssueTypeAdmin(admin.ModelAdmin):
 
 @admin.register(DetectedIssue)
 class DetectedIssueAdmin(admin.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = [
         "issue_type_code",
         "file_path",
@@ -729,13 +725,15 @@ class DetectedIssueAdmin(admin.ModelAdmin):
     date_hierarchy = "detected_at"
     ordering = ["-detected_at"]
 
-    def issue_type_code(self, obj):
+    def issue_type_code(self, obj) -> Any:
+        """TODO: Add docstring."""
         return obj.issue_type.code
 
     issue_type_code.short_description = "Issue Code"
     issue_type_code.admin_order_field = "issue_type__code"
 
-    def severity(self, obj):
+    def severity(self, obj) -> Any:
+        """TODO: Add docstring."""
         return obj.issue_type.severity
 
     severity.short_description = "Severity"
@@ -797,6 +795,8 @@ class DetectedIssueAdmin(admin.ModelAdmin):
 
 @admin.register(BackendStatistics)
 class BackendStatisticsAdmin(admin.ModelAdmin):
+    """TODO: Add docstring."""
+
     list_display = [
         "backend",
         "session",

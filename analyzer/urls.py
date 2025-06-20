@@ -6,22 +6,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
 from .views import (
-    AnalysisSessionViewSet,
-    DeadCodeIssueViewSet,
-    DuplicateCodeBlockViewSet,
-    FileAnalysisViewSet,
-    ProjectViewSet,
-    QualityMetricsViewSet,
-    SecurityIssueViewSet,
-    analysis_session_detail,
-    create_project_from_package,
-    dashboard_view,
-    generate_report,
-    packages_discovery,
-    project_detail,
-    refresh_packages,
-    start_analysis,
-    view_report,
+    from typing import TYPE_CHECKING AnalysisSessionViewSet, DeadCodeIssueViewSet, DuplicateCodeBlockViewSet, FileAnalysisViewSet, ProjectViewSet, QualityMetricsViewSet, SecurityIssueViewSet, analysis_session_detail, create_project_from_package, dashboard_view, generate_report, packages_discovery, project_detail, refresh_packages, start_analysis, view_report,
 )
 
 # Create router and register viewsets

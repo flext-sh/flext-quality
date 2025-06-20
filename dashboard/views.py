@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from analyzer.models import AnalysisSession, Project
 from analyzer.package_discovery import PackageDiscovery
 from django.contrib import messages
@@ -97,7 +99,6 @@ def packages_discovery(request: HttpRequest) -> HttpResponse:
         packages = discovery.get_analyzable_packages()
     elif search_query:
         packages = discovery.search_packages(search_query)
-    else:
         packages = discovery.get_installed_packages()
 
     # Pagination
@@ -272,7 +273,7 @@ def refresh_packages(_request: HttpRequest) -> JsonResponse:
         )
 
 
-def run_analysis(request, project_id):
+def run_analysis(request, project_id) -> Any:
     """Start analysis for a flx_project."""
     flx_project = get_object_or_404(Project, id=project_id)
 
@@ -328,7 +329,7 @@ def run_analysis(request, project_id):
     return render(request, "dashboard/run_analysis.html", context)
 
 
-def analysis_session_detail(request, session_id):
+def analysis_session_detail(request, session_id) -> Any:
     """Show detailed analysis session results."""
     from analyzer.models import (
         AnalysisSession,
@@ -357,7 +358,7 @@ def analysis_session_detail(request, session_id):
     return render(request, "dashboard/analysis_session_detail.html", context)
 
 
-def package_analysis_view(request, session_id, package_id):
+def package_analysis_view(request, session_id, package_id) -> Any:
     """Show detailed package analysis with drill-down options."""
     from analyzer.models import ClassAnalysis, FunctionAnalysis, PackageAnalysis
 
@@ -390,7 +391,7 @@ def package_analysis_view(request, session_id, package_id):
     return render(request, "dashboard/package_analysis.html", context)
 
 
-def class_analysis_view(request, session_id, class_id):
+def class_analysis_view(request, session_id, class_id) -> Any:
     """Show detailed class analysis with methods breakdown."""
     from analyzer.models import ClassAnalysis, FunctionAnalysis, VariableAnalysis
 
@@ -420,7 +421,7 @@ def class_analysis_view(request, session_id, class_id):
     return render(request, "dashboard/class_analysis.html", context)
 
 
-def function_analysis_view(request, session_id, function_id):
+def function_analysis_view(request, session_id, function_id) -> Any:
     """Show detailed function analysis."""
     from analyzer.models import FunctionAnalysis, VariableAnalysis
 
@@ -440,7 +441,7 @@ def function_analysis_view(request, session_id, function_id):
     return render(request, "dashboard/function_analysis.html", context)
 
 
-def analysis_overview(request):
+def analysis_overview(request) -> Any:
     """Overview of all analysis sessions."""
     from analyzer.models import AnalysisSession
 
@@ -474,7 +475,7 @@ def analysis_overview(request):
     return render(request, "dashboard/analysis_overview.html", context)
 
 
-def hierarchical_report(request, session_id):
+def hierarchical_report(request, session_id) -> Any:
     """Generate hierarchical drill-down report."""
     from analyzer.models import (
         AnalysisSession,
@@ -535,7 +536,7 @@ def hierarchical_report(request, session_id):
     return render(request, "dashboard/hierarchical_report.html", context)
 
 
-def backend_issues_report(request, session_id):
+def backend_issues_report(request, session_id) -> Any:
     """Enhanced report showing backend statistics and detected issues."""
     session = get_object_or_404(AnalysisSession, id=session_id)
 
@@ -551,7 +552,7 @@ def backend_issues_report(request, session_id):
     ).order_by("-detected_at")
 
     # Group issues by backend
-    issues_by_backend = {}
+    issues_by_backend: dict = {}
     for issue in detected_issues:
         backend_name = issue.issue_type.backend.name
         if backend_name not in issues_by_backend:

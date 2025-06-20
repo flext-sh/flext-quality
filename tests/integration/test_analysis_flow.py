@@ -5,11 +5,15 @@ from contextlib import contextmanager
 from pathlib import Path
 
 from analyzer.models import (
+    Any,
     BackendStatistics,
     FileAnalysis,
     Project,
     QualityMetrics,
     SecurityIssue,
+    from,
+    import,
+    typing,
 )
 from analyzer.multi_backend_analyzer import MultiBackendAnalyzer
 from django.test import TransactionTestCase
@@ -27,7 +31,7 @@ class TestCompleteAnalysisFlow(TransactionTestCase):
         )
 
     @contextmanager
-    def create_test_project(self):
+    def create_test_project(self) -> Any:
         """Create a test project with real Python files."""
         with tempfile.TemporaryDirectory() as temp_dir:
             project_path = Path(temp_dir)
@@ -49,7 +53,7 @@ import subprocess
 class TestClass:
     """A test class for analysis."""
 
-    def __init__(self, name: str, value: int = 42):
+    def __init__(self, name: str, value: int = 42) -> None:
         """Initialize the test class."""
         self.name = name
         self.value = value
@@ -66,13 +70,12 @@ class TestClass:
                 if z > 30:
                     if x + y > z:
                         return "very complex path"
-                    else:
                         return "another complex path"
                 return "medium complexity"
             return "some complexity"
         return "simple path"
 
-    def method_with_many_params(self, a, b, c, d, e, f, g, h, i, j):
+    def method_with_many_params(self, a, b, c, d, e, f, g, h, i, j) -> Any:
         """Method with too many parameters."""
         return a + b + c + d + e + f + g + h + i + j
 
@@ -82,44 +85,40 @@ class TestClass:
         return self.value * 2
 
 
-def function_with_security_issue():
+def function_with_security_issue() -> Any:
     """Function with potential security vulnerability."""
     # This should be detected by bandit
     subprocess.call("echo 'test'", shell=True)  # B602
 
 
-def another_function_with_issue():
+def another_function_with_issue() -> Any:
     """Another function with security issue."""
     # Hard-coded password (should be detected)
     password = "hardcoded_password_123"  # B105
     return password
 
 
-def complex_function(data):
+def complex_function(data) -> Any:
     """Function with high complexity."""
-    result = []
+    result: list = []
     for item in data:
         if isinstance(item, dict):
-            for key, value in item.items():
+            for _key, value in item.items():
                 if isinstance(value, list):
                     for sub_item in value:
                         if sub_item is not None:
                             if isinstance(sub_item, str):
                                 if len(sub_item) > 5:
                                     result.append(sub_item.upper())
-                                else:
                                     result.append(sub_item.lower())
-                            else:
                                 result.append(str(sub_item))
-                else:
                     result.append(str(value))
-        else:
             result.append(str(item))
     return result
 
 
 # Unused function (dead code)
-def unused_function():
+def unused_function() -> Any:
     """This function is never called."""
     return "This is dead code"
 
@@ -159,7 +158,6 @@ __all__ = ["utility_function", "DataModel"]
                 '''
 """Utility functions for the test package."""
 
-from typing import List, Dict, Any, Optional
 import json
 
 
@@ -181,25 +179,21 @@ def another_utility(x: int, y: int) -> int:
 
 
 # Duplicate code pattern (similar to main.py)
-def complex_function_duplicate(data):
+def complex_function_duplicate(data) -> Any:
     """Duplicate complex function."""
-    result = []
+    result: list = []
     for item in data:
         if isinstance(item, dict):
-            for key, value in item.items():
+            for _key, value in item.items():
                 if isinstance(value, list):
                     for sub_item in value:
                         if sub_item is not None:
                             if isinstance(sub_item, str):
                                 if len(sub_item) > 5:
                                     result.append(sub_item.upper())
-                                else:
                                     result.append(sub_item.lower())
-                            else:
                                 result.append(str(sub_item))
-                else:
                     result.append(str(value))
-        else:
             result.append(str(item))
     return result
 ''',
@@ -210,7 +204,6 @@ def complex_function_duplicate(data):
 """Data models for the test package."""
 
 from dataclasses import dataclass
-from typing import List, Optional
 
 
 @dataclass
@@ -234,7 +227,8 @@ class DataModel:
 class LegacyModel:
     """A legacy model without dataclass."""
 
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
+        """TODO: Add docstring."""
         self.name = name
         self.data = {}
 
@@ -247,6 +241,7 @@ class LegacyModel:
         return self.data.get(key)
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return f"LegacyModel({self.name})"
 ''',
             )

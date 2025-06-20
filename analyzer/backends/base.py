@@ -16,6 +16,7 @@ class AnalysisResult:
     """Container for analysis results from a backend."""
 
     def __init__(self) -> None:
+        """TODO: Add docstring."""
         self.packages: list[dict[str, Any]] = []
         self.files: list[dict[str, Any]] = []
         self.classes: list[dict[str, Any]] = []
@@ -43,6 +44,7 @@ class AnalysisBackend(ABC):
     """Abstract base class for analysis backends."""
 
     def __init__(self, session: Any, project_path: Path) -> None:
+        """TODO: Add docstring."""
         self.session = session
         self.project_path = project_path
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
@@ -71,6 +73,7 @@ class AnalysisBackend(ABC):
 
         Returns:
             AnalysisResult object containing all analysis data
+
         """
 
     def is_available(self) -> bool:
@@ -87,12 +90,14 @@ class AnalysisBackend(ABC):
 
     def _find_python_files(self, path: Path) -> list[Path]:
         """Find all Python files in a directory."""
-        python_files = []
+        python_files: list = []
         try:
-            for py_file in path.rglob("*.py"):
-                # Skip hidden files and directories
-                if not any(part.startswith(".") for part in py_file.parts):
-                    python_files.append(py_file)
+            # Skip hidden files and directories
+            python_files.extend(
+                py_file
+                for py_file in path.rglob("*.py")
+                if not any(part.startswith(".") for part in py_file.parts)
+            )
         except Exception as e:
             self.logger.exception(f"Error finding Python files in {path}: {e}")
 

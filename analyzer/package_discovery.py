@@ -13,6 +13,7 @@ class PackageDiscovery:
     """Discover and analyze Python packages for code analysis."""
 
     def __init__(self) -> None:
+        """TODO: Add docstring."""
         self.packages_cache: dict[str, dict[str, Any]] = {}
         self._cached_packages: list[dict[str, Any]] | None = None
 
@@ -26,7 +27,7 @@ class PackageDiscovery:
         if self._cached_packages is not None:
             return self._cached_packages
 
-        packages = []
+        packages: list = []
 
         # Use importlib.metadata for Python 3.8+
         for dist in importlib.metadata.distributions():
@@ -40,9 +41,7 @@ class PackageDiscovery:
                 (
                     0
                     if x["package_type"] == "source"
-                    else 1
-                    if x["package_type"] == "wheel"
-                    else 2
+                    else 1 if x["package_type"] == "wheel" else 2
                 ),
                 x["name"].lower(),
             ),
@@ -98,7 +97,6 @@ class PackageDiscovery:
                 # Get the first file to determine location
                 first_file = next(iter(dist.files))
                 location = str(Path(first_file.locate()).parent) if first_file else None
-            else:
                 location = None
 
             # Determine package type
@@ -335,15 +333,12 @@ class PackageDiscovery:
         packages = self.get_installed_packages()
         query_lower = query.lower()
 
-        results = []
-        for package in packages:
-            if (
-                query_lower in package["name"].lower()
-                or query_lower in package.get("description", "").lower()
-            ):
-                results.append(package)
-
-        return results
+        return [
+            package
+            for package in packages
+            if query_lower in package["name"].lower()
+            or query_lower in package.get("description", "").lower()
+        ]
 
     def get_development_packages(self) -> list[dict[str, Any]]:
         """Get packages installed from source (development installations)."""

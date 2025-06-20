@@ -3,18 +3,17 @@
 from __future__ import annotations
 
 import ast
-from typing import TYPE_CHECKING, Any
+from pathlib import Path
+from typing import Any
 
 from .base import AnalysisBackend, AnalysisResult
-
-if TYPE_CHECKING:
-    from pathlib import Path
 
 
 class ASTVisitor(ast.NodeVisitor):
     """AST visitor to extract detailed code structure information."""
 
     def __init__(self, file_path: Path, package_name: str) -> None:
+        """TODO: Add docstring."""
         self.file_path = file_path
         self.package_name = package_name
         self.current_class: dict[str, Any] | None = None
@@ -32,7 +31,7 @@ class ASTVisitor(ast.NodeVisitor):
         self.class_stack: list[dict[str, Any]] = []
         self.function_stack: list[dict[str, Any]] = []
 
-    def visit_ClassDef(self, node: ast.ClassDef) -> None:  # noqa: N802
+    def visit_ClassDef(self, node: ast.ClassDef) -> None:
         """Visit class definition."""
         # Extract class analysis into smaller helper methods
         full_name = self._calculate_class_full_name(node)
@@ -81,7 +80,7 @@ class ASTVisitor(ast.NodeVisitor):
 
     def _extract_base_classes(self, node: ast.ClassDef) -> list[str]:
         """Extract base class names from a class definition."""
-        base_classes = []
+        base_classes: list = []
         for base in node.bases:
             if isinstance(base, ast.Name):
                 base_classes.append(base.id)
@@ -125,11 +124,11 @@ class ASTVisitor(ast.NodeVisitor):
             "staticmethod_count": staticmethod_count,
         }
 
-    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:  # noqa: N802
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         """Visit function definition."""
         self._visit_function_def(node, "function")
 
-    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:  # noqa: N802
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
         """Visit async function definition."""
         self._visit_function_def(node, "async_function")
 
@@ -179,7 +178,7 @@ class ASTVisitor(ast.NodeVisitor):
         param_count += len(args.kwonlyargs)
 
         # Get parameter information
-        parameters = []
+        parameters: list = []
         for arg in args.args:
             param_info = {
                 "name": arg.arg,
@@ -240,7 +239,7 @@ class ASTVisitor(ast.NodeVisitor):
         self.function_stack.pop()
         self.current_function = self.function_stack[-1] if self.function_stack else None
 
-    def visit_Import(self, node: ast.Import) -> None:  # noqa: N802
+    def visit_Import(self, node: ast.Import) -> None:
         """Visit import statement."""
         for alias in node.names:
             import_info = {
@@ -253,7 +252,7 @@ class ASTVisitor(ast.NodeVisitor):
             }
             self.imports.append(import_info)
 
-    def visit_ImportFrom(self, node: ast.ImportFrom) -> None:  # noqa: N802
+    def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
         """Visit from...import statement."""
         module_name = node.module or ""
         for alias in node.names:
@@ -267,14 +266,14 @@ class ASTVisitor(ast.NodeVisitor):
             }
             self.imports.append(import_info)
 
-    def visit_Assign(self, node: ast.Assign) -> None:  # noqa: N802
+    def visit_Assign(self, node: ast.Assign) -> None:
         """Visit assignment statement."""
         for target in node.targets:
             if isinstance(target, ast.Name):
                 self._analyze_variable(target.id, node)
         self.generic_visit(node)
 
-    def visit_AnnAssign(self, node: ast.AnnAssign) -> None:  # noqa: N802
+    def visit_AnnAssign(self, node: ast.AnnAssign) -> None:
         """Visit annotated assignment."""
         if isinstance(node.target, ast.Name):
             self._analyze_variable(node.target.id, node, has_annotation=True)
@@ -428,14 +427,17 @@ class ASTBackend(AnalysisBackend):
 
     @property
     def name(self) -> str:
+        """TODO: Add docstring."""
         return "ast"
 
     @property
     def description(self) -> str:
+        """TODO: Add docstring."""
         return "AST-based analysis for detailed code structure (classes, functions, variables)"
 
     @property
     def capabilities(self) -> list[str]:
+        """TODO: Add docstring."""
         return [
             "package_structure",
             "class_analysis",

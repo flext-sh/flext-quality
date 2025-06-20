@@ -1,3 +1,7 @@
+"""Module dashboard_extras."""
+
+from typing import Any
+
 """Custom template filters for the dashboard app."""
 
 from django import template
@@ -7,7 +11,7 @@ register = template.Library()
 
 
 @register.filter
-def get_item(dictionary, key):
+def get_item(dictionary, key) -> Any:
     """Get an item from a dictionary using a key."""
     if isinstance(dictionary, dict):
         return dictionary.get(key)
@@ -15,7 +19,7 @@ def get_item(dictionary, key):
 
 
 @register.filter
-def multiply(value, arg):
+def multiply(value, arg) -> Any:
     """Multiply two values."""
     try:
         return float(value) * float(arg)
@@ -24,7 +28,7 @@ def multiply(value, arg):
 
 
 @register.filter
-def percentage(value, total):
+def percentage(value, total) -> Any:
     """Calculate percentage."""
     if total == 0:
         return 0
@@ -32,7 +36,7 @@ def percentage(value, total):
 
 
 @register.filter
-def severity_color(severity):
+def severity_color(severity) -> Any:
     """Get Bootstrap color class for severity level."""
     severity_colors = {
         "CRITICAL": "danger",
@@ -45,7 +49,7 @@ def severity_color(severity):
 
 
 @register.filter
-def status_icon(status):
+def status_icon(status) -> Any:
     """Get icon for backend status."""
     status_icons = {
         "success": "✅",
@@ -57,7 +61,7 @@ def status_icon(status):
 
 
 @register.filter
-def dict_get(dictionary, key):
+def dict_get(dictionary, key) -> Any:
     """Get value from dictionary by key."""
     if isinstance(dictionary, dict):
         return dictionary.get(key, 0)
@@ -65,7 +69,7 @@ def dict_get(dictionary, key):
 
 
 @register.filter
-def severity_badge(severity):
+def severity_badge(severity) -> Any:
     """Return Bootstrap badge class for severity level."""
     severity_classes = {
         "CRITICAL": "bg-danger",
@@ -78,7 +82,7 @@ def severity_badge(severity):
 
 
 @register.filter
-def status_badge(status):
+def status_badge(status) -> Any:
     """Return Bootstrap badge class for status."""
     status_classes = {
         "success": "bg-success",
@@ -111,7 +115,7 @@ def format_duration(duration) -> str:
 
 
 @register.filter
-def truncate_path(path, max_length=50):
+def truncate_path(path, max_length=50) -> Any:
     """Truncate file path for display."""
     if len(path) <= max_length:
         return path
@@ -124,14 +128,13 @@ def truncate_path(path, max_length=50):
 
         if remaining_length > 0:
             # Build path from the beginning until we run out of space
-            truncated_parts = []
+            truncated_parts: list = []
             current_length = 0
 
             for part in parts[:-1]:
                 if current_length + len(part) + 1 <= remaining_length:
                     truncated_parts.append(part)
                     current_length += len(part) + 1
-                else:
                     break
 
             if truncated_parts:
@@ -142,7 +145,7 @@ def truncate_path(path, max_length=50):
 
 
 @register.filter
-def issue_icon(category):
+def issue_icon(category) -> Any:
     """Return FontAwesome icon for issue category."""
     icons = {
         "security": "fas fa-shield-alt",
@@ -159,7 +162,7 @@ def issue_icon(category):
 
 
 @register.simple_tag
-def progress_bar(value, total, css_class="bg-primary"):
+def progress_bar(value, total, css_class="bg-primary") -> Any:
     """Generate a Bootstrap progress bar."""
     percentage = 0 if total == 0 else value / total * 100
 

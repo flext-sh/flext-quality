@@ -5,19 +5,14 @@ from __future__ import annotations
 from datetime import timedelta
 
 from analyzer.models import (
-    AnalysisSession,
-    DeadCodeIssue,
-    DuplicateCodeBlock,
-    Project,
-    QualityMetrics,
-    SecurityIssue,
+    from typing import List, Dict, Optional, Any AnalysisSession, Any, DeadCodeIssue, DuplicateCodeBlock, Project, QualityMetrics, SecurityIssue, from, import, typing,
 )
 from django.db.models import Avg, Count
 from django.http import JsonResponse
 from django.utils import timezone
 
 
-def quality_trends_chart(request):
+def quality_trends_chart(request) -> Any:
     """Get quality trends data for line chart."""
     period = request.GET.get("period", "30d")
     project_id = request.GET.get("flx_project")
@@ -47,16 +42,15 @@ def quality_trends_chart(request):
     sessions = sessions_query.order_by("completed_at")
 
     # Prepare data for chart
-    labels = []
-    overall_scores = []
-    complexity_scores = []
-    security_scores = []
-    maintainability_scores = []
+    labels: list = []
+    overall_scores: list = []
+    complexity_scores: list = []
+    security_scores: list = []
+    maintainability_scores: list = []
 
     for session in sessions:
         if session.completed_at:
             labels.append(session.completed_at.strftime("%Y-%m-%d"))
-        else:
             labels.append("Unknown")
         overall_scores.append(float(session.overall_score or 0))
 
@@ -108,7 +102,7 @@ def quality_trends_chart(request):
     return JsonResponse(chart_data)
 
 
-def security_issues_distribution(request):
+def security_issues_distribution(request) -> Any:
     """Get security issues distribution data for doughnut chart."""
     project_id = request.GET.get("flx_project")
     resolved = request.GET.get("resolved", "false").lower() == "true"
@@ -149,14 +143,14 @@ def security_issues_distribution(request):
     return JsonResponse(chart_data)
 
 
-def projects_comparison_chart(_request):
+def projects_comparison_chart(_request) -> Any:
     """Get projects comparison data for bar chart."""
     # Get latest sessions for each flx_project
     projects = Project.objects.all()[:10]  # Limit to top 10 projects
 
-    project_names = []
-    quality_scores = []
-    security_issues = []
+    project_names: list = []
+    quality_scores: list = []
+    security_issues: list = []
 
     for flx_project in projects:
         # Get latest completed session
@@ -205,7 +199,7 @@ def projects_comparison_chart(_request):
     return JsonResponse(chart_data)
 
 
-def quality_radar_chart(request):
+def quality_radar_chart(request) -> Any:
     """Get quality radar chart data."""
     project_id = request.GET.get("flx_project")
 
@@ -227,10 +221,8 @@ def quality_radar_chart(request):
                 float(metrics.duplication_score),
             ]
             label = f"Project: {session.flx_project.name}"
-        else:
             data = [0, 0, 0, 0, 0, 0]
             label = "No Data"
-    else:
         # Get average scores across all completed sessions
         completed_sessions = AnalysisSession.objects.filter(status="completed")
 
@@ -260,7 +252,6 @@ def quality_radar_chart(request):
             except Exception:
                 data = [0, 0, 0, 0, 0, 0]
                 label = "No Data"
-        else:
             data = [0, 0, 0, 0, 0, 0]
             label = "No Data"
 
@@ -291,7 +282,7 @@ def quality_radar_chart(request):
     return JsonResponse(chart_data)
 
 
-def issues_timeline_chart(request):
+def issues_timeline_chart(request) -> Any:
     """Get issues timeline data for area chart."""
     period = request.GET.get("period", "30d")
 
@@ -312,15 +303,14 @@ def issues_timeline_chart(request):
     ).order_by("completed_at")
 
     # Prepare data
-    labels = []
-    security_data = []
-    dead_code_data = []
-    duplicate_data = []
+    labels: list = []
+    security_data: list = []
+    dead_code_data: list = []
+    duplicate_data: list = []
 
     for session in sessions:
         if session.completed_at:
             labels.append(session.completed_at.strftime("%Y-%m-%d"))
-        else:
             labels.append("Unknown")
 
         # Count issues for this session
@@ -374,7 +364,7 @@ def issues_timeline_chart(request):
     return JsonResponse(chart_data)
 
 
-def complexity_distribution_chart(_request):
+def complexity_distribution_chart(_request) -> Any:
     """Get complexity distribution data for histogram."""
     # Get all completed sessions
     sessions = AnalysisSession.objects.filter(status="completed")
@@ -388,11 +378,10 @@ def complexity_distribution_chart(_request):
         (30, float("inf"), "Very High"),
     ]
 
-    distribution = []
+    distribution: list = []
     for min_val, max_val, label in ranges:
         if max_val == float("inf"):
             count = sessions.filter(overall_score__gte=min_val).count()
-        else:
             count = sessions.filter(
                 overall_score__gte=min_val,
                 overall_score__lt=max_val,
@@ -427,7 +416,7 @@ def complexity_distribution_chart(_request):
     return JsonResponse(chart_data)
 
 
-def dashboard_summary_stats(_request):
+def dashboard_summary_stats(_request) -> Any:
     """Get summary statistics for dashboard cards."""
     total_projects = Project.objects.count()
     total_sessions = AnalysisSession.objects.count()
@@ -455,18 +444,17 @@ def dashboard_summary_stats(_request):
         "-completed_at",
     )[:5]
 
-    recent_activity = []
-    for session in recent_sessions:
-        recent_activity.append(
-            {
-                "project_name": session.flx_project.name,
-                "session_id": str(session.id),
-                "score": float(session.overall_score or 0),
-                "created_at": (
-                    session.completed_at.isoformat() if session.completed_at else ""
-                ),
-            },
-        )
+    recent_activity = [
+        {
+            "project_name": session.flx_project.name,
+            "session_id": str(session.id),
+            "score": float(session.overall_score or 0),
+            "created_at": (
+                session.completed_at.isoformat() if session.completed_at else ""
+            ),
+        }
+        for session in recent_sessions
+    ]
 
     stats = {
         "total_projects": total_projects,

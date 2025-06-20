@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from .base import AnalysisBackend, AnalysisResult
+from typing import List, Dict, Optional, Any
 
 
 class QualityBackend(AnalysisBackend):
@@ -15,14 +16,17 @@ class QualityBackend(AnalysisBackend):
 
     @property
     def name(self) -> str:
+        """TODO: Add docstring."""
         return "quality"
 
     @property
     def description(self) -> str:
+        """TODO: Add docstring."""
         return "Code quality analysis using radon for complexity metrics"
 
     @property
     def capabilities(self) -> list[str]:
+        """TODO: Add docstring."""
         return [
             "complexity_analysis",
             "maintainability_analysis",
@@ -151,7 +155,7 @@ class QualityBackend(AnalysisBackend):
                     processed_data: dict[str, dict[str, Any]] = {}
 
                     for file_path, mi_data in data.items():
-                        rel_path = self._get_relative_path(Path(file_path))
+                        rel_path = self._get_relative_path(Path(file_path)))
                         processed_data[rel_path] = {
                             "maintainability_index": mi_data["mi"],
                             "rank": mi_data["rank"],
@@ -246,7 +250,7 @@ class QualityBackend(AnalysisBackend):
                     processed_data: dict[str, dict[str, Any]] = {}
 
                     for file_path, metrics in data.items():
-                        rel_path = self._get_relative_path(Path(file_path))
+                        rel_path = self._get_relative_path(Path(file_path)))
                         processed_data[rel_path] = {
                             "loc": metrics["loc"],  # Lines of code
                             "lloc": metrics["lloc"],  # Logical lines of code

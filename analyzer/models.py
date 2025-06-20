@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 from django.db import models
 
 
@@ -40,6 +42,8 @@ class Project(models.Model):
     python_files = models.IntegerField(default=0)
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_project"
         indexes = [
             models.Index(fields=["created_at"]),
@@ -47,6 +51,7 @@ class Project(models.Model):
         ]
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return self.name
 
 
@@ -109,6 +114,8 @@ class AnalysisSession(models.Model):
     error_message = models.TextField(blank=True)
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_analysis_session"
         indexes = [
             models.Index(fields=["status"]),
@@ -116,10 +123,11 @@ class AnalysisSession(models.Model):
         ]
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return f"{self.flx_project.name} - {self.name} ({self.status})"
 
     @property
-    def duration(self):
+    def duration(self) -> Any:
         """Calculate duration of analysis."""
         if self.started_at and self.completed_at:
             return self.completed_at - self.started_at
@@ -149,6 +157,8 @@ class FileAnalysis(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_file_analysis"
         indexes = [
             models.Index(fields=["session", "file_path"]),
@@ -156,10 +166,11 @@ class FileAnalysis(models.Model):
         ]
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return f"{self.file_name} (LOC: {self.lines_of_code})"
 
     @property
-    def total_lines(self):
+    def total_lines(self) -> Any:
         """Total lines in the file."""
         return self.lines_of_code + self.comment_lines + self.blank_lines
 
@@ -201,6 +212,8 @@ class SecurityIssue(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_security_issue"
         indexes = [
             models.Index(fields=["session", "severity"]),
@@ -208,6 +221,7 @@ class SecurityIssue(models.Model):
         ]
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return f"{self.severity} - {self.issue_type} in {self.file_path}:{self.line_number}"
 
 
@@ -239,6 +253,8 @@ class DeadCodeIssue(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_dead_code_issue"
         indexes = [
             models.Index(fields=["session", "dead_type"]),
@@ -246,6 +262,7 @@ class DeadCodeIssue(models.Model):
         ]
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return f"{self.dead_type} - {self.name} in {self.file_path}:{self.line_number}"
 
 
@@ -267,12 +284,15 @@ class DuplicateCodeBlock(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_duplicate_code_block"
         indexes = [
             models.Index(fields=["session", "similarity_score"]),
         ]
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return f"Duplicate block ({self.lines_count} lines, {self.similarity_score:.2f} similarity)"
 
 
@@ -289,12 +309,15 @@ class DuplicateLocation(models.Model):
     end_line = models.IntegerField()
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_duplicate_location"
         indexes = [
             models.Index(fields=["duplicate_block", "file_path"]),
         ]
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return f"{self.file_path}:{self.start_line}-{self.end_line}"
 
 
@@ -343,9 +366,12 @@ class QualityMetrics(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_quality_metrics"
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return f"Quality Metrics for {self.session} (Score: {self.overall_score:.1f})"
 
 
@@ -381,6 +407,8 @@ class AnalysisReport(models.Model):
     download_count = models.IntegerField(default=0)
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_analysis_report"
         indexes = [
             models.Index(fields=["session", "report_type"]),
@@ -388,6 +416,7 @@ class AnalysisReport(models.Model):
         ]
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return f"{self.name} ({self.report_type})"
 
 
@@ -428,6 +457,8 @@ class PackageAnalysis(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_package_analysis"
         unique_together = [["session", "name"]]
         indexes = [
@@ -436,6 +467,7 @@ class PackageAnalysis(models.Model):
         ]
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return f"{self.name} (Files: {self.python_files_count})"
 
 
@@ -496,6 +528,8 @@ class ClassAnalysis(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_class_analysis"
         unique_together = [["file_analysis", "name", "line_start"]]
         indexes = [
@@ -505,6 +539,7 @@ class ClassAnalysis(models.Model):
         ]
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return f"{self.name} (Methods: {self.method_count})"
 
 
@@ -590,6 +625,8 @@ class FunctionAnalysis(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_function_analysis"
         unique_together = [["file_analysis", "name", "line_start"]]
         indexes = [
@@ -600,6 +637,7 @@ class FunctionAnalysis(models.Model):
         ]
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return f"{self.name} ({self.function_type}, CC: {self.cyclomatic_complexity})"
 
 
@@ -671,6 +709,8 @@ class VariableAnalysis(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_variable_analysis"
         unique_together = [["file_analysis", "name", "line_number"]]
         indexes = [
@@ -680,6 +720,7 @@ class VariableAnalysis(models.Model):
         ]
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return f"{self.name} ({self.variable_type})"
 
 
@@ -724,6 +765,8 @@ class ImportAnalysis(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_import_analysis"
         unique_together = [
             ["file_analysis", "module_name", "import_name", "line_number"],
@@ -735,6 +778,7 @@ class ImportAnalysis(models.Model):
         ]
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         if self.import_name:
             return f"from {self.module_name} import {self.import_name}"
         return f"import {self.module_name}"
@@ -764,6 +808,8 @@ class AnalysisBackendModel(models.Model):
     last_check_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_backend"
         ordering = ["execution_order", "name"]
         indexes = [
@@ -772,6 +818,7 @@ class AnalysisBackendModel(models.Model):
         ]
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return f"{self.display_name} ({'Active' if self.is_active else 'Inactive'})"
 
 
@@ -824,6 +871,8 @@ class IssueType(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_issue_type"
         unique_together = [["backend", "code"]]
         indexes = [
@@ -833,6 +882,7 @@ class IssueType(models.Model):
         ]
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return f"{self.backend.name}:{self.code} - {self.name}"
 
 
@@ -885,6 +935,8 @@ class DetectedIssue(models.Model):
     detected_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_detected_issue"
         indexes = [
             models.Index(fields=["session", "issue_type"]),
@@ -894,18 +946,22 @@ class DetectedIssue(models.Model):
         ]
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return f"{self.issue_type.code} in {self.file_path}:{self.line_number}"
 
     @property
-    def severity(self):
+    def severity(self) -> Any:
+        """TODO: Add docstring."""
         return self.issue_type.severity
 
     @property
-    def category(self):
+    def category(self) -> Any:
+        """TODO: Add docstring."""
         return self.issue_type.category
 
     @property
-    def backend_name(self):
+    def backend_name(self) -> Any:
+        """TODO: Add docstring."""
         return self.issue_type.backend.name
 
 
@@ -951,6 +1007,8 @@ class BackendStatistics(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        """TODO: Add docstring."""
+
         db_table = "analyzer_backend_statistics"
         unique_together = [["session", "backend"]]
         indexes = [
@@ -959,4 +1017,5 @@ class BackendStatistics(models.Model):
         ]
 
     def __str__(self) -> str:
+        """TODO: Add docstring."""
         return f"{self.backend.name} - {self.session} ({self.status})"
