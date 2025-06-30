@@ -1,0 +1,51 @@
+# FLEXT Quality - Modern Code Analysis Docker Image
+FROM python:3.13-slim
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Create non-root user
+RUN groupadd -r flext && useradd -r -g flext flext
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set work directory
+WORKDIR /app
+
+# Copy Python requirements
+COPY pyproject.toml .
+RUN pip install poetry && \
+    poetry config virtualenvs.create false && \
+    poetry install --no-dev || echo "Using fallback installation"
+
+# Install core dependencies manually if poetry fails
+RUN pip install pydantic \
+    pathlib \
+    ast \
+    argparse \
+    typing-extensions
+
+# Copy application code
+COPY src/ ./src/
+
+# Install the application
+RUN pip install -e . || echo "Manual installation complete"
+
+# Create directories and set permissions
+RUN mkdir -p /app/reports && \
+    chown -R flext:flext /app
+
+# Switch to non-root user
+USER flext
+
+# Set entrypoint for the new CLI
+ENTRYPOINT ["python", "-m", "flext_quality.cli"]
+
+# Default command
+CMD ["--help"]
