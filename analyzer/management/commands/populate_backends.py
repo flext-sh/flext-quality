@@ -402,7 +402,7 @@ class Command(BaseCommand):
             if created:
                 created_count += 1
             elif force_update:
-                for value in issue_data.values():
+                for key, value in issue_data.items():
                     if key not in {"backend", "code"}:
                         setattr(issue_type, key, value)
                 issue_type.updated_at = timezone.now()

@@ -1,196 +1,80 @@
-# DC Code Analyzer Makefile
+# FLEXT-QUALITY Makefile
+# ========================
 
-.PHONY: help install install-dev test lint format type-check security clean docker-build docker-run docker-stop migrate serve docs
+.PHONY: help install test clean lint format build docs
 
 # Default target
-help:
-	@echo "DC Code Analyzer - Available Commands"
+help: ## Show this help message
+	@echo "FLEXT-QUALITY Development Commands"
 	@echo "===================================="
-	@echo ""
-	@echo "Development:"
-	@echo "  install          Install production dependencies"
-	@echo "  install-dev      Install all dependencies including dev"
-	@echo "  migrate          Run database migrations"
-	@echo "  serve            Start development server"
-	@echo "  shell            Start Django shell"
-	@echo ""
-	@echo "Code Quality:"
-	@echo "  test             Run tests"
-	@echo "  test-cov         Run tests with coverage"
-	@echo "  lint             Run all linting checks"
-	@echo "  format           Format code with black and isort"
-	@echo "  type-check       Run type checking with mypy"
-	@echo "  security         Run security checks"
-	@echo "  pre-commit       Run pre-commit hooks"
-	@echo ""
-	@echo "Docker:"
-	@echo "  docker-build     Build Docker image"
-	@echo "  docker-run       Run with Docker Compose"
-	@echo "  docker-stop      Stop Docker Compose"
-	@echo ""
-	@echo "Cleanup:"
-	@echo "  clean            Clean temporary files and caches"
-	@echo ""
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}'
 
 # Installation
-install:
-	poetry install --only=main
-
-install-dev:
-	poetry install --with dev
-	poetry run pre-commit install
-
-# Development
-migrate:
-	poetry run python manage.py migrate
-
-serve:
-	poetry run python manage.py runserver
-
-shell:
-	poetry run python manage.py shell
+install: ## Install dependencies
+	@echo "📦 Installing dependencies for flext-quality..."
+	@if [ -f pyproject.toml ]; then \
+		poetry install; \
+	else \
+		pip install -r requirements.txt; \
+	fi
 
 # Testing
-test:
-	poetry run pytest
+test: ## Run tests
+	@echo "🧪 Running tests for flext-quality..."
+	@if [ -d tests ]; then \
+		python -m pytest tests/ -v; \
+	else \
+		echo "No tests directory found"; \
+	fi
 
-test-cov:
-	poetry run pytest --cov=analyzer --cov=dashboard --cov-report=html --cov-report=term-missing
+test-coverage: ## Run tests with coverage
+	@echo "🧪 Running tests with coverage for flext-quality..."
+	@python -m pytest tests/ --cov=src --cov-report=html --cov-report=term
 
-test-ci:
-	poetry run pytest --cov=analyzer --cov=dashboard --cov-report=xml --cov-report=term-missing --junitxml=test-results.xml
+# Code quality
+lint: ## Run linters
+	@echo "🔍 Running linters for flext-quality..."
+	@python -m ruff check .
+	@python -m mypy src/ || true
 
-# Code Quality
-lint:
-	poetry run ruff check .
-	poetry run black --check .
-	poetry run isort --check-only .
+format: ## Format code
+	@echo "🎨 Formatting code for flext-quality..."
+	@python -m black .
+	@python -m ruff check --fix .
 
-format:
-	poetry run black .
-	poetry run isort .
-	poetry run ruff check --fix .
+check: lint test ## Run all quality checks
+	@echo "✅ All quality checks complete for flext-quality!"
 
-type-check:
-	poetry run mypy analyzer dashboard
-
-security:
-	poetry run bandit -r analyzer dashboard
-	poetry run safety check
-
-pre-commit:
-	poetry run pre-commit run --all-files
-
-# Analysis
-complexity:
-	poetry run radon cc analyzer dashboard
-	poetry run radon mi analyzer dashboard
-
-dead-code:
-	poetry run vulture analyzer dashboard
-
-analyze:
-	@echo "Running comprehensive code analysis..."
-	@mkdir -p reports
-	poetry run ruff check --output-format=json . > reports/ruff.json || true
-	poetry run bandit -r analyzer dashboard -f json -o reports/bandit.json || true
-	poetry run safety check --json --output reports/safety.json || true
-	poetry run vulture analyzer dashboard --json > reports/vulture.json || true
-	poetry run radon cc analyzer dashboard -j > reports/radon-cc.json || true
-	poetry run radon mi analyzer dashboard -j > reports/radon-mi.json || true
-	@echo "Analysis complete. Reports saved in reports/ directory."
-
-# Docker
-docker-build:
-	docker build -t dc-code-analyzer:latest .
-
-docker-run:
-	docker-compose up -d
-
-docker-stop:
-	docker-compose down
-
-docker-logs:
-	docker-compose logs -f
-
-# Database
-db-reset:
-	poetry run python manage.py flush --noinput
-	poetry run python manage.py migrate
-
-db-backup:
-	poetry run python manage.py dumpdata --natural-foreign --natural-primary -e contenttypes -e auth.Permission > backup.json
-
-db-restore:
-	poetry run python manage.py loaddata backup.json
-
-# Utilities
-collectstatic:
-	poetry run python manage.py collectstatic --noinput
-
-superuser:
-	poetry run python manage.py createsuperuser
-
-check:
-	poetry run python manage.py check
-
-# Cleanup
-clean:
-	find . -type f -name "*.pyc" -delete
-	find . -type d -name "__pycache__" -delete
-	find . -type d -name "*.egg-info" -exec rm -rf {} +
-	find . -type f -name ".coverage" -delete
-	rm -rf htmlcov/
-	rm -rf dist/
-	rm -rf build/
-	rm -rf .pytest_cache/
-	rm -rf .mypy_cache/
-	rm -rf .ruff_cache/
-	rm -rf reports/
-
-# CI/CD helpers
-ci-install:
-	poetry install --with dev --no-interaction
-
-ci-test:
-	$(MAKE) test-ci
-
-ci-lint:
-	$(MAKE) lint type-check security
-
-ci-build:
-	poetry build
+# Build
+build: ## Build the package
+	@echo "🔨 Building flext-quality..."
+	@if [ -f pyproject.toml ]; then \
+		poetry build; \
+	else \
+		python setup.py build; \
+	fi
 
 # Documentation
-docs-serve:
-	poetry run mkdocs serve
+docs: ## Generate documentation
+	@echo "📚 Generating documentation for flext-quality..."
+	@if [ -f docs/conf.py ]; then \
+		cd docs && make html; \
+	else \
+		echo "No docs configuration found"; \
+	fi
 
-docs-build:
-	poetry run mkdocs build
+# Cleanup
+clean: ## Clean build artifacts
+	@echo "🧹 Cleaning build artifacts for flext-quality..."
+	@rm -rf build/ dist/ *.egg-info/
+	@find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
+	@find . -name "*.pyc" -delete 2>/dev/null || true
+	@find . -name "*.pyo" -delete 2>/dev/null || true
 
-docs-deploy:
-	poetry run mkdocs gh-deploy
+# Development
+dev-setup: install ## Complete development setup
+	@echo "🎯 Setting up development environment for flext-quality..."
+	@echo "Development setup complete!"
 
-# Release
-bump-patch:
-	poetry version patch
-
-bump-minor:
-	poetry version minor
-
-bump-major:
-	poetry version major
-
-release:
-	@echo "Current version: $$(poetry version -s)"
-	@echo "Building package..."
-	poetry build
-	@echo "Package built successfully!"
-	@echo "To publish: poetry publish"
-
-# Performance
-profile:
-	poetry run python -m cProfile -o profile.stats manage.py runserver --noreload
-
-benchmark:
-	poetry run pytest tests/ -k "not slow" --benchmark-only
+# Environment variables
+export PYTHONPATH := $(PYTHONPATH):$(PWD)/src

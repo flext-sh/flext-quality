@@ -51,23 +51,21 @@ def analyze_command(args: Any) -> int:
             output_path = Path(args.output)
             report.save_report(output_path, args.format)
             print(f"📄 Report saved to: {output_path}")
+        # Print to console
+        elif args.format == "json":
+            print(report.generate_json_report())
+        elif args.format == "html":
+            print(report.generate_html_report())
         else:
-            # Print to console
-            if args.format == "json":
-                print(report.generate_json_report())
-            elif args.format == "html":
-                print(report.generate_html_report())
-            else:
-                print(report.generate_text_report())
+            print(report.generate_text_report())
 
         # Return appropriate exit code based on quality
         quality_score = analyzer.get_quality_score()
         if quality_score >= 80:
             return 0  # Good quality
-        elif quality_score >= 60:
+        if quality_score >= 60:
             return 1  # Medium quality
-        else:
-            return 2  # Poor quality
+        return 2  # Poor quality
 
     except Exception as e:
         print(f"❌ Analysis failed: {e}")
@@ -203,9 +201,8 @@ Examples:
     # Execute command
     if hasattr(args, "func"):
         return args.func(args)
-    else:
-        parser.print_help()
-        return 1
+    parser.print_help()
+    return 1
 
 
 if __name__ == "__main__":

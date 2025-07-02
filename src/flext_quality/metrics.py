@@ -47,6 +47,7 @@ class QualityMetrics:
 
         Returns:
             QualityMetrics instance.
+
         """
         metrics_data = results.get("metrics", {})
         issues = results.get("issues", {})
@@ -112,6 +113,7 @@ class QualityMetrics:
 
         Returns:
             Dictionary representation of metrics.
+
         """
         return {
             "overall_score": self.overall_score,
@@ -141,6 +143,7 @@ class QualityMetrics:
 
         Returns:
             Summary string.
+
         """
         return (
             f"Quality Grade: {self.quality_grade} ({self.overall_score:.1f}/100)\n"
@@ -157,25 +160,24 @@ class QualityMetrics:
         """Calculate letter grade from numeric score."""
         if score >= 95:
             return "A+"
-        elif score >= 90:
+        if score >= 90:
             return "A"
-        elif score >= 85:
+        if score >= 85:
             return "A-"
-        elif score >= 80:
+        if score >= 80:
             return "B+"
-        elif score >= 75:
+        if score >= 75:
             return "B"
-        elif score >= 70:
+        if score >= 70:
             return "B-"
-        elif score >= 65:
+        if score >= 65:
             return "C+"
-        elif score >= 60:
+        if score >= 60:
             return "C"
-        elif score >= 55:
+        if score >= 55:
             return "C-"
-        elif score >= 50:
+        if score >= 50:
             return "D+"
-        elif score >= 45:
+        if score >= 45:
             return "D"
-        else:
-            return "F"
+        return "F"

@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import ast
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from .base import AnalysisBackend, AnalysisResult
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class ASTVisitor(ast.NodeVisitor):

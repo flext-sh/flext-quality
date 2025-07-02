@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.contrib import messages
 from django.db.models import Avg
@@ -18,7 +18,6 @@ from django_filters.rest_framework import (
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.request import Request
 from rest_framework.response import Response
 
 from .analysis_engine import CodeAnalysisEngine
@@ -46,6 +45,9 @@ from .serializers import (
     SecurityIssueSerializer,
 )
 from .tasks import run_code_analysis
+
+if TYPE_CHECKING:
+    from rest_framework.request import Request
 
 logger = logging.getLogger(__name__)
 
@@ -161,6 +163,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return None
 
 
 class AnalysisSessionViewSet(viewsets.ModelViewSet):

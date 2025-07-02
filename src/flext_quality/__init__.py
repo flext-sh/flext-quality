@@ -14,15 +14,15 @@ from .metrics import QualityMetrics
 from .reports import QualityReport
 
 __all__ = [
-    # Version and metadata
-    "__version__",
-    "__author__",
-    "__email__",
-    "__license__",
     # Core components
     "CodeAnalyzer",
     "QualityMetrics",
     "QualityReport",
+    "__author__",
+    "__email__",
+    "__license__",
+    # Version and metadata
+    "__version__",
     # CLI
     "cli_main",
 ]
@@ -33,6 +33,7 @@ def get_version() -> str:
 
     Returns:
         The current version string.
+
     """
     return __version__
 
@@ -42,6 +43,7 @@ def get_info() -> dict[str, str]:
 
     Returns:
         Dictionary containing library metadata.
+
     """
     return {
         "name": "flext-quality",

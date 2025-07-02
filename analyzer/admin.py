@@ -53,7 +53,7 @@ class ProjectAdmin(admin.ModelAdmin):
     readonly_fields: ClassVar[list[str]] = ["created_at", "updated_at"]
     ordering: ClassVar[list[str]] = ["-updated_at"]
 
-    fieldsets = (
+    fieldsets: ClassVar = (
         (
             "Basic Information",
             {"fields": ("name", "description", "path")},
@@ -105,8 +105,8 @@ class FileAnalysisInline(admin.TabularInline):
 
     model = FileAnalysis
     extra = 0
-    readonly_fields = ["created_at"]
-    fields = [
+    readonly_fields: ClassVar = ["created_at"]
+    fields: ClassVar = [
         "file_name",
         "lines_of_code",
         "complexity_score",
@@ -120,15 +120,15 @@ class SecurityIssueInline(admin.TabularInline):
 
     model = SecurityIssue
     extra = 0
-    readonly_fields = ["created_at"]
-    fields = ["severity", "issue_type", "file_path", "line_number", "is_resolved"]
+    readonly_fields: ClassVar = ["created_at"]
+    fields: ClassVar = ["severity", "issue_type", "file_path", "line_number", "is_resolved"]
 
 
 @admin.register(AnalysisSession)
 class AnalysisSessionAdmin(admin.ModelAdmin):
     """Admin interface for AnalysisSession model."""
 
-    list_display = [
+    list_display: ClassVar = [
         "id",
         "flx_project",
         "status_badge",
@@ -136,15 +136,15 @@ class AnalysisSessionAdmin(admin.ModelAdmin):
         "duration_display",
         "created_at",
     ]
-    list_filter = [
+    list_filter: ClassVar = [
         "status",
         "include_security",
         "include_dead_code",
         "include_duplicates",
         "created_at",
     ]
-    search_fields = ["flx_project__name", "id"]
-    readonly_fields = [
+    search_fields: ClassVar = ["flx_project__name", "id"]
+    readonly_fields: ClassVar = [
         "id",
         "started_at",
         "completed_at",
@@ -153,9 +153,9 @@ class AnalysisSessionAdmin(admin.ModelAdmin):
         "overall_score",
         "quality_grade",
     ]
-    ordering = ["-created_at"]
+    ordering: ClassVar = ["-created_at"]
 
-    fieldsets = (
+    fieldsets: ClassVar = (
         (
             "Session Information",
             {"fields": ("id", "flx_project", "status", "error_message")},
@@ -194,7 +194,7 @@ class AnalysisSessionAdmin(admin.ModelAdmin):
         ),
     )
 
-    inlines = [SecurityIssueInline]
+    inlines: ClassVar = [SecurityIssueInline]
 
     def status_badge(self, obj) -> str:
         """Display status with color coding."""
@@ -257,7 +257,7 @@ class AnalysisSessionAdmin(admin.ModelAdmin):
 class FileAnalysisAdmin(admin.ModelAdmin):
     """Admin interface for FileAnalysis model."""
 
-    list_display = [
+    list_display: ClassVar = [
         "file_name",
         "session",
         "lines_of_code",
@@ -266,14 +266,14 @@ class FileAnalysisAdmin(admin.ModelAdmin):
         "class_count",
         "created_at",
     ]
-    list_filter = [
+    list_filter: ClassVar = [
         "session__flx_project",
         "session__status",
         "created_at",
     ]
-    search_fields = ["file_name", "file_path", "session__flx_project__name"]
-    readonly_fields = ["created_at"]
-    ordering = ["-complexity_score"]
+    search_fields: ClassVar = ["file_name", "file_path", "session__flx_project__name"]
+    readonly_fields: ClassVar = ["created_at"]
+    ordering: ClassVar = ["-complexity_score"]
 
     def complexity_score_badge(self, obj) -> str:
         """Display complexity score with color coding."""
@@ -293,7 +293,7 @@ class FileAnalysisAdmin(admin.ModelAdmin):
 class SecurityIssueAdmin(admin.ModelAdmin):
     """Admin interface for SecurityIssue model."""
 
-    list_display = [
+    list_display: ClassVar = [
         "severity_badge",
         "issue_type",
         "file_path",
@@ -302,7 +302,7 @@ class SecurityIssueAdmin(admin.ModelAdmin):
         "is_resolved",
         "created_at",
     ]
-    list_filter = [
+    list_filter: ClassVar = [
         "severity",
         "confidence",
         "issue_type",
@@ -310,11 +310,11 @@ class SecurityIssueAdmin(admin.ModelAdmin):
         "session__flx_project",
         "created_at",
     ]
-    search_fields = ["issue_type", "file_path", "description"]
-    readonly_fields = ["created_at", "resolved_at"]
-    ordering = ["-severity", "-created_at"]
+    search_fields: ClassVar = ["issue_type", "file_path", "description"]
+    readonly_fields: ClassVar = ["created_at", "resolved_at"]
+    ordering: ClassVar = ["-severity", "-created_at"]
 
-    fieldsets = (
+    fieldsets: ClassVar = (
         (
             "Issue Information",
             {"fields": ("severity", "confidence", "issue_type", "test_id")},
@@ -354,7 +354,7 @@ class SecurityIssueAdmin(admin.ModelAdmin):
 class DeadCodeIssueAdmin(admin.ModelAdmin):
     """Admin interface for DeadCodeIssue model."""
 
-    list_display = [
+    list_display: ClassVar = [
         "dead_type",
         "name",
         "file_path",
@@ -364,15 +364,15 @@ class DeadCodeIssueAdmin(admin.ModelAdmin):
         "is_resolved",
         "created_at",
     ]
-    list_filter = [
+    list_filter: ClassVar = [
         "dead_type",
         "is_resolved",
         "session__flx_project",
         "created_at",
     ]
-    search_fields = ["name", "file_path"]
-    readonly_fields = ["created_at", "resolved_at"]
-    ordering = ["-confidence", "-size_estimate"]
+    search_fields: ClassVar = ["name", "file_path"]
+    readonly_fields: ClassVar = ["created_at", "resolved_at"]
+    ordering: ClassVar = ["-confidence", "-size_estimate"]
 
     def confidence_badge(self, obj) -> str:
         """Display confidence with color coding."""
@@ -395,14 +395,14 @@ class DuplicateLocationInline(admin.TabularInline):
 
     model = DuplicateLocation
     extra = 0
-    fields = ["file_path", "start_line", "end_line", "function_name"]
+    fields: ClassVar = ["file_path", "start_line", "end_line", "function_name"]
 
 
 @admin.register(DuplicateCodeBlock)
 class DuplicateCodeBlockAdmin(admin.ModelAdmin):
     """Admin interface for DuplicateCodeBlock model."""
 
-    list_display = [
+    list_display: ClassVar = [
         "session",
         "lines_count",
         "similarity_score_badge",
@@ -410,18 +410,18 @@ class DuplicateCodeBlockAdmin(admin.ModelAdmin):
         "is_resolved",
         "created_at",
     ]
-    list_filter = [
+    list_filter: ClassVar = [
         "is_resolved",
         "session__flx_project",
         "created_at",
     ]
-    search_fields = ["block_hash", "content_preview"]
-    readonly_fields = ["created_at", "resolved_at", "locations_count"]
-    ordering = ["-lines_count", "-similarity_score"]
+    search_fields: ClassVar = ["block_hash", "content_preview"]
+    readonly_fields: ClassVar = ["created_at", "resolved_at", "locations_count"]
+    ordering: ClassVar = ["-lines_count", "-similarity_score"]
 
-    inlines = [DuplicateLocationInline]
+    inlines: ClassVar = [DuplicateLocationInline]
 
-    fieldsets = (
+    fieldsets: ClassVar = (
         (
             "Block Information",
             {"fields": ("block_hash", "lines_count", "similarity_score")},
@@ -461,7 +461,7 @@ class DuplicateCodeBlockAdmin(admin.ModelAdmin):
 class QualityMetricsAdmin(admin.ModelAdmin):
     """Admin interface for QualityMetrics model."""
 
-    list_display = [
+    list_display: ClassVar = [
         "session",
         "overall_score_badge",
         "security_score",
@@ -469,14 +469,14 @@ class QualityMetricsAdmin(admin.ModelAdmin):
         "technical_debt_ratio",
         "created_at",
     ]
-    list_filter = [
+    list_filter: ClassVar = [
         "session__flx_project",
         "created_at",
     ]
-    readonly_fields = ["created_at"]
-    ordering = ["-overall_score"]
+    readonly_fields: ClassVar = ["created_at"]
+    ordering: ClassVar = ["-overall_score"]
 
-    fieldsets = (
+    fieldsets: ClassVar = (
         ("Overall Quality", {"fields": ("overall_score", "session")}),
         (
             "Component Scores",
@@ -637,7 +637,7 @@ class ImportAnalysisAdmin(admin.ModelAdmin):
 class AnalysisBackendModelAdmin(admin.ModelAdmin):
     """TODO: Add docstring."""
 
-    list_display = [
+    list_display: ClassVar = [
         "name",
         "display_name",
         "is_active",
@@ -645,12 +645,12 @@ class AnalysisBackendModelAdmin(admin.ModelAdmin):
         "execution_order",
         "created_at",
     ]
-    list_filter = ["is_active", "is_available", "created_at"]
-    search_fields = ["name", "display_name", "description"]
-    readonly_fields = ["created_at", "updated_at", "last_check_at"]
-    ordering = ["execution_order", "name"]
+    list_filter: ClassVar = ["is_active", "is_available", "created_at"]
+    search_fields: ClassVar = ["name", "display_name", "description"]
+    readonly_fields: ClassVar = ["created_at", "updated_at", "last_check_at"]
+    ordering: ClassVar = ["execution_order", "name"]
 
-    fieldsets = [
+    fieldsets: ClassVar = [
         (
             "Basic Information",
             {
@@ -683,13 +683,13 @@ class AnalysisBackendModelAdmin(admin.ModelAdmin):
 class IssueTypeAdmin(admin.ModelAdmin):
     """TODO: Add docstring."""
 
-    list_display = ["code", "name", "backend", "category", "severity", "is_active"]
-    list_filter = ["backend", "category", "severity", "is_active", "created_at"]
-    search_fields = ["code", "name", "description"]
-    readonly_fields = ["created_at", "updated_at"]
-    ordering = ["backend__name", "code"]
+    list_display: ClassVar = ["code", "name", "backend", "category", "severity", "is_active"]
+    list_filter: ClassVar = ["backend", "category", "severity", "is_active", "created_at"]
+    search_fields: ClassVar = ["code", "name", "description"]
+    readonly_fields: ClassVar = ["created_at", "updated_at"]
+    ordering: ClassVar = ["backend__name", "code"]
 
-    fieldsets = [
+    fieldsets: ClassVar = [
         (
             "Basic Information",
             {
@@ -723,7 +723,7 @@ class IssueTypeAdmin(admin.ModelAdmin):
 class DetectedIssueAdmin(admin.ModelAdmin):
     """TODO: Add docstring."""
 
-    list_display = [
+    list_display: ClassVar = [
         "issue_type_code",
         "file_path",
         "line_number",
@@ -731,7 +731,7 @@ class DetectedIssueAdmin(admin.ModelAdmin):
         "is_resolved",
         "detected_at",
     ]
-    list_filter = [
+    list_filter: ClassVar = [
         "issue_type__backend",
         "issue_type__category",
         "issue_type__severity",
@@ -740,10 +740,10 @@ class DetectedIssueAdmin(admin.ModelAdmin):
         "confidence",
         "detected_at",
     ]
-    search_fields = ["file_path", "message", "issue_type__code", "issue_type__name"]
-    readonly_fields = ["detected_at", "severity", "category", "backend_name"]
+    search_fields: ClassVar = ["file_path", "message", "issue_type__code", "issue_type__name"]
+    readonly_fields: ClassVar = ["detected_at", "severity", "category", "backend_name"]
     date_hierarchy = "detected_at"
-    ordering = ["-detected_at"]
+    ordering: ClassVar = ["-detected_at"]
 
     def issue_type_code(self, obj) -> Any:
         """TODO: Add docstring."""
@@ -759,7 +759,7 @@ class DetectedIssueAdmin(admin.ModelAdmin):
     severity.short_description = "Severity"
     severity.admin_order_field = "issue_type__severity"
 
-    fieldsets = [
+    fieldsets: ClassVar = [
         (
             "Issue Information",
             {
@@ -817,7 +817,7 @@ class DetectedIssueAdmin(admin.ModelAdmin):
 class BackendStatisticsAdmin(admin.ModelAdmin):
     """TODO: Add docstring."""
 
-    list_display = [
+    list_display: ClassVar = [
         "backend",
         "session",
         "status",
@@ -826,13 +826,13 @@ class BackendStatisticsAdmin(admin.ModelAdmin):
         "issues_found",
         "created_at",
     ]
-    list_filter = ["backend", "status", "created_at"]
-    search_fields = ["backend__name", "session__name"]
-    readonly_fields = ["created_at"]
+    list_filter: ClassVar = ["backend", "status", "created_at"]
+    search_fields: ClassVar = ["backend__name", "session__name"]
+    readonly_fields: ClassVar = ["created_at"]
     date_hierarchy = "created_at"
-    ordering = ["-created_at"]
+    ordering: ClassVar = ["-created_at"]
 
-    fieldsets = [
+    fieldsets: ClassVar = [
         (
             "Basic Information",
             {

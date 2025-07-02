@@ -18,6 +18,7 @@ class CodeAnalyzer:
 
         Args:
             project_path: Path to the project to analyze.
+
         """
         self.project_path = Path(project_path)
         self.analysis_results: dict[str, Any] = {}
@@ -39,6 +40,7 @@ class CodeAnalyzer:
 
         Returns:
             Analysis results dictionary.
+
         """
         logger.info("Starting project analysis: %s", self.project_path)
 
@@ -100,6 +102,7 @@ class CodeAnalyzer:
 
         Returns:
             Quality score from 0 to 100.
+
         """
         if not self.analysis_results:
             return 0.0
@@ -133,33 +136,33 @@ class CodeAnalyzer:
 
         Returns:
             Letter grade (A+ to F).
+
         """
         score = self.get_quality_score()
 
         if score >= 95:
             return "A+"
-        elif score >= 90:
+        if score >= 90:
             return "A"
-        elif score >= 85:
+        if score >= 85:
             return "A-"
-        elif score >= 80:
+        if score >= 80:
             return "B+"
-        elif score >= 75:
+        if score >= 75:
             return "B"
-        elif score >= 70:
+        if score >= 70:
             return "B-"
-        elif score >= 65:
+        if score >= 65:
             return "C+"
-        elif score >= 60:
+        if score >= 60:
             return "C"
-        elif score >= 55:
+        if score >= 55:
             return "C-"
-        elif score >= 50:
+        if score >= 50:
             return "D+"
-        elif score >= 45:
+        if score >= 45:
             return "D"
-        else:
-            return "F"
+        return "F"
 
     def _find_python_files(self) -> list[Path]:
         """Find all Python files in the project."""
@@ -185,7 +188,7 @@ class CodeAnalyzer:
     def _analyze_file(self, file_path: Path) -> dict[str, Any] | None:
         """Analyze a single Python file."""
         try:
-            with open(file_path, "r", encoding="utf-8") as f:
+            with open(file_path, encoding="utf-8") as f:
                 content = f.read()
 
             lines = content.splitlines()
@@ -246,7 +249,7 @@ class CodeAnalyzer:
                 }
 
         except Exception as e:
-            logger.error("Error analyzing file %s: %s", file_path, e)
+            logger.exception("Error analyzing file %s: %s", file_path, e)
             return None
 
     def _calculate_complexity(self, tree: ast.AST) -> int:
@@ -255,11 +258,11 @@ class CodeAnalyzer:
 
         for node in ast.walk(tree):
             # Count decision points
-            if isinstance(node, (ast.If, ast.While, ast.For, ast.With)):
+            if isinstance(node, ast.If | ast.While | ast.For | ast.With):
                 complexity += 1
             elif isinstance(node, ast.Try):
                 complexity += len(node.handlers)
-            elif isinstance(node, (ast.And, ast.Or)):
+            elif isinstance(node, ast.And | ast.Or):
                 complexity += 1
 
         return complexity
@@ -297,7 +300,7 @@ class CodeAnalyzer:
 
         for py_file in self._find_python_files():
             try:
-                with open(py_file, "r", encoding="utf-8") as f:
+                with open(py_file, encoding="utf-8") as f:
                     content = f.read()
 
                 # Simple security checks
@@ -340,22 +343,15 @@ class CodeAnalyzer:
         self, file_metrics: list[dict[str, Any]]
     ) -> list[dict[str, Any]]:
         """Analyze complexity issues."""
-        issues = []
         complexity_threshold = 10
 
-        for metrics in file_metrics:
-            if metrics.get("complexity", 0) > complexity_threshold:
-                issues.append(
-                    {
+        return [{
                         "file": metrics["file_path"],
                         "type": "high_complexity",
                         "message": f"High complexity: {metrics['complexity']}",
                         "complexity": metrics["complexity"],
                         "threshold": complexity_threshold,
-                    }
-                )
-
-        return issues
+                    } for metrics in file_metrics if metrics.get("complexity", 0) > complexity_threshold]
 
     def _analyze_dead_code(self) -> list[dict[str, Any]]:
         """Analyze dead code (simplified)."""
@@ -365,7 +361,7 @@ class CodeAnalyzer:
         # Simple check for unused imports
         for py_file in self._find_python_files():
             try:
-                with open(py_file, "r", encoding="utf-8") as f:
+                with open(py_file, encoding="utf-8") as f:
                     content = f.read()
 
                 lines = content.splitlines()
@@ -403,7 +399,7 @@ class CodeAnalyzer:
         file_contents = {}
         for py_file in self._find_python_files():
             try:
-                with open(py_file, "r", encoding="utf-8") as f:
+                with open(py_file, encoding="utf-8") as f:
                     content = f.read()
                     if len(content.strip()) > 100:  # Only check substantial files
                         file_contents[py_file] = content
