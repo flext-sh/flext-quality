@@ -17,6 +17,7 @@ class QualityReport:
 
         Args:
             analysis_results: Results from CodeAnalyzer.
+
         """
         self.results = analysis_results
         self.metrics = QualityMetrics.from_analysis_results(analysis_results)
@@ -26,6 +27,7 @@ class QualityReport:
 
         Returns:
             Formatted text report.
+
         """
         lines = []
 
@@ -75,10 +77,8 @@ class QualityReport:
         security_issues = issues.get("security", [])
         if security_issues:
             lines.append(f"Security Issues: {len(security_issues)}")
-            for issue in security_issues[:5]:  # Show first 5
-                lines.append(
-                    f"  • {issue.get('message', 'Unknown issue')} ({issue.get('file', 'unknown')})"
-                )
+            # Show first 5
+            lines.extend(f"  • {issue.get('message', 'Unknown issue')} ({issue.get('file', 'unknown')})" for issue in security_issues[:5])
             if len(security_issues) > 5:
                 lines.append(f"  ... and {len(security_issues) - 5} more")
             lines.append("")
@@ -86,10 +86,7 @@ class QualityReport:
         complexity_issues = issues.get("complexity", [])
         if complexity_issues:
             lines.append(f"Complexity Issues: {len(complexity_issues)}")
-            for issue in complexity_issues[:5]:
-                lines.append(
-                    f"  • {issue.get('message', 'Unknown issue')} ({issue.get('file', 'unknown')})"
-                )
+            lines.extend(f"  • {issue.get('message', 'Unknown issue')} ({issue.get('file', 'unknown')})" for issue in complexity_issues[:5])
             if len(complexity_issues) > 5:
                 lines.append(f"  ... and {len(complexity_issues) - 5} more")
             lines.append("")
@@ -97,10 +94,7 @@ class QualityReport:
         dead_code_issues = issues.get("dead_code", [])
         if dead_code_issues:
             lines.append(f"Dead Code Issues: {len(dead_code_issues)}")
-            for issue in dead_code_issues[:5]:
-                lines.append(
-                    f"  • {issue.get('message', 'Unknown issue')} ({issue.get('file', 'unknown')})"
-                )
+            lines.extend(f"  • {issue.get('message', 'Unknown issue')} ({issue.get('file', 'unknown')})" for issue in dead_code_issues[:5])
             if len(dead_code_issues) > 5:
                 lines.append(f"  ... and {len(dead_code_issues) - 5} more")
             lines.append("")
@@ -117,8 +111,7 @@ class QualityReport:
             lines.append("")
 
         # Recommendations
-        lines.append("RECOMMENDATIONS")
-        lines.append("-" * 20)
+        lines.extend(("RECOMMENDATIONS", "-" * 20))
 
         recommendations = []
         if self.metrics.security_issues_count > 0:
@@ -139,8 +132,7 @@ class QualityReport:
         else:
             lines.append("• Code quality is good! Keep up the excellent work.")
 
-        lines.append("")
-        lines.append("=" * 60)
+        lines.extend(("", "=" * 60))
 
         return "\n".join(lines)
 
@@ -149,6 +141,7 @@ class QualityReport:
 
         Returns:
             JSON report string.
+
         """
         report_data = {
             "summary": {
@@ -169,6 +162,7 @@ class QualityReport:
 
         Returns:
             HTML report string.
+
         """
         html = f"""
 <!DOCTYPE html>
@@ -196,12 +190,12 @@ class QualityReport:
         <h1>FLEXT Quality Report</h1>
         <p>Project: {self.results.get("project_path", "Unknown")}</p>
     </div>
-    
+
     <div class="summary">
         <div class="grade">{self.metrics.quality_grade}</div>
         <div class="score">{self.metrics.overall_score:.1f}/100</div>
     </div>
-    
+
     <div class="section">
         <h2>Code Metrics</h2>
         <div class="metric">Files: {self.metrics.total_files:,}</div>
@@ -210,7 +204,7 @@ class QualityReport:
         <div class="metric">Classes: {self.metrics.total_classes:,}</div>
         <div class="metric">Avg Complexity: {self.metrics.average_complexity:.1f}</div>
     </div>
-    
+
     <div class="section">
         <h2>Component Scores</h2>
         <div class="metric">Complexity: {self.metrics.complexity_score:.1f}/100</div>
@@ -219,9 +213,9 @@ class QualityReport:
         <div class="metric">Duplication: {self.metrics.duplication_score:.1f}/100</div>
         <div class="metric">Documentation: {self.metrics.documentation_score:.1f}/100</div>
     </div>
-    
+
     {self._generate_issues_html()}
-    
+
     <div class="section">
         <h2>Recommendations</h2>
         <ul>
@@ -245,6 +239,7 @@ class QualityReport:
         Args:
             output_path: Path to save the report.
             format: Report format ("text", "json", or "html").
+
         """
         output_path = Path(output_path)
 
@@ -255,7 +250,8 @@ class QualityReport:
         elif format == "html":
             content = self.generate_html_report()
         else:
-            raise ValueError(f"Unsupported format: {format}")
+            msg = f"Unsupported format: {format}"
+            raise ValueError(msg)
 
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(content)
@@ -291,14 +287,13 @@ class QualityReport:
         grade = self.metrics.quality_grade
         if grade.startswith("A"):
             return "#4CAF50"  # Green
-        elif grade.startswith("B"):
+        if grade.startswith("B"):
             return "#2196F3"  # Blue
-        elif grade.startswith("C"):
+        if grade.startswith("C"):
             return "#FF9800"  # Orange
-        elif grade.startswith("D"):
+        if grade.startswith("D"):
             return "#FF5722"  # Red-Orange
-        else:
-            return "#F44336"  # Red
+        return "#F44336"  # Red
 
     def _generate_issues_html(self) -> str:
         """Generate HTML for issues section."""
@@ -334,7 +329,6 @@ class QualityReport:
         """Get CSS class for severity level."""
         if severity == "high":
             return "high-severity"
-        elif severity == "medium":
+        if severity == "medium":
             return "medium-severity"
-        else:
-            return "low-severity"
+        return "low-severity"
