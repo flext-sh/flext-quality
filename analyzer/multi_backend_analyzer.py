@@ -10,18 +10,18 @@ from django.utils import timezone
 
 from .backends import AnalysisResult, get_backend
 from .models import (
-    AnalysisBackendModel, 
-    AnalysisSession, 
-    BackendStatistics, 
-    ClassAnalysis, 
-    DetectedIssue, 
-    FileAnalysis, 
-    FunctionAnalysis, 
-    ImportAnalysis, 
-    IssueType, 
-    PackageAnalysis, 
-    QualityMetrics, 
-    SecurityIssue, 
+    AnalysisBackendModel,
+    AnalysisSession,
+    BackendStatistics,
+    ClassAnalysis,
+    DetectedIssue,
+    FileAnalysis,
+    FunctionAnalysis,
+    ImportAnalysis,
+    IssueType,
+    PackageAnalysis,
+    QualityMetrics,
+    SecurityIssue,
     VariableAnalysis,
 )
 

@@ -12,10 +12,13 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django_filters.rest_framework import DjangoFilterBackend  # type: ignore[import-untyped]
+from django_filters.rest_framework import (
+    DjangoFilterBackend,  # type: ignore[import-untyped]
+)
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.request import Request
 from rest_framework.response import Response
 
 from .analysis_engine import CodeAnalysisEngine
@@ -43,7 +46,6 @@ from .serializers import (
     SecurityIssueSerializer,
 )
 from .tasks import run_code_analysis
-from rest_framework.request import Request
 
 logger = logging.getLogger(__name__)
 

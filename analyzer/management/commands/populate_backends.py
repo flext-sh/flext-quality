@@ -1,8 +1,9 @@
 """Django management command to populate backend and issue type data."""
 
-from analyzer.models import AnalysisBackendModel, IssueType
 from django.core.management.base import BaseCommand
 from django.utils import timezone
+
+from analyzer.models import AnalysisBackendModel, IssueType
 
 
 class Command(BaseCommand):
