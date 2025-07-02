@@ -116,13 +116,13 @@ class DataProcessor:
 
     def __init__(self) -> None:
         """TODO: Add docstring."""
-        self.data: List[Dict[str, Any]] = []
+        self.data: list[dict[str, Any]] = []
 
-    def add_item(self, item: Dict[str, Any]) -> None:
+    def add_item(self, item: dict[str, Any]) -> None:
         """Add an item to the data."""
         self.data.append(item)
 
-    def process_data(self) -> List[str]:
+    def process_data(self) -> list[str]:
         """Process the data."""
         results: list = []
         for item in self.data:
