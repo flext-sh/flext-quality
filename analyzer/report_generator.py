@@ -12,7 +12,13 @@ from django.utils import timezone
 from xhtml2pdf import pisa
 
 from .models import (
-    from typing import List, Dict, Optional, Any AnalysisReport, AnalysisSession, DeadCodeIssue, DuplicateCodeBlock, FileAnalysis, QualityMetrics, SecurityIssue,
+    AnalysisReport,
+    AnalysisSession,
+    DeadCodeIssue,
+    DuplicateCodeBlock,
+    FileAnalysis,
+    QualityMetrics,
+    SecurityIssue,
 )
 
 logger = logging.getLogger(__name__)
@@ -54,7 +60,7 @@ class WebReportGenerator:
                 content=final_content,
             )
 
-            logger.info("Generated summary report in %s", format format")
+            logger.info("Generated summary report in %s", format)
             return report
 
         except Exception as e:
@@ -85,7 +91,7 @@ class WebReportGenerator:
                 content=final_content,
             )
 
-            logger.info("Generated detailed report in %s", format format")
+            logger.info("Generated detailed report in %s", format)
             return report
 
         except Exception as e:
@@ -116,7 +122,7 @@ class WebReportGenerator:
                 content=final_content,
             )
 
-            logger.info("Generated security report in %s", format format")
+            logger.info("Generated security report in %s", format)
             return report
 
         except Exception as e:

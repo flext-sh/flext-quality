@@ -8,7 +8,23 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from .models import (
-    from typing import List, Dict, Optional, Any AnalysisBackendModel, AnalysisSession, BackendStatistics, ClassAnalysis, DeadCodeIssue, DetectedIssue, DuplicateCodeBlock, DuplicateLocation, FileAnalysis, FunctionAnalysis, ImportAnalysis, IssueType, PackageAnalysis, Project, QualityMetrics, SecurityIssue, VariableAnalysis,
+    AnalysisBackendModel,
+    AnalysisSession,
+    BackendStatistics,
+    ClassAnalysis,
+    DeadCodeIssue,
+    DetectedIssue,
+    DuplicateCodeBlock,
+    DuplicateLocation,
+    FileAnalysis,
+    FunctionAnalysis,
+    ImportAnalysis,
+    IssueType,
+    PackageAnalysis,
+    Project,
+    QualityMetrics,
+    SecurityIssue,
+    VariableAnalysis,
 )
 
 
@@ -68,7 +84,9 @@ class ProjectAdmin(admin.ModelAdmin):
             color = (
                 "green"
                 if latest.overall_score >= 80
-                else "orange" if latest.overall_score >= 60 else "red"
+                else "orange"
+                if latest.overall_score >= 60
+                else "red"
             )
             return format_html(
                 '<span style="color: {}; font-weight: bold;">{:.1f} ({})</span>',
@@ -205,7 +223,9 @@ class AnalysisSessionAdmin(admin.ModelAdmin):
         color = (
             "green"
             if obj.overall_score >= 80
-            else "orange" if obj.overall_score >= 60 else "red"
+            else "orange"
+            if obj.overall_score >= 60
+            else "red"
         )
         return format_html(
             '<span style="color: {}; font-weight: bold;">{:.1f}</span>',
