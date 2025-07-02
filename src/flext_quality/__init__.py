@@ -20,7 +20,7 @@ __all__ = [
     "__email__",
     "__license__",
     # Core components
-    "CodeAnalyzer", 
+    "CodeAnalyzer",
     "QualityMetrics",
     "QualityReport",
     # CLI
@@ -30,7 +30,7 @@ __all__ = [
 
 def get_version() -> str:
     """Get the library version.
-    
+
     Returns:
         The current version string.
     """
@@ -39,7 +39,7 @@ def get_version() -> str:
 
 def get_info() -> dict[str, str]:
     """Get library information.
-    
+
     Returns:
         Dictionary containing library metadata.
     """

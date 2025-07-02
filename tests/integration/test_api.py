@@ -8,12 +8,13 @@ import tempfile
 from contextlib import contextmanager
 from pathlib import Path
 
-from analyzer.models import AnalysisSession, Project
 from django.contrib.auth.models import User
 from django.test import TransactionTestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
+
+from analyzer.models import AnalysisSession, Project
 
 
 class TestProjectAPI(TransactionTestCase):

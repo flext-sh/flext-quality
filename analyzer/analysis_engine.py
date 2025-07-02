@@ -16,7 +16,13 @@ from radon.metrics import mi_visit
 from vulture import Vulture
 
 from .models import (
-    AnalysisSession, DeadCodeIssue, DuplicateCodeBlock, DuplicateLocation, FileAnalysis, QualityMetrics, SecurityIssue,
+    AnalysisSession,
+    DeadCodeIssue,
+    DuplicateCodeBlock,
+    DuplicateLocation,
+    FileAnalysis,
+    QualityMetrics,
+    SecurityIssue,
 )
 
 logger = logging.getLogger(__name__)

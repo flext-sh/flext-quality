@@ -8,6 +8,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
+
 from analyzer.backends import (
     AVAILABLE_BACKENDS,
     AnalysisBackend,

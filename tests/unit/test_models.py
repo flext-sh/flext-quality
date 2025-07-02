@@ -1,6 +1,9 @@
 """Unit tests for Django models."""
 
 import pytest
+from django.db import IntegrityError
+from django.utils import timezone
+
 from analyzer.models import (
     AnalysisBackendModel,
     AnalysisSession,
@@ -15,8 +18,6 @@ from analyzer.models import (
     QualityMetrics,
     SecurityIssue,
 )
-from django.db import IntegrityError
-from django.utils import timezone
 
 
 @pytest.mark.django_db

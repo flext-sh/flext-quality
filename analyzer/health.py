@@ -3,6 +3,8 @@
 import time
 from typing import Any
 
+import redis
+from celery import current_app
 from django.conf import settings
 from django.core.cache import cache
 from django.db import connection
@@ -10,9 +12,6 @@ from django.http import JsonResponse
 from django.views.decorators.cache import never_cache
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-
-import redis
-from celery import current_app
 
 REDIS_AVAILABLE = True
 CELERY_AVAILABLE = True
