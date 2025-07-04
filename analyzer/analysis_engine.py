@@ -6,7 +6,7 @@ import ast
 import logging
 from difflib import SequenceMatcher
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from bandit import config as bandit_config
 from bandit.core import manager as bandit_manager
@@ -15,8 +15,7 @@ from radon.complexity import cc_visit
 from radon.metrics import mi_visit
 from vulture import Vulture
 
-from .models import (
-    AnalysisSession,
+from analyzer.models import (
     DeadCodeIssue,
     DuplicateCodeBlock,
     DuplicateLocation,
@@ -24,6 +23,9 @@ from .models import (
     QualityMetrics,
     SecurityIssue,
 )
+
+if TYPE_CHECKING:
+    from analyzer.models import AnalysisSession
 
 logger = logging.getLogger(__name__)
 

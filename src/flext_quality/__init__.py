@@ -8,10 +8,10 @@ __email__ = "dev@flext.sh"
 __license__ = "MIT"
 
 # Core analysis components
-from .analyzer import CodeAnalyzer
-from .cli import main as cli_main
-from .metrics import QualityMetrics
-from .reports import QualityReport
+from flext_quality.analyzer import CodeAnalyzer
+from flext_quality.cli import main as cli_main
+from flext_quality.metrics import QualityMetrics
+from flext_quality.reports import QualityReport
 
 __all__ = [
     # Core components

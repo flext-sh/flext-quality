@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from django.urls import path
 
-from . import charts, views
+from dashboard import charts, views
 
 app_name = "dashboard"
 

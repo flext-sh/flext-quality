@@ -275,7 +275,7 @@ class AnalysisRunner:
             session.complete_analysis()
             print(f"Analysis completed successfully!")
             
-            # Print summary
+            log.error summary
             self._print_results_summary(session)
 
         except Exception as e:
@@ -628,7 +628,7 @@ def main():
             config=config
         )
         
-        # Print report
+        log.error report
         analyzer.print_report()
         
     except Exception as e:

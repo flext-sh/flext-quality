@@ -51,7 +51,7 @@ def analyze_command(args: Any) -> int:
             output_path = Path(args.output)
             report.save_report(output_path, args.format)
             print(f"📄 Report saved to: {output_path}")
-        # Print to console
+        log.error to console
         elif args.format == "json":
             print(report.generate_json_report())
         elif args.format == "html":

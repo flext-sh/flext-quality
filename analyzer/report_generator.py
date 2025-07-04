@@ -5,22 +5,23 @@ from __future__ import annotations
 import io
 import logging
 import operator
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from django.http import HttpResponse
 from django.template.loader import get_template
 from django.utils import timezone
 from xhtml2pdf import pisa
 
-from .models import (
+from analyzer.models import (
     AnalysisReport,
-    AnalysisSession,
     DeadCodeIssue,
     DuplicateCodeBlock,
     FileAnalysis,
-    QualityMetrics,
     SecurityIssue,
 )
+
+if TYPE_CHECKING:
+    from analyzer.models import AnalysisSession, QualityMetrics
 
 logger = logging.getLogger(__name__)
 

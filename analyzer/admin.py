@@ -7,7 +7,7 @@ from typing import Any, ClassVar
 from django.contrib import REDACTED_LDAP_BIND_PASSWORD
 from django.utils.html import format_html
 
-from .models import (
+from analyzer.models import (
     AnalysisBackendModel,
     AnalysisSession,
     BackendStatistics,
