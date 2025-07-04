@@ -7,7 +7,7 @@ __email__ = "team@codeanalyzer.dev"
 
 # Import main components
 try:
-    from . import analyzer, code_analyzer_web, dashboard
+    from dc_code_analyzer import analyzer, code_analyzer_web, dashboard
 except ImportError:
     # Fallback for development mode
     pass

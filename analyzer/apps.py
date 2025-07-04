@@ -14,4 +14,4 @@ class AnalyzerConfig(AppConfig):
 
     def ready(self) -> None:
         """Initialize the app when Django starts."""
-        from . import signals  # noqa: F401
+        from analyzer import signals  # noqa: F401

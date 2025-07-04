@@ -6,10 +6,10 @@ Each backend can provide different analysis capabilities.
 
 from __future__ import annotations
 
-from .ast_backend import ASTBackend
-from .base import AnalysisBackend, AnalysisResult
-from .external_backend import ExternalToolsBackend
-from .quality_backend import QualityBackend
+from analyzer.backends.ast_backend import ASTBackend
+from analyzer.backends.base import AnalysisBackend, AnalysisResult
+from analyzer.backends.external_backend import ExternalToolsBackend
+from analyzer.backends.quality_backend import QualityBackend
 
 # Registry of available backends
 AVAILABLE_BACKENDS: dict[str, type[AnalysisBackend]] = {

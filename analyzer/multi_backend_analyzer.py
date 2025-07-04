@@ -8,8 +8,8 @@ from pathlib import Path
 
 from django.utils import timezone
 
-from .backends import AnalysisResult, get_backend
-from .models import (
+from analyzer.backends import AnalysisResult, get_backend
+from analyzer.models import (
     AnalysisBackendModel,
     AnalysisSession,
     BackendStatistics,

@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 from django.contrib import messages
 from django.db.models import Avg
-from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
@@ -20,8 +20,8 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from .analysis_engine import CodeAnalysisEngine
-from .models import (
+from analyzer.analysis_engine import CodeAnalysisEngine
+from analyzer.models import (
     AnalysisSession,
     DeadCodeIssue,
     DuplicateCodeBlock,
@@ -30,9 +30,9 @@ from .models import (
     QualityMetrics,
     SecurityIssue,
 )
-from .package_discovery import PackageDiscovery
-from .report_generator import WebReportGenerator, create_download_response
-from .serializers import (
+from analyzer.package_discovery import PackageDiscovery
+from analyzer.report_generator import WebReportGenerator, create_download_response
+from analyzer.serializers import (
     AnalysisSessionSerializer,
     AnalysisSessionSummarySerializer,
     CreateAnalysisSessionSerializer,
@@ -44,9 +44,10 @@ from .serializers import (
     QualityMetricsSerializer,
     SecurityIssueSerializer,
 )
-from .tasks import run_code_analysis
+from analyzer.tasks import run_code_analysis
 
 if TYPE_CHECKING:
+    from django.http import HttpRequest
     from rest_framework.request import Request
 
 logger = logging.getLogger(__name__)

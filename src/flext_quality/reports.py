@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from .metrics import QualityMetrics
+from flext_quality.metrics import QualityMetrics
 
 
 class QualityReport:

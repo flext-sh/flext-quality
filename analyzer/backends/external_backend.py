@@ -6,7 +6,7 @@ import json
 import subprocess
 from pathlib import Path
 
-from .base import AnalysisBackend, AnalysisResult
+from analyzer.backends.base import AnalysisBackend, AnalysisResult
 
 
 class ExternalToolsBackend(AnalysisBackend):
