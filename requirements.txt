@@ -11,7 +11,7 @@ flake8==6.1.0
 safety==2.3.5
 
 # AST & Code Processing
-astroid==3.0.2
+astroid==3.3.10
 mccabe==0.7.0
 
 # File & Path Processing
