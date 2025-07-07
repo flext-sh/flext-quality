@@ -33,7 +33,7 @@ pydantic-settings==2.1.0
 
 # CLI Interface
 click==8.1.7
-rich==13.7.0
+rich==14.0.0
 typer==0.9.0
 
 # Testing (for self-testing)
