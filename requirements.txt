@@ -21,7 +21,7 @@ chardet==5.2.0
 # Report Generation
 jinja2==3.1.2
 markdown==3.5.1
-Pygments==2.17.0
+Pygments==2.19.2
 
 # Data Processing & Tables
 pandas==2.1.4
