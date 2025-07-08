@@ -8,8 +8,8 @@ import sys
 from pathlib import Path
 from typing import Any
 
-from .analyzer import CodeAnalyzer
-from .reports import QualityReport
+from flext_quality.analyzer import CodeAnalyzer
+from flext_quality.reports import QualityReport
 
 
 def setup_logging(level: str = "INFO") -> None:
@@ -51,7 +51,7 @@ def analyze_command(args: Any) -> int:
             output_path = Path(args.output)
             report.save_report(output_path, args.format)
             print(f"📄 Report saved to: {output_path}")
-        log.error to console
+        # Output to console
         elif args.format == "json":
             print(report.generate_json_report())
         elif args.format == "html":
