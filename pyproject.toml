@@ -3,6 +3,14 @@ requires = ["poetry-core>=1.9.0"]
 build-backend = "poetry.core.masonry.api"
 
 [project]
+name = "flext-quality"
+version = "0.6.0"
+description = "FLEXT Quality - Code Quality Analysis and Reporting"
+authors = [{ name = "FLEXT Team", email = "team@flext.sh" }]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+keywords = ["flext", "quality", "analysis", "linting", "testing", "enterprise"]
 dependencies = [
     "ruff>=0.8.4",
     "mypy>=1.13.0",
@@ -38,35 +46,6 @@ flext-analyze = "flext_quality.analyzer:main"
 flext-report = "flext_quality.reporter:main"
 
 [project.urls]
-name = "flext-quality"
-version = "0.2.0"
-description = "FLEXT Quality - Enterprise Code Quality Analysis & Metrics"
-authors = [{ name = "FLEXT Team", email = "team@flext.sh" }]
-license = { text = "MIT" }
-readme = "README.md"
-requires-python = ">=3.13"
-keywords = [
-    "flext",
-    "quality",
-    "analysis",
-    "metrics",
-    "code-quality",
-    "enterprise",
-    "linting",
-]
-classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3 :: Only",
-    "Topic :: Software Development :: Quality Assurance",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Software Development :: Testing",
-    "Topic :: Utilities",
-    "Typing :: Typed",
-]
 Homepage = "https://github.com/flext-sh/flext-quality"
 Repository = "https://github.com/flext-sh/flext-quality"
 Documentation = "https://github.com/flext-sh/flext-quality/blob/main/README.md"
@@ -75,30 +54,29 @@ Changelog = "https://github.com/flext-sh/flext-quality/blob/main/CHANGELOG.md"
 
 [tool.poetry]
 packages = [{ include = "flext_quality", from = "src" }]
-
 [tool.poetry.group.dev.dependencies]
-pytest = "^8.3.0"
+pytest = "^8.4.0"
 pytest-asyncio = "^0.24.0"
-pytest-cov = "^6.0.0"
-pytest-xdist = "^3.6.0"
+pytest-cov = "^6.2.0"
+pytest-xdist = "^3.8.0"
 pytest-mock = "^3.14.0"
-pytest-timeout = "^2.3.0"
-types-requests = "^2.32.0"
-types-setuptools = "^75.6.0"
+pytest-timeout = "^2.4.0"
+types-requests = "^2.32.4"
+types-setuptools = "^75.8.2"
 types-python-dateutil = "^2.9.0"
 types-tabulate = "^0.9.0"
-pre-commit = "^4.0.0"
-mkdocs = "^1.6.0"
-mkdocs-material = "^9.5.0"
-ipython = "^8.29.0"
+pre-commit = "^4.2.0"
+mkdocs = "^1.6.1"
+mkdocs-material = "^9.6.15"
+ipython = "^8.37.0"
 
 [tool.poetry.group.security.dependencies]
-bandit = { extras = ["toml"], version = "^1.7.0" }
+bandit = {extras = ["toml"], version = "^1.8.0"}
 safety = "^3.2.0"
 
 [tool.poetry.group.build.dependencies]
-build = "^1.2.0"
-twine = "^6.0.0"
+build = "^1.2.2"
+twine = "^6.1.0"
 
 [tool.poetry.group.test.dependencies]
 pytest-benchmark = "^4.0.0"
@@ -157,13 +135,11 @@ ignore = [
     "D401",    #  #  # docstring imperative mood (temporarily)
 ]
 select = ["ALL"]
-
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["S101", "PLR2004", "D", "ANN"]
 "examples/*" = ["T201", "D", "ERA001"]
 "__init__.py" = ["D104"]
 "conftest.py" = ["D"]
-
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
@@ -172,7 +148,6 @@ line-ending = "lf"
 [tool.black]
 line-length = 88
 target-version = ["py313"]
-
 [tool.isort]
 profile = "black"
 line_length = 88
@@ -269,10 +244,8 @@ exclude_lines = [
 [tool.bandit]
 exclude_dirs = ["tests", "build", "dist"]
 skips = ["B101", "B601"]
-
 [tool.bandit.assert_used]
 skips = ["*/tests/*", "*/test_*.py"]
-
 [tool.ruff.lint.pydocstyle]
 convention = "google"
 
@@ -297,8 +270,7 @@ sort_by_size = true
 
 [tool.radon]
 exclude = ["tests/*", "*/tests/*"]
-ignore = ["F401"]
-# Unused imports
+ignore = ["F401"]# Unused imports
 total_average = true
 show_complexity = true
 average = true
