@@ -233,7 +233,7 @@ function loadQualityTrends() {
         .then(response => response.json())
         .then(data => {
             const ctx = document.getElementById('qualityTrendsChart').getContext('2d');
-            
+
             new Chart(ctx, {
                 type: 'line',
                 data: data,
@@ -289,7 +289,7 @@ function loadSecurityIssues() {
         .then(response => response.json())
         .then(data => {
             const ctx = document.getElementById('securityIssuesChart').getContext('2d');
-            
+
             if (data.labels.length === 0) {
                 // Show "no data" message
                 ctx.font = '16px Arial';
@@ -298,7 +298,7 @@ function loadSecurityIssues() {
                 ctx.fillText('No security issues found', ctx.canvas.width/2, ctx.canvas.height/2);
                 return;
             }
-            
+
             new Chart(ctx, {
                 type: 'doughnut',
                 data: data,
@@ -328,4 +328,4 @@ function loadSecurityIssues() {
         });
 }
 </script>
-{% endblock %} 
+{% endblock %}

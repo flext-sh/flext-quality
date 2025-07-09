@@ -44,7 +44,7 @@ class CodeAnalyzer:
         """
         logger.info("Starting project analysis: %s", self.project_path)
 
-        results = {
+        results: dict[str, Any] = {
             "project_path": str(self.project_path),
             "files_analyzed": 0,
             "total_lines": 0,
@@ -345,13 +345,17 @@ class CodeAnalyzer:
         """Analyze complexity issues."""
         complexity_threshold = 10
 
-        return [{
-                        "file": metrics["file_path"],
-                        "type": "high_complexity",
-                        "message": f"High complexity: {metrics['complexity']}",
-                        "complexity": metrics["complexity"],
-                        "threshold": complexity_threshold,
-                    } for metrics in file_metrics if metrics.get("complexity", 0) > complexity_threshold]
+        return [
+            {
+                "file": metrics["file_path"],
+                "type": "high_complexity",
+                "message": f"High complexity: {metrics['complexity']}",
+                "complexity": metrics["complexity"],
+                "threshold": complexity_threshold,
+            }
+            for metrics in file_metrics
+            if metrics.get("complexity", 0) > complexity_threshold
+        ]
 
     def _analyze_dead_code(self) -> list[dict[str, Any]]:
         """Analyze dead code (simplified)."""

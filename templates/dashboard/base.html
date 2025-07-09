@@ -7,17 +7,17 @@
         border-left: 4px solid #007bff;
         transition: all 0.3s ease;
     }
-    
+
     .analysis-card:hover {
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
-    
+
     .severity-badge {
         font-size: 0.8rem;
         font-weight: 600;
     }
-    
+
     .backend-status {
         display: inline-block;
         width: 12px;
@@ -25,27 +25,27 @@
         border-radius: 50%;
         margin-right: 8px;
     }
-    
+
     .backend-status.success { background-color: #28a745; }
     .backend-status.failed { background-color: #dc3545; }
     .backend-status.skipped { background-color: #ffc107; }
-    
+
     .issue-card {
         border-left: 3px solid;
         margin-bottom: 10px;
     }
-    
+
     .issue-card.critical { border-left-color: #dc3545; }
     .issue-card.high { border-left-color: #fd7e14; }
     .issue-card.medium { border-left-color: #ffc107; }
     .issue-card.low { border-left-color: #28a745; }
     .issue-card.info { border-left-color: #17a2b8; }
-    
+
     .collapsible-card .card-header {
         cursor: pointer;
         user-select: none;
     }
-    
+
     .collapsible-card .card-header:hover {
         background-color: #f8f9fa;
     }
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
-    
+
     // Collapsible cards
     document.querySelectorAll('.collapsible-toggle').forEach(function(element) {
         element.addEventListener('click', function() {
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    
+
     // Auto-refresh for running analyses
     const status = document.querySelector('[data-status]');
     if (status && status.dataset.status === 'running') {
@@ -96,4 +96,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% block dashboard_js %}{% endblock %}
-{% endblock %} 
+{% endblock %}

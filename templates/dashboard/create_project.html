@@ -23,12 +23,12 @@
             <div class="card-body">
                 <form method="post">
                     {% csrf_token %}
-                    
+
                     <div class="mb-3">
                         <label for="name" class="form-label">
                             <i class="fas fa-tag"></i> Project Name <span class="text-danger">*</span>
                         </label>
-                        <input type="text" class="form-control" id="name" name="name" 
+                        <input type="text" class="form-control" id="name" name="name"
                                placeholder="Enter flx_project name" required>
                         <div class="form-text">Choose a descriptive name for your flx_project.</div>
                     </div>
@@ -37,7 +37,7 @@
                         <label for="description" class="form-label">
                             <i class="fas fa-align-left"></i> Description
                         </label>
-                        <textarea class="form-control" id="description" name="description" 
+                        <textarea class="form-control" id="description" name="description"
                                   rows="3" placeholder="Enter flx_project description (optional)"></textarea>
                         <div class="form-text">Briefly describe what this flx_project is about.</div>
                     </div>
@@ -46,7 +46,7 @@
                         <label for="path" class="form-label">
                             <i class="fas fa-folder"></i> Project Path <span class="text-danger">*</span>
                         </label>
-                        <input type="text" class="form-control" id="path" name="path" 
+                        <input type="text" class="form-control" id="path" name="path"
                                placeholder="/path/to/your/flx_project" required>
                         <div class="form-text">
                             Full path to the directory containing your Python code.
@@ -56,7 +56,7 @@
 
                     <div class="alert alert-info">
                         <i class="fas fa-info-circle"></i>
-                        <strong>Note:</strong> Make sure the path exists and contains Python files (.py) 
+                        <strong>Note:</strong> Make sure the path exists and contains Python files (.py)
                         that you want to analyze. The analyzer will recursively scan all subdirectories.
                     </div>
 
@@ -110,7 +110,7 @@
 document.getElementById('path').addEventListener('blur', function() {
     const path = this.value.trim();
     const nameField = document.getElementById('name');
-    
+
     if (path && !nameField.value) {
         // Extract folder name from path
         const folderName = path.split('/').pop() || path.split('\\').pop();
@@ -124,4 +124,4 @@ document.getElementById('path').addEventListener('blur', function() {
     }
 });
 </script>
-{% endblock %} 
+{% endblock %}

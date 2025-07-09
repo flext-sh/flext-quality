@@ -255,7 +255,7 @@ class AnalysisRunner:
         try:
             # Get project path
             project_path = Path(session.project.repository_url)
-            
+
             # Run analysis with selected backends
             backends = session.configuration.get('backends', ['ast', 'quality'])
             results = self.analyzer.analyze_project(
@@ -274,7 +274,7 @@ class AnalysisRunner:
 
             session.complete_analysis()
             print(f"Analysis completed successfully!")
-            
+
             log.error summary
             self._print_results_summary(session)
 
@@ -288,21 +288,21 @@ class AnalysisRunner:
         print("\n" + "="*60)
         print("Analysis Results Summary")
         print("="*60)
-        
+
         for result in session.analysis_results.all():
             print(f"\n{result.backend_name}:")
             print(f"  Status: {result.status}")
-            
+
             if result.status == 'success':
                 data = result.result_data
                 if 'metrics' in data:
                     print("  Metrics:")
                     for key, value in data['metrics'].items():
                         print(f"    - {key}: {value}")
-                
+
                 if 'issues' in data:
                     print(f"  Issues found: {len(data['issues'])}")
-                
+
                 if 'score' in data:
                     print(f"  Quality score: {data['score']}")
 
@@ -319,45 +319,45 @@ def main():
     parser = argparse.ArgumentParser(
         description="Run code analysis for DC Code Analyzer projects"
     )
-    
+
     parser.add_argument(
         'project_id',
         type=int,
         help='Project ID to analyze'
     )
-    
+
     parser.add_argument(
         '--backends',
         nargs='+',
         default=['ast', 'quality'],
         help='Analysis backends to use (default: ast quality)'
     )
-    
+
     parser.add_argument(
         '--sync',
         action='store_true',
         help='Run analysis synchronously (default: async)'
     )
-    
+
     parser.add_argument(
         '--depth',
         choices=['shallow', 'normal', 'deep'],
         default='normal',
         help='Analysis depth (default: normal)'
     )
-    
+
     parser.add_argument(
         '--include-tests',
         action='store_true',
         help='Include test files in analysis'
     )
-    
+
     parser.add_argument(
         '--list-projects',
         action='store_true',
         help='List available projects'
     )
-    
+
     parser.add_argument(
         '--list-backends',
         action='store_true',
@@ -449,10 +449,10 @@ class BatchAnalyzer:
     ) -> List[Dict[str, Any]]:
         """Analyze multiple projects."""
         projects = self._get_projects(project_ids)
-        
+
         print(f"Starting batch analysis for {len(projects)} projects...")
         print(f"Using {self.max_workers} parallel workers")
-        
+
         with ThreadPoolExecutor(max_workers=self.max_workers) as executor:
             future_to_project = {
                 executor.submit(
@@ -463,7 +463,7 @@ class BatchAnalyzer:
                 ): project
                 for project in projects
             }
-            
+
             for future in as_completed(future_to_project):
                 project = future_to_project[future]
                 try:
@@ -477,7 +477,7 @@ class BatchAnalyzer:
                         'status': 'failed',
                         'error': str(e)
                     })
-        
+
         return self.results
 
     def _get_projects(self, project_ids: List[int]) -> List[Project]:
@@ -495,7 +495,7 @@ class BatchAnalyzer:
     ) -> Dict[str, Any]:
         """Analyze single project."""
         start_time = time.time()
-        
+
         # Create analysis session
         session = AnalysisSession.objects.create(
             project=project,
@@ -505,12 +505,12 @@ class BatchAnalyzer:
                 **config
             }
         )
-        
+
         # Queue analysis task
         run_analysis_task.delay(session.id)
-        
+
         duration = time.time() - start_time
-        
+
         return {
             'project': project.name,
             'session_id': session.id,
@@ -523,7 +523,7 @@ class BatchAnalyzer:
         total = len(self.results)
         successful = len([r for r in self.results if r['status'] == 'queued'])
         failed = len([r for r in self.results if r['status'] == 'failed'])
-        
+
         report = {
             'summary': {
                 'total_projects': total,
@@ -533,13 +533,13 @@ class BatchAnalyzer:
             },
             'projects': self.results
         }
-        
+
         return report
 
     def print_report(self):
         """Print analysis report."""
         report = self.generate_report()
-        
+
         print("\n" + "="*60)
         print("Batch Analysis Report")
         print("="*60)
@@ -547,7 +547,7 @@ class BatchAnalyzer:
         print(f"Successful: {report['summary']['successful']}")
         print(f"Failed: {report['summary']['failed']}")
         print(f"Success rate: {report['summary']['success_rate']:.1f}%")
-        
+
         if report['summary']['failed'] > 0:
             print("\nFailed projects:")
             for result in self.results:
@@ -559,40 +559,40 @@ def main():
     parser = argparse.ArgumentParser(
         description="Run batch analysis for multiple projects"
     )
-    
+
     parser.add_argument(
         '--project-ids',
         nargs='+',
         type=int,
         help='Project IDs to analyze (default: all projects)'
     )
-    
+
     parser.add_argument(
         '--backends',
         nargs='+',
         default=['ast', 'quality'],
         help='Analysis backends to use'
     )
-    
+
     parser.add_argument(
         '--workers',
         type=int,
         default=4,
         help='Number of parallel workers (default: 4)'
     )
-    
+
     parser.add_argument(
         '--depth',
         choices=['shallow', 'normal', 'deep'],
         default='normal',
         help='Analysis depth'
     )
-    
+
     parser.add_argument(
         '--language',
         help='Filter projects by language'
     )
-    
+
     parser.add_argument(
         '--framework',
         help='Filter projects by framework'
@@ -608,7 +608,7 @@ def main():
 
     # Get project IDs based on filters
     project_ids = args.project_ids or []
-    
+
     if not project_ids and (args.language or args.framework):
         # Filter projects
         projects = Project.objects.all()
@@ -620,17 +620,17 @@ def main():
 
     # Run batch analysis
     analyzer = BatchAnalyzer(max_workers=args.workers)
-    
+
     try:
         analyzer.analyze_projects(
             project_ids=project_ids,
             backends=args.backends,
             config=config
         )
-        
+
         log.error report
         analyzer.print_report()
-        
+
     except Exception as e:
         print(f"Batch analysis failed: {e}", file=sys.stderr)
         sys.exit(1)
@@ -683,18 +683,18 @@ class IssueChecker:
     ) -> List[Issue]:
         """Check issues for a project or session."""
         query = Issue.objects.all()
-        
+
         if session_id:
             query = query.filter(session_id=session_id)
         elif project_id:
             query = query.filter(session__project_id=project_id)
-        
+
         if severity:
             query = query.filter(severity=severity)
-        
+
         if issue_type:
             query = query.filter(type=issue_type)
-        
+
         self.issues = list(query.select_related('session', 'session__project'))
         return self.issues
 
@@ -702,37 +702,37 @@ class IssueChecker:
         """Analyze issue patterns and statistics."""
         if not self.issues:
             return {"error": "No issues found"}
-        
+
         # Calculate statistics
         for issue in self.issues:
             self.stats['total'] += 1
             self.stats[f'severity_{issue.severity}'] += 1
             self.stats[f'type_{issue.type}'] += 1
             self.stats[f'backend_{issue.backend_name}'] += 1
-        
+
         # Find most common issues
         issue_messages = defaultdict(int)
         for issue in self.issues:
             issue_messages[issue.message] += 1
-        
+
         most_common = sorted(
             issue_messages.items(),
             key=lambda x: x[1],
             reverse=True
         )[:10]
-        
+
         # Group by file
         issues_by_file = defaultdict(list)
         for issue in self.issues:
             issues_by_file[issue.file_path].append(issue)
-        
+
         # Files with most issues
         files_by_issue_count = sorted(
             [(file, len(issues)) for file, issues in issues_by_file.items()],
             key=lambda x: x[1],
             reverse=True
         )[:10]
-        
+
         return {
             'statistics': dict(self.stats),
             'most_common_issues': [
@@ -754,23 +754,23 @@ class IssueChecker:
     def generate_report(self, format: str = 'text') -> str:
         """Generate issue report in specified format."""
         analysis = self.analyze_issues()
-        
+
         if format == 'json':
             return json.dumps(analysis, indent=2)
-        
+
         elif format == 'csv':
             import csv
             import io
-            
+
             output = io.StringIO()
             writer = csv.writer(output)
-            
+
             # Write header
             writer.writerow([
                 'Project', 'File', 'Line', 'Column',
                 'Type', 'Severity', 'Message', 'Backend'
             ])
-            
+
             # Write issues
             for issue in self.issues:
                 writer.writerow([
@@ -783,41 +783,41 @@ class IssueChecker:
                     issue.message,
                     issue.backend_name
                 ])
-            
+
             return output.getvalue()
-        
+
         else:  # text format
             report = []
             report.append("="*60)
             report.append("Code Analysis Issues Report")
             report.append("="*60)
-            
+
             stats = analysis['statistics']
             report.append(f"\nTotal issues: {stats['total']}")
-            
+
             report.append("\nSeverity Distribution:")
             for severity, count in analysis['severity_distribution'].items():
                 report.append(f"  {severity}: {count}")
-            
+
             report.append("\nMost Common Issues:")
             for item in analysis['most_common_issues'][:5]:
                 report.append(f"  - {item['message'][:60]}... ({item['count']} occurrences)")
-            
+
             report.append("\nFiles with Most Issues:")
             for item in analysis['files_with_most_issues'][:5]:
                 report.append(f"  - {item['file']}: {item['issue_count']} issues")
-            
+
             return '\n'.join(report)
 
     def fix_suggestions(self) -> List[Dict[str, Any]]:
         """Generate fix suggestions for common issues."""
         suggestions = []
-        
+
         # Group issues by type
         issues_by_type = defaultdict(list)
         for issue in self.issues:
             issues_by_type[issue.type].append(issue)
-        
+
         # Generate suggestions
         for issue_type, issues in issues_by_type.items():
             if issue_type == 'complexity':
@@ -841,7 +841,7 @@ class IssueChecker:
                     'suggestion': 'Add docstrings to functions and classes for better documentation',
                     'priority': 'low'
                 })
-        
+
         return sorted(suggestions, key=lambda x: x['count'], reverse=True)
 
 def main():
@@ -849,42 +849,42 @@ def main():
     parser = argparse.ArgumentParser(
         description="Check and analyze detected code issues"
     )
-    
+
     parser.add_argument(
         '--project-id',
         type=int,
         help='Filter by project ID'
     )
-    
+
     parser.add_argument(
         '--session-id',
         type=int,
         help='Filter by analysis session ID'
     )
-    
+
     parser.add_argument(
         '--severity',
         choices=['low', 'medium', 'high', 'critical'],
         help='Filter by severity'
     )
-    
+
     parser.add_argument(
         '--type',
         help='Filter by issue type'
     )
-    
+
     parser.add_argument(
         '--format',
         choices=['text', 'json', 'csv'],
         default='text',
         help='Output format (default: text)'
     )
-    
+
     parser.add_argument(
         '--output',
         help='Output file (default: stdout)'
     )
-    
+
     parser.add_argument(
         '--fix-suggestions',
         action='store_true',
@@ -894,7 +894,7 @@ def main():
     args = parser.parse_args()
 
     checker = IssueChecker()
-    
+
     # Check issues
     issues = checker.check_project_issues(
         project_id=args.project_id,
@@ -902,29 +902,29 @@ def main():
         severity=args.severity,
         issue_type=args.type
     )
-    
+
     if not issues:
         print("No issues found matching criteria")
         return
-    
+
     print(f"Found {len(issues)} issues")
-    
+
     # Generate report
     report = checker.generate_report(format=args.format)
-    
+
     if args.output:
         with open(args.output, 'w') as f:
             f.write(report)
         print(f"Report saved to {args.output}")
     else:
         print(report)
-    
+
     # Show fix suggestions if requested
     if args.fix_suggestions:
         print("\n" + "="*60)
         print("Fix Suggestions")
         print("="*60)
-        
+
         suggestions = checker.fix_suggestions()
         for suggestion in suggestions:
             print(f"\n{suggestion['issue_type']} ({suggestion['count']} issues):")

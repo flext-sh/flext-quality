@@ -5,6 +5,31 @@ from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Django basics
+SECRET_KEY = "test-secret-key-for-flext-quality"
+DEBUG = True
+USE_TZ = True
+
+# Minimal app configuration
+INSTALLED_APPS = [
+    "django.contrib.contenttypes",
+    "django.contrib.auth",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "rest_framework",
+]
+
+MIDDLEWARE = [
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+]
+
+ROOT_URLCONF = []
+
 # Override database settings for testing
 DATABASES = {
     "default": {
@@ -22,16 +47,6 @@ DATABASES = {
 # Disable foreign key checks for SQLite in tests
 if DATABASES["default"]["ENGINE"] == "django.db.backends.sqlite3":
     DATABASES["default"]["OPTIONS"].pop("init_command", None)
-
-# Keep migrations enabled for now to create tables
-# class DisableMigrations:
-#     def __contains__(self, item):
-#         return True
-
-#     def __getitem__(self, item):
-#         return None
-
-# MIGRATION_MODULES = DisableMigrations()
 
 # Force syncdb for testing - use the models directly instead of migrations
 if "test" in sys.argv or "pytest" in sys.modules:

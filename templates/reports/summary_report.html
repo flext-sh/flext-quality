@@ -7,7 +7,7 @@
 {% block content %}
     {% if quality_metrics %}
         {% include "reports/quality_overview.html" %}
-        
+
         {% if complex_files %}
         <h2>⚠️ Most Complex Files</h2>
         <div class="table-container">
@@ -39,7 +39,7 @@
             </table>
         </div>
         {% endif %}
-        
+
         <h2>🎯 Recommendations</h2>
         <div class="list-group">
             {% if quality_metrics.security_issues_count > 0 %}
@@ -48,28 +48,28 @@
                 <span class="badge badge-danger">High Priority</span>
             </div>
             {% endif %}
-            
+
             {% if quality_metrics.dead_code_items_count > 0 %}
             <div class="list-group-item">
                 <span>🧹 Remove {{ quality_metrics.dead_code_items_count }} dead code items</span>
                 <span class="badge badge-warning">Medium Priority</span>
             </div>
             {% endif %}
-            
+
             {% if quality_metrics.duplicate_blocks_count > 0 %}
             <div class="list-group-item">
                 <span>🔄 Refactor {{ quality_metrics.duplicate_blocks_count }} duplicate code blocks</span>
                 <span class="badge badge-info">Low Priority</span>
             </div>
             {% endif %}
-            
+
             {% if quality_metrics.complex_functions_count > 0 %}
             <div class="list-group-item">
                 <span>⚡ Simplify {{ quality_metrics.complex_functions_count }} complex functions</span>
                 <span class="badge badge-warning">Medium Priority</span>
             </div>
             {% endif %}
-            
+
             {% if quality_metrics.documented_functions < quality_metrics.total_functions %}
             <div class="list-group-item">
                 <span>📚 Document {{ quality_metrics.total_functions|add:quality_metrics.documented_functions|add:"-"|add:quality_metrics.documented_functions }} functions</span>
@@ -77,7 +77,7 @@
             </div>
             {% endif %}
         </div>
-        
+
     {% else %}
         {% if error_message %}
             <div class="alert alert-danger">
@@ -89,4 +89,4 @@
             </div>
         {% endif %}
     {% endif %}
-{% endblock %} 
+{% endblock %}

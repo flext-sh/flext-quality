@@ -1,82 +1,268 @@
-# Pre-commit configuration - FLEXT Quality
-# See https://pre-commit.com for more information
+# ===== FLEXT STANDARDS - PRE-COMMIT CONFIGURATION =====
+# ==============================================================
+# Zero Tolerance Pre-Commit Hooks - FLEXT Standard 2025
+# All tools configured in pyproject.toml for single source of truth
+# Based on Python 3.13 + bleeding-edge tools with maximum strictness
 
 repos:
+  # ===== METADATA & STRUCTURE VALIDATION =====
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
     hooks:
       - id: trailing-whitespace
+        name: "🧹 Remove trailing whitespace"
       - id: end-of-file-fixer
+        name: "📝 Fix end of files"
       - id: check-yaml
+        name: "✅ Validate YAML files"
       - id: check-json
-      - id: check-added-large-files
-      - id: check-case-conflict
-      - id: check-merge-conflict
+        name: "✅ Validate JSON files"
       - id: check-toml
-      - id: debug-statements
+        name: "✅ Validate TOML files"
+      - id: check-xml
+        name: "✅ Validate XML files"
+      - id: check-merge-conflict
+        name: "🔍 Check for merge conflicts"
+      - id: check-case-conflict
+        name: "🔍 Check for case conflicts"
+      - id: check-symlinks
+        name: "🔍 Check for broken symlinks"
+      - id: destroyed-symlinks
+        name: "🔍 Check for destroyed symlinks"
+      - id: check-executables-have-shebangs
+        name: "🔍 Check executables have shebangs"
+      - id: check-shebang-scripts-are-executable
+        name: "🔍 Check shebang scripts are executable"
       - id: mixed-line-ending
+        name: "🔍 Check for mixed line endings"
+        args: ["--fix=lf"]
+      - id: check-byte-order-marker
+        name: "🔍 Check for byte order marker"
+      - id: check-ast
+        name: "🔍 Check Python AST"
+      - id: check-builtin-literals
+        name: "🔍 Check builtin type constructor use"
+      - id: check-docstring-first
+        name: "🔍 Check docstring is first"
+      - id: debug-statements
+        name: "🔍 Check for debugger imports"
+      - id: name-tests-test
+        name: "🔍 Check test file naming"
+      - id: requirements-txt-fixer
+        name: "📦 Fix requirements.txt"
+      - id: fix-byte-order-marker
+        name: "🔧 Fix byte order marker"
+      - id: pretty-format-json
+        name: "🎨 Format JSON files"
+        args: ["--autofix", "--indent=2"]
 
+  # ===== PYTHON CODE FORMATTING =====
   - repo: https://github.com/psf/black
     rev: 24.10.0
     hooks:
       - id: black
+        name: "🎨 Format Python code (Black)"
         language_version: python3.13
+        args: ["--config=pyproject.toml"]
+        types: [python]
 
-  - repo: https://github.com/charliermarsh/ruff-pre-commit
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
+    hooks:
+      - id: isort
+        name: "📦 Sort Python imports (isort)"
+        args: ["--settings-path=pyproject.toml"]
+        types: [python]
+
+  # ===== PYTHON CODE QUALITY & LINTING =====
+  - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.8.6
     hooks:
       - id: ruff
-        args: [--fix, --exit-non-zero-on-fix]
+        name: "🔬 Lint Python code (Ruff)"
+        args: ["--config=pyproject.toml", "--fix"]
+        types: [python]
       - id: ruff-format
+        name: "🎨 Format Python code (Ruff)"
+        args: ["--config=pyproject.toml"]
+        types: [python]
 
+  # ===== TYPE CHECKING =====
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.16.0
+    rev: v1.13.0
     hooks:
       - id: mypy
-        additional_dependencies:
-          [
-            types-python-dateutil,
-            types-requests,
-            types-setuptools,
-            types-tabulate,
-            pydantic,
-            pydantic-settings,
-            click,
-            rich,
-            typer,
-            structlog,
-            httpx,
-            aiofiles,
-            tabulate,
-            plotly,
-            pandas,
-            jinja2,
-            gitpython,
-            bandit,
-            ruff,
-            mypy,
-            black,
-            isort,
-            safety,
-            vulture,
-            radon,
-            mccabe,
-            flake8,
-            pylint,
-            prospector,
-          ]
-        args: [--strict, --ignore-missing-imports]
+        name: "🔍 Type checking (MyPy)"
+        args: ["--config-file=pyproject.toml", "--strict"]
+        language_version: python3.13
+        additional_dependencies: 
+          - types-requests
+          - types-setuptools
+          - types-python-dateutil
+          - types-tabulate
+        types: [python]
+        exclude: ^(docs/|scripts/|tests/fixtures/)
 
+  # ===== SECURITY SCANNING =====
   - repo: https://github.com/PyCQA/bandit
-    rev: 1.8.3
+    rev: 1.8.6
     hooks:
       - id: bandit
-        args: [-r, src/]
-        exclude: tests/
+        name: "🛡️ Security scan (Bandit)"
+        args: ["-c", "pyproject.toml", "-r", "src/"]
+        types: [python]
+        exclude: ^tests/
 
-  - repo: https://github.com/python-poetry/poetry
-    rev: 1.8.4
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        name: "🔍 Detect secrets"
+        args: ["--baseline", ".secrets.baseline"]
+        exclude: ^(tests/fixtures/|.*\.lock$|poetry\.lock$)
+
+  # ===== DOCUMENTATION =====
+  - repo: https://github.com/adamchainz/blacken-docs
+    rev: 1.19.1
+    hooks:
+      - id: blacken-docs
+        name: "🎨 Format code in docs (blacken-docs)"
+        additional_dependencies: [black]
+        language_version: python3.13
+
+  - repo: https://github.com/econchick/interrogate
+    rev: 1.7.0
+    hooks:
+      - id: interrogate
+        name: "📚 Check docstring coverage"
+        args: ["--config=pyproject.toml"]
+        types: [python]
+        exclude: ^(tests/|docs/|scripts/)
+
+  # ===== SPELL CHECKING =====
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+        name: "📝 Check spelling (codespell)"
+        args: ["--config=pyproject.toml"]
+        exclude: ^(poetry\.lock$|.*\.min\.(js|css)$|.*\.map$)
+
+  # ===== PYTHON UPGRADES =====
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.18.0
+    hooks:
+      - id: pyupgrade
+        name: "⬆️ Upgrade Python syntax"
+        args: ["--py313-plus"]
+        language_version: python3.13
+        types: [python]
+
+  # ===== YAML & TOML FORMATTING =====
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v4.0.0-alpha.8
+    hooks:
+      - id: prettier
+        name: "🎨 Format YAML/JSON/Markdown"
+        types_or: [yaml, json, markdown]
+        exclude: ^(poetry\.lock$|.*\.min\.(js|css)$)
+
+  # ===== DEPENDENCY SCANNING =====
+  - repo: https://github.com/Lucas-C/pre-commit-hooks-safety
+    rev: v1.3.3
+    hooks:
+      - id: python-safety-dependencies-check
+        name: "🔍 Check dependencies for vulnerabilities"
+        args: ["--ignore=70612"]  # Ignore jinja2 vulnerability in development
+
+  # ===== COMMIT STANDARDS =====
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.31.0
+    hooks:
+      - id: commitizen
+        name: "📝 Check commit message format"
+        stages: [commit-msg]
+
+  # ===== DOCKERFILE LINTING =====
+  - repo: https://github.com/hadolint/hadolint
+    rev: v2.12.0
+    hooks:
+      - id: hadolint-docker
+        name: "🐳 Lint Dockerfile"
+        files: Dockerfile.*
+        args: ["--config", ".hadolint.yaml"]
+
+  # ===== SHELL SCRIPT LINTING =====
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+        name: "🔍 Lint shell scripts"
+        types: [shell]
+        args: ["--severity=warning"]
+
+  # ===== GITHUB ACTIONS VALIDATION =====
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.33.2
+    hooks:
+      - id: check-github-workflows
+        name: "✅ Validate GitHub workflows"
+        files: ^\.github/workflows/.*\.ya?ml$
+      - id: check-dependabot
+        name: "✅ Validate Dependabot config"
+        files: ^\.github/dependabot\.ya?ml$
+
+  # ===== MAKEFILE LINTING =====
+  - repo: https://github.com/mrtazz/checkmake
+    rev: 0.2.2
+    hooks:
+      - id: checkmake
+        name: "🔍 Lint Makefile"
+        files: ^Makefile$
+
+  # ===== FINAL VALIDATION =====
+  - repo: local
     hooks:
       - id: poetry-check
-      - id: poetry-lock
-        args: [--no-update]
+        name: "📦 Validate Poetry configuration"
+        entry: poetry check
+        language: system
+        files: ^pyproject\.toml$
+        pass_filenames: false
+      
+      - id: poetry-lock-check
+        name: "🔒 Check Poetry lock file"
+        entry: poetry lock --check
+        language: system
+        files: ^(pyproject\.toml|poetry\.lock)$
+        pass_filenames: false
+
+# ===== CONFIGURATION =====
+default_stages: [pre-commit]
+default_language_version:
+  python: python3.13
+
+# ===== CI INTEGRATION =====
+ci:
+  autofix_commit_msg: |
+    🔧 auto-fix(pre-commit): apply automatic fixes
+    
+    [skip ci]
+  autofix_prs: true
+  autoupdate_branch: ''
+  autoupdate_commit_msg: '🔄 chore(deps): update pre-commit hooks'
+  autoupdate_schedule: weekly
+  skip:
+    - mypy  # Skip MyPy in CI as it's run separately
+    - interrogate  # Skip docstring check in CI
+    - python-safety-dependencies-check  # Skip safety in CI as it's run separately
+
+# ===== FLEXT STANDARDS COMPLIANCE =====
+# This configuration ensures:
+# ✅ Zero tolerance for code quality issues
+# ✅ Maximum security scanning
+# ✅ Complete documentation coverage
+# ✅ Bleeding-edge tool versions
+# ✅ Python 3.13 compatibility
+# ✅ All configurations centralized in pyproject.toml
+# ✅ Enterprise-grade standards

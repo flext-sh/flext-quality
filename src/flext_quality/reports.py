@@ -78,7 +78,10 @@ class QualityReport:
         if security_issues:
             lines.append(f"Security Issues: {len(security_issues)}")
             # Show first 5
-            lines.extend(f"  • {issue.get('message', 'Unknown issue')} ({issue.get('file', 'unknown')})" for issue in security_issues[:5])
+            lines.extend(
+                f"  • {issue.get('message', 'Unknown issue')} ({issue.get('file', 'unknown')})"
+                for issue in security_issues[:5]
+            )
             if len(security_issues) > 5:
                 lines.append(f"  ... and {len(security_issues) - 5} more")
             lines.append("")
@@ -86,7 +89,10 @@ class QualityReport:
         complexity_issues = issues.get("complexity", [])
         if complexity_issues:
             lines.append(f"Complexity Issues: {len(complexity_issues)}")
-            lines.extend(f"  • {issue.get('message', 'Unknown issue')} ({issue.get('file', 'unknown')})" for issue in complexity_issues[:5])
+            lines.extend(
+                f"  • {issue.get('message', 'Unknown issue')} ({issue.get('file', 'unknown')})"
+                for issue in complexity_issues[:5]
+            )
             if len(complexity_issues) > 5:
                 lines.append(f"  ... and {len(complexity_issues) - 5} more")
             lines.append("")
@@ -94,7 +100,10 @@ class QualityReport:
         dead_code_issues = issues.get("dead_code", [])
         if dead_code_issues:
             lines.append(f"Dead Code Issues: {len(dead_code_issues)}")
-            lines.extend(f"  • {issue.get('message', 'Unknown issue')} ({issue.get('file', 'unknown')})" for issue in dead_code_issues[:5])
+            lines.extend(
+                f"  • {issue.get('message', 'Unknown issue')} ({issue.get('file', 'unknown')})"
+                for issue in dead_code_issues[:5]
+            )
             if len(dead_code_issues) > 5:
                 lines.append(f"  ... and {len(dead_code_issues) - 5} more")
             lines.append("")
