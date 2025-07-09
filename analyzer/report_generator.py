@@ -372,7 +372,9 @@ class WebReportGenerator:
             issue_types[issue.issue_type] += 1
 
         # Generate recommendations based on most common issues
-        sorted_types = sorted(issue_types.items(), key=operator.itemgetter(1), reverse=True)
+        sorted_types = sorted(
+            issue_types.items(), key=operator.itemgetter(1), reverse=True
+        )
 
         for issue_type, count in sorted_types[:5]:  # Top 5 issue types
             recommendations.append(

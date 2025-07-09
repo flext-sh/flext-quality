@@ -200,7 +200,8 @@ Examples:
 
     # Execute command
     if hasattr(args, "func"):
-        return args.func(args)
+        result = args.func(args)
+        return int(result) if result is not None else 0
     parser.print_help()
     return 1
 

@@ -120,13 +120,13 @@ def calculate_metrics(data):
 
 class DataProcessor:
     """Process data with various methods."""
-    
+
     def __init__(self):
         self.data = []
-        
+
     def add_data(self, item):
         self.data.append(item)
-        
+
     def process(self):
         return [x * 2 for x in self.data if x > 0]
 '''
@@ -141,19 +141,19 @@ class DataProcessor:
         """Test Python code analysis with AST backend."""
         # Act
         results = ast_backend.analyze_code(sample_python_code, "test.py")
-        
+
         # Assert
         assert results is not None
         assert "metrics" in results
         assert "issues" in results
         assert "ast_info" in results
-        
+
         # Check metrics
         metrics = results["metrics"]
         assert metrics["functions"] == 1
         assert metrics["classes"] == 1
         assert metrics["methods"] == 3  # __init__, add_data, process
-        
+
         # Check complexity
         assert metrics["cyclomatic_complexity"] > 0
 
@@ -161,13 +161,13 @@ class DataProcessor:
         """Test code smell detection."""
         # Act
         issues = ast_backend.detect_code_smells(sample_python_code)
-        
+
         # Assert
         assert isinstance(issues, list)
-        
+
         # Check for specific code smells
         smell_types = [issue["type"] for issue in issues]
-        
+
         # Should detect high complexity in calculate_metrics
         complexity_issues = [i for i in issues if "complexity" in i["type"].lower()]
         assert len(complexity_issues) >= 0  # May or may not have complexity issues
@@ -176,16 +176,16 @@ class DataProcessor:
         """Test AST metrics extraction."""
         # Arrange
         tree = ast.parse(sample_python_code)
-        
+
         # Act
         metrics = ast_backend.extract_ast_metrics(tree)
-        
+
         # Assert
         assert "total_nodes" in metrics
         assert metrics["total_nodes"] > 0
         assert "depth" in metrics
         assert metrics["depth"] > 0
-        
+
         # Check node type distribution
         assert "node_types" in metrics
         node_types = metrics["node_types"]
@@ -203,15 +203,15 @@ from typing import Dict, List, Optional
 import pandas as pd
 from sklearn.metrics import accuracy_score
 '''
-        
+
         # Act
         import_info = ast_backend.analyze_imports(code_with_imports)
-        
+
         # Assert
         assert "stdlib_imports" in import_info
         assert "third_party_imports" in import_info
         assert "relative_imports" in import_info
-        
+
         assert "os" in import_info["stdlib_imports"]
         assert "pandas" in import_info["third_party_imports"]
 
@@ -228,7 +228,7 @@ class TestQualityBackend:
         """Create temporary project for testing."""
         project = tmp_path / "test_project"
         project.mkdir()
-        
+
         # Create sample Python files
         (project / "main.py").write_text('''
 def main():
@@ -241,7 +241,7 @@ def main():
 if __name__ == "__main__":
     main()
 ''')
-        
+
         (project / "utils.py").write_text('''
 def unused_function():
     pass
@@ -249,7 +249,7 @@ def unused_function():
 def used_function(x):
     return x * 2
 ''')
-        
+
         return project
 
     def test_quality_backend_initialization(self, quality_backend):
@@ -281,10 +281,10 @@ def used_function(x):
     }
 }
 '''
-        
+
         # Act
         results = quality_backend.run_pylint(project_path)
-        
+
         # Assert
         assert results is not None
         assert "messages" in results
@@ -300,10 +300,10 @@ def used_function(x):
             "mypy": {"errors": 1},
             "coverage": {"percentage": 85.0}
         }
-        
+
         # Act
         overall_score = quality_backend.calculate_quality_score(quality_results)
-        
+
         # Assert
         assert 0 <= overall_score <= 100
         assert overall_score > 70  # Should be reasonably high with these metrics
@@ -325,13 +325,13 @@ def used_function(x):
                 ]
             }
         }
-        
+
         # Act
         issues = quality_backend.aggregate_quality_issues(quality_results)
-        
+
         # Assert
         assert len(issues) == 4
-        
+
         # Check issue severity mapping
         severities = [issue["severity"] for issue in issues]
         assert "error" in severities
@@ -366,10 +366,10 @@ class TestExternalBackend:
             }
         }
         mock_post.return_value = mock_response
-        
+
         # Act
         results = external_backend.analyze_code("sample code", "test.py")
-        
+
         # Assert
         assert results["status"] == "success"
         assert results["analysis"]["security_score"] == 95
@@ -380,10 +380,10 @@ class TestExternalBackend:
         """Test handling of external service errors."""
         # Arrange
         mock_post.side_effect = Exception("Connection timeout")
-        
+
         # Act
         results = external_backend.analyze_code("sample code", "test.py")
-        
+
         # Assert
         assert results["status"] == "error"
         assert "error_message" in results
@@ -404,11 +404,11 @@ class TestMultiBackendAnalyzer:
         ast_backend = Mock(spec=ASTBackend)
         ast_backend.name = "AST Backend"
         ast_backend.analyze_code.return_value = {"ast_metrics": {"functions": 5}}
-        
+
         quality_backend = Mock(spec=QualityBackend)
         quality_backend.name = "Quality Backend"
         quality_backend.analyze_project.return_value = {"quality_score": 85}
-        
+
         return [ast_backend, quality_backend]
 
     def test_multi_backend_initialization(self, multi_analyzer):
@@ -422,10 +422,10 @@ class TestMultiBackendAnalyzer:
         # Arrange
         multi_analyzer.backends = mock_backends
         test_code = "def test(): pass"
-        
+
         # Act
         results = multi_analyzer.analyze_with_all_backends(test_code, "test.py")
-        
+
         # Assert
         assert len(results) == 2
         assert "AST Backend" in results
@@ -445,10 +445,10 @@ class TestMultiBackendAnalyzer:
                 "issues": [{"type": "style", "severity": "low"}]
             }
         }
-        
+
         # Act
         aggregated = multi_analyzer.aggregate_results(backend_results)
-        
+
         # Assert
         assert "combined_metrics" in aggregated
         assert "all_issues" in aggregated
@@ -464,10 +464,10 @@ class TestMultiBackendAnalyzer:
             {"type": "bug", "severity": "critical", "backend": "AST Backend"},
             {"type": "complexity", "severity": "medium", "backend": "AST Backend"}
         ]
-        
+
         # Act
         prioritized = multi_analyzer.prioritize_issues(issues)
-        
+
         # Assert
         assert prioritized[0]["severity"] == "critical"
         assert prioritized[1]["severity"] == "high"
@@ -485,8 +485,8 @@ from django.utils import timezone
 from datetime import timedelta
 
 from analyzer.models import (
-    Project, 
-    AnalysisSession, 
+    Project,
+    AnalysisSession,
     AnalysisResult,
     Issue,
     CodeMetric,
@@ -536,7 +536,7 @@ class TestProjectModel(TestCase):
             project=self.project,
             status="running"
         )
-        
+
         # Test relationship
         sessions = self.project.analysis_sessions.all()
         assert sessions.count() == 2
@@ -551,13 +551,13 @@ class TestProjectModel(TestCase):
             status="completed",
             started_at=timezone.now() - timedelta(days=7)
         )
-        
+
         recent_session = AnalysisSession.objects.create(
             project=self.project,
             status="completed",
             started_at=timezone.now() - timedelta(days=1)
         )
-        
+
         # Test latest analysis
         latest = self.project.get_latest_analysis()
         assert latest == recent_session
@@ -571,7 +571,7 @@ class TestAnalysisSessionModel(TestCase):
             name="Test Project",
             language="Python"
         )
-        
+
         self.session = AnalysisSession.objects.create(
             project=self.project,
             status="running",
@@ -592,12 +592,12 @@ class TestAnalysisSessionModel(TestCase):
         """Test analysis session status transitions."""
         # Initial status
         assert self.session.status == "running"
-        
+
         # Complete analysis
         self.session.complete_analysis()
         assert self.session.status == "completed"
         assert self.session.completed_at is not None
-        
+
         # Test error status
         error_session = AnalysisSession.objects.create(
             project=self.project,
@@ -614,7 +614,7 @@ class TestAnalysisSessionModel(TestCase):
         self.session.completed_at = timezone.now()
         self.session.status = "completed"
         self.session.save()
-        
+
         # Test duration
         duration = self.session.get_duration()
         assert duration.total_seconds() == pytest.approx(300, rel=10)
@@ -628,14 +628,14 @@ class TestAnalysisSessionModel(TestCase):
             status="success",
             result_data={"metrics": {"functions": 10}}
         )
-        
+
         result2 = AnalysisResult.objects.create(
             session=self.session,
             backend_name="Quality Backend",
             status="success",
             result_data={"score": 85}
         )
-        
+
         # Test relationship
         results = self.session.analysis_results.all()
         assert results.count() == 2
@@ -652,7 +652,7 @@ class TestIssueModel(TestCase):
             project=self.project,
             status="completed"
         )
-        
+
         self.issue = Issue.objects.create(
             session=self.session,
             type="complexity",
@@ -676,7 +676,7 @@ class TestIssueModel(TestCase):
     def test_issue_severity_levels(self):
         """Test issue severity level validation."""
         valid_severities = ["low", "medium", "high", "critical"]
-        
+
         for severity in valid_severities:
             issue = Issue.objects.create(
                 session=self.session,
@@ -697,7 +697,7 @@ class TestIssueModel(TestCase):
             file_path="utils.py",
             message="High complexity"
         )
-        
+
         Issue.objects.create(
             session=self.session,
             type="security",
@@ -705,14 +705,14 @@ class TestIssueModel(TestCase):
             file_path="auth.py",
             message="Security vulnerability"
         )
-        
+
         # Test grouping
         complexity_issues = Issue.objects.filter(
             session=self.session,
             type="complexity"
         )
         assert complexity_issues.count() == 2
-        
+
         security_issues = Issue.objects.filter(
             session=self.session,
             type="security"
@@ -723,7 +723,7 @@ class TestIssueModel(TestCase):
         """Test issue fix suggestion field."""
         self.issue.fix_suggestion = "Refactor function to reduce complexity"
         self.issue.save()
-        
+
         assert self.issue.fix_suggestion == "Refactor function to reduce complexity"
 
 class TestCodeMetricModel(TestCase):
@@ -736,7 +736,7 @@ class TestCodeMetricModel(TestCase):
             project=self.project,
             status="completed"
         )
-        
+
         self.metric = CodeMetric.objects.create(
             session=self.session,
             metric_name="cyclomatic_complexity",
@@ -761,20 +761,20 @@ class TestCodeMetricModel(TestCase):
             metric_value=8.0,
             file_path="src/simple_module.py"
         )
-        
+
         CodeMetric.objects.create(
             session=self.session,
             metric_name="lines_of_code",
             metric_value=500,
             file_path="src/complex_module.py"
         )
-        
+
         # Test aggregation
         complexity_metrics = CodeMetric.objects.filter(
             session=self.session,
             metric_name="cyclomatic_complexity"
         )
-        
+
         avg_complexity = sum(m.metric_value for m in complexity_metrics) / complexity_metrics.count()
         assert avg_complexity == 11.75
 
@@ -785,21 +785,21 @@ class TestCodeMetricModel(TestCase):
             project=self.project,
             status="completed"
         )
-        
+
         CodeMetric.objects.create(
             session=new_session,
             metric_name="cyclomatic_complexity",
             metric_value=12.0,
             file_path="src/complex_module.py"
         )
-        
+
         # Test trend analysis
         metrics = CodeMetric.objects.filter(
             session__project=self.project,
             metric_name="cyclomatic_complexity",
             file_path="src/complex_module.py"
         ).order_by('session__started_at')
-        
+
         assert metrics.count() == 2
         assert metrics[0].metric_value == 15.5
         assert metrics[1].metric_value == 12.0
@@ -836,12 +836,12 @@ class TestCompleteAnalysisFlow(TransactionTestCase):
             password='testpass123'
         )
         self.client.force_authenticate(user=self.user)
-        
+
         # Create temporary project directory
         self.temp_dir = tempfile.mkdtemp()
         self.project_path = Path(self.temp_dir) / "test_project"
         self.project_path.mkdir()
-        
+
         # Create sample Python files
         self._create_sample_project()
 
@@ -875,7 +875,7 @@ def process_data(data):
 if __name__ == "__main__":
     main()
 ''')
-        
+
         # Utility module
         (self.project_path / "utils.py").write_text('''
 """Utility functions."""
@@ -892,23 +892,23 @@ def validate_data(data: List) -> bool:
     """Validate input data."""
     if not data:
         return False
-    
+
     for item in data:
         if not isinstance(item, (int, float)):
             return False
-    
+
     return True
 
 class DataProcessor:
     """Process various data types."""
-    
+
     def __init__(self):
         self.data = []
-    
+
     def add_item(self, item):
         """Add item to processor."""
         self.data.append(item)
-    
+
     def get_summary(self) -> Dict:
         """Get data summary."""
         return {
@@ -917,7 +917,7 @@ class DataProcessor:
             "average": sum(self.data) / len(self.data) if self.data else 0
         }
 ''')
-        
+
         # Test file
         test_dir = self.project_path / "tests"
         test_dir.mkdir()
@@ -944,10 +944,10 @@ def test_process_data():
             'language': 'Python',
             'framework': 'None'
         })
-        
+
         assert response.status_code == 201
         project_id = response.data['id']
-        
+
         # Step 2: Trigger analysis via API
         response = self.client.post(f'/api/projects/{project_id}/analyze/', {
             'backends': ['ast', 'quality'],
@@ -956,44 +956,44 @@ def test_process_data():
                 'include_tests': True
             }
         })
-        
+
         assert response.status_code == 202
         session_id = response.data['session_id']
-        
+
         # Step 3: Wait for analysis to complete (simulate)
         session = AnalysisSession.objects.get(id=session_id)
-        
+
         # Run analysis directly (in real scenario, this would be Celery task)
         analyzer = MultiBackendAnalyzer()
         results = analyzer.analyze_project(self.project_path)
-        
+
         # Update session with results
         session.status = 'completed'
         session.save()
-        
+
         for backend_name, backend_results in results.items():
             session.analysis_results.create(
                 backend_name=backend_name,
                 status='success',
                 result_data=backend_results
             )
-        
+
         # Step 4: Retrieve analysis results via API
         response = self.client.get(f'/api/analysis-sessions/{session_id}/')
-        
+
         assert response.status_code == 200
         assert response.data['status'] == 'completed'
         assert len(response.data['results']) >= 2
-        
+
         # Step 5: Check specific results
         results = {r['backend_name']: r for r in response.data['results']}
-        
+
         # Check AST backend results
         assert 'AST Backend' in results
         ast_results = results['AST Backend']['result_data']
         assert 'metrics' in ast_results
         assert ast_results['metrics']['functions'] >= 2  # main and process_data
-        
+
         # Check Quality backend results
         assert 'Quality Backend' in results
 
@@ -1008,7 +1008,7 @@ def test_process_data():
                 'language': 'Python'
             })
             projects.append(response.data['id'])
-        
+
         # Start analysis for all projects
         sessions = []
         for project_id in projects:
@@ -1016,10 +1016,10 @@ def test_process_data():
                 'backends': ['ast']
             })
             sessions.append(response.data['session_id'])
-        
+
         # Verify all sessions are created
         assert len(sessions) == 3
-        
+
         # Check that all sessions are in correct state
         for session_id in sessions:
             session = AnalysisSession.objects.get(id=session_id)
@@ -1033,23 +1033,23 @@ def test_process_data():
             'repository_url': '/invalid/path/to/project',
             'language': 'Python'
         })
-        
+
         project_id = response.data['id']
-        
+
         # Trigger analysis
         response = self.client.post(f'/api/projects/{project_id}/analyze/', {
             'backends': ['ast']
         })
-        
+
         session_id = response.data['session_id']
-        
+
         # Simulate analysis error
         session = AnalysisSession.objects.get(id=session_id)
         session.mark_as_error("Project path not found")
-        
+
         # Retrieve error status
         response = self.client.get(f'/api/analysis-sessions/{session_id}/')
-        
+
         assert response.status_code == 200
         assert response.data['status'] == 'error'
         assert 'Project path not found' in response.data['error_message']
@@ -1074,27 +1074,27 @@ class TestAPIIntegration(TestCase):
             'description': 'Testing CRUD operations',
             'language': 'Python'
         })
-        
+
         assert response.status_code == 201
         project_id = response.data['id']
-        
+
         # Read
         response = self.client.get(f'/api/projects/{project_id}/')
         assert response.status_code == 200
         assert response.data['name'] == 'CRUD Test Project'
-        
+
         # Update
         response = self.client.patch(f'/api/projects/{project_id}/', {
             'description': 'Updated description'
         })
-        
+
         assert response.status_code == 200
         assert response.data['description'] == 'Updated description'
-        
+
         # Delete
         response = self.client.delete(f'/api/projects/{project_id}/')
         assert response.status_code == 204
-        
+
         # Verify deletion
         response = self.client.get(f'/api/projects/{project_id}/')
         assert response.status_code == 404
@@ -1106,7 +1106,7 @@ class TestAPIIntegration(TestCase):
             name='History Test Project',
             language='Python'
         )
-        
+
         # Create multiple analysis sessions
         for i in range(5):
             AnalysisSession.objects.create(
@@ -1114,18 +1114,18 @@ class TestAPIIntegration(TestCase):
                 status='completed',
                 configuration={'run': i}
             )
-        
+
         # Get analysis history
         response = self.client.get(f'/api/projects/{project.id}/analysis-history/')
-        
+
         assert response.status_code == 200
         assert len(response.data['results']) == 5
-        
+
         # Test pagination
         response = self.client.get(
             f'/api/projects/{project.id}/analysis-history/?page_size=2'
         )
-        
+
         assert response.status_code == 200
         assert len(response.data['results']) == 2
         assert 'next' in response.data
@@ -1138,10 +1138,10 @@ class TestAPIIntegration(TestCase):
             project=project,
             status='completed'
         )
-        
+
         # Create various issues
         from analyzer.models import Issue
-        
+
         Issue.objects.create(
             session=session,
             type='security',
@@ -1149,7 +1149,7 @@ class TestAPIIntegration(TestCase):
             file_path='auth.py',
             message='SQL injection vulnerability'
         )
-        
+
         Issue.objects.create(
             session=session,
             type='complexity',
@@ -1157,7 +1157,7 @@ class TestAPIIntegration(TestCase):
             file_path='utils.py',
             message='High cyclomatic complexity'
         )
-        
+
         Issue.objects.create(
             session=session,
             type='style',
@@ -1165,30 +1165,30 @@ class TestAPIIntegration(TestCase):
             file_path='main.py',
             message='Line too long'
         )
-        
+
         # Test filtering by severity
         response = self.client.get(
             f'/api/analysis-sessions/{session.id}/issues/?severity=critical'
         )
-        
+
         assert response.status_code == 200
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['severity'] == 'critical'
-        
+
         # Test filtering by type
         response = self.client.get(
             f'/api/analysis-sessions/{session.id}/issues/?type=complexity'
         )
-        
+
         assert response.status_code == 200
         assert len(response.data['results']) == 1
         assert response.data['results'][0]['type'] == 'complexity'
-        
+
         # Test sorting
         response = self.client.get(
             f'/api/analysis-sessions/{session.id}/issues/?ordering=-severity'
         )
-        
+
         assert response.status_code == 200
         severities = [issue['severity'] for issue in response.data['results']]
         assert severities == ['critical', 'medium', 'low']
@@ -1259,9 +1259,9 @@ def temp_project_dir():
     temp_dir = tempfile.mkdtemp()
     project_path = Path(temp_dir) / "test_project"
     project_path.mkdir()
-    
+
     yield project_path
-    
+
     # Cleanup
     shutil.rmtree(temp_dir)
 
@@ -1307,10 +1307,10 @@ def complex_function(data):
     return result
 '''
     }
-    
+
     for filename, content in files.items():
         (temp_project_dir / filename).write_text(content)
-    
+
     return temp_project_dir
 
 @pytest.fixture
@@ -1358,7 +1358,7 @@ def mock_external_api():
             }
         }
         return responses.get(endpoint, {})
-    
+
     return mock_response
 
 @pytest.fixture
@@ -1377,13 +1377,13 @@ def api_client():
 def authenticated_client(api_client):
     """Authenticated API client."""
     from django.contrib.auth.models import User
-    
+
     user = User.objects.create_user(
         username='testuser',
         password='testpass123'
     )
     api_client.force_authenticate(user=user)
-    
+
     return api_client
 
 @pytest.fixture

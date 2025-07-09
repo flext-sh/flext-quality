@@ -84,9 +84,7 @@ class ProjectAdmin(admin.ModelAdmin):
             color = (
                 "green"
                 if latest.overall_score >= 80
-                else "orange"
-                if latest.overall_score >= 60
-                else "red"
+                else "orange" if latest.overall_score >= 60 else "red"
             )
             return format_html(
                 '<span style="color: {}; font-weight: bold;">{:.1f} ({})</span>',
@@ -121,7 +119,13 @@ class SecurityIssueInline(admin.TabularInline):
     model = SecurityIssue
     extra = 0
     readonly_fields: ClassVar = ["created_at"]
-    fields: ClassVar = ["severity", "issue_type", "file_path", "line_number", "is_resolved"]
+    fields: ClassVar = [
+        "severity",
+        "issue_type",
+        "file_path",
+        "line_number",
+        "is_resolved",
+    ]
 
 
 @admin.register(AnalysisSession)
@@ -223,9 +227,7 @@ class AnalysisSessionAdmin(admin.ModelAdmin):
         color = (
             "green"
             if obj.overall_score >= 80
-            else "orange"
-            if obj.overall_score >= 60
-            else "red"
+            else "orange" if obj.overall_score >= 60 else "red"
         )
         return format_html(
             '<span style="color: {}; font-weight: bold;">{:.1f}</span>',
@@ -683,8 +685,21 @@ class AnalysisBackendModelAdmin(admin.ModelAdmin):
 class IssueTypeAdmin(admin.ModelAdmin):
     """TODO: Add docstring."""
 
-    list_display: ClassVar = ["code", "name", "backend", "category", "severity", "is_active"]
-    list_filter: ClassVar = ["backend", "category", "severity", "is_active", "created_at"]
+    list_display: ClassVar = [
+        "code",
+        "name",
+        "backend",
+        "category",
+        "severity",
+        "is_active",
+    ]
+    list_filter: ClassVar = [
+        "backend",
+        "category",
+        "severity",
+        "is_active",
+        "created_at",
+    ]
     search_fields: ClassVar = ["code", "name", "description"]
     readonly_fields: ClassVar = ["created_at", "updated_at"]
     ordering: ClassVar = ["backend__name", "code"]
@@ -740,7 +755,12 @@ class DetectedIssueAdmin(admin.ModelAdmin):
         "confidence",
         "detected_at",
     ]
-    search_fields: ClassVar = ["file_path", "message", "issue_type__code", "issue_type__name"]
+    search_fields: ClassVar = [
+        "file_path",
+        "message",
+        "issue_type__code",
+        "issue_type__name",
+    ]
     readonly_fields: ClassVar = ["detected_at", "severity", "category", "backend_name"]
     date_hierarchy = "detected_at"
     ordering: ClassVar = ["-detected_at"]
