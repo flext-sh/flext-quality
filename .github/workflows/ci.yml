@@ -319,7 +319,7 @@ jobs:
             -v
 
       - name: 📊 Upload Coverage Reports
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v5
         if: matrix.os == 'ubuntu-latest' && matrix.python-version == '3.13'
         with:
           file: ./coverage.xml
