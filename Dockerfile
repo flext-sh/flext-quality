@@ -1,7 +1,7 @@
 # Multi-stage Docker build for dc-code-analyzer
 
 # Build stage
-FROM python:3.11-slim as builder
+FROM python:3.13-slim as builder
 
 # Install system dependencies for building
 RUN apt-get update && apt-get install -y \
@@ -33,7 +33,7 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --only=main --no-root
 
 # Production stage
-FROM python:3.11-slim as production
+FROM python:3.13-slim as production
 
 # Create app user
 RUN groupadd -r appuser && useradd -r -g appuser appuser
