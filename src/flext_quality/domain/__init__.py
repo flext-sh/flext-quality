@@ -1,4 +1,3 @@
-
 """Domain layer for FLEXT-QUALITY.
 
 Using flext-core patterns - NO duplication, clean architecture.
@@ -41,10 +40,6 @@ from flext_quality.domain.value_objects import (
 )
 
 __all__ = [
-    # Entities
-    "QualityAnalysis",
-    "QualityProject",
-    "QualityReport",
     # Domain Services
     "AnalysisService",
     "ComplexityAnalyzerService",
@@ -60,8 +55,12 @@ __all__ = [
     "IssueType",
     "LintingService",
     "MetricsCollectorService",
+    # Entities
+    "QualityAnalysis",
     "QualityGrade",
     "QualityIssue",
+    "QualityProject",
+    "QualityReport",
     "QualityRule",
     "QualityScore",
     "ReportGeneratorService",

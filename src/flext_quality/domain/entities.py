@@ -7,14 +7,11 @@ All entities use mixins from flext-core for maximum code reduction.
 
 from __future__ import annotations
 
-from typing import Any
-
 from datetime import datetime
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from pydantic import Field
 
-from flext_core.domain.mixins import IdentifierMixin, StatusMixin
 from flext_core.domain.pydantic_base import DomainEntity, DomainEvent
 from flext_core.domain.types import Status, StrEnum
 

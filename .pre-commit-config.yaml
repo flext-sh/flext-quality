@@ -58,7 +58,7 @@ repos:
 
   # ===== PYTHON CODE FORMATTING =====
   - repo: https://github.com/psf/black
-    rev: 24.10.0
+    rev: 25.1.0
     hooks:
       - id: black
         name: "🎨 Format Python code (Black)"
@@ -67,7 +67,7 @@ repos:
         types: [python]
 
   - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
+    rev: 6.0.1
     hooks:
       - id: isort
         name: "📦 Sort Python imports (isort)"
@@ -76,7 +76,7 @@ repos:
 
   # ===== PYTHON CODE QUALITY & LINTING =====
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.6
+    rev: v0.12.3
     hooks:
       - id: ruff
         name: "🔬 Lint Python code (Ruff)"
@@ -89,7 +89,7 @@ repos:
 
   # ===== TYPE CHECKING =====
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.13.0
+    rev: v1.16.1
     hooks:
       - id: mypy
         name: "🔍 Type checking (MyPy)"

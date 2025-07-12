@@ -247,7 +247,7 @@ class QualityConfig(BaseSettings):
 
     def get_analysis_config(self) -> dict[str, Any]:
         """Get analysis configuration dictionary.
-        
+
         Returns:
             Dictionary containing analysis settings and thresholds.
 
@@ -268,7 +268,7 @@ class QualityConfig(BaseSettings):
 
     def get_report_config(self) -> dict[str, Any]:
         """Get report generation configuration.
-        
+
         Returns:
             Dictionary containing report generation settings.
 
@@ -282,7 +282,7 @@ class QualityConfig(BaseSettings):
 
     def get_linting_config(self) -> dict[str, Any]:
         """Get linting configuration dictionary.
-        
+
         Returns:
             Dictionary containing linting tool configurations.
 
@@ -298,5 +298,5 @@ class QualityConfig(BaseSettings):
         env_prefix="QUALITY_",
         env_file=".env",
         env_file_encoding="utf-8",
-        case_sensitive=False
+        case_sensitive=False,
     )

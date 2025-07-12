@@ -22,13 +22,14 @@ def pytest_configure(config:
 
 @pytest.fixture(scope="session")
 def django_db_setup(django_db_setup, django_db_blocker) -> None:
-        with django_db_blocker.unblock():
+    with django_db_blocker.unblock():
         call_command("migrate", "--run-syncdb")
 
 
 @pytest.fixture
 def temp_project_dir() -> Generator[Path]:
-        with tempfile.TemporaryDirectory() as temp_dir: project_path = Path(temp_dir)
+    with tempfile.TemporaryDirectory() as temp_dir:
+        project_path = Path(temp_dir)
 
         # Create a simple Python project structure
         (project_path / "main.py").write_text(

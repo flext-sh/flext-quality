@@ -396,6 +396,32 @@ workflow: ## $(LIGHTNING) Complete development workflow
 	@$(MAKE) docs
 	@echo "$(BOLD)$(GREEN)$(TROPHY) Development workflow completed successfully!$(NC)"
 
+# ===== DJANGO COMMANDS =====
+.PHONY: django-migrate
+django-migrate:  ## Run Django migrations
+	@echo "$(BOLD)$(BLUE)$(ROCKET) Running Django migrations...$(NC)"
+	$(PYTHON) scripts/manage.py migrate
+
+.PHONY: django-makemigrations
+django-makemigrations:  ## Create Django migrations
+	@echo "$(BOLD)$(BLUE)$(ROCKET) Creating Django migrations...$(NC)"
+	$(PYTHON) scripts/manage.py makemigrations
+
+.PHONY: django-runserver
+django-runserver:  ## Run Django development server
+	@echo "$(BOLD)$(BLUE)$(ROCKET) Starting Django development server...$(NC)"
+	$(PYTHON) scripts/manage.py runserver
+
+.PHONY: django-shell
+django-shell:  ## Open Django shell
+	@echo "$(BOLD)$(BLUE)$(ROCKET) Opening Django shell...$(NC)"
+	$(PYTHON) scripts/manage.py shell
+
+.PHONY: django-collectstatic
+django-collectstatic:  ## Collect static files
+	@echo "$(BOLD)$(BLUE)$(ROCKET) Collecting static files...$(NC)"
+	$(PYTHON) scripts/manage.py collectstatic --noinput
+
 # ===== CONDITIONAL VERBOSE OUTPUT =====
 ifeq ($(VERBOSE),1)
 .SILENT:

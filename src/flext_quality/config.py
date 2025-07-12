@@ -5,12 +5,14 @@ REFACTORED: Uses flext-core BaseSettings with mixins, types, and constants.
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from pydantic import ConfigDict, Field
 
 from flext_core.domain.pydantic_base import BaseSettings
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class QualityConfig(BaseSettings):
@@ -154,5 +156,5 @@ class QualityConfig(BaseSettings):
         env_prefix="QUALITY_",
         env_file=".env",
         env_file_encoding="utf-8",
-        case_sensitive=False
+        case_sensitive=False,
     )
