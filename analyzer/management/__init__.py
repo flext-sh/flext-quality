@@ -1,3 +1,3 @@
-"""Module __init__."""
+"""Package initialization."""
 
-# Management package
+__version__ = "0.1.0"

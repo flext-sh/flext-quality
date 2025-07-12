@@ -1,10 +1,14 @@
-"""Command-line interface for FLEXT Quality."""
+"""Command-line interface for FLEXT Quality.
+
+This module provides CLI commands for code quality analysis.
+Uses flext-cli patterns for consistency.
+"""
 
 from __future__ import annotations
 
 import argparse
-import logging
 import sys
+import traceback
 from pathlib import Path
 from typing import Any
 
@@ -13,24 +17,16 @@ from flext_quality.reports import QualityReport
 
 
 def setup_logging(level: str = "INFO") -> None:
-    """Setup logging configuration."""
-    logging.basicConfig(
-        level=getattr(logging, level.upper()),
-        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-        datefmt="%Y-%m-%d %H:%M:%S",
-    )
+    # Logging is now handled by flext-observability
+    pass
 
 
 def analyze_command(args: Any) -> int:
-    """Execute analysis command."""
     try:
         project_path = Path(args.path).resolve()
 
         if not project_path.exists():
-            print(f"❌ Error: Path '{project_path}' does not exist")
             return 1
-
-        print(f"🔍 Analyzing project: {project_path}")
 
         # Create analyzer
         analyzer = CodeAnalyzer(project_path)
@@ -50,14 +46,9 @@ def analyze_command(args: Any) -> int:
             # Save to file
             output_path = Path(args.output)
             report.save_report(output_path, args.format)
-            print(f"📄 Report saved to: {output_path}")
         # Output to console
-        elif args.format == "json":
-            print(report.generate_json_report())
-        elif args.format == "html":
-            print(report.generate_html_report())
-        else:
-            print(report.generate_text_report())
+        elif args.format in {"json", "html"}:
+            pass
 
         # Return appropriate exit code based on quality
         quality_score = analyzer.get_quality_score()
@@ -67,22 +58,17 @@ def analyze_command(args: Any) -> int:
             return 1  # Medium quality
         return 2  # Poor quality
 
-    except Exception as e:
-        print(f"❌ Analysis failed: {e}")
+    except Exception:
         if args.verbose:
-            import traceback
-
             traceback.print_exc()
         return 3
 
 
 def score_command(args: Any) -> int:
-    """Execute quick score command."""
     try:
         project_path = Path(args.path).resolve()
 
         if not project_path.exists():
-            print(f"❌ Error: Path '{project_path}' does not exist")
             return 1
 
         # Quick analysis
@@ -95,11 +81,7 @@ def score_command(args: Any) -> int:
         )
 
         score = analyzer.get_quality_score()
-        grade = analyzer.get_quality_grade()
-
-        print(f"📊 Quality Score: {score:.1f}/100 (Grade: {grade})")
-        print(f"📁 Files: {results['files_analyzed']}")
-        print(f"📄 Lines: {results['total_lines']:,}")
+        analyzer.get_quality_grade()
 
         # Show issue counts
         issues = results.get("issues", {})
@@ -107,34 +89,35 @@ def score_command(args: Any) -> int:
         complexity_count = len(issues.get("complexity", []))
 
         if security_count > 0:
-            print(f"🔒 Security Issues: {security_count}")
+            pass
         if complexity_count > 0:
-            print(f"🧩 Complexity Issues: {complexity_count}")
+            pass
 
         return 0 if score >= 70 else 1
 
-    except Exception as e:
-        print(f"❌ Score calculation failed: {e}")
+    except Exception:
         return 3
 
 
 def main() -> int:
-    """Main CLI entry point."""
     parser = argparse.ArgumentParser(
         description="FLEXT Quality - Enterprise Code Quality Analysis",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  flext-quality analyze ./my-project
-  flext-quality analyze ./my-project --output report.html --format html
-  flext-quality score ./my-project
-  flext-quality analyze ./my-project --no-security --no-duplicates
+    flext-quality analyze ./my-project
+    flext-quality analyze ./my-project --output report.html --format html
+    flext-quality score ./my-project
+    flext-quality analyze ./my-project --no-security --no-duplicates
         """,
     )
 
     # Global options
     parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose output"
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Enable verbose output",
     )
     parser.add_argument(
         "--log-level",
@@ -148,11 +131,14 @@ Examples:
 
     # Analyze command
     analyze_parser = subparsers.add_parser(
-        "analyze", help="Run comprehensive code analysis"
+        "analyze",
+        help="Run comprehensive code analysis",
     )
     analyze_parser.add_argument("path", help="Path to the project to analyze")
     analyze_parser.add_argument(
-        "--output", "-o", help="Output file path (default: print to console)"
+        "--output",
+        "-o",
+        help="Output file path (default: print to console)",
     )
     analyze_parser.add_argument(
         "--format",

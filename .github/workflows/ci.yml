@@ -17,12 +17,12 @@ on:
   pull_request:
     branches: [main, master, develop]
     paths-ignore:
-      - "*.md"  
+      - "*.md"
       - "docs/**"
       - ".gitignore"
       - "LICENSE"
   schedule:
-    - cron: "0 6 * * 1"  # Weekly security scan
+    - cron: "0 6 * * 1" # Weekly security scan
   workflow_dispatch:
     inputs:
       skip_tests:
@@ -31,7 +31,7 @@ on:
         default: "false"
         type: boolean
       security_scan:
-        description: "Run extended security scan"  
+        description: "Run extended security scan"
         required: false
         default: "false"
         type: boolean
@@ -126,7 +126,7 @@ jobs:
       - name: 🔧 Install Dependencies
         run: |
           poetry install --no-interaction --no-ansi --with dev
-          
+
       - name: 🔍 Bandit Security Scan
         run: |
           poetry run bandit -r src/ -f json -o bandit-report.json
@@ -148,7 +148,7 @@ jobs:
           name: security-reports
           path: |
             bandit-report.json
-            
+
       - name: 🔍 Dependency Vulnerability Scan
         if: github.event.inputs.security_scan == 'true' || github.event_name == 'schedule'
         run: |
@@ -204,8 +204,8 @@ jobs:
           echo "::group::Black Format Check"
           poetry run black --check --diff src/ tests/
           echo "::endgroup::"
-          
-          echo "::group::isort Import Check"  
+
+          echo "::group::isort Import Check"
           poetry run isort --check-only --diff src/ tests/
           echo "::endgroup::"
 
@@ -248,7 +248,7 @@ jobs:
         python-version: ["3.13"]
         include:
           - os: ubuntu-latest
-            python-version: "3.12"  # Compatibility test
+            python-version: "3.12" # Compatibility test
     services:
       postgres:
         image: postgres:16
@@ -432,7 +432,7 @@ jobs:
           echo "| 🤖 Pre-commit | ${{ needs.pre-commit.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
           echo "| 📦 Build | ${{ needs.build.result || 'skipped' }} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           if [[ "${{ needs.security.result }}" == "failure" ]] || \
              [[ "${{ needs.quality.result }}" == "failure" ]] || \
              [[ "${{ needs.test.result }}" == "failure" ]] || \
@@ -448,7 +448,7 @@ jobs:
         run: |
           echo "🎉 All quality checks passed! Code meets FLEXT standards."
 
-      - name: ❌ Failure Notification  
+      - name: ❌ Failure Notification
         if: failure()
         run: |
           echo "❌ Quality gate failed! Please fix the issues before proceeding."

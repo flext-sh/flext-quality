@@ -15,7 +15,8 @@ urlpatterns = [
     # Projects
     path("projects/", views.projects_list, name="projects_list"),
     path("projects/create/", views.create_project, name="create_project"),
-    path("projects/<int:project_id>/", views.project_detail, name="project_detail"),
+    path("projects/<int:
+            project_id>/", views.project_detail, name="project_detail"),
     path(
         "projects/<int:project_id>/analyze/",
         views.start_analysis,

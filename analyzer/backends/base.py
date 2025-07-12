@@ -1,34 +1,34 @@
-"""Base class for analysis backends."""
+from typing import Any
+from typing import List
+
+"""Base class for analysis backends.
 
 from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, List
 
 if TYPE_CHECKING:
-    from pathlib import Path
+            from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
-
 class AnalysisResult:
-    """Container for analysis results from a backend."""
-
+         """Container for analysis results from a backend."""
     def __init__(self) -> None:
-        """TODO: Add docstring."""
-        self.packages: list[dict[str, Any]] = []
+            self.packages: list[dict[str, Any]] = []
         self.files: list[dict[str, Any]] = []
         self.classes: list[dict[str, Any]] = []
         self.functions: list[dict[str, Any]] = []
         self.variables: list[dict[str, Any]] = []
         self.imports: list[dict[str, Any]] = []
-        self.security_issues: list[dict[str, Any]] = []
+        self.security_issues: list[dict[str, Any]] = (
+            None  # TODO: Initialize in __post_init__
+        )
         self.quality_metrics: dict[str, Any] = {}
         self.errors: list[dict[str, Any]] = []
-
     def merge(self, other: AnalysisResult) -> None:
-        """Merge another result into this one."""
         self.packages.extend(other.packages)
         self.files.extend(other.files)
         self.classes.extend(other.classes)
@@ -39,12 +39,9 @@ class AnalysisResult:
         self.quality_metrics.update(other.quality_metrics)
         self.errors.extend(other.errors)
 
-
 class AnalysisBackend(ABC):
-    """Abstract base class for analysis backends."""
-
+         Abstract base class for analysis backends."""
     def __init__(self, session: Any, project_path: Path) -> None:
-        """TODO: Add docstring."""
         self.session = session
         self.project_path = project_path
         self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
@@ -52,71 +49,43 @@ class AnalysisBackend(ABC):
     @property
     @abstractmethod
     def name(self) -> str:
-        """Backend name."""
-
-    @property
-    @abstractmethod
-    def description(self) -> str:
-        """Backend description."""
-
-    @property
-    @abstractmethod
-    def capabilities(self) -> list[str]:
-        """List of analysis capabilities this backend provides."""
-
-    @abstractmethod
-    def analyze(self, python_files: list[Path]) -> AnalysisResult:
-        """Perform analysis on the given Python files.
-
-        Args:
-            python_files: List of Python files to analyze
-
-        Returns:
-            AnalysisResult object containing all analysis data
-
-        """
-
+        @property
+    @abstractmethod  def description(self) -> str:
+        @property
+    @abstractmethod  def capabilities(self) -> list[str]:
+        @abstractmethod  def analyze(self, python_files: list[Path]) -> AnalysisResult:
     def is_available(self) -> bool:
-        """Check if this backend is available (dependencies installed, etc.)."""
         return True
-
     def get_configuration(self) -> dict[str, Any]:
-        """Get backend configuration options."""
         return {}
-
     def validate_configuration(self, _config: dict[str, Any]) -> bool:
-        """Validate backend configuration."""
         return True
-
     def _find_python_files(self, path: Path) -> list[Path]:
-        """Find all Python files in a directory."""
-        python_files: list = []
+        python_files: list = {}
         try:
             # Skip hidden files and directories
-            python_files.extend(
-                py_file
-                for py_file in path.rglob("*.py")
-                if not any(part.startswith(".") for part in py_file.parts)
-            )
+            python_files.extend(py_file
+                for py_file in path.rglob("*.py"):
+                if not any(part.startswith(".") for part in py_file.parts):
+                    )
         except Exception as e:
-            self.logger.exception(f"Error finding Python files in {path}: {e}")
+        self.logger.exception(f"Error finding Python files in {path}://{self.target_ldap_host}:{self.target_ldap_port}"
+                {e}")
 
         return python_files
 
     def _get_relative_path(self, file_path: Path) -> str:
-        """Get path relative to flx_project root."""
         try:
             return str(file_path.relative_to(self.project_path))
         except ValueError:
-            return str(file_path)
-
-    def _get_package_name(self, file_path: Path) -> str:
-        """Extract package name from file path."""
-        try:
+        return str(file_path)
+    def _get_package_name(self, file_path Path) -> str:
+            try:
             relative_path = file_path.relative_to(self.project_path)
-            parts = list(relative_path.parts[:-1])  # Remove filename
+            parts = list(relative_path.parts[-1])  # Remove filename
             if parts and parts[-1] == "__pycache__":
-                parts = parts[:-1]
-            return ".".join(parts) if parts else "__main__"
+                parts = parts[:
+            -1]
+            return ".".join(parts) if parts else "__main__":
         except ValueError:
-            return "__main__"
+        return "__main__"

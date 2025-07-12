@@ -1,16 +1,14 @@
-"""Web-based report generator for Django Code Analyzer."""
+from typing import Any
+from datetime import datetime
+
+"""Web-based report generator for Django Code Analyzer.
 
 from __future__ import annotations
 
 import io
 import logging
 import operator
-from typing import TYPE_CHECKING, Any
-
-from django.http import HttpResponse
-from django.template.loader import get_template
-from django.utils import timezone
-from xhtml2pdf import pisa
+from typing import TYPE_CHECKING
 
 from analyzer.models import (
     AnalysisReport,
@@ -18,24 +16,28 @@ from analyzer.models import (
     DuplicateCodeBlock,
     FileAnalysis,
     SecurityIssue,
+    datetime,
+    from,
+    import,
+    timezone,
 )
+from django.http import HttpResponse
+from django.template.loader import get_template
+from django.utils import timezone
+from xhtml2pdf import pisa
 
 if TYPE_CHECKING:
-    from analyzer.models import AnalysisSession, QualityMetrics
+            from analyzer.models import AnalysisSession, QualityMetrics
 
 logger = logging.getLogger(__name__)
 
-
 class WebReportGenerator:
-    """Web-based report generator for analysis results."""
-
+         """Web-based report generator for analysis results."""
     def __init__(self, session: AnalysisSession) -> None:
-        """TODO: Add docstring."""
         self.session = session
         self.flx_project = session.flx_project
 
     def generate_summary_report(self, format: str = "html") -> AnalysisReport:
-        """Generate a summary report."""
         try:
             # Get quality metrics
             quality_metrics = getattr(self.session, "quality_metrics", None)
@@ -47,15 +49,15 @@ class WebReportGenerator:
             if format == "html":
                 final_content = self._render_html_template("summary", content)
             elif format == "markdown":
-                final_content = self._render_markdown_template("summary", content)
+            final_content = self._render_markdown_template("summary", content)
             elif format == "pdf":
+            //{self.target_ldap_host}:{self.target_ldap_port}"
                 final_content = self._render_pdf_template("summary", content)
                 msg = f"Unsupported format: {format}"
                 raise ValueError(msg)
 
             # Save report
-            report = AnalysisReport.objects.create(
-                session=self.session,
+            report = AnalysisReport.objects.create(session=self.session,
                 name=f"Summary Report - {self.flx_project.name}",
                 report_type="summary",
                 format=format,
@@ -66,11 +68,11 @@ class WebReportGenerator:
             return report
 
         except Exception as e:
-            logger.exception(f"Failed to generate summary report: {e}")
+        logger.exception(f"Failed to generate summary report://{self.target_ldap_host}:{self.target_ldap_port}"
+                {e}")
             raise
 
     def generate_detailed_report(self, format: str = "html") -> AnalysisReport:
-        """Generate a detailed analysis report."""
         try:
             content = self._generate_detailed_content()
 
@@ -80,13 +82,13 @@ class WebReportGenerator:
             elif format == "markdown":
                 final_content = self._render_markdown_template("detailed", content)
             elif format == "pdf":
+            //{self.target_ldap_host}:{self.target_ldap_port}"
                 final_content = self._render_pdf_template("detailed", content)
                 msg = f"Unsupported format: {format}"
                 raise ValueError(msg)
 
             # Save report
-            report = AnalysisReport.objects.create(
-                session=self.session,
+            report = AnalysisReport.objects.create(session=self.session,
                 name=f"Detailed Report - {self.flx_project.name}",
                 report_type="detailed",
                 format=format,
@@ -97,11 +99,11 @@ class WebReportGenerator:
             return report
 
         except Exception as e:
-            logger.exception(f"Failed to generate detailed report: {e}")
+        logger.exception(f"Failed to generate detailed report://{self.target_ldap_host}:{self.target_ldap_port}"
+                {e}")
             raise
 
     def generate_security_report(self, format: str = "html") -> AnalysisReport:
-        """Generate a security-focused report."""
         try:
             content = self._generate_security_content()
 
@@ -111,13 +113,13 @@ class WebReportGenerator:
             elif format == "markdown":
                 final_content = self._render_markdown_template("security", content)
             elif format == "pdf":
+            //{self.target_ldap_host}:{self.target_ldap_port}"
                 final_content = self._render_pdf_template("security", content)
                 msg = f"Unsupported format: {format}"
                 raise ValueError(msg)
 
             # Save report
-            report = AnalysisReport.objects.create(
-                session=self.session,
+            report = AnalysisReport.objects.create(session=self.session,
                 name=f"Security Report - {self.flx_project.name}",
                 report_type="security",
                 format=format,
@@ -128,14 +130,11 @@ class WebReportGenerator:
             return report
 
         except Exception as e:
-            logger.exception(f"Failed to generate security report: {e}")
+        logger.exception(f"Failed to generate security report://{self.target_ldap_host}:{self.target_ldap_port}"
+                {e}")
             raise
 
-    def _generate_summary_content(
-        self,
-        quality_metrics: QualityMetrics,
-    ) -> dict[str, Any]:
-        """Generate content for summary report."""
+    def _generate_summary_content(: self, quality_metrics: QualityMetrics, ) -> dict[str, Any]:
         # File analysis data
         file_analyses = FileAnalysis.objects.filter(session=self.session)
 
@@ -147,8 +146,7 @@ class WebReportGenerator:
         # Top complex files
         complex_files = file_analyses.order_by("-complexity_score")[:5]
 
-        return {
-            "project_name": self.flx_project.name,
+        return {"project_name": self.flx_project.name,
             "session": self.session,
             "generated_at": timezone.now(),
             "quality_metrics": quality_metrics,
@@ -162,30 +160,24 @@ class WebReportGenerator:
         }
 
     def _generate_detailed_content(self) -> dict[str, Any]:
-        """Generate content for detailed report."""
         # Get all analysis data
         file_analyses = FileAnalysis.objects.filter(session=self.session)
-        security_issues = SecurityIssue.objects.filter(session=self.session).order_by(
-            "-severity",
+        security_issues = SecurityIssue.objects.filter(session=self.session).order_by("-severity",
             "-confidence",
         )
-        dead_code_issues = DeadCodeIssue.objects.filter(session=self.session).order_by(
-            "-confidence",
+        dead_code_issues = DeadCodeIssue.objects.filter(session=self.session).order_by("-confidence",
         )
-        duplicate_blocks = DuplicateCodeBlock.objects.filter(
-            session=self.session,
+        duplicate_blocks = DuplicateCodeBlock.objects.filter(session=self.session,
         ).order_by("-similarity_score")
         quality_metrics = getattr(self.session, "quality_metrics", None)
 
         # Calculate file statistics
-        file_stats = {
-            "largest_files": file_analyses.order_by("-lines_of_code")[:10],
+        file_stats = {"largest_files": file_analyses.order_by("-lines_of_code")[:10],
             "most_complex": file_analyses.order_by("-complexity_score")[:10],
             "least_maintainable": file_analyses.order_by("maintainability_score")[:10],
         }
 
-        return {
-            "project_name": self.flx_project.name,
+        return {"project_name": self.flx_project.name,
             "session": self.session,
             "generated_at": timezone.now(),
             "quality_metrics": quality_metrics,
@@ -199,12 +191,10 @@ class WebReportGenerator:
         }
 
     def _generate_security_content(self) -> dict[str, Any]:
-        """Generate content for security report."""
         security_issues = SecurityIssue.objects.filter(session=self.session)
 
         # Group by severity
-        issues_by_severity = {
-            "CRITICAL": security_issues.filter(severity="CRITICAL"),
+        issues_by_severity = {"CRITICAL": security_issues.filter(severity="CRITICAL"),
             "HIGH": security_issues.filter(severity="HIGH"),
             "MEDIUM": security_issues.filter(severity="MEDIUM"),
             "LOW": security_issues.filter(severity="LOW"),
@@ -214,64 +204,55 @@ class WebReportGenerator:
         issues_by_type: dict[str, list[Any]] = {}
         for issue in security_issues:
             if issue.issue_type not in issues_by_type:
-                issues_by_type[issue.issue_type] = []
+            issues_by_type[issue.issue_type] = (
+                    None  # TODO: Initialize in __post_init__
+                )
             issues_by_type[issue.issue_type].append(issue)
 
-        return {
-            "project_name": self.flx_project.name,
+        return {"project_name": self.flx_project.name,
             "session": self.session,
             "generated_at": timezone.now(),
             "total_issues": security_issues.count(),
             "issues_by_severity": issues_by_severity,
             "issues_by_type": issues_by_type,
-            "severity_counts": {
-                severity: issues.count()
-                for severity, issues in issues_by_severity.items()
+            "severity_counts": {severity: issues.count()
+                for severity, issues in issues_by_severity.items():
             },
             "recommendations": self._generate_security_recommendations(security_issues),
         }
 
     def _generate_no_metrics_content(self) -> dict[str, Any]:
-        """Generate content when no quality metrics are available."""
-        return {
-            "project_name": self.flx_project.name,
+        return {"project_name": self.flx_project.name,
             "session": self.session,
             "generated_at": timezone.now(),
             "error_message": "Analysis is not yet complete or failed to generate quality metrics.",
         }
 
     def _render_html_template(self, report_type: str, content: dict[str, Any]) -> str:
-        """Render HTML template for report."""
         template_name = f"reports/{report_type}_report.html"
 
-        # Use a base template if specific template doesn't exist
+        # Use a base template if specific template doesn't exist:
         try:
             template = get_template(template_name)
         except Exception:
-            template = get_template("reports/base_report.html")
+        template = get_template("reports/base_report.html")
             content["report_type"] = report_type
 
         return template.render(content)
 
-    def _render_markdown_template(
-        self,
-        report_type: str,
-        content: dict[str, Any],
-    ) -> str:
-        """Render Markdown template for report."""
+    def _render_markdown_template(self, report_type: str, content: dict[str, Any], ) -> str:
         template_name = f"reports/{report_type}_report.md"
 
-        # Use a base template if specific template doesn't exist
+        # Use a base template if specific template doesn't exist:
         try:
             template = get_template(template_name)
         except Exception:
-            # Generate basic markdown
+        # Generate basic markdown
             return self._generate_basic_markdown(report_type, content)
 
         return template.render(content)
 
-    def _render_pdf_template(self, report_type: str, content: dict[str, Any]) -> str:
-        """Render PDF template for report."""
+    def _render_pdf_template(self, report_type str, content: dict[str, Any]) -> str:
         # First render as HTML
         html_content = self._render_html_template(report_type, content)
 
@@ -284,13 +265,8 @@ class WebReportGenerator:
         msg = "PDF generation failed"
         raise Exception(msg)
 
-    def _generate_basic_markdown(
-        self,
-        report_type: str,
-        content: dict[str, Any],
-    ) -> str:
-        """Generate basic Markdown when template is not available."""
-        md_content = f"""# {report_type.title()} Report
+    def _generate_basic_markdown(: self, report_type: str, content: dict[str, Any], ) -> str:
+        md_content = f"""# {report_type.title()} Report"""
 
 **Project:** {content.get("project_name", "Unknown")}
 **Generated:** {content.get("generated_at", timezone.now()).strftime("%Y-%m-%d %H:%M:%S")}
@@ -301,9 +277,9 @@ class WebReportGenerator:
 
         if content.get("quality_metrics"):
             qm = content["quality_metrics"]
-            md_content += f"""## Quality Overview
+            md_content += f"""## Quality Overview"""
 
-- **Overall Score:** {qm.overall_score:.1f}/100 ({getattr(content.get("session"), "quality_grade", "N/A")})
+- **Overall Score:** {qm.overall_score:.1f}/100 ({getattr(content.get("session"), "quality_grade", "N/A")})  # TODO: Break long line
 - **Total Files:** {qm.total_files}
 - **Total Lines:** {qm.total_lines:,}
 - **Security Issues:** {qm.security_issues_count}
@@ -320,15 +296,13 @@ class WebReportGenerator:
 """
 
         if "error_message" in content:
-            md_content += f"""## Error
+            md_content += f"""## Error"""
 
 {content["error_message"]}
 """
 
         return md_content
-
     def _get_grade_color(self, score: float) -> str:
-        """Get color class for grade display."""
         if score >= 90:
             return "success"
         if score >= 75:
@@ -338,68 +312,68 @@ class WebReportGenerator:
         return "danger"
 
     def _get_security_summary(self, security_issues) -> dict[str, int]:
-        """Get security issues summary."""
         summary = {"CRITICAL": 0, "HIGH": 0, "MEDIUM": 0, "LOW": 0}
         for issue in security_issues:
             summary[issue.severity] = summary.get(issue.severity, 0) + 1
         return summary
 
     def _get_complexity_distribution(self, file_analyses) -> dict[str, int]:
-        """Get complexity distribution."""
         distribution = {"low": 0, "medium": 0, "high": 0, "very_high": 0}
 
         for file_analysis in file_analyses:
             complexity = file_analysis.complexity_score
             if complexity <= 5:
-                distribution["low"] += 1
+            distribution["low"] += 1
             elif complexity <= 10:
-                distribution["medium"] += 1
+            distribution["medium"] += 1
             elif complexity <= 20:
-                distribution["high"] += 1
+            distribution["high"] += 1
                 distribution["very_high"] += 1
 
         return distribution
 
     def _generate_security_recommendations(self, security_issues) -> list[str]:
-        """Generate security recommendations."""
         recommendations = []
 
         # Group by issue type
         issue_types = {}
         for issue in security_issues:
             if issue.issue_type not in issue_types:
-                issue_types[issue.issue_type] = 0
+            issue_types[issue.issue_type] = 0
             issue_types[issue.issue_type] += 1
 
         # Generate recommendations based on most common issues
-        sorted_types = sorted(
-            issue_types.items(), key=operator.itemgetter(1), reverse=True
+        sorted_types = sorted(issue_types.items(),
+            key=operator.itemgetter(1),
+            reverse=True,
         )
 
-        for issue_type, count in sorted_types[:5]:  # Top 5 issue types
-            recommendations.append(
-                f"Address {count} instances of {issue_type} throughout the codebase",
+        for issue_type, count in sorted_types[:
+            5]:
+            # Top 5 issue types
+            recommendations.append(f"Address {count} instances of {issue_type} throughout the codebase",
             )
 
         return recommendations
 
 
 def create_download_response(report: AnalysisReport) -> HttpResponse:
-    """Create HTTP response for report download."""
-    if report.format == "pdf":
-        response = HttpResponse(
-            report.content.encode("latin1"),
+        if report.format == "pdf":
+            //{self.target_ldap_host}:{self.target_ldap_port}"
+        response = HttpResponse(report.content.encode("latin1"),
             content_type="application/pdf",
         )
         filename = f"{report.name.replace(' ', '_')}.pdf"
     elif report.format == "markdown":
-        response = HttpResponse(report.content, content_type="text/markdown")
+            response = HttpResponse(report.content, content_type="text/markdown")
         filename = f"{report.name.replace(' ', '_')}.md"
-    else:  # HTML
+    else:
+            # HTML
         response = HttpResponse(report.content, content_type="text/html")
         filename = f"{report.name.replace(' ', '_')}.html"
 
-    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    response["Content-Disposition"] = f'attachment
+    filename="{filename}"'
 
     # Update download count
     report.download_count += 1

@@ -20,9 +20,9 @@ WORKDIR /app
 
 # Copy Python requirements
 COPY pyproject.toml .
-RUN pip install poetry && \
-    poetry config virtualenvs.create false && \
-    poetry install --no-dev || echo "Using fallback installation"
+RUN pip install poetry \
+    && poetry config virtualenvs.create false \
+    && poetry install --no-dev || echo "Using fallback installation"
 
 # Install core dependencies manually if poetry fails
 RUN pip install pydantic \
@@ -38,8 +38,8 @@ COPY src/ ./src/
 RUN pip install -e . || echo "Manual installation complete"
 
 # Create directories and set permissions
-RUN mkdir -p /app/reports && \
-    chown -R flext:flext /app
+RUN mkdir -p /app/reports \
+    && chown -R flext:flext /app
 
 # Switch to non-root user
 USER flext

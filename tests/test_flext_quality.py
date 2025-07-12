@@ -1,4 +1,4 @@
-"""Test suite for flext-quality basic functionality."""
+"""Test suite for flext-quality basic functionality.
 
 from pathlib import Path
 
@@ -8,19 +8,16 @@ from flext_quality.analyzer import CodeAnalyzer
 class TestCodeAnalyzer:
     """Test CodeAnalyzer functionality."""
 
-    def test_analyzer_initialization(self):
-        """Test CodeAnalyzer can be initialized."""
+    def test_analyzer_initialization(self) -> None:
         analyzer = CodeAnalyzer(".")
         assert analyzer is not None
         assert analyzer.project_path == Path()
 
-    def test_analyzer_with_path(self, tmp_path):
-        """Test CodeAnalyzer with temporary path."""
+    def test_analyzer_with_path(self, tmp_path) -> None:
         analyzer = CodeAnalyzer(tmp_path)
         assert analyzer.project_path == tmp_path
 
-    def test_find_python_files(self, tmp_path):
-        """Test finding Python files."""
+    def test_find_python_files(self, tmp_path) -> None:
         # Create test files
         (tmp_path / "test.py").write_text("print('hello')")
         (tmp_path / "subdir").mkdir()
@@ -33,19 +30,17 @@ class TestCodeAnalyzer:
         assert any(f.name == "test.py" for f in files)
         assert any(f.name == "test2.py" for f in files)
 
-    def test_analyze_project_basic(self, tmp_path):
-        """Test basic project analysis."""
-        # Create a simple Python file
+    def test_analyze_project_basic(self, tmp_path) -> None:
+            # Create a simple Python file
         test_file = tmp_path / "simple.py"
         test_file.write_text(
-            '''
-def hello():
-    """Say hello."""
-    return "Hello, World!"
+            """
+def hello() -> None:
+        return "Hello, World!"
 
 if __name__ == "__main__":
-    print(hello())
-'''
+            print(hello())
+""","""
         )
 
         analyzer = CodeAnalyzer(tmp_path)
@@ -60,8 +55,7 @@ if __name__ == "__main__":
         assert results["total_lines"] > 0
         assert len(results["python_files"]) == 1
 
-    def test_quality_score(self):
-        """Test quality score calculation."""
+    def test_quality_score(self) -> None:
         analyzer = CodeAnalyzer(".")
         analyzer.analysis_results = {
             "issues": {
@@ -69,7 +63,7 @@ if __name__ == "__main__":
                 "complexity": [],
                 "dead_code": [],
                 "duplicates": [],
-            }
+            },
         }
 
         score = analyzer.get_quality_score()

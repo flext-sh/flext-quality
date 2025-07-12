@@ -1,3 +1,5 @@
+from typing import Any
+from pydantic import Field
 """Django settings for Code Analyzer Web Interface flx_project."""
 
 from __future__ import annotations
@@ -5,7 +7,8 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-# Build paths inside the flx_project like this: BASE_DIR / 'subdir'.
+# Build paths inside the flx_project like this:
+            BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security settings
@@ -155,7 +158,8 @@ REST_FRAMEWORK = {
 # CORS settings for frontend integration
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "http:
+            //localhost:3000",
     "http://127.0.0.1:3000",
 ]
 

@@ -1,4 +1,4 @@
-"""Module dashboard_extras."""
+"""Module dashboard_extras.
 
 from typing import Any
 
@@ -12,33 +12,29 @@ register = template.Library()
 
 @register.filter
 def get_item(dictionary, key) -> Any:
-    """Get an item from a dictionary using a key."""
-    if isinstance(dictionary, dict):
-        return dictionary.get(key)
+            if isinstance(dictionary, dict):
+            return dictionary.get(key)
     return None
 
 
 @register.filter
 def multiply(value, arg) -> Any:
-    """Multiply two values."""
-    try:
-        return float(value) * float(arg)
+        try:
+            return float(value) * float(arg)
     except (ValueError, TypeError):
         return 0
 
 
 @register.filter
 def percentage(value, total) -> Any:
-    """Calculate percentage."""
-    if total == 0:
-        return 0
+        if total == 0:
+            return 0
     return round((value / total) * 100, 1)
 
 
 @register.filter
 def severity_color(severity) -> Any:
-    """Get Bootstrap color class for severity level."""
-    severity_colors = {
+        severity_colors = {
         "CRITICAL": "danger",
         "HIGH": "warning",
         "MEDIUM": "info",
@@ -50,8 +46,7 @@ def severity_color(severity) -> Any:
 
 @register.filter
 def status_icon(status) -> Any:
-    """Get icon for backend status."""
-    status_icons = {
+        status_icons = {
         "success": "✅",
         "failed": "❌",
         "skipped": "⏭️",
@@ -62,16 +57,14 @@ def status_icon(status) -> Any:
 
 @register.filter
 def dict_get(dictionary, key) -> Any:
-    """Get value from dictionary by key."""
-    if isinstance(dictionary, dict):
-        return dictionary.get(key, 0)
+        if isinstance(dictionary, dict):
+            return dictionary.get(key, 0)
     return 0
 
 
 @register.filter
 def severity_badge(severity) -> Any:
-    """Return Bootstrap badge class for severity level."""
-    severity_classes = {
+        severity_classes = {
         "CRITICAL": "bg-danger",
         "HIGH": "bg-warning",
         "MEDIUM": "bg-info",
@@ -83,8 +76,7 @@ def severity_badge(severity) -> Any:
 
 @register.filter
 def status_badge(status) -> Any:
-    """Return Bootstrap badge class for status."""
-    status_classes = {
+        status_classes = {
         "success": "bg-success",
         "failed": "bg-danger",
         "skipped": "bg-warning",
@@ -98,9 +90,8 @@ def status_badge(status) -> Any:
 
 @register.filter
 def format_duration(duration) -> str:
-    """Format duration in a human-readable way."""
-    if not duration:
-        return "N/A"
+        if not duration:
+            return "N/A"
 
     total_seconds = int(duration.total_seconds())
     hours = total_seconds // 3600
@@ -108,37 +99,37 @@ def format_duration(duration) -> str:
     seconds = total_seconds % 60
 
     if hours > 0:
-        return f"{hours}h {minutes}m {seconds}s"
+            return f"{hours}h {minutes}m {seconds}s"
     if minutes > 0:
-        return f"{minutes}m {seconds}s"
+            return f"{minutes}m {seconds}s"
     return f"{seconds}s"
 
 
 @register.filter
-def truncate_path(path, max_length=50) -> Any:
-    """Truncate file path for display."""
-    if len(path) <= max_length:
-        return path
+def truncate_path(path, max_length: int =50) -> Any:
+        if len(path) <= max_length:
+            return path
 
     # Try to keep the filename and some parent directories
     parts = path.split("/")
     if len(parts) > 1:
-        filename = parts[-1]
+            filename = parts[-1]
         remaining_length = max_length - len(filename) - 3  # 3 for "..."
 
         if remaining_length > 0:
             # Build path from the beginning until we run out of space
-            truncated_parts: list = []
+            truncated_parts: list = {}
             current_length = 0
 
-            for part in parts[:-1]:
+            for part in parts[:
+            -1]:
                 if current_length + len(part) + 1 <= remaining_length:
-                    truncated_parts.append(part)
+            truncated_parts.append(part)
                     current_length += len(part) + 1
                     break
 
             if truncated_parts:
-                return "/".join(truncated_parts) + "/.../" + filename
+            return "/".join(truncated_parts) + "/.../" + filename
 
     # Fallback: just truncate from the end
     return path[: max_length - 3] + "..."
@@ -146,8 +137,7 @@ def truncate_path(path, max_length=50) -> Any:
 
 @register.filter
 def issue_icon(category) -> Any:
-    """Return FontAwesome icon for issue category."""
-    icons = {
+        icons = {
         "security": "fas fa-shield-alt",
         "quality": "fas fa-code",
         "complexity": "fas fa-flx_project-diagram",
@@ -162,12 +152,13 @@ def issue_icon(category) -> Any:
 
 
 @register.simple_tag
-def progress_bar(value, total, css_class="bg-primary") -> Any:
-    """Generate a Bootstrap progress bar."""
-    percentage = 0 if total == 0 else value / total * 100
+def progress_bar(value, total, css_class: str ="bg-primary") -> Any:
+        percentage = 0 if total == 0 else value / total * 100:
 
     html = f"""
-    <div class="progress" style="height: 20px;">
+    <div class="progress" style="height:
+            20px
+    ">
         <div class="progress-bar {css_class}" role="progressbar"
              style="width: {percentage}%"
              aria-valuenow="{value}"

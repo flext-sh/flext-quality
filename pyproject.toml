@@ -4,180 +4,129 @@ build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "flext-quality"
-version = "0.6.0"
-description = "FLEXT Quality - Code Quality Analysis and Reporting"
-authors = [{name = "FLEXT Team", email = "team@flext.sh"}]
-license = {text = "MIT"}
+version = "0.7.0"
+description = "FLEXT Quality - Code Quality Analysis and Metrics"
+authors = [{ name = "FLEXT Team", email = "team@flext.sh" }]
+maintainers = [{ name = "FLEXT Team", email = "team@flext.sh" }]
+license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.13,<3.14"
-keywords = ["flext", "quality", "analysis", "linting", "testing", "enterprise"]
+dependencies = [
+    # Quality analysis specific dependencies
+    "radon>=6.0.1",
+    "vulture>=2.13",
+    "bandit>=1.7.10",
+    "django>=5.1.0",
+    "djangorestframework>=3.15.0",
+]
+keywords = ["flext", "quality", "code-analysis", "metrics", "django"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Software Development :: Quality Assurance",
-    "Topic :: Software Development :: Testing",
+    "Framework :: Django",
     "Typing :: Typed",
 ]
-dependencies = [
-    "django>=5.1.0",
-    "djangorestframework>=3.15.0",
-    "django-cors-headers>=4.6.0",
-    "django-environ>=0.11.0",
-    "celery>=5.4.0",
-    "redis>=5.2.0",
-    "psycopg2-binary>=2.9.0",
-    "gunicorn>=23.0.0",
-    "whitenoise>=6.8.0",
-    "ruff>=0.8.4",
-    "mypy>=1.13.0",
-    "black>=24.10.0",
-    "isort>=5.13.0",
-    "bandit[toml]>=1.7.0",
-    "safety>=3.2.0",
-    "vulture>=2.11",
-    "radon>=6.0.1",
-    "mccabe>=0.7.0",
-    "flake8>=7.1.0",
-    "pylint>=3.3.0",
-    "prospector>=1.12.0",
-    "pydantic>=2.11.0",
-    "pydantic-settings>=2.5.0",
-    "click>=8.1.7",
-    "rich>=13.9.0",
-    "typer>=0.12.0",
-    "structlog>=24.0.0",
-    "httpx>=0.28.0",
-    "aiofiles>=24.1.0",
-    "python-dateutil>=2.9.0",
-    "tabulate>=0.9.0",
-    "plotly>=5.24.0",
-    "pandas>=2.2.0",
-    "jinja2>=3.1.0",
-    "gitpython>=3.1.0",
-]
 
-[tool.poetry]
-packages = [{ include = "flext_quality", from = "src" }]
+[project.urls]
+Homepage = "https://github.com/flext-sh/flext"
+Repository = "https://github.com/flext-sh/flext"
+Documentation = "https://github.com/flext-sh/flext/blob/main/README.md"
 
 [project.scripts]
 flext-quality = "flext_quality.cli:main"
-flext-analyze = "flext_quality.analyzer:main"
-flext-report = "flext_quality.reporter:main"
 
-[project.urls]
-Homepage = "https://github.com/flext-sh/flext-quality"
-Repository = "https://github.com/flext-sh/flext-quality"
-Documentation = "https://github.com/flext-sh/flext-quality/blob/main/README.md"
-"Bug Tracker" = "https://github.com/flext-sh/flext-quality/issues"
-Changelog = "https://github.com/flext-sh/flext-quality/blob/main/CHANGELOG.md"
-[project.optional-dependencies]
-dev = [
-    "pytest>=8.4.0",
-    "pytest-asyncio>=0.24.0",
-    "pytest-cov>=6.2.0",
-    "pytest-xdist>=3.8.0",
-    "pytest-mock>=3.14.0",
-    "pytest-timeout>=2.4.0",
-    "pytest-django>=4.8.0",
-    "types-requests>=2.32.4",
-    "types-setuptools>=75.8.2",
-    "types-python-dateutil>=2.9.0",
-    "types-tabulate>=0.9.0",
-    "pre-commit>=4.2.0",
-    "mkdocs>=1.6.1",
-    "mkdocs-material>=9.6.15",
-    "ipython>=8.37.0",
-]
-test = [
-    "pytest-benchmark>=4.0.0",
-    "faker>=30.8.0",
-    "factory-boy>=3.3.0",
-]
-build = [
-    "build>=1.2.2",
-    "twine>=6.1.0",
-]
+[tool.poetry]
+name = "flext-quality"
+version = "0.7.0"
+description = "FLEXT Quality - Code Quality Analysis and Metrics"
+authors = ["FLEXT Team <team@flext.sh>"]
+readme = "README.md"
+packages = [{ include = "flext_quality", from = "src" }]
 
+[tool.poetry.dependencies]
+python = ">=3.13,<3.14"
+
+# Core FLEXT dependencies - primary source of truth
+flext-core = { path = "../flext-core", develop = true }
+flext-observability = { path = "../flext-observability", develop = true }
+
+# Quality analysis specific dependencies
+radon = ">=6.0.1"
+vulture = ">=2.13"
+bandit = ">=1.7.10"
+# safety removed - conflicted with meltano dependencies
+django = ">=5.1.0"
+djangorestframework = ">=3.15.0"
+
+# Core dependencies are managed by flext-core - no duplication
+# pydantic, pydantic-settings, click, structlog, etc.
+
+[tool.poetry.group.dev.dependencies]
+# Development tools - managed by flext-core
+pytest = ">=8.3.0"
+pytest-cov = ">=6.0.0"
+pytest-mock = ">=3.14.0"
+pytest-asyncio = ">=0.24.0"
+pytest-django = ">=4.9.0"
+mypy = ">=1.13.0"
+ruff = ">=0.8.0"
+
+# Quality testing
+factory-boy = ">=3.3.0"
+hypothesis = ">=6.119.0"
+
+[tool.poetry.scripts]
+flext-quality = "flext_quality.cli:main"
+
+# Ruff configuration - focused on src/ and tests/
 [tool.ruff]
+target-version = "py313"
 line-length = 88
-fix = true
+extend-include = ["*.pyi"]
 
 [tool.ruff.lint]
-ignore = [
-    # MANDATORY: Only formatter conflicts that cannot be auto-fixed
-    "COM812", #  #  # trailing-comma-missing (handled by formatter)
-    "ISC001", #  #  # implicit-str-concat (conflicts with formatter)
-    "D203",   #  #  # one-blank-line-before-class (conflicts with D211)
-    "D213",   #  #  # multi-line-docstring-summary-second-line (conflicts with D212)
-
-    # FOCUS: Only critical errors for now - ignore non-critical temporarily
-    "E501",    #  #  # line-too-long (formatting)
-    "D100", "D101", "D102", "D103", "D105", "D107", "D205", "D401", "D417",  # docstring issues
-    "ANN001", "ANN201", "ANN202", "ANN204", "ANN401", "ANN003", "ANN002",  # type annotations
-    "PLR0911", "PLR0912", "PLR0913", "PLR0915", "C901",  # complexity
-    "E402",    #  #  # import-not-at-top (legacy)
-    "S110", "S112", "S105", "S106", "S108", "S314", "S603", "S607", "S101", "S102", "S104", "S308",  # security (non-critical)
-    "ARG001", "ARG002", "ARG003", "ARG005",  # unused arguments
-    "PTH108", "PTH110", "PTH116", "PTH117", "PTH118", "PTH120", "PTH123",  # pathlib
-    "TRY002", "TRY003", "TRY004", "TRY300", "TRY301", "TRY401",  # try/except patterns
-    "FBT001", "FBT002", "FBT003",  # boolean traps
-    "DTZ001",  # "DTZ005", "DTZ006", "DTZ007",  # datetime
-    "G004",    # "G201",  # logging
-    "N806",    # "N811",  # naming
-    "B007",    # "B018", "B019", "B023", "B904",  # bugbear non-critical
-    "SIM102",  # "SIM105", "SIM113", "SIM117",  # simplify
-    "RUF001",  # "RUF002", "RUF005",  # ruff specific
-    "UP035",   #  #  # typing upgrades
-    "ERA001",  #  #  # commented code
-    "TD002",   # "TD003",  # todos
-    "FIX002",  #  #  # fixme
-    "PLW0602", # "PLW0603", "PLW2901",  # pylint warnings
-    "PLC0415", #  #  # pylint conventions
-    "PLE0605", #  #  # pylint errors non-critical
-    "PERF102", # "PERF203", "PERF402",  # performance
-    "A002",    # "A004",  # builtins
-    "PT011",   # "PT012", "PT017",  # pytest
-    "PD008",   #  #  # pandas
-    "INP001",  #  #  # namespace packages
-    "PLR0124", "PLR2004",  # magic values
-    "PYI056",  #  #  # pyi
-    "EXE001",  #  #  # executable
-    "BLE001",  #  #  # blind except (temporarily)
-    "SLF001",  #  #  # private access (temporarily)
-    "E722",    # "E741",  #  # bare except and ambiguous names
-    "T201",    #  #  # log.error statements (temporarily)
-    "PLW2901", #  #  # redefined loop variable (temporarily)
-    "D401",    #  #  # docstring imperative mood (temporarily)
-    "DJ001",   # Django model field issues
-    "RUF012",  # Mutable class attributes
-    "N802",    # Function name should be lowercase (AST visitor methods)
-    "SIM105",  # Use contextlib.suppress
-    "A001",    # Variable shadows builtin
-    "PTH103",  # os.makedirs should be Path.mkdir
+select = [
+    "ALL",
 ]
-select = ["ALL"]
+ignore = [
+    "E501", # line too long (handled by formatter)
+]
+
+# Test-specific ignores
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["S101", "PLR2004", "D", "ANN"]
-"examples/*" = ["T201", "D", "ERA001"]
-"__init__.py" = ["D104"]
-"conftest.py" = ["D"]
+"tests/**/*.py" = [
+    "S101",    # assert statements in tests
+    "PLR2004", # magic values in tests
+    "PLR6301", # methods could be static/function in tests
+]
+
+"**/tests/*.py" = ["S101", "D102", "N801", "N802", "N806", "PLR2004", "F401", "PLC0415", "G004", "T201"]
+"**/test_*.py" = ["S101", "D102", "N801", "N802", "N806", "PLR2004", "F401", "PLC0415", "G004", "T201"]
+
+# Auto-generated files - exclude from ALL linting
+"**/proto/*_pb2.py" = ["ALL"]
+"**/proto/*_pb2_grpc.py" = ["ALL"]
+"**/*_pb2.py" = ["ALL"]
+"**/*_pb2_grpc.py" = ["ALL"]
+"**/generated/**/*.py" = ["ALL"]
+[tool.ruff.lint.isort]
+known-first-party = ["flext_quality", "flext_core", "flext_observability"]
+force-single-line = false
+split-on-trailing-comma = true
+
 [tool.ruff.format]
 quote-style = "double"
 indent-style = "space"
-line-ending = "lf"
+skip-magic-trailing-comma = false
+line-ending = "auto"
 
-[tool.black]
-line-length = 88
-target-version = ["py313"]
-[tool.isort]
-profile = "black"
-line_length = 88
-
+# MyPy configuration - focused on src/ and tests/
 [tool.mypy]
 python_version = "3.13"
 strict = true
@@ -186,6 +135,7 @@ warn_unused_configs = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
 check_untyped_defs = true
+disallow_untyped_decorators = true
 no_implicit_optional = true
 warn_redundant_casts = true
 warn_unused_ignores = true
@@ -193,69 +143,45 @@ warn_no_return = true
 warn_unreachable = true
 strict_equality = true
 
+# Paths to check
+files = ["src", "tests"]
+
+# Import discovery
+namespace_packages = true
+explicit_package_bases = true
+
+# Error output
+show_error_codes = true
+show_column_numbers = true
+show_error_context = true
+pretty = true
+
+# Disable specific checks for tests
+[[tool.mypy.overrides]]
+module = "tests.*"
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+# External library stubs
 [[tool.mypy.overrides]]
 module = [
-    "vulture.*",
     "radon.*",
-    "mccabe.*",
-    "flake8.*",
-    "pylint.*",
-    "prospector.*",
-    "plotly.*",
-    "tabulate.*",
-    "git.*",
+    "vulture.*",
+    "bandit.*",
+    "safety.*",
+    "semgrep.*",
+    "django.*",
+    "rest_framework.*",
 ]
 ignore_missing_imports = true
 
-[tool.pytest.ini_options]
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-DJANGO_SETTINGS_MODULE = "tests.test_settings"
-addopts = "--reuse-db"
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests",
-    "e2e: marks tests as end-to-end tests",
-    "quality: marks tests as quality analysis tests",
-    "metrics: marks tests as metrics tests",
-    "linting: marks tests as linting tests",
-    "security: marks tests as security tests",
-    "performance: marks tests as performance tests",
-    "requires_git: tests that need git repository",
-    "django_db: marks tests as requiring database access",
-]
-filterwarnings = [
-    "error",
-    "ignore::UserWarning",
-    "ignore::DeprecationWarning",
-    "ignore::PendingDeprecationWarning",
-]
-asyncio_mode = "auto"
-
+# Coverage configuration
 [tool.coverage.run]
-branch = true
 source = ["src"]
-omit = [
-    "*/tests/*",
-    "*/test_*",
-    "*/*_test.py",
-    "*/conftest.py",
-    "*/__pycache__/*",
-    "*/site-packages/*",
-    "*/.venv/*",
-    "*/venv/*",
-    "*/build/*",
-    "*/dist/*",
-    "*/.eggs/*",
-]
+branch = true
+omit = ["*/tests/*", "*/test_*", "*/__pycache__/*", "*/site-packages/*"]
 
 [tool.coverage.report]
-skip_empty = true
-skip_covered = false
-show_missing = true
-sort = "Cover"
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
@@ -267,41 +193,28 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "class .*\\bProtocol\\):",
     "@(abc\\.)?abstractmethod",
-    "TYPE_CHECKING",
 ]
+show_missing = true
+precision = 2
 
-[tool.bandit]
-exclude_dirs = ["tests", "build", "dist"]
-skips = ["B101", "B601"]
-[tool.bandit.assert_used]
-skips = ["*/tests/*", "*/test_*.py"]
-[tool.ruff.lint.pydocstyle]
-convention = "google"
+[tool.coverage.html]
+directory = "htmlcov"
 
-[tool.ruff.lint.flake8-tidy-imports]
-ban-relative-imports = "all"
+# Pytest configuration
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = ["--strict-markers", "--strict-config", "--verbose", "--tb=short"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+    "django: marks tests as Django tests",
+]
+filterwarnings = ["error", "ignore::UserWarning", "ignore::DeprecationWarning"]
 
-[tool.ruff.lint.flake8-type-checking]
-strict = true
-
-
-[tool.ruff.lint.pylint]
-max-args = 10
-max-branches = 15
-max-returns = 8
-max-statements = 60
-
-[tool.vulture]
-ignore_decorators = ["@app.route", "@router.get", "@router.post"]
-ignore_names = ["_*"]
-make_whitelist = true
-sort_by_size = true
-
-[tool.radon]
-exclude = ["tests/*", "*/tests/*"]
-ignore = ["F401"]# Unused imports
-total_average = true
-show_complexity = true
-average = true
-order = "SCORE"
-min_confidence = 100
+# Django configuration for flext-quality web interface
+[tool.django]
+settings_module = "flext_quality.settings"
