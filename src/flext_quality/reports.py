@@ -43,18 +43,23 @@ class QualityReport:
             if issue_list:
                 report_lines.append(f"\n{category.upper()} ({len(issue_list)} issues):")
                 # Show first 5 issues
-                report_lines.extend(f"  - {issue.get('file', 'Unknown')}: {issue.get('message', 'No message')}" for issue in issue_list[:5])
+                report_lines.extend(
+                    f"  - {issue.get('file', 'Unknown')}: {issue.get('message', 'No message')}"
+                    for issue in issue_list[:5]
+                )
                 if len(issue_list) > 5:
                     report_lines.append(f"  ... and {len(issue_list) - 5} more")
 
         # Add recommendations
         recommendations = self._generate_recommendations()
         if recommendations:
-            report_lines.extend([
-                "",
-                "RECOMMENDATIONS:",
-                "-" * 20,
-            ])
+            report_lines.extend(
+                [
+                    "",
+                    "RECOMMENDATIONS:",
+                    "-" * 20,
+                ]
+            )
             report_lines.extend(f"• {rec}" for rec in recommendations)
 
         return "\n".join(report_lines)
@@ -135,14 +140,18 @@ class QualityReport:
         ]
 
         # Add recommendations
-        html_parts.extend(f"            <li>{rec}</li>" for rec in self._generate_recommendations())
+        html_parts.extend(
+            f"            <li>{rec}</li>" for rec in self._generate_recommendations()
+        )
 
-        html_parts.extend([
-            "        </ul>",
-            "    </div>",
-            "</body>",
-            "</html>",
-        ])
+        html_parts.extend(
+            [
+                "        </ul>",
+                "    </div>",
+                "</body>",
+                "</html>",
+            ]
+        )
 
         return "\n".join(html_parts)
 
@@ -204,10 +213,7 @@ class QualityReport:
         """Get number of critical issues."""
         issues = self.results.get("issues", {})
         critical_categories = ["security", "errors", "critical"]
-        return sum(
-            len(issues.get(category, []))
-            for category in critical_categories
-        )
+        return sum(len(issues.get(category, [])) for category in critical_categories)
 
     def _get_files_analyzed(self) -> int:
         """Get number of files analyzed."""
@@ -226,10 +232,12 @@ class QualityReport:
             if not issue_list:
                 continue
 
-            html_parts.extend([
-                '    <div class="section">',
-                f"        <h2>{category.title()} Issues ({len(issue_list)})</h2>",
-            ])
+            html_parts.extend(
+                [
+                    '    <div class="section">',
+                    f"        <h2>{category.title()} Issues ({len(issue_list)})</h2>",
+                ]
+            )
 
             for issue in issue_list[:10]:  # Show first 10 issues
                 severity = issue.get("severity", "low")
@@ -240,11 +248,13 @@ class QualityReport:
 
                 html_parts.append(
                     f'        <div class="issue {severity}-severity">'
-                    f'<strong>{file_path}{line_info}:</strong> {message}</div>',
+                    f"<strong>{file_path}{line_info}:</strong> {message}</div>",
                 )
 
             if len(issue_list) > 10:
-                html_parts.append(f'        <div class="issue">... and {len(issue_list) - 10} more issues</div>')
+                html_parts.append(
+                    f'        <div class="issue">... and {len(issue_list) - 10} more issues</div>'
+                )
 
             html_parts.append("    </div>")
 
@@ -259,17 +269,28 @@ class QualityReport:
         score = self._get_quality_score()
 
         if critical_issues > 0:
-            recommendations.append(f"Fix {critical_issues} critical security/error issues immediately")
+            recommendations.append(
+                f"Fix {critical_issues} critical security/error issues immediately"
+            )
 
         if total_issues > 50:
-            recommendations.append("Consider breaking down large files and reducing complexity")
+            recommendations.append(
+                "Consider breaking down large files and reducing complexity"
+            )
 
         if score < 70:
-            recommendations.extend(("Implement automated code quality checks in your CI/CD pipeline", "Add comprehensive unit tests to improve coverage"))
+            recommendations.extend(
+                (
+                    "Implement automated code quality checks in your CI/CD pipeline",
+                    "Add comprehensive unit tests to improve coverage",
+                )
+            )
 
         coverage = self._get_coverage_percent()
         if coverage < 80:
-            recommendations.append(f"Increase test coverage from {coverage}% to at least 80%")
+            recommendations.append(
+                f"Increase test coverage from {coverage}% to at least 80%"
+            )
 
         issues = self.results.get("issues", {})
         if issues.get("duplicates"):
@@ -279,6 +300,8 @@ class QualityReport:
             recommendations.append("Simplify complex functions and classes")
 
         if not recommendations:
-            recommendations.append("Great job! Your code quality is excellent. Keep up the good work!")
+            recommendations.append(
+                "Great job! Your code quality is excellent. Keep up the good work!"
+            )
 
         return recommendations

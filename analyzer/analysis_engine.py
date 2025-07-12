@@ -1,5 +1,5 @@
-from typing import Any
 from datetime import datetime
+from typing import Any
 
 """Integrated code analysis engine for Django Code Analyzer.
 

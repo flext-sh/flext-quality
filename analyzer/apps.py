@@ -1,4 +1,5 @@
 from pydantic import Field
+
 """Django app configuration for analyzer.
 
 from __future__ import annotations

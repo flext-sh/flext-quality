@@ -1,5 +1,7 @@
 from typing import Any
+
 from pydantic import Field
+
 """Django settings for Code Analyzer Web Interface flx_project."""
 
 from __future__ import annotations

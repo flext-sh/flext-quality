@@ -1,4 +1,5 @@
 from datetime import datetime
+
 """Django management command to populate backend and issue type data.
 
 from datetime import timezone

@@ -1,4 +1,5 @@
 from pathlib import Path
+
 """Module cli.
 
 from django.core.management import os  # TODO: Move import to module level
