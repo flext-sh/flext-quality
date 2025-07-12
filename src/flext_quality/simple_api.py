@@ -9,10 +9,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from flext_core.config import get_container
+
 from flext_quality.application.services import (
-    QualityProjectService,
     QualityAnalysisService,
     QualityIssueService,
+    QualityProjectService,
     QualityReportService,
 )
 
@@ -20,6 +21,7 @@ if TYPE_CHECKING:
     from uuid import UUID
 
     from flext_core.domain.types import ServiceResult
+
     from flext_quality.domain.entities import (
         QualityAnalysis,
         QualityIssue,

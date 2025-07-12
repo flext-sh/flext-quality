@@ -1,4 +1,5 @@
 from datetime import datetime
+
 """Health check utilities for the dc-code-analyzer application."""
 
 import time

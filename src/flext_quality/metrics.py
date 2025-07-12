@@ -4,9 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from pydantic import Field, computed_field
-
 from flext_core.domain.pydantic_base import DomainValueObject
+from pydantic import Field, computed_field
 
 
 class QualityMetrics(DomainValueObject):

@@ -1,5 +1,4 @@
-from typing import Any
-from typing import List
+from typing import Any, List
 
 """Base class for analysis backends.
 

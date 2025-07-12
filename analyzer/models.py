@@ -1,6 +1,8 @@
-from pydantic import Field
-from typing import List
 from pathlib import Path
+from typing import List
+
+from pydantic import Field
+
 """Django models for the code analyzer.
 
 from __future__ import annotations
