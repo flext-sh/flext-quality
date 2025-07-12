@@ -15,72 +15,66 @@ from django.test import override_settings
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "tests.test_settings")
 
 
-def pytest_configure(config: Any) -> None:
-    """Configure pytest and Django."""
-    django.setup()
+def pytest_configure(config:
+            Any) -> None:
+        django.setup()
 
 
 @pytest.fixture(scope="session")
 def django_db_setup(django_db_setup, django_db_blocker) -> None:
-    """Set up the test database."""
-    with django_db_blocker.unblock():
+        with django_db_blocker.unblock():
         call_command("migrate", "--run-syncdb")
 
 
 @pytest.fixture
 def temp_project_dir() -> Generator[Path]:
-    """Create a temporary directory with some Python files for testing."""
-    with tempfile.TemporaryDirectory() as temp_dir:
-        project_path = Path(temp_dir)
+        with tempfile.TemporaryDirectory() as temp_dir: project_path = Path(temp_dir)
 
         # Create a simple Python project structure
         (project_path / "main.py").write_text(
             '''
-"""Main module for testing."""
+"""Main module for testing.
 
 import os
 import sys
 
 
 class TestClass:
-    """A test class."""
+             """A test class."""
 
-    def __init__(self, name: str) -> None:
-        """TODO: Add docstring."""
+    def __init__(self, name:
+        str) -> None:
         self.name = name
         self.value = 42
 
-    def method_with_complexity(self, x: int) -> str:
-        """Method with some complexity."""
+    def method_with_complexity(self, x:
+        int) -> str:
         if x > 10:
             if x > 20:
                 if x > 30:
-                    return "high"
+            return "high"
                 return "medium-high"
             return "medium"
         return "low"
 
     def simple_method(self) -> str:
-        """Simple method."""
         return f"Hello, {self.name}!"
 
 
 def function_with_security_issue() -> Any:
-    """Function with potential security issue."""
-    import subprocess
+        import subprocess
     subprocess.call("echo test", shell=True)  # B602: subprocess_popen_with_shell_equals_true
 
 
 def complex_function(a, b, c, d, e, f, g, h) -> Any:
-    """Function with too many parameters."""
-    result = 0
+        result = 0
     for i in range(a):
-        for j in range(b):
+            for j in range(b):
             for k in range(c):
-                if i + j + k > d:
-                    if e > f:
+            if i + j + k > d:
+            if e > f:
                         if g > h:
-                            result += 1
+            result += 1
                             result -= 1
                         result *= 2
                     result //= 2
@@ -89,12 +83,11 @@ def complex_function(a, b, c, d, e, f, g, h) -> Any:
 
 # Unused function for dead code detection
 def unused_function() -> Any:
-    """This function is never called."""
-    return "dead code"
+            return "dead code"
 
 
 if __name__ == "__main__":
-    test_obj = TestClass("test")
+            test_obj = TestClass("test")
     print(test_obj.simple_method())
 ''',
         )
@@ -102,42 +95,40 @@ if __name__ == "__main__":
         # Create a package with __init__.py
         package_dir = project_path / "test_package"
         package_dir.mkdir()
-        (package_dir / "__init__.py").write_text('"""Test package."""\n')
+        (package_dir / "__init__.py").write_text('"""Test package.\n')"""
 
         (package_dir / "module.py").write_text(
             '''
-"""Test module in package."""
+"""Test module in package.
 
 from typing import List, Dict, List, Dict, Any
 
 
 class DataProcessor:
-    """Class for processing data."""
+         """Class for processing data."""
 
     def __init__(self) -> None:
-        """TODO: Add docstring."""
-        self.data: list[dict[str, Any]] = []
+            self.data: list[dict[str, Any]] = []
 
-    def add_item(self, item: dict[str, Any]) -> None:
-        """Add an item to the data."""
+    def add_item(self, item:
+        dict[str, Any]) -> None:
         self.data.append(item)
 
     def process_data(self) -> list[str]:
-        """Process the data."""
         results: list = []
         for item in self.data:
             if "name" in item:
-                results.append(item["name"])
+            results.append(item["name"])
         return results
 
 
 # Duplicate code block (similar to main.py)
-def method_with_complexity(x: int) -> str:
-    """Method with some complexity (duplicate)."""
-    if x > 10:
-        if x > 20:
+def method_with_complexity(x:
+        int) -> str:
+        if x > 10:
+            if x > 20:
             if x > 30:
-                return "high"
+            return "high"
             return "medium-high"
         return "medium"
     return "low"
@@ -148,29 +139,25 @@ def method_with_complexity(x: int) -> str:
 
 
 @pytest.fixture
-def sample_python_files(temp_project_dir: Path) -> list[Path]:
-    """Get list of Python files in the test project."""
-    return list(temp_project_dir.rglob("*.py"))
+def sample_python_files(temp_project_dir:
+        Path) -> list[Path]:
+        return list(temp_project_dir.rglob("*.py"))
 
 
 @pytest.fixture
 def mock_session() -> Any:
-    """Create a mock analysis session."""
-
-    class MockSession:
-        """TODO: Add docstring."""
+        class MockSession:
+         """TODO: Add docstring.
 
         def __init__(self) -> None:
-            """TODO: Add docstring."""
-            self.id = 1
+        self.id = 1
             self.flx_project = MockProject()
 
     class MockProject:
-        """TODO: Add docstring."""
+         """TODO: Add docstring."""
 
         def __init__(self) -> None:
-            """TODO: Add docstring."""
-            self.id = 1
+        self.id = 1
             self.name = "test_project"
 
     return MockSession()
@@ -179,32 +166,20 @@ def mock_session() -> Any:
 @override_settings(CELERY_TASK_ALWAYS_EAGER=True)
 @pytest.fixture
 def celery_settings() -> None:
-    """Configure Celery for testing."""
-
-
-@pytest.fixture(autouse=True)
+        @pytest.fixture(autouse=True)
 def enable_db_access_for_all_tests(db) -> None:
-    """Give all tests access to the database.
-
-    By default, pytest-django only allows database access in tests marked with
-    @pytest.mark.django_db. This fixture enables it for all tests.
-    """
-
-
-# Remove the migrate_database fixture - let pytest-django handle it
+        # Remove the migrate_database fixture - let pytest-django handle it
 
 
 @pytest.fixture
 def populate_backends() -> None:
-    """Populate the database with backend and issue type data."""
-    call_command("populate_backends", force=True, verbosity=0)
+        call_command("populate_backends", force=True, verbosity=0)
 
 
 # Test data fixtures
 @pytest.fixture
 def sample_analysis_result() -> Any:
-    """Create a sample AnalysisResult for testing."""
-    from analyzer.backends.base import AnalysisResult
+        from analyzer.backends.base import AnalysisResult
 
     result = AnalysisResult()
 
@@ -339,10 +314,7 @@ def sample_analysis_result() -> Any:
 
 @pytest.fixture
 def project_factory() -> Any:
-    """Factory for creating test projects."""
-
-    def _create_project(name: str = "test_project", path: str = "/test/path") -> Any:
-        """TODO: Add docstring."""
+        def _create_project(name: str = "test_project", path: str = "/test/path") -> Any:
         from analyzer.models import Project
 
         return Project.objects.create(
@@ -362,11 +334,9 @@ def project_factory() -> Any:
 
 @pytest.fixture
 def session_factory() -> Any:
-    """Factory for creating test analysis sessions."""
-    import uuid
+        import uuid
 
     def _create_session(project=None, status="completed") -> Any:
-        """TODO: Add docstring."""
         from analyzer.models import AnalysisSession
 
         if project is None:

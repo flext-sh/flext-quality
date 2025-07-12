@@ -12,7 +12,8 @@ from analyzer.backends.external_backend import ExternalToolsBackend
 from analyzer.backends.quality_backend import QualityBackend
 
 # Registry of available backends
-AVAILABLE_BACKENDS: dict[str, type[AnalysisBackend]] = {
+AVAILABLE_BACKENDS:
+            dict[str, type[AnalysisBackend]] = {
     "ast": ASTBackend,
     "external": ExternalToolsBackend,
     "quality": QualityBackend,
@@ -23,9 +24,8 @@ DEFAULT_BACKENDS = ["ast", "external", "quality"]
 
 
 def get_backend(name: str) -> type[AnalysisBackend]:
-    """Get a backend by name."""
-    if name not in AVAILABLE_BACKENDS:
-        msg = (
+        if name not in AVAILABLE_BACKENDS:
+            msg = (
             f"Backend '{name}' not found. Available: {list(AVAILABLE_BACKENDS.keys())}"
         )
         raise ValueError(
@@ -35,13 +35,11 @@ def get_backend(name: str) -> type[AnalysisBackend]:
 
 
 def get_all_backends() -> list[type[AnalysisBackend]]:
-    """Get all available backend classes."""
-    return list(AVAILABLE_BACKENDS.values())
+        return list(AVAILABLE_BACKENDS.values())
 
 
 def get_default_backends() -> list[type[AnalysisBackend]]:
-    """Get default backend classes."""
-    return [AVAILABLE_BACKENDS[name] for name in DEFAULT_BACKENDS]
+        return [AVAILABLE_BACKENDS[name] for name in DEFAULT_BACKENDS]
 
 
 __all__ = [

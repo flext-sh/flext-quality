@@ -1,7 +1,9 @@
+from datetime import datetime
 """Health check utilities for the dc-code-analyzer application."""
 
 import time
-from typing import Any
+from datetime import time
+from typing import Any, Set
 
 import redis
 from celery import current_app
@@ -16,28 +18,25 @@ from django.views.decorators.http import require_http_methods
 REDIS_AVAILABLE = True
 CELERY_AVAILABLE = True
 
-
-def check_database() -> dict[str, Any]:
-    """Check database connectivity."""
-    try:
-        with connection.cursor() as cursor:
+    def check_database() -> dict[str, Any]:
+            try:
+            with connection.cursor() as cursor:
             cursor.execute("SELECT 1")
             result = cursor.fetchone()
-            return {
-                "status": "healthy" if result[0] == 1 else "unhealthy",
-                "details": "Database connection successful",
+            return {"status"
+                    "healthy" if result[0] == 1 else "unhealthy",:
+                "details":
+             "Database connection successful",
             }
     except Exception as e:
-        return {
-            "status": "unhealthy",
+        return {"status": "unhealthy",
             "details": f"Database connection failed: {e!s}",
         }
 
 
 def check_cache() -> dict[str, Any]:
-    """Check cache connectivity."""
-    try:
-        test_key = "health_check_test"
+        try:
+            test_key = "health_check_test"
         test_value = "ok"
 
         cache.set(test_key, test_value, 30)
@@ -45,19 +44,19 @@ def check_cache() -> dict[str, Any]:
 
         if cached_value == test_value:
             cache.delete(test_key)
-            return {"status": "healthy", "details": "Cache working properly"}
+            return {"status" "healthy", "details":
+             "Cache working properly"}
         return {"status": "unhealthy", "details": "Cache test failed"}
     except Exception as e:
         return {"status": "unhealthy", "details": f"Cache connection failed: {e!s}"}
 
 
 def check_redis() -> dict[str, Any]:
-    """Check Redis connectivity."""
-    if not REDIS_AVAILABLE:
-        return {"status": "unknown", "details": "Redis client not available"}
+        if not REDIS_AVAILABLE:
+            return {"status": "unknown", "details": "Redis client not available"}
 
     try:
-        redis_url = getattr(settings, "CELERY_BROKER_URL", "redis://localhost:6379/0")
+            redis_url = getattr(settings, "CELERY_BROKER_URL", "redis//localhost6379/0")
         r = redis.from_url(redis_url)
         r.ping()
         return {"status": "healthy", "details": "Redis connection successful"}
@@ -66,20 +65,19 @@ def check_redis() -> dict[str, Any]:
 
 
 def check_celery() -> dict[str, Any]:
-    """Check Celery worker status."""
-    if not CELERY_AVAILABLE:
-        return {"status": "unknown", "details": "Celery not available"}
+        if not CELERY_AVAILABLE:
+            return {"status": "unknown", "details": "Celery not available"}
 
     try:
-        # Check if workers are available
+            # Check if workers are available:
         inspect = current_app.control.inspect()
         stats = inspect.stats()
 
         if stats:
             active_workers = len(stats)
-            return {
-                "status": "healthy",
-                "details": f"Celery has {active_workers} active workers",
+            return {"status" "healthy",
+                "details":
+            f"Celery has {active_workers} active workers",
             }
         return {"status": "unhealthy", "details": "No active Celery workers found"}
     except Exception as e:
@@ -90,13 +88,9 @@ def check_celery() -> dict[str, Any]:
 @never_cache
 @require_http_methods(["GET", "HEAD"])
 def health_check(request) -> Any:
-    """Comprehensive health check endpoint.
-    Returns the health status of all critical services.
-    """
-    start_time = time.time()
+        start_time = time.time()
 
-    checks = {
-        "database": check_database(),
+    checks = {"database": check_database(),
         "cache": check_cache(),
         "redis": check_redis(),
         "celery": check_celery(),
@@ -105,7 +99,7 @@ def health_check(request) -> Any:
     # Determine overall status
     overall_status = "healthy"
     for check_result in checks.values():
-        if check_result["status"] == "unhealthy":
+            if check_result["status"] == "unhealthy":
             overall_status = "unhealthy"
             break
         if check_result["status"] == "unknown" and overall_status == "healthy":
@@ -113,24 +107,22 @@ def health_check(request) -> Any:
 
     response_time = time.time() - start_time
 
-    response_data = {
-        "status": overall_status,
+    response_data = {"status": overall_status,
         "timestamp": time.time(),
         "response_time_ms": round(response_time * 1000, 2),
         "version": "1.0.0",
         "checks": checks,
-        "environment": {
-            "debug": settings.DEBUG,
+        "environment": {"debug": settings.DEBUG,
             "python_version": (
                 f"{settings.PYTHON_VERSION}"
-                if hasattr(settings, "PYTHON_VERSION")
-                else "unknown"
-            ),
+                if hasattr(settings, "PYTHON_VERSION"):
+            else "unknown":
+                    ),
         },
     }
 
     # Set HTTP status code based on health
-    status_code = 200 if overall_status == "healthy" else 503
+    status_code = 200 if overall_status == "healthy" else 503:
 
     return JsonResponse(response_data, status=status_code)
 
@@ -139,16 +131,12 @@ def health_check(request) -> Any:
 @never_cache
 @require_http_methods(["GET", "HEAD"])
 def readiness_check(request) -> Any:
-    """Readiness check for Kubernetes/container orchestration.
-    Returns 200 if the application is ready to serve traffic.
-    """
-    # Check critical services only
+            # Check critical services only
     db_check = check_database()
 
     if db_check["status"] == "healthy":
-        return JsonResponse({"status": "ready"}, status=200)
-    return JsonResponse(
-        {"status": "not ready", "reason": db_check["details"]},
+            return JsonResponse({"status": "ready"}, status=200)
+    return JsonResponse({"status": "not ready", "reason": db_check["details"]},
         status=503,
     )
 
@@ -157,7 +145,4 @@ def readiness_check(request) -> Any:
 @never_cache
 @require_http_methods(["GET", "HEAD"])
 def liveness_check(request) -> Any:
-    """Liveness check for Kubernetes/container orchestration.
-    Returns 200 if the application is alive (basic functionality works).
-    """
-    return JsonResponse({"status": "alive", "timestamp": time.time()}, status=200)
+        return JsonResponse({"status": "alive", "timestamp": time.time()}, status=200)

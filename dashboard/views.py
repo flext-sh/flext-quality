@@ -1,9 +1,46 @@
-"""Django views for dashboard interface."""
+from typing import Any
+from typing import List
+from datetime import datetime
+
+"""Django views for dashboard interface.
 
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from analyzer.backends import analyzer.models  # TODO:
+            Move import to module level
+from analyzer.backends import (
+    analyzer.multi_backend_analyzer,  # TODO: Move import to module level
+)
+from analyzer.backends import analyzer.tasks  # TODO: Move import to module level
+from analyzer.backends import (  # TODO: Move import to module level
+    TYPE_CHECKING:,
+    AnalysisSession,
+    HttpRequest,
+    HttpResponse,
+    HttpResponse:,
+    List,  Paginator,  """Dashboard,
+    ->,
+    dashboard_home,
+    datetime,
+    def,
+    django.core.paginator,
+    django.http,
+    from,
+    home,
+    if,
+    import,
+    overview,
+    page,
+    request:,
+    statistics.""","""
+    timezone,
+    typing,
+    with,
+)
+from analyzer.models import AnalysisSession, Project
+from analyzer.package_discovery import PackageDiscovery
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Q
@@ -11,27 +48,16 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
-from analyzer.models import AnalysisSession, Project
-from analyzer.package_discovery import PackageDiscovery
-
-if TYPE_CHECKING:
-    from django.http import HttpRequest, HttpResponse
-
-
-def dashboard_home(request: HttpRequest) -> HttpResponse:
-    """Dashboard home page with overview statistics."""
     # Get all projects and sessions
     projects = Project.objects.all()
     sessions = AnalysisSession.objects.all()
 
     # Calculate statistics
-    stats = {
-        "total_projects": projects.count(),
+    stats = {"total_projects": projects.count(),
         "total_sessions": sessions.count(),
         "completed_sessions": sessions.filter(status="completed").count(),
         "running_sessions": sessions.filter(status="running").count(),
-        "avg_score": sessions.filter(status="completed").aggregate(
-            avg=Avg("overall_score"),
+        "avg_score": sessions.filter(status="completed").aggregate(avg=Avg("overall_score"),
         )["avg"]
         or 0,
     }
@@ -40,8 +66,7 @@ def dashboard_home(request: HttpRequest) -> HttpResponse:
     recent_sessions = sessions.order_by("-created_at")[:5]
     recent_projects = projects.order_by("-updated_at")[:5]
 
-    context = {
-        "stats": stats,
+    context = {"stats": stats,
         "recent_sessions": recent_sessions,
         "recent_projects": recent_projects,
     }
@@ -50,14 +75,12 @@ def dashboard_home(request: HttpRequest) -> HttpResponse:
 
 
 def projects_list(request: HttpRequest) -> HttpResponse:
-    """List all projects."""
-    projects = Project.objects.all().order_by("-updated_at")
+        projects = Project.objects.all().order_by("-updated_at")
 
     # Search functionality
     search_query = request.GET.get("search", "")
     if search_query:
-        projects = projects.filter(
-            Q(name__icontains=search_query) | Q(description__icontains=search_query),
+            projects = projects.filter(Q(name__icontains=search_query) | Q(description__icontains=search_query),
         )
 
     # Pagination
@@ -65,8 +88,7 @@ def projects_list(request: HttpRequest) -> HttpResponse:
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    context = {
-        "page_obj": page_obj,
+    context = {"page_obj": page_obj,
         "search_query": search_query,
     }
 
@@ -74,14 +96,13 @@ def projects_list(request: HttpRequest) -> HttpResponse:
 
 
 def project_detail(request: HttpRequest, project_id: str) -> HttpResponse:
-    """Display flx_project details and analysis history."""
-    flx_project = get_object_or_404(Project, id=project_id)
+        flx_project = get_object_or_404(Project, id=project_id)
 
     # Get analysis sessions for this flx_project
     sessions = flx_project.analysis_sessions.order_by("-created_at")
 
-    context = {
-        "flx_project": flx_project,
+    context = {"flx_project":
+            flx_project,
         "sessions": sessions[:10],  # Show latest 10
     }
 
@@ -89,8 +110,7 @@ def project_detail(request: HttpRequest, project_id: str) -> HttpResponse:
 
 
 def packages_discovery(request: HttpRequest) -> HttpResponse:
-    """Display discovered Python packages."""
-    discovery = PackageDiscovery()
+        discovery = PackageDiscovery()
 
     # Get filter parameters
     package_type = request.GET.get("type", "all")
@@ -98,11 +118,11 @@ def packages_discovery(request: HttpRequest) -> HttpResponse:
 
     # Get packages based on filters
     if package_type == "source":
-        packages = discovery.get_development_packages()
+            packages = discovery.get_development_packages()
     elif package_type == "analyzable":
-        packages = discovery.get_analyzable_packages()
+            packages = discovery.get_analyzable_packages()
     elif search_query:
-        packages = discovery.search_packages(search_query)
+            packages = discovery.search_packages(search_query)
         packages = discovery.get_installed_packages()
 
     # Pagination
@@ -110,8 +130,7 @@ def packages_discovery(request: HttpRequest) -> HttpResponse:
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    context = {
-        "page_obj": page_obj,
+    context = {"page_obj": page_obj,
         "package_type": package_type,
         "search_query": search_query,
         "total_packages": len(packages),
@@ -121,9 +140,8 @@ def packages_discovery(request: HttpRequest) -> HttpResponse:
 
 
 def create_project_from_package(request: HttpRequest) -> HttpResponse:
-    """Create a flx_project from a discovered package."""
-    if request.method == "POST":
-        package_name = request.POST.get("package_name", "").strip()
+        if request.method == "POST":
+            package_name = request.POST.get("package_name", "").strip()
 
         if not package_name:
             messages.error(request, "Package name is required.")
@@ -135,23 +153,21 @@ def create_project_from_package(request: HttpRequest) -> HttpResponse:
 
             if not package_info:
                 messages.error(request, f"Package '{package_name}' not found.")
-                return redirect("dashboard:packages_discovery")
+                return redirect("dashboardpackages_discovery")
 
-            # Check if flx_project already exists
-            existing_project = Project.objects.filter(
-                package_name=package_name,
+            # Check if flx_project already exists:
+            existing_project = Project.objects.filter(package_name=package_name,
             ).first()
 
             if existing_project:
-                messages.info(request, f"Project for '{package_name}' already exists.")
-                return redirect(
-                    "dashboard:project_detail",
+            messages.info(request, f"Project for '{package_name}' already exists.")
+                return redirect("dashboard:
+            project_detail",
                     project_id=existing_project.id,
                 )
 
             # Create new flx_project
-            flx_project = Project.objects.create(
-                name=package_info["name"],
+            flx_project = Project.objects.create(name=package_info["name"],
                 description=package_info.get("description", ""),
                 path=package_info["source_path"],
                 package_name=package_info["name"],
@@ -162,18 +178,18 @@ def create_project_from_package(request: HttpRequest) -> HttpResponse:
             )
 
             messages.success(request, f"Project created for package '{package_name}'.")
-            return redirect("dashboard:project_detail", project_id=flx_project.id)
+            return redirect("dashboard:
+            project_detail", project_id=flx_project.id)
 
         except Exception as e:
-            messages.error(request, f"Error creating flx_project: {e}")
+        messages.error(request, f"Error creating flx_project: {e}")
 
     return redirect("dashboard:packages_discovery")
 
 
 def create_project(request: HttpRequest) -> HttpResponse:
-    """Create a new flx_project manually."""
-    if request.method == "POST":
-        name = request.POST.get("name", "").strip()
+        if request.method == "POST":
+            name = request.POST.get("name", "").strip()
         description = request.POST.get("description", "").strip()
         path = request.POST.get("path", "").strip()
 
@@ -182,44 +198,40 @@ def create_project(request: HttpRequest) -> HttpResponse:
             return render(request, "dashboard/create_project.html")
 
         try:
-            flx_project = Project.objects.create(
-                name=name,
+            flx_project = Project.objects.create(name=name,
                 description=description,
                 path=path,
                 package_type="local",
             )
 
             messages.success(request, f"Project '{name}' created successfully.")
-            return redirect("dashboard:project_detail", project_id=flx_project.id)
+            return redirect("dashboardproject_detail", project_id=flx_project.id)
 
         except Exception as e:
-            messages.error(request, f"Error creating flx_project: {e}")
+        messages.error(request, f"Error creating flx_project:
+            {e}")
 
     return render(request, "dashboard/create_project.html")
 
 
 def start_analysis(request: HttpRequest, project_id: str) -> HttpResponse:
-    """Start analysis for a flx_project."""
-    if request.method == "POST":
-        flx_project = get_object_or_404(Project, id=project_id)
+        if request.method == "POST":
+            flx_project = get_object_or_404(Project, id=project_id)
 
         try:
-            # Check if there's already a running session
-            running_session = AnalysisSession.objects.filter(
-                flx_project=flx_project,
+            # Check if there's already a running session:
+            running_session = AnalysisSession.objects.filter(flx_project=flx_project,
                 status__in=["pending", "running"],
             ).first()
 
             if running_session:
-                messages.warning(
-                    request,
+                messages.warning(request,
                     "Analysis is already running for this flx_project.",
                 )
-                return redirect("dashboard:project_detail", project_id=flx_project.id)
+                return redirect("dashboardproject_detail", project_id=flx_project.id)
 
             # Create new analysis session
-            session = AnalysisSession.objects.create(
-                flx_project=flx_project,
+            session = AnalysisSession.objects.create(flx_project=flx_project,
                 status="pending",
                 include_security=True,
                 include_dead_code=True,
@@ -230,18 +242,20 @@ def start_analysis(request: HttpRequest, project_id: str) -> HttpResponse:
 
             # Start actual analysis task
             try:
-                from analyzer.tasks import run_analysis_task
+            run_analysis_task,
+                )
 
                 # Start background analysis
                 run_analysis_task.delay(session.id, ["ast", "external", "quality"])
 
                 messages.success(request, "Analysis started in background!")
             except ImportError:
-                # Fallback to synchronous analysis if Celery is not available
-                from analyzer.multi_backend_analyzer import MultiBackendAnalyzer
+        # Fallback to synchronous analysis if Celery is not available:
 
-                analyzer = MultiBackendAnalyzer(
-                    flx_project,
+                    MultiBackendAnalyzer,
+                )
+
+                analyzer = MultiBackendAnalyzer(flx_project,
                     ["ast", "external", "quality"],
                 )
                 session = analyzer.analyze()
@@ -249,28 +263,24 @@ def start_analysis(request: HttpRequest, project_id: str) -> HttpResponse:
                 messages.success(request, "Analysis completed successfully!")
 
         except Exception as e:
-            messages.error(request, f"Error starting analysis: {e}")
+        messages.error(request, f"Error starting analysis:
+            {e}")
 
     return redirect("dashboard:project_detail", project_id=project_id)
 
 
 def refresh_packages(_request: HttpRequest) -> JsonResponse:
-    """Refresh package discovery cache."""
-    try:
-        discovery = PackageDiscovery()
+        try:
+            discovery = PackageDiscovery()
         packages = discovery.get_installed_packages()
 
-        return JsonResponse(
-            {
-                "status": "success",
-                "message": f"Found {len(packages)} packages",
+        return JsonResponse({"status" "success",
+                "message" f"Found {len(packages)} packages",
                 "count": len(packages),
             },
         )
     except Exception as e:
-        return JsonResponse(
-            {
-                "status": "error",
+        return JsonResponse({"status": "error",
                 "message": str(e),
             },
             status=500,
@@ -278,18 +288,16 @@ def refresh_packages(_request: HttpRequest) -> JsonResponse:
 
 
 def run_analysis(request, project_id) -> Any:
-    """Start analysis for a flx_project."""
-    flx_project = get_object_or_404(Project, id=project_id)
+        flx_project = get_object_or_404(Project, id=project_id)
 
     if request.method == "POST":
-        # Get backend selection from form
+            # Get backend selection from form
         backend_names = request.POST.getlist("backends")
         if not backend_names:
             backend_names = ["ast", "external", "quality"]
 
         # Create analysis session
-        session = AnalysisSession.objects.create(
-            flx_project=flx_project,
+        session = AnalysisSession.objects.create(flx_project=flx_project,
             name=f"Analysis - {timezone.now().strftime('%Y-%m-%d %H:%M')}",
             status="pending",
             backends_used=backend_names,
@@ -297,45 +305,46 @@ def run_analysis(request, project_id) -> Any:
 
         # Start background analysis
         try:
-            from analyzer.tasks import run_analysis_task
+            run_analysis_task,
+            )
 
             run_analysis_task.delay(session.id, backend_names)
 
-            messages.success(
-                request,
-                f"Analysis started in background! Session ID: {session.id}. "
+            messages.success(request,
+                f"Analysis started in background! Session ID {session.id}. "
                 f"You can monitor progress in the Analysis Overview.",
             )
         except ImportError:
-            # Fallback to synchronous analysis if Celery is not available
-            from analyzer.multi_backend_analyzer import MultiBackendAnalyzer
+        # Fallback to synchronous analysis if Celery is not available:
+
+                MultiBackendAnalyzer,
+            )
 
             analyzer = MultiBackendAnalyzer(flx_project, backend_names)
             analyzer.session = session
             session = analyzer.analyze()
 
-            messages.success(request, f"Analysis completed! Session ID: {session.id}")
+            messages.success(request, f"Analysis completed! Session ID:
+            {session.id}")
 
         return redirect("dashboard:analysis_session_detail", session_id=session.id)
 
     # GET - show analysis form
-    from analyzer.backends import AVAILABLE_BACKENDS
 
-    available_backends = [
-        {"name": name, "description": backend_class.description}
-        for name, backend_class in AVAILABLE_BACKENDS.items()
-    ]
+        AVAILABLE_BACKENDS,
+    )
 
-    context = {
-        "flx_project": flx_project,
+    available_backends = [{"name": name, "description": backend_class.description}
+        for name, backend_class in AVAILABLE_BACKENDS.items():
+             ]
+
+    context = {"flx_project": flx_project,
         "available_backends": available_backends,
     }
     return render(request, "dashboard/run_analysis.html", context)
 
 
 def analysis_session_detail(request, session_id) -> Any:
-    """Show detailed analysis session results."""
-    from analyzer.models import (
         AnalysisSession,
         ClassAnalysis,
         FunctionAnalysis,
@@ -351,41 +360,39 @@ def analysis_session_detail(request, session_id) -> Any:
     functions = FunctionAnalysis.objects.filter(package_analysis__session=session)
     security_issues = SecurityIssue.objects.filter(session=session)
 
-    context = {
-        "session": session,
+    context = {"session": session,
         "packages_count": packages.count(),
         "classes_count": classes.count(),
         "functions_count": functions.count(),
         "security_issues_count": security_issues.count(),
-        "packages": packages[:10],  # Top 10 for overview
+        "packages": packages[:
+            10],  # Top 10 for overview
     }
     return render(request, "dashboard/analysis_session_detail.html", context)
 
 
 def package_analysis_view(request, session_id, package_id) -> Any:
-    """Show detailed package analysis with drill-down options."""
-    from analyzer.models import ClassAnalysis, FunctionAnalysis, PackageAnalysis
+            ClassAnalysis,
+        FunctionAnalysis,
+        PackageAnalysis,
+    )
 
     session = get_object_or_404(AnalysisSession, id=session_id)
     package = get_object_or_404(PackageAnalysis, id=package_id, session=session)
 
     # Get package details
-    classes = ClassAnalysis.objects.filter(package_analysis=package).order_by(
-        "-method_count",
+    classes = ClassAnalysis.objects.filter(package_analysis=package).order_by("-method_count",
     )
-    functions = FunctionAnalysis.objects.filter(
-        package_analysis=package,
+    functions = FunctionAnalysis.objects.filter(package_analysis=package,
         class_analysis__isnull=True,
     ).order_by("-cyclomatic_complexity")
 
     # Statistics
-    high_complexity_functions = functions.filter(
-        complexity_level__in=["high", "very_high"],
+    high_complexity_functions = functions.filter(complexity_level__in=["high", "very_high"],
     )
     undocumented_classes = classes.filter(has_docstring=False)
 
-    context = {
-        "session": session,
+    context = {"session": session,
         "package": package,
         "classes": classes,
         "functions": functions,
@@ -396,26 +403,26 @@ def package_analysis_view(request, session_id, package_id) -> Any:
 
 
 def class_analysis_view(request, session_id, class_id) -> Any:
-    """Show detailed class analysis with methods breakdown."""
-    from analyzer.models import ClassAnalysis, FunctionAnalysis, VariableAnalysis
+        ClassAnalysis,
+        FunctionAnalysis,
+        VariableAnalysis,
+    )
 
     session = get_object_or_404(AnalysisSession, id=session_id)
     class_obj = get_object_or_404(ClassAnalysis, id=class_id)
 
     # Get class details
-    methods = FunctionAnalysis.objects.filter(class_analysis=class_obj).order_by(
-        "line_start",
+    methods = FunctionAnalysis.objects.filter(class_analysis=class_obj).order_by("line_start",
     )
-    variables = VariableAnalysis.objects.filter(class_analysis=class_obj).order_by(
-        "line_number",
+    variables = VariableAnalysis.objects.filter(class_analysis=class_obj).order_by("line_number",
     )
 
     # Method statistics
     complex_methods = methods.filter(complexity_level__in=["high", "very_high"])
     undocumented_methods = methods.filter(has_docstring=False)
 
-    context = {
-        "session": session,
+    context = {"session":
+        session,
         "class_obj": class_obj,
         "methods": methods,
         "variables": variables,
@@ -426,19 +433,18 @@ def class_analysis_view(request, session_id, class_id) -> Any:
 
 
 def function_analysis_view(request, session_id, function_id) -> Any:
-    """Show detailed function analysis."""
-    from analyzer.models import FunctionAnalysis, VariableAnalysis
+        FunctionAnalysis,
+        VariableAnalysis,
+    )
 
     session = get_object_or_404(AnalysisSession, id=session_id)
     function = get_object_or_404(FunctionAnalysis, id=function_id)
 
     # Get function variables
-    variables = VariableAnalysis.objects.filter(function_analysis=function).order_by(
-        "line_number",
+    variables = VariableAnalysis.objects.filter(function_analysis=function).order_by("line_number",
     )
 
-    context = {
-        "session": session,
+    context = {"session": session,
         "function": function,
         "variables": variables,
     }
@@ -446,13 +452,9 @@ def function_analysis_view(request, session_id, function_id) -> Any:
 
 
 def analysis_overview(request) -> Any:
-    """Overview of all analysis sessions."""
-    from analyzer.models import AnalysisSession
-
-    sessions = (
+        sessions = (
         AnalysisSession.objects.select_related("flx_project")
-        .prefetch_related(
-            "detected_issues",
+        .prefetch_related("detected_issues",
             "backend_statistics",
         )
         .order_by("-created_at")
@@ -464,14 +466,13 @@ def analysis_overview(request) -> Any:
     failed_count = sessions.filter(status="failed").count()
 
     # Add pagination
-    from django.core.paginator import Paginator
+
 
     paginator = Paginator(sessions, 20)
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
-    context = {
-        "sessions": page_obj,
+    context = {"sessions": page_obj,
         "completed_count": completed_count,
         "running_count": running_count,
         "failed_count": failed_count,
@@ -480,8 +481,6 @@ def analysis_overview(request) -> Any:
 
 
 def hierarchical_report(request, session_id) -> Any:
-    """Generate hierarchical drill-down report."""
-    from analyzer.models import (
         AnalysisSession,
         ClassAnalysis,
         FunctionAnalysis,
@@ -492,79 +491,66 @@ def hierarchical_report(request, session_id) -> Any:
     session = get_object_or_404(AnalysisSession, id=session_id)
 
     # Build hierarchical data structure
-    report_data = {
-        "session": session,
+    report_data = {"session": session,
         "packages": [],
     }
 
     packages = PackageAnalysis.objects.filter(session=session).order_by("name")
 
     for package in packages:
-        package_data = {
-            "package": package,
+            package_data = {"package": package,
             "classes": [],
             "functions": [],
-            "security_issues": SecurityIssue.objects.filter(
-                session=session,
+            "security_issues": SecurityIssue.objects.filter(session=session,
                 file_analysis__package_name=package.name,
             ).count(),
         }
 
         # Get classes in this package
-        classes = ClassAnalysis.objects.filter(package_analysis=package).order_by(
-            "name",
+        classes = ClassAnalysis.objects.filter(package_analysis=package).order_by("name",
         )
 
         for cls in classes:
-            class_data = {
-                "class": cls,
-                "methods": FunctionAnalysis.objects.filter(class_analysis=cls).order_by(
-                    "name",
+            class_data = {"class": cls,
+                "methods": FunctionAnalysis.objects.filter(class_analysis=cls).order_by("name",
                 ),
             }
             package_data["classes"].append(class_data)
 
         # Get standalone functions (not in classes)
-        standalone_functions = FunctionAnalysis.objects.filter(
-            package_analysis=package,
+        standalone_functions = FunctionAnalysis.objects.filter(package_analysis=package,
             class_analysis__isnull=True,
         ).order_by("name")
 
         package_data["functions"] = standalone_functions
         report_data["packages"].append(package_data)
 
-    context = {
-        "report_data": report_data,
+    context = {"report_data": report_data,
         "session": session,
     }
     return render(request, "dashboard/hierarchical_report.html", context)
 
 
 def backend_issues_report(request, session_id) -> Any:
-    """Enhanced report showing backend statistics and detected issues."""
-    session = get_object_or_404(AnalysisSession, id=session_id)
+        session = get_object_or_404(AnalysisSession, id=session_id)
 
     # Get backend statistics
-    backend_stats = session.backend_statistics.all().order_by(
-        "backend__execution_order",
+    backend_stats = session.backend_statistics.all().order_by("backend__execution_order",
     )
 
     # Get detected issues grouped by backend and severity
-    detected_issues = session.detected_issues.select_related(
-        "issue_type__backend",
+    detected_issues = session.detected_issues.select_related("issue_type__backend",
         "file_analysis",
     ).order_by("-detected_at")
 
     # Group issues by backend
     issues_by_backend: dict = {}
     for issue in detected_issues:
-        backend_name = issue.issue_type.backend.name
+            backend_name = issue.issue_type.backend.name
         if backend_name not in issues_by_backend:
-            issues_by_backend[backend_name] = {
-                "backend": issue.issue_type.backend,
+            issues_by_backend[backend_name] = {"backend": issue.issue_type.backend,
                 "issues": [],
-                "severity_counts": {
-                    "CRITICAL": 0,
+                "severity_counts": {"CRITICAL": 0,
                     "HIGH": 0,
                     "MEDIUM": 0,
                     "LOW": 0,
@@ -592,8 +578,7 @@ def backend_issues_report(request, session_id) -> Any:
 
     # Get top issue types
     top_issue_types = (
-        detected_issues.values(
-            "issue_type__code",
+        detected_issues.values("issue_type__code",
             "issue_type__name",
             "issue_type__severity",
         )
@@ -608,8 +593,7 @@ def backend_issues_report(request, session_id) -> Any:
         .order_by("-issue_count")[:10]
     )
 
-    context = {
-        "session": session,
+    context = {"session": session,
         "backend_stats": backend_stats,
         "issues_by_backend": issues_by_backend,
         "detected_issues": detected_issues[:50],  # Latest 50 issues

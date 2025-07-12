@@ -1,52 +1,92 @@
-"""Quality metrics calculation and management."""
+"""Quality metrics calculation and management - Modern Python 3.13 + flext-core patterns."""
 
 from __future__ import annotations
 
-from dataclasses import dataclass
 from typing import Any
 
+from pydantic import Field, computed_field
 
-@dataclass
-class QualityMetrics:
-    """Quality metrics for code analysis."""
+from flext_core.domain.pydantic_base import DomainValueObject
+
+
+class QualityMetrics(DomainValueObject):
+    """Quality metrics for code analysis - REFACTORED to use flext-core patterns."""
 
     # Overall metrics
-    overall_score: float = 0.0
-    quality_grade: str = "F"
+    overall_score: float = Field(
+        0.0,
+        description="Overall quality score (0-100)",
+        ge=0,
+        le=100,
+    )
+    quality_grade: str = Field("F", description="Quality grade letter (A+ to F)")
 
     # File metrics
-    total_files: int = 0
-    total_lines_of_code: int = 0
-    total_functions: int = 0
-    total_classes: int = 0
+    total_files: int = Field(0, description="Total number of files", ge=0)
+    total_lines_of_code: int = Field(0, description="Total lines of code", ge=0)
+    total_functions: int = Field(0, description="Total functions", ge=0)
+    total_classes: int = Field(0, description="Total classes", ge=0)
 
     # Complexity metrics
-    average_complexity: float = 0.0
-    max_complexity: float = 0.0
-    complex_files_count: int = 0
+    average_complexity: float = Field(0.0, description="Average complexity score", ge=0)
+    max_complexity: float = Field(0.0, description="Maximum complexity score", ge=0)
+    complex_files_count: int = Field(0, description="Number of complex files", ge=0)
 
     # Issue counts
-    security_issues_count: int = 0
-    dead_code_items_count: int = 0
-    duplicate_blocks_count: int = 0
-    complexity_issues_count: int = 0
+    security_issues_count: int = Field(0, description="Number of security issues", ge=0)
+    dead_code_items_count: int = Field(0, description="Number of dead code items", ge=0)
+    duplicate_blocks_count: int = Field(
+        0,
+        description="Number of duplicate blocks",
+        ge=0,
+    )
+    complexity_issues_count: int = Field(
+        0,
+        description="Number of complexity issues",
+        ge=0,
+    )
 
     # Scores by category (0-100)
-    complexity_score: float = 100.0
-    security_score: float = 100.0
-    maintainability_score: float = 100.0
-    duplication_score: float = 100.0
-    documentation_score: float = 100.0
+    complexity_score: float = Field(
+        100.0,
+        description="Complexity score (0-100)",
+        ge=0,
+        le=100,
+    )
+    security_score: float = Field(
+        100.0,
+        description="Security score (0-100)",
+        ge=0,
+        le=100,
+    )
+    maintainability_score: float = Field(
+        100.0,
+        description="Maintainability score (0-100)",
+        ge=0,
+        le=100,
+    )
+    duplication_score: float = Field(
+        100.0,
+        description="Duplication score (0-100)",
+        ge=0,
+        le=100,
+    )
+    documentation_score: float = Field(
+        100.0,
+        description="Documentation score (0-100)",
+        ge=0,
+        le=100,
+    )
 
     @classmethod
     def from_analysis_results(cls, results: dict[str, Any]) -> QualityMetrics:
-        """Create metrics from analysis results.
+        """Create QualityMetrics from analysis results dictionary.
 
         Args:
-            results: Analysis results dictionary.
+            results: Analysis results containing metrics and issues data.
 
         Returns:
-            QualityMetrics instance.
+            QualityMetrics instance with calculated scores and metrics.
 
         """
         metrics_data = results.get("metrics", {})
@@ -108,11 +148,44 @@ class QualityMetrics:
             documentation_score=documentation_score,
         )
 
-    def to_dict(self) -> dict[str, Any]:
-        """Convert metrics to dictionary.
+    @computed_field
+    @property
+    def scores_summary(self) -> dict[str, float]:
+        """Get summary of all quality scores by category.
 
         Returns:
-            Dictionary representation of metrics.
+            Dictionary mapping category names to their quality scores.
+
+        """
+        return {
+            "complexity": self.complexity_score,
+            "security": self.security_score,
+            "maintainability": self.maintainability_score,
+            "duplication": self.duplication_score,
+            "documentation": self.documentation_score,
+        }
+
+    @computed_field
+    @property
+    def total_issues(self) -> int:
+        """Get total count of all quality issues.
+
+        Returns:
+            Sum of all issue counts across all categories.
+
+        """
+        return (
+            self.security_issues_count
+            + self.dead_code_items_count
+            + self.duplicate_blocks_count
+            + self.complexity_issues_count
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert metrics to dictionary format.
+
+        Returns:
+            Dictionary representation of all metrics and scores.
 
         """
         return {
@@ -129,20 +202,15 @@ class QualityMetrics:
             "dead_code_items_count": self.dead_code_items_count,
             "duplicate_blocks_count": self.duplicate_blocks_count,
             "complexity_issues_count": self.complexity_issues_count,
-            "scores": {
-                "complexity": self.complexity_score,
-                "security": self.security_score,
-                "maintainability": self.maintainability_score,
-                "duplication": self.duplication_score,
-                "documentation": self.documentation_score,
-            },
+            "total_issues": self.total_issues,
+            "scores": self.scores_summary,
         }
 
     def get_summary(self) -> str:
-        """Get a human-readable summary.
+        """Get human-readable summary of quality metrics.
 
         Returns:
-            Summary string.
+            Formatted string summarizing key metrics and issue counts.
 
         """
         return (
@@ -157,7 +225,6 @@ class QualityMetrics:
 
     @staticmethod
     def _calculate_grade(score: float) -> str:
-        """Calculate letter grade from numeric score."""
         if score >= 95:
             return "A+"
         if score >= 90:

@@ -3,163 +3,73 @@
 from __future__ import annotations
 
 import json
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from flext_quality.metrics import QualityMetrics
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class QualityReport:
     """Generates quality reports from analysis results."""
 
     def __init__(self, analysis_results: dict[str, Any]) -> None:
-        """Initialize report generator.
-
-        Args:
-            analysis_results: Results from CodeAnalyzer.
-
-        """
         self.results = analysis_results
-        self.metrics = QualityMetrics.from_analysis_results(analysis_results)
 
     def generate_text_report(self) -> str:
-        """Generate a text-based quality report.
+        """Generate a text-based quality report."""
+        grade = self._get_quality_grade()
+        score = self._get_quality_score()
+        total_issues = self._get_total_issues()
+        critical_issues = self._get_critical_issues()
 
-        Returns:
-            Formatted text report.
+        report_lines = [
+            "=" * 60,
+            "FLEXT QUALITY REPORT",
+            "=" * 60,
+            f"Overall Grade: {grade}",
+            f"Quality Score: {score}/100",
+            f"Total Issues: {total_issues}",
+            f"Critical Issues: {critical_issues}",
+            f"Files Analyzed: {self._get_files_analyzed()}",
+            f"Code Coverage: {self._get_coverage_percent()}%",
+            "",
+            "ISSUES BY CATEGORY:",
+            "-" * 30,
+        ]
 
-        """
-        lines = []
-
-        # Header
-        lines.append("=" * 60)
-        lines.append("FLEXT QUALITY - CODE ANALYSIS REPORT")
-        lines.append("=" * 60)
-        lines.append("")
-
-        # Project info
-        lines.append(f"Project: {self.results.get('project_path', 'Unknown')}")
-        lines.append(f"Files Analyzed: {self.metrics.total_files:,}")
-        lines.append(f"Total Lines of Code: {self.metrics.total_lines_of_code:,}")
-        lines.append("")
-
-        # Overall score
-        lines.append("OVERALL QUALITY")
-        lines.append("-" * 20)
-        lines.append(f"Grade: {self.metrics.quality_grade}")
-        lines.append(f"Score: {self.metrics.overall_score:.1f}/100")
-        lines.append("")
-
-        # Component scores
-        lines.append("COMPONENT SCORES")
-        lines.append("-" * 20)
-        lines.append(f"Complexity:      {self.metrics.complexity_score:.1f}/100")
-        lines.append(f"Security:        {self.metrics.security_score:.1f}/100")
-        lines.append(f"Maintainability: {self.metrics.maintainability_score:.1f}/100")
-        lines.append(f"Duplication:     {self.metrics.duplication_score:.1f}/100")
-        lines.append(f"Documentation:   {self.metrics.documentation_score:.1f}/100")
-        lines.append("")
-
-        # Code metrics
-        lines.append("CODE METRICS")
-        lines.append("-" * 20)
-        lines.append(f"Functions: {self.metrics.total_functions:,}")
-        lines.append(f"Classes: {self.metrics.total_classes:,}")
-        lines.append(f"Average Complexity: {self.metrics.average_complexity:.1f}")
-        lines.append(f"Max Complexity: {self.metrics.max_complexity:.1f}")
-        lines.append("")
-
-        # Issues summary
-        lines.append("ISSUES FOUND")
-        lines.append("-" * 20)
+        # Add issue details
         issues = self.results.get("issues", {})
+        for category, issue_list in issues.items():
+            if issue_list:
+                report_lines.append(f"\n{category.upper()} ({len(issue_list)} issues):")
+                # Show first 5 issues
+                report_lines.extend(f"  - {issue.get('file', 'Unknown')}: {issue.get('message', 'No message')}" for issue in issue_list[:5])
+                if len(issue_list) > 5:
+                    report_lines.append(f"  ... and {len(issue_list) - 5} more")
 
-        security_issues = issues.get("security", [])
-        if security_issues:
-            lines.append(f"Security Issues: {len(security_issues)}")
-            # Show first 5
-            lines.extend(
-                f"  • {issue.get('message', 'Unknown issue')} ({issue.get('file', 'unknown')})"
-                for issue in security_issues[:5]
-            )
-            if len(security_issues) > 5:
-                lines.append(f"  ... and {len(security_issues) - 5} more")
-            lines.append("")
-
-        complexity_issues = issues.get("complexity", [])
-        if complexity_issues:
-            lines.append(f"Complexity Issues: {len(complexity_issues)}")
-            lines.extend(
-                f"  • {issue.get('message', 'Unknown issue')} ({issue.get('file', 'unknown')})"
-                for issue in complexity_issues[:5]
-            )
-            if len(complexity_issues) > 5:
-                lines.append(f"  ... and {len(complexity_issues) - 5} more")
-            lines.append("")
-
-        dead_code_issues = issues.get("dead_code", [])
-        if dead_code_issues:
-            lines.append(f"Dead Code Issues: {len(dead_code_issues)}")
-            lines.extend(
-                f"  • {issue.get('message', 'Unknown issue')} ({issue.get('file', 'unknown')})"
-                for issue in dead_code_issues[:5]
-            )
-            if len(dead_code_issues) > 5:
-                lines.append(f"  ... and {len(dead_code_issues) - 5} more")
-            lines.append("")
-
-        duplicate_issues = issues.get("duplicates", [])
-        if duplicate_issues:
-            lines.append(f"Duplicate Code Issues: {len(duplicate_issues)}")
-            for issue in duplicate_issues[:3]:
-                files = issue.get("files", [])
-                if len(files) >= 2:
-                    lines.append(f"  • Similar files: {files[0]} & {files[1]}")
-            if len(duplicate_issues) > 3:
-                lines.append(f"  ... and {len(duplicate_issues) - 3} more")
-            lines.append("")
-
-        # Recommendations
-        lines.extend(("RECOMMENDATIONS", "-" * 20))
-
-        recommendations = []
-        if self.metrics.security_issues_count > 0:
-            recommendations.append("• Review and fix security issues immediately")
-        if self.metrics.complexity_issues_count > 0:
-            recommendations.append(
-                "• Refactor complex functions to improve maintainability"
-            )
-        if self.metrics.dead_code_items_count > 0:
-            recommendations.append("• Remove unused code to improve clarity")
-        if self.metrics.duplicate_blocks_count > 0:
-            recommendations.append("• Extract common code into reusable functions")
-        if self.metrics.overall_score < 70:
-            recommendations.append("• Consider implementing code review processes")
-
+        # Add recommendations
+        recommendations = self._generate_recommendations()
         if recommendations:
-            lines.extend(recommendations)
-        else:
-            lines.append("• Code quality is good! Keep up the excellent work.")
+            report_lines.extend([
+                "",
+                "RECOMMENDATIONS:",
+                "-" * 20,
+            ])
+            report_lines.extend(f"• {rec}" for rec in recommendations)
 
-        lines.extend(("", "=" * 60))
-
-        return "\n".join(lines)
+        return "\n".join(report_lines)
 
     def generate_json_report(self) -> str:
-        """Generate a JSON-formatted quality report.
-
-        Returns:
-            JSON report string.
-
-        """
+        """Generate a JSON-formatted quality report."""
         report_data = {
             "summary": {
-                "overall_score": self.metrics.overall_score,
-                "quality_grade": self.metrics.quality_grade,
-                "total_files": self.metrics.total_files,
-                "total_lines_of_code": self.metrics.total_lines_of_code,
+                "grade": self._get_quality_grade(),
+                "score": self._get_quality_score(),
+                "total_issues": self._get_total_issues(),
+                "critical_issues": self._get_critical_issues(),
+                "files_analyzed": self._get_files_analyzed(),
+                "coverage_percent": self._get_coverage_percent(),
             },
-            "metrics": self.metrics.to_dict(),
             "analysis_results": self.results,
             "recommendations": self._generate_recommendations(),
         }
@@ -167,177 +77,208 @@ class QualityReport:
         return json.dumps(report_data, indent=2, default=str)
 
     def generate_html_report(self) -> str:
-        """Generate an HTML-formatted quality report.
+        """Generate an HTML-formatted quality report."""
+        grade_color = self._get_grade_color()
+        quality_grade = self._get_quality_grade()
+        quality_score = self._get_quality_score()
+        total_issues = self._get_total_issues()
+        critical_issues = self._get_critical_issues()
+        files_analyzed = self._get_files_analyzed()
+        coverage_percent = self._get_coverage_percent()
+        issues_html = self._generate_issues_html()
 
-        Returns:
-            HTML report string.
+        # Build HTML with proper string concatenation
+        html_parts = [
+            "<!DOCTYPE html>",
+            '<html lang="en">',
+            "<head>",
+            '    <meta charset="UTF-8">',
+            '    <meta name="viewport" content="width=device-width, initial-scale=1.0">',
+            "    <title>FLEXT Quality Report</title>",
+            "    <style>",
+            "        body { font-family: Arial, sans-serif; margin: 20px; }",
+            "        .header { background: #2c3e50; color: white; padding: 20px; border-radius: 5px; }",
+            "        .summary { margin: 20px 0; }",
+            f"        .grade {{ font-size: 3em; font-weight: bold; color: {grade_color}; }}",
+            "        .score { font-size: 1.5em; }",
+            "        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }",
+            "        .issue { margin: 5px 0; padding: 5px; background: #f8f9fa; border-radius: 3px; }",
+            "        .metric { display: inline-block; margin: 10px; padding: 10px; background: #e9ecef; border-radius: 5px; }",
+            "        .high-severity { background: #ff6b6b; color: white; }",
+            "        .medium-severity { background: #ffa726; color: white; }",
+            "        .low-severity { background: #66bb6a; color: white; }",
+            "    </style>",
+            "</head>",
+            "<body>",
+            '    <div class="header">',
+            "        <h1>FLEXT Quality Report</h1>",
+            "    </div>",
+            "",
+            '    <div class="summary">',
+            f'        <div class="grade">{quality_grade}</div>',
+            f'        <div class="score">Score: {quality_score}/100</div>',
+            "    </div>",
+            "",
+            '    <div class="section">',
+            "        <h2>Quality Metrics</h2>",
+            f'        <div class="metric"><strong>Total Issues:</strong> {total_issues}</div>',
+            f'        <div class="metric"><strong>Critical Issues:</strong> {critical_issues}</div>',
+            f'        <div class="metric"><strong>Files Analyzed:</strong> {files_analyzed}</div>',
+            f'        <div class="metric"><strong>Code Coverage:</strong> {coverage_percent}%</div>',
+            "    </div>",
+            "",
+            f"    {issues_html}",
+            "",
+            '    <div class="section">',
+            "        <h2>Recommendations</h2>",
+            "        <ul>",
+        ]
 
-        """
-        html = f"""
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FLEXT Quality Report</title>
-    <style>
-        body {{ font-family: Arial, sans-serif; margin: 20px; }}
-        .header {{ background: #2c3e50; color: white; padding: 20px; border-radius: 5px; }}
-        .summary {{ margin: 20px 0; }}
-        .grade {{ font-size: 3em; font-weight: bold; color: {self._get_grade_color()}; }}
-        .score {{ font-size: 1.5em; }}
-        .section {{ margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }}
-        .issue {{ margin: 5px 0; padding: 5px; background: #f8f9fa; border-radius: 3px; }}
-        .metric {{ display: inline-block; margin: 10px; padding: 10px; background: #e9ecef; border-radius: 5px; }}
-        .high-severity {{ background: #ff6b6b; color: white; }}
-        .medium-severity {{ background: #ffa726; color: white; }}
-        .low-severity {{ background: #66bb6a; color: white; }}
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>FLEXT Quality Report</h1>
-        <p>Project: {self.results.get("project_path", "Unknown")}</p>
-    </div>
+        # Add recommendations
+        html_parts.extend(f"            <li>{rec}</li>" for rec in self._generate_recommendations())
 
-    <div class="summary">
-        <div class="grade">{self.metrics.quality_grade}</div>
-        <div class="score">{self.metrics.overall_score:.1f}/100</div>
-    </div>
+        html_parts.extend([
+            "        </ul>",
+            "    </div>",
+            "</body>",
+            "</html>",
+        ])
 
-    <div class="section">
-        <h2>Code Metrics</h2>
-        <div class="metric">Files: {self.metrics.total_files:,}</div>
-        <div class="metric">Lines: {self.metrics.total_lines_of_code:,}</div>
-        <div class="metric">Functions: {self.metrics.total_functions:,}</div>
-        <div class="metric">Classes: {self.metrics.total_classes:,}</div>
-        <div class="metric">Avg Complexity: {self.metrics.average_complexity:.1f}</div>
-    </div>
+        return "\n".join(html_parts)
 
-    <div class="section">
-        <h2>Component Scores</h2>
-        <div class="metric">Complexity: {self.metrics.complexity_score:.1f}/100</div>
-        <div class="metric">Security: {self.metrics.security_score:.1f}/100</div>
-        <div class="metric">Maintainability: {self.metrics.maintainability_score:.1f}/100</div>
-        <div class="metric">Duplication: {self.metrics.duplication_score:.1f}/100</div>
-        <div class="metric">Documentation: {self.metrics.documentation_score:.1f}/100</div>
-    </div>
-
-    {self._generate_issues_html()}
-
-    <div class="section">
-        <h2>Recommendations</h2>
-        <ul>
-        """
-
-        for rec in self._generate_recommendations():
-            html += f"<li>{rec}</li>"
-
-        html += """
-        </ul>
-    </div>
-</body>
-</html>
-        """
-
-        return html
-
-    def save_report(self, output_path: str | Path, format: str = "text") -> None:
-        """Save report to file.
-
-        Args:
-            output_path: Path to save the report.
-            format: Report format ("text", "json", or "html").
-
-        """
-        output_path = Path(output_path)
-
-        if format == "text":
-            content = self.generate_text_report()
-        elif format == "json":
+    def save_report(self, output_path: Path, format_type: str = "text") -> None:
+        """Save report to file."""
+        if format_type == "json":
             content = self.generate_json_report()
-        elif format == "html":
+        elif format_type == "html":
             content = self.generate_html_report()
         else:
-            msg = f"Unsupported format: {format}"
-            raise ValueError(msg)
+            content = self.generate_text_report()
 
-        with open(output_path, "w", encoding="utf-8") as f:
-            f.write(content)
+        output_path.write_text(content, encoding="utf-8")
+
+    def _get_quality_grade(self) -> str:
+        """Calculate quality grade."""
+        score = self._get_quality_score()
+        if score >= 90:
+            return "A"
+        if score >= 80:
+            return "B"
+        if score >= 70:
+            return "C"
+        if score >= 60:
+            return "D"
+        return "F"
+
+    def _get_quality_score(self) -> int:
+        """Calculate overall quality score."""
+        # Simple scoring based on issue count
+        total_issues = self._get_total_issues()
+        critical_issues = self._get_critical_issues()
+
+        # Base score of 100, subtract points for issues
+        score = 100
+        score -= critical_issues * 10  # Critical issues cost 10 points each
+        score -= (total_issues - critical_issues) * 2  # Other issues cost 2 points each
+
+        return max(0, score)
+
+    def _get_grade_color(self) -> str:
+        """Get color for the grade."""
+        grade = self._get_quality_grade()
+        colors = {
+            "A": "#2e7d32",
+            "B": "#388e3c",
+            "C": "#f57c00",
+            "D": "#f44336",
+            "F": "#d32f2f",
+        }
+        return colors.get(grade, "#757575")
+
+    def _get_total_issues(self) -> int:
+        """Get total number of issues."""
+        issues = self.results.get("issues", {})
+        return sum(len(issue_list) for issue_list in issues.values())
+
+    def _get_critical_issues(self) -> int:
+        """Get number of critical issues."""
+        issues = self.results.get("issues", {})
+        critical_categories = ["security", "errors", "critical"]
+        return sum(
+            len(issues.get(category, []))
+            for category in critical_categories
+        )
+
+    def _get_files_analyzed(self) -> int:
+        """Get number of files analyzed."""
+        return self.results.get("metrics", {}).get("files_analyzed", 0)
+
+    def _get_coverage_percent(self) -> float:
+        """Get code coverage percentage."""
+        return self.results.get("metrics", {}).get("coverage_percent", 0.0)
+
+    def _generate_issues_html(self) -> str:
+        """Generate HTML for issues section."""
+        html_parts = []
+        issues = self.results.get("issues", {})
+
+        for category, issue_list in issues.items():
+            if not issue_list:
+                continue
+
+            html_parts.extend([
+                '    <div class="section">',
+                f"        <h2>{category.title()} Issues ({len(issue_list)})</h2>",
+            ])
+
+            for issue in issue_list[:10]:  # Show first 10 issues
+                severity = issue.get("severity", "low")
+                file_path = issue.get("file", "Unknown")
+                message = issue.get("message", "No message")
+                line = issue.get("line", "")
+                line_info = f" (line {line})" if line else ""
+
+                html_parts.append(
+                    f'        <div class="issue {severity}-severity">'
+                    f'<strong>{file_path}{line_info}:</strong> {message}</div>',
+                )
+
+            if len(issue_list) > 10:
+                html_parts.append(f'        <div class="issue">... and {len(issue_list) - 10} more issues</div>')
+
+            html_parts.append("    </div>")
+
+        return "\n".join(html_parts)
 
     def _generate_recommendations(self) -> list[str]:
         """Generate recommendations based on analysis results."""
         recommendations = []
 
-        if self.metrics.security_issues_count > 0:
-            recommendations.append("Review and fix security issues immediately")
+        total_issues = self._get_total_issues()
+        critical_issues = self._get_critical_issues()
+        score = self._get_quality_score()
 
-        if self.metrics.complexity_issues_count > 0:
-            recommendations.append(
-                "Refactor complex functions to improve maintainability"
-            )
+        if critical_issues > 0:
+            recommendations.append(f"Fix {critical_issues} critical security/error issues immediately")
 
-        if self.metrics.dead_code_items_count > 0:
-            recommendations.append("Remove unused code to improve clarity")
+        if total_issues > 50:
+            recommendations.append("Consider breaking down large files and reducing complexity")
 
-        if self.metrics.duplicate_blocks_count > 0:
-            recommendations.append("Extract common code into reusable functions")
+        if score < 70:
+            recommendations.extend(("Implement automated code quality checks in your CI/CD pipeline", "Add comprehensive unit tests to improve coverage"))
 
-        if self.metrics.overall_score < 70:
-            recommendations.append("Consider implementing code review processes")
+        coverage = self._get_coverage_percent()
+        if coverage < 80:
+            recommendations.append(f"Increase test coverage from {coverage}% to at least 80%")
+
+        issues = self.results.get("issues", {})
+        if issues.get("duplicates"):
+            recommendations.append("Refactor duplicate code to improve maintainability")
+
+        if issues.get("complexity"):
+            recommendations.append("Simplify complex functions and classes")
 
         if not recommendations:
-            recommendations.append("Code quality is good! Keep up the excellent work.")
+            recommendations.append("Great job! Your code quality is excellent. Keep up the good work!")
 
         return recommendations
-
-    def _get_grade_color(self) -> str:
-        """Get color for quality grade."""
-        grade = self.metrics.quality_grade
-        if grade.startswith("A"):
-            return "#4CAF50"  # Green
-        if grade.startswith("B"):
-            return "#2196F3"  # Blue
-        if grade.startswith("C"):
-            return "#FF9800"  # Orange
-        if grade.startswith("D"):
-            return "#FF5722"  # Red-Orange
-        return "#F44336"  # Red
-
-    def _generate_issues_html(self) -> str:
-        """Generate HTML for issues section."""
-        html = ""
-        issues = self.results.get("issues", {})
-
-        for issue_type, issue_list in issues.items():
-            if issue_list:
-                html += f"""
-    <div class="section">
-        <h2>{issue_type.title()} Issues ({len(issue_list)})</h2>
-                """
-
-                for issue in issue_list[:10]:  # Show first 10
-                    severity_class = self._get_severity_class(
-                        issue.get("severity", "low")
-                    )
-                    html += f"""
-        <div class="issue {severity_class}">
-            <strong>{issue.get("message", "Unknown issue")}</strong><br>
-            File: {issue.get("file", "unknown")}
-        </div>
-                    """
-
-                if len(issue_list) > 10:
-                    html += f"<p>... and {len(issue_list) - 10} more issues</p>"
-
-                html += "</div>"
-
-        return html
-
-    def _get_severity_class(self, severity: str) -> str:
-        """Get CSS class for severity level."""
-        if severity == "high":
-            return "high-severity"
-        if severity == "medium":
-            return "medium-severity"
-        return "low-severity"

@@ -95,7 +95,7 @@ repos:
         name: "🔍 Type checking (MyPy)"
         args: ["--config-file=pyproject.toml", "--strict"]
         language_version: python3.13
-        additional_dependencies: 
+        additional_dependencies:
           - types-requests
           - types-setuptools
           - types-python-dateutil
@@ -173,7 +173,7 @@ repos:
     hooks:
       - id: python-safety-dependencies-check
         name: "🔍 Check dependencies for vulnerabilities"
-        args: ["--ignore=70612"]  # Ignore jinja2 vulnerability in development
+        args: ["--ignore=70612"] # Ignore jinja2 vulnerability in development
 
   # ===== COMMIT STANDARDS =====
   - repo: https://github.com/commitizen-tools/commitizen
@@ -229,7 +229,7 @@ repos:
         language: system
         files: ^pyproject\.toml$
         pass_filenames: false
-      
+
       - id: poetry-lock-check
         name: "🔒 Check Poetry lock file"
         entry: poetry lock --check
@@ -246,16 +246,16 @@ default_language_version:
 ci:
   autofix_commit_msg: |
     🔧 auto-fix(pre-commit): apply automatic fixes
-    
+
     [skip ci]
   autofix_prs: true
-  autoupdate_branch: ''
-  autoupdate_commit_msg: '🔄 chore(deps): update pre-commit hooks'
+  autoupdate_branch: ""
+  autoupdate_commit_msg: "🔄 chore(deps): update pre-commit hooks"
   autoupdate_schedule: weekly
   skip:
-    - mypy  # Skip MyPy in CI as it's run separately
-    - interrogate  # Skip docstring check in CI
-    - python-safety-dependencies-check  # Skip safety in CI as it's run separately
+    - mypy # Skip MyPy in CI as it's run separately
+    - interrogate # Skip docstring check in CI
+    - python-safety-dependencies-check # Skip safety in CI as it's run separately
 
 # ===== FLEXT STANDARDS COMPLIANCE =====
 # This configuration ensures:

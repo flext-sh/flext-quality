@@ -21,12 +21,12 @@ urlpatterns = [
 
 # Serve static and media files in development
 if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+            urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-    # Add Django Debug Toolbar if installed
+    # Add Django Debug Toolbar if installed:
     try:
-        import debug_toolbar  # type: ignore[import-not-found]
+            import debug_toolbar  # type: ignore[import-not-found]
 
         urlpatterns += [
             path("__debug__/", include(debug_toolbar.urls)),

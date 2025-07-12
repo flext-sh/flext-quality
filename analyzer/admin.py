@@ -1,17 +1,15 @@
-"""Django REDACTED_LDAP_BIND_PASSWORD configuration for analyzer models."""
+"""Django REDACTED_LDAP_BIND_PASSWORD configuration for analyzer models.
 
 from __future__ import annotations
 
 from typing import Any, ClassVar
-
-from django.contrib import REDACTED_LDAP_BIND_PASSWORD
-from django.utils.html import format_html
 
 from analyzer.models import (
     AnalysisBackendModel,
     AnalysisSession,
     BackendStatistics,
     ClassAnalysis,
+    ClassVar,
     DeadCodeIssue,
     DetectedIssue,
     DuplicateCodeBlock,
@@ -25,15 +23,18 @@ from analyzer.models import (
     QualityMetrics,
     SecurityIssue,
     VariableAnalysis,
+    from,
+    import,
+    typing,
 )
+from django.contrib import REDACTED_LDAP_BIND_PASSWORD
+from django.utils.html import format_html
 
 
-@REDACTED_LDAP_BIND_PASSWORD.register(Project)
-class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
-    """Admin interface for Project model."""
+@REDACTED_LDAP_BIND_PASSWORD.register(Project)  class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
+             """Admin interface for Project model."""
 
-    list_display: ClassVar[list[str]] = [
-        "name",
+    list_display: ClassVar[list[str]] = ["name",
         "package_name",
         "package_version",
         "package_type",
@@ -43,8 +44,7 @@ class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         "created_at",
         "updated_at",
     ]
-    list_filter: ClassVar[list[str]] = [
-        "package_type",
+    list_filter: ClassVar[list[str]] = ["package_type",
         "is_installed_package",
         "created_at",
         "updated_at",
@@ -60,8 +60,7 @@ class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         ),
         (
             "Package Information",
-            {
-                "fields": (
+            {"fields": (
                     "package_name",
                     "package_version",
                     "is_installed_package",
@@ -78,16 +77,15 @@ class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
     )
 
     def latest_score(self, obj) -> str:
-        """Display latest analysis score."""
         latest = obj.analysis_sessions.first()
         if latest and latest.overall_score:
             color = (
                 "green"
-                if latest.overall_score >= 80
-                else "orange" if latest.overall_score >= 60 else "red"
-            )
-            return format_html(
-                '<span style="color: {}; font-weight: bold;">{:.1f} ({})</span>',
+                if latest.overall_score >= 80 else "orange" if latest.overall_score >= 60 else "red":
+                    )
+            return format_html('<span style="color: {}
+                font-weight: bold
+                ">{:.1f} ({})</span>',
                 color,
                 latest.overall_score,
                 latest.quality_grade or "N/A",
@@ -99,13 +97,13 @@ class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 
 class FileAnalysisInline(REDACTED_LDAP_BIND_PASSWORD.TabularInline):
-    """Inline REDACTED_LDAP_BIND_PASSWORD for FileAnalysis."""
+         """Inline REDACTED_LDAP_BIND_PASSWORD for FileAnalysis."""
 
     model = FileAnalysis
     extra = 0
-    readonly_fields: ClassVar = ["created_at"]
-    fields: ClassVar = [
-        "file_name",
+    readonly_fields:
+            ClassVar = ["created_at"]
+    fields: ClassVar = ["file_name",
         "lines_of_code",
         "complexity_score",
         "function_count",
@@ -114,13 +112,13 @@ class FileAnalysisInline(REDACTED_LDAP_BIND_PASSWORD.TabularInline):
 
 
 class SecurityIssueInline(REDACTED_LDAP_BIND_PASSWORD.TabularInline):
-    """Inline REDACTED_LDAP_BIND_PASSWORD for SecurityIssue."""
+         """Inline REDACTED_LDAP_BIND_PASSWORD for SecurityIssue."""
 
     model = SecurityIssue
     extra = 0
-    readonly_fields: ClassVar = ["created_at"]
-    fields: ClassVar = [
-        "severity",
+    readonly_fields:
+            ClassVar = ["created_at"]
+    fields: ClassVar = ["severity",
         "issue_type",
         "file_path",
         "line_number",
@@ -130,26 +128,24 @@ class SecurityIssueInline(REDACTED_LDAP_BIND_PASSWORD.TabularInline):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(AnalysisSession)
 class AnalysisSessionAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
-    """Admin interface for AnalysisSession model."""
+         """Admin interface for AnalysisSession model."""
 
-    list_display: ClassVar = [
-        "id",
+    list_display:
+            ClassVar = ["id",
         "flx_project",
         "status_badge",
         "overall_score_badge",
         "duration_display",
         "created_at",
     ]
-    list_filter: ClassVar = [
-        "status",
+    list_filter: ClassVar = ["status",
         "include_security",
         "include_dead_code",
         "include_duplicates",
         "created_at",
     ]
     search_fields: ClassVar = ["flx_project__name", "id"]
-    readonly_fields: ClassVar = [
-        "id",
+    readonly_fields: ClassVar = ["id",
         "started_at",
         "completed_at",
         "created_at",
@@ -166,8 +162,7 @@ class AnalysisSessionAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         ),
         (
             "Analysis Configuration",
-            {
-                "fields": (
+            {"fields": (
                     "include_security",
                     "include_dead_code",
                     "include_duplicates",
@@ -180,14 +175,12 @@ class AnalysisSessionAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         ),
         (
             "Results",
-            {
-                "fields": ("overall_score", "quality_grade"),
+            {"fields": ("overall_score", "quality_grade"),
             },
         ),
         (
             "Timestamps",
-            {
-                "fields": (
+            {"fields": (
                     "created_at",
                     "started_at",
                     "completed_at",
@@ -201,17 +194,16 @@ class AnalysisSessionAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
     inlines: ClassVar = [SecurityIssueInline]
 
     def status_badge(self, obj) -> str:
-        """Display status with color coding."""
-        colors = {
-            "pending": "orange",
+        colors = {"pending": "orange",
             "running": "blue",
             "completed": "green",
             "failed": "red",
             "cancelled": "gray",
         }
         color = colors.get(obj.status, "gray")
-        return format_html(
-            '<span style="color: {}; font-weight: bold;">{}</span>',
+        return format_html('<span style="color: {}
+            font-weight: bold
+            ">{}</span>',
             color,
             obj.get_status_display(),
         )
@@ -220,17 +212,16 @@ class AnalysisSessionAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
     status_badge.REDACTED_LDAP_BIND_PASSWORD_order_field = "status"
 
     def overall_score_badge(self, obj) -> str:
-        """Display overall score with color coding."""
         if obj.overall_score is None:
             return "-"
 
         color = (
             "green"
-            if obj.overall_score >= 80
-            else "orange" if obj.overall_score >= 60 else "red"
-        )
-        return format_html(
-            '<span style="color: {}; font-weight: bold;">{:.1f}</span>',
+            if obj.overall_score >= 80 else "orange" if obj.overall_score >= 60 else "red":
+                )
+        return format_html('<span style="color: {}
+            font-weight: bold
+            ">{:.1f}</span>',
             color,
             obj.overall_score,
         )
@@ -239,7 +230,6 @@ class AnalysisSessionAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
     overall_score_badge.REDACTED_LDAP_BIND_PASSWORD_order_field = "overall_score"
 
     def duration_display(self, obj) -> str:
-        """Display session duration."""
         duration = obj.duration
         if duration is None:
             return "-"
@@ -257,10 +247,10 @@ class AnalysisSessionAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(FileAnalysis)
 class FileAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
-    """Admin interface for FileAnalysis model."""
+         """Admin interface for FileAnalysis model."""
 
-    list_display: ClassVar = [
-        "file_name",
+    list_display:
+            ClassVar = ["file_name",
         "session",
         "lines_of_code",
         "complexity_score_badge",
@@ -268,8 +258,7 @@ class FileAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         "class_count",
         "created_at",
     ]
-    list_filter: ClassVar = [
-        "session__flx_project",
+    list_filter: ClassVar = ["session__flx_project",
         "session__status",
         "created_at",
     ]
@@ -278,11 +267,12 @@ class FileAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
     ordering: ClassVar = ["-complexity_score"]
 
     def complexity_score_badge(self, obj) -> str:
-        """Display complexity score with color coding."""
         score = obj.complexity_score
-        color = "green" if score >= 80 else "orange" if score >= 60 else "red"
-        return format_html(
-            '<span style="color: {}; font-weight: bold;">{:.1f}</span>',
+        color = "green" if score >= 80 else "orange" if score >= 60 else "red":
+        return format_html('<span style="color:
+            {}
+            font-weight: bold
+            ">{:.1f}</span>',
             color,
             score,
         )
@@ -293,10 +283,10 @@ class FileAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(SecurityIssue)
 class SecurityIssueAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
-    """Admin interface for SecurityIssue model."""
+         """Admin interface for SecurityIssue model."""
 
-    list_display: ClassVar = [
-        "severity_badge",
+    list_display:
+            ClassVar = ["severity_badge",
         "issue_type",
         "file_path",
         "line_number",
@@ -304,8 +294,7 @@ class SecurityIssueAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         "is_resolved",
         "created_at",
     ]
-    list_filter: ClassVar = [
-        "severity",
+    list_filter: ClassVar = ["severity",
         "confidence",
         "issue_type",
         "is_resolved",
@@ -326,24 +315,22 @@ class SecurityIssueAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         ("Resolution", {"fields": ("is_resolved", "resolved_at", "resolution_notes")}),
         (
             "Metadata",
-            {
-                "fields": ("session", "file_analysis", "created_at"),
+            {"fields": ("session", "file_analysis", "created_at"),
                 "classes": ("collapse",),
             },
         ),
     )
 
     def severity_badge(self, obj) -> str:
-        """Display severity with color coding."""
-        colors = {
-            "HIGH": "red",
+        colors = {"HIGH": "red",
             "MEDIUM": "orange",
             "LOW": "green",
             "INFO": "blue",
         }
         color = colors.get(obj.severity, "gray")
-        return format_html(
-            '<span style="color: {}; font-weight: bold;">{}</span>',
+        return format_html('<span style="color: {}
+            font-weight: bold
+            ">{}</span>',
             color,
             obj.severity,
         )
@@ -354,10 +341,10 @@ class SecurityIssueAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(DeadCodeIssue)
 class DeadCodeIssueAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
-    """Admin interface for DeadCodeIssue model."""
+         """Admin interface for DeadCodeIssue model."""
 
-    list_display: ClassVar = [
-        "dead_type",
+    list_display:
+            ClassVar = ["dead_type",
         "name",
         "file_path",
         "line_number",
@@ -366,8 +353,7 @@ class DeadCodeIssueAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         "is_resolved",
         "created_at",
     ]
-    list_filter: ClassVar = [
-        "dead_type",
+    list_filter: ClassVar = ["dead_type",
         "is_resolved",
         "session__flx_project",
         "created_at",
@@ -377,13 +363,14 @@ class DeadCodeIssueAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
     ordering: ClassVar = ["-confidence", "-size_estimate"]
 
     def confidence_badge(self, obj) -> str:
-        """Display confidence with color coding."""
         confidence = obj.confidence
         color = (
-            "green" if confidence >= 0.8 else "orange" if confidence >= 0.6 else "red"
+            "green" if confidence >= 0.8 else "orange" if confidence >= 0.6 else "red":
         )
-        return format_html(
-            '<span style="color: {}; font-weight: bold;">{:.1%}</span>',
+        return format_html('<span style="color:
+            {}
+            font-weight: bold
+            ">{:.1%}</span>',
             color,
             confidence,
         )
@@ -393,27 +380,27 @@ class DeadCodeIssueAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 
 class DuplicateLocationInline(REDACTED_LDAP_BIND_PASSWORD.TabularInline):
-    """Inline REDACTED_LDAP_BIND_PASSWORD for DuplicateLocation."""
+         """Inline REDACTED_LDAP_BIND_PASSWORD for DuplicateLocation."""
 
     model = DuplicateLocation
     extra = 0
-    fields: ClassVar = ["file_path", "start_line", "end_line", "function_name"]
+    fields:
+            ClassVar = ["file_path", "start_line", "end_line", "function_name"]
 
 
 @REDACTED_LDAP_BIND_PASSWORD.register(DuplicateCodeBlock)
 class DuplicateCodeBlockAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
-    """Admin interface for DuplicateCodeBlock model."""
+         """Admin interface for DuplicateCodeBlock model."""
 
-    list_display: ClassVar = [
-        "session",
+    list_display:
+            ClassVar = ["session",
         "lines_count",
         "similarity_score_badge",
         "locations_count",
         "is_resolved",
         "created_at",
     ]
-    list_filter: ClassVar = [
-        "is_resolved",
+    list_filter: ClassVar = ["is_resolved",
         "session__flx_project",
         "created_at",
     ]
@@ -432,19 +419,19 @@ class DuplicateCodeBlockAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         ("Resolution", {"fields": ("is_resolved", "resolved_at")}),
         (
             "Metadata",
-            {
-                "fields": ("session", "created_at", "locations_count"),
+            {"fields": ("session", "created_at", "locations_count"),
                 "classes": ("collapse",),
             },
         ),
     )
 
     def similarity_score_badge(self, obj) -> str:
-        """Display similarity score with color coding."""
         score = obj.similarity_score
-        color = "red" if score >= 0.9 else "orange" if score >= 0.8 else "green"
-        return format_html(
-            '<span style="color: {}; font-weight: bold;">{:.1%}</span>',
+        color = "red" if score >= 0.9 else "orange" if score >= 0.8 else "green":
+        return format_html('<span style="color:
+            {}
+            font-weight: bold
+            ">{:.1%}</span>',
             color,
             score,
         )
@@ -453,7 +440,6 @@ class DuplicateCodeBlockAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
     similarity_score_badge.REDACTED_LDAP_BIND_PASSWORD_order_field = "similarity_score"
 
     def locations_count(self, obj) -> int:
-        """Get count of locations for this duplicate block."""
         return obj.locations.count()
 
     locations_count.short_description = "Locations"
@@ -461,18 +447,17 @@ class DuplicateCodeBlockAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(QualityMetrics)
 class QualityMetricsAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
-    """Admin interface for QualityMetrics model."""
+         """Admin interface for QualityMetrics model."""
 
-    list_display: ClassVar = [
-        "session",
+    list_display:
+            ClassVar = ["session",
         "overall_score_badge",
         "security_score",
         "complexity_score",
         "technical_debt_ratio",
         "created_at",
     ]
-    list_filter: ClassVar = [
-        "session__flx_project",
+    list_filter: ClassVar = ["session__flx_project",
         "created_at",
     ]
     readonly_fields: ClassVar = ["created_at"]
@@ -482,8 +467,7 @@ class QualityMetricsAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         ("Overall Quality", {"fields": ("overall_score", "session")}),
         (
             "Component Scores",
-            {
-                "fields": (
+            {"fields": (
                     "complexity_score",
                     "maintainability_score",
                     "security_score",
@@ -494,8 +478,7 @@ class QualityMetricsAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         ),
         (
             "Size Metrics",
-            {
-                "fields": (
+            {"fields": (
                     "total_files",
                     "total_lines",
                     "total_functions",
@@ -505,8 +488,7 @@ class QualityMetricsAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         ),
         (
             "Complexity Metrics",
-            {
-                "fields": (
+            {"fields": (
                     "avg_complexity",
                     "max_complexity",
                     "complex_functions_count",
@@ -515,8 +497,7 @@ class QualityMetricsAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         ),
         (
             "Quality Indicators",
-            {
-                "fields": (
+            {"fields": (
                     "docstring_coverage",
                     "documented_functions",
                     "security_issues_count",
@@ -528,8 +509,7 @@ class QualityMetricsAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         ),
         (
             "Technical Debt",
-            {
-                "fields": (
+            {"fields": (
                     "technical_debt_ratio",
                     "estimated_debt_hours",
                 ),
@@ -539,11 +519,12 @@ class QualityMetricsAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
     )
 
     def overall_score_badge(self, obj) -> str:
-        """Display overall score with color coding."""
         score = obj.overall_score
-        color = "green" if score >= 80 else "orange" if score >= 60 else "red"
-        return format_html(
-            '<span style="color: {}; font-weight: bold;">{:.1f}</span>',
+        color = "green" if score >= 80 else "orange" if score >= 60 else "red":
+        return format_html('<span style="color:
+            {}
+            font-weight: bold
+            ">{:.1f}</span>',
             color,
             score,
         )
@@ -554,7 +535,7 @@ class QualityMetricsAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(PackageAnalysis)
 class PackageAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
-    """TODO: Add docstring."""
+         """TODO: Add docstring."""
 
     list_display = (
         "name",
@@ -571,7 +552,7 @@ class PackageAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(ClassAnalysis)
 class ClassAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
-    """TODO: Add docstring."""
+         """TODO: Add docstring."""
 
     list_display = (
         "name",
@@ -587,7 +568,7 @@ class ClassAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(FunctionAnalysis)
 class FunctionAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
-    """TODO: Add docstring."""
+         """TODO: Add docstring."""
 
     list_display = (
         "name",
@@ -608,7 +589,7 @@ class FunctionAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(VariableAnalysis)
 class VariableAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
-    """TODO: Add docstring."""
+         """TODO: Add docstring."""
 
     list_display = ("name", "variable_type", "scope_type", "is_constant", "is_unused")
     list_filter = ("variable_type", "scope_type", "is_constant", "is_unused")
@@ -618,7 +599,7 @@ class VariableAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(ImportAnalysis)
 class ImportAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
-    """TODO: Add docstring."""
+         """TODO: Add docstring."""
 
     list_display = (
         "module_name",
@@ -637,10 +618,9 @@ class ImportAnalysisAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(AnalysisBackendModel)
 class AnalysisBackendModelAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
-    """TODO: Add docstring."""
+         """TODO: Add docstring."""
 
-    list_display: ClassVar = [
-        "name",
+    list_display: ClassVar = ["name",
         "display_name",
         "is_active",
         "is_available",
@@ -652,18 +632,14 @@ class AnalysisBackendModelAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
     readonly_fields: ClassVar = ["created_at", "updated_at", "last_check_at"]
     ordering: ClassVar = ["execution_order", "name"]
 
-    fieldsets: ClassVar = [
-        (
+    fieldsets: ClassVar = [(
             "Basic Information",
-            {
-                "fields": ["name", "display_name", "description", "version"],
+            {"fields": ["name", "display_name", "description", "version"],
             },
         ),
         (
             "Configuration",
-            {
-                "fields": [
-                    "is_active",
+            {"fields": ["is_active",
                     "is_available",
                     "default_enabled",
                     "execution_order",
@@ -673,8 +649,7 @@ class AnalysisBackendModelAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         ),
         (
             "Metadata",
-            {
-                "fields": ["created_at", "updated_at", "last_check_at"],
+            {"fields": ["created_at", "updated_at", "last_check_at"],
                 "classes": ["collapse"],
             },
         ),
@@ -683,18 +658,16 @@ class AnalysisBackendModelAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(IssueType)
 class IssueTypeAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
-    """TODO: Add docstring."""
+         """TODO: Add docstring."""
 
-    list_display: ClassVar = [
-        "code",
+    list_display: ClassVar = ["code",
         "name",
         "backend",
         "category",
         "severity",
         "is_active",
     ]
-    list_filter: ClassVar = [
-        "backend",
+    list_filter: ClassVar = ["backend",
         "category",
         "severity",
         "is_active",
@@ -704,30 +677,25 @@ class IssueTypeAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
     readonly_fields: ClassVar = ["created_at", "updated_at"]
     ordering: ClassVar = ["backend__name", "code"]
 
-    fieldsets: ClassVar = [
-        (
+    fieldsets: ClassVar = [(
             "Basic Information",
-            {
-                "fields": ["backend", "code", "name", "description"],
+            {"fields": ["backend", "code", "name", "description"],
             },
         ),
         (
             "Classification",
-            {
-                "fields": ["category", "severity", "is_active"],
+            {"fields": ["category", "severity", "is_active"],
             },
         ),
         (
             "Documentation",
-            {
-                "fields": ["recommendation", "documentation_url", "examples"],
+            {"fields": ["recommendation", "documentation_url", "examples"],
                 "classes": ["collapse"],
             },
         ),
         (
             "Metadata",
-            {
-                "fields": ["created_at", "updated_at"],
+            {"fields": ["created_at", "updated_at"],
                 "classes": ["collapse"],
             },
         ),
@@ -736,18 +704,16 @@ class IssueTypeAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(DetectedIssue)
 class DetectedIssueAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
-    """TODO: Add docstring."""
+         """TODO: Add docstring."""
 
-    list_display: ClassVar = [
-        "issue_type_code",
+    list_display: ClassVar = ["issue_type_code",
         "file_path",
         "line_number",
         "severity",
         "is_resolved",
         "detected_at",
     ]
-    list_filter: ClassVar = [
-        "issue_type__backend",
+    list_filter: ClassVar = ["issue_type__backend",
         "issue_type__category",
         "issue_type__severity",
         "is_resolved",
@@ -755,8 +721,7 @@ class DetectedIssueAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         "confidence",
         "detected_at",
     ]
-    search_fields: ClassVar = [
-        "file_path",
+    search_fields: ClassVar = ["file_path",
         "message",
         "issue_type__code",
         "issue_type__name",
@@ -766,37 +731,30 @@ class DetectedIssueAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
     ordering: ClassVar = ["-detected_at"]
 
     def issue_type_code(self, obj) -> Any:
-        """TODO: Add docstring."""
         return obj.issue_type.code
 
     issue_type_code.short_description = "Issue Code"
     issue_type_code.REDACTED_LDAP_BIND_PASSWORD_order_field = "issue_type__code"
 
     def severity(self, obj) -> Any:
-        """TODO: Add docstring."""
         return obj.issue_type.severity
 
     severity.short_description = "Severity"
     severity.REDACTED_LDAP_BIND_PASSWORD_order_field = "issue_type__severity"
 
-    fieldsets: ClassVar = [
-        (
+    fieldsets: ClassVar = [(
             "Issue Information",
-            {
-                "fields": ["session", "issue_type", "file_analysis"],
+            {"fields": ["session", "issue_type", "file_analysis"],
             },
         ),
         (
             "Location",
-            {
-                "fields": ["file_path", "line_number", "column"],
+            {"fields": ["file_path", "line_number", "column"],
             },
         ),
         (
             "Details",
-            {
-                "fields": [
-                    "message",
+            {"fields": ["message",
                     "code_snippet",
                     "confidence",
                     "context",
@@ -807,16 +765,13 @@ class DetectedIssueAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         ),
         (
             "Classification",
-            {
-                "fields": ["backend_name", "category", "severity"],
+            {"fields": ["backend_name", "category", "severity"],
                 "classes": ["collapse"],
             },
         ),
         (
             "Resolution",
-            {
-                "fields": [
-                    "is_false_positive",
+            {"fields": ["is_false_positive",
                     "is_resolved",
                     "resolved_at",
                     "resolution_notes",
@@ -825,8 +780,7 @@ class DetectedIssueAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         ),
         (
             "Metadata",
-            {
-                "fields": ["detected_at"],
+            {"fields": ["detected_at"],
                 "classes": ["collapse"],
             },
         ),
@@ -835,10 +789,9 @@ class DetectedIssueAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
 
 @REDACTED_LDAP_BIND_PASSWORD.register(BackendStatistics)
 class BackendStatisticsAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
-    """TODO: Add docstring."""
+         """TODO: Add docstring."""
 
-    list_display: ClassVar = [
-        "backend",
+    list_display: ClassVar = ["backend",
         "session",
         "status",
         "execution_time",
@@ -852,37 +805,31 @@ class BackendStatisticsAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
     date_hierarchy = "created_at"
     ordering: ClassVar = ["-created_at"]
 
-    fieldsets: ClassVar = [
-        (
+    fieldsets: ClassVar = [(
             "Basic Information",
-            {
-                "fields": ["session", "backend", "status"],
+            {"fields": ["session", "backend", "status"],
             },
         ),
         (
             "Execution Metrics",
-            {
-                "fields": ["execution_time", "files_processed", "issues_found"],
+            {"fields": ["execution_time", "files_processed", "issues_found"],
             },
         ),
         (
             "Results Breakdown",
-            {
-                "fields": ["issues_by_severity", "issues_by_category"],
+            {"fields": ["issues_by_severity", "issues_by_category"],
                 "classes": ["collapse"],
             },
         ),
         (
             "Error Information",
-            {
-                "fields": ["error_message"],
+            {"fields": ["error_message"],
                 "classes": ["collapse"],
             },
         ),
         (
             "Metadata",
-            {
-                "fields": ["created_at"],
+            {"fields": ["created_at"],
                 "classes": ["collapse"],
             },
         ),

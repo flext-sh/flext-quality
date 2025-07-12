@@ -182,9 +182,6 @@ ignore = ["E501", "PLR0913", "PLR2004"]
 "tests/*" = ["S101", "PLR2004", "ARG001"]
 "scripts/*" = ["T201", "T203"]
 
-[tool.ruff.lint.pydocstyle]
-convention = "google"
-
 [tool.mypy]
 python_version = "3.13"
 strict = true

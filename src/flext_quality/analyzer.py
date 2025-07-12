@@ -3,23 +3,18 @@
 from __future__ import annotations
 
 import ast
-import logging
 from pathlib import Path
 from typing import Any
 
-logger = logging.getLogger(__name__)
+from flext_observability.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 class CodeAnalyzer:
     """Main code analyzer interface for FLEXT Quality."""
 
     def __init__(self, project_path: str | Path) -> None:
-        """Initialize code analyzer.
-
-        Args:
-            project_path: Path to the project to analyze.
-
-        """
         self.project_path = Path(project_path)
         self.analysis_results: dict[str, Any] = {}
 
@@ -30,16 +25,16 @@ class CodeAnalyzer:
         include_dead_code: bool = True,
         include_duplicates: bool = True,
     ) -> dict[str, Any]:
-        """Analyze the entire project.
+        """Analyze entire project for quality metrics and issues.
 
         Args:
-            include_security: Include security analysis.
-            include_complexity: Include complexity analysis.
-            include_dead_code: Include dead code detection.
-            include_duplicates: Include duplicate code detection.
+            include_security: Whether to include security analysis.
+            include_complexity: Whether to include complexity analysis.
+            include_dead_code: Whether to include dead code detection.
+            include_duplicates: Whether to include duplicate code detection.
 
         Returns:
-            Analysis results dictionary.
+            Dictionary containing analysis results including metrics and issues.
 
         """
         logger.info("Starting project analysis: %s", self.project_path)
@@ -98,10 +93,10 @@ class CodeAnalyzer:
         return results
 
     def get_quality_score(self) -> float:
-        """Calculate overall quality score (0-100).
+        """Calculate overall quality score based on analysis results.
 
         Returns:
-            Quality score from 0 to 100.
+            Quality score between 0.0 and 100.0 based on code quality metrics.
 
         """
         if not self.analysis_results:
@@ -132,10 +127,10 @@ class CodeAnalyzer:
         return max(0.0, score)
 
     def get_quality_grade(self) -> str:
-        """Get letter grade for quality score.
+        """Get letter grade based on quality score.
 
         Returns:
-            Letter grade (A+ to F).
+            Letter grade (A+ to F) based on calculated quality score.
 
         """
         score = self.get_quality_score()
@@ -165,7 +160,6 @@ class CodeAnalyzer:
         return "F"
 
     def _find_python_files(self) -> list[Path]:
-        """Find all Python files in the project."""
         if not self.project_path.exists():
             logger.warning("Project path does not exist: %s", self.project_path)
             return []
@@ -186,7 +180,6 @@ class CodeAnalyzer:
         return python_files
 
     def _analyze_file(self, file_path: Path) -> dict[str, Any] | None:
-        """Analyze a single Python file."""
         try:
             with open(file_path, encoding="utf-8") as f:
                 content = f.read()
@@ -253,7 +246,6 @@ class CodeAnalyzer:
             return None
 
     def _calculate_complexity(self, tree: ast.AST) -> int:
-        """Calculate cyclomatic complexity (simplified version)."""
         complexity = 1  # Base complexity
 
         for node in ast.walk(tree):
@@ -270,7 +262,6 @@ class CodeAnalyzer:
     def _calculate_overall_metrics(
         self, file_metrics: list[dict[str, Any]]
     ) -> dict[str, Any]:
-        """Calculate overall project metrics."""
         if not file_metrics:
             return {}
 
@@ -293,7 +284,6 @@ class CodeAnalyzer:
         }
 
     def _analyze_security(self) -> list[dict[str, Any]]:
-        """Analyze security issues (simplified)."""
         # This is a simplified implementation
         # In production, this would integrate with bandit or similar tools
         issues = []
@@ -342,7 +332,6 @@ class CodeAnalyzer:
     def _analyze_complexity(
         self, file_metrics: list[dict[str, Any]]
     ) -> list[dict[str, Any]]:
-        """Analyze complexity issues."""
         complexity_threshold = 10
 
         return [
@@ -358,7 +347,6 @@ class CodeAnalyzer:
         ]
 
     def _analyze_dead_code(self) -> list[dict[str, Any]]:
-        """Analyze dead code (simplified)."""
         # This is a placeholder - real implementation would use vulture or similar
         issues = []
 
@@ -396,7 +384,6 @@ class CodeAnalyzer:
         return issues
 
     def _analyze_duplicates(self) -> list[dict[str, Any]]:
-        """Analyze duplicate code (simplified)."""
         # This is a placeholder - real implementation would do more sophisticated analysis
         issues = []
 
@@ -405,7 +392,8 @@ class CodeAnalyzer:
             try:
                 with open(py_file, encoding="utf-8") as f:
                     content = f.read()
-                    if len(content.strip()) > 100:  # Only check substantial files
+                    if len(content.strip()) > 100:
+                        # Only check substantial files
                         file_contents[py_file] = content
             except Exception as e:
                 logger.warning("Error reading %s: %s", py_file, e)

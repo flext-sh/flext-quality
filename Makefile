@@ -406,3 +406,6 @@ endif
 reminder:
 	@echo "$(YELLOW)$(WARNING) Remember to run '$(CYAN)make quality-gate$(NC)' before committing$(NC)"
 	@echo "$(YELLOW)$(WARNING) Use '$(CYAN)make help$(NC)' to see all available commands$(NC)"
+
+# Include standardized build system
+include Makefile.build

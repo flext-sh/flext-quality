@@ -1,8 +1,11 @@
-"""FLEXT Quality - Enterprise Code Quality Analysis and Monitoring."""
+"""FLEXT Quality - Enterprise Code Quality Analysis and Monitoring.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+"""
 
 from __future__ import annotations
 
-__version__ = "0.5.0"
+__version__ = "0.7.0"
 __author__ = "FLEXT Team"
 __email__ = "dev@flext.sh"
 __license__ = "MIT"
@@ -29,22 +32,10 @@ __all__ = [
 
 
 def get_version() -> str:
-    """Get the library version.
-
-    Returns:
-        The current version string.
-
-    """
     return __version__
 
 
 def get_info() -> dict[str, str]:
-    """Get library information.
-
-    Returns:
-        Dictionary containing library metadata.
-
-    """
     return {
         "name": "flext-quality",
         "version": __version__,
