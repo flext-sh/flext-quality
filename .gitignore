@@ -162,31 +162,61 @@ cython_debug/
 # VS Code
 .vscode/
 
-# flx-ldap specific
-data/
-output/
-logs/
-state/
-extracted/
-loaded/
-transformed/
+# Code quality analysis specific
+reports/
+analysis_results/
+quality_reports/
+*.report.json
+*.report.xml
+*.report.html
+*.report.md
+*_REPORT*.md
+*_REPORT*.json
+*_REPORT*.xml
 
-# Singer SDK specific
-*.state
-state.json
-catalogs/
+# Development files
+.dev_deps_backup_*
+requirements.txt
+requirements-dev.txt
+requirements-test.txt
 
-# dbt specific (when using dbt integration)
-target/
-dbt_packages/
-dbt.log
+# Migration and temporary files
+CONFIG_MIGRATION*.md
+FLEXT_*_MIGRATION*.md
+DEVELOPMENT*.md
+DUPLICATION*.md
+fix_*.py
+*_fix.py
+*_validation.*
+validate_*.*
+*.backup.*
+*.orig
+*.rej
+*.tmp
+*.temp
+*.bak
 
-# LDAP specific
-*.ldif.bak
-ldap_data/
-ldap_backup/
-sync_state/
-migration_state/
+# Archives
+.archived/
+archives/
+backups/
+
+# IDE specific
+.cursor/
+.claude/
+*.swp
+*.swo
+*~
+
+# Project specific ignores
+.benchmarks/
+staticfiles/
+
+# Code quality tools cache
+.ruff_cache/
+.ruff/
+.pylint.d/
+.bandit/
 
 # Test artifacts
 test_output/
@@ -207,17 +237,6 @@ Thumbs.db
 internal.invalid.json
 .internal.invalid
 .env.*.local
-internal.invalid.json
-
-# Pipeline artifacts
-pipeline_state/
-execution_logs/
-workflow_data/
-
-# IDE files
-*.swp
-*.swo
-*~
 
 # OS generated files
 .DS_Store

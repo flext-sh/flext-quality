@@ -7,10 +7,12 @@ Uses flext-core patterns for standardization.
 from __future__ import annotations
 
 import json
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from flext_quality.metrics import QualityMetrics
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class QualityReport:
@@ -41,23 +43,22 @@ class QualityReport:
 
         # Issues by category
         if self.metrics.issues_by_category:
-            lines.append("ISSUES BY CATEGORY")
-            lines.append("-" * 20)
+            lines.extend(("ISSUES BY CATEGORY", "-" * 20))
             for category, count in self.metrics.issues_by_category.items():
                 lines.append(f"{category}: {count}")
             lines.append("")
 
         # Top problematic files
         if self.metrics.problematic_files:
-            lines.append("TOP PROBLEMATIC FILES")
-            lines.append("-" * 20)
-            for file_info in self.metrics.problematic_files[:10]:
-                lines.append(f"{file_info['file']}: {file_info['issues']} issues")
+            lines.extend(("TOP PROBLEMATIC FILES", "-" * 20))
+            lines.extend(
+                f"{file_info['file']}: {file_info['issues']} issues"
+                for file_info in self.metrics.problematic_files[:10]
+            )
             lines.append("")
 
         # Recommendations
-        lines.append("RECOMMENDATIONS")
-        lines.append("-" * 20)
+        lines.extend(("RECOMMENDATIONS", "-" * 20))
         lines.extend(self._generate_recommendations())
 
         return "\n".join(lines)
@@ -121,7 +122,9 @@ class QualityReport:
                 )
 
         if not recommendations:
-            recommendations.append("Quality looks good! Consider running tests and benchmarks.")
+            recommendations.append(
+                "Quality looks good! Consider running tests and benchmarks.",
+            )
 
         return recommendations
 
@@ -137,15 +140,14 @@ class QualityDashboard:
         """Generate summary dashboard across all reports."""
         lines = []
 
-        lines.append("=" * 80)
-        lines.append("FLEXT QUALITY DASHBOARD")
-        lines.append("=" * 80)
-        lines.append("")
+        lines.extend(("=" * 80, "FLEXT QUALITY DASHBOARD", "=" * 80, ""))
 
         # Overall statistics
         total_files = sum(report.metrics.total_files for report in self.reports)
         total_issues = sum(report.metrics.total_issues for report in self.reports)
-        avg_quality = sum(report.metrics.quality_score for report in self.reports) / len(self.reports)
+        avg_quality = sum(
+            report.metrics.quality_score for report in self.reports
+        ) / len(self.reports)
 
         lines.append("OVERALL STATISTICS")
         lines.append("-" * 30)
@@ -159,11 +161,15 @@ class QualityDashboard:
         lines.append("PROJECT BREAKDOWN")
         lines.append("-" * 30)
         for i, report in enumerate(self.reports, 1):
-            lines.append(f"Project {i}:")
-            lines.append(f"  Files: {report.metrics.total_files}")
-            lines.append(f"  Issues: {report.metrics.total_issues}")
-            lines.append(f"  Quality: {report.metrics.quality_score:.1f}%")
-            lines.append("")
+            lines.extend(
+                (
+                    f"Project {i}:",
+                    f"  Files: {report.metrics.total_files}",
+                    f"  Issues: {report.metrics.total_issues}",
+                    f"  Quality: {report.metrics.quality_score:.1f}%",
+                    "",
+                ),
+            )
 
         return "\n".join(lines)
 

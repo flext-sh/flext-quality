@@ -1,14 +1,9 @@
-from typing import Any, List
-from typing import List
-
 """Application services for FLEXT-QUALITY v0.7.0.
 
-from flext_quality.domain.entities import (
-from flext_quality.domain.entities import QualityAnalysis
-from flext_quality.domain.entities import QualityProject
-from flext_quality.domain.entities import QualityReport
 REFACTORED:
-            Using flext-core service patterns - NO duplication.  Clean architecture with dependency injection and ServiceResult pattern.  """
+    Using flext-core service patterns - NO duplication.
+    Clean architecture with dependency injection and ServiceResult pattern.
+"""
 
 from __future__ import annotations
 
@@ -26,20 +21,39 @@ if TYPE_CHECKING:
         QualityProject,
         QualityReport,
     )
+else:
+    from flext_quality.domain.entities import (
+        QualityAnalysis,
+        QualityIssue,
+        QualityProject,
+        QualityReport,
+    )
 
 
 @injectable()
 class QualityProjectService:
-         Service for managing quality projects."""
+    """Service for managing quality projects."""
 
     def __init__(self) -> None:
-            self._projects: dict[UUID, QualityProject] = (
+        self._projects: dict[UUID, QualityProject] = (
             None  # TODO: Initialize in __post_init__
         )
 
-    async def create_project(self, name: str, project_path: str, repository_url: str | None = None, config_path: str | None = None, language: str = "python", auto_analyze: bool = True, min_coverage: float = 95.0, max_complexity: int = 10, max_duplication: float = 5.0, ) -> ServiceResult[QualityProject]:
+    async def create_project(
+        self,
+        name: str,
+        project_path: str,
+        repository_url: str | None = None,
+        config_path: str | None = None,
+        language: str = "python",
+        auto_analyze: bool = True,
+        min_coverage: float = 95.0,
+        max_complexity: int = 10,
+        max_duplication: float = 5.0,
+    ) -> ServiceResult[QualityProject]:
         try:
-            project = QualityProject(name=name,
+            project = QualityProject(
+                name=name,
                 description=f"Quality analysis for {name}",
                 project_path=project_path,
                 repository_url=repository_url,
@@ -54,23 +68,30 @@ class QualityProjectService:
             self._projects[project.id] = project
             return ServiceResult.ok(project)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to create project {e}")
+            return ServiceResult.fail(f"Failed to create project {e}")
 
-    async def get_project(self, project_id: UUID, ) -> ServiceResult[QualityProject | None]:
+    async def get_project(
+        self,
+        project_id: UUID,
+    ) -> ServiceResult[QualityProject | None]:
         try:
             project = self._projects.get(project_id)
             return ServiceResult.ok(project)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to get project {e}")
+            return ServiceResult.fail(f"Failed to get project {e}")
 
     async def list_projects(self) -> ServiceResult[list[QualityProject]]:
-            try:
+        try:
             projects = list(self._projects.values())
             return ServiceResult.ok(projects)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to list projects {e}")
+            return ServiceResult.fail(f"Failed to list projects {e}")
 
-    async def update_project(self, project_id: UUID, updates: dict[str, Any], ) -> ServiceResult[QualityProject]:
+    async def update_project(
+        self,
+        project_id: UUID,
+        updates: dict[str, Any],
+    ) -> ServiceResult[QualityProject]:
         try:
             project = self._projects.get(project_id)
             if not project:
@@ -78,12 +99,12 @@ class QualityProjectService:
 
             for key, value in updates.items():
                 if hasattr(project, key):
-            setattr(project, key, value)
+                    setattr(project, key, value)
 
             project.touch()
             return ServiceResult.ok(project)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to update project: {e}")
+            return ServiceResult.fail(f"Failed to update project: {e}")
 
     async def delete_project(self, project_id: UUID) -> ServiceResult[bool]:
         try:
@@ -92,22 +113,29 @@ class QualityProjectService:
                 return ServiceResult.ok(True)
             return ServiceResult.fail("Project not found")
         except Exception as e:
-        return ServiceResult.fail(f"Failed to delete project:
-            {e}")
+            return ServiceResult.fail(f"Failed to delete project: {e}")
 
 
 @injectable()
 class QualityAnalysisService:
-         """Service for managing quality analyses."""
+    """Service for managing quality analyses."""
 
     def __init__(self) -> None:
-            self._analyses: dict[UUID, QualityAnalysis] = (
+        self._analyses: dict[UUID, QualityAnalysis] = (
             None  # TODO: Initialize in __post_init__
         )
 
-    async def create_analysis(self, project_id: UUID, commit_hash: str | None = None, branch: str | None = None, pull_request_id: str | None = None, analysis_config: dict[str, Any] | None = None,  ) -> ServiceResult[QualityAnalysis]:
+    async def create_analysis(
+        self,
+        project_id: UUID,
+        commit_hash: str | None = None,
+        branch: str | None = None,
+        pull_request_id: str | None = None,
+        analysis_config: dict[str, Any] | None = None,
+    ) -> ServiceResult[QualityAnalysis]:
         try:
-            analysis = QualityAnalysis(project_id=project_id,
+            analysis = QualityAnalysis(
+                project_id=project_id,
                 commit_hash=commit_hash,
                 branch=branch,
                 pull_request_id=pull_request_id,
@@ -120,9 +148,17 @@ class QualityAnalysisService:
             self._analyses[analysis.id] = analysis
             return ServiceResult.ok(analysis)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to create analysis {e}")
+            return ServiceResult.fail(f"Failed to create analysis {e}")
 
-    async def update_metrics(self, analysis_id: UUID, total_files: int, total_lines: int, code_lines: int, comment_lines: int, blank_lines: int, ) -> ServiceResult[QualityAnalysis]:
+    async def update_metrics(
+        self,
+        analysis_id: UUID,
+        total_files: int,
+        total_lines: int,
+        code_lines: int,
+        comment_lines: int,
+        blank_lines: int,
+    ) -> ServiceResult[QualityAnalysis]:
         try:
             analysis = self._analyses.get(analysis_id)
             if not analysis:
@@ -137,10 +173,17 @@ class QualityAnalysisService:
 
             return ServiceResult.ok(analysis)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to update metrics:
-            {e}")
+            return ServiceResult.fail(f"Failed to update metrics: {e}")
 
-    async def update_scores(self, analysis_id: UUID, coverage_score: float, complexity_score: float, duplication_score: float, security_score: float, maintainability_score: float, ) -> ServiceResult[QualityAnalysis]:
+    async def update_scores(
+        self,
+        analysis_id: UUID,
+        coverage_score: float,
+        complexity_score: float,
+        duplication_score: float,
+        security_score: float,
+        maintainability_score: float,
+    ) -> ServiceResult[QualityAnalysis]:
         try:
             analysis = self._analyses.get(analysis_id)
             if not analysis:
@@ -156,10 +199,16 @@ class QualityAnalysisService:
 
             return ServiceResult.ok(analysis)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to update scores:
-            {e}")
+            return ServiceResult.fail(f"Failed to update scores: {e}")
 
-    async def update_issue_counts(self, analysis_id: UUID, critical: int, high: int, medium: int, low: int, ) -> ServiceResult[QualityAnalysis]:
+    async def update_issue_counts(
+        self,
+        analysis_id: UUID,
+        critical: int,
+        high: int,
+        medium: int,
+        low: int,
+    ) -> ServiceResult[QualityAnalysis]:
         try:
             analysis = self._analyses.get(analysis_id)
             if not analysis:
@@ -174,10 +223,12 @@ class QualityAnalysisService:
 
             return ServiceResult.ok(analysis)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to update issue counts:
-            {e}")
+            return ServiceResult.fail(f"Failed to update issue counts: {e}")
 
-    async def complete_analysis(self, analysis_id: UUID, ) -> ServiceResult[QualityAnalysis]:
+    async def complete_analysis(
+        self,
+        analysis_id: UUID,
+    ) -> ServiceResult[QualityAnalysis]:
         try:
             analysis = self._analyses.get(analysis_id)
             if not analysis:
@@ -186,10 +237,13 @@ class QualityAnalysisService:
             analysis.complete_analysis()
             return ServiceResult.ok(analysis)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to complete analysis:
-            {e}")
+            return ServiceResult.fail(f"Failed to complete analysis: {e}")
 
-    async def fail_analysis(self, analysis_id: UUID, error: str, ) -> ServiceResult[QualityAnalysis]:
+    async def fail_analysis(
+        self,
+        analysis_id: UUID,
+        error: str,
+    ) -> ServiceResult[QualityAnalysis]:
         try:
             analysis = self._analyses.get(analysis_id)
             if not analysis:
@@ -198,45 +252,60 @@ class QualityAnalysisService:
             analysis.fail_analysis(error)
             return ServiceResult.ok(analysis)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to fail analysis:
-            {e}")
+            return ServiceResult.fail(f"Failed to fail analysis: {e}")
 
-    async def get_analysis(self, analysis_id: UUID, ) -> ServiceResult[QualityAnalysis | None]:
+    async def get_analysis(
+        self,
+        analysis_id: UUID,
+    ) -> ServiceResult[QualityAnalysis | None]:
         try:
             analysis = self._analyses.get(analysis_id)
             return ServiceResult.ok(analysis)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to get analysis {e}")
+            return ServiceResult.fail(f"Failed to get analysis: {e}")
 
-    async def list_analyses(self, project_id: UUID, ) -> ServiceResult[list[QualityAnalysis]]:
+    async def list_analyses(
+        self,
+        project_id: UUID,
+    ) -> ServiceResult[list[QualityAnalysis]]:
         try:
-            analyses = [a for a in self._analyses.values() if a.project_id == project_id:
+            analyses = [
+                a for a in self._analyses.values() if a.project_id == project_id
             ]
             # Sort by started_at descending
-            analyses.sort(key=lambda a a.started_at, reverse=True)
+            analyses.sort(key=lambda a: a.started_at, reverse=True)
             return ServiceResult.ok(analyses)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to list analyses:
-            {e}")
+            return ServiceResult.fail(f"Failed to list analyses: {e}")
 
 
 @injectable()
 class QualityIssueService:
-         """Service for managing quality issues."""
+    """Service for managing quality issues."""
 
     def __init__(self) -> None:
-            self._issues: dict[UUID, QualityIssue] = (
-            None  # TODO: Initialize in __post_init__
-        )
+        self._issues: dict[UUID, QualityIssue] = {}  # TODO: Initialize properly
 
-    async def create_issue(self, analysis_id: UUID, issue_type: str, severity: str, rule_id: str, file_path: str, message: str, line_number: int | None = None, column_number: int | None = None, end_line_number: int | None = None, end_column_number: int | None = None, code_snippet: str | None = None, suggestion: str | None = None,  ) -> ServiceResult[QualityIssue]:
+    async def create_issue(
+        self,
+        analysis_id: UUID,
+        issue_type: str,
+        severity: str,
+        rule_id: str,
+        file_path: str,
+        message: str,
+        line_number: int | None = None,
+        column_number: int | None = None,
+        end_line_number: int | None = None,
+        end_column_number: int | None = None,
+        code_snippet: str | None = None,
+        suggestion: str | None = None,
+    ) -> ServiceResult[QualityIssue]:
         try:
-            IssueSeverity,
-                IssueType,
-                QualityIssue,
-            )
+            from flext_core.domain.quality import IssueSeverity, IssueType, QualityIssue
 
-            issue = QualityIssue(analysis_id=analysis_id,
+            issue = QualityIssue(
+                analysis_id=analysis_id,
                 issue_type=IssueType(issue_type),
                 severity=IssueSeverity(severity),
                 rule_id=rule_id,
@@ -255,32 +324,37 @@ class QualityIssueService:
             self._issues[issue.id] = issue
             return ServiceResult.ok(issue)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to create issue:
-            {e}")
+            return ServiceResult.fail(f"Failed to create issue: {e}")
 
     async def get_issue(self, issue_id: UUID) -> ServiceResult[QualityIssue | None]:
         try:
             issue = self._issues.get(issue_id)
             return ServiceResult.ok(issue)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to get issue {e}")
+            return ServiceResult.fail(f"Failed to get issue {e}")
 
-    async def list_issues(self, analysis_id: UUID, severity: str | None = None, issue_type: str | None = None, file_path: str | None = None, ) -> ServiceResult[list[QualityIssue]]:
+    async def list_issues(
+        self,
+        analysis_id: UUID,
+        severity: str | None = None,
+        issue_type: str | None = None,
+        file_path: str | None = None,
+    ) -> ServiceResult[list[QualityIssue]]:
         try:
-            issues = [i for i in self._issues.values() if i.analysis_id == analysis_id]:
+            issues = [i for i in self._issues.values() if i.analysis_id == analysis_id]
 
             if severity:
-                issues = [i for i in issues if i.severity == severity]:
+                issues = [i for i in issues if i.severity == severity]
 
             if issue_type:
-                issues = [i for i in issues if i.issue_type == issue_type]:
+                issues = [i for i in issues if i.issue_type == issue_type]
 
             if file_path:
-            issues = [i for i in issues if i.file_path == file_path]:
+                issues = [i for i in issues if i.file_path == file_path]
 
             return ServiceResult.ok(issues)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to list issues: {e}")
+            return ServiceResult.fail(f"Failed to list issues: {e}")
 
     async def mark_fixed(self, issue_id: UUID) -> ServiceResult[QualityIssue]:
         try:
@@ -291,10 +365,13 @@ class QualityIssueService:
             issue.mark_fixed()
             return ServiceResult.ok(issue)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to mark issue as fixed:
-            {e}")
+            return ServiceResult.fail(f"Failed to mark issue as fixed: {e}")
 
-    async def suppress_issue(self, issue_id: UUID, reason: str, ) -> ServiceResult[QualityIssue]:
+    async def suppress_issue(
+        self,
+        issue_id: UUID,
+        reason: str,
+    ) -> ServiceResult[QualityIssue]:
         try:
             issue = self._issues.get(issue_id)
             if not issue:
@@ -303,8 +380,7 @@ class QualityIssueService:
             issue.suppress(reason)
             return ServiceResult.ok(issue)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to suppress issue:
-            {e}")
+            return ServiceResult.fail(f"Failed to suppress issue: {e}")
 
     async def unsuppress_issue(self, issue_id: UUID) -> ServiceResult[QualityIssue]:
         try:
@@ -315,8 +391,7 @@ class QualityIssueService:
             issue.unsuppress()
             return ServiceResult.ok(issue)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to unsuppress issue:
-            {e}")
+            return ServiceResult.fail(f"Failed to unsuppress issue: {e}")
 
 
 @injectable()
@@ -326,9 +401,17 @@ class QualityReportService:
     def __init__(self) -> None:
         self._reports: dict[UUID, QualityReport] = {}
 
-    async def create_report(self, analysis_id: UUID, report_type: str, report_format: str = "summary", report_path: str | None = None, report_size_bytes: int = 0, ) -> ServiceResult[QualityReport]:
+    async def create_report(
+        self,
+        analysis_id: UUID,
+        report_type: str,
+        report_format: str = "summary",
+        report_path: str | None = None,
+        report_size_bytes: int = 0,
+    ) -> ServiceResult[QualityReport]:
         try:
-            report = QualityReport(analysis_id=analysis_id,
+            report = QualityReport(
+                analysis_id=analysis_id,
                 report_type=report_type,
                 report_format=report_format,
                 report_path=report_path,
@@ -340,7 +423,7 @@ class QualityReportService:
             self._reports[report.id] = report
             return ServiceResult.ok(report)
         except Exception as e:
-        return ServiceResult.fail(f"Failed to create report {e}")
+            return ServiceResult.fail(f"Failed to create report: {e}")
 
     async def get_report(self, report_id: UUID) -> ServiceResult[QualityReport | None]:
         try:
@@ -351,9 +434,14 @@ class QualityReportService:
         except Exception as e:
             return ServiceResult.fail(f"Failed to get report: {e}")
 
-    async def list_reports(self, analysis_id: UUID, ) -> ServiceResult[list[QualityReport]]:
+    async def list_reports(
+        self,
+        analysis_id: UUID,
+    ) -> ServiceResult[list[QualityReport]]:
         try:
-            reports = [r for r in self._reports.values() if r.analysis_id == analysis_id]
+            reports = [
+                r for r in self._reports.values() if r.analysis_id == analysis_id
+            ]
             return ServiceResult.ok(reports)
         except Exception as e:
             return ServiceResult.fail(f"Failed to list reports {e}")

@@ -39,7 +39,7 @@ def quality_cli() -> None:
 )
 def analyze(project_path: Path, output_dir: Path, format: str) -> None:
     """Analyze project quality."""
-    config = QualityConfig(
+    QualityConfig(
         project_root=project_path,
         report_output_dir=output_dir,
     )

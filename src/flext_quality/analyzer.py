@@ -192,10 +192,10 @@ class CodeAnalyzer:
                     line
                     for line in lines
                     if line.strip() and not line.strip().startswith("#")
-                ]
+                ],
             )
             comment_lines = len(
-                [line for line in lines if line.strip().startswith("#")]
+                [line for line in lines if line.strip().startswith("#")],
             )
             blank_lines = len([line for line in lines if not line.strip()])
 
@@ -260,7 +260,8 @@ class CodeAnalyzer:
         return complexity
 
     def _calculate_overall_metrics(
-        self, file_metrics: list[dict[str, Any]]
+        self,
+        file_metrics: list[dict[str, Any]],
     ) -> dict[str, Any]:
         if not file_metrics:
             return {}
@@ -301,7 +302,7 @@ class CodeAnalyzer:
                             "type": "dangerous_function",
                             "message": "Use of eval() detected",
                             "severity": "high",
-                        }
+                        },
                     )
 
                 if "exec(" in content:
@@ -311,7 +312,7 @@ class CodeAnalyzer:
                             "type": "dangerous_function",
                             "message": "Use of exec() detected",
                             "severity": "high",
-                        }
+                        },
                     )
 
                 if "import os" in content and "os.system(" in content:
@@ -321,7 +322,7 @@ class CodeAnalyzer:
                             "type": "command_injection",
                             "message": "Potential command injection with os.system()",
                             "severity": "medium",
-                        }
+                        },
                     )
 
             except Exception as e:
@@ -330,7 +331,8 @@ class CodeAnalyzer:
         return issues
 
     def _analyze_complexity(
-        self, file_metrics: list[dict[str, Any]]
+        self,
+        file_metrics: list[dict[str, Any]],
     ) -> list[dict[str, Any]]:
         complexity_threshold = 10
 
@@ -375,7 +377,7 @@ class CodeAnalyzer:
                                 "line": i + 1,
                                 "type": "unused_import",
                                 "message": f"Potentially unused import: {line.strip()}",
-                            }
+                            },
                         )
 
             except Exception as e:
@@ -421,7 +423,7 @@ class CodeAnalyzer:
                                 ],
                                 "similarity": similarity,
                                 "message": f"High similarity ({similarity:.1%}) between files",
-                            }
+                            },
                         )
 
         return issues

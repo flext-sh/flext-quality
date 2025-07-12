@@ -90,13 +90,13 @@ class FilePath:
     @classmethod
     def validate_path(cls, v: str) -> str:
         """Validate and normalize file path.
-        
+
         Args:
             v: The file path to validate.
-            
+
         Returns:
             Normalized file path.
-            
+
         Raises:
             ValueError: If path is empty.
 
@@ -109,7 +109,7 @@ class FilePath:
     @property
     def path(self) -> Path:
         """Get Path object from string value.
-        
+
         Returns:
             Path object.
 
@@ -119,7 +119,7 @@ class FilePath:
     @property
     def filename(self) -> str:
         """Get filename from path.
-        
+
         Returns:
             Filename string.
 
@@ -129,7 +129,7 @@ class FilePath:
     @property
     def extension(self) -> str:
         """Get file extension from path.
-        
+
         Returns:
             File extension string.
 
@@ -139,7 +139,7 @@ class FilePath:
     @property
     def parent_dir(self) -> str:
         """Get parent directory from path.
-        
+
         Returns:
             Parent directory string.
 
@@ -159,14 +159,14 @@ class IssueLocation:
     @classmethod
     def validate_end_line(cls, v: int | None, values: dict) -> int | None:
         """Validate end line is after start line.
-        
+
         Args:
             v: End line number to validate.
             values: Field values dictionary.
-            
+
         Returns:
             Validated end line number.
-            
+
         Raises:
             ValueError: If end line is before start line.
 
@@ -179,7 +179,7 @@ class IssueLocation:
     @property
     def range_text(self) -> str:
         """Get human-readable text representation of location range.
-        
+
         Returns:
             Formatted range text.
 
@@ -199,7 +199,7 @@ class QualityScore:
     @property
     def percentage(self) -> str:
         """Get quality score as percentage string.
-        
+
         Returns:
             Formatted percentage string.
 
@@ -209,7 +209,7 @@ class QualityScore:
     @property
     def grade(self) -> QualityGrade:
         """Get quality grade based on score.
-        
+
         Returns:
             Quality grade enum value.
 
@@ -251,7 +251,7 @@ class ComplexityMetric(DomainBaseModel):
     @property
     def is_complex(self) -> bool:
         """Check if complexity metrics indicate complex code.
-        
+
         Returns:
             True if code is considered complex.
 
@@ -261,7 +261,7 @@ class ComplexityMetric(DomainBaseModel):
     @property
     def complexity_level(self) -> str:
         """Get complexity level description.
-        
+
         Returns:
             Complexity level as string.
 
@@ -300,7 +300,7 @@ class CoverageMetric(DomainBaseModel):
     @property
     def overall_coverage(self) -> float:
         """Calculate weighted overall coverage percentage.
-        
+
         Returns:
             Overall coverage percentage.
 
@@ -315,7 +315,7 @@ class CoverageMetric(DomainBaseModel):
     @property
     def is_sufficient(self) -> bool:
         """Check if coverage meets minimum requirements.
-        
+
         Returns:
             True if coverage is sufficient.
 
@@ -345,7 +345,7 @@ class DuplicationMetric(DomainBaseModel):
     @property
     def duplication_percentage(self) -> float:
         """Calculate duplication percentage.
-        
+
         Returns:
             Duplication percentage.
 
@@ -357,7 +357,7 @@ class DuplicationMetric(DomainBaseModel):
     @property
     def is_acceptable(self) -> bool:
         """Check if duplication level is acceptable.
-        
+
         Returns:
             True if duplication is below threshold.
 
