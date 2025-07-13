@@ -8,12 +8,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from lato import Container, DependencyProvider, Scope
+
 from flext_core.infrastructure.di import (
     configure_dependencies as configure_core_dependencies,
 )
 from flext_core.infrastructure.di import get_container
-from lato import Container, DependencyProvider, Scope
-
 from flext_quality.application.handlers import (
     AnalyzeProjectHandler,
     GenerateReportHandler,

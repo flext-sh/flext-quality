@@ -10,9 +10,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
+from pydantic import Field
+
 from flext_core.domain.pydantic_base import DomainEntity, DomainEvent
 from flext_core.domain.types import Status, StrEnum
-from pydantic import Field
 
 if TYPE_CHECKING:
     from uuid import UUID
