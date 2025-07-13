@@ -31,8 +31,9 @@ from django.contrib import REDACTED_LDAP_BIND_PASSWORD
 from django.utils.html import format_html
 
 
-@REDACTED_LDAP_BIND_PASSWORD.register(Project)  class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
-             """Admin interface for Project model."""
+@REDACTED_LDAP_BIND_PASSWORD.register(Project)
+class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
+    """Admin interface for Project model."""
 
     list_display: ClassVar[list[str]] = ["name",
         "package_name",
