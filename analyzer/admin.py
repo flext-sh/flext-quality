@@ -31,8 +31,9 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 
-@admin.register(Project)  class ProjectAdmin(admin.ModelAdmin):
-             """Admin interface for Project model."""
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    """Admin interface for Project model."""
 
     list_display: ClassVar[list[str]] = ["name",
         "package_name",
