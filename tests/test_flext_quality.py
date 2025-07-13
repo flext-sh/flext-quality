@@ -1,4 +1,4 @@
-"""Test suite for flext-quality basic functionality.
+"""Test suite for flext-quality basic functionality."""
 
 from pathlib import Path
 
@@ -40,7 +40,7 @@ def hello() -> None:
 
 if __name__ == "__main__":
             print(hello())
-""","""
+"""
         )
 
         analyzer = CodeAnalyzer(tmp_path)

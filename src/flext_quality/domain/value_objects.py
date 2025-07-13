@@ -8,9 +8,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from pydantic import Field, field_validator
+
 from flext_core.domain.pydantic_base import DomainBaseModel
 from flext_core.domain.types import StrEnum
-from pydantic import Field, field_validator
 
 
 class IssueSeverity(StrEnum):

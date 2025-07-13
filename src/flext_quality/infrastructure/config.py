@@ -7,9 +7,10 @@ from __future__ import annotations
 
 from typing import Any
 
+from pydantic import ConfigDict, Field
+
 from flext_core.domain.constants import ConfigDefaults
 from flext_core.domain.pydantic_base import BaseSettings
-from pydantic import ConfigDict, Field
 
 
 class QualityConfig(BaseSettings):

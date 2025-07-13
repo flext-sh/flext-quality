@@ -7,8 +7,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from flext_core.domain.pydantic_base import BaseSettings
 from pydantic import ConfigDict, Field
+
+from flext_core.domain.pydantic_base import BaseSettings
 
 if TYPE_CHECKING:
     from pathlib import Path

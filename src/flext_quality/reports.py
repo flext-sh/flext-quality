@@ -58,7 +58,7 @@ class QualityReport:
                     "",
                     "RECOMMENDATIONS:",
                     "-" * 20,
-                ]
+                ],
             )
             report_lines.extend(f"• {rec}" for rec in recommendations)
 
@@ -150,7 +150,7 @@ class QualityReport:
                 "    </div>",
                 "</body>",
                 "</html>",
-            ]
+            ],
         )
 
         return "\n".join(html_parts)
@@ -236,7 +236,7 @@ class QualityReport:
                 [
                     '    <div class="section">',
                     f"        <h2>{category.title()} Issues ({len(issue_list)})</h2>",
-                ]
+                ],
             )
 
             for issue in issue_list[:10]:  # Show first 10 issues
@@ -253,7 +253,7 @@ class QualityReport:
 
             if len(issue_list) > 10:
                 html_parts.append(
-                    f'        <div class="issue">... and {len(issue_list) - 10} more issues</div>'
+                    f'        <div class="issue">... and {len(issue_list) - 10} more issues</div>',
                 )
 
             html_parts.append("    </div>")
@@ -270,12 +270,12 @@ class QualityReport:
 
         if critical_issues > 0:
             recommendations.append(
-                f"Fix {critical_issues} critical security/error issues immediately"
+                f"Fix {critical_issues} critical security/error issues immediately",
             )
 
         if total_issues > 50:
             recommendations.append(
-                "Consider breaking down large files and reducing complexity"
+                "Consider breaking down large files and reducing complexity",
             )
 
         if score < 70:
@@ -283,13 +283,13 @@ class QualityReport:
                 (
                     "Implement automated code quality checks in your CI/CD pipeline",
                     "Add comprehensive unit tests to improve coverage",
-                )
+                ),
             )
 
         coverage = self._get_coverage_percent()
         if coverage < 80:
             recommendations.append(
-                f"Increase test coverage from {coverage}% to at least 80%"
+                f"Increase test coverage from {coverage}% to at least 80%",
             )
 
         issues = self.results.get("issues", {})
@@ -301,7 +301,7 @@ class QualityReport:
 
         if not recommendations:
             recommendations.append(
-                "Great job! Your code quality is excellent. Keep up the good work!"
+                "Great job! Your code quality is excellent. Keep up the good work!",
             )
 
         return recommendations
