@@ -1,3 +1,8 @@
+"""Signals for the analyzer Django app.
+
+This module contains Django signals for handling code analysis events.
+"""
+
 from typing import Any
 
 

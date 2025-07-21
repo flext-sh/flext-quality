@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Any
-
-from pydantic import Field, computed_field
+from typing import Any, ClassVar
 
 from flext_core.domain.pydantic_base import DomainValueObject
+from pydantic import Field, computed_field
 
 
 class QualityMetrics(DomainValueObject):
@@ -149,7 +148,6 @@ class QualityMetrics(DomainValueObject):
         )
 
     @computed_field
-    @property
     def scores_summary(self) -> dict[str, float]:
         """Get summary of all quality scores by category.
 
@@ -166,7 +164,6 @@ class QualityMetrics(DomainValueObject):
         }
 
     @computed_field
-    @property
     def total_issues(self) -> int:
         """Get total count of all quality issues.
 
@@ -223,28 +220,25 @@ class QualityMetrics(DomainValueObject):
             f"Duplicates({self.duplicate_blocks_count})"
         )
 
-    @staticmethod
-    def _calculate_grade(score: float) -> str:
-        if score >= 95:
-            return "A+"
-        if score >= 90:
-            return "A"
-        if score >= 85:
-            return "A-"
-        if score >= 80:
-            return "B+"
-        if score >= 75:
-            return "B"
-        if score >= 70:
-            return "B-"
-        if score >= 65:
-            return "C+"
-        if score >= 60:
-            return "C"
-        if score >= 55:
-            return "C-"
-        if score >= 50:
-            return "D+"
-        if score >= 45:
-            return "D"
+    # Grade thresholds - each tuple is (threshold, grade)
+    _GRADE_THRESHOLDS: ClassVar[list[tuple[int, str]]] = [
+        (95, "A+"),
+        (90, "A"),
+        (85, "A-"),
+        (80, "B+"),
+        (75, "B"),
+        (70, "B-"),
+        (65, "C+"),
+        (60, "C"),
+        (55, "C-"),
+        (50, "D+"),
+        (45, "D"),
+    ]
+
+    @classmethod
+    def _calculate_grade(cls, score: float) -> str:
+        """Calculate letter grade based on score using predefined thresholds."""
+        for threshold, grade in cls._GRADE_THRESHOLDS:
+            if score >= threshold:
+                return grade
         return "F"

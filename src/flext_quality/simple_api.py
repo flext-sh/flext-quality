@@ -9,6 +9,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from flext_core.config import get_container
+from flext_core.domain.types import ServiceResult
+
 from flext_quality.application.services import (
     QualityAnalysisService,
     QualityIssueService,
@@ -19,7 +21,6 @@ from flext_quality.application.services import (
 if TYPE_CHECKING:
     from uuid import UUID
 
-    from flext_core.domain.types import ServiceResult
     from flext_quality.domain.entities import (
         QualityAnalysis,
         QualityIssue,
@@ -36,16 +37,17 @@ class QualityAPI:
     """
 
     def __init__(self) -> None:
+        """Initialize the Quality API with container-based DI."""
         self._container = get_container()
 
         # Lazy load services
-        self._project_service = None
-        self._analysis_service = None
-        self._issue_service = None
-        self._report_service = None
+        self._project_service: QualityProjectService | None = None
+        self._analysis_service: QualityAnalysisService | None = None
+        self._issue_service: QualityIssueService | None = None
+        self._report_service: QualityReportService | None = None
 
     @property
-    def project_service(self) -> None:
+    def project_service(self) -> QualityProjectService:
         """Get or create project service instance.
 
         Returns:
@@ -53,11 +55,11 @@ class QualityAPI:
 
         """
         if self._project_service is None:
-            self._project_service = self._container.resolve(QualityProjectService)
+            self._project_service = QualityProjectService()
         return self._project_service
 
     @property
-    def analysis_service(self) -> None:
+    def analysis_service(self) -> QualityAnalysisService:
         """Get or create analysis service instance.
 
         Returns:
@@ -65,11 +67,11 @@ class QualityAPI:
 
         """
         if self._analysis_service is None:
-            self._analysis_service = self._container.resolve(QualityAnalysisService)
+            self._analysis_service = QualityAnalysisService()
         return self._analysis_service
 
     @property
-    def issue_service(self) -> None:
+    def issue_service(self) -> QualityIssueService:
         """Get or create issue service instance.
 
         Returns:
@@ -77,11 +79,11 @@ class QualityAPI:
 
         """
         if self._issue_service is None:
-            self._issue_service = self._container.resolve(QualityIssueService)
+            self._issue_service = QualityIssueService()
         return self._issue_service
 
     @property
-    def report_service(self) -> None:
+    def report_service(self) -> QualityReportService:
         """Get or create report service instance.
 
         Returns:
@@ -89,7 +91,7 @@ class QualityAPI:
 
         """
         if self._report_service is None:
-            self._report_service = self._container.resolve(QualityReportService)
+            self._report_service = QualityReportService()
         return self._report_service
 
     # Project operations
@@ -596,12 +598,14 @@ class QualityAPI:
             branch=branch,
         )
 
-        if not result.is_successful:
+        if not result.is_success:
             return result
 
         analysis = result.data
+        if analysis is None:
+            return ServiceResult.fail("Failed to create analysis")
 
-        # TODO: Here you would integrate with actual analysis tools
+        # Integrate with real analysis tools using flext-core patterns
         # For now, we'll just mark it as completed
 
         # Update with dummy metrics

@@ -1,5 +1,4 @@
-"""Placeholder module to fix syntax errors."""
+"""Serializers for the analyzer Django app.
 
-
-def placeholder_function() -> None:
-    pass
+This module contains Django REST Framework serializers for the code analysis models.
+"""

@@ -8,12 +8,11 @@ All entities use mixins from flext-core for maximum code reduction.
 from __future__ import annotations
 
 from datetime import datetime
+from enum import StrEnum
 from typing import TYPE_CHECKING, Any
 
-from pydantic import Field
-
 from flext_core.domain.pydantic_base import DomainEntity, DomainEvent
-from flext_core.domain.types import Status, StrEnum
+from pydantic import Field
 
 if TYPE_CHECKING:
     from uuid import UUID
@@ -79,7 +78,7 @@ class QualityProject(DomainEntity):
     def update_last_analysis(self) -> None:
         self.last_analysis_at = datetime.now()
         self.total_analyses += 1
-        self.touch()
+        # Remove touch() call - not available in flext-core DomainEntity
 
 
 class QualityAnalysis(DomainEntity):
@@ -119,34 +118,34 @@ class QualityAnalysis(DomainEntity):
     medium_issues: int = Field(default=0)
     low_issues: int = Field(default=0)
 
+    # Analysis status
+    status: AnalysisStatus = Field(default=AnalysisStatus.QUEUED)
+
     # Analysis data
     analysis_config: dict[str, Any] = Field(default_factory=dict)
 
     def start_analysis(self) -> None:
         self.started_at = datetime.now()
         self.status = AnalysisStatus.ANALYZING
-        self.touch()
+        # Remove touch() call - not available in flext-core DomainEntity
 
     def complete_analysis(self) -> None:
         self.completed_at = datetime.now()
-        self.status = Status.COMPLETED
+        self.status = AnalysisStatus.COMPLETED
 
         if self.started_at:
             duration = self.completed_at - self.started_at
             self.duration_seconds = duration.total_seconds()
 
-        self.touch()
+        # Remove touch() call - not available in flext-core DomainEntity
 
     def fail_analysis(self, error: str) -> None:
         self.completed_at = datetime.now()
-        self.status = Status.FAILED
-        self.add_validation_error(error)
+        self.status = AnalysisStatus.FAILED
 
         if self.started_at:
             duration = self.completed_at - self.started_at
             self.duration_seconds = duration.total_seconds()
-
-        self.touch()
 
     def calculate_overall_score(self) -> None:
         scores = [
@@ -160,11 +159,11 @@ class QualityAnalysis(DomainEntity):
 
     @property
     def is_completed(self) -> bool:
-        return self.status in {Status.COMPLETED, Status.FAILED}
+        return self.status in {AnalysisStatus.COMPLETED, AnalysisStatus.FAILED}
 
     @property
     def is_successful(self) -> bool:
-        return self.status == Status.COMPLETED
+        return self.status == AnalysisStatus.COMPLETED
 
 
 class QualityIssue(DomainEntity):
@@ -201,30 +200,25 @@ class QualityIssue(DomainEntity):
 
     def mark_fixed(self) -> None:
         self.is_fixed = True
-        self.status = Status.RESOLVED
-        self.touch()
 
     def suppress(self, reason: str) -> None:
         self.is_suppressed = True
         self.suppression_reason = reason
-        self.touch()
 
     def unsuppress(self) -> None:
         self.is_suppressed = False
         self.suppression_reason = None
-        self.touch()
 
     def increment_occurrence(self) -> None:
         self.occurrence_count += 1
         self.last_seen_at = datetime.now()
-        self.touch()
 
 
 class QualityRule(DomainEntity):
     """Quality rule domain entity using enhanced mixins for code reduction."""
 
     # Rule identification
-    rule_id: str = Field(..., min_length=1, unique=True)
+    rule_id: str = Field(..., min_length=1)
     category: IssueType = Field(...)
 
     # Rule configuration
@@ -241,21 +235,17 @@ class QualityRule(DomainEntity):
 
     def enable(self) -> None:
         self.enabled = True
-        self.status = Status.ACTIVE
-        self.touch()
 
     def disable(self) -> None:
         self.enabled = False
-        self.status = Status.INACTIVE
-        self.touch()
 
     def update_severity(self, severity: IssueSeverity) -> None:
         self.severity = severity
-        self.touch()
+        # Remove touch() call - not available in flext-core DomainEntity
 
     def set_parameter(self, key: str, value: Any) -> None:
         self.parameters[key] = value
-        self.touch()
+        # Remove touch() call - not available in flext-core DomainEntity
 
 
 class QualityReport(DomainEntity):
@@ -282,7 +272,7 @@ class QualityReport(DomainEntity):
     def increment_access(self) -> None:
         self.access_count += 1
         self.last_accessed_at = datetime.now()
-        self.touch()
+        # Remove touch() call - not available in flext-core DomainEntity
 
 
 # Domain Events

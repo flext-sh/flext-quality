@@ -4,16 +4,6 @@ REFACTORED:
             Using flext-core application patterns - NO duplication.
 """
 
-from flext_quality.application.services import (
-    QualityAnalysisService,
-    QualityIssueService,
-    QualityProjectService,
-    QualityReportService,
-)
+from __future__ import annotations
 
-__all__ = [
-    "QualityAnalysisService",
-    "QualityIssueService",
-    "QualityProjectService",
-    "QualityReportService",
-]
+__all__: list[str] = []

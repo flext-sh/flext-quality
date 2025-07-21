@@ -1,6 +1,11 @@
-"""Version information for dc-code-analyzer."""
+"""Version information for flext-quality package.
 
-__version__ = "0.5.0"
+This module contains version information for the flext-quality package.
+"""
+
+from __future__ import annotations
+
+__version__ = "0.7.0"
 __version_info__ = tuple(int(x) for x in __version__.split("."))
 
 # PyAuto Enterprise - Unified Versioning System

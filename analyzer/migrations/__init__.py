@@ -1,3 +1,8 @@
-"""Package initialization."""
+"""Database migrations for the analyzer Django app.
 
-__version__ = "0.1.0"
+This module contains Django database migrations for the code analysis models.
+"""
+
+from __future__ import annotations
+
+__version__ = "0.7.0"

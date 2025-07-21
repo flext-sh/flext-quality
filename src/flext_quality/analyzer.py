@@ -3,12 +3,11 @@
 from __future__ import annotations
 
 import ast
+import logging
 from pathlib import Path
 from typing import Any
 
-from flext_observability.logging import get_logger
-
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class CodeAnalyzer:
@@ -180,6 +179,15 @@ class CodeAnalyzer:
         return python_files
 
     def _analyze_file(self, file_path: Path) -> dict[str, Any] | None:
+        """Analyze a single Python file.
+
+        Args:
+            file_path: Path to the Python file.
+
+        Returns:
+            Dictionary with file metrics or None if analysis fails.
+
+        """
         try:
             with open(file_path, encoding="utf-8") as f:
                 content = f.read()
@@ -199,7 +207,6 @@ class CodeAnalyzer:
             )
             blank_lines = len([line for line in lines if not line.strip()])
 
-            # AST analysis
             try:
                 tree = ast.parse(content)
 
@@ -240,7 +247,6 @@ class CodeAnalyzer:
                     "complexity": 0,
                     "syntax_error": str(e),
                 }
-
         except Exception as e:
             logger.exception("Error analyzing file %s: %s", file_path, e)
             return None
@@ -288,8 +294,7 @@ class CodeAnalyzer:
         # This is a simplified implementation
         # In production, this would integrate with bandit or similar tools
         issues = []
-
-        for py_file in self._find_python_files():
+        for py_file in self.project_path.rglob("*.py"):
             try:
                 with open(py_file, encoding="utf-8") as f:
                     content = f.read()
@@ -324,7 +329,6 @@ class CodeAnalyzer:
                             "severity": "medium",
                         },
                     )
-
             except Exception as e:
                 logger.warning("Error checking security in %s: %s", py_file, e)
 
@@ -351,9 +355,7 @@ class CodeAnalyzer:
     def _analyze_dead_code(self) -> list[dict[str, Any]]:
         # This is a placeholder - real implementation would use vulture or similar
         issues = []
-
-        # Simple check for unused imports
-        for py_file in self._find_python_files():
+        for py_file in self.project_path.rglob("*.py"):
             try:
                 with open(py_file, encoding="utf-8") as f:
                     content = f.read()
@@ -379,7 +381,6 @@ class CodeAnalyzer:
                                 "message": f"Potentially unused import: {line.strip()}",
                             },
                         )
-
             except Exception as e:
                 logger.warning("Error checking dead code in %s: %s", py_file, e)
 
@@ -390,7 +391,7 @@ class CodeAnalyzer:
         issues = []
 
         file_contents = {}
-        for py_file in self._find_python_files():
+        for py_file in self.project_path.rglob("*.py"):
             try:
                 with open(py_file, encoding="utf-8") as f:
                     content = f.read()

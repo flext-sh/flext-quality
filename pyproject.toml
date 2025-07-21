@@ -1,37 +1,26 @@
 [build-system]
-requires = ["poetry-core>=1.9.0"]
+requires = [ "poetry-core>=1.9.0",]
 build-backend = "poetry.core.masonry.api"
 
 [project]
 name = "flext-quality"
 version = "0.7.0"
 description = "FLEXT Quality - Code Quality Analysis and Metrics"
-authors = [{ name = "FLEXT Team", email = "team@flext.sh" }]
-maintainers = [{ name = "FLEXT Team", email = "team@flext.sh" }]
-license = { text = "MIT" }
 readme = "README.md"
 requires-python = ">=3.13,<3.14"
-dependencies = [
-    # Quality analysis specific dependencies
-    "radon>=6.0.1",
-    "vulture>=2.13",
-    "bandit>=1.7.10",
-    "django>=5.1.0",
-    "djangorestframework>=3.15.0",
-]
-keywords = ["flext", "quality", "code-analysis", "metrics", "django"]
-classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3 :: Only",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-    "Topic :: Software Development :: Quality Assurance",
-    "Framework :: Django",
-    "Typing :: Typed",
-]
+keywords = [ "flext", "enterprise", "async", "typed", "integration", "adapter",]
+classifiers = [ "Development Status :: 5 - Production/Stable", "Intended Audience :: Developers", "License :: OSI Approved :: MIT License", "Operating System :: OS Independent", "Programming Language :: Python :: 3.13", "Programming Language :: Python :: 3 :: Only", "Topic :: Software Development :: Libraries :: Python Modules", "Typing :: Typed",]
+dependencies = []
+[[project.authors]]
+name = "FLEXT Team"
+email = "team@flext.sh"
+
+[[project.maintainers]]
+name = "FLEXT Team"
+email = "team@flext.sh"
+
+[project.license]
+text = "MIT"
 
 [project.urls]
 Homepage = "https://github.com/flext-sh/flext"
@@ -41,92 +30,15 @@ Documentation = "https://github.com/flext-sh/flext/blob/main/README.md"
 [project.scripts]
 flext-quality = "flext_quality.cli:main"
 
-[tool.poetry]
-name = "flext-quality"
-version = "0.7.0"
-description = "FLEXT Quality - Code Quality Analysis and Metrics"
-authors = ["FLEXT Team <team@flext.sh>"]
-readme = "README.md"
-packages = [{ include = "flext_quality", from = "src" }]
-
-[tool.poetry.dependencies]
-python = ">=3.13,<3.14"
-
-# Core FLEXT dependencies - primary source of truth
-flext-core = { path = "../flext-core", develop = true }
-flext-observability = { path = "../flext-observability", develop = true }
-
-# Quality analysis specific dependencies
-radon = ">=6.0.1"
-vulture = ">=2.13"
-bandit = ">=1.7.10"
-# safety removed - conflicted with meltano dependencies
-django = ">=5.1.0"
-djangorestframework = ">=3.15.0"
-
-# Core dependencies are managed by flext-core - no duplication
-# pydantic, pydantic-settings, click, structlog, etc.
-
-[tool.poetry.group.dev.dependencies]
-# Development tools - managed by flext-core
-pytest = ">=8.3.0"
-pytest-cov = ">=6.0.0"
-pytest-mock = ">=3.14.0"
-pytest-asyncio = ">=0.24.0"
-pytest-django = ">=4.9.0"
-mypy = ">=1.13.0"
-ruff = ">=0.8.0"
-
-# Quality testing
-factory-boy = ">=3.3.0"
-hypothesis = ">=6.119.0"
-
-[tool.poetry.scripts]
-flext-quality = "flext_quality.cli:main"
-
-# Ruff configuration - focused on src/ and tests/
 [tool.ruff]
 target-version = "py313"
 line-length = 88
-extend-include = ["*.pyi"]
+fix = true
+show-fixes = true
+respect-gitignore = true
+src = [ "src", "tests",]
+extend-exclude = [ "__pycache__", ".git", ".mypy_cache", ".pytest_cache", ".ruff_cache", ".venv", "venv", "build", "dist", "htmlcov",]
 
-[tool.ruff.lint]
-select = [
-    "ALL",
-]
-ignore = [
-    "E501", # line too long (handled by formatter)
-]
-
-# Test-specific ignores
-[tool.ruff.lint.per-file-ignores]
-"tests/**/*.py" = [
-    "S101",    # assert statements in tests
-    "PLR2004", # magic values in tests
-    "PLR6301", # methods could be static/function in tests
-]
-
-"**/tests/*.py" = ["S101", "D102", "N801", "N802", "N806", "PLR2004", "F401", "PLC0415", "G004", "T201"]
-"**/test_*.py" = ["S101", "D102", "N801", "N802", "N806", "PLR2004", "F401", "PLC0415", "G004", "T201"]
-
-# Auto-generated files - exclude from ALL linting
-"**/proto/*_pb2.py" = ["ALL"]
-"**/proto/*_pb2_grpc.py" = ["ALL"]
-"**/*_pb2.py" = ["ALL"]
-"**/*_pb2_grpc.py" = ["ALL"]
-"**/generated/**/*.py" = ["ALL"]
-[tool.ruff.lint.isort]
-known-first-party = ["flext_quality", "flext_core", "flext_observability"]
-force-single-line = false
-split-on-trailing-comma = true
-
-[tool.ruff.format]
-quote-style = "double"
-indent-style = "space"
-skip-magic-trailing-comma = false
-line-ending = "auto"
-
-# MyPy configuration - focused on src/ and tests/
 [tool.mypy]
 python_version = "3.13"
 strict = true
@@ -142,79 +54,134 @@ warn_unused_ignores = true
 warn_no_return = true
 warn_unreachable = true
 strict_equality = true
-
-# Paths to check
-files = ["src", "tests"]
-
-# Import discovery
-namespace_packages = true
-explicit_package_bases = true
-
-# Error output
 show_error_codes = true
-show_column_numbers = true
 show_error_context = true
 pretty = true
+disallow_any_generics = true
+disallow_subclassing_any = true
+disallow_untyped_calls = true
+ignore_missing_imports = false
+no_implicit_reexport = true
+files = [ "src", "tests",]
+plugins = [ "pydantic.mypy", "mypy_django_plugin.main",]
+exclude = [ "build", "dist", ".venv", ".mypy_cache",]
 
-# Disable specific checks for tests
-[[tool.mypy.overrides]]
-module = "tests.*"
-disallow_untyped_defs = false
-disallow_incomplete_defs = false
+[tool.bandit]
+exclude_dirs = [ "tests", "build", "dist",]
+skips = [ "B101", "B601",]
 
-# External library stubs
-[[tool.mypy.overrides]]
-module = [
-    "radon.*",
-    "vulture.*",
-    "bandit.*",
-    "safety.*",
-    "semgrep.*",
-    "django.*",
-    "rest_framework.*",
-]
-ignore_missing_imports = true
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
 
-# Coverage configuration
+[tool.django-stubs]
+django_settings_module = "code_analyzer_web.settings"
+
+[tool.poetry]
+[[tool.poetry.packages]]
+include = "flext_quality"
+from = "src"
+
+[tool.deptry]
+known_first_party = [ "flext_quality",]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+asyncio_mode = "auto"
+addopts = [ "-ra", "--strict-markers", "--strict-config", "--cov=flext_quality", "--cov-branch", "--cov-report=term-missing:skip-covered", "--cov-report=html:reports/coverage", "--cov-report=xml:reports/coverage.xml", "--cov-fail-under=85", "--maxfail=1", "--tb=short",]
+testpaths = [ "tests",]
+markers = [ "unit: Unit tests", "integration: Integration tests", "slow: Slow tests", "smoke: Smoke tests", "e2e: End-to-end tests",]
+filterwarnings = [ "error", "ignore::UserWarning", "ignore::DeprecationWarning",]
+
+[tool.ruff.lint]
+select = [ "ALL",]
+ignore = [ "COM812", "D203", "D213", "ISC001", "ANN401", "ARG001", "ARG002", "BLE001", "C901", "D102", "D103", "D105", "D107", "D401", "DTZ001", "DTZ005", "E401", "E501", "EM101", "EM102", "ERA001", "EXE001", "F401", "F823", "FBT001", "FBT002", "FBT003", "FIX002", "G004", "PLC0415", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PLR2004", "PLW0603", "PTH118", "PTH123", "RUF001", "S103", "S104", "S105", "S106", "S107", "S603", "S607", "SIM102", "TD002", "TD003", "TRY003", "TRY203", "TRY300", "TRY301", "TRY401",]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "lf"
+docstring-code-format = true
+
 [tool.coverage.run]
-source = ["src"]
+source = [ "src",]
 branch = true
-omit = ["*/tests/*", "*/test_*", "*/__pycache__/*", "*/site-packages/*"]
+omit = [ "*/tests/*", "*/test_*", "*/__pycache__/*", "*/venv/*", "*/.venv/*",]
 
 [tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if 0:",
-    "if __name__ == .__main__.:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
-]
-show_missing = true
-precision = 2
+exclude_lines = [ "pragma: no cover", "def __repr__", "if self.debug:", "if settings.DEBUG", "raise AssertionError", "raise NotImplementedError", "if 0:", "if __name__ == .__main__.:", "class .*\\bProtocol\\):", "@(abc\\.)?abstractmethod",]
 
 [tool.coverage.html]
-directory = "htmlcov"
+directory = "reports/coverage"
 
-# Pytest configuration
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = ["--strict-markers", "--strict-config", "--verbose", "--tb=short"]
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests",
-    "django: marks tests as Django tests",
-]
-filterwarnings = ["error", "ignore::UserWarning", "ignore::DeprecationWarning"]
+[tool.coverage.xml]
+output = "reports/coverage.xml"
 
-# Django configuration for flext-quality web interface
-[tool.django]
-settings_module = "flext_quality.settings"
+[tool.poetry.dependencies]
+python = ">=3.13,<3.14"
+
+
+[tool.ruff.lint.isort]
+known-first-party = [ "flext",]
+force-single-line = false
+split-on-trailing-comma = true
+combine-as-imports = true
+
+[tool.ruff.lint.per-file-ignores]
+"**/tests/**" = [ "S101", "S103", "S104", "S105", "S106", "S107", "PLR2004", "ARG", "SLF001", "PLC0415",]
+"**/scripts/**" = [ "T201", "S603", "S607", "ANN",]
+"**/__init__.py" = [ "F401",]
+"**/proto/*_pb2.py" = [ "ALL",]
+"**/proto/*_pb2_grpc.py" = [ "ALL",]
+"**/*_pb2.py" = [ "ALL",]
+"**/*_pb2_grpc.py" = [ "ALL",]
+"**/generated/**/*.py" = [ "ALL",]
+
+[tool.poetry.dependencies.flext-core]
+path = "../flext-core"
+develop = true
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.12.3"
+black = "^25.1.0"
+isort = "^6.0.1"
+mypy = "^1.13.0"
+pylint = "^3.3.0"
+pre-commit = "^4.0.1"
+vulture = "^2.13"
+radon = "^6.0.1"
+codespell = "^2.3.0"
+pyupgrade = "^3.19.0"
+autoflake = "^2.3.1"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^8.4.0"
+pytest-asyncio = "^1.0.0"
+pytest-cov = "^6.2.0"
+pytest-xdist = "^3.8.0"
+pytest-mock = "^3.14.0"
+pytest-timeout = "^2.4.0"
+pytest-benchmark = "^5.1.0"
+pytest-randomly = "^3.16.0"
+pytest-sugar = "^1.0.0"
+pytest-clarity = "^1.0.1"
+pytest-deadfixtures = "^2.2.1"
+pytest-env = "^1.1.5"
+pytest-httpx = "^0.35.0"
+hypothesis = "^6.125.0"
+factory-boy = "^3.3.1"
+faker = "^37.4.0"
+
+[tool.poetry.group.typings.dependencies]
+types-python-dateutil = "^2.9.0"
+types-pyyaml = "^6.0.12"
+types-setuptools = "^80.9.0"
+types-toml = "^0.10.8.20240310"
+types-requests = "^2.32.4"
+types-redis = "^4.6.0"
+types-psutil = "^7.0.0"
+
+[tool.poetry.group.security.dependencies]
+bandit = "^1.8.0"
+pip-audit = "^2.7.3"

@@ -1,40 +1,42 @@
-"""Module dashboard_extras.
-
-from typing import Any
-
 """Custom template filters for the dashboard app."""
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, Any
+
 from django import template
+from django.utils.html import escape
 from django.utils.safestring import mark_safe
+
+if TYPE_CHECKING:
+    from datetime import timedelta
 
 register = template.Library()
 
 
 @register.filter
-def get_item(dictionary, key) -> Any:
-            if isinstance(dictionary, dict):
-            return dictionary.get(key)
-    return None
+def get_item(dictionary: dict[str, Any], key: str) -> Any:
+    return dictionary.get(key)
 
 
 @register.filter
-def multiply(value, arg) -> Any:
-        try:
-            return float(value) * float(arg)
+def multiply(value: float, arg: float) -> float:
+    try:
+        return float(value) * float(arg)
     except (ValueError, TypeError):
         return 0
 
 
 @register.filter
-def percentage(value, total) -> Any:
-        if total == 0:
-            return 0
+def percentage(value: float, total: float) -> Any:
+    if total == 0:
+        return 0
     return round((value / total) * 100, 1)
 
 
 @register.filter
-def severity_color(severity) -> Any:
-        severity_colors = {
+def severity_color(severity: str) -> Any:
+    severity_colors = {
         "CRITICAL": "danger",
         "HIGH": "warning",
         "MEDIUM": "info",
@@ -45,8 +47,8 @@ def severity_color(severity) -> Any:
 
 
 @register.filter
-def status_icon(status) -> Any:
-        status_icons = {
+def status_icon(status: str) -> Any:
+    status_icons = {
         "success": "✅",
         "failed": "❌",
         "skipped": "⏭️",
@@ -56,15 +58,13 @@ def status_icon(status) -> Any:
 
 
 @register.filter
-def dict_get(dictionary, key) -> Any:
-        if isinstance(dictionary, dict):
-            return dictionary.get(key, 0)
-    return 0
+def dict_get(dictionary: dict[str, Any], key: str) -> Any:
+    return dictionary.get(key, 0)
 
 
 @register.filter
-def severity_badge(severity) -> Any:
-        severity_classes = {
+def severity_badge(severity: str) -> Any:
+    severity_classes = {
         "CRITICAL": "bg-danger",
         "HIGH": "bg-warning",
         "MEDIUM": "bg-info",
@@ -75,8 +75,8 @@ def severity_badge(severity) -> Any:
 
 
 @register.filter
-def status_badge(status) -> Any:
-        status_classes = {
+def status_badge(status: str) -> Any:
+    status_classes = {
         "success": "bg-success",
         "failed": "bg-danger",
         "skipped": "bg-warning",
@@ -89,9 +89,9 @@ def status_badge(status) -> Any:
 
 
 @register.filter
-def format_duration(duration) -> str:
-        if not duration:
-            return "N/A"
+def format_duration(duration: timedelta) -> str:
+    if not duration:
+        return "N/A"
 
     total_seconds = int(duration.total_seconds())
     hours = total_seconds // 3600
@@ -99,48 +99,48 @@ def format_duration(duration) -> str:
     seconds = total_seconds % 60
 
     if hours > 0:
-            return f"{hours}h {minutes}m {seconds}s"
+        return f"{hours}h {minutes}m {seconds}s"
     if minutes > 0:
-            return f"{minutes}m {seconds}s"
+        return f"{minutes}m {seconds}s"
     return f"{seconds}s"
 
 
 @register.filter
-def truncate_path(path, max_length: int =50) -> Any:
-        if len(path) <= max_length:
-            return path
+def truncate_path(path: str, max_length: int = 50) -> Any:
+    if len(path) <= max_length:
+        return path
 
     # Try to keep the filename and some parent directories
     parts = path.split("/")
     if len(parts) > 1:
-            filename = parts[-1]
+        filename = parts[-1]
         remaining_length = max_length - len(filename) - 3  # 3 for "..."
 
         if remaining_length > 0:
             # Build path from the beginning until we run out of space
-            truncated_parts: list = {}
+            truncated_parts: list[str] = []
             current_length = 0
 
-            for part in parts[:
-            -1]:
+            for part in parts[:-1]:
                 if current_length + len(part) + 1 <= remaining_length:
-            truncated_parts.append(part)
+                    truncated_parts.append(part)
                     current_length += len(part) + 1
+                else:
                     break
 
             if truncated_parts:
-            return "/".join(truncated_parts) + "/.../" + filename
+                return "/".join(truncated_parts) + "/.../" + filename
 
     # Fallback: just truncate from the end
     return path[: max_length - 3] + "..."
 
 
 @register.filter
-def issue_icon(category) -> Any:
-        icons = {
+def issue_icon(category: str) -> Any:
+    icons = {
         "security": "fas fa-shield-alt",
         "quality": "fas fa-code",
-        "complexity": "fas fa-flx_project-diagram",
+        "complexity": "fas fa-project-diagram",
         "dead_code": "fas fa-trash",
         "style": "fas fa-paint-brush",
         "documentation": "fas fa-book",
@@ -152,20 +152,23 @@ def issue_icon(category) -> Any:
 
 
 @register.simple_tag
-def progress_bar(value, total, css_class: str ="bg-primary") -> Any:
-        percentage = 0 if total == 0 else value / total * 100:
+def progress_bar(value: float, total: float, css_class: str = "bg-primary") -> str:
+    # Ensure numeric values and escape css_class for safety
+    value = int(value) if str(value).isdigit() else 0
+    total = int(total) if str(total).isdigit() else 1
+    css_class = escape(css_class)
+
+    percentage = 0 if total == 0 else value / total * 100
 
     html = f"""
-    <div class="progress" style="height:
-            20px
-    ">
+    <div class="progress" style="height: 20px">
         <div class="progress-bar {css_class}" role="progressbar"
-             style="width: {percentage}%"
-             aria-valuenow="{value}"
-             aria-valuemin="0"
-             aria-valuemax="{total}">
+                style="width: {percentage}%"
+                aria-valuenow="{value}"
+                aria-valuemin="0"
+                aria-valuemax="{total}">
             {value}/{total}
         </div>
     </div>
     """
-    return mark_safe(html)
+    return mark_safe(html)  # noqa: S308
