@@ -26,23 +26,31 @@ class AnalysisService(ABC):
         include_complexity: bool = True,
         include_dead_code: bool = True,
         include_duplicates: bool = True,
-    ) -> ServiceResult[dict[str, Any]]: ...
+    ) -> ServiceResult[dict[str, Any]]:
+        """Analyze a complete project with configurable analysis types."""
+        ...
 
     @abstractmethod
     async def analyze_file(
         self,
         file_path: Path,
         analysis_types: list[str] | None = None,
-    ) -> ServiceResult[dict[str, Any]]: ...
+    ) -> ServiceResult[dict[str, Any]]:
+        """Analyze a single file with specified analysis types."""
+        ...
 
     @abstractmethod
     async def calculate_quality_score(
         self,
         analysis_results: dict[str, Any],
-    ) -> ServiceResult[float]: ...
+    ) -> ServiceResult[float]:
+        """Calculate overall quality score from analysis results."""
+        ...
 
     @abstractmethod
-    async def get_quality_grade(self, quality_score: float) -> ServiceResult[str]: ...
+    async def get_quality_grade(self, quality_score: float) -> ServiceResult[str]:
+        """Convert quality score to letter grade (A, B, C, D, F)."""
+        ...
 
 
 class SecurityAnalyzerService(ABC):
@@ -53,20 +61,26 @@ class SecurityAnalyzerService(ABC):
         self,
         project_path: Path,
         severity_threshold: str = "medium",
-    ) -> ServiceResult[list[dict[str, Any]]]: ...
+    ) -> ServiceResult[list[dict[str, Any]]]:
+        """Analyze project for security vulnerabilities."""
+        ...
 
     @abstractmethod
     async def scan_file(
         self,
         file_path: Path,
         severity_threshold: str = "medium",
-    ) -> ServiceResult[list[dict[str, Any]]]: ...
+    ) -> ServiceResult[list[dict[str, Any]]]:
+        """Scan a single file for security issues."""
+        ...
 
     @abstractmethod
     async def validate_dependencies(
         self,
         project_path: Path,
-    ) -> ServiceResult[list[dict[str, Any]]]: ...
+    ) -> ServiceResult[list[dict[str, Any]]]:
+        """Validate project dependencies for known vulnerabilities."""
+        ...
 
 
 class LintingService(ABC):
@@ -77,17 +91,23 @@ class LintingService(ABC):
         self,
         project_path: Path,
         fix: bool = False,
-    ) -> ServiceResult[list[dict[str, Any]]]: ...
+    ) -> ServiceResult[list[dict[str, Any]]]:
+        """Lint entire project with optional auto-fix."""
+        ...
 
     @abstractmethod
     async def lint_file(
         self,
         file_path: Path,
         fix: bool = False,
-    ) -> ServiceResult[list[dict[str, Any]]]: ...
+    ) -> ServiceResult[list[dict[str, Any]]]:
+        """Lint a single file with optional auto-fix."""
+        ...
 
     @abstractmethod
-    async def format_code(self, file_path: Path) -> ServiceResult[str]: ...
+    async def format_code(self, file_path: Path) -> ServiceResult[str]:
+        """Format code in a file according to style guidelines."""
+        ...
 
 
 class ReportGeneratorService(ABC):

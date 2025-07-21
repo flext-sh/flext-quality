@@ -41,11 +41,7 @@ def check_database() -> dict[str, Any]:
                 "status": "healthy" if result and result[0] == 1 else "unhealthy",
                 "details": "Database connection successful",
             }
-    except (
-        connection.OperationalError,
-        connection.DatabaseError,
-        connection.InterfaceError,
-    ) as e:
+    except Exception as e:
         return {
             "status": "unhealthy",
             "details": f"Database connection failed: {e!s}",

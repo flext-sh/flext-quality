@@ -158,7 +158,13 @@ def configure_quality_dependencies() -> None:
 
 
 def get_quality_container() -> QualityContainer:
-    global _container  # noqa: PLW0602
+    global _container  # noqa: PLW0602 - Singleton pattern access to global container
     if _container is None:
         configure_quality_dependencies()
-    return _container  # type: ignore[return-value]
+
+    # Ensure container is properly initialized
+    if _container is None:
+        msg = "Container initialization failed"
+        raise RuntimeError(msg)
+
+    return _container

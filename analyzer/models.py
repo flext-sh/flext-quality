@@ -630,7 +630,7 @@ class ClassAnalysis(models.Model):
         """Meta options for ClassAnalysis model."""
 
         db_table = "analyzer_class_analysis"
-        unique_together: ClassVar[list[tuple[str, str, int]]] = [
+        unique_together: ClassVar[list[tuple[str, str, str]]] = [
             ("file_analysis", "name", "line_start"),
         ]
         indexes: ClassVar[list[Any]] = [
@@ -744,7 +744,7 @@ class FunctionAnalysis(models.Model):
         """Meta options for FunctionAnalysis model."""
 
         db_table = "analyzer_function_analysis"
-        unique_together: ClassVar[list[tuple[str, str, int]]] = [
+        unique_together: ClassVar[list[tuple[str, str, str]]] = [
             ("file_analysis", "name", "line_start"),
         ]
         indexes: ClassVar[list[Any]] = [
@@ -852,7 +852,7 @@ class VariableAnalysis(models.Model):
         """Meta options for VariableAnalysis model."""
 
         db_table = "analyzer_variable_analysis"
-        unique_together: ClassVar[list[tuple[str, str, int]]] = [
+        unique_together: ClassVar[list[tuple[str, str, str]]] = [
             ("file_analysis", "name", "line_number"),
         ]
         indexes: ClassVar[list[Any]] = [
@@ -924,7 +924,7 @@ class ImportAnalysis(models.Model):
         """Meta options for ImportAnalysis model."""
 
         db_table = "analyzer_import_analysis"
-        unique_together: ClassVar[list[tuple[str, str, str, int]]] = [
+        unique_together: ClassVar[list[tuple[str, str, str, str]]] = [
             ("file_analysis", "module_name", "import_name", "line_number"),
         ]
         indexes: ClassVar[list[Any]] = [
