@@ -34,6 +34,6 @@ app.conf.update(
 )
 
 
-@app.task(bind=True)
+@app.task(bind=True)  # type: ignore[misc]
 def debug_task(self: Any) -> None:
     pass

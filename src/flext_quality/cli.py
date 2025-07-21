@@ -20,7 +20,7 @@ def setup_logging(level: str = "INFO") -> None:
     pass
 
 
-def analyze_project(args: argparse.Namespace) -> None:
+def analyze_project(args: argparse.Namespace) -> int:
     """Analyze project quality."""
     try:
         project_path = Path(args.path).resolve()
@@ -68,7 +68,7 @@ def analyze_project(args: argparse.Namespace) -> None:
         return 3
 
 
-def another_function(args: argparse.Namespace) -> None:
+def another_function(args: argparse.Namespace) -> int:
     """Another function."""
     try:
         project_path = Path(args.path).resolve()

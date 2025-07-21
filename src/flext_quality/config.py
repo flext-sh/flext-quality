@@ -8,8 +8,9 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from flext_core.domain.pydantic_base import BaseSettings
-from pydantic import ConfigDict, Field
+from flext_core.config.base import BaseSettings
+from pydantic import Field
+from pydantic_settings import SettingsConfigDict
 
 
 class QualityConfig(BaseSettings):
@@ -149,8 +150,8 @@ class QualityConfig(BaseSettings):
             "black": self.black_config_path,
         }
 
-    model_config = ConfigDict(
-        # Remove invalid keys for flext-core ConfigDict
+    model_config = SettingsConfigDict(
+        # Remove invalid keys for flext-core SettingsConfigDict
         arbitrary_types_allowed=True,
         validate_assignment=True,
     )

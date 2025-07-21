@@ -6,7 +6,7 @@ import json
 import shutil
 import subprocess
 from pathlib import Path
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from analyzer.backends.base import AnalysisBackend, AnalysisResult
 
@@ -137,7 +137,7 @@ class ExternalToolsBackend(AnalysisBackend):
 
         return result
 
-    def _run_bandit(self, python_files: list[Path]) -> list[dict]:
+    def _run_bandit(self, python_files: list[Path]) -> list[dict[str, Any]]:
         """Run bandit security analysis on Python files.
 
         Args:
@@ -147,7 +147,7 @@ class ExternalToolsBackend(AnalysisBackend):
             List of security issues found by bandit.
 
         """
-        security_issues = []
+        security_issues: list[dict[str, Any]] = []
 
         # Get secure tool path
         bandit_path = self._get_tool_path("bandit")
@@ -206,7 +206,7 @@ class ExternalToolsBackend(AnalysisBackend):
 
         return security_issues
 
-    def _run_vulture(self, python_files: list[Path]) -> list[dict]:
+    def _run_vulture(self, python_files: list[Path]) -> list[dict[str, Any]]:
         """Run vulture dead code analysis on Python files.
 
         Args:
@@ -216,7 +216,7 @@ class ExternalToolsBackend(AnalysisBackend):
             List of dead code issues found by vulture.
 
         """
-        dead_code_issues = []
+        dead_code_issues: list[dict[str, Any]] = []
 
         # Get secure tool path
         vulture_path = self._get_tool_path("vulture")

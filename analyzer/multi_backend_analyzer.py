@@ -17,11 +17,11 @@ from analyzer.models import (
     ClassAnalysis,
     DetectedIssue,
     FileAnalysis,
-    FlxProjectModel,
     FunctionAnalysis,
     ImportAnalysis,
     IssueType,
     PackageAnalysis,
+    Project,
     QualityMetrics,
     SecurityIssue,
     VariableAnalysis,
@@ -35,7 +35,7 @@ class MultiBackendAnalyzer:
 
     def __init__(
         self,
-        flx_project: FlxProjectModel,
+        flx_project: Project,
         backend_names: list[str] | None = None,
     ) -> None:
         """Initialize the multi-backend analyzer."""
@@ -64,9 +64,6 @@ class MultiBackendAnalyzer:
             python_files = self._find_python_files(project_path)
 
             if not python_files:
-                if self.session is None:
-                    msg = "Analysis session is not initialized"
-                    raise RuntimeError(msg)
                 self.session.status = "completed"
                 self.session.completed_at = timezone.now()
                 self.session.error_message = "No Python files found"
@@ -153,11 +150,6 @@ class MultiBackendAnalyzer:
             # Save results to database
             self._save_results(combined_result, backend_stats)
 
-            # Update session
-            if self.session is None:
-                msg = "Analysis session is not initialized"
-                raise RuntimeError(msg)
-
             # Check if all backends failed - if so, mark analysis as failed
             successful_backends = [
                 name
@@ -188,13 +180,11 @@ class MultiBackendAnalyzer:
 
         except Exception as e:
             self.logger.exception(f"Analysis failed: {e}")
-            if self.session is None:
-                msg = "Analysis session is not initialized"
-                raise RuntimeError(msg) from e
             self.session.status = "failed"
             self.session.completed_at = timezone.now()
             self.session.error_message = str(e)
             self.session.save()
+            raise
 
         return self.session
 

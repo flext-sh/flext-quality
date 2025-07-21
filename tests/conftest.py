@@ -32,7 +32,7 @@ def set_test_environment() -> Generator[None]:
 @pytest.fixture
 def django_db_setup() -> Generator[None]:
     """Django database setup for testing."""
-    from django.test.utils import (  # type: ignore[import-untyped]
+    from django.test.utils import (
         setup_test_environment,
         teardown_test_environment,
     )

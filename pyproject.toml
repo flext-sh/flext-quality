@@ -63,7 +63,7 @@ disallow_untyped_calls = true
 ignore_missing_imports = false
 no_implicit_reexport = true
 files = [ "src", "tests",]
-plugins = [ "pydantic.mypy", "mypy_django_plugin.main",]
+plugins = [ "pydantic.mypy",]
 exclude = [ "build", "dist", ".venv", ".mypy_cache",]
 
 [tool.bandit]
@@ -97,6 +97,8 @@ filterwarnings = [ "error", "ignore::UserWarning", "ignore::DeprecationWarning",
 [tool.ruff.lint]
 select = [ "ALL",]
 ignore = [ "COM812", "D203", "D213", "ISC001", "ANN401", "ARG001", "ARG002", "BLE001", "C901", "D102", "D103", "D105", "D107", "D401", "DTZ001", "DTZ005", "E401", "E501", "EM101", "EM102", "ERA001", "EXE001", "F401", "F823", "FBT001", "FBT002", "FBT003", "FIX002", "G004", "PLC0415", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PLR2004", "PLW0603", "PTH118", "PTH123", "RUF001", "S103", "S104", "S105", "S106", "S107", "S603", "S607", "SIM102", "TD002", "TD003", "TRY003", "TRY203", "TRY300", "TRY301", "TRY401",]
+# Allow CamelCase for AST visitor methods (required by Python ast module)
+extend-per-file-ignores = { "analyzer/backends/ast_backend.py" = ["N802"] }
 
 [tool.ruff.format]
 quote-style = "double"
