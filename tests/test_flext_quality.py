@@ -1,4 +1,6 @@
-"""Test suite for flext-quality basic functionality."""
+"""Test suite for flext-infrastructure.monitoring.flext-quality basic functionality."""
+
+from __future__ import annotations
 
 from pathlib import Path
 
@@ -13,11 +15,11 @@ class TestCodeAnalyzer:
         assert analyzer is not None
         assert analyzer.project_path == Path()
 
-    def test_analyzer_with_path(self, tmp_path) -> None:
+    def test_analyzer_with_path(self, tmp_path: Path) -> None:
         analyzer = CodeAnalyzer(tmp_path)
         assert analyzer.project_path == tmp_path
 
-    def test_find_python_files(self, tmp_path) -> None:
+    def test_find_python_files(self, tmp_path: Path) -> None:
         # Create test files
         (tmp_path / "test.py").write_text("print('hello')")
         (tmp_path / "subdir").mkdir()
@@ -30,8 +32,8 @@ class TestCodeAnalyzer:
         assert any(f.name == "test.py" for f in files)
         assert any(f.name == "test2.py" for f in files)
 
-    def test_analyze_project_basic(self, tmp_path) -> None:
-            # Create a simple Python file
+    def test_analyze_project_basic(self, tmp_path: Path) -> None:
+        # Create a simple Python file
         test_file = tmp_path / "simple.py"
         test_file.write_text(
             """
@@ -40,7 +42,7 @@ def hello() -> None:
 
 if __name__ == "__main__":
             print(hello())
-"""
+""",
         )
 
         analyzer = CodeAnalyzer(tmp_path)

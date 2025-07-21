@@ -1,12 +1,23 @@
-from datetime import datetime
-from typing import Any
-
-"""Django REST Framework views for analyzer API.
+"""Django REST Framework views for analyzer API."""
 
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, ClassVar
+
+from django.contrib import messages
+from django.core.cache import cache
+from django.db.models import Avg
+from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_http_methods
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
 from analyzer.analysis_engine import CodeAnalysisEngine
 from analyzer.models import (
@@ -17,17 +28,9 @@ from analyzer.models import (
     Project,
     QualityMetrics,
     SecurityIssue,
-    dataclasses,
-    date,
-    datetime,
-    field,
-    from,
-    import,
-    time,
-    timezone,
 )
 from analyzer.package_discovery import PackageDiscovery
-from analyzer.report_generator import WebReportGenerator, create_download_response
+from analyzer.report_generator import WebReportGenerator
 from analyzer.serializers import (
     AnalysisSessionSerializer,
     AnalysisSessionSummarySerializer,
@@ -41,61 +44,58 @@ from analyzer.serializers import (
     SecurityIssueSerializer,
 )
 from analyzer.tasks import run_code_analysis
-from django.contrib import messages
-from django.db.models import Avg
-from django.http import HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
-from django.views.decorators.http import require_http_methods
-from django_filters.rest_framework import (
-    DjangoFilterBackend,  # type:
-            ignore[import-untyped]
-)
-from django_filters.rest_framework import (  # TODO: Move import to module level
-    cache,
-    django.core.cache,
-    from,
-    import,
-)
-from rest_framework import filters, status, viewsets
-from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
 
 if TYPE_CHECKING:
-            from django.http import HttpRequest
+    from django.http import HttpRequest
     from rest_framework.request import Request
 
 logger = logging.getLogger(__name__)
 
+
+def create_download_response(report: Any) -> HttpResponse:
+    """Create a download response for a report.
+
+    Args:
+        report: The report object with content and filename attributes.
+
+    Returns:
+        HttpResponse configured for file download.
+
+    """
+    response = HttpResponse(report.content, content_type=report.content_type)
+    response["Content-Disposition"] = f'attachment; filename="{report.filename}"'
+    return response
+
+
 class ProjectViewSet(viewsets.ModelViewSet):
-         """ViewSet for managing projects."""
+    """ViewSet for managing projects."""
 
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend,
+    permission_classes: ClassVar[list[Any]] = [IsAuthenticated]
+    filter_backends: ClassVar[list[type[filters.BaseFilterBackend]]] = [
+        DjangoFilterBackend,
         filters.SearchFilter,
         filters.OrderingFilter,
     ]
-    filterset_fields = ["name", "package_type"]
-    search_fields = ["name", "description", "path"]
-    ordering_fields = ["name", "created_at", "updated_at"]
-    ordering = ["-updated_at"]
+    filterset_fields: ClassVar[list[str]] = ["name", "package_type"]
+    search_fields: ClassVar[list[str]] = ["name", "description", "path"]
+    ordering_fields: ClassVar[list[str]] = ["name", "created_at", "updated_at"]
+    ordering: ClassVar[list[str]] = ["-updated_at"]
 
     def get_queryset(self) -> Any:
-            return Project.objects.all()
+        return Project.objects.all()
+
     def get_serializer_class(self) -> Any:
         if self.action == "list":
             return ProjectSummarySerializer
         return ProjectSerializer
 
-    def perform_create(self, serializer) -> None:
+    def perform_create(self, serializer: ProjectSerializer) -> None:
         serializer.save()
 
     @action(detail=True, methods=["get"])
-    def analysis_sessions(self, _request: Request, _pk: Any | None =None) -> Response:
+    def analysis_sessions(self, _request: Request, _pk: Any | None = None) -> Response:
         flx_project = self.get_object()
         sessions = flx_project.analysis_sessions.all()
 
@@ -103,17 +103,20 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @action(detail=True, methods=["get"])
-    def statistics(self, _request: Request, _pk: Any | None =None) -> Response:
+    def statistics(self, _request: Request, _pk: Any | None = None) -> Response:
         flx_project = self.get_object()
         sessions = flx_project.analysis_sessions.all()
 
-        stats = {"total_analyses": sessions.count(),
+        stats = {
+            "total_analyses": sessions.count(),
             "completed_analyses": sessions.filter(status="completed").count(),
             "failed_analyses": sessions.filter(status="failed").count(),
-            "avg_score": sessions.filter(status="completed").aggregate(avg=Avg("overall_score"),
+            "avg_score": sessions.filter(status="completed").aggregate(
+                avg=Avg("overall_score"),
             )["avg"],
             "last_analysis": sessions.first(),
-            "project_info": {"total_files": flx_project.total_files,
+            "project_info": {
+                "total_files": flx_project.total_files,
                 "total_lines": flx_project.total_lines,
                 "python_files": flx_project.python_files,
             },
@@ -122,11 +125,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response(stats)
 
     @action(detail=True, methods=["post"], url_path="start-analysis")
-    def start_analysis(self, request: Request, pk: Any | None =None) -> Response:
+    def start_analysis(self, request: Request, pk: Any | None = None) -> Response:
         flx_project = self.get_object()
 
         # Create analysis session
-        data = {"flx_project": flx_project.id,
+        data = {
+            "flx_project": flx_project.id,
             "include_security": request.data.get("include_security", True),
             "include_dead_code": request.data.get("include_dead_code", True),
             "include_duplicates": request.data.get("include_duplicates", True),
@@ -139,7 +143,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
             # Start the analysis
             try:
-            # Update status to running
+                # Update status to running
                 session.status = "running"
                 session.started_at = timezone.now()
                 session.save()
@@ -147,22 +151,24 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 # Start analysis task (would be Celery task in production)
                 run_code_analysis.delay(session.id)  # type ignore[attr-defined]
 
-                return Response({"session_id" session.id,
+                return Response(
+                    {
+                        "session_id": session.id,
                         "message": "Analysis started successfully",
                     },
                     status=status.HTTP_202_ACCEPTED,
                 )
 
             except Exception as e:
-        logger.exception(f"Failed to start analysis for session {session.id}:
-            //{self.target_ldap_host}:{self.target_ldap_port}"
-                        {e}",
+                logger.exception(
+                    f"Failed to start analysis for session {session.id}: {e}",
                 )
                 session.status = "failed"
                 session.error_message = str(e)
                 session.save()
 
-                return Response({"error": "Failed to start analysis"},
+                return Response(
+                    {"error": "Failed to start analysis"},
                     status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 )
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -170,19 +176,28 @@ class ProjectViewSet(viewsets.ModelViewSet):
 
 
 class AnalysisSessionViewSet(viewsets.ModelViewSet):
-         """ViewSet for managing analysis sessions."""
+    """ViewSet for managing analysis sessions."""
 
     queryset = AnalysisSession.objects.all()
     serializer_class = AnalysisSessionSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ["status", "flx_project"]
-    ordering_fields = ["created_at", "started_at", "completed_at", "overall_score"]
-    ordering = ["-created_at"]
+    permission_classes: ClassVar[list[Any]] = [IsAuthenticated]
+    filter_backends: ClassVar[list[type[filters.BaseFilterBackend]]] = [
+        DjangoFilterBackend,
+        filters.OrderingFilter,
+    ]
+    filterset_fields: ClassVar[list[str]] = ["status", "flx_project"]
+    ordering_fields: ClassVar[list[str]] = [
+        "created_at",
+        "started_at",
+        "completed_at",
+        "overall_score",
+    ]
+    ordering: ClassVar[list[str]] = ["-created_at"]
 
     def get_queryset(self) -> Any:
-            # TODO: Break long line
+        # TODO: Break long line
         return AnalysisSession.objects.all()
+
     def get_serializer_class(self) -> Any:
         if self.action == "create":
             return CreateAnalysisSessionSerializer
@@ -191,11 +206,12 @@ class AnalysisSessionViewSet(viewsets.ModelViewSet):
         return AnalysisSessionSerializer
 
     @action(detail=True, methods=["post"])
-    def start(self, _request: Request, _pk: Any | None =None) -> Response:
+    def start(self, _request: Request, _pk: Any | None = None) -> Response:
         session = self.get_object()
 
         if session.status != "pending":
-            return Response({"error": "Session is not in pending state"},
+            return Response(
+                {"error": "Session is not in pending state"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -208,25 +224,26 @@ class AnalysisSessionViewSet(viewsets.ModelViewSet):
             # Start analysis task (would be Celery task in production)
             run_code_analysis.delay(session.id)  # type ignore[attr-defined]
 
-            return Response({"message" "Analysis started successfully"})
+            return Response({"message": "Analysis started successfully"})
 
         except Exception as e:
-        logger.exception(f"Failed to start analysis {session.id}://{self.target_ldap_host}:{self.target_ldap_port}"
-                {e}")
+            logger.exception(f"Failed to start analysis {session.id}: {e}")
             session.status = "failed"
             session.error_message = str(e)
             session.save()
 
-            return Response({"error": "Failed to start analysis"},
+            return Response(
+                {"error": "Failed to start analysis"},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR,
             )
 
     @action(detail=True, methods=["post"])
-    def cancel(self, _request: Request, _pk: Any | None =None) -> Response:
+    def cancel(self, _request: Request, _pk: Any | None = None) -> Response:
         session = self.get_object()
 
         if session.status not in {"pending", "running"}:
-            return Response({"error": "Session cannot be cancelled"},
+            return Response(
+                {"error": "Session cannot be cancelled"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -237,7 +254,7 @@ class AnalysisSessionViewSet(viewsets.ModelViewSet):
         return Response({"message": "Analysis cancelled successfully"})
 
     @action(detail=True, methods=["get"])
-    def status(self, _request: Request, pk: Any | None =None) -> Response:
+    def status(self, _request: Request, pk: Any | None = None) -> Response:
         session = self.get_object()
 
         progress = 0
@@ -246,8 +263,9 @@ class AnalysisSessionViewSet(viewsets.ModelViewSet):
         elif session.status == "running":
             progress = 50  # Estimate for running state
 
-        return Response({"session_id":
-            session.id,
+        return Response(
+            {
+                "session_id": session.id,
                 "status": session.status,
                 "progress": progress,
                 "started_at": session.started_at,
@@ -257,33 +275,39 @@ class AnalysisSessionViewSet(viewsets.ModelViewSet):
         )
 
     @action(detail=True, methods=["get"])
-    def results(self, _request: Request, pk: Any | None =None) -> Response:
+    def results(self, _request: Request, pk: Any | None = None) -> Response:
         session = self.get_object()
 
         if session.status != "completed":
-            return Response({"error": "Analysis not completed yet"},
+            return Response(
+                {"error": "Analysis not completed yet"},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
-        results = {"session_id": session.id,
+        results = {
+            "session_id": session.id,
             "status": session.status,
             "overall_score": session.overall_score,
             "quality_grade": session.quality_grade,
             "quality_metrics": (
                 QualityMetricsSerializer(session.quality_metrics).data
-                if hasattr(session, "quality_metrics"):
-            else None:
-                    ),
-            "security_issues": SecurityIssueSerializer(session.security_issues.all(),
+                if hasattr(session, "quality_metrics")
+                else None
+            ),
+            "security_issues": SecurityIssueSerializer(
+                session.security_issues.all(),
                 many=True,
             ).data,
-            "dead_code_issues": DeadCodeIssueSerializer(session.dead_code_issues.all(),
+            "dead_code_issues": DeadCodeIssueSerializer(
+                session.dead_code_issues.all(),
                 many=True,
             ).data,
-            "duplicate_blocks": DuplicateCodeBlockSerializer(session.duplicate_blocks.all(),
+            "duplicate_blocks": DuplicateCodeBlockSerializer(
+                session.duplicate_blocks.all(),
                 many=True,
             ).data,
-            "file_analyses": FileAnalysisSerializer(session.file_analyses.all(),
+            "file_analyses": FileAnalysisSerializer(
+                session.file_analyses.all(),
                 many=True,
             ).data,
         }
@@ -294,14 +318,17 @@ class AnalysisSessionViewSet(viewsets.ModelViewSet):
     def dashboard_stats(self, _request: Request) -> Response:
         user_sessions = self.get_queryset()
 
-        stats = {"total_sessions": user_sessions.count(),
+        stats = {
+            "total_sessions": user_sessions.count(),
             "completed_sessions": user_sessions.filter(status="completed").count(),
             "running_sessions": user_sessions.filter(status="running").count(),
             "failed_sessions": user_sessions.filter(status="failed").count(),
-            "avg_score": user_sessions.filter(status="completed").aggregate(avg=Avg("overall_score"),
+            "avg_score": user_sessions.filter(status="completed").aggregate(
+                avg=Avg("overall_score"),
             )["avg"]
             or 0,
-            "recent_sessions": AnalysisSessionSummarySerializer(user_sessions[:5],
+            "recent_sessions": AnalysisSessionSummarySerializer(
+                user_sessions[:5],
                 many=True,
             ).data,
         }
@@ -310,22 +337,28 @@ class AnalysisSessionViewSet(viewsets.ModelViewSet):
 
 
 class FileAnalysisViewSet(viewsets.ReadOnlyModelViewSet):
-         """ViewSet for viewing file analyses."""
+    """ViewSet for viewing file analyses."""
 
     queryset = FileAnalysis.objects.all()
     serializer_class = FileAnalysisSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend,
+    permission_classes: ClassVar[list[Any]] = [IsAuthenticated]
+    filter_backends: ClassVar[list[Any]] = [
+        DjangoFilterBackend,
         filters.SearchFilter,
         filters.OrderingFilter,
     ]
-    filterset_fields = ["session", "file_name"]
-    search_fields = ["file_path", "file_name"]
-    ordering_fields = ["file_path", "complexity_score", "lines_of_code"]
-    ordering = ["file_path"]
+    filterset_fields: ClassVar[list[str]] = ["session", "file_name"]
+    search_fields: ClassVar[list[str]] = ["file_path", "file_name"]
+    ordering_fields: ClassVar[list[str]] = [
+        "file_path",
+        "complexity_score",
+        "lines_of_code",
+    ]
+    ordering: ClassVar[list[str]] = ["file_path"]
 
     def get_queryset(self) -> Any:
-            return FileAnalysis.objects.filter(session__project__created_by=self.request.user,
+        return FileAnalysis.objects.filter(
+            session__project__created_by=self.request.user,
         )
 
     @action(detail=False, methods=["get"])
@@ -336,22 +369,29 @@ class FileAnalysisViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class SecurityIssueViewSet(viewsets.ModelViewSet):
-         """ViewSet for managing security issues."""
+    """ViewSet for managing security issues."""
 
     queryset = SecurityIssue.objects.all()
     serializer_class = SecurityIssueSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ["severity", "confidence", "issue_type", "is_resolved"]
-    ordering_fields = ["severity", "line_number", "created_at"]
-    ordering = ["-severity", "line_number"]
+    permission_classes: ClassVar[list[Any]] = [IsAuthenticated]
+    filter_backends: ClassVar[list[Any]] = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields: ClassVar[list[str]] = [
+        "severity",
+        "confidence",
+        "issue_type",
+        "is_resolved",
+    ]
+    ordering_fields: ClassVar[list[str]] = ["severity", "line_number", "created_at"]
+    ordering: ClassVar[list[str]] = ["-severity", "line_number"]
 
     def get_queryset(self) -> Any:
-            return SecurityIssue.objects.filter(session__project__created_by=self.request.user,
+        return SecurityIssue.objects.filter(
+            session__project__created_by=self.request.user,
         )
 
     @action(detail=True, methods=["post"])
-    def resolve(self, request: Request, _pk: Any | None =None) -> Response:
+    def resolve(self, request: Request, _pk: Any | None = None) -> Response:
+        """Resolve a security issue with optional resolution notes."""
         issue = self.get_object()
         resolution_notes = request.data.get("resolution_notes", "")
 
@@ -364,9 +404,11 @@ class SecurityIssueViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def by_severity(self, _request: Request) -> Response:
+        """Get security issues by severity."""
         issues = self.get_queryset().filter(is_resolved=False)
 
-        severity_counts = {"HIGH": issues.filter(severity="HIGH").count(),
+        severity_counts = {
+            "HIGH": issues.filter(severity="HIGH").count(),
             "MEDIUM": issues.filter(severity="MEDIUM").count(),
             "LOW": issues.filter(severity="LOW").count(),
             "INFO": issues.filter(severity="INFO").count(),
@@ -376,22 +418,24 @@ class SecurityIssueViewSet(viewsets.ModelViewSet):
 
 
 class DeadCodeIssueViewSet(viewsets.ModelViewSet):
-         """ViewSet for managing dead code issues."""
+    """ViewSet for managing dead code issues."""
 
     queryset = DeadCodeIssue.objects.all()
     serializer_class = DeadCodeIssueSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ["dead_type", "is_resolved"]
-    ordering_fields = ["confidence", "size_estimate", "created_at"]
-    ordering = ["-confidence", "-size_estimate"]
+    permission_classes: ClassVar[list[Any]] = [IsAuthenticated]
+    filter_backends: ClassVar[list[Any]] = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields: ClassVar[list[str]] = ["dead_type", "is_resolved"]
+    ordering_fields: ClassVar[list[str]] = ["confidence", "size_estimate", "created_at"]
+    ordering: ClassVar[list[str]] = ["-confidence", "-size_estimate"]
 
     def get_queryset(self) -> Any:
-            return DeadCodeIssue.objects.filter(session__project__created_by=self.request.user,
+        return DeadCodeIssue.objects.filter(
+            session__project__created_by=self.request.user,
         )
 
     @action(detail=True, methods=["post"])
-    def resolve(self, _request: Request, _pk: Any | None =None) -> Response:
+    def resolve(self, _request: Request, _pk: Any | None = None) -> Response:
+        """Resolve a dead code issue with optional resolution notes."""
         issue = self.get_object()
 
         issue.is_resolved = True
@@ -402,9 +446,11 @@ class DeadCodeIssueViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def by_type(self, _request: Request) -> Response:
+        """Get dead code issues by type."""
         issues = self.get_queryset().filter(is_resolved=False)
 
-        type_counts = {"function": issues.filter(dead_type="function").count(),
+        type_counts = {
+            "function": issues.filter(dead_type="function").count(),
             "class": issues.filter(dead_type="class").count(),
             "variable": issues.filter(dead_type="variable").count(),
             "import": issues.filter(dead_type="import").count(),
@@ -415,22 +461,28 @@ class DeadCodeIssueViewSet(viewsets.ModelViewSet):
 
 
 class DuplicateCodeBlockViewSet(viewsets.ModelViewSet):
-         """ViewSet for managing duplicate code blocks."""
+    """ViewSet for managing duplicate code blocks."""
 
     queryset = DuplicateCodeBlock.objects.all()
     serializer_class = DuplicateCodeBlockSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [DjangoFilterBackend, filters.OrderingFilter]
-    filterset_fields = ["is_resolved"]
-    ordering_fields = ["lines_count", "similarity_score", "created_at"]
-    ordering = ["-lines_count", "-similarity_score"]
+    permission_classes: ClassVar[list[Any]] = [IsAuthenticated]
+    filter_backends: ClassVar[list[Any]] = [DjangoFilterBackend, filters.OrderingFilter]
+    filterset_fields: ClassVar[list[str]] = ["is_resolved"]
+    ordering_fields: ClassVar[list[str]] = [
+        "lines_count",
+        "similarity_score",
+        "created_at",
+    ]
+    ordering: ClassVar[list[str]] = ["-lines_count", "-similarity_score"]
 
     def get_queryset(self) -> Any:
-            return DuplicateCodeBlock.objects.filter(session__project__created_by=self.request.user,
+        return DuplicateCodeBlock.objects.filter(
+            session__project__created_by=self.request.user,
         )
 
     @action(detail=True, methods=["post"])
-    def resolve(self, _request: Request, _pk: Any | None =None) -> Response:
+    def resolve(self, _request: Request, _pk: Any | None = None) -> Response:
+        """Resolve a duplicate code block with optional resolution notes."""
         block = self.get_object()
 
         block.is_resolved = True
@@ -441,6 +493,7 @@ class DuplicateCodeBlockViewSet(viewsets.ModelViewSet):
 
     @action(detail=False, methods=["get"])
     def largest(self, _request: Request) -> Response:
+        """Get the largest duplicate code blocks."""
         blocks = (
             self.get_queryset().filter(is_resolved=False).order_by("-lines_count")[:10]
         )
@@ -449,51 +502,59 @@ class DuplicateCodeBlockViewSet(viewsets.ModelViewSet):
 
 
 class QualityMetricsViewSet(viewsets.ReadOnlyModelViewSet):
-         """ViewSet for viewing quality metrics."""
+    """ViewSet for viewing quality metrics."""
 
     queryset = QualityMetrics.objects.all()
     serializer_class = QualityMetricsSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [filters.OrderingFilter]
-    ordering_fields = ["overall_score", "created_at"]
-    ordering = ["-overall_score"]
+    permission_classes: ClassVar[list[Any]] = [IsAuthenticated]
+    filter_backends: ClassVar[list[Any]] = [filters.OrderingFilter]
+    ordering_fields: ClassVar[list[str]] = ["overall_score", "created_at"]
+    ordering: ClassVar[list[str]] = ["-overall_score"]
 
     def get_queryset(self) -> Any:
-            return QualityMetrics.objects.filter(session__project__created_by=self.request.user,
+        return QualityMetrics.objects.filter(
+            session__project__created_by=self.request.user,
         )
 
     @action(detail=False, methods=["get"])
     def trends(self, _request: Request) -> Response:
+        """Get quality metrics trends."""
         metrics = self.get_queryset().order_by("created_at")
 
-        trends = [{"date": metric.created_at.date(),
+        trends = [
+            {
+                "date": metric.created_at.date(),
                 "overall_score": metric.overall_score,
                 "complexity_score": metric.complexity_score,
                 "security_score": metric.security_score,
                 "maintainability_score": metric.maintainability_score,
                 "project_name": metric.session.flx_project.name,
             }
-            for metric in metrics:
-             ]
+            for metric in metrics
+        ]
 
         return Response(trends)
 
 
 # Django template views for web interface
 def dashboard_view(request: HttpRequest) -> HttpResponse:
-        projects = Project.objects.all()
-    recent_sessions = AnalysisSession.objects.select_related("flx_project").order_by("-created_at",
+    """Dashboard view for the quality analyzer."""
+    projects = Project.objects.all()
+    recent_sessions = AnalysisSession.objects.select_related("flx_project").order_by(
+        "-created_at",
     )[:5]
 
     # Get package discovery
     discovery = PackageDiscovery()
     packages = discovery.get_installed_packages()
 
-    context = {"projects": projects,
+    context = {
+        "projects": projects,
         "recent_sessions": recent_sessions,
         "packages": packages[:10],  # Top 10 packages
         "total_projects": projects.count(),
-        "completed_analyses": AnalysisSession.objects.filter(status="completed",
+        "completed_analyses": AnalysisSession.objects.filter(
+            status="completed",
         ).count(),
     }
 
@@ -501,7 +562,8 @@ def dashboard_view(request: HttpRequest) -> HttpResponse:
 
 
 def packages_discovery(request: HttpRequest) -> HttpResponse:
-        # Get filter parameters
+    """Packages discovery view for the quality analyzer."""
+    # Get filter parameters
     package_type = request.GET.get("type", "")
     search = request.GET.get("search", "")
     refresh = request.GET.get("refresh")
@@ -511,26 +573,29 @@ def packages_discovery(request: HttpRequest) -> HttpResponse:
 
     # Get packages from cache or discover them
     if refresh or not cache.get(cache_key):
-            discovery = PackageDiscovery()
+        discovery = PackageDiscovery()
         discovery.clear_cache()
         packages = discovery.get_installed_packages()
         # Cache for 5 minutes
         cache.set(cache_key, packages, 300)
+    else:
         packages = cache.get(cache_key, [])
 
     # Filter by type if provided:
     if package_type:
-            packages = [pkg for pkg in packages if pkg["package_type"] == package_type]:
+        packages = [pkg for pkg in packages if pkg["package_type"] == package_type]
 
     # Filter by search query if provided:
     if search:
-            packages = [pkg
-            for pkg in packages:
-            if search.lower() in pkg["name"].lower():
+        packages = [
+            pkg
+            for pkg in packages
+            if search.lower() in pkg["name"].lower()
             or search.lower() in pkg.get("description", "").lower()
         ]
 
-    context = {"packages": packages,
+    context = {
+        "packages": packages,
         "search": search,
         "selected_type": package_type,
     }
@@ -540,25 +605,27 @@ def packages_discovery(request: HttpRequest) -> HttpResponse:
 
 @require_http_methods(["POST"])
 def create_project_from_package(request: HttpRequest) -> HttpResponse:
-        package_name = request.POST.get("package_name")
+    """Create a project from a package."""
+    package_name = request.POST.get("package_name")
 
     if not package_name:
-            messages.error(request, "Package name is required")
+        messages.error(request, "Package name is required")
         return redirect("packages_discovery")
 
     discovery = PackageDiscovery()
     packages = discovery.get_installed_packages()
 
     # Find the package
-    package = next((p for p in packages if p["name"] == package_name), None):
+    package = next((p for p in packages if p["name"] == package_name), None)
 
     if not package:
-            messages.error(request, f"Package '{package_name}' not found")
+        messages.error(request, f"Package '{package_name}' not found")
         return redirect("packages_discovery")
 
     try:
-            # Create flx_project
-        flx_project = Project.objects.create(name=package["name"],
+        # Create flx_project
+        flx_project = Project.objects.create(
+            name=package["name"],
             description=f"Auto-discovered Python package {package.get('description', '')}",
             path=package["location"],
             package_name=package["name"],
@@ -569,40 +636,44 @@ def create_project_from_package(request: HttpRequest) -> HttpResponse:
         )
 
         messages.success(request, f"Project '{flx_project.name}' created successfully")
-        return redirect("project_detail", project_id=flx_project.id)
+        return redirect("project_detail", project_id=flx_project.pk)
 
     except Exception as e:
-        logger.exception(f"Failed to create flx_project from package {package_name}:
-            {e}",
+        logger.exception(
+            f"Failed to create flx_project from package {package_name}: {e}",
         )
         messages.error(request, f"Failed to create flx_project: {e}")
         return redirect("packages_discovery")
 
 
 def project_detail(request: HttpRequest, project_id: int) -> HttpResponse:
-        flx_project = get_object_or_404(Project, id=project_id)
-    sessions = flx_project.analysis_sessions.order_by("-created_at")
+    """Project detail view for the quality analyzer."""
+    flx_project = get_object_or_404(Project, id=project_id)
+    sessions = flx_project.analysis_sessions.all().order_by("-created_at")
     latest_session = sessions.first()
 
-    context = {"flx_project": flx_project,
-        "sessions": sessions,
+    context = {
+        "project": flx_project,
+        "sessions": sessions[:10],  # Show last 10 sessions
         "latest_session": latest_session,
     }
 
-    return render(request, "dashboard/project_detail.html", context)
+    return render(request, "analyzer/project_detail.html", context)
 
 
 def analysis_session_detail(request: HttpRequest, session_id: int) -> HttpResponse:
-        session = get_object_or_404(AnalysisSession, id=session_id)
+    """Analysis session detail view for the quality analyzer."""
+    session = get_object_or_404(AnalysisSession, id=session_id)
 
     # Get analysis data
-    file_analyses = session.file_analyses.order_by("-complexity_score")
-    security_issues = session.security_issues.order_by("-severity", "-confidence")
-    dead_code_issues = session.dead_code_issues.order_by("-confidence")
-    duplicate_blocks = session.duplicate_blocks.order_by("-similarity_score")
+    file_analyses = session.file_analyses.all().order_by("-complexity_score")
+    security_issues = session.security_issues.all().order_by("-severity", "-confidence")
+    dead_code_issues = session.dead_code_issues.all().order_by("-confidence")
+    duplicate_blocks = session.duplicate_code_blocks.order_by("-similarity_score")  # type: ignore[attr-defined]
     quality_metrics = getattr(session, "quality_metrics", None)
 
-    context = {"session": session,
+    context = {
+        "session": session,
         "file_analyses": file_analyses,
         "security_issues": security_issues,
         "dead_code_issues": dead_code_issues,
@@ -615,11 +686,13 @@ def analysis_session_detail(request: HttpRequest, session_id: int) -> HttpRespon
 
 @require_http_methods(["POST"])
 def start_analysis(request: HttpRequest, project_id: int) -> HttpResponse:
-        flx_project = get_object_or_404(Project, id=project_id)
+    """Start an analysis for a project."""
+    flx_project = get_object_or_404(Project, id=project_id)
 
     try:
-            # Create analysis session
-        session = AnalysisSession.objects.create(flx_project=flx_project,
+        # Create analysis session
+        session = AnalysisSession.objects.create(
+            flx_project=flx_project,
             name=f"Analysis {timezone.now().strftime('%Y-%m-%d %H%M')}",
             include_security=request.POST.get("include_security") == "on",
             include_dead_code=request.POST.get("include_dead_code") == "on",
@@ -634,33 +707,33 @@ def start_analysis(request: HttpRequest, project_id: int) -> HttpResponse:
 
         if success:
             messages.success(request, "Analysis completed successfully")
-            messages.error(request, f"Analysis failed:
-            {session.error_message}")
+        else:
+            messages.error(request, f"Analysis failed: {session.error_message}")
 
-        return redirect("analysis_session_detail", session_id=session.id)
+        return redirect("analysis_session_detail", session_id=session.pk)
 
     except Exception as e:
-        logger.exception(f"Failed to start analysis for flx_project {project_id}:
-            //{self.target_ldap_host}:{self.target_ldap_port}"
-            {e}")
+        logger.exception(f"Failed to start analysis for flx_project {project_id}: {e}")
         messages.error(request, f"Failed to start analysis: {e}")
         return redirect("project_detail", project_id=project_id)
 
 
 def generate_report(request: HttpRequest, session_id: int) -> HttpResponse:
-        session = get_object_or_404(AnalysisSession, id=session_id)
+    """Generate a report for an analysis session."""
+    session = get_object_or_404(AnalysisSession, id=session_id)
     report_type = request.GET.get("type", "summary")
-    format = request.GET.get("format", "html")
+    report_format = request.GET.get("format", "html")
 
     try:
-            generator = WebReportGenerator(session)
+        generator = WebReportGenerator(session)
 
         if report_type == "summary":
-            report = generator.generate_summary_report(format)
+            report = generator.generate_summary_report(report_format)
         elif report_type == "detailed":
-            report = generator.generate_detailed_report(format)
+            report = generator.generate_detailed_report(report_format)
         elif report_type == "security":
-            report = generator.generate_security_report(format)
+            report = generator.generate_security_report(report_format)
+        else:
             messages.error(request, f"Unknown report type: {report_type}")
             return redirect("analysis_session_detail", session_id=session_id)
 
@@ -668,19 +741,18 @@ def generate_report(request: HttpRequest, session_id: int) -> HttpResponse:
         return create_download_response(report)
 
     except Exception as e:
-        logger.exception(f"Failed to generate report for session {session_id}:
-            //{self.target_ldap_host}:{self.target_ldap_port}"
-            {e}")
+        logger.exception(f"Failed to generate report for session {session_id}: {e}")
         messages.error(request, f"Failed to generate report: {e}")
         return redirect("analysis_session_detail", session_id=session_id)
 
 
 def view_report(request: HttpRequest, session_id: int) -> HttpResponse:
-        session = get_object_or_404(AnalysisSession, id=session_id)
+    """View a report for an analysis session."""
+    session = get_object_or_404(AnalysisSession, id=session_id)
     report_type = request.GET.get("type", "summary")
 
     try:
-            generator = WebReportGenerator(session)
+        generator = WebReportGenerator(session)
 
         if report_type == "summary":
             report = generator.generate_summary_report("html")
@@ -688,6 +760,7 @@ def view_report(request: HttpRequest, session_id: int) -> HttpResponse:
             report = generator.generate_detailed_report("html")
         elif report_type == "security":
             report = generator.generate_security_report("html")
+        else:
             messages.error(request, f"Unknown report type: {report_type}")
             return redirect("analysis_session_detail", session_id=session_id)
 
@@ -695,30 +768,32 @@ def view_report(request: HttpRequest, session_id: int) -> HttpResponse:
         return HttpResponse(report.content, content_type="text/html")
 
     except Exception as e:
-        logger.exception(f"Failed to view report for session {session_id}:
-            //{self.target_ldap_host}:{self.target_ldap_port}"
-            {e}")
+        logger.exception(f"Failed to view report for session {session_id}: {e}")
         messages.error(request, f"Failed to view report: {e}")
         return redirect("analysis_session_detail", session_id=session_id)
 
 
 @csrf_exempt
 def refresh_packages(_request: HttpRequest) -> JsonResponse:
-        try:
-            discovery = PackageDiscovery()
+    """Refresh packages for the quality analyzer."""
+    try:
+        discovery = PackageDiscovery()
         discovery.clear_cache()  # Clear cache to force refresh
         packages = discovery.get_installed_packages()
 
-        return JsonResponse({"status" "success",
-                "count" len(packages),
+        return JsonResponse(
+            {
+                "status": "success",
+                "count": len(packages),
                 "packages": packages[:20],  # Return first 20
             },
         )
 
     except Exception as e:
-        logger.exception(f"Failed to refresh packages://{self.target_ldap_host}:{self.target_ldap_port}"
-            {e}")
-        return JsonResponse({"status": "error",
+        logger.exception(f"Failed to refresh packages: {e}")
+        return JsonResponse(
+            {
+                "status": "error",
                 "message": str(e),
             },
             status=500,

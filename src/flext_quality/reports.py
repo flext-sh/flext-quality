@@ -8,11 +8,31 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from pathlib import Path
 
+# Constants for grade thresholds
+GRADE_A_THRESHOLD = 90
+GRADE_B_THRESHOLD = 80
+GRADE_C_THRESHOLD = 70
+GRADE_D_THRESHOLD = 60
+
+# Constants for display limits
+ISSUE_PREVIEW_LIMIT = 5
+HTML_ISSUE_LIMIT = 10
+HIGH_ISSUE_THRESHOLD = 50
+MIN_COVERAGE_THRESHOLD = 80
+MIN_SCORE_THRESHOLD = 70
+HIGH_TYPE_ERROR_THRESHOLD = 10
+
 
 class QualityReport:
     """Generates quality reports from analysis results."""
 
     def __init__(self, analysis_results: dict[str, Any]) -> None:
+        """Initialize the quality report generator.
+
+        Args:
+            analysis_results: Dictionary containing analysis results and metrics.
+
+        """
         self.results = analysis_results
 
     def generate_text_report(self) -> str:
@@ -42,13 +62,16 @@ class QualityReport:
         for category, issue_list in issues.items():
             if issue_list:
                 report_lines.append(f"\n{category.upper()} ({len(issue_list)} issues):")
-                # Show first 5 issues
+                # Show first few issues
                 report_lines.extend(
-                    f"  - {issue.get('file', 'Unknown')}: {issue.get('message', 'No message')}"
-                    for issue in issue_list[:5]
+                    f"  - {issue.get('file', 'Unknown')}: "
+                    f"{issue.get('message', 'No message')}"
+                    for issue in issue_list[:ISSUE_PREVIEW_LIMIT]
                 )
-                if len(issue_list) > 5:
-                    report_lines.append(f"  ... and {len(issue_list) - 5} more")
+                if len(issue_list) > ISSUE_PREVIEW_LIMIT:
+                    report_lines.append(
+                        f"  ... and {len(issue_list) - ISSUE_PREVIEW_LIMIT} more",
+                    )
 
         # Add recommendations
         recommendations = self._generate_recommendations()
@@ -98,17 +121,23 @@ class QualityReport:
             '<html lang="en">',
             "<head>",
             '    <meta charset="UTF-8">',
-            '    <meta name="viewport" content="width=device-width, initial-scale=1.0">',
+            '    <meta name="viewport" '
+            'content="width=device-width, initial-scale=1.0">',
             "    <title>FLEXT Quality Report</title>",
             "    <style>",
             "        body { font-family: Arial, sans-serif; margin: 20px; }",
-            "        .header { background: #2c3e50; color: white; padding: 20px; border-radius: 5px; }",
+            "        .header { background: #2c3e50; color: white; "
+            "padding: 20px; border-radius: 5px; }",
             "        .summary { margin: 20px 0; }",
-            f"        .grade {{ font-size: 3em; font-weight: bold; color: {grade_color}; }}",
+            f"        .grade {{ font-size: 3em; font-weight: bold; "
+            f"color: {grade_color}; }}",
             "        .score { font-size: 1.5em; }",
-            "        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }",
-            "        .issue { margin: 5px 0; padding: 5px; background: #f8f9fa; border-radius: 3px; }",
-            "        .metric { display: inline-block; margin: 10px; padding: 10px; background: #e9ecef; border-radius: 5px; }",
+            "        .section { margin: 20px 0; padding: 15px; "
+            "border: 1px solid #ddd; border-radius: 5px; }",
+            "        .issue { margin: 5px 0; padding: 5px; "
+            "background: #f8f9fa; border-radius: 3px; }",
+            "        .metric { display: inline-block; margin: 10px; "
+            "padding: 10px; background: #e9ecef; border-radius: 5px; },"
             "        .high-severity { background: #ff6b6b; color: white; }",
             "        .medium-severity { background: #ffa726; color: white; }",
             "        .low-severity { background: #66bb6a; color: white; }",
@@ -126,10 +155,14 @@ class QualityReport:
             "",
             '    <div class="section">',
             "        <h2>Quality Metrics</h2>",
-            f'        <div class="metric"><strong>Total Issues:</strong> {total_issues}</div>',
-            f'        <div class="metric"><strong>Critical Issues:</strong> {critical_issues}</div>',
-            f'        <div class="metric"><strong>Files Analyzed:</strong> {files_analyzed}</div>',
-            f'        <div class="metric"><strong>Code Coverage:</strong> {coverage_percent}%</div>',
+            f'        <div class="metric"><strong>Total Issues:</strong> '
+            f"{total_issues}</div>",
+            f'        <div class="metric"><strong>Critical Issues:</strong> '
+            f"{critical_issues}</div>",
+            f'        <div class="metric"><strong>Files Analyzed:</strong> '
+            f"{files_analyzed}</div>",
+            f'        <div class="metric"><strong>Code Coverage:</strong> '
+            f"{coverage_percent}%</div>",
             "    </div>",
             "",
             f"    {issues_html}",
@@ -169,13 +202,13 @@ class QualityReport:
     def _get_quality_grade(self) -> str:
         """Calculate quality grade."""
         score = self._get_quality_score()
-        if score >= 90:
+        if score >= GRADE_A_THRESHOLD:
             return "A"
-        if score >= 80:
+        if score >= GRADE_B_THRESHOLD:
             return "B"
-        if score >= 70:
+        if score >= GRADE_C_THRESHOLD:
             return "C"
-        if score >= 60:
+        if score >= GRADE_D_THRESHOLD:
             return "D"
         return "F"
 
@@ -217,11 +250,11 @@ class QualityReport:
 
     def _get_files_analyzed(self) -> int:
         """Get number of files analyzed."""
-        return self.results.get("metrics", {}).get("files_analyzed", 0)
+        return int(self.results.get("metrics", {}).get("files_analyzed", 0))
 
     def _get_coverage_percent(self) -> float:
         """Get code coverage percentage."""
-        return self.results.get("metrics", {}).get("coverage_percent", 0.0)
+        return float(self.results.get("metrics", {}).get("coverage_percent", 0.0))
 
     def _generate_issues_html(self) -> str:
         """Generate HTML for issues section."""
@@ -251,9 +284,10 @@ class QualityReport:
                     f"<strong>{file_path}{line_info}:</strong> {message}</div>",
                 )
 
-            if len(issue_list) > 10:
+            if len(issue_list) > HTML_ISSUE_LIMIT:
                 html_parts.append(
-                    f'        <div class="issue">... and {len(issue_list) - 10} more issues</div>',
+                    f'        <div class="issue">... and '
+                    f"{len(issue_list) - HTML_ISSUE_LIMIT} more issues</div>",
                 )
 
             html_parts.append("    </div>")
@@ -273,12 +307,12 @@ class QualityReport:
                 f"Fix {critical_issues} critical security/error issues immediately",
             )
 
-        if total_issues > 50:
+        if total_issues > HIGH_ISSUE_THRESHOLD:
             recommendations.append(
                 "Consider breaking down large files and reducing complexity",
             )
 
-        if score < 70:
+        if score < MIN_SCORE_THRESHOLD:
             recommendations.extend(
                 (
                     "Implement automated code quality checks in your CI/CD pipeline",
@@ -287,9 +321,10 @@ class QualityReport:
             )
 
         coverage = self._get_coverage_percent()
-        if coverage < 80:
+        if coverage < MIN_COVERAGE_THRESHOLD:
             recommendations.append(
-                f"Increase test coverage from {coverage}% to at least 80%",
+                f"Increase test coverage from {coverage}% to at least "
+                f"{MIN_COVERAGE_THRESHOLD}%",
             )
 
         issues = self.results.get("issues", {})

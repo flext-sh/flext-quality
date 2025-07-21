@@ -5,14 +5,11 @@ REFACTORED: Uses flext-core BaseSettings with mixins, types, and constants.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
-
-from pydantic import ConfigDict, Field
+from pathlib import Path
+from typing import Any
 
 from flext_core.domain.pydantic_base import BaseSettings
-
-if TYPE_CHECKING:
-    from pathlib import Path
+from pydantic import ConfigDict, Field
 
 
 class QualityConfig(BaseSettings):
@@ -20,11 +17,11 @@ class QualityConfig(BaseSettings):
 
     # Project settings
     project_name: str = Field(
-        default="flext-quality",
+        default="flext-infrastructure.monitoring.flext-quality",
         description="Project name for quality analysis",
     )
     project_root: Path = Field(
-        default=".",
+        default_factory=Path.cwd,
         description="Project root directory",
     )
 
@@ -102,7 +99,7 @@ class QualityConfig(BaseSettings):
         description="Generate Markdown report",
     )
     report_output_dir: Path = Field(
-        default="reports",
+        default=Path("reports"),
         description="Output directory for reports",
     )
 
@@ -153,8 +150,7 @@ class QualityConfig(BaseSettings):
         }
 
     model_config = ConfigDict(
-        env_prefix="QUALITY_",
-        env_file=".env",
-        env_file_encoding="utf-8",
-        case_sensitive=False,
+        # Remove invalid keys for flext-core ConfigDict
+        arbitrary_types_allowed=True,
+        validate_assignment=True,
     )

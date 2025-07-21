@@ -1,5 +1,6 @@
-"""Placeholder module to fix syntax errors."""
+"""URL configuration for the analyzer Django app.
 
+This module contains URL patterns for the code analysis views.
+"""
 
-def placeholder_function() -> None:
-    pass
+from __future__ import annotations

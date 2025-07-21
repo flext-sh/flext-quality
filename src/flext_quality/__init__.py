@@ -37,7 +37,7 @@ def get_version() -> str:
 
 def get_info() -> dict[str, str]:
     return {
-        "name": "flext-quality",
+        "name": "flext-infrastructure.monitoring.flext-quality",
         "version": __version__,
         "author": __author__,
         "email": __email__,

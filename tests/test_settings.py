@@ -1,12 +1,14 @@
 """Test-specific Django settings."""
 
+from __future__ import annotations
+
 import sys
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Django basics
-SECRET_KEY = "test-secret-key-for-flext-quality"
+SECRET_KEY = "test-secret-key-for-flext-infrastructure.monitoring.flext-quality"
 DEBUG = True
 USE_TZ = True
 
@@ -28,7 +30,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
 
-ROOT_URLCONF = []
+ROOT_URLCONF: list[str] = []
 
 # Override database settings for testing
 DATABASES = {
@@ -46,12 +48,14 @@ DATABASES = {
 
 # Disable foreign key checks for SQLite in tests
 if DATABASES["default"]["ENGINE"] == "django.db.backends.sqlite3":
-    DATABASES["default"]["OPTIONS"].pop("init_command", None)
+    options = DATABASES["default"]["OPTIONS"]
+    if isinstance(options, dict):
+        options.pop("init_command", None)
 
 # Force syncdb for testing - use the models directly instead of migrations
 if "test" in sys.argv or "pytest" in sys.modules:
     # Use a real file-based database for tests to avoid migration issues
-    DATABASES["default"]["NAME"] = BASE_DIR / "test_db.sqlite3"
+    DATABASES["default"]["NAME"] = str(BASE_DIR / "test_db.sqlite3")
 
 # Test-specific settings
 PASSWORD_HASHERS = [

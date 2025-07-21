@@ -1,4 +1,5 @@
 """Domain service interfaces for FLEXT-QUALITY.
+
 REFACTORED:
 Defines service interfaces following clean architecture.
 """
@@ -96,7 +97,7 @@ class ReportGeneratorService(ABC):
     async def generate_report(
         self,
         analysis_results: dict[str, Any],
-        format: str = "html",
+        output_format: str = "html",
         output_path: Path | None = None,
     ) -> ServiceResult[str]: ...
 
@@ -110,7 +111,7 @@ class ReportGeneratorService(ABC):
     async def export_metrics(
         self,
         analysis_results: dict[str, Any],
-        format: str = "json",
+        output_format: str = "json",
     ) -> ServiceResult[str]: ...
 
 

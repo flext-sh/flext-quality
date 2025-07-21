@@ -1,6 +1,9 @@
 """Celery configuration for background tasks."""
 
+from __future__ import annotations
+
 import os
+from typing import Any
 
 from celery import Celery
 
@@ -11,8 +14,7 @@ app = Celery("code_analyzer_web")
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.
-app.config_from_object("django.conf:
-            settings", namespace="CELERY")
+app.config_from_object("django.conf:settings", namespace="CELERY")
 
 # Load task modules from all registered Django apps.
 app.autodiscover_tasks()
@@ -33,5 +35,5 @@ app.conf.update(
 
 
 @app.task(bind=True)
-def debug_task(self) -> None:
+def debug_task(self: Any) -> None:
     pass

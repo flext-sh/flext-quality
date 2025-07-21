@@ -1,7 +1,3 @@
-from typing import Any
-
-from pydantic import Field
-
 """Django settings for Code Analyzer Web Interface flx_project."""
 
 from __future__ import annotations
@@ -9,8 +5,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-# Build paths inside the flx_project like this:
-            BASE_DIR / 'subdir'.
+# Build paths inside the project like this: BASE_DIR / 'subdir'
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Security settings
@@ -21,7 +16,7 @@ SECRET_KEY = os.environ.get(
 
 DEBUG = os.environ.get("DEBUG", "True").lower() == "true"
 
-ALLOWED_HOSTS = ["localhost", "127.0.0.1", "0.0.0.0"]
+ALLOWED_HOSTS = ["localhost", "127.0.0.1"]
 
 # Application definition
 DJANGO_APPS = [
@@ -160,8 +155,7 @@ REST_FRAMEWORK = {
 # CORS settings for frontend integration
 CORS_ALLOW_ALL_ORIGINS = DEBUG
 CORS_ALLOWED_ORIGINS = [
-    "http:
-            //localhost:3000",
+    "http://localhost:3000",
     "http://127.0.0.1:3000",
 ]
 
@@ -241,6 +235,6 @@ CELERY_WORKER_MAX_TASKS_PER_CHILD = 1000
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 # Ensure required directories exist
-os.makedirs(BASE_DIR / "logs", exist_ok=True)
-os.makedirs(BASE_DIR / "media", exist_ok=True)
-os.makedirs(str(CODE_ANALYZER["DEFAULT_OUTPUT_DIR"]), exist_ok=True)
+(BASE_DIR / "logs").mkdir(parents=True, exist_ok=True)
+(BASE_DIR / "media").mkdir(parents=True, exist_ok=True)
+Path(str(CODE_ANALYZER["DEFAULT_OUTPUT_DIR"])).mkdir(parents=True, exist_ok=True)

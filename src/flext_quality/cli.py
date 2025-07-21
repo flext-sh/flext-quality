@@ -10,18 +10,18 @@ import argparse
 import sys
 import traceback
 from pathlib import Path
-from typing import Any
 
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.reports import QualityReport
 
 
 def setup_logging(level: str = "INFO") -> None:
-    # Logging is now handled by flext-observability
+    # Logging is now handled by flext-infrastructure.monitoring.flext-observability
     pass
 
 
-def analyze_command(args: Any) -> int:
+def analyze_project(args: argparse.Namespace) -> None:
+    """Analyze project quality."""
     try:
         project_path = Path(args.path).resolve()
 
@@ -46,9 +46,13 @@ def analyze_command(args: Any) -> int:
             # Save to file
             output_path = Path(args.output)
             report.save_report(output_path, args.format)
-        # Output to console
-        elif args.format in {"json", "html"}:
-            pass
+            print(f"Report saved to: {output_path}")  # noqa: T201
+        elif args.format == "json":
+            print(report.generate_json_report())  # noqa: T201
+        elif args.format == "html":
+            print(report.generate_html_report())  # noqa: T201
+        else:
+            print(report.generate_text_report())  # noqa: T201
 
         # Return appropriate exit code based on quality
         quality_score = analyzer.get_quality_score()
@@ -64,7 +68,8 @@ def analyze_command(args: Any) -> int:
         return 3
 
 
-def score_command(args: Any) -> int:
+def another_function(args: argparse.Namespace) -> None:
+    """Another function."""
     try:
         project_path = Path(args.path).resolve()
 
@@ -81,17 +86,19 @@ def score_command(args: Any) -> int:
         )
 
         score = analyzer.get_quality_score()
-        analyzer.get_quality_grade()
+        grade = analyzer.get_quality_grade()
+
+        # Show results
+        print(f"Quality Score: {score:.1f}/100.0")  # noqa: T201
+        print(f"Quality Grade: {grade}")  # noqa: T201
 
         # Show issue counts
         issues = results.get("issues", {})
         security_count = len(issues.get("security", []))
         complexity_count = len(issues.get("complexity", []))
 
-        if security_count > 0:
-            pass
-        if complexity_count > 0:
-            pass
+        print(f"Security Issues: {security_count}")  # noqa: T201
+        print(f"Complexity Issues: {complexity_count}")  # noqa: T201
 
         return 0 if score >= 70 else 1
 
@@ -105,10 +112,10 @@ def main() -> int:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-    flext-quality analyze ./my-project
-    flext-quality analyze ./my-project --output report.html --format html
-    flext-quality score ./my-project
-    flext-quality analyze ./my-project --no-security --no-duplicates
+    flext-infrastructure.monitoring.flext-quality analyze ./my-project
+    flext-infrastructure.monitoring.flext-quality analyze ./my-project --output report.html --format html
+    flext-infrastructure.monitoring.flext-quality score ./my-project
+    flext-infrastructure.monitoring.flext-quality analyze ./my-project --no-security --no-duplicates
         """,
     )
 
@@ -171,12 +178,12 @@ Examples:
         dest="include_duplicates",
         help="Skip duplicate code detection",
     )
-    analyze_parser.set_defaults(func=analyze_command)
+    analyze_parser.set_defaults(func=analyze_project)
 
     # Score command
     score_parser = subparsers.add_parser("score", help="Get quick quality score")
     score_parser.add_argument("path", help="Path to the project to analyze")
-    score_parser.set_defaults(func=score_command)
+    score_parser.set_defaults(func=another_function)
 
     # Parse arguments
     args = parser.parse_args()

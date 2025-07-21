@@ -7,10 +7,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from pydantic import ConfigDict, Field
-
 from flext_core.domain.constants import ConfigDefaults
 from flext_core.domain.pydantic_base import BaseSettings
+from pydantic import ConfigDict, Field
 
 
 class QualityConfig(BaseSettings):
@@ -18,7 +17,7 @@ class QualityConfig(BaseSettings):
 
     # Project settings
     project_name: str = Field(
-        default="flext-quality",
+        default="flext-infrastructure.monitoring.flext-quality",
         description="Quality analysis project name",
     )
     project_version: str = Field(
@@ -295,8 +294,7 @@ class QualityConfig(BaseSettings):
         }
 
     model_config = ConfigDict(
-        env_prefix="QUALITY_",
-        env_file=".env",
-        env_file_encoding="utf-8",
-        case_sensitive=False,
+        # Remove invalid keys for flext-core ConfigDict
+        arbitrary_types_allowed=True,
+        validate_assignment=True,
     )
