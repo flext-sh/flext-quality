@@ -8,8 +8,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from flext_core import ServiceResult
 from flext_core.config import get_container
-from flext_core.domain.types import ServiceResult
 
 from flext_quality.application.services import (
     QualityAnalysisService,
@@ -106,7 +106,7 @@ class QualityAPI:
         min_coverage: float = 95.0,
         max_complexity: int = 10,
         max_duplication: float = 5.0,
-    ) -> ServiceResult[QualityProject]:
+    ) -> ServiceResult[Any]:
         """Create a new quality project.
 
         Args:
@@ -139,7 +139,7 @@ class QualityAPI:
     async def get_project(
         self,
         project_id: UUID,
-    ) -> ServiceResult[QualityProject | None]:
+    ) -> ServiceResult[Any]:
         """Get a project by ID.
 
         Args:
@@ -151,7 +151,7 @@ class QualityAPI:
         """
         return await self.project_service.get_project(project_id)
 
-    async def list_projects(self) -> ServiceResult[list[QualityProject]]:
+    async def list_projects(self) -> ServiceResult[Any]:
         """List all projects.
 
         Returns:
@@ -164,7 +164,7 @@ class QualityAPI:
         self,
         project_id: UUID,
         updates: dict[str, Any],
-    ) -> ServiceResult[QualityProject]:
+    ) -> ServiceResult[Any]:
         """Update a project.
 
         Args:
@@ -177,7 +177,7 @@ class QualityAPI:
         """
         return await self.project_service.update_project(project_id, updates)
 
-    async def delete_project(self, project_id: UUID) -> ServiceResult[bool]:
+    async def delete_project(self, project_id: UUID) -> ServiceResult[Any]:
         """Delete a project.
 
         Args:
@@ -197,7 +197,7 @@ class QualityAPI:
         branch: str | None = None,
         pull_request_id: str | None = None,
         analysis_config: dict[str, Any] | None = None,
-    ) -> ServiceResult[QualityAnalysis]:
+    ) -> ServiceResult[Any]:
         """Create a new quality analysis.
 
         Args:
@@ -227,7 +227,7 @@ class QualityAPI:
         code_lines: int,
         comment_lines: int,
         blank_lines: int,
-    ) -> ServiceResult[QualityAnalysis]:
+    ) -> ServiceResult[Any]:
         """Update analysis metrics.
 
         Args:
@@ -259,7 +259,7 @@ class QualityAPI:
         duplication_score: float,
         security_score: float,
         maintainability_score: float,
-    ) -> ServiceResult[QualityAnalysis]:
+    ) -> ServiceResult[Any]:
         """Update analysis quality scores.
 
         Args:
@@ -290,7 +290,7 @@ class QualityAPI:
         high: int,
         medium: int,
         low: int,
-    ) -> ServiceResult[QualityAnalysis]:
+    ) -> ServiceResult[Any]:
         """Update analysis issue counts by severity.
 
         Args:
@@ -315,7 +315,7 @@ class QualityAPI:
     async def complete_analysis(
         self,
         analysis_id: UUID,
-    ) -> ServiceResult[QualityAnalysis]:
+    ) -> ServiceResult[Any]:
         """Mark analysis as completed.
 
         Args:
@@ -331,7 +331,7 @@ class QualityAPI:
         self,
         analysis_id: UUID,
         error: str,
-    ) -> ServiceResult[QualityAnalysis]:
+    ) -> ServiceResult[Any]:
         """Mark analysis as failed.
 
         Args:
@@ -347,7 +347,7 @@ class QualityAPI:
     async def get_analysis(
         self,
         analysis_id: UUID,
-    ) -> ServiceResult[QualityAnalysis | None]:
+    ) -> ServiceResult[Any]:
         """Get an analysis by ID.
 
         Args:
@@ -362,7 +362,7 @@ class QualityAPI:
     async def list_analyses(
         self,
         project_id: UUID,
-    ) -> ServiceResult[list[QualityAnalysis]]:
+    ) -> ServiceResult[Any]:
         """List all analyses for a project.
 
         Args:
@@ -389,7 +389,7 @@ class QualityAPI:
         end_column_number: int | None = None,
         code_snippet: str | None = None,
         suggestion: str | None = None,
-    ) -> ServiceResult[QualityIssue]:
+    ) -> ServiceResult[Any]:
         """Create a new quality issue.
 
         Args:
@@ -425,7 +425,7 @@ class QualityAPI:
             suggestion=suggestion,
         )
 
-    async def get_issue(self, issue_id: UUID) -> ServiceResult[QualityIssue | None]:
+    async def get_issue(self, issue_id: UUID) -> ServiceResult[Any]:
         """Get an issue by ID.
 
         Args:
@@ -443,7 +443,7 @@ class QualityAPI:
         severity: str | None = None,
         issue_type: str | None = None,
         file_path: str | None = None,
-    ) -> ServiceResult[list[QualityIssue]]:
+    ) -> ServiceResult[Any]:
         """List issues for an analysis with optional filters.
 
         Args:
@@ -463,7 +463,7 @@ class QualityAPI:
             file_path=file_path,
         )
 
-    async def mark_issue_fixed(self, issue_id: UUID) -> ServiceResult[QualityIssue]:
+    async def mark_issue_fixed(self, issue_id: UUID) -> ServiceResult[Any]:
         """Mark an issue as fixed.
 
         Args:
@@ -479,7 +479,7 @@ class QualityAPI:
         self,
         issue_id: UUID,
         reason: str,
-    ) -> ServiceResult[QualityIssue]:
+    ) -> ServiceResult[Any]:
         """Suppress an issue with a reason.
 
         Args:
@@ -492,7 +492,7 @@ class QualityAPI:
         """
         return await self.issue_service.suppress_issue(issue_id, reason)
 
-    async def unsuppress_issue(self, issue_id: UUID) -> ServiceResult[QualityIssue]:
+    async def unsuppress_issue(self, issue_id: UUID) -> ServiceResult[Any]:
         """Remove suppression from an issue.
 
         Args:
@@ -512,7 +512,7 @@ class QualityAPI:
         report_format: str = "summary",
         report_path: str | None = None,
         report_size_bytes: int = 0,
-    ) -> ServiceResult[QualityReport]:
+    ) -> ServiceResult[Any]:
         """Create a quality report.
 
         Args:
@@ -534,7 +534,7 @@ class QualityAPI:
             report_size_bytes=report_size_bytes,
         )
 
-    async def get_report(self, report_id: UUID) -> ServiceResult[QualityReport | None]:
+    async def get_report(self, report_id: UUID) -> ServiceResult[Any]:
         """Get a report by ID.
 
         Args:
@@ -549,7 +549,7 @@ class QualityAPI:
     async def list_reports(
         self,
         analysis_id: UUID,
-    ) -> ServiceResult[list[QualityReport]]:
+    ) -> ServiceResult[Any]:
         """List all reports for an analysis.
 
         Args:
@@ -561,7 +561,7 @@ class QualityAPI:
         """
         return await self.report_service.list_reports(analysis_id)
 
-    async def delete_report(self, report_id: UUID) -> ServiceResult[bool]:
+    async def delete_report(self, report_id: UUID) -> ServiceResult[Any]:
         """Delete a report.
 
         Args:
@@ -579,7 +579,7 @@ class QualityAPI:
         project_id: UUID,
         commit_hash: str | None = None,
         branch: str | None = None,
-    ) -> ServiceResult[QualityAnalysis]:
+    ) -> ServiceResult[Any]:
         """Run a complete quality analysis for a project.
 
         Args:
@@ -598,7 +598,7 @@ class QualityAPI:
             branch=branch,
         )
 
-        if not result.is_success:
+        if not result.success:
             return result
 
         analysis = result.data

@@ -5,6 +5,7 @@ REFACTORED: Uses flext-core configuration patterns - NO duplication.
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 from flext_core.config.base import BaseSettings
@@ -24,6 +25,10 @@ class QualityConfig(BaseSettings):
     project_version: str = Field(
         default="0.7.0",
         description="Quality analysis version",
+    )
+    project_root: Path = Field(
+        default_factory=Path.cwd,
+        description="Project root directory",
     )
 
     # Analysis settings
@@ -97,21 +102,21 @@ class QualityConfig(BaseSettings):
         default=True,
         description="Enable linting checks",
     )
-    ruff_config_path: str | None = Field(
+    ruff_config_path: Path | None = Field(
         default=None,
         description="Path to ruff configuration file",
     )
-    mypy_config_path: str | None = Field(
+    mypy_config_path: Path | None = Field(
         default=None,
         description="Path to mypy configuration file",
     )
-    black_config_path: str | None = Field(
+    black_config_path: Path | None = Field(
         default=None,
         description="Path to black configuration file",
     )
 
     # Security analysis
-    bandit_config_path: str | None = Field(
+    bandit_config_path: Path | None = Field(
         default=None,
         description="Path to bandit configuration file",
     )
@@ -134,8 +139,8 @@ class QualityConfig(BaseSettings):
         default=True,
         description="Generate Markdown quality report",
     )
-    report_output_dir: str = Field(
-        default="reports",
+    report_output_dir: Path = Field(
+        default=Path("reports"),
         description="Directory for quality reports",
     )
 

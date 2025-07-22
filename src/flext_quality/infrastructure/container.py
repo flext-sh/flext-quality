@@ -1,9 +1,7 @@
 """Dependency injection container for FLEXT-QUALITY.
-
 REFACTORED:
             Uses Lato DI framework with flext-core patterns.
 """
-
 from __future__ import annotations
 
 from flext_core.config import get_container
@@ -33,9 +31,8 @@ from flext_quality.infrastructure.ports import (
     RuffPort,
 )
 
+
 # Funções de fábrica
-
-
 def _create_analysis_result_repository() -> AnalysisResultRepository:
     return AnalysisResultRepository()
 
@@ -124,7 +121,6 @@ class QualityContainer:
     def resolve(self, service_type: type[object]) -> object:
         """Resolve a service instance."""
         service_name = service_type.__name__
-
         # Simple service resolution - create if not exists
         if service_name not in self._instances:
             if service_type == QualityConfig:
@@ -139,7 +135,6 @@ class QualityContainer:
             else:
                 # Fallback: try to instantiate
                 self._instances[service_name] = service_type()
-
         return self._instances[service_name]
 
 
@@ -151,20 +146,17 @@ def configure_quality_dependencies() -> None:
     """Configure quality-specific dependencies."""
     # Get core container (but not used in simplified implementation)
     get_container()
-
     # Create quality container
     global _container
     _container = QualityContainer()
 
 
 def get_quality_container() -> QualityContainer:
-    global _container  # noqa: PLW0602 - Singleton pattern access to global container
+    global _container
     if _container is None:
         configure_quality_dependencies()
-
     # Ensure container is properly initialized
     if _container is None:
         msg = "Container initialization failed"
         raise RuntimeError(msg)
-
     return _container
