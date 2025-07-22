@@ -10,7 +10,6 @@ from django.utils.safestring import mark_safe
 
 if TYPE_CHECKING:
     from datetime import timedelta
-
 register = template.Library()
 
 
@@ -92,12 +91,10 @@ def status_badge(status: str) -> Any:
 def format_duration(duration: timedelta) -> str:
     if not duration:
         return "N/A"
-
     total_seconds = int(duration.total_seconds())
     hours = total_seconds // 3600
     minutes = (total_seconds % 3600) // 60
     seconds = total_seconds % 60
-
     if hours > 0:
         return f"{hours}h {minutes}m {seconds}s"
     if minutes > 0:
@@ -109,28 +106,23 @@ def format_duration(duration: timedelta) -> str:
 def truncate_path(path: str, max_length: int = 50) -> Any:
     if len(path) <= max_length:
         return path
-
     # Try to keep the filename and some parent directories
     parts = path.split("/")
     if len(parts) > 1:
         filename = parts[-1]
         remaining_length = max_length - len(filename) - 3  # 3 for "..."
-
         if remaining_length > 0:
             # Build path from the beginning until we run out of space
             truncated_parts: list[str] = []
             current_length = 0
-
             for part in parts[:-1]:
                 if current_length + len(part) + 1 <= remaining_length:
                     truncated_parts.append(part)
                     current_length += len(part) + 1
                 else:
                     break
-
             if truncated_parts:
                 return "/".join(truncated_parts) + "/.../" + filename
-
     # Fallback: just truncate from the end
     return path[: max_length - 3] + "..."
 
@@ -157,9 +149,7 @@ def progress_bar(value: float, total: float, css_class: str = "bg-primary") -> s
     value = int(value) if str(value).isdigit() else 0
     total = int(total) if str(total).isdigit() else 1
     css_class = escape(css_class)
-
     percentage = 0 if total == 0 else value / total * 100
-
     html = f"""
     <div class="progress" style="height: 20px">
         <div class="progress-bar {css_class}" role="progressbar"
@@ -171,4 +161,4 @@ def progress_bar(value: float, total: float, css_class: str = "bg-primary") -> s
         </div>
     </div>
     """
-    return mark_safe(html)  # noqa: S308
+    return mark_safe(html)

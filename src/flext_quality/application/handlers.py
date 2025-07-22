@@ -10,7 +10,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 # Removed injectable - simplifying DI
-from flext_core.domain.types import ServiceResult
+from flext_core import ServiceResult
 
 if TYPE_CHECKING:
     from uuid import UUID

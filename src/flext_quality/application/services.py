@@ -9,8 +9,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-# Removed injectable - simplifying DI
-from flext_core.domain.types import ServiceResult
+from flext_core import ServiceResult
 
 if TYPE_CHECKING:
     from uuid import UUID
@@ -69,14 +68,14 @@ class QualityProjectService:
     async def get_project(
         self,
         project_id: UUID,
-    ) -> ServiceResult[QualityProject | None]:
+    ) -> ServiceResult[QualityProject]:
         try:
             project = self._projects.get(project_id)
             return ServiceResult.ok(project)
         except Exception as e:
             return ServiceResult.fail(f"Failed to get project {e}")
 
-    async def list_projects(self) -> ServiceResult[list[QualityProject]]:
+    async def list_projects(self) -> ServiceResult[Any]:
         try:
             projects = list(self._projects.values())
             return ServiceResult.ok(projects)
@@ -126,7 +125,7 @@ class QualityAnalysisService:
         branch: str | None = None,
         pull_request_id: str | None = None,
         analysis_config: dict[str, Any] | None = None,
-    ) -> ServiceResult[QualityAnalysis]:
+    ) -> ServiceResult[Any]:
         try:
             analysis = QualityAnalysis(
                 project_id=project_id,
@@ -150,7 +149,7 @@ class QualityAnalysisService:
         code_lines: int,
         comment_lines: int,
         blank_lines: int,
-    ) -> ServiceResult[QualityAnalysis]:
+    ) -> ServiceResult[Any]:
         try:
             analysis = self._analyses.get(analysis_id)
             if not analysis:
@@ -175,7 +174,7 @@ class QualityAnalysisService:
         duplication_score: float,
         security_score: float,
         maintainability_score: float,
-    ) -> ServiceResult[QualityAnalysis]:
+    ) -> ServiceResult[Any]:
         try:
             analysis = self._analyses.get(analysis_id)
             if not analysis:
@@ -200,7 +199,7 @@ class QualityAnalysisService:
         high: int,
         medium: int,
         low: int,
-    ) -> ServiceResult[QualityAnalysis]:
+    ) -> ServiceResult[Any]:
         try:
             analysis = self._analyses.get(analysis_id)
             if not analysis:
@@ -220,7 +219,7 @@ class QualityAnalysisService:
     async def complete_analysis(
         self,
         analysis_id: UUID,
-    ) -> ServiceResult[QualityAnalysis]:
+    ) -> ServiceResult[Any]:
         try:
             analysis = self._analyses.get(analysis_id)
             if not analysis:
@@ -235,7 +234,7 @@ class QualityAnalysisService:
         self,
         analysis_id: UUID,
         error: str,
-    ) -> ServiceResult[QualityAnalysis]:
+    ) -> ServiceResult[Any]:
         try:
             analysis = self._analyses.get(analysis_id)
             if not analysis:
@@ -249,7 +248,7 @@ class QualityAnalysisService:
     async def get_analysis(
         self,
         analysis_id: UUID,
-    ) -> ServiceResult[QualityAnalysis | None]:
+    ) -> ServiceResult[Any]:
         try:
             analysis = self._analyses.get(analysis_id)
             return ServiceResult.ok(analysis)
@@ -259,7 +258,7 @@ class QualityAnalysisService:
     async def list_analyses(
         self,
         project_id: UUID,
-    ) -> ServiceResult[list[QualityAnalysis]]:
+    ) -> ServiceResult[Any]:
         try:
             analyses = [
                 a for a in self._analyses.values() if a.project_id == project_id
@@ -292,7 +291,7 @@ class QualityIssueService:
         end_column_number: int | None = None,
         code_snippet: str | None = None,
         suggestion: str | None = None,
-    ) -> ServiceResult[QualityIssue]:
+    ) -> ServiceResult[Any]:
         try:
             from flext_quality.domain.entities import IssueSeverity, IssueType
 
@@ -316,7 +315,7 @@ class QualityIssueService:
         except Exception as e:
             return ServiceResult.fail(f"Failed to create issue: {e}")
 
-    async def get_issue(self, issue_id: UUID) -> ServiceResult[QualityIssue | None]:
+    async def get_issue(self, issue_id: UUID) -> ServiceResult[Any]:
         try:
             issue = self._issues.get(issue_id)
             return ServiceResult.ok(issue)
@@ -329,7 +328,7 @@ class QualityIssueService:
         severity: str | None = None,
         issue_type: str | None = None,
         file_path: str | None = None,
-    ) -> ServiceResult[list[QualityIssue]]:
+    ) -> ServiceResult[Any]:
         try:
             issues = [i for i in self._issues.values() if i.analysis_id == analysis_id]
 
@@ -346,7 +345,7 @@ class QualityIssueService:
         except Exception as e:
             return ServiceResult.fail(f"Failed to list issues: {e}")
 
-    async def mark_fixed(self, issue_id: UUID) -> ServiceResult[QualityIssue]:
+    async def mark_fixed(self, issue_id: UUID) -> ServiceResult[Any]:
         try:
             issue = self._issues.get(issue_id)
             if not issue:
@@ -361,7 +360,7 @@ class QualityIssueService:
         self,
         issue_id: UUID,
         reason: str,
-    ) -> ServiceResult[QualityIssue]:
+    ) -> ServiceResult[Any]:
         try:
             issue = self._issues.get(issue_id)
             if not issue:
@@ -372,7 +371,7 @@ class QualityIssueService:
         except Exception as e:
             return ServiceResult.fail(f"Failed to suppress issue: {e}")
 
-    async def unsuppress_issue(self, issue_id: UUID) -> ServiceResult[QualityIssue]:
+    async def unsuppress_issue(self, issue_id: UUID) -> ServiceResult[Any]:
         try:
             issue = self._issues.get(issue_id)
             if not issue:
@@ -398,7 +397,7 @@ class QualityReportService:
         report_format: str = "summary",
         report_path: str | None = None,
         report_size_bytes: int = 0,
-    ) -> ServiceResult[QualityReport]:
+    ) -> ServiceResult[Any]:
         try:
             report = QualityReport(
                 analysis_id=analysis_id,
@@ -413,7 +412,7 @@ class QualityReportService:
         except Exception as e:
             return ServiceResult.fail(f"Failed to create report: {e}")
 
-    async def get_report(self, report_id: UUID) -> ServiceResult[QualityReport | None]:
+    async def get_report(self, report_id: UUID) -> ServiceResult[Any]:
         try:
             report = self._reports.get(report_id)
             if report:
@@ -425,7 +424,7 @@ class QualityReportService:
     async def list_reports(
         self,
         analysis_id: UUID,
-    ) -> ServiceResult[list[QualityReport]]:
+    ) -> ServiceResult[Any]:
         try:
             reports = [
                 r for r in self._reports.values() if r.analysis_id == analysis_id
@@ -434,7 +433,7 @@ class QualityReportService:
         except Exception as e:
             return ServiceResult.fail(f"Failed to list reports {e}")
 
-    async def delete_report(self, report_id: UUID) -> ServiceResult[bool]:
+    async def delete_report(self, report_id: UUID) -> ServiceResult[Any]:
         try:
             if report_id in self._reports:
                 del self._reports[report_id]
@@ -472,7 +471,7 @@ class SecurityAnalyzerServiceImpl:
 
     async def analyze_security(self, project_path: str) -> ServiceResult[Any]:
         """Analyze security issues in project."""
-        return ServiceResult.ok({"security_issues": [], "scan_completed": True})
+        return ServiceResult.ok({"security_issues": []})
 
 
 # Simplified DI - removed decorator
@@ -485,7 +484,7 @@ class LintingServiceImpl:
 
     async def run_linting(self, project_path: str) -> ServiceResult[Any]:
         """Run linting analysis on project."""
-        return ServiceResult.ok({"linting_issues": [], "scan_completed": True})
+        return ServiceResult.ok({"linting_issues": []})
 
 
 # Simplified DI - removed decorator

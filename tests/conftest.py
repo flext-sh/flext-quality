@@ -1,20 +1,13 @@
 """Test configuration for flext-quality.
-
 Provides pytest fixtures and configuration for testing quality analysis functionality
 using Django test framework and flext-core patterns.
 """
-
 from __future__ import annotations
-
 import os
 from typing import TYPE_CHECKING, Any
-
 import pytest
-
 if TYPE_CHECKING:
     from collections.abc import Generator
-
-
 # Test environment setup
 @pytest.fixture(autouse=True)
 def set_test_environment() -> Generator[None]:
@@ -26,8 +19,6 @@ def set_test_environment() -> Generator[None]:
     # Cleanup
     os.environ.pop("FLEXT_ENV", None)
     os.environ.pop("FLEXT_LOG_LEVEL", None)
-
-
 # Django fixtures
 @pytest.fixture
 def django_db_setup() -> Generator[None]:
@@ -36,19 +27,16 @@ def django_db_setup() -> Generator[None]:
         setup_test_environment,
         teardown_test_environment,
     )
-
     setup_test_environment()
     yield
     teardown_test_environment()
-
-
 # Quality analysis fixtures
 @pytest.fixture
 def sample_code_repository() -> dict[str, Any]:
     """Sample code repository for testing."""
     return {
         "name": "test-repository",
-        "path": "/tmp/test-repo",  # noqa: S108
+        "path": "/tmp/test-repo",S108
         "language": "python",
         "files": [
             "src/main.py",
@@ -58,8 +46,6 @@ def sample_code_repository() -> dict[str, Any]:
         "size": 1024,
         "last_modified": "2023-01-01T12:00:00Z",
     }
-
-
 @pytest.fixture
 def quality_metrics_data() -> dict[str, Any]:
     """Quality metrics data for testing."""
@@ -85,8 +71,6 @@ def quality_metrics_data() -> dict[str, Any]:
             "rating": "B",
         },
     }
-
-
 @pytest.fixture
 def code_analysis_config() -> dict[str, Any]:
     """Code analysis configuration for testing."""
@@ -114,8 +98,6 @@ def code_analysis_config() -> dict[str, Any]:
             "maintainability": 70.0,
         },
     }
-
-
 @pytest.fixture
 def analysis_results() -> list[dict[str, Any]]:
     """Analysis results for testing."""
@@ -148,8 +130,6 @@ def analysis_results() -> list[dict[str, Any]]:
             "tool": "bandit",
         },
     ]
-
-
 # Report generation fixtures
 @pytest.fixture
 def report_config() -> dict[str, Any]:
@@ -158,11 +138,9 @@ def report_config() -> dict[str, Any]:
         "format": "json",
         "include_metrics": True,
         "include_details": True,
-        "output_path": "/tmp/report.json",  # noqa: S108
+        "output_path": "/tmp/report.json",S108
         "template": "default",
     }
-
-
 @pytest.fixture
 def dashboard_data() -> dict[str, Any]:
     """Dashboard data for testing."""
@@ -184,8 +162,6 @@ def dashboard_data() -> dict[str, Any]:
             {"type": "maintainability", "count": 3},
         ],
     }
-
-
 # Multi-backend fixtures
 @pytest.fixture
 def sonarqube_config() -> dict[str, Any]:
@@ -197,8 +173,6 @@ def sonarqube_config() -> dict[str, Any]:
         "organization": "test-org",
         "quality_gate": "Sonar way",
     }
-
-
 @pytest.fixture
 def codeclimate_config() -> dict[str, Any]:
     """CodeClimate configuration for testing."""
@@ -208,64 +182,49 @@ def codeclimate_config() -> dict[str, Any]:
         "maintainability_threshold": 3.0,
         "coverage_threshold": 80.0,
     }
-
-
 # File system fixtures
 @pytest.fixture
 def temporary_project_structure(tmp_path: Any) -> str:
     """Create temporary project structure for testing."""
     project_dir = tmp_path / "test_project"
     project_dir.mkdir()
-
     # Create source files
     src_dir = project_dir / "src"
     src_dir.mkdir()
-
     main_py = src_dir / "main.py"
     main_py.write_text("""
 def main() -> int:
     print("Hello, World!")
     return 0
-
 if __name__ == "__main__":
     main()
 """)
-
     utils_py = src_dir / "utils.py"
     utils_py.write_text("""
 import os
 import sys
-
 def get_env_var(name: str) -> str | None:
     return os.environ.get(name)
 """)
-
     # Create test files
     tests_dir = project_dir / "tests"
     tests_dir.mkdir()
-
     test_main_py = tests_dir / "test_main.py"
     test_main_py.write_text("""
 import pytest
 from src.main import main
-
 def test_main() -> None:
     assert main() == 0
 """)
-
     # Create config files
     pyproject_toml = project_dir / "pyproject.toml"
     pyproject_toml.write_text("""
 [tool.ruff]
 line-length = 79
-
 [tool.mypy]
 strict = true
 """)
-
     return str(project_dir)
-
-
 # Package discovery fixtures
 @pytest.fixture
 def package_metadata() -> dict[str, Any]:
@@ -286,8 +245,6 @@ def package_metadata() -> dict[str, Any]:
             "coverage>=6.0.0",
         ],
     }
-
-
 # Task management fixtures
 @pytest.fixture
 def celery_config() -> dict[str, Any]:
@@ -301,8 +258,6 @@ def celery_config() -> dict[str, Any]:
         "timezone": "UTC",
         "enable_utc": True,
     }
-
-
 @pytest.fixture
 def analysis_task_data() -> dict[str, Any]:
     """Analysis task data for testing."""
@@ -316,8 +271,6 @@ def analysis_task_data() -> dict[str, Any]:
         "result": None,
         "error": None,
     }
-
-
 # Pytest markers for test categorization
 def pytest_configure(config: pytest.Config) -> None:
     """Configure pytest markers."""
@@ -329,17 +282,13 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line("markers", "celery: Celery task tests")
     config.addinivalue_line("markers", "django: Django framework tests")
     config.addinivalue_line("markers", "slow: Slow tests")
-
-
 # Mock services
 @pytest.fixture
 def mock_quality_analyzer() -> Any:
     """Mock quality analyzer for testing."""
-
     class MockQualityAnalyzer:
         def __init__(self) -> None:
             self.analyzed_files: list[str] = []
-
         async def analyze_project(self, project_path: str) -> dict[str, Any]:
             self.analyzed_files.append(project_path)
             return {
@@ -348,7 +297,6 @@ def mock_quality_analyzer() -> Any:
                 "files_analyzed": 10,
                 "analysis_time": 2.5,
             }
-
         async def analyze_file(self, file_path: str) -> dict[str, Any]:
             return {
                 "file": file_path,
@@ -356,7 +304,6 @@ def mock_quality_analyzer() -> Any:
                 "issues": 2,
                 "coverage": 90.0,
             }
-
         async def get_metrics(self, project_path: str) -> dict[str, Any]:
             return {
                 "maintainability": 78.5,
@@ -364,18 +311,13 @@ def mock_quality_analyzer() -> Any:
                 "duplication": 2.1,
                 "security": 95.0,
             }
-
     return MockQualityAnalyzer()
-
-
 @pytest.fixture
 def mock_report_generator() -> Any:
     """Mock report generator for testing."""
-
     class MockReportGenerator:
         def __init__(self) -> None:
             self.generated_reports: list[dict[str, Any]] = []
-
         async def generate_report(
             self,
             data: dict[str, Any],
@@ -388,7 +330,6 @@ def mock_report_generator() -> Any:
             }
             self.generated_reports.append(report)
             return f"report_{len(self.generated_reports)}.{format}"
-
         async def generate_dashboard_data(self) -> dict[str, Any]:
             return {
                 "projects": 5,
@@ -396,5 +337,4 @@ def mock_report_generator() -> Any:
                 "avg_quality_score": 82.5,
                 "trend": "improving",
             }
-
     return MockReportGenerator()

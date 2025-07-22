@@ -1,5 +1,4 @@
 """URL configuration for Code Analyzer Web Interface flx_project."""
-
 from __future__ import annotations
 
 from django.conf import settings
@@ -18,22 +17,18 @@ urlpatterns = [
     # Redirect root to dashboard
     path("", RedirectView.as_view(url="/dashboard/", permanent=False)),
 ]
-
 # Serve static and media files in development
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
-
     # Add Django Debug Toolbar if installed:
     try:
-        import debug_toolbar  # type: ignore[import-not-found]
-
+        import debug_toolbar
         urlpatterns += [
             path("__debug__/", include(debug_toolbar.urls)),
         ]
     except ImportError:
         pass
-
 # Customize REDACTED_LDAP_BIND_PASSWORD site
 REDACTED_LDAP_BIND_PASSWORD.site.site_header = "Code Analyzer Administration"
 REDACTED_LDAP_BIND_PASSWORD.site.site_title = "Code Analyzer Admin"

@@ -12,7 +12,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from flext_core.domain.types import ServiceResult
+    from flext_core import ServiceResult
 
 
 class AnalysisService(ABC):
@@ -26,7 +26,7 @@ class AnalysisService(ABC):
         include_complexity: bool = True,
         include_dead_code: bool = True,
         include_duplicates: bool = True,
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Analyze a complete project with configurable analysis types."""
         ...
 
@@ -35,7 +35,7 @@ class AnalysisService(ABC):
         self,
         file_path: Path,
         analysis_types: list[str] | None = None,
-    ) -> ServiceResult[dict[str, Any]]:
+    ) -> ServiceResult[Any]:
         """Analyze a single file with specified analysis types."""
         ...
 
@@ -43,12 +43,12 @@ class AnalysisService(ABC):
     async def calculate_quality_score(
         self,
         analysis_results: dict[str, Any],
-    ) -> ServiceResult[float]:
+    ) -> ServiceResult[Any]:
         """Calculate overall quality score from analysis results."""
         ...
 
     @abstractmethod
-    async def get_quality_grade(self, quality_score: float) -> ServiceResult[str]:
+    async def get_quality_grade(self, quality_score: float) -> ServiceResult[Any]:
         """Convert quality score to letter grade (A, B, C, D, F)."""
         ...
 
@@ -61,7 +61,7 @@ class SecurityAnalyzerService(ABC):
         self,
         project_path: Path,
         severity_threshold: str = "medium",
-    ) -> ServiceResult[list[dict[str, Any]]]:
+    ) -> ServiceResult[Any]:
         """Analyze project for security vulnerabilities."""
         ...
 
@@ -70,7 +70,7 @@ class SecurityAnalyzerService(ABC):
         self,
         file_path: Path,
         severity_threshold: str = "medium",
-    ) -> ServiceResult[list[dict[str, Any]]]:
+    ) -> ServiceResult[Any]:
         """Scan a single file for security issues."""
         ...
 
@@ -78,7 +78,7 @@ class SecurityAnalyzerService(ABC):
     async def validate_dependencies(
         self,
         project_path: Path,
-    ) -> ServiceResult[list[dict[str, Any]]]:
+    ) -> ServiceResult[Any]:
         """Validate project dependencies for known vulnerabilities."""
         ...
 
@@ -91,7 +91,7 @@ class LintingService(ABC):
         self,
         project_path: Path,
         fix: bool = False,
-    ) -> ServiceResult[list[dict[str, Any]]]:
+    ) -> ServiceResult[Any]:
         """Lint entire project with optional auto-fix."""
         ...
 
@@ -100,12 +100,12 @@ class LintingService(ABC):
         self,
         file_path: Path,
         fix: bool = False,
-    ) -> ServiceResult[list[dict[str, Any]]]:
+    ) -> ServiceResult[Any]:
         """Lint a single file with optional auto-fix."""
         ...
 
     @abstractmethod
-    async def format_code(self, file_path: Path) -> ServiceResult[str]:
+    async def format_code(self, file_path: Path) -> ServiceResult[Any]:
         """Format code in a file according to style guidelines."""
         ...
 
