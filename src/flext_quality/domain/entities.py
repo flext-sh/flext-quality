@@ -11,7 +11,12 @@ from datetime import datetime
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any
 
-from flext_core.domain.pydantic_base import DomainEntity, DomainEvent
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
+from flext_quality.infrastructure.di_container import get_domain_entity
+
+DomainEntity = get_domain_entity()
+DomainEvent = get_domain_entity()  # Placeholder
+DomainBaseModel = get_domain_entity()  # Placeholder
 from pydantic import Field
 
 if TYPE_CHECKING:

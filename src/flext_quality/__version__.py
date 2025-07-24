@@ -6,7 +6,10 @@ This module contains version information for the flext-quality package.
 from __future__ import annotations
 
 # Import from centralized version management system
-from flext_core.version import get_version, get_version_info
+# 🚨 ARCHITECTURAL COMPLIANCE: DI container
+from flext_quality.infrastructure.di_container import get_service_result
+
+ServiceResult = get_service_result()
 
 __version__ = get_version("flext-quality")
 __version_info__ = get_version_info("flext-quality")

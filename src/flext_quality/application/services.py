@@ -9,7 +9,25 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from flext_core import ServiceResult
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container for flext-core imports
+from flext_quality.infrastructure.di_container import (
+    get_abstract_service,
+    get_command_handler,
+    get_domain_entity,
+    get_domain_value_object,
+    get_field,
+    get_query_handler,
+    get_service_result,
+)
+
+# Dynamic imports based on usage
+ServiceResult = get_service_result()
+DomainEntity = get_domain_entity()
+DomainValueObject = get_domain_value_object()
+Field = get_field()
+CommandHandler = get_command_handler()
+QueryHandler = get_query_handler()
+AbstractService = get_abstract_service()
 
 if TYPE_CHECKING:
     from uuid import UUID

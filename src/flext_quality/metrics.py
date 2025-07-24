@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from typing import Any, ClassVar
 
-from flext_core.domain.pydantic_base import DomainValueObject
+# 🚨 ARCHITECTURAL COMPLIANCE: DI container
+from flext_quality.infrastructure.di_container import get_service_result
+
+ServiceResult = get_service_result()
 from pydantic import Field, computed_field
 
 

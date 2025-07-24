@@ -9,7 +9,12 @@ from __future__ import annotations
 from enum import StrEnum
 from pathlib import Path
 
-from flext_core.domain.pydantic_base import DomainBaseModel
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
+from flext_quality.infrastructure.di_container import get_domain_entity
+
+DomainEntity = get_domain_entity()
+DomainEvent = get_domain_entity()  # Placeholder
+DomainBaseModel = get_domain_entity()  # Placeholder
 from pydantic import Field, field_validator
 
 

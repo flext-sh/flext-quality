@@ -1,4 +1,5 @@
 """Django REST Framework views for analyzer API."""
+
 from __future__ import annotations
 
 import logging
