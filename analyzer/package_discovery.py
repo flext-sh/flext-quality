@@ -46,9 +46,7 @@ class PackageDiscovery:
                 (
                     0
                     if x["package_type"] == "source"
-                    else 1
-                    if x["package_type"] == "wheel"
-                    else 2
+                    else 1 if x["package_type"] == "wheel" else 2
                 ),
                 x["name"].lower(),
             ),

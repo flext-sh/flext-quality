@@ -1,4 +1,5 @@
 """URL configuration for Code Analyzer Web Interface flx_project."""
+
 from __future__ import annotations
 
 from django.conf import settings
@@ -24,6 +25,7 @@ if settings.DEBUG:
     # Add Django Debug Toolbar if installed:
     try:
         import debug_toolbar
+
         urlpatterns += [
             path("__debug__/", include(debug_toolbar.urls)),
         ]

@@ -2,6 +2,7 @@
 This module provides CLI commands for code quality analysis.
 Uses flext-cli patterns for consistency.
 """
+
 from __future__ import annotations
 
 import argparse

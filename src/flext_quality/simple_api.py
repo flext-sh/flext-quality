@@ -8,8 +8,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from flext_core import ServiceResult
-from flext_core.config import get_container
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
+from flext_quality.infrastructure.di_container import get_service_result
+
+ServiceResult = get_service_result()
+# 🚨 ARCHITECTURAL COMPLIANCE: DI container
+from flext_quality.infrastructure.di_container import get_service_result
+
+ServiceResult = get_service_result()
 
 from flext_quality.application.services import (
     QualityAnalysisService,
@@ -21,12 +27,6 @@ from flext_quality.application.services import (
 if TYPE_CHECKING:
     from uuid import UUID
 
-    from flext_quality.domain.entities import (
-        QualityAnalysis,
-        QualityIssue,
-        QualityProject,
-        QualityReport,
-    )
 
 
 class QualityAPI:

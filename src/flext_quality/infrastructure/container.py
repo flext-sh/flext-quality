@@ -2,9 +2,13 @@
 REFACTORED:
             Uses Lato DI framework with flext-core patterns.
 """
+
 from __future__ import annotations
 
-from flext_core.config import get_container
+# 🚨 ARCHITECTURAL COMPLIANCE: DI container
+from flext_quality.infrastructure.di_container import get_service_result
+
+ServiceResult = get_service_result()
 
 from flext_quality.application.handlers import (
     AnalyzeProjectHandler,

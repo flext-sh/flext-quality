@@ -8,8 +8,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from flext_core.config.base import BaseSettings
-from flext_core.domain.constants import ConfigDefaults
+# 🚨 ARCHITECTURAL COMPLIANCE: DI container
+from flext_quality.infrastructure.di_container import get_service_result
+
+ServiceResult = get_service_result()
+# 🚨 ARCHITECTURAL COMPLIANCE: DI container
+from flext_quality.infrastructure.di_container import get_service_result
+
+ServiceResult = get_service_result()
 from pydantic import Field
 from pydantic_settings import SettingsConfigDict
 

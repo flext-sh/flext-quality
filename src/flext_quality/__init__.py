@@ -16,7 +16,10 @@ import importlib.metadata
 import warnings
 
 # Import from flext-core for foundational patterns
-from flext_core import BaseConfig, DomainBaseModel, ServiceResult
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
+from flext_quality.infrastructure.di_container import get_service_result
+
+ServiceResult = get_service_result()
 
 try:
     __version__ = importlib.metadata.version("flext-quality")
@@ -50,12 +53,10 @@ def _show_deprecation_warning(old_import: str, new_import: str) -> None:
 # ================================
 
 # Foundation patterns - ALWAYS from flext-core
-from flext_core import (
-    BaseConfig as QualityBaseConfig,  # Configuration base
-    DomainBaseModel as BaseModel,  # Base for quality models
-    DomainError as QualityError,  # Quality-specific errors
-    ValidationError as ValidationError,  # Validation errors
-)
+# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
+from flext_quality.infrastructure.di_container import get_service_result
+
+ServiceResult = get_service_result()
 
 # Core quality exports - simplified imports
 try:

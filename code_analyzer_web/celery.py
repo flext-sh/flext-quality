@@ -1,4 +1,5 @@
 """Celery configuration for background tasks."""
+
 from __future__ import annotations
 
 import os
