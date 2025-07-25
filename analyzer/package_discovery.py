@@ -9,7 +9,7 @@ from pathlib import Path
 from typing import Any
 
 # Use centralized logging
-from flext_observability.logging import get_logger
+from flext_observability.structured_logging import get_logger
 
 logger = get_logger(__name__)
 
@@ -46,7 +46,9 @@ class PackageDiscovery:
                 (
                     0
                     if x["package_type"] == "source"
-                    else 1 if x["package_type"] == "wheel" else 2
+                    else 1
+                    if x["package_type"] == "wheel"
+                    else 2
                 ),
                 x["name"].lower(),
             ),

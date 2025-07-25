@@ -8,19 +8,17 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-# 🚨 ARCHITECTURAL COMPLIANCE: DI container
-from flext_quality.infrastructure.di_container import get_service_result
-
-ServiceResult = get_service_result()
-# 🚨 ARCHITECTURAL COMPLIANCE: DI container
-from flext_quality.infrastructure.di_container import get_service_result
-
-ServiceResult = get_service_result()
+from flext_core import FlextCoreSettings
 from pydantic import Field
 from pydantic_settings import SettingsConfigDict
 
+# 🚨 ARCHITECTURAL COMPLIANCE: DI container
+from flext_quality.infrastructure.di_container import get_service_result
 
-class QualityConfig(BaseSettings):
+FlextResult = get_service_result()
+
+
+class QualityConfig(FlextCoreSettings):
     """Quality analysis configuration using flext-core BaseSettings."""
 
     # Project settings
@@ -156,7 +154,7 @@ class QualityConfig(BaseSettings):
         description="Enable analysis result caching",
     )
     cache_ttl_seconds: int = Field(
-        default=ConfigDefaults.DEFAULT_CACHE_TTL,
+        default=3600,  # 1 hour default cache TTL
         description="Cache time-to-live in seconds",
         ge=60,
         le=86400,

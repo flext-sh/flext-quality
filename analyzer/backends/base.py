@@ -2,16 +2,17 @@
 
 from __future__ import annotations
 
-import logging
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Any
+
+from flext_core import get_logger
 
 if TYPE_CHECKING:
     from pathlib import Path
 
     from analyzer.models import AnalysisSession
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class AnalysisResult:
@@ -49,7 +50,7 @@ class AnalysisBackend(ABC):
         """Initialize analysis backend with session and project path."""
         self.session = session
         self.project_path = project_path
-        self.logger = logging.getLogger(__name__ + "." + self.__class__.__name__)
+        self.logger = FlextLoggerFactory.get_logger(__name__ + "." + self.__class__.__name__)
 
     @property
     @abstractmethod

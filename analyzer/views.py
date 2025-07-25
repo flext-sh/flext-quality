@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import logging
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from django.contrib import messages
@@ -14,7 +13,10 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, status, viewsets
+from flext_core import get_logger
+
+# Create placeholder serializers
+from rest_framework import filters, serializers, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -31,24 +33,115 @@ from analyzer.models import (
 )
 from analyzer.package_discovery import PackageDiscovery
 from analyzer.report_generator import WebReportGenerator
-from analyzer.serializers import (
-    AnalysisSessionSerializer,
-    AnalysisSessionSummarySerializer,
-    CreateAnalysisSessionSerializer,
-    DeadCodeIssueSerializer,
-    DuplicateCodeBlockSerializer,
-    FileAnalysisSerializer,
-    ProjectSerializer,
-    ProjectSummarySerializer,
-    QualityMetricsSerializer,
-    SecurityIssueSerializer,
-)
 from analyzer.tasks import run_code_analysis
+
+
+class ProjectSerializer(serializers.ModelSerializer):
+    """Serializer for Project model."""
+
+    class Meta:
+        model = Project
+        fields = "__all__"
+
+
+class ProjectSummarySerializer(serializers.ModelSerializer):
+    """Summary serializer for Project model."""
+
+    class Meta:
+        model = Project
+        name = serializers.CharField(max_length=255)
+        description = serializers.CharField(max_length=512, allow_blank=True)
+        created_at = serializers.DateTimeField(read_only=True)
+        updated_at = serializers.DateTimeField(read_only=True)
+        fields = ClassVar["id", "name", "description", "created_at", "updated_at"]
+
+
+class AnalysisSessionSerializer(serializers.ModelSerializer):
+    """Serializer for AnalysisSession model."""
+
+    class Meta:
+        model = AnalysisSession
+        fields = "__all__"
+
+
+class AnalysisSessionSummarySerializer(serializers.ModelSerializer):
+    """Summary serializer for AnalysisSession model."""
+
+    class Meta:
+        model = AnalysisSession
+        name = serializers.CharField(max_length=255)
+        status = serializers.CharField(max_length=50)
+        created_at = serializers.DateTimeField(read_only=True)
+        overall_score = serializers.FloatField(read_only=True)
+        fields = ClassVar["id", "name", "status", "created_at", "overall_score"]
+
+
+class CreateAnalysisSessionSerializer(serializers.ModelSerializer):
+    """Serializer for creating AnalysisSession."""
+
+    class Meta:
+        model = AnalysisSession
+        flx_project = serializers.PrimaryKeyRelatedField(
+            queryset=Project.objects.all(),
+            write_only=True,
+        )
+        name = serializers.CharField(max_length=255)
+        include_security = serializers.BooleanField(default=True)
+        include_dead_code = serializers.BooleanField(default=True)
+        include_duplicates = serializers.BooleanField(default=True)
+        fields = ClassVar[
+            "flx_project",
+            "name",
+            "include_security",
+            "include_dead_code",
+            "include_duplicates",
+        ]
+
+
+class FileAnalysisSerializer(serializers.ModelSerializer):
+    """Serializer for FileAnalysis model."""
+
+    class Meta:
+        model = FileAnalysis
+        fields = "__all__"
+
+
+class SecurityIssueSerializer(serializers.ModelSerializer):
+    """Serializer for SecurityIssue model."""
+
+    class Meta:
+        model = SecurityIssue
+        fields = "__all__"
+
+
+class DeadCodeIssueSerializer(serializers.ModelSerializer):
+    """Serializer for DeadCodeIssue model."""
+
+    class Meta:
+        model = DeadCodeIssue
+        fields = "__all__"
+
+
+class DuplicateCodeBlockSerializer(serializers.ModelSerializer):
+    """Serializer for DuplicateCodeBlock model."""
+
+    class Meta:
+        model = DuplicateCodeBlock
+        fields = "__all__"
+
+
+class QualityMetricsSerializer(serializers.ModelSerializer):
+    """Serializer for QualityMetrics model."""
+
+    class Meta:
+        model = QualityMetrics
+        fields = "__all__"
+
 
 if TYPE_CHECKING:
     from django.http import HttpRequest
     from rest_framework.request import Request
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 def create_download_response(report: Any) -> HttpResponse:
@@ -141,7 +234,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 session.started_at = timezone.now()
                 session.save()
                 # Start analysis task (would be Celery task in production)
-                run_code_analysis.delay(session.id)  # type ignore[attr-defined]
+                run_code_analysis.delay(session.id)  # type
                 return Response(
                     {
                         "session_id": session.id,
@@ -208,7 +301,7 @@ class AnalysisSessionViewSet(viewsets.ModelViewSet):
             session.started_at = timezone.now()
             session.save()
             # Start analysis task (would be Celery task in production)
-            run_code_analysis.delay(session.id)  # type ignore[attr-defined]
+            run_code_analysis.delay(session.id)  # type
             return Response({"message": "Analysis started successfully"})
         except Exception as e:
             logger.exception(f"Failed to start analysis {session.id}: {e}")

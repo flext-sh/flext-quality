@@ -1,7 +1,7 @@
 """Value objects for FLEXT-QUALITY.
 
 REFACTORED:
-            Uses flext-core DomainValueObject - NO duplication.
+            Uses flext-core FlextValueObject - NO duplication.
 """
 
 from __future__ import annotations
@@ -9,13 +9,14 @@ from __future__ import annotations
 from enum import StrEnum
 from pathlib import Path
 
+from pydantic import Field, field_validator
+
 # 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
 from flext_quality.infrastructure.di_container import get_domain_entity
 
 DomainEntity = get_domain_entity()
 DomainEvent = get_domain_entity()  # Placeholder
-DomainBaseModel = get_domain_entity()  # Placeholder
-from pydantic import Field, field_validator
+FlextDomainBaseModel = get_domain_entity()  # Placeholder
 
 
 class IssueSeverity(StrEnum):
@@ -84,7 +85,7 @@ class QualityGrade(StrEnum):
     F = "F"
 
 
-class FilePath(DomainBaseModel):
+class FilePath(FlextDomainBaseModel):
     """File path value object."""
 
     value: str = Field(..., description="File path")
@@ -151,7 +152,7 @@ class FilePath(DomainBaseModel):
         return str(self.path.parent)
 
 
-class IssueLocation(DomainBaseModel):
+class IssueLocation(FlextDomainBaseModel):
     """Location of an issue in a file."""
 
     line: int = Field(..., description="Line number", ge=1)
@@ -192,7 +193,7 @@ class IssueLocation(DomainBaseModel):
         return f"lines {self.line}-{self.end_line}"
 
 
-class QualityScore(DomainBaseModel):
+class QualityScore(FlextDomainBaseModel):
     """Quality score value object."""
 
     value: float = Field(..., description="Quality score", ge=0.0, le=100.0)
@@ -242,7 +243,7 @@ class QualityScore(DomainBaseModel):
         return QualityGrade.F
 
 
-class ComplexityMetric(DomainBaseModel):
+class ComplexityMetric(FlextDomainBaseModel):
     """Complexity metric value object."""
 
     cyclomatic: int = Field(default=1, description="Cyclomatic complexity", ge=1)
@@ -276,7 +277,7 @@ class ComplexityMetric(DomainBaseModel):
         return "very complex"
 
 
-class CoverageMetric(DomainBaseModel):
+class CoverageMetric(FlextDomainBaseModel):
     """Test coverage metric value object."""
 
     line_coverage: float = Field(
@@ -324,7 +325,7 @@ class CoverageMetric(DomainBaseModel):
         return self.overall_coverage >= 95.0
 
 
-class DuplicationMetric(DomainBaseModel):
+class DuplicationMetric(FlextDomainBaseModel):
     """Code duplication metric value object."""
 
     duplicate_lines: int = Field(

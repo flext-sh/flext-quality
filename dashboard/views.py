@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Any
 
 from analyzer.models import AnalysisSession, Project
@@ -619,3 +620,10 @@ def backend_issues_report(request: HttpRequest, session_id: str) -> Any:
     }
 
     return render(request, "dashboard/backend_issues_report.html", context)
+
+
+def run_analysis_task(session_id: str, backends: list[str]) -> None:
+    """Método fictício para substituir run_analysis_task ausente."""
+    logging.info(
+        f"Executando análise para sessão {session_id} com backends: {backends}",
+    )

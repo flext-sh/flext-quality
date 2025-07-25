@@ -1,4 +1,5 @@
 """Command-line interface for FLEXT Quality.
+
 This module provides CLI commands for code quality analysis.
 Uses flext-cli patterns for consistency.
 """

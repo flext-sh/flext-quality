@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import logging
 import time
 from pathlib import Path
 from typing import Any
 
 from django.utils import timezone
+from flext_core import get_logger
 
 from analyzer.backends import AnalysisResult, get_backend
 from analyzer.models import (
@@ -27,7 +27,7 @@ from analyzer.models import (
     VariableAnalysis,
 )
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class MultiBackendAnalyzer:
@@ -42,7 +42,9 @@ class MultiBackendAnalyzer:
         self.flx_project = flx_project
         self.backend_names = backend_names or ["ast", "external", "quality"]
         self.session: AnalysisSession | None = None
-        self.logger = logging.getLogger(f"{__name__}.{self.__class__.__name__}")
+        self.logger = FlextLoggerFactory.get_logger(
+            f"{__name__}.{self.__class__.__name__}",
+        )
 
     def analyze(self) -> AnalysisSession:
         """Run analysis across all configured backends."""
@@ -230,7 +232,7 @@ class MultiBackendAnalyzer:
         """Save analysis results to database."""
         if self.session is None:
             msg = "Analysis session is not initialized"
-            raise RuntimeError(msg)
+            raise FlextServiceError(msg)
         self.logger.info("Saving analysis results to database")
 
         # Save all data components

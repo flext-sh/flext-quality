@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import ast
-import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from django.utils import timezone
+from flext_core import get_logger
 
 from analyzer.models import (
     DeadCodeIssue,
@@ -20,7 +20,7 @@ from analyzer.models import (
 if TYPE_CHECKING:
     from analyzer.models import AnalysisSession
 
-logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 class CodeAnalysisEngine:

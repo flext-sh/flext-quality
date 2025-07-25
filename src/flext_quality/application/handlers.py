@@ -22,9 +22,9 @@ from flext_quality.infrastructure.di_container import (
 )
 
 # Dynamic imports based on usage
-ServiceResult = get_service_result()
+FlextResult = get_service_result()
 DomainEntity = get_domain_entity()
-DomainValueObject = get_domain_value_object()
+FlextValueObject = get_domain_value_object()
 Field = get_field()
 CommandHandler = get_command_handler()
 QueryHandler = get_query_handler()
@@ -44,9 +44,9 @@ class AnalyzeProjectHandler:
     def __init__(self) -> None:
         pass
 
-    async def handle(self, project_id: UUID) -> ServiceResult[Any]:
+    async def handle(self, project_id: UUID) -> FlextResult[Any]:
         """Handle project analysis command."""
-        return ServiceResult.fail("Not implemented yet")
+        return FlextResult.fail("Not implemented yet")
 
 
 # Simplified DI - removed decorator
@@ -56,9 +56,9 @@ class GenerateReportHandler:
     def __init__(self) -> None:
         pass
 
-    async def handle(self, analysis_id: UUID) -> ServiceResult[Any]:
+    async def handle(self, analysis_id: UUID) -> FlextResult[Any]:
         """Handle report generation command."""
-        return ServiceResult.fail("Not implemented yet")
+        return FlextResult.fail("Not implemented yet")
 
 
 # Simplified DI - removed decorator
@@ -68,9 +68,9 @@ class RunLintingHandler:
     def __init__(self) -> None:
         pass
 
-    async def handle(self, project_id: UUID) -> ServiceResult[Any]:
+    async def handle(self, project_id: UUID) -> FlextResult[Any]:
         """Handle linting command."""
-        return ServiceResult.fail("Not implemented yet")
+        return FlextResult.fail("Not implemented yet")
 
 
 # Simplified DI - removed decorator
@@ -80,6 +80,6 @@ class RunSecurityCheckHandler:
     def __init__(self) -> None:
         pass
 
-    async def handle(self, project_id: UUID) -> ServiceResult[Any]:
+    async def handle(self, project_id: UUID) -> FlextResult[Any]:
         """Handle security check command."""
-        return ServiceResult.fail("Not implemented yet")
+        return FlextResult.fail("Not implemented yet")
