@@ -24,9 +24,9 @@ from flext_quality.infrastructure.di_container import (
 )
 
 # Dynamic imports based on usage
-ServiceResult = get_service_result()
+FlextResult = get_service_result()
 DomainEntity = get_domain_entity()
-DomainValueObject = get_domain_value_object()
+FlextValueObject = get_domain_value_object()
 Field = get_field()
 CommandHandler = get_command_handler()
 QueryHandler = get_query_handler()
@@ -44,7 +44,7 @@ class AnalysisService(ABC):
         include_complexity: bool = True,
         include_dead_code: bool = True,
         include_duplicates: bool = True,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Analyze a complete project with configurable analysis types."""
         ...
 
@@ -53,7 +53,7 @@ class AnalysisService(ABC):
         self,
         file_path: Path,
         analysis_types: list[str] | None = None,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Analyze a single file with specified analysis types."""
         ...
 
@@ -61,12 +61,12 @@ class AnalysisService(ABC):
     async def calculate_quality_score(
         self,
         analysis_results: dict[str, Any],
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Calculate overall quality score from analysis results."""
         ...
 
     @abstractmethod
-    async def get_quality_grade(self, quality_score: float) -> ServiceResult[Any]:
+    async def get_quality_grade(self, quality_score: float) -> FlextResult[Any]:
         """Convert quality score to letter grade (A, B, C, D, F)."""
         ...
 
@@ -79,7 +79,7 @@ class SecurityAnalyzerService(ABC):
         self,
         project_path: Path,
         severity_threshold: str = "medium",
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Analyze project for security vulnerabilities."""
         ...
 
@@ -88,7 +88,7 @@ class SecurityAnalyzerService(ABC):
         self,
         file_path: Path,
         severity_threshold: str = "medium",
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Scan a single file for security issues."""
         ...
 
@@ -96,7 +96,7 @@ class SecurityAnalyzerService(ABC):
     async def validate_dependencies(
         self,
         project_path: Path,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Validate project dependencies for known vulnerabilities."""
         ...
 
@@ -109,7 +109,7 @@ class LintingService(ABC):
         self,
         project_path: Path,
         fix: bool = False,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Lint entire project with optional auto-fix."""
         ...
 
@@ -118,12 +118,12 @@ class LintingService(ABC):
         self,
         file_path: Path,
         fix: bool = False,
-    ) -> ServiceResult[Any]:
+    ) -> FlextResult[Any]:
         """Lint a single file with optional auto-fix."""
         ...
 
     @abstractmethod
-    async def format_code(self, file_path: Path) -> ServiceResult[Any]:
+    async def format_code(self, file_path: Path) -> FlextResult[Any]:
         """Format code in a file according to style guidelines."""
         ...
 
@@ -137,20 +137,20 @@ class ReportGeneratorService(ABC):
         analysis_results: dict[str, Any],
         output_format: str = "html",
         output_path: Path | None = None,
-    ) -> ServiceResult[str]: ...
+    ) -> FlextResult[str]: ...
 
     @abstractmethod
     async def generate_summary(
         self,
         analysis_results: dict[str, Any],
-    ) -> ServiceResult[dict[str, Any]]: ...
+    ) -> FlextResult[dict[str, Any]]: ...
 
     @abstractmethod
     async def export_metrics(
         self,
         analysis_results: dict[str, Any],
         output_format: str = "json",
-    ) -> ServiceResult[str]: ...
+    ) -> FlextResult[str]: ...
 
 
 class ComplexityAnalyzerService(ABC):
@@ -161,19 +161,19 @@ class ComplexityAnalyzerService(ABC):
         self,
         project_path: Path,
         threshold: int = 10,
-    ) -> ServiceResult[list[dict[str, Any]]]: ...
+    ) -> FlextResult[list[dict[str, Any]]]: ...
 
     @abstractmethod
     async def calculate_cyclomatic_complexity(
         self,
         file_path: Path,
-    ) -> ServiceResult[dict[str, int]]: ...
+    ) -> FlextResult[dict[str, int]]: ...
 
     @abstractmethod
     async def calculate_cognitive_complexity(
         self,
         file_path: Path,
-    ) -> ServiceResult[dict[str, int]]: ...
+    ) -> FlextResult[dict[str, int]]: ...
 
 
 class DeadCodeDetectorService(ABC):
@@ -183,19 +183,19 @@ class DeadCodeDetectorService(ABC):
     async def detect_dead_code(
         self,
         project_path: Path,
-    ) -> ServiceResult[list[dict[str, Any]]]: ...
+    ) -> FlextResult[list[dict[str, Any]]]: ...
 
     @abstractmethod
     async def find_unused_imports(
         self,
         file_path: Path,
-    ) -> ServiceResult[list[str]]: ...
+    ) -> FlextResult[list[str]]: ...
 
     @abstractmethod
     async def find_unused_variables(
         self,
         file_path: Path,
-    ) -> ServiceResult[list[dict[str, Any]]]: ...
+    ) -> FlextResult[list[dict[str, Any]]]: ...
 
 
 class DuplicateDetectorService(ABC):
@@ -207,20 +207,20 @@ class DuplicateDetectorService(ABC):
         project_path: Path,
         min_lines: int = 5,
         similarity_threshold: float = 0.8,
-    ) -> ServiceResult[list[dict[str, Any]]]: ...
+    ) -> FlextResult[list[dict[str, Any]]]: ...
 
     @abstractmethod
     async def find_similar_functions(
         self,
         project_path: Path,
         similarity_threshold: float = 0.8,
-    ) -> ServiceResult[list[dict[str, Any]]]: ...
+    ) -> FlextResult[list[dict[str, Any]]]: ...
 
     @abstractmethod
     async def calculate_duplication_ratio(
         self,
         project_path: Path,
-    ) -> ServiceResult[float]: ...
+    ) -> FlextResult[float]: ...
 
 
 class MetricsCollectorService(ABC):
@@ -230,16 +230,16 @@ class MetricsCollectorService(ABC):
     async def collect_metrics(
         self,
         project_path: Path,
-    ) -> ServiceResult[dict[str, Any]]: ...
+    ) -> FlextResult[dict[str, Any]]: ...
 
     @abstractmethod
     async def calculate_maintainability_index(
         self,
         project_path: Path,
-    ) -> ServiceResult[float]: ...
+    ) -> FlextResult[float]: ...
 
     @abstractmethod
     async def calculate_technical_debt(
         self,
         project_path: Path,
-    ) -> ServiceResult[dict[str, Any]]: ...
+    ) -> FlextResult[dict[str, Any]]: ...

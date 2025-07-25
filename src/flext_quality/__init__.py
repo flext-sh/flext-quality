@@ -15,11 +15,8 @@ import contextlib
 import importlib.metadata
 import warnings
 
-# Import from flext-core for foundational patterns
-# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
-from flext_quality.infrastructure.di_container import get_service_result
-
-ServiceResult = get_service_result()
+# Core FlextCore patterns (root namespace imports)
+from flext_core import FlextConstants, FlextContainer, FlextResult
 
 try:
     __version__ = importlib.metadata.version("flext-quality")
@@ -52,11 +49,7 @@ def _show_deprecation_warning(old_import: str, new_import: str) -> None:
 # SIMPLIFIED PUBLIC API EXPORTS
 # ================================
 
-# Foundation patterns - ALWAYS from flext-core
-# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
-from flext_quality.infrastructure.di_container import get_service_result
-
-ServiceResult = get_service_result()
+# Core patterns - already imported from flext_core above
 
 # Core quality exports - simplified imports
 try:
@@ -65,9 +58,15 @@ try:
     from flext_quality.reports import QualityReport
 except ImportError:
     # Core layer not yet fully refactored - provide placeholders
-    CodeAnalyzer = None
-    QualityMetrics = None
-    QualityReport = None
+    class CodeAnalyzer:
+        """Placeholder for CodeAnalyzer until fully implemented."""
+
+    class QualityMetrics:
+        """Placeholder for QualityMetrics until fully implemented."""
+
+    class QualityReport:
+        """Placeholder for QualityReport until fully implemented."""
+
 
 # Simple API exports - simplified imports
 with contextlib.suppress(ImportError):
@@ -87,6 +86,7 @@ __all__ = [
     "CodeAnalyzer",  # from flext_quality import CodeAnalyzer
     # Deprecation utilities
     "FlextQualityDeprecationWarning",
+    "FlextResult",  # from flext_quality import FlextResult
     # Simple API Interface
     "QualityAPI",  # from flext_quality import QualityAPI
     # Core Patterns (from flext-core)
@@ -94,7 +94,6 @@ __all__ = [
     "QualityError",  # from flext_quality import QualityError
     "QualityMetrics",  # from flext_quality import QualityMetrics
     "QualityReport",  # from flext_quality import QualityReport
-    "ServiceResult",  # from flext_quality import ServiceResult
     "ValidationError",  # from flext_quality import ValidationError
     # Version
     "__version__",

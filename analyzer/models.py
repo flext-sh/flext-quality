@@ -63,6 +63,15 @@ class Project(models.Model):
     total_lines: models.IntegerField[int, int] = models.IntegerField(default=0)
     python_files: models.IntegerField[int, int] = models.IntegerField(default=0)
 
+    # Reverse relation to AnalysisSession
+    analysis_sessions: models.ForeignKey[AnalysisSession, AnalysisSession] = (
+        models.ForeignKey(
+            "AnalysisSession",
+            on_delete=models.CASCADE,
+            related_name="projects",
+        )
+    )
+
     class Meta:
         """Meta options for Project model."""
 

@@ -70,7 +70,9 @@ class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
             color = (
                 "green"
                 if latest.overall_score >= GOOD_SCORE_THRESHOLD
-                else "orange" if latest.overall_score >= FAIR_SCORE_THRESHOLD else "red"
+                else "orange"
+                if latest.overall_score >= FAIR_SCORE_THRESHOLD
+                else "red"
             )
             return format_html(
                 '<span style="color: {}; font-weight: bold">{:.1f} ({})</span>',

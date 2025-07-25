@@ -11,12 +11,7 @@ from datetime import datetime
 from enum import StrEnum
 from typing import TYPE_CHECKING, Any
 
-# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
-from flext_quality.infrastructure.di_container import get_domain_entity
-
-DomainEntity = get_domain_entity()
-DomainEvent = get_domain_entity()  # Placeholder
-DomainBaseModel = get_domain_entity()  # Placeholder
+from flext_core import DomainEntity, DomainEvent
 from pydantic import Field
 
 if TYPE_CHECKING:
@@ -83,7 +78,6 @@ class QualityProject(DomainEntity):
     def update_last_analysis(self) -> None:
         self.last_analysis_at = datetime.now()
         self.total_analyses += 1
-        # Remove touch() call - not available in flext-core DomainEntity
 
 
 class QualityAnalysis(DomainEntity):

@@ -1,9 +1,10 @@
-# FLEXT QUALITY - Comprehensive Code Quality Analysis Engine
-# ========================================================
-# Enterprise quality analysis with metrics collection and reporting
+# FLEXT QUALITY - Comprehensive Code Quality Analysis Service
+# ===========================================================
+# Enterprise quality analysis service with metrics collection and reporting
+# PROJECT_TYPE: quality-service
 # Python 3.13 + Quality Tools + Analysis Engine + Zero Tolerance Quality Gates
 
-.PHONY: help check validate test lint type-check security format format-check fix
+.PHONY: help info diagnose check validate test lint type-check security format format-check fix
 .PHONY: install dev-install setup pre-commit build clean
 .PHONY: coverage coverage-html test-unit test-integration test-quality
 .PHONY: deps-update deps-audit deps-tree deps-outdated
@@ -24,6 +25,37 @@ help: ## Show this help message
 	@echo "🧪 90%+ test coverage requirement with quality engine compliance"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\\033[36m%-20s\\033[0m %s\\n", $$1, $$2}'
+
+
+info: ## Mostrar informações do projeto
+	@echo "📊 Informações do Projeto"
+	@echo "======================"
+	@echo "Nome: flext-quality"
+	@echo "Título: FLEXT QUALITY"
+	@echo "Versão: $(shell poetry version -s 2>/dev/null || echo "0.7.0")"
+	@echo "Python: $(shell python3.13 --version 2>/dev/null || echo "Não encontrado")"
+	@echo "Poetry: $(shell poetry --version 2>/dev/null || echo "Não instalado")"
+	@echo "Venv: $(shell poetry env info --path 2>/dev/null || echo "Não ativado")"
+	@echo "Diretório: $(CURDIR)"
+	@echo "Git Branch: $(shell git branch --show-current 2>/dev/null || echo "Não é repo git")"
+	@echo "Git Status: $(shell git status --porcelain 2>/dev/null | wc -l | xargs echo) arquivos alterados"
+
+diagnose: ## Executar diagnósticos completos
+	@echo "🔍 Executando diagnósticos para flext-quality..."
+	@echo "Informações do Sistema:"
+	@echo "OS: $(shell uname -s)"
+	@echo "Arquitetura: $(shell uname -m)"
+	@echo "Python: $(shell python3.13 --version 2>/dev/null || echo "Não encontrado")"
+	@echo "Poetry: $(shell poetry --version 2>/dev/null || echo "Não instalado")"
+	@echo ""
+	@echo "Estrutura do Projeto:"
+	@ls -la
+	@echo ""
+	@echo "Configuração Poetry:"
+	@poetry config --list 2>/dev/null || echo "Poetry não configurado"
+	@echo ""
+	@echo "Status das Dependências:"
+	@poetry show --outdated 2>/dev/null || echo "Nenhuma dependência desatualizada"
 
 # ============================================================================
 # 🎯 CORE QUALITY GATES - ZERO TOLERANCE
@@ -138,6 +170,16 @@ pre-commit: ## Setup pre-commit hooks
 	@poetry run pre-commit install
 	@poetry run pre-commit run --all-files || true
 	@echo "✅ Pre-commit hooks installed"
+
+# ============================================================================
+# 🎯 QUALITY SERVICE OPERATIONS
+# ============================================================================
+
+service-start: dev-quality-server ## Start quality analysis service
+
+service-test: test-quality ## Test quality service functionality
+
+service-health: validate-quality-data ## Check quality service health
 
 # ============================================================================
 # 🔍 QUALITY ANALYSIS OPERATIONS - CORE FUNCTIONALITY
@@ -470,8 +512,9 @@ export RUFF_CACHE_DIR := .ruff_cache
 
 # Project information
 PROJECT_NAME := flext-quality
+PROJECT_TYPE := python-library
 PROJECT_VERSION := $(shell poetry version -s)
-PROJECT_DESCRIPTION := FLEXT QUALITY - Comprehensive Code Quality Analysis Engine
+PROJECT_DESCRIPTION := FLEXT QUALITY - Comprehensive Code Quality Analysis Service
 
 .DEFAULT_GOAL := help
 

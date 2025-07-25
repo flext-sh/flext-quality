@@ -1,11 +1,15 @@
 """Test configuration for flext-quality.
+
 Provides pytest fixtures and configuration for testing quality analysis functionality
 using Django test framework and flext-core patterns.
 """
 from __future__ import annotations
+
 import os
 from typing import TYPE_CHECKING, Any
+
 import pytest
+
 if TYPE_CHECKING:
     from collections.abc import Generator
 # Test environment setup
@@ -36,7 +40,7 @@ def sample_code_repository() -> dict[str, Any]:
     """Sample code repository for testing."""
     return {
         "name": "test-repository",
-        "path": "/tmp/test-repo",S108
+        "path": "/tmp/test-repo",  # noqa: S108
         "language": "python",
         "files": [
             "src/main.py",
@@ -138,7 +142,7 @@ def report_config() -> dict[str, Any]:
         "format": "json",
         "include_metrics": True,
         "include_details": True,
-        "output_path": "/tmp/report.json",S108
+        "output_path": "/tmp/report.json",  # noqa: S108
         "template": "default",
     }
 @pytest.fixture
@@ -201,7 +205,6 @@ if __name__ == "__main__":
 """)
     utils_py = src_dir / "utils.py"
     utils_py.write_text("""
-import os
 import sys
 def get_env_var(name: str) -> str | None:
     return os.environ.get(name)
@@ -211,7 +214,6 @@ def get_env_var(name: str) -> str | None:
     tests_dir.mkdir()
     test_main_py = tests_dir / "test_main.py"
     test_main_py.write_text("""
-import pytest
 from src.main import main
 def test_main() -> None:
     assert main() == 0
