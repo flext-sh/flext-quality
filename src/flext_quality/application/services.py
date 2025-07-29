@@ -7,21 +7,19 @@ REFACTORED:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from flext_core import FlextResult
 
 from flext_quality.domain.entities import (
+    AnalysisStatus,
     IssueSeverity,
     IssueType,
+    QualityAnalysis,
     QualityIssue,
     QualityProject,
     QualityReport,
 )
-
-if TYPE_CHECKING:
-
-    from flext_quality.domain.entities import QualityAnalysis
 
 
 # Simplified DI - removed decorator
@@ -91,10 +89,10 @@ class QualityProjectService:
 
             # Use model_copy to create updated version (immutable pattern)
             updated_project = project.model_copy(update=updates)
-            
+
             # Store the updated project
             self._projects[project_id] = updated_project
-            
+
             return FlextResult.ok(updated_project)
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to update project: {e}")
@@ -123,10 +121,25 @@ class QualityAnalysisService:
         branch: str | None = None,
         pull_request_id: str | None = None,
         analysis_config: dict[str, Any] | None = None,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[QualityAnalysis]:
         try:
-            # Logic for creating analysis
-            return FlextResult.ok({})
+            from uuid import uuid4
+
+            # Create real QualityAnalysis entity following flext-core patterns
+            analysis = QualityAnalysis(
+                id=str(uuid4()),
+                project_id=project_id,
+                commit_hash=commit_hash,
+                branch=branch,
+                pull_request_id=pull_request_id,
+                analysis_config=analysis_config or {},
+                status=AnalysisStatus.QUEUED,
+            )
+
+            # Store in repository
+            self._analyses[analysis.id] = analysis
+
+            return FlextResult.ok(analysis)
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to create analysis: {e}")
 
@@ -144,14 +157,19 @@ class QualityAnalysisService:
             if not analysis:
                 return FlextResult.fail("Analysis not found")
 
-            analysis.total_files = total_files
-            analysis.total_lines = total_lines
-            analysis.code_lines = code_lines
-            analysis.comment_lines = comment_lines
-            analysis.blank_lines = blank_lines
-            # Updated timestamp is managed automatically by DomainEntity
+            # Use immutable update pattern following flext-core guidelines
+            updated_analysis = analysis.model_copy(update={
+                "total_files": total_files,
+                "total_lines": total_lines,
+                "code_lines": code_lines,
+                "comment_lines": comment_lines,
+                "blank_lines": blank_lines,
+            })
 
-            return FlextResult.ok(analysis)
+            # Store updated analysis
+            self._analyses[analysis_id] = updated_analysis
+
+            return FlextResult.ok(updated_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to update metrics: {e}")
 
@@ -169,15 +187,22 @@ class QualityAnalysisService:
             if not analysis:
                 return FlextResult.fail("Analysis not found")
 
-            analysis.coverage_score = coverage_score
-            analysis.complexity_score = complexity_score
-            analysis.duplication_score = duplication_score
-            analysis.security_score = security_score
-            analysis.maintainability_score = maintainability_score
-            analysis.calculate_overall_score()
-            # Updated timestamp is managed automatically by DomainEntity
+            # Use immutable update pattern following flext-core guidelines
+            updated_analysis = analysis.model_copy(update={
+                "coverage_score": coverage_score,
+                "complexity_score": complexity_score,
+                "duplication_score": duplication_score,
+                "security_score": security_score,
+                "maintainability_score": maintainability_score,
+            })
 
-            return FlextResult.ok(analysis)
+            # Calculate overall score using domain method
+            final_analysis = updated_analysis.calculate_overall_score()
+
+            # Store updated analysis
+            self._analyses[analysis_id] = final_analysis
+
+            return FlextResult.ok(final_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to update scores: {e}")
 
@@ -194,14 +219,20 @@ class QualityAnalysisService:
             if not analysis:
                 return FlextResult.fail("Analysis not found")
 
-            analysis.critical_issues = critical
-            analysis.high_issues = high
-            analysis.medium_issues = medium
-            analysis.low_issues = low
-            analysis.total_issues = critical + high + medium + low
-            # Updated timestamp is managed automatically by DomainEntity
+            # Use immutable update pattern following flext-core guidelines
+            total_issues = critical + high + medium + low
+            updated_analysis = analysis.model_copy(update={
+                "critical_issues": critical,
+                "high_issues": high,
+                "medium_issues": medium,
+                "low_issues": low,
+                "total_issues": total_issues,
+            })
 
-            return FlextResult.ok(analysis)
+            # Store updated analysis
+            self._analyses[analysis_id] = updated_analysis
+
+            return FlextResult.ok(updated_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to update issue counts: {e}")
 
@@ -214,8 +245,13 @@ class QualityAnalysisService:
             if not analysis:
                 return FlextResult.fail("Analysis not found")
 
-            analysis.complete_analysis()
-            return FlextResult.ok(analysis)
+            # Use immutable update pattern following flext-core guidelines
+            completed_analysis = analysis.complete_analysis()
+
+            # Store updated analysis
+            self._analyses[analysis_id] = completed_analysis
+
+            return FlextResult.ok(completed_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to complete analysis: {e}")
 
@@ -229,8 +265,13 @@ class QualityAnalysisService:
             if not analysis:
                 return FlextResult.fail("Analysis not found")
 
-            analysis.fail_analysis(error)
-            return FlextResult.ok(analysis)
+            # Use immutable update pattern following flext-core guidelines
+            failed_analysis = analysis.fail_analysis(error)
+
+            # Store updated analysis
+            self._analyses[analysis_id] = failed_analysis
+
+            return FlextResult.ok(failed_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to fail analysis: {e}")
 

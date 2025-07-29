@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import pytest
-from flext_core import FlextResult
+
 from flext_quality.application.services import (
     QualityAnalysisService,
     QualityIssueService,
@@ -29,7 +29,7 @@ class TestQualityProjectService:
             repository_url="https://github.com/test/repo",
             language="python",
         )
-        
+
         assert result.is_success
         assert result.data is not None
         assert result.data.project_path == "/tmp/test"
@@ -45,7 +45,7 @@ class TestQualityProjectService:
         )
         assert create_result.is_success
         project_id = create_result.data.id
-        
+
         # Then get it
         result = await service.get_project(project_id)
         assert result.is_success
@@ -63,7 +63,7 @@ class TestQualityProjectService:
         # Create a few projects
         await service.create_project("test1", "/tmp/test1")
         await service.create_project("test2", "/tmp/test2")
-        
+
         result = await service.list_projects()
         assert result.is_success
         assert len(result.data) == 2
@@ -74,7 +74,7 @@ class TestQualityProjectService:
         create_result = await service.create_project("test", "/tmp/test")
         assert create_result.is_success
         project_id = create_result.data.id
-        
+
         # Update it
         updates = {"language": "go", "min_coverage": 80.0}
         result = await service.update_project(project_id, updates)
@@ -93,7 +93,7 @@ class TestQualityProjectService:
         create_result = await service.create_project("test", "/tmp/test")
         assert create_result.is_success
         project_id = create_result.data.id
-        
+
         # Delete it
         result = await service.delete_project(project_id)
         assert result.is_success
