@@ -5,6 +5,8 @@ from __future__ import annotations
 from datetime import datetime
 
 import pytest
+from pydantic import ValidationError
+
 from flext_quality.domain.entities import (
     AnalysisStatus,
     IssueSeverity,
@@ -28,7 +30,7 @@ class TestQualityProject:
             repository_url="https://github.com/test/repo",
             language="python",
         )
-        
+
         assert project.id == "test-project-id"
         assert project.project_path == "/tmp/test"
         assert project.repository_url == "https://github.com/test/repo"
@@ -42,20 +44,18 @@ class TestQualityProject:
             id="test-id",
             project_path="/tmp/test",
         )
-        
+
         result = project.validate_domain_rules()
         assert result.is_success
 
     def test_project_validation_failure(self) -> None:
         """Test project validation failure."""
-        project = QualityProject(
-            id="test-id",
-            project_path="",  # Empty path should fail
-        )
-        
-        result = project.validate_domain_rules()
-        assert result.is_failure
-        assert "required" in result.error.lower()
+        # Empty path should fail at Pydantic validation level
+        with pytest.raises(ValidationError):
+            QualityProject(
+                id="test-id",
+                project_path="",  # Empty path should fail
+            )
 
     def test_update_last_analysis(self) -> None:
         """Test updating last analysis timestamp."""
@@ -63,12 +63,12 @@ class TestQualityProject:
             id="test-id",
             project_path="/tmp/test",
         )
-        
+
         initial_count = project.total_analyses
         assert project.last_analysis_at is None
-        
+
         updated_project = project.update_last_analysis()
-        
+
         assert updated_project.last_analysis_at is not None
         assert isinstance(updated_project.last_analysis_at, datetime)
         assert updated_project.total_analyses == initial_count + 1
@@ -85,7 +85,7 @@ class TestQualityAnalysis:
             commit_hash="abc123",
             branch="main",
         )
-        
+
         assert analysis.id == "test-analysis-id"
         assert analysis.project_id == "test-project-id"
         assert analysis.commit_hash == "abc123"
@@ -98,7 +98,7 @@ class TestQualityAnalysis:
             id="test-id",
             project_id="project-id",
         )
-        
+
         result = analysis.validate_domain_rules()
         assert result.is_success
 
@@ -108,7 +108,7 @@ class TestQualityAnalysis:
             id="test-id",
             project_id="",  # Empty project_id should fail
         )
-        
+
         result = analysis.validate_domain_rules()
         assert result.is_failure
         assert "required" in result.error.lower()
@@ -119,11 +119,11 @@ class TestQualityAnalysis:
             id="test-id",
             project_id="project-id",
         )
-        
+
         assert analysis.status == AnalysisStatus.QUEUED
-        
+
         updated_analysis = analysis.start_analysis()
-        
+
         assert updated_analysis.status == AnalysisStatus.ANALYZING
         assert updated_analysis.started_at is not None
 
@@ -133,10 +133,10 @@ class TestQualityAnalysis:
             id="test-id",
             project_id="project-id",
         )
-        
+
         started_analysis = analysis.start_analysis()
         completed_analysis = started_analysis.complete_analysis()
-        
+
         assert completed_analysis.status == AnalysisStatus.COMPLETED
         assert completed_analysis.completed_at is not None
         assert completed_analysis.duration_seconds is not None
@@ -148,10 +148,10 @@ class TestQualityAnalysis:
             id="test-id",
             project_id="project-id",
         )
-        
+
         started_analysis = analysis.start_analysis()
         failed_analysis = started_analysis.fail_analysis("Test error")
-        
+
         assert failed_analysis.status == AnalysisStatus.FAILED
         assert failed_analysis.completed_at is not None
         assert failed_analysis.duration_seconds is not None
@@ -167,9 +167,9 @@ class TestQualityAnalysis:
             security_score=100.0,
             maintainability_score=80.0,
         )
-        
+
         updated_analysis = analysis.calculate_overall_score()
-        
+
         expected_score = (90.0 + 85.0 + 95.0 + 100.0 + 80.0) / 5
         assert updated_analysis.overall_score == expected_score
 
@@ -179,12 +179,12 @@ class TestQualityAnalysis:
             id="test-id",
             project_id="project-id",
         )
-        
+
         assert not analysis.is_completed
-        
+
         completed_analysis = analysis.complete_analysis()
         assert completed_analysis.is_completed
-        
+
         failed_analysis = analysis.model_copy(update={"status": AnalysisStatus.FAILED})
         assert failed_analysis.is_completed
 
@@ -194,12 +194,12 @@ class TestQualityAnalysis:
             id="test-id",
             project_id="project-id",
         )
-        
+
         assert not analysis.is_successful
-        
+
         completed_analysis = analysis.complete_analysis()
         assert completed_analysis.is_successful
-        
+
         failed_analysis = analysis.model_copy(update={"status": AnalysisStatus.FAILED})
         assert not failed_analysis.is_successful
 
@@ -219,7 +219,7 @@ class TestQualityIssue:
             message="Missing blank line",
             line_number=10,
         )
-        
+
         assert issue.id == "test-issue-id"
         assert issue.analysis_id == "test-analysis-id"
         assert issue.issue_type == IssueType.STYLE
@@ -242,7 +242,7 @@ class TestQualityIssue:
             file_path="test.py",
             message="Test message",
         )
-        
+
         result = issue.validate_domain_rules()
         assert result.is_success
 
@@ -257,7 +257,7 @@ class TestQualityIssue:
             file_path="test.py",
             message="Test message",
         )
-        
+
         result = issue.validate_domain_rules()
         assert result.is_failure
         assert "required" in result.error.lower()
@@ -273,11 +273,11 @@ class TestQualityIssue:
             file_path="test.py",
             message="Test message",
         )
-        
+
         assert not issue.is_fixed
-        
+
         fixed_issue = issue.mark_fixed()
-        
+
         assert fixed_issue.is_fixed
 
     def test_suppress_issue(self) -> None:
@@ -291,13 +291,13 @@ class TestQualityIssue:
             file_path="test.py",
             message="Test message",
         )
-        
+
         assert not issue.is_suppressed
         assert issue.suppression_reason is None
-        
+
         reason = "False positive"
         suppressed_issue = issue.suppress(reason)
-        
+
         assert suppressed_issue.is_suppressed
         assert suppressed_issue.suppression_reason == reason
 
@@ -312,14 +312,14 @@ class TestQualityIssue:
             file_path="test.py",
             message="Test message",
         )
-        
+
         # First suppress it
         suppressed_issue = issue.suppress("Test reason")
         assert suppressed_issue.is_suppressed
-        
+
         # Then unsuppress it
         unsuppressed_issue = suppressed_issue.unsuppress()
-        
+
         assert not unsuppressed_issue.is_suppressed
         assert unsuppressed_issue.suppression_reason is None
 
@@ -334,12 +334,12 @@ class TestQualityIssue:
             file_path="test.py",
             message="Test message",
         )
-        
+
         initial_count = issue.occurrence_count
         initial_time = issue.last_seen_at
-        
+
         updated_issue = issue.increment_occurrence()
-        
+
         assert updated_issue.occurrence_count == initial_count + 1
         assert updated_issue.last_seen_at > initial_time
 
@@ -356,7 +356,7 @@ class TestQualityRule:
             enabled=True,
             severity=IssueSeverity.MEDIUM,
         )
-        
+
         assert rule.id == "test-rule-id"
         assert rule.rule_id == "E302"
         assert rule.category == IssueType.STYLE
@@ -370,7 +370,7 @@ class TestQualityRule:
             rule_id="E302",
             category=IssueType.STYLE,
         )
-        
+
         result = rule.validate_domain_rules()
         assert result.is_success
 
@@ -382,10 +382,10 @@ class TestQualityRule:
             rule_id="E302",
             category=IssueType.STYLE,
         )
-        
+
         # Create an invalid instance for testing validation
         invalid_rule = rule.model_copy(update={"rule_id": ""})
-        
+
         result = invalid_rule.validate_domain_rules()
         assert result.is_failure
         assert "required" in result.error.lower()
@@ -398,12 +398,12 @@ class TestQualityRule:
             category=IssueType.STYLE,
             enabled=False,
         )
-        
+
         assert not rule.enabled
-        
+
         enabled_rule = rule.enable()
         assert enabled_rule.enabled
-        
+
         disabled_rule = enabled_rule.disable()
         assert not disabled_rule.enabled
 
@@ -415,11 +415,11 @@ class TestQualityRule:
             category=IssueType.STYLE,
             severity=IssueSeverity.LOW,
         )
-        
+
         assert rule.severity == IssueSeverity.LOW
-        
+
         updated_rule = rule.update_severity(IssueSeverity.HIGH)
-        
+
         assert updated_rule.severity == IssueSeverity.HIGH
 
     def test_set_parameter(self) -> None:
@@ -429,11 +429,11 @@ class TestQualityRule:
             rule_id="E302",
             category=IssueType.STYLE,
         )
-        
+
         assert len(rule.parameters) == 0
-        
+
         updated_rule = rule.set_parameter("max_line_length", 120)
-        
+
         assert updated_rule.parameters["max_line_length"] == 120
 
 
@@ -448,7 +448,7 @@ class TestQualityReport:
             report_type="html",
             report_format="detailed",
         )
-        
+
         assert report.id == "test-report-id"
         assert report.analysis_id == "test-analysis-id"
         assert report.report_type == "html"
@@ -462,7 +462,7 @@ class TestQualityReport:
             analysis_id="analysis-id",
             report_type="json",
         )
-        
+
         result = report.validate_domain_rules()
         assert result.is_success
 
@@ -473,7 +473,7 @@ class TestQualityReport:
             analysis_id="",  # Empty analysis_id should fail
             report_type="json",
         )
-        
+
         result = report.validate_domain_rules()
         assert result.is_failure
         assert "required" in result.error.lower()
@@ -485,11 +485,11 @@ class TestQualityReport:
             analysis_id="analysis-id",
             report_type="json",
         )
-        
+
         assert report.access_count == 0
         assert report.last_accessed_at is None
-        
+
         updated_report = report.increment_access()
-        
+
         assert updated_report.access_count == 1
         assert updated_report.last_accessed_at is not None

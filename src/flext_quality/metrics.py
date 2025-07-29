@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any, ClassVar
 
-from flext_core import FlextValueObject
+from flext_core import FlextResult, FlextValueObject
 from pydantic import Field, computed_field
 
 
@@ -242,3 +242,30 @@ class QualityMetrics(FlextValueObject):
             if score >= threshold:
                 return grade
         return "F"
+
+    def validate_domain_rules(self) -> FlextResult[None]:
+        """Validate quality metrics domain rules.
+
+        Returns:
+            FlextResult indicating validation success or failure.
+
+        """
+        # Validate score consistency
+        if self.overall_score < 0 or self.overall_score > 100:
+            return FlextResult.fail("Overall score must be between 0 and 100")
+
+        # Validate counts are non-negative
+        if any(count < 0 for count in [
+            self.total_files, self.total_lines_of_code, self.total_functions,
+            self.total_classes, self.security_issues_count, self.dead_code_items_count,
+            self.duplicate_blocks_count, self.complexity_issues_count
+        ]):
+            return FlextResult.fail("All counts must be non-negative")
+
+        # Validate complexity scores
+        if (self.average_complexity < 0 or
+            self.max_complexity < 0 or
+            self.max_complexity < self.average_complexity):
+            return FlextResult.fail("Complexity scores must be valid")
+
+        return FlextResult.ok(None)

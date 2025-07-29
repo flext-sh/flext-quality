@@ -12,7 +12,6 @@ from enum import StrEnum
 from typing import Any
 
 from flext_core import FlextEntity, FlextResult
-from flext_core.flext_types import TAnyDict
 from pydantic import BaseModel, Field
 
 
@@ -151,7 +150,7 @@ class QualityAnalysis(FlextEntity):
         if self.started_at:
             duration = completed_at - self.started_at
             duration_seconds = duration.total_seconds()
-        
+
         return self.model_copy(update={
             "completed_at": completed_at,
             "status": AnalysisStatus.COMPLETED,
@@ -165,7 +164,7 @@ class QualityAnalysis(FlextEntity):
         if self.started_at:
             duration = completed_at - self.started_at
             duration_seconds = duration.total_seconds()
-        
+
         return self.model_copy(update={
             "completed_at": completed_at,
             "status": AnalysisStatus.FAILED,
@@ -398,7 +397,7 @@ try:
     QualityIssue.model_rebuild()
     QualityRule.model_rebuild()
     QualityReport.model_rebuild()
-    
+
     # Also rebuild domain events
     FlextDomainEvent.model_rebuild()
     ProjectCreatedEvent.model_rebuild()
@@ -406,6 +405,7 @@ try:
     AnalysisCompletedEvent.model_rebuild()
     IssueDetectedEvent.model_rebuild()
     ReportGeneratedEvent.model_rebuild()
-except Exception:
-    # Ignore rebuild errors in development
-    pass
+except Exception as e:
+    # Log rebuild errors in development - should not affect runtime
+    import logging
+    logging.getLogger(__name__).debug("Model rebuild error: %s", e)
