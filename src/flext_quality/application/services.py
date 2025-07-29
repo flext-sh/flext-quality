@@ -57,7 +57,7 @@ class QualityProjectService:
 
             self._projects[project.id] = project
             return FlextResult.ok(project)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to create project {e}")
 
     async def get_project(
@@ -67,14 +67,14 @@ class QualityProjectService:
         try:
             project = self._projects.get(project_id)
             return FlextResult.ok(project)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to get project {e}")
 
     async def list_projects(self) -> FlextResult[Any]:
         try:
             projects = list(self._projects.values())
             return FlextResult.ok(projects)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to list projects {e}")
 
     async def update_project(
@@ -93,7 +93,7 @@ class QualityProjectService:
 
             # Updated timestamp is managed automatically by DomainEntity
             return FlextResult.ok(project)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to update project: {e}")
 
     async def delete_project(self, project_id: UUID) -> FlextResult[bool]:
@@ -102,7 +102,7 @@ class QualityProjectService:
                 del self._projects[project_id]
                 return FlextResult.ok(True)
             return FlextResult.fail("Project not found")
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to delete project: {e}")
 
 
@@ -124,7 +124,7 @@ class QualityAnalysisService:
         try:
             # Logic for creating analysis
             pass
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to create analysis: {e}")
 
     async def update_metrics(
@@ -149,7 +149,7 @@ class QualityAnalysisService:
             # Updated timestamp is managed automatically by DomainEntity
 
             return FlextResult.ok(analysis)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to update metrics: {e}")
 
     async def update_scores(
@@ -175,7 +175,7 @@ class QualityAnalysisService:
             # Updated timestamp is managed automatically by DomainEntity
 
             return FlextResult.ok(analysis)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to update scores: {e}")
 
     async def update_issue_counts(
@@ -199,7 +199,7 @@ class QualityAnalysisService:
             # Updated timestamp is managed automatically by DomainEntity
 
             return FlextResult.ok(analysis)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to update issue counts: {e}")
 
     async def complete_analysis(
@@ -213,7 +213,7 @@ class QualityAnalysisService:
 
             analysis.complete_analysis()
             return FlextResult.ok(analysis)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to complete analysis: {e}")
 
     async def fail_analysis(
@@ -228,7 +228,7 @@ class QualityAnalysisService:
 
             analysis.fail_analysis(error)
             return FlextResult.ok(analysis)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to fail analysis: {e}")
 
     async def get_analysis(
@@ -238,7 +238,7 @@ class QualityAnalysisService:
         try:
             analysis = self._analyses.get(analysis_id)
             return FlextResult.ok(analysis)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to get analysis: {e}")
 
     async def list_analyses(
@@ -252,7 +252,7 @@ class QualityAnalysisService:
             # Sort by started_at descending
             analyses.sort(key=lambda a: a.started_at, reverse=True)
             return FlextResult.ok(analyses)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to list analyses: {e}")
 
 
@@ -296,14 +296,14 @@ class QualityIssueService:
 
             self._issues[issue.id] = issue
             return FlextResult.ok(issue)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to create issue: {e}")
 
     async def get_issue(self, issue_id: UUID) -> FlextResult[QualityIssue | None]:
         try:
             issue = self._issues.get(issue_id)
             return FlextResult.ok(issue)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to get issue {e}")
 
     async def list_issues(
@@ -326,7 +326,7 @@ class QualityIssueService:
                 issues = [i for i in issues if i.file_path == file_path]
 
             return FlextResult.ok(issues)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to list issues: {e}")
 
     async def mark_fixed(self, issue_id: UUID) -> FlextResult[Any]:
@@ -337,7 +337,7 @@ class QualityIssueService:
 
             issue.mark_fixed()
             return FlextResult.ok(issue)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to mark issue as fixed: {e}")
 
     async def suppress_issue(
@@ -352,7 +352,7 @@ class QualityIssueService:
 
             issue.suppress(reason)
             return FlextResult.ok(issue)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to suppress issue: {e}")
 
     async def unsuppress_issue(self, issue_id: UUID) -> FlextResult[Any]:
@@ -363,7 +363,7 @@ class QualityIssueService:
 
             issue.unsuppress()
             return FlextResult.ok(issue)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to unsuppress issue: {e}")
 
 
@@ -393,7 +393,7 @@ class QualityReportService:
 
             self._reports[report.id] = report
             return FlextResult.ok(report)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to create report: {e}")
 
     async def get_report(self, report_id: UUID) -> FlextResult[Any]:
@@ -402,7 +402,7 @@ class QualityReportService:
             if report:
                 report.increment_access()
             return FlextResult.ok(report)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to get report: {e}")
 
     async def list_reports(
@@ -414,7 +414,7 @@ class QualityReportService:
                 r for r in self._reports.values() if r.analysis_id == analysis_id
             ]
             return FlextResult.ok(reports)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to list reports {e}")
 
     async def delete_report(self, report_id: UUID) -> FlextResult[Any]:
@@ -423,7 +423,7 @@ class QualityReportService:
                 del self._reports[report_id]
                 return FlextResult.ok(True)
             return FlextResult.fail("Report not found")
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to delete report: {e}")
 
 

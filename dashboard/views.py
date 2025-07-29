@@ -1,5 +1,15 @@
 """Django views for dashboard interface."""
 
+from analyzer.tasks import run_analysis_task
+from analyzer.multi_backend_analyzer import MultiBackendAnalyzer
+from analyzer.tasks import run_analysis_task
+from analyzer.multi_backend_analyzer import MultiBackendAnalyzer
+from analyzer.backends import AVAILABLE_BACKENDS
+from analyzer.models import (
+from analyzer.models import ClassAnalysis, FunctionAnalysis, VariableAnalysis
+from analyzer.models import (
+
+
 from __future__ import annotations
 
 import logging
@@ -163,7 +173,7 @@ def create_project_from_package(request: HttpRequest) -> HttpResponse:
             messages.success(request, f"Project created for package '{package_name}'.")
             return redirect("dashboard:project_detail", project_id=flx_project.id)
 
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             messages.error(request, f"Error creating project: {e}")
 
     return redirect("dashboard:packages_discovery")
@@ -191,7 +201,7 @@ def create_project(request: HttpRequest) -> HttpResponse:
             messages.success(request, f"Project '{name}' created successfully.")
             return redirect("dashboard:project_detail", project_id=flx_project.id)
 
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             messages.error(request, f"Error creating project: {e}")
 
     return render(request, "dashboard/create_project.html")
@@ -229,7 +239,7 @@ def start_analysis(request: HttpRequest, project_id: str) -> HttpResponse:
 
             # Start actual analysis task
             try:
-                from analyzer.tasks import run_analysis_task
+
 
                 # Start background analysis
                 run_analysis_task.delay(session.id, ["ast", "external", "quality"])
@@ -237,7 +247,7 @@ def start_analysis(request: HttpRequest, project_id: str) -> HttpResponse:
                 messages.success(request, "Analysis started in background!")
             except ImportError:
                 # Fallback to synchronous analysis if Celery is not available
-                from analyzer.multi_backend_analyzer import MultiBackendAnalyzer
+
 
                 analyzer = MultiBackendAnalyzer(
                     flx_project,
@@ -247,7 +257,7 @@ def start_analysis(request: HttpRequest, project_id: str) -> HttpResponse:
 
                 messages.success(request, "Analysis completed successfully!")
 
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             messages.error(request, f"Error starting analysis: {e}")
 
     return redirect("dashboard:project_detail", project_id=project_id)
@@ -266,7 +276,7 @@ def refresh_packages(_request: HttpRequest) -> JsonResponse:
                 "count": len(packages),
             },
         )
-    except Exception as e:
+    except (RuntimeError, ValueError, TypeError) as e:
         return JsonResponse(
             {
                 "status": "error",
@@ -296,7 +306,7 @@ def run_analysis(request: HttpRequest, project_id: str) -> object:
 
         # Start background analysis
         try:
-            from analyzer.tasks import run_analysis_task
+
 
             run_analysis_task.delay(session.id, backend_names)
 
@@ -307,7 +317,7 @@ def run_analysis(request: HttpRequest, project_id: str) -> object:
             )
         except ImportError:
             # Fallback to synchronous analysis if Celery is not available
-            from analyzer.multi_backend_analyzer import MultiBackendAnalyzer
+
 
             analyzer = MultiBackendAnalyzer(flx_project, backend_names)
             analyzer.session = session
@@ -318,7 +328,7 @@ def run_analysis(request: HttpRequest, project_id: str) -> object:
         return redirect("dashboard:analysis_session_detail", session_id=session.id)
 
     # GET - show analysis form
-    from analyzer.backends import AVAILABLE_BACKENDS
+
 
     available_backends = [
         {"name": name, "description": backend_class.description}
@@ -334,7 +344,7 @@ def run_analysis(request: HttpRequest, project_id: str) -> object:
 
 def analysis_session_detail(request: HttpRequest, session_id: str) -> object:
     """Show analysis session details."""
-    from analyzer.models import (
+
         AnalysisSession,
         ClassAnalysis,
         FunctionAnalysis,
@@ -400,7 +410,7 @@ def package_analysis_view(
 
 def class_analysis_view(request: HttpRequest, session_id: str, class_id: str) -> object:
     """Show class analysis details."""
-    from analyzer.models import ClassAnalysis, FunctionAnalysis, VariableAnalysis
+
 
     session = get_object_or_404(AnalysisSession, id=session_id)
     class_obj = get_object_or_404(ClassAnalysis, id=class_id)
@@ -481,7 +491,7 @@ def analysis_overview(request: HttpRequest) -> object:
 
 def hierarchical_report(request: HttpRequest, session_id: str) -> object:
     """Generate hierarchical analysis report."""
-    from analyzer.models import (
+
         AnalysisSession,
         ClassAnalysis,
         FunctionAnalysis,

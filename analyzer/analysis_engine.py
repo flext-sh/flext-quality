@@ -91,7 +91,7 @@ class CodeAnalysisEngine:
             )
             return True
 
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             logger.exception("Analysis failed for project %s", self.flx_project.name)
             self.session.status = "failed"
             self.session.error_message = str(e)
@@ -183,7 +183,7 @@ class CodeAnalysisEngine:
             )
             return file_analysis
 
-        except Exception:
+        except (RuntimeError, ValueError, TypeError):
             logger.exception("Error analyzing file %s", file_path)
         return None
 
@@ -223,7 +223,7 @@ class CodeAnalysisEngine:
             count = SecurityIssue.objects.filter(session=self.session).count()
             logger.info("Found %s security issues", count)
 
-        except Exception:
+        except (RuntimeError, ValueError, TypeError):
             logger.exception("Security analysis failed")
 
     def _run_dead_code_analysis(self) -> None:
@@ -259,7 +259,7 @@ class CodeAnalysisEngine:
             count = DeadCodeIssue.objects.filter(session=self.session).count()
             logger.info("Found %s dead code issues", count)
 
-        except Exception:
+        except (RuntimeError, ValueError, TypeError):
             logger.exception("Dead code analysis failed")
 
     def _run_duplicate_analysis(self) -> None:
@@ -272,7 +272,7 @@ class CodeAnalysisEngine:
             count = DuplicateCodeBlock.objects.filter(session=self.session).count()
             logger.info("Found %s duplicate blocks", count)
 
-        except Exception:
+        except (RuntimeError, ValueError, TypeError):
             logger.exception("Duplicate analysis failed")
 
     def _calculate_quality_metrics(self) -> None:
@@ -368,7 +368,7 @@ class CodeAnalysisEngine:
                 overall_score,
             )
 
-        except Exception:
+        except (RuntimeError, ValueError, TypeError):
             logger.exception("Quality metrics calculation failed")
 
     def _calculate_grade(self, score: float) -> str:
