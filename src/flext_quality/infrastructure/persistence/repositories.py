@@ -21,11 +21,11 @@ class AnalysisResultRepository:
     def __init__(self) -> None:
         self._storage: dict[UUID, Any] = {}
 
-    async def save(self, entity: Any) -> Any:
+    async def save(self, entity: Any) -> object:
         """Save analysis result."""
         return entity
 
-    async def find_by_id(self, entity_id: UUID) -> Any | None:
+    async def find_by_id(self, entity_id: UUID) -> object | None:
         """Find analysis result by ID."""
         return self._storage.get(entity_id)
 
@@ -41,11 +41,11 @@ class QualityMetricsRepository:
     def __init__(self) -> None:
         self._storage: dict[UUID, Any] = {}
 
-    async def save(self, entity: Any) -> Any:
+    async def save(self, entity: Any) -> object:
         """Save quality metrics."""
         return entity
 
-    async def find_by_id(self, entity_id: UUID) -> Any | None:
+    async def find_by_id(self, entity_id: UUID) -> object | None:
         """Find quality metrics by ID."""
         return self._storage.get(entity_id)
 
@@ -61,11 +61,11 @@ class QualityRuleRepository:
     def __init__(self) -> None:
         self._storage: dict[UUID, Any] = {}
 
-    async def save(self, entity: Any) -> Any:
+    async def save(self, entity: Any) -> object:
         """Save quality rule."""
         return entity
 
-    async def find_by_id(self, entity_id: UUID) -> Any | None:
+    async def find_by_id(self, entity_id: UUID) -> object | None:
         """Find quality rule by ID."""
         return self._storage.get(entity_id)
 

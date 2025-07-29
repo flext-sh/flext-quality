@@ -23,7 +23,7 @@ class Command(BaseCommand):
             help="Force update existing data",
         )
 
-    def handle(self, *_args: Any, **options: Any) -> None:
+    def handle(self, *_args: object, **options: Any) -> None:
         """Handle the command execution."""
         self.stdout.write(
             self.style.SUCCESS("🚀 Populating backend and issue type data..."),

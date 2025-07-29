@@ -155,7 +155,7 @@ def configure_quality_dependencies() -> None:
 
 
 def get_quality_container() -> QualityContainer:
-    global _container  # noqa: PLW0602
+    global _container
     if _container is None:
         configure_quality_dependencies()
     # Ensure container is properly initialized
