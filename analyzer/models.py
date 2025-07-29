@@ -178,7 +178,7 @@ class AnalysisSession(models.Model):
         return f"{self.flx_project.name} - {self.name} ({self.status})"
 
     @property
-    def duration(self) -> Any:
+    def duration(self) -> object:
         """Calculate the duration of the analysis session.
 
         Returns:
@@ -228,7 +228,7 @@ class FileAnalysis(models.Model):
         return f"{self.file_name} (LOC: {self.lines_of_code})"
 
     @property
-    def total_lines(self) -> Any:
+    def total_lines(self) -> object:
         """Calculate the total number of lines in the file.
 
         Returns:
@@ -1142,7 +1142,7 @@ class DetectedIssue(models.Model):
         return f"{self.issue_type.code} in {self.file_path}:{self.line_number}"
 
     @property
-    def severity(self) -> Any:
+    def severity(self) -> object:
         """Get the severity of this issue from its issue type.
 
         Returns:
@@ -1152,7 +1152,7 @@ class DetectedIssue(models.Model):
         return self.issue_type.severity
 
     @property
-    def category(self) -> Any:
+    def category(self) -> object:
         """Get the category of this issue from its issue type.
 
         Returns:
@@ -1162,7 +1162,7 @@ class DetectedIssue(models.Model):
         return self.issue_type.category
 
     @property
-    def backend_name(self) -> Any:
+    def backend_name(self) -> object:
         """Get the name of the backend that detected this issue.
 
         Returns:

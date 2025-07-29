@@ -12,8 +12,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Any
-
 # 🚨 ARCHITECTURAL COMPLIANCE: Use ONLY official flext-core FlextContainer
 from flext_core import FlextContainer, get_logger
 
@@ -52,7 +50,7 @@ def configure_flext_quality_dependencies() -> None:
         logger.exception(f"Failed to configure FLEXT_QUALITY dependencies: {e}")
 
 
-def get_flext_quality_service(service_name: str) -> Any:
+def get_flext_quality_service(service_name: str) -> object:
     """Get flext_quality service from container.
 
     Args:

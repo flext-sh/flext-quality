@@ -19,7 +19,7 @@ class AnalysisPort(ABC):
     """Base port for analysis operations."""
 
     @abstractmethod
-    async def analyze(self, project_path: Path) -> Any:
+    async def analyze(self, project_path: Path) -> object:
         """Analyze project at given path."""
 
 
@@ -30,7 +30,7 @@ class ASTAnalysisPort(AnalysisPort):
         """Initialize with optional config."""
         self.config = config
 
-    async def analyze(self, project_path: Path) -> Any:
+    async def analyze(self, project_path: Path) -> object:
         """Analyze using AST parsing."""
         return {"type": "ast", "path": str(project_path), "results": []}
 
@@ -42,7 +42,7 @@ class BanditSecurityPort(AnalysisPort):
         """Initialize with optional config."""
         self.config = config
 
-    async def analyze(self, project_path: Path) -> Any:
+    async def analyze(self, project_path: Path) -> object:
         """Analyze using Bandit security scanner."""
         return {"type": "security", "path": str(project_path), "issues": []}
 
@@ -54,7 +54,7 @@ class ComplexityAnalysisPort(AnalysisPort):
         """Initialize with optional config."""
         self.config = config
 
-    async def analyze(self, project_path: Path) -> Any:
+    async def analyze(self, project_path: Path) -> object:
         """Analyze code complexity."""
         return {"type": "complexity", "path": str(project_path), "metrics": {}}
 
@@ -66,7 +66,7 @@ class DeadCodeAnalysisPort(AnalysisPort):
         """Initialize with optional config."""
         self.config = config
 
-    async def analyze(self, project_path: Path) -> Any:
+    async def analyze(self, project_path: Path) -> object:
         """Analyze dead code."""
         return {"type": "dead_code", "path": str(project_path), "unused": []}
 
@@ -78,7 +78,7 @@ class DuplicationAnalysisPort(AnalysisPort):
         """Initialize with optional config."""
         self.config = config
 
-    async def analyze(self, project_path: Path) -> Any:
+    async def analyze(self, project_path: Path) -> object:
         """Analyze code duplication."""
         return {"type": "duplication", "path": str(project_path), "duplicates": []}
 
@@ -90,7 +90,7 @@ class PylintPort(AnalysisPort):
         """Initialize with optional config."""
         self.config = config
 
-    async def analyze(self, project_path: Path) -> Any:
+    async def analyze(self, project_path: Path) -> object:
         """Analyze using Pylint."""
         return {"type": "pylint", "path": str(project_path), "violations": []}
 
@@ -102,6 +102,6 @@ class RuffPort(AnalysisPort):
         """Initialize with optional config."""
         self.config = config
 
-    async def analyze(self, project_path: Path) -> Any:
+    async def analyze(self, project_path: Path) -> object:
         """Analyze using Ruff."""
         return {"type": "ruff", "path": str(project_path), "violations": []}

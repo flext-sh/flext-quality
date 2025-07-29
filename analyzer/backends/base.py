@@ -50,7 +50,9 @@ class AnalysisBackend(ABC):
         """Initialize analysis backend with session and project path."""
         self.session = session
         self.project_path = project_path
-        self.logger = FlextLoggerFactory.get_logger(__name__ + "." + self.__class__.__name__)
+        self.logger = FlextLoggerFactory.get_logger(
+            __name__ + "." + self.__class__.__name__,
+        )
 
     @property
     @abstractmethod

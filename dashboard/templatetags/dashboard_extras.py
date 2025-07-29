@@ -14,7 +14,7 @@ register = template.Library()
 
 
 @register.filter
-def get_item(dictionary: dict[str, Any], key: str) -> Any:
+def get_item(dictionary: dict[str, Any], key: str) -> object:
     return dictionary.get(key)
 
 
@@ -27,14 +27,14 @@ def multiply(value: float, arg: float) -> float:
 
 
 @register.filter
-def percentage(value: float, total: float) -> Any:
+def percentage(value: float, total: float) -> object:
     if total == 0:
         return 0
     return round((value / total) * 100, 1)
 
 
 @register.filter
-def severity_color(severity: str) -> Any:
+def severity_color(severity: str) -> object:
     severity_colors = {
         "CRITICAL": "danger",
         "HIGH": "warning",
@@ -46,7 +46,7 @@ def severity_color(severity: str) -> Any:
 
 
 @register.filter
-def status_icon(status: str) -> Any:
+def status_icon(status: str) -> object:
     status_icons = {
         "success": "✅",
         "failed": "❌",
@@ -57,12 +57,12 @@ def status_icon(status: str) -> Any:
 
 
 @register.filter
-def dict_get(dictionary: dict[str, Any], key: str) -> Any:
+def dict_get(dictionary: dict[str, Any], key: str) -> object:
     return dictionary.get(key, 0)
 
 
 @register.filter
-def severity_badge(severity: str) -> Any:
+def severity_badge(severity: str) -> object:
     severity_classes = {
         "CRITICAL": "bg-danger",
         "HIGH": "bg-warning",
@@ -74,7 +74,7 @@ def severity_badge(severity: str) -> Any:
 
 
 @register.filter
-def status_badge(status: str) -> Any:
+def status_badge(status: str) -> object:
     status_classes = {
         "success": "bg-success",
         "failed": "bg-danger",
@@ -103,7 +103,7 @@ def format_duration(duration: timedelta) -> str:
 
 
 @register.filter
-def truncate_path(path: str, max_length: int = 50) -> Any:
+def truncate_path(path: str, max_length: int = 50) -> object:
     if len(path) <= max_length:
         return path
     # Try to keep the filename and some parent directories
@@ -128,7 +128,7 @@ def truncate_path(path: str, max_length: int = 50) -> Any:
 
 
 @register.filter
-def issue_icon(category: str) -> Any:
+def issue_icon(category: str) -> object:
     icons = {
         "security": "fas fa-shield-alt",
         "quality": "fas fa-code",

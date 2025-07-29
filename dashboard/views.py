@@ -276,7 +276,7 @@ def refresh_packages(_request: HttpRequest) -> JsonResponse:
         )
 
 
-def run_analysis(request: HttpRequest, project_id: str) -> Any:
+def run_analysis(request: HttpRequest, project_id: str) -> object:
     """Run analysis with selected backends."""
     flx_project = get_object_or_404(Project, id=project_id)
 
@@ -332,7 +332,7 @@ def run_analysis(request: HttpRequest, project_id: str) -> Any:
     return render(request, "dashboard/run_analysis.html", context)
 
 
-def analysis_session_detail(request: HttpRequest, session_id: str) -> Any:
+def analysis_session_detail(request: HttpRequest, session_id: str) -> object:
     """Show analysis session details."""
     from analyzer.models import (
         AnalysisSession,
@@ -365,7 +365,7 @@ def package_analysis_view(
     request: HttpRequest,
     session_id: str,
     package_id: str,
-) -> Any:
+) -> object:
     """Show package analysis details."""
     from analyzer.models import ClassAnalysis, FunctionAnalysis, PackageAnalysis
 
@@ -398,7 +398,7 @@ def package_analysis_view(
     return render(request, "dashboard/package_analysis.html", context)
 
 
-def class_analysis_view(request: HttpRequest, session_id: str, class_id: str) -> Any:
+def class_analysis_view(request: HttpRequest, session_id: str, class_id: str) -> object:
     """Show class analysis details."""
     from analyzer.models import ClassAnalysis, FunctionAnalysis, VariableAnalysis
 
@@ -432,7 +432,7 @@ def function_analysis_view(
     request: HttpRequest,
     session_id: str,
     function_id: str,
-) -> Any:
+) -> object:
     """Show function analysis details."""
     from analyzer.models import FunctionAnalysis, VariableAnalysis
 
@@ -452,7 +452,7 @@ def function_analysis_view(
     return render(request, "dashboard/function_analysis.html", context)
 
 
-def analysis_overview(request: HttpRequest) -> Any:
+def analysis_overview(request: HttpRequest) -> object:
     """Show analysis overview with all sessions."""
     sessions = (
         AnalysisSession.objects.select_related("flx_project")
@@ -479,7 +479,7 @@ def analysis_overview(request: HttpRequest) -> Any:
     return render(request, "dashboard/analysis_overview.html", context)
 
 
-def hierarchical_report(request: HttpRequest, session_id: str) -> Any:
+def hierarchical_report(request: HttpRequest, session_id: str) -> object:
     """Generate hierarchical analysis report."""
     from analyzer.models import (
         AnalysisSession,
@@ -540,7 +540,7 @@ def hierarchical_report(request: HttpRequest, session_id: str) -> Any:
     return render(request, "dashboard/hierarchical_report.html", context)
 
 
-def backend_issues_report(request: HttpRequest, session_id: str) -> Any:
+def backend_issues_report(request: HttpRequest, session_id: str) -> object:
     """Generate backend issues report."""
     session = get_object_or_404(AnalysisSession, id=session_id)
 

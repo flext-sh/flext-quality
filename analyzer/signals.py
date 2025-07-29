@@ -3,10 +3,8 @@
 This module contains Django signals for handling code analysis events.
 """
 
-from typing import Any
-
 
 # Quality analysis signals
-def analysis_started(*args: Any, **kwargs: object) -> None:
-    def analysis_completed(*args: Any, **kwargs: object) -> None:
+def analysis_started(*args: object, **kwargs: object) -> None:
+    def analysis_completed(*args: object, **kwargs: object) -> None:
         pass

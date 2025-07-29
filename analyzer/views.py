@@ -175,10 +175,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
     ordering_fields: ClassVar[list[str]] = ["name", "created_at", "updated_at"]
     ordering: ClassVar[list[str]] = ["-updated_at"]
 
-    def get_queryset(self) -> Any:
+    def get_queryset(self) -> object:
         return Project.objects.all()
 
-    def get_serializer_class(self) -> Any:
+    def get_serializer_class(self) -> object:
         if self.action == "list":
             return ProjectSummarySerializer
         return ProjectSerializer
@@ -276,11 +276,11 @@ class AnalysisSessionViewSet(viewsets.ModelViewSet):
     ]
     ordering: ClassVar[list[str]] = ["-created_at"]
 
-    def get_queryset(self) -> Any:
+    def get_queryset(self) -> object:
         # TODO: Break long line
         return AnalysisSession.objects.all()
 
-    def get_serializer_class(self) -> Any:
+    def get_serializer_class(self) -> object:
         if self.action == "create":
             return CreateAnalysisSessionSerializer
         if self.action == "list":
@@ -422,7 +422,7 @@ class FileAnalysisViewSet(viewsets.ReadOnlyModelViewSet):
     ]
     ordering: ClassVar[list[str]] = ["file_path"]
 
-    def get_queryset(self) -> Any:
+    def get_queryset(self) -> object:
         return FileAnalysis.objects.filter(
             session__project__created_by=self.request.user,
         )
@@ -450,7 +450,7 @@ class SecurityIssueViewSet(viewsets.ModelViewSet):
     ordering_fields: ClassVar[list[str]] = ["severity", "line_number", "created_at"]
     ordering: ClassVar[list[str]] = ["-severity", "line_number"]
 
-    def get_queryset(self) -> Any:
+    def get_queryset(self) -> object:
         return SecurityIssue.objects.filter(
             session__project__created_by=self.request.user,
         )
@@ -490,7 +490,7 @@ class DeadCodeIssueViewSet(viewsets.ModelViewSet):
     ordering_fields: ClassVar[list[str]] = ["confidence", "size_estimate", "created_at"]
     ordering: ClassVar[list[str]] = ["-confidence", "-size_estimate"]
 
-    def get_queryset(self) -> Any:
+    def get_queryset(self) -> object:
         return DeadCodeIssue.objects.filter(
             session__project__created_by=self.request.user,
         )
@@ -533,7 +533,7 @@ class DuplicateCodeBlockViewSet(viewsets.ModelViewSet):
     ]
     ordering: ClassVar[list[str]] = ["-lines_count", "-similarity_score"]
 
-    def get_queryset(self) -> Any:
+    def get_queryset(self) -> object:
         return DuplicateCodeBlock.objects.filter(
             session__project__created_by=self.request.user,
         )
@@ -567,7 +567,7 @@ class QualityMetricsViewSet(viewsets.ReadOnlyModelViewSet):
     ordering_fields: ClassVar[list[str]] = ["overall_score", "created_at"]
     ordering: ClassVar[list[str]] = ["-overall_score"]
 
-    def get_queryset(self) -> Any:
+    def get_queryset(self) -> object:
         return QualityMetrics.objects.filter(
             session__project__created_by=self.request.user,
         )
