@@ -87,7 +87,7 @@ class PackageDiscovery:
                 "has_python_files": True,  # Assume true to avoid file system checks
                 "estimated_size": 0,  # Skip size estimation for performance
             }
-        except Exception:
+        except (RuntimeError, ValueError, TypeError):
             return None
 
     def _analyze_package(
@@ -128,7 +128,7 @@ class PackageDiscovery:
                 "has_python_files": self._has_python_files(source_path),
                 "estimated_size": self._estimate_package_size(source_path),
             }
-        except Exception:
+        except (RuntimeError, ValueError, TypeError):
             return None
 
     def _determine_package_type(
@@ -177,7 +177,7 @@ class PackageDiscovery:
                             "file://",
                         ):
                             return str(url_data["url"][7:])  # Remove file://
-                except Exception as e:
+                except (RuntimeError, ValueError, TypeError) as e:
                     logger.debug(
                         f"Failed to parse direct_url.json for {dist.metadata['name']}: {e}",
                     )
@@ -190,7 +190,7 @@ class PackageDiscovery:
                 )
 
             return None
-        except Exception:
+        except (RuntimeError, ValueError, TypeError):
             return None
 
     def _determine_package_type_fast(
@@ -218,13 +218,13 @@ class PackageDiscovery:
                     direct_url = dist.read_text("direct_url.json")
                     if direct_url and "editable" in direct_url:
                         return "source"
-                except Exception as e:
+                except (RuntimeError, ValueError, TypeError) as e:
                     logger.debug(
                         f"Failed to read direct_url.json for package type detection: {e}",
                     )
 
             return "wheel"
-        except Exception:
+        except (RuntimeError, ValueError, TypeError):
             return "system"
 
     def _is_interesting_package(self, name: str) -> bool:
@@ -318,7 +318,7 @@ class PackageDiscovery:
                     return True
 
             return False
-        except Exception:
+        except (RuntimeError, ValueError, TypeError):
             return False
 
     def _estimate_package_size(self, path: str) -> int:
@@ -326,7 +326,7 @@ class PackageDiscovery:
         try:
             path_obj = Path(path)
             return len(list(path_obj.rglob("*.py")))
-        except Exception:
+        except (RuntimeError, ValueError, TypeError):
             return 0
 
     def get_package_by_name(self, package_name: str) -> dict[str, Any] | None:

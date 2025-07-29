@@ -50,7 +50,7 @@ def analyze_project(args: argparse.Namespace) -> int:
         if quality_score >= 60:
             return 1  # Medium quality
         return 2  # Poor quality
-    except Exception:
+    except (RuntimeError, ValueError, TypeError):
         if args.verbose:
             traceback.print_exc()
         return 3
@@ -78,7 +78,7 @@ def another_function(args: argparse.Namespace) -> int:
         len(issues.get("security", []))
         len(issues.get("complexity", []))
         return 0 if score >= 70 else 1
-    except Exception:
+    except (RuntimeError, ValueError, TypeError):
         return 3
 
 

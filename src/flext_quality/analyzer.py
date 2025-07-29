@@ -248,7 +248,7 @@ class CodeAnalyzer:
                     "complexity": 0,
                     "syntax_error": str(e),
                 }
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             logger.exception("Error analyzing file %s: %s", file_path, e)
             return None
 
@@ -330,7 +330,7 @@ class CodeAnalyzer:
                             "severity": "medium",
                         },
                     )
-            except Exception as e:
+            except (RuntimeError, ValueError, TypeError) as e:
                 logger.warning("Error checking security in %s: %s", py_file, e)
 
         return issues
@@ -382,7 +382,7 @@ class CodeAnalyzer:
                                 "message": f"Potentially unused import: {line.strip()}",
                             },
                         )
-            except Exception as e:
+            except (RuntimeError, ValueError, TypeError) as e:
                 logger.warning("Error checking dead code in %s: %s", py_file, e)
 
         return issues
@@ -399,7 +399,7 @@ class CodeAnalyzer:
                     if len(content.strip()) > 100:
                         # Only check substantial files
                         file_contents[py_file] = content
-            except Exception as e:
+            except (RuntimeError, ValueError, TypeError) as e:
                 logger.warning("Error reading %s: %s", py_file, e)
 
         # Simple duplicate detection based on file similarity

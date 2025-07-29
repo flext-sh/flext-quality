@@ -220,7 +220,7 @@ class ASTBackend(AnalysisBackend):
                 result.variables.extend(visitor.variables)
                 result.imports.extend(visitor.imports)
 
-            except Exception as e:
+            except (RuntimeError, ValueError, TypeError) as e:
                 self.logger.exception("Error analyzing %s", file_path)
                 result.errors.append(
                     {

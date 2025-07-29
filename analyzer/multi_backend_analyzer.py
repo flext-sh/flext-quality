@@ -129,7 +129,7 @@ class MultiBackendAnalyzer:
                         "result": result,
                     }
 
-                except Exception as e:
+                except (RuntimeError, ValueError, TypeError) as e:
                     execution_time = time.time() - start_time
                     error_msg = str(e)
 
@@ -180,7 +180,7 @@ class MultiBackendAnalyzer:
 
             self.logger.info(f"Analysis completed for project: {self.flx_project.name}")
 
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             self.logger.exception(f"Analysis failed: {e}")
             self.session.status = "failed"
             self.session.completed_at = timezone.now()
@@ -203,7 +203,7 @@ class MultiBackendAnalyzer:
                     for part in py_file.parts
                 )
             )
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             self.logger.exception(f"Error finding Python files: {e}")
 
         return python_files
@@ -623,7 +623,7 @@ class MultiBackendAnalyzer:
                 raw_data=issue_data,
             )
 
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             self.logger.exception(f"Failed to create detected issue: {e}")
 
     def _extract_issue_code(
@@ -735,7 +735,7 @@ class MultiBackendAnalyzer:
 
                 self.logger.info("Saved statistics for backend: %s", backend_name)
 
-            except Exception as e:
+            except (RuntimeError, ValueError, TypeError) as e:
                 self.logger.exception(
                     f"Failed to save statistics for backend {backend_name}: {e}",
                 )

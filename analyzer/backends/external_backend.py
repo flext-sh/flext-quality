@@ -118,7 +118,7 @@ class ExternalToolsBackend(AnalysisBackend):
         try:
             security_issues = self._run_bandit(python_files)
             result.security_issues.extend(security_issues)
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             self.logger.exception("Bandit analysis failed")
             result.errors.append(
                 {"tool": "bandit", "error": str(e), "backend": self.name},
@@ -129,7 +129,7 @@ class ExternalToolsBackend(AnalysisBackend):
             dead_code_issues = self._run_vulture(python_files)
             # Add to results (you might want to create a separate field)
             result.quality_metrics["dead_code_issues"] = dead_code_issues
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             self.logger.exception("Vulture analysis failed")
             result.errors.append(
                 {"tool": "vulture", "error": str(e), "backend": self.name},
@@ -201,7 +201,7 @@ class ExternalToolsBackend(AnalysisBackend):
                 except json.JSONDecodeError:
                     self.logger.exception("Failed to parse bandit JSON output")
 
-        except Exception:
+        except (RuntimeError, ValueError, TypeError):
             self.logger.exception("Bandit execution failed")
 
         return security_issues
@@ -266,7 +266,7 @@ class ExternalToolsBackend(AnalysisBackend):
                 except json.JSONDecodeError:
                     self.logger.exception("Failed to parse vulture JSON output")
 
-        except Exception:
+        except (RuntimeError, ValueError, TypeError):
             self.logger.exception("Vulture execution failed")
 
         return dead_code_issues

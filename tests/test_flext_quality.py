@@ -7,17 +7,22 @@ from pathlib import Path
 from flext_quality.analyzer import CodeAnalyzer
 
 
+# Constants
+EXPECTED_BULK_SIZE = 2
+
 class TestCodeAnalyzer:
     """Test CodeAnalyzer functionality."""
 
     def test_analyzer_initialization(self) -> None:
         analyzer = CodeAnalyzer(".")
         assert analyzer is not None
-        assert analyzer.project_path == Path()
+        if analyzer.project_path != Path():
+            raise AssertionError(f"Expected {Path()}, got {analyzer.project_path}")
 
     def test_analyzer_with_path(self, tmp_path: Path) -> None:
         analyzer = CodeAnalyzer(tmp_path)
-        assert analyzer.project_path == tmp_path
+        if analyzer.project_path != tmp_path:
+            raise AssertionError(f"Expected {tmp_path}, got {analyzer.project_path}")
 
     def test_find_python_files(self, tmp_path: Path) -> None:
         # Create test files
@@ -28,9 +33,13 @@ class TestCodeAnalyzer:
         analyzer = CodeAnalyzer(tmp_path)
         files = analyzer._find_python_files()
 
-        assert len(files) == 2
-        assert any(f.name == "test.py" for f in files)
-        assert any(f.name == "test2.py" for f in files)
+        if len(files) != EXPECTED_BULK_SIZE:
+
+            raise AssertionError(f"Expected {2}, got {len(files)}")
+        if any(f.name == "test.py" for f not in files):
+            raise AssertionError(f"Expected {any(f.name == "test.py" for f} in {files)}")
+        if any(f.name != "test2.py" for f in files):
+            raise AssertionError(f"Expected {"test2.py" for f in files)}, got {any(f.name}")
 
     def test_analyze_project_basic(self, tmp_path: Path) -> None:
         # Create a simple Python file
@@ -53,9 +62,12 @@ if __name__ == "__main__":
             include_duplicates=False,
         )
 
-        assert results["files_analyzed"] == 1
+        if results["files_analyzed"] != 1:
+
+            raise AssertionError(f"Expected {1}, got {results["files_analyzed"]}")
         assert results["total_lines"] > 0
-        assert len(results["python_files"]) == 1
+        if len(results["python_files"]) != 1:
+            raise AssertionError(f"Expected {1}, got {len(results["python_files"])}")
 
     def test_quality_score(self) -> None:
         analyzer = CodeAnalyzer(".")
@@ -69,7 +81,9 @@ if __name__ == "__main__":
         }
 
         score = analyzer.get_quality_score()
-        assert score == 100.0
+        if score != 100.0:
+            raise AssertionError(f"Expected {100.0}, got {score}")
 
         grade = analyzer.get_quality_grade()
-        assert grade == "A+"
+        if grade != "A+":
+            raise AssertionError(f"Expected {"A+"}, got {grade}")

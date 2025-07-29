@@ -99,7 +99,7 @@ class AnalysisBackend(ABC):
                 for py_file in path.rglob("*.py")
                 if not any(part.startswith(".") for part in py_file.parts)
             )
-        except Exception:
+        except (RuntimeError, ValueError, TypeError):
             self.logger.exception("Error finding Python files in %s", path)
 
         return python_files

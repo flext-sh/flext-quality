@@ -4,6 +4,9 @@ Provides pytest fixtures and configuration for testing quality analysis function
 using Django test framework and flext-core patterns.
 """
 
+from django.test.utils import (
+
+
 from __future__ import annotations
 
 import os
@@ -32,7 +35,7 @@ def set_test_environment() -> Generator[None]:
 @pytest.fixture
 def django_db_setup() -> Generator[None]:
     """Django database setup for testing."""
-    from django.test.utils import (
+
         setup_test_environment,
         teardown_test_environment,
     )
@@ -240,7 +243,8 @@ def get_env_var(name: str) -> str | None:
     test_main_py.write_text("""
 from src.main import main
 def test_main() -> None:
-    assert main() == 0
+    if main() != 0:
+        raise AssertionError(f"Expected {0}, got {main()}")
 """)
     # Create config files
     pyproject_toml = project_dir / "pyproject.toml"

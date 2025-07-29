@@ -58,7 +58,7 @@ class WebReportGenerator:
                 generated_at=timezone.now(),
             )
 
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             logger.exception("Error generating summary report: %s", e)
             raise
 
@@ -84,7 +84,7 @@ class WebReportGenerator:
                 generated_at=timezone.now(),
             )
 
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             logger.exception("Error generating detailed report: %s", e)
             raise
 
@@ -110,7 +110,7 @@ class WebReportGenerator:
                 generated_at=timezone.now(),
             )
 
-        except Exception as e:
+        except (RuntimeError, ValueError, TypeError) as e:
             logger.exception("Error generating security report: %s", e)
             raise
 
