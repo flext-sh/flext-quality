@@ -7,12 +7,6 @@ from __future__ import annotations
 
 import importlib.metadata
 
-# Import from centralized version management system
-# 🚨 ARCHITECTURAL COMPLIANCE: DI container
-from flext_quality.infrastructure.di_container import get_service_result
-
-FlextResult = get_service_result()
-
 try:
     __version__ = importlib.metadata.version("flext-quality")
 except importlib.metadata.PackageNotFoundError:

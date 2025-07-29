@@ -7,11 +7,6 @@ from typing import Any, ClassVar
 from flext_core import FlextValueObject
 from pydantic import Field, computed_field
 
-# 🚨 ARCHITECTURAL COMPLIANCE: DI container
-from flext_quality.infrastructure.di_container import get_service_result
-
-FlextResult = get_service_result()
-
 
 class QualityMetrics(FlextValueObject):
     """Quality metrics for code analysis - REFACTORED to use flext-core patterns."""

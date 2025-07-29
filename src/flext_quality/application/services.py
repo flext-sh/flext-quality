@@ -9,6 +9,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from flext_core import FlextResult
+
 from flext_quality.domain.entities import (
     IssueSeverity,
     IssueType,
@@ -16,10 +18,8 @@ from flext_quality.domain.entities import (
     QualityProject,
     QualityReport,
 )
-from flext_quality.domain.services import FlextResult
 
 if TYPE_CHECKING:
-    from uuid import UUID
 
     from flext_quality.domain.entities import QualityAnalysis
 
@@ -29,7 +29,7 @@ class QualityProjectService:
     """Service for managing quality projects."""
 
     def __init__(self) -> None:
-        self._projects: dict[UUID, QualityProject] = {}
+        self._projects: dict[str, QualityProject] = {}
 
     async def create_project(
         self,
@@ -44,7 +44,9 @@ class QualityProjectService:
         max_duplication: float = 5.0,
     ) -> FlextResult[QualityProject]:
         try:
+            from uuid import uuid4
             project = QualityProject(
+                id=str(uuid4()),
                 project_path=project_path,
                 repository_url=repository_url,
                 config_path=config_path,
@@ -62,8 +64,8 @@ class QualityProjectService:
 
     async def get_project(
         self,
-        project_id: UUID,
-    ) -> FlextResult[QualityProject]:
+        project_id: str,
+    ) -> FlextResult[QualityProject | None]:
         try:
             project = self._projects.get(project_id)
             return FlextResult.ok(project)
@@ -79,7 +81,7 @@ class QualityProjectService:
 
     async def update_project(
         self,
-        project_id: UUID,
+        project_id: str,
         updates: dict[str, Any],
     ) -> FlextResult[QualityProject]:
         try:
@@ -87,16 +89,17 @@ class QualityProjectService:
             if not project:
                 return FlextResult.fail("Project not found")
 
-            for key, value in updates.items():
-                if hasattr(project, key):
-                    setattr(project, key, value)
-
-            # Updated timestamp is managed automatically by DomainEntity
-            return FlextResult.ok(project)
+            # Use model_copy to create updated version (immutable pattern)
+            updated_project = project.model_copy(update=updates)
+            
+            # Store the updated project
+            self._projects[project_id] = updated_project
+            
+            return FlextResult.ok(updated_project)
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to update project: {e}")
 
-    async def delete_project(self, project_id: UUID) -> FlextResult[bool]:
+    async def delete_project(self, project_id: str) -> FlextResult[bool]:
         try:
             if project_id in self._projects:
                 del self._projects[project_id]
@@ -111,11 +114,11 @@ class QualityAnalysisService:
     """Service for managing quality analyses."""
 
     def __init__(self) -> None:
-        self._analyses: dict[UUID, QualityAnalysis] = {}
+        self._analyses: dict[str, QualityAnalysis] = {}
 
     async def create_analysis(
         self,
-        project_id: UUID,
+        project_id: str,
         commit_hash: str | None = None,
         branch: str | None = None,
         pull_request_id: str | None = None,
@@ -123,13 +126,13 @@ class QualityAnalysisService:
     ) -> FlextResult[Any]:
         try:
             # Logic for creating analysis
-            pass
+            return FlextResult.ok({})
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to create analysis: {e}")
 
     async def update_metrics(
         self,
-        analysis_id: UUID,
+        analysis_id: str,
         total_files: int,
         total_lines: int,
         code_lines: int,
@@ -154,7 +157,7 @@ class QualityAnalysisService:
 
     async def update_scores(
         self,
-        analysis_id: UUID,
+        analysis_id: str,
         coverage_score: float,
         complexity_score: float,
         duplication_score: float,
@@ -180,7 +183,7 @@ class QualityAnalysisService:
 
     async def update_issue_counts(
         self,
-        analysis_id: UUID,
+        analysis_id: str,
         critical: int,
         high: int,
         medium: int,
@@ -204,7 +207,7 @@ class QualityAnalysisService:
 
     async def complete_analysis(
         self,
-        analysis_id: UUID,
+        analysis_id: str,
     ) -> FlextResult[Any]:
         try:
             analysis = self._analyses.get(analysis_id)
@@ -218,7 +221,7 @@ class QualityAnalysisService:
 
     async def fail_analysis(
         self,
-        analysis_id: UUID,
+        analysis_id: str,
         error: str,
     ) -> FlextResult[Any]:
         try:
@@ -233,7 +236,7 @@ class QualityAnalysisService:
 
     async def get_analysis(
         self,
-        analysis_id: UUID,
+        analysis_id: str,
     ) -> FlextResult[Any]:
         try:
             analysis = self._analyses.get(analysis_id)
@@ -243,7 +246,7 @@ class QualityAnalysisService:
 
     async def list_analyses(
         self,
-        project_id: UUID,
+        project_id: str,
     ) -> FlextResult[Any]:
         try:
             analyses = [
@@ -261,11 +264,11 @@ class QualityIssueService:
     """Service for managing quality issues."""
 
     def __init__(self) -> None:
-        self._issues: dict[UUID, QualityIssue] = {}
+        self._issues: dict[str, QualityIssue] = {}
 
     async def create_issue(
         self,
-        analysis_id: UUID,
+        analysis_id: str,
         issue_type: str,
         severity: str,
         rule_id: str,
@@ -279,7 +282,9 @@ class QualityIssueService:
         suggestion: str | None = None,
     ) -> FlextResult[Any]:
         try:
+            from uuid import uuid4
             issue = QualityIssue(
+                id=str(uuid4()),
                 analysis_id=analysis_id,
                 issue_type=IssueType(issue_type),
                 severity=IssueSeverity(severity),
@@ -299,7 +304,7 @@ class QualityIssueService:
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to create issue: {e}")
 
-    async def get_issue(self, issue_id: UUID) -> FlextResult[QualityIssue | None]:
+    async def get_issue(self, issue_id: str) -> FlextResult[QualityIssue | None]:
         try:
             issue = self._issues.get(issue_id)
             return FlextResult.ok(issue)
@@ -308,7 +313,7 @@ class QualityIssueService:
 
     async def list_issues(
         self,
-        analysis_id: UUID,
+        analysis_id: str,
         severity: str | None = None,
         issue_type: str | None = None,
         file_path: str | None = None,
@@ -329,20 +334,21 @@ class QualityIssueService:
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to list issues: {e}")
 
-    async def mark_fixed(self, issue_id: UUID) -> FlextResult[Any]:
+    async def mark_fixed(self, issue_id: str) -> FlextResult[Any]:
         try:
             issue = self._issues.get(issue_id)
             if not issue:
                 return FlextResult.fail("Issue not found")
 
-            issue.mark_fixed()
-            return FlextResult.ok(issue)
+            fixed_issue = issue.mark_fixed()
+            self._issues[issue_id] = fixed_issue
+            return FlextResult.ok(fixed_issue)
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to mark issue as fixed: {e}")
 
     async def suppress_issue(
         self,
-        issue_id: UUID,
+        issue_id: str,
         reason: str,
     ) -> FlextResult[Any]:
         try:
@@ -350,19 +356,21 @@ class QualityIssueService:
             if not issue:
                 return FlextResult.fail("Issue not found")
 
-            issue.suppress(reason)
-            return FlextResult.ok(issue)
+            suppressed_issue = issue.suppress(reason)
+            self._issues[issue_id] = suppressed_issue
+            return FlextResult.ok(suppressed_issue)
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to suppress issue: {e}")
 
-    async def unsuppress_issue(self, issue_id: UUID) -> FlextResult[Any]:
+    async def unsuppress_issue(self, issue_id: str) -> FlextResult[Any]:
         try:
             issue = self._issues.get(issue_id)
             if not issue:
                 return FlextResult.fail("Issue not found")
 
-            issue.unsuppress()
-            return FlextResult.ok(issue)
+            unsuppressed_issue = issue.unsuppress()
+            self._issues[issue_id] = unsuppressed_issue
+            return FlextResult.ok(unsuppressed_issue)
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to unsuppress issue: {e}")
 
@@ -372,18 +380,20 @@ class QualityReportService:
     """Service for managing quality reports."""
 
     def __init__(self) -> None:
-        self._reports: dict[UUID, QualityReport] = {}
+        self._reports: dict[str, QualityReport] = {}
 
     async def create_report(
         self,
-        analysis_id: UUID,
+        analysis_id: str,
         report_type: str,
         report_format: str = "summary",
         report_path: str | None = None,
         report_size_bytes: int = 0,
     ) -> FlextResult[Any]:
         try:
+            from uuid import uuid4
             report = QualityReport(
+                id=str(uuid4()),
                 analysis_id=analysis_id,
                 report_type=report_type,
                 report_format=report_format,
@@ -396,18 +406,20 @@ class QualityReportService:
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to create report: {e}")
 
-    async def get_report(self, report_id: UUID) -> FlextResult[Any]:
+    async def get_report(self, report_id: str) -> FlextResult[Any]:
         try:
             report = self._reports.get(report_id)
             if report:
-                report.increment_access()
+                updated_report = report.increment_access()
+                self._reports[report_id] = updated_report
+                return FlextResult.ok(updated_report)
             return FlextResult.ok(report)
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to get report: {e}")
 
     async def list_reports(
         self,
-        analysis_id: UUID,
+        analysis_id: str,
     ) -> FlextResult[Any]:
         try:
             reports = [
@@ -417,7 +429,7 @@ class QualityReportService:
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to list reports {e}")
 
-    async def delete_report(self, report_id: UUID) -> FlextResult[Any]:
+    async def delete_report(self, report_id: str) -> FlextResult[Any]:
         try:
             if report_id in self._reports:
                 del self._reports[report_id]
@@ -438,7 +450,7 @@ class AnalysisServiceImpl:
     def __init__(self) -> None:
         self._analysis_service = QualityAnalysisService()
 
-    async def analyze_project(self, project_id: UUID) -> FlextResult[Any]:
+    async def analyze_project(self, project_id: str) -> FlextResult[Any]:
         """Analyze project by ID."""
         return await self._analysis_service.create_analysis(
             project_id=project_id,
@@ -480,7 +492,7 @@ class ReportGeneratorServiceImpl:
 
     async def generate_report(
         self,
-        analysis_id: UUID,
+        analysis_id: str,
         report_type: str,
     ) -> FlextResult[Any]:
         """Generate report for analysis."""

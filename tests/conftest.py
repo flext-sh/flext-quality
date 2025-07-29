@@ -4,9 +4,6 @@ Provides pytest fixtures and configuration for testing quality analysis function
 using Django test framework and flext-core patterns.
 """
 
-from django.test.utils import (
-
-
 from __future__ import annotations
 
 import os
@@ -35,11 +32,7 @@ def set_test_environment() -> Generator[None]:
 @pytest.fixture
 def django_db_setup() -> Generator[None]:
     """Django database setup for testing."""
-
-        setup_test_environment,
-        teardown_test_environment,
-    )
-
+    from django.test.utils import setup_test_environment, teardown_test_environment
     setup_test_environment()
     yield
     teardown_test_environment()
@@ -47,11 +40,11 @@ def django_db_setup() -> Generator[None]:
 
 # Quality analysis fixtures
 @pytest.fixture
-def sample_code_repository() -> dict[str, Any]:
+def sample_code_repository(tmp_path: object) -> dict[str, Any]:
     """Sample code repository for testing."""
     return {
         "name": "test-repository",
-        "path": "/tmp/test-repo",
+        "path": str(tmp_path / "test-repo"),
         "language": "python",
         "files": [
             "src/main.py",
@@ -155,13 +148,13 @@ def analysis_results() -> list[dict[str, Any]]:
 
 # Report generation fixtures
 @pytest.fixture
-def report_config() -> dict[str, Any]:
+def report_config(tmp_path: object) -> dict[str, Any]:
     """Report configuration for testing."""
     return {
         "format": "json",
         "include_metrics": True,
         "include_details": True,
-        "output_path": "/tmp/report.json",
+        "output_path": str(tmp_path / "report.json"),
         "template": "default",
     }
 
