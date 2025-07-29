@@ -18,6 +18,11 @@ import warnings
 # Core FlextCore patterns (root namespace imports)
 from flext_core import FlextConstants, FlextContainer, FlextResult
 
+# Direct imports - no fallbacks allowed per CLAUDE.md
+from flext_quality.analyzer import CodeAnalyzer
+from flext_quality.metrics import QualityMetrics
+from flext_quality.reports import QualityReport
+
 try:
     __version__ = importlib.metadata.version("flext-quality")
 except importlib.metadata.PackageNotFoundError:
@@ -51,22 +56,7 @@ def _show_deprecation_warning(old_import: str, new_import: str) -> None:
 
 # Core patterns - already imported from flext_core above
 
-# Core quality exports - simplified imports
-try:
-    from flext_quality.analyzer import CodeAnalyzer
-    from flext_quality.metrics import QualityMetrics
-    from flext_quality.reports import QualityReport
-except ImportError:
-    # Core layer not yet fully refactored - provide placeholders
-    class CodeAnalyzer:
-        """Placeholder for CodeAnalyzer until fully implemented."""
-
-    class QualityMetrics:
-        """Placeholder for QualityMetrics until fully implemented."""
-
-    class QualityReport:
-        """Placeholder for QualityReport until fully implemented."""
-
+# Core quality exports - moved to top per linting rules
 
 # Simple API exports - simplified imports
 with contextlib.suppress(ImportError):

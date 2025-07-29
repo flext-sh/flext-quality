@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from flext_core import FlextResult
+
 from flext_quality.application.services import (
     QualityAnalysisService,
     QualityIssueService,
@@ -15,11 +17,6 @@ from flext_quality.application.services import (
     QualityReportService,
 )
 from flext_quality.infrastructure.container import get_quality_container
-
-# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
-from flext_quality.infrastructure.di_container import get_service_result
-
-FlextResult = get_service_result()
 
 if TYPE_CHECKING:
     from uuid import UUID
@@ -145,7 +142,7 @@ class QualityAPI:
             FlextResult containing the QualityProject or None if not found.
 
         """
-        return await self.project_service.get_project(project_id)
+        return await self.project_service.get_project(str(project_id))
 
     async def list_projects(self) -> FlextResult[Any]:
         """List all projects.
@@ -171,7 +168,7 @@ class QualityAPI:
             FlextResult containing the updated QualityProject.
 
         """
-        return await self.project_service.update_project(project_id, updates)
+        return await self.project_service.update_project(str(project_id), updates)
 
     async def delete_project(self, project_id: UUID) -> FlextResult[Any]:
         """Delete a project.
@@ -183,7 +180,7 @@ class QualityAPI:
             FlextResult containing True if deleted successfully.
 
         """
-        return await self.project_service.delete_project(project_id)
+        return await self.project_service.delete_project(str(project_id))
 
     # Analysis operations
     async def create_analysis(
@@ -208,7 +205,7 @@ class QualityAPI:
 
         """
         return await self.analysis_service.create_analysis(
-            project_id=project_id,
+            project_id=str(project_id),
             commit_hash=commit_hash,
             branch=branch,
             pull_request_id=pull_request_id,
@@ -239,7 +236,7 @@ class QualityAPI:
 
         """
         return await self.analysis_service.update_metrics(
-            analysis_id=analysis_id,
+            analysis_id=str(analysis_id),
             total_files=total_files,
             total_lines=total_lines,
             code_lines=code_lines,
@@ -271,7 +268,7 @@ class QualityAPI:
 
         """
         return await self.analysis_service.update_scores(
-            analysis_id=analysis_id,
+            analysis_id=str(analysis_id),
             coverage_score=coverage_score,
             complexity_score=complexity_score,
             duplication_score=duplication_score,
@@ -301,7 +298,7 @@ class QualityAPI:
 
         """
         return await self.analysis_service.update_issue_counts(
-            analysis_id=analysis_id,
+            analysis_id=str(analysis_id),
             critical=critical,
             high=high,
             medium=medium,
@@ -321,7 +318,7 @@ class QualityAPI:
             FlextResult containing the completed QualityAnalysis.
 
         """
-        return await self.analysis_service.complete_analysis(analysis_id)
+        return await self.analysis_service.complete_analysis(str(analysis_id))
 
     async def fail_analysis(
         self,
@@ -338,7 +335,7 @@ class QualityAPI:
             FlextResult containing the failed QualityAnalysis.
 
         """
-        return await self.analysis_service.fail_analysis(analysis_id, error)
+        return await self.analysis_service.fail_analysis(str(analysis_id), error)
 
     async def get_analysis(
         self,
@@ -353,7 +350,7 @@ class QualityAPI:
             FlextResult containing the QualityAnalysis or None if not found.
 
         """
-        return await self.analysis_service.get_analysis(analysis_id)
+        return await self.analysis_service.get_analysis(str(analysis_id))
 
     async def list_analyses(
         self,
@@ -368,7 +365,7 @@ class QualityAPI:
             FlextResult containing list of QualityAnalysis instances.
 
         """
-        return await self.analysis_service.list_analyses(project_id)
+        return await self.analysis_service.list_analyses(str(project_id))
 
     # Issue operations
     async def create_issue(
@@ -407,7 +404,7 @@ class QualityAPI:
 
         """
         return await self.issue_service.create_issue(
-            analysis_id=analysis_id,
+            analysis_id=str(analysis_id),
             issue_type=issue_type,
             severity=severity,
             rule_id=rule_id,
@@ -431,7 +428,7 @@ class QualityAPI:
             FlextResult containing the QualityIssue or None if not found.
 
         """
-        return await self.issue_service.get_issue(issue_id)
+        return await self.issue_service.get_issue(str(issue_id))
 
     async def list_issues(
         self,
@@ -453,7 +450,7 @@ class QualityAPI:
 
         """
         return await self.issue_service.list_issues(
-            analysis_id=analysis_id,
+            analysis_id=str(analysis_id),
             severity=severity,
             issue_type=issue_type,
             file_path=file_path,
@@ -469,7 +466,7 @@ class QualityAPI:
             FlextResult containing the updated QualityIssue.
 
         """
-        return await self.issue_service.mark_fixed(issue_id)
+        return await self.issue_service.mark_fixed(str(issue_id))
 
     async def suppress_issue(
         self,
@@ -486,7 +483,7 @@ class QualityAPI:
             FlextResult containing the suppressed QualityIssue.
 
         """
-        return await self.issue_service.suppress_issue(issue_id, reason)
+        return await self.issue_service.suppress_issue(str(issue_id), reason)
 
     async def unsuppress_issue(self, issue_id: UUID) -> FlextResult[Any]:
         """Remove suppression from an issue.
@@ -498,7 +495,7 @@ class QualityAPI:
             FlextResult containing the unsuppressed QualityIssue.
 
         """
-        return await self.issue_service.unsuppress_issue(issue_id)
+        return await self.issue_service.unsuppress_issue(str(issue_id))
 
     # Report operations
     async def create_report(
@@ -523,7 +520,7 @@ class QualityAPI:
 
         """
         return await self.report_service.create_report(
-            analysis_id=analysis_id,
+            analysis_id=str(analysis_id),
             report_type=report_type,
             report_format=report_format,
             report_path=report_path,
@@ -540,7 +537,7 @@ class QualityAPI:
             FlextResult containing the QualityReport or None if not found.
 
         """
-        return await self.report_service.get_report(report_id)
+        return await self.report_service.get_report(str(report_id))
 
     async def list_reports(
         self,
@@ -555,7 +552,7 @@ class QualityAPI:
             FlextResult containing list of QualityReport instances.
 
         """
-        return await self.report_service.list_reports(analysis_id)
+        return await self.report_service.list_reports(str(analysis_id))
 
     async def delete_report(self, report_id: UUID) -> FlextResult[Any]:
         """Delete a report.
@@ -567,7 +564,7 @@ class QualityAPI:
             FlextResult containing True if deleted successfully.
 
         """
-        return await self.report_service.delete_report(report_id)
+        return await self.report_service.delete_report(str(report_id))
 
     # High-level operations
     async def run_full_analysis(
@@ -594,7 +591,7 @@ class QualityAPI:
             branch=branch,
         )
 
-        if not result.success:
+        if not result.is_success:
             return result
 
         analysis = result.data

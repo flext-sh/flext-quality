@@ -9,13 +9,18 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
-from flext_core import DomainEntity, DomainEvent
-from pydantic import Field
+from flext_core import FlextEntity, FlextResult
+from flext_core.flext_types import TAnyDict
+from pydantic import BaseModel, Field
 
-if TYPE_CHECKING:
-    from uuid import UUID
+
+class FlextDomainEvent(BaseModel):
+    """Base class for domain events."""
+
+    event_type: str
+    timestamp: datetime = Field(default_factory=datetime.now)
 
 
 class IssueSeverity(StrEnum):
@@ -51,7 +56,7 @@ class AnalysisStatus(StrEnum):
     FAILED = "failed"
 
 
-class QualityProject(DomainEntity):
+class QualityProject(FlextEntity):
     """Quality project domain entity using enhanced mixins for code reduction."""
 
     # Project paths
@@ -64,6 +69,12 @@ class QualityProject(DomainEntity):
 
     # Analysis settings
     auto_analyze: bool = Field(default=True)
+
+    def validate_domain_rules(self) -> FlextResult[None]:
+        """Validate domain rules for quality project."""
+        if not self.project_path:
+            return FlextResult.fail("Project path is required")
+        return FlextResult.ok(None)
     analysis_schedule: str | None = None  # cron format
 
     # Quality thresholds
@@ -75,15 +86,18 @@ class QualityProject(DomainEntity):
     last_analysis_at: datetime | None = None
     total_analyses: int = Field(default=0)
 
-    def update_last_analysis(self) -> None:
-        self.last_analysis_at = datetime.now()
-        self.total_analyses += 1
+    def update_last_analysis(self) -> QualityProject:
+        """Update last analysis timestamp and return new instance."""
+        return self.model_copy(update={
+            "last_analysis_at": datetime.now(),
+            "total_analyses": self.total_analyses + 1,
+        })
 
 
-class QualityAnalysis(DomainEntity):
+class QualityAnalysis(FlextEntity):
     """Quality analysis domain entity using enhanced mixins for code reduction."""
 
-    project_id: UUID = Field(..., description="Associated project ID")
+    project_id: str = Field(..., description="Associated project ID")
 
     # Analysis identification
     commit_hash: str | None = None
@@ -123,30 +137,43 @@ class QualityAnalysis(DomainEntity):
     # Analysis data
     analysis_config: dict[str, Any] = Field(default_factory=dict)
 
-    def start_analysis(self) -> None:
-        self.started_at = datetime.now()
-        self.status = AnalysisStatus.ANALYZING
-        # Remove touch() call - not available in flext-core DomainEntity
+    def start_analysis(self) -> QualityAnalysis:
+        """Start analysis and return new instance."""
+        return self.model_copy(update={
+            "started_at": datetime.now(),
+            "status": AnalysisStatus.ANALYZING,
+        })
 
-    def complete_analysis(self) -> None:
-        self.completed_at = datetime.now()
-        self.status = AnalysisStatus.COMPLETED
-
+    def complete_analysis(self) -> QualityAnalysis:
+        """Complete analysis and return new instance."""
+        completed_at = datetime.now()
+        duration_seconds = None
         if self.started_at:
-            duration = self.completed_at - self.started_at
-            self.duration_seconds = duration.total_seconds()
+            duration = completed_at - self.started_at
+            duration_seconds = duration.total_seconds()
+        
+        return self.model_copy(update={
+            "completed_at": completed_at,
+            "status": AnalysisStatus.COMPLETED,
+            "duration_seconds": duration_seconds,
+        })
 
-        # Remove touch() call - not available in flext-core DomainEntity
-
-    def fail_analysis(self, error: str) -> None:
-        self.completed_at = datetime.now()
-        self.status = AnalysisStatus.FAILED
-
+    def fail_analysis(self, error: str) -> QualityAnalysis:
+        """Fail analysis and return new instance."""
+        completed_at = datetime.now()
+        duration_seconds = None
         if self.started_at:
-            duration = self.completed_at - self.started_at
-            self.duration_seconds = duration.total_seconds()
+            duration = completed_at - self.started_at
+            duration_seconds = duration.total_seconds()
+        
+        return self.model_copy(update={
+            "completed_at": completed_at,
+            "status": AnalysisStatus.FAILED,
+            "duration_seconds": duration_seconds,
+        })
 
-    def calculate_overall_score(self) -> None:
+    def calculate_overall_score(self) -> QualityAnalysis:
+        """Calculate overall score and return new instance."""
         scores = [
             self.coverage_score,
             self.complexity_score,
@@ -154,7 +181,8 @@ class QualityAnalysis(DomainEntity):
             self.security_score,
             self.maintainability_score,
         ]
-        self.overall_score = sum(scores) / len(scores)
+        overall_score = sum(scores) / len(scores)
+        return self.model_copy(update={"overall_score": overall_score})
 
     @property
     def is_completed(self) -> bool:
@@ -164,11 +192,17 @@ class QualityAnalysis(DomainEntity):
     def is_successful(self) -> bool:
         return self.status == AnalysisStatus.COMPLETED
 
+    def validate_domain_rules(self) -> FlextResult[None]:
+        """Validate domain rules for quality analysis."""
+        if not self.project_id:
+            return FlextResult.fail("Project ID is required")
+        return FlextResult.ok(None)
 
-class QualityIssue(DomainEntity):
+
+class QualityIssue(FlextEntity):
     """Quality issue domain entity using enhanced mixins for code reduction."""
 
-    analysis_id: UUID = Field(..., description="Associated analysis ID")
+    analysis_id: str = Field(..., description="Associated analysis ID")
 
     # Issue identification
     issue_type: IssueType = Field(...)
@@ -197,23 +231,39 @@ class QualityIssue(DomainEntity):
     last_seen_at: datetime = Field(default_factory=datetime.now)
     occurrence_count: int = Field(default=1)
 
-    def mark_fixed(self) -> None:
-        self.is_fixed = True
+    def mark_fixed(self) -> QualityIssue:
+        """Mark issue as fixed and return new instance."""
+        return self.model_copy(update={"is_fixed": True})
 
-    def suppress(self, reason: str) -> None:
-        self.is_suppressed = True
-        self.suppression_reason = reason
+    def suppress(self, reason: str) -> QualityIssue:
+        """Suppress issue and return new instance."""
+        return self.model_copy(update={
+            "is_suppressed": True,
+            "suppression_reason": reason,
+        })
 
-    def unsuppress(self) -> None:
-        self.is_suppressed = False
-        self.suppression_reason = None
+    def unsuppress(self) -> QualityIssue:
+        """Unsuppress issue and return new instance."""
+        return self.model_copy(update={
+            "is_suppressed": False,
+            "suppression_reason": None,
+        })
 
-    def increment_occurrence(self) -> None:
-        self.occurrence_count += 1
-        self.last_seen_at = datetime.now()
+    def increment_occurrence(self) -> QualityIssue:
+        """Increment occurrence count and return new instance."""
+        return self.model_copy(update={
+            "occurrence_count": self.occurrence_count + 1,
+            "last_seen_at": datetime.now(),
+        })
+
+    def validate_domain_rules(self) -> FlextResult[None]:
+        """Validate domain rules for quality issue."""
+        if not self.analysis_id:
+            return FlextResult.fail("Analysis ID is required")
+        return FlextResult.ok(None)
 
 
-class QualityRule(DomainEntity):
+class QualityRule(FlextEntity):
     """Quality rule domain entity using enhanced mixins for code reduction."""
 
     # Rule identification
@@ -232,25 +282,35 @@ class QualityRule(DomainEntity):
     documentation_url: str | None = None
     examples: list[dict[str, str]] = Field(default_factory=list)
 
-    def enable(self) -> None:
-        self.enabled = True
+    def enable(self) -> QualityRule:
+        """Enable rule and return new instance."""
+        return self.model_copy(update={"enabled": True})
 
-    def disable(self) -> None:
-        self.enabled = False
+    def disable(self) -> QualityRule:
+        """Disable rule and return new instance."""
+        return self.model_copy(update={"enabled": False})
 
-    def update_severity(self, severity: IssueSeverity) -> None:
-        self.severity = severity
-        # Remove touch() call - not available in flext-core DomainEntity
+    def update_severity(self, severity: IssueSeverity) -> QualityRule:
+        """Update severity and return new instance."""
+        return self.model_copy(update={"severity": severity})
 
-    def set_parameter(self, key: str, value: Any) -> None:
-        self.parameters[key] = value
-        # Remove touch() call - not available in flext-core DomainEntity
+    def set_parameter(self, key: str, value: Any) -> QualityRule:
+        """Set parameter and return new instance."""
+        new_parameters = self.parameters.copy()
+        new_parameters[key] = value
+        return self.model_copy(update={"parameters": new_parameters})
+
+    def validate_domain_rules(self) -> FlextResult[None]:
+        """Validate domain rules for quality rule."""
+        if not self.rule_id:
+            return FlextResult.fail("Rule ID is required")
+        return FlextResult.ok(None)
 
 
-class QualityReport(DomainEntity):
+class QualityReport(FlextEntity):
     """Quality report domain entity using enhanced mixins for code reduction."""
 
-    analysis_id: UUID = Field(..., description="Associated analysis ID")
+    analysis_id: str = Field(..., description="Associated analysis ID")
 
     # Report type
     report_type: str = Field(..., min_length=1)  # html, json, markdown, pdf
@@ -268,56 +328,84 @@ class QualityReport(DomainEntity):
     access_count: int = Field(default=0)
     last_accessed_at: datetime | None = None
 
-    def increment_access(self) -> None:
-        self.access_count += 1
-        self.last_accessed_at = datetime.now()
-        # Remove touch() call - not available in flext-core DomainEntity
+    def increment_access(self) -> QualityReport:
+        """Increment access count and return new instance."""
+        return self.model_copy(update={
+            "access_count": self.access_count + 1,
+            "last_accessed_at": datetime.now(),
+        })
+
+    def validate_domain_rules(self) -> FlextResult[None]:
+        """Validate domain rules for quality report."""
+        if not self.analysis_id:
+            return FlextResult.fail("Analysis ID is required")
+        return FlextResult.ok(None)
 
 
 # Domain Events
-class ProjectCreatedEvent(DomainEvent):
+class ProjectCreatedEvent(FlextDomainEvent):
     """Event raised when quality project is created."""
 
-    project_id: UUID
+    project_id: str
     project_name: str | None = None
 
 
-class AnalysisStartedEvent(DomainEvent):
+class AnalysisStartedEvent(FlextDomainEvent):
     """Event raised when quality analysis starts."""
 
-    project_id: UUID
-    analysis_id: UUID | None = None
+    project_id: str
+    analysis_id: str | None = None
     branch: str | None = None
     triggered_by: str | None = None
 
 
-class AnalysisCompletedEvent(DomainEvent):
+class AnalysisCompletedEvent(FlextDomainEvent):
     """Event raised when quality analysis completes."""
 
-    project_id: UUID
-    analysis_id: UUID
+    project_id: str
+    analysis_id: str
     overall_score: float
     total_issues: int
     critical_issues: int
     duration_seconds: float
 
 
-class IssueDetectedEvent(DomainEvent):
+class IssueDetectedEvent(FlextDomainEvent):
     """Event raised when quality issue is detected."""
 
-    analysis_id: UUID
-    issue_id: UUID
+    analysis_id: str
+    issue_id: str
     issue_type: IssueType
     severity: IssueSeverity
     file_path: str
     rule_id: str
 
 
-class ReportGeneratedEvent(DomainEvent):
+class ReportGeneratedEvent(FlextDomainEvent):
     """Event raised when quality report is generated."""
 
-    analysis_id: UUID
-    report_id: UUID
+    analysis_id: str
+    report_id: str
     report_type: str
     report_path: str
     report_size_bytes: int
+
+
+# Rebuild models to resolve forward references and type annotations
+try:
+    QualityProject.model_rebuild()
+    QualityAnalysis.model_rebuild()
+    QualityIssue.model_rebuild()
+    QualityRule.model_rebuild()
+    QualityReport.model_rebuild()
+    
+    # Also rebuild domain events
+    FlextDomainEvent.model_rebuild()
+    ProjectCreatedEvent.model_rebuild()
+    AnalysisStartedEvent.model_rebuild()
+    AnalysisCompletedEvent.model_rebuild()
+    IssueDetectedEvent.model_rebuild()
+    ReportGeneratedEvent.model_rebuild()
+except Exception:
+    # Ignore rebuild errors in development
+    pass

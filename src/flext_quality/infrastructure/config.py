@@ -8,17 +8,12 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from flext_core import FlextCoreSettings
+from flext_core import FlextBaseSettings
 from pydantic import Field
 from pydantic_settings import SettingsConfigDict
 
-# 🚨 ARCHITECTURAL COMPLIANCE: DI container
-from flext_quality.infrastructure.di_container import get_service_result
 
-FlextResult = get_service_result()
-
-
-class QualityConfig(FlextCoreSettings):
+class QualityConfig(FlextBaseSettings):
     """Quality analysis configuration using flext-core BaseSettings."""
 
     # Project settings

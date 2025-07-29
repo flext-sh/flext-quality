@@ -248,7 +248,7 @@ class CodeAnalyzer:
                     "complexity": 0,
                     "syntax_error": str(e),
                 }
-        except (RuntimeError, ValueError, TypeError) as e:
+        except (RuntimeError, ValueError, TypeError, FileNotFoundError, OSError) as e:
             logger.exception("Error analyzing file %s: %s", file_path, e)
             return None
 

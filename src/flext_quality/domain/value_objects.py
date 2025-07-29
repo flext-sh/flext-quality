@@ -9,14 +9,12 @@ from __future__ import annotations
 from enum import StrEnum
 from pathlib import Path
 
-from pydantic import Field, field_validator
+from flext_core import FlextEntity
+from pydantic import BaseModel, Field, field_validator
 
-# 🚨 ARCHITECTURAL COMPLIANCE: Using DI container
-from flext_quality.infrastructure.di_container import get_domain_entity
-
-DomainEntity = get_domain_entity()
-DomainEvent = get_domain_entity()  # Placeholder
-FlextDomainBaseModel = get_domain_entity()  # Placeholder
+# Use real imports instead of fallbacks
+DomainEntity = FlextEntity
+FlextDomainBaseModel = BaseModel  # Use BaseModel for value objects
 
 
 class IssueSeverity(StrEnum):

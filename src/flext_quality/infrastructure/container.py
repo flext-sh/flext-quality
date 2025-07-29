@@ -17,9 +17,6 @@ from flext_quality.application.services import (
     SecurityAnalyzerServiceImpl,
 )
 from flext_quality.infrastructure.config import QualityConfig
-
-# 🚨 ARCHITECTURAL COMPLIANCE: DI container
-from flext_quality.infrastructure.di_container import get_service_result
 from flext_quality.infrastructure.persistence.repositories import (
     AnalysisResultRepository,
     QualityMetricsRepository,
@@ -33,8 +30,6 @@ from flext_quality.infrastructure.ports import (
     DuplicationAnalysisPort,
     RuffPort,
 )
-
-FlextResult = get_service_result()
 
 
 # Funções de fábrica
@@ -155,7 +150,7 @@ def configure_quality_dependencies() -> None:
 
 
 def get_quality_container() -> QualityContainer:
-    global _container
+    global _container  # noqa: PLW0602
     if _container is None:
         configure_quality_dependencies()
     # Ensure container is properly initialized
