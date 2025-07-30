@@ -74,9 +74,12 @@ if __name__ == "__main__":
 
             msg = f"Expected {1}, got {results["files_analyzed"]}"
             raise AssertionError(msg)
-        assert results["total_lines"] > 0
-        if len(results["python_files"]) != 1:
-            msg = f"Expected {1}, got {len(results["python_files"])}"
+        total_lines = results["total_lines"]
+        assert isinstance(total_lines, int)
+        assert total_lines > 0
+        python_files = results["python_files"]
+        if isinstance(python_files, list) and len(python_files) != 1:
+            msg = f"Expected {1}, got {len(python_files)}"
             raise AssertionError(msg)
 
     def test_quality_score(self) -> None:

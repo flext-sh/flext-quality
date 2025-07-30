@@ -10,8 +10,6 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
-import pytest
-
 from flext_quality.analyzer import CodeAnalyzer
 
 
@@ -91,7 +89,10 @@ def function2():
 
             # Should detect high similarity
             issues = results.get("issues", {})
-            duplicates = issues.get("duplicates", [])
+            if isinstance(issues, dict):
+                duplicates = issues.get("duplicates", [])
+            else:
+                duplicates = []
 
             # Should find similarity above threshold
             assert len(duplicates) > 0
@@ -191,9 +192,12 @@ def invalid_syntax(
 
                 # Should handle error gracefully and continue
                 assert "issues" in results
-                assert "security" in results["issues"]
+                issues = results["issues"]
+                assert isinstance(issues, dict)
+                assert "security" in issues
                 # Security issues should be empty due to read error
-                assert isinstance(results["issues"]["security"], list)
+                security_issues = issues["security"]
+                assert isinstance(security_issues, list)
 
     def test_analyze_dead_code_with_file_read_error(self) -> None:
         """Test _analyze_dead_code handles file read errors."""
@@ -213,8 +217,11 @@ def invalid_syntax(
 
                 # Should handle error gracefully
                 assert "issues" in results
-                assert "dead_code" in results["issues"]
-                assert isinstance(results["issues"]["dead_code"], list)
+                issues = results["issues"]
+                assert isinstance(issues, dict)
+                assert "dead_code" in issues
+                dead_code_issues = issues["dead_code"]
+                assert isinstance(dead_code_issues, list)
 
     def test_analyze_duplicates_with_file_read_error(self) -> None:
         """Test _analyze_duplicates handles file read errors."""
@@ -236,8 +243,11 @@ def invalid_syntax(
 
                 # Should handle error gracefully
                 assert "issues" in results
-                assert "duplicates" in results["issues"]
-                assert isinstance(results["issues"]["duplicates"], list)
+                issues = results["issues"]
+                assert isinstance(issues, dict)
+                assert "duplicates" in issues
+                duplicates_issues = issues["duplicates"]
+                assert isinstance(duplicates_issues, list)
 
     def test_find_python_files_nonexistent_path(self) -> None:
         """Test _find_python_files with non-existent project path."""
@@ -265,7 +275,9 @@ import json
             results = analyzer.analyze_project(include_dead_code=True)
 
             # Should detect unused imports with comments
-            dead_code_issues = results["issues"]["dead_code"]
+            issues = results["issues"]
+            assert isinstance(issues, dict)
+            dead_code_issues = issues["dead_code"]
             assert len(dead_code_issues) >= 2  # Should find both unused imports
 
             # Check that it found the specific unused imports
@@ -286,7 +298,7 @@ import json
                     "complexity": [],
                     "dead_code": [],
                     "duplicates": [],
-                }
+                },
             }
 
             # Should get perfect score and A+ grade

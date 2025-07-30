@@ -6,14 +6,16 @@ Tests all branches, error paths, and integration scenarios for production-grade 
 
 from __future__ import annotations
 
-import ast
 import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from flext_quality.analyzer import CodeAnalyzer
+from tests.helpers import (
+    assert_analysis_results_structure,
+    assert_issues_structure,
+    assert_metrics_structure,
+)
 
 
 class TestCodeAnalyzerComprehensive:
@@ -57,8 +59,8 @@ class TestCodeAnalyzerComprehensive:
         assert "python_files" in metrics
 
         # Verify issues structure
-        issues = results["issues"]
-        assert isinstance(issues, dict)
+        # Use DRY helper for type-safe issues access
+        issues = assert_issues_structure(results["issues"])
         assert "security" in issues
         assert "complexity" in issues
         assert "dead_code" in issues
@@ -76,7 +78,8 @@ class TestCodeAnalyzerComprehensive:
             include_duplicates=False,
         )
 
-        issues = results["issues"]
+        # Use DRY helper for type-safe issues access
+        issues = assert_issues_structure(results["issues"])
         assert "security" in issues
         assert "complexity" in issues
         # When disabled, these should be empty lists
@@ -99,7 +102,8 @@ class TestCodeAnalyzerComprehensive:
         assert "issues" in results
 
         # But all issue types should be empty when disabled
-        issues = results["issues"]
+        # Use DRY helper for type-safe issues access
+        issues = assert_issues_structure(results["issues"])
         assert issues.get("security", []) == []
         assert issues.get("complexity", []) == []
         assert issues.get("dead_code", []) == []
@@ -163,7 +167,7 @@ class TestCodeAnalyzerComprehensive:
 
     def test_internal_analyze_file_with_syntax_error(self) -> None:
         """Test _analyze_file with file containing syntax errors."""
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
+        with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".py", delete=False) as f:
             f.write("def broken_function(\n")  # Intentional syntax error
             f.flush()
 
@@ -187,7 +191,7 @@ class TestCodeAnalyzerComprehensive:
         """Test _calculate_overall_metrics with multiple file metrics."""
         analyzer = CodeAnalyzer(temporary_project_structure)
 
-        file_metrics = [
+        file_metrics: list[dict[str, object]] = [
             {"lines_of_code": 50, "complexity": 5, "function_count": 3, "class_count": 1},
             {"lines_of_code": 30, "complexity": 3, "function_count": 2, "class_count": 0},
             {"lines_of_code": 20, "complexity": 2, "function_count": 1, "class_count": 1},
@@ -216,7 +220,7 @@ class TestCodeAnalyzerComprehensive:
         """Test _calculate_overall_metrics with single file."""
         with tempfile.TemporaryDirectory() as tmp_dir:
             analyzer = CodeAnalyzer(tmp_dir)
-        file_metrics = [{"lines_of_code": 42, "complexity": 7, "function_count": 5, "class_count": 2}]
+        file_metrics: list[dict[str, object]] = [{"lines_of_code": 42, "complexity": 7, "function_count": 5, "class_count": 2}]
 
         overall = analyzer._calculate_overall_metrics(file_metrics)
 
@@ -286,7 +290,11 @@ def complex_function(x):
 """)
 
         analyzer = CodeAnalyzer(temporary_project_structure)
-        issues = analyzer._analyze_complexity()
+        # Create sample file metrics for complexity analysis
+        file_metrics: list[dict[str, object]] = [
+            {"complexity": 15, "file_path": "complex_test.py"},
+        ]
+        issues = analyzer._analyze_complexity(file_metrics)
 
         assert isinstance(issues, list)
         # Should detect complexity issues
@@ -300,7 +308,9 @@ def complex_function(x):
         """Test _analyze_complexity with empty directory."""
         with tempfile.TemporaryDirectory() as temp_dir:
             analyzer = CodeAnalyzer(temp_dir)
-            issues = analyzer._analyze_complexity()
+            # Empty file metrics for no files scenario
+            file_metrics: list[dict[str, object]] = []
+            issues = analyzer._analyze_complexity(file_metrics)
             assert isinstance(issues, list)
             assert len(issues) == 0
 
@@ -409,7 +419,7 @@ def handle_data(data):
         mock_log: MagicMock,
         mock_metric: MagicMock,
         mock_trace: MagicMock,
-        temporary_project_structure: str
+        temporary_project_structure: str,
     ) -> None:
         """Test integration with flext-observability components."""
         analyzer = CodeAnalyzer(temporary_project_structure)
@@ -495,28 +505,28 @@ def complex_calculation(x, y, z):
             include_duplicates=True,
         )
 
-        # Verify comprehensive results
-        assert isinstance(results, dict)
+        # Verify comprehensive results using DRY helpers
+        validated_results = assert_analysis_results_structure(results)
 
-        # Check metrics
-        metrics = results["metrics"]
+        # Check metrics using type-safe helper
+        metrics = assert_metrics_structure(validated_results["metrics"])
         assert metrics["total_files"] >= 2
         assert metrics["total_lines_of_code"] > 20
         assert metrics["total_functions"] >= 2
         assert metrics["total_classes"] >= 1
         assert metrics["average_complexity"] > 0
 
-        # Check issues structure
-        issues = results["issues"]
+        # Check issues structure using type-safe helper
+        issues = assert_issues_structure(validated_results["issues"])
         assert "security" in issues
         assert "complexity" in issues
         assert "dead_code" in issues
         assert "duplicates" in issues
 
-        # Check files list
-        assert "files" in results
-        file_list = results["files"]
-        assert isinstance(file_list, list)
+        # Check files list using type-safe access
+        from tests.helpers import assert_is_list
+        file_list = validated_results["files"]
+        assert_is_list(file_list)
         assert len(file_list) >= 2
 
     def test_edge_case_ast_parsing_with_encoding_issues(self) -> None:
@@ -531,7 +541,7 @@ def test_unicode():
 
             with tempfile.TemporaryDirectory() as tmp_dir:
                 analyzer = CodeAnalyzer(tmp_dir)
-            metrics = analyzer.analyze_file(Path(f.name))
+            metrics = analyzer._analyze_file(Path(f.name))
 
             # Should handle unicode properly
             assert metrics["function_count"] == 1

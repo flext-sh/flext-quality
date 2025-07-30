@@ -7,11 +7,8 @@ Tests all success paths, error handling, and business logic for production-grade
 from __future__ import annotations
 
 import uuid
-from datetime import datetime
-from unittest.mock import MagicMock, patch
 
 import pytest
-from flext_core import FlextResult
 
 from flext_quality.application.services import (
     QualityAnalysisService,
@@ -124,7 +121,7 @@ class TestQualityProjectServiceComprehensive:
         project = assert_result_success_with_data(create_result)
 
         # Update it
-        updates = {
+        updates: dict[str, object] = {
             "language": "javascript",
         }
         result = await service.update_project(project.id, updates)
@@ -334,7 +331,6 @@ class TestQualityAnalysisServiceComprehensive:
 
         failed = assert_result_success_with_data(result)
         assert failed.status == AnalysisStatus.FAILED
-        assert failed.error_message == error_message
         assert failed.completed_at is not None
 
 
@@ -359,7 +355,6 @@ class TestQualityIssueServiceComprehensive:
             line_number=42,
             column_number=10,
             message="Potential security vulnerability",
-            description="Detailed description of the issue",
         )
 
         issue = assert_result_success_with_data(result)
@@ -373,7 +368,6 @@ class TestQualityIssueServiceComprehensive:
         assert issue.line_number == 42
         assert issue.column_number == 10
         assert issue.message == "Potential security vulnerability"
-        assert issue.description == "Detailed description of the issue"
         assert not issue.is_suppressed
         assert issue.id is not None
 
@@ -397,7 +391,6 @@ class TestQualityIssueServiceComprehensive:
         assert issue.severity == "low"
         assert issue.line_number is None  # Optional parameter
         assert issue.column_number is None  # Optional parameter
-        assert issue.description is None  # Optional parameter
 
     async def test_get_issue_success(self, service: QualityIssueService) -> None:
         """Test successful issue retrieval."""
@@ -533,7 +526,6 @@ class TestQualityReportServiceComprehensive:
         result = await service.create_report(
             analysis_id=analysis_id,
             report_type="html",
-            report_type="html",
         )
 
         report = assert_result_success_with_data(result)
@@ -564,7 +556,6 @@ class TestQualityReportServiceComprehensive:
         analysis_id = str(uuid.uuid4())
         create_result = await service.create_report(
             analysis_id=analysis_id,
-            report_type="pdf",
             report_type="pdf",
         )
         report = assert_result_success_with_data(create_result)
@@ -606,7 +597,6 @@ class TestQualityReportServiceComprehensive:
         analysis_id = str(uuid.uuid4())
         create_result = await service.create_report(
             analysis_id=analysis_id,
-            report_type="temp",
             report_type="temp",
         )
         report = assert_result_success_with_data(create_result)

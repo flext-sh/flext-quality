@@ -13,8 +13,6 @@ from io import StringIO
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-import pytest
-
 from flext_quality.cli import (
     analyze_project,
     another_function,
@@ -26,13 +24,32 @@ from flext_quality.cli import (
 class TestAnalyzeProjectComprehensive:
     """Comprehensive functional tests for analyze_project CLI function."""
 
+    def _create_analyze_args(
+        self,
+        path: str,
+        output: str | None = None,
+        format_type: str = "text",
+        verbose: bool = False,
+    ) -> argparse.Namespace:
+        """DRY helper: Create analyze_project arguments."""
+        return argparse.Namespace(
+            path=path,
+            output=output,
+            format=format_type,
+            verbose=verbose,
+            include_security=True,
+            include_complexity=True,
+            include_dead_code=True,
+            include_duplicates=True,
+        )
+
     def test_analyze_project_valid_path_default_params(self, temporary_project_structure: str) -> None:
         """Test analyze_project with valid path and default parameters."""
         args = argparse.Namespace(
             path=temporary_project_structure,
             output=None,
             format="text",
-            verbose=False
+            verbose=False,
         )
         result = analyze_project(args)
 
@@ -41,7 +58,7 @@ class TestAnalyzeProjectComprehensive:
 
     def test_analyze_project_valid_path_with_output_file(self, temporary_project_structure: str) -> None:
         """Test analyze_project with output file specified."""
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+        with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".json", delete=False) as f:
             output_file = f.name
 
         result = analyze_project(temporary_project_structure, output_file=output_file)
@@ -55,16 +72,7 @@ class TestAnalyzeProjectComprehensive:
 
     def test_analyze_project_with_format_json(self, temporary_project_structure: str) -> None:
         """Test analyze_project with JSON format."""
-        args = argparse.Namespace(
-            path=temporary_project_structure,
-            output=None,
-            format="json",
-            verbose=False,
-            include_security=True,
-            include_complexity=True,
-            include_dead_code=True,
-            include_duplicates=True
-        )
+        args = self._create_analyze_args(temporary_project_structure, format_type="json")
         result = analyze_project(args)
 
         # Should return success code
@@ -80,7 +88,7 @@ class TestAnalyzeProjectComprehensive:
             include_security=True,
             include_complexity=True,
             include_dead_code=True,
-            include_duplicates=True
+            include_duplicates=True,
         )
         result = analyze_project(args)
 
@@ -89,21 +97,24 @@ class TestAnalyzeProjectComprehensive:
 
     def test_analyze_project_with_verbose_true(self, temporary_project_structure: str) -> None:
         """Test analyze_project with verbose output enabled."""
-        result = analyze_project(temporary_project_structure, verbose=True)
+        args = self._create_analyze_args(temporary_project_structure, verbose=True)
+        result = analyze_project(args)
 
         # Should return success code
         assert result == 0
 
     def test_analyze_project_with_verbose_false(self, temporary_project_structure: str) -> None:
         """Test analyze_project with verbose output disabled."""
-        result = analyze_project(temporary_project_structure, verbose=False)
+        args = self._create_analyze_args(temporary_project_structure, verbose=False)
+        result = analyze_project(args)
 
         # Should return success code
         assert result == 0
 
     def test_analyze_project_nonexistent_path(self) -> None:
         """Test analyze_project with nonexistent path."""
-        result = analyze_project("/nonexistent/path")
+        args = self._create_analyze_args("/nonexistent/path")
+        result = analyze_project(args)
 
         # Should return error code
         assert result != 0
@@ -149,7 +160,7 @@ class TestAnalyzeProjectComprehensive:
         self,
         mock_report_class: MagicMock,
         mock_analyzer_class: MagicMock,
-        temporary_project_structure: str
+        temporary_project_structure: str,
     ) -> None:
         """Test analyze_project with JSON output to file."""
         # Setup mocks
@@ -162,13 +173,13 @@ class TestAnalyzeProjectComprehensive:
         mock_report.to_json.return_value = '{"report": "data"}'
         mock_report_class.return_value = mock_report
 
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+        with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".json", delete=False) as f:
             output_file = f.name
 
         result = analyze_project(
             temporary_project_structure,
             output_file=output_file,
-            format="json"
+            format="json",
         )
 
         # Should return success code
@@ -183,7 +194,7 @@ class TestAnalyzeProjectComprehensive:
         self,
         mock_report_class: MagicMock,
         mock_analyzer_class: MagicMock,
-        temporary_project_structure: str
+        temporary_project_structure: str,
     ) -> None:
         """Test analyze_project with JSON format but no output file."""
         # Setup mocks
@@ -212,16 +223,22 @@ class TestAnalyzeProjectComprehensive:
 class TestAnotherFunctionComprehensive:
     """Comprehensive functional tests for another_function CLI function."""
 
+    def _create_score_args(self, path: str) -> argparse.Namespace:
+        """DRY helper: Create another_function arguments."""
+        return argparse.Namespace(path=path)
+
     def test_another_function_valid_path_good_score(self, temporary_project_structure: str) -> None:
         """Test another_function with valid path resulting in good score."""
-        result = another_function(temporary_project_structure)
+        args = self._create_score_args(temporary_project_structure)
+        result = another_function(args)
 
         # Should return success code
         assert result == 0
 
     def test_another_function_nonexistent_path(self) -> None:
         """Test another_function with nonexistent path."""
-        result = another_function("/nonexistent/path")
+        args = self._create_score_args("/nonexistent/path")
+        result = another_function(args)
 
         # Should return error code
         assert result != 0
@@ -235,7 +252,8 @@ class TestAnotherFunctionComprehensive:
         mock_analyzer.get_quality_score.return_value = 45.0  # Below 75 threshold
         mock_analyzer_class.return_value = mock_analyzer
 
-        result = another_function(temporary_project_structure)
+        args = self._create_score_args(temporary_project_structure)
+        result = another_function(args)
 
         # Should return error code for low score
         assert result != 0
@@ -249,7 +267,8 @@ class TestAnotherFunctionComprehensive:
         mock_analyzer.get_quality_score.return_value = 85.0  # Above 75 threshold
         mock_analyzer_class.return_value = mock_analyzer
 
-        result = another_function(temporary_project_structure)
+        args = self._create_score_args(temporary_project_structure)
+        result = another_function(args)
 
         # Should return success code for high score
         assert result == 0
@@ -262,7 +281,8 @@ class TestAnotherFunctionComprehensive:
         mock_analyzer.analyze_project.side_effect = RuntimeError("Analysis failed")
         mock_analyzer_class.return_value = mock_analyzer
 
-        result = another_function(temporary_project_structure)
+        args = self._create_score_args(temporary_project_structure)
+        result = another_function(args)
 
         # Should return error code
         assert result != 0
@@ -312,7 +332,7 @@ class TestMainFunctionComprehensive:
         self,
         mock_analyze: MagicMock,
         mock_setup_logging: MagicMock,
-        temporary_project_structure: str
+        temporary_project_structure: str,
     ) -> None:
         """Test main function with analyze command."""
         mock_analyze.return_value = 0
@@ -332,7 +352,7 @@ class TestMainFunctionComprehensive:
         self,
         mock_analyze: MagicMock,
         mock_setup_logging: MagicMock,
-        temporary_project_structure: str
+        temporary_project_structure: str,
     ) -> None:
         """Test main function with analyze command and verbose flag."""
         mock_analyze.return_value = 0
@@ -346,7 +366,7 @@ class TestMainFunctionComprehensive:
             temporary_project_structure,
             output_file=None,
             format="text",
-            verbose=True
+            verbose=True,
         )
         assert result == 0
 
@@ -356,7 +376,7 @@ class TestMainFunctionComprehensive:
         self,
         mock_analyze: MagicMock,
         mock_setup_logging: MagicMock,
-        temporary_project_structure: str
+        temporary_project_structure: str,
     ) -> None:
         """Test main function with analyze command and output file."""
         mock_analyze.return_value = 0
@@ -369,7 +389,7 @@ class TestMainFunctionComprehensive:
             temporary_project_structure,
             output_file="output.json",
             format="text",
-            verbose=False
+            verbose=False,
         )
         assert result == 0
 
@@ -379,7 +399,7 @@ class TestMainFunctionComprehensive:
         self,
         mock_analyze: MagicMock,
         mock_setup_logging: MagicMock,
-        temporary_project_structure: str
+        temporary_project_structure: str,
     ) -> None:
         """Test main function with analyze command and format option."""
         mock_analyze.return_value = 0
@@ -392,7 +412,7 @@ class TestMainFunctionComprehensive:
             temporary_project_structure,
             output_file=None,
             format="json",
-            verbose=False
+            verbose=False,
         )
         assert result == 0
 
@@ -402,7 +422,7 @@ class TestMainFunctionComprehensive:
         self,
         mock_another: MagicMock,
         mock_setup_logging: MagicMock,
-        temporary_project_structure: str
+        temporary_project_structure: str,
     ) -> None:
         """Test main function with score command."""
         mock_another.return_value = 0
@@ -443,7 +463,7 @@ class TestMainFunctionComprehensive:
         self,
         mock_analyze: MagicMock,
         mock_setup_logging: MagicMock,
-        temporary_project_structure: str
+        temporary_project_structure: str,
     ) -> None:
         """Test main function when analyze command fails."""
         mock_analyze.return_value = 1  # Error code
@@ -460,7 +480,7 @@ class TestMainFunctionComprehensive:
         self,
         mock_another: MagicMock,
         mock_setup_logging: MagicMock,
-        temporary_project_structure: str
+        temporary_project_structure: str,
     ) -> None:
         """Test main function when score command fails."""
         mock_another.return_value = 1  # Error code
@@ -477,7 +497,7 @@ class TestMainFunctionComprehensive:
         self,
         mock_analyze: MagicMock,
         mock_setup_logging: MagicMock,
-        temporary_project_structure: str
+        temporary_project_structure: str,
     ) -> None:
         """Test main function with all options combined."""
         mock_analyze.return_value = 0
@@ -488,7 +508,7 @@ class TestMainFunctionComprehensive:
             temporary_project_structure,
             "--verbose",
             "-o", "report.json",
-            "-f", "json"
+            "-f", "json",
         ]
         with patch.object(sys, "argv", test_args):
             result = main()
@@ -497,7 +517,7 @@ class TestMainFunctionComprehensive:
             temporary_project_structure,
             output_file="report.json",
             format="json",
-            verbose=True
+            verbose=True,
         )
         assert result == 0
 
@@ -516,11 +536,12 @@ class TestCLIIntegration:
     def test_end_to_end_score_flow(self, temporary_project_structure: str) -> None:
         """Test complete end-to-end score flow."""
         # This test uses real implementations without mocking
-        result = another_function(temporary_project_structure)
+        args = self._create_score_args(temporary_project_structure)
+        result = another_function(args)
 
         # Should complete (result depends on actual code quality)
         assert isinstance(result, int)
-        assert result in [0, 1]  # Valid return codes
+        assert result in {0, 1}  # Valid return codes
 
     def test_main_function_integration(self, temporary_project_structure: str) -> None:
         """Test main function integration without mocking."""
