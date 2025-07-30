@@ -295,7 +295,11 @@ class TestRepositoryIntegration:
                 self.status = status
 
             def __eq__(self, other: object) -> bool:
-                return isinstance(other, TestEntity) and self.id == other.id and self.status == other.status
+                return (
+                    isinstance(other, TestEntity)
+                    and self.id == other.id
+                    and self.status == other.status
+                )
 
             def __hash__(self) -> int:
                 return hash((self.id, self.status))

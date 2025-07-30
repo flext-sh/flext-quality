@@ -143,6 +143,7 @@ class TestHandlerIntegration:
             else:
                 # Create a mock result for handlers without handle method
                 from flext_core import FlextResult
+
                 result = FlextResult.ok("Mock success")
             assert result.is_success
             assert result.data is not None

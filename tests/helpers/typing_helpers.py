@@ -77,7 +77,9 @@ def safe_list_access(data: object, index: int) -> Any:
 
     """
     assert_is_list(data)
-    assert 0 <= index < len(data), f"Index {index} out of bounds for list of length {len(data)}"
+    assert 0 <= index < len(data), (
+        f"Index {index} out of bounds for list of length {len(data)}"
+    )
     return data[index]
 
 
@@ -146,4 +148,6 @@ def assert_issues_structure(issues: object) -> dict[str, Any]:
         AssertionError: If structure is invalid
 
     """
-    return assert_dict_structure(issues, ["security", "complexity", "dead_code", "duplicates"])
+    return assert_dict_structure(
+        issues, ["security", "complexity", "dead_code", "duplicates"],
+    )

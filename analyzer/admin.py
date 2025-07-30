@@ -61,12 +61,19 @@ class ProjectAdmin(admin.ModelAdmin[Project]):
         ),
     )
 
-    @admin.display(description="Latest Score", ordering="analysissession__overall_score")
+    @admin.display(
+        description="Latest Score", ordering="analysissession__overall_score",
+    )
     def latest_score(self, obj: Project) -> str:
         """Display the latest analysis score."""
         # Get the latest analysis session using reverse relationship from AnalysisSession
         from analyzer.models import AnalysisSession
-        latest = AnalysisSession.objects.filter(flx_project=obj).order_by("-created_at").first()
+
+        latest = (
+            AnalysisSession.objects.filter(flx_project=obj)
+            .order_by("-created_at")
+            .first()
+        )
         if latest and latest.overall_score:
             color = (
                 "green"

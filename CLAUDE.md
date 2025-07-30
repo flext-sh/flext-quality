@@ -282,6 +282,7 @@ The service uses multiple configuration approaches:
 - **Analysis Config**: Per-analysis configuration in QualityAnalysis entity
 
 Key configuration files:
+
 - `pyproject.toml`: Primary configuration for tools and dependencies
 - `code_analyzer_web/settings.py`: Django configuration
 - `Makefile`: Development workflow and quality gates
@@ -289,41 +290,50 @@ Key configuration files:
 ## TODO: GAPS DE ARQUITETURA IDENTIFICADOS - PRIORIDADE ALTA
 
 ### 🚨 GAP 1: Integration com Ecosystem Services Missing
+
 **Status**: ALTO - Quality service não integrado com outros services
 **Problema**:
+
 - Django web interface não integra com flext-web ou flext-api
 - Quality analysis não conecta com flext-observability metrics
 - Não tem CLI integration com flext-cli
 - Reports não acessíveis via ecosystem dashboard
 
 **TODO**:
+
 - [ ] Integrar Django interface com flext-web patterns
 - [ ] Conectar quality metrics com flext-observability
 - [ ] Criar quality commands para flext-cli
 - [ ] Implementar quality dashboard no ecosystem web interface
 
 ### 🚨 GAP 2: Multi-Project Analysis Not Ecosystem-Aware
+
 **Status**: ALTO - Workspace analysis não conhece ecosystem structure
 **Problema**:
+
 - `make workspace-analyze` não entende 32-project ecosystem structure
 - Quality thresholds não diferenciados por tipo de project (core, service, tap, target)
 - Cross-project dependency analysis missing
 - Ecosystem-wide quality metrics não consolidados
 
 **TODO**:
+
 - [ ] Implementar ecosystem-aware analysis patterns
 - [ ] Criar quality thresholds específicos por project type
 - [ ] Implementar cross-project dependency quality analysis
 - [ ] Criar consolidated ecosystem quality dashboard
 
 ### 🚨 GAP 3: Django vs Clean Architecture Inconsistency
+
 **Status**: ALTO - Django patterns conflitam com Clean Architecture
 **Problema**:
+
 - Django usado para web interface vs flext-web Flask patterns
 - Django ORM vs flext-core domain patterns
 - Django settings vs flext-core configuration patterns
 
 **TODO**:
+
 - [ ] Refatorar para usar flext-web patterns ou justificar Django choice
 - [ ] Integrar Django models com flext-core domain entities
 - [ ] Migrar Django settings para flext-core configuration patterns

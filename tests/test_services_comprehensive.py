@@ -37,7 +37,9 @@ class TestQualityProjectServiceComprehensive:
         """Create service instance."""
         return QualityProjectService()
 
-    async def test_create_project_success_minimal_params(self, service: QualityProjectService, secure_temp_dir: str) -> None:
+    async def test_create_project_success_minimal_params(
+        self, service: QualityProjectService, secure_temp_dir: str,
+    ) -> None:
         """Test successful project creation with minimal parameters."""
         result = await service.create_project(
             name="minimal_project",
@@ -52,7 +54,9 @@ class TestQualityProjectServiceComprehensive:
         assert project.repository_url is None
         assert project.id is not None
 
-    async def test_create_project_success_full_params(self, service: QualityProjectService, secure_temp_dir: str) -> None:
+    async def test_create_project_success_full_params(
+        self, service: QualityProjectService, secure_temp_dir: str,
+    ) -> None:
         """Test successful project creation with all parameters."""
         result = await service.create_project(
             name="full_project",
@@ -68,7 +72,9 @@ class TestQualityProjectServiceComprehensive:
         assert project.language == "go"
         assert project.repository_url == "https://github.com/test/repo"
 
-    async def test_get_project_success(self, service: QualityProjectService, secure_temp_dir: str) -> None:
+    async def test_get_project_success(
+        self, service: QualityProjectService, secure_temp_dir: str,
+    ) -> None:
         """Test successful project retrieval."""
         # First create a project
         create_result = await service.create_project(
@@ -99,7 +105,9 @@ class TestQualityProjectServiceComprehensive:
         assert isinstance(projects, list)
         assert len(projects) == 0
 
-    async def test_list_projects_with_data(self, service: QualityProjectService, secure_temp_dir: str) -> None:
+    async def test_list_projects_with_data(
+        self, service: QualityProjectService, secure_temp_dir: str,
+    ) -> None:
         """Test list_projects with existing projects."""
         # Create multiple projects
         await service.create_project("project1", secure_temp_dir)
@@ -114,7 +122,9 @@ class TestQualityProjectServiceComprehensive:
         paths = [p.project_path for p in projects]
         assert secure_temp_dir in paths
 
-    async def test_update_project_success(self, service: QualityProjectService, secure_temp_dir: str) -> None:
+    async def test_update_project_success(
+        self, service: QualityProjectService, secure_temp_dir: str,
+    ) -> None:
         """Test successful project update."""
         # Create a project
         create_result = await service.create_project("original_name", secure_temp_dir)
@@ -130,14 +140,20 @@ class TestQualityProjectServiceComprehensive:
         assert updated_project.language == "javascript"
         assert updated_project.id == project.id  # ID should remain the same
 
-    async def test_update_project_not_found(self, service: QualityProjectService) -> None:
+    async def test_update_project_not_found(
+        self, service: QualityProjectService,
+    ) -> None:
         """Test update_project with non-existent ID."""
-        result = await service.update_project("non-existent-id", {"language": "new_language"})
+        result = await service.update_project(
+            "non-existent-id", {"language": "new_language"},
+        )
 
         error = assert_result_failure_with_error(result)
         assert "Project not found" in error
 
-    async def test_delete_project_success(self, service: QualityProjectService, secure_temp_dir: str) -> None:
+    async def test_delete_project_success(
+        self, service: QualityProjectService, secure_temp_dir: str,
+    ) -> None:
         """Test successful project deletion."""
         # Create a project
         create_result = await service.create_project("to_delete", secure_temp_dir)
@@ -152,7 +168,9 @@ class TestQualityProjectServiceComprehensive:
         get_result = await service.get_project(project.id)
         assert get_result.is_failure
 
-    async def test_delete_project_not_found(self, service: QualityProjectService) -> None:
+    async def test_delete_project_not_found(
+        self, service: QualityProjectService,
+    ) -> None:
         """Test delete_project with non-existent ID."""
         result = await service.delete_project("non-existent-id")
 
@@ -168,7 +186,9 @@ class TestQualityAnalysisServiceComprehensive:
         """Create service instance."""
         return QualityAnalysisService()
 
-    async def test_create_analysis_success(self, service: QualityAnalysisService) -> None:
+    async def test_create_analysis_success(
+        self, service: QualityAnalysisService,
+    ) -> None:
         """Test successful analysis creation."""
         project_id = str(uuid.uuid4())
 
@@ -195,7 +215,9 @@ class TestQualityAnalysisServiceComprehensive:
         assert retrieved.id == analysis.id
         assert retrieved.project_id == project_id
 
-    async def test_get_analysis_not_found(self, service: QualityAnalysisService) -> None:
+    async def test_get_analysis_not_found(
+        self, service: QualityAnalysisService,
+    ) -> None:
         """Test get_analysis with non-existent ID."""
         result = await service.get_analysis("non-existent-id")
 
@@ -220,7 +242,9 @@ class TestQualityAnalysisServiceComprehensive:
         for analysis in analyses:
             assert analysis.project_id == project_id
 
-    async def test_update_metrics_success(self, service: QualityAnalysisService) -> None:
+    async def test_update_metrics_success(
+        self, service: QualityAnalysisService,
+    ) -> None:
         """Test successful metrics update."""
         # Create an analysis
         project_id = str(uuid.uuid4())
@@ -244,7 +268,9 @@ class TestQualityAnalysisServiceComprehensive:
         assert updated.comment_lines == 100
         assert updated.blank_lines == 100
 
-    async def test_update_metrics_not_found(self, service: QualityAnalysisService) -> None:
+    async def test_update_metrics_not_found(
+        self, service: QualityAnalysisService,
+    ) -> None:
         """Test update_metrics with non-existent analysis."""
         result = await service.update_metrics(
             analysis_id="non-existent",
@@ -282,7 +308,9 @@ class TestQualityAnalysisServiceComprehensive:
         assert updated.security_score == 100.0
         assert updated.maintainability_score == 85.0
 
-    async def test_update_issue_counts_success(self, service: QualityAnalysisService) -> None:
+    async def test_update_issue_counts_success(
+        self, service: QualityAnalysisService,
+    ) -> None:
         """Test successful issue counts update."""
         # Create an analysis
         project_id = str(uuid.uuid4())
@@ -304,7 +332,9 @@ class TestQualityAnalysisServiceComprehensive:
         assert updated.medium_issues == 10
         assert updated.low_issues == 15
 
-    async def test_complete_analysis_success(self, service: QualityAnalysisService) -> None:
+    async def test_complete_analysis_success(
+        self, service: QualityAnalysisService,
+    ) -> None:
         """Test successful analysis completion."""
         # Create an analysis
         project_id = str(uuid.uuid4())
@@ -371,7 +401,9 @@ class TestQualityIssueServiceComprehensive:
         assert not issue.is_suppressed
         assert issue.id is not None
 
-    async def test_create_issue_minimal_params(self, service: QualityIssueService) -> None:
+    async def test_create_issue_minimal_params(
+        self, service: QualityIssueService,
+    ) -> None:
         """Test issue creation with minimal parameters."""
         analysis_id = str(uuid.uuid4())
 
@@ -536,7 +568,9 @@ class TestQualityReportServiceComprehensive:
         assert report.report_type == "html"
         assert report.id is not None
 
-    async def test_create_report_minimal_params(self, service: QualityReportService) -> None:
+    async def test_create_report_minimal_params(
+        self, service: QualityReportService,
+    ) -> None:
         """Test report creation with minimal parameters."""
         analysis_id = str(uuid.uuid4())
 
@@ -568,7 +602,9 @@ class TestQualityReportServiceComprehensive:
         assert retrieved.analysis_id == analysis_id
         assert retrieved.report_type == "pdf"
 
-    async def test_list_reports_by_analysis(self, service: QualityReportService) -> None:
+    async def test_list_reports_by_analysis(
+        self, service: QualityReportService,
+    ) -> None:
         """Test listing reports by analysis ID."""
         analysis_id = str(uuid.uuid4())
 

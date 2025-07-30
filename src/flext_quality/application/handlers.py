@@ -64,7 +64,10 @@ class AnalyzeProjectHandler:
                 flext_create_log_entry(
                     message=f"Failed to create analysis: {analysis_result.error}",
                     level="error",
-                    context={"handler": "AnalyzeProjectHandler", "project_id": str(project_id)},
+                    context={
+                        "handler": "AnalyzeProjectHandler",
+                        "project_id": str(project_id),
+                    },
                 )
                 return analysis_result
 
@@ -75,7 +78,11 @@ class AnalyzeProjectHandler:
             flext_create_log_entry(
                 message=f"Successfully created analysis for project {project_id}",
                 level="info",
-                context={"handler": "AnalyzeProjectHandler", "project_id": str(project_id), "analysis_id": getattr(analysis, "id", None)},
+                context={
+                    "handler": "AnalyzeProjectHandler",
+                    "project_id": str(project_id),
+                    "analysis_id": getattr(analysis, "id", None),
+                },
             )
 
             # Return the created analysis
@@ -85,7 +92,11 @@ class AnalyzeProjectHandler:
             flext_create_log_entry(
                 message=f"Unexpected error in AnalyzeProjectHandler: {e!s}",
                 level="error",
-                context={"handler": "AnalyzeProjectHandler", "project_id": str(project_id), "error": str(e)},
+                context={
+                    "handler": "AnalyzeProjectHandler",
+                    "project_id": str(project_id),
+                    "error": str(e),
+                },
             )
             return FlextResult.fail(f"Unexpected error: {e!s}")
 

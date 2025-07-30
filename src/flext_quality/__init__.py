@@ -3,7 +3,7 @@
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 
-Version 0.7.0 - Code Quality Analysis with simplified public API:
+Version 0.9.0 - Code Quality Analysis with simplified public API:
 - All common imports available from root: from flext_quality import QualityAPI
 - Built on flext-core foundation for robust quality analysis
 - Deprecation warnings for internal imports
@@ -26,7 +26,7 @@ from flext_quality.reports import QualityReport
 try:
     __version__ = importlib.metadata.version("flext-quality")
 except importlib.metadata.PackageNotFoundError:
-    __version__ = "0.7.0"
+    __version__ = "0.9.0"
 
 __version_info__ = tuple(int(x) for x in __version__.split(".") if x.isdigit())
 

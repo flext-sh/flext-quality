@@ -71,8 +71,7 @@ if __name__ == "__main__":
         )
 
         if results["files_analyzed"] != 1:
-
-            msg = f"Expected {1}, got {results["files_analyzed"]}"
+            msg = f"Expected {1}, got {results['files_analyzed']}"
             raise AssertionError(msg)
         total_lines = results["total_lines"]
         assert isinstance(total_lines, int)
@@ -100,5 +99,5 @@ if __name__ == "__main__":
 
         grade = analyzer.get_quality_grade()
         if grade != "A+":
-            msg = f"Expected {"A+"}, got {grade}"
+            msg = f"Expected {'A+'}, got {grade}"
             raise AssertionError(msg)

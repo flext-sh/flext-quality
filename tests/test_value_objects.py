@@ -100,8 +100,19 @@ class TestQualityGrade:
     def test_all_grades_exist(self) -> None:
         """Test all expected grades exist."""
         expected_grades = [
-            "A+", "A", "A-", "B+", "B", "B-",
-            "C+", "C", "C-", "D+", "D", "D-", "F",
+            "A+",
+            "A",
+            "A-",
+            "B+",
+            "B",
+            "B-",
+            "C+",
+            "C",
+            "C-",
+            "D+",
+            "D",
+            "D-",
+            "F",
         ]
 
         for grade in expected_grades:

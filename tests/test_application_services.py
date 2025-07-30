@@ -26,7 +26,9 @@ class TestQualityProjectService:
         return QualityProjectService()
 
     async def test_create_project_success(
-        self, service: QualityProjectService, secure_temp_dir: str,
+        self,
+        service: QualityProjectService,
+        secure_temp_dir: str,
     ) -> None:
         """Test successful project creation."""
         result = await service.create_project(
@@ -43,7 +45,9 @@ class TestQualityProjectService:
         assert result.data.language == "python"
 
     async def test_get_project_success(
-        self, service: QualityProjectService, secure_temp_dir: str,
+        self,
+        service: QualityProjectService,
+        secure_temp_dir: str,
     ) -> None:
         """Test getting an existing project."""
         # First create a project
@@ -66,7 +70,9 @@ class TestQualityProjectService:
         assert "not found" in error_msg.lower()
 
     async def test_list_projects(
-        self, service: QualityProjectService, secure_temp_dir: str,
+        self,
+        service: QualityProjectService,
+        secure_temp_dir: str,
     ) -> None:
         """Test listing projects."""
         # Create a few projects
@@ -78,7 +84,9 @@ class TestQualityProjectService:
         assert len(projects_data) == 2
 
     async def test_update_project(
-        self, service: QualityProjectService, secure_temp_dir: str,
+        self,
+        service: QualityProjectService,
+        secure_temp_dir: str,
     ) -> None:
         """Test updating a project."""
         # Create a project
@@ -92,14 +100,18 @@ class TestQualityProjectService:
         updated_data = assert_result_success_with_data(result)
         assert updated_data.language == "go"
 
-    async def test_update_project_not_found(self, service: QualityProjectService) -> None:
+    async def test_update_project_not_found(
+        self, service: QualityProjectService,
+    ) -> None:
         """Test updating a non-existent project."""
         result = await service.update_project("non-existent", {})
         error_msg = assert_result_failure_with_error(result)
         assert "not found" in error_msg.lower()
 
     async def test_delete_project(
-        self, service: QualityProjectService, secure_temp_dir: str,
+        self,
+        service: QualityProjectService,
+        secure_temp_dir: str,
     ) -> None:
         """Test deleting a project."""
         # Create a project
@@ -112,7 +124,9 @@ class TestQualityProjectService:
         assert result.is_success
         assert result.data is True
 
-    async def test_delete_project_not_found(self, service: QualityProjectService) -> None:
+    async def test_delete_project_not_found(
+        self, service: QualityProjectService,
+    ) -> None:
         """Test deleting a non-existent project."""
         result = await service.delete_project("non-existent")
         error_msg = assert_result_failure_with_error(result)

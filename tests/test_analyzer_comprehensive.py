@@ -34,7 +34,9 @@ class TestCodeAnalyzerComprehensive:
         assert analyzer.project_path == path_obj
         assert analyzer.analysis_results == {}
 
-    def test_analyze_project_all_features_enabled(self, temporary_project_structure: str) -> None:
+    def test_analyze_project_all_features_enabled(
+        self, temporary_project_structure: str,
+    ) -> None:
         """Test analyze_project with all analysis features enabled."""
         analyzer = CodeAnalyzer(temporary_project_structure)
 
@@ -66,7 +68,9 @@ class TestCodeAnalyzerComprehensive:
         assert "dead_code" in issues
         assert "duplicates" in issues
 
-    def test_analyze_project_selective_features(self, temporary_project_structure: str) -> None:
+    def test_analyze_project_selective_features(
+        self, temporary_project_structure: str,
+    ) -> None:
         """Test analyze_project with selective feature enabling."""
         analyzer = CodeAnalyzer(temporary_project_structure)
 
@@ -86,7 +90,9 @@ class TestCodeAnalyzerComprehensive:
         assert issues.get("dead_code", []) == []
         assert issues.get("duplicates", []) == []
 
-    def test_analyze_project_no_features(self, temporary_project_structure: str) -> None:
+    def test_analyze_project_no_features(
+        self, temporary_project_structure: str,
+    ) -> None:
         """Test analyze_project with all analysis features disabled."""
         analyzer = CodeAnalyzer(temporary_project_structure)
 
@@ -109,7 +115,9 @@ class TestCodeAnalyzerComprehensive:
         assert issues.get("dead_code", []) == []
         assert issues.get("duplicates", []) == []
 
-    def test_find_python_files_with_valid_project(self, temporary_project_structure: str) -> None:
+    def test_find_python_files_with_valid_project(
+        self, temporary_project_structure: str,
+    ) -> None:
         """Test _find_python_files with real project structure."""
         analyzer = CodeAnalyzer(temporary_project_structure)
 
@@ -137,7 +145,9 @@ class TestCodeAnalyzerComprehensive:
         python_files = analyzer._find_python_files()
         assert python_files == []
 
-    def test_internal_analyze_file_simple_valid_file(self, temporary_project_structure: str) -> None:
+    def test_internal_analyze_file_simple_valid_file(
+        self, temporary_project_structure: str,
+    ) -> None:
         """Test _analyze_file with simple valid Python file."""
         analyzer = CodeAnalyzer(temporary_project_structure)
         project_path = Path(temporary_project_structure)
@@ -167,7 +177,9 @@ class TestCodeAnalyzerComprehensive:
 
     def test_internal_analyze_file_with_syntax_error(self) -> None:
         """Test _analyze_file with file containing syntax errors."""
-        with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".py", delete=False) as f:
+        with tempfile.NamedTemporaryFile(
+            encoding="utf-8", mode="w", suffix=".py", delete=False,
+        ) as f:
             f.write("def broken_function(\n")  # Intentional syntax error
             f.flush()
 
@@ -187,14 +199,31 @@ class TestCodeAnalyzerComprehensive:
         # Should return None for non-existent files
         assert metrics is None
 
-    def test_calculate_overall_metrics_with_multiple_files(self, temporary_project_structure: str) -> None:
+    def test_calculate_overall_metrics_with_multiple_files(
+        self, temporary_project_structure: str,
+    ) -> None:
         """Test _calculate_overall_metrics with multiple file metrics."""
         analyzer = CodeAnalyzer(temporary_project_structure)
 
         file_metrics: list[dict[str, object]] = [
-            {"lines_of_code": 50, "complexity": 5, "function_count": 3, "class_count": 1},
-            {"lines_of_code": 30, "complexity": 3, "function_count": 2, "class_count": 0},
-            {"lines_of_code": 20, "complexity": 2, "function_count": 1, "class_count": 1},
+            {
+                "lines_of_code": 50,
+                "complexity": 5,
+                "function_count": 3,
+                "class_count": 1,
+            },
+            {
+                "lines_of_code": 30,
+                "complexity": 3,
+                "function_count": 2,
+                "class_count": 0,
+            },
+            {
+                "lines_of_code": 20,
+                "complexity": 2,
+                "function_count": 1,
+                "class_count": 1,
+            },
         ]
 
         overall = analyzer._calculate_overall_metrics(file_metrics)
@@ -220,7 +249,14 @@ class TestCodeAnalyzerComprehensive:
         """Test _calculate_overall_metrics with single file."""
         with tempfile.TemporaryDirectory() as tmp_dir:
             analyzer = CodeAnalyzer(tmp_dir)
-        file_metrics: list[dict[str, object]] = [{"lines_of_code": 42, "complexity": 7, "function_count": 5, "class_count": 2}]
+        file_metrics: list[dict[str, object]] = [
+            {
+                "lines_of_code": 42,
+                "complexity": 7,
+                "function_count": 5,
+                "class_count": 2,
+            },
+        ]
 
         overall = analyzer._calculate_overall_metrics(file_metrics)
 
@@ -398,7 +434,9 @@ def handle_data(data):
             assert isinstance(issues, list)
             assert len(issues) == 0
 
-    def test_analyze_duplicates_single_file(self, temporary_project_structure: str) -> None:
+    def test_analyze_duplicates_single_file(
+        self, temporary_project_structure: str,
+    ) -> None:
         """Test _analyze_duplicates with single file (no duplicates possible)."""
         # Create directory with only one file
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -437,7 +475,9 @@ def handle_data(data):
         args, kwargs = trace_call
         assert "trace_id" in kwargs or len(args) > 0
 
-    def test_analyze_project_integration_flow(self, temporary_project_structure: str) -> None:
+    def test_analyze_project_integration_flow(
+        self, temporary_project_structure: str,
+    ) -> None:
         """Test complete analyze_project integration flow with real files."""
         analyzer = CodeAnalyzer(temporary_project_structure)
 
@@ -525,13 +565,16 @@ def complex_calculation(x, y, z):
 
         # Check files list using type-safe access
         from tests.helpers import assert_is_list
+
         file_list = validated_results["files"]
         assert_is_list(file_list)
         assert len(file_list) >= 2
 
     def test_edge_case_ast_parsing_with_encoding_issues(self) -> None:
         """Test AST parsing with different file encodings."""
-        with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False, encoding="utf-8") as f:
+        with tempfile.NamedTemporaryFile(
+            mode="w", suffix=".py", delete=False, encoding="utf-8",
+        ) as f:
             f.write("""# -*- coding: utf-8 -*-
 def test_unicode():
     text = "Teste com acentos: ção, ã, é"
@@ -547,7 +590,9 @@ def test_unicode():
             assert metrics["function_count"] == 1
             assert "test_unicode" in metrics["functions"]
 
-    def test_ast_visitor_comprehensive_coverage(self, temporary_project_structure: str) -> None:
+    def test_ast_visitor_comprehensive_coverage(
+        self, temporary_project_structure: str,
+    ) -> None:
         """Test AST visitor with comprehensive Python constructs."""
         project_path = Path(temporary_project_structure)
         comprehensive_file = project_path / "comprehensive_test.py"
@@ -648,7 +693,20 @@ variable = "test"
         grade = analyzer.get_quality_grade()
 
         assert isinstance(grade, str)
-        assert grade in {"A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "F"}
+        assert grade in {
+            "A+",
+            "A",
+            "A-",
+            "B+",
+            "B",
+            "B-",
+            "C+",
+            "C",
+            "C-",
+            "D+",
+            "D",
+            "F",
+        }
 
     def test_get_quality_score_no_analysis(self) -> None:
         """Test get_quality_score without prior analysis."""
@@ -670,4 +728,17 @@ variable = "test"
 
         # Should return default grade when no analysis has been run
         assert isinstance(grade, str)
-        assert grade in {"A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "F"}
+        assert grade in {
+            "A+",
+            "A",
+            "A-",
+            "B+",
+            "B",
+            "B-",
+            "C+",
+            "C",
+            "C-",
+            "D+",
+            "D",
+            "F",
+        }

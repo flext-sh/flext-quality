@@ -41,6 +41,7 @@ class QualityProjectService:
     ) -> FlextResult[QualityProject]:
         try:
             from uuid import uuid4
+
             project = QualityProject(
                 id=str(uuid4()),
                 project_path=project_path,
@@ -158,13 +159,15 @@ class QualityAnalysisService:
                 return FlextResult.fail("Analysis not found")
 
             # Use immutable update pattern following flext-core guidelines
-            updated_analysis = analysis.model_copy(update={
-                "total_files": total_files,
-                "total_lines": total_lines,
-                "code_lines": code_lines,
-                "comment_lines": comment_lines,
-                "blank_lines": blank_lines,
-            })
+            updated_analysis = analysis.model_copy(
+                update={
+                    "total_files": total_files,
+                    "total_lines": total_lines,
+                    "code_lines": code_lines,
+                    "comment_lines": comment_lines,
+                    "blank_lines": blank_lines,
+                },
+            )
 
             # Store updated analysis
             self._analyses[analysis_id] = updated_analysis
@@ -188,13 +191,15 @@ class QualityAnalysisService:
                 return FlextResult.fail("Analysis not found")
 
             # Use immutable update pattern following flext-core guidelines
-            updated_analysis = analysis.model_copy(update={
-                "coverage_score": coverage_score,
-                "complexity_score": complexity_score,
-                "duplication_score": duplication_score,
-                "security_score": security_score,
-                "maintainability_score": maintainability_score,
-            })
+            updated_analysis = analysis.model_copy(
+                update={
+                    "coverage_score": coverage_score,
+                    "complexity_score": complexity_score,
+                    "duplication_score": duplication_score,
+                    "security_score": security_score,
+                    "maintainability_score": maintainability_score,
+                },
+            )
 
             # Calculate overall score using domain method
             final_analysis = updated_analysis.calculate_overall_score()
@@ -221,13 +226,15 @@ class QualityAnalysisService:
 
             # Use immutable update pattern following flext-core guidelines
             total_issues = critical + high + medium + low
-            updated_analysis = analysis.model_copy(update={
-                "critical_issues": critical,
-                "high_issues": high,
-                "medium_issues": medium,
-                "low_issues": low,
-                "total_issues": total_issues,
-            })
+            updated_analysis = analysis.model_copy(
+                update={
+                    "critical_issues": critical,
+                    "high_issues": high,
+                    "medium_issues": medium,
+                    "low_issues": low,
+                    "total_issues": total_issues,
+                },
+            )
 
             # Store updated analysis
             self._analyses[analysis_id] = updated_analysis
@@ -326,6 +333,7 @@ class QualityIssueService:
     ) -> FlextResult[QualityIssue]:
         try:
             from uuid import uuid4
+
             issue = QualityIssue(
                 id=str(uuid4()),
                 analysis_id=analysis_id,
@@ -437,6 +445,7 @@ class QualityReportService:
     ) -> FlextResult[QualityReport]:
         try:
             from uuid import uuid4
+
             report = QualityReport(
                 id=str(uuid4()),
                 analysis_id=analysis_id,
@@ -496,7 +505,9 @@ class BasePortService:
     SOLID: Dependency inversion principle.
     """
 
-    def __init__(self, port: object | None = None, repository: object | None = None) -> None:
+    def __init__(
+        self, port: object | None = None, repository: object | None = None,
+    ) -> None:
         self._port = port
         self._repository = repository
 

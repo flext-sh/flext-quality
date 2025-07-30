@@ -7,7 +7,7 @@ All entities use mixins from flext-core for maximum code reduction.
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timezone
+from datetime import UTC, datetime
 from enum import StrEnum
 
 from flext_core import FlextEntity, FlextResult, TAnyDict
@@ -73,6 +73,7 @@ class QualityProject(FlextEntity):
         if not self.project_path:
             return FlextResult.fail("Project path is required")
         return FlextResult.ok(None)
+
     analysis_schedule: str | None = None  # cron format
 
     # Quality thresholds
@@ -86,10 +87,12 @@ class QualityProject(FlextEntity):
 
     def update_last_analysis(self) -> QualityProject:
         """Update last analysis timestamp and return new instance."""
-        return self.model_copy(update={
-            "last_analysis_at": datetime.now(UTC),
-            "total_analyses": self.total_analyses + 1,
-        })
+        return self.model_copy(
+            update={
+                "last_analysis_at": datetime.now(UTC),
+                "total_analyses": self.total_analyses + 1,
+            },
+        )
 
 
 class QualityAnalysis(FlextEntity):
@@ -137,10 +140,12 @@ class QualityAnalysis(FlextEntity):
 
     def start_analysis(self) -> QualityAnalysis:
         """Start analysis and return new instance."""
-        return self.model_copy(update={
-            "started_at": datetime.now(UTC),
-            "status": AnalysisStatus.ANALYZING,
-        })
+        return self.model_copy(
+            update={
+                "started_at": datetime.now(UTC),
+                "status": AnalysisStatus.ANALYZING,
+            },
+        )
 
     def complete_analysis(self) -> QualityAnalysis:
         """Complete analysis and return new instance."""
@@ -150,11 +155,13 @@ class QualityAnalysis(FlextEntity):
             duration = completed_at - self.started_at
             duration_seconds = duration.total_seconds()
 
-        return self.model_copy(update={
-            "completed_at": completed_at,
-            "status": AnalysisStatus.COMPLETED,
-            "duration_seconds": duration_seconds,
-        })
+        return self.model_copy(
+            update={
+                "completed_at": completed_at,
+                "status": AnalysisStatus.COMPLETED,
+                "duration_seconds": duration_seconds,
+            },
+        )
 
     def fail_analysis(self, error: str) -> QualityAnalysis:
         """Fail analysis and return new instance."""
@@ -164,11 +171,13 @@ class QualityAnalysis(FlextEntity):
             duration = completed_at - self.started_at
             duration_seconds = duration.total_seconds()
 
-        return self.model_copy(update={
-            "completed_at": completed_at,
-            "status": AnalysisStatus.FAILED,
-            "duration_seconds": duration_seconds,
-        })
+        return self.model_copy(
+            update={
+                "completed_at": completed_at,
+                "status": AnalysisStatus.FAILED,
+                "duration_seconds": duration_seconds,
+            },
+        )
 
     def calculate_overall_score(self) -> QualityAnalysis:
         """Calculate overall score and return new instance."""
@@ -235,24 +244,30 @@ class QualityIssue(FlextEntity):
 
     def suppress(self, reason: str) -> QualityIssue:
         """Suppress issue and return new instance."""
-        return self.model_copy(update={
-            "is_suppressed": True,
-            "suppression_reason": reason,
-        })
+        return self.model_copy(
+            update={
+                "is_suppressed": True,
+                "suppression_reason": reason,
+            },
+        )
 
     def unsuppress(self) -> QualityIssue:
         """Unsuppress issue and return new instance."""
-        return self.model_copy(update={
-            "is_suppressed": False,
-            "suppression_reason": None,
-        })
+        return self.model_copy(
+            update={
+                "is_suppressed": False,
+                "suppression_reason": None,
+            },
+        )
 
     def increment_occurrence(self) -> QualityIssue:
         """Increment occurrence count and return new instance."""
-        return self.model_copy(update={
-            "occurrence_count": self.occurrence_count + 1,
-            "last_seen_at": datetime.now(UTC),
-        })
+        return self.model_copy(
+            update={
+                "occurrence_count": self.occurrence_count + 1,
+                "last_seen_at": datetime.now(UTC),
+            },
+        )
 
     def validate_domain_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality issue."""
@@ -328,10 +343,12 @@ class QualityReport(FlextEntity):
 
     def increment_access(self) -> QualityReport:
         """Increment access count and return new instance."""
-        return self.model_copy(update={
-            "access_count": self.access_count + 1,
-            "last_accessed_at": datetime.now(UTC),
-        })
+        return self.model_copy(
+            update={
+                "access_count": self.access_count + 1,
+                "last_accessed_at": datetime.now(UTC),
+            },
+        )
 
     def validate_domain_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality report."""
@@ -407,4 +424,5 @@ try:
 except Exception as e:
     # Log rebuild errors in development - should not affect runtime
     import logging
+
     logging.getLogger(__name__).debug("Model rebuild error: %s", e)

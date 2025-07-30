@@ -57,7 +57,8 @@ class TestQualityProjectServiceErrorScenarios:
         return QualityProjectService()
 
     async def test_create_project_exception_handling(
-        self, service: QualityProjectService,
+        self,
+        service: QualityProjectService,
     ) -> None:
         """Test exception handling in create_project - covers lines 58-59."""
         # Force exception by patching uuid4
@@ -72,7 +73,8 @@ class TestQualityProjectServiceErrorScenarios:
             assert "UUID generation failed" in error
 
     async def test_get_project_exception_handling(
-        self, service: QualityProjectService,
+        self,
+        service: QualityProjectService,
     ) -> None:
         """Test exception handling in get_project - covers lines 70-71."""
         # DRY: Use factory to create exception-throwing dict
@@ -86,7 +88,8 @@ class TestQualityProjectServiceErrorScenarios:
         assert "Storage corrupted" in error
 
     async def test_list_projects_exception_handling(
-        self, service: QualityProjectService,
+        self,
+        service: QualityProjectService,
     ) -> None:
         """Test exception handling in list_projects - covers lines 77-78."""
         # DRY: Use factory to create exception-throwing dict
@@ -100,7 +103,8 @@ class TestQualityProjectServiceErrorScenarios:
         assert "Invalid storage" in error
 
     async def test_update_project_exception_handling(
-        self, service: QualityProjectService,
+        self,
+        service: QualityProjectService,
     ) -> None:
         """Test exception handling in update_project - covers lines 97-98."""
         # DRY: Use factory to create exception-throwing dict
@@ -114,7 +118,8 @@ class TestQualityProjectServiceErrorScenarios:
         assert "Model copy failed" in error
 
     async def test_delete_project_exception_handling(
-        self, service: QualityProjectService,
+        self,
+        service: QualityProjectService,
     ) -> None:
         """Test exception handling in delete_project - covers lines 106-107."""
         # DRY: Use factory to create exception-throwing dict
@@ -137,7 +142,8 @@ class TestQualityAnalysisServiceErrorScenarios:
         return QualityAnalysisService()
 
     async def test_create_analysis_exception_handling(
-        self, service: QualityAnalysisService,
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test exception handling in create_analysis - covers lines 143-144."""
         # Force exception during uuid4 call
@@ -149,7 +155,8 @@ class TestQualityAnalysisServiceErrorScenarios:
             assert "Invalid parameters" in error
 
     async def test_update_metrics_exception_handling(
-        self, service: QualityAnalysisService,
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test exception handling in update_metrics - covers lines 173-174."""
         # DRY: Use factory to create exception-throwing dict
@@ -170,7 +177,8 @@ class TestQualityAnalysisServiceErrorScenarios:
         assert "Update failed" in error
 
     async def test_update_scores_exception_handling(
-        self, service: QualityAnalysisService,
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test exception handling in update_scores - covers lines 206-207."""
         # DRY: Use factory to create exception-throwing dict
@@ -191,7 +199,8 @@ class TestQualityAnalysisServiceErrorScenarios:
         assert "Calculation error" in error
 
     async def test_update_issue_counts_analysis_not_found(
-        self, service: QualityAnalysisService,
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test update_issue_counts when analysis not found - covers line 220."""
         result = await service.update_issue_counts(
@@ -206,7 +215,8 @@ class TestQualityAnalysisServiceErrorScenarios:
         assert "Analysis not found" in error
 
     async def test_complete_analysis_exception_handling(
-        self, service: QualityAnalysisService,
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test exception handling in complete_analysis - covers lines 255-256."""
         # DRY: Use factory to create exception-throwing dict
@@ -220,7 +230,8 @@ class TestQualityAnalysisServiceErrorScenarios:
         assert "Cannot complete" in error
 
     async def test_fail_analysis_exception_handling(
-        self, service: QualityAnalysisService,
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test exception handling in fail_analysis - covers lines 275-276."""
         # DRY: Use factory to create exception-throwing dict
@@ -234,7 +245,8 @@ class TestQualityAnalysisServiceErrorScenarios:
         assert "Cannot fail" in error
 
     async def test_get_analysis_exception_handling(
-        self, service: QualityAnalysisService,
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test exception handling in get_analysis - covers lines 287-288."""
         # DRY: Use factory to create exception-throwing dict
@@ -248,7 +260,8 @@ class TestQualityAnalysisServiceErrorScenarios:
         assert "Storage corrupted" in error
 
     async def test_list_analyses_exception_handling(
-        self, service: QualityAnalysisService,
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test exception handling in list_analyses - covers lines 301-302."""
         # DRY: Use factory to create exception-throwing dict
@@ -271,7 +284,8 @@ class TestQualityIssueServiceErrorScenarios:
         return QualityIssueService()
 
     async def test_create_issue_exception_handling(
-        self, service: QualityIssueService,
+        self,
+        service: QualityIssueService,
     ) -> None:
         """Test exception handling in create_issue - covers lines 347-348."""
         # Force exception during uuid4 call
@@ -290,7 +304,8 @@ class TestQualityIssueServiceErrorScenarios:
             assert "Invalid issue type" in error
 
     async def test_get_issue_exception_handling(
-        self, service: QualityIssueService,
+        self,
+        service: QualityIssueService,
     ) -> None:
         """Test exception handling in get_issue - covers line 356-357."""
         # DRY: Use factory to create exception-throwing dict
@@ -304,7 +319,8 @@ class TestQualityIssueServiceErrorScenarios:
         assert "Storage failure" in error
 
     async def test_list_issues_exception_handling(
-        self, service: QualityIssueService,
+        self,
+        service: QualityIssueService,
     ) -> None:
         """Test exception handling in list_issues - covers lines 379-380."""
         # DRY: Use factory to create exception-throwing dict
@@ -318,7 +334,8 @@ class TestQualityIssueServiceErrorScenarios:
         assert "Filter error" in error
 
     async def test_mark_fixed_exception_handling(
-        self, service: QualityIssueService,
+        self,
+        service: QualityIssueService,
     ) -> None:
         """Test exception handling in mark_fixed - covers lines 391-392."""
         # DRY: Use factory to create exception-throwing dict
@@ -332,7 +349,8 @@ class TestQualityIssueServiceErrorScenarios:
         assert "Cannot mark fixed" in error
 
     async def test_suppress_issue_exception_handling(
-        self, service: QualityIssueService,
+        self,
+        service: QualityIssueService,
     ) -> None:
         """Test exception handling in suppress_issue - covers lines 407-408."""
         # DRY: Use factory to create exception-throwing dict
@@ -346,7 +364,8 @@ class TestQualityIssueServiceErrorScenarios:
         assert "Cannot suppress" in error
 
     async def test_unsuppress_issue_exception_handling(
-        self, service: QualityIssueService,
+        self,
+        service: QualityIssueService,
     ) -> None:
         """Test exception handling in unsuppress_issue - covers lines 419-420."""
         # DRY: Use factory to create exception-throwing dict
@@ -369,7 +388,8 @@ class TestQualityReportServiceErrorScenarios:
         return QualityReportService()
 
     async def test_create_report_exception_handling(
-        self, service: QualityReportService,
+        self,
+        service: QualityReportService,
     ) -> None:
         """Test exception handling in create_report - covers lines 451-452."""
         # Force exception during uuid4 call
@@ -384,7 +404,8 @@ class TestQualityReportServiceErrorScenarios:
             assert "Invalid parameters" in error
 
     async def test_get_report_exception_handling(
-        self, service: QualityReportService,
+        self,
+        service: QualityReportService,
     ) -> None:
         """Test exception handling in get_report - covers lines 462-463."""
         # DRY: Use factory to create exception-throwing dict
@@ -398,7 +419,8 @@ class TestQualityReportServiceErrorScenarios:
         assert "Access error" in error
 
     async def test_list_reports_exception_handling(
-        self, service: QualityReportService,
+        self,
+        service: QualityReportService,
     ) -> None:
         """Test exception handling in list_reports - covers lines 474-475."""
         # DRY: Use factory to create exception-throwing dict
@@ -412,7 +434,8 @@ class TestQualityReportServiceErrorScenarios:
         assert "List error" in error
 
     async def test_delete_report_exception_handling(
-        self, service: QualityReportService,
+        self,
+        service: QualityReportService,
     ) -> None:
         """Test exception handling in delete_report - covers lines 483-484."""
         # DRY: Use factory to create exception-throwing dict

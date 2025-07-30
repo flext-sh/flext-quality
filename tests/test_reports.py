@@ -42,8 +42,17 @@ class TestQualityReport:
         return {
             "issues": {
                 "style": [
-                    {"file": "module1.py", "message": "Minor style issue", "severity": "low"},
-                    {"file": "module2.py", "message": "Another style issue", "severity": "low", "line": 10},
+                    {
+                        "file": "module1.py",
+                        "message": "Minor style issue",
+                        "severity": "low",
+                    },
+                    {
+                        "file": "module2.py",
+                        "message": "Another style issue",
+                        "severity": "low",
+                        "line": 10,
+                    },
                 ],
                 "complexity": [],
                 "security": [],
@@ -61,20 +70,50 @@ class TestQualityReport:
         return {
             "issues": {
                 "security": [
-                    {"file": "auth.py", "message": "Use of eval() detected", "severity": "high"},
-                    {"file": "utils.py", "message": "Command injection risk", "severity": "medium"},
-                    {"file": "handler.py", "message": "Hardcoded password", "severity": "critical"},
+                    {
+                        "file": "auth.py",
+                        "message": "Use of eval() detected",
+                        "severity": "high",
+                    },
+                    {
+                        "file": "utils.py",
+                        "message": "Command injection risk",
+                        "severity": "medium",
+                    },
+                    {
+                        "file": "handler.py",
+                        "message": "Hardcoded password",
+                        "severity": "critical",
+                    },
                 ],
                 "complexity": [
-                    {"file": "parser.py", "message": "High complexity: 15", "complexity": 15},
-                    {"file": "manager.py", "message": "High complexity: 12", "complexity": 12},
+                    {
+                        "file": "parser.py",
+                        "message": "High complexity: 15",
+                        "complexity": 15,
+                    },
+                    {
+                        "file": "manager.py",
+                        "message": "High complexity: 12",
+                        "complexity": 12,
+                    },
                 ],
                 "duplicates": [
-                    {"type": "duplicate_functions", "files": ["a.py", "b.py"], "similarity": 0.9},
+                    {
+                        "type": "duplicate_functions",
+                        "files": ["a.py", "b.py"],
+                        "similarity": 0.9,
+                    },
                 ],
                 "style": [
-                    {"file": "style.py", "message": "Style issue", "severity": "low", "line": 25},
-                ] * 60,  # Create many style issues to exceed HIGH_ISSUE_THRESHOLD
+                    {
+                        "file": "style.py",
+                        "message": "Style issue",
+                        "severity": "low",
+                        "line": 25,
+                    },
+                ]
+                * 60,  # Create many style issues to exceed HIGH_ISSUE_THRESHOLD
             },
             "metrics": {
                 "files_analyzed": 20,
@@ -88,16 +127,32 @@ class TestQualityReport:
         return {
             "issues": {
                 "security": [
-                    {"file": "main.py", "message": "Potential SQL injection", "severity": "high"},
+                    {
+                        "file": "main.py",
+                        "message": "Potential SQL injection",
+                        "severity": "high",
+                    },
                 ],
                 "errors": [
-                    {"file": "config.py", "message": "Undefined variable", "severity": "critical"},
+                    {
+                        "file": "config.py",
+                        "message": "Undefined variable",
+                        "severity": "critical",
+                    },
                 ],
                 "complexity": [
-                    {"file": "algorithm.py", "message": "High complexity: 11", "complexity": 11},
+                    {
+                        "file": "algorithm.py",
+                        "message": "High complexity: 11",
+                        "complexity": 11,
+                    },
                 ],
                 "duplicates": [
-                    {"type": "duplicate_code", "files": ["x.py", "y.py"], "similarity": 0.85},
+                    {
+                        "type": "duplicate_code",
+                        "files": ["x.py", "y.py"],
+                        "similarity": 0.85,
+                    },
                 ],
                 "style": [],
             },
@@ -133,10 +188,22 @@ class TestQualityReport:
         test_cases = [
             # (expected_grade, issues_setup)
             ("A", {"style": []}),  # No issues = 100 score = A
-            ("B", {"style": [{"file": "test.py", "message": "test"}] * 5}),  # 10 points off = 90 = A, but 5*2=10 points = 90
-            ("C", {"style": [{"file": "test.py", "message": "test"}] * 10}),  # 20 points off = 80 = B, 10*2=20 = 80
-            ("D", {"style": [{"file": "test.py", "message": "test"}] * 15}),  # 30 points off = 70 = C, 15*2=30 = 70
-            ("F", {"style": [{"file": "test.py", "message": "test"}] * 25}),  # 50 points off = 50 = F, 25*2=50 = 50
+            (
+                "B",
+                {"style": [{"file": "test.py", "message": "test"}] * 5},
+            ),  # 10 points off = 90 = A, but 5*2=10 points = 90
+            (
+                "C",
+                {"style": [{"file": "test.py", "message": "test"}] * 10},
+            ),  # 20 points off = 80 = B, 10*2=20 = 80
+            (
+                "D",
+                {"style": [{"file": "test.py", "message": "test"}] * 15},
+            ),  # 30 points off = 70 = C, 15*2=30 = 70
+            (
+                "F",
+                {"style": [{"file": "test.py", "message": "test"}] * 25},
+            ),  # 50 points off = 50 = F, 25*2=50 = 50
         ]
 
         for expected_grade, issues_setup in test_cases:
@@ -152,13 +219,27 @@ class TestQualityReport:
             if grade != expected_grade:
                 pass
             # For now, just test that we get valid grades
-            assert grade in {"A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "F"}
+            assert grade in {
+                "A+",
+                "A",
+                "A-",
+                "B+",
+                "B",
+                "B-",
+                "C+",
+                "C",
+                "C-",
+                "D+",
+                "D",
+                "D-",
+                "F",
+            }
 
     def test_get_grade_color(self) -> None:
         """Test grade color mapping."""
         # Test that each grade returns a valid color (hex format)
         grade_tests = [
-            ("A", 0),   # No issues = A grade
+            ("A", 0),  # No issues = A grade
             ("F", 30),  # Many issues = F grade
         ]
 
@@ -207,7 +288,9 @@ class TestQualityReport:
         coverage = report._get_coverage_percent()
         assert coverage == 85.5
 
-    def test_generate_text_report_minimal(self, minimal_results: AnalysisResults) -> None:
+    def test_generate_text_report_minimal(
+        self, minimal_results: AnalysisResults,
+    ) -> None:
         """Test text report generation with minimal data."""
         report = QualityReport(minimal_results)
         text_report = report.generate_text_report()
@@ -221,7 +304,9 @@ class TestQualityReport:
         assert "ISSUES BY CATEGORY:" in text_report
         assert "RECOMMENDATIONS:" in text_report
 
-    def test_generate_text_report_with_issues(self, poor_results: AnalysisResults) -> None:
+    def test_generate_text_report_with_issues(
+        self, poor_results: AnalysisResults,
+    ) -> None:
         """Test text report generation with many issues."""
         report = QualityReport(poor_results)
         text_report = report.generate_text_report()
@@ -237,10 +322,12 @@ class TestQualityReport:
         assert "Use of eval() detected" in text_report
 
         # Should show issue preview limit
-        security_section = text_report[text_report.find("SECURITY"):]
+        security_section = text_report[text_report.find("SECURITY") :]
         assert "eval() detected" in security_section
 
-    def test_generate_text_report_issue_truncation(self, poor_results: AnalysisResults) -> None:
+    def test_generate_text_report_issue_truncation(
+        self, poor_results: AnalysisResults,
+    ) -> None:
         """Test that text report truncates long issue lists."""
         # Cast to mutable dict and modify results to have many style issues
         poor_dict: dict[str, object] = dict(poor_results)
@@ -283,7 +370,9 @@ class TestQualityReport:
         assert summary["files_analyzed"] == 10
         assert summary["coverage_percent"] == 85.5
 
-    def test_generate_html_report_structure(self, mixed_results: AnalysisResults) -> None:
+    def test_generate_html_report_structure(
+        self, mixed_results: AnalysisResults,
+    ) -> None:
         """Test HTML report structure and content."""
         report = QualityReport(mixed_results)
         html_report = report.generate_html_report()
@@ -307,7 +396,9 @@ class TestQualityReport:
         assert "Quality Metrics" in html_report
         assert "Recommendations" in html_report
 
-    def test_generate_html_report_issues_section(self, mixed_results: AnalysisResults) -> None:
+    def test_generate_html_report_issues_section(
+        self, mixed_results: AnalysisResults,
+    ) -> None:
         """Test HTML report issues section."""
         report = QualityReport(mixed_results)
         html_report = report.generate_html_report()
@@ -343,7 +434,9 @@ class TestQualityReport:
         # Should be empty or minimal content
         assert issues_html == "" or len(issues_html.strip()) == 0
 
-    def test_generate_issues_html_with_issues(self, mixed_results: AnalysisResults) -> None:
+    def test_generate_issues_html_with_issues(
+        self, mixed_results: AnalysisResults,
+    ) -> None:
         """Test HTML issues generation with various issues."""
         report = QualityReport(mixed_results)
         issues_html = report._generate_issues_html()
@@ -360,7 +453,11 @@ class TestQualityReport:
         many_issues = {
             "issues": {
                 "style": [
-                    {"file": f"file{i}.py", "message": f"Style issue {i}", "severity": "low"}
+                    {
+                        "file": f"file{i}.py",
+                        "message": f"Style issue {i}",
+                        "severity": "low",
+                    }
                     for i in range(HTML_ISSUE_LIMIT + 5)
                 ],
             },
@@ -374,7 +471,9 @@ class TestQualityReport:
         assert "... and" in issues_html
         assert "more issues" in issues_html
 
-    def test_generate_recommendations_excellent_code(self, minimal_results: AnalysisResults) -> None:
+    def test_generate_recommendations_excellent_code(
+        self, minimal_results: AnalysisResults,
+    ) -> None:
         """Test recommendations for excellent code quality."""
         # Modify to have high coverage and no issues
         metrics_obj = minimal_results["metrics"]
@@ -388,17 +487,23 @@ class TestQualityReport:
         assert "Great job!" in recommendations[0]
         assert "excellent" in recommendations[0]
 
-    def test_generate_recommendations_critical_issues(self, mixed_results: AnalysisResults) -> None:
+    def test_generate_recommendations_critical_issues(
+        self, mixed_results: AnalysisResults,
+    ) -> None:
         """Test recommendations for critical issues."""
         report = QualityReport(mixed_results)
         recommendations = report._generate_recommendations()
 
         # Should recommend fixing critical issues
-        critical_rec = next((r for r in recommendations if "critical" in r.lower()), None)
+        critical_rec = next(
+            (r for r in recommendations if "critical" in r.lower()), None,
+        )
         assert critical_rec is not None
         assert "Fix" in critical_rec
 
-    def test_generate_recommendations_many_issues(self, poor_results: AnalysisResults) -> None:
+    def test_generate_recommendations_many_issues(
+        self, poor_results: AnalysisResults,
+    ) -> None:
         """Test recommendations for many issues."""
         report = QualityReport(poor_results)
         recommendations = report._generate_recommendations()
@@ -422,7 +527,9 @@ class TestQualityReport:
         report = QualityReport(low_coverage_results)
         recommendations = report._generate_recommendations()
 
-        coverage_rec = next((r for r in recommendations if "coverage" in r.lower()), None)
+        coverage_rec = next(
+            (r for r in recommendations if "coverage" in r.lower()), None,
+        )
         assert coverage_rec is not None
         assert "60" in coverage_rec
         assert str(MIN_COVERAGE_THRESHOLD) in coverage_rec
@@ -432,7 +539,11 @@ class TestQualityReport:
         duplicate_results = {
             "issues": {
                 "duplicates": [
-                    {"type": "duplicate_code", "files": ["a.py", "b.py"], "similarity": 0.9},
+                    {
+                        "type": "duplicate_code",
+                        "files": ["a.py", "b.py"],
+                        "similarity": 0.9,
+                    },
                 ],
             },
             "metrics": {"files_analyzed": 5, "coverage_percent": 85.0},
@@ -441,7 +552,9 @@ class TestQualityReport:
         report = QualityReport(duplicate_results)
         recommendations = report._generate_recommendations()
 
-        duplicate_rec = next((r for r in recommendations if "duplicate" in r.lower()), None)
+        duplicate_rec = next(
+            (r for r in recommendations if "duplicate" in r.lower()), None,
+        )
         assert duplicate_rec is not None
         assert "refactor" in duplicate_rec.lower()
 
@@ -450,7 +563,11 @@ class TestQualityReport:
         complex_results = {
             "issues": {
                 "complexity": [
-                    {"file": "complex.py", "message": "High complexity: 15", "complexity": 15},
+                    {
+                        "file": "complex.py",
+                        "message": "High complexity: 15",
+                        "complexity": 15,
+                    },
                 ],
             },
             "metrics": {"files_analyzed": 5, "coverage_percent": 85.0},
@@ -568,8 +685,16 @@ class TestQualityReport:
         severity_results = {
             "issues": {
                 "security": [
-                    {"file": "test1.py", "message": "High severity", "severity": "high"},
-                    {"file": "test2.py", "message": "Medium severity", "severity": "medium"},
+                    {
+                        "file": "test1.py",
+                        "message": "High severity",
+                        "severity": "high",
+                    },
+                    {
+                        "file": "test2.py",
+                        "message": "Medium severity",
+                        "severity": "medium",
+                    },
                     {"file": "test3.py", "message": "Low severity", "severity": "low"},
                 ],
             },
@@ -588,7 +713,8 @@ class TestQualityReport:
         # Test with extreme number of issues
         extreme_results = {
             "issues": {
-                "security": [{"file": "test.py", "message": "issue"}] * 100,  # Many critical issues
+                "security": [{"file": "test.py", "message": "issue"}]
+                * 100,  # Many critical issues
             },
             "metrics": {"files_analyzed": 1, "coverage_percent": 0.0},
         }
@@ -605,7 +731,12 @@ class TestQualityReport:
         results_with_lines = {
             "issues": {
                 "style": [
-                    {"file": "module.py", "message": "Style issue", "line": 42, "severity": "low"},
+                    {
+                        "file": "module.py",
+                        "message": "Style issue",
+                        "line": 42,
+                        "severity": "low",
+                    },
                     {"file": "other.py", "message": "No line info", "severity": "low"},
                 ],
             },

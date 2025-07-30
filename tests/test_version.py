@@ -20,7 +20,9 @@ class TestVersion:
         """Test version follows semantic versioning format."""
         # Semantic versioning pattern (X.Y.Z or X.Y.Z-suffix)
         pattern = r"^\d+\.\d+\.\d+(?:[-\w\.]+)?$"
-        assert re.match(pattern, __version__), f"Version '{__version__}' doesn't follow semantic versioning"
+        assert re.match(pattern, __version__), (
+            f"Version '{__version__}' doesn't follow semantic versioning"
+        )
 
     def test_version_info_exists(self) -> None:
         """Test that version info tuple exists."""
