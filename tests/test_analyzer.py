@@ -2,9 +2,10 @@
 
 import ast
 import tempfile
+from collections.abc import Callable, Generator
 from pathlib import Path
 from textwrap import dedent
-from typing import Any, Callable, Generator
+from typing import Any, TextIO
 
 import pytest
 
@@ -15,7 +16,7 @@ class TestCodeAnalyzer:
     """Test suite for CodeAnalyzer functionality."""
 
     @pytest.fixture
-    def temp_project(self) -> Generator[Path, None, None]:
+    def temp_project(self) -> Generator[Path]:
         """Create a temporary project with sample Python files."""
         with tempfile.TemporaryDirectory() as tmpdir:
             project_path = Path(tmpdir)
@@ -183,7 +184,7 @@ class TestCodeAnalyzer:
         file_names = {f.name for f in python_files}
         expected_files = {
             "simple.py", "complex.py", "security.py", "syntax_error.py",
-            "dead_code.py", "duplicate1.py", "duplicate2.py", "sub_module.py"
+            "dead_code.py", "duplicate1.py", "duplicate2.py", "sub_module.py",
         }
 
         assert expected_files.issubset(file_names)
@@ -279,7 +280,7 @@ class TestCodeAnalyzer:
         assert overall_metrics["total_lines_of_code"] == 45
         assert overall_metrics["total_functions"] == 6
         assert overall_metrics["total_classes"] == 3
-        assert overall_metrics["average_complexity"] == 10/3  # (3+5+2)/3
+        assert overall_metrics["average_complexity"] == 10 / 3  # (3+5+2)/3
         assert overall_metrics["max_complexity"] == 5
         assert overall_metrics["avg_lines_per_file"] == 15.0
 
@@ -408,7 +409,7 @@ class TestCodeAnalyzer:
             include_security=True,
             include_complexity=False,
             include_dead_code=False,
-            include_duplicates=False
+            include_duplicates=False,
         )
 
         issues = results["issues"]
@@ -447,8 +448,8 @@ class TestCodeAnalyzer:
                 "complexity": [],
                 "security": [],
                 "dead_code": [],
-                "duplicates": []
-            }
+                "duplicates": [],
+            },
         }
 
         score = analyzer.get_quality_score()
@@ -473,11 +474,11 @@ class TestCodeAnalyzer:
         for score, expected_grade in test_cases:
             # Mock the get_quality_score method to return specific score
             original_get_score = analyzer.get_quality_score
-            
+
             # Use closure to avoid loop variable binding issue
-            def make_score_lambda(s: float) -> callable:
+            def make_score_lambda(s: float) -> Callable[[], float]:
                 return lambda: s
-            
+
             analyzer.get_quality_score = make_score_lambda(score)
 
             grade = analyzer.get_quality_grade()
@@ -498,7 +499,7 @@ class TestCodeAnalyzer:
         assert analyzer.analysis_results == results
         assert analyzer.analysis_results != {}
 
-    def test_analyze_project_logging(self, temp_project, caplog) -> None:
+    def test_analyze_project_logging(self, temp_project: Path, caplog: Any) -> None:
         """Test that analysis produces appropriate log messages."""
         import logging
         caplog.set_level(logging.INFO)
@@ -522,7 +523,7 @@ class TestCodeAnalyzer:
         # Mock file to raise exception during analysis
         original_analyze = analyzer._analyze_file
 
-        def mock_analyze(file_path):
+        def mock_analyze(file_path: Path) -> dict[str, Any] | None:
             if file_path.name == "problem.py":
                 return None  # Simulate failure
             return original_analyze(file_path)
@@ -535,7 +536,7 @@ class TestCodeAnalyzer:
         # Should still analyze other files
         assert results["files_analyzed"] > 0
 
-    def test_security_analysis_error_handling(self, temp_project, caplog) -> None:
+    def test_security_analysis_error_handling(self, temp_project: Path, caplog: Any) -> None:
         """Test error handling in security analysis."""
         import logging
         caplog.set_level(logging.WARNING)
@@ -551,9 +552,10 @@ class TestCodeAnalyzer:
         import builtins
         original_open = builtins.open
 
-        def mock_open(file_path, *args, **kwargs):
+        def mock_open(file_path: str | Path, *args: Any, **kwargs: Any) -> TextIO:
             if "error_file.py" in str(file_path):
-                raise RuntimeError("Simulated read error")
+                msg = "Simulated read error"
+                raise RuntimeError(msg)
             return original_open(file_path, *args, **kwargs)
 
         builtins.open = mock_open
@@ -570,7 +572,7 @@ class TestCodeAnalyzer:
         finally:
             builtins.open = original_open
 
-    def test_dead_code_analysis_error_handling(self, temp_project, caplog) -> None:
+    def test_dead_code_analysis_error_handling(self, temp_project: Path, caplog: Any) -> None:
         """Test error handling in dead code analysis."""
         import logging
         caplog.set_level(logging.WARNING)
@@ -581,9 +583,10 @@ class TestCodeAnalyzer:
         import builtins
         original_open = builtins.open
 
-        def mock_open(file_path, *args, **kwargs):
+        def mock_open(file_path: str | Path, *args: Any, **kwargs: Any) -> TextIO:
             if "dead_code.py" in str(file_path):
-                raise ValueError("Simulated error")
+                msg = "Simulated error"
+                raise ValueError(msg)
             return original_open(file_path, *args, **kwargs)
 
         builtins.open = mock_open
@@ -599,7 +602,7 @@ class TestCodeAnalyzer:
         finally:
             builtins.open = original_open
 
-    def test_duplicate_analysis_error_handling(self, temp_project, caplog) -> None:
+    def test_duplicate_analysis_error_handling(self, temp_project: Path, caplog: Any) -> None:
         """Test error handling in duplicate analysis."""
         import logging
         caplog.set_level(logging.WARNING)
@@ -610,9 +613,10 @@ class TestCodeAnalyzer:
         import builtins
         original_open = builtins.open
 
-        def mock_open(file_path, *args, **kwargs):
+        def mock_open(file_path: str | Path, *args: Any, **kwargs: Any) -> TextIO:
             if "duplicate1.py" in str(file_path):
-                raise TypeError("Simulated error")
+                msg = "Simulated error"
+                raise TypeError(msg)
             return original_open(file_path, *args, **kwargs)
 
         builtins.open = mock_open

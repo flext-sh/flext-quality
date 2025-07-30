@@ -4,9 +4,15 @@ from __future__ import annotations
 
 import ast
 from pathlib import Path
-from typing import Any
 
 from flext_core import get_logger
+from flext_observability import (
+    flext_create_log_entry,
+    flext_create_metric,
+    flext_create_trace,
+)
+
+from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
 
 logger = get_logger(__name__)
 
@@ -16,7 +22,7 @@ class CodeAnalyzer:
 
     def __init__(self, project_path: str | Path) -> None:
         self.project_path = Path(project_path)
-        self.analysis_results: dict[str, Any] = {}
+        self.analysis_results: dict[str, object] = {}
 
     def analyze_project(
         self,
@@ -24,7 +30,7 @@ class CodeAnalyzer:
         include_complexity: bool = True,
         include_dead_code: bool = True,
         include_duplicates: bool = True,
-    ) -> dict[str, Any]:
+    ) -> dict[str, object]:
         """Analyze entire project for quality metrics and issues.
 
         Args:
@@ -37,9 +43,21 @@ class CodeAnalyzer:
             Dictionary containing analysis results including metrics and issues.
 
         """
-        logger.info("Starting project analysis: %s", self.project_path)
+        # Create trace for the entire analysis
+        flext_create_trace(
+            trace_id=f"analyze_project_{self.project_path.name}",
+            operation="CodeAnalyzer.analyze_project",
+            config={"project_path": str(self.project_path)},
+        )
 
-        results: dict[str, Any] = {
+        logger.info("Starting project analysis: %s", self.project_path)
+        flext_create_log_entry(
+            message=f"Starting comprehensive code analysis for {self.project_path}",
+            level="info",
+            context={"analyzer": "CodeAnalyzer", "project_path": str(self.project_path)},
+        )
+
+        results: dict[str, object] = {
             "project_path": str(self.project_path),
             "files_analyzed": 0,
             "total_lines": 0,
@@ -58,36 +76,88 @@ class CodeAnalyzer:
         results["python_files"] = [str(f) for f in python_files]
         results["files_analyzed"] = len(python_files)
 
-        # Analyze each file
+        # Analyze each file with proper type safety
         file_metrics = []
+        total_lines = 0
         for file_path in python_files:
             metrics = self._analyze_file(file_path)
             if metrics:
                 file_metrics.append(metrics)
-                results["total_lines"] += metrics.get("lines_of_code", 0)
+                lines = metrics.get("lines_of_code", 0)
+                if isinstance(lines, (int, float)):
+                    total_lines += int(lines)
+
+        results["total_lines"] = total_lines
 
         # Calculate overall metrics
         results["metrics"] = self._calculate_overall_metrics(file_metrics)
 
-        # Run specialized analyses
-        if include_security:
-            results["issues"]["security"] = self._analyze_security()
+        # Run specialized analyses with proper type casting
+        issues_dict = results["issues"]
+        if isinstance(issues_dict, dict):
+            if include_security:
+                issues_dict["security"] = self._analyze_security()
 
-        if include_complexity:
-            results["issues"]["complexity"] = self._analyze_complexity(file_metrics)
+            if include_complexity:
+                issues_dict["complexity"] = self._analyze_complexity(file_metrics)
 
-        if include_dead_code:
-            results["issues"]["dead_code"] = self._analyze_dead_code()
+            if include_dead_code:
+                issues_dict["dead_code"] = self._analyze_dead_code()
 
-        if include_duplicates:
-            results["issues"]["duplicates"] = self._analyze_duplicates()
+            if include_duplicates:
+                issues_dict["duplicates"] = self._analyze_duplicates()
 
         self.analysis_results = results
+
+        # Create metrics for observability using REAL flext-observability API with type safety
+        files_analyzed = results["files_analyzed"]
+        if isinstance(files_analyzed, (int, float)):
+            flext_create_metric(
+                name="code_analysis_files_analyzed",
+                value=float(files_analyzed),
+                tags={"project_path": str(self.project_path)},
+            )
+
+        total_lines_obj = results["total_lines"]
+        if isinstance(total_lines_obj, (int, float)):
+            flext_create_metric(
+                name="code_analysis_total_lines",
+                value=float(total_lines_obj),
+                tags={"project_path": str(self.project_path)},
+            )
+
+        # Count total issues for metrics with proper type handling
+        issues_dict = results["issues"]
+        if isinstance(issues_dict, dict):
+            total_issues = sum(
+                len(issue_list) for issue_list in issues_dict.values()
+                if isinstance(issue_list, list)
+            )
+        else:
+            total_issues = 0
+
+        flext_create_metric(
+            name="code_analysis_total_issues",
+            value=float(total_issues),
+            tags={"project_path": str(self.project_path)},
+        )
 
         logger.info(
             "Analysis completed. Files: %d, Lines: %d",
             results["files_analyzed"],
             results["total_lines"],
+        )
+
+        flext_create_log_entry(
+            message=f"Code analysis completed for {self.project_path}",
+            level="info",
+            context={
+                "analyzer": "CodeAnalyzer",
+                "project_path": str(self.project_path),
+                "files_analyzed": results["files_analyzed"],
+                "total_lines": results["total_lines"],
+                "total_issues": total_issues,
+            },
         )
 
         return results
@@ -103,61 +173,53 @@ class CodeAnalyzer:
             return 0.0
 
         self.analysis_results.get("metrics", {})
-        issues = self.analysis_results.get("issues", {})
+        issues_obj = self.analysis_results.get("issues", {})
+
+        # Type safety for issues dictionary
+        if not isinstance(issues_obj, dict):
+            return 0.0
+
+        issues = issues_obj
 
         # Base score
         score = 100.0
 
-        # Deduct for complexity issues
-        complexity_penalty = len(issues.get("complexity", [])) * 5
-        score -= min(complexity_penalty, 30)
+        # Deduct for complexity issues with type safety
+        complexity_list = issues.get("complexity", [])
+        if isinstance(complexity_list, list):
+            complexity_penalty = len(complexity_list) * 5
+            score -= min(complexity_penalty, 30)
 
-        # Deduct for security issues
-        security_penalty = len(issues.get("security", [])) * 10
-        score -= min(security_penalty, 40)
+        # Deduct for security issues with type safety
+        security_list = issues.get("security", [])
+        if isinstance(security_list, list):
+            security_penalty = len(security_list) * 10
+            score -= min(security_penalty, 40)
 
-        # Deduct for dead code
-        dead_code_penalty = len(issues.get("dead_code", [])) * 3
-        score -= min(dead_code_penalty, 20)
+        # Deduct for dead code with type safety
+        dead_code_list = issues.get("dead_code", [])
+        if isinstance(dead_code_list, list):
+            dead_code_penalty = len(dead_code_list) * 3
+            score -= min(dead_code_penalty, 20)
 
-        # Deduct for duplicates
-        duplicate_penalty = len(issues.get("duplicates", [])) * 5
-        score -= min(duplicate_penalty, 25)
+        # Deduct for duplicates with type safety
+        duplicates_list = issues.get("duplicates", [])
+        if isinstance(duplicates_list, list):
+            duplicate_penalty = len(duplicates_list) * 5
+            score -= min(duplicate_penalty, 25)
 
         return max(0.0, score)
 
     def get_quality_grade(self) -> str:
-        """Get letter grade based on quality score.
+        """Get letter grade based on quality score - DRY refactored.
 
         Returns:
             Letter grade (A+ to F) based on calculated quality score.
 
         """
         score = self.get_quality_score()
-
-        if score >= 95:
-            return "A+"
-        if score >= 90:
-            return "A"
-        if score >= 85:
-            return "A-"
-        if score >= 80:
-            return "B+"
-        if score >= 75:
-            return "B"
-        if score >= 70:
-            return "B-"
-        if score >= 65:
-            return "C+"
-        if score >= 60:
-            return "C"
-        if score >= 55:
-            return "C-"
-        if score >= 50:
-            return "D+"
-        if score >= 45:
-            return "D"
-        return "F"
+        grade = QualityGradeCalculator.calculate_grade(score)
+        return grade.value
 
     def _find_python_files(self) -> list[Path]:
         if not self.project_path.exists():
@@ -179,7 +241,7 @@ class CodeAnalyzer:
 
         return python_files
 
-    def _analyze_file(self, file_path: Path) -> dict[str, Any] | None:
+    def _analyze_file(self, file_path: Path) -> dict[str, object] | None:
         """Analyze a single Python file.
 
         Args:
@@ -268,18 +330,37 @@ class CodeAnalyzer:
 
     def _calculate_overall_metrics(
         self,
-        file_metrics: list[dict[str, Any]],
-    ) -> dict[str, Any]:
+        file_metrics: list[dict[str, object]],
+    ) -> dict[str, object]:
         if not file_metrics:
             return {}
 
         total_files = len(file_metrics)
-        total_loc = sum(m.get("lines_of_code", 0) for m in file_metrics)
-        total_functions = sum(m.get("function_count", 0) for m in file_metrics)
-        total_classes = sum(m.get("class_count", 0) for m in file_metrics)
 
-        avg_complexity = sum(m.get("complexity", 0) for m in file_metrics) / total_files
-        max_complexity = max(m.get("complexity", 0) for m in file_metrics)
+        # DRY helper for safe metric extraction with type safety
+        def safe_get_metric(metric_list: list[dict[str, object]], key: str, default: float = 0) -> list[int | float]:
+            """Extract metric safely with type validation."""
+            values = []
+            for m in metric_list:
+                value = m.get(key, default)
+                if isinstance(value, (int, float)):
+                    values.append(value)
+                else:
+                    values.append(default)
+            return values
+
+        # Extract metrics with type safety
+        loc_values = safe_get_metric(file_metrics, "lines_of_code", 0)
+        function_values = safe_get_metric(file_metrics, "function_count", 0)
+        class_values = safe_get_metric(file_metrics, "class_count", 0)
+        complexity_values = safe_get_metric(file_metrics, "complexity", 0.0)
+
+        total_loc = sum(loc_values)
+        total_functions = sum(function_values)
+        total_classes = sum(class_values)
+
+        avg_complexity = sum(complexity_values) / total_files if total_files > 0 else 0.0
+        max_complexity = max(complexity_values) if complexity_values else 0.0
 
         return {
             "total_files": total_files,
@@ -291,7 +372,7 @@ class CodeAnalyzer:
             "avg_lines_per_file": total_loc / total_files if total_files > 0 else 0,
         }
 
-    def _analyze_security(self) -> list[dict[str, Any]]:
+    def _analyze_security(self) -> list[dict[str, object]]:
         # This is a simplified implementation
         # In production, this would integrate with bandit or similar tools
         issues = []
@@ -300,7 +381,7 @@ class CodeAnalyzer:
                 with open(py_file, encoding="utf-8") as f:
                     content = f.read()
 
-                # Simple security checks
+                # Simple security checks with proper type casting for consistency
                 if "eval(" in content:
                     issues.append(
                         {
@@ -308,6 +389,7 @@ class CodeAnalyzer:
                             "type": "dangerous_function",
                             "message": "Use of eval() detected",
                             "severity": "high",
+                            "line": 0,  # Add line number for consistency with other dict structures
                         },
                     )
 
@@ -337,23 +419,25 @@ class CodeAnalyzer:
 
     def _analyze_complexity(
         self,
-        file_metrics: list[dict[str, Any]],
-    ) -> list[dict[str, Any]]:
+        file_metrics: list[dict[str, object]],
+    ) -> list[dict[str, object]]:
         complexity_threshold = 10
 
-        return [
-            {
-                "file": metrics["file_path"],
-                "type": "high_complexity",
-                "message": f"High complexity: {metrics['complexity']}",
-                "complexity": metrics["complexity"],
-                "threshold": complexity_threshold,
-            }
-            for metrics in file_metrics
-            if metrics.get("complexity", 0) > complexity_threshold
-        ]
+        # DRY pattern: extract complexity once with proper type safety
+        complex_files = []
+        for metrics in file_metrics:
+            complexity_val = metrics.get("complexity", 0)
+            if isinstance(complexity_val, (int, float)) and complexity_val > complexity_threshold:
+                complex_files.append({
+                    "file": metrics["file_path"],
+                    "type": "high_complexity",
+                    "message": f"High complexity: {complexity_val}",
+                    "complexity": complexity_val,
+                    "threshold": complexity_threshold,
+                })
+        return complex_files
 
-    def _analyze_dead_code(self) -> list[dict[str, Any]]:
+    def _analyze_dead_code(self) -> list[dict[str, object]]:
         # This is a placeholder - real implementation would use vulture or similar
         issues = []
         for py_file in self.project_path.rglob("*.py"):
@@ -387,7 +471,7 @@ class CodeAnalyzer:
 
         return issues
 
-    def _analyze_duplicates(self) -> list[dict[str, Any]]:
+    def _analyze_duplicates(self) -> list[dict[str, object]]:
         # This is a placeholder - real implementation would do more sophisticated analysis
         issues = []
 

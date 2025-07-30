@@ -63,8 +63,7 @@ class Command(BaseCommand):
             {
                 "name": "external",
                 "display_name": "External Tools",
-                "description": "Integration with external security and (
-                    quality tools (bandit, vulture)",)
+                "description": "Integration with external security and quality tools (bandit, vulture)",
                 "capabilities": [
                     "security_analysis",
                     "dead_code_detection",
@@ -135,8 +134,7 @@ class Command(BaseCommand):
                 "description": "Function or method without documentation",
                 "category": "documentation",
                 "severity": "LOW",
-                "recommendation": "Add a docstring to document function parameters and (
-                    return value",)
+                "recommendation": "Add a docstring to document function parameters and return value",
             },
             {
                 "backend": ast_backend,

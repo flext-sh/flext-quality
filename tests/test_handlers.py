@@ -23,15 +23,19 @@ class TestAnalyzeProjectHandler:
         assert handler is not None
 
     @pytest.mark.asyncio
-    async def test_handle_not_implemented(self) -> None:
-        """Test handle method returns not implemented error."""
+    async def test_handle_creates_analysis(self) -> None:
+        """Test handle method creates analysis successfully."""
         handler = AnalyzeProjectHandler()
         project_id = uuid4()
 
         result = await handler.handle(project_id)
 
-        assert result.is_failure
-        assert "Not implemented yet" in result.error
+        assert result.is_success
+        assert result.data is not None
+        # Should return a QualityAnalysis entity
+        assert hasattr(result.data, "id")
+        assert hasattr(result.data, "project_id")
+        assert result.data.project_id == str(project_id)
 
 
 class TestGenerateReportHandler:
@@ -43,15 +47,19 @@ class TestGenerateReportHandler:
         assert handler is not None
 
     @pytest.mark.asyncio
-    async def test_handle_not_implemented(self) -> None:
-        """Test handle method returns not implemented error."""
+    async def test_handle_creates_report(self) -> None:
+        """Test handle method creates report successfully."""
         handler = GenerateReportHandler()
         analysis_id = uuid4()
 
         result = await handler.handle(analysis_id)
 
-        assert result.is_failure
-        assert "Not implemented yet" in result.error
+        assert result.is_success
+        assert result.data is not None
+        # Should return a QualityReport entity
+        assert hasattr(result.data, "id")
+        assert hasattr(result.data, "analysis_id")
+        assert result.data.analysis_id == str(analysis_id)
 
 
 class TestRunLintingHandler:
@@ -63,15 +71,18 @@ class TestRunLintingHandler:
         assert handler is not None
 
     @pytest.mark.asyncio
-    async def test_handle_not_implemented(self) -> None:
-        """Test handle method returns not implemented error."""
+    async def test_handle_runs_linting(self) -> None:
+        """Test handle method runs linting successfully."""
         handler = RunLintingHandler()
         project_id = uuid4()
 
         result = await handler.handle(project_id)
 
-        assert result.is_failure
-        assert "Not implemented yet" in result.error
+        assert result.is_success
+        assert result.data is not None
+        # Should return linting results
+        assert isinstance(result.data, dict)
+        assert "linting_issues" in result.data
 
 
 class TestRunSecurityCheckHandler:
@@ -83,15 +94,18 @@ class TestRunSecurityCheckHandler:
         assert handler is not None
 
     @pytest.mark.asyncio
-    async def test_handle_not_implemented(self) -> None:
-        """Test handle method returns not implemented error."""
+    async def test_handle_runs_security_check(self) -> None:
+        """Test handle method runs security check successfully."""
         handler = RunSecurityCheckHandler()
         project_id = uuid4()
 
         result = await handler.handle(project_id)
 
-        assert result.is_failure
-        assert "Not implemented yet" in result.error
+        assert result.is_success
+        assert result.data is not None
+        # Should return security analysis results
+        assert isinstance(result.data, dict)
+        assert "security_issues" in result.data
 
 
 class TestHandlerIntegration:
@@ -111,8 +125,8 @@ class TestHandlerIntegration:
             assert handler is not None
 
     @pytest.mark.asyncio
-    async def test_all_handlers_return_failure(self) -> None:
-        """Test all handlers currently return failure (not implemented)."""
+    async def test_all_handlers_return_success(self) -> None:
+        """Test all handlers return success with real implementations."""
         project_id = uuid4()
         analysis_id = uuid4()
 
@@ -125,5 +139,5 @@ class TestHandlerIntegration:
 
         for handler, test_id in handlers_and_ids:
             result = await handler.handle(test_id)
-            assert result.is_failure
-            assert "Not implemented yet" in result.error
+            assert result.is_success
+            assert result.data is not None

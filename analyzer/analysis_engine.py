@@ -4,10 +4,16 @@ from __future__ import annotations
 
 import ast
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, cast
 
 from django.utils import timezone
 from flext_core import get_logger
+
+if TYPE_CHECKING:
+    from flext_core import TAnyDict
+else:
+    # Runtime type alias using flext-core patterns
+    TAnyDict = dict[str, object]
 
 from analyzer.models import (
     DeadCodeIssue,
@@ -31,7 +37,7 @@ class CodeAnalysisEngine:
         self.session = session
         self.flx_project = session.flx_project
         self.project_path = Path(self.flx_project.path)
-        self.results: dict[str, Any] = {
+        self.results: TAnyDict = {
             "files_analyzed": 0,
             "total_lines": 0,
             "security_issues": [],
@@ -177,10 +183,11 @@ class CodeAnalysisEngine:
                 class_count=class_count,
             )
 
-            self.results["files_analyzed"] = self.results.get("files_analyzed", 0) + 1
-            self.results["total_lines"] = self.results.get("total_lines", 0) + len(
-                lines,
-            )
+            # Type-safe operations using flext-core patterns with cast
+            current_files = cast("int", self.results.get("files_analyzed", 0))
+            self.results["files_analyzed"] = current_files + 1
+            current_lines = cast("int", self.results.get("total_lines", 0))
+            self.results["total_lines"] = current_lines + len(lines)
             return file_analysis
 
         except (RuntimeError, ValueError, TypeError):

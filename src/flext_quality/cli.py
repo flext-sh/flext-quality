@@ -73,10 +73,11 @@ def another_function(args: argparse.Namespace) -> int:
         score = analyzer.get_quality_score()
         analyzer.get_quality_grade()
         # Show results
-        # Show issue counts
-        issues = results.get("issues", {})
-        len(issues.get("security", []))
-        len(issues.get("complexity", []))
+        # Show issue counts with proper type casting
+        issues_obj = results.get("issues", {})
+        if isinstance(issues_obj, dict):
+            len(issues_obj.get("security", []))
+            len(issues_obj.get("complexity", []))
         return 0 if score >= 70 else 1
     except (RuntimeError, ValueError, TypeError):
         return 3

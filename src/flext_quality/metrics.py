@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from typing import Any, ClassVar
-
-from flext_core import FlextResult, FlextValueObject
+from flext_core import FlextResult, FlextValueObject, TAnyDict
 from pydantic import Field, computed_field
+
+from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
 
 
 class QualityMetrics(FlextValueObject):
@@ -78,7 +78,7 @@ class QualityMetrics(FlextValueObject):
     )
 
     @classmethod
-    def from_analysis_results(cls, results: dict[str, Any]) -> QualityMetrics:
+    def from_analysis_results(cls, results: TAnyDict) -> QualityMetrics:
         """Create QualityMetrics from analysis results dictionary.
 
         Args:
@@ -88,8 +88,12 @@ class QualityMetrics(FlextValueObject):
             QualityMetrics instance with calculated scores and metrics.
 
         """
-        metrics_data = results.get("metrics", {})
-        issues = results.get("issues", {})
+        # Cast TAnyDict to dict for type safety
+        results_dict = dict(results) if isinstance(results, dict) else {}
+        metrics_obj = results_dict.get("metrics", {})
+        metrics_data = dict(metrics_obj) if isinstance(metrics_obj, dict) else {}
+        issues_obj = results_dict.get("issues", {})
+        issues = dict(issues_obj) if isinstance(issues_obj, dict) else {}
 
         # Basic counts
         total_files = metrics_data.get("total_files", 0)
@@ -123,8 +127,9 @@ class QualityMetrics(FlextValueObject):
             + documentation_score * 0.15
         )
 
-        # Quality grade
-        quality_grade = cls._calculate_grade(overall_score)
+        # Quality grade - using centralized calculator (DRY)
+        quality_grade_enum = QualityGradeCalculator.calculate_grade(overall_score)
+        quality_grade = quality_grade_enum.value
 
         return cls(
             overall_score=overall_score,
@@ -178,7 +183,7 @@ class QualityMetrics(FlextValueObject):
             + self.complexity_issues_count
         )
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> TAnyDict:
         """Convert metrics to dictionary format.
 
         Returns:
@@ -220,28 +225,7 @@ class QualityMetrics(FlextValueObject):
             f"Duplicates({self.duplicate_blocks_count})"
         )
 
-    # Grade thresholds - each tuple is (threshold, grade)
-    _GRADE_THRESHOLDS: ClassVar[list[tuple[int, str]]] = [
-        (95, "A+"),
-        (90, "A"),
-        (85, "A-"),
-        (80, "B+"),
-        (75, "B"),
-        (70, "B-"),
-        (65, "C+"),
-        (60, "C"),
-        (55, "C-"),
-        (50, "D+"),
-        (45, "D"),
-    ]
-
-    @classmethod
-    def _calculate_grade(cls, score: float) -> str:
-        """Calculate letter grade based on score using predefined thresholds."""
-        for threshold, grade in cls._GRADE_THRESHOLDS:
-            if score >= threshold:
-                return grade
-        return "F"
+    # DRY REFACTOR: Removed duplicate grade calculation - now using QualityGradeCalculator
 
     def validate_domain_rules(self) -> FlextResult[None]:
         """Validate quality metrics domain rules.
@@ -258,7 +242,7 @@ class QualityMetrics(FlextValueObject):
         if any(count < 0 for count in [
             self.total_files, self.total_lines_of_code, self.total_functions,
             self.total_classes, self.security_issues_count, self.dead_code_items_count,
-            self.duplicate_blocks_count, self.complexity_issues_count
+            self.duplicate_blocks_count, self.complexity_issues_count,
         ]):
             return FlextResult.fail("All counts must be non-negative")
 

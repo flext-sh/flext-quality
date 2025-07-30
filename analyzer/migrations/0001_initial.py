@@ -7,7 +7,7 @@ This migration creates the initial database schema for the code analysis models.
 
 from __future__ import annotations
 
-from typing import Any, ClassVar
+from typing import ClassVar
 
 import django.db.models.deletion
 from django.db import migrations, models
@@ -18,9 +18,9 @@ class Migration:
 
     initial = True
 
-    dependencies: ClassVar[list[Any]] = []
+    dependencies: ClassVar[list[tuple[str, str]]] = []
 
-    operations: ClassVar[list[Any]] = [
+    operations: ClassVar[list[migrations.operations.base.Operation]] = [
         migrations.CreateModel(
             name="AnalysisBackendModel",
             fields=[

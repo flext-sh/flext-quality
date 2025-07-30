@@ -1,22 +1,23 @@
 """Django views for dashboard interface."""
 
-from analyzer.tasks import run_analysis_task
-from analyzer.multi_backend_analyzer import MultiBackendAnalyzer
-from analyzer.tasks import run_analysis_task
-from analyzer.multi_backend_analyzer import MultiBackendAnalyzer
-from analyzer.backends import AVAILABLE_BACKENDS
-from analyzer.models import (
-from analyzer.models import ClassAnalysis, FunctionAnalysis, VariableAnalysis
-from analyzer.models import (
-
-
 from __future__ import annotations
 
 import logging
 from typing import TYPE_CHECKING, Any
 
-from analyzer.models import AnalysisSession, Project
+from analyzer.backends import AVAILABLE_BACKENDS
+from analyzer.models import (
+    AnalysisSession,
+    ClassAnalysis,
+    FunctionAnalysis,
+    PackageAnalysis,
+    Project,
+    SecurityIssue,
+    VariableAnalysis,
+)
+from analyzer.multi_backend_analyzer import MultiBackendAnalyzer
 from analyzer.package_discovery import PackageDiscovery
+from analyzer.tasks import run_analysis_task
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Q
@@ -240,14 +241,12 @@ def start_analysis(request: HttpRequest, project_id: str) -> HttpResponse:
             # Start actual analysis task
             try:
 
-
                 # Start background analysis
                 run_analysis_task.delay(session.id, ["ast", "external", "quality"])
 
                 messages.success(request, "Analysis started in background!")
             except ImportError:
                 # Fallback to synchronous analysis if Celery is not available
-
 
                 analyzer = MultiBackendAnalyzer(
                     flx_project,
@@ -307,7 +306,6 @@ def run_analysis(request: HttpRequest, project_id: str) -> object:
         # Start background analysis
         try:
 
-
             run_analysis_task.delay(session.id, backend_names)
 
             messages.success(
@@ -318,7 +316,6 @@ def run_analysis(request: HttpRequest, project_id: str) -> object:
         except ImportError:
             # Fallback to synchronous analysis if Celery is not available
 
-
             analyzer = MultiBackendAnalyzer(flx_project, backend_names)
             analyzer.session = session
             session = analyzer.analyze()
@@ -328,7 +325,6 @@ def run_analysis(request: HttpRequest, project_id: str) -> object:
         return redirect("dashboard:analysis_session_detail", session_id=session.id)
 
     # GET - show analysis form
-
 
     available_backends = [
         {"name": name, "description": backend_class.description}
@@ -342,16 +338,8 @@ def run_analysis(request: HttpRequest, project_id: str) -> object:
     return render(request, "dashboard/run_analysis.html", context)
 
 
-def analysis_session_detail(request: HttpRequest, session_id: str) -> object:
+def analysis_session_detail(request: HttpRequest, session_id: str) -> HttpResponse:
     """Show analysis session details."""
-
-        AnalysisSession,
-        ClassAnalysis,
-        FunctionAnalysis,
-        PackageAnalysis,
-        SecurityIssue,
-    )
-
     session = get_object_or_404(AnalysisSession, id=session_id)
 
     # Get summary statistics
@@ -410,8 +398,6 @@ def package_analysis_view(
 
 def class_analysis_view(request: HttpRequest, session_id: str, class_id: str) -> object:
     """Show class analysis details."""
-
-
     session = get_object_or_404(AnalysisSession, id=session_id)
     class_obj = get_object_or_404(ClassAnalysis, id=class_id)
 
@@ -489,16 +475,8 @@ def analysis_overview(request: HttpRequest) -> object:
     return render(request, "dashboard/analysis_overview.html", context)
 
 
-def hierarchical_report(request: HttpRequest, session_id: str) -> object:
+def hierarchical_report(request: HttpRequest, session_id: str) -> HttpResponse:
     """Generate hierarchical analysis report."""
-
-        AnalysisSession,
-        ClassAnalysis,
-        FunctionAnalysis,
-        PackageAnalysis,
-        SecurityIssue,
-    )
-
     session = get_object_or_404(AnalysisSession, id=session_id)
 
     # Build hierarchical data structure

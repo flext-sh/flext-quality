@@ -6,9 +6,10 @@ Provides clean API interface for all quality analysis operations.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
+from uuid import UUID
 
-from flext_core import FlextResult
+from flext_core import FlextResult, TAnyDict
 
 from flext_quality.application.services import (
     QualityAnalysisService,
@@ -19,7 +20,15 @@ from flext_quality.application.services import (
 from flext_quality.infrastructure.container import get_quality_container
 
 if TYPE_CHECKING:
-    from uuid import UUID
+    from flext_quality.domain.entities import (
+        QualityAnalysis,
+        QualityIssue,
+        QualityProject,
+        QualityReport,
+    )
+else:
+    # Runtime imports for isinstance checks
+    from flext_quality.domain.entities import QualityAnalysis  # noqa: TC001
 
 
 class QualityAPI:
@@ -99,7 +108,7 @@ class QualityAPI:
         min_coverage: float = 95.0,
         max_complexity: int = 10,
         max_duplication: float = 5.0,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[QualityProject]:
         """Create a new quality project.
 
         Args:
@@ -132,7 +141,7 @@ class QualityAPI:
     async def get_project(
         self,
         project_id: UUID,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[QualityProject]:
         """Get a project by ID.
 
         Args:
@@ -144,7 +153,7 @@ class QualityAPI:
         """
         return await self.project_service.get_project(str(project_id))
 
-    async def list_projects(self) -> FlextResult[Any]:
+    async def list_projects(self) -> FlextResult[list[QualityProject]]:
         """List all projects.
 
         Returns:
@@ -156,8 +165,8 @@ class QualityAPI:
     async def update_project(
         self,
         project_id: UUID,
-        updates: dict[str, Any],
-    ) -> FlextResult[Any]:
+        updates: TAnyDict,
+    ) -> FlextResult[QualityProject]:
         """Update a project.
 
         Args:
@@ -170,7 +179,7 @@ class QualityAPI:
         """
         return await self.project_service.update_project(str(project_id), updates)
 
-    async def delete_project(self, project_id: UUID) -> FlextResult[Any]:
+    async def delete_project(self, project_id: UUID) -> FlextResult[bool]:
         """Delete a project.
 
         Args:
@@ -189,8 +198,8 @@ class QualityAPI:
         commit_hash: str | None = None,
         branch: str | None = None,
         pull_request_id: str | None = None,
-        analysis_config: dict[str, Any] | None = None,
-    ) -> FlextResult[Any]:
+        analysis_config: TAnyDict | None = None,
+    ) -> FlextResult[QualityAnalysis]:
         """Create a new quality analysis.
 
         Args:
@@ -220,7 +229,7 @@ class QualityAPI:
         code_lines: int,
         comment_lines: int,
         blank_lines: int,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[QualityAnalysis]:
         """Update analysis metrics.
 
         Args:
@@ -252,7 +261,7 @@ class QualityAPI:
         duplication_score: float,
         security_score: float,
         maintainability_score: float,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[QualityAnalysis]:
         """Update analysis quality scores.
 
         Args:
@@ -283,7 +292,7 @@ class QualityAPI:
         high: int,
         medium: int,
         low: int,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[QualityAnalysis]:
         """Update analysis issue counts by severity.
 
         Args:
@@ -308,7 +317,7 @@ class QualityAPI:
     async def complete_analysis(
         self,
         analysis_id: UUID,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[QualityAnalysis]:
         """Mark analysis as completed.
 
         Args:
@@ -324,7 +333,7 @@ class QualityAPI:
         self,
         analysis_id: UUID,
         error: str,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[QualityAnalysis]:
         """Mark analysis as failed.
 
         Args:
@@ -340,7 +349,7 @@ class QualityAPI:
     async def get_analysis(
         self,
         analysis_id: UUID,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[QualityAnalysis]:
         """Get an analysis by ID.
 
         Args:
@@ -355,7 +364,7 @@ class QualityAPI:
     async def list_analyses(
         self,
         project_id: UUID,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[list[QualityAnalysis]]:
         """List all analyses for a project.
 
         Args:
@@ -382,7 +391,7 @@ class QualityAPI:
         end_column_number: int | None = None,
         code_snippet: str | None = None,
         suggestion: str | None = None,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[QualityIssue]:
         """Create a new quality issue.
 
         Args:
@@ -418,7 +427,7 @@ class QualityAPI:
             suggestion=suggestion,
         )
 
-    async def get_issue(self, issue_id: UUID) -> FlextResult[Any]:
+    async def get_issue(self, issue_id: UUID) -> FlextResult[QualityIssue]:
         """Get an issue by ID.
 
         Args:
@@ -436,7 +445,7 @@ class QualityAPI:
         severity: str | None = None,
         issue_type: str | None = None,
         file_path: str | None = None,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[list[QualityIssue]]:
         """List issues for an analysis with optional filters.
 
         Args:
@@ -456,7 +465,7 @@ class QualityAPI:
             file_path=file_path,
         )
 
-    async def mark_issue_fixed(self, issue_id: UUID) -> FlextResult[Any]:
+    async def mark_issue_fixed(self, issue_id: UUID) -> FlextResult[QualityIssue]:
         """Mark an issue as fixed.
 
         Args:
@@ -472,7 +481,7 @@ class QualityAPI:
         self,
         issue_id: UUID,
         reason: str,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[QualityIssue]:
         """Suppress an issue with a reason.
 
         Args:
@@ -485,7 +494,7 @@ class QualityAPI:
         """
         return await self.issue_service.suppress_issue(str(issue_id), reason)
 
-    async def unsuppress_issue(self, issue_id: UUID) -> FlextResult[Any]:
+    async def unsuppress_issue(self, issue_id: UUID) -> FlextResult[QualityIssue]:
         """Remove suppression from an issue.
 
         Args:
@@ -505,7 +514,7 @@ class QualityAPI:
         report_format: str = "summary",
         report_path: str | None = None,
         report_size_bytes: int = 0,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[QualityReport]:
         """Create a quality report.
 
         Args:
@@ -527,7 +536,7 @@ class QualityAPI:
             report_size_bytes=report_size_bytes,
         )
 
-    async def get_report(self, report_id: UUID) -> FlextResult[Any]:
+    async def get_report(self, report_id: UUID) -> FlextResult[QualityReport]:
         """Get a report by ID.
 
         Args:
@@ -542,7 +551,7 @@ class QualityAPI:
     async def list_reports(
         self,
         analysis_id: UUID,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[list[QualityReport]]:
         """List all reports for an analysis.
 
         Args:
@@ -554,7 +563,7 @@ class QualityAPI:
         """
         return await self.report_service.list_reports(str(analysis_id))
 
-    async def delete_report(self, report_id: UUID) -> FlextResult[Any]:
+    async def delete_report(self, report_id: UUID) -> FlextResult[bool]:
         """Delete a report.
 
         Args:
@@ -572,7 +581,7 @@ class QualityAPI:
         project_id: UUID,
         commit_hash: str | None = None,
         branch: str | None = None,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[QualityAnalysis]:
         """Run a complete quality analysis for a project.
 
         Args:
@@ -603,7 +612,7 @@ class QualityAPI:
 
         # Update with dummy metrics
         await self.update_metrics(
-            analysis_id=analysis.id,
+            analysis_id=UUID(analysis.id),
             total_files=100,
             total_lines=10000,
             code_lines=7000,
@@ -613,7 +622,7 @@ class QualityAPI:
 
         # Update with dummy scores
         await self.update_scores(
-            analysis_id=analysis.id,
+            analysis_id=UUID(analysis.id),
             coverage_score=95.0,
             complexity_score=85.0,
             duplication_score=92.0,
@@ -623,7 +632,7 @@ class QualityAPI:
 
         # Update with dummy issue counts
         await self.update_issue_counts(
-            analysis_id=analysis.id,
+            analysis_id=UUID(analysis.id),
             critical=0,
             high=2,
             medium=5,
@@ -631,4 +640,4 @@ class QualityAPI:
         )
 
         # Complete the analysis
-        return await self.complete_analysis(analysis.id)
+        return await self.complete_analysis(UUID(analysis.id))

@@ -25,10 +25,10 @@ class TestIssueSeverity:
 
     def test_severity_values(self) -> None:
         """Test severity enum values."""
-        assert IssueSeverity.LOW == "low"
-        assert IssueSeverity.MEDIUM == "medium"
-        assert IssueSeverity.HIGH == "high"
-        assert IssueSeverity.CRITICAL == "critical"
+        assert IssueSeverity.LOW.value == "low"
+        assert IssueSeverity.MEDIUM.value == "medium"
+        assert IssueSeverity.HIGH.value == "high"
+        assert IssueSeverity.CRITICAL.value == "critical"
 
     def test_severity_enum_membership(self) -> None:
         """Test severity enum membership."""
@@ -44,45 +44,45 @@ class TestIssueType:
 
     def test_syntax_issues(self) -> None:
         """Test syntax issue types."""
-        assert IssueType.SYNTAX_ERROR == "syntax_error"
-        assert IssueType.STYLE_VIOLATION == "style_violation"
-        assert IssueType.NAMING_CONVENTION == "naming_convention"
+        assert IssueType.SYNTAX_ERROR.value == "syntax_error"
+        assert IssueType.STYLE_VIOLATION.value == "style_violation"
+        assert IssueType.NAMING_CONVENTION.value == "naming_convention"
 
     def test_complexity_issues(self) -> None:
         """Test complexity issue types."""
-        assert IssueType.HIGH_COMPLEXITY == "high_complexity"
-        assert IssueType.HIGH_COGNITIVE_COMPLEXITY == "high_cognitive_complexity"
-        assert IssueType.LONG_METHOD == "long_method"
-        assert IssueType.LONG_PARAMETER_LIST == "long_parameter_list"
+        assert IssueType.HIGH_COMPLEXITY.value == "high_complexity"
+        assert IssueType.HIGH_COGNITIVE_COMPLEXITY.value == "high_cognitive_complexity"
+        assert IssueType.LONG_METHOD.value == "long_method"
+        assert IssueType.LONG_PARAMETER_LIST.value == "long_parameter_list"
 
     def test_security_issues(self) -> None:
         """Test security issue types."""
-        assert IssueType.SECURITY_VULNERABILITY == "security_vulnerability"
-        assert IssueType.HARDCODED_SECRET == "hardcoded_secret"
-        assert IssueType.SQL_INJECTION == "sql_injection"
-        assert IssueType.XSS_VULNERABILITY == "xss_vulnerability"
+        assert IssueType.SECURITY_VULNERABILITY.value == "security_vulnerability"
+        assert IssueType.HARDCODED_SECRET.value == "hardcoded_secret"
+        assert IssueType.SQL_INJECTION.value == "sql_injection"
+        assert IssueType.XSS_VULNERABILITY.value == "xss_vulnerability"
 
     def test_dead_code_issues(self) -> None:
         """Test dead code issue types."""
-        assert IssueType.UNUSED_IMPORT == "unused_import"
-        assert IssueType.UNUSED_VARIABLE == "unused_variable"
-        assert IssueType.UNUSED_FUNCTION == "unused_function"
-        assert IssueType.UNREACHABLE_CODE == "unreachable_code"
+        assert IssueType.UNUSED_IMPORT.value == "unused_import"
+        assert IssueType.UNUSED_VARIABLE.value == "unused_variable"
+        assert IssueType.UNUSED_FUNCTION.value == "unused_function"
+        assert IssueType.UNREACHABLE_CODE.value == "unreachable_code"
 
     def test_duplication_issues(self) -> None:
         """Test duplication issue types."""
-        assert IssueType.DUPLICATE_CODE == "duplicate_code"
-        assert IssueType.SIMILAR_CODE == "similar_code"
+        assert IssueType.DUPLICATE_CODE.value == "duplicate_code"
+        assert IssueType.SIMILAR_CODE.value == "similar_code"
 
     def test_type_issues(self) -> None:
         """Test type issue types."""
-        assert IssueType.TYPE_ERROR == "type_error"
-        assert IssueType.MISSING_TYPE_ANNOTATION == "missing_type_annotation"
+        assert IssueType.TYPE_ERROR.value == "type_error"
+        assert IssueType.MISSING_TYPE_ANNOTATION.value == "missing_type_annotation"
 
     def test_documentation_issues(self) -> None:
         """Test documentation issue types."""
-        assert IssueType.MISSING_DOCSTRING == "missing_docstring"
-        assert IssueType.INVALID_DOCSTRING == "invalid_docstring"
+        assert IssueType.MISSING_DOCSTRING.value == "missing_docstring"
+        assert IssueType.INVALID_DOCSTRING.value == "invalid_docstring"
 
 
 class TestQualityGrade:
@@ -90,7 +90,7 @@ class TestQualityGrade:
 
     def test_grade_values(self) -> None:
         """Test quality grade values."""
-        assert QualityGrade.A_PLUS == "A+"
+        assert QualityGrade.A_PLUS.value == "A+"
         assert QualityGrade.A == "A"
         assert QualityGrade.B == "B"
         assert QualityGrade.C == "C"
@@ -101,7 +101,7 @@ class TestQualityGrade:
         """Test all expected grades exist."""
         expected_grades = [
             "A+", "A", "A-", "B+", "B", "B-",
-            "C+", "C", "C-", "D+", "D", "D-", "F"
+            "C+", "C", "C-", "D+", "D", "D-", "F",
         ]
 
         for grade in expected_grades:
@@ -339,7 +339,7 @@ class TestCoverageMetric:
         coverage = CoverageMetric(
             line_coverage=85.0,
             branch_coverage=75.0,
-            function_coverage=90.0
+            function_coverage=90.0,
         )
         assert coverage.line_coverage == 85.0
         assert coverage.branch_coverage == 75.0
@@ -365,7 +365,7 @@ class TestCoverageMetric:
         coverage = CoverageMetric(
             line_coverage=80.0,  # 50% weight = 40.0
             branch_coverage=70.0,  # 30% weight = 21.0
-            function_coverage=90.0  # 20% weight = 18.0
+            function_coverage=90.0,  # 20% weight = 18.0
         )
         # Total: 40.0 + 21.0 + 18.0 = 79.0
         expected = 79.0
@@ -376,7 +376,7 @@ class TestCoverageMetric:
         coverage = CoverageMetric(
             line_coverage=95.0,
             branch_coverage=95.0,
-            function_coverage=95.0
+            function_coverage=95.0,
         )
         assert coverage.is_sufficient
 
@@ -385,7 +385,7 @@ class TestCoverageMetric:
         coverage = CoverageMetric(
             line_coverage=80.0,
             branch_coverage=70.0,
-            function_coverage=90.0
+            function_coverage=90.0,
         )
         assert not coverage.is_sufficient
 
@@ -398,7 +398,7 @@ class TestDuplicationMetric:
         duplication = DuplicationMetric(
             duplicate_lines=50,
             total_lines=1000,
-            duplicate_blocks=5
+            duplicate_blocks=5,
         )
         assert duplication.duplicate_lines == 50
         assert duplication.total_lines == 1000

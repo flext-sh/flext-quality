@@ -9,9 +9,8 @@ from __future__ import annotations
 
 from datetime import datetime
 from enum import StrEnum
-from typing import Any
 
-from flext_core import FlextEntity, FlextResult
+from flext_core import FlextEntity, FlextResult, TAnyDict
 from pydantic import BaseModel, Field
 
 
@@ -134,7 +133,7 @@ class QualityAnalysis(FlextEntity):
     status: AnalysisStatus = Field(default=AnalysisStatus.QUEUED)
 
     # Analysis data
-    analysis_config: dict[str, Any] = Field(default_factory=dict)
+    analysis_config: TAnyDict = Field(default_factory=dict)
 
     def start_analysis(self) -> QualityAnalysis:
         """Start analysis and return new instance."""
@@ -275,7 +274,7 @@ class QualityRule(FlextEntity):
 
     # Rule details
     pattern: str | None = None
-    parameters: dict[str, Any] = Field(default_factory=dict)
+    parameters: TAnyDict = Field(default_factory=dict)
 
     # Documentation
     documentation_url: str | None = None
@@ -293,7 +292,7 @@ class QualityRule(FlextEntity):
         """Update severity and return new instance."""
         return self.model_copy(update={"severity": severity})
 
-    def set_parameter(self, key: str, value: Any) -> QualityRule:
+    def set_parameter(self, key: str, value: object) -> QualityRule:
         """Set parameter and return new instance."""
         new_parameters = self.parameters.copy()
         new_parameters[key] = value

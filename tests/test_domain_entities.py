@@ -22,27 +22,27 @@ from flext_quality.domain.entities import (
 class TestQualityProject:
     """Test QualityProject entity."""
 
-    def test_project_creation(self) -> None:
+    def test_project_creation(self, secure_temp_dir: str) -> None:
         """Test basic project creation."""
         project = QualityProject(
             id="test-project-id",
-            project_path="/tmp/test",
+            project_path=secure_temp_dir,
             repository_url="https://github.com/test/repo",
             language="python",
         )
 
         assert project.id == "test-project-id"
-        assert project.project_path == "/tmp/test"
+        assert project.project_path == secure_temp_dir
         assert project.repository_url == "https://github.com/test/repo"
         assert project.language == "python"
         assert project.auto_analyze is True
         assert project.min_coverage == 95.0
 
-    def test_project_validation_success(self) -> None:
+    def test_project_validation_success(self, secure_temp_dir: str) -> None:
         """Test successful project validation."""
         project = QualityProject(
             id="test-id",
-            project_path="/tmp/test",
+            project_path=secure_temp_dir,
         )
 
         result = project.validate_domain_rules()
@@ -57,11 +57,11 @@ class TestQualityProject:
                 project_path="",  # Empty path should fail
             )
 
-    def test_update_last_analysis(self) -> None:
+    def test_update_last_analysis(self, secure_temp_dir: str) -> None:
         """Test updating last analysis timestamp."""
         project = QualityProject(
             id="test-id",
-            project_path="/tmp/test",
+            project_path=secure_temp_dir,
         )
 
         initial_count = project.total_analyses
@@ -111,6 +111,7 @@ class TestQualityAnalysis:
 
         result = analysis.validate_domain_rules()
         assert result.is_failure
+        assert result.error is not None
         assert "required" in result.error.lower()
 
     def test_start_analysis(self) -> None:
@@ -260,6 +261,7 @@ class TestQualityIssue:
 
         result = issue.validate_domain_rules()
         assert result.is_failure
+        assert result.error is not None
         assert "required" in result.error.lower()
 
     def test_mark_fixed(self) -> None:
@@ -388,6 +390,7 @@ class TestQualityRule:
 
         result = invalid_rule.validate_domain_rules()
         assert result.is_failure
+        assert result.error is not None
         assert "required" in result.error.lower()
 
     def test_enable_disable_rule(self) -> None:
@@ -476,6 +479,7 @@ class TestQualityReport:
 
         result = report.validate_domain_rules()
         assert result.is_failure
+        assert result.error is not None
         assert "required" in result.error.lower()
 
     def test_increment_access(self) -> None:

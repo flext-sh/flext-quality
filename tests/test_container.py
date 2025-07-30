@@ -279,7 +279,7 @@ class TestContainerGlobalFunctions:
         assert flext_quality.infrastructure.container._container is not None
         assert isinstance(
             flext_quality.infrastructure.container._container,
-            QualityContainer
+            QualityContainer,
         )
 
     def test_get_quality_container_creates_if_not_exists(self) -> None:
@@ -305,10 +305,10 @@ class TestContainerGlobalFunctions:
         assert container1 is container2
         assert isinstance(container1, QualityContainer)
 
-    @patch("flext_quality.infrastructure.container.QualityContainer")
+    @patch("flext_quality.infrastructure.container.QualityContainer")  # type: ignore[misc]
     def test_get_quality_container_initialization_failure(
         self,
-        mock_container_class: MagicMock
+        mock_container_class: MagicMock,
     ) -> None:
         """Test get_quality_container handles initialization failure."""
         # Mock container creation to return None (simulating failure)
@@ -392,25 +392,25 @@ class TestContainerIntegration:
         config = QualityConfig()
 
         # Test port creation with config
-        ports = [
-            _create_ast_analysis_port(config),
-            _create_security_analyzer_port(config),
-            _create_complexity_analysis_port(config),
-            _create_dead_code_analysis_port(config),
-            _create_duplicate_analysis_port(config),
-            _create_ruff_port(config),
-        ]
+        ast_port = _create_ast_analysis_port(config)
+        security_port = _create_security_analyzer_port(config)
+        complexity_port = _create_complexity_analysis_port(config)
+        dead_code_port = _create_dead_code_analysis_port(config)
+        duplicate_port = _create_duplicate_analysis_port(config)
+        ruff_port = _create_ruff_port(config)
+
+        ports = [ast_port, security_port, complexity_port, dead_code_port, duplicate_port, ruff_port]
 
         # All ports should be properly created
         for port in ports:
             assert port is not None
 
         # Test repository creation
-        repos = [
-            _create_analysis_result_repository(),
-            _create_quality_metrics_repository(),
-            _create_quality_rule_repository(),
-        ]
+        analysis_repo = _create_analysis_result_repository()
+        metrics_repo = _create_quality_metrics_repository()
+        rules_repo = _create_quality_rule_repository()
+
+        repos = [analysis_repo, metrics_repo, rules_repo]
 
         # All repositories should be properly created
         for repo in repos:
@@ -418,11 +418,11 @@ class TestContainerIntegration:
 
         # Test service creation with dependencies
         analysis_service = _create_analysis_service(
-            ast_port=ports[0],
-            security_port=ports[1],
-            complexity_port=ports[2],
-            dead_code_port=ports[3],
-            duplicate_port=ports[4],
-            repo=repos[0],
+            ast_port=ast_port,
+            security_port=security_port,
+            complexity_port=complexity_port,
+            dead_code_port=dead_code_port,
+            duplicate_port=duplicate_port,
+            repo=analysis_repo,
         )
         assert isinstance(analysis_service, AnalysisServiceImpl)
