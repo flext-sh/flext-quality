@@ -47,7 +47,7 @@ class FlextQualityValidationError(FlextValidationError):
         **kwargs: object,
     ) -> None:
         """Initialize quality validation error with context."""
-        validation_details = {}
+        validation_details: dict[str, object] = {}
         if field is not None:
             validation_details["field"] = field
         if value is not None:
@@ -158,7 +158,7 @@ class FlextQualityAnalysisError(FlextQualityError):
         if file_count is not None:
             context["file_count"] = file_count
 
-        super().__init__(f"Quality analysis: {message}", **context)
+        super().__init__(f"Quality analysis: {message}", project_name=None, **context)
 
 
 class FlextQualityReportError(FlextQualityError):
@@ -178,7 +178,7 @@ class FlextQualityReportError(FlextQualityError):
         if output_format is not None:
             context["output_format"] = output_format
 
-        super().__init__(f"Quality report: {message}", **context)
+        super().__init__(f"Quality report: {message}", project_name=None, **context)
 
 
 class FlextQualityMetricsError(FlextQualityError):
@@ -198,7 +198,7 @@ class FlextQualityMetricsError(FlextQualityError):
         if metric_value is not None:
             context["metric_value"] = metric_value
 
-        super().__init__(f"Quality metrics: {message}", **context)
+        super().__init__(f"Quality metrics: {message}", project_name=None, **context)
 
 
 class FlextQualityGradeError(FlextQualityError):
@@ -218,7 +218,7 @@ class FlextQualityGradeError(FlextQualityError):
         if calculated_grade is not None:
             context["calculated_grade"] = calculated_grade
 
-        super().__init__(f"Quality grade: {message}", **context)
+        super().__init__(f"Quality grade: {message}", project_name=None, **context)
 
 
 class FlextQualityRuleError(FlextQualityError):
@@ -238,7 +238,7 @@ class FlextQualityRuleError(FlextQualityError):
         if rule_severity is not None:
             context["rule_severity"] = rule_severity
 
-        super().__init__(f"Quality rule: {message}", **context)
+        super().__init__(f"Quality rule: {message}", project_name=None, **context)
 
 
 __all__ = [

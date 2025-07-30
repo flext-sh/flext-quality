@@ -169,7 +169,8 @@ def invalid_syntax(
 
             # Mock open to raise FileNotFoundError
             with patch(
-                "builtins.open", side_effect=FileNotFoundError("File not accessible"),
+                "builtins.open",
+                side_effect=FileNotFoundError("File not accessible"),
             ):
                 metrics = analyzer._analyze_file(unreadable_file)
 

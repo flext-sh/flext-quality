@@ -577,7 +577,9 @@ class TestCodeAnalyzer:
         assert results["files_analyzed"] > 0
 
     def test_security_analysis_error_handling(
-        self, temp_project: Path, caplog: Any,
+        self,
+        temp_project: Path,
+        caplog: Any,
     ) -> None:
         """Test error handling in security analysis."""
         import logging
@@ -620,7 +622,9 @@ class TestCodeAnalyzer:
             builtins.open = original_open
 
     def test_dead_code_analysis_error_handling(
-        self, temp_project: Path, caplog: Any,
+        self,
+        temp_project: Path,
+        caplog: Any,
     ) -> None:
         """Test error handling in dead code analysis."""
         import logging
@@ -657,7 +661,9 @@ class TestCodeAnalyzer:
             builtins.open = original_open
 
     def test_duplicate_analysis_error_handling(
-        self, temp_project: Path, caplog: Any,
+        self,
+        temp_project: Path,
+        caplog: Any,
     ) -> None:
         """Test error handling in duplicate analysis."""
         import logging

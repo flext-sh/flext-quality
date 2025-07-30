@@ -62,7 +62,8 @@ class ProjectAdmin(admin.ModelAdmin[Project]):
     )
 
     @admin.display(
-        description="Latest Score", ordering="analysissession__overall_score",
+        description="Latest Score",
+        ordering="analysissession__overall_score",
     )
     def latest_score(self, obj: Project) -> str:
         """Display the latest analysis score."""

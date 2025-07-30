@@ -200,7 +200,8 @@ class TestRunSecurityCheckHandlerIntegration:
 
         # Mock service to fail
         with patch.object(
-            handler._security_service, "analyze_security",
+            handler._security_service,
+            "analyze_security",
         ) as mock_security:
             mock_security.return_value = FlextResult.fail("Security scanner failed")
 
@@ -217,7 +218,8 @@ class TestRunSecurityCheckHandlerIntegration:
 
         # Mock service to return success with None
         with patch.object(
-            handler._security_service, "analyze_security",
+            handler._security_service,
+            "analyze_security",
         ) as mock_security:
             mock_security.return_value = FlextResult.ok(None)
 

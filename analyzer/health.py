@@ -22,20 +22,9 @@ from django.views.decorators.http import require_http_methods
 if TYPE_CHECKING:
     from django.http import HttpRequest
 
-try:
-    import redis
-
-    REDIS_AVAILABLE = True
-except ImportError:
-    REDIS_AVAILABLE = False
-
-# Use flext-observability for proper health monitoring - DRY approach
-try:
-    from flext_observability import FlextHealthService, flext_create_health_check
-
-    FLEXT_HEALTH_AVAILABLE = True
-except ImportError:
-    FLEXT_HEALTH_AVAILABLE = False
+# Direct imports - guaranteed dependencies
+import redis
+from flext_observability import FlextHealthService, flext_create_health_check
 
 
 def check_database() -> TAnyDict:
@@ -74,9 +63,6 @@ def check_cache() -> TAnyDict:
 
 def check_redis() -> TAnyDict:
     """Check Redis connection health."""
-    if not REDIS_AVAILABLE:
-        return {"status": "unknown", "details": "Redis client not available"}
-
     try:
         redis_url = getattr(settings, "CELERY_BROKER_URL", "redis://localhost:6379/0")
         r = redis.from_url(redis_url)
@@ -89,9 +75,6 @@ def check_redis() -> TAnyDict:
 
 def check_background_tasks() -> TAnyDict:
     """Check background task processing health using flext-observability."""
-    if not FLEXT_HEALTH_AVAILABLE:
-        return {"status": "unknown", "details": "FLEXT health monitoring not available"}
-
     try:
         # Use flext-observability proper health service - DRY approach with real signature
         health_check_result = flext_create_health_check(

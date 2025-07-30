@@ -506,7 +506,9 @@ class BasePortService:
     """
 
     def __init__(
-        self, port: object | None = None, repository: object | None = None,
+        self,
+        port: object | None = None,
+        repository: object | None = None,
     ) -> None:
         self._port = port
         self._repository = repository

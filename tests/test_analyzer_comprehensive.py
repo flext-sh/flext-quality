@@ -35,7 +35,8 @@ class TestCodeAnalyzerComprehensive:
         assert analyzer.analysis_results == {}
 
     def test_analyze_project_all_features_enabled(
-        self, temporary_project_structure: str,
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test analyze_project with all analysis features enabled."""
         analyzer = CodeAnalyzer(temporary_project_structure)
@@ -69,7 +70,8 @@ class TestCodeAnalyzerComprehensive:
         assert "duplicates" in issues
 
     def test_analyze_project_selective_features(
-        self, temporary_project_structure: str,
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test analyze_project with selective feature enabling."""
         analyzer = CodeAnalyzer(temporary_project_structure)
@@ -91,7 +93,8 @@ class TestCodeAnalyzerComprehensive:
         assert issues.get("duplicates", []) == []
 
     def test_analyze_project_no_features(
-        self, temporary_project_structure: str,
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test analyze_project with all analysis features disabled."""
         analyzer = CodeAnalyzer(temporary_project_structure)
@@ -116,7 +119,8 @@ class TestCodeAnalyzerComprehensive:
         assert issues.get("duplicates", []) == []
 
     def test_find_python_files_with_valid_project(
-        self, temporary_project_structure: str,
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test _find_python_files with real project structure."""
         analyzer = CodeAnalyzer(temporary_project_structure)
@@ -146,7 +150,8 @@ class TestCodeAnalyzerComprehensive:
         assert python_files == []
 
     def test_internal_analyze_file_simple_valid_file(
-        self, temporary_project_structure: str,
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test _analyze_file with simple valid Python file."""
         analyzer = CodeAnalyzer(temporary_project_structure)
@@ -178,7 +183,10 @@ class TestCodeAnalyzerComprehensive:
     def test_internal_analyze_file_with_syntax_error(self) -> None:
         """Test _analyze_file with file containing syntax errors."""
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".py", delete=False,
+            encoding="utf-8",
+            mode="w",
+            suffix=".py",
+            delete=False,
         ) as f:
             f.write("def broken_function(\n")  # Intentional syntax error
             f.flush()
@@ -200,7 +208,8 @@ class TestCodeAnalyzerComprehensive:
         assert metrics is None
 
     def test_calculate_overall_metrics_with_multiple_files(
-        self, temporary_project_structure: str,
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test _calculate_overall_metrics with multiple file metrics."""
         analyzer = CodeAnalyzer(temporary_project_structure)
@@ -435,7 +444,8 @@ def handle_data(data):
             assert len(issues) == 0
 
     def test_analyze_duplicates_single_file(
-        self, temporary_project_structure: str,
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test _analyze_duplicates with single file (no duplicates possible)."""
         # Create directory with only one file
@@ -476,7 +486,8 @@ def handle_data(data):
         assert "trace_id" in kwargs or len(args) > 0
 
     def test_analyze_project_integration_flow(
-        self, temporary_project_structure: str,
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test complete analyze_project integration flow with real files."""
         analyzer = CodeAnalyzer(temporary_project_structure)
@@ -573,7 +584,10 @@ def complex_calculation(x, y, z):
     def test_edge_case_ast_parsing_with_encoding_issues(self) -> None:
         """Test AST parsing with different file encodings."""
         with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".py", delete=False, encoding="utf-8",
+            mode="w",
+            suffix=".py",
+            delete=False,
+            encoding="utf-8",
         ) as f:
             f.write("""# -*- coding: utf-8 -*-
 def test_unicode():
@@ -591,7 +605,8 @@ def test_unicode():
             assert "test_unicode" in metrics["functions"]
 
     def test_ast_visitor_comprehensive_coverage(
-        self, temporary_project_structure: str,
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test AST visitor with comprehensive Python constructs."""
         project_path = Path(temporary_project_structure)
