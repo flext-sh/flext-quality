@@ -268,6 +268,7 @@ class TestContainerGlobalFunctions:
         """Clean up global container state after each test."""
         # Reset global container to clean state
         import flext_quality.infrastructure.container
+
         flext_quality.infrastructure.container._container = None
 
     def test_configure_quality_dependencies(self) -> None:
@@ -276,6 +277,7 @@ class TestContainerGlobalFunctions:
 
         # Should create global container
         import flext_quality.infrastructure.container
+
         assert flext_quality.infrastructure.container._container is not None
         assert isinstance(
             flext_quality.infrastructure.container._container,
@@ -286,6 +288,7 @@ class TestContainerGlobalFunctions:
         """Test get_quality_container creates container if it doesn't exist."""
         # Ensure container is None initially
         import flext_quality.infrastructure.container
+
         flext_quality.infrastructure.container._container = None
 
         container = get_quality_container()
@@ -305,7 +308,7 @@ class TestContainerGlobalFunctions:
         assert container1 is container2
         assert isinstance(container1, QualityContainer)
 
-    @patch("flext_quality.infrastructure.container.QualityContainer")  # type: ignore[misc]
+    @patch("flext_quality.infrastructure.container.QualityContainer")
     def test_get_quality_container_initialization_failure(
         self,
         mock_container_class: MagicMock,
@@ -316,6 +319,7 @@ class TestContainerGlobalFunctions:
 
         # Reset global container to trigger initialization
         import flext_quality.infrastructure.container
+
         flext_quality.infrastructure.container._container = None
 
         # Should raise RuntimeError when container fails to initialize
@@ -326,6 +330,7 @@ class TestContainerGlobalFunctions:
         """Test that global container maintains singleton behavior."""
         # Reset to clean state
         import flext_quality.infrastructure.container
+
         flext_quality.infrastructure.container._container = None
 
         # Multiple calls should return same instance
@@ -382,8 +387,12 @@ class TestContainerIntegration:
         assert len(container._instances) == 4
 
         # Re-resolving should return same instances
-        for service_type in [QualityConfig, AnalysisResultRepository,
-                            QualityMetricsRepository, QualityRuleRepository]:
+        for service_type in [
+            QualityConfig,
+            AnalysisResultRepository,
+            QualityMetricsRepository,
+            QualityRuleRepository,
+        ]:
             cached_service = container.resolve(service_type)
             assert cached_service in services
 
@@ -399,7 +408,14 @@ class TestContainerIntegration:
         duplicate_port = _create_duplicate_analysis_port(config)
         ruff_port = _create_ruff_port(config)
 
-        ports = [ast_port, security_port, complexity_port, dead_code_port, duplicate_port, ruff_port]
+        ports = [
+            ast_port,
+            security_port,
+            complexity_port,
+            dead_code_port,
+            duplicate_port,
+            ruff_port,
+        ]
 
         # All ports should be properly created
         for port in ports:

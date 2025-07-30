@@ -171,13 +171,13 @@ class TestQualityMetrics:
             documentation_score=75.0,
         )
 
-        summary = metrics.scores_summary
+        summary = metrics.scores_summary()
 
-        assert summary["complexity"] == 85.0  # type: ignore[index]
-        assert summary["security"] == 90.0  # type: ignore[index]
-        assert summary["maintainability"] == 80.0  # type: ignore[index]
-        assert summary["duplication"] == 95.0  # type: ignore[index]
-        assert summary["documentation"] == 75.0  # type: ignore[index]
+        assert summary["complexity"] == 85.0
+        assert summary["security"] == 90.0
+        assert summary["maintainability"] == 80.0
+        assert summary["duplication"] == 95.0
+        assert summary["documentation"] == 75.0
 
     def test_total_issues_computed_field(self) -> None:
         """Test total_issues computed field."""
@@ -188,7 +188,7 @@ class TestQualityMetrics:
             complexity_issues_count=8,
         )
 
-        assert metrics.total_issues == 18  # type: ignore[comparison-overlap] # 5+3+2+8
+        assert metrics.total_issues() == 18  # 5+3+2+8
 
     def test_to_dict(self) -> None:
         """Test to_dict method."""
@@ -370,15 +370,28 @@ class TestQualityMetrics:
         assert metrics.dead_code_items_count == 2
         assert metrics.duplicate_blocks_count == 1
         assert metrics.complexity_issues_count == 3
-        assert metrics.total_issues == 7  # type: ignore[comparison-overlap]
+        assert metrics.total_issues() == 7
 
         # Verify scores are calculated
         assert 0 <= metrics.overall_score <= 100
-        assert metrics.quality_grade in {"A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "F"}
+        assert metrics.quality_grade in {
+            "A+",
+            "A",
+            "A-",
+            "B+",
+            "B",
+            "B-",
+            "C+",
+            "C",
+            "C-",
+            "D+",
+            "D",
+            "F",
+        }
 
         # Verify computed fields work
-        assert len(metrics.scores_summary) == 5  # type: ignore[arg-type]
-        assert all(0 <= score <= 100 for score in metrics.scores_summary.values())  # type: ignore[attr-defined]
+        assert len(metrics.scores_summary()) == 5
+        assert all(0 <= score <= 100 for score in metrics.scores_summary().values())
 
         # Verify string representation
         summary = metrics.get_summary()

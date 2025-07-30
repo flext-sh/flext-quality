@@ -6,10 +6,9 @@ Tests error paths, success paths, and integration with real services.
 
 from __future__ import annotations
 
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 from uuid import uuid4
 
-import pytest
 from flext_core import FlextResult
 
 from flext_quality.application.handlers import (
