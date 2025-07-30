@@ -2,9 +2,15 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from django import template
+
+if TYPE_CHECKING:
+    from flext_core import TAnyDict
+else:
+    # Runtime type alias using flext-core patterns
+    TAnyDict = dict[str, object]
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
@@ -14,7 +20,7 @@ register = template.Library()
 
 
 @register.filter
-def get_item(dictionary: dict[str, Any], key: str) -> object:
+def get_item(dictionary: TAnyDict, key: str) -> object:
     return dictionary.get(key)
 
 
@@ -57,7 +63,7 @@ def status_icon(status: str) -> object:
 
 
 @register.filter
-def dict_get(dictionary: dict[str, Any], key: str) -> object:
+def dict_get(dictionary: TAnyDict, key: str) -> object:
     return dictionary.get(key, 0)
 
 

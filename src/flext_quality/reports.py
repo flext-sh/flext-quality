@@ -3,16 +3,14 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-# Constants for grade thresholds
-GRADE_A_THRESHOLD = 90
-GRADE_B_THRESHOLD = 80
-GRADE_C_THRESHOLD = 70
-GRADE_D_THRESHOLD = 60
+    from flext_core import TAnyDict
+
+from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
 
 # Constants for display limits
 ISSUE_PREVIEW_LIMIT = 5
@@ -26,14 +24,15 @@ HIGH_TYPE_ERROR_THRESHOLD = 10
 class QualityReport:
     """Generates quality reports from analysis results."""
 
-    def __init__(self, analysis_results: dict[str, Any]) -> None:
+    def __init__(self, analysis_results: TAnyDict) -> None:
         """Initialize the quality report generator.
 
         Args:
             analysis_results: Dictionary containing analysis results and metrics.
 
         """
-        self.results = analysis_results
+        # Cast TAnyDict to dict for type safety
+        self.results: dict[str, object] = dict(analysis_results)
 
     def generate_text_report(self) -> str:
         """Generate a text-based quality report."""
@@ -58,7 +57,9 @@ class QualityReport:
         ]
 
         # Add issue details
-        issues = self.results.get("issues", {})
+        results_dict = dict(self.results) if isinstance(self.results, dict) else {}
+        issues_obj = results_dict.get("issues", {})
+        issues = dict(issues_obj) if isinstance(issues_obj, dict) else {}
         for category, issue_list in issues.items():
             if issue_list:
                 report_lines.append(f"\n{category.upper()} ({len(issue_list)} issues):")
@@ -200,17 +201,10 @@ class QualityReport:
         output_path.write_text(content, encoding="utf-8")
 
     def _get_quality_grade(self) -> str:
-        """Calculate quality grade."""
+        """Calculate quality grade - DRY refactored."""
         score = self._get_quality_score()
-        if score >= GRADE_A_THRESHOLD:
-            return "A"
-        if score >= GRADE_B_THRESHOLD:
-            return "B"
-        if score >= GRADE_C_THRESHOLD:
-            return "C"
-        if score >= GRADE_D_THRESHOLD:
-            return "D"
-        return "F"
+        grade = QualityGradeCalculator.calculate_grade(float(score))
+        return grade.value
 
     def _get_quality_score(self) -> int:
         """Calculate overall quality score."""
@@ -239,27 +233,34 @@ class QualityReport:
 
     def _get_total_issues(self) -> int:
         """Get total number of issues."""
-        issues = self.results.get("issues", {})
+        issues_obj = self.results.get("issues", {})
+        issues = dict(issues_obj) if isinstance(issues_obj, dict) else {}
         return sum(len(issue_list) for issue_list in issues.values())
 
     def _get_critical_issues(self) -> int:
         """Get number of critical issues."""
-        issues = self.results.get("issues", {})
+        issues_obj = self.results.get("issues", {})
+        issues = dict(issues_obj) if isinstance(issues_obj, dict) else {}
         critical_categories = ["security", "errors", "critical"]
         return sum(len(issues.get(category, [])) for category in critical_categories)
 
     def _get_files_analyzed(self) -> int:
         """Get number of files analyzed."""
-        return int(self.results.get("metrics", {}).get("files_analyzed", 0))
+        metrics_obj = self.results.get("metrics", {})
+        metrics = dict(metrics_obj) if isinstance(metrics_obj, dict) else {}
+        return int(metrics.get("files_analyzed", 0))
 
     def _get_coverage_percent(self) -> float:
         """Get code coverage percentage."""
-        return float(self.results.get("metrics", {}).get("coverage_percent", 0.0))
+        metrics_obj = self.results.get("metrics", {})
+        metrics = dict(metrics_obj) if isinstance(metrics_obj, dict) else {}
+        return float(metrics.get("coverage_percent", 0.0))
 
     def _generate_issues_html(self) -> str:
         """Generate HTML for issues section."""
         html_parts = []
-        issues = self.results.get("issues", {})
+        issues_obj = self.results.get("issues", {})
+        issues = dict(issues_obj) if isinstance(issues_obj, dict) else {}
 
         for category, issue_list in issues.items():
             if not issue_list:
@@ -327,7 +328,8 @@ class QualityReport:
                 f"{MIN_COVERAGE_THRESHOLD}%",
             )
 
-        issues = self.results.get("issues", {})
+        issues_obj = self.results.get("issues", {})
+        issues = dict(issues_obj) if isinstance(issues_obj, dict) else {}
         if issues.get("duplicates"):
             recommendations.append("Refactor duplicate code to improve maintainability")
 

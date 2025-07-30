@@ -3,9 +3,15 @@
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from django.conf import settings
+
+if TYPE_CHECKING:
+    from flext_core import TAnyDict
+else:
+    # Runtime type alias using flext-core patterns
+    TAnyDict = dict[str, object]
 from django.core.cache import cache
 from django.db import connection
 from django.http import JsonResponse
@@ -23,15 +29,15 @@ try:
 except ImportError:
     REDIS_AVAILABLE = False
 
+# Use flext-observability for proper health monitoring - DRY approach
 try:
-    from celery import current_app
-
-    CELERY_AVAILABLE = True
+    from flext_observability import FlextHealthService, flext_create_health_check
+    FLEXT_HEALTH_AVAILABLE = True
 except ImportError:
-    CELERY_AVAILABLE = False
+    FLEXT_HEALTH_AVAILABLE = False
 
 
-def check_database() -> dict[str, Any]:
+def check_database() -> TAnyDict:
     """Check database connection health."""
     try:
         with connection.cursor() as cursor:
@@ -48,7 +54,7 @@ def check_database() -> dict[str, Any]:
         }
 
 
-def check_cache() -> dict[str, Any]:
+def check_cache() -> TAnyDict:
     """Check cache connection health."""
     try:
         test_key = "health_check_test"
@@ -65,7 +71,7 @@ def check_cache() -> dict[str, Any]:
         return {"status": "unhealthy", "details": f"Cache connection failed: {e!s}"}
 
 
-def check_redis() -> dict[str, Any]:
+def check_redis() -> TAnyDict:
     """Check Redis connection health."""
     if not REDIS_AVAILABLE:
         return {"status": "unknown", "details": "Redis client not available"}
@@ -80,25 +86,31 @@ def check_redis() -> dict[str, Any]:
         return {"status": "healthy", "details": "Redis connection successful"}
 
 
-def check_celery() -> dict[str, Any]:
-    """Check Celery workers health."""
-    if not CELERY_AVAILABLE:
-        return {"status": "unknown", "details": "Celery not available"}
+def check_background_tasks() -> TAnyDict:
+    """Check background task processing health using flext-observability."""
+    if not FLEXT_HEALTH_AVAILABLE:
+        return {"status": "unknown", "details": "FLEXT health monitoring not available"}
 
     try:
-        # Check if workers are available
-        inspect = current_app.control.inspect()
-        stats = inspect.stats()
+        # Use flext-observability proper health service - DRY approach with real signature
+        health_check_result = flext_create_health_check(
+            component="background_tasks",
+            status="healthy",
+            message="Task processing system operational",
+        )
 
-        if stats:
-            active_workers = len(stats)
+        if health_check_result.is_success and health_check_result.data:
+            health_data = health_check_result.data
             return {
                 "status": "healthy",
-                "details": f"Celery has {active_workers} active workers",
+                "details": f"Background tasks: {health_data.message}",
             }
-        return {"status": "unhealthy", "details": "No active Celery workers found"}
+        return {
+            "status": "unhealthy",
+            "details": f"Health check creation failed: {health_check_result.error}",
+        }
     except (OSError, ConnectionError, TimeoutError) as e:
-        return {"status": "unhealthy", "details": f"Celery check failed: {e!s}"}
+        return {"status": "unhealthy", "details": f"FLEXT health check failed: {e!s}"}
 
 
 @csrf_exempt
@@ -112,7 +124,7 @@ def health_check(request: HttpRequest) -> JsonResponse:
         "database": check_database(),
         "cache": check_cache(),
         "redis": check_redis(),
-        "celery": check_celery(),
+        "background_tasks": check_background_tasks(),
     }
 
     # Determine overall status

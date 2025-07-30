@@ -4,14 +4,31 @@ from __future__ import annotations
 
 import importlib.metadata
 import json
+import logging
 import site
 from pathlib import Path
-from typing import Any
+from typing import TypedDict
 
-# Use centralized logging
-from flext_observability.structured_logging import get_logger
 
-logger = get_logger(__name__)
+# Type aliases for package data structures
+class PackageInfo(TypedDict, total=False):
+    """Type definition for package information."""
+
+    name: str
+    version: str
+    description: str
+    has_python_files: bool
+    estimated_size: int
+    location: str | None
+    is_editable: bool
+    package_type: str
+    summary: str
+    source_path: str | None
+
+
+PackageList = list[PackageInfo]
+
+logger = logging.getLogger(__name__)
 
 
 class PackageDiscovery:
@@ -19,20 +36,20 @@ class PackageDiscovery:
 
     def __init__(self) -> None:
         """Initialize package discovery system."""
-        self.packages_cache: dict[str, dict[str, Any]] = {}
-        self._cached_packages: list[dict[str, Any]] | None = None
+        self.packages_cache: dict[str, PackageInfo] = {}
+        self._cached_packages: PackageList | None = None
 
     def clear_cache(self) -> None:
         """Clear cached package information."""
         self._cached_packages = None
         self.packages_cache.clear()
 
-    def get_installed_packages(self) -> list[dict[str, Any]]:
+    def get_installed_packages(self) -> PackageList:
         """Get list of all installed packages."""
         if self._cached_packages is not None:
             return self._cached_packages
 
-        packages: list[dict[str, Any]] = []
+        packages: PackageList = []
 
         # Use importlib.metadata for Python 3.8+
         for dist in importlib.metadata.distributions():
@@ -61,7 +78,7 @@ class PackageDiscovery:
     def _analyze_package_fast(
         self,
         dist: importlib.metadata.Distribution,
-    ) -> dict[str, Any] | None:
+    ) -> PackageInfo | None:
         """Fast package analysis with minimal file system operations."""
         try:
             name = dist.metadata["Name"]
@@ -93,7 +110,7 @@ class PackageDiscovery:
     def _analyze_package(
         self,
         dist: importlib.metadata.Distribution,
-    ) -> dict[str, Any] | None:
+    ) -> PackageInfo | None:
         """Detailed package analysis with file system checks."""
         try:
             name = dist.metadata["Name"]
@@ -329,7 +346,7 @@ class PackageDiscovery:
         except (RuntimeError, ValueError, TypeError):
             return 0
 
-    def get_package_by_name(self, package_name: str) -> dict[str, Any] | None:
+    def get_package_by_name(self, package_name: str) -> PackageInfo | None:
         """Get package by name."""
         packages = self.get_installed_packages()
         for package in packages:
@@ -337,7 +354,7 @@ class PackageDiscovery:
                 return package
         return None
 
-    def search_packages(self, query: str) -> list[dict[str, Any]]:
+    def search_packages(self, query: str) -> PackageList:
         """Search packages by name or description."""
         packages = self.get_installed_packages()
         query_lower = query.lower()
@@ -349,12 +366,12 @@ class PackageDiscovery:
             or query_lower in package.get("description", "").lower()
         ]
 
-    def get_development_packages(self) -> list[dict[str, Any]]:
+    def get_development_packages(self) -> PackageList:
         """Get packages installed in development mode."""
         packages = self.get_installed_packages()
         return [p for p in packages if p["package_type"] == "source"]
 
-    def get_analyzable_packages(self) -> list[dict[str, Any]]:
+    def get_analyzable_packages(self) -> PackageList:
         """Get packages that can be analyzed."""
         packages = self.get_installed_packages()
         return [

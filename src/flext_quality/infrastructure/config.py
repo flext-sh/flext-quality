@@ -6,9 +6,8 @@ REFACTORED: Uses flext-core configuration patterns - NO duplication.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
-from flext_core import FlextBaseSettings
+from flext_core import FlextBaseSettings, TAnyDict
 from pydantic import Field
 from pydantic_settings import SettingsConfigDict
 
@@ -249,7 +248,7 @@ class QualityConfig(FlextBaseSettings):
         description="Enable custom quality rules",
     )
 
-    def get_analysis_config(self) -> dict[str, Any]:
+    def get_analysis_config(self) -> TAnyDict:
         """Get analysis configuration dictionary.
 
         Returns:
@@ -270,7 +269,7 @@ class QualityConfig(FlextBaseSettings):
             },
         }
 
-    def get_report_config(self) -> dict[str, Any]:
+    def get_report_config(self) -> TAnyDict:
         """Get report generation configuration.
 
         Returns:
@@ -284,7 +283,7 @@ class QualityConfig(FlextBaseSettings):
             "output_dir": self.report_output_dir,
         }
 
-    def get_linting_config(self) -> dict[str, Any]:
+    def get_linting_config(self) -> TAnyDict:
         """Get linting configuration dictionary.
 
         Returns:

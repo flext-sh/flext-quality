@@ -7,18 +7,15 @@ Defines service interfaces following clean architecture.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pathlib import Path
 
-from flext_core import FlextEntity, FlextHandlers, FlextResult
+    from flext_core import FlextResult, TAnyDict
 
-# Use real imports instead of fallbacks
-DomainEntity = FlextEntity
-CommandHandler = FlextHandlers.CommandHandler
-QueryHandler = FlextHandlers.QueryHandler
-AbstractService = ABC  # Use ABC directly
+
+# Using flext-core and ABC directly - no duplicate aliases
 
 
 class AnalysisService(ABC):
@@ -32,7 +29,7 @@ class AnalysisService(ABC):
         include_complexity: bool = True,
         include_dead_code: bool = True,
         include_duplicates: bool = True,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[TAnyDict]:
         """Analyze a complete project with configurable analysis types."""
         ...
 
@@ -41,20 +38,20 @@ class AnalysisService(ABC):
         self,
         file_path: Path,
         analysis_types: list[str] | None = None,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[TAnyDict]:
         """Analyze a single file with specified analysis types."""
         ...
 
     @abstractmethod
     async def calculate_quality_score(
         self,
-        analysis_results: dict[str, Any],
-    ) -> FlextResult[Any]:
+        analysis_results: TAnyDict,
+    ) -> FlextResult[TAnyDict]:
         """Calculate overall quality score from analysis results."""
         ...
 
     @abstractmethod
-    async def get_quality_grade(self, quality_score: float) -> FlextResult[Any]:
+    async def get_quality_grade(self, quality_score: float) -> FlextResult[str]:
         """Convert quality score to letter grade (A, B, C, D, F)."""
         ...
 
@@ -67,7 +64,7 @@ class SecurityAnalyzerService(ABC):
         self,
         project_path: Path,
         severity_threshold: str = "medium",
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[TAnyDict]:
         """Analyze project for security vulnerabilities."""
         ...
 
@@ -76,7 +73,7 @@ class SecurityAnalyzerService(ABC):
         self,
         file_path: Path,
         severity_threshold: str = "medium",
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[TAnyDict]:
         """Scan a single file for security issues."""
         ...
 
@@ -84,7 +81,7 @@ class SecurityAnalyzerService(ABC):
     async def validate_dependencies(
         self,
         project_path: Path,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[TAnyDict]:
         """Validate project dependencies for known vulnerabilities."""
         ...
 
@@ -97,7 +94,7 @@ class LintingService(ABC):
         self,
         project_path: Path,
         fix: bool = False,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[TAnyDict]:
         """Lint entire project with optional auto-fix."""
         ...
 
@@ -106,12 +103,12 @@ class LintingService(ABC):
         self,
         file_path: Path,
         fix: bool = False,
-    ) -> FlextResult[Any]:
+    ) -> FlextResult[TAnyDict]:
         """Lint a single file with optional auto-fix."""
         ...
 
     @abstractmethod
-    async def format_code(self, file_path: Path) -> FlextResult[Any]:
+    async def format_code(self, file_path: Path) -> FlextResult[bool]:
         """Format code in a file according to style guidelines."""
         ...
 
@@ -122,7 +119,7 @@ class ReportGeneratorService(ABC):
     @abstractmethod
     async def generate_report(
         self,
-        analysis_results: dict[str, Any],
+        analysis_results: TAnyDict,
         output_format: str = "html",
         output_path: Path | None = None,
     ) -> FlextResult[str]: ...
@@ -130,13 +127,13 @@ class ReportGeneratorService(ABC):
     @abstractmethod
     async def generate_summary(
         self,
-        analysis_results: dict[str, Any],
-    ) -> FlextResult[dict[str, Any]]: ...
+        analysis_results: TAnyDict,
+    ) -> FlextResult[TAnyDict]: ...
 
     @abstractmethod
     async def export_metrics(
         self,
-        analysis_results: dict[str, Any],
+        analysis_results: TAnyDict,
         output_format: str = "json",
     ) -> FlextResult[str]: ...
 
@@ -149,7 +146,7 @@ class ComplexityAnalyzerService(ABC):
         self,
         project_path: Path,
         threshold: int = 10,
-    ) -> FlextResult[list[dict[str, Any]]]: ...
+    ) -> FlextResult[list[TAnyDict]]: ...
 
     @abstractmethod
     async def calculate_cyclomatic_complexity(
@@ -171,7 +168,7 @@ class DeadCodeDetectorService(ABC):
     async def detect_dead_code(
         self,
         project_path: Path,
-    ) -> FlextResult[list[dict[str, Any]]]: ...
+    ) -> FlextResult[list[TAnyDict]]: ...
 
     @abstractmethod
     async def find_unused_imports(
@@ -183,7 +180,7 @@ class DeadCodeDetectorService(ABC):
     async def find_unused_variables(
         self,
         file_path: Path,
-    ) -> FlextResult[list[dict[str, Any]]]: ...
+    ) -> FlextResult[list[TAnyDict]]: ...
 
 
 class DuplicateDetectorService(ABC):
@@ -195,14 +192,14 @@ class DuplicateDetectorService(ABC):
         project_path: Path,
         min_lines: int = 5,
         similarity_threshold: float = 0.8,
-    ) -> FlextResult[list[dict[str, Any]]]: ...
+    ) -> FlextResult[list[TAnyDict]]: ...
 
     @abstractmethod
     async def find_similar_functions(
         self,
         project_path: Path,
         similarity_threshold: float = 0.8,
-    ) -> FlextResult[list[dict[str, Any]]]: ...
+    ) -> FlextResult[list[TAnyDict]]: ...
 
     @abstractmethod
     async def calculate_duplication_ratio(
@@ -218,7 +215,7 @@ class MetricsCollectorService(ABC):
     async def collect_metrics(
         self,
         project_path: Path,
-    ) -> FlextResult[dict[str, Any]]: ...
+    ) -> FlextResult[TAnyDict]: ...
 
     @abstractmethod
     async def calculate_maintainability_index(
@@ -230,4 +227,4 @@ class MetricsCollectorService(ABC):
     async def calculate_technical_debt(
         self,
         project_path: Path,
-    ) -> FlextResult[dict[str, Any]]: ...
+    ) -> FlextResult[TAnyDict]: ...

@@ -160,7 +160,7 @@ class TestQualityAPI:
 
         issue_id = uuid4()
         # Mock the issue in service
-        api.issue_service._issues[str(issue_id)] = create_result.data
+        api.issue_service._issues[str(issue_id)] = create_result.data  # type: ignore[assignment]
 
         result = await api.get_issue(issue_id)
         assert result.is_success
@@ -181,7 +181,7 @@ class TestQualityAPI:
 
         issue_id = uuid4()
         # Mock the issue in service
-        api.issue_service._issues[str(issue_id)] = create_result.data
+        api.issue_service._issues[str(issue_id)] = create_result.data  # type: ignore[assignment]
 
         result = await api.mark_issue_fixed(issue_id)
         assert result.is_success
@@ -202,7 +202,7 @@ class TestQualityAPI:
 
         issue_id = uuid4()
         # Mock the issue in service
-        api.issue_service._issues[str(issue_id)] = create_result.data
+        api.issue_service._issues[str(issue_id)] = create_result.data  # type: ignore[assignment]
 
         result = await api.suppress_issue(issue_id, "False positive")
         assert result.is_success
@@ -230,7 +230,7 @@ class TestQualityAPI:
 
         report_id = uuid4()
         # Mock the report in service
-        api.report_service._reports[str(report_id)] = create_result.data
+        api.report_service._reports[str(report_id)] = create_result.data  # type: ignore[assignment]
 
         result = await api.get_report(report_id)
         assert result.is_success
@@ -247,7 +247,7 @@ class TestQualityAPI:
 
         report_id = uuid4()
         # Mock the report in service
-        api.report_service._reports[str(report_id)] = create_result.data
+        api.report_service._reports[str(report_id)] = create_result.data  # type: ignore[assignment]
 
         result = await api.delete_report(report_id)
         assert result.is_success

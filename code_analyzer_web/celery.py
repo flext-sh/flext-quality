@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-from typing import Any
 
 from celery import Celery
 
@@ -30,6 +29,6 @@ app.conf.update(
 )
 
 
-@app.task(bind=True)
-def debug_task(self: Any) -> None:
-    pass
+# Remove debug task as it's not essential for production
+# and Celery lacks proper typing support
+# If needed, debug tasks can be created in appropriate task modules

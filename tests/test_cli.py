@@ -26,9 +26,9 @@ class TestSetupLogging:
 class TestAnalyzeProject:
     """Test analyze_project function."""
 
-    @patch("flext_quality.cli.CodeAnalyzer")
-    @patch("flext_quality.cli.QualityReport")
-    @patch("flext_quality.cli.Path")
+    @patch("flext_quality.cli.CodeAnalyzer")  # type: ignore[misc]  # type: ignore[misc]
+    @patch("flext_quality.cli.QualityReport")  # type: ignore[misc]  # type: ignore[misc]
+    @patch("flext_quality.cli.Path")  # type: ignore[misc]  # type: ignore[misc]
     def test_analyze_project_success_high_quality(
         self,
         mock_path: MagicMock,
@@ -75,9 +75,9 @@ class TestAnalyzeProject:
         )
         mock_report_class.assert_called_once_with({"issues": {}})
 
-    @patch("flext_quality.cli.CodeAnalyzer")
-    @patch("flext_quality.cli.QualityReport")
-    @patch("flext_quality.cli.Path")
+    @patch("flext_quality.cli.CodeAnalyzer")  # type: ignore[misc]  # type: ignore[misc]
+    @patch("flext_quality.cli.QualityReport")  # type: ignore[misc]  # type: ignore[misc]
+    @patch("flext_quality.cli.Path")  # type: ignore[misc]  # type: ignore[misc]
     def test_analyze_project_success_medium_quality(
         self,
         mock_path: MagicMock,
@@ -116,9 +116,9 @@ class TestAnalyzeProject:
         # Assertions
         assert result == 1  # Medium quality returns 1
 
-    @patch("flext_quality.cli.CodeAnalyzer")
-    @patch("flext_quality.cli.QualityReport")
-    @patch("flext_quality.cli.Path")
+    @patch("flext_quality.cli.CodeAnalyzer")  # type: ignore[misc]  # type: ignore[misc]
+    @patch("flext_quality.cli.QualityReport")  # type: ignore[misc]  # type: ignore[misc]
+    @patch("flext_quality.cli.Path")  # type: ignore[misc]  # type: ignore[misc]
     def test_analyze_project_success_poor_quality(
         self,
         mock_path: MagicMock,
@@ -157,7 +157,7 @@ class TestAnalyzeProject:
         # Assertions
         assert result == 2  # Poor quality returns 2
 
-    @patch("flext_quality.cli.Path")
+    @patch("flext_quality.cli.Path")  # type: ignore[misc]  # type: ignore[misc]
     def test_analyze_project_path_not_exists(self, mock_path: MagicMock) -> None:
         """Test analyze_project when path doesn't exist."""
         # Setup mocks
@@ -174,9 +174,9 @@ class TestAnalyzeProject:
         # Assertions
         assert result == 1  # Path not exists returns 1
 
-    @patch("flext_quality.cli.CodeAnalyzer")
-    @patch("flext_quality.cli.QualityReport")
-    @patch("flext_quality.cli.Path")
+    @patch("flext_quality.cli.CodeAnalyzer")  # type: ignore[misc]  # type: ignore[misc]
+    @patch("flext_quality.cli.QualityReport")  # type: ignore[misc]  # type: ignore[misc]
+    @patch("flext_quality.cli.Path")  # type: ignore[misc]  # type: ignore[misc]
     def test_analyze_project_with_output_file(
         self,
         mock_path: MagicMock,
@@ -216,9 +216,9 @@ class TestAnalyzeProject:
         assert result == 0
         mock_report.save_report.assert_called_once()
 
-    @patch("flext_quality.cli.CodeAnalyzer")
-    @patch("flext_quality.cli.QualityReport")
-    @patch("flext_quality.cli.Path")
+    @patch("flext_quality.cli.CodeAnalyzer")  # type: ignore[misc]
+    @patch("flext_quality.cli.QualityReport")  # type: ignore[misc]
+    @patch("flext_quality.cli.Path")  # type: ignore[misc]
     def test_analyze_project_json_format_no_output(
         self,
         mock_path: MagicMock,
@@ -259,9 +259,9 @@ class TestAnalyzeProject:
         # Should not call save_report when no output file
         mock_report.save_report.assert_not_called()
 
-    @patch("flext_quality.cli.CodeAnalyzer")
-    @patch("flext_quality.cli.traceback")
-    @patch("flext_quality.cli.Path")
+    @patch("flext_quality.cli.CodeAnalyzer")  # type: ignore[misc]
+    @patch("flext_quality.cli.traceback")  # type: ignore[misc]
+    @patch("flext_quality.cli.Path")  # type: ignore[misc]
     def test_analyze_project_exception_verbose(
         self,
         mock_path: MagicMock,
@@ -295,9 +295,9 @@ class TestAnalyzeProject:
         assert result == 3  # Exception returns 3
         mock_traceback.print_exc.assert_called_once()
 
-    @patch("flext_quality.cli.CodeAnalyzer")
-    @patch("flext_quality.cli.traceback")
-    @patch("flext_quality.cli.Path")
+    @patch("flext_quality.cli.CodeAnalyzer")  # type: ignore[misc]
+    @patch("flext_quality.cli.traceback")  # type: ignore[misc]
+    @patch("flext_quality.cli.Path")  # type: ignore[misc]
     def test_analyze_project_exception_not_verbose(
         self,
         mock_path: MagicMock,
@@ -335,8 +335,8 @@ class TestAnalyzeProject:
 class TestAnotherFunction:
     """Test another_function (score command)."""
 
-    @patch("flext_quality.cli.CodeAnalyzer")
-    @patch("flext_quality.cli.Path")
+    @patch("flext_quality.cli.CodeAnalyzer")  # type: ignore[misc]
+    @patch("flext_quality.cli.Path")  # type: ignore[misc]
     def test_another_function_success_good_score(
         self,
         mock_path: MagicMock,
@@ -353,7 +353,7 @@ class TestAnotherFunction:
             "issues": {
                 "security": ["issue1"],
                 "complexity": ["issue2"],
-            }
+            },
         }
         mock_analyzer.get_quality_score.return_value = 75.0  # Good score
         mock_analyzer.get_quality_grade.return_value = "B"
@@ -376,8 +376,8 @@ class TestAnotherFunction:
         mock_analyzer.get_quality_score.assert_called_once()
         mock_analyzer.get_quality_grade.assert_called_once()
 
-    @patch("flext_quality.cli.CodeAnalyzer")
-    @patch("flext_quality.cli.Path")
+    @patch("flext_quality.cli.CodeAnalyzer")  # type: ignore[misc]
+    @patch("flext_quality.cli.Path")  # type: ignore[misc]
     def test_another_function_success_poor_score(
         self,
         mock_path: MagicMock,
@@ -394,7 +394,7 @@ class TestAnotherFunction:
             "issues": {
                 "security": [],
                 "complexity": [],
-            }
+            },
         }
         mock_analyzer.get_quality_score.return_value = 60.0  # Poor score
         mock_analyzer_class.return_value = mock_analyzer
@@ -408,7 +408,7 @@ class TestAnotherFunction:
         # Assertions
         assert result == 1  # Poor score returns 1
 
-    @patch("flext_quality.cli.Path")
+    @patch("flext_quality.cli.Path")  # type: ignore[misc]
     def test_another_function_path_not_exists(self, mock_path: MagicMock) -> None:
         """Test another_function when path doesn't exist."""
         # Setup mocks
@@ -425,8 +425,8 @@ class TestAnotherFunction:
         # Assertions
         assert result == 1  # Path not exists returns 1
 
-    @patch("flext_quality.cli.CodeAnalyzer")
-    @patch("flext_quality.cli.Path")
+    @patch("flext_quality.cli.CodeAnalyzer")  # type: ignore[misc]
+    @patch("flext_quality.cli.Path")  # type: ignore[misc]
     def test_another_function_exception(
         self,
         mock_path: MagicMock,
@@ -453,9 +453,9 @@ class TestAnotherFunction:
 class TestMain:
     """Test main function."""
 
-    @patch("flext_quality.cli.setup_logging")
-    @patch("flext_quality.cli.analyze_project")
-    @patch("sys.argv", ["flext-quality", "analyze", "/test/path"])
+    @patch("flext_quality.cli.setup_logging")  # type: ignore[misc]
+    @patch("flext_quality.cli.analyze_project")  # type: ignore[misc]
+    @patch("sys.argv", ["flext-quality", "analyze", "/test/path"])  # type: ignore[misc]
     def test_main_analyze_command(
         self,
         mock_analyze: MagicMock,
@@ -470,9 +470,9 @@ class TestMain:
         mock_setup_logging.assert_called_once_with("INFO")
         mock_analyze.assert_called_once()
 
-    @patch("flext_quality.cli.setup_logging")
-    @patch("flext_quality.cli.another_function")
-    @patch("sys.argv", ["flext-quality", "score", "/test/path"])
+    @patch("flext_quality.cli.setup_logging")  # type: ignore[misc]
+    @patch("flext_quality.cli.another_function")  # type: ignore[misc]
+    @patch("sys.argv", ["flext-quality", "score", "/test/path"])  # type: ignore[misc]
     def test_main_score_command(
         self,
         mock_another: MagicMock,
@@ -487,8 +487,8 @@ class TestMain:
         mock_setup_logging.assert_called_once_with("INFO")
         mock_another.assert_called_once()
 
-    @patch("flext_quality.cli.setup_logging")
-    @patch("sys.argv", ["flext-quality"])
+    @patch("flext_quality.cli.setup_logging")  # type: ignore[misc]
+    @patch("sys.argv", ["flext-quality"])  # type: ignore[misc]
     def test_main_no_command(self, mock_setup_logging: MagicMock) -> None:
         """Test main function with no command (should show help)."""
         with patch("sys.stdout", new_callable=StringIO):
@@ -497,8 +497,8 @@ class TestMain:
         assert result == 1
         mock_setup_logging.assert_called_once_with("INFO")
 
-    @patch("flext_quality.cli.setup_logging")
-    @patch("flext_quality.cli.analyze_project")
+    @patch("flext_quality.cli.setup_logging")  # type: ignore[misc]
+    @patch("flext_quality.cli.analyze_project")  # type: ignore[misc]
     @patch(
         "sys.argv",
         [
@@ -544,9 +544,9 @@ class TestMain:
         assert call_args.include_dead_code is False
         assert call_args.include_duplicates is False
 
-    @patch("flext_quality.cli.setup_logging")
-    @patch("flext_quality.cli.analyze_project")
-    @patch("sys.argv", ["flext-quality", "analyze", "/test/path"])
+    @patch("flext_quality.cli.setup_logging")  # type: ignore[misc]
+    @patch("flext_quality.cli.analyze_project")  # type: ignore[misc]
+    @patch("sys.argv", ["flext-quality", "analyze", "/test/path"])  # type: ignore[misc]
     def test_main_function_returns_none(
         self,
         mock_analyze: MagicMock,
@@ -565,8 +565,8 @@ class TestMain:
 class TestMainExecution:
     """Test main execution block."""
 
-    @patch("flext_quality.cli.main")
-    @patch("sys.exit")
+    @patch("flext_quality.cli.main")  # type: ignore[misc]
+    @patch("sys.exit")  # type: ignore[misc]
     def test_main_execution_block(
         self,
         mock_exit: MagicMock,

@@ -2,9 +2,15 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, ClassVar
+from typing import TYPE_CHECKING, ClassVar
 
 from django.db import models
+
+if TYPE_CHECKING:
+    from flext_core import TAnyDict
+else:
+    # Runtime type alias using flext-core patterns
+    TAnyDict = dict[str, object]
 
 if TYPE_CHECKING:
     import datetime
@@ -76,7 +82,7 @@ class Project(models.Model):
         """Meta options for Project model."""
 
         db_table = "analyzer_project"
-        indexes: ClassVar[list[Any]] = [
+        indexes: ClassVar[list[models.Index]] = [
             models.Index(fields=["created_at"]),
             models.Index(fields=["package_name"]),
         ]
@@ -169,7 +175,7 @@ class AnalysisSession(models.Model):
         """Meta options for AnalysisSession model."""
 
         db_table = "analyzer_analysis_session"
-        indexes: ClassVar[list[Any]] = [
+        indexes: ClassVar[list[models.Index]] = [
             models.Index(fields=["status"]),
             models.Index(fields=["created_at"]),
         ]
@@ -219,7 +225,7 @@ class FileAnalysis(models.Model):
         """Meta options for FileAnalysis model."""
 
         db_table = "analyzer_file_analysis"
-        indexes: ClassVar[list[Any]] = [
+        indexes: ClassVar[list[models.Index]] = [
             models.Index(fields=["session", "file_path"]),
             models.Index(fields=["complexity_score"]),
         ]
@@ -288,7 +294,7 @@ class SecurityIssue(models.Model):
         """Meta options for SecurityIssue model."""
 
         db_table = "analyzer_security_issue"
-        indexes: ClassVar[list[Any]] = [
+        indexes: ClassVar[list[models.Index]] = [
             models.Index(fields=["session", "severity"]),
             models.Index(fields=["file_path"]),
         ]
@@ -337,7 +343,7 @@ class DeadCodeIssue(models.Model):
         """Meta options for DeadCodeIssue model."""
 
         db_table = "analyzer_dead_code_issue"
-        indexes: ClassVar[list[Any]] = [
+        indexes: ClassVar[list[models.Index]] = [
             models.Index(fields=["session", "dead_type"]),
             models.Index(fields=["file_path"]),
         ]
@@ -374,7 +380,7 @@ class DuplicateCodeBlock(models.Model):
         """Meta options for DuplicateCodeBlock model."""
 
         db_table = "analyzer_duplicate_code_block"
-        indexes: ClassVar[list[Any]] = [
+        indexes: ClassVar[list[models.Index]] = [
             models.Index(fields=["session", "similarity_score"]),
         ]
 
@@ -400,7 +406,7 @@ class DuplicateLocation(models.Model):
         """Meta options for DuplicateLocation model."""
 
         db_table = "analyzer_duplicate_location"
-        indexes: ClassVar[list[Any]] = [
+        indexes: ClassVar[list[models.Index]] = [
             models.Index(fields=["duplicate_block", "file_path"]),
         ]
 
@@ -508,7 +514,7 @@ class AnalysisReport(models.Model):
         """Meta options for AnalysisReport model."""
 
         db_table = "analyzer_analysis_report"
-        indexes: ClassVar[list[Any]] = [
+        indexes: ClassVar[list[models.Index]] = [
             models.Index(fields=["session", "report_type"]),
             models.Index(fields=["created_at"]),
         ]
@@ -562,7 +568,7 @@ class PackageAnalysis(models.Model):
 
         db_table = "analyzer_package_analysis"
         unique_together: ClassVar[list[tuple[str, str]]] = [("session", "name")]
-        indexes: ClassVar[list[Any]] = [
+        indexes: ClassVar[list[models.Index]] = [
             models.Index(fields=["session", "name"]),
             models.Index(fields=["maintainability_score"]),
         ]
@@ -642,7 +648,7 @@ class ClassAnalysis(models.Model):
         unique_together: ClassVar[list[tuple[str, str, str]]] = [
             ("file_analysis", "name", "line_start"),
         ]
-        indexes: ClassVar[list[Any]] = [
+        indexes: ClassVar[list[models.Index]] = [
             models.Index(fields=["complexity_level"]),
             models.Index(fields=["method_count"]),
             models.Index(fields=["is_abstract"]),
@@ -756,7 +762,7 @@ class FunctionAnalysis(models.Model):
         unique_together: ClassVar[list[tuple[str, str, str]]] = [
             ("file_analysis", "name", "line_start"),
         ]
-        indexes: ClassVar[list[Any]] = [
+        indexes: ClassVar[list[models.Index]] = [
             models.Index(fields=["file_analysis", "name"]),
             models.Index(fields=["function_type"]),
             models.Index(fields=["cyclomatic_complexity"]),
@@ -864,7 +870,7 @@ class VariableAnalysis(models.Model):
         unique_together: ClassVar[list[tuple[str, str, str]]] = [
             ("file_analysis", "name", "line_number"),
         ]
-        indexes: ClassVar[list[Any]] = [
+        indexes: ClassVar[list[models.Index]] = [
             models.Index(fields=["variable_type"]),
             models.Index(fields=["is_unused"]),
             models.Index(fields=["is_constant"]),
@@ -936,7 +942,7 @@ class ImportAnalysis(models.Model):
         unique_together: ClassVar[list[tuple[str, str, str, str]]] = [
             ("file_analysis", "module_name", "import_name", "line_number"),
         ]
-        indexes: ClassVar[list[Any]] = [
+        indexes: ClassVar[list[models.Index]] = [
             models.Index(fields=["import_type"]),
             models.Index(fields=["is_unused"]),
             models.Index(fields=["is_circular"]),
@@ -984,7 +990,7 @@ class AnalysisBackendModel(models.Model):
 
         db_table = "analyzer_backend"
         ordering: ClassVar[list[str]] = ["execution_order", "name"]
-        indexes: ClassVar[list[Any]] = [
+        indexes: ClassVar[list[models.Index]] = [
             models.Index(fields=["is_active", "is_available"]),
             models.Index(fields=["execution_order"]),
         ]
@@ -1060,7 +1066,7 @@ class IssueType(models.Model):
 
         db_table = "analyzer_issue_type"
         unique_together: ClassVar[list[tuple[str, str]]] = [("backend", "code")]
-        indexes: ClassVar[list[Any]] = [
+        indexes: ClassVar[list[models.Index]] = [
             models.Index(fields=["backend", "category"]),
             models.Index(fields=["severity", "category"]),
             models.Index(fields=["is_active"]),
@@ -1098,7 +1104,7 @@ class DetectedIssue(models.Model):
     # Issue details
     message: models.TextField[str, str] = models.TextField()
     code_snippet: models.TextField[str, str] = models.TextField(blank=True)
-    context: models.JSONField[dict[str, Any], dict[str, Any]] = models.JSONField(
+    context: models.JSONField[TAnyDict, TAnyDict] = models.JSONField(
         default=dict,
     )
 
@@ -1108,7 +1114,7 @@ class DetectedIssue(models.Model):
         choices=[("LOW", "Low"), ("MEDIUM", "Medium"), ("HIGH", "High")],
         default="MEDIUM",
     )
-    raw_data: models.JSONField[dict[str, Any], dict[str, Any]] = models.JSONField(
+    raw_data: models.JSONField[TAnyDict, TAnyDict] = models.JSONField(
         default=dict,
     )
 
@@ -1131,7 +1137,7 @@ class DetectedIssue(models.Model):
         """Meta options for DetectedIssue model."""
 
         db_table = "analyzer_detected_issue"
-        indexes: ClassVar[list[Any]] = [
+        indexes: ClassVar[list[models.Index]] = [
             models.Index(fields=["session", "issue_type"]),
             models.Index(fields=["file_path", "line_number"]),
             models.Index(fields=["is_resolved", "is_false_positive"]),
@@ -1212,10 +1218,10 @@ class BackendStatistics(models.Model):
     error_message: models.TextField[str, str] = models.TextField(blank=True)
 
     # Results breakdown
-    issues_by_severity: models.JSONField[dict[str, Any], dict[str, Any]] = (
+    issues_by_severity: models.JSONField[TAnyDict, TAnyDict] = (
         models.JSONField(default=dict)
     )
-    issues_by_category: models.JSONField[dict[str, Any], dict[str, Any]] = (
+    issues_by_category: models.JSONField[TAnyDict, TAnyDict] = (
         models.JSONField(default=dict)
     )
 
@@ -1228,7 +1234,7 @@ class BackendStatistics(models.Model):
 
         db_table = "analyzer_backend_statistics"
         unique_together: ClassVar[list[tuple[str, str]]] = [("session", "backend")]
-        indexes: ClassVar[list[Any]] = [
+        indexes: ClassVar[list[models.Index]] = [
             models.Index(fields=["session", "status"]),
             models.Index(fields=["backend", "created_at"]),
         ]

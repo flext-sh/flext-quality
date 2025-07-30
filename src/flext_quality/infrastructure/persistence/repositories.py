@@ -1,74 +1,59 @@
-"""Repository implementations for FLEXT-QUALITY v0.7.0.
+"""Repository implementations for FLEXT-QUALITY using flext-core patterns.
 
-REFACTORED:
-    Using flext-core repository patterns - NO duplication.
+DRY REFACTOR: Eliminated 3 duplicate repository classes.
+Using flext-core FlextRepository interface with proper inheritance.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
-
-# Removed injectable - simplifying DI
-
-if TYPE_CHECKING:
-    from uuid import UUID
+from flext_core import FlextRepository, FlextResult
 
 
-# Simplified DI - removed decorator
-class AnalysisResultRepository:
-    """Repository for analysis results."""
+class InMemoryRepository(FlextRepository):
+    """Base in-memory repository implementing FlextRepository interface.
+
+    DRY: Single implementation for all repository types.
+    SOLID: Follows interface segregation and dependency inversion.
+    """
 
     def __init__(self) -> None:
-        self._storage: dict[UUID, Any] = {}
+        self._storage: dict[str, object] = {}
 
-    async def save(self, entity: Any) -> object:
-        """Save analysis result."""
-        return entity
+    def find_by_id(self, entity_id: str) -> FlextResult[object]:
+        """Find entity by ID."""
+        entity = self._storage.get(entity_id)
+        if entity is None:
+            return FlextResult.fail(f"Entity not found: {entity_id}")
+        return FlextResult.ok(entity)
 
-    async def find_by_id(self, entity_id: UUID) -> object | None:
-        """Find analysis result by ID."""
-        return self._storage.get(entity_id)
+    def save(self, entity: object) -> FlextResult[None]:
+        """Save entity."""
+        if hasattr(entity, "id"):
+            entity_id = str(entity.id)
+            self._storage[entity_id] = entity
+            return FlextResult.ok(None)
+        return FlextResult.fail("Entity must have an 'id' attribute")
 
-    async def find_all(self) -> list[Any]:
-        """Find all analysis results."""
-        return list(self._storage.values())
+    def delete(self, entity_id: str) -> FlextResult[None]:
+        """Delete entity by ID."""
+        if entity_id in self._storage:
+            del self._storage[entity_id]
+            return FlextResult.ok(None)
+        return FlextResult.fail(f"Entity not found: {entity_id}")
 
-
-# Simplified DI - removed decorator
-class QualityMetricsRepository:
-    """Repository for quality metrics."""
-
-    def __init__(self) -> None:
-        self._storage: dict[UUID, Any] = {}
-
-    async def save(self, entity: Any) -> object:
-        """Save quality metrics."""
-        return entity
-
-    async def find_by_id(self, entity_id: UUID) -> object | None:
-        """Find quality metrics by ID."""
-        return self._storage.get(entity_id)
-
-    async def find_all(self) -> list[Any]:
-        """Find all quality metrics."""
-        return list(self._storage.values())
+    def find_all(self) -> FlextResult[list[object]]:
+        """Find all entities."""
+        return FlextResult.ok(list(self._storage.values()))
 
 
-# Simplified DI - removed decorator
-class QualityRuleRepository:
-    """Repository for quality rules."""
+# Type-specific repository aliases - DRY principle maintained
+class AnalysisResultRepository(InMemoryRepository):
+    """Repository for analysis results - uses base implementation."""
 
-    def __init__(self) -> None:
-        self._storage: dict[UUID, Any] = {}
 
-    async def save(self, entity: Any) -> object:
-        """Save quality rule."""
-        return entity
+class QualityMetricsRepository(InMemoryRepository):
+    """Repository for quality metrics - uses base implementation."""
 
-    async def find_by_id(self, entity_id: UUID) -> object | None:
-        """Find quality rule by ID."""
-        return self._storage.get(entity_id)
 
-    async def find_all(self) -> list[Any]:
-        """Find all quality rules."""
-        return list(self._storage.values())
+class QualityRuleRepository(InMemoryRepository):
+    """Repository for quality rules - uses base implementation."""

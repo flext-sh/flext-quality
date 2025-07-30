@@ -46,27 +46,27 @@ def _create_quality_rule_repository() -> QualityRuleRepository:
 
 
 def _create_ast_analysis_port(config: QualityConfig) -> ASTAnalysisPort:
-    return ASTAnalysisPort(config)
+    return ASTAnalysisPort(config.model_dump())
 
 
 def _create_security_analyzer_port(config: QualityConfig) -> BanditSecurityPort:
-    return BanditSecurityPort(config)
+    return BanditSecurityPort(config.model_dump())
 
 
 def _create_complexity_analysis_port(config: QualityConfig) -> ComplexityAnalysisPort:
-    return ComplexityAnalysisPort(config)
+    return ComplexityAnalysisPort(config.model_dump())
 
 
 def _create_dead_code_analysis_port(config: QualityConfig) -> DeadCodeAnalysisPort:
-    return DeadCodeAnalysisPort(config)
+    return DeadCodeAnalysisPort(config.model_dump())
 
 
 def _create_duplicate_analysis_port(config: QualityConfig) -> DuplicationAnalysisPort:
-    return DuplicationAnalysisPort(config)
+    return DuplicationAnalysisPort(config.model_dump())
 
 
 def _create_ruff_port(config: QualityConfig) -> RuffPort:
-    return RuffPort(config)
+    return RuffPort(config.model_dump())
 
 
 def _create_analysis_service(

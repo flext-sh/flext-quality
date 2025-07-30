@@ -45,29 +45,33 @@ class TestQualityMetrics:
 
     def test_score_validation(self) -> None:
         """Test score validation bounds."""
-        with pytest.raises(ValueError):
+        from pydantic import ValidationError
+
+        with pytest.raises(ValidationError):
             QualityMetrics(overall_score=-1.0)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValidationError):
             QualityMetrics(overall_score=101.0)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValidationError):
             QualityMetrics(complexity_score=-5.0)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValidationError):
             QualityMetrics(security_score=150.0)
 
     def test_count_validation(self) -> None:
         """Test count validation (non-negative)."""
-        with pytest.raises(ValueError):
+        from pydantic import ValidationError
+
+        with pytest.raises(ValidationError):
             QualityMetrics(total_files=-1)
 
-        with pytest.raises(ValueError):
+        with pytest.raises(ValidationError):
             QualityMetrics(security_issues_count=-5)
 
     def test_from_analysis_results_empty(self) -> None:
         """Test creating metrics from empty analysis results."""
-        results = {"metrics": {}, "issues": {}}
+        results: dict[str, object] = {"metrics": {}, "issues": {}}
 
         metrics = QualityMetrics.from_analysis_results(results)
 
@@ -92,7 +96,7 @@ class TestQualityMetrics:
                 "dead_code": [{"type": "unused_import"}],
                 "duplicates": [{"type": "duplicate_block"}],
                 "complexity": [{"type": "high_complexity"}],
-            }
+            },
         }
 
         metrics = QualityMetrics.from_analysis_results(results)
@@ -118,8 +122,8 @@ class TestQualityMetrics:
                 "security": [{"issue": 1}],  # 1 issue = -10 points
                 "complexity": [{"issue": 1}, {"issue": 2}],  # 2 issues = -10 points
                 "duplicates": [{"issue": 1}],  # 1 issue = -10 points
-                "dead_code": []
-            }
+                "dead_code": [],
+            },
         }
 
         metrics = QualityMetrics.from_analysis_results(results)
@@ -138,14 +142,14 @@ class TestQualityMetrics:
 
     def test_overall_score_calculation(self) -> None:
         """Test overall score weighted calculation."""
-        results = {
+        results: dict[str, object] = {
             "metrics": {},
             "issues": {
                 "security": [],
                 "dead_code": [],
                 "duplicates": [],
-                "complexity": []
-            }
+                "complexity": [],
+            },
         }
 
         metrics = QualityMetrics.from_analysis_results(results)
@@ -169,11 +173,11 @@ class TestQualityMetrics:
 
         summary = metrics.scores_summary
 
-        assert summary["complexity"] == 85.0
-        assert summary["security"] == 90.0
-        assert summary["maintainability"] == 80.0
-        assert summary["duplication"] == 95.0
-        assert summary["documentation"] == 75.0
+        assert summary["complexity"] == 85.0  # type: ignore[index]
+        assert summary["security"] == 90.0  # type: ignore[index]
+        assert summary["maintainability"] == 80.0  # type: ignore[index]
+        assert summary["duplication"] == 95.0  # type: ignore[index]
+        assert summary["documentation"] == 75.0  # type: ignore[index]
 
     def test_total_issues_computed_field(self) -> None:
         """Test total_issues computed field."""
@@ -184,7 +188,7 @@ class TestQualityMetrics:
             complexity_issues_count=8,
         )
 
-        assert metrics.total_issues == 18  # 5+3+2+8
+        assert metrics.total_issues == 18  # type: ignore[comparison-overlap] # 5+3+2+8
 
     def test_to_dict(self) -> None:
         """Test to_dict method."""
@@ -263,30 +267,33 @@ class TestQualityMetrics:
             (0.0, "F"),
         ]
 
+        from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
+
         for score, expected_grade in test_cases:
-            assert QualityMetrics._calculate_grade(score) == expected_grade
+            grade = QualityGradeCalculator.calculate_grade(score)
+            assert grade.value == expected_grade
 
     def test_from_analysis_results_missing_sections(self) -> None:
         """Test from_analysis_results with missing sections."""
         # Missing metrics section
-        results_no_metrics = {"issues": {}}
+        results_no_metrics: dict[str, object] = {"issues": {}}
         metrics = QualityMetrics.from_analysis_results(results_no_metrics)
         assert metrics.total_files == 0
 
         # Missing issues section
-        results_no_issues = {"metrics": {"total_files": 5}}
+        results_no_issues: dict[str, object] = {"metrics": {"total_files": 5}}
         metrics = QualityMetrics.from_analysis_results(results_no_issues)
         assert metrics.security_issues_count == 0
         assert metrics.total_files == 5
 
     def test_from_analysis_results_missing_issue_categories(self) -> None:
         """Test from_analysis_results with missing issue categories."""
-        results = {
+        results: dict[str, object] = {
             "metrics": {},
             "issues": {
                 "security": [{"issue": 1}],
                 # Missing dead_code, duplicates, complexity categories
-            }
+            },
         }
 
         metrics = QualityMetrics.from_analysis_results(results)
@@ -298,9 +305,9 @@ class TestQualityMetrics:
 
     def test_edge_case_zero_complexity(self) -> None:
         """Test edge case with zero complexity."""
-        results = {
+        results: dict[str, object] = {
             "metrics": {"average_complexity": 0.0},
-            "issues": {}
+            "issues": {},
         }
 
         metrics = QualityMetrics.from_analysis_results(results)
@@ -312,13 +319,13 @@ class TestQualityMetrics:
         """Test edge case with high issue counts."""
         many_issues = [{"issue": i} for i in range(50)]  # 50 issues
 
-        results = {
+        results: dict[str, object] = {
             "metrics": {},
             "issues": {
                 "security": many_issues,
                 "complexity": many_issues,
                 "duplicates": many_issues,
-            }
+            },
         }
 
         metrics = QualityMetrics.from_analysis_results(results)
@@ -345,9 +352,9 @@ class TestQualityMetrics:
                 "complexity": [
                     {"type": "high_complexity"},
                     {"type": "long_method"},
-                    {"type": "deep_nesting"}
+                    {"type": "deep_nesting"},
                 ],
-            }
+            },
         }
 
         metrics = QualityMetrics.from_analysis_results(results)
@@ -363,15 +370,15 @@ class TestQualityMetrics:
         assert metrics.dead_code_items_count == 2
         assert metrics.duplicate_blocks_count == 1
         assert metrics.complexity_issues_count == 3
-        assert metrics.total_issues == 7
+        assert metrics.total_issues == 7  # type: ignore[comparison-overlap]
 
         # Verify scores are calculated
         assert 0 <= metrics.overall_score <= 100
-        assert metrics.quality_grade in ["A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "F"]
+        assert metrics.quality_grade in {"A+", "A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "F"}
 
         # Verify computed fields work
-        assert len(metrics.scores_summary) == 5
-        assert all(0 <= score <= 100 for score in metrics.scores_summary.values())
+        assert len(metrics.scores_summary) == 5  # type: ignore[arg-type]
+        assert all(0 <= score <= 100 for score in metrics.scores_summary.values())  # type: ignore[attr-defined]
 
         # Verify string representation
         summary = metrics.get_summary()

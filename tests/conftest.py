@@ -7,12 +7,60 @@ using Django test framework and flext-core patterns.
 from __future__ import annotations
 
 import os
-from typing import TYPE_CHECKING, Any
+import tempfile
+from typing import TYPE_CHECKING, TypeVar
 
 import pytest
 
 if TYPE_CHECKING:
     from collections.abc import Generator
+    from pathlib import Path
+
+    from flext_core import FlextResult, TAnyDict
+
+# Type variable for FlextResult data
+T = TypeVar("T")
+
+
+def assert_result_success_with_data[T](result: FlextResult[T]) -> T:
+    """DRY helper: Assert FlextResult success and return data with null safety.
+
+    Eliminates duplicated pattern: assert result.is_success + assert result.data is not None
+    Following flext-core patterns with proper type safety.
+
+    Args:
+        result: FlextResult to validate
+
+    Returns:
+        The validated data from result
+
+    Raises:
+        AssertionError: If result is failure or data is None
+
+    """
+    assert result.is_success, f"Expected success but got failure: {result.error}"
+    assert result.data is not None, "Expected data but got None"
+    return result.data
+
+
+def assert_result_failure_with_error[T](result: FlextResult[T]) -> str:
+    """DRY helper: Assert FlextResult failure and return error message.
+
+    Eliminates duplicated pattern: assert result.is_failure + assert result.error is not None
+
+    Args:
+        result: FlextResult to validate
+
+    Returns:
+        The error message from result
+
+    Raises:
+        AssertionError: If result is success or error is None
+
+    """
+    assert result.is_failure, "Expected failure but got success"
+    assert result.error is not None, "Expected error message but got None"
+    return result.error
 
 
 # Test environment setup
@@ -40,7 +88,18 @@ def django_db_setup() -> Generator[None]:
 
 # Quality analysis fixtures
 @pytest.fixture
-def sample_code_repository(tmp_path: object) -> dict[str, Any]:
+def secure_temp_dir() -> Generator[str]:
+    """DRY fixture: Secure temporary directory for tests.
+
+    SOLID principle: Single Responsibility - manages temp dir lifecycle
+    Eliminates S108 security warnings by using proper temp dir creation.
+    """
+    with tempfile.TemporaryDirectory() as temp_dir:
+        yield temp_dir
+
+
+@pytest.fixture
+def sample_code_repository(tmp_path: Path) -> TAnyDict:
     """Sample code repository for testing."""
     return {
         "name": "test-repository",
@@ -57,7 +116,7 @@ def sample_code_repository(tmp_path: object) -> dict[str, Any]:
 
 
 @pytest.fixture
-def quality_metrics_data() -> dict[str, Any]:
+def quality_metrics_data() -> TAnyDict:
     """Quality metrics data for testing."""
     return {
         "complexity": {
@@ -84,7 +143,7 @@ def quality_metrics_data() -> dict[str, Any]:
 
 
 @pytest.fixture
-def code_analysis_config() -> dict[str, Any]:
+def code_analysis_config() -> TAnyDict:
     """Code analysis configuration for testing."""
     return {
         "analyzers": {
@@ -113,7 +172,7 @@ def code_analysis_config() -> dict[str, Any]:
 
 
 @pytest.fixture
-def analysis_results() -> list[dict[str, Any]]:
+def analysis_results() -> list[TAnyDict]:
     """Analysis results for testing."""
     return [
         {
@@ -148,7 +207,7 @@ def analysis_results() -> list[dict[str, Any]]:
 
 # Report generation fixtures
 @pytest.fixture
-def report_config(tmp_path: object) -> dict[str, Any]:
+def report_config(tmp_path: Path) -> TAnyDict:
     """Report configuration for testing."""
     return {
         "format": "json",
@@ -160,7 +219,7 @@ def report_config(tmp_path: object) -> dict[str, Any]:
 
 
 @pytest.fixture
-def dashboard_data() -> dict[str, Any]:
+def dashboard_data() -> TAnyDict:
     """Dashboard data for testing."""
     return {
         "summary": {
@@ -184,7 +243,7 @@ def dashboard_data() -> dict[str, Any]:
 
 # Multi-backend fixtures
 @pytest.fixture
-def sonarqube_config() -> dict[str, Any]:
+def sonarqube_config() -> TAnyDict:
     """SonarQube configuration for testing."""
     return {
         "host": "http://localhost:9000",
@@ -196,7 +255,7 @@ def sonarqube_config() -> dict[str, Any]:
 
 
 @pytest.fixture
-def codeclimate_config() -> dict[str, Any]:
+def codeclimate_config() -> TAnyDict:
     """CodeClimate configuration for testing."""
     return {
         "api_token": "test-api-token",
@@ -208,7 +267,7 @@ def codeclimate_config() -> dict[str, Any]:
 
 # File system fixtures
 @pytest.fixture
-def temporary_project_structure(tmp_path: Any) -> str:
+def temporary_project_structure(tmp_path: Path) -> str:
     """Create temporary project structure for testing."""
     project_dir = tmp_path / "test_project"
     project_dir.mkdir()
@@ -252,7 +311,7 @@ strict = true
 
 # Package discovery fixtures
 @pytest.fixture
-def package_metadata() -> dict[str, Any]:
+def package_metadata() -> TAnyDict:
     """Package metadata for testing."""
     return {
         "name": "test-package",
@@ -274,7 +333,7 @@ def package_metadata() -> dict[str, Any]:
 
 # Task management fixtures
 @pytest.fixture
-def celery_config() -> dict[str, Any]:
+def celery_config() -> TAnyDict:
     """Celery configuration for testing."""
     return {
         "broker_url": "redis://localhost:6379/0",
@@ -288,7 +347,7 @@ def celery_config() -> dict[str, Any]:
 
 
 @pytest.fixture
-def analysis_task_data() -> dict[str, Any]:
+def analysis_task_data() -> TAnyDict:
     """Analysis task data for testing."""
     return {
         "task_id": "test-task-123",
@@ -324,7 +383,7 @@ def mock_quality_analyzer() -> object:
         def __init__(self) -> None:
             self.analyzed_files: list[str] = []
 
-        async def analyze_project(self, project_path: str) -> dict[str, Any]:
+        async def analyze_project(self, project_path: str) -> TAnyDict:
             self.analyzed_files.append(project_path)
             return {
                 "quality_score": 85.0,
@@ -333,7 +392,7 @@ def mock_quality_analyzer() -> object:
                 "analysis_time": 2.5,
             }
 
-        async def analyze_file(self, file_path: str) -> dict[str, Any]:
+        async def analyze_file(self, file_path: str) -> TAnyDict:
             return {
                 "file": file_path,
                 "complexity": 3.2,
@@ -341,7 +400,7 @@ def mock_quality_analyzer() -> object:
                 "coverage": 90.0,
             }
 
-        async def get_metrics(self, project_path: str) -> dict[str, Any]:
+        async def get_metrics(self, project_path: str) -> TAnyDict:
             return {
                 "maintainability": 78.5,
                 "complexity": 5.2,
@@ -358,22 +417,22 @@ def mock_report_generator() -> object:
 
     class MockReportGenerator:
         def __init__(self) -> None:
-            self.generated_reports: list[dict[str, Any]] = []
+            self.generated_reports: list[TAnyDict] = []
 
         async def generate_report(
             self,
-            data: dict[str, Any],
+            data: TAnyDict,
             output_format: str = "json",
         ) -> str:
-            report = {
-                "format": format,
+            report: TAnyDict = {
+                "format": output_format,
                 "data": data,
                 "timestamp": "2023-01-01T12:00:00Z",
             }
             self.generated_reports.append(report)
-            return f"report_{len(self.generated_reports)}.{format}"
+            return f"report_{len(self.generated_reports)}.{output_format}"
 
-        async def generate_dashboard_data(self) -> dict[str, Any]:
+        async def generate_dashboard_data(self) -> TAnyDict:
             return {
                 "projects": 5,
                 "recent_analyses": 3,

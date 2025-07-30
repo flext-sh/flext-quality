@@ -7,12 +7,14 @@ REFACTORED:
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 # Remove injectable decorator for now - simplify
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+    from flext_core import TConfigDict
 
 
 class AnalysisPort(ABC):
@@ -26,7 +28,7 @@ class AnalysisPort(ABC):
 class ASTAnalysisPort(AnalysisPort):
     """Port for AST-based analysis."""
 
-    def __init__(self, config: Any = None) -> None:
+    def __init__(self, config: TConfigDict | None = None) -> None:
         """Initialize with optional config."""
         self.config = config
 
@@ -38,7 +40,7 @@ class ASTAnalysisPort(AnalysisPort):
 class BanditSecurityPort(AnalysisPort):
     """Port for Bandit security analysis."""
 
-    def __init__(self, config: Any = None) -> None:
+    def __init__(self, config: TConfigDict | None = None) -> None:
         """Initialize with optional config."""
         self.config = config
 
@@ -50,7 +52,7 @@ class BanditSecurityPort(AnalysisPort):
 class ComplexityAnalysisPort(AnalysisPort):
     """Port for complexity analysis."""
 
-    def __init__(self, config: Any = None) -> None:
+    def __init__(self, config: TConfigDict | None = None) -> None:
         """Initialize with optional config."""
         self.config = config
 
@@ -62,7 +64,7 @@ class ComplexityAnalysisPort(AnalysisPort):
 class DeadCodeAnalysisPort(AnalysisPort):
     """Port for dead code analysis."""
 
-    def __init__(self, config: Any = None) -> None:
+    def __init__(self, config: TConfigDict | None = None) -> None:
         """Initialize with optional config."""
         self.config = config
 
@@ -74,7 +76,7 @@ class DeadCodeAnalysisPort(AnalysisPort):
 class DuplicationAnalysisPort(AnalysisPort):
     """Port for code duplication analysis."""
 
-    def __init__(self, config: Any = None) -> None:
+    def __init__(self, config: TConfigDict | None = None) -> None:
         """Initialize with optional config."""
         self.config = config
 
@@ -86,7 +88,7 @@ class DuplicationAnalysisPort(AnalysisPort):
 class PylintPort(AnalysisPort):
     """Port for Pylint analysis."""
 
-    def __init__(self, config: Any = None) -> None:
+    def __init__(self, config: TConfigDict | None = None) -> None:
         """Initialize with optional config."""
         self.config = config
 
@@ -98,7 +100,7 @@ class PylintPort(AnalysisPort):
 class RuffPort(AnalysisPort):
     """Port for Ruff analysis."""
 
-    def __init__(self, config: Any = None) -> None:
+    def __init__(self, config: TConfigDict | None = None) -> None:
         """Initialize with optional config."""
         self.config = config
 

@@ -9,12 +9,9 @@ from __future__ import annotations
 from enum import StrEnum
 from pathlib import Path
 
-from flext_core import FlextEntity
 from pydantic import BaseModel, Field, field_validator
 
-# Use real imports instead of fallbacks
-DomainEntity = FlextEntity
-FlextDomainBaseModel = BaseModel  # Use BaseModel for value objects
+# Using flext-core and Pydantic directly
 
 
 class IssueSeverity(StrEnum):
@@ -83,7 +80,7 @@ class QualityGrade(StrEnum):
     F = "F"
 
 
-class FilePath(FlextDomainBaseModel):
+class FilePath(BaseModel):
     """File path value object."""
 
     value: str = Field(..., description="File path")
@@ -150,7 +147,7 @@ class FilePath(FlextDomainBaseModel):
         return str(self.path.parent)
 
 
-class IssueLocation(FlextDomainBaseModel):
+class IssueLocation(BaseModel):
     """Location of an issue in a file."""
 
     line: int = Field(..., description="Line number", ge=1)
@@ -191,7 +188,7 @@ class IssueLocation(FlextDomainBaseModel):
         return f"lines {self.line}-{self.end_line}"
 
 
-class QualityScore(FlextDomainBaseModel):
+class QualityScore(BaseModel):
     """Quality score value object."""
 
     value: float = Field(..., description="Quality score", ge=0.0, le=100.0)
@@ -241,7 +238,7 @@ class QualityScore(FlextDomainBaseModel):
         return QualityGrade.F
 
 
-class ComplexityMetric(FlextDomainBaseModel):
+class ComplexityMetric(BaseModel):
     """Complexity metric value object."""
 
     cyclomatic: int = Field(default=1, description="Cyclomatic complexity", ge=1)
@@ -275,7 +272,7 @@ class ComplexityMetric(FlextDomainBaseModel):
         return "very complex"
 
 
-class CoverageMetric(FlextDomainBaseModel):
+class CoverageMetric(BaseModel):
     """Test coverage metric value object."""
 
     line_coverage: float = Field(
@@ -323,7 +320,7 @@ class CoverageMetric(FlextDomainBaseModel):
         return self.overall_coverage >= 95.0
 
 
-class DuplicationMetric(FlextDomainBaseModel):
+class DuplicationMetric(BaseModel):
     """Code duplication metric value object."""
 
     duplicate_lines: int = Field(

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import ClassVar
-
 from django.contrib import REDACTED_LDAP_BIND_PASSWORD
 from django.utils.html import format_html
 
@@ -15,10 +13,10 @@ FAIR_SCORE_THRESHOLD = 60
 
 
 @REDACTED_LDAP_BIND_PASSWORD.register(Project)
-class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
+class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin[Project]):
     """Admin interface for Project model."""
 
-    list_display: ClassVar[list[str]] = [
+    list_display = [
         "name",
         "package_name",
         "package_version",
@@ -29,17 +27,17 @@ class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         "created_at",
         "updated_at",
     ]
-    list_filter: ClassVar[list[str]] = [
+    list_filter = [
         "package_type",
         "is_installed_package",
         "created_at",
         "updated_at",
     ]
-    search_fields: ClassVar[list[str]] = ["name", "description", "path", "package_name"]
-    readonly_fields: ClassVar[list[str]] = ["created_at", "updated_at"]
-    ordering: ClassVar[list[str]] = ["-updated_at"]
+    search_fields = ["name", "description", "path", "package_name"]
+    readonly_fields = ["created_at", "updated_at"]
+    ordering = ["-updated_at"]
 
-    fieldsets: ClassVar = (
+    fieldsets = (
         (
             "Basic Information",
             {"fields": ("name", "description", "path")},
@@ -63,9 +61,12 @@ class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
         ),
     )
 
+    @REDACTED_LDAP_BIND_PASSWORD.display(description="Latest Score", ordering="analysissession__overall_score")
     def latest_score(self, obj: Project) -> str:
         """Display the latest analysis score."""
-        latest = obj.analysis_sessions.first()
+        # Get the latest analysis session using reverse relationship from AnalysisSession
+        from analyzer.models import AnalysisSession
+        latest = AnalysisSession.objects.filter(flx_project=obj).order_by("-created_at").first()
         if latest and latest.overall_score:
             color = (
                 "green"
@@ -81,9 +82,6 @@ class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin):
                 latest.quality_grade or "N/A",
             )
         return "-"
-
-    latest_score.short_description = "Latest Score"
-    latest_score.REDACTED_LDAP_BIND_PASSWORD_order_field = "analysis_sessions__overall_score"
 
 
 # Customize REDACTED_LDAP_BIND_PASSWORD site headers
