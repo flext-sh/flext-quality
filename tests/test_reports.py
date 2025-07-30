@@ -289,7 +289,8 @@ class TestQualityReport:
         assert coverage == 85.5
 
     def test_generate_text_report_minimal(
-        self, minimal_results: AnalysisResults,
+        self,
+        minimal_results: AnalysisResults,
     ) -> None:
         """Test text report generation with minimal data."""
         report = QualityReport(minimal_results)
@@ -305,7 +306,8 @@ class TestQualityReport:
         assert "RECOMMENDATIONS:" in text_report
 
     def test_generate_text_report_with_issues(
-        self, poor_results: AnalysisResults,
+        self,
+        poor_results: AnalysisResults,
     ) -> None:
         """Test text report generation with many issues."""
         report = QualityReport(poor_results)
@@ -326,7 +328,8 @@ class TestQualityReport:
         assert "eval() detected" in security_section
 
     def test_generate_text_report_issue_truncation(
-        self, poor_results: AnalysisResults,
+        self,
+        poor_results: AnalysisResults,
     ) -> None:
         """Test that text report truncates long issue lists."""
         # Cast to mutable dict and modify results to have many style issues
@@ -371,7 +374,8 @@ class TestQualityReport:
         assert summary["coverage_percent"] == 85.5
 
     def test_generate_html_report_structure(
-        self, mixed_results: AnalysisResults,
+        self,
+        mixed_results: AnalysisResults,
     ) -> None:
         """Test HTML report structure and content."""
         report = QualityReport(mixed_results)
@@ -397,7 +401,8 @@ class TestQualityReport:
         assert "Recommendations" in html_report
 
     def test_generate_html_report_issues_section(
-        self, mixed_results: AnalysisResults,
+        self,
+        mixed_results: AnalysisResults,
     ) -> None:
         """Test HTML report issues section."""
         report = QualityReport(mixed_results)
@@ -435,7 +440,8 @@ class TestQualityReport:
         assert issues_html == "" or len(issues_html.strip()) == 0
 
     def test_generate_issues_html_with_issues(
-        self, mixed_results: AnalysisResults,
+        self,
+        mixed_results: AnalysisResults,
     ) -> None:
         """Test HTML issues generation with various issues."""
         report = QualityReport(mixed_results)
@@ -472,7 +478,8 @@ class TestQualityReport:
         assert "more issues" in issues_html
 
     def test_generate_recommendations_excellent_code(
-        self, minimal_results: AnalysisResults,
+        self,
+        minimal_results: AnalysisResults,
     ) -> None:
         """Test recommendations for excellent code quality."""
         # Modify to have high coverage and no issues
@@ -488,7 +495,8 @@ class TestQualityReport:
         assert "excellent" in recommendations[0]
 
     def test_generate_recommendations_critical_issues(
-        self, mixed_results: AnalysisResults,
+        self,
+        mixed_results: AnalysisResults,
     ) -> None:
         """Test recommendations for critical issues."""
         report = QualityReport(mixed_results)
@@ -496,13 +504,15 @@ class TestQualityReport:
 
         # Should recommend fixing critical issues
         critical_rec = next(
-            (r for r in recommendations if "critical" in r.lower()), None,
+            (r for r in recommendations if "critical" in r.lower()),
+            None,
         )
         assert critical_rec is not None
         assert "Fix" in critical_rec
 
     def test_generate_recommendations_many_issues(
-        self, poor_results: AnalysisResults,
+        self,
+        poor_results: AnalysisResults,
     ) -> None:
         """Test recommendations for many issues."""
         report = QualityReport(poor_results)
@@ -528,7 +538,8 @@ class TestQualityReport:
         recommendations = report._generate_recommendations()
 
         coverage_rec = next(
-            (r for r in recommendations if "coverage" in r.lower()), None,
+            (r for r in recommendations if "coverage" in r.lower()),
+            None,
         )
         assert coverage_rec is not None
         assert "60" in coverage_rec
@@ -553,7 +564,8 @@ class TestQualityReport:
         recommendations = report._generate_recommendations()
 
         duplicate_rec = next(
-            (r for r in recommendations if "duplicate" in r.lower()), None,
+            (r for r in recommendations if "duplicate" in r.lower()),
+            None,
         )
         assert duplicate_rec is not None
         assert "refactor" in duplicate_rec.lower()

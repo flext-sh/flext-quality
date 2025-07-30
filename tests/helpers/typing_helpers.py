@@ -149,5 +149,6 @@ def assert_issues_structure(issues: object) -> dict[str, Any]:
 
     """
     return assert_dict_structure(
-        issues, ["security", "complexity", "dead_code", "duplicates"],
+        issues,
+        ["security", "complexity", "dead_code", "duplicates"],
     )

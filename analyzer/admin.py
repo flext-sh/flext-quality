@@ -62,7 +62,8 @@ class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin[Project]):
     )
 
     @REDACTED_LDAP_BIND_PASSWORD.display(
-        description="Latest Score", ordering="analysissession__overall_score",
+        description="Latest Score",
+        ordering="analysissession__overall_score",
     )
     def latest_score(self, obj: Project) -> str:
         """Display the latest analysis score."""

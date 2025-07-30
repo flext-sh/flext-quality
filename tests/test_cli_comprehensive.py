@@ -44,7 +44,8 @@ class TestAnalyzeProjectComprehensive:
         )
 
     def test_analyze_project_valid_path_default_params(
-        self, temporary_project_structure: str,
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test analyze_project with valid path and default parameters."""
         args = argparse.Namespace(
@@ -59,11 +60,15 @@ class TestAnalyzeProjectComprehensive:
         assert result == 0
 
     def test_analyze_project_valid_path_with_output_file(
-        self, temporary_project_structure: str,
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test analyze_project with output file specified."""
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".json", delete=False,
+            encoding="utf-8",
+            mode="w",
+            suffix=".json",
+            delete=False,
         ) as f:
             output_file = f.name
 
@@ -77,11 +82,13 @@ class TestAnalyzeProjectComprehensive:
         assert output_path.exists()
 
     def test_analyze_project_with_format_json(
-        self, temporary_project_structure: str,
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test analyze_project with JSON format."""
         args = self._create_analyze_args(
-            temporary_project_structure, format_type="json",
+            temporary_project_structure,
+            format_type="json",
         )
         result = analyze_project(args)
 
@@ -89,7 +96,8 @@ class TestAnalyzeProjectComprehensive:
         assert result == 0
 
     def test_analyze_project_with_format_text(
-        self, temporary_project_structure: str,
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test analyze_project with text format."""
         args = argparse.Namespace(
@@ -108,7 +116,8 @@ class TestAnalyzeProjectComprehensive:
         assert result == 0
 
     def test_analyze_project_with_verbose_true(
-        self, temporary_project_structure: str,
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test analyze_project with verbose output enabled."""
         args = self._create_analyze_args(temporary_project_structure, verbose=True)
@@ -118,7 +127,8 @@ class TestAnalyzeProjectComprehensive:
         assert result == 0
 
     def test_analyze_project_with_verbose_false(
-        self, temporary_project_structure: str,
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test analyze_project with verbose output disabled."""
         args = self._create_analyze_args(temporary_project_structure, verbose=False)
@@ -146,7 +156,9 @@ class TestAnalyzeProjectComprehensive:
 
     @patch("flext_quality.cli.CodeAnalyzer")
     def test_analyze_project_analyzer_exception(
-        self, mock_analyzer_class: MagicMock, temporary_project_structure: str,
+        self,
+        mock_analyzer_class: MagicMock,
+        temporary_project_structure: str,
     ) -> None:
         """Test analyze_project when analyzer raises exception."""
         # Make analyzer raise exception
@@ -161,7 +173,9 @@ class TestAnalyzeProjectComprehensive:
 
     @patch("flext_quality.cli.CodeAnalyzer")
     def test_analyze_project_analyzer_exception_non_verbose(
-        self, mock_analyzer_class: MagicMock, temporary_project_structure: str,
+        self,
+        mock_analyzer_class: MagicMock,
+        temporary_project_structure: str,
     ) -> None:
         """Test analyze_project when analyzer raises exception with verbose=False."""
         # Make analyzer raise exception
@@ -194,7 +208,10 @@ class TestAnalyzeProjectComprehensive:
         mock_report_class.return_value = mock_report
 
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".json", delete=False,
+            encoding="utf-8",
+            mode="w",
+            suffix=".json",
+            delete=False,
         ) as f:
             output_file = f.name
 
@@ -250,7 +267,8 @@ class TestAnotherFunctionComprehensive:
         return argparse.Namespace(path=path)
 
     def test_another_function_valid_path_good_score(
-        self, temporary_project_structure: str,
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test another_function with valid path resulting in good score."""
         args = self._create_score_args(temporary_project_structure)
@@ -269,7 +287,9 @@ class TestAnotherFunctionComprehensive:
 
     @patch("flext_quality.cli.CodeAnalyzer")
     def test_another_function_low_quality_score(
-        self, mock_analyzer_class: MagicMock, temporary_project_structure: str,
+        self,
+        mock_analyzer_class: MagicMock,
+        temporary_project_structure: str,
     ) -> None:
         """Test another_function with low quality score."""
         # Setup mock analyzer to return low score
@@ -286,7 +306,9 @@ class TestAnotherFunctionComprehensive:
 
     @patch("flext_quality.cli.CodeAnalyzer")
     def test_another_function_high_quality_score(
-        self, mock_analyzer_class: MagicMock, temporary_project_structure: str,
+        self,
+        mock_analyzer_class: MagicMock,
+        temporary_project_structure: str,
     ) -> None:
         """Test another_function with high quality score."""
         # Setup mock analyzer to return high score
@@ -303,7 +325,9 @@ class TestAnotherFunctionComprehensive:
 
     @patch("flext_quality.cli.CodeAnalyzer")
     def test_another_function_analyzer_exception(
-        self, mock_analyzer_class: MagicMock, temporary_project_structure: str,
+        self,
+        mock_analyzer_class: MagicMock,
+        temporary_project_structure: str,
     ) -> None:
         """Test another_function when analyzer raises exception."""
         # Make analyzer raise exception

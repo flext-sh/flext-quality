@@ -343,7 +343,9 @@ class CodeAnalyzer:
 
         # DRY helper for safe metric extraction with type safety
         def safe_get_metric(
-            metric_list: list[dict[str, object]], key: str, default: float = 0,
+            metric_list: list[dict[str, object]],
+            key: str,
+            default: float = 0,
         ) -> list[int | float]:
             """Extract metric safely with type validation."""
             values = []

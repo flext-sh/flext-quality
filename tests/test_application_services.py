@@ -101,7 +101,8 @@ class TestQualityProjectService:
         assert updated_data.language == "go"
 
     async def test_update_project_not_found(
-        self, service: QualityProjectService,
+        self,
+        service: QualityProjectService,
     ) -> None:
         """Test updating a non-existent project."""
         result = await service.update_project("non-existent", {})
@@ -125,7 +126,8 @@ class TestQualityProjectService:
         assert result.data is True
 
     async def test_delete_project_not_found(
-        self, service: QualityProjectService,
+        self,
+        service: QualityProjectService,
     ) -> None:
         """Test deleting a non-existent project."""
         result = await service.delete_project("non-existent")
