@@ -81,6 +81,7 @@ def set_test_environment() -> Generator[None]:
 def django_db_setup() -> Generator[None]:
     """Django database setup for testing."""
     from django.test.utils import setup_test_environment, teardown_test_environment
+
     setup_test_environment()
     yield
     teardown_test_environment()

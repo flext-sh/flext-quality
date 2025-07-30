@@ -239,17 +239,27 @@ class QualityMetrics(FlextValueObject):
             return FlextResult.fail("Overall score must be between 0 and 100")
 
         # Validate counts are non-negative
-        if any(count < 0 for count in [
-            self.total_files, self.total_lines_of_code, self.total_functions,
-            self.total_classes, self.security_issues_count, self.dead_code_items_count,
-            self.duplicate_blocks_count, self.complexity_issues_count,
-        ]):
+        if any(
+            count < 0
+            for count in [
+                self.total_files,
+                self.total_lines_of_code,
+                self.total_functions,
+                self.total_classes,
+                self.security_issues_count,
+                self.dead_code_items_count,
+                self.duplicate_blocks_count,
+                self.complexity_issues_count,
+            ]
+        ):
             return FlextResult.fail("All counts must be non-negative")
 
         # Validate complexity scores
-        if (self.average_complexity < 0 or
-            self.max_complexity < 0 or
-            self.max_complexity < self.average_complexity):
+        if (
+            self.average_complexity < 0
+            or self.max_complexity < 0
+            or self.max_complexity < self.average_complexity
+        ):
             return FlextResult.fail("Complexity scores must be valid")
 
         return FlextResult.ok(None)

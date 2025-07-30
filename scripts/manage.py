@@ -1,20 +1,21 @@
 #!/usr/bin/env python3
 """Django's command-line utility for REDACTED_LDAP_BIND_PASSWORDistrative tasks."""
 
-from django.core.management import execute_from_command_line
-
-
 from __future__ import annotations
 
 import os
 import sys
+
+from django.core.management import execute_from_command_line
 
 
 def main() -> None:
     """Run REDACTED_LDAP_BIND_PASSWORDistrative tasks."""
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "code_analyzer_web.settings")
     try:
+        import django
 
+        django.setup()
     except ImportError as exc:
         msg = (
             "Couldn't import Django. Are you sure it's installed and "

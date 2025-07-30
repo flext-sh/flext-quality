@@ -54,7 +54,10 @@ class CodeAnalyzer:
         flext_create_log_entry(
             message=f"Starting comprehensive code analysis for {self.project_path}",
             level="info",
-            context={"analyzer": "CodeAnalyzer", "project_path": str(self.project_path)},
+            context={
+                "analyzer": "CodeAnalyzer",
+                "project_path": str(self.project_path),
+            },
         )
 
         results: dict[str, object] = {
@@ -130,7 +133,8 @@ class CodeAnalyzer:
         issues_dict = results["issues"]
         if isinstance(issues_dict, dict):
             total_issues = sum(
-                len(issue_list) for issue_list in issues_dict.values()
+                len(issue_list)
+                for issue_list in issues_dict.values()
                 if isinstance(issue_list, list)
             )
         else:
@@ -338,7 +342,9 @@ class CodeAnalyzer:
         total_files = len(file_metrics)
 
         # DRY helper for safe metric extraction with type safety
-        def safe_get_metric(metric_list: list[dict[str, object]], key: str, default: float = 0) -> list[int | float]:
+        def safe_get_metric(
+            metric_list: list[dict[str, object]], key: str, default: float = 0,
+        ) -> list[int | float]:
             """Extract metric safely with type validation."""
             values = []
             for m in metric_list:
@@ -359,7 +365,9 @@ class CodeAnalyzer:
         total_functions = sum(function_values)
         total_classes = sum(class_values)
 
-        avg_complexity = sum(complexity_values) / total_files if total_files > 0 else 0.0
+        avg_complexity = (
+            sum(complexity_values) / total_files if total_files > 0 else 0.0
+        )
         max_complexity = max(complexity_values) if complexity_values else 0.0
 
         return {
@@ -427,14 +435,19 @@ class CodeAnalyzer:
         complex_files = []
         for metrics in file_metrics:
             complexity_val = metrics.get("complexity", 0)
-            if isinstance(complexity_val, (int, float)) and complexity_val > complexity_threshold:
-                complex_files.append({
-                    "file": metrics["file_path"],
-                    "type": "high_complexity",
-                    "message": f"High complexity: {complexity_val}",
-                    "complexity": complexity_val,
-                    "threshold": complexity_threshold,
-                })
+            if (
+                isinstance(complexity_val, (int, float))
+                and complexity_val > complexity_threshold
+            ):
+                complex_files.append(
+                    {
+                        "file": metrics["file_path"],
+                        "type": "high_complexity",
+                        "message": f"High complexity: {complexity_val}",
+                        "complexity": complexity_val,
+                        "threshold": complexity_threshold,
+                    },
+                )
         return complex_files
 
     def _analyze_dead_code(self) -> list[dict[str, object]]:

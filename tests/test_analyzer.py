@@ -25,7 +25,8 @@ class TestCodeAnalyzer:
 
             # Simple file
             simple_file = project_path / "simple.py"
-            simple_file.write_text(dedent("""
+            simple_file.write_text(
+                dedent("""
                 # Simple module
                 def hello_world():
                     '''Simple function.'''
@@ -35,11 +36,13 @@ class TestCodeAnalyzer:
                     '''Simple class.'''
                     def method(self):
                         return "simple"
-            """))
+            """),
+            )
 
             # Complex file with high complexity
             complex_file = project_path / "complex.py"
-            complex_file.write_text(dedent("""
+            complex_file.write_text(
+                dedent("""
                 # Complex module with high cyclomatic complexity
                 def complex_function(data):
                     '''Function with high complexity.'''
@@ -67,11 +70,13 @@ class TestCodeAnalyzer:
 
                     def method2(self):
                         return 2
-            """))
+            """),
+            )
 
             # File with security issues
             security_file = project_path / "security.py"
-            security_file.write_text(dedent("""
+            security_file.write_text(
+                dedent("""
                 # File with security issues
                 import os
 
@@ -87,19 +92,23 @@ class TestCodeAnalyzer:
                     os.system("ls -la")
 
                     return result
-            """))
+            """),
+            )
 
             # File with syntax error
             syntax_error_file = project_path / "syntax_error.py"
-            syntax_error_file.write_text(dedent("""
+            syntax_error_file.write_text(
+                dedent("""
                 # File with syntax error
                 def broken_function(
                     return "This has a syntax error"
-            """))
+            """),
+            )
 
             # File with unused imports
             dead_code_file = project_path / "dead_code.py"
-            dead_code_file.write_text(dedent("""
+            dead_code_file.write_text(
+                dedent("""
                 # File with dead code indicators
                 import sys  # unused
                 from typing import List  # unused
@@ -107,11 +116,13 @@ class TestCodeAnalyzer:
 
                 def use_json():
                     return json.dumps({"test": True})
-            """))
+            """),
+            )
 
             # Duplicate file 1
             duplicate1 = project_path / "duplicate1.py"
-            duplicate1.write_text(dedent("""
+            duplicate1.write_text(
+                dedent("""
                 # Duplicate content file 1
                 def duplicate_function():
                     '''Duplicate function implementation.'''
@@ -125,11 +136,13 @@ class TestCodeAnalyzer:
                 class DuplicateClass:
                     def method(self):
                         return "duplicate"
-            """))
+            """),
+            )
 
             # Duplicate file 2 (similar to duplicate1)
             duplicate2 = project_path / "duplicate2.py"
-            duplicate2.write_text(dedent("""
+            duplicate2.write_text(
+                dedent("""
                 # Duplicate content file 2
                 def duplicate_function():
                     '''Duplicate function implementation.'''
@@ -143,18 +156,21 @@ class TestCodeAnalyzer:
                 class DuplicateClass:
                     def method(self):
                         return "duplicate"
-            """))
+            """),
+            )
 
             # Create subdirectory with files
             subdir = project_path / "subpackage"
             subdir.mkdir()
 
             sub_file = subdir / "sub_module.py"
-            sub_file.write_text(dedent("""
+            sub_file.write_text(
+                dedent("""
                 # Subpackage module
                 def sub_function():
                     return "sub"
-            """))
+            """),
+            )
 
             # Create files to ignore (hidden, cache, etc.)
             (project_path / ".hidden.py").write_text("# Hidden file")
@@ -183,8 +199,14 @@ class TestCodeAnalyzer:
         # Should find all .py files except hidden and cached ones
         file_names = {f.name for f in python_files}
         expected_files = {
-            "simple.py", "complex.py", "security.py", "syntax_error.py",
-            "dead_code.py", "duplicate1.py", "duplicate2.py", "sub_module.py",
+            "simple.py",
+            "complex.py",
+            "security.py",
+            "syntax_error.py",
+            "dead_code.py",
+            "duplicate1.py",
+            "duplicate2.py",
+            "sub_module.py",
         }
 
         assert expected_files.issubset(file_names)
@@ -269,9 +291,24 @@ class TestCodeAnalyzer:
         analyzer = CodeAnalyzer(temp_project)
 
         file_metrics = [
-            {"lines_of_code": 10, "function_count": 2, "class_count": 1, "complexity": 3},
-            {"lines_of_code": 20, "function_count": 3, "class_count": 0, "complexity": 5},
-            {"lines_of_code": 15, "function_count": 1, "class_count": 2, "complexity": 2},
+            {
+                "lines_of_code": 10,
+                "function_count": 2,
+                "class_count": 1,
+                "complexity": 3,
+            },
+            {
+                "lines_of_code": 20,
+                "function_count": 3,
+                "class_count": 0,
+                "complexity": 5,
+            },
+            {
+                "lines_of_code": 15,
+                "function_count": 1,
+                "class_count": 2,
+                "complexity": 2,
+            },
         ]
 
         overall_metrics = analyzer._calculate_overall_metrics(file_metrics)
@@ -337,7 +374,9 @@ class TestCodeAnalyzer:
         dead_code_issues = analyzer._analyze_dead_code()
 
         # Should find unused imports marked with # unused
-        unused_issues = [issue for issue in dead_code_issues if issue["type"] == "unused_import"]
+        unused_issues = [
+            issue for issue in dead_code_issues if issue["type"] == "unused_import"
+        ]
         assert len(unused_issues) >= 2  # sys and typing imports marked as unused
 
     def test_analyze_duplicates(self, temp_project: Path) -> None:
@@ -502,6 +541,7 @@ class TestCodeAnalyzer:
     def test_analyze_project_logging(self, temp_project: Path, caplog: Any) -> None:
         """Test that analysis produces appropriate log messages."""
         import logging
+
         caplog.set_level(logging.INFO)
 
         analyzer = CodeAnalyzer(temp_project)
@@ -536,9 +576,12 @@ class TestCodeAnalyzer:
         # Should still analyze other files
         assert results["files_analyzed"] > 0
 
-    def test_security_analysis_error_handling(self, temp_project: Path, caplog: Any) -> None:
+    def test_security_analysis_error_handling(
+        self, temp_project: Path, caplog: Any,
+    ) -> None:
         """Test error handling in security analysis."""
         import logging
+
         caplog.set_level(logging.WARNING)
 
         analyzer = CodeAnalyzer(temp_project)
@@ -550,6 +593,7 @@ class TestCodeAnalyzer:
 
         # Mock open to raise exception for specific file
         import builtins
+
         original_open = builtins.open
 
         def mock_open(file_path: str | Path, *args: Any, **kwargs: Any) -> TextIO:
@@ -566,21 +610,28 @@ class TestCodeAnalyzer:
             assert isinstance(security_issues, list)
 
             # Check for warning log
-            warning_messages = [record.message for record in caplog.records
-                             if record.levelname == "WARNING"]
+            warning_messages = [
+                record.message
+                for record in caplog.records
+                if record.levelname == "WARNING"
+            ]
             assert any("Error checking security" in msg for msg in warning_messages)
         finally:
             builtins.open = original_open
 
-    def test_dead_code_analysis_error_handling(self, temp_project: Path, caplog: Any) -> None:
+    def test_dead_code_analysis_error_handling(
+        self, temp_project: Path, caplog: Any,
+    ) -> None:
         """Test error handling in dead code analysis."""
         import logging
+
         caplog.set_level(logging.WARNING)
 
         analyzer = CodeAnalyzer(temp_project)
 
         # Mock file operations to simulate errors
         import builtins
+
         original_open = builtins.open
 
         def mock_open(file_path: str | Path, *args: Any, **kwargs: Any) -> TextIO:
@@ -596,21 +647,28 @@ class TestCodeAnalyzer:
             assert isinstance(dead_code_issues, list)
 
             # Check for warning log
-            warning_messages = [record.message for record in caplog.records
-                             if record.levelname == "WARNING"]
+            warning_messages = [
+                record.message
+                for record in caplog.records
+                if record.levelname == "WARNING"
+            ]
             assert any("Error checking dead code" in msg for msg in warning_messages)
         finally:
             builtins.open = original_open
 
-    def test_duplicate_analysis_error_handling(self, temp_project: Path, caplog: Any) -> None:
+    def test_duplicate_analysis_error_handling(
+        self, temp_project: Path, caplog: Any,
+    ) -> None:
         """Test error handling in duplicate analysis."""
         import logging
+
         caplog.set_level(logging.WARNING)
 
         analyzer = CodeAnalyzer(temp_project)
 
         # Mock file operations to simulate errors
         import builtins
+
         original_open = builtins.open
 
         def mock_open(file_path: str | Path, *args: Any, **kwargs: Any) -> TextIO:
@@ -626,8 +684,11 @@ class TestCodeAnalyzer:
             assert isinstance(duplicate_issues, list)
 
             # Check for warning log
-            warning_messages = [record.message for record in caplog.records
-                             if record.levelname == "WARNING"]
+            warning_messages = [
+                record.message
+                for record in caplog.records
+                if record.levelname == "WARNING"
+            ]
             assert any("Error reading" in msg for msg in warning_messages)
         finally:
             builtins.open = original_open

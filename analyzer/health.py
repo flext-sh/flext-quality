@@ -32,6 +32,7 @@ except ImportError:
 # Use flext-observability for proper health monitoring - DRY approach
 try:
     from flext_observability import FlextHealthService, flext_create_health_check
+
     FLEXT_HEALTH_AVAILABLE = True
 except ImportError:
     FLEXT_HEALTH_AVAILABLE = False

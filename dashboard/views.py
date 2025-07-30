@@ -240,7 +240,6 @@ def start_analysis(request: HttpRequest, project_id: str) -> HttpResponse:
 
             # Start actual analysis task
             try:
-
                 # Start background analysis
                 run_analysis_task.delay(session.id, ["ast", "external", "quality"])
 
@@ -305,7 +304,6 @@ def run_analysis(request: HttpRequest, project_id: str) -> object:
 
         # Start background analysis
         try:
-
             run_analysis_task.delay(session.id, backend_names)
 
             messages.success(

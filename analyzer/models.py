@@ -1218,11 +1218,11 @@ class BackendStatistics(models.Model):
     error_message: models.TextField[str, str] = models.TextField(blank=True)
 
     # Results breakdown
-    issues_by_severity: models.JSONField[TAnyDict, TAnyDict] = (
-        models.JSONField(default=dict)
+    issues_by_severity: models.JSONField[TAnyDict, TAnyDict] = models.JSONField(
+        default=dict,
     )
-    issues_by_category: models.JSONField[TAnyDict, TAnyDict] = (
-        models.JSONField(default=dict)
+    issues_by_category: models.JSONField[TAnyDict, TAnyDict] = models.JSONField(
+        default=dict,
     )
 
     created_at: models.DateTimeField[datetime.datetime, datetime.datetime] = (

@@ -168,7 +168,9 @@ def invalid_syntax(
             analyzer = CodeAnalyzer(temp_dir)
 
             # Mock open to raise FileNotFoundError
-            with patch("builtins.open", side_effect=FileNotFoundError("File not accessible")):
+            with patch(
+                "builtins.open", side_effect=FileNotFoundError("File not accessible"),
+            ):
                 metrics = analyzer._analyze_file(unreadable_file)
 
                 # Should return None when file cannot be read

@@ -199,7 +199,9 @@ class TestRunSecurityCheckHandlerIntegration:
         project_id = uuid4()
 
         # Mock service to fail
-        with patch.object(handler._security_service, "analyze_security") as mock_security:
+        with patch.object(
+            handler._security_service, "analyze_security",
+        ) as mock_security:
             mock_security.return_value = FlextResult.fail("Security scanner failed")
 
             result = await handler.handle(project_id)
@@ -214,7 +216,9 @@ class TestRunSecurityCheckHandlerIntegration:
         project_id = uuid4()
 
         # Mock service to return success with None
-        with patch.object(handler._security_service, "analyze_security") as mock_security:
+        with patch.object(
+            handler._security_service, "analyze_security",
+        ) as mock_security:
             mock_security.return_value = FlextResult.ok(None)
 
             result = await handler.handle(project_id)

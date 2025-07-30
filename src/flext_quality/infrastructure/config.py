@@ -21,7 +21,7 @@ class QualityConfig(FlextBaseSettings):
         description="Quality analysis project name",
     )
     project_version: str = Field(
-        default="0.7.0",
+        default="0.9.0",
         description="Quality analysis version",
     )
     project_root: Path = Field(
