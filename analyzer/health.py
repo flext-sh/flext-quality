@@ -142,7 +142,7 @@ def health_check(request: HttpRequest) -> JsonResponse:
         "status": overall_status,
         "timestamp": time.time(),
         "response_time_ms": round(response_time * 1000, 2),
-        "version": "1.0.0",
+        "version": "0.9.0",
         "checks": checks,
         "environment": {
             "debug": settings.DEBUG,

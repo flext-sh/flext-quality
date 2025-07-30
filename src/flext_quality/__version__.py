@@ -10,7 +10,7 @@ import importlib.metadata
 try:
     __version__ = importlib.metadata.version("flext-quality")
 except importlib.metadata.PackageNotFoundError:
-    __version__ = "0.8.0"
+    __version__ = "0.9.0"
 
 __version_info__ = tuple(int(x) for x in __version__.split(".") if x.isdigit())
 

@@ -315,7 +315,7 @@ def package_metadata() -> TAnyDict:
     """Package metadata for testing."""
     return {
         "name": "test-package",
-        "version": "1.0.0",
+        "version": "0.9.0",
         "description": "Test package for quality analysis",
         "author": "Test Author",
         "dependencies": [

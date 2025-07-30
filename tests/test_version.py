@@ -58,7 +58,7 @@ class TestVersion:
     def test_fallback_version(self) -> None:
         """Test fallback version handling."""
         # This tests the fallback logic indirectly
-        # If package is not installed, it should use "0.8.0"
+        # If package is not installed, it should use "0.9.0"
         assert isinstance(__version__, str)
         parts = __version__.split(".")
         assert len(parts) >= 3, "Version must have at least major.minor.patch"
