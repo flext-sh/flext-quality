@@ -7,7 +7,7 @@ All entities use mixins from flext-core for maximum code reduction.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime, timezone
 from enum import StrEnum
 
 from flext_core import FlextEntity, FlextResult, TAnyDict
@@ -87,7 +87,7 @@ class QualityProject(FlextEntity):
     def update_last_analysis(self) -> QualityProject:
         """Update last analysis timestamp and return new instance."""
         return self.model_copy(update={
-            "last_analysis_at": datetime.now(),
+            "last_analysis_at": datetime.now(UTC),
             "total_analyses": self.total_analyses + 1,
         })
 
@@ -138,13 +138,13 @@ class QualityAnalysis(FlextEntity):
     def start_analysis(self) -> QualityAnalysis:
         """Start analysis and return new instance."""
         return self.model_copy(update={
-            "started_at": datetime.now(),
+            "started_at": datetime.now(UTC),
             "status": AnalysisStatus.ANALYZING,
         })
 
     def complete_analysis(self) -> QualityAnalysis:
         """Complete analysis and return new instance."""
-        completed_at = datetime.now()
+        completed_at = datetime.now(UTC)
         duration_seconds = None
         if self.started_at:
             duration = completed_at - self.started_at
@@ -158,7 +158,7 @@ class QualityAnalysis(FlextEntity):
 
     def fail_analysis(self, error: str) -> QualityAnalysis:
         """Fail analysis and return new instance."""
-        completed_at = datetime.now()
+        completed_at = datetime.now(UTC)
         duration_seconds = None
         if self.started_at:
             duration = completed_at - self.started_at
@@ -251,7 +251,7 @@ class QualityIssue(FlextEntity):
         """Increment occurrence count and return new instance."""
         return self.model_copy(update={
             "occurrence_count": self.occurrence_count + 1,
-            "last_seen_at": datetime.now(),
+            "last_seen_at": datetime.now(UTC),
         })
 
     def validate_domain_rules(self) -> FlextResult[None]:
@@ -330,7 +330,7 @@ class QualityReport(FlextEntity):
         """Increment access count and return new instance."""
         return self.model_copy(update={
             "access_count": self.access_count + 1,
-            "last_accessed_at": datetime.now(),
+            "last_accessed_at": datetime.now(UTC),
         })
 
     def validate_domain_rules(self) -> FlextResult[None]:
