@@ -22,9 +22,8 @@ class TestConfigModule:
     def test_backward_compatibility(self) -> None:
         """Test backward compatibility of config re-export."""
         # Import from main config module
-        from flext_quality.config import QualityConfig as ConfigQualityConfig
-
         # Import from infrastructure directly
+        from flext_quality.config import QualityConfig as ConfigQualityConfig
         from flext_quality.infrastructure.config import (
             QualityConfig as InfraQualityConfig,
         )
