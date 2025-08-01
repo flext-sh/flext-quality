@@ -28,7 +28,7 @@ T = TypeVar("T")
 
 # DRY pattern: Factory for exception-throwing dict classes with proper generics
 def create_exception_dict(exception: Exception) -> type[dict[str, object]]:
-    """SOLID factory: Creates exception-throwing dict classes.
+    """factory: Creates exception-throwing dict classes.
 
     Single Responsibility: Creates mock dict that raises specific exceptions
     DRY principle: Eliminates duplicated ExceptionDict classes across tests
