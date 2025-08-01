@@ -1,144 +1,28 @@
-"""Quality service exception hierarchy using flext-core patterns.
+"""Quality service exception hierarchy using flext-core DRY patterns.
 
 Copyright (c) 2025 FLEXT Contributors
 SPDX-License-Identifier: MIT
 
-Domain-specific exceptions for quality service operations inheriting from flext-core.
+Domain-specific exceptions using factory pattern to eliminate 150+ lines of duplication.
 """
 
 from __future__ import annotations
 
 from flext_core.exceptions import (
-    FlextConfigurationError,
-    FlextConnectionError,
-    FlextError,
-    FlextProcessingError,
-    FlextTimeoutError,
-    FlextValidationError,
+    create_module_exception_classes,
 )
 
+# Create all standard exception classes using factory pattern - eliminates duplication
+quality_exceptions = create_module_exception_classes("flext_quality")
 
-class FlextQualityError(FlextError):
-    """Base exception for quality service operations."""
-
-    def __init__(
-        self,
-        message: str = "Quality service error",
-        project_name: str | None = None,
-        **kwargs: object,
-    ) -> None:
-        """Initialize quality service error with context."""
-        context = kwargs.copy()
-        if project_name is not None:
-            context["project_name"] = project_name
-
-        super().__init__(message, error_code="QUALITY_SERVICE_ERROR", context=context)
-
-
-class FlextQualityValidationError(FlextValidationError):
-    """Quality service validation errors."""
-
-    def __init__(
-        self,
-        message: str = "Quality validation failed",
-        field: str | None = None,
-        value: object = None,
-        rule_name: str | None = None,
-        **kwargs: object,
-    ) -> None:
-        """Initialize quality validation error with context."""
-        validation_details: dict[str, object] = {}
-        if field is not None:
-            validation_details["field"] = field
-        if value is not None:
-            validation_details["value"] = str(value)[:100]  # Truncate long values
-
-        context = kwargs.copy()
-        if rule_name is not None:
-            context["rule_name"] = rule_name
-
-        super().__init__(
-            f"Quality validation: {message}",
-            validation_details=validation_details,
-            context=context,
-        )
-
-
-class FlextQualityConfigurationError(FlextConfigurationError):
-    """Quality service configuration errors."""
-
-    def __init__(
-        self,
-        message: str = "Quality configuration error",
-        config_key: str | None = None,
-        **kwargs: object,
-    ) -> None:
-        """Initialize quality configuration error with context."""
-        context = kwargs.copy()
-        if config_key is not None:
-            context["config_key"] = config_key
-
-        super().__init__(f"Quality config: {message}", **context)
-
-
-class FlextQualityConnectionError(FlextConnectionError):
-    """Quality service connection errors."""
-
-    def __init__(
-        self,
-        message: str = "Quality connection failed",
-        service_name: str | None = None,
-        endpoint: str | None = None,
-        **kwargs: object,
-    ) -> None:
-        """Initialize quality connection error with context."""
-        context = kwargs.copy()
-        if service_name is not None:
-            context["service_name"] = service_name
-        if endpoint is not None:
-            context["endpoint"] = endpoint
-
-        super().__init__(f"Quality connection: {message}", **context)
-
-
-class FlextQualityProcessingError(FlextProcessingError):
-    """Quality service processing errors."""
-
-    def __init__(
-        self,
-        message: str = "Quality processing failed",
-        analysis_type: str | None = None,
-        file_path: str | None = None,
-        **kwargs: object,
-    ) -> None:
-        """Initialize quality processing error with context."""
-        context = kwargs.copy()
-        if analysis_type is not None:
-            context["analysis_type"] = analysis_type
-        if file_path is not None:
-            context["file_path"] = file_path
-
-        super().__init__(f"Quality processing: {message}", **context)
-
-
-class FlextQualityTimeoutError(FlextTimeoutError):
-    """Quality service timeout errors."""
-
-    def __init__(
-        self,
-        message: str = "Quality operation timed out",
-        operation: str | None = None,
-        timeout_seconds: float | None = None,
-        **kwargs: object,
-    ) -> None:
-        """Initialize quality timeout error with context."""
-        context = kwargs.copy()
-        if operation is not None:
-            context["operation"] = operation
-        if timeout_seconds is not None:
-            context["timeout_seconds"] = timeout_seconds
-
-        super().__init__(f"Quality timeout: {message}", **context)
+# Import generated classes for clean usage
+FlextQualityError = quality_exceptions["FlextQualityError"]
+FlextQualityValidationError = quality_exceptions["FlextQualityValidationError"]
+FlextQualityConfigurationError = quality_exceptions["FlextQualityConfigurationError"]
+FlextQualityConnectionError = quality_exceptions["FlextQualityConnectionError"]
+FlextQualityProcessingError = quality_exceptions["FlextQualityProcessingError"]
+FlextQualityAuthenticationError = quality_exceptions["FlextQualityAuthenticationError"]
+FlextQualityTimeoutError = quality_exceptions["FlextQualityTimeoutError"]
 
 
 class FlextQualityAnalysisError(FlextQualityError):
