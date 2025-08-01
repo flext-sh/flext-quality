@@ -24,7 +24,7 @@ if TYPE_CHECKING:
 
 # Direct imports - guaranteed dependencies
 import redis
-from flext_observability import FlextHealthService, flext_create_health_check
+from flext_observability import flext_create_health_check
 
 
 def check_database() -> TAnyDict:
