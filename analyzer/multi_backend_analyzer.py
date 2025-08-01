@@ -76,7 +76,7 @@ class MultiBackendAnalyzer:
 
             # Run backends and collect statistics
             combined_result = AnalysisResult()
-            backend_stats: dict[str, dict[str, Any]] = {}
+            backend_stats: dict[str, dict[str, object]] = {}
 
             for backend_name in self.backend_names:
                 start_time = time.time()
@@ -227,7 +227,7 @@ class MultiBackendAnalyzer:
     def _save_results(
         self,
         result: AnalysisResult,
-        backend_stats: dict[str, dict[str, Any]] | None = None,
+        backend_stats: dict[str, dict[str, object]] | None = None,
     ) -> None:
         """Save analysis results to database."""
         if self.session is None:
@@ -495,7 +495,7 @@ class MultiBackendAnalyzer:
     def _find_file_object(
         self,
         file_objects: dict[str, FileAnalysis],
-        data: dict[str, Any],
+        data: dict[str, object],
     ) -> FileAnalysis | None:
         """Find file object from analysis data."""
         # Try to extract file path from the data
@@ -528,7 +528,7 @@ class MultiBackendAnalyzer:
     def _find_package_object(
         self,
         package_objects: dict[str, PackageAnalysis],
-        data: dict[str, Any],
+        data: dict[str, object],
     ) -> PackageAnalysis | None:
         """Find package object from analysis data."""
         # First try direct package_name match
@@ -580,7 +580,7 @@ class MultiBackendAnalyzer:
 
     def _create_detected_issue(
         self,
-        issue_data: dict[str, Any],
+        issue_data: dict[str, object],
         backend_name: str,
         file_objects: dict[str, FileAnalysis],
         issue_category: str,
@@ -628,7 +628,7 @@ class MultiBackendAnalyzer:
 
     def _extract_issue_code(
         self,
-        issue_data: dict[str, Any],
+        issue_data: dict[str, object],
         backend_name: str,
     ) -> str:
         """Extract or generate issue code from issue data."""
@@ -652,7 +652,7 @@ class MultiBackendAnalyzer:
         self,
         backend_model: AnalysisBackendModel,
         issue_code: str,
-        issue_data: dict[str, Any],
+        issue_data: dict[str, object],
         category: str,
     ) -> IssueType:
         """Get or create issue type record."""
@@ -681,7 +681,7 @@ class MultiBackendAnalyzer:
 
     def _save_backend_statistics(
         self,
-        backend_stats: dict[str, dict[str, Any]],
+        backend_stats: dict[str, dict[str, object]],
     ) -> None:
         """Save backend execution statistics."""
         self.logger.info("Saving backend statistics to database")

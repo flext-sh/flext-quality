@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Any, TypeGuard
 
 
-def assert_is_dict(value: object) -> TypeGuard[dict[str, Any]]:
+def assert_is_dict(value: object) -> TypeGuard[dict[str, object]]:
     """Type-safe dict assertion following Single Responsibility Principle.
 
     Args:
@@ -83,7 +83,7 @@ def safe_list_access(data: object, index: int) -> Any:
     return data[index]
 
 
-def assert_dict_structure(data: object, required_keys: list[str]) -> dict[str, Any]:
+def assert_dict_structure(data: object, required_keys: list[str]) -> dict[str, object]:
     """Assert that object is dict with required keys - DRY pattern.
 
     Args:
@@ -103,7 +103,7 @@ def assert_dict_structure(data: object, required_keys: list[str]) -> dict[str, A
     return data
 
 
-def assert_analysis_results_structure(results: object) -> dict[str, Any]:
+def assert_analysis_results_structure(results: object) -> dict[str, object]:
     """Assert analyzer results have expected structure - specialized helper.
 
     Args:
@@ -119,7 +119,7 @@ def assert_analysis_results_structure(results: object) -> dict[str, Any]:
     return assert_dict_structure(results, ["metrics", "issues", "files"])
 
 
-def assert_metrics_structure(metrics: object) -> dict[str, Any]:
+def assert_metrics_structure(metrics: object) -> dict[str, object]:
     """Assert metrics have expected structure - specialized helper.
 
     Args:
@@ -135,7 +135,7 @@ def assert_metrics_structure(metrics: object) -> dict[str, Any]:
     return assert_dict_structure(metrics, ["total_files", "total_lines_of_code"])
 
 
-def assert_issues_structure(issues: object) -> dict[str, Any]:
+def assert_issues_structure(issues: object) -> dict[str, object]:
     """Assert issues have expected structure - specialized helper.
 
     Args:
