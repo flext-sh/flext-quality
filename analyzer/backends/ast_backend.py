@@ -18,20 +18,20 @@ class ASTVisitor(ast.NodeVisitor):
         """Initialize AST visitor with file path and package name."""
         self.file_path = file_path
         self.package_name = package_name
-        self.current_class: dict[str, Any] | None = None
-        self.current_function: dict[str, Any] | None = None
+        self.current_class: dict[str, object] | None = None
+        self.current_function: dict[str, object] | None = None
         self.scope_stack: list[str] = []
 
         # Results
-        self.classes: list[dict[str, Any]] = []
-        self.functions: list[dict[str, Any]] = []
-        self.variables: list[dict[str, Any]] = []
-        self.imports: list[dict[str, Any]] = []
-        self.constants: list[dict[str, Any]] = []
+        self.classes: list[dict[str, object]] = []
+        self.functions: list[dict[str, object]] = []
+        self.variables: list[dict[str, object]] = []
+        self.imports: list[dict[str, object]] = []
+        self.constants: list[dict[str, object]] = []
 
         # Context tracking
-        self.class_stack: list[dict[str, Any]] = []
-        self.function_stack: list[dict[str, Any]] = []
+        self.class_stack: list[dict[str, object]] = []
+        self.function_stack: list[dict[str, object]] = []
 
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
         """Visit a class definition."""

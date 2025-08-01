@@ -542,7 +542,7 @@ def backend_issues_report(request: HttpRequest, session_id: str) -> object:
     ).order_by("-detected_at")
 
     # Group issues by backend
-    issues_by_backend: dict[str, dict[str, Any]] = {}
+    issues_by_backend: dict[str, dict[str, object]] = {}
     for issue in detected_issues:
         backend_name = issue.issue_type.backend.name
         if backend_name not in issues_by_backend:

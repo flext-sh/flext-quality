@@ -563,7 +563,7 @@ class TestCodeAnalyzer:
         # Mock file to raise exception during analysis
         original_analyze = analyzer._analyze_file
 
-        def mock_analyze(file_path: Path) -> dict[str, Any] | None:
+        def mock_analyze(file_path: Path) -> dict[str, object] | None:
             if file_path.name == "problem.py":
                 return None  # Simulate failure
             return original_analyze(file_path)

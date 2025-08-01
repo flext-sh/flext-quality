@@ -20,15 +20,15 @@ class AnalysisResult:
 
     def __init__(self) -> None:
         """Initialize analysis result container."""
-        self.packages: list[dict[str, Any]] = []
-        self.files: list[dict[str, Any]] = []
-        self.classes: list[dict[str, Any]] = []
-        self.functions: list[dict[str, Any]] = []
-        self.variables: list[dict[str, Any]] = []
-        self.imports: list[dict[str, Any]] = []
-        self.security_issues: list[dict[str, Any]] = []
-        self.quality_metrics: dict[str, Any] = {}
-        self.errors: list[dict[str, Any]] = []
+        self.packages: list[dict[str, object]] = []
+        self.files: list[dict[str, object]] = []
+        self.classes: list[dict[str, object]] = []
+        self.functions: list[dict[str, object]] = []
+        self.variables: list[dict[str, object]] = []
+        self.imports: list[dict[str, object]] = []
+        self.security_issues: list[dict[str, object]] = []
+        self.quality_metrics: dict[str, object] = {}
+        self.errors: list[dict[str, object]] = []
 
     def merge(self, other: AnalysisResult) -> None:
         """Merge another AnalysisResult into this one."""
@@ -81,11 +81,11 @@ class AnalysisBackend(ABC):
         """Check if this backend is available."""
         return True
 
-    def get_configuration(self) -> dict[str, Any]:
+    def get_configuration(self) -> dict[str, object]:
         """Get the configuration for this backend."""
         return {}
 
-    def validate_configuration(self, _config: dict[str, Any]) -> bool:
+    def validate_configuration(self, _config: dict[str, object]) -> bool:
         """Validate the configuration for this backend."""
         return True
 
