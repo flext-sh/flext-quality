@@ -14,6 +14,36 @@ from pydantic import BaseModel, Field, field_validator
 # Using flext-core and Pydantic directly
 
 
+class QualityThresholds:
+    """Business rule constants for quality assessment - extracted magic numbers."""
+
+    # Quality grade thresholds (score percentages)
+    GRADE_A_PLUS = 95
+    GRADE_A = 90
+    GRADE_A_MINUS = 85
+    GRADE_B_PLUS = 80
+    GRADE_B = 75
+    GRADE_B_MINUS = 70
+    GRADE_C_PLUS = 65
+    GRADE_C = 60
+    GRADE_C_MINUS = 55
+    GRADE_D_PLUS = 50
+    GRADE_D = 45
+    GRADE_D_MINUS = 40
+
+    # Complexity thresholds
+    COMPLEXITY_CYCLOMATIC_HIGH = 10
+    COMPLEXITY_COGNITIVE_HIGH = 15
+    COMPLEXITY_DEPTH_HIGH = 4
+    COMPLEXITY_SIMPLE_MAX = 5
+    COMPLEXITY_MODERATE_MAX = 10
+    COMPLEXITY_COMPLEX_MAX = 20
+
+    # Coverage and quality thresholds
+    COVERAGE_EXCELLENT = 95.0
+    DUPLICATION_LOW_MAX = 5.0
+
+
 class IssueSeverity(StrEnum):
     """Issue severity levels using StrEnum."""
 
@@ -211,29 +241,29 @@ class QualityScore(BaseModel):
             Quality grade enum value.
 
         """
-        if self.value >= 95:
+        if self.value >= QualityThresholds.GRADE_A_PLUS:
             return QualityGrade.A_PLUS
-        if self.value >= 90:
+        if self.value >= QualityThresholds.GRADE_A:
             return QualityGrade.A
-        if self.value >= 85:
+        if self.value >= QualityThresholds.GRADE_A_MINUS:
             return QualityGrade.A_MINUS
-        if self.value >= 80:
+        if self.value >= QualityThresholds.GRADE_B_PLUS:
             return QualityGrade.B_PLUS
-        if self.value >= 75:
+        if self.value >= QualityThresholds.GRADE_B:
             return QualityGrade.B
-        if self.value >= 70:
+        if self.value >= QualityThresholds.GRADE_B_MINUS:
             return QualityGrade.B_MINUS
-        if self.value >= 65:
+        if self.value >= QualityThresholds.GRADE_C_PLUS:
             return QualityGrade.C_PLUS
-        if self.value >= 60:
+        if self.value >= QualityThresholds.GRADE_C:
             return QualityGrade.C
-        if self.value >= 55:
+        if self.value >= QualityThresholds.GRADE_C_MINUS:
             return QualityGrade.C_MINUS
-        if self.value >= 50:
+        if self.value >= QualityThresholds.GRADE_D_PLUS:
             return QualityGrade.D_PLUS
-        if self.value >= 45:
+        if self.value >= QualityThresholds.GRADE_D:
             return QualityGrade.D
-        if self.value >= 40:
+        if self.value >= QualityThresholds.GRADE_D_MINUS:
             return QualityGrade.D_MINUS
         return QualityGrade.F
 
@@ -253,7 +283,7 @@ class ComplexityMetric(BaseModel):
             True if code is considered complex.
 
         """
-        return self.cyclomatic > 10 or self.cognitive > 15 or self.max_depth > 4
+        return self.cyclomatic > QualityThresholds.COMPLEXITY_CYCLOMATIC_HIGH or self.cognitive > QualityThresholds.COMPLEXITY_COGNITIVE_HIGH or self.max_depth > QualityThresholds.COMPLEXITY_DEPTH_HIGH
 
     @property
     def complexity_level(self) -> str:
@@ -263,11 +293,11 @@ class ComplexityMetric(BaseModel):
             Complexity level as string.
 
         """
-        if self.cyclomatic <= 5:
+        if self.cyclomatic <= QualityThresholds.COMPLEXITY_SIMPLE_MAX:
             return "simple"
-        if self.cyclomatic <= 10:
+        if self.cyclomatic <= QualityThresholds.COMPLEXITY_MODERATE_MAX:
             return "moderate"
-        if self.cyclomatic <= 20:
+        if self.cyclomatic <= QualityThresholds.COMPLEXITY_COMPLEX_MAX:
             return "complex"
         return "very complex"
 
@@ -317,7 +347,7 @@ class CoverageMetric(BaseModel):
             True if coverage is sufficient.
 
         """
-        return self.overall_coverage >= 95.0
+        return self.overall_coverage >= QualityThresholds.COVERAGE_EXCELLENT
 
 
 class DuplicationMetric(BaseModel):
@@ -359,4 +389,4 @@ class DuplicationMetric(BaseModel):
             True if duplication is below threshold.
 
         """
-        return self.duplication_percentage < 5.0
+        return self.duplication_percentage < QualityThresholds.DUPLICATION_LOW_MAX
