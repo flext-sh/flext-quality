@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import time
 from pathlib import Path
-from typing import Any
 
 from django.utils import timezone
 from flext_core import get_logger
@@ -42,7 +41,10 @@ class MultiBackendAnalyzer:
         self.flx_project = flx_project
         self.backend_names = backend_names or ["ast", "external", "quality"]
         self.session: AnalysisSession | None = None
-        self.logger = FlextLoggerFactory.get_logger(
+        # TODO: Import FlextLoggerFactory from flext_core when available
+        import logging
+
+        self.logger = logging.getLogger(
             f"{__name__}.{self.__class__.__name__}",
         )
 
@@ -232,7 +234,8 @@ class MultiBackendAnalyzer:
         """Save analysis results to database."""
         if self.session is None:
             msg = "Analysis session is not initialized"
-            raise FlextServiceError(msg)
+            # TODO: Import FlextServiceError from flext_core when available
+            raise RuntimeError(msg)
         self.logger.info("Saving analysis results to database")
 
         # Save all data components
@@ -270,7 +273,7 @@ class MultiBackendAnalyzer:
                 total_functions=pkg_data.get("total_functions", 0),
                 total_classes=pkg_data.get("total_classes", 0),
             )
-            package_objects[pkg_data["name"]] = package_obj
+            package_objects[str(pkg_data["name"])] = package_obj
         return package_objects
 
     def _save_files(
@@ -293,7 +296,7 @@ class MultiBackendAnalyzer:
                 function_count=file_data.get("function_count", 0),
                 class_count=file_data.get("class_count", 0),
             )
-            file_objects[file_data["file_path"]] = file_obj
+            file_objects[str(file_data["file_path"])] = file_obj
         return file_objects
 
     def _save_classes(
@@ -330,7 +333,7 @@ class MultiBackendAnalyzer:
                         "is_dataclass": class_data.get("is_dataclass", False),
                     },
                 )
-                class_objects[class_data["full_name"]] = class_obj
+                class_objects[str(class_data["full_name"])] = class_obj
         return class_objects
 
     def _save_functions(
@@ -344,7 +347,7 @@ class MultiBackendAnalyzer:
         for func_data in result.functions:
             file_obj = self._find_file_object(file_objects, func_data)
             package_obj = self._find_package_object(package_objects, func_data)
-            class_obj = class_objects.get(func_data.get("class_name", ""))
+            class_obj = class_objects.get(str(func_data.get("class_name", "")))
 
             if file_obj and package_obj:
                 FunctionAnalysis.objects.get_or_create(
@@ -385,7 +388,7 @@ class MultiBackendAnalyzer:
         for var_data in result.variables:
             file_obj = self._find_file_object(file_objects, var_data)
             package_obj = self._find_package_object(package_objects, var_data)
-            class_obj = class_objects.get(var_data.get("class_name", ""))
+            class_obj = class_objects.get(str(var_data.get("class_name", "")))
 
             if file_obj and package_obj:
                 VariableAnalysis.objects.get_or_create(
@@ -534,15 +537,15 @@ class MultiBackendAnalyzer:
         # First try direct package_name match
         if "package_name" in data:
             package_name = data["package_name"]
-            if package_name in package_objects:
-                return package_objects[package_name]
+            if str(package_name) in package_objects:
+                return package_objects[str(package_name)]
 
         # Extract from full_name
         full_name = data.get("full_name", "")
         if "." in full_name:
             package_name = full_name.split(".")[0]
-            if package_name in package_objects:
-                return package_objects[package_name]
+            if str(package_name) in package_objects:
+                return package_objects[str(package_name)]
 
         # Default to __main__ package if available
         if "__main__" in package_objects:
@@ -603,7 +606,7 @@ class MultiBackendAnalyzer:
 
             # Get the file analysis object
             file_path = issue_data.get("file_path", "")
-            file_analysis = file_objects.get(file_path)
+            file_analysis = file_objects.get(str(file_path))
 
             # Create the detected issue
             DetectedIssue.objects.create(

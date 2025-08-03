@@ -5,17 +5,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from django import template
-
-if TYPE_CHECKING:
-    from flext_core import TAnyDict
-else:
-    # Runtime type alias using flext-core patterns
-    TAnyDict = dict[str, object]
-from django.utils.html import escape
-from django.utils.safestring import mark_safe
+from django.utils.html import escape, format_html
 
 if TYPE_CHECKING:
     from datetime import timedelta
+
+    from flext_core import TAnyDict
+
 register = template.Library()
 
 
@@ -156,15 +152,21 @@ def progress_bar(value: float, total: float, css_class: str = "bg-primary") -> s
     total = int(total) if str(total).isdigit() else 1
     css_class = escape(css_class)
     percentage = 0 if total == 0 else value / total * 100
-    html = f"""
-    <div class="progress" style="height: 20px">
-        <div class="progress-bar {css_class}" role="progressbar"
-                style="width: {percentage}%"
-                aria-valuenow="{value}"
-                aria-valuemin="0"
-                aria-valuemax="{total}">
-            {value}/{total}
-        </div>
-    </div>
-    """
-    return mark_safe(html)
+
+    return format_html(
+        '<div class="progress" style="height: 20px">'
+        '<div class="progress-bar {}" role="progressbar" '
+        'style="width: {}%" '
+        'aria-valuenow="{}" '
+        'aria-valuemin="0" '
+        'aria-valuemax="{}">'
+        "{}/{}"
+        "</div>"
+        "</div>",
+        css_class,
+        percentage,
+        value,
+        total,
+        value,
+        total,
+    )

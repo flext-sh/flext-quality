@@ -9,20 +9,44 @@ Domain-specific exceptions using factory pattern to eliminate 150+ lines of dupl
 from __future__ import annotations
 
 from flext_core.exceptions import (
-    create_module_exception_classes,
+    FlextAuthenticationError,
+    FlextConfigurationError,
+    FlextConnectionError,
+    FlextError,
+    FlextProcessingError,
+    FlextTimeoutError,
+    FlextValidationError,
 )
 
-# Create all standard exception classes using factory pattern - eliminates duplication
-quality_exceptions = create_module_exception_classes("flext_quality")
 
-# Import generated classes for clean usage
-FlextQualityError = quality_exceptions["FlextQualityError"]
-FlextQualityValidationError = quality_exceptions["FlextQualityValidationError"]
-FlextQualityConfigurationError = quality_exceptions["FlextQualityConfigurationError"]
-FlextQualityConnectionError = quality_exceptions["FlextQualityConnectionError"]
-FlextQualityProcessingError = quality_exceptions["FlextQualityProcessingError"]
-FlextQualityAuthenticationError = quality_exceptions["FlextQualityAuthenticationError"]
-FlextQualityTimeoutError = quality_exceptions["FlextQualityTimeoutError"]
+# Define base exception class explicitly for MyPy compatibility
+class FlextQualityError(FlextError):
+    """Base exception for all quality service errors."""
+
+
+# Standard exception hierarchy using flext-core patterns
+class FlextQualityValidationError(FlextValidationError):
+    """Quality validation errors."""
+
+
+class FlextQualityConfigurationError(FlextConfigurationError):
+    """Quality configuration errors."""
+
+
+class FlextQualityConnectionError(FlextConnectionError):
+    """Quality connection errors."""
+
+
+class FlextQualityProcessingError(FlextProcessingError):
+    """Quality processing errors."""
+
+
+class FlextQualityAuthenticationError(FlextAuthenticationError):
+    """Quality authentication errors."""
+
+
+class FlextQualityTimeoutError(FlextTimeoutError):
+    """Quality timeout errors."""
 
 
 class FlextQualityAnalysisError(FlextQualityError):
@@ -42,7 +66,7 @@ class FlextQualityAnalysisError(FlextQualityError):
         if file_count is not None:
             context["file_count"] = file_count
 
-        super().__init__(f"Quality analysis: {message}", project_name=None, **context)
+        super().__init__(f"Quality analysis: {message}", context=context)
 
 
 class FlextQualityReportError(FlextQualityError):
@@ -62,7 +86,7 @@ class FlextQualityReportError(FlextQualityError):
         if output_format is not None:
             context["output_format"] = output_format
 
-        super().__init__(f"Quality report: {message}", project_name=None, **context)
+        super().__init__(f"Quality report: {message}", context=context)
 
 
 class FlextQualityMetricsError(FlextQualityError):
@@ -82,7 +106,7 @@ class FlextQualityMetricsError(FlextQualityError):
         if metric_value is not None:
             context["metric_value"] = metric_value
 
-        super().__init__(f"Quality metrics: {message}", project_name=None, **context)
+        super().__init__(f"Quality metrics: {message}", context=context)
 
 
 class FlextQualityGradeError(FlextQualityError):
@@ -102,7 +126,7 @@ class FlextQualityGradeError(FlextQualityError):
         if calculated_grade is not None:
             context["calculated_grade"] = calculated_grade
 
-        super().__init__(f"Quality grade: {message}", project_name=None, **context)
+        super().__init__(f"Quality grade: {message}", context=context)
 
 
 class FlextQualityRuleError(FlextQualityError):
@@ -122,7 +146,7 @@ class FlextQualityRuleError(FlextQualityError):
         if rule_severity is not None:
             context["rule_severity"] = rule_severity
 
-        super().__init__(f"Quality rule: {message}", project_name=None, **context)
+        super().__init__(f"Quality rule: {message}", context=context)
 
 
 __all__ = [

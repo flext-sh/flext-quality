@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import ClassVar
+
 from django.contrib import REDACTED_LDAP_BIND_PASSWORD
 from django.utils.html import format_html
 
@@ -16,7 +18,7 @@ FAIR_SCORE_THRESHOLD = 60
 class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin[Project]):
     """Admin interface for Project model."""
 
-    list_display = [
+    list_display: ClassVar[list[str]] = [
         "name",
         "package_name",
         "package_version",
@@ -27,17 +29,19 @@ class ProjectAdmin(REDACTED_LDAP_BIND_PASSWORD.ModelAdmin[Project]):
         "created_at",
         "updated_at",
     ]
-    list_filter = [
+    list_filter: ClassVar[list[str]] = [
         "package_type",
         "is_installed_package",
         "created_at",
         "updated_at",
     ]
-    search_fields = ["name", "description", "path", "package_name"]
-    readonly_fields = ["created_at", "updated_at"]
-    ordering = ["-updated_at"]
+    search_fields: ClassVar[list[str]] = ["name", "description", "path", "package_name"]
+    readonly_fields: ClassVar[list[str]] = ["created_at", "updated_at"]
+    ordering: ClassVar[list[str]] = ["-updated_at"]
 
-    fieldsets = (
+    fieldsets: ClassVar[
+        tuple[tuple[str, dict[str, tuple[str, ...] | tuple[str, str]]], ...]
+    ] = (
         (
             "Basic Information",
             {"fields": ("name", "description", "path")},
