@@ -394,7 +394,9 @@ def package_analysis_view(
 
 
 def class_analysis_view(
-    request: HttpRequest, session_id: str, class_id: str,
+    request: HttpRequest,
+    session_id: str,
+    class_id: str,
 ) -> HttpResponse:
     """Show class analysis details."""
     session = get_object_or_404(AnalysisSession, id=session_id)
