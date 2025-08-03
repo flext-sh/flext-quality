@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-import logging
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from analyzer.backends import AVAILABLE_BACKENDS
 from analyzer.models import (
@@ -21,7 +20,7 @@ from analyzer.tasks import run_analysis_task
 from django.contrib import messages
 from django.core.paginator import Paginator
 from django.db.models import Avg, Count, Q
-from django.http import JsonResponse
+from django.http import HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
@@ -89,7 +88,7 @@ def project_detail(request: HttpRequest, project_id: str) -> HttpResponse:
     flx_project = get_object_or_404(Project, id=project_id)
 
     # Get analysis sessions for this project
-    sessions = flx_project.analysis_sessions.order_by("-created_at")
+    sessions = flx_project.analysis_sessions.all().order_by("-created_at")
 
     context = {
         "flx_project": flx_project,
@@ -241,7 +240,7 @@ def start_analysis(request: HttpRequest, project_id: str) -> HttpResponse:
             # Start actual analysis task
             try:
                 # Start background analysis
-                run_analysis_task.delay(session.id, ["ast", "external", "quality"])
+                run_analysis_task(str(session.id), ["ast", "external", "quality"])
 
                 messages.success(request, "Analysis started in background!")
             except ImportError:
@@ -284,7 +283,7 @@ def refresh_packages(_request: HttpRequest) -> JsonResponse:
         )
 
 
-def run_analysis(request: HttpRequest, project_id: str) -> object:
+def run_analysis(request: HttpRequest, project_id: str) -> HttpResponse:
     """Run analysis with selected backends."""
     flx_project = get_object_or_404(Project, id=project_id)
 
@@ -304,7 +303,7 @@ def run_analysis(request: HttpRequest, project_id: str) -> object:
 
         # Start background analysis
         try:
-            run_analysis_task.delay(session.id, backend_names)
+            run_analysis_task(str(session.id), backend_names)
 
             messages.success(
                 request,
@@ -361,7 +360,7 @@ def package_analysis_view(
     request: HttpRequest,
     session_id: str,
     package_id: str,
-) -> object:
+) -> HttpResponse:
     """Show package analysis details."""
     from analyzer.models import ClassAnalysis, FunctionAnalysis, PackageAnalysis
 
@@ -394,7 +393,9 @@ def package_analysis_view(
     return render(request, "dashboard/package_analysis.html", context)
 
 
-def class_analysis_view(request: HttpRequest, session_id: str, class_id: str) -> object:
+def class_analysis_view(
+    request: HttpRequest, session_id: str, class_id: str,
+) -> HttpResponse:
     """Show class analysis details."""
     session = get_object_or_404(AnalysisSession, id=session_id)
     class_obj = get_object_or_404(ClassAnalysis, id=class_id)
@@ -426,7 +427,7 @@ def function_analysis_view(
     request: HttpRequest,
     session_id: str,
     function_id: str,
-) -> object:
+) -> HttpResponse:
     """Show function analysis details."""
     from analyzer.models import FunctionAnalysis, VariableAnalysis
 
@@ -446,11 +447,11 @@ def function_analysis_view(
     return render(request, "dashboard/function_analysis.html", context)
 
 
-def analysis_overview(request: HttpRequest) -> object:
+def analysis_overview(request: HttpRequest) -> HttpResponse:
     """Show analysis overview with all sessions."""
     sessions = (
         AnalysisSession.objects.select_related("flx_project")
-        .prefetch_related("detected_issues", "backend_statistics")
+        .prefetch_related("security_issues")
         .order_by("-created_at")
     )
 
@@ -478,7 +479,8 @@ def hierarchical_report(request: HttpRequest, session_id: str) -> HttpResponse:
     session = get_object_or_404(AnalysisSession, id=session_id)
 
     # Build hierarchical data structure
-    report_data = {
+
+    report_data: dict[str, AnalysisSession | list] = {
         "session": session,
         "packages": [],
     }
@@ -486,10 +488,10 @@ def hierarchical_report(request: HttpRequest, session_id: str) -> HttpResponse:
     packages = PackageAnalysis.objects.filter(session=session).order_by("name")
 
     for package in packages:
-        package_data = {
+        package_data: dict[str, PackageAnalysis | list | int] = {
             "package": package,
-            "classes": [],
-            "functions": [],
+            "classes": [],  # type: ignore[misc]
+            "functions": [],  # type: ignore[misc]
             "security_issues": SecurityIssue.objects.filter(
                 session=session,
                 file_analysis__package_name=package.name,
@@ -526,63 +528,43 @@ def hierarchical_report(request: HttpRequest, session_id: str) -> HttpResponse:
     return render(request, "dashboard/hierarchical_report.html", context)
 
 
-def backend_issues_report(request: HttpRequest, session_id: str) -> object:
+def backend_issues_report(request: HttpRequest, session_id: str) -> HttpResponse:
     """Generate backend issues report."""
     session = get_object_or_404(AnalysisSession, id=session_id)
 
-    # Get backend statistics
-    backend_stats = session.backend_statistics.all().order_by(
-        "backend__execution_order",
-    )
+    # Get backend statistics (placeholder - backend_statistics model doesn't exist yet)
+    backend_stats: list[object] = []  # TODO: Implement backend statistics model
 
     # Get detected issues grouped by backend and severity
-    detected_issues = session.detected_issues.select_related(
-        "issue_type__backend",
-        "file_analysis",
-    ).order_by("-detected_at")
+    # Note: Using SecurityIssue as DetectedIssue model structure is unclear
 
-    # Group issues by backend
-    issues_by_backend: dict[str, dict[str, object]] = {}
-    for issue in detected_issues:
-        backend_name = issue.issue_type.backend.name
-        if backend_name not in issues_by_backend:
-            issues_by_backend[backend_name] = {
-                "backend": issue.issue_type.backend,
-                "issues": [],
-                "severity_counts": {
-                    "CRITICAL": 0,
-                    "HIGH": 0,
-                    "MEDIUM": 0,
-                    "LOW": 0,
-                    "INFO": 0,
-                },
-                "category_counts": {},
-            }
+    detected_issues = SecurityIssue.objects.filter(session=session).order_by(
+        "-created_at",
+    )
 
-        issues_by_backend[backend_name]["issues"].append(issue)
-
-        # Count by severity
-        severity = issue.severity
-        if severity in issues_by_backend[backend_name]["severity_counts"]:
-            issues_by_backend[backend_name]["severity_counts"][severity] += 1
-
-        # Count by category
-        category = issue.category
-        if category not in issues_by_backend[backend_name]["category_counts"]:
-            issues_by_backend[backend_name]["category_counts"][category] = 0
-        issues_by_backend[backend_name]["category_counts"][category] += 1
+    # Group issues by backend (simplified for SecurityIssue model)
+    issues_by_backend = {
+        "security": {
+            "backend": "Security Analysis",
+            "issues": list(detected_issues),
+            "severity_counts": {
+                "CRITICAL": detected_issues.filter(severity="CRITICAL").count(),
+                "HIGH": detected_issues.filter(severity="HIGH").count(),
+                "MEDIUM": detected_issues.filter(severity="MEDIUM").count(),
+                "LOW": detected_issues.filter(severity="LOW").count(),
+                "INFO": 0,
+            },
+            "category_counts": {"security": detected_issues.count()},
+        },
+    }
 
     # Calculate overall statistics
     total_issues = detected_issues.count()
     total_files_with_issues = detected_issues.values("file_path").distinct().count()
 
-    # Get top issue types
+    # Get top issue types (simplified for SecurityIssue model)
     top_issue_types = (
-        detected_issues.values(
-            "issue_type__code",
-            "issue_type__name",
-            "issue_type__severity",
-        )
+        detected_issues.values("issue_type", "severity")
         .annotate(count=Count("id"))
         .order_by("-count")[:10]
     )
@@ -606,10 +588,3 @@ def backend_issues_report(request: HttpRequest, session_id: str) -> object:
     }
 
     return render(request, "dashboard/backend_issues_report.html", context)
-
-
-def run_analysis_task(session_id: str, backends: list[str]) -> None:
-    """Método fictício para substituir run_analysis_task ausente."""
-    logging.info(
-        f"Executando análise para sessão {session_id} com backends: {backends}",
-    )

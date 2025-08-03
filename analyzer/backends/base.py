@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from flext_core import get_logger
 
@@ -50,7 +50,10 @@ class AnalysisBackend(ABC):
         """Initialize analysis backend with session and project path."""
         self.session = session
         self.project_path = project_path
-        self.logger = FlextLoggerFactory.get_logger(
+        # TODO: Import FlextLoggerFactory from flext_core when available
+        import logging
+
+        self.logger = logging.getLogger(
             __name__ + "." + self.__class__.__name__,
         )
 

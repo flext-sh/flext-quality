@@ -102,7 +102,7 @@ class QualityProjectService:
         try:
             if project_id in self._projects:
                 del self._projects[project_id]
-                return FlextResult.ok(True)
+                return FlextResult.ok(data=True)
             return FlextResult.fail("Project not found")
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to delete project: {e}")
@@ -487,7 +487,7 @@ class QualityReportService:
         try:
             if report_id in self._reports:
                 del self._reports[report_id]
-                return FlextResult.ok(True)
+                return FlextResult.ok(data=True)
             return FlextResult.fail("Report not found")
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to delete report: {e}")

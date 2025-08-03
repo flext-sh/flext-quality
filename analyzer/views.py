@@ -40,6 +40,8 @@ class ProjectSerializer(serializers.ModelSerializer):
     """Serializer for Project model."""
 
     class Meta:
+        """Meta configuration for ProjectSerializer."""
+
         model = Project
         fields = "__all__"
 
@@ -48,6 +50,8 @@ class ProjectSummarySerializer(serializers.ModelSerializer):
     """Summary serializer for Project model."""
 
     class Meta:
+        """Meta configuration for ProjectSummarySerializer."""
+
         model = Project
         name = serializers.CharField(max_length=255)
         description = serializers.CharField(max_length=512, allow_blank=True)
@@ -60,6 +64,8 @@ class AnalysisSessionSerializer(serializers.ModelSerializer):
     """Serializer for AnalysisSession model."""
 
     class Meta:
+        """Meta configuration for AnalysisSessionSerializer."""
+
         model = AnalysisSession
         fields = "__all__"
 
@@ -68,6 +74,8 @@ class AnalysisSessionSummarySerializer(serializers.ModelSerializer):
     """Summary serializer for AnalysisSession model."""
 
     class Meta:
+        """Meta configuration for AnalysisSessionSummarySerializer."""
+
         model = AnalysisSession
         name = serializers.CharField(max_length=255)
         status = serializers.CharField(max_length=50)
@@ -80,6 +88,8 @@ class CreateAnalysisSessionSerializer(serializers.ModelSerializer):
     """Serializer for creating AnalysisSession."""
 
     class Meta:
+        """Meta configuration for CreateAnalysisSessionSerializer."""
+
         model = AnalysisSession
         flx_project = serializers.PrimaryKeyRelatedField(
             queryset=Project.objects.all(),
@@ -102,6 +112,8 @@ class FileAnalysisSerializer(serializers.ModelSerializer):
     """Serializer for FileAnalysis model."""
 
     class Meta:
+        """Meta configuration for FileAnalysisSerializer."""
+
         model = FileAnalysis
         fields = "__all__"
 
@@ -110,6 +122,8 @@ class SecurityIssueSerializer(serializers.ModelSerializer):
     """Serializer for SecurityIssue model."""
 
     class Meta:
+        """Meta configuration for SecurityIssueSerializer."""
+
         model = SecurityIssue
         fields = "__all__"
 
@@ -118,6 +132,8 @@ class DeadCodeIssueSerializer(serializers.ModelSerializer):
     """Serializer for DeadCodeIssue model."""
 
     class Meta:
+        """Meta configuration for DeadCodeIssueSerializer."""
+
         model = DeadCodeIssue
         fields = "__all__"
 
@@ -126,6 +142,8 @@ class DuplicateCodeBlockSerializer(serializers.ModelSerializer):
     """Serializer for DuplicateCodeBlock model."""
 
     class Meta:
+        """Meta configuration for DuplicateCodeBlockSerializer."""
+
         model = DuplicateCodeBlock
         fields = "__all__"
 
@@ -134,6 +152,8 @@ class QualityMetricsSerializer(serializers.ModelSerializer):
     """Serializer for QualityMetrics model."""
 
     class Meta:
+        """Meta configuration for QualityMetricsSerializer."""
+
         model = QualityMetrics
         fields = "__all__"
 
@@ -144,7 +164,7 @@ if TYPE_CHECKING:
 logger = get_logger(__name__)
 
 
-def create_download_response(report: Any) -> HttpResponse:
+def create_download_response(report: object) -> HttpResponse:
     """Create a download response for a report.
 
     Args:
