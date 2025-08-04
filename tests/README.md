@@ -216,7 +216,7 @@ def test_should_do_something_when_condition():
     result = service.perform_operation(test_data)
 
     # Then (Assert)
-    assert result.is_success
+    assert result.success
     assert result.data.expected_property == expected_value
 ```
 

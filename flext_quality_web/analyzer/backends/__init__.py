@@ -45,7 +45,7 @@ def get_default_backends() -> list[type[AnalysisBackend]]:
     return [AVAILABLE_BACKENDS[name] for name in DEFAULT_BACKENDS]
 
 
-__all__ = [
+__all__: list[str] = [
     "AVAILABLE_BACKENDS",
     "ASTBackend",
     "AnalysisBackend",

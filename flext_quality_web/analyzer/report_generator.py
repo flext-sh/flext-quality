@@ -9,8 +9,8 @@ from django.template.loader import get_template
 from django.utils import timezone
 from xhtml2pdf import pisa
 
-from flext_core import get_logger
 from analyzer.models import AnalysisReport
+from flext_core import get_logger
 
 if TYPE_CHECKING:
     from analyzer.models import (

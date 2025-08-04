@@ -159,7 +159,7 @@ result: FlextResult[QualityProject] = await project_service.create_project(
     repository_url="https://github.com/flext-sh/flext-core"
 )
 
-if result.is_success:
+if result.success:
     project = result.data
     print(f"Project created: {project.name}")
 else:

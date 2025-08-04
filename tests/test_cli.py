@@ -80,7 +80,7 @@ class TestAnalyzeProject:
             {
                 "issues": {},
                 "files_analyzed": 3,  # Include the complete analyzer results
-            }
+            },
         )
 
     @patch("flext_quality.cli.CodeAnalyzer")

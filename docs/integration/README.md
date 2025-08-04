@@ -777,7 +777,7 @@ class TestGitHubIntegration:
             comment="Quality analysis completed"
         )
 
-        assert result.is_success
+        assert result.success
         mock_post.assert_called_once()
 ```
 

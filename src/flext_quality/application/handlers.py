@@ -9,9 +9,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from flext_core import FlextResult, TAnyDict
+from flext_core import FlextResult
 from flext_observability import flext_create_log_entry, flext_create_trace
-
 from flext_quality.application.services import (
     LintingServiceImpl,
     QualityAnalysisService,
@@ -136,7 +135,7 @@ class RunLintingHandler:
     def __init__(self) -> None:
         self._linting_service = LintingServiceImpl()
 
-    async def handle(self, project_id: UUID) -> FlextResult[TAnyDict]:
+    async def handle(self, project_id: UUID) -> FlextResult[dict[str, object]]:
         """Handle linting command."""
         # Convert UUID to string for service compatibility
         project_id_str = str(project_id)
@@ -165,7 +164,7 @@ class RunSecurityCheckHandler:
     def __init__(self) -> None:
         self._security_service = SecurityAnalyzerServiceImpl()
 
-    async def handle(self, project_id: UUID) -> FlextResult[TAnyDict]:
+    async def handle(self, project_id: UUID) -> FlextResult[dict[str, object]]:
         """Handle security check command."""
         # Convert UUID to string for service compatibility
         project_id_str = str(project_id)

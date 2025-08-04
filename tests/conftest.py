@@ -81,7 +81,7 @@ def assert_result_success_with_data[T](result: FlextResult[T]) -> T:
         messages for test debugging and failure analysis.
 
     """
-    assert result.is_success, f"Expected success but got failure: {result.error}"
+    assert result.success, f"Expected success but got failure: {result.error}"
     assert result.data is not None, "Expected data but got None"
     return result.data
 
@@ -207,7 +207,7 @@ def sample_code_repository(tmp_path: Path) -> TAnyDict:
         >>> def test_repo_analysis(sample_code_repository):
         ...     analyzer = CodeAnalyzer(sample_code_repository["path"])
         ...     result = analyzer.analyze_project()
-        ...     assert result.is_success
+        ...     assert result.success
 
     """
     return {

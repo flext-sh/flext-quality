@@ -17,13 +17,13 @@ class TestCodeAnalyzer:
         analyzer = CodeAnalyzer(".")
         assert analyzer is not None
         if analyzer.project_path != Path():
-            msg = f"Expected {Path()}, got {analyzer.project_path}"
+            msg: str = f"Expected {Path()}, got {analyzer.project_path}"
             raise AssertionError(msg)
 
     def test_analyzer_with_path(self, tmp_path: Path) -> None:
         analyzer = CodeAnalyzer(tmp_path)
         if analyzer.project_path != tmp_path:
-            msg = f"Expected {tmp_path}, got {analyzer.project_path}"
+            msg: str = f"Expected {tmp_path}, got {analyzer.project_path}"
             raise AssertionError(msg)
 
     def test_find_python_files(self, tmp_path: Path) -> None:
@@ -36,17 +36,17 @@ class TestCodeAnalyzer:
         files = analyzer._find_python_files()
 
         if len(files) != EXPECTED_BULK_SIZE:
-            msg = f"Expected {EXPECTED_BULK_SIZE}, got {len(files)}"
+            msg: str = f"Expected {EXPECTED_BULK_SIZE}, got {len(files)}"
             raise AssertionError(msg)
 
         test_py_found = any(f.name == "test.py" for f in files)
         test2_py_found = any(f.name == "test2.py" for f in files)
 
         if not test_py_found:
-            msg = f"Expected test.py in files: {[f.name for f in files]}"
+            msg: str = f"Expected test.py in files: {[f.name for f in files]}"
             raise AssertionError(msg)
         if not test2_py_found:
-            msg = f"Expected test2.py in files: {[f.name for f in files]}"
+            msg: str = f"Expected test2.py in files: {[f.name for f in files]}"
             raise AssertionError(msg)
 
     def test_analyze_project_basic(self, tmp_path: Path) -> None:
@@ -71,14 +71,14 @@ if __name__ == "__main__":
         )
 
         if results["files_analyzed"] != 1:
-            msg = f"Expected {1}, got {results['files_analyzed']}"
+            msg: str = f"Expected {1}, got {results['files_analyzed']}"
             raise AssertionError(msg)
         total_lines = results["total_lines"]
         assert isinstance(total_lines, int)
         assert total_lines > 0
         python_files = results["python_files"]
         if isinstance(python_files, list) and len(python_files) != 1:
-            msg = f"Expected {1}, got {len(python_files)}"
+            msg: str = f"Expected {1}, got {len(python_files)}"
             raise AssertionError(msg)
 
     def test_quality_score(self) -> None:
@@ -94,10 +94,10 @@ if __name__ == "__main__":
 
         score = analyzer.get_quality_score()
         if score != 100.0:
-            msg = f"Expected {100.0}, got {score}"
+            msg: str = f"Expected {100.0}, got {score}"
             raise AssertionError(msg)
 
         grade = analyzer.get_quality_grade()
         if grade != "A+":
-            msg = f"Expected {'A+'}, got {grade}"
+            msg: str = f"Expected {'A+'}, got {grade}"
             raise AssertionError(msg)

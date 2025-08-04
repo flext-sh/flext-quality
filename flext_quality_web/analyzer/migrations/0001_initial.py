@@ -7,8 +7,6 @@ This migration creates the initial database schema for the code analysis models.
 
 from __future__ import annotations
 
-from typing import ClassVar
-
 import django.db.models.deletion
 from django.db import migrations, models
 

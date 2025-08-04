@@ -32,7 +32,7 @@ Example:
     >>> from flext_quality import QualityAPI
     >>> api = QualityAPI()
     >>> result = await api.analyze_project("/path/to/project")
-    >>> if result.is_success:
+    >>> if result.success:
     ...     print(f"Quality Score: {result.data.overall_score}")
     ...     print(f"Issues Found: {len(result.data.issues)}")
 
@@ -120,7 +120,7 @@ with contextlib.suppress(ImportError):
 # PUBLIC API EXPORTS
 # ================================
 
-__all__ = [
+__all__: list[str] = [
     "BaseModel",  # from flext_quality import BaseModel
     # Core Quality System (simplified access)
     "CodeAnalyzer",  # from flext_quality import CodeAnalyzer

@@ -5,6 +5,7 @@ import subprocess
 import sys
 from pathlib import Path
 
+
 def run_tests():
     """Executa testes sem interferência."""
     # Change to project directory
@@ -23,18 +24,14 @@ def run_tests():
             "--tb=no",
             "-q",
             "--confcutdir=.",  # Apenas conftest local
-            "--disable-warnings"
+            "--disable-warnings",
         ]
 
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        print("STDOUT:", result.stdout)
-        print("STDERR:", result.stderr)
-        print("RETURN CODE:", result.returncode)
-
-        return result
+        return subprocess.run(cmd, check=False, capture_output=True, text=True)
 
     finally:
         os.chdir(original_dir)
+
 
 if __name__ == "__main__":
     run_tests()

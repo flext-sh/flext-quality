@@ -10,7 +10,6 @@ from typing import TYPE_CHECKING
 from uuid import UUID
 
 from flext_core import FlextResult, TAnyDict
-
 from flext_quality.application.services import (
     QualityAnalysisService,
     QualityIssueService,
@@ -600,7 +599,7 @@ class QualityAPI:
             branch=branch,
         )
 
-        if not result.is_success:
+        if not result.success:
             return result
 
         analysis = result.data

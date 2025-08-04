@@ -46,7 +46,7 @@ class TestQualityProject:
         )
 
         result = project.validate_domain_rules()
-        assert result.is_success
+        assert result.success
 
     def test_project_validation_failure(self) -> None:
         """Test project validation failure."""
@@ -100,7 +100,7 @@ class TestQualityAnalysis:
         )
 
         result = analysis.validate_domain_rules()
-        assert result.is_success
+        assert result.success
 
     def test_analysis_validation_failure(self) -> None:
         """Test analysis validation failure."""
@@ -189,20 +189,20 @@ class TestQualityAnalysis:
         failed_analysis = analysis.model_copy(update={"status": AnalysisStatus.FAILED})
         assert failed_analysis.is_completed
 
-    def test_is_successful_property(self) -> None:
-        """Test is_successful property."""
+    def test_successful_property(self) -> None:
+        """Test successful property."""
         analysis = QualityAnalysis(
             id="test-id",
             project_id="project-id",
         )
 
-        assert not analysis.is_successful
+        assert not analysis.successful
 
         completed_analysis = analysis.complete_analysis()
-        assert completed_analysis.is_successful
+        assert completed_analysis.successful
 
         failed_analysis = analysis.model_copy(update={"status": AnalysisStatus.FAILED})
-        assert not failed_analysis.is_successful
+        assert not failed_analysis.successful
 
 
 class TestQualityIssue:
@@ -245,7 +245,7 @@ class TestQualityIssue:
         )
 
         result = issue.validate_domain_rules()
-        assert result.is_success
+        assert result.success
 
     def test_issue_validation_failure(self) -> None:
         """Test issue validation failure."""
@@ -374,7 +374,7 @@ class TestQualityRule:
         )
 
         result = rule.validate_domain_rules()
-        assert result.is_success
+        assert result.success
 
     def test_rule_validation_failure(self) -> None:
         """Test rule validation failure."""
@@ -467,7 +467,7 @@ class TestQualityReport:
         )
 
         result = report.validate_domain_rules()
-        assert result.is_success
+        assert result.success
 
     def test_report_validation_failure(self) -> None:
         """Test report validation failure."""

@@ -11,7 +11,7 @@ from .typing_helpers import (
     safe_list_access,
 )
 
-__all__ = [
+__all__: list[str] = [
     "assert_analysis_results_structure",
     "assert_dict_structure",
     "assert_is_dict",

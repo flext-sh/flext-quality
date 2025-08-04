@@ -174,7 +174,7 @@ class RuffAnalyzerAdapter(SecurityAnalyzerService):
             timeout=300  # 5 minute timeout
         )
 
-        if process.returncode not in [0, 1]:  # 1 = issues found, still success
+        if process.returncode not in [0, 1]:  # 1 = issues found, still success:
             raise AnalysisError(f"Ruff failed: {stderr.decode()}")
 
         return json.loads(stdout.decode())

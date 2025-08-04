@@ -109,7 +109,7 @@ class CodeAnalysisEngine:
     def _find_python_files(self) -> list[Path]:
         """Find all Python files in the project."""
         if not self.project_path.exists():
-            msg = f"Project path does not exist: {self.project_path}"
+            msg: str = f"Project path does not exist: {self.project_path}"
             raise FileNotFoundError(msg)
 
         # Skip hidden files and directories

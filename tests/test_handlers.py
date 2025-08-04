@@ -30,7 +30,7 @@ class TestAnalyzeProjectHandler:
 
         result = await handler.handle(project_id)
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         # Should return a QualityAnalysis entity
         assert hasattr(result.data, "id")
@@ -54,7 +54,7 @@ class TestGenerateReportHandler:
 
         result = await handler.handle(analysis_id)
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         # Should return a QualityReport entity
         assert hasattr(result.data, "id")
@@ -78,7 +78,7 @@ class TestRunLintingHandler:
 
         result = await handler.handle(project_id)
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         # Should return linting results
         assert isinstance(result.data, dict)
@@ -101,7 +101,7 @@ class TestRunSecurityCheckHandler:
 
         result = await handler.handle(project_id)
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         # Should return security analysis results
         assert isinstance(result.data, dict)
@@ -145,5 +145,5 @@ class TestHandlerIntegration:
                 from flext_core import FlextResult
 
                 result = FlextResult.ok("Mock success")
-            assert result.is_success
+            assert result.success
             assert result.data is not None

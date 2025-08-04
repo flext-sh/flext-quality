@@ -100,7 +100,7 @@ class TestFlextQualityExceptions:
     def test_report_error_with_context(self) -> None:
         """Test FlextQualityReportError with full context."""
         exception = FlextQualityReportError(
-            "Invalid format", report_type="html", output_format="pdf", extra_info="test"
+            "Invalid format", report_type="html", output_format="pdf", extra_info="test",
         )
         assert "Quality report: Invalid format" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -119,7 +119,7 @@ class TestFlextQualityExceptions:
     def test_metrics_error_with_context(self) -> None:
         """Test FlextQualityMetricsError with full context."""
         exception = FlextQualityMetricsError(
-            "Invalid value", metric_name="complexity", metric_value=42.5, threshold=10.0
+            "Invalid value", metric_name="complexity", metric_value=42.5, threshold=10.0,
         )
         assert "Quality metrics: Invalid value" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -138,7 +138,7 @@ class TestFlextQualityExceptions:
     def test_grade_error_with_context(self) -> None:
         """Test FlextQualityGradeError with full context."""
         exception = FlextQualityGradeError(
-            "Invalid grade", grade_type="overall", calculated_grade="A++", score=95.5
+            "Invalid grade", grade_type="overall", calculated_grade="A++", score=95.5,
         )
         assert "Quality grade: Invalid grade" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -157,7 +157,7 @@ class TestFlextQualityExceptions:
     def test_rule_error_with_context(self) -> None:
         """Test FlextQualityRuleError with full context."""
         exception = FlextQualityRuleError(
-            "Rule not found", rule_name="E302", rule_severity="high", category="style"
+            "Rule not found", rule_name="E302", rule_severity="high", category="style",
         )
         assert "Quality rule: Rule not found" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -194,17 +194,20 @@ class TestExceptionInheritance:
     def test_exception_raising(self) -> None:
         """Test that exceptions can be raised and caught correctly."""
         with pytest.raises(FlextQualityAnalysisError) as exc_info:
-            raise FlextQualityAnalysisError("Test analysis error")
+            msg = "Test analysis error"
+            raise FlextQualityAnalysisError(msg)
 
         assert "Quality analysis: Test analysis error" in str(exc_info.value)
 
         # Test catching by base class
         with pytest.raises(FlextQualityError):
-            raise FlextQualityMetricsError("Test metrics error")
+            msg = "Test metrics error"
+            raise FlextQualityMetricsError(msg)
 
         # Test catching by Exception (specific error type)
         with pytest.raises(FlextQualityReportError, match="Test report error"):
-            raise FlextQualityReportError("Test report error")
+            msg = "Test report error"
+            raise FlextQualityReportError(msg)
 
 
 class TestExceptionModuleExports:

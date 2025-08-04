@@ -22,11 +22,11 @@ class TestDIContainer:
 
         # Register service
         result = container.register("quality_service", test_service)
-        assert result.is_success
+        assert result.success
 
         # Retrieve service
         get_result = container.get("quality_service")
-        assert get_result.is_success
+        assert get_result.success
         assert get_result.data == test_service
 
     def test_quality_service_registration(self) -> None:
@@ -40,11 +40,11 @@ class TestDIContainer:
 
         analyzer = MockQualityAnalyzer()
         result = container.register("quality_analyzer", analyzer)
-        assert result.is_success
+        assert result.success
 
         # Retrieve and test
         get_result = container.get("quality_analyzer")
-        assert get_result.is_success
+        assert get_result.success
         retrieved_analyzer = get_result.data
         assert hasattr(retrieved_analyzer, "analyze")
 
@@ -59,5 +59,5 @@ class TestDIContainer:
 
         # Test getting non-existent service
         result = container.get("non_existent_service")
-        assert not result.is_success
+        assert not result.success
         assert result.error is not None

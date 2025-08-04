@@ -20,7 +20,6 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from flext_core import get_logger
 from analyzer.analysis_engine import CodeAnalysisEngine
 from analyzer.models import (
     AnalysisSession,
@@ -34,6 +33,7 @@ from analyzer.models import (
 from analyzer.package_discovery import PackageDiscovery
 from analyzer.report_generator import WebReportGenerator
 from analyzer.tasks import run_code_analysis
+from flext_core import get_logger
 
 
 def health_check(request):

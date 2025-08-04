@@ -101,7 +101,7 @@ quality_api = QualityAPI(container)
 async def analyze_with_monitoring(project_path: str):
     result = await quality_api.analyze_project(project_path)
 
-    if result.is_success:
+    if result.success:
         # Publish metrics to observability stack
         create_metric(
             name="project_quality_score",

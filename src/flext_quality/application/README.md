@@ -292,7 +292,7 @@ async def execute_analysis(
 
         # Validation
         validation_result = analysis.validate_domain_rules()
-        if not validation_result.is_success:
+        if not validation_result.success:
             return validation_result.cast()
 
         # Success path
@@ -463,7 +463,7 @@ async def test_quality_analysis_service_comprehensive_workflow():
     )
 
     # Then
-    assert result.is_success
+    assert result.success
     analysis = result.data
     assert analysis.status == AnalysisStatus.COMPLETED
     assert analysis.overall_score >= 0.0
@@ -524,7 +524,7 @@ result = await service.execute_comprehensive_analysis(
     )
 )
 
-if result.is_success:
+if result.success:
     analysis = result.data
     print(f"Quality Score: {analysis.overall_score}")
     print(f"Issues Found: {len(analysis.issues)}")
@@ -545,7 +545,7 @@ async def complete_quality_assessment_workflow(project_path: str):
     project_result = await project_service.create_project(
         ProjectCreationData(path=project_path)
     )
-    if not project_result.is_success:
+    if not project_result.success:
         return project_result.cast()
 
     # Step 2: Execute analysis
@@ -553,7 +553,7 @@ async def complete_quality_assessment_workflow(project_path: str):
         project_result.data.id,
         AnalysisConfiguration.default()
     )
-    if not analysis_result.is_success:
+    if not analysis_result.success:
         return analysis_result.cast()
 
     # Step 3: Generate reports

@@ -38,7 +38,7 @@ class TestQualityProjectService:
             language="python",
         )
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         assert result.data.project_path == secure_temp_dir
         assert result.data.repository_url == "https://github.com/test/repo"
@@ -122,7 +122,7 @@ class TestQualityProjectService:
 
         # Delete it
         result = await service.delete_project(project_id)
-        assert result.is_success
+        assert result.success
         assert result.data is True
 
     async def test_delete_project_not_found(
@@ -150,7 +150,7 @@ class TestQualityAnalysisService:
             commit_hash="abc123",
             branch="main",
         )
-        assert result.is_success
+        assert result.success
 
     async def test_update_metrics(self, service: QualityAnalysisService) -> None:
         """Test updating analysis metrics."""
@@ -317,5 +317,5 @@ class TestQualityReportService:
 
         # Delete it
         result = await service.delete_report(report_id)
-        assert result.is_success
+        assert result.success
         assert result.data is True

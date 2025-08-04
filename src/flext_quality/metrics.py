@@ -44,9 +44,9 @@ Version: 0.9.0
 
 from __future__ import annotations
 
-from flext_core import FlextResult, FlextValueObject, TAnyDict
 from pydantic import Field, computed_field
 
+from flext_core import FlextResult, FlextValueObject, TAnyDict
 from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
 
 
