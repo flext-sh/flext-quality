@@ -75,7 +75,7 @@ from flext_quality.domain.value_objects import (
     QualityScore,
 )
 
-__all__ = [
+__all__: list[str] = [
     # Domain Services
     "AnalysisService",
     "ComplexityAnalyzerService",

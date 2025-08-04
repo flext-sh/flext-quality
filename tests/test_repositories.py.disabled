@@ -31,7 +31,7 @@ class TestAnalysisResultRepository:
 
         result = repo.save(entity)
 
-        assert result.is_success
+        assert result.success
         assert result.data is None  # save returns FlextResult[None]
 
     def test_find_by_id_existing(self) -> None:
@@ -45,7 +45,7 @@ class TestAnalysisResultRepository:
 
         result = repo.find_by_id(entity_id)
 
-        assert result.is_success
+        assert result.success
         assert result.data == entity
 
     def test_find_by_id_not_found(self) -> None:
@@ -65,7 +65,7 @@ class TestAnalysisResultRepository:
 
         result = repo.find_all()
 
-        assert result.is_success
+        assert result.success
         assert result.data == []
 
     def test_find_all_with_entities(self) -> None:
@@ -80,7 +80,7 @@ class TestAnalysisResultRepository:
 
         result = repo.find_all()
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         assert len(result.data) == 2
         assert entity1 in result.data
@@ -109,7 +109,7 @@ class TestQualityMetricsRepository:
 
         result = repo.save(entity)
 
-        assert result.is_success
+        assert result.success
         assert result.data is None  # save returns FlextResult[None]
 
     def test_find_by_id_existing(self) -> None:
@@ -122,7 +122,7 @@ class TestQualityMetricsRepository:
 
         result = repo.find_by_id(entity_id)
 
-        assert result.is_success
+        assert result.success
         assert result.data == entity
 
     def test_find_by_id_not_found(self) -> None:
@@ -142,7 +142,7 @@ class TestQualityMetricsRepository:
 
         result = repo.find_all()
 
-        assert result.is_success
+        assert result.success
         assert result.data == []
 
     def test_find_all_with_entities(self) -> None:
@@ -156,7 +156,7 @@ class TestQualityMetricsRepository:
 
         result = repo.find_all()
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         assert len(result.data) == 2
         assert entity1 in result.data
@@ -185,7 +185,7 @@ class TestQualityRuleRepository:
 
         result = repo.save(entity)
 
-        assert result.is_success
+        assert result.success
         assert result.data is None  # save returns FlextResult[None]
 
     def test_find_by_id_existing(self) -> None:
@@ -198,7 +198,7 @@ class TestQualityRuleRepository:
 
         result = repo.find_by_id(entity_id)
 
-        assert result.is_success
+        assert result.success
         assert result.data == entity
 
     def test_find_by_id_not_found(self) -> None:
@@ -218,7 +218,7 @@ class TestQualityRuleRepository:
 
         result = repo.find_all()
 
-        assert result.is_success
+        assert result.success
         assert result.data == []
 
     def test_find_all_with_entities(self) -> None:
@@ -232,7 +232,7 @@ class TestQualityRuleRepository:
 
         result = repo.find_all()
 
-        assert result.is_success
+        assert result.success
         assert result.data is not None
         assert len(result.data) == 2
         assert entity1 in result.data
@@ -264,18 +264,18 @@ class TestRepositoryIntegration:
         rules_result = rules_repo.save(rules_entity)
 
         # Verify saves succeeded
-        assert analysis_result.is_success
-        assert metrics_result.is_success
-        assert rules_result.is_success
+        assert analysis_result.success
+        assert metrics_result.success
+        assert rules_result.success
 
         # Each repository should have its own data (save DOES add to storage)
         analysis_results = analysis_repo.find_all()
         metrics_results = metrics_repo.find_all()
         rules_results = rules_repo.find_all()
 
-        assert analysis_results.is_success
-        assert metrics_results.is_success
-        assert rules_results.is_success
+        assert analysis_results.success
+        assert metrics_results.success
+        assert rules_results.success
         assert analysis_results.data is not None
         assert metrics_results.data is not None
         assert rules_results.data is not None
@@ -308,22 +308,22 @@ class TestRepositoryIntegration:
 
         # Initially empty
         all_entities = repo.find_all()
-        assert all_entities.is_success
+        assert all_entities.success
         assert all_entities.data is not None
         assert len(all_entities.data) == 0
 
         # Save entity using real save method
         save_result = repo.save(entity)
-        assert save_result.is_success
+        assert save_result.success
 
         # Find by ID
         found_result = repo.find_by_id(entity_id)
-        assert found_result.is_success
+        assert found_result.success
         assert found_result.data == entity
 
         # Find all
         all_entities = repo.find_all()
-        assert all_entities.is_success
+        assert all_entities.success
         assert all_entities.data is not None
         assert len(all_entities.data) == 1
         assert entity in all_entities.data
@@ -334,12 +334,12 @@ class TestRepositoryIntegration:
 
         # Verify update
         found_updated = repo.find_by_id(entity_id)
-        assert found_updated.is_success
+        assert found_updated.success
         assert found_updated.data == updated_entity
 
         # Remove entity using delete method
         delete_result = repo.delete(entity_id)
-        assert delete_result.is_success
+        assert delete_result.success
 
         # Verify removal
         not_found = repo.find_by_id(entity_id)
@@ -348,6 +348,6 @@ class TestRepositoryIntegration:
         assert "Entity not found" in not_found.error
 
         empty_results = repo.find_all()
-        assert empty_results.is_success
+        assert empty_results.success
         assert empty_results.data is not None
         assert len(empty_results.data) == 0

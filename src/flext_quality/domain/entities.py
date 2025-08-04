@@ -10,8 +10,9 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from enum import StrEnum
 
-from flext_core import FlextEntity, FlextResult, TAnyDict
 from pydantic import BaseModel, Field
+
+from flext_core import FlextEntity, FlextResult, TAnyDict
 
 
 class FlextDomainEvent(BaseModel):
@@ -196,7 +197,7 @@ class QualityAnalysis(FlextEntity):
         return self.status in {AnalysisStatus.COMPLETED, AnalysisStatus.FAILED}
 
     @property
-    def is_successful(self) -> bool:
+    def successful(self) -> bool:
         return self.status == AnalysisStatus.COMPLETED
 
     def validate_domain_rules(self) -> FlextResult[None]:

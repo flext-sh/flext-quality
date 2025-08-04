@@ -49,7 +49,7 @@ from pydantic_settings import BaseSettings
 class FlextResult:
     """Mock FlextResult for enterprise compatibility."""
     def __init__(self, success: bool, data: Any = None, error: str = None):
-        self.is_success = success
+        self.success = success
         self.is_failure = not success
         self.data = data
         self.error = error
@@ -151,7 +151,7 @@ TAnyDict = Dict[str, Any]
 TConfigDict = Dict[str, Any]
 
 # Export all required symbols
-__all__ = [
+__all__: list[str] = [
     "FlextResult", "get_logger", "FlextContainer", "get_flext_container",
     "FlextEntity", "FlextValueObject", "FlextBaseSettings", "FlextConstants", 
     "TAnyDict", "TConfigDict", "FlextError", "FlextValidationError",
@@ -197,7 +197,7 @@ class FlextTimeoutError(FlextError):
     """Timeout error."""
     pass
 
-__all__ = [
+__all__: list[str] = [
     "FlextError", "FlextValidationError", "FlextConfigurationError",
     "FlextConnectionError", "FlextProcessingError", "FlextAuthenticationError",
     "FlextTimeoutError"

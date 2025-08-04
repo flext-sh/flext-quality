@@ -145,7 +145,7 @@ class QualityProjectService:
         try:
             project = QualityProject(name=name, project_path=path)
             validation = project.validate_standards()
-            if not validation.is_success:
+            if not validation.success:
                 return validation
             return FlextResult.ok(project)
         except Exception as e:
@@ -179,7 +179,7 @@ Always use FlextResult for error handling:
 async def analyze_project(project_id: str) -> FlextResult[QualityAnalysis]:
     try:
         project = await self._get_project(project_id)
-        if not project.is_success:
+        if not project.success:
             return project  # Propagate error
 
         analysis = await self._run_analysis(project.data)
@@ -219,7 +219,7 @@ class TestQualityProjectService:
             project_path="/path/to/project"
         )
 
-        assert result.is_success
+        assert result.success
         assert isinstance(result.data, QualityProject)
         assert result.data.name == "test-project"
 
@@ -231,7 +231,7 @@ class TestQualityProjectService:
             project_path=""  # Invalid empty path
         )
 
-        assert not result.is_success
+        assert not result.success
         assert "path is required" in result.error.lower()
 ```
 
@@ -488,7 +488,7 @@ async def analyze_project(
     """Analyze project quality following API patterns."""
     result = await service.analyze_project(project_id)
 
-    if result.is_success:
+    if result.success:
         return {"status": "success", "data": result.data.dict()}
     else:
         return {"status": "error", "message": result.error}

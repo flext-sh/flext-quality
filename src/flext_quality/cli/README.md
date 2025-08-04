@@ -145,7 +145,7 @@ class BaseCommand(ABC):
 
     def handle_result(self, result: FlextResult[dict]) -> int:
         """Handle command result and return exit code."""
-        if result.is_success:
+        if result.success:
             self.display_success(result.data)
             return 0
         else:
@@ -173,7 +173,7 @@ class AnalyzeCommand(BaseCommand):
                 project_path, config
             )
 
-            if result.is_success:
+            if result.success:
                 return FlextResult.ok({
                     "analysis_id": result.data.id,
                     "quality_score": result.data.overall_score,

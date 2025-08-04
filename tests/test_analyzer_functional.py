@@ -284,7 +284,7 @@ def multiply(x: int, y: int) -> int:
         grade = analyzer.get_quality_grade()
 
         assert isinstance(grade, str)
-        assert grade in [
+        assert grade in {
             "A+",
             "A",
             "A-",
@@ -298,7 +298,7 @@ def multiply(x: int, y: int) -> int:
             "D",
             "D-",
             "F",
-        ]
+        }
 
     def test_empty_project_directory(self) -> None:
         """Test analyzer with empty project directory."""
@@ -348,7 +348,7 @@ invalid_syntax here
             [
                 f'def function_{i}(param_{i}: int) -> int:\n    """Function {i}."""\n    return param_{i} * {i}'
                 for i in range(50)
-            ]
+            ],
         )
 
         large_file.write_text(large_content)
@@ -428,13 +428,13 @@ class TestCodeAnalyzerEdgeCases:
             # Add files in various locations
             (project_dir / "main.py").write_text("# Main file\nprint('main')\n")
             (project_dir / "src" / "utils.py").write_text(
-                "# Utils file\ndef util(): pass\n"
+                "# Utils file\ndef util(): pass\n",
             )
             (project_dir / "src" / "module1" / "core.py").write_text(
-                "# Core file\nclass Core: pass\n"
+                "# Core file\nclass Core: pass\n",
             )
             (project_dir / "tests" / "test_main.py").write_text(
-                "# Test file\ndef test(): assert True\n"
+                "# Test file\ndef test(): assert True\n",
             )
 
             analyzer = CodeAnalyzer(project_dir)

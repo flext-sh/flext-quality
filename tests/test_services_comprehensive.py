@@ -201,7 +201,7 @@ class TestQualityAnalysisServiceComprehensive:
         """Create service instance."""
         return QualityAnalysisService()
 
-    async def test_create_analysis_success(
+    async def test_create_analyssuccess(
         self,
         service: QualityAnalysisService,
     ) -> None:
@@ -217,7 +217,7 @@ class TestQualityAnalysisServiceComprehensive:
         assert analysis.status == AnalysisStatus.QUEUED
         assert analysis.id is not None
 
-    async def test_get_analysis_success(self, service: QualityAnalysisService) -> None:
+    async def test_get_analyssuccess(self, service: QualityAnalysisService) -> None:
         """Test successful analysis retrieval."""
         # Create an analysis
         project_id = str(uuid.uuid4())
@@ -352,7 +352,7 @@ class TestQualityAnalysisServiceComprehensive:
         assert updated.medium_issues == 10
         assert updated.low_issues == 15
 
-    async def test_complete_analysis_success(
+    async def test_complete_analyssuccess(
         self,
         service: QualityAnalysisService,
     ) -> None:
@@ -369,7 +369,7 @@ class TestQualityAnalysisServiceComprehensive:
         assert completed.status == AnalysisStatus.COMPLETED
         assert completed.completed_at is not None
 
-    async def test_fail_analysis_success(self, service: QualityAnalysisService) -> None:
+    async def test_fail_analyssuccess(self, service: QualityAnalysisService) -> None:
         """Test successful analysis failure marking."""
         # Create an analysis
         project_id = str(uuid.uuid4())

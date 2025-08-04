@@ -27,7 +27,7 @@ def analyze_project(args: argparse.Namespace) -> int:
         # Enable quiet mode for JSON/HTML output to prevent log contamination
         if (
             hasattr(args, "format")
-            and args.format in ("json", "html")
+            and args.format in {"json", "html"}
             and not getattr(args, "verbose", False)
         ):
             os.environ["FLEXT_OBSERVABILITY_QUIET"] = "1"

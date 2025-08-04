@@ -7,8 +7,7 @@ REFACTORED:
 
 from __future__ import annotations
 
-from flext_core import FlextResult, TAnyDict, TConfigDict
-
+from flext_core import FlextResult, TConfigDict
 from flext_quality.domain.entities import (
     AnalysisStatus,
     IssueSeverity,
@@ -81,7 +80,7 @@ class QualityProjectService:
     async def update_project(
         self,
         project_id: str,
-        updates: TAnyDict,
+        updates: dict[str, object],
     ) -> FlextResult[QualityProject]:
         try:
             project = self._projects.get(project_id)
@@ -530,7 +529,7 @@ class AnalysisServiceImpl:
 class SecurityAnalyzerServiceImpl(BasePortService):
     """Implementation of security analyzer service for DI container."""
 
-    async def analyze_security(self, project_path: str) -> FlextResult[TAnyDict]:
+    async def analyze_security(self, project_path: str) -> FlextResult[dict[str, object]]:
         """Analyze security issues in project."""
         return FlextResult.ok({"security_issues": []})
 
@@ -538,7 +537,7 @@ class SecurityAnalyzerServiceImpl(BasePortService):
 class LintingServiceImpl(BasePortService):
     """Implementation of linting service for DI container."""
 
-    async def run_linting(self, project_path: str) -> FlextResult[TAnyDict]:
+    async def run_linting(self, project_path: str) -> FlextResult[dict[str, object]]:
         """Run linting analysis on project."""
         return FlextResult.ok({"linting_issues": []})
 

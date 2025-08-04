@@ -201,7 +201,7 @@ from flext_core import FlextResult
 
 # Service methods return FlextResult[T]
 result = await service.create_project(...)
-if result.is_success:
+if result.success:
     project = result.data
 else:
     error = result.error
@@ -302,7 +302,7 @@ class QualityProjectService:
             project = QualityProject(...)
             # Validation
             validation_result = project.validate_domain_rules()
-            if not validation_result.is_success:
+            if not validation_result.success:
                 return validation_result
             # Storage
             self._projects[project.id] = project

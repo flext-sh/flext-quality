@@ -4,13 +4,6 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from django.contrib import messages
-from django.core.paginator import Paginator
-from django.db.models import Avg, Count, Q
-from django.http import HttpRequest, HttpResponse, JsonResponse
-from django.shortcuts import get_object_or_404, redirect, render
-from django.utils import timezone
-
 from analyzer.backends import AVAILABLE_BACKENDS
 from analyzer.models import (
     AnalysisSession,
@@ -26,6 +19,12 @@ from analyzer.multi_backend_analyzer import (
 )
 from analyzer.package_discovery import PackageDiscovery
 from analyzer.tasks import run_analysis_task
+from django.contrib import messages
+from django.core.paginator import Paginator
+from django.db.models import Avg, Count, Q
+from django.http import HttpRequest, HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 if TYPE_CHECKING:
     from django.http import HttpRequest, HttpResponse

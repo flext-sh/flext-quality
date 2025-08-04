@@ -84,7 +84,7 @@ def check_background_tasks() -> TAnyDict:
             message="Task processing system operational",
         )
 
-        if health_check_result.is_success and health_check_result.data:
+        if health_check_result.success and health_check_result.data:
             health_data = health_check_result.data
             return {
                 "status": "healthy",

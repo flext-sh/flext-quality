@@ -5,15 +5,14 @@ from __future__ import annotations
 from datetime import timedelta
 from typing import TYPE_CHECKING
 
-from django.db.models import Avg, Count
-from django.http import JsonResponse
-from django.utils import timezone
-
 from analyzer.models import (
     AnalysisSession,
     Project,
     SecurityIssue,
 )
+from django.db.models import Avg, Count
+from django.http import JsonResponse
+from django.utils import timezone
 
 if TYPE_CHECKING:
     from django.http import HttpRequest

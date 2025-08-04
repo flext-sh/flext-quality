@@ -10,7 +10,6 @@ from unittest.mock import patch
 from uuid import uuid4
 
 from flext_core import FlextResult
-
 from flext_quality.application.handlers import (
     AnalyzeProjectHandler,
     GenerateReportHandler,

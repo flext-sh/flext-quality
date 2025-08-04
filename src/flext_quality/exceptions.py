@@ -143,7 +143,7 @@ class FlextQualityRuleError(FlextQualityError):
         super().__init__(f"Quality rule: {message}", context=context)
 
 
-__all__ = [
+__all__: list[str] = [
     "FlextQualityAnalysisError",
     "FlextQualityAuthenticationError",
     "FlextQualityConfigurationError",
