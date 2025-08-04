@@ -8,8 +8,6 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from pathlib import Path
 
-    from flext_core import TAnyDict
-
 from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
 
 # Constants for display limits
@@ -24,15 +22,15 @@ HIGH_TYPE_ERROR_THRESHOLD = 10
 class QualityReport:
     """Generates quality reports from analysis results."""
 
-    def __init__(self, analysis_results: TAnyDict) -> None:
+    def __init__(self, analysis_results: dict[str, object]) -> None:
         """Initialize the quality report generator.
 
         Args:
             analysis_results: Dictionary containing analysis results and metrics.
 
         """
-        # Cast TAnyDict to dict for type safety
-        self.results: dict[str, object] = dict(analysis_results)
+        # Store analysis results directly
+        self.results: dict[str, object] = analysis_results
 
     def generate_text_report(self) -> str:
         """Generate a text-based quality report."""

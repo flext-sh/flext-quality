@@ -26,7 +26,7 @@ Architecture:
 Integration:
     - Uses flext-core.FlextValueObject for immutable data structures
     - Integrates with domain layer for grade calculation
-    - Provides TAnyDict compatibility for data exchange
+    - Provides dict[str, object] compatibility for data exchange
     - Supports validation through FlextResult patterns
 
 Example:
@@ -46,7 +46,7 @@ from __future__ import annotations
 
 from pydantic import Field, computed_field
 
-from flext_core import FlextResult, FlextValueObject, TAnyDict
+from flext_core import FlextResult, FlextValueObject
 from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
 
 
@@ -158,7 +158,7 @@ class QualityMetrics(FlextValueObject):
     )
 
     @classmethod
-    def from_analysis_results(cls, results: TAnyDict) -> QualityMetrics:
+    def from_analysis_results(cls, results: dict[str, object]) -> QualityMetrics:
         """Create QualityMetrics from comprehensive analysis results.
 
         Factory method that processes raw analysis results and calculates
@@ -190,8 +190,8 @@ class QualityMetrics(FlextValueObject):
             missing values gracefully with appropriate defaults.
 
         """
-        # Cast TAnyDict to dict for type safety
-        results_dict = dict(results) if isinstance(results, dict) else {}
+        # Extract results data safely
+        results_dict = results
         metrics_obj = results_dict.get("metrics", {})
         metrics_data = dict(metrics_obj) if isinstance(metrics_obj, dict) else {}
         issues_obj = results_dict.get("issues", {})
@@ -308,7 +308,7 @@ class QualityMetrics(FlextValueObject):
             + self.complexity_issues_count
         )
 
-    def to_dict(self) -> TAnyDict:
+    def to_dict(self) -> dict[str, object]:
         """Export metrics as dictionary for serialization and integration.
 
         Converts the immutable metrics object to a dictionary format suitable

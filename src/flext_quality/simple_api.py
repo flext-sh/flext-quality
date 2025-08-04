@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from uuid import UUID
 
-from flext_core import FlextResult, TAnyDict
+from flext_core import FlextResult, TConfigDict
 from flext_quality.application.services import (
     QualityAnalysisService,
     QualityIssueService,
@@ -164,7 +164,7 @@ class QualityAPI:
     async def update_project(
         self,
         project_id: UUID,
-        updates: TAnyDict,
+        updates: dict[str, object],
     ) -> FlextResult[QualityProject]:
         """Update a project.
 
@@ -197,7 +197,7 @@ class QualityAPI:
         commit_hash: str | None = None,
         branch: str | None = None,
         pull_request_id: str | None = None,
-        analysis_config: TAnyDict | None = None,
+        analysis_config: TConfigDict | None = None,
     ) -> FlextResult[QualityAnalysis]:
         """Create a new quality analysis.
 

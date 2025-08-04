@@ -193,20 +193,20 @@ class TestExceptionInheritance:
 
     def test_exception_raising(self) -> None:
         """Test that exceptions can be raised and caught correctly."""
+        msg = "Test analysis error"
         with pytest.raises(FlextQualityAnalysisError) as exc_info:
-            msg = "Test analysis error"
             raise FlextQualityAnalysisError(msg)
 
         assert "Quality analysis: Test analysis error" in str(exc_info.value)
 
         # Test catching by base class
+        msg = "Test metrics error"
         with pytest.raises(FlextQualityError):
-            msg = "Test metrics error"
             raise FlextQualityMetricsError(msg)
 
         # Test catching by Exception (specific error type)
+        msg = "Test report error"
         with pytest.raises(FlextQualityReportError, match="Test report error"):
-            msg = "Test report error"
             raise FlextQualityReportError(msg)
 
 

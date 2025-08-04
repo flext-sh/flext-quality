@@ -5,7 +5,7 @@ import tempfile
 from collections.abc import Callable, Generator
 from pathlib import Path
 from textwrap import dedent
-from typing import Any, TextIO
+from typing import TextIO
 
 import pytest
 
@@ -538,7 +538,7 @@ class TestCodeAnalyzer:
         assert analyzer.analysis_results == results
         assert analyzer.analysis_results != {}
 
-    def test_analyze_project_logging(self, temp_project: Path, caplog: Any) -> None:
+    def test_analyze_project_logging(self, temp_project: Path, caplog: pytest.LogCaptureFixture) -> None:
         """Test that analysis produces appropriate log messages."""
         import logging
 
@@ -579,7 +579,7 @@ class TestCodeAnalyzer:
     def test_security_analysis_error_handling(
         self,
         temp_project: Path,
-        caplog: Any,
+        caplog: pytest.LogCaptureFixture,
     ) -> None:
         """Test error handling in security analysis."""
         import logging
@@ -598,7 +598,7 @@ class TestCodeAnalyzer:
 
         original_open = builtins.open
 
-        def mock_open(file_path: str | Path, *args: Any, **kwargs: Any) -> TextIO:
+        def mock_open(file_path: str | Path, *args: object, **kwargs: object) -> TextIO:
             if "error_file.py" in str(file_path):
                 msg = "Simulated read error"
                 raise RuntimeError(msg)
@@ -624,7 +624,7 @@ class TestCodeAnalyzer:
     def test_dead_code_analysis_error_handling(
         self,
         temp_project: Path,
-        caplog: Any,
+        caplog: pytest.LogCaptureFixture,
     ) -> None:
         """Test error handling in dead code analysis."""
         import logging
@@ -638,7 +638,7 @@ class TestCodeAnalyzer:
 
         original_open = builtins.open
 
-        def mock_open(file_path: str | Path, *args: Any, **kwargs: Any) -> TextIO:
+        def mock_open(file_path: str | Path, *args: object, **kwargs: object) -> TextIO:
             if "dead_code.py" in str(file_path):
                 msg = "Simulated error"
                 raise ValueError(msg)
@@ -663,7 +663,7 @@ class TestCodeAnalyzer:
     def test_duplicate_analysis_error_handling(
         self,
         temp_project: Path,
-        caplog: Any,
+        caplog: pytest.LogCaptureFixture,
     ) -> None:
         """Test error handling in duplicate analysis."""
         import logging
@@ -677,7 +677,7 @@ class TestCodeAnalyzer:
 
         original_open = builtins.open
 
-        def mock_open(file_path: str | Path, *args: Any, **kwargs: Any) -> TextIO:
+        def mock_open(file_path: str | Path, *args: object, **kwargs: object) -> TextIO:
             if "duplicate1.py" in str(file_path):
                 msg = "Simulated error"
                 raise TypeError(msg)
