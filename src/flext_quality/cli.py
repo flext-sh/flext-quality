@@ -7,6 +7,7 @@ Uses flext-cli patterns for consistency.
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 import traceback
 from pathlib import Path
@@ -23,6 +24,14 @@ def setup_logging(level: str = "INFO") -> None:
 def analyze_project(args: argparse.Namespace) -> int:
     """Analyze project quality."""
     try:
+        # Enable quiet mode for JSON/HTML output to prevent log contamination
+        if (
+            hasattr(args, "format")
+            and args.format in ("json", "html")
+            and not getattr(args, "verbose", False)
+        ):
+            os.environ["FLEXT_OBSERVABILITY_QUIET"] = "1"
+
         project_path = Path(args.path).resolve()
         if not project_path.exists():
             return 1
@@ -35,14 +44,23 @@ def analyze_project(args: argparse.Namespace) -> int:
             include_dead_code=args.include_dead_code,
             include_duplicates=args.include_duplicates,
         )
+        # Check if any files were analyzed
+        files_analyzed = results.get("files_analyzed", 0)
+        if isinstance(files_analyzed, (int, float)) and files_analyzed == 0:
+            return 1  # Error: no files to analyze
+
         # Generate report
         report = QualityReport(results)
         if args.output:
             # Save to file
             output_path = Path(args.output)
             report.save_report(output_path, args.format)
-        elif args.format in {"json", "html"}:
-            pass
+        elif args.format == "json":
+            # Print JSON to stdout
+            print(report.to_json())  # noqa: T201
+        elif args.format == "html":
+            # Print HTML to stdout
+            print(report.to_html())  # noqa: T201
         # Return appropriate exit code based on quality
         quality_score = analyzer.get_quality_score()
         if quality_score >= 80:

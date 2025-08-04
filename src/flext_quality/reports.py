@@ -105,6 +105,14 @@ class QualityReport:
 
         return json.dumps(report_data, indent=2, default=str)
 
+    def to_json(self) -> str:
+        """Alias for generate_json_report for compatibility."""
+        return self.generate_json_report()
+
+    def to_html(self) -> str:
+        """Alias for generate_html_report for compatibility."""
+        return self.generate_html_report()
+
     def generate_html_report(self) -> str:
         """Generate an HTML-formatted quality report."""
         grade_color = self._get_grade_color()

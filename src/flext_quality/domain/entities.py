@@ -18,7 +18,7 @@ class FlextDomainEvent(BaseModel):
     """Base class for domain events."""
 
     event_type: str
-    timestamp: datetime = Field(default_factory=datetime.now)
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
 class IssueSeverity(StrEnum):
@@ -106,7 +106,7 @@ class QualityAnalysis(FlextEntity):
     pull_request_id: str | None = None
 
     # Timing
-    started_at: datetime = Field(default_factory=datetime.now)
+    started_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     completed_at: datetime | None = None
     duration_seconds: float | None = None
 
@@ -234,8 +234,8 @@ class QualityIssue(FlextEntity):
     suppression_reason: str | None = None
 
     # Tracking
-    first_detected_at: datetime = Field(default_factory=datetime.now)
-    last_seen_at: datetime = Field(default_factory=datetime.now)
+    first_detected_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    last_seen_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     occurrence_count: int = Field(default=1)
 
     def mark_fixed(self) -> QualityIssue:
@@ -334,7 +334,7 @@ class QualityReport(FlextEntity):
     report_size_bytes: int = Field(default=0)
 
     # Generation
-    generated_at: datetime = Field(default_factory=datetime.now)
+    generated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
     generation_duration_ms: float | None = None
 
     # Access

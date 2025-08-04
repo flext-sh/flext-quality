@@ -283,7 +283,11 @@ class ComplexityMetric(BaseModel):
             True if code is considered complex.
 
         """
-        return self.cyclomatic > QualityThresholds.COMPLEXITY_CYCLOMATIC_HIGH or self.cognitive > QualityThresholds.COMPLEXITY_COGNITIVE_HIGH or self.max_depth > QualityThresholds.COMPLEXITY_DEPTH_HIGH
+        return (
+            self.cyclomatic > QualityThresholds.COMPLEXITY_CYCLOMATIC_HIGH
+            or self.cognitive > QualityThresholds.COMPLEXITY_COGNITIVE_HIGH
+            or self.max_depth > QualityThresholds.COMPLEXITY_DEPTH_HIGH
+        )
 
     @property
     def complexity_level(self) -> str:

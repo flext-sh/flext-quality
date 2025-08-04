@@ -26,7 +26,7 @@ pip install -q sarif-om jschema-to-python 2>/dev/null || true
 
 # Run migrations if needed
 echo "🗄️  Checking database migrations..."
-python manage.py migrate --noinput
+cd flext_quality_web && python manage.py migrate --noinput
 
 # Start the server with autoreload (default behavior)
 echo "🎯 Starting server on 0.0.0.0:8000..."

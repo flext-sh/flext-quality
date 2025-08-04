@@ -95,13 +95,13 @@ coverage-score: ## Calculate coverage score
 
 # Web interface
 web-start: ## Start Django web interface
-	$(POETRY) run python manage.py runserver
+	cd flext_quality_web && $(POETRY) run python manage.py runserver
 
 web-migrate: ## Run Django migrations
-	$(POETRY) run python manage.py migrate
+	cd flext_quality_web && $(POETRY) run python manage.py migrate
 
 web-shell: ## Open Django shell
-	$(POETRY) run python manage.py shell
+	cd flext_quality_web && $(POETRY) run python manage.py shell
 
 # Build
 build: ## Build package

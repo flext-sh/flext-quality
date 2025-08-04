@@ -1,0 +1,102 @@
+"""Django admin configuration for analyzer models."""
+
+from __future__ import annotations
+
+from typing import ClassVar
+
+from django.contrib import admin
+from django.utils.html import format_html
+
+from analyzer.models import Project
+
+# Score thresholds for color coding
+GOOD_SCORE_THRESHOLD = 80
+FAIR_SCORE_THRESHOLD = 60
+
+
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    """Admin interface for Project model."""
+
+    list_display: ClassVar[list[str]] = [
+        "name",
+        "package_name",
+        "package_version",
+        "package_type",
+        "total_files",
+        "python_files",
+        "latest_score",
+        "created_at",
+        "updated_at",
+    ]
+    list_filter: ClassVar[list[str]] = [
+        "package_type",
+        "is_installed_package",
+        "created_at",
+        "updated_at",
+    ]
+    search_fields: ClassVar[list[str]] = ["name", "description", "path", "package_name"]
+    readonly_fields: ClassVar[list[str]] = ["created_at", "updated_at"]
+    ordering: ClassVar[list[str]] = ["-updated_at"]
+
+    fieldsets: ClassVar[
+        tuple[tuple[str, dict[str, tuple[str, ...] | tuple[str, str]]], ...]
+    ] = (
+        (
+            "Basic Information",
+            {"fields": ("name", "description", "path")},
+        ),
+        (
+            "Package Information",
+            {
+                "fields": (
+                    "package_name",
+                    "package_version",
+                    "is_installed_package",
+                    "install_location",
+                    "package_type",
+                ),
+            },
+        ),
+        ("Statistics", {"fields": ("total_files", "total_lines", "python_files")}),
+        (
+            "Timestamps",
+            {"fields": ("created_at", "updated_at"), "classes": ("collapse",)},
+        ),
+    )
+
+    @admin.display(
+        description="Latest Score",
+        ordering="analysissession__overall_score",
+    )
+    def latest_score(self, obj: Project) -> str:
+        """Display the latest analysis score."""
+        # Get the latest analysis session using reverse relationship from AnalysisSession
+        from analyzer.models import AnalysisSession
+
+        latest = (
+            AnalysisSession.objects.filter(flx_project=obj)
+            .order_by("-created_at")
+            .first()
+        )
+        if latest and latest.overall_score:
+            color = (
+                "green"
+                if latest.overall_score >= GOOD_SCORE_THRESHOLD
+                else "orange"
+                if latest.overall_score >= FAIR_SCORE_THRESHOLD
+                else "red"
+            )
+            return format_html(
+                '<span style="color: {}; font-weight: bold">{:.1f} ({})</span>',
+                color,
+                latest.overall_score,
+                latest.quality_grade or "N/A",
+            )
+        return "-"
+
+
+# Customize admin site headers
+admin.site.site_header = "Code Analyzer Administration"
+admin.site.site_title = "Code Analyzer Admin"
+admin.site.index_title = "Welcome to Code Analyzer Administration"

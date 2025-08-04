@@ -52,14 +52,14 @@ class TestCodeAnalyzerComprehensive:
         assert isinstance(results, dict)
         assert "metrics" in results
         assert "issues" in results
-        assert "files" in results
+        assert "python_files" in results
 
         # Verify metrics
         metrics = results["metrics"]
         assert isinstance(metrics, dict)
         assert "total_files" in metrics
         assert "total_lines_of_code" in metrics
-        assert "python_files" in metrics
+        assert "total_functions" in metrics
 
         # Verify issues structure
         # Use DRY helper for type-safe issues access
@@ -195,8 +195,11 @@ class TestCodeAnalyzerComprehensive:
                 analyzer = CodeAnalyzer(tmp_dir)
             metrics = analyzer._analyze_file(Path(f.name))
 
-            # Should return None for unparseable files
-            assert metrics is None
+            # Should return dict with syntax_error for unparseable files
+            assert metrics is not None
+            assert isinstance(metrics, dict)
+            assert "syntax_error" in metrics
+            assert metrics["function_count"] == 0
 
     def test_internal_analyze_file_nonexistent_file(self) -> None:
         """Test _analyze_file with nonexistent file."""
@@ -577,7 +580,7 @@ def complex_calculation(x, y, z):
         # Check files list using type-safe access
         from tests.helpers import assert_is_list
 
-        file_list = validated_results["files"]
+        file_list = validated_results["python_files"]
         assert_is_list(file_list)
         assert len(file_list) >= 2
 

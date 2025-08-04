@@ -60,23 +60,23 @@ fi
 
 # Apply migrations
 echo "🗄️  Setting up database..."
-python manage.py migrate >/dev/null 2>&1
+cd flext_quality_web && python manage.py migrate >/dev/null 2>&1 && cd ..
 echo "✓ Database migrations applied"
 
 # Populate backends
 echo "⚙️  Populating analysis backends..."
-python manage.py populate_backends >/dev/null 2>&1
+cd flext_quality_web && python manage.py populate_backends >/dev/null 2>&1 && cd ..
 echo "✓ Analysis backends populated"
 
 # Collect static files
 echo "🎨 Collecting static files..."
-python manage.py collectstatic --noinput >/dev/null 2>&1
+cd flext_quality_web && python manage.py collectstatic --noinput >/dev/null 2>&1 && cd ..
 echo "✓ Static files collected"
 
 # Create superuser if needed (optional)
 if [ "$1" = "--create-superuser" ]; then
 	echo "👤 Creating superuser..."
-	python manage.py createsuperuser
+	cd flext_quality_web && python manage.py createsuperuser && cd ..
 fi
 
 # Start services
@@ -84,7 +84,7 @@ echo "🌟 Starting services..."
 
 # Start Celery worker in background
 echo "  Starting Celery worker..."
-celery -A code_analyzer_web worker --loglevel=info --concurrency=2 --detach
+cd flext_quality_web && celery -A settings.celery worker --loglevel=info --concurrency=2 --detach && cd ..
 echo "✓ Celery worker started"
 
 # Start Django development server
@@ -99,4 +99,4 @@ echo ""
 echo "Press Ctrl+C to stop the server"
 echo ""
 
-python manage.py runserver 8000
+cd flext_quality_web && python manage.py runserver 8000

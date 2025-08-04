@@ -171,7 +171,7 @@ class TestQualityMetrics:
             documentation_score=75.0,
         )
 
-        summary = metrics.scores_summary()
+        summary = metrics.scores_summary
 
         assert summary["complexity"] == 85.0
         assert summary["security"] == 90.0
@@ -188,7 +188,7 @@ class TestQualityMetrics:
             complexity_issues_count=8,
         )
 
-        assert metrics.total_issues() == 18  # 5+3+2+8
+        assert metrics.total_issues == 18  # 5+3+2+8
 
     def test_to_dict(self) -> None:
         """Test to_dict method."""
@@ -370,7 +370,7 @@ class TestQualityMetrics:
         assert metrics.dead_code_items_count == 2
         assert metrics.duplicate_blocks_count == 1
         assert metrics.complexity_issues_count == 3
-        assert metrics.total_issues() == 7
+        assert metrics.total_issues == 7
 
         # Verify scores are calculated
         assert 0 <= metrics.overall_score <= 100
@@ -390,8 +390,8 @@ class TestQualityMetrics:
         }
 
         # Verify computed fields work
-        assert len(metrics.scores_summary()) == 5
-        assert all(0 <= score <= 100 for score in metrics.scores_summary().values())
+        assert len(metrics.scores_summary) == 5
+        assert all(0 <= score <= 100 for score in metrics.scores_summary.values())
 
         # Verify string representation
         summary = metrics.get_summary()

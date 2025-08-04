@@ -10,9 +10,10 @@ if [ -d "venv" ]; then
 fi
 
 # Set Django settings
-export DJANGO_SETTINGS_MODULE=code_analyzer_web.settings
+export DJANGO_SETTINGS_MODULE=settings.settings
 
-# Start Celery worker
-celery -A code_analyzer_web worker --loglevel=info --concurrency=2
+# Change to Django directory and start Celery worker
+cd flext_quality_web
+celery -A settings.celery worker --loglevel=info --concurrency=2
 
 echo "Celery worker stopped"

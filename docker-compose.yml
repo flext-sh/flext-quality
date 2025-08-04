@@ -19,7 +19,8 @@ services:
       - db
       - redis
     command: >
-      sh -c "python manage.py migrate &&
+      sh -c "cd flext_quality_web &&
+             python manage.py migrate &&
              python manage.py collectstatic --noinput &&
              python manage.py runserver 0.0.0.0:8000"
 
@@ -54,7 +55,7 @@ services:
     depends_on:
       - db
       - redis
-    command: celery -A code_analyzer_web worker -l info
+    command: sh -c "cd flext_quality_web && celery -A settings.celery worker -l info"
 
   celery-beat:
     build: .
@@ -69,7 +70,7 @@ services:
     depends_on:
       - db
       - redis
-    command: celery -A code_analyzer_web beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    command: sh -c "cd flext_quality_web && celery -A settings.celery beat -l info --scheduler django_celery_beat.schedulers:DatabaseScheduler"
 
   flower:
     build: .
@@ -80,7 +81,7 @@ services:
       - CELERY_RESULT_BACKEND=redis://redis:6379/0
     depends_on:
       - redis
-    command: celery -A code_analyzer_web flower
+    command: sh -c "cd flext_quality_web && celery -A settings.celery flower"
 
 volumes:
   postgres_data:

@@ -13,6 +13,8 @@ from io import StringIO
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from flext_quality.cli import (
     analyze_project,
     another_function,
@@ -53,6 +55,10 @@ class TestAnalyzeProjectComprehensive:
             output=None,
             format="text",
             verbose=False,
+            include_security=True,
+            include_complexity=True,
+            include_dead_code=True,
+            include_duplicates=True,
         )
         result = analyze_project(args)
 
@@ -72,7 +78,17 @@ class TestAnalyzeProjectComprehensive:
         ) as f:
             output_file = f.name
 
-        result = analyze_project(temporary_project_structure, output_file=output_file)
+        args = argparse.Namespace(
+            path=temporary_project_structure,
+            output=output_file,
+            format="json",
+            verbose=False,
+            include_security=True,
+            include_complexity=True,
+            include_dead_code=True,
+            include_duplicates=True,
+        )
+        result = analyze_project(args)
 
         # Should return success code
         assert result == 0
@@ -149,7 +165,8 @@ class TestAnalyzeProjectComprehensive:
         """Test analyze_project with invalid path type."""
         # Path that exists but is not a directory
         with tempfile.NamedTemporaryFile() as f:
-            result = analyze_project(f.name)
+            args = self._create_analyze_args(f.name)
+            result = analyze_project(args)
 
             # Should handle gracefully and return error code
             assert result != 0
@@ -166,7 +183,8 @@ class TestAnalyzeProjectComprehensive:
         mock_analyzer.analyze_project.side_effect = RuntimeError("Analysis failed")
         mock_analyzer_class.return_value = mock_analyzer
 
-        result = analyze_project(temporary_project_structure, verbose=True)
+        args = self._create_analyze_args(temporary_project_structure, verbose=True)
+        result = analyze_project(args)
 
         # Should return error code
         assert result != 0
@@ -183,7 +201,8 @@ class TestAnalyzeProjectComprehensive:
         mock_analyzer.analyze_project.side_effect = RuntimeError("Analysis failed")
         mock_analyzer_class.return_value = mock_analyzer
 
-        result = analyze_project(temporary_project_structure, verbose=False)
+        args = self._create_analyze_args(temporary_project_structure, verbose=False)
+        result = analyze_project(args)
 
         # Should return error code
         assert result != 0
@@ -199,7 +218,10 @@ class TestAnalyzeProjectComprehensive:
         """Test analyze_project with JSON output to file."""
         # Setup mocks
         mock_analyzer = MagicMock()
-        mock_analyzer.analyze_project.return_value = {"test": "data"}
+        mock_analyzer.analyze_project.return_value = {
+            "test": "data",
+            "files_analyzed": 5,  # Mock at least 1 file analyzed
+        }
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer
 
@@ -215,11 +237,12 @@ class TestAnalyzeProjectComprehensive:
         ) as f:
             output_file = f.name
 
-        result = analyze_project(
+        args = self._create_analyze_args(
             temporary_project_structure,
-            output_file=output_file,
-            format="json",
+            output=output_file,
+            format_type="json",
         )
+        result = analyze_project(args)
 
         # Should return success code
         assert result == 0
@@ -238,7 +261,10 @@ class TestAnalyzeProjectComprehensive:
         """Test analyze_project with JSON format but no output file."""
         # Setup mocks
         mock_analyzer = MagicMock()
-        mock_analyzer.analyze_project.return_value = {"test": "data"}
+        mock_analyzer.analyze_project.return_value = {
+            "test": "data",
+            "files_analyzed": 3,  # Mock at least 1 file analyzed
+        }
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer
 
@@ -249,7 +275,11 @@ class TestAnalyzeProjectComprehensive:
         # Capture stdout to verify JSON output
         captured_output = StringIO()
         with patch("sys.stdout", captured_output):
-            result = analyze_project(temporary_project_structure, format="json")
+            args = self._create_analyze_args(
+                temporary_project_structure,
+                format_type="json",
+            )
+            result = analyze_project(args)
 
         # Should return success code
         assert result == 0
@@ -413,20 +443,20 @@ class TestMainFunctionComprehensive:
 
         test_args = [
             "flext-quality",
+            "--verbose",
             "analyze",
             temporary_project_structure,
-            "--verbose",
         ]
         with patch.object(sys, "argv", test_args):
             result = main()
 
         mock_setup_logging.assert_called_once()
-        mock_analyze.assert_called_once_with(
-            temporary_project_structure,
-            output_file=None,
-            format="text",
-            verbose=True,
-        )
+        mock_analyze.assert_called_once()
+        args = mock_analyze.call_args[0][0]
+        assert args.path == temporary_project_structure
+        assert args.output is None
+        assert args.format == "text"
+        assert args.verbose is True
         assert result == 0
 
     @patch("flext_quality.cli.setup_logging")
@@ -450,12 +480,12 @@ class TestMainFunctionComprehensive:
         with patch.object(sys, "argv", test_args):
             result = main()
 
-        mock_analyze.assert_called_once_with(
-            temporary_project_structure,
-            output_file="output.json",
-            format="text",
-            verbose=False,
-        )
+        mock_analyze.assert_called_once()
+        args = mock_analyze.call_args[0][0]
+        assert args.path == temporary_project_structure
+        assert args.output == "output.json"
+        assert args.format == "text"
+        assert args.verbose is False
         assert result == 0
 
     @patch("flext_quality.cli.setup_logging")
@@ -479,12 +509,12 @@ class TestMainFunctionComprehensive:
         with patch.object(sys, "argv", test_args):
             result = main()
 
-        mock_analyze.assert_called_once_with(
-            temporary_project_structure,
-            output_file=None,
-            format="json",
-            verbose=False,
-        )
+        mock_analyze.assert_called_once()
+        args = mock_analyze.call_args[0][0]
+        assert args.path == temporary_project_structure
+        assert args.output is None
+        assert args.format == "json"
+        assert args.verbose is False
         assert result == 0
 
     @patch("flext_quality.cli.setup_logging")
@@ -503,7 +533,10 @@ class TestMainFunctionComprehensive:
             result = main()
 
         mock_setup_logging.assert_called_once()
-        mock_another.assert_called_once_with(temporary_project_structure)
+        # Check that another_function was called with the right arguments
+        mock_another.assert_called_once()
+        args = mock_another.call_args[0][0]
+        assert args.path == temporary_project_structure
         assert result == 0
 
     @patch("flext_quality.cli.setup_logging")
@@ -521,12 +554,14 @@ class TestMainFunctionComprehensive:
     def test_main_invalid_command(self, mock_setup_logging: MagicMock) -> None:
         """Test main function with invalid command."""
         test_args = ["flext-quality", "invalid-command"]
-        with patch.object(sys, "argv", test_args):
-            result = main()
+        with (
+            patch.object(sys, "argv", test_args),
+            pytest.raises(SystemExit) as exc_info,
+        ):
+            main()
 
-        mock_setup_logging.assert_called_once()
-        # Should handle gracefully and return error code
-        assert result != 0
+        # Should exit with error code
+        assert exc_info.value.code != 0
 
     @patch("flext_quality.cli.setup_logging")
     @patch("flext_quality.cli.analyze_project")
@@ -575,9 +610,9 @@ class TestMainFunctionComprehensive:
 
         test_args = [
             "flext-quality",
+            "--verbose",
             "analyze",
             temporary_project_structure,
-            "--verbose",
             "-o",
             "report.json",
             "-f",
@@ -586,22 +621,36 @@ class TestMainFunctionComprehensive:
         with patch.object(sys, "argv", test_args):
             result = main()
 
-        mock_analyze.assert_called_once_with(
-            temporary_project_structure,
-            output_file="report.json",
-            format="json",
-            verbose=True,
-        )
+        mock_analyze.assert_called_once()
+        args = mock_analyze.call_args[0][0]
+        assert args.path == temporary_project_structure
+        assert args.output == "report.json"
+        assert args.format == "json"
+        assert args.verbose is True
         assert result == 0
 
 
 class TestCLIIntegration:
     """Integration tests for CLI functionality."""
 
+    def _create_score_args(self, path: str) -> argparse.Namespace:
+        """DRY helper: Create another_function arguments."""
+        return argparse.Namespace(path=path)
+
     def test_end_to_end_analyze_flow(self, temporary_project_structure: str) -> None:
         """Test complete end-to-end analyze flow."""
         # This test uses real implementations without mocking
-        result = analyze_project(temporary_project_structure, verbose=True)
+        args = argparse.Namespace(
+            path=temporary_project_structure,
+            output=None,
+            format="text",
+            verbose=True,
+            include_security=True,
+            include_complexity=True,
+            include_dead_code=True,
+            include_duplicates=True,
+        )
+        result = analyze_project(args)
 
         # Should complete successfully
         assert result == 0
@@ -639,8 +688,19 @@ class TestCLIIntegration:
     def test_error_handling_integration(self) -> None:
         """Test error handling in CLI functions."""
         # Test with invalid paths
-        result1 = analyze_project("/nonexistent/path/that/does/not/exist")
+        args1 = argparse.Namespace(
+            path="/nonexistent/path/that/does/not/exist",
+            output=None,
+            format="text",
+            verbose=False,
+            include_security=True,
+            include_complexity=True,
+            include_dead_code=True,
+            include_duplicates=True,
+        )
+        result1 = analyze_project(args1)
         assert result1 != 0
 
-        result2 = another_function("/nonexistent/path/that/does/not/exist")
+        args2 = argparse.Namespace(path="/nonexistent/path/that/does/not/exist")
+        result2 = another_function(args2)
         assert result2 != 0
