@@ -452,7 +452,7 @@ class TestQualityIssueServiceComprehensive:
         analysis_id = str(uuid.uuid4())
         create_result = await service.create_issue(
             analysis_id=analysis_id,
-            issue_type="quality",
+            issue_type="complexity",
             severity="medium",
             rule_id="Q100",
             file_path="src/quality.py",
@@ -505,7 +505,7 @@ class TestQualityIssueServiceComprehensive:
         analysis_id = str(uuid.uuid4())
         create_result = await service.create_issue(
             analysis_id=analysis_id,
-            issue_type="bug",
+            issue_type="syntax",
             severity="high",
             rule_id="B100",
             file_path="src/bug.py",
@@ -525,7 +525,7 @@ class TestQualityIssueServiceComprehensive:
         analysis_id = str(uuid.uuid4())
         create_result = await service.create_issue(
             analysis_id=analysis_id,
-            issue_type="false_positive",
+            issue_type="style",
             severity="low",
             rule_id="FP100",
             file_path="src/fp.py",
@@ -547,7 +547,7 @@ class TestQualityIssueServiceComprehensive:
         analysis_id = str(uuid.uuid4())
         create_result = await service.create_issue(
             analysis_id=analysis_id,
-            issue_type="review",
+            issue_type="maintainability",
             severity="medium",
             rule_id="R100",
             file_path="src/review.py",

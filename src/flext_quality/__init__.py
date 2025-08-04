@@ -1,12 +1,46 @@
-"""FLEXT Quality - Enterprise Code Quality Analysis with simplified imports.
+"""FLEXT Quality - Enterprise Code Quality Analysis and Governance Service.
 
+FLEXT Quality is an enterprise-grade quality governance service that provides
+comprehensive code quality analysis, issue detection, and reporting capabilities
+for the FLEXT ecosystem. Built with Clean Architecture and Domain-Driven Design
+principles, it serves as the centralized quality control hub for all FLEXT projects.
+
+Key Features:
+    - Multi-backend analysis engine (AST, Ruff, MyPy, Bandit, Security)
+    - Enterprise-grade quality metrics and scoring algorithms
+    - Comprehensive reporting in multiple formats (HTML, JSON, PDF)
+    - FLEXT ecosystem integration with cross-project analysis
+    - Real-time quality monitoring and threshold enforcement
+    - CI/CD pipeline integration with quality gates
+
+Architecture:
+    The service follows Clean Architecture with clear layer separation:
+    - Domain Layer: Core business entities and quality analysis logic
+    - Application Layer: Service orchestration and business workflows
+    - Infrastructure Layer: External tool integration and data persistence
+    - Presentation Layer: APIs, web interface, and reporting
+
+Integration:
+    - Built on flext-core foundation patterns (FlextResult, FlextEntity)
+    - Integrates with flext-observability for monitoring and metrics
+    - Provides APIs for flext-cli and flext-web integration
+    - Supports workspace-wide analysis across 32+ FLEXT projects
+
+Example:
+    Basic usage with the simplified API:
+
+    >>> from flext_quality import QualityAPI
+    >>> api = QualityAPI()
+    >>> result = await api.analyze_project("/path/to/project")
+    >>> if result.is_success:
+    ...     print(f"Quality Score: {result.data.overall_score}")
+    ...     print(f"Issues Found: {len(result.data.issues)}")
+
+Author: FLEXT Development Team
+Version: 0.9.0
+License: MIT
 Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
 
-Version 0.9.0 - Code Quality Analysis with simplified public API:
-- All common imports available from root: from flext_quality import QualityAPI
-- Built on flext-core foundation for robust quality analysis
-- Deprecation warnings for internal imports
 """
 
 from __future__ import annotations
@@ -32,11 +66,27 @@ __version_info__ = tuple(int(x) for x in __version__.split(".") if x.isdigit())
 
 
 class FlextQualityDeprecationWarning(DeprecationWarning):
-    """Custom deprecation warning for FLEXT Quality import changes."""
+    """Custom deprecation warning for FLEXT Quality import changes.
+
+    This warning is raised when deprecated import paths are used, guiding
+    developers to use the simplified public API instead of internal modules.
+    All deprecated imports will be removed in version 1.0.0.
+    """
 
 
 def _show_deprecation_warning(old_import: str, new_import: str) -> None:
-    """Show deprecation warning for import paths."""
+    """Display deprecation warning for import paths with migration guidance.
+
+    Args:
+        old_import: The deprecated import path being used
+        new_import: The recommended replacement import path
+
+    Note:
+        This function formats and displays user-friendly deprecation warnings
+        that include the old path, recommended replacement, version information,
+        and links to migration documentation.
+
+    """
     message_parts = [
         f"⚠️  DEPRECATED IMPORT: {old_import}",
         f"✅ USE INSTEAD: {new_import}",

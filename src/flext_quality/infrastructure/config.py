@@ -20,4 +20,6 @@ class QualityConfig(FlextBaseSettings):
     parallel_workers: int = 4
 
     class Config:
+        """Pydantic configuration for QualityConfig."""
+
         env_prefix = "QUALITY_"

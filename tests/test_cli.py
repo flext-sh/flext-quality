@@ -42,7 +42,10 @@ class TestAnalyzeProject:
         mock_path.return_value.resolve.return_value = mock_path_instance
 
         mock_analyzer = MagicMock()
-        mock_analyzer.analyze_project.return_value = {"issues": {}}
+        mock_analyzer.analyze_project.return_value = {
+            "issues": {},
+            "files_analyzed": 3,  # Mock some files analyzed
+        }
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer
 
@@ -73,7 +76,12 @@ class TestAnalyzeProject:
             include_dead_code=True,
             include_duplicates=True,
         )
-        mock_report_class.assert_called_once_with({"issues": {}})
+        mock_report_class.assert_called_once_with(
+            {
+                "issues": {},
+                "files_analyzed": 3,  # Include the complete analyzer results
+            }
+        )
 
     @patch("flext_quality.cli.CodeAnalyzer")
     @patch("flext_quality.cli.QualityReport")
@@ -91,7 +99,10 @@ class TestAnalyzeProject:
         mock_path.return_value.resolve.return_value = mock_path_instance
 
         mock_analyzer = MagicMock()
-        mock_analyzer.analyze_project.return_value = {"issues": {}}
+        mock_analyzer.analyze_project.return_value = {
+            "issues": {},
+            "files_analyzed": 3,  # Mock some files analyzed
+        }
         mock_analyzer.get_quality_score.return_value = 70.0  # Medium quality
         mock_analyzer_class.return_value = mock_analyzer
 
@@ -132,7 +143,10 @@ class TestAnalyzeProject:
         mock_path.return_value.resolve.return_value = mock_path_instance
 
         mock_analyzer = MagicMock()
-        mock_analyzer.analyze_project.return_value = {"issues": {}}
+        mock_analyzer.analyze_project.return_value = {
+            "issues": {},
+            "files_analyzed": 3,  # Mock some files analyzed
+        }
         mock_analyzer.get_quality_score.return_value = 40.0  # Poor quality
         mock_analyzer_class.return_value = mock_analyzer
 
@@ -190,7 +204,10 @@ class TestAnalyzeProject:
         mock_path.return_value.resolve.return_value = mock_path_instance
 
         mock_analyzer = MagicMock()
-        mock_analyzer.analyze_project.return_value = {"issues": {}}
+        mock_analyzer.analyze_project.return_value = {
+            "issues": {},
+            "files_analyzed": 3,  # Mock some files analyzed
+        }
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer
 
@@ -232,7 +249,10 @@ class TestAnalyzeProject:
         mock_path.return_value.resolve.return_value = mock_path_instance
 
         mock_analyzer = MagicMock()
-        mock_analyzer.analyze_project.return_value = {"issues": {}}
+        mock_analyzer.analyze_project.return_value = {
+            "issues": {},
+            "files_analyzed": 3,  # Mock some files analyzed
+        }
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer
 

@@ -1,6 +1,42 @@
-"""Domain layer for FLEXT-QUALITY.
+"""Domain Layer - Core Business Logic for FLEXT Quality Analysis.
 
-Using flext-core patterns - NO duplication, clean architecture.
+This module contains the core domain entities, value objects, and service ports
+that define the business logic for quality analysis within the FLEXT ecosystem.
+Follows Clean Architecture and Domain-Driven Design principles with strict
+separation from infrastructure concerns.
+
+Key Components:
+    - QualityProject: Represents a code project under quality analysis
+    - QualityAnalysis: Encapsulates a single analysis run with metrics
+    - QualityIssue: Individual quality issues detected during analysis
+    - QualityReport: Generated quality reports in various formats
+    - QualityRule: Configuration rules for quality analysis
+
+Value Objects:
+    - QualityScore: Immutable quality scoring with grade calculations
+    - ComplexityMetric: Code complexity measurements and thresholds
+    - CoverageMetric: Test coverage statistics and requirements
+    - DuplicationMetric: Code duplication detection and analysis
+    - IssueSeverity: Classification of issue severity levels
+
+Service Ports:
+    - AnalysisService: Core analysis orchestration interface
+    - MetricsCollectorService: Quality metrics collection interface
+    - ReportGeneratorService: Quality report generation interface
+    - SecurityAnalyzerService: Security analysis and vulnerability detection
+
+Architecture:
+    Built on flext-core foundation patterns with no code duplication.
+    Uses FlextEntity for domain entities and FlextResult for operation results.
+    Implements dependency inversion with service ports and adapters.
+
+Integration:
+    - Built on flext-core.domain patterns for consistency
+    - Integrates with flext-observability for domain event monitoring
+    - Provides interfaces for infrastructure layer implementations
+
+Author: FLEXT Development Team
+Version: 0.9.0
 """
 
 from __future__ import annotations

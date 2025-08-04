@@ -116,7 +116,7 @@ def assert_analysis_results_structure(results: object) -> dict[str, object]:
         AssertionError: If structure is invalid
 
     """
-    return assert_dict_structure(results, ["metrics", "issues", "files"])
+    return assert_dict_structure(results, ["metrics", "issues", "python_files"])
 
 
 def assert_metrics_structure(metrics: object) -> dict[str, object]:

@@ -9,13 +9,7 @@ Domain-specific exceptions using factory pattern to eliminate 150+ lines of dupl
 from __future__ import annotations
 
 from flext_core.exceptions import (
-    FlextAuthenticationError,
-    FlextConfigurationError,
-    FlextConnectionError,
     FlextError,
-    FlextProcessingError,
-    FlextTimeoutError,
-    FlextValidationError,
 )
 
 
@@ -24,28 +18,28 @@ class FlextQualityError(FlextError):
     """Base exception for all quality service errors."""
 
 
-# Standard exception hierarchy using flext-core patterns
-class FlextQualityValidationError(FlextValidationError):
+# Standard exception hierarchy - inherit from FlextQualityError for unified hierarchy
+class FlextQualityValidationError(FlextQualityError):
     """Quality validation errors."""
 
 
-class FlextQualityConfigurationError(FlextConfigurationError):
+class FlextQualityConfigurationError(FlextQualityError):
     """Quality configuration errors."""
 
 
-class FlextQualityConnectionError(FlextConnectionError):
+class FlextQualityConnectionError(FlextQualityError):
     """Quality connection errors."""
 
 
-class FlextQualityProcessingError(FlextProcessingError):
+class FlextQualityProcessingError(FlextQualityError):
     """Quality processing errors."""
 
 
-class FlextQualityAuthenticationError(FlextAuthenticationError):
+class FlextQualityAuthenticationError(FlextQualityError):
     """Quality authentication errors."""
 
 
-class FlextQualityTimeoutError(FlextTimeoutError):
+class FlextQualityTimeoutError(FlextQualityError):
     """Quality timeout errors."""
 
 
@@ -151,6 +145,7 @@ class FlextQualityRuleError(FlextQualityError):
 
 __all__ = [
     "FlextQualityAnalysisError",
+    "FlextQualityAuthenticationError",
     "FlextQualityConfigurationError",
     "FlextQualityConnectionError",
     "FlextQualityError",

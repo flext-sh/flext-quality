@@ -39,4 +39,4 @@ class TestConfigModule:
         # Check basic attributes exist
         assert hasattr(config_instance, "min_coverage")
         assert hasattr(config_instance, "max_complexity")
-        assert hasattr(config_instance, "max_line_length")
+        assert hasattr(config_instance, "max_duplication")

@@ -69,8 +69,12 @@ make coverage-html            # Generate and open HTML coverage report
 # Complete setup
 make setup                    # Complete development setup
 make install                  # Install dependencies with Poetry
-make dev-install              # Install in development mode
+make install-dev              # Install dev dependencies
 make pre-commit               # Setup pre-commit hooks
+
+# Django-specific setup
+make web-migrate              # Run Django migrations
+make web-shell               # Open Django shell
 ```
 
 ### Quality Analysis Operations
@@ -131,13 +135,44 @@ make prioritize-issues        # Prioritize issues by impact
 make track-issues             # Track issue resolution progress
 ```
 
+### Django Web Interface
+
+```bash
+# Django development server
+make web-start                # Start Django web interface (port 8000)
+make web-migrate              # Run Django migrations
+make web-shell                # Open Django shell
+
+# Quick start with all services
+./start_all.sh                # Start complete system (Redis, Celery, Django)
+./start_all.sh --create-superuser  # Include superuser creation
+```
+
+### Docker Operations
+
+```bash
+# Full containerized development
+docker-compose up -d          # Start all services (web, db, redis, celery, flower)
+docker-compose up web         # Start web service only
+docker-compose logs -f web    # Follow web service logs
+docker-compose exec web python manage.py shell  # Django shell in container
+
+# Individual services
+docker-compose up db redis    # Start database and Redis only
+docker-compose exec db psql -U postgres -d dc_analyzer  # Access PostgreSQL
+
+# Monitoring
+docker-compose up flower      # Start Celery monitoring (port 5555)
+```
+
 ### Build & Distribution
 
 ```bash
 # Build operations
 make build                    # Build distribution packages
-make package                  # Create deployment package
+make build-clean              # Clean and build
 make clean                    # Remove all artifacts
+make clean-all                # Deep clean including venv
 ```
 
 ## Key Architecture Patterns
@@ -222,11 +257,36 @@ FLEXT Quality integrates with the broader FLEXT ecosystem:
 
 ## Development Workflow
 
-1. **Setup**: Run `make setup` for complete development environment
-2. **Development**: Make changes following Clean Architecture patterns
-3. **Quality Gates**: Run `make validate` before committing
-4. **Testing**: Ensure 90% coverage with `make test`
-5. **Analysis**: Use quality analysis tools to validate code quality
+### Local Development Setup
+
+1. **Initial Setup**: Run `make setup` for complete development environment
+2. **Django Setup**: Run `make web-migrate` to setup database
+3. **Development**: Make changes following Clean Architecture patterns
+4. **Testing**: Run `make test` to ensure 90% coverage
+5. **Quality Gates**: Run `make validate` before committing
+
+### Containerized Development Setup
+
+1. **Docker Setup**: Run `docker-compose up -d` for full containerized environment
+2. **Database Setup**: Migrations run automatically in container
+3. **Development**: Make changes with hot reload enabled
+4. **Testing**: Run `docker-compose exec web pytest`
+5. **Monitoring**: Access Flower at <http://localhost:5555> for Celery monitoring
+
+### Quick Start Development
+
+```bash
+# Option 1: All-in-one script (recommended for new developers)
+./start_all.sh --create-superuser
+
+# Option 2: Manual setup with make commands
+make setup
+make web-migrate
+make web-start
+
+# Option 3: Docker development
+docker-compose up -d
+```
 
 ## Common Patterns
 
@@ -286,55 +346,160 @@ Key configuration files:
 - `pyproject.toml`: Primary configuration for tools and dependencies
 - `code_analyzer_web/settings.py`: Django configuration
 - `Makefile`: Development workflow and quality gates
+- `docker-compose.yml`: Container orchestration with PostgreSQL, Redis, Celery
+- `start_all.sh`: Complete system startup script
 
-## TODO: GAPS DE ARQUITETURA IDENTIFICADOS - PRIORIDADE ALTA
+### Essential Environment Variables
 
-### 🚨 GAP 1: Integration com Ecosystem Services Missing
+```bash
+# Database configuration
+export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/dc_analyzer
 
-**Status**: ALTO - Quality service não integrado com outros services
-**Problema**:
+# Redis/Celery configuration
+export REDIS_URL=redis://localhost:6379/0
+export CELERY_BROKER_URL=redis://localhost:6379/0
+export CELERY_RESULT_BACKEND=redis://localhost:6379/0
 
-- Django web interface não integra com flext-web ou flext-api
-- Quality analysis não conecta com flext-observability metrics
-- Não tem CLI integration com flext-cli
-- Reports não acessíveis via ecosystem dashboard
+# Django configuration
+export DEBUG=True
+export SECRET_KEY=your-secret-key-here
 
-**TODO**:
+# Quality thresholds
+export QUALITY_MIN_COVERAGE=90.0
+export QUALITY_MAX_COMPLEXITY=10
+```
 
-- [ ] Integrar Django interface com flext-web patterns
-- [ ] Conectar quality metrics com flext-observability
-- [ ] Criar quality commands para flext-cli
-- [ ] Implementar quality dashboard no ecosystem web interface
+## Critical Architecture Gaps - High Priority Resolution Required
+
+### 🚨 GAP 1: Ecosystem Services Integration Missing
+
+**Status**: HIGH PRIORITY - Quality service not integrated with FLEXT ecosystem services
+
+**Current Issues**:
+
+- Django web interface not integrated with flext-web or flext-api patterns
+- Quality analysis not connected to flext-observability metrics collection
+- No CLI integration with flext-cli command structure
+- Reports not accessible via ecosystem dashboard interfaces
+
+**Required Actions**:
+
+- [ ] Integrate Django interface with flext-web architectural patterns
+- [ ] Connect quality metrics pipeline with flext-observability
+- [ ] Create quality analysis commands for flext-cli integration
+- [ ] Implement quality dashboard integration with ecosystem web interface
 
 ### 🚨 GAP 2: Multi-Project Analysis Not Ecosystem-Aware
 
-**Status**: ALTO - Workspace analysis não conhece ecosystem structure
-**Problema**:
+**Status**: HIGH PRIORITY - Workspace analysis lacks ecosystem structure understanding
 
-- `make workspace-analyze` não entende 32-project ecosystem structure
-- Quality thresholds não diferenciados por tipo de project (core, service, tap, target)
-- Cross-project dependency analysis missing
-- Ecosystem-wide quality metrics não consolidados
+**Current Issues**:
 
-**TODO**:
+- `make workspace-analyze` doesn't understand 32-project ecosystem structure
+- Quality thresholds not differentiated by project type (core, service, tap, target)
+- Cross-project dependency analysis capabilities missing
+- Ecosystem-wide quality metrics not consolidated or available
 
-- [ ] Implementar ecosystem-aware analysis patterns
-- [ ] Criar quality thresholds específicos por project type
-- [ ] Implementar cross-project dependency quality analysis
-- [ ] Criar consolidated ecosystem quality dashboard
+**Required Actions**:
+
+- [ ] Implement ecosystem-aware analysis patterns for 32+ project structure
+- [ ] Create project-type-specific quality thresholds (core, service, tap, target)
+- [ ] Implement cross-project dependency quality analysis capabilities
+- [ ] Create consolidated ecosystem quality dashboard and metrics
 
 ### 🚨 GAP 3: Django vs Clean Architecture Inconsistency
 
-**Status**: ALTO - Django patterns conflitam com Clean Architecture
-**Problema**:
+**Status**: HIGH PRIORITY - Django patterns conflict with Clean Architecture principles
 
-- Django usado para web interface vs flext-web Flask patterns
-- Django ORM vs flext-core domain patterns
-- Django settings vs flext-core configuration patterns
+**Current Issues**:
 
-**TODO**:
+- Django used for web interface conflicts with flext-web Flask patterns
+- Django ORM conflicts with flext-core domain entity patterns
+- Django settings conflict with flext-core configuration management
 
-- [ ] Refatorar para usar flext-web patterns ou justificar Django choice
-- [ ] Integrar Django models com flext-core domain entities
-- [ ] Migrar Django settings para flext-core configuration patterns
-- [ ] Documentar web interface architecture decisions
+**Required Actions**:
+
+- [ ] Refactor to use flext-web patterns or document Django architecture decision
+- [ ] Integrate Django models with flext-core domain entities
+- [ ] Migrate Django settings to flext-core configuration patterns
+- [ ] Document web interface architecture decisions and trade-offs
+
+## Troubleshooting
+
+### Common Development Issues
+
+**Database Connection Issues:**
+
+```bash
+# Reset database
+docker-compose down -v
+docker-compose up -d db
+make web-migrate
+
+# Check database connection
+docker-compose exec db psql -U postgres -d dc_analyzer -c "SELECT version();"
+```
+
+**Redis/Celery Issues:**
+
+```bash
+# Check Redis connection
+redis-cli ping
+
+# Restart Celery worker
+pkill -f celery
+celery -A code_analyzer_web worker --loglevel=info --detach
+
+# Monitor Celery tasks
+docker-compose up flower  # Access at localhost:5555
+```
+
+**Django Development Issues:**
+
+```bash
+# Reset Django state
+make clean
+make web-migrate
+python manage.py collectstatic --noinput
+
+# Debug Django settings
+make web-shell
+>>> from django.conf import settings
+>>> print(settings.DATABASES)
+```
+
+**Poetry/Dependencies Issues:**
+
+```bash
+# Reset virtual environment
+make clean-all
+make setup
+
+# Check dependency conflicts
+poetry show --tree
+poetry check
+```
+
+### Performance Debugging
+
+```bash
+# Profile analysis performance
+make analyze PROJECT=small-project  # Start with small projects
+time make workspace-analyze         # Time full workspace analysis
+
+# Django debug toolbar (when DEBUG=True)
+# Add django-debug-toolbar to see SQL queries and performance
+
+# Celery monitoring
+docker-compose up flower            # Monitor task execution
+```
+
+### Service Architecture
+
+The project uses a **hybrid architecture** combining:
+
+1. **Django Web Framework**: For REDACTED_LDAP_BIND_PASSWORD interface, REST API, and web dashboard
+2. **Clean Architecture**: Domain entities in `src/flext_quality/domain/`
+3. **Multi-Backend Analysis**: Pluggable analyzers (AST, Ruff, MyPy, Bandit)
+4. **Celery Task Processing**: Async analysis execution
+5. **Docker Multi-Service**: PostgreSQL, Redis, Celery worker, web server
