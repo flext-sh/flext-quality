@@ -6,7 +6,7 @@ across test files while maintaining strict MyPy compliance.
 
 from __future__ import annotations
 
-from typing import Any, TypeGuard
+from typing import TypeGuard
 
 
 def assert_is_dict(value: object) -> TypeGuard[dict[str, object]]:
@@ -26,7 +26,7 @@ def assert_is_dict(value: object) -> TypeGuard[dict[str, object]]:
     return True
 
 
-def assert_is_list(value: object) -> TypeGuard[list[Any]]:
+def assert_is_list(value: object) -> TypeGuard[list[object]]:
     """Type-safe list assertion following Single Responsibility Principle.
 
     Args:
@@ -43,7 +43,7 @@ def assert_is_list(value: object) -> TypeGuard[list[Any]]:
     return True
 
 
-def safe_dict_access(data: object, key: str) -> Any:
+def safe_dict_access(data: object, key: str) -> object:
     """Type-safe dictionary access with proper error handling.
 
     Args:
@@ -62,7 +62,7 @@ def safe_dict_access(data: object, key: str) -> Any:
     return data[key]
 
 
-def safe_list_access(data: object, index: int) -> Any:
+def safe_list_access(data: object, index: int) -> object:
     """Type-safe list access with proper error handling.
 
     Args:

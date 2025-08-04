@@ -12,7 +12,7 @@ from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
-from flext_core import FlextEntity, FlextResult, TAnyDict
+from flext_core import FlextEntity, FlextResult, TConfigDict
 
 
 class FlextDomainEvent(BaseModel):
@@ -137,7 +137,7 @@ class QualityAnalysis(FlextEntity):
     status: AnalysisStatus = Field(default=AnalysisStatus.QUEUED)
 
     # Analysis data
-    analysis_config: TAnyDict = Field(default_factory=dict)
+    analysis_config: TConfigDict = Field(default_factory=dict)
 
     def start_analysis(self) -> QualityAnalysis:
         """Start analysis and return new instance."""
@@ -290,7 +290,7 @@ class QualityRule(FlextEntity):
 
     # Rule details
     pattern: str | None = None
-    parameters: TAnyDict = Field(default_factory=dict)
+    parameters: dict[str, object] = Field(default_factory=dict)
 
     # Documentation
     documentation_url: str | None = None
