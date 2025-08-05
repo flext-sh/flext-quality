@@ -8,7 +8,6 @@ from textwrap import dedent
 from typing import TextIO
 
 import pytest
-
 from flext_quality.analyzer import CodeAnalyzer
 
 

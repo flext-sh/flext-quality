@@ -5,7 +5,6 @@ from __future__ import annotations
 from uuid import uuid4
 
 import pytest
-
 from flext_quality.simple_api import QualityAPI
 
 

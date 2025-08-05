@@ -10,9 +10,8 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from enum import StrEnum
 
-from pydantic import BaseModel, Field
-
 from flext_core import FlextEntity, FlextResult, TConfigDict
+from pydantic import BaseModel, Field
 
 
 class FlextDomainEvent(BaseModel):

@@ -9,7 +9,6 @@ from __future__ import annotations
 import tempfile
 
 import pytest
-
 from flext_quality.application.services import (
     QualityAnalysisService,
     QualityIssueService,

@@ -1174,31 +1174,6 @@ All modules must meet these quality standards:
 - **Documentation**: 100% public API documented
 - **Import Quality**: No circular imports, clear dependency direction
 
-### Linting Configuration
-
-```toml
-# pyproject.toml - module organization specific rules
-[tool.ruff.lint.per-file-ignores]
-"**/domain/**" = [
-    "D103",  # Allow missing docstrings in domain internal modules
-]
-"**/infrastructure/**" = [
-    "D101",  # Allow missing docstrings in infrastructure adapters
-]
-"**/legacy/**" = [
-    "ALL",   # Legacy modules exempt from new standards
-]
-
-[tool.mypy.per-module-overrides]
-"flext_quality.domain.*" = {
-    strict = true,
-    disallow_any_expr = true,
-}
-"flext_quality.legacy.*" = {
-    strict = false,  # Legacy modules exempt
-}
-```
-
 ## Conclusion
 
 This Python module organization standard ensures FLEXT Quality maintains consistency with the broader FLEXT ecosystem while implementing Clean Architecture principles effectively. The structure provides clear separation of concerns, enables testability, and supports the long-term maintainability required for enterprise-grade software.

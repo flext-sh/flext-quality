@@ -7,10 +7,10 @@ from typing import TYPE_CHECKING
 
 from django.template.loader import get_template
 from django.utils import timezone
+from flext_core import get_logger
 from xhtml2pdf import pisa
 
 from analyzer.models import AnalysisReport
-from flext_core import get_logger
 
 if TYPE_CHECKING:
     from analyzer.models import (
