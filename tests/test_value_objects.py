@@ -5,6 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from pydantic import ValidationError
+
 from flext_quality.domain.value_objects import (
     ComplexityMetric,
     CoverageMetric,
@@ -16,7 +18,6 @@ from flext_quality.domain.value_objects import (
     QualityGrade,
     QualityScore,
 )
-from pydantic import ValidationError
 
 
 class TestIssueSeverity:

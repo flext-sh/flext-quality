@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from flext_quality.metrics import QualityMetrics
 
 

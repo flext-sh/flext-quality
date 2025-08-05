@@ -377,7 +377,7 @@ class QualityMetrics(FlextValueObject):
     # Architecture Note: Grade calculation centralized in QualityGradeCalculator
     # for consistency across FLEXT ecosystem quality services
 
-    def validate_domain_rules(self) -> FlextResult[None]:
+    def validate_business_rules(self) -> FlextResult[None]:
         """Validate quality metrics against domain business rules.
 
         Performs comprehensive validation of all metric values against

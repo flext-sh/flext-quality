@@ -5,6 +5,8 @@ from __future__ import annotations
 from datetime import datetime
 
 import pytest
+from pydantic import ValidationError
+
 from flext_quality.domain.entities import (
     AnalysisStatus,
     IssueSeverity,
@@ -15,7 +17,6 @@ from flext_quality.domain.entities import (
     QualityReport,
     QualityRule,
 )
-from pydantic import ValidationError
 
 
 class TestQualityProject:
@@ -44,7 +45,7 @@ class TestQualityProject:
             project_path=secure_temp_dir,
         )
 
-        result = project.validate_domain_rules()
+        result = project.validate_business_rules()
         assert result.success
 
     def test_project_validation_failure(self) -> None:
@@ -98,7 +99,7 @@ class TestQualityAnalysis:
             project_id="project-id",
         )
 
-        result = analysis.validate_domain_rules()
+        result = analysis.validate_business_rules()
         assert result.success
 
     def test_analysis_validation_failure(self) -> None:
@@ -108,7 +109,7 @@ class TestQualityAnalysis:
             project_id="",  # Empty project_id should fail
         )
 
-        result = analysis.validate_domain_rules()
+        result = analysis.validate_business_rules()
         assert result.is_failure
         assert result.error is not None
         assert "required" in result.error.lower()
@@ -243,7 +244,7 @@ class TestQualityIssue:
             message="Test message",
         )
 
-        result = issue.validate_domain_rules()
+        result = issue.validate_business_rules()
         assert result.success
 
     def test_issue_validation_failure(self) -> None:
@@ -258,7 +259,7 @@ class TestQualityIssue:
             message="Test message",
         )
 
-        result = issue.validate_domain_rules()
+        result = issue.validate_business_rules()
         assert result.is_failure
         assert result.error is not None
         assert "required" in result.error.lower()
@@ -372,7 +373,7 @@ class TestQualityRule:
             category=IssueType.STYLE,
         )
 
-        result = rule.validate_domain_rules()
+        result = rule.validate_business_rules()
         assert result.success
 
     def test_rule_validation_failure(self) -> None:
@@ -387,7 +388,7 @@ class TestQualityRule:
         # Create an invalid instance for testing validation
         invalid_rule = rule.model_copy(update={"rule_id": ""})
 
-        result = invalid_rule.validate_domain_rules()
+        result = invalid_rule.validate_business_rules()
         assert result.is_failure
         assert result.error is not None
         assert "required" in result.error.lower()
@@ -465,7 +466,7 @@ class TestQualityReport:
             report_type="json",
         )
 
-        result = report.validate_domain_rules()
+        result = report.validate_business_rules()
         assert result.success
 
     def test_report_validation_failure(self) -> None:
@@ -476,7 +477,7 @@ class TestQualityReport:
             report_type="json",
         )
 
-        result = report.validate_domain_rules()
+        result = report.validate_business_rules()
         assert result.is_failure
         assert result.error is not None
         assert "required" in result.error.lower()

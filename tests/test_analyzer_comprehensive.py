@@ -11,7 +11,6 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from flext_quality.analyzer import CodeAnalyzer
-
 from tests.helpers import (
     assert_analysis_results_structure,
     assert_issues_structure,

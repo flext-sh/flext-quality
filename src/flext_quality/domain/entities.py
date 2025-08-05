@@ -68,7 +68,7 @@ class QualityProject(FlextEntity):
     # Analysis settings
     auto_analyze: bool = Field(default=True)
 
-    def validate_domain_rules(self) -> FlextResult[None]:
+    def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality project."""
         if not self.project_path:
             return FlextResult.fail("Project path is required")
@@ -199,7 +199,7 @@ class QualityAnalysis(FlextEntity):
     def successful(self) -> bool:
         return self.status == AnalysisStatus.COMPLETED
 
-    def validate_domain_rules(self) -> FlextResult[None]:
+    def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality analysis."""
         if not self.project_id:
             return FlextResult.fail("Project ID is required")
@@ -269,7 +269,7 @@ class QualityIssue(FlextEntity):
             },
         )
 
-    def validate_domain_rules(self) -> FlextResult[None]:
+    def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality issue."""
         if not self.analysis_id:
             return FlextResult.fail("Analysis ID is required")
@@ -313,7 +313,7 @@ class QualityRule(FlextEntity):
         new_parameters[key] = value
         return self.model_copy(update={"parameters": new_parameters})
 
-    def validate_domain_rules(self) -> FlextResult[None]:
+    def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality rule."""
         if not self.rule_id:
             return FlextResult.fail("Rule ID is required")
@@ -350,7 +350,7 @@ class QualityReport(FlextEntity):
             },
         )
 
-    def validate_domain_rules(self) -> FlextResult[None]:
+    def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality report."""
         if not self.analysis_id:
             return FlextResult.fail("Analysis ID is required")

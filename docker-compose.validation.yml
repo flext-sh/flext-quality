@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # Main FLEXT Quality validation service
@@ -21,7 +21,13 @@ services:
     networks:
       - flext-network
     healthcheck:
-      test: ["CMD", "python", "-c", "from flext_quality import CodeAnalyzer; print('✅ Health OK')"]
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "from flext_quality import CodeAnalyzer; print('✅ Health OK')",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
