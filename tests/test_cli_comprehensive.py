@@ -14,6 +14,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from flext_quality.cli import (
     analyze_project,
     another_function,

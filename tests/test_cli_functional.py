@@ -14,6 +14,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 import pytest
+
 from flext_quality.cli import analyze_project, another_function, setup_logging
 
 
@@ -75,7 +76,8 @@ class TestCLIFunctional:
         assert True
 
     def test_analyze_project_basic_success(
-        self, basic_args: argparse.Namespace,
+        self,
+        basic_args: argparse.Namespace,
     ) -> None:
         """Test basic successful project analysis."""
         result = analyze_project(basic_args)
@@ -84,7 +86,9 @@ class TestCLIFunctional:
         assert result in {0, 1, 2}  # Valid exit codes
 
     def test_analyze_project_json_output(
-        self, basic_args: argparse.Namespace, capsys: pytest.CaptureFixture[str],
+        self,
+        basic_args: argparse.Namespace,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
         """Test project analysis with JSON output."""
         basic_args.format = "json"
@@ -106,7 +110,9 @@ class TestCLIFunctional:
             pytest.fail("Output is not valid JSON")
 
     def test_analyze_project_html_output(
-        self, basic_args: argparse.Namespace, capsys: pytest.CaptureFixture[str],
+        self,
+        basic_args: argparse.Namespace,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
         """Test project analysis with HTML output."""
         basic_args.format = "html"
@@ -180,7 +186,8 @@ class TestCLIFunctional:
             assert result == 1
 
     def test_analyze_project_with_options_disabled(
-        self, basic_args: argparse.Namespace,
+        self,
+        basic_args: argparse.Namespace,
     ) -> None:
         """Test analysis with various options disabled."""
         basic_args.include_security = False
@@ -203,7 +210,8 @@ class TestCLIFunctional:
         assert result in {0, 1, 2}
 
     def test_analyze_project_quiet_mode_json(
-        self, basic_args: argparse.Namespace,
+        self,
+        basic_args: argparse.Namespace,
     ) -> None:
         """Test that quiet mode is enabled for JSON output."""
         basic_args.format = "json"
@@ -219,7 +227,8 @@ class TestCLIFunctional:
             assert os.environ.get("FLEXT_OBSERVABILITY_QUIET") == "1"
 
     def test_analyze_project_quiet_mode_html(
-        self, basic_args: argparse.Namespace,
+        self,
+        basic_args: argparse.Namespace,
     ) -> None:
         """Test that quiet mode is enabled for HTML output."""
         basic_args.format = "html"
@@ -235,7 +244,8 @@ class TestCLIFunctional:
             assert os.environ.get("FLEXT_OBSERVABILITY_QUIET") == "1"
 
     def test_analyze_project_no_quiet_mode_verbose(
-        self, basic_args: argparse.Namespace,
+        self,
+        basic_args: argparse.Namespace,
     ) -> None:
         """Test that quiet mode is NOT enabled when verbose is True."""
         basic_args.format = "json"
@@ -251,7 +261,8 @@ class TestCLIFunctional:
             assert "FLEXT_OBSERVABILITY_QUIET" not in os.environ
 
     def test_analyze_project_exception_handling(
-        self, basic_args: argparse.Namespace,
+        self,
+        basic_args: argparse.Namespace,
     ) -> None:
         """Test exception handling in analyze_project."""
         # Force an exception by corrupting the path
@@ -263,7 +274,9 @@ class TestCLIFunctional:
         assert result == 3
 
     def test_analyze_project_exception_verbose(
-        self, basic_args: argparse.Namespace, capsys: pytest.CaptureFixture[str],
+        self,
+        basic_args: argparse.Namespace,
+        capsys: pytest.CaptureFixture[str],
     ) -> None:
         """Test exception handling with verbose mode."""
         basic_args.path = None  # Force exception
@@ -307,7 +320,8 @@ class TestCLIFunctional:
         assert isinstance(result, int)
 
     def test_analyze_project_quality_score_thresholds(
-        self, sample_project_dir: Path,
+        self,
+        sample_project_dir: Path,
     ) -> None:
         """Test different quality score thresholds."""
         # Create low-quality code to test different exit codes
@@ -370,7 +384,8 @@ class TestCLIEdgeCases:
     """Test edge cases and error conditions."""
 
     def test_analyze_project_invalid_format(
-        self, basic_args: argparse.Namespace,
+        self,
+        basic_args: argparse.Namespace,
     ) -> None:
         """Test analysis with invalid format argument."""
         basic_args.format = "invalid_format"
@@ -421,7 +436,8 @@ class TestCLIEdgeCases:
                     shutil.rmtree(test_dir)
 
     def test_analyze_project_output_directory_creation(
-        self, basic_args: argparse.Namespace,
+        self,
+        basic_args: argparse.Namespace,
     ) -> None:
         """Test behavior when output directory doesn't exist."""
         with tempfile.TemporaryDirectory() as temp_dir:

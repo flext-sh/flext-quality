@@ -8,6 +8,7 @@ from textwrap import dedent
 from typing import TextIO
 
 import pytest
+
 from flext_quality.analyzer import CodeAnalyzer
 
 
@@ -537,7 +538,9 @@ class TestCodeAnalyzer:
         assert analyzer.analysis_results == results
         assert analyzer.analysis_results != {}
 
-    def test_analyze_project_logging(self, temp_project: Path, caplog: pytest.LogCaptureFixture) -> None:
+    def test_analyze_project_logging(
+        self, temp_project: Path, caplog: pytest.LogCaptureFixture
+    ) -> None:
         """Test that analysis produces appropriate log messages."""
         import logging
 

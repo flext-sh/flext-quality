@@ -530,7 +530,9 @@ class AnalysisServiceImpl:
 class SecurityAnalyzerServiceImpl(BasePortService):
     """Implementation of security analyzer service for DI container."""
 
-    async def analyze_security(self, project_path: str) -> FlextResult[dict[str, object]]:
+    async def analyze_security(
+        self, project_path: str,
+    ) -> FlextResult[dict[str, object]]:
         """Analyze security issues in project."""
         return FlextResult.ok({"security_issues": []})
 

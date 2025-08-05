@@ -14,12 +14,14 @@ def run_tests() -> subprocess.CompletedProcess[str]:
 
     try:
         import os
+
         os.chdir(project_dir)
 
         # Isolar pytest apenas para este projeto
         cmd = [
             sys.executable,
-            "-m", "pytest",
+            "-m",
+            "pytest",
             "tests/",
             "--tb=no",
             "-q",

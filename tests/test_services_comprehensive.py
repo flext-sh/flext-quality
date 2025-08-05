@@ -9,6 +9,7 @@ from __future__ import annotations
 import uuid
 
 import pytest
+
 from flext_quality.application.services import (
     QualityAnalysisService,
     QualityIssueService,
@@ -22,7 +23,6 @@ from flext_quality.domain.entities import (
     QualityProject,
     QualityReport,
 )
-
 from tests.conftest import (
     assert_result_failure_with_error,
     assert_result_success_with_data,

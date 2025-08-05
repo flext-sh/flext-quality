@@ -170,7 +170,9 @@ async def demonstrate_service_integration() -> None:
     # Create project
     with tempfile.TemporaryDirectory() as temp_dir:
         project_result = await project_service.create_project(
-            name="API Demo Project", project_path=temp_dir, language="python",
+            name="API Demo Project",
+            project_path=temp_dir,
+            language="python",
         )
 
         if project_result.success:
@@ -250,7 +252,8 @@ async def demonstrate_service_integration() -> None:
         created_issues = []
         for issue_data in issues_data:
             issue_result = await issue_service.create_issue(
-                analysis_id=analysis.id, **issue_data,
+                analysis_id=analysis.id,
+                **issue_data,
             )
 
             if issue_result.success:
@@ -259,7 +262,11 @@ async def demonstrate_service_integration() -> None:
 
         # Update issue counts in analysis
         issue_counts_result = await analysis_service.update_issue_counts(
-            analysis_id=analysis.id, critical=0, high=1, medium=1, low=1,
+            analysis_id=analysis.id,
+            critical=0,
+            high=1,
+            medium=1,
+            low=1,
         )
 
         if issue_counts_result.success:
@@ -278,7 +285,8 @@ async def demonstrate_service_integration() -> None:
 
         for report_type in report_types:
             report_result = await report_service.create_report(
-                analysis_id=analysis.id, report_type=report_type,
+                analysis_id=analysis.id,
+                report_type=report_type,
             )
 
             if report_result.success:
@@ -374,7 +382,6 @@ def process_data(data):
             )
 
         except ImportError:
-
             # Simulate observability integration
             pass
 
@@ -404,14 +411,14 @@ def process_data(data):
                     # Demonstrate service usage
                     with tempfile.TemporaryDirectory() as temp_service_dir:
                         project_result = await project_service.create_project(
-                            name="DI Demo Project", project_path=temp_service_dir,
+                            name="DI Demo Project",
+                            project_path=temp_service_dir,
                         )
 
                         if project_result.success:
                             pass
 
             except ImportError:
-
                 # Direct instantiation
                 project_service = QualityProjectService()
                 QualityAnalysisService()

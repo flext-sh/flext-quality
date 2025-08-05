@@ -7,6 +7,7 @@ and improve coverage from 0% to 100% for exceptions.py module.
 from __future__ import annotations
 
 import pytest
+
 from flext_quality.exceptions import (
     FlextQualityAnalysisError,
     FlextQualityAuthenticationError,
@@ -99,7 +100,10 @@ class TestFlextQualityExceptions:
     def test_report_error_with_context(self) -> None:
         """Test FlextQualityReportError with full context."""
         exception = FlextQualityReportError(
-            "Invalid format", report_type="html", output_format="pdf", extra_info="test",
+            "Invalid format",
+            report_type="html",
+            output_format="pdf",
+            extra_info="test",
         )
         assert "Quality report: Invalid format" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -118,7 +122,10 @@ class TestFlextQualityExceptions:
     def test_metrics_error_with_context(self) -> None:
         """Test FlextQualityMetricsError with full context."""
         exception = FlextQualityMetricsError(
-            "Invalid value", metric_name="complexity", metric_value=42.5, threshold=10.0,
+            "Invalid value",
+            metric_name="complexity",
+            metric_value=42.5,
+            threshold=10.0,
         )
         assert "Quality metrics: Invalid value" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -137,7 +144,10 @@ class TestFlextQualityExceptions:
     def test_grade_error_with_context(self) -> None:
         """Test FlextQualityGradeError with full context."""
         exception = FlextQualityGradeError(
-            "Invalid grade", grade_type="overall", calculated_grade="A++", score=95.5,
+            "Invalid grade",
+            grade_type="overall",
+            calculated_grade="A++",
+            score=95.5,
         )
         assert "Quality grade: Invalid grade" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -156,7 +166,10 @@ class TestFlextQualityExceptions:
     def test_rule_error_with_context(self) -> None:
         """Test FlextQualityRuleError with full context."""
         exception = FlextQualityRuleError(
-            "Rule not found", rule_name="E302", rule_severity="high", category="style",
+            "Rule not found",
+            rule_name="E302",
+            rule_severity="high",
+            category="style",
         )
         assert "Quality rule: Rule not found" in str(exception)
         assert isinstance(exception, FlextQualityError)

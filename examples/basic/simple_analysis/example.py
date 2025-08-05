@@ -67,10 +67,10 @@ def analyze_project(project_path: str) -> None:
 
         # Execute comprehensive analysis with ALL features
         results = analyzer.analyze_project(
-            include_security=True,      # Security vulnerability detection
-            include_complexity=True,    # Cyclomatic complexity analysis
-            include_dead_code=True,     # Unused code detection
-            include_duplicates=True,     # Code duplication analysis
+            include_security=True,  # Security vulnerability detection
+            include_complexity=True,  # Cyclomatic complexity analysis
+            include_dead_code=True,  # Unused code detection
+            include_duplicates=True,  # Code duplication analysis
         )
 
         # Extract basic project information
@@ -115,7 +115,6 @@ def analyze_project(project_path: str) -> None:
         # Detailed issue breakdown - SHOW ALL ISSUES
         for issue_list in issues.values():
             if isinstance(issue_list, list):
-
                 if not issue_list:
                     pass
                 else:

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import pytest
+
 from flext_quality.application.services import (
     QualityAnalysisService,
     QualityIssueService,
@@ -10,7 +11,6 @@ from flext_quality.application.services import (
     QualityReportService,
 )
 from flext_quality.domain.entities import IssueSeverity, IssueType
-
 from tests.conftest import (
     assert_result_failure_with_error,
     assert_result_success_with_data,

@@ -9,6 +9,7 @@ from __future__ import annotations
 import tempfile
 
 import pytest
+
 from flext_quality.application.services import (
     QualityAnalysisService,
     QualityIssueService,
@@ -30,7 +31,9 @@ class TestQualityProjectServiceFunctional:
         """Test successful project creation - covers lines 42-56."""
         with tempfile.TemporaryDirectory() as temp_dir:
             result = await service.create_project(
-                name="Test Project", project_path=temp_dir, language="python",
+                name="Test Project",
+                project_path=temp_dir,
+                language="python",
             )
 
             assert result.success
@@ -45,7 +48,8 @@ class TestQualityProjectServiceFunctional:
         # Create project first
         with tempfile.TemporaryDirectory() as temp_dir:
             create_result = await service.create_project(
-                name="Test Project", project_path=temp_dir,
+                name="Test Project",
+                project_path=temp_dir,
             )
             project_id = create_result.data.id
 
@@ -72,10 +76,14 @@ class TestQualityProjectServiceFunctional:
             tempfile.TemporaryDirectory() as temp_dir2,
         ):
             await service.create_project(
-                name="Project 1", project_path=temp_dir1, language="python",
+                name="Project 1",
+                project_path=temp_dir1,
+                language="python",
             )
             await service.create_project(
-                name="Project 2", project_path=temp_dir2, language="go",
+                name="Project 2",
+                project_path=temp_dir2,
+                language="go",
             )
 
             result = await service.list_projects()
@@ -91,13 +99,15 @@ class TestQualityProjectServiceFunctional:
         # Create project first
         with tempfile.TemporaryDirectory() as temp_dir:
             create_result = await service.create_project(
-                name="Test Project", project_path=temp_dir,
+                name="Test Project",
+                project_path=temp_dir,
             )
             project_id = create_result.data.id
 
             # Update project
             result = await service.update_project(
-                project_id, {"language": "go", "auto_analyze": False},
+                project_id,
+                {"language": "go", "auto_analyze": False},
             )
 
             assert result.success
@@ -106,7 +116,8 @@ class TestQualityProjectServiceFunctional:
             assert updated_project.auto_analyze is False
 
     async def test_update_project_not_found(
-        self, service: QualityProjectService,
+        self,
+        service: QualityProjectService,
     ) -> None:
         """Test update project when not found - covers line 89."""
         result = await service.update_project("non-existent", {"language": "go"})
@@ -119,7 +130,8 @@ class TestQualityProjectServiceFunctional:
         # Create project first
         with tempfile.TemporaryDirectory() as temp_dir:
             create_result = await service.create_project(
-                name="Test Project", project_path=temp_dir,
+                name="Test Project",
+                project_path=temp_dir,
             )
             project_id = create_result.data.id
 
@@ -130,7 +142,8 @@ class TestQualityProjectServiceFunctional:
             assert len(service._projects) == 0
 
     async def test_delete_project_not_found(
-        self, service: QualityProjectService,
+        self,
+        service: QualityProjectService,
     ) -> None:
         """Test delete project when not found - covers lines 102-103."""
         result = await service.delete_project("non-existent-id")
@@ -150,7 +163,9 @@ class TestQualityAnalysisServiceFunctional:
     async def test_create_analyssuccess(self, service: QualityAnalysisService) -> None:
         """Test successful analysis creation - covers lines 121-141."""
         result = await service.create_analysis(
-            project_id="test-project-id", commit_hash="abc123", branch="main",
+            project_id="test-project-id",
+            commit_hash="abc123",
+            branch="main",
         )
 
         assert result.success
@@ -176,7 +191,8 @@ class TestQualityAnalysisServiceFunctional:
         assert analysis.project_id == "test-project"
 
     async def test_get_analysis_not_found(
-        self, service: QualityAnalysisService,
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test get analysis when not found - covers line 284."""
         result = await service.get_analysis("non-existent-id")
@@ -185,7 +201,8 @@ class TestQualityAnalysisServiceFunctional:
         assert "Analysis not found" in result.error
 
     async def test_update_metrics_success(
-        self, service: QualityAnalysisService,
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test successful metrics update - covers lines 147-171."""
         # Create analysis first
@@ -211,7 +228,8 @@ class TestQualityAnalysisServiceFunctional:
         assert updated_analysis.blank_lines == 100
 
     async def test_update_metrics_not_found(
-        self, service: QualityAnalysisService,
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test update metrics when analysis not found - covers line 149."""
         result = await service.update_metrics(
@@ -251,7 +269,8 @@ class TestQualityAnalysisServiceFunctional:
         assert updated_analysis.maintainability_score == 80.0
 
     async def test_update_scores_not_found(
-        self, service: QualityAnalysisService,
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test update scores when analysis not found - covers line 179."""
         result = await service.update_scores(
@@ -267,7 +286,8 @@ class TestQualityAnalysisServiceFunctional:
         assert "Analysis not found" in result.error
 
     async def test_update_issue_counts_success(
-        self, service: QualityAnalysisService,
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test successful issue counts update - covers lines 212-226."""
         # Create analysis first
@@ -276,7 +296,11 @@ class TestQualityAnalysisServiceFunctional:
 
         # Update issue counts
         result = await service.update_issue_counts(
-            analysis_id=analysis_id, critical=1, high=2, medium=3, low=4,
+            analysis_id=analysis_id,
+            critical=1,
+            high=2,
+            medium=3,
+            low=4,
         )
 
         assert result.success
@@ -288,7 +312,8 @@ class TestQualityAnalysisServiceFunctional:
         assert updated_analysis.total_issues == 10  # Sum of all issues
 
     async def test_complete_analyssuccess(
-        self, service: QualityAnalysisService,
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test successful analysis completion - covers lines 246-253."""
         # Create analysis first
@@ -305,7 +330,8 @@ class TestQualityAnalysisServiceFunctional:
         assert completed_analysis.duration_seconds is not None
 
     async def test_complete_analysis_not_found(
-        self, service: QualityAnalysisService,
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test complete analysis when not found - covers line 248."""
         result = await service.complete_analysis("non-existent-id")
@@ -328,7 +354,8 @@ class TestQualityAnalysisServiceFunctional:
         assert failed_analysis.completed_at is not None
 
     async def test_fail_analysis_not_found(
-        self, service: QualityAnalysisService,
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test fail analysis when not found - covers line 265."""
         result = await service.fail_analysis("non-existent-id", "Error")
@@ -424,13 +451,28 @@ class TestQualityIssueServiceFunctional:
         """Test successful issues listing - covers lines 361-377."""
         # Create multiple issues
         await service.create_issue(
-            "analysis-1", "security", "high", "S001", "file1.py", message="Issue 1",
+            "analysis-1",
+            "security",
+            "high",
+            "S001",
+            "file1.py",
+            message="Issue 1",
         )
         await service.create_issue(
-            "analysis-1", "style", "low", "E301", "file2.py", message="Issue 2",
+            "analysis-1",
+            "style",
+            "low",
+            "E301",
+            "file2.py",
+            message="Issue 2",
         )
         await service.create_issue(
-            "analysis-2", "complexity", "medium", "C001", "file3.py", message="Issue 3",
+            "analysis-2",
+            "complexity",
+            "medium",
+            "C001",
+            "file3.py",
+            message="Issue 3",
         )
 
         # List issues for analysis-1
@@ -454,7 +496,12 @@ class TestQualityIssueServiceFunctional:
         """Test successful issue marking as fixed - covers lines 383-390."""
         # Create issue first
         create_result = await service.create_issue(
-            "test-analysis", "style", "low", "E301", "test.py", message="Style issue",
+            "test-analysis",
+            "style",
+            "low",
+            "E301",
+            "test.py",
+            message="Style issue",
         )
         issue_id = create_result.data.id
 
@@ -476,7 +523,12 @@ class TestQualityIssueServiceFunctional:
         """Test successful issue suppression - covers lines 399-406."""
         # Create issue first
         create_result = await service.create_issue(
-            "test-analysis", "style", "low", "E301", "test.py", message="Style issue",
+            "test-analysis",
+            "style",
+            "low",
+            "E301",
+            "test.py",
+            message="Style issue",
         )
         issue_id = create_result.data.id
 
@@ -499,7 +551,12 @@ class TestQualityIssueServiceFunctional:
         """Test successful issue unsuppression - covers lines 411-418."""
         # Create and suppress issue first
         create_result = await service.create_issue(
-            "test-analysis", "style", "low", "E301", "test.py", message="Style issue",
+            "test-analysis",
+            "style",
+            "low",
+            "E301",
+            "test.py",
+            message="Style issue",
         )
         issue_id = create_result.data.id
         await service.suppress_issue(issue_id, "False positive")
@@ -513,7 +570,8 @@ class TestQualityIssueServiceFunctional:
         assert unsuppressed_issue.suppression_reason is None
 
     async def test_unsuppress_issue_not_found(
-        self, service: QualityIssueService,
+        self,
+        service: QualityIssueService,
     ) -> None:
         """Test unsuppress issue when not found - covers line 413."""
         result = await service.unsuppress_issue("non-existent-id")
@@ -533,7 +591,9 @@ class TestQualityReportServiceFunctional:
     async def test_create_report_success(self, service: QualityReportService) -> None:
         """Test successful report creation - covers lines 429-449."""
         result = await service.create_report(
-            analysis_id="test-analysis", report_type="html", report_format="detailed",
+            analysis_id="test-analysis",
+            report_type="html",
+            report_format="detailed",
         )
 
         assert result.success
@@ -622,7 +682,8 @@ class TestServiceIntegration:
         # 1. Create project
         with tempfile.TemporaryDirectory() as temp_dir:
             project_result = await project_service.create_project(
-                name="Integration Test", project_path=temp_dir,
+                name="Integration Test",
+                project_path=temp_dir,
             )
             assert project_result.success
             project = project_result.data
@@ -634,7 +695,12 @@ class TestServiceIntegration:
 
             # 3. Update analysis metrics
             metrics_result = await analysis_service.update_metrics(
-                analysis.id, 5, 100, 80, 10, 10,
+                analysis.id,
+                5,
+                100,
+                80,
+                10,
+                10,
             )
             assert metrics_result.success
 
@@ -651,7 +717,11 @@ class TestServiceIntegration:
 
             # 5. Update issue counts
             counts_result = await analysis_service.update_issue_counts(
-                analysis.id, 0, 1, 0, 0,
+                analysis.id,
+                0,
+                1,
+                0,
+                0,
             )
             assert counts_result.success
 

@@ -32,10 +32,12 @@ def run_cli_analysis(project_path: str, format_type: str = "json") -> dict[str, 
     # Build CLI command with correct arguments
     cmd = [
         sys.executable,
-        "-m", "flext_quality.cli",
+        "-m",
+        "flext_quality.cli",
         "analyze",
         project_path,
-        "--format", format_type,
+        "--format",
+        format_type,
         # Note: All analysis types are enabled by default
         # Use --no-security, --no-complexity, etc. to disable
     ]
@@ -44,7 +46,8 @@ def run_cli_analysis(project_path: str, format_type: str = "json") -> dict[str, 
         # Execute CLI command
         result = subprocess.run(
             cmd,
-            check=False, capture_output=True,
+            check=False,
+            capture_output=True,
             text=True,
             timeout=120,  # 2 minute timeout
         )
@@ -52,6 +55,7 @@ def run_cli_analysis(project_path: str, format_type: str = "json") -> dict[str, 
         # CLI may return non-zero exit code for validation but still output valid JSON
         if format_type == "json" and result.stdout.strip():
             import json
+
             try:
                 parsed_json = json.loads(result.stdout)
                 if result.returncode != 0:
@@ -62,7 +66,10 @@ def run_cli_analysis(project_path: str, format_type: str = "json") -> dict[str, 
         elif result.returncode == 0:
             return {"output": result.stdout, "format": format_type}
         else:
-            return {"error": f"CLI failed: {result.stderr}", "exit_code": result.returncode}
+            return {
+                "error": f"CLI failed: {result.stderr}",
+                "exit_code": result.returncode,
+            }
 
     except subprocess.TimeoutExpired:
         return {"error": "Analysis timeout"}
@@ -82,11 +89,11 @@ def check_quality_thresholds(results: dict[str, Any]) -> dict[str, Any]:
     """
     # Define enterprise quality thresholds
     thresholds = {
-        "min_score": 80.0,           # Minimum overall score
-        "max_security_issues": 0,    # Zero security issues allowed
+        "min_score": 80.0,  # Minimum overall score
+        "max_security_issues": 0,  # Zero security issues allowed
         "max_complexity_issues": 5,  # Maximum complexity issues
-        "max_critical_issues": 2,    # Maximum critical issues
-        "min_files_analyzed": 1,      # Must analyze at least 1 file
+        "max_critical_issues": 2,  # Maximum critical issues
+        "min_files_analyzed": 1,  # Must analyze at least 1 file
     }
 
     # Extract metrics for threshold checking
@@ -106,7 +113,11 @@ def check_quality_thresholds(results: dict[str, Any]) -> dict[str, Any]:
     files_analyzed = analysis_results.get("files_analyzed", 0)
 
     # Mock quality score calculation (would come from actual analysis)
-    total_issues = sum(len(issue_list) for issue_list in issues.values() if isinstance(issue_list, list))
+    total_issues = sum(
+        len(issue_list)
+        for issue_list in issues.values()
+        if isinstance(issue_list, list)
+    )
     estimated_score = max(0, 100 - (total_issues * 10) - (security_count * 20))
 
     # Check each threshold
@@ -241,26 +252,29 @@ def another_complex_function(x, y, z, a, b, c):
         results_summary = []
 
         for project in projects:
-
             # Run analysis
             results = run_cli_analysis(project["path"], "json")
 
             if "error" in results:
-                results_summary.append({
-                    "name": project["name"],
-                    "status": "FAILED",
-                    "error": results["error"],
-                })
+                results_summary.append(
+                    {
+                        "name": project["name"],
+                        "status": "FAILED",
+                        "error": results["error"],
+                    }
+                )
             else:
                 # Check quality gates
                 decision = check_quality_thresholds(results)
 
-                results_summary.append({
-                    "name": project["name"],
-                    "status": "COMPLETED",
-                    "quality_gate": decision["recommendation"],
-                    "passed_checks": f"{decision['passed_checks']}/{decision['total_checks']}",
-                })
+                results_summary.append(
+                    {
+                        "name": project["name"],
+                        "status": "COMPLETED",
+                        "quality_gate": decision["recommendation"],
+                        "passed_checks": f"{decision['passed_checks']}/{decision['total_checks']}",
+                    }
+                )
 
         # Display batch summary
 
