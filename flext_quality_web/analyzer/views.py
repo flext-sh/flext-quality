@@ -13,6 +13,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django_filters.rest_framework import DjangoFilterBackend
+from flext_core import get_logger
 
 # Create placeholder serializers
 from rest_framework import filters, serializers, status, viewsets
@@ -33,7 +34,6 @@ from analyzer.models import (
 from analyzer.package_discovery import PackageDiscovery
 from analyzer.report_generator import WebReportGenerator
 from analyzer.tasks import run_code_analysis
-from flext_core import get_logger
 
 
 def health_check(request):

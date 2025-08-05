@@ -50,7 +50,7 @@ import importlib.metadata
 import warnings
 
 # Core FlextCore patterns (root namespace imports)
-from flext_core import FlextConstants, FlextContainer, FlextResult
+from flext_core import FlextResult
 
 # Direct imports - no fallbacks allowed per CLAUDE.md
 from flext_quality.analyzer import CodeAnalyzer

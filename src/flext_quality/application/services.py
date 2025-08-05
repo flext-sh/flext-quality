@@ -8,6 +8,7 @@ REFACTORED:
 from __future__ import annotations
 
 from flext_core import FlextResult, TConfigDict
+
 from flext_quality.domain.entities import (
     AnalysisStatus,
     IssueSeverity,

@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING
 from uuid import UUID
 
 from flext_core import FlextResult, TConfigDict
+
 from flext_quality.application.services import (
     QualityAnalysisService,
     QualityIssueService,

@@ -5,8 +5,6 @@ from __future__ import annotations
 from datetime import datetime
 
 import pytest
-from pydantic import ValidationError
-
 from flext_quality.domain.entities import (
     AnalysisStatus,
     IssueSeverity,
@@ -17,6 +15,7 @@ from flext_quality.domain.entities import (
     QualityReport,
     QualityRule,
 )
+from pydantic import ValidationError
 
 
 class TestQualityProject:

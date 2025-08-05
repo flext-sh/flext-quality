@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING
 
 from flext_core import FlextResult
 from flext_observability import flext_create_log_entry, flext_create_trace
+
 from flext_quality.application.services import (
     LintingServiceImpl,
     QualityAnalysisService,

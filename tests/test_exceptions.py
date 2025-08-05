@@ -7,7 +7,6 @@ and improve coverage from 0% to 100% for exceptions.py module.
 from __future__ import annotations
 
 import pytest
-
 from flext_quality.exceptions import (
     FlextQualityAnalysisError,
     FlextQualityAuthenticationError,

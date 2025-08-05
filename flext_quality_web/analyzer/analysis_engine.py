@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 from django.utils import timezone
-
 from flext_core import get_logger
 
 if TYPE_CHECKING:

@@ -6,6 +6,7 @@ import time
 from pathlib import Path
 
 from django.utils import timezone
+from flext_core import get_logger
 
 from analyzer.backends import AnalysisResult, get_backend
 from analyzer.models import (
@@ -24,7 +25,6 @@ from analyzer.models import (
     SecurityIssue,
     VariableAnalysis,
 )
-from flext_core import get_logger
 
 logger = get_logger(__name__)
 

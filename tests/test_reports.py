@@ -5,7 +5,6 @@ import tempfile
 from pathlib import Path
 
 import pytest
-
 from flext_core import TAnyDict
 from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
 from flext_quality.domain.value_objects import QualityGrade
