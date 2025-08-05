@@ -501,8 +501,8 @@ def hierarchical_report(request: HttpRequest, session_id: str) -> HttpResponse:
     for package in packages:
         package_data: dict[str, PackageAnalysis | list | int] = {
             "package": package,
-            "classes": [],  # type: ignore[misc]
-            "functions": [],  # type: ignore[misc]
+            "classes": [],
+            "functions": [],
             "security_issues": SecurityIssue.objects.filter(
                 session=session,
                 file_analysis__package_name=package.name,

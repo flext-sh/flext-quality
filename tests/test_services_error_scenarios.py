@@ -79,7 +79,7 @@ class TestQualityProjectServiceErrorScenarios:
         """Test exception handling in get_project - covers lines 70-71."""
         # DRY: Use factory to create exception-throwing dict
         exception_dict_class = create_exception_dict(ValueError("Storage corrupted"))
-        service._projects = exception_dict_class()  # type: ignore[assignment]  # Test mock
+        service._projects = exception_dict_class()
 
         result = await service.get_project("test-id")
 

@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 
-def run_tests():
+def run_tests() -> subprocess.CompletedProcess[str]:
     """Executa testes sem interferência."""
     # Change to project directory
     project_dir = Path(__file__).parent
@@ -34,4 +34,5 @@ def run_tests():
 
 
 if __name__ == "__main__":
-    run_tests()
+    result = run_tests()
+    sys.exit(result.returncode)
