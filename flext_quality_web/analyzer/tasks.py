@@ -22,7 +22,7 @@ def run_analysis_task(session_id: str, backends: list[str]) -> None:
         this would be a Celery task that runs analysis asynchronously.
 
     """
-    logger.info(f"Starting analysis for session {session_id} with backends: {backends}")
+    logger.info("Starting analysis for session %s with backends: %s", session_id, backends)
 
     # TODO: Implement actual analysis logic here
     # This would typically:
@@ -31,7 +31,7 @@ def run_analysis_task(session_id: str, backends: list[str]) -> None:
     # 3. Run the analysis
     # 4. Update session status and results
 
-    logger.info(f"Analysis completed for session {session_id}")
+    logger.info("Analysis completed for session %s", session_id)
 
 
 def run_code_analysis(project_path: str, session_id: str) -> None:
@@ -45,11 +45,11 @@ def run_code_analysis(project_path: str, session_id: str) -> None:
         This is a placeholder implementation for compatibility.
 
     """
-    logger.info(f"Running code analysis on {project_path} for session {session_id}")
+    logger.info("Running code analysis on %s for session %s", project_path, session_id)
 
     # TODO: Implement actual code analysis logic
 
-    logger.info(f"Code analysis completed for session {session_id}")
+    logger.info("Code analysis completed for session %s", session_id)
 
 
 def placeholder_function() -> None:

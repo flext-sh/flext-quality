@@ -51,7 +51,7 @@ class MultiBackendAnalyzer:
     def analyze(self) -> AnalysisSession:
         """Run analysis across all configured backends."""
         self.logger.info(
-            f"Starting multi-backend analysis for project: {self.flx_project.name}",
+            "Starting multi-backend analysis for project: %s", self.flx_project.name,
         )
 
         # Create analysis session
@@ -91,7 +91,7 @@ class MultiBackendAnalyzer:
                     if not backend.is_available():
                         execution_time = time.time() - start_time
                         self.logger.warning(
-                            f"Backend {backend_name} is not available, skipping",
+                            "Backend %s is not available, skipping", backend_name,
                         )
 
                         # Track skipped statistics
@@ -135,7 +135,7 @@ class MultiBackendAnalyzer:
                     execution_time = time.time() - start_time
                     error_msg = str(e)
 
-                    self.logger.exception(f"Backend {backend_name} failed: {e}")
+                    self.logger.exception("Backend %s failed: %s", backend_name, e)
                     combined_result.errors.append(
                         {"backend": backend_name, "error": error_msg},
                     )
@@ -180,10 +180,10 @@ class MultiBackendAnalyzer:
             self.session.files_analyzed = len(python_files)
             self.session.save()
 
-            self.logger.info(f"Analysis completed for project: {self.flx_project.name}")
+            self.logger.info("Analysis completed for project: %s", self.flx_project.name)
 
         except (RuntimeError, ValueError, TypeError) as e:
-            self.logger.exception(f"Analysis failed: {e}")
+            self.logger.exception("Analysis failed: %s", e)
             self.session.status = "failed"
             self.session.completed_at = timezone.now()
             self.session.error_message = str(e)

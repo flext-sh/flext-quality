@@ -254,7 +254,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                 )
             except (RuntimeError, ValueError, TypeError) as e:
                 logger.exception(
-                    f"Failed to start analysis for session {session.id}: {e}",
+                    "Failed to start analysis for session %s: %s", session.id, e,
                 )
                 session.status = "failed"
                 session.error_message = str(e)
@@ -314,7 +314,7 @@ class AnalysisSessionViewSet(viewsets.ModelViewSet):
             run_code_analysis.delay(session.id)  # type
             return Response({"message": "Analysis started successfully"})
         except (RuntimeError, ValueError, TypeError) as e:
-            logger.exception(f"Failed to start analysis {session.id}: {e}")
+            logger.exception("Failed to start analysis %s: %s", session.id, e)
             session.status = "failed"
             session.error_message = str(e)
             session.save()
@@ -688,7 +688,7 @@ def create_project_from_package(request: HttpRequest) -> HttpResponse:
         return redirect("project_detail", project_id=flx_project.pk)
     except (RuntimeError, ValueError, TypeError) as e:
         logger.exception(
-            f"Failed to create flx_project from package {package_name}: {e}",
+            "Failed to create flx_project from package %s: %s", package_name, e,
         )
         messages.error(request, f"Failed to create flx_project: {e}")
         return redirect("packages_discovery")
@@ -751,7 +751,7 @@ def start_analysis(request: HttpRequest, project_id: int) -> HttpResponse:
             messages.error(request, f"Analysis failed: {session.error_message}")
         return redirect("analysis_session_detail", session_id=session.pk)
     except (RuntimeError, ValueError, TypeError) as e:
-        logger.exception(f"Failed to start analysis for flx_project {project_id}: {e}")
+        logger.exception("Failed to start analysis for flx_project %s: %s", project_id, e)
         messages.error(request, f"Failed to start analysis: {e}")
         return redirect("project_detail", project_id=project_id)
 
@@ -775,7 +775,7 @@ def generate_report(request: HttpRequest, session_id: int) -> HttpResponse:
         # Return download response
         return create_download_response(report)
     except (RuntimeError, ValueError, TypeError) as e:
-        logger.exception(f"Failed to generate report for session {session_id}: {e}")
+        logger.exception("Failed to generate report for session %s: %s", session_id, e)
         messages.error(request, f"Failed to generate report: {e}")
         return redirect("analysis_session_detail", session_id=session_id)
 
@@ -798,7 +798,7 @@ def view_report(request: HttpRequest, session_id: int) -> HttpResponse:
         # Return HTML content directly
         return HttpResponse(report.content, content_type="text/html")
     except (RuntimeError, ValueError, TypeError) as e:
-        logger.exception(f"Failed to view report for session {session_id}: {e}")
+        logger.exception("Failed to view report for session %s: %s", session_id, e)
         messages.error(request, f"Failed to view report: {e}")
         return redirect("analysis_session_detail", session_id=session_id)
 
@@ -818,7 +818,7 @@ def refresh_packages(_request: HttpRequest) -> JsonResponse:
             },
         )
     except (RuntimeError, ValueError, TypeError) as e:
-        logger.exception(f"Failed to refresh packages: {e}")
+        logger.exception("Failed to refresh packages: %s", e)
         return JsonResponse(
             {
                 "status": "error",
