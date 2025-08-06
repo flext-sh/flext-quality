@@ -122,7 +122,9 @@ def analyze_project(project_path: str) -> None:
                     pass
                 else:
                     # Show detailed information for each issue
-                    for _i, issue in enumerate(issue_list[:MAX_FILES_TO_SHOW]):  # Show first 5 issues
+                    for _i, issue in enumerate(
+                        issue_list[:MAX_FILES_TO_SHOW]
+                    ):  # Show first 5 issues
                         if isinstance(issue, dict):
                             issue.get("file", "unknown")
                             issue.get("message", "No description")
@@ -166,7 +168,13 @@ def analyze_project(project_path: str) -> None:
         MINIMUM_SCORE = 60
 
         # Score-based recommendations
-        if score >= EXCELLENT_SCORE or score >= VERY_GOOD_SCORE or score >= GOOD_SCORE or score >= ACCEPTABLE_SCORE or score >= MINIMUM_SCORE:
+        if (
+            score >= EXCELLENT_SCORE
+            or score >= VERY_GOOD_SCORE
+            or score >= GOOD_SCORE
+            or score >= ACCEPTABLE_SCORE
+            or score >= MINIMUM_SCORE
+        ):
             pass
 
         # Category-specific recommendations with actionable advice

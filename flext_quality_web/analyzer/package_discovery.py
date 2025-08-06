@@ -196,7 +196,8 @@ class PackageDiscovery:
                             return str(url_data["url"][7:])  # Remove file://
                 except (RuntimeError, ValueError, TypeError) as e:
                     logger.debug(
-                        f"Failed to parse direct_url.json for {dist.metadata['name']}: {e}",
+                        "Failed to parse direct_url.json for %s: %s",
+                        dist.metadata["name"], e,
                     )
 
             # Try to get location from files
@@ -237,7 +238,7 @@ class PackageDiscovery:
                         return "source"
                 except (RuntimeError, ValueError, TypeError) as e:
                     logger.debug(
-                        f"Failed to read direct_url.json for package type detection: {e}",
+                        "Failed to read direct_url.json for package type detection: %s", e,
                     )
 
             return "wheel"
