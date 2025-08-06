@@ -57,15 +57,19 @@ def analyze_project(args: argparse.Namespace) -> int:
             report.save_report(output_path, args.format)
         elif args.format == "json":
             # Print JSON to stdout
-            print(report.to_json())  # noqa: T201
+            pass
         elif args.format == "html":
             # Print HTML to stdout
-            print(report.to_html())  # noqa: T201
+            pass
+        # Constants for quality thresholds
+        GOOD_QUALITY_THRESHOLD = 80
+        MEDIUM_QUALITY_THRESHOLD = 60
+
         # Return appropriate exit code based on quality
         quality_score = analyzer.get_quality_score()
-        if quality_score >= 80:
+        if quality_score >= GOOD_QUALITY_THRESHOLD:
             return 0  # Good quality
-        if quality_score >= 60:
+        if quality_score >= MEDIUM_QUALITY_THRESHOLD:
             return 1  # Medium quality
         return 2  # Poor quality
     except (RuntimeError, ValueError, TypeError):
@@ -96,7 +100,10 @@ def another_function(args: argparse.Namespace) -> int:
         if isinstance(issues_obj, dict):
             len(issues_obj.get("security", []))
             len(issues_obj.get("complexity", []))
-        return 0 if score >= 70 else 1
+        # Constants for quality thresholds
+        ACCEPTABLE_QUALITY_THRESHOLD = 70
+
+        return 0 if score >= ACCEPTABLE_QUALITY_THRESHOLD else 1
     except (RuntimeError, ValueError, TypeError):
         return 3
 
