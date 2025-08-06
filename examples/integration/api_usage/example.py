@@ -28,7 +28,7 @@ from flext_quality.application.services import (
 
 # Import FLEXT core patterns
 try:
-    from flext_core import FlextResult, get_logger
+    from flext_core import get_logger
 
     FLEXT_CORE_AVAILABLE = True
 except ImportError:

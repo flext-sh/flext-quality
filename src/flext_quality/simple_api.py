@@ -28,7 +28,7 @@ if TYPE_CHECKING:
     )
 else:
     # Runtime imports for isinstance checks
-    from flext_quality.domain.entities import QualityAnalysis  # noqa: TC001
+    pass
 
 
 class QualityAPI:

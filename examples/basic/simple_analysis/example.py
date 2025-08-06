@@ -82,9 +82,12 @@ def analyze_project(project_path: str) -> None:
 
         # Show sample files (first 5)
         if python_files:
-            for _i, _file_path in enumerate(python_files[:5]):
+            # Constants for display limits
+            MAX_FILES_TO_SHOW = 5
+
+            for _i, _file_path in enumerate(python_files[:MAX_FILES_TO_SHOW]):
                 pass
-            if len(python_files) > 5:
+            if len(python_files) > MAX_FILES_TO_SHOW:
                 pass
 
         # Calculate quality score and grade - DEMONSTRATE ALL SCORING
@@ -119,14 +122,14 @@ def analyze_project(project_path: str) -> None:
                     pass
                 else:
                     # Show detailed information for each issue
-                    for _i, issue in enumerate(issue_list[:5]):  # Show first 5 issues
+                    for _i, issue in enumerate(issue_list[:MAX_FILES_TO_SHOW]):  # Show first 5 issues
                         if isinstance(issue, dict):
                             issue.get("file", "unknown")
                             issue.get("message", "No description")
                             issue.get("severity", "unknown")
                             issue.get("line", "")
 
-                    if len(issue_list) > 5:
+                    if len(issue_list) > MAX_FILES_TO_SHOW:
                         pass
 
         # DEMONSTRATE REPORT GENERATION - ALL FORMATS
@@ -146,7 +149,7 @@ def analyze_project(project_path: str) -> None:
 
             # Show sample of JSON report structure
             sample_data = json.loads(json_report)
-            for _key in list(sample_data.keys())[:5]:
+            for _key in list(sample_data.keys())[:MAX_FILES_TO_SHOW]:
                 pass
 
         except Exception:
@@ -155,8 +158,15 @@ def analyze_project(project_path: str) -> None:
         # COMPREHENSIVE RECOMMENDATIONS - demonstrate all recommendation logic
         print_section("💡 Comprehensive Recommendations")
 
+        # Constants for score thresholds
+        EXCELLENT_SCORE = 95
+        VERY_GOOD_SCORE = 90
+        GOOD_SCORE = 80
+        ACCEPTABLE_SCORE = 70
+        MINIMUM_SCORE = 60
+
         # Score-based recommendations
-        if score >= 95 or score >= 90 or score >= 80 or score >= 70 or score >= 60:
+        if score >= EXCELLENT_SCORE or score >= VERY_GOOD_SCORE or score >= GOOD_SCORE or score >= ACCEPTABLE_SCORE or score >= MINIMUM_SCORE:
             pass
 
         # Category-specific recommendations with actionable advice

@@ -185,6 +185,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     ordering: ClassVar[list[str]] = ["-updated_at"]
 
     def get_queryset(self) -> object:
+        """Return the queryset for this view."""
         return Project.objects.all()
 
     def get_serializer_class(self) -> object:
