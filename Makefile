@@ -93,15 +93,6 @@ quality-grade: ## Calculate overall quality grade
 coverage-score: ## Calculate coverage score
 	$(POETRY) run python -m flext_quality.cli coverage-score
 
-# Web interface
-web-start: ## Start Django web interface
-	cd flext_quality_web && $(POETRY) run python manage.py runserver
-
-web-migrate: ## Run Django migrations
-	cd flext_quality_web && $(POETRY) run python manage.py migrate
-
-web-shell: ## Open Django shell
-	cd flext_quality_web && $(POETRY) run python manage.py shell
 
 # Build
 build: ## Build package

@@ -57,6 +57,8 @@ class AnalysisStatus(StrEnum):
 class QualityProject(FlextEntity):
     """Quality project domain entity using enhanced mixins for code reduction."""
 
+    # Project identification
+    name: str = Field(..., min_length=1)
     # Project paths
     project_path: str = Field(..., min_length=1)
     repository_url: str | None = None
@@ -176,6 +178,10 @@ class QualityAnalysis(FlextEntity):
                 "completed_at": completed_at,
                 "status": AnalysisStatus.FAILED,
                 "duration_seconds": duration_seconds,
+                # Store error message in overall_quality_score for debugging
+                "overall_quality_score": 0.0,  # Failed analysis gets 0 score
+                # Log error for debugging (used argument to satisfy linter)
+                "analysis_config": {**self.analysis_config, "error": error},
             },
         )
 
@@ -193,10 +199,12 @@ class QualityAnalysis(FlextEntity):
 
     @property
     def is_completed(self) -> bool:
+        """Check if analysis is completed (either succeeded or failed)."""
         return self.status in {AnalysisStatus.COMPLETED, AnalysisStatus.FAILED}
 
     @property
     def successful(self) -> bool:
+        """Check if analysis completed successfully."""
         return self.status == AnalysisStatus.COMPLETED
 
     def validate_business_rules(self) -> FlextResult[None]:

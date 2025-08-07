@@ -122,20 +122,53 @@ class ReportGeneratorService(ABC):
         analysis_results: dict[str, object],
         output_format: str = "html",
         output_path: Path | None = None,
-    ) -> FlextResult[str]: ...
+    ) -> FlextResult[str]:
+        """Generate quality report from analysis results.
+
+        Args:
+            analysis_results: Dictionary containing analysis results
+            output_format: Format for the report (default: html)
+            output_path: Optional path to save the report
+
+        Returns:
+            FlextResult containing the generated report content or error
+
+        """
+        ...
 
     @abstractmethod
     async def generate_summary(
         self,
         analysis_results: dict[str, object],
-    ) -> FlextResult[dict[str, object]]: ...
+    ) -> FlextResult[dict[str, object]]:
+        """Generate summary from analysis results.
+
+        Args:
+            analysis_results: Dictionary containing analysis results
+
+        Returns:
+            FlextResult containing the generated summary or error
+
+        """
+        ...
 
     @abstractmethod
     async def export_metrics(
         self,
         analysis_results: dict[str, object],
         output_format: str = "json",
-    ) -> FlextResult[str]: ...
+    ) -> FlextResult[str]:
+        """Export analysis metrics in specified format.
+
+        Args:
+            analysis_results: Dictionary containing analysis results
+            output_format: Export format (default: json)
+
+        Returns:
+            FlextResult containing the exported metrics or error
+
+        """
+        ...
 
 
 class ComplexityAnalyzerService(ABC):
@@ -146,19 +179,50 @@ class ComplexityAnalyzerService(ABC):
         self,
         project_path: Path,
         threshold: int = 10,
-    ) -> FlextResult[list[dict[str, object]]]: ...
+    ) -> FlextResult[list[dict[str, object]]]:
+        """Analyze code complexity in project.
+
+        Args:
+            project_path: Path to the project directory
+            threshold: Complexity threshold for reporting (default: 10)
+
+        Returns:
+            FlextResult containing list of complexity issues or error
+
+        """
+        ...
 
     @abstractmethod
     async def calculate_cyclomatic_complexity(
         self,
         file_path: Path,
-    ) -> FlextResult[dict[str, int]]: ...
+    ) -> FlextResult[dict[str, int]]:
+        """Calculate cyclomatic complexity for file.
+
+        Args:
+            file_path: Path to the Python file
+
+        Returns:
+            FlextResult containing complexity metrics or error
+
+        """
+        ...
 
     @abstractmethod
     async def calculate_cognitive_complexity(
         self,
         file_path: Path,
-    ) -> FlextResult[dict[str, int]]: ...
+    ) -> FlextResult[dict[str, int]]:
+        """Calculate cognitive complexity for file.
+
+        Args:
+            file_path: Path to the Python file
+
+        Returns:
+            FlextResult containing cognitive complexity metrics or error
+
+        """
+        ...
 
 
 class DeadCodeDetectorService(ABC):
@@ -168,19 +232,49 @@ class DeadCodeDetectorService(ABC):
     async def detect_dead_code(
         self,
         project_path: Path,
-    ) -> FlextResult[list[dict[str, object]]]: ...
+    ) -> FlextResult[list[dict[str, object]]]:
+        """Detect dead code in project.
+
+        Args:
+            project_path: Path to the project directory
+
+        Returns:
+            FlextResult containing list of dead code instances or error
+
+        """
+        ...
 
     @abstractmethod
     async def find_unused_imports(
         self,
         file_path: Path,
-    ) -> FlextResult[list[str]]: ...
+    ) -> FlextResult[list[str]]:
+        """Find unused imports in file.
+
+        Args:
+            file_path: Path to the Python file
+
+        Returns:
+            FlextResult containing list of unused import names or error
+
+        """
+        ...
 
     @abstractmethod
     async def find_unused_variables(
         self,
         file_path: Path,
-    ) -> FlextResult[list[dict[str, object]]]: ...
+    ) -> FlextResult[list[dict[str, object]]]:
+        """Find unused variables in file.
+
+        Args:
+            file_path: Path to the Python file
+
+        Returns:
+            FlextResult containing list of unused variable information or error
+
+        """
+        ...
 
 
 class DuplicateDetectorService(ABC):
@@ -192,20 +286,53 @@ class DuplicateDetectorService(ABC):
         project_path: Path,
         min_lines: int = 5,
         similarity_threshold: float = 0.8,
-    ) -> FlextResult[list[dict[str, object]]]: ...
+    ) -> FlextResult[list[dict[str, object]]]:
+        """Detect duplicate code blocks in project.
+
+        Args:
+            project_path: Path to the project directory
+            min_lines: Minimum lines for duplication detection (default: 5)
+            similarity_threshold: Similarity threshold for detection (default: 0.8)
+
+        Returns:
+            FlextResult containing list of duplicate code blocks or error
+
+        """
+        ...
 
     @abstractmethod
     async def find_similar_functions(
         self,
         project_path: Path,
         similarity_threshold: float = 0.8,
-    ) -> FlextResult[list[dict[str, object]]]: ...
+    ) -> FlextResult[list[dict[str, object]]]:
+        """Find similar functions in project.
+
+        Args:
+            project_path: Path to the project directory
+            similarity_threshold: Similarity threshold for detection (default: 0.8)
+
+        Returns:
+            FlextResult containing list of similar function pairs or error
+
+        """
+        ...
 
     @abstractmethod
     async def calculate_duplication_ratio(
         self,
         project_path: Path,
-    ) -> FlextResult[float]: ...
+    ) -> FlextResult[float]:
+        """Calculate code duplication ratio for project.
+
+        Args:
+            project_path: Path to the project directory
+
+        Returns:
+            FlextResult containing the duplication ratio or error
+
+        """
+        ...
 
 
 class MetricsCollectorService(ABC):
@@ -215,16 +342,46 @@ class MetricsCollectorService(ABC):
     async def collect_metrics(
         self,
         project_path: Path,
-    ) -> FlextResult[dict[str, object]]: ...
+    ) -> FlextResult[dict[str, object]]:
+        """Collect comprehensive quality metrics for project.
+
+        Args:
+            project_path: Path to the project directory
+
+        Returns:
+            FlextResult containing metrics dictionary or error
+
+        """
+        ...
 
     @abstractmethod
     async def calculate_maintainability_index(
         self,
         project_path: Path,
-    ) -> FlextResult[float]: ...
+    ) -> FlextResult[float]:
+        """Calculate maintainability index for project.
+
+        Args:
+            project_path: Path to the project directory
+
+        Returns:
+            FlextResult containing the maintainability index or error
+
+        """
+        ...
 
     @abstractmethod
     async def calculate_technical_debt(
         self,
         project_path: Path,
-    ) -> FlextResult[dict[str, object]]: ...
+    ) -> FlextResult[dict[str, object]]:
+        """Calculate technical debt metrics for project.
+
+        Args:
+            project_path: Path to the project directory
+
+        Returns:
+            FlextResult containing technical debt metrics or error
+
+        """
+        ...

@@ -17,8 +17,29 @@ from flext_quality.reports import QualityReport
 
 
 def setup_logging(level: str = "INFO") -> None:
+    """Setup logging configuration.
+
+    Args:
+        level: Logging level to set (default: INFO)
+
+    """
     # Logging is now handled by flext-infrastructure.monitoring.flext-observability
-    pass
+
+
+def run_web_server(args: argparse.Namespace) -> int:
+    """Run quality web interface server."""
+    try:
+        from flext_quality.web_interface import QualityWebInterface
+
+        interface = QualityWebInterface()
+        interface.run(host=args.host, port=args.port, debug=args.debug)
+        return 0
+    except KeyboardInterrupt:
+        return 0
+    except Exception:
+        if args.verbose:
+            traceback.print_exc()
+        return 1
 
 
 def analyze_project(args: argparse.Namespace) -> int:
@@ -56,25 +77,35 @@ def analyze_project(args: argparse.Namespace) -> int:
             output_path = Path(args.output)
             report.save_report(output_path, args.format)
         elif args.format == "json":
-            # Print JSON to stdout
-            pass
+            # Write JSON to stdout explicitly for CLI output
+            import sys
+            sys.stdout.write(report.to_json() + "\n")
         elif args.format == "html":
-            # Print HTML to stdout
-            pass
+            # Write HTML to stdout explicitly for CLI output
+            import sys
+            sys.stdout.write(report.to_html() + "\n")
         # Constants for quality thresholds
-        GOOD_QUALITY_THRESHOLD = 80
-        MEDIUM_QUALITY_THRESHOLD = 60
+        good_quality_threshold = 80
+        medium_quality_threshold = 60
 
         # Return appropriate exit code based on quality
         quality_score = analyzer.get_quality_score()
-        if quality_score >= GOOD_QUALITY_THRESHOLD:
+        if quality_score >= good_quality_threshold:
             return 0  # Good quality
-        if quality_score >= MEDIUM_QUALITY_THRESHOLD:
+        if quality_score >= medium_quality_threshold:
             return 1  # Medium quality
         return 2  # Poor quality
-    except (RuntimeError, ValueError, TypeError):
+    except (RuntimeError, ValueError, TypeError) as e:
+        from flext_core import get_logger
+
+        logger = get_logger(__name__)
+        # EXPLICIT TRANSPARENCY: CLI function must return exit code for process management
+        logger.exception(f"Quality analysis failed with specific error: {e}")
+        logger.exception("Returning exit code 3 to indicate analysis failure")
         if args.verbose:
+            logger.info("Verbose mode enabled - showing full traceback")
             traceback.print_exc()
+        # Return 3 to indicate analysis error (distinct from quality scores 0,1,2)
         return 3
 
 
@@ -101,14 +132,32 @@ def another_function(args: argparse.Namespace) -> int:
             len(issues_obj.get("security", []))
             len(issues_obj.get("complexity", []))
         # Constants for quality thresholds
-        ACCEPTABLE_QUALITY_THRESHOLD = 70
+        acceptable_quality_threshold = 70
 
-        return 0 if score >= ACCEPTABLE_QUALITY_THRESHOLD else 1
-    except (RuntimeError, ValueError, TypeError):
+        return 0 if score >= acceptable_quality_threshold else 1
+    except (RuntimeError, ValueError, TypeError) as e:
+        from flext_core import get_logger
+
+        logger = get_logger(__name__)
+        # EXPLICIT TRANSPARENCY: CLI function returning exit code for threshold evaluation
+        logger.exception(f"Quality threshold evaluation failed with error: {e}")
+        logger.exception(
+            "Cannot determine quality threshold - returning exit code 3 for evaluation failure",
+        )
+        logger.info(
+            "Exit code meanings: 0=acceptable quality, 1=below threshold, 3=evaluation error",
+        )
+        # Return 3 to indicate evaluation error (not quality level)
         return 3
 
 
 def main() -> int:
+    """Main CLI entry point.
+
+    Returns:
+        Exit code: 0=success, 1=quality below threshold, 3=error
+
+    """
     parser = argparse.ArgumentParser(
         description="FLEXT Quality - Enterprise Code Quality Analysis",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -182,6 +231,18 @@ Examples:
     score_parser = subparsers.add_parser("score", help="Get quick quality score")
     score_parser.add_argument("path", help="Path to the project to analyze")
     score_parser.set_defaults(func=another_function)
+
+    # Web server command
+    web_parser = subparsers.add_parser("web", help="Run quality web interface")
+    web_parser.add_argument(
+        "--host", default="localhost", help="Host to bind to (default: localhost)",
+    )
+    web_parser.add_argument(
+        "--port", type=int, default=8080, help="Port to bind to (default: 8080)",
+    )
+    web_parser.add_argument("--debug", action="store_true", help="Enable debug mode")
+    web_parser.set_defaults(func=run_web_server)
+
     # Parse arguments
     args = parser.parse_args()
     # Setup logging
