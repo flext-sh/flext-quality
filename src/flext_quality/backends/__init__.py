@@ -6,26 +6,26 @@ Each backend can provide different analysis capabilities.
 
 from __future__ import annotations
 
-from analyzer.backends.ast_backend import ASTBackend
-from analyzer.backends.base import (
-    AnalysisBackend,
-    AnalysisResult,
+from flext_quality.backends.ast_backend import ASTBackend
+from flext_quality.backends.base import (
+    BackendType,
+    BaseAnalyzer,
 )
-from analyzer.backends.external_backend import (
-    ExternalToolsBackend,
+from flext_quality.backends.external_backend import (
+    ExternalBackend,
 )
 
 # Registry of available backends
-AVAILABLE_BACKENDS: dict[str, type[AnalysisBackend]] = {
+AVAILABLE_BACKENDS: dict[str, type[BaseAnalyzer]] = {
     "ast": ASTBackend,
-    "external": ExternalToolsBackend,
+    "external": ExternalBackend,
 }
 
 # Default backend configuration
 DEFAULT_BACKENDS = ["ast", "external"]
 
 
-def get_backend(name: str) -> type[AnalysisBackend]:
+def get_backend(name: str) -> type[BaseAnalyzer]:
     """Get a backend by name."""
     if name not in AVAILABLE_BACKENDS:
         msg = (
@@ -35,12 +35,12 @@ def get_backend(name: str) -> type[AnalysisBackend]:
     return AVAILABLE_BACKENDS[name]
 
 
-def get_all_backends() -> list[type[AnalysisBackend]]:
+def get_all_backends() -> list[type[BaseAnalyzer]]:
     """Get all available backends."""
     return list(AVAILABLE_BACKENDS.values())
 
 
-def get_default_backends() -> list[type[AnalysisBackend]]:
+def get_default_backends() -> list[type[BaseAnalyzer]]:
     """Get the default backends."""
     return [AVAILABLE_BACKENDS[name] for name in DEFAULT_BACKENDS]
 
@@ -48,10 +48,9 @@ def get_default_backends() -> list[type[AnalysisBackend]]:
 __all__: list[str] = [
     "AVAILABLE_BACKENDS",
     "ASTBackend",
-    "AnalysisBackend",
-    "AnalysisResult",
-    "ExternalToolsBackend",
-    "QualityBackend",
+    "BackendType",
+    "BaseAnalyzer",
+    "ExternalBackend",
     "get_all_backends",
     "get_backend",
     "get_default_backends",

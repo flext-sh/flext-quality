@@ -311,6 +311,9 @@ class CodeAnalyzer:
                 }
 
             except SyntaxError as e:
+                from flext_core import get_logger
+
+                logger = get_logger(__name__)
                 logger.warning("Syntax error in %s: %s", file_path, e)
                 # Handle file paths that may be outside project directory
                 try:
@@ -331,6 +334,10 @@ class CodeAnalyzer:
                     "syntax_error": str(e),
                 }
         except (RuntimeError, ValueError, TypeError, FileNotFoundError, OSError) as e:
+            from flext_core import get_logger
+
+            logger = get_logger(__name__)
+            logger.exception(f"File analysis failed for {file_path}: {e}")
             logger.exception("Error analyzing file %s: %s", file_path, e)
             return None
 

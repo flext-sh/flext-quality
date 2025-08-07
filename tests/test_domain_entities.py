@@ -26,6 +26,7 @@ class TestQualityProject:
         """Test basic project creation."""
         project = QualityProject(
             id="test-project-id",
+            name="Test Project",
             project_path=secure_temp_dir,
             repository_url="https://github.com/test/repo",
             language="python",
@@ -42,6 +43,7 @@ class TestQualityProject:
         """Test successful project validation."""
         project = QualityProject(
             id="test-id",
+            name="Test Project",
             project_path=secure_temp_dir,
         )
 
@@ -61,6 +63,7 @@ class TestQualityProject:
         """Test updating last analysis timestamp."""
         project = QualityProject(
             id="test-id",
+            name="Test Project",
             project_path=secure_temp_dir,
         )
 

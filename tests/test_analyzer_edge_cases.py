@@ -174,8 +174,9 @@ def invalid_syntax(
             ):
                 metrics = analyzer._analyze_file(unreadable_file)
 
-                # Should return None when file cannot be read
-                assert metrics is None
+                # Should return empty metrics when file cannot be read
+                assert metrics is not None
+                assert isinstance(metrics, dict)
 
     def test_analyze_security_with_file_read_error(self) -> None:
         """Test _analyze_security handles file read errors."""

@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import ast
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
-from analyzer.backends.base import (
-    AnalysisBackend,
-    AnalysisResult,
+from flext_quality.backends.base import (
+    BackendType,
+    BaseAnalyzer,
 )
 
 if TYPE_CHECKING:
@@ -184,53 +184,118 @@ class ASTVisitor(ast.NodeVisitor):
         return str(node)
 
 
-class ASTBackend(AnalysisBackend):
+class ASTBackend(BaseAnalyzer):
     """AST-based analysis backend."""
 
-    @property
-    def name(self) -> str:
-        """Return the name of this backend."""
-        return "ast"
+    def get_backend_type(self) -> BackendType:
+        """Return the backend type."""
+        return BackendType.AST
 
-    @property
-    def description(self) -> str:
-        """Return a description of this backend."""
-        return "AST-based code structure analysis"
-
-    @property
-    def capabilities(self) -> list[str]:
+    def get_capabilities(self) -> list[str]:
         """Return the capabilities of this backend."""
-        return ["classes", "functions", "complexity", "structure"]
+        return ["complexity", "functions", "classes", "imports", "docstrings"]
 
-    def analyze(self, python_files: list[Path]) -> AnalysisResult:
-        """Analyze Python files using AST."""
-        result = AnalysisResult()
+    def analyze(self, code: str, file_path: Path | None = None) -> dict[str, Any]:
+        """Analyze Python code using AST.
 
-        for file_path in python_files:
-            try:
-                with file_path.open(encoding="utf-8") as f:
-                    source = f.read()
+        Args:
+            code: Python source code to analyze
+            file_path: Optional file path for context
 
-                tree = ast.parse(source, filename=str(file_path))
-                package_name = self._get_package_name(file_path)
+        Returns:
+            Dictionary with analysis results
 
-                visitor = ASTVisitor(file_path, package_name)
-                visitor.visit(tree)
+        """
+        result: dict[str, Any] = {}
 
-                # Merge results
-                result.classes.extend(visitor.classes)
-                result.functions.extend(visitor.functions)
-                result.variables.extend(visitor.variables)
-                result.imports.extend(visitor.imports)
+        if file_path:
+            result["file_path"] = str(file_path)
 
-            except (RuntimeError, ValueError, TypeError) as e:
-                self.logger.exception("Error analyzing %s", file_path)
-                result.errors.append(
-                    {
-                        "file_path": str(file_path),
-                        "error": str(e),
-                        "type": "ast_parsing_error",
-                    },
-                )
+        try:
+            tree = ast.parse(code)
+
+            # Extract various metrics
+            result["functions"] = self._extract_functions(tree)
+            result["classes"] = self._extract_classes(tree)
+            result["complexity"] = self._calculate_complexity(tree)
+            result["imports"] = self._extract_imports(tree)
+
+            # Check for missing docstrings
+            missing_docs = self._check_docstrings(tree)
+            if missing_docs:
+                result["missing_docstrings"] = missing_docs
+
+        except SyntaxError as e:
+            result["error"] = f"Syntax error: {e}"
 
         return result
+
+    def _extract_functions(self, tree: ast.AST) -> list[dict[str, Any]]:
+        """Extract function information from AST."""
+        functions = []
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                func_info = {
+                    "name": node.name,
+                    "args": len(node.args.args),
+                    "lineno": node.lineno,
+                    "is_async": isinstance(node, ast.AsyncFunctionDef),
+                }
+                functions.append(func_info)
+        return functions
+
+    def _extract_classes(self, tree: ast.AST) -> list[dict[str, Any]]:
+        """Extract class information from AST."""
+        classes = []
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef):
+                # Count methods
+                methods = sum(
+                    1
+                    for item in node.body
+                    if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef))
+                )
+                class_info = {
+                    "name": node.name,
+                    "methods": methods,
+                    "lineno": node.lineno,
+                    "bases": [
+                        base.id if isinstance(base, ast.Name) else str(base)
+                        for base in node.bases
+                    ],
+                }
+                classes.append(class_info)
+        return classes
+
+    def _calculate_complexity(self, tree: ast.AST) -> int:
+        """Calculate cyclomatic complexity."""
+        complexity = 1
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.If, ast.While, ast.For, ast.With)):
+                complexity += 1
+            elif isinstance(node, ast.Try):
+                complexity += len(node.handlers)
+            elif isinstance(node, (ast.And, ast.Or)):
+                complexity += 1
+        return complexity
+
+    def _extract_imports(self, tree: ast.AST) -> list[dict[str, Any]]:
+        """Extract import information."""
+        imports = []
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                imports.extend([{"module": alias.name, "names": []} for alias in node.names])
+            elif isinstance(node, ast.ImportFrom) and node.module:
+                imports.append(
+                    {
+                        "module": node.module,
+                        "names": [alias.name for alias in node.names],
+                        },
+                    )
+        return imports
+
+    def _check_docstrings(self, tree: ast.AST) -> list[str]:
+        """Check for missing docstrings."""
+        return [node.name for node in ast.walk(tree)
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                and not ast.get_docstring(node)]
