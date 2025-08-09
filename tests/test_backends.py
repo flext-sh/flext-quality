@@ -35,7 +35,7 @@ class TestBaseAnalyzer:
     def test_base_analyzer_abstract(self) -> None:
         """Test BaseAnalyzer is abstract and cannot be instantiated."""
         with pytest.raises(TypeError):
-            BaseAnalyzer()  # type: ignore[abstract]
+            BaseAnalyzer()
 
     def test_base_analyzer_concrete_implementation(self) -> None:
         """Test concrete implementation of BaseAnalyzer."""
@@ -390,7 +390,9 @@ class TestExternalBackend:
 
         mock_run.return_value = MagicMock(returncode=0, stdout="[]", stderr="")
 
-        with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".py", delete=False) as f:
+        with tempfile.NamedTemporaryFile(
+            encoding="utf-8", mode="w", suffix=".py", delete=False
+        ) as f:
             f.write("test code")
             temp_path = Path(f.name)
 
@@ -412,7 +414,9 @@ class TestExternalBackend:
             returncode=0, stdout="Success: no issues found", stderr=""
         )
 
-        with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".py", delete=False) as f:
+        with tempfile.NamedTemporaryFile(
+            encoding="utf-8", mode="w", suffix=".py", delete=False
+        ) as f:
             f.write("test code")
             temp_path = Path(f.name)
 
@@ -433,7 +437,9 @@ class TestExternalBackend:
             returncode=0, stdout='{"results": []}', stderr=""
         )
 
-        with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".py", delete=False) as f:
+        with tempfile.NamedTemporaryFile(
+            encoding="utf-8", mode="w", suffix=".py", delete=False
+        ) as f:
             f.write("test code")
             temp_path = Path(f.name)
 
@@ -453,7 +459,9 @@ class TestExternalBackend:
 
         mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
 
-        with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".py", delete=False) as f:
+        with tempfile.NamedTemporaryFile(
+            encoding="utf-8", mode="w", suffix=".py", delete=False
+        ) as f:
             f.write("test code")
             temp_path = Path(f.name)
 

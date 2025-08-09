@@ -65,7 +65,6 @@ ignore = [
 
 [tool.ruff.lint.isort]
 known-first-party = ["flext_quality"]
-
 [tool.mypy]
 # Strict mode - enables all recommended checks
 strict = true
@@ -119,7 +118,7 @@ namespace_packages = true
 mypy_path = ["src"]
 files = ["src", "tests"]
 
-# Plugins - Pydantic only for this project
+# Plugins
 plugins = ["pydantic.mypy"]
 
 # Cache
@@ -138,11 +137,8 @@ warn_incomplete_stub = true
 
 exclude = [
     "__pycache__/",
-    ".*/examples/",
     ".*/generate_config.py",
     ".*/manage.py",
-    ".*/scripts/",
-    ".*/tests/",
     ".coverage.*",
     ".git/",
     ".mypy_cache/",
@@ -154,7 +150,6 @@ exclude = [
     "node_modules/",
     "vendor/",
 ]
-
 [tool.bandit]
 exclude_dirs = ["tests", "build", "dist"]
 skips = ["B101", "B601"]
