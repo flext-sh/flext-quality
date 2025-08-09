@@ -26,7 +26,10 @@ class ExternalBackend(BaseAnalyzer):
         return ["ruff", "mypy", "bandit", "vulture"]
 
     def analyze(
-        self, code: str, file_path: Path | None = None, tool: str = "ruff",
+        self,
+        code: str,
+        file_path: Path | None = None,
+        tool: str = "ruff",
     ) -> dict[str, Any]:
         """Analyze code using external tools.
 
@@ -46,7 +49,9 @@ class ExternalBackend(BaseAnalyzer):
 
         # Create temporary file for analysis
         try:
-            with tempfile.NamedTemporaryFile(encoding="utf-8", mode="w", suffix=".py", delete=False) as f:
+            with tempfile.NamedTemporaryFile(
+                encoding="utf-8", mode="w", suffix=".py", delete=False
+            ) as f:
                 f.write(code)
                 temp_path = Path(f.name)
 
@@ -85,11 +90,12 @@ class ExternalBackend(BaseAnalyzer):
 
             # Use absolute path for ruff to avoid S607
             import shutil
+
             ruff_cmd = shutil.which("ruff")
             if not ruff_cmd:
                 return {"error": "Ruff not found in PATH"}
 
-            result = subprocess.run(  # noqa: S603 # Subprocess needed for external tool integration
+            result = subprocess.run(
                 [ruff_cmd, "check", safe_path, "--output-format", "json"],
                 check=False,
                 capture_output=True,
@@ -113,11 +119,12 @@ class ExternalBackend(BaseAnalyzer):
 
             # Use absolute path for mypy to avoid S607
             import shutil
+
             mypy_cmd = shutil.which("mypy")
             if not mypy_cmd:
                 return {"error": "MyPy not found in PATH"}
 
-            result = subprocess.run(  # noqa: S603 # Subprocess needed for external tool integration
+            result = subprocess.run(
                 [mypy_cmd, safe_path],
                 check=False,
                 capture_output=True,
@@ -141,11 +148,12 @@ class ExternalBackend(BaseAnalyzer):
 
             # Use absolute path for bandit to avoid S607
             import shutil
+
             bandit_cmd = shutil.which("bandit")
             if not bandit_cmd:
                 return {"error": "Bandit not found in PATH"}
 
-            result = subprocess.run(  # noqa: S603 # Subprocess needed for external tool integration
+            result = subprocess.run(
                 [bandit_cmd, "-f", "json", safe_path],
                 check=False,
                 capture_output=True,
@@ -171,11 +179,12 @@ class ExternalBackend(BaseAnalyzer):
 
             # Use absolute path for vulture to avoid S607
             import shutil
+
             vulture_cmd = shutil.which("vulture")
             if not vulture_cmd:
                 return {"error": "Vulture not found in PATH"}
 
-            result = subprocess.run(  # noqa: S603 # Subprocess needed for external tool integration
+            result = subprocess.run(
                 [vulture_cmd, safe_path],
                 check=False,
                 capture_output=True,
@@ -183,7 +192,9 @@ class ExternalBackend(BaseAnalyzer):
                 timeout=10,
             )
 
-            dead_code = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+            dead_code = [
+                line.strip() for line in result.stdout.splitlines() if line.strip()
+            ]
 
             return {"dead_code": dead_code, "code_length": len(code)}
 
@@ -201,4 +212,8 @@ class ExternalBackend(BaseAnalyzer):
 
     def _parse_mypy_output(self, output: str) -> list[dict[str, Any]]:
         """Parse mypy text output."""
-        return [{"message": line.strip()} for line in output.splitlines() if "error:" in line or "warning:" in line]
+        return [
+            {"message": line.strip()}
+            for line in output.splitlines()
+            if "error:" in line or "warning:" in line
+        ]

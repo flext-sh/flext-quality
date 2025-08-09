@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from flext_core import FlextBaseSettings
+from flext_core import FlextSettings
 
 
-class QualityConfig(FlextBaseSettings):
+class QualityConfig(FlextSettings):
     """Quality service configuration using flext-core patterns."""
 
     # Analysis settings
