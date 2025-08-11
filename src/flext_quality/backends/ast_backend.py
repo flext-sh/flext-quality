@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import ast
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from flext_quality.backends.base import (
     BackendType,
@@ -195,7 +195,7 @@ class ASTBackend(BaseAnalyzer):
         """Return the capabilities of this backend."""
         return ["complexity", "functions", "classes", "imports", "docstrings"]
 
-    def analyze(self, code: str, file_path: Path | None = None) -> dict[str, Any]:
+    def analyze(self, code: str, file_path: Path | None = None) -> dict[str, object]:
         """Analyze Python code using AST.
 
         Args:
@@ -206,7 +206,7 @@ class ASTBackend(BaseAnalyzer):
             Dictionary with analysis results
 
         """
-        result: dict[str, Any] = {}
+        result: dict[str, object] = {}
 
         if file_path:
             result["file_path"] = str(file_path)
@@ -230,7 +230,7 @@ class ASTBackend(BaseAnalyzer):
 
         return result
 
-    def _extract_functions(self, tree: ast.AST) -> list[dict[str, Any]]:
+    def _extract_functions(self, tree: ast.AST) -> list[dict[str, object]]:
         """Extract function information from AST."""
         functions = []
         for node in ast.walk(tree):
@@ -244,7 +244,7 @@ class ASTBackend(BaseAnalyzer):
                 functions.append(func_info)
         return functions
 
-    def _extract_classes(self, tree: ast.AST) -> list[dict[str, Any]]:
+    def _extract_classes(self, tree: ast.AST) -> list[dict[str, object]]:
         """Extract class information from AST."""
         classes = []
         for node in ast.walk(tree):
@@ -279,7 +279,7 @@ class ASTBackend(BaseAnalyzer):
                 complexity += 1
         return complexity
 
-    def _extract_imports(self, tree: ast.AST) -> list[dict[str, Any]]:
+    def _extract_imports(self, tree: ast.AST) -> list[dict[str, object]]:
         """Extract import information."""
         imports = []
         for node in ast.walk(tree):

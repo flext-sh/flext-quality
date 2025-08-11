@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -22,7 +22,7 @@ class BaseAnalyzer(ABC):
     """Abstract base class for code analyzers."""
 
     @abstractmethod
-    def analyze(self, code: str, file_path: Path | None = None) -> dict[str, Any]:
+    def analyze(self, code: str, file_path: Path | None = None) -> dict[str, object]:
         """Analyze code and return results.
 
         Args:
