@@ -10,7 +10,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from enum import StrEnum
 
-from flext_core import FlextEntity, FlextResult, TConfigDict
+from flext_core import FlextEntity, FlextResult, FlextTypes
 from pydantic import BaseModel, Field
 
 
@@ -138,7 +138,7 @@ class QualityAnalysis(FlextEntity):
     status: AnalysisStatus = Field(default=AnalysisStatus.QUEUED)
 
     # Analysis data
-    analysis_config: TConfigDict = Field(default_factory=dict)
+    analysis_config: FlextTypes.Core.JsonDict = Field(default_factory=dict)
 
     def start_analysis(self) -> QualityAnalysis:
         """Start analysis and return new instance."""

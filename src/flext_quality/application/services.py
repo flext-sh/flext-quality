@@ -7,7 +7,7 @@ REFACTORED:
 
 from __future__ import annotations
 
-from flext_core import FlextResult, TConfigDict
+from flext_core import FlextResult, FlextTypes
 
 from flext_quality.domain.entities import (
     AnalysisStatus,
@@ -173,7 +173,7 @@ class QualityAnalysisService:
         commit_hash: str | None = None,
         branch: str | None = None,
         pull_request_id: str | None = None,
-        analysis_config: TConfigDict | None = None,
+        analysis_config: FlextTypes.Core.JsonDict | None = None,
     ) -> FlextResult[QualityAnalysis]:
         """Create a new quality analysis.
 

@@ -109,8 +109,8 @@ def analyze_project(args: argparse.Namespace) -> int:
         return 3
 
 
-def another_function(args: argparse.Namespace) -> int:
-    """Another function."""
+def score_project(args: argparse.Namespace) -> int:
+    """Get quick quality score for project."""
     try:
         project_path = Path(args.path).resolve()
         if not project_path.exists():
@@ -124,13 +124,20 @@ def another_function(args: argparse.Namespace) -> int:
             include_duplicates=False,  # Skip for speed
         )
         score = analyzer.get_quality_score()
-        analyzer.get_quality_grade()
-        # Show results
-        # Show issue counts with proper type casting
+        grade = analyzer.get_quality_grade()
+
+        # Show results (print to stdout for CLI usage)
+        print(f"Quality Score: {score:.1f}")
+        print(f"Quality Grade: {grade}")
+
+        # Show issue counts
         issues_obj = results.get("issues", {})
         if isinstance(issues_obj, dict):
-            len(issues_obj.get("security", []))
-            len(issues_obj.get("complexity", []))
+            security_count = len(issues_obj.get("security", []))
+            complexity_count = len(issues_obj.get("complexity", []))
+            print(f"Security Issues: {security_count}")
+            print(f"Complexity Issues: {complexity_count}")
+
         # Constants for quality thresholds
         acceptable_quality_threshold = 70
 
@@ -139,15 +146,7 @@ def another_function(args: argparse.Namespace) -> int:
         from flext_core import get_logger
 
         logger = get_logger(__name__)
-        # EXPLICIT TRANSPARENCY: CLI function returning exit code for threshold evaluation
-        logger.exception(f"Quality threshold evaluation failed with error: {e}")
-        logger.exception(
-            "Cannot determine quality threshold - returning exit code 3 for evaluation failure",
-        )
-        logger.info(
-            "Exit code meanings: 0=acceptable quality, 1=below threshold, 3=evaluation error",
-        )
-        # Return 3 to indicate evaluation error (not quality level)
+        logger.exception(f"Quality score calculation failed: {e}")
         return 3
 
 
@@ -230,7 +229,7 @@ Examples:
     # Score command
     score_parser = subparsers.add_parser("score", help="Get quick quality score")
     score_parser.add_argument("path", help="Path to the project to analyze")
-    score_parser.set_defaults(func=another_function)
+    score_parser.set_defaults(func=score_project)
 
     # Web server command
     web_parser = subparsers.add_parser("web", help="Run quality web interface")

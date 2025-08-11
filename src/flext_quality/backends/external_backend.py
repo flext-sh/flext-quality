@@ -30,7 +30,7 @@ class ExternalBackend(BaseAnalyzer):
         code: str,
         file_path: Path | None = None,
         tool: str = "ruff",
-    ) -> dict[str, Any]:
+    ) -> dict[str, object]:
         """Analyze code using external tools.
 
         Args:
@@ -42,7 +42,7 @@ class ExternalBackend(BaseAnalyzer):
             Dictionary with analysis results
 
         """
-        result: dict[str, Any] = {"tool": tool}
+        result: dict[str, object] = {"tool": tool}
 
         if file_path:
             result["file_path"] = str(file_path)
@@ -80,7 +80,7 @@ class ExternalBackend(BaseAnalyzer):
 
         return result
 
-    def _run_ruff(self, code: str, file_path: Path) -> dict[str, Any]:
+    def _run_ruff(self, code: str, file_path: Path) -> dict[str, object]:
         """Run ruff linter."""
         try:
             # Validate file path is safe (no shell injection)
@@ -109,7 +109,7 @@ class ExternalBackend(BaseAnalyzer):
         except Exception as e:
             return {"error": str(e)}
 
-    def _run_mypy(self, code: str, file_path: Path) -> dict[str, Any]:
+    def _run_mypy(self, code: str, file_path: Path) -> dict[str, object]:
         """Run mypy type checker."""
         try:
             # Validate file path is safe (no shell injection)
@@ -138,7 +138,7 @@ class ExternalBackend(BaseAnalyzer):
         except Exception as e:
             return {"error": str(e)}
 
-    def _run_bandit(self, code: str, file_path: Path) -> dict[str, Any]:
+    def _run_bandit(self, code: str, file_path: Path) -> dict[str, object]:
         """Run bandit security scanner."""
         try:
             # Validate file path is safe (no shell injection)
@@ -169,7 +169,7 @@ class ExternalBackend(BaseAnalyzer):
         except Exception as e:
             return {"error": str(e)}
 
-    def _run_vulture(self, code: str, file_path: Path) -> dict[str, Any]:
+    def _run_vulture(self, code: str, file_path: Path) -> dict[str, object]:
         """Run vulture dead code detector."""
         try:
             # Validate file path is safe (no shell injection)
@@ -201,16 +201,16 @@ class ExternalBackend(BaseAnalyzer):
         except Exception as e:
             return {"error": str(e)}
 
-    def _parse_ruff_output(self, output: str) -> list[dict[str, Any]]:
+    def _parse_ruff_output(self, output: str) -> list[dict[str, object]]:
         """Parse ruff JSON output."""
         try:
             if output.strip():
-                return json.loads(output)
+                return json.loads(output)  # type: ignore[no-any-return]
             return []
         except json.JSONDecodeError:
             return []
 
-    def _parse_mypy_output(self, output: str) -> list[dict[str, Any]]:
+    def _parse_mypy_output(self, output: str) -> list[dict[str, object]]:
         """Parse mypy text output."""
         return [
             {"message": line.strip()}
