@@ -154,7 +154,7 @@ class QualityProjectService:
         try:
             if project_id in self._projects:
                 del self._projects[project_id]
-                return FlextResult.ok(True)
+                return FlextResult.ok(data=True)
             return FlextResult.fail("Project not found")
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to delete project: {e}")
@@ -739,7 +739,7 @@ class QualityReportService:
         try:
             if report_id in self._reports:
                 del self._reports[report_id]
-                return FlextResult.ok(True)
+                return FlextResult.ok(data=True)
             return FlextResult.fail("Report not found")
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to delete report: {e}")
@@ -797,7 +797,7 @@ class SecurityAnalyzerServiceImpl(BasePortService):
 
             # Read project files and analyze with bandit
             project_path_obj = Path(project_path)
-            security_issues = []
+            security_issues: list[dict[str, object]] = []
 
             if project_path_obj.exists():
                 # For each Python file, run security analysis
@@ -805,7 +805,7 @@ class SecurityAnalyzerServiceImpl(BasePortService):
                     try:
                         code = py_file.read_text(encoding="utf-8")
                         result = backend.analyze(code, py_file, tool="bandit")
-                        if "issues" in result:
+                        if "issues" in result and isinstance(result["issues"], list):
                             security_issues.extend(result["issues"])
                     except (OSError, UnicodeDecodeError):
                         # Skip files that can't be read
@@ -836,7 +836,7 @@ class LintingServiceImpl(BasePortService):
 
             # Read project files and analyze with ruff
             project_path_obj = Path(project_path)
-            linting_issues = []
+            linting_issues: list[dict[str, object]] = []
 
             if project_path_obj.exists():
                 # For each Python file, run linting analysis
@@ -844,7 +844,7 @@ class LintingServiceImpl(BasePortService):
                     try:
                         code = py_file.read_text(encoding="utf-8")
                         result = backend.analyze(code, py_file, tool="ruff")
-                        if "issues" in result:
+                        if "issues" in result and isinstance(result["issues"], list):
                             linting_issues.extend(result["issues"])
                     except (OSError, UnicodeDecodeError):
                         # Skip files that can't be read

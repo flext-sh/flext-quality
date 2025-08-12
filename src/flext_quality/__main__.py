@@ -1,4 +1,7 @@
-"""Main entry point for flext-quality module execution."""
+"""Console script entrypoint for flext-quality.
+
+Thin wrapper to invoke `flext_quality.cli.main`.
+"""
 
 import sys
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from flext_core import FlextSettings
+from flext_core.config import FlextSettings
 
 
 class QualityConfig(FlextSettings):

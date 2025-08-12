@@ -63,6 +63,13 @@ ignore = [
     "F823",    # Local variable referenced before assignment - false positive
 ]
 
+# Justified per-file ignores
+# - external_backend.py executes vetted CLI tools (ruff, mypy, bandit, vulture)
+#   via safe argument lists (no shell) and with path validation; we allow S603 here.
+[tool.ruff.lint.per-file-ignores]
+"src/flext_quality/backends/external_backend.py" = ["S603"]
+"tests/**/*.py" = ["S101", "ARG002", "D102"]
+
 [tool.ruff.lint.isort]
 known-first-party = ["flext_quality"]
 [tool.mypy]

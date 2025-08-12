@@ -1,7 +1,8 @@
 """Analysis backends for the code analyzer.
 
-This module provides a pluggable architecture for different code analysis backends.
-Each backend can provide different analysis capabilities.
+This module provides a pluggable architecture for different code analysis
+backends. Each backend can provide different analysis capabilities and we
+re-export the primary types for convenient imports in examples and tests.
 """
 
 from __future__ import annotations

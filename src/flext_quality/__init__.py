@@ -1,45 +1,87 @@
-"""FLEXT Quality - Enterprise Code Quality Analysis and Governance Service.
+"""FLEXT Quality - Enterprise Code Quality Analysis and Governance Service for FLEXT ecosystem.
 
-FLEXT Quality is an enterprise-grade quality governance service that provides
-comprehensive code quality analysis, issue detection, and reporting capabilities
-for the FLEXT ecosystem. Built with Clean Architecture and Domain-Driven Design
-principles, it serves as the centralized quality control hub for all FLEXT projects.
+This module provides comprehensive code quality analysis, governance, and monitoring
+capabilities for the entire FLEXT ecosystem. Built with Clean Architecture and
+Domain-Driven Design principles, it serves as the centralized quality control hub
+providing enterprise-grade analysis across 32+ FLEXT projects.
+
+The service implements sophisticated quality analysis algorithms, multi-backend
+integration, and comprehensive reporting to maintain high code quality standards
+throughout the FLEXT data integration platform.
+
+Architecture (Clean Architecture + DDD):
+    - Domain Layer: Quality analysis entities, metrics, and business rules
+    - Application Layer: Analysis orchestration services and workflow management
+    - Infrastructure Layer: Tool integration (Ruff, MyPy, Bandit) and data persistence
+    - Presentation Layer: REST APIs, web interfaces, and comprehensive reporting
 
 Key Features:
-    - Multi-backend analysis engine (AST, Ruff, MyPy, Bandit, Security)
-    - Enterprise-grade quality metrics and scoring algorithms
-    - Comprehensive reporting in multiple formats (HTML, JSON, PDF)
-    - FLEXT ecosystem integration with cross-project analysis
-    - Real-time quality monitoring and threshold enforcement
-    - CI/CD pipeline integration with quality gates
+    - Multi-Backend Analysis: Integrated analysis using AST, Ruff, MyPy, Bandit, and security scanners
+    - Quality Metrics: Enterprise-grade scoring algorithms with customizable thresholds
+    - Comprehensive Reporting: Multi-format reports (HTML, JSON, PDF) with trend analysis
+    - FLEXT Integration: Cross-project analysis with ecosystem-aware quality assessment
+    - Real-Time Monitoring: Continuous quality monitoring with alerting and notifications
+    - CI/CD Integration: Quality gates with automated pass/fail determination
+    - Pattern Recognition: Intelligent detection of code patterns and anti-patterns
+    - Remediation Guidance: Actionable recommendations for quality improvements
 
-Architecture:
-    The service follows Clean Architecture with clear layer separation:
-    - Domain Layer: Core business entities and quality analysis logic
-    - Application Layer: Service orchestration and business workflows
-    - Infrastructure Layer: External tool integration and data persistence
-    - Presentation Layer: APIs, web interface, and reporting
+Analysis Capabilities:
+    - Code Style: PEP8 compliance, formatting, and style consistency
+    - Type Safety: MyPy analysis with strict type checking
+    - Security: Vulnerability scanning and security best practice validation
+    - Complexity: Cyclomatic complexity, maintainability metrics
+    - Testing: Test coverage analysis and quality assessment
+    - Documentation: Docstring coverage and quality validation
+    - Dependencies: Dependency analysis and security vulnerability scanning
 
-Integration:
-    - Built on flext-core foundation patterns (FlextResult, FlextEntity)
-    - Integrates with flext-observability for monitoring and metrics
-    - Provides APIs for flext-cli and flext-web integration
-    - Supports workspace-wide analysis across 32+ FLEXT projects
+Quality Metrics:
+    - Overall Quality Score: Composite quality rating (0-100)
+    - Technical Debt Index: Quantified technical debt measurement
+    - Maintainability Rating: Code maintainability assessment
+    - Security Rating: Security posture evaluation
+    - Test Quality Score: Testing completeness and effectiveness
+
+FLEXT Ecosystem Integration:
+    - Built on flext-core foundation patterns (FlextResult, FlextEntity, FlextContainer)
+    - Integrates with flext-observability for monitoring and metrics collection
+    - Provides REST APIs for flext-cli and flext-web integration
+    - Supports workspace-wide analysis across all FLEXT projects
+    - Leverages flext-auth for secure access control and audit logging
 
 Example:
-    Basic usage with the simplified API:
+    Basic project analysis with comprehensive quality assessment:
 
-    >>> from flext_quality import QualityAPI
-    >>> api = QualityAPI()
-    >>> result = await api.analyze_project("/path/to/project")
-    >>> if result.success:
-    ...     print(f"Quality Score: {result.data.overall_score}")
-    ...     print(f"Issues Found: {len(result.data.issues)}")
+    >>> from flext_quality import FlextQualityAPI, FlextQualityConfig
+    >>> from flext_core import FlextResult
+    >>>
+    >>> # Configure quality analysis service
+    >>> config = FlextQualityConfig(
+    ...     analysis_backends=["ruff", "mypy", "bandit"],
+    ...     quality_threshold=80.0,
+    ...     enable_security_scan=True
+    ... )
+    >>>
+    >>> # Initialize API and analyze project
+    >>> api = FlextQualityAPI(config)
+    >>> result = await api.analyze_project("/path/to/flext-project")
+    >>> if result.is_success:
+    ...     analysis = result.data
+    ...     print(f"Quality Score: {analysis.overall_score}/100")
+    ...     print(f"Issues Found: {len(analysis.issues)}")
+    ...     print(f"Security Vulnerabilities: {analysis.security_score}")
 
-Author: FLEXT Development Team
-Version: 0.9.0
-License: MIT
-Copyright (c) 2025 FLEXT Team. All rights reserved.
+    Ecosystem-wide quality analysis:
+
+    >>> # Analyze entire FLEXT ecosystem
+    >>> ecosystem_result = await api.analyze_ecosystem("/home/user/flext")
+    >>> if ecosystem_result.is_success:
+    ...     ecosystem_quality = ecosystem_result.data
+    ...     for project in ecosystem_quality.projects:
+    ...         print(f"{project.name}: {project.quality_score}/100")
+    ...     print(f"Ecosystem Average: {ecosystem_quality.average_score}")
+
+Copyright (c) 2025 FLEXT Contributors
+SPDX-License-Identifier: MIT
 
 """
 
@@ -88,10 +130,10 @@ def _show_deprecation_warning(old_import: str, new_import: str) -> None:
 
     """
     message_parts = [
-        f"⚠️  DEPRECATED IMPORT: {old_import}",
-        f"✅ USE INSTEAD: {new_import}",
-        "🔗 This will be removed in version 1.0.0",
-        "📖 See FLEXT Quality docs for migration guide",
+        f"DEPRECATED IMPORT: {old_import}",
+        f"USE INSTEAD: {new_import}",
+        "This will be removed in version 1.0.0",
+        "See FLEXT Quality docs for migration guide",
     ]
     warnings.warn(
         "\n".join(message_parts),
@@ -121,23 +163,18 @@ with contextlib.suppress(ImportError):
 # ================================
 
 __all__: list[str] = [
-    "BaseModel",  # from flext_quality import BaseModel
-    # Core Quality System (simplified access)
-    "CodeAnalyzer",  # from flext_quality import CodeAnalyzer
-    # Deprecation utilities
+    "BaseModel",
+    "CodeAnalyzer",
     "FlextQualityDeprecationWarning",
-    "FlextResult",  # from flext_quality import FlextResult
-    # Simple API Interface
-    "QualityAPI",  # from flext_quality import QualityAPI
-    # Core Patterns (from flext-core)
-    "QualityBaseConfig",  # from flext_quality import QualityBaseConfig
-    "QualityError",  # from flext_quality import QualityError
-    "QualityMetrics",  # from flext_quality import QualityMetrics
-    "QualityReport",  # from flext_quality import QualityReport
-    "ValidationError",  # from flext_quality import ValidationError
-    # Version
+    "FlextResult",
+    "QualityAPI",
+    "QualityBaseConfig",
+    "QualityError",
+    "QualityMetrics",
+    "QualityReport",
+    "ValidationError",
     "__version__",
     "__version_info__",
-    # Command Line Interface
-    "cli_main",  # from flext_quality import cli_main
+    "annotations",
+    "cli_main",
 ]

@@ -44,7 +44,7 @@ class TestBaseAnalyzer:
             """Concrete implementation for testing."""
 
             def analyze(
-                self, code: str, file_path: Path | None = None
+                self, code: str, file_path: Path | None = None,
             ) -> dict[str, Any]:
                 """Implement abstract method."""
                 return {"analyzed": True, "code": code}
@@ -345,7 +345,7 @@ class TestExternalBackend:
 
         # Mock mypy output
         mock_run.return_value = MagicMock(
-            returncode=1, stdout="test.py:1: error: Name 'x' is not defined", stderr=""
+            returncode=1, stdout="test.py:1: error: Name 'x' is not defined", stderr="",
         )
 
         result = backend.analyze("test code", tool="mypy")
@@ -391,7 +391,7 @@ class TestExternalBackend:
         mock_run.return_value = MagicMock(returncode=0, stdout="[]", stderr="")
 
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".py", delete=False
+            encoding="utf-8", mode="w", suffix=".py", delete=False,
         ) as f:
             f.write("test code")
             temp_path = Path(f.name)
@@ -411,11 +411,11 @@ class TestExternalBackend:
         backend = ExternalBackend()
 
         mock_run.return_value = MagicMock(
-            returncode=0, stdout="Success: no issues found", stderr=""
+            returncode=0, stdout="Success: no issues found", stderr="",
         )
 
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".py", delete=False
+            encoding="utf-8", mode="w", suffix=".py", delete=False,
         ) as f:
             f.write("test code")
             temp_path = Path(f.name)
@@ -434,11 +434,11 @@ class TestExternalBackend:
         backend = ExternalBackend()
 
         mock_run.return_value = MagicMock(
-            returncode=0, stdout='{"results": []}', stderr=""
+            returncode=0, stdout='{"results": []}', stderr="",
         )
 
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".py", delete=False
+            encoding="utf-8", mode="w", suffix=".py", delete=False,
         ) as f:
             f.write("test code")
             temp_path = Path(f.name)
@@ -460,7 +460,7 @@ class TestExternalBackend:
         mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
 
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".py", delete=False
+            encoding="utf-8", mode="w", suffix=".py", delete=False,
         ) as f:
             f.write("test code")
             temp_path = Path(f.name)

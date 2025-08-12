@@ -261,7 +261,7 @@ def another_complex_function(x, y, z, a, b, c):
                         "name": project["name"],
                         "status": "FAILED",
                         "error": results["error"],
-                    }
+                    },
                 )
             else:
                 # Check quality gates
@@ -273,7 +273,7 @@ def another_complex_function(x, y, z, a, b, c):
                         "status": "COMPLETED",
                         "quality_gate": decision["recommendation"],
                         "passed_checks": f"{decision['passed_checks']}/{decision['total_checks']}",
-                    }
+                    },
                 )
 
         # Display batch summary

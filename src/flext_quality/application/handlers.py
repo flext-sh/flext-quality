@@ -10,8 +10,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from flext_core import FlextResult
-from flext_observability import flext_create_log_entry, flext_create_trace
 
+# Avoid importing flext_observability at module import time to prevent
+# Pydantic model rebuild side-effects in tests; import lazily inside methods.
 from flext_quality.application.services import (
     LintingServiceImpl,
     QualityAnalysisService,
@@ -38,18 +39,30 @@ class AnalyzeProjectHandler:
     async def handle(self, project_id: UUID) -> FlextResult[QualityAnalysis]:
         """Handle project analysis command."""
         # Create trace for observability
-        flext_create_trace(
-            trace_id=f"analyze_project_{project_id}",
-            operation="AnalyzeProjectHandler.handle",
-            config={"project_id": str(project_id)},
-        )
+        try:
+            from flext_observability import flext_create_trace
+
+            flext_create_trace(
+                trace_id=f"analyze_project_{project_id}",
+                operation="AnalyzeProjectHandler.handle",
+                config={"project_id": str(project_id)},
+            )
+        except Exception as _e:
+            # Observability backend may be unavailable in some environments
+            # We intentionally continue without failing the handler
+            _ = _e
 
         # Log operation start
-        flext_create_log_entry(
-            message=f"Starting project analysis for {project_id}",
-            level="info",
-            context={"handler": "AnalyzeProjectHandler", "project_id": str(project_id)},
-        )
+        try:
+            from flext_observability import flext_create_log_entry
+
+            flext_create_log_entry(
+                message=f"Starting project analysis for {project_id}",
+                level="info",
+                context={"handler": "AnalyzeProjectHandler", "project_id": str(project_id)},
+            )
+        except Exception as _e:
+            _ = _e
 
         try:
             # Convert UUID to string for service compatibility
@@ -61,43 +74,58 @@ class AnalyzeProjectHandler:
             )
 
             if analysis_result.is_failure:
-                flext_create_log_entry(
-                    message=f"Failed to create analysis: {analysis_result.error}",
-                    level="error",
-                    context={
-                        "handler": "AnalyzeProjectHandler",
-                        "project_id": str(project_id),
-                    },
-                )
+                try:
+                    from flext_observability import flext_create_log_entry
+
+                    flext_create_log_entry(
+                        message=f"Failed to create analysis: {analysis_result.error}",
+                        level="error",
+                        context={
+                            "handler": "AnalyzeProjectHandler",
+                            "project_id": str(project_id),
+                        },
+                    )
+                except Exception as _e:
+                    _ = _e
                 return analysis_result
 
             analysis = analysis_result.data
             if analysis is None:
                 return FlextResult.fail("Analysis data is None")
 
-            flext_create_log_entry(
-                message=f"Successfully created analysis for project {project_id}",
-                level="info",
-                context={
-                    "handler": "AnalyzeProjectHandler",
-                    "project_id": str(project_id),
-                    "analysis_id": getattr(analysis, "id", None),
-                },
-            )
+            try:
+                from flext_observability import flext_create_log_entry
+
+                flext_create_log_entry(
+                    message=f"Successfully created analysis for project {project_id}",
+                    level="info",
+                    context={
+                        "handler": "AnalyzeProjectHandler",
+                        "project_id": str(project_id),
+                        "analysis_id": getattr(analysis, "id", None),
+                    },
+                )
+            except Exception as _e:
+                _ = _e
 
             # Return the created analysis
             return FlextResult.ok(analysis)
 
         except Exception as e:
-            flext_create_log_entry(
-                message=f"Unexpected error in AnalyzeProjectHandler: {e!s}",
-                level="error",
-                context={
-                    "handler": "AnalyzeProjectHandler",
-                    "project_id": str(project_id),
-                    "error": str(e),
-                },
-            )
+            try:
+                from flext_observability import flext_create_log_entry
+
+                flext_create_log_entry(
+                    message=f"Unexpected error in AnalyzeProjectHandler: {e!s}",
+                    level="error",
+                    context={
+                        "handler": "AnalyzeProjectHandler",
+                        "project_id": str(project_id),
+                        "error": str(e),
+                    },
+                )
+            except Exception as _e:
+                _ = _e
             return FlextResult.fail(f"Unexpected error: {e!s}")
 
 

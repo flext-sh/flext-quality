@@ -15,7 +15,7 @@ class TestQualityWebInterface:
     @patch("flext_quality.web_interface.get_web_settings")
     @patch("flext_quality.web_interface.create_service")
     def test_init(
-        self, mock_create_service: MagicMock, mock_get_settings: MagicMock
+        self, mock_create_service: MagicMock, mock_get_settings: MagicMock,
     ) -> None:
         """Test QualityWebInterface initialization."""
         # Setup mocks
@@ -40,7 +40,7 @@ class TestQualityWebInterface:
     @patch("flext_quality.web_interface.get_web_settings")
     @patch("flext_quality.web_interface.create_service")
     def test_register_routes(
-        self, mock_create_service: MagicMock, mock_get_settings: MagicMock
+        self, mock_create_service: MagicMock, mock_get_settings: MagicMock,
     ) -> None:
         """Test route registration."""
         # Setup mocks
@@ -65,7 +65,7 @@ class TestQualityWebInterface:
     @patch("flext_quality.web_interface.get_web_settings")
     @patch("flext_quality.web_interface.create_service")
     def test_quality_dashboard(
-        self, mock_create_service: MagicMock, mock_get_settings: MagicMock
+        self, mock_create_service: MagicMock, mock_get_settings: MagicMock,
     ) -> None:
         """Test quality dashboard method."""
         # Setup mocks
@@ -93,7 +93,7 @@ class TestQualityWebInterface:
     @patch("flext_quality.web_interface.get_web_settings")
     @patch("flext_quality.web_interface.create_service")
     def test_analyze_project(
-        self, mock_create_service: MagicMock, mock_get_settings: MagicMock
+        self, mock_create_service: MagicMock, mock_get_settings: MagicMock,
     ) -> None:
         """Test analyze_project method."""
         # Setup mocks
@@ -110,7 +110,7 @@ class TestQualityWebInterface:
 
         # Use Flask test client context
         with mock_app.test_request_context(
-            "/api/quality/analyze", method="POST", json={"path": "/test/path"}
+            "/api/quality/analyze", method="POST", json={"path": "/test/path"},
         ):
             # Import inside context to avoid issues
 
@@ -215,7 +215,9 @@ class TestQualityWebInterface:
         mock_create_service.return_value = mock_service
 
         # Mock for error response - jsonify returns tuple for error cases
-        def jsonify_side_effect(data, *args):
+        def jsonify_side_effect(
+            data: dict[str, object] | str, *_: object,
+        ) -> str:
             if "error" in data:
                 return "error_response"
             return "success_response"
@@ -257,7 +259,7 @@ class TestQualityWebInterface:
 
         # Verify
         mock_service.run.assert_called_once_with(
-            host="127.0.0.1", port=9000, debug=False
+            host="127.0.0.1", port=9000, debug=False,
         )
         mock_logger.info.assert_called()
 
