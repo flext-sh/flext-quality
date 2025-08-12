@@ -6,13 +6,47 @@ import ast
 from pathlib import Path
 
 from flext_core import get_logger
-from flext_observability import (
-    flext_create_log_entry,
-    flext_create_metric,
-    flext_create_trace,
-)
 
 from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
+
+
+# Import lazily inside methods to avoid pydantic model rebuild side-effects during import
+# Expose observability symbols for tests to patch via module attribute shims
+def flext_create_trace(
+    *, trace_id: str, operation: str, config: dict[str, object] | None = None,
+) -> None:
+    """Shim for observability trace; safe no-op if backend unavailable."""
+    try:
+        from flext_observability import flext_create_trace as _real
+
+        _real(trace_id=trace_id, operation=operation, config=config)
+    except Exception:
+        return
+
+
+def flext_create_metric(
+    *, name: str, value: float, tags: dict[str, object] | None = None,
+) -> None:
+    """Shim for observability metric; safe no-op if backend unavailable."""
+    try:
+        from flext_observability import flext_create_metric as _real
+
+        _real(name=name, value=value, tags=tags)
+    except Exception:
+        return
+
+
+def flext_create_log_entry(
+    *, message: str, level: str, context: dict[str, object] | None = None,
+) -> None:
+    """Shim for observability log; safe no-op if backend unavailable."""
+    try:
+        from flext_observability import flext_create_log_entry as _real
+
+        _real(message=message, level=level, context=context)
+    except Exception:
+        return
+
 
 logger = get_logger(__name__)
 
@@ -44,6 +78,7 @@ class CodeAnalyzer:
 
         """
         # Create trace for the entire analysis
+        # Emit trace via shim (patched in tests; no hard dependency at runtime)
         flext_create_trace(
             trace_id=f"analyze_project_{self.project_path.name}",
             operation="CodeAnalyzer.analyze_project",

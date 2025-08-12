@@ -123,7 +123,7 @@ def analyze_project(project_path: str) -> None:
                 else:
                     # Show detailed information for each issue
                     for _i, issue in enumerate(
-                        issue_list[:MAX_FILES_TO_SHOW]
+                        issue_list[:MAX_FILES_TO_SHOW],
                     ):  # Show first 5 issues
                         if isinstance(issue, dict):
                             issue.get("file", "unknown")

@@ -6,7 +6,6 @@ import json
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Any
 
 from flext_quality.backends.base import (
     BackendType,
@@ -50,7 +49,10 @@ class ExternalBackend(BaseAnalyzer):
         # Create temporary file for analysis
         try:
             with tempfile.NamedTemporaryFile(
-                encoding="utf-8", mode="w", suffix=".py", delete=False
+                encoding="utf-8",
+                mode="w",
+                suffix=".py",
+                delete=False,
             ) as f:
                 f.write(code)
                 temp_path = Path(f.name)
@@ -95,6 +97,7 @@ class ExternalBackend(BaseAnalyzer):
             if not ruff_cmd:
                 return {"error": "Ruff not found in PATH"}
 
+            # Safe invocation of external tool without shell, fixed timeout
             result = subprocess.run(
                 [ruff_cmd, "check", safe_path, "--output-format", "json"],
                 check=False,
@@ -124,6 +127,7 @@ class ExternalBackend(BaseAnalyzer):
             if not mypy_cmd:
                 return {"error": "MyPy not found in PATH"}
 
+            # Safe invocation of external tool without shell, fixed timeout
             result = subprocess.run(
                 [mypy_cmd, safe_path],
                 check=False,
@@ -153,6 +157,7 @@ class ExternalBackend(BaseAnalyzer):
             if not bandit_cmd:
                 return {"error": "Bandit not found in PATH"}
 
+            # Safe invocation of external tool without shell, fixed timeout
             result = subprocess.run(
                 [bandit_cmd, "-f", "json", safe_path],
                 check=False,
@@ -184,6 +189,7 @@ class ExternalBackend(BaseAnalyzer):
             if not vulture_cmd:
                 return {"error": "Vulture not found in PATH"}
 
+            # Safe invocation of external tool without shell, fixed timeout
             result = subprocess.run(
                 [vulture_cmd, safe_path],
                 check=False,
@@ -205,7 +211,9 @@ class ExternalBackend(BaseAnalyzer):
         """Parse ruff JSON output."""
         try:
             if output.strip():
-                return json.loads(output)  # type: ignore[no-any-return]
+                result = json.loads(output)
+                # Ensure we return the proper type by casting the result
+                return result if isinstance(result, list) else []
             return []
         except json.JSONDecodeError:
             return []

@@ -25,7 +25,10 @@ from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.simple_api import QualityAPI
 
 if TYPE_CHECKING:
-    from werkzeug.wrappers import Response as ResponseType
+    from flask import Response as FlaskResponse
+    from werkzeug.wrappers import Response as WerkzeugResponse
+
+    ResponseType = FlaskResponse | WerkzeugResponse | tuple[FlaskResponse, int]
 
 logger = get_logger(__name__)
 
@@ -154,12 +157,16 @@ class QualityWebInterface:
         analyzer = CodeAnalyzer(Path(project_path))
         result = analyzer.analyze_project()
 
+        # Safely extract files list
+        files_data = result.get("files", [])
+        files_count = len(files_data) if isinstance(files_data, list) else 0
+
         return jsonify(
             {
                 "success": True,
                 "data": {
                     "path": project_path,
-                    "files_analyzed": len(result.get("files", [])),
+                    "files_analyzed": files_count,
                     "issues": result.get("issues", []),
                     "metrics": result.get("metrics", {}),
                 },

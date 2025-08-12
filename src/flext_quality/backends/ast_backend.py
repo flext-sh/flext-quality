@@ -281,7 +281,7 @@ class ASTBackend(BaseAnalyzer):
 
     def _extract_imports(self, tree: ast.AST) -> list[dict[str, object]]:
         """Extract import information."""
-        imports = []
+        imports: list[dict[str, object]] = []
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
                 imports.extend([{"module": alias.name, "names": []} for alias in node.names])
