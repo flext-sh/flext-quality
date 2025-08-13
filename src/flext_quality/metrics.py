@@ -49,6 +49,9 @@ from pydantic import Field, computed_field
 
 from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
 
+# Constants
+MAX_QUALITY_SCORE = 100
+
 
 class QualityMetrics(FlextValueObject):
     """Comprehensive Quality Metrics Value Object.
@@ -400,7 +403,7 @@ class QualityMetrics(FlextValueObject):
 
         """
         # Validate score consistency
-        if self.overall_score < 0 or self.overall_score > 100:
+        if self.overall_score < 0 or self.overall_score > MAX_QUALITY_SCORE:
             return FlextResult.fail("Overall score must be between 0 and 100")
 
         # Validate counts are non-negative

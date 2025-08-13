@@ -44,7 +44,7 @@ def run_cli_analysis(project_path: str, format_type: str = "json") -> dict[str, 
 
     try:
         # Execute CLI command
-        result = subprocess.run(
+        result = subprocess.run(  # noqa: S603 - CLI quality tool execution, cmd is constructed from validated params
             cmd,
             check=False,
             capture_output=True,

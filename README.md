@@ -1,10 +1,10 @@
 # flext-quality
 
-**Type**: Library | **Status**: Production | **Dependencies**: flext-core
+**Type**: Application Service | **Status**: Active Development | **Dependencies**: flext-core
 
 Code quality analysis and governance library for the FLEXT ecosystem.
 
-> **✅ Production Ready**: Quality analysis engine fully functional as a library
+> ⚠️ Development Status: Quality analysis engine functional; ecosystem integration in progress.
 
 ## Quick Start
 

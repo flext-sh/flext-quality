@@ -201,15 +201,17 @@ def analyze_project(project_path: str) -> None:
 
 def get_quality_assessment(score: float) -> str:
     """Get descriptive assessment based on quality score."""
-    if score >= 95:
+    from flext_quality.constants import FlextQualityConstants
+
+    if score >= FlextQualityConstants.QualityThresholds.OUTSTANDING_THRESHOLD:
         return "Outstanding quality - industry leading"
-    if score >= 90:
+    if score >= FlextQualityConstants.QualityThresholds.EXCELLENT_THRESHOLD:
         return "Excellent quality - production ready"
-    if score >= 80:
+    if score >= FlextQualityConstants.QualityThresholds.GOOD_THRESHOLD:
         return "Good quality - minor improvements recommended"
-    if score >= 70:
+    if score >= FlextQualityConstants.QualityThresholds.ACCEPTABLE_THRESHOLD:
         return "Acceptable quality - moderate improvements needed"
-    if score >= 60:
+    if score >= FlextQualityConstants.QualityThresholds.BELOW_AVERAGE_THRESHOLD:
         return "Below average - significant improvements required"
     return "Poor quality - major refactoring needed"
 

@@ -50,16 +50,22 @@ def flext_create_log_entry(
 
 logger = get_logger(__name__)
 
+# Constants
+MIN_FILE_SIZE_FOR_DUPLICATION_CHECK = 100
+SIMILARITY_THRESHOLD = 0.8
+
 
 class CodeAnalyzer:
     """Main code analyzer interface for FLEXT Quality."""
 
     def __init__(self, project_path: str | Path) -> None:
+        """Initialize analyzer with project path."""
         self.project_path = Path(project_path)
         self.analysis_results: dict[str, object] = {}
 
     def analyze_project(
         self,
+        *,
         include_security: bool = True,
         include_complexity: bool = True,
         include_dead_code: bool = True,
@@ -368,12 +374,12 @@ class CodeAnalyzer:
                     "complexity": 0,
                     "syntax_error": str(e),
                 }
-        except (RuntimeError, ValueError, TypeError, FileNotFoundError, OSError) as e:
+        except (RuntimeError, ValueError, TypeError, FileNotFoundError, OSError):
             from flext_core import get_logger
 
             logger = get_logger(__name__)
-            logger.exception(f"File analysis failed for {file_path}: {e}")
-            logger.exception("Error analyzing file %s: %s", file_path, e)
+            logger.exception("File analysis failed for %s", file_path)
+            logger.exception("Error analyzing file %s", file_path)
             return None
 
     def _calculate_complexity(self, tree: ast.AST) -> int:
@@ -456,7 +462,7 @@ class CodeAnalyzer:
         issues = []
         for py_file in self.project_path.rglob("*.py"):
             try:
-                with open(py_file, encoding="utf-8") as f:
+                with py_file.open(encoding="utf-8") as f:
                     content = f.read()
 
                 # Simple security checks with proper type casting for consistency
@@ -537,7 +543,7 @@ class CodeAnalyzer:
         issues = []
         for py_file in self.project_path.rglob("*.py"):
             try:
-                with open(py_file, encoding="utf-8") as f:
+                with py_file.open(encoding="utf-8") as f:
                     content = f.read()
 
                 lines = content.splitlines()
@@ -573,9 +579,9 @@ class CodeAnalyzer:
         file_contents = {}
         for py_file in self.project_path.rglob("*.py"):
             try:
-                with open(py_file, encoding="utf-8") as f:
+                with py_file.open(encoding="utf-8") as f:
                     content = f.read()
-                    if len(content.strip()) > 100:
+                    if len(content.strip()) > MIN_FILE_SIZE_FOR_DUPLICATION_CHECK:
                         # Only check substantial files
                         file_contents[py_file] = content
             except (RuntimeError, ValueError, TypeError) as e:
@@ -594,7 +600,7 @@ class CodeAnalyzer:
                 if lines1 and lines2:
                     similarity = len(lines1 & lines2) / max(len(lines1), len(lines2))
 
-                    if similarity > 0.8:  # 80% similarity threshold
+                    if similarity > SIMILARITY_THRESHOLD:  # 80% similarity threshold
                         issues.append(
                             {
                                 "type": "duplicate_files",

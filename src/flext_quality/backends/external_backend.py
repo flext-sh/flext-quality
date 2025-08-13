@@ -98,7 +98,7 @@ class ExternalBackend(BaseAnalyzer):
                 return {"error": "Ruff not found in PATH"}
 
             # Safe invocation of external tool without shell, fixed timeout
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603
                 [ruff_cmd, "check", safe_path, "--output-format", "json"],
                 check=False,
                 capture_output=True,
@@ -128,7 +128,7 @@ class ExternalBackend(BaseAnalyzer):
                 return {"error": "MyPy not found in PATH"}
 
             # Safe invocation of external tool without shell, fixed timeout
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603
                 [mypy_cmd, safe_path],
                 check=False,
                 capture_output=True,
@@ -158,7 +158,7 @@ class ExternalBackend(BaseAnalyzer):
                 return {"error": "Bandit not found in PATH"}
 
             # Safe invocation of external tool without shell, fixed timeout
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603
                 [bandit_cmd, "-f", "json", safe_path],
                 check=False,
                 capture_output=True,
@@ -190,7 +190,7 @@ class ExternalBackend(BaseAnalyzer):
                 return {"error": "Vulture not found in PATH"}
 
             # Safe invocation of external tool without shell, fixed timeout
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603
                 [vulture_cmd, safe_path],
                 check=False,
                 capture_output=True,

@@ -104,6 +104,7 @@ class QualityAPI:
         repository_url: str | None = None,
         config_path: str | None = None,
         language: str = "python",
+        *,
         auto_analyze: bool = True,
         min_coverage: float = 95.0,
         max_complexity: int = 10,
