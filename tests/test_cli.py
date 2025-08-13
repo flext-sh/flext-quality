@@ -6,6 +6,7 @@ import argparse
 from io import StringIO
 from unittest.mock import MagicMock, patch
 
+import flext_quality.cli  # moved to top-level to avoid local import in test
 from flext_quality.cli import analyze_project, another_function, main, setup_logging
 
 
@@ -598,12 +599,8 @@ class TestMainExecution:
         """Test the if __name__ == '__main__' block."""
         mock_main.return_value = 2
 
-        # Import to trigger the main execution
-        import flext_quality.cli
-
-        # Manually trigger the main block since we can't easily test __name__ == '__main__'
-        if hasattr(flext_quality.cli, "__main__"):
-            flext_quality.cli.main()
+        # Import already happens at top-level; call main directly to simulate
+        flext_quality.cli.main()
 
         # The mock_main should have been called during import if __name__ == '__main__'
         # But since we're testing in pytest, __name__ won't be '__main__'

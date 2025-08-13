@@ -7,7 +7,7 @@ REFACTORED:
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from flext_core import FlextResult, get_logger
 
@@ -24,31 +24,30 @@ try:
         flext_create_log_entry as _flext_create_log_entry,
     )
 except Exception:  # pragma: no cover - optional dependency
-    _flext_create_log_entry = None
+    _flext_create_log_entry = None  # type: ignore[assignment]
 
 try:
     from flext_observability import (
         flext_create_trace as _flext_create_trace,
     )
 except Exception:  # pragma: no cover - optional dependency
-    _flext_create_trace = None
+    _flext_create_trace = None  # type: ignore[assignment]
 
 
 def _noop(*_args: object, **_kwargs: object) -> None:
     return None
 
 
-flext_create_log_entry: Callable[..., Any] = (
+flext_create_log_entry = (
     _flext_create_log_entry if callable(_flext_create_log_entry) else _noop
 )
-flext_create_trace: Callable[..., Any] = (
+flext_create_trace = (
     _flext_create_trace if callable(_flext_create_trace) else _noop
 )
 
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-    from collections.abc import Callable
 
     from flext_quality.domain.entities import QualityAnalysis, QualityReport
 

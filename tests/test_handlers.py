@@ -5,6 +5,7 @@ from __future__ import annotations
 from uuid import uuid4
 
 import pytest
+from flext_core import FlextResult
 
 from flext_quality.application.handlers import (
     AnalyzeProjectHandler,
@@ -142,8 +143,6 @@ class TestHandlerIntegration:
                 result = await handler.handle(test_id)
             else:
                 # Create a mock result for handlers without handle method
-                from flext_core import FlextResult
-
                 result = FlextResult.ok("Mock success")
             assert result.success
             assert result.data is not None

@@ -17,6 +17,14 @@ from flext_core import get_logger
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.reports import QualityReport
 
+# Optional web interface dependency
+try:
+    from flext_quality.web_interface import (
+        QualityWebInterface,  # type: ignore[import-not-found]
+    )
+except Exception:  # pragma: no cover - optional
+    QualityWebInterface = None  # sentinel for absence
+
 
 def setup_logging(level: str = "INFO") -> None:
     """Set up logging configuration.
@@ -31,9 +39,7 @@ def setup_logging(level: str = "INFO") -> None:
 def run_web_server(args: argparse.Namespace) -> int:
     """Run quality web interface server."""
     logger = get_logger(__name__)
-    try:
-        from flext_quality.web_interface import QualityWebInterface
-    except Exception:
+    if QualityWebInterface is None:
         # Optional dependency; when unavailable, return error unless verbose mode prints trace
         if args.verbose:
             traceback.print_exc()

@@ -123,11 +123,8 @@ class TestQualityWebInterface:
             json={"path": "/test/path"},
         ):
             # Import inside context to avoid issues
-
-            # Call method (it's not async, remove await)
-            import asyncio
-
-            result = asyncio.run(interface.analyze_project())
+            # Call method (it's async)
+            result = interface.analyze_project()
 
             # Verify response structure
             # The actual jsonify returns a Response object in test context
