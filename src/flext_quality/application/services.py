@@ -7,10 +7,13 @@ REFACTORED:
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import TYPE_CHECKING
+from uuid import uuid4
 
 from flext_core import FlextResult
 
+from flext_quality.backends.external_backend import ExternalBackend
 from flext_quality.domain.entities import (
     AnalysisStatus,
     IssueSeverity,
@@ -64,8 +67,6 @@ class QualityProjectService:
 
         """
         try:
-            from uuid import uuid4
-
             project = QualityProject(
                 id=str(uuid4()),
                 name=name,  # Use the name parameter
@@ -197,8 +198,6 @@ class QualityAnalysisService:
 
         """
         try:
-            from uuid import uuid4
-
             # Create real QualityAnalysis entity following flext-core patterns
             analysis = QualityAnalysis(
                 id=str(uuid4()),
@@ -504,8 +503,6 @@ class QualityIssueService:
 
         """
         try:
-            from uuid import uuid4
-
             issue = QualityIssue(
                 id=str(uuid4()),
                 analysis_id=analysis_id,
@@ -679,8 +676,6 @@ class QualityReportService:
 
         """
         try:
-            from uuid import uuid4
-
             report = QualityReport(
                 id=str(uuid4()),
                 analysis_id=analysis_id,
@@ -800,10 +795,6 @@ class SecurityAnalyzerServiceImpl(BasePortService):
     ) -> FlextResult[dict[str, object]]:
         """Analyze security issues in project."""
         try:
-            from pathlib import Path
-
-            from flext_quality.backends.external_backend import ExternalBackend
-
             # Use the generic external backend for security analysis
             backend = ExternalBackend()
 
@@ -841,10 +832,6 @@ class LintingServiceImpl(BasePortService):
     async def run_linting(self, project_path: str) -> FlextResult[dict[str, object]]:
         """Run linting analysis on project."""
         try:
-            from pathlib import Path
-
-            from flext_quality.backends.external_backend import ExternalBackend
-
             # Use the generic external backend for linting analysis
             backend = ExternalBackend()
 

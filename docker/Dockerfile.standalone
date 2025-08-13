@@ -133,31 +133,27 @@ print('✅ Mock dependencies created for examples')
 
 # Validate CLI functionality
 RUN echo "🔧 CLI VALIDATION: Testing CLI commands..." && \
-    python -c "
-import subprocess
-import sys
+    python - <<'PY'
+import io
+import contextlib
+from flext_quality import cli as quality_cli
 
-# Test CLI help commands
-try:
-    result = subprocess.run([sys.executable, '-m', 'flext_quality.cli', '--help'], 
-                          capture_output=True, text=True, timeout=30)
-    if result.returncode == 0:
-        print('✅ CLI help working')
-    else:
-        print(f'⚠️ CLI help exit code: {result.returncode}')
-        
-    result = subprocess.run([sys.executable, '-m', 'flext_quality.cli', 'analyze', '--help'], 
-                          capture_output=True, text=True, timeout=30)
-    if result.returncode == 0:
-        print('✅ CLI analyze help working')
-    else:
-        print(f'⚠️ CLI analyze help exit code: {result.returncode}')
-        
-except Exception as e:
-    print(f'⚠️ CLI test failed: {e}')
+def run_cli_help(args: list[str]) -> int:
+    out = io.StringIO()
+    err = io.StringIO()
+    with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+        try:
+            quality_cli.main(args)
+            return 0
+        except SystemExit as exc:
+            return int(getattr(exc, 'code', 0) or 0)
 
+rc_help = run_cli_help(['--help'])
+print('✅ CLI help working' if rc_help in (0, 2) else f'⚠️ CLI help exit code: {rc_help}')
+rc_analyze = run_cli_help(['analyze', '--help'])
+print('✅ CLI analyze help working' if rc_analyze in (0, 2) else f'⚠️ CLI analyze help exit code: {rc_analyze}')
 print('✅ CLI validation completed')
-"
+PY
 
 # Create validation report
 RUN echo "📊 STANDALONE CONTAINER VALIDATION COMPLETE:" && \

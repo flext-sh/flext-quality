@@ -46,6 +46,8 @@ flext-quality = "flext_quality.cli:main"
 [tool.ruff]
 extend = "../.ruff-shared.toml"
 lint.isort.known-first-party = ["flext_quality"]
+
+ 
 [tool.mypy]
 # Strict mode - enables all recommended checks
 strict = true

@@ -12,6 +12,8 @@ import sys
 import traceback
 from pathlib import Path
 
+from flext_core import get_logger
+
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.reports import QualityReport
 
@@ -28,9 +30,17 @@ def setup_logging(level: str = "INFO") -> None:
 
 def run_web_server(args: argparse.Namespace) -> int:
     """Run quality web interface server."""
+    logger = get_logger(__name__)
     try:
         from flext_quality.web_interface import QualityWebInterface
+    except Exception:
+        # Optional dependency; when unavailable, return error unless verbose mode prints trace
+        if args.verbose:
+            traceback.print_exc()
+        logger.warning("Quality web interface not available; install optional dependencies.")
+        return 1
 
+    try:
         interface = QualityWebInterface()
         interface.run(host=args.host, port=args.port, debug=args.debug)
         return 0
@@ -78,13 +88,9 @@ def analyze_project(args: argparse.Namespace) -> int:
             report.save_report(output_path, args.format)
         elif args.format == "json":
             # Write JSON to stdout explicitly for CLI output
-            import sys
-
             sys.stdout.write(report.to_json() + "\n")
         elif args.format == "html":
             # Write HTML to stdout explicitly for CLI output
-            import sys
-
             sys.stdout.write(report.to_html() + "\n")
         # Constants for quality thresholds
         good_quality_threshold = 80
@@ -98,8 +104,6 @@ def analyze_project(args: argparse.Namespace) -> int:
             return 1  # Medium quality
         return 2  # Poor quality
     except (RuntimeError, ValueError, TypeError):
-        from flext_core import get_logger
-
         logger = get_logger(__name__)
         # EXPLICIT TRANSPARENCY: CLI function must return exit code for process management
         logger.exception("Quality analysis failed with specific error")
@@ -141,8 +145,6 @@ def score_project(args: argparse.Namespace) -> int:
 
         return 0 if score >= acceptable_quality_threshold else 1
     except (RuntimeError, ValueError, TypeError):
-        from flext_core import get_logger
-
         logger = get_logger(__name__)
         logger.exception("Quality score calculation failed")
         return 3

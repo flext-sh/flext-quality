@@ -5,10 +5,11 @@ from __future__ import annotations
 import contextlib
 import io
 import json
-import subprocess  # legacy import kept only for typing
 import tempfile
+from importlib import import_module, util
 from pathlib import Path
 
+from importlib import import_module, util
 from flext_quality.backends.base import (
     BackendType,
     BaseAnalyzer,
@@ -73,7 +74,7 @@ class ExternalBackend(BaseAnalyzer):
 
         except FileNotFoundError:
             result["error"] = f"Tool {tool} not found"
-        except subprocess.TimeoutExpired:
+        except TimeoutError:
             result["error"] = f"Tool {tool} timed out"
         except Exception as e:
             result["error"] = str(e)
@@ -91,35 +92,25 @@ class ExternalBackend(BaseAnalyzer):
             if not file_path.exists() or not file_path.is_file():
                 return {"error": "Invalid file path"}
 
-            # Use absolute path for ruff to avoid S607
-            import shutil
-
-            ruff_cmd = shutil.which("ruff")
-            if not ruff_cmd:
-                return {"error": "Ruff not found in PATH"}
+            # Prefer in-process API; avoid subprocess PATH lookups per policy
 
             # Prefer in-process Ruff API when available
-            try:
-                import ruff.__main__ as ruff_main  # type: ignore[import-not-found]
-
-                stdout = io.StringIO()
-                stderr = io.StringIO()
-                with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
-                    try:
-                        ruff_main.main(["check", str(file_path.resolve()), "--output-format", "json"])  # type: ignore[arg-type]
-                    except SystemExit as exc:
-                        _ = int(getattr(exc, "code", 0) or 0)
-                issues = self._parse_ruff_output(stdout.getvalue())
-            except Exception:
-                # Fallback to absolute-path subprocess if API unavailable
-                result = __import__("subprocess").run(  # noqa: S603
-                    [ruff_cmd, "check", str(file_path.resolve()), "--output-format", "json"],
-                    check=False,
-                    capture_output=True,
-                    text=True,
-                    timeout=10,
-                )
-                issues = self._parse_ruff_output(result.stdout)
+            # Import only if available via optional dependency
+            ruff_main = import_module("ruff.__main__") if util.find_spec("ruff.__main__") else None
+            if ruff_main is None:
+                # Evita uso de subprocess; orienta execução manual
+                return {
+                    "error": "Ruff in-process API indisponível; execute manualmente: 'ruff check <file> --output-format json'",
+                    "code_length": len(code),
+                }
+            stdout = io.StringIO()
+            stderr = io.StringIO()
+            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                try:
+                    ruff_main.main(["check", str(file_path.resolve()), "--output-format", "json"])  # type: ignore[arg-type]
+                except SystemExit as exc:  # noqa: F841
+                    _ = int(getattr(exc, "code", 0) or 0)
+            issues = self._parse_ruff_output(stdout.getvalue())
             return {"issues": issues, "code_length": len(code)}
 
         except Exception as e:
@@ -132,28 +123,18 @@ class ExternalBackend(BaseAnalyzer):
             if not file_path.exists() or not file_path.is_file():
                 return {"error": "Invalid file path"}
 
-            # Use absolute path for mypy to avoid S607
-            import shutil
-
-            mypy_cmd = shutil.which("mypy")
-            if not mypy_cmd:
-                return {"error": "MyPy not found in PATH"}
+            # Prefer in-process API; avoid subprocess PATH lookups per policy
 
             # Prefer in-process MyPy API
-            try:
-                from mypy import api as mypy_api  # type: ignore[import-not-found]
-
-                stdout, _stderr, _status = mypy_api.run([str(file_path.resolve())])
-                issues = self._parse_mypy_output(stdout)
-            except Exception:
-                result = __import__("subprocess").run(  # noqa: S603
-                    [mypy_cmd, str(file_path.resolve())],
-                    check=False,
-                    capture_output=True,
-                    text=True,
-                    timeout=10,
-                )
-                issues = self._parse_mypy_output(result.stdout)
+            mypy_api = import_module("mypy.api") if util.find_spec("mypy.api") else None
+            if mypy_api is None:
+                # Evita uso de subprocess; orienta execução manual
+                return {
+                    "error": "MyPy in-process API indisponível; execute manualmente: 'mypy <file>'",
+                    "code_length": len(code),
+                }
+            stdout, _stderr, _status = mypy_api.run([str(file_path.resolve())])
+            issues = self._parse_mypy_output(stdout)
             return {"issues": issues, "code_length": len(code)}
 
         except Exception as e:
