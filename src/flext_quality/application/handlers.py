@@ -41,14 +41,11 @@ def _noop(*_args: object, **_kwargs: object) -> None:
 flext_create_log_entry = (
     _flext_create_log_entry if callable(_flext_create_log_entry) else _noop
 )
-flext_create_trace = (
-    _flext_create_trace if callable(_flext_create_trace) else _noop
-)
+flext_create_trace = _flext_create_trace if callable(_flext_create_trace) else _noop
 
 logger = get_logger(__name__)
 
 if TYPE_CHECKING:
-
     from flext_quality.domain.entities import QualityAnalysis, QualityReport
 
 # Using flext-core handlers directly - no fallbacks

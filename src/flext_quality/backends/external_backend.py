@@ -95,7 +95,11 @@ class ExternalBackend(BaseAnalyzer):
 
             # Prefer in-process Ruff API when available
             # Import only if available via optional dependency
-            ruff_main = import_module("ruff.__main__") if util.find_spec("ruff.__main__") else None
+            ruff_main = (
+                import_module("ruff.__main__")
+                if util.find_spec("ruff.__main__")
+                else None
+            )
             if ruff_main is None:
                 # Evita uso de subprocess; orienta execução manual
                 return {
@@ -104,8 +108,14 @@ class ExternalBackend(BaseAnalyzer):
                 }
             stdout = io.StringIO()
             stderr = io.StringIO()
-            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr), contextlib.suppress(SystemExit):
-                ruff_main.main(["check", str(file_path.resolve()), "--output-format", "json"])  # type: ignore[arg-type]
+            with (
+                contextlib.redirect_stdout(stdout),
+                contextlib.redirect_stderr(stderr),
+                contextlib.suppress(SystemExit),
+            ):
+                ruff_main.main(
+                    ["check", str(file_path.resolve()), "--output-format", "json"],
+                )
             issues = self._parse_ruff_output(stdout.getvalue())
             return {"issues": issues, "code_length": len(code)}
 
