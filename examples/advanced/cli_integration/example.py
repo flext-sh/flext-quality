@@ -11,7 +11,8 @@ This example demonstrates advanced usage patterns including:
 This showcases enterprise-grade automation capabilities for quality gates.
 """
 
-import subprocess
+import contextlib
+import io
 import sys
 import tempfile
 from pathlib import Path
@@ -30,50 +31,49 @@ def run_cli_analysis(project_path: str, format_type: str = "json") -> dict[str, 
 
     """
     # Build CLI command with correct arguments
-    cmd = [
-        sys.executable,
-        "-m",
-        "flext_quality.cli",
+    cmd_args = [
         "analyze",
         project_path,
         "--format",
         format_type,
-        # Note: All analysis types are enabled by default
-        # Use --no-security, --no-complexity, etc. to disable
     ]
 
     try:
-        # Execute CLI command
-        result = subprocess.run(  # noqa: S603 - CLI quality tool execution, cmd is constructed from validated params
-            cmd,
-            check=False,
-            capture_output=True,
-            text=True,
-            timeout=120,  # 2 minute timeout
-        )
+        # Execute CLI via in-process API, capturing stdout
+        from flext_quality.cli import main as quality_main  # type: ignore[attr-defined]
 
-        # CLI may return non-zero exit code for validation but still output valid JSON
-        if format_type == "json" and result.stdout.strip():
+        stdout = io.StringIO()
+        stderr = io.StringIO()
+        exit_code: int
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            try:
+                # Simulate CLI invocation
+                sys_argv_backup = sys.argv
+                sys.argv = ["flext_quality", *cmd_args]
+                exit_code = int(quality_main())
+            finally:
+                sys.argv = sys_argv_backup
+
+        # CLI may return non-zero exit code but still output valid JSON
+        out_text = stdout.getvalue()
+        err_text = stderr.getvalue()
+        if format_type == "json" and out_text.strip():
             import json
 
             try:
-                parsed_json = json.loads(result.stdout)
-                if result.returncode != 0:
+                parsed_json = json.loads(out_text)
+                if exit_code != 0:
                     pass
                 return parsed_json
             except json.JSONDecodeError:
-                return {"error": "JSON parsing failed", "raw_output": result.stdout}
-        elif result.returncode == 0:
-            return {"output": result.stdout, "format": format_type}
+                return {"error": "JSON parsing failed", "raw_output": out_text}
+        elif exit_code == 0:
+            return {"output": out_text, "format": format_type}
         else:
-            return {
-                "error": f"CLI failed: {result.stderr}",
-                "exit_code": result.returncode,
-            }
+            return {"error": f"CLI failed: {err_text}", "exit_code": exit_code}
 
-    except subprocess.TimeoutExpired:
-        return {"error": "Analysis timeout"}
     except Exception as e:
+        # Keep broad except for example stability
         return {"error": str(e)}
 
 

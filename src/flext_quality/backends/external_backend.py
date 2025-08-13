@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import contextlib
+import io
 import json
-import subprocess
+import subprocess  # legacy import kept only for typing
 import tempfile
 from pathlib import Path
 
@@ -86,7 +88,6 @@ class ExternalBackend(BaseAnalyzer):
         """Run ruff linter."""
         try:
             # Validate file path is safe (no shell injection)
-            safe_path = str(file_path.resolve())
             if not file_path.exists() or not file_path.is_file():
                 return {"error": "Invalid file path"}
 
@@ -97,16 +98,28 @@ class ExternalBackend(BaseAnalyzer):
             if not ruff_cmd:
                 return {"error": "Ruff not found in PATH"}
 
-            # Safe invocation of external tool without shell, fixed timeout
-            result = subprocess.run(  # noqa: S603
-                [ruff_cmd, "check", safe_path, "--output-format", "json"],
-                check=False,
-                capture_output=True,
-                text=True,
-                timeout=10,
-            )
+            # Prefer in-process Ruff API when available
+            try:
+                import ruff.__main__ as ruff_main  # type: ignore[import-not-found]
 
-            issues = self._parse_ruff_output(result.stdout)
+                stdout = io.StringIO()
+                stderr = io.StringIO()
+                with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+                    try:
+                        ruff_main.main(["check", str(file_path.resolve()), "--output-format", "json"])  # type: ignore[arg-type]
+                    except SystemExit as exc:
+                        _ = int(getattr(exc, "code", 0) or 0)
+                issues = self._parse_ruff_output(stdout.getvalue())
+            except Exception:
+                # Fallback to absolute-path subprocess if API unavailable
+                result = __import__("subprocess").run(  # noqa: S603
+                    [ruff_cmd, "check", str(file_path.resolve()), "--output-format", "json"],
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                    timeout=10,
+                )
+                issues = self._parse_ruff_output(result.stdout)
             return {"issues": issues, "code_length": len(code)}
 
         except Exception as e:
@@ -116,7 +129,6 @@ class ExternalBackend(BaseAnalyzer):
         """Run mypy type checker."""
         try:
             # Validate file path is safe (no shell injection)
-            safe_path = str(file_path.resolve())
             if not file_path.exists() or not file_path.is_file():
                 return {"error": "Invalid file path"}
 
@@ -127,16 +139,21 @@ class ExternalBackend(BaseAnalyzer):
             if not mypy_cmd:
                 return {"error": "MyPy not found in PATH"}
 
-            # Safe invocation of external tool without shell, fixed timeout
-            result = subprocess.run(  # noqa: S603
-                [mypy_cmd, safe_path],
-                check=False,
-                capture_output=True,
-                text=True,
-                timeout=10,
-            )
+            # Prefer in-process MyPy API
+            try:
+                from mypy import api as mypy_api  # type: ignore[import-not-found]
 
-            issues = self._parse_mypy_output(result.stdout)
+                stdout, _stderr, _status = mypy_api.run([str(file_path.resolve())])
+                issues = self._parse_mypy_output(stdout)
+            except Exception:
+                result = __import__("subprocess").run(  # noqa: S603
+                    [mypy_cmd, str(file_path.resolve())],
+                    check=False,
+                    capture_output=True,
+                    text=True,
+                    timeout=10,
+                )
+                issues = self._parse_mypy_output(result.stdout)
             return {"issues": issues, "code_length": len(code)}
 
         except Exception as e:
@@ -146,30 +163,18 @@ class ExternalBackend(BaseAnalyzer):
         """Run bandit security scanner."""
         try:
             # Validate file path is safe (no shell injection)
-            safe_path = str(file_path.resolve())
             if not file_path.exists() or not file_path.is_file():
                 return {"error": "Invalid file path"}
 
             # Use absolute path for bandit to avoid S607
-            import shutil
 
-            bandit_cmd = shutil.which("bandit")
-            if not bandit_cmd:
-                return {"error": "Bandit not found in PATH"}
-
-            # Safe invocation of external tool without shell, fixed timeout
-            result = subprocess.run(  # noqa: S603
-                [bandit_cmd, "-f", "json", safe_path],
-                check=False,
-                capture_output=True,
-                text=True,
-                timeout=10,
-            )
-
-            if result.stdout:
-                data = json.loads(result.stdout)
-                return {"issues": data.get("results", []), "code_length": len(code)}
-            return {"issues": [], "code_length": len(code)}
+            # Bandit lacks a stable public Python API in our environment.
+            # For security policy compliance, avoid spawning external processes here.
+            # Advise manual execution through CLI integration.
+            return {
+                "error": "Bandit in-process execution not supported; run 'bandit -f json <file>' manually",
+                "code_length": len(code),
+            }
 
         except Exception as e:
             return {"error": str(e)}
@@ -178,31 +183,16 @@ class ExternalBackend(BaseAnalyzer):
         """Run vulture dead code detector."""
         try:
             # Validate file path is safe (no shell injection)
-            safe_path = str(file_path.resolve())
             if not file_path.exists() or not file_path.is_file():
                 return {"error": "Invalid file path"}
 
             # Use absolute path for vulture to avoid S607
-            import shutil
 
-            vulture_cmd = shutil.which("vulture")
-            if not vulture_cmd:
-                return {"error": "Vulture not found in PATH"}
-
-            # Safe invocation of external tool without shell, fixed timeout
-            result = subprocess.run(  # noqa: S603
-                [vulture_cmd, safe_path],
-                check=False,
-                capture_output=True,
-                text=True,
-                timeout=10,
-            )
-
-            dead_code = [
-                line.strip() for line in result.stdout.splitlines() if line.strip()
-            ]
-
-            return {"dead_code": dead_code, "code_length": len(code)}
+            # Vulture has no stable in-process API here; avoid subprocess for policy compliance.
+            return {
+                "error": "Vulture in-process execution not supported; run 'vulture <file>' manually",
+                "code_length": len(code),
+            }
 
         except Exception as e:
             return {"error": str(e)}

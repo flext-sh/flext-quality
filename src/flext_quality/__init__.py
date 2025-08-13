@@ -98,6 +98,9 @@ from flext_core import FlextResult
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.metrics import QualityMetrics
 from flext_quality.reports import QualityReport
+from flext_quality.exceptions import (
+    FlextQualityError as QualityError,
+)
 
 try:
     __version__ = importlib.metadata.version("flext-quality")
@@ -163,16 +166,13 @@ with contextlib.suppress(ImportError):
 # ================================
 
 __all__: list[str] = [
-    "BaseModel",
     "CodeAnalyzer",
     "FlextQualityDeprecationWarning",
     "FlextResult",
     "QualityAPI",
-    "QualityBaseConfig",
     "QualityError",
     "QualityMetrics",
     "QualityReport",
-    "ValidationError",
     "__version__",
     "__version_info__",
     "annotations",
