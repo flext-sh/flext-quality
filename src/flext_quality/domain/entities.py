@@ -15,9 +15,9 @@ from pydantic import BaseModel, Field
 
 # Ensure FlextTypes forward ref is resolvable at import time
 try:  # EAFP: import actual types to avoid forward-ref rebuild issues
-    from flext_quality.typings import FlextTypes  # noqa: F401
+    from flext_quality.typings import FlextTypes
 except Exception:
-    FlextTypes = None  # type: ignore[assignment]
+    FlextTypes = None  # type: ignore[misc,assignment]
 
 
 class FlextDomainEvent(BaseModel):

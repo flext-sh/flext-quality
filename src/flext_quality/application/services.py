@@ -198,6 +198,10 @@ class QualityAnalysisService:
 
         """
         try:
+            # Validate project_id
+            if not project_id or not project_id.strip():
+                return FlextResult.fail("Project ID is required")
+
             # Create real QualityAnalysis entity following flext-core patterns
             analysis = QualityAnalysis(
                 id=str(uuid4()),
