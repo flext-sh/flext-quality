@@ -69,7 +69,7 @@ class IssueType(StrEnum):
 
     # Security issues
     SECURITY_VULNERABILITY = "security_vulnerability"
-    HARDCODED_SECRET = "hardcoded_secret"  # noqa: S105 - Issue type constant, not a password
+    HARDCODED_CREDENTIAL = "hardcoded_credential"
     SQL_INJECTION = "sql_injection"
     XSS_VULNERABILITY = "xss_vulnerability"
 

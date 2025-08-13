@@ -7,7 +7,9 @@ REFACTORED:
 
 from __future__ import annotations
 
-from flext_core import FlextResult, FlextTypes
+from typing import TYPE_CHECKING
+
+from flext_core import FlextResult
 
 from flext_quality.domain.entities import (
     AnalysisStatus,
@@ -18,6 +20,9 @@ from flext_quality.domain.entities import (
     QualityProject,
     QualityReport,
 )
+
+if TYPE_CHECKING:
+    from flext_quality.typings import FlextTypes
 
 
 # Simplified DI - removed decorator
@@ -818,12 +823,14 @@ class SecurityAnalyzerServiceImpl(BasePortService):
                         # Skip files that can't be read
                         continue
 
-            return FlextResult.ok({
-                "security_issues": security_issues,
-                "project_path": project_path,
-                "tool": "bandit",
-                "total_issues": len(security_issues),
-            })
+            return FlextResult.ok(
+                {
+                    "security_issues": security_issues,
+                    "project_path": project_path,
+                    "tool": "bandit",
+                    "total_issues": len(security_issues),
+                },
+            )
         except Exception as e:
             return FlextResult.fail(f"Security analysis failed: {e}")
 
@@ -857,12 +864,14 @@ class LintingServiceImpl(BasePortService):
                         # Skip files that can't be read
                         continue
 
-            return FlextResult.ok({
-                "linting_issues": linting_issues,
-                "project_path": project_path,
-                "tool": "ruff",
-                "total_issues": len(linting_issues),
-            })
+            return FlextResult.ok(
+                {
+                    "linting_issues": linting_issues,
+                    "project_path": project_path,
+                    "tool": "ruff",
+                    "total_issues": len(linting_issues),
+                },
+            )
         except Exception as e:
             return FlextResult.fail(f"Linting analysis failed: {e}")
 

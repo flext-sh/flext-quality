@@ -58,7 +58,7 @@ Example:
     >>> config = FlextQualityConfig(
     ...     analysis_backends=["ruff", "mypy", "bandit"],
     ...     quality_threshold=80.0,
-    ...     enable_security_scan=True
+    ...     enable_security_scan=True,
     ... )
     >>>
     >>> # Initialize API and analyze project

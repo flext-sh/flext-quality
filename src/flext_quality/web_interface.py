@@ -199,7 +199,11 @@ class QualityWebInterface:
         return jsonify({"success": True, "data": report})
 
     def run(
-        self, host: str = "localhost", port: int = 8080, *, debug: bool = True,
+        self,
+        host: str = "localhost",
+        port: int = 8080,
+        *,
+        debug: bool = True,
     ) -> None:
         """Run the quality web server."""
         logger.info(f"Starting FLEXT Quality Web Interface on {host}:{port}")

@@ -284,18 +284,23 @@ class ASTBackend(BaseAnalyzer):
         imports: list[dict[str, object]] = []
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
-                imports.extend([{"module": alias.name, "names": []} for alias in node.names])
+                imports.extend(
+                    [{"module": alias.name, "names": []} for alias in node.names],
+                )
             elif isinstance(node, ast.ImportFrom) and node.module:
                 imports.append(
                     {
                         "module": node.module,
                         "names": [alias.name for alias in node.names],
-                        },
-                    )
+                    },
+                )
         return imports
 
     def _check_docstrings(self, tree: ast.AST) -> list[str]:
         """Check for missing docstrings."""
-        return [node.name for node in ast.walk(tree)
-                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
-                and not ast.get_docstring(node)]
+        return [
+            node.name
+            for node in ast.walk(tree)
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+            and not ast.get_docstring(node)
+        ]

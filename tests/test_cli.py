@@ -257,7 +257,9 @@ class TestAnalyzeProject:
         mock_analyzer_class.return_value = mock_analyzer
 
         mock_report = MagicMock()
-        mock_report.to_json.return_value = '{"test": "json_output"}'  # Return string for sys.stdout.write()
+        mock_report.to_json.return_value = (
+            '{"test": "json_output"}'  # Return string for sys.stdout.write()
+        )
         mock_report_class.return_value = mock_report
 
         # Create test args with JSON format but no output

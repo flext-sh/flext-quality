@@ -58,7 +58,7 @@ class TestIssueType:
     def test_security_issues(self) -> None:
         """Test security issue types."""
         assert IssueType.SECURITY_VULNERABILITY.value == "security_vulnerability"
-        assert IssueType.HARDCODED_SECRET.value == "hardcoded_secret"
+        assert IssueType.HARDCODED_CREDENTIAL.value == "hardcoded_credential"
         assert IssueType.SQL_INJECTION.value == "sql_injection"
         assert IssueType.XSS_VULNERABILITY.value == "xss_vulnerability"
 

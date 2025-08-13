@@ -79,10 +79,12 @@ def analyze_project(args: argparse.Namespace) -> int:
         elif args.format == "json":
             # Write JSON to stdout explicitly for CLI output
             import sys
+
             sys.stdout.write(report.to_json() + "\n")
         elif args.format == "html":
             # Write HTML to stdout explicitly for CLI output
             import sys
+
             sys.stdout.write(report.to_html() + "\n")
         # Constants for quality thresholds
         good_quality_threshold = 80
@@ -239,10 +241,15 @@ Examples:
     # Web server command
     web_parser = subparsers.add_parser("web", help="Run quality web interface")
     web_parser.add_argument(
-        "--host", default="localhost", help="Host to bind to (default: localhost)",
+        "--host",
+        default="localhost",
+        help="Host to bind to (default: localhost)",
     )
     web_parser.add_argument(
-        "--port", type=int, default=8080, help="Port to bind to (default: 8080)",
+        "--port",
+        type=int,
+        default=8080,
+        help="Port to bind to (default: 8080)",
     )
     web_parser.add_argument("--debug", action="store_true", help="Enable debug mode")
     web_parser.set_defaults(func=run_web_server)
