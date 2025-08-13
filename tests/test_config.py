@@ -2,8 +2,12 @@
 
 from __future__ import annotations
 
+import flext_quality.config as config_module
 from flext_quality import config
-from flext_quality.infrastructure.config import QualityConfig
+from flext_quality.infrastructure.config import (
+    QualityConfig,
+    QualityConfig as InfraQualityConfig,
+)
 
 
 class TestConfigModule:
@@ -21,15 +25,11 @@ class TestConfigModule:
 
     def test_backward_compatibility(self) -> None:
         """Test backward compatibility of config re-export."""
-        # Import from main config module
-        # Import from infrastructure directly
-        from flext_quality.config import QualityConfig as ConfigQualityConfig
-        from flext_quality.infrastructure.config import (
-            QualityConfig as InfraQualityConfig,
-        )
+        # Use module-level imports
+        config_quality_config = config_module.QualityConfig
 
         # Should be the same class
-        assert ConfigQualityConfig is InfraQualityConfig
+        assert config_quality_config is InfraQualityConfig
 
     def test_config_instantiation(self) -> None:
         """Test config can be instantiated through re-export."""

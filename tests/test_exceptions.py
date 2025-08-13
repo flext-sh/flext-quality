@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import pytest
 
+import flext_quality.exceptions as exc_module
 from flext_quality.exceptions import (
     FlextQualityAnalysisError,
     FlextQualityAuthenticationError,
@@ -21,6 +22,7 @@ from flext_quality.exceptions import (
     FlextQualityRuleError,
     FlextQualityTimeoutError,
     FlextQualityValidationError,
+    __all__ as exceptions_all,
 )
 
 
@@ -227,8 +229,6 @@ class TestExceptionModuleExports:
 
     def test_all_exceptions_in_all_list(self) -> None:
         """Test that __all__ contains all exception classes."""
-        from flext_quality.exceptions import __all__
-
         expected_exceptions = {
             "FlextQualityAnalysisError",
             "FlextQualityAuthenticationError",
@@ -244,14 +244,11 @@ class TestExceptionModuleExports:
             "FlextQualityValidationError",
         }
 
-        assert set(__all__) == expected_exceptions
+        assert set(exceptions_all) == expected_exceptions
 
     def test_all_exceptions_importable(self) -> None:
         """Test that all exceptions can be imported from the module."""
-        import flext_quality.exceptions as exc_module
-        from flext_quality.exceptions import __all__
-
-        for exception_name in __all__:
+        for exception_name in exceptions_all:
             # Test that the exception class exists and is callable
             exception_class = getattr(exc_module, exception_name)
             assert callable(exception_class)

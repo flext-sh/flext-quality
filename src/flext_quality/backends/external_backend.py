@@ -9,7 +9,6 @@ import tempfile
 from importlib import import_module, util
 from pathlib import Path
 
-from importlib import import_module, util
 from flext_quality.backends.base import (
     BackendType,
     BaseAnalyzer,
@@ -105,11 +104,8 @@ class ExternalBackend(BaseAnalyzer):
                 }
             stdout = io.StringIO()
             stderr = io.StringIO()
-            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
-                try:
-                    ruff_main.main(["check", str(file_path.resolve()), "--output-format", "json"])  # type: ignore[arg-type]
-                except SystemExit as exc:  # noqa: F841
-                    _ = int(getattr(exc, "code", 0) or 0)
+            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr), contextlib.suppress(SystemExit):
+                ruff_main.main(["check", str(file_path.resolve()), "--output-format", "json"])  # type: ignore[arg-type]
             issues = self._parse_ruff_output(stdout.getvalue())
             return {"issues": issues, "code_length": len(code)}
 

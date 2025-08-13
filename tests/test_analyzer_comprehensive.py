@@ -13,6 +13,7 @@ from unittest.mock import MagicMock, patch
 from flext_quality.analyzer import CodeAnalyzer
 from tests.helpers import (
     assert_analysis_results_structure,
+    assert_is_list,
     assert_issues_structure,
     assert_metrics_structure,
 )
@@ -576,9 +577,6 @@ def complex_calculation(x, y, z):
         assert "complexity" in issues
         assert "dead_code" in issues
         assert "duplicates" in issues
-
-        # Check files list using type-safe access
-        from tests.helpers import assert_is_list
 
         file_list = validated_results["python_files"]
         assert_is_list(file_list)

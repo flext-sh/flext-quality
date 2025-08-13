@@ -9,13 +9,15 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from enum import StrEnum
-from typing import TYPE_CHECKING
 
 from flext_core import FlextEntity, FlextResult
 from pydantic import BaseModel, Field
 
-if TYPE_CHECKING:
-    from flext_quality.typings import FlextTypes
+# Ensure FlextTypes forward ref is resolvable at import time
+try:  # EAFP: import actual types to avoid forward-ref rebuild issues
+    from flext_quality.typings import FlextTypes  # noqa: F401
+except Exception:
+    FlextTypes = None  # type: ignore[assignment]
 
 
 class FlextDomainEvent(BaseModel):

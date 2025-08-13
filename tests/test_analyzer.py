@@ -1,6 +1,8 @@
 """Comprehensive tests for the CodeAnalyzer class."""
 
 import ast
+import builtins
+import logging
 import tempfile
 from collections.abc import Callable, Generator
 from pathlib import Path
@@ -544,8 +546,6 @@ class TestCodeAnalyzer:
         caplog: pytest.LogCaptureFixture,
     ) -> None:
         """Test that analysis produces appropriate log messages."""
-        import logging
-
         caplog.set_level(logging.INFO)
 
         analyzer = CodeAnalyzer(temp_project)
@@ -586,8 +586,6 @@ class TestCodeAnalyzer:
         caplog: pytest.LogCaptureFixture,
     ) -> None:
         """Test error handling in security analysis."""
-        import logging
-
         caplog.set_level(logging.WARNING)
 
         analyzer = CodeAnalyzer(temp_project)
@@ -598,8 +596,6 @@ class TestCodeAnalyzer:
         error_file.write_text("# Error file")
 
         # Mock open to raise exception for specific file
-        import builtins
-
         original_open = builtins.open
 
         def mock_open(file_path: str | Path, *args: object, **kwargs: object) -> TextIO:
@@ -631,15 +627,11 @@ class TestCodeAnalyzer:
         caplog: pytest.LogCaptureFixture,
     ) -> None:
         """Test error handling in dead code analysis."""
-        import logging
-
         caplog.set_level(logging.WARNING)
 
         analyzer = CodeAnalyzer(temp_project)
 
         # Mock file operations to simulate errors
-        import builtins
-
         original_open = builtins.open
 
         def mock_open(file_path: str | Path, *args: object, **kwargs: object) -> TextIO:
@@ -670,15 +662,11 @@ class TestCodeAnalyzer:
         caplog: pytest.LogCaptureFixture,
     ) -> None:
         """Test error handling in duplicate analysis."""
-        import logging
-
         caplog.set_level(logging.WARNING)
 
         analyzer = CodeAnalyzer(temp_project)
 
         # Mock file operations to simulate errors
-        import builtins
-
         original_open = builtins.open
 
         def mock_open(file_path: str | Path, *args: object, **kwargs: object) -> TextIO:

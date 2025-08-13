@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import pytest
+from pydantic import ValidationError
 
+from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
 from flext_quality.metrics import QualityMetrics
 
 
@@ -45,8 +47,6 @@ class TestQualityMetrics:
 
     def test_score_validation(self) -> None:
         """Test score validation bounds."""
-        from pydantic import ValidationError
-
         with pytest.raises(ValidationError):
             QualityMetrics(overall_score=-1.0)
 
@@ -61,8 +61,6 @@ class TestQualityMetrics:
 
     def test_count_validation(self) -> None:
         """Test count validation (non-negative)."""
-        from pydantic import ValidationError
-
         with pytest.raises(ValidationError):
             QualityMetrics(total_files=-1)
 
@@ -266,8 +264,6 @@ class TestQualityMetrics:
             (44.0, "F"),
             (0.0, "F"),
         ]
-
-        from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
 
         for score, expected_grade in test_cases:
             grade = QualityGradeCalculator.calculate_grade(score)
