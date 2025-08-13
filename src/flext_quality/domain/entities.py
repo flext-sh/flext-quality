@@ -9,11 +9,13 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from enum import StrEnum
+from typing import TYPE_CHECKING
 
 from flext_core import FlextEntity, FlextResult
 from pydantic import BaseModel, Field
 
-from flext_quality.typings import FlextTypes
+if TYPE_CHECKING:
+    from flext_quality.typings import FlextTypes
 
 
 class FlextDomainEvent(BaseModel):

@@ -22,9 +22,7 @@ classifiers = [
 dependencies = [
     "pydantic (>=2.11.7)",
     "pydantic-settings (>=2.10.1)",
-    "flext-observability @ file:///home/marlonsc/flext/flext-observability",
-    "flext-core @ file:///home/marlonsc/flext/flext-core",
-    "flext-web @ file:///home/marlonsc/flext/flext-web",
+    # Local workspace packages are defined under [tool.poetry.dependencies.*]
 ]
 [[project.authors]]
 name = "FLEXT Team"
@@ -152,6 +150,18 @@ django_settings_module = "code_analyzer_web.settings"
 include = "flext_quality"
 from = "src"
 
+[tool.poetry.dependencies.flext-core]
+path = "../flext-core"
+develop = true
+
+[tool.poetry.dependencies.flext-observability]
+path = "../flext-observability"
+develop = true
+
+[tool.poetry.dependencies.flext-web]
+path = "../flext-web"
+develop = true
+
 [tool.deptry]
 known_first_party = ["flext_quality"]
 
@@ -205,13 +215,8 @@ directory = "reports/coverage"
 
 [tool.coverage.xml]
 output = "reports/coverage.xml"
-
 [tool.poetry.dependencies]
 python = ">=3.13,<3.14"
-
-[tool.poetry.dependencies.flext-core]
-path = "../flext-core"
-develop = true
 
 [tool.poetry.group.dev.dependencies]
 ruff = ">=0.12.3"
@@ -258,3 +263,4 @@ types-psutil = ">=7.0.0"
 [tool.poetry.group.security.dependencies]
 bandit = ">=1.8.0"
 pip-audit = ">=2.7.3"
+

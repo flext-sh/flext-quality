@@ -20,16 +20,15 @@ from flext_quality.application.services import (
 from flext_quality.infrastructure.container import get_quality_container
 
 if TYPE_CHECKING:
+    from flext_quality.typings import FlextTypes
+
+if TYPE_CHECKING:
     from flext_quality.domain.entities import (
         QualityAnalysis,
         QualityIssue,
         QualityProject,
         QualityReport,
     )
-    from flext_quality.typings import FlextTypes
-else:
-    # Runtime imports for isinstance checks
-    pass
 
 
 class QualityAPI:
