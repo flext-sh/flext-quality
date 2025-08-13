@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import importlib
 from pathlib import Path
 
 from flext_core import get_logger
@@ -20,9 +21,10 @@ def flext_create_trace(
 ) -> None:
     """Shim for observability trace; safe no-op if backend unavailable."""
     try:
-        from flext_observability import flext_create_trace as _real
-
-        _real(trace_id=trace_id, operation=operation, config=config)
+        mod = importlib.import_module("flext_observability")
+        real = getattr(mod, "flext_create_trace", None)
+        if callable(real):
+            real(trace_id=trace_id, operation=operation, config=config)
     except Exception:
         return
 
@@ -35,9 +37,10 @@ def flext_create_metric(
 ) -> None:
     """Shim for observability metric; safe no-op if backend unavailable."""
     try:
-        from flext_observability import flext_create_metric as _real
-
-        _real(name=name, value=value, tags=tags)
+        mod = importlib.import_module("flext_observability")
+        real = getattr(mod, "flext_create_metric", None)
+        if callable(real):
+            real(name=name, value=value, tags=tags)
     except Exception:
         return
 
@@ -50,9 +53,10 @@ def flext_create_log_entry(
 ) -> None:
     """Shim for observability log; safe no-op if backend unavailable."""
     try:
-        from flext_observability import flext_create_log_entry as _real
-
-        _real(message=message, level=level, context=context)
+        mod = importlib.import_module("flext_observability")
+        real = getattr(mod, "flext_create_log_entry", None)
+        if callable(real):
+            real(message=message, level=level, context=context)
     except Exception:
         return
 
@@ -361,9 +365,7 @@ class CodeAnalyzer:
                 }
 
             except SyntaxError as e:
-                from flext_core import get_logger
-
-                logger = get_logger(__name__)
+                # Reuse module-level logger
                 logger.warning("Syntax error in %s: %s", file_path, e)
                 # Handle file paths that may be outside project directory
                 try:
@@ -384,9 +386,7 @@ class CodeAnalyzer:
                     "syntax_error": str(e),
                 }
         except (RuntimeError, ValueError, TypeError, FileNotFoundError, OSError):
-            from flext_core import get_logger
-
-            logger = get_logger(__name__)
+            # Reuse module-level logger
             logger.exception("File analysis failed for %s", file_path)
             logger.exception("Error analyzing file %s", file_path)
             return None
