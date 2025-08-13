@@ -7,6 +7,7 @@ Provides clean API interface for all quality analysis operations.
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from flext_quality.typings import FlextTypes
 from uuid import UUID
 
 from flext_core import FlextResult
@@ -18,9 +19,6 @@ from flext_quality.application.services import (
     QualityReportService,
 )
 from flext_quality.infrastructure.container import get_quality_container
-
-if TYPE_CHECKING:
-    from flext_quality.typings import FlextTypes
 
 if TYPE_CHECKING:
     from flext_quality.domain.entities import (
