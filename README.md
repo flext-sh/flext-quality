@@ -165,10 +165,10 @@ export QUALITY_MIN_SECURITY_SCORE=90.0
 
 ## Quality Standards
 
-### **Zero Tolerance Quality Gates**
+### **Quality Targets**
 
-- **Coverage**: 90% test coverage enforced
-- **Type Safety**: Strict MyPy configuration
+- **Coverage**: 90% target
+- **Type Safety**: MyPy strict mode adoption
 - **Linting**: Ruff with comprehensive rules
 - **Security**: Bandit + pip-audit scanning
 

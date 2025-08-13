@@ -31,6 +31,7 @@ class TestAnalyzeProjectComprehensive:
         path: str,
         output: str | None = None,
         format_type: str = "text",
+        *,
         verbose: bool = False,
     ) -> argparse.Namespace:
         """DRY helper: Create analyze_project arguments."""

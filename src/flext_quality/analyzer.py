@@ -13,7 +13,10 @@ from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
 # Import lazily inside methods to avoid pydantic model rebuild side-effects during import
 # Expose observability symbols for tests to patch via module attribute shims
 def flext_create_trace(
-    *, trace_id: str, operation: str, config: dict[str, object] | None = None,
+    *,
+    trace_id: str,
+    operation: str,
+    config: dict[str, object] | None = None,
 ) -> None:
     """Shim for observability trace; safe no-op if backend unavailable."""
     try:
@@ -25,7 +28,10 @@ def flext_create_trace(
 
 
 def flext_create_metric(
-    *, name: str, value: float, tags: dict[str, object] | None = None,
+    *,
+    name: str,
+    value: float,
+    tags: dict[str, object] | None = None,
 ) -> None:
     """Shim for observability metric; safe no-op if backend unavailable."""
     try:
@@ -37,7 +43,10 @@ def flext_create_metric(
 
 
 def flext_create_log_entry(
-    *, message: str, level: str, context: dict[str, object] | None = None,
+    *,
+    message: str,
+    level: str,
+    context: dict[str, object] | None = None,
 ) -> None:
     """Shim for observability log; safe no-op if backend unavailable."""
     try:

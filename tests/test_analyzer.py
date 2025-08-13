@@ -539,7 +539,9 @@ class TestCodeAnalyzer:
         assert analyzer.analysis_results != {}
 
     def test_analyze_project_logging(
-        self, temp_project: Path, caplog: pytest.LogCaptureFixture,
+        self,
+        temp_project: Path,
+        caplog: pytest.LogCaptureFixture,
     ) -> None:
         """Test that analysis produces appropriate log messages."""
         import logging

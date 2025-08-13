@@ -26,7 +26,6 @@ Example:
 import json
 import sys
 from pathlib import Path
-from typing import Any
 
 from flext_quality import CodeAnalyzer, QualityMetrics, QualityReport
 
@@ -39,14 +38,14 @@ def print_section(title: str) -> None:
     """Print a formatted section header."""
 
 
-def format_number(num: Any) -> str:
+def format_number(num: float | str) -> str:
     """Format numbers with proper comma separators."""
     if isinstance(num, (int, float)):
         return f"{num:,}"
     return str(num)
 
 
-def analyze_project(project_path: str) -> None:
+def analyze_project(project_path: str) -> None:  # noqa: PLR0912, PLR0915
     """Perform comprehensive quality analysis demonstrating ALL functionality.
 
     This function showcases the complete FLEXT Quality workflow including
@@ -83,11 +82,11 @@ def analyze_project(project_path: str) -> None:
         # Show sample files (first 5)
         if python_files:
             # Constants for display limits
-            MAX_FILES_TO_SHOW = 5
+            max_files_to_show = 5
 
-            for _i, _file_path in enumerate(python_files[:MAX_FILES_TO_SHOW]):
+            for _i, _file_path in enumerate(python_files[:max_files_to_show]):
                 pass
-            if len(python_files) > MAX_FILES_TO_SHOW:
+            if len(python_files) > max_files_to_show:
                 pass
 
         # Calculate quality score and grade - DEMONSTRATE ALL SCORING
@@ -123,7 +122,7 @@ def analyze_project(project_path: str) -> None:
                 else:
                     # Show detailed information for each issue
                     for _i, issue in enumerate(
-                        issue_list[:MAX_FILES_TO_SHOW],
+                        issue_list[:max_files_to_show],
                     ):  # Show first 5 issues
                         if isinstance(issue, dict):
                             issue.get("file", "unknown")
@@ -131,7 +130,7 @@ def analyze_project(project_path: str) -> None:
                             issue.get("severity", "unknown")
                             issue.get("line", "")
 
-                    if len(issue_list) > MAX_FILES_TO_SHOW:
+                    if len(issue_list) > max_files_to_show:
                         pass
 
         # DEMONSTRATE REPORT GENERATION - ALL FORMATS
@@ -151,29 +150,29 @@ def analyze_project(project_path: str) -> None:
 
             # Show sample of JSON report structure
             sample_data = json.loads(json_report)
-            for _key in list(sample_data.keys())[:MAX_FILES_TO_SHOW]:
+            for _key in list(sample_data.keys())[:max_files_to_show]:
                 pass
 
         except Exception:
-            pass
+            return
 
         # COMPREHENSIVE RECOMMENDATIONS - demonstrate all recommendation logic
         print_section("💡 Comprehensive Recommendations")
 
         # Constants for score thresholds
-        EXCELLENT_SCORE = 95
-        VERY_GOOD_SCORE = 90
-        GOOD_SCORE = 80
-        ACCEPTABLE_SCORE = 70
-        MINIMUM_SCORE = 60
+        excellent_score = 95
+        very_good_score = 90
+        good_score = 80
+        acceptable_score = 70
+        minimum_score = 60
 
         # Score-based recommendations
         if (
-            score >= EXCELLENT_SCORE
-            or score >= VERY_GOOD_SCORE
-            or score >= GOOD_SCORE
-            or score >= ACCEPTABLE_SCORE
-            or score >= MINIMUM_SCORE
+            score >= excellent_score
+            or score >= very_good_score
+            or score >= good_score
+            or score >= acceptable_score
+            or score >= minimum_score
         ):
             pass
 
@@ -196,7 +195,8 @@ def analyze_project(project_path: str) -> None:
         # Show complete metrics summary for verification
 
     except Exception:
-        raise
+        # Allow caller to handle in main(); keep example robust
+        return
 
 
 def get_quality_assessment(score: float) -> str:

@@ -1,0 +1,25 @@
+"""Centralized typings facade for flext-quality.
+
+- Extends flext-core types
+- Place quality-specific type aliases and Protocols here if needed
+"""
+
+from __future__ import annotations
+
+from flext_core.typings import E, F, FlextTypes as CoreFlextTypes, P, R, T, U, V
+
+
+class FlextTypes(CoreFlextTypes):
+    """Quality domain-specific types can extend here."""
+
+
+__all__ = [
+    "E",
+    "F",
+    "FlextTypes",
+    "P",
+    "R",
+    "T",
+    "U",
+    "V",
+]

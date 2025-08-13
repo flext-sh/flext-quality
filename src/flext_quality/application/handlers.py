@@ -60,7 +60,10 @@ class AnalyzeProjectHandler:
             flext_create_log_entry(
                 message=f"Starting project analysis for {project_id}",
                 level="info",
-                context={"handler": "AnalyzeProjectHandler", "project_id": str(project_id)},
+                context={
+                    "handler": "AnalyzeProjectHandler",
+                    "project_id": str(project_id),
+                },
             )
         except Exception as _e:
             _ = _e
