@@ -25,6 +25,7 @@ class QualityProjectService:
     """Service for managing quality projects."""
 
     def __init__(self) -> None:
+        """Initialize service with in-memory repository."""
         self._projects: dict[str, QualityProject] = {}
 
     async def create_project(
@@ -34,6 +35,7 @@ class QualityProjectService:
         repository_url: str | None = None,
         config_path: str | None = None,
         language: str = "python",
+        *,
         auto_analyze: bool = True,
         min_coverage: float = 95.0,
         max_complexity: int = 10,
@@ -165,6 +167,7 @@ class QualityAnalysisService:
     """Service for managing quality analyses."""
 
     def __init__(self) -> None:
+        """Initialize service with in-memory repository."""
         self._analyses: dict[str, QualityAnalysis] = {}
 
     async def create_analysis(
@@ -457,6 +460,7 @@ class QualityIssueService:
     """Service for managing quality issues."""
 
     def __init__(self) -> None:
+        """Initialize service with in-memory repository."""
         self._issues: dict[str, QualityIssue] = {}
 
     async def create_issue(
@@ -645,6 +649,7 @@ class QualityReportService:
     """Service for managing quality reports."""
 
     def __init__(self) -> None:
+        """Initialize service with in-memory repository."""
         self._reports: dict[str, QualityReport] = {}
 
     async def create_report(
@@ -762,6 +767,7 @@ class BasePortService:
         port: object | None = None,
         repository: object | None = None,
     ) -> None:
+        """Initialize base port service with optional dependencies."""
         self._port = port
         self._repository = repository
 
@@ -770,6 +776,7 @@ class AnalysisServiceImpl:
     """Implementation of analysis service for DI container."""
 
     def __init__(self) -> None:
+        """Initialize with underlying analysis service."""
         self._analysis_service = QualityAnalysisService()
 
     async def analyze_project(self, project_id: str) -> FlextResult[QualityAnalysis]:
@@ -864,6 +871,7 @@ class ReportGeneratorServiceImpl:
     """Implementation of report generator service for DI container."""
 
     def __init__(self) -> None:
+        """Initialize with underlying report service."""
         self._report_service = QualityReportService()
 
     async def generate_report(

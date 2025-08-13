@@ -17,7 +17,7 @@ from flext_quality.reports import QualityReport
 
 
 def setup_logging(level: str = "INFO") -> None:
-    """Setup logging configuration.
+    """Set up logging configuration.
 
     Args:
         level: Logging level to set (default: INFO)
@@ -95,12 +95,12 @@ def analyze_project(args: argparse.Namespace) -> int:
         if quality_score >= medium_quality_threshold:
             return 1  # Medium quality
         return 2  # Poor quality
-    except (RuntimeError, ValueError, TypeError) as e:
+    except (RuntimeError, ValueError, TypeError):
         from flext_core import get_logger
 
         logger = get_logger(__name__)
         # EXPLICIT TRANSPARENCY: CLI function must return exit code for process management
-        logger.exception(f"Quality analysis failed with specific error: {e}")
+        logger.exception("Quality analysis failed with specific error")
         logger.exception("Returning exit code 3 to indicate analysis failure")
         if args.verbose:
             logger.info("Verbose mode enabled - showing full traceback")
@@ -138,11 +138,11 @@ def score_project(args: argparse.Namespace) -> int:
         acceptable_quality_threshold = 70
 
         return 0 if score >= acceptable_quality_threshold else 1
-    except (RuntimeError, ValueError, TypeError) as e:
+    except (RuntimeError, ValueError, TypeError):
         from flext_core import get_logger
 
         logger = get_logger(__name__)
-        logger.exception(f"Quality score calculation failed: {e}")
+        logger.exception("Quality score calculation failed")
         return 3
 
 
@@ -155,7 +155,7 @@ def another_function(args: argparse.Namespace) -> int:
 
 
 def main() -> int:
-    """Main CLI entry point.
+    """Provide CLI entry point.
 
     Returns:
         Exit code: 0=success, 1=quality below threshold, 3=error

@@ -69,7 +69,7 @@ class IssueType(StrEnum):
 
     # Security issues
     SECURITY_VULNERABILITY = "security_vulnerability"
-    HARDCODED_SECRET = "hardcoded_secret"  # nosec: B105 # This is an issue type constant, not a password
+    HARDCODED_SECRET = "hardcoded_secret"  # noqa: S105 - Issue type constant, not a password
     SQL_INJECTION = "sql_injection"
     XSS_VULNERABILITY = "xss_vulnerability"
 
@@ -234,7 +234,7 @@ class QualityScore(BaseModel):
         return f"{self.value:.1f}%"
 
     @property
-    def grade(self) -> QualityGrade:
+    def grade(self) -> QualityGrade:  # noqa: PLR0911
         """Get quality grade based on score.
 
         Returns:

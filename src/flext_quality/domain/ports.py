@@ -25,6 +25,7 @@ class AnalysisService(ABC):
     async def analyze_project(
         self,
         project_path: Path,
+        *,
         include_security: bool = True,
         include_complexity: bool = True,
         include_dead_code: bool = True,
@@ -93,6 +94,7 @@ class LintingService(ABC):
     async def lint_project(
         self,
         project_path: Path,
+        *,
         fix: bool = False,
     ) -> FlextResult[dict[str, object]]:
         """Lint entire project with optional auto-fix."""
@@ -102,6 +104,7 @@ class LintingService(ABC):
     async def lint_file(
         self,
         file_path: Path,
+        *,
         fix: bool = False,
     ) -> FlextResult[dict[str, object]]:
         """Lint a single file with optional auto-fix."""

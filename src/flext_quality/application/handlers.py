@@ -34,6 +34,7 @@ class AnalyzeProjectHandler:
     """Handler for analyzing projects."""
 
     def __init__(self) -> None:
+        """Initialize handler with analysis service."""
         self._analysis_service = QualityAnalysisService()
 
     async def handle(self, project_id: UUID) -> FlextResult[QualityAnalysis]:
@@ -133,6 +134,7 @@ class GenerateReportHandler:
     """Handler for generating reports."""
 
     def __init__(self) -> None:
+        """Initialize handler with report service."""
         self._report_service = QualityReportService()
 
     async def handle(self, analysis_id: UUID) -> FlextResult[QualityReport]:
@@ -162,6 +164,7 @@ class RunLintingHandler:
     """Handler for running linting checks."""
 
     def __init__(self) -> None:
+        """Initialize handler with linting service implementation."""
         self._linting_service = LintingServiceImpl()
 
     async def handle(self, project_id: UUID) -> FlextResult[dict[str, object]]:
@@ -191,6 +194,7 @@ class RunSecurityCheckHandler:
     """Handler for running security checks."""
 
     def __init__(self) -> None:
+        """Initialize handler with security analyzer service."""
         self._security_service = SecurityAnalyzerServiceImpl()
 
     async def handle(self, project_id: UUID) -> FlextResult[dict[str, object]]:

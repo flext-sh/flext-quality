@@ -29,7 +29,7 @@ def run_tests() -> subprocess.CompletedProcess[str]:
             "--disable-warnings",
         ]
 
-        return subprocess.run(cmd, check=False, capture_output=True, text=True)
+        return subprocess.run(cmd, check=False, capture_output=True, text=True)  # noqa: S603 - Test runner command, cmd is constructed from known pytest args
 
     finally:
         os.chdir(original_dir)

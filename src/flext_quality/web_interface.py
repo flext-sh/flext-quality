@@ -184,14 +184,14 @@ class QualityWebInterface:
         }
         return jsonify({"success": True, "data": metrics})
 
-    def get_report(self, format: str) -> ResponseType:
+    def get_report(self, report_format: str) -> ResponseType:
         """Generate and return quality report."""
-        if format not in {"json", "html", "pdf"}:
+        if report_format not in {"json", "html", "pdf"}:
             return jsonify({"success": False, "error": "Invalid format"}), 400
 
         # Simple report placeholder
         report = {
-            "format": format,
+            "format": report_format,
             "generated_at": "2025-01-08",
             "quality_score": "A",
             "coverage": 95.0,
@@ -199,7 +199,7 @@ class QualityWebInterface:
         return jsonify({"success": True, "data": report})
 
     def run(
-        self, host: str = "localhost", port: int = 8080, debug: bool = True,
+        self, host: str = "localhost", port: int = 8080, *, debug: bool = True,
     ) -> None:
         """Run the quality web server."""
         logger.info(f"Starting FLEXT Quality Web Interface on {host}:{port}")
@@ -207,7 +207,7 @@ class QualityWebInterface:
 
 
 def main() -> None:
-    """Main entry point for quality web interface."""
+    """Provide entry point for quality web interface."""
     interface = QualityWebInterface()
     interface.run()
 
