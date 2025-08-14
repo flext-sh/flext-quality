@@ -17,6 +17,7 @@ from flext_core import get_logger
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.reports import QualityReport
 
+
 def setup_logging(level: str = "INFO") -> None:
     """Set up logging configuration.
 
@@ -30,21 +31,13 @@ def setup_logging(level: str = "INFO") -> None:
 def run_web_server(args: argparse.Namespace) -> int:
     """Run quality web interface server."""
     logger = get_logger(__name__)
-    
-    # Try to import and use web interface
+
     try:
+        # Import and use web interface (no silent fallback)
         from flext_quality.web_interface import QualityWebInterface
         interface = QualityWebInterface()
         interface.run(host=args.host, port=args.port, debug=args.debug)
         return 0
-    except ImportError:
-        # Optional dependency not available
-        if args.verbose:
-            traceback.print_exc()
-        logger.warning(
-            "Quality web interface not available; install optional dependencies.",
-        )
-        return 1
     except KeyboardInterrupt:
         return 0
     except Exception:
