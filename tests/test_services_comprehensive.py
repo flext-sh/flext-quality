@@ -23,7 +23,7 @@ from flext_quality.domain.entities import (
     QualityProject,
     QualityReport,
 )
-from tests.conftest import (
+from .conftest import (
     assert_result_failure_with_error,
     assert_result_success_with_data,
 )
