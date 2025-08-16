@@ -102,8 +102,6 @@ class AnalyzeProjectHandler:
                 return analysis_result
 
             analysis = analysis_result.data
-            if analysis is None:
-                return FlextResult.fail("Analysis data is None")
 
             flext_create_log_entry(
                 message=f"Successfully created analysis for project {project_id}",
@@ -155,8 +153,6 @@ class GenerateReportHandler:
             return report_result
 
         report = report_result.data
-        if report is None:
-            return FlextResult.fail("Report data is None")
 
         # Return the created report
         return FlextResult.ok(report)
@@ -185,8 +181,6 @@ class RunLintingHandler:
             return linting_result
 
         linting_issues = linting_result.data
-        if linting_issues is None:
-            return FlextResult.fail("Linting data is None")
 
         # Return linting results
         return FlextResult.ok(linting_issues)
@@ -215,8 +209,6 @@ class RunSecurityCheckHandler:
             return security_result
 
         security_issues = security_result.data
-        if security_issues is None:
-            return FlextResult.fail("Security data is None")
 
         # Return security analysis results
         return FlextResult.ok(security_issues)

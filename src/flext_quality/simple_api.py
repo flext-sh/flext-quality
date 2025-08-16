@@ -605,8 +605,6 @@ class QualityAPI:
             return result
 
         analysis = result.data
-        if analysis is None:
-            return FlextResult.fail("Failed to create analysis")
 
         # Integrate with real analysis tools using flext-core patterns
         # For now, we'll just mark it as completed
