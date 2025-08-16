@@ -19,12 +19,12 @@ Scoring Categories:
     - Documentation Score: Assessment of code documentation quality
 
 Architecture:
-    Built as a FlextBaseModel using flext-core patterns for immutability
+    Built as a FlextModel using flext-core patterns for immutability
     and validation. Integrates with QualityGradeCalculator for consistent
     grading across the FLEXT ecosystem.
 
 Integration:
-    - Uses flext-core.FlextBaseModel for immutable data structures
+    - Uses flext-core.FlextModel for immutable data structures
     - Integrates with domain layer for grade calculation
     - Provides dict[str, object] compatibility for data exchange
     - Supports validation through FlextResult patterns
@@ -44,7 +44,7 @@ Version: 0.9.0
 
 from __future__ import annotations
 
-from flext_core import FlextBaseModel, FlextResult
+from flext_core import FlextModel, FlextResult
 from pydantic import Field, computed_field
 
 from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
@@ -53,7 +53,7 @@ from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
 MAX_QUALITY_SCORE = 100
 
 
-class QualityMetrics(FlextBaseModel):
+class QualityMetrics(FlextModel):
     """Comprehensive Quality Metrics Value Object.
 
     Immutable value object that encapsulates comprehensive code quality
@@ -313,7 +313,7 @@ class QualityMetrics(FlextBaseModel):
             + self.complexity_issues_count
         )
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self, *, by_alias: bool = False, exclude_none: bool = False) -> dict[str, object]:
         """Export metrics as dictionary for serialization and integration.
 
         Converts the immutable metrics object to a dictionary format suitable
@@ -332,7 +332,7 @@ class QualityMetrics(FlextBaseModel):
             computed fields for comprehensive data export.
 
         """
-        return {
+        base: dict[str, object] = {
             "overall_score": self.overall_score,
             "quality_grade": self.quality_grade,
             "total_files": self.total_files,
@@ -349,6 +349,8 @@ class QualityMetrics(FlextBaseModel):
             "total_issues": self.total_issues,
             "scores": self.scores_summary,
         }
+        _ = (by_alias, exclude_none)
+        return base
 
     def get_summary(self) -> str:
         """Generate human-readable quality metrics summary.
