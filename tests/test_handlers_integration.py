@@ -17,6 +17,7 @@ from flext_quality.application.handlers import (
     RunLintingHandler,
     RunSecurityCheckHandler,
 )
+
 from .conftest import (
     assert_result_failure_with_error,
     assert_result_success_with_data,

@@ -14,6 +14,7 @@ class TestCodeAnalyzer:
     """Test CodeAnalyzer functionality."""
 
     def test_analyzer_initialization(self) -> None:
+        """Test analyzer initialization function."""
         analyzer = CodeAnalyzer(".")
         assert analyzer is not None
         if analyzer.project_path != Path():
@@ -21,12 +22,24 @@ class TestCodeAnalyzer:
             raise AssertionError(msg)
 
     def test_analyzer_with_path(self, tmp_path: Path) -> None:
+        """Test analyzer with path function.
+
+        Args:
+            tmp_path (Path): Description.
+
+        """
         analyzer = CodeAnalyzer(tmp_path)
         if analyzer.project_path != tmp_path:
             msg: str = f"Expected {tmp_path}, got {analyzer.project_path}"
             raise AssertionError(msg)
 
     def test_find_python_files(self, tmp_path: Path) -> None:
+        """Test find python files function.
+
+        Args:
+            tmp_path (Path): Description.
+
+        """
         # Create test files
         (tmp_path / "test.py").write_text("print('hello')")
         (tmp_path / "subdir").mkdir()
@@ -50,6 +63,12 @@ class TestCodeAnalyzer:
             raise AssertionError(msg)
 
     def test_analyze_project_basic(self, tmp_path: Path) -> None:
+        """Test analyze project basic function.
+
+        Args:
+            tmp_path (Path): Description.
+
+        """
         # Create a simple Python file
         test_file = tmp_path / "simple.py"
         test_file.write_text(
@@ -82,6 +101,7 @@ if __name__ == "__main__":
             raise AssertionError(msg)
 
     def test_quality_score(self) -> None:
+        """Test quality score function."""
         analyzer = CodeAnalyzer(".")
         analyzer.analysis_results = {
             "issues": {

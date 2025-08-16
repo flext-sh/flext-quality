@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from flext_core.config import FlextSettings
+from flext_core import FlextBaseConfigModel
+from pydantic_settings import SettingsConfigDict
 
 
-class QualityConfig(FlextSettings):
+class QualityConfig(FlextBaseConfigModel):
     """Quality service configuration using flext-core patterns."""
 
     # Analysis settings
@@ -19,7 +20,4 @@ class QualityConfig(FlextSettings):
     analysis_timeout: int = 300
     parallel_workers: int = 4
 
-    class Config:
-        """Pydantic configuration for QualityConfig."""
-
-        env_prefix = "QUALITY_"
+    model_config = SettingsConfigDict(env_prefix="QUALITY_")

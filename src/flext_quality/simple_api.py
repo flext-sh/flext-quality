@@ -613,7 +613,7 @@ class QualityAPI:
 
         # Update with dummy metrics
         await self.update_metrics(
-            analysis_id=UUID(analysis.id),
+            analysis_id=UUID(str(analysis.id)),
             total_files=100,
             total_lines=10000,
             code_lines=7000,
@@ -623,7 +623,7 @@ class QualityAPI:
 
         # Update with dummy scores
         await self.update_scores(
-            analysis_id=UUID(analysis.id),
+            analysis_id=UUID(str(analysis.id)),
             coverage_score=95.0,
             complexity_score=85.0,
             duplication_score=92.0,
@@ -633,7 +633,7 @@ class QualityAPI:
 
         # Update with dummy issue counts
         await self.update_issue_counts(
-            analysis_id=UUID(analysis.id),
+            analysis_id=UUID(str(analysis.id)),
             critical=0,
             high=2,
             medium=5,
@@ -641,4 +641,4 @@ class QualityAPI:
         )
 
         # Complete the analysis
-        return await self.complete_analysis(UUID(analysis.id))
+        return await self.complete_analysis(UUID(str(analysis.id)))
