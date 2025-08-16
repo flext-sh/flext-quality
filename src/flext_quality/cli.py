@@ -30,7 +30,7 @@ def setup_logging(level: str = "INFO") -> None:
 
 def run_web_server(args: argparse.Namespace) -> int:
     """Run quality web interface server."""
-    logger = get_logger(__name__)
+    get_logger(__name__)
 
     try:
         # Import and use web interface (no silent fallback)

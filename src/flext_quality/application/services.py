@@ -80,7 +80,7 @@ class QualityProjectService:
                 max_duplication=max_duplication,
             )
 
-            self._projects[project.id] = project
+            self._projects[str(project.id)] = project
             return FlextResult.ok(project)
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to create project {e}")
@@ -214,7 +214,7 @@ class QualityAnalysisService:
             )
 
             # Store in repository
-            self._analyses[analysis.id] = analysis
+            self._analyses[str(analysis.id)] = analysis
 
             return FlextResult.ok(analysis)
         except (RuntimeError, ValueError, TypeError) as e:
@@ -523,7 +523,7 @@ class QualityIssueService:
                 suggestion=suggestion,
             )
 
-            self._issues[issue.id] = issue
+            self._issues[str(issue.id)] = issue
             return FlextResult.ok(issue)
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to create issue: {e}")
@@ -689,7 +689,7 @@ class QualityReportService:
                 report_size_bytes=report_size_bytes,
             )
 
-            self._reports[report.id] = report
+            self._reports[str(report.id)] = report
             return FlextResult.ok(report)
         except (RuntimeError, ValueError, TypeError) as e:
             return FlextResult.fail(f"Failed to create report: {e}")

@@ -19,12 +19,12 @@ Scoring Categories:
     - Documentation Score: Assessment of code documentation quality
 
 Architecture:
-    Built as a FlextValueObject using flext-core patterns for immutability
+    Built as a FlextBaseModel using flext-core patterns for immutability
     and validation. Integrates with QualityGradeCalculator for consistent
     grading across the FLEXT ecosystem.
 
 Integration:
-    - Uses flext-core.FlextValueObject for immutable data structures
+    - Uses flext-core.FlextBaseModel for immutable data structures
     - Integrates with domain layer for grade calculation
     - Provides dict[str, object] compatibility for data exchange
     - Supports validation through FlextResult patterns
@@ -44,7 +44,7 @@ Version: 0.9.0
 
 from __future__ import annotations
 
-from flext_core import FlextResult, FlextValueObject
+from flext_core import FlextBaseModel, FlextResult
 from pydantic import Field, computed_field
 
 from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
@@ -53,7 +53,7 @@ from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
 MAX_QUALITY_SCORE = 100
 
 
-class QualityMetrics(FlextValueObject):
+class QualityMetrics(FlextBaseModel):
     """Comprehensive Quality Metrics Value Object.
 
     Immutable value object that encapsulates comprehensive code quality
@@ -236,25 +236,27 @@ class QualityMetrics(FlextValueObject):
         quality_grade_enum = QualityGradeCalculator.calculate_grade(overall_score)
         quality_grade = quality_grade_enum.value
 
-        return cls(
-            overall_score=overall_score,
-            quality_grade=quality_grade,
-            total_files=total_files,
-            total_lines_of_code=total_loc,
-            total_functions=total_functions,
-            total_classes=total_classes,
-            average_complexity=avg_complexity,
-            max_complexity=max_complexity,
-            complex_files_count=complexity_count,
-            security_issues_count=security_count,
-            dead_code_items_count=dead_code_count,
-            duplicate_blocks_count=duplicate_count,
-            complexity_issues_count=complexity_count,
-            complexity_score=complexity_score,
-            security_score=security_score,
-            maintainability_score=maintainability_score,
-            duplication_score=duplication_score,
-            documentation_score=documentation_score,
+        return cls.model_validate(
+            {
+                "overall_score": overall_score,
+                "quality_grade": quality_grade,
+                "total_files": total_files,
+                "total_lines_of_code": total_loc,
+                "total_functions": total_functions,
+                "total_classes": total_classes,
+                "average_complexity": avg_complexity,
+                "max_complexity": max_complexity,
+                "complex_files_count": complexity_count,
+                "security_issues_count": security_count,
+                "dead_code_items_count": dead_code_count,
+                "duplicate_blocks_count": duplicate_count,
+                "complexity_issues_count": complexity_count,
+                "complexity_score": complexity_score,
+                "security_score": security_score,
+                "maintainability_score": maintainability_score,
+                "duplication_score": duplication_score,
+                "documentation_score": documentation_score,
+            },
         )
 
     @computed_field
