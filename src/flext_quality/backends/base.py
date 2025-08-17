@@ -4,10 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from pathlib import Path
+from pathlib import Path
 
 
 class BackendType(Enum):
@@ -23,34 +20,34 @@ class BaseAnalyzer(ABC):
 
     @abstractmethod
     def analyze(self, code: str, file_path: Path | None = None) -> dict[str, object]:
-        """Analyze code and return results.
+      """Analyze code and return results.
 
-        Args:
-            code: Source code to analyze
-            file_path: Optional file path for context
+      Args:
+          code: Source code to analyze
+          file_path: Optional file path for context
 
-        Returns:
-            Dictionary containing analysis results
+      Returns:
+          Dictionary containing analysis results
 
-        """
-        ...
+      """
+      ...
 
     @abstractmethod
     def get_backend_type(self) -> BackendType:
-        """Get the type of this backend.
+      """Get the type of this backend.
 
-        Returns:
-            BackendType enum value
+      Returns:
+          BackendType enum value
 
-        """
-        ...
+      """
+      ...
 
     @abstractmethod
     def get_capabilities(self) -> list[str]:
-        """Get list of capabilities this backend provides.
+      """Get list of capabilities this backend provides.
 
-        Returns:
-            List of capability strings
+      Returns:
+          List of capability strings
 
-        """
-        ...
+      """
+      ...

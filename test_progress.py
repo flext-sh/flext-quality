@@ -13,43 +13,43 @@ def run_tests() -> "CompletedProcess[str]":
     original_dir = Path.cwd()
 
     try:
-        import os
+      import os
 
-        os.chdir(project_dir)
+      os.chdir(project_dir)
 
-        # Isolar pytest apenas para este projeto
-        cmd = [
-            sys.executable,
-            "-m",
-            "pytest",
-            "tests/",
-            "--tb=no",
-            "-q",
-            "--confcutdir=.",  # Apenas conftest local
-            "--disable-warnings",
-        ]
+      # Isolar pytest apenas para este projeto
+      cmd = [
+          sys.executable,
+          "-m",
+          "pytest",
+          "tests/",
+          "--tb=no",
+          "-q",
+          "--confcutdir=.",  # Apenas conftest local
+          "--disable-warnings",
+      ]
 
-        async def _run(cmd_list: list[str]) -> tuple[int, str, str]:
-            process = await asyncio.create_subprocess_exec(
-                *cmd_list,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-            )
-            stdout, stderr = await process.communicate()
-            return process.returncode, stdout.decode(), stderr.decode()
+      async def _run(cmd_list: list[str]) -> tuple[int, str, str]:
+          process = await asyncio.create_subprocess_exec(
+              *cmd_list,
+              stdout=asyncio.subprocess.PIPE,
+              stderr=asyncio.subprocess.PIPE,
+          )
+          stdout, stderr = await process.communicate()
+          return process.returncode, stdout.decode(), stderr.decode()
 
-        rc, out, err = asyncio.run(_run(cmd))
+      rc, out, err = asyncio.run(_run(cmd))
 
-        class CompletedProcess:
-            def __init__(self, returncode: int, stdout: str, stderr: str) -> None:
-                self.returncode = returncode
-                self.stdout = stdout
-                self.stderr = stderr
+      class CompletedProcess:
+          def __init__(self, returncode: int, stdout: str, stderr: str) -> None:
+              self.returncode = returncode
+              self.stdout = stdout
+              self.stderr = stderr
 
-        return CompletedProcess(rc, out, err)
+      return CompletedProcess(rc, out, err)
 
     finally:
-        os.chdir(original_dir)
+      os.chdir(original_dir)
 
 
 if __name__ == "__main__":

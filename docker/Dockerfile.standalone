@@ -84,9 +84,9 @@ sys.path.insert(0, '/app/src')
 
 # Test core imports work
 try:
-    from flext_quality.analyzer import CodeAnalyzer
-    from flext_quality.metrics import QualityMetrics
-    from flext_quality.reports import QualityReport
+from flext_quality.analyzer import CodeAnalyzer
+from flext_quality.metrics import QualityMetrics
+from flext_quality.reports import QualityReport
     print('✅ Core imports successful')
 except Exception as e:
     print(f'❌ Import failed: {e}')

@@ -35,14 +35,14 @@ ROOT_URLCONF: list[str] = []
 # Override database settings for testing
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": ":memory:",
-        "OPTIONS": {
-            "timeout": 20,
-        },
-        "TEST": {
-            "NAME": ":memory:",
-        },
+      "ENGINE": "django.db.backends.sqlite3",
+      "NAME": ":memory:",
+      "OPTIONS": {
+          "timeout": 20,
+      },
+      "TEST": {
+          "NAME": ":memory:",
+      },
     },
 }
 
@@ -50,7 +50,7 @@ DATABASES = {
 if DATABASES["default"]["ENGINE"] == "django.db.backends.sqlite3":
     options = DATABASES["default"]["OPTIONS"]
     if isinstance(options, dict):
-        options.pop("init_command", None)
+      options.pop("init_command", None)
 
 # Force syncdb for testing - use the models directly instead of migrations
 if "test" in sys.argv or "pytest" in sys.modules:
@@ -67,12 +67,12 @@ LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "handlers": {
-        "null": {
-            "class": "logging.NullHandler",
-        },
+      "null": {
+          "class": "logging.NullHandler",
+      },
     },
     "root": {
-        "handlers": ["null"],
+      "handlers": ["null"],
     },
 }
 
@@ -83,6 +83,6 @@ CELERY_TASK_EAGER_PROPAGATES = True
 # Cache settings for tests
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+      "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
     },
 }

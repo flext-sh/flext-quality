@@ -2,13 +2,10 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from flext_quality.backends.external_backend import ExternalBackend
-
-if TYPE_CHECKING:
-    from pathlib import Path
+from flext_quality import ExternalBackend
 
 
 def _temp_py(tmp_path: Path) -> Path:

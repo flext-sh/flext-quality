@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-FLEXT Quality is a comprehensive code quality analysis and metrics service that provides enterprise-grade quality assessment, issue detection, and reporting capabilities. It's built using Python 3.13, Django, and follows Clean Architecture patterns with Domain-Driven Design (DDD) principles.
+FLEXT Quality is a comprehensive code quality analysis and metrics service for the FLEXT ecosystem. It provides automated quality assessment, issue detection, and reporting capabilities using Python 3.13 with Clean Architecture patterns and Domain-Driven Design (DDD) principles.
 
 ## Architecture
 
@@ -13,17 +13,17 @@ FLEXT Quality is a comprehensive code quality analysis and metrics service that 
 The project follows Clean Architecture with clear separation of concerns:
 
 - **Domain Layer** (`src/flext_quality/domain/`): Core business entities, value objects, and domain logic
-- **Application Layer** (`src/flext_quality/application/`): Service classes and application-specific business rules
+- **Application Layer** (`src/flext_quality/application/`): Service classes and application-specific business rules  
 - **Infrastructure Layer** (`src/flext_quality/infrastructure/`): External dependencies, repositories, and adapters
-- **Presentation Layer**: Django web interface and REST API endpoints
+- **CLI Interface** (`src/flext_quality/cli.py`): Command-line interface for quality operations
 
 ### Key Components
 
-- **Quality Analyzer Engine**: Core analysis functionality with multiple backend analyzers (AST, external tools)
-- **Multi-Backend System**: Pluggable analyzer backends for extensibility
-- **Domain Entities**: Quality projects, analyses, issues, rules, and reports
-- **Service Layer**: Application services for managing quality operations
-- **Reporting System**: Comprehensive quality reports in multiple formats (HTML, JSON, PDF)
+- **Quality Analyzer Engine** (`analyzer.py`): Multi-backend analysis system (AST, Ruff, MyPy, Bandit)
+- **Backend System** (`backends/`): Pluggable analyzer backends for extensibility
+- **Domain Entities** (`domain/entities.py`): Quality projects, analyses, issues, and reports
+- **Service Layer** (`application/services.py`): Application services for quality operations
+- **Reporting System** (`reports.py`): Quality reports in multiple formats (HTML, JSON, PDF)
 
 ### Domain Model
 
@@ -41,14 +41,15 @@ The domain is centered around these core entities:
 
 ```bash
 # Complete validation - ALL must pass
-make validate                 # Strict compliance validation (lint + type + security + test + quality-check)
+make validate                 # Full validation (lint + type + security + test + quality-check)
 
 # Essential checks
-make check                    # Essential quality checks (lint + type + test)
-make lint                     # Ruff linting with ALL rules enabled
+make check                    # Quick health check (lint + type)
+make lint                     # Ruff linting 
 make type-check               # MyPy strict mode type checking
-make security                 # Security scans (bandit + pip-audit + secrets)
+make security                 # Security scans (bandit + pip-audit)
 make format                   # Format code with ruff
+make fix                      # Auto-fix issues with ruff
 ```
 
 ### Testing (90% Coverage Minimum)
@@ -57,24 +58,23 @@ make format                   # Format code with ruff
 # Test execution
 make test                     # Run tests with 90% coverage requirement
 make test-unit                # Unit tests only
-make test-integration         # Integration tests only
+make test-integration         # Integration tests only  
 make test-quality             # Quality analysis tests
-make coverage                 # Generate detailed coverage report
-make coverage-html            # Generate and open HTML coverage report
+make test-django              # Django-specific tests
+make test-analysis            # Analysis engine tests
+make test-e2e                 # End-to-end tests
+make test-fast                # Run tests without coverage
+make coverage-html            # Generate HTML coverage report
 ```
 
 ### Development Setup
 
 ```bash
 # Complete setup
-make setup                    # Complete development setup
+make setup                    # Complete development setup (install-dev + pre-commit)
 make install                  # Install dependencies with Poetry
 make install-dev              # Install dev dependencies
-make pre-commit               # Setup pre-commit hooks
-
-# Django-specific setup
-make web-migrate              # Run Django migrations
-make web-shell               # Open Django shell
+make pre-commit               # Run pre-commit hooks
 ```
 
 ### Quality Analysis Operations
@@ -83,86 +83,54 @@ The core functionality of the service:
 
 ```bash
 # Analysis operations
-make analyze                  # Run comprehensive quality analysis on workspace
-make quality-check            # Check quality thresholds against standards
-make metrics                  # Collect and calculate quality metrics
-make report                   # Generate comprehensive quality reports
+make analyze                  # Run comprehensive quality analysis
+make quality-check            # Check quality thresholds
+make metrics                  # Collect quality metrics  
+make report                   # Generate quality reports
 make workspace-analyze        # Analyze entire FLEXT workspace
-make project-analyze PROJECT=name  # Analyze specific project
-
-# Quality tools integration
-make quality-tools            # Test all quality tool integrations
-make ruff-analysis            # Run Ruff analysis with custom configuration
-make mypy-analysis            # Run MyPy analysis with strict configuration
-make coverage-analysis        # Run coverage analysis with thresholds
-make security-analysis        # Run security analysis with vulnerability scanning
-make complexity-analysis      # Run complexity analysis
-make duplication-analysis     # Run code duplication analysis
-```
-
-### Quality Metrics & Scoring
-
-```bash
-# Score calculations
-make calculate-scores         # Calculate quality scores for all projects
-make coverage-score           # Calculate coverage score
-make complexity-score         # Calculate complexity score
-make security-score           # Calculate security score
-make maintainability-score    # Calculate maintainability score
+make detect-issues            # Detect quality issues
+make calculate-scores         # Calculate quality scores
 make quality-grade            # Calculate overall quality grade
+make coverage-score           # Calculate coverage score
 ```
 
-### Quality Reporting
+### CLI Interface
 
 ```bash
-# Report generation
-make generate-reports         # Generate all quality reports
-make executive-report         # Generate executive summary report
-make technical-report         # Generate technical detailed report
-make dashboard-report         # Generate dashboard overview report
-make html-report              # Generate HTML quality report
-make json-report              # Generate JSON quality report
-make pdf-report               # Generate PDF quality report
+# Use the flext-quality CLI directly
+poetry run python -m flext_quality.cli analyze
+poetry run python -m flext_quality.cli check-thresholds
+poetry run python -m flext_quality.cli collect-metrics
+poetry run python -m flext_quality.cli generate-report
+poetry run python -m flext_quality.cli analyze-workspace
 ```
 
-### Issue Management
-
-```bash
-# Issue detection and management
-make detect-issues            # Detect quality issues across projects
-make classify-issues          # Classify detected issues by severity
-make prioritize-issues        # Prioritize issues by impact
-make track-issues             # Track issue resolution progress
-```
-
-### Django Web Interface
+### Web Interface
 
 ```bash
 # Django development server
 make web-start                # Start Django web interface (port 8000)
 make web-migrate              # Run Django migrations
 make web-shell                # Open Django shell
-
-# Quick start with all services
-./start_all.sh                # Start complete system (Redis, Celery, Django)
-./start_all.sh --create-superuser  # Include superuser creation
+make web-collectstatic        # Collect static files
+make web-createsuperuser      # Create Django superuser
 ```
 
-### Docker Operations
+### Documentation & Dependencies
 
 ```bash
-# Full containerized development
-docker-compose up -d          # Start all services (web, db, redis, celery, flower)
-docker-compose up web         # Start web service only
-docker-compose logs -f web    # Follow web service logs
-docker-compose exec web python manage.py shell  # Django shell in container
+# Documentation
+make docs                     # Build documentation
+make docs-serve               # Serve documentation
 
-# Individual services
-docker-compose up db redis    # Start database and Redis only
-docker-compose exec db psql -U postgres -d dc_analyzer  # Access PostgreSQL
+# Dependencies
+make deps-update              # Update dependencies
+make deps-show                # Show dependency tree
+make deps-audit               # Audit dependencies
 
-# Monitoring
-docker-compose up flower      # Start Celery monitoring (port 5555)
+# Diagnostics
+make diagnose                 # Project diagnostics
+make doctor                   # Full health check
 ```
 
 ### Build & Distribution
@@ -173,6 +141,7 @@ make build                    # Build distribution packages
 make build-clean              # Clean and build
 make clean                    # Remove all artifacts
 make clean-all                # Deep clean including venv
+make reset                    # Reset project (clean-all + setup)
 ```
 
 ## Key Architecture Patterns
@@ -336,137 +305,60 @@ Quality analysis follows a structured workflow:
 
 The service uses multiple configuration approaches:
 
-- **Environment Variables**: Runtime configuration and thresholds
-- **pyproject.toml**: Tool configuration (ruff, mypy, pytest)
-- **Django Settings**: Web interface configuration
+- **Environment Variables**: Runtime configuration and quality thresholds
+- **pyproject.toml**: Primary tool configuration (ruff, mypy, pytest, dependencies)
+- **Makefile**: Development workflow and quality gates
 - **Analysis Config**: Per-analysis configuration in QualityAnalysis entity
 
 Key configuration files:
 
-- `pyproject.toml`: Primary configuration for tools and dependencies
-- `code_analyzer_web/settings.py`: Django configuration
-- `Makefile`: Development workflow and quality gates
-- `docker-compose.yml`: Container orchestration with PostgreSQL, Redis, Celery
-- `start_all.sh`: Complete system startup script
+- `pyproject.toml`: Primary configuration for tools, dependencies, and quality standards
+- `Makefile`: Development workflow commands and quality gates
+- `src/flext_quality/config.py`: Application configuration
+- `setup.cfg`: Additional tool configuration
 
-### Essential Environment Variables
+### Quality Thresholds (Environment Variables)
 
 ```bash
-# Database configuration
-export DATABASE_URL=postgresql://postgres:postgres@localhost:5432/dc_analyzer
-
-# Redis/Celery configuration
-export REDIS_URL=redis://localhost:6379/0
-export CELERY_BROKER_URL=redis://localhost:6379/0
-export CELERY_RESULT_BACKEND=redis://localhost:6379/0
-
-# Django configuration
-export DEBUG=True
-export SECRET_KEY=your-secret-key-here
-
-# Quality thresholds
+# Quality standards
 export QUALITY_MIN_COVERAGE=90.0
 export QUALITY_MAX_COMPLEXITY=10
+export QUALITY_MAX_DUPLICATION=5.0
+export QUALITY_MIN_SECURITY_SCORE=90.0
+export QUALITY_MIN_MAINTAINABILITY=80.0
 ```
 
-## Critical Architecture Gaps - High Priority Resolution Required
+## Integration with FLEXT Ecosystem
 
-### 🚨 GAP 1: Ecosystem Services Integration Missing
+FLEXT Quality integrates with the broader FLEXT ecosystem:
 
-**Status**: HIGH PRIORITY - Quality service not integrated with FLEXT ecosystem services
+- **flext-core**: Base patterns, FlextResult, FlextEntity, DI container
+- **flext-observability**: Monitoring, metrics, tracing, health checks  
+- **flext-web**: Web interface integration (planned)
+- **flext-cli**: CLI command integration (planned)
 
-**Current Issues**:
+Dependencies are declared in pyproject.toml using local file paths for ecosystem integration.
 
-- Django web interface not integrated with flext-web or flext-api patterns
-- Quality analysis not connected to flext-observability metrics collection
-- No CLI integration with flext-cli command structure
-- Reports not accessible via ecosystem dashboard interfaces
+## Current Development Status
 
-**Required Actions**:
+### What Works Today
 
-- [ ] Integrate Django interface with flext-web architectural patterns
-- [ ] Connect quality metrics pipeline with flext-observability
-- [ ] Create quality analysis commands for flext-cli integration
-- [ ] Implement quality dashboard integration with ecosystem web interface
+- ✅ **Quality Analysis Engine**: Multi-backend system (AST, Ruff, MyPy, Bandit)
+- ✅ **Domain Entities**: QualityProject, QualityAnalysis, QualityIssue with business logic
+- ✅ **Service Layer**: Application services with FlextResult pattern
+- ✅ **CLI Interface**: Command-line analysis and reporting
+- ✅ **Quality Scoring**: Composite quality scores and metrics
+- ✅ **Report Generation**: HTML, JSON, PDF reports
 
-### 🚨 GAP 2: Multi-Project Analysis Not Ecosystem-Aware
+### In Progress
 
-**Status**: HIGH PRIORITY - Workspace analysis lacks ecosystem structure understanding
-
-**Current Issues**:
-
-- `make workspace-analyze` doesn't understand 32-project ecosystem structure
-- Quality thresholds not differentiated by project type (core, service, tap, target)
-- Cross-project dependency analysis capabilities missing
-- Ecosystem-wide quality metrics not consolidated or available
-
-**Required Actions**:
-
-- [ ] Implement ecosystem-aware analysis patterns for 32+ project structure
-- [ ] Create project-type-specific quality thresholds (core, service, tap, target)
-- [ ] Implement cross-project dependency quality analysis capabilities
-- [ ] Create consolidated ecosystem quality dashboard and metrics
-
-### 🚨 GAP 3: Django vs Clean Architecture Inconsistency
-
-**Status**: HIGH PRIORITY - Django patterns conflict with Clean Architecture principles
-
-**Current Issues**:
-
-- Django used for web interface conflicts with flext-web Flask patterns
-- Django ORM conflicts with flext-core domain entity patterns
-- Django settings conflict with flext-core configuration management
-
-**Required Actions**:
-
-- [ ] Refactor to use flext-web patterns or document Django architecture decision
-- [ ] Integrate Django models with flext-core domain entities
-- [ ] Migrate Django settings to flext-core configuration patterns
-- [ ] Document web interface architecture decisions and trade-offs
+- 🔄 **Ecosystem Integration**: Multi-project analysis for 32+ FLEXT projects
+- 🔄 **Web Interface**: Django-based dashboard and interface
+- 🔄 **Type Safety**: Ongoing MyPy strict mode improvements
 
 ## Troubleshooting
 
 ### Common Development Issues
-
-**Database Connection Issues:**
-
-```bash
-# Reset database
-docker-compose down -v
-docker-compose up -d db
-make web-migrate
-
-# Check database connection
-docker-compose exec db psql -U postgres -d dc_analyzer -c "SELECT version();"
-```
-
-**Redis/Celery Issues:**
-
-```bash
-# Check Redis connection
-redis-cli ping
-
-# Restart Celery worker
-pkill -f celery
-celery -A code_analyzer_web worker --loglevel=info --detach
-
-# Monitor Celery tasks
-docker-compose up flower  # Access at localhost:5555
-```
-
-**Django Development Issues:**
-
-```bash
-# Reset Django state
-make clean
-make web-migrate
-python manage.py collectstatic --noinput
-
-# Debug Django settings
-make web-shell
->>> from django.conf import settings
->>> print(settings.DATABASES)
-```
 
 **Poetry/Dependencies Issues:**
 
@@ -478,28 +370,86 @@ make setup
 # Check dependency conflicts
 poetry show --tree
 poetry check
+
+# Update dependencies
+make deps-update
+```
+
+**Type Checking Issues:**
+
+```bash
+# Run MyPy with detailed output
+poetry run mypy src --show-error-codes
+
+# Check specific files
+poetry run mypy src/flext_quality/analyzer.py --strict
+```
+
+**Test Failures:**
+
+```bash
+# Run tests with verbose output
+make test-fast -v
+
+# Run specific test categories
+make test-unit
+make test-integration
+make test-quality
+
+# Check coverage
+make coverage-html
+```
+
+**Analysis Issues:**
+
+```bash
+# Test analysis engine directly
+poetry run python -c "from flext_quality.analyzer import CodeAnalyzer; analyzer = CodeAnalyzer(); print('✅ Working')"
+
+# Run workspace analysis with debugging
+poetry run python -m flext_quality.cli analyze-workspace --verbose
+
+# Check quality thresholds
+poetry run python -m flext_quality.cli check-thresholds
 ```
 
 ### Performance Debugging
 
 ```bash
 # Profile analysis performance
-make analyze PROJECT=small-project  # Start with small projects
+time make analyze                   # Time analysis operation
 time make workspace-analyze         # Time full workspace analysis
 
-# Django debug toolbar (when DEBUG=True)
-# Add django-debug-toolbar to see SQL queries and performance
+# Check system diagnostics
+make diagnose
+make doctor
 
-# Celery monitoring
-docker-compose up flower            # Monitor task execution
+# Monitor test performance
+poetry run pytest tests/ --benchmark-only
 ```
 
-### Service Architecture
+### Development Workflow Issues
 
-The project uses a **hybrid architecture** combining:
+**Quality Gates Failing:**
 
-1. **Django Web Framework**: For admin interface, REST API, and web dashboard
-2. **Clean Architecture**: Domain entities in `src/flext_quality/domain/`
-3. **Multi-Backend Analysis**: Pluggable analyzers (AST, Ruff, MyPy, Bandit)
-4. **Celery Task Processing**: Async analysis execution
-5. **Docker Multi-Service**: PostgreSQL, Redis, Celery worker, web server
+```bash
+# Run individual quality checks
+make lint                          # Check for linting issues
+make type-check                    # Check for type issues
+make security                      # Check for security issues
+make test                          # Run tests with coverage
+
+# Auto-fix what can be fixed
+make fix                          # Auto-fix with ruff
+make format                       # Format code
+```
+
+**Project Structure Questions:**
+
+Key files and their purposes:
+- `src/flext_quality/analyzer.py`: Main analysis engine
+- `src/flext_quality/domain/entities.py`: Core domain models
+- `src/flext_quality/application/services.py`: Business logic services
+- `src/flext_quality/backends/`: Pluggable analyzer backends
+- `src/flext_quality/cli.py`: Command-line interface
+- `tests/`: Comprehensive test suite with 90% coverage target

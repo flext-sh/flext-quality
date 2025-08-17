@@ -13,13 +13,13 @@ def assert_is_dict(value: object) -> TypeGuard[dict[str, object]]:
     """Type-safe dict assertion following Single Responsibility Principle.
 
     Args:
-        value: Object to check
+      value: Object to check
 
     Returns:
-        TypeGuard confirming value is a dict
+      TypeGuard confirming value is a dict
 
     Raises:
-        AssertionError: If value is not a dict
+      AssertionError: If value is not a dict
 
     """
     assert isinstance(value, dict), f"Expected dict, got {type(value)}"
@@ -30,13 +30,13 @@ def assert_is_list(value: object) -> TypeGuard[list[object]]:
     """Type-safe list assertion following Single Responsibility Principle.
 
     Args:
-        value: Object to check
+      value: Object to check
 
     Returns:
-        TypeGuard confirming value is a list
+      TypeGuard confirming value is a list
 
     Raises:
-        AssertionError: If value is not a list
+      AssertionError: If value is not a list
 
     """
     assert isinstance(value, list), f"Expected list, got {type(value)}"
@@ -47,14 +47,14 @@ def safe_dict_access(data: object, key: str) -> object:
     """Type-safe dictionary access with proper error handling.
 
     Args:
-        data: Object to access (must be a dict)
-        key: Key to access
+      data: Object to access (must be a dict)
+      key: Key to access
 
     Returns:
-        Value from dict
+      Value from dict
 
     Raises:
-        AssertionError: If data is not a dict or key missing
+      AssertionError: If data is not a dict or key missing
 
     """
     assert_is_dict(data)
@@ -66,19 +66,19 @@ def safe_list_access(data: object, index: int) -> object:
     """Type-safe list access with proper error handling.
 
     Args:
-        data: Object to access (must be a list)
-        index: Index to access
+      data: Object to access (must be a list)
+      index: Index to access
 
     Returns:
-        Value from list
+      Value from list
 
     Raises:
-        AssertionError: If data is not a list or index out of bounds
+      AssertionError: If data is not a list or index out of bounds
 
     """
     assert_is_list(data)
     assert 0 <= index < len(data), (
-        f"Index {index} out of bounds for list of length {len(data)}"
+      f"Index {index} out of bounds for list of length {len(data)}"
     )
     return data[index]
 
@@ -87,19 +87,19 @@ def assert_dict_structure(data: object, required_keys: list[str]) -> dict[str, o
     """Assert that object is dict with required keys - DRY pattern.
 
     Args:
-        data: Object to check
-        required_keys: Keys that must be present
+      data: Object to check
+      required_keys: Keys that must be present
 
     Returns:
-        The validated dict
+      The validated dict
 
     Raises:
-        AssertionError: If validation fails
+      AssertionError: If validation fails
 
     """
     assert_is_dict(data)
     for key in required_keys:
-        assert key in data, f"Required key '{key}' missing from dict"
+      assert key in data, f"Required key '{key}' missing from dict"
     return data
 
 
@@ -107,13 +107,13 @@ def assert_analysis_results_structure(results: object) -> dict[str, object]:
     """Assert analyzer results have expected structure - specialized helper.
 
     Args:
-        results: Analyzer results to validate
+      results: Analyzer results to validate
 
     Returns:
-        Validated results dict
+      Validated results dict
 
     Raises:
-        AssertionError: If structure is invalid
+      AssertionError: If structure is invalid
 
     """
     return assert_dict_structure(results, ["metrics", "issues", "python_files"])
@@ -123,13 +123,13 @@ def assert_metrics_structure(metrics: object) -> dict[str, object]:
     """Assert metrics have expected structure - specialized helper.
 
     Args:
-        metrics: Metrics to validate
+      metrics: Metrics to validate
 
     Returns:
-        Validated metrics dict
+      Validated metrics dict
 
     Raises:
-        AssertionError: If structure is invalid
+      AssertionError: If structure is invalid
 
     """
     return assert_dict_structure(metrics, ["total_files", "total_lines_of_code"])
@@ -139,16 +139,16 @@ def assert_issues_structure(issues: object) -> dict[str, object]:
     """Assert issues have expected structure - specialized helper.
 
     Args:
-        issues: Issues to validate
+      issues: Issues to validate
 
     Returns:
-        Validated issues dict
+      Validated issues dict
 
     Raises:
-        AssertionError: If structure is invalid
+      AssertionError: If structure is invalid
 
     """
     return assert_dict_structure(
-        issues,
-        ["security", "complexity", "dead_code", "duplicates"],
+      issues,
+      ["security", "complexity", "dead_code", "duplicates"],
     )

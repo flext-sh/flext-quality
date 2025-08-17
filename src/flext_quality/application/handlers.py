@@ -6,10 +6,13 @@ REFACTORED:
 """
 
 from __future__ import annotations
-
-from typing import TYPE_CHECKING
+from uuid import UUID
 
 from flext_core import FlextResult, get_logger
+from flext_observability import (
+    flext_create_log_entry as _flext_create_log_entry,
+    flext_create_trace as _flext_create_trace,
+)
 
 from flext_quality.application.services import (
     LintingServiceImpl,
@@ -17,21 +20,7 @@ from flext_quality.application.services import (
     QualityReportService,
     SecurityAnalyzerServiceImpl,
 )
-
-# Optional observability: import at module level with safe fallbacks
-try:
-    from flext_observability import (
-        flext_create_log_entry as _flext_create_log_entry,
-    )
-except Exception:  # pragma: no cover - optional dependency
-    _flext_create_log_entry = None  # type: ignore[assignment]
-
-try:
-    from flext_observability import (
-        flext_create_trace as _flext_create_trace,
-    )
-except Exception:  # pragma: no cover - optional dependency
-    _flext_create_trace = None  # type: ignore[assignment]
+from flext_quality.domain.entities import QualityAnalysis, QualityReport
 
 
 def _noop(*_args: object, **_kwargs: object) -> None:
@@ -45,13 +34,8 @@ flext_create_trace = _flext_create_trace if callable(_flext_create_trace) else _
 
 logger = get_logger(__name__)
 
-if TYPE_CHECKING:
-    from flext_quality.domain.entities import QualityAnalysis, QualityReport
 
 # Using flext-core handlers directly - no fallbacks
-
-if TYPE_CHECKING:
-    from uuid import UUID
 
 
 # Real handlers using actual services
@@ -59,156 +43,156 @@ class AnalyzeProjectHandler:
     """Handler for analyzing projects."""
 
     def __init__(self) -> None:
-        """Initialize handler with analysis service."""
-        self._analysis_service = QualityAnalysisService()
+      """Initialize handler with analysis service."""
+      self._analysis_service = QualityAnalysisService()
 
     async def handle(self, project_id: UUID) -> FlextResult[QualityAnalysis]:
-        """Handle project analysis command."""
-        # Create trace for observability (optional dependency)
-        flext_create_trace(
-            trace_id=f"analyze_project_{project_id}",
-            operation="AnalyzeProjectHandler.handle",
-            config={"project_id": str(project_id)},
-        )
+      """Handle project analysis command."""
+      # Create trace for observability (optional dependency)
+      flext_create_trace(
+          trace_id=f"analyze_project_{project_id}",
+          operation="AnalyzeProjectHandler.handle",
+          config={"project_id": str(project_id)},
+      )
 
-        # Log operation start
-        flext_create_log_entry(
-            message=f"Starting project analysis for {project_id}",
-            level="info",
-            context={
-                "handler": "AnalyzeProjectHandler",
-                "project_id": str(project_id),
-            },
-        )
+      # Log operation start
+      flext_create_log_entry(
+          message=f"Starting project analysis for {project_id}",
+          level="info",
+          context={
+              "handler": "AnalyzeProjectHandler",
+              "project_id": str(project_id),
+          },
+      )
 
-        try:
-            # Convert UUID to string for service compatibility
-            project_id_str = str(project_id)
+      try:
+          # Convert UUID to string for service compatibility
+          project_id_str = str(project_id)
 
-            # Create and start analysis
-            analysis_result = await self._analysis_service.create_analysis(
-                project_id=project_id_str,
-            )
+          # Create and start analysis
+          analysis_result = await self._analysis_service.create_analysis(
+              project_id=project_id_str,
+          )
 
-            if analysis_result.is_failure:
-                flext_create_log_entry(
-                    message=f"Failed to create analysis: {analysis_result.error}",
-                    level="error",
-                    context={
-                        "handler": "AnalyzeProjectHandler",
-                        "project_id": str(project_id),
-                    },
-                )
-                return analysis_result
+          if analysis_result.is_failure:
+              flext_create_log_entry(
+                  message=f"Failed to create analysis: {analysis_result.error}",
+                  level="error",
+                  context={
+                      "handler": "AnalyzeProjectHandler",
+                      "project_id": str(project_id),
+                  },
+              )
+              return analysis_result
 
-            analysis = analysis_result.data
+          analysis = analysis_result.data
 
-            flext_create_log_entry(
-                message=f"Successfully created analysis for project {project_id}",
-                level="info",
-                context={
-                    "handler": "AnalyzeProjectHandler",
-                    "project_id": str(project_id),
-                    "analysis_id": getattr(analysis, "id", None),
-                },
-            )
+          flext_create_log_entry(
+              message=f"Successfully created analysis for project {project_id}",
+              level="info",
+              context={
+                  "handler": "AnalyzeProjectHandler",
+                  "project_id": str(project_id),
+                  "analysis_id": getattr(analysis, "id", None),
+              },
+          )
 
-            # Return the created analysis
-            return FlextResult.ok(analysis)
+          # Return the created analysis
+          return FlextResult.ok(analysis)
 
-        except Exception as e:
-            flext_create_log_entry(
-                message=f"Unexpected error in AnalyzeProjectHandler: {e!s}",
-                level="error",
-                context={
-                    "handler": "AnalyzeProjectHandler",
-                    "project_id": str(project_id),
-                    "error": str(e),
-                },
-            )
-            logger.exception("Unexpected error in AnalyzeProjectHandler")
-            return FlextResult.fail(f"Unexpected error: {e!s}")
+      except Exception as e:
+          flext_create_log_entry(
+              message=f"Unexpected error in AnalyzeProjectHandler: {e!s}",
+              level="error",
+              context={
+                  "handler": "AnalyzeProjectHandler",
+                  "project_id": str(project_id),
+                  "error": str(e),
+              },
+          )
+          logger.exception("Unexpected error in AnalyzeProjectHandler")
+          return FlextResult.fail(f"Unexpected error: {e!s}")
 
 
 class GenerateReportHandler:
     """Handler for generating reports."""
 
     def __init__(self) -> None:
-        """Initialize handler with report service."""
-        self._report_service = QualityReportService()
+      """Initialize handler with report service."""
+      self._report_service = QualityReportService()
 
     async def handle(self, analysis_id: UUID) -> FlextResult[QualityReport]:
-        """Handle report generation command."""
-        # Convert UUID to string for service compatibility
-        analysis_id_str = str(analysis_id)
+      """Handle report generation command."""
+      # Convert UUID to string for service compatibility
+      analysis_id_str = str(analysis_id)
 
-        # Create report for the analysis
-        report_result = await self._report_service.create_report(
-            analysis_id=analysis_id_str,
-            report_type="comprehensive",
-            report_format="html",
-        )
+      # Create report for the analysis
+      report_result = await self._report_service.create_report(
+          analysis_id=analysis_id_str,
+          report_type="comprehensive",
+          report_format="html",
+      )
 
-        if report_result.is_failure:
-            return report_result
+      if report_result.is_failure:
+          return report_result
 
-        report = report_result.data
+      report = report_result.data
 
-        # Return the created report
-        return FlextResult.ok(report)
+      # Return the created report
+      return FlextResult.ok(report)
 
 
 class RunLintingHandler:
     """Handler for running linting checks."""
 
     def __init__(self) -> None:
-        """Initialize handler with linting service implementation."""
-        self._linting_service = LintingServiceImpl()
+      """Initialize handler with linting service implementation."""
+      self._linting_service = LintingServiceImpl()
 
     async def handle(self, project_id: UUID) -> FlextResult[dict[str, object]]:
-        """Handle linting command."""
-        # Convert UUID to string for service compatibility
-        project_id_str = str(project_id)
+      """Handle linting command."""
+      # Convert UUID to string for service compatibility
+      project_id_str = str(project_id)
 
-        # Use analyzer to get project path (simplified)
-        # In real implementation, this would get project info from repository
-        project_path = f"/projects/{project_id_str}"  # Placeholder path
+      # Use analyzer to get project path (simplified)
+      # In real implementation, this would get project info from repository
+      project_path = f"/projects/{project_id_str}"  # Placeholder path
 
-        # Run linting analysis
-        linting_result = await self._linting_service.run_linting(project_path)
+      # Run linting analysis
+      linting_result = await self._linting_service.run_linting(project_path)
 
-        if linting_result.is_failure:
-            return linting_result
+      if linting_result.is_failure:
+          return linting_result
 
-        linting_issues = linting_result.data
+      linting_issues = linting_result.data
 
-        # Return linting results
-        return FlextResult.ok(linting_issues)
+      # Return linting results
+      return FlextResult.ok(linting_issues)
 
 
 class RunSecurityCheckHandler:
     """Handler for running security checks."""
 
     def __init__(self) -> None:
-        """Initialize handler with security analyzer service."""
-        self._security_service = SecurityAnalyzerServiceImpl()
+      """Initialize handler with security analyzer service."""
+      self._security_service = SecurityAnalyzerServiceImpl()
 
     async def handle(self, project_id: UUID) -> FlextResult[dict[str, object]]:
-        """Handle security check command."""
-        # Convert UUID to string for service compatibility
-        project_id_str = str(project_id)
+      """Handle security check command."""
+      # Convert UUID to string for service compatibility
+      project_id_str = str(project_id)
 
-        # Use analyzer to get project path (simplified)
-        # In real implementation, this would get project info from repository
-        project_path = f"/projects/{project_id_str}"  # Placeholder path
+      # Use analyzer to get project path (simplified)
+      # In real implementation, this would get project info from repository
+      project_path = f"/projects/{project_id_str}"  # Placeholder path
 
-        # Run security analysis
-        security_result = await self._security_service.analyze_security(project_path)
+      # Run security analysis
+      security_result = await self._security_service.analyze_security(project_path)
 
-        if security_result.is_failure:
-            return security_result
+      if security_result.is_failure:
+          return security_result
 
-        security_issues = security_result.data
+      security_issues = security_result.data
 
-        # Return security analysis results
-        return FlextResult.ok(security_issues)
+      # Return security analysis results
+      return FlextResult.ok(security_issues)

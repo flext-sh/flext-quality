@@ -18,47 +18,47 @@ class QualityGradeCalculator:
 
     # Grade thresholds - single source of truth
     _GRADE_THRESHOLDS: ClassVar[list[tuple[int, QualityGrade]]] = [
-        (95, QualityGrade.A_PLUS),
-        (90, QualityGrade.A),
-        (85, QualityGrade.A_MINUS),
-        (80, QualityGrade.B_PLUS),
-        (75, QualityGrade.B),
-        (70, QualityGrade.B_MINUS),
-        (65, QualityGrade.C_PLUS),
-        (60, QualityGrade.C),
-        (55, QualityGrade.C_MINUS),
-        (50, QualityGrade.D_PLUS),
-        (45, QualityGrade.D),
+      (95, QualityGrade.A_PLUS),
+      (90, QualityGrade.A),
+      (85, QualityGrade.A_MINUS),
+      (80, QualityGrade.B_PLUS),
+      (75, QualityGrade.B),
+      (70, QualityGrade.B_MINUS),
+      (65, QualityGrade.C_PLUS),
+      (60, QualityGrade.C),
+      (55, QualityGrade.C_MINUS),
+      (50, QualityGrade.D_PLUS),
+      (45, QualityGrade.D),
     ]
 
     @classmethod
     def calculate_grade(cls, score: float) -> QualityGrade:
-        """Calculate grade from score - DRY implementation.
+      """Calculate grade from score - DRY implementation.
 
-        Args:
-            score: Quality score (0-100)
+      Args:
+          score: Quality score (0-100)
 
-        Returns:
-            QualityGrade enum value
+      Returns:
+          QualityGrade enum value
 
-        """
-        for threshold, grade in cls._GRADE_THRESHOLDS:
-            if score >= threshold:
-                return grade
-        return QualityGrade.F
+      """
+      for threshold, grade in cls._GRADE_THRESHOLDS:
+          if score >= threshold:
+              return grade
+      return QualityGrade.F
 
     @classmethod
     def get_grade_threshold(cls, grade: QualityGrade) -> int:
-        """Get minimum threshold for a grade.
+      """Get minimum threshold for a grade.
 
-        Args:
-            grade: QualityGrade enum value
+      Args:
+          grade: QualityGrade enum value
 
-        Returns:
-            Minimum score threshold for the grade
+      Returns:
+          Minimum score threshold for the grade
 
-        """
-        for threshold, g in cls._GRADE_THRESHOLDS:
-            if g == grade:
-                return threshold
-        return 0  # F grade
+      """
+      for threshold, g in cls._GRADE_THRESHOLDS:
+          if g == grade:
+              return threshold
+      return 0  # F grade
