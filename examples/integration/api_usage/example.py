@@ -17,7 +17,8 @@ import sys
 import tempfile
 from pathlib import Path
 
-# Import FLEXT Quality components
+from flext_core import get_logger
+
 from flext_quality import (
     CodeAnalyzer,
     QualityAnalysisService,
@@ -29,30 +30,19 @@ from flext_quality import (
     QualityReportService,
 )
 
-# Import FLEXT core patterns
-try:
-    except ImportError:
-    FLEXT_CORE_AVAILABLE = False
-
-# Setup logging
-if FLEXT_CORE_AVAILABLE:
-    logger = get_logger(__name__)
-else:
-    import logging
-
-    logger = logging.getLogger(__name__)
+logger = get_logger(__name__)
 
 
 async def demonstrate_simple_api() -> None:
     """Demonstrate simple API usage patterns."""
     # Create sample project for analysis
     with tempfile.TemporaryDirectory() as temp_dir:
-      project_path = Path(temp_dir) / "sample_project"
-      project_path.mkdir()
+        project_path = Path(temp_dir) / "sample_project"
+        project_path.mkdir()
 
-      # Create sample Python file
-      sample_file = project_path / "sample.py"
-      sample_file.write_text('''
+        # Create sample Python file
+        sample_file = project_path / "sample.py"
+        sample_file.write_text('''
 """Sample module for API demonstration."""
 
 import os
@@ -123,38 +113,38 @@ if __name__ == "__main__":
     print(f"Processing stats: {stats}")
 ''')
 
-      # 1. Direct CodeAnalyzer usage
+        # 1. Direct CodeAnalyzer usage
 
-      analyzer = CodeAnalyzer(str(project_path))
-      results = analyzer.analyze_project()
+        analyzer = CodeAnalyzer(str(project_path))
+        results = analyzer.analyze_project()
 
-      analyzer.get_quality_score()
-      analyzer.get_quality_grade()
+        analyzer.get_quality_score()
+        analyzer.get_quality_grade()
 
-      # 2. QualityMetrics usage
+        # 2. QualityMetrics usage
 
-      metrics = QualityMetrics.from_analysis_results(results)
+        metrics = QualityMetrics.from_analysis_results(results)
 
-      # Show detailed scores
-      for _category, _score_val in metrics.scores_summary.items():
-          pass
+        # Show detailed scores
+        for _category, _score_val in metrics.scores_summary.items():
+            pass
 
-      # 3. QualityReport generation
+        # 3. QualityReport generation
 
-      report = QualityReport(results)
+        report = QualityReport(results)
 
-      # Generate JSON report
-      json_report = report.generate_json_report()
+        # Generate JSON report
+        json_report = report.generate_json_report()
 
-      # Generate HTML report
-      html_report = report.generate_html_report()
+        # Generate HTML report
+        html_report = report.generate_html_report()
 
-      # Save reports
-      json_path = project_path / "api_demo_report.json"
-      html_path = project_path / "api_demo_report.html"
+        # Save reports
+        json_path = project_path / "api_demo_report.json"
+        html_path = project_path / "api_demo_report.html"
 
-      json_path.write_text(json_report)
-      html_path.write_text(html_report)
+        json_path.write_text(json_report)
+        html_path.write_text(html_report)
 
 
 async def demonstrate_service_integration() -> None:  # noqa: PLR0912
@@ -169,152 +159,152 @@ async def demonstrate_service_integration() -> None:  # noqa: PLR0912
 
     # Create project
     with tempfile.TemporaryDirectory() as temp_dir:
-      project_result = await project_service.create_project(
-          name="API Demo Project",
-          project_path=temp_dir,
-          language="python",
-      )
+        project_result = await project_service.create_project(
+            name="API Demo Project",
+            project_path=temp_dir,
+            language="python",
+        )
 
-      if project_result.success:
-          project = project_result.data
-      else:
-          return
+        if project_result.success:
+            project = project_result.data
+        else:
+            return
 
-      # Create analysis
+        # Create analysis
 
-      analysis_result = await analysis_service.create_analysis(project_id=project.id)
+        analysis_result = await analysis_service.create_analysis(project_id=project.id)
 
-      if analysis_result.success:
-          analysis = analysis_result.data
-      else:
-          return
+        if analysis_result.success:
+            analysis = analysis_result.data
+        else:
+            return
 
-      # Update analysis metrics
-      metrics_result = await analysis_service.update_metrics(
-          analysis_id=analysis.id,
-          total_files=5,
-          total_lines=250,
-          code_lines=200,
-          comment_lines=30,
-          blank_lines=20,
-      )
+        # Update analysis metrics
+        metrics_result = await analysis_service.update_metrics(
+            analysis_id=analysis.id,
+            total_files=5,
+            total_lines=250,
+            code_lines=200,
+            comment_lines=30,
+            blank_lines=20,
+        )
 
-      if metrics_result.success:
-          pass
-      else:
-          return
+        if metrics_result.success:
+            pass
+        else:
+            return
 
-      # Update quality scores
-      scores_result = await analysis_service.update_scores(
-          analysis_id=analysis.id,
-          coverage_score=85.0,
-          complexity_score=78.0,
-          duplication_score=92.0,
-          security_score=95.0,
-          maintainability_score=80.0,
-      )
+        # Update quality scores
+        scores_result = await analysis_service.update_scores(
+            analysis_id=analysis.id,
+            coverage_score=85.0,
+            complexity_score=78.0,
+            duplication_score=92.0,
+            security_score=95.0,
+            maintainability_score=80.0,
+        )
 
-      if scores_result.success:
-          pass
-      else:
-          return
+        if scores_result.success:
+            pass
+        else:
+            return
 
-      # Create issues
+        # Create issues
 
-      # Create different types of issues
-      issues_data = [
-          {
-              "issue_type": "security",
-              "severity": "high",
-              "rule_id": "S001",
-              "file_path": "src/auth.py",
-              "line_number": 42,
-              "message": "Potential SQL injection vulnerability",
-          },
-          {
-              "issue_type": "complexity",
-              "severity": "medium",
-              "rule_id": "C001",
-              "file_path": "src/processor.py",
-              "line_number": 15,
-              "message": "Cyclomatic complexity too high (12)",
-          },
-          {
-              "issue_type": "style",
-              "severity": "low",
-              "rule_id": "E301",
-              "file_path": "src/utils.py",
-              "line_number": 8,
-              "message": "Expected 1 blank line, found 0",
-          },
-      ]
+        # Create different types of issues
+        issues_data = [
+            {
+                "issue_type": "security",
+                "severity": "high",
+                "rule_id": "S001",
+                "file_path": "src/auth.py",
+                "line_number": 42,
+                "message": "Potential SQL injection vulnerability",
+            },
+            {
+                "issue_type": "complexity",
+                "severity": "medium",
+                "rule_id": "C001",
+                "file_path": "src/processor.py",
+                "line_number": 15,
+                "message": "Cyclomatic complexity too high (12)",
+            },
+            {
+                "issue_type": "style",
+                "severity": "low",
+                "rule_id": "E301",
+                "file_path": "src/utils.py",
+                "line_number": 8,
+                "message": "Expected 1 blank line, found 0",
+            },
+        ]
 
-      created_issues = []
-      for issue_data in issues_data:
-          issue_result = await issue_service.create_issue(
-              analysis_id=analysis.id,
-              **issue_data,
-          )
+        created_issues = []
+        for issue_data in issues_data:
+            issue_result = await issue_service.create_issue(
+                analysis_id=analysis.id,
+                **issue_data,
+            )
 
-          if issue_result.success:
-              issue = issue_result.data
-              created_issues.append(issue)
+            if issue_result.success:
+                issue = issue_result.data
+                created_issues.append(issue)
 
-      # Update issue counts in analysis
-      issue_counts_result = await analysis_service.update_issue_counts(
-          analysis_id=analysis.id,
-          critical=0,
-          high=1,
-          medium=1,
-          low=1,
-      )
+        # Update issue counts in analysis
+        issue_counts_result = await analysis_service.update_issue_counts(
+            analysis_id=analysis.id,
+            critical=0,
+            high=1,
+            medium=1,
+            low=1,
+        )
 
-      if issue_counts_result.success:
-          pass
+        if issue_counts_result.success:
+            pass
 
-      # Complete the analysis
-      complete_result = await analysis_service.complete_analysis(analysis.id)
+        # Complete the analysis
+        complete_result = await analysis_service.complete_analysis(analysis.id)
 
-      if complete_result.success:
-          pass
+        if complete_result.success:
+            pass
 
-      # Create reports
+        # Create reports
 
-      # Create different report types
-      report_types = ["html", "json", "pdf"]
+        # Create different report types
+        report_types = ["html", "json", "pdf"]
 
-      for report_type in report_types:
-          report_result = await report_service.create_report(
-              analysis_id=analysis.id,
-              report_type=report_type,
-          )
+        for report_type in report_types:
+            report_result = await report_service.create_report(
+                analysis_id=analysis.id,
+                report_type=report_type,
+            )
 
-          if report_result.success:
-              pass
+            if report_result.success:
+                pass
 
-      # List all reports for the analysis
-      reports_result = await report_service.list_reports(analysis.id)
+        # List all reports for the analysis
+        reports_result = await report_service.list_reports(analysis.id)
 
-      if reports_result.success:
-          reports = reports_result.data
-          for _report in reports:
-              pass
+        if reports_result.success:
+            reports = reports_result.data
+            for _report in reports:
+                pass
 
 
 async def demonstrate_flext_ecosystem_integration() -> None:
     """Demonstrate FLEXT ecosystem integration patterns."""
     if not FLEXT_CORE_AVAILABLE:
-      pass
+        pass
 
     # Demonstrate FlextResult pattern usage
 
     # Create sample project for analysis
     with tempfile.TemporaryDirectory() as temp_dir:
-      project_path = Path(temp_dir) / "ecosystem_demo"
-      project_path.mkdir()
+        project_path = Path(temp_dir) / "ecosystem_demo"
+        project_path.mkdir()
 
-      # Create sample file
-      (project_path / "demo.py").write_text('''
+        # Create sample file
+        (project_path / "demo.py").write_text('''
 def process_data(data):
     """Process data with basic validation."""
     if not data:
@@ -328,128 +318,128 @@ def process_data(data):
     return results
 ''')
 
-      # Demonstrate API usage with result handling
-      QualityAPI()
+        # Demonstrate API usage with result handling
+        QualityAPI()
 
-      try:
-          # Use direct analyzer (QualityAPI is a simple wrapper)
-          analyzer = CodeAnalyzer(str(project_path))
-          results = analyzer.analyze_project()
+        try:
+            # Use direct analyzer (QualityAPI is a simple wrapper)
+            analyzer = CodeAnalyzer(str(project_path))
+            results = analyzer.analyze_project()
 
-          analysis_data = {
-              "quality_score": analyzer.get_quality_score(),
-              "quality_grade": analyzer.get_quality_grade(),
-              "files_analyzed": results.get("files_analyzed", 0),
-              "total_lines": results.get("total_lines", 0),
-              "analysis_results": results,
-          }
+            analysis_data = {
+                "quality_score": analyzer.get_quality_score(),
+                "quality_grade": analyzer.get_quality_grade(),
+                "files_analyzed": results.get("files_analyzed", 0),
+                "total_lines": results.get("total_lines", 0),
+                "analysis_results": results,
+            }
 
-      except Exception:
-          return
+        except Exception:
+            return
 
-      # Demonstrate observability integration (if available)
+        # Demonstrate observability integration (if available)
 
-      try:
-          from flext_observability import (
-              flext_create_log_entry,
-              flext_create_metric,
-              flext_create_trace,
-          )
+        try:
+            from flext_observability import (
+                flext_create_log_entry,
+                flext_create_metric,
+                flext_create_trace,
+            )
 
-          # Create metrics
-          flext_create_metric(
-              name="quality_analysis_score",
-              value=analysis_data.get("quality_score", 0),
-              tags={"project": "ecosystem_demo", "integration": "api"},
-          )
+            # Create metrics
+            flext_create_metric(
+                name="quality_analysis_score",
+                value=analysis_data.get("quality_score", 0),
+                tags={"project": "ecosystem_demo", "integration": "api"},
+            )
 
-          # Create trace
-          flext_create_trace(
-              trace_id="ecosystem_demo_analysis",
-              operation="api.analyze_project",
-              config={"project_path": str(project_path)},
-          )
+            # Create trace
+            flext_create_trace(
+                trace_id="ecosystem_demo_analysis",
+                operation="api.analyze_project",
+                config={"project_path": str(project_path)},
+            )
 
-          # Create log entry
-          flext_create_log_entry(
-              message="FLEXT Quality ecosystem integration demonstration completed",
-              level="info",
-              context={
-                  "component": "quality_api",
-                  "project": "ecosystem_demo",
-                  "files_analyzed": analysis_data.get("files_analyzed", 0),
-              },
-          )
+            # Create log entry
+            flext_create_log_entry(
+                message="FLEXT Quality ecosystem integration demonstration completed",
+                level="info",
+                context={
+                    "component": "quality_api",
+                    "project": "ecosystem_demo",
+                    "files_analyzed": analysis_data.get("files_analyzed", 0),
+                },
+            )
 
-      except ImportError:
-          # Simulate observability integration
-          pass
+        except ImportError:
+            # Simulate observability integration
+            pass
 
-      # Demonstrate container-based dependency injection (if available)
+        # Demonstrate container-based dependency injection (if available)
 
-      if FLEXT_CORE_AVAILABLE:
-          try:
-              from flext_core import FlextContainer
+        if FLEXT_CORE_AVAILABLE:
+            try:
+                from flext_core import FlextContainer
 
-              # Create container
-              container = FlextContainer()
+                # Create container
+                container = FlextContainer()
 
-              # Register services
-              project_service_instance = QualityProjectService()
-              analysis_service_instance = QualityAnalysisService()
+                # Register services
+                project_service_instance = QualityProjectService()
+                analysis_service_instance = QualityAnalysisService()
 
-              container.register("QualityProjectService", project_service_instance)
-              container.register("QualityAnalysisService", analysis_service_instance)
+                container.register("QualityProjectService", project_service_instance)
+                container.register("QualityAnalysisService", analysis_service_instance)
 
-              # Resolve services (FlextContainer.get returns FlextResult)
-              project_service_result = container.get("QualityProjectService")
-              analysis_service_result = container.get("QualityAnalysisService")
+                # Resolve services (FlextContainer.get returns FlextResult)
+                project_service_result = container.get("QualityProjectService")
+                analysis_service_result = container.get("QualityAnalysisService")
 
-              if project_service_result.success and analysis_service_result.success:
-                  project_service = project_service_result.data
+                if project_service_result.success and analysis_service_result.success:
+                    project_service = project_service_result.data
 
-                  # Demonstrate service usage
-                  with tempfile.TemporaryDirectory() as temp_service_dir:
-                      project_result = await project_service.create_project(
-                          name="DI Demo Project",
-                          project_path=temp_service_dir,
-                      )
+                    # Demonstrate service usage
+                    with tempfile.TemporaryDirectory() as temp_service_dir:
+                        project_result = await project_service.create_project(
+                            name="DI Demo Project",
+                            project_path=temp_service_dir,
+                        )
 
-                      if project_result.success:
-                          pass
+                        if project_result.success:
+                            pass
 
-          except ImportError:
-              # Direct instantiation
-              project_service = QualityProjectService()
-              QualityAnalysisService()
-      else:
-          project_service = QualityProjectService()
-          QualityAnalysisService()
+            except ImportError:
+                # Direct instantiation
+                project_service = QualityProjectService()
+                QualityAnalysisService()
+        else:
+            project_service = QualityProjectService()
+            QualityAnalysisService()
 
 
 async def demonstrate_custom_workflows() -> None:
     """Demonstrate custom quality workflow automation."""
     # Define custom workflow
     workflow_steps = [
-      "Initialize project analysis",
-      "Execute quality analysis",
-      "Process quality metrics",
-      "Generate comprehensive reports",
-      "Apply quality gates",
-      "Send notifications",
+        "Initialize project analysis",
+        "Execute quality analysis",
+        "Process quality metrics",
+        "Generate comprehensive reports",
+        "Apply quality gates",
+        "Send notifications",
     ]
 
     for _i, _step in enumerate(workflow_steps, 1):
-      pass
+        pass
 
     # Create sample project
     with tempfile.TemporaryDirectory() as temp_dir:
-      project_path = Path(temp_dir) / "workflow_demo"
-      project_path.mkdir()
+        project_path = Path(temp_dir) / "workflow_demo"
+        project_path.mkdir()
 
-      # Create sample files
-      files_data = {
-          "main.py": '''
+        # Create sample files
+        files_data = {
+            "main.py": '''
 """Main application module."""
 
 import logging
@@ -507,7 +497,7 @@ if __name__ == "__main__":
       results = app.process_data(test_data)
       print(f"Processed results: {results}")
 ''',
-          "utils.py": '''
+            "utils.py": '''
 """Utility functions."""
 
 def calculate_average(numbers: List[float]) -> float:
@@ -520,7 +510,7 @@ def format_percentage(value: float) -> str:
     """Format value as percentage."""
     return f"{value * 100:.1f}%"
 ''',
-          "tests.py": '''
+            "tests.py": '''
 """Test module."""
 
 import unittest
@@ -560,99 +550,99 @@ class TestUtils(unittest.TestCase):
 if __name__ == "__main__":
     unittest.main()
 ''',
-      }
+        }
 
-      # Create files
-      for filename, content in files_data.items():
-          (project_path / filename).write_text(content)
+        # Create files
+        for filename, content in files_data.items():
+            (project_path / filename).write_text(content)
 
-      # Execute custom workflow
+        # Execute custom workflow
 
-      # Step 1: Initialize project analysis
-      analyzer = CodeAnalyzer(str(project_path))
+        # Step 1: Initialize project analysis
+        analyzer = CodeAnalyzer(str(project_path))
 
-      # Step 2: Execute quality analysis
-      results = analyzer.analyze_project(
-          include_security=True,
-          include_complexity=True,
-          include_dead_code=True,
-          include_duplicates=True,
-      )
+        # Step 2: Execute quality analysis
+        results = analyzer.analyze_project(
+            include_security=True,
+            include_complexity=True,
+            include_dead_code=True,
+            include_duplicates=True,
+        )
 
-      # Step 3: Process quality metrics
-      metrics = QualityMetrics.from_analysis_results(results)
-      score = analyzer.get_quality_score()
-      analyzer.get_quality_grade()
+        # Step 3: Process quality metrics
+        metrics = QualityMetrics.from_analysis_results(results)
+        score = analyzer.get_quality_score()
+        analyzer.get_quality_grade()
 
-      # Step 4: Generate comprehensive reports
-      report = QualityReport(results)
+        # Step 4: Generate comprehensive reports
+        report = QualityReport(results)
 
-      json_report = report.generate_json_report()
-      html_report = report.generate_html_report()
+        json_report = report.generate_json_report()
+        html_report = report.generate_html_report()
 
-      # Save reports
-      json_path = project_path / "workflow_report.json"
-      html_path = project_path / "workflow_report.html"
-      json_path.write_text(json_report)
-      html_path.write_text(html_report)
+        # Save reports
+        json_path = project_path / "workflow_report.json"
+        html_path = project_path / "workflow_report.html"
+        json_path.write_text(json_report)
+        html_path.write_text(html_report)
 
-      # Step 5: Apply quality gates
+        # Step 5: Apply quality gates
 
-      # Define quality gates
-      quality_gates = {
-          "min_score": 70.0,
-          "max_security_issues": 0,
-          "max_complexity_issues": 3,
-          "max_total_issues": 5,
-      }
+        # Define quality gates
+        quality_gates = {
+            "min_score": 70.0,
+            "max_security_issues": 0,
+            "max_complexity_issues": 3,
+            "max_total_issues": 5,
+        }
 
-      # Check gates
-      gates_passed = 0
-      len(quality_gates)
+        # Check gates
+        gates_passed = 0
+        len(quality_gates)
 
-      # Score gate
-      if score >= quality_gates["min_score"]:
-          gates_passed += 1
+        # Score gate
+        if score >= quality_gates["min_score"]:
+            gates_passed += 1
 
-      # Security gate
-      if metrics.security_issues_count <= quality_gates["max_security_issues"]:
-          gates_passed += 1
+        # Security gate
+        if metrics.security_issues_count <= quality_gates["max_security_issues"]:
+            gates_passed += 1
 
-      # Complexity gate
-      if metrics.complexity_issues_count <= quality_gates["max_complexity_issues"]:
-          gates_passed += 1
+        # Complexity gate
+        if metrics.complexity_issues_count <= quality_gates["max_complexity_issues"]:
+            gates_passed += 1
 
-      # Total issues gate
-      if metrics.total_issues <= quality_gates["max_total_issues"]:
-          gates_passed += 1
+        # Total issues gate
+        if metrics.total_issues <= quality_gates["max_total_issues"]:
+            gates_passed += 1
 
-      # Overall gate decision
+        # Overall gate decision
 
-      # Step 6: Send notifications
+        # Step 6: Send notifications
 
-      # Simulate notifications
-      notification_channels = ["email", "slack", "webhook"]
+        # Simulate notifications
+        notification_channels = ["email", "slack", "webhook"]
 
-      for _channel in notification_channels:
-          pass
+        for _channel in notification_channels:
+            pass
 
-      # Workflow summary
+        # Workflow summary
 
 
 async def main() -> int:
     """Main demonstration of complete API integration functionality."""
     try:
-      # Demonstrate all API integration patterns
-      await demonstrate_simple_api()
-      await demonstrate_service_integration()
-      await demonstrate_flext_ecosystem_integration()
-      await demonstrate_custom_workflows()
+        # Demonstrate all API integration patterns
+        await demonstrate_simple_api()
+        await demonstrate_service_integration()
+        await demonstrate_flext_ecosystem_integration()
+        await demonstrate_custom_workflows()
 
-      return 0
+        return 0
 
     except Exception:
-      logger.exception("API integration demonstration failed")
-      return 1
+        logger.exception("API integration demonstration failed")
+        return 1
 
 
 if __name__ == "__main__":

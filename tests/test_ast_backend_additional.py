@@ -20,7 +20,7 @@ def test_ast_backend_syntax_error() -> None:
 def test_ast_visitor_extracts_details(tmp_path: Path) -> None:
     """Visitor tracks classes and functions with flags."""
     code = ast.parse(
-      """
+        """
 class A:
     def m(self):
       pass

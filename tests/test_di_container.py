@@ -9,55 +9,55 @@ class TestDIContainer:
     """Test dependency injection using FlextContainer directly."""
 
     def test_flext_container_creation(self) -> None:
-      """Test creating FlextContainer instance directly."""
-      container = FlextContainer()
-      assert isinstance(container, FlextContainer)
+        """Test creating FlextContainer instance directly."""
+        container = FlextContainer()
+        assert isinstance(container, FlextContainer)
 
     def test_service_registration_and_retrieval(self) -> None:
-      """Test registering and retrieving services from container."""
-      container = FlextContainer()
+        """Test registering and retrieving services from container."""
+        container = FlextContainer()
 
-      # Create a test service
-      test_service = "test_quality_service"
+        # Create a test service
+        test_service = "test_quality_service"
 
-      # Register service
-      result = container.register("quality_service", test_service)
-      assert result.success
+        # Register service
+        result = container.register("quality_service", test_service)
+        assert result.success
 
-      # Retrieve service
-      get_result = container.get("quality_service")
-      assert get_result.success
-      assert get_result.data == test_service
+        # Retrieve service
+        get_result = container.get("quality_service")
+        assert get_result.success
+        assert get_result.data == test_service
 
     def test_quality_service_registration(self) -> None:
-      """Test registering quality-specific services."""
-      container = FlextContainer()
+        """Test registering quality-specific services."""
+        container = FlextContainer()
 
-      # Register a quality analysis service (mock)
-      class MockQualityAnalyzer:
-          def analyze(self, code: str) -> dict:
-              return {"quality_score": 85, "issues": []}
+        # Register a quality analysis service (mock)
+        class MockQualityAnalyzer:
+            def analyze(self, code: str) -> dict:
+                return {"quality_score": 85, "issues": []}
 
-      analyzer = MockQualityAnalyzer()
-      result = container.register("quality_analyzer", analyzer)
-      assert result.success
+        analyzer = MockQualityAnalyzer()
+        result = container.register("quality_analyzer", analyzer)
+        assert result.success
 
-      # Retrieve and test
-      get_result = container.get("quality_analyzer")
-      assert get_result.success
-      retrieved_analyzer = get_result.data
-      assert hasattr(retrieved_analyzer, "analyze")
+        # Retrieve and test
+        get_result = container.get("quality_analyzer")
+        assert get_result.success
+        retrieved_analyzer = get_result.data
+        assert hasattr(retrieved_analyzer, "analyze")
 
-      # Test functionality
-      analysis = retrieved_analyzer.analyze("def hello(): pass")
-      assert isinstance(analysis, dict)
-      assert "quality_score" in analysis
+        # Test functionality
+        analysis = retrieved_analyzer.analyze("def hello(): pass")
+        assert isinstance(analysis, dict)
+        assert "quality_score" in analysis
 
     def test_container_error_handling(self) -> None:
-      """Test container handles errors properly."""
-      container = FlextContainer()
+        """Test container handles errors properly."""
+        container = FlextContainer()
 
-      # Test getting non-existent service
-      result = container.get("non_existent_service")
-      assert not result.success
-      assert result.error is not None
+        # Test getting non-existent service
+        result = container.get("non_existent_service")
+        assert not result.success
+        assert result.error is not None

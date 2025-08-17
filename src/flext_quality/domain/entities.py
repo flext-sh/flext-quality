@@ -73,10 +73,10 @@ class QualityProject(FlextEntity):
     auto_analyze: bool = Field(default=True)
 
     def validate_business_rules(self) -> FlextResult[None]:
-      """Validate domain rules for quality project."""
-      if not self.project_path:
-          return FlextResult.fail("Project path is required")
-      return FlextResult.ok(None)
+        """Validate domain rules for quality project."""
+        if not self.project_path:
+            return FlextResult.fail("Project path is required")
+        return FlextResult.ok(None)
 
     analysis_schedule: str | None = None  # cron format
 
@@ -90,13 +90,13 @@ class QualityProject(FlextEntity):
     total_analyses: int = Field(default=0)
 
     def update_last_analysis(self) -> QualityProject:
-      """Update last analysis timestamp and return new instance."""
-      return self.model_copy(
-          update={
-              "last_analysis_at": datetime.now(UTC),
-              "total_analyses": self.total_analyses + 1,
-          },
-      )
+        """Update last analysis timestamp and return new instance."""
+        return self.model_copy(
+            update={
+                "last_analysis_at": datetime.now(UTC),
+                "total_analyses": self.total_analyses + 1,
+            },
+        )
 
 
 class QualityAnalysis(FlextEntity):
@@ -143,77 +143,77 @@ class QualityAnalysis(FlextEntity):
     analysis_config: FlextTypes.Core.JsonDict = Field(default_factory=dict)
 
     def start_analysis(self) -> QualityAnalysis:
-      """Start analysis and return new instance."""
-      return self.model_copy(
-          update={
-              "started_at": datetime.now(UTC),
-              "status": AnalysisStatus.ANALYZING,
-          },
-      )
+        """Start analysis and return new instance."""
+        return self.model_copy(
+            update={
+                "started_at": datetime.now(UTC),
+                "status": AnalysisStatus.ANALYZING,
+            },
+        )
 
     def complete_analysis(self) -> QualityAnalysis:
-      """Complete analysis and return new instance."""
-      completed_at = datetime.now(UTC)
-      duration_seconds = None
-      if self.started_at:
-          duration = completed_at - self.started_at
-          duration_seconds = duration.total_seconds()
+        """Complete analysis and return new instance."""
+        completed_at = datetime.now(UTC)
+        duration_seconds = None
+        if self.started_at:
+            duration = completed_at - self.started_at
+            duration_seconds = duration.total_seconds()
 
-      return self.model_copy(
-          update={
-              "completed_at": completed_at,
-              "status": AnalysisStatus.COMPLETED,
-              "duration_seconds": duration_seconds,
-          },
-      )
+        return self.model_copy(
+            update={
+                "completed_at": completed_at,
+                "status": AnalysisStatus.COMPLETED,
+                "duration_seconds": duration_seconds,
+            },
+        )
 
     def fail_analysis(self, error: str) -> QualityAnalysis:
-      """Fail analysis and return new instance."""
-      completed_at = datetime.now(UTC)
-      duration_seconds = None
-      if self.started_at:
-          duration = completed_at - self.started_at
-          duration_seconds = duration.total_seconds()
+        """Fail analysis and return new instance."""
+        completed_at = datetime.now(UTC)
+        duration_seconds = None
+        if self.started_at:
+            duration = completed_at - self.started_at
+            duration_seconds = duration.total_seconds()
 
-      return self.model_copy(
-          update={
-              "completed_at": completed_at,
-              "status": AnalysisStatus.FAILED,
-              "duration_seconds": duration_seconds,
-              # Store error message in overall_quality_score for debugging
-              "overall_quality_score": 0.0,  # Failed analysis gets 0 score
-              # Log error for debugging (used argument to satisfy linter)
-              "analysis_config": {**self.analysis_config, "error": error},
-          },
-      )
+        return self.model_copy(
+            update={
+                "completed_at": completed_at,
+                "status": AnalysisStatus.FAILED,
+                "duration_seconds": duration_seconds,
+                # Store error message in overall_quality_score for debugging
+                "overall_quality_score": 0.0,  # Failed analysis gets 0 score
+                # Log error for debugging (used argument to satisfy linter)
+                "analysis_config": {**self.analysis_config, "error": error},
+            },
+        )
 
     def calculate_overall_score(self) -> QualityAnalysis:
-      """Calculate overall score and return new instance."""
-      scores = [
-          self.coverage_score,
-          self.complexity_score,
-          self.duplication_score,
-          self.security_score,
-          self.maintainability_score,
-      ]
-      overall_score = sum(scores) / len(scores)
-      return self.model_copy(update={"overall_score": overall_score})
+        """Calculate overall score and return new instance."""
+        scores = [
+            self.coverage_score,
+            self.complexity_score,
+            self.duplication_score,
+            self.security_score,
+            self.maintainability_score,
+        ]
+        overall_score = sum(scores) / len(scores)
+        return self.model_copy(update={"overall_score": overall_score})
 
     @property
     def is_completed(self) -> bool:
-      """Check if analysis is completed (either succeeded or failed)."""
-      return self.status in {AnalysisStatus.COMPLETED, AnalysisStatus.FAILED}
+        """Check if analysis is completed (either succeeded or failed)."""
+        return self.status in {AnalysisStatus.COMPLETED, AnalysisStatus.FAILED}
 
     @property
     def successful(self) -> bool:
-      """Check if analysis completed successfully."""
-      return self.status == AnalysisStatus.COMPLETED
+        """Check if analysis completed successfully."""
+        return self.status == AnalysisStatus.COMPLETED
 
     def validate_business_rules(self) -> FlextResult[None]:
-      """Validate domain rules for quality analysis."""
-      if not self.project_id:
-          return FlextResult.fail("Project ID is required")
-      return FlextResult.ok(None)
+        """Validate domain rules for quality analysis."""
+        if not self.project_id:
+            return FlextResult.fail("Project ID is required")
+        return FlextResult.ok(None)
 
 
 class QualityIssue(FlextEntity):
@@ -249,41 +249,41 @@ class QualityIssue(FlextEntity):
     occurrence_count: int = Field(default=1)
 
     def mark_fixed(self) -> QualityIssue:
-      """Mark issue as fixed and return new instance."""
-      return self.model_copy(update={"is_fixed": True})
+        """Mark issue as fixed and return new instance."""
+        return self.model_copy(update={"is_fixed": True})
 
     def suppress(self, reason: str) -> QualityIssue:
-      """Suppress issue and return new instance."""
-      return self.model_copy(
-          update={
-              "is_suppressed": True,
-              "suppression_reason": reason,
-          },
-      )
+        """Suppress issue and return new instance."""
+        return self.model_copy(
+            update={
+                "is_suppressed": True,
+                "suppression_reason": reason,
+            },
+        )
 
     def unsuppress(self) -> QualityIssue:
-      """Unsuppress issue and return new instance."""
-      return self.model_copy(
-          update={
-              "is_suppressed": False,
-              "suppression_reason": None,
-          },
-      )
+        """Unsuppress issue and return new instance."""
+        return self.model_copy(
+            update={
+                "is_suppressed": False,
+                "suppression_reason": None,
+            },
+        )
 
     def increment_occurrence(self) -> QualityIssue:
-      """Increment occurrence count and return new instance."""
-      return self.model_copy(
-          update={
-              "occurrence_count": self.occurrence_count + 1,
-              "last_seen_at": datetime.now(UTC),
-          },
-      )
+        """Increment occurrence count and return new instance."""
+        return self.model_copy(
+            update={
+                "occurrence_count": self.occurrence_count + 1,
+                "last_seen_at": datetime.now(UTC),
+            },
+        )
 
     def validate_business_rules(self) -> FlextResult[None]:
-      """Validate domain rules for quality issue."""
-      if not self.analysis_id:
-          return FlextResult.fail("Analysis ID is required")
-      return FlextResult.ok(None)
+        """Validate domain rules for quality issue."""
+        if not self.analysis_id:
+            return FlextResult.fail("Analysis ID is required")
+        return FlextResult.ok(None)
 
 
 class QualityRule(FlextEntity):
@@ -306,28 +306,28 @@ class QualityRule(FlextEntity):
     examples: list[dict[str, str]] = Field(default_factory=list)
 
     def enable(self) -> QualityRule:
-      """Enable rule and return new instance."""
-      return self.model_copy(update={"enabled": True})
+        """Enable rule and return new instance."""
+        return self.model_copy(update={"enabled": True})
 
     def disable(self) -> QualityRule:
-      """Disable rule and return new instance."""
-      return self.model_copy(update={"enabled": False})
+        """Disable rule and return new instance."""
+        return self.model_copy(update={"enabled": False})
 
     def update_severity(self, severity: IssueSeverity) -> QualityRule:
-      """Update severity and return new instance."""
-      return self.model_copy(update={"severity": severity})
+        """Update severity and return new instance."""
+        return self.model_copy(update={"severity": severity})
 
     def set_parameter(self, key: str, value: object) -> QualityRule:
-      """Set parameter and return new instance."""
-      new_parameters = self.parameters.copy()
-      new_parameters[key] = value
-      return self.model_copy(update={"parameters": new_parameters})
+        """Set parameter and return new instance."""
+        new_parameters = self.parameters.copy()
+        new_parameters[key] = value
+        return self.model_copy(update={"parameters": new_parameters})
 
     def validate_business_rules(self) -> FlextResult[None]:
-      """Validate domain rules for quality rule."""
-      if not self.rule_id:
-          return FlextResult.fail("Rule ID is required")
-      return FlextResult.ok(None)
+        """Validate domain rules for quality rule."""
+        if not self.rule_id:
+            return FlextResult.fail("Rule ID is required")
+        return FlextResult.ok(None)
 
 
 class QualityReport(FlextEntity):
@@ -352,19 +352,19 @@ class QualityReport(FlextEntity):
     last_accessed_at: datetime | None = None
 
     def increment_access(self) -> QualityReport:
-      """Increment access count and return new instance."""
-      return self.model_copy(
-          update={
-              "access_count": self.access_count + 1,
-              "last_accessed_at": datetime.now(UTC),
-          },
-      )
+        """Increment access count and return new instance."""
+        return self.model_copy(
+            update={
+                "access_count": self.access_count + 1,
+                "last_accessed_at": datetime.now(UTC),
+            },
+        )
 
     def validate_business_rules(self) -> FlextResult[None]:
-      """Validate domain rules for quality report."""
-      if not self.analysis_id:
-          return FlextResult.fail("Analysis ID is required")
-      return FlextResult.ok(None)
+        """Validate domain rules for quality report."""
+        if not self.analysis_id:
+            return FlextResult.fail("Analysis ID is required")
+        return FlextResult.ok(None)
 
 
 # Domain Events

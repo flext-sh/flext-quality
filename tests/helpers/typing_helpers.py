@@ -78,7 +78,7 @@ def safe_list_access(data: object, index: int) -> object:
     """
     assert_is_list(data)
     assert 0 <= index < len(data), (
-      f"Index {index} out of bounds for list of length {len(data)}"
+        f"Index {index} out of bounds for list of length {len(data)}"
     )
     return data[index]
 
@@ -99,7 +99,7 @@ def assert_dict_structure(data: object, required_keys: list[str]) -> dict[str, o
     """
     assert_is_dict(data)
     for key in required_keys:
-      assert key in data, f"Required key '{key}' missing from dict"
+        assert key in data, f"Required key '{key}' missing from dict"
     return data
 
 
@@ -149,6 +149,6 @@ def assert_issues_structure(issues: object) -> dict[str, object]:
 
     """
     return assert_dict_structure(
-      issues,
-      ["security", "complexity", "dead_code", "duplicates"],
+        issues,
+        ["security", "complexity", "dead_code", "duplicates"],
     )
