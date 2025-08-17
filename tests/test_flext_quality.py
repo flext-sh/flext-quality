@@ -14,110 +14,110 @@ class TestCodeAnalyzer:
     """Test CodeAnalyzer functionality."""
 
     def test_analyzer_initialization(self) -> None:
-      """Test analyzer initialization function."""
-      analyzer = CodeAnalyzer(".")
-      assert analyzer is not None
-      if analyzer.project_path != Path():
-          msg: str = f"Expected {Path()}, got {analyzer.project_path}"
-          raise AssertionError(msg)
+        """Test analyzer initialization function."""
+        analyzer = CodeAnalyzer(".")
+        assert analyzer is not None
+        if analyzer.project_path != Path():
+            msg: str = f"Expected {Path()}, got {analyzer.project_path}"
+            raise AssertionError(msg)
 
     def test_analyzer_with_path(self, tmp_path: Path) -> None:
-      """Test analyzer with path function.
+        """Test analyzer with path function.
 
-      Args:
-          tmp_path (Path): Description.
+        Args:
+            tmp_path (Path): Description.
 
-      """
-      analyzer = CodeAnalyzer(tmp_path)
-      if analyzer.project_path != tmp_path:
-          msg: str = f"Expected {tmp_path}, got {analyzer.project_path}"
-          raise AssertionError(msg)
+        """
+        analyzer = CodeAnalyzer(tmp_path)
+        if analyzer.project_path != tmp_path:
+            msg: str = f"Expected {tmp_path}, got {analyzer.project_path}"
+            raise AssertionError(msg)
 
     def test_find_python_files(self, tmp_path: Path) -> None:
-      """Test find python files function.
+        """Test find python files function.
 
-      Args:
-          tmp_path (Path): Description.
+        Args:
+            tmp_path (Path): Description.
 
-      """
-      # Create test files
-      (tmp_path / "test.py").write_text("print('hello')")
-      (tmp_path / "subdir").mkdir()
-      (tmp_path / "subdir" / "test2.py").write_text("print('world')")
+        """
+        # Create test files
+        (tmp_path / "test.py").write_text("print('hello')")
+        (tmp_path / "subdir").mkdir()
+        (tmp_path / "subdir" / "test2.py").write_text("print('world')")
 
-      analyzer = CodeAnalyzer(tmp_path)
-      files = analyzer._find_python_files()
+        analyzer = CodeAnalyzer(tmp_path)
+        files = analyzer._find_python_files()
 
-      if len(files) != EXPECTED_BULK_SIZE:
-          msg: str = f"Expected {EXPECTED_BULK_SIZE}, got {len(files)}"
-          raise AssertionError(msg)
+        if len(files) != EXPECTED_BULK_SIZE:
+            msg: str = f"Expected {EXPECTED_BULK_SIZE}, got {len(files)}"
+            raise AssertionError(msg)
 
-      test_py_found = any(f.name == "test.py" for f in files)
-      test2_py_found = any(f.name == "test2.py" for f in files)
+        test_py_found = any(f.name == "test.py" for f in files)
+        test2_py_found = any(f.name == "test2.py" for f in files)
 
-      if not test_py_found:
-          msg: str = f"Expected test.py in files: {[f.name for f in files]}"
-          raise AssertionError(msg)
-      if not test2_py_found:
-          msg: str = f"Expected test2.py in files: {[f.name for f in files]}"
-          raise AssertionError(msg)
+        if not test_py_found:
+            msg: str = f"Expected test.py in files: {[f.name for f in files]}"
+            raise AssertionError(msg)
+        if not test2_py_found:
+            msg: str = f"Expected test2.py in files: {[f.name for f in files]}"
+            raise AssertionError(msg)
 
     def test_analyze_project_basic(self, tmp_path: Path) -> None:
-      """Test analyze project basic function.
+        """Test analyze project basic function.
 
-      Args:
-          tmp_path (Path): Description.
+        Args:
+            tmp_path (Path): Description.
 
-      """
-      # Create a simple Python file
-      test_file = tmp_path / "simple.py"
-      test_file.write_text(
-          """
+        """
+        # Create a simple Python file
+        test_file = tmp_path / "simple.py"
+        test_file.write_text(
+            """
 def hello() -> None:
       return "Hello, World!"
 
 if __name__ == "__main__":
           print(hello())
 """,
-      )
+        )
 
-      analyzer = CodeAnalyzer(tmp_path)
-      results = analyzer.analyze_project(
-          include_security=False,
-          include_complexity=False,
-          include_dead_code=False,
-          include_duplicates=False,
-      )
+        analyzer = CodeAnalyzer(tmp_path)
+        results = analyzer.analyze_project(
+            include_security=False,
+            include_complexity=False,
+            include_dead_code=False,
+            include_duplicates=False,
+        )
 
-      if results["files_analyzed"] != 1:
-          msg: str = f"Expected {1}, got {results['files_analyzed']}"
-          raise AssertionError(msg)
-      total_lines = results["total_lines"]
-      assert isinstance(total_lines, int)
-      assert total_lines > 0
-      python_files = results["python_files"]
-      if isinstance(python_files, list) and len(python_files) != 1:
-          msg: str = f"Expected {1}, got {len(python_files)}"
-          raise AssertionError(msg)
+        if results["files_analyzed"] != 1:
+            msg: str = f"Expected {1}, got {results['files_analyzed']}"
+            raise AssertionError(msg)
+        total_lines = results["total_lines"]
+        assert isinstance(total_lines, int)
+        assert total_lines > 0
+        python_files = results["python_files"]
+        if isinstance(python_files, list) and len(python_files) != 1:
+            msg: str = f"Expected {1}, got {len(python_files)}"
+            raise AssertionError(msg)
 
     def test_quality_score(self) -> None:
-      """Test quality score function."""
-      analyzer = CodeAnalyzer(".")
-      analyzer.analysis_results = {
-          "issues": {
-              "security": [],
-              "complexity": [],
-              "dead_code": [],
-              "duplicates": [],
-          },
-      }
+        """Test quality score function."""
+        analyzer = CodeAnalyzer(".")
+        analyzer.analysis_results = {
+            "issues": {
+                "security": [],
+                "complexity": [],
+                "dead_code": [],
+                "duplicates": [],
+            },
+        }
 
-      score = analyzer.get_quality_score()
-      if score != 100.0:
-          msg: str = f"Expected {100.0}, got {score}"
-          raise AssertionError(msg)
+        score = analyzer.get_quality_score()
+        if score != 100.0:
+            msg: str = f"Expected {100.0}, got {score}"
+            raise AssertionError(msg)
 
-      grade = analyzer.get_quality_grade()
-      if grade != "A+":
-          msg: str = f"Expected {'A+'}, got {grade}"
-          raise AssertionError(msg)
+        grade = analyzer.get_quality_grade()
+        if grade != "A+":
+            msg: str = f"Expected {'A+'}, got {grade}"
+            raise AssertionError(msg)

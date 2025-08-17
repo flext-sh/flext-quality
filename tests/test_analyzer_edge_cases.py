@@ -17,53 +17,53 @@ class TestCodeAnalyzerEdgeCases:
     """Test edge cases and uncovered paths in CodeAnalyzer."""
 
     def test_analyze_project_with_no_analysis_results(self) -> None:
-      """Test get_quality_score when no analysis_results - covers line 137."""
-      with TemporaryDirectory() as temp_dir:
-          analyzer = CodeAnalyzer(temp_dir)
+        """Test get_quality_score when no analysis_results - covers line 137."""
+        with TemporaryDirectory() as temp_dir:
+            analyzer = CodeAnalyzer(temp_dir)
 
-          # Call get_quality_score without running analyze_project first
-          score = analyzer.get_quality_score()
+            # Call get_quality_score without running analyze_project first
+            score = analyzer.get_quality_score()
 
-          # Should return 0.0 when no analysis results
-          assert score == 0.0
+            # Should return 0.0 when no analysis results
+            assert score == 0.0
 
     def test_get_quality_score_with_invalid_issues_type(self) -> None:
-      """Test get_quality_score when issues is not dict - covers line 180."""
-      with TemporaryDirectory() as temp_dir:
-          analyzer = CodeAnalyzer(temp_dir)
+        """Test get_quality_score when issues is not dict - covers line 180."""
+        with TemporaryDirectory() as temp_dir:
+            analyzer = CodeAnalyzer(temp_dir)
 
-          # Manually set analysis_results with invalid issues type
-          analyzer.analysis_results = {
-              "metrics": {},
-              "issues": "invalid_type",  # Should be dict but is string
-          }
+            # Manually set analysis_results with invalid issues type
+            analyzer.analysis_results = {
+                "metrics": {},
+                "issues": "invalid_type",  # Should be dict but is string
+            }
 
-          score = analyzer.get_quality_score()
+            score = analyzer.get_quality_score()
 
-          # Should return 0.0 when issues is not dict
-          assert score == 0.0
+            # Should return 0.0 when issues is not dict
+            assert score == 0.0
 
     def test_calculate_overall_metrics_with_empty_file_metrics(self) -> None:
-      """Test _calculate_overall_metrics with empty list - covers line 349."""
-      with TemporaryDirectory() as temp_dir:
-          analyzer = CodeAnalyzer(temp_dir)
+        """Test _calculate_overall_metrics with empty list - covers line 349."""
+        with TemporaryDirectory() as temp_dir:
+            analyzer = CodeAnalyzer(temp_dir)
 
-          # Call with empty list
-          result = analyzer._calculate_overall_metrics([])
+            # Call with empty list
+            result = analyzer._calculate_overall_metrics([])
 
-          # Should return empty dict
-          assert result == {}
+            # Should return empty dict
+            assert result == {}
 
     def test_analyze_project_with_large_duplicate_files(self) -> None:
-      """Test _analyze_duplicates with files reaching similarity threshold."""
-      with TemporaryDirectory() as temp_dir:
-          temp_path = Path(temp_dir)
+        """Test _analyze_duplicates with files reaching similarity threshold."""
+        with TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
 
-          # Create two files with similar content (>80% similarity)
-          file1 = temp_path / "file1.py"
-          file2 = temp_path / "file2.py"
+            # Create two files with similar content (>80% similarity)
+            file1 = temp_path / "file1.py"
+            file2 = temp_path / "file2.py"
 
-          similar_content = """
+            similar_content = """
 def function1():
     print("Line 1")
     print("Line 2")
@@ -77,234 +77,236 @@ def function2():
     return False
 """
 
-          # File1 has exact content
-          file1.write_text(similar_content)
+            # File1 has exact content
+            file1.write_text(similar_content)
 
-          # File2 has mostly same content with one difference
-          file2_content = similar_content.replace("Line 5", "Line 5 modified")
-          file2.write_text(file2_content)
+            # File2 has mostly same content with one difference
+            file2_content = similar_content.replace("Line 5", "Line 5 modified")
+            file2.write_text(file2_content)
 
-          analyzer = CodeAnalyzer(temp_dir)
-          results = analyzer.analyze_project(include_duplicates=True)
+            analyzer = CodeAnalyzer(temp_dir)
+            results = analyzer.analyze_project(include_duplicates=True)
 
-          # Should detect high similarity
-          issues = results.get("issues", {})
-          duplicates = issues.get("duplicates", []) if isinstance(issues, dict) else []
+            # Should detect high similarity
+            issues = results.get("issues", {})
+            duplicates = (
+                issues.get("duplicates", []) if isinstance(issues, dict) else []
+            )
 
-          # Should find similarity above threshold
-          assert len(duplicates) > 0
-          similarity_found = any(
-              issue.get("similarity", 0) > 0.8
-              for issue in duplicates
-              if isinstance(issue, dict)
-          )
-          assert similarity_found
+            # Should find similarity above threshold
+            assert len(duplicates) > 0
+            similarity_found = any(
+                issue.get("similarity", 0) > 0.8
+                for issue in duplicates
+                if isinstance(issue, dict)
+            )
+            assert similarity_found
 
     def test_find_python_files_with_hidden_directories(self) -> None:
-      """Test _find_python_files skips hidden directories correctly."""
-      with TemporaryDirectory() as temp_dir:
-          temp_path = Path(temp_dir)
+        """Test _find_python_files skips hidden directories correctly."""
+        with TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
 
-          # Create regular Python file
-          regular_file = temp_path / "regular.py"
-          regular_file.write_text("print('regular')")
+            # Create regular Python file
+            regular_file = temp_path / "regular.py"
+            regular_file.write_text("print('regular')")
 
-          # Create hidden directory with Python file
-          hidden_dir = temp_path / ".hidden"
-          hidden_dir.mkdir()
-          hidden_file = hidden_dir / "hidden.py"
-          hidden_file.write_text("print('hidden')")
+            # Create hidden directory with Python file
+            hidden_dir = temp_path / ".hidden"
+            hidden_dir.mkdir()
+            hidden_file = hidden_dir / "hidden.py"
+            hidden_file.write_text("print('hidden')")
 
-          # Create __pycache__ directory with .pyc file
-          pycache_dir = temp_path / "__pycache__"
-          pycache_dir.mkdir()
-          pyc_file = pycache_dir / "cached.py"
-          pyc_file.write_text("print('cached')")
+            # Create __pycache__ directory with .pyc file
+            pycache_dir = temp_path / "__pycache__"
+            pycache_dir.mkdir()
+            pyc_file = pycache_dir / "cached.py"
+            pyc_file.write_text("print('cached')")
 
-          analyzer = CodeAnalyzer(temp_dir)
-          python_files = analyzer._find_python_files()
+            analyzer = CodeAnalyzer(temp_dir)
+            python_files = analyzer._find_python_files()
 
-          # Should only find regular file, skip hidden and __pycache__
-          file_names = [f.name for f in python_files]
-          assert "regular.py" in file_names
-          assert "hidden.py" not in file_names
-          assert "cached.py" not in file_names
+            # Should only find regular file, skip hidden and __pycache__
+            file_names = [f.name for f in python_files]
+            assert "regular.py" in file_names
+            assert "hidden.py" not in file_names
+            assert "cached.py" not in file_names
 
     def test_analyze_file_with_syntax_error(self) -> None:
-      """Test _analyze_file handles syntax errors correctly."""
-      with TemporaryDirectory() as temp_dir:
-          temp_path = Path(temp_dir)
+        """Test _analyze_file handles syntax errors correctly."""
+        with TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
 
-          # Create file with syntax error
-          syntax_error_file = temp_path / "syntax_error.py"
-          syntax_error_file.write_text("""
+            # Create file with syntax error
+            syntax_error_file = temp_path / "syntax_error.py"
+            syntax_error_file.write_text("""
 def invalid_syntax(
     # Missing closing parenthesis and colon
     print("This will cause syntax error")
 """)
 
-          analyzer = CodeAnalyzer(temp_dir)
-          metrics = analyzer._analyze_file(syntax_error_file)
+            analyzer = CodeAnalyzer(temp_dir)
+            metrics = analyzer._analyze_file(syntax_error_file)
 
-          # Should handle syntax error and return metrics with error info
-          assert metrics is not None
-          assert "syntax_error" in metrics
-          assert metrics["function_count"] == 0
-          assert metrics["class_count"] == 0
-          assert metrics["complexity"] == 0
+            # Should handle syntax error and return metrics with error info
+            assert metrics is not None
+            assert "syntax_error" in metrics
+            assert metrics["function_count"] == 0
+            assert metrics["class_count"] == 0
+            assert metrics["complexity"] == 0
 
     def test_analyze_file_with_file_read_error(self) -> None:
-      """Test _analyze_file handles file read errors."""
-      with TemporaryDirectory() as temp_dir:
-          temp_path = Path(temp_dir)
+        """Test _analyze_file handles file read errors."""
+        with TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
 
-          # Create file then make it unreadable
-          unreadable_file = temp_path / "unreadable.py"
-          unreadable_file.write_text("print('test')")
+            # Create file then make it unreadable
+            unreadable_file = temp_path / "unreadable.py"
+            unreadable_file.write_text("print('test')")
 
-          analyzer = CodeAnalyzer(temp_dir)
+            analyzer = CodeAnalyzer(temp_dir)
 
-          # Mock open to raise FileNotFoundError
-          with patch(
-              "builtins.open",
-              side_effect=FileNotFoundError("File not accessible"),
-          ):
-              metrics = analyzer._analyze_file(unreadable_file)
+            # Mock open to raise FileNotFoundError
+            with patch(
+                "builtins.open",
+                side_effect=FileNotFoundError("File not accessible"),
+            ):
+                metrics = analyzer._analyze_file(unreadable_file)
 
-              # Should return empty metrics when file cannot be read
-              assert metrics is not None
-              assert isinstance(metrics, dict)
+                # Should return empty metrics when file cannot be read
+                assert metrics is not None
+                assert isinstance(metrics, dict)
 
     def test_analyze_security_with_file_read_error(self) -> None:
-      """Test _analyze_security handles file read errors."""
-      with TemporaryDirectory() as temp_dir:
-          temp_path = Path(temp_dir)
+        """Test _analyze_security handles file read errors."""
+        with TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
 
-          # Create file
-          test_file = temp_path / "test.py"
-          test_file.write_text("print('test')")
+            # Create file
+            test_file = temp_path / "test.py"
+            test_file.write_text("print('test')")
 
-          analyzer = CodeAnalyzer(temp_dir)
+            analyzer = CodeAnalyzer(temp_dir)
 
-          # Mock open to raise RuntimeError during security analysis
-          with patch("builtins.open", side_effect=RuntimeError("Permission denied")):
-              # Call analyze_project which calls _analyze_security
-              results = analyzer.analyze_project(include_security=True)
+            # Mock open to raise RuntimeError during security analysis
+            with patch("builtins.open", side_effect=RuntimeError("Permission denied")):
+                # Call analyze_project which calls _analyze_security
+                results = analyzer.analyze_project(include_security=True)
 
-              # Should handle error gracefully and continue
-              assert "issues" in results
-              issues = results["issues"]
-              assert isinstance(issues, dict)
-              assert "security" in issues
-              # Security issues should be empty due to read error
-              security_issues = issues["security"]
-              assert isinstance(security_issues, list)
+                # Should handle error gracefully and continue
+                assert "issues" in results
+                issues = results["issues"]
+                assert isinstance(issues, dict)
+                assert "security" in issues
+                # Security issues should be empty due to read error
+                security_issues = issues["security"]
+                assert isinstance(security_issues, list)
 
     def test_analyze_dead_code_with_file_read_error(self) -> None:
-      """Test _analyze_dead_code handles file read errors."""
-      with TemporaryDirectory() as temp_dir:
-          temp_path = Path(temp_dir)
+        """Test _analyze_dead_code handles file read errors."""
+        with TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
 
-          # Create file
-          test_file = temp_path / "test.py"
-          test_file.write_text("import unused  # unused")
+            # Create file
+            test_file = temp_path / "test.py"
+            test_file.write_text("import unused  # unused")
 
-          analyzer = CodeAnalyzer(temp_dir)
+            analyzer = CodeAnalyzer(temp_dir)
 
-          # Mock open to raise ValueError during dead code analysis
-          with patch("builtins.open", side_effect=ValueError("Encoding error")):
-              # Call analyze_project which calls _analyze_dead_code
-              results = analyzer.analyze_project(include_dead_code=True)
+            # Mock open to raise ValueError during dead code analysis
+            with patch("builtins.open", side_effect=ValueError("Encoding error")):
+                # Call analyze_project which calls _analyze_dead_code
+                results = analyzer.analyze_project(include_dead_code=True)
 
-              # Should handle error gracefully
-              assert "issues" in results
-              issues = results["issues"]
-              assert isinstance(issues, dict)
-              assert "dead_code" in issues
-              dead_code_issues = issues["dead_code"]
-              assert isinstance(dead_code_issues, list)
+                # Should handle error gracefully
+                assert "issues" in results
+                issues = results["issues"]
+                assert isinstance(issues, dict)
+                assert "dead_code" in issues
+                dead_code_issues = issues["dead_code"]
+                assert isinstance(dead_code_issues, list)
 
     def test_analyze_duplicates_with_file_read_error(self) -> None:
-      """Test _analyze_duplicates handles file read errors."""
-      with TemporaryDirectory() as temp_dir:
-          temp_path = Path(temp_dir)
+        """Test _analyze_duplicates handles file read errors."""
+        with TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
 
-          # Create files
-          file1 = temp_path / "file1.py"
-          file1.write_text("print('file1')")
-          file2 = temp_path / "file2.py"
-          file2.write_text("print('file2')")
+            # Create files
+            file1 = temp_path / "file1.py"
+            file1.write_text("print('file1')")
+            file2 = temp_path / "file2.py"
+            file2.write_text("print('file2')")
 
-          analyzer = CodeAnalyzer(temp_dir)
+            analyzer = CodeAnalyzer(temp_dir)
 
-          # Mock open to raise TypeError during duplicate analysis
-          with patch("builtins.open", side_effect=TypeError("Invalid operation")):
-              # Call analyze_project which calls _analyze_duplicates
-              results = analyzer.analyze_project(include_duplicates=True)
+            # Mock open to raise TypeError during duplicate analysis
+            with patch("builtins.open", side_effect=TypeError("Invalid operation")):
+                # Call analyze_project which calls _analyze_duplicates
+                results = analyzer.analyze_project(include_duplicates=True)
 
-              # Should handle error gracefully
-              assert "issues" in results
-              issues = results["issues"]
-              assert isinstance(issues, dict)
-              assert "duplicates" in issues
-              duplicates_issues = issues["duplicates"]
-              assert isinstance(duplicates_issues, list)
+                # Should handle error gracefully
+                assert "issues" in results
+                issues = results["issues"]
+                assert isinstance(issues, dict)
+                assert "duplicates" in issues
+                duplicates_issues = issues["duplicates"]
+                assert isinstance(duplicates_issues, list)
 
     def test_find_python_files_nonexistent_path(self) -> None:
-      """Test _find_python_files with non-existent project path."""
-      # Use non-existent path
-      analyzer = CodeAnalyzer("/non/existent/path")
-      python_files = analyzer._find_python_files()
+        """Test _find_python_files with non-existent project path."""
+        # Use non-existent path
+        analyzer = CodeAnalyzer("/non/existent/path")
+        python_files = analyzer._find_python_files()
 
-      # Should return empty list
-      assert python_files == []
+        # Should return empty list
+        assert python_files == []
 
     def test_analyze_dead_code_with_unused_import_comment(self) -> None:
-      """Test _analyze_dead_code detects unused import comments."""
-      with TemporaryDirectory() as temp_dir:
-          temp_path = Path(temp_dir)
+        """Test _analyze_dead_code detects unused import comments."""
+        with TemporaryDirectory() as temp_dir:
+            temp_path = Path(temp_dir)
 
-          # Create file with "unused" comment
-          test_file = temp_path / "test_unused.py"
-          test_file.write_text("""
+            # Create file with "unused" comment
+            test_file = temp_path / "test_unused.py"
+            test_file.write_text("""
 import os  # unused
 from sys import path  # UNUSED import
 import json
 """)
 
-          analyzer = CodeAnalyzer(temp_dir)
-          results = analyzer.analyze_project(include_dead_code=True)
+            analyzer = CodeAnalyzer(temp_dir)
+            results = analyzer.analyze_project(include_dead_code=True)
 
-          # Should detect unused imports with comments
-          issues = results["issues"]
-          assert isinstance(issues, dict)
-          dead_code_issues = issues["dead_code"]
-          assert len(dead_code_issues) >= 2  # Should find both unused imports
+            # Should detect unused imports with comments
+            issues = results["issues"]
+            assert isinstance(issues, dict)
+            dead_code_issues = issues["dead_code"]
+            assert len(dead_code_issues) >= 2  # Should find both unused imports
 
-          # Check that it found the specific unused imports
-          messages = [issue["message"] for issue in dead_code_issues]
-          assert any("import os" in msg for msg in messages)
-          assert any("from sys import path" in msg for msg in messages)
+            # Check that it found the specific unused imports
+            messages = [issue["message"] for issue in dead_code_issues]
+            assert any("import os" in msg for msg in messages)
+            assert any("from sys import path" in msg for msg in messages)
 
     def test_quality_grade_calculator_edge_case(self) -> None:
-      """Test get_quality_grade with edge case score."""
-      with TemporaryDirectory() as temp_dir:
-          analyzer = CodeAnalyzer(temp_dir)
+        """Test get_quality_grade with edge case score."""
+        with TemporaryDirectory() as temp_dir:
+            analyzer = CodeAnalyzer(temp_dir)
 
-          # Set analysis results manually to test grade calculator
-          analyzer.analysis_results = {
-              "metrics": {},
-              "issues": {
-                  "security": [],
-                  "complexity": [],
-                  "dead_code": [],
-                  "duplicates": [],
-              },
-          }
+            # Set analysis results manually to test grade calculator
+            analyzer.analysis_results = {
+                "metrics": {},
+                "issues": {
+                    "security": [],
+                    "complexity": [],
+                    "dead_code": [],
+                    "duplicates": [],
+                },
+            }
 
-          # Should get perfect score and A+ grade
-          score = analyzer.get_quality_score()
-          grade = analyzer.get_quality_grade()
+            # Should get perfect score and A+ grade
+            score = analyzer.get_quality_score()
+            grade = analyzer.get_quality_grade()
 
-          assert score == 100.0
-          assert grade == "A+"
+            assert score == 100.0
+            assert grade == "A+"

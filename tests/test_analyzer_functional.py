@@ -19,12 +19,12 @@ class TestCodeAnalyzerFunctional:
 
     @pytest.fixture
     def sample_project_dir(self) -> Path:
-      """Create a temporary directory with sample Python files."""
-      temp_dir = Path(tempfile.mkdtemp())
+        """Create a temporary directory with sample Python files."""
+        temp_dir = Path(tempfile.mkdtemp())
 
-      # Create main.py with various code patterns
-      main_py = temp_dir / "main.py"
-      main_py.write_text('''"""Sample main module."""
+        # Create main.py with various code patterns
+        main_py = temp_dir / "main.py"
+        main_py.write_text('''"""Sample main module."""
 
 import os
 import sys
@@ -87,9 +87,9 @@ if __name__ == "__main__":
     sys.exit(main())
 ''')
 
-      # Create utils.py with utility functions
-      utils_py = temp_dir / "utils.py"
-      utils_py.write_text('''"""Utility functions."""
+        # Create utils.py with utility functions
+        utils_py = temp_dir / "utils.py"
+        utils_py.write_text('''"""Utility functions."""
 
 def format_percentage(value: float) -> str:
     """Format value as percentage."""
@@ -107,220 +107,220 @@ def multiply(x: int, y: int) -> int:
     return x * y
 ''')
 
-      # Create empty __init__.py
-      (temp_dir / "__init__.py").write_text('"""Package init file."""\n')
+        # Create empty __init__.py
+        (temp_dir / "__init__.py").write_text('"""Package init file."""\n')
 
-      return temp_dir
+        return temp_dir
 
     def test_analyzer_initialization(self, sample_project_dir: Path) -> None:
-      """Test CodeAnalyzer initialization."""
-      analyzer = CodeAnalyzer(sample_project_dir)
+        """Test CodeAnalyzer initialization."""
+        analyzer = CodeAnalyzer(sample_project_dir)
 
-      assert analyzer.project_path == sample_project_dir
-      assert isinstance(analyzer.analysis_results, dict)
-      assert len(analyzer.analysis_results) == 0
+        assert analyzer.project_path == sample_project_dir
+        assert isinstance(analyzer.analysis_results, dict)
+        assert len(analyzer.analysis_results) == 0
 
     def test_analyze_project_basic(self, sample_project_dir: Path) -> None:
-      """Test basic project analysis functionality."""
-      analyzer = CodeAnalyzer(sample_project_dir)
+        """Test basic project analysis functionality."""
+        analyzer = CodeAnalyzer(sample_project_dir)
 
-      results = analyzer.analyze_project()
+        results = analyzer.analyze_project()
 
-      # Verify results structure
-      assert isinstance(results, dict)
-      assert "project_path" in results
-      assert "files_analyzed" in results
-      assert "total_lines" in results
-      assert "python_files" in results
-      assert "metrics" in results
-      assert "issues" in results
+        # Verify results structure
+        assert isinstance(results, dict)
+        assert "project_path" in results
+        assert "files_analyzed" in results
+        assert "total_lines" in results
+        assert "python_files" in results
+        assert "metrics" in results
+        assert "issues" in results
 
-      # Verify basic metrics
-      assert results["project_path"] == str(sample_project_dir)
-      assert results["files_analyzed"] == 3  # main.py, utils.py, __init__.py
-      assert results["total_lines"] > 0
+        # Verify basic metrics
+        assert results["project_path"] == str(sample_project_dir)
+        assert results["files_analyzed"] == 3  # main.py, utils.py, __init__.py
+        assert results["total_lines"] > 0
 
-      # Verify file list
-      python_files = results["python_files"]
-      assert isinstance(python_files, list)
-      assert len(python_files) == 3
+        # Verify file list
+        python_files = results["python_files"]
+        assert isinstance(python_files, list)
+        assert len(python_files) == 3
 
-      # Check that all expected files are found
-      file_names = [Path(f).name for f in python_files]
-      assert "main.py" in file_names
-      assert "utils.py" in file_names
-      assert "__init__.py" in file_names
+        # Check that all expected files are found
+        file_names = [Path(f).name for f in python_files]
+        assert "main.py" in file_names
+        assert "utils.py" in file_names
+        assert "__init__.py" in file_names
 
     def test_analyze_project_with_options(self, sample_project_dir: Path) -> None:
-      """Test project analysis with various options."""
-      analyzer = CodeAnalyzer(sample_project_dir)
+        """Test project analysis with various options."""
+        analyzer = CodeAnalyzer(sample_project_dir)
 
-      # Test with all options enabled
-      results_all = analyzer.analyze_project(
-          include_security=True,
-          include_complexity=True,
-          include_dead_code=True,
-          include_duplicates=True,
-      )
+        # Test with all options enabled
+        results_all = analyzer.analyze_project(
+            include_security=True,
+            include_complexity=True,
+            include_dead_code=True,
+            include_duplicates=True,
+        )
 
-      assert isinstance(results_all, dict)
-      assert results_all["files_analyzed"] == 3
+        assert isinstance(results_all, dict)
+        assert results_all["files_analyzed"] == 3
 
-      # Test with some options disabled
-      results_minimal = analyzer.analyze_project(
-          include_security=False,
-          include_complexity=False,
-          include_dead_code=False,
-          include_duplicates=False,
-      )
+        # Test with some options disabled
+        results_minimal = analyzer.analyze_project(
+            include_security=False,
+            include_complexity=False,
+            include_dead_code=False,
+            include_duplicates=False,
+        )
 
-      assert isinstance(results_minimal, dict)
-      assert results_minimal["files_analyzed"] == 3
+        assert isinstance(results_minimal, dict)
+        assert results_minimal["files_analyzed"] == 3
 
     def test_find_python_files(self, sample_project_dir: Path) -> None:
-      """Test _find_python_files method."""
-      analyzer = CodeAnalyzer(sample_project_dir)
+        """Test _find_python_files method."""
+        analyzer = CodeAnalyzer(sample_project_dir)
 
-      # Access private method for testing
-      python_files = analyzer._find_python_files()
+        # Access private method for testing
+        python_files = analyzer._find_python_files()
 
-      assert isinstance(python_files, list)
-      assert len(python_files) == 3
+        assert isinstance(python_files, list)
+        assert len(python_files) == 3
 
-      # Verify all files are Path objects and have .py extension
-      for file_path in python_files:
-          assert isinstance(file_path, Path)
-          assert file_path.suffix == ".py"
-          assert file_path.exists()
+        # Verify all files are Path objects and have .py extension
+        for file_path in python_files:
+            assert isinstance(file_path, Path)
+            assert file_path.suffix == ".py"
+            assert file_path.exists()
 
     def test_analyze_file_individual(self, sample_project_dir: Path) -> None:
-      """Test _analyze_file method on individual files."""
-      analyzer = CodeAnalyzer(sample_project_dir)
+        """Test _analyze_file method on individual files."""
+        analyzer = CodeAnalyzer(sample_project_dir)
 
-      main_py = sample_project_dir / "main.py"
+        main_py = sample_project_dir / "main.py"
 
-      # Test analyzing individual file
-      metrics = analyzer._analyze_file(main_py)
+        # Test analyzing individual file
+        metrics = analyzer._analyze_file(main_py)
 
-      assert isinstance(metrics, dict)
-      assert "file_path" in metrics
-      assert "lines_of_code" in metrics
-      assert "function_count" in metrics
-      assert "class_count" in metrics
+        assert isinstance(metrics, dict)
+        assert "file_path" in metrics
+        assert "lines_of_code" in metrics
+        assert "function_count" in metrics
+        assert "class_count" in metrics
 
-      # Verify metrics are reasonable
-      assert metrics["file_path"] == main_py.name  # Only filename, not full path
-      assert isinstance(metrics["lines_of_code"], int)
-      assert metrics["lines_of_code"] > 10  # main.py has many lines
-      assert isinstance(metrics["function_count"], int)
-      assert metrics["function_count"] >= 1  # Should have functions
+        # Verify metrics are reasonable
+        assert metrics["file_path"] == main_py.name  # Only filename, not full path
+        assert isinstance(metrics["lines_of_code"], int)
+        assert metrics["lines_of_code"] > 10  # main.py has many lines
+        assert isinstance(metrics["function_count"], int)
+        assert metrics["function_count"] >= 1  # Should have functions
 
     def test_analyze_nonexistent_file(self, sample_project_dir: Path) -> None:
-      """Test analyzing a non-existent file."""
-      analyzer = CodeAnalyzer(sample_project_dir)
+        """Test analyzing a non-existent file."""
+        analyzer = CodeAnalyzer(sample_project_dir)
 
-      nonexistent_file = sample_project_dir / "nonexistent.py"
+        nonexistent_file = sample_project_dir / "nonexistent.py"
 
-      # Should return None or empty dict for non-existent file
-      result = analyzer._analyze_file(nonexistent_file)
+        # Should return None or empty dict for non-existent file
+        result = analyzer._analyze_file(nonexistent_file)
 
-      # The method should gracefully handle missing files
-      assert result is None or result == {}
+        # The method should gracefully handle missing files
+        assert result is None or result == {}
 
     def test_calculate_overall_metrics(self, sample_project_dir: Path) -> None:
-      """Test _calculate_overall_metrics method."""
-      analyzer = CodeAnalyzer(sample_project_dir)
+        """Test _calculate_overall_metrics method."""
+        analyzer = CodeAnalyzer(sample_project_dir)
 
-      # Create sample file metrics matching actual structure
-      file_metrics = [
-          {
-              "lines_of_code": 50,
-              "function_count": 3,
-              "class_count": 1,
-              "complexity": 10,
-          },
-          {
-              "lines_of_code": 30,
-              "function_count": 2,
-              "class_count": 0,
-              "complexity": 5,
-          },
-          {
-              "lines_of_code": 10,
-              "function_count": 0,
-              "class_count": 1,
-              "complexity": 2,
-          },
-      ]
+        # Create sample file metrics matching actual structure
+        file_metrics = [
+            {
+                "lines_of_code": 50,
+                "function_count": 3,
+                "class_count": 1,
+                "complexity": 10,
+            },
+            {
+                "lines_of_code": 30,
+                "function_count": 2,
+                "class_count": 0,
+                "complexity": 5,
+            },
+            {
+                "lines_of_code": 10,
+                "function_count": 0,
+                "class_count": 1,
+                "complexity": 2,
+            },
+        ]
 
-      overall_metrics = analyzer._calculate_overall_metrics(file_metrics)
+        overall_metrics = analyzer._calculate_overall_metrics(file_metrics)
 
-      assert isinstance(overall_metrics, dict)
+        assert isinstance(overall_metrics, dict)
 
-      # Should aggregate metrics from all files if implemented
-      # Note: The actual implementation may vary, just verify it returns a dict
+        # Should aggregate metrics from all files if implemented
+        # Note: The actual implementation may vary, just verify it returns a dict
 
     def test_get_quality_score(self, sample_project_dir: Path) -> None:
-      """Test get_quality_score method."""
-      analyzer = CodeAnalyzer(sample_project_dir)
+        """Test get_quality_score method."""
+        analyzer = CodeAnalyzer(sample_project_dir)
 
-      # Run analysis first
-      analyzer.analyze_project()
+        # Run analysis first
+        analyzer.analyze_project()
 
-      # Get quality score
-      score = analyzer.get_quality_score()
+        # Get quality score
+        score = analyzer.get_quality_score()
 
-      assert isinstance(score, (int, float))
-      assert 0 <= score <= 100
+        assert isinstance(score, (int, float))
+        assert 0 <= score <= 100
 
     def test_get_quality_grade(self, sample_project_dir: Path) -> None:
-      """Test get_quality_grade method."""
-      analyzer = CodeAnalyzer(sample_project_dir)
+        """Test get_quality_grade method."""
+        analyzer = CodeAnalyzer(sample_project_dir)
 
-      # Run analysis first
-      analyzer.analyze_project()
+        # Run analysis first
+        analyzer.analyze_project()
 
-      # Get quality grade
-      grade = analyzer.get_quality_grade()
+        # Get quality grade
+        grade = analyzer.get_quality_grade()
 
-      assert isinstance(grade, str)
-      assert grade in {
-          "A+",
-          "A",
-          "A-",
-          "B+",
-          "B",
-          "B-",
-          "C+",
-          "C",
-          "C-",
-          "D+",
-          "D",
-          "D-",
-          "F",
-      }
+        assert isinstance(grade, str)
+        assert grade in {
+            "A+",
+            "A",
+            "A-",
+            "B+",
+            "B",
+            "B-",
+            "C+",
+            "C",
+            "C-",
+            "D+",
+            "D",
+            "D-",
+            "F",
+        }
 
     def test_empty_project_directory(self) -> None:
-      """Test analyzer with empty project directory."""
-      with tempfile.TemporaryDirectory() as temp_dir:
-          empty_dir = Path(temp_dir)
-          analyzer = CodeAnalyzer(empty_dir)
+        """Test analyzer with empty project directory."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            empty_dir = Path(temp_dir)
+            analyzer = CodeAnalyzer(empty_dir)
 
-          results = analyzer.analyze_project()
+            results = analyzer.analyze_project()
 
-          assert isinstance(results, dict)
-          assert results["files_analyzed"] == 0
-          assert results["total_lines"] == 0
-          assert len(results["python_files"]) == 0
+            assert isinstance(results, dict)
+            assert results["files_analyzed"] == 0
+            assert results["total_lines"] == 0
+            assert len(results["python_files"]) == 0
 
     def test_project_with_syntax_errors(self) -> None:
-      """Test analyzer with files containing syntax errors."""
-      with tempfile.TemporaryDirectory() as temp_dir:
-          project_dir = Path(temp_dir)
+        """Test analyzer with files containing syntax errors."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project_dir = Path(temp_dir)
 
-          # Create file with syntax error
-          bad_file = project_dir / "bad_syntax.py"
-          bad_file.write_text("""
+            # Create file with syntax error
+            bad_file = project_dir / "bad_syntax.py"
+            bad_file.write_text("""
 # This file has syntax errors
 def broken_function(
     # Missing closing parenthesis and colon
@@ -328,125 +328,125 @@ def broken_function(
 invalid_syntax here
 """)
 
-          analyzer = CodeAnalyzer(project_dir)
+            analyzer = CodeAnalyzer(project_dir)
 
-          # Should handle syntax errors gracefully
-          results = analyzer.analyze_project()
+            # Should handle syntax errors gracefully
+            results = analyzer.analyze_project()
 
-          assert isinstance(results, dict)
-          assert results["files_analyzed"] == 1
-          # Should still attempt to process the file
+            assert isinstance(results, dict)
+            assert results["files_analyzed"] == 1
+            # Should still attempt to process the file
 
     def test_large_file_analysis(self, sample_project_dir: Path) -> None:
-      """Test analyzer with a larger file."""
-      # Create a larger Python file
-      large_file = sample_project_dir / "large_file.py"
-      large_content = '''"""Large Python file for testing."""
+        """Test analyzer with a larger file."""
+        # Create a larger Python file
+        large_file = sample_project_dir / "large_file.py"
+        large_content = '''"""Large Python file for testing."""
 
 # Generate a larger file with repeated patterns
 ''' + "\n".join(
-          [
-              f'def function_{i}(param_{i}: int) -> int:\n    """Function {i}."""\n    return param_{i} * {i}'
-              for i in range(50)
-          ],
-      )
+            [
+                f'def function_{i}(param_{i}: int) -> int:\n    """Function {i}."""\n    return param_{i} * {i}'
+                for i in range(50)
+            ],
+        )
 
-      large_file.write_text(large_content)
+        large_file.write_text(large_content)
 
-      analyzer = CodeAnalyzer(sample_project_dir)
-      results = analyzer.analyze_project()
+        analyzer = CodeAnalyzer(sample_project_dir)
+        results = analyzer.analyze_project()
 
-      assert isinstance(results, dict)
-      assert results["files_analyzed"] == 4  # Original 3 + 1 large file
-      assert results["total_lines"] > 100  # Should be much larger now
+        assert isinstance(results, dict)
+        assert results["files_analyzed"] == 4  # Original 3 + 1 large file
+        assert results["total_lines"] > 100  # Should be much larger now
 
     def test_analyzer_with_string_path(self) -> None:
-      """Test analyzer initialization with string path."""
-      with tempfile.TemporaryDirectory() as temp_dir:
-          # Pass string instead of Path
-          analyzer = CodeAnalyzer(temp_dir)
+        """Test analyzer initialization with string path."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            # Pass string instead of Path
+            analyzer = CodeAnalyzer(temp_dir)
 
-          assert isinstance(analyzer.project_path, Path)
-          assert str(analyzer.project_path) == temp_dir
+            assert isinstance(analyzer.project_path, Path)
+            assert str(analyzer.project_path) == temp_dir
 
     def test_concurrent_analysis_safety(self, sample_project_dir: Path) -> None:
-      """Test that analyzer can handle multiple analyses safely."""
-      analyzer = CodeAnalyzer(sample_project_dir)
+        """Test that analyzer can handle multiple analyses safely."""
+        analyzer = CodeAnalyzer(sample_project_dir)
 
-      # Run multiple analyses
-      results1 = analyzer.analyze_project(include_security=True)
-      results2 = analyzer.analyze_project(include_security=False)
+        # Run multiple analyses
+        results1 = analyzer.analyze_project(include_security=True)
+        results2 = analyzer.analyze_project(include_security=False)
 
-      # Both should succeed and return valid results
-      assert isinstance(results1, dict)
-      assert isinstance(results2, dict)
-      assert results1["files_analyzed"] == results2["files_analyzed"]
-      assert results1["project_path"] == results2["project_path"]
+        # Both should succeed and return valid results
+        assert isinstance(results1, dict)
+        assert isinstance(results2, dict)
+        assert results1["files_analyzed"] == results2["files_analyzed"]
+        assert results1["project_path"] == results2["project_path"]
 
 
 class TestCodeAnalyzerEdgeCases:
     """Test edge cases and error handling."""
 
     def test_nonexistent_project_path(self) -> None:
-      """Test analyzer with non-existent project path."""
-      nonexistent_path = Path("/nonexistent/path/to/project")
-      analyzer = CodeAnalyzer(nonexistent_path)
+        """Test analyzer with non-existent project path."""
+        nonexistent_path = Path("/nonexistent/path/to/project")
+        analyzer = CodeAnalyzer(nonexistent_path)
 
-      # Should handle gracefully
-      results = analyzer.analyze_project()
+        # Should handle gracefully
+        results = analyzer.analyze_project()
 
-      assert isinstance(results, dict)
-      assert results["files_analyzed"] == 0
+        assert isinstance(results, dict)
+        assert results["files_analyzed"] == 0
 
     def test_file_permission_issues(self) -> None:
-      """Test analyzer when file permissions might be an issue."""
-      with tempfile.TemporaryDirectory() as temp_dir:
-          project_dir = Path(temp_dir)
+        """Test analyzer when file permissions might be an issue."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project_dir = Path(temp_dir)
 
-          # Create a file
-          test_file = project_dir / "test.py"
-          test_file.write_text("# Simple test file\nprint('hello')\n")
+            # Create a file
+            test_file = project_dir / "test.py"
+            test_file.write_text("# Simple test file\nprint('hello')\n")
 
-          analyzer = CodeAnalyzer(project_dir)
+            analyzer = CodeAnalyzer(project_dir)
 
-          # Should work normally in most cases
-          results = analyzer.analyze_project()
+            # Should work normally in most cases
+            results = analyzer.analyze_project()
 
-          assert isinstance(results, dict)
-          assert results["files_analyzed"] >= 0  # Should handle gracefully
+            assert isinstance(results, dict)
+            assert results["files_analyzed"] >= 0  # Should handle gracefully
 
     def test_nested_directory_structure(self) -> None:
-      """Test analyzer with nested directory structure."""
-      with tempfile.TemporaryDirectory() as temp_dir:
-          project_dir = Path(temp_dir)
+        """Test analyzer with nested directory structure."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            project_dir = Path(temp_dir)
 
-          # Create nested structure
-          (project_dir / "src").mkdir()
-          (project_dir / "src" / "module1").mkdir()
-          (project_dir / "tests").mkdir()
+            # Create nested structure
+            (project_dir / "src").mkdir()
+            (project_dir / "src" / "module1").mkdir()
+            (project_dir / "tests").mkdir()
 
-          # Add files in various locations
-          (project_dir / "main.py").write_text("# Main file\nprint('main')\n")
-          (project_dir / "src" / "utils.py").write_text(
-              "# Utils file\ndef util(): pass\n",
-          )
-          (project_dir / "src" / "module1" / "core.py").write_text(
-              "# Core file\nclass Core: pass\n",
-          )
-          (project_dir / "tests" / "test_main.py").write_text(
-              "# Test file\ndef test(): assert True\n",
-          )
+            # Add files in various locations
+            (project_dir / "main.py").write_text("# Main file\nprint('main')\n")
+            (project_dir / "src" / "utils.py").write_text(
+                "# Utils file\ndef util(): pass\n",
+            )
+            (project_dir / "src" / "module1" / "core.py").write_text(
+                "# Core file\nclass Core: pass\n",
+            )
+            (project_dir / "tests" / "test_main.py").write_text(
+                "# Test file\ndef test(): assert True\n",
+            )
 
-          analyzer = CodeAnalyzer(project_dir)
-          results = analyzer.analyze_project()
+            analyzer = CodeAnalyzer(project_dir)
+            results = analyzer.analyze_project()
 
-          assert isinstance(results, dict)
-          assert results["files_analyzed"] == 4  # Should find all Python files
+            assert isinstance(results, dict)
+            assert results["files_analyzed"] == 4  # Should find all Python files
 
-          # Check that files from different directories are found
-          python_files = results["python_files"]
-          file_names = [Path(f).name for f in python_files]
-          assert "main.py" in file_names
-          assert "utils.py" in file_names
-          assert "core.py" in file_names
-          assert "test_main.py" in file_names
+            # Check that files from different directories are found
+            python_files = results["python_files"]
+            file_names = [Path(f).name for f in python_files]
+            assert "main.py" in file_names
+            assert "utils.py" in file_names
+            assert "core.py" in file_names
+            assert "test_main.py" in file_names

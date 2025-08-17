@@ -33,32 +33,32 @@ class QualityWebInterface:
     """Quality analysis web interface that extends flext-web."""
 
     def __init__(self) -> None:
-      """Initialize quality web interface."""
-      # Create base web service from flext-web
-      self.config = get_web_settings()
-      self.web_service = create_service(self.config)
+        """Initialize quality web interface."""
+        # Create base web service from flext-web
+        self.config = get_web_settings()
+        self.web_service = create_service(self.config)
 
-      # Initialize quality components
-      self.quality_api = QualityAPI()
+        # Initialize quality components
+        self.quality_api = QualityAPI()
 
-      # Register quality-specific routes
-      self._register_routes()
+        # Register quality-specific routes
+        self._register_routes()
 
     def _register_routes(self) -> None:
-      """Register quality analysis routes with Flask app."""
-      app = self.web_service.app
+        """Register quality analysis routes with Flask app."""
+        app = self.web_service.app
 
-      # Dashboard
-      app.route("/quality")(self.quality_dashboard)
+        # Dashboard
+        app.route("/quality")(self.quality_dashboard)
 
-      # API endpoints
-      app.route("/api/quality/analyze", methods=["POST"])(self.analyze_project)
-      app.route("/api/quality/metrics", methods=["GET"])(self.get_metrics)
-      app.route("/api/quality/report/<format>", methods=["GET"])(self.get_report)
+        # API endpoints
+        app.route("/api/quality/analyze", methods=["POST"])(self.analyze_project)
+        app.route("/api/quality/metrics", methods=["GET"])(self.get_metrics)
+        app.route("/api/quality/report/<format>", methods=["GET"])(self.get_report)
 
     def quality_dashboard(self) -> str:
-      """Render quality dashboard."""
-      return """
+        """Render quality dashboard."""
+        return """
       <!DOCTYPE html>
       <html>
       <head>
@@ -145,65 +145,65 @@ class QualityWebInterface:
       """
 
     async def analyze_project(self) -> ResponseType:
-      """Analyze a project and return results."""
-      data = request.get_json()
-      project_path = data.get("path", ".")
+        """Analyze a project and return results."""
+        data = request.get_json()
+        project_path = data.get("path", ".")
 
-      # Create analyzer for the specific path
-      analyzer = CodeAnalyzer(Path(project_path))
-      result = analyzer.analyze_project()
+        # Create analyzer for the specific path
+        analyzer = CodeAnalyzer(Path(project_path))
+        result = analyzer.analyze_project()
 
-      # Safely extract files list
-      files_data = result.get("files", [])
-      files_count = len(files_data) if isinstance(files_data, list) else 0
+        # Safely extract files list
+        files_data = result.get("files", [])
+        files_count = len(files_data) if isinstance(files_data, list) else 0
 
-      return jsonify(
-          {
-              "success": True,
-              "data": {
-                  "path": project_path,
-                  "files_analyzed": files_count,
-                  "issues": result.get("issues", []),
-                  "metrics": result.get("metrics", {}),
-              },
-          },
-      )
+        return jsonify(
+            {
+                "success": True,
+                "data": {
+                    "path": project_path,
+                    "files_analyzed": files_count,
+                    "issues": result.get("issues", []),
+                    "metrics": result.get("metrics", {}),
+                },
+            },
+        )
 
     def get_metrics(self) -> ResponseType:
-      """Get quality metrics."""
-      # Use simple placeholder metrics for now
-      metrics = {
-          "coverage": 95.0,
-          "complexity": 10.0,
-          "duplication": 5.0,
-          "issues": 12,
-      }
-      return jsonify({"success": True, "data": metrics})
+        """Get quality metrics."""
+        # Use simple placeholder metrics for now
+        metrics = {
+            "coverage": 95.0,
+            "complexity": 10.0,
+            "duplication": 5.0,
+            "issues": 12,
+        }
+        return jsonify({"success": True, "data": metrics})
 
     def get_report(self, report_format: str) -> ResponseType:
-      """Generate and return quality report."""
-      if report_format not in {"json", "html", "pdf"}:
-          return jsonify({"success": False, "error": "Invalid format"}), 400
+        """Generate and return quality report."""
+        if report_format not in {"json", "html", "pdf"}:
+            return jsonify({"success": False, "error": "Invalid format"}), 400
 
-      # Simple report placeholder
-      report = {
-          "format": report_format,
-          "generated_at": "2025-01-08",
-          "quality_score": "A",
-          "coverage": 95.0,
-      }
-      return jsonify({"success": True, "data": report})
+        # Simple report placeholder
+        report = {
+            "format": report_format,
+            "generated_at": "2025-01-08",
+            "quality_score": "A",
+            "coverage": 95.0,
+        }
+        return jsonify({"success": True, "data": report})
 
     def run(
-      self,
-      host: str = "localhost",
-      port: int = 8080,
-      *,
-      debug: bool = True,
+        self,
+        host: str = "localhost",
+        port: int = 8080,
+        *,
+        debug: bool = True,
     ) -> None:
-      """Run the quality web server."""
-      logger.info(f"Starting FLEXT Quality Web Interface on {host}:{port}")
-      self.web_service.run(host=host, port=port, debug=debug)
+        """Run the quality web server."""
+        logger.info(f"Starting FLEXT Quality Web Interface on {host}:{port}")
+        self.web_service.run(host=host, port=port, debug=debug)
 
 
 def main() -> None:

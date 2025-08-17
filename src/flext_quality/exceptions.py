@@ -100,197 +100,197 @@ class FlextQualityAnalysisOperationError(FlextQualityAnalysisError):
     """Quality analysis operation errors with analysis context."""
 
     def __init__(
-      self,
-      message: str,
-      *,
-      analyzer_name: str | None = None,
-      file_count: int | None = None,
-      analysis_type: str | None = None,
-      execution_time: float | None = None,
-      code: FlextQualityErrorCodes
-      | None = FlextQualityErrorCodes.QUALITY_ANALYSIS_ERROR,
-      context: Mapping[str, object] | None = None,
+        self,
+        message: str,
+        *,
+        analyzer_name: str | None = None,
+        file_count: int | None = None,
+        analysis_type: str | None = None,
+        execution_time: float | None = None,
+        code: FlextQualityErrorCodes
+        | None = FlextQualityErrorCodes.QUALITY_ANALYSIS_ERROR,
+        context: Mapping[str, object] | None = None,
     ) -> None:
-      """Initialize with quality analysis context."""
-      context_dict: dict[str, object] = dict(context) if context else {}
-      if analyzer_name is not None:
-          context_dict["analyzer_name"] = analyzer_name
-      if file_count is not None:
-          context_dict["file_count"] = file_count
-      if analysis_type is not None:
-          context_dict["analysis_type"] = analysis_type
-      if execution_time is not None:
-          context_dict["execution_time"] = execution_time
+        """Initialize with quality analysis context."""
+        context_dict: dict[str, object] = dict(context) if context else {}
+        if analyzer_name is not None:
+            context_dict["analyzer_name"] = analyzer_name
+        if file_count is not None:
+            context_dict["file_count"] = file_count
+        if analysis_type is not None:
+            context_dict["analysis_type"] = analysis_type
+        if execution_time is not None:
+            context_dict["execution_time"] = execution_time
 
-      super().__init__(
-          message,
-          code=code,
-          context=context_dict,
-      )
+        super().__init__(
+            message,
+            code=code,
+            context=context_dict,
+        )
 
 
 class FlextQualityReportOperationError(FlextQualityReportError):
     """Quality report operation errors with report context."""
 
     def __init__(
-      self,
-      message: str,
-      *,
-      report_type: str | None = None,
-      output_format: str | None = None,
-      project_name: str | None = None,
-      report_size: int | None = None,
-      code: FlextQualityErrorCodes
-      | None = FlextQualityErrorCodes.QUALITY_REPORT_ERROR,
-      context: Mapping[str, object] | None = None,
+        self,
+        message: str,
+        *,
+        report_type: str | None = None,
+        output_format: str | None = None,
+        project_name: str | None = None,
+        report_size: int | None = None,
+        code: FlextQualityErrorCodes
+        | None = FlextQualityErrorCodes.QUALITY_REPORT_ERROR,
+        context: Mapping[str, object] | None = None,
     ) -> None:
-      """Initialize with quality report context."""
-      context_dict: dict[str, object] = dict(context) if context else {}
-      if report_type is not None:
-          context_dict["report_type"] = report_type
-      if output_format is not None:
-          context_dict["output_format"] = output_format
-      if project_name is not None:
-          context_dict["project_name"] = project_name
-      if report_size is not None:
-          context_dict["report_size"] = report_size
+        """Initialize with quality report context."""
+        context_dict: dict[str, object] = dict(context) if context else {}
+        if report_type is not None:
+            context_dict["report_type"] = report_type
+        if output_format is not None:
+            context_dict["output_format"] = output_format
+        if project_name is not None:
+            context_dict["project_name"] = project_name
+        if report_size is not None:
+            context_dict["report_size"] = report_size
 
-      super().__init__(
-          message,
-          code=code,
-          context=context_dict,
-      )
+        super().__init__(
+            message,
+            code=code,
+            context=context_dict,
+        )
 
 
 class FlextQualityMetricsOperationError(FlextQualityMetricsError):
     """Quality metrics operation errors with metrics context."""
 
     def __init__(
-      self,
-      message: str,
-      *,
-      metric_name: str | None = None,
-      metric_value: float | None = None,
-      metric_type: str | None = None,
-      threshold_value: float | None = None,
-      code: FlextQualityErrorCodes
-      | None = FlextQualityErrorCodes.QUALITY_METRICS_ERROR,
-      context: Mapping[str, object] | None = None,
+        self,
+        message: str,
+        *,
+        metric_name: str | None = None,
+        metric_value: float | None = None,
+        metric_type: str | None = None,
+        threshold_value: float | None = None,
+        code: FlextQualityErrorCodes
+        | None = FlextQualityErrorCodes.QUALITY_METRICS_ERROR,
+        context: Mapping[str, object] | None = None,
     ) -> None:
-      """Initialize with quality metrics context."""
-      context_dict: dict[str, object] = dict(context) if context else {}
-      if metric_name is not None:
-          context_dict["metric_name"] = metric_name
-      if metric_value is not None:
-          context_dict["metric_value"] = metric_value
-      if metric_type is not None:
-          context_dict["metric_type"] = metric_type
-      if threshold_value is not None:
-          context_dict["threshold_value"] = threshold_value
+        """Initialize with quality metrics context."""
+        context_dict: dict[str, object] = dict(context) if context else {}
+        if metric_name is not None:
+            context_dict["metric_name"] = metric_name
+        if metric_value is not None:
+            context_dict["metric_value"] = metric_value
+        if metric_type is not None:
+            context_dict["metric_type"] = metric_type
+        if threshold_value is not None:
+            context_dict["threshold_value"] = threshold_value
 
-      super().__init__(
-          message,
-          code=code,
-          context=context_dict,
-      )
+        super().__init__(
+            message,
+            code=code,
+            context=context_dict,
+        )
 
 
 class FlextQualityGradeOperationError(FlextQualityGradeError):
     """Quality grade operation errors with grade context."""
 
     def __init__(
-      self,
-      message: str,
-      *,
-      grade_type: str | None = None,
-      calculated_grade: str | None = None,
-      grade_score: float | None = None,
-      min_threshold: float | None = None,
-      code: FlextQualityErrorCodes
-      | None = FlextQualityErrorCodes.QUALITY_GRADE_ERROR,
-      context: Mapping[str, object] | None = None,
+        self,
+        message: str,
+        *,
+        grade_type: str | None = None,
+        calculated_grade: str | None = None,
+        grade_score: float | None = None,
+        min_threshold: float | None = None,
+        code: FlextQualityErrorCodes
+        | None = FlextQualityErrorCodes.QUALITY_GRADE_ERROR,
+        context: Mapping[str, object] | None = None,
     ) -> None:
-      """Initialize with quality grade context."""
-      context_dict: dict[str, object] = dict(context) if context else {}
-      if grade_type is not None:
-          context_dict["grade_type"] = grade_type
-      if calculated_grade is not None:
-          context_dict["calculated_grade"] = calculated_grade
-      if grade_score is not None:
-          context_dict["grade_score"] = grade_score
-      if min_threshold is not None:
-          context_dict["min_threshold"] = min_threshold
+        """Initialize with quality grade context."""
+        context_dict: dict[str, object] = dict(context) if context else {}
+        if grade_type is not None:
+            context_dict["grade_type"] = grade_type
+        if calculated_grade is not None:
+            context_dict["calculated_grade"] = calculated_grade
+        if grade_score is not None:
+            context_dict["grade_score"] = grade_score
+        if min_threshold is not None:
+            context_dict["min_threshold"] = min_threshold
 
-      super().__init__(
-          message,
-          code=code,
-          context=context_dict,
-      )
+        super().__init__(
+            message,
+            code=code,
+            context=context_dict,
+        )
 
 
 class FlextQualityRuleOperationError(FlextQualityRuleError):
     """Quality rule operation errors with rule context."""
 
     def __init__(
-      self,
-      message: str,
-      *,
-      rule_name: str | None = None,
-      rule_severity: str | None = None,
-      rule_category: str | None = None,
-      violation_count: int | None = None,
-      code: FlextQualityErrorCodes | None = FlextQualityErrorCodes.QUALITY_RULE_ERROR,
-      context: Mapping[str, object] | None = None,
+        self,
+        message: str,
+        *,
+        rule_name: str | None = None,
+        rule_severity: str | None = None,
+        rule_category: str | None = None,
+        violation_count: int | None = None,
+        code: FlextQualityErrorCodes | None = FlextQualityErrorCodes.QUALITY_RULE_ERROR,
+        context: Mapping[str, object] | None = None,
     ) -> None:
-      """Initialize with quality rule context."""
-      context_dict: dict[str, object] = dict(context) if context else {}
-      if rule_name is not None:
-          context_dict["rule_name"] = rule_name
-      if rule_severity is not None:
-          context_dict["rule_severity"] = rule_severity
-      if rule_category is not None:
-          context_dict["rule_category"] = rule_category
-      if violation_count is not None:
-          context_dict["violation_count"] = violation_count
+        """Initialize with quality rule context."""
+        context_dict: dict[str, object] = dict(context) if context else {}
+        if rule_name is not None:
+            context_dict["rule_name"] = rule_name
+        if rule_severity is not None:
+            context_dict["rule_severity"] = rule_severity
+        if rule_category is not None:
+            context_dict["rule_category"] = rule_category
+        if violation_count is not None:
+            context_dict["violation_count"] = violation_count
 
-      super().__init__(
-          message,
-          code=code,
-          context=context_dict,
-      )
+        super().__init__(
+            message,
+            code=code,
+            context=context_dict,
+        )
 
 
 class FlextQualityThresholdOperationError(FlextQualityThresholdError):
     """Quality threshold operation errors with threshold context."""
 
     def __init__(
-      self,
-      message: str,
-      *,
-      threshold_name: str | None = None,
-      current_value: float | None = None,
-      threshold_value: float | None = None,
-      threshold_type: str | None = None,
-      code: FlextQualityErrorCodes
-      | None = FlextQualityErrorCodes.QUALITY_THRESHOLD_ERROR,
-      context: Mapping[str, object] | None = None,
+        self,
+        message: str,
+        *,
+        threshold_name: str | None = None,
+        current_value: float | None = None,
+        threshold_value: float | None = None,
+        threshold_type: str | None = None,
+        code: FlextQualityErrorCodes
+        | None = FlextQualityErrorCodes.QUALITY_THRESHOLD_ERROR,
+        context: Mapping[str, object] | None = None,
     ) -> None:
-      """Initialize with quality threshold context."""
-      context_dict: dict[str, object] = dict(context) if context else {}
-      if threshold_name is not None:
-          context_dict["threshold_name"] = threshold_name
-      if current_value is not None:
-          context_dict["current_value"] = current_value
-      if threshold_value is not None:
-          context_dict["threshold_value"] = threshold_value
-      if threshold_type is not None:
-          context_dict["threshold_type"] = threshold_type
+        """Initialize with quality threshold context."""
+        context_dict: dict[str, object] = dict(context) if context else {}
+        if threshold_name is not None:
+            context_dict["threshold_name"] = threshold_name
+        if current_value is not None:
+            context_dict["current_value"] = current_value
+        if threshold_value is not None:
+            context_dict["threshold_value"] = threshold_value
+        if threshold_type is not None:
+            context_dict["threshold_type"] = threshold_type
 
-      super().__init__(
-          message,
-          code=code,
-          context=context_dict,
-      )
+        super().__init__(
+            message,
+            code=code,
+            context=context_dict,
+        )
 
 
 __all__: list[str] = [

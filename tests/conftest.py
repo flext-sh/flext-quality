@@ -41,14 +41,12 @@ from __future__ import annotations
 
 import os
 import tempfile
+from collections.abc import Generator
+from pathlib import Path
 from typing import TypeVar
 
 import pytest
 from django.test.utils import setup_test_environment, teardown_test_environment
-
-from collections.abc import Generator
-    from pathlib import Path
-
 from flext_core import FlextResult, TAnyDict
 
 # Type variable for FlextResult data
@@ -179,7 +177,7 @@ def secure_temp_dir() -> Generator[str]:
 
     """
     with tempfile.TemporaryDirectory() as temp_dir:
-      yield temp_dir
+        yield temp_dir
 
 
 @pytest.fixture
@@ -209,16 +207,16 @@ def sample_code_repository(tmp_path: Path) -> TAnyDict:
 
     """
     return {
-      "name": "test-repository",
-      "path": str(tmp_path / "test-repo"),
-      "language": "python",
-      "files": [
-          "src/main.py",
-          "src/utils.py",
-          "tests/test_main.py",
-      ],
-      "size": 1024,
-      "last_modified": "2023-01-01T12:00:00Z",
+        "name": "test-repository",
+        "path": str(tmp_path / "test-repo"),
+        "language": "python",
+        "files": [
+            "src/main.py",
+            "src/utils.py",
+            "tests/test_main.py",
+        ],
+        "size": 1024,
+        "last_modified": "2023-01-01T12:00:00Z",
     }
 
 
@@ -226,26 +224,26 @@ def sample_code_repository(tmp_path: Path) -> TAnyDict:
 def quality_metrics_data() -> TAnyDict:
     """Quality metrics data for testing."""
     return {
-      "complexity": {
-          "cyclomatic": 5.2,
-          "cognitive": 3.8,
-          "average": 4.5,
-      },
-      "maintainability": {
-          "index": 78.5,
-          "rating": "A",
-          "debt_ratio": 0.15,
-      },
-      "coverage": {
-          "line": 85.0,
-          "branch": 78.5,
-          "function": 92.0,
-      },
-      "security": {
-          "vulnerabilities": 2,
-          "hotspots": 1,
-          "rating": "B",
-      },
+        "complexity": {
+            "cyclomatic": 5.2,
+            "cognitive": 3.8,
+            "average": 4.5,
+        },
+        "maintainability": {
+            "index": 78.5,
+            "rating": "A",
+            "debt_ratio": 0.15,
+        },
+        "coverage": {
+            "line": 85.0,
+            "branch": 78.5,
+            "function": 92.0,
+        },
+        "security": {
+            "vulnerabilities": 2,
+            "hotspots": 1,
+            "rating": "B",
+        },
     }
 
 
@@ -253,28 +251,28 @@ def quality_metrics_data() -> TAnyDict:
 def code_analysis_config() -> TAnyDict:
     """Code analysis configuration for testing."""
     return {
-      "analyzers": {
-          "ruff": {
-              "enabled": True,
-              "config_file": "pyproject.toml",
-              "rules": ["E", "W", "F"],
-          },
-          "mypy": {
-              "enabled": True,
-              "strict": True,
-              "ignore_missing_imports": False,
-          },
-          "bandit": {
-              "enabled": True,
-              "confidence": "medium",
-              "severity": "low",
-          },
-      },
-      "thresholds": {
-          "complexity": 10,
-          "coverage": 80.0,
-          "maintainability": 70.0,
-      },
+        "analyzers": {
+            "ruff": {
+                "enabled": True,
+                "config_file": "pyproject.toml",
+                "rules": ["E", "W", "F"],
+            },
+            "mypy": {
+                "enabled": True,
+                "strict": True,
+                "ignore_missing_imports": False,
+            },
+            "bandit": {
+                "enabled": True,
+                "confidence": "medium",
+                "severity": "low",
+            },
+        },
+        "thresholds": {
+            "complexity": 10,
+            "coverage": 80.0,
+            "maintainability": 70.0,
+        },
     }
 
 
@@ -282,33 +280,33 @@ def code_analysis_config() -> TAnyDict:
 def analysis_results() -> list[TAnyDict]:
     """Analysis results for testing."""
     return [
-      {
-          "file": "src/main.py",
-          "line": 42,
-          "column": 10,
-          "rule": "E501",
-          "message": "Line too long (88 > 79 characters)",
-          "severity": "warning",
-          "tool": "ruff",
-      },
-      {
-          "file": "src/utils.py",
-          "line": 15,
-          "column": 5,
-          "rule": "F401",
-          "message": "'unused_import' imported but unused",
-          "severity": "error",
-          "tool": "ruff",
-      },
-      {
-          "file": "src/main.py",
-          "line": 25,
-          "column": 1,
-          "rule": "B101",
-          "message": "Use of assert detected",
-          "severity": "low",
-          "tool": "bandit",
-      },
+        {
+            "file": "src/main.py",
+            "line": 42,
+            "column": 10,
+            "rule": "E501",
+            "message": "Line too long (88 > 79 characters)",
+            "severity": "warning",
+            "tool": "ruff",
+        },
+        {
+            "file": "src/utils.py",
+            "line": 15,
+            "column": 5,
+            "rule": "F401",
+            "message": "'unused_import' imported but unused",
+            "severity": "error",
+            "tool": "ruff",
+        },
+        {
+            "file": "src/main.py",
+            "line": 25,
+            "column": 1,
+            "rule": "B101",
+            "message": "Use of assert detected",
+            "severity": "low",
+            "tool": "bandit",
+        },
     ]
 
 
@@ -317,11 +315,11 @@ def analysis_results() -> list[TAnyDict]:
 def report_config(tmp_path: Path) -> TAnyDict:
     """Report configuration for testing."""
     return {
-      "format": "json",
-      "include_metrics": True,
-      "include_details": True,
-      "output_path": str(tmp_path / "report.json"),
-      "template": "default",
+        "format": "json",
+        "include_metrics": True,
+        "include_details": True,
+        "output_path": str(tmp_path / "report.json"),
+        "template": "default",
     }
 
 
@@ -329,22 +327,22 @@ def report_config(tmp_path: Path) -> TAnyDict:
 def dashboard_data() -> TAnyDict:
     """Dashboard data for testing."""
     return {
-      "summary": {
-          "total_projects": 5,
-          "analyzed_today": 3,
-          "critical_issues": 12,
-          "warnings": 45,
-      },
-      "trends": {
-          "quality_score": [78, 79, 81, 80, 82],
-          "issue_count": [25, 23, 20, 22, 18],
-          "coverage": [75, 78, 80, 82, 85],
-      },
-      "top_issues": [
-          {"type": "complexity", "count": 8},
-          {"type": "security", "count": 5},
-          {"type": "maintainability", "count": 3},
-      ],
+        "summary": {
+            "total_projects": 5,
+            "analyzed_today": 3,
+            "critical_issues": 12,
+            "warnings": 45,
+        },
+        "trends": {
+            "quality_score": [78, 79, 81, 80, 82],
+            "issue_count": [25, 23, 20, 22, 18],
+            "coverage": [75, 78, 80, 82, 85],
+        },
+        "top_issues": [
+            {"type": "complexity", "count": 8},
+            {"type": "security", "count": 5},
+            {"type": "maintainability", "count": 3},
+        ],
     }
 
 
@@ -353,11 +351,11 @@ def dashboard_data() -> TAnyDict:
 def sonarqube_config() -> TAnyDict:
     """SonarQube configuration for testing."""
     return {
-      "host": "http://localhost:9000",
-      "token": "test-token",
-      "project_key": "test-project",
-      "organization": "test-org",
-      "quality_gate": "Sonar way",
+        "host": "http://localhost:9000",
+        "token": "test-token",
+        "project_key": "test-project",
+        "organization": "test-org",
+        "quality_gate": "Sonar way",
     }
 
 
@@ -365,10 +363,10 @@ def sonarqube_config() -> TAnyDict:
 def codeclimate_config() -> TAnyDict:
     """CodeClimate configuration for testing."""
     return {
-      "api_token": "test-api-token",
-      "repo_id": "test-repo-123",
-      "maintainability_threshold": 3.0,
-      "coverage_threshold": 80.0,
+        "api_token": "test-api-token",
+        "repo_id": "test-repo-123",
+        "maintainability_threshold": 3.0,
+        "coverage_threshold": 80.0,
     }
 
 
@@ -449,20 +447,20 @@ strict = true
 def package_metadata() -> TAnyDict:
     """Package metadata for testing."""
     return {
-      "name": "test-package",
-      "version": "0.9.0",
-      "description": "Test package for quality analysis",
-      "author": "Test Author",
-      "dependencies": [
-          "requests>=2.25.0",
-          "pandas>=1.3.0",
-          "pytest>=6.0.0",
-      ],
-      "dev_dependencies": [
-          "ruff>=0.1.0",
-          "mypy>=1.0.0",
-          "coverage>=6.0.0",
-      ],
+        "name": "test-package",
+        "version": "0.9.0",
+        "description": "Test package for quality analysis",
+        "author": "Test Author",
+        "dependencies": [
+            "requests>=2.25.0",
+            "pandas>=1.3.0",
+            "pytest>=6.0.0",
+        ],
+        "dev_dependencies": [
+            "ruff>=0.1.0",
+            "mypy>=1.0.0",
+            "coverage>=6.0.0",
+        ],
     }
 
 
@@ -471,13 +469,13 @@ def package_metadata() -> TAnyDict:
 def celery_config() -> TAnyDict:
     """Celery configuration for testing."""
     return {
-      "broker_url": "redis://localhost:6379/0",
-      "result_backend": "redis://localhost:6379/0",
-      "task_serializer": "json",
-      "accept_content": ["json"],
-      "result_serializer": "json",
-      "timezone": "UTC",
-      "enable_utc": True,
+        "broker_url": "redis://localhost:6379/0",
+        "result_backend": "redis://localhost:6379/0",
+        "task_serializer": "json",
+        "accept_content": ["json"],
+        "result_serializer": "json",
+        "timezone": "UTC",
+        "enable_utc": True,
     }
 
 
@@ -485,14 +483,14 @@ def celery_config() -> TAnyDict:
 def analysis_task_data() -> TAnyDict:
     """Analysis task data for testing."""
     return {
-      "task_id": "test-task-123",
-      "project_id": "test-project-456",
-      "status": "pending",
-      "progress": 0,
-      "started_at": None,
-      "completed_at": None,
-      "result": None,
-      "error": None,
+        "task_id": "test-task-123",
+        "project_id": "test-project-456",
+        "status": "pending",
+        "progress": 0,
+        "started_at": None,
+        "completed_at": None,
+        "result": None,
+        "error": None,
     }
 
 
@@ -560,66 +558,66 @@ def mock_quality_analyzer() -> object:
     """
 
     class MockQualityAnalyzer:
-      """Mock implementation of quality analyzer for testing.
+        """Mock implementation of quality analyzer for testing.
 
-      Provides realistic analyzer behavior without external dependencies,
-      enabling fast and reliable unit testing of analysis workflows.
-      """
+        Provides realistic analyzer behavior without external dependencies,
+        enabling fast and reliable unit testing of analysis workflows.
+        """
 
-      def __init__(self) -> None:
-          self.analyzed_files: list[str] = []
+        def __init__(self) -> None:
+            self.analyzed_files: list[str] = []
 
-      async def analyze_project(self, project_path: str) -> TAnyDict:
-          """Simulate comprehensive project analysis.
+        async def analyze_project(self, project_path: str) -> TAnyDict:
+            """Simulate comprehensive project analysis.
 
-          Args:
-              project_path: Path to project for analysis
+            Args:
+                project_path: Path to project for analysis
 
-          Returns:
-              Realistic analysis results with quality metrics
+            Returns:
+                Realistic analysis results with quality metrics
 
-          """
-          self.analyzed_files.append(project_path)
-          return {
-              "quality_score": 85.0,
-              "issues": 5,
-              "files_analyzed": 10,
-              "analysis_time": 2.5,
-          }
+            """
+            self.analyzed_files.append(project_path)
+            return {
+                "quality_score": 85.0,
+                "issues": 5,
+                "files_analyzed": 10,
+                "analysis_time": 2.5,
+            }
 
-      async def analyze_file(self, file_path: str) -> TAnyDict:
-          """Simulate individual file analysis.
+        async def analyze_file(self, file_path: str) -> TAnyDict:
+            """Simulate individual file analysis.
 
-          Args:
-              file_path: Path to file for analysis
+            Args:
+                file_path: Path to file for analysis
 
-          Returns:
-              File-level quality metrics and statistics
+            Returns:
+                File-level quality metrics and statistics
 
-          """
-          return {
-              "file": file_path,
-              "complexity": 3.2,
-              "issues": 2,
-              "coverage": 90.0,
-          }
+            """
+            return {
+                "file": file_path,
+                "complexity": 3.2,
+                "issues": 2,
+                "coverage": 90.0,
+            }
 
-      async def get_metrics(self, project_path: str) -> TAnyDict:
-          """Simulate project-wide quality metrics collection.
+        async def get_metrics(self, project_path: str) -> TAnyDict:  # noqa: ARG002
+            """Simulate project-wide quality metrics collection.
 
-          Args:
-              project_path: Path to project for metrics
+            Args:
+                project_path: Path to project for metrics
 
-          Returns:
-              Comprehensive quality metrics across all categories
+            Returns:
+                Comprehensive quality metrics across all categories
 
-          """
-          return {
-              "maintainability": 78.5,
-              "complexity": 5.2,
-              "duplication": 2.1,
-              "security": 95.0,
-          }
+            """
+            return {
+                "maintainability": 78.5,
+                "complexity": 5.2,
+                "duplication": 2.1,
+                "security": 95.0,
+            }
 
     return MockQualityAnalyzer()
 
@@ -653,50 +651,50 @@ def mock_report_generator() -> object:
     """
 
     class MockReportGenerator:
-      """Mock implementation of report generator for testing.
+        """Mock implementation of report generator for testing.
 
-      Simulates report generation capabilities without file system
-      operations, enabling isolated testing of reporting workflows.
-      """
+        Simulates report generation capabilities without file system
+        operations, enabling isolated testing of reporting workflows.
+        """
 
-      def __init__(self) -> None:
-          self.generated_reports: list[TAnyDict] = []
+        def __init__(self) -> None:
+            self.generated_reports: list[TAnyDict] = []
 
-      async def generate_report(
-          self,
-          data: TAnyDict,
-          output_format: str = "json",
-      ) -> str:
-          """Simulate report generation in specified format.
+        async def generate_report(
+            self,
+            data: TAnyDict,
+            output_format: str = "json",
+        ) -> str:
+            """Simulate report generation in specified format.
 
-          Args:
-              data: Analysis data for report generation
-              output_format: Desired report format (json, html, pdf)
+            Args:
+                data: Analysis data for report generation
+                output_format: Desired report format (json, html, pdf)
 
-          Returns:
-              Generated report filename
+            Returns:
+                Generated report filename
 
-          """
-          report: TAnyDict = {
-              "format": output_format,
-              "data": data,
-              "timestamp": "2023-01-01T12:00:00Z",
-          }
-          self.generated_reports.append(report)
-          return f"report_{len(self.generated_reports)}.{output_format}"
+            """
+            report: TAnyDict = {
+                "format": output_format,
+                "data": data,
+                "timestamp": "2023-01-01T12:00:00Z",
+            }
+            self.generated_reports.append(report)
+            return f"report_{len(self.generated_reports)}.{output_format}"
 
-      async def generate_dashboard_data(self) -> TAnyDict:
-          """Simulate dashboard data generation.
+        async def generate_dashboard_data(self) -> TAnyDict:
+            """Simulate dashboard data generation.
 
-          Returns:
-              Dashboard metrics and summary information
+            Returns:
+                Dashboard metrics and summary information
 
-          """
-          return {
-              "projects": 5,
-              "recent_analyses": 3,
-              "avg_quality_score": 82.5,
-              "trend": "improving",
-          }
+            """
+            return {
+                "projects": 5,
+                "recent_analyses": 3,
+                "avg_quality_score": 82.5,
+                "trend": "improving",
+            }
 
     return MockReportGenerator()

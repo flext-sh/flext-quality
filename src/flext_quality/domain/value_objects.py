@@ -119,62 +119,62 @@ class FilePath(BaseModel):
     @field_validator("value")
     @classmethod
     def validate_path(cls, v: str) -> str:
-      """Validate file path.
+        """Validate file path.
 
-      Args:
-          v: Path string to validate.
+        Args:
+            v: Path string to validate.
 
-      Returns:
-          Normalized path string.
+        Returns:
+            Normalized path string.
 
-      Raises:
-          ValueError: If path is empty.
+        Raises:
+            ValueError: If path is empty.
 
-      """
-      if not v:
-          msg = "File path cannot be empty"
-          raise ValueError(msg)
-      return str(Path(v).as_posix())  # Normalize path
+        """
+        if not v:
+            msg = "File path cannot be empty"
+            raise ValueError(msg)
+        return str(Path(v).as_posix())  # Normalize path
 
     @property
     def path(self) -> Path:
-      """Get Path object from string value.
+        """Get Path object from string value.
 
-      Returns:
-          Path object.
+        Returns:
+            Path object.
 
-      """
-      return Path(self.value)
+        """
+        return Path(self.value)
 
     @property
     def filename(self) -> str:
-      """Get filename from path.
+        """Get filename from path.
 
-      Returns:
-          Filename string.
+        Returns:
+            Filename string.
 
-      """
-      return self.path.name
+        """
+        return self.path.name
 
     @property
     def extension(self) -> str:
-      """Get file extension from path.
+        """Get file extension from path.
 
-      Returns:
-          File extension string.
+        Returns:
+            File extension string.
 
-      """
-      return self.path.suffix
+        """
+        return self.path.suffix
 
     @property
     def parent_dir(self) -> str:
-      """Get parent directory from path.
+        """Get parent directory from path.
 
-      Returns:
-          Parent directory string.
+        Returns:
+            Parent directory string.
 
-      """
-      return str(self.path.parent)
+        """
+        return str(self.path.parent)
 
 
 class IssueLocation(BaseModel):
@@ -188,34 +188,34 @@ class IssueLocation(BaseModel):
     @field_validator("end_line", mode="before")
     @classmethod
     def validate_end_line(cls, v: int | None) -> int | None:
-      """Validate end line is valid.
+        """Validate end line is valid.
 
-      Args:
-          v: End line number to validate.
+        Args:
+            v: End line number to validate.
 
-      Returns:
-          Validated end line number.
+        Returns:
+            Validated end line number.
 
-      """
-      # Simple validation - must be positive if provided
-      if v is not None and v < 1:
-          msg = "End line number must be positive"
-          raise ValueError(msg)
-      return v
+        """
+        # Simple validation - must be positive if provided
+        if v is not None and v < 1:
+            msg = "End line number must be positive"
+            raise ValueError(msg)
+        return v
 
     @property
     def range_text(self) -> str:
-      """Get human-readable text representation of location range.
+        """Get human-readable text representation of location range.
 
-      Returns:
-          Formatted range text.
+        Returns:
+            Formatted range text.
 
-      """
-      if self.end_line is None:
-          return f"line {self.line}, column {self.column}"
-      if self.line == self.end_line:
-          return f"line {self.line}, columns {self.column}-{self.end_column or 'end'}"
-      return f"lines {self.line}-{self.end_line}"
+        """
+        if self.end_line is None:
+            return f"line {self.line}, column {self.column}"
+        if self.line == self.end_line:
+            return f"line {self.line}, columns {self.column}-{self.end_column or 'end'}"
+        return f"lines {self.line}-{self.end_line}"
 
 
 class QualityScore(BaseModel):
@@ -225,47 +225,47 @@ class QualityScore(BaseModel):
 
     @property
     def percentage(self) -> str:
-      """Get quality score as percentage string.
+        """Get quality score as percentage string.
 
-      Returns:
-          Formatted percentage string.
+        Returns:
+            Formatted percentage string.
 
-      """
-      return f"{self.value:.1f}%"
+        """
+        return f"{self.value:.1f}%"
 
     @property
     def grade(self) -> QualityGrade:  # noqa: PLR0911
-      """Get quality grade based on score.
+        """Get quality grade based on score.
 
-      Returns:
-          Quality grade enum value.
+        Returns:
+            Quality grade enum value.
 
-      """
-      if self.value >= QualityThresholds.GRADE_A_PLUS:
-          return QualityGrade.A_PLUS
-      if self.value >= QualityThresholds.GRADE_A:
-          return QualityGrade.A
-      if self.value >= QualityThresholds.GRADE_A_MINUS:
-          return QualityGrade.A_MINUS
-      if self.value >= QualityThresholds.GRADE_B_PLUS:
-          return QualityGrade.B_PLUS
-      if self.value >= QualityThresholds.GRADE_B:
-          return QualityGrade.B
-      if self.value >= QualityThresholds.GRADE_B_MINUS:
-          return QualityGrade.B_MINUS
-      if self.value >= QualityThresholds.GRADE_C_PLUS:
-          return QualityGrade.C_PLUS
-      if self.value >= QualityThresholds.GRADE_C:
-          return QualityGrade.C
-      if self.value >= QualityThresholds.GRADE_C_MINUS:
-          return QualityGrade.C_MINUS
-      if self.value >= QualityThresholds.GRADE_D_PLUS:
-          return QualityGrade.D_PLUS
-      if self.value >= QualityThresholds.GRADE_D:
-          return QualityGrade.D
-      if self.value >= QualityThresholds.GRADE_D_MINUS:
-          return QualityGrade.D_MINUS
-      return QualityGrade.F
+        """
+        if self.value >= QualityThresholds.GRADE_A_PLUS:
+            return QualityGrade.A_PLUS
+        if self.value >= QualityThresholds.GRADE_A:
+            return QualityGrade.A
+        if self.value >= QualityThresholds.GRADE_A_MINUS:
+            return QualityGrade.A_MINUS
+        if self.value >= QualityThresholds.GRADE_B_PLUS:
+            return QualityGrade.B_PLUS
+        if self.value >= QualityThresholds.GRADE_B:
+            return QualityGrade.B
+        if self.value >= QualityThresholds.GRADE_B_MINUS:
+            return QualityGrade.B_MINUS
+        if self.value >= QualityThresholds.GRADE_C_PLUS:
+            return QualityGrade.C_PLUS
+        if self.value >= QualityThresholds.GRADE_C:
+            return QualityGrade.C
+        if self.value >= QualityThresholds.GRADE_C_MINUS:
+            return QualityGrade.C_MINUS
+        if self.value >= QualityThresholds.GRADE_D_PLUS:
+            return QualityGrade.D_PLUS
+        if self.value >= QualityThresholds.GRADE_D:
+            return QualityGrade.D
+        if self.value >= QualityThresholds.GRADE_D_MINUS:
+            return QualityGrade.D_MINUS
+        return QualityGrade.F
 
 
 class ComplexityMetric(BaseModel):
@@ -277,120 +277,120 @@ class ComplexityMetric(BaseModel):
 
     @property
     def is_complex(self) -> bool:
-      """Check if complexity metrics indicate complex code.
+        """Check if complexity metrics indicate complex code.
 
-      Returns:
-          True if code is considered complex.
+        Returns:
+            True if code is considered complex.
 
-      """
-      return (
-          self.cyclomatic > QualityThresholds.COMPLEXITY_CYCLOMATIC_HIGH
-          or self.cognitive > QualityThresholds.COMPLEXITY_COGNITIVE_HIGH
-          or self.max_depth > QualityThresholds.COMPLEXITY_DEPTH_HIGH
-      )
+        """
+        return (
+            self.cyclomatic > QualityThresholds.COMPLEXITY_CYCLOMATIC_HIGH
+            or self.cognitive > QualityThresholds.COMPLEXITY_COGNITIVE_HIGH
+            or self.max_depth > QualityThresholds.COMPLEXITY_DEPTH_HIGH
+        )
 
     @property
     def complexity_level(self) -> str:
-      """Get complexity level description.
+        """Get complexity level description.
 
-      Returns:
-          Complexity level as string.
+        Returns:
+            Complexity level as string.
 
-      """
-      if self.cyclomatic <= QualityThresholds.COMPLEXITY_SIMPLE_MAX:
-          return "simple"
-      if self.cyclomatic <= QualityThresholds.COMPLEXITY_MODERATE_MAX:
-          return "moderate"
-      if self.cyclomatic <= QualityThresholds.COMPLEXITY_COMPLEX_MAX:
-          return "complex"
-      return "very complex"
+        """
+        if self.cyclomatic <= QualityThresholds.COMPLEXITY_SIMPLE_MAX:
+            return "simple"
+        if self.cyclomatic <= QualityThresholds.COMPLEXITY_MODERATE_MAX:
+            return "moderate"
+        if self.cyclomatic <= QualityThresholds.COMPLEXITY_COMPLEX_MAX:
+            return "complex"
+        return "very complex"
 
 
 class CoverageMetric(BaseModel):
     """Test coverage metric value object."""
 
     line_coverage: float = Field(
-      default=0.0,
-      description="Line coverage percentage",
-      ge=0.0,
-      le=100.0,
+        default=0.0,
+        description="Line coverage percentage",
+        ge=0.0,
+        le=100.0,
     )
     branch_coverage: float = Field(
-      default=0.0,
-      description="Branch coverage percentage",
-      ge=0.0,
-      le=100.0,
+        default=0.0,
+        description="Branch coverage percentage",
+        ge=0.0,
+        le=100.0,
     )
     function_coverage: float = Field(
-      default=0.0,
-      description="Function coverage percentage",
-      ge=0.0,
-      le=100.0,
+        default=0.0,
+        description="Function coverage percentage",
+        ge=0.0,
+        le=100.0,
     )
 
     @property
     def overall_coverage(self) -> float:
-      """Calculate weighted overall coverage percentage.
+        """Calculate weighted overall coverage percentage.
 
-      Returns:
-          Overall coverage percentage.
+        Returns:
+            Overall coverage percentage.
 
-      """
-      # Weight: 50% line, 30% branch, 20% function
-      return (
-          self.line_coverage * 0.5
-          + self.branch_coverage * 0.3
-          + self.function_coverage * 0.2
-      )
+        """
+        # Weight: 50% line, 30% branch, 20% function
+        return (
+            self.line_coverage * 0.5
+            + self.branch_coverage * 0.3
+            + self.function_coverage * 0.2
+        )
 
     @property
     def is_sufficient(self) -> bool:
-      """Check if coverage meets minimum requirements.
+        """Check if coverage meets minimum requirements.
 
-      Returns:
-          True if coverage is sufficient.
+        Returns:
+            True if coverage is sufficient.
 
-      """
-      return self.overall_coverage >= QualityThresholds.COVERAGE_EXCELLENT
+        """
+        return self.overall_coverage >= QualityThresholds.COVERAGE_EXCELLENT
 
 
 class DuplicationMetric(BaseModel):
     """Code duplication metric value object."""
 
     duplicate_lines: int = Field(
-      default=0,
-      description="Number of duplicate lines",
-      ge=0,
+        default=0,
+        description="Number of duplicate lines",
+        ge=0,
     )
     total_lines: int = Field(
-      default=0,
-      description="Total lines of code",
-      ge=0,
+        default=0,
+        description="Total lines of code",
+        ge=0,
     )
     duplicate_blocks: int = Field(
-      default=0,
-      description="Number of duplicate blocks",
-      ge=0,
+        default=0,
+        description="Number of duplicate blocks",
+        ge=0,
     )
 
     @property
     def duplication_percentage(self) -> float:
-      """Calculate duplication percentage.
+        """Calculate duplication percentage.
 
-      Returns:
-          Duplication percentage.
+        Returns:
+            Duplication percentage.
 
-      """
-      if self.total_lines == 0:
-          return 0.0
-      return (self.duplicate_lines / self.total_lines) * 100
+        """
+        if self.total_lines == 0:
+            return 0.0
+        return (self.duplicate_lines / self.total_lines) * 100
 
     @property
     def is_acceptable(self) -> bool:
-      """Check if duplication level is acceptable.
+        """Check if duplication level is acceptable.
 
-      Returns:
-          True if duplication is below threshold.
+        Returns:
+            True if duplication is below threshold.
 
-      """
-      return self.duplication_percentage < QualityThresholds.DUPLICATION_LOW_MAX
+        """
+        return self.duplication_percentage < QualityThresholds.DUPLICATION_LOW_MAX

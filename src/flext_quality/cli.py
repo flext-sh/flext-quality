@@ -34,113 +34,113 @@ def run_web_server(args: argparse.Namespace) -> int:
     get_logger(__name__)
 
     try:
-      interface = QualityWebInterface()
-      interface.run(host=args.host, port=args.port, debug=args.debug)
-      return 0
+        interface = QualityWebInterface()
+        interface.run(host=args.host, port=args.port, debug=args.debug)
+        return 0
     except KeyboardInterrupt:
-      return 0
+        return 0
     except Exception:
-      if args.verbose:
-          traceback.print_exc()
-      return 1
+        if args.verbose:
+            traceback.print_exc()
+        return 1
 
 
 def analyze_project(args: argparse.Namespace) -> int:
     """Analyze project quality."""
     try:
-      # Enable quiet mode for JSON/HTML output to prevent log contamination
-      if (
-          hasattr(args, "format")
-          and args.format in {"json", "html"}
-          and not getattr(args, "verbose", False)
-      ):
-          os.environ["FLEXT_OBSERVABILITY_QUIET"] = "1"
+        # Enable quiet mode for JSON/HTML output to prevent log contamination
+        if (
+            hasattr(args, "format")
+            and args.format in {"json", "html"}
+            and not getattr(args, "verbose", False)
+        ):
+            os.environ["FLEXT_OBSERVABILITY_QUIET"] = "1"
 
-      project_path = Path(args.path).resolve()
-      if not project_path.exists():
-          return 1
-      # Create analyzer
-      analyzer = CodeAnalyzer(project_path)
-      # Run analysis
-      results = analyzer.analyze_project(
-          include_security=args.include_security,
-          include_complexity=args.include_complexity,
-          include_dead_code=args.include_dead_code,
-          include_duplicates=args.include_duplicates,
-      )
-      # Check if any files were analyzed
-      files_analyzed = results.get("files_analyzed", 0)
-      if isinstance(files_analyzed, (int, float)) and files_analyzed == 0:
-          return 1  # Error: no files to analyze
+        project_path = Path(args.path).resolve()
+        if not project_path.exists():
+            return 1
+        # Create analyzer
+        analyzer = CodeAnalyzer(project_path)
+        # Run analysis
+        results = analyzer.analyze_project(
+            include_security=args.include_security,
+            include_complexity=args.include_complexity,
+            include_dead_code=args.include_dead_code,
+            include_duplicates=args.include_duplicates,
+        )
+        # Check if any files were analyzed
+        files_analyzed = results.get("files_analyzed", 0)
+        if isinstance(files_analyzed, (int, float)) and files_analyzed == 0:
+            return 1  # Error: no files to analyze
 
-      # Generate report
-      report = QualityReport(results)
-      if args.output:
-          # Save to file
-          output_path = Path(args.output)
-          report.save_report(output_path, args.format)
-      elif args.format == "json":
-          # Write JSON to stdout explicitly for CLI output
-          sys.stdout.write(report.to_json() + "\n")
-      elif args.format == "html":
-          # Write HTML to stdout explicitly for CLI output
-          sys.stdout.write(report.to_html() + "\n")
-      # Constants for quality thresholds
-      good_quality_threshold = 80
-      medium_quality_threshold = 60
+        # Generate report
+        report = QualityReport(results)
+        if args.output:
+            # Save to file
+            output_path = Path(args.output)
+            report.save_report(output_path, args.format)
+        elif args.format == "json":
+            # Write JSON to stdout explicitly for CLI output
+            sys.stdout.write(report.to_json() + "\n")
+        elif args.format == "html":
+            # Write HTML to stdout explicitly for CLI output
+            sys.stdout.write(report.to_html() + "\n")
+        # Constants for quality thresholds
+        good_quality_threshold = 80
+        medium_quality_threshold = 60
 
-      # Return appropriate exit code based on quality
-      quality_score = analyzer.get_quality_score()
-      if quality_score >= good_quality_threshold:
-          return 0  # Good quality
-      if quality_score >= medium_quality_threshold:
-          return 1  # Medium quality
-      return 2  # Poor quality
+        # Return appropriate exit code based on quality
+        quality_score = analyzer.get_quality_score()
+        if quality_score >= good_quality_threshold:
+            return 0  # Good quality
+        if quality_score >= medium_quality_threshold:
+            return 1  # Medium quality
+        return 2  # Poor quality
     except (RuntimeError, ValueError, TypeError):
-      logger = get_logger(__name__)
-      # EXPLICIT TRANSPARENCY: CLI function must return exit code for process management
-      logger.exception("Quality analysis failed with specific error")
-      logger.exception("Returning exit code 3 to indicate analysis failure")
-      if args.verbose:
-          logger.info("Verbose mode enabled - showing full traceback")
-          traceback.print_exc()
-      # Return 3 to indicate analysis error (distinct from quality scores 0,1,2)
-      return 3
+        logger = get_logger(__name__)
+        # EXPLICIT TRANSPARENCY: CLI function must return exit code for process management
+        logger.exception("Quality analysis failed with specific error")
+        logger.exception("Returning exit code 3 to indicate analysis failure")
+        if args.verbose:
+            logger.info("Verbose mode enabled - showing full traceback")
+            traceback.print_exc()
+        # Return 3 to indicate analysis error (distinct from quality scores 0,1,2)
+        return 3
 
 
 def score_project(args: argparse.Namespace) -> int:
     """Get quick quality score for project."""
     try:
-      project_path = Path(args.path).resolve()
-      if not project_path.exists():
-          return 1
-      # Quick analysis
-      analyzer = CodeAnalyzer(project_path)
-      results = analyzer.analyze_project(
-          include_security=True,
-          include_complexity=True,
-          include_dead_code=False,  # Skip for speed
-          include_duplicates=False,  # Skip for speed
-      )
-      score = analyzer.get_quality_score()
-      analyzer.get_quality_grade()
+        project_path = Path(args.path).resolve()
+        if not project_path.exists():
+            return 1
+        # Quick analysis
+        analyzer = CodeAnalyzer(project_path)
+        results = analyzer.analyze_project(
+            include_security=True,
+            include_complexity=True,
+            include_dead_code=False,  # Skip for speed
+            include_duplicates=False,  # Skip for speed
+        )
+        score = analyzer.get_quality_score()
+        analyzer.get_quality_grade()
 
-      # Show results (print to stdout for CLI usage)
+        # Show results (print to stdout for CLI usage)
 
-      # Show issue counts
-      issues_obj = results.get("issues", {})
-      if isinstance(issues_obj, dict):
-          len(issues_obj.get("security", []))
-          len(issues_obj.get("complexity", []))
+        # Show issue counts
+        issues_obj = results.get("issues", {})
+        if isinstance(issues_obj, dict):
+            len(issues_obj.get("security", []))
+            len(issues_obj.get("complexity", []))
 
-      # Constants for quality thresholds
-      acceptable_quality_threshold = 70
+        # Constants for quality thresholds
+        acceptable_quality_threshold = 70
 
-      return 0 if score >= acceptable_quality_threshold else 1
+        return 0 if score >= acceptable_quality_threshold else 1
     except (RuntimeError, ValueError, TypeError):
-      logger = get_logger(__name__)
-      logger.exception("Quality score calculation failed")
-      return 3
+        logger = get_logger(__name__)
+        logger.exception("Quality score calculation failed")
+        return 3
 
 
 def another_function(args: argparse.Namespace) -> int:
@@ -159,9 +159,9 @@ def main() -> int:
 
     """
     parser = argparse.ArgumentParser(
-      description="FLEXT Quality - Enterprise Code Quality Analysis",
-      formatter_class=argparse.RawDescriptionHelpFormatter,
-      epilog="""
+        description="FLEXT Quality - Enterprise Code Quality Analysis",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
 Examples:
     flext-infrastructure.monitoring.flext-quality analyze ./my-project
     flext-infrastructure.monitoring.flext-quality analyze ./my-project --output report.html --format html
@@ -171,60 +171,60 @@ Examples:
     )
     # Global options
     parser.add_argument(
-      "--verbose",
-      "-v",
-      action="store_true",
-      help="Enable verbose output",
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Enable verbose output",
     )
     parser.add_argument(
-      "--log-level",
-      choices=["DEBUG", "INFO", "WARNING", "ERROR"],
-      default="INFO",
-      help="Set logging level",
+        "--log-level",
+        choices=["DEBUG", "INFO", "WARNING", "ERROR"],
+        default="INFO",
+        help="Set logging level",
     )
     # Subcommands
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
     # Analyze command
     analyze_parser = subparsers.add_parser(
-      "analyze",
-      help="Run comprehensive code analysis",
+        "analyze",
+        help="Run comprehensive code analysis",
     )
     analyze_parser.add_argument("path", help="Path to the project to analyze")
     analyze_parser.add_argument(
-      "--output",
-      "-o",
-      help="Output file path (default: print to console)",
+        "--output",
+        "-o",
+        help="Output file path (default: print to console)",
     )
     analyze_parser.add_argument(
-      "--format",
-      "-f",
-      choices=["text", "json", "html"],
-      default="text",
-      help="Report format",
+        "--format",
+        "-f",
+        choices=["text", "json", "html"],
+        default="text",
+        help="Report format",
     )
     analyze_parser.add_argument(
-      "--no-security",
-      action="store_false",
-      dest="include_security",
-      help="Skip security analysis",
+        "--no-security",
+        action="store_false",
+        dest="include_security",
+        help="Skip security analysis",
     )
     analyze_parser.add_argument(
-      "--no-complexity",
-      action="store_false",
-      dest="include_complexity",
-      help="Skip complexity analysis",
+        "--no-complexity",
+        action="store_false",
+        dest="include_complexity",
+        help="Skip complexity analysis",
     )
     analyze_parser.add_argument(
-      "--no-dead-code",
-      action="store_false",
-      dest="include_dead_code",
-      help="Skip dead code detection",
+        "--no-dead-code",
+        action="store_false",
+        dest="include_dead_code",
+        help="Skip dead code detection",
     )
     analyze_parser.add_argument(
-      "--no-duplicates",
-      action="store_false",
-      dest="include_duplicates",
-      help="Skip duplicate code detection",
+        "--no-duplicates",
+        action="store_false",
+        dest="include_duplicates",
+        help="Skip duplicate code detection",
     )
     analyze_parser.set_defaults(func=analyze_project)
     # Score command
@@ -236,15 +236,15 @@ Examples:
     # Web server command
     web_parser = subparsers.add_parser("web", help="Run quality web interface")
     web_parser.add_argument(
-      "--host",
-      default="localhost",
-      help="Host to bind to (default: localhost)",
+        "--host",
+        default="localhost",
+        help="Host to bind to (default: localhost)",
     )
     web_parser.add_argument(
-      "--port",
-      type=int,
-      default=8080,
-      help="Port to bind to (default: 8080)",
+        "--port",
+        type=int,
+        default=8080,
+        help="Port to bind to (default: 8080)",
     )
     web_parser.add_argument("--debug", action="store_true", help="Enable debug mode")
     web_parser.set_defaults(func=run_web_server)
@@ -255,8 +255,8 @@ Examples:
     setup_logging(args.log_level)
     # Execute command
     if hasattr(args, "func"):
-      result = args.func(args)
-      return int(result) if result is not None else 0
+        result = args.func(args)
+        return int(result) if result is not None else 0
     parser.print_help()
     return 1
 

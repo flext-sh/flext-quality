@@ -36,26 +36,26 @@ from flext_quality.exceptions import (
 # Import quality components for legacy aliases
 try:
     from flext_quality.application.services import (
-      FlextQualityAnalysisService,
-      FlextQualityReportService,
+        FlextQualityAnalysisService,
+        FlextQualityReportService,
     )
     from flext_quality.domain.entities import (
-      FlextQualityAnalysis,
-      FlextQualityIssue,
-      FlextQualityProject,
+        FlextQualityAnalysis,
+        FlextQualityIssue,
+        FlextQualityProject,
     )
     from flext_quality.platform import FlextQualityPlatform
     from flext_quality.simple_api import (
-      create_flext_quality_analysis,
-      create_flext_quality_project,
-      create_flext_quality_report,
-      run_quality_analysis,
+        create_flext_quality_analysis,
+        create_flext_quality_project,
+        create_flext_quality_report,
+        run_quality_analysis,
     )
 except ImportError:
     # Handle missing modules gracefully for backward compatibility
     FlextQualityAnalysisService = FlextQualityReportService = None
     FlextQualityProject = FlextQualityAnalysis = FlextQualityIssue = (
-      FlextQualityPlatform
+        FlextQualityPlatform
     ) = None
     create_flext_quality_project = create_flext_quality_analysis = None
     create_flext_quality_report = run_quality_analysis = None
@@ -64,9 +64,9 @@ except ImportError:
 def _deprecation_warning(old_name: str, new_name: str) -> None:
     """Issue a deprecation warning for legacy imports."""
     warnings.warn(
-      f"{old_name} is deprecated, use {new_name} instead",
-      DeprecationWarning,
-      stacklevel=3,
+        f"{old_name} is deprecated, use {new_name} instead",
+        DeprecationWarning,
+        stacklevel=3,
     )
 
 
@@ -75,8 +75,8 @@ def QualityService(*args: object, **kwargs: object) -> object:  # noqa: N802
     """Legacy alias for FlextQualityAnalysisService."""
     _deprecation_warning("QualityService", "FlextQualityAnalysisService")
     if FlextQualityAnalysisService is None:
-      msg = "FlextQualityAnalysisService not available"
-      raise ImportError(msg)
+        msg = "FlextQualityAnalysisService not available"
+        raise ImportError(msg)
     return FlextQualityAnalysisService(*args, **kwargs)
 
 
@@ -84,8 +84,8 @@ def QualityAnalyzer(*args: object, **kwargs: object) -> object:  # noqa: N802
     """Legacy alias for FlextQualityPlatform."""
     _deprecation_warning("QualityAnalyzer", "FlextQualityPlatform")
     if FlextQualityPlatform is None:
-      msg = "FlextQualityPlatform not available"
-      raise ImportError(msg)
+        msg = "FlextQualityPlatform not available"
+        raise ImportError(msg)
     return FlextQualityPlatform(*args, **kwargs)
 
 
@@ -93,8 +93,8 @@ def QualityReportService(*args: object, **kwargs: object) -> object:  # noqa: N8
     """Legacy alias for FlextQualityReportService."""
     _deprecation_warning("QualityReportService", "FlextQualityReportService")
     if FlextQualityReportService is None:
-      msg = "FlextQualityReportService not available"
-      raise ImportError(msg)
+        msg = "FlextQualityReportService not available"
+        raise ImportError(msg)
     return FlextQualityReportService(*args, **kwargs)
 
 
@@ -102,8 +102,8 @@ def QualityProject(*args: object, **kwargs: object) -> object:  # noqa: N802
     """Legacy alias for FlextQualityProject."""
     _deprecation_warning("QualityProject", "FlextQualityProject")
     if FlextQualityProject is None:
-      msg = "FlextQualityProject not available"
-      raise ImportError(msg)
+        msg = "FlextQualityProject not available"
+        raise ImportError(msg)
     return FlextQualityProject(*args, **kwargs)
 
 
@@ -111,8 +111,8 @@ def QualityAnalysis(*args: object, **kwargs: object) -> object:  # noqa: N802
     """Legacy alias for FlextQualityAnalysis."""
     _deprecation_warning("QualityAnalysis", "FlextQualityAnalysis")
     if FlextQualityAnalysis is None:
-      msg = "FlextQualityAnalysis not available"
-      raise ImportError(msg)
+        msg = "FlextQualityAnalysis not available"
+        raise ImportError(msg)
     return FlextQualityAnalysis(*args, **kwargs)
 
 
@@ -120,8 +120,8 @@ def QualityIssue(*args: object, **kwargs: object) -> object:  # noqa: N802
     """Legacy alias for FlextQualityIssue."""
     _deprecation_warning("QualityIssue", "FlextQualityIssue")
     if FlextQualityIssue is None:
-      msg = "FlextQualityIssue not available"
-      raise ImportError(msg)
+        msg = "FlextQualityIssue not available"
+        raise ImportError(msg)
     return FlextQualityIssue(*args, **kwargs)
 
 
@@ -130,8 +130,8 @@ def create_quality_project(*args: object, **kwargs: object) -> object:
     """Legacy alias for create_flext_quality_project."""
     _deprecation_warning("create_quality_project", "create_flext_quality_project")
     if create_flext_quality_project is None:
-      msg = "create_flext_quality_project not available"
-      raise ImportError(msg)
+        msg = "create_flext_quality_project not available"
+        raise ImportError(msg)
     return create_flext_quality_project(*args, **kwargs)
 
 
@@ -139,8 +139,8 @@ def create_quality_analysis(*args: object, **kwargs: object) -> object:
     """Legacy alias for create_flext_quality_analysis."""
     _deprecation_warning("create_quality_analysis", "create_flext_quality_analysis")
     if create_flext_quality_analysis is None:
-      msg = "create_flext_quality_analysis not available"
-      raise ImportError(msg)
+        msg = "create_flext_quality_analysis not available"
+        raise ImportError(msg)
     return create_flext_quality_analysis(*args, **kwargs)
 
 
@@ -148,8 +148,8 @@ def create_quality_report(*args: object, **kwargs: object) -> object:
     """Legacy alias for create_flext_quality_report."""
     _deprecation_warning("create_quality_report", "create_flext_quality_report")
     if create_flext_quality_report is None:
-      msg = "create_flext_quality_report not available"
-      raise ImportError(msg)
+        msg = "create_flext_quality_report not available"
+        raise ImportError(msg)
     return create_flext_quality_report(*args, **kwargs)
 
 
@@ -157,8 +157,8 @@ def run_analysis(*args: object, **kwargs: object) -> object:
     """Legacy alias for run_quality_analysis."""
     _deprecation_warning("run_analysis", "run_quality_analysis")
     if run_quality_analysis is None:
-      msg = "run_quality_analysis not available"
-      raise ImportError(msg)
+        msg = "run_quality_analysis not available"
+        raise ImportError(msg)
     return run_quality_analysis(*args, **kwargs)
 
 
@@ -218,7 +218,7 @@ def QualityAuthenticationError(  # noqa: N802
 ) -> FlextQualityAuthenticationError:
     """Legacy alias for FlextQualityAuthenticationError."""
     _deprecation_warning(
-      "QualityAuthenticationError", "FlextQualityAuthenticationError"
+        "QualityAuthenticationError", "FlextQualityAuthenticationError"
     )
     return FlextQualityAuthenticationError(*args, **kwargs)
 
@@ -266,8 +266,8 @@ def FlextQualityManager(*args: object, **kwargs: object) -> object:  # noqa: N80
     """Legacy alias for FlextQualityPlatform (alternate naming)."""
     _deprecation_warning("FlextQualityManager", "FlextQualityPlatform")
     if FlextQualityPlatform is None:
-      msg = "FlextQualityPlatform not available"
-      raise ImportError(msg)
+        msg = "FlextQualityPlatform not available"
+        raise ImportError(msg)
     return FlextQualityPlatform(*args, **kwargs)
 
 
@@ -275,8 +275,8 @@ def SimpleQualityAnalyzer(*args: object, **kwargs: object) -> object:  # noqa: N
     """Legacy alias for FlextQualityPlatform (simple variant)."""
     _deprecation_warning("SimpleQualityAnalyzer", "FlextQualityPlatform")
     if FlextQualityPlatform is None:
-      msg = "FlextQualityPlatform not available"
-      raise ImportError(msg)
+        msg = "FlextQualityPlatform not available"
+        raise ImportError(msg)
     return FlextQualityPlatform(*args, **kwargs)
 
 
@@ -285,8 +285,8 @@ def init_quality_system(*args: object, **kwargs: object) -> object:
     """Legacy alias for creating quality platform."""
     _deprecation_warning("init_quality_system", "create_flext_quality_platform")
     if FlextQualityPlatform is None:
-      msg = "FlextQualityPlatform not available"
-      raise ImportError(msg)
+        msg = "FlextQualityPlatform not available"
+        raise ImportError(msg)
     return FlextQualityPlatform(*args, **kwargs)
 
 
@@ -294,8 +294,8 @@ def setup_quality_analysis(*args: object, **kwargs: object) -> object:
     """Legacy alias for creating quality platform."""
     _deprecation_warning("setup_quality_analysis", "create_flext_quality_platform")
     if FlextQualityPlatform is None:
-      msg = "FlextQualityPlatform not available"
-      raise ImportError(msg)
+        msg = "FlextQualityPlatform not available"
+        raise ImportError(msg)
     return FlextQualityPlatform(*args, **kwargs)
 
 
