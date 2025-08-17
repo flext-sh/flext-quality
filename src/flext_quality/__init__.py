@@ -11,10 +11,49 @@ from flext_core import FlextResult
 
 # Direct imports - no fallbacks allowed per CLAUDE.md
 from flext_quality.analyzer import CodeAnalyzer
+from flext_quality.backends.ast_backend import ASTBackend, ASTVisitor
+from flext_quality.backends.base import BackendType, BaseAnalyzer
+from flext_quality.backends.external_backend import ExternalBackend
+from flext_quality.application.services import (
+    LintingServiceImpl,
+    QualityAnalysisService,
+    QualityIssueService,
+    QualityProjectService,
+    QualityReportService,
+    SecurityAnalyzerServiceImpl,
+)
+from flext_quality.application.handlers import (
+    AnalyzeProjectHandler,
+    GenerateReportHandler,
+    RunLintingHandler,
+    RunSecurityCheckHandler,
+)
+from flext_quality.domain.entities import (
+    AnalysisStatus,
+    IssueSeverity,
+    IssueType,
+    QualityAnalysis,
+    QualityIssue,
+    QualityProject,
+    QualityReport as DomainQualityReport,
+)
+from flext_quality.domain.quality_grade_calculator import (
+    QualityGrade,
+    QualityGradeCalculator,
+)
+from flext_quality.infrastructure.container import get_quality_container
+from flext_quality.simple_api import QualityAPI
 from flext_quality.metrics import QualityMetrics
 from flext_quality.reports import QualityReport
 from flext_quality.exceptions import (
     FlextQualityError as QualityError,
+)
+from flext_quality.web_interface import QualityWebInterface, main as quality_web_main
+from flext_quality.cli import (
+    another_function as _cli_another_function,
+    analyze_project as _cli_analyze_project,
+    main as cli_main,
+    setup_logging as _cli_setup_logging,
 )
 
 try:
@@ -28,68 +67,58 @@ __version_info__ = tuple(int(x) for x in __version__.split(".") if x.isdigit())
 class FlextQualityDeprecationWarning(DeprecationWarning):
     """Custom deprecation warning for FLEXT Quality import changes.
 
-    This warning is raised when deprecated import paths are used, guiding
-    developers to use the simplified public API instead of internal modules.
-    All deprecated imports will be removed in version 1.0.0.
+    This warning is raised when deprecated import patterns are used.
     """
 
 
-def _show_deprecation_warning(old_import: str, new_import: str) -> None:
-    """Display deprecation warning for import paths with migration guidance.
-
-    Args:
-        old_import: The deprecated import path being used
-        new_import: The recommended replacement import path
-
-    Note:
-        This function formats and displays user-friendly deprecation warnings
-        that include the old path, recommended replacement, version information,
-        and links to migration documentation.
-
-    """
-    message_parts = [
-        f"DEPRECATED IMPORT: {old_import}",
-        f"USE INSTEAD: {new_import}",
-        "This will be removed in version 1.0.0",
-        "See FLEXT Quality docs for migration guide",
-    ]
-    warnings.warn(
-        "\n".join(message_parts),
-        FlextQualityDeprecationWarning,
-        stacklevel=3,
-    )
-
-
-# ================================
-# SIMPLIFIED PUBLIC API EXPORTS
-# ================================
-
-# Core patterns - already imported from flext_core above
-
-# Core quality exports - moved to top per linting rules
-
-# Simple API exports - simplified imports
-with contextlib.suppress(ImportError):
-    from flext_quality.simple_api import QualityAPI
-
-# CLI exports - simplified imports
-with contextlib.suppress(ImportError):
-    from flext_quality.cli import main as cli_main
-
-# ================================
-# PUBLIC API EXPORTS
-# ================================
-
+# Export clean, professional public API
 __all__: list[str] = [
+    # Backends (root import for tests/examples)
+    "ASTBackend",
+    "ASTVisitor",
+    "BackendType",
+    "BaseAnalyzer",
+    "ExternalBackend",
     "CodeAnalyzer",
+    # Application Services
+    "LintingServiceImpl",
+    "QualityAnalysisService",
+    "QualityIssueService",
+    "QualityProjectService",
+    "QualityReportService",
+    "SecurityAnalyzerServiceImpl",
+    # Application Handlers
+    "AnalyzeProjectHandler",
+    "GenerateReportHandler",
+    "RunLintingHandler",
+    "RunSecurityCheckHandler",
+    # Domain Entities
+    "AnalysisStatus",
+    "IssueSeverity",
+    "IssueType",
+    "QualityProject",
+    "QualityAnalysis",
+    "DomainQualityReport",
+    # Domain Utilities
+    "QualityGrade",
+    "QualityGradeCalculator",
     "FlextQualityDeprecationWarning",
     "FlextResult",
     "QualityAPI",
     "QualityError",
     "QualityMetrics",
     "QualityReport",
+    # Infrastructure
+    "get_quality_container",
     "__version__",
     "__version_info__",
     "annotations",
+    # Web interface
+    "QualityWebInterface",
+    "quality_web_main",
+    # CLI surface (re-exported at root for tests/examples)
     "cli_main",
+    "_cli_analyze_project",
+    "_cli_another_function",
+    "_cli_setup_logging",
 ]

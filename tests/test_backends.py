@@ -10,183 +10,181 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from flext_quality.backends.ast_backend import ASTBackend
-from flext_quality.backends.base import BackendType, BaseAnalyzer
-from flext_quality.backends.external_backend import ExternalBackend
+from flext_quality import ASTBackend, BackendType, BaseAnalyzer, ExternalBackend
 
 
 class TestBaseAnalyzer:
     """Test BaseAnalyzer abstract base class."""
 
     def test_backend_type_enum(self) -> None:
-        """Test BackendType enum values."""
-        assert BackendType.AST.value == "ast"
-        assert BackendType.EXTERNAL.value == "external"
-        assert BackendType.HYBRID.value == "hybrid"
+      """Test BackendType enum values."""
+      assert BackendType.AST.value == "ast"
+      assert BackendType.EXTERNAL.value == "external"
+      assert BackendType.HYBRID.value == "hybrid"
 
-        # Test all enum values are accessible
-        backend_types = list(BackendType)
-        assert len(backend_types) == 3
-        assert BackendType.AST in backend_types
-        assert BackendType.EXTERNAL in backend_types
-        assert BackendType.HYBRID in backend_types
+      # Test all enum values are accessible
+      backend_types = list(BackendType)
+      assert len(backend_types) == 3
+      assert BackendType.AST in backend_types
+      assert BackendType.EXTERNAL in backend_types
+      assert BackendType.HYBRID in backend_types
 
     def test_base_analyzer_abstract(self) -> None:
-        """Test BaseAnalyzer is abstract and cannot be instantiated."""
-        with pytest.raises(TypeError):
-            BaseAnalyzer()
+      """Test BaseAnalyzer is abstract and cannot be instantiated."""
+      with pytest.raises(TypeError):
+          BaseAnalyzer()
 
     def test_base_analyzer_concrete_implementation(self) -> None:
-        """Test concrete implementation of BaseAnalyzer."""
+      """Test concrete implementation of BaseAnalyzer."""
 
-        class ConcreteAnalyzer(BaseAnalyzer):
-            """Concrete implementation for testing."""
+      class ConcreteAnalyzer(BaseAnalyzer):
+          """Concrete implementation for testing."""
 
-            def analyze(
-                self,
-                code: str,
-                file_path: Path | None = None,
-            ) -> dict[str, Any]:
-                """Implement abstract method."""
-                return {"analyzed": True, "code": code}
+          def analyze(
+              self,
+              code: str,
+              file_path: Path | None = None,
+          ) -> dict[str, Any]:
+              """Implement abstract method."""
+              return {"analyzed": True, "code": code}
 
-            def get_backend_type(self) -> BackendType:
-                """Implement abstract method."""
-                return BackendType.HYBRID
+          def get_backend_type(self) -> BackendType:
+              """Implement abstract method."""
+              return BackendType.HYBRID
 
-            def get_capabilities(self) -> list[str]:
-                """Implement abstract method."""
-                return ["test", "mock"]
+          def get_capabilities(self) -> list[str]:
+              """Implement abstract method."""
+              return ["test", "mock"]
 
-        # Should be able to instantiate concrete class
-        analyzer = ConcreteAnalyzer()
-        assert analyzer is not None
+      # Should be able to instantiate concrete class
+      analyzer = ConcreteAnalyzer()
+      assert analyzer is not None
 
-        # Test methods work
-        result = analyzer.analyze("test code")
-        assert result == {"analyzed": True, "code": "test code"}
+      # Test methods work
+      result = analyzer.analyze("test code")
+      assert result == {"analyzed": True, "code": "test code"}
 
-        backend_type = analyzer.get_backend_type()
-        assert backend_type == BackendType.HYBRID
+      backend_type = analyzer.get_backend_type()
+      assert backend_type == BackendType.HYBRID
 
-        capabilities = analyzer.get_capabilities()
-        assert capabilities == ["test", "mock"]
+      capabilities = analyzer.get_capabilities()
+      assert capabilities == ["test", "mock"]
 
 
 class TestASTBackend:
     """Test AST-based code analyzer backend."""
 
     def test_initialization(self) -> None:
-        """Test ASTBackend initialization."""
-        backend = ASTBackend()
-        assert backend is not None
-        assert backend.get_backend_type() == BackendType.AST
+      """Test ASTBackend initialization."""
+      backend = ASTBackend()
+      assert backend is not None
+      assert backend.get_backend_type() == BackendType.AST
 
     def test_get_capabilities(self) -> None:
-        """Test get_capabilities method."""
-        backend = ASTBackend()
-        capabilities = backend.get_capabilities()
+      """Test get_capabilities method."""
+      backend = ASTBackend()
+      capabilities = backend.get_capabilities()
 
-        assert isinstance(capabilities, list)
-        assert "complexity" in capabilities
-        assert "functions" in capabilities
-        assert "classes" in capabilities
-        assert "imports" in capabilities
-        assert "docstrings" in capabilities
+      assert isinstance(capabilities, list)
+      assert "complexity" in capabilities
+      assert "functions" in capabilities
+      assert "classes" in capabilities
+      assert "imports" in capabilities
+      assert "docstrings" in capabilities
 
     def test_analyze_valid_code(self) -> None:
-        """Test analyzing valid Python code."""
-        backend = ASTBackend()
-        code = """
+      """Test analyzing valid Python code."""
+      backend = ASTBackend()
+      code = """
 def hello_world():
     '''Say hello.'''
     print("Hello, World!")
 
 class TestClass:
     def method(self):
-        pass
+      pass
 """
-        result = backend.analyze(code)
+      result = backend.analyze(code)
 
-        assert "functions" in result
-        assert "classes" in result
-        assert "complexity" in result
-        # ast.walk finds all functions including methods
-        assert len(result["functions"]) == 2  # hello_world + method
-        assert len(result["classes"]) == 1
-        # Check that hello_world is one of the functions
-        func_names = [f["name"] for f in result["functions"]]
-        assert "hello_world" in func_names
-        assert result["classes"][0]["name"] == "TestClass"
+      assert "functions" in result
+      assert "classes" in result
+      assert "complexity" in result
+      # ast.walk finds all functions including methods
+      assert len(result["functions"]) == 2  # hello_world + method
+      assert len(result["classes"]) == 1
+      # Check that hello_world is one of the functions
+      func_names = [f["name"] for f in result["functions"]]
+      assert "hello_world" in func_names
+      assert result["classes"][0]["name"] == "TestClass"
 
     def test_analyze_with_file_path(self) -> None:
-        """Test analyzing code with file path provided."""
-        backend = ASTBackend()
-        code = "x = 1"
-        file_path = Path("/test/file.py")
+      """Test analyzing code with file path provided."""
+      backend = ASTBackend()
+      code = "x = 1"
+      file_path = Path("/test/file.py")
 
-        result = backend.analyze(code, file_path)
+      result = backend.analyze(code, file_path)
 
-        assert "file_path" in result
-        assert result["file_path"] == str(file_path)
+      assert "file_path" in result
+      assert result["file_path"] == str(file_path)
 
     def test_analyze_syntax_error(self) -> None:
-        """Test analyzing code with syntax error."""
-        backend = ASTBackend()
-        code = "def invalid("  # Missing closing parenthesis
+      """Test analyzing code with syntax error."""
+      backend = ASTBackend()
+      code = "def invalid("  # Missing closing parenthesis
 
-        result = backend.analyze(code)
+      result = backend.analyze(code)
 
-        assert "error" in result
-        assert "syntax" in result["error"].lower()
+      assert "error" in result
+      assert "syntax" in result["error"].lower()
 
     def test_analyze_complex_code(self) -> None:
-        """Test analyzing complex code with multiple constructs."""
-        backend = ASTBackend()
-        code = """
+      """Test analyzing complex code with multiple constructs."""
+      backend = ASTBackend()
+      code = """
 import os
 from typing import List
 
 def complex_function(x: int) -> int:
     if x > 10:
-        for i in range(x):
-            if i % 2 == 0:
-                print(i)
+      for i in range(x):
+          if i % 2 == 0:
+              print(i)
     elif x < 0:
-        while x < 0:
-            x += 1
+      while x < 0:
+          x += 1
     else:
-        try:
-            return 1 / x
-        except ZeroDivisionError:
-            return 0
+      try:
+          return 1 / x
+      except ZeroDivisionError:
+          return 0
     return x
 
 class MyClass:
     '''A test class.'''
 
     def __init__(self):
-        self.value = 0
+      self.value = 0
 
     def method_one(self):
-        pass
+      pass
 
     async def async_method(self):
-        pass
+      pass
 """
-        result = backend.analyze(code)
+      result = backend.analyze(code)
 
-        assert result["complexity"] > 5  # Should have high complexity
-        assert len(result["imports"]) == 2
-        # ast.walk finds all functions including methods, so we get 4 total
-        assert len(result["functions"]) == 4  # 1 top-level + 3 methods
-        assert len(result["classes"]) == 1
-        assert result["classes"][0]["methods"] == 3
+      assert result["complexity"] > 5  # Should have high complexity
+      assert len(result["imports"]) == 2
+      # ast.walk finds all functions including methods, so we get 4 total
+      assert len(result["functions"]) == 4  # 1 top-level + 3 methods
+      assert len(result["classes"]) == 1
+      assert result["classes"][0]["methods"] == 3
 
     def test_extract_functions(self) -> None:
-        """Test _extract_functions method."""
-        backend = ASTBackend()
-        code = """
+      """Test _extract_functions method."""
+      backend = ASTBackend()
+      code = """
 def func1():
     pass
 
@@ -196,88 +194,88 @@ async def func2():
 def func3(x, y=1, *args, **kwargs):
     return x + y
 """
-        tree = ast.parse(code)
-        functions = backend._extract_functions(tree)
+      tree = ast.parse(code)
+      functions = backend._extract_functions(tree)
 
-        assert len(functions) == 3
-        assert functions[0]["name"] == "func1"
-        assert functions[1]["name"] == "func2"
-        assert functions[1]["is_async"] is True
-        assert functions[2]["name"] == "func3"
-        assert functions[2]["args"] == 2  # Only x and y, not *args/**kwargs
+      assert len(functions) == 3
+      assert functions[0]["name"] == "func1"
+      assert functions[1]["name"] == "func2"
+      assert functions[1]["is_async"] is True
+      assert functions[2]["name"] == "func3"
+      assert functions[2]["args"] == 2  # Only x and y, not *args/**kwargs
 
     def test_extract_classes(self) -> None:
-        """Test _extract_classes method."""
-        backend = ASTBackend()
-        code = """
+      """Test _extract_classes method."""
+      backend = ASTBackend()
+      code = """
 class BaseClass:
     pass
 
 class DerivedClass(BaseClass):
     def method1(self):
-        pass
+      pass
 
     def method2(self):
-        pass
+      pass
 """
-        tree = ast.parse(code)
-        classes = backend._extract_classes(tree)
+      tree = ast.parse(code)
+      classes = backend._extract_classes(tree)
 
-        assert len(classes) == 2
-        assert classes[0]["name"] == "BaseClass"
-        assert classes[0]["methods"] == 0
-        assert classes[1]["name"] == "DerivedClass"
-        assert classes[1]["methods"] == 2
-        assert classes[1]["bases"] == ["BaseClass"]
+      assert len(classes) == 2
+      assert classes[0]["name"] == "BaseClass"
+      assert classes[0]["methods"] == 0
+      assert classes[1]["name"] == "DerivedClass"
+      assert classes[1]["methods"] == 2
+      assert classes[1]["bases"] == ["BaseClass"]
 
     def test_calculate_complexity(self) -> None:
-        """Test _calculate_complexity method."""
-        backend = ASTBackend()
+      """Test _calculate_complexity method."""
+      backend = ASTBackend()
 
-        # Simple code - low complexity
-        simple_code = "x = 1\ny = 2"
-        simple_tree = ast.parse(simple_code)
-        simple_complexity = backend._calculate_complexity(simple_tree)
-        assert simple_complexity == 1
+      # Simple code - low complexity
+      simple_code = "x = 1\ny = 2"
+      simple_tree = ast.parse(simple_code)
+      simple_complexity = backend._calculate_complexity(simple_tree)
+      assert simple_complexity == 1
 
-        # Complex code - higher complexity
-        complex_code = """
+      # Complex code - higher complexity
+      complex_code = """
 if x:
     for i in range(10):
-        while True:
-            try:
-                break
-            except:
-                pass
+      while True:
+          try:
+              break
+          except:
+              pass
 elif y:
     pass
 """
-        complex_tree = ast.parse(complex_code)
-        complex_complexity = backend._calculate_complexity(complex_tree)
-        assert complex_complexity > 3
+      complex_tree = ast.parse(complex_code)
+      complex_complexity = backend._calculate_complexity(complex_tree)
+      assert complex_complexity > 3
 
     def test_extract_imports(self) -> None:
-        """Test _extract_imports method."""
-        backend = ASTBackend()
-        code = """
+      """Test _extract_imports method."""
+      backend = ASTBackend()
+      code = """
 import os
 import sys
 from pathlib import Path
 from typing import List, Dict
 import numpy as np
 """
-        tree = ast.parse(code)
-        imports = backend._extract_imports(tree)
+      tree = ast.parse(code)
+      imports = backend._extract_imports(tree)
 
-        assert len(imports) == 5
-        assert {"module": "os", "names": []} in imports
-        assert {"module": "pathlib", "names": ["Path"]} in imports
-        assert {"module": "typing", "names": ["List", "Dict"]} in imports
+      assert len(imports) == 5
+      assert {"module": "os", "names": []} in imports
+      assert {"module": "pathlib", "names": ["Path"]} in imports
+      assert {"module": "typing", "names": ["List", "Dict"]} in imports
 
     def test_check_docstrings(self) -> None:
-        """Test _check_docstrings method."""
-        backend = ASTBackend()
-        code = """
+      """Test _check_docstrings method."""
+      backend = ASTBackend()
+      code = """
 def with_docstring():
     '''This function has a docstring.'''
     pass
@@ -292,199 +290,199 @@ class WithDoc:
 class WithoutDoc:
     pass
 """
-        tree = ast.parse(code)
-        missing = backend._check_docstrings(tree)
+      tree = ast.parse(code)
+      missing = backend._check_docstrings(tree)
 
-        assert len(missing) == 2
-        assert "without_docstring" in missing
-        assert "WithoutDoc" in missing
+      assert len(missing) == 2
+      assert "without_docstring" in missing
+      assert "WithoutDoc" in missing
 
 
 class TestExternalBackend:
     """Test external tool-based analyzer backend."""
 
     def test_initialization(self) -> None:
-        """Test ExternalBackend initialization."""
-        backend = ExternalBackend()
-        assert backend is not None
-        assert backend.get_backend_type() == BackendType.EXTERNAL
+      """Test ExternalBackend initialization."""
+      backend = ExternalBackend()
+      assert backend is not None
+      assert backend.get_backend_type() == BackendType.EXTERNAL
 
     def test_get_capabilities(self) -> None:
-        """Test get_capabilities method."""
-        backend = ExternalBackend()
-        capabilities = backend.get_capabilities()
+      """Test get_capabilities method."""
+      backend = ExternalBackend()
+      capabilities = backend.get_capabilities()
 
-        assert isinstance(capabilities, list)
-        assert "ruff" in capabilities
-        assert "mypy" in capabilities
-        assert "bandit" in capabilities
-        assert "vulture" in capabilities
+      assert isinstance(capabilities, list)
+      assert "ruff" in capabilities
+      assert "mypy" in capabilities
+      assert "bandit" in capabilities
+      assert "vulture" in capabilities
 
     def test_analyze_with_ruff(self) -> None:
-        """Test analyze with ruff linter."""
-        backend = ExternalBackend()
-        result = backend.analyze("test code", tool="ruff")
+      """Test analyze with ruff linter."""
+      backend = ExternalBackend()
+      result = backend.analyze("test code", tool="ruff")
 
-        assert "tool" in result
-        assert result["tool"] == "ruff"
-        # Depending on environment, either issues or error may be present
-        assert ("issues" in result) or ("error" in result)
+      assert "tool" in result
+      assert result["tool"] == "ruff"
+      # Depending on environment, either issues or error may be present
+      assert ("issues" in result) or ("error" in result)
 
     def test_analyze_with_mypy(self) -> None:
-        """Test analyze with mypy type checker."""
-        backend = ExternalBackend()
-        result = backend.analyze("test code", tool="mypy")
+      """Test analyze with mypy type checker."""
+      backend = ExternalBackend()
+      result = backend.analyze("test code", tool="mypy")
 
-        assert result["tool"] == "mypy"
-        assert ("issues" in result) or ("error" in result)
+      assert result["tool"] == "mypy"
+      assert ("issues" in result) or ("error" in result)
 
     def test_analyze_tool_not_found(self) -> None:
-        """Test analyze when tool is not found."""
-        backend = ExternalBackend()
-        result = backend.analyze("test code", tool="ruff")
+      """Test analyze when tool is not found."""
+      backend = ExternalBackend()
+      result = backend.analyze("test code", tool="ruff")
 
-        assert "error" in result
-        assert isinstance(result["error"], str)
+      assert "error" in result
+      assert isinstance(result["error"], str)
 
     def test_analyze_timeout(self) -> None:
-        """Test analyze with timeout."""
-        backend = ExternalBackend()
-        with patch(
-            "flext_quality.backends.external_backend.ExternalBackend._run_mypy",
-            side_effect=TimeoutError("timed out"),
-        ):
-            result = backend.analyze("test code", tool="mypy")
+      """Test analyze with timeout."""
+      backend = ExternalBackend()
+      with patch(
+          "flext_quality.backends.external_backend.ExternalBackend._run_mypy",
+          side_effect=TimeoutError("timed out"),
+      ):
+          result = backend.analyze("test code", tool="mypy")
 
-        assert "error" in result
-        assert (
-            "timed out" in result["error"].lower()
-            or "timeout" in result["error"].lower()
-        )
+      assert "error" in result
+      assert (
+          "timed out" in result["error"].lower()
+          or "timeout" in result["error"].lower()
+      )
 
     def test_run_ruff(self) -> None:
-        """Test _run_ruff method."""
-        backend = ExternalBackend()
-        with tempfile.NamedTemporaryFile(
-            encoding="utf-8",
-            mode="w",
-            suffix=".py",
-            delete=False,
-        ) as f:
-            f.write("test code")
-            temp_path = Path(f.name)
+      """Test _run_ruff method."""
+      backend = ExternalBackend()
+      with tempfile.NamedTemporaryFile(
+          encoding="utf-8",
+          mode="w",
+          suffix=".py",
+          delete=False,
+      ) as f:
+          f.write("test code")
+          temp_path = Path(f.name)
 
-        try:
-            result = backend._run_ruff("test code", temp_path)
-        finally:
-            temp_path.unlink(missing_ok=True)
+      try:
+          result = backend._run_ruff("test code", temp_path)
+      finally:
+          temp_path.unlink(missing_ok=True)
 
-        # _run_ruff should return either issues or error
-        assert ("issues" in result) or ("error" in result)
+      # _run_ruff should return either issues or error
+      assert ("issues" in result) or ("error" in result)
 
     def test_run_mypy(self) -> None:
-        """Test _run_mypy method."""
-        backend = ExternalBackend()
-        with tempfile.NamedTemporaryFile(
-            encoding="utf-8",
-            mode="w",
-            suffix=".py",
-            delete=False,
-        ) as f:
-            f.write("test code")
-            temp_path = Path(f.name)
+      """Test _run_mypy method."""
+      backend = ExternalBackend()
+      with tempfile.NamedTemporaryFile(
+          encoding="utf-8",
+          mode="w",
+          suffix=".py",
+          delete=False,
+      ) as f:
+          f.write("test code")
+          temp_path = Path(f.name)
 
-        try:
-            result = backend._run_mypy("test code", temp_path)
-        finally:
-            temp_path.unlink(missing_ok=True)
+      try:
+          result = backend._run_mypy("test code", temp_path)
+      finally:
+          temp_path.unlink(missing_ok=True)
 
-        assert ("issues" in result) or ("error" in result)
+      assert ("issues" in result) or ("error" in result)
 
     def test_run_bandit(self) -> None:
-        """Test _run_bandit method."""
-        backend = ExternalBackend()
-        with tempfile.NamedTemporaryFile(
-            encoding="utf-8",
-            mode="w",
-            suffix=".py",
-            delete=False,
-        ) as f:
-            f.write("test code")
-            temp_path = Path(f.name)
+      """Test _run_bandit method."""
+      backend = ExternalBackend()
+      with tempfile.NamedTemporaryFile(
+          encoding="utf-8",
+          mode="w",
+          suffix=".py",
+          delete=False,
+      ) as f:
+          f.write("test code")
+          temp_path = Path(f.name)
 
-        try:
-            result = backend._run_bandit("test code", temp_path)
-        finally:
-            temp_path.unlink(missing_ok=True)
+      try:
+          result = backend._run_bandit("test code", temp_path)
+      finally:
+          temp_path.unlink(missing_ok=True)
 
-        assert "error" in result
+      assert "error" in result
 
     def test_run_vulture(self) -> None:
-        """Test _run_vulture method."""
-        backend = ExternalBackend()
-        with tempfile.NamedTemporaryFile(
-            encoding="utf-8",
-            mode="w",
-            suffix=".py",
-            delete=False,
-        ) as f:
-            f.write("test code")
-            temp_path = Path(f.name)
+      """Test _run_vulture method."""
+      backend = ExternalBackend()
+      with tempfile.NamedTemporaryFile(
+          encoding="utf-8",
+          mode="w",
+          suffix=".py",
+          delete=False,
+      ) as f:
+          f.write("test code")
+          temp_path = Path(f.name)
 
-        try:
-            result = backend._run_vulture("test code", temp_path)
-        finally:
-            temp_path.unlink(missing_ok=True)
+      try:
+          result = backend._run_vulture("test code", temp_path)
+      finally:
+          temp_path.unlink(missing_ok=True)
 
-        assert "error" in result
+      assert "error" in result
 
     def test_analyze_with_file_path(self) -> None:
-        """Test analyze with actual file path."""
-        backend = ExternalBackend()
+      """Test analyze with actual file path."""
+      backend = ExternalBackend()
 
-        with patch("subprocess.run") as mock_run:
-            mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
+      with patch("subprocess.run") as mock_run:
+          mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
 
-            result = backend.analyze("code", Path("/test/file.py"), tool="ruff")
+          result = backend.analyze("code", Path("/test/file.py"), tool="ruff")
 
-            assert "file_path" in result
-            assert result["file_path"] == "/test/file.py"
+          assert "file_path" in result
+          assert result["file_path"] == "/test/file.py"
 
     def test_analyze_default_tool(self) -> None:
-        """Test analyze with default tool (ruff)."""
-        backend = ExternalBackend()
+      """Test analyze with default tool (ruff)."""
+      backend = ExternalBackend()
 
-        with patch("subprocess.run") as mock_run:
-            mock_run.return_value = MagicMock(returncode=0, stdout="[]", stderr="")
+      with patch("subprocess.run") as mock_run:
+          mock_run.return_value = MagicMock(returncode=0, stdout="[]", stderr="")
 
-            # Should use ruff by default
-            result = backend.analyze("test code")
+          # Should use ruff by default
+          result = backend.analyze("test code")
 
-            assert result["tool"] == "ruff"
+          assert result["tool"] == "ruff"
 
     def test_parse_ruff_output(self) -> None:
-        """Test _parse_ruff_output method."""
-        backend = ExternalBackend()
+      """Test _parse_ruff_output method."""
+      backend = ExternalBackend()
 
-        # Valid JSON output
-        json_output = '[{"code": "E501", "line": 1}]'
-        issues = backend._parse_ruff_output(json_output)
-        assert len(issues) == 1
+      # Valid JSON output
+      json_output = '[{"code": "E501", "line": 1}]'
+      issues = backend._parse_ruff_output(json_output)
+      assert len(issues) == 1
 
-        # Invalid JSON - should return empty list
-        invalid_output = "not json"
-        issues = backend._parse_ruff_output(invalid_output)
-        assert issues == []
+      # Invalid JSON - should return empty list
+      invalid_output = "not json"
+      issues = backend._parse_ruff_output(invalid_output)
+      assert issues == []
 
     def test_parse_mypy_output(self) -> None:
-        """Test _parse_mypy_output method."""
-        backend = ExternalBackend()
+      """Test _parse_mypy_output method."""
+      backend = ExternalBackend()
 
-        mypy_output = """
+      mypy_output = """
 test.py:1: error: Name 'x' is not defined
 test.py:5: note: See documentation
 Success: no other issues
 """
-        issues = backend._parse_mypy_output(mypy_output)
-        assert len(issues) >= 1
-        assert "not defined" in str(issues[0])
+      issues = backend._parse_mypy_output(mypy_output)
+      assert len(issues) >= 1
+      assert "not defined" in str(issues[0])
