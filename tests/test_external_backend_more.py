@@ -21,20 +21,20 @@ def test_external_tool_missing_returns_error(tmp_path: Path) -> None:
     temp = _temp_py(tmp_path)
     # Ruff
     res1 = backend._run_ruff("code", temp)
-    assert "error" in res1  # type: ignore[operator]
-    assert "Ruff not found" in str(res1["error"])  # type: ignore[index]
+    assert "error" in res1
+    assert "Ruff not found" in str(res1["error"])
     # MyPy
     res2 = backend._run_mypy("code", temp)
-    assert "error" in res2  # type: ignore[operator]
-    assert "MyPy not found" in str(res2["error"])  # type: ignore[index]
+    assert "error" in res2
+    assert "MyPy not found" in str(res2["error"])
     # Bandit
     res3 = backend._run_bandit("code", temp)
-    assert "error" in res3  # type: ignore[operator]
-    assert "Bandit not found" in str(res3["error"])  # type: ignore[index]
+    assert "error" in res3
+    assert "Bandit not found" in str(res3["error"])
     # Vulture
     res4 = backend._run_vulture("code", temp)
-    assert "error" in res4  # type: ignore[operator]
-    assert "Vulture not found" in str(res4["error"])  # type: ignore[index]
+    assert "error" in res4
+    assert "Vulture not found" in str(res4["error"])
 
 
 @patch("shutil.which", side_effect=lambda name: name)
@@ -50,22 +50,22 @@ def test_external_backend_empty_outputs(
     # Ruff with empty stdout -> issues []
     mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
     out1 = backend._run_ruff("code", temp)
-    assert out1["issues"] == []  # type: ignore[index]
+    assert out1["issues"] == []
 
     # MyPy with empty stdout -> issues []
     mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
     out2 = backend._run_mypy("code", temp)
-    assert isinstance(out2["issues"], list)  # type: ignore[index]
+    assert isinstance(out2["issues"], list)
 
     # Bandit with empty stdout -> default path
     mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
     out3 = backend._run_bandit("code", temp)
-    assert out3["issues"] == []  # type: ignore[index]
+    assert out3["issues"] == []
 
     # Vulture with empty stdout -> dead_code []
     mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
     out4 = backend._run_vulture("code", temp)
-    assert out4["dead_code"] == []  # type: ignore[index]
+    assert out4["dead_code"] == []
 
 
 def test_external_backend_invalid_path_handling(tmp_path: Path) -> None:
@@ -74,8 +74,8 @@ def test_external_backend_invalid_path_handling(tmp_path: Path) -> None:
     # Use non-existent file to trigger invalid path
     missing = tmp_path / "missing.py"
     res = backend._run_ruff("code", missing)
-    assert "error" in res  # type: ignore[operator]
-    assert res["error"] == "Invalid file path"  # type: ignore[index]
+    assert "error" in res
+    assert res["error"] == "Invalid file path"
 
 
 def test_parse_ruff_output_invalid_json() -> None:
