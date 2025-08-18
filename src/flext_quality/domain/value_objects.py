@@ -9,9 +9,10 @@ from __future__ import annotations
 from enum import StrEnum
 from pathlib import Path
 
-from pydantic import BaseModel, Field, field_validator
+from flext_core import FlextValueObject
+from pydantic import Field, field_validator
 
-# Using flext-core and Pydantic directly
+# Using flext-core patterns consistently
 
 
 class QualityThresholds:
@@ -110,7 +111,7 @@ class QualityGrade(StrEnum):
     F = "F"
 
 
-class FilePath(BaseModel):
+class FilePath(FlextValueObject):
     """File path value object."""
 
     value: str = Field(..., description="File path")
@@ -177,7 +178,7 @@ class FilePath(BaseModel):
         return str(self.path.parent)
 
 
-class IssueLocation(BaseModel):
+class IssueLocation(FlextValueObject):
     """Location of an issue in a file."""
 
     line: int = Field(..., description="Line number", ge=1)
@@ -218,7 +219,7 @@ class IssueLocation(BaseModel):
         return f"lines {self.line}-{self.end_line}"
 
 
-class QualityScore(BaseModel):
+class QualityScore(FlextValueObject):
     """Quality score value object."""
 
     value: float = Field(..., description="Quality score", ge=0.0, le=100.0)
@@ -268,7 +269,7 @@ class QualityScore(BaseModel):
         return QualityGrade.F
 
 
-class ComplexityMetric(BaseModel):
+class ComplexityMetric(FlextValueObject):
     """Complexity metric value object."""
 
     cyclomatic: int = Field(default=1, description="Cyclomatic complexity", ge=1)
@@ -306,7 +307,7 @@ class ComplexityMetric(BaseModel):
         return "very complex"
 
 
-class CoverageMetric(BaseModel):
+class CoverageMetric(FlextValueObject):
     """Test coverage metric value object."""
 
     line_coverage: float = Field(
@@ -354,7 +355,7 @@ class CoverageMetric(BaseModel):
         return self.overall_coverage >= QualityThresholds.COVERAGE_EXCELLENT
 
 
-class DuplicationMetric(BaseModel):
+class DuplicationMetric(FlextValueObject):
     """Code duplication metric value object."""
 
     duplicate_lines: int = Field(

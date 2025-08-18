@@ -10,13 +10,13 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from enum import StrEnum
 
-from flext_core import FlextEntity, FlextResult
-from pydantic import BaseModel, Field
+from flext_core import FlextEntity, FlextResult, FlextValueObject
+from pydantic import Field
 
 from flext_quality.typings import FlextTypes
 
 
-class FlextDomainEvent(BaseModel):
+class FlextDomainEvent(FlextValueObject):
     """Base class for domain events."""
 
     event_type: str

@@ -18,6 +18,8 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+from flext_quality import main as quality_main
+
 
 def run_cli_analysis(project_path: str, format_type: str = "json") -> dict[str, Any]:
     """Run FLEXT Quality CLI analysis and return parsed results.
@@ -40,7 +42,6 @@ def run_cli_analysis(project_path: str, format_type: str = "json") -> dict[str, 
 
     try:
         # Execute CLI via in-process API, capturing stdout
-        from flext_quality import main as quality_main  # type: ignore[attr-defined]
 
         stdout = io.StringIO()
         stderr = io.StringIO()
