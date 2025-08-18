@@ -1,7 +1,7 @@
 # Multi-stage Docker build for FLEXT Quality - Enterprise Validation Container
 
 # Build stage with correct Python version
-FROM python:3.13-slim as builder
+FROM python:3.13.7-slim as builder
 
 # Install system dependencies for building
 RUN apt-get update && apt-get install -y \
@@ -33,7 +33,7 @@ COPY pyproject.toml poetry.lock ./
 RUN poetry install --no-root
 
 # Production stage with correct Python version
-FROM python:3.13-slim as production
+FROM python:3.13.7-slim as production
 
 # Create app user
 RUN groupadd -r appuser && useradd -r -g appuser appuser
