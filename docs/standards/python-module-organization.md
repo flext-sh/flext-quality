@@ -169,12 +169,12 @@ class QualityProject(FlextEntity):
     def validate_standards(self) -> FlextResult[bool]:
         """Validate project meets quality standards."""
         if not self.project_path:
-            return FlextResult.fail("Project path is required")
+            return FlextResult[None].fail("Project path is required")
 
         if self.min_coverage < 0 or self.min_coverage > 100:
-            return FlextResult.fail("Coverage must be between 0 and 100")
+            return FlextResult[None].fail("Coverage must be between 0 and 100")
 
-        return FlextResult.ok(True)
+        return FlextResult[None].ok(True)
 
     def calculate_compliance(self, analysis: QualityAnalysis) -> float:
         """Calculate compliance percentage for this project."""
@@ -405,10 +405,10 @@ class QualityProjectService:
 
             # Persist project
             saved_project = await self._project_repository.save(project)
-            return FlextResult.ok(saved_project)
+            return FlextResult[None].ok(saved_project)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to create project: {e}")
+            return FlextResult[None].fail(f"Failed to create project: {e}")
 
     @flext_monitor_function("analyze_quality_project")
     async def analyze_project(
@@ -443,10 +443,10 @@ class QualityProjectService:
 
             # Persist analysis
             saved_analysis = await self._analysis_repository.save(completed_analysis)
-            return FlextResult.ok(saved_analysis)
+            return FlextResult[None].ok(saved_analysis)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to analyze project: {e}")
+            return FlextResult[None].fail(f"Failed to analyze project: {e}")
 ```
 
 #### CQRS Handler Pattern
@@ -559,14 +559,14 @@ class PostgreSQLQualityProjectRepository(QualityProjectRepository):
                 # ORM query implementation
                 result = await session.get(QualityProjectModel, project_id)
                 if not result:
-                    return FlextResult.fail(f"Project not found: {project_id}")
+                    return FlextResult[None].fail(f"Project not found: {project_id}")
 
                 # Convert ORM model to domain entity
                 project = self._to_domain_entity(result)
-                return FlextResult.ok(project)
+                return FlextResult[None].ok(project)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to get project: {e}")
+            return FlextResult[None].fail(f"Failed to get project: {e}")
 
     async def save(self, project: QualityProject) -> FlextResult[QualityProject]:
         """Save project."""
@@ -578,10 +578,10 @@ class PostgreSQLQualityProjectRepository(QualityProjectRepository):
                 await session.commit()
 
                 # Return domain entity
-                return FlextResult.ok(project)
+                return FlextResult[None].ok(project)
 
         except Exception as e:
-            return FlextResult.fail(f"Failed to save project: {e}")
+            return FlextResult[None].fail(f"Failed to save project: {e}")
 
     def _to_domain_entity(self, model: QualityProjectModel) -> QualityProject:
         """Convert ORM model to domain entity."""
@@ -854,7 +854,7 @@ class QualityAPI:
         )
 
         if result.success:
-            return FlextResult.ok({
+            return FlextResult[None].ok({
                 'id': result.data.id,
                 'name': result.data.name,
                 'path': result.data.project_path,
@@ -874,7 +874,7 @@ class QualityAPI:
 
         if result.success:
             analysis = result.data
-            return FlextResult.ok({
+            return FlextResult[None].ok({
                 'analysis_id': analysis.id,
                 'project_id': analysis.project_id,
                 'status': analysis.status.value,

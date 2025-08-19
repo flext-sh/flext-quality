@@ -29,8 +29,8 @@ class QualityProject(FlextEntity):
     def validate_standards(self) -> FlextResult[bool]:
         """Validate project standards using FlextResult pattern."""
         if not self.project_path:
-            return FlextResult.fail("Project path is required")
-        return FlextResult.ok(True)
+            return FlextResult[None].fail("Project path is required")
+        return FlextResult[None].ok(True)
 
 # Services return FlextResult for consistent error handling
 async def analyze_project(project_id: str) -> FlextResult[QualityAnalysis]:
@@ -39,7 +39,7 @@ async def analyze_project(project_id: str) -> FlextResult[QualityAnalysis]:
         result = await quality_service.analyze_project(project_id)
         return result
     except Exception as e:
-        return FlextResult.fail(f"Analysis failed: {e}")
+        return FlextResult[None].fail(f"Analysis failed: {e}")
 ```
 
 ### flext-observability Integration

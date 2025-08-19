@@ -297,15 +297,15 @@ async def execute_analysis(
 
         # Success path
         await self._publish_analysis_completed_event(analysis)
-        return FlextResult.ok(analysis)
+        return FlextResult[None].ok(analysis)
 
     except AnalysisTimeoutError as e:
-        return FlextResult.fail(f"Analysis timeout: {e}")
+        return FlextResult[None].fail(f"Analysis timeout: {e}")
     except InsufficientResourcesError as e:
-        return FlextResult.fail(f"Resource limitation: {e}")
+        return FlextResult[None].fail(f"Resource limitation: {e}")
     except Exception as e:
         logger.exception("Unexpected error during analysis")
-        return FlextResult.fail(f"Analysis failed: {e}")
+        return FlextResult[None].fail(f"Analysis failed: {e}")
 ```
 
 ### Retry and Circuit Breaker Patterns

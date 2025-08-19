@@ -115,9 +115,9 @@ class DjangoQualityProjectRepository(QualityProjectRepository):
         try:
             django_model = await self._to_django_model(project)
             await django_model.asave()
-            return FlextResult.ok(project)
+            return FlextResult[None].ok(project)
         except Exception as e:
-            return FlextResult.fail(f"Failed to save project: {e}")
+            return FlextResult[None].fail(f"Failed to save project: {e}")
 ```
 
 #### **Option 2: Pure Repository Pattern**
@@ -157,9 +157,9 @@ class RuffAnalyzerAdapter(SecurityAnalyzerService):
             # Convert ruff output to domain QualityIssue entities
             issues = self._convert_to_quality_issues(result)
 
-            return FlextResult.ok(issues)
+            return FlextResult[None].ok(issues)
         except Exception as e:
-            return FlextResult.fail(f"Ruff analysis failed: {e}")
+            return FlextResult[None].fail(f"Ruff analysis failed: {e}")
 
     async def _execute_ruff(self, project_path: str) -> dict:
         """Execute ruff analysis with timeout and error handling."""
@@ -258,9 +258,9 @@ class FlextObservabilityAdapter:
                 }
             )
 
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         except Exception as e:
-            return FlextResult.fail(f"Failed to publish metrics: {e}")
+            return FlextResult[None].fail(f"Failed to publish metrics: {e}")
 ```
 
 #### **NotificationAdapter**
@@ -310,9 +310,9 @@ class EventPublisherAdapter:
                 message=event_data
             )
 
-            return FlextResult.ok(None)
+            return FlextResult[None].ok(None)
         except Exception as e:
-            return FlextResult.fail(f"Failed to publish event: {e}")
+            return FlextResult[None].fail(f"Failed to publish event: {e}")
 ```
 
 ## File System Abstractions
@@ -336,7 +336,7 @@ class ProjectFileSystemAdapter:
         try:
             # Validate path is within allowed directories
             if not self._is_path_allowed(project_path):
-                return FlextResult.fail(f"Path not allowed: {project_path}")
+                return FlextResult[None].fail(f"Path not allowed: {project_path}")
 
             python_files = []
             project_dir = Path(project_path)
@@ -348,9 +348,9 @@ class ProjectFileSystemAdapter:
 
                 python_files.append(py_file)
 
-            return FlextResult.ok(python_files)
+            return FlextResult[None].ok(python_files)
         except Exception as e:
-            return FlextResult.fail(f"Failed to list files: {e}")
+            return FlextResult[None].fail(f"Failed to list files: {e}")
 
     def _is_path_allowed(self, path: str) -> bool:
         """Validate path against security allowlist."""
@@ -386,15 +386,15 @@ class CircuitBreakerAdapter:
             if self._should_attempt_reset():
                 self._state = "HALF_OPEN"
             else:
-                return FlextResult.fail("Circuit breaker is open")
+                return FlextResult[None].fail("Circuit breaker is open")
 
         try:
             result = await operation()
             self._on_success()
-            return FlextResult.ok(result)
+            return FlextResult[None].ok(result)
         except Exception as e:
             self._on_failure()
-            return FlextResult.fail(f"Operation failed: {e}")
+            return FlextResult[None].fail(f"Operation failed: {e}")
 ```
 
 ### Retry Logic
@@ -428,7 +428,7 @@ class MockRuffAnalyzerAdapter(SecurityAnalyzerService):
 
     async def analyze_project(self, project_path: str) -> FlextResult[list[QualityIssue]]:
         self.analyzed_projects.append(project_path)
-        return FlextResult.ok(self.mock_issues.copy())
+        return FlextResult[None].ok(self.mock_issues.copy())
 
     def set_mock_issues(self, issues: list[QualityIssue]) -> None:
         """Configure mock issues for testing scenarios."""

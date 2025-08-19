@@ -132,8 +132,8 @@ class QualityProject(FlextEntity):
     def validate_standards(self) -> FlextResult[bool]:
         """Domain validation using FlextResult pattern."""
         if not self.project_path:
-            return FlextResult.fail("Project path is required")
-        return FlextResult.ok(True)
+            return FlextResult[None].fail("Project path is required")
+        return FlextResult[None].ok(True)
 
 # Application Services
 class QualityProjectService:
@@ -147,9 +147,9 @@ class QualityProjectService:
             validation = project.validate_standards()
             if not validation.success:
                 return validation
-            return FlextResult.ok(project)
+            return FlextResult[None].ok(project)
         except Exception as e:
-            return FlextResult.fail(f"Failed to create project: {e}")
+            return FlextResult[None].fail(f"Failed to create project: {e}")
 ```
 
 ### Clean Architecture Implementation
@@ -185,7 +185,7 @@ async def analyze_project(project_id: str) -> FlextResult[QualityAnalysis]:
         analysis = await self._run_analysis(project.data)
         return analysis
     except Exception as e:
-        return FlextResult.fail(f"Analysis failed: {e}")
+        return FlextResult[None].fail(f"Analysis failed: {e}")
 
 # ❌ INCORRECT: Throwing exceptions
 async def analyze_project_bad(project_id: str) -> QualityAnalysis:

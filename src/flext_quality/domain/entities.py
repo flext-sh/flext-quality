@@ -75,8 +75,8 @@ class QualityProject(FlextEntity):
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality project."""
         if not self.project_path:
-            return FlextResult.fail("Project path is required")
-        return FlextResult.ok(None)
+            return FlextResult[None].fail("Project path is required")
+        return FlextResult[None].ok(None)
 
     analysis_schedule: str | None = None  # cron format
 
@@ -212,8 +212,8 @@ class QualityAnalysis(FlextEntity):
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality analysis."""
         if not self.project_id:
-            return FlextResult.fail("Project ID is required")
-        return FlextResult.ok(None)
+            return FlextResult[None].fail("Project ID is required")
+        return FlextResult[None].ok(None)
 
 
 class QualityIssue(FlextEntity):
@@ -282,8 +282,8 @@ class QualityIssue(FlextEntity):
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality issue."""
         if not self.analysis_id:
-            return FlextResult.fail("Analysis ID is required")
-        return FlextResult.ok(None)
+            return FlextResult[None].fail("Analysis ID is required")
+        return FlextResult[None].ok(None)
 
 
 class QualityRule(FlextEntity):
@@ -326,8 +326,8 @@ class QualityRule(FlextEntity):
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality rule."""
         if not self.rule_id:
-            return FlextResult.fail("Rule ID is required")
-        return FlextResult.ok(None)
+            return FlextResult[None].fail("Rule ID is required")
+        return FlextResult[None].ok(None)
 
 
 class QualityReport(FlextEntity):
@@ -363,8 +363,8 @@ class QualityReport(FlextEntity):
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality report."""
         if not self.analysis_id:
-            return FlextResult.fail("Analysis ID is required")
-        return FlextResult.ok(None)
+            return FlextResult[None].fail("Analysis ID is required")
+        return FlextResult[None].ok(None)
 
 
 # Domain Events

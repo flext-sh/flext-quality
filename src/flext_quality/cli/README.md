@@ -174,7 +174,7 @@ class AnalyzeCommand(BaseCommand):
             )
 
             if result.success:
-                return FlextResult.ok({
+                return FlextResult[None].ok({
                     "analysis_id": result.data.id,
                     "quality_score": result.data.overall_score,
                     "quality_grade": result.data.quality_grade,
@@ -185,7 +185,7 @@ class AnalyzeCommand(BaseCommand):
                 return result.cast()
 
         except Exception as e:
-            return FlextResult.fail(f"Analysis execution failed: {e}")
+            return FlextResult[None].fail(f"Analysis execution failed: {e}")
 ```
 
 ### Click Integration
@@ -395,13 +395,13 @@ class EcosystemIntegration:
             # Query service registry
             services = await self._query_service_registry()
 
-            return FlextResult.ok({
+            return FlextResult[None].ok({
                 "flext-core": services.get("flext-core"),
                 "flext-observability": services.get("flext-observability"),
                 "flext-web": services.get("flext-web")
             })
         except Exception as e:
-            return FlextResult.fail(f"Service discovery failed: {e}")
+            return FlextResult[None].fail(f"Service discovery failed: {e}")
 ```
 
 ### Metrics Publishing
