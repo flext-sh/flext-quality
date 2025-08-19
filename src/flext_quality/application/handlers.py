@@ -99,7 +99,7 @@ class AnalyzeProjectHandler:
             )
 
             # Return the created analysis
-            return FlextResult.ok(analysis)
+            return FlextResult[None].ok(analysis)
 
         except Exception as e:
             flext_create_log_entry(
@@ -112,7 +112,7 @@ class AnalyzeProjectHandler:
                 },
             )
             logger.exception("Unexpected error in AnalyzeProjectHandler")
-            return FlextResult.fail(f"Unexpected error: {e!s}")
+            return FlextResult[None].fail(f"Unexpected error: {e!s}")
 
 
 class GenerateReportHandler:
@@ -140,7 +140,7 @@ class GenerateReportHandler:
         report = report_result.data
 
         # Return the created report
-        return FlextResult.ok(report)
+        return FlextResult[None].ok(report)
 
 
 class RunLintingHandler:
@@ -168,7 +168,7 @@ class RunLintingHandler:
         linting_issues = linting_result.data
 
         # Return linting results
-        return FlextResult.ok(linting_issues)
+        return FlextResult[None].ok(linting_issues)
 
 
 class RunSecurityCheckHandler:
@@ -196,4 +196,4 @@ class RunSecurityCheckHandler:
         security_issues = security_result.data
 
         # Return security analysis results
-        return FlextResult.ok(security_issues)
+        return FlextResult[None].ok(security_issues)

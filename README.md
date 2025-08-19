@@ -181,9 +181,9 @@ export QUALITY_MIN_SECURITY_SCORE=90.0
 async def create_analysis(self, project_id: str) -> FlextResult[QualityAnalysis]:
     try:
         analysis = QualityAnalysis(project_id=project_id)
-        return FlextResult.ok(analysis)
+        return FlextResult[None].ok(analysis)
     except Exception as e:
-        return FlextResult.fail(f"Analysis creation failed: {e}")
+        return FlextResult[None].fail(f"Analysis creation failed: {e}")
 ```
 
 ### **Service Integration**

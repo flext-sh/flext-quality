@@ -413,7 +413,7 @@ class QualityMetrics(FlextModel):
         """
         # Validate score consistency
         if self.overall_score < 0 or self.overall_score > MAX_QUALITY_SCORE:
-            return FlextResult.fail("Overall score must be between 0 and 100")
+            return FlextResult[None].fail("Overall score must be between 0 and 100")
 
         # Validate counts are non-negative
         if any(
@@ -429,7 +429,7 @@ class QualityMetrics(FlextModel):
                 self.complexity_issues_count,
             ]
         ):
-            return FlextResult.fail("All counts must be non-negative")
+            return FlextResult[None].fail("All counts must be non-negative")
 
         # Validate complexity scores
         if (
@@ -437,6 +437,6 @@ class QualityMetrics(FlextModel):
             or self.max_complexity < 0
             or self.max_complexity < self.average_complexity
         ):
-            return FlextResult.fail("Complexity scores must be valid")
+            return FlextResult[None].fail("Complexity scores must be valid")
 
-        return FlextResult.ok(None)
+        return FlextResult[None].ok(None)

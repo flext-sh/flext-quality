@@ -275,9 +275,9 @@ class QualityProjectService:
                 return validation_result
             # Storage
             self._projects[project.id] = project
-            return FlextResult.ok(project)
+            return FlextResult[None].ok(project)
         except Exception as e:
-            return FlextResult.fail(f"Failed to create project: {e}")
+            return FlextResult[None].fail(f"Failed to create project: {e}")
 ```
 
 ### Domain Entity Updates

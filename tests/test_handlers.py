@@ -143,6 +143,6 @@ class TestHandlerIntegration:
                 result = await handler.handle(test_id)
             else:
                 # Create a mock result for handlers without handle method
-                result = FlextResult.ok("Mock success")
+                result = FlextResult[None].ok("Mock success")
             assert result.success
             assert result.data is not None
