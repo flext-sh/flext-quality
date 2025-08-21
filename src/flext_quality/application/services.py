@@ -10,7 +10,7 @@ from __future__ import annotations
 from pathlib import Path
 from uuid import uuid4
 
-from flext_core import FlextResult
+from flext_core import FlextEntityId, FlextResult
 
 from flext_quality.backends.external_backend import ExternalBackend
 from flext_quality.domain.entities import (
@@ -65,7 +65,7 @@ class QualityProjectService:
         """
         try:
             project = QualityProject(
-                id=str(uuid4()),
+                id=FlextEntityId(str(uuid4())),
                 name=name,  # Use the name parameter
                 project_path=project_path,
                 repository_url=repository_url,
@@ -78,9 +78,9 @@ class QualityProjectService:
             )
 
             self._projects[str(project.id)] = project
-            return FlextResult[object].ok(project)
+            return FlextResult[QualityProject].ok(project)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to create project {e}")
+            return FlextResult[QualityProject].fail(f"Failed to create project {e}")
 
     async def get_project(
         self,
@@ -98,10 +98,12 @@ class QualityProjectService:
         try:
             project = self._projects.get(project_id)
             if project is None:
-                return FlextResult[object].fail(f"Project not found: {project_id}")
-            return FlextResult[object].ok(project)
+                return FlextResult[QualityProject].fail(
+                    f"Project not found: {project_id}"
+                )
+            return FlextResult[QualityProject].ok(project)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to get project {e}")
+            return FlextResult[QualityProject].fail(f"Failed to get project {e}")
 
     async def list_projects(self) -> FlextResult[list[QualityProject]]:
         """List all projects.
@@ -112,9 +114,11 @@ class QualityProjectService:
         """
         try:
             projects = list(self._projects.values())
-            return FlextResult[object].ok(projects)
+            return FlextResult[list[QualityProject]].ok(projects)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to list projects {e}")
+            return FlextResult[list[QualityProject]].fail(
+                f"Failed to list projects {e}"
+            )
 
     async def update_project(
         self,
@@ -134,7 +138,7 @@ class QualityProjectService:
         try:
             project = self._projects.get(project_id)
             if not project:
-                return FlextResult[object].fail("Project not found")
+                return FlextResult[QualityProject].fail("Project not found")
 
             # Use model_copy to create updated version (immutable pattern)
             updated_project = project.model_copy(update=updates)
@@ -142,9 +146,9 @@ class QualityProjectService:
             # Store the updated project
             self._projects[project_id] = updated_project
 
-            return FlextResult[object].ok(updated_project)
+            return FlextResult[QualityProject].ok(updated_project)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to update project: {e}")
+            return FlextResult[QualityProject].fail(f"Failed to update project: {e}")
 
     async def delete_project(self, project_id: str) -> FlextResult[bool]:
         """Delete a project.
@@ -159,10 +163,11 @@ class QualityProjectService:
         try:
             if project_id in self._projects:
                 del self._projects[project_id]
-                return FlextResult[object].ok(True)
-            return FlextResult[object].fail("Project not found")
+                success = True
+                return FlextResult[bool].ok(success)
+            return FlextResult[bool].fail("Project not found")
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to delete project: {e}")
+            return FlextResult[bool].fail(f"Failed to delete project: {e}")
 
 
 # Simplified DI - removed decorator
@@ -197,11 +202,11 @@ class QualityAnalysisService:
         try:
             # Validate project_id
             if not project_id or not project_id.strip():
-                return FlextResult[object].fail("Project ID is required")
+                return FlextResult[QualityAnalysis].fail("Project ID is required")
 
             # Create real QualityAnalysis entity following flext-core patterns
             analysis = QualityAnalysis(
-                id=str(uuid4()),
+                id=FlextEntityId(str(uuid4())),
                 project_id=project_id,
                 commit_hash=commit_hash,
                 branch=branch,
@@ -213,9 +218,9 @@ class QualityAnalysisService:
             # Store in repository
             self._analyses[str(analysis.id)] = analysis
 
-            return FlextResult[object].ok(analysis)
+            return FlextResult[QualityAnalysis].ok(analysis)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to create analysis: {e}")
+            return FlextResult[QualityAnalysis].fail(f"Failed to create analysis: {e}")
 
     async def update_metrics(
         self,
@@ -243,7 +248,7 @@ class QualityAnalysisService:
         try:
             analysis = self._analyses.get(analysis_id)
             if not analysis:
-                return FlextResult[object].fail("Analysis not found")
+                return FlextResult[QualityAnalysis].fail("Analysis not found")
 
             # Use immutable update pattern following flext-core guidelines
             updated_analysis = analysis.model_copy(
@@ -259,9 +264,9 @@ class QualityAnalysisService:
             # Store updated analysis
             self._analyses[analysis_id] = updated_analysis
 
-            return FlextResult[object].ok(updated_analysis)
+            return FlextResult[QualityAnalysis].ok(updated_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to update metrics: {e}")
+            return FlextResult[QualityAnalysis].fail(f"Failed to update metrics: {e}")
 
     async def update_scores(
         self,
@@ -289,7 +294,7 @@ class QualityAnalysisService:
         try:
             analysis = self._analyses.get(analysis_id)
             if not analysis:
-                return FlextResult[object].fail("Analysis not found")
+                return FlextResult[QualityAnalysis].fail("Analysis not found")
 
             # Use immutable update pattern following flext-core guidelines
             updated_analysis = analysis.model_copy(
@@ -308,9 +313,9 @@ class QualityAnalysisService:
             # Store updated analysis
             self._analyses[analysis_id] = final_analysis
 
-            return FlextResult[object].ok(final_analysis)
+            return FlextResult[QualityAnalysis].ok(final_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to update scores: {e}")
+            return FlextResult[QualityAnalysis].fail(f"Failed to update scores: {e}")
 
     async def update_issue_counts(
         self,
@@ -336,7 +341,7 @@ class QualityAnalysisService:
         try:
             analysis = self._analyses.get(analysis_id)
             if not analysis:
-                return FlextResult[object].fail("Analysis not found")
+                return FlextResult[QualityAnalysis].fail("Analysis not found")
 
             # Use immutable update pattern following flext-core guidelines
             total_issues = critical + high + medium + low
@@ -353,9 +358,11 @@ class QualityAnalysisService:
             # Store updated analysis
             self._analyses[analysis_id] = updated_analysis
 
-            return FlextResult[object].ok(updated_analysis)
+            return FlextResult[QualityAnalysis].ok(updated_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to update issue counts: {e}")
+            return FlextResult[QualityAnalysis].fail(
+                f"Failed to update issue counts: {e}"
+            )
 
     async def complete_analysis(
         self,
@@ -373,7 +380,7 @@ class QualityAnalysisService:
         try:
             analysis = self._analyses.get(analysis_id)
             if not analysis:
-                return FlextResult[object].fail("Analysis not found")
+                return FlextResult[QualityAnalysis].fail("Analysis not found")
 
             # Use immutable update pattern following flext-core guidelines
             completed_analysis = analysis.complete_analysis()
@@ -381,9 +388,11 @@ class QualityAnalysisService:
             # Store updated analysis
             self._analyses[analysis_id] = completed_analysis
 
-            return FlextResult[object].ok(completed_analysis)
+            return FlextResult[QualityAnalysis].ok(completed_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to complete analysis: {e}")
+            return FlextResult[QualityAnalysis].fail(
+                f"Failed to complete analysis: {e}"
+            )
 
     async def fail_analysis(
         self,
@@ -403,7 +412,7 @@ class QualityAnalysisService:
         try:
             analysis = self._analyses.get(analysis_id)
             if not analysis:
-                return FlextResult[object].fail("Analysis not found")
+                return FlextResult[QualityAnalysis].fail("Analysis not found")
 
             # Use immutable update pattern following flext-core guidelines
             failed_analysis = analysis.fail_analysis(error)
@@ -411,9 +420,9 @@ class QualityAnalysisService:
             # Store updated analysis
             self._analyses[analysis_id] = failed_analysis
 
-            return FlextResult[object].ok(failed_analysis)
+            return FlextResult[QualityAnalysis].ok(failed_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to fail analysis: {e}")
+            return FlextResult[QualityAnalysis].fail(f"Failed to fail analysis: {e}")
 
     async def get_analysis(
         self,
@@ -431,10 +440,12 @@ class QualityAnalysisService:
         try:
             analysis = self._analyses.get(analysis_id)
             if analysis is None:
-                return FlextResult[object].fail(f"Analysis not found: {analysis_id}")
-            return FlextResult[object].ok(analysis)
+                return FlextResult[QualityAnalysis].fail(
+                    "Analysis not found: " + analysis_id
+                )
+            return FlextResult[QualityAnalysis].ok(analysis)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to get analysis: {e}")
+            return FlextResult[QualityAnalysis].fail(f"Failed to get analysis: {e}")
 
     async def list_analyses(
         self,
@@ -455,9 +466,11 @@ class QualityAnalysisService:
             ]
             # Sort by started_at descending
             analyses.sort(key=lambda a: a.started_at, reverse=True)
-            return FlextResult[object].ok(analyses)
+            return FlextResult[list[QualityAnalysis]].ok(analyses)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to list analyses: {e}")
+            return FlextResult[list[QualityAnalysis]].fail(
+                f"Failed to list analyses: {e}"
+            )
 
 
 # Simplified DI - removed decorator
@@ -505,7 +518,7 @@ class QualityIssueService:
         """
         try:
             issue = QualityIssue(
-                id=str(uuid4()),
+                id=FlextEntityId(str(uuid4())),
                 analysis_id=analysis_id,
                 issue_type=IssueType(issue_type),
                 severity=IssueSeverity(severity),
@@ -521,9 +534,9 @@ class QualityIssueService:
             )
 
             self._issues[str(issue.id)] = issue
-            return FlextResult[object].ok(issue)
+            return FlextResult[QualityIssue].ok(issue)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to create issue: {e}")
+            return FlextResult[QualityIssue].fail(f"Failed to create issue: {e}")
 
     async def get_issue(self, issue_id: str) -> FlextResult[QualityIssue]:
         """Get an issue by ID.
@@ -538,10 +551,10 @@ class QualityIssueService:
         try:
             issue = self._issues.get(issue_id)
             if issue is None:
-                return FlextResult[object].fail(f"Issue not found: {issue_id}")
-            return FlextResult[object].ok(issue)
+                return FlextResult[QualityIssue].fail(f"Issue not found: {issue_id}")
+            return FlextResult[QualityIssue].ok(issue)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to get issue {e}")
+            return FlextResult[QualityIssue].fail(f"Failed to get issue {e}")
 
     async def list_issues(
         self,
@@ -574,9 +587,9 @@ class QualityIssueService:
             if file_path:
                 issues = [i for i in issues if i.file_path == file_path]
 
-            return FlextResult[object].ok(issues)
+            return FlextResult[list[QualityIssue]].ok(issues)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to list issues: {e}")
+            return FlextResult[list[QualityIssue]].fail(f"Failed to list issues: {e}")
 
     async def mark_fixed(self, issue_id: str) -> FlextResult[QualityIssue]:
         """Mark issue as fixed.
@@ -591,13 +604,13 @@ class QualityIssueService:
         try:
             issue = self._issues.get(issue_id)
             if not issue:
-                return FlextResult[object].fail("Issue not found")
+                return FlextResult[QualityIssue].fail("Issue not found")
 
             fixed_issue = issue.mark_fixed()
             self._issues[issue_id] = fixed_issue
-            return FlextResult[object].ok(fixed_issue)
+            return FlextResult[QualityIssue].ok(fixed_issue)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to mark issue as fixed: {e}")
+            return FlextResult[QualityIssue].fail(f"Failed to mark issue as fixed: {e}")
 
     async def suppress_issue(
         self,
@@ -617,13 +630,13 @@ class QualityIssueService:
         try:
             issue = self._issues.get(issue_id)
             if not issue:
-                return FlextResult[object].fail("Issue not found")
+                return FlextResult[QualityIssue].fail("Issue not found")
 
             suppressed_issue = issue.suppress(reason)
             self._issues[issue_id] = suppressed_issue
-            return FlextResult[object].ok(suppressed_issue)
+            return FlextResult[QualityIssue].ok(suppressed_issue)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to suppress issue: {e}")
+            return FlextResult[QualityIssue].fail(f"Failed to suppress issue: {e}")
 
     async def unsuppress_issue(self, issue_id: str) -> FlextResult[QualityIssue]:
         """Remove suppression from an issue.
@@ -638,13 +651,13 @@ class QualityIssueService:
         try:
             issue = self._issues.get(issue_id)
             if not issue:
-                return FlextResult[object].fail("Issue not found")
+                return FlextResult[QualityIssue].fail("Issue not found")
 
             unsuppressed_issue = issue.unsuppress()
             self._issues[issue_id] = unsuppressed_issue
-            return FlextResult[object].ok(unsuppressed_issue)
+            return FlextResult[QualityIssue].ok(unsuppressed_issue)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to unsuppress issue: {e}")
+            return FlextResult[QualityIssue].fail(f"Failed to unsuppress issue: {e}")
 
 
 # Simplified DI - removed decorator
@@ -678,7 +691,7 @@ class QualityReportService:
         """
         try:
             report = QualityReport(
-                id=str(uuid4()),
+                id=FlextEntityId(str(uuid4())),
                 analysis_id=analysis_id,
                 report_type=report_type,
                 report_format=report_format,
@@ -687,9 +700,9 @@ class QualityReportService:
             )
 
             self._reports[str(report.id)] = report
-            return FlextResult[object].ok(report)
+            return FlextResult[QualityReport].ok(report)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to create report: {e}")
+            return FlextResult[QualityReport].fail(f"Failed to create report: {e}")
 
     async def get_report(self, report_id: str) -> FlextResult[QualityReport]:
         """Get a report by ID.
@@ -704,12 +717,12 @@ class QualityReportService:
         try:
             report = self._reports.get(report_id)
             if report is None:
-                return FlextResult[object].fail(f"Report not found: {report_id}")
+                return FlextResult[QualityReport].fail(f"Report not found: {report_id}")
             updated_report = report.increment_access()
             self._reports[report_id] = updated_report
-            return FlextResult[object].ok(updated_report)
+            return FlextResult[QualityReport].ok(updated_report)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to get report: {e}")
+            return FlextResult[QualityReport].fail(f"Failed to get report: {e}")
 
     async def list_reports(
         self,
@@ -728,9 +741,9 @@ class QualityReportService:
             reports = [
                 r for r in self._reports.values() if r.analysis_id == analysis_id
             ]
-            return FlextResult[object].ok(reports)
+            return FlextResult[list[QualityReport]].ok(reports)
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to list reports {e}")
+            return FlextResult[list[QualityReport]].fail(f"Failed to list reports {e}")
 
     async def delete_report(self, report_id: str) -> FlextResult[bool]:
         """Delete a report.
@@ -745,10 +758,11 @@ class QualityReportService:
         try:
             if report_id in self._reports:
                 del self._reports[report_id]
-                return FlextResult[object].ok(True)
-            return FlextResult[object].fail("Report not found")
+                success = True
+                return FlextResult[bool].ok(success)
+            return FlextResult[bool].fail("Report not found")
         except (RuntimeError, ValueError, TypeError) as e:
-            return FlextResult[object].fail(f"Failed to delete report: {e}")
+            return FlextResult[bool].fail(f"Failed to delete report: {e}")
 
 
 # Implementation classes for dependency injection containers
@@ -771,6 +785,21 @@ class BasePortService:
         """Initialize base port service with optional dependencies."""
         self._port = port
         self._repository = repository
+
+    def _convert_to_typed_issues(
+        self, raw_issues: list[object]
+    ) -> list[dict[str, object]]:
+        """Convert raw issues to properly typed dict format."""
+        typed_issues: list[dict[str, object]] = []
+        for item in raw_issues:
+            if isinstance(item, dict):
+                # Ensure all dict values are properly typed
+                typed_dict: dict[str, object] = dict(item.items())
+                typed_issues.append(typed_dict)
+            else:
+                # Convert non-dict items to dict format
+                typed_issues.append({"raw": str(item)})
+        return typed_issues
 
 
 class AnalysisServiceImpl:
@@ -810,12 +839,16 @@ class SecurityAnalyzerServiceImpl(BasePortService):
                         code = py_file.read_text(encoding="utf-8")
                         result = backend.analyze(code, py_file, tool="bandit")
                         if "issues" in result and isinstance(result["issues"], list):
-                            security_issues.extend(result["issues"])
+                            # Safe conversion with type validation
+                            raw_issues = result.get("issues", [])
+                            if isinstance(raw_issues, list):
+                                issues_list = self._convert_to_typed_issues(raw_issues)
+                                security_issues.extend(issues_list)
                     except (OSError, UnicodeDecodeError):
                         # Skip files that can't be read
                         continue
 
-            return FlextResult[object].ok(
+            return FlextResult[dict[str, object]].ok(
                 {
                     "security_issues": security_issues,
                     "project_path": project_path,
@@ -824,7 +857,7 @@ class SecurityAnalyzerServiceImpl(BasePortService):
                 },
             )
         except Exception as e:
-            return FlextResult[object].fail(f"Security analysis failed: {e}")
+            return FlextResult[dict[str, object]].fail(f"Security analysis failed: {e}")
 
 
 class LintingServiceImpl(BasePortService):
@@ -847,12 +880,16 @@ class LintingServiceImpl(BasePortService):
                         code = py_file.read_text(encoding="utf-8")
                         result = backend.analyze(code, py_file, tool="ruff")
                         if "issues" in result and isinstance(result["issues"], list):
-                            linting_issues.extend(result["issues"])
+                            # Safe conversion with type validation
+                            raw_issues = result.get("issues", [])
+                            if isinstance(raw_issues, list):
+                                issues_list = self._convert_to_typed_issues(raw_issues)
+                                linting_issues.extend(issues_list)
                     except (OSError, UnicodeDecodeError):
                         # Skip files that can't be read
                         continue
 
-            return FlextResult[object].ok(
+            return FlextResult[dict[str, object]].ok(
                 {
                     "linting_issues": linting_issues,
                     "project_path": project_path,
@@ -861,7 +898,7 @@ class LintingServiceImpl(BasePortService):
                 },
             )
         except Exception as e:
-            return FlextResult[object].fail(f"Linting analysis failed: {e}")
+            return FlextResult[dict[str, object]].fail(f"Linting analysis failed: {e}")
 
 
 class ReportGeneratorServiceImpl:

@@ -43,10 +43,20 @@ class TestAnalyzeProject:
         mock_path.return_value.resolve.return_value = mock_path_instance
 
         mock_analyzer = MagicMock()
-        mock_analyzer.analyze_project.return_value = {
-            "issues": {},
-            "files_analyzed": 3,  # Mock some files analyzed
-        }
+        # Use real AnalysisResults type instead of dict mock
+        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
+
+        mock_analyzer.analyze_project.return_value = AnalysisResults(
+            overall_metrics=OverallMetrics(
+                files_analyzed=3,
+                total_lines=100,
+                quality_score=85.0,
+                coverage_score=90.0,
+                security_score=95.0,
+                maintainability_score=80.0,
+                complexity_score=75.0,
+            )
+        )
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer
 
@@ -100,10 +110,20 @@ class TestAnalyzeProject:
         mock_path.return_value.resolve.return_value = mock_path_instance
 
         mock_analyzer = MagicMock()
-        mock_analyzer.analyze_project.return_value = {
-            "issues": {},
-            "files_analyzed": 3,  # Mock some files analyzed
-        }
+        # Use real AnalysisResults type instead of dict mock
+        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
+
+        mock_analyzer.analyze_project.return_value = AnalysisResults(
+            overall_metrics=OverallMetrics(
+                files_analyzed=3,
+                total_lines=100,
+                quality_score=85.0,
+                coverage_score=90.0,
+                security_score=95.0,
+                maintainability_score=80.0,
+                complexity_score=75.0,
+            )
+        )
         mock_analyzer.get_quality_score.return_value = 70.0  # Medium quality
         mock_analyzer_class.return_value = mock_analyzer
 
@@ -144,10 +164,20 @@ class TestAnalyzeProject:
         mock_path.return_value.resolve.return_value = mock_path_instance
 
         mock_analyzer = MagicMock()
-        mock_analyzer.analyze_project.return_value = {
-            "issues": {},
-            "files_analyzed": 3,  # Mock some files analyzed
-        }
+        # Use real AnalysisResults type instead of dict mock
+        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
+
+        mock_analyzer.analyze_project.return_value = AnalysisResults(
+            overall_metrics=OverallMetrics(
+                files_analyzed=3,
+                total_lines=100,
+                quality_score=85.0,
+                coverage_score=90.0,
+                security_score=95.0,
+                maintainability_score=80.0,
+                complexity_score=75.0,
+            )
+        )
         mock_analyzer.get_quality_score.return_value = 40.0  # Poor quality
         mock_analyzer_class.return_value = mock_analyzer
 
@@ -205,10 +235,20 @@ class TestAnalyzeProject:
         mock_path.return_value.resolve.return_value = mock_path_instance
 
         mock_analyzer = MagicMock()
-        mock_analyzer.analyze_project.return_value = {
-            "issues": {},
-            "files_analyzed": 3,  # Mock some files analyzed
-        }
+        # Use real AnalysisResults type instead of dict mock
+        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
+
+        mock_analyzer.analyze_project.return_value = AnalysisResults(
+            overall_metrics=OverallMetrics(
+                files_analyzed=3,
+                total_lines=100,
+                quality_score=85.0,
+                coverage_score=90.0,
+                security_score=95.0,
+                maintainability_score=80.0,
+                complexity_score=75.0,
+            )
+        )
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer
 
@@ -250,10 +290,20 @@ class TestAnalyzeProject:
         mock_path.return_value.resolve.return_value = mock_path_instance
 
         mock_analyzer = MagicMock()
-        mock_analyzer.analyze_project.return_value = {
-            "issues": {},
-            "files_analyzed": 3,  # Mock some files analyzed
-        }
+        # Use real AnalysisResults type instead of dict mock
+        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
+
+        mock_analyzer.analyze_project.return_value = AnalysisResults(
+            overall_metrics=OverallMetrics(
+                files_analyzed=3,
+                total_lines=100,
+                quality_score=85.0,
+                coverage_score=90.0,
+                security_score=95.0,
+                maintainability_score=80.0,
+                complexity_score=75.0,
+            )
+        )
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer
 
@@ -373,12 +423,20 @@ class TestAnotherFunction:
         mock_path.return_value.resolve.return_value = mock_path_instance
 
         mock_analyzer = MagicMock()
-        mock_analyzer.analyze_project.return_value = {
-            "issues": {
-                "security": ["issue1"],
-                "complexity": ["issue2"],
-            },
-        }
+        # Use real AnalysisResults type instead of dict mock
+        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
+
+        mock_analyzer.analyze_project.return_value = AnalysisResults(
+            overall_metrics=OverallMetrics(
+                files_analyzed=3,
+                total_lines=100,
+                quality_score=60.0,  # Lower score due to issues
+                coverage_score=75.0,
+                security_score=50.0,  # Lower due to security issues
+                maintainability_score=60.0,
+                complexity_score=45.0,  # Lower due to complexity issues
+            )
+        )
         mock_analyzer.get_quality_score.return_value = 75.0  # Good score
         mock_analyzer.get_quality_grade.return_value = "B"
         mock_analyzer_class.return_value = mock_analyzer
@@ -414,12 +472,20 @@ class TestAnotherFunction:
         mock_path.return_value.resolve.return_value = mock_path_instance
 
         mock_analyzer = MagicMock()
-        mock_analyzer.analyze_project.return_value = {
-            "issues": {
-                "security": [],
-                "complexity": [],
-            },
-        }
+        # Use real AnalysisResults type instead of dict mock
+        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
+
+        mock_analyzer.analyze_project.return_value = AnalysisResults(
+            overall_metrics=OverallMetrics(
+                files_analyzed=3,
+                total_lines=100,
+                quality_score=95.0,  # High score, no issues
+                coverage_score=98.0,
+                security_score=100.0,  # Perfect, no security issues
+                maintainability_score=95.0,
+                complexity_score=90.0,  # Good, no complexity issues
+            )
+        )
         mock_analyzer.get_quality_score.return_value = 60.0  # Poor score
         mock_analyzer_class.return_value = mock_analyzer
 
@@ -590,10 +656,8 @@ class TestMainExecution:
     """Test main execution block."""
 
     @patch("flext_quality.cli.main")
-    @patch("sys.exit")
     def test_main_execution_block(
         self,
-        mock_exit: MagicMock,
         mock_main: MagicMock,
     ) -> None:
         """Test the if __name__ == '__main__' block."""

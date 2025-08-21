@@ -4,11 +4,60 @@ from __future__ import annotations
 
 import ast
 from pathlib import Path
+from typing import override
+
+from pydantic import BaseModel
 
 from flext_quality.backends.base import (
     BackendType,
     BaseAnalyzer,
 )
+
+
+class ClassInfo(BaseModel):
+    """Strongly-typed class information from AST analysis."""
+
+    name: str
+    full_name: str
+    file_path: str
+    package_name: str
+    line_number: int
+    end_line_number: int
+    base_classes: list[str]
+    decorators: list[str]
+    is_dataclass: bool
+    is_abstract: bool
+    has_docstring: bool
+    method_count: int
+    public_methods: int
+    private_methods: int
+    protected_methods: int
+    property_count: int = 0
+    class_method_count: int = 0
+    static_method_count: int = 0
+    complexity: int = 0
+
+
+class FunctionInfo(BaseModel):
+    """Strongly-typed function information from AST analysis."""
+
+    name: str
+    full_name: str
+    file_path: str
+    package_name: str
+    line_number: int
+    end_line_number: int
+    decorators: list[str]
+    is_async: bool
+    is_generator: bool
+    is_method: bool
+    is_property: bool
+    is_class_method: bool
+    is_static_method: bool
+    parameter_count: int
+    returns_annotation: str | None
+    complexity: int
+    docstring: str | None
 
 
 class ASTVisitor(ast.NodeVisitor):
@@ -18,21 +67,28 @@ class ASTVisitor(ast.NodeVisitor):
         """Initialize AST visitor with file path and package name."""
         self.file_path = file_path
         self.package_name = package_name
-        self.current_class: dict[str, object] | None = None
-        self.current_function: dict[str, object] | None = None
+        self.current_class: ClassInfo | None = None
+        self.current_function: FunctionInfo | None = None
         self.scope_stack: list[str] = []
 
-        # Results
-        self.classes: list[dict[str, object]] = []
-        self.functions: list[dict[str, object]] = []
-        self.variables: list[dict[str, object]] = []
-        self.imports: list[dict[str, object]] = []
-        self.constants: list[dict[str, object]] = []
+        # Results - using strongly typed models
+        self.classes: list[ClassInfo] = []
+        self.functions: list[FunctionInfo] = []
+        self.variables: list[
+            dict[str, object]
+        ] = []  # Keeping as generic dict with object values
+        self.imports: list[
+            dict[str, object]
+        ] = []  # Keeping as generic dict with object values
+        self.constants: list[
+            dict[str, object]
+        ] = []  # Keeping as generic dict with object values
 
         # Context tracking
-        self.class_stack: list[dict[str, object]] = []
-        self.function_stack: list[dict[str, object]] = []
+        self.class_stack: list[ClassInfo] = []
+        self.function_stack: list[FunctionInfo] = []
 
+    @override
     def visit_ClassDef(self, node: ast.ClassDef) -> None:
         """Visit a class definition."""
         # Extract class analysis into smaller helper methods
@@ -41,20 +97,20 @@ class ASTVisitor(ast.NodeVisitor):
         decorators, is_dataclass, is_abstract = self._analyze_class_decorators(node)
         method_counts = self._count_class_methods(node)
 
-        class_info = {
-            "name": node.name,
-            "full_name": full_name,
-            "file_path": str(self.file_path),
-            "package_name": self.package_name,
-            "line_number": node.lineno,
-            "end_line_number": getattr(node, "end_lineno", node.lineno),
-            "base_classes": base_classes,
-            "decorators": decorators,
-            "is_dataclass": is_dataclass,
-            "is_abstract": is_abstract,
-            "has_docstring": ast.get_docstring(node) is not None,
+        class_info = ClassInfo(
+            name=node.name,
+            full_name=full_name,
+            file_path=str(self.file_path),
+            package_name=self.package_name,
+            line_number=node.lineno,
+            end_line_number=getattr(node, "end_lineno", node.lineno),
+            base_classes=base_classes,
+            decorators=decorators,
+            is_dataclass=is_dataclass,
+            is_abstract=is_abstract,
+            has_docstring=ast.get_docstring(node) is not None,
             **method_counts,
-        }
+        )
 
         self.classes.append(class_info)
         self.class_stack.append(class_info)
@@ -67,26 +123,31 @@ class ASTVisitor(ast.NodeVisitor):
         self.class_stack.pop()
         self.current_class = self.class_stack[-1] if self.class_stack else None
 
+    @override
     def visit_FunctionDef(
         self,
         node: ast.FunctionDef | ast.AsyncFunctionDef,
     ) -> None:
         """Visit a function or method definition."""
-        function_info = {
-            "name": node.name,
-            "full_name": self._calculate_function_full_name(node),
-            "file_path": str(self.file_path),
-            "package_name": self.package_name,
-            "line_number": node.lineno,
-            "end_line_number": getattr(node, "end_lineno", node.lineno),
-            "is_async": isinstance(node, ast.AsyncFunctionDef),
-            "is_method": self.current_class is not None,
-            "class_name": self.current_class["name"] if self.current_class else None,
-            "has_docstring": ast.get_docstring(node) is not None,
-            "argument_count": len(node.args.args),
-            "has_type_hints": self._check_type_hints(node),
-            "cyclomatic_complexity": self._calculate_complexity(node),
-        }
+        function_info = FunctionInfo(
+            name=node.name,
+            full_name=self._calculate_function_full_name(node),
+            file_path=str(self.file_path),
+            package_name=self.package_name,
+            line_number=node.lineno,
+            end_line_number=getattr(node, "end_lineno", node.lineno),
+            decorators=[self._get_name_from_node(dec) for dec in node.decorator_list],
+            is_async=isinstance(node, ast.AsyncFunctionDef),
+            is_generator=self._check_is_generator(node),
+            is_method=self.current_class is not None,
+            is_property=self._check_is_property(node),
+            is_class_method=self._check_is_classmethod(node),
+            is_static_method=self._check_is_staticmethod(node),
+            parameter_count=len(node.args.args),
+            returns_annotation=self._get_return_annotation(node),
+            complexity=self._calculate_complexity(node),
+            docstring=ast.get_docstring(node),
+        )
 
         self.functions.append(function_info)
         self.function_stack.append(function_info)
@@ -99,6 +160,7 @@ class ASTVisitor(ast.NodeVisitor):
         self.function_stack.pop()
         self.current_function = self.function_stack[-1] if self.function_stack else None
 
+    @override
     def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
         """Visit an async function definition."""
         self.visit_FunctionDef(node)
@@ -106,7 +168,7 @@ class ASTVisitor(ast.NodeVisitor):
     def _calculate_class_full_name(self, node: ast.ClassDef) -> str:
         """Calculate the full name of a class."""
         if self.current_class:
-            return f"{self.current_class['full_name']}.{node.name}"
+            return f"{self.current_class.full_name}.{node.name}"
         return f"{self.package_name}.{node.name}" if self.package_name else node.name
 
     def _extract_base_classes(self, node: ast.ClassDef) -> list[str]:
@@ -149,7 +211,7 @@ class ASTVisitor(ast.NodeVisitor):
     ) -> str:
         """Calculate the full name of a function."""
         if self.current_class:
-            return f"{self.current_class['full_name']}.{node.name}"
+            return f"{self.current_class.full_name}.{node.name}"
         return f"{self.package_name}.{node.name}" if self.package_name else node.name
 
     def _check_type_hints(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
@@ -180,18 +242,61 @@ class ASTVisitor(ast.NodeVisitor):
             return f"{self._get_name_from_node(node.value)}.{node.attr}"
         return str(node)
 
+    def _check_is_generator(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+        """Check if function is a generator (contains yield)."""
+        for child in ast.walk(node):
+            if isinstance(child, (ast.Yield, ast.YieldFrom)):
+                return True
+        return False
+
+    def _check_is_property(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
+        """Check if function is a property."""
+        return any(
+            self._get_name_from_node(dec).endswith("property")
+            for dec in node.decorator_list
+        )
+
+    def _check_is_classmethod(
+        self, node: ast.FunctionDef | ast.AsyncFunctionDef
+    ) -> bool:
+        """Check if function is a classmethod."""
+        return any(
+            self._get_name_from_node(dec) == "classmethod"
+            for dec in node.decorator_list
+        )
+
+    def _check_is_staticmethod(
+        self, node: ast.FunctionDef | ast.AsyncFunctionDef
+    ) -> bool:
+        """Check if function is a staticmethod."""
+        return any(
+            self._get_name_from_node(dec) == "staticmethod"
+            for dec in node.decorator_list
+        )
+
+    def _get_return_annotation(
+        self, node: ast.FunctionDef | ast.AsyncFunctionDef
+    ) -> str | None:
+        """Get return type annotation as string."""
+        if node.returns:
+            return ast.unparse(node.returns)
+        return None
+
 
 class ASTBackend(BaseAnalyzer):
     """AST-based analysis backend."""
 
+    @override
     def get_backend_type(self) -> BackendType:
         """Return the backend type."""
         return BackendType.AST
 
+    @override
     def get_capabilities(self) -> list[str]:
         """Return the capabilities of this backend."""
         return ["complexity", "functions", "classes", "imports", "docstrings"]
 
+    @override
     def analyze(self, code: str, file_path: Path | None = None) -> dict[str, object]:
         """Analyze Python code using AST.
 
@@ -229,10 +334,10 @@ class ASTBackend(BaseAnalyzer):
 
     def _extract_functions(self, tree: ast.AST) -> list[dict[str, object]]:
         """Extract function information from AST."""
-        functions = []
+        functions: list[dict[str, object]] = []
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                func_info = {
+                func_info: dict[str, object] = {
                     "name": node.name,
                     "args": len(node.args.args),
                     "lineno": node.lineno,
@@ -243,7 +348,7 @@ class ASTBackend(BaseAnalyzer):
 
     def _extract_classes(self, tree: ast.AST) -> list[dict[str, object]]:
         """Extract class information from AST."""
-        classes = []
+        classes: list[dict[str, object]] = []
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
                 # Count methods
@@ -252,7 +357,7 @@ class ASTBackend(BaseAnalyzer):
                     for item in node.body
                     if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef))
                 )
-                class_info = {
+                class_info: dict[str, object] = {
                     "name": node.name,
                     "methods": methods,
                     "lineno": node.lineno,

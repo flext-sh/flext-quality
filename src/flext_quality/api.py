@@ -6,10 +6,12 @@ Provides clean API interface for all quality analysis operations.
 
 from __future__ import annotations
 
+from pathlib import Path
 from uuid import UUID
 
 from flext_core import FlextResult
 
+from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.application.services import (
     QualityAnalysisService,
     QualityIssueService,
@@ -596,41 +598,71 @@ class QualityAPI:
             branch=branch,
         )
 
-        if not result.success:
+        # Use is_failure for early return pattern (current flext-core API)
+        if result.is_failure:
             return result
+        analysis = result.value
 
-        analysis = result.data
+        # Get the project to access its path
+        project_result = await self.get_project(project_id)
+        if project_result.is_failure:
+            return FlextResult[QualityAnalysis].fail(
+                f"Failed to get project: {project_result.error}"
+            )
+
+        project = project_result.value
 
         # Integrate with real analysis tools using flext-core patterns
-        # For now, we'll just mark it as completed
+        # Execute real analysis using CodeAnalyzer
+        project_path = Path(project.project_path)
+        analyzer = CodeAnalyzer(project_path)
+        analysis_results = analyzer.analyze_project()
 
-        # Update with dummy metrics
+        # Update with real metrics from analysis
         await self.update_metrics(
             analysis_id=UUID(str(analysis.id)),
-            total_files=100,
-            total_lines=10000,
-            code_lines=7000,
-            comment_lines=2000,
-            blank_lines=1000,
+            total_files=analysis_results.overall_metrics.files_analyzed,
+            total_lines=analysis_results.overall_metrics.total_lines,
+            code_lines=analysis_results.overall_metrics.total_lines,  # CodeAnalyzer provides total lines
+            comment_lines=0,  # Would need detailed AST analysis
+            blank_lines=0,  # Would need detailed AST analysis
         )
 
-        # Update with dummy scores
+        # Update with real scores from analysis
         await self.update_scores(
             analysis_id=UUID(str(analysis.id)),
-            coverage_score=95.0,
-            complexity_score=85.0,
-            duplication_score=92.0,
-            security_score=98.0,
-            maintainability_score=88.0,
+            coverage_score=analysis_results.overall_metrics.coverage_score,
+            complexity_score=analysis_results.overall_metrics.complexity_score,
+            duplication_score=100.0
+            - len(analysis_results.duplication_issues),  # Convert issues to score
+            security_score=analysis_results.overall_metrics.security_score,
+            maintainability_score=analysis_results.overall_metrics.maintainability_score,
         )
 
-        # Update with dummy issue counts
+        # Count real issues by severity
+        critical_issues = len(
+            [i for i in analysis_results.security_issues if i.severity == "critical"],
+        )
+        high_issues = len(
+            [i for i in analysis_results.security_issues if i.severity == "high"],
+        )
+        medium_issues = len(
+            [i for i in analysis_results.security_issues if i.severity == "medium"],
+        )
+        low_issues = len(
+            [i for i in analysis_results.security_issues if i.severity == "low"],
+        )
+
+        # Add complexity issues to high priority
+        high_issues += len(analysis_results.complexity_issues)
+
+        # Update with real issue counts
         await self.update_issue_counts(
             analysis_id=UUID(str(analysis.id)),
-            critical=0,
-            high=2,
-            medium=5,
-            low=10,
+            critical=critical_issues,
+            high=high_issues,
+            medium=medium_issues,
+            low=low_issues,
         )
 
         # Complete the analysis

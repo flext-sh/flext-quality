@@ -8,6 +8,7 @@ import json
 import tempfile
 from importlib import import_module, util
 from pathlib import Path
+from typing import override
 
 from flext_quality.backends.base import (
     BackendType,
@@ -18,14 +19,17 @@ from flext_quality.backends.base import (
 class ExternalBackend(BaseAnalyzer):
     """Backend using external tools like ruff, mypy, bandit, vulture."""
 
+    @override
     def get_backend_type(self) -> BackendType:
         """Return the backend type."""
         return BackendType.EXTERNAL
 
+    @override
     def get_capabilities(self) -> list[str]:
         """Return the capabilities of this backend."""
         return ["ruff", "mypy", "bandit", "vulture"]
 
+    @override
     def analyze(
         self,
         code: str,
@@ -83,6 +87,21 @@ class ExternalBackend(BaseAnalyzer):
                 temp_path.unlink(missing_ok=True)
 
         return result
+
+    def _convert_result_to_typed_dicts(
+        self, result_list: list[object]
+    ) -> list[dict[str, object]]:
+        """Convert result list to properly typed dict format."""
+        typed_results: list[dict[str, object]] = []
+        for item in result_list:
+            if isinstance(item, dict):
+                # Ensure all dict values are properly typed as object
+                typed_dict: dict[str, object] = dict(item.items())
+                typed_results.append(typed_dict)
+            else:
+                # Convert non-dict items to dict format
+                typed_results.append({"raw": str(item)})
+        return typed_results
 
     def _run_ruff(self, code: str, file_path: Path) -> dict[str, object]:
         """Run ruff linter."""
@@ -189,16 +208,19 @@ class ExternalBackend(BaseAnalyzer):
         try:
             if output.strip():
                 result = json.loads(output)
-                # Ensure we return the proper type by casting the result
-                return result if isinstance(result, list) else []
+                # Safe type conversion
+                if isinstance(result, list):
+                    return self._convert_result_to_typed_dicts(result)
+                return []
             return []
         except json.JSONDecodeError:
             return []
 
     def _parse_mypy_output(self, output: str) -> list[dict[str, object]]:
         """Parse mypy text output."""
-        return [
-            {"message": line.strip()}
-            for line in output.splitlines()
-            if "error:" in line or "warning:" in line
-        ]
+        issues: list[dict[str, object]] = []
+        for line in output.splitlines():
+            if "error:" in line or "warning:" in line:
+                issue: dict[str, object] = {"message": line.strip()}
+                issues.append(issue)
+        return issues

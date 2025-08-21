@@ -23,15 +23,9 @@ from flext_quality.application.services import (
 )
 from flext_quality.domain.entities import QualityAnalysis, QualityReport
 
-
-def _noop(*_args: object, **_kwargs: object) -> None:
-    return None
-
-
-flext_create_log_entry = (
-    _flext_create_log_entry if callable(_flext_create_log_entry) else _noop
-)
-flext_create_trace = _flext_create_trace if callable(_flext_create_trace) else _noop
+# Use flext-observability directly - no fallbacks
+flext_create_log_entry = _flext_create_log_entry
+flext_create_trace = _flext_create_trace
 
 logger = get_logger(__name__)
 
@@ -51,19 +45,16 @@ class AnalyzeProjectHandler:
         """Handle project analysis command."""
         # Create trace for observability (optional dependency)
         flext_create_trace(
-            trace_id=f"analyze_project_{project_id}",
-            operation="AnalyzeProjectHandler.handle",
+            operation_name="AnalyzeProjectHandler.handle",
+            service_name="flext-quality",
             config={"project_id": str(project_id)},
         )
 
         # Log operation start
         flext_create_log_entry(
             message=f"Starting project analysis for {project_id}",
+            service="flext-quality",
             level="info",
-            context={
-                "handler": "AnalyzeProjectHandler",
-                "project_id": str(project_id),
-            },
         )
 
         try:
@@ -75,44 +66,35 @@ class AnalyzeProjectHandler:
                 project_id=project_id_str,
             )
 
+            # Use is_failure for early return pattern (current flext-core API)
             if analysis_result.is_failure:
                 flext_create_log_entry(
                     message=f"Failed to create analysis: {analysis_result.error}",
+                    service="flext-quality",
                     level="error",
-                    context={
-                        "handler": "AnalyzeProjectHandler",
-                        "project_id": str(project_id),
-                    },
                 )
                 return analysis_result
 
-            analysis = analysis_result.data
+            # Safe value extraction using current API
+            analysis = analysis_result.value
 
             flext_create_log_entry(
                 message=f"Successfully created analysis for project {project_id}",
+                service="flext-quality",
                 level="info",
-                context={
-                    "handler": "AnalyzeProjectHandler",
-                    "project_id": str(project_id),
-                    "analysis_id": getattr(analysis, "id", None),
-                },
             )
 
             # Return the created analysis
-            return FlextResult[None].ok(analysis)
+            return FlextResult[QualityAnalysis].ok(analysis)
 
         except Exception as e:
             flext_create_log_entry(
                 message=f"Unexpected error in AnalyzeProjectHandler: {e!s}",
+                service="flext-quality",
                 level="error",
-                context={
-                    "handler": "AnalyzeProjectHandler",
-                    "project_id": str(project_id),
-                    "error": str(e),
-                },
             )
             logger.exception("Unexpected error in AnalyzeProjectHandler")
-            return FlextResult[None].fail(f"Unexpected error: {e!s}")
+            return FlextResult[QualityAnalysis].fail(f"Unexpected error: {e!s}")
 
 
 class GenerateReportHandler:
@@ -134,13 +116,15 @@ class GenerateReportHandler:
             report_format="html",
         )
 
+        # Use is_failure for early return pattern (current flext-core API)
         if report_result.is_failure:
             return report_result
 
-        report = report_result.data
+        # Safe value extraction using current API
+        report = report_result.value
 
         # Return the created report
-        return FlextResult[None].ok(report)
+        return FlextResult[QualityReport].ok(report)
 
 
 class RunLintingHandler:
@@ -162,13 +146,15 @@ class RunLintingHandler:
         # Run linting analysis
         linting_result = await self._linting_service.run_linting(project_path)
 
+        # Use is_failure for early return pattern (current flext-core API)
         if linting_result.is_failure:
             return linting_result
 
-        linting_issues = linting_result.data
+        # Safe value extraction using current API
+        linting_issues = linting_result.value
 
         # Return linting results
-        return FlextResult[None].ok(linting_issues)
+        return FlextResult[dict[str, object]].ok(linting_issues)
 
 
 class RunSecurityCheckHandler:
@@ -190,10 +176,12 @@ class RunSecurityCheckHandler:
         # Run security analysis
         security_result = await self._security_service.analyze_security(project_path)
 
+        # Use is_failure for early return pattern (current flext-core API)
         if security_result.is_failure:
             return security_result
 
-        security_issues = security_result.data
+        # Safe value extraction using current API
+        security_issues = security_result.value
 
         # Return security analysis results
-        return FlextResult[None].ok(security_issues)
+        return FlextResult[dict[str, object]].ok(security_issues)

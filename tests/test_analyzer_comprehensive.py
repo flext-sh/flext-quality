@@ -447,10 +447,7 @@ def handle_data(data):
             assert isinstance(issues, list)
             assert len(issues) == 0
 
-    def test_analyze_duplicates_single_file(
-        self,
-        temporary_project_structure: str,
-    ) -> None:
+    def test_analyze_duplicates_single_file(self) -> None:
         """Test _analyze_duplicates with single file (no duplicates possible)."""
         # Create directory with only one file
         with tempfile.TemporaryDirectory() as temp_dir:

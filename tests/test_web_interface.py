@@ -12,35 +12,33 @@ from flext_quality import QualityWebInterface, main
 class TestQualityWebInterface:
     """Test Quality Web Interface class."""
 
-    @patch("flext_quality.web_interface.get_web_settings")
-    @patch("flext_quality.web_interface.create_service")
-    def test_init(
-        self,
-        mock_create_service: MagicMock,
-        mock_get_settings: MagicMock,
-    ) -> None:
+    def test_init(self) -> None:
         """Test QualityWebInterface initialization."""
-        # Setup mocks
-        mock_config = MagicMock()
-        mock_get_settings.return_value = mock_config
+        with (
+            patch("flext_quality.web.get_web_settings") as mock_get_settings,
+            patch("flext_quality.web.create_service") as mock_create_service,
+        ):
+            # Setup mocks
+            mock_config = MagicMock()
+            mock_get_settings.return_value = mock_config
 
-        mock_service = MagicMock()
-        mock_app = Flask(__name__)
-        mock_service.app = mock_app
-        mock_create_service.return_value = mock_service
+            mock_service = MagicMock()
+            mock_app = Flask(__name__)
+            mock_service.app = mock_app
+            mock_create_service.return_value = mock_service
 
-        # Create interface
-        interface = QualityWebInterface()
+            # Create interface
+            interface = QualityWebInterface()
 
-        # Verify initialization
-        assert interface.config == mock_config
-        assert interface.web_service == mock_service
-        assert interface.quality_api is not None
-        mock_get_settings.assert_called_once()
-        mock_create_service.assert_called_once_with(mock_config)
+            # Verify initialization
+            assert interface.config == mock_config
+            assert interface.web_service == mock_service
+            assert interface.quality_api is not None
+            mock_get_settings.assert_called_once()
+            mock_create_service.assert_called_once_with(mock_config)
 
-    @patch("flext_quality.web_interface.get_web_settings")
-    @patch("flext_quality.web_interface.create_service")
+    @patch("flext_quality.web.get_web_settings")
+    @patch("flext_quality.web.create_service")
     def test_register_routes(
         self,
         mock_create_service: MagicMock,
@@ -66,8 +64,8 @@ class TestQualityWebInterface:
         mock_app.route.assert_any_call("/api/quality/metrics", methods=["GET"])
         mock_app.route.assert_any_call("/api/quality/report/<format>", methods=["GET"])
 
-    @patch("flext_quality.web_interface.get_web_settings")
-    @patch("flext_quality.web_interface.create_service")
+    @patch("flext_quality.web.get_web_settings")
+    @patch("flext_quality.web.create_service")
     def test_quality_dashboard(
         self,
         mock_create_service: MagicMock,
@@ -96,8 +94,8 @@ class TestQualityWebInterface:
         assert "Quality Score" in html
         assert "Issues Found" in html
 
-    @patch("flext_quality.web_interface.get_web_settings")
-    @patch("flext_quality.web_interface.create_service")
+    @patch("flext_quality.web.get_web_settings")
+    @patch("flext_quality.web.create_service")
     def test_analyze_project(
         self,
         mock_create_service: MagicMock,
@@ -131,9 +129,9 @@ class TestQualityWebInterface:
             # We just verify the method runs without error
             assert result is not None
 
-    @patch("flext_quality.web_interface.get_web_settings")
-    @patch("flext_quality.web_interface.create_service")
-    @patch("flext_quality.web_interface.jsonify")
+    @patch("flext_quality.web.get_web_settings")
+    @patch("flext_quality.web.create_service")
+    @patch("flext_quality.web.jsonify")
     def test_get_metrics(
         self,
         mock_jsonify: MagicMock,
@@ -167,9 +165,9 @@ class TestQualityWebInterface:
         assert "coverage" in call_args["data"]
         assert "complexity" in call_args["data"]
 
-    @patch("flext_quality.web_interface.get_web_settings")
-    @patch("flext_quality.web_interface.create_service")
-    @patch("flext_quality.web_interface.jsonify")
+    @patch("flext_quality.web.get_web_settings")
+    @patch("flext_quality.web.create_service")
+    @patch("flext_quality.web.jsonify")
     def test_get_report_valid_format(
         self,
         mock_jsonify: MagicMock,
@@ -202,9 +200,9 @@ class TestQualityWebInterface:
         assert "data" in call_args
         assert call_args["data"]["format"] == "json"
 
-    @patch("flext_quality.web_interface.get_web_settings")
-    @patch("flext_quality.web_interface.create_service")
-    @patch("flext_quality.web_interface.jsonify")
+    @patch("flext_quality.web.get_web_settings")
+    @patch("flext_quality.web.create_service")
+    @patch("flext_quality.web.jsonify")
     def test_get_report_invalid_format(
         self,
         mock_jsonify: MagicMock,
@@ -241,9 +239,9 @@ class TestQualityWebInterface:
         # Verify error response - get_report returns tuple
         assert result == ("error_response", 400)
 
-    @patch("flext_quality.web_interface.get_web_settings")
-    @patch("flext_quality.web_interface.create_service")
-    @patch("flext_quality.web_interface.logger")
+    @patch("flext_quality.web.get_web_settings")
+    @patch("flext_quality.web.create_service")
+    @patch("flext_quality.web.logger")
     def test_run(
         self,
         mock_logger: MagicMock,
@@ -273,7 +271,7 @@ class TestQualityWebInterface:
         )
         mock_logger.info.assert_called()
 
-    @patch("flext_quality.web_interface.QualityWebInterface")
+    @patch("flext_quality.web.QualityWebInterface")
     def test_main(self, mock_interface_class: MagicMock) -> None:
         """Test main function."""
         # Setup mock

@@ -26,8 +26,8 @@ class TestDIContainer:
 
         # Retrieve service
         get_result = container.get("quality_service")
-        assert get_result.success
-        assert get_result.data == test_service
+        service = get_result.unwrap_or(None)
+        assert service == test_service
 
     def test_quality_service_registration(self) -> None:
         """Test registering quality-specific services."""
@@ -35,7 +35,7 @@ class TestDIContainer:
 
         # Register a quality analysis service (mock)
         class MockQualityAnalyzer:
-            def analyze(self, code: str) -> dict:
+            def analyze(self, _code: str) -> dict[str, object]:
                 return {"quality_score": 85, "issues": []}
 
         analyzer = MockQualityAnalyzer()
@@ -44,8 +44,8 @@ class TestDIContainer:
 
         # Retrieve and test
         get_result = container.get("quality_analyzer")
-        assert get_result.success
-        retrieved_analyzer = get_result.data
+        retrieved_analyzer = get_result.unwrap_or(None)
+        assert retrieved_analyzer is not None
         assert hasattr(retrieved_analyzer, "analyze")
 
         # Test functionality

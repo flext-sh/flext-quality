@@ -16,7 +16,7 @@ from flext_core import get_logger
 
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.reports import QualityReport
-from flext_quality.web_interface import QualityWebInterface
+from flext_quality.web import QualityWebInterface
 
 
 def setup_logging(level: str = "INFO") -> None:
@@ -69,8 +69,8 @@ def analyze_project(args: argparse.Namespace) -> int:
             include_duplicates=args.include_duplicates,
         )
         # Check if any files were analyzed
-        files_analyzed = results.get("files_analyzed", 0)
-        if isinstance(files_analyzed, (int, float)) and files_analyzed == 0:
+        files_analyzed = results.overall_metrics.files_analyzed
+        if files_analyzed == 0:
             return 1  # Error: no files to analyze
 
         # Generate report
@@ -116,7 +116,7 @@ def score_project(args: argparse.Namespace) -> int:
             return 1
         # Quick analysis
         analyzer = CodeAnalyzer(project_path)
-        results = analyzer.analyze_project(
+        analyzer.analyze_project(
             include_security=True,
             include_complexity=True,
             include_dead_code=False,  # Skip for speed
@@ -127,11 +127,7 @@ def score_project(args: argparse.Namespace) -> int:
 
         # Show results (print to stdout for CLI usage)
 
-        # Show issue counts
-        issues_obj = results.get("issues", {})
-        if isinstance(issues_obj, dict):
-            len(issues_obj.get("security", []))
-            len(issues_obj.get("complexity", []))
+        # Issue counts available via results.total_issues property
 
         # Constants for quality thresholds
         acceptable_quality_threshold = 70
@@ -144,7 +140,7 @@ def score_project(args: argparse.Namespace) -> int:
 
 
 def another_function(args: argparse.Namespace) -> int:
-    """Compatibility alias for the 'score' command expected by tests.
+    """Compatibility alias for the 'score' command.
 
     Delegates to `score_project` to compute a quick project quality score.
     """
@@ -230,7 +226,7 @@ Examples:
     # Score command
     score_parser = subparsers.add_parser("score", help="Get quick quality score")
     score_parser.add_argument("path", help="Path to the project to analyze")
-    # Keep historical test contract: use another_function as entrypoint
+    # Use another_function as entrypoint for compatibility
     score_parser.set_defaults(func=another_function)
 
     # Web server command

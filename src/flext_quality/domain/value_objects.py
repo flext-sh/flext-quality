@@ -9,7 +9,7 @@ from __future__ import annotations
 from enum import StrEnum
 from pathlib import Path
 
-from flext_core import FlextValueObject
+from flext_core import FlextResult, FlextValueObject
 from pydantic import Field, field_validator
 
 # Using flext-core patterns consistently
@@ -39,10 +39,15 @@ class QualityThresholds:
     COMPLEXITY_SIMPLE_MAX = 5
     COMPLEXITY_MODERATE_MAX = 10
     COMPLEXITY_COMPLEX_MAX = 20
+    COMPLEXITY_CYCLOMATIC_MAX = 50
 
     # Coverage and quality thresholds
     COVERAGE_EXCELLENT = 95.0
+    COVERAGE_PERCENTAGE_MAX = 100.0
     DUPLICATION_LOW_MAX = 5.0
+
+    # File system limits
+    FILE_PATH_MAX_LENGTH = 4096
 
 
 class IssueSeverity(StrEnum):
@@ -177,14 +182,25 @@ class FilePath(FlextValueObject):
         """
         return str(self.path.parent)
 
+    def validate_business_rules(self) -> FlextResult[None]:
+        """Validate file path business rules."""
+        if not self.value:
+            return FlextResult[None].fail("File path cannot be empty")
+        if len(self.value) > QualityThresholds.FILE_PATH_MAX_LENGTH:
+            return FlextResult[None].fail(
+                f"File path too long (>{QualityThresholds.FILE_PATH_MAX_LENGTH} characters)"
+            )
+
+        return FlextResult[None].ok(None)
+
 
 class IssueLocation(FlextValueObject):
     """Location of an issue in a file."""
 
     line: int = Field(..., description="Line number", ge=1)
     column: int = Field(default=1, description="Column number", ge=1)
-    end_line: int | None = Field(None, description="End line number", ge=1)
-    end_column: int | None = Field(None, description="End column number", ge=1)
+    end_line: int | None = Field(default=None, description="End line number", ge=1)
+    end_column: int | None = Field(default=None, description="End column number", ge=1)
 
     @field_validator("end_line", mode="before")
     @classmethod
@@ -217,6 +233,19 @@ class IssueLocation(FlextValueObject):
         if self.line == self.end_line:
             return f"line {self.line}, columns {self.column}-{self.end_column or 'end'}"
         return f"lines {self.line}-{self.end_line}"
+
+    def validate_business_rules(self) -> FlextResult[None]:
+        """Validate issue location business rules."""
+        if self.line < 1:
+            return FlextResult[None].fail("Line number must be positive")
+        if self.column < 1:
+            return FlextResult[None].fail("Column number must be positive")
+        if self.end_line is not None and self.end_line < self.line:
+            return FlextResult[None].fail("End line cannot be before start line")
+        if self.end_column is not None and self.end_column < 1:
+            return FlextResult[None].fail("End column must be positive")
+
+        return FlextResult[None].ok(None)
 
 
 class QualityScore(FlextValueObject):
@@ -268,6 +297,15 @@ class QualityScore(FlextValueObject):
             return QualityGrade.D_MINUS
         return QualityGrade.F
 
+    def validate_business_rules(self) -> FlextResult[None]:
+        """Validate quality score business rules."""
+        if self.value < 0.0 or self.value > QualityThresholds.COVERAGE_PERCENTAGE_MAX:
+            return FlextResult[None].fail(
+                f"Quality score must be between 0.0 and {QualityThresholds.COVERAGE_PERCENTAGE_MAX}"
+            )
+
+        return FlextResult[None].ok(None)
+
 
 class ComplexityMetric(FlextValueObject):
     """Complexity metric value object."""
@@ -305,6 +343,21 @@ class ComplexityMetric(FlextValueObject):
         if self.cyclomatic <= QualityThresholds.COMPLEXITY_COMPLEX_MAX:
             return "complex"
         return "very complex"
+
+    def validate_business_rules(self) -> FlextResult[None]:
+        """Validate complexity metric business rules."""
+        if self.cyclomatic < 1:
+            return FlextResult[None].fail("Cyclomatic complexity must be at least 1")
+        if self.cognitive < 0:
+            return FlextResult[None].fail("Cognitive complexity cannot be negative")
+        if self.max_depth < 0:
+            return FlextResult[None].fail("Max depth cannot be negative")
+        if self.cyclomatic > QualityThresholds.COMPLEXITY_CYCLOMATIC_MAX:
+            return FlextResult[None].fail(
+                f"Cyclomatic complexity too high (>{QualityThresholds.COMPLEXITY_CYCLOMATIC_MAX})"
+            )
+
+        return FlextResult[None].ok(None)
 
 
 class CoverageMetric(FlextValueObject):
@@ -354,6 +407,34 @@ class CoverageMetric(FlextValueObject):
         """
         return self.overall_coverage >= QualityThresholds.COVERAGE_EXCELLENT
 
+    def validate_business_rules(self) -> FlextResult[None]:
+        """Validate coverage metric business rules."""
+        # Pydantic validators handle range validation (0-100),
+        # so we only need business logic validation here
+        if (
+            self.line_coverage > QualityThresholds.COVERAGE_PERCENTAGE_MAX
+            or self.line_coverage < 0.0
+        ):
+            return FlextResult[None].fail(
+                f"Line coverage must be between 0% and {QualityThresholds.COVERAGE_PERCENTAGE_MAX}%"
+            )
+        if (
+            self.branch_coverage > QualityThresholds.COVERAGE_PERCENTAGE_MAX
+            or self.branch_coverage < 0.0
+        ):
+            return FlextResult[None].fail(
+                f"Branch coverage must be between 0% and {QualityThresholds.COVERAGE_PERCENTAGE_MAX}%"
+            )
+        if (
+            self.function_coverage > QualityThresholds.COVERAGE_PERCENTAGE_MAX
+            or self.function_coverage < 0.0
+        ):
+            return FlextResult[None].fail(
+                f"Function coverage must be between 0% and {QualityThresholds.COVERAGE_PERCENTAGE_MAX}%"
+            )
+
+        return FlextResult[None].ok(None)
+
 
 class DuplicationMetric(FlextValueObject):
     """Code duplication metric value object."""
@@ -395,3 +476,16 @@ class DuplicationMetric(FlextValueObject):
 
         """
         return self.duplication_percentage < QualityThresholds.DUPLICATION_LOW_MAX
+
+    def validate_business_rules(self) -> FlextResult[None]:
+        """Validate duplication metric business rules."""
+        if self.duplicate_lines < 0:
+            return FlextResult[None].fail("Duplicate lines cannot be negative")
+        if self.total_lines < 0:
+            return FlextResult[None].fail("Total lines cannot be negative")
+        if self.duplicate_blocks < 0:
+            return FlextResult[None].fail("Duplicate blocks cannot be negative")
+        if self.duplicate_lines > self.total_lines:
+            return FlextResult[None].fail("Duplicate lines cannot exceed total lines")
+
+        return FlextResult[None].ok(None)
