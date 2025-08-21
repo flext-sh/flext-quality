@@ -34,5 +34,5 @@ async def f(x: int) -> None:
     visitor.visit(code)
     assert any(c.name == "A" for c in visitor.classes)
     assert any(fn.name == "m" for fn in visitor.functions)
-    # ensure complexity captured for async function  
+    # ensure complexity captured for async function
     assert any(isinstance(fn.is_async, bool) for fn in visitor.functions)

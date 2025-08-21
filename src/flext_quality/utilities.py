@@ -194,7 +194,8 @@ def process_data_type_b(data):
         """Create files that will cause real analysis failures."""
         if error_type == "syntax_error":
             file_path.write_text(
-                "def broken_function(\n  # Missing closing parenthesis", encoding="utf-8"
+                "def broken_function(\n  # Missing closing parenthesis",
+                encoding="utf-8",
             )
         elif error_type == "encoding_error":
             # Create a file with invalid UTF-8

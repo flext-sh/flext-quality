@@ -262,7 +262,7 @@ class TestExceptionModuleExports:
         """Test that all exceptions can be imported from the module."""
         # Filter to only exception classes from __all__
         exception_names = [name for name in exceptions_all if "Error" in name]
-        
+
         for exception_name in exception_names:
             # Test that the exception class exists and is callable
             exception_class = getattr(exc_module, exception_name)

@@ -5,8 +5,8 @@ from __future__ import annotations
 import ast
 import tempfile
 from pathlib import Path
-from typing import Any, override
-from unittest.mock import MagicMock, patch
+from typing import override
+# Removed unused mock imports - using real implementations
 
 import pytest
 
@@ -120,7 +120,9 @@ class TestClass:
         assert len(functions) == 2  # hello_world + method
         assert len(classes) == 1
         # Check that hello_world is one of the functions
-        func_names = [f["name"] for f in functions if isinstance(f, dict) and "name" in f]
+        func_names = [
+            f["name"] for f in functions if isinstance(f, dict) and "name" in f
+        ]
         assert "hello_world" in func_names
         assert isinstance(classes[0], dict) and classes[0]["name"] == "TestClass"
 
@@ -185,11 +187,15 @@ class MyClass:
         imports = result["imports"]
         functions = result["functions"]
         classes = result["classes"]
-        
-        assert isinstance(complexity, (int, float)) and complexity > 5  # Should have high complexity
+
+        assert (
+            isinstance(complexity, (int, float)) and complexity > 5
+        )  # Should have high complexity
         assert isinstance(imports, list) and len(imports) == 2
         # ast.walk finds all functions including methods, so we get 4 total
-        assert isinstance(functions, list) and len(functions) == 4  # 1 top-level + 3 methods
+        assert (
+            isinstance(functions, list) and len(functions) == 4
+        )  # 1 top-level + 3 methods
         assert isinstance(classes, list) and len(classes) == 1
         assert isinstance(classes[0], dict) and classes[0]["methods"] == 3
 
@@ -449,28 +455,55 @@ class TestExternalBackend:
         assert "error" in result
 
     def test_analyze_with_file_path(self) -> None:
-        """Test analyze with actual file path."""
+        """Test analyze with actual file path using real code."""
         backend = ExternalBackend()
-
-        with patch("subprocess.run") as mock_run:
-            mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
-
-            result = backend.analyze("code", Path("/test/file.py"), tool="ruff")
-
+        
+        # Create a real temporary file with test code
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as tmp_file:
+            # Write sample code that might have ruff issues
+            tmp_file.write("""# Test file for analysis
+def test_function( ):
+    x=1+2+3+4+5+6+7+8+9+10+11+12+13+14+15+16+17+18+19+20
+    return x
+""")
+            tmp_path = Path(tmp_file.name)
+        
+        try:
+            # Run real analysis with ruff
+            result = backend.analyze("", tmp_path, tool="ruff")
+            
             assert "file_path" in result
-            assert result["file_path"] == "/test/file.py"
+            assert result["file_path"] == str(tmp_path)
+            # Should have analysis results (may include issues)
+            assert "issues" in result
+            
+        finally:
+            # Clean up
+            tmp_path.unlink(missing_ok=True)
 
     def test_analyze_default_tool(self) -> None:
-        """Test analyze with default tool (ruff)."""
+        """Test analyze with default tool (ruff) using real code."""
         backend = ExternalBackend()
-
-        with patch("subprocess.run") as mock_run:
-            mock_run.return_value = MagicMock(returncode=0, stdout="[]", stderr="")
-
+        
+        # Create a real temporary file with test code
+        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as tmp_file:
+            # Write simple valid Python code
+            tmp_file.write("""def hello():
+    '''Simple function.'''
+    return 'hello world'
+""")
+            tmp_path = Path(tmp_file.name)
+        
+        try:
             # Should use ruff by default
-            result = backend.analyze("test code")
-
+            result = backend.analyze("", tmp_path)
+            
             assert result["tool"] == "ruff"
+            assert "issues" in result
+            
+        finally:
+            # Clean up
+            tmp_path.unlink(missing_ok=True)
 
     def test_parse_ruff_output(self) -> None:
         """Test _parse_ruff_output method."""

@@ -11,14 +11,14 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import override
 
-from flext_core import FlextEntity, FlextResult, FlextValueObject
+from flext_core import FlextEntity, FlextResult, FlextValue
 from pydantic import Field
 
 from flext_quality.domain.value_objects import IssueSeverity, IssueType
 from flext_quality.typings import FlextTypes
 
 
-class FlextDomainEvent(FlextValueObject):
+class FlextDomainEvent(FlextValue):
     """Base class for domain events."""
 
     event_type: str

@@ -372,8 +372,12 @@ def process_data(data):
 
             # Resolve services using current API
             project_service_result = container.get("QualityProjectService")
-            project_service = project_service_result.value if project_service_result.success else QualityProjectService()
-            
+            project_service = (
+                project_service_result.value
+                if project_service_result.success
+                else QualityProjectService()
+            )
+
             analysis_service_result = container.get("QualityAnalysisService")
             analysis_service_result.value if analysis_service_result.success else QualityAnalysisService()
 

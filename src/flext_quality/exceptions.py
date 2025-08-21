@@ -66,85 +66,85 @@ class FlextQualityTimeoutError(FlextQualityError):
 
 class FlextQualityAnalysisError(FlextQualityError):
     """Quality analysis errors."""
-    
+
     def __init__(
-        self, 
-        message: str = "Quality analysis error", 
-        *, 
-        code: object | None = None, 
-        error_code: object | None = None, 
-        context: Mapping[str, object] | None = None
+        self,
+        message: str = "Quality analysis error",
+        *,
+        code: object | None = None,
+        error_code: object | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         super().__init__(message, code=code, error_code=error_code, context=context)
-    
+
     def __str__(self) -> str:
         return f"Quality analysis: {self.message}"
 
 
 class FlextQualityReportError(FlextQualityError):
     """Quality report errors."""
-    
+
     def __init__(
-        self, 
-        message: str = "Quality report error", 
-        *, 
-        code: object | None = None, 
-        error_code: object | None = None, 
-        context: Mapping[str, object] | None = None
+        self,
+        message: str = "Quality report error",
+        *,
+        code: object | None = None,
+        error_code: object | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         super().__init__(message, code=code, error_code=error_code, context=context)
-    
+
     def __str__(self) -> str:
         return f"Quality report: {self.message}"
 
 
 class FlextQualityMetricsError(FlextQualityError):
     """Quality metrics errors."""
-    
+
     def __init__(
-        self, 
-        message: str = "Quality metrics error", 
-        *, 
-        code: object | None = None, 
-        error_code: object | None = None, 
-        context: Mapping[str, object] | None = None
+        self,
+        message: str = "Quality metrics error",
+        *,
+        code: object | None = None,
+        error_code: object | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         super().__init__(message, code=code, error_code=error_code, context=context)
-    
+
     def __str__(self) -> str:
         return f"Quality metrics: {self.message}"
 
 
 class FlextQualityGradeError(FlextQualityError):
     """Quality grade calculation errors."""
-    
+
     def __init__(
-        self, 
-        message: str = "Quality grade error", 
-        *, 
-        code: object | None = None, 
-        error_code: object | None = None, 
-        context: Mapping[str, object] | None = None
+        self,
+        message: str = "Quality grade error",
+        *,
+        code: object | None = None,
+        error_code: object | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         super().__init__(message, code=code, error_code=error_code, context=context)
-    
+
     def __str__(self) -> str:
         return f"Quality grade: {self.message}"
 
 
 class FlextQualityRuleError(FlextQualityError):
     """Quality rule errors."""
-    
+
     def __init__(
-        self, 
-        message: str = "Quality rule error", 
-        *, 
-        code: object | None = None, 
-        error_code: object | None = None, 
-        context: Mapping[str, object] | None = None
+        self,
+        message: str = "Quality rule error",
+        *,
+        code: object | None = None,
+        error_code: object | None = None,
+        context: Mapping[str, object] | None = None,
     ) -> None:
         super().__init__(message, code=code, error_code=error_code, context=context)
-    
+
     def __str__(self) -> str:
         return f"Quality rule: {self.message}"
 

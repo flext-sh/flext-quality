@@ -85,7 +85,7 @@ All components built on flext-core foundation patterns:
 
 - **FlextResult**: Consistent error handling and operation outcomes
 - **FlextEntity**: Domain entity base classes with validation
-- **FlextValueObject**: Immutable value objects with business rules
+- **FlextValue**: Immutable value objects with business rules
 - **FlextContainer**: Dependency injection for testability
 
 ### Observability Integration

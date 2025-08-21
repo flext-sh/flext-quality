@@ -133,14 +133,14 @@ def analyze_project(project_path: str) -> None:  # noqa: PLR0912, PLR0915
                 # Show detailed information for each issue
                 for _i, issue in enumerate(issue_list[:max_files_to_show]):
                     # Access typed issue properties
-                    if hasattr(issue, 'file_path'):
-                        getattr(issue, 'file_path', 'unknown')
-                    if hasattr(issue, 'message'):
-                        getattr(issue, 'message', 'No description')
-                    if hasattr(issue, 'severity'):
-                        getattr(issue, 'severity', 'unknown')
-                    if hasattr(issue, 'line_number'):
-                        getattr(issue, 'line_number', '')
+                    if hasattr(issue, "file_path"):
+                        getattr(issue, "file_path", "unknown")
+                    if hasattr(issue, "message"):
+                        getattr(issue, "message", "No description")
+                    if hasattr(issue, "severity"):
+                        getattr(issue, "severity", "unknown")
+                    if hasattr(issue, "line_number"):
+                        getattr(issue, "line_number", "")
 
                 if len(issue_list) > max_files_to_show:
                     pass

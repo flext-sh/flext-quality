@@ -464,7 +464,13 @@ class CodeAnalyzer:
                     if len(content.strip()) > MIN_FILE_SIZE_FOR_DUPLICATION_CHECK:
                         # Only check substantial files
                         file_contents[py_file] = content
-            except (RuntimeError, ValueError, TypeError, OSError, UnicodeDecodeError) as e:
+            except (
+                RuntimeError,
+                ValueError,
+                TypeError,
+                OSError,
+                UnicodeDecodeError,
+            ) as e:
                 logger.warning("Error reading %s: %s", py_file, e)
 
         # Simple duplicate detection based on file similarity
