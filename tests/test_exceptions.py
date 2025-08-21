@@ -10,15 +10,20 @@ import pytest
 
 from flext_quality import (
     FlextQualityAnalysisError,
+    FlextQualityAnalysisOperationError,
     FlextQualityAuthenticationError,
     FlextQualityConfigurationError,
     FlextQualityConnectionError,
     FlextQualityError,
     FlextQualityGradeError,
+    FlextQualityGradeOperationError,
     FlextQualityMetricsError,
+    FlextQualityMetricsOperationError,
     FlextQualityProcessingError,
     FlextQualityReportError,
+    FlextQualityReportOperationError,
     FlextQualityRuleError,
+    FlextQualityRuleOperationError,
     FlextQualityTimeoutError,
     FlextQualityValidationError,
     __all__ as exceptions_all,
@@ -78,12 +83,12 @@ class TestFlextQualityExceptions:
         assert isinstance(exception, FlextQualityError)
 
     def test_analysis_error_with_context(self) -> None:
-        """Test FlextQualityAnalysisError with full context."""
-        exception = FlextQualityAnalysisError(
+        """Test FlextQualityAnalysisOperationError with full context."""
+        exception = FlextQualityAnalysisOperationError(
             "Analyzer crashed",
             analyzer_name="pylint",
             file_count=42,
-            custom_field="test_value",
+            analysis_type="test_value",
         )
         assert "Quality analysis: Analyzer crashed" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -100,12 +105,12 @@ class TestFlextQualityExceptions:
         assert isinstance(exception, FlextQualityError)
 
     def test_report_error_with_context(self) -> None:
-        """Test FlextQualityReportError with full context."""
-        exception = FlextQualityReportError(
+        """Test FlextQualityReportOperationError with full context."""
+        exception = FlextQualityReportOperationError(
             "Invalid format",
             report_type="html",
             output_format="pdf",
-            extra_info="test",
+            project_name="test",
         )
         assert "Quality report: Invalid format" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -122,12 +127,12 @@ class TestFlextQualityExceptions:
         assert isinstance(exception, FlextQualityError)
 
     def test_metrics_error_with_context(self) -> None:
-        """Test FlextQualityMetricsError with full context."""
-        exception = FlextQualityMetricsError(
+        """Test FlextQualityMetricsOperationError with full context."""
+        exception = FlextQualityMetricsOperationError(
             "Invalid value",
             metric_name="complexity",
             metric_value=42.5,
-            threshold=10.0,
+            threshold_value=10.0,
         )
         assert "Quality metrics: Invalid value" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -144,12 +149,12 @@ class TestFlextQualityExceptions:
         assert isinstance(exception, FlextQualityError)
 
     def test_grade_error_with_context(self) -> None:
-        """Test FlextQualityGradeError with full context."""
-        exception = FlextQualityGradeError(
+        """Test FlextQualityGradeOperationError with full context."""
+        exception = FlextQualityGradeOperationError(
             "Invalid grade",
             grade_type="overall",
             calculated_grade="A++",
-            score=95.5,
+            grade_score=95.5,
         )
         assert "Quality grade: Invalid grade" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -166,12 +171,12 @@ class TestFlextQualityExceptions:
         assert isinstance(exception, FlextQualityError)
 
     def test_rule_error_with_context(self) -> None:
-        """Test FlextQualityRuleError with full context."""
-        exception = FlextQualityRuleError(
+        """Test FlextQualityRuleOperationError with full context."""
+        exception = FlextQualityRuleOperationError(
             "Rule not found",
             rule_name="E302",
             rule_severity="high",
-            category="style",
+            rule_category="style",
         )
         assert "Quality rule: Rule not found" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -228,27 +233,37 @@ class TestExceptionModuleExports:
     """Test that all exceptions are properly exported."""
 
     def test_all_exceptions_in_all_list(self) -> None:
-        """Test that __all__ contains all exception classes."""
+        """Test that __all__ contains all expected exception classes."""
         expected_exceptions = {
             "FlextQualityAnalysisError",
+            "FlextQualityAnalysisOperationError",
             "FlextQualityAuthenticationError",
             "FlextQualityConfigurationError",
             "FlextQualityConnectionError",
             "FlextQualityError",
             "FlextQualityGradeError",
+            "FlextQualityGradeOperationError",
             "FlextQualityMetricsError",
+            "FlextQualityMetricsOperationError",
             "FlextQualityProcessingError",
             "FlextQualityReportError",
+            "FlextQualityReportOperationError",
             "FlextQualityRuleError",
+            "FlextQualityRuleOperationError",
             "FlextQualityTimeoutError",
             "FlextQualityValidationError",
         }
 
-        assert set(exceptions_all) == expected_exceptions
+        # Extract only exception classes from the full __all__ list
+        exception_classes_in_all = {name for name in exceptions_all if "Error" in name}
+        assert exception_classes_in_all == expected_exceptions
 
     def test_all_exceptions_importable(self) -> None:
         """Test that all exceptions can be imported from the module."""
-        for exception_name in exceptions_all:
+        # Filter to only exception classes from __all__
+        exception_names = [name for name in exceptions_all if "Error" in name]
+        
+        for exception_name in exception_names:
             # Test that the exception class exists and is callable
             exception_class = getattr(exc_module, exception_name)
             assert callable(exception_class)

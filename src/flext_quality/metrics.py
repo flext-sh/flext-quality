@@ -47,7 +47,7 @@ from __future__ import annotations
 from typing import override
 
 from flext_core import FlextModel, FlextResult
-from pydantic import Field, computed_field
+from pydantic import Field
 
 from flext_quality.analysis_types import AnalysisResults, OverallMetrics
 from flext_quality.domain.grade_calculator import QualityGradeCalculator
@@ -98,12 +98,7 @@ class QualityMetrics(FlextModel):
     """
 
     # Overall metrics
-    overall_score: float = Field(
-        0.0,
-        description="Overall quality score (0-100)",
-        ge=0,
-        le=100,
-    )
+    overall_score: float = Field(0.0, description="Overall quality score (0-100)", ge=0, le=100)
     quality_grade: str = Field("F", description="Quality grade letter (A+ to F)")
 
     # File metrics
@@ -120,48 +115,123 @@ class QualityMetrics(FlextModel):
     # Issue counts
     security_issues_count: int = Field(0, description="Number of security issues", ge=0)
     dead_code_items_count: int = Field(0, description="Number of dead code items", ge=0)
-    duplicate_blocks_count: int = Field(
-        0,
-        description="Number of duplicate blocks",
-        ge=0,
-    )
-    complexity_issues_count: int = Field(
-        0,
-        description="Number of complexity issues",
-        ge=0,
-    )
+    duplicate_blocks_count: int = Field(0, description="Number of duplicate blocks", ge=0)
+    complexity_issues_count: int = Field(0, description="Number of complexity issues", ge=0)
 
     # Scores by category (0-100)
-    complexity_score: float = Field(
-        100.0,
-        description="Complexity score (0-100)",
-        ge=0,
-        le=100,
-    )
-    security_score: float = Field(
-        100.0,
-        description="Security score (0-100)",
-        ge=0,
-        le=100,
-    )
-    maintainability_score: float = Field(
-        100.0,
-        description="Maintainability score (0-100)",
-        ge=0,
-        le=100,
-    )
-    duplication_score: float = Field(
-        100.0,
-        description="Duplication score (0-100)",
-        ge=0,
-        le=100,
-    )
-    documentation_score: float = Field(
-        100.0,
-        description="Documentation score (0-100)",
-        ge=0,
-        le=100,
-    )
+    complexity_score: float = Field(100.0, description="Complexity score (0-100)", ge=0, le=100)
+    security_score: float = Field(100.0, description="Security score (0-100)", ge=0, le=100)
+    maintainability_score: float = Field(100.0, description="Maintainability score (0-100)", ge=0, le=100)
+    duplication_score: float = Field(100.0, description="Duplication score (0-100)", ge=0, le=100)
+    documentation_score: float = Field(100.0, description="Documentation score (0-100)", ge=0, le=100)
+
+    @classmethod
+    def create_default(cls) -> QualityMetrics:
+        """Create QualityMetrics with all default values explicitly set.
+        
+        This factory method ensures all fields are explicitly provided to avoid
+        type checker issues with default field interpretation.
+        """
+        return cls(
+            overall_score=0.0,
+            quality_grade="F",
+            total_files=0,
+            total_lines_of_code=0,
+            total_functions=0,
+            total_classes=0,
+            average_complexity=0.0,
+            max_complexity=0.0,
+            complex_files_count=0,
+            security_issues_count=0,
+            dead_code_items_count=0,
+            duplicate_blocks_count=0,
+            complexity_issues_count=0,
+            complexity_score=100.0,
+            security_score=100.0,
+            maintainability_score=100.0,
+            duplication_score=100.0,
+            documentation_score=100.0,
+        )
+
+    @classmethod
+    def create(
+        cls,
+        *,
+        overall_score: float = 0.0,
+        quality_grade: str = "F",
+        total_files: int = 0,
+        total_lines_of_code: int = 0,
+        total_functions: int = 0,
+        total_classes: int = 0,
+        average_complexity: float = 0.0,
+        max_complexity: float = 0.0,
+        complex_files_count: int = 0,
+        security_issues_count: int = 0,
+        dead_code_items_count: int = 0,
+        duplicate_blocks_count: int = 0,
+        complexity_issues_count: int = 0,
+        complexity_score: float = 100.0,
+        security_score: float = 100.0,
+        maintainability_score: float = 100.0,
+        duplication_score: float = 100.0,
+        documentation_score: float = 100.0,
+    ) -> QualityMetrics:
+        """Create QualityMetrics with explicit defaults and optional overrides.
+        
+        This factory method provides type-safe creation with explicit defaults
+        for all fields, avoiding type checker issues while allowing customization.
+        """
+        return cls(
+            overall_score=overall_score,
+            quality_grade=quality_grade,
+            total_files=total_files,
+            total_lines_of_code=total_lines_of_code,
+            total_functions=total_functions,
+            total_classes=total_classes,
+            average_complexity=average_complexity,
+            max_complexity=max_complexity,
+            complex_files_count=complex_files_count,
+            security_issues_count=security_issues_count,
+            dead_code_items_count=dead_code_items_count,
+            duplicate_blocks_count=duplicate_blocks_count,
+            complexity_issues_count=complexity_issues_count,
+            complexity_score=complexity_score,
+            security_score=security_score,
+            maintainability_score=maintainability_score,
+            duplication_score=duplication_score,
+            documentation_score=documentation_score,
+        )
+
+    @classmethod 
+    def create_for_validation_test(cls, **overrides: object) -> QualityMetrics:
+        """Create QualityMetrics for validation testing purposes.
+        
+        This method allows creating instances with specific field overrides
+        for validation testing without triggering type checker warnings.
+        Used primarily in test scenarios to test boundary conditions.
+        """
+        defaults = {
+            "overall_score": 0.0,
+            "quality_grade": "F",
+            "total_files": 0,
+            "total_lines_of_code": 0,
+            "total_functions": 0,
+            "total_classes": 0,
+            "average_complexity": 0.0,
+            "max_complexity": 0.0,
+            "complex_files_count": 0,
+            "security_issues_count": 0,
+            "dead_code_items_count": 0,
+            "duplicate_blocks_count": 0,
+            "complexity_issues_count": 0,
+            "complexity_score": 100.0,
+            "security_score": 100.0,
+            "maintainability_score": 100.0,
+            "duplication_score": 100.0,
+            "documentation_score": 100.0,
+        }
+        defaults.update(overrides)
+        return cls(**defaults)
 
     @classmethod
     def from_analysis_results(
@@ -419,7 +489,7 @@ class QualityMetrics(FlextModel):
             },
         )
 
-    @computed_field
+    @property
     def scores_summary(self) -> dict[str, float]:
         """Get comprehensive summary of quality scores by category.
 
@@ -435,7 +505,7 @@ class QualityMetrics(FlextModel):
             - documentation: Documentation quality score
 
         Note:
-            This computed field is automatically updated when the
+            This property is automatically updated when the
             underlying score values change, ensuring consistency.
 
         """
@@ -447,7 +517,7 @@ class QualityMetrics(FlextModel):
             "documentation": self.documentation_score,
         }
 
-    @computed_field
+    @property
     def total_issues(self) -> int:
         """Calculate total count of all detected quality issues.
 
@@ -462,7 +532,7 @@ class QualityMetrics(FlextModel):
             - Complexity violations
 
         Note:
-            This computed field automatically updates when individual
+            This property automatically updates when individual
             issue counts change, providing real-time total calculation.
 
         """
@@ -602,3 +672,7 @@ class QualityMetrics(FlextModel):
             return FlextResult[None].fail("Complexity scores must be valid")
 
         return FlextResult[None].ok(None)
+
+
+# Rebuild model to resolve forward references
+QualityMetrics.model_rebuild()

@@ -14,7 +14,7 @@ from flext_quality import (
     QualityAnalysis,
     QualityIssue,
     QualityProject,
-    QualityReport,
+    DomainQualityReport as QualityReport,
     QualityRule,
 )
 
@@ -56,6 +56,7 @@ class TestQualityProject:
         with pytest.raises(ValidationError):
             QualityProject(
                 id="test-id",
+                name="test-project",
                 project_path="",  # Empty path should fail
             )
 
@@ -216,7 +217,7 @@ class TestQualityIssue:
         issue = QualityIssue(
             id="test-issue-id",
             analysis_id="test-analysis-id",
-            issue_type=IssueType.STYLE,
+            issue_type=IssueType.STYLE_VIOLATION,
             severity=IssueSeverity.MEDIUM,
             rule_id="E302",
             file_path="test.py",
@@ -226,7 +227,7 @@ class TestQualityIssue:
 
         assert issue.id == "test-issue-id"
         assert issue.analysis_id == "test-analysis-id"
-        assert issue.issue_type == IssueType.STYLE
+        assert issue.issue_type == IssueType.STYLE_VIOLATION
         assert issue.severity == IssueSeverity.MEDIUM
         assert issue.rule_id == "E302"
         assert issue.file_path == "test.py"
@@ -240,7 +241,7 @@ class TestQualityIssue:
         issue = QualityIssue(
             id="test-id",
             analysis_id="analysis-id",
-            issue_type=IssueType.STYLE,
+            issue_type=IssueType.STYLE_VIOLATION,
             severity=IssueSeverity.LOW,
             rule_id="E302",
             file_path="test.py",
@@ -255,7 +256,7 @@ class TestQualityIssue:
         issue = QualityIssue(
             id="test-id",
             analysis_id="",  # Empty analysis_id should fail
-            issue_type=IssueType.STYLE,
+            issue_type=IssueType.STYLE_VIOLATION,
             severity=IssueSeverity.LOW,
             rule_id="E302",
             file_path="test.py",
@@ -272,7 +273,7 @@ class TestQualityIssue:
         issue = QualityIssue(
             id="test-id",
             analysis_id="analysis-id",
-            issue_type=IssueType.STYLE,
+            issue_type=IssueType.STYLE_VIOLATION,
             severity=IssueSeverity.LOW,
             rule_id="E302",
             file_path="test.py",
@@ -290,7 +291,7 @@ class TestQualityIssue:
         issue = QualityIssue(
             id="test-id",
             analysis_id="analysis-id",
-            issue_type=IssueType.STYLE,
+            issue_type=IssueType.STYLE_VIOLATION,
             severity=IssueSeverity.LOW,
             rule_id="E302",
             file_path="test.py",
@@ -311,7 +312,7 @@ class TestQualityIssue:
         issue = QualityIssue(
             id="test-id",
             analysis_id="analysis-id",
-            issue_type=IssueType.STYLE,
+            issue_type=IssueType.STYLE_VIOLATION,
             severity=IssueSeverity.LOW,
             rule_id="E302",
             file_path="test.py",
@@ -333,7 +334,7 @@ class TestQualityIssue:
         issue = QualityIssue(
             id="test-id",
             analysis_id="analysis-id",
-            issue_type=IssueType.STYLE,
+            issue_type=IssueType.STYLE_VIOLATION,
             severity=IssueSeverity.LOW,
             rule_id="E302",
             file_path="test.py",
@@ -357,14 +358,14 @@ class TestQualityRule:
         rule = QualityRule(
             id="test-rule-id",
             rule_id="E302",
-            category=IssueType.STYLE,
+            category=IssueType.STYLE_VIOLATION,
             enabled=True,
             severity=IssueSeverity.MEDIUM,
         )
 
         assert rule.id == "test-rule-id"
         assert rule.rule_id == "E302"
-        assert rule.category == IssueType.STYLE
+        assert rule.category == IssueType.STYLE_VIOLATION
         assert rule.enabled is True
         assert rule.severity == IssueSeverity.MEDIUM
 
@@ -373,7 +374,7 @@ class TestQualityRule:
         rule = QualityRule(
             id="test-id",
             rule_id="E302",
-            category=IssueType.STYLE,
+            category=IssueType.STYLE_VIOLATION,
         )
 
         result = rule.validate_business_rules()
@@ -385,7 +386,7 @@ class TestQualityRule:
         rule = QualityRule(
             id="test-id",
             rule_id="E302",
-            category=IssueType.STYLE,
+            category=IssueType.STYLE_VIOLATION,
         )
 
         # Create an invalid instance for testing validation
@@ -401,7 +402,7 @@ class TestQualityRule:
         rule = QualityRule(
             id="test-id",
             rule_id="E302",
-            category=IssueType.STYLE,
+            category=IssueType.STYLE_VIOLATION,
             enabled=False,
         )
 
@@ -418,7 +419,7 @@ class TestQualityRule:
         rule = QualityRule(
             id="test-id",
             rule_id="E302",
-            category=IssueType.STYLE,
+            category=IssueType.STYLE_VIOLATION,
             severity=IssueSeverity.LOW,
         )
 
@@ -433,7 +434,7 @@ class TestQualityRule:
         rule = QualityRule(
             id="test-id",
             rule_id="E302",
-            category=IssueType.STYLE,
+            category=IssueType.STYLE_VIOLATION,
         )
 
         assert len(rule.parameters) == 0

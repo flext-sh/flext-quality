@@ -89,13 +89,14 @@ if __name__ == "__main__":
             include_duplicates=False,
         )
 
-        if results["files_analyzed"] != 1:
-            msg: str = f"Expected {1}, got {results['files_analyzed']}"
+        if results.overall_metrics.files_analyzed != 1:
+            msg: str = f"Expected {1}, got {results.overall_metrics.files_analyzed}"
             raise AssertionError(msg)
-        total_lines = results["total_lines"]
+        total_lines = results.overall_metrics.total_lines
         assert isinstance(total_lines, int)
         assert total_lines > 0
-        python_files = results["python_files"]
+        # Note: python_files is not in AnalysisResults/OverallMetrics - use file_metrics length
+        python_files = results.file_metrics
         if isinstance(python_files, list) and len(python_files) != 1:
             msg: str = f"Expected {1}, got {len(python_files)}"
             raise AssertionError(msg)

@@ -14,7 +14,8 @@ def test_ast_backend_syntax_error() -> None:
     # Missing colon
     result = backend.analyze("def foo()\n    return 1")
     assert "error" in result
-    assert "Syntax error" in result["error"]
+    error_msg = result["error"]
+    assert isinstance(error_msg, str) and "Syntax error" in error_msg
 
 
 def test_ast_visitor_extracts_details(tmp_path: Path) -> None:
@@ -31,7 +32,7 @@ async def f(x: int) -> None:
     )
     visitor = ASTVisitor(file_path=tmp_path / "a.py", package_name="pkg")
     visitor.visit(code)
-    assert any(c["name"] == "A" for c in visitor.classes)
-    assert any(fn["name"] == "m" for fn in visitor.functions)
-    # ensure complexity captured for async function
-    assert any(isinstance(fn["is_async"], bool) for fn in visitor.functions)
+    assert any(c.name == "A" for c in visitor.classes)
+    assert any(fn.name == "m" for fn in visitor.functions)
+    # ensure complexity captured for async function  
+    assert any(isinstance(fn.is_async, bool) for fn in visitor.functions)

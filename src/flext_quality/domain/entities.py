@@ -14,8 +14,8 @@ from typing import override
 from flext_core import FlextEntity, FlextResult, FlextValueObject
 from pydantic import Field
 
-from flext_quality.typings import FlextTypes
 from flext_quality.domain.value_objects import IssueSeverity, IssueType
+from flext_quality.typings import FlextTypes
 
 
 class FlextDomainEvent(FlextValueObject):
