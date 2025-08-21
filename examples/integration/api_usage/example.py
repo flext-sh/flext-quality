@@ -170,13 +170,13 @@ async def demonstrate_service_integration() -> None:  # noqa: PLR0912
             language="python",
         )
 
-        project = project_result.unwrap_or(None)
+        project = project_result.value if project_result.success else None
 
         # Create analysis
 
         analysis_result = await analysis_service.create_analysis(project_id=project.id)
 
-        analysis = analysis_result.unwrap_or(None)
+        analysis = analysis_result.value if analysis_result.success else None
 
         # Update analysis metrics
         metrics_result = await analysis_service.update_metrics(
@@ -188,7 +188,7 @@ async def demonstrate_service_integration() -> None:  # noqa: PLR0912
             blank_lines=20,
         )
 
-        metrics_result.unwrap_or(None)  # Handle result
+        metrics_result.value if metrics_result.success else None  # Handle result
 
         # Update quality scores
         scores_result = await analysis_service.update_scores(
@@ -200,7 +200,7 @@ async def demonstrate_service_integration() -> None:  # noqa: PLR0912
             maintainability_score=80.0,
         )
 
-        scores_result.unwrap_or(None)  # Handle result
+        scores_result.value if scores_result.success else None  # Handle result
 
         # Create issues
 
@@ -239,7 +239,7 @@ async def demonstrate_service_integration() -> None:  # noqa: PLR0912
                 **issue_data,
             )
 
-            issue = issue_result.unwrap_or(None)
+            issue = issue_result.value if issue_result.success else None
             if issue is not None:
                 created_issues.append(issue)
 
@@ -252,12 +252,12 @@ async def demonstrate_service_integration() -> None:  # noqa: PLR0912
             low=1,
         )
 
-        issue_counts_result.unwrap_or(None)  # Handle result
+        issue_counts_result.value if issue_counts_result.success else None  # Handle result
 
         # Complete the analysis
         complete_result = await analysis_service.complete_analysis(analysis.id)
 
-        complete_result.unwrap_or(None)  # Handle result
+        complete_result.value if complete_result.success else None  # Handle result
 
         # Create reports
 
@@ -270,12 +270,12 @@ async def demonstrate_service_integration() -> None:  # noqa: PLR0912
                 report_type=report_type,
             )
 
-            report_result.unwrap_or(None)  # Handle result
+            report_result.value if report_result.success else None  # Handle result
 
         # List all reports for the analysis
         reports_result = await report_service.list_reports(analysis.id)
 
-        reports = reports_result.unwrap_or([])
+        reports = reports_result.value if reports_result.success else []
         for _report in reports:
             pass
 
@@ -317,8 +317,8 @@ def process_data(data):
             analysis_data = {
                 "quality_score": analyzer.get_quality_score(),
                 "quality_grade": analyzer.get_quality_grade(),
-                "files_analyzed": results.get("files_analyzed", 0),
-                "total_lines": results.get("total_lines", 0),
+                "files_analyzed": results.overall_metrics.files_analyzed,
+                "total_lines": results.overall_metrics.total_lines,
                 "analysis_results": results,
             }
 
@@ -331,7 +331,7 @@ def process_data(data):
             # Create metrics
             flext_create_metric(
                 name="quality_analysis_score",
-                value=analysis_data.get("quality_score", 0),
+                value=analysis_data.get("quality_score", 0.0),
                 tags={"project": "ecosystem_demo", "integration": "api"},
             )
 
@@ -371,12 +371,11 @@ def process_data(data):
             container.register("QualityAnalysisService", analysis_service_instance)
 
             # Resolve services using current API
-            project_service = container.get("QualityProjectService").unwrap_or(
-                QualityProjectService()
-            )
-            container.get("QualityAnalysisService").unwrap_or(
-                QualityAnalysisService()
-            )
+            project_service_result = container.get("QualityProjectService")
+            project_service = project_service_result.value if project_service_result.success else QualityProjectService()
+            
+            analysis_service_result = container.get("QualityAnalysisService")
+            analysis_service_result.value if analysis_service_result.success else QualityAnalysisService()
 
             # Demonstrate service usage
             with tempfile.TemporaryDirectory() as temp_service_dir:
@@ -385,7 +384,7 @@ def process_data(data):
                     project_path=temp_service_dir,
                 )
 
-                project_result.unwrap_or(None)  # Handle result
+                project_result.value if project_result.success else None  # Handle result
 
         except ImportError:
             # Direct instantiation

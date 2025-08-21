@@ -32,11 +32,16 @@ class TestCodeAnalyzerEdgeCases:
         with TemporaryDirectory() as temp_dir:
             analyzer = CodeAnalyzer(temp_dir)
 
-            # Manually set analysis_results with invalid issues type
-            analyzer.analysis_results = {
-                "metrics": {},
-                "issues": "invalid_type",  # Should be dict but is string
-            }
+            # Manually set _current_results to test error handling
+            from flext_quality.analysis_types import AnalysisResults, OverallMetrics
+            analyzer._current_results = AnalysisResults(
+                overall_metrics=OverallMetrics(),
+                file_metrics=[],
+                complexity_issues=[],
+                security_issues=[],
+                dead_code_issues=[],
+                duplication_issues=[]
+            )
 
             score = analyzer.get_quality_score()
 
@@ -153,10 +158,10 @@ def invalid_syntax(
 
             # Should handle syntax error and return metrics with error info
             assert metrics is not None
-            assert "syntax_error" in metrics
-            assert metrics["function_count"] == 0
-            assert metrics["class_count"] == 0
-            assert metrics["complexity"] == 0
+            # Syntax errors are tracked via security_issues field (as per analyzer.py:264)
+            assert metrics.security_issues == 1
+            assert metrics.complexity_score == 0.0
+            assert metrics.lines_of_code >= 0
 
     def test_analyze_file_with_file_read_error(self) -> None:
         """Test _analyze_file handles file read errors."""
@@ -176,9 +181,8 @@ def invalid_syntax(
             ):
                 metrics = analyzer._analyze_file(unreadable_file)
 
-                # Should return empty metrics when file cannot be read
-                assert metrics is not None
-                assert isinstance(metrics, dict)
+                # Should return None when file cannot be read
+                assert metrics is None
 
     def test_analyze_security_with_file_read_error(self) -> None:
         """Test _analyze_security handles file read errors."""
@@ -197,12 +201,9 @@ def invalid_syntax(
                 results = analyzer.analyze_project(include_security=True)
 
                 # Should handle error gracefully and continue
-                assert "issues" in results
-                issues = results["issues"]
-                assert isinstance(issues, dict)
-                assert "security" in issues
+                assert results is not None
                 # Security issues should be empty due to read error
-                security_issues = issues["security"]
+                security_issues = results.security_issues
                 assert isinstance(security_issues, list)
 
     def test_analyze_dead_code_with_file_read_error(self) -> None:
@@ -222,11 +223,8 @@ def invalid_syntax(
                 results = analyzer.analyze_project(include_dead_code=True)
 
                 # Should handle error gracefully
-                assert "issues" in results
-                issues = results["issues"]
-                assert isinstance(issues, dict)
-                assert "dead_code" in issues
-                dead_code_issues = issues["dead_code"]
+                assert results is not None
+                dead_code_issues = results.dead_code_issues
                 assert isinstance(dead_code_issues, list)
 
     def test_analyze_duplicates_with_file_read_error(self) -> None:
@@ -248,11 +246,8 @@ def invalid_syntax(
                 results = analyzer.analyze_project(include_duplicates=True)
 
                 # Should handle error gracefully
-                assert "issues" in results
-                issues = results["issues"]
-                assert isinstance(issues, dict)
-                assert "duplicates" in issues
-                duplicates_issues = issues["duplicates"]
+                assert results is not None
+                duplicates_issues = results.duplication_issues
                 assert isinstance(duplicates_issues, list)
 
     def test_find_python_files_nonexistent_path(self) -> None:
@@ -281,13 +276,11 @@ import json
             results = analyzer.analyze_project(include_dead_code=True)
 
             # Should detect unused imports with comments
-            issues = results["issues"]
-            assert isinstance(issues, dict)
-            dead_code_issues = issues["dead_code"]
+            dead_code_issues = results.dead_code_issues
             assert len(dead_code_issues) >= 2  # Should find both unused imports
 
             # Check that it found the specific unused imports
-            messages = [issue["message"] for issue in dead_code_issues]
+            messages = [issue.message for issue in dead_code_issues]
             assert any("import os" in msg for msg in messages)
             assert any("from sys import path" in msg for msg in messages)
 
@@ -296,16 +289,16 @@ import json
         with TemporaryDirectory() as temp_dir:
             analyzer = CodeAnalyzer(temp_dir)
 
-            # Set analysis results manually to test grade calculator
-            analyzer.analysis_results = {
-                "metrics": {},
-                "issues": {
-                    "security": [],
-                    "complexity": [],
-                    "dead_code": [],
-                    "duplicates": [],
-                },
-            }
+            # Set _current_results manually to test grade calculator
+            from flext_quality.analysis_types import AnalysisResults, OverallMetrics
+            analyzer._current_results = AnalysisResults(
+                overall_metrics=OverallMetrics(),
+                file_metrics=[],
+                complexity_issues=[],
+                security_issues=[],
+                dead_code_issues=[],
+                duplication_issues=[]
+            )
 
             # Should get perfect score and A+ grade
             score = analyzer.get_quality_score()

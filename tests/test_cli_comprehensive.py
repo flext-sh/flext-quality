@@ -230,7 +230,12 @@ class TestAnalyzeProjectComprehensive:
                 security_score=95.0,
                 maintainability_score=80.0,
                 complexity_score=75.0,
-            )
+            ),
+            file_metrics=[],
+            complexity_issues=[],
+            security_issues=[],
+            dead_code_issues=[],
+            duplication_issues=[]
         )
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer
@@ -282,7 +287,12 @@ class TestAnalyzeProjectComprehensive:
                 security_score=92.0,
                 maintainability_score=82.0,
                 complexity_score=78.0,
-            )
+            ),
+            file_metrics=[],
+            complexity_issues=[],
+            security_issues=[],
+            dead_code_issues=[],
+            duplication_issues=[]
         )
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer

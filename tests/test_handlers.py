@@ -32,11 +32,11 @@ class TestAnalyzeProjectHandler:
         result = await handler.handle(project_id)
 
         assert result.success
-        assert result.data is not None
+        assert result.value is not None
         # Should return a QualityAnalysis entity
-        assert hasattr(result.data, "id")
-        assert hasattr(result.data, "project_id")
-        assert result.data.project_id == str(project_id)
+        assert hasattr(result.value, "id")
+        assert hasattr(result.value, "project_id")
+        assert result.value.project_id == str(project_id)
 
 
 class TestGenerateReportHandler:
@@ -56,11 +56,11 @@ class TestGenerateReportHandler:
         result = await handler.handle(analysis_id)
 
         assert result.success
-        assert result.data is not None
+        assert result.value is not None
         # Should return a QualityReport entity
-        assert hasattr(result.data, "id")
-        assert hasattr(result.data, "analysis_id")
-        assert result.data.analysis_id == str(analysis_id)
+        assert hasattr(result.value, "id")
+        assert hasattr(result.value, "analysis_id")
+        assert result.value.analysis_id == str(analysis_id)
 
 
 class TestRunLintingHandler:
@@ -80,10 +80,10 @@ class TestRunLintingHandler:
         result = await handler.handle(project_id)
 
         assert result.success
-        assert result.data is not None
+        assert result.value is not None
         # Should return linting results
-        assert isinstance(result.data, dict)
-        assert "linting_issues" in result.data
+        assert isinstance(result.value, dict)
+        assert "linting_issues" in result.value
 
 
 class TestRunSecurityCheckHandler:
@@ -103,10 +103,10 @@ class TestRunSecurityCheckHandler:
         result = await handler.handle(project_id)
 
         assert result.success
-        assert result.data is not None
+        assert result.value is not None
         # Should return security analysis results
-        assert isinstance(result.data, dict)
-        assert "security_issues" in result.data
+        assert isinstance(result.value, dict)
+        assert "security_issues" in result.value
 
 
 class TestHandlerIntegration:
@@ -143,6 +143,6 @@ class TestHandlerIntegration:
                 result = await handler.handle(test_id)
             else:
                 # Create a mock result for handlers without handle method
-                result = FlextResult[None].ok("Mock success")
+                result = FlextResult[str].ok("Mock success")
             assert result.success
-            assert result.data is not None
+            assert result.value is not None

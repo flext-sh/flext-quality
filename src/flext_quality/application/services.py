@@ -15,13 +15,12 @@ from flext_core import FlextEntityId, FlextResult
 from flext_quality.backends.external_backend import ExternalBackend
 from flext_quality.domain.entities import (
     AnalysisStatus,
-    IssueSeverity,
-    IssueType,
     QualityAnalysis,
     QualityIssue,
     QualityProject,
     QualityReport,
 )
+from flext_quality.domain.value_objects import IssueSeverity, IssueType
 from flext_quality.typings import FlextTypes
 
 

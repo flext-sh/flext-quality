@@ -28,8 +28,6 @@ from flext_quality.application.handlers import (
 )
 from flext_quality.domain.entities import (
     AnalysisStatus,
-    IssueSeverity,
-    IssueType,
     QualityAnalysis,
     QualityIssue,
     QualityProject,
@@ -46,6 +44,8 @@ from flext_quality.domain.value_objects import (
     DuplicationMetric,
     FilePath,
     IssueLocation,
+    IssueSeverity,
+    IssueType,
     QualityScore,
 )
 from flext_quality.analysis_types import (
@@ -76,15 +76,20 @@ from flext_quality.reports import (
 )
 from flext_quality.exceptions import (
     FlextQualityAnalysisError,
+    FlextQualityAnalysisOperationError,
     FlextQualityAuthenticationError,
     FlextQualityConfigurationError,
     FlextQualityConnectionError,
     FlextQualityError,
     FlextQualityGradeError,
+    FlextQualityGradeOperationError,
     FlextQualityMetricsError,
+    FlextQualityMetricsOperationError,
     FlextQualityProcessingError,
     FlextQualityReportError,
+    FlextQualityReportOperationError,
     FlextQualityRuleError,
+    FlextQualityRuleOperationError,
     FlextQualityTimeoutError,
     FlextQualityValidationError,
 )
@@ -154,15 +159,20 @@ __all__: list[str] = [
     "QualityMetrics",
     # Exceptions
     "FlextQualityAnalysisError",
+    "FlextQualityAnalysisOperationError",
     "FlextQualityAuthenticationError",
     "FlextQualityConfigurationError",
     "FlextQualityConnectionError",
     "FlextQualityError",
     "FlextQualityGradeError",
+    "FlextQualityGradeOperationError",
     "FlextQualityMetricsError",
+    "FlextQualityMetricsOperationError",
     "FlextQualityProcessingError",
     "FlextQualityReportError",
+    "FlextQualityReportOperationError",
     "FlextQualityRuleError",
+    "FlextQualityRuleOperationError",
     "FlextQualityTimeoutError",
     "FlextQualityValidationError",
     "exceptions",

@@ -89,7 +89,7 @@ class TestQualityProjectServiceComprehensive:
         created_project = assert_result_success_with_data(create_result)
 
         # Then retrieve it
-        result = await service.get_project(created_project.id)
+        result = await service.get_project(str(created_project.id))
 
         project = assert_result_success_with_data(result)
         assert project.id == created_project.id
@@ -143,7 +143,7 @@ class TestQualityProjectServiceComprehensive:
         updates: dict[str, object] = {
             "language": "javascript",
         }
-        result = await service.update_project(project.id, updates)
+        result = await service.update_project(str(project.id), updates)
 
         updated_project = assert_result_success_with_data(result)
         assert updated_project.language == "javascript"
@@ -173,12 +173,12 @@ class TestQualityProjectServiceComprehensive:
         project = assert_result_success_with_data(create_result)
 
         # Delete it
-        result = await service.delete_project(project.id)
+        result = await service.delete_project(str(project.id))
 
         assert_result_success_with_data(result)
 
         # Verify it's gone
-        get_result = await service.get_project(project.id)
+        get_result = await service.get_project(str(project.id))
         assert get_result.is_failure
 
     async def test_delete_project_not_found(
@@ -224,7 +224,7 @@ class TestQualityAnalysisServiceComprehensive:
         analysis = assert_result_success_with_data(create_result)
 
         # Retrieve it
-        result = await service.get_analysis(analysis.id)
+        result = await service.get_analysis(str(analysis.id))
 
         retrieved = assert_result_success_with_data(result)
         assert retrieved.id == analysis.id
@@ -270,7 +270,7 @@ class TestQualityAnalysisServiceComprehensive:
 
         # Update metrics
         result = await service.update_metrics(
-            analysis_id=analysis.id,
+            analysis_id=str(analysis.id),
             total_files=10,
             total_lines=1000,
             code_lines=800,
@@ -311,7 +311,7 @@ class TestQualityAnalysisServiceComprehensive:
 
         # Update scores
         result = await service.update_scores(
-            analysis_id=analysis.id,
+            analysis_id=str(analysis.id),
             coverage_score=95.0,
             complexity_score=88.0,
             duplication_score=92.0,
@@ -338,7 +338,7 @@ class TestQualityAnalysisServiceComprehensive:
 
         # Update issue counts
         result = await service.update_issue_counts(
-            analysis_id=analysis.id,
+            analysis_id=str(analysis.id),
             critical=2,
             high=5,
             medium=10,
@@ -362,7 +362,7 @@ class TestQualityAnalysisServiceComprehensive:
         analysis = assert_result_success_with_data(create_result)
 
         # Complete it
-        result = await service.complete_analysis(analysis.id)
+        result = await service.complete_analysis(str(analysis.id))
 
         completed = assert_result_success_with_data(result)
         assert completed.status == AnalysisStatus.COMPLETED
@@ -377,7 +377,7 @@ class TestQualityAnalysisServiceComprehensive:
 
         # Mark as failed
         error_message = "Analysis failed due to timeout"
-        result = await service.fail_analysis(analysis.id, error_message)
+        result = await service.fail_analysis(str(analysis.id), error_message)
 
         failed = assert_result_success_with_data(result)
         assert failed.status == AnalysisStatus.FAILED
@@ -460,7 +460,7 @@ class TestQualityIssueServiceComprehensive:
         issue = assert_result_success_with_data(create_result)
 
         # Retrieve it
-        result = await service.get_issue(issue.id)
+        result = await service.get_issue(str(issue.id))
 
         retrieved = assert_result_success_with_data(result)
         assert retrieved.id == issue.id
@@ -513,7 +513,7 @@ class TestQualityIssueServiceComprehensive:
         issue = assert_result_success_with_data(create_result)
 
         # Mark as fixed
-        result = await service.mark_fixed(issue.id)
+        result = await service.mark_fixed(str(issue.id))
 
         fixed_issue = assert_result_success_with_data(result)
         assert fixed_issue.is_fixed
@@ -534,7 +534,7 @@ class TestQualityIssueServiceComprehensive:
 
         # Suppress it
         reason = "This is a false positive"
-        result = await service.suppress_issue(issue.id, reason)
+        result = await service.suppress_issue(str(issue.id), reason)
 
         suppressed = assert_result_success_with_data(result)
         assert suppressed.is_suppressed
@@ -554,10 +554,10 @@ class TestQualityIssueServiceComprehensive:
         )
         issue = assert_result_success_with_data(create_result)
 
-        await service.suppress_issue(issue.id, "Initially suppressed")
+        await service.suppress_issue(str(issue.id), "Initially suppressed")
 
         # Unsuppress it
-        result = await service.unsuppress_issue(issue.id)
+        result = await service.unsuppress_issue(str(issue.id))
 
         unsuppressed = assert_result_success_with_data(result)
         assert not unsuppressed.is_suppressed
@@ -617,7 +617,7 @@ class TestQualityReportServiceComprehensive:
         report = assert_result_success_with_data(create_result)
 
         # Retrieve it
-        result = await service.get_report(report.id)
+        result = await service.get_report(str(report.id))
 
         retrieved = assert_result_success_with_data(result)
         assert retrieved.id == report.id
@@ -661,12 +661,12 @@ class TestQualityReportServiceComprehensive:
         report = assert_result_success_with_data(create_result)
 
         # Delete it
-        result = await service.delete_report(report.id)
+        result = await service.delete_report(str(report.id))
 
         assert_result_success_with_data(result)
 
         # Verify it's gone
-        get_result = await service.get_report(report.id)
+        get_result = await service.get_report(str(report.id))
         assert get_result.is_failure
 
     async def test_delete_report_not_found(self, service: QualityReportService) -> None:

@@ -55,7 +55,12 @@ class TestAnalyzeProject:
                 security_score=95.0,
                 maintainability_score=80.0,
                 complexity_score=75.0,
-            )
+            ),
+            file_metrics=[],
+            complexity_issues=[],
+            security_issues=[],
+            dead_code_issues=[],
+            duplication_issues=[]
         )
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer
@@ -122,7 +127,12 @@ class TestAnalyzeProject:
                 security_score=95.0,
                 maintainability_score=80.0,
                 complexity_score=75.0,
-            )
+            ),
+            file_metrics=[],
+            complexity_issues=[],
+            security_issues=[],
+            dead_code_issues=[],
+            duplication_issues=[]
         )
         mock_analyzer.get_quality_score.return_value = 70.0  # Medium quality
         mock_analyzer_class.return_value = mock_analyzer
@@ -176,7 +186,12 @@ class TestAnalyzeProject:
                 security_score=95.0,
                 maintainability_score=80.0,
                 complexity_score=75.0,
-            )
+            ),
+            file_metrics=[],
+            complexity_issues=[],
+            security_issues=[],
+            dead_code_issues=[],
+            duplication_issues=[]
         )
         mock_analyzer.get_quality_score.return_value = 40.0  # Poor quality
         mock_analyzer_class.return_value = mock_analyzer
@@ -247,7 +262,12 @@ class TestAnalyzeProject:
                 security_score=95.0,
                 maintainability_score=80.0,
                 complexity_score=75.0,
-            )
+            ),
+            file_metrics=[],
+            complexity_issues=[],
+            security_issues=[],
+            dead_code_issues=[],
+            duplication_issues=[]
         )
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer
@@ -302,7 +322,12 @@ class TestAnalyzeProject:
                 security_score=95.0,
                 maintainability_score=80.0,
                 complexity_score=75.0,
-            )
+            ),
+            file_metrics=[],
+            complexity_issues=[],
+            security_issues=[],
+            dead_code_issues=[],
+            duplication_issues=[]
         )
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer
@@ -435,7 +460,12 @@ class TestAnotherFunction:
                 security_score=50.0,  # Lower due to security issues
                 maintainability_score=60.0,
                 complexity_score=45.0,  # Lower due to complexity issues
-            )
+            ),
+            file_metrics=[],
+            complexity_issues=[],
+            security_issues=[],
+            dead_code_issues=[],
+            duplication_issues=[]
         )
         mock_analyzer.get_quality_score.return_value = 75.0  # Good score
         mock_analyzer.get_quality_grade.return_value = "B"
@@ -484,7 +514,12 @@ class TestAnotherFunction:
                 security_score=100.0,  # Perfect, no security issues
                 maintainability_score=95.0,
                 complexity_score=90.0,  # Good, no complexity issues
-            )
+            ),
+            file_metrics=[],
+            complexity_issues=[],
+            security_issues=[],
+            dead_code_issues=[],
+            duplication_issues=[]
         )
         mock_analyzer.get_quality_score.return_value = 60.0  # Poor score
         mock_analyzer_class.return_value = mock_analyzer

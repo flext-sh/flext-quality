@@ -5,7 +5,7 @@ from __future__ import annotations
 import ast
 import tempfile
 from pathlib import Path
-from typing import Any
+from typing import Any, override
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -32,7 +32,7 @@ class TestBaseAnalyzer:
     def test_base_analyzer_abstract(self) -> None:
         """Test BaseAnalyzer is abstract and cannot be instantiated."""
         with pytest.raises(TypeError):
-            BaseAnalyzer()
+            BaseAnalyzer()  # type: ignore[abstract] # Testing that abstract class cannot be instantiated
 
     def test_base_analyzer_concrete_implementation(self) -> None:
         """Test concrete implementation of BaseAnalyzer."""
@@ -40,18 +40,21 @@ class TestBaseAnalyzer:
         class ConcreteAnalyzer(BaseAnalyzer):
             """Concrete implementation for testing."""
 
+            @override
             def analyze(
                 self,
                 code: str,
-                _file_path: Path | None = None,
-            ) -> dict[str, Any]:
+                file_path: Path | None = None,
+            ) -> dict[str, object]:
                 """Implement abstract method."""
                 return {"analyzed": True, "code": code}
 
+            @override
             def get_backend_type(self) -> BackendType:
                 """Implement abstract method."""
                 return BackendType.HYBRID
 
+            @override
             def get_capabilities(self) -> list[str]:
                 """Implement abstract method."""
                 return ["test", "mock"]
@@ -110,12 +113,16 @@ class TestClass:
         assert "classes" in result
         assert "complexity" in result
         # ast.walk finds all functions including methods
-        assert len(result["functions"]) == 2  # hello_world + method
-        assert len(result["classes"]) == 1
+        functions = result["functions"]
+        classes = result["classes"]
+        assert isinstance(functions, list)
+        assert isinstance(classes, list)
+        assert len(functions) == 2  # hello_world + method
+        assert len(classes) == 1
         # Check that hello_world is one of the functions
-        func_names = [f["name"] for f in result["functions"]]
+        func_names = [f["name"] for f in functions if isinstance(f, dict) and "name" in f]
         assert "hello_world" in func_names
-        assert result["classes"][0]["name"] == "TestClass"
+        assert isinstance(classes[0], dict) and classes[0]["name"] == "TestClass"
 
     def test_analyze_with_file_path(self) -> None:
         """Test analyzing code with file path provided."""
@@ -174,12 +181,17 @@ class MyClass:
 """
         result = backend.analyze(code)
 
-        assert result["complexity"] > 5  # Should have high complexity
-        assert len(result["imports"]) == 2
+        complexity = result["complexity"]
+        imports = result["imports"]
+        functions = result["functions"]
+        classes = result["classes"]
+        
+        assert isinstance(complexity, (int, float)) and complexity > 5  # Should have high complexity
+        assert isinstance(imports, list) and len(imports) == 2
         # ast.walk finds all functions including methods, so we get 4 total
-        assert len(result["functions"]) == 4  # 1 top-level + 3 methods
-        assert len(result["classes"]) == 1
-        assert result["classes"][0]["methods"] == 3
+        assert isinstance(functions, list) and len(functions) == 4  # 1 top-level + 3 methods
+        assert isinstance(classes, list) and len(classes) == 1
+        assert isinstance(classes[0], dict) and classes[0]["methods"] == 3
 
     def test_extract_functions(self) -> None:
         """Test _extract_functions method."""

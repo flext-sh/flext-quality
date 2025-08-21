@@ -41,10 +41,10 @@ class TestQualityProjectService:
         )
 
         assert result.success
-        assert result.data is not None
-        assert result.data.project_path == secure_temp_dir
-        assert result.data.repository_url == "https://github.com/test/repo"
-        assert result.data.language == "python"
+        assert result.value is not None
+        assert result.value.project_path == secure_temp_dir
+        assert result.value.repository_url == "https://github.com/test/repo"
+        assert result.value.language == "python"
 
     async def test_get_project_success(
         self,
@@ -61,7 +61,7 @@ class TestQualityProjectService:
         project_id = project_data.id
 
         # Then get it
-        result = await service.get_project(project_id)
+        result = await service.get_project(str(project_id))
         retrieved_data = assert_result_success_with_data(result)
         assert retrieved_data.id == project_id
 
@@ -98,7 +98,7 @@ class TestQualityProjectService:
 
         # Update it
         updates = {"language": "go", "min_coverage": 80.0}
-        result = await service.update_project(project_id, updates)
+        result = await service.update_project(str(project_id), updates)
         updated_data = assert_result_success_with_data(result)
         assert updated_data.language == "go"
 
@@ -123,9 +123,9 @@ class TestQualityProjectService:
         project_id = project_data.id
 
         # Delete it
-        result = await service.delete_project(project_id)
+        result = await service.delete_project(str(project_id))
         assert result.success
-        assert result.data is True
+        assert result.value is True
 
     async def test_delete_project_not_found(
         self,
@@ -201,7 +201,7 @@ class TestQualityIssueService:
         """Test creating an issue."""
         result = await service.create_issue(
             analysis_id="test-analysis-id",
-            issue_type="style",
+            issue_type="style_violation",
             severity="medium",
             rule_id="E302",
             file_path="test.py",
@@ -209,7 +209,7 @@ class TestQualityIssueService:
             line_number=10,
         )
         issue_data = assert_result_success_with_data(result)
-        assert issue_data.issue_type == IssueType.STYLE
+        assert issue_data.issue_type == IssueType.STYLE_VIOLATION
         assert issue_data.severity == IssueSeverity.MEDIUM
 
     async def test_get_issue(self, service: QualityIssueService) -> None:
@@ -217,7 +217,7 @@ class TestQualityIssueService:
         # Create an issue first
         create_result = await service.create_issue(
             analysis_id="test-analysis-id",
-            issue_type="style",
+            issue_type="style_violation",
             severity="medium",
             rule_id="E302",
             file_path="test.py",
@@ -227,7 +227,7 @@ class TestQualityIssueService:
         issue_id = created_issue.id
 
         # Get the issue
-        result = await service.get_issue(issue_id)
+        result = await service.get_issue(str(issue_id))
         retrieved_issue = assert_result_success_with_data(result)
         assert retrieved_issue.id == issue_id
 
@@ -236,7 +236,7 @@ class TestQualityIssueService:
         # Create an issue first
         create_result = await service.create_issue(
             analysis_id="test-analysis-id",
-            issue_type="style",
+            issue_type="style_violation",
             severity="medium",
             rule_id="E302",
             file_path="test.py",
@@ -246,7 +246,7 @@ class TestQualityIssueService:
         issue_id = created_issue.id
 
         # Mark it as fixed
-        result = await service.mark_fixed(issue_id)
+        result = await service.mark_fixed(str(issue_id))
         fixed_issue = assert_result_success_with_data(result)
         assert fixed_issue.is_fixed is True
 
@@ -255,7 +255,7 @@ class TestQualityIssueService:
         # Create an issue first
         create_result = await service.create_issue(
             analysis_id="test-analysis-id",
-            issue_type="style",
+            issue_type="style_violation",
             severity="medium",
             rule_id="E302",
             file_path="test.py",
@@ -266,7 +266,7 @@ class TestQualityIssueService:
 
         # Suppress it
         reason = "False positive"
-        result = await service.suppress_issue(issue_id, reason)
+        result = await service.suppress_issue(str(issue_id), reason)
         suppressed_issue = assert_result_success_with_data(result)
         assert suppressed_issue.is_suppressed is True
         assert suppressed_issue.suppression_reason == reason
@@ -302,7 +302,7 @@ class TestQualityReportService:
         report_id = created_report.id
 
         # Get the report
-        result = await service.get_report(report_id)
+        result = await service.get_report(str(report_id))
         retrieved_report = assert_result_success_with_data(result)
         assert retrieved_report.id == report_id
         assert retrieved_report.access_count == 1  # Incremented on access
@@ -318,6 +318,6 @@ class TestQualityReportService:
         report_id = created_report.id
 
         # Delete it
-        result = await service.delete_report(report_id)
+        result = await service.delete_report(str(report_id))
         assert result.success
-        assert result.data is True
+        assert result.value is True

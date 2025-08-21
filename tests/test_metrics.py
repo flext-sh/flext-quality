@@ -13,7 +13,7 @@ class TestQualityMetrics:
 
     def test_metrics_creation_defaults(self) -> None:
         """Test quality metrics creation with defaults."""
-        metrics = QualityMetrics()
+        metrics = QualityMetrics.create_default()
 
         assert metrics.overall_score == 0.0
         assert metrics.quality_grade == "F"
@@ -24,7 +24,7 @@ class TestQualityMetrics:
 
     def test_metrics_creation_with_values(self) -> None:
         """Test quality metrics creation with specific values."""
-        metrics = QualityMetrics(
+        metrics = QualityMetrics.create(
             overall_score=85.5,
             quality_grade="B+",
             total_files=10,
@@ -47,24 +47,24 @@ class TestQualityMetrics:
     def test_score_validation(self) -> None:
         """Test score validation bounds."""
         with pytest.raises(ValidationError):
-            QualityMetrics(overall_score=-1.0)
+            QualityMetrics.create_for_validation_test(overall_score=-1.0)
 
         with pytest.raises(ValidationError):
-            QualityMetrics(overall_score=101.0)
+            QualityMetrics.create_for_validation_test(overall_score=101.0)
 
         with pytest.raises(ValidationError):
-            QualityMetrics(complexity_score=-5.0)
+            QualityMetrics.create_for_validation_test(complexity_score=-5.0)
 
         with pytest.raises(ValidationError):
-            QualityMetrics(security_score=150.0)
+            QualityMetrics.create_for_validation_test(security_score=150.0)
 
     def test_count_validation(self) -> None:
         """Test count validation (non-negative)."""
         with pytest.raises(ValidationError):
-            QualityMetrics(total_files=-1)
+            QualityMetrics.create_for_validation_test(total_files=-1)
 
         with pytest.raises(ValidationError):
-            QualityMetrics(security_issues_count=-5)
+            QualityMetrics.create_for_validation_test(security_issues_count=-5)
 
     def test_from_analysis_results_empty(self) -> None:
         """Test creating metrics from empty analysis results."""
@@ -160,7 +160,7 @@ class TestQualityMetrics:
 
     def test_scores_summary_computed_field(self) -> None:
         """Test scores_summary computed field."""
-        metrics = QualityMetrics(
+        metrics = QualityMetrics.create(
             complexity_score=85.0,
             security_score=90.0,
             maintainability_score=80.0,
@@ -178,7 +178,7 @@ class TestQualityMetrics:
 
     def test_total_issues_computed_field(self) -> None:
         """Test total_issues computed field."""
-        metrics = QualityMetrics(
+        metrics = QualityMetrics.create(
             security_issues_count=5,
             dead_code_items_count=3,
             duplicate_blocks_count=2,
@@ -189,7 +189,7 @@ class TestQualityMetrics:
 
     def test_to_dict(self) -> None:
         """Test to_dict method."""
-        metrics = QualityMetrics(
+        metrics = QualityMetrics.create(
             overall_score=87.5,
             quality_grade="B+",
             total_files=15,
@@ -210,7 +210,7 @@ class TestQualityMetrics:
 
     def test_get_summary(self) -> None:
         """Test get_summary method."""
-        metrics = QualityMetrics(
+        metrics = QualityMetrics.create(
             overall_score=87.5,
             quality_grade="B+",
             total_files=15,

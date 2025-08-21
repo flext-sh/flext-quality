@@ -77,21 +77,22 @@ def analyze_project(project_path: str) -> None:  # noqa: PLR0912, PLR0915
             include_duplicates=True,  # Code duplication analysis
         )
 
-        # Extract basic project information
-        results.get("files_analyzed", 0)
-        results.get("total_lines", 0)
-        python_files = results.get("python_files", [])
+        # Extract basic project information using modern AnalysisResults API
+        files_analyzed = results.overall_metrics.files_analyzed
+        total_lines = results.overall_metrics.total_lines
+        # Note: python_files not available in AnalysisResults - use file_metrics instead
+        analyzed_files = [str(fm.file_path) for fm in results.file_metrics]
 
         print_section("📈 Project Overview")
 
         # Show sample files (first 5)
-        if python_files:
+        if analyzed_files:
             # Constants for display limits
             max_files_to_show = 5
 
-            for _i, _file_path in enumerate(python_files[:max_files_to_show]):
+            for _i, _file_path in enumerate(analyzed_files[:max_files_to_show]):
                 pass
-            if len(python_files) > max_files_to_show:
+            if len(analyzed_files) > max_files_to_show:
                 pass
 
         # Calculate quality score and grade - DEMONSTRATE ALL SCORING
@@ -114,29 +115,35 @@ def analyze_project(project_path: str) -> None:  # noqa: PLR0912, PLR0915
         if hasattr(metrics, "average_complexity") and metrics.average_complexity > 0:
             pass
 
-        # Process and display ALL ISSUES in detail
-        issues = results.get("issues", {})
-
+        # Process and display ALL ISSUES in detail using modern AnalysisResults API
         print_section("🚨 Issues Detection Summary")
 
-        # Detailed issue breakdown - SHOW ALL ISSUES
-        for issue_list in issues.values():
-            if isinstance(issue_list, list):
-                if not issue_list:
-                    pass
-                else:
-                    # Show detailed information for each issue
-                    for _i, issue in enumerate(
-                        issue_list[:max_files_to_show],
-                    ):  # Show first 5 issues
-                        if isinstance(issue, dict):
-                            issue.get("file", "unknown")
-                            issue.get("message", "No description")
-                            issue.get("severity", "unknown")
-                            issue.get("line", "")
+        # Detailed issue breakdown - SHOW ALL ISSUES using typed properties
+        issue_categories = {
+            "Security": results.security_issues,
+            "Complexity": results.complexity_issues,
+            "Dead Code": results.dead_code_issues,
+            "Duplication": results.duplication_issues,
+        }
 
-                    if len(issue_list) > max_files_to_show:
-                        pass
+        for category_name, issue_list in issue_categories.items():
+            if not issue_list:
+                pass
+            else:
+                # Show detailed information for each issue
+                for _i, issue in enumerate(issue_list[:max_files_to_show]):
+                    # Access typed issue properties
+                    if hasattr(issue, 'file_path'):
+                        getattr(issue, 'file_path', 'unknown')
+                    if hasattr(issue, 'message'):
+                        getattr(issue, 'message', 'No description')
+                    if hasattr(issue, 'severity'):
+                        getattr(issue, 'severity', 'unknown')
+                    if hasattr(issue, 'line_number'):
+                        getattr(issue, 'line_number', '')
+
+                if len(issue_list) > max_files_to_show:
+                    pass
 
         # DEMONSTRATE REPORT GENERATION - ALL FORMATS
         print_section("📊 Generating Quality Reports")

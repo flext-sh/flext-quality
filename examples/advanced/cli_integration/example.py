@@ -97,28 +97,46 @@ def check_quality_thresholds(results: dict[str, Any]) -> dict[str, Any]:
         "min_files_analyzed": 1,  # Must analyze at least 1 file
     }
 
-    # Extract metrics for threshold checking
+    # Extract metrics for threshold checking using modern AnalysisResults API
     analysis_results = results.get("analysis_results", {})
-    issues = analysis_results.get("issues", {})
-
-    # Count issues by category
-    security_count = len(issues.get("security", []))
-    complexity_count = len(issues.get("complexity", []))
-
-    # Calculate total critical issues (security + high complexity)
-    critical_issues = security_count
-    for issue in issues.get("complexity", []):
-        if isinstance(issue, dict) and issue.get("severity") == "high":
-            critical_issues += 1
-
-    files_analyzed = analysis_results.get("files_analyzed", 0)
+    
+    # Handle both legacy dict and modern AnalysisResults format
+    if hasattr(analysis_results, 'security_issues'):
+        # Modern AnalysisResults format
+        security_count = len(analysis_results.security_issues)
+        complexity_count = len(analysis_results.complexity_issues)
+        files_analyzed = analysis_results.overall_metrics.files_analyzed
+        
+        # Calculate critical issues from typed results
+        critical_issues = security_count
+        for issue in analysis_results.complexity_issues:
+            if hasattr(issue, 'severity') and getattr(issue, 'severity', '') == 'high':
+                critical_issues += 1
+    else:
+        # Legacy dict format fallback
+        issues = analysis_results.get("issues", {})
+        security_count = len(issues.get("security", []))
+        complexity_count = len(issues.get("complexity", []))
+        files_analyzed = analysis_results.get("files_analyzed", 0)
+        
+        # Calculate total critical issues (security + high complexity)
+        critical_issues = security_count
+        for issue in issues.get("complexity", []):
+            if isinstance(issue, dict) and issue.get("severity") == "high":
+                critical_issues += 1
 
     # Mock quality score calculation (would come from actual analysis)
-    total_issues = sum(
-        len(issue_list)
-        for issue_list in issues.values()
-        if isinstance(issue_list, list)
-    )
+    if hasattr(analysis_results, 'total_issues'):
+        # Modern AnalysisResults format
+        total_issues = analysis_results.total_issues
+    else:
+        # Legacy dict format fallback
+        issues = analysis_results.get("issues", {})
+        total_issues = sum(
+            len(issue_list)
+            for issue_list in issues.values()
+            if isinstance(issue_list, list)
+        )
     estimated_score = max(0, 100 - (total_issues * 10) - (security_count * 20))
 
     # Check each threshold

@@ -80,8 +80,8 @@ def assert_result_success_with_data[T](result: FlextResult[T]) -> T:
 
     """
     assert result.success, f"Expected success but got failure: {result.error}"
-    assert result.data is not None, "Expected data but got None"
-    return result.data
+    assert result.value is not None, "Expected data but got None"
+    return result.value
 
 
 def assert_result_failure_with_error[T](result: FlextResult[T]) -> str:
