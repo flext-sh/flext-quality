@@ -6,7 +6,7 @@ across test files while maintaining strict MyPy compliance.
 
 from __future__ import annotations
 
-from typing import TypeGuard
+from typing import TypeGuard, cast
 
 
 def assert_is_dict(value: object) -> TypeGuard[dict[str, object]]:
@@ -43,7 +43,7 @@ def assert_is_list(value: object) -> TypeGuard[list[object]]:
     return True
 
 
-def safe_dict_access(data: object, key: str) -> object:
+def safe_dict_access(data: dict[str, object], key: str) -> object:
     """Type-safe dictionary access with proper error handling.
 
     Args:
@@ -57,12 +57,11 @@ def safe_dict_access(data: object, key: str) -> object:
       AssertionError: If data is not a dict or key missing
 
     """
-    assert_is_dict(data)
     assert key in data, f"Key '{key}' not found in dict"
     return data[key]
 
 
-def safe_list_access(data: object, index: int) -> object:
+def safe_list_access(data: list[object], index: int) -> object:
     """Type-safe list access with proper error handling.
 
     Args:
@@ -83,7 +82,9 @@ def safe_list_access(data: object, index: int) -> object:
     return data[index]
 
 
-def assert_dict_structure(data: object, required_keys: list[str]) -> dict[str, object]:
+def assert_dict_structure(
+    data: dict[str, object], required_keys: list[str]
+) -> dict[str, object]:
     """Assert that object is dict with required keys - DRY pattern.
 
     Args:
@@ -97,7 +98,6 @@ def assert_dict_structure(data: object, required_keys: list[str]) -> dict[str, o
       AssertionError: If validation fails
 
     """
-    assert_is_dict(data)
     for key in required_keys:
         assert key in data, f"Required key '{key}' missing from dict"
     return data
@@ -116,7 +116,10 @@ def assert_analysis_results_structure(results: object) -> dict[str, object]:
       AssertionError: If structure is invalid
 
     """
-    return assert_dict_structure(results, ["metrics", "issues", "python_files"])
+    assert_is_dict(results)
+    return assert_dict_structure(
+        cast("dict[str, object]", results), ["metrics", "issues", "python_files"]
+    )
 
 
 def assert_metrics_structure(metrics: object) -> dict[str, object]:
@@ -132,7 +135,10 @@ def assert_metrics_structure(metrics: object) -> dict[str, object]:
       AssertionError: If structure is invalid
 
     """
-    return assert_dict_structure(metrics, ["total_files", "total_lines_of_code"])
+    assert_is_dict(metrics)
+    return assert_dict_structure(
+        cast("dict[str, object]", metrics), ["total_files", "total_lines_of_code"]
+    )
 
 
 def assert_issues_structure(issues: object) -> dict[str, object]:
@@ -148,7 +154,8 @@ def assert_issues_structure(issues: object) -> dict[str, object]:
       AssertionError: If structure is invalid
 
     """
+    assert_is_dict(issues)
     return assert_dict_structure(
-        issues,
+        cast("dict[str, object]", issues),
         ["security", "complexity", "dead_code", "duplicates"],
     )

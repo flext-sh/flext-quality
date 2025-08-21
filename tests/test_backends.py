@@ -43,7 +43,7 @@ class TestBaseAnalyzer:
             def analyze(
                 self,
                 code: str,
-                file_path: Path | None = None,
+                _file_path: Path | None = None,
             ) -> dict[str, Any]:
                 """Implement abstract method."""
                 return {"analyzed": True, "code": code}

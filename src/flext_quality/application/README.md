@@ -293,7 +293,7 @@ async def execute_analysis(
         # Validation
         validation_result = analysis.validate_domain_rules()
         if not validation_result.success:
-            return validation_result.cast()
+            return validation_result
 
         # Success path
         await self._publish_analysis_completed_event(analysis)
@@ -462,9 +462,9 @@ async def test_quality_analysis_service_comprehensive_workflow():
         AnalysisConfiguration(include_all=True)
     )
 
-    # Then
+    # Then - Use current API (.value instead of .data)
     assert result.success
-    analysis = result.data
+    analysis = result.value
     assert analysis.status == AnalysisStatus.COMPLETED
     assert analysis.overall_score >= 0.0
     assert len(analysis.issues) >= 0
@@ -484,19 +484,19 @@ async def test_full_analysis_workflow():
 
     # Create project
     project_result = await project_service.create_project(test_data)
-    project = project_result.data
+    project = project_result.value
 
     # Execute analysis
     analysis_result = await analysis_service.execute_comprehensive_analysis(
         project.id, default_config
     )
-    analysis = analysis_result.data
+    analysis = analysis_result.value
 
     # Generate report
     report_result = await report_service.generate_executive_report(
         analysis.id, ReportFormat.HTML
     )
-    report = report_result.data
+    report = report_result.value
 
     # Validate end-to-end workflow
     assert report.analysis_id == analysis.id
@@ -524,8 +524,9 @@ result = await service.execute_comprehensive_analysis(
     )
 )
 
-if result.success:
-    analysis = result.data
+# Use value with proper error handling instead of unwrap_or
+if result.is_success:
+    analysis = result.value
     print(f"Quality Score: {analysis.overall_score}")
     print(f"Issues Found: {len(analysis.issues)}")
 else:
@@ -546,19 +547,19 @@ async def complete_quality_assessment_workflow(project_path: str):
         ProjectCreationData(path=project_path)
     )
     if not project_result.success:
-        return project_result.cast()
+        return project_result
 
     # Step 2: Execute analysis
     analysis_result = await analysis_service.execute_comprehensive_analysis(
-        project_result.data.id,
+        project_result.value.id,
         AnalysisConfiguration.default()
     )
     if not analysis_result.success:
-        return analysis_result.cast()
+        return analysis_result
 
     # Step 3: Generate reports
     report_result = await report_service.generate_executive_report(
-        analysis_result.data.id
+        analysis_result.value.id
     )
 
     return report_result

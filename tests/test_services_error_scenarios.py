@@ -36,7 +36,7 @@ def create_exception_dict(exception: Exception) -> type[dict[str, object]]:
     """
 
     class ExceptionDict(UserDict[str, object]):
-        def get(self, key: str, default: object = None) -> Never:
+        def get(self, _key: str, _default: object = None) -> Never:
             raise exception
 
         def values(self) -> Never:

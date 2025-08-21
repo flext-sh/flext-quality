@@ -62,3 +62,6 @@ class QualityGradeCalculator:
             if g == grade:
                 return threshold
         return 0  # F grade
+
+
+__all__ = ["QualityGrade", "QualityGradeCalculator"]

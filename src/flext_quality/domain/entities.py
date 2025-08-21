@@ -9,11 +9,13 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from enum import StrEnum
+from typing import override
 
 from flext_core import FlextEntity, FlextResult, FlextValueObject
 from pydantic import Field
 
 from flext_quality.typings import FlextTypes
+from flext_quality.domain.value_objects import IssueSeverity, IssueType
 
 
 class FlextDomainEvent(FlextValueObject):
@@ -21,30 +23,6 @@ class FlextDomainEvent(FlextValueObject):
 
     event_type: str
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
-
-
-class IssueSeverity(StrEnum):
-    """Issue severity levels."""
-
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-    CRITICAL = "critical"
-
-
-class IssueType(StrEnum):
-    """Issue types."""
-
-    SYNTAX = "syntax"
-    STYLE = "style"
-    COMPLEXITY = "complexity"
-    SECURITY = "security"
-    PERFORMANCE = "performance"
-    MAINTAINABILITY = "maintainability"
-    DUPLICATION = "duplication"
-    DEAD_CODE = "dead_code"
-    TYPING = "typing"
-    DOCUMENTATION = "documentation"
 
 
 class AnalysisStatus(StrEnum):
@@ -72,6 +50,7 @@ class QualityProject(FlextEntity):
     # Analysis settings
     auto_analyze: bool = Field(default=True)
 
+    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality project."""
         if not self.project_path:
@@ -209,6 +188,7 @@ class QualityAnalysis(FlextEntity):
         """Check if analysis completed successfully."""
         return self.status == AnalysisStatus.COMPLETED
 
+    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality analysis."""
         if not self.project_id:
@@ -279,6 +259,7 @@ class QualityIssue(FlextEntity):
             },
         )
 
+    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality issue."""
         if not self.analysis_id:
@@ -303,7 +284,7 @@ class QualityRule(FlextEntity):
 
     # Documentation
     documentation_url: str | None = None
-    examples: list[dict[str, str]] = Field(default_factory=list)
+    examples: list[dict[str, object]] = Field(default_factory=list)
 
     def enable(self) -> QualityRule:
         """Enable rule and return new instance."""
@@ -323,6 +304,7 @@ class QualityRule(FlextEntity):
         new_parameters[key] = value
         return self.model_copy(update={"parameters": new_parameters})
 
+    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality rule."""
         if not self.rule_id:
@@ -360,6 +342,7 @@ class QualityReport(FlextEntity):
             },
         )
 
+    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality report."""
         if not self.analysis_id:

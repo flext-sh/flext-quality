@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-import contextlib
 import importlib.metadata
-import warnings
 
 # Core FlextCore patterns (root namespace imports)
 from flext_core import FlextResult
@@ -36,25 +34,71 @@ from flext_quality.domain.entities import (
     QualityIssue,
     QualityProject,
     QualityReport as DomainQualityReport,
+    QualityRule,
 )
-from flext_quality.domain.quality_grade_calculator import (
+from flext_quality.domain.grade_calculator import (
     QualityGrade,
     QualityGradeCalculator,
 )
+from flext_quality.domain.value_objects import (
+    ComplexityMetric,
+    CoverageMetric,
+    DuplicationMetric,
+    FilePath,
+    IssueLocation,
+    QualityScore,
+)
+from flext_quality.analysis_types import (
+    AnalysisResults,
+    OverallMetrics,
+    FileAnalysisResult,
+    ComplexityIssue,
+    SecurityIssue,
+    DeadCodeIssue,
+    DuplicationIssue,
+)
+from flext_quality.utilities import (
+    FlextTestUtilities,
+    FlextQualityUtilities,
+    FlextAnalysisUtilities,
+    FlextReportUtilities,
+)
 from flext_quality.infrastructure.container import get_quality_container
-from flext_quality.simple_api import QualityAPI
+from flext_quality.api import QualityAPI
 from flext_quality.metrics import QualityMetrics
-from flext_quality.reports import QualityReport
+from flext_quality.reports import (
+    QualityReport,
+    HIGH_ISSUE_THRESHOLD,
+    HTML_ISSUE_LIMIT,
+    ISSUE_PREVIEW_LIMIT,
+    MIN_COVERAGE_THRESHOLD,
+    MIN_SCORE_THRESHOLD,
+)
 from flext_quality.exceptions import (
-    FlextQualityError as QualityError,
+    FlextQualityAnalysisError,
+    FlextQualityAuthenticationError,
+    FlextQualityConfigurationError,
+    FlextQualityConnectionError,
+    FlextQualityError,
+    FlextQualityGradeError,
+    FlextQualityMetricsError,
+    FlextQualityProcessingError,
+    FlextQualityReportError,
+    FlextQualityRuleError,
+    FlextQualityTimeoutError,
+    FlextQualityValidationError,
 )
-from flext_quality.web_interface import QualityWebInterface, main as quality_web_main
+from flext_quality import exceptions
+from flext_quality.web import QualityWebInterface, main as quality_web_main
 from flext_quality.cli import (
-    another_function as _cli_another_function,
-    analyze_project as _cli_analyze_project,
-    main as cli_main,
-    setup_logging as _cli_setup_logging,
+    analyze_project,
+    another_function,
+    main,
+    setup_logging,
 )
+from flext_quality import config
+from flext_quality.config import QualityConfig
+from flext_quality.constants import FlextQualityConstants
 
 try:
     __version__ = importlib.metadata.version("flext-quality")
@@ -98,6 +142,8 @@ __all__: list[str] = [
     "IssueType",
     "QualityProject",
     "QualityAnalysis",
+    "QualityIssue",
+    "QualityRule",
     "DomainQualityReport",
     # Domain Utilities
     "QualityGrade",
@@ -105,8 +151,21 @@ __all__: list[str] = [
     "FlextQualityDeprecationWarning",
     "FlextResult",
     "QualityAPI",
-    "QualityError",
     "QualityMetrics",
+    # Exceptions
+    "FlextQualityAnalysisError",
+    "FlextQualityAuthenticationError",
+    "FlextQualityConfigurationError",
+    "FlextQualityConnectionError",
+    "FlextQualityError",
+    "FlextQualityGradeError",
+    "FlextQualityMetricsError",
+    "FlextQualityProcessingError",
+    "FlextQualityReportError",
+    "FlextQualityRuleError",
+    "FlextQualityTimeoutError",
+    "FlextQualityValidationError",
+    "exceptions",
     "QualityReport",
     # Infrastructure
     "get_quality_container",
@@ -117,8 +176,38 @@ __all__: list[str] = [
     "QualityWebInterface",
     "quality_web_main",
     # CLI surface (re-exported at root for tests/examples)
-    "cli_main",
-    "_cli_analyze_project",
-    "_cli_another_function",
-    "_cli_setup_logging",
+    "analyze_project",
+    "another_function",
+    "main",
+    "setup_logging",
+    # Configuration
+    "config",
+    "QualityConfig",
+    "FlextQualityConstants",
+    # Value Objects
+    "ComplexityMetric",
+    "CoverageMetric",
+    "DuplicationMetric",
+    "FilePath",
+    "IssueLocation",
+    "QualityScore",
+    # Analysis Types
+    "AnalysisResults",
+    "OverallMetrics",
+    "FileAnalysisResult",
+    "ComplexityIssue",
+    "SecurityIssue",
+    "DeadCodeIssue",
+    "DuplicationIssue",
+    # Utilities
+    "FlextTestUtilities",
+    "FlextQualityUtilities",
+    "FlextAnalysisUtilities",
+    "FlextReportUtilities",
+    # Report Constants
+    "HIGH_ISSUE_THRESHOLD",
+    "HTML_ISSUE_LIMIT",
+    "ISSUE_PREVIEW_LIMIT",
+    "MIN_COVERAGE_THRESHOLD",
+    "MIN_SCORE_THRESHOLD",
 ]

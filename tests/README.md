@@ -215,9 +215,10 @@ def test_should_do_something_when_condition():
     # When (Act)
     result = service.perform_operation(test_data)
 
-    # Then (Assert)
-    assert result.success
-    assert result.data.expected_property == expected_value
+    # Then (Assert) - Using current API
+    data = result.unwrap_or(None)
+    assert data is not None
+    assert data.expected_property == expected_value
 ```
 
 ### Naming Conventions
@@ -277,8 +278,9 @@ def test_analyzer_performance_benchmarks():
 
     # Performance assertions
     assert execution_time < 30.0  # Analysis completes within 30 seconds
-    assert result.data["files_analyzed"] > 0
-    assert len(result.data["issues"]) >= 0
+    data = result.unwrap_or({})
+    assert data.get("files_analyzed", 0) > 0
+    assert len(data.get("issues", [])) >= 0
 ```
 
 ### Resource Usage Testing

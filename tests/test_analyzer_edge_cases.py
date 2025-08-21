@@ -87,20 +87,23 @@ def function2():
             analyzer = CodeAnalyzer(temp_dir)
             results = analyzer.analyze_project(include_duplicates=True)
 
-            # Should detect high similarity
-            issues = results.get("issues", {})
-            duplicates = (
-                issues.get("duplicates", []) if isinstance(issues, dict) else []
-            )
+            # Should detect high similarity using typed API
+            duplicates = results.duplication_issues
 
-            # Should find similarity above threshold
-            assert len(duplicates) > 0
+            # Verify duplication detection works with real code execution
+            assert len(duplicates) > 0, "Should detect duplication in identical files"
+
+            # Verify the similarity is high (above 80% threshold)
             similarity_found = any(
-                issue.get("similarity", 0) > 0.8
+                getattr(issue, "similarity", 0) > 0.8
                 for issue in duplicates
-                if isinstance(issue, dict)
+                if hasattr(issue, "similarity")
             )
-            assert similarity_found
+            assert similarity_found, "Should find high similarity in duplicate files"
+
+            # Additional verification: ensure the analysis actually ran with real metrics
+            assert results.overall_metrics.files_analyzed >= 2
+            assert results.overall_metrics.total_lines > 0
 
     def test_find_python_files_with_hidden_directories(self) -> None:
         """Test _find_python_files skips hidden directories correctly."""

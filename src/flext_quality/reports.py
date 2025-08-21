@@ -5,7 +5,14 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
+from flext_quality.analysis_types import (
+    AnalysisResults,
+)
+from flext_quality.domain.grade_calculator import QualityGradeCalculator
+from flext_quality.utilities import (
+    FlextQualityUtilities,
+    FlextReportUtilities,
+)
 
 # Constants for display limits
 ISSUE_PREVIEW_LIMIT = 5
@@ -19,15 +26,15 @@ HIGH_TYPE_ERROR_THRESHOLD = 10
 class QualityReport:
     """Generates quality reports from analysis results."""
 
-    def __init__(self, analysis_results: dict[str, object]) -> None:
+    def __init__(self, analysis_results: AnalysisResults) -> None:
         """Initialize the quality report generator.
 
         Args:
-            analysis_results: Dictionary containing analysis results and metrics.
+            analysis_results: Strongly-typed analysis results and metrics.
 
         """
         # Store analysis results directly
-        self.results: dict[str, object] = analysis_results
+        self.results: AnalysisResults = analysis_results
 
     def generate_text_report(self) -> str:
         """Generate a text-based quality report."""
@@ -51,19 +58,20 @@ class QualityReport:
             "-" * 30,
         ]
 
-        # Add issue details
-        results_dict = dict(self.results) if isinstance(self.results, dict) else {}
-        issues_obj = results_dict.get("issues", {})
-        issues = dict(issues_obj) if isinstance(issues_obj, dict) else {}
-        for category, issue_list in issues.items():
+        # Add issue details using utilities for proper typing
+        issue_categories: dict[str, list[object]] = (
+            FlextReportUtilities.format_issue_categories(self.results)
+        )
+
+        for category, issue_list in issue_categories.items():
             if issue_list:
-                report_lines.append(f"\n{category.upper()} ({len(issue_list)} issues):")
+                report_lines.append(f"\n{category} ({len(issue_list)} issues):")
                 # Show first few issues
-                report_lines.extend(
-                    f"  - {issue.get('file', 'Unknown')}: "
-                    f"{issue.get('message', 'No message')}"
-                    for issue in issue_list[:ISSUE_PREVIEW_LIMIT]
-                )
+                for issue in issue_list[:ISSUE_PREVIEW_LIMIT]:
+                    summary = FlextQualityUtilities.get_issue_summary(issue)
+                    message = getattr(issue, "message", "No description available")
+                    report_lines.append(f"  - {summary}: {message}")
+
                 if len(issue_list) > ISSUE_PREVIEW_LIMIT:
                     report_lines.append(
                         f"  ... and {len(issue_list) - ISSUE_PREVIEW_LIMIT} more",
@@ -85,7 +93,7 @@ class QualityReport:
 
     def generate_json_report(self) -> str:
         """Generate a JSON-formatted quality report."""
-        report_data = {
+        report_data: dict[str, object] = {
             "summary": {
                 "grade": self._get_quality_grade(),
                 "score": self._get_quality_score(),
@@ -125,23 +133,17 @@ class QualityReport:
             '<html lang="en">',
             "<head>",
             '    <meta charset="UTF-8">',
-            '    <meta name="viewport" '
-            'content="width=device-width, initial-scale=1.0">',
+            '    <meta name="viewport" content="width=device-width, initial-scale=1.0">',
             "    <title>FLEXT Quality Report</title>",
             "    <style>",
             "        body { font-family: Arial, sans-serif; margin: 20px; }",
-            "        .header { background: #2c3e50; color: white; "
-            "padding: 20px; border-radius: 5px; }",
+            "        .header { background: #2c3e50; color: white; padding: 20px; border-radius: 5px; }",
             "        .summary { margin: 20px 0; }",
-            f"        .grade {{ font-size: 3em; font-weight: bold; "
-            f"color: {grade_color}; }}",
+            f"        .grade {{ font-size: 3em; font-weight: bold; color: {grade_color}; }}",
             "        .score { font-size: 1.5em; }",
-            "        .section { margin: 20px 0; padding: 15px; "
-            "border: 1px solid #ddd; border-radius: 5px; }",
-            "        .issue { margin: 5px 0; padding: 5px; "
-            "background: #f8f9fa; border-radius: 3px; }",
-            "        .metric { display: inline-block; margin: 10px; "
-            "padding: 10px; background: #e9ecef; border-radius: 5px; },"
+            "        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }",
+            "        .issue { margin: 5px 0; padding: 5px; background: #f8f9fa; border-radius: 3px; }",
+            "        .metric { display: inline-block; margin: 10px; padding: 10px; background: #e9ecef; border-radius: 5px; }",
             "        .high-severity { background: #ff6b6b; color: white; }",
             "        .medium-severity { background: #ffa726; color: white; }",
             "        .low-severity { background: #66bb6a; color: white; }",
@@ -159,14 +161,10 @@ class QualityReport:
             "",
             '    <div class="section">',
             "        <h2>Quality Metrics</h2>",
-            f'        <div class="metric"><strong>Total Issues:</strong> '
-            f"{total_issues}</div>",
-            f'        <div class="metric"><strong>Critical Issues:</strong> '
-            f"{critical_issues}</div>",
-            f'        <div class="metric"><strong>Files Analyzed:</strong> '
-            f"{files_analyzed}</div>",
-            f'        <div class="metric"><strong>Code Coverage:</strong> '
-            f"{coverage_percent}%</div>",
+            f'        <div class="metric"><strong>Total Issues:</strong> {total_issues}</div>',
+            f'        <div class="metric"><strong>Critical Issues:</strong> {critical_issues}</div>',
+            f'        <div class="metric"><strong>Files Analyzed:</strong> {files_analyzed}</div>',
+            f'        <div class="metric"><strong>Code Coverage:</strong> {coverage_percent}%</div>',
             "    </div>",
             "",
             f"    {issues_html}",
@@ -236,36 +234,41 @@ class QualityReport:
 
     def _get_total_issues(self) -> int:
         """Get total number of issues."""
-        issues_obj = self.results.get("issues", {})
-        issues = dict(issues_obj) if isinstance(issues_obj, dict) else {}
-        return sum(len(issue_list) for issue_list in issues.values())
+        # Use modern AnalysisResults API only
+        return self.results.total_issues
 
     def _get_critical_issues(self) -> int:
         """Get number of critical issues."""
-        issues_obj = self.results.get("issues", {})
-        issues = dict(issues_obj) if isinstance(issues_obj, dict) else {}
-        critical_categories = ["security", "errors", "critical"]
-        return sum(len(issues.get(category, [])) for category in critical_categories)
+        # Use modern AnalysisResults API only
+        return self.results.critical_issues
 
     def _get_files_analyzed(self) -> int:
         """Get number of files analyzed."""
-        metrics_obj = self.results.get("metrics", {})
-        metrics = dict(metrics_obj) if isinstance(metrics_obj, dict) else {}
-        return int(metrics.get("files_analyzed", 0))
+        return self.results.overall_metrics.files_analyzed
 
     def _get_coverage_percent(self) -> float:
         """Get code coverage percentage."""
-        metrics_obj = self.results.get("metrics", {})
-        metrics = dict(metrics_obj) if isinstance(metrics_obj, dict) else {}
-        return float(metrics.get("coverage_percent", 0.0))
+        return self.results.overall_metrics.coverage_score
 
     def _generate_issues_html(self) -> str:
         """Generate HTML for issues section."""
-        html_parts = []
-        issues_obj = self.results.get("issues", {})
-        issues = dict(issues_obj) if isinstance(issues_obj, dict) else {}
+        html_parts: list[str] = FlextReportUtilities.create_report_lines()
+        issue_categories: dict[str, list[object]] = {
+            "security": FlextQualityUtilities.safe_issue_list(
+                self.results.security_issues
+            ),
+            "complexity": FlextQualityUtilities.safe_issue_list(
+                self.results.complexity_issues
+            ),
+            "dead_code": FlextQualityUtilities.safe_issue_list(
+                self.results.dead_code_issues
+            ),
+            "duplication": FlextQualityUtilities.safe_issue_list(
+                self.results.duplication_issues
+            ),
+        }
 
-        for category, issue_list in issues.items():
+        for category, issue_list in issue_categories.items():
             if not issue_list:
                 continue
 
@@ -277,21 +280,32 @@ class QualityReport:
             )
 
             for issue in issue_list[:10]:  # Show first 10 issues
-                severity = issue.get("severity", "low")
-                file_path = issue.get("file", "Unknown")
-                message = issue.get("message", "No message")
-                line = issue.get("line", "")
-                line_info = f" (line {line})" if line else ""
+                # Get attributes based on issue type
+                if hasattr(issue, "severity"):
+                    severity = getattr(issue, "severity", "low")
+                else:
+                    severity = "low"
+
+                if hasattr(issue, "file_path"):
+                    file_path = str(getattr(issue, "file_path", "Unknown"))
+                else:
+                    file_path = "Unknown"
+
+                message = getattr(issue, "message", "No message")
+
+                if hasattr(issue, "line_number"):
+                    line = getattr(issue, "line_number", "")
+                    line_info = f" (line {line})" if line else ""
+                else:
+                    line_info = ""
 
                 html_parts.append(
-                    f'        <div class="issue {severity}-severity">'
-                    f"<strong>{file_path}{line_info}:</strong> {message}</div>",
+                    f'        <div class="issue {severity}-severity"><strong>{file_path}{line_info}:</strong> {message}</div>',
                 )
 
             if len(issue_list) > HTML_ISSUE_LIMIT:
                 html_parts.append(
-                    f'        <div class="issue">... and '
-                    f"{len(issue_list) - HTML_ISSUE_LIMIT} more issues</div>",
+                    f'        <div class="issue">... and {len(issue_list) - HTML_ISSUE_LIMIT} more issues</div>',
                 )
 
             html_parts.append("    </div>")
@@ -300,7 +314,7 @@ class QualityReport:
 
     def _generate_recommendations(self) -> list[str]:
         """Generate recommendations based on analysis results."""
-        recommendations = []
+        recommendations: list[str] = FlextReportUtilities.create_report_lines()
 
         total_issues = self._get_total_issues()
         critical_issues = self._get_critical_issues()
@@ -317,26 +331,24 @@ class QualityReport:
             )
 
         if score < MIN_SCORE_THRESHOLD:
-            recommendations.extend(
-                (
+            FlextReportUtilities.safe_extend_lines(
+                recommendations,
+                [
                     "Implement automated code quality checks in your CI/CD pipeline",
                     "Add comprehensive unit tests to improve coverage",
-                ),
+                ],
             )
 
         coverage = self._get_coverage_percent()
         if coverage < MIN_COVERAGE_THRESHOLD:
             recommendations.append(
-                f"Increase test coverage from {coverage}% to at least "
-                f"{MIN_COVERAGE_THRESHOLD}%",
+                f"Increase test coverage from {coverage}% to at least {MIN_COVERAGE_THRESHOLD}%",
             )
 
-        issues_obj = self.results.get("issues", {})
-        issues = dict(issues_obj) if isinstance(issues_obj, dict) else {}
-        if issues.get("duplicates"):
+        if self.results.duplication_issues:
             recommendations.append("Refactor duplicate code to improve maintainability")
 
-        if issues.get("complexity"):
+        if self.results.complexity_issues:
             recommendations.append("Simplify complex functions and classes")
 
         if not recommendations:

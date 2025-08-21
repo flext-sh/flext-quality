@@ -44,10 +44,13 @@ Version: 0.9.0
 
 from __future__ import annotations
 
+from typing import override
+
 from flext_core import FlextModel, FlextResult
 from pydantic import Field, computed_field
 
-from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
+from flext_quality.analysis_types import AnalysisResults, OverallMetrics
+from flext_quality.domain.grade_calculator import QualityGradeCalculator
 
 # Constants
 MAX_QUALITY_SCORE = 100
@@ -161,7 +164,9 @@ class QualityMetrics(FlextModel):
     )
 
     @classmethod
-    def from_analysis_results(cls, results: dict[str, object]) -> QualityMetrics:
+    def from_analysis_results(
+        cls, results: dict[str, object] | AnalysisResults
+    ) -> QualityMetrics:
         """Create QualityMetrics from comprehensive analysis results.
 
         Factory method that processes raw analysis results and calculates
@@ -193,28 +198,75 @@ class QualityMetrics(FlextModel):
             missing values gracefully with appropriate defaults.
 
         """
-        # Extract results data safely
-        results_dict = results
+        # Handle both dict and AnalysisResults types
+        if hasattr(results, "overall_metrics"):  # AnalysisResults object
+            if isinstance(results, AnalysisResults):
+                analysis_results = results
+            else:
+                # Create default AnalysisResults if needed
+                analysis_results = AnalysisResults(
+                    overall_metrics=OverallMetrics(),
+                    file_metrics=[],
+                    complexity_issues=[],
+                    security_issues=[],
+                    dead_code_issues=[],
+                    duplication_issues=[],
+                )
+            return cls._from_analysis_results_object(analysis_results)
+
+        # Legacy dict format
+        results_dict = dict(results) if isinstance(results, dict) else {}
         metrics_obj = results_dict.get("metrics", {})
         metrics_data = dict(metrics_obj) if isinstance(metrics_obj, dict) else {}
         issues_obj = results_dict.get("issues", {})
         issues = dict(issues_obj) if isinstance(issues_obj, dict) else {}
 
-        # Basic counts
-        total_files = metrics_data.get("total_files", 0)
-        total_loc = metrics_data.get("total_lines_of_code", 0)
-        total_functions = metrics_data.get("total_functions", 0)
-        total_classes = metrics_data.get("total_classes", 0)
+        # Basic counts with type safety - handle None and non-numeric values
+        def safe_int(value: object, default: int = 0) -> int:
+            """Safely convert value to int."""
+            if value is None:
+                return default
+            if isinstance(value, int):
+                return value
+            if isinstance(value, (str, float)):
+                try:
+                    return int(value)
+                except (TypeError, ValueError):
+                    return default
+            return default
 
-        # Complexity
-        avg_complexity = metrics_data.get("average_complexity", 0.0)
-        max_complexity = metrics_data.get("max_complexity", 0.0)
+        def safe_float(value: object, default: float = 0.0) -> float:
+            """Safely convert value to float."""
+            if value is None:
+                return default
+            if isinstance(value, float):
+                return value
+            if isinstance(value, (str, int)):
+                try:
+                    return float(value)
+                except (TypeError, ValueError):
+                    return default
+            return default
 
-        # Issue counts
-        security_count = len(issues.get("security", []))
-        dead_code_count = len(issues.get("dead_code", []))
-        duplicate_count = len(issues.get("duplicates", []))
-        complexity_count = len(issues.get("complexity", []))
+        total_files: int = safe_int(metrics_data.get("total_files", 0))
+        total_loc: int = safe_int(metrics_data.get("total_lines_of_code", 0))
+        total_functions: int = safe_int(metrics_data.get("total_functions", 0))
+        total_classes: int = safe_int(metrics_data.get("total_classes", 0))
+
+        # Complexity with type safety
+        avg_complexity: float = safe_float(metrics_data.get("average_complexity", 0.0))
+        max_complexity: float = safe_float(metrics_data.get("max_complexity", 0.0))
+
+        # Issue counts with type safety
+        def safe_list_len(value: object, default: int = 0) -> int:
+            """Safely get length of value if it's a list."""
+            return len(value) if isinstance(value, list) else default
+
+        security_issues_list = issues.get("security", [])
+        security_count = safe_list_len(security_issues_list)
+        dead_code_count = safe_list_len(issues.get("dead_code", []))
+        duplicate_count = safe_list_len(issues.get("duplicates", []))
+        complexity_count = safe_list_len(issues.get("complexity", []))
 
         # Calculate component scores
         complexity_score = max(0, 100 - (avg_complexity * 5))
@@ -236,6 +288,114 @@ class QualityMetrics(FlextModel):
         quality_grade_enum = QualityGradeCalculator.calculate_grade(overall_score)
         quality_grade = quality_grade_enum.value
 
+        return cls._create_metrics_instance(
+            overall_score,
+            quality_grade,
+            total_files,
+            total_loc,
+            total_functions,
+            total_classes,
+            avg_complexity,
+            max_complexity,
+            complexity_count,
+            security_count,
+            dead_code_count,
+            duplicate_count,
+            complexity_score,
+            security_score,
+            maintainability_score,
+            duplication_score,
+            documentation_score,
+        )
+
+    @classmethod
+    def _from_analysis_results_object(cls, results: AnalysisResults) -> QualityMetrics:
+        """Create QualityMetrics from typed AnalysisResults object."""
+        # Extract metrics from typed object
+        total_files = len(results.file_metrics)
+        total_loc = sum(file.lines_of_code for file in results.file_metrics)
+        total_functions = 0  # Would need to be calculated from file metrics
+        total_classes = 0  # Would need to be calculated from file metrics
+
+        # Complexity metrics
+        complexity_values = [
+            issue.complexity_value for issue in results.complexity_issues
+        ]
+        avg_complexity = (
+            sum(complexity_values) / len(complexity_values)
+            if complexity_values
+            else 0.0
+        )
+        max_complexity = max(complexity_values) if complexity_values else 0.0
+
+        # Issue counts
+        security_count = len(results.security_issues)
+        dead_code_count = len(results.dead_code_issues)
+        duplicate_count = len(results.duplication_issues)
+        complexity_count = len(results.complexity_issues)
+
+        # Calculate component scores
+        complexity_score = max(0, 100 - (avg_complexity * 5))
+        security_score = max(0, 100 - (security_count * 10))
+        maintainability_score = max(0, 100 - (complexity_count * 5))
+        duplication_score = max(0, 100 - (duplicate_count * 10))
+        documentation_score = 75.0  # Placeholder
+
+        # Overall score (weighted average)
+        overall_score = (
+            complexity_score * 0.25
+            + security_score * 0.25
+            + maintainability_score * 0.2
+            + duplication_score * 0.15
+            + documentation_score * 0.15
+        )
+
+        # Quality grade
+        quality_grade_enum = QualityGradeCalculator.calculate_grade(overall_score)
+        quality_grade = quality_grade_enum.value
+
+        return cls._create_metrics_instance(
+            overall_score,
+            quality_grade,
+            total_files,
+            total_loc,
+            total_functions,
+            total_classes,
+            avg_complexity,
+            max_complexity,
+            complexity_count,
+            security_count,
+            dead_code_count,
+            duplicate_count,
+            complexity_score,
+            security_score,
+            maintainability_score,
+            duplication_score,
+            documentation_score,
+        )
+
+    @classmethod
+    def _create_metrics_instance(
+        cls,
+        overall_score: float,
+        quality_grade: str,
+        total_files: int,
+        total_loc: int,
+        total_functions: int,
+        total_classes: int,
+        avg_complexity: float,
+        max_complexity: float,
+        complexity_count: int,
+        security_count: int,
+        dead_code_count: int,
+        duplicate_count: int,
+        complexity_score: float,
+        security_score: float,
+        maintainability_score: float,
+        duplication_score: float,
+        documentation_score: float,
+    ) -> QualityMetrics:
+        """Create QualityMetrics instance with all parameters."""
         return cls.model_validate(
             {
                 "overall_score": overall_score,
@@ -313,6 +473,7 @@ class QualityMetrics(FlextModel):
             + self.complexity_issues_count
         )
 
+    @override
     def to_dict(
         self,
         *,
@@ -389,6 +550,7 @@ class QualityMetrics(FlextModel):
     # Architecture Note: Grade calculation centralized in QualityGradeCalculator
     # for consistency across FLEXT ecosystem quality services
 
+    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate quality metrics against domain business rules.
 

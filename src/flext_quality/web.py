@@ -22,7 +22,7 @@ from flext_web import create_service, get_web_settings
 from werkzeug.wrappers import Response as WerkzeugResponse
 
 from flext_quality.analyzer import CodeAnalyzer
-from flext_quality.simple_api import QualityAPI
+from flext_quality.api import QualityAPI
 
 ResponseType = FlaskResponse | WerkzeugResponse | tuple[FlaskResponse, int]
 
@@ -153,9 +153,8 @@ class QualityWebInterface:
         analyzer = CodeAnalyzer(Path(project_path))
         result = analyzer.analyze_project()
 
-        # Safely extract files list
-        files_data = result.get("files", [])
-        files_count = len(files_data) if isinstance(files_data, list) else 0
+        # Extract data from AnalysisResults
+        files_count = result.overall_metrics.files_analyzed
 
         return jsonify(
             {
@@ -163,8 +162,12 @@ class QualityWebInterface:
                 "data": {
                     "path": project_path,
                     "files_analyzed": files_count,
-                    "issues": result.get("issues", []),
-                    "metrics": result.get("metrics", {}),
+                    "issues": result.total_issues,
+                    "metrics": {
+                        "quality_score": result.overall_metrics.quality_score,
+                        "security_score": result.overall_metrics.security_score,
+                        "coverage_score": result.overall_metrics.coverage_score,
+                    },
                 },
             },
         )
@@ -172,7 +175,7 @@ class QualityWebInterface:
     def get_metrics(self) -> ResponseType:
         """Get quality metrics."""
         # Use simple placeholder metrics for now
-        metrics = {
+        metrics: dict[str, object] = {
             "coverage": 95.0,
             "complexity": 10.0,
             "duplication": 5.0,
@@ -186,7 +189,7 @@ class QualityWebInterface:
             return jsonify({"success": False, "error": "Invalid format"}), 400
 
         # Simple report placeholder
-        report = {
+        report: dict[str, object] = {
             "format": report_format,
             "generated_at": "2025-01-08",
             "quality_score": "A",

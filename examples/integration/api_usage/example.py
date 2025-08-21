@@ -17,7 +17,12 @@ import sys
 import tempfile
 from pathlib import Path
 
-from flext_core import get_logger
+from flext_core import FlextContainer, get_logger
+from flext_observability import (
+    flext_create_log_entry,
+    flext_create_metric,
+    flext_create_trace,
+)
 
 from flext_quality import (
     CodeAnalyzer,
@@ -165,19 +170,13 @@ async def demonstrate_service_integration() -> None:  # noqa: PLR0912
             language="python",
         )
 
-        if project_result.success:
-            project = project_result.data
-        else:
-            return
+        project = project_result.unwrap_or(None)
 
         # Create analysis
 
         analysis_result = await analysis_service.create_analysis(project_id=project.id)
 
-        if analysis_result.success:
-            analysis = analysis_result.data
-        else:
-            return
+        analysis = analysis_result.unwrap_or(None)
 
         # Update analysis metrics
         metrics_result = await analysis_service.update_metrics(
@@ -189,10 +188,7 @@ async def demonstrate_service_integration() -> None:  # noqa: PLR0912
             blank_lines=20,
         )
 
-        if metrics_result.success:
-            pass
-        else:
-            return
+        metrics_result.unwrap_or(None)  # Handle result
 
         # Update quality scores
         scores_result = await analysis_service.update_scores(
@@ -204,10 +200,7 @@ async def demonstrate_service_integration() -> None:  # noqa: PLR0912
             maintainability_score=80.0,
         )
 
-        if scores_result.success:
-            pass
-        else:
-            return
+        scores_result.unwrap_or(None)  # Handle result
 
         # Create issues
 
@@ -246,8 +239,8 @@ async def demonstrate_service_integration() -> None:  # noqa: PLR0912
                 **issue_data,
             )
 
-            if issue_result.success:
-                issue = issue_result.data
+            issue = issue_result.unwrap_or(None)
+            if issue is not None:
                 created_issues.append(issue)
 
         # Update issue counts in analysis
@@ -259,14 +252,12 @@ async def demonstrate_service_integration() -> None:  # noqa: PLR0912
             low=1,
         )
 
-        if issue_counts_result.success:
-            pass
+        issue_counts_result.unwrap_or(None)  # Handle result
 
         # Complete the analysis
         complete_result = await analysis_service.complete_analysis(analysis.id)
 
-        if complete_result.success:
-            pass
+        complete_result.unwrap_or(None)  # Handle result
 
         # Create reports
 
@@ -279,22 +270,19 @@ async def demonstrate_service_integration() -> None:  # noqa: PLR0912
                 report_type=report_type,
             )
 
-            if report_result.success:
-                pass
+            report_result.unwrap_or(None)  # Handle result
 
         # List all reports for the analysis
         reports_result = await report_service.list_reports(analysis.id)
 
-        if reports_result.success:
-            reports = reports_result.data
-            for _report in reports:
-                pass
+        reports = reports_result.unwrap_or([])
+        for _report in reports:
+            pass
 
 
 async def demonstrate_flext_ecosystem_integration() -> None:
     """Demonstrate FLEXT ecosystem integration patterns."""
-    if not FLEXT_CORE_AVAILABLE:
-        pass
+    # FLEXT ecosystem integration is always available
 
     # Demonstrate FlextResult pattern usage
 
@@ -340,12 +328,6 @@ def process_data(data):
         # Demonstrate observability integration (if available)
 
         try:
-            from flext_observability import (
-                flext_create_log_entry,
-                flext_create_metric,
-                flext_create_trace,
-            )
-
             # Create metrics
             flext_create_metric(
                 name="quality_analysis_score",
@@ -377,42 +359,36 @@ def process_data(data):
 
         # Demonstrate container-based dependency injection (if available)
 
-        if FLEXT_CORE_AVAILABLE:
-            try:
-                from flext_core import FlextContainer
+        try:
+            # Create container
+            container = FlextContainer()
 
-                # Create container
-                container = FlextContainer()
+            # Register services
+            project_service_instance = QualityProjectService()
+            analysis_service_instance = QualityAnalysisService()
 
-                # Register services
-                project_service_instance = QualityProjectService()
-                analysis_service_instance = QualityAnalysisService()
+            container.register("QualityProjectService", project_service_instance)
+            container.register("QualityAnalysisService", analysis_service_instance)
 
-                container.register("QualityProjectService", project_service_instance)
-                container.register("QualityAnalysisService", analysis_service_instance)
-
-                # Resolve services (FlextContainer.get returns FlextResult)
-                project_service_result = container.get("QualityProjectService")
-                analysis_service_result = container.get("QualityAnalysisService")
-
-                if project_service_result.success and analysis_service_result.success:
-                    project_service = project_service_result.data
-
-                    # Demonstrate service usage
-                    with tempfile.TemporaryDirectory() as temp_service_dir:
-                        project_result = await project_service.create_project(
-                            name="DI Demo Project",
-                            project_path=temp_service_dir,
-                        )
-
-                        if project_result.success:
-                            pass
-
-            except ImportError:
-                # Direct instantiation
-                project_service = QualityProjectService()
+            # Resolve services using current API
+            project_service = container.get("QualityProjectService").unwrap_or(
+                QualityProjectService()
+            )
+            container.get("QualityAnalysisService").unwrap_or(
                 QualityAnalysisService()
-        else:
+            )
+
+            # Demonstrate service usage
+            with tempfile.TemporaryDirectory() as temp_service_dir:
+                project_result = await project_service.create_project(
+                    name="DI Demo Project",
+                    project_path=temp_service_dir,
+                )
+
+                project_result.unwrap_or(None)  # Handle result
+
+        except ImportError:
+            # Direct instantiation
             project_service = QualityProjectService()
             QualityAnalysisService()
 

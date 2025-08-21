@@ -3,63 +3,27 @@
 from __future__ import annotations
 
 import ast
-import importlib
 from pathlib import Path
 
 from flext_core import get_logger
+from flext_observability import (
+    flext_create_log_entry,
+    flext_create_metric,
+    flext_create_trace,
+)
 
-from flext_quality.domain.quality_grade_calculator import QualityGradeCalculator
-
-
-# Import lazily inside methods to avoid pydantic model rebuild side-effects during import
-# Expose observability symbols for tests to patch via module attribute shims
-def flext_create_trace(
-    *,
-    trace_id: str,
-    operation: str,
-    config: dict[str, object] | None = None,
-) -> None:
-    """Shim for observability trace; safe no-op if backend unavailable."""
-    try:
-        mod = importlib.import_module("flext_observability")
-        real = getattr(mod, "flext_create_trace", None)
-        if callable(real):
-            real(trace_id=trace_id, operation=operation, config=config)
-    except Exception:
-        return
-
-
-def flext_create_metric(
-    *,
-    name: str,
-    value: float,
-    tags: dict[str, object] | None = None,
-) -> None:
-    """Shim for observability metric; safe no-op if backend unavailable."""
-    try:
-        mod = importlib.import_module("flext_observability")
-        real = getattr(mod, "flext_create_metric", None)
-        if callable(real):
-            real(name=name, value=value, tags=tags)
-    except Exception:
-        return
-
-
-def flext_create_log_entry(
-    *,
-    message: str,
-    level: str,
-    context: dict[str, object] | None = None,
-) -> None:
-    """Shim for observability log; safe no-op if backend unavailable."""
-    try:
-        mod = importlib.import_module("flext_observability")
-        real = getattr(mod, "flext_create_log_entry", None)
-        if callable(real):
-            real(message=message, level=level, context=context)
-    except Exception:
-        return
-
+from flext_quality.analysis_types import (
+    AnalysisResults,
+    ComplexityIssue,
+    DeadCodeIssue,
+    DuplicationIssue,
+    FileAnalysisResult,
+    IssueSeverity,
+    IssueType,
+    OverallMetrics,
+    SecurityIssue,
+)
+from flext_quality.domain.grade_calculator import QualityGradeCalculator
 
 logger = get_logger(__name__)
 
@@ -74,7 +38,7 @@ class CodeAnalyzer:
     def __init__(self, project_path: str | Path) -> None:
         """Initialize analyzer with project path."""
         self.project_path = Path(project_path)
-        self.analysis_results: dict[str, object] = {}
+        self._current_results: AnalysisResults | None = None
 
     def analyze_project(
         self,
@@ -83,7 +47,7 @@ class CodeAnalyzer:
         include_complexity: bool = True,
         include_dead_code: bool = True,
         include_duplicates: bool = True,
-    ) -> dict[str, object]:
+    ) -> AnalysisResults:
         """Analyze entire project for quality metrics and issues.
 
         Args:
@@ -97,125 +61,88 @@ class CodeAnalyzer:
 
         """
         # Create trace for the entire analysis
-        # Emit trace via shim (patched in tests; no hard dependency at runtime)
+        # Emit trace via observability integration
         flext_create_trace(
-            trace_id=f"analyze_project_{self.project_path.name}",
-            operation="CodeAnalyzer.analyze_project",
+            operation_name="CodeAnalyzer.analyze_project",
+            service_name="flext-quality",
             config={"project_path": str(self.project_path)},
         )
 
         logger.info("Starting project analysis: %s", self.project_path)
         flext_create_log_entry(
             message=f"Starting comprehensive code analysis for {self.project_path}",
+            service="flext-quality",
             level="info",
-            context={
-                "analyzer": "CodeAnalyzer",
-                "project_path": str(self.project_path),
-            },
         )
-
-        results: dict[str, object] = {
-            "project_path": str(self.project_path),
-            "files_analyzed": 0,
-            "total_lines": 0,
-            "python_files": [],
-            "metrics": {},
-            "issues": {
-                "security": [],
-                "complexity": [],
-                "dead_code": [],
-                "duplicates": [],
-            },
-        }
 
         # Find Python files
         python_files = self._find_python_files()
-        results["python_files"] = [str(f) for f in python_files]
-        results["files_analyzed"] = len(python_files)
+        files_analyzed = len(python_files)
 
-        # Analyze each file with proper type safety
-        file_metrics = []
+        # Analyze each file
+        file_metrics: list[FileAnalysisResult] = []
         total_lines = 0
         for file_path in python_files:
             metrics = self._analyze_file(file_path)
             if metrics:
                 file_metrics.append(metrics)
-                lines = metrics.get("lines_of_code", 0)
-                if isinstance(lines, (int, float)):
-                    total_lines += int(lines)
-
-        results["total_lines"] = total_lines
+                total_lines += metrics.lines_of_code
 
         # Calculate overall metrics
-        results["metrics"] = self._calculate_overall_metrics(file_metrics)
+        overall_metrics = OverallMetrics(
+            files_analyzed=files_analyzed,
+            total_lines=total_lines,
+            quality_score=self._calculate_quality_score(file_metrics),
+            coverage_score=85.0,  # Placeholder - would need real coverage integration
+            security_score=90.0,  # Will be calculated from security issues
+            maintainability_score=80.0,  # Will be calculated from complexity
+            complexity_score=75.0,  # Will be calculated from complexity issues
+        )
 
-        # Run specialized analyses with proper type casting
-        issues_dict = results["issues"]
-        if isinstance(issues_dict, dict):
-            if include_security:
-                issues_dict["security"] = self._analyze_security()
+        # Run specialized analyses
+        complexity_issues = (
+            self._analyze_complexity(file_metrics) if include_complexity else []
+        )
+        security_issues = self._analyze_security() if include_security else []
+        dead_code_issues = self._analyze_dead_code() if include_dead_code else []
+        duplication_issues = self._analyze_duplicates() if include_duplicates else []
 
-            if include_complexity:
-                issues_dict["complexity"] = self._analyze_complexity(file_metrics)
+        # Create final results
+        results = AnalysisResults(
+            overall_metrics=overall_metrics,
+            file_metrics=file_metrics,
+            complexity_issues=complexity_issues,
+            security_issues=security_issues,
+            dead_code_issues=dead_code_issues,
+            duplication_issues=duplication_issues,
+        )
 
-            if include_dead_code:
-                issues_dict["dead_code"] = self._analyze_dead_code()
-
-            if include_duplicates:
-                issues_dict["duplicates"] = self._analyze_duplicates()
-
-        self.analysis_results = results
+        # Store results for further analysis
+        self._current_results = results
 
         # Create metrics for observability using REAL flext-observability API with type safety
-        files_analyzed = results["files_analyzed"]
-        if isinstance(files_analyzed, (int, float)):
-            flext_create_metric(
-                name="code_analysis_files_analyzed",
-                value=float(files_analyzed),
-                tags={"project_path": str(self.project_path)},
-            )
-
-        total_lines_obj = results["total_lines"]
-        if isinstance(total_lines_obj, (int, float)):
-            flext_create_metric(
-                name="code_analysis_total_lines",
-                value=float(total_lines_obj),
-                tags={"project_path": str(self.project_path)},
-            )
-
-        # Count total issues for metrics with proper type handling
-        issues_dict = results["issues"]
-        if isinstance(issues_dict, dict):
-            total_issues = sum(
-                len(issue_list)
-                for issue_list in issues_dict.values()
-                if isinstance(issue_list, list)
-            )
-        else:
-            total_issues = 0
+        flext_create_metric(
+            name="files_analyzed",
+            value=float(files_analyzed),
+            tags={"project": str(self.project_path)},
+        )
 
         flext_create_metric(
-            name="code_analysis_total_issues",
-            value=float(total_issues),
-            tags={"project_path": str(self.project_path)},
+            name="total_issues",
+            value=float(results.total_issues),
+            tags={"project": str(self.project_path)},
         )
 
         logger.info(
             "Analysis completed. Files: %d, Lines: %d",
-            results["files_analyzed"],
-            results["total_lines"],
+            files_analyzed,
+            total_lines,
         )
 
         flext_create_log_entry(
             message=f"Code analysis completed for {self.project_path}",
+            service="flext-quality",
             level="info",
-            context={
-                "analyzer": "CodeAnalyzer",
-                "project_path": str(self.project_path),
-                "files_analyzed": results["files_analyzed"],
-                "total_lines": results["total_lines"],
-                "total_issues": total_issues,
-            },
         )
 
         return results
@@ -227,44 +154,29 @@ class CodeAnalyzer:
             Quality score between 0.0 and 100.0 based on code quality metrics.
 
         """
-        if not self.analysis_results:
+        if not self._current_results:
             return 0.0
 
-        self.analysis_results.get("metrics", {})
-        issues_obj = self.analysis_results.get("issues", {})
-
-        # Type safety for issues dictionary
-        if not isinstance(issues_obj, dict):
-            return 0.0
-
-        issues = issues_obj
+        results = self._current_results
 
         # Base score
         score = 100.0
 
-        # Deduct for complexity issues with type safety
-        complexity_list = issues.get("complexity", [])
-        if isinstance(complexity_list, list):
-            complexity_penalty = len(complexity_list) * 5
-            score -= min(complexity_penalty, 30)
+        # Deduct for complexity issues
+        complexity_penalty = len(results.complexity_issues) * 5
+        score -= min(complexity_penalty, 30)
 
-        # Deduct for security issues with type safety
-        security_list = issues.get("security", [])
-        if isinstance(security_list, list):
-            security_penalty = len(security_list) * 10
-            score -= min(security_penalty, 40)
+        # Deduct for security issues
+        security_penalty = len(results.security_issues) * 10
+        score -= min(security_penalty, 40)
 
-        # Deduct for dead code with type safety
-        dead_code_list = issues.get("dead_code", [])
-        if isinstance(dead_code_list, list):
-            dead_code_penalty = len(dead_code_list) * 3
-            score -= min(dead_code_penalty, 20)
+        # Deduct for dead code
+        dead_code_penalty = len(results.dead_code_issues) * 3
+        score -= min(dead_code_penalty, 20)
 
-        # Deduct for duplicates with type safety
-        duplicates_list = issues.get("duplicates", [])
-        if isinstance(duplicates_list, list):
-            duplicate_penalty = len(duplicates_list) * 5
-            score -= min(duplicate_penalty, 25)
+        # Deduct for duplicates
+        duplicates_penalty = len(results.duplication_issues) * 8
+        score -= min(duplicates_penalty, 25)
 
         return max(0.0, score)
 
@@ -277,14 +189,14 @@ class CodeAnalyzer:
         """
         score = self.get_quality_score()
         grade = QualityGradeCalculator.calculate_grade(score)
-        return grade.value
+        return str(grade.value)
 
     def _find_python_files(self) -> list[Path]:
         if not self.project_path.exists():
             logger.warning("Project path does not exist: %s", self.project_path)
             return []
 
-        python_files = []
+        python_files: list[Path] = []
         for py_file in self.project_path.rglob("*.py"):
             # Skip hidden files and common ignore patterns
             if any(part.startswith(".") for part in py_file.parts):
@@ -299,14 +211,14 @@ class CodeAnalyzer:
 
         return python_files
 
-    def _analyze_file(self, file_path: Path) -> dict[str, object] | None:
+    def _analyze_file(self, file_path: Path) -> FileAnalysisResult | None:
         """Analyze a single Python file.
 
         Args:
             file_path: Path to the Python file.
 
         Returns:
-            Dictionary with file metrics or None if analysis fails.
+            FileAnalysisResult with file metrics or None if analysis fails.
 
         """
         try:
@@ -323,68 +235,36 @@ class CodeAnalyzer:
                     if line.strip() and not line.strip().startswith("#")
                 ],
             )
-            comment_lines = len(
-                [line for line in lines if line.strip().startswith("#")],
-            )
-            blank_lines = len([line for line in lines if not line.strip()])
 
             try:
                 tree = ast.parse(content)
 
-                # Count functions and classes (including async functions)
-                functions = [
-                    node
-                    for node in ast.walk(tree)
-                    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
-                ]
-                classes = [
-                    node for node in ast.walk(tree) if isinstance(node, ast.ClassDef)
-                ]
+                # Count functions and classes (including async functions) - for complexity calculation
 
                 # Calculate cyclomatic complexity (simplified)
                 complexity = self._calculate_complexity(tree)
 
-                # Handle file paths that may be outside project directory
-                try:
-                    relative_path = str(file_path.relative_to(self.project_path))
-                except ValueError:
-                    # File is outside project directory - use absolute path
-                    relative_path = str(file_path)
-
-                return {
-                    "file_path": relative_path,
-                    "lines_of_code": lines_of_code,
-                    "comment_lines": comment_lines,
-                    "blank_lines": blank_lines,
-                    "total_lines": len(lines),
-                    "function_count": len(functions),
-                    "class_count": len(classes),
-                    "complexity": complexity,
-                    "functions": [f.name for f in functions],
-                    "classes": [c.name for c in classes],
-                }
+                return FileAnalysisResult(
+                    file_path=file_path,
+                    lines_of_code=lines_of_code,
+                    complexity_score=max(0.0, min(100.0, 100.0 - complexity * 2)),
+                    security_issues=0,  # Will be calculated later
+                    style_issues=0,  # Will be calculated later
+                    dead_code_lines=0,  # Will be calculated later
+                )
 
             except SyntaxError as e:
                 # Reuse module-level logger
                 logger.warning("Syntax error in %s: %s", file_path, e)
-                # Handle file paths that may be outside project directory
-                try:
-                    relative_path = str(file_path.relative_to(self.project_path))
-                except ValueError:
-                    # File is outside project directory - use absolute path
-                    relative_path = str(file_path)
 
-                return {
-                    "file_path": relative_path,
-                    "lines_of_code": lines_of_code,
-                    "comment_lines": comment_lines,
-                    "blank_lines": blank_lines,
-                    "total_lines": len(lines),
-                    "function_count": 0,
-                    "class_count": 0,
-                    "complexity": 0,
-                    "syntax_error": str(e),
-                }
+                return FileAnalysisResult(
+                    file_path=file_path,
+                    lines_of_code=lines_of_code,
+                    complexity_score=0.0,  # No complexity for files with syntax errors
+                    security_issues=1,  # Syntax error is a security/quality issue
+                    style_issues=0,
+                    dead_code_lines=0,
+                )
         except (RuntimeError, ValueError, TypeError, FileNotFoundError, OSError):
             # Reuse module-level logger
             logger.exception("File analysis failed for %s", file_path)
@@ -431,7 +311,7 @@ class CodeAnalyzer:
                 List of numeric values with type safety guaranteed
 
             """
-            values = []
+            values: list[int | float] = []
             for m in metric_list:
                 value = m.get(key, default)
                 if isinstance(value, (int, float)):
@@ -465,103 +345,94 @@ class CodeAnalyzer:
             "avg_lines_per_file": total_loc / total_files if total_files > 0 else 0,
         }
 
-    def _analyze_security(self) -> list[dict[str, object]]:
-        # This is a simplified implementation
-        # In production, this would integrate with bandit or similar tools
-        issues = []
+    def _analyze_security(self) -> list[SecurityIssue]:
+        issues: list[SecurityIssue] = []
         for py_file in self.project_path.rglob("*.py"):
             try:
                 with py_file.open(encoding="utf-8") as f:
                     content = f.read()
 
-                # Simple security checks with proper type casting for consistency
+                # Simple security checks
                 if "eval(" in content:
                     issues.append(
-                        {
-                            "file": str(py_file.relative_to(self.project_path)),
-                            "type": "dangerous_function",
-                            "message": "Use of eval() detected",
-                            "severity": "high",
-                            "line": 0,  # Add line number for consistency with other dict structures
-                        },
+                        SecurityIssue(
+                            file_path=str(py_file.relative_to(self.project_path)),
+                            line_number=1,  # Would need line-by-line analysis for exact position
+                            issue_type=IssueType.SECURITY_VULNERABILITY,
+                            severity=IssueSeverity.HIGH,
+                            message="Use of eval() detected",
+                            rule_id="B307",  # Bandit rule ID for eval usage
+                        ),
                     )
 
                 if "exec(" in content:
                     issues.append(
-                        {
-                            "file": str(py_file.relative_to(self.project_path)),
-                            "type": "dangerous_function",
-                            "message": "Use of exec() detected",
-                            "severity": "high",
-                        },
+                        SecurityIssue(
+                            file_path=str(py_file.relative_to(self.project_path)),
+                            line_number=1,
+                            issue_type=IssueType.SECURITY_VULNERABILITY,
+                            severity=IssueSeverity.HIGH,
+                            message="Use of exec() detected",
+                            rule_id="B102",  # Bandit rule ID for exec usage
+                        ),
                     )
 
                 if "import os" in content and "os.system(" in content:
                     issues.append(
-                        {
-                            "file": str(py_file.relative_to(self.project_path)),
-                            "type": "command_injection",
-                            "message": "Potential command injection with os.system()",
-                            "severity": "medium",
-                        },
+                        SecurityIssue(
+                            file_path=str(py_file.relative_to(self.project_path)),
+                            line_number=1,
+                            issue_type=IssueType.SECURITY_VULNERABILITY,
+                            severity=IssueSeverity.MEDIUM,
+                            message="Potential command injection with os.system()",
+                            rule_id="B605",  # Bandit rule ID for os.system usage
+                        ),
                     )
             except (RuntimeError, ValueError, TypeError) as e:
                 logger.warning("Error checking security in %s: %s", py_file, e)
 
         return issues
 
+    def _calculate_quality_score(self, file_metrics: list[FileAnalysisResult]) -> float:
+        """Calculate overall quality score from file metrics."""
+        if not file_metrics:
+            return 0.0
+
+        total_score = sum(metrics.complexity_score for metrics in file_metrics)
+        return total_score / len(file_metrics)
+
     def _analyze_complexity(
         self,
-        file_metrics: list[dict[str, object]],
-    ) -> list[dict[str, object]]:
+        file_metrics: list[FileAnalysisResult],
+    ) -> list[ComplexityIssue]:
         complexity_threshold = 10
 
-        # DRY pattern: extract complexity once with proper type safety
-        complex_issues = []
+        complex_issues: list[ComplexityIssue] = []
         for metrics in file_metrics:
-            complexity_val = metrics.get("complexity", 0)
-            if (
-                isinstance(complexity_val, (int, float))
-                and complexity_val > complexity_threshold
-            ):
-                # For now, report file-level complexity but include function context
-                file_path = metrics.get("file_path", "unknown")
-                functions = metrics.get("functions", [])
-
-                # If functions exist, report the main contributor function
-                main_function = (
-                    functions[0]
-                    if isinstance(functions, list) and functions
-                    else "file_level"
-                )
-
+            # Calculate complexity from score - lower score means higher complexity
+            complexity_val = int((100.0 - metrics.complexity_score) / 2)
+            if complexity_val > complexity_threshold:
                 complex_issues.append(
-                    {
-                        "file": file_path,
-                        "function": main_function,  # Add function field as expected by test
-                        "type": "high_complexity",
-                        "message": f"High complexity: {complexity_val}",
-                        "complexity": complexity_val,
-                        "threshold": complexity_threshold,
-                    },
+                    ComplexityIssue(
+                        file_path=str(metrics.file_path),
+                        function_name="file_level",  # Would need AST parsing for specific functions
+                        line_number=1,
+                        complexity_value=complexity_val,
+                        issue_type="high_complexity",
+                        message=f"High complexity: {complexity_val}",
+                    ),
                 )
         return complex_issues
 
-    def _analyze_dead_code(self) -> list[dict[str, object]]:
+    def _analyze_dead_code(self) -> list[DeadCodeIssue]:
         # This is a placeholder - real implementation would use vulture or similar
-        issues = []
+        issues: list[DeadCodeIssue] = []
         for py_file in self.project_path.rglob("*.py"):
             try:
                 with py_file.open(encoding="utf-8") as f:
                     content = f.read()
 
                 lines = content.splitlines()
-                [
-                    line.strip()
-                    for line in lines
-                    if line.strip().startswith("import ")
-                    or line.strip().startswith("from ")
-                ]
 
                 # Simple heuristic: if import line contains "unused" comment
                 for i, line in enumerate(lines):
@@ -569,23 +440,23 @@ class CodeAnalyzer:
                         "import " in line or "from " in line
                     ) and "# unused" in line.lower():
                         issues.append(
-                            {
-                                "file": str(py_file.relative_to(self.project_path)),
-                                "line": i + 1,
-                                "type": "unused_import",
-                                "message": f"Potentially unused import: {line.strip()}",
-                            },
+                            DeadCodeIssue(
+                                file_path=str(py_file.relative_to(self.project_path)),
+                                line_number=i + 1,
+                                end_line_number=i + 1,
+                                code_type="unused_import",
+                                message=f"Potentially unused import: {line.strip()}",
+                            ),
                         )
             except (RuntimeError, ValueError, TypeError) as e:
                 logger.warning("Error checking dead code in %s: %s", py_file, e)
 
         return issues
 
-    def _analyze_duplicates(self) -> list[dict[str, object]]:
-        # This is a placeholder - real implementation would do more sophisticated analysis
-        issues = []
+    def _analyze_duplicates(self) -> list[DuplicationIssue]:
+        issues: list[DuplicationIssue] = []
 
-        file_contents = {}
+        file_contents: dict[Path, str] = {}
         for py_file in self.project_path.rglob("*.py"):
             try:
                 with py_file.open(encoding="utf-8") as f:
@@ -593,7 +464,7 @@ class CodeAnalyzer:
                     if len(content.strip()) > MIN_FILE_SIZE_FOR_DUPLICATION_CHECK:
                         # Only check substantial files
                         file_contents[py_file] = content
-            except (RuntimeError, ValueError, TypeError) as e:
+            except (RuntimeError, ValueError, TypeError, OSError, UnicodeDecodeError) as e:
                 logger.warning("Error reading %s: %s", py_file, e)
 
         # Simple duplicate detection based on file similarity
@@ -611,15 +482,18 @@ class CodeAnalyzer:
 
                     if similarity > SIMILARITY_THRESHOLD:  # 80% similarity threshold
                         issues.append(
-                            {
-                                "type": "duplicate_files",
-                                "files": [
+                            DuplicationIssue(
+                                files=[
                                     str(file1.relative_to(self.project_path)),
                                     str(file2.relative_to(self.project_path)),
                                 ],
-                                "similarity": similarity,
-                                "message": f"High similarity ({similarity:.1%}) between files",
-                            },
+                                similarity=similarity,
+                                line_ranges=[
+                                    (1, len(lines1)),
+                                    (1, len(lines2)),
+                                ],  # Simplified
+                                message=f"High similarity ({similarity:.1%}) between files",
+                            ),
                         )
 
         return issues
