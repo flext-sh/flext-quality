@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-import contextlib
-import io
 import json
 import tempfile
 from importlib import import_module, util
@@ -104,40 +102,42 @@ class ExternalBackend(BaseAnalyzer):
         return typed_results
 
     def _run_ruff(self, code: str, file_path: Path) -> dict[str, object]:
-        """Run ruff linter."""
+        """Run ruff linter using subprocess."""
         try:
             # Validate file path is safe (no shell injection)
             if not file_path.exists() or not file_path.is_file():
                 return {"error": "Invalid file path"}
 
-            # Prefer in-process API; avoid subprocess PATH lookups per policy
+            # Use subprocess to run ruff - secure way with explicit path
+            import subprocess
 
-            # Prefer in-process Ruff API when available
-            # Import only if available via optional dependency
-            ruff_main = (
-                import_module("ruff.__main__")
-                if util.find_spec("ruff.__main__")
-                else None
+            # Use absolute path for security
+            abs_file_path = file_path.resolve()
+
+            # Run ruff with JSON output format
+            result = subprocess.run(
+                ["ruff", "check", str(abs_file_path), "--output-format", "json"],
+                capture_output=True,
+                text=True,
+                timeout=30,  # Prevent hanging
+                check=False  # Don't raise exception on non-zero exit
             )
-            if ruff_main is None:
-                # Evita uso de subprocess; orienta execução manual
-                return {
-                    "error": "Ruff in-process API indisponível; execute manualmente: 'ruff check <file> --output-format json'",
-                    "code_length": len(code),
-                }
-            stdout = io.StringIO()
-            stderr = io.StringIO()
-            with (
-                contextlib.redirect_stdout(stdout),
-                contextlib.redirect_stderr(stderr),
-                contextlib.suppress(SystemExit),
-            ):
-                ruff_main.main(
-                    ["check", str(file_path.resolve()), "--output-format", "json"],
-                )
-            issues = self._parse_ruff_output(stdout.getvalue())
+
+            # Parse output even if ruff found issues (non-zero exit is expected)
+            if result.stdout:
+                issues = self._parse_ruff_output(result.stdout)
+            else:
+                issues = []
+
             return {"issues": issues, "code_length": len(code)}
 
+        except subprocess.TimeoutExpired:
+            return {"error": "Ruff execution timed out"}
+        except FileNotFoundError:
+            return {
+                "error": "Ruff not found; install with: pip install ruff",
+                "code_length": len(code),
+            }
         except Exception as e:
             return {"error": str(e)}
 

@@ -34,13 +34,14 @@ class TestCodeAnalyzerEdgeCases:
 
             # Manually set _current_results to test error handling
             from flext_quality.analysis_types import AnalysisResults, OverallMetrics
+
             analyzer._current_results = AnalysisResults(
                 overall_metrics=OverallMetrics(),
                 file_metrics=[],
                 complexity_issues=[],
                 security_issues=[],
                 dead_code_issues=[],
-                duplication_issues=[]
+                duplication_issues=[],
             )
 
             score = analyzer.get_quality_score()
@@ -291,13 +292,14 @@ import json
 
             # Set _current_results manually to test grade calculator
             from flext_quality.analysis_types import AnalysisResults, OverallMetrics
+
             analyzer._current_results = AnalysisResults(
                 overall_metrics=OverallMetrics(),
                 file_metrics=[],
                 complexity_issues=[],
                 security_issues=[],
                 dead_code_issues=[],
-                duplication_issues=[]
+                duplication_issues=[],
             )
 
             # Should get perfect score and A+ grade

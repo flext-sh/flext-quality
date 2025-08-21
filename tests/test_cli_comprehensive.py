@@ -235,7 +235,7 @@ class TestAnalyzeProjectComprehensive:
             complexity_issues=[],
             security_issues=[],
             dead_code_issues=[],
-            duplication_issues=[]
+            duplication_issues=[],
         )
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer
@@ -292,7 +292,7 @@ class TestAnalyzeProjectComprehensive:
             complexity_issues=[],
             security_issues=[],
             dead_code_issues=[],
-            duplication_issues=[]
+            duplication_issues=[],
         )
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer

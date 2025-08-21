@@ -60,7 +60,7 @@ class TestAnalyzeProject:
             complexity_issues=[],
             security_issues=[],
             dead_code_issues=[],
-            duplication_issues=[]
+            duplication_issues=[],
         )
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer
@@ -132,7 +132,7 @@ class TestAnalyzeProject:
             complexity_issues=[],
             security_issues=[],
             dead_code_issues=[],
-            duplication_issues=[]
+            duplication_issues=[],
         )
         mock_analyzer.get_quality_score.return_value = 70.0  # Medium quality
         mock_analyzer_class.return_value = mock_analyzer
@@ -191,7 +191,7 @@ class TestAnalyzeProject:
             complexity_issues=[],
             security_issues=[],
             dead_code_issues=[],
-            duplication_issues=[]
+            duplication_issues=[],
         )
         mock_analyzer.get_quality_score.return_value = 40.0  # Poor quality
         mock_analyzer_class.return_value = mock_analyzer
@@ -267,7 +267,7 @@ class TestAnalyzeProject:
             complexity_issues=[],
             security_issues=[],
             dead_code_issues=[],
-            duplication_issues=[]
+            duplication_issues=[],
         )
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer
@@ -327,7 +327,7 @@ class TestAnalyzeProject:
             complexity_issues=[],
             security_issues=[],
             dead_code_issues=[],
-            duplication_issues=[]
+            duplication_issues=[],
         )
         mock_analyzer.get_quality_score.return_value = 85.0
         mock_analyzer_class.return_value = mock_analyzer
@@ -465,7 +465,7 @@ class TestAnotherFunction:
             complexity_issues=[],
             security_issues=[],
             dead_code_issues=[],
-            duplication_issues=[]
+            duplication_issues=[],
         )
         mock_analyzer.get_quality_score.return_value = 75.0  # Good score
         mock_analyzer.get_quality_grade.return_value = "B"
@@ -519,7 +519,7 @@ class TestAnotherFunction:
             complexity_issues=[],
             security_issues=[],
             dead_code_issues=[],
-            duplication_issues=[]
+            duplication_issues=[],
         )
         mock_analyzer.get_quality_score.return_value = 60.0  # Poor score
         mock_analyzer_class.return_value = mock_analyzer

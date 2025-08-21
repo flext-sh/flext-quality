@@ -99,18 +99,18 @@ def check_quality_thresholds(results: dict[str, Any]) -> dict[str, Any]:
 
     # Extract metrics for threshold checking using modern AnalysisResults API
     analysis_results = results.get("analysis_results", {})
-    
+
     # Handle both legacy dict and modern AnalysisResults format
-    if hasattr(analysis_results, 'security_issues'):
+    if hasattr(analysis_results, "security_issues"):
         # Modern AnalysisResults format
         security_count = len(analysis_results.security_issues)
         complexity_count = len(analysis_results.complexity_issues)
         files_analyzed = analysis_results.overall_metrics.files_analyzed
-        
+
         # Calculate critical issues from typed results
         critical_issues = security_count
         for issue in analysis_results.complexity_issues:
-            if hasattr(issue, 'severity') and getattr(issue, 'severity', '') == 'high':
+            if hasattr(issue, "severity") and getattr(issue, "severity", "") == "high":
                 critical_issues += 1
     else:
         # Legacy dict format fallback
@@ -118,7 +118,7 @@ def check_quality_thresholds(results: dict[str, Any]) -> dict[str, Any]:
         security_count = len(issues.get("security", []))
         complexity_count = len(issues.get("complexity", []))
         files_analyzed = analysis_results.get("files_analyzed", 0)
-        
+
         # Calculate total critical issues (security + high complexity)
         critical_issues = security_count
         for issue in issues.get("complexity", []):
@@ -126,7 +126,7 @@ def check_quality_thresholds(results: dict[str, Any]) -> dict[str, Any]:
                 critical_issues += 1
 
     # Mock quality score calculation (would come from actual analysis)
-    if hasattr(analysis_results, 'total_issues'):
+    if hasattr(analysis_results, "total_issues"):
         # Modern AnalysisResults format
         total_issues = analysis_results.total_issues
     else:

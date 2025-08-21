@@ -1,7 +1,7 @@
 """Value objects for FLEXT-QUALITY.
 
 REFACTORED:
-          Uses flext-core FlextValueObject - NO duplication.
+          Uses flext-core FlextValue - NO duplication.
 """
 
 from __future__ import annotations
@@ -9,7 +9,7 @@ from __future__ import annotations
 from enum import StrEnum
 from pathlib import Path
 
-from flext_core import FlextResult, FlextValueObject
+from flext_core import FlextResult, FlextValue
 from pydantic import Field, field_validator
 
 # Using flext-core patterns consistently
@@ -116,7 +116,7 @@ class QualityGrade(StrEnum):
     F = "F"
 
 
-class FilePath(FlextValueObject):
+class FilePath(FlextValue):
     """File path value object."""
 
     value: str = Field(..., description="File path")
@@ -194,7 +194,7 @@ class FilePath(FlextValueObject):
         return FlextResult[None].ok(None)
 
 
-class IssueLocation(FlextValueObject):
+class IssueLocation(FlextValue):
     """Location of an issue in a file."""
 
     line: int = Field(..., description="Line number", ge=1)
@@ -248,7 +248,7 @@ class IssueLocation(FlextValueObject):
         return FlextResult[None].ok(None)
 
 
-class QualityScore(FlextValueObject):
+class QualityScore(FlextValue):
     """Quality score value object."""
 
     value: float = Field(..., description="Quality score", ge=0.0, le=100.0)
@@ -307,7 +307,7 @@ class QualityScore(FlextValueObject):
         return FlextResult[None].ok(None)
 
 
-class ComplexityMetric(FlextValueObject):
+class ComplexityMetric(FlextValue):
     """Complexity metric value object."""
 
     cyclomatic: int = Field(default=1, description="Cyclomatic complexity", ge=1)
@@ -360,7 +360,7 @@ class ComplexityMetric(FlextValueObject):
         return FlextResult[None].ok(None)
 
 
-class CoverageMetric(FlextValueObject):
+class CoverageMetric(FlextValue):
     """Test coverage metric value object."""
 
     line_coverage: float = Field(
@@ -436,7 +436,7 @@ class CoverageMetric(FlextValueObject):
         return FlextResult[None].ok(None)
 
 
-class DuplicationMetric(FlextValueObject):
+class DuplicationMetric(FlextValue):
     """Code duplication metric value object."""
 
     duplicate_lines: int = Field(

@@ -16,6 +16,7 @@ from flext_quality import (
     QualityGradeCalculator,
     QualityReport,
 )
+
 # AnalysisResults import removed - using Any for legacy dict compatibility testing
 from typing import Any
 
@@ -24,7 +25,9 @@ class TestQualityReport:
     """Test suite for QualityReport functionality."""
 
     @pytest.fixture
-    def minimal_results(self) -> Any:  # Legacy dict format for backward compatibility testing
+    def minimal_results(
+        self,
+    ) -> Any:  # Legacy dict format for backward compatibility testing
         """Minimal analysis results for testing."""
         return {
             "issues": {},
@@ -35,7 +38,9 @@ class TestQualityReport:
         }
 
     @pytest.fixture
-    def good_results(self) -> Any:  # Legacy dict format for backward compatibility testing
+    def good_results(
+        self,
+    ) -> Any:  # Legacy dict format for backward compatibility testing
         """Analysis results with good quality scores."""
         return {
             "issues": {
@@ -63,7 +68,9 @@ class TestQualityReport:
         }
 
     @pytest.fixture
-    def poor_results(self) -> Any:  # Legacy dict format for backward compatibility testing
+    def poor_results(
+        self,
+    ) -> Any:  # Legacy dict format for backward compatibility testing
         """Analysis results with poor quality scores."""
         return {
             "issues": {
@@ -120,7 +127,9 @@ class TestQualityReport:
         }
 
     @pytest.fixture
-    def mixed_results(self) -> Any:  # Legacy dict format for backward compatibility testing
+    def mixed_results(
+        self,
+    ) -> Any:  # Legacy dict format for backward compatibility testing
         """Analysis results with mixed quality."""
         return {
             "issues": {

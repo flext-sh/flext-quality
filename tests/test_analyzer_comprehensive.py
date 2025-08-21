@@ -47,7 +47,7 @@ class TestCodeAnalyzerComprehensive:
 
         # Verify structure using typed AnalysisResults API
         assert isinstance(results, AnalysisResults)
-        
+
         # Verify overall metrics using typed API
         metrics = results.overall_metrics
         assert metrics.files_analyzed > 0
@@ -56,10 +56,10 @@ class TestCodeAnalyzerComprehensive:
         assert len(results.file_metrics) > 0
 
         # Verify issues structure using typed AnalysisResults API
-        assert hasattr(results, 'security_issues')
-        assert hasattr(results, 'complexity_issues')
-        assert hasattr(results, 'dead_code_issues')
-        assert hasattr(results, 'duplication_issues')
+        assert hasattr(results, "security_issues")
+        assert hasattr(results, "complexity_issues")
+        assert hasattr(results, "dead_code_issues")
+        assert hasattr(results, "duplication_issues")
         # Verify these are lists
         assert isinstance(results.security_issues, list)
         assert isinstance(results.complexity_issues, list)
@@ -102,7 +102,7 @@ class TestCodeAnalyzerComprehensive:
             include_duplicates=False,
         )
 
-        # Should still have basic structure 
+        # Should still have basic structure
         assert hasattr(results, "overall_metrics")
         assert hasattr(results, "security_issues")
 
@@ -336,7 +336,7 @@ def complex_function(x):
         # Create proper FileAnalysisResult objects
         from flext_quality.analysis_types import FileAnalysisResult
         from pathlib import Path
-        
+
         file_metrics = [
             FileAnalysisResult(
                 file_path=Path("complex_test.py"),
@@ -344,7 +344,7 @@ def complex_function(x):
                 complexity_score=70.0,  # (100-70)/2 = 15 complexity
                 security_issues=0,
                 style_issues=0,
-                dead_code_lines=0
+                dead_code_lines=0,
             )
         ]
         issues = analyzer._analyze_complexity(file_metrics)
@@ -352,9 +352,9 @@ def complex_function(x):
         assert isinstance(issues, list)
         # Should detect complexity issues
         for issue in issues:
-            assert hasattr(issue, 'issue_type')
-            assert hasattr(issue, 'function_name') 
-            assert hasattr(issue, 'complexity_value')
+            assert hasattr(issue, "issue_type")
+            assert hasattr(issue, "function_name")
+            assert hasattr(issue, "complexity_value")
 
     def test_analyze_complexity_no_files(self) -> None:
         """Test _analyze_complexity with empty directory."""
@@ -561,7 +561,9 @@ def complex_calculation(x, y, z):
         )
 
         # Verify comprehensive results using modern AnalysisResults API
-        assert isinstance(results, AnalysisResults), f"Expected AnalysisResults, got {type(results)}"
+        assert isinstance(results, AnalysisResults), (
+            f"Expected AnalysisResults, got {type(results)}"
+        )
 
         # Check metrics using type-safe AnalysisResults properties
         metrics = results.overall_metrics
@@ -569,16 +571,18 @@ def complex_calculation(x, y, z):
         assert metrics.total_lines > 20
         # Note: Functions and classes are in file_metrics, not overall_metrics
         assert len(results.file_metrics) >= 2
-        
+
         # Verify we have file analysis results with functions/classes
-        total_functions = sum(1 for _ in results.file_metrics if hasattr(_, 'complexity_score'))
+        total_functions = sum(
+            1 for _ in results.file_metrics if hasattr(_, "complexity_score")
+        )
         assert total_functions >= 1
 
         # Check issues structure using AnalysisResults properties
-        assert hasattr(results, 'security_issues')
-        assert hasattr(results, 'complexity_issues')
-        assert hasattr(results, 'dead_code_issues')
-        assert hasattr(results, 'duplication_issues')
+        assert hasattr(results, "security_issues")
+        assert hasattr(results, "complexity_issues")
+        assert hasattr(results, "dead_code_issues")
+        assert hasattr(results, "duplication_issues")
 
         # Verify file metrics list
         assert isinstance(results.file_metrics, list)
@@ -604,7 +608,9 @@ def test_unicode():
             metrics = analyzer._analyze_file(Path(f.name))
 
             # Should handle unicode properly - metrics is FileAnalysisResult
-            assert isinstance(metrics, FileAnalysisResult), f"Expected FileAnalysisResult, got {type(metrics)}"
+            assert isinstance(metrics, FileAnalysisResult), (
+                f"Expected FileAnalysisResult, got {type(metrics)}"
+            )
             # FileAnalysisResult doesn't have function_count - this needs to be updated based on actual structure
             assert metrics.file_path.name == Path(f.name).name
 
@@ -681,7 +687,9 @@ variable = "test"
         metrics = analyzer._analyze_file(comprehensive_file)
 
         # Should properly analyze all constructs - metrics is FileAnalysisResult
-        assert isinstance(metrics, FileAnalysisResult), f"Expected FileAnalysisResult, got {type(metrics)}"
+        assert isinstance(metrics, FileAnalysisResult), (
+            f"Expected FileAnalysisResult, got {type(metrics)}"
+        )
         # FileAnalysisResult has different structure - verify basic properties
         assert metrics.lines_of_code > 0
         assert metrics.complexity_score >= 0.0
