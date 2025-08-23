@@ -99,7 +99,7 @@ The version in `pyproject.toml` is the single source of truth:
 ```toml
 [project]
 name = "your-project"
-version = "1.0.0"  # This is the only place to update version
+version = "0.9.0"  # This is the only place to update version
 ```
 
 ## Benefits
