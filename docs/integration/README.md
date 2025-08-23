@@ -30,7 +30,7 @@ class QualityProject(FlextEntity):
         """Validate project standards using FlextResult pattern."""
         if not self.project_path:
             return FlextResult[None].fail("Project path is required")
-        return FlextResult[None].ok(True)
+        return FlextResult[None].ok(data=True)
 
 # Services return FlextResult for consistent error handling
 async def analyze_project(project_id: str) -> FlextResult[QualityAnalysis]:
