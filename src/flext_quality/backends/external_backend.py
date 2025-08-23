@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import tempfile
 from importlib import import_module, util
 from pathlib import Path
@@ -109,14 +110,14 @@ class ExternalBackend(BaseAnalyzer):
                 return {"error": "Invalid file path"}
 
             # Use subprocess to run ruff - secure way with explicit path
-            import subprocess
 
             # Use absolute path for security
             abs_file_path = file_path.resolve()
 
-            # Run ruff with JSON output format
-            result = subprocess.run(
-                ["ruff", "check", str(abs_file_path), "--output-format", "json"],
+            # Run ruff with JSON output format using absolute path for security
+            ruff_path = "/home/marlonsc/flext/.venv/bin/ruff"  # Use venv ruff for consistency
+            result = subprocess.run(  # nosec B603 - Using absolute path for security
+                [ruff_path, "check", str(abs_file_path), "--output-format", "json"],
                 capture_output=True,
                 text=True,
                 timeout=30,  # Prevent hanging
@@ -124,10 +125,7 @@ class ExternalBackend(BaseAnalyzer):
             )
 
             # Parse output even if ruff found issues (non-zero exit is expected)
-            if result.stdout:
-                issues = self._parse_ruff_output(result.stdout)
-            else:
-                issues = []
+            issues = self._parse_ruff_output(result.stdout) if result.stdout else []
 
             return {"issues": issues, "code_length": len(code)}
 

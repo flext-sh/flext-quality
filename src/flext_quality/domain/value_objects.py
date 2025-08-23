@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 from pathlib import Path
+from typing import override
 
 from flext_core import FlextResult, FlextValue
 from pydantic import Field, field_validator
@@ -182,6 +183,7 @@ class FilePath(FlextValue):
         """
         return str(self.path.parent)
 
+    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate file path business rules."""
         if not self.value:
@@ -234,6 +236,7 @@ class IssueLocation(FlextValue):
             return f"line {self.line}, columns {self.column}-{self.end_column or 'end'}"
         return f"lines {self.line}-{self.end_line}"
 
+    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate issue location business rules."""
         if self.line < 1:
@@ -297,6 +300,7 @@ class QualityScore(FlextValue):
             return QualityGrade.D_MINUS
         return QualityGrade.F
 
+    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate quality score business rules."""
         if self.value < 0.0 or self.value > QualityThresholds.COVERAGE_PERCENTAGE_MAX:
@@ -344,6 +348,7 @@ class ComplexityMetric(FlextValue):
             return "complex"
         return "very complex"
 
+    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate complexity metric business rules."""
         if self.cyclomatic < 1:
@@ -407,6 +412,7 @@ class CoverageMetric(FlextValue):
         """
         return self.overall_coverage >= QualityThresholds.COVERAGE_EXCELLENT
 
+    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate coverage metric business rules."""
         # Pydantic validators handle range validation (0-100),
@@ -477,6 +483,7 @@ class DuplicationMetric(FlextValue):
         """
         return self.duplication_percentage < QualityThresholds.DUPLICATION_LOW_MAX
 
+    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate duplication metric business rules."""
         if self.duplicate_lines < 0:
