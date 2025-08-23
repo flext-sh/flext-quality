@@ -115,13 +115,15 @@ class ExternalBackend(BaseAnalyzer):
             abs_file_path = file_path.resolve()
 
             # Run ruff with JSON output format using absolute path for security
-            ruff_path = "/home/marlonsc/flext/.venv/bin/ruff"  # Use venv ruff for consistency
+            ruff_path = (
+                "/home/marlonsc/flext/.venv/bin/ruff"  # Use venv ruff for consistency
+            )
             result = subprocess.run(  # nosec B603 - Using absolute path for security
                 [ruff_path, "check", str(abs_file_path), "--output-format", "json"],
                 capture_output=True,
                 text=True,
                 timeout=30,  # Prevent hanging
-                check=False  # Don't raise exception on non-zero exit
+                check=False,  # Don't raise exception on non-zero exit
             )
 
             # Parse output even if ruff found issues (non-zero exit is expected)

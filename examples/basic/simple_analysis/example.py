@@ -78,8 +78,6 @@ def analyze_project(project_path: str) -> None:  # noqa: PLR0912, PLR0915
         )
 
         # Extract basic project information using modern AnalysisResults API
-        files_analyzed = results.overall_metrics.files_analyzed
-        total_lines = results.overall_metrics.total_lines
         # Note: python_files not available in AnalysisResults - use file_metrics instead
         analyzed_files = [str(fm.file_path) for fm in results.file_metrics]
 
@@ -126,7 +124,7 @@ def analyze_project(project_path: str) -> None:  # noqa: PLR0912, PLR0915
             "Duplication": results.duplication_issues,
         }
 
-        for category_name, issue_list in issue_categories.items():
+        for issue_list in issue_categories.values():
             if not issue_list:
                 pass
             else:

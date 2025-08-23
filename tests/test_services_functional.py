@@ -68,7 +68,8 @@ class TestQualityProjectServiceFunctional:
         result = await service.get_project("non-existent-id")
 
         assert result.is_failure
-        assert result.error is not None and "Project not found" in result.error
+        assert result.error is not None
+        assert "Project not found" in result.error
 
     async def test_list_projects_success(self, service: QualityProjectService) -> None:
         """Test successful project listing - covers line 76."""
@@ -125,7 +126,8 @@ class TestQualityProjectServiceFunctional:
         result = await service.update_project("non-existent", {"language": "go"})
 
         assert result.is_failure
-        assert result.error is not None and "Project not found" in result.error
+        assert result.error is not None
+        assert "Project not found" in result.error
 
     async def test_delete_project_success(self, service: QualityProjectService) -> None:
         """Test successful project deletion - covers lines 101-104."""
@@ -151,7 +153,8 @@ class TestQualityProjectServiceFunctional:
         result = await service.delete_project("non-existent-id")
 
         assert result.is_failure
-        assert result.error is not None and "Project not found" in result.error
+        assert result.error is not None
+        assert "Project not found" in result.error
 
 
 class TestQualityAnalysisServiceFunctional:
@@ -200,7 +203,8 @@ class TestQualityAnalysisServiceFunctional:
         result = await service.get_analysis("non-existent-id")
 
         assert result.is_failure
-        assert result.error is not None and "Analysis not found" in result.error
+        assert result.error is not None
+        assert "Analysis not found" in result.error
 
     async def test_update_metrics_success(
         self,
@@ -244,7 +248,8 @@ class TestQualityAnalysisServiceFunctional:
         )
 
         assert result.is_failure
-        assert result.error is not None and "Analysis not found" in result.error
+        assert result.error is not None
+        assert "Analysis not found" in result.error
 
     async def test_update_scores_success(self, service: QualityAnalysisService) -> None:
         """Test successful scores update - covers lines 177-204."""
@@ -285,7 +290,8 @@ class TestQualityAnalysisServiceFunctional:
         )
 
         assert result.is_failure
-        assert result.error is not None and "Analysis not found" in result.error
+        assert result.error is not None
+        assert "Analysis not found" in result.error
 
     async def test_update_issue_counts_success(
         self,
@@ -339,7 +345,8 @@ class TestQualityAnalysisServiceFunctional:
         result = await service.complete_analysis("non-existent-id")
 
         assert result.is_failure
-        assert result.error is not None and "Analysis not found" in result.error
+        assert result.error is not None
+        assert "Analysis not found" in result.error
 
     async def test_fail_analyssuccess(self, service: QualityAnalysisService) -> None:
         """Test successful analysis failure - covers lines 263-271."""
@@ -363,7 +370,8 @@ class TestQualityAnalysisServiceFunctional:
         result = await service.fail_analysis("non-existent-id", "Error")
 
         assert result.is_failure
-        assert result.error is not None and "Analysis not found" in result.error
+        assert result.error is not None
+        assert "Analysis not found" in result.error
 
     async def test_list_analyses_success(self, service: QualityAnalysisService) -> None:
         """Test successful analyses listing - covers lines 290-299."""
@@ -447,7 +455,8 @@ class TestQualityIssueServiceFunctional:
         result = await service.get_issue("non-existent-id")
 
         assert result.is_failure
-        assert result.error is not None and "Issue not found" in result.error
+        assert result.error is not None
+        assert "Issue not found" in result.error
 
     async def test_list_issues_success(self, service: QualityIssueService) -> None:
         """Test successful issues listing - covers lines 361-377."""
@@ -519,7 +528,8 @@ class TestQualityIssueServiceFunctional:
         result = await service.mark_fixed("non-existent-id")
 
         assert result.is_failure
-        assert result.error is not None and "Issue not found" in result.error
+        assert result.error is not None
+        assert "Issue not found" in result.error
 
     async def test_suppress_issue_success(self, service: QualityIssueService) -> None:
         """Test successful issue suppression - covers lines 399-406."""
@@ -547,7 +557,8 @@ class TestQualityIssueServiceFunctional:
         result = await service.suppress_issue("non-existent-id", "Reason")
 
         assert result.is_failure
-        assert result.error is not None and "Issue not found" in result.error
+        assert result.error is not None
+        assert "Issue not found" in result.error
 
     async def test_unsuppress_issue_success(self, service: QualityIssueService) -> None:
         """Test successful issue unsuppression - covers lines 411-418."""
@@ -579,7 +590,8 @@ class TestQualityIssueServiceFunctional:
         result = await service.unsuppress_issue("non-existent-id")
 
         assert result.is_failure
-        assert result.error is not None and "Issue not found" in result.error
+        assert result.error is not None
+        assert "Issue not found" in result.error
 
 
 class TestQualityReportServiceFunctional:
@@ -625,7 +637,8 @@ class TestQualityReportServiceFunctional:
         result = await service.get_report("non-existent-id")
 
         assert result.is_failure
-        assert result.error is not None and "Report not found" in result.error
+        assert result.error is not None
+        assert "Report not found" in result.error
 
     async def test_list_reports_success(self, service: QualityReportService) -> None:
         """Test successful reports listing - covers lines 466-473."""
@@ -668,7 +681,8 @@ class TestQualityReportServiceFunctional:
         result = await service.delete_report("non-existent-id")
 
         assert result.is_failure
-        assert result.error is not None and "Report not found" in result.error
+        assert result.error is not None
+        assert "Report not found" in result.error
 
 
 class TestServiceIntegration:

@@ -15,7 +15,8 @@ def test_ast_backend_syntax_error() -> None:
     result = backend.analyze("def foo()\n    return 1")
     assert "error" in result
     error_msg = result["error"]
-    assert isinstance(error_msg, str) and "Syntax error" in error_msg
+    assert isinstance(error_msg, str)
+    assert "Syntax error" in error_msg
 
 
 def test_ast_visitor_extracts_details(tmp_path: Path) -> None:

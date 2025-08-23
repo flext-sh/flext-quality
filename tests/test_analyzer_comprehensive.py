@@ -12,6 +12,7 @@ from unittest.mock import MagicMock, patch
 
 from flext_quality import CodeAnalyzer
 from flext_quality.analysis_types import AnalysisResults, FileAnalysisResult
+
 # No longer need legacy dict helpers - using typed AnalysisResults API
 
 
@@ -334,8 +335,9 @@ def complex_function(x):
         analyzer = CodeAnalyzer(temporary_project_structure)
         # Create sample file metrics for complexity analysis
         # Create proper FileAnalysisResult objects
-        from flext_quality.analysis_types import FileAnalysisResult
         from pathlib import Path
+
+        from flext_quality.analysis_types import FileAnalysisResult
 
         file_metrics = [
             FileAnalysisResult(
