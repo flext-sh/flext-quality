@@ -174,7 +174,7 @@ class QualityProject(FlextEntity):
         if self.min_coverage < 0 or self.min_coverage > 100:
             return FlextResult[None].fail("Coverage must be between 0 and 100")
 
-        return FlextResult[None].ok(True)
+        return FlextResult[None].ok(data=True)
 
     def calculate_compliance(self, analysis: QualityAnalysis) -> float:
         """Calculate compliance percentage for this project."""
