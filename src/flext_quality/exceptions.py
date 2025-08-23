@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from enum import Enum
+from typing import override
 
 from flext_core import FlextError
 
@@ -71,12 +72,12 @@ class FlextQualityAnalysisError(FlextQualityError):
         self,
         message: str = "Quality analysis error",
         *,
-        code: object | None = None,
-        error_code: object | None = None,
-        context: Mapping[str, object] | None = None,
+        error_code: str = "QUALITY_ANALYSIS_ERROR",
+        context: dict[str, object] | None = None,
     ) -> None:
-        super().__init__(message, code=code, error_code=error_code, context=context)
+        super().__init__(message, error_code=error_code, context=context)
 
+    @override
     def __str__(self) -> str:
         return f"Quality analysis: {self.message}"
 
@@ -88,12 +89,12 @@ class FlextQualityReportError(FlextQualityError):
         self,
         message: str = "Quality report error",
         *,
-        code: object | None = None,
-        error_code: object | None = None,
-        context: Mapping[str, object] | None = None,
+        error_code: str = "QUALITY_REPORT_ERROR",
+        context: dict[str, object] | None = None,
     ) -> None:
-        super().__init__(message, code=code, error_code=error_code, context=context)
+        super().__init__(message, error_code=error_code, context=context)
 
+    @override
     def __str__(self) -> str:
         return f"Quality report: {self.message}"
 
@@ -105,12 +106,12 @@ class FlextQualityMetricsError(FlextQualityError):
         self,
         message: str = "Quality metrics error",
         *,
-        code: object | None = None,
-        error_code: object | None = None,
-        context: Mapping[str, object] | None = None,
+        error_code: str = "QUALITY_METRICS_ERROR",
+        context: dict[str, object] | None = None,
     ) -> None:
-        super().__init__(message, code=code, error_code=error_code, context=context)
+        super().__init__(message, error_code=error_code, context=context)
 
+    @override
     def __str__(self) -> str:
         return f"Quality metrics: {self.message}"
 
@@ -122,12 +123,12 @@ class FlextQualityGradeError(FlextQualityError):
         self,
         message: str = "Quality grade error",
         *,
-        code: object | None = None,
-        error_code: object | None = None,
-        context: Mapping[str, object] | None = None,
+        error_code: str = "QUALITY_GRADE_ERROR",
+        context: dict[str, object] | None = None,
     ) -> None:
-        super().__init__(message, code=code, error_code=error_code, context=context)
+        super().__init__(message, error_code=error_code, context=context)
 
+    @override
     def __str__(self) -> str:
         return f"Quality grade: {self.message}"
 
@@ -139,12 +140,12 @@ class FlextQualityRuleError(FlextQualityError):
         self,
         message: str = "Quality rule error",
         *,
-        code: object | None = None,
-        error_code: object | None = None,
-        context: Mapping[str, object] | None = None,
+        error_code: str = "QUALITY_RULE_ERROR",
+        context: dict[str, object] | None = None,
     ) -> None:
-        super().__init__(message, code=code, error_code=error_code, context=context)
+        super().__init__(message, error_code=error_code, context=context)
 
+    @override
     def __str__(self) -> str:
         return f"Quality rule: {self.message}"
 
@@ -172,8 +173,6 @@ class FlextQualityAnalysisOperationError(FlextQualityAnalysisError):
         file_count: int | None = None,
         analysis_type: str | None = None,
         execution_time: float | None = None,
-        code: FlextQualityErrorCodes
-        | None = FlextQualityErrorCodes.QUALITY_ANALYSIS_ERROR,
         context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize with quality analysis context."""
@@ -189,7 +188,7 @@ class FlextQualityAnalysisOperationError(FlextQualityAnalysisError):
 
         super().__init__(
             message,
-            code=code,
+            error_code="QUALITY_OPERATION_ERROR",
             context=context_dict,
         )
 
@@ -205,8 +204,6 @@ class FlextQualityReportOperationError(FlextQualityReportError):
         output_format: str | None = None,
         project_name: str | None = None,
         report_size: int | None = None,
-        code: FlextQualityErrorCodes
-        | None = FlextQualityErrorCodes.QUALITY_REPORT_ERROR,
         context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize with quality report context."""
@@ -222,7 +219,7 @@ class FlextQualityReportOperationError(FlextQualityReportError):
 
         super().__init__(
             message,
-            code=code,
+            error_code="QUALITY_OPERATION_ERROR",
             context=context_dict,
         )
 
@@ -238,8 +235,6 @@ class FlextQualityMetricsOperationError(FlextQualityMetricsError):
         metric_value: float | None = None,
         metric_type: str | None = None,
         threshold_value: float | None = None,
-        code: FlextQualityErrorCodes
-        | None = FlextQualityErrorCodes.QUALITY_METRICS_ERROR,
         context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize with quality metrics context."""
@@ -255,7 +250,7 @@ class FlextQualityMetricsOperationError(FlextQualityMetricsError):
 
         super().__init__(
             message,
-            code=code,
+            error_code="QUALITY_OPERATION_ERROR",
             context=context_dict,
         )
 
@@ -271,8 +266,6 @@ class FlextQualityGradeOperationError(FlextQualityGradeError):
         calculated_grade: str | None = None,
         grade_score: float | None = None,
         min_threshold: float | None = None,
-        code: FlextQualityErrorCodes
-        | None = FlextQualityErrorCodes.QUALITY_GRADE_ERROR,
         context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize with quality grade context."""
@@ -288,7 +281,7 @@ class FlextQualityGradeOperationError(FlextQualityGradeError):
 
         super().__init__(
             message,
-            code=code,
+            error_code="QUALITY_OPERATION_ERROR",
             context=context_dict,
         )
 
@@ -304,7 +297,6 @@ class FlextQualityRuleOperationError(FlextQualityRuleError):
         rule_severity: str | None = None,
         rule_category: str | None = None,
         violation_count: int | None = None,
-        code: FlextQualityErrorCodes | None = FlextQualityErrorCodes.QUALITY_RULE_ERROR,
         context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize with quality rule context."""
@@ -320,7 +312,7 @@ class FlextQualityRuleOperationError(FlextQualityRuleError):
 
         super().__init__(
             message,
-            code=code,
+            error_code="QUALITY_OPERATION_ERROR",
             context=context_dict,
         )
 
@@ -336,8 +328,6 @@ class FlextQualityThresholdOperationError(FlextQualityThresholdError):
         current_value: float | None = None,
         threshold_value: float | None = None,
         threshold_type: str | None = None,
-        code: FlextQualityErrorCodes
-        | None = FlextQualityErrorCodes.QUALITY_THRESHOLD_ERROR,
         context: Mapping[str, object] | None = None,
     ) -> None:
         """Initialize with quality threshold context."""
@@ -353,7 +343,7 @@ class FlextQualityThresholdOperationError(FlextQualityThresholdError):
 
         super().__init__(
             message,
-            code=code,
+            error_code="QUALITY_OPERATION_ERROR",
             context=context_dict,
         )
 
