@@ -69,14 +69,14 @@ class TestQualityMetrics:
     def test_from_analysis_results_empty(self) -> None:
         """Test creating metrics from empty analysis results using AnalysisResults."""
         from flext_quality.analysis_types import AnalysisResults, OverallMetrics
-        
+
         results = AnalysisResults(
             overall_metrics=OverallMetrics(),
             file_metrics=[],
             complexity_issues=[],
             security_issues=[],
             dead_code_issues=[],
-            duplication_issues=[]
+            duplication_issues=[],
         )
 
         metrics = QualityMetrics.from_analysis_results(results)
@@ -88,8 +88,12 @@ class TestQualityMetrics:
 
     def test_from_analysis_results_with_metrics(self) -> None:
         """Test creating metrics from analysis results with data using AnalysisResults."""
-        from flext_quality.analysis_types import AnalysisResults, OverallMetrics, FileMetrics
-        
+        from flext_quality.analysis_types import (
+            AnalysisResults,
+            FileMetrics,
+            OverallMetrics,
+        )
+
         results = AnalysisResults(
             overall_metrics=OverallMetrics(
                 files_analyzed=20,
@@ -100,13 +104,17 @@ class TestQualityMetrics:
                 max_complexity=12.0,
             ),
             file_metrics=[
-                FileMetrics(file_path="test1.py", lines_of_code=1000, complexity_score=5.0),
-                FileMetrics(file_path="test2.py", lines_of_code=1500, complexity_score=8.0),
+                FileMetrics(
+                    file_path="test1.py", lines_of_code=1000, complexity_score=5.0
+                ),
+                FileMetrics(
+                    file_path="test2.py", lines_of_code=1500, complexity_score=8.0
+                ),
             ],
             complexity_issues=[{"type": "high_complexity"}],
             security_issues=[{"type": "hardcoded_secret"}, {"type": "sql_injection"}],
             dead_code_issues=[{"type": "unused_import"}],
-            duplication_issues=[{"type": "duplicate_block"}]
+            duplication_issues=[{"type": "duplicate_block"}],
         )
 
         metrics = QualityMetrics.from_analysis_results(results)
@@ -127,14 +135,14 @@ class TestQualityMetrics:
     def test_score_calculations(self) -> None:
         """Test score calculations in from_analysis_results using AnalysisResults."""
         from flext_quality.analysis_types import AnalysisResults, OverallMetrics
-        
+
         results = AnalysisResults(
             overall_metrics=OverallMetrics(average_complexity=4.0),
             file_metrics=[],
             security_issues=[{"issue": 1}],  # 1 issue = -10 points
             complexity_issues=[{"issue": 1}, {"issue": 2}],  # 2 issues = -10 points
             duplication_issues=[{"issue": 1}],  # 1 issue = -10 points
-            dead_code_issues=[]
+            dead_code_issues=[],
         )
 
         metrics = QualityMetrics.from_analysis_results(results)
@@ -154,14 +162,14 @@ class TestQualityMetrics:
     def test_overall_score_calculation(self) -> None:
         """Test overall score weighted calculation using AnalysisResults."""
         from flext_quality.analysis_types import AnalysisResults, OverallMetrics
-        
+
         results = AnalysisResults(
             overall_metrics=OverallMetrics(),  # Default values (no complexity)
             file_metrics=[],
             security_issues=[],
             dead_code_issues=[],
             duplication_issues=[],
-            complexity_issues=[]
+            complexity_issues=[],
         )
 
         metrics = QualityMetrics.from_analysis_results(results)

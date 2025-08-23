@@ -5,7 +5,6 @@ from __future__ import annotations
 from uuid import uuid4
 
 import pytest
-from flext_core import FlextResult
 
 from flext_quality import (
     AnalyzeProjectHandler,
@@ -141,7 +140,7 @@ class TestHandlerIntegration:
         for handler, test_id in handlers_and_ids:
             # All handlers should have handle method - using real implementations
             result = await handler.handle(test_id)
-            
+
             # Test with FlextResult.is_success (current flext-core API)
             assert result.is_success
             assert result.value is not None

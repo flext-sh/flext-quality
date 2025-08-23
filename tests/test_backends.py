@@ -6,8 +6,8 @@ import ast
 import tempfile
 from pathlib import Path
 from typing import override
-# Removed unused mock imports - using real implementations
 
+# Removed unused mock imports - using real implementations
 import pytest
 
 from flext_quality import ASTBackend, BackendType, BaseAnalyzer, ExternalBackend
@@ -124,7 +124,8 @@ class TestClass:
             f["name"] for f in functions if isinstance(f, dict) and "name" in f
         ]
         assert "hello_world" in func_names
-        assert isinstance(classes[0], dict) and classes[0]["name"] == "TestClass"
+        assert isinstance(classes[0], dict)
+        assert classes[0]["name"] == "TestClass"
 
     def test_analyze_with_file_path(self) -> None:
         """Test analyzing code with file path provided."""
@@ -188,16 +189,17 @@ class MyClass:
         functions = result["functions"]
         classes = result["classes"]
 
-        assert (
-            isinstance(complexity, (int, float)) and complexity > 5
-        )  # Should have high complexity
-        assert isinstance(imports, list) and len(imports) == 2
+        assert isinstance(complexity, (int, float))
+        assert complexity > 5
+        assert isinstance(imports, list)
+        assert len(imports) == 2
         # ast.walk finds all functions including methods, so we get 4 total
-        assert (
-            isinstance(functions, list) and len(functions) == 4
-        )  # 1 top-level + 3 methods
-        assert isinstance(classes, list) and len(classes) == 1
-        assert isinstance(classes[0], dict) and classes[0]["methods"] == 3
+        assert isinstance(functions, list)
+        assert len(functions) == 4
+        assert isinstance(classes, list)
+        assert len(classes) == 1
+        assert isinstance(classes[0], dict)
+        assert classes[0]["methods"] == 3
 
     def test_extract_functions(self) -> None:
         """Test _extract_functions method."""
@@ -457,9 +459,11 @@ class TestExternalBackend:
     def test_analyze_with_file_path(self) -> None:
         """Test analyze with actual file path using real code."""
         backend = ExternalBackend()
-        
+
         # Create a real temporary file with test code
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as tmp_file:
+        with tempfile.NamedTemporaryFile(
+            encoding="utf-8", mode="w", suffix=".py", delete=False
+        ) as tmp_file:
             # Write sample code that might have ruff issues
             tmp_file.write("""# Test file for analysis
 def test_function( ):
@@ -467,16 +471,16 @@ def test_function( ):
     return x
 """)
             tmp_path = Path(tmp_file.name)
-        
+
         try:
             # Run real analysis with ruff
             result = backend.analyze("", tmp_path, tool="ruff")
-            
+
             assert "file_path" in result
             assert result["file_path"] == str(tmp_path)
             # Should have analysis results (may include issues)
             assert "issues" in result
-            
+
         finally:
             # Clean up
             tmp_path.unlink(missing_ok=True)
@@ -484,23 +488,25 @@ def test_function( ):
     def test_analyze_default_tool(self) -> None:
         """Test analyze with default tool (ruff) using real code."""
         backend = ExternalBackend()
-        
+
         # Create a real temporary file with test code
-        with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as tmp_file:
+        with tempfile.NamedTemporaryFile(
+            encoding="utf-8", mode="w", suffix=".py", delete=False
+        ) as tmp_file:
             # Write simple valid Python code
             tmp_file.write("""def hello():
     '''Simple function.'''
     return 'hello world'
 """)
             tmp_path = Path(tmp_file.name)
-        
+
         try:
             # Should use ruff by default
             result = backend.analyze("", tmp_path)
-            
+
             assert result["tool"] == "ruff"
             assert "issues" in result
-            
+
         finally:
             # Clean up
             tmp_path.unlink(missing_ok=True)

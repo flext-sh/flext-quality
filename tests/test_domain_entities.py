@@ -9,12 +9,12 @@ from pydantic import ValidationError
 
 from flext_quality import (
     AnalysisStatus,
+    DomainQualityReport as QualityReport,
     IssueSeverity,
     IssueType,
     QualityAnalysis,
     QualityIssue,
     QualityProject,
-    DomainQualityReport as QualityReport,
     QualityRule,
 )
 

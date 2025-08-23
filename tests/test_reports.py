@@ -4,6 +4,9 @@ import json
 import tempfile
 from pathlib import Path
 
+# AnalysisResults import removed - using Any for legacy dict compatibility testing
+from typing import Any
+
 import pytest
 
 from flext_quality import (
@@ -16,9 +19,6 @@ from flext_quality import (
     QualityGradeCalculator,
     QualityReport,
 )
-
-# AnalysisResults import removed - using Any for legacy dict compatibility testing
-from typing import Any
 
 
 class TestQualityReport:
