@@ -47,7 +47,7 @@ class FlextQualityUtilities:
     def safe_issue_list(value: object) -> list[object]:
         """Safely convert value to typed issue list."""
         if FlextQualityUtilities.is_issue_list(value):
-            return value  # type: ignore[return-value]
+            return value  # type: ignore[return-value]  # Type guard ensures this is list[object]
         return []
 
     @staticmethod

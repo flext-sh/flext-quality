@@ -254,7 +254,7 @@ def multiply(x: int, y: int) -> int:
         ]
 
         # Cast to expected type to handle list invariance
-        file_metrics_typed: list[dict[str, object]] = file_metrics  # type: ignore[assignment]
+        file_metrics_typed: list[dict[str, object]] = file_metrics
         overall_metrics = analyzer._calculate_overall_metrics(file_metrics_typed)
 
         assert isinstance(overall_metrics, dict)

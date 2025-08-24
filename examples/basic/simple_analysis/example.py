@@ -50,7 +50,7 @@ def format_number(num: float | str) -> str:
     return str(num)
 
 
-def analyze_project(project_path: str) -> None:  # noqa: PLR0912, PLR0915
+def analyze_project(project_path: str) -> None:
     """Perform comprehensive quality analysis demonstrating ALL functionality.
 
     This function showcases the complete FLEXT Quality workflow including

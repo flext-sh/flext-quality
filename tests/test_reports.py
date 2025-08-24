@@ -171,18 +171,18 @@ class TestQualityReport:
 
     def test_report_initialization(self, minimal_results: Any) -> None:
         """Test QualityReport initialization."""
-        report = QualityReport(minimal_results)  # type: ignore[arg-type]
+        report = QualityReport(minimal_results)
         assert report.results == minimal_results
 
     def test_get_quality_score_minimal(self, minimal_results: Any) -> None:
         """Test quality score calculation with minimal issues."""
-        report = QualityReport(minimal_results)  # type: ignore[arg-type]
+        report = QualityReport(minimal_results)
         score = report._get_quality_score()
         assert score == 100  # No issues = perfect score
 
     def test_get_quality_score_with_issues(self, poor_results: Any) -> None:
         """Test quality score calculation with many issues."""
-        report = QualityReport(poor_results)  # type: ignore[arg-type]
+        report = QualityReport(poor_results)
         score = report._get_quality_score()
 
         # Should be significantly reduced due to issues
@@ -219,7 +219,7 @@ class TestQualityReport:
                 "metrics": {"files_analyzed": 1, "coverage_percent": 90.0},
             }
 
-            report = QualityReport(results)  # type: ignore[arg-type]
+            report = QualityReport(results)
             grade = report._get_quality_grade()
             # Debug info
             report._get_quality_score()
@@ -258,7 +258,7 @@ class TestQualityReport:
                 "metrics": {"files_analyzed": 1, "coverage_percent": 90.0},
             }
 
-            report = QualityReport(results)  # type: ignore[arg-type]
+            report = QualityReport(results)
             color = report._get_grade_color()
 
             # Should return a valid hex color
@@ -267,7 +267,7 @@ class TestQualityReport:
 
     def test_get_total_issues(self, mixed_results: Any) -> None:
         """Test total issue calculation."""
-        report = QualityReport(mixed_results)  # type: ignore[arg-type]
+        report = QualityReport(mixed_results)
         total = report._get_total_issues()
 
         # Count issues in mixed_results
@@ -276,7 +276,7 @@ class TestQualityReport:
 
     def test_get_critical_issues(self, mixed_results: Any) -> None:
         """Test critical issue calculation."""
-        report = QualityReport(mixed_results)  # type: ignore[arg-type]
+        report = QualityReport(mixed_results)
         critical = report._get_critical_issues()
 
         # Should count security + errors + critical categories
@@ -285,13 +285,13 @@ class TestQualityReport:
 
     def test_get_files_analyzed(self, good_results: Any) -> None:
         """Test files analyzed extraction."""
-        report = QualityReport(good_results)  # type: ignore[arg-type]
+        report = QualityReport(good_results)
         files = report._get_files_analyzed()
         assert files == 10
 
     def test_get_coverage_percent(self, good_results: Any) -> None:
         """Test coverage percentage extraction."""
-        report = QualityReport(good_results)  # type: ignore[arg-type]
+        report = QualityReport(good_results)
         coverage = report._get_coverage_percent()
         assert coverage == 85.5
 
@@ -300,7 +300,7 @@ class TestQualityReport:
         minimal_results: Any,
     ) -> None:
         """Test text report generation with minimal data."""
-        report = QualityReport(minimal_results)  # type: ignore[arg-type]
+        report = QualityReport(minimal_results)
         text_report = report.generate_text_report()
 
         assert "FLEXT QUALITY REPORT" in text_report
@@ -317,7 +317,7 @@ class TestQualityReport:
         poor_results: Any,
     ) -> None:
         """Test text report generation with many issues."""
-        report = QualityReport(poor_results)  # type: ignore[arg-type]
+        report = QualityReport(poor_results)
         text_report = report.generate_text_report()
 
         assert "FLEXT QUALITY REPORT" in text_report
@@ -350,7 +350,7 @@ class TestQualityReport:
         ]
         poor_dict["issues"] = issues_dict
 
-        report = QualityReport(poor_dict)  # type: ignore[arg-type]
+        report = QualityReport(poor_dict)
         text_report = report.generate_text_report()
 
         # Should show truncation message
@@ -359,7 +359,7 @@ class TestQualityReport:
 
     def test_generate_json_report(self, good_results: Any) -> None:
         """Test JSON report generation."""
-        report = QualityReport(good_results)  # type: ignore[arg-type]
+        report = QualityReport(good_results)
         json_report = report.generate_json_report()
 
         # Should be valid JSON
@@ -385,7 +385,7 @@ class TestQualityReport:
         mixed_results: Any,
     ) -> None:
         """Test HTML report structure and content."""
-        report = QualityReport(mixed_results)  # type: ignore[arg-type]
+        report = QualityReport(mixed_results)
         html_report = report.generate_html_report()
 
         # Check HTML structure
@@ -412,7 +412,7 @@ class TestQualityReport:
         mixed_results: Any,
     ) -> None:
         """Test HTML report issues section."""
-        report = QualityReport(mixed_results)  # type: ignore[arg-type]
+        report = QualityReport(mixed_results)
         html_report = report.generate_html_report()
 
         # Should contain issue categories
@@ -433,14 +433,14 @@ class TestQualityReport:
             "issues": {},
             "metrics": {"files_analyzed": 5, "coverage_percent": 95.0},
         }
-        report = QualityReport(good_results)  # type: ignore[arg-type]
+        report = QualityReport(good_results)
         html_report = report.generate_html_report()
         # Check that some color is present (flexible test)
         assert "#" in html_report or "color:" in html_report  # Some color styling
 
     def test_generate_issues_html_empty(self, minimal_results: Any) -> None:
         """Test HTML issues generation with no issues."""
-        report = QualityReport(minimal_results)  # type: ignore[arg-type]
+        report = QualityReport(minimal_results)
         issues_html = report._generate_issues_html()
 
         # Should be empty or minimal content
@@ -451,7 +451,7 @@ class TestQualityReport:
         mixed_results: Any,
     ) -> None:
         """Test HTML issues generation with various issues."""
-        report = QualityReport(mixed_results)  # type: ignore[arg-type]
+        report = QualityReport(mixed_results)
         issues_html = report._generate_issues_html()
 
         assert "Security Issues" in issues_html
@@ -477,7 +477,7 @@ class TestQualityReport:
             "metrics": {"files_analyzed": 1, "coverage_percent": 80.0},
         }
 
-        report = QualityReport(many_issues)  # type: ignore[arg-type]
+        report = QualityReport(many_issues)
         issues_html = report._generate_issues_html()
 
         # Should show truncation message
@@ -494,7 +494,7 @@ class TestQualityReport:
         assert isinstance(metrics_obj, dict)
         metrics_obj["coverage_percent"] = 95.0
 
-        report = QualityReport(minimal_results)  # type: ignore[arg-type]
+        report = QualityReport(minimal_results)
         recommendations = report._generate_recommendations()
 
         assert len(recommendations) == 1
@@ -506,7 +506,7 @@ class TestQualityReport:
         mixed_results: Any,
     ) -> None:
         """Test recommendations for critical issues."""
-        report = QualityReport(mixed_results)  # type: ignore[arg-type]
+        report = QualityReport(mixed_results)
         recommendations = report._generate_recommendations()
 
         # Should recommend fixing critical issues
@@ -522,7 +522,7 @@ class TestQualityReport:
         poor_results: Any,
     ) -> None:
         """Test recommendations for many issues."""
-        report = QualityReport(poor_results)  # type: ignore[arg-type]
+        report = QualityReport(poor_results)
         recommendations = report._generate_recommendations()
 
         # Should have multiple recommendations
@@ -541,7 +541,7 @@ class TestQualityReport:
             "metrics": {"files_analyzed": 10, "coverage_percent": 60.0},
         }
 
-        report = QualityReport(low_coverage_results)  # type: ignore[arg-type]
+        report = QualityReport(low_coverage_results)
         recommendations = report._generate_recommendations()
 
         coverage_rec = next(
@@ -567,7 +567,7 @@ class TestQualityReport:
             "metrics": {"files_analyzed": 5, "coverage_percent": 85.0},
         }
 
-        report = QualityReport(duplicate_results)  # type: ignore[arg-type]
+        report = QualityReport(duplicate_results)
         recommendations = report._generate_recommendations()
 
         duplicate_rec = next(
@@ -592,7 +592,7 @@ class TestQualityReport:
             "metrics": {"files_analyzed": 5, "coverage_percent": 85.0},
         }
 
-        report = QualityReport(complex_results)  # type: ignore[arg-type]
+        report = QualityReport(complex_results)
         recommendations = report._generate_recommendations()
 
         complex_rec = next((r for r in recommendations if "complex" in r.lower()), None)
@@ -601,7 +601,7 @@ class TestQualityReport:
 
     def test_save_report_text_format(self, good_results: Any) -> None:
         """Test saving report in text format."""
-        report = QualityReport(good_results)  # type: ignore[arg-type]
+        report = QualityReport(good_results)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             output_path = Path(tmpdir) / "report.txt"
@@ -614,7 +614,7 @@ class TestQualityReport:
 
     def test_save_report_json_format(self, good_results: Any) -> None:
         """Test saving report in JSON format."""
-        report = QualityReport(good_results)  # type: ignore[arg-type]
+        report = QualityReport(good_results)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             output_path = Path(tmpdir) / "report.json"
@@ -630,7 +630,7 @@ class TestQualityReport:
 
     def test_save_report_html_format(self, good_results: Any) -> None:
         """Test saving report in HTML format."""
-        report = QualityReport(good_results)  # type: ignore[arg-type]
+        report = QualityReport(good_results)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             output_path = Path(tmpdir) / "report.html"
@@ -643,7 +643,7 @@ class TestQualityReport:
 
     def test_save_report_default_format(self, good_results: Any) -> None:
         """Test saving report with default format (text)."""
-        report = QualityReport(good_results)  # type: ignore[arg-type]
+        report = QualityReport(good_results)
 
         with tempfile.TemporaryDirectory() as tmpdir:
             output_path = Path(tmpdir) / "report.txt"
@@ -657,7 +657,7 @@ class TestQualityReport:
         """Test handling of empty or missing metrics."""
         empty_results: dict[str, object] = {"issues": {}}  # No metrics section
 
-        report = QualityReport(empty_results)  # type: ignore[arg-type]
+        report = QualityReport(empty_results)
 
         assert report._get_files_analyzed() == 0
         assert report._get_coverage_percent() == 0.0
@@ -677,7 +677,7 @@ class TestQualityReport:
             "metrics": {"files_analyzed": 1, "coverage_percent": 50.0},
         }
 
-        report = QualityReport(incomplete_results)  # type: ignore[arg-type]
+        report = QualityReport(incomplete_results)
 
         # Should handle gracefully
         text_report = report.generate_text_report()
@@ -720,7 +720,7 @@ class TestQualityReport:
             "metrics": {"files_analyzed": 3, "coverage_percent": 75.0},
         }
 
-        report = QualityReport(severity_results)  # type: ignore[arg-type]
+        report = QualityReport(severity_results)
         html_report = report.generate_html_report()
 
         assert "high-severity" in html_report
@@ -738,7 +738,7 @@ class TestQualityReport:
             "metrics": {"files_analyzed": 1, "coverage_percent": 0.0},
         }
 
-        report = QualityReport(extreme_results)  # type: ignore[arg-type]
+        report = QualityReport(extreme_results)
         score = report._get_quality_score()
 
         # Score should not go below 0
@@ -762,7 +762,7 @@ class TestQualityReport:
             "metrics": {"files_analyzed": 2, "coverage_percent": 80.0},
         }
 
-        report = QualityReport(results_with_lines)  # type: ignore[arg-type]
+        report = QualityReport(results_with_lines)
         html_report = report.generate_html_report()
 
         assert "(line 42)" in html_report

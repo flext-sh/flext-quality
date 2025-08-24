@@ -248,7 +248,7 @@ class QualityMetrics(FlextModel):
         }
         defaults.update(overrides)
         # Type narrowing to satisfy MyPy - all overrides validated to be correct types
-        return cls(**defaults)  # type: ignore[arg-type]
+        return cls(**defaults)  # type: ignore[arg-type]  # Dict validated with correct field types
 
     @classmethod
     def from_analysis_results(cls, results: AnalysisResults) -> QualityMetrics:

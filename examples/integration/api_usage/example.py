@@ -152,7 +152,7 @@ if __name__ == "__main__":
         html_path.write_text(html_report)
 
 
-async def demonstrate_service_integration() -> None:  # noqa: PLR0912
+async def demonstrate_service_integration() -> None:
     """Demonstrate advanced service integration patterns."""
     # Initialize services
     project_service = QualityProjectService()
