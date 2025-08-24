@@ -118,7 +118,7 @@ class ExternalBackend(BaseAnalyzer):
             ruff_path = (
                 "/home/marlonsc/flext/.venv/bin/ruff"  # Use venv ruff for consistency
             )
-            result = subprocess.run(  # nosec B603 - Using absolute path for security
+            result = subprocess.run(  # nosec B603 - Using absolute path for security  # noqa: S603
                 [ruff_path, "check", str(abs_file_path), "--output-format", "json"],
                 capture_output=True,
                 text=True,

@@ -602,7 +602,7 @@ def mock_quality_analyzer() -> object:
                 "coverage": 90.0,
             }
 
-        async def get_metrics(self, project_path: str) -> TAnyDict:  # noqa: ARG002
+        async def get_metrics(self, project_path: str) -> TAnyDict:
             """Simulate project-wide quality metrics collection.
 
             Args:

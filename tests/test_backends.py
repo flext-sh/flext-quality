@@ -6,6 +6,7 @@ import ast
 import tempfile
 from pathlib import Path
 from typing import override
+from unittest.mock import patch
 
 # Removed unused mock imports - using real implementations
 import pytest
@@ -32,7 +33,7 @@ class TestBaseAnalyzer:
     def test_base_analyzer_abstract(self) -> None:
         """Test BaseAnalyzer is abstract and cannot be instantiated."""
         with pytest.raises(TypeError):
-            BaseAnalyzer()  # type: ignore[abstract] # Testing that abstract class cannot be instantiated
+            BaseAnalyzer()
 
     def test_base_analyzer_concrete_implementation(self) -> None:
         """Test concrete implementation of BaseAnalyzer."""

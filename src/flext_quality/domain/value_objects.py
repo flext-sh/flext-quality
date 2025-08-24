@@ -267,7 +267,7 @@ class QualityScore(FlextValue):
         return f"{self.value:.1f}%"
 
     @property
-    def grade(self) -> QualityGrade:  # noqa: PLR0911
+    def grade(self) -> QualityGrade:  # noqa: PLR0911  # Grade calculation legitimately needs many returns
         """Get quality grade based on score.
 
         Returns:
