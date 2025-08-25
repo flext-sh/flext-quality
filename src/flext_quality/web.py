@@ -29,7 +29,7 @@ ResponseType = FlaskResponse | WerkzeugResponse | tuple[FlaskResponse, int]
 logger = get_logger(__name__)
 
 
-class QualityWebInterface:
+class FlextQualityWebInterface:
     """Quality analysis web interface that extends flext-web."""
 
     def __init__(self) -> None:
@@ -211,7 +211,7 @@ class QualityWebInterface:
 
 def main() -> None:
     """Provide entry point for quality web interface."""
-    interface = QualityWebInterface()
+    interface = FlextQualityWebInterface()
     interface.run()
 
 

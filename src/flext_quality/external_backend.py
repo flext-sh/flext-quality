@@ -5,17 +5,16 @@ from __future__ import annotations
 import json
 import subprocess
 import tempfile
+import warnings
 from importlib import import_module, util
 from pathlib import Path
 from typing import override
 
-from flext_quality.backends.base import (
-    BackendType,
-    BaseAnalyzer,
-)
+from flext_quality.backend_type import BackendType
+from flext_quality.base import BaseAnalyzer
 
 
-class ExternalBackend(BaseAnalyzer):
+class FlextQualityExternalBackend(BaseAnalyzer):
     """Backend using external tools like ruff, mypy, bandit, vulture."""
 
     @override
@@ -47,6 +46,7 @@ class ExternalBackend(BaseAnalyzer):
 
         """
         result: dict[str, object] = {"tool": tool}
+        temp_path: Path | None = None
 
         if file_path:
             result["file_path"] = str(file_path)
@@ -82,7 +82,7 @@ class ExternalBackend(BaseAnalyzer):
             result["error"] = str(e)
         finally:
             # Clean up temp file
-            if "temp_path" in locals():
+            if temp_path is not None:
                 temp_path.unlink(missing_ok=True)
 
         return result
@@ -224,3 +224,20 @@ class ExternalBackend(BaseAnalyzer):
                 issue: dict[str, object] = {"message": line.strip()}
                 issues.append(issue)
         return issues
+
+
+# Legacy compatibility facade (TEMPORARY)
+class ExternalBackend(FlextQualityExternalBackend):
+    """Legacy external backend class - replaced by FlextQualityExternalBackend.
+
+    DEPRECATED: Use FlextQualityExternalBackend directly.
+    This facade provides compatibility during migration.
+    """
+
+    def __init__(self) -> None:
+        warnings.warn(
+            "ExternalBackend is deprecated; use FlextQualityExternalBackend",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super().__init__()

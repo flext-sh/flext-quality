@@ -11,6 +11,7 @@ from tempfile import TemporaryDirectory
 from unittest.mock import patch
 
 from flext_quality import CodeAnalyzer
+from flext_quality.analysis_types import AnalysisResults, OverallMetrics
 
 
 class TestCodeAnalyzerEdgeCases:
@@ -33,7 +34,6 @@ class TestCodeAnalyzerEdgeCases:
             analyzer = CodeAnalyzer(temp_dir)
 
             # Manually set _current_results to test error handling
-            from flext_quality.analysis_types import AnalysisResults, OverallMetrics
 
             analyzer._current_results = AnalysisResults(
                 overall_metrics=OverallMetrics(),
@@ -291,7 +291,6 @@ import json
             analyzer = CodeAnalyzer(temp_dir)
 
             # Set _current_results manually to test grade calculator
-            from flext_quality.analysis_types import AnalysisResults, OverallMetrics
 
             analyzer._current_results = AnalysisResults(
                 overall_metrics=OverallMetrics(),

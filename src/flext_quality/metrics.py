@@ -50,7 +50,7 @@ from flext_core import FlextModel, FlextResult
 from pydantic import Field
 
 from flext_quality.analysis_types import AnalysisResults
-from flext_quality.domain.grade_calculator import QualityGradeCalculator
+from flext_quality.grade_calculator import QualityGradeCalculator
 
 # Constants
 MAX_QUALITY_SCORE = 100

@@ -7,6 +7,7 @@ All entities use mixins from flext-core for maximum code reduction.
 
 from __future__ import annotations
 
+import warnings
 from datetime import UTC, datetime
 from enum import StrEnum
 from typing import override
@@ -14,8 +15,8 @@ from typing import override
 from flext_core import FlextEntity, FlextResult, FlextValue
 from pydantic import Field
 
-from flext_quality.domain.value_objects import IssueSeverity, IssueType
 from flext_quality.typings import FlextTypes
+from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
 
 
 class FlextDomainEvent(FlextValue):
@@ -25,7 +26,7 @@ class FlextDomainEvent(FlextValue):
     timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
 
-class AnalysisStatus(StrEnum):
+class FlextAnalysisStatus(StrEnum):
     """Analysis status for quality analysis."""
 
     QUEUED = "queued"
@@ -34,7 +35,12 @@ class AnalysisStatus(StrEnum):
     FAILED = "failed"
 
 
-class QualityProject(FlextEntity):
+# Legacy compatibility facade - DEPRECATED
+AnalysisStatus = FlextAnalysisStatus
+warnings.warn("AnalysisStatus is deprecated; use FlextAnalysisStatus", DeprecationWarning, stacklevel=2)
+
+
+class FlextQualityProject(FlextEntity):
     """Quality project domain entity using enhanced mixins for code reduction."""
 
     # Project identification
@@ -78,7 +84,12 @@ class QualityProject(FlextEntity):
         )
 
 
-class QualityAnalysis(FlextEntity):
+# Legacy compatibility facade - DEPRECATED
+QualityProject = FlextQualityProject
+warnings.warn("QualityProject is deprecated; use FlextQualityProject", DeprecationWarning, stacklevel=2)
+
+
+class FlextQualityAnalysis(FlextEntity):
     """Quality analysis domain entity using enhanced mixins for code reduction."""
 
     project_id: str = Field(..., description="Associated project ID")
@@ -196,14 +207,19 @@ class QualityAnalysis(FlextEntity):
         return FlextResult[None].ok(None)
 
 
-class QualityIssue(FlextEntity):
+# Legacy compatibility facade - DEPRECATED
+QualityAnalysis = FlextQualityAnalysis
+warnings.warn("QualityAnalysis is deprecated; use FlextQualityAnalysis", DeprecationWarning, stacklevel=2)
+
+
+class FlextQualityIssue(FlextEntity):
     """Quality issue domain entity using enhanced mixins for code reduction."""
 
     analysis_id: str = Field(..., description="Associated analysis ID")
 
     # Issue identification
-    issue_type: IssueType = Field(...)
-    severity: IssueSeverity = Field(...)
+    issue_type: FlextIssueType = Field(...)
+    severity: FlextIssueSeverity = Field(...)
     rule_id: str = Field(..., min_length=1)
 
     # Location
@@ -267,16 +283,21 @@ class QualityIssue(FlextEntity):
         return FlextResult[None].ok(None)
 
 
-class QualityRule(FlextEntity):
+# Legacy compatibility facade - DEPRECATED
+QualityIssue = FlextQualityIssue
+warnings.warn("QualityIssue is deprecated; use FlextQualityIssue", DeprecationWarning, stacklevel=2)
+
+
+class FlextQualityRule(FlextEntity):
     """Quality rule domain entity using enhanced mixins for code reduction."""
 
     # Rule identification
     rule_id: str = Field(..., min_length=1)
-    category: IssueType = Field(...)
+    category: FlextIssueType = Field(...)
 
     # Rule configuration
     enabled: bool = Field(default=True)
-    severity: IssueSeverity = Field(default=IssueSeverity.MEDIUM)
+    severity: FlextIssueSeverity = Field(default=FlextIssueSeverity.MEDIUM)
 
     # Rule details
     pattern: str | None = None
@@ -286,19 +307,19 @@ class QualityRule(FlextEntity):
     documentation_url: str | None = None
     examples: list[dict[str, object]] = Field(default_factory=list)
 
-    def enable(self) -> QualityRule:
+    def enable(self) -> FlextQualityRule:
         """Enable rule and return new instance."""
         return self.model_copy(update={"enabled": True})
 
-    def disable(self) -> QualityRule:
+    def disable(self) -> FlextQualityRule:
         """Disable rule and return new instance."""
         return self.model_copy(update={"enabled": False})
 
-    def update_severity(self, severity: IssueSeverity) -> QualityRule:
+    def update_severity(self, severity: FlextIssueSeverity) -> FlextQualityRule:
         """Update severity and return new instance."""
         return self.model_copy(update={"severity": severity})
 
-    def set_parameter(self, key: str, value: object) -> QualityRule:
+    def set_parameter(self, key: str, value: object) -> FlextQualityRule:
         """Set parameter and return new instance."""
         new_parameters = self.parameters.copy()
         new_parameters[key] = value
@@ -312,7 +333,12 @@ class QualityRule(FlextEntity):
         return FlextResult[None].ok(None)
 
 
-class QualityReport(FlextEntity):
+# Legacy compatibility facade - DEPRECATED
+QualityRule = FlextQualityRule
+warnings.warn("QualityRule is deprecated; use FlextQualityRule", DeprecationWarning, stacklevel=2)
+
+
+class FlextQualityReport(FlextEntity):
     """Quality report domain entity using enhanced mixins for code reduction."""
 
     analysis_id: str = Field(..., description="Associated analysis ID")
@@ -350,6 +376,11 @@ class QualityReport(FlextEntity):
         return FlextResult[None].ok(None)
 
 
+# Legacy compatibility facade - DEPRECATED
+QualityReport = FlextQualityReport
+warnings.warn("QualityReport is deprecated; use FlextQualityReport", DeprecationWarning, stacklevel=2)
+
+
 # Domain Events
 class ProjectCreatedEvent(FlextDomainEvent):
     """Event raised when quality project is created."""
@@ -383,8 +414,8 @@ class IssueDetectedEvent(FlextDomainEvent):
 
     analysis_id: str
     issue_id: str
-    issue_type: IssueType
-    severity: IssueSeverity
+    issue_type: FlextIssueType
+    severity: FlextIssueSeverity
     file_path: str
     rule_id: str
 

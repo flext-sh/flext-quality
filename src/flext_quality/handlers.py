@@ -15,13 +15,13 @@ from flext_observability import (
     flext_create_trace as _flext_create_trace,
 )
 
-from flext_quality.application.services import (
+from flext_quality.entities import QualityAnalysis, QualityReport
+from flext_quality.services import (
     LintingServiceImpl,
     QualityAnalysisService,
     QualityReportService,
     SecurityAnalyzerServiceImpl,
 )
-from flext_quality.domain.entities import QualityAnalysis, QualityReport
 
 # Use flext-observability directly - no fallbacks
 flext_create_log_entry = _flext_create_log_entry

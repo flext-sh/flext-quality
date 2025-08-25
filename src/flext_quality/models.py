@@ -15,17 +15,17 @@ from __future__ import annotations
 from datetime import datetime
 from uuid import UUID
 
-from flext_core import FlextBaseModel
+from flext_core.models import FlextModel
 from pydantic import Field, field_validator
 
 from flext_quality.constants import FlextQualityConstants
 
 
-class QualityBaseModel(FlextBaseModel):
+class FlextQualityBaseModel(FlextModel):
     """Base model for all quality domain entities extending FlextEntity patterns."""
 
 
-class QualityProjectModel(QualityBaseModel):
+class FlextQualityProjectModel(FlextQualityBaseModel):
     """Pydantic model for quality project representation."""
 
     id: UUID = Field(..., description="Unique project identifier")
@@ -49,7 +49,7 @@ class QualityProjectModel(QualityBaseModel):
         return v.strip()
 
 
-class QualityAnalysisModel(QualityBaseModel):
+class FlextQualityAnalysisModel(FlextQualityBaseModel):
     """Pydantic model for quality analysis representation."""
 
     id: UUID = Field(..., description="Unique analysis identifier")
@@ -91,7 +91,7 @@ class QualityAnalysisModel(QualityBaseModel):
         return max(0.0, min(100.0, v))
 
 
-class QualityIssueModel(QualityBaseModel):
+class FlextQualityIssueModel(FlextQualityBaseModel):
     """Pydantic model for quality issue representation."""
 
     id: UUID = Field(..., description="Unique issue identifier")
@@ -117,7 +117,7 @@ class QualityIssueModel(QualityBaseModel):
         return v
 
 
-class QualityReportModel(QualityBaseModel):
+class FlextQualityReportModel(FlextQualityBaseModel):
     """Pydantic model for quality report representation."""
 
     id: UUID = Field(..., description="Unique report identifier")
@@ -133,7 +133,7 @@ class QualityReportModel(QualityBaseModel):
     )
 
 
-class AnalysisConfigModel(QualityBaseModel):
+class FlextAnalysisConfigModel(FlextQualityBaseModel):
     """Pydantic model for analysis configuration."""
 
     include_patterns: list[str] = Field(
@@ -175,10 +175,10 @@ class AnalysisConfigModel(QualityBaseModel):
 
 # Export models for clean imports
 __all__ = [
-    "AnalysisConfigModel",
-    "QualityAnalysisModel",
-    "QualityBaseModel",
-    "QualityIssueModel",
-    "QualityProjectModel",
-    "QualityReportModel",
+    "FlextAnalysisConfigModel",
+    "FlextQualityAnalysisModel",
+    "FlextQualityBaseModel",
+    "FlextQualityIssueModel",
+    "FlextQualityProjectModel",
+    "FlextQualityReportModel",
 ]

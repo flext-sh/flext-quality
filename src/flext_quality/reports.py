@@ -3,12 +3,13 @@
 from __future__ import annotations
 
 import json
+import warnings
 from pathlib import Path
 
 from flext_quality.analysis_types import (
     AnalysisResults,
 )
-from flext_quality.domain.grade_calculator import QualityGradeCalculator
+from flext_quality.grade_calculator import FlextQualityGradeCalculator
 from flext_quality.utilities import (
     FlextQualityUtilities,
     FlextReportUtilities,
@@ -23,7 +24,7 @@ MIN_SCORE_THRESHOLD = 70
 HIGH_TYPE_ERROR_THRESHOLD = 10
 
 
-class QualityReport:
+class FlextQualityReport:
     """Generates quality reports from analysis results."""
 
     def __init__(self, analysis_results: AnalysisResults) -> None:
@@ -204,7 +205,7 @@ class QualityReport:
     def _get_quality_grade(self) -> str:
         """Calculate quality grade - DRY refactored."""
         score = self._get_quality_score()
-        grade = QualityGradeCalculator.calculate_grade(float(score))
+        grade = FlextQualityGradeCalculator.calculate_grade(float(score))
         return grade.value
 
     def _get_quality_score(self) -> int:
@@ -357,3 +358,8 @@ class QualityReport:
             )
 
         return recommendations
+
+
+# Legacy compatibility facade - DEPRECATED
+QualityReport = FlextQualityReport
+warnings.warn("QualityReport is deprecated; use FlextQualityReport", DeprecationWarning, stacklevel=2)

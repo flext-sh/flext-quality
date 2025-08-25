@@ -335,9 +335,6 @@ def complex_function(x):
         analyzer = CodeAnalyzer(temporary_project_structure)
         # Create sample file metrics for complexity analysis
         # Create proper FileAnalysisResult objects
-        from pathlib import Path
-
-        from flext_quality.analysis_types import FileAnalysisResult
 
         file_metrics = [
             FileAnalysisResult(

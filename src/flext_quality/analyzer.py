@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import ast
+import warnings
 from pathlib import Path
 
 from flext_core import get_logger
@@ -23,7 +24,7 @@ from flext_quality.analysis_types import (
     OverallMetrics,
     SecurityIssue,
 )
-from flext_quality.domain.grade_calculator import QualityGradeCalculator
+from flext_quality.grade_calculator import QualityGradeCalculator
 
 logger = get_logger(__name__)
 
@@ -32,7 +33,7 @@ MIN_FILE_SIZE_FOR_DUPLICATION_CHECK = 100
 SIMILARITY_THRESHOLD = 0.8
 
 
-class CodeAnalyzer:
+class FlextQualityCodeAnalyzer:
     """Main code analyzer interface for FLEXT Quality."""
 
     def __init__(self, project_path: str | Path) -> None:
@@ -503,3 +504,20 @@ class CodeAnalyzer:
                         )
 
         return issues
+
+
+# Legacy compatibility facade (TEMPORARY)
+class CodeAnalyzer(FlextQualityCodeAnalyzer):
+    """Legacy analyzer class - replaced by FlextQualityCodeAnalyzer.
+
+    DEPRECATED: Use FlextQualityCodeAnalyzer directly.
+    This facade provides compatibility during migration.
+    """
+
+    def __init__(self, project_path: str | Path) -> None:
+        warnings.warn(
+            "CodeAnalyzer is deprecated; use FlextQualityCodeAnalyzer",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super().__init__(project_path)

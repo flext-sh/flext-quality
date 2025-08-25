@@ -2,6 +2,7 @@
 
 import ast
 import logging
+import stat
 import tempfile
 from collections.abc import Generator
 from pathlib import Path
@@ -673,7 +674,6 @@ class TestCodeAnalyzer:
         analyzer = CodeAnalyzer(temp_project)
 
         # Create a real file that is likely to cause reading issues
-        import stat
 
         problematic_file = temp_project / "binary_file.py"
         # Create a file with binary content that might cause encoding issues

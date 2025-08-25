@@ -188,7 +188,7 @@ async def demonstrate_service_integration() -> None:
             blank_lines=20,
         )
 
-        metrics_result.value if metrics_result.success else None  # Handle result
+        _ = metrics_result.value if metrics_result.success else None  # Handle result
 
         # Update quality scores
         scores_result = await analysis_service.update_scores(
@@ -200,7 +200,7 @@ async def demonstrate_service_integration() -> None:
             maintainability_score=80.0,
         )
 
-        scores_result.value if scores_result.success else None  # Handle result
+        _ = scores_result.value if scores_result.success else None  # Handle result
 
         # Create issues
 
@@ -252,12 +252,12 @@ async def demonstrate_service_integration() -> None:
             low=1,
         )
 
-        issue_counts_result.value if issue_counts_result.success else None  # Handle result
+        _ = issue_counts_result.value if issue_counts_result.success else None  # Handle result
 
         # Complete the analysis
         complete_result = await analysis_service.complete_analysis(analysis.id)
 
-        complete_result.value if complete_result.success else None  # Handle result
+        _ = complete_result.value if complete_result.success else None  # Handle result
 
         # Create reports
 
@@ -270,7 +270,7 @@ async def demonstrate_service_integration() -> None:
                 report_type=report_type,
             )
 
-            report_result.value if report_result.success else None  # Handle result
+            _ = report_result.value if report_result.success else None  # Handle result
 
         # List all reports for the analysis
         reports_result = await report_service.list_reports(analysis.id)
@@ -388,7 +388,7 @@ def process_data(data):
                     project_path=temp_service_dir,
                 )
 
-                project_result.value if project_result.success else None  # Handle result
+                _ = project_result.value if project_result.success else None  # Handle result
 
         except ImportError:
             # Direct instantiation

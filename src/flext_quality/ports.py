@@ -6,17 +6,21 @@ Defines service interfaces following clean architecture.
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
 from pathlib import Path
+from typing import Protocol, runtime_checkable
 
 from flext_core import FlextResult
 
 
-# Using flext-core and ABC directly - no duplicate aliases
-class AnalysisService(ABC):
-    """Service interface for code analysis operations."""
+# Legacy compatibility facade (TEMPORARY)
+@runtime_checkable
+class AnalysisService(Protocol):
+    """Service interface for code analysis operations.
 
-    @abstractmethod
+    DEPRECATED: Use FlextAsyncService directly from flext-core.
+    This facade provides compatibility during migration.
+    """
+
     async def analyze_project(
         self,
         project_path: Path,
@@ -29,7 +33,6 @@ class AnalysisService(ABC):
         """Analyze a complete project with configurable analysis types."""
         ...
 
-    @abstractmethod
     async def analyze_file(
         self,
         file_path: Path,
@@ -38,7 +41,6 @@ class AnalysisService(ABC):
         """Analyze a single file with specified analysis types."""
         ...
 
-    @abstractmethod
     async def calculate_quality_score(
         self,
         analysis_results: dict[str, object],
@@ -46,16 +48,18 @@ class AnalysisService(ABC):
         """Calculate overall quality score from analysis results."""
         ...
 
-    @abstractmethod
     async def get_quality_grade(self, quality_score: float) -> FlextResult[str]:
         """Convert quality score to letter grade (A, B, C, D, F)."""
         ...
 
 
-class SecurityAnalyzerService(ABC):
-    """Service interface for security analysis."""
+@runtime_checkable
+class SecurityAnalyzerService(Protocol):
+    """Service interface for security analysis.
 
-    @abstractmethod
+    DEPRECATED: Use FlextAsyncService directly from flext-core.
+    """
+
     async def analyze_security(
         self,
         project_path: Path,
@@ -64,7 +68,6 @@ class SecurityAnalyzerService(ABC):
         """Analyze project for security vulnerabilities."""
         ...
 
-    @abstractmethod
     async def scan_file(
         self,
         file_path: Path,
@@ -73,7 +76,6 @@ class SecurityAnalyzerService(ABC):
         """Scan a single file for security issues."""
         ...
 
-    @abstractmethod
     async def validate_dependencies(
         self,
         project_path: Path,
@@ -82,10 +84,10 @@ class SecurityAnalyzerService(ABC):
         ...
 
 
-class LintingService(ABC):
+@runtime_checkable
+class LintingService(Protocol):
     """Service interface for code linting."""
 
-    @abstractmethod
     async def lint_project(
         self,
         project_path: Path,
@@ -95,7 +97,6 @@ class LintingService(ABC):
         """Lint entire project with optional auto-fix."""
         ...
 
-    @abstractmethod
     async def lint_file(
         self,
         file_path: Path,
@@ -105,16 +106,15 @@ class LintingService(ABC):
         """Lint a single file with optional auto-fix."""
         ...
 
-    @abstractmethod
     async def format_code(self, file_path: Path) -> FlextResult[bool]:
         """Format code in a file according to style guidelines."""
         ...
 
 
-class ReportGeneratorService(ABC):
+@runtime_checkable
+class ReportGeneratorService(Protocol):
     """Service interface for quality report generation."""
 
-    @abstractmethod
     async def generate_report(
         self,
         analysis_results: dict[str, object],
@@ -133,7 +133,6 @@ class ReportGeneratorService(ABC):
         """
         ...
 
-    @abstractmethod
     async def generate_summary(
         self,
         analysis_results: dict[str, object],
@@ -148,7 +147,6 @@ class ReportGeneratorService(ABC):
         """
         ...
 
-    @abstractmethod
     async def export_metrics(
         self,
         analysis_results: dict[str, object],
@@ -167,10 +165,10 @@ class ReportGeneratorService(ABC):
         ...
 
 
-class ComplexityAnalyzerService(ABC):
+@runtime_checkable
+class ComplexityAnalyzerService(Protocol):
     """Service interface for code complexity analysis."""
 
-    @abstractmethod
     async def analyze_complexity(
         self,
         project_path: Path,
@@ -188,7 +186,6 @@ class ComplexityAnalyzerService(ABC):
         """
         ...
 
-    @abstractmethod
     async def calculate_cyclomatic_complexity(
         self,
         file_path: Path,
@@ -203,7 +200,6 @@ class ComplexityAnalyzerService(ABC):
         """
         ...
 
-    @abstractmethod
     async def calculate_cognitive_complexity(
         self,
         file_path: Path,
@@ -219,10 +215,10 @@ class ComplexityAnalyzerService(ABC):
         ...
 
 
-class DeadCodeDetectorService(ABC):
+@runtime_checkable
+class DeadCodeDetectorService(Protocol):
     """Service interface for dead code detection."""
 
-    @abstractmethod
     async def detect_dead_code(
         self,
         project_path: Path,
@@ -237,7 +233,6 @@ class DeadCodeDetectorService(ABC):
         """
         ...
 
-    @abstractmethod
     async def find_unused_imports(
         self,
         file_path: Path,
@@ -252,7 +247,6 @@ class DeadCodeDetectorService(ABC):
         """
         ...
 
-    @abstractmethod
     async def find_unused_variables(
         self,
         file_path: Path,
@@ -268,10 +262,10 @@ class DeadCodeDetectorService(ABC):
         ...
 
 
-class DuplicateDetectorService(ABC):
+@runtime_checkable
+class DuplicateDetectorService(Protocol):
     """Service interface for duplicate code detection."""
 
-    @abstractmethod
     async def detect_duplicates(
         self,
         project_path: Path,
@@ -291,7 +285,6 @@ class DuplicateDetectorService(ABC):
         """
         ...
 
-    @abstractmethod
     async def find_similar_functions(
         self,
         project_path: Path,
@@ -309,7 +302,6 @@ class DuplicateDetectorService(ABC):
         """
         ...
 
-    @abstractmethod
     async def calculate_duplication_ratio(
         self,
         project_path: Path,
@@ -325,10 +317,10 @@ class DuplicateDetectorService(ABC):
         ...
 
 
-class MetricsCollectorService(ABC):
+@runtime_checkable
+class MetricsCollectorService(Protocol):
     """Service interface for quality metrics collection."""
 
-    @abstractmethod
     async def collect_metrics(
         self,
         project_path: Path,
@@ -343,7 +335,6 @@ class MetricsCollectorService(ABC):
         """
         ...
 
-    @abstractmethod
     async def calculate_maintainability_index(
         self,
         project_path: Path,
@@ -358,7 +349,6 @@ class MetricsCollectorService(ABC):
         """
         ...
 
-    @abstractmethod
     async def calculate_technical_debt(
         self,
         project_path: Path,
