@@ -236,7 +236,7 @@ def process_data_type_b(data):
 
 # Backward compatibility aliases - following flext-cli pattern
 FlextReportUtilities = FlextQualityUtilities
-FlextTestUtilities = FlextQualityUtilities 
+FlextTestUtilities = FlextQualityUtilities
 FlextAnalysisUtilities = FlextQualityUtilities
 
 # Legacy compatibility aliases
@@ -253,6 +253,6 @@ __all__ = [
     "UtilityIssueList",
     "UtilityIssueType",
     # Legacy compatibility
-    "IssueList",  
+    "IssueList",
     "IssueType",
 ]

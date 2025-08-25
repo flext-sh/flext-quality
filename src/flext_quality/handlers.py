@@ -39,8 +39,8 @@ class FlextQualityHandlers:
         self._analysis_service = QualityAnalysisService()
         self._report_service = QualityReportService()
         # Use placeholder services for now - these would be injected
-        self._linting_service = None  # type: ignore[assignment]
-        self._security_service = None  # type: ignore[assignment]
+        self._linting_service = None
+        self._security_service = None
 
     async def analyze_project(self, project_id: UUID) -> FlextResult[QualityAnalysis]:
         """Handle project analysis command."""

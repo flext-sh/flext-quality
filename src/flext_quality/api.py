@@ -279,7 +279,7 @@ class FlextQualityAPI:
         overall_score = (
             coverage_score + complexity_score + security_score + maintainability_score
         ) / 4.0
-        
+
         return await self.analysis_service.update_scores(
             analysis_id=str(analysis_id),
             coverage_score=coverage_score,
@@ -311,7 +311,7 @@ class FlextQualityAPI:
 
         """
         total_issues = critical + high + medium + low
-        
+
         return await self.analysis_service.update_issue_counts(
             analysis_id=str(analysis_id),
             total_issues=total_issues,
@@ -421,13 +421,13 @@ class FlextQualityAPI:
         """
         # Convert string parameters to enum types
         from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
-        
+
         try:
             severity_enum = FlextIssueSeverity(severity)
             issue_type_enum = FlextIssueType(issue_type)
         except ValueError as e:
             return FlextResult[QualityIssue].fail(f"Invalid severity or issue type: {e}")
-        
+
         return await self.issue_service.create_issue(
             analysis_id=str(analysis_id),
             file_path=file_path,
@@ -478,7 +478,7 @@ class FlextQualityAPI:
                 severity_enum = FlextIssueSeverity(severity)
             except ValueError:
                 return FlextResult[list[QualityIssue]].fail(f"Invalid severity: {severity}")
-        
+
         return await self.issue_service.list_issues(
             analysis_id=str(analysis_id),
             severity=severity_enum,

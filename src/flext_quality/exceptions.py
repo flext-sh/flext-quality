@@ -174,7 +174,7 @@ __all__ = [
     "FlextQualityExceptionsError",
     # Legacy compatibility aliases
     "FlextQualityError",
-    "FlextQualityValidationError", 
+    "FlextQualityValidationError",
     "FlextQualityConfigurationError",
     "FlextQualityConnectionError",
     "FlextQualityProcessingError",

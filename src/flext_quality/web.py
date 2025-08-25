@@ -219,8 +219,8 @@ main = web_main
 
 __all__ = [
     "FlextQualityWebInterface",
-    "web_main",
     "main",  # Legacy compatibility
+    "web_main",
 ]
 
 if __name__ == "__main__":
