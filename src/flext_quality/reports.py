@@ -24,7 +24,7 @@ MIN_SCORE_THRESHOLD = 70
 HIGH_TYPE_ERROR_THRESHOLD = 10
 
 
-class FlextQualityReport:
+class FlextQualityReportGenerator:
     """Generates quality reports from analysis results."""
 
     def __init__(self, analysis_results: AnalysisResults) -> None:
@@ -361,5 +361,19 @@ class FlextQualityReport:
 
 
 # Legacy compatibility facade - DEPRECATED
-QualityReport = FlextQualityReport
-warnings.warn("QualityReport is deprecated; use FlextQualityReport", DeprecationWarning, stacklevel=2)
+FlextQualityReport = FlextQualityReportGenerator  # Keep old name for backward compatibility
+QualityReport = FlextQualityReportGenerator
+warnings.warn("QualityReport is deprecated; use FlextQualityReportGenerator", DeprecationWarning, stacklevel=2)
+
+__all__ = [
+    "FlextQualityReportGenerator",
+    "FlextQualityReport",  # Legacy compatibility
+    "QualityReport",  # Legacy compatibility
+    # Constants
+    "ISSUE_PREVIEW_LIMIT",
+    "HTML_ISSUE_LIMIT", 
+    "HIGH_ISSUE_THRESHOLD",
+    "MIN_COVERAGE_THRESHOLD",
+    "MIN_SCORE_THRESHOLD",
+    "HIGH_TYPE_ERROR_THRESHOLD",
+]

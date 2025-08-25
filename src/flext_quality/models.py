@@ -15,7 +15,7 @@ from __future__ import annotations
 from datetime import datetime
 from uuid import UUID
 
-from flext_core.models import FlextModel
+from flext_core import FlextModel
 from pydantic import Field, field_validator
 
 from flext_quality.constants import FlextQualityConstants

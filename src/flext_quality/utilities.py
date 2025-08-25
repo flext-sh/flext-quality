@@ -1,7 +1,7 @@
-"""Utility classes and functions for FLEXT Quality project.
+"""CONSOLIDATED Utility classes for FLEXT-QUALITY.
 
-This module provides reusable utility classes with static methods for common
-operations across the quality analysis system, following FLEXT patterns.
+REFACTORED: Single CONSOLIDATED class following FLEXT_REFACTORING_PROMPT.md patterns.
+Follows flext-core aggregation pattern - NO duplication, NO multiple separate classes.
 """
 
 from __future__ import annotations
@@ -21,16 +21,21 @@ if TYPE_CHECKING:
 
 # Type aliases for better readability
 if TYPE_CHECKING:
-    IssueType = SecurityIssue | ComplexityIssue | DeadCodeIssue | DuplicationIssue
-    IssueList = list[IssueType]
+    UtilityIssueType = SecurityIssue | ComplexityIssue | DeadCodeIssue | DuplicationIssue
+    UtilityIssueList = list[UtilityIssueType]
 else:
-    IssueType = object
-    IssueList = list[object]
+    UtilityIssueType = object
+    UtilityIssueList = list[object]
 
 
 class FlextQualityUtilities:
-    """Utility class for FLEXT Quality operations."""
+    """CONSOLIDATED utility class following FLEXT_REFACTORING_PROMPT.md pattern.
 
+    Single class containing ALL utility functionality to eliminate duplication
+    and follow FLEXT ecosystem standards.
+    """
+
+    # CONSOLIDATED: Issue processing methods
     @staticmethod
     def is_issue_list(value: object) -> bool:
         """Type guard to check if value is a list of quality issues."""
@@ -68,9 +73,7 @@ class FlextQualityUtilities:
         return "Unknown location"
 
 
-class FlextReportUtilities:
-    """Utility class for report generation operations."""
-
+    # CONSOLIDATED: Report generation methods (formerly FlextReportUtilities)
     @staticmethod
     def format_issue_categories(results: object) -> dict[str, list[object]]:
         """Format issue categories with proper typing."""
@@ -102,9 +105,7 @@ class FlextReportUtilities:
             target.extend(str_items)
 
 
-class FlextTestUtilities:
-    """Utility class for testing with real code execution."""
-
+    # CONSOLIDATED: Test utility methods (formerly FlextTestUtilities)
     @staticmethod
     def create_test_file_with_issues(file_path: Path, issue_type: str) -> None:
         """Create test files with specific types of real issues."""
@@ -207,9 +208,7 @@ def process_data_type_b(data):
             file_path.write_text("# Test file", encoding="utf-8")
 
 
-class FlextAnalysisUtilities:
-    """Utility class for analysis operations."""
-
+    # CONSOLIDATED: Analysis utility methods (formerly FlextAnalysisUtilities)
     @staticmethod
     def calculate_real_score(analysis_results: AnalysisResults | object) -> float:
         """Calculate quality score from real analysis results."""
@@ -234,11 +233,26 @@ class FlextAnalysisUtilities:
         return 0
 
 
+
+# Backward compatibility aliases - following flext-cli pattern
+FlextReportUtilities = FlextQualityUtilities
+FlextTestUtilities = FlextQualityUtilities 
+FlextAnalysisUtilities = FlextQualityUtilities
+
+# Legacy compatibility aliases
+IssueType = UtilityIssueType
+IssueList = UtilityIssueList
+
+# Export CONSOLIDATED class and aliases
 __all__ = [
-    "FlextAnalysisUtilities",
     "FlextQualityUtilities",
+    # Backward compatibility
+    "FlextAnalysisUtilities",
     "FlextReportUtilities",
     "FlextTestUtilities",
-    "IssueList",
+    "UtilityIssueList",
+    "UtilityIssueType",
+    # Legacy compatibility
+    "IssueList",  
     "IssueType",
 ]

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from flext_core.models import FlextModel
+from flext_core import FlextModel
 
 
 class FunctionInfo(FlextModel):

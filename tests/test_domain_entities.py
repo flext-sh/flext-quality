@@ -9,7 +9,7 @@ from pydantic import ValidationError
 
 from flext_quality import (
     AnalysisStatus,
-    DomainQualityReport as QualityReport,
+    QualityReport,
     IssueSeverity,
     IssueType,
     QualityAnalysis,

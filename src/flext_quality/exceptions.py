@@ -38,7 +38,7 @@ class FlextQualityErrorCodes(Enum):
 # CONSOLIDATED Exception Class following FLEXT_REFACTORING_PROMPT.md pattern
 class FlextQualityExceptionsError(FlextError):
     """Single consolidated class containing ALL quality exceptions.
-    
+
     Consolidates ALL exception definitions into one class following FLEXT patterns.
     Individual exceptions available as nested classes for organization.
     """
@@ -46,32 +46,25 @@ class FlextQualityExceptionsError(FlextError):
     class QualityError(FlextError):
         """Base exception for all quality domain errors."""
 
-
-    class ValidationError(FlextError):
+    class ValidationError(QualityError):
         """Quality validation errors."""
 
-
-    class ConfigurationError(FlextError):
+    class ConfigurationError(QualityError):
         """Quality configuration errors."""
 
-
-    class QualityConnectionError(FlextError):
+    class QualityConnectionError(QualityError):
         """Quality connection errors."""
 
-
-    class ProcessingError(FlextError):
+    class ProcessingError(QualityError):
         """Quality processing errors."""
 
-
-    class AuthenticationError(FlextError):
+    class AuthenticationError(QualityError):
         """Quality authentication errors."""
 
-
-    class QualityTimeoutError(FlextError):
+    class QualityTimeoutError(QualityError):
         """Quality timeout errors."""
 
-
-    class AnalysisError(FlextError):
+    class AnalysisError(QualityError):
         """Quality analysis errors."""
 
         def __init__(
@@ -87,7 +80,7 @@ class FlextQualityExceptionsError(FlextError):
         def __str__(self) -> str:
             return f"Quality analysis: {self.message}"
 
-    class ReportError(FlextError):
+    class ReportError(QualityError):
         """Quality report errors."""
 
         def __init__(
@@ -103,7 +96,7 @@ class FlextQualityExceptionsError(FlextError):
         def __str__(self) -> str:
             return f"Quality report: {self.message}"
 
-    class MetricsError(FlextError):
+    class MetricsError(QualityError):
         """Quality metrics errors."""
 
         def __init__(
@@ -119,7 +112,7 @@ class FlextQualityExceptionsError(FlextError):
         def __str__(self) -> str:
             return f"Quality metrics: {self.message}"
 
-    class GradeError(FlextError):
+    class GradeError(QualityError):
         """Quality grade errors."""
 
         def __init__(
@@ -135,7 +128,7 @@ class FlextQualityExceptionsError(FlextError):
         def __str__(self) -> str:
             return f"Quality grade: {self.message}"
 
-    class RuleError(FlextError):
+    class RuleError(QualityError):
         """Quality rule errors."""
 
         def __init__(
@@ -151,74 +144,47 @@ class FlextQualityExceptionsError(FlextError):
         def __str__(self) -> str:
             return f"Quality rule: {self.message}"
 
-    class IssueError(FlextError):
+    class IssueError(QualityError):
         """Quality issue errors."""
 
-
-    class ThresholdError(FlextError):
+    class ThresholdError(QualityError):
         """Quality threshold errors."""
 
 
-    # Legacy compatibility properties (as per FLEXT_REFACTORING_PROMPT.md)
-    @property
-    def FlextQualityError(self):
-        return self.QualityError
-
-    @property
-    def FlextQualityValidationError(self):
-        return self.ValidationError
-
-    @property
-    def FlextQualityConfigurationError(self):
-        return self.ConfigurationError
-
-    @property
-    def FlextQualityConnectionError(self):
-        return self.QualityConnectionError
-
-    @property
-    def FlextQualityProcessingError(self):
-        return self.ProcessingError
-
-    @property
-    def FlextQualityAuthenticationError(self):
-        return self.AuthenticationError
-
-    @property
-    def FlextQualityTimeoutError(self):
-        return self.QualityTimeoutError
-
-    @property
-    def FlextQualityAnalysisError(self):
-        return self.AnalysisError
-
-    @property
-    def FlextQualityReportError(self):
-        return self.ReportError
-
-    @property
-    def FlextQualityMetricsError(self):
-        return self.MetricsError
-
-    @property
-    def FlextQualityGradeError(self):
-        return self.GradeError
-
-    @property
-    def FlextQualityRuleError(self):
-        return self.RuleError
-
-    @property
-    def FlextQualityIssueError(self):
-        return self.IssueError
-
-    @property
-    def FlextQualityThresholdError(self):
-        return self.ThresholdError
+# Legacy compatibility aliases - following flext-cli pattern
+FlextQualityError = FlextQualityExceptionsError.QualityError
+FlextQualityValidationError = FlextQualityExceptionsError.ValidationError
+FlextQualityConfigurationError = FlextQualityExceptionsError.ConfigurationError
+FlextQualityConnectionError = FlextQualityExceptionsError.QualityConnectionError
+FlextQualityProcessingError = FlextQualityExceptionsError.ProcessingError
+FlextQualityAuthenticationError = FlextQualityExceptionsError.AuthenticationError
+FlextQualityTimeoutError = FlextQualityExceptionsError.QualityTimeoutError
+FlextQualityAnalysisError = FlextQualityExceptionsError.AnalysisError
+FlextQualityReportError = FlextQualityExceptionsError.ReportError
+FlextQualityMetricsError = FlextQualityExceptionsError.MetricsError
+FlextQualityGradeError = FlextQualityExceptionsError.GradeError
+FlextQualityRuleError = FlextQualityExceptionsError.RuleError
+FlextQualityIssueError = FlextQualityExceptionsError.IssueError
+FlextQualityThresholdError = FlextQualityExceptionsError.ThresholdError
 
 
-# Export consolidated class
+# Export consolidated class and legacy aliases
 __all__ = [
     "FlextQualityErrorCodes",
     "FlextQualityExceptionsError",
+    # Legacy compatibility aliases
+    "FlextQualityError",
+    "FlextQualityValidationError", 
+    "FlextQualityConfigurationError",
+    "FlextQualityConnectionError",
+    "FlextQualityProcessingError",
+    "FlextQualityAuthenticationError",
+    "FlextQualityTimeoutError",
+    "FlextQualityAnalysisError",
+    "FlextQualityReportError",
+    "FlextQualityMetricsError",
+    "FlextQualityGradeError",
+    "FlextQualityRuleError",
+    "FlextQualityIssueError",
+    "FlextQualityThresholdError",
 ]
