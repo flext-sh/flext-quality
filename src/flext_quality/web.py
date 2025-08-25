@@ -209,11 +209,19 @@ class FlextQualityWebInterface:
         self.web_service.run(host=host, port=port, debug=debug)
 
 
-def main() -> None:
+def web_main() -> None:
     """Provide entry point for quality web interface."""
     interface = FlextQualityWebInterface()
     interface.run()
 
+# Legacy compatibility alias
+main = web_main
+
+__all__ = [
+    "FlextQualityWebInterface",
+    "web_main",
+    "main",  # Legacy compatibility
+]
 
 if __name__ == "__main__":
-    main()
+    web_main()

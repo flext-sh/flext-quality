@@ -10,25 +10,22 @@ import pytest
 
 from flext_quality import (
     FlextQualityAnalysisError,
-    FlextQualityAnalysisOperationError,
     FlextQualityAuthenticationError,
     FlextQualityConfigurationError,
     FlextQualityConnectionError,
     FlextQualityError,
     FlextQualityGradeError,
-    FlextQualityGradeOperationError,
     FlextQualityMetricsError,
-    FlextQualityMetricsOperationError,
     FlextQualityProcessingError,
     FlextQualityReportError,
-    FlextQualityReportOperationError,
     FlextQualityRuleError,
-    FlextQualityRuleOperationError,
     FlextQualityTimeoutError,
     FlextQualityValidationError,
-    __all__ as exceptions_all,
-    exceptions as exc_module,
+    FlextQualityIssueError,
+    FlextQualityThresholdError,
 )
+from flext_quality import exceptions as exc_module
+from flext_quality.exceptions import __all__ as exceptions_all
 
 
 class TestFlextQualityExceptions:
@@ -83,12 +80,14 @@ class TestFlextQualityExceptions:
         assert isinstance(exception, FlextQualityError)
 
     def test_analysis_error_with_context(self) -> None:
-        """Test FlextQualityAnalysisOperationError with full context."""
-        exception = FlextQualityAnalysisOperationError(
+        """Test FlextQualityAnalysisError with full context."""
+        exception = FlextQualityAnalysisError(
             "Analyzer crashed",
-            analyzer_name="pylint",
-            file_count=42,
-            analysis_type="test_value",
+            context={
+                "analyzer_name": "pylint",
+                "file_count": 42,
+                "analysis_type": "test_value",
+            }
         )
         assert "Quality analysis: Analyzer crashed" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -105,12 +104,14 @@ class TestFlextQualityExceptions:
         assert isinstance(exception, FlextQualityError)
 
     def test_report_error_with_context(self) -> None:
-        """Test FlextQualityReportOperationError with full context."""
-        exception = FlextQualityReportOperationError(
+        """Test FlextQualityReportError with full context."""
+        exception = FlextQualityReportError(
             "Invalid format",
-            report_type="html",
-            output_format="pdf",
-            project_name="test",
+            context={
+                "report_type": "html",
+                "output_format": "pdf",
+                "project_name": "test",
+            }
         )
         assert "Quality report: Invalid format" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -127,12 +128,14 @@ class TestFlextQualityExceptions:
         assert isinstance(exception, FlextQualityError)
 
     def test_metrics_error_with_context(self) -> None:
-        """Test FlextQualityMetricsOperationError with full context."""
-        exception = FlextQualityMetricsOperationError(
+        """Test FlextQualityMetricsError with full context."""
+        exception = FlextQualityMetricsError(
             "Invalid value",
-            metric_name="complexity",
-            metric_value=42.5,
-            threshold_value=10.0,
+            context={
+                "metric_name": "complexity",
+                "metric_value": 42.5,
+                "threshold_value": 10.0,
+            }
         )
         assert "Quality metrics: Invalid value" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -149,12 +152,14 @@ class TestFlextQualityExceptions:
         assert isinstance(exception, FlextQualityError)
 
     def test_grade_error_with_context(self) -> None:
-        """Test FlextQualityGradeOperationError with full context."""
-        exception = FlextQualityGradeOperationError(
+        """Test FlextQualityGradeError with full context."""
+        exception = FlextQualityGradeError(
             "Invalid grade",
-            grade_type="overall",
-            calculated_grade="A++",
-            grade_score=95.5,
+            context={
+                "grade_type": "overall",
+                "calculated_grade": "A++",
+                "grade_score": 95.5,
+            }
         )
         assert "Quality grade: Invalid grade" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -171,12 +176,14 @@ class TestFlextQualityExceptions:
         assert isinstance(exception, FlextQualityError)
 
     def test_rule_error_with_context(self) -> None:
-        """Test FlextQualityRuleOperationError with full context."""
-        exception = FlextQualityRuleOperationError(
+        """Test FlextQualityRuleError with full context."""
+        exception = FlextQualityRuleError(
             "Rule not found",
-            rule_name="E302",
-            rule_severity="high",
-            rule_category="style",
+            context={
+                "rule_name": "E302",
+                "rule_severity": "high",
+                "rule_category": "style",
+            }
         )
         assert "Quality rule: Rule not found" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -236,32 +243,36 @@ class TestExceptionModuleExports:
         """Test that __all__ contains all expected exception classes."""
         expected_exceptions = {
             "FlextQualityAnalysisError",
-            "FlextQualityAnalysisOperationError",
             "FlextQualityAuthenticationError",
             "FlextQualityConfigurationError",
             "FlextQualityConnectionError",
             "FlextQualityError",
             "FlextQualityGradeError",
-            "FlextQualityGradeOperationError",
             "FlextQualityMetricsError",
-            "FlextQualityMetricsOperationError",
             "FlextQualityProcessingError",
             "FlextQualityReportError",
-            "FlextQualityReportOperationError",
             "FlextQualityRuleError",
-            "FlextQualityRuleOperationError",
             "FlextQualityTimeoutError",
             "FlextQualityValidationError",
+            "FlextQualityIssueError",
+            "FlextQualityThresholdError",
         }
 
         # Extract only exception classes from the full __all__ list
-        exception_classes_in_all = {name for name in exceptions_all if "Error" in name}
+        # Exclude ErrorCodes (enum) and ExceptionsError (consolidation class)
+        exception_classes_in_all = {
+            name for name in exceptions_all 
+            if "Error" in name and name not in {"FlextQualityErrorCodes", "FlextQualityExceptionsError"}
+        }
         assert exception_classes_in_all == expected_exceptions
 
     def test_all_exceptions_importable(self) -> None:
         """Test that all exceptions can be imported from the module."""
-        # Filter to only exception classes from __all__
-        exception_names = [name for name in exceptions_all if "Error" in name]
+        # Filter to only exception classes from __all__, excluding non-exception classes
+        exception_names = [
+            name for name in exceptions_all 
+            if "Error" in name and name not in {"FlextQualityErrorCodes", "FlextQualityExceptionsError"}
+        ]
 
         for exception_name in exception_names:
             # Test that the exception class exists and is callable
