@@ -1,22 +1,18 @@
-"""Base class for analysis backends."""
+"""Base class for analysis backends using flext-core patterns."""
 
 from __future__ import annotations
 
-from abc import ABC, abstractmethod
-from enum import Enum
+import warnings
+from abc import abstractmethod
 from pathlib import Path
 
+from flext_core import FlextAbstractMixin
 
-class BackendType(Enum):
-    """Enumeration of backend types."""
-
-    AST = "ast"
-    EXTERNAL = "external"
-    HYBRID = "hybrid"
+from flext_quality.backend_type import BackendType
 
 
-class BaseAnalyzer(ABC):
-    """Abstract base class for code analyzers."""
+class FlextQualityAnalyzer(FlextAbstractMixin):
+    """Abstract base class for code analyzers using flext-core patterns."""
 
     @abstractmethod
     def analyze(self, code: str, file_path: Path | None = None) -> dict[str, object]:
@@ -51,3 +47,12 @@ class BaseAnalyzer(ABC):
 
         """
         ...
+
+
+# Legacy compatibility facade (temporary)
+BaseAnalyzer = FlextQualityAnalyzer
+warnings.warn(
+    "BaseAnalyzer is deprecated; use FlextQualityAnalyzer",
+    DeprecationWarning,
+    stacklevel=2,
+)

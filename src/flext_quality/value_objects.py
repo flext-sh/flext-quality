@@ -16,7 +16,7 @@ from pydantic import Field, field_validator
 # Using flext-core patterns consistently
 
 
-class QualityThresholds:
+class FlextQualityThresholds:
     """Business rule constants for quality assessment - extracted magic numbers."""
 
     # Quality grade thresholds (score percentages)
@@ -51,7 +51,7 @@ class QualityThresholds:
     FILE_PATH_MAX_LENGTH = 4096
 
 
-class IssueSeverity(StrEnum):
+class FlextIssueSeverity(StrEnum):
     """Issue severity levels using StrEnum."""
 
     LOW = "low"
@@ -60,7 +60,7 @@ class IssueSeverity(StrEnum):
     CRITICAL = "critical"
 
 
-class IssueType(StrEnum):
+class FlextIssueType(StrEnum):
     """Issue type enumeration using StrEnum."""
 
     # Code quality issues
@@ -99,7 +99,7 @@ class IssueType(StrEnum):
     INVALID_DOCSTRING = "invalid_docstring"
 
 
-class QualityGrade(StrEnum):
+class FlextQualityGrade(StrEnum):
     """Quality grade enumeration using StrEnum."""
 
     A_PLUS = "A+"
@@ -117,7 +117,7 @@ class QualityGrade(StrEnum):
     F = "F"
 
 
-class FilePath(FlextValue):
+class FlextFilePath(FlextValue):
     """File path value object."""
 
     value: str = Field(..., description="File path")
@@ -188,15 +188,15 @@ class FilePath(FlextValue):
         """Validate file path business rules."""
         if not self.value:
             return FlextResult[None].fail("File path cannot be empty")
-        if len(self.value) > QualityThresholds.FILE_PATH_MAX_LENGTH:
+        if len(self.value) > FlextQualityThresholds.FILE_PATH_MAX_LENGTH:
             return FlextResult[None].fail(
-                f"File path too long (>{QualityThresholds.FILE_PATH_MAX_LENGTH} characters)"
+                f"File path too long (>{FlextQualityThresholds.FILE_PATH_MAX_LENGTH} characters)"
             )
 
         return FlextResult[None].ok(None)
 
 
-class IssueLocation(FlextValue):
+class FlextIssueLocation(FlextValue):
     """Location of an issue in a file."""
 
     line: int = Field(..., description="Line number", ge=1)
@@ -251,7 +251,7 @@ class IssueLocation(FlextValue):
         return FlextResult[None].ok(None)
 
 
-class QualityScore(FlextValue):
+class FlextQualityScore(FlextValue):
     """Quality score value object."""
 
     value: float = Field(..., description="Quality score", ge=0.0, le=100.0)
@@ -267,51 +267,51 @@ class QualityScore(FlextValue):
         return f"{self.value:.1f}%"
 
     @property
-    def grade(self) -> QualityGrade:  # noqa: PLR0911  # Grade calculation legitimately needs many returns
+    def grade(self) -> FlextQualityGrade:  # noqa: PLR0911  # Grade calculation legitimately needs many returns
         """Get quality grade based on score.
 
         Returns:
             Quality grade enum value.
 
         """
-        if self.value >= QualityThresholds.GRADE_A_PLUS:
-            return QualityGrade.A_PLUS
-        if self.value >= QualityThresholds.GRADE_A:
-            return QualityGrade.A
-        if self.value >= QualityThresholds.GRADE_A_MINUS:
-            return QualityGrade.A_MINUS
-        if self.value >= QualityThresholds.GRADE_B_PLUS:
-            return QualityGrade.B_PLUS
-        if self.value >= QualityThresholds.GRADE_B:
-            return QualityGrade.B
-        if self.value >= QualityThresholds.GRADE_B_MINUS:
-            return QualityGrade.B_MINUS
-        if self.value >= QualityThresholds.GRADE_C_PLUS:
-            return QualityGrade.C_PLUS
-        if self.value >= QualityThresholds.GRADE_C:
-            return QualityGrade.C
-        if self.value >= QualityThresholds.GRADE_C_MINUS:
-            return QualityGrade.C_MINUS
-        if self.value >= QualityThresholds.GRADE_D_PLUS:
-            return QualityGrade.D_PLUS
-        if self.value >= QualityThresholds.GRADE_D:
-            return QualityGrade.D
-        if self.value >= QualityThresholds.GRADE_D_MINUS:
-            return QualityGrade.D_MINUS
-        return QualityGrade.F
+        if self.value >= FlextQualityThresholds.GRADE_A_PLUS:
+            return FlextQualityGrade.A_PLUS
+        if self.value >= FlextQualityThresholds.GRADE_A:
+            return FlextQualityGrade.A
+        if self.value >= FlextQualityThresholds.GRADE_A_MINUS:
+            return FlextQualityGrade.A_MINUS
+        if self.value >= FlextQualityThresholds.GRADE_B_PLUS:
+            return FlextQualityGrade.B_PLUS
+        if self.value >= FlextQualityThresholds.GRADE_B:
+            return FlextQualityGrade.B
+        if self.value >= FlextQualityThresholds.GRADE_B_MINUS:
+            return FlextQualityGrade.B_MINUS
+        if self.value >= FlextQualityThresholds.GRADE_C_PLUS:
+            return FlextQualityGrade.C_PLUS
+        if self.value >= FlextQualityThresholds.GRADE_C:
+            return FlextQualityGrade.C
+        if self.value >= FlextQualityThresholds.GRADE_C_MINUS:
+            return FlextQualityGrade.C_MINUS
+        if self.value >= FlextQualityThresholds.GRADE_D_PLUS:
+            return FlextQualityGrade.D_PLUS
+        if self.value >= FlextQualityThresholds.GRADE_D:
+            return FlextQualityGrade.D
+        if self.value >= FlextQualityThresholds.GRADE_D_MINUS:
+            return FlextQualityGrade.D_MINUS
+        return FlextQualityGrade.F
 
     @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate quality score business rules."""
-        if self.value < 0.0 or self.value > QualityThresholds.COVERAGE_PERCENTAGE_MAX:
+        if self.value < 0.0 or self.value > FlextQualityThresholds.COVERAGE_PERCENTAGE_MAX:
             return FlextResult[None].fail(
-                f"Quality score must be between 0.0 and {QualityThresholds.COVERAGE_PERCENTAGE_MAX}"
+                f"Quality score must be between 0.0 and {FlextQualityThresholds.COVERAGE_PERCENTAGE_MAX}"
             )
 
         return FlextResult[None].ok(None)
 
 
-class ComplexityMetric(FlextValue):
+class FlextComplexityMetric(FlextValue):
     """Complexity metric value object."""
 
     cyclomatic: int = Field(default=1, description="Cyclomatic complexity", ge=1)
@@ -327,9 +327,9 @@ class ComplexityMetric(FlextValue):
 
         """
         return (
-            self.cyclomatic > QualityThresholds.COMPLEXITY_CYCLOMATIC_HIGH
-            or self.cognitive > QualityThresholds.COMPLEXITY_COGNITIVE_HIGH
-            or self.max_depth > QualityThresholds.COMPLEXITY_DEPTH_HIGH
+            self.cyclomatic > FlextQualityThresholds.COMPLEXITY_CYCLOMATIC_HIGH
+            or self.cognitive > FlextQualityThresholds.COMPLEXITY_COGNITIVE_HIGH
+            or self.max_depth > FlextQualityThresholds.COMPLEXITY_DEPTH_HIGH
         )
 
     @property
@@ -340,11 +340,11 @@ class ComplexityMetric(FlextValue):
             Complexity level as string.
 
         """
-        if self.cyclomatic <= QualityThresholds.COMPLEXITY_SIMPLE_MAX:
+        if self.cyclomatic <= FlextQualityThresholds.COMPLEXITY_SIMPLE_MAX:
             return "simple"
-        if self.cyclomatic <= QualityThresholds.COMPLEXITY_MODERATE_MAX:
+        if self.cyclomatic <= FlextQualityThresholds.COMPLEXITY_MODERATE_MAX:
             return "moderate"
-        if self.cyclomatic <= QualityThresholds.COMPLEXITY_COMPLEX_MAX:
+        if self.cyclomatic <= FlextQualityThresholds.COMPLEXITY_COMPLEX_MAX:
             return "complex"
         return "very complex"
 
@@ -357,15 +357,15 @@ class ComplexityMetric(FlextValue):
             return FlextResult[None].fail("Cognitive complexity cannot be negative")
         if self.max_depth < 0:
             return FlextResult[None].fail("Max depth cannot be negative")
-        if self.cyclomatic > QualityThresholds.COMPLEXITY_CYCLOMATIC_MAX:
+        if self.cyclomatic > FlextQualityThresholds.COMPLEXITY_CYCLOMATIC_MAX:
             return FlextResult[None].fail(
-                f"Cyclomatic complexity too high (>{QualityThresholds.COMPLEXITY_CYCLOMATIC_MAX})"
+                f"Cyclomatic complexity too high (>{FlextQualityThresholds.COMPLEXITY_CYCLOMATIC_MAX})"
             )
 
         return FlextResult[None].ok(None)
 
 
-class CoverageMetric(FlextValue):
+class FlextCoverageMetric(FlextValue):
     """Test coverage metric value object."""
 
     line_coverage: float = Field(
@@ -410,7 +410,7 @@ class CoverageMetric(FlextValue):
             True if coverage is sufficient.
 
         """
-        return self.overall_coverage >= QualityThresholds.COVERAGE_EXCELLENT
+        return self.overall_coverage >= FlextQualityThresholds.COVERAGE_EXCELLENT
 
     @override
     def validate_business_rules(self) -> FlextResult[None]:
@@ -418,31 +418,31 @@ class CoverageMetric(FlextValue):
         # Pydantic validators handle range validation (0-100),
         # so we only need business logic validation here
         if (
-            self.line_coverage > QualityThresholds.COVERAGE_PERCENTAGE_MAX
+            self.line_coverage > FlextQualityThresholds.COVERAGE_PERCENTAGE_MAX
             or self.line_coverage < 0.0
         ):
             return FlextResult[None].fail(
-                f"Line coverage must be between 0% and {QualityThresholds.COVERAGE_PERCENTAGE_MAX}%"
+                f"Line coverage must be between 0% and {FlextQualityThresholds.COVERAGE_PERCENTAGE_MAX}%"
             )
         if (
-            self.branch_coverage > QualityThresholds.COVERAGE_PERCENTAGE_MAX
+            self.branch_coverage > FlextQualityThresholds.COVERAGE_PERCENTAGE_MAX
             or self.branch_coverage < 0.0
         ):
             return FlextResult[None].fail(
-                f"Branch coverage must be between 0% and {QualityThresholds.COVERAGE_PERCENTAGE_MAX}%"
+                f"Branch coverage must be between 0% and {FlextQualityThresholds.COVERAGE_PERCENTAGE_MAX}%"
             )
         if (
-            self.function_coverage > QualityThresholds.COVERAGE_PERCENTAGE_MAX
+            self.function_coverage > FlextQualityThresholds.COVERAGE_PERCENTAGE_MAX
             or self.function_coverage < 0.0
         ):
             return FlextResult[None].fail(
-                f"Function coverage must be between 0% and {QualityThresholds.COVERAGE_PERCENTAGE_MAX}%"
+                f"Function coverage must be between 0% and {FlextQualityThresholds.COVERAGE_PERCENTAGE_MAX}%"
             )
 
         return FlextResult[None].ok(None)
 
 
-class DuplicationMetric(FlextValue):
+class FlextDuplicationMetric(FlextValue):
     """Code duplication metric value object."""
 
     duplicate_lines: int = Field(
@@ -481,7 +481,7 @@ class DuplicationMetric(FlextValue):
             True if duplication is below threshold.
 
         """
-        return self.duplication_percentage < QualityThresholds.DUPLICATION_LOW_MAX
+        return self.duplication_percentage < FlextQualityThresholds.DUPLICATION_LOW_MAX
 
     @override
     def validate_business_rules(self) -> FlextResult[None]:

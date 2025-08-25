@@ -10,7 +10,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from enum import Enum
 from typing import override
 
@@ -36,341 +35,190 @@ class FlextQualityErrorCodes(Enum):
     QUALITY_THRESHOLD_ERROR = "QUALITY_THRESHOLD_ERROR"
 
 
-# Base quality exception hierarchy using FlextErrorMixin pattern
-class FlextQualityError(FlextError):
-    """Base exception for all quality domain errors."""
+# CONSOLIDATED Exception Class following FLEXT_REFACTORING_PROMPT.md pattern
+class FlextQualityExceptionsError(FlextError):
+    """Single consolidated class containing ALL quality exceptions.
+    
+    Consolidates ALL exception definitions into one class following FLEXT patterns.
+    Individual exceptions available as nested classes for organization.
+    """
 
+    class QualityError(FlextError):
+        """Base exception for all quality domain errors."""
 
-class FlextQualityValidationError(FlextQualityError):
-    """Quality validation errors."""
 
+    class ValidationError(FlextError):
+        """Quality validation errors."""
 
-class FlextQualityConfigurationError(FlextQualityError):
-    """Quality configuration errors."""
 
+    class ConfigurationError(FlextError):
+        """Quality configuration errors."""
 
-class FlextQualityConnectionError(FlextQualityError):
-    """Quality connection errors."""
 
+    class QualityConnectionError(FlextError):
+        """Quality connection errors."""
 
-class FlextQualityProcessingError(FlextQualityError):
-    """Quality processing errors."""
 
+    class ProcessingError(FlextError):
+        """Quality processing errors."""
 
-class FlextQualityAuthenticationError(FlextQualityError):
-    """Quality authentication errors."""
 
+    class AuthenticationError(FlextError):
+        """Quality authentication errors."""
 
-class FlextQualityTimeoutError(FlextQualityError):
-    """Quality timeout errors."""
 
+    class QualityTimeoutError(FlextError):
+        """Quality timeout errors."""
 
-class FlextQualityAnalysisError(FlextQualityError):
-    """Quality analysis errors."""
 
-    def __init__(
-        self,
-        message: str = "Quality analysis error",
-        *,
-        error_code: str = "QUALITY_ANALYSIS_ERROR",
-        context: dict[str, object] | None = None,
-    ) -> None:
-        super().__init__(message, error_code=error_code, context=context)
+    class AnalysisError(FlextError):
+        """Quality analysis errors."""
 
-    @override
-    def __str__(self) -> str:
-        return f"Quality analysis: {self.message}"
+        def __init__(
+            self,
+            message: str = "Quality analysis error",
+            *,
+            error_code: str = "QUALITY_ANALYSIS_ERROR",
+            context: dict[str, object] | None = None,
+        ) -> None:
+            super().__init__(message, error_code=error_code, context=context)
 
+        @override
+        def __str__(self) -> str:
+            return f"Quality analysis: {self.message}"
 
-class FlextQualityReportError(FlextQualityError):
-    """Quality report errors."""
+    class ReportError(FlextError):
+        """Quality report errors."""
 
-    def __init__(
-        self,
-        message: str = "Quality report error",
-        *,
-        error_code: str = "QUALITY_REPORT_ERROR",
-        context: dict[str, object] | None = None,
-    ) -> None:
-        super().__init__(message, error_code=error_code, context=context)
+        def __init__(
+            self,
+            message: str = "Quality report error",
+            *,
+            error_code: str = "QUALITY_REPORT_ERROR",
+            context: dict[str, object] | None = None,
+        ) -> None:
+            super().__init__(message, error_code=error_code, context=context)
 
-    @override
-    def __str__(self) -> str:
-        return f"Quality report: {self.message}"
+        @override
+        def __str__(self) -> str:
+            return f"Quality report: {self.message}"
 
+    class MetricsError(FlextError):
+        """Quality metrics errors."""
 
-class FlextQualityMetricsError(FlextQualityError):
-    """Quality metrics errors."""
+        def __init__(
+            self,
+            message: str = "Quality metrics error",
+            *,
+            error_code: str = "QUALITY_METRICS_ERROR",
+            context: dict[str, object] | None = None,
+        ) -> None:
+            super().__init__(message, error_code=error_code, context=context)
 
-    def __init__(
-        self,
-        message: str = "Quality metrics error",
-        *,
-        error_code: str = "QUALITY_METRICS_ERROR",
-        context: dict[str, object] | None = None,
-    ) -> None:
-        super().__init__(message, error_code=error_code, context=context)
+        @override
+        def __str__(self) -> str:
+            return f"Quality metrics: {self.message}"
 
-    @override
-    def __str__(self) -> str:
-        return f"Quality metrics: {self.message}"
+    class GradeError(FlextError):
+        """Quality grade errors."""
 
+        def __init__(
+            self,
+            message: str = "Quality grade error",
+            *,
+            error_code: str = "QUALITY_GRADE_ERROR",
+            context: dict[str, object] | None = None,
+        ) -> None:
+            super().__init__(message, error_code=error_code, context=context)
 
-class FlextQualityGradeError(FlextQualityError):
-    """Quality grade calculation errors."""
+        @override
+        def __str__(self) -> str:
+            return f"Quality grade: {self.message}"
 
-    def __init__(
-        self,
-        message: str = "Quality grade error",
-        *,
-        error_code: str = "QUALITY_GRADE_ERROR",
-        context: dict[str, object] | None = None,
-    ) -> None:
-        super().__init__(message, error_code=error_code, context=context)
+    class RuleError(FlextError):
+        """Quality rule errors."""
 
-    @override
-    def __str__(self) -> str:
-        return f"Quality grade: {self.message}"
+        def __init__(
+            self,
+            message: str = "Quality rule error",
+            *,
+            error_code: str = "QUALITY_RULE_ERROR",
+            context: dict[str, object] | None = None,
+        ) -> None:
+            super().__init__(message, error_code=error_code, context=context)
 
+        @override
+        def __str__(self) -> str:
+            return f"Quality rule: {self.message}"
 
-class FlextQualityRuleError(FlextQualityError):
-    """Quality rule errors."""
-
-    def __init__(
-        self,
-        message: str = "Quality rule error",
-        *,
-        error_code: str = "QUALITY_RULE_ERROR",
-        context: dict[str, object] | None = None,
-    ) -> None:
-        super().__init__(message, error_code=error_code, context=context)
-
-    @override
-    def __str__(self) -> str:
-        return f"Quality rule: {self.message}"
-
-
-class FlextQualityIssueError(FlextQualityError):
-    """Quality issue management errors."""
-
-
-class FlextQualityThresholdError(FlextQualityError):
-    """Quality threshold validation errors."""
-
-
-# Domain-specific exceptions for quality business logic
-# Using modern FlextErrorMixin pattern with context support
-
-
-class FlextQualityAnalysisOperationError(FlextQualityAnalysisError):
-    """Quality analysis operation errors with analysis context."""
-
-    def __init__(
-        self,
-        message: str,
-        *,
-        analyzer_name: str | None = None,
-        file_count: int | None = None,
-        analysis_type: str | None = None,
-        execution_time: float | None = None,
-        context: Mapping[str, object] | None = None,
-    ) -> None:
-        """Initialize with quality analysis context."""
-        context_dict: dict[str, object] = dict(context) if context else {}
-        if analyzer_name is not None:
-            context_dict["analyzer_name"] = analyzer_name
-        if file_count is not None:
-            context_dict["file_count"] = file_count
-        if analysis_type is not None:
-            context_dict["analysis_type"] = analysis_type
-        if execution_time is not None:
-            context_dict["execution_time"] = execution_time
-
-        super().__init__(
-            message,
-            error_code="QUALITY_OPERATION_ERROR",
-            context=context_dict,
-        )
-
-
-class FlextQualityReportOperationError(FlextQualityReportError):
-    """Quality report operation errors with report context."""
-
-    def __init__(
-        self,
-        message: str,
-        *,
-        report_type: str | None = None,
-        output_format: str | None = None,
-        project_name: str | None = None,
-        report_size: int | None = None,
-        context: Mapping[str, object] | None = None,
-    ) -> None:
-        """Initialize with quality report context."""
-        context_dict: dict[str, object] = dict(context) if context else {}
-        if report_type is not None:
-            context_dict["report_type"] = report_type
-        if output_format is not None:
-            context_dict["output_format"] = output_format
-        if project_name is not None:
-            context_dict["project_name"] = project_name
-        if report_size is not None:
-            context_dict["report_size"] = report_size
-
-        super().__init__(
-            message,
-            error_code="QUALITY_OPERATION_ERROR",
-            context=context_dict,
-        )
-
-
-class FlextQualityMetricsOperationError(FlextQualityMetricsError):
-    """Quality metrics operation errors with metrics context."""
-
-    def __init__(
-        self,
-        message: str,
-        *,
-        metric_name: str | None = None,
-        metric_value: float | None = None,
-        metric_type: str | None = None,
-        threshold_value: float | None = None,
-        context: Mapping[str, object] | None = None,
-    ) -> None:
-        """Initialize with quality metrics context."""
-        context_dict: dict[str, object] = dict(context) if context else {}
-        if metric_name is not None:
-            context_dict["metric_name"] = metric_name
-        if metric_value is not None:
-            context_dict["metric_value"] = metric_value
-        if metric_type is not None:
-            context_dict["metric_type"] = metric_type
-        if threshold_value is not None:
-            context_dict["threshold_value"] = threshold_value
-
-        super().__init__(
-            message,
-            error_code="QUALITY_OPERATION_ERROR",
-            context=context_dict,
-        )
-
-
-class FlextQualityGradeOperationError(FlextQualityGradeError):
-    """Quality grade operation errors with grade context."""
-
-    def __init__(
-        self,
-        message: str,
-        *,
-        grade_type: str | None = None,
-        calculated_grade: str | None = None,
-        grade_score: float | None = None,
-        min_threshold: float | None = None,
-        context: Mapping[str, object] | None = None,
-    ) -> None:
-        """Initialize with quality grade context."""
-        context_dict: dict[str, object] = dict(context) if context else {}
-        if grade_type is not None:
-            context_dict["grade_type"] = grade_type
-        if calculated_grade is not None:
-            context_dict["calculated_grade"] = calculated_grade
-        if grade_score is not None:
-            context_dict["grade_score"] = grade_score
-        if min_threshold is not None:
-            context_dict["min_threshold"] = min_threshold
-
-        super().__init__(
-            message,
-            error_code="QUALITY_OPERATION_ERROR",
-            context=context_dict,
-        )
-
-
-class FlextQualityRuleOperationError(FlextQualityRuleError):
-    """Quality rule operation errors with rule context."""
-
-    def __init__(
-        self,
-        message: str,
-        *,
-        rule_name: str | None = None,
-        rule_severity: str | None = None,
-        rule_category: str | None = None,
-        violation_count: int | None = None,
-        context: Mapping[str, object] | None = None,
-    ) -> None:
-        """Initialize with quality rule context."""
-        context_dict: dict[str, object] = dict(context) if context else {}
-        if rule_name is not None:
-            context_dict["rule_name"] = rule_name
-        if rule_severity is not None:
-            context_dict["rule_severity"] = rule_severity
-        if rule_category is not None:
-            context_dict["rule_category"] = rule_category
-        if violation_count is not None:
-            context_dict["violation_count"] = violation_count
-
-        super().__init__(
-            message,
-            error_code="QUALITY_OPERATION_ERROR",
-            context=context_dict,
-        )
-
-
-class FlextQualityThresholdOperationError(FlextQualityThresholdError):
-    """Quality threshold operation errors with threshold context."""
-
-    def __init__(
-        self,
-        message: str,
-        *,
-        threshold_name: str | None = None,
-        current_value: float | None = None,
-        threshold_value: float | None = None,
-        threshold_type: str | None = None,
-        context: Mapping[str, object] | None = None,
-    ) -> None:
-        """Initialize with quality threshold context."""
-        context_dict: dict[str, object] = dict(context) if context else {}
-        if threshold_name is not None:
-            context_dict["threshold_name"] = threshold_name
-        if current_value is not None:
-            context_dict["current_value"] = current_value
-        if threshold_value is not None:
-            context_dict["threshold_value"] = threshold_value
-        if threshold_type is not None:
-            context_dict["threshold_type"] = threshold_type
-
-        super().__init__(
-            message,
-            error_code="QUALITY_OPERATION_ERROR",
-            context=context_dict,
-        )
-
-
-__all__: list[str] = [
-    # Base exceptions (alphabetical)
-    "FlextQualityAnalysisError",
-    # Domain-specific operation exceptions
-    "FlextQualityAnalysisOperationError",
-    "FlextQualityAuthenticationError",
-    "FlextQualityConfigurationError",
-    "FlextQualityConnectionError",
-    "FlextQualityError",
-    # Error codes enum
+    class IssueError(FlextError):
+        """Quality issue errors."""
+
+
+    class ThresholdError(FlextError):
+        """Quality threshold errors."""
+
+
+    # Legacy compatibility properties (as per FLEXT_REFACTORING_PROMPT.md)
+    @property
+    def FlextQualityError(self):
+        return self.QualityError
+
+    @property
+    def FlextQualityValidationError(self):
+        return self.ValidationError
+
+    @property
+    def FlextQualityConfigurationError(self):
+        return self.ConfigurationError
+
+    @property
+    def FlextQualityConnectionError(self):
+        return self.QualityConnectionError
+
+    @property
+    def FlextQualityProcessingError(self):
+        return self.ProcessingError
+
+    @property
+    def FlextQualityAuthenticationError(self):
+        return self.AuthenticationError
+
+    @property
+    def FlextQualityTimeoutError(self):
+        return self.QualityTimeoutError
+
+    @property
+    def FlextQualityAnalysisError(self):
+        return self.AnalysisError
+
+    @property
+    def FlextQualityReportError(self):
+        return self.ReportError
+
+    @property
+    def FlextQualityMetricsError(self):
+        return self.MetricsError
+
+    @property
+    def FlextQualityGradeError(self):
+        return self.GradeError
+
+    @property
+    def FlextQualityRuleError(self):
+        return self.RuleError
+
+    @property
+    def FlextQualityIssueError(self):
+        return self.IssueError
+
+    @property
+    def FlextQualityThresholdError(self):
+        return self.ThresholdError
+
+
+# Export consolidated class
+__all__ = [
     "FlextQualityErrorCodes",
-    "FlextQualityGradeError",
-    "FlextQualityGradeOperationError",
-    "FlextQualityIssueError",
-    "FlextQualityMetricsError",
-    "FlextQualityMetricsOperationError",
-    "FlextQualityProcessingError",
-    "FlextQualityReportError",
-    "FlextQualityReportOperationError",
-    "FlextQualityRuleError",
-    "FlextQualityRuleOperationError",
-    "FlextQualityThresholdError",
-    "FlextQualityThresholdOperationError",
-    "FlextQualityTimeoutError",
-    "FlextQualityValidationError",
+    "FlextQualityExceptionsError",
 ]

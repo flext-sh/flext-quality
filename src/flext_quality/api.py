@@ -6,29 +6,30 @@ Provides clean API interface for all quality analysis operations.
 
 from __future__ import annotations
 
+import warnings
 from pathlib import Path
 from uuid import UUID
 
 from flext_core import FlextResult
 
 from flext_quality.analyzer import CodeAnalyzer
-from flext_quality.application.services import (
-    QualityAnalysisService,
-    QualityIssueService,
-    QualityProjectService,
-    QualityReportService,
-)
-from flext_quality.domain.entities import (
+from flext_quality.container import get_quality_container
+from flext_quality.entities import (
     QualityAnalysis,
     QualityIssue,
     QualityProject,
     QualityReport,
 )
-from flext_quality.infrastructure.container import get_quality_container
+from flext_quality.services import (
+    QualityAnalysisService,
+    QualityIssueService,
+    QualityProjectService,
+    QualityReportService,
+)
 from flext_quality.typings import FlextTypes
 
 
-class QualityAPI:
+class FlextQualityAPI:
     """Simple API interface for quality analysis operations.
 
     Uses dependency injection to resolve services from flext-core container.
@@ -667,3 +668,20 @@ class QualityAPI:
 
         # Complete the analysis
         return await self.complete_analysis(UUID(str(analysis.id)))
+
+
+# Legacy compatibility facade (TEMPORARY)
+class QualityAPI(FlextQualityAPI):
+    """Legacy API class - replaced by FlextQualityAPI.
+
+    DEPRECATED: Use FlextQualityAPI directly.
+    This facade provides compatibility during migration.
+    """
+
+    def __init__(self) -> None:
+        warnings.warn(
+            "QualityAPI is deprecated; use FlextQualityAPI",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super().__init__()

@@ -11,14 +11,18 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Annotated
 
-from pydantic import BaseModel, Field
+from flext_core.models import FlextModel
+from pydantic import Field
 
-from flext_quality.domain.value_objects import IssueSeverity, IssueType
+from flext_quality.value_objects import (
+    FlextIssueSeverity as IssueSeverity,
+    FlextIssueType as IssueType,
+)
 
 
 # Use enums from domain.value_objects (single source of truth)
 # Define issue classes
-class FileAnalysisResult(BaseModel):
+class FileAnalysisResult(FlextModel):
     """Result of analyzing a single file."""
 
     file_path: Path = Field(..., description="Path to the analyzed file")
@@ -33,7 +37,7 @@ class FileAnalysisResult(BaseModel):
     dead_code_lines: int = Field(default=0, ge=0, description="Lines of dead code")
 
 
-class ComplexityIssue(BaseModel):
+class ComplexityIssue(FlextModel):
     """Represents a complexity issue in code."""
 
     file_path: str = Field(..., description="File where issue was found")
@@ -44,7 +48,7 @@ class ComplexityIssue(BaseModel):
     message: str = Field(..., description="Description of the complexity issue")
 
 
-class SecurityIssue(BaseModel):
+class SecurityIssue(FlextModel):
     """Represents a security issue in code."""
 
     file_path: str = Field(..., description="File where issue was found")
@@ -55,7 +59,7 @@ class SecurityIssue(BaseModel):
     rule_id: str | None = Field(None, description="Security rule that triggered")
 
 
-class DeadCodeIssue(BaseModel):
+class DeadCodeIssue(FlextModel):
     """Represents dead code detected in analysis."""
 
     file_path: str = Field(..., description="File containing dead code")
@@ -67,7 +71,7 @@ class DeadCodeIssue(BaseModel):
     message: str = Field(..., description="Description of the dead code")
 
 
-class DuplicationIssue(BaseModel):
+class DuplicationIssue(FlextModel):
     """Represents code duplication detected in analysis."""
 
     files: list[str] = Field(
@@ -81,7 +85,7 @@ class DuplicationIssue(BaseModel):
 
 
 # Define metrics classes
-class OverallMetrics(BaseModel):
+class OverallMetrics(FlextModel):
     """Overall quality metrics from analysis."""
 
     files_analyzed: int = Field(default=0, ge=0, description="Total files analyzed")
@@ -107,7 +111,7 @@ class OverallMetrics(BaseModel):
 
 
 # Define the main results class last
-class AnalysisResults(BaseModel):
+class AnalysisResults(FlextModel):
     """Complete results from code analysis."""
 
     overall_metrics: Annotated[OverallMetrics, Field(default_factory=OverallMetrics)]

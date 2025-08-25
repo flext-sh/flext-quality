@@ -21,19 +21,29 @@ The project follows Clean Architecture with clear separation of concerns:
 
 - **Quality Analyzer Engine** (`analyzer.py`): Multi-backend analysis system (AST, Ruff, MyPy, Bandit)
 - **Backend System** (`backends/`): Pluggable analyzer backends for extensibility
+  - `ASTBackend`: AST-based analysis for complexity and dead code detection
+  - `ExternalBackend`: Integration with external tools (Ruff, MyPy, Bandit)
+  - `BaseAnalyzer`: Abstract base for all analyzer backends
 - **Domain Entities** (`domain/entities.py`): Quality projects, analyses, issues, and reports
 - **Service Layer** (`application/services.py`): Application services for quality operations
 - **Reporting System** (`reports.py`): Quality reports in multiple formats (HTML, JSON, PDF)
 
 ### Domain Model
 
-The domain is centered around these core entities:
+The domain is centered around these core entities (all extending `FlextEntity`):
 
-- `QualityProject`: Represents a code project under analysis
+- `QualityProject`: Represents a code project under analysis with validation rules
 - `QualityAnalysis`: Represents a single analysis run with metrics and scores
 - `QualityIssue`: Individual quality issues detected during analysis
 - `QualityRule`: Configuration rules for quality analysis
 - `QualityReport`: Generated reports from analysis results
+
+Key value objects include:
+- `IssueSeverity` (CRITICAL, HIGH, MEDIUM, LOW, INFO)
+- `IssueType` (COMPLEXITY, SECURITY, DEAD_CODE, DUPLICATION, STYLE, etc.)
+- `AnalysisStatus` (QUEUED, ANALYZING, COMPLETED, FAILED)
+
+All entities follow immutable update patterns using `model_copy()` for state changes.
 
 ## Development Commands
 
@@ -178,7 +188,7 @@ else:
 
 ### Immutable Entity Pattern
 
-Entities use immutable update patterns:
+Entities use immutable update patterns with helper methods:
 
 ```python
 # Domain entities use model_copy for updates
@@ -186,6 +196,11 @@ updated_analysis = analysis.model_copy(update={
     "status": AnalysisStatus.COMPLETED,
     "completed_at": datetime.now(UTC)
 })
+
+# Or use domain-specific helper methods
+analysis = analysis.complete_analysis()  # Immutable update with business logic
+project = project.update_last_analysis()  # Increments total_analyses counter
+issue = issue.mark_fixed()  # Sets is_fixed flag
 ```
 
 ## Quality Standards
@@ -261,7 +276,7 @@ docker-compose up -d
 
 ### Service Implementation
 
-Services follow consistent patterns:
+Services follow consistent patterns with FlextResult error handling:
 
 ```python
 class QualityProjectService:
@@ -270,14 +285,29 @@ class QualityProjectService:
             # Business logic
             project = QualityProject(...)
             # Validation
-            validation_result = project.validate_domain_rules()
+            validation_result = project.validate_business_rules()  # Note: validate_business_rules not validate_domain_rules
             if not validation_result.success:
                 return validation_result
             # Storage
             self._projects[project.id] = project
-            return FlextResult[None].ok(project)
+            return FlextResult[QualityProject].ok(project)  # Note: correct generic type
         except Exception as e:
-            return FlextResult[None].fail(f"Failed to create project: {e}")
+            return FlextResult[QualityProject].fail(f"Failed to create project: {e}")
+```
+
+### Backend Implementation Pattern
+
+Analyzer backends extend `BaseAnalyzer` with consistent interface:
+
+```python
+from flext_quality.backends.base import BaseAnalyzer, BackendType
+
+class CustomBackend(BaseAnalyzer):
+    backend_type = BackendType.STATIC_ANALYSIS
+    
+    def analyze_file(self, file_path: Path) -> FileAnalysisResult:
+        # Implementation specific analysis
+        return FileAnalysisResult(...)
 ```
 
 ### Domain Entity Updates
@@ -294,12 +324,18 @@ def update_analysis_scores(self, scores: dict) -> QualityAnalysis:
 
 Quality analysis follows a structured workflow:
 
-1. Create QualityProject
-2. Initialize QualityAnalysis
-3. Run analyzer backends (AST, external tools)
-4. Collect metrics and issues
-5. Calculate quality scores
-6. Generate reports
+1. Create QualityProject with validation
+2. Initialize QualityAnalysis with `start_analysis()`
+3. Run analyzer backends (AST, external tools) via `CodeAnalyzer`
+4. Collect metrics and issues using domain services
+5. Calculate quality scores with `QualityGradeCalculator`
+6. Generate reports using `QualityReport` entity
+7. Complete analysis with `complete_analysis()` or `fail_analysis(error)`
+
+Key classes in the workflow:
+- `CodeAnalyzer`: Orchestrates multi-backend analysis
+- `QualityAnalysisService`: Manages analysis lifecycle
+- `QualityGradeCalculator`: Computes quality scores and grades
 
 ## Configuration
 
@@ -347,14 +383,26 @@ Dependencies are declared in pyproject.toml using local file paths for ecosystem
 - ✅ **Domain Entities**: QualityProject, QualityAnalysis, QualityIssue with business logic
 - ✅ **Service Layer**: Application services with FlextResult pattern
 - ✅ **CLI Interface**: Command-line analysis and reporting
-- ✅ **Quality Scoring**: Composite quality scores and metrics
+- ✅ **Quality Scoring**: Composite quality scores and metrics with grade calculation
 - ✅ **Report Generation**: HTML, JSON, PDF reports
+- ✅ **Backend System**: Pluggable analyzer architecture with AST and external tool backends
+- ✅ **Domain Events**: Event-driven architecture with comprehensive domain events
+- ✅ **Value Objects**: Rich domain value objects for type safety
 
 ### In Progress
 
 - 🔄 **Ecosystem Integration**: Multi-project analysis for 32+ FLEXT projects
 - 🔄 **Web Interface**: Django-based dashboard and interface
 - 🔄 **Type Safety**: Ongoing MyPy strict mode improvements
+
+### Architecture Completeness
+
+The project demonstrates a complete Clean Architecture implementation with:
+- Well-defined layer boundaries and dependency rules
+- Comprehensive domain modeling with entities, value objects, and events
+- Application services following CQRS patterns with handlers
+- Infrastructure adapters for external tools and persistence
+- Strong integration with FLEXT ecosystem (flext-core, flext-observability)
 
 ## Troubleshooting
 

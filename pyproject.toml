@@ -44,7 +44,7 @@ Documentation = "https://github.com/flext-sh/flext/blob/main/README.md"
 flext-quality = "flext_quality.cli:main"
 
 [tool.ruff]
-extend = "../.config/tools/.ruff-shared.toml"
+extend = "../ruff-shared.toml"
 lint.isort.known-first-party = ["flext_quality"]
 
  

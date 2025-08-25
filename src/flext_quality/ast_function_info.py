@@ -1,0 +1,27 @@
+"""AST function information model."""
+
+from __future__ import annotations
+
+from flext_core.models import FlextModel
+
+
+class FunctionInfo(FlextModel):
+    """Strongly-typed function information from AST analysis."""
+
+    name: str
+    full_name: str
+    file_path: str
+    package_name: str
+    line_number: int
+    end_line_number: int
+    decorators: list[str]
+    is_async: bool
+    is_generator: bool
+    is_method: bool
+    is_property: bool
+    is_class_method: bool
+    is_static_method: bool
+    parameter_count: int
+    returns_annotation: str | None
+    complexity: int
+    docstring: str | None

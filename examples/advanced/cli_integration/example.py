@@ -13,6 +13,7 @@ This showcases enterprise-grade automation capabilities for quality gates.
 
 import contextlib
 import io
+import json
 import sys
 import tempfile
 from pathlib import Path
@@ -59,7 +60,6 @@ def run_cli_analysis(project_path: str, format_type: str = "json") -> dict[str, 
         out_text = stdout.getvalue()
         err_text = stderr.getvalue()
         if format_type == "json" and out_text.strip():
-            import json
 
             try:
                 parsed_json = json.loads(out_text)

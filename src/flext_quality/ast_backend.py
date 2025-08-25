@@ -3,61 +3,14 @@
 from __future__ import annotations
 
 import ast
+import warnings
 from pathlib import Path
 from typing import override
 
-from pydantic import BaseModel
-
-from flext_quality.backends.base import (
-    BackendType,
-    BaseAnalyzer,
-)
-
-
-class ClassInfo(BaseModel):
-    """Strongly-typed class information from AST analysis."""
-
-    name: str
-    full_name: str
-    file_path: str
-    package_name: str
-    line_number: int
-    end_line_number: int
-    base_classes: list[str]
-    decorators: list[str]
-    is_dataclass: bool
-    is_abstract: bool
-    has_docstring: bool
-    method_count: int
-    public_methods: int
-    private_methods: int
-    protected_methods: int
-    property_count: int = 0
-    class_method_count: int = 0
-    static_method_count: int = 0
-    complexity: int = 0
-
-
-class FunctionInfo(BaseModel):
-    """Strongly-typed function information from AST analysis."""
-
-    name: str
-    full_name: str
-    file_path: str
-    package_name: str
-    line_number: int
-    end_line_number: int
-    decorators: list[str]
-    is_async: bool
-    is_generator: bool
-    is_method: bool
-    is_property: bool
-    is_class_method: bool
-    is_static_method: bool
-    parameter_count: int
-    returns_annotation: str | None
-    complexity: int
-    docstring: str | None
+from flext_quality.ast_class_info import ClassInfo
+from flext_quality.ast_function_info import FunctionInfo
+from flext_quality.backend_type import BackendType
+from flext_quality.base import BaseAnalyzer
 
 
 class ASTVisitor(ast.NodeVisitor):
@@ -283,7 +236,7 @@ class ASTVisitor(ast.NodeVisitor):
         return None
 
 
-class ASTBackend(BaseAnalyzer):
+class FlextQualityASTBackend(BaseAnalyzer):
     """AST-based analysis backend."""
 
     @override
@@ -406,3 +359,20 @@ class ASTBackend(BaseAnalyzer):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
             and not ast.get_docstring(node)
         ]
+
+
+# Legacy compatibility facade (TEMPORARY)
+class ASTBackend(FlextQualityASTBackend):
+    """Legacy AST backend class - replaced by FlextQualityASTBackend.
+
+    DEPRECATED: Use FlextQualityASTBackend directly.
+    This facade provides compatibility during migration.
+    """
+
+    def __init__(self) -> None:
+        warnings.warn(
+            "ASTBackend is deprecated; use FlextQualityASTBackend",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super().__init__()

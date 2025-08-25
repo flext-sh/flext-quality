@@ -1,223 +1,94 @@
-"""Enterprise Code Quality Analysis and Governance Service for FLEXT ecosystem."""
+"""Analysis backends for the code analyzer.
+
+This module provides a pluggable architecture for different code analysis
+backends. Each backend can provide different analysis capabilities and we
+re-export the primary types for convenient imports in examples and tests.
+"""
 
 from __future__ import annotations
 
-import importlib.metadata
+# Core backend classes
+from flext_quality.ast_backend import ASTBackend
+from flext_quality.backend_type import BackendType
+from flext_quality.base import BaseAnalyzer
+from flext_quality.external_backend import ExternalBackend
 
-# Core FlextCore patterns (root namespace imports)
-from flext_core import FlextResult
-
-# Direct imports - no fallbacks allowed per CLAUDE.md
+# Main analyzer classes
 from flext_quality.analyzer import CodeAnalyzer
-from flext_quality.backends.ast_backend import ASTBackend, ASTVisitor
-from flext_quality.backends.base import BackendType, BaseAnalyzer
-from flext_quality.backends.external_backend import ExternalBackend
-from flext_quality.application.services import (
-    LintingServiceImpl,
-    QualityAnalysisService,
-    QualityIssueService,
-    QualityProjectService,
-    QualityReportService,
-    SecurityAnalyzerServiceImpl,
-)
-from flext_quality.application.handlers import (
-    AnalyzeProjectHandler,
-    GenerateReportHandler,
-    RunLintingHandler,
-    RunSecurityCheckHandler,
-)
-from flext_quality.domain.entities import (
-    AnalysisStatus,
-    QualityAnalysis,
-    QualityIssue,
-    QualityProject,
-    QualityReport as DomainQualityReport,
-    QualityRule,
-)
-from flext_quality.domain.grade_calculator import (
-    QualityGrade,
-    QualityGradeCalculator,
-)
-from flext_quality.domain.value_objects import (
-    ComplexityMetric,
-    CoverageMetric,
-    DuplicationMetric,
-    FilePath,
-    IssueLocation,
-    IssueSeverity,
-    IssueType,
-    QualityScore,
-)
+
+# Analysis types and results
 from flext_quality.analysis_types import (
     AnalysisResults,
-    OverallMetrics,
-    FileAnalysisResult,
     ComplexityIssue,
-    SecurityIssue,
     DeadCodeIssue,
     DuplicationIssue,
+    FileAnalysisResult,
+    OverallMetrics,
+    SecurityIssue,
 )
-from flext_quality.utilities import (
-    FlextTestUtilities,
-    FlextQualityUtilities,
-    FlextAnalysisUtilities,
-    FlextReportUtilities,
-)
-from flext_quality.infrastructure.container import get_quality_container
-from flext_quality.api import QualityAPI
-from flext_quality.metrics import QualityMetrics
-from flext_quality.reports import (
-    QualityReport,
-    HIGH_ISSUE_THRESHOLD,
-    HTML_ISSUE_LIMIT,
-    ISSUE_PREVIEW_LIMIT,
-    MIN_COVERAGE_THRESHOLD,
-    MIN_SCORE_THRESHOLD,
-)
-from flext_quality.exceptions import (
-    FlextQualityAnalysisError,
-    FlextQualityAnalysisOperationError,
-    FlextQualityAuthenticationError,
-    FlextQualityConfigurationError,
-    FlextQualityConnectionError,
-    FlextQualityError,
-    FlextQualityGradeError,
-    FlextQualityGradeOperationError,
-    FlextQualityMetricsError,
-    FlextQualityMetricsOperationError,
-    FlextQualityProcessingError,
-    FlextQualityReportError,
-    FlextQualityReportOperationError,
-    FlextQualityRuleError,
-    FlextQualityRuleOperationError,
-    FlextQualityTimeoutError,
-    FlextQualityValidationError,
-)
-from flext_quality import exceptions
-from flext_quality.web import QualityWebInterface, main as quality_web_main
-from flext_quality.cli import (
-    analyze_project,
-    another_function,
-    main,
-    setup_logging,
-)
-from flext_quality import config
-from flext_quality.config import QualityConfig
-from flext_quality.constants import FlextQualityConstants
 
-try:
-    __version__ = importlib.metadata.version("flext-quality")
-except importlib.metadata.PackageNotFoundError:
-    __version__ = "0.9.0"
+# Utilities
+from flext_quality.utilities import FlextTestUtilities
 
-__version_info__ = tuple(int(x) for x in __version__.split(".") if x.isdigit())
+# Grade calculator
+from flext_quality.grade_calculator import FlextQualityGradeCalculator
+
+# Create alias for backward compatibility
+QualityGradeCalculator = FlextQualityGradeCalculator
+
+# Registry of available backends
+AVAILABLE_BACKENDS: dict[str, type[BaseAnalyzer]] = {
+    "ast": ASTBackend,
+    "external": ExternalBackend,
+}
+
+# Default backend configuration
+DEFAULT_BACKENDS = ["ast", "external"]
 
 
-class FlextQualityDeprecationWarning(DeprecationWarning):
-    """Custom deprecation warning for FLEXT Quality import changes.
+def get_backend(name: str) -> type[BaseAnalyzer]:
+    """Get a backend by name."""
+    if name not in AVAILABLE_BACKENDS:
+        msg = (
+            f"Backend '{name}' not found. Available: {list(AVAILABLE_BACKENDS.keys())}"
+        )
+        raise ValueError(msg)
+    return AVAILABLE_BACKENDS[name]
 
-    This warning is raised when deprecated import patterns are used.
-    """
+
+def get_all_backends() -> list[type[BaseAnalyzer]]:
+    """Get all available backends."""
+    return list(AVAILABLE_BACKENDS.values())
 
 
-# Export clean, professional public API
+def get_default_backends() -> list[type[BaseAnalyzer]]:
+    """Get the default backends."""
+    return [AVAILABLE_BACKENDS[name] for name in DEFAULT_BACKENDS]
+
+
 __all__: list[str] = [
-    # Backends (root import for tests/examples)
+    # Backend system
+    "AVAILABLE_BACKENDS",
     "ASTBackend",
-    "ASTVisitor",
     "BackendType",
     "BaseAnalyzer",
     "ExternalBackend",
+    "get_all_backends",
+    "get_backend",
+    "get_default_backends",
+    # Main analyzer
     "CodeAnalyzer",
-    # Application Services
-    "LintingServiceImpl",
-    "QualityAnalysisService",
-    "QualityIssueService",
-    "QualityProjectService",
-    "QualityReportService",
-    "SecurityAnalyzerServiceImpl",
-    # Application Handlers
-    "AnalyzeProjectHandler",
-    "GenerateReportHandler",
-    "RunLintingHandler",
-    "RunSecurityCheckHandler",
-    # Domain Entities
-    "AnalysisStatus",
-    "IssueSeverity",
-    "IssueType",
-    "QualityProject",
-    "QualityAnalysis",
-    "QualityIssue",
-    "QualityRule",
-    "DomainQualityReport",
-    # Domain Utilities
-    "QualityGrade",
-    "QualityGradeCalculator",
-    "FlextQualityDeprecationWarning",
-    "FlextResult",
-    "QualityAPI",
-    "QualityMetrics",
-    # Exceptions
-    "FlextQualityAnalysisError",
-    "FlextQualityAnalysisOperationError",
-    "FlextQualityAuthenticationError",
-    "FlextQualityConfigurationError",
-    "FlextQualityConnectionError",
-    "FlextQualityError",
-    "FlextQualityGradeError",
-    "FlextQualityGradeOperationError",
-    "FlextQualityMetricsError",
-    "FlextQualityMetricsOperationError",
-    "FlextQualityProcessingError",
-    "FlextQualityReportError",
-    "FlextQualityReportOperationError",
-    "FlextQualityRuleError",
-    "FlextQualityRuleOperationError",
-    "FlextQualityTimeoutError",
-    "FlextQualityValidationError",
-    "exceptions",
-    "QualityReport",
-    # Infrastructure
-    "get_quality_container",
-    "__version__",
-    "__version_info__",
-    "annotations",
-    # Web interface
-    "QualityWebInterface",
-    "quality_web_main",
-    # CLI surface (re-exported at root for tests/examples)
-    "analyze_project",
-    "another_function",
-    "main",
-    "setup_logging",
-    # Configuration
-    "config",
-    "QualityConfig",
-    "FlextQualityConstants",
-    # Value Objects
-    "ComplexityMetric",
-    "CoverageMetric",
-    "DuplicationMetric",
-    "FilePath",
-    "IssueLocation",
-    "QualityScore",
-    # Analysis Types
+    # Analysis types
     "AnalysisResults",
-    "OverallMetrics",
-    "FileAnalysisResult",
     "ComplexityIssue",
-    "SecurityIssue",
     "DeadCodeIssue",
     "DuplicationIssue",
+    "FileAnalysisResult",
+    "OverallMetrics",
+    "SecurityIssue",
     # Utilities
     "FlextTestUtilities",
-    "FlextQualityUtilities",
-    "FlextAnalysisUtilities",
-    "FlextReportUtilities",
-    # Report Constants
-    "HIGH_ISSUE_THRESHOLD",
-    "HTML_ISSUE_LIMIT",
-    "ISSUE_PREVIEW_LIMIT",
-    "MIN_COVERAGE_THRESHOLD",
-    "MIN_SCORE_THRESHOLD",
+    # Grade calculator
+    "FlextQualityGradeCalculator",
+    "QualityGradeCalculator",  # Legacy alias
 ]

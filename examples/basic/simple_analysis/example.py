@@ -27,6 +27,7 @@ import json
 import sys
 from pathlib import Path
 
+# Using object instead of Any for better type safety
 from flext_quality import (
     CodeAnalyzer,
     FlextQualityConstants,
@@ -48,6 +49,116 @@ def format_number(num: float | str) -> str:
     if isinstance(num, (int, float)):
         return f"{num:,}"
     return str(num)
+
+
+def _display_project_overview(analyzed_files: list[str]) -> None:
+    """Display project overview with file listing."""
+    print_section("📈 Project Overview")
+
+    if analyzed_files:
+        max_files_to_show = 5
+        for _i, _file_path in enumerate(analyzed_files[:max_files_to_show]):
+            pass
+        if len(analyzed_files) > max_files_to_show:
+            pass
+
+
+def _display_quality_metrics(analyzer: CodeAnalyzer, results: object) -> None:
+    """Display quality metrics and scores."""
+    print_section("🎯 Quality Assessment")
+
+    # Calculate quality score and grade - DEMONSTRATE ALL SCORING
+    _ = analyzer.get_quality_score()  # Used for demonstration
+    analyzer.get_quality_grade()
+
+    print_section("📋 Complete Quality Metrics")
+
+    # Process COMPLETE quality metrics - demonstrate ALL metrics
+    metrics = QualityMetrics.from_analysis_results(results)
+
+    # Show detailed scores
+    scores_summary = metrics.scores_summary
+    for _category, _score_val in scores_summary.items():
+        pass
+
+    # Show complexity metrics if available
+    if hasattr(metrics, "average_complexity") and metrics.average_complexity > 0:
+        pass
+
+
+def _display_issues(results: object) -> None:
+    """Display issues detection summary."""
+    print_section("🚨 Issues Detection Summary")
+
+    # Detailed issue breakdown - SHOW ALL ISSUES using typed properties
+    issue_categories = {
+        "Security": results.security_issues,
+        "Complexity": results.complexity_issues,
+        "Dead Code": results.dead_code_issues,
+        "Duplication": results.duplication_issues,
+    }
+
+    for issue_list in issue_categories.values():
+        if not issue_list:
+            pass
+
+
+def _generate_reports(results: object, project_path: str) -> None:
+    """Generate quality reports in different formats."""
+    print_section("📊 Generating Quality Reports")
+
+    try:
+        # Create QualityReport instance
+        report = QualityReport(results)
+
+        json_report = report.generate_json_report()
+        json_path = Path(project_path) / "quality_report.json"
+        json_path.write_text(json_report)
+
+        html_report = report.generate_html_report()
+        html_path = Path(project_path) / "quality_report.html"
+        html_path.write_text(html_report)
+
+        # Show sample of JSON report structure
+        sample_data = json.loads(json_report)
+        max_files_to_show = 5
+        for _key in list(sample_data.keys())[:max_files_to_show]:
+            pass
+
+    except Exception:
+        return
+
+
+def _show_recommendations(analyzer: CodeAnalyzer, results: object) -> None:
+    """Show quality recommendations and final summary."""
+    print_section("💡 Comprehensive Recommendations")
+
+    score = analyzer.get_quality_score()
+    metrics = QualityMetrics.from_analysis_results(results)
+
+    # Score thresholds constants
+    excellent_score = 95
+    very_good_score = 90
+    good_score = 80
+    acceptable_score = 70
+    minimum_score = 60
+
+    # Score-based recommendations
+    if (score >= excellent_score or score >= very_good_score or
+        score >= good_score or score >= acceptable_score or score >= minimum_score):
+        pass
+
+    # Category-specific recommendations
+    if metrics.security_issues_count > 0:
+        pass
+    if metrics.complexity_issues_count > 0:
+        pass
+    if metrics.duplicate_blocks_count > 0:
+        pass
+    if metrics.dead_code_items_count > 0:
+        pass
+
+    print_section("✅ Analysis Complete - Summary")
 
 
 def analyze_project(project_path: str) -> None:
@@ -78,131 +189,14 @@ def analyze_project(project_path: str) -> None:
         )
 
         # Extract basic project information using modern AnalysisResults API
-        # Note: python_files not available in AnalysisResults - use file_metrics instead
         analyzed_files = [str(fm.file_path) for fm in results.file_metrics]
 
-        print_section("📈 Project Overview")
+        _display_project_overview(analyzed_files)
+        _display_quality_metrics(analyzer, results)
+        _display_issues(results)
 
-        # Show sample files (first 5)
-        if analyzed_files:
-            # Constants for display limits
-            max_files_to_show = 5
-
-            for _i, _file_path in enumerate(analyzed_files[:max_files_to_show]):
-                pass
-            if len(analyzed_files) > max_files_to_show:
-                pass
-
-        # Calculate quality score and grade - DEMONSTRATE ALL SCORING
-        score = analyzer.get_quality_score()
-        analyzer.get_quality_grade()
-
-        print_section("🎯 Quality Assessment")
-
-        # Process COMPLETE quality metrics - demonstrate ALL metrics
-        metrics = QualityMetrics.from_analysis_results(results)
-
-        print_section("📋 Complete Quality Metrics")
-
-        # Show detailed scores
-        scores_summary = metrics.scores_summary
-        for _category, _score_val in scores_summary.items():
-            pass
-
-        # Show complexity metrics if available
-        if hasattr(metrics, "average_complexity") and metrics.average_complexity > 0:
-            pass
-
-        # Process and display ALL ISSUES in detail using modern AnalysisResults API
-        print_section("🚨 Issues Detection Summary")
-
-        # Detailed issue breakdown - SHOW ALL ISSUES using typed properties
-        issue_categories = {
-            "Security": results.security_issues,
-            "Complexity": results.complexity_issues,
-            "Dead Code": results.dead_code_issues,
-            "Duplication": results.duplication_issues,
-        }
-
-        for issue_list in issue_categories.values():
-            if not issue_list:
-                pass
-            else:
-                # Show detailed information for each issue
-                for _i, issue in enumerate(issue_list[:max_files_to_show]):
-                    # Access typed issue properties
-                    if hasattr(issue, "file_path"):
-                        getattr(issue, "file_path", "unknown")
-                    if hasattr(issue, "message"):
-                        getattr(issue, "message", "No description")
-                    if hasattr(issue, "severity"):
-                        getattr(issue, "severity", "unknown")
-                    if hasattr(issue, "line_number"):
-                        getattr(issue, "line_number", "")
-
-                if len(issue_list) > max_files_to_show:
-                    pass
-
-        # DEMONSTRATE REPORT GENERATION - ALL FORMATS
-        print_section("📊 Generating Quality Reports")
-
-        try:
-            # Create QualityReport instance
-            report = QualityReport(results)
-
-            json_report = report.generate_json_report()
-            json_path = Path(project_path) / "quality_report.json"
-            json_path.write_text(json_report)
-
-            html_report = report.generate_html_report()
-            html_path = Path(project_path) / "quality_report.html"
-            html_path.write_text(html_report)
-
-            # Show sample of JSON report structure
-            sample_data = json.loads(json_report)
-            for _key in list(sample_data.keys())[:max_files_to_show]:
-                pass
-
-        except Exception:
-            return
-
-        # COMPREHENSIVE RECOMMENDATIONS - demonstrate all recommendation logic
-        print_section("💡 Comprehensive Recommendations")
-
-        # Constants for score thresholds
-        excellent_score = 95
-        very_good_score = 90
-        good_score = 80
-        acceptable_score = 70
-        minimum_score = 60
-
-        # Score-based recommendations
-        if (
-            score >= excellent_score
-            or score >= very_good_score
-            or score >= good_score
-            or score >= acceptable_score
-            or score >= minimum_score
-        ):
-            pass
-
-        # Category-specific recommendations with actionable advice
-        if metrics.security_issues_count > 0:
-            pass
-
-        if metrics.complexity_issues_count > 0:
-            pass
-
-        if metrics.duplicate_blocks_count > 0:
-            pass
-
-        if metrics.dead_code_items_count > 0:
-            pass
-
-        # Final summary with complete metrics display
-        print_section("✅ Analysis Complete - Summary")
-
-        # Show complete metrics summary for verification
+        _generate_reports(results, project_path)
+        _show_recommendations(analyzer, results)
 
     except Exception:
         # Allow caller to handle in main(); keep example robust

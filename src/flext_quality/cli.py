@@ -16,7 +16,7 @@ from flext_core import get_logger
 
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.reports import QualityReport
-from flext_quality.web import QualityWebInterface
+from flext_quality.web import FlextQualityWebInterface
 
 
 def setup_logging(level: str = "INFO") -> None:
@@ -34,7 +34,7 @@ def run_web_server(args: argparse.Namespace) -> int:
     get_logger(__name__)
 
     try:
-        interface = QualityWebInterface()
+        interface = FlextQualityWebInterface()
         interface.run(host=args.host, port=args.port, debug=args.debug)
         return 0
     except KeyboardInterrupt:
