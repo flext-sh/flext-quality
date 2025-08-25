@@ -46,7 +46,7 @@ from flext_quality.typings import *
 # Specific imports to avoid conflicts
 from flext_quality.utilities import FlextQualityUtilities, FlextReportUtilities, FlextTestUtilities, FlextAnalysisUtilities
 from flext_quality.value_objects import *
-# Specific imports to avoid conflicts  
+# Specific imports to avoid conflicts
 from flext_quality.web import FlextQualityWebInterface, web_main
 
 # Note: __all__ is constructed dynamically at runtime from imported modules

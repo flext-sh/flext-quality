@@ -117,12 +117,12 @@ class FlextQualityAnalysisTypes:
     class AnalysisResults(FlextModel):
         """Complete results from code analysis."""
 
-        overall_metrics: Annotated["FlextQualityAnalysisTypes.OverallMetrics", Field(default_factory=lambda: FlextQualityAnalysisTypes.OverallMetrics())]
-        file_metrics: Annotated[list["FlextQualityAnalysisTypes.FileAnalysisResult"], Field(default_factory=list)]
-        complexity_issues: Annotated[list["FlextQualityAnalysisTypes.ComplexityIssue"], Field(default_factory=list)]
-        security_issues: Annotated[list["FlextQualityAnalysisTypes.SecurityIssue"], Field(default_factory=list)]
-        dead_code_issues: Annotated[list["FlextQualityAnalysisTypes.DeadCodeIssue"], Field(default_factory=list)]
-        duplication_issues: Annotated[list["FlextQualityAnalysisTypes.DuplicationIssue"], Field(default_factory=list)]
+        overall_metrics: Annotated[FlextQualityAnalysisTypes.OverallMetrics, Field(default_factory=lambda: FlextQualityAnalysisTypes.OverallMetrics())]
+        file_metrics: Annotated[list[FlextQualityAnalysisTypes.FileAnalysisResult], Field(default_factory=list)]
+        complexity_issues: Annotated[list[FlextQualityAnalysisTypes.ComplexityIssue], Field(default_factory=list)]
+        security_issues: Annotated[list[FlextQualityAnalysisTypes.SecurityIssue], Field(default_factory=list)]
+        dead_code_issues: Annotated[list[FlextQualityAnalysisTypes.DeadCodeIssue], Field(default_factory=list)]
+        duplication_issues: Annotated[list[FlextQualityAnalysisTypes.DuplicationIssue], Field(default_factory=list)]
 
         @property
         def total_issues(self) -> int:
@@ -149,7 +149,7 @@ class FlextQualityAnalysisTypes:
 
 # Backward compatibility aliases - following flext-core pattern
 FileAnalysisResult = FlextQualityAnalysisTypes.FileAnalysisResult
-ComplexityIssue = FlextQualityAnalysisTypes.ComplexityIssue 
+ComplexityIssue = FlextQualityAnalysisTypes.ComplexityIssue
 SecurityIssue = FlextQualityAnalysisTypes.SecurityIssue
 DeadCodeIssue = FlextQualityAnalysisTypes.DeadCodeIssue
 DuplicationIssue = FlextQualityAnalysisTypes.DuplicationIssue

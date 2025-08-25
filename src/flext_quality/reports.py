@@ -371,7 +371,7 @@ __all__ = [
     "QualityReport",  # Legacy compatibility
     # Constants
     "ISSUE_PREVIEW_LIMIT",
-    "HTML_ISSUE_LIMIT", 
+    "HTML_ISSUE_LIMIT",
     "HIGH_ISSUE_THRESHOLD",
     "MIN_COVERAGE_THRESHOLD",
     "MIN_SCORE_THRESHOLD",

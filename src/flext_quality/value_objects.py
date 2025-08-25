@@ -176,6 +176,14 @@ FlextComplexityMetric = FlextValue
 FlextCoverageMetric = FlextValue
 FlextDuplicationMetric = FlextValue
 
+# Additional legacy compatibility for tests
+ComplexityMetric = FlextValue
+CoverageMetric = FlextValue
+DuplicationMetric = FlextValue
+FilePath = FlextValue
+IssueLocation = FlextValue
+QualityScore = FlextValue
+
 
 # Export CONSOLIDATED class and aliases
 __all__ = [
@@ -191,6 +199,12 @@ __all__ = [
     # Backward compatibility
     "FlextQualityThresholds",
     "FlextQualityValueObjects",
-    # Legacy compatibility
+    # Legacy compatibility for tests
+    "ComplexityMetric",
+    "CoverageMetric",
+    "DuplicationMetric",
+    "FilePath",
+    "IssueLocation",
     "QualityGrade",
+    "QualityScore",
 ]
