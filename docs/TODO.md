@@ -63,7 +63,7 @@ Container de DI completamente vazio e inútil:
 ```python
 # ❌ PROBLEMA: Container vazio
 def get_quality_container() -> FlextContainer:
-    return get_flext_container()
+    return FlextContainer.get_global()
     # Register quality-specific services here if needed
     # container.register("quality_service", QualityService())
 ```
@@ -81,7 +81,7 @@ Implementar registro de services no container:
 
 ```python
 def get_quality_container() -> FlextContainer:
-    container = get_flext_container()
+    container = FlextContainer.get_global()
     container.register("quality_project_service", QualityProjectService())
     container.register("quality_analysis_service", QualityAnalysisService())
     return container
