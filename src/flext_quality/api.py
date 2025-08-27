@@ -27,6 +27,7 @@ from flext_quality.services import (
     QualityReportService,
 )
 from flext_quality.typings import FlextTypes
+from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
 
 
 class FlextQualityAPI:
@@ -257,7 +258,7 @@ class FlextQualityAPI:
         analysis_id: UUID,
         coverage_score: float,
         complexity_score: float,
-        duplication_score: float,
+        duplication_score: float,  # noqa: ARG002
         security_score: float,
         maintainability_score: float,
     ) -> FlextResult[QualityAnalysis]:
@@ -394,10 +395,10 @@ class FlextQualityAPI:
         message: str,
         line_number: int | None = None,
         column_number: int | None = None,
-        end_line_number: int | None = None,
-        end_column_number: int | None = None,
-        code_snippet: str | None = None,
-        suggestion: str | None = None,
+        end_line_number: int | None = None,  # noqa: ARG002
+        end_column_number: int | None = None,  # noqa: ARG002
+        code_snippet: str | None = None,  # noqa: ARG002
+        suggestion: str | None = None,  # noqa: ARG002
     ) -> FlextResult[QualityIssue]:
         """Create a new quality issue.
 
@@ -420,7 +421,6 @@ class FlextQualityAPI:
 
         """
         # Convert string parameters to enum types
-        from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
 
         try:
             severity_enum = FlextIssueSeverity(severity)
@@ -455,8 +455,8 @@ class FlextQualityAPI:
         self,
         analysis_id: UUID,
         severity: str | None = None,
-        issue_type: str | None = None,
-        file_path: str | None = None,
+        issue_type: str | None = None,  # noqa: ARG002
+        file_path: str | None = None,  # noqa: ARG002
     ) -> FlextResult[list[QualityIssue]]:
         """List issues for an analysis with optional filters.
 
@@ -473,7 +473,6 @@ class FlextQualityAPI:
         # Convert string severity to enum if provided
         severity_enum = None
         if severity:
-            from flext_quality.value_objects import FlextIssueSeverity
             try:
                 severity_enum = FlextIssueSeverity(severity)
             except ValueError:
@@ -529,10 +528,10 @@ class FlextQualityAPI:
     async def create_report(
         self,
         analysis_id: UUID,
-        report_type: str,
+        report_type: str,  # noqa: ARG002
         report_format: str = "summary",
         report_path: str | None = None,
-        report_size_bytes: int = 0,
+        report_size_bytes: int = 0,  # noqa: ARG002
     ) -> FlextResult[QualityReport]:
         """Create a quality report.
 

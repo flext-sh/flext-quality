@@ -21,10 +21,8 @@ from flext_quality import (
     FlextQualityRuleError,
     FlextQualityTimeoutError,
     FlextQualityValidationError,
-    FlextQualityIssueError,
-    FlextQualityThresholdError,
+    exceptions as exc_module,
 )
-from flext_quality import exceptions as exc_module
 from flext_quality.exceptions import __all__ as exceptions_all
 
 
@@ -34,43 +32,51 @@ class TestFlextQualityExceptions:
     def test_base_exception_creation(self) -> None:
         """Test FlextQualityError base exception creation."""
         exception = FlextQualityError("Test error")
-        assert "Test error" in str(exception)  # FlextError adds prefixes
+        assert "Test error" in str(exception)  # FlextExceptions.Error adds prefixes
         assert isinstance(exception, Exception)
 
     def test_validation_error_creation(self) -> None:
         """Test FlextQualityValidationError creation."""
         exception = FlextQualityValidationError("Validation failed")
-        assert "Validation failed" in str(exception)  # FlextError adds prefixes
+        assert "Validation failed" in str(
+            exception
+        )  # FlextExceptions.Error adds prefixes
         assert isinstance(exception, FlextQualityError)
 
     def test_configuration_error_creation(self) -> None:
         """Test FlextQualityConfigurationError creation."""
         exception = FlextQualityConfigurationError("Config error")
-        assert "Config error" in str(exception)  # FlextError adds prefixes
+        assert "Config error" in str(exception)  # FlextExceptions.Error adds prefixes
         assert isinstance(exception, FlextQualityError)
 
     def test_connection_error_creation(self) -> None:
         """Test FlextQualityConnectionError creation."""
         exception = FlextQualityConnectionError("Connection failed")
-        assert "Connection failed" in str(exception)  # FlextError adds prefixes
+        assert "Connection failed" in str(
+            exception
+        )  # FlextExceptions.Error adds prefixes
         assert isinstance(exception, FlextQualityError)
 
     def test_processing_error_creation(self) -> None:
         """Test FlextQualityProcessingError creation."""
         exception = FlextQualityProcessingError("Processing failed")
-        assert "Processing failed" in str(exception)  # FlextError adds prefixes
+        assert "Processing failed" in str(
+            exception
+        )  # FlextExceptions.Error adds prefixes
         assert isinstance(exception, FlextQualityError)
 
     def test_authentication_error_creation(self) -> None:
         """Test FlextQualityAuthenticationError creation."""
         exception = FlextQualityAuthenticationError("Auth failed")
-        assert "Auth failed" in str(exception)  # FlextError adds prefixes
+        assert "Auth failed" in str(exception)  # FlextExceptions.Error adds prefixes
         assert isinstance(exception, FlextQualityError)
 
     def test_timeout_error_creation(self) -> None:
         """Test FlextQualityTimeoutError creation."""
         exception = FlextQualityTimeoutError("Timeout occurred")
-        assert "Timeout occurred" in str(exception)  # FlextError adds prefixes
+        assert "Timeout occurred" in str(
+            exception
+        )  # FlextExceptions.Error adds prefixes
         assert isinstance(exception, FlextQualityError)
 
     def test_analysis_error_basic(self) -> None:
@@ -87,7 +93,7 @@ class TestFlextQualityExceptions:
                 "analyzer_name": "pylint",
                 "file_count": 42,
                 "analysis_type": "test_value",
-            }
+            },
         )
         assert "Quality analysis: Analyzer crashed" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -111,7 +117,7 @@ class TestFlextQualityExceptions:
                 "report_type": "html",
                 "output_format": "pdf",
                 "project_name": "test",
-            }
+            },
         )
         assert "Quality report: Invalid format" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -135,7 +141,7 @@ class TestFlextQualityExceptions:
                 "metric_name": "complexity",
                 "metric_value": 42.5,
                 "threshold_value": 10.0,
-            }
+            },
         )
         assert "Quality metrics: Invalid value" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -159,7 +165,7 @@ class TestFlextQualityExceptions:
                 "grade_type": "overall",
                 "calculated_grade": "A++",
                 "grade_score": 95.5,
-            }
+            },
         )
         assert "Quality grade: Invalid grade" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -183,7 +189,7 @@ class TestFlextQualityExceptions:
                 "rule_name": "E302",
                 "rule_severity": "high",
                 "rule_category": "style",
-            }
+            },
         )
         assert "Quality rule: Rule not found" in str(exception)
         assert isinstance(exception, FlextQualityError)
@@ -248,21 +254,23 @@ class TestExceptionModuleExports:
             "FlextQualityConnectionError",
             "FlextQualityError",
             "FlextQualityGradeError",
+            "FlextQualityIssueError",
             "FlextQualityMetricsError",
             "FlextQualityProcessingError",
             "FlextQualityReportError",
             "FlextQualityRuleError",
+            "FlextQualityThresholdError",
             "FlextQualityTimeoutError",
             "FlextQualityValidationError",
-            "FlextQualityIssueError",
-            "FlextQualityThresholdError",
         }
 
         # Extract only exception classes from the full __all__ list
         # Exclude ErrorCodes (enum) and ExceptionsError (consolidation class)
         exception_classes_in_all = {
-            name for name in exceptions_all 
-            if "Error" in name and name not in {"FlextQualityErrorCodes", "FlextQualityExceptionsError"}
+            name
+            for name in exceptions_all
+            if "Error" in name
+            and name not in {"FlextQualityErrorCodes", "FlextQualityExceptionsError"}
         }
         assert exception_classes_in_all == expected_exceptions
 
@@ -270,8 +278,10 @@ class TestExceptionModuleExports:
         """Test that all exceptions can be imported from the module."""
         # Filter to only exception classes from __all__, excluding non-exception classes
         exception_names = [
-            name for name in exceptions_all 
-            if "Error" in name and name not in {"FlextQualityErrorCodes", "FlextQualityExceptionsError"}
+            name
+            for name in exceptions_all
+            if "Error" in name
+            and name not in {"FlextQualityErrorCodes", "FlextQualityExceptionsError"}
         ]
 
         for exception_name in exception_names:

@@ -122,20 +122,24 @@ class FlextQualityHandlers:
     async def run_linting(self, project_id: UUID) -> FlextResult[dict[str, object]]:
         """Handle linting command."""
         # Return placeholder result since linting service is not implemented
-        return FlextResult[dict[str, object]].ok({
+        linting_data: dict[str, object] = {
             "project_id": str(project_id),
             "status": "placeholder_implementation",
             "issues": [],
-        })
+        }
+
+        return FlextResult[dict[str, object]].ok(linting_data)
 
     async def run_security_check(self, project_id: UUID) -> FlextResult[dict[str, object]]:
         """Handle security check command."""
         # Return placeholder result since security service is not implemented
-        return FlextResult[dict[str, object]].ok({
+        security_data: dict[str, object] = {
             "project_id": str(project_id),
             "status": "placeholder_implementation",
             "vulnerabilities": [],
-        })
+        }
+
+        return FlextResult[dict[str, object]].ok(security_data)
 
 
 # Backward compatibility aliases - following flext-cli pattern

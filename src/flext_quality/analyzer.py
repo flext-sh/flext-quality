@@ -360,6 +360,7 @@ class FlextQualityCodeAnalyzer:
                             file_path=str(py_file.relative_to(self.project_path)),
                             line_number=1,  # Would need line-by-line analysis for exact position
                             issue_type=IssueType.SECURITY_VULNERABILITY,
+                            description="Use of eval() function detected - potential code injection vulnerability",
                             severity=IssueSeverity.HIGH,
                             message="Use of eval() detected",
                             rule_id="B307",  # Bandit rule ID for eval usage
@@ -372,6 +373,7 @@ class FlextQualityCodeAnalyzer:
                             file_path=str(py_file.relative_to(self.project_path)),
                             line_number=1,
                             issue_type=IssueType.SECURITY_VULNERABILITY,
+                            description="Use of exec() function detected - potential code injection vulnerability",
                             severity=IssueSeverity.HIGH,
                             message="Use of exec() detected",
                             rule_id="B102",  # Bandit rule ID for exec usage
@@ -384,6 +386,7 @@ class FlextQualityCodeAnalyzer:
                             file_path=str(py_file.relative_to(self.project_path)),
                             line_number=1,
                             issue_type=IssueType.SECURITY_VULNERABILITY,
+                            description="Use of os.system() function detected - potential command injection vulnerability",
                             severity=IssueSeverity.MEDIUM,
                             message="Potential command injection with os.system()",
                             rule_id="B605",  # Bandit rule ID for os.system usage
@@ -445,7 +448,9 @@ class FlextQualityCodeAnalyzer:
                                 file_path=str(py_file.relative_to(self.project_path)),
                                 line_number=i + 1,
                                 end_line_number=i + 1,
-                                code_type="unused_import",
+                                issue_type="unused_import",
+                                code_type="import_statement",
+                                code_snippet=line.strip(),
                                 message=f"Potentially unused import: {line.strip()}",
                             ),
                         )
@@ -488,13 +493,18 @@ class FlextQualityCodeAnalyzer:
                     similarity = len(lines1 & lines2) / max(len(lines1), len(lines2))
 
                     if similarity > SIMILARITY_THRESHOLD:  # 80% similarity threshold
+                        duplicate_lines = len(lines1 & lines2)  # Common lines count
+                        similarity_percent = similarity * 100.0  # Convert to percentage
+
                         issues.append(
                             DuplicationIssue(
                                 files=[
                                     str(file1.relative_to(self.project_path)),
                                     str(file2.relative_to(self.project_path)),
                                 ],
+                                duplicate_lines=duplicate_lines,
                                 similarity=similarity,
+                                similarity_percent=similarity_percent,
                                 line_ranges=[
                                     (1, len(lines1)),
                                     (1, len(lines2)),

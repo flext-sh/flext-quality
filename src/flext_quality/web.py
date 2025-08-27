@@ -205,7 +205,7 @@ class FlextQualityWebInterface:
         debug: bool = True,
     ) -> None:
         """Run the quality web server."""
-        logger.info(f"Starting FLEXT Quality Web Interface on {host}:{port}")
+        logger.info("Starting FLEXT Quality Web Interface on %s:%s", host, port)
         self.web_service.run(host=host, port=port, debug=debug)
 
 
@@ -213,6 +213,7 @@ def web_main() -> None:
     """Provide entry point for quality web interface."""
     interface = FlextQualityWebInterface()
     interface.run()
+
 
 # Legacy compatibility alias
 main = web_main

@@ -8,6 +8,7 @@ from unittest.mock import MagicMock, patch
 
 import flext_quality.cli  # moved to top-level to avoid local import in test
 from flext_quality import analyze_project, another_function, main, setup_logging
+from flext_quality.analysis_types import AnalysisResults, OverallMetrics
 
 
 class TestSetupLogging:
@@ -44,8 +45,6 @@ class TestAnalyzeProject:
 
         mock_analyzer = MagicMock()
         # Use real AnalysisResults type instead of dict mock
-        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
-
         mock_analyzer.analyze_project.return_value = AnalysisResults(
             overall_metrics=OverallMetrics(
                 files_analyzed=3,
@@ -116,8 +115,6 @@ class TestAnalyzeProject:
 
         mock_analyzer = MagicMock()
         # Use real AnalysisResults type instead of dict mock
-        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
-
         mock_analyzer.analyze_project.return_value = AnalysisResults(
             overall_metrics=OverallMetrics(
                 files_analyzed=3,
@@ -175,8 +172,6 @@ class TestAnalyzeProject:
 
         mock_analyzer = MagicMock()
         # Use real AnalysisResults type instead of dict mock
-        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
-
         mock_analyzer.analyze_project.return_value = AnalysisResults(
             overall_metrics=OverallMetrics(
                 files_analyzed=3,
@@ -251,8 +246,6 @@ class TestAnalyzeProject:
 
         mock_analyzer = MagicMock()
         # Use real AnalysisResults type instead of dict mock
-        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
-
         mock_analyzer.analyze_project.return_value = AnalysisResults(
             overall_metrics=OverallMetrics(
                 files_analyzed=3,
@@ -311,8 +304,6 @@ class TestAnalyzeProject:
 
         mock_analyzer = MagicMock()
         # Use real AnalysisResults type instead of dict mock
-        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
-
         mock_analyzer.analyze_project.return_value = AnalysisResults(
             overall_metrics=OverallMetrics(
                 files_analyzed=3,
@@ -449,8 +440,6 @@ class TestAnotherFunction:
 
         mock_analyzer = MagicMock()
         # Use real AnalysisResults type instead of dict mock
-        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
-
         mock_analyzer.analyze_project.return_value = AnalysisResults(
             overall_metrics=OverallMetrics(
                 files_analyzed=3,
@@ -503,8 +492,6 @@ class TestAnotherFunction:
 
         mock_analyzer = MagicMock()
         # Use real AnalysisResults type instead of dict mock
-        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
-
         mock_analyzer.analyze_project.return_value = AnalysisResults(
             overall_metrics=OverallMetrics(
                 files_analyzed=3,

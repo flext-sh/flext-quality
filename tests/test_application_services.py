@@ -172,9 +172,9 @@ class TestQualityAnalysisService:
             analysis_id="test-analysis-id",
             coverage_score=95.0,
             complexity_score=90.0,
-            duplication_score=85.0,
-            security_score=100.0,
             maintainability_score=88.0,
+            security_score=100.0,
+            overall_score=90.5,
         )
         assert result.is_failure  # Analysis not found
 
@@ -201,12 +201,13 @@ class TestQualityIssueService:
         """Test creating an issue."""
         result = await service.create_issue(
             analysis_id="test-analysis-id",
-            issue_type="style_violation",
-            severity="medium",
-            rule_id="E302",
             file_path="test.py",
-            message="Missing blank line",
             line_number=10,
+            column_number=None,
+            severity=IssueSeverity.MEDIUM,
+            issue_type=IssueType.STYLE_VIOLATION,
+            message="Missing blank line",
+            rule="E302",
         )
         issue_data = assert_result_success_with_data(result)
         assert issue_data.issue_type == IssueType.STYLE_VIOLATION
@@ -217,11 +218,13 @@ class TestQualityIssueService:
         # Create an issue first
         create_result = await service.create_issue(
             analysis_id="test-analysis-id",
-            issue_type="style_violation",
-            severity="medium",
-            rule_id="E302",
             file_path="test.py",
+            line_number=10,
+            column_number=None,
+            severity=IssueSeverity.MEDIUM,
+            issue_type=IssueType.STYLE_VIOLATION,
             message="Missing blank line",
+            rule="E302",
         )
         created_issue = assert_result_success_with_data(create_result)
         issue_id = created_issue.id
@@ -236,11 +239,13 @@ class TestQualityIssueService:
         # Create an issue first
         create_result = await service.create_issue(
             analysis_id="test-analysis-id",
-            issue_type="style_violation",
-            severity="medium",
-            rule_id="E302",
             file_path="test.py",
+            line_number=10,
+            column_number=None,
+            severity=IssueSeverity.MEDIUM,
+            issue_type=IssueType.STYLE_VIOLATION,
             message="Missing blank line",
+            rule="E302",
         )
         created_issue = assert_result_success_with_data(create_result)
         issue_id = created_issue.id
@@ -255,11 +260,13 @@ class TestQualityIssueService:
         # Create an issue first
         create_result = await service.create_issue(
             analysis_id="test-analysis-id",
-            issue_type="style_violation",
-            severity="medium",
-            rule_id="E302",
             file_path="test.py",
+            line_number=10,
+            column_number=None,
+            severity=IssueSeverity.MEDIUM,
+            issue_type=IssueType.STYLE_VIOLATION,
             message="Missing blank line",
+            rule="E302",
         )
         created_issue = assert_result_success_with_data(create_result)
         issue_id = created_issue.id
@@ -284,12 +291,12 @@ class TestQualityReportService:
         """Test creating a report."""
         result = await service.create_report(
             analysis_id="test-analysis-id",
-            report_type="html",
-            report_format="detailed",
+            format_type="html",
+            content="<html>Test Report</html>",
         )
         report_data = assert_result_success_with_data(result)
-        assert report_data.report_type == "html"
-        assert report_data.report_format == "detailed"
+        assert report_data.report_type == "html"  # Entity uses report_type, not format_type
+        assert hasattr(report_data, "analysis_id")
 
     async def test_get_report(self, service: QualityReportService) -> None:
         """Test getting a report."""

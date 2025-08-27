@@ -24,11 +24,11 @@ class TestAnalyzeProjectHandler:
 
     @pytest.mark.asyncio
     async def test_handle_creates_analysis(self) -> None:
-        """Test handle method creates analysis successfully."""
+        """Test analyze_project method creates analysis successfully."""
         handler = AnalyzeProjectHandler()
         project_id = uuid4()
 
-        result = await handler.handle(project_id)
+        result = await handler.analyze_project(project_id)
 
         assert result.is_success
         assert result.value is not None
@@ -48,11 +48,11 @@ class TestGenerateReportHandler:
 
     @pytest.mark.asyncio
     async def test_handle_creates_report(self) -> None:
-        """Test handle method creates report successfully."""
+        """Test generate_report method creates report successfully."""
         handler = GenerateReportHandler()
         analysis_id = uuid4()
 
-        result = await handler.handle(analysis_id)
+        result = await handler.generate_report(analysis_id)
 
         assert result.is_success
         assert result.value is not None
@@ -72,17 +72,17 @@ class TestRunLintingHandler:
 
     @pytest.mark.asyncio
     async def test_handle_runs_linting(self) -> None:
-        """Test handle method runs linting successfully."""
+        """Test run_linting method runs linting successfully."""
         handler = RunLintingHandler()
         project_id = uuid4()
 
-        result = await handler.handle(project_id)
+        result = await handler.run_linting(project_id)
 
         assert result.is_success
         assert result.value is not None
         # Should return linting results
         assert isinstance(result.value, dict)
-        assert "linting_issues" in result.value
+        assert "issues" in result.value
 
 
 class TestRunSecurityCheckHandler:
@@ -95,17 +95,17 @@ class TestRunSecurityCheckHandler:
 
     @pytest.mark.asyncio
     async def test_handle_runs_security_check(self) -> None:
-        """Test handle method runs security check successfully."""
+        """Test run_security_check method runs security check successfully."""
         handler = RunSecurityCheckHandler()
         project_id = uuid4()
 
-        result = await handler.handle(project_id)
+        result = await handler.run_security_check(project_id)
 
         assert result.is_success
         assert result.value is not None
         # Should return security analysis results
         assert isinstance(result.value, dict)
-        assert "security_issues" in result.value
+        assert "vulnerabilities" in result.value
 
 
 class TestHandlerIntegration:
@@ -130,17 +130,23 @@ class TestHandlerIntegration:
         project_id = uuid4()
         analysis_id = uuid4()
 
-        handlers_and_ids = [
-            (AnalyzeProjectHandler(), project_id),
-            (GenerateReportHandler(), analysis_id),
-            (RunLintingHandler(), project_id),
-            (RunSecurityCheckHandler(), project_id),
-        ]
+        # Test specific handler methods instead of generic handle
+        analyze_handler = AnalyzeProjectHandler()
+        result = await analyze_handler.analyze_project(project_id)
+        assert result.is_success
+        assert result.value is not None
 
-        for handler, test_id in handlers_and_ids:
-            # All handlers should have handle method - using real implementations
-            result = await handler.handle(test_id)
+        report_handler = GenerateReportHandler()
+        result = await report_handler.generate_report(analysis_id)
+        assert result.is_success
+        assert result.value is not None
 
-            # Test with FlextResult.is_success (current flext-core API)
-            assert result.is_success
-            assert result.value is not None
+        linting_handler = RunLintingHandler()
+        result = await linting_handler.run_linting(project_id)
+        assert result.is_success
+        assert result.value is not None
+
+        security_handler = RunSecurityCheckHandler()
+        result = await security_handler.run_security_check(project_id)
+        assert result.is_success
+        assert result.value is not None

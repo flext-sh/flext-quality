@@ -117,8 +117,7 @@ def multiply(x: int, y: int) -> int:
         analyzer = CodeAnalyzer(sample_project_dir)
 
         assert analyzer.project_path == sample_project_dir
-        assert isinstance(analyzer.analysis_results, dict)
-        assert len(analyzer.analysis_results) == 0
+        assert analyzer._current_results is None
 
     def test_analyze_project_basic(self, sample_project_dir: Path) -> None:
         """Test basic project analysis functionality."""
@@ -127,17 +126,17 @@ def multiply(x: int, y: int) -> int:
         results = analyzer.analyze_project()
 
         # Verify results structure
-        assert isinstance(results, dict)
-        assert "project_path" in results
+        assert hasattr(results, "overall_metrics")
+        assert hasattr(results, "overall_metrics")
         assert "files_analyzed" in results
-        assert "total_lines" in results
+        assert hasattr(results.overall_metrics, "total_lines")
         assert "python_files" in results
         assert "metrics" in results
         assert "issues" in results
 
         # Verify basic metrics
         assert results["project_path"] == str(sample_project_dir)
-        assert results["files_analyzed"] == 3  # main.py, utils.py, __init__.py
+        assert results.overall_metrics.files_analyzed == 3  # main.py, utils.py, __init__.py
         assert results["total_lines"] > 0
 
         # Verify file list
@@ -202,18 +201,16 @@ def multiply(x: int, y: int) -> int:
         # Test analyzing individual file
         metrics = analyzer._analyze_file(main_py)
 
-        assert isinstance(metrics, dict)
-        assert "file_path" in metrics
-        assert "lines_of_code" in metrics
-        assert "function_count" in metrics
-        assert "class_count" in metrics
+        # Now returns FileAnalysisResult object
+        assert metrics is not None
+        assert hasattr(metrics, "file_path")
+        assert hasattr(metrics, "lines_of_code")
+        assert hasattr(metrics, "complexity_score")
 
         # Verify metrics are reasonable
-        assert metrics["file_path"] == main_py.name  # Only filename, not full path
-        assert isinstance(metrics["lines_of_code"], int)
-        assert metrics["lines_of_code"] > 10  # main.py has many lines
-        assert isinstance(metrics["function_count"], int)
-        assert metrics["function_count"] >= 1  # Should have functions
+        assert isinstance(metrics.lines_of_code, int)
+        assert metrics.lines_of_code > 10  # main.py has many lines
+        assert isinstance(metrics.complexity_score, (int, float))
 
     def test_analyze_nonexistent_file(self, sample_project_dir: Path) -> None:
         """Test analyzing a non-existent file."""
@@ -310,8 +307,8 @@ def multiply(x: int, y: int) -> int:
 
             results = analyzer.analyze_project()
 
-            assert isinstance(results, dict)
-            assert results["files_analyzed"] == 0
+            assert hasattr(results, "overall_metrics")
+            assert results.overall_metrics.files_analyzed == 0
             assert results["total_lines"] == 0
             assert len(results["python_files"]) == 0
 
@@ -335,8 +332,8 @@ invalid_syntax here
             # Should handle syntax errors gracefully
             results = analyzer.analyze_project()
 
-            assert isinstance(results, dict)
-            assert results["files_analyzed"] == 1
+            assert hasattr(results, "overall_metrics")
+            assert results.overall_metrics.files_analyzed == 1
             # Should still attempt to process the file
 
     def test_large_file_analysis(self, sample_project_dir: Path) -> None:
@@ -358,8 +355,8 @@ invalid_syntax here
         analyzer = CodeAnalyzer(sample_project_dir)
         results = analyzer.analyze_project()
 
-        assert isinstance(results, dict)
-        assert results["files_analyzed"] == 4  # Original 3 + 1 large file
+        assert hasattr(results, "overall_metrics")
+        assert results.overall_metrics.files_analyzed == 4  # Original 3 + 1 large file
         assert results["total_lines"] > 100  # Should be much larger now
 
     def test_analyzer_with_string_path(self) -> None:
@@ -397,8 +394,8 @@ class TestCodeAnalyzerEdgeCases:
         # Should handle gracefully
         results = analyzer.analyze_project()
 
-        assert isinstance(results, dict)
-        assert results["files_analyzed"] == 0
+        assert hasattr(results, "overall_metrics")
+        assert results.overall_metrics.files_analyzed == 0
 
     def test_file_permission_issues(self) -> None:
         """Test analyzer when file permissions might be an issue."""
@@ -414,8 +411,8 @@ class TestCodeAnalyzerEdgeCases:
             # Should work normally in most cases
             results = analyzer.analyze_project()
 
-            assert isinstance(results, dict)
-            assert results["files_analyzed"] >= 0  # Should handle gracefully
+            assert hasattr(results, "overall_metrics")
+            assert results.overall_metrics.files_analyzed >= 0  # Should handle gracefully
 
     def test_nested_directory_structure(self) -> None:
         """Test analyzer with nested directory structure."""
@@ -442,12 +439,11 @@ class TestCodeAnalyzerEdgeCases:
             analyzer = CodeAnalyzer(project_dir)
             results = analyzer.analyze_project()
 
-            assert isinstance(results, dict)
-            assert results["files_analyzed"] == 4  # Should find all Python files
+            assert hasattr(results, "overall_metrics")
+            assert results.overall_metrics.files_analyzed == 4  # Should find all Python files
 
             # Check that files from different directories are found
-            python_files = results["python_files"]
-            file_names = [Path(f).name for f in python_files]
+            file_names = [Path(fm.file_path).name for fm in results.file_metrics]
             assert "main.py" in file_names
             assert "utils.py" in file_names
             assert "core.py" in file_names

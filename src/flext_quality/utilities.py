@@ -1,14 +1,16 @@
-"""CONSOLIDATED Utility classes for FLEXT-QUALITY.
+"""Quality-specific utility classes extending flext-core FlextUtilities.
 
-REFACTORED: Single CONSOLIDATED class following FLEXT_REFACTORING_PROMPT.md patterns.
-Follows flext-core aggregation pattern - NO duplication, NO multiple separate classes.
+Uses flext-core FlextUtilities as base and adds only quality-specific utilities.
+Follows FLEXT patterns: Multiple classes per module, extending core functionality.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
 from textwrap import dedent
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
+
+from flext_core.utilities import FlextUtilities  # Use flext-core utilities as base
 
 if TYPE_CHECKING:
     from flext_quality.analysis_types import (
@@ -21,59 +23,75 @@ if TYPE_CHECKING:
 
 # Type aliases for better readability
 if TYPE_CHECKING:
-    UtilityIssueType = SecurityIssue | ComplexityIssue | DeadCodeIssue | DuplicationIssue
-    UtilityIssueList = list[UtilityIssueType]
+    QualityIssueType = (
+        SecurityIssue | ComplexityIssue | DeadCodeIssue | DuplicationIssue
+    )
+    QualityIssueList = list[QualityIssueType]
 else:
-    UtilityIssueType = object
-    UtilityIssueList = list[object]
+    QualityIssueType = object
+    QualityIssueList = list[object]
 
 
-class FlextQualityUtilities:
-    """CONSOLIDATED utility class following FLEXT_REFACTORING_PROMPT.md pattern.
+class FlextQualityUtilities(FlextUtilities):
+    """Quality-specific utilities extending flext-core FlextUtilities.
 
-    Single class containing ALL utility functionality to eliminate duplication
-    and follow FLEXT ecosystem standards.
+    Adds quality-specific functionality while inheriting all base utility methods.
+    Uses proper FLEXT patterns and eliminates code duplication.
     """
 
-    # CONSOLIDATED: Issue processing methods
     @staticmethod
-    def is_issue_list(value: object) -> bool:
+    def is_quality_issue_list(value: object) -> bool:
         """Type guard to check if value is a list of quality issues."""
-        if not isinstance(value, list):
+        # Use FlextUtilities base type checking
+        if not FlextUtilities.TypeGuards.is_list(value):
             return False
-        # For empty lists, assume they are valid issue lists
-        if not value:
+        if not value:  # Empty list is valid
             return True
-        # Check first item to determine if it's likely an issue list
-        first_item = value[0]
-        return hasattr(first_item, "file_path") and hasattr(first_item, "message")
+        # Quality-specific check: issues have file_path and message
+        # Cast to list for safe access after TypeGuards.is_list check
+        value_list = cast("list[object]", value)
+        first_item = value_list[0]
+        return (
+            hasattr(first_item, "file_path")
+            and hasattr(first_item, "message")
+        )
 
     @staticmethod
     def safe_issue_list(value: object) -> list[object]:
         """Safely convert value to typed issue list."""
-        if FlextQualityUtilities.is_issue_list(value):
+        if FlextQualityUtilities.is_quality_issue_list(value):
             return value  # type: ignore[return-value]  # Type guard ensures this is list[object]
         return []
 
     @staticmethod
     def get_issue_summary(issue: object) -> str:
         """Get a formatted summary string for any issue type."""
-        # Check if it's a DuplicationIssue by checking for 'files' attribute
+        # Use FlextUtilities safe conversions instead of raw getattr
         if hasattr(issue, "files") and hasattr(issue, "similarity"):
             files = getattr(issue, "files", [])
-            files_str = ", ".join(files[:2]) if files else "unknown"
-            return f"Duplicated in: {files_str}"
+            if files and isinstance(files, list):
+                files_str = ", ".join(str(f) for f in files[:2])
+                return f"Duplicated in: {files_str}"
 
-        # For all other issue types (SecurityIssue, ComplexityIssue, DeadCodeIssue)
+        # For all other issue types - use safe string conversion
         if hasattr(issue, "file_path") and hasattr(issue, "line_number"):
-            file_path = getattr(issue, "file_path", "unknown")
-            line_number = getattr(issue, "line_number", "?")
+            file_path = FlextUtilities.Conversions.safe_str(
+                getattr(issue, "file_path", ""), "unknown"
+            )
+            line_number = FlextUtilities.Conversions.safe_str(
+                getattr(issue, "line_number", ""), "?"
+            )
             return f"{file_path}:{line_number}"
 
         return "Unknown location"
 
 
-    # CONSOLIDATED: Report generation methods (formerly FlextReportUtilities)
+class FlextReportUtilities(FlextUtilities):
+    """Report generation utilities extending flext-core FlextUtilities.
+
+    Handles quality-specific report formatting while using base utility methods.
+    """
+
     @staticmethod
     def format_issue_categories(results: object) -> dict[str, list[object]]:
         """Format issue categories with proper typing."""
@@ -100,12 +118,21 @@ class FlextQualityUtilities:
     @staticmethod
     def safe_extend_lines(target: list[str], source: object) -> None:
         """Safely extend target list with source items."""
-        if isinstance(source, list):
-            str_items = [str(item) for item in source]
+        # Use FlextUtilities type checking and safe conversion
+        if FlextUtilities.TypeGuards.is_list(source):
+            str_items = [
+                FlextUtilities.Conversions.safe_str(item, "")
+                for item in source  # type: ignore[attr-defined]
+            ]
             target.extend(str_items)
 
 
-    # CONSOLIDATED: Test utility methods (formerly FlextTestUtilities)
+class FlextTestUtilities(FlextUtilities):
+    """Testing utilities extending flext-core FlextUtilities.
+
+    Provides quality-specific testing utilities while using base methods.
+    """
+
     @staticmethod
     def create_test_file_with_issues(file_path: Path, issue_type: str) -> None:
         """Create test files with specific types of real issues."""
@@ -208,51 +235,54 @@ def process_data_type_b(data):
             file_path.write_text("# Test file", encoding="utf-8")
 
 
-    # CONSOLIDATED: Analysis utility methods (formerly FlextAnalysisUtilities)
+class FlextAnalysisUtilities(FlextUtilities):
+    """Analysis utilities extending flext-core FlextUtilities.
+
+    Provides quality-specific analysis utilities while using base methods.
+    """
+
     @staticmethod
     def calculate_real_score(analysis_results: AnalysisResults | object) -> float:
         """Calculate quality score from real analysis results."""
+        # Use FlextUtilities for safe attribute access
         if not hasattr(analysis_results, "overall_metrics"):
             return 0.0
 
         metrics = getattr(analysis_results, "overall_metrics", None)
         if metrics is None:
             return 0.0
-        return getattr(metrics, "quality_score", 0.0)
+
+        # Use safe float conversion from FlextUtilities
+        score = getattr(metrics, "quality_score", 0.0)
+        return FlextUtilities.Conversions.safe_float(score, 0.0)
 
     @staticmethod
     def count_real_issues(analysis_results: AnalysisResults | object) -> int:
         """Count total issues from real analysis results."""
+        # Use FlextUtilities for safe type conversion
         if hasattr(analysis_results, "total_issues"):
             total_issues_attr = getattr(analysis_results, "total_issues", 0)
-            return (
-                int(total_issues_attr)
-                if isinstance(total_issues_attr, (int, float))
-                else 0
-            )
+            return FlextUtilities.Conversions.safe_int(total_issues_attr, 0)
         return 0
 
 
-
-# Backward compatibility aliases - following flext-cli pattern
-FlextReportUtilities = FlextQualityUtilities
-FlextTestUtilities = FlextQualityUtilities
-FlextAnalysisUtilities = FlextQualityUtilities
+# Backward compatibility aliases - classes are now separate (correct FLEXT pattern)
+# No aliases needed since classes exist independently
 
 # Legacy compatibility aliases
-IssueType = UtilityIssueType
-IssueList = UtilityIssueList
+IssueType = QualityIssueType
+IssueList = QualityIssueList
 
 # Export CONSOLIDATED class and aliases
 __all__ = [
-    "FlextQualityUtilities",
     # Backward compatibility
     "FlextAnalysisUtilities",
+    "FlextQualityUtilities",
     "FlextReportUtilities",
     "FlextTestUtilities",
-    "UtilityIssueList",
-    "UtilityIssueType",
     # Legacy compatibility
     "IssueList",
     "IssueType",
+    "QualityIssueList",
+    "QualityIssueType",
 ]

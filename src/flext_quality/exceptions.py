@@ -1,7 +1,7 @@
 """Quality Exception Hierarchy - Modern Pydantic v2 Patterns.
 
 This module provides quality-specific exceptions using modern patterns from flext-core.
-All exceptions follow the FlextErrorMixin pattern with keyword-only arguments and
+All exceptions follow the FlextExceptions.ErrorMixin pattern with keyword-only arguments and
 modern Python 3.13 type aliases for comprehensive error handling in quality operations.
 
 Copyright (c) 2025 FLEXT Contributors
@@ -13,7 +13,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import override
 
-from flext_core import FlextError
+from flext_core import FlextExceptions
 
 
 class FlextQualityErrorCodes(Enum):
@@ -36,14 +36,14 @@ class FlextQualityErrorCodes(Enum):
 
 
 # CONSOLIDATED Exception Class following FLEXT_REFACTORING_PROMPT.md pattern
-class FlextQualityExceptionsError(FlextError):
+class FlextQualityExceptionsError(FlextExceptions.Error):
     """Single consolidated class containing ALL quality exceptions.
 
     Consolidates ALL exception definitions into one class following FLEXT patterns.
     Individual exceptions available as nested classes for organization.
     """
 
-    class QualityError(FlextError):
+    class QualityError(FlextExceptions.Error):
         """Base exception for all quality domain errors."""
 
     class ValidationError(QualityError):
@@ -170,21 +170,21 @@ FlextQualityThresholdError = FlextQualityExceptionsError.ThresholdError
 
 # Export consolidated class and legacy aliases
 __all__ = [
-    "FlextQualityErrorCodes",
-    "FlextQualityExceptionsError",
-    # Legacy compatibility aliases
-    "FlextQualityError",
-    "FlextQualityValidationError",
+    "FlextQualityAnalysisError",
+    "FlextQualityAuthenticationError",
     "FlextQualityConfigurationError",
     "FlextQualityConnectionError",
-    "FlextQualityProcessingError",
-    "FlextQualityAuthenticationError",
-    "FlextQualityTimeoutError",
-    "FlextQualityAnalysisError",
-    "FlextQualityReportError",
-    "FlextQualityMetricsError",
+    # Legacy compatibility aliases
+    "FlextQualityError",
+    "FlextQualityErrorCodes",
+    "FlextQualityExceptionsError",
     "FlextQualityGradeError",
-    "FlextQualityRuleError",
     "FlextQualityIssueError",
+    "FlextQualityMetricsError",
+    "FlextQualityProcessingError",
+    "FlextQualityReportError",
+    "FlextQualityRuleError",
     "FlextQualityThresholdError",
+    "FlextQualityTimeoutError",
+    "FlextQualityValidationError",
 ]
