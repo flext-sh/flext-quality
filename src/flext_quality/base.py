@@ -3,15 +3,13 @@
 from __future__ import annotations
 
 import warnings
-from abc import abstractmethod
+from abc import ABC, abstractmethod
 from pathlib import Path
-
-from flext_core import FlextAbstractMixin
 
 from flext_quality.backend_type import BackendType
 
 
-class FlextQualityAnalyzer(FlextAbstractMixin):
+class FlextQualityAnalyzer(ABC):
     """Abstract base class for code analyzers using flext-core patterns."""
 
     @abstractmethod

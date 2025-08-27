@@ -262,9 +262,9 @@ class TestQualityAnalysisServiceFunctional:
             analysis_id=str(analysis_id),
             coverage_score=85.0,
             complexity_score=78.0,
-            duplication_score=92.0,
-            security_score=95.0,
             maintainability_score=80.0,
+            security_score=95.0,
+            overall_score=84.0,
         )
 
         assert result.success
@@ -284,9 +284,9 @@ class TestQualityAnalysisServiceFunctional:
             analysis_id="non-existent",
             coverage_score=85.0,
             complexity_score=78.0,
-            duplication_score=92.0,
-            security_score=95.0,
             maintainability_score=80.0,
+            security_score=95.0,
+            overall_score=84.0,
         )
 
         assert result.is_failure
@@ -305,10 +305,11 @@ class TestQualityAnalysisServiceFunctional:
         # Update issue counts
         result = await service.update_issue_counts(
             analysis_id=str(analysis_id),
-            critical=1,
-            high=2,
-            medium=3,
-            low=4,
+            total_issues=10,
+            critical_issues=1,
+            high_issues=2,
+            medium_issues=3,
+            low_issues=4,
         )
 
         assert result.success
@@ -410,12 +411,13 @@ class TestQualityIssueServiceFunctional:
         """Test successful issue creation - covers lines 319-345."""
         result = await service.create_issue(
             analysis_id="test-analysis",
-            issue_type="security",
-            severity="high",
-            rule_id="S001",
             file_path="src/auth.py",
             line_number=42,
+            column_number=1,
+            severity=IssueSeverity.HIGH,
+            issue_type=IssueType.SECURITY_VULNERABILITY,
             message="Potential security vulnerability",
+            rule="S001",
         )
 
         assert result.success
@@ -434,11 +436,13 @@ class TestQualityIssueServiceFunctional:
         # Create issue first
         create_result = await service.create_issue(
             analysis_id="test-analysis",
-            issue_type="style",
-            severity="low",
-            rule_id="E301",
             file_path="test.py",
+            line_number=1,
+            column_number=1,
+            severity=IssueSeverity.LOW,
+            issue_type=IssueType.STYLE_VIOLATION,
             message="Style issue",
+            rule="E301",
         )
         issue_id = create_result.value.id
 
@@ -462,28 +466,34 @@ class TestQualityIssueServiceFunctional:
         """Test successful issues listing - covers lines 361-377."""
         # Create multiple issues
         await service.create_issue(
-            "analysis-1",
-            "security",
-            "high",
-            "S001",
-            "file1.py",
+            analysis_id="analysis-1",
+            file_path="file1.py",
+            line_number=1,
+            column_number=1,
+            severity=IssueSeverity.HIGH,
+            issue_type=IssueType.SECURITY_VULNERABILITY,
             message="Issue 1",
+            rule="S001",
         )
         await service.create_issue(
-            "analysis-1",
-            "style",
-            "low",
-            "E301",
-            "file2.py",
+            analysis_id="analysis-1",
+            file_path="file2.py",
+            line_number=1,
+            column_number=1,
+            severity=IssueSeverity.LOW,
+            issue_type=IssueType.STYLE_VIOLATION,
             message="Issue 2",
+            rule="E301",
         )
         await service.create_issue(
-            "analysis-2",
-            "complexity",
-            "medium",
-            "C001",
-            "file3.py",
+            analysis_id="analysis-2",
+            file_path="file3.py",
+            line_number=1,
+            column_number=1,
+            severity=IssueSeverity.MEDIUM,
+            issue_type=IssueType.HIGH_COMPLEXITY,
             message="Issue 3",
+            rule="C001",
         )
 
         # List issues for analysis-1
@@ -507,12 +517,14 @@ class TestQualityIssueServiceFunctional:
         """Test successful issue marking as fixed - covers lines 383-390."""
         # Create issue first
         create_result = await service.create_issue(
-            "test-analysis",
-            "style",
-            "low",
-            "E301",
-            "test.py",
+            analysis_id="test-analysis",
+            file_path="test.py",
+            line_number=1,
+            column_number=1,
+            severity=IssueSeverity.LOW,
+            issue_type=IssueType.STYLE_VIOLATION,
             message="Style issue",
+            rule="E301",
         )
         issue_id = create_result.value.id
 
@@ -535,12 +547,14 @@ class TestQualityIssueServiceFunctional:
         """Test successful issue suppression - covers lines 399-406."""
         # Create issue first
         create_result = await service.create_issue(
-            "test-analysis",
-            "style",
-            "low",
-            "E301",
-            "test.py",
+            analysis_id="test-analysis",
+            file_path="test.py",
+            line_number=1,
+            column_number=1,
+            severity=IssueSeverity.LOW,
+            issue_type=IssueType.STYLE_VIOLATION,
             message="Style issue",
+            rule="E301",
         )
         issue_id = create_result.value.id
 
@@ -564,12 +578,14 @@ class TestQualityIssueServiceFunctional:
         """Test successful issue unsuppression - covers lines 411-418."""
         # Create and suppress issue first
         create_result = await service.create_issue(
-            "test-analysis",
-            "style",
-            "low",
-            "E301",
-            "test.py",
+            analysis_id="test-analysis",
+            file_path="test.py",
+            line_number=1,
+            column_number=1,
+            severity=IssueSeverity.LOW,
+            issue_type=IssueType.STYLE_VIOLATION,
             message="Style issue",
+            rule="E301",
         )
         issue_id = create_result.value.id
         await service.suppress_issue(str(issue_id), "False positive")
@@ -606,8 +622,8 @@ class TestQualityReportServiceFunctional:
         """Test successful report creation - covers lines 429-449."""
         result = await service.create_report(
             analysis_id="test-analysis",
-            report_type="html",
-            report_format="detailed",
+            format_type="html",
+            content="<html>Test report content</html>",
         )
 
         assert result.success
@@ -621,7 +637,11 @@ class TestQualityReportServiceFunctional:
     async def test_get_report_success(self, service: QualityReportService) -> None:
         """Test successful report retrieval - covers lines 454-461."""
         # Create report first
-        create_result = await service.create_report("test-analysis", "json")
+        create_result = await service.create_report(
+            analysis_id="test-analysis",
+            format_type="json",
+            content='{"test": "content"}'
+        )
         report_id = create_result.value.id
 
         # Get report
@@ -643,9 +663,21 @@ class TestQualityReportServiceFunctional:
     async def test_list_reports_success(self, service: QualityReportService) -> None:
         """Test successful reports listing - covers lines 466-473."""
         # Create multiple reports
-        await service.create_report("analysis-1", "html")
-        await service.create_report("analysis-1", "json")
-        await service.create_report("analysis-2", "pdf")
+        await service.create_report(
+            analysis_id="analysis-1",
+            format_type="html",
+            content="<html>Report 1</html>"
+        )
+        await service.create_report(
+            analysis_id="analysis-1",
+            format_type="json",
+            content='{"report": "1"}'
+        )
+        await service.create_report(
+            analysis_id="analysis-2",
+            format_type="pdf",
+            content="PDF content"
+        )
 
         # List reports for analysis-1
         result = await service.list_reports("analysis-1")
@@ -667,7 +699,11 @@ class TestQualityReportServiceFunctional:
     async def test_delete_report_success(self, service: QualityReportService) -> None:
         """Test successful report deletion - covers lines 477-481."""
         # Create report first
-        create_result = await service.create_report("test-analysis", "html")
+        create_result = await service.create_report(
+            analysis_id="test-analysis",
+            format_type="html",
+            content="<html>Report to delete</html>"
+        )
         report_id = create_result.value.id
 
         # Delete report
@@ -722,22 +758,25 @@ class TestServiceIntegration:
 
             # 4. Create issues
             issue_result = await issue_service.create_issue(
-                str(analysis.id),
-                "security",
-                "high",
-                "S001",
-                "auth.py",
+                analysis_id=str(analysis.id),
+                file_path="auth.py",
+                line_number=1,
+                column_number=1,
+                severity=IssueSeverity.HIGH,
+                issue_type=IssueType.SECURITY_VULNERABILITY,
                 message="Security issue",
+                rule="S001",
             )
             assert issue_result.success
 
             # 5. Update issue counts
             counts_result = await analysis_service.update_issue_counts(
-                str(analysis.id),
-                0,
-                1,
-                0,
-                0,
+                analysis_id=str(analysis.id),
+                total_issues=1,
+                critical_issues=0,
+                high_issues=1,
+                medium_issues=0,
+                low_issues=0,
             )
             assert counts_result.success
 
@@ -746,7 +785,11 @@ class TestServiceIntegration:
             assert complete_result.success
 
             # 7. Create report
-            report_result = await report_service.create_report(str(analysis.id), "html")
+            report_result = await report_service.create_report(
+                analysis_id=str(analysis.id),
+                format_type="html",
+                content="<html>Integration test report</html>"
+            )
             assert report_result.success
 
             # Verify final state

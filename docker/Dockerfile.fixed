@@ -63,33 +63,33 @@ class FlextResult:
         return cls(False, error=error)
 
 # Mock exceptions hierarchy for flext_core.exceptions
-class FlextError(Exception):
+class FlextExceptions.Error(Exception):
     """Base flext exception."""
     def __init__(self, message: str, context: dict = None):
         super().__init__(message)
         self.context = context or {}
 
-class FlextValidationError(FlextError):
+class FlextExceptions.ValidationError(FlextExceptions.Error):
     """Validation error."""
     pass
 
-class FlextConfigurationError(FlextError):
+class FlextExceptions.ConfigurationError(FlextExceptions.Error):
     """Configuration error."""
     pass
 
-class FlextConnectionError(FlextError):
+class FlextExceptions.ConnectionError(FlextExceptions.Error):
     """Connection error."""
     pass
 
-class FlextProcessingError(FlextError):
+class FlextProcessingError(FlextExceptions.Error):
     """Processing error."""
     pass
 
-class FlextAuthenticationError(FlextError):
+class FlextExceptions.AuthenticationError(FlextExceptions.Error):
     """Authentication error."""
     pass
 
-class FlextTimeoutError(FlextError):
+class FlextExceptions.TimeoutError(FlextExceptions.Error):
     """Timeout error."""
     pass
 
@@ -154,9 +154,9 @@ TConfigDict = Dict[str, Any]
 __all__: list[str] = [
     "FlextResult", "get_logger", "FlextContainer", "get_flext_container",
     "FlextEntity", "FlextValue", "FlextSettings", "FlextConstants", 
-    "TAnyDict", "TConfigDict", "FlextError", "FlextValidationError",
-    "FlextConfigurationError", "FlextConnectionError", "FlextProcessingError",
-    "FlextAuthenticationError", "FlextTimeoutError"
+    "TAnyDict", "TConfigDict", "FlextExceptions.Error", "FlextExceptions.ValidationError",
+    "FlextExceptions.ConfigurationError", "FlextExceptions.ConnectionError", "FlextProcessingError",
+    "FlextExceptions.AuthenticationError", "FlextExceptions.TimeoutError"
 ]
 ''')
 
@@ -167,40 +167,40 @@ with open(exceptions_dir / 'exceptions.py', 'w') as f:
     f.write('''# Mock flext_core.exceptions module
 """Mock exceptions module for enterprise compatibility."""
 
-class FlextError(Exception):
+class FlextExceptions.Error(Exception):
     """Base flext exception."""
     def __init__(self, message: str, context: dict = None):
         super().__init__(message)
         self.context = context or {}
 
-class FlextValidationError(FlextError):
+class FlextExceptions.ValidationError(FlextExceptions.Error):
     """Validation error."""
     pass
 
-class FlextConfigurationError(FlextError):
+class FlextExceptions.ConfigurationError(FlextExceptions.Error):
     """Configuration error."""
     pass
 
-class FlextConnectionError(FlextError):
+class FlextExceptions.ConnectionError(FlextExceptions.Error):
     """Connection error."""
     pass
 
-class FlextProcessingError(FlextError):
+class FlextProcessingError(FlextExceptions.Error):
     """Processing error."""
     pass
 
-class FlextAuthenticationError(FlextError):
+class FlextExceptions.AuthenticationError(FlextExceptions.Error):
     """Authentication error."""
     pass
 
-class FlextTimeoutError(FlextError):
+class FlextExceptions.TimeoutError(FlextExceptions.Error):
     """Timeout error."""
     pass
 
 __all__: list[str] = [
-    "FlextError", "FlextValidationError", "FlextConfigurationError",
-    "FlextConnectionError", "FlextProcessingError", "FlextAuthenticationError",
-    "FlextTimeoutError"
+    "FlextExceptions.Error", "FlextExceptions.ValidationError", "FlextExceptions.ConfigurationError",
+    "FlextExceptions.ConnectionError", "FlextProcessingError", "FlextExceptions.AuthenticationError",
+    "FlextExceptions.TimeoutError"
 ]
 ''')
 

@@ -57,27 +57,27 @@ TAnyDict = Dict[str, Any]
 ' > /app/src/flext_core/__init__.py
 
 # Create exceptions module
-RUN echo 'class FlextError(Exception):
+RUN echo 'class FlextExceptions.Error(Exception):
     def __init__(self, message: str, context: dict = None):
         super().__init__(message)
         self.context = context or {}
 
-class FlextValidationError(FlextError):
+class FlextExceptions.ValidationError(FlextExceptions.Error):
     pass
 
-class FlextConfigurationError(FlextError):
+class FlextExceptions.ConfigurationError(FlextExceptions.Error):
     pass
 
-class FlextConnectionError(FlextError):
+class FlextExceptions.ConnectionError(FlextExceptions.Error):
     pass
 
-class FlextProcessingError(FlextError):
+class FlextProcessingError(FlextExceptions.Error):
     pass
 
-class FlextAuthenticationError(FlextError):
+class FlextExceptions.AuthenticationError(FlextExceptions.Error):
     pass
 
-class FlextTimeoutError(FlextError):
+class FlextExceptions.TimeoutError(FlextExceptions.Error):
     pass
 ' > /app/src/flext_core/exceptions.py
 
@@ -104,7 +104,7 @@ RUN pip install -e . --no-deps
 RUN echo "🧪 Testing imports..." && \
     python -c "from flext_quality.analyzer import CodeAnalyzer; print('✅ CodeAnalyzer')" && \
     python -c "from flext_quality.exceptions import FlextQualityError; print('✅ Exceptions')" && \
-    python -c "from flext_core.exceptions import FlextError; print('✅ FlextCore')" && \
+    python -c "from flext_core.exceptions import FlextExceptions.Error; print('✅ FlextCore')" && \
     echo "✅ All imports successful\!"
 
 # Run critical tests

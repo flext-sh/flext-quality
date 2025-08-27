@@ -6,6 +6,14 @@ import pytest
 from pydantic import ValidationError
 
 from flext_quality import QualityGradeCalculator, QualityMetrics
+from flext_quality.analysis_types import (
+    AnalysisResults,
+    FileAnalysisResult,
+    OverallMetrics,
+)
+
+# Import correct classes - now independent classes, not nested
+FileMetrics = FileAnalysisResult  # Alias for backward compatibility
 
 
 class TestQualityMetrics:
@@ -68,8 +76,6 @@ class TestQualityMetrics:
 
     def test_from_analysis_results_empty(self) -> None:
         """Test creating metrics from empty analysis results using AnalysisResults."""
-        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
-
         results = AnalysisResults(
             overall_metrics=OverallMetrics(),
             file_metrics=[],
@@ -88,12 +94,6 @@ class TestQualityMetrics:
 
     def test_from_analysis_results_with_metrics(self) -> None:
         """Test creating metrics from analysis results with data using AnalysisResults."""
-        from flext_quality.analysis_types import (
-            AnalysisResults,
-            FileMetrics,
-            OverallMetrics,
-        )
-
         results = AnalysisResults(
             overall_metrics=OverallMetrics(
                 files_analyzed=20,
@@ -134,8 +134,6 @@ class TestQualityMetrics:
 
     def test_score_calculations(self) -> None:
         """Test score calculations in from_analysis_results using AnalysisResults."""
-        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
-
         results = AnalysisResults(
             overall_metrics=OverallMetrics(average_complexity=4.0),
             file_metrics=[],
@@ -161,8 +159,6 @@ class TestQualityMetrics:
 
     def test_overall_score_calculation(self) -> None:
         """Test overall score weighted calculation using AnalysisResults."""
-        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
-
         results = AnalysisResults(
             overall_metrics=OverallMetrics(),  # Default values (no complexity)
             file_metrics=[],

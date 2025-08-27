@@ -28,3 +28,9 @@ class FlextQualityConfig(FlextBaseConfigModel):
 # Legacy compatibility facade - DEPRECATED
 QualityConfig = FlextQualityConfig
 warnings.warn("QualityConfig is deprecated; use FlextQualityConfig", DeprecationWarning, stacklevel=2)
+
+# Export all classes
+__all__ = [
+    "FlextQualityConfig",
+    "QualityConfig",  # Legacy compatibility
+]

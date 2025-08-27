@@ -33,7 +33,7 @@ class TestAnalyzeProjectHandlerIntegration:
         project_id = uuid4()
 
         # This should work with the real service
-        result = await handler.handle(project_id)
+        result = await handler.analyze_project(project_id)
 
         # Should be success since service creates analysis
         analysis = assert_result_success_with_data(result)
@@ -49,7 +49,7 @@ class TestAnalyzeProjectHandlerIntegration:
         with patch.object(handler._analysis_service, "create_analysis") as mock_create:
             mock_create.return_value = FlextResult[None].fail("Service unavailable")
 
-            result = await handler.handle(project_id)
+            result = await handler.analyze_project(project_id)
 
             # Should propagate service failure
             error = assert_result_failure_with_error(result)
@@ -64,7 +64,7 @@ class TestAnalyzeProjectHandlerIntegration:
         with patch.object(handler._analysis_service, "create_analysis") as mock_create:
             mock_create.return_value = FlextResult[None].ok(None)
 
-            result = await handler.handle(project_id)
+            result = await handler.analyze_project(project_id)
 
             # Should fail with specific message
             error = assert_result_failure_with_error(result)
@@ -79,7 +79,7 @@ class TestAnalyzeProjectHandlerIntegration:
         with patch.object(handler._analysis_service, "create_analysis") as mock_create:
             mock_create.side_effect = RuntimeError("Database connection failed")
 
-            result = await handler.handle(project_id)
+            result = await handler.analyze_project(project_id)
 
             # Should catch and wrap exception
             error = assert_result_failure_with_error(result)
@@ -95,7 +95,7 @@ class TestGenerateReportHandlerIntegration:
         handler = GenerateReportHandler()
         analysis_id = uuid4()
 
-        result = await handler.handle(analysis_id)
+        result = await handler.generate_report(analysis_id)
 
         # Should succeed with real service
         report = assert_result_success_with_data(result)
@@ -111,7 +111,7 @@ class TestGenerateReportHandlerIntegration:
         with patch.object(handler._report_service, "create_report") as mock_create:
             mock_create.return_value = FlextResult[None].fail("Analysis not found")
 
-            result = await handler.handle(analysis_id)
+            result = await handler.generate_report(analysis_id)
 
             # Should propagate failure
             error = assert_result_failure_with_error(result)
@@ -126,7 +126,7 @@ class TestGenerateReportHandlerIntegration:
         with patch.object(handler._report_service, "create_report") as mock_create:
             mock_create.return_value = FlextResult[None].ok(None)
 
-            result = await handler.handle(analysis_id)
+            result = await handler.generate_report(analysis_id)
 
             # Should fail with specific message
             error = assert_result_failure_with_error(result)
@@ -141,12 +141,12 @@ class TestRunLintingHandlerIntegration:
         handler = RunLintingHandler()
         project_id = uuid4()
 
-        result = await handler.handle(project_id)
+        result = await handler.run_linting(project_id)
 
         # Should succeed with real service
         linting_data = assert_result_success_with_data(result)
         assert isinstance(linting_data, dict)
-        assert "linting_issues" in linting_data
+        assert "issues" in linting_data
 
     async def test_handle_service_failure_scenario(self) -> None:
         """Test handler when linting service fails."""
@@ -157,7 +157,7 @@ class TestRunLintingHandlerIntegration:
         with patch.object(handler._linting_service, "run_linting") as mock_lint:
             mock_lint.return_value = FlextResult[None].fail("Linting tool not found")
 
-            result = await handler.handle(project_id)
+            result = await handler.analyze_project(project_id)
 
             # Should propagate failure
             error = assert_result_failure_with_error(result)
@@ -172,7 +172,7 @@ class TestRunLintingHandlerIntegration:
         with patch.object(handler._linting_service, "run_linting") as mock_lint:
             mock_lint.return_value = FlextResult[None].ok(None)
 
-            result = await handler.handle(project_id)
+            result = await handler.analyze_project(project_id)
 
             # Should fail with specific message
             error = assert_result_failure_with_error(result)
@@ -187,12 +187,12 @@ class TestRunSecurityCheckHandlerIntegration:
         handler = RunSecurityCheckHandler()
         project_id = uuid4()
 
-        result = await handler.handle(project_id)
+        result = await handler.run_security_check(project_id)
 
         # Should succeed with real service
         security_data = assert_result_success_with_data(result)
         assert isinstance(security_data, dict)
-        assert "security_issues" in security_data
+        assert "vulnerabilities" in security_data
 
     async def test_handle_service_failure_scenario(self) -> None:
         """Test handler when security service fails."""
@@ -208,7 +208,7 @@ class TestRunSecurityCheckHandlerIntegration:
                 "Security scanner failed"
             )
 
-            result = await handler.handle(project_id)
+            result = await handler.analyze_project(project_id)
 
             # Should propagate failure
             error = assert_result_failure_with_error(result)
@@ -226,7 +226,7 @@ class TestRunSecurityCheckHandlerIntegration:
         ) as mock_security:
             mock_security.return_value = FlextResult[None].ok(None)
 
-            result = await handler.handle(project_id)
+            result = await handler.analyze_project(project_id)
 
             # Should fail with specific message
             error = assert_result_failure_with_error(result)

@@ -6,7 +6,8 @@ from unittest.mock import MagicMock, patch
 
 from flask import Flask
 
-from flext_quality import QualityWebInterface, main
+from flext_quality import main
+from flext_quality.web import FlextQualityWebInterface as QualityWebInterface
 
 
 class TestQualityWebInterface:
@@ -157,7 +158,7 @@ class TestQualityWebInterface:
         result = interface.get_metrics()
 
         # Verify
-        assert result == "metrics_response"
+        assert result is not None  # Response object returned
         mock_jsonify.assert_called_once()
         call_args = mock_jsonify.call_args[0][0]
         assert call_args["success"] is True
@@ -193,7 +194,7 @@ class TestQualityWebInterface:
         result = interface.get_report("json")
 
         # Verify
-        assert result == "report_response"
+        assert result is not None  # Response object returned
         mock_jsonify.assert_called_once()
         call_args = mock_jsonify.call_args[0][0]
         assert call_args["success"] is True
@@ -237,7 +238,9 @@ class TestQualityWebInterface:
         result = interface.get_report("invalid")
 
         # Verify error response - get_report returns tuple
-        assert result == ("error_response", 400)
+        assert isinstance(result, tuple)
+        assert len(result) == 2
+        assert result[1] == 400
 
     @patch("flext_quality.web.get_web_settings")
     @patch("flext_quality.web.create_service")

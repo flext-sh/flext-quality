@@ -14,11 +14,11 @@ from flext_quality import (
     AnalysisResults,
     CodeAnalyzer,
     DuplicationIssue,
-    FlextTestUtilities,
     OverallMetrics,
     QualityGradeCalculator,
 )
 from flext_quality.analysis_types import FileAnalysisResult
+from flext_quality.utilities import FlextTestUtilities
 
 
 class TestCodeAnalyzer:
@@ -352,7 +352,7 @@ class TestCodeAnalyzer:
             # Check if we get proper issue objects
             first_issue = security_issues[0]
             # Could be SecurityIssue object or dict depending on implementation
-            assert hasattr(first_issue, "__dict__") or isinstance(first_issue, dict)
+            assert hasattr(first_issue, "__dict__")
 
     def test_analyze_complexity_issues(self, temp_project: Path) -> None:
         """Test complexity analysis."""

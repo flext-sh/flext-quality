@@ -73,7 +73,7 @@ class BasicQualityProjectService:
 
         """
         try:
-            self._logger.info(f"Creating project: {name}")
+            self._logger.info("Creating project: %s", name)
 
             project = FlextQualityProject(
                 id=str(uuid4()),
@@ -89,7 +89,7 @@ class BasicQualityProjectService:
             )
 
             self._projects[str(project.id)] = project
-            self._logger.info(f"Project created successfully: {project.id}")
+            self._logger.info("Project created successfully: %s", project.id)
             return FlextResult[FlextQualityProject].ok(project)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to create project")
@@ -158,7 +158,7 @@ class BasicQualityProjectService:
             # Store the updated project
             self._projects[project_id] = updated_project
 
-            self._logger.info(f"Project updated successfully: {project_id}")
+            self._logger.info("Project updated successfully: %s", project_id)
             return FlextResult[FlextQualityProject].ok(updated_project)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to update project")
@@ -177,7 +177,7 @@ class BasicQualityProjectService:
         try:
             if project_id in self._projects:
                 del self._projects[project_id]
-                self._logger.info(f"Project deleted successfully: {project_id}")
+                self._logger.info("Project deleted successfully: %s", project_id)
                 success = True
                 return FlextResult[bool].ok(success)
             return FlextResult[bool].fail("Project not found")
@@ -216,7 +216,7 @@ class BasicQualityAnalysisService:
 
         """
         try:
-            self._logger.info(f"Creating analysis for project: {project_id}")
+            self._logger.info("Creating analysis for project: %s", project_id)
 
             analysis = FlextQualityAnalysis(
                 id=str(uuid4()),
@@ -229,7 +229,7 @@ class BasicQualityAnalysisService:
             )
 
             self._analyses[str(analysis.id)] = analysis
-            self._logger.info(f"Analysis created successfully: {analysis.id}")
+            self._logger.info("Analysis created successfully: %s", analysis.id)
             return FlextResult[FlextQualityAnalysis].ok(analysis)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to create analysis")
@@ -284,7 +284,7 @@ class BasicQualityAnalysisService:
             )
 
             self._analyses[analysis_id] = updated_analysis
-            self._logger.info(f"Analysis status updated: {analysis_id} -> {status}")
+            self._logger.info("Analysis status updated: %s -> %s", analysis_id, status)
             return FlextResult[FlextQualityAnalysis].ok(updated_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to update analysis")
@@ -330,7 +330,7 @@ class BasicQualityAnalysisService:
             )
 
             self._analyses[analysis_id] = updated_analysis
-            self._logger.info(f"Analysis metrics updated: {analysis_id}")
+            self._logger.info("Analysis metrics updated: %s", analysis_id)
             return FlextResult[FlextQualityAnalysis].ok(updated_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to update analysis metrics")
@@ -376,7 +376,7 @@ class BasicQualityAnalysisService:
             )
 
             self._analyses[analysis_id] = updated_analysis
-            self._logger.info(f"Analysis scores updated: {analysis_id}")
+            self._logger.info("Analysis scores updated: %s", analysis_id)
             return FlextResult[FlextQualityAnalysis].ok(updated_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to update analysis scores")
@@ -422,7 +422,7 @@ class BasicQualityAnalysisService:
             )
 
             self._analyses[analysis_id] = updated_analysis
-            self._logger.info(f"Analysis issue counts updated: {analysis_id}")
+            self._logger.info("Analysis issue counts updated: %s", analysis_id)
             return FlextResult[FlextQualityAnalysis].ok(updated_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to update analysis issue counts")
@@ -635,7 +635,7 @@ class BasicQualityIssueService:
             updated_issue = issue.model_copy(update={"is_suppressed": False})
 
             self._issues[issue_id] = updated_issue
-            self._logger.info(f"Issue marked as fixed: {issue_id}")
+            self._logger.info("Issue marked as fixed: %s", issue_id)
             return FlextResult[FlextQualityIssue].ok(updated_issue)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to mark issue as fixed")
@@ -667,7 +667,7 @@ class BasicQualityIssueService:
             )
 
             self._issues[issue_id] = updated_issue
-            self._logger.info(f"Issue suppressed: {issue_id} - {reason}")
+            self._logger.info("Issue suppressed: %s - %s", issue_id, reason)
             return FlextResult[FlextQualityIssue].ok(updated_issue)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to suppress issue")
@@ -694,7 +694,7 @@ class BasicQualityIssueService:
             )
 
             self._issues[issue_id] = updated_issue
-            self._logger.info(f"Issue unsuppressed: {issue_id}")
+            self._logger.info("Issue unsuppressed: %s", issue_id)
             return FlextResult[FlextQualityIssue].ok(updated_issue)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to unsuppress issue")
@@ -739,7 +739,7 @@ class BasicQualityReportService:
             )
 
             self._reports[str(report.id)] = report
-            self._logger.info(f"Report created successfully: {report.id}")
+            self._logger.info("Report created successfully: %s", report.id)
             return FlextResult[FlextQualityReport].ok(report)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to create report")
@@ -815,8 +815,9 @@ class BasicQualityReportService:
         try:
             if report_id in self._reports:
                 del self._reports[report_id]
-                self._logger.info(f"Report deleted successfully: {report_id}")
-                return FlextResult[bool].ok(True)
+                self._logger.info("Report deleted successfully: %s", report_id)
+                success = True
+                return FlextResult[bool].ok(success)
             return FlextResult[bool].fail("Report not found")
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to delete report")
@@ -849,7 +850,7 @@ class ExternalAnalysisService:
 
         """
         try:
-            self._logger.info(f"Running {backend_tool} analysis")
+            self._logger.info("Running %s analysis", backend_tool)
             result = self._backend.analyze(code, file_path, tool=backend_tool)
             return FlextResult[dict[str, object]].ok(result)
         except (RuntimeError, ValueError, TypeError) as e:

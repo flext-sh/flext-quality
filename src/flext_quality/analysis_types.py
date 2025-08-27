@@ -1,14 +1,13 @@
-"""CONSOLIDATED Analysis Types for FLEXT-QUALITY.
+"""Analysis Types for FLEXT-QUALITY.
 
-REFACTORED: Single CONSOLIDATED class following FLEXT_REFACTORING_PROMPT.md patterns.
-Follows flext-core model patterns - NO duplication, NO multiple separate classes.
+Following FLEXT patterns: Multiple independent classes per module like flext-core.
+Each class is a separate domain model following SOLID principles.
 Strongly-typed data structures that integrate with FLEXT ecosystem.
 """
 
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Annotated
 
 from flext_core import FlextModel
 from pydantic import Field
@@ -19,169 +18,177 @@ from flext_quality.value_objects import (
 )
 
 
-class FlextQualityAnalysisTypes:
-    """CONSOLIDATED analysis types class following FLEXT_REFACTORING_PROMPT.md pattern.
+class FileAnalysisResult(FlextModel):
+    """Result of analyzing a single file."""
 
-    Single class containing ALL analysis type models to eliminate duplication
-    and follow FLEXT ecosystem standards.
-    """
+    file_path: Path = Field(..., description="Path to the analyzed file")
+    lines_of_code: int = Field(default=0, ge=0, description="Total lines of code")
+    complexity_score: float = Field(
+        default=0.0, ge=0.0, le=100.0, description="Complexity score"
+    )
+    security_issues: int = Field(
+        default=0, ge=0, description="Number of security issues"
+    )
+    style_issues: int = Field(default=0, ge=0, description="Number of style issues")
+    dead_code_lines: int = Field(default=0, ge=0, description="Lines of dead code")
 
-    # CONSOLIDATED: Nested model classes for structured analysis results
-    class FileAnalysisResult(FlextModel):
-        """Result of analyzing a single file."""
 
-        file_path: Path = Field(..., description="Path to the analyzed file")
-        lines_of_code: int = Field(default=0, ge=0, description="Total lines of code")
-        complexity_score: float = Field(
-            default=0.0, ge=0.0, le=100.0, description="Complexity score"
+class ComplexityIssue(FlextModel):
+    """Represents a complexity issue in code."""
+
+    file_path: str = Field(..., description="File where issue was found")
+    function_name: str = Field(..., description="Function with complexity issue")
+    line_number: int = Field(..., ge=1, description="Line number of function")
+    complexity_value: int = Field(
+        ..., ge=1, description="Cyclomatic complexity value"
+    )
+    message: str = Field(..., description="Human-readable issue message")
+    issue_type: str = Field(
+        default="high_complexity", description="Type of complexity issue"
+    )
+    severity: IssueSeverity = Field(
+        default=IssueSeverity.MEDIUM, description="Issue severity level"
+    )
+
+
+class SecurityIssue(FlextModel):
+    """Represents a security issue found in code."""
+
+    file_path: str = Field(..., description="File where issue was found")
+    line_number: int = Field(..., ge=1, description="Line number of issue")
+    issue_type: str = Field(..., description="Type of security issue")
+    description: str = Field(..., description="Detailed issue description")
+    message: str = Field(..., description="Human-readable issue message")
+    rule_id: str = Field(..., description="Security rule identifier")
+    severity: IssueSeverity = Field(
+        default=IssueSeverity.HIGH, description="Security issue severity"
+    )
+    confidence: str = Field(
+        default="MEDIUM", description="Confidence level of detection"
+    )
+
+
+class DeadCodeIssue(FlextModel):
+    """Represents dead/unused code found during analysis."""
+
+    file_path: str = Field(..., description="File containing dead code")
+    line_number: int = Field(..., ge=1, description="Line number of dead code")
+    end_line_number: int = Field(..., ge=1, description="End line number of dead code")
+    issue_type: str = Field(..., description="Type of dead code")
+    code_type: str = Field(..., description="Type of code element (function, class, etc)")
+    code_snippet: str = Field(..., description="The unused code snippet")
+    message: str = Field(..., description="Human-readable issue message")
+    severity: IssueSeverity = Field(
+        default=IssueSeverity.LOW, description="Dead code severity"
+    )
+
+
+class DuplicationIssue(FlextModel):
+    """Represents code duplication detected in analysis."""
+
+    files: list[str] = Field(..., description="Files containing duplicated code")
+    line_ranges: list[tuple[int, int]] = Field(
+        ..., description="Line ranges of duplicate code"
+    )
+    duplicate_lines: int = Field(..., ge=1, description="Number of duplicate lines")
+    similarity: float = Field(
+        ..., ge=0.0, le=100.0, description="Similarity score (0.0 to 100.0)"
+    )
+    similarity_percent: float = Field(
+        ..., ge=0.0, le=100.0, description="Percentage similarity"
+    )
+    message: str = Field(..., description="Human-readable duplication message")
+    severity: IssueSeverity = Field(
+        default=IssueSeverity.MEDIUM, description="Duplication severity"
+    )
+
+
+class OverallMetrics(FlextModel):
+    """Overall metrics for the entire analysis."""
+
+    files_analyzed: int = Field(default=0, ge=0, description="Total files analyzed")
+    total_lines: int = Field(default=0, ge=0, description="Total lines of code")
+    functions_count: int = Field(default=0, ge=0, description="Total functions")
+    classes_count: int = Field(default=0, ge=0, description="Total classes")
+    average_complexity: float = Field(
+        default=0.0, ge=0.0, description="Average cyclomatic complexity"
+    )
+    max_complexity: float = Field(
+        default=0.0, ge=0.0, description="Maximum complexity found"
+    )
+    # Quality scores
+    quality_score: float = Field(
+        default=0.0, ge=0.0, le=100.0, description="Overall quality score"
+    )
+    coverage_score: float = Field(
+        default=0.0, ge=0.0, le=100.0, description="Code coverage score"
+    )
+    security_score: float = Field(
+        default=0.0, ge=0.0, le=100.0, description="Security quality score"
+    )
+    maintainability_score: float = Field(
+        default=0.0, ge=0.0, le=100.0, description="Maintainability score"
+    )
+    complexity_score: float = Field(
+        default=0.0, ge=0.0, le=100.0, description="Complexity score"
+    )
+
+
+class AnalysisResults(FlextModel):
+    """Complete analysis results containing all metrics and issues."""
+
+    overall_metrics: OverallMetrics = Field(
+        default_factory=OverallMetrics, description="Overall analysis metrics"
+    )
+    file_metrics: list[FileAnalysisResult] = Field(
+        default_factory=list, description="Per-file analysis results"
+    )
+    complexity_issues: list[ComplexityIssue] = Field(
+        default_factory=list, description="Complexity issues found"
+    )
+    security_issues: list[SecurityIssue] = Field(
+        default_factory=list, description="Security issues found"
+    )
+    dead_code_issues: list[DeadCodeIssue] = Field(
+        default_factory=list, description="Dead code issues found"
+    )
+    duplication_issues: list[DuplicationIssue] = Field(
+        default_factory=list, description="Code duplication issues found"
+    )
+
+    @property
+    def total_issues(self) -> int:
+        """Calculate total number of issues across all categories."""
+        return (
+            len(self.complexity_issues)
+            + len(self.security_issues)
+            + len(self.dead_code_issues)
+            + len(self.duplication_issues)
         )
-        security_issues: int = Field(
-            default=0, ge=0, description="Number of security issues"
-        )
-        style_issues: int = Field(default=0, ge=0, description="Number of style issues")
-        dead_code_lines: int = Field(default=0, ge=0, description="Lines of dead code")
+
+    @property
+    def critical_issues(self) -> int:
+        """Calculate number of critical issues."""
+        critical_count = 0
+        for sec_issue in self.security_issues:
+            if sec_issue.severity == IssueSeverity.HIGH:
+                critical_count += 1
+        for comp_issue in self.complexity_issues:
+            if comp_issue.severity == IssueSeverity.HIGH:
+                critical_count += 1
+        return critical_count
 
 
-    class ComplexityIssue(FlextModel):
-        """Represents a complexity issue in code."""
-
-        file_path: str = Field(..., description="File where issue was found")
-        function_name: str = Field(..., description="Function with complexity issue")
-        line_number: int = Field(..., ge=1, description="Line number of function")
-        complexity_value: int = Field(..., ge=1, description="Cyclomatic complexity value")
-        issue_type: str = Field("high_complexity", description="Type of complexity issue")
-        message: str = Field(..., description="Description of the complexity issue")
-
-
-    class SecurityIssue(FlextModel):
-        """Represents a security issue in code."""
-
-        file_path: str = Field(..., description="File where issue was found")
-        line_number: int = Field(..., ge=0, description="Line number of issue")
-        issue_type: IssueType = Field(..., description="Type of security issue")
-        severity: IssueSeverity = Field(..., description="Severity level")
-        message: str = Field(..., description="Description of the security issue")
-        rule_id: str | None = Field(None, description="Security rule that triggered")
-
-
-    class DeadCodeIssue(FlextModel):
-        """Represents dead code detected in analysis."""
-
-        file_path: str = Field(..., description="File containing dead code")
-        line_number: int = Field(..., ge=1, description="Starting line of dead code")
-        end_line_number: int = Field(..., ge=1, description="Ending line of dead code")
-        code_type: str = Field(
-            ..., description="Type of dead code (function, class, variable)"
-        )
-        message: str = Field(..., description="Description of the dead code")
-
-
-    class DuplicationIssue(FlextModel):
-        """Represents code duplication detected in analysis."""
-
-        files: list[str] = Field(
-            ..., min_length=2, description="Files containing duplicated code"
-        )
-        similarity: float = Field(..., ge=0.0, le=1.0, description="Similarity percentage")
-        line_ranges: list[tuple[int, int]] = Field(
-            ..., description="Line ranges of duplicated code"
-        )
-        message: str = Field(..., description="Description of the duplication")
-
-
-    class OverallMetrics(FlextModel):
-        """Overall quality metrics from analysis."""
-
-        files_analyzed: int = Field(default=0, ge=0, description="Total files analyzed")
-        total_lines: int = Field(default=0, ge=0, description="Total lines of code")
-        quality_score: float = Field(
-            default=0.0, ge=0.0, le=100.0, description="Overall quality score"
-        )
-        coverage_score: float = Field(
-            default=0.0, ge=0.0, le=100.0, description="Test coverage score"
-        )
-        security_score: float = Field(
-            default=0.0, ge=0.0, le=100.0, description="Security score"
-        )
-        duplication_score: float = Field(
-            default=0.0, ge=0.0, le=100.0, description="Duplication score"
-        )
-        maintainability_score: float = Field(
-            default=0.0, ge=0.0, le=100.0, description="Maintainability score"
-        )
-        complexity_score: float = Field(
-            default=0.0, ge=0.0, le=100.0, description="Complexity score"
-        )
-
-
-    class AnalysisResults(FlextModel):
-        """Complete results from code analysis."""
-
-        overall_metrics: Annotated[FlextQualityAnalysisTypes.OverallMetrics, Field(default_factory=lambda: FlextQualityAnalysisTypes.OverallMetrics())]
-        file_metrics: Annotated[list[FlextQualityAnalysisTypes.FileAnalysisResult], Field(default_factory=list)]
-        complexity_issues: Annotated[list[FlextQualityAnalysisTypes.ComplexityIssue], Field(default_factory=list)]
-        security_issues: Annotated[list[FlextQualityAnalysisTypes.SecurityIssue], Field(default_factory=list)]
-        dead_code_issues: Annotated[list[FlextQualityAnalysisTypes.DeadCodeIssue], Field(default_factory=list)]
-        duplication_issues: Annotated[list[FlextQualityAnalysisTypes.DuplicationIssue], Field(default_factory=list)]
-
-        @property
-        def total_issues(self) -> int:
-            """Calculate total number of issues found."""
-            return (
-                len(self.complexity_issues)
-                + len(self.security_issues)
-                + len(self.dead_code_issues)
-                + len(self.duplication_issues)
-            )
-
-        @property
-        def critical_issues(self) -> int:
-            """Count critical severity issues."""
-            return len(
-                [
-                    issue
-                    for issue in self.security_issues
-                    if issue.severity == IssueSeverity.CRITICAL
-                ]
-            )
-
-
-
-# Backward compatibility aliases - following flext-core pattern
-FileAnalysisResult = FlextQualityAnalysisTypes.FileAnalysisResult
-ComplexityIssue = FlextQualityAnalysisTypes.ComplexityIssue
-SecurityIssue = FlextQualityAnalysisTypes.SecurityIssue
-DeadCodeIssue = FlextQualityAnalysisTypes.DeadCodeIssue
-DuplicationIssue = FlextQualityAnalysisTypes.DuplicationIssue
-OverallMetrics = FlextQualityAnalysisTypes.OverallMetrics
-AnalysisResults = FlextQualityAnalysisTypes.AnalysisResults
-
-# Export CONSOLIDATED class and aliases
+# Export all classes
 __all__ = [
-    "FlextQualityAnalysisTypes",
-    # Backward compatibility
     "AnalysisResults",
     "ComplexityIssue",
     "DeadCodeIssue",
     "DuplicationIssue",
     "FileAnalysisResult",
+    # Type aliases for backward compatibility
     "IssueSeverity",
     "IssueType",
     "OverallMetrics",
     "SecurityIssue",
 ]
-
-# Rebuild all models to resolve forward references and ensure proper typing
-try:
-    FlextQualityAnalysisTypes.FileAnalysisResult.model_rebuild()
-    FlextQualityAnalysisTypes.ComplexityIssue.model_rebuild()
-    FlextQualityAnalysisTypes.SecurityIssue.model_rebuild()
-    FlextQualityAnalysisTypes.DeadCodeIssue.model_rebuild()
-    FlextQualityAnalysisTypes.DuplicationIssue.model_rebuild()
-    FlextQualityAnalysisTypes.OverallMetrics.model_rebuild()
-    FlextQualityAnalysisTypes.AnalysisResults.model_rebuild()
-except Exception as e:
-    # Log rebuild errors but don't fail import
-    import logging
-
-    logging.getLogger(__name__).debug("Model rebuild warning: %s", e)

@@ -21,6 +21,7 @@ from flext_quality import (
     main,
     setup_logging,
 )
+from flext_quality.analysis_types import AnalysisResults, OverallMetrics
 
 
 class TestAnalyzeProjectComprehensive:
@@ -218,8 +219,6 @@ class TestAnalyzeProjectComprehensive:
     ) -> None:
         """Test analyze_project with JSON output to file."""
         # Setup mocks to use real AnalysisResults type
-        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
-
         mock_analyzer = MagicMock()
         mock_analyzer.analyze_project.return_value = AnalysisResults(
             overall_metrics=OverallMetrics(
@@ -275,8 +274,6 @@ class TestAnalyzeProjectComprehensive:
     ) -> None:
         """Test analyze_project with JSON format but no output file."""
         # Setup mocks to use real AnalysisResults type
-        from flext_quality.analysis_types import AnalysisResults, OverallMetrics
-
         mock_analyzer = MagicMock()
         mock_analyzer.analyze_project.return_value = AnalysisResults(
             overall_metrics=OverallMetrics(

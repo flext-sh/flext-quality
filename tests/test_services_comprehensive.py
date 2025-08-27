@@ -12,6 +12,8 @@ import pytest
 
 from flext_quality import (
     AnalysisStatus,
+    IssueSeverity,
+    IssueType,
     QualityAnalysis,
     QualityAnalysisService,
     QualityIssue,
@@ -314,7 +316,7 @@ class TestQualityAnalysisServiceComprehensive:
             analysis_id=str(analysis.id),
             coverage_score=95.0,
             complexity_score=88.0,
-            duplication_score=92.0,
+            overall_score=92.0,
             security_score=100.0,
             maintainability_score=85.0,
         )
@@ -339,10 +341,11 @@ class TestQualityAnalysisServiceComprehensive:
         # Update issue counts
         result = await service.update_issue_counts(
             analysis_id=str(analysis.id),
-            critical=2,
-            high=5,
-            medium=10,
-            low=15,
+            total_issues=32,
+            critical_issues=2,
+            high_issues=5,
+            medium_issues=10,
+            low_issues=15,
         )
 
         updated = assert_result_success_with_data(result)
@@ -398,13 +401,13 @@ class TestQualityIssueServiceComprehensive:
 
         result = await service.create_issue(
             analysis_id=analysis_id,
-            issue_type="security",
-            severity="high",
-            rule_id="S100",
             file_path="src/test.py",
             line_number=42,
             column_number=10,
+            severity=IssueSeverity.HIGH,
+            issue_type=IssueType.SECURITY_VULNERABILITY,
             message="Potential security vulnerability",
+            rule="S100",
         )
 
         issue = assert_result_success_with_data(result)
@@ -430,10 +433,12 @@ class TestQualityIssueServiceComprehensive:
 
         result = await service.create_issue(
             analysis_id=analysis_id,
-            issue_type="style",
-            severity="low",
-            rule_id="E302",
+            issue_type=IssueType.STYLE_VIOLATION,
+            severity=IssueSeverity.LOW,
+            rule="E302",
             file_path="src/style.py",
+            line_number=1,
+            column_number=1,
             message="Expected 2 blank lines",
         )
 
@@ -451,10 +456,12 @@ class TestQualityIssueServiceComprehensive:
         analysis_id = str(uuid.uuid4())
         create_result = await service.create_issue(
             analysis_id=analysis_id,
-            issue_type="complexity",
-            severity="medium",
-            rule_id="Q100",
+            issue_type=IssueType.HIGH_COMPLEXITY,
+            severity=IssueSeverity.MEDIUM,
+            rule="Q100",
             file_path="src/quality.py",
+            line_number=1,
+            column_number=1,
             message="Quality issue detected",
         )
         issue = assert_result_success_with_data(create_result)
@@ -473,18 +480,22 @@ class TestQualityIssueServiceComprehensive:
         # Create multiple issues
         await service.create_issue(
             analysis_id=analysis_id,
-            issue_type="security",
-            severity="high",
-            rule_id="S1",
+            issue_type=IssueType.SECURITY_VULNERABILITY,
+            severity=IssueSeverity.HIGH,
+            rule="S1",
             file_path="file1.py",
+            line_number=1,
+            column_number=1,
             message="Issue 1",
         )
         await service.create_issue(
             analysis_id=analysis_id,
-            issue_type="complexity",
-            severity="medium",
-            rule_id="C1",
+            issue_type=IssueType.HIGH_COMPLEXITY,
+            severity=IssueSeverity.MEDIUM,
+            rule="C1",
             file_path="file2.py",
+            line_number=1,
+            column_number=1,
             message="Issue 2",
         )
 
@@ -504,10 +515,12 @@ class TestQualityIssueServiceComprehensive:
         analysis_id = str(uuid.uuid4())
         create_result = await service.create_issue(
             analysis_id=analysis_id,
-            issue_type="syntax",
-            severity="high",
-            rule_id="B100",
+            issue_type=IssueType.SYNTAX_ERROR,
+            severity=IssueSeverity.HIGH,
+            rule="B100",
             file_path="src/bug.py",
+            line_number=1,
+            column_number=1,
             message="Bug detected",
         )
         issue = assert_result_success_with_data(create_result)
@@ -524,10 +537,12 @@ class TestQualityIssueServiceComprehensive:
         analysis_id = str(uuid.uuid4())
         create_result = await service.create_issue(
             analysis_id=analysis_id,
-            issue_type="style",
-            severity="low",
-            rule_id="FP100",
+            issue_type=IssueType.STYLE_VIOLATION,
+            severity=IssueSeverity.LOW,
+            rule="FP100",
             file_path="src/fp.py",
+            line_number=1,
+            column_number=1,
             message="False positive",
         )
         issue = assert_result_success_with_data(create_result)
@@ -546,10 +561,12 @@ class TestQualityIssueServiceComprehensive:
         analysis_id = str(uuid.uuid4())
         create_result = await service.create_issue(
             analysis_id=analysis_id,
-            issue_type="maintainability",
-            severity="medium",
-            rule_id="R100",
+            issue_type=IssueType.DUPLICATE_CODE,
+            severity=IssueSeverity.MEDIUM,
+            rule="R100",
             file_path="src/review.py",
+            line_number=1,
+            column_number=1,
             message="Needs review",
         )
         issue = assert_result_success_with_data(create_result)
@@ -578,7 +595,8 @@ class TestQualityReportServiceComprehensive:
 
         result = await service.create_report(
             analysis_id=analysis_id,
-            report_type="html",
+            format_type="html",
+            content="<html>Test report</html>",
         )
 
         report = assert_result_success_with_data(result)
@@ -598,7 +616,8 @@ class TestQualityReportServiceComprehensive:
 
         result = await service.create_report(
             analysis_id=analysis_id,
-            report_type="json",
+            format_type="json",
+            content='{"test": "report"}',
         )
 
         report = assert_result_success_with_data(result)
@@ -612,7 +631,8 @@ class TestQualityReportServiceComprehensive:
         analysis_id = str(uuid.uuid4())
         create_result = await service.create_report(
             analysis_id=analysis_id,
-            report_type="pdf",
+            format_type="pdf",
+            content="PDF content",
         )
         report = assert_result_success_with_data(create_result)
 
@@ -632,9 +652,9 @@ class TestQualityReportServiceComprehensive:
         analysis_id = str(uuid.uuid4())
 
         # Create multiple reports
-        await service.create_report(analysis_id=analysis_id, report_type="html")
-        await service.create_report(analysis_id=analysis_id, report_type="json")
-        await service.create_report(analysis_id=analysis_id, report_type="pdf")
+        await service.create_report(analysis_id=analysis_id, format_type="html", content="<html>HTML Report</html>")
+        await service.create_report(analysis_id=analysis_id, format_type="json", content='{"report": "1"}')
+        await service.create_report(analysis_id=analysis_id, format_type="pdf", content="PDF report")
 
         result = await service.list_reports(analysis_id)
 
@@ -656,7 +676,8 @@ class TestQualityReportServiceComprehensive:
         analysis_id = str(uuid.uuid4())
         create_result = await service.create_report(
             analysis_id=analysis_id,
-            report_type="temp",
+            format_type="temp",
+            content="Temporary report",
         )
         report = assert_result_success_with_data(create_result)
 
