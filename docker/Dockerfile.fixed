@@ -121,7 +121,7 @@ class FlextContainer:
 # Mock global container instance
 _global_container = FlextContainer()
 
-def get_flext_container():
+def FlextContainer.get_global():
     """Get global container instance."""
     return _global_container
 
@@ -136,8 +136,8 @@ class FlextValue(BaseModel):
     """Mock FlextValue base class."""
     pass
 
-class FlextSettings(BaseSettings):
-    """Mock FlextSettings for configuration."""
+class FlextConfig(BaseSettings):
+    """Mock FlextConfig for configuration."""
     pass
 
 class FlextConstants:
@@ -153,7 +153,7 @@ TConfigDict = Dict[str, Any]
 # Export all required symbols
 __all__: list[str] = [
     "FlextResult", "get_logger", "FlextContainer", "get_flext_container",
-    "FlextEntity", "FlextValue", "FlextSettings", "FlextConstants", 
+    "FlextEntity", "FlextValue", "FlextConfig", "FlextConstants", 
     "TAnyDict", "TConfigDict", "FlextExceptions.Error", "FlextExceptions.ValidationError",
     "FlextExceptions.ConfigurationError", "FlextExceptions.ConnectionError", "FlextProcessingError",
     "FlextExceptions.AuthenticationError", "FlextExceptions.TimeoutError"

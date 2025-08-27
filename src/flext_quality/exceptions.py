@@ -1,7 +1,7 @@
 """Quality Exception Hierarchy - Modern Pydantic v2 Patterns.
 
 This module provides quality-specific exceptions using modern patterns from flext-core.
-All exceptions follow the FlextExceptions.ErrorMixin pattern with keyword-only arguments and
+All exceptions follow the FlextExceptionsMixin pattern with keyword-only arguments and
 modern Python 3.13 type aliases for comprehensive error handling in quality operations.
 
 Copyright (c) 2025 FLEXT Contributors
@@ -36,14 +36,14 @@ class FlextQualityErrorCodes(Enum):
 
 
 # CONSOLIDATED Exception Class following FLEXT_REFACTORING_PROMPT.md pattern
-class FlextQualityExceptionsError(FlextExceptions.Error):
+class FlextQualityExceptionsError(FlextExceptions):
     """Single consolidated class containing ALL quality exceptions.
 
     Consolidates ALL exception definitions into one class following FLEXT patterns.
     Individual exceptions available as nested classes for organization.
     """
 
-    class QualityError(FlextExceptions.Error):
+    class QualityError(FlextExceptions):
         """Base exception for all quality domain errors."""
 
     class ValidationError(QualityError):

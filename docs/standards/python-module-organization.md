@@ -637,7 +637,7 @@ def configure_quality_container() -> FlextContainer:
     """Configure dependency injection container for FLEXT Quality."""
 
     # Get base FLEXT container
-    container = get_flext_container()
+    container = FlextContainer.get_global()
 
     # Register repositories
     container.register_singleton(
