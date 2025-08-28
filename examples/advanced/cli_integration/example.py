@@ -17,12 +17,13 @@ import json
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any
+
+object
 
 from flext_quality import main as quality_main
 
 
-def run_cli_analysis(project_path: str, format_type: str = "json") -> dict[str, Any]:
+def run_cli_analysis(project_path: str, format_type: str = "json") -> dict[str, object]:
     """Run FLEXT Quality CLI analysis and return parsed results.
 
     Args:
@@ -60,7 +61,6 @@ def run_cli_analysis(project_path: str, format_type: str = "json") -> dict[str, 
         out_text = stdout.getvalue()
         err_text = stderr.getvalue()
         if format_type == "json" and out_text.strip():
-
             try:
                 parsed_json = json.loads(out_text)
                 if exit_code != 0:
@@ -78,7 +78,7 @@ def run_cli_analysis(project_path: str, format_type: str = "json") -> dict[str, 
         return {"error": str(e)}
 
 
-def check_quality_thresholds(results: dict[str, Any]) -> dict[str, Any]:
+def check_quality_thresholds(results: dict[str, object]) -> dict[str, object]:
     """Check analysis results against quality thresholds.
 
     Args:

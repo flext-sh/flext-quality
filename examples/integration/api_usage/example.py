@@ -76,7 +76,7 @@ class DataProcessor:
       self.threshold = threshold
       self.processed_count = 0
 
-    def process_item(self, item: Any) -> Optional[Any]:
+    def process_item(self, item: object) -> Optional[object]:
       """Process individual item with validation."""
       if item is None:
           return None
@@ -94,7 +94,7 @@ class DataProcessor:
           logger.warning(f"Unsupported item type: {type(item)}")
           return None
 
-    def get_stats(self) -> Dict[str, Any]:
+    def get_stats(self) -> Dict[str, object]:
       """Get processing statistics."""
       return {
           "processed_count": self.processed_count,
@@ -252,7 +252,9 @@ async def demonstrate_service_integration() -> None:
             low=1,
         )
 
-        _ = issue_counts_result.value if issue_counts_result.success else None  # Handle result
+        _ = (
+            issue_counts_result.value if issue_counts_result.success else None
+        )  # Handle result
 
         # Complete the analysis
         complete_result = await analysis_service.complete_analysis(analysis.id)
@@ -388,7 +390,9 @@ def process_data(data):
                     project_path=temp_service_dir,
                 )
 
-                _ = project_result.value if project_result.success else None  # Handle result
+                _ = (
+                    project_result.value if project_result.success else None
+                )  # Handle result
 
         except ImportError:
             # Direct instantiation
@@ -422,14 +426,14 @@ async def demonstrate_custom_workflows() -> None:
 """Main application module."""
 
 import logging
-from typing import List, Dict, Any
+from typing import List, Dict, object
 
 logger = logging.getLogger(__name__)
 
 class Application:
     """Main application class."""
 
-    def __init__(self, config: Dict[str, Any]):
+    def __init__(self, config: Dict[str, object]):
       self.config = config
       self.initialized = False
 
@@ -444,7 +448,7 @@ class Application:
           logger.error(f"Initialization failed: {e}")
           return False
 
-    def process_data(self, data: List[Any]) -> List[Any]:
+    def process_data(self, data: List[object]) -> List[object]:
       """Process input data."""
       if not self.initialized:
           raise RuntimeError("Application not initialized")
@@ -460,7 +464,7 @@ class Application:
 
       return results
 
-    def _process_item(self, item: Any) -> Any:
+    def _process_item(self, item: object) -> object:
       """Process individual item."""
       if isinstance(item, str):
           return item.strip().upper()

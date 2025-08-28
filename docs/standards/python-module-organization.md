@@ -824,7 +824,7 @@ __all__: list[str] = [
 
 from __future__ import annotations
 
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, object
 
 from flext_core import FlextResult
 from flext_quality.infrastructure.container import quality_container
@@ -842,7 +842,7 @@ class QualityAPI:
         path: str,
         repository_url: Optional[str] = None,
         **config
-    ) -> FlextResult[Dict[str, Any]]:
+    ) -> FlextResult[Dict[str, object]]:
         """Create a quality project with simplified interface."""
 
         result = await self._project_service.create_project(
@@ -867,7 +867,7 @@ class QualityAPI:
         self,
         project_id: str,
         wait_for_completion: bool = False
-    ) -> FlextResult[Dict[str, Any]]:
+    ) -> FlextResult[Dict[str, object]]:
         """Analyze project with simplified interface."""
 
         result = await self._project_service.analyze_project(project_id)
@@ -907,7 +907,7 @@ class QualityAPI:
 from __future__ import annotations
 import asyncio
 from datetime import datetime, UTC
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, object
 from uuid import uuid4
 
 # Third-party imports

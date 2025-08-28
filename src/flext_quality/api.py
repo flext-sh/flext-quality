@@ -258,7 +258,7 @@ class FlextQualityAPI:
         analysis_id: UUID,
         coverage_score: float,
         complexity_score: float,
-        duplication_score: float,  # noqa: ARG002
+        duplication_score: float,
         security_score: float,
         maintainability_score: float,
     ) -> FlextResult[QualityAnalysis]:
@@ -395,10 +395,10 @@ class FlextQualityAPI:
         message: str,
         line_number: int | None = None,
         column_number: int | None = None,
-        end_line_number: int | None = None,  # noqa: ARG002
-        end_column_number: int | None = None,  # noqa: ARG002
-        code_snippet: str | None = None,  # noqa: ARG002
-        suggestion: str | None = None,  # noqa: ARG002
+        end_line_number: int | None = None,
+        end_column_number: int | None = None,
+        code_snippet: str | None = None,
+        suggestion: str | None = None,
     ) -> FlextResult[QualityIssue]:
         """Create a new quality issue.
 
@@ -426,7 +426,9 @@ class FlextQualityAPI:
             severity_enum = FlextIssueSeverity(severity)
             issue_type_enum = FlextIssueType(issue_type)
         except ValueError as e:
-            return FlextResult[QualityIssue].fail(f"Invalid severity or issue type: {e}")
+            return FlextResult[QualityIssue].fail(
+                f"Invalid severity or issue type: {e}"
+            )
 
         return await self.issue_service.create_issue(
             analysis_id=str(analysis_id),
@@ -455,8 +457,8 @@ class FlextQualityAPI:
         self,
         analysis_id: UUID,
         severity: str | None = None,
-        issue_type: str | None = None,  # noqa: ARG002
-        file_path: str | None = None,  # noqa: ARG002
+        issue_type: str | None = None,
+        file_path: str | None = None,
     ) -> FlextResult[list[QualityIssue]]:
         """List issues for an analysis with optional filters.
 
@@ -476,7 +478,9 @@ class FlextQualityAPI:
             try:
                 severity_enum = FlextIssueSeverity(severity)
             except ValueError:
-                return FlextResult[list[QualityIssue]].fail(f"Invalid severity: {severity}")
+                return FlextResult[list[QualityIssue]].fail(
+                    f"Invalid severity: {severity}"
+                )
 
         return await self.issue_service.list_issues(
             analysis_id=str(analysis_id),
@@ -528,10 +532,10 @@ class FlextQualityAPI:
     async def create_report(
         self,
         analysis_id: UUID,
-        report_type: str,  # noqa: ARG002
+        report_type: str,
         report_format: str = "summary",
         report_path: str | None = None,
-        report_size_bytes: int = 0,  # noqa: ARG002
+        report_size_bytes: int = 0,
     ) -> FlextResult[QualityReport]:
         """Create a quality report.
 

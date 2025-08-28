@@ -27,7 +27,7 @@ import json
 import sys
 from pathlib import Path
 
-# Using object instead of Any for better type safety
+# Using object instead of object for better type safety
 from flext_quality import (
     CodeAnalyzer,
     FlextQualityConstants,
@@ -144,8 +144,13 @@ def _show_recommendations(analyzer: CodeAnalyzer, results: object) -> None:
     minimum_score = 60
 
     # Score-based recommendations
-    if (score >= excellent_score or score >= very_good_score or
-        score >= good_score or score >= acceptable_score or score >= minimum_score):
+    if (
+        score >= excellent_score
+        or score >= very_good_score
+        or score >= good_score
+        or score >= acceptable_score
+        or score >= minimum_score
+    ):
         pass
 
     # Category-specific recommendations

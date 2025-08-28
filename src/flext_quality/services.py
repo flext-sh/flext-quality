@@ -93,7 +93,9 @@ class BasicQualityProjectService:
             return FlextResult[FlextQualityProject].ok(project)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to create project")
-            return FlextResult[FlextQualityProject].fail(f"Failed to create project {e}")
+            return FlextResult[FlextQualityProject].fail(
+                f"Failed to create project {e}"
+            )
 
     async def get_project(self, project_id: str) -> FlextResult[FlextQualityProject]:
         """Get a project by ID.
@@ -162,7 +164,9 @@ class BasicQualityProjectService:
             return FlextResult[FlextQualityProject].ok(updated_project)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to update project")
-            return FlextResult[FlextQualityProject].fail(f"Failed to update project: {e}")
+            return FlextResult[FlextQualityProject].fail(
+                f"Failed to update project: {e}"
+            )
 
     async def delete_project(self, project_id: str) -> FlextResult[bool]:
         """Delete a project.
@@ -233,7 +237,9 @@ class BasicQualityAnalysisService:
             return FlextResult[FlextQualityAnalysis].ok(analysis)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to create analysis")
-            return FlextResult[FlextQualityAnalysis].fail(f"Failed to create analysis {e}")
+            return FlextResult[FlextQualityAnalysis].fail(
+                f"Failed to create analysis {e}"
+            )
 
     async def get_analysis(self, analysis_id: str) -> FlextResult[FlextQualityAnalysis]:
         """Get analysis by ID.
@@ -288,7 +294,9 @@ class BasicQualityAnalysisService:
             return FlextResult[FlextQualityAnalysis].ok(updated_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to update analysis")
-            return FlextResult[FlextQualityAnalysis].fail(f"Failed to update analysis: {e}")
+            return FlextResult[FlextQualityAnalysis].fail(
+                f"Failed to update analysis: {e}"
+            )
 
     async def update_metrics(
         self,
@@ -334,7 +342,9 @@ class BasicQualityAnalysisService:
             return FlextResult[FlextQualityAnalysis].ok(updated_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to update analysis metrics")
-            return FlextResult[FlextQualityAnalysis].fail(f"Failed to update metrics: {e}")
+            return FlextResult[FlextQualityAnalysis].fail(
+                f"Failed to update metrics: {e}"
+            )
 
     async def update_scores(
         self,
@@ -380,7 +390,9 @@ class BasicQualityAnalysisService:
             return FlextResult[FlextQualityAnalysis].ok(updated_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to update analysis scores")
-            return FlextResult[FlextQualityAnalysis].fail(f"Failed to update scores: {e}")
+            return FlextResult[FlextQualityAnalysis].fail(
+                f"Failed to update scores: {e}"
+            )
 
     async def update_issue_counts(
         self,
@@ -426,9 +438,13 @@ class BasicQualityAnalysisService:
             return FlextResult[FlextQualityAnalysis].ok(updated_analysis)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to update analysis issue counts")
-            return FlextResult[FlextQualityAnalysis].fail(f"Failed to update issue counts: {e}")
+            return FlextResult[FlextQualityAnalysis].fail(
+                f"Failed to update issue counts: {e}"
+            )
 
-    async def complete_analysis(self, analysis_id: str) -> FlextResult[FlextQualityAnalysis]:
+    async def complete_analysis(
+        self, analysis_id: str
+    ) -> FlextResult[FlextQualityAnalysis]:
         """Complete an analysis.
 
         Args:
@@ -464,7 +480,9 @@ class BasicQualityAnalysisService:
             error_message=error_message,
         )
 
-    async def list_analyses(self, project_id: str) -> FlextResult[list[FlextQualityAnalysis]]:
+    async def list_analyses(
+        self, project_id: str
+    ) -> FlextResult[list[FlextQualityAnalysis]]:
         """List all analyses for a project.
 
         Args:
@@ -483,7 +501,9 @@ class BasicQualityAnalysisService:
             return FlextResult[list[FlextQualityAnalysis]].ok(analyses)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to list analyses")
-            return FlextResult[list[FlextQualityAnalysis]].fail(f"Failed to list analyses: {e}")
+            return FlextResult[list[FlextQualityAnalysis]].fail(
+                f"Failed to list analyses: {e}"
+            )
 
 
 class BasicQualityIssueService:
@@ -504,7 +524,7 @@ class BasicQualityIssueService:
         issue_type: IssueType,
         message: str,
         rule: str | None = None,
-        source: str = "ruff",  # noqa: ARG002
+        source: str = "ruff",
     ) -> FlextResult[FlextQualityIssue]:
         """Create a new quality issue.
 
@@ -581,7 +601,9 @@ class BasicQualityIssueService:
         try:
             issue = self._issues.get(issue_id)
             if issue is None:
-                return FlextResult[FlextQualityIssue].fail(f"Issue not found: {issue_id}")
+                return FlextResult[FlextQualityIssue].fail(
+                    f"Issue not found: {issue_id}"
+                )
             return FlextResult[FlextQualityIssue].ok(issue)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to get issue")
@@ -614,7 +636,9 @@ class BasicQualityIssueService:
             return FlextResult[list[FlextQualityIssue]].ok(issues)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to list issues")
-            return FlextResult[list[FlextQualityIssue]].fail(f"Failed to list issues: {e}")
+            return FlextResult[list[FlextQualityIssue]].fail(
+                f"Failed to list issues: {e}"
+            )
 
     async def mark_fixed(self, issue_id: str) -> FlextResult[FlextQualityIssue]:
         """Mark an issue as fixed.
@@ -639,7 +663,9 @@ class BasicQualityIssueService:
             return FlextResult[FlextQualityIssue].ok(updated_issue)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to mark issue as fixed")
-            return FlextResult[FlextQualityIssue].fail(f"Failed to mark issue as fixed: {e}")
+            return FlextResult[FlextQualityIssue].fail(
+                f"Failed to mark issue as fixed: {e}"
+            )
 
     async def suppress_issue(
         self,
@@ -698,7 +724,9 @@ class BasicQualityIssueService:
             return FlextResult[FlextQualityIssue].ok(updated_issue)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to unsuppress issue")
-            return FlextResult[FlextQualityIssue].fail(f"Failed to unsuppress issue: {e}")
+            return FlextResult[FlextQualityIssue].fail(
+                f"Failed to unsuppress issue: {e}"
+            )
 
 
 class BasicQualityReportService:
@@ -713,9 +741,9 @@ class BasicQualityReportService:
         self,
         analysis_id: str,
         format_type: str,
-        content: str,  # noqa: ARG002
+        content: str,
         file_path: str | None = None,
-        metadata: dict[str, object] | None = None,  # noqa: ARG002
+        metadata: dict[str, object] | None = None,
     ) -> FlextResult[FlextQualityReport]:
         """Create a new quality report.
 
@@ -784,13 +812,17 @@ class BasicQualityReportService:
         try:
             report = self._reports.get(report_id)
             if report is None:
-                return FlextResult[FlextQualityReport].fail(f"Report not found: {report_id}")
+                return FlextResult[FlextQualityReport].fail(
+                    f"Report not found: {report_id}"
+                )
             return FlextResult[FlextQualityReport].ok(report)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to get report")
             return FlextResult[FlextQualityReport].fail(f"Failed to get report: {e}")
 
-    async def list_reports(self, analysis_id: str) -> FlextResult[list[FlextQualityReport]]:
+    async def list_reports(
+        self, analysis_id: str
+    ) -> FlextResult[list[FlextQualityReport]]:
         """List all reports for an analysis.
 
         Args:

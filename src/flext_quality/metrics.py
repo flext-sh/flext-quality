@@ -248,10 +248,12 @@ class QualityMetrics(FlextModel):
         }
         defaults.update(overrides)
         # Type narrowing to satisfy MyPy - all overrides validated to be correct types
-        return cls(**defaults)  # type: ignore[arg-type]  # Dict validated with correct field types
+        return cls(**defaults)  # Dict validated with correct field types
 
     @classmethod
-    def from_analysis_results(cls, results: AnalysisResults | dict[str, object]) -> QualityMetrics:
+    def from_analysis_results(
+        cls, results: AnalysisResults | dict[str, object]
+    ) -> QualityMetrics:
         """Create QualityMetrics from AnalysisResults using modern API only.
 
         Factory method that processes AnalysisResults and calculates
@@ -296,13 +298,17 @@ class QualityMetrics(FlextModel):
         metrics = results.get("metrics", {})
         if isinstance(metrics, dict):
             files_analyzed = int(cast("int", metrics.get("total_files")) or 0)
-            total_lines_of_code = int(cast("int", metrics.get("total_lines_of_code")) or 0)
+            total_lines_of_code = int(
+                cast("int", metrics.get("total_lines_of_code")) or 0
+            )
             total_functions = int(cast("int", metrics.get("total_functions")) or 0)
             total_classes = int(cast("int", metrics.get("total_classes")) or 0)
         else:
             # Fallback to top-level keys - safe cast for Pyright
             files_analyzed = int(cast("int", results.get("files_analyzed")) or 0)
-            total_lines_of_code = int(cast("int", results.get("total_lines_of_code")) or 0)
+            total_lines_of_code = int(
+                cast("int", results.get("total_lines_of_code")) or 0
+            )
             total_functions = int(cast("int", results.get("total_functions")) or 0)
             total_classes = int(cast("int", results.get("total_classes")) or 0)
 
@@ -314,10 +320,14 @@ class QualityMetrics(FlextModel):
             dead_code_issues = len(issues.get("dead_code", []))
             duplication_issues = len(issues.get("duplicates", []))
         else:
-            security_issues = complexity_issues = dead_code_issues = duplication_issues = 0
+            security_issues = complexity_issues = dead_code_issues = (
+                duplication_issues
+            ) = 0
 
         # Calculate simple quality score based on issues
-        total_issues = security_issues + complexity_issues + dead_code_issues + duplication_issues
+        total_issues = (
+            security_issues + complexity_issues + dead_code_issues + duplication_issues
+        )
         quality_score = max(0, 100 - (total_issues * 5))  # Simple penalty-based scoring
 
         return cls(
@@ -331,8 +341,8 @@ class QualityMetrics(FlextModel):
             total_classes=total_classes,
             # Complexity metrics
             average_complexity=0.0,  # Not available from dict
-            max_complexity=0.0,      # Not available from dict
-            complex_files_count=0,   # Not available from dict
+            max_complexity=0.0,  # Not available from dict
+            complex_files_count=0,  # Not available from dict
             # Issue counts
             security_issues_count=security_issues,
             dead_code_items_count=dead_code_issues,

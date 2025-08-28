@@ -4,8 +4,8 @@ import json
 import tempfile
 from pathlib import Path
 
-# AnalysisResults import removed - using Any for legacy dict compatibility testing
-from typing import Any
+# AnalysisResults import removed - using object for legacy dict compatibility testing
+object
 
 import pytest
 
@@ -27,7 +27,7 @@ class TestQualityReport:
     @pytest.fixture
     def minimal_results(
         self,
-    ) -> Any:  # Legacy dict format for backward compatibility testing
+    ) -> object:  # Legacy dict format for backward compatibility testing
         """Minimal analysis results for testing."""
         return {
             "issues": {},
@@ -40,7 +40,7 @@ class TestQualityReport:
     @pytest.fixture
     def good_results(
         self,
-    ) -> Any:  # Legacy dict format for backward compatibility testing
+    ) -> object:  # Legacy dict format for backward compatibility testing
         """Analysis results with good quality scores."""
         return {
             "issues": {
@@ -70,7 +70,7 @@ class TestQualityReport:
     @pytest.fixture
     def poor_results(
         self,
-    ) -> Any:  # Legacy dict format for backward compatibility testing
+    ) -> object:  # Legacy dict format for backward compatibility testing
         """Analysis results with poor quality scores."""
         return {
             "issues": {
@@ -129,7 +129,7 @@ class TestQualityReport:
     @pytest.fixture
     def mixed_results(
         self,
-    ) -> Any:  # Legacy dict format for backward compatibility testing
+    ) -> object:  # Legacy dict format for backward compatibility testing
         """Analysis results with mixed quality."""
         return {
             "issues": {
@@ -169,18 +169,18 @@ class TestQualityReport:
             },
         }
 
-    def test_report_initialization(self, minimal_results: Any) -> None:
+    def test_report_initialization(self, minimal_results: object) -> None:
         """Test QualityReport initialization."""
         report = QualityReport(minimal_results)
         assert report.results == minimal_results
 
-    def test_get_quality_score_minimal(self, minimal_results: Any) -> None:
+    def test_get_quality_score_minimal(self, minimal_results: object) -> None:
         """Test quality score calculation with minimal issues."""
         report = QualityReport(minimal_results)
         score = report._get_quality_score()
         assert score == 100  # No issues = perfect score
 
-    def test_get_quality_score_with_issues(self, poor_results: Any) -> None:
+    def test_get_quality_score_with_issues(self, poor_results: object) -> None:
         """Test quality score calculation with many issues."""
         report = QualityReport(poor_results)
         score = report._get_quality_score()
@@ -265,7 +265,7 @@ class TestQualityReport:
             assert color.startswith("#")
             assert len(color) == 7  # #RRGGBB format
 
-    def test_get_total_issues(self, mixed_results: Any) -> None:
+    def test_get_total_issues(self, mixed_results: object) -> None:
         """Test total issue calculation."""
         report = QualityReport(mixed_results)
         total = report._get_total_issues()
@@ -274,7 +274,7 @@ class TestQualityReport:
         expected_total = 1 + 1 + 1 + 1  # security + errors + complexity + duplicates
         assert total == expected_total
 
-    def test_get_critical_issues(self, mixed_results: Any) -> None:
+    def test_get_critical_issues(self, mixed_results: object) -> None:
         """Test critical issue calculation."""
         report = QualityReport(mixed_results)
         critical = report._get_critical_issues()
@@ -283,13 +283,13 @@ class TestQualityReport:
         expected_critical = 2  # 1 security + 1 errors
         assert critical == expected_critical
 
-    def test_get_files_analyzed(self, good_results: Any) -> None:
+    def test_get_files_analyzed(self, good_results: object) -> None:
         """Test files analyzed extraction."""
         report = QualityReport(good_results)
         files = report._get_files_analyzed()
         assert files == 10
 
-    def test_get_coverage_percent(self, good_results: Any) -> None:
+    def test_get_coverage_percent(self, good_results: object) -> None:
         """Test coverage percentage extraction."""
         report = QualityReport(good_results)
         coverage = report._get_coverage_percent()
@@ -297,7 +297,7 @@ class TestQualityReport:
 
     def test_generate_text_report_minimal(
         self,
-        minimal_results: Any,
+        minimal_results: object,
     ) -> None:
         """Test text report generation with minimal data."""
         report = QualityReport(minimal_results)
@@ -314,7 +314,7 @@ class TestQualityReport:
 
     def test_generate_text_report_with_issues(
         self,
-        poor_results: Any,
+        poor_results: object,
     ) -> None:
         """Test text report generation with many issues."""
         report = QualityReport(poor_results)
@@ -336,7 +336,7 @@ class TestQualityReport:
 
     def test_generate_text_report_issue_truncation(
         self,
-        poor_results: Any,
+        poor_results: object,
     ) -> None:
         """Test that text report truncates long issue lists."""
         # Cast to mutable dict and modify results to have many style issues
@@ -357,7 +357,7 @@ class TestQualityReport:
         assert "... and" in text_report
         assert "more" in text_report
 
-    def test_generate_json_report(self, good_results: Any) -> None:
+    def test_generate_json_report(self, good_results: object) -> None:
         """Test JSON report generation."""
         report = QualityReport(good_results)
         json_report = report.generate_json_report()
@@ -382,7 +382,7 @@ class TestQualityReport:
 
     def test_generate_html_report_structure(
         self,
-        mixed_results: Any,
+        mixed_results: object,
     ) -> None:
         """Test HTML report structure and content."""
         report = QualityReport(mixed_results)
@@ -409,7 +409,7 @@ class TestQualityReport:
 
     def test_generate_html_report_issues_section(
         self,
-        mixed_results: Any,
+        mixed_results: object,
     ) -> None:
         """Test HTML report issues section."""
         report = QualityReport(mixed_results)
@@ -438,7 +438,7 @@ class TestQualityReport:
         # Check that some color is present (flexible test)
         assert "#" in html_report or "color:" in html_report  # Some color styling
 
-    def test_generate_issues_html_empty(self, minimal_results: Any) -> None:
+    def test_generate_issues_html_empty(self, minimal_results: object) -> None:
         """Test HTML issues generation with no issues."""
         report = QualityReport(minimal_results)
         issues_html = report._generate_issues_html()
@@ -448,7 +448,7 @@ class TestQualityReport:
 
     def test_generate_issues_html_with_issues(
         self,
-        mixed_results: Any,
+        mixed_results: object,
     ) -> None:
         """Test HTML issues generation with various issues."""
         report = QualityReport(mixed_results)
@@ -486,7 +486,7 @@ class TestQualityReport:
 
     def test_generate_recommendations_excellent_code(
         self,
-        minimal_results: Any,
+        minimal_results: object,
     ) -> None:
         """Test recommendations for excellent code quality."""
         # Modify to have high coverage and no issues
@@ -503,7 +503,7 @@ class TestQualityReport:
 
     def test_generate_recommendations_critical_issues(
         self,
-        mixed_results: Any,
+        mixed_results: object,
     ) -> None:
         """Test recommendations for critical issues."""
         report = QualityReport(mixed_results)
@@ -519,7 +519,7 @@ class TestQualityReport:
 
     def test_generate_recommendations_many_issues(
         self,
-        poor_results: Any,
+        poor_results: object,
     ) -> None:
         """Test recommendations for many issues."""
         report = QualityReport(poor_results)
@@ -599,7 +599,7 @@ class TestQualityReport:
         assert complex_rec is not None
         assert "simplify" in complex_rec.lower()
 
-    def test_save_report_text_format(self, good_results: Any) -> None:
+    def test_save_report_text_format(self, good_results: object) -> None:
         """Test saving report in text format."""
         report = QualityReport(good_results)
 
@@ -612,7 +612,7 @@ class TestQualityReport:
             assert "FLEXT QUALITY REPORT" in content
             assert "Overall Grade:" in content
 
-    def test_save_report_json_format(self, good_results: Any) -> None:
+    def test_save_report_json_format(self, good_results: object) -> None:
         """Test saving report in JSON format."""
         report = QualityReport(good_results)
 
@@ -628,7 +628,7 @@ class TestQualityReport:
             assert "summary" in data
             assert "analysis_results" in data
 
-    def test_save_report_html_format(self, good_results: Any) -> None:
+    def test_save_report_html_format(self, good_results: object) -> None:
         """Test saving report in HTML format."""
         report = QualityReport(good_results)
 
@@ -641,7 +641,7 @@ class TestQualityReport:
             assert "<!DOCTYPE html>" in content
             assert "FLEXT Quality Report" in content
 
-    def test_save_report_default_format(self, good_results: Any) -> None:
+    def test_save_report_default_format(self, good_results: object) -> None:
         """Test saving report with default format (text)."""
         report = QualityReport(good_results)
 
