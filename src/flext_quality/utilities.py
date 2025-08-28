@@ -32,23 +32,23 @@ else:
     QualityIssueList = list[object]
 
 
-class FlextQualityUtilities(FlextUtilities):
-    """Quality-specific utilities extending flext-core FlextUtilities.
+class FlextQualityUtilities:
+    """Quality-specific utilities using FlextUtilities composition.
 
-    Adds quality-specific functionality while inheriting all base utility methods.
-    Uses proper FLEXT patterns and eliminates code duplication.
+    Uses composition with all FlextUtilities functionalities while adding
+    quality-specific functionality. Eliminates inheritance complexity.
     """
 
     @staticmethod
     def is_quality_issue_list(value: object) -> bool:
         """Type guard to check if value is a list of quality issues."""
-        # Use FlextUtilities base type checking
-        if not FlextUtilities.TypeGuards.is_list(value):
+        # Use native Python type checking since FlextUtilities doesn't have is_list
+        if not isinstance(value, list):
             return False
         if not value:  # Empty list is valid
             return True
         # Quality-specific check: issues have file_path and message
-        # Cast to list for safe access after TypeGuards.is_list check
+        # Cast to list for safe access after isinstance check
         value_list = cast("list[object]", value)
         first_item = value_list[0]
         return (
@@ -75,10 +75,10 @@ class FlextQualityUtilities(FlextUtilities):
 
         # For all other issue types - use safe string conversion
         if hasattr(issue, "file_path") and hasattr(issue, "line_number"):
-            file_path = FlextUtilities.Conversions.safe_str(
+            file_path = FlextUtilities.TextProcessor.safe_string(
                 getattr(issue, "file_path", ""), "unknown"
             )
-            line_number = FlextUtilities.Conversions.safe_str(
+            line_number = FlextUtilities.TextProcessor.safe_string(
                 getattr(issue, "line_number", ""), "?"
             )
             return f"{file_path}:{line_number}"
@@ -86,10 +86,11 @@ class FlextQualityUtilities(FlextUtilities):
         return "Unknown location"
 
 
-class FlextReportUtilities(FlextUtilities):
-    """Report generation utilities extending flext-core FlextUtilities.
+class FlextReportUtilities:
+    """Report generation utilities using FlextUtilities composition.
 
-    Handles quality-specific report formatting while using base utility methods.
+    Uses composition with all FlextUtilities functionalities for
+    quality-specific report formatting.
     """
 
     @staticmethod
@@ -118,19 +119,20 @@ class FlextReportUtilities(FlextUtilities):
     @staticmethod
     def safe_extend_lines(target: list[str], source: object) -> None:
         """Safely extend target list with source items."""
-        # Use FlextUtilities type checking and safe conversion
-        if FlextUtilities.TypeGuards.is_list(source):
+        # Use native Python type checking since FlextUtilities doesn't have is_list
+        if isinstance(source, list):
             str_items = [
-                FlextUtilities.Conversions.safe_str(item, "")
+                FlextUtilities.TextProcessor.safe_string(item, "")
                 for item in source  # type: ignore[attr-defined]
             ]
             target.extend(str_items)
 
 
-class FlextTestUtilities(FlextUtilities):
-    """Testing utilities extending flext-core FlextUtilities.
+class FlextTestUtilities:
+    """Testing utilities using FlextUtilities composition.
 
-    Provides quality-specific testing utilities while using base methods.
+    Uses composition with all FlextUtilities functionalities for
+    quality-specific testing utilities.
     """
 
     @staticmethod
@@ -235,10 +237,11 @@ def process_data_type_b(data):
             file_path.write_text("# Test file", encoding="utf-8")
 
 
-class FlextAnalysisUtilities(FlextUtilities):
-    """Analysis utilities extending flext-core FlextUtilities.
+class FlextAnalysisUtilities:
+    """Analysis utilities using FlextUtilities composition.
 
-    Provides quality-specific analysis utilities while using base methods.
+    Uses composition with all FlextUtilities functionalities for
+    quality-specific analysis utilities.
     """
 
     @staticmethod

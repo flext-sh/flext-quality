@@ -45,7 +45,7 @@ class DataProcessor:
       self.threshold = threshold
       self.processed_count = 0
 
-    def process_items(self, items: List[Any]) -> List[Any]:
+    def process_items(self, items: List[object]) -> List[object]:
       """Process list of items."""
       results = []
       for item in items:
@@ -57,11 +57,11 @@ class DataProcessor:
 
       return results
 
-    def _is_valid_item(self, item: Any) -> bool:
+    def _is_valid_item(self, item: object) -> bool:
       """Check if item is valid for processing."""
       return item is not None and isinstance(item, (str, int, float))
 
-    def _process_single_item(self, item: Any) -> Any:
+    def _process_single_item(self, item: object) -> object:
       """Process a single item."""
       if isinstance(item, str):
           return item.upper().strip()
@@ -136,7 +136,9 @@ def multiply(x: int, y: int) -> int:
 
         # Verify basic metrics
         assert results["project_path"] == str(sample_project_dir)
-        assert results.overall_metrics.files_analyzed == 3  # main.py, utils.py, __init__.py
+        assert (
+            results.overall_metrics.files_analyzed == 3
+        )  # main.py, utils.py, __init__.py
         assert results["total_lines"] > 0
 
         # Verify file list
@@ -412,7 +414,9 @@ class TestCodeAnalyzerEdgeCases:
             results = analyzer.analyze_project()
 
             assert hasattr(results, "overall_metrics")
-            assert results.overall_metrics.files_analyzed >= 0  # Should handle gracefully
+            assert (
+                results.overall_metrics.files_analyzed >= 0
+            )  # Should handle gracefully
 
     def test_nested_directory_structure(self) -> None:
         """Test analyzer with nested directory structure."""
@@ -440,7 +444,9 @@ class TestCodeAnalyzerEdgeCases:
             results = analyzer.analyze_project()
 
             assert hasattr(results, "overall_metrics")
-            assert results.overall_metrics.files_analyzed == 4  # Should find all Python files
+            assert (
+                results.overall_metrics.files_analyzed == 4
+            )  # Should find all Python files
 
             # Check that files from different directories are found
             file_names = [Path(fm.file_path).name for fm in results.file_metrics]

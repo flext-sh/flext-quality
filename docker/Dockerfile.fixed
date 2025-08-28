@@ -42,20 +42,21 @@ mock_dir.mkdir(exist_ok=True)
 with open(mock_dir / '__init__.py', 'w') as f:
     f.write('''# Complete Mock flext_core for FLEXT Quality - ALL IMPORTS
 import logging
-from typing import Any, Dict, Optional, Union
+from typing import Dict, Optional, Union
+
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
 
 class FlextResult:
     """Mock FlextResult for enterprise compatibility."""
-    def __init__(self, success: bool, data: Any = None, error: str = None):
+    def __init__(self, success: bool, data: object = None, error: str = None):
         self.success = success
         self.is_failure = not success
         self.data = data
         self.error = error
     
     @classmethod
-    def ok(cls, data: Any = None):
+    def ok(cls, data: object = None):
         return cls(True, data=data)
     
     @classmethod 
@@ -102,7 +103,7 @@ class FlextContainer:
     def __init__(self):
         self._services = {}
     
-    def register(self, name: str, service: Any):
+    def register(self, name: str, service: object):
         self._services[name] = service
         return FlextResult.ok(None)
     
@@ -147,8 +148,8 @@ class FlextConstants:
     MAX_RETRIES = 3
 
 # Type aliases for compatibility
-TAnyDict = Dict[str, Any]
-TConfigDict = Dict[str, Any]
+TAnyDict = Dict[str, object]
+TConfigDict = Dict[str, object]
 
 # Export all required symbols
 __all__: list[str] = [

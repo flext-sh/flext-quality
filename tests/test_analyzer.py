@@ -653,7 +653,7 @@ class TestCodeAnalyzer:
         assert isinstance(dead_code_issues, list)
 
         # The analysis should complete without crashing, even with problematic files
-        # Any warnings about file issues should be logged
+        # object warnings about file issues should be logged
         warning_messages = [
             record.message for record in caplog.records if record.levelname == "WARNING"
         ]
