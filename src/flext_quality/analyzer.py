@@ -6,7 +6,7 @@ import ast
 import warnings
 from pathlib import Path
 
-from flext_core import get_logger
+from flext_core import FlextLogger
 from flext_observability import (
     flext_create_log_entry,
     flext_create_metric,
@@ -26,7 +26,7 @@ from flext_quality.analysis_types import (
 )
 from flext_quality.grade_calculator import QualityGradeCalculator
 
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 # Constants
 MIN_FILE_SIZE_FOR_DUPLICATION_CHECK = 100

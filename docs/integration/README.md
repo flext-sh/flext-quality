@@ -19,11 +19,11 @@ FLEXT Quality provides multiple integration points:
 FLEXT Quality is built on flext-core foundation patterns:
 
 ```python
-from flext_core import FlextEntity, FlextResult, FlextContainer
+from flext_core import FlextModels.Entity, FlextResult, FlextContainer
 from flext_quality.domain.entities import QualityProject
 
-# All domain entities extend FlextEntity
-class QualityProject(FlextEntity):
+# All domain entities extend FlextModels.Entity
+class QualityProject(FlextModels.Entity):
     """Quality project following flext-core patterns."""
 
     def validate_standards(self) -> FlextResult[bool]:

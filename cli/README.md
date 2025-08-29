@@ -136,7 +136,7 @@ class BaseCommand(ABC):
 
     def __init__(self, container: FlextContainer):
         self.container = container
-        self.logger = get_logger(self.__class__.__name__)
+        self.logger = FlextLogger(self.__class__.__name__)
 
     @abstractmethod
     async def execute(self, **kwargs) -> FlextResult[dict]:

@@ -94,7 +94,7 @@ class FlextExceptions.TimeoutError(FlextExceptions.Error):
     """Timeout error."""
     pass
 
-def get_logger(name: str):
+def FlextLogger(name: str):
     """Mock logger factory."""
     return logging.getLogger(name)
 
@@ -126,15 +126,15 @@ def FlextContainer.get_global():
     """Get global container instance."""
     return _global_container
 
-class FlextEntity(BaseModel):
-    """Mock FlextEntity base class."""
+class FlextModels.Entity(BaseModel):
+    """Mock FlextModels.Entity base class."""
     id: str = "mock_id"
     
     def validate_domain_rules(self):
         return FlextResult.ok(None)
 
-class FlextValue(BaseModel):
-    """Mock FlextValue base class."""
+class FlextModels.Value(BaseModel):
+    """Mock FlextModels.Value base class."""
     pass
 
 class FlextConfig(BaseSettings):
@@ -153,8 +153,8 @@ TConfigDict = Dict[str, object]
 
 # Export all required symbols
 __all__: list[str] = [
-    "FlextResult", "get_logger", "FlextContainer", "get_flext_container",
-    "FlextEntity", "FlextValue", "FlextConfig", "FlextConstants", 
+    "FlextResult", "FlextLogger", "FlextContainer", "get_flext_container",
+    "FlextModels.Entity", "FlextModels.Value", "FlextConfig", "FlextConstants", 
     "TAnyDict", "TConfigDict", "FlextExceptions.Error", "FlextExceptions.ValidationError",
     "FlextExceptions.ConfigurationError", "FlextExceptions.ConnectionError", "FlextProcessingError",
     "FlextExceptions.AuthenticationError", "FlextExceptions.TimeoutError"

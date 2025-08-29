@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from uuid import UUID
 
-from flext_core import FlextResult, get_logger
+from flext_core import FlextLogger, FlextResult
 from flext_observability import (
     flext_create_log_entry as _flext_create_log_entry,
     flext_create_trace as _flext_create_trace,
@@ -24,7 +24,7 @@ from flext_quality.services import (
 flext_create_log_entry = _flext_create_log_entry
 flext_create_trace = _flext_create_trace
 
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 
 class FlextQualityHandlers:
@@ -130,7 +130,9 @@ class FlextQualityHandlers:
 
         return FlextResult[dict[str, object]].ok(linting_data)
 
-    async def run_security_check(self, project_id: UUID) -> FlextResult[dict[str, object]]:
+    async def run_security_check(
+        self, project_id: UUID
+    ) -> FlextResult[dict[str, object]]:
         """Handle security check command."""
         # Return placeholder result since security service is not implemented
         security_data: dict[str, object] = {

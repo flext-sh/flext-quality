@@ -17,7 +17,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-from flext_core import FlextContainer, get_logger
+from flext_core import FlextContainer, FlextLogger
 from flext_observability import (
     flext_create_log_entry,
     flext_create_metric,
@@ -35,7 +35,7 @@ from flext_quality import (
     QualityReportService,
 )
 
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 
 async def demonstrate_simple_api() -> None:

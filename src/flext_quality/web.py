@@ -17,7 +17,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from flask import Response as FlaskResponse, jsonify, request
-from flext_core import get_logger
+from flext_core import FlextLogger
 from flext_web import create_service, get_web_settings
 from werkzeug.wrappers import Response as WerkzeugResponse
 
@@ -26,7 +26,7 @@ from flext_quality.api import QualityAPI
 
 ResponseType = FlaskResponse | WerkzeugResponse | tuple[FlaskResponse, int]
 
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 
 class FlextQualityWebInterface:

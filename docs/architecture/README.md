@@ -241,7 +241,7 @@ Separate models for read and write operations:
 ├──────────────────────────────────────────────────────────────┤
 │  flext-core Integration                                      │
 │  ┌─────────────┐ ┌─────────────┐ ┌─────────────────────────┐│
-│  │FlextEntity  │ │FlextResult  │ │   FlextContainer        ││
+│  │FlextModels.Entity  │ │FlextResult  │ │   FlextContainer        ││
 │  │  (Base)     │ │ (Errors)    │ │ (Dependency Inject)     ││
 │  └─────────────┘ └─────────────┘ └─────────────────────────┘│
 ├──────────────────────────────────────────────────────────────┤

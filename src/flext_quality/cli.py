@@ -12,7 +12,7 @@ import sys
 import traceback
 from pathlib import Path
 
-from flext_core import get_logger
+from flext_core import FlextLogger
 
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.reports import QualityReport
@@ -31,7 +31,7 @@ def setup_logging(level: str = "INFO") -> None:
 
 def run_web_server(args: argparse.Namespace) -> int:
     """Run quality web interface server."""
-    get_logger(__name__)
+    FlextLogger(__name__)
 
     try:
         interface = FlextQualityWebInterface()
@@ -97,7 +97,7 @@ def analyze_project(args: argparse.Namespace) -> int:
             return 1  # Medium quality
         return 2  # Poor quality
     except (RuntimeError, ValueError, TypeError):
-        logger = get_logger(__name__)
+        logger = FlextLogger(__name__)
         # EXPLICIT TRANSPARENCY: CLI function must return exit code for process management
         logger.exception("Quality analysis failed with specific error")
         logger.exception("Returning exit code 3 to indicate analysis failure")
@@ -134,7 +134,7 @@ def score_project(args: argparse.Namespace) -> int:
 
         return 0 if score >= acceptable_quality_threshold else 1
     except (RuntimeError, ValueError, TypeError):
-        logger = get_logger(__name__)
+        logger = FlextLogger(__name__)
         logger.exception("Quality score calculation failed")
         return 3
 

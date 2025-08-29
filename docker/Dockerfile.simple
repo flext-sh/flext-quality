@@ -32,7 +32,7 @@ class FlextResult:
     def fail(cls, error: str):
         return cls(False, error=error)
 
-def get_logger(name: str):
+def FlextLogger(name: str):
     return logging.getLogger(name)
 
 class FlextContainer:
@@ -48,7 +48,7 @@ class FlextContainer:
             return FlextResult.ok(self._services[name])
         return FlextResult.fail(f"Service {name} not found")
 
-class FlextEntity(BaseModel):
+class FlextModels.Entity(BaseModel):
     id: str = "mock_id"
     
     def validate_domain_rules(self):
