@@ -447,6 +447,6 @@ try:
     ReportGeneratedEvent.model_rebuild()
 except Exception as e:
     # Log rebuild errors in development - should not affect runtime
-    import logging
+    from flext_core import get_logger
 
-    logging.getLogger(__name__).debug("Model rebuild error: %s", e)
+    get_logger(__name__).debug("Model rebuild error: %s", e)
