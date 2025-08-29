@@ -84,8 +84,8 @@ Implements external dependencies and adapters:
 All components built on flext-core foundation patterns:
 
 - **FlextResult**: Consistent error handling and operation outcomes
-- **FlextEntity**: Domain entity base classes with validation
-- **FlextValue**: Immutable value objects with business rules
+- **FlextModels.Entity**: Domain entity base classes with validation
+- **FlextModels.Value**: Immutable value objects with business rules
 - **FlextContainer**: Dependency injection for testability
 
 ### Observability Integration

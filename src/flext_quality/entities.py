@@ -12,14 +12,14 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import override
 
-from flext_core import FlextEntity, FlextResult, FlextValue
+from flext_core import FlextModels.Entity, FlextResult, FlextModels.Value
 from pydantic import Field
 
 from flext_quality.typings import FlextTypes
 from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
 
 
-class FlextDomainEvent(FlextValue):
+class FlextDomainEvent(FlextModels.Value):
     """Base class for domain events."""
 
     event_type: str
@@ -40,7 +40,7 @@ AnalysisStatus = FlextAnalysisStatus
 warnings.warn("AnalysisStatus is deprecated; use FlextAnalysisStatus", DeprecationWarning, stacklevel=2)
 
 
-class FlextQualityProject(FlextEntity):
+class FlextQualityProject(FlextModels.Entity):
     """Quality project domain entity using enhanced mixins for code reduction."""
 
     # Project identification
@@ -89,7 +89,7 @@ QualityProject = FlextQualityProject
 warnings.warn("QualityProject is deprecated; use FlextQualityProject", DeprecationWarning, stacklevel=2)
 
 
-class FlextQualityAnalysis(FlextEntity):
+class FlextQualityAnalysis(FlextModels.Entity):
     """Quality analysis domain entity using enhanced mixins for code reduction."""
 
     project_id: str = Field(..., description="Associated project ID")
@@ -212,7 +212,7 @@ QualityAnalysis = FlextQualityAnalysis
 warnings.warn("QualityAnalysis is deprecated; use FlextQualityAnalysis", DeprecationWarning, stacklevel=2)
 
 
-class FlextQualityIssue(FlextEntity):
+class FlextQualityIssue(FlextModels.Entity):
     """Quality issue domain entity using enhanced mixins for code reduction."""
 
     analysis_id: str = Field(..., description="Associated analysis ID")
@@ -288,7 +288,7 @@ QualityIssue = FlextQualityIssue
 warnings.warn("QualityIssue is deprecated; use FlextQualityIssue", DeprecationWarning, stacklevel=2)
 
 
-class FlextQualityRule(FlextEntity):
+class FlextQualityRule(FlextModels.Entity):
     """Quality rule domain entity using enhanced mixins for code reduction."""
 
     # Rule identification
@@ -338,7 +338,7 @@ QualityRule = FlextQualityRule
 warnings.warn("QualityRule is deprecated; use FlextQualityRule", DeprecationWarning, stacklevel=2)
 
 
-class FlextQualityReport(FlextEntity):
+class FlextQualityReport(FlextModels.Entity):
     """Quality report domain entity using enhanced mixins for code reduction."""
 
     analysis_id: str = Field(..., description="Associated analysis ID")
@@ -447,6 +447,6 @@ try:
     ReportGeneratedEvent.model_rebuild()
 except Exception as e:
     # Log rebuild errors in development - should not affect runtime
-    from flext_core import get_logger
+    from flext_core import FlextLogger
 
-    get_logger(__name__).debug("Model rebuild error: %s", e)
+    FlextLogger(__name__).debug("Model rebuild error: %s", e)

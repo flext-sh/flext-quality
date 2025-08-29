@@ -651,14 +651,14 @@ POST /api/v1/rules
 ```json
 {
   "name": "FLEXT Entity Pattern",
-  "description": "Ensure all domain entities extend FlextEntity",
+  "description": "Ensure all domain entities extend FlextModels.Entity",
   "category": "architecture",
   "severity": "high",
   "analyzer": "semgrep",
   "rule_definition": {
     "pattern": "class $CLASS(...):\n  ...",
-    "condition": "not ($CLASS extends FlextEntity)",
-    "message": "Domain entities must extend FlextEntity"
+    "condition": "not ($CLASS extends FlextModels.Entity)",
+    "message": "Domain entities must extend FlextModels.Entity"
   },
   "enabled": true
 }

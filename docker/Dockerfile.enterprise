@@ -52,7 +52,7 @@ class FlextResult:
     def ok(cls, data=None): return cls(True, data=data)
     @classmethod 
     def fail(cls, error): return cls(False, error=error)
-def get_logger(name): return logging.getLogger(name)
+def FlextLogger(name): return logging.getLogger(name)
 class FlextContainer:
     def __init__(self): self._services = {}
     def register(self, name, service): self._services[name] = service; return FlextResult.ok(None)

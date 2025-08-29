@@ -1,7 +1,7 @@
 """Application services for FLEXT-QUALITY v0.7.0.
 
 Services following flext-cli patterns with multiple service classes per module.
-Uses working flext-core imports: FlextResult, get_logger.
+Uses working flext-core imports: FlextResult, FlextLogger.
 """
 
 from __future__ import annotations
@@ -10,7 +10,7 @@ import warnings
 from pathlib import Path
 from uuid import uuid4
 
-from flext_core import FlextProtocols, FlextResult, get_logger
+from flext_core import FlextLogger, FlextProtocols, FlextResult
 
 from flext_quality.entities import (
     FlextAnalysisStatus,
@@ -26,7 +26,7 @@ from flext_quality.value_objects import (
     FlextIssueType as IssueType,
 )
 
-logger = get_logger(__name__)
+logger = FlextLogger(__name__)
 
 # Use flext-core protocols instead of local definitions
 QualityServiceProtocol = FlextProtocols.Domain.Service
@@ -40,7 +40,7 @@ class BasicQualityProjectService:
     def __init__(self) -> None:
         """Initialize service with in-memory repository."""
         self._projects: dict[str, FlextQualityProject] = {}
-        self._logger = get_logger(__name__)
+        self._logger = FlextLogger(__name__)
 
     async def create_project(
         self,
@@ -196,7 +196,7 @@ class BasicQualityAnalysisService:
     def __init__(self) -> None:
         """Initialize service with in-memory repository."""
         self._analyses: dict[str, FlextQualityAnalysis] = {}
-        self._logger = get_logger(__name__)
+        self._logger = FlextLogger(__name__)
 
     async def create_analysis(
         self,
@@ -512,7 +512,7 @@ class BasicQualityIssueService:
     def __init__(self) -> None:
         """Initialize service with in-memory repository."""
         self._issues: dict[str, FlextQualityIssue] = {}
-        self._logger = get_logger(__name__)
+        self._logger = FlextLogger(__name__)
 
     async def create_issue(
         self,
@@ -735,7 +735,7 @@ class BasicQualityReportService:
     def __init__(self) -> None:
         """Initialize service with in-memory repository."""
         self._reports: dict[str, FlextQualityReport] = {}
-        self._logger = get_logger(__name__)
+        self._logger = FlextLogger(__name__)
 
     async def create_report(
         self,
@@ -862,7 +862,7 @@ class ExternalAnalysisService:
     def __init__(self) -> None:
         """Initialize service with external backend."""
         self._backend = ExternalBackend()
-        self._logger = get_logger(__name__)
+        self._logger = FlextLogger(__name__)
 
     async def analyze_with_backend(
         self,

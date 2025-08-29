@@ -9,7 +9,7 @@ from __future__ import annotations
 from enum import StrEnum
 from pathlib import Path
 
-from flext_core import FlextResult, FlextValue
+from flext_core import FlextResult, FlextModels.Value
 from pydantic import Field
 
 # Quality Score Constants
@@ -126,7 +126,7 @@ GRADE_THRESHOLDS = [
 ]
 
 
-class QualityScore(FlextValue):
+class QualityScore(FlextModels.Value):
     """Quality score value object with validation and grade calculation."""
 
     value: float = Field(..., ge=MIN_QUALITY_SCORE, le=MAX_QUALITY_SCORE, description="Quality score percentage")
@@ -153,7 +153,7 @@ class QualityScore(FlextValue):
         return QualityGrade.F
 
 
-class IssueLocation(FlextValue):
+class IssueLocation(FlextModels.Value):
     """Represents location of an issue in source code."""
 
     line: int = Field(..., ge=1, description="Line number")
@@ -179,7 +179,7 @@ class IssueLocation(FlextValue):
         return f"lines {self.line}-{self.end_line}"
 
 
-class ComplexityMetric(FlextValue):
+class ComplexityMetric(FlextModels.Value):
     """Complexity metrics for code analysis."""
 
     cyclomatic: int = Field(default=1, ge=1, description="Cyclomatic complexity")
@@ -213,7 +213,7 @@ class ComplexityMetric(FlextValue):
         return "very complex"
 
 
-class CoverageMetric(FlextValue):
+class CoverageMetric(FlextModels.Value):
     """Code coverage metrics with weighted calculations."""
 
     line_coverage: float = Field(default=MIN_QUALITY_SCORE, ge=MIN_QUALITY_SCORE, le=MAX_QUALITY_SCORE, description="Line coverage %")
@@ -246,7 +246,7 @@ class CoverageMetric(FlextValue):
         return self.overall_coverage >= MIN_COVERAGE_REQUIREMENT
 
 
-class DuplicationMetric(FlextValue):
+class DuplicationMetric(FlextModels.Value):
     """Code duplication metrics."""
 
     duplicate_lines: int = Field(default=0, ge=0, description="Number of duplicate lines")
@@ -272,7 +272,7 @@ class DuplicationMetric(FlextValue):
         return self.duplication_percentage < MAX_DUPLICATION_THRESHOLD
 
 
-class FilePath(FlextValue):
+class FilePath(FlextModels.Value):
     """File path value object with validation."""
 
     value: str = Field(..., min_length=1, max_length=MAX_PATH_LENGTH, description="File path string")

@@ -27,7 +27,7 @@ src/flext_quality/
 │
 ├── domain/                         # Domain Layer (Core Business Logic)
 │   ├── __init__.py                # Domain public exports
-│   ├── entities.py                # Domain entities (FlextEntity-based)
+│   ├── entities.py                # Domain entities (FlextModels.Entity-based)
 │   ├── value_objects.py           # Value objects and domain primitives
 │   ├── ports.py                   # Interfaces and contracts
 │   ├── services.py                # Domain services
@@ -149,10 +149,10 @@ from __future__ import annotations
 from datetime import datetime, UTC
 from typing import Optional, List
 
-from flext_core import FlextEntity, FlextResult
+from flext_core import FlextModels.Entity, FlextResult
 from flext_quality.domain.value_objects import QualityScore, QualityGrade
 
-class QualityProject(FlextEntity):
+class QualityProject(FlextModels.Entity):
     """Quality project aggregate root."""
 
     # Domain attributes
@@ -191,7 +191,7 @@ class QualityProject(FlextEntity):
 
         return min(compliance_score, 100.0)
 
-class QualityAnalysis(FlextEntity):
+class QualityAnalysis(FlextModels.Entity):
     """Quality analysis aggregate."""
 
     project_id: str
@@ -761,7 +761,7 @@ from __future__ import annotations
 from flext_quality.__version__ import __version__, __version_info__
 
 # Core patterns from flext-core
-from flext_core import FlextResult, FlextEntity, FlextContainer
+from flext_core import FlextResult, FlextModels.Entity, FlextContainer
 
 # Domain exports (most commonly used)
 from flext_quality.domain import (
@@ -793,7 +793,7 @@ __all__: list[str] = [
 
     # Core patterns
     "FlextResult",
-    "FlextEntity",
+    "FlextModels.Entity",
     "FlextContainer",
 
     # Domain models
@@ -915,7 +915,7 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
 # FLEXT core imports
-from flext_core import FlextResult, FlextEntity, FlextContainer
+from flext_core import FlextResult, FlextModels.Entity, FlextContainer
 from flext_observability import flext_monitor_function
 
 # Project imports (relative)
@@ -1100,7 +1100,7 @@ Integration:
     - Coordinates with [other FLEXT services]
 
 See Also:
-    - flext_core.FlextEntity: Base entity pattern
+    - flext_core.FlextModels.Entity: Base entity pattern
     - flext_core.FlextResult: Error handling pattern
     - Related module documentation
 """
@@ -1111,7 +1111,7 @@ See Also:
 Follow Google-style docstrings with FLEXT-specific sections:
 
 ```python
-class QualityProject(FlextEntity):
+class QualityProject(FlextModels.Entity):
     """Quality project domain entity following FLEXT patterns.
 
     Represents a code project under quality analysis within the FLEXT ecosystem.
@@ -1136,7 +1136,7 @@ class QualityProject(FlextEntity):
         >>> assert result.success
 
     Integration:
-        - Extends flext_core.FlextEntity for base functionality
+        - Extends flext_core.FlextModels.Entity for base functionality
         - Monitored via flext-observability integration
         - Persisted through repository pattern
     """

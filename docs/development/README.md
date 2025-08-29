@@ -120,11 +120,11 @@ flext-quality/
 All development must follow flext-core patterns:
 
 ```python
-from flext_core import FlextEntity, FlextResult, FlextContainer
+from flext_core import FlextModels.Entity, FlextResult, FlextContainer
 from flext_observability import flext_monitor_function
 
 # Domain Entities
-class QualityProject(FlextEntity):
+class QualityProject(FlextModels.Entity):
     """Quality project domain entity following flext-core patterns."""
     name: str
     project_path: str

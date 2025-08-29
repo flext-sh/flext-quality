@@ -30,7 +30,7 @@ class Project(models.Model):
     path = models.CharField(max_length=500)
 
 # src/flext_quality/domain/entities.py
-class QualityProject(FlextEntity):
+class QualityProject(FlextModels.Entity):
     name: str
     project_path: str
 ```
