@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from flext_core import FlextModel
+from flext_core import FlextModels
 
 
-class ClassInfo(FlextModel):
+class ClassInfo(FlextModels):
     """Strongly-typed class information from AST analysis."""
 
     name: str

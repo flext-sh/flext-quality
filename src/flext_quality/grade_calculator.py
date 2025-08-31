@@ -67,6 +67,10 @@ class FlextQualityGradeCalculator:
 
 # Legacy compatibility facade - DEPRECATED
 QualityGradeCalculator = FlextQualityGradeCalculator
-warnings.warn("QualityGradeCalculator is deprecated; use FlextQualityGradeCalculator", DeprecationWarning, stacklevel=2)
+warnings.warn(
+    "QualityGradeCalculator is deprecated; use FlextQualityGradeCalculator",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 __all__ = ["FlextQualityGradeCalculator", "QualityGradeCalculator"]

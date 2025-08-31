@@ -361,9 +361,15 @@ class FlextQualityReportGenerator:
 
 
 # Legacy compatibility facade - DEPRECATED
-FlextQualityReport = FlextQualityReportGenerator  # Keep old name for backward compatibility
+FlextQualityReport = (
+    FlextQualityReportGenerator  # Keep old name for backward compatibility
+)
 QualityReport = FlextQualityReportGenerator
-warnings.warn("QualityReport is deprecated; use FlextQualityReportGenerator", DeprecationWarning, stacklevel=2)
+warnings.warn(
+    "QualityReport is deprecated; use FlextQualityReportGenerator",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 __all__ = [
     "HIGH_ISSUE_THRESHOLD",

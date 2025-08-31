@@ -51,10 +51,7 @@ class FlextQualityUtilities:
         # Cast to list for safe access after isinstance check
         value_list = cast("list[object]", value)
         first_item = value_list[0]
-        return (
-            hasattr(first_item, "file_path")
-            and hasattr(first_item, "message")
-        )
+        return hasattr(first_item, "file_path") and hasattr(first_item, "message")
 
     @staticmethod
     def safe_issue_list(value: object) -> list[object]:

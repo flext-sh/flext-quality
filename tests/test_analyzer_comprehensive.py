@@ -89,7 +89,9 @@ class TestCodeAnalyzerComprehensive:
         # Use modern AnalysisResults API instead of dict access
         # Note: Security issues depend on the specific code content
         assert len(results.security_issues) >= 0  # May or may not have security issues
-        assert len(results.complexity_issues) >= 0  # May or may not have complexity issues
+        assert (
+            len(results.complexity_issues) >= 0
+        )  # May or may not have complexity issues
         # When disabled, these should be empty lists
         assert results.dead_code_issues == []
         assert results.duplication_issues == []
@@ -485,8 +487,12 @@ def handle_data(data):
         assert trace_call is not None
         args, kwargs = trace_call
         # Check for observability parameters - any one of these indicates proper tracing
-        assert ("trace_id" in kwargs or "operation_name" in kwargs or
-                "service_name" in kwargs or len(args) > 0)
+        assert (
+            "trace_id" in kwargs
+            or "operation_name" in kwargs
+            or "service_name" in kwargs
+            or len(args) > 0
+        )
 
     def test_analyze_project_integration_flow(
         self,

@@ -640,7 +640,7 @@ class TestQualityReportServiceFunctional:
         create_result = await service.create_report(
             analysis_id="test-analysis",
             format_type="json",
-            content='{"test": "content"}'
+            content='{"test": "content"}',
         )
         report_id = create_result.value.id
 
@@ -666,17 +666,13 @@ class TestQualityReportServiceFunctional:
         await service.create_report(
             analysis_id="analysis-1",
             format_type="html",
-            content="<html>Report 1</html>"
+            content="<html>Report 1</html>",
         )
         await service.create_report(
-            analysis_id="analysis-1",
-            format_type="json",
-            content='{"report": "1"}'
+            analysis_id="analysis-1", format_type="json", content='{"report": "1"}'
         )
         await service.create_report(
-            analysis_id="analysis-2",
-            format_type="pdf",
-            content="PDF content"
+            analysis_id="analysis-2", format_type="pdf", content="PDF content"
         )
 
         # List reports for analysis-1
@@ -702,7 +698,7 @@ class TestQualityReportServiceFunctional:
         create_result = await service.create_report(
             analysis_id="test-analysis",
             format_type="html",
-            content="<html>Report to delete</html>"
+            content="<html>Report to delete</html>",
         )
         report_id = create_result.value.id
 
@@ -788,7 +784,7 @@ class TestServiceIntegration:
             report_result = await report_service.create_report(
                 analysis_id=str(analysis.id),
                 format_type="html",
-                content="<html>Integration test report</html>"
+                content="<html>Integration test report</html>",
             )
             assert report_result.success
 

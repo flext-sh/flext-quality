@@ -295,7 +295,9 @@ class TestQualityReportService:
             content="<html>Test Report</html>",
         )
         report_data = assert_result_success_with_data(result)
-        assert report_data.report_type == "html"  # Entity uses report_type, not format_type
+        assert (
+            report_data.report_type == "html"
+        )  # Entity uses report_type, not format_type
         assert hasattr(report_data, "analysis_id")
 
     async def test_get_report(self, service: QualityReportService) -> None:

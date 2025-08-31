@@ -12,7 +12,7 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import override
 
-from flext_core import FlextModels.Entity, FlextResult, FlextModels.Value
+from flext_core import FlextModels, FlextResult
 from pydantic import Field
 
 from flext_quality.typings import FlextTypes
