@@ -652,9 +652,17 @@ class TestQualityReportServiceComprehensive:
         analysis_id = str(uuid.uuid4())
 
         # Create multiple reports
-        await service.create_report(analysis_id=analysis_id, format_type="html", content="<html>HTML Report</html>")
-        await service.create_report(analysis_id=analysis_id, format_type="json", content='{"report": "1"}')
-        await service.create_report(analysis_id=analysis_id, format_type="pdf", content="PDF report")
+        await service.create_report(
+            analysis_id=analysis_id,
+            format_type="html",
+            content="<html>HTML Report</html>",
+        )
+        await service.create_report(
+            analysis_id=analysis_id, format_type="json", content='{"report": "1"}'
+        )
+        await service.create_report(
+            analysis_id=analysis_id, format_type="pdf", content="PDF report"
+        )
 
         result = await service.list_reports(analysis_id)
 

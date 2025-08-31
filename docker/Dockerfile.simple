@@ -72,7 +72,7 @@ class FlextExceptions.ConfigurationError(FlextExceptions.Error):
 class FlextExceptions.ConnectionError(FlextExceptions.Error):
     pass
 
-class FlextProcessingError(FlextExceptions.Error):
+class FlextExceptions.ProcessingError(FlextExceptions.Error):
     pass
 
 class FlextExceptions.AuthenticationError(FlextExceptions.Error):

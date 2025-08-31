@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import warnings
 
-from flext_core import FlextConfig.BaseConfigModel
+from flext_core import FlextConfig.BaseModel
 from pydantic_settings import SettingsConfigDict
 
 
-class FlextQualityConfig(FlextConfig.BaseConfigModel):
+class FlextQualityConfig(FlextConfig.BaseModel):
     """Quality service configuration using flext-core patterns."""
 
     # Analysis settings

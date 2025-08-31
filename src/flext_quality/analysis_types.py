@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextModel
+from flext_core import FlextModels
 from pydantic import Field
 
 from flext_quality.value_objects import (
@@ -18,7 +18,7 @@ from flext_quality.value_objects import (
 )
 
 
-class FileAnalysisResult(FlextModel):
+class FileAnalysisResult(FlextModels):
     """Result of analyzing a single file."""
 
     file_path: Path = Field(..., description="Path to the analyzed file")
@@ -33,15 +33,13 @@ class FileAnalysisResult(FlextModel):
     dead_code_lines: int = Field(default=0, ge=0, description="Lines of dead code")
 
 
-class ComplexityIssue(FlextModel):
+class ComplexityIssue(FlextModels):
     """Represents a complexity issue in code."""
 
     file_path: str = Field(..., description="File where issue was found")
     function_name: str = Field(..., description="Function with complexity issue")
     line_number: int = Field(..., ge=1, description="Line number of function")
-    complexity_value: int = Field(
-        ..., ge=1, description="Cyclomatic complexity value"
-    )
+    complexity_value: int = Field(..., ge=1, description="Cyclomatic complexity value")
     message: str = Field(..., description="Human-readable issue message")
     issue_type: str = Field(
         default="high_complexity", description="Type of complexity issue"
@@ -51,7 +49,7 @@ class ComplexityIssue(FlextModel):
     )
 
 
-class SecurityIssue(FlextModel):
+class SecurityIssue(FlextModels):
     """Represents a security issue found in code."""
 
     file_path: str = Field(..., description="File where issue was found")
@@ -68,14 +66,16 @@ class SecurityIssue(FlextModel):
     )
 
 
-class DeadCodeIssue(FlextModel):
+class DeadCodeIssue(FlextModels):
     """Represents dead/unused code found during analysis."""
 
     file_path: str = Field(..., description="File containing dead code")
     line_number: int = Field(..., ge=1, description="Line number of dead code")
     end_line_number: int = Field(..., ge=1, description="End line number of dead code")
     issue_type: str = Field(..., description="Type of dead code")
-    code_type: str = Field(..., description="Type of code element (function, class, etc)")
+    code_type: str = Field(
+        ..., description="Type of code element (function, class, etc)"
+    )
     code_snippet: str = Field(..., description="The unused code snippet")
     message: str = Field(..., description="Human-readable issue message")
     severity: IssueSeverity = Field(
@@ -83,7 +83,7 @@ class DeadCodeIssue(FlextModel):
     )
 
 
-class DuplicationIssue(FlextModel):
+class DuplicationIssue(FlextModels):
     """Represents code duplication detected in analysis."""
 
     files: list[str] = Field(..., description="Files containing duplicated code")
@@ -103,7 +103,7 @@ class DuplicationIssue(FlextModel):
     )
 
 
-class OverallMetrics(FlextModel):
+class OverallMetrics(FlextModels):
     """Overall metrics for the entire analysis."""
 
     files_analyzed: int = Field(default=0, ge=0, description="Total files analyzed")
@@ -134,7 +134,7 @@ class OverallMetrics(FlextModel):
     )
 
 
-class AnalysisResults(FlextModel):
+class AnalysisResults(FlextModels):
     """Complete analysis results containing all metrics and issues."""
 
     overall_metrics: OverallMetrics = Field(

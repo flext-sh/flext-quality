@@ -82,7 +82,7 @@ class FlextExceptions.ConnectionError(FlextExceptions.Error):
     """Connection error."""
     pass
 
-class FlextProcessingError(FlextExceptions.Error):
+class FlextExceptions.ProcessingError(FlextExceptions.Error):
     """Processing error."""
     pass
 
@@ -156,7 +156,7 @@ __all__: list[str] = [
     "FlextResult", "FlextLogger", "FlextContainer", "get_flext_container",
     "FlextModels.Entity", "FlextModels.Value", "FlextConfig", "FlextConstants", 
     "TAnyDict", "TConfigDict", "FlextExceptions.Error", "FlextExceptions.ValidationError",
-    "FlextExceptions.ConfigurationError", "FlextExceptions.ConnectionError", "FlextProcessingError",
+    "FlextExceptions.ConfigurationError", "FlextExceptions.ConnectionError", "FlextExceptions.ProcessingError",
     "FlextExceptions.AuthenticationError", "FlextExceptions.TimeoutError"
 ]
 ''')
@@ -186,7 +186,7 @@ class FlextExceptions.ConnectionError(FlextExceptions.Error):
     """Connection error."""
     pass
 
-class FlextProcessingError(FlextExceptions.Error):
+class FlextExceptions.ProcessingError(FlextExceptions.Error):
     """Processing error."""
     pass
 
@@ -200,7 +200,7 @@ class FlextExceptions.TimeoutError(FlextExceptions.Error):
 
 __all__: list[str] = [
     "FlextExceptions.Error", "FlextExceptions.ValidationError", "FlextExceptions.ConfigurationError",
-    "FlextExceptions.ConnectionError", "FlextProcessingError", "FlextExceptions.AuthenticationError",
+    "FlextExceptions.ConnectionError", "FlextExceptions.ProcessingError", "FlextExceptions.AuthenticationError",
     "FlextExceptions.TimeoutError"
 ]
 ''')

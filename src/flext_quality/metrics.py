@@ -19,12 +19,12 @@ Scoring Categories:
     - Documentation Score: Assessment of code documentation quality
 
 Architecture:
-    Built as a FlextModel using flext-core patterns for immutability
+    Built as a FlextModels using flext-core patterns for immutability
     and validation. Integrates with QualityGradeCalculator for consistent
     grading across the FLEXT ecosystem.
 
 Integration:
-    - Uses flext-core.FlextModel for immutable data structures
+    - Uses flext-core.FlextModels for immutable data structures
     - Integrates with domain layer for grade calculation
     - Provides dict[str, object] compatibility for data exchange
     - Supports validation through FlextResult patterns
@@ -46,7 +46,7 @@ from __future__ import annotations
 
 from typing import cast, override
 
-from flext_core import FlextModel, FlextResult
+from flext_core import FlextModels, FlextResult
 from pydantic import Field
 
 from flext_quality.analysis_types import AnalysisResults
@@ -56,7 +56,7 @@ from flext_quality.grade_calculator import QualityGradeCalculator
 MAX_QUALITY_SCORE = 100
 
 
-class QualityMetrics(FlextModel):
+class QualityMetrics(FlextModels):
     """Comprehensive Quality Metrics Value Object.
 
     Immutable value object that encapsulates comprehensive code quality
