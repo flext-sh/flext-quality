@@ -21,7 +21,7 @@ from pydantic import Field, field_validator
 from flext_quality.constants import FlextQualityConstants
 
 
-class FlextQualityBaseModel(FlextModels.BaseModel):
+class FlextQualityBaseModel(FlextModels.BaseConfig):
     """Base model for all quality domain entities extending FlextModels patterns."""
 
 
