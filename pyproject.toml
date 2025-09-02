@@ -219,6 +219,7 @@ directory = "reports/coverage"
 output = "reports/coverage.xml"
 [tool.poetry.dependencies]
 python = ">=3.13,<3.14"
+flext-cli = {path = "../flext-cli", develop = true}
 
 [tool.poetry.group.dev.dependencies]
 ruff = ">=0.12.3"

@@ -21,11 +21,7 @@ from pydantic import Field, field_validator
 from flext_quality.constants import FlextQualityConstants
 
 
-class FlextQualityBaseModel(FlextModels.BaseConfig):
-    """Base model for all quality domain entities extending FlextModels patterns."""
-
-
-class FlextQualityProjectModel(FlextQualityBaseModel):
+class FlextQualityProjectModel(FlextModels.BaseConfig):
     """Pydantic model for quality project representation."""
 
     id: UUID = Field(..., description="Unique project identifier")
@@ -49,7 +45,7 @@ class FlextQualityProjectModel(FlextQualityBaseModel):
         return v.strip()
 
 
-class FlextQualityAnalysisModel(FlextQualityBaseModel):
+class FlextQualityAnalysisModel(FlextModels.BaseConfig):
     """Pydantic model for quality analysis representation."""
 
     id: UUID = Field(..., description="Unique analysis identifier")
@@ -91,7 +87,7 @@ class FlextQualityAnalysisModel(FlextQualityBaseModel):
         return max(0.0, min(100.0, v))
 
 
-class FlextQualityIssueModel(FlextQualityBaseModel):
+class FlextQualityIssueModel(FlextModels.BaseConfig):
     """Pydantic model for quality issue representation."""
 
     id: UUID = Field(..., description="Unique issue identifier")
@@ -117,7 +113,7 @@ class FlextQualityIssueModel(FlextQualityBaseModel):
         return v
 
 
-class FlextQualityReportModel(FlextQualityBaseModel):
+class FlextQualityReportModel(FlextModels.BaseConfig):
     """Pydantic model for quality report representation."""
 
     id: UUID = Field(..., description="Unique report identifier")
@@ -133,7 +129,7 @@ class FlextQualityReportModel(FlextQualityBaseModel):
     )
 
 
-class FlextAnalysisConfigModel(FlextQualityBaseModel):
+class FlextAnalysisConfigModel(FlextModels.BaseConfig):
     """Pydantic model for analysis configuration."""
 
     include_patterns: list[str] = Field(
@@ -177,7 +173,6 @@ class FlextAnalysisConfigModel(FlextQualityBaseModel):
 __all__ = [
     "FlextAnalysisConfigModel",
     "FlextQualityAnalysisModel",
-    "FlextQualityBaseModel",
     "FlextQualityIssueModel",
     "FlextQualityProjectModel",
     "FlextQualityReportModel",
