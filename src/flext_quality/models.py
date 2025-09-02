@@ -1,7 +1,7 @@
 """Centralized Pydantic models for flext-quality.
 
 This module provides centralized model definitions following FLEXT patterns,
-extending FlextModels.Entity from flext-core for consistency across the ecosystem.
+extending FlextModels from flext-core for consistency across the ecosystem.
 
 Models are organized by domain responsibility:
 - Quality: Core quality analysis models
@@ -21,8 +21,8 @@ from pydantic import Field, field_validator
 from flext_quality.constants import FlextQualityConstants
 
 
-class FlextQualityBaseModel(FlextModels):
-    """Base model for all quality domain entities extending FlextModels.Entity patterns."""
+class FlextQualityBaseModel(FlextModels.BaseModel):
+    """Base model for all quality domain entities extending FlextModels patterns."""
 
 
 class FlextQualityProjectModel(FlextQualityBaseModel):

@@ -19,7 +19,7 @@ from flext_quality.typings import FlextTypes
 from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
 
 
-class FlextDomainEvent(FlextModels.Value):
+class FlextDomainEvent(FlextModels):
     """Base class for domain events."""
 
     event_type: str
@@ -37,10 +37,14 @@ class FlextAnalysisStatus(StrEnum):
 
 # Legacy compatibility facade - DEPRECATED
 AnalysisStatus = FlextAnalysisStatus
-warnings.warn("AnalysisStatus is deprecated; use FlextAnalysisStatus", DeprecationWarning, stacklevel=2)
+warnings.warn(
+    "AnalysisStatus is deprecated; use FlextAnalysisStatus",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 
-class FlextQualityProject(FlextModels.Entity):
+class FlextQualityProject(FlextModels):
     """Quality project domain entity using enhanced mixins for code reduction."""
 
     # Project identification
@@ -86,10 +90,14 @@ class FlextQualityProject(FlextModels.Entity):
 
 # Legacy compatibility facade - DEPRECATED
 QualityProject = FlextQualityProject
-warnings.warn("QualityProject is deprecated; use FlextQualityProject", DeprecationWarning, stacklevel=2)
+warnings.warn(
+    "QualityProject is deprecated; use FlextQualityProject",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 
-class FlextQualityAnalysis(FlextModels.Entity):
+class FlextQualityAnalysis(FlextModels):
     """Quality analysis domain entity using enhanced mixins for code reduction."""
 
     project_id: str = Field(..., description="Associated project ID")
@@ -209,10 +217,14 @@ class FlextQualityAnalysis(FlextModels.Entity):
 
 # Legacy compatibility facade - DEPRECATED
 QualityAnalysis = FlextQualityAnalysis
-warnings.warn("QualityAnalysis is deprecated; use FlextQualityAnalysis", DeprecationWarning, stacklevel=2)
+warnings.warn(
+    "QualityAnalysis is deprecated; use FlextQualityAnalysis",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 
-class FlextQualityIssue(FlextModels.Entity):
+class FlextQualityIssue(FlextModels):
     """Quality issue domain entity using enhanced mixins for code reduction."""
 
     analysis_id: str = Field(..., description="Associated analysis ID")
@@ -285,10 +297,14 @@ class FlextQualityIssue(FlextModels.Entity):
 
 # Legacy compatibility facade - DEPRECATED
 QualityIssue = FlextQualityIssue
-warnings.warn("QualityIssue is deprecated; use FlextQualityIssue", DeprecationWarning, stacklevel=2)
+warnings.warn(
+    "QualityIssue is deprecated; use FlextQualityIssue",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 
-class FlextQualityRule(FlextModels.Entity):
+class FlextQualityRule(FlextModels):
     """Quality rule domain entity using enhanced mixins for code reduction."""
 
     # Rule identification
@@ -335,10 +351,12 @@ class FlextQualityRule(FlextModels.Entity):
 
 # Legacy compatibility facade - DEPRECATED
 QualityRule = FlextQualityRule
-warnings.warn("QualityRule is deprecated; use FlextQualityRule", DeprecationWarning, stacklevel=2)
+warnings.warn(
+    "QualityRule is deprecated; use FlextQualityRule", DeprecationWarning, stacklevel=2
+)
 
 
-class FlextQualityReport(FlextModels.Entity):
+class FlextQualityReport(FlextModels):
     """Quality report domain entity using enhanced mixins for code reduction."""
 
     analysis_id: str = Field(..., description="Associated analysis ID")
@@ -378,7 +396,11 @@ class FlextQualityReport(FlextModels.Entity):
 
 # Legacy compatibility facade - DEPRECATED
 QualityReport = FlextQualityReport
-warnings.warn("QualityReport is deprecated; use FlextQualityReport", DeprecationWarning, stacklevel=2)
+warnings.warn(
+    "QualityReport is deprecated; use FlextQualityReport",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 
 # Domain Events
