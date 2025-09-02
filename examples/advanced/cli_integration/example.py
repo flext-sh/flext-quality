@@ -18,8 +18,6 @@ import sys
 import tempfile
 from pathlib import Path
 
-object
-
 from flext_quality import main as quality_main
 
 

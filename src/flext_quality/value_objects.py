@@ -9,7 +9,7 @@ from __future__ import annotations
 from enum import StrEnum
 from pathlib import Path
 
-from flext_core import FlextResult, FlextModels.Value
+from flext_core import FlextModels, FlextResult
 from pydantic import Field
 
 # Quality Score Constants
@@ -126,10 +126,15 @@ GRADE_THRESHOLDS = [
 ]
 
 
-class QualityScore(FlextModels.Value):
+class QualityScore(FlextModels):
     """Quality score value object with validation and grade calculation."""
 
-    value: float = Field(..., ge=MIN_QUALITY_SCORE, le=MAX_QUALITY_SCORE, description="Quality score percentage")
+    value: float = Field(
+        ...,
+        ge=MIN_QUALITY_SCORE,
+        le=MAX_QUALITY_SCORE,
+        description="Quality score percentage",
+    )
 
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate business rules for quality score."""
@@ -153,7 +158,7 @@ class QualityScore(FlextModels.Value):
         return QualityGrade.F
 
 
-class IssueLocation(FlextModels.Value):
+class IssueLocation(FlextModels):
     """Represents location of an issue in source code."""
 
     line: int = Field(..., ge=1, description="Line number")
@@ -179,7 +184,7 @@ class IssueLocation(FlextModels.Value):
         return f"lines {self.line}-{self.end_line}"
 
 
-class ComplexityMetric(FlextModels.Value):
+class ComplexityMetric(FlextModels):
     """Complexity metrics for code analysis."""
 
     cyclomatic: int = Field(default=1, ge=1, description="Cyclomatic complexity")
@@ -213,12 +218,27 @@ class ComplexityMetric(FlextModels.Value):
         return "very complex"
 
 
-class CoverageMetric(FlextModels.Value):
+class CoverageMetric(FlextModels):
     """Code coverage metrics with weighted calculations."""
 
-    line_coverage: float = Field(default=MIN_QUALITY_SCORE, ge=MIN_QUALITY_SCORE, le=MAX_QUALITY_SCORE, description="Line coverage %")
-    branch_coverage: float = Field(default=MIN_QUALITY_SCORE, ge=MIN_QUALITY_SCORE, le=MAX_QUALITY_SCORE, description="Branch coverage %")
-    function_coverage: float = Field(default=MIN_QUALITY_SCORE, ge=MIN_QUALITY_SCORE, le=MAX_QUALITY_SCORE, description="Function coverage %")
+    line_coverage: float = Field(
+        default=MIN_QUALITY_SCORE,
+        ge=MIN_QUALITY_SCORE,
+        le=MAX_QUALITY_SCORE,
+        description="Line coverage %",
+    )
+    branch_coverage: float = Field(
+        default=MIN_QUALITY_SCORE,
+        ge=MIN_QUALITY_SCORE,
+        le=MAX_QUALITY_SCORE,
+        description="Branch coverage %",
+    )
+    function_coverage: float = Field(
+        default=MIN_QUALITY_SCORE,
+        ge=MIN_QUALITY_SCORE,
+        le=MAX_QUALITY_SCORE,
+        description="Function coverage %",
+    )
 
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate coverage metrics business rules."""
@@ -246,16 +266,24 @@ class CoverageMetric(FlextModels.Value):
         return self.overall_coverage >= MIN_COVERAGE_REQUIREMENT
 
 
-class DuplicationMetric(FlextModels.Value):
+class DuplicationMetric(FlextModels):
     """Code duplication metrics."""
 
-    duplicate_lines: int = Field(default=0, ge=0, description="Number of duplicate lines")
+    duplicate_lines: int = Field(
+        default=0, ge=0, description="Number of duplicate lines"
+    )
     total_lines: int = Field(default=0, ge=0, description="Total lines of code")
-    duplicate_blocks: int = Field(default=0, ge=0, description="Number of duplicate blocks")
+    duplicate_blocks: int = Field(
+        default=0, ge=0, description="Number of duplicate blocks"
+    )
 
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate duplication metrics business rules."""
-        if self.duplicate_lines < 0 or self.total_lines < 0 or self.duplicate_blocks < 0:
+        if (
+            self.duplicate_lines < 0
+            or self.total_lines < 0
+            or self.duplicate_blocks < 0
+        ):
             return FlextResult[None].fail("All metrics must be >= 0")
         return FlextResult[None].ok(None)
 
@@ -272,10 +300,12 @@ class DuplicationMetric(FlextModels.Value):
         return self.duplication_percentage < MAX_DUPLICATION_THRESHOLD
 
 
-class FilePath(FlextModels.Value):
+class FilePath(FlextModels):
     """File path value object with validation."""
 
-    value: str = Field(..., min_length=1, max_length=MAX_PATH_LENGTH, description="File path string")
+    value: str = Field(
+        ..., min_length=1, max_length=MAX_PATH_LENGTH, description="File path string"
+    )
     is_absolute: bool = Field(default=False, description="Whether path is absolute")
 
     def validate_business_rules(self) -> FlextResult[None]:

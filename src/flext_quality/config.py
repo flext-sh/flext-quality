@@ -4,11 +4,11 @@ from __future__ import annotations
 
 import warnings
 
-from flext_core import FlextConfig.BaseModel
+from flext_core import FlextModels
 from pydantic_settings import SettingsConfigDict
 
 
-class FlextQualityConfig(FlextConfig.BaseModel):
+class FlextQualityConfig(FlextModels.BaseModel):
     """Quality service configuration using flext-core patterns."""
 
     # Analysis settings
@@ -27,7 +27,11 @@ class FlextQualityConfig(FlextConfig.BaseModel):
 
 # Legacy compatibility facade - DEPRECATED
 QualityConfig = FlextQualityConfig
-warnings.warn("QualityConfig is deprecated; use FlextQualityConfig", DeprecationWarning, stacklevel=2)
+warnings.warn(
+    "QualityConfig is deprecated; use FlextQualityConfig",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 # Export all classes
 __all__ = [
