@@ -4,9 +4,6 @@ import json
 import tempfile
 from pathlib import Path
 
-# AnalysisResults import removed - using object for legacy dict compatibility testing
-object
-
 import pytest
 
 from flext_quality import (

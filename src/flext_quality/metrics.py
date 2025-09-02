@@ -652,5 +652,9 @@ class QualityMetrics(FlextModels):
         return FlextResult[None].ok(None)
 
 
-# Rebuild model to resolve forward references
-QualityMetrics.model_rebuild()
+# Rebuild model to resolve forward references - Pydantic v2 compatibility
+try:
+    QualityMetrics.model_rebuild()
+except AttributeError:
+    # Pydantic v1 compatibility or no model_rebuild needed
+    pass
