@@ -13,7 +13,7 @@ FLEXT Quality is a comprehensive code quality analysis and metrics service for t
 The project follows Clean Architecture with clear separation of concerns:
 
 - **Domain Layer** (`src/flext_quality/domain/`): Core business entities, value objects, and domain logic
-- **Application Layer** (`src/flext_quality/application/`): Service classes and application-specific business rules  
+- **Application Layer** (`src/flext_quality/application/`): Service classes and application-specific business rules
 - **Infrastructure Layer** (`src/flext_quality/infrastructure/`): External dependencies, repositories, and adapters
 - **CLI Interface** (`src/flext_quality/cli.py`): Command-line interface for quality operations
 
@@ -39,6 +39,7 @@ The domain is centered around these core entities (all extending `FlextEntity`):
 - `QualityReport`: Generated reports from analysis results
 
 Key value objects include:
+
 - `IssueSeverity` (CRITICAL, HIGH, MEDIUM, LOW, INFO)
 - `IssueType` (COMPLEXITY, SECURITY, DEAD_CODE, DUPLICATION, STYLE, etc.)
 - `AnalysisStatus` (QUEUED, ANALYZING, COMPLETED, FAILED)
@@ -55,7 +56,7 @@ make validate                 # Full validation (lint + type + security + test +
 
 # Essential checks
 make check                    # Quick health check (lint + type)
-make lint                     # Ruff linting 
+make lint                     # Ruff linting
 make type-check               # MyPy strict mode type checking
 make security                 # Security scans (bandit + pip-audit)
 make format                   # Format code with ruff
@@ -68,7 +69,7 @@ make fix                      # Auto-fix issues with ruff
 # Test execution
 make test                     # Run tests with 90% coverage requirement
 make test-unit                # Unit tests only
-make test-integration         # Integration tests only  
+make test-integration         # Integration tests only
 make test-quality             # Quality analysis tests
 make test-django              # Django-specific tests
 make test-analysis            # Analysis engine tests
@@ -95,7 +96,7 @@ The core functionality of the service:
 # Analysis operations
 make analyze                  # Run comprehensive quality analysis
 make quality-check            # Check quality thresholds
-make metrics                  # Collect quality metrics  
+make metrics                  # Collect quality metrics
 make report                   # Generate quality reports
 make workspace-analyze        # Analyze entire FLEXT workspace
 make detect-issues            # Detect quality issues
@@ -304,7 +305,7 @@ from flext_quality.backends.base import BaseAnalyzer, BackendType
 
 class CustomBackend(BaseAnalyzer):
     backend_type = BackendType.STATIC_ANALYSIS
-    
+
     def analyze_file(self, file_path: Path) -> FileAnalysisResult:
         # Implementation specific analysis
         return FileAnalysisResult(...)
@@ -333,6 +334,7 @@ Quality analysis follows a structured workflow:
 7. Complete analysis with `complete_analysis()` or `fail_analysis(error)`
 
 Key classes in the workflow:
+
 - `CodeAnalyzer`: Orchestrates multi-backend analysis
 - `QualityAnalysisService`: Manages analysis lifecycle
 - `QualityGradeCalculator`: Computes quality scores and grades
@@ -369,7 +371,7 @@ export QUALITY_MIN_MAINTAINABILITY=80.0
 FLEXT Quality integrates with the broader FLEXT ecosystem:
 
 - **flext-core**: Base patterns, FlextResult, FlextEntity, DI container
-- **flext-observability**: Monitoring, metrics, tracing, health checks  
+- **flext-observability**: Monitoring, metrics, tracing, health checks
 - **flext-web**: Web interface integration (planned)
 - **flext-cli**: CLI command integration (planned)
 
@@ -398,6 +400,7 @@ Dependencies are declared in pyproject.toml using local file paths for ecosystem
 ### Architecture Completeness
 
 The project demonstrates a complete Clean Architecture implementation with:
+
 - Well-defined layer boundaries and dependency rules
 - Comprehensive domain modeling with entities, value objects, and events
 - Application services following CQRS patterns with handlers
@@ -495,6 +498,7 @@ make format                       # Format code
 **Project Structure Questions:**
 
 Key files and their purposes:
+
 - `src/flext_quality/analyzer.py`: Main analysis engine
 - `src/flext_quality/domain/entities.py`: Core domain models
 - `src/flext_quality/application/services.py`: Business logic services
