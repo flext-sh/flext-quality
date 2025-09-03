@@ -8,7 +8,7 @@ from flext_core import FlextModels
 from pydantic_settings import SettingsConfigDict
 
 
-class FlextQualityConfig(FlextModels.BaseConfig):
+class FlextQualityConfig(FlextModels.Config):
     """Quality service configuration using flext-core patterns."""
 
     # Analysis settings

@@ -21,7 +21,7 @@ from pydantic import Field, field_validator
 from flext_quality.constants import FlextQualityConstants
 
 
-class FlextQualityProjectModel(FlextModels.BaseConfig):
+class FlextQualityProjectModel(FlextModels.Config):
     """Pydantic model for quality project representation."""
 
     id: UUID = Field(..., description="Unique project identifier")
@@ -45,7 +45,7 @@ class FlextQualityProjectModel(FlextModels.BaseConfig):
         return v.strip()
 
 
-class FlextQualityAnalysisModel(FlextModels.BaseConfig):
+class FlextQualityAnalysisModel(FlextModels.Config):
     """Pydantic model for quality analysis representation."""
 
     id: UUID = Field(..., description="Unique analysis identifier")
@@ -87,7 +87,7 @@ class FlextQualityAnalysisModel(FlextModels.BaseConfig):
         return max(0.0, min(100.0, v))
 
 
-class FlextQualityIssueModel(FlextModels.BaseConfig):
+class FlextQualityIssueModel(FlextModels.Config):
     """Pydantic model for quality issue representation."""
 
     id: UUID = Field(..., description="Unique issue identifier")
@@ -113,7 +113,7 @@ class FlextQualityIssueModel(FlextModels.BaseConfig):
         return v
 
 
-class FlextQualityReportModel(FlextModels.BaseConfig):
+class FlextQualityReportModel(FlextModels.Config):
     """Pydantic model for quality report representation."""
 
     id: UUID = Field(..., description="Unique report identifier")
@@ -129,7 +129,7 @@ class FlextQualityReportModel(FlextModels.BaseConfig):
     )
 
 
-class FlextAnalysisConfigModel(FlextModels.BaseConfig):
+class FlextAnalysisConfigModel(FlextModels.Config):
     """Pydantic model for analysis configuration."""
 
     include_patterns: list[str] = Field(
