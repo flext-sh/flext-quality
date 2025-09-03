@@ -209,7 +209,7 @@ class ObservabilityConfig(BaseModel):
         description="Enable distributed tracing"
     )
 
-class BaseConfig(BaseModel):
+class Config(BaseModel):
     """Base configuration with common settings."""
     
     # Application settings
@@ -302,9 +302,9 @@ class BaseConfig(BaseModel):
 Development environment settings with debugging enabled:
 
 ```python
-from .base import BaseConfig, DatabaseConfig, RedisConfig
+from .base import Config, DatabaseConfig, RedisConfig
 
-class DevelopmentConfig(BaseConfig):
+class DevelopmentConfig(Config):
     """Development environment configuration."""
     
     debug: bool = True
@@ -343,7 +343,7 @@ class DevelopmentConfig(BaseConfig):
 Test environment settings optimized for testing:
 
 ```python
-class TestingConfig(BaseConfig):
+class TestingConfig(Config):
     """Testing environment configuration."""
     
     debug: bool = True
@@ -382,7 +382,7 @@ Production environment settings with security and performance optimizations:
 import os
 from typing import List
 
-class ProductionConfig(BaseConfig):
+class ProductionConfig(Config):
     """Production environment configuration."""
     
     debug: bool = False
@@ -593,7 +593,7 @@ class AnalysisConfiguration(BaseModel):
 class QualityConfigurationManager:
     """Manager for quality analysis configurations."""
     
-    def __init__(self, base_config: BaseConfig):
+    def __init__(self, base_config: Config):
         self.base_config = base_config
         self._analysis_templates = self._load_analysis_templates()
     
@@ -657,7 +657,7 @@ Centralized configuration loading with environment detection:
 import os
 from typing import Type
 
-def get_config_class() -> Type[BaseConfig]:
+def get_config_class() -> Type[Config]:
     """Get appropriate configuration class based on environment."""
     env = os.getenv("FLEXT_ENV", "development").lower()
     
@@ -669,7 +669,7 @@ def get_config_class() -> Type[BaseConfig]:
     
     return config_map.get(env, DevelopmentConfig)
 
-def load_config() -> BaseConfig:
+def load_config() -> Config:
     """Load configuration from environment and files."""
     config_class = get_config_class()
     
@@ -683,7 +683,7 @@ def load_config() -> BaseConfig:
     
     return config
 
-def load_config_from_file(base_config: BaseConfig, config_file: str) -> BaseConfig:
+def load_config_from_file(base_config: Config, config_file: str) -> Config:
     """Load configuration overrides from YAML or JSON file."""
     import yaml
     import json
@@ -711,7 +711,7 @@ config = load_config()
 Comprehensive validation with helpful error messages:
 
 ```python
-def validate_configuration(config: BaseConfig) -> List[str]:
+def validate_configuration(config: Config) -> List[str]:
     """Validate configuration and return list of validation errors."""
     errors = []
     
