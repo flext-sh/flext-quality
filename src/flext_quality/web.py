@@ -18,7 +18,7 @@ from pathlib import Path
 
 from flask import Response as FlaskResponse, jsonify, request
 from flext_core import FlextLogger
-from flext_web import create_service
+from flext_web import create_service, get_web_settings
 from werkzeug.wrappers import Response as WerkzeugResponse
 
 from flext_quality.analyzer import CodeAnalyzer
