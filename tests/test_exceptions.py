@@ -2,6 +2,10 @@
 
 Tests all custom exceptions defined in exceptions.py to ensure they work correctly
 and improve coverage from 0% to 100% for exceptions.py module.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations

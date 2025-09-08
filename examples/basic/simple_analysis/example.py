@@ -28,7 +28,7 @@ import sys
 from pathlib import Path
 
 # Using object instead of object for better type safety
-from flext_quality import (
+from ....flext_quality import (
     CodeAnalyzer,
     FlextQualityConstants,
     QualityMetrics,
@@ -51,7 +51,7 @@ def format_number(num: float | str) -> str:
     return str(num)
 
 
-def _display_project_overview(analyzed_files: list[str]) -> None:
+def _display_project_overview(analyzed_files: FlextTypes.Core.StringList) -> None:
     """Display project overview with file listing."""
     print_section("📈 Project Overview")
 

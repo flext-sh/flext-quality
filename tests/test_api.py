@@ -1,10 +1,15 @@
-"""Test suite for simple API."""
+"""Test suite for simple API.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
 from uuid import uuid4
 
 import pytest
+from flext_core import FlextTypes
 
 from flext_quality import QualityAPI
 
@@ -68,7 +73,7 @@ class TestQualityAPI:
             api.project_service._projects[str(project_id)] = create_result.value
 
         # Update the project
-        updates: dict[str, object] = {"language": "go"}
+        updates: FlextTypes.Core.Dict = {"language": "go"}
         result = await api.update_project(project_id, updates)
         assert result.success
 

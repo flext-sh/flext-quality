@@ -30,7 +30,7 @@ def run_tests() -> "CompletedProcess[str]":
             "--disable-warnings",
         ]
 
-        async def _run(cmd_list: list[str]) -> tuple[int, str, str]:
+        async def _run(cmd_list: FlextTypes.Core.StringList) -> tuple[int, str, str]:
             process = await asyncio.create_subprocess_exec(
                 *cmd_list,
                 stdout=asyncio.subprocess.PIPE,

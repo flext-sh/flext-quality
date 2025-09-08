@@ -2,9 +2,19 @@
 
 Following FLEXT patterns: Multiple independent classes per module like flext-core.
 Each class is a separate value object following SOLID principles.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
+
+"""
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
 
 from enum import StrEnum
 from pathlib import Path

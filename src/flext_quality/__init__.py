@@ -1,11 +1,17 @@
-"""FLEXT Quality - Code Quality Analysis System.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
+"""Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT.
 """
 
 from __future__ import annotations
+from flext_core import FlextTypes
+
+
+"""FLEXT Quality - Code Quality Analysis System."""
+"""
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
 
 # ruff: noqa: F403
 # Import all from each module following flext-core pattern

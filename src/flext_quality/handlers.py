@@ -2,13 +2,17 @@
 
 REFACTORED: Single CONSOLIDATED class following FLEXT_REFACTORING_PROMPT.md patterns.
 Uses flext-core handler patterns - NO duplication, NO multiple separate classes.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
 
 from uuid import UUID
 
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, FlextResult, FlextTypes
 from flext_observability import (
     flext_create_log_entry as _flext_create_log_entry,
     flext_create_trace as _flext_create_trace,
@@ -119,29 +123,29 @@ class FlextQualityHandlers:
         # Return the created report
         return FlextResult[QualityReport].ok(report)
 
-    async def run_linting(self, project_id: UUID) -> FlextResult[dict[str, object]]:
+    async def run_linting(self, project_id: UUID) -> FlextResult[FlextTypes.Core.Dict]:
         """Handle linting command."""
         # Return placeholder result since linting service is not implemented
-        linting_data: dict[str, object] = {
+        linting_data: FlextTypes.Core.Dict = {
             "project_id": str(project_id),
             "status": "placeholder_implementation",
             "issues": [],
         }
 
-        return FlextResult[dict[str, object]].ok(linting_data)
+        return FlextResult[FlextTypes.Core.Dict].ok(linting_data)
 
     async def run_security_check(
         self, project_id: UUID
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[FlextTypes.Core.Dict]:
         """Handle security check command."""
         # Return placeholder result since security service is not implemented
-        security_data: dict[str, object] = {
+        security_data: FlextTypes.Core.Dict = {
             "project_id": str(project_id),
             "status": "placeholder_implementation",
             "vulnerabilities": [],
         }
 
-        return FlextResult[dict[str, object]].ok(security_data)
+        return FlextResult[FlextTypes.Core.Dict].ok(security_data)
 
 
 # Backward compatibility aliases - following flext-cli pattern

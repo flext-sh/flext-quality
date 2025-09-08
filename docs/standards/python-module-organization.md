@@ -118,7 +118,7 @@ from flext_quality.domain.services import (
     IssueClassifier,
 )
 
-__all__: list[str] = [
+__all__: FlextTypes.Core.StringList = [
     # Entities
     "QualityProject",
     "QualityAnalysis",
@@ -786,7 +786,7 @@ from flext_quality.simple_api import QualityAPI
 from flext_quality.cli import main as cli_main
 
 # Public API exports
-__all__: list[str] = [
+__all__: FlextTypes.Core.StringList = [
     # Version
     "__version__",
     "__version_info__",

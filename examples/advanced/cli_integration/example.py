@@ -18,10 +18,12 @@ import sys
 import tempfile
 from pathlib import Path
 
-from flext_quality import main as quality_main
+from ....flext_quality import main as quality_main
 
 
-def run_cli_analysis(project_path: str, format_type: str = "json") -> dict[str, object]:
+def run_cli_analysis(
+    project_path: str, format_type: str = "json"
+) -> FlextTypes.Core.Dict:
     """Run FLEXT Quality CLI analysis and return parsed results.
 
     Args:
@@ -76,7 +78,7 @@ def run_cli_analysis(project_path: str, format_type: str = "json") -> dict[str, 
         return {"error": str(e)}
 
 
-def check_quality_thresholds(results: dict[str, object]) -> dict[str, object]:
+def check_quality_thresholds(results: FlextTypes.Core.Dict) -> FlextTypes.Core.Dict:
     """Check analysis results against quality thresholds.
 
     Args:

@@ -1,6 +1,25 @@
-"""AST class information model."""
+"""AST class information model.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
+
+from flext_core import FlextTypes
+
+"""
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
+
+from flext_core import FlextModels
+
+
+class ClassInfo(FlextModels):
+    """Strongly-typed class information from AST analysis."""
+
 
 from flext_core import FlextModels
 
@@ -14,8 +33,8 @@ class ClassInfo(FlextModels):
     package_name: str
     line_number: int
     end_line_number: int
-    base_classes: list[str]
-    decorators: list[str]
+    base_classes: FlextTypes.Core.StringList
+    decorators: FlextTypes.Core.StringList
     is_dataclass: bool
     is_abstract: bool
     has_docstring: bool

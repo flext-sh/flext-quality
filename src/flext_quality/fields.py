@@ -3,12 +3,9 @@
 This module provides reusable, validated field definitions following FLEXT patterns.
 Fields are organized by domain and provide consistent validation across all models.
 
-Field categories:
-- Identity: ID fields and identifiers
-- Temporal: Date/time related fields
-- Score: Quality score fields with validation
-- Path: File and directory path fields
-- Content: Text content and message fields
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations

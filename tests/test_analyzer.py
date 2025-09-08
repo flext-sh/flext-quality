@@ -2,6 +2,10 @@
 
 Real functional tests covering all analyzer functionality following flext-core patterns.
 Tests all branches, error paths, and integration scenarios for production-grade coverage.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -9,6 +13,8 @@ from __future__ import annotations
 import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
+
+from flext_core import FlextTypes
 
 from flext_quality import CodeAnalyzer
 from flext_quality.analysis_types import (
@@ -211,7 +217,7 @@ class TestCodeAnalyzerComprehensive:
         """Test _calculate_overall_metrics with multiple file metrics."""
         analyzer = CodeAnalyzer(temporary_project_structure)
 
-        file_metrics: list[dict[str, object]] = [
+        file_metrics: list[FlextTypes.Core.Dict] = [
             {
                 "lines_of_code": 50,
                 "complexity": 5,
@@ -255,7 +261,7 @@ class TestCodeAnalyzerComprehensive:
         """Test _calculate_overall_metrics with single file."""
         with tempfile.TemporaryDirectory() as tmp_dir:
             analyzer = CodeAnalyzer(tmp_dir)
-        file_metrics: list[dict[str, object]] = [
+        file_metrics: list[FlextTypes.Core.Dict] = [
             {
                 "lines_of_code": 42,
                 "complexity": 7,

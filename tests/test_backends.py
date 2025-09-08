@@ -1,4 +1,8 @@
-"""Comprehensive tests for backend modules."""
+"""Comprehensive tests for backend modules.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
@@ -10,6 +14,7 @@ from unittest.mock import patch
 
 # Removed unused mock imports - using real implementations
 import pytest
+from flext_core import FlextTypes
 
 from flext_quality import ASTBackend, BackendType, BaseAnalyzer, ExternalBackend
 
@@ -46,7 +51,7 @@ class TestBaseAnalyzer:
                 self,
                 code: str,
                 file_path: Path | None = None,
-            ) -> dict[str, object]:
+            ) -> FlextTypes.Core.Dict:
                 """Implement abstract method."""
                 return {"analyzed": True, "code": code}
 
@@ -56,7 +61,7 @@ class TestBaseAnalyzer:
                 return BackendType.HYBRID
 
             @override
-            def get_capabilities(self) -> list[str]:
+            def get_capabilities(self) -> FlextTypes.Core.StringList:
                 """Implement abstract method."""
                 return ["test", "mock"]
 

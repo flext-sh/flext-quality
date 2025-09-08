@@ -2,14 +2,20 @@
 
 This module provides reusable type-safe helpers to eliminate duplicate code
 across test files while maintaining strict MyPy compliance.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
 
 from typing import TypeGuard, cast
 
+from flext_core import FlextTypes
 
-def assert_is_dict(value: object) -> TypeGuard[dict[str, object]]:
+
+def assert_is_dict(value: object) -> TypeGuard[FlextTypes.Core.Dict]:
     """Type-safe dict assertion following Single Responsibility Principle.
 
     Args:
@@ -26,7 +32,7 @@ def assert_is_dict(value: object) -> TypeGuard[dict[str, object]]:
     return True
 
 
-def assert_is_list(value: object) -> TypeGuard[list[object]]:
+def assert_is_list(value: object) -> TypeGuard[FlextTypes.Core.List]:
     """Type-safe list assertion following Single Responsibility Principle.
 
     Args:
@@ -43,7 +49,7 @@ def assert_is_list(value: object) -> TypeGuard[list[object]]:
     return True
 
 
-def safe_dict_access(data: dict[str, object], key: str) -> object:
+def safe_dict_access(data: FlextTypes.Core.Dict, key: str) -> object:
     """Type-safe dictionary access with proper error handling.
 
     Args:
@@ -61,7 +67,7 @@ def safe_dict_access(data: dict[str, object], key: str) -> object:
     return data[key]
 
 
-def safe_list_access(data: list[object], index: int) -> object:
+def safe_list_access(data: FlextTypes.Core.List, index: int) -> object:
     """Type-safe list access with proper error handling.
 
     Args:
@@ -83,8 +89,8 @@ def safe_list_access(data: list[object], index: int) -> object:
 
 
 def assert_dict_structure(
-    data: dict[str, object], required_keys: list[str]
-) -> dict[str, object]:
+    data: FlextTypes.Core.Dict, required_keys: FlextTypes.Core.StringList
+) -> FlextTypes.Core.Dict:
     """Assert that object is dict with required keys - DRY pattern.
 
     Args:
@@ -103,7 +109,7 @@ def assert_dict_structure(
     return data
 
 
-def assert_analysis_results_structure(results: object) -> dict[str, object]:
+def assert_analysis_results_structure(results: object) -> FlextTypes.Core.Dict:
     """Assert analyzer results have expected structure - specialized helper.
 
     Args:
@@ -118,11 +124,11 @@ def assert_analysis_results_structure(results: object) -> dict[str, object]:
     """
     assert_is_dict(results)
     return assert_dict_structure(
-        cast("dict[str, object]", results), ["metrics", "issues", "python_files"]
+        cast("FlextTypes.Core.Dict", results), ["metrics", "issues", "python_files"]
     )
 
 
-def assert_metrics_structure(metrics: object) -> dict[str, object]:
+def assert_metrics_structure(metrics: object) -> FlextTypes.Core.Dict:
     """Assert metrics have expected structure - specialized helper.
 
     Args:
@@ -137,11 +143,11 @@ def assert_metrics_structure(metrics: object) -> dict[str, object]:
     """
     assert_is_dict(metrics)
     return assert_dict_structure(
-        cast("dict[str, object]", metrics), ["total_files", "total_lines_of_code"]
+        cast("FlextTypes.Core.Dict", metrics), ["total_files", "total_lines_of_code"]
     )
 
 
-def assert_issues_structure(issues: object) -> dict[str, object]:
+def assert_issues_structure(issues: object) -> FlextTypes.Core.Dict:
     """Assert issues have expected structure - specialized helper.
 
     Args:
@@ -156,6 +162,6 @@ def assert_issues_structure(issues: object) -> dict[str, object]:
     """
     assert_is_dict(issues)
     return assert_dict_structure(
-        cast("dict[str, object]", issues),
+        cast("FlextTypes.Core.Dict", issues),
         ["security", "complexity", "dead_code", "duplicates"],
     )

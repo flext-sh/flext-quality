@@ -2,9 +2,21 @@
 
 REFACTORED: Using flext-core DI patterns and FlextResult - NO duplication.
 Provides clean API interface for all quality analysis operations.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
+
+from flext_core import FlextTypes
+
+"""
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
 
 import warnings
 from pathlib import Path
@@ -31,11 +43,7 @@ from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
 
 
 class FlextQualityAPI:
-    """Simple API interface for quality analysis operations.
-
-    Uses dependency injection to resolve services from flext-core container.
-    All operations return FlextResult for type-safe error handling.
-    """
+    """Simple API interface for quality analysis operations."""
 
     def __init__(self) -> None:
         """Initialize the Quality API with container-based DI."""
@@ -49,48 +57,28 @@ class FlextQualityAPI:
 
     @property
     def project_service(self) -> QualityProjectService:
-        """Get or create project service instance.
-
-        Returns:
-            QualityProjectService instance.
-
-        """
+        """Get or create project service instance."""
         if self._project_service is None:
             self._project_service = QualityProjectService()
         return self._project_service
 
     @property
     def analysis_service(self) -> QualityAnalysisService:
-        """Get or create analysis service instance.
-
-        Returns:
-            QualityAnalysisService instance.
-
-        """
+        """Get or create analysis service instance."""
         if self._analysis_service is None:
             self._analysis_service = QualityAnalysisService()
         return self._analysis_service
 
     @property
     def issue_service(self) -> QualityIssueService:
-        """Get or create issue service instance.
-
-        Returns:
-            QualityIssueService instance.
-
-        """
+        """Get or create issue service instance."""
         if self._issue_service is None:
             self._issue_service = QualityIssueService()
         return self._issue_service
 
     @property
     def report_service(self) -> QualityReportService:
-        """Get or create report service instance.
-
-        Returns:
-            QualityReportService instance.
-
-        """
+        """Get or create report service instance."""
         if self._report_service is None:
             self._report_service = QualityReportService()
         return self._report_service
@@ -109,23 +97,7 @@ class FlextQualityAPI:
         max_complexity: int = 10,
         max_duplication: float = 5.0,
     ) -> FlextResult[QualityProject]:
-        """Create a new quality project.
-
-        Args:
-            name: Project name.
-            project_path: Path to project directory.
-            repository_url: Optional repository URL.
-            config_path: Optional config file path.
-            language: Programming language (default: python).
-            auto_analyze: Whether to auto-analyze (default: True).
-            min_coverage: Minimum coverage threshold (default: 95.0).
-            max_complexity: Maximum complexity threshold (default: 10).
-            max_duplication: Maximum duplication threshold (default: 5.0).
-
-        Returns:
-            FlextResult containing the created QualityProject.
-
-        """
+        """Create a new quality project."""
         return await self.project_service.create_project(
             name=name,
             project_path=project_path,
@@ -142,53 +114,23 @@ class FlextQualityAPI:
         self,
         project_id: UUID,
     ) -> FlextResult[QualityProject]:
-        """Get a project by ID.
-
-        Args:
-            project_id: Project UUID.
-
-        Returns:
-            FlextResult containing the QualityProject or None if not found.
-
-        """
+        """Get a project by ID."""
         return await self.project_service.get_project(str(project_id))
 
     async def list_projects(self) -> FlextResult[list[QualityProject]]:
-        """List all projects.
-
-        Returns:
-            FlextResult containing list of QualityProject instances.
-
-        """
+        """List all projects."""
         return await self.project_service.list_projects()
 
     async def update_project(
         self,
         project_id: UUID,
-        updates: dict[str, object],
+        updates: FlextTypes.Core.Dict,
     ) -> FlextResult[QualityProject]:
-        """Update a project.
-
-        Args:
-            project_id: Project UUID.
-            updates: Dictionary of fields to update.
-
-        Returns:
-            FlextResult containing the updated QualityProject.
-
-        """
+        """Update a project."""
         return await self.project_service.update_project(str(project_id), updates)
 
     async def delete_project(self, project_id: UUID) -> FlextResult[bool]:
-        """Delete a project.
-
-        Args:
-            project_id: Project UUID.
-
-        Returns:
-            FlextResult containing True if deleted successfully.
-
-        """
+        """Delete a project."""
         return await self.project_service.delete_project(str(project_id))
 
     # Analysis operations
@@ -200,19 +142,7 @@ class FlextQualityAPI:
         pull_request_id: str | None = None,
         analysis_config: FlextTypes.Core.JsonDict | None = None,
     ) -> FlextResult[QualityAnalysis]:
-        """Create a new quality analysis.
-
-        Args:
-            project_id: Project UUID.
-            commit_hash: Optional commit hash.
-            branch: Optional branch name.
-            pull_request_id: Optional pull request ID.
-            analysis_config: Optional analysis configuration.
-
-        Returns:
-            FlextResult containing the created QualityAnalysis.
-
-        """
+        """Create a new quality analysis."""
         return await self.analysis_service.create_analysis(
             project_id=str(project_id),
             commit_hash=commit_hash,
@@ -230,20 +160,7 @@ class FlextQualityAPI:
         comment_lines: int,
         blank_lines: int,
     ) -> FlextResult[QualityAnalysis]:
-        """Update analysis metrics.
-
-        Args:
-            analysis_id: Analysis UUID.
-            total_files: Total number of files.
-            total_lines: Total lines of code.
-            code_lines: Lines of actual code.
-            comment_lines: Lines of comments.
-            blank_lines: Blank lines.
-
-        Returns:
-            FlextResult containing the updated QualityAnalysis.
-
-        """
+        """Update analysis metrics."""
         return await self.analysis_service.update_metrics(
             analysis_id=str(analysis_id),
             total_files=total_files,
@@ -262,20 +179,7 @@ class FlextQualityAPI:
         security_score: float,
         maintainability_score: float,
     ) -> FlextResult[QualityAnalysis]:
-        """Update analysis quality scores.
-
-        Args:
-            analysis_id: Analysis UUID.
-            coverage_score: Code coverage score.
-            complexity_score: Code complexity score.
-            duplication_score: Code duplication score.
-            security_score: Security analysis score.
-            maintainability_score: Maintainability score.
-
-        Returns:
-            FlextResult containing the updated QualityAnalysis.
-
-        """
+        """Update analysis quality scores."""
         # Calculate overall score as average
         overall_score = (
             coverage_score + complexity_score + security_score + maintainability_score
@@ -298,19 +202,7 @@ class FlextQualityAPI:
         medium: int,
         low: int,
     ) -> FlextResult[QualityAnalysis]:
-        """Update analysis issue counts by severity.
-
-        Args:
-            analysis_id: Analysis UUID.
-            critical: Number of critical issues.
-            high: Number of high severity issues.
-            medium: Number of medium severity issues.
-            low: Number of low severity issues.
-
-        Returns:
-            FlextResult containing the updated QualityAnalysis.
-
-        """
+        """Update analysis issue counts by severity."""
         total_issues = critical + high + medium + low
 
         return await self.analysis_service.update_issue_counts(
@@ -326,15 +218,7 @@ class FlextQualityAPI:
         self,
         analysis_id: UUID,
     ) -> FlextResult[QualityAnalysis]:
-        """Mark analysis as completed.
-
-        Args:
-            analysis_id: Analysis UUID.
-
-        Returns:
-            FlextResult containing the completed QualityAnalysis.
-
-        """
+        """Mark analysis as completed."""
         return await self.analysis_service.complete_analysis(str(analysis_id))
 
     async def fail_analysis(
@@ -342,46 +226,21 @@ class FlextQualityAPI:
         analysis_id: UUID,
         error: str,
     ) -> FlextResult[QualityAnalysis]:
-        """Mark analysis as failed.
-
-        Args:
-            analysis_id: Analysis UUID.
-            error: Error message describing the failure.
-
-        Returns:
-            FlextResult containing the failed QualityAnalysis.
-
-        """
+        """Mark analysis as failed."""
         return await self.analysis_service.fail_analysis(str(analysis_id), error)
 
     async def get_analysis(
         self,
         analysis_id: UUID,
     ) -> FlextResult[QualityAnalysis]:
-        """Get an analysis by ID.
-
-        Args:
-            analysis_id: Analysis UUID.
-
-        Returns:
-            FlextResult containing the QualityAnalysis or None if not found.
-
-        """
+        """Get an analysis by ID."""
         return await self.analysis_service.get_analysis(str(analysis_id))
 
     async def list_analyses(
         self,
         project_id: UUID,
     ) -> FlextResult[list[QualityAnalysis]]:
-        """List all analyses for a project.
-
-        Args:
-            project_id: Project UUID.
-
-        Returns:
-            FlextResult containing list of QualityAnalysis instances.
-
-        """
+        """List all analyses for a project."""
         return await self.analysis_service.list_analyses(str(project_id))
 
     # Issue operations
@@ -400,26 +259,7 @@ class FlextQualityAPI:
         code_snippet: str | None = None,
         suggestion: str | None = None,
     ) -> FlextResult[QualityIssue]:
-        """Create a new quality issue.
-
-        Args:
-            analysis_id: Analysis UUID.
-            issue_type: Type of issue.
-            severity: Issue severity level.
-            rule_id: Rule identifier that triggered the issue.
-            file_path: Path to the file with the issue.
-            message: Issue description message.
-            line_number: Optional line number.
-            column_number: Optional column number.
-            end_line_number: Optional end line number.
-            end_column_number: Optional end column number.
-            code_snippet: Optional code snippet.
-            suggestion: Optional fix suggestion.
-
-        Returns:
-            FlextResult containing the created QualityIssue.
-
-        """
+        """Create a new quality issue."""
         # Convert string parameters to enum types
 
         try:
@@ -442,15 +282,7 @@ class FlextQualityAPI:
         )
 
     async def get_issue(self, issue_id: UUID) -> FlextResult[QualityIssue]:
-        """Get an issue by ID.
-
-        Args:
-            issue_id: Issue UUID.
-
-        Returns:
-            FlextResult containing the QualityIssue or None if not found.
-
-        """
+        """Get an issue by ID."""
         return await self.issue_service.get_issue(str(issue_id))
 
     async def list_issues(
@@ -460,18 +292,7 @@ class FlextQualityAPI:
         issue_type: str | None = None,
         file_path: str | None = None,
     ) -> FlextResult[list[QualityIssue]]:
-        """List issues for an analysis with optional filters.
-
-        Args:
-            analysis_id: Analysis UUID.
-            severity: Optional severity filter.
-            issue_type: Optional issue type filter.
-            file_path: Optional file path filter.
-
-        Returns:
-            FlextResult containing list of QualityIssue instances.
-
-        """
+        """List issues for an analysis with optional filters."""
         # Convert string severity to enum if provided
         severity_enum = None
         if severity:
@@ -488,15 +309,7 @@ class FlextQualityAPI:
         )
 
     async def mark_issue_fixed(self, issue_id: UUID) -> FlextResult[QualityIssue]:
-        """Mark an issue as fixed.
-
-        Args:
-            issue_id: Issue UUID.
-
-        Returns:
-            FlextResult containing the updated QualityIssue.
-
-        """
+        """Mark an issue as fixed."""
         return await self.issue_service.mark_fixed(str(issue_id))
 
     async def suppress_issue(
@@ -504,28 +317,11 @@ class FlextQualityAPI:
         issue_id: UUID,
         reason: str,
     ) -> FlextResult[QualityIssue]:
-        """Suppress an issue with a reason.
-
-        Args:
-            issue_id: Issue UUID.
-            reason: Reason for suppressing the issue.
-
-        Returns:
-            FlextResult containing the suppressed QualityIssue.
-
-        """
+        """Suppress an issue with a reason."""
         return await self.issue_service.suppress_issue(str(issue_id), reason)
 
     async def unsuppress_issue(self, issue_id: UUID) -> FlextResult[QualityIssue]:
-        """Remove suppression from an issue.
-
-        Args:
-            issue_id: Issue UUID.
-
-        Returns:
-            FlextResult containing the unsuppressed QualityIssue.
-
-        """
+        """Remove suppression from an issue."""
         return await self.issue_service.unsuppress_issue(str(issue_id))
 
     # Report operations
@@ -537,19 +333,7 @@ class FlextQualityAPI:
         report_path: str | None = None,
         report_size_bytes: int = 0,
     ) -> FlextResult[QualityReport]:
-        """Create a quality report.
-
-        Args:
-            analysis_id: Analysis UUID.
-            report_type: Type of report to create.
-            report_format: Report format (default: summary).
-            report_path: Optional path to save report.
-            report_size_bytes: Report size in bytes (default: 0).
-
-        Returns:
-            FlextResult containing the created QualityReport.
-
-        """
+        """Create a quality report."""
         return await self.report_service.create_report(
             analysis_id=str(analysis_id),
             format_type=report_format,
@@ -558,42 +342,18 @@ class FlextQualityAPI:
         )
 
     async def get_report(self, report_id: UUID) -> FlextResult[QualityReport]:
-        """Get a report by ID.
-
-        Args:
-            report_id: Report UUID.
-
-        Returns:
-            FlextResult containing the QualityReport or None if not found.
-
-        """
+        """Get a report by ID."""
         return await self.report_service.get_report(str(report_id))
 
     async def list_reports(
         self,
         analysis_id: UUID,
     ) -> FlextResult[list[QualityReport]]:
-        """List all reports for an analysis.
-
-        Args:
-            analysis_id: Analysis UUID.
-
-        Returns:
-            FlextResult containing list of QualityReport instances.
-
-        """
+        """List all reports for an analysis."""
         return await self.report_service.list_reports(str(analysis_id))
 
     async def delete_report(self, report_id: UUID) -> FlextResult[bool]:
-        """Delete a report.
-
-        Args:
-            report_id: Report UUID.
-
-        Returns:
-            FlextResult containing True if deleted successfully.
-
-        """
+        """Delete a report."""
         return await self.report_service.delete_report(str(report_id))
 
     # High-level operations
@@ -603,17 +363,7 @@ class FlextQualityAPI:
         commit_hash: str | None = None,
         branch: str | None = None,
     ) -> FlextResult[QualityAnalysis]:
-        """Run a complete quality analysis for a project.
-
-        Args:
-            project_id: Project UUID.
-            commit_hash: Optional commit hash.
-            branch: Optional branch name.
-
-        Returns:
-            FlextResult containing the completed QualityAnalysis.
-
-        """
+        """Run a complete quality analysis for a project."""
         # Create analysis
         result = await self.create_analysis(
             project_id=project_id,
@@ -694,11 +444,7 @@ class FlextQualityAPI:
 
 # Legacy compatibility facade (TEMPORARY)
 class QualityAPI(FlextQualityAPI):
-    """Legacy API class - replaced by FlextQualityAPI.
-
-    DEPRECATED: Use FlextQualityAPI directly.
-    This facade provides compatibility during migration.
-    """
+    """Legacy API class - replaced by FlextQualityAPI."""
 
     def __init__(self) -> None:
         warnings.warn(

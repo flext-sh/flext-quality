@@ -2,6 +2,10 @@
 
 Tests core functionality of the analyzer using real file analysis.
 Focuses on the main analyze_project method and its helper methods.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -10,6 +14,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
+from flext_core import FlextTypes
 
 from flext_quality import CodeAnalyzer
 
@@ -253,7 +258,7 @@ def multiply(x: int, y: int) -> int:
         ]
 
         # Cast to expected type to handle list invariance
-        file_metrics_typed: list[dict[str, object]] = file_metrics
+        file_metrics_typed: list[FlextTypes.Core.Dict] = file_metrics
         overall_metrics = analyzer._calculate_overall_metrics(file_metrics_typed)
 
         assert isinstance(overall_metrics, dict)

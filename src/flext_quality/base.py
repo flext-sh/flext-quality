@@ -1,6 +1,18 @@
-"""Base class for analysis backends using flext-core patterns."""
+"""Base class for analysis backends using flext-core patterns.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
+
+from flext_core import FlextTypes
+
+"""
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
 
 import warnings
 from abc import ABC, abstractmethod
@@ -12,8 +24,15 @@ from flext_quality.backend_type import BackendType
 class FlextQualityAnalyzer(ABC):
     """Abstract base class for code analyzers using flext-core patterns."""
 
+
+from abc import ABC
+
+
+class FlextQualityAnalyzer(ABC):
+    """Abstract base class for code analyzers using flext-core patterns."""
+
     @abstractmethod
-    def analyze(self, code: str, file_path: Path | None = None) -> dict[str, object]:
+    def analyze(self, code: str, file_path: Path | None = None) -> FlextTypes.Core.Dict:
         """Analyze code and return results.
 
         Args:
@@ -37,7 +56,7 @@ class FlextQualityAnalyzer(ABC):
         ...
 
     @abstractmethod
-    def get_capabilities(self) -> list[str]:
+    def get_capabilities(self) -> FlextTypes.Core.StringList:
         """Get list of capabilities this backend provides.
 
         Returns:

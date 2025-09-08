@@ -4,6 +4,10 @@ DRY REFACTOR: Centralizes grade calculation logic used across analyzer.py,
 metrics.py, and reports.py to eliminate code duplication.
 
 SOLID: Single Responsibility Principle - one place for grade logic.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations

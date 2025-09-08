@@ -1,8 +1,13 @@
-"""Test quality metrics functionality."""
+"""Test quality metrics functionality.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
 import pytest
+from flext_core import FlextTypes
 from pydantic import ValidationError
 
 from flext_quality import QualityGradeCalculator, QualityMetrics
@@ -290,19 +295,19 @@ class TestQualityMetrics:
     def test_from_analysis_results_missing_sections(self) -> None:
         """Test from_analysis_results with missing sections."""
         # Missing metrics section
-        results_no_metrics: dict[str, object] = {"issues": {}}
+        results_no_metrics: FlextTypes.Core.Dict = {"issues": {}}
         metrics = QualityMetrics.from_analysis_results(results_no_metrics)
         assert metrics.total_files == 0
 
         # Missing issues section
-        results_no_issues: dict[str, object] = {"metrics": {"total_files": 5}}
+        results_no_issues: FlextTypes.Core.Dict = {"metrics": {"total_files": 5}}
         metrics = QualityMetrics.from_analysis_results(results_no_issues)
         assert metrics.security_issues_count == 0
         assert metrics.total_files == 5
 
     def test_from_analysis_results_missing_issue_categories(self) -> None:
         """Test from_analysis_results with missing issue categories."""
-        results: dict[str, object] = {
+        results: FlextTypes.Core.Dict = {
             "metrics": {},
             "issues": {
                 "security": [{"issue": 1}],
@@ -319,7 +324,7 @@ class TestQualityMetrics:
 
     def test_edge_case_zero_complexity(self) -> None:
         """Test edge case with zero complexity."""
-        results: dict[str, object] = {
+        results: FlextTypes.Core.Dict = {
             "metrics": {"average_complexity": 0.0},
             "issues": {},
         }
@@ -333,7 +338,7 @@ class TestQualityMetrics:
         """Test edge case with high issue counts."""
         many_issues = [{"issue": i} for i in range(50)]  # 50 issues
 
-        results: dict[str, object] = {
+        results: FlextTypes.Core.Dict = {
             "metrics": {},
             "issues": {
                 "security": many_issues,

@@ -1,6 +1,18 @@
-"""Quality report generation and formatting."""
+"""Quality report generation and formatting.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
+
+from flext_core import FlextTypes
+
+"""
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
 
 import json
 import warnings
@@ -27,11 +39,27 @@ HIGH_TYPE_ERROR_THRESHOLD = 10
 class FlextQualityReportGenerator:
     """Generates quality reports from analysis results."""
 
+
+# Constants for display limits
+ISSUE_PREVIEW_LIMIT = 5
+HTML_ISSUE_LIMIT = 10
+HIGH_ISSUE_THRESHOLD = 50
+MIN_COVERAGE_THRESHOLD = 80
+MIN_SCORE_THRESHOLD = 70
+HIGH_TYPE_ERROR_THRESHOLD = 10
+
+
+class FlextQualityReportGenerator:
+    """Generates quality reports from analysis results."""
+
     def __init__(self, analysis_results: AnalysisResults) -> None:
         """Initialize the quality report generator.
 
         Args:
             analysis_results: Strongly-typed analysis results and metrics.
+
+        Returns:
+            object: Description of return value.
 
         """
         # Store analysis results directly
@@ -60,7 +88,7 @@ class FlextQualityReportGenerator:
         ]
 
         # Add issue details using utilities for proper typing
-        issue_categories: dict[str, list[object]] = (
+        issue_categories: dict[str, FlextTypes.Core.List] = (
             FlextReportUtilities.format_issue_categories(self.results)
         )
 
@@ -94,7 +122,7 @@ class FlextQualityReportGenerator:
 
     def generate_json_report(self) -> str:
         """Generate a JSON-formatted quality report."""
-        report_data: dict[str, object] = {
+        report_data: FlextTypes.Core.Dict = {
             "summary": {
                 "grade": self._get_quality_grade(),
                 "score": self._get_quality_score(),
@@ -253,8 +281,10 @@ class FlextQualityReportGenerator:
 
     def _generate_issues_html(self) -> str:
         """Generate HTML for issues section."""
-        html_parts: list[str] = FlextReportUtilities.create_report_lines()
-        issue_categories: dict[str, list[object]] = {
+        html_parts: FlextTypes.Core.StringList = (
+            FlextReportUtilities.create_report_lines()
+        )
+        issue_categories: dict[str, FlextTypes.Core.List] = {
             "security": FlextQualityUtilities.safe_issue_list(
                 self.results.security_issues
             ),
@@ -313,9 +343,11 @@ class FlextQualityReportGenerator:
 
         return "\n".join(html_parts)
 
-    def _generate_recommendations(self) -> list[str]:
+    def _generate_recommendations(self) -> FlextTypes.Core.StringList:
         """Generate recommendations based on analysis results."""
-        recommendations: list[str] = FlextReportUtilities.create_report_lines()
+        recommendations: FlextTypes.Core.StringList = (
+            FlextReportUtilities.create_report_lines()
+        )
 
         total_issues = self._get_total_issues()
         critical_issues = self._get_critical_issues()

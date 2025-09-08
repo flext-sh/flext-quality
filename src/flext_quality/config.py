@@ -1,11 +1,28 @@
-"""Quality configuration management using flext-core patterns."""
+"""Quality configuration management using flext-core patterns.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
+
+"""
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
 
 import warnings
 
 from flext_core import FlextModels
 from pydantic_settings import SettingsConfigDict
+
+
+class FlextQualityConfig(FlextModels.Config):
+    """Quality service configuration using flext-core patterns."""
+
+
+from flext_core import FlextModels
 
 
 class FlextQualityConfig(FlextModels.Config):

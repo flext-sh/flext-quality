@@ -3,13 +3,10 @@
 This module extends flext-web Flask service with quality analysis capabilities,
 reusing existing analysis components from flext-quality.
 
-Architecture:
-    - Properly extends flext-web without violating dependency hierarchy
-    - Reuses existing analysis backends and metrics collectors
-    - Provides REST API and simple dashboard
 
-Author: FLEXT Development Team
-Version: 0.9.0
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -17,7 +14,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from flask import Response as FlaskResponse, jsonify, request
-from flext_core import FlextLogger
+from flext_core import FlextLogger, FlextTypes
 from flext_web import create_service, get_web_settings
 from werkzeug.wrappers import Response as WerkzeugResponse
 
@@ -175,7 +172,7 @@ class FlextQualityWebInterface:
     def get_metrics(self) -> ResponseType:
         """Get quality metrics."""
         # Use simple placeholder metrics for now
-        metrics: dict[str, object] = {
+        metrics: FlextTypes.Core.Dict = {
             "coverage": 95.0,
             "complexity": 10.0,
             "duplication": 5.0,
@@ -189,7 +186,7 @@ class FlextQualityWebInterface:
             return jsonify({"success": False, "error": "Invalid format"}), 400
 
         # Simple report placeholder
-        report: dict[str, object] = {
+        report: FlextTypes.Core.Dict = {
             "format": report_format,
             "generated_at": "2025-01-08",
             "quality_score": "A",

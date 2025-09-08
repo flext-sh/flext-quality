@@ -1,9 +1,15 @@
-"""Test-specific Django settings."""
+"""Test-specific Django settings.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
 import sys
 from pathlib import Path
+
+from flext_core import FlextTypes
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -30,7 +36,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
 
-ROOT_URLCONF: list[str] = []
+ROOT_URLCONF: FlextTypes.Core.StringList = []
 
 # Override database settings for testing
 DATABASES = {

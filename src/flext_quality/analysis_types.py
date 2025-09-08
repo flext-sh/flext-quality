@@ -3,9 +3,21 @@
 Following FLEXT patterns: Multiple independent classes per module like flext-core.
 Each class is a separate domain model following SOLID principles.
 Strongly-typed data structures that integrate with FLEXT ecosystem.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
+
+from flext_core import FlextTypes
+
+"""
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
 
 from pathlib import Path
 
@@ -86,7 +98,9 @@ class DeadCodeIssue(FlextModels):
 class DuplicationIssue(FlextModels):
     """Represents code duplication detected in analysis."""
 
-    files: list[str] = Field(..., description="Files containing duplicated code")
+    files: FlextTypes.Core.StringList = Field(
+        ..., description="Files containing duplicated code"
+    )
     line_ranges: list[tuple[int, int]] = Field(
         ..., description="Line ranges of duplicate code"
     )

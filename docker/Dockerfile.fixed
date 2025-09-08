@@ -152,7 +152,7 @@ TAnyDict = Dict[str, object]
 TConfigDict = Dict[str, object]
 
 # Export all required symbols
-__all__: list[str] = [
+__all__: FlextTypes.Core.StringList = [
     "FlextResult", "FlextLogger", "FlextContainer", "get_flext_container",
     "FlextModels.Entity", "FlextModels.Value", "FlextConfig", "FlextConstants", 
     "TAnyDict", "TConfigDict", "FlextExceptions.Error", "FlextExceptions.ValidationError",
@@ -198,7 +198,7 @@ class FlextExceptions.TimeoutError(FlextExceptions.Error):
     """Timeout error."""
     pass
 
-__all__: list[str] = [
+__all__: FlextTypes.Core.StringList = [
     "FlextExceptions.Error", "FlextExceptions.ValidationError", "FlextExceptions.ConfigurationError",
     "FlextExceptions.ConnectionError", "FlextExceptions.ProcessingError", "FlextExceptions.AuthenticationError",
     "FlextExceptions.TimeoutError"

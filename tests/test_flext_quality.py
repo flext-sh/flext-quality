@@ -1,4 +1,8 @@
-"""Test suite for flext-infrastructure.monitoring.flext-quality basic functionality."""
+"""Test suite for flext-infrastructure.monitoring.flext-quality basic functionality.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 

@@ -2,6 +2,10 @@
 
 Real functional tests covering all service functionality following flext-core patterns.
 Tests all success paths, error handling, and business logic for production-grade coverage.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -9,6 +13,7 @@ from __future__ import annotations
 import uuid
 
 import pytest
+from flext_core import FlextTypes
 
 from flext_quality import (
     AnalysisStatus,
@@ -142,7 +147,7 @@ class TestQualityProjectServiceComprehensive:
         project = assert_result_success_with_data(create_result)
 
         # Update it
-        updates: dict[str, object] = {
+        updates: FlextTypes.Core.Dict = {
             "language": "javascript",
         }
         result = await service.update_project(str(project.id), updates)

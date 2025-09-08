@@ -2,6 +2,10 @@
 
 Real functional tests for all handler scenarios following flext-core patterns.
 Tests error paths, success paths, and integration with real services.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations

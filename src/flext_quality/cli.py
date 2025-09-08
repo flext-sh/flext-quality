@@ -2,6 +2,9 @@
 
 This module provides CLI commands for code quality analysis.
 Uses modern flext-cli patterns for consistency.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -35,7 +38,7 @@ except Exception:  # pragma: no cover - fallback for environments without flext-
     flext_cli_create_helper = None
 
 
-def get_cli_helper(verbose: bool = False) -> FlextCliHelper | Console:
+def get_cli_helper(*, verbose: bool = False) -> FlextCliHelper | Console:
     """Get CLI helper or fallback to Console."""
     if FLEXT_CLI_AVAILABLE and flext_cli_create_helper:
         return flext_cli_create_helper(quiet=not verbose)

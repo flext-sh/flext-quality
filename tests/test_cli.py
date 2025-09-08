@@ -2,6 +2,10 @@
 
 Real functional tests covering all CLI functionality following flext-core patterns.
 Tests all command-line scenarios, argument handling, and integration flows.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations

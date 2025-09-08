@@ -4,36 +4,8 @@ Provides pytest fixtures, configuration, and testing utilities for comprehensive
 validation of FLEXT Quality functionality including domain entities, application
 services, and infrastructure integrations.
 
-Key Features:
-    - Comprehensive test fixtures for all quality analysis components
-    - Mock services for isolated unit testing with proper FlextResult patterns
-    - Test data builders for consistent and realistic test scenarios
-    - Environment configuration for test isolation and reproducibility
-    - Integration test support with temporary file systems and databases
-
-Fixture Categories:
-    - Environment Fixtures: Test environment setup and configuration
-    - Data Fixtures: Test data generation and management
-    - Service Fixtures: Mock services and dependency injection
-    - File System Fixtures: Temporary project structures and file management
-    - Integration Fixtures: External service and database configuration
-
-Testing Standards:
-    - FlextResult pattern validation with type-safe helpers
-    - Comprehensive edge case and error scenario coverage
-    - Realistic test data reflecting production scenarios
-    - Proper isolation and cleanup for reliable test execution
-
-Example:
-    Using test fixtures in quality analysis testing:
-
-    >>> def test_quality_analysis(sample_code_repository, mock_quality_analyzer):
-    ...     result = analyzer.analyze_project(sample_code_repository["path"])
-    ...     data = assert_result_success_with_data(result)
-    ...     assert data.quality_score > 0.0
-
-Author: FLEXT Development Team
-Version: 0.9.0
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 
 """
 
@@ -47,7 +19,7 @@ from typing import TypeVar
 
 import pytest
 from django.test.utils import setup_test_environment, teardown_test_environment
-from flext_core import FlextResult, TAnyDict
+from flext_core import FlextResult, FlextTypes, TAnyDict
 
 # Type variable for FlextResult data
 T = TypeVar("T")
@@ -565,7 +537,7 @@ def mock_quality_analyzer() -> object:
         """
 
         def __init__(self) -> None:
-            self.analyzed_files: list[str] = []
+            self.analyzed_files: FlextTypes.Core.StringList = []
 
         async def analyze_project(self, project_path: str) -> TAnyDict:
             """Simulate comprehensive project analysis.

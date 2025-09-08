@@ -1,6 +1,18 @@
-"""Code analyzer interface for FLEXT Quality."""
+"""Code analyzer interface for FLEXT Quality.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
+
+from flext_core import FlextTypes
+
+"""
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
 
 import ast
 import warnings
@@ -25,6 +37,19 @@ from flext_quality.analysis_types import (
     SecurityIssue,
 )
 from flext_quality.grade_calculator import QualityGradeCalculator
+
+logger = FlextLogger(__name__)
+
+# Constants
+MIN_FILE_SIZE_FOR_DUPLICATION_CHECK = 100
+SIMILARITY_THRESHOLD = 0.8
+
+
+class FlextQualityCodeAnalyzer:
+    """Main code analyzer interface for FLEXT Quality."""
+
+
+from flext_core import FlextLogger
 
 logger = FlextLogger(__name__)
 
@@ -288,8 +313,8 @@ class FlextQualityCodeAnalyzer:
 
     def _calculate_overall_metrics(
         self,
-        file_metrics: list[dict[str, object]],
-    ) -> dict[str, object]:
+        file_metrics: list[FlextTypes.Core.Dict],
+    ) -> FlextTypes.Core.Dict:
         if not file_metrics:
             return {}
 
@@ -297,7 +322,7 @@ class FlextQualityCodeAnalyzer:
 
         # DRY helper for safe metric extraction with type safety
         def safe_get_metric(
-            metric_list: list[dict[str, object]],
+            metric_list: list[FlextTypes.Core.Dict],
             key: str,
             default: float = 0,
         ) -> list[int | float]:

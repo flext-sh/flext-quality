@@ -8,12 +8,10 @@ Copyright (c) 2025 FLEXT Contributors
 SPDX-License-Identifier: MIT
 """
 
-from __future__ import annotations
-
 from enum import Enum
 from typing import override
 
-from flext_core import FlextExceptions
+from flext_core import FlextExceptions, FlextTypes
 
 
 class FlextQualityErrorCodes(Enum):
@@ -72,7 +70,7 @@ class FlextQualityExceptionsError(FlextExceptions):
             message: str = "Quality analysis error",
             *,
             error_code: str = "QUALITY_ANALYSIS_ERROR",
-            context: dict[str, object] | None = None,
+            context: FlextTypes.Core.Dict | None = None,
         ) -> None:
             super().__init__(message, error_code=error_code, context=context)
 
@@ -88,7 +86,7 @@ class FlextQualityExceptionsError(FlextExceptions):
             message: str = "Quality report error",
             *,
             error_code: str = "QUALITY_REPORT_ERROR",
-            context: dict[str, object] | None = None,
+            context: FlextTypes.Core.Dict | None = None,
         ) -> None:
             super().__init__(message, error_code=error_code, context=context)
 
@@ -104,7 +102,7 @@ class FlextQualityExceptionsError(FlextExceptions):
             message: str = "Quality metrics error",
             *,
             error_code: str = "QUALITY_METRICS_ERROR",
-            context: dict[str, object] | None = None,
+            context: FlextTypes.Core.Dict | None = None,
         ) -> None:
             super().__init__(message, error_code=error_code, context=context)
 
@@ -120,7 +118,7 @@ class FlextQualityExceptionsError(FlextExceptions):
             message: str = "Quality grade error",
             *,
             error_code: str = "QUALITY_GRADE_ERROR",
-            context: dict[str, object] | None = None,
+            context: FlextTypes.Core.Dict | None = None,
         ) -> None:
             super().__init__(message, error_code=error_code, context=context)
 
@@ -136,7 +134,7 @@ class FlextQualityExceptionsError(FlextExceptions):
             message: str = "Quality rule error",
             *,
             error_code: str = "QUALITY_RULE_ERROR",
-            context: dict[str, object] | None = None,
+            context: FlextTypes.Core.Dict | None = None,
         ) -> None:
             super().__init__(message, error_code=error_code, context=context)
 

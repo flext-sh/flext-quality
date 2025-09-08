@@ -4,41 +4,8 @@ This module provides the QualityMetrics value object that encapsulates
 comprehensive code quality measurements, scoring algorithms, and quality
 grade calculations for the FLEXT Quality analysis system.
 
-Key Features:
-    - Multi-dimensional quality scoring (complexity, security, maintainability)
-    - Standardized quality grading with letter grades (A+ to F)
-    - Comprehensive metrics aggregation from analysis results
-    - Domain rule validation for data integrity
-    - Export capabilities for reporting and integration
-
-Scoring Categories:
-    - Complexity Score: Based on cyclomatic complexity measurements
-    - Security Score: Derived from security vulnerability detection
-    - Maintainability Score: Calculated from code structure metrics
-    - Duplication Score: Based on duplicate code detection
-    - Documentation Score: Assessment of code documentation quality
-
-Architecture:
-    Built as a FlextModels using flext-core patterns for immutability
-    and validation. Integrates with QualityGradeCalculator for consistent
-    grading across the FLEXT ecosystem.
-
-Integration:
-    - Uses flext-core.FlextModels for immutable data structures
-    - Integrates with domain layer for grade calculation
-    - Provides dict[str, object] compatibility for data exchange
-    - Supports validation through FlextResult patterns
-
-Example:
-    Creating metrics from analysis results:
-
-    >>> results = analyzer.analyze_project()
-    >>> metrics = QualityMetrics.from_analysis_results(results)
-    >>> print(f"Grade: {metrics.quality_grade} ({metrics.overall_score:.1f})")
-    >>> print(metrics.get_summary())
-
-Author: FLEXT Development Team
-Version: 0.9.0
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 
 """
 
@@ -46,7 +13,7 @@ from __future__ import annotations
 
 from typing import cast, override
 
-from flext_core import FlextModels, FlextResult
+from flext_core import FlextModels, FlextResult, FlextTypes
 from pydantic import Field
 
 from flext_quality.analysis_types import AnalysisResults
@@ -147,6 +114,10 @@ class QualityMetrics(FlextModels):
 
         This factory method ensures all fields are explicitly provided to avoid
         type checker issues with default field interpretation.
+
+        Returns:
+            QualityMetrics:: Description of return value.
+
         """
         return cls(
             overall_score=0.0,
@@ -225,6 +196,10 @@ class QualityMetrics(FlextModels):
         This method allows creating instances with specific field overrides
         for validation testing without triggering type checker warnings.
         Used primarily in test scenarios to test boundary conditions.
+
+        Returns:
+            QualityMetrics:: Description of return value.
+
         """
         defaults = {
             "overall_score": 0.0,
@@ -252,7 +227,7 @@ class QualityMetrics(FlextModels):
 
     @classmethod
     def from_analysis_results(
-        cls, results: AnalysisResults | dict[str, object]
+        cls, results: AnalysisResults | FlextTypes.Core.Dict
     ) -> QualityMetrics:
         """Create QualityMetrics from AnalysisResults using modern API only.
 
@@ -292,7 +267,9 @@ class QualityMetrics(FlextModels):
         return cls._from_analysis_results_object(results)
 
     @classmethod
-    def _from_analysis_results_dict(cls, results: dict[str, object]) -> QualityMetrics:
+    def _from_analysis_results_dict(
+        cls, results: FlextTypes.Core.Dict
+    ) -> QualityMetrics:
         """Create QualityMetrics from legacy dict format for test compatibility."""
         # Extract basic metrics from dict - handle nested structure with safe casting
         metrics = results.get("metrics", {})
@@ -527,7 +504,7 @@ class QualityMetrics(FlextModels):
         *,
         by_alias: bool = False,
         exclude_none: bool = False,
-    ) -> dict[str, object]:
+    ) -> FlextTypes.Core.Dict:
         """Export metrics as dictionary for serialization and integration.
 
         Converts the immutable metrics object to a dictionary format suitable
@@ -546,7 +523,7 @@ class QualityMetrics(FlextModels):
             computed fields for comprehensive data export.
 
         """
-        base: dict[str, object] = {
+        base: FlextTypes.Core.Dict = {
             "overall_score": self.overall_score,
             "quality_grade": self.quality_grade,
             "total_files": self.total_files,

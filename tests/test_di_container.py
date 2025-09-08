@@ -1,8 +1,12 @@
-"""Test DI container functionality using FlextContainer directly."""
+"""Test DI container functionality using FlextContainer directly.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
 
-from flext_core import FlextContainer
+from flext_core import FlextContainer, FlextTypes
 
 
 class TestDIContainer:
@@ -35,7 +39,7 @@ class TestDIContainer:
 
         # Register a quality analysis service (mock)
         class MockQualityAnalyzer:
-            def analyze(self, _code: str) -> dict[str, object]:
+            def analyze(self, _code: str) -> FlextTypes.Core.Dict:
                 return {"quality_score": 85, "issues": []}
 
         analyzer = MockQualityAnalyzer()

@@ -2,6 +2,10 @@
 
 Tests main CLI functions with real argument parsing and file operations.
 Focuses on analyze_project and other CLI commands.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations

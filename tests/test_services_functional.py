@@ -2,6 +2,10 @@
 
 Tests success paths and missing functionality in services.py.
 Covers lines not tested by error scenarios.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations

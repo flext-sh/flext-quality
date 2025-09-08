@@ -1,6 +1,25 @@
-"""AST function information model."""
+"""AST function information model.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
+
+from flext_core import FlextTypes
+
+"""
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
+
+from flext_core import FlextModels
+
+
+class FunctionInfo(FlextModels):
+    """Strongly-typed function information from AST analysis."""
+
 
 from flext_core import FlextModels
 
@@ -14,7 +33,7 @@ class FunctionInfo(FlextModels):
     package_name: str
     line_number: int
     end_line_number: int
-    decorators: list[str]
+    decorators: FlextTypes.Core.StringList
     is_async: bool
     is_generator: bool
     is_method: bool

@@ -8,6 +8,10 @@ Models are organized by domain responsibility:
 - Analysis: Analysis execution and results
 - Reporting: Report generation and metrics
 - Configuration: Analysis configuration models
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
@@ -15,7 +19,7 @@ from __future__ import annotations
 from datetime import datetime
 from uuid import UUID
 
-from flext_core import FlextModels
+from flext_core import FlextModels, FlextTypes
 from pydantic import Field, field_validator
 
 from flext_quality.constants import FlextQualityConstants
@@ -124,7 +128,7 @@ class FlextQualityReportModel(FlextModels.Config):
     generated_at: datetime = Field(
         default_factory=datetime.now, description="Report generation time"
     )
-    metadata: dict[str, object] = Field(
+    metadata: FlextTypes.Core.Dict = Field(
         default_factory=dict, description="Additional report metadata"
     )
 
@@ -132,10 +136,10 @@ class FlextQualityReportModel(FlextModels.Config):
 class FlextAnalysisConfigModel(FlextModels.Config):
     """Pydantic model for analysis configuration."""
 
-    include_patterns: list[str] = Field(
+    include_patterns: FlextTypes.Core.StringList = Field(
         default_factory=list, description="File patterns to include"
     )
-    exclude_patterns: list[str] = Field(
+    exclude_patterns: FlextTypes.Core.StringList = Field(
         default_factory=list, description="File patterns to exclude"
     )
     enable_security: bool = Field(default=True, description="Enable security analysis")

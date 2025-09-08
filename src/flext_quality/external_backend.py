@@ -1,6 +1,18 @@
-"""External tools backend for security and quality analysis."""
+"""External tools backend for security and quality analysis.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 from __future__ import annotations
+
+from flext_core import FlextTypes
+
+"""
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
 
 import json
 import subprocess
@@ -17,13 +29,20 @@ from flext_quality.base import BaseAnalyzer
 class FlextQualityExternalBackend(BaseAnalyzer):
     """Backend using external tools like ruff, mypy, bandit, vulture."""
 
+
+from flext_quality.base import BaseAnalyzer
+
+
+class FlextQualityExternalBackend(BaseAnalyzer):
+    """Backend using external tools like ruff, mypy, bandit, vulture."""
+
     @override
     def get_backend_type(self) -> BackendType:
         """Return the backend type."""
         return BackendType.EXTERNAL
 
     @override
-    def get_capabilities(self) -> list[str]:
+    def get_capabilities(self) -> FlextTypes.Core.StringList:
         """Return the capabilities of this backend."""
         return ["ruff", "mypy", "bandit", "vulture"]
 
@@ -33,7 +52,7 @@ class FlextQualityExternalBackend(BaseAnalyzer):
         code: str,
         file_path: Path | None = None,
         tool: str = "ruff",
-    ) -> dict[str, object]:
+    ) -> FlextTypes.Core.Dict:
         """Analyze code using external tools.
 
         Args:
@@ -45,7 +64,7 @@ class FlextQualityExternalBackend(BaseAnalyzer):
             Dictionary with analysis results
 
         """
-        result: dict[str, object] = {"tool": tool}
+        result: FlextTypes.Core.Dict = {"tool": tool}
         temp_path: Path | None = None
 
         if file_path:
@@ -88,21 +107,21 @@ class FlextQualityExternalBackend(BaseAnalyzer):
         return result
 
     def _convert_result_to_typed_dicts(
-        self, result_list: list[object]
-    ) -> list[dict[str, object]]:
+        self, result_list: FlextTypes.Core.List
+    ) -> list[FlextTypes.Core.Dict]:
         """Convert result list to properly typed dict format."""
-        typed_results: list[dict[str, object]] = []
+        typed_results: list[FlextTypes.Core.Dict] = []
         for item in result_list:
             if isinstance(item, dict):
                 # Ensure all dict values are properly typed as object
-                typed_dict: dict[str, object] = dict(item.items())
+                typed_dict: FlextTypes.Core.Dict = dict(item.items())
                 typed_results.append(typed_dict)
             else:
                 # Convert non-dict items to dict format
                 typed_results.append({"raw": str(item)})
         return typed_results
 
-    def _run_ruff(self, code: str, file_path: Path) -> dict[str, object]:
+    def _run_ruff(self, code: str, file_path: Path) -> FlextTypes.Core.Dict:
         """Run ruff linter using subprocess."""
         try:
             # Validate file path is safe (no shell injection)
@@ -141,7 +160,7 @@ class FlextQualityExternalBackend(BaseAnalyzer):
         except Exception as e:
             return {"error": str(e)}
 
-    def _run_mypy(self, code: str, file_path: Path) -> dict[str, object]:
+    def _run_mypy(self, code: str, file_path: Path) -> FlextTypes.Core.Dict:
         """Run mypy type checker."""
         try:
             # Validate file path is safe (no shell injection)
@@ -165,7 +184,7 @@ class FlextQualityExternalBackend(BaseAnalyzer):
         except Exception as e:
             return {"error": str(e)}
 
-    def _run_bandit(self, code: str, file_path: Path) -> dict[str, object]:
+    def _run_bandit(self, code: str, file_path: Path) -> FlextTypes.Core.Dict:
         """Run bandit security scanner."""
         try:
             # Validate file path is safe (no shell injection)
@@ -185,7 +204,7 @@ class FlextQualityExternalBackend(BaseAnalyzer):
         except Exception as e:
             return {"error": str(e)}
 
-    def _run_vulture(self, code: str, file_path: Path) -> dict[str, object]:
+    def _run_vulture(self, code: str, file_path: Path) -> FlextTypes.Core.Dict:
         """Run vulture dead code detector."""
         try:
             # Validate file path is safe (no shell injection)
@@ -203,7 +222,7 @@ class FlextQualityExternalBackend(BaseAnalyzer):
         except Exception as e:
             return {"error": str(e)}
 
-    def _parse_ruff_output(self, output: str) -> list[dict[str, object]]:
+    def _parse_ruff_output(self, output: str) -> list[FlextTypes.Core.Dict]:
         """Parse ruff JSON output."""
         try:
             if output.strip():
@@ -216,12 +235,12 @@ class FlextQualityExternalBackend(BaseAnalyzer):
         except json.JSONDecodeError:
             return []
 
-    def _parse_mypy_output(self, output: str) -> list[dict[str, object]]:
+    def _parse_mypy_output(self, output: str) -> list[FlextTypes.Core.Dict]:
         """Parse mypy text output."""
-        issues: list[dict[str, object]] = []
+        issues: list[FlextTypes.Core.Dict] = []
         for line in output.splitlines():
             if "error:" in line or "warning:" in line:
-                issue: dict[str, object] = {"message": line.strip()}
+                issue: FlextTypes.Core.Dict = {"message": line.strip()}
                 issues.append(issue)
         return issues
 

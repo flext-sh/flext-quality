@@ -3,9 +3,21 @@
 REFACTORED:
           Using flext-core modern patterns - NO duplication.
 All entities use mixins from flext-core for maximum code reduction.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
+
+from flext_core import FlextTypes
+
+"""
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
 
 import warnings
 from datetime import UTC, datetime
@@ -317,11 +329,11 @@ class FlextQualityRule(FlextModels):
 
     # Rule details
     pattern: str | None = None
-    parameters: dict[str, object] = Field(default_factory=dict)
+    parameters: FlextTypes.Core.Dict = Field(default_factory=dict)
 
     # Documentation
     documentation_url: str | None = None
-    examples: list[dict[str, object]] = Field(default_factory=list)
+    examples: list[FlextTypes.Core.Dict] = Field(default_factory=list)
 
     def enable(self) -> FlextQualityRule:
         """Enable rule and return new instance."""

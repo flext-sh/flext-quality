@@ -2,9 +2,21 @@
 
 Uses flext-core FlextUtilities as base and adds only quality-specific utilities.
 Follows FLEXT patterns: Multiple classes per module, extending core functionality.
+
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
+
+from flext_core import FlextTypes
+
+"""
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
 
 from pathlib import Path
 from textwrap import dedent
@@ -29,7 +41,7 @@ if TYPE_CHECKING:
     QualityIssueList = list[QualityIssueType]
 else:
     QualityIssueType = object
-    QualityIssueList = list[object]
+    QualityIssueList = FlextTypes.Core.List
 
 
 class FlextQualityUtilities:
@@ -49,12 +61,12 @@ class FlextQualityUtilities:
             return True
         # Quality-specific check: issues have file_path and message
         # Cast to list for safe access after isinstance check
-        value_list = cast("list[object]", value)
+        value_list = cast("FlextTypes.Core.List", value)
         first_item = value_list[0]
         return hasattr(first_item, "file_path") and hasattr(first_item, "message")
 
     @staticmethod
-    def safe_issue_list(value: object) -> list[object]:
+    def safe_issue_list(value: object) -> FlextTypes.Core.List:
         """Safely convert value to typed issue list."""
         if FlextQualityUtilities.is_quality_issue_list(value):
             return value
@@ -91,7 +103,7 @@ class FlextReportUtilities:
     """
 
     @staticmethod
-    def format_issue_categories(results: object) -> dict[str, list[object]]:
+    def format_issue_categories(results: object) -> dict[str, FlextTypes.Core.List]:
         """Format issue categories with proper typing."""
         return {
             "SECURITY": FlextQualityUtilities.safe_issue_list(
@@ -109,12 +121,12 @@ class FlextReportUtilities:
         }
 
     @staticmethod
-    def create_report_lines() -> list[str]:
+    def create_report_lines() -> FlextTypes.Core.StringList:
         """Create a new report lines list with proper typing."""
         return []
 
     @staticmethod
-    def safe_extend_lines(target: list[str], source: object) -> None:
+    def safe_extend_lines(target: FlextTypes.Core.StringList, source: object) -> None:
         """Safely extend target list with source items."""
         # Use native Python type checking since FlextUtilities doesn't have is_list
         if isinstance(source, list):
