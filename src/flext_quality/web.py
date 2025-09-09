@@ -15,7 +15,24 @@ from pathlib import Path
 
 from flask import Response as FlaskResponse, jsonify, request
 from flext_core import FlextLogger, FlextTypes
-from flext_web import create_service, get_web_settings
+
+# Use aliases simples para funções existentes no flext-web
+from flext_web import FlextWebServices
+from flext_web.config import FlextWebConfigs
+
+
+# Aliases simples para compatibilidade dos testes
+def create_service(config=None):
+    """Alias simples para FlextWebServices.create_web_service."""
+    result = FlextWebServices.create_web_service(config)
+    return result.value if result.is_success else None
+
+
+def get_web_settings():
+    """Alias simples para FlextWebConfigs.get_web_settings."""
+    return FlextWebConfigs.get_web_settings()
+
+
 from werkzeug.wrappers import Response as WerkzeugResponse
 
 from flext_quality.analyzer import CodeAnalyzer
