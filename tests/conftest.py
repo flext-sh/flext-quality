@@ -19,7 +19,7 @@ from typing import TypeVar
 
 import pytest
 from django.test.utils import setup_test_environment, teardown_test_environment
-from flext_core import FlextResult, FlextTypes, TAnyDict
+from flext_core import FlextResult, FlextTypes
 
 # Type variable for FlextResult data
 T = TypeVar("T")
@@ -153,7 +153,7 @@ def secure_temp_dir() -> Generator[str]:
 
 
 @pytest.fixture
-def sample_code_repository(tmp_path: Path) -> TAnyDict:
+def sample_code_repository(tmp_path: Path) -> FlextTypes.Core.Dict:
     """Provide sample code repository metadata for quality analysis testing.
 
     Creates realistic repository metadata that simulates typical project
@@ -193,7 +193,7 @@ def sample_code_repository(tmp_path: Path) -> TAnyDict:
 
 
 @pytest.fixture
-def quality_metrics_data() -> TAnyDict:
+def quality_metrics_data() -> FlextTypes.Core.Dict:
     """Quality metrics data for testing."""
     return {
         "complexity": {
@@ -220,7 +220,7 @@ def quality_metrics_data() -> TAnyDict:
 
 
 @pytest.fixture
-def code_analysis_config() -> TAnyDict:
+def code_analysis_config() -> FlextTypes.Core.Dict:
     """Code analysis configuration for testing."""
     return {
         "analyzers": {
@@ -249,7 +249,7 @@ def code_analysis_config() -> TAnyDict:
 
 
 @pytest.fixture
-def analysis_results() -> list[TAnyDict]:
+def analysis_results() -> list[FlextTypes.Core.Dict]:
     """Analysis results for testing."""
     return [
         {
@@ -284,7 +284,7 @@ def analysis_results() -> list[TAnyDict]:
 
 # Report generation fixtures
 @pytest.fixture
-def report_config(tmp_path: Path) -> TAnyDict:
+def report_config(tmp_path: Path) -> FlextTypes.Core.Dict:
     """Report configuration for testing."""
     return {
         "format": "json",
@@ -296,7 +296,7 @@ def report_config(tmp_path: Path) -> TAnyDict:
 
 
 @pytest.fixture
-def dashboard_data() -> TAnyDict:
+def dashboard_data() -> FlextTypes.Core.Dict:
     """Dashboard data for testing."""
     return {
         "summary": {
@@ -320,7 +320,7 @@ def dashboard_data() -> TAnyDict:
 
 # Multi-backend fixtures
 @pytest.fixture
-def sonarqube_config() -> TAnyDict:
+def sonarqube_config() -> FlextTypes.Core.Dict:
     """SonarQube configuration for testing."""
     return {
         "host": "http://localhost:9000",
@@ -332,7 +332,7 @@ def sonarqube_config() -> TAnyDict:
 
 
 @pytest.fixture
-def codeclimate_config() -> TAnyDict:
+def codeclimate_config() -> FlextTypes.Core.Dict:
     """CodeClimate configuration for testing."""
     return {
         "api_token": "test-api-token",
@@ -416,7 +416,7 @@ strict = true
 
 # Package discovery fixtures
 @pytest.fixture
-def package_metadata() -> TAnyDict:
+def package_metadata() -> FlextTypes.Core.Dict:
     """Package metadata for testing."""
     return {
         "name": "test-package",
@@ -438,7 +438,7 @@ def package_metadata() -> TAnyDict:
 
 # Task management fixtures
 @pytest.fixture
-def celery_config() -> TAnyDict:
+def celery_config() -> FlextTypes.Core.Dict:
     """Celery configuration for testing."""
     return {
         "broker_url": "redis://localhost:6379/0",
@@ -452,7 +452,7 @@ def celery_config() -> TAnyDict:
 
 
 @pytest.fixture
-def analysis_task_data() -> TAnyDict:
+def analysis_task_data() -> FlextTypes.Core.Dict:
     """Analysis task data for testing."""
     return {
         "task_id": "test-task-123",
@@ -539,7 +539,7 @@ def mock_quality_analyzer() -> object:
         def __init__(self) -> None:
             self.analyzed_files: FlextTypes.Core.StringList = []
 
-        async def analyze_project(self, project_path: str) -> TAnyDict:
+        async def analyze_project(self, project_path: str) -> FlextTypes.Core.Dict:
             """Simulate comprehensive project analysis.
 
             Args:
@@ -557,7 +557,7 @@ def mock_quality_analyzer() -> object:
                 "analysis_time": 2.5,
             }
 
-        async def analyze_file(self, file_path: str) -> TAnyDict:
+        async def analyze_file(self, file_path: str) -> FlextTypes.Core.Dict:
             """Simulate individual file analysis.
 
             Args:
@@ -574,7 +574,7 @@ def mock_quality_analyzer() -> object:
                 "coverage": 90.0,
             }
 
-        async def get_metrics(self, project_path: str) -> TAnyDict:
+        async def get_metrics(self, project_path: str) -> FlextTypes.Core.Dict:
             """Simulate project-wide quality metrics collection.
 
             Args:
@@ -630,11 +630,11 @@ def mock_report_generator() -> object:
         """
 
         def __init__(self) -> None:
-            self.generated_reports: list[TAnyDict] = []
+            self.generated_reports: list[FlextTypes.Core.Dict] = []
 
         async def generate_report(
             self,
-            data: TAnyDict,
+            data: FlextTypes.Core.Dict,
             output_format: str = "json",
         ) -> str:
             """Simulate report generation in specified format.
@@ -647,7 +647,7 @@ def mock_report_generator() -> object:
                 Generated report filename
 
             """
-            report: TAnyDict = {
+            report: FlextTypes.Core.Dict = {
                 "format": output_format,
                 "data": data,
                 "timestamp": "2023-01-01T12:00:00Z",
@@ -655,7 +655,7 @@ def mock_report_generator() -> object:
             self.generated_reports.append(report)
             return f"report_{len(self.generated_reports)}.{output_format}"
 
-        async def generate_dashboard_data(self) -> TAnyDict:
+        async def generate_dashboard_data(self) -> FlextTypes.Core.Dict:
             """Simulate dashboard data generation.
 
             Returns:
