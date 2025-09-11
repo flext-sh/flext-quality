@@ -30,7 +30,7 @@ from flext_quality.value_objects import (
 )
 
 
-class FileAnalysisResult(FlextModels):
+class FileAnalysisResult(FlextModels.Value):
     """Result of analyzing a single file."""
 
     file_path: Path = Field(..., description="Path to the analyzed file")
@@ -45,7 +45,7 @@ class FileAnalysisResult(FlextModels):
     dead_code_lines: int = Field(default=0, ge=0, description="Lines of dead code")
 
 
-class ComplexityIssue(FlextModels):
+class ComplexityIssue(FlextModels.Value):
     """Represents a complexity issue in code."""
 
     file_path: str = Field(..., description="File where issue was found")
@@ -61,7 +61,7 @@ class ComplexityIssue(FlextModels):
     )
 
 
-class SecurityIssue(FlextModels):
+class SecurityIssue(FlextModels.Value):
     """Represents a security issue found in code."""
 
     file_path: str = Field(..., description="File where issue was found")
@@ -78,7 +78,7 @@ class SecurityIssue(FlextModels):
     )
 
 
-class DeadCodeIssue(FlextModels):
+class DeadCodeIssue(FlextModels.Value):
     """Represents dead/unused code found during analysis."""
 
     file_path: str = Field(..., description="File containing dead code")
@@ -95,7 +95,7 @@ class DeadCodeIssue(FlextModels):
     )
 
 
-class DuplicationIssue(FlextModels):
+class DuplicationIssue(FlextModels.Value):
     """Represents code duplication detected in analysis."""
 
     files: FlextTypes.Core.StringList = Field(
@@ -117,7 +117,7 @@ class DuplicationIssue(FlextModels):
     )
 
 
-class OverallMetrics(FlextModels):
+class OverallMetrics(FlextModels.Value):
     """Overall metrics for the entire analysis."""
 
     files_analyzed: int = Field(default=0, ge=0, description="Total files analyzed")
@@ -200,7 +200,6 @@ __all__ = [
     "DeadCodeIssue",
     "DuplicationIssue",
     "FileAnalysisResult",
-    # Type aliases for backward compatibility
     "IssueSeverity",
     "IssueType",
     "OverallMetrics",

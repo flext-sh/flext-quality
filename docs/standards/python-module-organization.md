@@ -22,7 +22,7 @@ FLEXT Quality follows **Clean Architecture + Domain-Driven Design (DDD)** patter
 src/flext_quality/
 ├── __init__.py                     # Public API exports and simplified imports
 ├── __version__.py                  # Version information
-├── py.typed                        # Type information marker
+├── py.typed
 ├── exceptions.py                   # Quality-specific exceptions
 │
 ├── domain/                         # Domain Layer (Core Business Logic)
@@ -74,7 +74,7 @@ src/flext_quality/
 │   ├── __init__.py                # Shared public exports
 │   ├── utils.py                   # General utilities
 │   ├── constants.py               # Application constants
-│   ├── types.py                   # Type definitions
+│   ├── types.py
 │   └── logging.py                 # Logging configuration
 │
 └── legacy/                         # Legacy code (Deprecated)
@@ -808,7 +808,7 @@ __all__: FlextTypes.Core.StringList = [
     "QualityProjectService",
     "QualityAnalysisService",
 
-    # Simple API
+  
     "QualityAPI",
 
     # CLI
@@ -819,7 +819,7 @@ __all__: FlextTypes.Core.StringList = [
 ### Simple API for Common Use Cases
 
 ```python
-# simple_api.py
+
 """Simplified API for common FLEXT Quality operations."""
 
 from __future__ import annotations

@@ -378,7 +378,6 @@ class FlextQualityCodeAnalyzer:
                 with py_file.open(encoding="utf-8") as f:
                     content = f.read()
 
-                # Simple security checks
                 if "eval(" in content:
                     issues.append(
                         SecurityIssue(
@@ -463,7 +462,6 @@ class FlextQualityCodeAnalyzer:
 
                 lines = content.splitlines()
 
-                # Simple heuristic: if import line contains "unused" comment
                 for i, line in enumerate(lines):
                     if (
                         "import " in line or "from " in line
@@ -504,13 +502,11 @@ class FlextQualityCodeAnalyzer:
             ) as e:
                 logger.warning("Error reading %s: %s", py_file, e)
 
-        # Simple duplicate detection based on file similarity
         files = list(file_contents.keys())
         for i in range(len(files)):
             for j in range(i + 1, len(files)):
                 file1, file2 = files[i], files[j]
 
-                # Simple line-based similarity check
                 lines1 = set(file_contents[file1].splitlines())
                 lines2 = set(file_contents[file2].splitlines())
 

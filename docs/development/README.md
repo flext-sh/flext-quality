@@ -246,7 +246,7 @@ All code must pass these quality gates:
 make validate
 
 # Individual checks
-make lint          # Ruff with ALL rules enabled
+make lint
 make type-check    # MyPy strict mode
 make test          # 90% coverage minimum
 make security      # Bandit + pip-audit

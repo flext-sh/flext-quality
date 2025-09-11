@@ -18,13 +18,6 @@ from enum import Enum
 class BackendType(Enum):
     """Enumeration of backend types."""
 
-
-from enum import Enum
-
-
-class BackendType(Enum):
-    """Enumeration of backend types."""
-
     AST = "ast"
     EXTERNAL = "external"
     HYBRID = "hybrid"

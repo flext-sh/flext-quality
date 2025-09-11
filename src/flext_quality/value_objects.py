@@ -93,7 +93,7 @@ class IssueType(StrEnum):
     # Duplication issues
     DUPLICATE_CODE = "duplicate_code"
     SIMILAR_CODE = "similar_code"
-    # Type issues
+
     TYPE_ERROR = "type_error"
     MISSING_TYPE_ANNOTATION = "missing_type_annotation"
     # Documentation issues

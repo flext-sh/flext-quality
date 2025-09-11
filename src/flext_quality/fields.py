@@ -16,10 +16,6 @@ from typing import cast
 from pydantic import Field
 from pydantic.fields import FieldInfo
 
-# =============================================================================
-# IDENTITY FIELDS - IDs and identifiers
-# =============================================================================
-
 
 def entity_id_field(description: str = "Unique entity identifier") -> FieldInfo:
     """Standard UUID field for entity identifiers."""
@@ -31,11 +27,6 @@ def optional_entity_id_field(
 ) -> FieldInfo:
     """Optional UUID field for entity identifiers."""
     return cast("FieldInfo", Field(None, description=description))
-
-
-# =============================================================================
-# TEMPORAL FIELDS - Date/time fields
-# =============================================================================
 
 
 def created_at_field() -> FieldInfo:
@@ -76,11 +67,6 @@ def started_at_field() -> FieldInfo:
     )
 
 
-# =============================================================================
-# SCORE FIELDS - Quality scores with validation
-# =============================================================================
-
-
 def quality_score_field(description: str = "Quality score") -> FieldInfo:
     """Standard quality score field (0-100)."""
     return cast(
@@ -119,11 +105,6 @@ def complexity_score_field() -> FieldInfo:
     return quality_score_field("Complexity score")
 
 
-# =============================================================================
-# PATH FIELDS - File and directory paths
-# =============================================================================
-
-
 def file_path_field(description: str = "File path") -> FieldInfo:
     """Standard file path field."""
     return cast("FieldInfo", Field(..., description=description))
@@ -137,11 +118,6 @@ def optional_file_path_field(description: str = "Optional file path") -> FieldIn
 def project_path_field() -> FieldInfo:
     """Project path field for analysis."""
     return cast("FieldInfo", Field(..., description="Project path for analysis"))
-
-
-# =============================================================================
-# CONTENT FIELDS - Text and message fields
-# =============================================================================
 
 
 def name_field(max_length: int = 255, description: str = "Name") -> FieldInfo:
@@ -194,11 +170,6 @@ def report_content_field() -> FieldInfo:
     return content_field("Report content")
 
 
-# =============================================================================
-# NUMERIC FIELDS - Numbers with validation
-# =============================================================================
-
-
 def line_number_field() -> FieldInfo:
     """Line number field (must be positive)."""
     return cast("FieldInfo", Field(..., ge=1, description="Line number"))
@@ -232,11 +203,6 @@ def min_coverage_field(default: float = 90.0) -> FieldInfo:
 def security_threshold_field(default: float = 90.0) -> FieldInfo:
     """Security score threshold field."""
     return percentage_field(default, "Security score threshold")
-
-
-# =============================================================================
-# COLLECTION FIELDS - Lists and dictionaries
-# =============================================================================
 
 
 def string_list_field(description: str = "List of strings") -> FieldInfo:
@@ -276,11 +242,6 @@ def report_metadata_field() -> FieldInfo:
     )
 
 
-# =============================================================================
-# BOOLEAN FIELDS - Feature flags and toggles
-# =============================================================================
-
-
 def feature_flag_field(
     *, default: bool = True, description: str = "Feature flag"
 ) -> FieldInfo:
@@ -301,11 +262,6 @@ def enable_complexity_field() -> FieldInfo:
 def enable_coverage_field() -> FieldInfo:
     """Enable coverage analysis flag."""
     return feature_flag_field(default=True, description="Enable coverage analysis")
-
-
-# =============================================================================
-# ENUMERATION FIELDS - Status and type fields
-# =============================================================================
 
 
 def status_field(description: str = "Status") -> FieldInfo:

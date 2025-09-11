@@ -238,7 +238,6 @@ class FlextQualityReportGenerator:
 
     def _get_quality_score(self) -> int:
         """Calculate overall quality score."""
-        # Simple scoring based on issue count
         total_issues = self._get_total_issues()
         critical_issues = self._get_critical_issues()
 

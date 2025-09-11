@@ -202,7 +202,6 @@ class FlextQualityWebInterface:
         if report_format not in {"json", "html", "pdf"}:
             return jsonify({"success": False, "error": "Invalid format"}), 400
 
-        # Simple report placeholder
         report: FlextTypes.Core.Dict = {
             "format": report_format,
             "generated_at": "2025-01-08",

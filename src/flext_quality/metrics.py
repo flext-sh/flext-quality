@@ -222,7 +222,7 @@ class QualityMetrics(FlextModels):
             "documentation_score": 100.0,
         }
         defaults.update(overrides)
-        # Type narrowing to satisfy MyPy - all overrides validated to be correct types
+
         return cls(**defaults)  # Dict validated with correct field types
 
     @classmethod
@@ -305,12 +305,12 @@ class QualityMetrics(FlextModels):
         total_issues = (
             security_issues + complexity_issues + dead_code_issues + duplication_issues
         )
-        quality_score = max(0, 100 - (total_issues * 5))  # Simple penalty-based scoring
+        quality_score = max(0, 100 - (total_issues * 5))
 
         return cls(
             # Overall metrics
             overall_score=quality_score,
-            quality_grade="B",  # Simple default
+            quality_grade="B",
             # File metrics
             total_files=files_analyzed,
             total_lines_of_code=total_lines_of_code,

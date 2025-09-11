@@ -23,11 +23,11 @@ def test_external_tool_missing_returns_error(tmp_path: Path) -> None:
     """When tools are missing, return error messages for each runner."""
     backend = ExternalBackend()
     temp = _temp_py(tmp_path)
-    # Ruff
+
     res1 = backend._run_ruff("code", temp)
     assert "error" in res1
     assert "Ruff not found" in str(res1["error"])
-    # MyPy
+
     res2 = backend._run_mypy("code", temp)
     assert "error" in res2
     assert "MyPy not found" in str(res2["error"])
@@ -51,12 +51,10 @@ def test_external_backend_empty_outputs(
     backend = ExternalBackend()
     temp = _temp_py(tmp_path)
 
-    # Ruff with empty stdout -> issues []
     mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
     out1 = backend._run_ruff("code", temp)
     assert out1["issues"] == []
 
-    # MyPy with empty stdout -> issues []
     mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
     out2 = backend._run_mypy("code", temp)
     assert isinstance(out2["issues"], list)

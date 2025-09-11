@@ -81,7 +81,7 @@ class DataProcessor:
       if item is None:
           return None
 
-      # Simple processing logic
+
       if isinstance(item, (int, float)):
           result = item * 2
           self.processed_count += 1
@@ -103,7 +103,7 @@ class DataProcessor:
       }
 
 if __name__ == "__main__":
-    # Simple usage example
+
     processor = DataProcessor()
 
     test_values = [1, 2, 3, 4, 5]

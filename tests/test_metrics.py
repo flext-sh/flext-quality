@@ -18,7 +18,7 @@ from flext_quality.analysis_types import (
 )
 
 # Import correct classes - now independent classes, not nested
-FileMetrics = FileAnalysisResult  # Alias for backward compatibility
+FileMetrics = FileAnalysisResult
 
 
 class TestQualityMetrics:

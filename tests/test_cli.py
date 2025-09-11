@@ -19,13 +19,13 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from flext_quality import (
+from flext_quality.analysis_types import AnalysisResults, OverallMetrics
+from flext_quality.cli import (
     analyze_project,
     another_function,
     main,
     setup_logging,
 )
-from flext_quality.analysis_types import AnalysisResults, OverallMetrics
 
 
 class TestAnalyzeProjectComprehensive:

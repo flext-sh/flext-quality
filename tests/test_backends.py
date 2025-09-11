@@ -258,7 +258,6 @@ class DerivedClass(BaseClass):
         """Test _calculate_complexity method."""
         backend = ASTBackend()
 
-        # Simple code - low complexity
         simple_code = "x = 1\ny = 2"
         simple_tree = ast.parse(simple_code)
         simple_complexity = backend._calculate_complexity(simple_tree)
