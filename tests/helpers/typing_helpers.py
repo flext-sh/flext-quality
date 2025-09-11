@@ -1,4 +1,4 @@
-"""DRY typing helpers for tests
+"""DRY typing helpers for tests.
 
 This module provides reusable type-safe helpers to eliminate duplicate code
 across test files while maintaining strict MyPy compliance.
