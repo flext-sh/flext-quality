@@ -1,7 +1,7 @@
 """Value Objects for FLEXT-QUALITY.
 
 Following FLEXT patterns: Multiple independent classes per module like flext-core.
-Each class is a separate value object following SOLID principles.
+Each class is a separate value object
 
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.

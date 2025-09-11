@@ -1,7 +1,7 @@
 """Analysis Types for FLEXT-QUALITY.
 
 Following FLEXT patterns: Multiple independent classes per module like flext-core.
-Each class is a separate domain model following SOLID principles.
+Each class is a separate domain model
 Strongly-typed data structures that integrate with FLEXT ecosystem.
 
 

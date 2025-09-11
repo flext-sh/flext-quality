@@ -386,7 +386,7 @@ class FlextQualityAPI:
         project = project_result.value
 
         # Integrate with real analysis tools using flext-core patterns
-        # Execute real analysis using CodeAnalyzer
+        # Execute analysis using CodeAnalyzer
         project_path = Path(project.project_path)
         analyzer = CodeAnalyzer(project_path)
         analysis_results = analyzer.analyze_project()
