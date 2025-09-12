@@ -11,8 +11,4 @@ from flext_core import FlextContainer
 
 def get_quality_container() -> FlextContainer:
     """Get quality service container using flext-core patterns."""
-
-
-def get_quality_container() -> FlextContainer:
-    """Get quality service container using flext-core patterns."""
     return FlextContainer.get_global()

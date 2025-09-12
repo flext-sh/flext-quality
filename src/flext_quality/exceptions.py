@@ -69,10 +69,10 @@ class FlextQualityExceptionsError(FlextExceptions):
             self,
             message: str = "Quality analysis error",
             *,
-            error_code: str = "QUALITY_ANALYSIS_ERROR",
+            code: str = "QUALITY_ANALYSIS_ERROR",
             context: FlextTypes.Core.Dict | None = None,
         ) -> None:
-            super().__init__(message, error_code=error_code, context=context)
+            super().__init__(message, code=code, context=context)
 
         @override
         def __str__(self) -> str:
@@ -85,10 +85,10 @@ class FlextQualityExceptionsError(FlextExceptions):
             self,
             message: str = "Quality report error",
             *,
-            error_code: str = "QUALITY_REPORT_ERROR",
+            code: str = "QUALITY_REPORT_ERROR",
             context: FlextTypes.Core.Dict | None = None,
         ) -> None:
-            super().__init__(message, error_code=error_code, context=context)
+            super().__init__(message, code=code, context=context)
 
         @override
         def __str__(self) -> str:
@@ -101,10 +101,10 @@ class FlextQualityExceptionsError(FlextExceptions):
             self,
             message: str = "Quality metrics error",
             *,
-            error_code: str = "QUALITY_METRICS_ERROR",
+            code: str = "QUALITY_METRICS_ERROR",
             context: FlextTypes.Core.Dict | None = None,
         ) -> None:
-            super().__init__(message, error_code=error_code, context=context)
+            super().__init__(message, code=code, context=context)
 
         @override
         def __str__(self) -> str:
@@ -117,10 +117,10 @@ class FlextQualityExceptionsError(FlextExceptions):
             self,
             message: str = "Quality grade error",
             *,
-            error_code: str = "QUALITY_GRADE_ERROR",
+            code: str = "QUALITY_GRADE_ERROR",
             context: FlextTypes.Core.Dict | None = None,
         ) -> None:
-            super().__init__(message, error_code=error_code, context=context)
+            super().__init__(message, code=code, context=context)
 
         @override
         def __str__(self) -> str:
@@ -133,10 +133,10 @@ class FlextQualityExceptionsError(FlextExceptions):
             self,
             message: str = "Quality rule error",
             *,
-            error_code: str = "QUALITY_RULE_ERROR",
+            code: str = "QUALITY_RULE_ERROR",
             context: FlextTypes.Core.Dict | None = None,
         ) -> None:
-            super().__init__(message, error_code=error_code, context=context)
+            super().__init__(message, code=code, context=context)
 
         @override
         def __str__(self) -> str:

@@ -6,22 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextTypes
-
-"""
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
-
-from flext_core import FlextModels
-
-
-class ClassInfo(FlextModels):
-    """Strongly-typed class information from AST analysis."""
-
-
-from flext_core import FlextModels
+from flext_core import FlextModels, FlextTypes
 
 
 class ClassInfo(FlextModels):

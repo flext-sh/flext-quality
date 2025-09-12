@@ -24,14 +24,14 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import override
 
-from flext_core import FlextModels, FlextResult
-from pydantic import Field
+from flext_core import FlextResult
+from pydantic import BaseModel, Field
 
 from flext_quality.typings import FlextTypes
 from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
 
 
-class FlextDomainEvent(FlextModels):
+class FlextDomainEvent(BaseModel):
     """Base class for domain events."""
 
     event_type: str
@@ -56,7 +56,7 @@ warnings.warn(
 )
 
 
-class FlextQualityProject(FlextModels):
+class FlextQualityProject(BaseModel):
     """Quality project domain entity using enhanced mixins for code reduction."""
 
     # Project identification
@@ -109,7 +109,7 @@ warnings.warn(
 )
 
 
-class FlextQualityAnalysis(FlextModels):
+class FlextQualityAnalysis(BaseModel):
     """Quality analysis domain entity using enhanced mixins for code reduction."""
 
     project_id: str = Field(..., description="Associated project ID")
@@ -236,7 +236,7 @@ warnings.warn(
 )
 
 
-class FlextQualityIssue(FlextModels):
+class FlextQualityIssue(BaseModel):
     """Quality issue domain entity using enhanced mixins for code reduction."""
 
     analysis_id: str = Field(..., description="Associated analysis ID")
@@ -316,7 +316,7 @@ warnings.warn(
 )
 
 
-class FlextQualityRule(FlextModels):
+class FlextQualityRule(BaseModel):
     """Quality rule domain entity using enhanced mixins for code reduction."""
 
     # Rule identification
@@ -368,7 +368,7 @@ warnings.warn(
 )
 
 
-class FlextQualityReport(FlextModels):
+class FlextQualityReport(BaseModel):
     """Quality report domain entity using enhanced mixins for code reduction."""
 
     analysis_id: str = Field(..., description="Associated analysis ID")
@@ -466,11 +466,11 @@ class ReportGeneratedEvent(FlextDomainEvent):
 
 # Rebuild models to resolve forward references and type annotations
 try:
-    QualityProject.model_rebuild()
-    QualityAnalysis.model_rebuild()
-    QualityIssue.model_rebuild()
-    QualityRule.model_rebuild()
-    QualityReport.model_rebuild()
+    FlextQualityProject.model_rebuild()
+    FlextQualityAnalysis.model_rebuild()
+    FlextQualityIssue.model_rebuild()
+    FlextQualityRule.model_rebuild()
+    FlextQualityReport.model_rebuild()
 
     # Also rebuild domain events
     FlextDomainEvent.model_rebuild()

@@ -6,26 +6,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextTypes
-
-"""
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
-
 import warnings
 from abc import ABC, abstractmethod
 from pathlib import Path
 
+from flext_core import FlextTypes
+
 from flext_quality.backend_type import BackendType
-
-
-class FlextQualityAnalyzer(ABC):
-    """Abstract base class for code analyzers using flext-core patterns."""
-
-
-from abc import ABC
 
 
 class FlextQualityAnalyzer(ABC):

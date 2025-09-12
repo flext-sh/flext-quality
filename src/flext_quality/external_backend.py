@@ -6,14 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextTypes
-
-"""
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
-
 import json
 import subprocess
 import tempfile
@@ -22,14 +14,9 @@ from importlib import import_module, util
 from pathlib import Path
 from typing import override
 
+from flext_core import FlextTypes
+
 from flext_quality.backend_type import BackendType
-from flext_quality.base import BaseAnalyzer
-
-
-class FlextQualityExternalBackend(BaseAnalyzer):
-    """Backend using external tools like ruff, mypy, bandit, vulture."""
-
-
 from flext_quality.base import BaseAnalyzer
 
 
