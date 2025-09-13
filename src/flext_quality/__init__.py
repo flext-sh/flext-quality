@@ -1,136 +1,43 @@
-"""Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT.
-"""
+"""FLEXT Quality - Code Quality Analysis System.
 
-from __future__ import annotations
-
-"""FLEXT Quality - Code Quality Analysis System."""
-"""
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
+from __future__ import annotations
 
-# Import all from each module following flext-core pattern
-# Note: __all__ is constructed dynamically at runtime from imported modules
-# This pattern is necessary for library aggregation but causes pyright warnings
-import flext_quality.analysis_types as _analysis_types
-import flext_quality.analyzer as _analyzer
-import flext_quality.api as _api
-import flext_quality.ast_backend as _ast_backend
-import flext_quality.ast_class_info as _ast_class_info
-import flext_quality.ast_function_info as _ast_function_info
-import flext_quality.backend_type as _backend_type
-import flext_quality.base as _base
-import flext_quality.cli as _cli
-import flext_quality.config as _config
-import flext_quality.constants as _constants
-import flext_quality.container as _container
-import flext_quality.entities as _entities
-import flext_quality.exceptions as _exceptions
-import flext_quality.external_backend as _external_backend
-import flext_quality.fields as _fields
-import flext_quality.grade_calculator as _grade_calculator
-import flext_quality.handlers as _handlers
-import flext_quality.metrics as _metrics
-import flext_quality.models as _models
-import flext_quality.ports as _ports
-import flext_quality.reports as _reports
-import flext_quality.services as _services
-import flext_quality.typings as _typings
-import flext_quality.utilities as _utilities
-import flext_quality.value_objects as _value_objects
-import flext_quality.web as _web
-from flext_quality.__version__ import *
-from flext_quality.analysis_types import *
-from flext_quality.analyzer import *
-from flext_quality.api import *
-from flext_quality.ast_backend import *
-from flext_quality.ast_class_info import *
-from flext_quality.ast_function_info import *
-from flext_quality.backend_type import *
-from flext_quality.base import *
-from flext_quality.cli import *
-from flext_quality.config import *
-from flext_quality.constants import *
-from flext_quality.container import *
-from flext_quality.entities import *
-from flext_quality.exceptions import *
-from flext_quality.external_backend import *
-from flext_quality.fields import *
-from flext_quality.grade_calculator import *
-from flext_quality.handlers import *
-from flext_quality.metrics import *
-from flext_quality.models import *
-from flext_quality.ports import *
+from flext_quality.__version__ import __version__, __version_info__
 
-# Specific imports to avoid conflicts
-from flext_quality.reports import (
-    HIGH_ISSUE_THRESHOLD,
-    HIGH_TYPE_ERROR_THRESHOLD,
-    HTML_ISSUE_LIMIT,
-    ISSUE_PREVIEW_LIMIT,
-    MIN_COVERAGE_THRESHOLD,
-    MIN_SCORE_THRESHOLD,
-    FlextQualityReportGenerator,
-)
-from flext_quality.services import *
-from flext_quality.typings import *
+# from flext_quality.analysis_types import QualityAnalysisType, QualityMetricType  # Temporarily disabled - these don't exist
+from flext_quality.config import FlextQualityConfig
+from flext_quality.exceptions import FlextQualityError, FlextQualityValidationError
+from flext_quality.grade_calculator import QualityGradeCalculator
+from flext_quality.handlers import FlextQualityHandler
+from flext_quality.models import QualityMetric, QualityReport
+from flext_quality.ports import QualityAnalysisPort
+from flext_quality.reports import QualityReportGenerator
+from flext_quality.services import FlextQualityService
+from flext_quality.utilities import QualityUtilities
+from flext_quality.value_objects import QualityScore, QualityThreshold
+from flext_quality.web import FlextQualityWebInterface
 
-# Specific imports to avoid conflicts
-from flext_quality.utilities import (
-    FlextAnalysisUtilities,
-    FlextQualityUtilities,
-    FlextReportUtilities,
-    FlextTestUtilities,
-)
-from flext_quality.value_objects import *
-
-# Specific imports to avoid conflicts
-from flext_quality.web import FlextQualityWebInterface, web_main
-
-# Static __all__ list to satisfy Ruff PLE0605 requirement
-# Essential exports - only explicitly imported items to avoid F405 errors
 __all__ = [
-    "HIGH_ISSUE_THRESHOLD",
-    "HIGH_TYPE_ERROR_THRESHOLD",
-    "HTML_ISSUE_LIMIT",
-    "ISSUE_PREVIEW_LIMIT",
-    "MIN_COVERAGE_THRESHOLD",
-    "MIN_SCORE_THRESHOLD",
-    "FlextAnalysisUtilities",
-    "FlextQualityReportGenerator",
-    "FlextQualityUtilities",
-    # Explicitly imported from web module
+    "FlextQualityConfig",
+    "FlextQualityError",
+    "FlextQualityHandler",
+    "FlextQualityService",
+    "FlextQualityValidationError",
     "FlextQualityWebInterface",
-    "FlextReportUtilities",
-    "FlextTestUtilities",
-    "_analysis_types",
-    "_analyzer",
-    "_api",
-    "_ast_backend",
-    "_ast_class_info",
-    "_ast_function_info",
-    "_backend_type",
-    "_base",
-    "_cli",
-    "_config",
-    "_constants",
-    "_container",
-    "_entities",
-    "_exceptions",
-    "_external_backend",
-    "_fields",
-    "_grade_calculator",
-    "_handlers",
-    "_metrics",
-    "_models",
-    "_ports",
-    "_reports",
-    "_services",
-    "_typings",
-    "_utilities",
-    "_value_objects",
-    "_web",
-    "web_main",
+    "QualityAnalysisPort",
+    # "QualityAnalysisType",  # Disabled - doesn't exist
+    "QualityGradeCalculator",
+    "QualityMetric",
+    # "QualityMetricType",  # Disabled - doesn't exist
+    "QualityReport",
+    "QualityReportGenerator",
+    "QualityScore",
+    "QualityThreshold",
+    "QualityUtilities",
+    "__version__",
+    "__version_info__",
 ]

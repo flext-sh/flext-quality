@@ -1,8 +1,4 @@
-"""Quality-specific utility classes extending flext-core FlextUtilities.
-
-Uses flext-core FlextUtilities as base and adds only quality-specific utilities.
-Follows FLEXT patterns: Multiple classes per module, extending core functionality.
-
+"""Quality analysis utilities for FLEXT Quality System.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -10,19 +6,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextTypes
-
-"""
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
-
 from pathlib import Path
 from textwrap import dedent
 from typing import TYPE_CHECKING, cast
 
-from flext_core.utilities import FlextUtilities  # Use flext-core utilities as base
+from flext_core import FlextTypes, FlextUtilities
 
 if TYPE_CHECKING:
     from flext_quality.analysis_types import (
@@ -69,7 +57,7 @@ class FlextQualityUtilities:
     def safe_issue_list(value: object) -> FlextTypes.Core.List:
         """Safely convert value to typed issue list."""
         if FlextQualityUtilities.is_quality_issue_list(value):
-            return value
+            return value  # type: ignore
         return []
 
     @staticmethod
@@ -85,10 +73,10 @@ class FlextQualityUtilities:
         # For all other issue types - use safe string conversion
         if hasattr(issue, "file_path") and hasattr(issue, "line_number"):
             file_path = FlextUtilities.TextProcessor.safe_string(
-                getattr(issue, "file_path", ""), "unknown"
+                getattr(issue, "file_path", "") or "unknown"
             )
             line_number = FlextUtilities.TextProcessor.safe_string(
-                getattr(issue, "line_number", ""), "?"
+                getattr(issue, "line_number", "") or "?"
             )
             return f"{file_path}:{line_number}"
 
@@ -131,7 +119,7 @@ class FlextReportUtilities:
         # Use native Python type checking since FlextUtilities doesn't have is_list
         if isinstance(source, list):
             str_items = [
-                FlextUtilities.TextProcessor.safe_string(item, "") for item in source
+                FlextUtilities.TextProcessor.safe_string(item or "") for item in source
             ]
             target.extend(str_items)
 
@@ -148,8 +136,10 @@ class FlextTestUtilities:
         """Create test files with specific types of real issues."""
         content_map = {
             "complexity": '''
+
 def complex_function(x):
     """Function with high complexity - real code."""
+
     if x > 10:
         if x > 20:
             if x > 30:
@@ -168,11 +158,15 @@ def complex_function(x):
         return "low"
 ''',
             "security": '''
+
 import os
 import subprocess
+from typing import List
+from typing import Type
 
 def unsafe_function(user_input):
     """Function with real security issues."""
+
     # SQL injection vulnerability (real)
     query = f"SELECT * FROM users WHERE name = '{user_input}'"
 
@@ -185,25 +179,31 @@ def unsafe_function(user_input):
     return query
 ''',
             "dead_code": '''
+
 def used_function():
     """This function is used."""
+
     return "active"
 
 def unused_function():
     """This function is never called - dead code."""
+
     unused_variable = "this is dead code"
     return unused_variable
 
 def another_unused():
     """Another unused function."""
+
     pass
 
 # This is the only function that gets called
 result = used_function()
 ''',
             "duplication": '''
+
 def process_data_type_a(data):
     """Process data type A."""
+
     if not data:
         return None
     processed = []
@@ -214,6 +214,7 @@ def process_data_type_a(data):
 
 def process_data_type_b(data):
     """Process data type B - duplicated logic."""
+
     if not data:
         return None
     processed = []
@@ -265,7 +266,7 @@ class FlextAnalysisUtilities:
 
         # Use safe float conversion from FlextUtilities
         score = getattr(metrics, "quality_score", 0.0)
-        return FlextUtilities.Conversions.safe_float(score, 0.0)
+        return FlextUtilities.Conversions.safe_float(score, default=0.0)
 
     @staticmethod
     def count_real_issues(analysis_results: AnalysisResults | object) -> int:
@@ -273,7 +274,7 @@ class FlextAnalysisUtilities:
         # Use FlextUtilities for safe type conversion
         if hasattr(analysis_results, "total_issues"):
             total_issues_attr = getattr(analysis_results, "total_issues", 0)
-            return FlextUtilities.Conversions.safe_int(total_issues_attr, 0)
+            return FlextUtilities.Conversions.safe_int(total_issues_attr, default=0)
         return 0
 
 

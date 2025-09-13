@@ -10,10 +10,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TypeGuard, cast
-
-from flext_core import FlextTypes
-
 
 def assert_is_dict(value: object) -> TypeGuard[FlextTypes.Core.Dict]:
     """Type-safe dict assertion following Single Responsibility Principle.

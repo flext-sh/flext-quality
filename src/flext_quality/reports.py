@@ -6,26 +6,17 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextTypes
-
-"""
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
-
 import json
 import warnings
 from pathlib import Path
+
+from flext_core import FlextTypes
 
 from flext_quality.analysis_types import (
     AnalysisResults,
 )
 from flext_quality.grade_calculator import FlextQualityGradeCalculator
-from flext_quality.utilities import (
-    FlextQualityUtilities,
-    FlextReportUtilities,
-)
+from flext_quality.utilities import FlextQualityUtilities, FlextReportUtilities
 
 # Constants for display limits
 ISSUE_PREVIEW_LIMIT = 5
@@ -34,10 +25,6 @@ HIGH_ISSUE_THRESHOLD = 50
 MIN_COVERAGE_THRESHOLD = 80
 MIN_SCORE_THRESHOLD = 70
 HIGH_TYPE_ERROR_THRESHOLD = 10
-
-
-class FlextQualityReportGenerator:
-    """Generates quality reports from analysis results."""
 
 
 # Constants for display limits

@@ -34,9 +34,12 @@ class TestCodeAnalyzerFunctional:
 import os
 import sys
 from typing import List, Optional
+from typing import Dict
+from typing import Optional
 
 def calculate_average(numbers: List[float]) -> float:
     """Calculate average of numbers."""
+
     if not numbers:
       return 0.0
 
@@ -47,11 +50,14 @@ class DataProcessor:
     """Process data with validation."""
 
     def __init__(self, threshold: float = 0.8):
+        """Initialize the instance."""
+
       self.threshold = threshold
       self.processed_count = 0
 
     def process_items(self, items: List[object]) -> List[object]:
       """Process list of items."""
+
       results = []
       for item in items:
           if self._is_valid_item(item):
@@ -64,10 +70,12 @@ class DataProcessor:
 
     def _is_valid_item(self, item: object) -> bool:
       """Check if item is valid for processing."""
+
       return item is not None and isinstance(item, (str, int, float))
 
     def _process_single_item(self, item: object) -> object:
       """Process a single item."""
+
       if isinstance(item, str):
           return item.upper().strip()
       elif isinstance(item, (int, float)):
@@ -77,6 +85,7 @@ class DataProcessor:
 
 def main():
     """Main function."""
+
     processor = DataProcessor()
     test_data = ["hello", "world", 42, 3.14, None]
 
@@ -98,10 +107,12 @@ if __name__ == "__main__":
 
 def format_percentage(value: float) -> str:
     """Format value as percentage."""
+
     return f"{value * 100:.1f}%"
 
 def safe_divide(a: float, b: float) -> float:
     """Safely divide two numbers."""
+
     if b == 0:
       return 0.0
     return a / b
@@ -109,6 +120,7 @@ def safe_divide(a: float, b: float) -> float:
 # Simple function for testing
 def multiply(x: int, y: int) -> int:
     """Multiply two integers."""
+
     return x * y
 ''')
 
@@ -327,6 +339,7 @@ def multiply(x: int, y: int) -> int:
             # Create file with syntax error
             bad_file = project_dir / "bad_syntax.py"
             bad_file.write_text("""
+
 # This file has syntax errors
 def broken_function(
     # Missing closing parenthesis and colon

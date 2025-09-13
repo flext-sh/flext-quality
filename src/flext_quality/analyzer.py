@@ -6,24 +6,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextTypes
-
-"""
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
-
 import ast
 import warnings
 from pathlib import Path
 
-from flext_core import FlextLogger
-from flext_observability import (
-    flext_create_log_entry,
-    flext_create_metric,
-    flext_create_trace,
-)
+from flext_core import FlextLogger, FlextTypes
 
 from flext_quality.analysis_types import (
     AnalysisResults,
@@ -31,22 +18,17 @@ from flext_quality.analysis_types import (
     DeadCodeIssue,
     DuplicationIssue,
     FileAnalysisResult,
-    IssueSeverity,
-    IssueType,
     OverallMetrics,
     SecurityIssue,
 )
-from flext_quality.grade_calculator import QualityGradeCalculator
+from flext_quality.grade_calculator import FlextQualityGradeCalculator
+from flext_quality.value_objects import IssueSeverity, IssueType
 
 logger = FlextLogger(__name__)
 
 # Constants
 MIN_FILE_SIZE_FOR_DUPLICATION_CHECK = 100
 SIMILARITY_THRESHOLD = 0.8
-
-
-class FlextQualityCodeAnalyzer:
-    """Main code analyzer interface for FLEXT Quality."""
 
 
 from flext_core import FlextLogger
@@ -88,18 +70,10 @@ class FlextQualityCodeAnalyzer:
         """
         # Create trace for the entire analysis
         # Emit trace via observability integration
-        flext_create_trace(
-            operation_name="CodeAnalyzer.analyze_project",
-            service_name="flext-quality",
-            config={"project_path": str(self.project_path)},
-        )
+        logger.info("Starting code analysis trace for project: %s", self.project_path)
 
         logger.info("Starting project analysis: %s", self.project_path)
-        flext_create_log_entry(
-            message=f"Starting comprehensive code analysis for {self.project_path}",
-            service="flext-quality",
-            level="info",
-        )
+        logger.info("Starting comprehensive code analysis for %s", self.project_path)
 
         # Find Python files
         python_files = self._find_python_files()
@@ -147,17 +121,8 @@ class FlextQualityCodeAnalyzer:
         self._current_results = results
 
         # Create metrics for observability using REAL flext-observability API with type safety
-        flext_create_metric(
-            name="files_analyzed",
-            value=float(files_analyzed),
-            tags={"project": str(self.project_path)},
-        )
-
-        flext_create_metric(
-            name="total_issues",
-            value=float(results.total_issues),
-            tags={"project": str(self.project_path)},
-        )
+        logger.info("Files analyzed: %d", files_analyzed)
+        logger.info("Total issues found: %d", results.total_issues)
 
         logger.info(
             "Analysis completed. Files: %d, Lines: %d",
@@ -165,11 +130,7 @@ class FlextQualityCodeAnalyzer:
             total_lines,
         )
 
-        flext_create_log_entry(
-            message=f"Code analysis completed for {self.project_path}",
-            service="flext-quality",
-            level="info",
-        )
+        logger.info("Code analysis completed for %s", self.project_path)
 
         return results
 
@@ -214,7 +175,7 @@ class FlextQualityCodeAnalyzer:
 
         """
         score = self.get_quality_score()
-        grade = QualityGradeCalculator.calculate_grade(score)
+        grade = FlextQualityGradeCalculator.calculate_grade(score)
         return str(grade.value)
 
     def _find_python_files(self) -> list[Path]:
@@ -546,6 +507,7 @@ class CodeAnalyzer(FlextQualityCodeAnalyzer):
     """
 
     def __init__(self, project_path: str | Path) -> None:
+        """Initialize the instance."""
         warnings.warn(
             "CodeAnalyzer is deprecated; use FlextQualityCodeAnalyzer",
             DeprecationWarning,

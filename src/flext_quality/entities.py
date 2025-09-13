@@ -1,34 +1,20 @@
-"""Domain entities for FLEXT-QUALITY v0.7.0.
-
-REFACTORED:
-          Using flext-core modern patterns - NO duplication.
-All entities use mixins from flext-core for maximum code reduction.
-
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
 from __future__ import annotations
-
-from flext_core import FlextTypes
-
-"""
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
 
 import warnings
 from datetime import UTC, datetime
 from enum import StrEnum
-from typing import override
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextTypes
 from pydantic import BaseModel, Field
 
 from flext_quality.typings import FlextTypes
 from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
+
+"""
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
 
 
 class FlextDomainEvent(BaseModel):
@@ -72,7 +58,6 @@ class FlextQualityProject(BaseModel):
     # Analysis settings
     auto_analyze: bool = Field(default=True)
 
-    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality project."""
         if not self.project_path:
@@ -125,11 +110,11 @@ class FlextQualityAnalysis(BaseModel):
     duration_seconds: float | None = None
 
     # Metrics
-    total_files: int = Field(default=0)
-    total_lines: int = Field(default=0)
-    code_lines: int = Field(default=0)
-    comment_lines: int = Field(default=0)
-    blank_lines: int = Field(default=0)
+    total_files: int = 0
+    total_lines: int = 0
+    code_lines: int = 0
+    comment_lines: int = 0
+    blank_lines: int = 0
 
     # Quality scores
     overall_score: float = Field(default=0.0, ge=0.0, le=100.0)
@@ -219,7 +204,6 @@ class FlextQualityAnalysis(BaseModel):
         """Check if analysis completed successfully."""
         return self.status == AnalysisStatus.COMPLETED
 
-    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality analysis."""
         if not self.project_id:
@@ -299,7 +283,6 @@ class FlextQualityIssue(BaseModel):
             },
         )
 
-    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality issue."""
         if not self.analysis_id:
@@ -353,7 +336,6 @@ class FlextQualityRule(BaseModel):
         new_parameters[key] = value
         return self.model_copy(update={"parameters": new_parameters})
 
-    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality rule."""
         if not self.rule_id:
@@ -398,7 +380,6 @@ class FlextQualityReport(BaseModel):
             },
         )
 
-    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate domain rules for quality report."""
         if not self.analysis_id:

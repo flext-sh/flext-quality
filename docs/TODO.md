@@ -150,13 +150,11 @@ analyzer/ (Django App)           (Integrado como Infrastructure)
 #### Funcionalidades Duplicadas
 
 1. **Análise de Código**:
-
    - `src/flext_quality/analyzer.py` (Clean Architecture)
    - `analyzer/analysis_engine.py` (Django App)
    - `analyzer/multi_backend_analyzer.py` (Django App)
 
 2. **Modelos de Dados**:
-
    - Domain Entities vs Django Models
    - 15+ entidades duplicadas
 

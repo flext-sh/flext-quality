@@ -6,10 +6,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextModels, FlextTypes
+from flext_core import FlextTypes
+from pydantic import BaseModel
 
 
-class ClassInfo(FlextModels):
+class ClassInfo(BaseModel):
     """Strongly-typed class information from AST analysis."""
 
     name: str

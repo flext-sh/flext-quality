@@ -1,20 +1,14 @@
-"""Quality Metrics - Comprehensive Code Quality Measurement and Scoring.
+"""FLEXT Module.
 
-This module provides the QualityMetrics value object that encapsulates
-comprehensive code quality measurements, scoring algorithms, and quality
-grade calculations for the FLEXT Quality analysis system.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
-
 """
 
 from __future__ import annotations
 
 from typing import cast, override
 
-from flext_core import FlextModels, FlextResult, FlextTypes
-from pydantic import Field
+from flext_core import FlextResult, FlextTypes
+from pydantic import BaseModel, Field
 
 from flext_quality.analysis_types import AnalysisResults
 from flext_quality.grade_calculator import QualityGradeCalculator
@@ -23,7 +17,7 @@ from flext_quality.grade_calculator import QualityGradeCalculator
 MAX_QUALITY_SCORE = 100
 
 
-class QualityMetrics(FlextModels):
+class QualityMetrics(BaseModel):
     """Comprehensive Quality Metrics Value Object.
 
     Immutable value object that encapsulates comprehensive code quality

@@ -247,7 +247,7 @@ make validate
 
 # Individual checks
 make lint
-make type-check  
+make type-check
 make test          # 90% coverage minimum
 make security      # Bandit + pip-audit
 ```

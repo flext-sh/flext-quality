@@ -1,7 +1,4 @@
-"""Command-line interface for FLEXT Quality.
-
-This module provides CLI commands for code quality analysis.
-Uses modern flext-cli patterns for consistency.
+"""FLEXT Quality CLI interface.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -15,27 +12,17 @@ import sys
 import traceback
 from pathlib import Path
 
+from flext_cli import (
+    FlextCliApiFunctions,
+    FlextCliHelper,
+    flext_cli_create_helper,
+)
 from flext_core import FlextLogger
 from rich.console import Console
 
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.reports import QualityReport
 from flext_quality.web import FlextQualityWebInterface
-
-try:
-    # Prefer modern flext-cli abstractions when available
-    from flext_cli import (
-        FlextCliApiFunctions,
-        FlextCliHelper,
-        flext_cli_create_helper,
-    )
-
-    FLEXT_CLI_AVAILABLE = True
-except Exception:  # pragma: no cover - fallback for environments without flext-cli
-    FLEXT_CLI_AVAILABLE = False
-    FlextCliApiFunctions = None
-    FlextCliHelper = None
-    flext_cli_create_helper = None
 
 
 def get_cli_helper(*, verbose: bool = False) -> FlextCliHelper | Console:
@@ -324,6 +311,7 @@ def main() -> None:
         description="FLEXT Quality - Enterprise Code Quality Analysis",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
+
 Examples:
     flext-quality analyze ./my-project
     flext-quality analyze ./my-project --output report.html --format html

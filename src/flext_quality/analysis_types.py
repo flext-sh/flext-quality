@@ -1,28 +1,13 @@
-"""Analysis Types for FLEXT-QUALITY.
-
-Following FLEXT patterns: Multiple independent classes per module like flext-core.
-Each class is a separate domain model
-Strongly-typed data structures that integrate with FLEXT ecosystem.
-
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
+"""Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT.
 """
 
 from __future__ import annotations
 
-from flext_core import FlextTypes
-
-"""
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
-
 from pathlib import Path
 
-from flext_core import FlextModels
-from pydantic import Field
+from flext_core import FlextModels, FlextTypes
+from pydantic import BaseModel, Field
 
 from flext_quality.value_objects import (
     FlextIssueSeverity as IssueSeverity,
@@ -45,7 +30,7 @@ class FileAnalysisResult(FlextModels.Value):
     dead_code_lines: int = Field(default=0, ge=0, description="Lines of dead code")
 
 
-class ComplexityIssue(FlextModels.Value):
+class ComplexityIssue(BaseModel):
     """Represents a complexity issue in code."""
 
     file_path: str = Field(..., description="File where issue was found")
@@ -148,7 +133,7 @@ class OverallMetrics(FlextModels.Value):
     )
 
 
-class AnalysisResults(FlextModels):
+class AnalysisResults(BaseModel):
     """Complete analysis results containing all metrics and issues."""
 
     overall_metrics: OverallMetrics = Field(

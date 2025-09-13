@@ -39,7 +39,7 @@ class TestDIContainer:
 
         # Register a quality analysis service (mock)
         class MockQualityAnalyzer:
-            def analyze(self, _code: str) -> FlextTypes.Core.Dict:
+            def analyze(self, __code: str) -> FlextTypes.Core.Dict:
                 return {"quality_score": 85, "issues": []}
 
         analyzer = MockQualityAnalyzer()

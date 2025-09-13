@@ -77,6 +77,7 @@ class TestCodeAnalyzer:
         test_file = tmp_path / "simple.py"
         test_file.write_text(
             """
+
 def hello() -> None:
       return "Hello, World!"
 

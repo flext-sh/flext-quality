@@ -27,6 +27,7 @@ def test_ast_visitor_extracts_details(tmp_path: Path) -> None:
     """Visitor tracks classes and functions with flags."""
     code = ast.parse(
         """
+
 class A:
     def m(self):
       pass

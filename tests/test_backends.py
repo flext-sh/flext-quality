@@ -12,7 +12,6 @@ from pathlib import Path
 from typing import override
 from unittest.mock import patch
 
-# Removed unused mock imports - using real implementations
 import pytest
 from flext_core import FlextTypes
 
@@ -105,14 +104,17 @@ class TestASTBackend:
         """Test analyzing valid Python code."""
         backend = ASTBackend()
         code = """
+
 def hello_world():
     '''Say hello.'''
+
     print("Hello, World!")
 
 class TestClass:
     def method(self):
       pass
 """
+
         result = backend.analyze(code)
 
         assert "functions" in result
@@ -157,10 +159,7 @@ class TestClass:
     def test_analyze_complex_code(self) -> None:
         """Test analyzing complex code with multiple constructs."""
         backend = ASTBackend()
-        code = """
-import os
-from typing import List
-
+        code = r"""
 def complex_function(x: int) -> int:
     if x > 10:
       for i in range(x):
@@ -180,6 +179,8 @@ class MyClass:
     '''A test class.'''
 
     def __init__(self):
+        \"\"\"Initialize the instance.\"\"\"
+
       self.value = 0
 
     def method_one(self):
@@ -188,6 +189,7 @@ class MyClass:
     async def async_method(self):
       pass
 """
+
         result = backend.analyze(code)
 
         complexity = result["complexity"]
@@ -211,6 +213,7 @@ class MyClass:
         """Test _extract_functions method."""
         backend = ASTBackend()
         code = """
+
 def func1():
     pass
 
@@ -220,6 +223,7 @@ async def func2():
 def func3(x, y=1, *args, **kwargs):
     return x + y
 """
+
         tree = ast.parse(code)
         functions = backend._extract_functions(tree)
 
@@ -234,6 +238,7 @@ def func3(x, y=1, *args, **kwargs):
         """Test _extract_classes method."""
         backend = ASTBackend()
         code = """
+
 class BaseClass:
     pass
 
@@ -244,6 +249,7 @@ class DerivedClass(BaseClass):
     def method2(self):
       pass
 """
+
         tree = ast.parse(code)
         classes = backend._extract_classes(tree)
 
@@ -265,6 +271,7 @@ class DerivedClass(BaseClass):
 
         # Complex code - higher complexity
         complex_code = """
+
 if x:
     for i in range(10):
       while True:
@@ -275,6 +282,7 @@ if x:
 elif y:
     pass
 """
+
         complex_tree = ast.parse(complex_code)
         complex_complexity = backend._calculate_complexity(complex_tree)
         assert complex_complexity > 3
@@ -283,12 +291,10 @@ elif y:
         """Test _extract_imports method."""
         backend = ASTBackend()
         code = """
-import os
-import sys
-from pathlib import Path
-from typing import List, Dict
-import numpy as np
+
+from typing import Dict
 """
+
         tree = ast.parse(code)
         imports = backend._extract_imports(tree)
 
@@ -301,8 +307,10 @@ import numpy as np
         """Test _check_docstrings method."""
         backend = ASTBackend()
         code = """
+
 def with_docstring():
     '''This function has a docstring.'''
+
     pass
 
 def without_docstring():
@@ -310,11 +318,13 @@ def without_docstring():
 
 class WithDoc:
     '''Class with docstring.'''
+
     pass
 
 class WithoutDoc:
     pass
 """
+
         tree = ast.parse(code)
         missing = backend._check_docstrings(tree)
 
@@ -539,6 +549,7 @@ test.py:1: error: Name 'x' is not defined
 test.py:5: note: See documentation
 Success: no other issues
 """
+
         issues = backend._parse_mypy_output(mypy_output)
         assert len(issues) >= 1
         assert "not defined" in str(issues[0])

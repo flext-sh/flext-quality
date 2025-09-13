@@ -1,8 +1,4 @@
-"""Application services for FLEXT-QUALITY v0.7.0.
-
-Services following flext-cli patterns with multiple service classes per module.
-Uses working flext-core imports: FlextResult, FlextLogger.
-
+"""Quality domain services following flext-core patterns.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -22,10 +18,7 @@ from flext_quality.entities import (
     FlextQualityReport,
 )
 from flext_quality.external_backend import ExternalBackend
-from flext_quality.value_objects import (
-    FlextIssueSeverity as IssueSeverity,
-    FlextIssueType as IssueType,
-)
+from flext_quality.value_objects import IssueSeverity, IssueType
 
 logger = FlextLogger(__name__)
 
@@ -76,20 +69,16 @@ class BasicQualityProjectService:
         try:
             # Create project entity
             project = FlextQualityProject(
-                id=name,
                 name=name,
-                path=Path(project_path),
+                project_path=str(project_path),
                 repository_url=repository_url,
-                config_path=Path(config_path) if config_path else None,
+                config_path=str(config_path) if config_path else None,
                 language=language,
                 auto_analyze=auto_analyze,
-                min_coverage=min_coverage,
-                max_complexity=max_complexity,
-                max_duplication=max_duplication,
             )
 
             # Store project
-            self._projects[project.id] = project
+            self._projects[name] = project
             self._logger.info("Created project: %s", project.name)
             return FlextResult[FlextQualityProject].ok(project)
         except (RuntimeError, ValueError, TypeError) as e:
@@ -960,6 +949,7 @@ class FlextQualityProjectService(BasicQualityProjectService):
     """Legacy compatibility facade - DEPRECATED."""
 
     def __init__(self) -> None:
+        """Initialize the instance."""
         warnings.warn(
             "FlextQualityProjectService is deprecated; use FlextQualityProjectService directly",
             DeprecationWarning,
@@ -972,6 +962,7 @@ class FlextQualityAnalysisService(BasicQualityAnalysisService):
     """Legacy compatibility facade - DEPRECATED."""
 
     def __init__(self) -> None:
+        """Initialize the instance."""
         warnings.warn(
             "FlextQualityAnalysisService is deprecated; use FlextQualityAnalysisService directly",
             DeprecationWarning,
@@ -984,6 +975,7 @@ class FlextQualityIssueService(BasicQualityIssueService):
     """Legacy compatibility facade - DEPRECATED."""
 
     def __init__(self) -> None:
+        """Initialize the instance."""
         warnings.warn(
             "FlextQualityIssueService is deprecated; use FlextQualityIssueService directly",
             DeprecationWarning,
@@ -996,6 +988,7 @@ class FlextQualityReportService(BasicQualityReportService):
     """Legacy compatibility facade - DEPRECATED."""
 
     def __init__(self) -> None:
+        """Initialize the instance."""
         warnings.warn(
             "FlextQualityReportService is deprecated; use FlextQualityReportService directly",
             DeprecationWarning,

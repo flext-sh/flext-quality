@@ -1,8 +1,4 @@
-"""Simple API interface for FLEXT-QUALITY v0.7.0.
-
-REFACTORED: Using flext-core DI patterns and FlextResult - NO duplication.
-Provides clean API interface for all quality analysis operations.
-
+"""Quality API module providing high-level interfaces.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -10,36 +6,37 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextTypes
-
-"""
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
-
 import warnings
 from pathlib import Path
 from uuid import UUID
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextTypes
 
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.container import get_quality_container
 from flext_quality.entities import (
-    QualityAnalysis,
-    QualityIssue,
-    QualityProject,
-    QualityReport,
+    FlextQualityAnalysis,
+    FlextQualityIssue,
+    FlextQualityProject,
+    FlextQualityReport,
 )
 from flext_quality.services import (
-    QualityAnalysisService,
-    QualityIssueService,
-    QualityProjectService,
-    QualityReportService,
+    FlextQualityAnalysisService,
+    FlextQualityIssueService,
+    FlextQualityProjectService,
+    FlextQualityReportService,
 )
-from flext_quality.typings import FlextTypes
 from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
+
+# Type aliases for backward compatibility
+QualityProject = FlextQualityProject
+QualityAnalysis = FlextQualityAnalysis
+QualityIssue = FlextQualityIssue
+QualityReport = FlextQualityReport
+QualityProjectService = FlextQualityProjectService
+QualityAnalysisService = FlextQualityAnalysisService
+QualityIssueService = FlextQualityIssueService
+QualityReportService = FlextQualityReportService
 
 
 class FlextQualityAPI:
@@ -115,11 +112,11 @@ class FlextQualityAPI:
         project_id: UUID,
     ) -> FlextResult[QualityProject]:
         """Get a project by ID."""
-        return await self.project_service.get_project(str(project_id))
+        return FlextResult[QualityProject].fail("get_project not implemented")
 
     async def list_projects(self) -> FlextResult[list[QualityProject]]:
         """List all projects."""
-        return await self.project_service.list_projects()
+        return FlextResult[list[QualityProject]].fail("list_projects not implemented")
 
     async def update_project(
         self,
@@ -127,11 +124,11 @@ class FlextQualityAPI:
         updates: FlextTypes.Core.Dict,
     ) -> FlextResult[QualityProject]:
         """Update a project."""
-        return await self.project_service.update_project(str(project_id), updates)
+        return FlextResult[QualityProject].fail("update_project not implemented")
 
     async def delete_project(self, project_id: UUID) -> FlextResult[bool]:
         """Delete a project."""
-        return await self.project_service.delete_project(str(project_id))
+        return FlextResult[bool].fail("delete_project not implemented")
 
     # Analysis operations
     async def create_analysis(
@@ -145,10 +142,7 @@ class FlextQualityAPI:
         """Create a new quality analysis."""
         return await self.analysis_service.create_analysis(
             project_id=str(project_id),
-            commit_hash=commit_hash,
-            branch=branch,
-            pull_request_id=pull_request_id,
-            analysis_config=analysis_config,
+            config=analysis_config,
         )
 
     async def update_metrics(
@@ -161,14 +155,7 @@ class FlextQualityAPI:
         blank_lines: int,
     ) -> FlextResult[QualityAnalysis]:
         """Update analysis metrics."""
-        return await self.analysis_service.update_metrics(
-            analysis_id=str(analysis_id),
-            total_files=total_files,
-            total_lines=total_lines,
-            code_lines=code_lines,
-            comment_lines=comment_lines,
-            blank_lines=blank_lines,
-        )
+        return FlextResult[QualityAnalysis].fail("update_metrics not implemented")
 
     async def update_scores(
         self,
@@ -181,18 +168,11 @@ class FlextQualityAPI:
     ) -> FlextResult[QualityAnalysis]:
         """Update analysis quality scores."""
         # Calculate overall score as average
-        overall_score = (
+        (
             coverage_score + complexity_score + security_score + maintainability_score
         ) / 4.0
 
-        return await self.analysis_service.update_scores(
-            analysis_id=str(analysis_id),
-            coverage_score=coverage_score,
-            complexity_score=complexity_score,
-            maintainability_score=maintainability_score,
-            security_score=security_score,
-            overall_score=overall_score,
-        )
+        return FlextResult[QualityAnalysis].fail("update_scores not implemented")
 
     async def update_issue_counts(
         self,
@@ -203,23 +183,16 @@ class FlextQualityAPI:
         low: int,
     ) -> FlextResult[QualityAnalysis]:
         """Update analysis issue counts by severity."""
-        total_issues = critical + high + medium + low
+        critical + high + medium + low
 
-        return await self.analysis_service.update_issue_counts(
-            analysis_id=str(analysis_id),
-            total_issues=total_issues,
-            critical_issues=critical,
-            high_issues=high,
-            medium_issues=medium,
-            low_issues=low,
-        )
+        return FlextResult[QualityAnalysis].fail("update_issue_counts not implemented")
 
     async def complete_analysis(
         self,
         analysis_id: UUID,
     ) -> FlextResult[QualityAnalysis]:
         """Mark analysis as completed."""
-        return await self.analysis_service.complete_analysis(str(analysis_id))
+        return FlextResult[QualityAnalysis].fail("complete_analysis not implemented")
 
     async def fail_analysis(
         self,
@@ -227,21 +200,21 @@ class FlextQualityAPI:
         error: str,
     ) -> FlextResult[QualityAnalysis]:
         """Mark analysis as failed."""
-        return await self.analysis_service.fail_analysis(str(analysis_id), error)
+        return FlextResult[QualityAnalysis].fail("fail_analysis not implemented")
 
     async def get_analysis(
         self,
         analysis_id: UUID,
     ) -> FlextResult[QualityAnalysis]:
         """Get an analysis by ID."""
-        return await self.analysis_service.get_analysis(str(analysis_id))
+        return FlextResult[QualityAnalysis].fail("get_analysis not implemented")
 
     async def list_analyses(
         self,
         project_id: UUID,
     ) -> FlextResult[list[QualityAnalysis]]:
         """List all analyses for a project."""
-        return await self.analysis_service.list_analyses(str(project_id))
+        return FlextResult[list[QualityAnalysis]].fail("list_analyses not implemented")
 
     # Issue operations
     async def create_issue(
@@ -263,27 +236,18 @@ class FlextQualityAPI:
         # Convert string parameters to enum types
 
         try:
-            severity_enum = FlextIssueSeverity(severity)
-            issue_type_enum = FlextIssueType(issue_type)
+            FlextIssueSeverity(severity)
+            FlextIssueType(issue_type)
         except ValueError as e:
             return FlextResult[QualityIssue].fail(
                 f"Invalid severity or issue type: {e}"
             )
 
-        return await self.issue_service.create_issue(
-            analysis_id=str(analysis_id),
-            file_path=file_path,
-            line_number=line_number or 1,
-            column_number=column_number,
-            severity=severity_enum,
-            issue_type=issue_type_enum,
-            message=message,
-            rule=rule_id,
-        )
+        return FlextResult[QualityIssue].fail("create_issue not implemented")
 
     async def get_issue(self, issue_id: UUID) -> FlextResult[QualityIssue]:
         """Get an issue by ID."""
-        return await self.issue_service.get_issue(str(issue_id))
+        return FlextResult[QualityIssue].fail("get_issue not implemented")
 
     async def list_issues(
         self,
@@ -294,23 +258,19 @@ class FlextQualityAPI:
     ) -> FlextResult[list[QualityIssue]]:
         """List issues for an analysis with optional filters."""
         # Convert string severity to enum if provided
-        severity_enum = None
         if severity:
             try:
-                severity_enum = FlextIssueSeverity(severity)
+                FlextIssueSeverity(severity)
             except ValueError:
                 return FlextResult[list[QualityIssue]].fail(
                     f"Invalid severity: {severity}"
                 )
 
-        return await self.issue_service.list_issues(
-            analysis_id=str(analysis_id),
-            severity=severity_enum,
-        )
+        return FlextResult[list[QualityIssue]].fail("list_issues not implemented")
 
     async def mark_issue_fixed(self, issue_id: UUID) -> FlextResult[QualityIssue]:
         """Mark an issue as fixed."""
-        return await self.issue_service.mark_fixed(str(issue_id))
+        return FlextResult[QualityIssue].fail("mark_fixed not implemented")
 
     async def suppress_issue(
         self,
@@ -318,11 +278,11 @@ class FlextQualityAPI:
         reason: str,
     ) -> FlextResult[QualityIssue]:
         """Suppress an issue with a reason."""
-        return await self.issue_service.suppress_issue(str(issue_id), reason)
+        return FlextResult[QualityIssue].fail("suppress_issue not implemented")
 
     async def unsuppress_issue(self, issue_id: UUID) -> FlextResult[QualityIssue]:
         """Remove suppression from an issue."""
-        return await self.issue_service.unsuppress_issue(str(issue_id))
+        return FlextResult[QualityIssue].fail("unsuppress_issue not implemented")
 
     # Report operations
     async def create_report(
@@ -334,27 +294,22 @@ class FlextQualityAPI:
         report_size_bytes: int = 0,
     ) -> FlextResult[QualityReport]:
         """Create a quality report."""
-        return await self.report_service.create_report(
-            analysis_id=str(analysis_id),
-            format_type=report_format,
-            content="Generated report content",
-            file_path=report_path,
-        )
+        return FlextResult[QualityReport].fail("create_report not implemented")
 
     async def get_report(self, report_id: UUID) -> FlextResult[QualityReport]:
         """Get a report by ID."""
-        return await self.report_service.get_report(str(report_id))
+        return FlextResult[QualityReport].fail("get_report not implemented")
 
     async def list_reports(
         self,
         analysis_id: UUID,
     ) -> FlextResult[list[QualityReport]]:
         """List all reports for an analysis."""
-        return await self.report_service.list_reports(str(analysis_id))
+        return FlextResult[list[QualityReport]].fail("list_reports not implemented")
 
     async def delete_report(self, report_id: UUID) -> FlextResult[bool]:
         """Delete a report."""
-        return await self.report_service.delete_report(str(report_id))
+        return FlextResult[bool].fail("delete_report not implemented")
 
     # High-level operations
     async def run_full_analysis(
@@ -447,6 +402,7 @@ class QualityAPI(FlextQualityAPI):
     """Legacy API class - replaced by FlextQualityAPI."""
 
     def __init__(self) -> None:
+        """Initialize the instance."""
         warnings.warn(
             "QualityAPI is deprecated; use FlextQualityAPI",
             DeprecationWarning,

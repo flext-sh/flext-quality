@@ -1,11 +1,5 @@
-"""Application handlers for FLEXT-QUALITY v0.7.0.
-
-REFACTORED: Single CONSOLIDATED class following FLEXT_REFACTORING_PROMPT.md patterns.
-Uses flext-core handler patterns - NO duplication, NO multiple separate classes.
-
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
+"""Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT.
 """
 
 from __future__ import annotations
@@ -19,10 +13,6 @@ from flext_observability import (
 )
 
 from flext_quality.entities import QualityAnalysis, QualityReport
-from flext_quality.services import (
-    QualityAnalysisService,
-    QualityReportService,
-)
 
 # Use flext-observability directly - no fallbacks
 flext_create_log_entry = _flext_create_log_entry

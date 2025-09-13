@@ -286,8 +286,7 @@ class TestCodeAnalyzerComprehensive:
         # Create a file with potential security issues
         security_file = project_path / "security_test.py"
         security_file.write_text("""
-import subprocess
-import os
+
 
 password = "hardcoded_password"
 query = f"SELECT * FROM users WHERE id = {user_id}"  # SQL injection risk
@@ -318,6 +317,7 @@ subprocess.call(f"rm -rf {user_input}")  # Command injection risk
         # Create a file with high complexity
         complex_file = project_path / "complex_test.py"
         complex_file.write_text("""
+
 def complex_function(x):
     if x > 10:
       if x > 20:
@@ -378,8 +378,7 @@ def complex_function(x):
         # Create a file with dead code
         dead_code_file = project_path / "dead_code_test.py"
         dead_code_file.write_text("""
-import unused_module
-import os  # This one is used
+
 
 def unused_function():
     pass
@@ -418,6 +417,7 @@ print(used_variable)
         # Create files with duplicate code blocks
         dup_file1 = project_path / "dup_test1.py"
         dup_file1.write_text("""
+
 def process_data(data):
     result = []
     for item in data:
@@ -428,6 +428,7 @@ def process_data(data):
 
         dup_file2 = project_path / "dup_test2.py"
         dup_file2.write_text("""
+
 def handle_data(data):
     result = []
     for item in data:
@@ -513,12 +514,12 @@ def handle_data(data):
         # Enhance utils.py with more content
         utils_file = project_path / "src" / "utils.py"
         utils_file.write_text("""
-import sys
-import os
-import json
+
 
 class DataProcessor:
     def __init__(self, config_path: str):
+        \"\"\"Initialize the instance.\"\"\"
+
       self.config_path = config_path
       self.config = self._load_config()
 
@@ -634,18 +635,24 @@ def test_unicode():
         comprehensive_file = project_path / "comprehensive_test.py"
 
         comprehensive_file.write_text('''
-import asyncio
-from typing import List, Dict, Optional
+
+from typing import Dict
+from typing import Optional
 
 class BaseClass:
     """Base class for testing."""
+
     def __init__(self, name: str):
+        """Initialize the instance."""
+
       self.name = name
 
 class DerivedClass(BaseClass):
     """Derived class for testing."""
 
     def __init__(self, name: str, value: int):
+        """Initialize the instance."""
+
       super().__init__(name)
       self.value = value
 

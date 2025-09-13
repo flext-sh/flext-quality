@@ -241,6 +241,7 @@ class ExternalBackend(FlextQualityExternalBackend):
     """
 
     def __init__(self) -> None:
+        """Initialize the instance."""
         warnings.warn(
             "ExternalBackend is deprecated; use FlextQualityExternalBackend",
             DeprecationWarning,

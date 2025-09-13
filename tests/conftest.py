@@ -381,6 +381,7 @@ def temporary_project_structure(tmp_path: Path) -> str:
     src_dir.mkdir()
     main_py = src_dir / "main.py"
     main_py.write_text("""
+
 def main() -> int:
     print("Hello, World!")
     return 0
@@ -389,6 +390,7 @@ if __name__ == "__main__":
 """)
     utils_py = src_dir / "utils.py"
     utils_py.write_text("""
+
 import sys
 def get_env_var(name: str) -> str | None:
     return os.environ.get(name)
@@ -398,7 +400,11 @@ def get_env_var(name: str) -> str | None:
     tests_dir.mkdir()
     test_main_py = tests_dir / "test_main.py"
     test_main_py.write_text("""
+
 from src.main import main
+from typing import Dict
+from typing import Generator
+from typing import List
 def test_main() -> None:
     if main() != 0:
       raise AssertionError(f"Expected {0}, got {main()}")
@@ -406,6 +412,7 @@ def test_main() -> None:
     # Create config files
     pyproject_toml = project_dir / "pyproject.toml"
     pyproject_toml.write_text("""
+
 [tool.ruff]
 line-length = 79
 [tool.mypy]
@@ -537,6 +544,7 @@ def mock_quality_analyzer() -> object:
         """
 
         def __init__(self) -> None:
+            """Initialize the instance."""
             self.analyzed_files: FlextTypes.Core.StringList = []
 
         async def analyze_project(self, project_path: str) -> FlextTypes.Core.Dict:
@@ -630,6 +638,7 @@ def mock_report_generator() -> object:
         """
 
         def __init__(self) -> None:
+            """Initialize the instance."""
             self.generated_reports: list[FlextTypes.Core.Dict] = []
 
         async def generate_report(

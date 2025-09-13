@@ -1,14 +1,6 @@
-"""Centralized Pydantic models for flext-quality.
-
-This module provides centralized model definitions following FLEXT patterns,
-extending FlextModels from flext-core for consistency across the ecosystem.
-
-Models are organized by domain responsibility:
-- Quality: Core quality analysis models
-- Analysis: Analysis execution and results
+"""- Analysis: Analysis execution and results
 - Reporting: Report generation and metrics
-- Configuration: Analysis configuration models
-
+- Configuration: Analysis configuration models.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT

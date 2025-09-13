@@ -2,6 +2,7 @@
 """Script para testar progresso sem interferência cross-project."""
 
 import asyncio
+import os
 import sys
 from pathlib import Path
 from subprocess import CompletedProcess
@@ -14,8 +15,6 @@ def run_tests() -> "CompletedProcess[str]":
     original_dir = Path.cwd()
 
     try:
-        import os
-
         os.chdir(project_dir)
 
         # Isolar pytest apenas para este projeto
@@ -43,6 +42,7 @@ def run_tests() -> "CompletedProcess[str]":
 
         class CompletedProcess:
             def __init__(self, returncode: int, stdout: str, stderr: str) -> None:
+                """Initialize the instance."""
                 self.returncode = returncode
                 self.stdout = stdout
                 self.stderr = stderr

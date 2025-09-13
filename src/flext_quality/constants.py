@@ -1,20 +1,10 @@
-"""Constants for FLEXT Quality module.
-
-This module defines centralized constants following the FlextConstants pattern
-from flext-core, extending it with quality assessment specific constants.
-
+"""Quality assessment constants extending flext-core patterns.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
-
-"""
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
 
 from flext_core import FlextConstants
 

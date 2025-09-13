@@ -50,7 +50,6 @@ async def demonstrate_simple_api() -> None:
 """Sample module for API demonstration."""
 
 import os
-import sys
 from typing import Optional, List
 
 def calculate_score(values: List[float]) -> float:
@@ -425,7 +424,7 @@ async def demonstrate_custom_workflows() -> None:
 """Main application module."""
 
 import logging
-from typing import List, Dict, object
+from typing import List, Dict
 
 logger = logging.getLogger(__name__)
 

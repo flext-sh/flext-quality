@@ -6,30 +6,17 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextTypes
-
-"""
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
-
 import ast
 import warnings
 from pathlib import Path
 from typing import override
 
+from flext_core import FlextTypes
+
 from flext_quality.ast_class_info import ClassInfo
 from flext_quality.ast_function_info import FunctionInfo
 from flext_quality.backend_type import BackendType
 from flext_quality.base import BaseAnalyzer
-
-
-class ASTVisitor(ast.NodeVisitor):
-    """AST visitor to extract detailed code structure information."""
-
-
-import ast
 
 
 class ASTVisitor(ast.NodeVisitor):
@@ -389,6 +376,7 @@ class ASTBackend(FlextQualityASTBackend):
     """
 
     def __init__(self) -> None:
+        """Initialize the instance."""
         warnings.warn(
             "ASTBackend is deprecated; use FlextQualityASTBackend",
             DeprecationWarning,

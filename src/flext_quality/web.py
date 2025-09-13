@@ -1,24 +1,17 @@
-"""FLEXT Quality Web Interface Extension.
-
-This module extends flext-web Flask service with quality analysis capabilities,
-reusing existing analysis components from flext-quality.
-
-
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
-
 from __future__ import annotations
 
 from pathlib import Path
 
 from flask import Response as FlaskResponse, jsonify, request
 from flext_core import FlextLogger, FlextTypes
-
-# Use aliases simples para funções existentes no flext-web
 from flext_web import FlextWebServices
 from flext_web.config import FlextWebConfigs
+from werkzeug.wrappers import Response as WerkzeugResponse
+
+from flext_quality.analyzer import CodeAnalyzer
+from flext_quality.api import QualityAPI
+
+# Use aliases simples para funções existentes no flext-web
 
 
 # Aliases simples para compatibilidade dos testes
@@ -32,11 +25,6 @@ def get_web_settings():
     """Alias simples para FlextWebConfigs.get_web_settings."""
     return FlextWebConfigs.get_web_settings()
 
-
-from werkzeug.wrappers import Response as WerkzeugResponse
-
-from flext_quality.analyzer import CodeAnalyzer
-from flext_quality.api import QualityAPI
 
 ResponseType = FlaskResponse | WerkzeugResponse | tuple[FlaskResponse, int]
 
@@ -73,6 +61,7 @@ class FlextQualityWebInterface:
     def quality_dashboard(self) -> str:
         """Render quality dashboard."""
         return """
+
       <!DOCTYPE html>
       <html>
       <head>

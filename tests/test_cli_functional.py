@@ -35,6 +35,7 @@ def sample_project_dir() -> Path:
 
 def hello_world():
     """Print hello world."""
+
     print("Hello, World!")
 
 if __name__ == "__main__":
@@ -47,6 +48,7 @@ if __name__ == "__main__":
 
 def add(a: int, b: int) -> int:
     """Add two numbers."""
+
     return a + b
 ''')
 
@@ -332,6 +334,7 @@ class TestCLIFunctional:
         # Create low-quality code to test different exit codes
         bad_code_file = sample_project_dir / "bad_code.py"
         bad_code_file.write_text("""
+
 # Intentionally bad code for testing
 def very_complex_function_with_many_parameters_and_bad_style(param1, param2, param3, param4, param5, param6, param7, param8):
     if param1:
@@ -492,6 +495,7 @@ class TestCLIEdgeCases:
 
 def function_{i}_{j}():
     """Function {i} {j}."""
+
     return {i} + {j}
 
 class Class_{i}_{j}:
@@ -543,6 +547,7 @@ from typing import List, Optional
 
 def process_data(data: List[str]) -> Optional[List[str]]:
     """Process input data."""
+
     if not data:
       return None
 
@@ -556,6 +561,7 @@ def process_data(data: List[str]) -> Optional[List[str]]:
 
 def main() -> int:
     """Main entry point."""
+
     test_data = ["hello", "world", " test "]
     results = process_data(test_data)
 
@@ -578,18 +584,21 @@ if __name__ == "__main__":
 
 import unittest
 from src.main import process_data
+from typing import Optional
 
 class TestProcessData(unittest.TestCase):
     """Test process_data function."""
 
     def test_process_data_success(self):
       """Test successful data processing."""
+
       data = ["hello", "world"]
       result = process_data(data)
       self.assertEqual(result, ["HELLO", "WORLD"])
 
     def test_process_data_empty(self):
       """Test empty data processing."""
+
       result = process_data([])
       self.assertIsNone(result)
 

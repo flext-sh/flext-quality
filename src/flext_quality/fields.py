@@ -1,11 +1,6 @@
-"""Centralized Pydantic field definitions for flext-quality.
+"""FLEXT Module.
 
-This module provides reusable, validated field definitions following FLEXT patterns.
-Fields are organized by domain and provide consistent validation across all models.
-
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
+Copyright (c) 2025 FLEXT Team. All rights reserved. SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations

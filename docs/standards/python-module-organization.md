@@ -808,7 +808,7 @@ __all__: FlextTypes.Core.StringList = [
     "QualityProjectService",
     "QualityAnalysisService",
 
-  
+
     "QualityAPI",
 
     # CLI
@@ -824,7 +824,7 @@ __all__: FlextTypes.Core.StringList = [
 
 from __future__ import annotations
 
-from typing import Optional, Dict, object
+from typing import Optional, Dict
 
 from flext_core import FlextResult
 from flext_quality.infrastructure.container import quality_container
@@ -907,7 +907,7 @@ class QualityAPI:
 from __future__ import annotations
 import asyncio
 from datetime import datetime, UTC
-from typing import Optional, List, Dict, object
+from typing import Optional, List, Dict
 from uuid import uuid4
 
 # Third-party imports

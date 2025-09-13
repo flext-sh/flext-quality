@@ -1,8 +1,4 @@
-"""Centralized typings facade for flext-quality.
-
-- Extends flext-core types
-- Place quality-specific type aliases and Protocols here if needed
-
+"""- Place quality-specific type aliases and Protocols here if needed.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
