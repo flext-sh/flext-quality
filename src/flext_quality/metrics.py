@@ -196,7 +196,7 @@ class QualityMetrics(BaseModel):
             QualityMetrics:: Description of return value.
 
         """
-        defaults = {
+        defaults: dict[str, object] = {
             "overall_score": 0.0,
             "quality_grade": "F",
             "total_files": 0,
@@ -218,7 +218,8 @@ class QualityMetrics(BaseModel):
         }
         defaults.update(overrides)
 
-        return cls(**defaults)  # Dict validated with correct field types
+        # Type ignore needed here because we're using dict unpacking with runtime validation
+        return cls(**defaults)  # type: ignore[arg-type]
 
     @classmethod
     def from_analysis_results(

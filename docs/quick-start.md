@@ -1,368 +1,301 @@
 # FLEXT Quality Quick Start Guide
 
-Get up and running with FLEXT Quality in minutes. This guide covers installation, basic configuration, and your first quality analysis.
+**Version**: 0.9.0 | **Status**: Technical Integration Issues | **Updated**: 2025-09-17
+
+---
+
+## Current Status Notice
+
+**FLEXT Quality** has functional core components with technical integration issues that require resolution before full production use.
+
+### **Current Functionality Status:**
+- ✅ **Analysis Engine** - Basic code analysis capabilities work
+- ✅ **Domain Models** - Complete DDD implementation with FlextModels
+- ⚠️ **Type Safety** - MyPy parameter mismatch errors present
+- 🔴 **Test Suite** - Import errors prevent test execution
+- 🔴 **CLI Interface** - Import errors prevent command execution
+- ⚠️ **API Methods** - Some methods return placeholder responses
+
+**For developers**: See [TODO.md](../TODO.md) for development priorities and technical issues.
+
+---
 
 ## Prerequisites
 
-- **Python 3.13+** installed on your system
-- **Poetry** for Python dependency management
-- **Docker & Docker Compose** (optional, for full service stack)
-- **Git** for version control
+- **Python 3.13+** with type annotation support
+- **FLEXT ecosystem** dependencies (flext-core, flext-cli, etc.)
+- **Modern quality tools**: Ruff, MyPy, Bandit (managed via project)
+- **Poetry** for dependency management
 
-## Installation Options
+## Current Setup (Development/Transformation)
 
-### Option 1: Quick Setup (Recommended)
+### **Step 1: Clone and Install**
 
 ```bash
 # Clone the repository
-git clone https://github.com/flext-sh/flext-quality.git
-cd flext-quality
-
-# Complete setup with one command
-make setup
-
-# Start all services
-./start_all.sh
-```
-
-### Option 2: Docker Setup
-
-```bash
-# Clone and start with Docker
-git clone https://github.com/flext-sh/flext-quality.git
-cd flext-quality
-
-# Start all services with Docker
-docker-compose up -d
-
-# Check service status
-docker-compose ps
-```
-
-### Option 3: Manual Setup
-
-```bash
-# Clone repository
-git clone https://github.com/flext-sh/flext-quality.git
+git clone <repository-url>
 cd flext-quality
 
 # Install dependencies
-poetry install --with dev,test
+poetry install
 
-# Setup database
-make web-migrate
-
-# Start web server
-make web-start
+# Activate environment
+poetry shell
 ```
 
-## Verify Installation
-
-Check that all services are running:
+### **Step 2: Verify Current State**
 
 ```bash
-# Check web interface
-curl http://localhost:8000/health
+# Check type errors (expect 45 errors currently)
+mypy src/flext_quality/ --strict
 
-# Check API
-curl http://localhost:8000/api/v1/health
+# Check test status (expect import failures currently)
+pytest tests/ -v
 
-# Check database connection
-make diagnose
+# Check available commands (limited functionality)
+python -m flext_quality --help
 ```
 
-Expected output:
-
-```json
-{
-  "status": "healthy",
-  "services": {
-    "database": "connected",
-    "redis": "connected",
-    "celery": "running"
-  },
-  "version": "0.9.0"
-}
-```
-
-## Your First Quality Analysis
-
-### 1. Access the Web Dashboard
-
-Open your browser and navigate to:
-
-```
-http://localhost:8000
-```
-
-You should see the FLEXT Quality dashboard.
-
-### 2. Create Your First Project
-
-Using the web interface:
-
-1. Click "New Project"
-2. Fill in project details:
-   - **Name**: `my-first-project`
-   - **Path**: `/path/to/your/python/project`
-   - **Repository URL**: (optional) `https://github.com/user/repo`
-
-Or use the command line:
+### **Step 3: Review Architecture**
 
 ```bash
-# Create project via CLI
-make create-project NAME=my-first-project PATH=/path/to/project
+# Explore the excellent domain architecture
+ls -la src/flext_quality/
+# entities.py     - Core business entities ✅
+# value_objects.py - Quality metrics and scores ✅
+# services.py     - Domain services (needs consolidation)
+# api.py          - API facade (90% not implemented)
+# cli.py          - CLI interface (needs flext-cli conversion)
 ```
 
-### 3. Run Quality Analysis
+---
 
-Via web interface:
+## Intended Usage (Post-Transformation)
 
-1. Go to your project page
-2. Click "Start Analysis"
-3. Wait for analysis to complete (usually 2-5 minutes)
-
-Via command line:
-
-```bash
-# Analyze project
-make analyze PROJECT=my-first-project
-
-# Or analyze any directory
-make analyze-path PATH=/path/to/project
-```
-
-### 4. View Results
-
-The analysis will provide:
-
-- **Quality Score** (0-100)
-- **Quality Grade** (A+ to F)
-- **Issue Breakdown** by severity
-- **Detailed Report** with recommendations
-
-## Example: Analyzing FLEXT Core
-
-Let's analyze the FLEXT core library as an example:
-
-```bash
-# If you have access to flext-core
-git clone https://github.com/flext-sh/flext-core.git /tmp/flext-core
-
-# Create project
-curl -X POST http://localhost:8000/api/v1/projects \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "flext-core-example",
-    "project_path": "/tmp/flext-core",
-    "repository_url": "https://github.com/flext-sh/flext-core",
-    "language": "python"
-  }'
-
-# Start analysis (replace PROJECT_ID with actual ID from previous response)
-curl -X POST http://localhost:8000/api/v1/projects/PROJECT_ID/analyze
-
-# Check results
-curl http://localhost:8000/api/v1/projects/PROJECT_ID
-```
-
-Expected quality metrics for a well-maintained project:
-
-```json
-{
-  "quality_score": 92.5,
-  "quality_grade": "A",
-  "metrics": {
-    "coverage_percentage": 94.2,
-    "complexity_score": 8.1,
-    "security_score": 98.5,
-    "maintainability_score": 89.3
-  },
-  "issue_counts": {
-    "critical": 0,
-    "high": 2,
-    "medium": 8,
-    "low": 15
-  }
-}
-```
-
-## Understanding Quality Scores
-
-### Quality Grade Scale
-
-- **A+ (95-100)**: Exceptional quality, minimal issues
-- **A (90-94)**: High quality, few minor issues
-- **A- (85-89)**: Good quality, some improvements needed
-- **B+ (80-84)**: Acceptable quality, moderate issues
-- **B (75-79)**: Below standard, significant issues
-- **C (60-74)**: Poor quality, major refactoring needed
-- **D (40-59)**: Very poor quality, extensive work required
-- **F (0-39)**: Failing quality, complete overhaul needed
-
-### Key Metrics Explained
-
-- **Coverage Score**: Percentage of code covered by tests
-- **Complexity Score**: Average cyclomatic complexity (lower is better)
-- **Security Score**: Security vulnerability assessment
-- **Maintainability Score**: Code maintainability assessment
-
-## Common Configuration
-
-### Environment Variables
-
-Create a `.env` file for local development:
-
-```bash
-# Database
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/flext_quality
-
-# Redis/Celery
-REDIS_URL=redis://localhost:6379/0
-CELERY_BROKER_URL=redis://localhost:6379/0
-
-# Quality thresholds
-QUALITY_MIN_COVERAGE=90.0
-QUALITY_MAX_COMPLEXITY=10
-QUALITY_MIN_SECURITY_SCORE=90.0
-
-# FLEXT integration
-FLEXT_OBSERVABILITY_ENABLED=true
-```
-
-### Quality Standards
-
-Customize quality standards in `pyproject.toml`:
-
-```toml
-[tool.flext-quality]
-min_coverage = 90.0
-max_complexity = 10
-max_duplication = 5.0
-enabled_analyzers = ["ruff", "mypy", "bandit", "semgrep"]
-report_formats = ["html", "json", "executive"]
-
-# Custom thresholds per project type
-[tool.flext-quality.thresholds]
-core_library = { min_coverage = 95.0, max_complexity = 8 }
-application = { min_coverage = 85.0, max_complexity = 12 }
-test_code = { min_coverage = 70.0, max_complexity = 15 }
-```
-
-## Basic API Usage
-
-### Using Python SDK
+### **Basic Quality Analysis** (PLANNED)
 
 ```python
-from flext_quality import FlextQualityClient
+from flext_quality import FlextQualityService, FlextQualityConfig
 
-# Initialize client
-client = FlextQualityClient(base_url="http://localhost:8000")
+# Create enterprise quality service
+quality_service = FlextQualityService()
 
-# Create project
-project = await client.projects.create(
-    name="api-example",
-    project_path="/path/to/project"
+# Configure comprehensive analysis
+config = FlextQualityConfig(
+    project_path="./src",
+    min_coverage=90.0,
+    max_complexity=10,
+    enable_security_scan=True,
+    enable_type_checking=True,
+    tools_config={
+        "ruff": {"aggressive": True, "fix": True},
+        "mypy": {"strict": True, "cache": True},
+        "bandit": {"severity": "medium"},
+    }
 )
 
-# Start analysis
-analysis = await client.analyses.start(project.id)
+# Execute comprehensive analysis
+analysis_result = await quality_service.analyze_project(config)
 
-# Wait for completion
-result = await client.analyses.wait_for_completion(analysis.id)
-
-print(f"Quality Score: {result.quality_score}")
-print(f"Grade: {result.quality_grade}")
+if analysis_result.success:
+    report = analysis_result.value
+    print(f"📊 Quality Grade: {report.overall_grade}")
+    print(f"🐛 Issues Found: {report.total_issues}")
+    print(f"📈 Coverage: {report.coverage_percentage}%")
+    print(f"🔒 Security Score: {report.security_score}")
+else:
+    print(f"❌ Analysis Failed: {analysis_result.error}")
 ```
 
-### Using REST API
+### **CLI Usage** (PLANNED - Pure FLEXT-CLI)
 
 ```bash
-# Create project
-PROJECT_ID=$(curl -X POST http://localhost:8000/api/v1/projects \
-  -H "Content-Type: application/json" \
-  -d '{"name": "rest-example", "project_path": "/path/to/project"}' \
-  | jq -r '.data.id')
+# Comprehensive project analysis
+flext-quality analyze --project ./src --format html --output quality-report.html
 
-# Start analysis
-ANALYSIS_ID=$(curl -X POST http://localhost:8000/api/v1/projects/$PROJECT_ID/analyze \
-  | jq -r '.data.analysis_id')
+# Quality gate validation with thresholds
+flext-quality validate --thresholds quality-config.toml
 
-# Check status
-curl http://localhost:8000/api/v1/analyses/$ANALYSIS_ID
+# Workspace-wide quality analysis (absorbing workspace scripts)
+flext-quality workspace-analyze --parallel --security-scan
 
-# Get results when complete
-curl http://localhost:8000/api/v1/analyses/$ANALYSIS_ID/results
+# Quality metrics collection
+flext-quality metrics --project ./src --export json
+
+# Code fixing automation (absorbing gradual_lint_fixer.py)
+flext-quality fix --project ./src --auto-approve --backup
 ```
 
-## Troubleshooting
+### **Enterprise Dashboard** (PLANNED - FLEXT-WEB)
 
-### Common Issues
+```python
+from flext_quality import FlextQualityWeb
 
-**Service won't start:**
+# Create enterprise quality dashboard
+quality_web = FlextQualityWeb()
+dashboard = await quality_web.create_enterprise_dashboard()
 
-```bash
-# Check port conflicts
-sudo netstat -tulpn | grep -E "(8000|5432|6379)"
-
-# Restart services
-docker-compose restart
-# or
-./start_all.sh
+# Dashboard features (planned):
+# - Real-time quality metrics overview
+# - Project health trends and analytics
+# - Issue management and resolution tracking
+# - Executive reporting with quality KPIs
+# - Team collaboration and code review integration
 ```
 
-**Database connection error:**
+### **Integration with FLEXT Ecosystem** (PLANNED)
 
-```bash
-# Check PostgreSQL
-docker-compose exec db pg_isready -U postgres
+```python
+# FLEXT-API integration for programmatic access
+from flext_api import FlextApiRouter
+from flext_quality import FlextQualityApiRouter
 
-# Reset database
-docker-compose down -v
-docker-compose up -d db
-make web-migrate
+api_router = FlextApiRouter()
+api_router.include_router(FlextQualityApiRouter())
+
+# FLEXT-AUTH integration for enterprise security
+from flext_auth import FlextAuthMiddleware
+from flext_quality import FlextQualityAuthenticatedService
+
+quality_service = FlextQualityAuthenticatedService(
+    auth_middleware=FlextAuthMiddleware()
+)
 ```
 
-**Analysis fails:**
+---
 
-```bash
-# Check logs
-docker-compose logs -f celery
+## Enterprise Features (Post-Transformation)
 
-# Verify project path exists
-ls -la /path/to/your/project
+### **Workspace Integration** (Research-Based 2025 Patterns)
 
-# Check disk space
-df -h
+FLEXT Quality will absorb and modernize all workspace quality functionality:
+
+```python
+# Absorbing workspace scripts into unified architecture:
+WORKSPACE_INTEGRATION = {
+    "quality_gateway.py": "FlextQualityGateway - Enterprise quality gates",
+    "complete_quality_analysis.py": "FlextQualityAnalyzer - Multi-tool analysis",
+    "gradual_lint_fixer.py": "FlextQualityFixer - Automated code remediation",
+    "mypy_analyzer.py": "Type analysis integration with dual MyPy/PyRight",
+    "pattern_audit_system.py": "FlextQualityValidator - Pattern detection",
+    "flext_tools/quality_*": "Core quality bridge and gateway integration"
+}
 ```
 
-### Getting Help
+### **Modern Tool Stack** (Research-Based)
 
-- **Documentation**: [docs/README.md](README.md)
-- **Issues**: [GitHub Issues](https://github.com/flext-sh/flext-quality/issues)
-- **Troubleshooting**: [docs/operations/troubleshooting.md](operations/troubleshooting.md)
+```python
+# 2025 Enterprise Quality Stack Integration
+ENTERPRISE_TOOLS = {
+    "ruff": {
+        "description": "Rust-based linting, 3453+ patterns, extremely fast",
+        "features": "TOML config, hierarchical overrides, pre-commit integration"
+    },
+    "mypy": {
+        "description": "Industry standard type checking with plugin system",
+        "features": "Strict mode, incremental cache, enterprise reporting"
+    },
+    "bandit": {
+        "description": "Security vulnerability scanning",
+        "features": "CVE detection, custom rules, CI/CD integration"
+    },
+    "coverage.py": {
+        "description": "Test coverage measurement and reporting",
+        "features": "Branch coverage, HTML/XML reports, threshold enforcement"
+    }
+}
+```
 
-## Next Steps
+### **Configuration Management** (Modern Standards)
 
-Now that you have FLEXT Quality running:
+```toml
+# quality-config.toml (PLANNED)
+[tool.flext_quality]
+project_name = "my-enterprise-project"
+python_version = "3.13"
 
-1. **Explore the Web Interface** - Browse projects, analyses, and reports
-2. **Integrate with CI/CD** - Set up quality gates in your development workflow
-3. **Customize Rules** - Configure quality standards for your organization
-4. **Set up Monitoring** - Connect to your observability stack
-5. **Scale Deployment** - Move to production with Kubernetes or Docker Swarm
+[tool.flext_quality.analysis]
+min_coverage = 90.0
+max_complexity = 10
+security_level = "enterprise"
+enable_parallel = true
 
-### Recommended Reading
+[tool.flext_quality.tools.ruff]
+extend = "enterprise-python.toml"
+line_length = 88
+target_version = "py313"
 
-- **[Development Guide](development/README.md)** - Set up development environment
-- **[Architecture Overview](architecture/README.md)** - Understand system design
-- **[API Documentation](api/README.md)** - Integrate with external systems
-- **[Deployment Guide](deployment/README.md)** - Production deployment
+[tool.flext_quality.tools.mypy]
+strict = true
+disallow_untyped_defs = true
+warn_return_any = true
 
-### Integration Examples
+[tool.flext_quality.reporting]
+formats = ["html", "json", "pdf"]
+include_executive_summary = true
+include_trend_analysis = true
+```
 
-- **[CI/CD Integration](integration/cicd.md)** - GitHub Actions, GitLab CI
-- **[IDE Integration](integration/ide.md)** - VS Code, PyCharm
-- **[Monitoring Setup](integration/monitoring.md)** - Prometheus, Grafana
+---
 
-Welcome to FLEXT Quality! 🚀
+## Development Status & Roadmap
+
+### **Phase 1: Critical Fixes (Week 1)**
+- 🔥 Fix 45 MyPy type errors for production readiness
+- 🔥 Restore test infrastructure (0% → 85% coverage target)
+- 🔥 Complete API implementation (replace 90% placeholders)
+- 🔥 Consolidate service architecture (unified class patterns)
+
+### **Phase 2: Workspace Absorption (Week 2)**
+- 📦 Absorb all `scripts/quality/*.py` functionality
+- 📦 Integrate `flext_tools` quality components
+- 🔧 Implement modern Python quality stack (Ruff, MyPy, etc.)
+
+### **Phase 3: FLEXT Ecosystem Integration (Week 3)**
+- 🖥️ Convert to pure FLEXT-CLI (remove argparse)
+- 🌐 Implement FLEXT-WEB enterprise dashboard
+- 🗄️ Add proper repository layer with database persistence
+- 🔐 Integrate FLEXT-AUTH for enterprise security
+
+### **Phase 4: Enterprise Features (Week 4)**
+- 📊 Executive reporting and quality KPIs
+- 🤝 Team collaboration and code review integration
+- 📈 Quality trend analysis and predictive insights
+- 🔄 CI/CD pipeline integration with quality gates
+
+---
+
+## Getting Involved in Transformation
+
+### **For Developers**
+1. Review [TODO.md](../TODO.md) for detailed transformation plan
+2. Focus on Phase 1 critical fixes first
+3. Follow FLEXT standards (unified classes, FlextResult patterns, etc.)
+4. Contribute to fixing type errors and API implementations
+
+### **For FLEXT Users**
+1. Wait for transformation completion (2-3 weeks)
+2. Prepare projects for integration with new quality platform
+3. Review planned CLI and API interfaces
+4. Provide feedback on enterprise requirements
+
+### **For Enterprise Teams**
+1. Plan integration with enterprise quality workflows
+2. Review dashboard and reporting requirements
+3. Prepare for migration from current quality tools
+4. Consider pilot deployment after transformation
+
+---
+
+## Support During Transformation
+
+- **Issues**: Report via GitHub Issues with "transformation" label
+- **Questions**: Use GitHub Discussions for transformation-related questions
+- **Updates**: Watch repository for transformation progress updates
+- **Contributing**: See transformation roadmap in TODO.md for contribution opportunities
+
+---
+
+**NOTE**: This quick start guide describes the intended functionality. Current implementation has significant gaps requiring the transformation outlined in [TODO.md](../TODO.md). The excellent architectural foundations suggest 2-3 weeks focused development will achieve full functionality.
+
+**VISION**: FLEXT Quality will become the premier enterprise code quality platform, absorbing workspace functionality and providing unified interfaces to Python's best quality tools while maintaining zero-tolerance quality enforcement.

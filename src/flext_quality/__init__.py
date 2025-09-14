@@ -12,31 +12,28 @@ from flext_quality.__version__ import __version__, __version_info__
 from flext_quality.config import FlextQualityConfig
 from flext_quality.exceptions import FlextQualityError, FlextQualityValidationError
 from flext_quality.grade_calculator import QualityGradeCalculator
-from flext_quality.handlers import FlextQualityHandler
-from flext_quality.models import QualityMetric, QualityReport
-from flext_quality.ports import QualityAnalysisPort
-from flext_quality.reports import QualityReportGenerator
-from flext_quality.services import FlextQualityService
-from flext_quality.utilities import QualityUtilities
-from flext_quality.value_objects import QualityScore, QualityThreshold
-from flext_quality.web import FlextQualityWebInterface
+
+# from flext_quality.handlers import FlextQualityHandler  # Temporarily disabled - doesn't exist
+from flext_quality.models import (
+    FlextQualityReportModel,  # QualityMetric, QualityReport don't exist
+)
+
+# from flext_quality.ports import QualityAnalysisPort  # Temporarily disabled - doesn't exist
+# from flext_quality.reports import QualityReportGenerator  # Temporarily disabled - doesn't exist
+from flext_quality.services import BasicQualityProjectService as FlextQualityService
+from flext_quality.utilities import FlextQualityUtilities as QualityUtilities
+from flext_quality.value_objects import QualityScore  # QualityThreshold doesn't exist
+
+# from flext_quality.web import FlextQualityWebInterface  # Temporarily disabled - circular import
 
 __all__ = [
     "FlextQualityConfig",
     "FlextQualityError",
-    "FlextQualityHandler",
+    "FlextQualityReportModel",
     "FlextQualityService",
     "FlextQualityValidationError",
-    "FlextQualityWebInterface",
-    "QualityAnalysisPort",
-    # "QualityAnalysisType",  # Disabled - doesn't exist
     "QualityGradeCalculator",
-    "QualityMetric",
-    # "QualityMetricType",  # Disabled - doesn't exist
-    "QualityReport",
-    "QualityReportGenerator",
     "QualityScore",
-    "QualityThreshold",
     "QualityUtilities",
     "__version__",
     "__version_info__",

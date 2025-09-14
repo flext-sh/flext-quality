@@ -138,21 +138,21 @@ class FlextQualityAnalysis(BaseModel):
     low_issues: int = Field(default=0)
 
     # Analysis status
-    status: AnalysisStatus = Field(default=AnalysisStatus.QUEUED)
+    status: FlextAnalysisStatus = Field(default=FlextAnalysisStatus.QUEUED)
 
     # Analysis data
-    analysis_config: FlextTypes.Core.JsonDict = Field(default_factory=dict)
+    analysis_config: dict[str, object] = Field(default_factory=dict)
 
-    def start_analysis(self) -> QualityAnalysis:
+    def start_analysis(self) -> FlextQualityAnalysis:
         """Start analysis and return new instance."""
         return self.model_copy(
             update={
                 "started_at": datetime.now(UTC),
-                "status": AnalysisStatus.ANALYZING,
+                "status": FlextAnalysisStatus.ANALYZING,
             },
         )
 
-    def complete_analysis(self) -> QualityAnalysis:
+    def complete_analysis(self) -> FlextQualityAnalysis:
         """Complete analysis and return new instance."""
         completed_at = datetime.now(UTC)
         duration_seconds = None
@@ -163,7 +163,7 @@ class FlextQualityAnalysis(BaseModel):
         return self.model_copy(
             update={
                 "completed_at": completed_at,
-                "status": AnalysisStatus.COMPLETED,
+                "status": FlextAnalysisStatus.COMPLETED,
                 "duration_seconds": duration_seconds,
             },
         )

@@ -106,7 +106,7 @@ class BasicQualityIssueService:
         issue_type: IssueType,
         message: str,
         rule: str | None = None,
-        source: str = "ruff",
+        _source: str = "ruff",
     ) -> FlextResult[FlextQualityIssue]:
         """Create a new quality issue.
 
@@ -124,445 +124,104 @@ class BasicQualityIssueService:
         Returns:
             FlextResult containing the created issue or error
 
-        Returns:
-            FlextResult containing list of issues or error
+        """
+        try:
+            # Create issue ID
+            issue_id = f"{analysis_id}:{file_path}:{line_number}"
 
-        Returns:
-            FlextResult containing list of issues or error
+            # Create quality issue
+            issue = FlextQualityIssue(
+                analysis_id=analysis_id,
+                issue_type=issue_type,
+                severity=severity,
+                rule_id=rule or "unknown",
+                file_path=file_path,
+                line_number=line_number,
+                column_number=column_number,
+                message=message,
+            )
 
-        Returns:
-            FlextResult containing list of issues or error
+            # Store issue
+            self._issues[issue_id] = issue
 
-        Returns:
-            FlextResult containing list of issues or error
+            self._logger.debug(f"Created quality issue: {issue_id}")
+            return FlextResult[FlextQualityIssue].ok(issue)
+        except Exception as e:
+            self._logger.exception("Failed to create issue")
+            return FlextResult[FlextQualityIssue].fail(f"Failed to create issue: {e}")
 
-        Returns:
-            FlextResult containing list of issues or error
+    async def get_issues_by_analysis(
+        self, analysis_id: str
+    ) -> FlextResult[list[FlextQualityIssue]]:
+        """Get all issues for a specific analysis.
 
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
+        Args:
             analysis_id: Analysis unique identifier
 
         Returns:
             FlextResult containing list of issues or error
 
-        Returns:
-            FlextResult containing the issue or error
+        """
+        try:
+            issues = [
+                issue
+                for issue in self._issues.values()
+                if issue.analysis_id == analysis_id
+            ]
+            return FlextResult[list[FlextQualityIssue]].ok(issues)
+        except Exception as e:
+            self._logger.exception("Failed to get issues for analysis %s", analysis_id)
+            return FlextResult[list[FlextQualityIssue]].fail(
+                f"Failed to get issues: {e}"
+            )
 
-        Returns:
-            FlextResult containing the issue or error
+    async def get_issue(self, issue_id: str) -> FlextResult[FlextQualityIssue | None]:
+        """Get a specific issue by ID.
 
-        Returns:
-            FlextResult containing the issue or error
-
-        Returns:
-            FlextResult containing the issue or error
-
-        Returns:
-            FlextResult containing the issue or error
-
-        Returns:
-            FlextResult containing the issue or error
-
-        Returns:
-            FlextResult containing the issue or error
-
-        Returns:
-            FlextResult containing the issue or error
-
-        Returns:
-            FlextResult containing the issue or error
-
-        Returns:
-            FlextResult containing the issue or error
-
-        Returns:
-            FlextResult containing the issue or error
-
-        Returns:
-            FlextResult containing the issue or error
-
-        Returns:
-            FlextResult containing the issue or error
-
-        Returns:
-            FlextResult containing the issue or error
-
-        Returns:
-            FlextResult containing the issue or error
-
-        Returns:
-            FlextResult containing the issue or error
-
-        Returns:
-            FlextResult containing the issue or error
-
-        Returns:
-            FlextResult containing the issue or error
-
+        Args:
             issue_id: Issue unique identifier
 
         Returns:
-            FlextResult containing the issue or error
+            FlextResult containing the issue or None if not found
 
-        Returns:
-            FlextResult containing list of issues or error
+        """
+        try:
+            issue = self._issues.get(issue_id)
+            return FlextResult[FlextQualityIssue | None].ok(issue)
+        except Exception as e:
+            self._logger.exception("Failed to get issue %s", issue_id)
+            return FlextResult[FlextQualityIssue | None].fail(
+                f"Failed to get issue: {e}"
+            )
 
-        Returns:
-            FlextResult containing list of issues or error
+    async def suppress_issue(
+        self, issue_id: str, reason: str
+    ) -> FlextResult[FlextQualityIssue]:
+        """Suppress a specific issue.
 
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing list of issues or error
-
-            severity: Optional severity filter
-
-        Returns:
-            FlextResult containing list of issues or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the updated issue or error
-
+        Args:
             issue_id: Issue unique identifier
-
-        Returns:
-            FlextResult containing the updated issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
-        Returns:
-            FlextResult containing the suppressed issue or error
-
             reason: Reason for suppression
 
         Returns:
             FlextResult containing the suppressed issue or error
 
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
-            issue_id: Issue unique identifier
-
-        Returns:
-            FlextResult containing the unsuppressed issue or error
-
         """
+        try:
+            issue = self._issues.get(issue_id)
+            if not issue:
+                return FlextResult[FlextQualityIssue].fail(
+                    f"Issue not found: {issue_id}"
+                )
+
+            suppressed_issue = issue.suppress(reason)
+            self._issues[issue_id] = suppressed_issue
+
+            self._logger.debug(f"Suppressed issue: {issue_id}")
+            return FlextResult[FlextQualityIssue].ok(suppressed_issue)
+        except Exception as e:
+            self._logger.exception("Failed to suppress issue %s", issue_id)
+            return FlextResult[FlextQualityIssue].fail(f"Failed to suppress issue: {e}")
 
     async def unsuppress_issue(self, issue_id: str) -> FlextResult[FlextQualityIssue]:
         """Unsuppress a quality issue.
@@ -619,14 +278,14 @@ class BasicQualityAnalysisService:
         """
         try:
             analysis = FlextQualityAnalysis(
-                id=f"{project_id}_analysis_{len(self._analyses)}",
                 project_id=project_id,
-                config=config or {},
+                analysis_config=config or {},
             )
 
             # Store analysis
-            self._analyses[analysis.id] = analysis
-            self._logger.info("Created analysis: %s", analysis.id)
+            analysis_id = f"{project_id}_analysis_{len(self._analyses)}"
+            self._analyses[analysis_id] = analysis
+            self._logger.info("Created analysis: %s", analysis_id)
             return FlextResult[FlextQualityAnalysis].ok(analysis)
         except (RuntimeError, ValueError, TypeError) as e:
             self._logger.exception("Failed to create analysis")
@@ -674,7 +333,7 @@ class BasicQualityReportService:
         format_type: str,
         content: str,
         file_path: str | None = None,
-        metadata: FlextTypes.Core.Dict | None = None,
+        _metadata: FlextTypes.Core.Dict | None = None,
     ) -> FlextResult[FlextQualityReport]:
         """Create a new quality report.
 
@@ -683,230 +342,54 @@ class BasicQualityReportService:
             format_type: Report format (HTML, JSON, PDF)
             content: Report content
             file_path: Optional path to saved report file
-            metadata: Optional report metadata
+            _metadata: Optional report metadata
 
         Returns:
             FlextResult containing the created report or error
 
-        Returns:
-            FlextResult containing list of reports or error
+        """
+        try:
+            report = FlextQualityReport(
+                analysis_id=analysis_id,
+                report_type=format_type,
+                report_format="summary",
+                report_path=file_path,
+                report_size_bytes=len(content.encode()) if content else 0,
+            )
 
-        Returns:
-            FlextResult containing list of reports or error
+            # Store report
+            report_id = f"{analysis_id}_report_{len(self._reports)}"
+            self._reports[report_id] = report
+            self._logger.info("Created report: %s", report_id)
+            return FlextResult[FlextQualityReport].ok(report)
+        except (RuntimeError, ValueError, TypeError) as e:
+            self._logger.exception("Failed to create report")
+            return FlextResult[FlextQualityReport].fail(f"Failed to create report: {e}")
 
-        Returns:
-            FlextResult containing list of reports or error
+    async def get_reports_by_analysis(
+        self, analysis_id: str
+    ) -> FlextResult[list[FlextQualityReport]]:
+        """Get all reports for an analysis.
 
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
+        Args:
             analysis_id: Analysis unique identifier
 
         Returns:
             FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing the report or error
-
-            report_id: Report unique identifier
-
-        Returns:
-            FlextResult containing the report or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing list of reports or error
-
-            analysis_id: Analysis unique identifier
-
-        Returns:
-            FlextResult containing list of reports or error
-
-        Returns:
-            FlextResult containing success status or error
-
-        Returns:
-            FlextResult containing success status or error
-
-        Returns:
-            FlextResult containing success status or error
-
-        Returns:
-            FlextResult containing success status or error
-
-        Returns:
-            FlextResult containing success status or error
-
-        Returns:
-            FlextResult containing success status or error
-
-        Returns:
-            FlextResult containing success status or error
-
-            report_id: Report unique identifier
-
-        Returns:
-            FlextResult containing success status or error
 
         """
+        try:
+            reports = [
+                report
+                for report in self._reports.values()
+                if report.analysis_id == analysis_id
+            ]
+            return FlextResult[list[FlextQualityReport]].ok(reports)
+        except (RuntimeError, ValueError, TypeError) as e:
+            self._logger.exception("Failed to list reports")
+            return FlextResult[list[FlextQualityReport]].fail(
+                f"Failed to list reports: {e}"
+            )
 
     async def delete_report(self, report_id: str) -> FlextResult[bool]:
         """Delete a quality report.
@@ -973,7 +456,7 @@ class FlextQualityProjectService(BasicQualityProjectService):
     def __init__(self) -> None:
         """Initialize the instance."""
         warnings.warn(
-            "FlextQualityProjectService is deprecated; use FlextQualityProjectService directly",
+            "FlextQualityProjectService is deprecated; use BasicQualityProjectService directly",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -986,7 +469,7 @@ class FlextQualityAnalysisService(BasicQualityAnalysisService):
     def __init__(self) -> None:
         """Initialize the instance."""
         warnings.warn(
-            "FlextQualityAnalysisService is deprecated; use FlextQualityAnalysisService directly",
+            "FlextQualityAnalysisService is deprecated; use BasicQualityAnalysisService directly",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -999,7 +482,7 @@ class FlextQualityIssueService(BasicQualityIssueService):
     def __init__(self) -> None:
         """Initialize the instance."""
         warnings.warn(
-            "FlextQualityIssueService is deprecated; use FlextQualityIssueService directly",
+            "FlextQualityIssueService is deprecated; use BasicQualityIssueService directly",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -1012,7 +495,7 @@ class FlextQualityReportService(BasicQualityReportService):
     def __init__(self) -> None:
         """Initialize the instance."""
         warnings.warn(
-            "FlextQualityReportService is deprecated; use FlextQualityReportService directly",
+            "FlextQualityReportService is deprecated; use BasicQualityReportService directly",
             DeprecationWarning,
             stacklevel=2,
         )

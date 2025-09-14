@@ -31,6 +31,7 @@ MIN_ACCEPTABLE_QUALITY_SCORE = 70
 # Check if flext-cli is available
 try:
     from flext_cli import FlextCliHelper
+
     FLEXT_CLI_AVAILABLE = True
 except ImportError:
     FLEXT_CLI_AVAILABLE = False
@@ -123,8 +124,8 @@ def analyze_project(args: argparse.Namespace) -> int:
                     sys.stdout.write(format_result.value + "\n")
                 else:
                     helper.print_error(
-                            f"Failed to format as JSON: {format_result.error}"
-                        )
+                        f"Failed to format as JSON: {format_result.error}"
+                    )
                     return 1
             else:
                 sys.stdout.write(report.to_json() + "\n")
