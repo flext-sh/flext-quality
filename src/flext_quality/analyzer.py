@@ -31,15 +31,6 @@ MIN_FILE_SIZE_FOR_DUPLICATION_CHECK = 100
 SIMILARITY_THRESHOLD = 0.8
 
 
-from flext_core import FlextLogger
-
-logger = FlextLogger(__name__)
-
-# Constants
-MIN_FILE_SIZE_FOR_DUPLICATION_CHECK = 100
-SIMILARITY_THRESHOLD = 0.8
-
-
 class FlextQualityCodeAnalyzer:
     """Main code analyzer interface for FLEXT Quality."""
 

@@ -4,6 +4,8 @@ Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
+from flext_core import FlextTypes
+
 from .typing_helpers import (
     assert_analysis_results_structure,
     assert_dict_structure,

@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections import UserDict
-from typing import Never, TypeVar, override
+from typing import Never, override
 from unittest.mock import patch
 
 import pytest
@@ -27,9 +27,6 @@ from flext_quality import (
 from tests.conftest import (
     assert_result_failure_with_error,
 )
-
-# Type variable for generic dictionary values
-T = TypeVar("T")
 
 
 # DRY pattern: Factory for exception-throwing dict classes with proper generics

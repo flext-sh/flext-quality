@@ -1,3 +1,9 @@
+"""FLEXT Quality Web - Web service endpoints for quality analysis.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
 from __future__ import annotations
 
 from pathlib import Path
@@ -15,13 +21,13 @@ from flext_quality.api import QualityAPI
 
 
 # Aliases simples para compatibilidade dos testes
-def create_service(config=None):
+def create_service(config: dict | None = None) -> FlextWebServices | None:
     """Alias simples para FlextWebServices.create_web_service."""
     result = FlextWebServices.create_web_service(config)
     return result.value if result.is_success else None
 
 
-def get_web_settings():
+def get_web_settings() -> dict:
     """Alias simples para FlextWebConfigs.get_web_settings."""
     return FlextWebConfigs.get_web_settings()
 

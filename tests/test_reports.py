@@ -9,6 +9,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
+from flext_core import FlextTypes
 
 from flext_quality import (
     HIGH_ISSUE_THRESHOLD,

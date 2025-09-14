@@ -45,9 +45,9 @@ class BasicQualityProjectService:
         language: str = "python",
         *,
         auto_analyze: bool = True,
-        min_coverage: float = 95.0,
-        max_complexity: int = 10,
-        max_duplication: float = 5.0,
+        _min_coverage: float = 95.0,
+        _max_complexity: int = 10,
+        _max_duplication: float = 5.0,
     ) -> FlextResult[FlextQualityProject]:
         """Create a new quality project.
 
@@ -563,6 +563,17 @@ class BasicQualityIssueService:
             FlextResult containing the unsuppressed issue or error
 
         """
+
+    async def unsuppress_issue(self, issue_id: str) -> FlextResult[FlextQualityIssue]:
+        """Unsuppress a quality issue.
+
+        Args:
+            issue_id: Issue unique identifier
+
+        Returns:
+            FlextResult containing the unsuppressed issue or error
+
+        """
         try:
             issue = self._issues.get(issue_id)
             if not issue:
@@ -890,6 +901,17 @@ class BasicQualityReportService:
         Returns:
             FlextResult containing success status or error
 
+            report_id: Report unique identifier
+
+        Returns:
+            FlextResult containing success status or error
+
+        """
+
+    async def delete_report(self, report_id: str) -> FlextResult[bool]:
+        """Delete a quality report.
+
+        Args:
             report_id: Report unique identifier
 
         Returns:

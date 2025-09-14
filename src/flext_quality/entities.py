@@ -1,10 +1,16 @@
+"""FLEXT Quality Entities - Domain entities for quality analysis operations.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
+"""
+
 from __future__ import annotations
 
 import warnings
 from datetime import UTC, datetime
 from enum import StrEnum
 
-from flext_core import FlextResult, FlextTypes
+from flext_core import FlextResult
 from pydantic import BaseModel, Field
 
 from flext_quality.typings import FlextTypes

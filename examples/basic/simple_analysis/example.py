@@ -27,6 +27,8 @@ import json
 import sys
 from pathlib import Path
 
+from flext_core import FlextTypes
+
 # Using object instead of object for better type safety
 from ....flext_quality import (
     CodeAnalyzer,

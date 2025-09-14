@@ -5,6 +5,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import contextlib
 from typing import cast, override
 
 from flext_core import FlextResult, FlextTypes
@@ -624,8 +625,5 @@ class QualityMetrics(BaseModel):
 
 
 # Rebuild model to resolve forward references - Pydantic v2 compatibility
-try:
+with contextlib.suppress(AttributeError):
     QualityMetrics.model_rebuild()
-except AttributeError:
-    # Pydantic v1 compatibility or no model_rebuild needed
-    pass

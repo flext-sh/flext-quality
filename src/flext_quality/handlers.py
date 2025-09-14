@@ -1,4 +1,5 @@
 """Copyright (c) 2025 FLEXT Team. All rights reserved.
+
 SPDX-License-Identifier: MIT.
 """
 
@@ -13,6 +14,10 @@ from flext_observability import (
 )
 
 from flext_quality.entities import QualityAnalysis, QualityReport
+from flext_quality.services import (
+    FlextQualityAnalysisService,
+    FlextQualityReportService,
+)
 
 # Use flext-observability directly - no fallbacks
 flext_create_log_entry = _flext_create_log_entry
@@ -30,8 +35,8 @@ class FlextQualityHandlers:
 
     def __init__(self) -> None:
         """Initialize all services for handler operations."""
-        self._analysis_service = QualityAnalysisService()
-        self._report_service = QualityReportService()
+        self._analysis_service = FlextQualityAnalysisService()
+        self._report_service = FlextQualityReportService()
         # Use placeholder services for now - these would be injected
         self._linting_service = None
         self._security_service = None

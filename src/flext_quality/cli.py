@@ -17,19 +17,32 @@ from flext_cli import (
     FlextCliHelper,
     flext_cli_create_helper,
 )
+
+# Console import removed - using flext-cli exclusively
 from flext_core import FlextLogger
-from rich.console import Console
 
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.reports import QualityReport
 from flext_quality.web import FlextQualityWebInterface
 
+# Quality score thresholds
+MIN_ACCEPTABLE_QUALITY_SCORE = 70
 
-def get_cli_helper(*, verbose: bool = False) -> FlextCliHelper | Console:
-    """Get CLI helper or fallback to Console."""
+# Check if flext-cli is available
+try:
+    from flext_cli import FlextCliHelper
+    FLEXT_CLI_AVAILABLE = True
+except ImportError:
+    FLEXT_CLI_AVAILABLE = False
+
+
+def get_cli_helper(*, verbose: bool = False) -> FlextCliHelper:
+    """Get CLI helper using flext-cli exclusively."""
     if FLEXT_CLI_AVAILABLE and flext_cli_create_helper:
         return flext_cli_create_helper(quiet=not verbose)
-    return Console(quiet=not verbose)
+    # MANDATORY: No Console fallback - flext-cli is required
+    msg = "flext-cli is required but not available - install flext-cli package"
+    raise RuntimeError(msg)
 
 
 def analyze_project(args: argparse.Namespace) -> int:
@@ -44,16 +57,10 @@ def analyze_project(args: argparse.Namespace) -> int:
 
         project_path = Path(args.path).resolve()
         if not project_path.exists():
-            if isinstance(helper, Console):
-                helper.print(f"[red]Error: Path does not exist: {project_path}[/red]")
-            else:
-                helper.print_error(f"Path does not exist: {project_path}")
+            helper.print_error(f"Path does not exist: {project_path}")
             return 1
 
-        if isinstance(helper, Console):
-            helper.print(f"[blue]Analyzing project: {project_path}[/blue]")
-        else:
-            helper.print_info(f"Analyzing project: {project_path}")
+        helper.print_info(f"Analyzing project: {project_path}")
 
         # Create analyzer
         analyzer = CodeAnalyzer(project_path)
@@ -69,10 +76,7 @@ def analyze_project(args: argparse.Namespace) -> int:
         # Check if any files were analyzed
         files_analyzed = results.overall_metrics.files_analyzed
         if files_analyzed == 0:
-            if isinstance(helper, Console):
-                helper.print("[red]Error: No files to analyze[/red]")
-            else:
-                helper.print_error("No files to analyze")
+            helper.print_error("No files to analyze")
             return 1
 
         # Generate report
@@ -90,12 +94,7 @@ def analyze_project(args: argparse.Namespace) -> int:
                     # Write HTML directly since FlextCli doesn't handle HTML export
                     output_path.write_text(report.to_html(), encoding="utf-8")
                     export_result = None
-                    if isinstance(helper, Console):
-                        helper.print(
-                            f"[green]HTML report saved to {output_path}[/green]"
-                        )
-                    else:
-                        helper.print_success(f"HTML report saved to {output_path}")
+                    helper.print_success(f"HTML report saved to {output_path}")
                 else:
                     # Table format - export as JSON
                     export_result = FlextCliApiFunctions.export(
@@ -103,20 +102,10 @@ def analyze_project(args: argparse.Namespace) -> int:
                     )
 
                 if export_result and not export_result.is_success:
-                    if isinstance(helper, Console):
-                        helper.print(
-                            f"[red]Failed to save report: {export_result.error}[/red]"
-                        )
-                    else:
-                        helper.print_error(
-                            f"Failed to save report: {export_result.error}"
-                        )
+                    helper.print_error(f"Failed to save report: {export_result.error}")
                     return 1
                 if export_result:
-                    if isinstance(helper, Console):
-                        helper.print(f"[green]{export_result.value}[/green]")
-                    else:
-                        helper.print_success(export_result.value)
+                    helper.print_success(export_result.value)
             else:
                 # Fallback without FlextCli
                 if args.format == "json":
@@ -133,12 +122,7 @@ def analyze_project(args: argparse.Namespace) -> int:
                 if format_result.is_success:
                     sys.stdout.write(format_result.value + "\n")
                 else:
-                    if isinstance(helper, Console):
-                        helper.print(
-                            f"[red]Failed to format as JSON: {format_result.error}[/red]"
-                        )
-                    else:
-                        helper.print_error(
+                    helper.print_error(
                             f"Failed to format as JSON: {format_result.error}"
                         )
                     return 1
@@ -151,17 +135,9 @@ def analyze_project(args: argparse.Namespace) -> int:
                 report.to_dict(), "Quality Analysis"
             )
             if table_result.is_success:
-                if isinstance(helper, Console):
-                    helper.print(table_result.value)
-                else:
-                    helper.console.print(table_result.value)
+                helper.console.print(table_result.value)
             else:
-                if isinstance(helper, Console):
-                    helper.print(
-                        f"[red]Failed to display table: {table_result.error}[/red]"
-                    )
-                else:
-                    helper.print_error(f"Failed to display table: {table_result.error}")
+                helper.print_error(f"Failed to display table: {table_result.error}")
                 return 1
         else:
             # Fallback table display
@@ -174,29 +150,17 @@ def analyze_project(args: argparse.Namespace) -> int:
         # Return appropriate exit code based on quality
         quality_score = analyzer.get_quality_score()
         if quality_score >= good_quality_threshold:
-            if isinstance(helper, Console):
-                helper.print(f"[green]Good quality: {quality_score}%[/green]")
-            else:
-                helper.print_success(f"Good quality: {quality_score}%")
+            helper.print_success(f"Good quality: {quality_score}%")
             return 0
         if quality_score >= medium_quality_threshold:
-            if isinstance(helper, Console):
-                helper.print(f"[yellow]Medium quality: {quality_score}%[/yellow]")
-            else:
-                helper.print_warning(f"Medium quality: {quality_score}%")
+            helper.print_warning(f"Medium quality: {quality_score}%")
             return 1
-        if isinstance(helper, Console):
-            helper.print(f"[red]Poor quality: {quality_score}%[/red]")
-        else:
-            helper.print_error(f"Poor quality: {quality_score}%")
+        helper.print_error(f"Poor quality: {quality_score}%")
         return 2
 
     except (RuntimeError, ValueError, TypeError) as e:
-        logger.exception(f"Quality analysis failed: {e}")
-        if isinstance(helper, Console):
-            helper.print(f"[red]Analysis failed: {e}[/red]")
-        else:
-            helper.print_error(f"Analysis failed: {e}")
+        logger.exception("Quality analysis failed")
+        helper.print_error(f"Analysis failed: {e}")
         if args.verbose:
             logger.info("Verbose mode enabled - showing full traceback")
             traceback.print_exc()
@@ -210,10 +174,7 @@ def score_project(args: argparse.Namespace) -> int:
 
     try:
         project_path = Path(args.path).resolve()
-        if isinstance(helper, Console):
-            helper.print(f"[blue]Calculating quality score for: {project_path}[/blue]")
-        else:
-            helper.print_info(f"Calculating quality score for: {project_path}")
+        helper.print_info(f"Calculating quality score for: {project_path}")
 
         # Quick analysis
         analyzer = CodeAnalyzer(project_path)
@@ -238,14 +199,7 @@ def score_project(args: argparse.Namespace) -> int:
         if FLEXT_CLI_AVAILABLE and FlextCliApiFunctions:
             table_result = FlextCliApiFunctions.table(score_data, "Quality Score")
             if table_result.is_success:
-                if isinstance(helper, Console):
-                    helper.print(table_result.value)
-                else:
-                    helper.console.print(table_result.value)
-            elif isinstance(helper, Console):
-                helper.print(
-                    f"[red]Failed to display score: {table_result.error}[/red]"
-                )
+                helper.console.print(table_result.value)
             else:
                 helper.print_error(f"Failed to display score: {table_result.error}")
         else:
@@ -253,24 +207,15 @@ def score_project(args: argparse.Namespace) -> int:
             helper.print(f"Quality Score: {score_value}% (Grade: {grade})")
 
         # Exit based on score
-        if score_value >= 70:
-            if isinstance(helper, Console):
-                helper.print(f"[green]Quality acceptable: {score_value}%[/green]")
-            else:
-                helper.print_success(f"Quality acceptable: {score_value}%")
+        if score_value >= MIN_ACCEPTABLE_QUALITY_SCORE:
+            helper.print_success(f"Quality acceptable: {score_value}%")
             return 0
-        if isinstance(helper, Console):
-            helper.print(f"[yellow]Quality needs improvement: {score_value}%[/yellow]")
-        else:
-            helper.print_warning(f"Quality needs improvement: {score_value}%")
+        helper.print_warning(f"Quality needs improvement: {score_value}%")
         return 1
 
     except Exception as e:
-        logger.exception(f"Quality score calculation failed: {e}")
-        if isinstance(helper, Console):
-            helper.print(f"[red]Score calculation failed: {e}[/red]")
-        else:
-            helper.print_error(f"Score calculation failed: {e}")
+        logger.exception("Quality score calculation failed")
+        helper.print_error(f"Score calculation failed: {e}")
         return 1
 
 
@@ -280,26 +225,17 @@ def run_web_server(args: argparse.Namespace) -> int:
     helper = get_cli_helper(args.verbose)
 
     try:
-        if isinstance(helper, Console):
-            helper.print(f"[blue]Starting web server on {args.host}:{args.port}[/blue]")
-        else:
-            helper.print_info(f"Starting web server on {args.host}:{args.port}")
+        helper.print_info(f"Starting web server on {args.host}:{args.port}")
 
         interface = FlextQualityWebInterface()
         interface.run(host=args.host, port=args.port, debug=args.debug)
         return 0
     except KeyboardInterrupt:
-        if isinstance(helper, Console):
-            helper.print("[blue]Web server stopped by user[/blue]")
-        else:
-            helper.print_info("Web server stopped by user")
+        helper.print_info("Web server stopped by user")
         return 0
     except Exception as e:
-        logger.exception(f"Web server failed: {e}")
-        if isinstance(helper, Console):
-            helper.print(f"[red]Web server failed: {e}[/red]")
-        else:
-            helper.print_error(f"Web server failed: {e}")
+        logger.exception("Web server failed")
+        helper.print_error(f"Web server failed: {e}")
         if args.verbose:
             traceback.print_exc()
         return 1
@@ -428,7 +364,7 @@ Examples:
 
 
 # Ultra-simple compatibility functions for test requirements
-def another_function(args: argparse.Namespace) -> int:
+def another_function(_args: argparse.Namespace) -> int:
     """Ultra-simple test compatibility function - returns success."""
     return 0
 

@@ -1,4 +1,6 @@
-"""- Analysis: Analysis execution and results
+"""FLEXT Quality Models - Analysis execution, reporting, and configuration models.
+
+- Analysis: Analysis execution and results
 - Reporting: Report generation and metrics
 - Configuration: Analysis configuration models.
 

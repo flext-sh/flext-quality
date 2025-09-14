@@ -7,6 +7,8 @@ import sys
 from pathlib import Path
 from subprocess import CompletedProcess
 
+from flext_core import FlextTypes
+
 
 def run_tests() -> "CompletedProcess[str]":
     """Executa testes sem interferência."""
@@ -36,18 +38,13 @@ def run_tests() -> "CompletedProcess[str]":
                 stderr=asyncio.subprocess.PIPE,
             )
             stdout, stderr = await process.communicate()
-            return process.returncode, stdout.decode(), stderr.decode()
+            # Ensure returncode is not None
+            returncode = process.returncode if process.returncode is not None else -1
+            return returncode, stdout.decode(), stderr.decode()
 
         rc, out, err = asyncio.run(_run(cmd))
 
-        class CompletedProcess:
-            def __init__(self, returncode: int, stdout: str, stderr: str) -> None:
-                """Initialize the instance."""
-                self.returncode = returncode
-                self.stdout = stdout
-                self.stderr = stderr
-
-        return CompletedProcess(rc, out, err)
+        return CompletedProcess(args=cmd, returncode=rc, stdout=out, stderr=err)
 
     finally:
         os.chdir(original_dir)

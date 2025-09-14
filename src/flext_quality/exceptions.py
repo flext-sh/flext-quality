@@ -68,6 +68,7 @@ class FlextQualityExceptionsError(FlextExceptions):
             code: str = "QUALITY_ANALYSIS_ERROR",
             context: FlextTypes.Core.Dict | None = None,
         ) -> None:
+            """Initialize quality analysis error with message and optional context."""
             super().__init__(message, code=code, context=context)
 
         @override
@@ -84,6 +85,7 @@ class FlextQualityExceptionsError(FlextExceptions):
             code: str = "QUALITY_REPORT_ERROR",
             context: FlextTypes.Core.Dict | None = None,
         ) -> None:
+            """Initialize quality report error with message and optional context."""
             super().__init__(message, code=code, context=context)
 
         @override
@@ -100,6 +102,7 @@ class FlextQualityExceptionsError(FlextExceptions):
             code: str = "QUALITY_METRICS_ERROR",
             context: FlextTypes.Core.Dict | None = None,
         ) -> None:
+            """Initialize quality metrics error with message and optional context."""
             super().__init__(message, code=code, context=context)
 
         @override
@@ -116,6 +119,7 @@ class FlextQualityExceptionsError(FlextExceptions):
             code: str = "QUALITY_GRADE_ERROR",
             context: FlextTypes.Core.Dict | None = None,
         ) -> None:
+            """Initialize quality grade error with message and optional context."""
             super().__init__(message, code=code, context=context)
 
         @override
@@ -132,6 +136,7 @@ class FlextQualityExceptionsError(FlextExceptions):
             code: str = "QUALITY_RULE_ERROR",
             context: FlextTypes.Core.Dict | None = None,
         ) -> None:
+            """Initialize quality rule error with message and optional context."""
             super().__init__(message, code=code, context=context)
 
         @override

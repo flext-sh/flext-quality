@@ -15,14 +15,10 @@ import os
 import tempfile
 from collections.abc import Generator
 from pathlib import Path
-from typing import TypeVar
 
 import pytest
 from django.test.utils import setup_test_environment, teardown_test_environment
-from flext_core import FlextResult, FlextTypes
-
-# Type variable for FlextResult data
-T = TypeVar("T")
+from flext_core import FlextResult, FlextTypes, T
 
 
 def assert_result_success_with_data[T](result: FlextResult[T]) -> T:
@@ -582,7 +578,7 @@ def mock_quality_analyzer() -> object:
                 "coverage": 90.0,
             }
 
-        async def get_metrics(self, project_path: str) -> FlextTypes.Core.Dict:
+        async def get_metrics(self, _project_path: str) -> FlextTypes.Core.Dict:
             """Simulate project-wide quality metrics collection.
 
             Args:
