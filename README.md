@@ -84,21 +84,32 @@ print('Core imports successful')
 ### **Basic Usage**
 
 ```python
+import asyncio
 from flext_quality import FlextQualityService
-from flext_core import FlextResult
+from flext_quality.analyzer import FlextQualityCodeAnalyzer
 
-# Initialize quality service
-quality_service = FlextQualityService()
-
-# Analyze project (when working)
-# Note: Currently blocked by type safety issues
-try:
-    result = quality_service.analyze_project("/path/to/project")
+# Option 1: Service Layer (Async)
+async def analyze_with_service():
+    service = FlextQualityService()
+    result = await service.create_project(
+        name="my_project",
+        project_path="/path/to/project"
+    )
     if result.success:
-        analysis = result.value
-        print(f"Quality Score: {analysis.overall_score}")
-except ImportError as e:
-    print(f"Integration issue: {e}")
+        project = result.value
+        print(f"Project created: {project.name}")
+
+# Option 2: Direct Analysis Engine
+def analyze_with_engine():
+    analyzer = FlextQualityCodeAnalyzer("/path/to/project")
+    analysis_result = analyzer.analyze_project()
+    score = analyzer.get_quality_score()
+    grade = analyzer.get_quality_grade()
+    print(f"Quality Score: {score}, Grade: {grade}")
+
+# Run analysis
+asyncio.run(analyze_with_service())
+analyze_with_engine()
 ```
 
 ---
@@ -167,10 +178,10 @@ tests/
 ### **Testing Commands**
 
 ```bash
-# Current status: Tests blocked by import errors
-make test              # Produces ImportError
-make test-unit         # Unit tests (when imports are fixed)
-make coverage-html     # HTML coverage report (when tests run)
+# Basic test execution
+pytest tests/test_basic.py --no-cov    # Works: Basic tests execute successfully
+make test                             # Limited: Coverage configuration issues
+make test-unit                        # Individual test modules work
 
 # Diagnostic command
 make diagnose          # Check system status and dependencies
@@ -182,12 +193,12 @@ make diagnose          # Check system status and dependencies
 
 ### **Current Implementation Status**
 
-- **Analysis Engine**: Functional - Basic code analysis capabilities work
+- **Analysis Engine**: Functional - FlextQualityCodeAnalyzer works with scoring and grading
+- **Service Layer**: Functional - Async project creation and management works
 - **Domain Models**: Complete - Excellent DDD implementation with FlextModels
-- **Service Layer**: Partial - CRUD operations available, business logic incomplete
-- **API Layer**: Incomplete - Multiple methods return "not implemented"
-- **CLI Interface**: Blocked - Import errors prevent command execution
-- **Test Suite**: Blocked - Import errors prevent test execution
+- **Export Configuration**: Limited - 8 items exported from 29 modules (28% accessibility)
+- **Quality Calculator**: Partial - Method signature mismatch in QualityGradeCalculator
+- **Test Suite**: Basic - Individual tests work, coverage configuration needs fixing
 
 ### **Quality Standards**
 

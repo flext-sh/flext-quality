@@ -72,39 +72,56 @@ ls -la src/flext_quality/
 
 ## Intended Usage (Post-Transformation)
 
-### **Basic Quality Analysis** (PLANNED)
+### **Basic Quality Analysis** (WORKING)
 
 ```python
-from flext_quality import FlextQualityService, FlextQualityConfig
+import asyncio
+from flext_quality import FlextQualityService
+from flext_quality.analyzer import FlextQualityCodeAnalyzer
 
-# Create enterprise quality service
-quality_service = FlextQualityService()
+# Option 1: Service Layer Approach
+async def service_analysis():
+    service = FlextQualityService()
 
-# Configure comprehensive analysis
-config = FlextQualityConfig(
-    project_path="./src",
-    min_coverage=90.0,
-    max_complexity=10,
-    enable_security_scan=True,
-    enable_type_checking=True,
-    tools_config={
-        "ruff": {"aggressive": True, "fix": True},
-        "mypy": {"strict": True, "cache": True},
-        "bandit": {"severity": "medium"},
-    }
-)
+    # Create project with quality thresholds
+    project_result = await service.create_project(
+        name="my_project",
+        project_path="./src",
+        _min_coverage=85.0,  # Note: internal parameter name
+        _max_complexity=10
+    )
 
-# Execute comprehensive analysis
-analysis_result = await quality_service.analyze_project(config)
+    if project_result.success:
+        project = project_result.value
+        print(f"✅ Project: {project.name}")
+        print(f"📁 Path: {project.project_path}")
+        print(f"🎯 Min Coverage: {project.min_coverage}")
 
-if analysis_result.success:
-    report = analysis_result.value
-    print(f"📊 Quality Grade: {report.overall_grade}")
-    print(f"🐛 Issues Found: {report.total_issues}")
-    print(f"📈 Coverage: {report.coverage_percentage}%")
-    print(f"🔒 Security Score: {report.security_score}")
-else:
-    print(f"❌ Analysis Failed: {analysis_result.error}")
+# Option 2: Direct Analysis Engine
+def direct_analysis():
+    # Analyze project directly
+    analyzer = FlextQualityCodeAnalyzer("./src")
+
+    # Run comprehensive analysis
+    analysis_result = analyzer.analyze_project(
+        include_security=True,
+        include_complexity=True,
+        include_dead_code=True,
+        include_duplicates=True
+    )
+
+    # Get results
+    score = analyzer.get_quality_score()
+    grade = analyzer.get_quality_grade()
+
+    print(f"📊 Quality Score: {score}")
+    print(f"🏆 Quality Grade: {grade}")
+    print(f"📄 Files Analyzed: {analysis_result.overall_metrics.files_analyzed}")
+    print(f"📏 Total Lines: {analysis_result.overall_metrics.total_lines}")
+
+# Run both approaches
+asyncio.run(service_analysis())
+direct_analysis()
 ```
 
 ### **CLI Usage** (PLANNED - Pure FLEXT-CLI)
