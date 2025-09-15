@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from flext_quality import exceptions
 from flext_quality.__version__ import __version__, __version_info__
 
 # Core analyzer and backends
@@ -22,8 +23,9 @@ from flext_quality.ast_backend import (
 from flext_quality.backend_type import BackendType
 from flext_quality.base import BaseAnalyzer
 
-# CLI functions (temporarily disabled due to flext-cli integration issues)
-# from flext_quality.cli import analyze_project, main
+# CLI functions (re-enabled for testing compatibility)
+from flext_quality.cli import analyze_project, another_function, main, setup_logging
+
 # Configuration and containers
 from flext_quality.config import FlextQualityConfig, FlextQualityConfig as QualityConfig
 from flext_quality.container import get_quality_container
@@ -37,7 +39,20 @@ from flext_quality.entities import (
     FlextQualityReport as QualityReport,
     FlextQualityRule as QualityRule,
 )
-from flext_quality.exceptions import FlextQualityError, FlextQualityValidationError
+from flext_quality.exceptions import (
+    FlextQualityAnalysisError,
+    FlextQualityAuthenticationError,
+    FlextQualityConfigurationError,
+    FlextQualityConnectionError,
+    FlextQualityError,
+    FlextQualityGradeError,
+    FlextQualityMetricsError,
+    FlextQualityProcessingError,
+    FlextQualityReportError,
+    FlextQualityRuleError,
+    FlextQualityTimeoutError,
+    FlextQualityValidationError,
+)
 from flext_quality.external_backend import (
     FlextQualityExternalBackend as ExternalBackend,
 )
@@ -65,8 +80,13 @@ from flext_quality.utilities import FlextQualityUtilities as QualityUtilities
 
 # Value objects
 from flext_quality.value_objects import (
+    ComplexityMetric,
+    CoverageMetric,
+    DuplicationMetric,
     FlextIssueSeverity as IssueSeverity,
     FlextIssueType as IssueType,
+    IssueLocation,
+    QualityGrade,
     QualityScore,
 )
 
@@ -78,17 +98,32 @@ __all__ = [
     "BaseAnalyzer",
     # Core analyzer and backends
     "CodeAnalyzer",
+    "ComplexityMetric",
+    "CoverageMetric",
+    "DuplicationMetric",
     "ExternalBackend",
+    "FlextQualityAnalysisError",
+    "FlextQualityAuthenticationError",
     # Configuration and containers
     "FlextQualityConfig",
+    "FlextQualityConfigurationError",
+    "FlextQualityConnectionError",
+    # Exceptions
     "FlextQualityError",
+    "FlextQualityGradeError",
     "FlextQualityHandler",
+    "FlextQualityMetricsError",
+    "FlextQualityProcessingError",
+    "FlextQualityReportError",
     # Reports
     "FlextQualityReportGenerator",
     # Models and metrics
     "FlextQualityReportModel",
+    "FlextQualityRuleError",
     "FlextQualityService",
+    "FlextQualityTimeoutError",
     "FlextQualityValidationError",
+    "IssueLocation",
     "IssueSeverity",
     "IssueType",
     # API and handlers
@@ -96,6 +131,7 @@ __all__ = [
     "QualityAnalysis",
     "QualityAnalysisService",
     "QualityConfig",
+    "QualityGrade",
     "QualityGradeCalculator",
     "QualityIssue",
     "QualityIssueService",
@@ -109,13 +145,16 @@ __all__ = [
     "QualityRule",
     # Value objects
     "QualityScore",
-    # CLI functions (temporarily disabled)
-    # "analyze_project",
-    # "main",
     # Utilities and exceptions
     "QualityUtilities",
     # Version info
     "__version__",
     "__version_info__",
+    # CLI functions (re-enabled for testing compatibility)
+    "analyze_project",
+    "another_function",
+    "exceptions",
     "get_quality_container",
+    "main",
+    "setup_logging",
 ]

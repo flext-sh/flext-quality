@@ -218,7 +218,7 @@ class QualityMetrics(FlextModels.Value):
         }
         defaults.update(overrides)
 
-        # Type ignore needed here because we're using dict unpacking with runtime validation
+        # Type ignore needed for Pydantic model construction with dict unpacking
         return cls(**defaults)
 
     @classmethod

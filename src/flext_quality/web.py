@@ -23,8 +23,19 @@ from flext_quality.api import QualityAPI
 # Aliases simples para compatibilidade dos testes
 def create_service(config: dict[str, object] | None = None) -> object | None:
     """Alias simples para FlextWebServices.create_web_service."""
-    # Type cast for compatibility since we're providing a simple dict
-    result = FlextWebServices.create_web_service(config)
+    # Convert dict to proper WebConfig if provided
+    web_config = None
+    if config:
+        try:
+            web_config = FlextWebConfigs.WebConfig(**config)
+        except Exception:
+            # Log the exception but continue with None config
+            logger.warning(
+                "Failed to create WebConfig from provided dict, using default"
+            )
+            web_config = None
+
+    result = FlextWebServices.create_web_service(web_config)
     return result.value if result.is_success else None
 
 
@@ -63,6 +74,9 @@ class FlextQualityWebInterface:
 
     def _register_routes(self) -> None:
         """Register quality analysis routes with Flask app."""
+        if not hasattr(self.web_service, "app"):
+            msg = "Web service does not have an 'app' attribute"
+            raise AttributeError(msg)
         app = self.web_service.app
 
         # Dashboard
@@ -223,6 +237,9 @@ class FlextQualityWebInterface:
     ) -> None:
         """Run the quality web server."""
         logger.info("Starting FLEXT Quality Web Interface on %s:%s", host, port)
+        if not hasattr(self.web_service, "run"):
+            msg = "Web service does not have a 'run' method"
+            raise AttributeError(msg)
         self.web_service.run(host=host, port=port, debug=debug)
 
 
