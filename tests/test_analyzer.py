@@ -286,11 +286,12 @@ class TestCodeAnalyzerComprehensive:
         # Create a file with potential security issues
         security_file = project_path / "security_test.py"
         security_file.write_text("""
-
+# INTENTIONAL SECURITY VULNERABILITIES FOR TESTING PURPOSES ONLY
+# These are deliberately insecure patterns to test the security analyzer
 
 password = "hardcoded_password"
-query = f"SELECT * FROM users WHERE id = {user_id}"  # SQL injection risk
-subprocess.call(f"rm -rf {user_input}")  # Command injection risk
+query = f"SELECT * FROM users WHERE id = {user_id}"  # SQL injection risk - INTENTIONAL FOR TESTING
+subprocess.call(f"rm -rf {user_input}")  # Command injection risk - INTENTIONAL FOR TESTING
 """)
 
         analyzer = CodeAnalyzer(temporary_project_structure)

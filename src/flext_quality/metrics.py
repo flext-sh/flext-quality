@@ -6,10 +6,10 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import contextlib
-from typing import cast, override
+from typing import cast
 
-from flext_core import FlextResult, FlextTypes
-from pydantic import BaseModel, Field
+from flext_core import FlextModels, FlextResult, FlextTypes
+from pydantic import Field
 
 from flext_quality.analysis_types import AnalysisResults
 from flext_quality.grade_calculator import QualityGradeCalculator
@@ -18,7 +18,7 @@ from flext_quality.grade_calculator import QualityGradeCalculator
 MAX_QUALITY_SCORE = 100
 
 
-class QualityMetrics(BaseModel):
+class QualityMetrics(FlextModels.Value):
     """Comprehensive Quality Metrics Value Object.
 
     Immutable value object that encapsulates comprehensive code quality
@@ -494,7 +494,6 @@ class QualityMetrics(BaseModel):
             + self.complexity_issues_count
         )
 
-    @override
     def to_dict(
         self,
         *,
@@ -571,7 +570,6 @@ class QualityMetrics(BaseModel):
     # Architecture Note: Grade calculation centralized in QualityGradeCalculator
     # for consistency across FLEXT ecosystem quality services
 
-    @override
     def validate_business_rules(self) -> FlextResult[None]:
         """Validate quality metrics against domain business rules.
 

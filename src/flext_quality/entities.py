@@ -103,6 +103,7 @@ warnings.warn(
 class FlextQualityAnalysis(BaseModel):
     """Quality analysis domain entity using enhanced mixins for code reduction."""
 
+    id: str = Field(default_factory=lambda: str(__import__("uuid").uuid4()), description="Unique analysis ID")
     project_id: str = Field(..., description="Associated project ID")
 
     # Analysis identification

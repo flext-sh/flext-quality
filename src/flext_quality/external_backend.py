@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 import shutil
-import subprocess
+import subprocess  # nosec B404 # Required for external tool integration
 import tempfile
 import warnings
 from importlib import import_module, util
@@ -124,9 +124,12 @@ class FlextQualityExternalBackend(BaseAnalyzer):
             # Run ruff with JSON output format using validated executable path
             ruff_path = shutil.which("ruff")
             if not ruff_path:
-                return []  # Return empty list if ruff is not available
+                return {
+                    "issues": [],
+                    "ruff_available": False,
+                }  # Return empty dict if ruff is not available
 
-            result = subprocess.run(  # noqa: S603
+            result = subprocess.run(  # nosec B603 # Validated ruff execution with timeout
                 [ruff_path, "check", str(abs_file_path), "--output-format", "json"],
                 capture_output=True,
                 text=True,

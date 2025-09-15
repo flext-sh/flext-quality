@@ -165,12 +165,12 @@ from typing import List
 from typing import Type
 
 def unsafe_function(user_input):
-    """Function with real security issues."""
+    """Function with real security issues - INTENTIONAL FOR TESTING PURPOSES ONLY."""
 
-    # SQL injection vulnerability (real)
+    # SQL injection vulnerability (real) - INTENTIONAL FOR TESTING
     query = f"SELECT * FROM users WHERE name = '{user_input}'"
 
-    # Command injection vulnerability (real)
+    # Command injection vulnerability (real) - INTENTIONAL FOR TESTING
     os.system(f"ls {user_input}")
 
     # Another command injection (real)

@@ -7,15 +7,15 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 import traceback
 from pathlib import Path
 
 from flext_cli import (
-    FlextCliApiFunctions,
-    FlextCliHelper,
-    flext_cli_create_helper,
+    FlextCliApi,
+    FlextCliContext,
 )
 
 # Console import removed - using flext-cli exclusively
@@ -30,17 +30,17 @@ MIN_ACCEPTABLE_QUALITY_SCORE = 70
 
 # Check if flext-cli is available
 try:
-    from flext_cli import FlextCliHelper
+    from flext_cli import FlextCliApi
 
     FLEXT_CLI_AVAILABLE = True
 except ImportError:
     FLEXT_CLI_AVAILABLE = False
 
 
-def get_cli_helper(*, verbose: bool = False) -> FlextCliHelper:
-    """Get CLI helper using flext-cli exclusively."""
-    if FLEXT_CLI_AVAILABLE and flext_cli_create_helper:
-        return flext_cli_create_helper(quiet=not verbose)
+def get_cli_context(*, verbose: bool = False) -> FlextCliContext:
+    """Get CLI context using flext-cli exclusively."""
+    if FLEXT_CLI_AVAILABLE:
+        return FlextCliContext(verbose=verbose)
     # MANDATORY: No Console fallback - flext-cli is required
     msg = "flext-cli is required but not available - install flext-cli package"
     raise RuntimeError(msg)
@@ -49,7 +49,8 @@ def get_cli_helper(*, verbose: bool = False) -> FlextCliHelper:
 def analyze_project(args: argparse.Namespace) -> int:
     """Analyze project quality using FlextCli APIs."""
     logger = FlextLogger(__name__)
-    helper = get_cli_helper(args.verbose)
+    cli_context = get_cli_context(verbose=getattr(args, "verbose", False))
+    cli_api = FlextCliApi()
 
     try:
         # Enable quiet mode for JSON/HTML output to prevent log contamination
@@ -58,10 +59,10 @@ def analyze_project(args: argparse.Namespace) -> int:
 
         project_path = Path(args.path).resolve()
         if not project_path.exists():
-            helper.print_error(f"Path does not exist: {project_path}")
+            cli_context.print_error(f"Path does not exist: {project_path}")
             return 1
 
-        helper.print_info(f"Analyzing project: {project_path}")
+        cli_context.print_info(f"Analyzing project: {project_path}")
 
         # Create analyzer
         analyzer = CodeAnalyzer(project_path)
@@ -77,7 +78,7 @@ def analyze_project(args: argparse.Namespace) -> int:
         # Check if any files were analyzed
         files_analyzed = results.overall_metrics.files_analyzed
         if files_analyzed == 0:
-            helper.print_error("No files to analyze")
+            cli_context.print_error("No files to analyze")
             return 1
 
         # Generate report
@@ -86,27 +87,30 @@ def analyze_project(args: argparse.Namespace) -> int:
         if args.output:
             # Save to file using FlextCli export
             output_path = Path(args.output)
-            if FLEXT_CLI_AVAILABLE and FlextCliApiFunctions:
+            if FLEXT_CLI_AVAILABLE:
                 if args.format == "json":
-                    export_result = FlextCliApiFunctions.export(
-                        report.to_dict(), str(output_path), "json"
+                    # Get dict from JSON report
+                    report_dict = json.loads(report.to_json())
+                    export_result = cli_api.export_data(
+                        report_dict, str(output_path)
                     )
                 elif args.format == "html":
                     # Write HTML directly since FlextCli doesn't handle HTML export
                     output_path.write_text(report.to_html(), encoding="utf-8")
                     export_result = None
-                    helper.print_success(f"HTML report saved to {output_path}")
+                    cli_context.print_success(f"HTML report saved to {output_path}")
                 else:
                     # Table format - export as JSON
-                    export_result = FlextCliApiFunctions.export(
-                        report.to_dict(), str(output_path), "json"
+                    report_dict = json.loads(report.to_json())
+                    export_result = cli_api.export_data(
+                        report_dict, str(output_path)
                     )
 
-                if export_result and not export_result.is_success:
-                    helper.print_error(f"Failed to save report: {export_result.error}")
+                if export_result and export_result.is_failure:
+                    cli_context.print_error(f"Failed to save report: {export_result.error}")
                     return 1
-                if export_result:
-                    helper.print_success(export_result.value)
+                if export_result and export_result.is_success:
+                    cli_context.print_success(export_result.value)
             else:
                 # Fallback without FlextCli
                 if args.format == "json":
@@ -115,15 +119,17 @@ def analyze_project(args: argparse.Namespace) -> int:
                     output_path.write_text(report.to_html(), encoding="utf-8")
                 else:
                     output_path.write_text(report.to_json(), encoding="utf-8")
-                helper.print(f"Report saved to {output_path}")
+                cli_context.print_info(f"Report saved to {output_path}")
         # Output to stdout
         elif args.format == "json":
-            if FLEXT_CLI_AVAILABLE and FlextCliApiFunctions:
-                format_result = FlextCliApiFunctions.format(report.to_dict(), "json")
+            if FLEXT_CLI_AVAILABLE:
+                # Get dict from JSON report
+                report_dict = json.loads(report.to_json())
+                format_result = cli_api.format_data(report_dict, "json")
                 if format_result.is_success:
                     sys.stdout.write(format_result.value + "\n")
                 else:
-                    helper.print_error(
+                    cli_context.print_error(
                         f"Failed to format as JSON: {format_result.error}"
                     )
                     return 1
@@ -131,18 +137,22 @@ def analyze_project(args: argparse.Namespace) -> int:
                 sys.stdout.write(report.to_json() + "\n")
         elif args.format == "html":
             sys.stdout.write(report.to_html() + "\n")
-        elif FLEXT_CLI_AVAILABLE and FlextCliApiFunctions:
-            table_result = FlextCliApiFunctions.table(
-                report.to_dict(), "Quality Analysis"
+        elif FLEXT_CLI_AVAILABLE:
+            # Get dict from JSON report
+            report_dict = json.loads(report.to_json())
+            table_result = cli_api.create_table(
+                report_dict, title="Quality Analysis"
             )
             if table_result.is_success:
-                helper.console.print(table_result.value)
+                cli_context.print_info(str(table_result.value))
             else:
-                helper.print_error(f"Failed to display table: {table_result.error}")
+                cli_context.print_error(f"Failed to display table: {table_result.error}")
                 return 1
         else:
             # Fallback table display
-            helper.print(str(report.to_dict()))
+            # Get dict from JSON report
+            report_dict = json.loads(report.to_json())
+            cli_context.print_info(str(report_dict))
 
         # Quality thresholds
         good_quality_threshold = 80
@@ -151,17 +161,17 @@ def analyze_project(args: argparse.Namespace) -> int:
         # Return appropriate exit code based on quality
         quality_score = analyzer.get_quality_score()
         if quality_score >= good_quality_threshold:
-            helper.print_success(f"Good quality: {quality_score}%")
+            cli_context.print_success(f"Good quality: {quality_score}%")
             return 0
         if quality_score >= medium_quality_threshold:
-            helper.print_warning(f"Medium quality: {quality_score}%")
+            cli_context.print_warning(f"Medium quality: {quality_score}%")
             return 1
-        helper.print_error(f"Poor quality: {quality_score}%")
+        cli_context.print_error(f"Poor quality: {quality_score}%")
         return 2
 
     except (RuntimeError, ValueError, TypeError) as e:
         logger.exception("Quality analysis failed")
-        helper.print_error(f"Analysis failed: {e}")
+        cli_context.print_error(f"Analysis failed: {e}")
         if args.verbose:
             logger.info("Verbose mode enabled - showing full traceback")
             traceback.print_exc()
@@ -171,11 +181,12 @@ def analyze_project(args: argparse.Namespace) -> int:
 def score_project(args: argparse.Namespace) -> int:
     """Get quick quality score for project using FlextCli APIs."""
     logger = FlextLogger(__name__)
-    helper = get_cli_helper(args.verbose)
+    cli_context = get_cli_context(verbose=getattr(args, "verbose", False))
+    cli_api = FlextCliApi()
 
     try:
         project_path = Path(args.path).resolve()
-        helper.print_info(f"Calculating quality score for: {project_path}")
+        cli_context.print_info(f"Calculating quality score for: {project_path}")
 
         # Quick analysis
         analyzer = CodeAnalyzer(project_path)
@@ -197,52 +208,52 @@ def score_project(args: argparse.Namespace) -> int:
         }
 
         # Format and display using FlextCli or fallback
-        if FLEXT_CLI_AVAILABLE and FlextCliApiFunctions:
-            table_result = FlextCliApiFunctions.table(score_data, "Quality Score")
+        if FLEXT_CLI_AVAILABLE:
+            table_result = cli_api.create_table(score_data, title="Quality Score")
             if table_result.is_success:
-                helper.console.print(table_result.value)
+                cli_context.print_info(str(table_result.value))
             else:
-                helper.print_error(f"Failed to display score: {table_result.error}")
+                cli_context.print_error(f"Failed to display score: {table_result.error}")
         else:
             # Fallback display
-            helper.print(f"Quality Score: {score_value}% (Grade: {grade})")
+            cli_context.print_info(f"Quality Score: {score_value}% (Grade: {grade})")
 
         # Exit based on score
         if score_value >= MIN_ACCEPTABLE_QUALITY_SCORE:
-            helper.print_success(f"Quality acceptable: {score_value}%")
+            cli_context.print_success(f"Quality acceptable: {score_value}%")
             return 0
-        helper.print_warning(f"Quality needs improvement: {score_value}%")
+        cli_context.print_warning(f"Quality needs improvement: {score_value}%")
         return 1
 
     except Exception as e:
         logger.exception("Quality score calculation failed")
-        helper.print_error(f"Score calculation failed: {e}")
+        cli_context.print_error(f"Score calculation failed: {e}")
         return 1
 
 
 def run_web_server(args: argparse.Namespace) -> int:
     """Run quality web interface server."""
     logger = FlextLogger(__name__)
-    helper = get_cli_helper(args.verbose)
+    cli_context = get_cli_context(verbose=getattr(args, "verbose", False))
 
     try:
-        helper.print_info(f"Starting web server on {args.host}:{args.port}")
+        cli_context.print_info(f"Starting web server on {args.host}:{args.port}")
 
         interface = FlextQualityWebInterface()
         interface.run(host=args.host, port=args.port, debug=args.debug)
         return 0
     except KeyboardInterrupt:
-        helper.print_info("Web server stopped by user")
+        cli_context.print_info("Web server stopped by user")
         return 0
     except Exception as e:
         logger.exception("Web server failed")
-        helper.print_error(f"Web server failed: {e}")
+        cli_context.print_error(f"Web server failed: {e}")
         if args.verbose:
             traceback.print_exc()
         return 1
 
 
-def main() -> None:
+def main() -> int:
     """Main CLI entry point using argparse with FlextCli integration."""
     parser = argparse.ArgumentParser(
         description="FLEXT Quality - Enterprise Code Quality Analysis",
@@ -346,7 +357,7 @@ Examples:
 
     if not args.command:
         parser.print_help()
-        sys.exit(1)
+        return 1
 
     # Setup logging level
     if args.verbose:
@@ -354,14 +365,13 @@ Examples:
 
     # Route to appropriate handler
     if args.command == "analyze":
-        sys.exit(analyze_project(args))
-    elif args.command == "score":
-        sys.exit(score_project(args))
-    elif args.command == "web":
-        sys.exit(run_web_server(args))
-    else:
-        parser.print_help()
-        sys.exit(1)
+        return analyze_project(args)
+    if args.command == "score":
+        return score_project(args)
+    if args.command == "web":
+        return run_web_server(args)
+    parser.print_help()
+    return 1
 
 
 # Ultra-simple compatibility functions for test requirements

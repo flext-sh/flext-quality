@@ -102,9 +102,9 @@ class FlextQualityAPI:
             config_path=config_path,
             language=language,
             auto_analyze=auto_analyze,
-            min_coverage=min_coverage,
-            max_complexity=max_complexity,
-            max_duplication=max_duplication,
+            _min_coverage=min_coverage,
+            _max_complexity=max_complexity,
+            _max_duplication=max_duplication,
         )
 
     async def get_project(
@@ -142,7 +142,7 @@ class FlextQualityAPI:
         """Create a new quality analysis."""
         return await self.analysis_service.create_analysis(
             project_id=str(project_id),
-            config=analysis_config,
+            config=analysis_config if analysis_config is None else dict(analysis_config),
         )
 
     async def update_metrics(
@@ -322,8 +322,8 @@ class FlextQualityAPI:
         # Create analysis
         result = await self.create_analysis(
             project_id=project_id,
-            commit_hash=commit_hash,
-            branch=branch,
+            _commit_hash=commit_hash,
+            _branch=branch,
         )
 
         # Use is_failure for early return pattern (current flext-core API)
@@ -348,20 +348,20 @@ class FlextQualityAPI:
 
         # Update with real metrics from analysis
         await self.update_metrics(
-            analysis_id=UUID(str(analysis.id)),
-            total_files=analysis_results.overall_metrics.files_analyzed,
-            total_lines=analysis_results.overall_metrics.total_lines,
-            code_lines=analysis_results.overall_metrics.total_lines,  # CodeAnalyzer provides total lines
-            comment_lines=0,  # Would need detailed AST analysis
-            blank_lines=0,  # Would need detailed AST analysis
+            _analysis_id=UUID(str(analysis.id)),
+            _total_files=analysis_results.overall_metrics.files_analyzed,
+            _total_lines=analysis_results.overall_metrics.total_lines,
+            _code_lines=analysis_results.overall_metrics.total_lines,  # CodeAnalyzer provides total lines
+            _comment_lines=0,  # Would need detailed AST analysis
+            _blank_lines=0,  # Would need detailed AST analysis
         )
 
         # Update with real scores from analysis
         await self.update_scores(
-            analysis_id=UUID(str(analysis.id)),
-            coverage_score=analysis_results.overall_metrics.coverage_score,
+            _analysis_id=UUID(str(analysis.id)),
+            _coverage_score=analysis_results.overall_metrics.coverage_score,
             complexity_score=analysis_results.overall_metrics.complexity_score,
-            duplication_score=100.0
+            _duplication_score=100.0
             - len(analysis_results.duplication_issues),  # Convert issues to score
             security_score=analysis_results.overall_metrics.security_score,
             maintainability_score=analysis_results.overall_metrics.maintainability_score,
@@ -386,7 +386,7 @@ class FlextQualityAPI:
 
         # Update with real issue counts
         await self.update_issue_counts(
-            analysis_id=UUID(str(analysis.id)),
+            _analysis_id=UUID(str(analysis.id)),
             critical=critical_issues,
             high=high_issues,
             medium=medium_issues,

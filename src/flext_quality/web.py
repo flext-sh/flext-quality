@@ -21,15 +21,18 @@ from flext_quality.api import QualityAPI
 
 
 # Aliases simples para compatibilidade dos testes
-def create_service(config: dict | None = None) -> FlextWebServices | None:
+def create_service(config: dict[str, object] | None = None) -> object | None:
     """Alias simples para FlextWebServices.create_web_service."""
+    # Type cast for compatibility since we're providing a simple dict
     result = FlextWebServices.create_web_service(config)
     return result.value if result.is_success else None
 
 
-def get_web_settings() -> dict:
+def get_web_settings() -> dict[str, object]:
     """Alias simples para FlextWebConfigs.get_web_settings."""
-    return FlextWebConfigs.get_web_settings()
+    # Type conversion for compatibility
+    result = FlextWebConfigs.get_web_settings()
+    return dict(result) if hasattr(result, "__dict__") else {}
 
 
 ResponseType = FlaskResponse | WerkzeugResponse | tuple[FlaskResponse, int]
@@ -44,7 +47,13 @@ class FlextQualityWebInterface:
         """Initialize quality web interface."""
         # Create base web service from flext-web
         self.config = get_web_settings()
-        self.web_service = create_service(self.config)
+        web_service = create_service(self.config)
+
+        if web_service is None:
+            error_msg = "Failed to create web service"
+            raise RuntimeError(error_msg)
+
+        self.web_service = web_service
 
         # Initialize quality components
         self.quality_api = QualityAPI()
