@@ -120,11 +120,13 @@ class FlextQualityExternalBackend(BaseAnalyzer):
             # Use absolute path for security
             abs_file_path = file_path.resolve()
 
-            # Run ruff with JSON output format using absolute path for security
-            ruff_path = (
-                "/home/marlonsc/flext/.venv/bin/ruff"  # Use venv ruff for consistency
-            )
-            result = subprocess.run(  # nosec B603 - Using absolute path for security  # noqa: S603
+            # Run ruff with JSON output format using validated executable path
+            import shutil
+            ruff_path = shutil.which("ruff")
+            if not ruff_path:
+                return []  # Return empty list if ruff is not available
+
+            result = subprocess.run(
                 [ruff_path, "check", str(abs_file_path), "--output-format", "json"],
                 capture_output=True,
                 text=True,

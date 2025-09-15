@@ -219,7 +219,7 @@ class QualityMetrics(BaseModel):
         defaults.update(overrides)
 
         # Type ignore needed here because we're using dict unpacking with runtime validation
-        return cls(**defaults)  # type: ignore[arg-type]
+        return cls(**defaults)
 
     @classmethod
     def from_analysis_results(
