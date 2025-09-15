@@ -91,9 +91,7 @@ def analyze_project(args: argparse.Namespace) -> int:
                 if args.format == "json":
                     # Get dict from JSON report
                     report_dict = json.loads(report.to_json())
-                    export_result = cli_api.export_data(
-                        report_dict, str(output_path)
-                    )
+                    export_result = cli_api.export_data(report_dict, str(output_path))
                 elif args.format == "html":
                     # Write HTML directly since FlextCli doesn't handle HTML export
                     output_path.write_text(report.to_html(), encoding="utf-8")
@@ -102,12 +100,12 @@ def analyze_project(args: argparse.Namespace) -> int:
                 else:
                     # Table format - export as JSON
                     report_dict = json.loads(report.to_json())
-                    export_result = cli_api.export_data(
-                        report_dict, str(output_path)
-                    )
+                    export_result = cli_api.export_data(report_dict, str(output_path))
 
                 if export_result and export_result.is_failure:
-                    cli_context.print_error(f"Failed to save report: {export_result.error}")
+                    cli_context.print_error(
+                        f"Failed to save report: {export_result.error}"
+                    )
                     return 1
                 if export_result and export_result.is_success:
                     cli_context.print_success(export_result.value)
@@ -140,13 +138,13 @@ def analyze_project(args: argparse.Namespace) -> int:
         elif FLEXT_CLI_AVAILABLE:
             # Get dict from JSON report
             report_dict = json.loads(report.to_json())
-            table_result = cli_api.create_table(
-                report_dict, title="Quality Analysis"
-            )
+            table_result = cli_api.create_table(report_dict, title="Quality Analysis")
             if table_result.is_success:
                 cli_context.print_info(str(table_result.value))
             else:
-                cli_context.print_error(f"Failed to display table: {table_result.error}")
+                cli_context.print_error(
+                    f"Failed to display table: {table_result.error}"
+                )
                 return 1
         else:
             # Fallback table display
@@ -213,7 +211,9 @@ def score_project(args: argparse.Namespace) -> int:
             if table_result.is_success:
                 cli_context.print_info(str(table_result.value))
             else:
-                cli_context.print_error(f"Failed to display score: {table_result.error}")
+                cli_context.print_error(
+                    f"Failed to display score: {table_result.error}"
+                )
         else:
             # Fallback display
             cli_context.print_info(f"Quality Score: {score_value}% (Grade: {grade})")

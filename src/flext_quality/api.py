@@ -142,7 +142,9 @@ class FlextQualityAPI:
         """Create a new quality analysis."""
         return await self.analysis_service.create_analysis(
             project_id=str(project_id),
-            config=analysis_config if analysis_config is None else dict(analysis_config),
+            config=analysis_config
+            if analysis_config is None
+            else dict(analysis_config),
         )
 
     async def update_metrics(
