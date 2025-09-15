@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import json
+import shutil
 import subprocess
 import tempfile
 import warnings
@@ -121,12 +122,11 @@ class FlextQualityExternalBackend(BaseAnalyzer):
             abs_file_path = file_path.resolve()
 
             # Run ruff with JSON output format using validated executable path
-            import shutil
             ruff_path = shutil.which("ruff")
             if not ruff_path:
                 return []  # Return empty list if ruff is not available
 
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603
                 [ruff_path, "check", str(abs_file_path), "--output-format", "json"],
                 capture_output=True,
                 text=True,
