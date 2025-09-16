@@ -64,7 +64,9 @@ def _display_project_overview(analyzed_files: FlextTypes.Core.StringList) -> Non
             pass
 
 
-def _display_quality_metrics(analyzer: CodeAnalyzer, results: dict[str, object]) -> None:
+def _display_quality_metrics(
+    analyzer: CodeAnalyzer, results: dict[str, object]
+) -> None:
     """Display quality metrics and scores."""
     print_section("🎯 Quality Assessment")
 
@@ -115,15 +117,12 @@ def _generate_reports(_results: dict[str, object], project_path: str) -> None:
 
     try:
         # Create QualityReport instance with proper parameters
-        _report = QualityReport(
-            analysis_id="example-analysis-001",
-            report_type="json"
-        )
+        _report = QualityReport(analysis_id="example-analysis-001", report_type="json")
 
         # Generate simple JSON report from results
         json_data = {
             "project_path": str(project_path),
-            "analysis_results": "Analysis completed successfully"
+            "analysis_results": "Analysis completed successfully",
         }
         json_report = json.dumps(json_data, indent=2)
         json_path = Path(project_path) / "quality_report.json"

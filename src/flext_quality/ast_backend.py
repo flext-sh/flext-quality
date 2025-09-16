@@ -7,11 +7,10 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import ast
-import warnings
 from pathlib import Path
 from typing import override
 
-from flext_core import FlextTypes
+from flext_core import FlextContainer, FlextLogger, FlextTypes
 
 from flext_quality.ast_class_info import ClassInfo
 from flext_quality.ast_function_info import FunctionInfo
@@ -19,231 +18,260 @@ from flext_quality.backend_type import BackendType
 from flext_quality.base import BaseAnalyzer
 
 
-class ASTVisitor(ast.NodeVisitor):
-    """AST visitor to extract detailed code structure information."""
-
-    def __init__(self, file_path: Path, package_name: str) -> None:
-        """Initialize AST visitor with file path and package name."""
-        self.file_path = file_path
-        self.package_name = package_name
-        self.current_class: ClassInfo | None = None
-        self.current_function: FunctionInfo | None = None
-        self.scope_stack: FlextTypes.Core.StringList = []
-
-        # Results - using strongly typed models
-        self.classes: list[ClassInfo] = []
-        self.functions: list[FunctionInfo] = []
-        self.variables: list[
-            FlextTypes.Core.Dict
-        ] = []  # Keeping as generic dict with object values
-        self.imports: list[
-            FlextTypes.Core.Dict
-        ] = []  # Keeping as generic dict with object values
-        self.constants: list[
-            FlextTypes.Core.Dict
-        ] = []  # Keeping as generic dict with object values
-
-        # Context tracking
-        self.class_stack: list[ClassInfo] = []
-        self.function_stack: list[FunctionInfo] = []
-
-    @override
-    def visit_ClassDef(self, node: ast.ClassDef) -> None:
-        """Visit a class definition."""
-        # Extract class analysis into smaller helper methods
-        full_name = self._calculate_class_full_name(node)
-        base_classes = self._extract_base_classes(node)
-        decorators, is_dataclass, is_abstract = self._analyze_class_decorators(node)
-        method_counts = self._count_class_methods(node)
-
-        class_info = ClassInfo(
-            name=node.name,
-            full_name=full_name,
-            file_path=str(self.file_path),
-            package_name=self.package_name,
-            line_number=node.lineno,
-            end_line_number=getattr(node, "end_lineno", node.lineno),
-            base_classes=base_classes,
-            decorators=decorators,
-            is_dataclass=is_dataclass,
-            is_abstract=is_abstract,
-            has_docstring=ast.get_docstring(node) is not None,
-            **method_counts,
-        )
-
-        self.classes.append(class_info)
-        self.class_stack.append(class_info)
-        self.current_class = class_info
-
-        # Visit child nodes
-        self.generic_visit(node)
-
-        # Pop class from stack
-        self.class_stack.pop()
-        self.current_class = self.class_stack[-1] if self.class_stack else None
-
-    @override
-    def visit_FunctionDef(
-        self,
-        node: ast.FunctionDef | ast.AsyncFunctionDef,
-    ) -> None:
-        """Visit a function or method definition."""
-        function_info = FunctionInfo(
-            name=node.name,
-            full_name=self._calculate_function_full_name(node),
-            file_path=str(self.file_path),
-            package_name=self.package_name,
-            line_number=node.lineno,
-            end_line_number=getattr(node, "end_lineno", node.lineno),
-            decorators=[self._get_name_from_node(dec) for dec in node.decorator_list],
-            is_async=isinstance(node, ast.AsyncFunctionDef),
-            is_generator=self._check_is_generator(node),
-            is_method=self.current_class is not None,
-            is_property=self._check_is_property(node),
-            is_class_method=self._check_is_classmethod(node),
-            is_static_method=self._check_is_staticmethod(node),
-            parameter_count=len(node.args.args),
-            returns_annotation=self._get_return_annotation(node),
-            complexity=self._calculate_complexity(node),
-            docstring=ast.get_docstring(node),
-        )
-
-        self.functions.append(function_info)
-        self.function_stack.append(function_info)
-        self.current_function = function_info
-
-        # Visit child nodes
-        self.generic_visit(node)
-
-        # Pop function from stack
-        self.function_stack.pop()
-        self.current_function = self.function_stack[-1] if self.function_stack else None
-
-    @override
-    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
-        """Visit an async function definition."""
-        self.visit_FunctionDef(node)
-
-    def _calculate_class_full_name(self, node: ast.ClassDef) -> str:
-        """Calculate the full name of a class."""
-        if self.current_class:
-            return f"{self.current_class.full_name}.{node.name}"
-        return f"{self.package_name}.{node.name}" if self.package_name else node.name
-
-    def _extract_base_classes(self, node: ast.ClassDef) -> FlextTypes.Core.StringList:
-        """Extract base class names."""
-        return [self._get_name_from_node(base) for base in node.bases]
-
-    def _analyze_class_decorators(
-        self,
-        node: ast.ClassDef,
-    ) -> tuple[FlextTypes.Core.StringList, bool, bool]:
-        """Analyze class decorators."""
-        decorators = [self._get_name_from_node(dec) for dec in node.decorator_list]
-        is_dataclass = any("dataclass" in dec for dec in decorators)
-        is_abstract = any("abstractmethod" in dec for dec in decorators)
-        return decorators, is_dataclass, is_abstract
-
-    def _count_class_methods(self, node: ast.ClassDef) -> dict[str, int]:
-        """Count different types of methods in a class."""
-        methods = [
-            n
-            for n in node.body
-            if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
-        ]
-        return {
-            "method_count": len(methods),
-            "public_methods": len([m for m in methods if not m.name.startswith("_")]),
-            "private_methods": len([m for m in methods if m.name.startswith("__")]),
-            "protected_methods": len(
-                [
-                    m
-                    for m in methods
-                    if m.name.startswith("_") and not m.name.startswith("__")
-                ],
-            ),
-        }
-
-    def _calculate_function_full_name(
-        self,
-        node: ast.FunctionDef | ast.AsyncFunctionDef,
-    ) -> str:
-        """Calculate the full name of a function."""
-        if self.current_class:
-            return f"{self.current_class.full_name}.{node.name}"
-        return f"{self.package_name}.{node.name}" if self.package_name else node.name
-
-    def _check_type_hints(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
-        """Check if function has type hints."""
-        return node.returns is not None or any(arg.annotation for arg in node.args.args)
-
-    def _calculate_complexity(
-        self,
-        node: ast.FunctionDef | ast.AsyncFunctionDef,
-    ) -> int:
-        """Calculate cyclomatic complexity of a function."""
-        complexity = 1  # Base complexity
-        for child in ast.walk(node):
-            if isinstance(
-                child,
-                (ast.If, ast.While, ast.For, ast.AsyncFor, ast.ExceptHandler),
-            ):
-                complexity += 1
-            elif isinstance(child, ast.BoolOp):
-                complexity += len(child.values) - 1
-        return complexity
-
-    def _get_name_from_node(self, node: ast.AST) -> str:
-        """Get name from an AST node."""
-        if isinstance(node, ast.Name):
-            return node.id
-        if isinstance(node, ast.Attribute):
-            return f"{self._get_name_from_node(node.value)}.{node.attr}"
-        return str(node)
-
-    def _check_is_generator(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
-        """Check if function is a generator (contains yield)."""
-        for child in ast.walk(node):
-            if isinstance(child, (ast.Yield, ast.YieldFrom)):
-                return True
-        return False
-
-    def _check_is_property(self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> bool:
-        """Check if function is a property."""
-        return any(
-            self._get_name_from_node(dec).endswith("property")
-            for dec in node.decorator_list
-        )
-
-    def _check_is_classmethod(
-        self, node: ast.FunctionDef | ast.AsyncFunctionDef
-    ) -> bool:
-        """Check if function is a classmethod."""
-        return any(
-            self._get_name_from_node(dec) == "classmethod"
-            for dec in node.decorator_list
-        )
-
-    def _check_is_staticmethod(
-        self, node: ast.FunctionDef | ast.AsyncFunctionDef
-    ) -> bool:
-        """Check if function is a staticmethod."""
-        return any(
-            self._get_name_from_node(dec) == "staticmethod"
-            for dec in node.decorator_list
-        )
-
-    def _get_return_annotation(
-        self, node: ast.FunctionDef | ast.AsyncFunctionDef
-    ) -> str | None:
-        """Get return type annotation as string."""
-        if node.returns:
-            return ast.unparse(node.returns)
-        return None
-
-
 class FlextQualityASTBackend(BaseAnalyzer):
-    """AST-based analysis backend."""
+    """Unified AST backend class following FLEXT architecture patterns.
+
+    Single responsibility: AST-based code analysis
+    Contains all AST analysis functionality as nested classes with shared resources.
+    """
+
+    def __init__(self) -> None:
+        """Initialize AST backend with dependency injection."""
+        super().__init__()
+        self._container = FlextContainer.get_global()
+        self._logger = FlextLogger(__name__)
+
+    class _ASTVisitor(ast.NodeVisitor):
+        """Nested AST visitor to extract detailed code structure information."""
+
+        def __init__(self, file_path: Path, package_name: str) -> None:
+            """Initialize AST visitor with file path and package name."""
+            self.file_path = file_path
+            self.package_name = package_name
+            self.current_class: ClassInfo | None = None
+            self.current_function: FunctionInfo | None = None
+            self.scope_stack: FlextTypes.Core.StringList = []
+
+            # Results - using strongly typed models
+            self.classes: list[ClassInfo] = []
+            self.functions: list[FunctionInfo] = []
+            self.variables: list[
+                FlextTypes.Core.Dict
+            ] = []  # Keeping as generic dict with object values
+            self.imports: list[
+                FlextTypes.Core.Dict
+            ] = []  # Keeping as generic dict with object values
+            self.constants: list[
+                FlextTypes.Core.Dict
+            ] = []  # Keeping as generic dict with object values
+
+            # Context tracking
+            self.class_stack: list[ClassInfo] = []
+            self.function_stack: list[FunctionInfo] = []
+
+        @override
+        def visit_ClassDef(self, node: ast.ClassDef) -> None:
+            """Visit a class definition."""
+            # Extract class analysis into smaller helper methods
+            full_name = self._calculate_class_full_name(node)
+            base_classes = self._extract_base_classes(node)
+            decorators, is_dataclass, is_abstract = self._analyze_class_decorators(node)
+            method_counts = self._count_class_methods(node)
+
+            class_info = ClassInfo(
+                name=node.name,
+                full_name=full_name,
+                file_path=str(self.file_path),
+                package_name=self.package_name,
+                line_number=node.lineno,
+                end_line_number=getattr(node, "end_lineno", node.lineno),
+                base_classes=base_classes,
+                decorators=decorators,
+                is_dataclass=is_dataclass,
+                is_abstract=is_abstract,
+                has_docstring=ast.get_docstring(node) is not None,
+                **method_counts,
+            )
+
+            self.classes.append(class_info)
+            self.class_stack.append(class_info)
+            self.current_class = class_info
+
+            # Visit child nodes
+            self.generic_visit(node)
+
+            # Pop class from stack
+            self.class_stack.pop()
+            self.current_class = self.class_stack[-1] if self.class_stack else None
+
+        @override
+        def visit_FunctionDef(
+            self,
+            node: ast.FunctionDef | ast.AsyncFunctionDef,
+        ) -> None:
+            """Visit a function or method definition."""
+            function_info = FunctionInfo(
+                name=node.name,
+                full_name=self._calculate_function_full_name(node),
+                file_path=str(self.file_path),
+                package_name=self.package_name,
+                line_number=node.lineno,
+                end_line_number=getattr(node, "end_lineno", node.lineno),
+                decorators=[
+                    self._get_name_from_node(dec) for dec in node.decorator_list
+                ],
+                is_async=isinstance(node, ast.AsyncFunctionDef),
+                is_generator=self._check_is_generator(node),
+                is_method=self.current_class is not None,
+                is_property=self._check_is_property(node),
+                is_class_method=self._check_is_classmethod(node),
+                is_static_method=self._check_is_staticmethod(node),
+                parameter_count=len(node.args.args),
+                returns_annotation=self._get_return_annotation(node),
+                complexity=self._calculate_complexity(node),
+                docstring=ast.get_docstring(node),
+            )
+
+            self.functions.append(function_info)
+            self.function_stack.append(function_info)
+            self.current_function = function_info
+
+            # Visit child nodes
+            self.generic_visit(node)
+
+            # Pop function from stack
+            self.function_stack.pop()
+            self.current_function = (
+                self.function_stack[-1] if self.function_stack else None
+            )
+
+        @override
+        def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+            """Visit an async function definition."""
+            self.visit_FunctionDef(node)
+
+        def _calculate_class_full_name(self, node: ast.ClassDef) -> str:
+            """Calculate the full name of a class."""
+            if self.current_class:
+                return f"{self.current_class.full_name}.{node.name}"
+            return (
+                f"{self.package_name}.{node.name}" if self.package_name else node.name
+            )
+
+        def _extract_base_classes(
+            self, node: ast.ClassDef
+        ) -> FlextTypes.Core.StringList:
+            """Extract base class names."""
+            return [self._get_name_from_node(base) for base in node.bases]
+
+        def _analyze_class_decorators(
+            self,
+            node: ast.ClassDef,
+        ) -> tuple[FlextTypes.Core.StringList, bool, bool]:
+            """Analyze class decorators."""
+            decorators = [self._get_name_from_node(dec) for dec in node.decorator_list]
+            is_dataclass = any("dataclass" in dec for dec in decorators)
+            is_abstract = any("abstractmethod" in dec for dec in decorators)
+            return decorators, is_dataclass, is_abstract
+
+        def _count_class_methods(self, node: ast.ClassDef) -> dict[str, int]:
+            """Count different types of methods in a class."""
+            methods = [
+                n
+                for n in node.body
+                if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+            ]
+            return {
+                "method_count": len(methods),
+                "public_methods": len(
+                    [m for m in methods if not m.name.startswith("_")]
+                ),
+                "private_methods": len([m for m in methods if m.name.startswith("__")]),
+                "protected_methods": len(
+                    [
+                        m
+                        for m in methods
+                        if m.name.startswith("_") and not m.name.startswith("__")
+                    ],
+                ),
+            }
+
+        def _calculate_function_full_name(
+            self,
+            node: ast.FunctionDef | ast.AsyncFunctionDef,
+        ) -> str:
+            """Calculate the full name of a function."""
+            if self.current_class:
+                return f"{self.current_class.full_name}.{node.name}"
+            return (
+                f"{self.package_name}.{node.name}" if self.package_name else node.name
+            )
+
+        def _check_type_hints(
+            self, node: ast.FunctionDef | ast.AsyncFunctionDef
+        ) -> bool:
+            """Check if function has type hints."""
+            return node.returns is not None or any(
+                arg.annotation for arg in node.args.args
+            )
+
+        def _calculate_complexity(
+            self,
+            node: ast.FunctionDef | ast.AsyncFunctionDef,
+        ) -> int:
+            """Calculate cyclomatic complexity of a function."""
+            complexity = 1  # Base complexity
+            for child in ast.walk(node):
+                if isinstance(
+                    child,
+                    (ast.If, ast.While, ast.For, ast.AsyncFor, ast.ExceptHandler),
+                ):
+                    complexity += 1
+                elif isinstance(child, ast.BoolOp):
+                    complexity += len(child.values) - 1
+            return complexity
+
+        def _get_name_from_node(self, node: ast.AST) -> str:
+            """Get name from an AST node."""
+            if isinstance(node, ast.Name):
+                return node.id
+            if isinstance(node, ast.Attribute):
+                return f"{self._get_name_from_node(node.value)}.{node.attr}"
+            return str(node)
+
+        def _check_is_generator(
+            self, node: ast.FunctionDef | ast.AsyncFunctionDef
+        ) -> bool:
+            """Check if function is a generator (contains yield)."""
+            for child in ast.walk(node):
+                if isinstance(child, (ast.Yield, ast.YieldFrom)):
+                    return True
+            return False
+
+        def _check_is_property(
+            self, node: ast.FunctionDef | ast.AsyncFunctionDef
+        ) -> bool:
+            """Check if function is a property."""
+            return any(
+                self._get_name_from_node(dec).endswith("property")
+                for dec in node.decorator_list
+            )
+
+        def _check_is_classmethod(
+            self, node: ast.FunctionDef | ast.AsyncFunctionDef
+        ) -> bool:
+            """Check if function is a classmethod."""
+            return any(
+                self._get_name_from_node(dec) == "classmethod"
+                for dec in node.decorator_list
+            )
+
+        def _check_is_staticmethod(
+            self, node: ast.FunctionDef | ast.AsyncFunctionDef
+        ) -> bool:
+            """Check if function is a staticmethod."""
+            return any(
+                self._get_name_from_node(dec) == "staticmethod"
+                for dec in node.decorator_list
+            )
+
+        def _get_return_annotation(
+            self, node: ast.FunctionDef | ast.AsyncFunctionDef
+        ) -> str | None:
+            """Get return type annotation as string."""
+            if node.returns:
+                return ast.unparse(node.returns)
+            return None
 
     @override
     def get_backend_type(self) -> BackendType:
@@ -367,19 +395,6 @@ class FlextQualityASTBackend(BaseAnalyzer):
         ]
 
 
-# Legacy compatibility facade (TEMPORARY)
-class ASTBackend(FlextQualityASTBackend):
-    """Legacy AST backend class - replaced by FlextQualityASTBackend.
-
-    DEPRECATED: Use FlextQualityASTBackend directly.
-    This facade provides compatibility during migration.
-    """
-
-    def __init__(self) -> None:
-        """Initialize the instance."""
-        warnings.warn(
-            "ASTBackend is deprecated; use FlextQualityASTBackend",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        super().__init__()
+# Backward compatibility aliases for existing code
+ASTVisitor = FlextQualityASTBackend._ASTVisitor
+ASTBackend = FlextQualityASTBackend

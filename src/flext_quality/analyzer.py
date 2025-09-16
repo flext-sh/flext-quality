@@ -10,7 +10,7 @@ import ast
 import warnings
 from pathlib import Path
 
-from flext_core import FlextLogger, FlextTypes
+from flext_core import FlextLogger, FlextResult, FlextTypes
 
 from flext_quality.analysis_types import (
     AnalysisResults,
@@ -60,28 +60,40 @@ class FlextQualityCodeAnalyzer:
 
         """
         # Create trace for the entire analysis
-        # Emit trace via observability integration
         logger.info("Starting code analysis trace for project: %s", self.project_path)
-
         logger.info("Starting project analysis: %s", self.project_path)
         logger.info("Starting comprehensive code analysis for %s", self.project_path)
 
         # Find Python files
         python_files = self._find_python_files()
-        files_analyzed = len(python_files)
 
-        # Analyze each file
+        # Analyze each file using FlextResult pattern
         file_metrics: list[FileAnalysisResult] = []
         total_lines = 0
+        analysis_errors = 0
+
         for file_path in python_files:
-            metrics = self._analyze_file(file_path)
-            if metrics:
+            metrics_result = self._analyze_file(file_path)
+            if metrics_result.is_success:
+                metrics = metrics_result.value
                 file_metrics.append(metrics)
                 total_lines += metrics.lines_of_code
+            else:
+                analysis_errors += 1
+                logger.warning(
+                    "Failed to analyze file %s: %s", file_path, metrics_result.error
+                )
+
+        # Log analysis summary
+        logger.info(
+            "File analysis complete: %d succeeded, %d failed",
+            len(file_metrics),
+            analysis_errors,
+        )
 
         # Calculate overall metrics
         overall_metrics = OverallMetrics(
-            files_analyzed=files_analyzed,
+            files_analyzed=len(file_metrics),  # Only count successfully analyzed files
             total_lines=total_lines,
             quality_score=self._calculate_quality_score(file_metrics),
             coverage_score=85.0,  # Placeholder - would need real coverage integration
@@ -112,12 +124,13 @@ class FlextQualityCodeAnalyzer:
         self._current_results = results
 
         # Create metrics for observability using REAL flext-observability API with type safety
-        logger.info("Files analyzed: %d", files_analyzed)
+        logger.info("Files analyzed: %d", len(file_metrics))
         logger.info("Total issues found: %d", results.total_issues)
+        logger.info("Analysis errors: %d", analysis_errors)
 
         logger.info(
             "Analysis completed. Files: %d, Lines: %d",
-            files_analyzed,
+            len(file_metrics),
             total_lines,
         )
 
@@ -189,65 +202,127 @@ class FlextQualityCodeAnalyzer:
 
         return python_files
 
-    def _analyze_file(self, file_path: Path) -> FileAnalysisResult | None:
+    def _analyze_file(self, file_path: Path) -> FlextResult[FileAnalysisResult]:
         """Analyze a single Python file.
 
         Args:
             file_path: Path to the Python file.
 
         Returns:
-            FileAnalysisResult with file metrics or None if analysis fails.
+            FlextResult containing FileAnalysisResult with file metrics or error.
 
         """
-        try:
-            with Path(file_path).open(encoding="utf-8") as f:
-                content = f.read()
-
-            lines = content.splitlines()
-
-            # Basic metrics
-            lines_of_code = len(
-                [
-                    line
-                    for line in lines
-                    if line.strip() and not line.strip().startswith("#")
-                ],
+        if not Path(file_path).exists():
+            return FlextResult[FileAnalysisResult].fail(
+                f"File does not exist: {file_path}"
             )
 
-            try:
-                tree = ast.parse(content)
+        # Read file content with explicit error handling
+        content_result = self._read_file_content(file_path)
+        if content_result.is_failure:
+            return FlextResult[FileAnalysisResult].fail(content_result.error)
 
-                # Count functions and classes (including async functions) - for complexity calculation
+        content = content_result.value
+        lines = content.splitlines()
 
-                # Calculate cyclomatic complexity (simplified)
-                complexity = self._calculate_complexity(tree)
+        # Basic metrics
+        lines_of_code = len(
+            [
+                line
+                for line in lines
+                if line.strip() and not line.strip().startswith("#")
+            ]
+        )
 
-                return FileAnalysisResult(
-                    file_path=file_path,
-                    lines_of_code=lines_of_code,
-                    complexity_score=max(0.0, min(100.0, 100.0 - complexity * 2)),
-                    security_issues=0,  # Will be calculated later
-                    style_issues=0,  # Will be calculated later
-                    dead_code_lines=0,  # Will be calculated later
-                )
+        # Parse AST with explicit error handling
+        ast_result = self._parse_ast_content(content)
+        if ast_result.is_failure:
+            # Handle syntax errors explicitly - still return valid result with limited data
+            logger.warning("Syntax error in %s: %s", file_path, ast_result.error)
 
-            except SyntaxError as e:
-                # Reuse module-level logger
-                logger.warning("Syntax error in %s: %s", file_path, e)
+            analysis_result = FileAnalysisResult(
+                file_path=file_path,
+                lines_of_code=lines_of_code,
+                complexity_score=0.0,  # No complexity for files with syntax errors
+                security_issues=1,  # Syntax error is a security/quality issue
+                style_issues=0,
+                dead_code_lines=0,
+            )
+            return FlextResult[FileAnalysisResult].ok(analysis_result)
 
-                return FileAnalysisResult(
-                    file_path=file_path,
-                    lines_of_code=lines_of_code,
-                    complexity_score=0.0,  # No complexity for files with syntax errors
-                    security_issues=1,  # Syntax error is a security/quality issue
-                    style_issues=0,
-                    dead_code_lines=0,
-                )
-        except (RuntimeError, ValueError, TypeError, FileNotFoundError, OSError):
-            # Reuse module-level logger
-            logger.exception("File analysis failed for %s", file_path)
-            logger.exception("Error analyzing file %s", file_path)
-            return None
+        tree = ast_result.value
+
+        # Calculate cyclomatic complexity (simplified)
+        complexity = self._calculate_complexity(tree)
+
+        analysis_result = FileAnalysisResult(
+            file_path=file_path,
+            lines_of_code=lines_of_code,
+            complexity_score=max(0.0, min(100.0, 100.0 - complexity * 2)),
+            security_issues=0,  # Will be calculated later
+            style_issues=0,  # Will be calculated later
+            dead_code_lines=0,  # Will be calculated later
+        )
+
+        return FlextResult[FileAnalysisResult].ok(analysis_result)
+
+    def _read_file_content(self, file_path: Path) -> FlextResult[str]:
+        """Read file content with explicit error handling.
+
+        Args:
+            file_path: Path to the file to read.
+
+        Returns:
+            FlextResult containing file content or error message.
+
+        """
+        if not file_path.exists():
+            return FlextResult[str].fail(f"File does not exist: {file_path}")
+
+        if not file_path.is_file():
+            return FlextResult[str].fail(f"Path is not a file: {file_path}")
+
+        # Check file size before reading
+        if file_path.stat().st_size > 10 * 1024 * 1024:  # 10MB limit
+            return FlextResult[str].fail(f"File too large: {file_path}")
+
+        # Read with explicit encoding handling
+        try:
+            with file_path.open(encoding="utf-8", errors="strict") as f:
+                content = f.read()
+        except UnicodeDecodeError as e:
+            return FlextResult[str].fail(f"File encoding error: {e}")
+        except OSError as e:
+            return FlextResult[str].fail(f"OS error reading file: {e}")
+        except MemoryError:
+            return FlextResult[str].fail(
+                f"File too large to read into memory: {file_path}"
+            )
+
+        return FlextResult[str].ok(content)
+
+    def _parse_ast_content(self, content: str) -> FlextResult[ast.AST]:
+        """Parse content into AST with explicit error handling.
+
+        Args:
+            content: Python source code content.
+
+        Returns:
+            FlextResult containing AST tree or error message.
+
+        """
+        if not content.strip():
+            return FlextResult[ast.AST].fail("Empty content cannot be parsed")
+
+        try:
+            tree = ast.parse(content)
+            return FlextResult[ast.AST].ok(tree)
+        except SyntaxError as e:
+            return FlextResult[ast.AST].fail(f"Syntax error: {e}")
+        except ValueError as e:
+            return FlextResult[ast.AST].fail(f"Value error in parsing: {e}")
+        except RecursionError:
+            return FlextResult[ast.AST].fail("Code too deeply nested to parse")
 
     def _calculate_complexity(self, tree: ast.AST) -> int:
         complexity = 1  # Base complexity

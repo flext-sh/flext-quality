@@ -9,7 +9,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from flask import Response as FlaskResponse, jsonify, request
-from flext_core import FlextLogger, FlextTypes
+from flext_core import FlextContainer, FlextLogger, FlextTypes
 from flext_web import FlextWebServices
 from flext_web.config import FlextWebConfigs
 from werkzeug.wrappers import Response as WerkzeugResponse
@@ -17,48 +17,24 @@ from werkzeug.wrappers import Response as WerkzeugResponse
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.api import QualityAPI
 
-# Use aliases simples para funções existentes no flext-web
-
-
-# Aliases simples para compatibilidade dos testes
-def create_service(config: dict[str, object] | None = None) -> object | None:
-    """Alias simples para FlextWebServices.create_web_service."""
-    # Convert dict to proper WebConfig if provided
-    web_config = None
-    if config:
-        try:
-            web_config = FlextWebConfigs.WebConfig(**config)
-        except Exception:
-            # Log the exception but continue with None config
-            logger.warning(
-                "Failed to create WebConfig from provided dict, using default"
-            )
-            web_config = None
-
-    result = FlextWebServices.create_web_service(web_config)
-    return result.value if result.is_success else None
-
-
-def get_web_settings() -> dict[str, object]:
-    """Alias simples para FlextWebConfigs.get_web_settings."""
-    # Type conversion for compatibility
-    result = FlextWebConfigs.get_web_settings()
-    return dict(result) if hasattr(result, "__dict__") else {}
-
-
 ResponseType = FlaskResponse | WerkzeugResponse | tuple[FlaskResponse, int]
 
-logger = FlextLogger(__name__)
 
+class FlextQualityWeb:
+    """Unified quality web class following FLEXT architecture patterns.
 
-class FlextQualityWebInterface:
-    """Quality analysis web interface that extends flext-web."""
+    Single responsibility: Quality web interface and service management
+    Contains all web functionality as nested classes and methods.
+    """
 
     def __init__(self) -> None:
         """Initialize quality web interface."""
+        self._container = FlextContainer.get_global()
+        self._logger = FlextLogger(__name__)
+
         # Create base web service from flext-web
-        self.config = get_web_settings()
-        web_service = create_service(self.config)
+        self.config = self._get_web_settings()
+        web_service = self._create_service(self.config)
 
         if web_service is None:
             error_msg = "Failed to create web service"
@@ -71,6 +47,39 @@ class FlextQualityWebInterface:
 
         # Register quality-specific routes
         self._register_routes()
+
+    @staticmethod
+    def _create_service(config: dict[str, object] | None = None) -> object | None:
+        """Create web service using flext-web patterns."""
+        logger = FlextLogger(__name__)
+
+        # Convert dict to proper WebConfig if provided
+        web_config = None
+        if config:
+            try:
+                web_config = FlextWebConfigs.WebConfig(**config)
+            except Exception:
+                # Log the exception but continue with None config
+                logger.warning(
+                    "Failed to create WebConfig from provided dict, using default"
+                )
+                web_config = None
+
+        result = FlextWebServices.create_web_service(web_config)
+        return result.value if result.is_success else None
+
+    @staticmethod
+    def _get_web_settings() -> dict[str, object]:
+        """Get web settings using flext-web patterns."""
+        # Type conversion for compatibility
+        result = FlextWebConfigs.get_web_settings()
+        return dict(result) if hasattr(result, "__dict__") else {}
+
+    @staticmethod
+    def web_main() -> None:
+        """Main entry point for quality web interface."""
+        interface = FlextQualityWeb()
+        interface.run()
 
     def _register_routes(self) -> None:
         """Register quality analysis routes with Flask app."""
@@ -236,24 +245,25 @@ class FlextQualityWebInterface:
         debug: bool = True,
     ) -> None:
         """Run the quality web server."""
-        logger.info("Starting FLEXT Quality Web Interface on %s:%s", host, port)
+        self._logger.info("Starting FLEXT Quality Web Interface on %s:%s", host, port)
         if not hasattr(self.web_service, "run"):
             msg = "Web service does not have a 'run' method"
             raise AttributeError(msg)
         self.web_service.run(host=host, port=port, debug=debug)
 
 
-def web_main() -> None:
-    """Provide entry point for quality web interface."""
-    interface = FlextQualityWebInterface()
-    interface.run()
-
-
-# Legacy compatibility alias
+# Backward compatibility aliases for existing code
+create_service = FlextQualityWeb._create_service
+get_web_settings = FlextQualityWeb._get_web_settings
+web_main = FlextQualityWeb.web_main
+FlextQualityWebInterface = FlextQualityWeb
 main = web_main
 
 __all__ = [
+    "FlextQualityWeb",
     "FlextQualityWebInterface",
+    "create_service",
+    "get_web_settings",
     "main",  # Legacy compatibility
     "web_main",
 ]

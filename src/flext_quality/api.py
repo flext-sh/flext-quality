@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import warnings
 from pathlib import Path
 from uuid import UUID
 
@@ -399,15 +398,5 @@ class FlextQualityAPI:
         return await self.complete_analysis(UUID(str(analysis.id)))
 
 
-# Legacy compatibility facade (TEMPORARY)
-class QualityAPI(FlextQualityAPI):
-    """Legacy API class - replaced by FlextQualityAPI."""
-
-    def __init__(self) -> None:
-        """Initialize the instance."""
-        warnings.warn(
-            "QualityAPI is deprecated; use FlextQualityAPI",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        super().__init__()
+# Backward compatibility alias for existing code
+QualityAPI = FlextQualityAPI

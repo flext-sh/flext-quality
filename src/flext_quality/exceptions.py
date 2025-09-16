@@ -7,35 +7,38 @@ SPDX-License-Identifier: MIT
 from enum import Enum
 from typing import override
 
-from flext_core import FlextExceptions, FlextTypes
+from flext_core import FlextContainer, FlextExceptions, FlextLogger, FlextTypes
 
 
-class FlextQualityErrorCodes(Enum):
-    """Error codes for quality domain operations."""
+class FlextQualityExceptions:
+    """Unified quality exceptions class following FLEXT architecture patterns.
 
-    QUALITY_ERROR = "QUALITY_ERROR"
-    QUALITY_VALIDATION_ERROR = "QUALITY_VALIDATION_ERROR"
-    QUALITY_CONFIGURATION_ERROR = "QUALITY_CONFIGURATION_ERROR"
-    QUALITY_CONNECTION_ERROR = "QUALITY_CONNECTION_ERROR"
-    QUALITY_PROCESSING_ERROR = "QUALITY_PROCESSING_ERROR"
-    QUALITY_AUTHENTICATION_ERROR = "QUALITY_AUTHENTICATION_ERROR"
-    QUALITY_TIMEOUT_ERROR = "QUALITY_TIMEOUT_ERROR"
-    QUALITY_ANALYSIS_ERROR = "QUALITY_ANALYSIS_ERROR"
-    QUALITY_REPORT_ERROR = "QUALITY_REPORT_ERROR"
-    QUALITY_METRICS_ERROR = "QUALITY_METRICS_ERROR"
-    QUALITY_GRADE_ERROR = "QUALITY_GRADE_ERROR"
-    QUALITY_RULE_ERROR = "QUALITY_RULE_ERROR"
-    QUALITY_ISSUE_ERROR = "QUALITY_ISSUE_ERROR"
-    QUALITY_THRESHOLD_ERROR = "QUALITY_THRESHOLD_ERROR"
-
-
-# CONSOLIDATED Exception Class following FLEXT_REFACTORING_PROMPT.md pattern
-class FlextQualityExceptionsError(FlextExceptions):
-    """Single consolidated class containing ALL quality exceptions.
-
-    Consolidates ALL exception definitions into one class following FLEXT patterns.
-    Individual exceptions available as nested classes for organization.
+    Single responsibility: Quality error handling and exception management
+    Contains all error codes and exceptions as nested classes with shared functionality.
     """
+
+    def __init__(self) -> None:
+        """Initialize exceptions with dependency injection."""
+        self._container = FlextContainer.get_global()
+        self._logger = FlextLogger(__name__)
+
+    class ErrorCodes(Enum):
+        """Error codes for quality domain operations."""
+
+        QUALITY_ERROR = "QUALITY_ERROR"
+        QUALITY_VALIDATION_ERROR = "QUALITY_VALIDATION_ERROR"
+        QUALITY_CONFIGURATION_ERROR = "QUALITY_CONFIGURATION_ERROR"
+        QUALITY_CONNECTION_ERROR = "QUALITY_CONNECTION_ERROR"
+        QUALITY_PROCESSING_ERROR = "QUALITY_PROCESSING_ERROR"
+        QUALITY_AUTHENTICATION_ERROR = "QUALITY_AUTHENTICATION_ERROR"
+        QUALITY_TIMEOUT_ERROR = "QUALITY_TIMEOUT_ERROR"
+        QUALITY_ANALYSIS_ERROR = "QUALITY_ANALYSIS_ERROR"
+        QUALITY_REPORT_ERROR = "QUALITY_REPORT_ERROR"
+        QUALITY_METRICS_ERROR = "QUALITY_METRICS_ERROR"
+        QUALITY_GRADE_ERROR = "QUALITY_GRADE_ERROR"
+        QUALITY_RULE_ERROR = "QUALITY_RULE_ERROR"
+        QUALITY_ISSUE_ERROR = "QUALITY_ISSUE_ERROR"
+        QUALITY_THRESHOLD_ERROR = "QUALITY_THRESHOLD_ERROR"
 
     class QualityError(FlextExceptions.BaseError):
         """Base exception for all quality domain errors."""
@@ -150,21 +153,25 @@ class FlextQualityExceptionsError(FlextExceptions):
         """Quality threshold errors."""
 
 
-# Legacy compatibility aliases - following flext-cli pattern
-FlextQualityError = FlextQualityExceptionsError.QualityError
-FlextQualityValidationError = FlextQualityExceptionsError.ValidationError
-FlextQualityConfigurationError = FlextQualityExceptionsError.ConfigurationError
-FlextQualityConnectionError = FlextQualityExceptionsError.QualityConnectionError
-FlextQualityProcessingError = FlextQualityExceptionsError.ProcessingError
-FlextQualityAuthenticationError = FlextQualityExceptionsError.AuthenticationError
-FlextQualityTimeoutError = FlextQualityExceptionsError.QualityTimeoutError
-FlextQualityAnalysisError = FlextQualityExceptionsError.AnalysisError
-FlextQualityReportError = FlextQualityExceptionsError.ReportError
-FlextQualityMetricsError = FlextQualityExceptionsError.MetricsError
-FlextQualityGradeError = FlextQualityExceptionsError.GradeError
-FlextQualityRuleError = FlextQualityExceptionsError.RuleError
-FlextQualityIssueError = FlextQualityExceptionsError.IssueError
-FlextQualityThresholdError = FlextQualityExceptionsError.ThresholdError
+# Backward compatibility aliases for existing code
+FlextQualityErrorCodes = FlextQualityExceptions.ErrorCodes
+FlextQualityError = FlextQualityExceptions.QualityError
+FlextQualityValidationError = FlextQualityExceptions.ValidationError
+FlextQualityConfigurationError = FlextQualityExceptions.ConfigurationError
+FlextQualityConnectionError = FlextQualityExceptions.QualityConnectionError
+FlextQualityProcessingError = FlextQualityExceptions.ProcessingError
+FlextQualityAuthenticationError = FlextQualityExceptions.AuthenticationError
+FlextQualityTimeoutError = FlextQualityExceptions.QualityTimeoutError
+FlextQualityAnalysisError = FlextQualityExceptions.AnalysisError
+FlextQualityReportError = FlextQualityExceptions.ReportError
+FlextQualityMetricsError = FlextQualityExceptions.MetricsError
+FlextQualityGradeError = FlextQualityExceptions.GradeError
+FlextQualityRuleError = FlextQualityExceptions.RuleError
+FlextQualityIssueError = FlextQualityExceptions.IssueError
+FlextQualityThresholdError = FlextQualityExceptions.ThresholdError
+
+# Legacy compatibility facade
+FlextQualityExceptionsError = FlextQualityExceptions
 
 
 # Export consolidated class and legacy aliases
@@ -176,6 +183,7 @@ __all__ = [
     # Legacy compatibility aliases
     "FlextQualityError",
     "FlextQualityErrorCodes",
+    "FlextQualityExceptions",
     "FlextQualityExceptionsError",
     "FlextQualityGradeError",
     "FlextQualityIssueError",

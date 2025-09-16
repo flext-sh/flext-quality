@@ -19,12 +19,6 @@ from flext_quality.services import (
     FlextQualityReportService,
 )
 
-# Use flext-observability directly - no fallbacks
-flext_create_log_entry = _flext_create_log_entry
-flext_create_trace = _flext_create_trace
-
-logger = FlextLogger(__name__)
-
 
 class FlextQualityHandlers:
     """CONSOLIDATED handlers class following FLEXT_REFACTORING_PROMPT.md pattern.
@@ -33,6 +27,23 @@ class FlextQualityHandlers:
     and follow FLEXT ecosystem standards.
     """
 
+    class _ObservabilityHelper:
+        """Nested helper class for observability operations."""
+
+        @staticmethod
+        def create_log_entry(message: str, service: str, level: str) -> None:
+            """Create log entry using flext-observability."""
+            _flext_create_log_entry(message=message, service=service, level=level)
+
+        @staticmethod
+        def create_trace(
+            operation_name: str, service_name: str, config: dict[str, str]
+        ) -> None:
+            """Create trace using flext-observability."""
+            _flext_create_trace(
+                operation_name=operation_name, service_name=service_name, config=config
+            )
+
     def __init__(self) -> None:
         """Initialize all services for handler operations."""
         self._analysis_service = FlextQualityAnalysisService()
@@ -40,18 +51,20 @@ class FlextQualityHandlers:
         # Use placeholder services for now - these would be injected
         self._linting_service = None
         self._security_service = None
+        self._logger = FlextLogger(__name__)
+        self._observability = self._ObservabilityHelper()
 
     async def analyze_project(self, project_id: UUID) -> FlextResult[QualityAnalysis]:
         """Handle project analysis command."""
         # Create trace for observability (optional dependency)
-        flext_create_trace(
+        self._observability.create_trace(
             operation_name="FlextQualityHandlers.analyze_project",
             service_name="flext-quality",
             config={"project_id": str(project_id)},
         )
 
         # Log operation start
-        flext_create_log_entry(
+        self._observability.create_log_entry(
             message=f"Starting project analysis for {project_id}",
             service="flext-quality",
             level="info",
@@ -68,7 +81,7 @@ class FlextQualityHandlers:
 
             # Use is_failure for early return pattern (current flext-core API)
             if analysis_result.is_failure:
-                flext_create_log_entry(
+                self._observability.create_log_entry(
                     message=f"Failed to create analysis: {analysis_result.error}",
                     service="flext-quality",
                     level="error",
@@ -78,7 +91,7 @@ class FlextQualityHandlers:
             # Safe value extraction using current API
             analysis = analysis_result.value
 
-            flext_create_log_entry(
+            self._observability.create_log_entry(
                 message=f"Successfully created analysis for project {project_id}",
                 service="flext-quality",
                 level="info",
@@ -88,12 +101,12 @@ class FlextQualityHandlers:
             return FlextResult[QualityAnalysis].ok(analysis)
 
         except Exception as e:
-            flext_create_log_entry(
+            self._observability.create_log_entry(
                 message=f"Unexpected error in analyze_project: {e!s}",
                 service="flext-quality",
                 level="error",
             )
-            logger.exception("Unexpected error in analyze_project")
+            self._logger.exception("Unexpected error in analyze_project")
             return FlextResult[QualityAnalysis].fail(f"Unexpected error: {e!s}")
 
     async def generate_report(self, analysis_id: UUID) -> FlextResult[QualityReport]:
