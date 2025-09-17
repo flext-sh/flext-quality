@@ -13,8 +13,8 @@ from typing import override
 from unittest.mock import patch
 
 import pytest
-from flext_core import FlextTypes
 
+from flext_core import FlextTypes
 from flext_quality import ASTBackend, BackendType, BaseAnalyzer, ExternalBackend
 
 

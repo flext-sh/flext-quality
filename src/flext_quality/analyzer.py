@@ -11,7 +11,6 @@ import warnings
 from pathlib import Path
 
 from flext_core import FlextLogger, FlextResult, FlextTypes
-
 from flext_quality.analysis_types import (
     AnalysisResults,
     ComplexityIssue,

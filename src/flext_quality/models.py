@@ -13,9 +13,9 @@ from __future__ import annotations
 from datetime import datetime
 from uuid import UUID
 
-from flext_core import FlextContainer, FlextLogger, FlextModels, FlextTypes
 from pydantic import Field, field_validator
 
+from flext_core import FlextContainer, FlextLogger, FlextModels, FlextTypes
 from flext_quality.constants import FlextQualityConstants
 
 

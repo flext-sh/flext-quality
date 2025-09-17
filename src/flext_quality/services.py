@@ -16,7 +16,6 @@ from flext_core import (
     FlextResult,
     FlextTypes,
 )
-
 from flext_quality.entities import (
     FlextQualityAnalysis,
     FlextQualityIssue,

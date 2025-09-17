@@ -8,8 +8,9 @@ from __future__ import annotations
 from enum import StrEnum
 from pathlib import Path
 
-from flext_core import FlextContainer, FlextLogger, FlextModels, FlextResult
 from pydantic import Field
+
+from flext_core import FlextContainer, FlextLogger, FlextModels, FlextResult
 
 # Quality Score Constants
 MIN_QUALITY_SCORE = 0.0

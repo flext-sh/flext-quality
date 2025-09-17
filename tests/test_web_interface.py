@@ -9,8 +9,8 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 from flask import Flask
-from flext_core import FlextTypes
 
+from flext_core import FlextTypes
 from flext_quality import main
 from flext_quality.web import FlextQualityWebInterface as QualityWebInterface
 

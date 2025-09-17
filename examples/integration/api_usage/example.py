@@ -23,7 +23,6 @@ from flext_observability import (
     flext_create_metric,
     flext_create_trace,
 )
-
 from flext_quality import (
     CodeAnalyzer,
     QualityAnalysisService,
@@ -51,7 +50,7 @@ async def demonstrate_simple_api() -> None:
 """Sample module for API demonstration."""
 
 import os
-from typing import Optional, List
+from typing import List
 
 def calculate_score(values: List[float]) -> float:
     """Calculate average score from values.
@@ -75,7 +74,7 @@ class DataProcessor:
       self.threshold = threshold
       self.processed_count = 0
 
-    def process_item(self, item: object) -> Optional[object]:
+    def process_item(self, item: object) -> FlextTypes.Core.Optional[object]:
       """Process individual item with validation."""
       if item is None:
           return None

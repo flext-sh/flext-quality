@@ -25,7 +25,6 @@ from flext_core import (
     FlextLogger,
     FlextResult,
 )
-
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.reports import QualityReport
 from flext_quality.web import FlextQualityWebInterface

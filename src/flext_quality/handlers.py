@@ -12,7 +12,6 @@ from flext_observability import (
     flext_create_log_entry as _flext_create_log_entry,
     flext_create_trace as _flext_create_trace,
 )
-
 from flext_quality.entities import QualityAnalysis, QualityReport
 from flext_quality.services import (
     FlextQualityAnalysisService,

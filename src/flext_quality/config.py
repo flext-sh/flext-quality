@@ -8,8 +8,9 @@ from __future__ import annotations
 
 import warnings
 
-from flext_core import FlextModels
 from pydantic_settings import SettingsConfigDict
+
+from flext_core import FlextModels
 
 
 class FlextQualityConfig(FlextModels.Config):

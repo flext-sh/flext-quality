@@ -16,7 +16,6 @@ from pathlib import Path
 from typing import override
 
 from flext_core import FlextTypes
-
 from flext_quality.backend_type import BackendType
 from flext_quality.base import BaseAnalyzer
 

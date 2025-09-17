@@ -7,9 +7,9 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import pytest
-from flext_core import FlextTypes
 from pydantic import ValidationError
 
+from flext_core import FlextTypes
 from flext_quality import QualityGradeCalculator, QualityMetrics
 from flext_quality.analysis_types import (
     AnalysisResults,

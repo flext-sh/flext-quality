@@ -10,7 +10,6 @@ from pathlib import Path
 from uuid import UUID
 
 from flext_core import FlextResult, FlextTypes
-
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.container import get_quality_container
 from flext_quality.entities import (

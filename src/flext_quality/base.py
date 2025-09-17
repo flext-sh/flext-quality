@@ -11,7 +11,6 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 
 from flext_core import FlextTypes
-
 from flext_quality.backend_type import BackendType
 
 

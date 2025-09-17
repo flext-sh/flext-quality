@@ -13,8 +13,8 @@ from __future__ import annotations
 import uuid
 
 import pytest
-from flext_core import FlextTypes
 
+from flext_core import FlextTypes
 from flext_quality import (
     AnalysisStatus,
     IssueSeverity,

@@ -11,7 +11,6 @@ from pathlib import Path
 from typing import override
 
 from flext_core import FlextContainer, FlextLogger, FlextTypes
-
 from flext_quality.ast_class_info import ClassInfo
 from flext_quality.ast_function_info import FunctionInfo
 from flext_quality.backend_type import BackendType

@@ -8,9 +8,9 @@ from __future__ import annotations
 import contextlib
 from typing import cast
 
-from flext_core import FlextModels, FlextResult, FlextTypes
 from pydantic import Field
 
+from flext_core import FlextModels, FlextResult, FlextTypes
 from flext_quality.analysis_types import AnalysisResults
 from flext_quality.grade_calculator import QualityGradeCalculator
 

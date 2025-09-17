@@ -10,9 +10,9 @@ import warnings
 from datetime import UTC, datetime
 from enum import StrEnum
 
-from flext_core import FlextContainer, FlextLogger, FlextResult
 from pydantic import BaseModel, Field
 
+from flext_core import FlextContainer, FlextLogger, FlextResult
 from flext_quality.typings import FlextTypes
 from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
 

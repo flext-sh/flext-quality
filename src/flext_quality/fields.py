@@ -8,9 +8,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import cast
 
-from flext_core import FlextContainer, FlextLogger
 from pydantic import Field
 from pydantic.fields import FieldInfo
+
+from flext_core import FlextContainer, FlextLogger
 
 
 class FlextQualityFields:

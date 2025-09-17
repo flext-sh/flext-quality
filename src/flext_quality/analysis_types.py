@@ -7,9 +7,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextContainer, FlextLogger, FlextModels, FlextTypes
 from pydantic import BaseModel, Field
 
+from flext_core import FlextContainer, FlextLogger, FlextModels, FlextTypes
 from flext_quality.value_objects import (
     FlextIssueSeverity as IssueSeverity,
     FlextIssueType as IssueType,
