@@ -67,13 +67,7 @@ from flext_quality.models import FlextQualityReportModel
 from flext_quality.reports import FlextQualityReportGenerator
 
 # Services
-from flext_quality.services import (
-    BasicQualityAnalysisService as QualityAnalysisService,
-    BasicQualityIssueService as QualityIssueService,
-    BasicQualityProjectService as FlextQualityService,
-    BasicQualityProjectService as QualityProjectService,
-    BasicQualityReportService as QualityReportService,
-)
+from flext_quality.services import FlextQualityServices
 
 # Utilities and exceptions
 from flext_quality.utilities import FlextQualityUtilities as QualityUtilities
@@ -120,7 +114,7 @@ __all__ = [
     # Models and metrics
     "FlextQualityReportModel",
     "FlextQualityRuleError",
-    "FlextQualityService",
+    "FlextQualityServices",
     "FlextQualityTimeoutError",
     "FlextQualityValidationError",
     "IssueLocation",
@@ -129,19 +123,15 @@ __all__ = [
     # API and handlers
     "QualityAPI",
     "QualityAnalysis",
-    "QualityAnalysisService",
     "QualityConfig",
     "QualityGrade",
     "QualityGradeCalculator",
     "QualityIssue",
-    "QualityIssueService",
     "QualityMetrics",
     # Domain entities
     "QualityProject",
     # Services
-    "QualityProjectService",
     "QualityReport",
-    "QualityReportService",
     "QualityRule",
     # Value objects
     "QualityScore",

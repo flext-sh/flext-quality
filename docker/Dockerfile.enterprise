@@ -31,12 +31,12 @@ RUN mkdir -p /app/logs /app/outputs /app/test_results /app/example_results && \
 RUN pip install -e . --no-deps
 
 # Create mock dependencies script
-COPY <<EOF /app/create_mocks.py
+COPY <<'EOF' /app/create_mocks.py
 import sys
 from pathlib import Path
 
 # Create mock flext_core module
-mock_dir = Path('/app/src/flext_core')  
+mock_dir = Path('/app/src/flext_core')
 mock_dir.mkdir(exist_ok=True)
 
 with open(mock_dir / '__init__.py', 'w') as f:
@@ -50,7 +50,7 @@ class FlextResult:
         self.error = error
     @classmethod
     def ok(cls, data=None): return cls(True, data=data)
-    @classmethod 
+    @classmethod
     def fail(cls, error): return cls(False, error=error)
 def FlextLogger(name): return logging.getLogger(name)
 class FlextContainer:

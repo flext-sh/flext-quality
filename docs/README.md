@@ -1,6 +1,6 @@
 # FLEXT Quality Documentation
 
-**Version**: 0.9.0 | **Status**: Solid Architecture with Critical Gaps | **Updated**: 2025-09-17
+**Version**: 0.9.9 RC | **Status**: Solid Architecture with Critical Gaps · 1.0.0 Release Preparation | **Updated**: 2025-09-17
 
 Documentation for FLEXT Quality - code quality analysis library for the FLEXT ecosystem.
 

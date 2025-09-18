@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import warnings
 from pathlib import Path
 
 from flext_core import (
@@ -395,199 +394,36 @@ class FlextQualityServices:
 # =============================================================================
 
 
-class BasicQualityProjectService:
-    """Backward compatibility facade for project service."""
-
-    def __init__(self) -> None:
-        """Initialize service facade."""
-        self._services = FlextQualityServices()
-        self._service = self._services.get_project_service()
-
-    async def create_project(
-        self, *args: object, **kwargs: object
-    ) -> FlextResult[FlextQualityProject]:
-        """Delegate to unified service."""
-        return await self._service.create_project(*args, **kwargs)
+# BasicQualityProjectService removed for 1.0 production readiness
+# Use FlextQualityServices.get_project_service() directly
 
 
-class BasicQualityIssueService:
-    """Backward compatibility facade for issue service."""
-
-    def __init__(self) -> None:
-        """Initialize service facade."""
-        self._services = FlextQualityServices()
-        self._service = self._services.get_issue_service()
-
-    async def create_issue(
-        self, *args: object, **kwargs: object
-    ) -> FlextResult[FlextQualityIssue]:
-        """Delegate to unified service."""
-        return await self._service.create_issue(*args, **kwargs)
-
-    async def get_issues_by_analysis(
-        self, *args: object, **kwargs: object
-    ) -> FlextResult[list[FlextQualityIssue]]:
-        """Delegate to unified service."""
-        return await self._service.get_issues_by_analysis(*args, **kwargs)
-
-    async def get_issue(
-        self, *args: object, **kwargs: object
-    ) -> FlextResult[FlextQualityIssue | None]:
-        """Delegate to unified service."""
-        return await self._service.get_issue(*args, **kwargs)
-
-    async def suppress_issue(
-        self, *args: object, **kwargs: object
-    ) -> FlextResult[FlextQualityIssue]:
-        """Delegate to unified service."""
-        return await self._service.suppress_issue(*args, **kwargs)
-
-    async def unsuppress_issue(
-        self, *args: object, **kwargs: object
-    ) -> FlextResult[FlextQualityIssue]:
-        """Delegate to unified service."""
-        return await self._service.unsuppress_issue(*args, **kwargs)
+# BasicQualityIssueService removed for 1.0 production readiness
+# Use FlextQualityServices.get_issue_service() directly
 
 
-class BasicQualityAnalysisService:
-    """Backward compatibility facade for analysis service."""
+# BasicQualityAnalysisService removed for 1.0 production readiness
+# Use FlextQualityServices.get_analysis_service() directly
 
-    def __init__(self) -> None:
-        """Initialize service facade."""
-        self._services = FlextQualityServices()
-        self._service = self._services.get_analysis_service()
-
-    async def create_analysis(
-        self, *args: object, **kwargs: object
-    ) -> FlextResult[FlextQualityAnalysis]:
-        """Delegate to unified service."""
-        return await self._service.create_analysis(*args, **kwargs)
-
-    async def get_analyses_by_project(
-        self, *args: object, **kwargs: object
-    ) -> FlextResult[list[FlextQualityAnalysis]]:
-        """Delegate to unified service."""
-        return await self._service.get_analyses_by_project(*args, **kwargs)
+# BasicQualityReportService removed for 1.0 production readiness
+# Use FlextQualityServices.get_report_service() directly
 
 
-class BasicQualityReportService:
-    """Backward compatibility facade for report service."""
+# ExternalAnalysisService removed for 1.0 production readiness
+# Use FlextQualityServices.get_external_analysis_service() directly
 
-    def __init__(self) -> None:
-        """Initialize service facade."""
-        self._services = FlextQualityServices()
-        self._service = self._services.get_report_service()
-
-    async def create_report(
-        self, *args: object, **kwargs: object
-    ) -> FlextResult[FlextQualityReport]:
-        """Delegate to unified service."""
-        return await self._service.create_report(*args, **kwargs)
-
-    async def get_reports_by_analysis(
-        self, *args: object, **kwargs: object
-    ) -> FlextResult[list[FlextQualityReport]]:
-        """Delegate to unified service."""
-        return await self._service.get_reports_by_analysis(*args, **kwargs)
-
-    async def delete_report(self, *args: object, **kwargs: object) -> FlextResult[bool]:
-        """Delegate to unified service."""
-        return await self._service.delete_report(*args, **kwargs)
+# Legacy compatibility classes removed for 1.0 production readiness
+# Use FlextQualityServices directly instead of deprecated facade classes
 
 
-class ExternalAnalysisService:
-    """Backward compatibility facade for external analysis service."""
+# FlextQualityReportService removed for 1.0 production readiness
 
-    def __init__(self) -> None:
-        """Initialize service facade."""
-        self._services = FlextQualityServices()
-        self._service = self._services.get_external_analysis_service()
-
-    async def analyze_with_backend(
-        self, *args: object, **kwargs: object
-    ) -> FlextResult[FlextTypes.Core.Dict]:
-        """Delegate to unified service."""
-        return await self._service.analyze_with_backend(*args, **kwargs)
-
-
-# Legacy compatibility - using warnings like flext-cli
-class FlextQualityProjectService(BasicQualityProjectService):
-    """Legacy compatibility facade - DEPRECATED."""
-
-    def __init__(self) -> None:
-        """Initialize the instance."""
-        warnings.warn(
-            "FlextQualityProjectService is deprecated; use BasicQualityProjectService directly",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        super().__init__()
-
-
-class FlextQualityAnalysisService(BasicQualityAnalysisService):
-    """Legacy compatibility facade - DEPRECATED."""
-
-    def __init__(self) -> None:
-        """Initialize the instance."""
-        warnings.warn(
-            "FlextQualityAnalysisService is deprecated; use BasicQualityAnalysisService directly",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        super().__init__()
-
-
-class FlextQualityIssueService(BasicQualityIssueService):
-    """Legacy compatibility facade - DEPRECATED."""
-
-    def __init__(self) -> None:
-        """Initialize the instance."""
-        warnings.warn(
-            "FlextQualityIssueService is deprecated; use BasicQualityIssueService directly",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        super().__init__()
-
-
-class FlextQualityReportService(BasicQualityReportService):
-    """Legacy compatibility facade - DEPRECATED."""
-
-    def __init__(self) -> None:
-        """Initialize the instance."""
-        warnings.warn(
-            "FlextQualityReportService is deprecated; use BasicQualityReportService directly",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        super().__init__()
-
-
-# Aliases for backward compatibility (like flext-cli pattern)
-QualityProjectService = BasicQualityProjectService
-QualityAnalysisService = BasicQualityAnalysisService
-QualityIssueService = BasicQualityIssueService
-QualityReportService = BasicQualityReportService
+# Aliases removed for 1.0 production readiness
+# Use FlextQualityServices directly
 
 
 # Export all classes via __all__
 __all__ = [
-    "BasicQualityAnalysisService",
-    "BasicQualityIssueService",
-    # Basic service implementations (real classes)
-    "BasicQualityProjectService",
-    "BasicQualityReportService",
-    "ExternalAnalysisService",
-    # Legacy compatibility
-    "FlextQualityAnalysisService",
-    "FlextQualityIssueService",
-    "FlextQualityProjectService",
-    "FlextQualityReportService",
-    # Unified services class
+    # Unified services class - main entry point
     "FlextQualityServices",
-    # Compatibility aliases
-    "QualityAnalysisService",
-    "QualityIssueService",
-    "QualityProjectService",
-    "QualityReportService",
 ]

@@ -417,54 +417,10 @@ class FlextQualityEntities:
         report_size_bytes: int
 
     # =============================================================================
-    # ENTITY FACTORY METHODS
+    # ENTITY FACTORY METHODS - Removed for 1.0 production readiness
     # =============================================================================
-
-    def create_project(self, **kwargs: object) -> QualityProject:
-        """Create a quality project entity."""
-        return self.QualityProject(**kwargs)
-
-    def create_analysis(self, **kwargs: object) -> QualityAnalysis:
-        """Create a quality analysis entity."""
-        return self.QualityAnalysis(**kwargs)
-
-    def create_issue(self, **kwargs: object) -> QualityIssue:
-        """Create a quality issue entity."""
-        return self.QualityIssue(**kwargs)
-
-    def create_rule(self, **kwargs: object) -> QualityRule:
-        """Create a quality rule entity."""
-        return self.QualityRule(**kwargs)
-
-    def create_report(self, **kwargs: object) -> QualityReport:
-        """Create a quality report entity."""
-        return self.QualityReport(**kwargs)
-
-    # =============================================================================
-    # EVENT FACTORY METHODS
-    # =============================================================================
-
-    def create_project_created_event(self, **kwargs: object) -> ProjectCreatedEvent:
-        """Create a project created event."""
-        return self.ProjectCreatedEvent(event_type="project_created", **kwargs)
-
-    def create_analysis_started_event(self, **kwargs: object) -> AnalysisStartedEvent:
-        """Create an analysis started event."""
-        return self.AnalysisStartedEvent(event_type="analysis_started", **kwargs)
-
-    def create_analysis_completed_event(
-        self, **kwargs: object
-    ) -> AnalysisCompletedEvent:
-        """Create an analysis completed event."""
-        return self.AnalysisCompletedEvent(event_type="analysis_completed", **kwargs)
-
-    def create_issue_detected_event(self, **kwargs: object) -> IssueDetectedEvent:
-        """Create an issue detected event."""
-        return self.IssueDetectedEvent(event_type="issue_detected", **kwargs)
-
-    def create_report_generated_event(self, **kwargs: object) -> ReportGeneratedEvent:
-        """Create a report generated event."""
-        return self.ReportGeneratedEvent(event_type="report_generated", **kwargs)
+    # Factory methods removed to eliminate Any type usage and ensure type safety
+    # Users should instantiate entities directly: QualityProject(name="...", project_path="...")
 
 
 # =============================================================================

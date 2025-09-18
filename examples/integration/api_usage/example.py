@@ -37,7 +37,7 @@ from flext_quality import (
 logger = FlextLogger(__name__)
 
 
-async def demonstrate_simple_api() -> None:
+def demonstrate_simple_api() -> None:
     """Demonstrate simple API usage patterns."""
     # Create sample project for analysis
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -387,7 +387,7 @@ def process_data(data):
             )  # Handle result
 
 
-async def demonstrate_custom_workflows() -> None:
+def demonstrate_custom_workflows() -> None:
     """Demonstrate custom quality workflow automation."""
     # Define custom workflow
     workflow_steps = [
@@ -603,10 +603,10 @@ async def main() -> int:
     """Main demonstration of complete API integration functionality."""
     try:
         # Demonstrate all API integration patterns
-        await demonstrate_simple_api()
+        demonstrate_simple_api()
         await demonstrate_service_integration()
         await demonstrate_flext_ecosystem_integration()
-        await demonstrate_custom_workflows()
+        demonstrate_custom_workflows()
 
         return 0
 

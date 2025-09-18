@@ -18,12 +18,7 @@ from flext_quality.entities import (
     FlextQualityProject,
     FlextQualityReport,
 )
-from flext_quality.services import (
-    FlextQualityAnalysisService,
-    FlextQualityIssueService,
-    FlextQualityProjectService,
-    FlextQualityReportService,
-)
+from flext_quality.services import FlextQualityServices
 from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
 
 # Type aliases for backward compatibility
@@ -31,10 +26,6 @@ QualityProject = FlextQualityProject
 QualityAnalysis = FlextQualityAnalysis
 QualityIssue = FlextQualityIssue
 QualityReport = FlextQualityReport
-QualityProjectService = FlextQualityProjectService
-QualityAnalysisService = FlextQualityAnalysisService
-QualityIssueService = FlextQualityIssueService
-QualityReportService = FlextQualityReportService
 
 
 class FlextQualityAPI:
@@ -43,40 +34,27 @@ class FlextQualityAPI:
     def __init__(self) -> None:
         """Initialize the Quality API with container-based DI."""
         self._container = get_quality_container()
-
-        # Lazy load services
-        self._project_service: QualityProjectService | None = None
-        self._analysis_service: QualityAnalysisService | None = None
-        self._issue_service: QualityIssueService | None = None
-        self._report_service: QualityReportService | None = None
+        self._services = FlextQualityServices()
 
     @property
-    def project_service(self) -> QualityProjectService:
-        """Get or create project service instance."""
-        if self._project_service is None:
-            self._project_service = QualityProjectService()
-        return self._project_service
+    def project_service(self) -> object:
+        """Get project service instance."""
+        return self._services.get_project_service()
 
     @property
-    def analysis_service(self) -> QualityAnalysisService:
-        """Get or create analysis service instance."""
-        if self._analysis_service is None:
-            self._analysis_service = QualityAnalysisService()
-        return self._analysis_service
+    def analysis_service(self) -> object:
+        """Get analysis service instance."""
+        return self._services.get_analysis_service()
 
     @property
-    def issue_service(self) -> QualityIssueService:
-        """Get or create issue service instance."""
-        if self._issue_service is None:
-            self._issue_service = QualityIssueService()
-        return self._issue_service
+    def issue_service(self) -> object:
+        """Get issue service instance."""
+        return self._services.get_issue_service()
 
     @property
-    def report_service(self) -> QualityReportService:
-        """Get or create report service instance."""
-        if self._report_service is None:
-            self._report_service = QualityReportService()
-        return self._report_service
+    def report_service(self) -> object:
+        """Get report service instance."""
+        return self._services.get_report_service()
 
     # Project operations
     async def create_project(

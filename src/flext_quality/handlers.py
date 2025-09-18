@@ -13,10 +13,7 @@ from flext_observability import (
     flext_create_trace as _flext_create_trace,
 )
 from flext_quality.entities import QualityAnalysis, QualityReport
-from flext_quality.services import (
-    FlextQualityAnalysisService,
-    FlextQualityReportService,
-)
+from flext_quality.services import FlextQualityServices
 
 
 class FlextQualityHandlers:
@@ -45,8 +42,9 @@ class FlextQualityHandlers:
 
     def __init__(self) -> None:
         """Initialize all services for handler operations."""
-        self._analysis_service = FlextQualityAnalysisService()
-        self._report_service = FlextQualityReportService()
+        self._services = FlextQualityServices()
+        self._analysis_service = self._services.get_analysis_service()
+        self._report_service = self._services.get_report_service()
         # Use placeholder services for now - these would be injected
         self._linting_service = None
         self._security_service = None

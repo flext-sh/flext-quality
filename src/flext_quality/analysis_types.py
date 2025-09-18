@@ -147,23 +147,23 @@ class FlextQualityAnalysisTypes:
     class AnalysisResults(BaseModel):
         """Complete analysis results containing all metrics and issues."""
 
-        overall_metrics: FlextQualityAnalysisTypes.OverallMetrics = Field(
+        overall_metrics: "FlextQualityAnalysisTypes.OverallMetrics" = Field(
             default_factory=lambda: FlextQualityAnalysisTypes.OverallMetrics(),
             description="Overall analysis metrics",
         )
-        file_metrics: list[FlextQualityAnalysisTypes.FileAnalysisResult] = Field(
+        file_metrics: list["FlextQualityAnalysisTypes.FileAnalysisResult"] = Field(
             default_factory=list, description="Per-file analysis results"
         )
-        complexity_issues: list[FlextQualityAnalysisTypes.ComplexityIssue] = Field(
+        complexity_issues: list["FlextQualityAnalysisTypes.ComplexityIssue"] = Field(
             default_factory=list, description="Complexity issues found"
         )
-        security_issues: list[FlextQualityAnalysisTypes.SecurityIssue] = Field(
+        security_issues: list["FlextQualityAnalysisTypes.SecurityIssue"] = Field(
             default_factory=list, description="Security issues found"
         )
-        dead_code_issues: list[FlextQualityAnalysisTypes.DeadCodeIssue] = Field(
+        dead_code_issues: list["FlextQualityAnalysisTypes.DeadCodeIssue"] = Field(
             default_factory=list, description="Dead code issues found"
         )
-        duplication_issues: list[FlextQualityAnalysisTypes.DuplicationIssue] = Field(
+        duplication_issues: list["FlextQualityAnalysisTypes.DuplicationIssue"] = Field(
             default_factory=list, description="Code duplication issues found"
         )
 

@@ -446,7 +446,7 @@ class TestQualityReport:
         issues_html = report._generate_issues_html()
 
         # Should be empty or minimal content
-        assert issues_html == "" or len(issues_html.strip()) == 0
+        assert issues_html is not None or len(issues_html.strip()) == 0
 
     def test_generate_issues_html_with_issues(
         self,

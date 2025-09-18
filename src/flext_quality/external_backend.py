@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 import shutil
-import subprocess  # nosec B404 # Required for external tool integration
+import subprocess
 import tempfile
 import warnings
 from importlib import import_module, util

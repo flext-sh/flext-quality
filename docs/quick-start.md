@@ -1,6 +1,6 @@
 # FLEXT Quality Quick Start Guide
 
-**Version**: 0.9.0 | **Status**: Accessibility Improvements Needed | **Updated**: 2025-09-17
+**Version**: 0.9.9 RC | **Status**: Accessibility Improvements Needed · 1.0.0 Release Preparation | **Updated**: 2025-09-17
 
 ---
 
