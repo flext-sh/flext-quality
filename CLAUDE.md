@@ -366,7 +366,21 @@ from flext_quality import (
 
 ## 📦 FLEXT ECOSYSTEM INTEGRATION (MANDATORY QUALITY DEPENDENCIES)
 
-### **FLEXT Foundation Dependencies (ENTERPRISE QUALITY INTEGRATION)**
+## 🔗 MCP SERVER INTEGRATION
+
+### Mandatory MCP Server Usage (QUALITY COMPLIANCE)
+As defined in [../CLAUDE.md](../CLAUDE.md), all FLEXT development MUST use:
+- **serena**: All semantic code operations, symbol analysis, and refactoring
+- **sequential-thinking**: Complex problem decomposition and planning
+- **context7**: Third-party library documentation and API references
+- **github**: Repository operations and pull request management
+- **puppeteer**: Web automation and testing interfaces
+
+Quality analysis must leverage MCP servers for comprehensive code evaluation and metrics collection.
+
+---
+
+## 📦 FLEXT Foundation Dependencies (ENTERPRISE QUALITY INTEGRATION)**
 
 ```python
 # MANDATORY: Core FLEXT patterns for quality system
@@ -688,7 +702,7 @@ make report                   # Quality reporting system validation
 
 **FLEXT-QUALITY AUTHORITY**: This document establishes flext-quality as the definitive code quality analysis and quality assurance foundation for the entire FLEXT ecosystem.
 
-**ZERO TOLERANCE ENFORCEMENT**: Any deviation from these patterns requires explicit approval from FLEXT architecture authority.
+**ZERO TOLERANCE ENFORCEMENT**: object deviation from these patterns requires explicit approval from FLEXT architecture authority.
 
 **ENTERPRISE GRADE**: Production-ready quality analysis with comprehensive metrics, reporting, and threshold validation.
 

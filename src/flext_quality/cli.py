@@ -32,13 +32,8 @@ from flext_quality.web import FlextQualityWebInterface
 # Quality score thresholds
 MIN_ACCEPTABLE_QUALITY_SCORE = 70
 
-# Check if flext-cli is available
-try:
-    from flext_cli import FlextCliApi
-
-    FLEXT_CLI_AVAILABLE = True
-except ImportError:
-    FLEXT_CLI_AVAILABLE = False
+# FlextCli availability flag
+FLEXT_CLI_AVAILABLE = True
 
 
 class FlextQualityCliService(FlextDomainService[int]):
@@ -60,13 +55,8 @@ class FlextQualityCliService(FlextDomainService[int]):
         @staticmethod
         def get_cli_context(*, verbose: bool = False) -> FlextResult[FlextCliContext]:
             """Get CLI context using flext-cli exclusively."""
-            if FLEXT_CLI_AVAILABLE:
-                context = FlextCliContext(verbose=verbose)
-                return FlextResult[FlextCliContext].ok(context)
-            # MANDATORY: No Console fallback - flext-cli is required
-            return FlextResult[FlextCliContext].fail(
-                "flext-cli is required but not available - install flext-cli package"
-            )
+            context = FlextCliContext(verbose=verbose)
+            return FlextResult[FlextCliContext].ok(context)
 
     class _ProjectAnalysisHelper:
         """Nested helper for project analysis operations."""

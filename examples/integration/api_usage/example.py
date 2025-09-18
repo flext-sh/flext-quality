@@ -325,77 +325,66 @@ def process_data(data):
         except Exception:
             return
 
-        # Demonstrate observability integration (if available)
+        # Demonstrate observability integration
 
-        try:
-            # Create metrics
-            flext_create_metric(
-                name="quality_analysis_score",
-                value=analysis_data.get("quality_score", 0.0),
-                tags={"project": "ecosystem_demo", "integration": "api"},
+        # Create metrics
+        flext_create_metric(
+            name="quality_analysis_score",
+            value=analysis_data.get("quality_score", 0.0),
+            tags={"project": "ecosystem_demo", "integration": "api"},
+        )
+
+        # Create trace
+        flext_create_trace(
+            trace_id="ecosystem_demo_analysis",
+            operation="api.analyze_project",
+            config={"project_path": str(project_path)},
+        )
+
+        # Create log entry
+        flext_create_log_entry(
+            message="FLEXT Quality ecosystem integration demonstration completed",
+            level="info",
+            context={
+                "component": "quality_api",
+                "project": "ecosystem_demo",
+                "files_analyzed": analysis_data.get("files_analyzed", 0),
+            },
+        )
+
+        # Demonstrate container-based dependency injection
+
+        # Create container
+        container = FlextContainer()
+
+        # Register services
+        project_service_instance = QualityProjectService()
+        analysis_service_instance = QualityAnalysisService()
+
+        container.register("QualityProjectService", project_service_instance)
+        container.register("QualityAnalysisService", analysis_service_instance)
+
+        # Resolve services using current API
+        project_service_result = container.get("QualityProjectService")
+        project_service = (
+            project_service_result.value
+            if project_service_result.success
+            else QualityProjectService()
+        )
+
+        analysis_service_result = container.get("QualityAnalysisService")
+        analysis_service_result.value if analysis_service_result.success else QualityAnalysisService()
+
+        # Demonstrate service usage
+        with tempfile.TemporaryDirectory() as temp_service_dir:
+            project_result = await project_service.create_project(
+                name="DI Demo Project",
+                project_path=temp_service_dir,
             )
 
-            # Create trace
-            flext_create_trace(
-                trace_id="ecosystem_demo_analysis",
-                operation="api.analyze_project",
-                config={"project_path": str(project_path)},
-            )
-
-            # Create log entry
-            flext_create_log_entry(
-                message="FLEXT Quality ecosystem integration demonstration completed",
-                level="info",
-                context={
-                    "component": "quality_api",
-                    "project": "ecosystem_demo",
-                    "files_analyzed": analysis_data.get("files_analyzed", 0),
-                },
-            )
-
-        except ImportError:
-            # Simulate observability integration
-            pass
-
-        # Demonstrate container-based dependency injection (if available)
-
-        try:
-            # Create container
-            container = FlextContainer()
-
-            # Register services
-            project_service_instance = QualityProjectService()
-            analysis_service_instance = QualityAnalysisService()
-
-            container.register("QualityProjectService", project_service_instance)
-            container.register("QualityAnalysisService", analysis_service_instance)
-
-            # Resolve services using current API
-            project_service_result = container.get("QualityProjectService")
-            project_service = (
-                project_service_result.value
-                if project_service_result.success
-                else QualityProjectService()
-            )
-
-            analysis_service_result = container.get("QualityAnalysisService")
-            analysis_service_result.value if analysis_service_result.success else QualityAnalysisService()
-
-            # Demonstrate service usage
-            with tempfile.TemporaryDirectory() as temp_service_dir:
-                project_result = await project_service.create_project(
-                    name="DI Demo Project",
-                    project_path=temp_service_dir,
-                )
-
-                _ = (
-                    project_result.value if project_result.success else None
-                )  # Handle result
-
-        except ImportError:
-            # Direct instantiation
-            project_service = QualityProjectService()
-            QualityAnalysisService()
+            _ = (
+                project_result.value if project_result.success else None
+            )  # Handle result
 
 
 async def demonstrate_custom_workflows() -> None:
