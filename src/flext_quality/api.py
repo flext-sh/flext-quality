@@ -37,12 +37,12 @@ class FlextQualityAPI:
         self._services = FlextQualityServices()
 
     @property
-    def project_service(self) -> object:
+    def project_service(self) -> FlextQualityServices.ProjectService:
         """Get project service instance."""
         return self._services.get_project_service()
 
     @property
-    def analysis_service(self) -> object:
+    def analysis_service(self) -> FlextQualityServices.AnalysisService:
         """Get analysis service instance."""
         return self._services.get_analysis_service()
 

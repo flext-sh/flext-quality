@@ -419,7 +419,7 @@ class FlextQualityEntities:
     # =============================================================================
     # ENTITY FACTORY METHODS - Removed for 1.0 production readiness
     # =============================================================================
-    # Factory methods removed to eliminate Any type usage and ensure type safety
+    # Factory methods removed to eliminate object type usage and ensure type safety
     # Users should instantiate entities directly: QualityProject(name="...", project_path="...")
 
 

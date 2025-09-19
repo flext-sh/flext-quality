@@ -15,7 +15,7 @@ import tempfile
 import pytest
 
 from flext_quality import (
-    AnalysisStatus,
+    FlextAnalysisStatus,
     IssueSeverity,
     IssueType,
     QualityAnalysisService,
@@ -182,7 +182,7 @@ class TestQualityAnalysisServiceFunctional:
         assert analysis.project_id == "test-project-id"
         assert analysis.commit_hash == "abc123"
         assert analysis.branch == "main"
-        assert analysis.status == AnalysisStatus.QUEUED
+        assert analysis.status == FlextAnalysisStatus.QUEUED
         assert len(service._analyses) == 1
 
     async def test_get_analyssuccess(self, service: QualityAnalysisService) -> None:
@@ -338,7 +338,7 @@ class TestQualityAnalysisServiceFunctional:
 
         assert result.success
         completed_analysis = result.value
-        assert completed_analysis.status == AnalysisStatus.COMPLETED
+        assert completed_analysis.status == FlextAnalysisStatus.COMPLETED
         assert completed_analysis.completed_at is not None
         assert completed_analysis.duration_seconds is not None
 
@@ -364,7 +364,7 @@ class TestQualityAnalysisServiceFunctional:
 
         assert result.success
         failed_analysis = result.value
-        assert failed_analysis.status == AnalysisStatus.FAILED
+        assert failed_analysis.status == FlextAnalysisStatus.FAILED
         assert failed_analysis.completed_at is not None
 
     async def test_fail_analysis_not_found(
@@ -800,7 +800,7 @@ class TestServiceIntegration:
 
             assert final_project.success
             assert final_analysis.success
-            assert final_analysis.value.status == AnalysisStatus.COMPLETED
+            assert final_analysis.value.status == FlextAnalysisStatus.COMPLETED
             assert final_issues.success
             assert len(final_issues.value) == 1
             assert final_reports.success

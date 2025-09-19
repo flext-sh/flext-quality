@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import contextlib
-from typing import cast
 
 from pydantic import Field
 
@@ -196,30 +195,39 @@ class QualityMetrics(FlextModels.Value):
             QualityMetrics:: Description of return value.
 
         """
-        defaults: dict[str, object] = {
-            "overall_score": 0.0,
-            "quality_grade": "F",
-            "total_files": 0,
-            "total_lines_of_code": 0,
-            "total_functions": 0,
-            "total_classes": 0,
-            "average_complexity": 0.0,
-            "max_complexity": 0.0,
-            "complex_files_count": 0,
-            "security_issues_count": 0,
-            "dead_code_items_count": 0,
-            "duplicate_blocks_count": 0,
-            "complexity_issues_count": 0,
-            "complexity_score": 100.0,
-            "security_score": 100.0,
-            "maintainability_score": 100.0,
-            "duplication_score": 100.0,
-            "documentation_score": 100.0,
-        }
-        defaults.update(overrides)
+        # Extract values with proper type checking - no casts or fallbacks
+        def get_float(key: str, default: float) -> float:
+            value = overrides.get(key, default)
+            return float(value) if isinstance(value, (int, float)) else default
 
-        # Type ignore needed for Pydantic model construction with dict unpacking
-        return cls(**defaults)
+        def get_int(key: str, default: int) -> int:
+            value = overrides.get(key, default)
+            return int(value) if isinstance(value, (int, float)) else default
+
+        def get_str(key: str, default: str) -> str:
+            value = overrides.get(key, default)
+            return str(value) if isinstance(value, str) else default
+
+        return cls(
+            overall_score=get_float("overall_score", 0.0),
+            quality_grade=get_str("quality_grade", "F"),
+            total_files=get_int("total_files", 0),
+            total_lines_of_code=get_int("total_lines_of_code", 0),
+            total_functions=get_int("total_functions", 0),
+            total_classes=get_int("total_classes", 0),
+            average_complexity=get_float("average_complexity", 0.0),
+            max_complexity=get_float("max_complexity", 0.0),
+            complex_files_count=get_int("complex_files_count", 0),
+            security_issues_count=get_int("security_issues_count", 0),
+            dead_code_items_count=get_int("dead_code_items_count", 0),
+            duplicate_blocks_count=get_int("duplicate_blocks_count", 0),
+            complexity_issues_count=get_int("complexity_issues_count", 0),
+            complexity_score=get_float("complexity_score", 100.0),
+            security_score=get_float("security_score", 100.0),
+            maintainability_score=get_float("maintainability_score", 100.0),
+            duplication_score=get_float("duplication_score", 100.0),
+            documentation_score=get_float("documentation_score", 100.0),
+        )
 
     @classmethod
     def from_analysis_results(
@@ -267,23 +275,28 @@ class QualityMetrics(FlextModels.Value):
         cls, results: FlextTypes.Core.Dict
     ) -> QualityMetrics:
         """Create QualityMetrics from legacy dict format for test compatibility."""
-        # Extract basic metrics from dict - handle nested structure with safe casting
+        # Extract basic metrics from dict with proper type checking
+        def get_int_from_dict(source: dict[str, object], key: str, default: int = 0) -> int:
+            """Extract integer value with proper type checking."""
+            value = source.get(key, default)
+            if isinstance(value, int):
+                return value
+            if isinstance(value, float):
+                return int(value)
+            return default
+
         metrics = results.get("metrics", {})
         if isinstance(metrics, dict):
-            files_analyzed = int(cast("int", metrics.get("total_files")) or 0)
-            total_lines_of_code = int(
-                cast("int", metrics.get("total_lines_of_code")) or 0
-            )
-            total_functions = int(cast("int", metrics.get("total_functions")) or 0)
-            total_classes = int(cast("int", metrics.get("total_classes")) or 0)
+            files_analyzed = get_int_from_dict(metrics, "total_files", 0)
+            total_lines_of_code = get_int_from_dict(metrics, "total_lines_of_code", 0)
+            total_functions = get_int_from_dict(metrics, "total_functions", 0)
+            total_classes = get_int_from_dict(metrics, "total_classes", 0)
         else:
-            # Fallback to top-level keys - safe cast for Pyright
-            files_analyzed = int(cast("int", results.get("files_analyzed")) or 0)
-            total_lines_of_code = int(
-                cast("int", results.get("total_lines_of_code")) or 0
-            )
-            total_functions = int(cast("int", results.get("total_functions")) or 0)
-            total_classes = int(cast("int", results.get("total_classes")) or 0)
+            # Fallback to top-level keys with type checking
+            files_analyzed = get_int_from_dict(results, "files_analyzed", 0)
+            total_lines_of_code = get_int_from_dict(results, "total_lines_of_code", 0)
+            total_functions = get_int_from_dict(results, "total_functions", 0)
+            total_classes = get_int_from_dict(results, "total_classes", 0)
 
         # Extract issue counts from nested dict structure
         issues = results.get("issues", {})

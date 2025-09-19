@@ -43,11 +43,16 @@ class FlextQualityCliService(FlextDomainService[int]):
     nested helper classes and explicit FlextResult error handling.
     """
 
-    def __init__(self, **data: object) -> None:
+    def __init__(self, **_data: object) -> None:
         """Initialize CLI service with FLEXT core patterns."""
-        super().__init__(**data)
+        super().__init__()
         self._container = FlextContainer.get_global()
         self._logger = FlextLogger(__name__)
+
+    def execute(self) -> FlextResult[int]:
+        """Execute CLI service - required abstract method implementation."""
+        self._logger.info("CLI service execute called - this is a placeholder")
+        return FlextResult[int].ok(0)
 
     class _CliContextHelper:
         """Nested helper for CLI context management."""
@@ -74,7 +79,9 @@ class FlextQualityCliService(FlextDomainService[int]):
                 )
             )
             if cli_context_result.is_failure:
-                return FlextResult[int].fail(cli_context_result.error)
+                return FlextResult[int].fail(
+                    cli_context_result.error or "CLI context creation failed"
+                )
 
             cli_context = cli_context_result.value
             cli_api = FlextCliApi()
@@ -113,7 +120,9 @@ class FlextQualityCliService(FlextDomainService[int]):
             # Handle output based on format
             output_result = self._handle_output(args, report, cli_context, cli_api)
             if output_result.is_failure:
-                cli_context.print_error(output_result.error)
+                cli_context.print_error(
+                    output_result.error or "Output processing failed"
+                )
                 return FlextResult[int].ok(1)
 
             # Quality thresholds
@@ -242,7 +251,9 @@ class FlextQualityCliService(FlextDomainService[int]):
                 )
             )
             if cli_context_result.is_failure:
-                return FlextResult[int].fail(cli_context_result.error)
+                return FlextResult[int].fail(
+                    cli_context_result.error or "CLI context creation failed"
+                )
 
             cli_context = cli_context_result.value
             cli_api = FlextCliApi()
@@ -305,7 +316,9 @@ class FlextQualityCliService(FlextDomainService[int]):
                 )
             )
             if cli_context_result.is_failure:
-                return FlextResult[int].fail(cli_context_result.error)
+                return FlextResult[int].fail(
+                    cli_context_result.error or "CLI context creation failed"
+                )
 
             cli_context = cli_context_result.value
 

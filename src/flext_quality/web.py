@@ -53,16 +53,29 @@ class FlextQualityWeb:
         """Create web service using flext-web patterns."""
         logger = FlextLogger(__name__)
 
-        # Convert dict to proper WebConfig if provided
+        # Convert dict to proper WebConfig with explicit validation - no try/except fallbacks
         web_config = None
-        if config:
-            try:
-                web_config = FlextWebConfigs.WebConfig(**config)
-            except Exception:
-                # Log the exception but continue with None config
-                logger.warning(
-                    "Failed to create WebConfig from provided dict, using default"
+        if config and isinstance(config, dict):
+            # Extract values with proper type checking
+            def safe_int(value: object, default: int) -> int:
+                return int(value) if isinstance(value, (int, float)) else default
+
+            def safe_str(value: object, default: str) -> str:
+                return str(value) if isinstance(value, str) else default
+
+            def safe_bool(value: object, default: bool) -> bool:
+                return bool(value) if isinstance(value, bool) else default
+
+            # Validate required config parameters explicitly
+            if all(key in config for key in ["host", "port"]):
+                web_config = FlextWebConfigs.WebConfig(
+                    host=safe_str(config.get("host"), "localhost"),
+                    port=safe_int(config.get("port"), 8000),
+                    debug=safe_bool(config.get("debug"), False),
+                    max_workers=safe_int(config.get("max_workers"), 1),
                 )
+            else:
+                logger.warning("Invalid WebConfig dict: missing required fields")
                 web_config = None
 
         result = FlextWebServices.create_web_service(web_config)

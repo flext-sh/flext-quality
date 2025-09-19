@@ -219,7 +219,9 @@ class FlextQualityCodeAnalyzer:
         # Read file content with explicit error handling
         content_result = self._read_file_content(file_path)
         if content_result.is_failure:
-            return FlextResult[FileAnalysisResult].fail(content_result.error)
+            return FlextResult[FileAnalysisResult].fail(
+                content_result.error or "Failed to read file content"
+            )
 
         content = content_result.value
         lines = content.splitlines()
