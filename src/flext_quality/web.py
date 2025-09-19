@@ -9,13 +9,13 @@ from __future__ import annotations
 from pathlib import Path
 
 from flask import Response as FlaskResponse, jsonify, request
-from flext_web.config import FlextWebConfigs
 from werkzeug.wrappers import Response as WerkzeugResponse
 
 from flext_core import FlextContainer, FlextLogger, FlextTypes
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.api import QualityAPI
 from flext_web import FlextWebServices
+from flext_web.config import FlextWebConfigs
 
 ResponseType = FlaskResponse | WerkzeugResponse | tuple[FlaskResponse, int]
 
