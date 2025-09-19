@@ -33,11 +33,15 @@ class FlextQualityHandlers:
 
         @staticmethod
         def create_trace(
-            operation_name: str, service_name: str, config: dict[str, str],
+            operation_name: str,
+            service_name: str,
+            config: dict[str, str],
         ) -> None:
             """Create trace using flext-observability."""
             _flext_create_trace(
-                operation_name=operation_name, service_name=service_name, config=config,
+                operation_name=operation_name,
+                service_name=service_name,
+                config=config,
             )
 
     def __init__(self) -> None:
@@ -140,7 +144,8 @@ class FlextQualityHandlers:
         return FlextResult[FlextTypes.Core.Dict].ok(linting_data)
 
     async def run_security_check(
-        self, project_id: UUID,
+        self,
+        project_id: UUID,
     ) -> FlextResult[FlextTypes.Core.Dict]:
         """Handle security check command."""
         # Return placeholder result since security service is not implemented

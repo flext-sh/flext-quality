@@ -11,9 +11,7 @@ import warnings
 from pathlib import Path
 
 from flext_core import FlextTypes
-from flext_quality.analysis_types import (
-    AnalysisResults,
-)
+from flext_quality.analysis_types import FlextQualityAnalysisTypes
 from flext_quality.grade_calculator import FlextQualityGradeCalculator
 from flext_quality.utilities import FlextQualityUtilities, FlextReportUtilities
 
@@ -38,7 +36,9 @@ HIGH_TYPE_ERROR_THRESHOLD = 10
 class FlextQualityReportGenerator:
     """Generates quality reports from analysis results."""
 
-    def __init__(self, analysis_results: AnalysisResults) -> None:
+    def __init__(
+        self, analysis_results: FlextQualityAnalysisTypes.AnalysisResults
+    ) -> None:
         """Initialize the quality report generator.
 
         Args:
@@ -49,7 +49,7 @@ class FlextQualityReportGenerator:
 
         """
         # Store analysis results directly
-        self.results: AnalysisResults = analysis_results
+        self.results: FlextQualityAnalysisTypes.AnalysisResults = analysis_results
 
     def generate_text_report(self) -> str:
         """Generate a text-based quality report."""
@@ -248,12 +248,12 @@ class FlextQualityReportGenerator:
 
     def _get_total_issues(self) -> int:
         """Get total number of issues."""
-        # Use modern AnalysisResults API only
+        # Use modern FlextQualityAnalysisTypes.AnalysisResults API only
         return self.results.total_issues
 
     def _get_critical_issues(self) -> int:
         """Get number of critical issues."""
-        # Use modern AnalysisResults API only
+        # Use modern FlextQualityAnalysisTypes.AnalysisResults API only
         return self.results.critical_issues
 
     def _get_files_analyzed(self) -> int:

@@ -166,7 +166,8 @@ class FlextQualityFields:
     def optional_error_message_field() -> FieldInfo:
         """Optional error message field."""
         return cast(
-            "FieldInfo", Field(None, description="Error message if operation failed"),
+            "FieldInfo",
+            Field(None, description="Error message if operation failed"),
         )
 
     @staticmethod
@@ -199,18 +200,21 @@ class FlextQualityFields:
 
     @staticmethod
     def percentage_field(
-        default: float = 0.0, description: str = "Percentage value",
+        default: float = 0.0,
+        description: str = "Percentage value",
     ) -> FieldInfo:
         """Percentage field (0-100)."""
         return cast(
-            "FieldInfo", Field(default, ge=0.0, le=100.0, description=description),
+            "FieldInfo",
+            Field(default, ge=0.0, le=100.0, description=description),
         )
 
     @staticmethod
     def min_coverage_field(default: float = 90.0) -> FieldInfo:
         """Minimum coverage threshold field."""
         return FlextQualityFields.percentage_field(
-            default, "Minimum coverage threshold",
+            default,
+            "Minimum coverage threshold",
         )
 
     @staticmethod
@@ -257,7 +261,9 @@ class FlextQualityFields:
 
     @staticmethod
     def feature_flag_field(
-        *, default: bool = True, description: str = "Feature flag",
+        *,
+        default: bool = True,
+        description: str = "Feature flag",
     ) -> FieldInfo:
         """Standard feature flag field."""
         return cast("FieldInfo", Field(default, description=description))
@@ -266,21 +272,24 @@ class FlextQualityFields:
     def enable_security_field() -> FieldInfo:
         """Enable security analysis flag."""
         return FlextQualityFields.feature_flag_field(
-            default=True, description="Enable security analysis",
+            default=True,
+            description="Enable security analysis",
         )
 
     @staticmethod
     def enable_complexity_field() -> FieldInfo:
         """Enable complexity analysis flag."""
         return FlextQualityFields.feature_flag_field(
-            default=True, description="Enable complexity analysis",
+            default=True,
+            description="Enable complexity analysis",
         )
 
     @staticmethod
     def enable_coverage_field() -> FieldInfo:
         """Enable coverage analysis flag."""
         return FlextQualityFields.feature_flag_field(
-            default=True, description="Enable coverage analysis",
+            default=True,
+            description="Enable coverage analysis",
         )
 
     @staticmethod
@@ -307,14 +316,16 @@ class FlextQualityFields:
     def format_type_field() -> FieldInfo:
         """Report format type field."""
         return cast(
-            "FieldInfo", Field(..., description="Report format (HTML, JSON, PDF)"),
+            "FieldInfo",
+            Field(..., description="Report format (HTML, JSON, PDF)"),
         )
 
     @staticmethod
     def rule_field() -> FieldInfo:
         """Optional rule field."""
         return cast(
-            "FieldInfo", Field(None, description="Rule that triggered this issue"),
+            "FieldInfo",
+            Field(None, description="Rule that triggered this issue"),
         )
 
     @staticmethod

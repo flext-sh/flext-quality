@@ -147,7 +147,8 @@ class FlextQualityServices:
                 )
 
         async def get_issues_by_analysis(
-            self, analysis_id: str,
+            self,
+            analysis_id: str,
         ) -> FlextResult[list[FlextQualityIssue]]:
             """Get all issues for a specific analysis."""
             try:
@@ -159,14 +160,16 @@ class FlextQualityServices:
                 return FlextResult[list[FlextQualityIssue]].ok(issues)
             except Exception as e:
                 self._logger.exception(
-                    "Failed to get issues for analysis %s", analysis_id,
+                    "Failed to get issues for analysis %s",
+                    analysis_id,
                 )
                 return FlextResult[list[FlextQualityIssue]].fail(
                     f"Failed to get issues: {e}",
                 )
 
         async def get_issue(
-            self, issue_id: str,
+            self,
+            issue_id: str,
         ) -> FlextResult[FlextQualityIssue | None]:
             """Get a specific issue by ID."""
             try:
@@ -179,7 +182,9 @@ class FlextQualityServices:
                 )
 
         async def suppress_issue(
-            self, issue_id: str, reason: str,
+            self,
+            issue_id: str,
+            reason: str,
         ) -> FlextResult[FlextQualityIssue]:
             """Suppress a specific issue."""
             try:
@@ -201,7 +206,8 @@ class FlextQualityServices:
                 )
 
         async def unsuppress_issue(
-            self, issue_id: str,
+            self,
+            issue_id: str,
         ) -> FlextResult[FlextQualityIssue]:
             """Unsuppress a quality issue."""
             try:
@@ -255,7 +261,8 @@ class FlextQualityServices:
                 )
 
         async def get_analyses_by_project(
-            self, project_id: str,
+            self,
+            project_id: str,
         ) -> FlextResult[list[FlextQualityAnalysis]]:
             """Get all analyses for a project."""
             try:
@@ -309,7 +316,8 @@ class FlextQualityServices:
                 )
 
         async def get_reports_by_analysis(
-            self, analysis_id: str,
+            self,
+            analysis_id: str,
         ) -> FlextResult[list[FlextQualityReport]]:
             """Get all reports for an analysis."""
             try:

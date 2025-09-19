@@ -314,13 +314,16 @@ class FlextQualityEntities:
             return self.model_copy(update={"enabled": False})
 
         def update_severity(
-            self, severity: FlextIssueSeverity,
+            self,
+            severity: FlextIssueSeverity,
         ) -> FlextQualityEntities.QualityRule:
             """Update severity and return new instance."""
             return self.model_copy(update={"severity": severity})
 
         def set_parameter(
-            self, key: str, value: object,
+            self,
+            key: str,
+            value: object,
         ) -> FlextQualityEntities.QualityRule:
             """Set parameter and return new instance."""
             new_parameters = self.parameters.copy()
@@ -478,7 +481,9 @@ warnings.warn(
 
 QualityRule = FlextQualityRule
 warnings.warn(
-    "QualityRule is deprecated; use FlextQualityRule", DeprecationWarning, stacklevel=2,
+    "QualityRule is deprecated; use FlextQualityRule",
+    DeprecationWarning,
+    stacklevel=2,
 )
 
 QualityReport = FlextQualityReport

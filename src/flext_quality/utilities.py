@@ -13,18 +13,15 @@ from typing import TYPE_CHECKING, cast
 from flext_core import FlextContainer, FlextLogger, FlextTypes, FlextUtilities
 
 if TYPE_CHECKING:
-    from flext_quality.analysis_types import (
-        AnalysisResults,
-        ComplexityIssue,
-        DeadCodeIssue,
-        DuplicationIssue,
-        SecurityIssue,
-    )
+    from flext_quality.analysis_types import FlextQualityAnalysisTypes
 
 # Type aliases for better readability
 if TYPE_CHECKING:
     QualityIssueType = (
-        SecurityIssue | ComplexityIssue | DeadCodeIssue | DuplicationIssue
+        FlextQualityAnalysisTypes.SecurityIssue
+        | FlextQualityAnalysisTypes.ComplexityIssue
+        | FlextQualityAnalysisTypes.DeadCodeIssue
+        | FlextQualityAnalysisTypes.DuplicationIssue
     )
     QualityIssueList = list[QualityIssueType]
 else:
@@ -118,7 +115,8 @@ class FlextQualityUtilities:
 
         @staticmethod
         def safe_extend_lines(
-            target: FlextTypes.Core.StringList, source: object,
+            target: FlextTypes.Core.StringList,
+            source: object,
         ) -> None:
             """Safely extend target list with source items."""
             if isinstance(source, list):
@@ -305,14 +303,16 @@ def process_data_type_b(data):
     def create_test_file_with_issues(file_path: Path, issue_type: str) -> None:
         """Create test files with specific types of real issues."""
         return FlextQualityUtilities._TestFileGenerator.create_test_file_with_issues(
-            file_path, issue_type,
+            file_path,
+            issue_type,
         )
 
     @staticmethod
     def create_failing_file(file_path: Path, error_type: str) -> None:
         """Create files that will cause real analysis failures."""
         return FlextQualityUtilities._TestFileGenerator.create_failing_file(
-            file_path, error_type,
+            file_path,
+            error_type,
         )
 
     @staticmethod
@@ -501,7 +501,9 @@ class FlextAnalysisUtilities:
     """
 
     @staticmethod
-    def calculate_real_score(analysis_results: AnalysisResults | object) -> float:
+    def calculate_real_score(
+        analysis_results: FlextQualityAnalysisTypes.AnalysisResults | object,
+    ) -> float:
         """Calculate quality score from real analysis results."""
         # Use FlextUtilities for safe attribute access
         if not hasattr(analysis_results, "overall_metrics"):
@@ -516,7 +518,9 @@ class FlextAnalysisUtilities:
         return FlextUtilities.Conversions.safe_float(score, default=0.0)
 
     @staticmethod
-    def count_real_issues(analysis_results: AnalysisResults | object) -> int:
+    def count_real_issues(
+        analysis_results: FlextQualityAnalysisTypes.AnalysisResults | object,
+    ) -> int:
         """Count total issues from real analysis results."""
         # Use FlextUtilities for safe type conversion
         if hasattr(analysis_results, "total_issues"):

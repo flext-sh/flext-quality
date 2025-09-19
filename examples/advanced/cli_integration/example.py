@@ -23,7 +23,8 @@ from flext_quality.cli import main as quality_main
 
 
 def run_cli_analysis(
-    project_path: str, format_type: str = "json",
+    project_path: str,
+    format_type: str = "json",
 ) -> FlextTypes.Core.Dict:
     """Run FLEXT Quality CLI analysis and return parsed results.
 

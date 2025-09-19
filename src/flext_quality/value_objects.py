@@ -274,11 +274,15 @@ class DuplicationMetric(FlextModels):
     """Code duplication metrics."""
 
     duplicate_lines: int = Field(
-        default=0, ge=0, description="Number of duplicate lines",
+        default=0,
+        ge=0,
+        description="Number of duplicate lines",
     )
     total_lines: int = Field(default=0, ge=0, description="Total lines of code")
     duplicate_blocks: int = Field(
-        default=0, ge=0, description="Number of duplicate blocks",
+        default=0,
+        ge=0,
+        description="Number of duplicate blocks",
     )
 
     def validate_business_rules(self) -> FlextResult[None]:
@@ -308,7 +312,10 @@ class FilePath(FlextModels):
     """File path value object with validation."""
 
     value: str = Field(
-        ..., min_length=1, max_length=MAX_PATH_LENGTH, description="File path string",
+        ...,
+        min_length=1,
+        max_length=MAX_PATH_LENGTH,
+        description="File path string",
     )
     is_absolute: bool = Field(default=False, description="Whether path is absolute")
 
@@ -463,10 +470,14 @@ class FlextQualityValueObjects:
         line_number: int = Field(ge=1, description="Line number (1-based)")
         column_number: int = Field(ge=0, description="Column number (0-based)")
         end_line: int | None = Field(
-            default=None, ge=1, description="End line for multi-line issues",
+            default=None,
+            ge=1,
+            description="End line for multi-line issues",
         )
         end_column: int | None = Field(
-            default=None, ge=0, description="End column for multi-line issues",
+            default=None,
+            ge=0,
+            description="End column for multi-line issues",
         )
 
         def validate_business_rules(self) -> FlextResult[None]:
@@ -520,13 +531,19 @@ class FlextQualityValueObjects:
         """Coverage metric value object."""
 
         line_coverage: float = Field(
-            ge=0.0, le=100.0, description="Line coverage percentage",
+            ge=0.0,
+            le=100.0,
+            description="Line coverage percentage",
         )
         branch_coverage: float = Field(
-            ge=0.0, le=100.0, description="Branch coverage percentage",
+            ge=0.0,
+            le=100.0,
+            description="Branch coverage percentage",
         )
         function_coverage: float = Field(
-            ge=0.0, le=100.0, description="Function coverage percentage",
+            ge=0.0,
+            le=100.0,
+            description="Function coverage percentage",
         )
 
         def validate_business_rules(self) -> FlextResult[None]:
@@ -546,11 +563,14 @@ class FlextQualityValueObjects:
         """Code duplication metric value object."""
 
         percentage: float = Field(
-            ge=0.0, le=100.0, description="Duplication percentage",
+            ge=0.0,
+            le=100.0,
+            description="Duplication percentage",
         )
         lines_duplicated: int = Field(ge=0, description="Number of duplicated lines")
         files_with_duplicates: int = Field(
-            ge=0, description="Number of files with duplicates",
+            ge=0,
+            description="Number of files with duplicates",
         )
 
         def validate_business_rules(self) -> FlextResult[None]:
@@ -660,7 +680,8 @@ class FlextQualityValueObjects:
     # =============================================================================
 
     def create_quality_score(
-        self, percentage: float,
+        self,
+        percentage: float,
     ) -> FlextResult[FlextQualityValueObjects.QualityScore]:
         """Create a validated quality score."""
         try:

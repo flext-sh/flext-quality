@@ -65,7 +65,8 @@ def _display_project_overview(analyzed_files: FlextTypes.Core.StringList) -> Non
 
 
 def _display_quality_metrics(
-    analyzer: CodeAnalyzer, results: dict[str, object],
+    analyzer: CodeAnalyzer,
+    results: dict[str, object],
 ) -> None:
     """Display quality metrics and scores."""
     print_section("🎯 Quality Assessment")

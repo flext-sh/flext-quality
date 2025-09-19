@@ -70,7 +70,8 @@ class FlextQualityCliService(FlextDomainService[int]):
             self._logger = logger
 
         def analyze_project_workflow(
-            self, args: argparse.Namespace,
+            self,
+            args: argparse.Namespace,
         ) -> FlextResult[int]:
             """Execute complete project analysis workflow."""
             cli_context_result = (
@@ -222,7 +223,8 @@ class FlextQualityCliService(FlextDomainService[int]):
                 # Get dict from JSON report
                 report_dict = json.loads(report.to_json())
                 table_result = cli_api.create_table(
-                    report_dict, title="Quality Analysis",
+                    report_dict,
+                    title="Quality Analysis",
                 )
                 if table_result.is_success:
                     cli_context.print_info(str(table_result.value))
@@ -489,7 +491,10 @@ Examples:
         """,
     )
     parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose output",
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Enable verbose output",
     )
     parser.add_argument(
         "--log-level",
@@ -567,10 +572,15 @@ Examples:
     # Web command
     web_parser = subparsers.add_parser("web", help="Run web interface server")
     web_parser.add_argument(
-        "--host", default="127.0.0.1", help="Host address to bind to",
+        "--host",
+        default="127.0.0.1",
+        help="Host address to bind to",
     )
     web_parser.add_argument(
-        "--port", type=int, default=8000, help="Port number to bind to",
+        "--port",
+        type=int,
+        default=8000,
+        help="Port number to bind to",
     )
     web_parser.add_argument("--debug", action="store_true", help="Enable debug mode")
 

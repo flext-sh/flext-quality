@@ -40,7 +40,8 @@ class FlextQualityWeb:
             error_msg = "Failed to create web service"
             raise RuntimeError(error_msg)
 
-        self.web_service = web_service
+        # Type annotation and assignment combined
+        self.web_service: object = web_service
 
         # Initialize quality components
         self.quality_api = QualityAPI()
@@ -99,7 +100,7 @@ class FlextQualityWeb:
         if not hasattr(self.web_service, "app"):
             msg = "Web service does not have an 'app' attribute"
             raise AttributeError(msg)
-        app = self.web_service.app
+        app = getattr(self.web_service, "app")
 
         # Dashboard
         app.route("/quality")(self.quality_dashboard)
@@ -262,7 +263,8 @@ class FlextQualityWeb:
         if not hasattr(self.web_service, "run"):
             msg = "Web service does not have a 'run' method"
             raise AttributeError(msg)
-        self.web_service.run(host=host, port=port, debug=debug)
+        run_method = getattr(self.web_service, "run")
+        run_method(host=host, port=port, debug=debug)
 
 
 # Backward compatibility aliases for existing code

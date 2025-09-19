@@ -89,7 +89,8 @@ def safe_list_access(data: FlextTypes.Core.List, index: int) -> object:
 
 
 def assert_dict_structure(
-    data: FlextTypes.Core.Dict, required_keys: FlextTypes.Core.StringList,
+    data: FlextTypes.Core.Dict,
+    required_keys: FlextTypes.Core.StringList,
 ) -> FlextTypes.Core.Dict:
     """Assert that object is dict with required keys - DRY pattern.
 
@@ -124,7 +125,8 @@ def assert_analysis_results_structure(results: object) -> FlextTypes.Core.Dict:
     """
     assert_is_dict(results)
     return assert_dict_structure(
-        cast("FlextTypes.Core.Dict", results), ["metrics", "issues", "python_files"],
+        cast("FlextTypes.Core.Dict", results),
+        ["metrics", "issues", "python_files"],
     )
 
 
@@ -143,7 +145,8 @@ def assert_metrics_structure(metrics: object) -> FlextTypes.Core.Dict:
     """
     assert_is_dict(metrics)
     return assert_dict_structure(
-        cast("FlextTypes.Core.Dict", metrics), ["total_files", "total_lines_of_code"],
+        cast("FlextTypes.Core.Dict", metrics),
+        ["total_files", "total_lines_of_code"],
     )
 
 

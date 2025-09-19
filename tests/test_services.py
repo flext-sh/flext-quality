@@ -663,10 +663,14 @@ class TestQualityReportServiceComprehensive:
             content="<html>HTML Report</html>",
         )
         await service.create_report(
-            analysis_id=analysis_id, format_type="json", content='{"report": "1"}',
+            analysis_id=analysis_id,
+            format_type="json",
+            content='{"report": "1"}',
         )
         await service.create_report(
-            analysis_id=analysis_id, format_type="pdf", content="PDF report",
+            analysis_id=analysis_id,
+            format_type="pdf",
+            content="PDF report",
         )
 
         result = await service.list_reports(analysis_id)

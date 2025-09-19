@@ -148,7 +148,8 @@ class FlextQualityASTBackend(BaseAnalyzer):
             )
 
         def _extract_base_classes(
-            self, node: ast.ClassDef,
+            self,
+            node: ast.ClassDef,
         ) -> FlextTypes.Core.StringList:
             """Extract base class names."""
             return [self._get_name_from_node(base) for base in node.bases]
@@ -197,7 +198,8 @@ class FlextQualityASTBackend(BaseAnalyzer):
             )
 
         def _check_type_hints(
-            self, node: ast.FunctionDef | ast.AsyncFunctionDef,
+            self,
+            node: ast.FunctionDef | ast.AsyncFunctionDef,
         ) -> bool:
             """Check if function has type hints."""
             return node.returns is not None or any(
@@ -229,7 +231,8 @@ class FlextQualityASTBackend(BaseAnalyzer):
             return str(node)
 
         def _check_is_generator(
-            self, node: ast.FunctionDef | ast.AsyncFunctionDef,
+            self,
+            node: ast.FunctionDef | ast.AsyncFunctionDef,
         ) -> bool:
             """Check if function is a generator (contains yield)."""
             for child in ast.walk(node):
@@ -238,7 +241,8 @@ class FlextQualityASTBackend(BaseAnalyzer):
             return False
 
         def _check_is_property(
-            self, node: ast.FunctionDef | ast.AsyncFunctionDef,
+            self,
+            node: ast.FunctionDef | ast.AsyncFunctionDef,
         ) -> bool:
             """Check if function is a property."""
             return any(
@@ -247,7 +251,8 @@ class FlextQualityASTBackend(BaseAnalyzer):
             )
 
         def _check_is_classmethod(
-            self, node: ast.FunctionDef | ast.AsyncFunctionDef,
+            self,
+            node: ast.FunctionDef | ast.AsyncFunctionDef,
         ) -> bool:
             """Check if function is a classmethod."""
             return any(
@@ -256,7 +261,8 @@ class FlextQualityASTBackend(BaseAnalyzer):
             )
 
         def _check_is_staticmethod(
-            self, node: ast.FunctionDef | ast.AsyncFunctionDef,
+            self,
+            node: ast.FunctionDef | ast.AsyncFunctionDef,
         ) -> bool:
             """Check if function is a staticmethod."""
             return any(
@@ -265,7 +271,8 @@ class FlextQualityASTBackend(BaseAnalyzer):
             )
 
         def _get_return_annotation(
-            self, node: ast.FunctionDef | ast.AsyncFunctionDef,
+            self,
+            node: ast.FunctionDef | ast.AsyncFunctionDef,
         ) -> str | None:
             """Get return type annotation as string."""
             if node.returns:
