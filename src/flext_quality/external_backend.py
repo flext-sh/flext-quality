@@ -94,7 +94,7 @@ class FlextQualityExternalBackend(BaseAnalyzer):
         return result
 
     def _convert_result_to_typed_dicts(
-        self, result_list: FlextTypes.Core.List
+        self, result_list: FlextTypes.Core.List,
     ) -> list[FlextTypes.Core.Dict]:
         """Convert result list to properly typed dict format."""
         typed_results: list[FlextTypes.Core.Dict] = []

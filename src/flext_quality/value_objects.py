@@ -144,7 +144,7 @@ class QualityScore(FlextModels):
         """Validate business rules for quality score."""
         if not MIN_QUALITY_SCORE <= self.value <= MAX_QUALITY_SCORE:
             return FlextResult[None].fail(
-                f"Quality score must be between {MIN_QUALITY_SCORE} and {MAX_QUALITY_SCORE}"
+                f"Quality score must be between {MIN_QUALITY_SCORE} and {MAX_QUALITY_SCORE}",
             )
         return FlextResult[None].ok(None)
 
@@ -250,7 +250,7 @@ class CoverageMetric(FlextModels):
             value = getattr(self, field_name)
             if not MIN_QUALITY_SCORE <= value <= MAX_QUALITY_SCORE:
                 return FlextResult[None].fail(
-                    f"{field_name} must be between {MIN_QUALITY_SCORE} and {MAX_QUALITY_SCORE}"
+                    f"{field_name} must be between {MIN_QUALITY_SCORE} and {MAX_QUALITY_SCORE}",
                 )
         return FlextResult[None].ok(None)
 
@@ -274,11 +274,11 @@ class DuplicationMetric(FlextModels):
     """Code duplication metrics."""
 
     duplicate_lines: int = Field(
-        default=0, ge=0, description="Number of duplicate lines"
+        default=0, ge=0, description="Number of duplicate lines",
     )
     total_lines: int = Field(default=0, ge=0, description="Total lines of code")
     duplicate_blocks: int = Field(
-        default=0, ge=0, description="Number of duplicate blocks"
+        default=0, ge=0, description="Number of duplicate blocks",
     )
 
     def validate_business_rules(self) -> FlextResult[None]:
@@ -308,7 +308,7 @@ class FilePath(FlextModels):
     """File path value object with validation."""
 
     value: str = Field(
-        ..., min_length=1, max_length=MAX_PATH_LENGTH, description="File path string"
+        ..., min_length=1, max_length=MAX_PATH_LENGTH, description="File path string",
     )
     is_absolute: bool = Field(default=False, description="Whether path is absolute")
 
@@ -443,7 +443,7 @@ class FlextQualityValueObjects:
             expected_grade = self._calculate_grade_from_score(self.value)
             if self.grade != expected_grade:
                 return FlextResult[None].fail(
-                    f"Grade {self.grade} does not match score {self.value}"
+                    f"Grade {self.grade} does not match score {self.value}",
                 )
 
             return FlextResult[None].ok(None)
@@ -463,10 +463,10 @@ class FlextQualityValueObjects:
         line_number: int = Field(ge=1, description="Line number (1-based)")
         column_number: int = Field(ge=0, description="Column number (0-based)")
         end_line: int | None = Field(
-            default=None, ge=1, description="End line for multi-line issues"
+            default=None, ge=1, description="End line for multi-line issues",
         )
         end_column: int | None = Field(
-            default=None, ge=0, description="End column for multi-line issues"
+            default=None, ge=0, description="End column for multi-line issues",
         )
 
         def validate_business_rules(self) -> FlextResult[None]:
@@ -480,7 +480,7 @@ class FlextQualityValueObjects:
                 and self.end_column < self.column_number
             ):
                 return FlextResult[None].fail(
-                    "End column cannot be before start column on same line"
+                    "End column cannot be before start column on same line",
                 )
 
             return FlextResult[None].ok(None)
@@ -498,12 +498,12 @@ class FlextQualityValueObjects:
                 self.cyclomatic > CYCLOMATIC_HIGH_THRESHOLD * 5
             ):  # Reasonable upper bound
                 return FlextResult[None].fail(
-                    f"Cyclomatic complexity {self.cyclomatic} is extremely high"
+                    f"Cyclomatic complexity {self.cyclomatic} is extremely high",
                 )
 
             if self.cognitive > COGNITIVE_HIGH_THRESHOLD * 5:  # Reasonable upper bound
                 return FlextResult[None].fail(
-                    f"Cognitive complexity {self.cognitive} is extremely high"
+                    f"Cognitive complexity {self.cognitive} is extremely high",
                 )
 
             return FlextResult[None].ok(None)
@@ -520,13 +520,13 @@ class FlextQualityValueObjects:
         """Coverage metric value object."""
 
         line_coverage: float = Field(
-            ge=0.0, le=100.0, description="Line coverage percentage"
+            ge=0.0, le=100.0, description="Line coverage percentage",
         )
         branch_coverage: float = Field(
-            ge=0.0, le=100.0, description="Branch coverage percentage"
+            ge=0.0, le=100.0, description="Branch coverage percentage",
         )
         function_coverage: float = Field(
-            ge=0.0, le=100.0, description="Function coverage percentage"
+            ge=0.0, le=100.0, description="Function coverage percentage",
         )
 
         def validate_business_rules(self) -> FlextResult[None]:
@@ -546,18 +546,18 @@ class FlextQualityValueObjects:
         """Code duplication metric value object."""
 
         percentage: float = Field(
-            ge=0.0, le=100.0, description="Duplication percentage"
+            ge=0.0, le=100.0, description="Duplication percentage",
         )
         lines_duplicated: int = Field(ge=0, description="Number of duplicated lines")
         files_with_duplicates: int = Field(
-            ge=0, description="Number of files with duplicates"
+            ge=0, description="Number of files with duplicates",
         )
 
         def validate_business_rules(self) -> FlextResult[None]:
             """Validate duplication metrics."""
             if self.lines_duplicated > 0 and self.files_with_duplicates == 0:
                 return FlextResult[None].fail(
-                    "Cannot have duplicated lines without files containing duplicates"
+                    "Cannot have duplicated lines without files containing duplicates",
                 )
 
             return FlextResult[None].ok(None)
@@ -571,7 +571,7 @@ class FlextQualityValueObjects:
             """Validate file path."""
             if len(self.path) > MAX_PATH_LENGTH:
                 return FlextResult[None].fail(
-                    f"Path exceeds maximum length {MAX_PATH_LENGTH}"
+                    f"Path exceeds maximum length {MAX_PATH_LENGTH}",
                 )
 
             if not self.path.strip():
@@ -640,7 +640,7 @@ class FlextQualityValueObjects:
             """Validate quality score is in valid range."""
             if not MIN_QUALITY_SCORE <= score <= MAX_QUALITY_SCORE:
                 return FlextResult[float].fail(
-                    f"Quality score must be between {MIN_QUALITY_SCORE} and {MAX_QUALITY_SCORE}"
+                    f"Quality score must be between {MIN_QUALITY_SCORE} and {MAX_QUALITY_SCORE}",
                 )
             return FlextResult[float].ok(score)
 
@@ -660,7 +660,7 @@ class FlextQualityValueObjects:
     # =============================================================================
 
     def create_quality_score(
-        self, percentage: float
+        self, percentage: float,
     ) -> FlextResult[FlextQualityValueObjects.QualityScore]:
         """Create a validated quality score."""
         try:
@@ -668,7 +668,7 @@ class FlextQualityValueObjects:
             grade_result = self._ValidationHelper.get_grade_from_score(percentage)
             if grade_result.is_failure:
                 return FlextResult[FlextQualityValueObjects.QualityScore].fail(
-                    f"Failed to calculate grade: {grade_result.error}"
+                    f"Failed to calculate grade: {grade_result.error}",
                 )
 
             grade = grade_result.value
@@ -688,13 +688,13 @@ class FlextQualityValueObjects:
             validation_result = instance.validate_business_rules()
             if validation_result.is_failure:
                 return FlextResult[FlextQualityValueObjects.QualityScore].fail(
-                    validation_result.error or "Validation failed"
+                    validation_result.error or "Validation failed",
                 )
 
             return FlextResult[FlextQualityValueObjects.QualityScore].ok(instance)
         except Exception as e:
             return FlextResult[FlextQualityValueObjects.QualityScore].fail(
-                f"Failed to create QualityScore: {e}"
+                f"Failed to create QualityScore: {e}",
             )
 
     def validate_file_path(self, path: str | Path) -> FlextResult[Path]:

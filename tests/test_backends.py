@@ -477,7 +477,7 @@ class TestExternalBackend:
 
         # Create a real temporary file with test code
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".py", delete=False
+            encoding="utf-8", mode="w", suffix=".py", delete=False,
         ) as tmp_file:
             # Write sample code that might have ruff issues
             tmp_file.write("""# Test file for analysis
@@ -506,7 +506,7 @@ def test_function( ):
 
         # Create a real temporary file with test code
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".py", delete=False
+            encoding="utf-8", mode="w", suffix=".py", delete=False,
         ) as tmp_file:
             # Write simple valid Python code
             tmp_file.write("""def hello():

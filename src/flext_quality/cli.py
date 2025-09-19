@@ -70,17 +70,17 @@ class FlextQualityCliService(FlextDomainService[int]):
             self._logger = logger
 
         def analyze_project_workflow(
-            self, args: argparse.Namespace
+            self, args: argparse.Namespace,
         ) -> FlextResult[int]:
             """Execute complete project analysis workflow."""
             cli_context_result = (
                 FlextQualityCliService._CliContextHelper.get_cli_context(
-                    verbose=getattr(args, "verbose", False)
+                    verbose=getattr(args, "verbose", False),
                 )
             )
             if cli_context_result.is_failure:
                 return FlextResult[int].fail(
-                    cli_context_result.error or "CLI context creation failed"
+                    cli_context_result.error or "CLI context creation failed",
                 )
 
             cli_context = cli_context_result.value
@@ -121,7 +121,7 @@ class FlextQualityCliService(FlextDomainService[int]):
             output_result = self._handle_output(args, report, cli_context, cli_api)
             if output_result.is_failure:
                 cli_context.print_error(
-                    output_result.error or "Output processing failed"
+                    output_result.error or "Output processing failed",
                 )
                 return FlextResult[int].ok(1)
 
@@ -179,7 +179,7 @@ class FlextQualityCliService(FlextDomainService[int]):
 
                 if export_result and export_result.is_failure:
                     return FlextResult[None].fail(
-                        f"Failed to save report: {export_result.error}"
+                        f"Failed to save report: {export_result.error}",
                     )
                 if export_result and export_result.is_success:
                     cli_context.print_success(export_result.value)
@@ -212,7 +212,7 @@ class FlextQualityCliService(FlextDomainService[int]):
                         sys.stdout.write(format_result.value + "\\n")
                     else:
                         return FlextResult[None].fail(
-                            f"Failed to format as JSON: {format_result.error}"
+                            f"Failed to format as JSON: {format_result.error}",
                         )
                 else:
                     sys.stdout.write(report.to_json() + "\\n")
@@ -222,13 +222,13 @@ class FlextQualityCliService(FlextDomainService[int]):
                 # Get dict from JSON report
                 report_dict = json.loads(report.to_json())
                 table_result = cli_api.create_table(
-                    report_dict, title="Quality Analysis"
+                    report_dict, title="Quality Analysis",
                 )
                 if table_result.is_success:
                     cli_context.print_info(str(table_result.value))
                 else:
                     return FlextResult[None].fail(
-                        f"Failed to display table: {table_result.error}"
+                        f"Failed to display table: {table_result.error}",
                     )
             else:
                 # Fallback table display
@@ -247,12 +247,12 @@ class FlextQualityCliService(FlextDomainService[int]):
             """Execute project scoring workflow."""
             cli_context_result = (
                 FlextQualityCliService._CliContextHelper.get_cli_context(
-                    verbose=getattr(args, "verbose", False)
+                    verbose=getattr(args, "verbose", False),
                 )
             )
             if cli_context_result.is_failure:
                 return FlextResult[int].fail(
-                    cli_context_result.error or "CLI context creation failed"
+                    cli_context_result.error or "CLI context creation failed",
                 )
 
             cli_context = cli_context_result.value
@@ -287,12 +287,12 @@ class FlextQualityCliService(FlextDomainService[int]):
                     cli_context.print_info(str(table_result.value))
                 else:
                     return FlextResult[int].fail(
-                        f"Failed to display score: {table_result.error}"
+                        f"Failed to display score: {table_result.error}",
                     )
             else:
                 # Fallback display
                 cli_context.print_info(
-                    f"Quality Score: {score_value}% (Grade: {grade})"
+                    f"Quality Score: {score_value}% (Grade: {grade})",
                 )
 
             # Exit based on score
@@ -312,12 +312,12 @@ class FlextQualityCliService(FlextDomainService[int]):
             """Execute web server startup workflow."""
             cli_context_result = (
                 FlextQualityCliService._CliContextHelper.get_cli_context(
-                    verbose=getattr(args, "verbose", False)
+                    verbose=getattr(args, "verbose", False),
                 )
             )
             if cli_context_result.is_failure:
                 return FlextResult[int].fail(
-                    cli_context_result.error or "CLI context creation failed"
+                    cli_context_result.error or "CLI context creation failed",
                 )
 
             cli_context = cli_context_result.value
@@ -347,7 +347,7 @@ class FlextQualityCliService(FlextDomainService[int]):
         if scoring_result.is_failure:
             self._logger.error("Quality score calculation failed")
             return FlextResult[int].fail(
-                f"Score calculation failed: {scoring_result.error}"
+                f"Score calculation failed: {scoring_result.error}",
             )
 
         return scoring_result
@@ -382,7 +382,7 @@ def analyze_project(args: argparse.Namespace) -> int:
         logger = FlextLogger(__name__)
         logger.error("Quality analysis failed")
         cli_context_result = service._CliContextHelper.get_cli_context(
-            verbose=getattr(args, "verbose", False)
+            verbose=getattr(args, "verbose", False),
         )
         if cli_context_result.is_success:
             cli_context = cli_context_result.value
@@ -433,7 +433,7 @@ def score_project(args: argparse.Namespace) -> int:
                 cli_context.print_info(str(table_result.value))
             else:
                 cli_context.print_error(
-                    f"Failed to display score: {table_result.error}"
+                    f"Failed to display score: {table_result.error}",
                 )
         else:
             # Fallback display
@@ -489,7 +489,7 @@ Examples:
         """,
     )
     parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose output"
+        "--verbose", "-v", action="store_true", help="Enable verbose output",
     )
     parser.add_argument(
         "--log-level",
@@ -567,10 +567,10 @@ Examples:
     # Web command
     web_parser = subparsers.add_parser("web", help="Run web interface server")
     web_parser.add_argument(
-        "--host", default="127.0.0.1", help="Host address to bind to"
+        "--host", default="127.0.0.1", help="Host address to bind to",
     )
     web_parser.add_argument(
-        "--port", type=int, default=8000, help="Port number to bind to"
+        "--port", type=int, default=8000, help="Port number to bind to",
     )
     web_parser.add_argument("--debug", action="store_true", help="Enable debug mode")
 

@@ -63,7 +63,7 @@ class FlextQualityWeb:
             def safe_str(value: object, default: str) -> str:
                 return str(value) if isinstance(value, str) else default
 
-            def safe_bool(value: object, default: bool) -> bool:
+            def safe_bool(value: object, *, default: bool) -> bool:
                 return bool(value) if isinstance(value, bool) else default
 
             # Validate required config parameters explicitly
@@ -71,7 +71,7 @@ class FlextQualityWeb:
                 web_config = FlextWebConfigs.WebConfig(
                     host=safe_str(config.get("host"), "localhost"),
                     port=safe_int(config.get("port"), 8000),
-                    debug=safe_bool(config.get("debug"), False),
+                    debug=safe_bool(config.get("debug"), default=False),
                     max_workers=safe_int(config.get("max_workers"), 1),
                 )
             else:

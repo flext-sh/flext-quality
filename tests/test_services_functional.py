@@ -673,10 +673,10 @@ class TestQualityReportServiceFunctional:
             content="<html>Report 1</html>",
         )
         await service.create_report(
-            analysis_id="analysis-1", format_type="json", content='{"report": "1"}'
+            analysis_id="analysis-1", format_type="json", content='{"report": "1"}',
         )
         await service.create_report(
-            analysis_id="analysis-2", format_type="pdf", content="PDF content"
+            analysis_id="analysis-2", format_type="pdf", content="PDF content",
         )
 
         # List reports for analysis-1

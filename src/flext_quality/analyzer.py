@@ -80,7 +80,7 @@ class FlextQualityCodeAnalyzer:
             else:
                 analysis_errors += 1
                 logger.warning(
-                    "Failed to analyze file %s: %s", file_path, metrics_result.error
+                    "Failed to analyze file %s: %s", file_path, metrics_result.error,
                 )
 
         # Log analysis summary
@@ -213,14 +213,14 @@ class FlextQualityCodeAnalyzer:
         """
         if not Path(file_path).exists():
             return FlextResult[FileAnalysisResult].fail(
-                f"File does not exist: {file_path}"
+                f"File does not exist: {file_path}",
             )
 
         # Read file content with explicit error handling
         content_result = self._read_file_content(file_path)
         if content_result.is_failure:
             return FlextResult[FileAnalysisResult].fail(
-                content_result.error or "Failed to read file content"
+                content_result.error or "Failed to read file content",
             )
 
         content = content_result.value
@@ -232,7 +232,7 @@ class FlextQualityCodeAnalyzer:
                 line
                 for line in lines
                 if line.strip() and not line.strip().startswith("#")
-            ]
+            ],
         )
 
         # Parse AST with explicit error handling
@@ -297,7 +297,7 @@ class FlextQualityCodeAnalyzer:
             return FlextResult[str].fail(f"OS error reading file: {e}")
         except MemoryError:
             return FlextResult[str].fail(
-                f"File too large to read into memory: {file_path}"
+                f"File too large to read into memory: {file_path}",
             )
 
         return FlextResult[str].ok(content)

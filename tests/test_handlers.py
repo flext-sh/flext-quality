@@ -208,7 +208,7 @@ class TestRunSecurityCheckHandlerIntegration:
             "analyze_security",
         ) as mock_security:
             mock_security.return_value = FlextResult[None].fail(
-                "Security scanner failed"
+                "Security scanner failed",
             )
 
             result = await handler.analyze_project(project_id)

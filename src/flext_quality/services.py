@@ -95,7 +95,7 @@ class FlextQualityServices:
             except (RuntimeError, ValueError, TypeError) as e:
                 self._logger.exception("Failed to create project")
                 return FlextResult[FlextQualityProject].fail(
-                    f"Failed to create project: {e}"
+                    f"Failed to create project: {e}",
                 )
 
     class IssueService:
@@ -143,11 +143,11 @@ class FlextQualityServices:
             except Exception as e:
                 self._logger.exception("Failed to create issue")
                 return FlextResult[FlextQualityIssue].fail(
-                    f"Failed to create issue: {e}"
+                    f"Failed to create issue: {e}",
                 )
 
         async def get_issues_by_analysis(
-            self, analysis_id: str
+            self, analysis_id: str,
         ) -> FlextResult[list[FlextQualityIssue]]:
             """Get all issues for a specific analysis."""
             try:
@@ -159,14 +159,14 @@ class FlextQualityServices:
                 return FlextResult[list[FlextQualityIssue]].ok(issues)
             except Exception as e:
                 self._logger.exception(
-                    "Failed to get issues for analysis %s", analysis_id
+                    "Failed to get issues for analysis %s", analysis_id,
                 )
                 return FlextResult[list[FlextQualityIssue]].fail(
-                    f"Failed to get issues: {e}"
+                    f"Failed to get issues: {e}",
                 )
 
         async def get_issue(
-            self, issue_id: str
+            self, issue_id: str,
         ) -> FlextResult[FlextQualityIssue | None]:
             """Get a specific issue by ID."""
             try:
@@ -175,18 +175,18 @@ class FlextQualityServices:
             except Exception as e:
                 self._logger.exception("Failed to get issue %s", issue_id)
                 return FlextResult[FlextQualityIssue | None].fail(
-                    f"Failed to get issue: {e}"
+                    f"Failed to get issue: {e}",
                 )
 
         async def suppress_issue(
-            self, issue_id: str, reason: str
+            self, issue_id: str, reason: str,
         ) -> FlextResult[FlextQualityIssue]:
             """Suppress a specific issue."""
             try:
                 issue = self._parent._issues.get(issue_id)
                 if not issue:
                     return FlextResult[FlextQualityIssue].fail(
-                        f"Issue not found: {issue_id}"
+                        f"Issue not found: {issue_id}",
                     )
 
                 suppressed_issue = issue.suppress(reason)
@@ -197,11 +197,11 @@ class FlextQualityServices:
             except Exception as e:
                 self._logger.exception("Failed to suppress issue %s", issue_id)
                 return FlextResult[FlextQualityIssue].fail(
-                    f"Failed to suppress issue: {e}"
+                    f"Failed to suppress issue: {e}",
                 )
 
         async def unsuppress_issue(
-            self, issue_id: str
+            self, issue_id: str,
         ) -> FlextResult[FlextQualityIssue]:
             """Unsuppress a quality issue."""
             try:
@@ -211,7 +211,7 @@ class FlextQualityServices:
 
                 # Update issue to unsuppressed status using model_copy
                 updated_issue = issue.model_copy(
-                    update={"is_suppressed": False, "suppression_reason": None}
+                    update={"is_suppressed": False, "suppression_reason": None},
                 )
 
                 self._parent._issues[issue_id] = updated_issue
@@ -220,7 +220,7 @@ class FlextQualityServices:
             except (RuntimeError, ValueError, TypeError) as e:
                 self._logger.exception("Failed to unsuppress issue")
                 return FlextResult[FlextQualityIssue].fail(
-                    f"Failed to unsuppress issue: {e}"
+                    f"Failed to unsuppress issue: {e}",
                 )
 
     class AnalysisService:
@@ -251,11 +251,11 @@ class FlextQualityServices:
             except (RuntimeError, ValueError, TypeError) as e:
                 self._logger.exception("Failed to create analysis")
                 return FlextResult[FlextQualityAnalysis].fail(
-                    f"Failed to create analysis: {e}"
+                    f"Failed to create analysis: {e}",
                 )
 
         async def get_analyses_by_project(
-            self, project_id: str
+            self, project_id: str,
         ) -> FlextResult[list[FlextQualityAnalysis]]:
             """Get all analyses for a project."""
             try:
@@ -268,7 +268,7 @@ class FlextQualityServices:
             except (RuntimeError, ValueError, TypeError) as e:
                 self._logger.exception("Failed to list analyses")
                 return FlextResult[list[FlextQualityAnalysis]].fail(
-                    f"Failed to list analyses: {e}"
+                    f"Failed to list analyses: {e}",
                 )
 
     class ReportService:
@@ -305,11 +305,11 @@ class FlextQualityServices:
             except (RuntimeError, ValueError, TypeError) as e:
                 self._logger.exception("Failed to create report")
                 return FlextResult[FlextQualityReport].fail(
-                    f"Failed to create report: {e}"
+                    f"Failed to create report: {e}",
                 )
 
         async def get_reports_by_analysis(
-            self, analysis_id: str
+            self, analysis_id: str,
         ) -> FlextResult[list[FlextQualityReport]]:
             """Get all reports for an analysis."""
             try:
@@ -322,7 +322,7 @@ class FlextQualityServices:
             except (RuntimeError, ValueError, TypeError) as e:
                 self._logger.exception("Failed to list reports")
                 return FlextResult[list[FlextQualityReport]].fail(
-                    f"Failed to list reports: {e}"
+                    f"Failed to list reports: {e}",
                 )
 
         async def delete_report(self, report_id: str) -> FlextResult[bool]:
@@ -361,7 +361,7 @@ class FlextQualityServices:
             except (RuntimeError, ValueError, TypeError) as e:
                 self._logger.exception("Failed to analyze with external backend")
                 return FlextResult[FlextTypes.Core.Dict].fail(
-                    f"Failed to analyze with external backend {e}"
+                    f"Failed to analyze with external backend {e}",
                 )
 
     # =============================================================================

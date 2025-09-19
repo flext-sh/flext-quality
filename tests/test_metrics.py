@@ -110,10 +110,10 @@ class TestQualityMetrics:
             ),
             file_metrics=[
                 FileMetrics(
-                    file_path="test1.py", lines_of_code=1000, complexity_score=5.0
+                    file_path="test1.py", lines_of_code=1000, complexity_score=5.0,
                 ),
                 FileMetrics(
-                    file_path="test2.py", lines_of_code=1500, complexity_score=8.0
+                    file_path="test2.py", lines_of_code=1500, complexity_score=8.0,
                 ),
             ],
             complexity_issues=[{"type": "high_complexity"}],

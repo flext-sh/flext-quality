@@ -60,7 +60,7 @@ class QualityMetrics(FlextModels.Value):
 
     # Overall metrics
     overall_score: float = Field(
-        0.0, description="Overall quality score (0-100)", ge=0, le=100
+        0.0, description="Overall quality score (0-100)", ge=0, le=100,
     )
     quality_grade: str = Field("F", description="Quality grade letter (A+ to F)")
 
@@ -79,27 +79,27 @@ class QualityMetrics(FlextModels.Value):
     security_issues_count: int = Field(0, description="Number of security issues", ge=0)
     dead_code_items_count: int = Field(0, description="Number of dead code items", ge=0)
     duplicate_blocks_count: int = Field(
-        0, description="Number of duplicate blocks", ge=0
+        0, description="Number of duplicate blocks", ge=0,
     )
     complexity_issues_count: int = Field(
-        0, description="Number of complexity issues", ge=0
+        0, description="Number of complexity issues", ge=0,
     )
 
     # Scores by category (0-100)
     complexity_score: float = Field(
-        100.0, description="Complexity score (0-100)", ge=0, le=100
+        100.0, description="Complexity score (0-100)", ge=0, le=100,
     )
     security_score: float = Field(
-        100.0, description="Security score (0-100)", ge=0, le=100
+        100.0, description="Security score (0-100)", ge=0, le=100,
     )
     maintainability_score: float = Field(
-        100.0, description="Maintainability score (0-100)", ge=0, le=100
+        100.0, description="Maintainability score (0-100)", ge=0, le=100,
     )
     duplication_score: float = Field(
-        100.0, description="Duplication score (0-100)", ge=0, le=100
+        100.0, description="Duplication score (0-100)", ge=0, le=100,
     )
     documentation_score: float = Field(
-        100.0, description="Documentation score (0-100)", ge=0, le=100
+        100.0, description="Documentation score (0-100)", ge=0, le=100,
     )
 
     @classmethod
@@ -231,7 +231,7 @@ class QualityMetrics(FlextModels.Value):
 
     @classmethod
     def from_analysis_results(
-        cls, results: AnalysisResults | FlextTypes.Core.Dict
+        cls, results: AnalysisResults | FlextTypes.Core.Dict,
     ) -> QualityMetrics:
         """Create QualityMetrics from AnalysisResults using modern API only.
 
@@ -272,7 +272,7 @@ class QualityMetrics(FlextModels.Value):
 
     @classmethod
     def _from_analysis_results_dict(
-        cls, results: FlextTypes.Core.Dict
+        cls, results: FlextTypes.Core.Dict,
     ) -> QualityMetrics:
         """Create QualityMetrics from legacy dict format for test compatibility."""
         # Extract basic metrics from dict with proper type checking

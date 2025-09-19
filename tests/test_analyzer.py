@@ -349,7 +349,7 @@ def complex_function(x):
                 security_issues=0,
                 style_issues=0,
                 dead_code_lines=0,
-            )
+            ),
         ]
         issues = analyzer._analyze_complexity(file_metrics)
 

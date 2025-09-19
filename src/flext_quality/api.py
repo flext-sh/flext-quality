@@ -218,7 +218,7 @@ class FlextQualityAPI:
             FlextIssueType(issue_type)
         except ValueError as e:
             return FlextResult[QualityIssue].fail(
-                f"Invalid severity or issue type: {e}"
+                f"Invalid severity or issue type: {e}",
             )
 
         return FlextResult[QualityIssue].fail("create_issue not implemented")
@@ -241,7 +241,7 @@ class FlextQualityAPI:
                 FlextIssueSeverity(severity)
             except ValueError:
                 return FlextResult[list[QualityIssue]].fail(
-                    f"Invalid severity: {severity}"
+                    f"Invalid severity: {severity}",
                 )
 
         return FlextResult[list[QualityIssue]].fail("list_issues not implemented")
@@ -313,7 +313,7 @@ class FlextQualityAPI:
         project_result = await self.get_project(project_id)
         if project_result.is_failure:
             return FlextResult[QualityAnalysis].fail(
-                f"Failed to get project: {project_result.error}"
+                f"Failed to get project: {project_result.error}",
             )
 
         project = project_result.value

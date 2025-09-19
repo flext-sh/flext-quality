@@ -81,10 +81,10 @@ class FlextQualityUtilities:
             # For all other issue types - use safe string conversion
             if hasattr(issue, "file_path") and hasattr(issue, "line_number"):
                 file_path = FlextUtilities.TextProcessor.safe_string(
-                    getattr(issue, "file_path", "") or "unknown"
+                    getattr(issue, "file_path", "") or "unknown",
                 )
                 line_number = FlextUtilities.TextProcessor.safe_string(
-                    getattr(issue, "line_number", "") or "?"
+                    getattr(issue, "line_number", "") or "?",
                 )
                 return f"{file_path}:{line_number}"
 
@@ -98,16 +98,16 @@ class FlextQualityUtilities:
             """Format issue categories with proper typing."""
             return {
                 "SECURITY": FlextQualityUtilities._IssueProcessor.safe_issue_list(
-                    getattr(results, "security_issues", [])
+                    getattr(results, "security_issues", []),
                 ),
                 "COMPLEXITY": FlextQualityUtilities._IssueProcessor.safe_issue_list(
-                    getattr(results, "complexity_issues", [])
+                    getattr(results, "complexity_issues", []),
                 ),
                 "DEAD CODE": FlextQualityUtilities._IssueProcessor.safe_issue_list(
-                    getattr(results, "dead_code_issues", [])
+                    getattr(results, "dead_code_issues", []),
                 ),
                 "DUPLICATION": FlextQualityUtilities._IssueProcessor.safe_issue_list(
-                    getattr(results, "duplication_issues", [])
+                    getattr(results, "duplication_issues", []),
                 ),
             }
 
@@ -118,7 +118,7 @@ class FlextQualityUtilities:
 
         @staticmethod
         def safe_extend_lines(
-            target: FlextTypes.Core.StringList, source: object
+            target: FlextTypes.Core.StringList, source: object,
         ) -> None:
             """Safely extend target list with source items."""
             if isinstance(source, list):
@@ -305,28 +305,28 @@ def process_data_type_b(data):
     def create_test_file_with_issues(file_path: Path, issue_type: str) -> None:
         """Create test files with specific types of real issues."""
         return FlextQualityUtilities._TestFileGenerator.create_test_file_with_issues(
-            file_path, issue_type
+            file_path, issue_type,
         )
 
     @staticmethod
     def create_failing_file(file_path: Path, error_type: str) -> None:
         """Create files that will cause real analysis failures."""
         return FlextQualityUtilities._TestFileGenerator.create_failing_file(
-            file_path, error_type
+            file_path, error_type,
         )
 
     @staticmethod
     def calculate_real_score(analysis_results: object) -> float:
         """Calculate quality score from real analysis results."""
         return FlextQualityUtilities._AnalysisCalculator.calculate_real_score(
-            analysis_results
+            analysis_results,
         )
 
     @staticmethod
     def count_real_issues(analysis_results: object) -> int:
         """Count total issues from real analysis results."""
         return FlextQualityUtilities._AnalysisCalculator.count_real_issues(
-            analysis_results
+            analysis_results,
         )
 
 
@@ -342,16 +342,16 @@ class FlextReportUtilities:
         """Format issue categories with proper typing."""
         return {
             "SECURITY": FlextQualityUtilities.safe_issue_list(
-                getattr(results, "security_issues", [])
+                getattr(results, "security_issues", []),
             ),
             "COMPLEXITY": FlextQualityUtilities.safe_issue_list(
-                getattr(results, "complexity_issues", [])
+                getattr(results, "complexity_issues", []),
             ),
             "DEAD CODE": FlextQualityUtilities.safe_issue_list(
-                getattr(results, "dead_code_issues", [])
+                getattr(results, "dead_code_issues", []),
             ),
             "DUPLICATION": FlextQualityUtilities.safe_issue_list(
-                getattr(results, "duplication_issues", [])
+                getattr(results, "duplication_issues", []),
             ),
         }
 

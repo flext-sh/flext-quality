@@ -271,16 +271,16 @@ class FlextQualityReportGenerator:
         )
         issue_categories: dict[str, FlextTypes.Core.List] = {
             "security": FlextQualityUtilities.safe_issue_list(
-                self.results.security_issues
+                self.results.security_issues,
             ),
             "complexity": FlextQualityUtilities.safe_issue_list(
-                self.results.complexity_issues
+                self.results.complexity_issues,
             ),
             "dead_code": FlextQualityUtilities.safe_issue_list(
-                self.results.dead_code_issues
+                self.results.dead_code_issues,
             ),
             "duplication": FlextQualityUtilities.safe_issue_list(
-                self.results.duplication_issues
+                self.results.duplication_issues,
             ),
         }
 

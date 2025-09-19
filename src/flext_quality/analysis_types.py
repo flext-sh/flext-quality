@@ -34,10 +34,10 @@ class FlextQualityAnalysisTypes:
         file_path: Path = Field(..., description="Path to the analyzed file")
         lines_of_code: int = Field(default=0, ge=0, description="Total lines of code")
         complexity_score: float = Field(
-            default=0.0, ge=0.0, le=100.0, description="Complexity score"
+            default=0.0, ge=0.0, le=100.0, description="Complexity score",
         )
         security_issues: int = Field(
-            default=0, ge=0, description="Number of security issues"
+            default=0, ge=0, description="Number of security issues",
         )
         style_issues: int = Field(default=0, ge=0, description="Number of style issues")
         dead_code_lines: int = Field(default=0, ge=0, description="Lines of dead code")
@@ -49,14 +49,14 @@ class FlextQualityAnalysisTypes:
         function_name: str = Field(..., description="Function with complexity issue")
         line_number: int = Field(..., ge=1, description="Line number of function")
         complexity_value: int = Field(
-            ..., ge=1, description="Cyclomatic complexity value"
+            ..., ge=1, description="Cyclomatic complexity value",
         )
         message: str = Field(..., description="Human-readable issue message")
         issue_type: str = Field(
-            default="high_complexity", description="Type of complexity issue"
+            default="high_complexity", description="Type of complexity issue",
         )
         severity: IssueSeverity = Field(
-            default=IssueSeverity.MEDIUM, description="Issue severity level"
+            default=IssueSeverity.MEDIUM, description="Issue severity level",
         )
 
     class SecurityIssue(FlextModels.Value):
@@ -69,10 +69,10 @@ class FlextQualityAnalysisTypes:
         message: str = Field(..., description="Human-readable issue message")
         rule_id: str = Field(..., description="Security rule identifier")
         severity: IssueSeverity = Field(
-            default=IssueSeverity.HIGH, description="Security issue severity"
+            default=IssueSeverity.HIGH, description="Security issue severity",
         )
         confidence: str = Field(
-            default="MEDIUM", description="Confidence level of detection"
+            default="MEDIUM", description="Confidence level of detection",
         )
 
     class DeadCodeIssue(FlextModels.Value):
@@ -81,37 +81,37 @@ class FlextQualityAnalysisTypes:
         file_path: str = Field(..., description="File containing dead code")
         line_number: int = Field(..., ge=1, description="Line number of dead code")
         end_line_number: int = Field(
-            ..., ge=1, description="End line number of dead code"
+            ..., ge=1, description="End line number of dead code",
         )
         issue_type: str = Field(..., description="Type of dead code")
         code_type: str = Field(
-            ..., description="Type of code element (function, class, etc)"
+            ..., description="Type of code element (function, class, etc)",
         )
         code_snippet: str = Field(..., description="The unused code snippet")
         message: str = Field(..., description="Human-readable issue message")
         severity: IssueSeverity = Field(
-            default=IssueSeverity.LOW, description="Dead code severity"
+            default=IssueSeverity.LOW, description="Dead code severity",
         )
 
     class DuplicationIssue(FlextModels.Value):
         """Represents code duplication detected in analysis."""
 
         files: FlextTypes.Core.StringList = Field(
-            ..., description="Files containing duplicated code"
+            ..., description="Files containing duplicated code",
         )
         line_ranges: list[tuple[int, int]] = Field(
-            ..., description="Line ranges of duplicate code"
+            ..., description="Line ranges of duplicate code",
         )
         duplicate_lines: int = Field(..., ge=1, description="Number of duplicate lines")
         similarity: float = Field(
-            ..., ge=0.0, le=100.0, description="Similarity score (0.0 to 100.0)"
+            ..., ge=0.0, le=100.0, description="Similarity score (0.0 to 100.0)",
         )
         similarity_percent: float = Field(
-            ..., ge=0.0, le=100.0, description="Percentage similarity"
+            ..., ge=0.0, le=100.0, description="Percentage similarity",
         )
         message: str = Field(..., description="Human-readable duplication message")
         severity: IssueSeverity = Field(
-            default=IssueSeverity.MEDIUM, description="Duplication severity"
+            default=IssueSeverity.MEDIUM, description="Duplication severity",
         )
 
     class OverallMetrics(FlextModels.Value):
@@ -122,49 +122,49 @@ class FlextQualityAnalysisTypes:
         functions_count: int = Field(default=0, ge=0, description="Total functions")
         classes_count: int = Field(default=0, ge=0, description="Total classes")
         average_complexity: float = Field(
-            default=0.0, ge=0.0, description="Average cyclomatic complexity"
+            default=0.0, ge=0.0, description="Average cyclomatic complexity",
         )
         max_complexity: float = Field(
-            default=0.0, ge=0.0, description="Maximum complexity found"
+            default=0.0, ge=0.0, description="Maximum complexity found",
         )
         # Quality scores
         quality_score: float = Field(
-            default=0.0, ge=0.0, le=100.0, description="Overall quality score"
+            default=0.0, ge=0.0, le=100.0, description="Overall quality score",
         )
         coverage_score: float = Field(
-            default=0.0, ge=0.0, le=100.0, description="Code coverage score"
+            default=0.0, ge=0.0, le=100.0, description="Code coverage score",
         )
         security_score: float = Field(
-            default=0.0, ge=0.0, le=100.0, description="Security quality score"
+            default=0.0, ge=0.0, le=100.0, description="Security quality score",
         )
         maintainability_score: float = Field(
-            default=0.0, ge=0.0, le=100.0, description="Maintainability score"
+            default=0.0, ge=0.0, le=100.0, description="Maintainability score",
         )
         complexity_score: float = Field(
-            default=0.0, ge=0.0, le=100.0, description="Complexity score"
+            default=0.0, ge=0.0, le=100.0, description="Complexity score",
         )
 
     class AnalysisResults(BaseModel):
         """Complete analysis results containing all metrics and issues."""
 
-        overall_metrics: "FlextQualityAnalysisTypes.OverallMetrics" = Field(
-            default_factory=lambda: FlextQualityAnalysisTypes.OverallMetrics(),
+        overall_metrics: OverallMetrics = Field(
+            default_factory=OverallMetrics,
             description="Overall analysis metrics",
         )
-        file_metrics: list[FlextQualityAnalysisTypes.FileAnalysisResult] = Field(
-            default_factory=list, description="Per-file analysis results"
+        file_metrics: list[FileAnalysisResult] = Field(
+            default_factory=list, description="Per-file analysis results",
         )
-        complexity_issues: list[FlextQualityAnalysisTypes.ComplexityIssue] = Field(
-            default_factory=list, description="Complexity issues found"
+        complexity_issues: list[ComplexityIssue] = Field(
+            default_factory=list, description="Complexity issues found",
         )
-        security_issues: list[FlextQualityAnalysisTypes.SecurityIssue] = Field(
-            default_factory=list, description="Security issues found"
+        security_issues: list[SecurityIssue] = Field(
+            default_factory=list, description="Security issues found",
         )
-        dead_code_issues: list[FlextQualityAnalysisTypes.DeadCodeIssue] = Field(
-            default_factory=list, description="Dead code issues found"
+        dead_code_issues: list[DeadCodeIssue] = Field(
+            default_factory=list, description="Dead code issues found",
         )
-        duplication_issues: list[FlextQualityAnalysisTypes.DuplicationIssue] = Field(
-            default_factory=list, description="Code duplication issues found"
+        duplication_issues: list[DuplicationIssue] = Field(
+            default_factory=list, description="Code duplication issues found",
         )
 
         @property
@@ -191,13 +191,6 @@ class FlextQualityAnalysisTypes:
 
 
 # Backward compatibility aliases for existing code
-FileAnalysisResult = FlextQualityAnalysisTypes.FileAnalysisResult
-ComplexityIssue = FlextQualityAnalysisTypes.ComplexityIssue
-SecurityIssue = FlextQualityAnalysisTypes.SecurityIssue
-DeadCodeIssue = FlextQualityAnalysisTypes.DeadCodeIssue
-DuplicationIssue = FlextQualityAnalysisTypes.DuplicationIssue
-OverallMetrics = FlextQualityAnalysisTypes.OverallMetrics
-AnalysisResults = FlextQualityAnalysisTypes.AnalysisResults
 
 # Export all classes
 __all__ = [

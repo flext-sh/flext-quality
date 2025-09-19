@@ -35,14 +35,14 @@ class FlextQualityModels:
         """Pydantic model for quality project representation."""
 
         id: UUID = Field(..., description="Unique project identifier")
-        name: str = Field(..., min_length=1, max_length=255, description="Project name")
+        name: str = Field(default="", min_length=1, max_length=255, description="Project name")
         path: str = Field(..., description="Project path for analysis")
         description: str | None = Field(None, description="Project description")
         created_at: datetime = Field(
-            default_factory=datetime.now, description="Creation timestamp"
+            default_factory=datetime.now, description="Creation timestamp",
         )
         updated_at: datetime = Field(
-            default_factory=datetime.now, description="Last update timestamp"
+            default_factory=datetime.now, description="Last update timestamp",
         )
 
         @field_validator("name")
@@ -61,28 +61,28 @@ class FlextQualityModels:
         project_id: UUID = Field(..., description="Associated project identifier")
         status: str = Field(..., description="Analysis status")
         overall_score: float = Field(
-            0.0, ge=0.0, le=100.0, description="Overall quality score"
+            0.0, ge=0.0, le=100.0, description="Overall quality score",
         )
         coverage_score: float = Field(
-            0.0, ge=0.0, le=100.0, description="Test coverage score"
+            0.0, ge=0.0, le=100.0, description="Test coverage score",
         )
         security_score: float = Field(
-            0.0, ge=0.0, le=100.0, description="Security analysis score"
+            0.0, ge=0.0, le=100.0, description="Security analysis score",
         )
         maintainability_score: float = Field(
-            0.0, ge=0.0, le=100.0, description="Maintainability score"
+            0.0, ge=0.0, le=100.0, description="Maintainability score",
         )
         complexity_score: float = Field(
-            0.0, ge=0.0, le=100.0, description="Complexity score"
+            0.0, ge=0.0, le=100.0, description="Complexity score",
         )
         started_at: datetime = Field(
-            default_factory=datetime.now, description="Analysis start time"
+            default_factory=datetime.now, description="Analysis start time",
         )
         completed_at: datetime | None = Field(
-            None, description="Analysis completion time"
+            None, description="Analysis completion time",
         )
         error_message: str | None = Field(
-            None, description="Error message if analysis failed"
+            None, description="Error message if analysis failed",
         )
 
         @field_validator(
@@ -105,7 +105,7 @@ class FlextQualityModels:
         file_path: str = Field(..., description="File path where issue was found")
         line_number: int = Field(..., ge=1, description="Line number of the issue")
         column_number: int | None = Field(
-            None, ge=1, description="Column number of the issue"
+            None, ge=1, description="Column number of the issue",
         )
         severity: str = Field(..., description="Issue severity level")
         issue_type: str = Field(..., description="Type of quality issue")
@@ -131,29 +131,29 @@ class FlextQualityModels:
         content: str = Field(..., description="Report content")
         file_path: str | None = Field(None, description="Path to saved report file")
         generated_at: datetime = Field(
-            default_factory=datetime.now, description="Report generation time"
+            default_factory=datetime.now, description="Report generation time",
         )
         metadata: FlextTypes.Core.Dict = Field(
-            default_factory=dict, description="Additional report metadata"
+            default_factory=dict, description="Additional report metadata",
         )
 
     class ConfigModel(FlextModels.Config):
         """Pydantic model for analysis configuration."""
 
         include_patterns: FlextTypes.Core.StringList = Field(
-            default_factory=list, description="File patterns to include"
+            default_factory=list, description="File patterns to include",
         )
         exclude_patterns: FlextTypes.Core.StringList = Field(
-            default_factory=list, description="File patterns to exclude"
+            default_factory=list, description="File patterns to exclude",
         )
         enable_security: bool = Field(
-            default=True, description="Enable security analysis"
+            default=True, description="Enable security analysis",
         )
         enable_complexity: bool = Field(
-            default=True, description="Enable complexity analysis"
+            default=True, description="Enable complexity analysis",
         )
         enable_coverage: bool = Field(
-            default=True, description="Enable coverage analysis"
+            default=True, description="Enable coverage analysis",
         )
         max_complexity: int = Field(
             FlextQualityConstants.Complexity.MAX_COMPLEXITY,

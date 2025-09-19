@@ -19,7 +19,7 @@ class FlextQualityAnalyzer(ABC):
 
     @abstractmethod
     def analyze(
-        self, _code: str, file_path: Path | None = None
+        self, _code: str, file_path: Path | None = None,
     ) -> FlextTypes.Core.Dict:
         """Analyze code and return results.
 
