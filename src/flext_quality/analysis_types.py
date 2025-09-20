@@ -191,7 +191,7 @@ class FlextQualityAnalysisTypes:
         """Complete analysis results containing all metrics and issues."""
 
         overall_metrics: FlextQualityAnalysisTypes.OverallMetrics = Field(
-            default_factory=lambda: FlextQualityAnalysisTypes.OverallMetrics(),
+            default_factory=FlextQualityAnalysisTypes.OverallMetrics,
             description="Overall analysis metrics",
         )
         file_metrics: list[FlextQualityAnalysisTypes.FileAnalysisResult] = Field(
