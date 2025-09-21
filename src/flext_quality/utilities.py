@@ -255,17 +255,25 @@ def process_data_type_b(data):
             if metrics is None:
                 return 0.0
 
-            # Use safe float conversion from FlextUtilities
+            # Use safe float conversion
             score = getattr(metrics, "quality_score", 0.0)
-            return FlextUtilities.Conversions.safe_float(score, default=0.0)
+            try:
+                return float(score) if score is not None else 0.0
+            except (ValueError, TypeError):
+                return 0.0
 
         @staticmethod
         def count_real_issues(analysis_results: object) -> int:
             """Count total issues from real analysis results."""
-            # Use FlextUtilities for safe type conversion
+            # Use safe int conversion
             if hasattr(analysis_results, "total_issues"):
                 total_issues_attr = getattr(analysis_results, "total_issues", 0)
-                return FlextUtilities.Conversions.safe_int(total_issues_attr, default=0)
+                try:
+                    return (
+                        int(total_issues_attr) if total_issues_attr is not None else 0
+                    )
+                except (ValueError, TypeError):
+                    return 0
             return 0
 
     # Backward compatibility methods - delegate to nested classes
@@ -513,19 +521,25 @@ class FlextAnalysisUtilities:
         if metrics is None:
             return 0.0
 
-        # Use safe float conversion from FlextUtilities
+        # Use safe float conversion
         score = getattr(metrics, "quality_score", 0.0)
-        return FlextUtilities.Conversions.safe_float(score, default=0.0)
+        try:
+            return float(score) if score is not None else 0.0
+        except (ValueError, TypeError):
+            return 0.0
 
     @staticmethod
     def count_real_issues(
         analysis_results: FlextQualityAnalysisTypes.AnalysisResults | object,
     ) -> int:
         """Count total issues from real analysis results."""
-        # Use FlextUtilities for safe type conversion
+        # Use safe int conversion
         if hasattr(analysis_results, "total_issues"):
             total_issues_attr = getattr(analysis_results, "total_issues", 0)
-            return FlextUtilities.Conversions.safe_int(total_issues_attr, default=0)
+            try:
+                return int(total_issues_attr) if total_issues_attr is not None else 0
+            except (ValueError, TypeError):
+                return 0
         return 0
 
 

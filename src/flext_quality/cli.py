@@ -183,7 +183,8 @@ class FlextQualityCliService(FlextDomainService[int]):
                         f"Failed to save report: {export_result.error}",
                     )
                 if export_result and export_result.is_success:
-                    cli_context.print_success(export_result.value)
+                    success_msg = export_result.value or "Report saved successfully"
+                    cli_context.print_success(success_msg)
             else:
                 # Fallback without FlextCli
                 if args.format == "json":
