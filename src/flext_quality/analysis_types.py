@@ -5,6 +5,7 @@ SPDX-License-Identifier: MIT.
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from pathlib import Path
 
 from pydantic import BaseModel, Field
@@ -198,44 +199,26 @@ class FlextQualityAnalysisTypes:
             default_factory=list,
             description="Per-file analysis results",
         )
-        complexity_issues: list[FlextQualityAnalysisTypes.ComplexityIssue] = Field(
+        code_issues: list[FlextQualityAnalysisTypes.CodeIssue] = Field(
             default_factory=list,
-            description="Complexity issues found",
+            description="Code quality issues found",
         )
-        security_issues: list[FlextQualityAnalysisTypes.SecurityIssue] = Field(
+        dependencies: list[FlextQualityAnalysisTypes.Dependency] = Field(
             default_factory=list,
-            description="Security issues found",
+            description="Project dependencies analysis",
         )
-        dead_code_issues: list[FlextQualityAnalysisTypes.DeadCodeIssue] = Field(
-            default_factory=list,
-            description="Dead code issues found",
+        test_results: FlextQualityAnalysisTypes.TestResults | None = Field(
+            default=None,
+            description="Test results if available",
         )
-        duplication_issues: list[FlextQualityAnalysisTypes.DuplicationIssue] = Field(
-            default_factory=list,
-            description="Code duplication issues found",
+        analysis_config: dict[str, object] = Field(
+            default_factory=dict,
+            description="Configuration used for analysis",
         )
-
-        @property
-        def total_issues(self) -> int:
-            """Calculate total number of issues across all categories."""
-            return (
-                len(self.complexity_issues)
-                + len(self.security_issues)
-                + len(self.dead_code_issues)
-                + len(self.duplication_issues)
-            )
-
-        @property
-        def critical_issues(self) -> int:
-            """Calculate number of critical issues."""
-            critical_count = 0
-            for sec_issue in self.security_issues:
-                if sec_issue.severity == IssueSeverity.HIGH:
-                    critical_count += 1
-            for comp_issue in self.complexity_issues:
-                if comp_issue.severity == IssueSeverity.HIGH:
-                    critical_count += 1
-            return critical_count
+        analysis_timestamp: str = Field(
+            default_factory=lambda: datetime.now(UTC).isoformat(),
+            description="When analysis was performed",
+        )
 
 
 # Backward compatibility aliases for existing code

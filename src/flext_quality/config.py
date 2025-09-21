@@ -10,7 +10,7 @@ import warnings
 
 from pydantic_settings import SettingsConfigDict
 
-from flext_core import FlextModels
+from flext_core import FlextConstants, FlextModels
 
 
 class FlextQualityConfig(FlextModels.Config):
@@ -23,9 +23,9 @@ class FlextQualityConfig(FlextModels.Config):
     min_security_score: float = 90.0
     min_maintainability: float = 80.0
 
-    # Service settings
-    analysis_timeout: int = 300
-    parallel_workers: int = 4
+    # Service settings - using FlextConstants as SOURCE OF TRUTH
+    analysis_timeout: int = FlextConstants.Defaults.TIMEOUT * 10  # 300 seconds
+    parallel_workers: int = FlextConstants.Container.MAX_WORKERS  # 4 workers
 
     model_config = SettingsConfigDict(env_prefix="QUALITY_")
 
