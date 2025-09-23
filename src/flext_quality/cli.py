@@ -21,9 +21,9 @@ from flext_cli import (
 # Console import removed - using flext-cli exclusively
 from flext_core import (
     FlextContainer,
-    FlextDomainService,
     FlextLogger,
     FlextResult,
+    FlextService,
 )
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.reports import QualityReport
@@ -36,7 +36,7 @@ MIN_ACCEPTABLE_QUALITY_SCORE = 70
 FLEXT_CLI_AVAILABLE = True
 
 
-class FlextQualityCliService(FlextDomainService[int]):
+class FlextQualityCliService(FlextService[int]):
     """Unified FLEXT Quality CLI service following enterprise patterns.
 
     Single responsibility class that handles all CLI operations with
