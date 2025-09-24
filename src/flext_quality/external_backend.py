@@ -8,14 +8,14 @@ from __future__ import annotations
 
 import json
 import shutil
-import subprocess
+import subprocess  # noqa: S404  # Standard library module for process execution - validated tools only
 import tempfile
 import warnings
 from importlib import import_module, util
 from pathlib import Path
 from typing import override
 
-from flext_core import FlextTypes
+from flext_core import FlextResult, FlextTypes
 from flext_quality.backend_type import BackendType
 from flext_quality.base import BaseAnalyzer
 
@@ -24,12 +24,12 @@ class FlextQualityExternalBackend(BaseAnalyzer):
     """Backend using external tools like ruff, mypy, bandit, vulture."""
 
     @override
-    def get_backend_type(self) -> BackendType:
+    def get_backend_type(self: object) -> BackendType:
         """Return the backend type."""
         return BackendType.EXTERNAL
 
     @override
-    def get_capabilities(self) -> FlextTypes.Core.StringList:
+    def get_capabilities(self: object) -> FlextTypes.Core.StringList:
         """Return the capabilities of this backend."""
         return ["ruff", "mypy", "bandit", "vulture"]
 
@@ -129,7 +129,8 @@ class FlextQualityExternalBackend(BaseAnalyzer):
                     "ruff_available": False,
                 }  # Return empty dict if ruff is not available
 
-            result = subprocess.run(  # nosec B603 # Validated ruff execution with timeout
+            # Execute ruff with validated path and arguments only
+            result = subprocess.run(  # noqa: S603 # Validated ruff execution with timeout
                 [ruff_path, "check", str(abs_file_path), "--output-format", "json"],
                 capture_output=True,
                 text=True,
@@ -138,7 +139,9 @@ class FlextQualityExternalBackend(BaseAnalyzer):
             )
 
             # Parse output even if ruff found issues (non-zero exit is expected)
-            issues = self._parse_ruff_output(result.stdout) if result.stdout else []
+            issues: list[object] = (
+                self._parse_ruff_output(result.stdout) if result.stdout else []
+            )
 
             return {"issues": issues, "code_length": len(code)}
 
@@ -218,7 +221,7 @@ class FlextQualityExternalBackend(BaseAnalyzer):
         """Parse ruff JSON output."""
         try:
             if output.strip():
-                result = json.loads(output)
+                result: FlextResult[object] = json.loads(output)
                 # Safe type conversion
                 if isinstance(result, list):
                     return self._convert_result_to_typed_dicts(result)
@@ -245,7 +248,7 @@ class ExternalBackend(FlextQualityExternalBackend):
     This facade provides compatibility during migration.
     """
 
-    def __init__(self) -> None:
+    def __init__(self: object) -> None:
         """Initialize the instance."""
         warnings.warn(
             "ExternalBackend is deprecated; use FlextQualityExternalBackend",

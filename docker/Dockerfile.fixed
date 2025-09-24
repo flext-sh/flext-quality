@@ -41,7 +41,6 @@ mock_dir.mkdir(exist_ok=True)
 
 with open(mock_dir / '__init__.py', 'w') as f:
     f.write('''# Complete Mock flext_core for FLEXT Quality - ALL IMPORTS
-import logging
 from typing import Dict, Optional, Union
 
 from pydantic import BaseModel

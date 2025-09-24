@@ -27,7 +27,7 @@ class FlextQualityConfig(FlextConfig):
     analysis_timeout: int = FlextConstants.Defaults.TIMEOUT * 10  # 300 seconds
     parallel_workers: int = FlextConstants.Container.MAX_WORKERS  # 4 workers
 
-    model_config = SettingsConfigDict(env_prefix="QUALITY_")
+    model_config: dict[str, object] = SettingsConfigDict(env_prefix="QUALITY_")
 
 
 # Legacy compatibility facade - DEPRECATED

@@ -51,7 +51,7 @@ class FlextQualityReportGenerator:
         # Store analysis results directly
         self.results: FlextQualityAnalysisTypes.AnalysisResults = analysis_results
 
-    def generate_text_report(self) -> str:
+    def generate_text_report(self: object) -> str:
         """Generate a text-based quality report."""
         grade = self._get_quality_grade()
         score = self._get_quality_score()
@@ -106,7 +106,7 @@ class FlextQualityReportGenerator:
 
         return "\n".join(report_lines)
 
-    def generate_json_report(self) -> str:
+    def generate_json_report(self: object) -> str:
         """Generate a JSON-formatted quality report."""
         report_data: FlextTypes.Core.Dict = {
             "summary": {
@@ -123,15 +123,15 @@ class FlextQualityReportGenerator:
 
         return json.dumps(report_data, indent=2, default=str)
 
-    def to_json(self) -> str:
+    def to_json(self: object) -> str:
         """Alias for generate_json_report for compatibility."""
         return self.generate_json_report()
 
-    def to_html(self) -> str:
+    def to_html(self: object) -> str:
         """Alias for generate_html_report for compatibility."""
         return self.generate_html_report()
 
-    def generate_html_report(self) -> str:
+    def generate_html_report(self: object) -> str:
         """Generate an HTML-formatted quality report."""
         grade_color = self._get_grade_color()
         quality_grade = self._get_quality_grade()
@@ -216,13 +216,13 @@ class FlextQualityReportGenerator:
 
         output_path.write_text(content, encoding="utf-8")
 
-    def _get_quality_grade(self) -> str:
+    def _get_quality_grade(self: object) -> str:
         """Calculate quality grade - DRY refactored."""
         score = self._get_quality_score()
         grade = FlextQualityGradeCalculator.calculate_grade(float(score))
         return grade.value
 
-    def _get_quality_score(self) -> int:
+    def _get_quality_score(self: object) -> int:
         """Calculate overall quality score."""
         total_issues = self._get_total_issues()
         critical_issues = self._get_critical_issues()
@@ -234,7 +234,7 @@ class FlextQualityReportGenerator:
 
         return max(0, score)
 
-    def _get_grade_color(self) -> str:
+    def _get_grade_color(self: object) -> str:
         """Get color for the grade."""
         grade = self._get_quality_grade()
         colors = {
@@ -246,25 +246,25 @@ class FlextQualityReportGenerator:
         }
         return colors.get(grade, "#757575")
 
-    def _get_total_issues(self) -> int:
+    def _get_total_issues(self: object) -> int:
         """Get total number of issues."""
         # Use modern FlextQualityAnalysisTypes.AnalysisResults API only
         return self.results.total_issues
 
-    def _get_critical_issues(self) -> int:
+    def _get_critical_issues(self: object) -> int:
         """Get number of critical issues."""
         # Use modern FlextQualityAnalysisTypes.AnalysisResults API only
         return self.results.critical_issues
 
-    def _get_files_analyzed(self) -> int:
+    def _get_files_analyzed(self: object) -> int:
         """Get number of files analyzed."""
         return self.results.overall_metrics.files_analyzed
 
-    def _get_coverage_percent(self) -> float:
+    def _get_coverage_percent(self: object) -> float:
         """Get code coverage percentage."""
         return self.results.overall_metrics.coverage_score
 
-    def _generate_issues_html(self) -> str:
+    def _generate_issues_html(self: object) -> str:
         """Generate HTML for issues section."""
         html_parts: FlextTypes.Core.StringList = (
             FlextReportUtilities.create_report_lines()
@@ -328,7 +328,7 @@ class FlextQualityReportGenerator:
 
         return "\n".join(html_parts)
 
-    def _generate_recommendations(self) -> FlextTypes.Core.StringList:
+    def _generate_recommendations(self: object) -> FlextTypes.Core.StringList:
         """Generate recommendations based on analysis results."""
         recommendations: FlextTypes.Core.StringList = (
             FlextReportUtilities.create_report_lines()

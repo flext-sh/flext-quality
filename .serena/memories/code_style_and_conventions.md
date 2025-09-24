@@ -28,7 +28,7 @@
 ```python
 # ✅ CORRECT
 from flext_core import FlextResult, FlextLogger, FlextContainer
-from flext_cli import FlextCliApi, FlextCliMain  # CLI projects only
+from flext_cli import FlextCliApi, FlextCliCommands  # CLI projects only
 
 # ❌ FORBIDDEN
 from flext_core.result import FlextResult  # Internal imports

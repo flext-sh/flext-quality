@@ -126,7 +126,7 @@ class QualityMetrics(FlextModels.Value):
     )
 
     @classmethod
-    def create_default(cls) -> QualityMetrics:
+    def create_default(cls: object) -> QualityMetrics:
         """Create QualityMetrics with all default values explicitly set.
 
         This factory method ensures all fields are explicitly provided to avoid
@@ -314,7 +314,7 @@ class QualityMetrics(FlextModels.Value):
                 return int(value)
             return default
 
-        metrics = results.get("metrics", {})
+        metrics: dict[str, object] = results.get("metrics", {})
         if isinstance(metrics, dict):
             files_analyzed = get_int_from_dict(metrics, "total_files", 0)
             total_lines_of_code = get_int_from_dict(metrics, "total_lines_of_code", 0)
@@ -328,12 +328,12 @@ class QualityMetrics(FlextModels.Value):
             total_classes = get_int_from_dict(results, "total_classes", 0)
 
         # Extract issue counts from nested dict structure
-        issues = results.get("issues", {})
+        issues: dict[str, object] = results.get("issues", {})
         if isinstance(issues, dict):
-            security_issues = len(issues.get("security", []))
-            complexity_issues = len(issues.get("complexity", []))
-            dead_code_issues = len(issues.get("dead_code", []))
-            duplication_issues = len(issues.get("duplicates", []))
+            security_issues: list[object] = len(issues.get("security", []))
+            complexity_issues: list[object] = len(issues.get("complexity", []))
+            dead_code_issues: list[object] = len(issues.get("dead_code", []))
+            duplication_issues: list[object] = len(issues.get("duplicates", []))
         else:
             security_issues = complexity_issues = dead_code_issues = (
                 duplication_issues
@@ -485,7 +485,7 @@ class QualityMetrics(FlextModels.Value):
         )
 
     @property
-    def scores_summary(self) -> dict[str, float]:
+    def scores_summary(self: object) -> dict[str, float]:
         """Get comprehensive summary of quality scores by category.
 
         Provides a structured view of all quality category scores for
@@ -513,7 +513,7 @@ class QualityMetrics(FlextModels.Value):
         }
 
     @property
-    def total_issues(self) -> int:
+    def total_issues(self: object) -> int:
         """Calculate total count of all detected quality issues.
 
         Aggregates issue counts across all analysis categories to provide
@@ -582,7 +582,7 @@ class QualityMetrics(FlextModels.Value):
         _ = (by_alias, exclude_none)
         return base
 
-    def get_summary(self) -> str:
+    def get_summary(self: object) -> str:
         """Generate human-readable quality metrics summary.
 
         Creates a formatted text summary of key quality metrics suitable
@@ -614,7 +614,7 @@ class QualityMetrics(FlextModels.Value):
     # Architecture Note: Grade calculation centralized in QualityGradeCalculator
     # for consistency across FLEXT ecosystem quality services
 
-    def validate_business_rules(self) -> FlextResult[None]:
+    def validate_business_rules(self: object) -> FlextResult[None]:
         """Validate quality metrics against domain business rules.
 
         Performs comprehensive validation of all metric values against

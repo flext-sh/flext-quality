@@ -64,7 +64,7 @@ class FlextQualityCodeAnalyzer:
         analysis_errors = 0
 
         for file_path in python_files:
-            metrics_result = self._analyze_file(file_path)
+            metrics_result: FlextResult[object] = self._analyze_file(file_path)
             if metrics_result.is_success:
                 metrics = metrics_result.value
                 file_metrics.append(metrics)
@@ -99,9 +99,15 @@ class FlextQualityCodeAnalyzer:
         complexity_issues = (
             self._analyze_complexity(file_metrics) if include_complexity else []
         )
-        security_issues = self._analyze_security() if include_security else []
-        dead_code_issues = self._analyze_dead_code() if include_dead_code else []
-        duplication_issues = self._analyze_duplicates() if include_duplicates else []
+        security_issues: list[object] = (
+            self._analyze_security() if include_security else []
+        )
+        dead_code_issues: list[object] = (
+            self._analyze_dead_code() if include_dead_code else []
+        )
+        duplication_issues: list[object] = (
+            self._analyze_duplicates() if include_duplicates else []
+        )
 
         # Create final results
         results = FlextQualityAnalysisTypes.AnalysisResults(
@@ -131,7 +137,7 @@ class FlextQualityCodeAnalyzer:
 
         return results
 
-    def get_quality_score(self) -> float:
+    def get_quality_score(self: object) -> float:
         """Calculate overall quality score based on analysis results.
 
         Returns:
@@ -164,7 +170,7 @@ class FlextQualityCodeAnalyzer:
 
         return max(0.0, score)
 
-    def get_quality_grade(self) -> str:
+    def get_quality_grade(self: object) -> str:
         """Get letter grade based on quality score - DRY refactored.
 
         Returns:
@@ -175,7 +181,7 @@ class FlextQualityCodeAnalyzer:
         grade = FlextQualityGradeCalculator.calculate_grade(score)
         return str(grade.value)
 
-    def _find_python_files(self) -> list[Path]:
+    def _find_python_files(self: object) -> list[Path]:
         if not self.project_path.exists():
             logger.warning("Project path does not exist: %s", self.project_path)
             return []
@@ -213,7 +219,7 @@ class FlextQualityCodeAnalyzer:
             )
 
         # Read file content with explicit error handling
-        content_result = self._read_file_content(file_path)
+        content_result: FlextResult[object] = self._read_file_content(file_path)
         if content_result.is_failure:
             return FlextResult[FlextQualityAnalysisTypes.FileAnalysisResult].fail(
                 content_result.error or "Failed to read file content",
@@ -232,7 +238,7 @@ class FlextQualityCodeAnalyzer:
         )
 
         # Parse AST with explicit error handling
-        ast_result = self._parse_ast_content(content)
+        ast_result: FlextResult[object] = self._parse_ast_content(content)
         if ast_result.is_failure:
             # Handle syntax errors explicitly - still return valid result with limited data
             logger.warning("Syntax error in %s: %s", file_path, ast_result.error)
@@ -399,7 +405,9 @@ class FlextQualityCodeAnalyzer:
             "avg_lines_per_file": total_loc / total_files if total_files > 0 else 0,
         }
 
-    def _analyze_security(self) -> list[FlextQualityAnalysisTypes.SecurityIssue]:
+    def _analyze_security(
+        self: object,
+    ) -> list[FlextQualityAnalysisTypes.SecurityIssue]:
         issues: list[FlextQualityAnalysisTypes.SecurityIssue] = []
         for py_file in self.project_path.rglob("*.py"):
             try:
@@ -482,7 +490,9 @@ class FlextQualityCodeAnalyzer:
                 )
         return complex_issues
 
-    def _analyze_dead_code(self) -> list[FlextQualityAnalysisTypes.DeadCodeIssue]:
+    def _analyze_dead_code(
+        self: object,
+    ) -> list[FlextQualityAnalysisTypes.DeadCodeIssue]:
         # This is a placeholder - real implementation would use vulture or similar
         issues: list[FlextQualityAnalysisTypes.DeadCodeIssue] = []
         for py_file in self.project_path.rglob("*.py"):
@@ -512,7 +522,9 @@ class FlextQualityCodeAnalyzer:
 
         return issues
 
-    def _analyze_duplicates(self) -> list[FlextQualityAnalysisTypes.DuplicationIssue]:
+    def _analyze_duplicates(
+        self: object,
+    ) -> list[FlextQualityAnalysisTypes.DuplicationIssue]:
         issues: list[FlextQualityAnalysisTypes.DuplicationIssue] = []
 
         file_contents: dict[Path, str] = {}

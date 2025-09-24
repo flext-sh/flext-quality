@@ -10,7 +10,12 @@ from pathlib import Path
 
 from pydantic import Field
 
-from flext_core import FlextContainer, FlextLogger, FlextModels, FlextResult
+from flext_core import (
+    FlextContainer,
+    FlextLogger,
+    FlextModels,
+    FlextResult,
+)
 
 # Quality Score Constants
 MIN_QUALITY_SCORE = 0.0
@@ -140,7 +145,7 @@ class QualityScore(FlextModels):
         description="Quality score percentage",
     )
 
-    def validate_business_rules(self) -> FlextResult[None]:
+    def validate_business_rules(self: object) -> FlextResult[None]:
         """Validate business rules for quality score."""
         if not MIN_QUALITY_SCORE <= self.value <= MAX_QUALITY_SCORE:
             return FlextResult[None].fail(
@@ -149,12 +154,12 @@ class QualityScore(FlextModels):
         return FlextResult[None].ok(None)
 
     @property
-    def percentage(self) -> str:
+    def percentage(self: object) -> str:
         """Format score as percentage string."""
         return f"{self.value:.1f}%"
 
     @property
-    def grade(self) -> QualityGrade:
+    def grade(self: object) -> QualityGrade:
         """Calculate quality grade from score using efficient lookup."""
         for threshold, grade in GRADE_THRESHOLDS:
             if self.value >= threshold:
@@ -170,14 +175,14 @@ class IssueLocation(FlextModels):
     end_line: int | None = Field(default=None, ge=1, description="End line number")
     end_column: int | None = Field(default=None, ge=1, description="End column number")
 
-    def validate_business_rules(self) -> FlextResult[None]:
+    def validate_business_rules(self: object) -> FlextResult[None]:
         """Validate issue location business rules."""
         if self.end_line is not None and self.end_line < self.line:
             return FlextResult[None].fail("End line must be >= start line")
         return FlextResult[None].ok(None)
 
     @property
-    def range_text(self) -> str:
+    def range_text(self: object) -> str:
         """Human-readable range description."""
         if self.end_line is None:
             return f"line {self.line}, column {self.column}"
@@ -195,14 +200,14 @@ class ComplexityMetric(FlextModels):
     cognitive: int = Field(default=0, ge=0, description="Cognitive complexity")
     max_depth: int = Field(default=0, ge=0, description="Maximum nesting depth")
 
-    def validate_business_rules(self) -> FlextResult[None]:
+    def validate_business_rules(self: object) -> FlextResult[None]:
         """Validate complexity metrics business rules."""
         if self.cyclomatic < 1:
             return FlextResult[None].fail("Cyclomatic complexity must be >= 1")
         return FlextResult[None].ok(None)
 
     @property
-    def is_complex(self) -> bool:
+    def is_complex(self: object) -> bool:
         """Check if complexity is too high."""
         return (
             self.cyclomatic > CYCLOMATIC_HIGH_THRESHOLD
@@ -211,7 +216,7 @@ class ComplexityMetric(FlextModels):
         )
 
     @property
-    def complexity_level(self) -> str:
+    def complexity_level(self: object) -> str:
         """Get complexity level description."""
         if self.cyclomatic <= COMPLEXITY_SIMPLE_MAX:
             return "simple"
@@ -244,7 +249,7 @@ class CoverageMetric(FlextModels):
         description="Function coverage %",
     )
 
-    def validate_business_rules(self) -> FlextResult[None]:
+    def validate_business_rules(self: object) -> FlextResult[None]:
         """Validate coverage metrics business rules."""
         for field_name in ["line_coverage", "branch_coverage", "function_coverage"]:
             value = getattr(self, field_name)
@@ -255,7 +260,7 @@ class CoverageMetric(FlextModels):
         return FlextResult[None].ok(None)
 
     @property
-    def overall_coverage(self) -> float:
+    def overall_coverage(self: object) -> float:
         """Calculate weighted overall coverage."""
         # Weighted average: line 50%, branch 30%, function 20%
         return (
@@ -265,7 +270,7 @@ class CoverageMetric(FlextModels):
         )
 
     @property
-    def is_sufficient(self) -> bool:
+    def is_sufficient(self: object) -> bool:
         """Check if coverage meets minimum requirements."""
         return self.overall_coverage >= MIN_COVERAGE_REQUIREMENT
 
@@ -285,7 +290,7 @@ class DuplicationMetric(FlextModels):
         description="Number of duplicate blocks",
     )
 
-    def validate_business_rules(self) -> FlextResult[None]:
+    def validate_business_rules(self: object) -> FlextResult[None]:
         """Validate duplication metrics business rules."""
         if (
             self.duplicate_lines < 0
@@ -296,14 +301,14 @@ class DuplicationMetric(FlextModels):
         return FlextResult[None].ok(None)
 
     @property
-    def duplication_percentage(self) -> float:
+    def duplication_percentage(self: object) -> float:
         """Calculate duplication percentage."""
         if self.total_lines == 0:
             return 0.0
         return (self.duplicate_lines / self.total_lines) * MAX_QUALITY_SCORE
 
     @property
-    def is_acceptable(self) -> bool:
+    def is_acceptable(self: object) -> bool:
         """Check if duplication is within acceptable limits."""
         return self.duplication_percentage < MAX_DUPLICATION_THRESHOLD
 
@@ -319,7 +324,7 @@ class FilePath(FlextModels):
     )
     is_absolute: bool = Field(default=False, description="Whether path is absolute")
 
-    def validate_business_rules(self) -> FlextResult[None]:
+    def validate_business_rules(self: object) -> FlextResult[None]:
         """Validate file path business rules."""
         try:
             path_obj = Path(self.value)
@@ -330,22 +335,22 @@ class FilePath(FlextModels):
             return FlextResult[None].fail(f"Invalid file path: {e}")
 
     @property
-    def path(self) -> Path:
+    def path(self: object) -> Path:
         """Get Path object."""
         return Path(self.value)
 
     @property
-    def filename(self) -> str:
+    def filename(self: object) -> str:
         """Get filename."""
         return self.path.name
 
     @property
-    def extension(self) -> str:
+    def extension(self: object) -> str:
         """Get file extension."""
         return self.path.suffix
 
     @property
-    def parent_dir(self) -> str:
+    def parent_dir(self: object) -> str:
         """Get parent directory."""
         return str(self.path.parent)
 
@@ -441,7 +446,7 @@ class FlextQualityValueObjects:
         grade: str = Field(description="Letter grade representation")
         category: str = Field(description="Score category")
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self: object) -> FlextResult[None]:
             """Validate business rules for quality score."""
             if self.value < MIN_QUALITY_SCORE or self.value > MAX_QUALITY_SCORE:
                 return FlextResult[None].fail("Quality score must be 0-100")
@@ -480,7 +485,7 @@ class FlextQualityValueObjects:
             description="End column for multi-line issues",
         )
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self: object) -> FlextResult[None]:
             """Validate business rules for issue location."""
             if self.end_line is not None and self.end_line < self.line_number:
                 return FlextResult[None].fail("End line cannot be before start line")
@@ -503,7 +508,7 @@ class FlextQualityValueObjects:
         cognitive: int = Field(ge=0, description="Cognitive complexity")
         nesting_depth: int = Field(ge=0, description="Maximum nesting depth")
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self: object) -> FlextResult[None]:
             """Validate complexity metric values."""
             if (
                 self.cyclomatic > CYCLOMATIC_HIGH_THRESHOLD * 5
@@ -519,7 +524,7 @@ class FlextQualityValueObjects:
 
             return FlextResult[None].ok(None)
 
-        def get_complexity_level(self) -> str:
+        def get_complexity_level(self: object) -> str:
             """Get complexity level based on thresholds."""
             if self.cyclomatic <= COMPLEXITY_SIMPLE_MAX:
                 return "simple"
@@ -546,12 +551,12 @@ class FlextQualityValueObjects:
             description="Function coverage percentage",
         )
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self: object) -> FlextResult[None]:
             """Validate coverage metrics."""
             # All validations handled by Field constraints
             return FlextResult[None].ok(None)
 
-        def get_overall_coverage(self) -> float:
+        def get_overall_coverage(self: object) -> float:
             """Calculate weighted overall coverage."""
             return (
                 self.line_coverage * 0.5
@@ -573,7 +578,7 @@ class FlextQualityValueObjects:
             description="Number of files with duplicates",
         )
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self: object) -> FlextResult[None]:
             """Validate duplication metrics."""
             if self.lines_duplicated > 0 and self.files_with_duplicates == 0:
                 return FlextResult[None].fail(
@@ -587,7 +592,7 @@ class FlextQualityValueObjects:
 
         path: str = Field(description="File system path")
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self: object) -> FlextResult[None]:
             """Validate file path."""
             if len(self.path) > MAX_PATH_LENGTH:
                 return FlextResult[None].fail(
@@ -599,7 +604,7 @@ class FlextQualityValueObjects:
 
             return FlextResult[None].ok(None)
 
-        def as_path(self) -> Path:
+        def as_path(self: object) -> Path:
             """Convert to pathlib.Path object."""
             return Path(self.path)
 
@@ -686,7 +691,9 @@ class FlextQualityValueObjects:
         """Create a validated quality score."""
         try:
             # Calculate grade using helper
-            grade_result = self._ValidationHelper.get_grade_from_score(percentage)
+            grade_result: FlextResult[object] = (
+                self._ValidationHelper.get_grade_from_score(percentage)
+            )
             if grade_result.is_failure:
                 return FlextResult[FlextQualityValueObjects.QualityScore].fail(
                     f"Failed to calculate grade: {grade_result.error}",
@@ -706,7 +713,7 @@ class FlextQualityValueObjects:
             instance = self.QualityScore(**score_data)
 
             # Validate business rules
-            validation_result = instance.validate_business_rules()
+            validation_result: FlextResult[object] = instance.validate_business_rules()
             if validation_result.is_failure:
                 return FlextResult[FlextQualityValueObjects.QualityScore].fail(
                     validation_result.error or "Validation failed",

@@ -44,7 +44,7 @@ class FlextQualityHandlers:
                 config=config,
             )
 
-    def __init__(self) -> None:
+    def __init__(self: object) -> None:
         """Initialize all services for handler operations."""
         self._services = FlextQualityServices()
         self._analysis_service = self._services.get_analysis_service()

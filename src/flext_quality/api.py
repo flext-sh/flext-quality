@@ -31,28 +31,28 @@ QualityReport = FlextQualityReport
 class FlextQualityAPI:
     """Simple API interface for quality analysis operations."""
 
-    def __init__(self) -> None:
+    def __init__(self: object) -> None:
         """Initialize the Quality API with container-based DI."""
         self._container = get_quality_container()
         self._services = FlextQualityServices()
 
     @property
-    def project_service(self) -> FlextQualityServices.ProjectService:
+    def project_service(self: object) -> FlextQualityServices.ProjectService:
         """Get project service instance."""
         return self._services.get_project_service()
 
     @property
-    def analysis_service(self) -> FlextQualityServices.AnalysisService:
+    def analysis_service(self: object) -> FlextQualityServices.AnalysisService:
         """Get analysis service instance."""
         return self._services.get_analysis_service()
 
     @property
-    def issue_service(self) -> object:
+    def issue_service(self: object) -> object:
         """Get issue service instance."""
         return self._services.get_issue_service()
 
     @property
-    def report_service(self) -> object:
+    def report_service(self: object) -> object:
         """Get report service instance."""
         return self._services.get_report_service()
 
@@ -310,7 +310,7 @@ class FlextQualityAPI:
         analysis = result.value
 
         # Get the project to access its path
-        project_result = await self.get_project(project_id)
+        project_result: FlextResult[object] = await self.get_project(project_id)
         if project_result.is_failure:
             return FlextResult[QualityAnalysis].fail(
                 f"Failed to get project: {project_result.error}",
@@ -322,7 +322,7 @@ class FlextQualityAPI:
         # Execute analysis using CodeAnalyzer
         project_path = Path(project.project_path)
         analyzer = CodeAnalyzer(project_path)
-        analysis_results = analyzer.analyze_project()
+        analysis_results: FlextResult[object] = analyzer.analyze_project()
 
         # Update with real metrics from analysis
         await self.update_metrics(

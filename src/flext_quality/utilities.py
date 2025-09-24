@@ -8,25 +8,13 @@ from __future__ import annotations
 
 from pathlib import Path
 from textwrap import dedent
-from typing import TYPE_CHECKING, cast
+from typing import cast
 
 from flext_core import FlextContainer, FlextLogger, FlextTypes, FlextUtilities
-
-if TYPE_CHECKING:
-    from flext_quality.analysis_types import FlextQualityAnalysisTypes
+from flext_quality.analysis_types import FlextQualityAnalysisTypes
+from flext_quality.value_objects import IssueList, IssueType
 
 # Type aliases for better readability
-if TYPE_CHECKING:
-    QualityIssueType = (
-        FlextQualityAnalysisTypes.SecurityIssue
-        | FlextQualityAnalysisTypes.ComplexityIssue
-        | FlextQualityAnalysisTypes.DeadCodeIssue
-        | FlextQualityAnalysisTypes.DuplicationIssue
-    )
-    QualityIssueList = list[QualityIssueType]
-else:
-    QualityIssueType = object
-    QualityIssueList = FlextTypes.Core.List
 
 
 class FlextQualityUtilities(FlextUtilities):
@@ -37,7 +25,7 @@ class FlextQualityUtilities(FlextUtilities):
     and follow the unified class pattern mandated by CLAUDE.md.
     """
 
-    def __init__(self) -> None:
+    def __init__(self: object) -> None:
         """Initialize utilities with dependency injection."""
         self._container = (
             FlextContainer.get_global() if hasattr(self, "_container") else None
@@ -55,7 +43,7 @@ class FlextQualityUtilities(FlextUtilities):
             if not value:  # Empty list is valid
                 return True
             # Quality-specific check: issues have file_path and message
-            value_list = cast("FlextTypes.Core.List", value)
+            value_list: list[object] = cast("FlextTypes.Core.List", value)
             first_item = value_list[0]
             return hasattr(first_item, "file_path") and hasattr(first_item, "message")
 
@@ -71,7 +59,7 @@ class FlextQualityUtilities(FlextUtilities):
             """Get a formatted summary string for any issue type."""
             # Use FlextUtilities safe conversions instead of raw getattr
             if hasattr(issue, "files") and hasattr(issue, "similarity"):
-                files = getattr(issue, "files", [])
+                files: list[object] = getattr(issue, "files", [])
                 if files and isinstance(files, list):
                     files_str = ", ".join(str(f) for f in files[:2])
                     return f"Duplicated in: {files_str}"
@@ -135,7 +123,7 @@ class FlextQualityUtilities(FlextUtilities):
             """Create test files with specific types of real issues."""
             content_map = {
                 "complexity": '''
-def complex_function(x):
+def complex_function(x: object) -> object:
     """Function with high complexity - real code."""
 
     if x > 10:
@@ -162,7 +150,7 @@ import subprocess
 from typing import List
 from typing import Type
 
-def unsafe_function(user_input):
+def unsafe_function(user_input: object) -> object:
     """Function with real security issues - INTENTIONAL FOR TESTING PURPOSES ONLY."""
 
     # SQL injection vulnerability (real) - INTENTIONAL FOR TESTING
@@ -178,28 +166,28 @@ def unsafe_function(user_input):
 ''',
                 "dead_code": '''
 
-def used_function():
+def used_function() -> object:
     """This function is used."""
 
     return "active"
 
-def unused_function():
+def unused_function() -> object:
     """This function is never called - dead code."""
 
     unused_variable = "this is dead code"
     return unused_variable
 
-def another_unused():
+def another_unused() -> object:
     """Another unused function."""
 
     pass
 
 # This is the only function that gets called
-result = used_function()
+result: FlextResult[object] = used_function()
 ''',
                 "duplication": '''
 
-def process_data_type_a(data):
+def process_data_type_a(data: object) -> object:
     """Process data type A."""
 
     if not data:
@@ -210,7 +198,7 @@ def process_data_type_a(data):
             processed.append(item * 2)
     return processed
 
-def process_data_type_b(data):
+def process_data_type_b(data: object) -> object:
     """Process data type B - duplicated logic."""
 
     if not data:
@@ -393,7 +381,7 @@ class FlextTestUtilities:
         content_map = {
             "complexity": '''
 
-def complex_function(x):
+def complex_function(x: object) -> object:
     """Function with high complexity - real code."""
 
     if x > 10:
@@ -420,7 +408,7 @@ import subprocess
 from typing import List
 from typing import Type
 
-def unsafe_function(user_input):
+def unsafe_function(user_input: object) -> object:
     """Function with real security issues - INTENTIONAL FOR TESTING PURPOSES ONLY."""
 
     # SQL injection vulnerability (real) - INTENTIONAL FOR TESTING
@@ -436,28 +424,28 @@ def unsafe_function(user_input):
 ''',
             "dead_code": '''
 
-def used_function():
+def used_function() -> object:
     """This function is used."""
 
     return "active"
 
-def unused_function():
+def unused_function() -> object:
     """This function is never called - dead code."""
 
     unused_variable = "this is dead code"
     return unused_variable
 
-def another_unused():
+def another_unused() -> object:
     """Another unused function."""
 
     pass
 
 # This is the only function that gets called
-result = used_function()
+result: FlextResult[object] = used_function()
 ''',
             "duplication": '''
 
-def process_data_type_a(data):
+def process_data_type_a(data: object) -> object:
     """Process data type A."""
 
     if not data:
@@ -468,7 +456,7 @@ def process_data_type_a(data):
             processed.append(item * 2)
     return processed
 
-def process_data_type_b(data):
+def process_data_type_b(data: object) -> object:
     """Process data type B - duplicated logic."""
 
     if not data:
@@ -548,8 +536,8 @@ class FlextAnalysisUtilities:
 # No aliases needed since classes exist independently
 
 # Legacy compatibility aliases
-IssueType = QualityIssueType
-IssueList = QualityIssueList
+QualityIssueType = IssueType
+QualityIssueList = IssueList
 
 # Export CONSOLIDATED class and aliases
 __all__ = [

@@ -16,7 +16,7 @@ class FlextQualityContainer:
     Contains all container functionality as nested classes with shared resources.
     """
 
-    def __init__(self) -> None:
+    def __init__(self: object) -> None:
         """Initialize container with dependency injection."""
         self._container = FlextContainer.get_global()
         self._logger = FlextLogger(__name__)

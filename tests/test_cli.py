@@ -19,8 +19,9 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from flext_quality.analysis_types import AnalysisResults, OverallMetrics
-from flext_quality.cli import (
+from flext_quality import (
+    AnalysisResults,
+    OverallMetrics,
     analyze_project,
     another_function,
     main,

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import re
 
-from flext_quality.__version__ import __version__, __version_info__
+from flext_quality import __version__, __version_info__
 
 
 class TestVersion:

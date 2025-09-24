@@ -41,7 +41,6 @@ mock_dir.mkdir(exist_ok=True)
 
 with open(mock_dir / '__init__.py', 'w') as f:
     f.write('''# Mock flext_core
-import logging
 class FlextResult:
     def __init__(self, success, data=None, error=None):
         self.success = success

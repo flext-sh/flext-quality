@@ -19,7 +19,7 @@ import tempfile
 from pathlib import Path
 
 from flext_core import FlextTypes
-from flext_quality.cli import main as quality_main
+from flext_quality import main as quality_main
 
 
 def run_cli_analysis(

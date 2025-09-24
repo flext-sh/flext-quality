@@ -10,11 +10,12 @@ import pytest
 from pydantic import ValidationError
 
 from flext_core import FlextTypes
-from flext_quality import QualityGradeCalculator, QualityMetrics
-from flext_quality.analysis_types import (
+from flext_quality import (
     AnalysisResults,
     FileAnalysisResult,
     OverallMetrics,
+    QualityGradeCalculator,
+    QualityMetrics,
 )
 
 # Import correct classes - now independent classes, not nested

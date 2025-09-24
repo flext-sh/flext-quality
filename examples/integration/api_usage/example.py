@@ -412,10 +412,9 @@ def demonstrate_custom_workflows() -> None:
             "main.py": '''
 """Main application module."""
 
-import logging
 from typing import List, Dict
 
-logger = logging.getLogger(__name__)
+logger = FlextLogger(__name__)
 
 class Application:
     """Main application class."""

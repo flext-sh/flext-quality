@@ -19,8 +19,8 @@ from flext_quality import (
     MIN_SCORE_THRESHOLD,
     QualityGrade,
     QualityGradeCalculator,
+    QualityReport,
 )
-from flext_quality.entities import QualityReport
 
 
 class TestQualityReport:

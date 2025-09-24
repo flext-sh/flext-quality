@@ -24,7 +24,7 @@ class FlextQualityEntities:
     Contains all domain entities as nested classes with shared functionality.
     """
 
-    def __init__(self) -> None:
+    def __init__(self: object) -> None:
         """Initialize quality entities with dependency injection."""
         self._container = FlextContainer.get_global()
         self._logger = FlextLogger(__name__)
@@ -81,13 +81,13 @@ class FlextQualityEntities:
         last_analysis_at: datetime | None = None
         total_analyses: int = Field(default=0)
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self: object) -> FlextResult[None]:
             """Validate domain rules for quality project."""
             if not self.project_path:
                 return FlextResult[None].fail("Project path is required")
             return FlextResult[None].ok(None)
 
-        def update_last_analysis(self) -> FlextQualityEntities.QualityProject:
+        def update_last_analysis(self: object) -> FlextQualityEntities.QualityProject:
             """Update last analysis timestamp and return new instance."""
             return self.model_copy(
                 update={
@@ -143,7 +143,7 @@ class FlextQualityEntities:
         # Analysis data
         analysis_config: dict[str, object] = Field(default_factory=dict)
 
-        def start_analysis(self) -> FlextQualityEntities.QualityAnalysis:
+        def start_analysis(self: object) -> FlextQualityEntities.QualityAnalysis:
             """Start analysis and return new instance."""
             return self.model_copy(
                 update={
@@ -152,7 +152,7 @@ class FlextQualityEntities:
                 },
             )
 
-        def complete_analysis(self) -> FlextQualityEntities.QualityAnalysis:
+        def complete_analysis(self: object) -> FlextQualityEntities.QualityAnalysis:
             """Complete analysis and return new instance."""
             completed_at = datetime.now(UTC)
             duration_seconds = None
@@ -186,7 +186,9 @@ class FlextQualityEntities:
                 },
             )
 
-        def calculate_overall_score(self) -> FlextQualityEntities.QualityAnalysis:
+        def calculate_overall_score(
+            self: object,
+        ) -> FlextQualityEntities.QualityAnalysis:
             """Calculate overall score and return new instance."""
             scores = [
                 self.coverage_score,
@@ -199,7 +201,7 @@ class FlextQualityEntities:
             return self.model_copy(update={"overall_score": overall_score})
 
         @property
-        def is_completed(self) -> bool:
+        def is_completed(self: object) -> bool:
             """Check if analysis is completed (either succeeded or failed)."""
             return self.status in {
                 FlextQualityEntities.AnalysisStatus.COMPLETED,
@@ -207,11 +209,11 @@ class FlextQualityEntities:
             }
 
         @property
-        def successful(self) -> bool:
+        def successful(self: object) -> bool:
             """Check if analysis completed successfully."""
             return self.status == FlextQualityEntities.AnalysisStatus.COMPLETED
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self: object) -> FlextResult[None]:
             """Validate domain rules for quality analysis."""
             if not self.project_id:
                 return FlextResult[None].fail("Project ID is required")
@@ -249,7 +251,7 @@ class FlextQualityEntities:
         last_seen_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
         occurrence_count: int = Field(default=1)
 
-        def mark_fixed(self) -> FlextQualityEntities.QualityIssue:
+        def mark_fixed(self: object) -> FlextQualityEntities.QualityIssue:
             """Mark issue as fixed and return new instance."""
             return self.model_copy(update={"is_fixed": True})
 
@@ -262,7 +264,7 @@ class FlextQualityEntities:
                 },
             )
 
-        def unsuppress(self) -> FlextQualityEntities.QualityIssue:
+        def unsuppress(self: object) -> FlextQualityEntities.QualityIssue:
             """Unsuppress issue and return new instance."""
             return self.model_copy(
                 update={
@@ -271,7 +273,7 @@ class FlextQualityEntities:
                 },
             )
 
-        def increment_occurrence(self) -> FlextQualityEntities.QualityIssue:
+        def increment_occurrence(self: object) -> FlextQualityEntities.QualityIssue:
             """Increment occurrence count and return new instance."""
             return self.model_copy(
                 update={
@@ -280,7 +282,7 @@ class FlextQualityEntities:
                 },
             )
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self: object) -> FlextResult[None]:
             """Validate domain rules for quality issue."""
             if not self.analysis_id:
                 return FlextResult[None].fail("Analysis ID is required")
@@ -305,11 +307,11 @@ class FlextQualityEntities:
         documentation_url: str | None = None
         examples: list[FlextTypes.Core.Dict] = Field(default_factory=list)
 
-        def enable(self) -> FlextQualityEntities.QualityRule:
+        def enable(self: object) -> FlextQualityEntities.QualityRule:
             """Enable rule and return new instance."""
             return self.model_copy(update={"enabled": True})
 
-        def disable(self) -> FlextQualityEntities.QualityRule:
+        def disable(self: object) -> FlextQualityEntities.QualityRule:
             """Disable rule and return new instance."""
             return self.model_copy(update={"enabled": False})
 
@@ -330,7 +332,7 @@ class FlextQualityEntities:
             new_parameters[key] = value
             return self.model_copy(update={"parameters": new_parameters})
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self: object) -> FlextResult[None]:
             """Validate domain rules for quality rule."""
             if not self.rule_id:
                 return FlextResult[None].fail("Rule ID is required")
@@ -357,7 +359,7 @@ class FlextQualityEntities:
         access_count: int = Field(default=0)
         last_accessed_at: datetime | None = None
 
-        def increment_access(self) -> FlextQualityEntities.QualityReport:
+        def increment_access(self: object) -> FlextQualityEntities.QualityReport:
             """Increment access count and return new instance."""
             return self.model_copy(
                 update={
@@ -366,7 +368,7 @@ class FlextQualityEntities:
                 },
             )
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self: object) -> FlextResult[None]:
             """Validate domain rules for quality report."""
             if not self.analysis_id:
                 return FlextResult[None].fail("Analysis ID is required")
@@ -513,6 +515,6 @@ try:
     FlextQualityEntities.ReportGeneratedEvent.model_rebuild()
 except Exception as e:
     # Log rebuild errors in development - should not affect runtime
-    from flext_core import FlextLogger
+    from flext_core import FlextLogger, FlextResult
 
     FlextLogger(__name__).debug("Model rebuild error: %s", e)

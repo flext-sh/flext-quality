@@ -49,7 +49,7 @@ class FlextQualityCliService(FlextService[int]):
         self._container = FlextContainer.get_global()
         self._logger = FlextLogger(__name__)
 
-    def execute(self) -> FlextResult[int]:
+    def execute(self: object) -> FlextResult[int]:
         """Execute CLI service - required abstract method implementation."""
         self._logger.info("CLI service execute called - this is a placeholder")
         return FlextResult[int].ok(0)
@@ -119,7 +119,9 @@ class FlextQualityCliService(FlextService[int]):
             report = QualityReport(results)
 
             # Handle output based on format
-            output_result = self._handle_output(args, report, cli_context, cli_api)
+            output_result: FlextResult[object] = self._handle_output(
+                args, report, cli_context, cli_api
+            )
             if output_result.is_failure:
                 cli_context.print_error(
                     output_result.error or "Output processing failed",
@@ -166,8 +168,10 @@ class FlextQualityCliService(FlextService[int]):
             if FLEXT_CLI_AVAILABLE:
                 if args.format == "json":
                     # Get dict from JSON report
-                    report_dict = json.loads(report.to_json())
-                    export_result = cli_api.export_data(report_dict, str(output_path))
+                    report_dict: dict[str, object] = json.loads(report.to_json())
+                    export_result: FlextResult[object] = cli_api.export_data(
+                        report_dict, str(output_path)
+                    )
                 elif args.format == "html":
                     # Write HTML directly since FlextCli doesn't handle HTML export
                     output_path.write_text(report.to_html(), encoding="utf-8")
@@ -175,8 +179,10 @@ class FlextQualityCliService(FlextService[int]):
                     return FlextResult[None].ok(None)
                 else:
                     # Table format - export as JSON
-                    report_dict = json.loads(report.to_json())
-                    export_result = cli_api.export_data(report_dict, str(output_path))
+                    report_dict: dict[str, object] = json.loads(report.to_json())
+                    export_result: FlextResult[object] = cli_api.export_data(
+                        report_dict, str(output_path)
+                    )
 
                 if export_result and export_result.is_failure:
                     return FlextResult[None].fail(
@@ -208,8 +214,10 @@ class FlextQualityCliService(FlextService[int]):
             if args.format == "json":
                 if FLEXT_CLI_AVAILABLE:
                     # Get dict from JSON report
-                    report_dict = json.loads(report.to_json())
-                    format_result = cli_api.format_data(report_dict, "json")
+                    report_dict: dict[str, object] = json.loads(report.to_json())
+                    format_result: FlextResult[object] = cli_api.format_data(
+                        report_dict, "json"
+                    )
                     if format_result.is_success:
                         sys.stdout.write(format_result.value + "\\n")
                     else:
@@ -222,7 +230,7 @@ class FlextQualityCliService(FlextService[int]):
                 sys.stdout.write(report.to_html() + "\\n")
             elif FLEXT_CLI_AVAILABLE:
                 # Get dict from JSON report
-                report_dict = json.loads(report.to_json())
+                report_dict: dict[str, object] = json.loads(report.to_json())
                 table_result = cli_api.create_table(
                     report_dict,
                     title="Quality Analysis",
@@ -235,7 +243,7 @@ class FlextQualityCliService(FlextService[int]):
                     )
             else:
                 # Fallback table display
-                report_dict = json.loads(report.to_json())
+                report_dict: dict[str, object] = json.loads(report.to_json())
                 cli_context.print_info(str(report_dict))
 
             return FlextResult[None].ok(None)
@@ -285,7 +293,9 @@ class FlextQualityCliService(FlextService[int]):
 
             # Format and display using FlextCli or fallback
             if FLEXT_CLI_AVAILABLE:
-                table_result = cli_api.create_table(score_data, title="Quality Score")
+                table_result: FlextResult[object] = cli_api.create_table(
+                    score_data, title="Quality Score"
+                )
                 if table_result.is_success:
                     cli_context.print_info(str(table_result.value))
                 else:
@@ -335,7 +345,9 @@ class FlextQualityCliService(FlextService[int]):
         """Analyze project quality using unified service pattern."""
         analysis_helper = self._ProjectAnalysisHelper(self._logger)
 
-        analysis_result = analysis_helper.analyze_project_workflow(args)
+        analysis_result: FlextResult[object] = analysis_helper.analyze_project_workflow(
+            args
+        )
         if analysis_result.is_failure:
             self._logger.error("Quality analysis failed")
             return FlextResult[int].fail(f"Analysis failed: {analysis_result.error}")
@@ -346,7 +358,9 @@ class FlextQualityCliService(FlextService[int]):
         """Get quick quality score for project using unified service pattern."""
         scoring_helper = self._ProjectScoringHelper(self._logger)
 
-        scoring_result = scoring_helper.score_project_workflow(args)
+        scoring_result: FlextResult[object] = scoring_helper.score_project_workflow(
+            args
+        )
         if scoring_result.is_failure:
             self._logger.error("Quality score calculation failed")
             return FlextResult[int].fail(
@@ -359,19 +373,23 @@ class FlextQualityCliService(FlextService[int]):
         """Run quality web interface server using unified service pattern."""
         web_helper = self._WebServerHelper(self._logger)
 
-        web_result = web_helper.run_web_server_workflow(args)
+        web_result: FlextResult[object] = web_helper.run_web_server_workflow(args)
         if web_result.is_failure:
             self._logger.error("Web server failed")
             return FlextResult[int].fail(f"Web server failed: {web_result.error}")
 
         return web_result
 
+    def get_cli_context(self, *, verbose: bool = False) -> FlextResult[FlextCliContext]:
+        """Public method to get CLI context."""
+        return self._CliContextHelper.get_cli_context(verbose=verbose)
+
 
 # Legacy function wrappers for backward compatibility
 def get_cli_context(*, verbose: bool = False) -> FlextCliContext:
     """Legacy wrapper - use FlextQualityCliService instead."""
     service = FlextQualityCliService()
-    result = service._CliContextHelper.get_cli_context(verbose=verbose)
+    result: FlextResult[object] = service.get_cli_context(verbose=verbose)
     if result.is_failure:
         raise RuntimeError(result.error)
     return result.value
@@ -380,11 +398,11 @@ def get_cli_context(*, verbose: bool = False) -> FlextCliContext:
 def analyze_project(args: argparse.Namespace) -> int:
     """Legacy wrapper - use FlextQualityCliService instead."""
     service = FlextQualityCliService()
-    result = service.analyze_project(args)
+    result: FlextResult[object] = service.analyze_project(args)
     if result.is_failure:
         logger = FlextLogger(__name__)
         logger.error("Quality analysis failed")
-        cli_context_result = service._CliContextHelper.get_cli_context(
+        cli_context_result = service.get_cli_context(
             verbose=getattr(args, "verbose", False),
         )
         if cli_context_result.is_success:
@@ -431,7 +449,9 @@ def score_project(args: argparse.Namespace) -> int:
 
         # Format and display using FlextCli or fallback
         if FLEXT_CLI_AVAILABLE:
-            table_result = cli_api.create_table(score_data, title="Quality Score")
+            table_result: FlextResult[object] = cli_api.create_table(
+                score_data, title="Quality Score"
+            )
             if table_result.is_success:
                 cli_context.print_info(str(table_result.value))
             else:

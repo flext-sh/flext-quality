@@ -14,7 +14,6 @@ RUN mkdir -p /app/src/flext_core /app/src/flext_observability
 # Create flext_core mock
 RUN echo 'from typing import Dict
 
-import logging
 from pydantic import BaseModel
 
 class FlextResult:

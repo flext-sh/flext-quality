@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from flext_quality import exceptions
 from flext_quality.__version__ import __version__, __version_info__
+from flext_quality.analysis_types import OverallMetrics
 
 # Core analyzer and backends
 from flext_quality.analyzer import FlextQualityCodeAnalyzer as CodeAnalyzer
@@ -24,7 +25,13 @@ from flext_quality.backend_type import BackendType
 from flext_quality.base import BaseAnalyzer
 
 # CLI functions (re-enabled for testing compatibility)
-from flext_quality.cli import analyze_project, another_function, main, setup_logging
+from flext_quality.cli import (
+    analyze_project,
+    another_function,
+    main,
+    quality_main,
+    setup_logging,
+)
 
 # Configuration and containers
 from flext_quality.config import FlextQualityConfig, FlextQualityConfig as QualityConfig
@@ -52,6 +59,7 @@ from flext_quality.exceptions import (
     FlextQualityRuleError,
     FlextQualityTimeoutError,
     FlextQualityValidationError,
+    exceptions_all,
 )
 from flext_quality.external_backend import (
     FlextQualityExternalBackend as ExternalBackend,
@@ -83,6 +91,7 @@ from flext_quality.value_objects import (
     QualityGrade,
     QualityScore,
 )
+from flext_quality.web import QualityWebInterface
 
 __all__ = [
     "ASTBackend",
@@ -90,7 +99,6 @@ __all__ = [
     "AnalysisStatus",
     "BackendType",
     "BaseAnalyzer",
-    # Core analyzer and backends
     "CodeAnalyzer",
     "ComplexityMetric",
     "CoverageMetric",
@@ -98,20 +106,16 @@ __all__ = [
     "ExternalBackend",
     "FlextQualityAnalysisError",
     "FlextQualityAuthenticationError",
-    # Configuration and containers
     "FlextQualityConfig",
     "FlextQualityConfigurationError",
     "FlextQualityConnectionError",
-    # Exceptions
     "FlextQualityError",
     "FlextQualityGradeError",
     "FlextQualityHandler",
     "FlextQualityMetricsError",
     "FlextQualityProcessingError",
     "FlextQualityReportError",
-    # Reports
     "FlextQualityReportGenerator",
-    # Models and metrics
     "FlextQualityReportModel",
     "FlextQualityRuleError",
     "FlextQualityServices",
@@ -120,7 +124,7 @@ __all__ = [
     "IssueLocation",
     "IssueSeverity",
     "IssueType",
-    # API and handlers
+    "OverallMetrics",
     "QualityAPI",
     "QualityAnalysis",
     "QualityConfig",
@@ -128,23 +132,20 @@ __all__ = [
     "QualityGradeCalculator",
     "QualityIssue",
     "QualityMetrics",
-    # Domain entities
     "QualityProject",
-    # Services
     "QualityReport",
     "QualityRule",
-    # Value objects
     "QualityScore",
-    # Utilities and exceptions
     "QualityUtilities",
-    # Version info
+    "QualityWebInterface",
     "__version__",
     "__version_info__",
-    # CLI functions (re-enabled for testing compatibility)
     "analyze_project",
     "another_function",
     "exceptions",
+    "exceptions_all",
     "get_quality_container",
     "main",
+    "quality_main",
     "setup_logging",
 ]

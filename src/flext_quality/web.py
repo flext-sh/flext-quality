@@ -12,7 +12,7 @@ from flask import Response as FlaskResponse, jsonify, request
 from flext_web.config import FlextWebConfigs
 from werkzeug.wrappers import Response as WerkzeugResponse
 
-from flext_core import FlextContainer, FlextLogger, FlextTypes
+from flext_core import FlextContainer, FlextLogger, FlextResult, FlextTypes
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.api import QualityAPI
 from flext_web import FlextWebServices
@@ -27,13 +27,13 @@ class FlextQualityWeb:
     Contains all web functionality as nested classes and methods.
     """
 
-    def __init__(self) -> None:
+    def __init__(self: object) -> None:
         """Initialize quality web interface."""
         self._container = FlextContainer.get_global()
         self._logger = FlextLogger(__name__)
 
         # Create base web service from flext-web
-        self.config = self._get_web_settings()
+        self.config: dict[str, object] = self._get_web_settings()
         web_service = self._create_service(self.config)
 
         if web_service is None:
@@ -79,14 +79,14 @@ class FlextQualityWeb:
                 logger.warning("Invalid WebConfig dict: missing required fields")
                 web_config = None
 
-        result = FlextWebServices.create_web_service(web_config)
+        result: FlextResult[object] = FlextWebServices.create_web_service(web_config)
         return result.value if result.is_success else None
 
     @staticmethod
     def _get_web_settings() -> dict[str, object]:
         """Get web settings using flext-web patterns."""
         # Type conversion for compatibility
-        result = FlextWebConfigs.get_web_settings()
+        result: FlextResult[object] = FlextWebConfigs.get_web_settings()
         return dict(result) if hasattr(result, "__dict__") else {}
 
     @staticmethod
@@ -95,7 +95,7 @@ class FlextQualityWeb:
         interface = FlextQualityWeb()
         interface.run()
 
-    def _register_routes(self) -> None:
+    def _register_routes(self: object) -> None:
         """Register quality analysis routes with Flask app."""
         if not hasattr(self.web_service, "app"):
             msg = "Web service does not have an 'app' attribute"
@@ -110,7 +110,7 @@ class FlextQualityWeb:
         app.route("/api/quality/metrics", methods=["GET"])(self.get_metrics)
         app.route("/api/quality/report/<format>", methods=["GET"])(self.get_report)
 
-    def quality_dashboard(self) -> str:
+    def quality_dashboard(self: object) -> str:
         """Render quality dashboard."""
         return """
 
@@ -190,7 +190,7 @@ class FlextQualityWeb:
                       headers: {'Content-Type': 'application/json'},
                       body: JSON.stringify({path: path})
                   });
-                  const data = await response.json();
+                  const data: dict[str, object] = await response.json();
                   document.getElementById('results').innerHTML =
                       '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
               }
@@ -201,12 +201,12 @@ class FlextQualityWeb:
 
     async def analyze_project(self) -> ResponseType:
         """Analyze a project and return results."""
-        data = request.get_json()
+        data: dict[str, object] = request.get_json()
         project_path = data.get("path", ".")
 
         # Create analyzer for the specific path
         analyzer = CodeAnalyzer(Path(project_path))
-        result = analyzer.analyze_project()
+        result: FlextResult[object] = analyzer.analyze_project()
 
         # Extract data from AnalysisResults
         files_count = result.overall_metrics.files_analyzed
@@ -227,7 +227,7 @@ class FlextQualityWeb:
             },
         )
 
-    def get_metrics(self) -> ResponseType:
+    def get_metrics(self: object) -> ResponseType:
         """Get quality metrics."""
         # Use simple placeholder metrics for now
         metrics: FlextTypes.Core.Dict = {
@@ -268,8 +268,6 @@ class FlextQualityWeb:
 
 
 # Backward compatibility aliases for existing code
-create_service = FlextQualityWeb._create_service
-get_web_settings = FlextQualityWeb._get_web_settings
 web_main = FlextQualityWeb.web_main
 FlextQualityWebInterface = FlextQualityWeb
 main = web_main
@@ -277,8 +275,6 @@ main = web_main
 __all__ = [
     "FlextQualityWeb",
     "FlextQualityWebInterface",
-    "create_service",
-    "get_web_settings",
     "main",  # Legacy compatibility
     "web_main",
 ]

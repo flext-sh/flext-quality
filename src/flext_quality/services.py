@@ -51,6 +51,38 @@ class FlextQualityServices:
         self._analyses: dict[str, FlextQualityAnalysis] = {}
         self._reports: dict[str, FlextQualityReport] = {}
 
+    def get_projects(self) -> dict[str, FlextQualityProject]:
+        """Get projects dictionary."""
+        return self._projects
+
+    def set_project(self, name: str, project: FlextQualityProject) -> None:
+        """Set a project in the projects dictionary."""
+        self._projects[name] = project
+
+    def get_issues(self) -> dict[str, FlextQualityIssue]:
+        """Get issues dictionary."""
+        return self._issues
+
+    def set_issue(self, issue_id: str, issue: FlextQualityIssue) -> None:
+        """Set an issue in the issues dictionary."""
+        self._issues[issue_id] = issue
+
+    def get_analyses(self) -> dict[str, FlextQualityAnalysis]:
+        """Get analyses dictionary."""
+        return self._analyses
+
+    def set_analysis(self, analysis_id: str, analysis: FlextQualityAnalysis) -> None:
+        """Set an analysis in the analyses dictionary."""
+        self._analyses[analysis_id] = analysis
+
+    def get_reports(self) -> dict[str, FlextQualityReport]:
+        """Get reports dictionary."""
+        return self._reports
+
+    def set_report(self, report_id: str, report: FlextQualityReport) -> None:
+        """Set a report in the reports dictionary."""
+        self._reports[report_id] = report
+
     # =============================================================================
     # NESTED SERVICE CLASSES - All quality services consolidated
     # =============================================================================
@@ -89,7 +121,7 @@ class FlextQualityServices:
                 )
 
                 # Store project in shared storage
-                self._parent._projects[name] = project
+                self._parent.set_project(name, project)
                 self._logger.info("Created project: %s", project.name)
                 return FlextResult[FlextQualityProject].ok(project)
             except (RuntimeError, ValueError, TypeError) as e:
@@ -136,7 +168,7 @@ class FlextQualityServices:
                 )
 
                 # Store issue in shared storage
-                self._parent._issues[issue_id] = issue
+                self._parent.set_issue(issue_id, issue)
 
                 self._logger.debug(f"Created quality issue: {issue_id}")
                 return FlextResult[FlextQualityIssue].ok(issue)
@@ -154,7 +186,7 @@ class FlextQualityServices:
             try:
                 issues = [
                     issue
-                    for issue in self._parent._issues.values()
+                    for issue in self._parent.get_issues().values()
                     if issue.analysis_id == analysis_id
                 ]
                 return FlextResult[list[FlextQualityIssue]].ok(issues)
@@ -173,7 +205,7 @@ class FlextQualityServices:
         ) -> FlextResult[FlextQualityIssue | None]:
             """Get a specific issue by ID."""
             try:
-                issue = self._parent._issues.get(issue_id)
+                issue = self._parent.get_issues().get(issue_id)
                 return FlextResult[FlextQualityIssue | None].ok(issue)
             except Exception as e:
                 self._logger.exception("Failed to get issue %s", issue_id)
@@ -188,14 +220,14 @@ class FlextQualityServices:
         ) -> FlextResult[FlextQualityIssue]:
             """Suppress a specific issue."""
             try:
-                issue = self._parent._issues.get(issue_id)
+                issue = self._parent.get_issues().get(issue_id)
                 if not issue:
                     return FlextResult[FlextQualityIssue].fail(
                         f"Issue not found: {issue_id}",
                     )
 
                 suppressed_issue = issue.suppress(reason)
-                self._parent._issues[issue_id] = suppressed_issue
+                self._parent.set_issue(issue_id, suppressed_issue)
 
                 self._logger.debug(f"Suppressed issue: {issue_id}")
                 return FlextResult[FlextQualityIssue].ok(suppressed_issue)
@@ -211,7 +243,7 @@ class FlextQualityServices:
         ) -> FlextResult[FlextQualityIssue]:
             """Unsuppress a quality issue."""
             try:
-                issue = self._parent._issues.get(issue_id)
+                issue = self._parent.get_issues().get(issue_id)
                 if not issue:
                     return FlextResult[FlextQualityIssue].fail("Issue not found")
 
@@ -220,7 +252,7 @@ class FlextQualityServices:
                     update={"is_suppressed": False, "suppression_reason": None},
                 )
 
-                self._parent._issues[issue_id] = updated_issue
+                self._parent.set_issue(issue_id, updated_issue)
                 self._logger.info("Issue unsuppressed: %s", issue_id)
                 return FlextResult[FlextQualityIssue].ok(updated_issue)
             except (RuntimeError, ValueError, TypeError) as e:
@@ -250,8 +282,10 @@ class FlextQualityServices:
                 )
 
                 # Store analysis in shared storage
-                analysis_id = f"{project_id}_analysis_{len(self._parent._analyses)}"
-                self._parent._analyses[analysis_id] = analysis
+                analysis_id = (
+                    f"{project_id}_analysis_{len(self._parent.get_analyses())}"
+                )
+                self._parent.set_analysis(analysis_id, analysis)
                 self._logger.info("Created analysis: %s", analysis_id)
                 return FlextResult[FlextQualityAnalysis].ok(analysis)
             except (RuntimeError, ValueError, TypeError) as e:
@@ -268,7 +302,7 @@ class FlextQualityServices:
             try:
                 analyses = [
                     analysis
-                    for analysis in self._parent._analyses.values()
+                    for analysis in self._parent.get_analyses().values()
                     if analysis.project_id == project_id
                 ]
                 return FlextResult[list[FlextQualityAnalysis]].ok(analyses)
@@ -305,8 +339,8 @@ class FlextQualityServices:
                 )
 
                 # Store report in shared storage
-                report_id = f"{analysis_id}_report_{len(self._parent._reports)}"
-                self._parent._reports[report_id] = report
+                report_id = f"{analysis_id}_report_{len(self._parent.get_reports())}"
+                self._parent.set_report(report_id, report)
                 self._logger.info("Created report: %s", report_id)
                 return FlextResult[FlextQualityReport].ok(report)
             except (RuntimeError, ValueError, TypeError) as e:
@@ -323,7 +357,7 @@ class FlextQualityServices:
             try:
                 reports = [
                     report
-                    for report in self._parent._reports.values()
+                    for report in self._parent.get_reports().values()
                     if report.analysis_id == analysis_id
                 ]
                 return FlextResult[list[FlextQualityReport]].ok(reports)
@@ -336,8 +370,9 @@ class FlextQualityServices:
         async def delete_report(self, report_id: str) -> FlextResult[bool]:
             """Delete a quality report."""
             try:
-                if report_id in self._parent._reports:
-                    del self._parent._reports[report_id]
+                reports = self._parent.get_reports()
+                if report_id in reports:
+                    del reports[report_id]
                     self._logger.info("Report deleted successfully: %s", report_id)
                     success = True
                     return FlextResult[bool].ok(success)
@@ -364,7 +399,9 @@ class FlextQualityServices:
             """Analyze code using external backend tools."""
             try:
                 self._logger.info("Running %s analysis", backend_tool)
-                result = self._backend.analyze(code, file_path, tool=backend_tool)
+                result: FlextResult[object] = self._backend.analyze(
+                    code, file_path, tool=backend_tool
+                )
                 return FlextResult[FlextTypes.Core.Dict].ok(result)
             except (RuntimeError, ValueError, TypeError) as e:
                 self._logger.exception("Failed to analyze with external backend")
@@ -376,23 +413,23 @@ class FlextQualityServices:
     # SERVICE FACTORY METHODS
     # =============================================================================
 
-    def get_project_service(self) -> ProjectService:
+    def get_project_service(self: object) -> ProjectService:
         """Get project service instance."""
         return self.ProjectService(self)
 
-    def get_issue_service(self) -> IssueService:
+    def get_issue_service(self: object) -> IssueService:
         """Get issue service instance."""
         return self.IssueService(self)
 
-    def get_analysis_service(self) -> AnalysisService:
+    def get_analysis_service(self: object) -> AnalysisService:
         """Get analysis service instance."""
         return self.AnalysisService(self)
 
-    def get_report_service(self) -> ReportService:
+    def get_report_service(self: object) -> ReportService:
         """Get report service instance."""
         return self.ReportService(self)
 
-    def get_external_analysis_service(self) -> ExternalAnalysisService:
+    def get_external_analysis_service(self: object) -> ExternalAnalysisService:
         """Get external analysis service instance."""
         return self.ExternalAnalysisService(self)
 

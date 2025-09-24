@@ -36,7 +36,7 @@ class FlextQualityAnalyzer(ABC):
         ...
 
     @abstractmethod
-    def get_backend_type(self) -> BackendType:
+    def get_backend_type(self: object) -> BackendType:
         """Get the type of this backend.
 
         Returns:
@@ -46,7 +46,7 @@ class FlextQualityAnalyzer(ABC):
         ...
 
     @abstractmethod
-    def get_capabilities(self) -> FlextTypes.Core.StringList:
+    def get_capabilities(self: object) -> FlextTypes.Core.StringList:
         """Get list of capabilities this backend provides.
 
         Returns:

@@ -17,7 +17,7 @@ class FlextQualityExceptions:
     Contains all error codes and exceptions as nested classes with shared functionality.
     """
 
-    def __init__(self) -> None:
+    def __init__(self: object) -> None:
         """Initialize exceptions with dependency injection."""
         self._container = FlextContainer.get_global()
         self._logger = FlextLogger(__name__)
@@ -75,7 +75,7 @@ class FlextQualityExceptions:
             super().__init__(message, code=code, context=context)
 
         @override
-        def __str__(self) -> str:
+        def __str__(self: object) -> str:
             return f"Quality analysis: {self.message}"
 
     class ReportError(QualityError):
@@ -92,7 +92,7 @@ class FlextQualityExceptions:
             super().__init__(message, code=code, context=context)
 
         @override
-        def __str__(self) -> str:
+        def __str__(self: object) -> str:
             return f"Quality report: {self.message}"
 
     class MetricsError(QualityError):
@@ -109,7 +109,7 @@ class FlextQualityExceptions:
             super().__init__(message, code=code, context=context)
 
         @override
-        def __str__(self) -> str:
+        def __str__(self: object) -> str:
             return f"Quality metrics: {self.message}"
 
     class GradeError(QualityError):
@@ -126,7 +126,7 @@ class FlextQualityExceptions:
             super().__init__(message, code=code, context=context)
 
         @override
-        def __str__(self) -> str:
+        def __str__(self: object) -> str:
             return f"Quality grade: {self.message}"
 
     class RuleError(QualityError):
@@ -143,7 +143,7 @@ class FlextQualityExceptions:
             super().__init__(message, code=code, context=context)
 
         @override
-        def __str__(self) -> str:
+        def __str__(self: object) -> str:
             return f"Quality rule: {self.message}"
 
     class IssueError(QualityError):

@@ -26,7 +26,6 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
     def __init__(self) -> None:
         """Initialize AST backend with dependency injection."""
-        super().__init__()
         self._container = FlextContainer.get_global()
         self._logger = FlextLogger(__name__)
 
@@ -160,7 +159,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
         ) -> tuple[FlextTypes.Core.StringList, bool, bool]:
             """Analyze class decorators."""
             decorators = [self._get_name_from_node(dec) for dec in node.decorator_list]
-            is_dataclass = any("dataclass" in dec for dec in decorators)
+            is_dataclass: bool = any("dataclass" in dec for dec in decorators)
             is_abstract = any("abstractmethod" in dec for dec in decorators)
             return decorators, is_dataclass, is_abstract
 
@@ -280,12 +279,12 @@ class FlextQualityASTBackend(BaseAnalyzer):
             return None
 
     @override
-    def get_backend_type(self) -> BackendType:
+    def get_backend_type(self: object) -> BackendType:
         """Return the backend type."""
         return BackendType.AST
 
     @override
-    def get_capabilities(self) -> FlextTypes.Core.StringList:
+    def get_capabilities(self: object) -> FlextTypes.Core.StringList:
         """Return the capabilities of this backend."""
         return ["complexity", "functions", "classes", "imports", "docstrings"]
 
@@ -402,5 +401,14 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
 
 # Backward compatibility aliases for existing code
-ASTVisitor = FlextQualityASTBackend._ASTVisitor
+# Create public alias for the nested ASTVisitor class
+# Create public alias for the nested ASTVisitor class
+class ASTVisitor:
+    """Public alias for the nested ASTVisitor class."""
+
+    def __new__(cls, *args: object, **kwargs: object) -> object:
+        """Create instance of the actual ASTVisitor class."""
+        return FlextQualityASTBackend._ASTVisitor(*args, **kwargs)  # noqa: SLF001
+
+
 ASTBackend = FlextQualityASTBackend

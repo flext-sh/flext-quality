@@ -25,9 +25,9 @@ from flext_quality import (
     FlextQualityRuleError,
     FlextQualityTimeoutError,
     FlextQualityValidationError,
+    __all__ as exceptions_all,
     exceptions as exc_module,
 )
-from flext_quality.exceptions import __all__ as exceptions_all
 
 
 class TestFlextQualityExceptions:

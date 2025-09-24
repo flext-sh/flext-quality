@@ -24,7 +24,7 @@ class FlextQualityAnalysisTypes:
     Contains all analysis types as nested classes with shared functionality.
     """
 
-    def __init__(self) -> None:
+    def __init__(self: object) -> None:
         """Initialize analysis types with dependency injection."""
         self._container = FlextContainer.get_global()
         self._logger = FlextLogger(__name__)
@@ -192,7 +192,7 @@ class FlextQualityAnalysisTypes:
         """Complete analysis results containing all metrics and issues."""
 
         overall_metrics: FlextQualityAnalysisTypes.OverallMetrics = Field(
-            default_factory=FlextQualityAnalysisTypes.OverallMetrics,
+            default_factory=lambda: FlextQualityAnalysisTypes().OverallMetrics(),
             description="Overall analysis metrics",
         )
         file_metrics: list[FlextQualityAnalysisTypes.FileAnalysisResult] = Field(

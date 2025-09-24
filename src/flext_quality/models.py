@@ -27,7 +27,7 @@ class FlextQualityModels(FlextModels):
     Contains all Pydantic models as nested classes with shared functionality.
     """
 
-    def __init__(self) -> None:
+    def __init__(self: object) -> None:
         """Initialize models with dependency injection."""
         self._container = FlextContainer.get_global()
         self._logger = FlextLogger(__name__)
