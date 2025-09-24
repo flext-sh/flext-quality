@@ -29,9 +29,10 @@ else:
     QualityIssueList = FlextTypes.Core.List
 
 
-class FlextQualityUtilities:
+class FlextQualityUtilities(FlextUtilities):
     """Unified quality utilities class following FLEXT architecture patterns.
 
+    Inherits from FlextUtilities to avoid duplication and ensure consistency.
     Single consolidated class containing ALL utility functionality to eliminate duplication
     and follow the unified class pattern mandated by CLAUDE.md.
     """

@@ -10,10 +10,10 @@ import warnings
 
 from pydantic_settings import SettingsConfigDict
 
-from flext_core import FlextConstants, FlextModels
+from flext_core import FlextConfig, FlextConstants
 
 
-class FlextQualityConfig(FlextModels.Config):
+class FlextQualityConfig(FlextConfig):
     """Quality service configuration using flext-core patterns."""
 
     # Analysis settings

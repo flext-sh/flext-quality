@@ -19,9 +19,10 @@ from flext_core import FlextContainer, FlextLogger, FlextModels, FlextTypes
 from flext_quality.constants import FlextQualityConstants
 
 
-class FlextQualityModels:
+class FlextQualityModels(FlextModels):
     """Unified quality models class following FLEXT architecture patterns.
 
+    Inherits from FlextModels to avoid duplication and ensure consistency.
     Single responsibility: Quality data models and validation
     Contains all Pydantic models as nested classes with shared functionality.
     """
