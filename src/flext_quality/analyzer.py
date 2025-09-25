@@ -336,11 +336,11 @@ class FlextQualityCodeAnalyzer:
 
         for node in ast.walk(tree):
             # Count decision points
-            if isinstance(node, ast.If | ast.While | ast.For | ast.With):
+            if isinstance(node, (ast.If | ast.While | ast.For) | ast.With):
                 complexity += 1
             elif isinstance(node, ast.Try):
                 complexity += len(node.handlers)
-            elif isinstance(node, ast.And | ast.Or):
+            elif isinstance(node, (ast.And | ast.Or)):
                 complexity += 1
 
         return complexity

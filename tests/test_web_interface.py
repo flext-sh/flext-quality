@@ -227,7 +227,7 @@ class TestQualityWebInterface:
         # Mock for error response - jsonify returns tuple for error cases
         def jsonify_side_effect(
             data: FlextTypes.Core.Dict | str,
-            *_: object,
+            *_,
         ) -> str:
             if "error" in data:
                 return "error_response"
@@ -279,7 +279,7 @@ class TestQualityWebInterface:
         mock_logger.info.assert_called()
 
     @patch("flext_quality.web.QualityWebInterface")
-    def test_main(self, mock_interface_class: MagicMock) -> None:
+    def test_self(self, mock_interface_class: MagicMock) -> None:
         """Test main function."""
         # Setup mock
         mock_interface = MagicMock()

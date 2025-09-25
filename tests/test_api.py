@@ -22,7 +22,7 @@ class TestQualityAPI:
         """Create a QualityAPI instance."""
         return QualityAPI()
 
-    async def test_create_project(self, api: QualityAPI) -> None:
+    async def test_create_project_through_api(self, api: QualityAPI) -> None:
         """Test creating a project through API."""
         result = await api.create_project(
             name="test_project",
@@ -35,7 +35,7 @@ class TestQualityAPI:
         assert result.value is not None
         assert result.value.project_path == "./test_project"
 
-    async def test_get_project(self, api: QualityAPI) -> None:
+    async def test_get_project_through_api(self, api: QualityAPI) -> None:
         """Test getting a project through API."""
         # First create a project
         create_result = await api.create_project(
@@ -52,13 +52,13 @@ class TestQualityAPI:
         result = await api.get_project(project_id)
         assert result.success
 
-    async def test_list_projects(self, api: QualityAPI) -> None:
+    async def test_list_projects_through_api(self, api: QualityAPI) -> None:
         """Test listing projects through API."""
         result = await api.list_projects()
         assert result.success
         assert isinstance(result.value, list)
 
-    async def test_update_project(self, api: QualityAPI) -> None:
+    async def test_update_project_through_api(self, api: QualityAPI) -> None:
         """Test updating a project through API."""
         # First create a project
         create_result = await api.create_project(
@@ -77,7 +77,7 @@ class TestQualityAPI:
         result = await api.update_project(project_id, updates)
         assert result.success
 
-    async def test_delete_project(self, api: QualityAPI) -> None:
+    async def test_delete_project_through_api(self, api: QualityAPI) -> None:
         """Test deleting a project through API."""
         # First create a project
         create_result = await api.create_project(
@@ -95,7 +95,7 @@ class TestQualityAPI:
         result = await api.delete_project(project_id)
         assert result.success
 
-    async def test_create_analysis(self, api: QualityAPI) -> None:
+    async def test_create_analysis_through_api(self, api: QualityAPI) -> None:
         """Test creating an analysis through API."""
         project_id = uuid4()
 
@@ -106,7 +106,7 @@ class TestQualityAPI:
         )
         assert result.success
 
-    async def test_update_analysis_metrics(self, api: QualityAPI) -> None:
+    async def test_update_analysis_metrics_through_api(self, api: QualityAPI) -> None:
         """Test updating analysis metrics through API."""
         analysis_id = uuid4()
 
@@ -121,7 +121,7 @@ class TestQualityAPI:
         # This will fail because analysis doesn't exist, but tests the API call
         assert result.is_failure
 
-    async def test_update_analysis_scores(self, api: QualityAPI) -> None:
+    async def test_update_analysis_scores_through_api(self, api: QualityAPI) -> None:
         """Test updating analysis scores through API."""
         analysis_id = uuid4()
 
@@ -136,7 +136,7 @@ class TestQualityAPI:
         # This will fail because analysis doesn't exist
         assert result.is_failure
 
-    async def test_create_issue(self, api: QualityAPI) -> None:
+    async def test_create_issue_through_api(self, api: QualityAPI) -> None:
         """Test creating an issue through API."""
         analysis_id = uuid4()
 
@@ -151,7 +151,7 @@ class TestQualityAPI:
         )
         assert result.success
 
-    async def test_get_issue(self, api: QualityAPI) -> None:
+    async def test_get_issue_through_api(self, api: QualityAPI) -> None:
         """Test getting an issue through API."""
         # First create an issue
         analysis_id = uuid4()
@@ -172,7 +172,7 @@ class TestQualityAPI:
         result = await api.get_issue(issue_id)
         assert result.success
 
-    async def test_mark_issue_fixed(self, api: QualityAPI) -> None:
+    async def test_mark_issue_fixed_through_api(self, api: QualityAPI) -> None:
         """Test marking an issue as fixed through API."""
         # First create an issue
         analysis_id = uuid4()
@@ -193,7 +193,7 @@ class TestQualityAPI:
         result = await api.mark_issue_fixed(issue_id)
         assert result.success
 
-    async def test_suppress_issue(self, api: QualityAPI) -> None:
+    async def test_suppress_issue_through_api(self, api: QualityAPI) -> None:
         """Test suppressing an issue through API."""
         # First create an issue
         analysis_id = uuid4()
@@ -214,7 +214,7 @@ class TestQualityAPI:
         result = await api.suppress_issue(issue_id, "False positive")
         assert result.success
 
-    async def test_create_report(self, api: QualityAPI) -> None:
+    async def test_create_report_through_api(self, api: QualityAPI) -> None:
         """Test creating a report through API."""
         analysis_id = uuid4()
 
@@ -225,7 +225,7 @@ class TestQualityAPI:
         )
         assert result.success
 
-    async def test_get_report(self, api: QualityAPI) -> None:
+    async def test_get_report_through_api(self, api: QualityAPI) -> None:
         """Test getting a report through API."""
         # First create a report
         analysis_id = uuid4()
@@ -242,7 +242,7 @@ class TestQualityAPI:
         result = await api.get_report(report_id)
         assert result.success
 
-    async def test_delete_report(self, api: QualityAPI) -> None:
+    async def test_delete_report_through_api(self, api: QualityAPI) -> None:
         """Test deleting a report through API."""
         # First create a report
         analysis_id = uuid4()
@@ -259,7 +259,7 @@ class TestQualityAPI:
         result = await api.delete_report(report_id)
         assert result.success
 
-    async def test_analyze_project_full(self, api: QualityAPI) -> None:
+    async def test_run_full_analysis_through_api(self, api: QualityAPI) -> None:
         """Test full project analysis through API."""
         project_id = uuid4()
 
@@ -271,21 +271,21 @@ class TestQualityAPI:
         # This is complex flow, just test it doesn't crash
         assert result is not None
 
-    async def test_list_project_analyses(self, api: QualityAPI) -> None:
+    async def test_list_analyses_through_api(self, api: QualityAPI) -> None:
         """Test listing project analyses through API."""
         project_id = uuid4()
 
         result = await api.list_analyses(project_id)
         assert result.success
 
-    async def test_list_analysis_issues(self, api: QualityAPI) -> None:
+    async def test_list_issues_through_api(self, api: QualityAPI) -> None:
         """Test listing analysis issues through API."""
         analysis_id = uuid4()
 
         result = await api.list_issues(analysis_id)
         assert result.success
 
-    async def test_list_analysis_reports(self, api: QualityAPI) -> None:
+    async def test_list_reports_through_api(self, api: QualityAPI) -> None:
         """Test listing analysis reports through API."""
         analysis_id = uuid4()
 

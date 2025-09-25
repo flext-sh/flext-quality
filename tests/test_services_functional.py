@@ -33,7 +33,7 @@ class TestQualityProjectServiceFunctional:
         """Create service instance."""
         return QualityProjectService()
 
-    async def test_create_project_success(self, service: QualityProjectService) -> None:
+    async def test_project_creation_success(self, service: QualityProjectService) -> None:
         """Test successful project creation - covers lines 42-56."""
         with tempfile.TemporaryDirectory() as temp_dir:
             result = await service.create_project(
@@ -49,7 +49,7 @@ class TestQualityProjectServiceFunctional:
             assert project.auto_analyze is True
             assert len(service._projects) == 1
 
-    async def test_get_project_success(self, service: QualityProjectService) -> None:
+    async def test_project_retrieval_success(self, service: QualityProjectService) -> None:
         """Test successful project retrieval - covers lines 61-66."""
         # Create project first
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -67,7 +67,7 @@ class TestQualityProjectServiceFunctional:
             assert project.id == project_id
             assert project.project_path == temp_dir
 
-    async def test_get_project_not_found(self, service: QualityProjectService) -> None:
+    async def test_project_retrieval_not_found(self, service: QualityProjectService) -> None:
         """Test get project when not found - covers line 75."""
         result = await service.get_project("non-existent-id")
 
@@ -75,7 +75,7 @@ class TestQualityProjectServiceFunctional:
         assert result.error is not None
         assert "Project not found" in result.error
 
-    async def test_list_projects_success(self, service: QualityProjectService) -> None:
+    async def test_project_listing_success(self, service: QualityProjectService) -> None:
         """Test successful project listing - covers line 76."""
         # Create multiple projects
         with (
@@ -101,7 +101,7 @@ class TestQualityProjectServiceFunctional:
             assert projects[0].project_path == temp_dir1
             assert projects[1].project_path == temp_dir2
 
-    async def test_update_project_success(self, service: QualityProjectService) -> None:
+    async def test_project_update_success(self, service: QualityProjectService) -> None:
         """Test successful project update - covers lines 82-95."""
         # Create project first
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -133,7 +133,7 @@ class TestQualityProjectServiceFunctional:
         assert result.error is not None
         assert "Project not found" in result.error
 
-    async def test_delete_project_success(self, service: QualityProjectService) -> None:
+    async def test_project_deletion_success(self, service: QualityProjectService) -> None:
         """Test successful project deletion - covers lines 101-104."""
         # Create project first
         with tempfile.TemporaryDirectory() as temp_dir:
@@ -169,7 +169,7 @@ class TestQualityAnalysisServiceFunctional:
         """Create service instance."""
         return QualityAnalysisService()
 
-    async def test_create_analyssuccess(self, service: QualityAnalysisService) -> None:
+    async def test_analysis_creation_success(self, service: QualityAnalysisService) -> None:
         """Test successful analysis creation - covers lines 121-141."""
         result = await service.create_analysis(
             project_id="test-project-id",
@@ -185,7 +185,7 @@ class TestQualityAnalysisServiceFunctional:
         assert analysis.status == FlextAnalysisStatus.QUEUED
         assert len(service._analyses) == 1
 
-    async def test_get_analyssuccess(self, service: QualityAnalysisService) -> None:
+    async def test_analysis_retrieval_success(self, service: QualityAnalysisService) -> None:
         """Test successful analysis retrieval - covers lines 283-286."""
         # Create analysis first
         create_result = await service.create_analysis("test-project")
@@ -255,7 +255,7 @@ class TestQualityAnalysisServiceFunctional:
         assert result.error is not None
         assert "Analysis not found" in result.error
 
-    async def test_update_scores_success(self, service: QualityAnalysisService) -> None:
+    async def test_analysis_scores_update_success(self, service: QualityAnalysisService) -> None:
         """Test successful scores update - covers lines 177-204."""
         # Create analysis first
         create_result = await service.create_analysis("test-project")
@@ -353,7 +353,7 @@ class TestQualityAnalysisServiceFunctional:
         assert result.error is not None
         assert "Analysis not found" in result.error
 
-    async def test_fail_analyssuccess(self, service: QualityAnalysisService) -> None:
+    async def test_analysis_failure_success(self, service: QualityAnalysisService) -> None:
         """Test successful analysis failure - covers lines 263-271."""
         # Create analysis first
         create_result = await service.create_analysis("test-project")
@@ -378,7 +378,7 @@ class TestQualityAnalysisServiceFunctional:
         assert result.error is not None
         assert "Analysis not found" in result.error
 
-    async def test_list_analyses_success(self, service: QualityAnalysisService) -> None:
+    async def test_analyses_listing_success(self, service: QualityAnalysisService) -> None:
         """Test successful analyses listing - covers lines 290-299."""
         # Create multiple analyses
         await service.create_analysis("project-1")
@@ -394,7 +394,7 @@ class TestQualityAnalysisServiceFunctional:
         for analysis in analyses:
             assert analysis.project_id == "project-1"
 
-    async def test_list_analyses_empty(self, service: QualityAnalysisService) -> None:
+    async def test_analyses_listing_empty_result(self, service: QualityAnalysisService) -> None:
         """Test list analyses when none exist - covers empty filter case."""
         result = await service.list_analyses("non-existent-project")
 
@@ -411,7 +411,7 @@ class TestQualityIssueServiceFunctional:
         """Create service instance."""
         return QualityIssueService()
 
-    async def test_create_issue_success(self, service: QualityIssueService) -> None:
+    async def test_issue_creation_success(self, service: QualityIssueService) -> None:
         """Test successful issue creation - covers lines 319-345."""
         result = await service.create_issue(
             analysis_id="test-analysis",
@@ -435,7 +435,7 @@ class TestQualityIssueServiceFunctional:
         assert issue.message == "Potential security vulnerability"
         assert len(service._issues) == 1
 
-    async def test_get_issue_success(self, service: QualityIssueService) -> None:
+    async def test_issue_retrieval_success(self, service: QualityIssueService) -> None:
         """Test successful issue retrieval - covers lines 350-355."""
         # Create issue first
         create_result = await service.create_issue(
@@ -458,7 +458,7 @@ class TestQualityIssueServiceFunctional:
         assert issue.id == issue_id
         assert issue.issue_type == IssueType.STYLE_VIOLATION
 
-    async def test_get_issue_not_found(self, service: QualityIssueService) -> None:
+    async def test_issue_retrieval_not_found(self, service: QualityIssueService) -> None:
         """Test get issue when not found - covers line 352."""
         result = await service.get_issue("non-existent-id")
 
@@ -466,7 +466,7 @@ class TestQualityIssueServiceFunctional:
         assert result.error is not None
         assert "Issue not found" in result.error
 
-    async def test_list_issues_success(self, service: QualityIssueService) -> None:
+    async def test_issues_listing_success(self, service: QualityIssueService) -> None:
         """Test successful issues listing - covers lines 361-377."""
         # Create multiple issues
         await service.create_issue(
@@ -509,7 +509,7 @@ class TestQualityIssueServiceFunctional:
         for issue in issues:
             assert issue.analysis_id == "analysis-1"
 
-    async def test_list_issues_empty(self, service: QualityIssueService) -> None:
+    async def test_issues_listing_empty_result(self, service: QualityIssueService) -> None:
         """Test list issues when none exist - covers empty filter case."""
         result = await service.list_issues("non-existent-analysis")
 
@@ -517,7 +517,7 @@ class TestQualityIssueServiceFunctional:
         issues = result.value
         assert len(issues) == 0
 
-    async def test_mark_fixed_success(self, service: QualityIssueService) -> None:
+    async def test_issue_mark_fixed_success(self, service: QualityIssueService) -> None:
         """Test successful issue marking as fixed - covers lines 383-390."""
         # Create issue first
         create_result = await service.create_issue(
@@ -539,7 +539,7 @@ class TestQualityIssueServiceFunctional:
         fixed_issue = result.value
         assert fixed_issue.is_fixed is True
 
-    async def test_mark_fixed_not_found(self, service: QualityIssueService) -> None:
+    async def test_issue_mark_fixed_not_found(self, service: QualityIssueService) -> None:
         """Test mark fixed when issue not found - covers line 385."""
         result = await service.mark_fixed("non-existent-id")
 
@@ -547,7 +547,7 @@ class TestQualityIssueServiceFunctional:
         assert result.error is not None
         assert "Issue not found" in result.error
 
-    async def test_suppress_issue_success(self, service: QualityIssueService) -> None:
+    async def test_issue_suppression_success(self, service: QualityIssueService) -> None:
         """Test successful issue suppression - covers lines 399-406."""
         # Create issue first
         create_result = await service.create_issue(
@@ -570,7 +570,7 @@ class TestQualityIssueServiceFunctional:
         assert suppressed_issue.is_suppressed is True
         assert suppressed_issue.suppression_reason == "False positive"
 
-    async def test_suppress_issue_not_found(self, service: QualityIssueService) -> None:
+    async def test_issue_suppression_not_found(self, service: QualityIssueService) -> None:
         """Test suppress issue when not found - covers line 401."""
         result = await service.suppress_issue("non-existent-id", "Reason")
 
@@ -578,7 +578,7 @@ class TestQualityIssueServiceFunctional:
         assert result.error is not None
         assert "Issue not found" in result.error
 
-    async def test_unsuppress_issue_success(self, service: QualityIssueService) -> None:
+    async def test_issue_unsuppression_success(self, service: QualityIssueService) -> None:
         """Test successful issue unsuppression - covers lines 411-418."""
         # Create and suppress issue first
         create_result = await service.create_issue(
@@ -622,7 +622,7 @@ class TestQualityReportServiceFunctional:
         """Create service instance."""
         return QualityReportService()
 
-    async def test_create_report_success(self, service: QualityReportService) -> None:
+    async def test_report_creation_success(self, service: QualityReportService) -> None:
         """Test successful report creation - covers lines 429-449."""
         result = await service.create_report(
             analysis_id="test-analysis",
@@ -638,7 +638,7 @@ class TestQualityReportServiceFunctional:
         assert report.generated_at is not None
         assert len(service._reports) == 1
 
-    async def test_get_report_success(self, service: QualityReportService) -> None:
+    async def test_report_retrieval_success(self, service: QualityReportService) -> None:
         """Test successful report retrieval - covers lines 454-461."""
         # Create report first
         create_result = await service.create_report(
@@ -656,7 +656,7 @@ class TestQualityReportServiceFunctional:
         assert report.id == report_id
         assert report.analysis_id == "test-analysis"
 
-    async def test_get_report_not_found(self, service: QualityReportService) -> None:
+    async def test_report_retrieval_not_found(self, service: QualityReportService) -> None:
         """Test get report when not found - covers line 456."""
         result = await service.get_report("non-existent-id")
 
@@ -664,7 +664,7 @@ class TestQualityReportServiceFunctional:
         assert result.error is not None
         assert "Report not found" in result.error
 
-    async def test_list_reports_success(self, service: QualityReportService) -> None:
+    async def test_reports_listing_success(self, service: QualityReportService) -> None:
         """Test successful reports listing - covers lines 466-473."""
         # Create multiple reports
         await service.create_report(
@@ -692,7 +692,7 @@ class TestQualityReportServiceFunctional:
         for report in reports:
             assert report.analysis_id == "analysis-1"
 
-    async def test_list_reports_empty(self, service: QualityReportService) -> None:
+    async def test_reports_listing_empty_result(self, service: QualityReportService) -> None:
         """Test list reports when none exist - covers empty filter case."""
         result = await service.list_reports("non-existent-analysis")
 
@@ -700,7 +700,7 @@ class TestQualityReportServiceFunctional:
         reports = result.value
         assert len(reports) == 0
 
-    async def test_delete_report_success(self, service: QualityReportService) -> None:
+    async def test_report_deletion_success(self, service: QualityReportService) -> None:
         """Test successful report deletion - covers lines 477-481."""
         # Create report first
         create_result = await service.create_report(
@@ -716,7 +716,7 @@ class TestQualityReportServiceFunctional:
         assert result.success
         assert len(service._reports) == 0
 
-    async def test_delete_report_not_found(self, service: QualityReportService) -> None:
+    async def test_report_deletion_not_found(self, service: QualityReportService) -> None:
         """Test delete report when not found - covers line 479."""
         result = await service.delete_report("non-existent-id")
 

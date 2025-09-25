@@ -389,7 +389,7 @@ if __name__ == "__main__":
     utils_py.write_text("""
 
 import sys
-def get_env_var(name: str) -> str | None:
+def get_env_var(name: str) -> Union[str, None]:
     return os.environ.get(name)
 """)
     # Create test files
@@ -399,7 +399,7 @@ def get_env_var(name: str) -> str | None:
     test_main_py.write_text("""
 
 from src.main import main
-from typing import Dict
+from typing import Union, Dict
 from typing import Generator
 from typing import List
 def test_main() -> None:

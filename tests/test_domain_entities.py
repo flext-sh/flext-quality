@@ -26,7 +26,7 @@ from flext_quality import (
 class TestQualityProject:
     """Test QualityProject entity."""
 
-    def test_project_creation(self, secure_temp_dir: str) -> None:
+    def test_basic_project_creation(self, secure_temp_dir: str) -> None:
         """Test basic project creation."""
         project = QualityProject(
             id="test-project-id",
@@ -64,7 +64,7 @@ class TestQualityProject:
                 project_path="",  # Empty path should fail
             )
 
-    def test_update_last_analysis(self, secure_temp_dir: str) -> None:
+    def test_update_last_analysis_timestamp(self, secure_temp_dir: str) -> None:
         """Test updating last analysis timestamp."""
         project = QualityProject(
             id="test-id",

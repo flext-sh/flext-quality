@@ -135,7 +135,7 @@ class TestCLIFunctional:
         assert captured.out.strip()  # Should have output
         assert "<html>" in captured.out or "<!DOCTYPE" in captured.out
 
-    def test_analyze_project_save_to_file(self, basic_args: argparse.Namespace) -> None:
+    def test_self(self, basic_args: argparse.Namespace) -> None:
         """Test project analysis with file output."""
         with tempfile.TemporaryDirectory() as temp_dir:
             output_file = Path(temp_dir) / "report.json"
@@ -207,7 +207,7 @@ class TestCLIFunctional:
         # Should still succeed
         assert result in {0, 1, 2}
 
-    def test_analyze_project_verbose_mode(self, basic_args: argparse.Namespace) -> None:
+    def test_analysis_with_verbose_mode(self, basic_args: argparse.Namespace) -> None:
         """Test analysis with verbose mode."""
         basic_args.verbose = True
 
@@ -298,7 +298,7 @@ class TestCLIFunctional:
         captured = capsys.readouterr()
         assert "Traceback" in captured.err or len(captured.err) > 0
 
-    def test_another_function_basic(self, basic_args: argparse.Namespace) -> None:
+    def test_another_function_basic_args(self, basic_args: argparse.Namespace) -> None:
         """Test another_function with basic arguments."""
         result = another_function(basic_args)
 

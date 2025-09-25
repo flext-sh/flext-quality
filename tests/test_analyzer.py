@@ -278,7 +278,9 @@ class TestCodeAnalyzerComprehensive:
         assert overall["average_complexity"] == 7
         assert overall["max_complexity"] == 7
 
-    def test_analyze_security_enabled(self, temporary_project_structure: str) -> None:
+    def test_analyze_security_with_vulnerabilities(
+        self, temporary_project_structure: str
+    ) -> None:
         """Test _analyze_security when security analysis is enabled."""
         project_path = Path(temporary_project_structure)
 
@@ -309,7 +311,9 @@ subprocess.call(f"rm -rf {user_input}")  # Command injection risk - INTENTIONAL 
             assert isinstance(issues, list)
             assert len(issues) == 0
 
-    def test_analyze_complexity_enabled(self, temporary_project_structure: str) -> None:
+    def test_analyze_complexity_with_high_complexity(
+        self, temporary_project_structure: str
+    ) -> None:
         """Test _analyze_complexity when complexity analysis is enabled."""
         analyzer = CodeAnalyzer(temporary_project_structure)
         project_path = Path(temporary_project_structure)
@@ -370,7 +374,9 @@ def complex_function(x):
             assert isinstance(issues, list)
             assert len(issues) == 0
 
-    def test_analyze_dead_code_enabled(self, temporary_project_structure: str) -> None:
+    def test_analyze_dead_code_with_unused_functions(
+        self, temporary_project_structure: str
+    ) -> None:
         """Test _analyze_dead_code when dead code analysis is enabled."""
         analyzer = CodeAnalyzer(temporary_project_structure)
         project_path = Path(temporary_project_structure)
@@ -409,7 +415,9 @@ print(used_variable)
             assert isinstance(issues, list)
             assert len(issues) == 0
 
-    def test_analyze_duplicates_enabled(self, temporary_project_structure: str) -> None:
+    def test_analyze_duplicates_with_duplicate_blocks(
+        self, temporary_project_structure: str
+    ) -> None:
         """Test _analyze_duplicates when duplicate analysis is enabled."""
         analyzer = CodeAnalyzer(temporary_project_structure)
         project_path = Path(temporary_project_structure)
@@ -545,7 +553,7 @@ class DataProcessor:
           return item.upper()
       return str(item)
 
-def get_env_var(name: str) -> str | None:
+def get_env_var(name: str) -> Union[str, None]:
     return os.environ.get(name)
 
 def complex_calculation(x, y, z):
@@ -636,7 +644,7 @@ def test_unicode():
 
         comprehensive_file.write_text('''
 
-from typing import Dict
+from typing import Union, Dict
 from typing import Optional
 
 class BaseClass:
@@ -714,7 +722,9 @@ variable = "test"
         assert metrics.file_path == comprehensive_file
         # Note: Class/function names are not stored in FileAnalysisResult
 
-    def test_get_quality_score_method(self, temporary_project_structure: str) -> None:
+    def test_get_quality_score_public_method(
+        self, temporary_project_structure: str
+    ) -> None:
         """Test get_quality_score public method."""
         analyzer = CodeAnalyzer(temporary_project_structure)
 
@@ -726,7 +736,9 @@ variable = "test"
         assert isinstance(score, float)
         assert 0.0 <= score <= 100.0
 
-    def test_get_quality_grade_method(self, temporary_project_structure: str) -> None:
+    def test_get_quality_grade_public_method(
+        self, temporary_project_structure: str
+    ) -> None:
         """Test get_quality_grade public method."""
         analyzer = CodeAnalyzer(temporary_project_structure)
 

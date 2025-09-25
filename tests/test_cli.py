@@ -577,7 +577,7 @@ class TestMainFunctionComprehensive:
         assert result == 0
 
     @patch("flext_quality.cli.setup_logging")
-    def test_main_no_command(self, mock_setup_logging: MagicMock) -> None:
+    def test_self(self, mock_setup_logging: MagicMock) -> None:
         """Test main function with no command provided."""
         test_args = ["flext-quality"]
         with patch.object(sys, "argv", test_args):
@@ -678,7 +678,7 @@ class TestCLIIntegration:
         """DRY helper: Create another_function arguments."""
         return argparse.Namespace(path=path)
 
-    def test_end_to_end_analyze_flow(self, temporary_project_structure: str) -> None:
+    def test_self(self, temporary_project_structure: str) -> None:
         """Test complete end-to-end analyze flow."""
         # This test uses real implementations without mocking
         args = argparse.Namespace(
@@ -696,7 +696,7 @@ class TestCLIIntegration:
         # Should complete successfully
         assert result == 0
 
-    def test_end_to_end_score_flow(self, temporary_project_structure: str) -> None:
+    def test_complete_end_to_end_score_flow(self, temporary_project_structure: str) -> None:
         """Test complete end-to-end score flow."""
         # This test uses real implementations without mocking
         args = self._create_score_args(temporary_project_structure)
@@ -706,7 +706,7 @@ class TestCLIIntegration:
         assert isinstance(result, int)
         assert result in {0, 1}  # Valid return codes
 
-    def test_main_function_integration(self, temporary_project_structure: str) -> None:
+    def test_main_function_integration_no_mocking(self, temporary_project_structure: str) -> None:
         """Test main function integration without mocking."""
         test_args = ["flext-quality", "analyze", temporary_project_structure]
         with patch.object(sys, "argv", test_args):

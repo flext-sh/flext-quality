@@ -69,7 +69,7 @@ class TestQualityProjectService:
         retrieved_data = assert_result_success_with_data(result)
         assert retrieved_data.id == project_id
 
-    async def test_get_project_not_found(self, service: QualityProjectService) -> None:
+    async def test_get_nonexistent_project(self, service: QualityProjectService) -> None:
         """Test getting a non-existent project."""
         result = await service.get_project("non-existent-id")
         error_msg = assert_result_failure_with_error(result)
@@ -149,7 +149,7 @@ class TestQualityAnalysisService:
         """Create a QualityAnalysisService instance."""
         return QualityAnalysisService()
 
-    async def test_create_analysis(self, service: QualityAnalysisService) -> None:
+    async def test_create_analysis_basic(self, service: QualityAnalysisService) -> None:
         """Test creating an analysis."""
         result = await service.create_analysis(
             project_id="test-project-id",
@@ -158,7 +158,7 @@ class TestQualityAnalysisService:
         )
         assert result.success
 
-    async def test_update_metrics(self, service: QualityAnalysisService) -> None:
+    async def test_update_analysis_metrics(self, service: QualityAnalysisService) -> None:
         """Test updating analysis metrics."""
         result = await service.update_metrics(
             analysis_id="test-analysis-id",
@@ -170,7 +170,7 @@ class TestQualityAnalysisService:
         )
         assert result.is_failure  # Analysis not found
 
-    async def test_update_scores(self, service: QualityAnalysisService) -> None:
+    async def test_update_analysis_scores(self, service: QualityAnalysisService) -> None:
         """Test updating analysis scores."""
         result = await service.update_scores(
             analysis_id="test-analysis-id",
@@ -182,12 +182,12 @@ class TestQualityAnalysisService:
         )
         assert result.is_failure  # Analysis not found
 
-    async def test_complete_analysis(self, service: QualityAnalysisService) -> None:
+    async def test_complete_analysis_basic(self, service: QualityAnalysisService) -> None:
         """Test completing an analysis."""
         result = await service.complete_analysis("test-analysis-id")
         assert result.is_failure  # Analysis not found
 
-    async def test_fail_analysis(self, service: QualityAnalysisService) -> None:
+    async def test_fail_analysis_basic(self, service: QualityAnalysisService) -> None:
         """Test failing an analysis."""
         result = await service.fail_analysis("test-analysis-id", "Test error")
         assert result.is_failure  # Analysis not found
@@ -201,7 +201,7 @@ class TestQualityIssueService:
         """Create a QualityIssueService instance."""
         return QualityIssueService()
 
-    async def test_create_issue(self, service: QualityIssueService) -> None:
+    async def test_create_issue_basic(self, service: QualityIssueService) -> None:
         """Test creating an issue."""
         result = await service.create_issue(
             analysis_id="test-analysis-id",
@@ -217,7 +217,7 @@ class TestQualityIssueService:
         assert issue_data.issue_type == IssueType.STYLE_VIOLATION
         assert issue_data.severity == IssueSeverity.MEDIUM
 
-    async def test_get_issue(self, service: QualityIssueService) -> None:
+    async def test_get_issue_basic(self, service: QualityIssueService) -> None:
         """Test getting an issue."""
         # Create an issue first
         create_result = await service.create_issue(
@@ -238,7 +238,7 @@ class TestQualityIssueService:
         retrieved_issue = assert_result_success_with_data(result)
         assert retrieved_issue.id == issue_id
 
-    async def test_mark_fixed(self, service: QualityIssueService) -> None:
+    async def test_mark_issue_fixed(self, service: QualityIssueService) -> None:
         """Test marking an issue as fixed."""
         # Create an issue first
         create_result = await service.create_issue(
@@ -259,7 +259,7 @@ class TestQualityIssueService:
         fixed_issue = assert_result_success_with_data(result)
         assert fixed_issue.is_fixed is True
 
-    async def test_suppress_issue(self, service: QualityIssueService) -> None:
+    async def test_suppress_issue_basic(self, service: QualityIssueService) -> None:
         """Test suppressing an issue."""
         # Create an issue first
         create_result = await service.create_issue(
@@ -291,7 +291,7 @@ class TestQualityReportService:
         """Create a QualityReportService instance."""
         return QualityReportService()
 
-    async def test_create_report(self, service: QualityReportService) -> None:
+    async def test_create_report_basic(self, service: QualityReportService) -> None:
         """Test creating a report."""
         result = await service.create_report(
             analysis_id="test-analysis-id",
@@ -304,7 +304,7 @@ class TestQualityReportService:
         )  # Entity uses report_type, not format_type
         assert hasattr(report_data, "analysis_id")
 
-    async def test_get_report(self, service: QualityReportService) -> None:
+    async def test_get_report_basic(self, service: QualityReportService) -> None:
         """Test getting a report."""
         # Create a report first
         create_result = await service.create_report(
@@ -320,7 +320,7 @@ class TestQualityReportService:
         assert retrieved_report.id == report_id
         assert retrieved_report.access_count == 1  # Incremented on access
 
-    async def test_delete_report(self, service: QualityReportService) -> None:
+    async def test_delete_report_basic(self, service: QualityReportService) -> None:
         """Test deleting a report."""
         # Create a report first
         create_result = await service.create_report(

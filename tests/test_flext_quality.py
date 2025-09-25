@@ -25,7 +25,7 @@ class TestCodeAnalyzer:
             msg: str = f"Expected {Path()}, got {analyzer.project_path}"
             raise AssertionError(msg)
 
-    def test_analyzer_with_path(self, tmp_path: Path) -> None:
+    def test_analyzer_initialization_with_path(self, tmp_path: Path) -> None:
         """Test analyzer with path function.
 
         Args:
@@ -37,7 +37,7 @@ class TestCodeAnalyzer:
             msg: str = f"Expected {tmp_path}, got {analyzer.project_path}"
             raise AssertionError(msg)
 
-    def test_find_python_files(self, tmp_path: Path) -> None:
+    def test_find_python_files_function(self, tmp_path: Path) -> None:
         """Test find python files function.
 
         Args:
@@ -66,7 +66,7 @@ class TestCodeAnalyzer:
             msg: str = f"Expected test2.py in files: {[f.name for f in files]}"
             raise AssertionError(msg)
 
-    def test_analyze_project_basic(self, tmp_path: Path) -> None:
+    def test_analyze_project_basic_function(self, tmp_path: Path) -> None:
         """Test analyze project basic function.
 
         Args:

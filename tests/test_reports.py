@@ -171,18 +171,18 @@ class TestQualityReport:
             },
         }
 
-    def test_report_initialization(self, minimal_results: object) -> None:
+    def test_quality_report_initialization(self, minimal_results: object) -> None:
         """Test QualityReport initialization."""
         report = QualityReport(minimal_results)
         assert report.results == minimal_results
 
-    def test_get_quality_score_minimal(self, minimal_results: object) -> None:
+    def test_quality_score_minimal_issues(self, minimal_results: object) -> None:
         """Test quality score calculation with minimal issues."""
         report = QualityReport(minimal_results)
         score = report._get_quality_score()
         assert score == 100  # No issues = perfect score
 
-    def test_get_quality_score_with_issues(self, poor_results: object) -> None:
+    def test_quality_score_many_issues(self, poor_results: object) -> None:
         """Test quality score calculation with many issues."""
         report = QualityReport(poor_results)
         score = report._get_quality_score()
@@ -267,7 +267,7 @@ class TestQualityReport:
             assert color.startswith("#")
             assert len(color) == 7  # #RRGGBB format
 
-    def test_get_total_issues(self, mixed_results: object) -> None:
+    def test_total_issues_calculation(self, mixed_results: object) -> None:
         """Test total issue calculation."""
         report = QualityReport(mixed_results)
         total = report._get_total_issues()
@@ -276,7 +276,7 @@ class TestQualityReport:
         expected_total = 1 + 1 + 1 + 1  # security + errors + complexity + duplicates
         assert total == expected_total
 
-    def test_get_critical_issues(self, mixed_results: object) -> None:
+    def test_critical_issues_calculation(self, mixed_results: object) -> None:
         """Test critical issue calculation."""
         report = QualityReport(mixed_results)
         critical = report._get_critical_issues()
@@ -285,13 +285,13 @@ class TestQualityReport:
         expected_critical = 2  # 1 security + 1 errors
         assert critical == expected_critical
 
-    def test_get_files_analyzed(self, good_results: object) -> None:
+    def test_files_analyzed_extraction(self, good_results: object) -> None:
         """Test files analyzed extraction."""
         report = QualityReport(good_results)
         files = report._get_files_analyzed()
         assert files == 10
 
-    def test_get_coverage_percent(self, good_results: object) -> None:
+    def test_coverage_percentage_extraction(self, good_results: object) -> None:
         """Test coverage percentage extraction."""
         report = QualityReport(good_results)
         coverage = report._get_coverage_percent()
@@ -359,7 +359,7 @@ class TestQualityReport:
         assert "... and" in text_report
         assert "more" in text_report
 
-    def test_generate_json_report(self, good_results: object) -> None:
+    def test_json_report_generation(self, good_results: object) -> None:
         """Test JSON report generation."""
         report = QualityReport(good_results)
         json_report = report.generate_json_report()
@@ -440,7 +440,7 @@ class TestQualityReport:
         # Check that some color is present (flexible test)
         assert "#" in html_report or "color:" in html_report  # Some color styling
 
-    def test_generate_issues_html_empty(self, minimal_results: object) -> None:
+    def test_html_issues_generation_no_issues(self, minimal_results: object) -> None:
         """Test HTML issues generation with no issues."""
         report = QualityReport(minimal_results)
         issues_html = report._generate_issues_html()

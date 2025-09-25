@@ -102,14 +102,14 @@ class TestQualityProjectServiceComprehensive:
         assert project.id == created_project.id
         assert project.project_path == secure_temp_dir
 
-    async def test_get_project_not_found(self, service: QualityProjectService) -> None:
+    async def test_project_get_not_found(self, service: QualityProjectService) -> None:
         """Test get_project with non-existent ID."""
         result = await service.get_project("non-existent-id")
 
         error = assert_result_failure_with_error(result)
         assert "Project not found" in error
 
-    async def test_list_projects_empty(self, service: QualityProjectService) -> None:
+    async def test_project_list_empty(self, service: QualityProjectService) -> None:
         """Test list_projects when no projects exist."""
         result = await service.list_projects()
 
@@ -223,7 +223,7 @@ class TestQualityAnalysisServiceComprehensive:
         assert analysis.status == AnalysisStatus.QUEUED
         assert analysis.id is not None
 
-    async def test_get_analyssuccess(self, service: QualityAnalysisService) -> None:
+    async def test_analysis_retrieval_success(self, service: QualityAnalysisService) -> None:
         """Test successful analysis retrieval."""
         # Create an analysis
         project_id = str(uuid.uuid4())
@@ -247,7 +247,7 @@ class TestQualityAnalysisServiceComprehensive:
         error = assert_result_failure_with_error(result)
         assert "Analysis not found" in error
 
-    async def test_list_analyses_success(self, service: QualityAnalysisService) -> None:
+    async def test_analysis_listing_success(self, service: QualityAnalysisService) -> None:
         """Test successful analyses listing."""
         project_id = str(uuid.uuid4())
 
@@ -309,7 +309,7 @@ class TestQualityAnalysisServiceComprehensive:
         error = assert_result_failure_with_error(result)
         assert "Analysis not found" in error
 
-    async def test_update_scores_success(self, service: QualityAnalysisService) -> None:
+    async def test_analysis_scores_update_success(self, service: QualityAnalysisService) -> None:
         """Test successful scores update."""
         # Create an analysis
         project_id = str(uuid.uuid4())
@@ -376,7 +376,7 @@ class TestQualityAnalysisServiceComprehensive:
         assert completed.status == AnalysisStatus.COMPLETED
         assert completed.completed_at is not None
 
-    async def test_fail_analyssuccess(self, service: QualityAnalysisService) -> None:
+    async def test_analysis_failure_marking_success(self, service: QualityAnalysisService) -> None:
         """Test successful analysis failure marking."""
         # Create an analysis
         project_id = str(uuid.uuid4())
@@ -400,7 +400,7 @@ class TestQualityIssueServiceComprehensive:
         """Create service instance."""
         return QualityIssueService()
 
-    async def test_create_issue_success(self, service: QualityIssueService) -> None:
+    async def test_issue_creation_success(self, service: QualityIssueService) -> None:
         """Test successful issue creation."""
         analysis_id = str(uuid.uuid4())
 
@@ -455,7 +455,7 @@ class TestQualityIssueServiceComprehensive:
         assert issue.line_number is None  # Optional parameter
         assert issue.column_number is None  # Optional parameter
 
-    async def test_get_issue_success(self, service: QualityIssueService) -> None:
+    async def test_issue_retrieval_success(self, service: QualityIssueService) -> None:
         """Test successful issue retrieval."""
         # Create an issue
         analysis_id = str(uuid.uuid4())
@@ -478,7 +478,7 @@ class TestQualityIssueServiceComprehensive:
         assert retrieved.id == issue.id
         assert retrieved.analysis_id == analysis_id
 
-    async def test_list_issues_by_analysis(self, service: QualityIssueService) -> None:
+    async def test_issue_listing_by_analysis(self, service: QualityIssueService) -> None:
         """Test listing issues by analysis ID."""
         analysis_id = str(uuid.uuid4())
 
@@ -514,7 +514,7 @@ class TestQualityIssueServiceComprehensive:
         for issue in issues:
             assert issue.analysis_id == analysis_id
 
-    async def test_mark_fixed_success(self, service: QualityIssueService) -> None:
+    async def test_issue_mark_fixed_success(self, service: QualityIssueService) -> None:
         """Test successful issue marking as fixed."""
         # Create an issue
         analysis_id = str(uuid.uuid4())
@@ -536,7 +536,7 @@ class TestQualityIssueServiceComprehensive:
         fixed_issue = assert_result_success_with_data(result)
         assert fixed_issue.is_fixed
 
-    async def test_suppress_issue_success(self, service: QualityIssueService) -> None:
+    async def test_issue_suppression_success(self, service: QualityIssueService) -> None:
         """Test successful issue suppression."""
         # Create an issue
         analysis_id = str(uuid.uuid4())
@@ -560,7 +560,7 @@ class TestQualityIssueServiceComprehensive:
         assert suppressed.is_suppressed
         assert suppressed.suppression_reason == reason
 
-    async def test_unsuppress_issue_success(self, service: QualityIssueService) -> None:
+    async def test_issue_unsuppression_success(self, service: QualityIssueService) -> None:
         """Test successful issue unsuppression."""
         # Create and suppress an issue
         analysis_id = str(uuid.uuid4())
@@ -594,7 +594,7 @@ class TestQualityReportServiceComprehensive:
         """Create service instance."""
         return QualityReportService()
 
-    async def test_create_report_success(self, service: QualityReportService) -> None:
+    async def test_report_creation_success(self, service: QualityReportService) -> None:
         """Test successful report creation."""
         analysis_id = str(uuid.uuid4())
 
@@ -630,7 +630,7 @@ class TestQualityReportServiceComprehensive:
         assert report.report_type == "json"
         assert report.report_type == "json"
 
-    async def test_get_report_success(self, service: QualityReportService) -> None:
+    async def test_report_retrieval_success(self, service: QualityReportService) -> None:
         """Test successful report retrieval."""
         # Create a report
         analysis_id = str(uuid.uuid4())
@@ -687,7 +687,7 @@ class TestQualityReportServiceComprehensive:
         types = {r.report_type for r in reports}
         assert types == {"html", "json", "pdf"}
 
-    async def test_delete_report_success(self, service: QualityReportService) -> None:
+    async def test_report_deletion_success(self, service: QualityReportService) -> None:
         """Test successful report deletion."""
         # Create a report
         analysis_id = str(uuid.uuid4())
@@ -707,7 +707,7 @@ class TestQualityReportServiceComprehensive:
         get_result = await service.get_report(str(report.id))
         assert get_result.is_failure
 
-    async def test_delete_report_not_found(self, service: QualityReportService) -> None:
+    async def test_report_deletion_not_found(self, service: QualityReportService) -> None:
         """Test delete_report with non-existent ID."""
         result = await service.delete_report("non-existent-id")
 

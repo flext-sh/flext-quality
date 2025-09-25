@@ -9,7 +9,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from flask import Response as FlaskResponse, jsonify, request
-from flext_web.config import FlextWebConfigs
+from Flext_web.config import FlextWebConfig
 from werkzeug.wrappers import Response as WerkzeugResponse
 
 from flext_core import FlextContainer, FlextLogger, FlextResult, FlextTypes
@@ -17,7 +17,7 @@ from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.api import QualityAPI
 from flext_web import FlextWebServices
 
-ResponseType = FlaskResponse | WerkzeugResponse | tuple[FlaskResponse, int]
+ResponseType = (FlaskResponse | WerkzeugResponse) | tuple[FlaskResponse, int]
 
 
 class FlextQualityWeb:
@@ -69,7 +69,7 @@ class FlextQualityWeb:
 
             # Validate required config parameters explicitly
             if all(key in config for key in ["host", "port"]):
-                web_config = FlextWebConfigs.WebConfig(
+                web_config = FlextWebConfig.WebConfig(
                     host=safe_str(config.get("host"), "localhost"),
                     port=safe_int(config.get("port"), 8000),
                     debug=safe_bool(config.get("debug"), default=False),
@@ -86,7 +86,7 @@ class FlextQualityWeb:
     def _get_web_settings() -> dict[str, object]:
         """Get web settings using flext-web patterns."""
         # Type conversion for compatibility
-        result: FlextResult[object] = FlextWebConfigs.get_web_settings()
+        result: FlextResult[object] = FlextWebConfig.get_web_settings()
         return dict(result) if hasattr(result, "__dict__") else {}
 
     @staticmethod

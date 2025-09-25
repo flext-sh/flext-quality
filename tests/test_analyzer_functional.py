@@ -68,12 +68,12 @@ class DataProcessor:
 
       return results
 
-    def _is_valid_item(self, item: object) -> bool:
+    def _is_valid_item(self, item) -> bool:
       """Check if item is valid for processing."""
 
       return item is not None and isinstance(item, (str, int, float))
 
-    def _process_single_item(self, item: object) -> object:
+    def _process_single_item(self, item) -> object:
       """Process a single item."""
 
       if isinstance(item, str):
@@ -136,7 +136,7 @@ def multiply(x: int, y: int) -> int:
         assert analyzer.project_path == sample_project_dir
         assert analyzer._current_results is None
 
-    def test_analyze_project_basic(self, sample_project_dir: Path) -> None:
+    def test_basic_project_analysis(self, sample_project_dir: Path) -> None:
         """Test basic project analysis functionality."""
         analyzer = CodeAnalyzer(sample_project_dir)
 
@@ -169,7 +169,7 @@ def multiply(x: int, y: int) -> int:
         assert "utils.py" in file_names
         assert "__init__.py" in file_names
 
-    def test_analyze_project_with_options(self, sample_project_dir: Path) -> None:
+    def test_project_analysis_with_options(self, sample_project_dir: Path) -> None:
         """Test project analysis with various options."""
         analyzer = CodeAnalyzer(sample_project_dir)
 
@@ -195,7 +195,7 @@ def multiply(x: int, y: int) -> int:
         assert isinstance(results_minimal, dict)
         assert results_minimal["files_analyzed"] == 3
 
-    def test_find_python_files(self, sample_project_dir: Path) -> None:
+    def test_find_python_files_method(self, sample_project_dir: Path) -> None:
         """Test _find_python_files method."""
         analyzer = CodeAnalyzer(sample_project_dir)
 
@@ -211,7 +211,7 @@ def multiply(x: int, y: int) -> int:
             assert file_path.suffix == ".py"
             assert file_path.exists()
 
-    def test_analyze_file_individual(self, sample_project_dir: Path) -> None:
+    def test_analyze_file_method_individual(self, sample_project_dir: Path) -> None:
         """Test _analyze_file method on individual files."""
         analyzer = CodeAnalyzer(sample_project_dir)
 
@@ -243,7 +243,7 @@ def multiply(x: int, y: int) -> int:
         # The method should gracefully handle missing files
         assert result is None or result == {}
 
-    def test_calculate_overall_metrics(self, sample_project_dir: Path) -> None:
+    def test_calculate_overall_metrics_method(self, sample_project_dir: Path) -> None:
         """Test _calculate_overall_metrics method."""
         analyzer = CodeAnalyzer(sample_project_dir)
 
@@ -278,7 +278,7 @@ def multiply(x: int, y: int) -> int:
         # Should aggregate metrics from all files if implemented
         # Note: The actual implementation may vary, just verify it returns a dict
 
-    def test_get_quality_score(self, sample_project_dir: Path) -> None:
+    def test_get_quality_score_method(self, sample_project_dir: Path) -> None:
         """Test get_quality_score method."""
         analyzer = CodeAnalyzer(sample_project_dir)
 
@@ -291,7 +291,7 @@ def multiply(x: int, y: int) -> int:
         assert isinstance(score, (int, float))
         assert 0 <= score <= 100
 
-    def test_get_quality_grade(self, sample_project_dir: Path) -> None:
+    def test_get_quality_grade_method(self, sample_project_dir: Path) -> None:
         """Test get_quality_grade method."""
         analyzer = CodeAnalyzer(sample_project_dir)
 
@@ -356,7 +356,7 @@ invalid_syntax here
             assert results.overall_metrics.files_analyzed == 1
             # Should still attempt to process the file
 
-    def test_large_file_analysis(self, sample_project_dir: Path) -> None:
+    def test_analyzer_with_larger_file(self, sample_project_dir: Path) -> None:
         """Test analyzer with a larger file."""
         # Create a larger Python file
         large_file = sample_project_dir / "large_file.py"
@@ -388,7 +388,7 @@ invalid_syntax here
             assert isinstance(analyzer.project_path, Path)
             assert str(analyzer.project_path) == temp_dir
 
-    def test_concurrent_analysis_safety(self, sample_project_dir: Path) -> None:
+    def test_analyzer_multiple_analyses(self, sample_project_dir: Path) -> None:
         """Test that analyzer can handle multiple analyses safely."""
         analyzer = CodeAnalyzer(sample_project_dir)
 
