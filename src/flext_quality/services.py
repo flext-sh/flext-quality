@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
+from typing import override
 
 from flext_core import (
     FlextContainer,
@@ -28,7 +29,7 @@ logger = FlextLogger(__name__)
 
 # Use flext-core protocols instead of local definitions
 QualityServiceProtocol = FlextProtocols.Domain.Service
-QualityAnalysisServiceProtocol = FlextProtocols.Application.Handler[str, object]
+QualityAnalysisServiceProtocol = FlextProtocols.Application.Handler["str", "object"]
 QualityProjectServiceProtocol = FlextProtocols.Domain.Service
 
 
@@ -39,6 +40,7 @@ class FlextQualityServices:
     Contains all quality services as nested classes with shared resources.
     """
 
+    @override
     def __init__(self, **data: object) -> None:
         """Initialize quality services with dependency injection."""
         super().__init__(**data)  # Pass data to parent
@@ -90,6 +92,7 @@ class FlextQualityServices:
     class ProjectService:
         """Service for managing quality projects using flext-core patterns."""
 
+        @override
         def __init__(self, parent: FlextQualityServices) -> None:
             """Initialize service with parent reference."""
             self._parent = parent
@@ -133,6 +136,7 @@ class FlextQualityServices:
     class IssueService:
         """Service for managing quality issues using flext-core patterns."""
 
+        @override
         def __init__(self, parent: FlextQualityServices) -> None:
             """Initialize service with parent reference."""
             self._parent = parent
@@ -160,7 +164,7 @@ class FlextQualityServices:
                     analysis_id=analysis_id,
                     issue_type=issue_type,
                     severity=severity,
-                    rule_id=rule or "unknown",
+                    rule_id=rule or unknown,
                     file_path=file_path,
                     line_number=line_number,
                     column_number=column_number,
@@ -249,7 +253,7 @@ class FlextQualityServices:
 
                 # Update issue to unsuppressed status using model_copy
                 updated_issue = issue.model_copy(
-                    update={"is_suppressed": False, "suppression_reason": None},
+                    update={"is_suppressed": "False", "suppression_reason": "None"},
                 )
 
                 self._parent.set_issue(issue_id, updated_issue)
@@ -264,6 +268,7 @@ class FlextQualityServices:
     class AnalysisService:
         """Service for managing quality analyses using flext-core patterns."""
 
+        @override
         def __init__(self, parent: FlextQualityServices) -> None:
             """Initialize service with parent reference."""
             self._parent = parent
@@ -315,6 +320,7 @@ class FlextQualityServices:
     class ReportService:
         """Service for managing quality reports using flext-core patterns."""
 
+        @override
         def __init__(self, parent: FlextQualityServices) -> None:
             """Initialize service with parent reference."""
             self._parent = parent
@@ -333,7 +339,7 @@ class FlextQualityServices:
                 report = FlextQualityReport(
                     analysis_id=analysis_id,
                     report_type=format_type,
-                    report_format="summary",
+                    report_format=summary,
                     report_path=file_path,
                     report_size_bytes=len(content.encode()) if content else 0,
                 )
@@ -384,6 +390,7 @@ class FlextQualityServices:
     class ExternalAnalysisService:
         """Service for external backend analysis using flext-core patterns."""
 
+        @override
         def __init__(self, parent: FlextQualityServices) -> None:
             """Initialize service with external backend."""
             self._parent = parent

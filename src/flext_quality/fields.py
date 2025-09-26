@@ -6,7 +6,7 @@ Copyright (c) 2025 FLEXT Team. All rights reserved. SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from datetime import datetime
-from typing import cast
+from typing import cast, override
 
 from pydantic import Field
 from pydantic.fields import FieldInfo
@@ -21,6 +21,7 @@ class FlextQualityFields:
     Contains all field factory functions as static methods with shared functionality.
     """
 
+    @override
     def __init__(self: object) -> None:
         """Initialize fields with dependency injection."""
         self._container = FlextContainer.get_global()

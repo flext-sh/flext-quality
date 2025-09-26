@@ -9,6 +9,7 @@ from __future__ import annotations
 import warnings
 from datetime import UTC, datetime
 from enum import StrEnum
+from typing import override
 
 from pydantic import BaseModel, Field
 
@@ -24,6 +25,7 @@ class FlextQualityEntities:
     Contains all domain entities as nested classes with shared functionality.
     """
 
+    @override
     def __init__(self: object) -> None:
         """Initialize quality entities with dependency injection."""
         self._container = FlextContainer.get_global()
@@ -155,34 +157,32 @@ class FlextQualityEntities:
         def complete_analysis(self: object) -> FlextQualityEntities.QualityAnalysis:
             """Complete analysis and return new instance."""
             completed_at = datetime.now(UTC)
-            duration_seconds = None
             if self.started_at:
                 duration = completed_at - self.started_at
-                duration_seconds = duration.total_seconds()
+                duration.total_seconds()
 
             return self.model_copy(
                 update={
-                    "completed_at": completed_at,
+                    "completed_at": "completed_at",
                     "status": FlextQualityEntities.AnalysisStatus.COMPLETED,
-                    "duration_seconds": duration_seconds,
+                    "duration_seconds": "duration_seconds",
                 },
             )
 
         def fail_analysis(self, error: str) -> FlextQualityEntities.QualityAnalysis:
             """Fail analysis and return new instance."""
             completed_at = datetime.now(UTC)
-            duration_seconds = None
             if self.started_at:
                 duration = completed_at - self.started_at
-                duration_seconds = duration.total_seconds()
+                duration.total_seconds()
 
             return self.model_copy(
                 update={
-                    "completed_at": completed_at,
+                    "completed_at": "completed_at",
                     "status": FlextQualityEntities.AnalysisStatus.FAILED,
-                    "duration_seconds": duration_seconds,
+                    "duration_seconds": "duration_seconds",
                     "overall_score": 0.0,  # Failed analysis gets 0 score
-                    "analysis_config": {**self.analysis_config, "error": error},
+                    "analysis_config": {**self.analysis_config, "error": "error"},
                 },
             )
 
@@ -197,8 +197,8 @@ class FlextQualityEntities:
                 self.security_score,
                 self.maintainability_score,
             ]
-            overall_score = sum(scores) / len(scores)
-            return self.model_copy(update={"overall_score": overall_score})
+            sum(scores) / len(scores)
+            return self.model_copy(update={"overall_score": "overall_score"})
 
         @property
         def is_completed(self: object) -> bool:
@@ -253,14 +253,14 @@ class FlextQualityEntities:
 
         def mark_fixed(self: object) -> FlextQualityEntities.QualityIssue:
             """Mark issue as fixed and return new instance."""
-            return self.model_copy(update={"is_fixed": True})
+            return self.model_copy(update={"is_fixed": "True"})
 
         def suppress(self, reason: str) -> FlextQualityEntities.QualityIssue:
             """Suppress issue and return new instance."""
             return self.model_copy(
                 update={
-                    "is_suppressed": True,
-                    "suppression_reason": reason,
+                    "is_suppressed": "True",
+                    "suppression_reason": "reason",
                 },
             )
 
@@ -268,8 +268,8 @@ class FlextQualityEntities:
             """Unsuppress issue and return new instance."""
             return self.model_copy(
                 update={
-                    "is_suppressed": False,
-                    "suppression_reason": None,
+                    "is_suppressed": "False",
+                    "suppression_reason": "None",
                 },
             )
 
@@ -309,18 +309,18 @@ class FlextQualityEntities:
 
         def enable(self: object) -> FlextQualityEntities.QualityRule:
             """Enable rule and return new instance."""
-            return self.model_copy(update={"enabled": True})
+            return self.model_copy(update={"enabled": "True"})
 
         def disable(self: object) -> FlextQualityEntities.QualityRule:
             """Disable rule and return new instance."""
-            return self.model_copy(update={"enabled": False})
+            return self.model_copy(update={"enabled": "False"})
 
         def update_severity(
             self,
             severity: FlextIssueSeverity,
         ) -> FlextQualityEntities.QualityRule:
             """Update severity and return new instance."""
-            return self.model_copy(update={"severity": severity})
+            return self.model_copy(update={"severity": "severity"})
 
         def set_parameter(
             self,
@@ -330,7 +330,7 @@ class FlextQualityEntities:
             """Set parameter and return new instance."""
             new_parameters = self.parameters.copy()
             new_parameters[key] = value
-            return self.model_copy(update={"parameters": new_parameters})
+            return self.model_copy(update={"parameters": "new_parameters"})
 
         def validate_business_rules(self: object) -> FlextResult[None]:
             """Validate domain rules for quality rule."""

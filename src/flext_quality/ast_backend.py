@@ -344,14 +344,14 @@ class FlextQualityASTBackend(BaseAnalyzer):
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
                 # Count methods
-                methods = sum(
+                sum(
                     1
                     for item in node.body
                     if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef))
                 )
                 class_info: FlextTypes.Core.Dict = {
                     "name": node.name,
-                    "methods": methods,
+                    "methods": "methods",
                     "lineno": node.lineno,
                     "bases": [
                         base.id if isinstance(base, ast.Name) else str(base)
@@ -408,7 +408,7 @@ class ASTVisitor:
 
     def __new__(cls, *args: object, **kwargs: object) -> object:
         """Create instance of the actual ASTVisitor class."""
-        return FlextQualityASTBackend._ASTVisitor(*args, **kwargs)  # noqa: SLF001
+        return FlextQualityASTBackend._ASTVisitor(*args, **kwargs)
 
 
 ASTBackend = FlextQualityASTBackend

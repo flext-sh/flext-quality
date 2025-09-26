@@ -23,7 +23,7 @@ DuplicateDetectorService = FlextProtocols.Domain.Service
 MetricsCollectorService = FlextProtocols.Domain.Service
 
 # Report generation uses Application.Handler protocol
-ReportGeneratorService = FlextProtocols.Application.Handler[object, str]
+ReportGeneratorService = FlextProtocols.Application.Handler["object", "str"]
 
 
 # Export protocol aliases

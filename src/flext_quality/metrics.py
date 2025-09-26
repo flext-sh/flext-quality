@@ -66,7 +66,7 @@ class QualityMetrics(FlextModels.Value):
         ge=0,
         le=100,
     )
-    quality_grade: str = Field("F", description="Quality grade letter (A+ to F)")
+    quality_grade: str = Field(F, description="Quality grade letter (A+ to F)")
 
     # File metrics
     total_files: int = Field(0, description="Total number of files", ge=0)
@@ -138,7 +138,7 @@ class QualityMetrics(FlextModels.Value):
         """
         return cls(
             overall_score=0.0,
-            quality_grade="F",
+            quality_grade=F,
             total_files=0,
             total_lines_of_code=0,
             total_functions=0,
@@ -463,24 +463,24 @@ class QualityMetrics(FlextModels.Value):
         """Create QualityMetrics instance with all parameters."""
         return cls.model_validate(
             {
-                "overall_score": overall_score,
-                "quality_grade": quality_grade,
-                "total_files": total_files,
-                "total_lines_of_code": total_loc,
-                "total_functions": total_functions,
-                "total_classes": total_classes,
-                "average_complexity": avg_complexity,
-                "max_complexity": max_complexity,
-                "complex_files_count": complexity_count,
-                "security_issues_count": security_count,
-                "dead_code_items_count": dead_code_count,
-                "duplicate_blocks_count": duplicate_count,
-                "complexity_issues_count": complexity_count,
-                "complexity_score": complexity_score,
-                "security_score": security_score,
-                "maintainability_score": maintainability_score,
-                "duplication_score": duplication_score,
-                "documentation_score": documentation_score,
+                "overall_score": "overall_score",
+                "quality_grade": "quality_grade",
+                "total_files": "total_files",
+                "total_lines_of_code": "total_loc",
+                "total_functions": "total_functions",
+                "total_classes": "total_classes",
+                "average_complexity": "avg_complexity",
+                "max_complexity": "max_complexity",
+                "complex_files_count": "complexity_count",
+                "security_issues_count": "security_count",
+                "dead_code_items_count": "dead_code_count",
+                "duplicate_blocks_count": "duplicate_count",
+                "complexity_issues_count": "complexity_count",
+                "complexity_score": "complexity_score",
+                "security_score": "security_score",
+                "maintainability_score": "maintainability_score",
+                "duplication_score": "duplication_score",
+                "documentation_score": "documentation_score",
             },
         )
 

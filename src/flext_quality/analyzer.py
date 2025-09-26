@@ -9,6 +9,7 @@ from __future__ import annotations
 import ast
 import warnings
 from pathlib import Path
+from typing import override
 
 from flext_core import FlextLogger, FlextResult, FlextTypes
 from flext_quality.analysis_types import FlextQualityAnalysisTypes
@@ -25,6 +26,8 @@ SIMILARITY_THRESHOLD = 0.8
 class FlextQualityCodeAnalyzer:
     """Main code analyzer interface for FLEXT Quality."""
 
+    @override
+    @override
     def __init__(self, project_path: str | Path) -> None:
         """Initialize analyzer with project path."""
         self.project_path = Path(project_path)
@@ -387,21 +390,21 @@ class FlextQualityCodeAnalyzer:
         complexity_values = safe_get_metric(file_metrics, "complexity", 0.0)
 
         total_loc = sum(loc_values)
-        total_functions = sum(function_values)
-        total_classes = sum(class_values)
+        sum(function_values)
+        sum(class_values)
 
-        avg_complexity = (
+        (
             sum(complexity_values) / total_files if total_files > 0 else 0.0
         )
-        max_complexity = max(complexity_values) if complexity_values else 0.0
+        max(complexity_values) if complexity_values else 0.0
 
         return {
-            "total_files": total_files,
-            "total_lines_of_code": total_loc,
-            "total_functions": total_functions,
-            "total_classes": total_classes,
-            "average_complexity": avg_complexity,
-            "max_complexity": max_complexity,
+            "total_files": "total_files",
+            "total_lines_of_code": "total_loc",
+            "total_functions": "total_functions",
+            "total_classes": "total_classes",
+            "average_complexity": "avg_complexity",
+            "max_complexity": "max_complexity",
             "avg_lines_per_file": total_loc / total_files if total_files > 0 else 0,
         }
 
@@ -484,7 +487,7 @@ class FlextQualityCodeAnalyzer:
                         function_name="file_level",  # Would need AST parsing for specific functions
                         line_number=1,
                         complexity_value=complexity_val,
-                        issue_type="high_complexity",
+                        issue_type=high_complexity,
                         message=f"High complexity: {complexity_val}",
                     ),
                 )
@@ -511,8 +514,8 @@ class FlextQualityCodeAnalyzer:
                                 file_path=str(py_file.relative_to(self.project_path)),
                                 line_number=i + 1,
                                 end_line_number=i + 1,
-                                issue_type="unused_import",
-                                code_type="import_statement",
+                                issue_type=unused_import,
+                                code_type=import_statement,
                                 code_snippet=line.strip(),
                                 message=f"Potentially unused import: {line.strip()}",
                             ),
@@ -587,6 +590,8 @@ class CodeAnalyzer(FlextQualityCodeAnalyzer):
     This facade provides compatibility during migration.
     """
 
+    @override
+    @override
     def __init__(self, project_path: str | Path) -> None:
         """Initialize the instance."""
         warnings.warn(

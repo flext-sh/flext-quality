@@ -11,6 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from datetime import datetime
+from typing import override
 from uuid import UUID
 
 from pydantic import Field, field_validator
@@ -27,6 +28,7 @@ class FlextQualityModels(FlextModels):
     Contains all Pydantic models as nested classes with shared functionality.
     """
 
+    @override
     def __init__(self: object) -> None:
         """Initialize models with dependency injection."""
         self._container = FlextContainer.get_global()

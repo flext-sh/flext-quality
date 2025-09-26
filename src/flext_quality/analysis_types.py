@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import override
 
 from pydantic import BaseModel, Field
 
@@ -24,6 +25,7 @@ class FlextQualityAnalysisTypes:
     Contains all analysis types as nested classes with shared functionality.
     """
 
+    @override
     def __init__(self: object) -> None:
         """Initialize analysis types with dependency injection."""
         self._container = FlextContainer.get_global()
@@ -83,7 +85,7 @@ class FlextQualityAnalysisTypes:
             description="Security issue severity",
         )
         confidence: str = Field(
-            default="MEDIUM",
+            default=MEDIUM,
             description="Confidence level of detection",
         )
 

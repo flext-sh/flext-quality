@@ -13,8 +13,8 @@ TESTS_DIR := tests
 COV_DIR := flext_quality
 
 # Quality Standards
-MIN_COVERAGE := 90
-QUALITY_MIN_COVERAGE := 90.0
+MIN_COVERAGE := 100
+QUALITY_MIN_COVERAGE := 100.0
 QUALITY_MAX_COMPLEXITY := 10
 QUALITY_MAX_DUPLICATION := 5.0
 
@@ -42,7 +42,7 @@ info: ## Show project information
 	@echo "Project: $(PROJECT_NAME)"
 	@echo "Python: $(PYTHON_VERSION)+"
 	@echo "Poetry: $(POETRY)"
-	@echo "Coverage: $(MIN_COVERAGE)% minimum"
+	@echo "Coverage: $(MIN_COVERAGE)% minimum (MANDATORY)"
 	@echo "Django Port: $(DJANGO_PORT)"
 	@echo "Quality Thresholds: Coverage $(QUALITY_MIN_COVERAGE)%, Complexity $(QUALITY_MAX_COMPLEXITY), Duplication $(QUALITY_MAX_DUPLICATION)%"
 	@echo "Architecture: Clean Architecture + DDD + Django + Quality Analysis"
@@ -64,7 +64,7 @@ setup: install-dev ## Complete project setup
 	$(POETRY) run pre-commit install
 
 # =============================================================================
-# QUALITY GATES (MANDATORY)
+# QUALITY GATES (MANDATORY - ZERO TOLERANCE)
 # =============================================================================
 
 .PHONY: validate
@@ -75,16 +75,16 @@ validate: lint type-check security test quality-check ## Run all quality gates
 check: lint type-check ## Quick health check
 
 .PHONY: lint
-lint: ## Run linting
-	$(POETRY) run ruff check $(SRC_DIR) $(TESTS_DIR)
+lint: ## Run linting (ZERO TOLERANCE)
+	$(POETRY) run ruff check .
 
 .PHONY: format
 format: ## Format code
-	$(POETRY) run ruff format $(SRC_DIR) $(TESTS_DIR)
+	$(POETRY) run ruff format .
 
 .PHONY: type-check
-type-check: ## Run type checking
-	$(POETRY) run mypy $(SRC_DIR) --strict
+type-check: ## Run type checking with Pyrefly (ZERO TOLERANCE)
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run pyrefly check .
 
 .PHONY: security
 security: ## Run security scanning
@@ -93,24 +93,24 @@ security: ## Run security scanning
 
 .PHONY: fix
 fix: ## Auto-fix issues
-	$(POETRY) run ruff check $(SRC_DIR) $(TESTS_DIR) --fix
-	$(POETRY) run ruff format $(SRC_DIR) $(TESTS_DIR)
+	$(POETRY) run ruff check . --fix
+	$(POETRY) run ruff format .
 
 # =============================================================================
-# TESTING
+# TESTING (MANDATORY - 100% COVERAGE)
 # =============================================================================
 
 .PHONY: test
-test: ## Run tests with coverage
-	$(POETRY) run pytest $(TESTS_DIR) --cov=$(COV_DIR) --cov-report=term-missing --cov-fail-under=$(MIN_COVERAGE)
+test: ## Run tests with 100% coverage (MANDATORY)
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run pytest -q --maxfail=10000 --cov=$(COV_DIR) --cov-report=term-missing:skip-covered --cov-fail-under=$(MIN_COVERAGE)
 
 .PHONY: test-unit
 test-unit: ## Run unit tests
-	$(POETRY) run pytest $(TESTS_DIR) -m "not integration" -v
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run pytest -m "not integration" -v
 
 .PHONY: test-integration
-test-integration: ## Run integration tests
-	$(POETRY) run pytest $(TESTS_DIR) -m integration -v
+test-integration: ## Run integration tests with Docker
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run pytest -m integration -v
 
 .PHONY: test-quality
 test-quality: ## Run quality analysis tests
@@ -130,11 +130,11 @@ test-e2e: ## Run end-to-end tests
 
 .PHONY: test-fast
 test-fast: ## Run tests without coverage
-	$(POETRY) run pytest $(TESTS_DIR) -v
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run pytest -v
 
 .PHONY: coverage-html
 coverage-html: ## Generate HTML coverage report
-	$(POETRY) run pytest $(TESTS_DIR) --cov=$(COV_DIR) --cov-report=html
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run pytest --cov=$(COV_DIR) --cov-report=html
 
 # =============================================================================
 # BUILD & DISTRIBUTION
@@ -153,39 +153,39 @@ build-clean: clean build ## Clean and build
 
 .PHONY: analyze
 analyze: ## Run comprehensive quality analysis
-	$(POETRY) run python -m flext_quality.cli analyze
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run python -m flext_quality.cli analyze
 
 .PHONY: quality-check
 quality-check: ## Check quality thresholds
-	$(POETRY) run python -m flext_quality.cli check-thresholds
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run python -m flext_quality.cli check-thresholds
 
 .PHONY: metrics
 metrics: ## Collect quality metrics
-	$(POETRY) run python -m flext_quality.cli collect-metrics
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run python -m flext_quality.cli collect-metrics
 
 .PHONY: report
 report: ## Generate quality reports
-	$(POETRY) run python -m flext_quality.cli generate-report
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run python -m flext_quality.cli generate-report
 
 .PHONY: workspace-analyze
 workspace-analyze: ## Analyze FLEXT workspace
-	$(POETRY) run python -m flext_quality.cli analyze-workspace
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run python -m flext_quality.cli analyze-workspace
 
 .PHONY: detect-issues
 detect-issues: ## Detect quality issues
-	$(POETRY) run python -m flext_quality.cli detect-issues
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run python -m flext_quality.cli detect-issues
 
 .PHONY: calculate-scores
 calculate-scores: ## Calculate quality scores
-	$(POETRY) run python -m flext_quality.cli calculate-scores
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run python -m flext_quality.cli calculate-scores
 
 .PHONY: quality-grade
 quality-grade: ## Calculate overall quality grade
-	$(POETRY) run python -m flext_quality.cli quality-grade
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run python -m flext_quality.cli quality-grade
 
 .PHONY: coverage-score
 coverage-score: ## Calculate coverage score
-	$(POETRY) run python -m flext_quality.cli coverage-score
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run python -m flext_quality.cli coverage-score
 
 # =============================================================================
 # DJANGO OPERATIONS
@@ -193,23 +193,23 @@ coverage-score: ## Calculate coverage score
 
 .PHONY: web-start
 web-start: ## Start Django web interface
-	$(POETRY) run python manage.py runserver $(DJANGO_PORT)
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run python manage.py runserver $(DJANGO_PORT)
 
 .PHONY: web-migrate
 web-migrate: ## Run Django migrations
-	$(POETRY) run python manage.py migrate
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run python manage.py migrate
 
 .PHONY: web-shell
 web-shell: ## Open Django shell
-	$(POETRY) run python manage.py shell
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run python manage.py shell
 
 .PHONY: web-collectstatic
 web-collectstatic: ## Collect static files
-	$(POETRY) run python manage.py collectstatic --noinput
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run python manage.py collectstatic --noinput
 
 .PHONY: web-createsuperuser
 web-createsuperuser: ## Create Django superuser
-	$(POETRY) run python manage.py createsuperuser
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run python manage.py createsuperuser
 
 # =============================================================================
 # DOCUMENTATION
@@ -245,7 +245,7 @@ deps-audit: ## Audit dependencies
 
 .PHONY: shell
 shell: ## Open Python shell
-	$(POETRY) run python
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run python
 
 .PHONY: pre-commit
 pre-commit: ## Run pre-commit hooks
@@ -257,7 +257,7 @@ pre-commit: ## Run pre-commit hooks
 
 .PHONY: clean
 clean: ## Clean build artifacts
-	rm -rf build/ dist/ *.egg-info/ .pytest_cache/ htmlcov/ .coverage .mypy_cache/ .ruff_cache/
+	rm -rf build/ dist/ *.egg-info/ .pytest_cache/ htmlcov/ .coverage .mypy_cache/ .pyrefly_cache/ .ruff_cache/
 	rm -rf reports/ quality_reports/ analysis_results/
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete 2>/dev/null || true
@@ -277,7 +277,7 @@ reset: clean-all setup ## Reset project
 diagnose: ## Project diagnostics
 	@echo "Python: $$(python --version)"
 	@echo "Poetry: $$($(POETRY) --version)"
-	@echo "Quality Service: $$($(POETRY) run python -c 'import flext_quality; print(getattr(flext_quality, \"__version__\", \"dev\"))' 2>/dev/null || echo 'Not available')"
+	@echo "Quality Service: $$(PYTHONPATH=$(SRC_DIR) $(POETRY) run python -c 'import flext_quality; print(getattr(flext_quality, \"__version__\", \"dev\"))' 2>/dev/null || echo 'Not available')"
 	@$(POETRY) env info
 
 .PHONY: doctor

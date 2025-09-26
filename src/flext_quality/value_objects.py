@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from enum import StrEnum
 from pathlib import Path
+from typing import override
 
 from pydantic import Field
 
@@ -362,6 +363,7 @@ class FlextQualityValueObjects:
     Contains all enums, models, and utilities as nested classes.
     """
 
+    @override
     def __init__(self, **data: object) -> None:
         """Initialize value objects service."""
         super().__init__()
@@ -699,17 +701,12 @@ class FlextQualityValueObjects:
                     f"Failed to calculate grade: {grade_result.error}",
                 )
 
-            grade = grade_result.value
-            category = (
-                "excellent"
-                if percentage >= EXCELLENT_QUALITY_THRESHOLD
-                else "good"
-                if percentage >= GOOD_QUALITY_THRESHOLD
-                else "needs_improvement"
-            )
-
             # Create instance using dict construction
-            score_data = {"value": percentage, "grade": grade, "category": category}
+            score_data = {
+                "value": "percentage",
+                "grade": "grade",
+                "category": "category",
+            }
             instance = self.QualityScore(**score_data)
 
             # Validate business rules

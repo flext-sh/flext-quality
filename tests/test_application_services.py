@@ -69,7 +69,9 @@ class TestQualityProjectService:
         retrieved_data = assert_result_success_with_data(result)
         assert retrieved_data.id == project_id
 
-    async def test_get_nonexistent_project(self, service: QualityProjectService) -> None:
+    async def test_get_nonexistent_project(
+        self, service: QualityProjectService
+    ) -> None:
         """Test getting a non-existent project."""
         result = await service.get_project("non-existent-id")
         error_msg = assert_result_failure_with_error(result)
@@ -158,7 +160,9 @@ class TestQualityAnalysisService:
         )
         assert result.success
 
-    async def test_update_analysis_metrics(self, service: QualityAnalysisService) -> None:
+    async def test_update_analysis_metrics(
+        self, service: QualityAnalysisService
+    ) -> None:
         """Test updating analysis metrics."""
         result = await service.update_metrics(
             analysis_id="test-analysis-id",
@@ -170,7 +174,9 @@ class TestQualityAnalysisService:
         )
         assert result.is_failure  # Analysis not found
 
-    async def test_update_analysis_scores(self, service: QualityAnalysisService) -> None:
+    async def test_update_analysis_scores(
+        self, service: QualityAnalysisService
+    ) -> None:
         """Test updating analysis scores."""
         result = await service.update_scores(
             analysis_id="test-analysis-id",
@@ -182,7 +188,9 @@ class TestQualityAnalysisService:
         )
         assert result.is_failure  # Analysis not found
 
-    async def test_complete_analysis_basic(self, service: QualityAnalysisService) -> None:
+    async def test_complete_analysis_basic(
+        self, service: QualityAnalysisService
+    ) -> None:
         """Test completing an analysis."""
         result = await service.complete_analysis("test-analysis-id")
         assert result.is_failure  # Analysis not found

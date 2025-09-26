@@ -13,7 +13,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TypeVar
+from typing import Literal
 
 from flext_core import FlextTypes
 
@@ -21,17 +21,8 @@ from flext_core import FlextTypes
 # QUALITY-SPECIFIC TYPE VARIABLES - Domain-specific TypeVars for quality operations
 # =============================================================================
 
+
 # Quality domain TypeVars
-TQualityAnalysis = TypeVar("TQualityAnalysis")
-TQualityProject = TypeVar("TQualityProject")
-TQualityReport = TypeVar("TQualityReport")
-TQualityRule = TypeVar("TQualityRule")
-TQualityMetric = TypeVar("TQualityMetric")
-TQualityIssue = TypeVar("TQualityIssue")
-TQualityScore = TypeVar("TQualityScore")
-TCodeAnalyzer = TypeVar("TCodeAnalyzer")
-
-
 class FlextQualityTypes(FlextTypes):
     """Quality analysis-specific type definitions extending FlextTypes.
 
@@ -150,21 +141,54 @@ class FlextQualityTypes(FlextTypes):
             str, str | bool | list[str] | dict[str, object]
         ]
 
+    # =========================================================================
+    # QUALITY PROJECT TYPES - Domain-specific project types extending FlextTypes
+    # =========================================================================
+
+    class Project(FlextTypes.Project):
+        """Quality-specific project types extending FlextTypes.Project.
+
+        Adds quality/analysis-specific project types while inheriting
+        generic types from FlextTypes. Follows domain separation principle:
+        Quality domain owns code quality and analysis-specific types.
+        """
+
+        # Quality-specific project types extending the generic ones
+        type ProjectType = Literal[
+            # Generic types inherited from FlextTypes.Project
+            "library",
+            "application",
+            "service",
+            # Quality-specific types
+            "quality-analyzer",
+            "code-analysis",
+            "quality-dashboard",
+            "metrics-collector",
+            "quality-gateway",
+            "analysis-engine",
+            "quality-reporter",
+            "code-scanner",
+            "quality-monitor",
+            "compliance-checker",
+            "quality-validator",
+            "audit-system",
+            "quality-api",
+            "analysis-service",
+            "code-quality",
+            "quality-platform",
+        ]
+
+        # Quality-specific project configurations
+        type QualityProjectConfig = dict[str, FlextTypes.Core.ConfigValue | object]
+        type AnalysisConfig = dict[str, str | int | bool | list[str]]
+        type QualityThresholds = dict[str, bool | str | dict[str, object]]
+        type MetricsConfig = dict[str, FlextTypes.Core.ConfigValue | object]
+
 
 # =============================================================================
 # PUBLIC API EXPORTS - Quality TypeVars and types
 # =============================================================================
 
 __all__: list[str] = [
-    # Quality Types class
     "FlextQualityTypes",
-    # Quality-specific TypeVars
-    "TCodeAnalyzer",
-    "TQualityAnalysis",
-    "TQualityIssue",
-    "TQualityMetric",
-    "TQualityProject",
-    "TQualityReport",
-    "TQualityRule",
-    "TQualityScore",
 ]

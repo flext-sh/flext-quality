@@ -5,6 +5,7 @@ SPDX-License-Identifier: MIT.
 
 from __future__ import annotations
 
+from typing import override
 from uuid import UUID
 
 from flext_core import FlextLogger, FlextResult, FlextTypes
@@ -44,6 +45,7 @@ class FlextQualityHandlers:
                 config=config,
             )
 
+    @override
     def __init__(self: object) -> None:
         """Initialize all services for handler operations."""
         self._services = FlextQualityServices()
@@ -118,7 +120,7 @@ class FlextQualityHandlers:
         # Create report for the analysis
         report_result = await self._report_service.create_report(
             analysis_id=analysis_id_str,
-            format_type="html",
+            format_type=html,
             content="comprehensive report",
         )
 

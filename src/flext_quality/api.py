@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
+from typing import override
 from uuid import UUID
 
 from flext_core import FlextResult, FlextTypes
@@ -31,6 +32,7 @@ QualityReport = FlextQualityReport
 class FlextQualityAPI:
     """Simple API interface for quality analysis operations."""
 
+    @override
     def __init__(self: object) -> None:
         """Initialize the Quality API with container-based DI."""
         self._container = get_quality_container()

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from textwrap import dedent
-from typing import cast
+from typing import cast, override
 
 from flext_core import FlextContainer, FlextLogger, FlextTypes, FlextUtilities
 from flext_quality.analysis_types import FlextQualityAnalysisTypes
@@ -25,6 +25,7 @@ class FlextQualityUtilities(FlextUtilities):
     and follow the unified class pattern mandated by CLAUDE.md.
     """
 
+    @override
     def __init__(self: object) -> None:
         """Initialize utilities with dependency injection."""
         self._container = (
@@ -147,8 +148,8 @@ def complex_function(x: object) -> object:
 
 import os
 import subprocess
-from typing import List
-from typing import Type
+from typing import , override
+from typing import Type, override
 
 def unsafe_function(user_input: object) -> object:
     """Function with real security issues - INTENTIONAL FOR TESTING PURPOSES ONLY."""
@@ -405,8 +406,8 @@ def complex_function(x: object) -> object:
 
 import os
 import subprocess
-from typing import List
-from typing import Type
+from typing import , override
+from typing import Type, override
 
 def unsafe_function(user_input: object) -> object:
     """Function with real security issues - INTENTIONAL FOR TESTING PURPOSES ONLY."""

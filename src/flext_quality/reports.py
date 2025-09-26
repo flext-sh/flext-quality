@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import warnings
 from pathlib import Path
+from typing import override
 
 from flext_core import FlextTypes
 from flext_quality.analysis_types import FlextQualityAnalysisTypes
@@ -36,6 +37,7 @@ HIGH_TYPE_ERROR_THRESHOLD = 10
 class FlextQualityReportGenerator:
     """Generates quality reports from analysis results."""
 
+    @override
     def __init__(
         self, analysis_results: FlextQualityAnalysisTypes.AnalysisResults
     ) -> None:
@@ -151,7 +153,7 @@ class FlextQualityReportGenerator:
             '    <meta name="viewport" content="width=device-width, initial-scale=1.0">',
             "    <title>FLEXT Quality Report</title>",
             "    <style>",
-            "        body { font-family: Arial, sans-serif; margin: 20px; }",
+            "        body { font-family: 'Arial', sans-serif; margin: 20px; }",
             "        .header { background: #2c3e50; color: white; padding: 20px; border-radius: 5px; }",
             "        .summary { margin: 20px 0; }",
             f"        .grade {{ font-size: 3em; font-weight: bold; color: {grade_color}; }}",

@@ -227,7 +227,7 @@ class TestQualityWebInterface:
         # Mock for error response - jsonify returns tuple for error cases
         def jsonify_side_effect(
             data: FlextTypes.Core.Dict | str,
-            *_,
+            *_: object,
         ) -> str:
             if "error" in data:
                 return "error_response"

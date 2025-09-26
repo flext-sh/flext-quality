@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 import shutil
-import subprocess  # noqa: S404  # Standard library module for process execution - validated tools only
+import subprocess
 import tempfile
 import warnings
 from importlib import import_module, util
@@ -51,7 +51,7 @@ class FlextQualityExternalBackend(BaseAnalyzer):
             Dictionary with analysis results
 
         """
-        result: FlextTypes.Core.Dict = {"tool": tool}
+        result: FlextTypes.Core.Dict = {"tool": "tool"}
         temp_path: Path | None = None
 
         if file_path:
@@ -61,7 +61,7 @@ class FlextQualityExternalBackend(BaseAnalyzer):
         try:
             with tempfile.NamedTemporaryFile(
                 encoding="utf-8",
-                mode="w",
+                mode=w,
                 suffix=".py",
                 delete=False,
             ) as f:
@@ -126,11 +126,11 @@ class FlextQualityExternalBackend(BaseAnalyzer):
             if not ruff_path:
                 return {
                     "issues": [],
-                    "ruff_available": False,
+                    "ruff_available": "False",
                 }  # Return empty dict if ruff is not available
 
             # Execute ruff with validated path and arguments only
-            result = subprocess.run(  # noqa: S603 # Validated ruff execution with timeout
+            result = subprocess.run(
                 [ruff_path, "check", str(abs_file_path), "--output-format", "json"],
                 capture_output=True,
                 text=True,
@@ -139,11 +139,11 @@ class FlextQualityExternalBackend(BaseAnalyzer):
             )
 
             # Parse output even if ruff found issues (non-zero exit is expected)
-            issues: list[object] = (
+            (
                 self._parse_ruff_output(result.stdout) if result.stdout else []
             )
 
-            return {"issues": issues, "code_length": len(code)}
+            return {"issues": "issues", "code_length": len(code)}
 
         except subprocess.TimeoutExpired:
             return {"error": "Ruff execution timed out"}
@@ -169,12 +169,12 @@ class FlextQualityExternalBackend(BaseAnalyzer):
             if mypy_api is None:
                 # Evita uso de subprocess; orienta execução manual
                 return {
-                    "error": "MyPy in-process API indisponível; execute manualmente: 'mypy <file>'",
+                    "error": "MyPy in-process API indisponível; execute manualmente: mypy <file>",
                     "code_length": len(code),
                 }
             stdout, _stderr, _status = mypy_api.run([str(file_path.resolve())])
-            issues = self._parse_mypy_output(stdout)
-            return {"issues": issues, "code_length": len(code)}
+            self._parse_mypy_output(stdout)
+            return {"issues": "issues", "code_length": len(code)}
 
         except Exception as e:
             return {"error": str(e)}
@@ -192,7 +192,7 @@ class FlextQualityExternalBackend(BaseAnalyzer):
             # For security policy compliance, avoid spawning external processes here.
             # Advise manual execution through CLI integration.
             return {
-                "error": "Bandit in-process execution not supported; run 'bandit -f json <file>' manually",
+                "error": "Bandit in-process execution not supported; run bandit -f json <file> manually",
                 "code_length": len(code),
             }
 
@@ -210,7 +210,7 @@ class FlextQualityExternalBackend(BaseAnalyzer):
 
             # Vulture has no stable in-process API here; avoid subprocess for policy compliance.
             return {
-                "error": "Vulture in-process execution not supported; run 'vulture <file>' manually",
+                "error": "Vulture in-process execution not supported; run vulture <file> manually",
                 "code_length": len(code),
             }
 
@@ -248,6 +248,7 @@ class ExternalBackend(FlextQualityExternalBackend):
     This facade provides compatibility during migration.
     """
 
+    @override
     def __init__(self: object) -> None:
         """Initialize the instance."""
         warnings.warn(

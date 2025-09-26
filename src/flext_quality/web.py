@@ -7,17 +7,18 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
+from typing import override
 
 from flask import Response as FlaskResponse, jsonify, request
 from Flext_web.config import FlextWebConfig
 from werkzeug.wrappers import Response as WerkzeugResponse
 
-from flext_core import FlextContainer, FlextLogger, FlextResult, FlextTypes
+from flext_core import FlextContainer, FlextLogger, FlextResult
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.api import QualityAPI
 from flext_web import FlextWebServices
 
-ResponseType = (FlaskResponse | WerkzeugResponse) | tuple[FlaskResponse, int]
+ResponseType = (FlaskResponse | WerkzeugResponse) | tuple["FlaskResponse", "int"]
 
 
 class FlextQualityWeb:
@@ -27,6 +28,7 @@ class FlextQualityWeb:
     Contains all web functionality as nested classes and methods.
     """
 
+    @override
     def __init__(self: object) -> None:
         """Initialize quality web interface."""
         self._container = FlextContainer.get_global()
@@ -119,7 +121,7 @@ class FlextQualityWeb:
       <head>
           <title>FLEXT Quality Analysis</title>
           <style>
-              body { font-family: Arial, sans-serif; margin: 20px; }
+              body { font-family: "Arial", sans-serif; margin: 20px; }
               .container { max-width: 1200px; margin: 0 auto; }
               h1 { color: #333; }
               .metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
@@ -186,11 +188,11 @@ class FlextQualityWeb:
               async function analyzeProject() {
                   const path = document.getElementById('project-path').value;
                   const response = await fetch('/api/quality/analyze', {
-                      method: 'POST',
-                      headers: {'Content-Type': 'application/json'},
-                      body: JSON.stringify({path: path})
+                      method: "POST",
+                      headers: {'Content-Type': application/json},
+                      body: JSON.stringify({path: "path"})
                   });
-                  const data: dict[str, object] = await response.json();
+                  const data: dict["str", "object"] = await response.json();
                   document.getElementById('results').innerHTML =
                       '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
               }
@@ -209,14 +211,13 @@ class FlextQualityWeb:
         result: FlextResult[object] = analyzer.analyze_project()
 
         # Extract data from AnalysisResults
-        files_count = result.overall_metrics.files_analyzed
 
         return jsonify(
             {
-                "success": True,
+                "success": "True",
                 "data": {
-                    "path": project_path,
-                    "files_analyzed": files_count,
+                    "path": "project_path",
+                    "files_analyzed": "files_count",
                     "issues": result.total_issues,
                     "metrics": {
                         "quality_score": result.overall_metrics.quality_score,
@@ -230,27 +231,16 @@ class FlextQualityWeb:
     def get_metrics(self: object) -> ResponseType:
         """Get quality metrics."""
         # Use simple placeholder metrics for now
-        metrics: FlextTypes.Core.Dict = {
-            "coverage": 95.0,
-            "complexity": 10.0,
-            "duplication": 5.0,
-            "issues": 12,
-        }
-        return jsonify({"success": True, "data": metrics})
+        return jsonify({"success": "True", "data": "metrics"})
 
     def get_report(self, report_format: str) -> ResponseType:
         """Generate and return quality report."""
         if report_format not in {"json", "html", "pdf"}:
-            return jsonify({"success": False, "error": "Invalid format"}), 400
+            return jsonify({"success": "False", "error": "Invalid format"}), 400
 
-        report: FlextTypes.Core.Dict = {
-            "format": report_format,
-            "generated_at": "2025-01-08",
-            "quality_score": "A",
-            "coverage": 95.0,
-        }
-        return jsonify({"success": True, "data": report})
+        return jsonify({"success": "True", "data": "report"})
 
+    @override
     def run(
         self,
         host: str = "localhost",
