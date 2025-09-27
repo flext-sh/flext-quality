@@ -399,6 +399,18 @@ class FlextQualityASTBackend(BaseAnalyzer):
             and not ast.get_docstring(node)
         ]
 
+    def create_visitor(self, *args: object, **kwargs: object) -> object:
+        """Create an AST visitor instance.
+
+        Public factory method for creating AST visitor instances.
+        This provides a proper interface instead of accessing private members.
+
+        Returns:
+            AST visitor instance for code analysis.
+
+        """
+        return self._ASTVisitor(*args, **kwargs)
+
 
 # Backward compatibility aliases for existing code
 # Create public alias for the nested ASTVisitor class
@@ -408,7 +420,8 @@ class ASTVisitor:
 
     def __new__(cls, *args: object, **kwargs: object) -> object:
         """Create instance of the actual ASTVisitor class."""
-        return FlextQualityASTBackend._ASTVisitor(*args, **kwargs)
+        backend = FlextQualityASTBackend()
+        return backend.create_visitor(*args, **kwargs)
 
 
 ASTBackend = FlextQualityASTBackend

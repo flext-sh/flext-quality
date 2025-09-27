@@ -13,6 +13,7 @@ from typing import override
 
 from flext_core import FlextLogger, FlextResult, FlextTypes
 from flext_quality.analysis_types import FlextQualityAnalysisTypes
+from flext_quality.config import FlextQualityConfig
 from flext_quality.grade_calculator import FlextQualityGradeCalculator
 from flext_quality.value_objects import IssueSeverity, IssueType
 
@@ -26,11 +27,18 @@ SIMILARITY_THRESHOLD = 0.8
 class FlextQualityCodeAnalyzer:
     """Main code analyzer interface for FLEXT Quality."""
 
-    @override
-    @override
-    def __init__(self, project_path: str | Path) -> None:
-        """Initialize analyzer with project path."""
+    def __init__(
+        self, project_path: str | Path, config: FlextQualityConfig | None = None
+    ) -> None:
+        """Initialize analyzer with project path and configuration.
+
+        Args:
+            project_path: Path to the project to analyze
+            config: Optional FlextQualityConfig instance. If None, uses global instance.
+
+        """
         self.project_path = Path(project_path)
+        self._config = config or FlextQualityConfig.get_global_instance()
         self._current_results: FlextQualityAnalysisTypes.AnalysisResults | None = None
 
     def analyze_project(
@@ -87,15 +95,17 @@ class FlextQualityCodeAnalyzer:
             analysis_errors,
         )
 
-        # Calculate overall metrics
+        # Calculate overall metrics using config thresholds
         overall_metrics = FlextQualityAnalysisTypes.OverallMetrics(
             files_analyzed=len(file_metrics),  # Only count successfully analyzed files
             total_lines=total_lines,
             quality_score=self._calculate_quality_score(file_metrics),
-            coverage_score=85.0,  # Placeholder - would need real coverage integration
-            security_score=90.0,  # Will be calculated from security issues
-            maintainability_score=80.0,  # Will be calculated from complexity
-            complexity_score=75.0,  # Will be calculated from complexity issues
+            coverage_score=self._config.min_coverage,  # Use config target as baseline
+            security_score=self._config.min_security_score,  # Use config target as baseline
+            maintainability_score=self._config.min_maintainability,  # Use config target as baseline
+            complexity_score=max(
+                0.0, 100.0 - self._config.max_complexity * 10
+            ),  # Convert complexity to score
         )
 
         # Run specialized analyses
@@ -292,9 +302,14 @@ class FlextQualityCodeAnalyzer:
         if not file_path.is_file():
             return FlextResult[str].fail(f"Path is not a file: {file_path}")
 
-        # Check file size before reading
-        if file_path.stat().st_size > 10 * 1024 * 1024:  # 10MB limit
-            return FlextResult[str].fail(f"File too large: {file_path}")
+        # Check file size before reading - use reasonable limit based on memory config
+        max_file_size = (
+            self._config.memory_limit_mb * 1024 * 1024
+        )  # Convert MB to bytes
+        if file_path.stat().st_size > max_file_size:
+            return FlextResult[str].fail(
+                f"File too large: {file_path} (limit: {self._config.memory_limit_mb}MB)"
+            )
 
         # Read with explicit encoding handling
         try:
@@ -393,9 +408,7 @@ class FlextQualityCodeAnalyzer:
         sum(function_values)
         sum(class_values)
 
-        (
-            sum(complexity_values) / total_files if total_files > 0 else 0.0
-        )
+        (sum(complexity_values) / total_files if total_files > 0 else 0.0)
         max(complexity_values) if complexity_values else 0.0
 
         return {
@@ -474,7 +487,9 @@ class FlextQualityCodeAnalyzer:
         self,
         file_metrics: list[FlextQualityAnalysisTypes.FileAnalysisResult],
     ) -> list[FlextQualityAnalysisTypes.ComplexityIssue]:
-        complexity_threshold = 10
+        """Analyze complexity issues using configuration thresholds."""
+        # Use config instead of hardcoded values
+        complexity_threshold = self._config.max_complexity
 
         complex_issues: list[FlextQualityAnalysisTypes.ComplexityIssue] = []
         for metrics in file_metrics:
@@ -487,8 +502,8 @@ class FlextQualityCodeAnalyzer:
                         function_name="file_level",  # Would need AST parsing for specific functions
                         line_number=1,
                         complexity_value=complexity_val,
-                        issue_type=high_complexity,
-                        message=f"High complexity: {complexity_val}",
+                        issue_type="high_complexity",
+                        message=f"High complexity: {complexity_val} (threshold: {complexity_threshold})",
                     ),
                 )
         return complex_issues
@@ -514,8 +529,8 @@ class FlextQualityCodeAnalyzer:
                                 file_path=str(py_file.relative_to(self.project_path)),
                                 line_number=i + 1,
                                 end_line_number=i + 1,
-                                issue_type=unused_import,
-                                code_type=import_statement,
+                                issue_type="unused_import",
+                                code_type="import_statement",
                                 code_snippet=line.strip(),
                                 message=f"Potentially unused import: {line.strip()}",
                             ),

@@ -14,7 +14,7 @@ from typing import override
 from flext_core import FlextTypes
 from flext_quality.analysis_types import FlextQualityAnalysisTypes
 from flext_quality.grade_calculator import FlextQualityGradeCalculator
-from flext_quality.utilities import FlextQualityUtilities, FlextReportUtilities
+from flext_quality.utilities import FlextQualityUtilities
 
 # Constants for display limits
 ISSUE_PREVIEW_LIMIT = 5
@@ -77,7 +77,7 @@ class FlextQualityReportGenerator:
 
         # Add issue details using utilities for proper typing
         issue_categories: dict[str, FlextTypes.Core.List] = (
-            FlextReportUtilities.format_issue_categories(self.results)
+            FlextQualityUtilities.format_issue_categories(self.results)
         )
 
         for category, issue_list in issue_categories.items():
@@ -269,7 +269,7 @@ class FlextQualityReportGenerator:
     def _generate_issues_html(self: object) -> str:
         """Generate HTML for issues section."""
         html_parts: FlextTypes.Core.StringList = (
-            FlextReportUtilities.create_report_lines()
+            FlextQualityUtilities.create_report_lines()
         )
         issue_categories: dict[str, FlextTypes.Core.List] = {
             "security": FlextQualityUtilities.safe_issue_list(
@@ -333,7 +333,7 @@ class FlextQualityReportGenerator:
     def _generate_recommendations(self: object) -> FlextTypes.Core.StringList:
         """Generate recommendations based on analysis results."""
         recommendations: FlextTypes.Core.StringList = (
-            FlextReportUtilities.create_report_lines()
+            FlextQualityUtilities.create_report_lines()
         )
 
         total_issues = self._get_total_issues()
@@ -351,7 +351,7 @@ class FlextQualityReportGenerator:
             )
 
         if score < MIN_SCORE_THRESHOLD:
-            FlextReportUtilities.safe_extend_lines(
+            FlextQualityUtilities.safe_extend_lines(
                 recommendations,
                 [
                     "Implement automated code quality checks in your CI/CD pipeline",

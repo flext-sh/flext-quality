@@ -34,7 +34,7 @@ from flext_quality.cli import (
 )
 
 # Configuration and containers
-from flext_quality.config import FlextQualityConfig, FlextQualityConfig as QualityConfig
+from flext_quality.config import FlextQualityConfig
 from flext_quality.container import get_quality_container
 
 # Domain entities
@@ -127,7 +127,6 @@ __all__ = [
     "OverallMetrics",
     "QualityAPI",
     "QualityAnalysis",
-    "QualityConfig",
     "QualityGrade",
     "QualityGradeCalculator",
     "QualityIssue",

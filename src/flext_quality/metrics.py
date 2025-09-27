@@ -13,6 +13,7 @@ from pydantic import Field
 from flext_core import FlextModels, FlextResult, FlextTypes
 from flext_quality.analysis_types import FlextQualityAnalysisTypes
 from flext_quality.grade_calculator import QualityGradeCalculator
+from flext_quality.typings import FlextQualityTypes
 
 # Constants
 MAX_QUALITY_SCORE = 100
@@ -66,7 +67,7 @@ class QualityMetrics(FlextModels.Value):
         ge=0,
         le=100,
     )
-    quality_grade: str = Field(F, description="Quality grade letter (A+ to F)")
+    quality_grade: str = Field("F", description="Quality grade letter (A+ to F)")
 
     # File metrics
     total_files: int = Field(0, description="Total number of files", ge=0)
@@ -138,7 +139,7 @@ class QualityMetrics(FlextModels.Value):
         """
         return cls(
             overall_score=0.0,
-            quality_grade=F,
+            quality_grade="F",
             total_files=0,
             total_lines_of_code=0,
             total_functions=0,
@@ -304,7 +305,7 @@ class QualityMetrics(FlextModels.Value):
 
         # Extract basic metrics from dict with proper type checking
         def get_int_from_dict(
-            source: dict[str, object], key: str, default: int = 0
+            source: FlextQualityTypes.Core.MetricsDict, key: str, default: int = 0
         ) -> int:
             """Extract integer value with proper type checking."""
             value = source.get(key, default)
@@ -314,7 +315,7 @@ class QualityMetrics(FlextModels.Value):
                 return int(value)
             return default
 
-        metrics: dict[str, object] = results.get("metrics", {})
+        metrics: FlextQualityTypes.Core.MetricsDict = results.get("metrics", {})
         if isinstance(metrics, dict):
             files_analyzed = get_int_from_dict(metrics, "total_files", 0)
             total_lines_of_code = get_int_from_dict(metrics, "total_lines_of_code", 0)
@@ -328,7 +329,7 @@ class QualityMetrics(FlextModels.Value):
             total_classes = get_int_from_dict(results, "total_classes", 0)
 
         # Extract issue counts from nested dict structure
-        issues: dict[str, object] = results.get("issues", {})
+        issues: FlextQualityTypes.Core.IssueDict = results.get("issues", {})
         if isinstance(issues, dict):
             security_issues: list[object] = len(issues.get("security", []))
             complexity_issues: list[object] = len(issues.get("complexity", []))
@@ -442,23 +443,23 @@ class QualityMetrics(FlextModels.Value):
     @classmethod
     def _create_metrics_instance(
         cls,
-        overall_score: float,
-        quality_grade: str,
-        total_files: int,
-        total_loc: int,
-        total_functions: int,
-        total_classes: int,
-        avg_complexity: float,
-        max_complexity: float,
-        complexity_count: int,
-        security_count: int,
-        dead_code_count: int,
-        duplicate_count: int,
-        complexity_score: float,
-        security_score: float,
-        maintainability_score: float,
-        duplication_score: float,
-        documentation_score: float,
+        _overall_score: float,
+        _quality_grade: str,
+        _total_files: int,
+        _total_loc: int,
+        _total_functions: int,
+        _total_classes: int,
+        _avg_complexity: float,
+        _max_complexity: float,
+        _complexity_count: int,
+        _security_count: int,
+        _dead_code_count: int,
+        _duplicate_count: int,
+        _complexity_score: float,
+        _security_score: float,
+        _maintainability_score: float,
+        _duplication_score: float,
+        _documentation_score: float,
     ) -> QualityMetrics:
         """Create QualityMetrics instance with all parameters."""
         return cls.model_validate(

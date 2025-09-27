@@ -120,7 +120,7 @@ class FlextQualityHandlers:
         # Create report for the analysis
         report_result = await self._report_service.create_report(
             analysis_id=analysis_id_str,
-            format_type=html,
+            format_type="html",
             content="comprehensive report",
         )
 

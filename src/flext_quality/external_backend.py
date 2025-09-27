@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 import shutil
-import subprocess
+import subprocess  # noqa: S404 # Required for external tool integration with security validation
 import tempfile
 import warnings
 from importlib import import_module, util
@@ -61,7 +61,7 @@ class FlextQualityExternalBackend(BaseAnalyzer):
         try:
             with tempfile.NamedTemporaryFile(
                 encoding="utf-8",
-                mode=w,
+                mode="w",
                 suffix=".py",
                 delete=False,
             ) as f:
@@ -136,12 +136,11 @@ class FlextQualityExternalBackend(BaseAnalyzer):
                 text=True,
                 timeout=30,  # Prevent hanging
                 check=False,  # Don't raise exception on non-zero exit
+                shell=False,  # Explicitly disable shell execution for security
             )
 
             # Parse output even if ruff found issues (non-zero exit is expected)
-            (
-                self._parse_ruff_output(result.stdout) if result.stdout else []
-            )
+            (self._parse_ruff_output(result.stdout) if result.stdout else [])
 
             return {"issues": "issues", "code_length": len(code)}
 

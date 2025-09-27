@@ -6,72 +6,424 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import threading
 import warnings
-from typing import ClassVar
+from typing import Self
 
-from pydantic import Field
+from pydantic import Field, field_validator, model_validator
 from pydantic_settings import SettingsConfigDict
 
-from flext_core import FlextConfig, FlextConstants
+from flext_core import FlextConfig, FlextResult
+from flext_quality.constants import FlextQualityConstants
 
 
 class FlextQualityConfig(FlextConfig):
-    """Quality service configuration using flext-core patterns."""
+    """Single Pydantic 2 Settings class for flext-quality extending FlextConfig.
 
-    # Singleton pattern attributes
-    _global_instance: ClassVar[FlextQualityConfig | None] = None
-    _lock: ClassVar[threading.Lock] = threading.Lock()
+    Follows standardized pattern:
+    - Extends FlextConfig from flext-core
+    - No nested classes within Config
+    - All defaults from FlextQualityConstants
+    - Uses enhanced singleton pattern with inverse dependency injection
+    - Uses Pydantic 2.11+ features (field_validator, model_validator)
+    """
 
-    # Analysis settings
-    min_coverage: float = 90.0
-    max_complexity: int = 10
-    max_duplication: float = 5.0
-    min_security_score: float = 90.0
-    min_maintainability: float = 80.0
+    model_config = SettingsConfigDict(
+        env_prefix="FLEXT_QUALITY_",
+        case_sensitive=False,
+        extra="allow",
+        # Inherit enhanced Pydantic 2.11+ features from FlextConfig
+        validate_assignment=True,
+        str_strip_whitespace=True,
+        json_schema_extra={
+            "title": "FLEXT Quality Configuration",
+            "description": "Code quality analysis configuration extending FlextConfig",
+        },
+    )
 
-    # Service settings - using FlextConstants as SOURCE OF TRUTH
-    analysis_timeout: int = FlextConstants.Defaults.TIMEOUT * 10  # 300 seconds
-    parallel_workers: int = FlextConstants.Container.MAX_WORKERS  # 4 workers
+    # Quality Analysis Configuration using FlextQualityConstants for defaults
+    min_coverage: float = Field(
+        default=FlextQualityConstants.Coverage.MINIMUM_COVERAGE,
+        ge=FlextQualityConstants.Validation.MINIMUM_PERCENTAGE,
+        le=FlextQualityConstants.Validation.MAXIMUM_PERCENTAGE,
+        description="Minimum test coverage percentage required",
+    )
 
-    # Observability settings for quality analysis
+    max_complexity: int = Field(
+        default=FlextQualityConstants.Complexity.MAX_COMPLEXITY,
+        ge=1,
+        le=FlextQualityConstants.Complexity.HIGH_COMPLEXITY_WARNING_THRESHOLD,
+        description="Maximum cyclomatic complexity allowed",
+    )
+
+    max_duplication: float = Field(
+        default=5.0,
+        ge=FlextQualityConstants.Validation.MINIMUM_PERCENTAGE,
+        le=FlextQualityConstants.Validation.MAXIMUM_PERCENTAGE,
+        description="Maximum code duplication percentage allowed",
+    )
+
+    min_security_score: float = Field(
+        default=FlextQualityConstants.Security.MINIMUM_SECURITY_SCORE,
+        ge=FlextQualityConstants.Validation.MINIMUM_PERCENTAGE,
+        le=FlextQualityConstants.Validation.MAXIMUM_PERCENTAGE,
+        description="Minimum security score required",
+    )
+
+    min_maintainability: float = Field(
+        default=FlextQualityConstants.Maintainability.MINIMUM_MAINTAINABILITY,
+        ge=FlextQualityConstants.Validation.MINIMUM_PERCENTAGE,
+        le=FlextQualityConstants.Validation.MAXIMUM_PERCENTAGE,
+        description="Minimum maintainability index required",
+    )
+
+    # Service Configuration using FlextQualityConstants for defaults
+    analysis_timeout: int = Field(
+        default=FlextQualityConstants.Performance.DEFAULT_ANALYSIS_TIMEOUT,
+        gt=0,
+        le=FlextQualityConstants.Performance.MAXIMUM_ANALYSIS_TIMEOUT,
+        description="Quality analysis timeout in seconds",
+    )
+
+    parallel_workers: int = Field(
+        default=4,
+        ge=1,
+        le=FlextQualityConstants.Performance.MAXIMUM_WORKERS,
+        description="Number of parallel workers for analysis",
+    )
+
+    memory_limit_mb: int = Field(
+        default=512,
+        gt=0,
+        le=2048,
+        description="Memory limit per file in MB",
+    )
+
+    # Backend Configuration using FlextQualityConstants for defaults
+    enable_ast_analysis: bool = Field(
+        default=True,
+        description="Enable AST-based code analysis",
+    )
+
+    enable_external_tools: bool = Field(
+        default=True,
+        description="Enable external tool integration",
+    )
+
+    enable_ruff: bool = Field(
+        default=True,
+        description="Enable Ruff linting analysis",
+    )
+
+    enable_mypy: bool = Field(
+        default=True,
+        description="Enable MyPy type checking analysis",
+    )
+
+    enable_bandit: bool = Field(
+        default=True,
+        description="Enable Bandit security analysis",
+    )
+
+    enable_dependency_scan: bool = Field(
+        default=True,
+        description="Enable dependency vulnerability scanning",
+    )
+
+    # Reporting Configuration using FlextQualityConstants for defaults
+    enable_html_reports: bool = Field(
+        default=True,
+        description="Enable HTML report generation",
+    )
+
+    enable_json_reports: bool = Field(
+        default=True,
+        description="Enable JSON report generation",
+    )
+
+    enable_audit_logging: bool = Field(
+        default=True,
+        description="Enable audit logging for quality operations",
+    )
+
+    include_trend_analysis: bool = Field(
+        default=True,
+        description="Include trend analysis in reports",
+    )
+
+    include_executive_summary: bool = Field(
+        default=True,
+        description="Include executive summary in reports",
+    )
+
+    # Observability Configuration using FlextQualityConstants for defaults
     observability_quiet: bool = Field(
         default=False,
         description="Enable quiet mode for observability (useful for JSON/HTML output)",
     )
 
     observability_log_level: str = Field(
-        default=INFO, description="Log level for observability components"
+        default="INFO",
+        description="Log level for observability components",
     )
 
-    model_config: dict[str, object] = SettingsConfigDict(env_prefix="QUALITY_")
+    # Project Identification
+    project_name: str = Field(
+        default="flext-quality",
+        description="Project name",
+    )
 
-    # Singleton pattern override for proper typing
+    project_version: str = Field(
+        default="0.9.0",
+        description="Project version",
+    )
+
+    # Pydantic 2.11+ field validators
+    @field_validator(
+        "min_coverage", "max_duplication", "min_security_score", "min_maintainability"
+    )
+    @classmethod
+    def validate_percentage_range(cls, v: float) -> float:
+        """Validate percentage values are in valid range."""
+        if not (
+            FlextQualityConstants.Validation.MINIMUM_PERCENTAGE
+            <= v
+            <= FlextQualityConstants.Validation.MAXIMUM_PERCENTAGE
+        ):
+            msg = f"Percentage values must be between {FlextQualityConstants.Validation.MINIMUM_PERCENTAGE} and {FlextQualityConstants.Validation.MAXIMUM_PERCENTAGE}"
+            raise ValueError(msg)
+        return v
+
+    @field_validator("max_complexity")
+    @classmethod
+    def validate_complexity_threshold(cls, v: int) -> int:
+        """Validate complexity threshold is reasonable."""
+        if v < 1:
+            msg = "Complexity threshold must be positive"
+            raise ValueError(msg)
+        if v > FlextQualityConstants.Complexity.HIGH_COMPLEXITY_WARNING_THRESHOLD:
+            warnings.warn(
+                f"High complexity threshold ({v}) may be too permissive",
+                UserWarning,
+                stacklevel=2,
+            )
+        return v
+
+    @field_validator("analysis_timeout")
+    @classmethod
+    def validate_timeout(cls, v: int) -> int:
+        """Validate analysis timeout is reasonable."""
+        if v <= 0:
+            msg = "Analysis timeout must be positive"
+            raise ValueError(msg)
+        if v > FlextQualityConstants.Performance.MAXIMUM_ANALYSIS_TIMEOUT:
+            warnings.warn(
+                f"Very long timeout ({v}s) may cause performance issues",
+                UserWarning,
+                stacklevel=2,
+            )
+        return v
+
+    @field_validator("parallel_workers")
+    @classmethod
+    def validate_workers(cls, v: int) -> int:
+        """Validate number of parallel workers."""
+        if v < 1:
+            msg = "At least one worker required"
+            raise ValueError(msg)
+        if v > FlextQualityConstants.Performance.MAXIMUM_WORKERS:
+            warnings.warn(
+                f"High worker count ({v}) may impact system performance",
+                UserWarning,
+                stacklevel=2,
+            )
+        return v
+
+    @field_validator("observability_log_level")
+    @classmethod
+    def validate_log_level(cls, v: str) -> str:
+        """Validate log level is supported."""
+        valid_levels = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
+        if v.upper() not in valid_levels:
+            msg = f"Log level must be one of {valid_levels}"
+            raise ValueError(msg)
+        return v.upper()
+
+    @model_validator(mode="after")
+    def validate_quality_configuration_consistency(self) -> Self:
+        """Validate quality configuration consistency."""
+        # Validate threshold relationships
+        if (
+            self.min_coverage
+            >= FlextQualityConstants.Validation.COVERAGE_EXTERNAL_TOOLS_THRESHOLD
+            and not self.enable_external_tools
+        ):
+            warnings.warn(
+                "100% coverage target requires external tools for validation",
+                UserWarning,
+                stacklevel=2,
+            )
+
+        # Validate security configuration
+        if (
+            self.min_security_score
+            >= FlextQualityConstants.Validation.SECURITY_BANDIT_THRESHOLD
+            and not self.enable_bandit
+        ):
+            msg = "High security score requires Bandit security analysis"
+            raise ValueError(msg)
+
+        # Validate analysis configuration
+        if not any([
+            self.enable_ast_analysis,
+            self.enable_external_tools,
+            self.enable_ruff,
+            self.enable_mypy,
+            self.enable_bandit,
+        ]):
+            msg = "At least one analysis method must be enabled"
+            raise ValueError(msg)
+
+        # Validate reporting configuration
+        if not any([self.enable_html_reports, self.enable_json_reports]):
+            warnings.warn(
+                "No report formats enabled, analysis results may not be accessible",
+                UserWarning,
+                stacklevel=2,
+            )
+
+        return self
+
+    def validate_business_rules(self) -> FlextResult[None]:
+        """Validate quality analysis business rules."""
+        try:
+            # Validate analysis requirements
+            if self.min_coverage > 0.0 and not self.enable_external_tools:
+                return FlextResult[None].fail(
+                    "Coverage analysis requires external tools"
+                )
+
+            # Validate performance requirements
+            if (
+                self.analysis_timeout
+                < FlextQualityConstants.Performance.MINIMUM_ANALYSIS_TIMEOUT
+            ):
+                return FlextResult[None].fail(
+                    f"Analysis timeout too low (minimum {FlextQualityConstants.Performance.MINIMUM_ANALYSIS_TIMEOUT} seconds)"
+                )
+
+            # Validate threshold consistency
+            if (
+                self.min_security_score
+                >= FlextQualityConstants.Validation.SECURITY_DEPENDENCY_SCAN_THRESHOLD
+                and not self.enable_dependency_scan
+            ):
+                return FlextResult[None].fail(
+                    "High security score requires dependency scanning"
+                )
+
+            # Validate reporting requirements
+            if self.include_trend_analysis and not self.enable_audit_logging:
+                return FlextResult[None].fail("Trend analysis requires audit logging")
+
+            return FlextResult[None].ok(None)
+        except Exception as e:
+            return FlextResult[None].fail(f"Business rules validation failed: {e}")
+
+    def get_analysis_config(self) -> dict[str, object]:
+        """Get quality analysis configuration context."""
+        return {
+            "min_coverage": self.min_coverage,
+            "max_complexity": self.max_complexity,
+            "max_duplication": self.max_duplication,
+            "min_security_score": self.min_security_score,
+            "min_maintainability": self.min_maintainability,
+            "timeout": self.analysis_timeout,
+            "workers": self.parallel_workers,
+        }
+
+    def get_backend_config(self) -> dict[str, object]:
+        """Get analysis backend configuration context."""
+        return {
+            "enable_ast_analysis": self.enable_ast_analysis,
+            "enable_external_tools": self.enable_external_tools,
+            "enable_ruff": self.enable_ruff,
+            "enable_mypy": self.enable_mypy,
+            "enable_bandit": self.enable_bandit,
+            "enable_dependency_scan": self.enable_dependency_scan,
+        }
+
+    def get_reporting_config(self) -> dict[str, object]:
+        """Get quality reporting configuration context."""
+        return {
+            "enable_html_reports": self.enable_html_reports,
+            "enable_json_reports": self.enable_json_reports,
+            "enable_audit_logging": self.enable_audit_logging,
+            "include_trend_analysis": self.include_trend_analysis,
+            "include_executive_summary": self.include_executive_summary,
+        }
+
+    def get_observability_config(self) -> dict[str, object]:
+        """Get observability configuration context."""
+        return {
+            "quiet": self.observability_quiet,
+            "log_level": self.observability_log_level,
+        }
+
+    @classmethod
+    def create_for_environment(
+        cls, environment: str, **overrides: object
+    ) -> FlextQualityConfig:
+        """Create configuration for specific environment using enhanced singleton pattern."""
+        return cls.get_or_create_shared_instance(
+            project_name="flext-quality", environment=environment, **overrides
+        )
+
+    @classmethod
+    def create_default(cls) -> FlextQualityConfig:
+        """Create default configuration instance using enhanced singleton pattern."""
+        return cls.get_or_create_shared_instance(project_name="flext-quality")
+
+    @classmethod
+    def create_for_development(cls) -> FlextQualityConfig:
+        """Create configuration optimized for development using enhanced singleton pattern."""
+        return cls.get_or_create_shared_instance(
+            project_name="flext-quality",
+            min_coverage=80.0,
+            max_complexity=15,
+            analysis_timeout=120,
+            parallel_workers=2,
+            enable_audit_logging=False,
+            observability_quiet=True,
+        )
+
+    @classmethod
+    def create_for_production(cls) -> FlextQualityConfig:
+        """Create configuration optimized for production using enhanced singleton pattern."""
+        return cls.get_or_create_shared_instance(
+            project_name="flext-quality",
+            min_coverage=FlextQualityConstants.Coverage.TARGET_COVERAGE,
+            max_complexity=8,
+            min_security_score=FlextQualityConstants.Security.TARGET_SECURITY_SCORE,
+            min_maintainability=85.0,
+            analysis_timeout=600,
+            parallel_workers=8,
+            enable_audit_logging=True,
+            include_trend_analysis=True,
+            include_executive_summary=True,
+        )
+
     @classmethod
     def get_global_instance(cls) -> FlextQualityConfig:
-        """Get the global singleton instance of FlextQualityConfig."""
-        if cls._global_instance is None:
-            with cls._lock:
-                if cls._global_instance is None:
-                    cls._global_instance = cls()
-        return cls._global_instance
+        """Get the global singleton instance using enhanced FlextConfig pattern."""
+        return cls.get_or_create_shared_instance(project_name="flext-quality")
 
     @classmethod
     def reset_global_instance(cls) -> None:
         """Reset the global FlextQualityConfig instance (mainly for testing)."""
-        cls._global_instance = None
+        # Use the enhanced FlextConfig reset mechanism
+        cls.reset_shared_instance()
 
 
-# Legacy compatibility facade - DEPRECATED
-QualityConfig = FlextQualityConfig
-warnings.warn(
-    "QualityConfig is deprecated; use FlextQualityConfig",
-    DeprecationWarning,
-    stacklevel=2,
-)
-
-# Export all classes
 __all__ = [
     "FlextQualityConfig",
-    "QualityConfig",  # Legacy compatibility
 ]

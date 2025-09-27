@@ -12,6 +12,7 @@ from typing import override
 from pydantic import BaseModel, Field
 
 from flext_core import FlextContainer, FlextLogger, FlextModels, FlextTypes
+from flext_quality.typings import FlextQualityTypes
 from flext_quality.value_objects import (
     FlextIssueSeverity as IssueSeverity,
     FlextIssueType as IssueType,
@@ -85,7 +86,7 @@ class FlextQualityAnalysisTypes:
             description="Security issue severity",
         )
         confidence: str = Field(
-            default=MEDIUM,
+            default="MEDIUM",
             description="Confidence level of detection",
         )
 
@@ -213,7 +214,7 @@ class FlextQualityAnalysisTypes:
             default=None,
             description="Test results if available",
         )
-        analysis_config: dict[str, object] = Field(
+        analysis_config: FlextQualityTypes.Core.AnalysisDict = Field(
             default_factory=dict,
             description="Configuration used for analysis",
         )

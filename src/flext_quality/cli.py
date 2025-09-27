@@ -26,7 +26,9 @@ from flext_core import (
     FlextService,
 )
 from flext_quality.analyzer import CodeAnalyzer
+from flext_quality.config import FlextQualityConfig
 from flext_quality.reports import QualityReport
+from flext_quality.typings import FlextQualityTypes
 from flext_quality.web import FlextQualityWebInterface
 
 # Quality score thresholds
@@ -92,7 +94,6 @@ class FlextQualityCliService(FlextService[int]):
 
             # Enable quiet mode for JSON/HTML output to prevent log contamination
             # Use FlextQualityConfig instead of direct environment manipulation
-            from flext_quality.config import FlextQualityConfig
 
             quality_config = FlextQualityConfig.get_global_instance()
 
@@ -176,7 +177,9 @@ class FlextQualityCliService(FlextService[int]):
             if FLEXT_CLI_AVAILABLE:
                 if args.format == "json":
                     # Get dict from JSON report
-                    report_dict: dict[str, object] = json.loads(report.to_json())
+                    report_dict: FlextQualityTypes.Core.ReportDict = json.loads(
+                        report.to_json()
+                    )
                     export_result: FlextResult[object] = cli_api.export_data(
                         report_dict, str(output_path)
                     )
@@ -187,7 +190,9 @@ class FlextQualityCliService(FlextService[int]):
                     return FlextResult[None].ok(None)
                 else:
                     # Table format - export as JSON
-                    report_dict: dict[str, object] = json.loads(report.to_json())
+                    report_dict: FlextQualityTypes.Core.ReportDict = json.loads(
+                        report.to_json()
+                    )
                     export_result: FlextResult[object] = cli_api.export_data(
                         report_dict, str(output_path)
                     )
@@ -222,7 +227,9 @@ class FlextQualityCliService(FlextService[int]):
             if args.format == "json":
                 if FLEXT_CLI_AVAILABLE:
                     # Get dict from JSON report
-                    report_dict: dict[str, object] = json.loads(report.to_json())
+                    report_dict: FlextQualityTypes.Core.ReportDict = json.loads(
+                        report.to_json()
+                    )
                     format_result: FlextResult[object] = cli_api.format_data(
                         report_dict, "json"
                     )
@@ -524,84 +531,84 @@ Examples:
     parser.add_argument(
         "--verbose",
         "-v",
-        action=store_true,
+        action="store_true",
         help="Enable verbose output",
     )
     parser.add_argument(
         "--log-level",
-        default=INFO,
+        default="INFO",
         choices=["DEBUG", "INFO", "WARNING", "ERROR"],
         help="Set logging level",
     )
 
-    subparsers = parser.add_subparsers(dest=command, help="Available commands")
+    subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # Analyze command
-    analyze_parser = subparsers.add_parser(analyze, help="Analyze project quality")
-    analyze_parser.add_argument(path, type=Path, help="Path to project to analyze")
+    analyze_parser = subparsers.add_parser("analyze", help="Analyze project quality")
+    analyze_parser.add_argument("path", type=Path, help="Path to project to analyze")
     analyze_parser.add_argument("--output", "-o", type=Path, help="Output file path")
     analyze_parser.add_argument(
         "--format",
         "-f",
-        default=table,
+        default="table",
         choices=["table", "json", "html"],
         help="Output format",
     )
     analyze_parser.add_argument(
         "--include-security",
-        action=store_true,
+        action="store_true",
         default=True,
         help="Include security analysis",
     )
     analyze_parser.add_argument(
         "--no-security",
-        dest=include_security,
-        action=store_false,
+        dest="include_security",
+        action="store_false",
         help="Skip security analysis",
     )
     analyze_parser.add_argument(
         "--include-complexity",
-        action=store_true,
+        action="store_true",
         default=True,
         help="Include complexity analysis",
     )
     analyze_parser.add_argument(
         "--no-complexity",
-        dest=include_complexity,
-        action=store_false,
+        dest="include_complexity",
+        action="store_false",
         help="Skip complexity analysis",
     )
     analyze_parser.add_argument(
         "--include-dead-code",
-        action=store_true,
+        action="store_true",
         default=True,
         help="Include dead code detection",
     )
     analyze_parser.add_argument(
         "--no-dead-code",
-        dest=include_dead_code,
-        action=store_false,
+        dest="include_dead_code",
+        action="store_false",
         help="Skip dead code detection",
     )
     analyze_parser.add_argument(
         "--include-duplicates",
-        action=store_true,
+        action="store_true",
         default=True,
         help="Include duplicate code detection",
     )
     analyze_parser.add_argument(
         "--no-duplicates",
-        dest=include_duplicates,
-        action=store_false,
+        dest="include_duplicates",
+        action="store_false",
         help="Skip duplicate code detection",
     )
 
     # Score command
-    score_parser = subparsers.add_parser(score, help="Get quick quality score")
-    score_parser.add_argument(path, type=Path, help="Path to project to score")
+    score_parser = subparsers.add_parser("score", help="Get quick quality score")
+    score_parser.add_argument("path", type=Path, help="Path to project to score")
 
     # Web command
-    web_parser = subparsers.add_parser(web, help="Run web interface server")
+    web_parser = subparsers.add_parser("web", help="Run web interface server")
     web_parser.add_argument(
         "--host",
         default="127.0.0.1",
@@ -613,7 +620,7 @@ Examples:
         default=8000,
         help="Port number to bind to",
     )
-    web_parser.add_argument("--debug", action=store_true, help="Enable debug mode")
+    web_parser.add_argument("--debug", action="store_true", help="Enable debug mode")
 
     args = parser.parse_args()
 
@@ -622,7 +629,6 @@ Examples:
         return 1
 
     # Setup logging level using FlextQualityConfig
-    from flext_quality.config import FlextQualityConfig
 
     quality_config = FlextQualityConfig.get_global_instance()
 

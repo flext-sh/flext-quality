@@ -142,6 +142,41 @@ class FlextQualityTypes(FlextTypes):
         ]
 
     # =========================================================================
+    # CORE TYPES - Essential Quality types extending FlextTypes.Core
+    # =========================================================================
+
+    class Core(FlextTypes.Core):
+        """Core Quality analysis types extending FlextTypes.Core.
+
+        Essential domain-specific types for quality analysis operations.
+        Replaces generic dict[str, object] with semantic quality types.
+        """
+
+        # Configuration and analysis types
+        type ConfigDict = dict[str, FlextTypes.Core.ConfigValue | object]
+        type AnalysisDict = dict[str, object]
+        type ResultDict = dict[str, object]
+        type MetricsDict = dict[str, object]
+
+        # Quality assessment types
+        type QualityDict = dict[str, float | int | bool | dict[str, object]]
+        type ThresholdDict = dict[str, bool | str | dict[str, object]]
+        type ReportDict = dict[str, str | float | list[dict[str, object]]]
+        type IssueDict = dict[str, object]
+
+        # Tool integration types
+        type ToolDict = dict[str, str | dict[str, object]]
+        type SettingsDict = dict[str, object]
+        type ContextDict = dict[str, object]
+        type DataDict = dict[str, object]
+
+        # Collection types for quality operations
+        type AnalysisList = list[AnalysisDict]
+        type ResultList = list[ResultDict]
+        type IssueList = list[IssueDict]
+        type StringList = list[str]
+
+    # =========================================================================
     # QUALITY PROJECT TYPES - Domain-specific project types extending FlextTypes
     # =========================================================================
 

@@ -16,6 +16,7 @@ from werkzeug.wrappers import Response as WerkzeugResponse
 from flext_core import FlextContainer, FlextLogger, FlextResult
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.api import QualityAPI
+from flext_quality.typings import FlextQualityTypes
 from flext_web import FlextWebServices
 
 ResponseType = (FlaskResponse | WerkzeugResponse) | tuple["FlaskResponse", "int"]
@@ -35,7 +36,7 @@ class FlextQualityWeb:
         self._logger = FlextLogger(__name__)
 
         # Create base web service from flext-web
-        self.config: dict[str, object] = self._get_web_settings()
+        self.config: FlextQualityTypes.Core.SettingsDict = self._get_web_settings()
         web_service = self._create_service(self.config)
 
         if web_service is None:
@@ -52,7 +53,9 @@ class FlextQualityWeb:
         self._register_routes()
 
     @staticmethod
-    def _create_service(config: dict[str, object] | None = None) -> object | None:
+    def _create_service(
+        config: FlextQualityTypes.Core.SettingsDict | None = None,
+    ) -> object | None:
         """Create web service using flext-web patterns."""
         logger = FlextLogger(__name__)
 
@@ -85,7 +88,7 @@ class FlextQualityWeb:
         return result.value if result.is_success else None
 
     @staticmethod
-    def _get_web_settings() -> dict[str, object]:
+    def _get_web_settings() -> FlextQualityTypes.Core.SettingsDict:
         """Get web settings using flext-web patterns."""
         # Type conversion for compatibility
         result: FlextResult[object] = FlextWebConfig.get_web_settings()
@@ -203,7 +206,7 @@ class FlextQualityWeb:
 
     async def analyze_project(self) -> ResponseType:
         """Analyze a project and return results."""
-        data: dict[str, object] = request.get_json()
+        data: FlextQualityTypes.Core.DataDict = request.get_json()
         project_path = data.get("path", ".")
 
         # Create analyzer for the specific path

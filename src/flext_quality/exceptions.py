@@ -1,12 +1,10 @@
-"""Module docstring."""
-
-from __future__ import annotations
-
 """Modern Python 3.13 type aliases for comprehensive error handling in quality operations.
 
 Copyright (c) 2025 FLEXT Contributors
 SPDX-License-Identifier: MIT
 """
+
+from __future__ import annotations
 
 from enum import Enum
 from typing import override

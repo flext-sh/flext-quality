@@ -14,7 +14,7 @@ from typing import override
 from pydantic import BaseModel, Field
 
 from flext_core import FlextContainer, FlextLogger, FlextResult
-from flext_quality.typings import FlextTypes
+from flext_quality.typings import FlextQualityTypes
 from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
 
 
@@ -143,7 +143,9 @@ class FlextQualityEntities:
         status: str = Field(default="queued")
 
         # Analysis data
-        analysis_config: dict[str, object] = Field(default_factory=dict)
+        analysis_config: FlextQualityTypes.Core.AnalysisDict = Field(
+            default_factory=dict
+        )
 
         def start_analysis(self: object) -> FlextQualityEntities.QualityAnalysis:
             """Start analysis and return new instance."""
@@ -169,7 +171,7 @@ class FlextQualityEntities:
                 },
             )
 
-        def fail_analysis(self, error: str) -> FlextQualityEntities.QualityAnalysis:
+        def fail_analysis(self, _error: str) -> FlextQualityEntities.QualityAnalysis:
             """Fail analysis and return new instance."""
             completed_at = datetime.now(UTC)
             if self.started_at:
@@ -255,7 +257,7 @@ class FlextQualityEntities:
             """Mark issue as fixed and return new instance."""
             return self.model_copy(update={"is_fixed": "True"})
 
-        def suppress(self, reason: str) -> FlextQualityEntities.QualityIssue:
+        def suppress(self, _reason: str) -> FlextQualityEntities.QualityIssue:
             """Suppress issue and return new instance."""
             return self.model_copy(
                 update={
@@ -301,11 +303,11 @@ class FlextQualityEntities:
 
         # Rule details
         pattern: str | None = None
-        parameters: FlextTypes.Core.Dict = Field(default_factory=dict)
+        parameters: FlextQualityTypes.Core.DataDict = Field(default_factory=dict)
 
         # Documentation
         documentation_url: str | None = None
-        examples: list[FlextTypes.Core.Dict] = Field(default_factory=list)
+        examples: list[FlextQualityTypes.Core.DataDict] = Field(default_factory=list)
 
         def enable(self: object) -> FlextQualityEntities.QualityRule:
             """Enable rule and return new instance."""
@@ -317,7 +319,7 @@ class FlextQualityEntities:
 
         def update_severity(
             self,
-            severity: FlextIssueSeverity,
+            _severity: FlextIssueSeverity,
         ) -> FlextQualityEntities.QualityRule:
             """Update severity and return new instance."""
             return self.model_copy(update={"severity": "severity"})

@@ -164,7 +164,7 @@ class FlextQualityServices:
                     analysis_id=analysis_id,
                     issue_type=issue_type,
                     severity=severity,
-                    rule_id=rule or unknown,
+                    rule_id=rule or "unknown",
                     file_path=file_path,
                     line_number=line_number,
                     column_number=column_number,
@@ -339,7 +339,7 @@ class FlextQualityServices:
                 report = FlextQualityReport(
                     analysis_id=analysis_id,
                     report_type=format_type,
-                    report_format=summary,
+                    report_format="summary",
                     report_path=file_path,
                     report_size_bytes=len(content.encode()) if content else 0,
                 )
