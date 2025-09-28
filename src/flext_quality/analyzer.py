@@ -606,7 +606,6 @@ class CodeAnalyzer(FlextQualityCodeAnalyzer):
     """
 
     @override
-    @override
     def __init__(self, project_path: str | Path) -> None:
         """Initialize the instance."""
         warnings.warn(

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 import shutil
-import subprocess  # noqa: S404 # Required for external tool integration with security validation
+import subprocess
 import tempfile
 import warnings
 from importlib import import_module, util
