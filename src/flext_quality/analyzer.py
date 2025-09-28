@@ -75,7 +75,7 @@ class FlextQualityCodeAnalyzer:
         analysis_errors = 0
 
         for file_path in python_files:
-            metrics_result: FlextResult[object] = self._analyze_file(file_path)
+            metrics_result: FlextResult[FlextQualityAnalysisTypes.FileAnalysisResult] = self._analyze_file(file_path)
             if metrics_result.is_success:
                 metrics = metrics_result.value
                 file_metrics.append(metrics)
@@ -232,7 +232,7 @@ class FlextQualityCodeAnalyzer:
             )
 
         # Read file content with explicit error handling
-        content_result: FlextResult[object] = self._read_file_content(file_path)
+        content_result: FlextResult[str] = self._read_file_content(file_path)
         if content_result.is_failure:
             return FlextResult[FlextQualityAnalysisTypes.FileAnalysisResult].fail(
                 content_result.error or "Failed to read file content",

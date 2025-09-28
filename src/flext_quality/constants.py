@@ -34,6 +34,9 @@ class FlextQualityConstants(FlextConstants):
         # Below average quality
         BELOW_AVERAGE_THRESHOLD = 60.0
 
+        # Enterprise-ready threshold (combination requirement)
+        ENTERPRISE_READY_THRESHOLD = 85.0
+
         # Poor quality (anything below BELOW_AVERAGE_THRESHOLD)
 
     class Coverage:
@@ -41,6 +44,7 @@ class FlextQualityConstants(FlextConstants):
 
         # Coverage requirements
         MINIMUM_COVERAGE = 90.0
+        PRODUCTION_COVERAGE = 75.0  # Minimum for production-ready configs
         TARGET_COVERAGE = 95.0
         EXCELLENT_COVERAGE = 98.0
         MAXIMUM_COVERAGE = 100.0  # Maximum possible coverage percentage
@@ -52,6 +56,7 @@ class FlextQualityConstants(FlextConstants):
         MAX_COMPLEXITY = 10
         WARNING_COMPLEXITY = 7
         IDEAL_COMPLEXITY = 5
+        STRICT_COMPLEXITY = 8  # Strict threshold for enterprise configurations
         HIGH_COMPLEXITY_WARNING_THRESHOLD = (
             50  # Warning threshold for very high complexity
         )
@@ -93,3 +98,18 @@ class FlextQualityConstants(FlextConstants):
         COVERAGE_EXTERNAL_TOOLS_THRESHOLD = 100.0  # Coverage requiring external tools
         SECURITY_BANDIT_THRESHOLD = 90.0  # Security score requiring Bandit
         SECURITY_DEPENDENCY_SCAN_THRESHOLD = 95.0  # Security requiring dependency scan
+
+    class Reporting:
+        """Reporting constants and limits."""
+
+        # Report size thresholds
+        LARGE_REPORT_SIZE_BYTES = 100000  # 100KB threshold for large reports
+
+        # Path display limits
+        PATH_SEGMENTS_TO_KEEP = 4  # Number of path segments to keep in display
+
+    class Project:
+        """Project lifecycle constants."""
+
+        # Time-based thresholds
+        RECENT_UPDATE_DAYS = 7  # Days threshold for "recently updated" status

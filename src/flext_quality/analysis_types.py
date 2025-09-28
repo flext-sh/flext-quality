@@ -7,11 +7,10 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import override
-
-from pydantic import BaseModel, Field
 
 from flext_core import FlextContainer, FlextLogger, FlextModels, FlextTypes
+from pydantic import BaseModel, Field
+
 from flext_quality.typings import FlextQualityTypes
 from flext_quality.value_objects import (
     FlextIssueSeverity as IssueSeverity,
@@ -19,21 +18,8 @@ from flext_quality.value_objects import (
 )
 
 
-class FlextQualityAnalysisTypes:
-    """Unified analysis types class following FLEXT architecture patterns.
-
-    Single responsibility: Quality analysis data types and models
-    Contains all analysis types as nested classes with shared functionality.
-    """
-
-    @override
-    def __init__(self: object) -> None:
-        """Initialize analysis types with dependency injection."""
-        self._container = FlextContainer.get_global()
-        self._logger = FlextLogger(__name__)
-
-    class FileAnalysisResult(FlextModels.Value):
-        """Result of analyzing a single file."""
+class FileAnalysisResult(FlextModels.Value):
+    """Result of analyzing a single file."""
 
         file_path: Path = Field(..., description="Path to the analyzed file")
         lines_of_code: int = Field(default=0, ge=0, description="Total lines of code")
@@ -51,8 +37,24 @@ class FlextQualityAnalysisTypes:
         style_issues: int = Field(default=0, ge=0, description="Number of style issues")
         dead_code_lines: int = Field(default=0, ge=0, description="Lines of dead code")
 
-    class ComplexityIssue(BaseModel):
-        """Represents a complexity issue in code."""
+
+class CodeIssue(BaseModel):
+    """General code quality issue."""
+
+    file_path: str = Field(..., description="File where issue was found")
+    line_number: int = Field(..., ge=1, description="Line number of issue")
+    issue_type: str = Field(..., description="Type of code issue")
+    message: str = Field(..., description="Human-readable issue message")
+    severity: IssueSeverity = Field(
+        default=IssueSeverity.MEDIUM,
+        description="Issue severity level",
+    )
+    rule_id: str = Field(..., description="Rule identifier")
+    code_snippet: str | None = Field(default=None, description="Code snippet")
+
+
+class ComplexityIssue(BaseModel):
+    """Represents a complexity issue in code."""
 
         file_path: str = Field(..., description="File where issue was found")
         function_name: str = Field(..., description="Function with complexity issue")
@@ -72,8 +74,9 @@ class FlextQualityAnalysisTypes:
             description="Issue severity level",
         )
 
-    class SecurityIssue(FlextModels.Value):
-        """Represents a security issue found in code."""
+
+class SecurityIssue(FlextModels.Value):
+    """Represents a security issue found in code."""
 
         file_path: str = Field(..., description="File where issue was found")
         line_number: int = Field(..., ge=1, description="Line number of issue")
@@ -90,8 +93,9 @@ class FlextQualityAnalysisTypes:
             description="Confidence level of detection",
         )
 
-    class DeadCodeIssue(FlextModels.Value):
-        """Represents dead/unused code found during analysis."""
+
+class DeadCodeIssue(FlextModels.Value):
+    """Represents dead/unused code found during analysis."""
 
         file_path: str = Field(..., description="File containing dead code")
         line_number: int = Field(..., ge=1, description="Line number of dead code")
@@ -112,8 +116,9 @@ class FlextQualityAnalysisTypes:
             description="Dead code severity",
         )
 
-    class DuplicationIssue(FlextModels.Value):
-        """Represents code duplication detected in analysis."""
+
+class DuplicationIssue(FlextModels.Value):
+    """Represents code duplication detected in analysis."""
 
         files: FlextTypes.Core.StringList = Field(
             ...,
@@ -142,7 +147,42 @@ class FlextQualityAnalysisTypes:
             description="Duplication severity",
         )
 
-    class OverallMetrics(FlextModels.Value):
+
+class Dependency(BaseModel):
+    """Project dependency information."""
+
+        name: str = Field(..., description="Dependency name")
+        version: str = Field(..., description="Dependency version")
+        type: str = Field(default="runtime", description="Dependency type")
+        vulnerabilities: list[str] = Field(
+            default_factory=list,
+            description="Known vulnerabilities",
+        )
+        license: str | None = Field(default=None, description="License information")
+        is_dev: bool = Field(default=False, description="Development dependency")
+
+
+class TestResults(BaseModel):
+    """Test execution results."""
+
+        total_tests: int = Field(default=0, description="Total number of tests")
+        passed_tests: int = Field(default=0, description="Number of passed tests")
+        failed_tests: int = Field(default=0, description="Number of failed tests")
+        skipped_tests: int = Field(default=0, description="Number of skipped tests")
+        test_duration: float = Field(default=0.0, description="Total test duration")
+        coverage_percentage: float = Field(
+            default=0.0,
+            ge=0.0,
+            le=100.0,
+            description="Code coverage percentage",
+        )
+        test_errors: list[str] = Field(
+            default_factory=list,
+            description="Test execution errors",
+        )
+
+
+class OverallMetrics(FlextModels.Value):
         """Overall metrics for the entire analysis."""
 
         files_analyzed: int = Field(default=0, ge=0, description="Total files analyzed")
@@ -191,26 +231,43 @@ class FlextQualityAnalysisTypes:
             description="Complexity score",
         )
 
-    class AnalysisResults(BaseModel):
+
+class AnalysisResults(BaseModel):
         """Complete analysis results containing all metrics and issues."""
 
-        overall_metrics: FlextQualityAnalysisTypes.OverallMetrics = Field(
-            default_factory=lambda: FlextQualityAnalysisTypes().OverallMetrics(),
+        overall_metrics: OverallMetrics = Field(
+            default_factory=OverallMetrics,
             description="Overall analysis metrics",
         )
-        file_metrics: list[FlextQualityAnalysisTypes.FileAnalysisResult] = Field(
+        file_metrics: list[FileAnalysisResult] = Field(
             default_factory=list,
             description="Per-file analysis results",
         )
-        code_issues: list[FlextQualityAnalysisTypes.CodeIssue] = Field(
+        code_issues: list[CodeIssue] = Field(
             default_factory=list,
             description="Code quality issues found",
         )
-        dependencies: list[FlextQualityAnalysisTypes.Dependency] = Field(
+        complexity_issues: list[ComplexityIssue] = Field(
+            default_factory=list,
+            description="Complexity issues found",
+        )
+        security_issues: list[SecurityIssue] = Field(
+            default_factory=list,
+            description="Security issues found",
+        )
+        dead_code_issues: list[DeadCodeIssue] = Field(
+            default_factory=list,
+            description="Dead code issues found",
+        )
+        duplication_issues: list[DuplicationIssue] = Field(
+            default_factory=list,
+            description="Code duplication issues found",
+        )
+        dependencies: list[Dependency] = Field(
             default_factory=list,
             description="Project dependencies analysis",
         )
-        test_results: FlextQualityAnalysisTypes.TestResults | None = Field(
+        test_results: TestResults | None = Field(
             default=None,
             description="Test results if available",
         )
@@ -223,12 +280,36 @@ class FlextQualityAnalysisTypes:
             description="When analysis was performed",
         )
 
+    @property
+    def total_issues(self) -> int:
+        """Total number of issues found across all categories."""
+        return (
+            len(self.code_issues)
+            + len(self.complexity_issues)
+            + len(self.security_issues)
+            + len(self.dead_code_issues)
+            + len(self.duplication_issues)
+        )
+
+    def get_quality_score(self) -> float:
+        """Calculate overall quality score."""
+        return self.overall_metrics.quality_score
+
 
 # Backward compatibility aliases for existing code
 
 # Export all classes
 __all__ = [
-    "FlextQualityAnalysisTypes",
+    "FileAnalysisResult",
+    "CodeIssue",
+    "ComplexityIssue",
+    "SecurityIssue",
+    "DeadCodeIssue",
+    "DuplicationIssue",
+    "Dependency",
+    "TestResults",
+    "OverallMetrics",
+    "AnalysisResults",
     "IssueSeverity",
     "IssueType",
 ]

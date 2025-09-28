@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import warnings
 from datetime import UTC, datetime
 from enum import StrEnum
 from typing import override
@@ -26,7 +25,7 @@ class FlextQualityEntities:
     """
 
     @override
-    def __init__(self: object) -> None:
+    def __init__(self) -> None:
         """Initialize quality entities with dependency injection."""
         self._container = FlextContainer.get_global()
         self._logger = FlextLogger(__name__)
@@ -83,13 +82,13 @@ class FlextQualityEntities:
         last_analysis_at: datetime | None = None
         total_analyses: int = Field(default=0)
 
-        def validate_business_rules(self: object) -> FlextResult[None]:
+        def validate_business_rules(self) -> FlextResult[None]:
             """Validate domain rules for quality project."""
             if not self.project_path:
                 return FlextResult[None].fail("Project path is required")
             return FlextResult[None].ok(None)
 
-        def update_last_analysis(self: object) -> FlextQualityEntities.QualityProject:
+        def update_last_analysis(self) -> FlextQualityEntities.QualityProject:
             """Update last analysis timestamp and return new instance."""
             return self.model_copy(
                 update={
@@ -147,7 +146,7 @@ class FlextQualityEntities:
             default_factory=dict
         )
 
-        def start_analysis(self: object) -> FlextQualityEntities.QualityAnalysis:
+        def start_analysis(self) -> FlextQualityEntities.QualityAnalysis:
             """Start analysis and return new instance."""
             return self.model_copy(
                 update={
@@ -156,7 +155,7 @@ class FlextQualityEntities:
                 },
             )
 
-        def complete_analysis(self: object) -> FlextQualityEntities.QualityAnalysis:
+        def complete_analysis(self) -> FlextQualityEntities.QualityAnalysis:
             """Complete analysis and return new instance."""
             completed_at = datetime.now(UTC)
             if self.started_at:
@@ -189,7 +188,7 @@ class FlextQualityEntities:
             )
 
         def calculate_overall_score(
-            self: object,
+            self,
         ) -> FlextQualityEntities.QualityAnalysis:
             """Calculate overall score and return new instance."""
             scores = [
@@ -203,7 +202,7 @@ class FlextQualityEntities:
             return self.model_copy(update={"overall_score": "overall_score"})
 
         @property
-        def is_completed(self: object) -> bool:
+        def is_completed(self) -> bool:
             """Check if analysis is completed (either succeeded or failed)."""
             return self.status in {
                 FlextQualityEntities.AnalysisStatus.COMPLETED,
@@ -211,11 +210,11 @@ class FlextQualityEntities:
             }
 
         @property
-        def successful(self: object) -> bool:
+        def successful(self) -> bool:
             """Check if analysis completed successfully."""
             return self.status == FlextQualityEntities.AnalysisStatus.COMPLETED
 
-        def validate_business_rules(self: object) -> FlextResult[None]:
+        def validate_business_rules(self) -> FlextResult[None]:
             """Validate domain rules for quality analysis."""
             if not self.project_id:
                 return FlextResult[None].fail("Project ID is required")
@@ -253,7 +252,7 @@ class FlextQualityEntities:
         last_seen_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
         occurrence_count: int = Field(default=1)
 
-        def mark_fixed(self: object) -> FlextQualityEntities.QualityIssue:
+        def mark_fixed(self) -> FlextQualityEntities.QualityIssue:
             """Mark issue as fixed and return new instance."""
             return self.model_copy(update={"is_fixed": "True"})
 
@@ -266,7 +265,7 @@ class FlextQualityEntities:
                 },
             )
 
-        def unsuppress(self: object) -> FlextQualityEntities.QualityIssue:
+        def unsuppress(self) -> FlextQualityEntities.QualityIssue:
             """Unsuppress issue and return new instance."""
             return self.model_copy(
                 update={
@@ -275,7 +274,7 @@ class FlextQualityEntities:
                 },
             )
 
-        def increment_occurrence(self: object) -> FlextQualityEntities.QualityIssue:
+        def increment_occurrence(self) -> FlextQualityEntities.QualityIssue:
             """Increment occurrence count and return new instance."""
             return self.model_copy(
                 update={
@@ -284,7 +283,7 @@ class FlextQualityEntities:
                 },
             )
 
-        def validate_business_rules(self: object) -> FlextResult[None]:
+        def validate_business_rules(self) -> FlextResult[None]:
             """Validate domain rules for quality issue."""
             if not self.analysis_id:
                 return FlextResult[None].fail("Analysis ID is required")
@@ -309,11 +308,11 @@ class FlextQualityEntities:
         documentation_url: str | None = None
         examples: list[FlextQualityTypes.Core.DataDict] = Field(default_factory=list)
 
-        def enable(self: object) -> FlextQualityEntities.QualityRule:
+        def enable(self) -> FlextQualityEntities.QualityRule:
             """Enable rule and return new instance."""
             return self.model_copy(update={"enabled": "True"})
 
-        def disable(self: object) -> FlextQualityEntities.QualityRule:
+        def disable(self) -> FlextQualityEntities.QualityRule:
             """Disable rule and return new instance."""
             return self.model_copy(update={"enabled": "False"})
 
@@ -334,7 +333,7 @@ class FlextQualityEntities:
             new_parameters[key] = value
             return self.model_copy(update={"parameters": "new_parameters"})
 
-        def validate_business_rules(self: object) -> FlextResult[None]:
+        def validate_business_rules(self) -> FlextResult[None]:
             """Validate domain rules for quality rule."""
             if not self.rule_id:
                 return FlextResult[None].fail("Rule ID is required")
@@ -361,7 +360,7 @@ class FlextQualityEntities:
         access_count: int = Field(default=0)
         last_accessed_at: datetime | None = None
 
-        def increment_access(self: object) -> FlextQualityEntities.QualityReport:
+        def increment_access(self) -> FlextQualityEntities.QualityReport:
             """Increment access count and return new instance."""
             return self.model_copy(
                 update={
@@ -370,7 +369,7 @@ class FlextQualityEntities:
                 },
             )
 
-        def validate_business_rules(self: object) -> FlextResult[None]:
+        def validate_business_rules(self) -> FlextResult[None]:
             """Validate domain rules for quality report."""
             if not self.analysis_id:
                 return FlextResult[None].fail("Analysis ID is required")
@@ -429,73 +428,6 @@ class FlextQualityEntities:
     # Factory methods removed to eliminate object type usage and ensure type safety
     # Users should instantiate entities directly: QualityProject(name="...", project_path="...")
 
-
-# =============================================================================
-# BACKWARD COMPATIBILITY FACADES - Maintain existing API
-# =============================================================================
-
-# Status enums
-FlextAnalysisStatus = FlextQualityEntities.AnalysisStatus
-
-# Base classes
-FlextDomainEvent = FlextQualityEntities.DomainEvent
-
-# Core entities
-FlextQualityProject = FlextQualityEntities.QualityProject
-FlextQualityAnalysis = FlextQualityEntities.QualityAnalysis
-FlextQualityIssue = FlextQualityEntities.QualityIssue
-FlextQualityRule = FlextQualityEntities.QualityRule
-FlextQualityReport = FlextQualityEntities.QualityReport
-
-# Domain events
-ProjectCreatedEvent = FlextQualityEntities.ProjectCreatedEvent
-AnalysisStartedEvent = FlextQualityEntities.AnalysisStartedEvent
-AnalysisCompletedEvent = FlextQualityEntities.AnalysisCompletedEvent
-IssueDetectedEvent = FlextQualityEntities.IssueDetectedEvent
-ReportGeneratedEvent = FlextQualityEntities.ReportGeneratedEvent
-
-# Legacy compatibility facades - DEPRECATED
-AnalysisStatus = FlextAnalysisStatus
-warnings.warn(
-    "AnalysisStatus is deprecated; use FlextAnalysisStatus",
-    DeprecationWarning,
-    stacklevel=2,
-)
-
-QualityProject = FlextQualityProject
-warnings.warn(
-    "QualityProject is deprecated; use FlextQualityProject",
-    DeprecationWarning,
-    stacklevel=2,
-)
-
-QualityAnalysis = FlextQualityAnalysis
-warnings.warn(
-    "QualityAnalysis is deprecated; use FlextQualityAnalysis",
-    DeprecationWarning,
-    stacklevel=2,
-)
-
-QualityIssue = FlextQualityIssue
-warnings.warn(
-    "QualityIssue is deprecated; use FlextQualityIssue",
-    DeprecationWarning,
-    stacklevel=2,
-)
-
-QualityRule = FlextQualityRule
-warnings.warn(
-    "QualityRule is deprecated; use FlextQualityRule",
-    DeprecationWarning,
-    stacklevel=2,
-)
-
-QualityReport = FlextQualityReport
-warnings.warn(
-    "QualityReport is deprecated; use FlextQualityReport",
-    DeprecationWarning,
-    stacklevel=2,
-)
 
 # Rebuild models to resolve forward references and type annotations
 try:

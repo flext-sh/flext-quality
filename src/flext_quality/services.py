@@ -441,26 +441,6 @@ class FlextQualityServices:
         return self.ExternalAnalysisService(self)
 
 
-# =============================================================================
-# BACKWARD COMPATIBILITY FACADES - Maintain existing API
-# =============================================================================
-
-
-# BasicQualityProjectService removed for 1.0 production readiness
-# Use FlextQualityServices.get_project_service() directly
-
-
-# BasicQualityIssueService removed for 1.0 production readiness
-# Use FlextQualityServices.get_issue_service() directly
-
-
-# BasicQualityAnalysisService removed for 1.0 production readiness
-# Use FlextQualityServices.get_analysis_service() directly
-
-# BasicQualityReportService removed for 1.0 production readiness
-# Use FlextQualityServices.get_report_service() directly
-
-
 # ExternalAnalysisService removed for 1.0 production readiness
 # Use FlextQualityServices.get_external_analysis_service() directly
 

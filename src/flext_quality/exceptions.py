@@ -175,6 +175,9 @@ FlextQualityThresholdError = FlextQualityExceptions.ThresholdError
 # Legacy compatibility facade
 FlextQualityExceptionsError = FlextQualityExceptions
 
+# Consolidated exceptions collection for legacy compatibility
+exceptions_all = FlextQualityExceptions
+
 
 # Export consolidated class and legacy aliases
 __all__ = [
@@ -196,4 +199,5 @@ __all__ = [
     "FlextQualityThresholdError",
     "FlextQualityTimeoutError",
     "FlextQualityValidationError",
+    "exceptions_all",
 ]

@@ -514,6 +514,11 @@ def run_web_server(args: argparse.Namespace) -> int:
         return 1
 
 
+def quality_main() -> int:
+    """Legacy quality main function alias."""
+    return main()
+
+
 def main() -> int:
     """Main CLI entry point using argparse with FlextCli integration."""
     parser = argparse.ArgumentParser(
