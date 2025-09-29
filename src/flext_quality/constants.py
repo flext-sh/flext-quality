@@ -113,3 +113,11 @@ class FlextQualityConstants(FlextConstants):
 
         # Time-based thresholds
         RECENT_UPDATE_DAYS = 7  # Days threshold for "recently updated" status
+
+    class Duplication:
+        """Code duplication thresholds."""
+
+        # Duplication percentage limits
+        MAXIMUM_DUPLICATION = 5.0  # Maximum allowed code duplication percentage
+        TARGET_DUPLICATION = 3.0  # Target duplication percentage
+        EXCELLENT_DUPLICATION = 1.0  # Excellent duplication threshold

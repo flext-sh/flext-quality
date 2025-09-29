@@ -11,14 +11,14 @@ from typing import override
 from uuid import UUID
 
 from flext_core import FlextResult, FlextTypes
+from flext_quality import (
+    QualityAnalysis,
+    QualityIssue,
+    QualityProject,
+    QualityReport,
+)
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.container import get_quality_container
-from flext_quality.entities import (
-    FlextQualityAnalysis,
-    FlextQualityIssue,
-    FlextQualityProject,
-    FlextQualityReport,
-)
 from flext_quality.services import FlextQualityServices
 from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
 

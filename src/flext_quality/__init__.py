@@ -8,7 +8,18 @@ from __future__ import annotations
 
 from flext_quality import exceptions
 from flext_quality.__version__ import __version__, __version_info__
-from flext_quality.analysis_types import FlextQualityAnalysisTypes
+from flext_quality.analysis_types import (
+    AnalysisResults,
+    CodeIssue,
+    ComplexityIssue,
+    DeadCodeIssue,
+    Dependency,
+    DuplicationIssue,
+    FileAnalysisResult,
+    OverallMetrics,
+    SecurityIssue,
+    TestResults,
+)
 from flext_quality.analyzer import FlextQualityCodeAnalyzer as CodeAnalyzer
 from flext_quality.api import FlextQualityAPI as QualityAPI
 from flext_quality.ast_backend import (
@@ -48,6 +59,7 @@ from flext_quality.grade_calculator import QualityGradeCalculator
 from flext_quality.handlers import FlextQualityHandlers as FlextQualityHandler
 from flext_quality.metrics import QualityMetrics
 from flext_quality.models import FlextQualityReportModel
+from flext_quality.protocols import FlextQualityProtocols
 from flext_quality.reports import FlextQualityReportGenerator
 from flext_quality.services import FlextQualityServices
 from flext_quality.utilities import FlextQualityUtilities as QualityUtilities
@@ -69,18 +81,25 @@ QualityIssue = FlextQualityEntities.QualityIssue
 QualityProject = FlextQualityEntities.QualityProject
 QualityReport = FlextQualityEntities.QualityReport
 QualityRule = FlextQualityEntities.QualityRule
-OverallMetrics = FlextQualityAnalysisTypes.OverallMetrics
+# OverallMetrics imported directly above
 
 __all__ = [
     "ASTBackend",
+    "AnalysisResults",
     "AnalysisStatus",
     "BackendType",
     "BaseAnalyzer",
     "CodeAnalyzer",
+    "CodeIssue",
+    "ComplexityIssue",
     "ComplexityMetric",
     "CoverageMetric",
+    "DeadCodeIssue",
+    "Dependency",
+    "DuplicationIssue",
     "DuplicationMetric",
     "ExternalBackend",
+    "FileAnalysisResult",
     "FlextQualityAnalysisError",
     "FlextQualityAuthenticationError",
     "FlextQualityConfig",
@@ -91,6 +110,7 @@ __all__ = [
     "FlextQualityHandler",
     "FlextQualityMetricsError",
     "FlextQualityProcessingError",
+    "FlextQualityProtocols",
     "FlextQualityReportError",
     "FlextQualityReportGenerator",
     "FlextQualityReportModel",
@@ -114,6 +134,8 @@ __all__ = [
     "QualityScore",
     "QualityUtilities",
     "QualityWebInterface",
+    "SecurityIssue",
+    "TestResults",
     "__version__",
     "__version_info__",
     "analyze_project",

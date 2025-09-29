@@ -75,7 +75,9 @@ class FlextQualityCodeAnalyzer:
         analysis_errors = 0
 
         for file_path in python_files:
-            metrics_result: FlextResult[FlextQualityAnalysisTypes.FileAnalysisResult] = self._analyze_file(file_path)
+            metrics_result: FlextResult[
+                FlextQualityAnalysisTypes.FileAnalysisResult
+            ] = self._analyze_file(file_path)
             if metrics_result.is_success:
                 metrics = metrics_result.value
                 file_metrics.append(metrics)

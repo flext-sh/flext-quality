@@ -12,7 +12,7 @@ from typing import Self
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import SettingsConfigDict
 
-from flext_core import FlextConfig, FlextResult
+from flext_core import FlextConfig, FlextConstants, FlextResult
 from flext_quality.constants import FlextQualityConstants
 
 
@@ -56,7 +56,7 @@ class FlextQualityConfig(FlextConfig):
     )
 
     max_duplication: float = Field(
-        default=5.0,
+        default=FlextQualityConstants.Duplication.MAXIMUM_DUPLICATION,
         ge=FlextQualityConstants.Validation.MINIMUM_PERCENTAGE,
         le=FlextQualityConstants.Validation.MAXIMUM_PERCENTAGE,
         description="Maximum code duplication percentage allowed",
@@ -85,14 +85,14 @@ class FlextQualityConfig(FlextConfig):
     )
 
     parallel_workers: int = Field(
-        default=4,
+        default=FlextConstants.Container.DEFAULT_WORKERS,
         ge=1,
         le=FlextQualityConstants.Performance.MAXIMUM_WORKERS,
         description="Number of parallel workers for analysis",
     )
 
     memory_limit_mb: int = Field(
-        default=512,
+        default=FlextConstants.Logging.MAX_FILE_SIZE // (1024 * 1024),
         gt=0,
         le=2048,
         description="Memory limit per file in MB",

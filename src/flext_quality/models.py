@@ -909,9 +909,12 @@ class FlextQualityModels(FlextModels):
         def _has_strict_thresholds(self) -> bool:
             """Check if configuration has strict quality thresholds."""
             return (
-                self.min_coverage >= FlextQualityConstants.QualityThresholds.EXCELLENT_THRESHOLD
-                and self.security_threshold >= FlextQualityConstants.Security.TARGET_SECURITY_SCORE
-                and self.max_complexity <= FlextQualityConstants.Complexity.STRICT_COMPLEXITY
+                self.min_coverage
+                >= FlextQualityConstants.QualityThresholds.EXCELLENT_THRESHOLD
+                and self.security_threshold
+                >= FlextQualityConstants.Security.TARGET_SECURITY_SCORE
+                and self.max_complexity
+                <= FlextQualityConstants.Complexity.STRICT_COMPLEXITY
             )
 
         @field_validator("max_complexity")

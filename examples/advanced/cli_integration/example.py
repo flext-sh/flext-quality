@@ -19,7 +19,6 @@ import tempfile
 from pathlib import Path
 
 from flext_core import FlextTypes
-
 from flext_quality import main as quality_main
 
 
