@@ -23,10 +23,6 @@ from flext_quality.services import FlextQualityServices
 from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
 
 # Type aliases for backward compatibility
-QualityProject = FlextQualityProject
-QualityAnalysis = FlextQualityAnalysis
-QualityIssue = FlextQualityIssue
-QualityReport = FlextQualityReport
 
 
 class FlextQualityAPI:
