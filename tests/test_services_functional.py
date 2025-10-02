@@ -73,7 +73,7 @@ class TestQualityProjectServiceFunctional:
 
         assert result.is_failure
         assert result.error is not None
-        assert "Project not found" in result.error
+        assert result.error is not None and "Project not found" in result.error
 
     def test_project_listing_success(self, service: QualityProjectService) -> None:
         """Test successful project listing - covers line 76."""
@@ -131,7 +131,7 @@ class TestQualityProjectServiceFunctional:
 
         assert result.is_failure
         assert result.error is not None
-        assert "Project not found" in result.error
+        assert result.error is not None and "Project not found" in result.error
 
     def test_project_deletion_success(self, service: QualityProjectService) -> None:
         """Test successful project deletion - covers lines 101-104."""
@@ -158,7 +158,7 @@ class TestQualityProjectServiceFunctional:
 
         assert result.is_failure
         assert result.error is not None
-        assert "Project not found" in result.error
+        assert result.error is not None and "Project not found" in result.error
 
 
 class TestQualityAnalysisServiceFunctional:
@@ -208,7 +208,7 @@ class TestQualityAnalysisServiceFunctional:
 
         assert result.is_failure
         assert result.error is not None
-        assert "Analysis not found" in result.error
+        assert result.error is not None and "Analysis not found" in result.error
 
     def test_update_metrics_success(
         self,
@@ -253,7 +253,7 @@ class TestQualityAnalysisServiceFunctional:
 
         assert result.is_failure
         assert result.error is not None
-        assert "Analysis not found" in result.error
+        assert result.error is not None and "Analysis not found" in result.error
 
     def test_analysis_scores_update_success(
         self, service: QualityAnalysisService
@@ -297,7 +297,7 @@ class TestQualityAnalysisServiceFunctional:
 
         assert result.is_failure
         assert result.error is not None
-        assert "Analysis not found" in result.error
+        assert result.error is not None and "Analysis not found" in result.error
 
     def test_update_issue_counts_success(
         self,
@@ -353,7 +353,7 @@ class TestQualityAnalysisServiceFunctional:
 
         assert result.is_failure
         assert result.error is not None
-        assert "Analysis not found" in result.error
+        assert result.error is not None and "Analysis not found" in result.error
 
     def test_analysis_failure_success(self, service: QualityAnalysisService) -> None:
         """Test successful analysis failure - covers lines 263-271."""
@@ -378,7 +378,7 @@ class TestQualityAnalysisServiceFunctional:
 
         assert result.is_failure
         assert result.error is not None
-        assert "Analysis not found" in result.error
+        assert result.error is not None and "Analysis not found" in result.error
 
     def test_analyses_listing_success(self, service: QualityAnalysisService) -> None:
         """Test successful analyses listing - covers lines 290-299."""
@@ -468,7 +468,7 @@ class TestQualityIssueServiceFunctional:
 
         assert result.is_failure
         assert result.error is not None
-        assert "Issue not found" in result.error
+        assert result.error is not None and "Issue not found" in result.error
 
     def test_issues_listing_success(self, service: QualityIssueService) -> None:
         """Test successful issues listing - covers lines 361-377."""
@@ -549,7 +549,7 @@ class TestQualityIssueServiceFunctional:
 
         assert result.is_failure
         assert result.error is not None
-        assert "Issue not found" in result.error
+        assert result.error is not None and "Issue not found" in result.error
 
     def test_issue_suppression_success(self, service: QualityIssueService) -> None:
         """Test successful issue suppression - covers lines 399-406."""
@@ -580,7 +580,7 @@ class TestQualityIssueServiceFunctional:
 
         assert result.is_failure
         assert result.error is not None
-        assert "Issue not found" in result.error
+        assert result.error is not None and "Issue not found" in result.error
 
     def test_issue_unsuppression_success(self, service: QualityIssueService) -> None:
         """Test successful issue unsuppression - covers lines 411-418."""
@@ -615,7 +615,7 @@ class TestQualityIssueServiceFunctional:
 
         assert result.is_failure
         assert result.error is not None
-        assert "Issue not found" in result.error
+        assert result.error is not None and "Issue not found" in result.error
 
 
 class TestQualityReportServiceFunctional:
@@ -666,7 +666,7 @@ class TestQualityReportServiceFunctional:
 
         assert result.is_failure
         assert result.error is not None
-        assert "Report not found" in result.error
+        assert result.error is not None and "Report not found" in result.error
 
     def test_reports_listing_success(self, service: QualityReportService) -> None:
         """Test successful reports listing - covers lines 466-473."""
@@ -726,7 +726,7 @@ class TestQualityReportServiceFunctional:
 
         assert result.is_failure
         assert result.error is not None
-        assert "Report not found" in result.error
+        assert result.error is not None and "Report not found" in result.error
 
 
 class TestServiceIntegration:

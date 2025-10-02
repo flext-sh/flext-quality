@@ -120,7 +120,7 @@ class TestQualityAnalysis:
         result = analysis.validate_business_rules()
         assert result.is_failure
         assert result.error is not None
-        assert "required" in result.error.lower()
+        assert result.error is not None and "required" in result.error.lower()
 
     def test_start_analysis(self) -> None:
         """Test starting an analysis."""
@@ -270,7 +270,7 @@ class TestQualityIssue:
         result = issue.validate_business_rules()
         assert result.is_failure
         assert result.error is not None
-        assert "required" in result.error.lower()
+        assert result.error is not None and "required" in result.error.lower()
 
     def test_mark_fixed(self) -> None:
         """Test marking issue as fixed."""
@@ -399,7 +399,7 @@ class TestQualityRule:
         result = invalid_rule.validate_business_rules()
         assert result.is_failure
         assert result.error is not None
-        assert "required" in result.error.lower()
+        assert result.error is not None and "required" in result.error.lower()
 
     def test_enable_disable_rule(self) -> None:
         """Test enabling and disabling a rule."""
@@ -488,7 +488,7 @@ class TestQualityReport:
         result = report.validate_business_rules()
         assert result.is_failure
         assert result.error is not None
-        assert "required" in result.error.lower()
+        assert result.error is not None and "required" in result.error.lower()
 
     def test_increment_access(self) -> None:
         """Test incrementing access count."""

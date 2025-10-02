@@ -644,8 +644,6 @@ def test_unicode():
 
         comprehensive_file.write_text('''
 
-from typing import Union, Dict
-from typing import Optional
 
 class BaseClass:
     """Base class for testing."""

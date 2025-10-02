@@ -6,8 +6,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import Final
+
 from flext_quality import exceptions
-from flext_quality.__version__ import __version__, __version_info__
 from flext_quality.analysis_types import (
     AnalysisResults,
     CodeIssue,
@@ -73,6 +74,7 @@ from flext_quality.value_objects import (
     QualityGrade,
     QualityScore,
 )
+from flext_quality.version import VERSION, FlextQualityVersion
 from flext_quality.web import FlextQualityWebInterface as QualityWebInterface
 
 AnalysisStatus = FlextQualityEntities.AnalysisStatus
@@ -81,9 +83,15 @@ QualityIssue = FlextQualityEntities.QualityIssue
 QualityProject = FlextQualityEntities.QualityProject
 QualityReport = FlextQualityEntities.QualityReport
 QualityRule = FlextQualityEntities.QualityRule
-# OverallMetrics imported directly above
+
+PROJECT_VERSION: Final[FlextQualityVersion] = VERSION
+
+__version__: str = VERSION.version
+__version_info__: tuple[int | str, ...] = VERSION.version_info
 
 __all__ = [
+    "PROJECT_VERSION",
+    "VERSION",
     "ASTBackend",
     "AnalysisResults",
     "AnalysisStatus",
@@ -118,6 +126,7 @@ __all__ = [
     "FlextQualityServices",
     "FlextQualityTimeoutError",
     "FlextQualityValidationError",
+    "FlextQualityVersion",
     "IssueLocation",
     "IssueSeverity",
     "IssueType",

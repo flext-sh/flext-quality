@@ -146,8 +146,6 @@ def complex_function(x: object) -> object:
 
 import os
 import subprocess
-from typing import , override
-from typing import Type, override
 
 def unsafe_function(user_input: object) -> object:
     """Function with real security issues - INTENTIONAL FOR TESTING PURPOSES ONLY."""

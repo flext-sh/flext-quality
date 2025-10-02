@@ -22,6 +22,7 @@ from flext_observability import (
     flext_create_metric,
     flext_create_trace,
 )
+
 from flext_quality import (
     CodeAnalyzer,
     QualityAnalysisService,
@@ -49,7 +50,6 @@ def demonstrate_simple_api() -> None:
 """Sample module for API demonstration."""
 
 import os
-from typing import List
 
 def calculate_score(values: List[float]) -> float:
     """Calculate average score from values.
@@ -411,7 +411,6 @@ def demonstrate_custom_workflows() -> None:
             "main.py": '''
 """Main application module."""
 
-from typing import List, Dict
 
 logger = FlextLogger(__name__)
 

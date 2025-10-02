@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import pathlib
 from datetime import UTC, datetime
-from typing import Any, override
+from typing import override
 from uuid import UUID
 
 from pydantic import (
@@ -99,7 +99,7 @@ class FlextQualityModels(FlextModels):
 
     @computed_field
     @property
-    def quality_system_summary(self) -> dict[str, Any]:
+    def quality_system_summary(self) -> dict[str, object]:
         """Computed field providing comprehensive quality system summary."""
         return {
             "system_info": {
@@ -201,7 +201,7 @@ class FlextQualityModels(FlextModels):
 
         @computed_field
         @property
-        def project_summary(self) -> dict[str, Any]:
+        def project_summary(self) -> dict[str, object]:
             """Computed field providing comprehensive project summary."""
             return {
                 "project_info": {
@@ -319,7 +319,7 @@ class FlextQualityModels(FlextModels):
 
         @computed_field
         @property
-        def analysis_summary(self) -> dict[str, Any]:
+        def analysis_summary(self) -> dict[str, object]:
             """Computed field providing comprehensive analysis summary."""
             duration_seconds = 0
             if self.completed_at and self.started_at:
@@ -462,7 +462,7 @@ class FlextQualityModels(FlextModels):
 
         @computed_field
         @property
-        def issue_summary(self) -> dict[str, Any]:
+        def issue_summary(self) -> dict[str, object]:
             """Computed field providing comprehensive issue summary."""
             return {
                 "issue_identity": {
@@ -611,7 +611,7 @@ class FlextQualityModels(FlextModels):
 
         @computed_field
         @property
-        def report_summary(self) -> dict[str, Any]:
+        def report_summary(self) -> dict[str, object]:
             """Computed field providing comprehensive report summary."""
             return {
                 "report_identity": {
@@ -663,7 +663,7 @@ class FlextQualityModels(FlextModels):
             return self
 
         @field_serializer("content", when_used="json")
-        def serialize_content_efficiently(self, value: str) -> dict[str, Any]:
+        def serialize_content_efficiently(self, value: str) -> dict[str, object]:
             """Field serializer for efficient content handling."""
             # For large content, provide summary instead of full content in JSON
             max_content_size = 10000  # 10KB limit for JSON serialization
@@ -682,7 +682,7 @@ class FlextQualityModels(FlextModels):
             }
 
         @field_serializer("metadata", when_used="json")
-        def serialize_metadata_with_context(self, value: dict) -> dict[str, Any]:
+        def serialize_metadata_with_context(self, value: dict) -> dict[str, object]:
             """Field serializer for metadata with processing context."""
             return {
                 "report_metadata": value,
@@ -764,7 +764,7 @@ class FlextQualityModels(FlextModels):
 
         @computed_field
         @property
-        def config_summary(self) -> dict[str, Any]:
+        def config_summary(self) -> dict[str, object]:
             """Computed field providing comprehensive configuration summary."""
             return {
                 "pattern_configuration": {
@@ -844,7 +844,7 @@ class FlextQualityModels(FlextModels):
         @field_serializer("include_patterns", when_used="json")
         def serialize_include_patterns_with_metadata(
             self, value: list[str]
-        ) -> dict[str, Any]:
+        ) -> dict[str, object]:
             """Field serializer for include patterns with validation metadata."""
             return {
                 "patterns": value,
@@ -859,7 +859,7 @@ class FlextQualityModels(FlextModels):
         @field_serializer("exclude_patterns", when_used="json")
         def serialize_exclude_patterns_with_metadata(
             self, value: list[str]
-        ) -> dict[str, Any]:
+        ) -> dict[str, object]:
             """Field serializer for exclude patterns with validation metadata."""
             return {
                 "patterns": value,

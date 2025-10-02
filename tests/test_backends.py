@@ -292,7 +292,6 @@ elif y:
         backend = ASTBackend()
         code = """
 
-from typing import Dict
 """
 
         tree = ast.parse(code)

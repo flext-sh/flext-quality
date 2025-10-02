@@ -1,19 +1,17 @@
-"""FLEXT Module.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved. SPDX-License-Identifier: MIT Copyright (c) 2025 FLEXT Team. All rights reserved. SPDX-License-Identifier: MIT
-"""
+"""Version metadata for flext quality."""
 
 from __future__ import annotations
 
-import importlib.metadata
+from typing import Final, cast
 
-try:
-    __version__ = importlib.metadata.version("flext-quality")
-except importlib.metadata.PackageNotFoundError:
-    __version__ = "0.9.0"
+from flext_core.metadata import build_metadata_exports
 
-__version_info__ = tuple(int(x) for x in __version__.split(".") if x.isdigit())
+_metadata = build_metadata_exports(__file__)
 
-# FLEXT Enterprise - Unified Versioning System
-# Version is managed centrally in flext_core.version
-# This maintains backward compatibility while eliminating duplication.
+__version__: Final[str] = cast("str", _metadata["__version__"])
+__version_info__: Final[tuple[int | str, ...]] = cast(
+    "tuple[int | str, ...]",
+    _metadata["__version_info__"],
+)
+
+__all__ = ["__version__", "__version_info__"]

@@ -543,7 +543,6 @@ class TestCLIIntegration:
 """Main application module."""
 
 import sys
-from typing import List, Optional
 
 def process_data(data: List[str]) -> Optional[List[str]]:
     """Process input data."""
@@ -584,7 +583,6 @@ if __name__ == "__main__":
 
 import unittest
 from src.main import process_data
-from typing import Optional
 
 class TestProcessData(unittest.TestCase):
     """Test process_data function."""

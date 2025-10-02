@@ -33,9 +33,6 @@ class TestCodeAnalyzerFunctional:
 
 import os
 import sys
-from typing import List, Optional
-from typing import Dict
-from typing import Optional
 
 def calculate_average(numbers: List[float]) -> float:
     """Calculate average of numbers."""
