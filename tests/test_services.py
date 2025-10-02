@@ -43,13 +43,13 @@ class TestQualityProjectServiceComprehensive:
         """Create service instance."""
         return QualityProjectService()
 
-    async def test_create_project_success_minimal_params(
+    def test_create_project_success_minimal_params(
         self,
         service: QualityProjectService,
         secure_temp_dir: str,
     ) -> None:
         """Test successful project creation with minimal parameters."""
-        result = await service.create_project(
+        result = service.create_project(
             name="minimal_project",
             project_path=secure_temp_dir,
         )
@@ -62,13 +62,13 @@ class TestQualityProjectServiceComprehensive:
         assert project.repository_url is None
         assert project.id is not None
 
-    async def test_create_project_success_full_params(
+    def test_create_project_success_full_params(
         self,
         service: QualityProjectService,
         secure_temp_dir: str,
     ) -> None:
         """Test successful project creation with all parameters."""
-        result = await service.create_project(
+        result = service.create_project(
             name="full_project",
             project_path=secure_temp_dir,
             repository_url="https://github.com/test/repo",
@@ -82,52 +82,52 @@ class TestQualityProjectServiceComprehensive:
         assert project.language == "go"
         assert project.repository_url == "https://github.com/test/repo"
 
-    async def test_get_project_success(
+    def test_get_project_success(
         self,
         service: QualityProjectService,
         secure_temp_dir: str,
     ) -> None:
         """Test successful project retrieval."""
         # First create a project
-        create_result = await service.create_project(
+        create_result = service.create_project(
             name="test_project",
             project_path=secure_temp_dir,
         )
         created_project = assert_result_success_with_data(create_result)
 
         # Then retrieve it
-        result = await service.get_project(str(created_project.id))
+        result = service.get_project(str(created_project.id))
 
         project = assert_result_success_with_data(result)
         assert project.id == created_project.id
         assert project.project_path == secure_temp_dir
 
-    async def test_project_get_not_found(self, service: QualityProjectService) -> None:
+    def test_project_get_not_found(self, service: QualityProjectService) -> None:
         """Test get_project with non-existent ID."""
-        result = await service.get_project("non-existent-id")
+        result = service.get_project("non-existent-id")
 
         error = assert_result_failure_with_error(result)
         assert "Project not found" in error
 
-    async def test_project_list_empty(self, service: QualityProjectService) -> None:
+    def test_project_list_empty(self, service: QualityProjectService) -> None:
         """Test list_projects when no projects exist."""
-        result = await service.list_projects()
+        result = service.list_projects()
 
         projects = assert_result_success_with_data(result)
         assert isinstance(projects, list)
         assert len(projects) == 0
 
-    async def test_list_projects_with_data(
+    def test_list_projects_with_data(
         self,
         service: QualityProjectService,
         secure_temp_dir: str,
     ) -> None:
         """Test list_projects with existing projects."""
         # Create multiple projects
-        await service.create_project("project1", secure_temp_dir)
-        await service.create_project("project2", secure_temp_dir)
+        service.create_project("project1", secure_temp_dir)
+        service.create_project("project2", secure_temp_dir)
 
-        result = await service.list_projects()
+        result = service.list_projects()
 
         projects = assert_result_success_with_data(result)
         assert isinstance(projects, list)
@@ -136,32 +136,32 @@ class TestQualityProjectServiceComprehensive:
         paths = [p.project_path for p in projects]
         assert secure_temp_dir in paths
 
-    async def test_update_project_success(
+    def test_update_project_success(
         self,
         service: QualityProjectService,
         secure_temp_dir: str,
     ) -> None:
         """Test successful project update."""
         # Create a project
-        create_result = await service.create_project("original_name", secure_temp_dir)
+        create_result = service.create_project("original_name", secure_temp_dir)
         project = assert_result_success_with_data(create_result)
 
         # Update it
         updates: FlextTypes.Core.Dict = {
             "language": "javascript",
         }
-        result = await service.update_project(str(project.id), updates)
+        result = service.update_project(str(project.id), updates)
 
         updated_project = assert_result_success_with_data(result)
         assert updated_project.language == "javascript"
         assert updated_project.id == project.id  # ID should remain the same
 
-    async def test_update_project_not_found(
+    def test_update_project_not_found(
         self,
         service: QualityProjectService,
     ) -> None:
         """Test update_project with non-existent ID."""
-        result = await service.update_project(
+        result = service.update_project(
             "non-existent-id",
             {"language": "new_language"},
         )
@@ -169,31 +169,31 @@ class TestQualityProjectServiceComprehensive:
         error = assert_result_failure_with_error(result)
         assert "Project not found" in error
 
-    async def test_delete_project_success(
+    def test_delete_project_success(
         self,
         service: QualityProjectService,
         secure_temp_dir: str,
     ) -> None:
         """Test successful project deletion."""
         # Create a project
-        create_result = await service.create_project("to_delete", secure_temp_dir)
+        create_result = service.create_project("to_delete", secure_temp_dir)
         project = assert_result_success_with_data(create_result)
 
         # Delete it
-        result = await service.delete_project(str(project.id))
+        result = service.delete_project(str(project.id))
 
         assert_result_success_with_data(result)
 
         # Verify it's gone
-        get_result = await service.get_project(str(project.id))
+        get_result = service.get_project(str(project.id))
         assert get_result.is_failure
 
-    async def test_delete_project_not_found(
+    def test_delete_project_not_found(
         self,
         service: QualityProjectService,
     ) -> None:
         """Test delete_project with non-existent ID."""
-        result = await service.delete_project("non-existent-id")
+        result = service.delete_project("non-existent-id")
 
         error = assert_result_failure_with_error(result)
         assert "Project not found" in error
@@ -207,14 +207,14 @@ class TestQualityAnalysisServiceComprehensive:
         """Create service instance."""
         return QualityAnalysisService()
 
-    async def test_create_analyssuccess(
+    def test_create_analyssuccess(
         self,
         service: QualityAnalysisService,
     ) -> None:
         """Test successful analysis creation."""
         project_id = str(uuid.uuid4())
 
-        result = await service.create_analysis(project_id=project_id)
+        result = service.create_analysis(project_id=project_id)
 
         analysis = assert_result_success_with_data(result)
 
@@ -223,43 +223,39 @@ class TestQualityAnalysisServiceComprehensive:
         assert analysis.status == AnalysisStatus.QUEUED
         assert analysis.id is not None
 
-    async def test_analysis_retrieval_success(
-        self, service: QualityAnalysisService
-    ) -> None:
+    def test_analysis_retrieval_success(self, service: QualityAnalysisService) -> None:
         """Test successful analysis retrieval."""
         # Create an analysis
         project_id = str(uuid.uuid4())
-        create_result = await service.create_analysis(project_id=project_id)
+        create_result = service.create_analysis(project_id=project_id)
         analysis = assert_result_success_with_data(create_result)
 
         # Retrieve it
-        result = await service.get_analysis(str(analysis.id))
+        result = service.get_analysis(str(analysis.id))
 
         retrieved = assert_result_success_with_data(result)
         assert retrieved.id == analysis.id
         assert retrieved.project_id == project_id
 
-    async def test_get_analysis_not_found(
+    def test_get_analysis_not_found(
         self,
         service: QualityAnalysisService,
     ) -> None:
         """Test get_analysis with non-existent ID."""
-        result = await service.get_analysis("non-existent-id")
+        result = service.get_analysis("non-existent-id")
 
         error = assert_result_failure_with_error(result)
         assert "Analysis not found" in error
 
-    async def test_analysis_listing_success(
-        self, service: QualityAnalysisService
-    ) -> None:
+    def test_analysis_listing_success(self, service: QualityAnalysisService) -> None:
         """Test successful analyses listing."""
         project_id = str(uuid.uuid4())
 
         # Create multiple analyses
-        await service.create_analysis(project_id=project_id)
-        await service.create_analysis(project_id=project_id)
+        service.create_analysis(project_id=project_id)
+        service.create_analysis(project_id=project_id)
 
-        result = await service.list_analyses(project_id)
+        result = service.list_analyses(project_id)
 
         analyses = assert_result_success_with_data(result)
         assert isinstance(analyses, list)
@@ -269,18 +265,18 @@ class TestQualityAnalysisServiceComprehensive:
         for analysis in analyses:
             assert analysis.project_id == project_id
 
-    async def test_update_metrics_success(
+    def test_update_metrics_success(
         self,
         service: QualityAnalysisService,
     ) -> None:
         """Test successful metrics update."""
         # Create an analysis
         project_id = str(uuid.uuid4())
-        create_result = await service.create_analysis(project_id=project_id)
+        create_result = service.create_analysis(project_id=project_id)
         analysis = assert_result_success_with_data(create_result)
 
         # Update metrics
-        result = await service.update_metrics(
+        result = service.update_metrics(
             analysis_id=str(analysis.id),
             total_files=10,
             total_lines=1000,
@@ -296,12 +292,12 @@ class TestQualityAnalysisServiceComprehensive:
         assert updated.comment_lines == 100
         assert updated.blank_lines == 100
 
-    async def test_update_metrics_not_found(
+    def test_update_metrics_not_found(
         self,
         service: QualityAnalysisService,
     ) -> None:
         """Test update_metrics with non-existent analysis."""
-        result = await service.update_metrics(
+        result = service.update_metrics(
             analysis_id="non-existent",
             total_files=10,
             total_lines=1000,
@@ -313,17 +309,17 @@ class TestQualityAnalysisServiceComprehensive:
         error = assert_result_failure_with_error(result)
         assert "Analysis not found" in error
 
-    async def test_analysis_scores_update_success(
+    def test_analysis_scores_update_success(
         self, service: QualityAnalysisService
     ) -> None:
         """Test successful scores update."""
         # Create an analysis
         project_id = str(uuid.uuid4())
-        create_result = await service.create_analysis(project_id=project_id)
+        create_result = service.create_analysis(project_id=project_id)
         analysis = assert_result_success_with_data(create_result)
 
         # Update scores
-        result = await service.update_scores(
+        result = service.update_scores(
             analysis_id=str(analysis.id),
             coverage_score=95.0,
             complexity_score=88.0,
@@ -339,18 +335,18 @@ class TestQualityAnalysisServiceComprehensive:
         assert updated.security_score == 100.0
         assert updated.maintainability_score == 85.0
 
-    async def test_update_issue_counts_success(
+    def test_update_issue_counts_success(
         self,
         service: QualityAnalysisService,
     ) -> None:
         """Test successful issue counts update."""
         # Create an analysis
         project_id = str(uuid.uuid4())
-        create_result = await service.create_analysis(project_id=project_id)
+        create_result = service.create_analysis(project_id=project_id)
         analysis = assert_result_success_with_data(create_result)
 
         # Update issue counts
-        result = await service.update_issue_counts(
+        result = service.update_issue_counts(
             analysis_id=str(analysis.id),
             total_issues=32,
             critical_issues=2,
@@ -365,35 +361,35 @@ class TestQualityAnalysisServiceComprehensive:
         assert updated.medium_issues == 10
         assert updated.low_issues == 15
 
-    async def test_complete_analyssuccess(
+    def test_complete_analyssuccess(
         self,
         service: QualityAnalysisService,
     ) -> None:
         """Test successful analysis completion."""
         # Create an analysis
         project_id = str(uuid.uuid4())
-        create_result = await service.create_analysis(project_id=project_id)
+        create_result = service.create_analysis(project_id=project_id)
         analysis = assert_result_success_with_data(create_result)
 
         # Complete it
-        result = await service.complete_analysis(str(analysis.id))
+        result = service.complete_analysis(str(analysis.id))
 
         completed = assert_result_success_with_data(result)
         assert completed.status == AnalysisStatus.COMPLETED
         assert completed.completed_at is not None
 
-    async def test_analysis_failure_marking_success(
+    def test_analysis_failure_marking_success(
         self, service: QualityAnalysisService
     ) -> None:
         """Test successful analysis failure marking."""
         # Create an analysis
         project_id = str(uuid.uuid4())
-        create_result = await service.create_analysis(project_id=project_id)
+        create_result = service.create_analysis(project_id=project_id)
         analysis = assert_result_success_with_data(create_result)
 
         # Mark as failed
         error_message = "Analysis failed due to timeout"
-        result = await service.fail_analysis(str(analysis.id), error_message)
+        result = service.fail_analysis(str(analysis.id), error_message)
 
         failed = assert_result_success_with_data(result)
         assert failed.status == AnalysisStatus.FAILED
@@ -408,11 +404,11 @@ class TestQualityIssueServiceComprehensive:
         """Create service instance."""
         return QualityIssueService()
 
-    async def test_issue_creation_success(self, service: QualityIssueService) -> None:
+    def test_issue_creation_success(self, service: QualityIssueService) -> None:
         """Test successful issue creation."""
         analysis_id = str(uuid.uuid4())
 
-        result = await service.create_issue(
+        result = service.create_issue(
             analysis_id=analysis_id,
             file_path="src/test.py",
             line_number=42,
@@ -437,14 +433,14 @@ class TestQualityIssueServiceComprehensive:
         assert not issue.is_suppressed
         assert issue.id is not None
 
-    async def test_create_issue_minimal_params(
+    def test_create_issue_minimal_params(
         self,
         service: QualityIssueService,
     ) -> None:
         """Test issue creation with minimal parameters."""
         analysis_id = str(uuid.uuid4())
 
-        result = await service.create_issue(
+        result = service.create_issue(
             analysis_id=analysis_id,
             issue_type=IssueType.STYLE_VIOLATION,
             severity=IssueSeverity.LOW,
@@ -463,11 +459,11 @@ class TestQualityIssueServiceComprehensive:
         assert issue.line_number is None  # Optional parameter
         assert issue.column_number is None  # Optional parameter
 
-    async def test_issue_retrieval_success(self, service: QualityIssueService) -> None:
+    def test_issue_retrieval_success(self, service: QualityIssueService) -> None:
         """Test successful issue retrieval."""
         # Create an issue
         analysis_id = str(uuid.uuid4())
-        create_result = await service.create_issue(
+        create_result = service.create_issue(
             analysis_id=analysis_id,
             issue_type=IssueType.HIGH_COMPLEXITY,
             severity=IssueSeverity.MEDIUM,
@@ -480,20 +476,18 @@ class TestQualityIssueServiceComprehensive:
         issue = assert_result_success_with_data(create_result)
 
         # Retrieve it
-        result = await service.get_issue(str(issue.id))
+        result = service.get_issue(str(issue.id))
 
         retrieved = assert_result_success_with_data(result)
         assert retrieved.id == issue.id
         assert retrieved.analysis_id == analysis_id
 
-    async def test_issue_listing_by_analysis(
-        self, service: QualityIssueService
-    ) -> None:
+    def test_issue_listing_by_analysis(self, service: QualityIssueService) -> None:
         """Test listing issues by analysis ID."""
         analysis_id = str(uuid.uuid4())
 
         # Create multiple issues
-        await service.create_issue(
+        service.create_issue(
             analysis_id=analysis_id,
             issue_type=IssueType.SECURITY_VULNERABILITY,
             severity=IssueSeverity.HIGH,
@@ -503,7 +497,7 @@ class TestQualityIssueServiceComprehensive:
             column_number=1,
             message="Issue 1",
         )
-        await service.create_issue(
+        service.create_issue(
             analysis_id=analysis_id,
             issue_type=IssueType.HIGH_COMPLEXITY,
             severity=IssueSeverity.MEDIUM,
@@ -514,7 +508,7 @@ class TestQualityIssueServiceComprehensive:
             message="Issue 2",
         )
 
-        result = await service.list_issues(analysis_id)
+        result = service.list_issues(analysis_id)
 
         issues = assert_result_success_with_data(result)
         assert isinstance(issues, list)
@@ -524,11 +518,11 @@ class TestQualityIssueServiceComprehensive:
         for issue in issues:
             assert issue.analysis_id == analysis_id
 
-    async def test_issue_mark_fixed_success(self, service: QualityIssueService) -> None:
+    def test_issue_mark_fixed_success(self, service: QualityIssueService) -> None:
         """Test successful issue marking as fixed."""
         # Create an issue
         analysis_id = str(uuid.uuid4())
-        create_result = await service.create_issue(
+        create_result = service.create_issue(
             analysis_id=analysis_id,
             issue_type=IssueType.SYNTAX_ERROR,
             severity=IssueSeverity.HIGH,
@@ -541,18 +535,16 @@ class TestQualityIssueServiceComprehensive:
         issue = assert_result_success_with_data(create_result)
 
         # Mark as fixed
-        result = await service.mark_fixed(str(issue.id))
+        result = service.mark_fixed(str(issue.id))
 
         fixed_issue = assert_result_success_with_data(result)
         assert fixed_issue.is_fixed
 
-    async def test_issue_suppression_success(
-        self, service: QualityIssueService
-    ) -> None:
+    def test_issue_suppression_success(self, service: QualityIssueService) -> None:
         """Test successful issue suppression."""
         # Create an issue
         analysis_id = str(uuid.uuid4())
-        create_result = await service.create_issue(
+        create_result = service.create_issue(
             analysis_id=analysis_id,
             issue_type=IssueType.STYLE_VIOLATION,
             severity=IssueSeverity.LOW,
@@ -566,19 +558,17 @@ class TestQualityIssueServiceComprehensive:
 
         # Suppress it
         reason = "This is a false positive"
-        result = await service.suppress_issue(str(issue.id), reason)
+        result = service.suppress_issue(str(issue.id), reason)
 
         suppressed = assert_result_success_with_data(result)
         assert suppressed.is_suppressed
         assert suppressed.suppression_reason == reason
 
-    async def test_issue_unsuppression_success(
-        self, service: QualityIssueService
-    ) -> None:
+    def test_issue_unsuppression_success(self, service: QualityIssueService) -> None:
         """Test successful issue unsuppression."""
         # Create and suppress an issue
         analysis_id = str(uuid.uuid4())
-        create_result = await service.create_issue(
+        create_result = service.create_issue(
             analysis_id=analysis_id,
             issue_type=IssueType.DUPLICATE_CODE,
             severity=IssueSeverity.MEDIUM,
@@ -590,10 +580,10 @@ class TestQualityIssueServiceComprehensive:
         )
         issue = assert_result_success_with_data(create_result)
 
-        await service.suppress_issue(str(issue.id), "Initially suppressed")
+        service.suppress_issue(str(issue.id), "Initially suppressed")
 
         # Unsuppress it
-        result = await service.unsuppress_issue(str(issue.id))
+        result = service.unsuppress_issue(str(issue.id))
 
         unsuppressed = assert_result_success_with_data(result)
         assert not unsuppressed.is_suppressed
@@ -608,11 +598,11 @@ class TestQualityReportServiceComprehensive:
         """Create service instance."""
         return QualityReportService()
 
-    async def test_report_creation_success(self, service: QualityReportService) -> None:
+    def test_report_creation_success(self, service: QualityReportService) -> None:
         """Test successful report creation."""
         analysis_id = str(uuid.uuid4())
 
-        result = await service.create_report(
+        result = service.create_report(
             analysis_id=analysis_id,
             format_type="html",
             content="<html>Test report</html>",
@@ -626,14 +616,14 @@ class TestQualityReportServiceComprehensive:
         assert report.report_type == "html"
         assert report.id is not None
 
-    async def test_create_report_minimal_params(
+    def test_create_report_minimal_params(
         self,
         service: QualityReportService,
     ) -> None:
         """Test report creation with minimal parameters."""
         analysis_id = str(uuid.uuid4())
 
-        result = await service.create_report(
+        result = service.create_report(
             analysis_id=analysis_id,
             format_type="json",
             content='{"test": "report"}',
@@ -644,13 +634,11 @@ class TestQualityReportServiceComprehensive:
         assert report.report_type == "json"
         assert report.report_type == "json"
 
-    async def test_report_retrieval_success(
-        self, service: QualityReportService
-    ) -> None:
+    def test_report_retrieval_success(self, service: QualityReportService) -> None:
         """Test successful report retrieval."""
         # Create a report
         analysis_id = str(uuid.uuid4())
-        create_result = await service.create_report(
+        create_result = service.create_report(
             analysis_id=analysis_id,
             format_type="pdf",
             content="PDF content",
@@ -658,14 +646,14 @@ class TestQualityReportServiceComprehensive:
         report = assert_result_success_with_data(create_result)
 
         # Retrieve it
-        result = await service.get_report(str(report.id))
+        result = service.get_report(str(report.id))
 
         retrieved = assert_result_success_with_data(result)
         assert retrieved.id == report.id
         assert retrieved.analysis_id == analysis_id
         assert retrieved.report_type == "pdf"
 
-    async def test_list_reports_by_analysis(
+    def test_list_reports_by_analysis(
         self,
         service: QualityReportService,
     ) -> None:
@@ -673,23 +661,23 @@ class TestQualityReportServiceComprehensive:
         analysis_id = str(uuid.uuid4())
 
         # Create multiple reports
-        await service.create_report(
+        service.create_report(
             analysis_id=analysis_id,
             format_type="html",
             content="<html>HTML Report</html>",
         )
-        await service.create_report(
+        service.create_report(
             analysis_id=analysis_id,
             format_type="json",
             content='{"report": "1"}',
         )
-        await service.create_report(
+        service.create_report(
             analysis_id=analysis_id,
             format_type="pdf",
             content="PDF report",
         )
 
-        result = await service.list_reports(analysis_id)
+        result = service.list_reports(analysis_id)
 
         reports = assert_result_success_with_data(result)
         assert isinstance(reports, list)
@@ -703,11 +691,11 @@ class TestQualityReportServiceComprehensive:
         types = {r.report_type for r in reports}
         assert types == {"html", "json", "pdf"}
 
-    async def test_report_deletion_success(self, service: QualityReportService) -> None:
+    def test_report_deletion_success(self, service: QualityReportService) -> None:
         """Test successful report deletion."""
         # Create a report
         analysis_id = str(uuid.uuid4())
-        create_result = await service.create_report(
+        create_result = service.create_report(
             analysis_id=analysis_id,
             format_type="temp",
             content="Temporary report",
@@ -715,19 +703,17 @@ class TestQualityReportServiceComprehensive:
         report = assert_result_success_with_data(create_result)
 
         # Delete it
-        result = await service.delete_report(str(report.id))
+        result = service.delete_report(str(report.id))
 
         assert_result_success_with_data(result)
 
         # Verify it's gone
-        get_result = await service.get_report(str(report.id))
+        get_result = service.get_report(str(report.id))
         assert get_result.is_failure
 
-    async def test_report_deletion_not_found(
-        self, service: QualityReportService
-    ) -> None:
+    def test_report_deletion_not_found(self, service: QualityReportService) -> None:
         """Test delete_report with non-existent ID."""
-        result = await service.delete_report("non-existent-id")
+        result = service.delete_report("non-existent-id")
 
         error = assert_result_failure_with_error(result)
         assert "Report not found" in error

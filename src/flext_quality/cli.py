@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import override
 
 from flext_cli import (
-    FlextCliApi,
+    FlextCli,
     FlextCliContext,
 )
 
@@ -90,7 +90,7 @@ class FlextQualityCliService(FlextService[int]):
                 )
 
             cli_context = cli_context_result.value
-            cli_api = FlextCliApi()
+            cli_api = FlextCli()
 
             # Enable quiet mode for JSON/HTML output to prevent log contamination
             # Use FlextQualityConfig instead of direct environment manipulation
@@ -157,7 +157,7 @@ class FlextQualityCliService(FlextService[int]):
             args: argparse.Namespace,
             report: QualityReport,
             cli_context: FlextCliContext,
-            cli_api: FlextCliApi,
+            cli_api: FlextCli,
         ) -> FlextResult[None]:
             """Handle report output to file or stdout."""
             if args.output:
@@ -169,7 +169,7 @@ class FlextQualityCliService(FlextService[int]):
             args: argparse.Namespace,
             report: QualityReport,
             cli_context: FlextCliContext,
-            cli_api: FlextCliApi,
+            cli_api: FlextCli,
         ) -> FlextResult[None]:
             """Save report to file using FlextCli export."""
             output_path = Path(args.output)
@@ -221,7 +221,7 @@ class FlextQualityCliService(FlextService[int]):
             args: argparse.Namespace,
             report: QualityReport,
             cli_context: FlextCliContext,
-            cli_api: FlextCliApi,
+            cli_api: FlextCli,
         ) -> FlextResult[None]:
             """Output report to stdout."""
             if args.format == "json":
@@ -283,7 +283,7 @@ class FlextQualityCliService(FlextService[int]):
                 )
 
             cli_context = cli_context_result.value
-            cli_api = FlextCliApi()
+            cli_api = FlextCli()
 
             project_path = Path(args.path).resolve()
             cli_context.print_info(f"Calculating quality score for: {project_path}")
@@ -439,7 +439,7 @@ def score_project(args: argparse.Namespace) -> int:
     """Get quick quality score for project using FlextCli APIs."""
     logger = FlextLogger(__name__)
     cli_context = get_cli_context(verbose=getattr(args, "verbose", False))
-    cli_api = FlextCliApi()
+    cli_api = FlextCli()
 
     try:
         project_path = Path(args.path).resolve()

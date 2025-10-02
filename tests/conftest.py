@@ -522,12 +522,12 @@ def mock_quality_analyzer() -> object:
     Features:
       - Tracks analyzed files for test verification
       - Returns realistic quality scores and metrics
-      - Simulates async operations for testing async workflows
+      - Simulates operations for testing workflows
       - Provides consistent, deterministic results
 
     Example:
       >>> def test_analysis_service(mock_quality_analyzer):
-      ...     result = await mock_quality_analyzer.analyze_project("/test")
+      ...     result = mock_quality_analyzer.analyze_project("/test")
       ...     assert result["quality_score"] == 85.0
       ...     assert result["issues"] == 5
 
@@ -544,7 +544,7 @@ def mock_quality_analyzer() -> object:
             """Initialize the instance."""
             self.analyzed_files: FlextTypes.Core.StringList = []
 
-        async def analyze_project(self, project_path: str) -> FlextTypes.Core.Dict:
+        def analyze_project(self, project_path: str) -> FlextTypes.Core.Dict:
             """Simulate comprehensive project analysis.
 
             Args:
@@ -562,7 +562,7 @@ def mock_quality_analyzer() -> object:
                 "analysis_time": 2.5,
             }
 
-        async def analyze_file(self, file_path: str) -> FlextTypes.Core.Dict:
+        def analyze_file(self, file_path: str) -> FlextTypes.Core.Dict:
             """Simulate individual file analysis.
 
             Args:
@@ -579,7 +579,7 @@ def mock_quality_analyzer() -> object:
                 "coverage": 90.0,
             }
 
-        async def get_metrics(self, _project_path: str) -> FlextTypes.Core.Dict:
+        def get_metrics(self, _project_path: str) -> FlextTypes.Core.Dict:
             """Simulate project-wide quality metrics collection.
 
             Args:
@@ -617,11 +617,11 @@ def mock_report_generator() -> object:
       - Supports multiple output formats (JSON, HTML, PDF)
       - Maintains history of generated reports
       - Returns realistic report metadata and content
-      - Simulates async report generation workflows
+      - Simulates report generation workflows
 
     Example:
       >>> def test_report_service(mock_report_generator):
-      ...     filename = await mock_report_generator.generate_report(data, "json")
+      ...     filename = mock_report_generator.generate_report(data, "json")
       ...     assert filename.endswith(".json")
       ...     assert len(mock_report_generator.generated_reports) == 1
 
@@ -638,7 +638,7 @@ def mock_report_generator() -> object:
             """Initialize the instance."""
             self.generated_reports: list[FlextTypes.Core.Dict] = []
 
-        async def generate_report(
+        def generate_report(
             self,
             data: FlextTypes.Core.Dict,
             output_format: str = "json",
@@ -661,7 +661,7 @@ def mock_report_generator() -> object:
             self.generated_reports.append(report)
             return f"report_{len(self.generated_reports)}.{output_format}"
 
-        async def generate_dashboard_data(self) -> FlextTypes.Core.Dict:
+        def generate_dashboard_data(self) -> FlextTypes.Core.Dict:
             """Simulate dashboard data generation.
 
             Returns:

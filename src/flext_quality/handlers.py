@@ -57,7 +57,7 @@ class FlextQualityHandlers:
         self._logger = FlextLogger(__name__)
         self._observability = self._ObservabilityHelper()
 
-    async def analyze_project(self, project_id: UUID) -> FlextResult[QualityAnalysis]:
+    def analyze_project(self, project_id: UUID) -> FlextResult[QualityAnalysis]:
         """Handle project analysis command."""
         # Create trace for observability (optional dependency)
         self._observability.create_trace(
@@ -78,7 +78,7 @@ class FlextQualityHandlers:
             project_id_str = str(project_id)
 
             # Create and start analysis
-            analysis_result = await self._analysis_service.create_analysis(
+            analysis_result = self._analysis_service.create_analysis(
                 project_id=project_id_str,
             )
 
@@ -112,13 +112,13 @@ class FlextQualityHandlers:
             self._logger.exception("Unexpected error in analyze_project")
             return FlextResult[QualityAnalysis].fail(f"Unexpected error: {e!s}")
 
-    async def generate_report(self, analysis_id: UUID) -> FlextResult[QualityReport]:
+    def generate_report(self, analysis_id: UUID) -> FlextResult[QualityReport]:
         """Handle report generation command."""
         # Convert UUID to string for service compatibility
         analysis_id_str = str(analysis_id)
 
         # Create report for the analysis
-        report_result = await self._report_service.create_report(
+        report_result = self._report_service.create_report(
             analysis_id=analysis_id_str,
             format_type="html",
             content="comprehensive report",
@@ -134,7 +134,7 @@ class FlextQualityHandlers:
         # Return the created report
         return FlextResult[QualityReport].ok(report)
 
-    async def run_linting(self, project_id: UUID) -> FlextResult[FlextTypes.Core.Dict]:
+    def run_linting(self, project_id: UUID) -> FlextResult[FlextTypes.Core.Dict]:
         """Handle linting command."""
         # Return placeholder result since linting service is not implemented
         linting_data: FlextTypes.Core.Dict = {
@@ -145,7 +145,7 @@ class FlextQualityHandlers:
 
         return FlextResult[FlextTypes.Core.Dict].ok(linting_data)
 
-    async def run_security_check(
+    def run_security_check(
         self,
         project_id: UUID,
     ) -> FlextResult[FlextTypes.Core.Dict]:

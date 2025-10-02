@@ -186,7 +186,7 @@ class MyClass:
     def method_one(self):
       pass
 
-    async def async_method(self):
+    def method(self):
       pass
 """
 
@@ -217,7 +217,7 @@ class MyClass:
 def func1():
     pass
 
-async def func2():
+def func2():
     pass
 
 def func3(x, y=1, *args, **kwargs):
@@ -230,7 +230,7 @@ def func3(x, y=1, *args, **kwargs):
         assert len(functions) == 3
         assert functions[0]["name"] == "func1"
         assert functions[1]["name"] == "func2"
-        assert functions[1]["is_async"] is True
+        assert functions[1]["is"] is True
         assert functions[2]["name"] == "func3"
         assert functions[2]["args"] == 2  # Only x and y, not *args/**kwargs
 

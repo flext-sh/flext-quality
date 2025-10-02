@@ -5,14 +5,13 @@ This example demonstrates comprehensive usage of the FLEXT Quality API including
 - Simple API usage with QualityAPI
 - Advanced service integration patterns
 - FLEXT ecosystem integration (flext-core, flext-observability)
-- Async/await patterns for enterprise applications
+- /patterns for enterprise applications
 - Error handling with FlextResult patterns
 - Custom quality workflows and automation
 
 This showcases complete API integration patterns for enterprise applications.
 """
 
-import asyncio
 import sys
 import tempfile
 from pathlib import Path
@@ -150,7 +149,7 @@ if __name__ == "__main__":
         html_path.write_text(html_report)
 
 
-async def demonstrate_service_integration() -> None:
+def demonstrate_service_integration() -> None:
     """Demonstrate advanced service integration patterns."""
     # Initialize services
     project_service = QualityProjectService()
@@ -162,7 +161,7 @@ async def demonstrate_service_integration() -> None:
 
     # Create project
     with tempfile.TemporaryDirectory() as temp_dir:
-        project_result = await project_service.create_project(
+        project_result = project_service.create_project(
             name="API Demo Project",
             project_path=temp_dir,
             language="python",
@@ -172,12 +171,12 @@ async def demonstrate_service_integration() -> None:
 
         # Create analysis
 
-        analysis_result = await analysis_service.create_analysis(project_id=project.id)
+        analysis_result = analysis_service.create_analysis(project_id=project.id)
 
         analysis = analysis_result.value if analysis_result.success else None
 
         # Update analysis metrics
-        metrics_result = await analysis_service.update_metrics(
+        metrics_result = analysis_service.update_metrics(
             analysis_id=analysis.id,
             total_files=5,
             total_lines=250,
@@ -189,7 +188,7 @@ async def demonstrate_service_integration() -> None:
         _ = metrics_result.value if metrics_result.success else None  # Handle result
 
         # Update quality scores
-        scores_result = await analysis_service.update_scores(
+        scores_result = analysis_service.update_scores(
             analysis_id=analysis.id,
             coverage_score=85.0,
             complexity_score=78.0,
@@ -232,7 +231,7 @@ async def demonstrate_service_integration() -> None:
 
         created_issues = []
         for issue_data in issues_data:
-            issue_result = await issue_service.create_issue(
+            issue_result = issue_service.create_issue(
                 analysis_id=analysis.id,
                 **issue_data,
             )
@@ -242,7 +241,7 @@ async def demonstrate_service_integration() -> None:
                 created_issues.append(issue)
 
         # Update issue counts in analysis
-        issue_counts_result = await analysis_service.update_issue_counts(
+        issue_counts_result = analysis_service.update_issue_counts(
             analysis_id=analysis.id,
             critical=0,
             high=1,
@@ -255,7 +254,7 @@ async def demonstrate_service_integration() -> None:
         )  # Handle result
 
         # Complete the analysis
-        complete_result = await analysis_service.complete_analysis(analysis.id)
+        complete_result = analysis_service.complete_analysis(analysis.id)
 
         _ = complete_result.value if complete_result.success else None  # Handle result
 
@@ -265,7 +264,7 @@ async def demonstrate_service_integration() -> None:
         report_types = ["html", "json", "pdf"]
 
         for report_type in report_types:
-            report_result = await report_service.create_report(
+            report_result = report_service.create_report(
                 analysis_id=analysis.id,
                 report_type=report_type,
             )
@@ -273,14 +272,14 @@ async def demonstrate_service_integration() -> None:
             _ = report_result.value if report_result.success else None  # Handle result
 
         # List all reports for the analysis
-        reports_result = await report_service.list_reports(analysis.id)
+        reports_result = report_service.list_reports(analysis.id)
 
         reports = reports_result.value if reports_result.success else []
         for _report in reports:
             pass
 
 
-async def demonstrate_flext_ecosystem_integration() -> None:
+def demonstrate_flext_ecosystem_integration() -> None:
     """Demonstrate FLEXT ecosystem integration patterns."""
     # FLEXT ecosystem integration is always available
 
@@ -377,7 +376,7 @@ def process_data(data):
 
         # Demonstrate service usage
         with tempfile.TemporaryDirectory() as temp_service_dir:
-            project_result = await project_service.create_project(
+            project_result = project_service.create_project(
                 name="DI Demo Project",
                 project_path=temp_service_dir,
             )
@@ -598,13 +597,13 @@ if __name__ == "__main__":
         # Workflow summary
 
 
-async def main() -> int:
+def main() -> int:
     """Main demonstration of complete API integration functionality."""
     try:
         # Demonstrate all API integration patterns
         demonstrate_simple_api()
-        await demonstrate_service_integration()
-        await demonstrate_flext_ecosystem_integration()
+        demonstrate_service_integration()
+        demonstrate_flext_ecosystem_integration()
         demonstrate_custom_workflows()
 
         return 0
@@ -615,4 +614,4 @@ async def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(asyncio.run(main()))
+    sys.exit(run(main()))

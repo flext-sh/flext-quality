@@ -188,14 +188,14 @@ class FlextQualityWeb:
           </div>
 
           <script>
-              async function analyzeProject() {
+              function analyzeProject() {
                   const path = document.getElementById('project-path').value;
-                  const response = await fetch('/api/quality/analyze', {
+                  const response = fetch('/api/quality/analyze', {
                       method: "POST",
                       headers: {'Content-Type': application/json},
                       body: JSON.stringify({path: "path"})
                   });
-                  const data: dict["str", "object"] = await response.json();
+                  const data: dict["str", "object"] = response.json();
                   document.getElementById('results').innerHTML =
                       '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
               }
@@ -204,7 +204,7 @@ class FlextQualityWeb:
       </html>
       """
 
-    async def analyze_project(self) -> ResponseType:
+    def analyze_project(self) -> ResponseType:
         """Analyze a project and return results."""
         data: FlextQualityTypes.Core.DataDict = request.get_json()
         project_path = data.get("path", ".")

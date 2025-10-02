@@ -679,8 +679,8 @@ class DerivedClass(BaseClass):
 def simple_function() -> None:
     pass
 
-async def async_function() -> int:
-    await asyncio.sleep(0.1)
+def function() -> int:
+    sleep(0.1)
     return 42
 
 def complex_function(data: List[Dict[str, Optional[int]]]) -> Dict[str, int]:

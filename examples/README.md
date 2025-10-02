@@ -98,8 +98,8 @@ container = FlextContainer()
 quality_api = QualityAPI(container)
 
 # Execute analysis with observability
-async def analyze_with_monitoring(project_path: str):
-    result = await quality_api.analyze_project(project_path)
+def analyze_with_monitoring(project_path: str):
+    result = quality_api.analyze_project(project_path)
 
     # Use current API pattern
     data = result.unwrap_or(None)

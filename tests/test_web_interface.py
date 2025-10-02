@@ -126,7 +126,7 @@ class TestQualityWebInterface:
             json={"path": "/test/path"},
         ):
             # Import inside context to avoid issues
-            # Call method (it's async)
+            # Call method (it's )
             result = interface.analyze_project()
 
             # Verify response structure

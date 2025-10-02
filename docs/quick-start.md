@@ -11,7 +11,7 @@
 ### **Implementation Status:**
 
 - ✅ **Domain Architecture** - Complete entity design with FlextResult patterns
-- ✅ **Service Layer** - Functional async services with proper error handling
+- ✅ **Service Layer** - Functional services with proper error handling
 - ⚠️ **Core Analyzer** - FlextQualityCodeAnalyzer functional but not exported
 - ❌ **Quality Gates** - 2 MyPy type errors, test execution blocked by imports
 - ⚠️ **Modern Integration** - Limited 2025 Python quality ecosystem integration
@@ -75,16 +75,15 @@ ls -la src/flext_quality/
 ### **Basic Quality Analysis** (WORKING)
 
 ```python
-import asyncio
 from flext_quality import FlextQualityService
 from flext_quality.analyzer import FlextQualityCodeAnalyzer
 
 # Option 1: Service Layer Approach
-async def service_analysis():
+def service_analysis():
     service = FlextQualityService()
 
     # Create project with quality thresholds
-    project_result = await service.create_project(
+    project_result = service.create_project(
         name="my_project",
         project_path="./src",
         _min_coverage=85.0,  # Note: internal parameter name
@@ -120,7 +119,7 @@ def direct_analysis():
     print(f"📏 Total Lines: {analysis_result.overall_metrics.total_lines}")
 
 # Run both approaches
-asyncio.run(service_analysis())
+run(service_analysis())
 direct_analysis()
 ```
 
@@ -150,7 +149,7 @@ from flext_quality import FlextQualityWeb
 
 # Create enterprise quality dashboard
 quality_web = FlextQualityWeb()
-dashboard = await quality_web.create_enterprise_dashboard()
+dashboard = quality_web.create_enterprise_dashboard()
 
 # Dashboard features (planned):
 # - Real-time quality metrics overview

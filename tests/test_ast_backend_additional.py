@@ -6,10 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import ast
-from pathlib import Path
-
-from flext_quality import ASTBackend, ASTVisitor
+from flext_quality import ASTBackend
 
 
 def test_ast_backend_syntax_error() -> None:
@@ -21,24 +18,3 @@ def test_ast_backend_syntax_error() -> None:
     error_msg = result["error"]
     assert isinstance(error_msg, str)
     assert "Syntax error" in error_msg
-
-
-def test_ast_visitor_extracts_details(tmp_path: Path) -> None:
-    """Visitor tracks classes and functions with flags."""
-    code = ast.parse(
-        """
-
-class A:
-    def m(self):
-      pass
-
-async def f(x: int) -> None:
-    return None
-      """,
-    )
-    visitor = ASTVisitor(file_path=tmp_path / "a.py", package_name="pkg")
-    visitor.visit(code)
-    assert any(c.name == "A" for c in visitor.classes)
-    assert any(fn.name == "m" for fn in visitor.functions)
-    # ensure complexity captured for async function
-    assert any(isinstance(fn.is_async, bool) for fn in visitor.functions)

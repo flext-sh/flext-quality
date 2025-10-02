@@ -95,7 +95,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
         @override
         def visit_FunctionDef(
             self,
-            node: ast.FunctionDef | ast.AsyncFunctionDef,
+            node: ast.FunctionDef,
         ) -> None:
             """Visit a function or method definition."""
             function_info = FunctionInfo(
@@ -108,7 +108,6 @@ class FlextQualityASTBackend(BaseAnalyzer):
                 decorators=[
                     self._get_name_from_node(dec) for dec in node.decorator_list
                 ],
-                is_async=isinstance(node, ast.AsyncFunctionDef),
                 is_generator=self._check_is_generator(node),
                 is_method=self.current_class is not None,
                 is_property=self._check_is_property(node),
@@ -132,11 +131,6 @@ class FlextQualityASTBackend(BaseAnalyzer):
             self.current_function = (
                 self.function_stack[-1] if self.function_stack else None
             )
-
-        @override
-        def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
-            """Visit an async function definition."""
-            self.visit_FunctionDef(node)
 
         def _calculate_class_full_name(self, node: ast.ClassDef) -> str:
             """Calculate the full name of a class."""
@@ -165,11 +159,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
         def _count_class_methods(self, node: ast.ClassDef) -> dict[str, int]:
             """Count different types of methods in a class."""
-            methods = [
-                n
-                for n in node.body
-                if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
-            ]
+            methods = [n for n in node.body if isinstance(n, ast.FunctionDef)]
             return {
                 "method_count": len(methods),
                 "public_methods": len(
@@ -187,7 +177,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
         def _calculate_function_full_name(
             self,
-            node: ast.FunctionDef | ast.AsyncFunctionDef,
+            node: ast.FunctionDef,
         ) -> str:
             """Calculate the full name of a function."""
             if self.current_class:
@@ -198,7 +188,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
         def _check_type_hints(
             self,
-            node: ast.FunctionDef | ast.AsyncFunctionDef,
+            node: ast.FunctionDef,
         ) -> bool:
             """Check if function has type hints."""
             return node.returns is not None or any(
@@ -207,14 +197,14 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
         def _calculate_complexity(
             self,
-            node: ast.FunctionDef | ast.AsyncFunctionDef,
+            node: ast.FunctionDef,
         ) -> int:
             """Calculate cyclomatic complexity of a function."""
             complexity = 1  # Base complexity
             for child in ast.walk(node):
                 if isinstance(
                     child,
-                    (ast.If, ast.While, ast.For, ast.AsyncFor, ast.ExceptHandler),
+                    (ast.If, ast.While, ast.For, ast.ExceptHandler),
                 ):
                     complexity += 1
                 elif isinstance(child, ast.BoolOp):
@@ -231,7 +221,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
         def _check_is_generator(
             self,
-            node: ast.FunctionDef | ast.AsyncFunctionDef,
+            node: ast.FunctionDef,
         ) -> bool:
             """Check if function is a generator (contains yield)."""
             for child in ast.walk(node):
@@ -241,7 +231,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
         def _check_is_property(
             self,
-            node: ast.FunctionDef | ast.AsyncFunctionDef,
+            node: ast.FunctionDef,
         ) -> bool:
             """Check if function is a property."""
             return any(
@@ -251,7 +241,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
         def _check_is_classmethod(
             self,
-            node: ast.FunctionDef | ast.AsyncFunctionDef,
+            node: ast.FunctionDef,
         ) -> bool:
             """Check if function is a classmethod."""
             return any(
@@ -261,7 +251,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
         def _check_is_staticmethod(
             self,
-            node: ast.FunctionDef | ast.AsyncFunctionDef,
+            node: ast.FunctionDef,
         ) -> bool:
             """Check if function is a staticmethod."""
             return any(
@@ -271,7 +261,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
         def _get_return_annotation(
             self,
-            node: ast.FunctionDef | ast.AsyncFunctionDef,
+            node: ast.FunctionDef,
         ) -> str | None:
             """Get return type annotation as string."""
             if node.returns:
@@ -289,7 +279,9 @@ class FlextQualityASTBackend(BaseAnalyzer):
         return ["complexity", "functions", "classes", "imports", "docstrings"]
 
     @override
-    def analyze(self, code: str, file_path: Path | None = None) -> FlextTypes.Core.Dict:
+    def analyze(
+        self, _code: str, file_path: Path | None = None
+    ) -> FlextTypes.Core.Dict:
         """Analyze Python code using AST.
 
         Args:
@@ -306,7 +298,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
             result["file_path"] = str(file_path)
 
         try:
-            tree = ast.parse(code)
+            tree = ast.parse(_code)
 
             # Extract various metrics
             result["functions"] = self._extract_functions(tree)
@@ -328,12 +320,12 @@ class FlextQualityASTBackend(BaseAnalyzer):
         """Extract function information from AST."""
         functions: list[FlextTypes.Core.Dict] = []
         for node in ast.walk(tree):
-            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if isinstance(node, ast.FunctionDef):
                 func_info: FlextTypes.Core.Dict = {
                     "name": node.name,
                     "args": len(node.args.args),
                     "lineno": node.lineno,
-                    "is_async": isinstance(node, ast.AsyncFunctionDef),
+                    "is": isinstance(node, ast.FunctionDef),
                 }
                 functions.append(func_info)
         return functions
@@ -344,11 +336,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
                 # Count methods
-                sum(
-                    1
-                    for item in node.body
-                    if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef))
-                )
+                sum(1 for item in node.body if isinstance(item, ast.FunctionDef))
                 class_info: FlextTypes.Core.Dict = {
                     "name": node.name,
                     "methods": "methods",
@@ -395,21 +383,25 @@ class FlextQualityASTBackend(BaseAnalyzer):
         return [
             node.name
             for node in ast.walk(tree)
-            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+            if isinstance(node, (ast.FunctionDef, ast.ClassDef))
             and not ast.get_docstring(node)
         ]
 
-    def create_visitor(self, *args: object, **kwargs: object) -> object:
+    def create_visitor(self, file_path: Path, package_name: str) -> object:
         """Create an AST visitor instance.
 
         Public factory method for creating AST visitor instances.
         This provides a proper interface instead of accessing private members.
 
+        Args:
+            file_path: Path to the file being analyzed
+            package_name: Name of the package containing the file
+
         Returns:
             AST visitor instance for code analysis.
 
         """
-        return self._ASTVisitor(*args, **kwargs)
+        return self._ASTVisitor(file_path, package_name)
 
 
 # Backward compatibility aliases for existing code
@@ -418,10 +410,10 @@ class FlextQualityASTBackend(BaseAnalyzer):
 class ASTVisitor:
     """Public alias for the nested ASTVisitor class."""
 
-    def __new__(cls, *args: object, **kwargs: object) -> object:
+    def __new__(cls, file_path: Path, package_name: str) -> object:
         """Create instance of the actual ASTVisitor class."""
         backend = FlextQualityASTBackend()
-        return backend.create_visitor(*args, **kwargs)
+        return backend.create_visitor(file_path, package_name)
 
 
 ASTBackend = FlextQualityASTBackend

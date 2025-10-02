@@ -98,7 +98,7 @@ class FlextQualityServices:
             self._parent = parent
             self._logger = parent._logger
 
-        async def create_project(
+        def create_project(
             self,
             name: str,
             project_path: str,
@@ -142,7 +142,7 @@ class FlextQualityServices:
             self._parent = parent
             self._logger = parent._logger
 
-        async def create_issue(
+        def create_issue(
             self,
             analysis_id: str,
             file_path: str,
@@ -182,7 +182,7 @@ class FlextQualityServices:
                     f"Failed to create issue: {e}",
                 )
 
-        async def get_issues_by_analysis(
+        def get_issues_by_analysis(
             self,
             analysis_id: str,
         ) -> FlextResult[list[FlextQualityIssue]]:
@@ -203,7 +203,7 @@ class FlextQualityServices:
                     f"Failed to get issues: {e}",
                 )
 
-        async def get_issue(
+        def get_issue(
             self,
             issue_id: str,
         ) -> FlextResult[FlextQualityIssue | None]:
@@ -217,7 +217,7 @@ class FlextQualityServices:
                     f"Failed to get issue: {e}",
                 )
 
-        async def suppress_issue(
+        def suppress_issue(
             self,
             issue_id: str,
             reason: str,
@@ -241,7 +241,7 @@ class FlextQualityServices:
                     f"Failed to suppress issue: {e}",
                 )
 
-        async def unsuppress_issue(
+        def unsuppress_issue(
             self,
             issue_id: str,
         ) -> FlextResult[FlextQualityIssue]:
@@ -274,7 +274,7 @@ class FlextQualityServices:
             self._parent = parent
             self._logger = parent._logger
 
-        async def create_analysis(
+        def create_analysis(
             self,
             project_id: str,
             config: FlextTypes.Core.Dict | None = None,
@@ -299,7 +299,7 @@ class FlextQualityServices:
                     f"Failed to create analysis: {e}",
                 )
 
-        async def get_analyses_by_project(
+        def get_analyses_by_project(
             self,
             project_id: str,
         ) -> FlextResult[list[FlextQualityAnalysis]]:
@@ -326,7 +326,7 @@ class FlextQualityServices:
             self._parent = parent
             self._logger = parent._logger
 
-        async def create_report(
+        def create_report(
             self,
             analysis_id: str,
             format_type: str,
@@ -355,7 +355,7 @@ class FlextQualityServices:
                     f"Failed to create report: {e}",
                 )
 
-        async def get_reports_by_analysis(
+        def get_reports_by_analysis(
             self,
             analysis_id: str,
         ) -> FlextResult[list[FlextQualityReport]]:
@@ -373,7 +373,7 @@ class FlextQualityServices:
                     f"Failed to list reports: {e}",
                 )
 
-        async def delete_report(self, report_id: str) -> FlextResult[bool]:
+        def delete_report(self, report_id: str) -> FlextResult[bool]:
             """Delete a quality report."""
             try:
                 reports = self._parent.get_reports()
@@ -397,7 +397,7 @@ class FlextQualityServices:
             self._backend = ExternalBackend()
             self._logger = parent._logger
 
-        async def analyze_with_backend(
+        def analyze_with_backend(
             self,
             code: str,
             file_path: Path | None = None,

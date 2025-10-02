@@ -21,7 +21,6 @@ class FunctionInfo(BaseModel):
     line_number: int
     end_line_number: int
     decorators: FlextTypes.Core.StringList
-    is_async: bool
     is_generator: bool
     is_method: bool
     is_property: bool

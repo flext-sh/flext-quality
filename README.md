@@ -38,7 +38,7 @@ FLEXT Quality serves as the centralized code quality analysis platform for all F
 | Component               | Status            | Details                                                   |
 | ----------------------- | ----------------- | --------------------------------------------------------- |
 | **Domain Architecture** | ✅ **Complete**   | Proper entity design, FlextResult patterns, domain events |
-| **Service Layer**       | ✅ **Functional** | Async services with FlextLogger integration               |
+| **Service Layer**       | ✅ **Functional** | services with FlextLogger integration               |
 | **Core Analyzer**       | ⚠️ **Hidden**     | FlextQualityCodeAnalyzer functional but not exported      |
 | **Quality Gates**       | ❌ **Blocked**    | 2 MyPy errors, test import failures                       |
 | **Modern Integration**  | ⚠️ **Limited**    | Basic external backend, missing 2025 ecosystem tools      |
@@ -85,15 +85,14 @@ print('Core imports successful')
 ### **Basic Usage**
 
 ```python
-import asyncio
 from flext_quality import FlextQualityService
 
 # Service Layer Usage (Recommended)
-async def main():
+def main():
     service = FlextQualityService()
 
     # Create project with quality thresholds
-    result = await service.create_project(
+    result = service.create_project(
         name="my_project",
         project_path="/path/to/project",
         _min_coverage=80.0,  # Note: internal parameter naming
@@ -120,7 +119,7 @@ def analyze_code():
     print(f"🔍 Total Issues: {result.total_issues}")
 
 # Run analysis
-asyncio.run(main())
+run(main())
 analyze_code()
 ```
 
@@ -209,7 +208,7 @@ make diagnose          # Check system status and dependencies
 Evidence-based analysis of current state:
 
 - **✅ Domain Architecture**: Complete - Well-designed entities with FlextResult patterns
-- **✅ Service Layer**: Functional - Async operations with proper error handling
+- **✅ Service Layer**: Functional - operations with proper error handling
 - **✅ Analysis Engine**: Operational - AST analysis, quality scoring, grade calculation
 - **⚠️ Accessibility**: Core analyzer not exported in main module interface
 - **❌ Quality Gates**: 2 MyPy type errors, test execution blocked by import issues

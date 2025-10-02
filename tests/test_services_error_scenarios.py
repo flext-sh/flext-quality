@@ -62,14 +62,14 @@ class TestQualityProjectServiceErrorScenarios:
         """Create service instance."""
         return QualityProjectService()
 
-    async def test_create_project_exception_handling(
+    def test_create_project_exception_handling(
         self,
         service: QualityProjectService,
     ) -> None:
         """Test exception handling in create_project - covers lines 58-59."""
         # Force exception by patching uuid4
         with patch("uuid.uuid4", side_effect=RuntimeError("UUID generation failed")):
-            result = await service.create_project(
+            result = service.create_project(
                 name="test_project",
                 project_path="/opt/test_secure",
             )
@@ -78,7 +78,7 @@ class TestQualityProjectServiceErrorScenarios:
             assert "Failed to create project" in error
             assert "UUID generation failed" in error
 
-    async def test_get_project_exception_handling(
+    def test_get_project_exception_handling(
         self,
         service: QualityProjectService,
     ) -> None:
@@ -87,13 +87,13 @@ class TestQualityProjectServiceErrorScenarios:
         exception_dict_class = create_exception_dict(ValueError("Storage corrupted"))
         service._projects = exception_dict_class()
 
-        result = await service.get_project("test-id")
+        result = service.get_project("test-id")
 
         error = assert_result_failure_with_error(result)
         assert "Failed to get project" in error
         assert "Storage corrupted" in error
 
-    async def test_list_projects_exception_handling(
+    def test_list_projects_exception_handling(
         self,
         service: QualityProjectService,
     ) -> None:
@@ -102,13 +102,13 @@ class TestQualityProjectServiceErrorScenarios:
         exception_dict_class = create_exception_dict(TypeError("Invalid storage"))
         service._projects = exception_dict_class()
 
-        result = await service.list_projects()
+        result = service.list_projects()
 
         error = assert_result_failure_with_error(result)
         assert "Failed to list projects" in error
         assert "Invalid storage" in error
 
-    async def test_update_project_exception_handling(
+    def test_update_project_exception_handling(
         self,
         service: QualityProjectService,
     ) -> None:
@@ -117,13 +117,13 @@ class TestQualityProjectServiceErrorScenarios:
         exception_dict_class = create_exception_dict(RuntimeError("Model copy failed"))
         service._projects = exception_dict_class()
 
-        result = await service.update_project("test-id", {"language": "go"})
+        result = service.update_project("test-id", {"language": "go"})
 
         error = assert_result_failure_with_error(result)
         assert "Failed to update project" in error
         assert "Model copy failed" in error
 
-    async def test_delete_project_exception_handling(
+    def test_delete_project_exception_handling(
         self,
         service: QualityProjectService,
     ) -> None:
@@ -132,7 +132,7 @@ class TestQualityProjectServiceErrorScenarios:
         exception_dict_class = create_exception_dict(ValueError("Storage error"))
         service._projects = exception_dict_class()
 
-        result = await service.delete_project("test-id")
+        result = service.delete_project("test-id")
 
         error = assert_result_failure_with_error(result)
         assert "Failed to delete project" in error
@@ -147,20 +147,20 @@ class TestQualityAnalysisServiceErrorScenarios:
         """Create service instance."""
         return QualityAnalysisService()
 
-    async def test_create_analysis_exception_handling(
+    def test_create_analysis_exception_handling(
         self,
         service: QualityAnalysisService,
     ) -> None:
         """Test exception handling in create_analysis - covers lines 143-144."""
         # Force exception during uuid4 call
         with patch("uuid.uuid4", side_effect=TypeError("Invalid parameters")):
-            result = await service.create_analysis(project_id="test-project")
+            result = service.create_analysis(project_id="test-project")
 
             error = assert_result_failure_with_error(result)
             assert "Failed to create analysis" in error
             assert "Invalid parameters" in error
 
-    async def test_update_metrics_exception_handling(
+    def test_update_metrics_exception_handling(
         self,
         service: QualityAnalysisService,
     ) -> None:
@@ -169,7 +169,7 @@ class TestQualityAnalysisServiceErrorScenarios:
         exception_dict_class = create_exception_dict(RuntimeError("Update failed"))
         service._analyses = exception_dict_class()
 
-        result = await service.update_metrics(
+        result = service.update_metrics(
             analysis_id="test-id",
             total_files=10,
             total_lines=1000,
@@ -182,7 +182,7 @@ class TestQualityAnalysisServiceErrorScenarios:
         assert "Failed to update metrics" in error
         assert "Update failed" in error
 
-    async def test_update_scores_exception_handling(
+    def test_update_scores_exception_handling(
         self,
         service: QualityAnalysisService,
     ) -> None:
@@ -191,7 +191,7 @@ class TestQualityAnalysisServiceErrorScenarios:
         exception_dict_class = create_exception_dict(ValueError("Calculation error"))
         service._analyses = exception_dict_class()
 
-        result = await service.update_scores(
+        result = service.update_scores(
             analysis_id="test-id",
             coverage_score=95.0,
             complexity_score=90.0,
@@ -204,12 +204,12 @@ class TestQualityAnalysisServiceErrorScenarios:
         assert "Failed to update scores" in error
         assert "Calculation error" in error
 
-    async def test_update_issue_counts_analysis_not_found(
+    def test_update_issue_counts_analysis_not_found(
         self,
         service: QualityAnalysisService,
     ) -> None:
         """Test update_issue_counts when analysis not found - covers line 220."""
-        result = await service.update_issue_counts(
+        result = service.update_issue_counts(
             analysis_id="non-existent",
             total_issues=10,
             critical_issues=1,
@@ -221,7 +221,7 @@ class TestQualityAnalysisServiceErrorScenarios:
         error = assert_result_failure_with_error(result)
         assert "Analysis not found" in error
 
-    async def test_complete_analysis_exception_handling(
+    def test_complete_analysis_exception_handling(
         self,
         service: QualityAnalysisService,
     ) -> None:
@@ -230,13 +230,13 @@ class TestQualityAnalysisServiceErrorScenarios:
         exception_dict_class = create_exception_dict(RuntimeError("Cannot complete"))
         service._analyses = exception_dict_class()
 
-        result = await service.complete_analysis("test-id")
+        result = service.complete_analysis("test-id")
 
         error = assert_result_failure_with_error(result)
         assert "Failed to complete analysis" in error
         assert "Cannot complete" in error
 
-    async def test_fail_analysis_exception_handling(
+    def test_fail_analysis_exception_handling(
         self,
         service: QualityAnalysisService,
     ) -> None:
@@ -245,13 +245,13 @@ class TestQualityAnalysisServiceErrorScenarios:
         exception_dict_class = create_exception_dict(ValueError("Cannot fail"))
         service._analyses = exception_dict_class()
 
-        result = await service.fail_analysis("test-id", "Test error")
+        result = service.fail_analysis("test-id", "Test error")
 
         error = assert_result_failure_with_error(result)
         assert "Failed to fail analysis" in error
         assert "Cannot fail" in error
 
-    async def test_get_analysis_exception_handling(
+    def test_get_analysis_exception_handling(
         self,
         service: QualityAnalysisService,
     ) -> None:
@@ -260,13 +260,13 @@ class TestQualityAnalysisServiceErrorScenarios:
         exception_dict_class = create_exception_dict(TypeError("Storage corrupted"))
         service._analyses = exception_dict_class()
 
-        result = await service.get_analysis("test-id")
+        result = service.get_analysis("test-id")
 
         error = assert_result_failure_with_error(result)
         assert "Failed to get analysis" in error
         assert "Storage corrupted" in error
 
-    async def test_list_analyses_exception_handling(
+    def test_list_analyses_exception_handling(
         self,
         service: QualityAnalysisService,
     ) -> None:
@@ -275,7 +275,7 @@ class TestQualityAnalysisServiceErrorScenarios:
         exception_dict_class = create_exception_dict(RuntimeError("List error"))
         service._analyses = exception_dict_class()
 
-        result = await service.list_analyses("test-project")
+        result = service.list_analyses("test-project")
 
         error = assert_result_failure_with_error(result)
         assert "Failed to list analyses" in error
@@ -290,14 +290,14 @@ class TestQualityIssueServiceErrorScenarios:
         """Create service instance."""
         return QualityIssueService()
 
-    async def test_create_issue_exception_handling(
+    def test_create_issue_exception_handling(
         self,
         service: QualityIssueService,
     ) -> None:
         """Test exception handling in create_issue - covers lines 347-348."""
         # Force exception during uuid4 call
         with patch("uuid.uuid4", side_effect=ValueError("Invalid issue type")):
-            result = await service.create_issue(
+            result = service.create_issue(
                 analysis_id="test-analysis",
                 file_path="test.py",
                 line_number=1,
@@ -312,7 +312,7 @@ class TestQualityIssueServiceErrorScenarios:
             assert "Failed to create issue" in error
             assert "Invalid issue type" in error
 
-    async def test_get_issue_exception_handling(
+    def test_get_issue_exception_handling(
         self,
         service: QualityIssueService,
     ) -> None:
@@ -321,13 +321,13 @@ class TestQualityIssueServiceErrorScenarios:
         exception_dict_class = create_exception_dict(RuntimeError("Storage failure"))
         service._issues = exception_dict_class()
 
-        result = await service.get_issue("test-id")
+        result = service.get_issue("test-id")
 
         error = assert_result_failure_with_error(result)
         assert "Failed to get issue" in error
         assert "Storage failure" in error
 
-    async def test_list_issues_exception_handling(
+    def test_list_issues_exception_handling(
         self,
         service: QualityIssueService,
     ) -> None:
@@ -336,13 +336,13 @@ class TestQualityIssueServiceErrorScenarios:
         exception_dict_class = create_exception_dict(TypeError("Filter error"))
         service._issues = exception_dict_class()
 
-        result = await service.list_issues("test-analysis")
+        result = service.list_issues("test-analysis")
 
         error = assert_result_failure_with_error(result)
         assert "Failed to list issues" in error
         assert "Filter error" in error
 
-    async def test_mark_fixed_exception_handling(
+    def test_mark_fixed_exception_handling(
         self,
         service: QualityIssueService,
     ) -> None:
@@ -351,13 +351,13 @@ class TestQualityIssueServiceErrorScenarios:
         exception_dict_class = create_exception_dict(RuntimeError("Cannot mark fixed"))
         service._issues = exception_dict_class()
 
-        result = await service.mark_fixed("test-id")
+        result = service.mark_fixed("test-id")
 
         error = assert_result_failure_with_error(result)
         assert "Failed to mark issue as fixed" in error
         assert "Cannot mark fixed" in error
 
-    async def test_suppress_issue_exception_handling(
+    def test_suppress_issue_exception_handling(
         self,
         service: QualityIssueService,
     ) -> None:
@@ -366,13 +366,13 @@ class TestQualityIssueServiceErrorScenarios:
         exception_dict_class = create_exception_dict(ValueError("Cannot suppress"))
         service._issues = exception_dict_class()
 
-        result = await service.suppress_issue("test-id", "False positive")
+        result = service.suppress_issue("test-id", "False positive")
 
         error = assert_result_failure_with_error(result)
         assert "Failed to suppress issue" in error
         assert "Cannot suppress" in error
 
-    async def test_unsuppress_issue_exception_handling(
+    def test_unsuppress_issue_exception_handling(
         self,
         service: QualityIssueService,
     ) -> None:
@@ -381,7 +381,7 @@ class TestQualityIssueServiceErrorScenarios:
         exception_dict_class = create_exception_dict(RuntimeError("Cannot unsuppress"))
         service._issues = exception_dict_class()
 
-        result = await service.unsuppress_issue("test-id")
+        result = service.unsuppress_issue("test-id")
 
         error = assert_result_failure_with_error(result)
         assert "Failed to unsuppress issue" in error
@@ -396,14 +396,14 @@ class TestQualityReportServiceErrorScenarios:
         """Create service instance."""
         return QualityReportService()
 
-    async def test_create_report_exception_handling(
+    def test_create_report_exception_handling(
         self,
         service: QualityReportService,
     ) -> None:
         """Test exception handling in create_report - covers lines 451-452."""
         # Force exception during uuid4 call
         with patch("uuid.uuid4", side_effect=TypeError("Invalid parameters")):
-            result = await service.create_report(
+            result = service.create_report(
                 analysis_id="test-analysis",
                 format_type="html",
                 content="<html>Test report</html>",
@@ -413,7 +413,7 @@ class TestQualityReportServiceErrorScenarios:
             assert "Failed to create report" in error
             assert "Invalid parameters" in error
 
-    async def test_get_report_exception_handling(
+    def test_get_report_exception_handling(
         self,
         service: QualityReportService,
     ) -> None:
@@ -422,13 +422,13 @@ class TestQualityReportServiceErrorScenarios:
         exception_dict_class = create_exception_dict(RuntimeError("Access error"))
         service._reports = exception_dict_class()
 
-        result = await service.get_report("test-id")
+        result = service.get_report("test-id")
 
         error = assert_result_failure_with_error(result)
         assert "Failed to get report" in error
         assert "Access error" in error
 
-    async def test_list_reports_exception_handling(
+    def test_list_reports_exception_handling(
         self,
         service: QualityReportService,
     ) -> None:
@@ -437,13 +437,13 @@ class TestQualityReportServiceErrorScenarios:
         exception_dict_class = create_exception_dict(ValueError("List error"))
         service._reports = exception_dict_class()
 
-        result = await service.list_reports("test-analysis")
+        result = service.list_reports("test-analysis")
 
         error = assert_result_failure_with_error(result)
         assert "Failed to list reports" in error
         assert "List error" in error
 
-    async def test_delete_report_exception_handling(
+    def test_delete_report_exception_handling(
         self,
         service: QualityReportService,
     ) -> None:
@@ -452,7 +452,7 @@ class TestQualityReportServiceErrorScenarios:
         exception_dict_class = create_exception_dict(RuntimeError("Delete error"))
         service._reports = exception_dict_class()
 
-        result = await service.delete_report("test-id")
+        result = service.delete_report("test-id")
 
         error = assert_result_failure_with_error(result)
         assert "Failed to delete report" in error
