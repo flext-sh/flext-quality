@@ -22,7 +22,7 @@ class FlextQualityAnalyzer(ABC):
         self,
         _code: str,
         file_path: Path | None = None,
-    ) -> FlextTypes.Core.Dict:
+    ) -> FlextTypes.Dict:
         """Analyze code and return results.
 
         Args:
@@ -46,7 +46,7 @@ class FlextQualityAnalyzer(ABC):
         ...
 
     @abstractmethod
-    def get_capabilities(self: object) -> FlextTypes.Core.StringList:
+    def get_capabilities(self: object) -> FlextTypes.StringList:
         """Get list of capabilities this backend provides.
 
         Returns:

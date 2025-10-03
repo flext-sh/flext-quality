@@ -42,15 +42,15 @@ class FlextQualityUtilities(FlextUtilities):
             if not value:  # Empty list is valid
                 return True
             # Quality-specific check: issues have file_path and message
-            value_list: list[object] = cast("FlextTypes.Core.List", value)
+            value_list: FlextTypes.List = cast("FlextTypes.List", value)
             first_item = value_list[0]
             return hasattr(first_item, "file_path") and hasattr(first_item, "message")
 
         @staticmethod
-        def safe_issue_list(value: object) -> FlextTypes.Core.List:
+        def safe_issue_list(value: object) -> FlextTypes.List:
             """Safely convert value to typed issue list."""
             if FlextQualityUtilities._IssueProcessor.is_quality_issue_list(value):
-                return cast("FlextTypes.Core.List", value)
+                return cast("FlextTypes.List", value)
             return []
 
         @staticmethod
@@ -58,7 +58,7 @@ class FlextQualityUtilities(FlextUtilities):
             """Get a formatted summary string for any issue type."""
             # Use FlextUtilities safe conversions instead of raw getattr
             if hasattr(issue, "files") and hasattr(issue, "similarity"):
-                files: list[object] = getattr(issue, "files", [])
+                files: FlextTypes.List = getattr(issue, "files", [])
                 if files and isinstance(files, list):
                     files_str = ", ".join(str(f) for f in files[:2])
                     return f"Duplicated in: {files_str}"
@@ -79,7 +79,7 @@ class FlextQualityUtilities(FlextUtilities):
         """Nested helper class for report formatting operations."""
 
         @staticmethod
-        def format_issue_categories(results: object) -> dict[str, FlextTypes.Core.List]:
+        def format_issue_categories(results: object) -> dict[str, FlextTypes.List]:
             """Format issue categories with proper typing."""
             return {
                 "SECURITY": FlextQualityUtilities._IssueProcessor.safe_issue_list(
@@ -97,13 +97,13 @@ class FlextQualityUtilities(FlextUtilities):
             }
 
         @staticmethod
-        def create_report_lines() -> FlextTypes.Core.StringList:
+        def create_report_lines() -> FlextTypes.StringList:
             """Create a new report lines list with proper typing."""
             return []
 
         @staticmethod
         def safe_extend_lines(
-            target: FlextTypes.Core.StringList,
+            target: FlextTypes.StringList,
             source: object,
         ) -> None:
             """Safely extend target list with source items."""
@@ -269,7 +269,7 @@ def process_data_type_b(data: object) -> object:
         return FlextQualityUtilities._IssueProcessor.is_quality_issue_list(value)
 
     @staticmethod
-    def safe_issue_list(value: object) -> FlextTypes.Core.List:
+    def safe_issue_list(value: object) -> FlextTypes.List:
         """Safely convert value to typed issue list."""
         return FlextQualityUtilities._IssueProcessor.safe_issue_list(value)
 
@@ -279,17 +279,17 @@ def process_data_type_b(data: object) -> object:
         return FlextQualityUtilities._IssueProcessor.get_issue_summary(issue)
 
     @staticmethod
-    def format_issue_categories(results: object) -> dict[str, FlextTypes.Core.List]:
+    def format_issue_categories(results: object) -> dict[str, FlextTypes.List]:
         """Format issue categories with proper typing."""
         return FlextQualityUtilities._ReportFormatter.format_issue_categories(results)
 
     @staticmethod
-    def create_report_lines() -> FlextTypes.Core.StringList:
+    def create_report_lines() -> FlextTypes.StringList:
         """Create a new report lines list with proper typing."""
         return FlextQualityUtilities._ReportFormatter.create_report_lines()
 
     @staticmethod
-    def safe_extend_lines(target: FlextTypes.Core.StringList, source: object) -> None:
+    def safe_extend_lines(target: FlextTypes.StringList, source: object) -> None:
         """Safely extend target list with source items."""
         return FlextQualityUtilities._ReportFormatter.safe_extend_lines(target, source)
 

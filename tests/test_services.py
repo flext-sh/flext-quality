@@ -147,7 +147,7 @@ class TestQualityProjectServiceComprehensive:
         project = assert_result_success_with_data(create_result)
 
         # Update it
-        updates: FlextTypes.Core.Dict = {
+        updates: FlextTypes.Dict = {
             "language": "javascript",
         }
         result = service.update_project(str(project.id), updates)

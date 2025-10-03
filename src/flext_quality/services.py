@@ -277,7 +277,7 @@ class FlextQualityServices:
         def create_analysis(
             self,
             project_id: str,
-            config: FlextTypes.Core.Dict | None = None,
+            config: FlextTypes.Dict | None = None,
         ) -> FlextResult[FlextQualityAnalysis]:
             """Create a new quality analysis."""
             try:
@@ -332,7 +332,7 @@ class FlextQualityServices:
             format_type: str,
             content: str,
             file_path: str | None = None,
-            _metadata: FlextTypes.Core.Dict | None = None,
+            _metadata: FlextTypes.Dict | None = None,
         ) -> FlextResult[FlextQualityReport]:
             """Create a new quality report."""
             try:
@@ -402,17 +402,17 @@ class FlextQualityServices:
             code: str,
             file_path: Path | None = None,
             backend_tool: str = "ruff",
-        ) -> FlextResult[FlextTypes.Core.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Analyze code using external backend tools."""
             try:
                 self._logger.info("Running %s analysis", backend_tool)
                 result: FlextResult[object] = self._backend.analyze(
                     code, file_path, tool=backend_tool
                 )
-                return FlextResult[FlextTypes.Core.Dict].ok(result)
+                return FlextResult[FlextTypes.Dict].ok(result)
             except (RuntimeError, ValueError, TypeError) as e:
                 self._logger.exception("Failed to analyze with external backend")
-                return FlextResult[FlextTypes.Core.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Failed to analyze with external backend {e}",
                 )
 

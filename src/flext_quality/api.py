@@ -7,7 +7,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import override
 from uuid import UUID
 
 from flext_core import FlextResult, FlextTypes
@@ -20,6 +19,7 @@ from flext_quality import (
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.container import get_quality_container
 from flext_quality.services import FlextQualityServices
+from flext_quality.typings import FlextQualityTypes
 from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
 
 # Type aliases for backward compatibility
@@ -28,29 +28,28 @@ from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
 class FlextQualityAPI:
     """Simple API interface for quality analysis operations."""
 
-    @override
-    def __init__(self: object) -> None:
+    def __init__(self) -> None:
         """Initialize the Quality API with container-based DI."""
         self._container = get_quality_container()
         self._services = FlextQualityServices()
 
     @property
-    def project_service(self: object) -> FlextQualityServices.ProjectService:
+    def project_service(self) -> object:
         """Get project service instance."""
         return self._services.get_project_service()
 
     @property
-    def analysis_service(self: object) -> FlextQualityServices.AnalysisService:
+    def analysis_service(self) -> object:
         """Get analysis service instance."""
         return self._services.get_analysis_service()
 
     @property
-    def issue_service(self: object) -> object:
+    def issue_service(self) -> object:
         """Get issue service instance."""
         return self._services.get_issue_service()
 
     @property
-    def report_service(self: object) -> object:
+    def report_service(self) -> object:
         """Get report service instance."""
         return self._services.get_report_service()
 
@@ -95,7 +94,7 @@ class FlextQualityAPI:
     def update_project(
         self,
         _project_id: UUID,
-        _updates: FlextTypes.Core.Dict,
+        _updates: FlextTypes.Dict,
     ) -> FlextResult[QualityProject]:
         """Update a project."""
         return FlextResult[QualityProject].fail("update_project not implemented")
@@ -111,7 +110,7 @@ class FlextQualityAPI:
         _commit_hash: str | None = None,
         _branch: str | None = None,
         _pull_request_id: str | None = None,
-        analysis_config: FlextTypes.Core.JsonDict | None = None,
+        analysis_config: FlextTypes.JsonDict | None = None,
     ) -> FlextResult[QualityAnalysis]:
         """Create a new quality analysis."""
         return self.analysis_service.create_analysis(
@@ -308,7 +307,7 @@ class FlextQualityAPI:
         analysis = result.value
 
         # Get the project to access its path
-        project_result: FlextResult[object] = self.get_project(project_id)
+        project_result = self.get_project(project_id)
         if project_result.is_failure:
             return FlextResult[QualityAnalysis].fail(
                 f"Failed to get project: {project_result.error}",
@@ -320,7 +319,7 @@ class FlextQualityAPI:
         # Execute analysis using CodeAnalyzer
         project_path = Path(project.project_path)
         analyzer = CodeAnalyzer(project_path)
-        analysis_results: FlextResult[object] = analyzer.analyze_project()
+        analysis_results: FlextQualityTypes.AnalysisResults = analyzer.analyze_project()
 
         # Update with real metrics from analysis
         self.update_metrics(

@@ -8,11 +8,12 @@ from __future__ import annotations
 from typing import override
 from uuid import UUID
 
-from flext_core import FlextLogger, FlextResult, FlextTypes
 from flext_observability import (
     flext_create_log_entry as _flext_create_log_entry,
     flext_create_trace as _flext_create_trace,
 )
+
+from flext_core import FlextLogger, FlextResult, FlextTypes
 from flext_quality.entities import QualityAnalysis, QualityReport
 from flext_quality.services import FlextQualityServices
 
@@ -36,7 +37,7 @@ class FlextQualityHandlers:
         def create_trace(
             operation_name: str,
             service_name: str,
-            config: dict[str, str],
+            config: FlextTypes.StringDict,
         ) -> None:
             """Create trace using flext-observability."""
             _flext_create_trace(
@@ -134,30 +135,30 @@ class FlextQualityHandlers:
         # Return the created report
         return FlextResult[QualityReport].ok(report)
 
-    def run_linting(self, project_id: UUID) -> FlextResult[FlextTypes.Core.Dict]:
+    def run_linting(self, project_id: UUID) -> FlextResult[FlextTypes.Dict]:
         """Handle linting command."""
         # Return placeholder result since linting service is not implemented
-        linting_data: FlextTypes.Core.Dict = {
+        linting_data: FlextTypes.Dict = {
             "project_id": str(project_id),
             "status": "placeholder_implementation",
             "issues": [],
         }
 
-        return FlextResult[FlextTypes.Core.Dict].ok(linting_data)
+        return FlextResult[FlextTypes.Dict].ok(linting_data)
 
     def run_security_check(
         self,
         project_id: UUID,
-    ) -> FlextResult[FlextTypes.Core.Dict]:
+    ) -> FlextResult[FlextTypes.Dict]:
         """Handle security check command."""
         # Return placeholder result since security service is not implemented
-        security_data: FlextTypes.Core.Dict = {
+        security_data: FlextTypes.Dict = {
             "project_id": str(project_id),
             "status": "placeholder_implementation",
             "vulnerabilities": [],
         }
 
-        return FlextResult[FlextTypes.Core.Dict].ok(security_data)
+        return FlextResult[FlextTypes.Dict].ok(security_data)
 
 
 # Backward compatibility aliases - following flext-cli pattern

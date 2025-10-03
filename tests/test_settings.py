@@ -36,7 +36,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
 
-ROOT_URLCONF: FlextTypes.Core.StringList = []
+ROOT_URLCONF: FlextTypes.StringList = []
 
 # Override database settings for testing
 DATABASES = {

@@ -20,7 +20,7 @@ class FunctionInfo(BaseModel):
     package_name: str
     line_number: int
     end_line_number: int
-    decorators: FlextTypes.Core.StringList
+    decorators: FlextTypes.StringList
     is_generator: bool
     is_method: bool
     is_property: bool

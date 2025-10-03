@@ -150,7 +150,7 @@ def secure_temp_dir() -> Generator[str]:
 
 
 @pytest.fixture
-def sample_code_repository(tmp_path: Path) -> FlextTypes.Core.Dict:
+def sample_code_repository(tmp_path: Path) -> FlextTypes.Dict:
     """Provide sample code repository metadata for quality analysis testing.
 
     Creates realistic repository metadata that simulates typical project
@@ -190,7 +190,7 @@ def sample_code_repository(tmp_path: Path) -> FlextTypes.Core.Dict:
 
 
 @pytest.fixture
-def quality_metrics_data() -> FlextTypes.Core.Dict:
+def quality_metrics_data() -> FlextTypes.Dict:
     """Quality metrics data for testing."""
     return {
         "complexity": {
@@ -217,7 +217,7 @@ def quality_metrics_data() -> FlextTypes.Core.Dict:
 
 
 @pytest.fixture
-def code_analysis_config() -> FlextTypes.Core.Dict:
+def code_analysis_config() -> FlextTypes.Dict:
     """Code analysis configuration for testing."""
     return {
         "analyzers": {
@@ -246,7 +246,7 @@ def code_analysis_config() -> FlextTypes.Core.Dict:
 
 
 @pytest.fixture
-def analysis_results() -> list[FlextTypes.Core.Dict]:
+def analysis_results() -> list[FlextTypes.Dict]:
     """Analysis results for testing."""
     return [
         {
@@ -281,7 +281,7 @@ def analysis_results() -> list[FlextTypes.Core.Dict]:
 
 # Report generation fixtures
 @pytest.fixture
-def report_config(tmp_path: Path) -> FlextTypes.Core.Dict:
+def report_config(tmp_path: Path) -> FlextTypes.Dict:
     """Report configuration for testing."""
     return {
         "format": "json",
@@ -293,7 +293,7 @@ def report_config(tmp_path: Path) -> FlextTypes.Core.Dict:
 
 
 @pytest.fixture
-def dashboard_data() -> FlextTypes.Core.Dict:
+def dashboard_data() -> FlextTypes.Dict:
     """Dashboard data for testing."""
     return {
         "summary": {
@@ -317,7 +317,7 @@ def dashboard_data() -> FlextTypes.Core.Dict:
 
 # Multi-backend fixtures
 @pytest.fixture
-def sonarqube_config() -> FlextTypes.Core.Dict:
+def sonarqube_config() -> FlextTypes.Dict:
     """SonarQube configuration for testing."""
     return {
         "host": "http://localhost:9000",
@@ -329,7 +329,7 @@ def sonarqube_config() -> FlextTypes.Core.Dict:
 
 
 @pytest.fixture
-def codeclimate_config() -> FlextTypes.Core.Dict:
+def codeclimate_config() -> FlextTypes.Dict:
     """CodeClimate configuration for testing."""
     return {
         "api_token": "test-api-token",
@@ -417,7 +417,7 @@ strict = true
 
 # Package discovery fixtures
 @pytest.fixture
-def package_metadata() -> FlextTypes.Core.Dict:
+def package_metadata() -> FlextTypes.Dict:
     """Package metadata for testing."""
     return {
         "name": "test-package",
@@ -439,7 +439,7 @@ def package_metadata() -> FlextTypes.Core.Dict:
 
 # Task management fixtures
 @pytest.fixture
-def celery_config() -> FlextTypes.Core.Dict:
+def celery_config() -> FlextTypes.Dict:
     """Celery configuration for testing."""
     return {
         "broker_url": "redis://localhost:6379/0",
@@ -453,7 +453,7 @@ def celery_config() -> FlextTypes.Core.Dict:
 
 
 @pytest.fixture
-def analysis_task_data() -> FlextTypes.Core.Dict:
+def analysis_task_data() -> FlextTypes.Dict:
     """Analysis task data for testing."""
     return {
         "task_id": "test-task-123",
@@ -539,9 +539,9 @@ def mock_quality_analyzer() -> object:
 
         def __init__(self) -> None:
             """Initialize the instance."""
-            self.analyzed_files: FlextTypes.Core.StringList = []
+            self.analyzed_files: FlextTypes.StringList = []
 
-        def analyze_project(self, project_path: str) -> FlextTypes.Core.Dict:
+        def analyze_project(self, project_path: str) -> FlextTypes.Dict:
             """Simulate comprehensive project analysis.
 
             Args:
@@ -559,7 +559,7 @@ def mock_quality_analyzer() -> object:
                 "analysis_time": 2.5,
             }
 
-        def analyze_file(self, file_path: str) -> FlextTypes.Core.Dict:
+        def analyze_file(self, file_path: str) -> FlextTypes.Dict:
             """Simulate individual file analysis.
 
             Args:
@@ -576,7 +576,7 @@ def mock_quality_analyzer() -> object:
                 "coverage": 90.0,
             }
 
-        def get_metrics(self, _project_path: str) -> FlextTypes.Core.Dict:
+        def get_metrics(self, _project_path: str) -> FlextTypes.Dict:
             """Simulate project-wide quality metrics collection.
 
             Args:
@@ -633,11 +633,11 @@ def mock_report_generator() -> object:
 
         def __init__(self) -> None:
             """Initialize the instance."""
-            self.generated_reports: list[FlextTypes.Core.Dict] = []
+            self.generated_reports: list[FlextTypes.Dict] = []
 
         def generate_report(
             self,
-            data: FlextTypes.Core.Dict,
+            data: FlextTypes.Dict,
             output_format: str = "json",
         ) -> str:
             """Simulate report generation in specified format.
@@ -650,7 +650,7 @@ def mock_report_generator() -> object:
                 Generated report filename
 
             """
-            report: FlextTypes.Core.Dict = {
+            report: FlextTypes.Dict = {
                 "format": output_format,
                 "data": data,
                 "timestamp": "2023-01-01T12:00:00Z",
@@ -658,7 +658,7 @@ def mock_report_generator() -> object:
             self.generated_reports.append(report)
             return f"report_{len(self.generated_reports)}.{output_format}"
 
-        def generate_dashboard_data(self) -> FlextTypes.Core.Dict:
+        def generate_dashboard_data(self) -> FlextTypes.Dict:
             """Simulate dashboard data generation.
 
             Returns:

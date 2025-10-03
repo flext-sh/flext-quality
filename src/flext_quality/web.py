@@ -7,19 +7,15 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import override
 
-from flask import Response as FlaskResponse, jsonify, request
-from Flext_web.config import FlextWebConfig
+from flask import Flask, Response as FlaskResponse, jsonify, request
 from werkzeug.wrappers import Response as WerkzeugResponse
 
-from flext_core import FlextContainer, FlextLogger, FlextResult
+from flext_core import FlextContainer, FlextLogger
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.api import QualityAPI
-from flext_quality.typings import FlextQualityTypes
-from flext_web import FlextWebServices
 
-ResponseType = (FlaskResponse | WerkzeugResponse) | tuple["FlaskResponse", "int"]
+ResponseType = FlaskResponse | WerkzeugResponse | tuple[FlaskResponse, int]
 
 
 class FlextQualityWeb:
@@ -29,22 +25,13 @@ class FlextQualityWeb:
     Contains all web functionality as nested classes and methods.
     """
 
-    @override
-    def __init__(self: object) -> None:
+    def __init__(self) -> None:
         """Initialize quality web interface."""
         self._container = FlextContainer.get_global()
         self._logger = FlextLogger(__name__)
 
-        # Create base web service from flext-web
-        self.config: FlextQualityTypes.Core.SettingsDict = self._get_web_settings()
-        web_service = self._create_service(self.config)
-
-        if web_service is None:
-            error_msg = "Failed to create web service"
-            raise RuntimeError(error_msg)
-
-        # Type annotation and assignment combined
-        self.web_service: object = web_service
+        # Create Flask app directly
+        self.app = Flask(__name__)
 
         # Initialize quality components
         self.quality_api = QualityAPI()
@@ -52,70 +39,17 @@ class FlextQualityWeb:
         # Register quality-specific routes
         self._register_routes()
 
-    @staticmethod
-    def _create_service(
-        config: FlextQualityTypes.Core.SettingsDict | None = None,
-    ) -> object | None:
-        """Create web service using flext-web patterns."""
-        logger = FlextLogger(__name__)
-
-        # Convert dict to proper WebConfig with explicit validation - no try/except fallbacks
-        web_config = None
-        if config and isinstance(config, dict):
-            # Extract values with proper type checking
-            def safe_int(value: object, default: int) -> int:
-                return int(value) if isinstance(value, (int, float)) else default
-
-            def safe_str(value: object, default: str) -> str:
-                return str(value) if isinstance(value, str) else default
-
-            def safe_bool(value: object, *, default: bool) -> bool:
-                return bool(value) if isinstance(value, bool) else default
-
-            # Validate required config parameters explicitly
-            if all(key in config for key in ["host", "port"]):
-                web_config = FlextWebConfig.WebConfig(
-                    host=safe_str(config.get("host"), "localhost"),
-                    port=safe_int(config.get("port"), 8000),
-                    debug=safe_bool(config.get("debug"), default=False),
-                    max_workers=safe_int(config.get("max_workers"), 1),
-                )
-            else:
-                logger.warning("Invalid WebConfig dict: missing required fields")
-                web_config = None
-
-        result: FlextResult[object] = FlextWebServices.create_web_service(web_config)
-        return result.value if result.is_success else None
-
-    @staticmethod
-    def _get_web_settings() -> FlextQualityTypes.Core.SettingsDict:
-        """Get web settings using flext-web patterns."""
-        # Type conversion for compatibility
-        result: FlextResult[object] = FlextWebConfig.get_web_settings()
-        return dict(result) if hasattr(result, "__dict__") else {}
-
-    @staticmethod
-    def web_main() -> None:
-        """Main entry point for quality web interface."""
-        interface = FlextQualityWeb()
-        interface.run()
-
-    def _register_routes(self: object) -> None:
+    def _register_routes(self) -> None:
         """Register quality analysis routes with Flask app."""
-        if not hasattr(self.web_service, "app"):
-            msg = "Web service does not have an 'app' attribute"
-            raise AttributeError(msg)
-        app = getattr(self.web_service, "app")
-
         # Dashboard
-        app.route("/quality")(self.quality_dashboard)
+        self.app.route("/quality")(self.quality_dashboard)
 
         # API endpoints
-        app.route("/api/quality/analyze", methods=["POST"])(self.analyze_project)
-        app.route("/api/quality/metrics", methods=["GET"])(self.get_metrics)
-        app.route("/api/quality/report/<format>", methods=["GET"])(self.get_report)
+        self.app.route("/api/quality/analyze", methods=["POST"])(self.analyze_project)
+        self.app.route("/api/quality/metrics", methods=["GET"])(self.get_metrics)
+        self.app.route("/api/quality/report/<format>", methods=["GET"])(self.get_report)
 
-    def quality_dashboard(self: object) -> str:
+    def quality_dashboard(self) -> str:
         """Render quality dashboard."""
         return """
 
@@ -188,14 +122,14 @@ class FlextQualityWeb:
           </div>
 
           <script>
-              function analyzeProject() {
+              async function analyzeProject() {
                   const path = document.getElementById('project-path').value;
-                  const response = fetch('/api/quality/analyze', {
+                  const response = await fetch('/api/quality/analyze', {
                       method: "POST",
-                      headers: {'Content-Type': application/json},
-                      body: JSON.stringify({path: "path"})
+                      headers: {'Content-Type': 'application/json'},
+                      body: JSON.stringify({path: path})
                   });
-                  const data: dict["str", "object"] = response.json();
+                  const data = await response.json();
                   document.getElementById('results').innerHTML =
                       '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
               }
@@ -206,44 +140,55 @@ class FlextQualityWeb:
 
     def analyze_project(self) -> ResponseType:
         """Analyze a project and return results."""
-        data: FlextQualityTypes.Core.DataDict = request.get_json()
+        data = request.get_json()
+        if not data or not isinstance(data, dict):
+            return jsonify({"success": False, "error": "Invalid JSON data"}), 400
+
         project_path = data.get("path", ".")
 
         # Create analyzer for the specific path
         analyzer = CodeAnalyzer(Path(project_path))
-        result: FlextResult[object] = analyzer.analyze_project()
+        result = analyzer.analyze_project()
 
-        # Extract data from AnalysisResults
+        if not hasattr(result, "overall_metrics"):
+            return jsonify({"success": False, "error": "Analysis failed"}), 500
 
         return jsonify(
             {
-                "success": "True",
+                "success": True,
                 "data": {
-                    "path": "project_path",
-                    "files_analyzed": "files_count",
-                    "issues": result.total_issues,
+                    "path": project_path,
+                    "files_analyzed": getattr(
+                        result.overall_metrics, "files_analyzed", 0
+                    ),
+                    "issues": getattr(result, "total_issues", 0),
                     "metrics": {
-                        "quality_score": result.overall_metrics.quality_score,
-                        "security_score": result.overall_metrics.security_score,
-                        "coverage_score": result.overall_metrics.coverage_score,
+                        "quality_score": getattr(
+                            result.overall_metrics, "quality_score", 0.0
+                        ),
+                        "security_score": getattr(
+                            result.overall_metrics, "security_score", 0.0
+                        ),
+                        "coverage_score": getattr(
+                            result.overall_metrics, "coverage_score", 0.0
+                        ),
                     },
                 },
             },
         )
 
-    def get_metrics(self: object) -> ResponseType:
+    def get_metrics(self) -> ResponseType:
         """Get quality metrics."""
         # Use simple placeholder metrics for now
-        return jsonify({"success": "True", "data": "metrics"})
+        return jsonify({"success": True, "data": {}})
 
     def get_report(self, report_format: str) -> ResponseType:
         """Generate and return quality report."""
         if report_format not in {"json", "html", "pdf"}:
-            return jsonify({"success": "False", "error": "Invalid format"}), 400
+            return jsonify({"success": False, "error": "Invalid format"}), 400
 
-        return jsonify({"success": "True", "data": "report"})
+        return jsonify({"success": True, "data": {}})
 
-    @override
     def run(
         self,
         host: str = "localhost",
@@ -253,11 +198,13 @@ class FlextQualityWeb:
     ) -> None:
         """Run the quality web server."""
         self._logger.info("Starting FLEXT Quality Web Interface on %s:%s", host, port)
-        if not hasattr(self.web_service, "run"):
-            msg = "Web service does not have a 'run' method"
-            raise AttributeError(msg)
-        run_method = getattr(self.web_service, "run")
-        run_method(host=host, port=port, debug=debug)
+        self.app.run(host=host, port=port, debug=debug)
+
+    @staticmethod
+    def web_main() -> None:
+        """Main entry point for quality web interface."""
+        interface = FlextQualityWeb()
+        interface.run()
 
 
 # Backward compatibility aliases for existing code

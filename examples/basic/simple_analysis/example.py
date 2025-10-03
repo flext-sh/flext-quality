@@ -35,6 +35,7 @@ from flext_quality import (
     QualityMetrics,
     QualityReport,
 )
+from flext_quality.typings import FlextQualityTypes
 
 
 def print_header(title: str) -> None:
@@ -52,7 +53,7 @@ def format_number(num: float | str) -> str:
     return str(num)
 
 
-def _display_project_overview(analyzed_files: FlextTypes.Core.StringList) -> None:
+def _display_project_overview(analyzed_files: FlextTypes.StringList) -> None:
     """Display project overview with file listing."""
     print_section("📈 Project Overview")
 
@@ -66,7 +67,7 @@ def _display_project_overview(analyzed_files: FlextTypes.Core.StringList) -> Non
 
 def _display_quality_metrics(
     analyzer: CodeAnalyzer,
-    results: dict[str, object],
+    results: FlextQualityTypes.AnalysisResults,
 ) -> None:
     """Display quality metrics and scores."""
     print_section("🎯 Quality Assessment")
@@ -95,16 +96,16 @@ def _display_quality_metrics(
         pass
 
 
-def _display_issues(results: dict[str, object]) -> None:
+def _display_issues(results: FlextQualityTypes.AnalysisResults) -> None:
     """Display issues detection summary."""
     print_section("🚨 Issues Detection Summary")
 
     # Detailed issue breakdown - SHOW ALL ISSUES using safe access patterns
     issue_categories = {
-        "Security": results.get("security_issues", []),
-        "Complexity": results.get("complexity_issues", []),
-        "Dead Code": results.get("dead_code_issues", []),
-        "Duplication": results.get("duplication_issues", []),
+        "Security": results.security_issues,
+        "Complexity": results.complexity_issues,
+        "Dead Code": results.dead_code_issues,
+        "Duplication": results.duplication_issues,
     }
 
     for issue_list in issue_categories.values():
@@ -112,7 +113,9 @@ def _display_issues(results: dict[str, object]) -> None:
             pass
 
 
-def _generate_reports(_results: dict[str, object], project_path: str) -> None:
+def _generate_reports(
+    _results: FlextQualityTypes.AnalysisResults, project_path: str
+) -> None:
     """Generate quality reports in different formats."""
     print_section("📊 Generating Quality Reports")
 
@@ -152,7 +155,9 @@ def _generate_reports(_results: dict[str, object], project_path: str) -> None:
         return
 
 
-def _show_recommendations(analyzer: CodeAnalyzer, results: dict[str, object]) -> None:
+def _show_recommendations(
+    analyzer: CodeAnalyzer, results: FlextQualityTypes.AnalysisResults
+) -> None:
     """Show quality recommendations and final summary."""
     print_section("💡 Comprehensive Recommendations")
 

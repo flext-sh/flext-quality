@@ -99,7 +99,7 @@ class FlextQualityModels(FlextModels):
 
     @computed_field
     @property
-    def quality_system_summary(self) -> dict[str, object]:
+    def quality_system_summary(self) -> FlextTypes.Dict:
         """Computed field providing comprehensive quality system summary."""
         return {
             "system_info": {
@@ -201,7 +201,7 @@ class FlextQualityModels(FlextModels):
 
         @computed_field
         @property
-        def project_summary(self) -> dict[str, object]:
+        def project_summary(self) -> FlextTypes.Dict:
             """Computed field providing comprehensive project summary."""
             return {
                 "project_info": {
@@ -319,7 +319,7 @@ class FlextQualityModels(FlextModels):
 
         @computed_field
         @property
-        def analysis_summary(self) -> dict[str, object]:
+        def analysis_summary(self) -> FlextTypes.Dict:
             """Computed field providing comprehensive analysis summary."""
             duration_seconds = 0
             if self.completed_at and self.started_at:
@@ -462,7 +462,7 @@ class FlextQualityModels(FlextModels):
 
         @computed_field
         @property
-        def issue_summary(self) -> dict[str, object]:
+        def issue_summary(self) -> FlextTypes.Dict:
             """Computed field providing comprehensive issue summary."""
             return {
                 "issue_identity": {
@@ -604,14 +604,14 @@ class FlextQualityModels(FlextModels):
             default_factory=datetime.now,
             description="Report generation time",
         )
-        metadata: FlextTypes.Core.Dict = Field(
+        metadata: FlextTypes.Dict = Field(
             default_factory=dict,
             description="Additional report metadata",
         )
 
         @computed_field
         @property
-        def report_summary(self) -> dict[str, object]:
+        def report_summary(self) -> FlextTypes.Dict:
             """Computed field providing comprehensive report summary."""
             return {
                 "report_identity": {
@@ -663,7 +663,7 @@ class FlextQualityModels(FlextModels):
             return self
 
         @field_serializer("content", when_used="json")
-        def serialize_content_efficiently(self, value: str) -> dict[str, object]:
+        def serialize_content_efficiently(self, value: str) -> FlextTypes.Dict:
             """Field serializer for efficient content handling."""
             # For large content, provide summary instead of full content in JSON
             max_content_size = 10000  # 10KB limit for JSON serialization
@@ -682,7 +682,7 @@ class FlextQualityModels(FlextModels):
             }
 
         @field_serializer("metadata", when_used="json")
-        def serialize_metadata_with_context(self, value: dict) -> dict[str, object]:
+        def serialize_metadata_with_context(self, value: dict) -> FlextTypes.Dict:
             """Field serializer for metadata with processing context."""
             return {
                 "report_metadata": value,
@@ -706,7 +706,7 @@ class FlextQualityModels(FlextModels):
             enterprise_formats = ["HTML", "PDF", "JSON"]
             return self.format_type in enterprise_formats
 
-        def _get_format_capabilities(self) -> list[str]:
+        def _get_format_capabilities(self) -> FlextTypes.StringList:
             """Get capabilities based on report format."""
             capabilities_map = {
                 "HTML": ["interactive", "styling", "charts", "responsive"],
@@ -729,11 +729,11 @@ class FlextQualityModels(FlextModels):
             validate_return=True,
         )
 
-        include_patterns: FlextTypes.Core.StringList = Field(
+        include_patterns: FlextTypes.StringList = Field(
             default_factory=list,
             description="File patterns to include",
         )
-        exclude_patterns: FlextTypes.Core.StringList = Field(
+        exclude_patterns: FlextTypes.StringList = Field(
             default_factory=list,
             description="File patterns to exclude",
         )
@@ -764,7 +764,7 @@ class FlextQualityModels(FlextModels):
 
         @computed_field
         @property
-        def config_summary(self) -> dict[str, object]:
+        def config_summary(self) -> FlextTypes.Dict:
             """Computed field providing comprehensive configuration summary."""
             return {
                 "pattern_configuration": {
@@ -843,8 +843,8 @@ class FlextQualityModels(FlextModels):
 
         @field_serializer("include_patterns", when_used="json")
         def serialize_include_patterns_with_metadata(
-            self, value: list[str]
-        ) -> dict[str, object]:
+            self, value: FlextTypes.StringList
+        ) -> FlextTypes.Dict:
             """Field serializer for include patterns with validation metadata."""
             return {
                 "patterns": value,
@@ -858,8 +858,8 @@ class FlextQualityModels(FlextModels):
 
         @field_serializer("exclude_patterns", when_used="json")
         def serialize_exclude_patterns_with_metadata(
-            self, value: list[str]
-        ) -> dict[str, object]:
+            self, value: FlextTypes.StringList
+        ) -> FlextTypes.Dict:
             """Field serializer for exclude patterns with validation metadata."""
             return {
                 "patterns": value,

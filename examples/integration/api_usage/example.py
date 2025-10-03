@@ -12,17 +12,18 @@ This example demonstrates comprehensive usage of the FLEXT Quality API including
 This showcases complete API integration patterns for enterprise applications.
 """
 
+import asyncio
 import sys
 import tempfile
 from pathlib import Path
 
-from flext_core import FlextContainer, FlextLogger
 from flext_observability import (
     flext_create_log_entry,
     flext_create_metric,
     flext_create_trace,
 )
 
+from flext_core import FlextContainer, FlextLogger
 from flext_quality import (
     CodeAnalyzer,
     QualityAnalysisService,
@@ -73,7 +74,7 @@ class DataProcessor:
       self.threshold = threshold
       self.processed_count = 0
 
-    def process_item(self, item: object) -> FlextTypes.Core.Optional[object]:
+    def process_item(self, item: object) -> FlextTypes.Optional[object]:
       """Process individual item with validation."""
       if item is None:
           return None
@@ -91,7 +92,7 @@ class DataProcessor:
           logger.warning(f"Unsupported item type: {type(item)}")
           return None
 
-    def get_stats(self) -> Dict[str, object]:
+    def get_stats(self) -> FlextTypes.Dict:
       """Get processing statistics."""
       return {
           "processed_count": self.processed_count,
@@ -417,7 +418,7 @@ logger = FlextLogger(__name__)
 class Application:
     """Main application class."""
 
-    def __init__(self, config: Dict[str, object]):
+    def __init__(self, config: FlextTypes.Dict):
       self.config = config
       self.initialized = False
 
@@ -613,4 +614,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(run(main()))
+    sys.exit(asyncio.run(main()))

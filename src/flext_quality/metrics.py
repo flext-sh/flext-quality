@@ -11,7 +11,6 @@ import contextlib
 from pydantic import Field
 
 from flext_core import FlextModels, FlextResult, FlextTypes
-from flext_quality.analysis_types import FlextQualityAnalysisTypes
 from flext_quality.grade_calculator import QualityGradeCalculator
 from flext_quality.typings import FlextQualityTypes
 
@@ -257,16 +256,16 @@ class QualityMetrics(FlextModels.Value):
     @classmethod
     def from_analysis_results(
         cls,
-        results: FlextQualityAnalysisTypes.AnalysisResults | FlextTypes.Core.Dict,
+        results: FlextQualityTypes.AnalysisResults | FlextTypes.Dict,
     ) -> QualityMetrics:
-        """Create QualityMetrics from FlextQualityAnalysisTypes.AnalysisResults using modern API only.
+        """Create QualityMetrics from FlextQualityTypes.AnalysisResults using modern API only.
 
-        Factory method that processes FlextQualityAnalysisTypes.AnalysisResults and calculates
+        Factory method that processes FlextQualityTypes.AnalysisResults and calculates
         comprehensive quality metrics including weighted scores, issue counts,
         and overall quality grading. No legacy dict support.
 
         Args:
-            results: FlextQualityAnalysisTypes.AnalysisResults object containing:
+            results: FlextQualityTypes.AnalysisResults object containing:
                 - overall_metrics: Aggregated file-level metrics
                 - complexity_issues: Complexity-related quality issues
                 - security_issues: Security vulnerability issues
@@ -287,7 +286,7 @@ class QualityMetrics(FlextModels.Value):
             - Quality grade calculated using standardized grade scale
 
         Note:
-            Uses modern FlextQualityAnalysisTypes.AnalysisResults type only - no legacy dict support.
+            Uses modern FlextQualityTypes.AnalysisResults type only - no legacy dict support.
             All legacy fallback code has been removed.
 
         """
@@ -299,7 +298,7 @@ class QualityMetrics(FlextModels.Value):
     @classmethod
     def _from_analysis_results_dict(
         cls,
-        results: FlextTypes.Core.Dict,
+        results: FlextTypes.Dict,
     ) -> QualityMetrics:
         """Create QualityMetrics from legacy dict format for test compatibility."""
 
@@ -331,10 +330,10 @@ class QualityMetrics(FlextModels.Value):
         # Extract issue counts from nested dict structure
         issues: FlextQualityTypes.Core.IssueDict = results.get("issues", {})
         if isinstance(issues, dict):
-            security_issues: list[object] = len(issues.get("security", []))
-            complexity_issues: list[object] = len(issues.get("complexity", []))
-            dead_code_issues: list[object] = len(issues.get("dead_code", []))
-            duplication_issues: list[object] = len(issues.get("duplicates", []))
+            security_issues: FlextTypes.List = len(issues.get("security", []))
+            complexity_issues: FlextTypes.List = len(issues.get("complexity", []))
+            dead_code_issues: FlextTypes.List = len(issues.get("dead_code", []))
+            duplication_issues: FlextTypes.List = len(issues.get("duplicates", []))
         else:
             security_issues = complexity_issues = dead_code_issues = (
                 duplication_issues
@@ -374,9 +373,9 @@ class QualityMetrics(FlextModels.Value):
 
     @classmethod
     def _from_analysis_results_object(
-        cls, results: FlextQualityAnalysisTypes.AnalysisResults
+        cls, results: FlextQualityTypes.AnalysisResults
     ) -> QualityMetrics:
-        """Create QualityMetrics from typed FlextQualityAnalysisTypes.AnalysisResults object."""
+        """Create QualityMetrics from typed FlextQualityTypes.AnalysisResults object."""
         # Extract metrics from typed object
         total_files = len(results.file_metrics)
         total_loc = sum(file.lines_of_code for file in results.file_metrics)
@@ -486,7 +485,7 @@ class QualityMetrics(FlextModels.Value):
         )
 
     @property
-    def scores_summary(self: object) -> dict[str, float]:
+    def scores_summary(self: object) -> FlextTypes.FloatDict:
         """Get comprehensive summary of quality scores by category.
 
         Provides a structured view of all quality category scores for
@@ -544,7 +543,7 @@ class QualityMetrics(FlextModels.Value):
         *,
         by_alias: bool = False,
         exclude_none: bool = False,
-    ) -> FlextTypes.Core.Dict:
+    ) -> FlextTypes.Dict:
         """Export metrics as dictionary for serialization and integration.
 
         Converts the immutable metrics object to a dictionary format suitable
@@ -563,7 +562,7 @@ class QualityMetrics(FlextModels.Value):
             computed fields for comprehensive data export.
 
         """
-        base: FlextTypes.Core.Dict = {
+        base: FlextTypes.Dict = {
             "overall_score": self.overall_score,
             "quality_grade": self.quality_grade,
             "total_files": self.total_files,

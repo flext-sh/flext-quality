@@ -12,8 +12,8 @@ from pathlib import Path
 from typing import override
 
 from flext_core import FlextTypes
-from flext_quality.analysis_types import FlextQualityAnalysisTypes
 from flext_quality.grade_calculator import FlextQualityGradeCalculator
+from flext_quality.typings import FlextQualityTypes
 from flext_quality.utilities import FlextQualityUtilities
 
 # Constants for display limits
@@ -38,9 +38,7 @@ class FlextQualityReportGenerator:
     """Generates quality reports from analysis results."""
 
     @override
-    def __init__(
-        self, analysis_results: FlextQualityAnalysisTypes.AnalysisResults
-    ) -> None:
+    def __init__(self, analysis_results: FlextQualityTypes.AnalysisResults) -> None:
         """Initialize the quality report generator.
 
         Args:
@@ -51,7 +49,7 @@ class FlextQualityReportGenerator:
 
         """
         # Store analysis results directly
-        self.results: FlextQualityAnalysisTypes.AnalysisResults = analysis_results
+        self.results: FlextQualityTypes.AnalysisResults = analysis_results
 
     def generate_text_report(self: object) -> str:
         """Generate a text-based quality report."""
@@ -76,7 +74,7 @@ class FlextQualityReportGenerator:
         ]
 
         # Add issue details using utilities for proper typing
-        issue_categories: dict[str, FlextTypes.Core.List] = (
+        issue_categories: dict[str, FlextTypes.List] = (
             FlextQualityUtilities.format_issue_categories(self.results)
         )
 
@@ -110,7 +108,7 @@ class FlextQualityReportGenerator:
 
     def generate_json_report(self: object) -> str:
         """Generate a JSON-formatted quality report."""
-        report_data: FlextTypes.Core.Dict = {
+        report_data: FlextTypes.Dict = {
             "summary": {
                 "grade": self._get_quality_grade(),
                 "score": self._get_quality_score(),
@@ -250,12 +248,12 @@ class FlextQualityReportGenerator:
 
     def _get_total_issues(self: object) -> int:
         """Get total number of issues."""
-        # Use modern FlextQualityAnalysisTypes.AnalysisResults API only
+        # Use modern FlextQualityTypes.AnalysisResults API only
         return self.results.total_issues
 
     def _get_critical_issues(self: object) -> int:
         """Get number of critical issues."""
-        # Use modern FlextQualityAnalysisTypes.AnalysisResults API only
+        # Use modern FlextQualityTypes.AnalysisResults API only
         return self.results.critical_issues
 
     def _get_files_analyzed(self: object) -> int:
@@ -268,10 +266,8 @@ class FlextQualityReportGenerator:
 
     def _generate_issues_html(self: object) -> str:
         """Generate HTML for issues section."""
-        html_parts: FlextTypes.Core.StringList = (
-            FlextQualityUtilities.create_report_lines()
-        )
-        issue_categories: dict[str, FlextTypes.Core.List] = {
+        html_parts: FlextTypes.StringList = FlextQualityUtilities.create_report_lines()
+        issue_categories: dict[str, FlextTypes.List] = {
             "security": FlextQualityUtilities.safe_issue_list(
                 self.results.security_issues,
             ),
@@ -330,9 +326,9 @@ class FlextQualityReportGenerator:
 
         return "\n".join(html_parts)
 
-    def _generate_recommendations(self: object) -> FlextTypes.Core.StringList:
+    def _generate_recommendations(self: object) -> FlextTypes.StringList:
         """Generate recommendations based on analysis results."""
-        recommendations: FlextTypes.Core.StringList = (
+        recommendations: FlextTypes.StringList = (
             FlextQualityUtilities.create_report_lines()
         )
 

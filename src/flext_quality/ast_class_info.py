@@ -20,8 +20,8 @@ class ClassInfo(BaseModel):
     package_name: str
     line_number: int
     end_line_number: int
-    base_classes: FlextTypes.Core.StringList
-    decorators: FlextTypes.Core.StringList
+    base_classes: FlextTypes.StringList
+    decorators: FlextTypes.StringList
     is_dataclass: bool
     is_abstract: bool
     has_docstring: bool

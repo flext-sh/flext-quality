@@ -12,7 +12,7 @@ from typing import Self
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import SettingsConfigDict
 
-from flext_core import FlextConfig, FlextConstants, FlextResult
+from flext_core import FlextConfig, FlextConstants, FlextResult, FlextTypes
 from flext_quality.constants import FlextQualityConstants
 
 
@@ -20,11 +20,11 @@ class FlextQualityConfig(FlextConfig):
     """Single Pydantic 2 Settings class for flext-quality extending FlextConfig.
 
     Follows standardized pattern:
-    - Extends FlextConfig from flext-core
+    - Extends FlextConfig from flext-core with enhanced Pydantic 2.11+ features
     - No nested classes within Config
     - All defaults from FlextQualityConstants
-    - Uses enhanced singleton pattern with inverse dependency injection
-    - Uses Pydantic 2.11+ features (field_validator, model_validator)
+    - Uses direct instantiation pattern (no singleton)
+    - Uses Pydantic 2.11+ field_validator and model_validator
     """
 
     model_config = SettingsConfigDict(
@@ -329,7 +329,7 @@ class FlextQualityConfig(FlextConfig):
         except Exception as e:
             return FlextResult[None].fail(f"Business rules validation failed: {e}")
 
-    def get_analysis_config(self) -> dict[str, object]:
+    def get_analysis_config(self) -> FlextTypes.Dict:
         """Get quality analysis configuration context."""
         return {
             "min_coverage": self.min_coverage,
@@ -341,7 +341,7 @@ class FlextQualityConfig(FlextConfig):
             "workers": self.parallel_workers,
         }
 
-    def get_backend_config(self) -> dict[str, object]:
+    def get_backend_config(self) -> FlextTypes.Dict:
         """Get analysis backend configuration context."""
         return {
             "enable_ast_analysis": self.enable_ast_analysis,
@@ -352,7 +352,7 @@ class FlextQualityConfig(FlextConfig):
             "enable_dependency_scan": self.enable_dependency_scan,
         }
 
-    def get_reporting_config(self) -> dict[str, object]:
+    def get_reporting_config(self) -> FlextTypes.Dict:
         """Get quality reporting configuration context."""
         return {
             "enable_html_reports": self.enable_html_reports,
@@ -362,7 +362,7 @@ class FlextQualityConfig(FlextConfig):
             "include_executive_summary": self.include_executive_summary,
         }
 
-    def get_observability_config(self) -> dict[str, object]:
+    def get_observability_config(self) -> FlextTypes.Dict:
         """Get observability configuration context."""
         return {
             "quiet": self.observability_quiet,
@@ -373,21 +373,19 @@ class FlextQualityConfig(FlextConfig):
     def create_for_environment(
         cls, environment: str, **overrides: object
     ) -> FlextQualityConfig:
-        """Create configuration for specific environment using enhanced singleton pattern."""
-        return cls.get_or_create_shared_instance(
-            project_name="flext-quality", environment=environment, **overrides
-        )
+        """Create configuration for specific environment using direct instantiation."""
+        return cls(environment=environment, **overrides)
 
     @classmethod
     def create_default(cls) -> FlextQualityConfig:
-        """Create default configuration instance using enhanced singleton pattern."""
-        return cls.get_or_create_shared_instance(project_name="flext-quality")
+        """Create default configuration instance using direct instantiation."""
+        return cls()
 
     @classmethod
     def create_for_development(cls) -> FlextQualityConfig:
-        """Create configuration optimized for development using enhanced singleton pattern."""
-        return cls.get_or_create_shared_instance(
-            project_name="flext-quality",
+        """Create configuration optimized for development using direct instantiation."""
+        return cls(
+            environment="development",
             min_coverage=80.0,
             max_complexity=15,
             analysis_timeout=120,
@@ -398,9 +396,9 @@ class FlextQualityConfig(FlextConfig):
 
     @classmethod
     def create_for_production(cls) -> FlextQualityConfig:
-        """Create configuration optimized for production using enhanced singleton pattern."""
-        return cls.get_or_create_shared_instance(
-            project_name="flext-quality",
+        """Create configuration optimized for production using direct instantiation."""
+        return cls(
+            environment="production",
             min_coverage=FlextQualityConstants.Coverage.TARGET_COVERAGE,
             max_complexity=8,
             min_security_score=FlextQualityConstants.Security.TARGET_SECURITY_SCORE,
@@ -411,17 +409,6 @@ class FlextQualityConfig(FlextConfig):
             include_trend_analysis=True,
             include_executive_summary=True,
         )
-
-    @classmethod
-    def get_global_instance(cls) -> FlextQualityConfig:
-        """Get the global singleton instance using enhanced FlextConfig pattern."""
-        return cls.get_or_create_shared_instance(project_name="flext-quality")
-
-    @classmethod
-    def reset_global_instance(cls) -> None:
-        """Reset the global FlextQualityConfig instance (mainly for testing)."""
-        # Use the enhanced FlextConfig reset mechanism
-        cls.reset_shared_instance()
 
 
 __all__ = [

@@ -2,33 +2,41 @@
 
 from __future__ import annotations
 
-from typing import Final, cast
+from typing import Final
 
-from flext_core.metadata import (
-    FlextProjectVersion,
-    build_metadata_exports,
-)
-
-_metadata = build_metadata_exports(__file__)
-globals().update(_metadata)
-_metadata_obj = cast("FlextProjectMetadata", _metadata["__flext_metadata__"])
+from flext_quality.__version__ import __version__, __version_info__
 
 
-class FlextQualityVersion(FlextProjectVersion):
+class FlextQualityVersion:
     """Structured metadata for the flext quality distribution."""
+
+    def __init__(self, version: str, version_info: tuple[int | str, ...]) -> None:
+        """Initialize version metadata.
+
+        Args:
+            version: Version string (e.g., "1.0.0")
+            version_info: Version info tuple
+
+        """
+        self._version = version
+        self._version_info = version_info
+
+    @property
+    def version(self) -> str:
+        """Return the version string."""
+        return self._version
+
+    @property
+    def version_info(self) -> tuple[int | str, ...]:
+        """Return the version info tuple."""
+        return self._version_info
 
     @classmethod
     def current(cls) -> FlextQualityVersion:
-        """Return canonical metadata loaded from pyproject.toml."""
-        return cls.from_metadata(_metadata_obj)
+        """Return canonical metadata loaded from package."""
+        return cls(__version__, __version_info__)
 
 
 VERSION: Final[FlextQualityVersion] = FlextQualityVersion.current()
-__version__: Final[str] = VERSION.version
-__version_info__: Final[tuple[int | str, ...]] = VERSION.version_info
-
-for _name in tuple(_metadata):
-    if _name not in {"__version__", "__version_info__"}:
-        globals().pop(_name, None)
 
 __all__ = ["VERSION", "FlextQualityVersion", "__version__", "__version_info__"]

@@ -8,19 +8,10 @@ from __future__ import annotations
 
 from typing import Final
 
+# Core imports
 from flext_quality import exceptions
-from flext_quality.analysis_types import (
-    AnalysisResults,
-    CodeIssue,
-    ComplexityIssue,
-    DeadCodeIssue,
-    Dependency,
-    DuplicationIssue,
-    FileAnalysisResult,
-    OverallMetrics,
-    SecurityIssue,
-    TestResults,
-)
+
+# Main modules
 from flext_quality.analyzer import FlextQualityCodeAnalyzer as CodeAnalyzer
 from flext_quality.api import FlextQualityAPI as QualityAPI
 from flext_quality.ast_backend import (
@@ -63,6 +54,9 @@ from flext_quality.models import FlextQualityReportModel
 from flext_quality.protocols import FlextQualityProtocols
 from flext_quality.reports import FlextQualityReportGenerator
 from flext_quality.services import FlextQualityServices
+
+# Type system and aliases
+from flext_quality.typings import FlextQualityTypes
 from flext_quality.utilities import FlextQualityUtilities as QualityUtilities
 from flext_quality.value_objects import (
     ComplexityMetric,
@@ -77,6 +71,19 @@ from flext_quality.value_objects import (
 from flext_quality.version import VERSION, FlextQualityVersion
 from flext_quality.web import FlextQualityWebInterface as QualityWebInterface
 
+# Type aliases for backward compatibility (deprecated - use FlextQualityTypes.*)
+AnalysisResults = FlextQualityTypes.AnalysisResults
+CodeIssue = FlextQualityTypes.CodeIssue
+ComplexityIssue = FlextQualityTypes.ComplexityIssue
+DeadCodeIssue = FlextQualityTypes.DeadCodeIssue
+Dependency = FlextQualityTypes.Dependency
+DuplicationIssue = FlextQualityTypes.DuplicationIssue
+FileAnalysisResult = FlextQualityTypes.FileAnalysisResult
+OverallMetrics = FlextQualityTypes.OverallMetrics
+SecurityIssue = FlextQualityTypes.SecurityIssue
+TestResults = FlextQualityTypes.TestResults
+
+# Entity aliases
 AnalysisStatus = FlextQualityEntities.AnalysisStatus
 QualityAnalysis = FlextQualityEntities.QualityAnalysis
 QualityIssue = FlextQualityEntities.QualityIssue

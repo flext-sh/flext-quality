@@ -50,7 +50,7 @@ class TestBaseAnalyzer:
                 self,
                 code: str,
                 file_path: Path | None = None,
-            ) -> FlextTypes.Core.Dict:
+            ) -> FlextTypes.Dict:
                 """Implement abstract method."""
                 return {"analyzed": True, "code": code}
 
@@ -60,7 +60,7 @@ class TestBaseAnalyzer:
                 return BackendType.HYBRID
 
             @override
-            def get_capabilities(self) -> FlextTypes.Core.StringList:
+            def get_capabilities(self) -> FlextTypes.StringList:
                 """Implement abstract method."""
                 return ["test", "mock"]
 

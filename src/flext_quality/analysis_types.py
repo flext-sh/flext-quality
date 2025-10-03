@@ -120,7 +120,7 @@ class DeadCodeIssue(FlextModels.Value):
 class DuplicationIssue(FlextModels.Value):
     """Represents code duplication detected in analysis."""
 
-    files: FlextTypes.Core.StringList = Field(
+    files: FlextTypes.StringList = Field(
         ...,
         description="Files containing duplicated code",
     )
@@ -154,7 +154,7 @@ class Dependency(BaseModel):
     name: str = Field(..., description="Dependency name")
     version: str = Field(..., description="Dependency version")
     type: str = Field(default="runtime", description="Dependency type")
-    vulnerabilities: list[str] = Field(
+    vulnerabilities: FlextTypes.StringList = Field(
         default_factory=list,
         description="Known vulnerabilities",
     )
@@ -176,7 +176,7 @@ class TestResults(BaseModel):
         le=100.0,
         description="Code coverage percentage",
     )
-    test_errors: list[str] = Field(
+    test_errors: FlextTypes.StringList = Field(
         default_factory=list,
         description="Test execution errors",
     )

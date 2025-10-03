@@ -20,12 +20,13 @@ from pathlib import Path
 
 from flext_core import FlextTypes
 from flext_quality import main as quality_main
+from flext_quality.typings import FlextQualityTypes
 
 
 def run_cli_analysis(
     project_path: str,
     format_type: str = "json",
-) -> FlextTypes.Core.Dict:
+) -> FlextTypes.Dict:
     """Run FLEXT Quality CLI analysis and return parsed results.
 
     Args:
@@ -80,7 +81,7 @@ def run_cli_analysis(
         return {"error": str(e)}
 
 
-def check_quality_thresholds(results: FlextTypes.Core.Dict) -> FlextTypes.Core.Dict:
+def check_quality_thresholds(results: FlextTypes.Dict) -> FlextTypes.Dict:
     """Check analysis results against quality thresholds.
 
     Args:
@@ -102,7 +103,11 @@ def check_quality_thresholds(results: FlextTypes.Core.Dict) -> FlextTypes.Core.D
     # Extract metrics for threshold checking using modern AnalysisResults API
     analysis_results = results.get("analysis_results", {})
 
-    # Handle both legacy dict and modern AnalysisResults format
+    # Convert dict to AnalysisResults object if needed
+    if isinstance(analysis_results, dict):
+        analysis_results = FlextQualityTypes.AnalysisResults(**analysis_results)
+
+    # Use modern AnalysisResults format
     if hasattr(analysis_results, "security_issues"):
         # Modern AnalysisResults format
         security_count = len(analysis_results.security_issues)
@@ -308,7 +313,7 @@ def another_complex_function(x, y, z, a, b, c):
                 summary["passed_checks"]
 
 
-def demonstrate_ci_cd_integration() -> None:
+def demonstrate_ci_cd_integration() -> int:
     """Demonstrate CI/CD integration patterns."""
     # Simulate CI/CD environment variables
     ci_env = {

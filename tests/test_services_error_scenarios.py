@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections import UserDict
-from typing import override
+from typing import Never, override
 from unittest.mock import patch
 
 import pytest

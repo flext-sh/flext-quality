@@ -73,7 +73,7 @@ class TestQualityAPI:
             api.project_service._projects[str(project_id)] = create_result.value
 
         # Update the project
-        updates: FlextTypes.Core.Dict = {"language": "go"}
+        updates: FlextTypes.Dict = {"language": "go"}
         result = api.update_project(project_id, updates)
         assert result.success
 
