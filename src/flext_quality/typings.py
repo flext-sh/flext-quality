@@ -149,8 +149,8 @@ class FlextQualityTypes(FlextTypes):
     class AnalysisResults(FlextModels.Value):
         """Complete analysis results containing all metrics and issues."""
 
-        overall_metrics: FlextQualityTypes.OverallMetrics = Field(
-            default_factory=lambda: FlextQualityTypes.OverallMetrics(),
+        overall_metrics: "OverallMetrics" = Field(
+            default_factory=dict,
             description="Overall analysis metrics",
         )
         file_metrics: list[FlextQualityTypes.FileAnalysisResult] = Field(
