@@ -10,12 +10,13 @@ from pathlib import Path
 from uuid import UUID
 
 from flext_core import FlextResult, FlextTypes
-from flext_quality import (
-    QualityAnalysis,
-    QualityIssue,
-    QualityProject,
-    QualityReport,
-)
+from flext_quality.entities import FlextQualityEntities
+
+# Create aliases to match __init__.py exports
+QualityAnalysis = FlextQualityEntities.QualityAnalysis
+QualityIssue = FlextQualityEntities.QualityIssue
+QualityProject = FlextQualityEntities.QualityProject
+QualityReport = FlextQualityEntities.QualityReport
 from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.container import get_quality_container
 from flext_quality.services import FlextQualityServices
@@ -34,22 +35,22 @@ class FlextQualityAPI:
         self._services = FlextQualityServices()
 
     @property
-    def project_service(self):
+    def project_service(self) -> object:
         """Get project service instance."""
         return self._services.get_project_service()
 
     @property
-    def analysis_service(self):
+    def analysis_service(self) -> object:
         """Get analysis service instance."""
         return self._services.get_analysis_service()
 
     @property
-    def issue_service(self):
+    def issue_service(self) -> object:
         """Get issue service instance."""
         return self._services.get_issue_service()
 
     @property
-    def report_service(self):
+    def report_service(self) -> object:
         """Get report service instance."""
         return self._services.get_report_service()
 

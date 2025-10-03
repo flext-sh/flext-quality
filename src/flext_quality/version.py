@@ -31,6 +31,69 @@ class FlextQualityVersion:
         """Return the version info tuple."""
         return self._version_info
 
+    @property
+    def version_tuple(self) -> tuple[int | str, ...]:
+        """Return the version info tuple (alias for compatibility)."""
+        return self._version_info
+
+    @property
+    def metadata(self) -> dict:
+        """Return project metadata."""
+        return {
+            "name": "flext-quality",
+            "version": self._version,
+            "description": "Code quality analysis and metrics for FLEXT ecosystem",
+            "authors": ["FLEXT Team"],
+            "maintainers": ["FLEXT Team"],
+            "license": "MIT",
+            "url": "https://github.com/flext/flext-quality",
+            "project_urls": {
+                "Documentation": "https://flext-quality.readthedocs.io/",
+                "Source": "https://github.com/flext/flext-quality",
+                "Tracker": "https://github.com/flext/flext-quality/issues",
+            },
+        }
+
+    @property
+    def project(self) -> str:
+        """Return project name."""
+        return "flext-quality"
+
+    @property
+    def urls(self) -> dict:
+        """Return project URLs."""
+        return self.metadata["project_urls"]
+
+    @property
+    def author(self) -> str:
+        """Return primary author."""
+        return "FLEXT Team"
+
+    @property
+    def maintainer(self) -> str:
+        """Return primary maintainer."""
+        return "FLEXT Team"
+
+    @property
+    def author_name(self) -> str:
+        """Return author name."""
+        return self.author
+
+    @property
+    def maintainer_name(self) -> str:
+        """Return maintainer name."""
+        return self.maintainer
+
+    @property
+    def authors(self) -> list[str]:
+        """Return list of authors."""
+        return self.metadata["authors"]
+
+    @property
+    def maintainers(self) -> list[str]:
+        """Return list of maintainers."""
+        return self.metadata["maintainers"]
+
     @classmethod
     def current(cls) -> FlextQualityVersion:
         """Return canonical metadata loaded from package."""

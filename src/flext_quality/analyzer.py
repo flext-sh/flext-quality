@@ -24,7 +24,7 @@ MIN_FILE_SIZE_FOR_DUPLICATION_CHECK = 100
 SIMILARITY_THRESHOLD = 0.8
 
 
-class FlextQualityCodeAnalyzer(FlextService[FlextQualityConfig]):
+class FlextQualityCodeAnalyzer:
     """Main code analyzer interface for FLEXT Quality."""
 
     def __init__(
