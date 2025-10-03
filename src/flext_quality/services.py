@@ -14,6 +14,7 @@ from flext_core import (
     FlextLogger,
     FlextProtocols,
     FlextResult,
+    FlextService,
     FlextTypes,
 )
 from flext_quality.entities import (
@@ -89,12 +90,13 @@ class FlextQualityServices:
     # NESTED SERVICE CLASSES - All quality services consolidated
     # =============================================================================
 
-    class ProjectService:
+    class ProjectService(FlextService[None]):
         """Service for managing quality projects using flext-core patterns."""
 
         @override
         def __init__(self, parent: FlextQualityServices) -> None:
             """Initialize service with parent reference."""
+            super().__init__()
             self._parent = parent
             self._logger = parent._logger
 
@@ -133,12 +135,13 @@ class FlextQualityServices:
                     f"Failed to create project: {e}",
                 )
 
-    class IssueService:
+    class IssueService(FlextService[None]):
         """Service for managing quality issues using flext-core patterns."""
 
         @override
         def __init__(self, parent: FlextQualityServices) -> None:
             """Initialize service with parent reference."""
+            super().__init__()
             self._parent = parent
             self._logger = parent._logger
 
@@ -265,12 +268,13 @@ class FlextQualityServices:
                     f"Failed to unsuppress issue: {e}",
                 )
 
-    class AnalysisService:
+    class AnalysisService(FlextService[None]):
         """Service for managing quality analyses using flext-core patterns."""
 
         @override
         def __init__(self, parent: FlextQualityServices) -> None:
             """Initialize service with parent reference."""
+            super().__init__()
             self._parent = parent
             self._logger = parent._logger
 
@@ -317,12 +321,13 @@ class FlextQualityServices:
                     f"Failed to list analyses: {e}",
                 )
 
-    class ReportService:
+    class ReportService(FlextService[None]):
         """Service for managing quality reports using flext-core patterns."""
 
         @override
         def __init__(self, parent: FlextQualityServices) -> None:
             """Initialize service with parent reference."""
+            super().__init__()
             self._parent = parent
             self._logger = parent._logger
 
@@ -387,12 +392,13 @@ class FlextQualityServices:
                 self._logger.exception("Failed to delete report")
                 return FlextResult[bool].fail(f"Failed to delete report: {e}")
 
-    class ExternalAnalysisService:
+    class ExternalAnalysisService(FlextService[None]):
         """Service for external backend analysis using flext-core patterns."""
 
         @override
         def __init__(self, parent: FlextQualityServices) -> None:
             """Initialize service with external backend."""
+            super().__init__()
             self._parent = parent
             self._backend = ExternalBackend()
             self._logger = parent._logger
