@@ -9,10 +9,10 @@ from __future__ import annotations
 import warnings
 from typing import Self
 
+from flext_core import FlextConfig, FlextConstants, FlextResult, FlextTypes
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import SettingsConfigDict
 
-from flext_core import FlextConfig, FlextConstants, FlextResult, FlextTypes
 from flext_quality.constants import FlextQualityConstants
 
 
@@ -374,7 +374,9 @@ class FlextQualityConfig(FlextConfig):
         cls, environment: str, **overrides: object
     ) -> FlextQualityConfig:
         """Create configuration for specific environment using direct instantiation."""
-        return cls(environment=environment, **overrides)
+        # Note: environment parameter reserved for future use
+        _ = environment  # Unused but maintains parent signature
+        return cls.model_validate(overrides)
 
     @classmethod
     def create_default(cls) -> FlextQualityConfig:
@@ -383,32 +385,25 @@ class FlextQualityConfig(FlextConfig):
 
     @classmethod
     def create_for_development(cls) -> FlextQualityConfig:
-        """Create configuration optimized for development using direct instantiation."""
-        return cls(
-            environment="development",
-            min_coverage=80.0,
-            max_complexity=15,
-            analysis_timeout=120,
-            parallel_workers=2,
-            enable_audit_logging=False,
-            observability_quiet=True,
-        )
+        """Create configuration optimized for development using model_validate."""
+        return cls.model_validate({
+            "min_coverage": 80.0,
+            "max_complexity": 15,
+            "analysis_timeout": 120,
+            "parallel_workers": 2,
+        })
 
     @classmethod
     def create_for_production(cls) -> FlextQualityConfig:
-        """Create configuration optimized for production using direct instantiation."""
-        return cls(
-            environment="production",
-            min_coverage=FlextQualityConstants.Coverage.TARGET_COVERAGE,
-            max_complexity=8,
-            min_security_score=FlextQualityConstants.Security.TARGET_SECURITY_SCORE,
-            min_maintainability=85.0,
-            analysis_timeout=600,
-            parallel_workers=8,
-            enable_audit_logging=True,
-            include_trend_analysis=True,
-            include_executive_summary=True,
-        )
+        """Create configuration optimized for production using model_validate."""
+        return cls.model_validate({
+            "min_coverage": FlextQualityConstants.Coverage.TARGET_COVERAGE,
+            "max_complexity": 8,
+            "min_security_score": FlextQualityConstants.Security.TARGET_SECURITY_SCORE,
+            "min_maintainability": 85.0,
+            "analysis_timeout": 600,
+            "parallel_workers": 8,
+        })
 
 
 __all__ = [

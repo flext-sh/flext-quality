@@ -12,20 +12,17 @@ from typing import Final
 from flext_quality import exceptions
 
 # Main modules
-from flext_quality.analyzer import FlextQualityCodeAnalyzer as CodeAnalyzer
+from flext_quality.analyzer import FlextQualityAnalyzer as CodeAnalyzer
 from flext_quality.api import FlextQualityAPI as QualityAPI
 from flext_quality.ast_backend import (
     FlextQualityASTBackend as ASTBackend,
 )
 from flext_quality.backend_type import BackendType
 from flext_quality.base import BaseAnalyzer
-from flext_quality.cli import (
-    analyze_project,
-    another_function,
-    main,
-    quality_main,
-    setup_logging,
-)
+
+# CLI imports are lazy to avoid flext_cli dependency issues
+# Use: from flext_quality.cli import main
+# Instead of: from flext_quality import main
 from flext_quality.config import FlextQualityConfig
 from flext_quality.container import get_quality_container
 from flext_quality.entities import FlextQualityEntities
@@ -49,6 +46,7 @@ from flext_quality.external_backend import (
 )
 from flext_quality.grade_calculator import QualityGradeCalculator
 from flext_quality.handlers import FlextQualityHandlers as FlextQualityHandler
+from flext_quality.integrations import FlextQualityIntegrations
 from flext_quality.metrics import QualityMetrics
 from flext_quality.models import FlextQualityReportModel
 from flext_quality.protocols import FlextQualityProtocols
@@ -123,6 +121,7 @@ __all__ = [
     "FlextQualityError",
     "FlextQualityGradeError",
     "FlextQualityHandler",
+    "FlextQualityIntegrations",
     "FlextQualityMetricsError",
     "FlextQualityProcessingError",
     "FlextQualityProtocols",
@@ -154,12 +153,8 @@ __all__ = [
     "TestResults",
     "__version__",
     "__version_info__",
-    "analyze_project",
-    "another_function",
     "exceptions",
     "exceptions_all",
     "get_quality_container",
-    "main",
-    "quality_main",
-    "setup_logging",
+    # CLI functions removed from __all__ - import directly from flext_quality.cli if needed
 ]

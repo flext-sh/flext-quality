@@ -9,48 +9,82 @@ from __future__ import annotations
 from pathlib import Path
 from uuid import UUID
 
-from flext_core import FlextResult, FlextTypes
+from flext_core import (
+    FlextBus,
+    FlextContainer,
+    FlextContext,
+    FlextCqrs,
+    FlextDispatcher,
+    FlextLogger,
+    FlextProcessors,
+    FlextRegistry,
+    FlextResult,
+    FlextService,
+    FlextTypes,
+)
+
+from flext_quality.analyzer import CodeAnalyzer
 from flext_quality.entities import FlextQualityEntities
+from flext_quality.services import FlextQualityServices
+from flext_quality.typings import FlextQualityTypes
+from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
 
 # Create aliases to match __init__.py exports
 QualityAnalysis = FlextQualityEntities.QualityAnalysis
 QualityIssue = FlextQualityEntities.QualityIssue
 QualityProject = FlextQualityEntities.QualityProject
 QualityReport = FlextQualityEntities.QualityReport
-from flext_quality.analyzer import CodeAnalyzer
-from flext_quality.container import get_quality_container
-from flext_quality.services import FlextQualityServices
-from flext_quality.typings import FlextQualityTypes
-from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
 
 # Type aliases for backward compatibility
 
 
-class FlextQualityAPI:
-    """Simple API interface for quality analysis operations."""
+class FlextQualityAPI(FlextService[None]):
+    """Thin facade for quality operations with complete FLEXT integration.
+
+    Integrates:
+    - FlextBus: Event emission
+    - FlextContainer: Dependency injection
+    - FlextContext: Operation context
+    - FlextDispatcher: Message routing
+    - FlextProcessors: Processing utilities
+    - FlextRegistry: Component registration
+    - FlextLogger: Advanced logging
+    """
 
     def __init__(self) -> None:
-        """Initialize the Quality API with container-based DI."""
-        self._container = get_quality_container()
+        """Initialize the Quality API with complete FLEXT ecosystem integration."""
+        super().__init__()
+
+        # Complete FLEXT ecosystem integration
+        self._container = FlextContainer.get_global()
+        self._context = FlextContext()
+        self._bus = FlextBus()
+        self._dispatcher = FlextDispatcher()
+        self._processors = FlextProcessors()
+        self._registry = FlextRegistry(dispatcher=self._dispatcher)
+        self._cqrs = FlextCqrs()
+        self._logger = FlextLogger(__name__)
+
+        # Domain services
         self._services = FlextQualityServices()
 
     @property
-    def project_service(self) -> object:
+    def project_service(self) -> FlextQualityServices.ProjectService:
         """Get project service instance."""
         return self._services.get_project_service()
 
     @property
-    def analysis_service(self) -> object:
+    def analysis_service(self) -> FlextQualityServices.AnalysisService:
         """Get analysis service instance."""
         return self._services.get_analysis_service()
 
     @property
-    def issue_service(self) -> object:
+    def issue_service(self) -> FlextQualityServices.IssueService:
         """Get issue service instance."""
         return self._services.get_issue_service()
 
     @property
-    def report_service(self) -> object:
+    def report_service(self) -> FlextQualityServices.ReportService:
         """Get report service instance."""
         return self._services.get_report_service()
 
@@ -320,14 +354,26 @@ class FlextQualityAPI:
         # Execute analysis using CodeAnalyzer
         project_path = Path(project.project_path)
         analyzer = CodeAnalyzer(project_path)
-        analysis_results: FlextQualityTypes.AnalysisResults = analyzer.analyze_project()
+        analysis_result = analyzer.analyze_project()
+
+        # Unwrap FlextResult
+        if analysis_result.is_failure:
+            return FlextResult[QualityAnalysis].fail(analysis_result.error)
+
+        analysis_results: FlextQualityTypes.AnalysisResults = analysis_result.value
 
         # Update with real metrics from analysis
+        # Note: analysis_results is a Pydantic model
+        overall_metrics: dict = analysis_results.overall_metrics
+        duplication_issues: list = analysis_results.duplication_issues
+
         self.update_metrics(
             _analysis_id=UUID(str(analysis.id)),
-            _total_files=analysis_results.overall_metrics.files_analyzed,
-            _total_lines=analysis_results.overall_metrics.total_lines,
-            _code_lines=analysis_results.overall_metrics.total_lines,  # CodeAnalyzer provides total lines
+            _total_files=overall_metrics.get("files_analyzed", 0),
+            _total_lines=overall_metrics.get("total_lines", 0),
+            _code_lines=overall_metrics.get(
+                "total_lines", 0
+            ),  # CodeAnalyzer provides total lines
             _comment_lines=0,  # Would need detailed AST analysis
             _blank_lines=0,  # Would need detailed AST analysis
         )
@@ -335,30 +381,33 @@ class FlextQualityAPI:
         # Update with real scores from analysis
         self.update_scores(
             _analysis_id=UUID(str(analysis.id)),
-            _coverage_score=analysis_results.overall_metrics.coverage_score,
-            complexity_score=analysis_results.overall_metrics.complexity_score,
+            _coverage_score=overall_metrics.get("coverage_score", 0.0),
+            complexity_score=overall_metrics.get("complexity_score", 0.0),
             _duplication_score=100.0
-            - len(analysis_results.duplication_issues),  # Convert issues to score
-            security_score=analysis_results.overall_metrics.security_score,
-            maintainability_score=analysis_results.overall_metrics.maintainability_score,
+            - len(duplication_issues),  # Convert issues to score
+            security_score=overall_metrics.get("security_score", 0.0),
+            maintainability_score=overall_metrics.get("maintainability_score", 0.0),
         )
 
         # Count real issues by severity
+        security_issues: list = analysis_results.security_issues
+        complexity_issues: list = analysis_results.complexity_issues
+
         critical_issues = len(
-            [i for i in analysis_results.security_issues if i.severity == "critical"],
+            [i for i in security_issues if i.get("severity") == "critical"],
         )
         high_issues = len(
-            [i for i in analysis_results.security_issues if i.severity == "high"],
+            [i for i in security_issues if i.get("severity") == "high"],
         )
         medium_issues = len(
-            [i for i in analysis_results.security_issues if i.severity == "medium"],
+            [i for i in security_issues if i.get("severity") == "medium"],
         )
         low_issues = len(
-            [i for i in analysis_results.security_issues if i.severity == "low"],
+            [i for i in security_issues if i.get("severity") == "low"],
         )
 
         # Add complexity issues to high priority
-        high_issues += len(analysis_results.complexity_issues)
+        high_issues += len(complexity_issues)
 
         # Update with real issue counts
         self.update_issue_counts(

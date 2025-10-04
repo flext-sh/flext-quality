@@ -28,14 +28,17 @@ import sys
 from pathlib import Path
 
 from flext_core import FlextTypes
+from rich.console import Console
 
 # Using proper flext-quality imports
 from flext_quality import (
     CodeAnalyzer,
     QualityMetrics,
-    QualityReport,
 )
 from flext_quality.typings import FlextQualityTypes
+
+# Initialize rich console for output
+console = Console()
 
 
 def print_header(title: str) -> None:
@@ -120,8 +123,10 @@ def _generate_reports(
     print_section("📊 Generating Quality Reports")
 
     try:
-        # Create QualityReport instance with proper parameters
-        _report = QualityReport(analysis_id="example-analysis-001", report_type="json")
+        # Create QualityReport generator instance with proper parameters
+        from flext_quality.reports import FlextQualityReportGenerator
+
+        _report = FlextQualityReportGenerator(_results)
 
         # Generate simple JSON report from results
         json_data = {
@@ -219,12 +224,19 @@ def analyze_project(project_path: str) -> None:
         print_section("📊 Executing Comprehensive Analysis")
 
         # Execute comprehensive analysis with ALL features
-        results = analyzer.analyze_project(
+        result = analyzer.analyze_project(
             include_security=True,  # Security vulnerability detection
             include_complexity=True,  # Cyclomatic complexity analysis
             include_dead_code=True,  # Unused code detection
             include_duplicates=True,  # Code duplication analysis
         )
+
+        # Unwrap FlextResult
+        if result.is_failure:
+            console.print(f"[red]Analysis failed: {result.error}[/red]")
+            return
+
+        results = result.value
 
         # Extract basic project information using modern AnalysisResults API
         analyzed_files = [str(fm.file_path) for fm in results.file_metrics]

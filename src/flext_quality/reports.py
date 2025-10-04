@@ -12,9 +12,11 @@ from pathlib import Path
 from typing import override
 
 from flext_core import FlextTypes
+
 from flext_quality.grade_calculator import FlextQualityGradeCalculator
 from flext_quality.typings import FlextQualityTypes
 from flext_quality.utilities import FlextQualityUtilities
+from flext_quality.value_objects import IssueSeverity
 
 # Constants for display limits
 ISSUE_PREVIEW_LIMIT = 5
@@ -51,7 +53,7 @@ class FlextQualityReportGenerator:
         # Store analysis results directly
         self.results: FlextQualityTypes.AnalysisResults = analysis_results
 
-    def generate_text_report(self: object) -> str:
+    def generate_text_report(self) -> str:
         """Generate a text-based quality report."""
         grade = self._get_quality_grade()
         score = self._get_quality_score()
@@ -106,7 +108,7 @@ class FlextQualityReportGenerator:
 
         return "\n".join(report_lines)
 
-    def generate_json_report(self: object) -> str:
+    def generate_json_report(self) -> str:
         """Generate a JSON-formatted quality report."""
         report_data: FlextTypes.Dict = {
             "summary": {
@@ -123,15 +125,15 @@ class FlextQualityReportGenerator:
 
         return json.dumps(report_data, indent=2, default=str)
 
-    def to_json(self: object) -> str:
+    def to_json(self) -> str:
         """Alias for generate_json_report for compatibility."""
         return self.generate_json_report()
 
-    def to_html(self: object) -> str:
+    def to_html(self) -> str:
         """Alias for generate_html_report for compatibility."""
         return self.generate_html_report()
 
-    def generate_html_report(self: object) -> str:
+    def generate_html_report(self) -> str:
         """Generate an HTML-formatted quality report."""
         grade_color = self._get_grade_color()
         quality_grade = self._get_quality_grade()
@@ -216,13 +218,13 @@ class FlextQualityReportGenerator:
 
         output_path.write_text(content, encoding="utf-8")
 
-    def _get_quality_grade(self: object) -> str:
+    def _get_quality_grade(self) -> str:
         """Calculate quality grade - DRY refactored."""
         score = self._get_quality_score()
         grade = FlextQualityGradeCalculator.calculate_grade(float(score))
         return grade.value
 
-    def _get_quality_score(self: object) -> int:
+    def _get_quality_score(self) -> int:
         """Calculate overall quality score."""
         total_issues = self._get_total_issues()
         critical_issues = self._get_critical_issues()
@@ -234,7 +236,7 @@ class FlextQualityReportGenerator:
 
         return max(0, score)
 
-    def _get_grade_color(self: object) -> str:
+    def _get_grade_color(self) -> str:
         """Get color for the grade."""
         grade = self._get_quality_grade()
         colors = {
@@ -246,25 +248,32 @@ class FlextQualityReportGenerator:
         }
         return colors.get(grade, "#757575")
 
-    def _get_total_issues(self: object) -> int:
+    def _get_total_issues(self) -> int:
         """Get total number of issues."""
         # Use modern FlextQualityTypes.AnalysisResults API only
         return self.results.total_issues
 
-    def _get_critical_issues(self: object) -> int:
+    def _get_critical_issues(self) -> int:
         """Get number of critical issues."""
-        # Use modern FlextQualityTypes.AnalysisResults API only
-        return self.results.critical_issues
+        # Count high severity issues across all categories
+        critical_count = 0
+        for issue in self.results.security_issues:
+            if getattr(issue, "severity", None) == IssueSeverity.CRITICAL:
+                critical_count += 1
+        for issue in self.results.complexity_issues:
+            if getattr(issue, "severity", None) == IssueSeverity.CRITICAL:
+                critical_count += 1
+        return critical_count
 
-    def _get_files_analyzed(self: object) -> int:
+    def _get_files_analyzed(self) -> int:
         """Get number of files analyzed."""
-        return self.results.overall_metrics.files_analyzed
+        return int(self.results.overall_metrics.get("files_analyzed", 0))
 
-    def _get_coverage_percent(self: object) -> float:
+    def _get_coverage_percent(self) -> float:
         """Get code coverage percentage."""
-        return self.results.overall_metrics.coverage_score
+        return float(self.results.overall_metrics.get("coverage_score", 0.0))
 
-    def _generate_issues_html(self: object) -> str:
+    def _generate_issues_html(self) -> str:
         """Generate HTML for issues section."""
         html_parts: FlextTypes.StringList = FlextQualityUtilities.create_report_lines()
         issue_categories: dict[str, FlextTypes.List] = {
@@ -326,7 +335,7 @@ class FlextQualityReportGenerator:
 
         return "\n".join(html_parts)
 
-    def _generate_recommendations(self: object) -> FlextTypes.StringList:
+    def _generate_recommendations(self) -> FlextTypes.StringList:
         """Generate recommendations based on analysis results."""
         recommendations: FlextTypes.StringList = (
             FlextQualityUtilities.create_report_lines()

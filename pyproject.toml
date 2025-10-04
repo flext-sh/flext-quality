@@ -18,6 +18,8 @@
     dependencies = [
         "pydantic (>=2.11.7)",
         "pydantic-settings (>=2.10.1)",
+        "pyright (>=1.1.406,<2.0.0)",
+        "mypy (>=1.18.2,<2.0.0)",
     ]
     description = "FLEXT Quality - Code Quality Analysis and Metrics"
     keywords = [
@@ -86,6 +88,19 @@
 [tool.ruff]
     extend = "../ruff-shared.toml"
 
+    [tool.ruff.lint.per-file-ignores]
+        # Suppress subprocess security warnings for files that legitimately use subprocess
+        "src/flext_quality/external_backend.py" = ["S404", "S603", "S607"]
+        "src/flext_quality/tools/git.py" = ["S404", "S603", "S607"]
+        "src/flext_quality/tools/optimizer_operations.py" = ["S404", "S603", "S607", "SLF001", "PLR2004", "N806", "FURB118", "SIM102", "PLC0415"]
+        "src/flext_quality/tools/quality_operations.py" = ["S404", "S603", "S607"]
+        # CLI is allowed to use lazy imports and asserts for type narrowing
+        "src/flext_quality/cli.py" = ["PLC0415", "S101"]
+        # Examples are allowed to use print statements and magic values
+        "examples/**/*.py" = ["T201", "PLR2004"]
+        # Tests are allowed to use assert statements, access private members, use magic values, insecure temp files, hardcoded secrets, complex assertions, and be in implicit namespace packages
+        "tests/**/*.py" = ["S101", "SLF001", "INP001", "PLR2004", "S108", "PT018", "S105"]
+
     [tool.poetry.dependencies]
         python = ">=3.13,<3.14"
 
@@ -152,15 +167,15 @@
             develop = true
             path    = "../flext-core"
 
-        [tool.poetry.dependencies.flext-observability]
+                [tool.poetry.dependencies.flext-observability]
             develop = true
             path    = "../flext-observability"
 
-        [tool.poetry.dependencies.flext-web]
+                        [tool.poetry.dependencies.flext-web]
             develop = true
             path    = "../flext-web"
 
-        [tool.poetry.dependencies.flext-cli]
+                                [tool.poetry.dependencies.flext-cli]
             develop = true
             path    = "../flext-cli"
 

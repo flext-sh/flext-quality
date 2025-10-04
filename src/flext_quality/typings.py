@@ -17,9 +17,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Literal
 
+from flext_core import FlextModels, FlextTypes
 from pydantic import BaseModel, Field
 
-from flext_core import FlextModels, FlextTypes
 from flext_quality.value_objects import (
     FlextIssueSeverity as IssueSeverity,
 )

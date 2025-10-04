@@ -9,14 +9,13 @@ from enum import StrEnum
 from pathlib import Path
 from typing import override
 
-from pydantic import Field
-
 from flext_core import (
     FlextContainer,
     FlextLogger,
     FlextModels,
     FlextResult,
 )
+from pydantic import Field
 
 # Quality Score Constants
 MIN_QUALITY_SCORE = 0.0

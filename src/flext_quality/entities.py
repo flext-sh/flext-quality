@@ -10,9 +10,9 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import override
 
+from flext_core import FlextContainer, FlextLogger, FlextResult
 from pydantic import BaseModel, Field
 
-from flext_core import FlextContainer, FlextLogger, FlextResult
 from flext_quality.typings import FlextQualityTypes
 from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
 

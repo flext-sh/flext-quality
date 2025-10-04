@@ -15,6 +15,7 @@ from datetime import UTC, datetime
 from typing import override
 from uuid import UUID
 
+from flext_core import FlextContainer, FlextLogger, FlextModels, FlextTypes
 from pydantic import (
     ConfigDict,
     Field,
@@ -25,7 +26,6 @@ from pydantic import (
     model_validator,
 )
 
-from flext_core import FlextContainer, FlextLogger, FlextModels, FlextTypes
 from flext_quality.constants import FlextQualityConstants
 
 
@@ -172,7 +172,7 @@ class FlextQualityModels(FlextModels):
         self._container = FlextContainer.get_global()
         self._logger = FlextLogger(__name__)
 
-    class ProjectModel(FlextModels.Config):
+    class ProjectModel(FlextModels.BaseModel):
         """Pydantic model for quality project representation."""
 
         model_config = ConfigDict(
@@ -260,7 +260,7 @@ class FlextQualityModels(FlextModels):
                 raise ValueError(msg)
             return v.strip()
 
-    class AnalysisModel(FlextModels.Config):
+    class AnalysisModel(FlextModels.BaseModel):
         """Pydantic model for quality analysis representation."""
 
         model_config = ConfigDict(
@@ -433,7 +433,7 @@ class FlextQualityModels(FlextModels):
             """Ensure scores are within valid range."""
             return max(0.0, min(100.0, v))
 
-    class IssueModel(FlextModels.Config):
+    class IssueModel(FlextModels.BaseModel):
         """Pydantic model for quality issue representation."""
 
         model_config = ConfigDict(
@@ -583,7 +583,7 @@ class FlextQualityModels(FlextModels):
                 raise ValueError(msg)
             return v
 
-    class ReportModel(FlextModels.Config):
+    class ReportModel(FlextModels.BaseModel):
         """Pydantic model for quality report representation."""
 
         model_config = ConfigDict(
@@ -718,7 +718,7 @@ class FlextQualityModels(FlextModels):
             }
             return capabilities_map.get(self.format_type, [])
 
-    class ConfigModel(FlextModels.Config):
+    class ConfigModel(FlextModels.BaseModel):
         """Pydantic model for analysis configuration."""
 
         model_config = ConfigDict(
@@ -928,6 +928,74 @@ class FlextQualityModels(FlextModels):
         def validate_percentage(cls, v: float) -> float:
             """Ensure percentage values are within valid range."""
             return max(0.0, min(100.0, v))
+
+    # ==== INTERNAL TOOLS MODELS (from flext_tools migration) ====
+
+    class GitOperation(FlextModels.Command):
+        """Git operation command for quality tools."""
+
+        repo_path: str
+        operation_type: str
+        dry_run: bool = True
+        temp_path: str | None = None
+
+    class RewriteResult(FlextModels.Value):
+        """Git history rewrite result."""
+
+        commits_processed: int
+        commits_changed: int
+        success: bool
+        errors: list[str]
+
+    class OptimizationTarget(FlextModels.Entity):
+        """Target for optimization."""
+
+        project_path: str
+        module_name: str
+        file_path: str
+        optimization_type: str
+        priority: int = 1
+
+    class OptimizationResult(FlextModels.Value):
+        """Result of optimization operation."""
+
+        target: FlextQualityModels.OptimizationTarget
+        success: bool
+        changes_made: int
+        errors: list[str]
+        warnings: list[str]
+
+    class QualityCheckResult(FlextModels.Value):
+        """Quality check result."""
+
+        lint_passed: bool
+        type_check_passed: bool
+        coverage: float
+        violations: list[str]
+
+    class ValidationResult(FlextModels.Value):
+        """Validation result."""
+
+        passed: bool
+        checks_run: int
+        checks_passed: int
+        failures: list[str]
+
+    class AnalysisResult(FlextModels.Value):
+        """Architecture analysis result."""
+
+        violations: list[str]
+        suggestions: list[str]
+        complexity_score: float
+        domain_library_usage: dict[str, bool]
+
+    class DependencyInfo(FlextModels.Value):
+        """Dependency information."""
+
+        name: str
+        version: str
+        source: str
+        required_by: list[str]
 
 
 # Backward compatibility aliases for existing code

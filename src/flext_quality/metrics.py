@@ -7,10 +7,11 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import contextlib
-
-from pydantic import Field
+from typing import cast
 
 from flext_core import FlextModels, FlextResult, FlextTypes
+from pydantic import Field
+
 from flext_quality.grade_calculator import QualityGradeCalculator
 from flext_quality.typings import FlextQualityTypes
 
@@ -126,7 +127,7 @@ class QualityMetrics(FlextModels.Value):
     )
 
     @classmethod
-    def create_default(cls: object) -> QualityMetrics:
+    def create_default(cls) -> QualityMetrics:
         """Create QualityMetrics with all default values explicitly set.
 
         This factory method ensures all fields are explicitly provided to avoid
@@ -158,7 +159,7 @@ class QualityMetrics(FlextModels.Value):
         )
 
     @classmethod
-    def create(
+    def create_with_defaults(
         cls,
         *,
         overall_score: float = 0.0,
@@ -314,7 +315,10 @@ class QualityMetrics(FlextModels.Value):
                 return int(value)
             return default
 
-        metrics: FlextQualityTypes.Core.MetricsDict = results.get("metrics", {})
+        metrics_raw = results.get("metrics", {})
+        metrics: FlextQualityTypes.Core.MetricsDict = cast(
+            "FlextQualityTypes.Core.MetricsDict", metrics_raw
+        )
         if isinstance(metrics, dict):
             files_analyzed = get_int_from_dict(metrics, "total_files", 0)
             total_lines_of_code = get_int_from_dict(metrics, "total_lines_of_code", 0)
@@ -328,12 +332,20 @@ class QualityMetrics(FlextModels.Value):
             total_classes = get_int_from_dict(results, "total_classes", 0)
 
         # Extract issue counts from nested dict structure
-        issues: FlextQualityTypes.Core.IssueDict = results.get("issues", {})
+        issues_raw = results.get("issues", {})
+        issues: FlextQualityTypes.Core.IssueDict = cast(
+            "FlextQualityTypes.Core.IssueDict", issues_raw
+        )
         if isinstance(issues, dict):
-            security_issues: FlextTypes.List = len(issues.get("security", []))
-            complexity_issues: FlextTypes.List = len(issues.get("complexity", []))
-            dead_code_issues: FlextTypes.List = len(issues.get("dead_code", []))
-            duplication_issues: FlextTypes.List = len(issues.get("duplicates", []))
+            security_list = cast("list", issues.get("security", []))
+            complexity_list = cast("list", issues.get("complexity", []))
+            dead_code_list = cast("list", issues.get("dead_code", []))
+            duplicates_list = cast("list", issues.get("duplicates", []))
+
+            security_issues: int = len(security_list)
+            complexity_issues: int = len(complexity_list)
+            dead_code_issues: int = len(dead_code_list)
+            duplication_issues: int = len(duplicates_list)
         else:
             security_issues = complexity_issues = dead_code_issues = (
                 duplication_issues
@@ -382,16 +394,17 @@ class QualityMetrics(FlextModels.Value):
         total_functions = 0  # Would need to be calculated from file metrics
         total_classes = 0  # Would need to be calculated from file metrics
 
-        # Complexity metrics
-        complexity_values = [
-            issue.complexity_value for issue in results.complexity_issues
+        # Complexity metrics - using getattr for type safety
+        complexity_values: list[int] = [
+            int(getattr(issue, "complexity_value", 0))
+            for issue in results.complexity_issues
         ]
         avg_complexity = (
             sum(complexity_values) / len(complexity_values)
             if complexity_values
             else 0.0
         )
-        max_complexity = max(complexity_values) if complexity_values else 0.0
+        max_complexity = float(max(complexity_values)) if complexity_values else 0.0
 
         # Issue counts
         security_count = len(results.security_issues)
@@ -400,10 +413,10 @@ class QualityMetrics(FlextModels.Value):
         complexity_count = len(results.complexity_issues)
 
         # Calculate component scores
-        complexity_score = max(0, 100 - (avg_complexity * 5))
-        security_score = max(0, 100 - (security_count * 10))
-        maintainability_score = max(0, 100 - (complexity_count * 5))
-        duplication_score = max(0, 100 - (duplicate_count * 10))
+        complexity_score = max(0.0, 100.0 - (avg_complexity * 5))
+        security_score = max(0.0, 100.0 - (security_count * 10))
+        maintainability_score = max(0.0, 100.0 - (complexity_count * 5))
+        duplication_score = max(0.0, 100.0 - (duplicate_count * 10))
         documentation_score = 75.0  # Placeholder
 
         # Overall score (weighted average)
@@ -463,29 +476,29 @@ class QualityMetrics(FlextModels.Value):
         """Create QualityMetrics instance with all parameters."""
         return cls.model_validate(
             {
-                "overall_score": "overall_score",
-                "quality_grade": "quality_grade",
-                "total_files": "total_files",
-                "total_lines_of_code": "total_loc",
-                "total_functions": "total_functions",
-                "total_classes": "total_classes",
-                "average_complexity": "avg_complexity",
-                "max_complexity": "max_complexity",
-                "complex_files_count": "complexity_count",
-                "security_issues_count": "security_count",
-                "dead_code_items_count": "dead_code_count",
-                "duplicate_blocks_count": "duplicate_count",
-                "complexity_issues_count": "complexity_count",
-                "complexity_score": "complexity_score",
-                "security_score": "security_score",
-                "maintainability_score": "maintainability_score",
-                "duplication_score": "duplication_score",
-                "documentation_score": "documentation_score",
+                "overall_score": _overall_score,
+                "quality_grade": _quality_grade,
+                "total_files": _total_files,
+                "total_lines_of_code": _total_loc,
+                "total_functions": _total_functions,
+                "total_classes": _total_classes,
+                "average_complexity": _avg_complexity,
+                "max_complexity": _max_complexity,
+                "complex_files_count": _complexity_count,
+                "security_issues_count": _security_count,
+                "dead_code_items_count": _dead_code_count,
+                "duplicate_blocks_count": _duplicate_count,
+                "complexity_issues_count": _complexity_count,
+                "complexity_score": _complexity_score,
+                "security_score": _security_score,
+                "maintainability_score": _maintainability_score,
+                "duplication_score": _duplication_score,
+                "documentation_score": _documentation_score,
             },
         )
 
     @property
-    def scores_summary(self: object) -> FlextTypes.FloatDict:
+    def scores_summary(self) -> FlextTypes.FloatDict:
         """Get comprehensive summary of quality scores by category.
 
         Provides a structured view of all quality category scores for
@@ -513,7 +526,7 @@ class QualityMetrics(FlextModels.Value):
         }
 
     @property
-    def total_issues(self: object) -> int:
+    def total_issues(self) -> int:
         """Calculate total count of all detected quality issues.
 
         Aggregates issue counts across all analysis categories to provide
@@ -582,7 +595,7 @@ class QualityMetrics(FlextModels.Value):
         _ = (by_alias, exclude_none)
         return base
 
-    def get_summary(self: object) -> str:
+    def get_summary(self) -> str:
         """Generate human-readable quality metrics summary.
 
         Creates a formatted text summary of key quality metrics suitable
@@ -614,7 +627,7 @@ class QualityMetrics(FlextModels.Value):
     # Architecture Note: Grade calculation centralized in QualityGradeCalculator
     # for consistency across FLEXT ecosystem quality services
 
-    def validate_business_rules(self: object) -> FlextResult[None]:
+    def validate_business_rules(self) -> FlextResult[None]:
         """Validate quality metrics against domain business rules.
 
         Performs comprehensive validation of all metric values against

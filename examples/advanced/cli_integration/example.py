@@ -19,7 +19,8 @@ import tempfile
 from pathlib import Path
 
 from flext_core import FlextTypes
-from flext_quality import main as quality_main
+
+# Note: CLI is lazy-loaded, don't import main directly
 from flext_quality.typings import FlextQualityTypes
 
 
@@ -47,6 +48,7 @@ def run_cli_analysis(
 
     try:
         # Execute CLI via in-process API, capturing stdout
+        from flext_quality.cli import main as quality_main
 
         stdout = io.StringIO()
         stderr = io.StringIO()
@@ -103,28 +105,35 @@ def check_quality_thresholds(results: FlextTypes.Dict) -> FlextTypes.Dict:
     # Extract metrics for threshold checking using modern AnalysisResults API
     analysis_results = results.get("analysis_results", {})
 
-    # Convert dict to AnalysisResults object if needed
-    if isinstance(analysis_results, dict):
-        analysis_results = FlextQualityTypes.AnalysisResults(**analysis_results)
-
-    # Use modern AnalysisResults format
-    if hasattr(analysis_results, "security_issues"):
+    # Handle both dict and AnalysisResults object
+    if isinstance(analysis_results, FlextQualityTypes.AnalysisResults):
         # Modern AnalysisResults format
         security_count = len(analysis_results.security_issues)
         complexity_count = len(analysis_results.complexity_issues)
-        files_analyzed = analysis_results.overall_metrics.files_analyzed
+        files_analyzed = getattr(analysis_results.overall_metrics, "files_analyzed", 0)
 
         # Calculate critical issues from typed results
         critical_issues = security_count
         for issue in analysis_results.complexity_issues:
             if hasattr(issue, "severity") and getattr(issue, "severity", "") == "high":
                 critical_issues += 1
+
+        # Get total issues
+        total_issues = analysis_results.total_issues
     else:
         # Legacy dict format fallback
-        issues = analysis_results.get("issues", {})
+        issues = (
+            analysis_results.get("issues", {})
+            if isinstance(analysis_results, dict)
+            else {}
+        )
         security_count = len(issues.get("security", []))
         complexity_count = len(issues.get("complexity", []))
-        files_analyzed = analysis_results.get("files_analyzed", 0)
+        files_analyzed = (
+            analysis_results.get("files_analyzed", 0)
+            if isinstance(analysis_results, dict)
+            else 0
+        )
 
         # Calculate total critical issues (security + high complexity)
         critical_issues = security_count
@@ -132,18 +141,13 @@ def check_quality_thresholds(results: FlextTypes.Dict) -> FlextTypes.Dict:
             if isinstance(issue, dict) and issue.get("severity") == "high":
                 critical_issues += 1
 
-    # Mock quality score calculation (would come from actual analysis)
-    if hasattr(analysis_results, "total_issues"):
-        # Modern AnalysisResults format
-        total_issues = analysis_results.total_issues
-    else:
-        # Legacy dict format fallback
-        issues = analysis_results.get("issues", {})
+        # Calculate total issues
         total_issues = sum(
             len(issue_list)
             for issue_list in issues.values()
             if isinstance(issue_list, list)
         )
+
     estimated_score = max(0, 100 - (total_issues * 10) - (security_count * 20))
 
     # Check each threshold

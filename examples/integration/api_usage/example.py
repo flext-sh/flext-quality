@@ -12,28 +12,34 @@ This example demonstrates comprehensive usage of the FLEXT Quality API including
 This showcases complete API integration patterns for enterprise applications.
 """
 
-import asyncio
 import sys
 import tempfile
 from pathlib import Path
 
-from flext_observability import (
-    flext_create_log_entry,
-    flext_create_metric,
-    flext_create_trace,
-)
-
 from flext_core import FlextContainer, FlextLogger
+
+# Note: flext_observability imports are optional and may not be available
+try:
+    from flext_observability import (
+        flext_create_log_entry,
+        flext_create_metric,
+        flext_create_trace,
+    )
+
+    OBSERVABILITY_AVAILABLE = True
+except ImportError:
+    OBSERVABILITY_AVAILABLE = False
+
 from flext_quality import (
     CodeAnalyzer,
-    QualityAnalysisService,
     QualityAPI,
-    QualityIssueService,
     QualityMetrics,
-    QualityProjectService,
-    QualityReport,
-    QualityReportService,
 )
+
+# Import report generator
+from flext_quality.reports import FlextQualityReportGenerator
+
+# Import services from services module
 
 logger = FlextLogger(__name__)
 
@@ -119,7 +125,14 @@ if __name__ == "__main__":
         # 1. Direct CodeAnalyzer usage
 
         analyzer = CodeAnalyzer(str(project_path))
-        results = analyzer.analyze_project()
+        result = analyzer.analyze_project()
+
+        # Unwrap FlextResult
+        if result.is_failure:
+            logger.error(f"Analysis failed: {result.error}")
+            return
+
+        results = result.value
 
         analyzer.get_quality_score()
         analyzer.get_quality_grade()
@@ -134,7 +147,7 @@ if __name__ == "__main__":
 
         # 3. QualityReport generation
 
-        report = QualityReport(results)
+        report = FlextQualityReportGenerator(results)
 
         # Generate JSON report
         json_report = report.generate_json_report()
@@ -151,133 +164,14 @@ if __name__ == "__main__":
 
 
 def demonstrate_service_integration() -> None:
-    """Demonstrate advanced service integration patterns."""
-    # Initialize services
-    project_service = QualityProjectService()
-    analysis_service = QualityAnalysisService()
-    issue_service = QualityIssueService()
-    report_service = QualityReportService()
+    """Demonstrate advanced service integration patterns.
 
-    # Create a sample project using service
-
-    # Create project
-    with tempfile.TemporaryDirectory() as temp_dir:
-        project_result = project_service.create_project(
-            name="API Demo Project",
-            project_path=temp_dir,
-            language="python",
-        )
-
-        project = project_result.value if project_result.success else None
-
-        # Create analysis
-
-        analysis_result = analysis_service.create_analysis(project_id=project.id)
-
-        analysis = analysis_result.value if analysis_result.success else None
-
-        # Update analysis metrics
-        metrics_result = analysis_service.update_metrics(
-            analysis_id=analysis.id,
-            total_files=5,
-            total_lines=250,
-            code_lines=200,
-            comment_lines=30,
-            blank_lines=20,
-        )
-
-        _ = metrics_result.value if metrics_result.success else None  # Handle result
-
-        # Update quality scores
-        scores_result = analysis_service.update_scores(
-            analysis_id=analysis.id,
-            coverage_score=85.0,
-            complexity_score=78.0,
-            duplication_score=92.0,
-            security_score=95.0,
-            maintainability_score=80.0,
-        )
-
-        _ = scores_result.value if scores_result.success else None  # Handle result
-
-        # Create issues
-
-        # Create different types of issues
-        issues_data = [
-            {
-                "issue_type": "security",
-                "severity": "high",
-                "rule_id": "S001",
-                "file_path": "src/auth.py",
-                "line_number": 42,
-                "message": "Potential SQL injection vulnerability",
-            },
-            {
-                "issue_type": "complexity",
-                "severity": "medium",
-                "rule_id": "C001",
-                "file_path": "src/processor.py",
-                "line_number": 15,
-                "message": "Cyclomatic complexity too high (12)",
-            },
-            {
-                "issue_type": "style",
-                "severity": "low",
-                "rule_id": "E301",
-                "file_path": "src/utils.py",
-                "line_number": 8,
-                "message": "Expected 1 blank line, found 0",
-            },
-        ]
-
-        created_issues = []
-        for issue_data in issues_data:
-            issue_result = issue_service.create_issue(
-                analysis_id=analysis.id,
-                **issue_data,
-            )
-
-            issue = issue_result.value if issue_result.success else None
-            if issue is not None:
-                created_issues.append(issue)
-
-        # Update issue counts in analysis
-        issue_counts_result = analysis_service.update_issue_counts(
-            analysis_id=analysis.id,
-            critical=0,
-            high=1,
-            medium=1,
-            low=1,
-        )
-
-        _ = (
-            issue_counts_result.value if issue_counts_result.success else None
-        )  # Handle result
-
-        # Complete the analysis
-        complete_result = analysis_service.complete_analysis(analysis.id)
-
-        _ = complete_result.value if complete_result.success else None  # Handle result
-
-        # Create reports
-
-        # Create different report types
-        report_types = ["html", "json", "pdf"]
-
-        for report_type in report_types:
-            report_result = report_service.create_report(
-                analysis_id=analysis.id,
-                report_type=report_type,
-            )
-
-            _ = report_result.value if report_result.success else None  # Handle result
-
-        # List all reports for the analysis
-        reports_result = report_service.list_reports(analysis.id)
-
-        reports = reports_result.value if reports_result.success else []
-        for _report in reports:
-            pass
+    Note: Service integration APIs are under development.
+    This demo shows conceptual patterns only.
+    """
+    logger.info("Service integration patterns - conceptual demonstration")
+    logger.info("Services are available via FlextQualityServices class")
+    logger.info("For actual usage, see CodeAnalyzer and QualityMetrics examples")
 
 
 def demonstrate_flext_ecosystem_integration() -> None:
@@ -312,79 +206,64 @@ def process_data(data):
         try:
             # Use direct analyzer (QualityAPI is a simple wrapper)
             analyzer = CodeAnalyzer(str(project_path))
-            results = analyzer.analyze_project()
+            result = analyzer.analyze_project()
+
+            # Unwrap FlextResult
+            if result.is_failure:
+                logger.error(f"Analysis failed: {result.error}")
+                return
+
+            results = result.value
 
             analysis_data = {
                 "quality_score": analyzer.get_quality_score(),
                 "quality_grade": analyzer.get_quality_grade(),
-                "files_analyzed": results.overall_metrics.files_analyzed,
-                "total_lines": results.overall_metrics.total_lines,
+                "files_analyzed": getattr(results.overall_metrics, "files_analyzed", 0),
+                "total_lines": getattr(results.overall_metrics, "total_lines", 0),
                 "analysis_results": results,
             }
 
         except Exception:
             return
 
-        # Demonstrate observability integration
+        # Demonstrate observability integration (if available)
+        if OBSERVABILITY_AVAILABLE:
+            try:
+                # Create metrics
+                score_value = analysis_data.get("quality_score", 0.0)
+                if isinstance(score_value, (int, float)):
+                    flext_create_metric(
+                        name="quality_analysis_score",
+                        value=float(score_value),
+                    )
 
-        # Create metrics
-        flext_create_metric(
-            name="quality_analysis_score",
-            value=analysis_data.get("quality_score", 0.0),
-            tags={"project": "ecosystem_demo", "integration": "api"},
-        )
+                # Create trace
+                flext_create_trace(
+                    name="ecosystem_demo_analysis",
+                    operation="api.analyze_project",
+                )
 
-        # Create trace
-        flext_create_trace(
-            trace_id="ecosystem_demo_analysis",
-            operation="api.analyze_project",
-            config={"project_path": str(project_path)},
-        )
-
-        # Create log entry
-        flext_create_log_entry(
-            message="FLEXT Quality ecosystem integration demonstration completed",
-            level="info",
-            context={
-                "component": "quality_api",
-                "project": "ecosystem_demo",
-                "files_analyzed": analysis_data.get("files_analyzed", 0),
-            },
-        )
+                # Create log entry
+                flext_create_log_entry(
+                    message="FLEXT Quality ecosystem integration demonstration completed",
+                    level="info",
+                )
+            except Exception as e:
+                logger.warning(f"Observability integration failed: {e}")
 
         # Demonstrate container-based dependency injection
-
-        # Create container
+        logger.info("Container-based DI demonstration - using FlextContainer")
         container = FlextContainer()
 
-        # Register services
-        project_service_instance = QualityProjectService()
-        analysis_service_instance = QualityAnalysisService()
+        # Register quality analyzer
+        analyzer_instance = CodeAnalyzer(str(project_path))
+        container.register("quality_analyzer", analyzer_instance)
 
-        container.register("QualityProjectService", project_service_instance)
-        container.register("QualityAnalysisService", analysis_service_instance)
-
-        # Resolve services using current API
-        project_service_result = container.get("QualityProjectService")
-        project_service = (
-            project_service_result.value
-            if project_service_result.success
-            else QualityProjectService()
-        )
-
-        analysis_service_result = container.get("QualityAnalysisService")
-        analysis_service_result.value if analysis_service_result.success else QualityAnalysisService()
-
-        # Demonstrate service usage
-        with tempfile.TemporaryDirectory() as temp_service_dir:
-            project_result = project_service.create_project(
-                name="DI Demo Project",
-                project_path=temp_service_dir,
-            )
-
-            _ = (
-                project_result.value if project_result.success else None
-            )  # Handle result
+        # Resolve and use
+        analyzer_result = container.get("quality_analyzer")
+        if analyzer_result.is_success:
+            resolved_analyzer = analyzer_result.value
+            logger.info(f"Resolved analyzer from container: {type(resolved_analyzer)}")
 
 
 def demonstrate_custom_workflows() -> None:
@@ -530,12 +409,19 @@ if __name__ == "__main__":
         analyzer = CodeAnalyzer(str(project_path))
 
         # Step 2: Execute quality analysis
-        results = analyzer.analyze_project(
+        result = analyzer.analyze_project(
             include_security=True,
             include_complexity=True,
             include_dead_code=True,
             include_duplicates=True,
         )
+
+        # Unwrap FlextResult
+        if result.is_failure:
+            logger.error(f"Analysis failed: {result.error}")
+            return
+
+        results = result.value
 
         # Step 3: Process quality metrics
         metrics = QualityMetrics.from_analysis_results(results)
@@ -543,7 +429,7 @@ if __name__ == "__main__":
         analyzer.get_quality_grade()
 
         # Step 4: Generate comprehensive reports
-        report = QualityReport(results)
+        report = FlextQualityReportGenerator(results)
 
         json_report = report.generate_json_report()
         html_report = report.generate_html_report()
@@ -614,4 +500,4 @@ def main() -> int:
 
 
 if __name__ == "__main__":
-    sys.exit(asyncio.run(main()))
+    sys.exit(main())

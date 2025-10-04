@@ -9,8 +9,8 @@ from __future__ import annotations
 from uuid import uuid4
 
 import pytest
-
 from flext_core import FlextTypes
+
 from flext_quality import QualityAPI
 
 

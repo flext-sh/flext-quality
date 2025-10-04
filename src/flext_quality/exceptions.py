@@ -661,6 +661,106 @@ class FlextQualityExceptions(FlextExceptions):
                 correlation_id=correlation_id,
             )
 
+    # ==== INTERNAL TOOLS EXCEPTIONS (from flext_tools migration) ====
+
+    class GitOperationError(FlextExceptions.BaseError):
+        """Git operation error for quality tools."""
+
+        def __init__(
+            self,
+            message: str,
+            repo_path: str | None = None,
+        ) -> None:
+            """Initialize git operation error."""
+            super().__init__(message)
+            self.repo_path = repo_path
+
+    class OptimizationError(FlextExceptions.BaseError):
+        """Module optimization error."""
+
+        def __init__(
+            self,
+            message: str,
+            module_path: str | None = None,
+        ) -> None:
+            """Initialize optimization error."""
+            super().__init__(message)
+            self.module_path = module_path
+
+    class QualityGateFailure(FlextExceptions.ValidationError):
+        """Quality gate validation failure."""
+
+        def __init__(
+            self,
+            message: str,
+            violations: list[str],
+        ) -> None:
+            """Initialize quality gate failure."""
+            super().__init__(message)
+            self.violations = violations
+
+    class DomainLibraryViolation(FlextExceptions.ValidationError):
+        """Domain library usage violation."""
+
+        def __init__(
+            self,
+            message: str,
+            forbidden_import: str,
+            required_library: str,
+        ) -> None:
+            """Initialize domain library violation."""
+            super().__init__(message)
+            self.forbidden_import = forbidden_import
+            self.required_library = required_library
+
+    class ValidationFailure(FlextExceptions.ValidationError):
+        """General validation failure."""
+
+        def __init__(
+            self,
+            message: str,
+            failures: list[str],
+        ) -> None:
+            """Initialize validation failure."""
+            super().__init__(message)
+            self.failures = failures
+
+    class ArchitectureViolation(FlextExceptions.ValidationError):
+        """Architecture violation error."""
+
+        def __init__(
+            self,
+            message: str,
+            violation_type: str,
+        ) -> None:
+            """Initialize architecture violation."""
+            super().__init__(message)
+            self.violation_type = violation_type
+
+    class DependencyError(FlextExceptions.BaseError):
+        """Dependency management error."""
+
+        def __init__(
+            self,
+            message: str,
+            dependency_name: str | None = None,
+        ) -> None:
+            """Initialize dependency error."""
+            super().__init__(message)
+            self.dependency_name = dependency_name
+
+    class DryRunViolation(FlextExceptions.ValidationError):
+        """Dry-run mode violation."""
+
+        def __init__(
+            self,
+            message: str,
+            operation: str,
+        ) -> None:
+            """Initialize dry-run violation."""
+            super().__init__(message)
+            self.operation = operation
+
 
 # Backward compatibility aliases - property-based exports
 FlextQualityErrorCodes = FlextQualityExceptions.ErrorCodes

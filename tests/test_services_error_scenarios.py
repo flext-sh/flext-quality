@@ -10,11 +10,11 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections import UserDict
 from typing import Never, override
 from unittest.mock import patch
 
 import pytest
+from flext_core import FlextTypes
 
 from flext_quality import (
     IssueSeverity,
@@ -30,7 +30,7 @@ from tests.conftest import (
 
 
 # DRY pattern: Factory for exception-throwing dict classes with proper generics
-def create_exception_dict(exception: Exception) -> type[UserDict[str, object]]:
+def create_exception_dict(exception: Exception) -> type[FlextTypes.Dict]:
     """factory: Creates exception-throwing dict classes.
 
     Single Responsibility: Creates mock dict that raises specific exceptions
@@ -38,7 +38,7 @@ def create_exception_dict(exception: Exception) -> type[UserDict[str, object]]:
     Open/Closed: Extensible for different exception types without modification
     """
 
-    class ExceptionDict(UserDict[str, object]):
+    class ExceptionDict(FlextTypes.Dict):
         @override
         def get(self, key: str, default: object = None) -> Never:
             raise exception

@@ -15,6 +15,7 @@ from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from flext_core import FlextTypes
+
 from flext_quality import (
     AnalysisResults,
     CodeAnalyzer,

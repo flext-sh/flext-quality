@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 import shutil
-import subprocess  # noqa: S404 - subprocess used safely with validated arguments
+import subprocess
 import tempfile
 import warnings
 from importlib import import_module, util
@@ -16,6 +16,7 @@ from pathlib import Path
 from typing import override
 
 from flext_core import FlextResult, FlextTypes
+
 from flext_quality.backend_type import BackendType
 from flext_quality.base import BaseAnalyzer
 
@@ -130,7 +131,7 @@ class FlextQualityExternalBackend(BaseAnalyzer):
                 }  # Return empty dict if ruff is not available
 
             # Execute ruff with validated path and arguments only
-            result = subprocess.run(  # noqa: S603 - arguments are validated and safe
+            result = subprocess.run(
                 [ruff_path, "check", str(abs_file_path), "--output-format", "json"],
                 capture_output=True,
                 text=True,

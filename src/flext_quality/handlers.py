@@ -8,14 +8,18 @@ from __future__ import annotations
 from typing import override
 from uuid import UUID
 
+from flext_core import FlextLogger, FlextResult, FlextTypes
 from flext_observability import (
     flext_create_log_entry as _flext_create_log_entry,
     flext_create_trace as _flext_create_trace,
 )
 
-from flext_core import FlextLogger, FlextResult, FlextTypes
-from flext_quality.entities import QualityAnalysis, QualityReport
+from flext_quality.entities import FlextQualityEntities
 from flext_quality.services import FlextQualityServices
+
+# Type aliases for convenience
+QualityAnalysis = FlextQualityEntities.QualityAnalysis
+QualityReport = FlextQualityEntities.QualityReport
 
 
 class FlextQualityHandlers:
@@ -31,7 +35,9 @@ class FlextQualityHandlers:
         @staticmethod
         def create_log_entry(message: str, service: str, level: str) -> None:
             """Create log entry using flext-observability."""
-            _flext_create_log_entry(message=message, service=service, level=level)
+            # Note: service parameter not used by flext_create_log_entry API
+            _ = service
+            _flext_create_log_entry(message=message, level=level)
 
         @staticmethod
         def create_trace(
@@ -40,14 +46,15 @@ class FlextQualityHandlers:
             config: FlextTypes.StringDict,
         ) -> None:
             """Create trace using flext-observability."""
+            # Map to actual flext_create_trace API parameters
+            _ = config  # config parameter not used by API
             _flext_create_trace(
-                operation_name=operation_name,
-                service_name=service_name,
-                config=config,
+                name=service_name,
+                operation=operation_name,
             )
 
     @override
-    def __init__(self: object) -> None:
+    def __init__(self) -> None:
         """Initialize all services for handler operations."""
         self._services = FlextQualityServices()
         self._analysis_service = self._services.get_analysis_service()

@@ -11,6 +11,7 @@ from __future__ import annotations
 from typing import Protocol
 
 from flext_core import FlextResult
+
 from flext_quality.typings import FlextQualityTypes
 
 
@@ -48,6 +49,76 @@ class FlextQualityProtocols:
             thresholds: FlextQualityTypes.Analysis.AnalysisThresholds,
         ) -> FlextResult[bool]:
             """Validate analysis results against quality thresholds."""
+            ...
+
+    # ==== INTERNAL TOOLS PROTOCOLS (from flext_tools migration) ====
+
+    class GitService(Protocol):
+        """Git service protocol for quality tools."""
+
+        def execute(
+            self,
+            repo_path: str,
+            *,
+            dry_run: bool = True,
+            temp_path: str | None = None,
+        ) -> FlextResult[object]:
+            """Execute git operation with dry-run support."""
+            ...
+
+    class OptimizationStrategy(Protocol):
+        """Module optimization strategy protocol."""
+
+        def optimize(
+            self,
+            module_path: str,
+            *,
+            dry_run: bool = True,
+            temp_path: str | None = None,
+        ) -> FlextResult[object]:
+            """Optimize module with dry-run support."""
+            ...
+
+    class QualityChecker(Protocol):
+        """Quality checking protocol."""
+
+        def check(
+            self,
+            project_path: str,
+            config: dict | None = None,
+        ) -> FlextResult[object]:
+            """Run quality checks."""
+            ...
+
+    class Validator(Protocol):
+        """Validation protocol."""
+
+        def validate(
+            self,
+            target_path: str,
+        ) -> FlextResult[object]:
+            """Validate target."""
+            ...
+
+    class ArchitectureAnalyzer(Protocol):
+        """Architecture analysis protocol."""
+
+        def analyze(
+            self,
+            project_path: str,
+        ) -> FlextResult[object]:
+            """Analyze architecture."""
+            ...
+
+    class DependencyManager(Protocol):
+        """Dependency management protocol."""
+
+        def manage(
+            self,
+            project_path: str,
+            operation: str,
+        ) -> FlextResult[object]:
+            """Manage dependencies."""
             ...
 
 
