@@ -68,6 +68,24 @@ class FlextQualityAnalyzer(FlextService[None]):
         self.project_path = Path(project_path)
         self._current_results: FlextQualityTypes.AnalysisResults | None = None
 
+    @property
+    def logger(self) -> FlextLogger:
+        """Get logger with type narrowing."""
+        assert self._logger is not None  # noqa: S101
+        return self._logger
+
+    @property
+    def context(self) -> FlextContext:  # type: ignore[return]
+        """Get context with type narrowing."""
+        assert self._context is not None  # noqa: S101
+        return self._context  # type: ignore[return-value]
+
+    @property
+    def bus(self) -> FlextBus:  # type: ignore[return]
+        """Get bus with type narrowing."""
+        assert self._bus is not None  # noqa: S101
+        return self._bus  # type: ignore[return-value]
+
     def analyze_project(
         self,
         *,
@@ -88,17 +106,17 @@ class FlextQualityAnalyzer(FlextService[None]):
             FlextResult containing analysis results including metrics and issues.
 
         """
-        self._logger.info("Starting project analysis: %s", self.project_path)
+        self.logger.info("Starting project analysis: %s", self.project_path)
 
         # Set up analysis context
-        analysis_context = self._context.create_child("quality_analysis")
+        analysis_context = self.context.create_child("quality_analysis")  # type: ignore[attr-defined]
         analysis_context.set("project_path", str(self.project_path))
         analysis_context.set(
             "analysis_config", self._quality_config.get_analysis_config()
         )
 
         # Emit analysis started event
-        self._bus.publish(
+        self.bus.publish(
             "quality.analysis.started",
             {
                 "project_path": str(self.project_path),
@@ -180,7 +198,7 @@ class FlextQualityAnalyzer(FlextService[None]):
         )
 
         # Emit analysis completed event
-        self._bus.publish(
+        self.bus.publish(
             "quality.analysis.completed",
             {
                 "project_path": str(self.project_path),
@@ -197,7 +215,7 @@ class FlextQualityAnalyzer(FlextService[None]):
             },
         )
 
-        self._logger.info("Analysis completed for project: %s", self.project_path)
+        self.logger.info("Analysis completed for project: %s", self.project_path)
         return FlextResult.ok(results)
 
     def _find_python_files(self) -> list[Path]:
