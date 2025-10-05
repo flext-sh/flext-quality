@@ -14,8 +14,8 @@ from flext_observability import (
     flext_create_trace as _flext_create_trace,
 )
 
-from flext_quality.entities import FlextQualityEntities
-from flext_quality.services import FlextQualityServices
+from .entities import FlextQualityEntities
+from .services import FlextQualityServices
 
 # Type aliases for convenience
 QualityAnalysis = FlextQualityEntities.QualityAnalysis

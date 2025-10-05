@@ -13,10 +13,10 @@ from typing import override
 
 from flext_core import FlextTypes
 
-from flext_quality.grade_calculator import FlextQualityGradeCalculator
-from flext_quality.typings import FlextQualityTypes
-from flext_quality.utilities import FlextQualityUtilities
-from flext_quality.value_objects import IssueSeverity
+from .grade_calculator import FlextQualityGradeCalculator
+from .typings import FlextQualityTypes
+from .utilities import FlextQualityUtilities
+from .value_objects import IssueSeverity
 
 # Constants for display limits
 ISSUE_PREVIEW_LIMIT = 5

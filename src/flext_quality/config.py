@@ -13,7 +13,7 @@ from flext_core import FlextConfig, FlextConstants, FlextResult, FlextTypes
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import SettingsConfigDict
 
-from flext_quality.constants import FlextQualityConstants
+from .constants import FlextQualityConstants
 
 
 class FlextQualityConfig(FlextConfig):

@@ -9,7 +9,7 @@ from __future__ import annotations
 import warnings
 from typing import ClassVar
 
-from flext_quality.value_objects import FlextQualityGrade
+from .value_objects import FlextQualityGrade
 
 
 class FlextQualityGradeCalculator:

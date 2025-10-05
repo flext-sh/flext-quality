@@ -13,8 +13,8 @@ from typing import override
 from flext_core import FlextContainer, FlextLogger, FlextResult
 from pydantic import BaseModel, Field
 
-from flext_quality.typings import FlextQualityTypes
-from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
+from .typings import FlextQualityTypes
+from .value_objects import FlextIssueSeverity, FlextIssueType
 
 
 class FlextQualityEntities:

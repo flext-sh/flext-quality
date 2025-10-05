@@ -20,6 +20,9 @@ from pathlib import Path
 
 from flext_core import FlextTypes
 
+# CLI imports - lazy-loaded for performance
+from flext_quality.cli import main as quality_main
+
 # Note: CLI is lazy-loaded, don't import main directly
 from flext_quality.typings import FlextQualityTypes
 
@@ -48,8 +51,6 @@ def run_cli_analysis(
 
     try:
         # Execute CLI via in-process API, capturing stdout
-        from flext_quality.cli import main as quality_main
-
         stdout = io.StringIO()
         stderr = io.StringIO()
         exit_code: int

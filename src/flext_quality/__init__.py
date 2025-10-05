@@ -8,30 +8,30 @@ from __future__ import annotations
 
 from typing import Final
 
-# Core imports
-from flext_quality import exceptions
-
+# Core imports - moved to specific imports below to avoid circular import
 # Main modules
-from flext_quality.analyzer import FlextQualityAnalyzer as CodeAnalyzer
-from flext_quality.api import FlextQualityAPI as QualityAPI
-from flext_quality.ast_backend import (
+from .analyzer import FlextQualityAnalyzer as CodeAnalyzer
+from .api import FlextQualityAPI as QualityAPI
+from .ast_backend import (
     FlextQualityASTBackend as ASTBackend,
 )
-from flext_quality.backend_type import BackendType
-from flext_quality.base import BaseAnalyzer
+from .backend_type import BackendType
+from .base import BaseAnalyzer
 
 # CLI imports are lazy to avoid flext_cli dependency issues
-# Use: from flext_quality.cli import main
+# Use: from .cli import main
 # Instead of: from flext_quality import main
-from flext_quality.config import FlextQualityConfig
-from flext_quality.container import get_quality_container
-from flext_quality.entities import FlextQualityEntities
-from flext_quality.exceptions import (
+from .config import FlextQualityConfig
+from .constants import FlextQualityConstants
+from .container import get_quality_container
+from .entities import FlextQualityEntities
+from .exceptions import (
     FlextQualityAnalysisError,
     FlextQualityAuthenticationError,
     FlextQualityConfigurationError,
     FlextQualityConnectionError,
     FlextQualityError,
+    FlextQualityExceptions,
     FlextQualityGradeError,
     FlextQualityMetricsError,
     FlextQualityProcessingError,
@@ -39,24 +39,23 @@ from flext_quality.exceptions import (
     FlextQualityRuleError,
     FlextQualityTimeoutError,
     FlextQualityValidationError,
-    exceptions_all,
 )
-from flext_quality.external_backend import (
+from .external_backend import (
     FlextQualityExternalBackend as ExternalBackend,
 )
-from flext_quality.grade_calculator import QualityGradeCalculator
-from flext_quality.handlers import FlextQualityHandlers as FlextQualityHandler
-from flext_quality.integrations import FlextQualityIntegrations
-from flext_quality.metrics import QualityMetrics
-from flext_quality.models import FlextQualityReportModel
-from flext_quality.protocols import FlextQualityProtocols
-from flext_quality.reports import FlextQualityReportGenerator
-from flext_quality.services import FlextQualityServices
+from .grade_calculator import QualityGradeCalculator
+from .handlers import FlextQualityHandlers as FlextQualityHandler
+from .integrations import FlextQualityIntegrations
+from .metrics import QualityMetrics
+from .models import FlextQualityModels, FlextQualityReportModel
+from .protocols import FlextQualityProtocols
+from .reports import FlextQualityReportGenerator
+from .services import FlextQualityServices
 
 # Type system and aliases
-from flext_quality.typings import FlextQualityTypes
-from flext_quality.utilities import FlextQualityUtilities as QualityUtilities
-from flext_quality.value_objects import (
+from .typings import FlextQualityTypes
+from .utilities import FlextQualityUtilities as QualityUtilities
+from .value_objects import (
     ComplexityMetric,
     CoverageMetric,
     DuplicationMetric,
@@ -66,8 +65,8 @@ from flext_quality.value_objects import (
     QualityGrade,
     QualityScore,
 )
-from flext_quality.version import VERSION, FlextQualityVersion
-from flext_quality.web import FlextQualityWebInterface as QualityWebInterface
+from .version import VERSION, FlextQualityVersion
+from .web import FlextQualityWebInterface as QualityWebInterface
 
 # Type aliases for backward compatibility (deprecated - use FlextQualityTypes.*)
 AnalysisResults = FlextQualityTypes.AnalysisResults
@@ -118,11 +117,14 @@ __all__ = [
     "FlextQualityConfig",
     "FlextQualityConfigurationError",
     "FlextQualityConnectionError",
+    "FlextQualityConstants",
     "FlextQualityError",
+    "FlextQualityExceptions",
     "FlextQualityGradeError",
     "FlextQualityHandler",
     "FlextQualityIntegrations",
     "FlextQualityMetricsError",
+    "FlextQualityModels",
     "FlextQualityProcessingError",
     "FlextQualityProtocols",
     "FlextQualityReportError",
@@ -131,6 +133,7 @@ __all__ = [
     "FlextQualityRuleError",
     "FlextQualityServices",
     "FlextQualityTimeoutError",
+    "FlextQualityTypes",
     "FlextQualityValidationError",
     "FlextQualityVersion",
     "IssueLocation",
@@ -153,8 +156,7 @@ __all__ = [
     "TestResults",
     "__version__",
     "__version_info__",
-    "exceptions",
     "exceptions_all",
     "get_quality_container",
-    # CLI functions removed from __all__ - import directly from flext_quality.cli if needed
+    # CLI functions removed from __all__ - import directly from .cli if needed
 ]

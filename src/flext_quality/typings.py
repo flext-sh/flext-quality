@@ -20,7 +20,7 @@ from typing import Literal
 from flext_core import FlextModels, FlextTypes
 from pydantic import BaseModel, Field
 
-from flext_quality.value_objects import (
+from .value_objects import (
     FlextIssueSeverity as IssueSeverity,
 )
 

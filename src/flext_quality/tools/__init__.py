@@ -9,12 +9,12 @@ flext-quality's domain API and provide supporting functionality.
 
 from __future__ import annotations
 
-from flext_quality.tools.architecture import FlextQualityArchitectureTools
-from flext_quality.tools.dependencies import FlextQualityDependencyTools
-from flext_quality.tools.git import FlextQualityGitTools
-from flext_quality.tools.optimizer_operations import FlextQualityOptimizerOperations
-from flext_quality.tools.quality_operations import FlextQualityOperations
-from flext_quality.tools.utilities import (
+from .tools.architecture import FlextQualityArchitectureTools
+from .tools.dependencies import FlextQualityDependencyTools
+from .tools.git import FlextQualityGitTools
+from .tools.optimizer_operations import FlextQualityOptimizerOperations
+from .tools.quality_operations import FlextQualityOperations
+from .tools.utilities import (
     Colors,
     FlextQualityToolsUtilities,
     colorize,
@@ -25,7 +25,7 @@ from flext_quality.tools.utilities import (
     print_colored,
     should_ignore_path,
 )
-from flext_quality.tools.validation import FlextQualityValidationTools
+from .tools.validation import FlextQualityValidationTools
 
 __all__ = [
     # Utility components

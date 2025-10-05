@@ -27,8 +27,8 @@ from pathlib import Path
 from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
 from pydantic import ConfigDict
 
-from flext_quality.constants import FlextQualityConstants
-from flext_quality.models import FlextQualityModels
+from .constants import FlextQualityConstants
+from .models import FlextQualityModels
 
 
 class FlextQualityGitTools(FlextService[None]):
@@ -36,7 +36,7 @@ class FlextQualityGitTools(FlextService[None]):
 
     Example usage:
     ```python
-    from flext_quality.tools import FlextQualityGitTools
+    from .tools import FlextQualityGitTools
 
     git = FlextQualityGitTools()
 

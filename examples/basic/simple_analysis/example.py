@@ -35,6 +35,7 @@ from flext_quality import (
     CodeAnalyzer,
     QualityMetrics,
 )
+from flext_quality.reports import FlextQualityReportGenerator
 from flext_quality.typings import FlextQualityTypes
 
 # Initialize rich console for output
@@ -124,8 +125,6 @@ def _generate_reports(
 
     try:
         # Create QualityReport generator instance with proper parameters
-        from flext_quality.reports import FlextQualityReportGenerator
-
         _report = FlextQualityReportGenerator(_results)
 
         # Generate simple JSON report from results

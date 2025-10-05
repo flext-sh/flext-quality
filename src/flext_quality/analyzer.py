@@ -18,9 +18,9 @@ from flext_core import (
     FlextService,
 )
 
-from flext_quality.config import FlextQualityConfig
-from flext_quality.typings import FlextQualityTypes
-from flext_quality.value_objects import IssueSeverity
+from .config import FlextQualityConfig
+from .typings import FlextQualityTypes
+from .value_objects import IssueSeverity
 
 logger = FlextLogger(__name__)
 
@@ -71,20 +71,20 @@ class FlextQualityAnalyzer(FlextService[None]):
     @property
     def logger(self) -> FlextLogger:
         """Get logger with type narrowing."""
-        assert self._logger is not None  # noqa: S101
+        assert self._logger is not None
         return self._logger
 
     @property
-    def context(self) -> FlextContext:  # type: ignore[return]
+    def context(self) -> FlextContext:
         """Get context with type narrowing."""
-        assert self._context is not None  # noqa: S101
-        return self._context  # type: ignore[return-value]
+        assert self._context is not None
+        return self._context
 
     @property
-    def bus(self) -> FlextBus:  # type: ignore[return]
+    def bus(self) -> FlextBus:
         """Get bus with type narrowing."""
-        assert self._bus is not None  # noqa: S101
-        return self._bus  # type: ignore[return-value]
+        assert self._bus is not None
+        return self._bus
 
     def analyze_project(
         self,
@@ -109,7 +109,7 @@ class FlextQualityAnalyzer(FlextService[None]):
         self.logger.info("Starting project analysis: %s", self.project_path)
 
         # Set up analysis context
-        analysis_context = self.context.create_child("quality_analysis")  # type: ignore[attr-defined]
+        analysis_context = self.context.create_child("quality_analysis")
         analysis_context.set("project_path", str(self.project_path))
         analysis_context.set(
             "analysis_config", self._quality_config.get_analysis_config()

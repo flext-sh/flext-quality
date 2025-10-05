@@ -11,8 +11,8 @@ from pathlib import Path
 from flext_core import FlextModels, FlextTypes
 from pydantic import BaseModel, Field
 
-from flext_quality.typings import FlextQualityTypes
-from flext_quality.value_objects import (
+from .typings import FlextQualityTypes
+from .value_objects import (
     FlextIssueSeverity as IssueSeverity,
     FlextIssueType as IssueType,
 )

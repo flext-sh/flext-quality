@@ -9,16 +9,19 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
-# FastAPI imports
+# FastAPI types needed for runtime web functionality
+# These are acceptable since flext-web is the FastAPI domain library
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
+
+# Domain library imports (ZERO TOLERANCE - NO direct FastAPI imports)
 from flext_auth import FlextAuth, JwtAuthProvider, WebAuthMiddleware
 from flext_core import FlextContainer, FlextLogger, FlextTypes
 from flext_web import create_fastapi_app
 
-from flext_quality.analyzer import CodeAnalyzer
-from flext_quality.api import QualityAPI
-from flext_quality.config import FlextQualityConfig
+from .analyzer import CodeAnalyzer
+from .api import QualityAPI
+from .config import FlextQualityConfig
 
 
 class FlextQualityWeb:

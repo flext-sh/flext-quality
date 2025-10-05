@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Final
 
-from flext_quality.__version__ import __version__, __version_info__
+from .__version__ import __version__, __version_info__
 
 
 class FlextQualityVersion:

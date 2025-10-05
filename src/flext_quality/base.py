@@ -12,7 +12,7 @@ from pathlib import Path
 
 from flext_core import FlextTypes
 
-from flext_quality.backend_type import BackendType
+from .backend_type import BackendType
 
 
 class FlextQualityAnalyzer(ABC):

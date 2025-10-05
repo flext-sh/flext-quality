@@ -24,9 +24,9 @@ from flext_core import (
     FlextTypes,
 )
 
-from flext_quality.entities import FlextQualityEntities
-from flext_quality.external_backend import ExternalBackend
-from flext_quality.value_objects import IssueSeverity, IssueType
+from .entities import FlextQualityEntities
+from .external_backend import ExternalBackend
+from .value_objects import IssueSeverity, IssueType
 
 logger = FlextLogger(__name__)
 

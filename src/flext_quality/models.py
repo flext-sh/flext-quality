@@ -26,7 +26,7 @@ from pydantic import (
     model_validator,
 )
 
-from flext_quality.constants import FlextQualityConstants
+from .constants import FlextQualityConstants
 
 
 class FlextQualityModels(FlextModels):

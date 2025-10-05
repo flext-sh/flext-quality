@@ -31,11 +31,11 @@ from flext_core import (
     FlextService,
 )
 
-from flext_quality.analyzer import CodeAnalyzer
-from flext_quality.config import FlextQualityConfig
-from flext_quality.reports import QualityReport
-from flext_quality.typings import FlextQualityTypes
-from flext_quality.web import FlextQualityWebInterface
+from .analyzer import CodeAnalyzer
+from .config import FlextQualityConfig
+from .reports import QualityReport
+from .typings import FlextQualityTypes
+from .web import FlextQualityWebInterface
 
 # Quality score thresholds
 MIN_ACCEPTABLE_QUALITY_SCORE = 70
@@ -44,15 +44,14 @@ MIN_ACCEPTABLE_QUALITY_SCORE = 70
 FLEXT_CLI_AVAILABLE = True
 
 # Lazy-loaded CLI API instance for table creation
-_cli_api_instance: FlextCli | None = None
+_cli_api_holder = [None]  # Use list to avoid global statement
 
 
 def _get_cli_api() -> FlextCli:
     """Get CLI API instance with lazy loading."""
-    global _cli_api_instance
-    if _cli_api_instance is None:
-        _cli_api_instance = FlextCli()
-    return _cli_api_instance
+    if _cli_api_holder[0] is None:
+        _cli_api_holder[0] = FlextCli()
+    return _cli_api_holder[0]
 
 
 class FlextQualityCliService(FlextService[int]):

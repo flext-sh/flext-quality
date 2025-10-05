@@ -10,12 +10,12 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from flext_core import FlextResult
+from flext_core import FlextProtocols, FlextResult
 
-from flext_quality.typings import FlextQualityTypes
+from .typings import FlextQualityTypes
 
 
-class FlextQualityProtocols:
+class FlextQualityProtocols(FlextProtocols):
     """Quality analysis protocol definitions."""
 
     class QualityAnalyzer(Protocol):

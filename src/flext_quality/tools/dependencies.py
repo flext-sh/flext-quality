@@ -14,7 +14,7 @@ from __future__ import annotations
 from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
 from pydantic import ConfigDict
 
-from flext_quality.models import FlextQualityModels
+from .models import FlextQualityModels
 
 
 class FlextQualityDependencyTools(FlextService[None]):

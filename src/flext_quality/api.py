@@ -13,7 +13,6 @@ from flext_core import (
     FlextBus,
     FlextContainer,
     FlextContext,
-    FlextCqrs,
     FlextDispatcher,
     FlextLogger,
     FlextProcessors,
@@ -23,11 +22,11 @@ from flext_core import (
     FlextTypes,
 )
 
-from flext_quality.analyzer import CodeAnalyzer
-from flext_quality.entities import FlextQualityEntities
-from flext_quality.services import FlextQualityServices
-from flext_quality.typings import FlextQualityTypes
-from flext_quality.value_objects import FlextIssueSeverity, FlextIssueType
+from .analyzer import CodeAnalyzer
+from .entities import FlextQualityEntities
+from .services import FlextQualityServices
+from .typings import FlextQualityTypes
+from .value_objects import FlextIssueSeverity, FlextIssueType
 
 # Create aliases to match __init__.py exports
 QualityAnalysis = FlextQualityEntities.QualityAnalysis
@@ -62,7 +61,6 @@ class FlextQualityAPI(FlextService[None]):
         self._dispatcher = FlextDispatcher()
         self._processors = FlextProcessors()
         self._registry = FlextRegistry(dispatcher=self._dispatcher)
-        self._cqrs = FlextCqrs()
         self._logger = FlextLogger(__name__)
 
         # Domain services

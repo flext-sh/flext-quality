@@ -12,8 +12,8 @@ from typing import cast
 from flext_core import FlextModels, FlextResult, FlextTypes
 from pydantic import Field
 
-from flext_quality.grade_calculator import QualityGradeCalculator
-from flext_quality.typings import FlextQualityTypes
+from .grade_calculator import QualityGradeCalculator
+from .typings import FlextQualityTypes
 
 # Constants
 MAX_QUALITY_SCORE = 100

@@ -12,10 +12,10 @@ from typing import override
 
 from flext_core import FlextContainer, FlextLogger, FlextTypes
 
-from flext_quality.ast_class_info import ClassInfo
-from flext_quality.ast_function_info import FunctionInfo
-from flext_quality.backend_type import BackendType
-from flext_quality.base import BaseAnalyzer
+from .ast_class_info import ClassInfo
+from .ast_function_info import FunctionInfo
+from .backend_type import BackendType
+from .base import BaseAnalyzer
 
 
 class FlextQualityASTBackend(BaseAnalyzer):
