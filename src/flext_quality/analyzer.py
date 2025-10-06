@@ -20,7 +20,7 @@ from flext_core import (
 
 from .config import FlextQualityConfig
 from .constants import FlextQualityConstants
-from .typings import FlextQualityTypes
+from .models import FlextQualityModels
 
 
 class FlextQualityAnalyzer(FlextService[None]):
@@ -36,7 +36,7 @@ class FlextQualityAnalyzer(FlextService[None]):
     _logger: FlextLogger | None
     _quality_config: FlextQualityConfig
     project_path: Path
-    _current_results: FlextQualityTypes.AnalysisResults | None
+    _current_results: FlextQualityModels.AnalysisResults | None
 
     def __init__(
         self, project_path: str | Path, config: FlextQualityConfig | None = None
@@ -58,7 +58,7 @@ class FlextQualityAnalyzer(FlextService[None]):
 
         self._quality_config = config or FlextQualityConfig()
         self.project_path = Path(project_path)
-        self._current_results: FlextQualityTypes.AnalysisResults | None = None
+        self._current_results: FlextQualityModels.AnalysisResults | None = None
 
     @property
     def logger(self) -> FlextLogger:
@@ -81,7 +81,7 @@ class FlextQualityAnalyzer(FlextService[None]):
         include_complexity: bool = True,
         include_dead_code: bool = True,
         include_duplicates: bool = True,
-    ) -> FlextQualityTypes.AnalysisResults:
+    ) -> FlextQualityModels.AnalysisResults:
         """Analyze entire project for quality metrics and issues.
 
         Args:
@@ -110,7 +110,7 @@ class FlextQualityAnalyzer(FlextService[None]):
         python_files = self._find_python_files()
 
         # Analyze each file
-        file_metrics: list[FlextQualityTypes.FileAnalysisResult] = []
+        file_metrics: list[FlextQualityModels.FileAnalysisResult] = []
         total_lines = 0
         analysis_errors = 0
 
@@ -148,7 +148,7 @@ class FlextQualityAnalyzer(FlextService[None]):
         )
 
         # Store results
-        results = FlextQualityTypes.AnalysisResults(
+        results = FlextQualityModels.AnalysisResults(
             overall_metrics=overall_metrics,
             file_metrics=file_metrics,
             code_issues=[issue for issue in issues if issue.issue_type == "CODE"],
@@ -186,7 +186,7 @@ class FlextQualityAnalyzer(FlextService[None]):
         include_security: bool = True,
         include_complexity: bool = True,
         include_dead_code: bool = True,
-    ) -> FlextResult[FlextQualityTypes.FileAnalysisResult]:
+    ) -> FlextResult[FlextQualityModels.FileAnalysisResult]:
         """Analyze a single Python file."""
         try:
             with file_path.open(encoding="utf-8") as f:
@@ -209,7 +209,7 @@ class FlextQualityAnalyzer(FlextService[None]):
             dead_code_lines = self._detect_dead_code(tree) if include_dead_code else 0
 
             return FlextResult.ok(
-                FlextQualityTypes.FileAnalysisResult(
+                FlextQualityModels.FileAnalysisResult(
                     file_path=file_path,
                     lines_of_code=lines_of_code,
                     complexity_score=complexity_score,
@@ -254,7 +254,8 @@ class FlextQualityAnalyzer(FlextService[None]):
         for node in ast.walk(tree):
             if (
                 isinstance(node, ast.FunctionDef)
-                and len(node.name) > FlextQualityConstants.Analysis.MAX_FUNCTION_NAME_LENGTH
+                and len(node.name)
+                > FlextQualityConstants.Analysis.MAX_FUNCTION_NAME_LENGTH
             ):
                 issues += 1
         return issues
@@ -271,11 +272,13 @@ class FlextQualityAnalyzer(FlextService[None]):
         return dead_lines
 
     def _calculate_overall_metrics(
-        self, file_metrics: list[FlextQualityTypes.FileAnalysisResult], total_lines: int
-    ) -> FlextQualityTypes.OverallMetrics:
+        self,
+        file_metrics: list[FlextQualityModels.FileAnalysisResult],
+        total_lines: int,
+    ) -> FlextQualityModels.OverallMetrics:
         """Calculate overall project metrics."""
         if not file_metrics:
-            return FlextQualityTypes.OverallMetrics(
+            return FlextQualityModels.OverallMetrics(
                 files_analyzed=0,
                 total_lines=0,
                 functions_count=0,
@@ -292,7 +295,7 @@ class FlextQualityAnalyzer(FlextService[None]):
         total_complexity = sum(m.complexity_score for m in file_metrics)
         total_security_issues = sum(m.security_issues for m in file_metrics)
 
-        return FlextQualityTypes.OverallMetrics(
+        return FlextQualityModels.OverallMetrics(
             files_analyzed=len(file_metrics),
             total_lines=total_lines,
             functions_count=sum(1 for _ in file_metrics),  # Simplified
@@ -308,17 +311,17 @@ class FlextQualityAnalyzer(FlextService[None]):
 
     def _collect_issues(
         self,
-        file_metrics: list[FlextQualityTypes.FileAnalysisResult],
+        file_metrics: list[FlextQualityModels.FileAnalysisResult],
         *,
         include_duplicates: bool,
-    ) -> list[FlextQualityTypes.CodeIssue]:
+    ) -> list[FlextQualityModels.CodeIssue]:
         """Collect all issues from file metrics."""
-        issues: list[FlextQualityTypes.CodeIssue] = []
+        issues: list[FlextQualityModels.CodeIssue] = []
 
         for metrics in file_metrics:
             # Add security issues
             security_issues = [
-                FlextQualityTypes.CodeIssue(
+                FlextQualityModels.CodeIssue(
                     file_path=str(metrics.file_path),
                     line_number=1,  # Simplified
                     issue_type="SECURITY",
@@ -336,7 +339,7 @@ class FlextQualityAnalyzer(FlextService[None]):
                 > FlextQualityConstants.Complexity.MAX_COMPLEXITY
             ):  # Default complexity threshold
                 issues.append(
-                    FlextQualityTypes.CodeIssue(
+                    FlextQualityModels.CodeIssue(
                         file_path=str(metrics.file_path),
                         line_number=1,  # Simplified
                         issue_type="COMPLEXITY",
@@ -353,9 +356,9 @@ class FlextQualityAnalyzer(FlextService[None]):
 
         return issues
 
-    def _detect_duplications(self) -> list[FlextQualityTypes.CodeIssue]:
+    def _detect_duplications(self) -> list[FlextQualityModels.CodeIssue]:
         """Detect code duplications across files."""
-        issues: list[FlextQualityTypes.CodeIssue] = []
+        issues: list[FlextQualityModels.CodeIssue] = []
         python_files = self._find_python_files()
 
         file_contents: dict[Path, str] = {}
@@ -377,7 +380,7 @@ class FlextQualityAnalyzer(FlextService[None]):
         # Check for duplications between file pairs
         file_list = list(file_contents.keys())
         duplication_issues = [
-            FlextQualityTypes.CodeIssue(
+            FlextQualityModels.CodeIssue(
                 file_path=str(file1),
                 line_number=1,
                 issue_type="DUPLICATION",
@@ -425,19 +428,19 @@ class FlextQualityAnalyzer(FlextService[None]):
 
     def get_last_analysis_result(
         self,
-    ) -> FlextResult[FlextQualityTypes.AnalysisResults]:
+    ) -> FlextResult[FlextQualityModels.AnalysisResults]:
         """Get the result of the last analysis."""
         if not self._current_results:
             return FlextResult.fail("No analysis results available")
         return FlextResult.ok(self._current_results)
 
-    def _analyze_security(self) -> list[FlextQualityTypes.CodeIssue]:
+    def _analyze_security(self) -> list[FlextQualityModels.CodeIssue]:
         """Analyze security issues in the project."""
         if not self._current_results:
             return []
         # Convert SecurityIssue to CodeIssue for compatibility
         return [
-            FlextQualityTypes.CodeIssue(
+            FlextQualityModels.CodeIssue(
                 file_path=issue.file_path,
                 line_number=issue.line_number,
                 issue_type="SECURITY",
@@ -449,11 +452,11 @@ class FlextQualityAnalyzer(FlextService[None]):
         ]
 
     def _analyze_complexity(
-        self, file_metrics: list[FlextQualityTypes.FileAnalysisResult]
-    ) -> list[FlextQualityTypes.CodeIssue]:
+        self, file_metrics: list[FlextQualityModels.FileAnalysisResult]
+    ) -> list[FlextQualityModels.CodeIssue]:
         """Analyze complexity issues in the project."""
-        issues: list[FlextQualityTypes.CodeIssue] = [
-            FlextQualityTypes.CodeIssue(
+        issues: list[FlextQualityModels.CodeIssue] = [
+            FlextQualityModels.CodeIssue(
                 file_path=str(metrics.file_path),
                 line_number=1,
                 issue_type="COMPLEXITY",
@@ -467,13 +470,13 @@ class FlextQualityAnalyzer(FlextService[None]):
         ]
         return issues
 
-    def _analyze_dead_code(self) -> list[FlextQualityTypes.CodeIssue]:
+    def _analyze_dead_code(self) -> list[FlextQualityModels.CodeIssue]:
         """Analyze dead code issues in the project."""
         if not self._current_results:
             return []
         # Convert DeadCodeIssue to CodeIssue for compatibility
         return [
-            FlextQualityTypes.CodeIssue(
+            FlextQualityModels.CodeIssue(
                 file_path=issue.file_path,
                 line_number=issue.line_number,
                 issue_type="DEAD_CODE",
@@ -484,13 +487,13 @@ class FlextQualityAnalyzer(FlextService[None]):
             for issue in self._current_results.dead_code_issues
         ]
 
-    def _analyze_duplicates(self) -> list[FlextQualityTypes.CodeIssue]:
+    def _analyze_duplicates(self) -> list[FlextQualityModels.CodeIssue]:
         """Analyze duplicate code issues in the project."""
         if not self._current_results:
             return []
         # Convert DuplicationIssue to CodeIssue for compatibility
         return [
-            FlextQualityTypes.CodeIssue(
+            FlextQualityModels.CodeIssue(
                 file_path=files[0] if files else "unknown",
                 line_number=line_ranges[0][0] if line_ranges else 1,
                 issue_type="DUPLICATION",

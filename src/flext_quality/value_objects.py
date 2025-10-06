@@ -97,27 +97,6 @@ class FlextQualityValueObjects:
         D_MINUS = "D-"
         F = "F"
 
-    class IssueSeverity(StrEnum):
-        """Issue severity enumeration using StrEnum."""
-
-        CRITICAL = "CRITICAL"
-        HIGH = "HIGH"
-        MEDIUM = "MEDIUM"
-        LOW = "LOW"
-        INFO = "INFO"
-
-    class IssueType(StrEnum):
-        """Issue type enumeration using StrEnum."""
-
-        SECURITY = "SECURITY"
-        COMPLEXITY = "COMPLEXITY"
-        DUPLICATION = "DUPLICATION"
-        COVERAGE = "COVERAGE"
-        STYLE = "STYLE"
-        BUG = "BUG"
-        PERFORMANCE = "PERFORMANCE"
-        MAINTAINABILITY = "MAINTAINABILITY"
-
     # =============================================================================
     # NESTED VALUE MODELS - All Pydantic models as nested classes
     # =============================================================================
@@ -135,7 +114,10 @@ class FlextQualityValueObjects:
 
         def validate_business_rules(self) -> FlextResult[None]:
             """Validate business rules for quality score."""
-            if self.value < 0.0 or self.value > 100.0:
+            if (
+                self.value < 0.0
+                or self.value > FlextQualityConstants.Validation.MAXIMUM_PERCENTAGE
+            ):
                 return FlextResult[None].fail("Quality score must be 0-100")
 
             # Validate grade matches score

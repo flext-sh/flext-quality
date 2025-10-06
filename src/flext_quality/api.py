@@ -24,8 +24,8 @@ from flext_core import (
 
 from .analyzer import CodeAnalyzer
 from .entities import FlextQualityEntities
+from .models import FlextQualityModels
 from .services import FlextQualityServices
-from .typings import FlextQualityTypes
 from .value_objects import FlextIssueSeverity, FlextIssueType
 
 
@@ -387,7 +387,7 @@ class FlextQuality(FlextService[None]):
         analysis_result = analyzer.analyze_project()
 
         # analysis_result is now AnalysisResults directly, not FlextResult
-        analysis_results: FlextQualityTypes.AnalysisResults = analysis_result
+        analysis_results: FlextQualityModels.AnalysisResults = analysis_result
 
         # Update with real metrics from analysis
         # Note: analysis_results is a Pydantic model

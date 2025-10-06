@@ -14,7 +14,7 @@ from typing import override
 from flext_core import FlextTypes
 
 from .grade_calculator import FlextQualityGradeCalculator
-from .typings import FlextQualityTypes
+from .models import FlextQualityModels
 from .utilities import FlextQualityUtilities
 from .value_objects import IssueSeverity
 
@@ -40,7 +40,7 @@ class FlextQualityReportGenerator:
     """Generates quality reports from analysis results."""
 
     @override
-    def __init__(self, analysis_results: FlextQualityTypes.AnalysisResults) -> None:
+    def __init__(self, analysis_results: FlextQualityModels.AnalysisResults) -> None:
         """Initialize the quality report generator.
 
         Args:
@@ -51,7 +51,7 @@ class FlextQualityReportGenerator:
 
         """
         # Store analysis results directly
-        self.results: FlextQualityTypes.AnalysisResults = analysis_results
+        self.results: FlextQualityModels.AnalysisResults = analysis_results
 
     def generate_text_report(self) -> str:
         """Generate a text-based quality report."""
@@ -250,7 +250,7 @@ class FlextQualityReportGenerator:
 
     def _get_total_issues(self) -> int:
         """Get total number of issues."""
-        # Use modern FlextQualityTypes.AnalysisResults API only
+        # Use modern FlextQualityModels.AnalysisResults API only
         return self.results.total_issues
 
     def _get_critical_issues(self) -> int:

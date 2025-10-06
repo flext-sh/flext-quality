@@ -35,7 +35,7 @@ from .analyzer import CodeAnalyzer
 from .config import FlextQualityConfig
 from .reports import QualityReport
 from .typings import FlextQualityTypes
-from .web import FlextQualityWebInterface
+from .web import FlextQualityWeb
 
 # Quality score thresholds
 MIN_ACCEPTABLE_QUALITY_SCORE = 70
@@ -44,7 +44,7 @@ MIN_ACCEPTABLE_QUALITY_SCORE = 70
 FLEXT_CLI_AVAILABLE = True
 
 # Lazy-loaded CLI API instance for table creation
-_cli_api_holder = [None]  # Use list to avoid global statement
+_cli_api_holder: list[object | None] = [None]  # Use list to avoid global statement
 
 
 def _get_cli_api() -> FlextCli:
@@ -392,7 +392,7 @@ class FlextQualityCliService(FlextService[int]):
 
             cli_context.print_info(f"Starting web server on {args.host}:{args.port}")
 
-            interface = FlextQualityWebInterface()
+            interface = FlextQualityWeb()
             interface.run(host=args.host, port=args.port, debug=args.debug)
             return FlextResult[int].ok(0)
 
@@ -564,7 +564,7 @@ def run_web_server(args: argparse.Namespace) -> int:
     try:
         cli_context.print_info(f"Starting web server on {args.host}:{args.port}")
 
-        interface = FlextQualityWebInterface()
+        interface = FlextQualityWeb()
         interface.run(host=args.host, port=args.port, debug=args.debug)
         return 0
     except KeyboardInterrupt:

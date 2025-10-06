@@ -70,7 +70,7 @@ class FlextQualityOperations(FlextService[None]):
             project_path: str,
             *,
             _config: dict | None = None,
-        ) -> FlextResult[FlextQualityModels.QualityCheckResult]:
+        ) -> FlextResult[FlextQualityModels.CheckResult]:
             """Run complete quality pipeline.
 
             Args:
@@ -82,9 +82,7 @@ class FlextQualityOperations(FlextService[None]):
 
             """
             FlextLogger(__name__)
-            cli = FlextCli()  # MANDATORY: Use flext-cli
-
-            cli.info("Running quality checks...")
+            FlextCli()  # MANDATORY: Use flext-cli
 
             # Run lint check
             lint_result = FlextQualityOperations.LintingService.run_lint(project_path)
@@ -99,14 +97,14 @@ class FlextQualityOperations(FlextService[None]):
             # Run coverage check (placeholder)
             coverage = 0.0
 
-            result = FlextQualityModels.QualityCheckResult(
+            result = FlextQualityModels.CheckResult(
                 lint_passed=lint_passed,
                 type_check_passed=type_passed,
                 coverage=coverage,
                 violations=[],
             )
 
-            return FlextResult[FlextQualityModels.QualityCheckResult].ok(result)
+            return FlextResult[FlextQualityModels.CheckResult].ok(result)
 
     class LintingService:
         """Linting operations with gradual fixing.
@@ -240,9 +238,7 @@ class FlextQualityOperations(FlextService[None]):
 
             """
             FlextLogger(__name__)
-            cli = FlextCli()  # MANDATORY: Use flext-cli
-
-            cli.info(f"Type checking: {module_path}")
+            FlextCli()  # MANDATORY: Use flext-cli
 
             return FlextQualityOperations.TypeChecker.run_type_check(module_path)
 
@@ -269,9 +265,7 @@ class FlextQualityOperations(FlextService[None]):
 
             """
             FlextLogger(__name__)
-            cli = FlextCli()  # MANDATORY: Use flext-cli
-
-            cli.info(f"Detecting duplicates (threshold: {threshold} lines)...")
+            FlextCli()  # MANDATORY: Use flext-cli
 
             # Placeholder implementation - would use AST analysis or external tool
             return FlextResult[FlextTypes.Dict].ok({
@@ -367,9 +361,7 @@ class FlextQualityOperations(FlextService[None]):
 
             """
             FlextLogger(__name__)
-            cli = FlextCli()  # MANDATORY: Use flext-cli
-
-            cli.info("Auditing code patterns...")
+            FlextCli()  # MANDATORY: Use flext-cli
 
             # Would implement pattern auditing here
             return FlextResult[FlextTypes.Dict].ok({"patterns_checked": 0})

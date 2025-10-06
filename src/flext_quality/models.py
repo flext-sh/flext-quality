@@ -1112,42 +1112,42 @@ class FlextQualityModels(FlextModels):
     class AnalysisResults(BaseModel):
         """Complete analysis results for a project."""
 
-        overall_metrics: FlextQualityTypes.OverallMetrics = Field(
+        overall_metrics: FlextQualityModels.OverallMetrics = Field(
             ..., description="Overall project metrics"
         )
-        file_metrics: list[FlextQualityTypes.FileAnalysisResult] = Field(
+        file_metrics: list[FlextQualityModels.FileAnalysisResult] = Field(
             default_factory=list,
             description="Metrics for individual files",
         )
-        code_issues: list[FlextQualityTypes.CodeIssue] = Field(
+        code_issues: list[FlextQualityModels.CodeIssue] = Field(
             default_factory=list,
             description="General code issues",
         )
-        complexity_issues: list[FlextQualityTypes.ComplexityIssue] = Field(
+        complexity_issues: list[FlextQualityModels.ComplexityIssue] = Field(
             default_factory=list,
             description="Complexity issues",
         )
-        security_issues: list[FlextQualityTypes.SecurityIssue] = Field(
+        security_issues: list[FlextQualityModels.SecurityIssue] = Field(
             default_factory=list,
             description="Security issues",
         )
-        dead_code_issues: list[FlextQualityTypes.DeadCodeIssue] = Field(
+        dead_code_issues: list[FlextQualityModels.DeadCodeIssue] = Field(
             default_factory=list,
             description="Dead code issues",
         )
-        duplication_issues: list[FlextQualityTypes.DuplicationIssue] = Field(
+        duplication_issues: list[FlextQualityModels.DuplicationIssue] = Field(
             default_factory=list,
             description="Code duplication issues",
         )
-        dependencies: list[FlextQualityTypes.Dependency] = Field(
+        dependencies: list[FlextQualityModels.Dependency] = Field(
             default_factory=list,
             description="Project dependencies",
         )
-        test_results: FlextQualityTypes.TestResults | None = Field(
+        test_results: FlextQualityModels.TestResults | None = Field(
             default=None,
             description="Test results if available",
         )
-        analysis_config: FlextQualityTypes.Core.AnalysisDict = Field(
+        analysis_config: FlextQualityModels.Core.AnalysisDict = Field(
             default_factory=dict,
             description="Configuration used for analysis",
         )
@@ -1225,7 +1225,7 @@ class FlextQualityModels(FlextModels):
         coverage: float
         violations: list[str]
 
-    class ValidationResult(FlextModels.Value):
+    class QualityValidationResult(FlextModels.Value):
         """Quality validation result."""
 
         passed: bool
@@ -1256,7 +1256,7 @@ FlextQualityAnalysisModel = FlextQualityModels.AnalysisModel
 FlextQualityIssueModel = FlextQualityModels.IssueModel
 FlextQualityReportModel = FlextQualityModels.ReportModel
 FlextAnalysisConfigModel = FlextQualityModels.ConfigModel
-ValidationResult = FlextQualityModels.ValidationResult
+QualityValidationResult = FlextQualityModels.QualityValidationResult
 
 # Export models for clean imports
 __all__ = [
@@ -1266,5 +1266,5 @@ __all__ = [
     "FlextQualityModels",
     "FlextQualityProjectModel",
     "FlextQualityReportModel",
-    "ValidationResult",
+    "QualityValidationResult",
 ]

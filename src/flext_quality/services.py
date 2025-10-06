@@ -23,7 +23,7 @@ from flext_core import (
 )
 
 from .entities import FlextQualityEntities
-from .external_backend import ExternalBackend
+from .external_backend import FlextQualityExternalBackend
 
 
 class FlextQualityServices:
@@ -234,7 +234,7 @@ class FlextQualityServices:
                 issue = self._parent.get_issues().get(issue_id)
                 return FlextResult[FlextQualityEntities.Issue | None].ok(issue)
             except Exception as e:
-                self.logger.exception("Failed to get issue %s", issue_id)
+                self.logger.exception(f"Failed to get issue {issue_id}")
                 return FlextResult[FlextQualityEntities.Issue | None].fail(
                     f"Failed to get issue: {e}",
                 )
@@ -258,7 +258,7 @@ class FlextQualityServices:
                 self.logger.debug(f"Suppressed issue: {issue_id}")
                 return FlextResult[FlextQualityEntities.Issue].ok(suppressed_issue)
             except Exception as e:
-                self.logger.exception("Failed to suppress issue %s", issue_id)
+                self.logger.exception(f"Failed to suppress issue {issue_id}")
                 return FlextResult[FlextQualityEntities.Issue].fail(
                     f"Failed to suppress issue: {e}",
                 )
@@ -439,7 +439,7 @@ class FlextQualityServices:
             """Initialize service with external backend."""
             super().__init__()
             self._parent = parent
-            self._backend = ExternalBackend()
+            self._backend = FlextQualityExternalBackend()
             # Initialize logger directly for type safety
             self._logger = FlextLogger(__name__)
 

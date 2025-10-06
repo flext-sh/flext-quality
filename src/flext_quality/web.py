@@ -7,7 +7,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import cast
 
 # Web server dependency
 import uvicorn
@@ -19,19 +18,23 @@ from fastapi.responses import HTMLResponse
 
 # Domain library imports (ZERO TOLERANCE - NO direct FastAPI imports)
 from flext_auth import FlextAuth, JwtAuthProvider
+from flext_core import FlextContainer, FlextLogger, FlextResult, FlextTypes
+
+from .analyzer import CodeAnalyzer
+from .api import FlextQuality
+from .config import FlextQualityConfig
+
+# Import from models instead of flext_web mock
+from .models import FlextQualityModels
 
 
 # Mock WebAuthMiddleware until flext_auth is available
 class WebAuthMiddleware:
-    def __init__(self, auth_provider, exclude_paths=None) -> None:
+    def __init__(
+        self, auth_provider: object, exclude_paths: list[str] | None = None
+    ) -> None:
         self.auth_provider = auth_provider
         self.exclude_paths = exclude_paths or []
-
-
-from flext_core import FlextContainer, FlextLogger, FlextResult, FlextTypes
-
-# Import from models instead of flext_web mock
-from .models import FlextQualityModels
 
 
 def create_fastapi_app(config: FlextQualityModels.AppConfig) -> FlextResult[FastAPI]:
@@ -46,11 +49,6 @@ def create_fastapi_app(config: FlextQualityModels.AppConfig) -> FlextResult[Fast
         return FlextResult[FastAPI].ok(app)
     except Exception as e:
         return FlextResult[FastAPI].fail(f"Failed to create FastAPI app: {e}")
-
-
-from .analyzer import CodeAnalyzer
-from .api import FlextQuality
-from .config import FlextQualityConfig
 
 
 class FlextQualityWeb:
@@ -83,7 +81,7 @@ class FlextQualityWeb:
         if app_result.is_failure:
             msg = f"Failed to create FastAPI app: {app_result.error}"
             raise RuntimeError(msg)
-        self.app = cast("FastAPI", app_result.value)
+        self.app = app_result.value
 
         # Initialize quality components
         self.quality_api = FlextQuality()
@@ -239,7 +237,7 @@ class FlextQualityWeb:
       </html>
       """
 
-    def analyze_project(self, request: Request) -> FlextTypes.Dict:
+    async def analyze_project(self, request: Request) -> FlextTypes.Dict:
         """Analyze a project and return results (FastAPI endpoint).
 
         Requires authentication via WebAuthMiddleware.
