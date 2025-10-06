@@ -24,7 +24,7 @@ from flext_cli import FlextCli
 from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
 from pydantic import ConfigDict
 
-from .models import FlextQualityModels
+from flext_quality.models import FlextQualityModels
 
 
 class FlextQualityOperations(FlextService[None]):

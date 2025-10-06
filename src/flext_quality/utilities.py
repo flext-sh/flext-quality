@@ -8,27 +8,23 @@ from __future__ import annotations
 
 from pathlib import Path
 from textwrap import dedent
-from typing import cast, override
+from typing import cast
 
 from flext_core import FlextContainer, FlextLogger, FlextTypes, FlextUtilities
 
 # Type aliases for better readability
 
 
-class FlextQualityUtilities(FlextUtilities):
+class FlextQualityUtilities:
     """Unified quality utilities class following FLEXT architecture patterns.
 
-    Inherits from FlextUtilities to avoid duplication and ensure consistency.
     Single consolidated class containing ALL utility functionality to eliminate duplication
     and follow the unified class pattern mandated by CLAUDE.md.
     """
 
-    @override
-    def __init__(self: object) -> None:
+    def __init__(self) -> None:
         """Initialize utilities with dependency injection."""
-        self._container = (
-            FlextContainer.get_global() if hasattr(self, "_container") else None
-        )
+        self._container = FlextContainer.get_global()
         self._logger = FlextLogger(__name__)
 
     class _IssueProcessor:

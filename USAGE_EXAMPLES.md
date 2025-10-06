@@ -77,7 +77,7 @@ if result.is_success:
     print(f"Duplicates found: {result.value['duplicates_found']}")
 ```
 
-### Export Repairer - Fix __init__.py Exports
+### Export Repairer - Fix **init**.py Exports
 
 ```python
 result = quality.exports.repair_exports(
@@ -417,6 +417,7 @@ if arch_result.is_success:
 ## 🔒 Best Practices
 
 ### 1. ALWAYS Use Dry-Run First
+
 ```python
 # ✅ CORRECT: Test in dry-run first
 result = optimizer.module.optimize("module.py", dry_run=True)
@@ -429,6 +430,7 @@ result = optimizer.module.optimize("module.py", dry_run=False)
 ```
 
 ### 2. ALWAYS Check FlextResult
+
 ```python
 # ✅ CORRECT: Check result before using value
 result = quality.linting.fix_issues("module.py")
@@ -442,6 +444,7 @@ value = result.value  # May crash if result.is_failure
 ```
 
 ### 3. ALWAYS Use Keyword Arguments
+
 ```python
 # ✅ CORRECT: Use keyword arguments (enforced by *)
 result = optimizer.module.optimize(

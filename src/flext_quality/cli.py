@@ -11,7 +11,7 @@ import json
 import sys
 import traceback
 from pathlib import Path
-from typing import override
+from typing import cast, override
 
 from flext_cli import (
     FlextCli,
@@ -140,12 +140,8 @@ class FlextQualityCliService(FlextService[int]):
                 include_duplicates=args.include_duplicates,
             )
 
-            # Unwrap FlextResult
-            if analysis_result.is_failure:
-                cli_context.print_error(f"Analysis failed: {analysis_result.error}")
-                return FlextResult[int].ok(1)
-
-            results = analysis_result.value
+            # analysis_result is now AnalysisResults directly, not FlextResult
+            results = analysis_result
 
             # Check if any files were analyzed
             files_analyzed = getattr(results.overall_metrics, "files_analyzed", 0)
@@ -297,8 +293,6 @@ class FlextQualityCliService(FlextService[int]):
                 )
                 cli_api = _get_cli_api()
                 # Display data as table using FlextCli
-                from typing import cast
-
                 cli_api.display_data(
                     cast("dict[str, object]", report_dict), format_type="table"
                 )
@@ -361,8 +355,6 @@ class FlextQualityCliService(FlextService[int]):
             # Format and display using FlextCli or fallback
             if FLEXT_CLI_AVAILABLE:
                 # Display score data as table using FlextCli
-                from typing import cast
-
                 cli_api.display_data(
                     cast("dict[str, object]", score_data), format_type="table"
                 )
@@ -406,7 +398,9 @@ class FlextQualityCliService(FlextService[int]):
 
     def analyze_project(self, args: argparse.Namespace) -> FlextResult[int]:
         """Analyze project quality using unified service pattern."""
-        assert self._logger is not None, "Logger must be initialized"
+        if self._logger is None:
+            msg = "Logger must be initialized"
+            raise RuntimeError(msg)
         analysis_helper = self._ProjectAnalysisHelper(self._logger)
 
         analysis_result: FlextResult[int] = analysis_helper.analyze_project_workflow(
@@ -420,7 +414,9 @@ class FlextQualityCliService(FlextService[int]):
 
     def score_project(self, args: argparse.Namespace) -> FlextResult[int]:
         """Get quick quality score for project using unified service pattern."""
-        assert self._logger is not None, "Logger must be initialized"
+        if self._logger is None:
+            msg = "Logger must be initialized"
+            raise RuntimeError(msg)
         scoring_helper = self._ProjectScoringHelper(self._logger)
 
         scoring_result: FlextResult[int] = scoring_helper.score_project_workflow(args)
@@ -434,7 +430,9 @@ class FlextQualityCliService(FlextService[int]):
 
     def run_web_server(self, args: argparse.Namespace) -> FlextResult[int]:
         """Run quality web interface server using unified service pattern."""
-        assert self._logger is not None, "Logger must be initialized"
+        if self._logger is None:
+            msg = "Logger must be initialized"
+            raise RuntimeError(msg)
         web_helper = self._WebServerHelper(self._logger)
 
         web_result: FlextResult[int] = web_helper.run_web_server_workflow(args)

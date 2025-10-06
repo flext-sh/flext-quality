@@ -10,7 +10,6 @@ import json
 import shutil
 import subprocess
 import tempfile
-import warnings
 from importlib import import_module, util
 from pathlib import Path
 from typing import override
@@ -37,14 +36,14 @@ class FlextQualityExternalBackend(BaseAnalyzer):
     @override
     def analyze(
         self,
-        code: str,
+        _code: str,
         file_path: Path | None = None,
         tool: str = "ruff",
     ) -> FlextTypes.Dict:
         """Analyze code using external tools.
 
         Args:
-            code: Python source code to analyze
+            _code: Python source code to analyze
             file_path: Optional file path for context
             tool: Tool to use (ruff, mypy, bandit, vulture)
 
@@ -66,18 +65,18 @@ class FlextQualityExternalBackend(BaseAnalyzer):
                 suffix=".py",
                 delete=False,
             ) as f:
-                f.write(code)
+                f.write(_code)
                 temp_path = Path(f.name)
 
             # Run the specified tool
             if tool == "ruff":
-                result.update(self._run_ruff(code, temp_path))
+                result.update(self._run_ruff(_code, temp_path))
             elif tool == "mypy":
-                result.update(self._run_mypy(code, temp_path))
+                result.update(self._run_mypy(_code, temp_path))
             elif tool == "bandit":
-                result.update(self._run_bandit(code, temp_path))
+                result.update(self._run_bandit(_code, temp_path))
             elif tool == "vulture":
-                result.update(self._run_vulture(code, temp_path))
+                result.update(self._run_vulture(_code, temp_path))
             else:
                 result["error"] = f"Unknown tool: {tool}"
 
@@ -238,22 +237,3 @@ class FlextQualityExternalBackend(BaseAnalyzer):
                 issue: FlextTypes.Dict = {"message": line.strip()}
                 issues.append(issue)
         return issues
-
-
-# Legacy compatibility facade (TEMPORARY)
-class ExternalBackend(FlextQualityExternalBackend):
-    """Legacy external backend class - replaced by FlextQualityExternalBackend.
-
-    DEPRECATED: Use FlextQualityExternalBackend directly.
-    This facade provides compatibility during migration.
-    """
-
-    @override
-    def __init__(self: object) -> None:
-        """Initialize the instance."""
-        warnings.warn(
-            "ExternalBackend is deprecated; use FlextQualityExternalBackend",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        super().__init__()

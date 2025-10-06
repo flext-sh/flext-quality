@@ -1,4 +1,4 @@
-"""Unified quality analyzer following FLEXT architecture patterns.
+"""FLEXT Quality Analyzer - Main analysis engine following FLEXT standards.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -19,32 +19,24 @@ from flext_core import (
 )
 
 from .config import FlextQualityConfig
+from .constants import FlextQualityConstants
 from .typings import FlextQualityTypes
-from .value_objects import IssueSeverity
-
-logger = FlextLogger(__name__)
 
 
 class FlextQualityAnalyzer(FlextService[None]):
-    """Unified quality analyzer following FLEXT architecture patterns.
+    """Main quality analyzer following FLEXT [Project][Module] pattern.
 
     Single responsibility: Code quality analysis with complete flext-core integration.
     Contains all analysis functionality in one unified class with nested helpers.
     """
 
-    # Analysis constants as nested class
-    class AnalysisConstants:
-        """Constants for code analysis operations."""
-
-        # Quality grade thresholds
-        GRADE_A_THRESHOLD = 90
-        GRADE_B_THRESHOLD = 80
-        GRADE_C_THRESHOLD = 70
-        GRADE_D_THRESHOLD = 60
-
-        MIN_FILE_SIZE_FOR_DUPLICATION_CHECK = 100
-        SIMILARITY_THRESHOLD = 0.8
-        MAX_FUNCTION_NAME_LENGTH = 50
+    _container: FlextContainer | None
+    _context: object | None
+    _bus: object | None
+    _logger: FlextLogger | None
+    _quality_config: FlextQualityConfig
+    project_path: Path
+    _current_results: FlextQualityTypes.AnalysisResults | None
 
     def __init__(
         self, project_path: str | Path, config: FlextQualityConfig | None = None
@@ -70,21 +62,17 @@ class FlextQualityAnalyzer(FlextService[None]):
 
     @property
     def logger(self) -> FlextLogger:
-        """Get logger with type narrowing."""
-        assert self._logger is not None
+        """Get logger instance."""
+        if self._logger is None:
+            self._logger = FlextLogger(__name__)
         return self._logger
 
     @property
-    def context(self) -> FlextContext:
-        """Get context with type narrowing."""
-        assert self._context is not None
-        return self._context
-
-    @property
-    def bus(self) -> FlextBus:
-        """Get bus with type narrowing."""
-        assert self._bus is not None
-        return self._bus
+    def container(self) -> FlextContainer:
+        """Get container instance."""
+        if self._container is None:
+            self._container = FlextContainer.get_global()
+        return self._container
 
     def analyze_project(
         self,
@@ -93,7 +81,7 @@ class FlextQualityAnalyzer(FlextService[None]):
         include_complexity: bool = True,
         include_dead_code: bool = True,
         include_duplicates: bool = True,
-    ) -> FlextResult[FlextQualityTypes.AnalysisResults]:
+    ) -> FlextQualityTypes.AnalysisResults:
         """Analyze entire project for quality metrics and issues.
 
         Args:
@@ -103,26 +91,20 @@ class FlextQualityAnalyzer(FlextService[None]):
             include_duplicates: Whether to include duplicate code detection.
 
         Returns:
-            FlextResult containing analysis results including metrics and issues.
+            AnalysisResults containing analysis results including metrics and issues.
 
         """
         self.logger.info("Starting project analysis: %s", self.project_path)
 
-        # Set up analysis context
-        analysis_context = self.context.create_child("quality_analysis")
-        analysis_context.set("project_path", str(self.project_path))
-        analysis_context.set(
-            "analysis_config", self._quality_config.get_analysis_config()
-        )
-
-        # Emit analysis started event
-        self.bus.publish(
-            "quality.analysis.started",
-            {
-                "project_path": str(self.project_path),
-                "config": self._quality_config.get_analysis_config(),
-            },
-        )
+        # Emit analysis start event
+        if self._bus is not None and hasattr(self._bus, "publish"):
+            self._bus.publish(
+                "quality.analysis.started",
+                {
+                    "project_path": str(self.project_path),
+                    "config": self._quality_config.get_analysis_config(),
+                },
+            )
 
         # Find Python files
         python_files = self._find_python_files()
@@ -145,13 +127,13 @@ class FlextQualityAnalyzer(FlextService[None]):
                 total_lines += metrics.lines_of_code
             else:
                 analysis_errors += 1
-                logger.warning(
+                self.logger.warning(
                     "Failed to analyze file %s: %s",
                     file_path,
                     metrics_result.error,
                 )
 
-        logger.info(
+        self.logger.info(
             "File analysis complete: %d succeeded, %d failed",
             len(file_metrics),
             analysis_errors,
@@ -184,39 +166,14 @@ class FlextQualityAnalyzer(FlextService[None]):
             ],
             dependencies=[],  # Would need dependency scanning
             test_results=None,  # Would need test execution
-            analysis_config=self._quality_config.get_analysis_config(),
+            analysis_config={},  # Simplified for now
             analysis_timestamp=None,  # Will be set by Pydantic
         )
 
         self._current_results = results
 
-        # Update context with results
-        analysis_context.set("total_files", len(file_metrics))
-        analysis_context.set("analysis_errors", analysis_errors)
-        analysis_context.set(
-            "overall_score", results.overall_metrics.get("quality_score", 0.0)
-        )
-
-        # Emit analysis completed event
-        self.bus.publish(
-            "quality.analysis.completed",
-            {
-                "project_path": str(self.project_path),
-                "results": {
-                    "files_analyzed": len(file_metrics),
-                    "total_lines": total_lines,
-                    "overall_score": results.overall_metrics.get("quality_score", 0.0),
-                    "total_issues": len(results.code_issues)
-                    + len(results.complexity_issues)
-                    + len(results.security_issues)
-                    + len(results.dead_code_issues)
-                    + len(results.duplication_issues),
-                },
-            },
-        )
-
         self.logger.info("Analysis completed for project: %s", self.project_path)
-        return FlextResult.ok(results)
+        return results
 
     def _find_python_files(self) -> list[Path]:
         """Find all Python files in the project."""
@@ -297,7 +254,7 @@ class FlextQualityAnalyzer(FlextService[None]):
         for node in ast.walk(tree):
             if (
                 isinstance(node, ast.FunctionDef)
-                and len(node.name) > self.AnalysisConstants.MAX_FUNCTION_NAME_LENGTH
+                and len(node.name) > FlextQualityConstants.Analysis.MAX_FUNCTION_NAME_LENGTH
             ):
                 issues += 1
         return issues
@@ -366,7 +323,7 @@ class FlextQualityAnalyzer(FlextService[None]):
                     line_number=1,  # Simplified
                     issue_type="SECURITY",
                     message="Security vulnerability detected",
-                    severity=IssueSeverity.HIGH,
+                    severity="HIGH",
                     rule_id="security_check",
                 )
                 for _i in range(metrics.security_issues)
@@ -374,14 +331,17 @@ class FlextQualityAnalyzer(FlextService[None]):
             issues.extend(security_issues)
 
             # Add complexity issues
-            if metrics.complexity_score > self._quality_config.max_complexity:
+            if (
+                metrics.complexity_score
+                > FlextQualityConstants.Complexity.MAX_COMPLEXITY
+            ):  # Default complexity threshold
                 issues.append(
                     FlextQualityTypes.CodeIssue(
                         file_path=str(metrics.file_path),
                         line_number=1,  # Simplified
                         issue_type="COMPLEXITY",
                         message=f"Complexity score {metrics.complexity_score} exceeds threshold",
-                        severity=IssueSeverity.MEDIUM,
+                        severity="MEDIUM",
                         rule_id="complexity_check",
                     )
                 )
@@ -405,11 +365,11 @@ class FlextQualityAnalyzer(FlextService[None]):
                     content = f.read()
                 if (
                     len(content.strip())
-                    > self.AnalysisConstants.MIN_FILE_SIZE_FOR_DUPLICATION_CHECK
+                    > FlextQualityConstants.Analysis.MIN_FILE_SIZE_FOR_DUPLICATION_CHECK
                 ):
                     file_contents[py_file] = content
             except Exception as e:
-                logger.warning(
+                self.logger.warning(
                     "Failed to read file for duplication check: %s - %s", py_file, e
                 )
                 continue
@@ -422,7 +382,7 @@ class FlextQualityAnalyzer(FlextService[None]):
                 line_number=1,
                 issue_type="DUPLICATION",
                 message=f"Code duplication detected with {file2.name}",
-                severity=IssueSeverity.MEDIUM,
+                severity="MEDIUM",
                 rule_id="duplication_check",
             )
             for i, file1 in enumerate(file_list)
@@ -440,7 +400,7 @@ class FlextQualityAnalyzer(FlextService[None]):
 
         if lines1 and lines2:
             similarity = len(lines1 & lines2) / max(len(lines1), len(lines2))
-            return similarity > self.AnalysisConstants.SIMILARITY_THRESHOLD
+            return similarity > FlextQualityConstants.Analysis.SIMILARITY_THRESHOLD
 
         return False
 
@@ -448,18 +408,18 @@ class FlextQualityAnalyzer(FlextService[None]):
         """Get the overall quality score from the last analysis."""
         if not self._current_results:
             return 0.0
-        return self._current_results.overall_metrics.get("quality_score", 0.0)
+        return self._current_results.overall_metrics.quality_score
 
     def get_quality_grade(self) -> str:
         """Get the quality grade from the last analysis."""
         score = self.get_quality_score()
-        if score >= self.AnalysisConstants.GRADE_A_THRESHOLD:
+        if score >= FlextQualityConstants.Analysis.GRADE_A_THRESHOLD:
             return "A"
-        if score >= self.AnalysisConstants.GRADE_B_THRESHOLD:
+        if score >= FlextQualityConstants.Analysis.GRADE_B_THRESHOLD:
             return "B"
-        if score >= self.AnalysisConstants.GRADE_C_THRESHOLD:
+        if score >= FlextQualityConstants.Analysis.GRADE_C_THRESHOLD:
             return "C"
-        if score >= self.AnalysisConstants.GRADE_D_THRESHOLD:
+        if score >= FlextQualityConstants.Analysis.GRADE_D_THRESHOLD:
             return "D"
         return "F"
 
@@ -471,6 +431,77 @@ class FlextQualityAnalyzer(FlextService[None]):
             return FlextResult.fail("No analysis results available")
         return FlextResult.ok(self._current_results)
 
+    def _analyze_security(self) -> list[FlextQualityTypes.CodeIssue]:
+        """Analyze security issues in the project."""
+        if not self._current_results:
+            return []
+        # Convert SecurityIssue to CodeIssue for compatibility
+        return [
+            FlextQualityTypes.CodeIssue(
+                file_path=issue.file_path,
+                line_number=issue.line_number,
+                issue_type="SECURITY",
+                message=issue.message,
+                severity=issue.severity,
+                rule_id=issue.rule_id,
+            )
+            for issue in self._current_results.security_issues
+        ]
 
-# Legacy compatibility alias
+    def _analyze_complexity(
+        self, file_metrics: list[FlextQualityTypes.FileAnalysisResult]
+    ) -> list[FlextQualityTypes.CodeIssue]:
+        """Analyze complexity issues in the project."""
+        issues: list[FlextQualityTypes.CodeIssue] = [
+            FlextQualityTypes.CodeIssue(
+                file_path=str(metrics.file_path),
+                line_number=1,
+                issue_type="COMPLEXITY",
+                message=f"Complexity score {metrics.complexity_score} exceeds threshold",
+                severity="MEDIUM",
+                rule_id="complexity_check",
+            )
+            for metrics in file_metrics
+            if metrics.complexity_score
+            > FlextQualityConstants.Complexity.MAX_COMPLEXITY
+        ]
+        return issues
+
+    def _analyze_dead_code(self) -> list[FlextQualityTypes.CodeIssue]:
+        """Analyze dead code issues in the project."""
+        if not self._current_results:
+            return []
+        # Convert DeadCodeIssue to CodeIssue for compatibility
+        return [
+            FlextQualityTypes.CodeIssue(
+                file_path=issue.file_path,
+                line_number=issue.line_number,
+                issue_type="DEAD_CODE",
+                message=issue.message,
+                severity=issue.severity,
+                rule_id="dead_code_check",
+            )
+            for issue in self._current_results.dead_code_issues
+        ]
+
+    def _analyze_duplicates(self) -> list[FlextQualityTypes.CodeIssue]:
+        """Analyze duplicate code issues in the project."""
+        if not self._current_results:
+            return []
+        # Convert DuplicationIssue to CodeIssue for compatibility
+        return [
+            FlextQualityTypes.CodeIssue(
+                file_path=files[0] if files else "unknown",
+                line_number=line_ranges[0][0] if line_ranges else 1,
+                issue_type="DUPLICATION",
+                message=issue.message,
+                severity=issue.severity,
+                rule_id="duplication_check",
+            )
+            for issue in self._current_results.duplication_issues
+            for files, line_ranges in [(issue.files, issue.line_ranges)]
+        ]
+
+
+# Backward compatibility alias
 CodeAnalyzer = FlextQualityAnalyzer

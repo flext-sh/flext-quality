@@ -1,4 +1,4 @@
-"""Quality assessment constants extending flext-core patterns.
+"""FLEXT Quality Constants - Centralized constants following FLEXT standards.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -7,133 +7,209 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import tempfile
-from typing import ClassVar
+from typing import ClassVar, Literal
 
 from flext_core import FlextConstants
 
 
 class FlextQualityConstants(FlextConstants):
-    """Central container for quality assessment constants.
+    """Central container for quality assessment constants following FLEXT patterns.
 
-    Follows the same pattern as FlextConstants from flext-core,
-    organizing constants into logical categories with type safety.
+    Extends FlextConstants with quality-specific constants organized into
+    logical categories with comprehensive type safety and enterprise standards.
     """
 
-    class QualityThresholds:
+    # =============================================================================
+    # QUALITY THRESHOLDS - Enterprise quality standards
+    # =============================================================================
+
+    class Thresholds:
         """Quality score thresholds for assessment levels."""
 
         # Industry-leading quality
-        OUTSTANDING_THRESHOLD = 95.0
-
-        # Production-ready quality
-        EXCELLENT_THRESHOLD = 90.0
-
-        # Good quality with minor improvements
-        GOOD_THRESHOLD = 80.0
-
-        # Acceptable quality with moderate improvements
-        ACCEPTABLE_THRESHOLD = 70.0
-
-        # Below average quality
-        BELOW_AVERAGE_THRESHOLD = 60.0
-
-        # Enterprise-ready threshold (combination requirement)
-        ENTERPRISE_READY_THRESHOLD = 85.0
-
-        # Poor quality (anything below BELOW_AVERAGE_THRESHOLD)
+        OUTSTANDING_THRESHOLD: float = 95.0
+        EXCELLENT_THRESHOLD: float = 90.0
+        GOOD_THRESHOLD: float = 80.0
+        ACCEPTABLE_THRESHOLD: float = 70.0
+        BELOW_AVERAGE_THRESHOLD: float = 60.0
+        ENTERPRISE_READY_THRESHOLD: float = 85.0
 
     class Coverage:
         """Coverage thresholds and limits."""
 
-        # Coverage requirements
-        MINIMUM_COVERAGE = 90.0
-        PRODUCTION_COVERAGE = 75.0  # Minimum for production-ready configs
-        TARGET_COVERAGE = 95.0
-        EXCELLENT_COVERAGE = 98.0
-        MAXIMUM_COVERAGE = 100.0  # Maximum possible coverage percentage
+        MINIMUM_COVERAGE: float = 90.0
+        PRODUCTION_COVERAGE: float = 75.0
+        TARGET_COVERAGE: float = 95.0
+        EXCELLENT_COVERAGE: float = 98.0
+        MAXIMUM_COVERAGE: float = 100.0
 
     class Complexity:
         """Complexity thresholds."""
 
-        # Cyclomatic complexity limits
-        MAX_COMPLEXITY = 10
-        WARNING_COMPLEXITY = 7
-        IDEAL_COMPLEXITY = 5
-        STRICT_COMPLEXITY = 8  # Strict threshold for enterprise configurations
-        HIGH_COMPLEXITY_WARNING_THRESHOLD = (
-            50  # Warning threshold for very high complexity
-        )
+        MAX_COMPLEXITY: int = 10
+        WARNING_COMPLEXITY: int = 7
+        IDEAL_COMPLEXITY: int = 5
+        STRICT_COMPLEXITY: int = 8
+        HIGH_COMPLEXITY_WARNING_THRESHOLD: int = 50
 
     class Security:
-        """Security scoring thresholds."""
+        """Security scoring thresholds for quality analysis."""
 
-        MINIMUM_SECURITY_SCORE = 90.0
-        TARGET_SECURITY_SCORE = 95.0
-        HIGH_SECURITY_SCORE_THRESHOLD = 95.0  # Threshold requiring enhanced validation
+        MINIMUM_SECURITY_SCORE: float = 90.0
+        TARGET_SECURITY_SCORE: float = 95.0
+        HIGH_SECURITY_SCORE_THRESHOLD: float = 95.0
 
     class Maintainability:
         """Maintainability scoring thresholds."""
 
-        MINIMUM_MAINTAINABILITY = 80.0
-        TARGET_MAINTAINABILITY = 90.0
-
-    class Performance:
-        """Performance and timeout limits."""
-
-        # Analysis timeouts in seconds
-        MINIMUM_ANALYSIS_TIMEOUT = 30  # Minimum timeout for analysis operations
-        MAXIMUM_ANALYSIS_TIMEOUT = 3600  # Maximum timeout to prevent system impact
-        DEFAULT_ANALYSIS_TIMEOUT = 300  # Default timeout for most operations
-
-        # Worker limits
-        MINIMUM_WORKERS = 1  # Minimum number of worker processes
-        MAXIMUM_WORKERS = 16  # Maximum workers to prevent system overload
-        DEFAULT_WORKERS = 4  # Default number of worker processes
-
-    class Validation:
-        """Validation ranges and limits."""
-
-        # Percentage validation
-        MINIMUM_PERCENTAGE = 0.0
-        MAXIMUM_PERCENTAGE = 100.0
-
-        # Score thresholds requiring specific tools
-        COVERAGE_EXTERNAL_TOOLS_THRESHOLD = 100.0  # Coverage requiring external tools
-        SECURITY_BANDIT_THRESHOLD = 90.0  # Security score requiring Bandit
-        SECURITY_DEPENDENCY_SCAN_THRESHOLD = 95.0  # Security requiring dependency scan
-
-    class Reporting:
-        """Reporting constants and limits."""
-
-        # Report size thresholds
-        LARGE_REPORT_SIZE_BYTES = 100000  # 100KB threshold for large reports
-
-        # Path display limits
-        PATH_SEGMENTS_TO_KEEP = 4  # Number of path segments to keep in display
-
-    class Project:
-        """Project lifecycle constants."""
-
-        # Time-based thresholds
-        RECENT_UPDATE_DAYS = 7  # Days threshold for "recently updated" status
+        MINIMUM_MAINTAINABILITY: float = 80.0
+        TARGET_MAINTAINABILITY: float = 90.0
 
     class Duplication:
         """Code duplication thresholds."""
 
-        # Duplication percentage limits
-        MAXIMUM_DUPLICATION = 5.0  # Maximum allowed code duplication percentage
-        TARGET_DUPLICATION = 3.0  # Target duplication percentage
-        EXCELLENT_DUPLICATION = 1.0  # Excellent duplication threshold
+        MAXIMUM_DUPLICATION: float = 5.0
+        TARGET_DUPLICATION: float = 3.0
+        EXCELLENT_DUPLICATION: float = 1.0
 
-    # ==== INTERNAL TOOLS CONSTANTS (from flext_tools migration) ====
+    # =============================================================================
+    # PERFORMANCE AND TIMEOUTS - Analysis performance limits
+    # =============================================================================
+
+    class Performance:
+        """Performance and timeout limits for quality analysis."""
+
+        MINIMUM_ANALYSIS_TIMEOUT: int = 30
+        MAXIMUM_ANALYSIS_TIMEOUT: int = 3600
+        DEFAULT_ANALYSIS_TIMEOUT: int = 300
+        MINIMUM_WORKERS: int = 1
+        MAXIMUM_WORKERS: int = 16
+        DEFAULT_WORKERS: int = 4
+
+    class Validation:
+        """Validation ranges and limits for quality analysis."""
+
+        MINIMUM_PERCENTAGE: float = 0.0
+        MAXIMUM_PERCENTAGE: float = 100.0
+        COVERAGE_EXTERNAL_TOOLS_THRESHOLD: float = 100.0
+        SECURITY_BANDIT_THRESHOLD: float = 90.0
+        SECURITY_DEPENDENCY_SCAN_THRESHOLD: float = 95.0
+
+    # =============================================================================
+    # REPORTING AND OUTPUT - Report generation constants
+    # =============================================================================
+
+    class Reporting:
+        """Reporting constants and limits."""
+
+        LARGE_REPORT_SIZE_BYTES: int = 100000
+        PATH_SEGMENTS_TO_KEEP: int = 4
+        SUPPORTED_FORMATS: tuple[str, ...] = (
+            "HTML",
+            "JSON",
+            "PDF",
+            "CSV",
+            "XML",
+            "MARKDOWN",
+        )
+        DEFAULT_FORMAT: str = "HTML"
+
+    class Project:
+        """Project lifecycle constants."""
+
+        RECENT_UPDATE_DAYS: int = 7
+        SUPPORTED_LANGUAGES: tuple[str, ...] = (
+            "python",
+            "javascript",
+            "typescript",
+            "java",
+            "go",
+            "rust",
+        )
+
+    # =============================================================================
+    # ANALYSIS BACKENDS - Backend configuration constants
+    # =============================================================================
+
+    class Backends:
+        """Analysis backend constants."""
+
+        SUPPORTED_BACKENDS: tuple[str, ...] = ("AST", "EXTERNAL", "HYBRID")
+        DEFAULT_BACKEND: str = "AST"
+        EXTERNAL_TOOLS: tuple[str, ...] = (
+            "ruff",
+            "mypy",
+            "bandit",
+            "coverage",
+            "pytest",
+        )
+
+    class Analysis:
+        """Analysis configuration constants."""
+
+        DEFAULT_INCLUDE_PATTERNS: tuple[str, ...] = ("*.py", "*.pyi")
+        DEFAULT_EXCLUDE_PATTERNS: tuple[str, ...] = (
+            "__pycache__",
+            ".git",
+            ".venv",
+            "node_modules",
+            "*.pyc",
+            "*.pyo",
+            "*.pyd",
+            ".DS_Store",
+        )
+        MAX_FUNCTION_NAME_LENGTH: int = 50
+        MIN_FILE_SIZE_FOR_DUPLICATION_CHECK: int = 100
+        SIMILARITY_THRESHOLD: float = 0.8
+        GRADE_A_THRESHOLD: float = 90.0
+        GRADE_B_THRESHOLD: float = 80.0
+        GRADE_C_THRESHOLD: float = 70.0
+        GRADE_D_THRESHOLD: float = 60.0
+
+    # =============================================================================
+    # LITERAL TYPES - Type-safe string literals
+    # =============================================================================
+
+    class Literals:
+        """Type-safe string literals for quality analysis."""
+
+        AnalysisStatus = Literal["queued", "analyzing", "completed", "failed"]
+        IssueSeverity = Literal["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]
+        IssueType = Literal[
+            "SECURITY",
+            "COMPLEXITY",
+            "DUPLICATION",
+            "COVERAGE",
+            "STYLE",
+            "BUG",
+            "PERFORMANCE",
+            "MAINTAINABILITY",
+        ]
+        ReportFormat = Literal["HTML", "JSON", "PDF", "CSV", "XML", "MARKDOWN"]
+        BackendType = Literal["AST", "EXTERNAL", "HYBRID"]
+        Language = Literal["python", "javascript", "typescript", "java", "go", "rust"]
+
+    # =============================================================================
+    # QUALITY TOOLS - Internal tools constants
+    # =============================================================================
+
+    class Tools:
+        """Quality tools constants."""
+
+        LINT_TOOLS: tuple[str, ...] = ("ruff", "black")
+        TYPE_TOOLS: tuple[str, ...] = ("mypy", "pyrefly")
+        MIN_COVERAGE: int = 75
+        MAX_LINE_LENGTH: int = 79
+        REQUIRED_FILES: tuple[str, ...] = ("pyproject.toml", "Makefile", "README.md")
+        REQUIRED_DIRS: tuple[str, ...] = ("src", "tests")
 
     class Git:
         """Git tool constants for quality operations."""
 
-        DEFAULT_AUTHOR_NAME: ClassVar[str] = "Marlon Costa"
-        DEFAULT_AUTHOR_EMAIL: ClassVar[str] = "marlonsc@gmail.com"
-        DEFAULT_BACKUP_DIR: ClassVar[str] = "~/flext-backup"
-        AI_PATTERNS: ClassVar[list[str]] = [
+        DEFAULT_AUTHOR_NAME: str = "Marlon Costa"
+        DEFAULT_AUTHOR_EMAIL: str = "marlonsc@gmail.com"
+        DEFAULT_BACKUP_DIR: str = "~/flext-backup"
+        AI_PATTERNS: tuple[str, ...] = (
             r"🤖 Generated with \[Claude Code\].*",
             r"Co-Authored-By: Claude.*",
             r"Co-Authored-By: Codex.*",
@@ -148,15 +224,15 @@ class FlextQualityConstants(FlextConstants):
             r"With assistance from.*",
             r"AI-assisted.*",
             r"noreply@anthropic\.com",
-        ]
+        )
 
     class Optimization:
         """Module optimization constants."""
 
-        DEFAULT_BATCH_SIZE: ClassVar[int] = 5
-        MAX_FILE_SIZE: ClassVar[int] = 1024 * 1024  # 1MB
-        SUPPORTED_EXTENSIONS: ClassVar[set[str]] = {".py", ".pyi"}
-        EXCLUDE_PATTERNS: ClassVar[list[str]] = [
+        DEFAULT_BATCH_SIZE: int = 5
+        MAX_FILE_SIZE: int = 1024 * 1024  # 1MB
+        SUPPORTED_EXTENSIONS: frozenset[str] = frozenset({".py", ".pyi"})
+        EXCLUDE_PATTERNS: tuple[str, ...] = (
             "__pycache__",
             ".git",
             ".venv",
@@ -165,28 +241,10 @@ class FlextQualityConstants(FlextConstants):
             "*.pyo",
             "*.pyd",
             ".DS_Store",
-        ]
-
-    class Quality:
-        """Quality check tool constants."""
-
-        LINT_TOOLS: ClassVar[list[str]] = ["ruff", "black"]
-        TYPE_TOOLS: ClassVar[list[str]] = ["mypy", "pyrefly"]
-        MIN_COVERAGE: ClassVar[int] = 75
-        MAX_LINE_LENGTH: ClassVar[int] = 79
-
-    class ToolValidation:
-        """Validation constants for quality tools."""
-
-        REQUIRED_FILES: ClassVar[list[str]] = [
-            "pyproject.toml",
-            "Makefile",
-            "README.md",
-        ]
-        REQUIRED_DIRS: ClassVar[list[str]] = ["src", "tests"]
+        )
 
     class Patterns:
-        """Pattern matching constants for domain library enforcement."""
+        """Pattern matching constants for quality analysis enforcement."""
 
         FORBIDDEN_DIRECT_IMPORTS: ClassVar[dict[str, str]] = {
             "import ldap3": "flext-ldap",
@@ -207,16 +265,16 @@ class FlextQualityConstants(FlextConstants):
             "from fastapi": "flext-web",
         }
 
-        FORBIDDEN_PATTERNS: ClassVar[list[str]] = [
+        FORBIDDEN_PATTERNS: tuple[str, ...] = (
             r"# type: ignore.*$",
             r"def .*\).*-> Any:",
             r"except.*pass",
             r"from flext_core\.[^.]+\.import",
-        ]
+        )
 
     class DryRun:
         """Dry-run mode constants for safe testing."""
 
-        DEFAULT_TEMP_PREFIX: ClassVar[str] = f"{tempfile.gettempdir()}/flext-tools-"
-        BACKUP_SUFFIX: ClassVar[str] = ".backup"
-        DRY_RUN_DEFAULT: ClassVar[bool] = True
+        DEFAULT_TEMP_PREFIX: str = f"{tempfile.gettempdir()}/flext-tools-"
+        BACKUP_SUFFIX: str = ".backup"
+        DRY_RUN_DEFAULT: bool = True

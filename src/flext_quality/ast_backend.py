@@ -401,18 +401,3 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
         """
         return self._ASTVisitor(file_path, package_name)
-
-
-# Backward compatibility aliases for existing code
-# Create public alias for the nested ASTVisitor class
-# Create public alias for the nested ASTVisitor class
-class ASTVisitor:
-    """Public alias for the nested ASTVisitor class."""
-
-    def __new__(cls, file_path: Path, package_name: str) -> object:
-        """Create instance of the actual ASTVisitor class."""
-        backend = FlextQualityASTBackend()
-        return backend.create_visitor(file_path, package_name)
-
-
-ASTBackend = FlextQualityASTBackend

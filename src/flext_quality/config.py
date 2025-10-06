@@ -9,7 +9,7 @@ from __future__ import annotations
 import warnings
 from typing import Self
 
-from flext_core import FlextConfig, FlextConstants, FlextResult, FlextTypes
+from flext_core import FlextConfig, FlextResult, FlextTypes
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import SettingsConfigDict
 
@@ -85,14 +85,14 @@ class FlextQualityConfig(FlextConfig):
     )
 
     parallel_workers: int = Field(
-        default=FlextConstants.Container.DEFAULT_WORKERS,
+        default=FlextQualityConstants.Performance.DEFAULT_WORKERS,
         ge=1,
         le=FlextQualityConstants.Performance.MAXIMUM_WORKERS,
         description="Number of parallel workers for analysis",
     )
 
     memory_limit_mb: int = Field(
-        default=FlextConstants.Logging.MAX_FILE_SIZE // (1024 * 1024),
+        default=FlextQualityConstants.Optimization.MAX_FILE_SIZE // (1024 * 1024),
         gt=0,
         le=2048,
         description="Memory limit per file in MB",

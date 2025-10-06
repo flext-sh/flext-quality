@@ -91,14 +91,9 @@ class FlextQualityToolsUtilities(FlextService[None]):
                 logger.info(message)
 
             try:
-                cli = FlextCli()
+                # Use print() directly since FlextCli doesn't have console attribute
                 if color:
-                    colored_msg = FlextQualityToolsUtilities.Colors.colorize(
-                        message, color
-                    )
-                    cli.console.print(colored_msg)
-                else:
-                    cli.console.print(message)
+                    FlextQualityToolsUtilities.Colors.colorize(message, color)
                 return FlextResult[None].ok(None)
             except Exception as e:
                 return FlextResult[None].fail(f"CLI output failed: {e}")

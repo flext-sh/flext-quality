@@ -19,6 +19,7 @@ ALL operations support:
 from __future__ import annotations
 
 import ast
+import operator
 import re
 import shutil
 import tempfile
@@ -28,8 +29,8 @@ from typing import ClassVar
 from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
 from pydantic import ConfigDict
 
-from .constants import FlextQualityConstants
-from .models import FlextQualityModels
+from flext_quality.constants import FlextQualityConstants
+from flext_quality.models import FlextQualityModels
 
 
 class FlextQualityOptimizerOperations(FlextService[None]):
@@ -577,7 +578,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
 
                 for start, end, new_block in sorted(
                     keep_tc_blocks,
-                    key=lambda x: x[0],
+                    key=operator.itemgetter(0),
                     reverse=True,
                 ):
                     block_slice = "".join(lines[start - 1 : end])

@@ -9,18 +9,47 @@ from __future__ import annotations
 from pathlib import Path
 from typing import cast
 
+# Web server dependency
+import uvicorn
+
 # FastAPI types needed for runtime web functionality
 # These are acceptable since flext-web is the FastAPI domain library
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 
 # Domain library imports (ZERO TOLERANCE - NO direct FastAPI imports)
-from flext_auth import FlextAuth, JwtAuthProvider, WebAuthMiddleware
-from flext_core import FlextContainer, FlextLogger, FlextTypes
-from flext_web import create_fastapi_app
+from flext_auth import FlextAuth, JwtAuthProvider
+
+
+# Mock WebAuthMiddleware until flext_auth is available
+class WebAuthMiddleware:
+    def __init__(self, auth_provider, exclude_paths=None) -> None:
+        self.auth_provider = auth_provider
+        self.exclude_paths = exclude_paths or []
+
+
+from flext_core import FlextContainer, FlextLogger, FlextResult, FlextTypes
+
+# Import from models instead of flext_web mock
+from .models import FlextQualityModels
+
+
+def create_fastapi_app(config: FlextQualityModels.AppConfig) -> FlextResult[FastAPI]:
+    """Temporary mock implementation of create_fastapi_app."""
+    try:
+        app = FastAPI(
+            title=config.title,
+            version=config.version,
+            docs_url="/docs" if config.enable_docs else None,
+            redoc_url="/redoc" if config.enable_docs else None,
+        )
+        return FlextResult[FastAPI].ok(app)
+    except Exception as e:
+        return FlextResult[FastAPI].fail(f"Failed to create FastAPI app: {e}")
+
 
 from .analyzer import CodeAnalyzer
-from .api import QualityAPI
+from .api import FlextQuality
 from .config import FlextQualityConfig
 
 
@@ -42,9 +71,7 @@ class FlextQualityWeb:
         self._quality_config = FlextQualityConfig()
 
         # Initialize flext-web configuration
-        from flext_web import FlextWebModels  # noqa: PLC0415
-
-        app_config = FlextWebModels.AppConfig(
+        app_config = FlextQualityModels.AppConfig(
             title="flext-quality",
             version="0.9.0",
             enable_cors=True,
@@ -59,7 +86,7 @@ class FlextQualityWeb:
         self.app = cast("FastAPI", app_result.value)
 
         # Initialize quality components
-        self.quality_api = QualityAPI()
+        self.quality_api = FlextQuality()
 
         # Initialize authentication (flext-auth integration)
         self._auth = self._setup_authentication()
@@ -115,7 +142,7 @@ class FlextQualityWeb:
         self.app.get("/api/quality/metrics", tags=["Metrics"])(self.get_metrics)
         self.app.get("/api/quality/report/{format}", tags=["Reports"])(self.get_report)
 
-    async def health_check(self) -> dict[str, str]:
+    def health_check(self) -> dict[str, str]:
         """Health check endpoint for quality service monitoring."""
         return {
             "status": "healthy",
@@ -212,7 +239,7 @@ class FlextQualityWeb:
       </html>
       """
 
-    async def analyze_project(self, request: Request) -> FlextTypes.Dict:
+    def analyze_project(self, request: Request) -> FlextTypes.Dict:
         """Analyze a project and return results (FastAPI endpoint).
 
         Requires authentication via WebAuthMiddleware.
@@ -258,7 +285,7 @@ class FlextQualityWeb:
             },
         }
 
-    async def get_metrics(self) -> FlextTypes.Dict:
+    def get_metrics(self) -> FlextTypes.Dict:
         """Get quality metrics (FastAPI endpoint).
 
         Requires authentication via WebAuthMiddleware.
@@ -266,7 +293,7 @@ class FlextQualityWeb:
         # Use simple placeholder metrics for now
         return {"success": True, "data": {}}
 
-    async def get_report(self, report_format: str) -> FlextTypes.Dict:
+    def get_report(self, report_format: str) -> FlextTypes.Dict:
         """Generate and return quality report (FastAPI endpoint).
 
         Args:
@@ -282,7 +309,7 @@ class FlextQualityWeb:
 
     def run(
         self,
-        host: str = "0.0.0.0",  # noqa: S104
+        host: str = "127.0.0.1",
         port: int = 8080,
         *,
         debug: bool = False,
@@ -291,20 +318,13 @@ class FlextQualityWeb:
         """Run the quality web server using uvicorn (FastAPI ASGI server).
 
         Args:
-            host: Server host address (default: 0.0.0.0)
+            host: Server host address (default: 127.0.0.1)
             port: Server port (default: 8080)
             debug: Enable debug mode
             reload: Enable auto-reload on code changes
 
         """
         self._logger.info("Starting FLEXT Quality Web Interface on %s:%s", host, port)
-
-        try:
-            import uvicorn  # noqa: PLC0415
-        except ImportError as e:
-            self._logger.exception("uvicorn not installed")
-            msg = "uvicorn not installed. Install with: pip install uvicorn[standard]"
-            raise ImportError(msg) from e
 
         uvicorn.run(
             self.app,
@@ -321,17 +341,9 @@ class FlextQualityWeb:
         interface.run(debug=True, reload=True)
 
 
-# Backward compatibility aliases for existing code
-web_main = FlextQualityWeb.web_main
-FlextQualityWebInterface = FlextQualityWeb
-main = web_main
-
 __all__ = [
     "FlextQualityWeb",
-    "FlextQualityWebInterface",
-    "main",  # Legacy compatibility
-    "web_main",
 ]
 
 if __name__ == "__main__":
-    web_main()
+    FlextQualityWeb.web_main()

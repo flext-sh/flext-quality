@@ -47,7 +47,7 @@ class FlextQualityIntegrations(FlextService[None]):
         assert self._logger is not None
         return self._logger
 
-    async def send_webhook_notification(
+    def send_webhook_notification(
         self,
         webhook_url: str,
         event_type: str,
@@ -93,7 +93,7 @@ class FlextQualityIntegrations(FlextService[None]):
             self.logger.exception("Webhook notification failed")
             return FlextResult[FlextTypes.Dict].fail(f"Webhook error: {e}")
 
-    async def send_slack_notification(
+    def send_slack_notification(
         self,
         webhook_url: str,
         message: str,
@@ -146,7 +146,7 @@ class FlextQualityIntegrations(FlextService[None]):
             self.logger.exception("Slack notification failed")
             return FlextResult[FlextTypes.Dict].fail(f"Slack error: {e}")
 
-    async def integrate_sonarqube(
+    def integrate_sonarqube(
         self,
         sonarqube_url: str,
         project_key: str,
@@ -196,7 +196,7 @@ class FlextQualityIntegrations(FlextService[None]):
             self.logger.exception("SonarQube integration failed")
             return FlextResult[FlextTypes.Dict].fail(f"SonarQube error: {e}")
 
-    async def integrate_github_checks(
+    def integrate_github_checks(
         self,
         github_api_url: str,
         repo: str,
@@ -258,7 +258,7 @@ class FlextQualityIntegrations(FlextService[None]):
             self.logger.exception("GitHub Checks integration failed")
             return FlextResult[FlextTypes.Dict].fail(f"GitHub error: {e}")
 
-    async def deliver_report_to_external_storage(
+    def deliver_report_to_external_storage(
         self,
         storage_url: str,
         report_file: Path,
@@ -301,7 +301,7 @@ class FlextQualityIntegrations(FlextService[None]):
             self.logger.exception("Report delivery failed")
             return FlextResult[FlextTypes.Dict].fail(f"Delivery error: {e}")
 
-    async def notify_on_threshold_violation(
+    def notify_on_threshold_violation(
         self,
         webhook_urls: list[str],
         violation_data: FlextTypes.Dict,
@@ -319,7 +319,7 @@ class FlextQualityIntegrations(FlextService[None]):
         results: list[FlextTypes.Dict] = []
 
         for webhook_url in webhook_urls:
-            result = await self.send_webhook_notification(
+            result = self.send_webhook_notification(
                 webhook_url=webhook_url,
                 event_type="threshold_violation",
                 event_data=violation_data,

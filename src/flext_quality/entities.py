@@ -13,8 +13,8 @@ from typing import override
 from flext_core import FlextContainer, FlextLogger, FlextResult
 from pydantic import BaseModel, Field
 
+from .constants import FlextQualityConstants
 from .typings import FlextQualityTypes
-from .value_objects import FlextIssueSeverity, FlextIssueType
 
 
 class FlextQualityEntities:
@@ -56,7 +56,7 @@ class FlextQualityEntities:
     # NESTED ENTITY CLASSES - Core domain entities
     # =============================================================================
 
-    class QualityProject(BaseModel):
+    class Project(BaseModel):
         """Quality project domain entity using enhanced mixins for code reduction."""
 
         # Project identification
@@ -73,10 +73,18 @@ class FlextQualityEntities:
         auto_analyze: bool = Field(default=True)
         analysis_schedule: str | None = None  # cron format
 
-        # Quality thresholds
-        min_coverage: float = Field(default=95.0, ge=0.0, le=100.0)
-        max_complexity: int = Field(default=10, ge=1)
-        max_duplication: float = Field(default=5.0, ge=0.0, le=100.0)
+        # Quality thresholds from constants
+        min_coverage: float = Field(
+            default=FlextQualityConstants.Coverage.MINIMUM_COVERAGE, ge=0.0, le=100.0
+        )
+        max_complexity: int = Field(
+            default=FlextQualityConstants.Complexity.MAX_COMPLEXITY, ge=1
+        )
+        max_duplication: float = Field(
+            default=FlextQualityConstants.Duplication.MAXIMUM_DUPLICATION,
+            ge=0.0,
+            le=100.0,
+        )
 
         # Statistics
         last_analysis_at: datetime | None = None
@@ -88,7 +96,7 @@ class FlextQualityEntities:
                 return FlextResult[None].fail("Project path is required")
             return FlextResult[None].ok(None)
 
-        def update_last_analysis(self) -> FlextQualityEntities.QualityProject:
+        def update_last_analysis(self) -> FlextQualityEntities.Project:
             """Update last analysis timestamp and return new instance."""
             return self.model_copy(
                 update={
@@ -97,7 +105,7 @@ class FlextQualityEntities:
                 },
             )
 
-    class QualityAnalysis(BaseModel):
+    class Analysis(BaseModel):
         """Quality analysis domain entity using enhanced mixins for code reduction."""
 
         id: str = Field(
@@ -146,7 +154,7 @@ class FlextQualityEntities:
             default_factory=dict
         )
 
-        def start_analysis(self) -> FlextQualityEntities.QualityAnalysis:
+        def start_analysis(self) -> FlextQualityEntities.Analysis:
             """Start analysis and return new instance."""
             return self.model_copy(
                 update={
@@ -155,7 +163,7 @@ class FlextQualityEntities:
                 },
             )
 
-        def complete_analysis(self) -> FlextQualityEntities.QualityAnalysis:
+        def complete_analysis(self) -> FlextQualityEntities.Analysis:
             """Complete analysis and return new instance."""
             completed_at = datetime.now(UTC)
             if self.started_at:
@@ -170,7 +178,7 @@ class FlextQualityEntities:
                 },
             )
 
-        def fail_analysis(self, _error: str) -> FlextQualityEntities.QualityAnalysis:
+        def fail_analysis(self, _error: str) -> FlextQualityEntities.Analysis:
             """Fail analysis and return new instance."""
             completed_at = datetime.now(UTC)
             if self.started_at:
@@ -189,7 +197,7 @@ class FlextQualityEntities:
 
         def calculate_overall_score(
             self,
-        ) -> FlextQualityEntities.QualityAnalysis:
+        ) -> FlextQualityEntities.Analysis:
             """Calculate overall score and return new instance."""
             scores = [
                 self.coverage_score,
@@ -220,14 +228,14 @@ class FlextQualityEntities:
                 return FlextResult[None].fail("Project ID is required")
             return FlextResult[None].ok(None)
 
-    class QualityIssue(BaseModel):
+    class Issue(BaseModel):
         """Quality issue domain entity using enhanced mixins for code reduction."""
 
         analysis_id: str = Field(..., description="Associated analysis ID")
 
         # Issue identification
-        issue_type: FlextIssueType = Field(...)
-        severity: FlextIssueSeverity = Field(...)
+        issue_type: str = Field(...)
+        severity: str = Field(...)
         rule_id: str = Field(..., min_length=1)
 
         # Location
@@ -252,11 +260,11 @@ class FlextQualityEntities:
         last_seen_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
         occurrence_count: int = Field(default=1)
 
-        def mark_fixed(self) -> FlextQualityEntities.QualityIssue:
+        def mark_fixed(self) -> FlextQualityEntities.Issue:
             """Mark issue as fixed and return new instance."""
             return self.model_copy(update={"is_fixed": "True"})
 
-        def suppress(self, _reason: str) -> FlextQualityEntities.QualityIssue:
+        def suppress(self, _reason: str) -> FlextQualityEntities.Issue:
             """Suppress issue and return new instance."""
             return self.model_copy(
                 update={
@@ -265,7 +273,7 @@ class FlextQualityEntities:
                 },
             )
 
-        def unsuppress(self) -> FlextQualityEntities.QualityIssue:
+        def unsuppress(self) -> FlextQualityEntities.Issue:
             """Unsuppress issue and return new instance."""
             return self.model_copy(
                 update={
@@ -274,7 +282,7 @@ class FlextQualityEntities:
                 },
             )
 
-        def increment_occurrence(self) -> FlextQualityEntities.QualityIssue:
+        def increment_occurrence(self) -> FlextQualityEntities.Issue:
             """Increment occurrence count and return new instance."""
             return self.model_copy(
                 update={
@@ -289,16 +297,16 @@ class FlextQualityEntities:
                 return FlextResult[None].fail("Analysis ID is required")
             return FlextResult[None].ok(None)
 
-    class QualityRule(BaseModel):
+    class Rule(BaseModel):
         """Quality rule domain entity using enhanced mixins for code reduction."""
 
         # Rule identification
         rule_id: str = Field(..., min_length=1)
-        category: FlextIssueType = Field(...)
+        category: str = Field(...)
 
         # Rule configuration
         enabled: bool = Field(default=True)
-        severity: FlextIssueSeverity = Field(default=FlextIssueSeverity.MEDIUM)
+        severity: str = Field(default="MEDIUM")
 
         # Rule details
         pattern: str | None = None
@@ -308,18 +316,18 @@ class FlextQualityEntities:
         documentation_url: str | None = None
         examples: list[FlextQualityTypes.Core.DataDict] = Field(default_factory=list)
 
-        def enable(self) -> FlextQualityEntities.QualityRule:
+        def enable(self) -> FlextQualityEntities.Rule:
             """Enable rule and return new instance."""
             return self.model_copy(update={"enabled": "True"})
 
-        def disable(self) -> FlextQualityEntities.QualityRule:
+        def disable(self) -> FlextQualityEntities.Rule:
             """Disable rule and return new instance."""
             return self.model_copy(update={"enabled": "False"})
 
         def update_severity(
             self,
-            _severity: FlextIssueSeverity,
-        ) -> FlextQualityEntities.QualityRule:
+            _severity: str,
+        ) -> FlextQualityEntities.Rule:
             """Update severity and return new instance."""
             return self.model_copy(update={"severity": "severity"})
 
@@ -327,7 +335,7 @@ class FlextQualityEntities:
             self,
             key: str,
             value: object,
-        ) -> FlextQualityEntities.QualityRule:
+        ) -> FlextQualityEntities.Rule:
             """Set parameter and return new instance."""
             new_parameters = self.parameters.copy()
             new_parameters[key] = value
@@ -339,7 +347,7 @@ class FlextQualityEntities:
                 return FlextResult[None].fail("Rule ID is required")
             return FlextResult[None].ok(None)
 
-    class QualityReport(BaseModel):
+    class Report(BaseModel):
         """Quality report domain entity using enhanced mixins for code reduction."""
 
         analysis_id: str = Field(..., description="Associated analysis ID")
@@ -360,7 +368,7 @@ class FlextQualityEntities:
         access_count: int = Field(default=0)
         last_accessed_at: datetime | None = None
 
-        def increment_access(self) -> FlextQualityEntities.QualityReport:
+        def increment_access(self) -> FlextQualityEntities.Report:
             """Increment access count and return new instance."""
             return self.model_copy(
                 update={
@@ -408,8 +416,8 @@ class FlextQualityEntities:
 
         analysis_id: str
         issue_id: str
-        issue_type: FlextIssueType
-        severity: FlextIssueSeverity
+        issue_type: str
+        severity: str
         file_path: str
         rule_id: str
 
@@ -426,7 +434,7 @@ class FlextQualityEntities:
     # ENTITY FACTORY METHODS - Removed for 1.0 production readiness
     # =============================================================================
     # Factory methods removed to eliminate object type usage and ensure type safety
-    # Users should instantiate entities directly: QualityProject(name="...", project_path="...")
+    # Users should instantiate entities directly: Project(name="...", project_path="...")
 
 
 # Rebuild models to resolve forward references and type annotations
@@ -434,11 +442,11 @@ try:
     _entities = FlextQualityEntities()
 
     # Rebuild nested models
-    FlextQualityEntities.QualityProject.model_rebuild()
-    FlextQualityEntities.QualityAnalysis.model_rebuild()
-    FlextQualityEntities.QualityIssue.model_rebuild()
-    FlextQualityEntities.QualityRule.model_rebuild()
-    FlextQualityEntities.QualityReport.model_rebuild()
+    FlextQualityEntities.Project.model_rebuild()
+    FlextQualityEntities.Analysis.model_rebuild()
+    FlextQualityEntities.Issue.model_rebuild()
+    FlextQualityEntities.Rule.model_rebuild()
+    FlextQualityEntities.Report.model_rebuild()
 
     # Also rebuild domain events
     FlextQualityEntities.DomainEvent.model_rebuild()

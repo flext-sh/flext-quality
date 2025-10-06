@@ -267,11 +267,11 @@ class FlextQualityReportGenerator:
 
     def _get_files_analyzed(self) -> int:
         """Get number of files analyzed."""
-        return int(self.results.overall_metrics.get("files_analyzed", 0))
+        return int(self.results.overall_metrics.files_analyzed)
 
     def _get_coverage_percent(self) -> float:
         """Get code coverage percentage."""
-        return float(self.results.overall_metrics.get("coverage_score", 0.0))
+        return float(self.results.overall_metrics.coverage_score)
 
     def _generate_issues_html(self) -> str:
         """Generate HTML for issues section."""

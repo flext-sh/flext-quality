@@ -6,8 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import override
-
 from flext_core import FlextContainer, FlextLogger
 
 
@@ -18,8 +16,10 @@ class FlextQualityContainer:
     Contains all container functionality as nested classes with shared resources.
     """
 
-    @override
-    def __init__(self: object) -> None:
+    _container: FlextContainer
+    _logger: FlextLogger
+
+    def __init__(self) -> None:
         """Initialize container with dependency injection."""
         self._container = FlextContainer.get_global()
         self._logger = FlextLogger(__name__)

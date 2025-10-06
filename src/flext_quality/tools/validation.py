@@ -14,7 +14,7 @@ from __future__ import annotations
 from flext_core import FlextLogger, FlextResult, FlextService
 from pydantic import ConfigDict
 
-from .models import FlextQualityModels
+from flext_quality.models import FlextQualityModels
 
 
 class FlextQualityValidationTools(FlextService[None]):
@@ -46,7 +46,8 @@ class FlextQualityValidationTools(FlextService[None]):
             logger.info(f"Validating equilibrium for {workspace_path}")
 
             result = FlextQualityModels.ValidationResult(
-                passed=True,
+                is_valid=True,
+                errors=[],
                 checks_run=10,
                 checks_passed=10,
                 failures=[],
@@ -74,7 +75,8 @@ class FlextQualityValidationTools(FlextService[None]):
             logger.info(f"Validating domain separation for {project_path}")
 
             result = FlextQualityModels.ValidationResult(
-                passed=True,
+                is_valid=True,
+                errors=[],
                 checks_run=5,
                 checks_passed=5,
                 failures=[],
@@ -102,7 +104,8 @@ class FlextQualityValidationTools(FlextService[None]):
             logger.info(f"Validating ecosystem quality for {workspace_path}")
 
             result = FlextQualityModels.ValidationResult(
-                passed=True,
+                is_valid=True,
+                errors=[],
                 checks_run=15,
                 checks_passed=15,
                 failures=[],

@@ -231,11 +231,8 @@ def analyze_project(project_path: str) -> None:
         )
 
         # Unwrap FlextResult
-        if result.is_failure:
-            console.print(f"[red]Analysis failed: {result.error}[/red]")
-            return
-
-        results = result.value
+        # result is now AnalysisResults directly, not FlextResult
+        results = result
 
         # Extract basic project information using modern AnalysisResults API
         analyzed_files = [str(fm.file_path) for fm in results.file_metrics]

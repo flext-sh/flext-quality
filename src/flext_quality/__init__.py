@@ -8,13 +8,14 @@ from __future__ import annotations
 
 from typing import Final
 
+# Import specific types from the nested class
+from .analysis_types import FlextQualityAnalysisTypes
+
 # Core imports - moved to specific imports below to avoid circular import
 # Main modules
 from .analyzer import FlextQualityAnalyzer as CodeAnalyzer
-from .api import FlextQualityAPI as QualityAPI
-from .ast_backend import (
-    FlextQualityASTBackend as ASTBackend,
-)
+from .api import FlextQuality as FlextQuality, FlextQuality as QualityAPI
+from .ast_backend import FlextQualityASTBackend as ASTBackend
 from .backend_type import BackendType
 from .base import BaseAnalyzer
 
@@ -40,9 +41,7 @@ from .exceptions import (
     FlextQualityTimeoutError,
     FlextQualityValidationError,
 )
-from .external_backend import (
-    FlextQualityExternalBackend as ExternalBackend,
-)
+from .external_backend import FlextQualityExternalBackend as ExternalBackend
 from .grade_calculator import QualityGradeCalculator
 from .handlers import FlextQualityHandlers as FlextQualityHandler
 from .integrations import FlextQualityIntegrations
@@ -55,38 +54,9 @@ from .services import FlextQualityServices
 # Type system and aliases
 from .typings import FlextQualityTypes
 from .utilities import FlextQualityUtilities as QualityUtilities
-from .value_objects import (
-    ComplexityMetric,
-    CoverageMetric,
-    DuplicationMetric,
-    FlextIssueSeverity as IssueSeverity,
-    FlextIssueType as IssueType,
-    IssueLocation,
-    QualityGrade,
-    QualityScore,
-)
+from .value_objects import FlextQualityValueObjects
 from .version import VERSION, FlextQualityVersion
-from .web import FlextQualityWebInterface as QualityWebInterface
-
-# Type aliases for backward compatibility (deprecated - use FlextQualityTypes.*)
-AnalysisResults = FlextQualityTypes.AnalysisResults
-CodeIssue = FlextQualityTypes.CodeIssue
-ComplexityIssue = FlextQualityTypes.ComplexityIssue
-DeadCodeIssue = FlextQualityTypes.DeadCodeIssue
-Dependency = FlextQualityTypes.Dependency
-DuplicationIssue = FlextQualityTypes.DuplicationIssue
-FileAnalysisResult = FlextQualityTypes.FileAnalysisResult
-OverallMetrics = FlextQualityTypes.OverallMetrics
-SecurityIssue = FlextQualityTypes.SecurityIssue
-TestResults = FlextQualityTypes.TestResults
-
-# Entity aliases
-AnalysisStatus = FlextQualityEntities.AnalysisStatus
-QualityAnalysis = FlextQualityEntities.QualityAnalysis
-QualityIssue = FlextQualityEntities.QualityIssue
-QualityProject = FlextQualityEntities.QualityProject
-QualityReport = FlextQualityEntities.QualityReport
-QualityRule = FlextQualityEntities.QualityRule
+from .web import FlextQualityWeb
 
 PROJECT_VERSION: Final[FlextQualityVersion] = VERSION
 
@@ -97,27 +67,20 @@ __all__ = [
     "PROJECT_VERSION",
     "VERSION",
     "ASTBackend",
-    "AnalysisResults",
-    "AnalysisStatus",
+    # Additional exports for tests and examples
     "BackendType",
     "BaseAnalyzer",
     "CodeAnalyzer",
-    "CodeIssue",
-    "ComplexityIssue",
-    "ComplexityMetric",
-    "CoverageMetric",
-    "DeadCodeIssue",
-    "Dependency",
-    "DuplicationIssue",
-    "DuplicationMetric",
     "ExternalBackend",
-    "FileAnalysisResult",
+    "FlextQuality",
     "FlextQualityAnalysisError",
+    "FlextQualityAnalysisTypes",
     "FlextQualityAuthenticationError",
     "FlextQualityConfig",
     "FlextQualityConfigurationError",
     "FlextQualityConnectionError",
     "FlextQualityConstants",
+    "FlextQualityEntities",
     "FlextQualityError",
     "FlextQualityExceptions",
     "FlextQualityGradeError",
@@ -135,28 +98,15 @@ __all__ = [
     "FlextQualityTimeoutError",
     "FlextQualityTypes",
     "FlextQualityValidationError",
+    "FlextQualityValueObjects",
     "FlextQualityVersion",
-    "IssueLocation",
-    "IssueSeverity",
-    "IssueType",
-    "OverallMetrics",
+    "FlextQualityWeb",
     "QualityAPI",
-    "QualityAnalysis",
-    "QualityGrade",
     "QualityGradeCalculator",
-    "QualityIssue",
     "QualityMetrics",
-    "QualityProject",
-    "QualityReport",
-    "QualityRule",
-    "QualityScore",
     "QualityUtilities",
-    "QualityWebInterface",
-    "SecurityIssue",
-    "TestResults",
     "__version__",
     "__version_info__",
-    "exceptions_all",
     "get_quality_container",
     # CLI functions removed from __all__ - import directly from .cli if needed
 ]

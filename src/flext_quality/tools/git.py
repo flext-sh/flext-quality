@@ -27,8 +27,8 @@ from pathlib import Path
 from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
 from pydantic import ConfigDict
 
-from .constants import FlextQualityConstants
-from .models import FlextQualityModels
+from flext_quality.constants import FlextQualityConstants
+from flext_quality.models import FlextQualityModels
 
 
 class FlextQualityGitTools(FlextService[None]):

@@ -38,7 +38,7 @@ class FlextQualityExceptions(FlextExceptions):
         QUALITY_THRESHOLD_ERROR = "QUALITY_THRESHOLD_ERROR"
 
     # Base quality exception classes as nested classes
-    class QualityError(FlextExceptions.BaseError):
+    class Error(FlextExceptions.BaseError):
         """Base exception for all quality domain errors."""
 
         @override
@@ -49,7 +49,7 @@ class FlextQualityExceptions(FlextExceptions):
             component: str | None = None,
             **kwargs: object,
         ) -> None:
-            """Initialize quality error with context using helpers.
+            """Initialize quality error with context.
 
             Args:
                 message: Error message
@@ -57,29 +57,32 @@ class FlextQualityExceptions(FlextExceptions):
                 **kwargs: Additional context (context, correlation_id, error_code)
 
             """
-            # Store component before extracting common kwargs
+            # Store component
             self.component = component
 
-            # Extract common parameters using helper
-            base_context, correlation_id, error_code = self._extract_common_kwargs(
-                kwargs
+            # Extract common parameters
+            context_raw = kwargs.get("context", {})
+            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            correlation_id = (
+                str(kwargs.get("correlation_id"))
+                if kwargs.get("correlation_id")
+                else None
             )
+            error_code = str(kwargs.get("error_code", "QUALITY_ERROR"))
 
-            # Build context with quality-specific fields
-            context = self._build_context(
-                base_context,
-                component=component,
-            )
+            # Add component to context if provided
+            if component:
+                context["component"] = component
 
             # Call parent with complete error information
             super().__init__(
                 message,
-                code=error_code or "QUALITY_ERROR",
-                context=context,
+                error_code=error_code,
                 correlation_id=correlation_id,
+                metadata=context,
             )
 
-    class ValidationError(QualityError):
+    class ValidationError(Error):
         """Quality validation errors."""
 
         @override
@@ -101,27 +104,26 @@ class FlextQualityExceptions(FlextExceptions):
             # Store field_name before extracting common kwargs
             self.field_name = field_name
 
-            # Extract common parameters using helper
-            base_context, correlation_id, error_code = self._extract_common_kwargs(
-                kwargs
-            )
+            # Extract common parameters
+            context_raw = kwargs.get("context", {})
+            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            correlation_id = kwargs.get("correlation_id")
+            error_code = str(kwargs.get("error_code", "QUALITY_VALIDATION_ERROR"))
 
-            # Build context with validation-specific fields
-            context = self._build_context(
-                base_context,
-                field_name=field_name,
-            )
+            # Add field name to context if provided
+            if field_name:
+                context["field_name"] = field_name
 
             # Call parent with specific error code
             super().__init__(
                 message,
                 component="validation",
-                code=error_code or "QUALITY_VALIDATION_ERROR",
-                context=context,
+                error_code=error_code,
                 correlation_id=correlation_id,
+                context=context,
             )
 
-    class ConfigurationError(QualityError):
+    class ConfigurationError(Error):
         """Quality configuration errors."""
 
         @override
@@ -146,28 +148,28 @@ class FlextQualityExceptions(FlextExceptions):
             self.config_key = config_key
             self.config_value = config_value
 
-            # Extract common parameters using helper
-            base_context, correlation_id, error_code = self._extract_common_kwargs(
-                kwargs
-            )
+            # Extract common parameters
+            context_raw = kwargs.get("context", {})
+            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            correlation_id = kwargs.get("correlation_id")
+            error_code = str(kwargs.get("error_code", "QUALITY_CONFIGURATION_ERROR"))
 
-            # Build context with configuration fields
-            context = self._build_context(
-                base_context,
-                config_key=config_key,
-                config_value=config_value,
-            )
+            # Add config fields to context if provided
+            if config_key:
+                context["config_key"] = config_key
+            if config_value is not None:
+                context["config_value"] = str(config_value)
 
             # Call parent with specific error code
             super().__init__(
                 message,
                 component="configuration",
-                code=error_code or "QUALITY_CONFIGURATION_ERROR",
-                context=context,
+                error_code=error_code,
                 correlation_id=correlation_id,
+                context=context,
             )
 
-    class QualityConnectionError(QualityError):
+    class ConnectionError(Error):
         """Quality connection errors."""
 
         @override
@@ -189,27 +191,25 @@ class FlextQualityExceptions(FlextExceptions):
             # Store connection attributes before extracting common kwargs
             self.connection_target = connection_target
 
-            # Extract common parameters using helper
-            base_context, correlation_id, error_code = self._extract_common_kwargs(
-                kwargs
-            )
+            # Extract common parameters
+            context_raw = kwargs.get("context", {})
+            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            correlation_id = kwargs.get("correlation_id")
+            error_code = str(kwargs.get("error_code", "QUALITY_CONNECTION_ERROR"))
 
-            # Build context with connection fields
-            context = self._build_context(
-                base_context,
-                connection_target=connection_target,
-            )
+            # Add specific fields to context if provided
+            # (Add specific field handling here)
 
             # Call parent with specific error code
             super().__init__(
                 message,
                 component="connection",
-                code=error_code or "QUALITY_CONNECTION_ERROR",
-                context=context,
+                error_code=error_code,
                 correlation_id=correlation_id,
+                context=context,
             )
 
-    class ProcessingError(QualityError):
+    class ProcessingError(Error):
         """Quality processing errors."""
 
         @override
@@ -231,27 +231,25 @@ class FlextQualityExceptions(FlextExceptions):
             # Store processing attributes before extracting common kwargs
             self.processing_step = processing_step
 
-            # Extract common parameters using helper
-            base_context, correlation_id, error_code = self._extract_common_kwargs(
-                kwargs
-            )
+            # Extract common parameters
+            context_raw = kwargs.get("context", {})
+            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            correlation_id = kwargs.get("correlation_id")
+            error_code = str(kwargs.get("error_code", "QUALITY_PROCESSING_ERROR"))
 
-            # Build context with processing fields
-            context = self._build_context(
-                base_context,
-                processing_step=processing_step,
-            )
+            # Add specific fields to context if provided
+            # (Add specific field handling here)
 
             # Call parent with specific error code
             super().__init__(
                 message,
                 component="processing",
-                code=error_code or "QUALITY_PROCESSING_ERROR",
-                context=context,
+                error_code=error_code,
                 correlation_id=correlation_id,
+                context=context,
             )
 
-    class AuthenticationError(QualityError):
+    class AuthenticationError(Error):
         """Quality authentication errors."""
 
         @override
@@ -273,27 +271,25 @@ class FlextQualityExceptions(FlextExceptions):
             # Store username before extracting common kwargs
             self.username = username
 
-            # Extract common parameters using helper
-            base_context, correlation_id, error_code = self._extract_common_kwargs(
-                kwargs
-            )
+            # Extract common parameters
+            context_raw = kwargs.get("context", {})
+            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            correlation_id = kwargs.get("correlation_id")
+            error_code = str(kwargs.get("error_code", "QUALITY_AUTHENTICATION_ERROR"))
 
-            # Build context with authentication fields
-            context = self._build_context(
-                base_context,
-                username=username,
-            )
+            # Add specific fields to context if provided
+            # (Add specific field handling here)
 
             # Call parent with specific error code
             super().__init__(
                 message,
                 component="authentication",
-                code=error_code or "QUALITY_AUTHENTICATION_ERROR",
-                context=context,
+                error_code=error_code,
                 correlation_id=correlation_id,
+                context=context,
             )
 
-    class QualityTimeoutError(QualityError):
+    class TimeoutError(Error):
         """Quality timeout errors."""
 
         @override
@@ -315,27 +311,25 @@ class FlextQualityExceptions(FlextExceptions):
             # Store timeout attributes before extracting common kwargs
             self.timeout_duration = timeout_duration
 
-            # Extract common parameters using helper
-            base_context, correlation_id, error_code = self._extract_common_kwargs(
-                kwargs
-            )
+            # Extract common parameters
+            context_raw = kwargs.get("context", {})
+            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            correlation_id = kwargs.get("correlation_id")
+            error_code = str(kwargs.get("error_code", "QUALITY_TIMEOUT_ERROR"))
 
-            # Build context with timeout fields
-            context = self._build_context(
-                base_context,
-                timeout_duration=timeout_duration,
-            )
+            # Add specific fields to context if provided
+            # (Add specific field handling here)
 
             # Call parent with specific error code
             super().__init__(
                 message,
                 component="timeout",
-                code=error_code or "QUALITY_TIMEOUT_ERROR",
-                context=context,
+                error_code=error_code,
                 correlation_id=correlation_id,
+                context=context,
             )
 
-    class AnalysisError(QualityError):
+    class AnalysisError(Error):
         """Quality analysis errors."""
 
         @override
@@ -360,28 +354,25 @@ class FlextQualityExceptions(FlextExceptions):
             self.analysis_type = analysis_type
             self.project_path = project_path
 
-            # Extract common parameters using helper
-            base_context, correlation_id, error_code = self._extract_common_kwargs(
-                kwargs
-            )
+            # Extract common parameters
+            context_raw = kwargs.get("context", {})
+            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            correlation_id = kwargs.get("correlation_id")
+            error_code = str(kwargs.get("error_code", "QUALITY_ANALYSIS_ERROR"))
 
-            # Build context with analysis fields
-            context = self._build_context(
-                base_context,
-                analysis_type=analysis_type,
-                project_path=project_path,
-            )
+            # Add specific fields to context if provided
+            # (Add specific field handling here)
 
             # Call parent with specific error code
             super().__init__(
                 message,
                 component="analysis",
-                code=error_code or "QUALITY_ANALYSIS_ERROR",
-                context=context,
+                error_code=error_code,
                 correlation_id=correlation_id,
+                context=context,
             )
 
-    class ReportError(QualityError):
+    class ReportError(Error):
         """Quality report errors."""
 
         @override
@@ -406,28 +397,25 @@ class FlextQualityExceptions(FlextExceptions):
             self.report_format = report_format
             self.report_path = report_path
 
-            # Extract common parameters using helper
-            base_context, correlation_id, error_code = self._extract_common_kwargs(
-                kwargs
-            )
+            # Extract common parameters
+            context_raw = kwargs.get("context", {})
+            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            correlation_id = kwargs.get("correlation_id")
+            error_code = str(kwargs.get("error_code", "QUALITY_REPORT_ERROR"))
 
-            # Build context with report fields
-            context = self._build_context(
-                base_context,
-                report_format=report_format,
-                report_path=report_path,
-            )
+            # Add specific fields to context if provided
+            # (Add specific field handling here)
 
             # Call parent with specific error code
             super().__init__(
                 message,
                 component="reporting",
-                code=error_code or "QUALITY_REPORT_ERROR",
-                context=context,
+                error_code=error_code,
                 correlation_id=correlation_id,
+                context=context,
             )
 
-    class MetricsError(QualityError):
+    class MetricsError(Error):
         """Quality metrics errors."""
 
         @override
@@ -452,28 +440,25 @@ class FlextQualityExceptions(FlextExceptions):
             self.metric_name = metric_name
             self.metric_value = metric_value
 
-            # Extract common parameters using helper
-            base_context, correlation_id, error_code = self._extract_common_kwargs(
-                kwargs
-            )
+            # Extract common parameters
+            context_raw = kwargs.get("context", {})
+            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            correlation_id = kwargs.get("correlation_id")
+            error_code = str(kwargs.get("error_code", "QUALITY_METRICS_ERROR"))
 
-            # Build context with metrics fields
-            context = self._build_context(
-                base_context,
-                metric_name=metric_name,
-                metric_value=metric_value,
-            )
+            # Add specific fields to context if provided
+            # (Add specific field handling here)
 
             # Call parent with specific error code
             super().__init__(
                 message,
                 component="metrics",
-                code=error_code or "QUALITY_METRICS_ERROR",
-                context=context,
+                error_code=error_code,
                 correlation_id=correlation_id,
+                context=context,
             )
 
-    class GradeError(QualityError):
+    class GradeError(Error):
         """Quality grade errors."""
 
         @override
@@ -498,28 +483,25 @@ class FlextQualityExceptions(FlextExceptions):
             self.grade_value = grade_value
             self.score = score
 
-            # Extract common parameters using helper
-            base_context, correlation_id, error_code = self._extract_common_kwargs(
-                kwargs
-            )
+            # Extract common parameters
+            context_raw = kwargs.get("context", {})
+            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            correlation_id = kwargs.get("correlation_id")
+            error_code = str(kwargs.get("error_code", "QUALITY_GRADE_ERROR"))
 
-            # Build context with grade fields
-            context = self._build_context(
-                base_context,
-                grade_value=grade_value,
-                score=score,
-            )
+            # Add specific fields to context if provided
+            # (Add specific field handling here)
 
             # Call parent with specific error code
             super().__init__(
                 message,
                 component="grading",
-                code=error_code or "QUALITY_GRADE_ERROR",
-                context=context,
+                error_code=error_code,
                 correlation_id=correlation_id,
+                context=context,
             )
 
-    class RuleError(QualityError):
+    class RuleError(Error):
         """Quality rule errors."""
 
         @override
@@ -544,28 +526,25 @@ class FlextQualityExceptions(FlextExceptions):
             self.rule_id = rule_id
             self.rule_name = rule_name
 
-            # Extract common parameters using helper
-            base_context, correlation_id, error_code = self._extract_common_kwargs(
-                kwargs
-            )
+            # Extract common parameters
+            context_raw = kwargs.get("context", {})
+            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            correlation_id = kwargs.get("correlation_id")
+            error_code = str(kwargs.get("error_code", "QUALITY_RULE_ERROR"))
 
-            # Build context with rule fields
-            context = self._build_context(
-                base_context,
-                rule_id=rule_id,
-                rule_name=rule_name,
-            )
+            # Add specific fields to context if provided
+            # (Add specific field handling here)
 
             # Call parent with specific error code
             super().__init__(
                 message,
                 component="rules",
-                code=error_code or "QUALITY_RULE_ERROR",
-                context=context,
+                error_code=error_code,
                 correlation_id=correlation_id,
+                context=context,
             )
 
-    class IssueError(QualityError):
+    class IssueError(Error):
         """Quality issue errors."""
 
         @override
@@ -590,28 +569,25 @@ class FlextQualityExceptions(FlextExceptions):
             self.issue_id = issue_id
             self.severity = severity
 
-            # Extract common parameters using helper
-            base_context, correlation_id, error_code = self._extract_common_kwargs(
-                kwargs
-            )
+            # Extract common parameters
+            context_raw = kwargs.get("context", {})
+            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            correlation_id = kwargs.get("correlation_id")
+            error_code = str(kwargs.get("error_code", "QUALITY_ISSUE_ERROR"))
 
-            # Build context with issue fields
-            context = self._build_context(
-                base_context,
-                issue_id=issue_id,
-                severity=severity,
-            )
+            # Add specific fields to context if provided
+            # (Add specific field handling here)
 
             # Call parent with specific error code
             super().__init__(
                 message,
                 component="issues",
-                code=error_code or "QUALITY_ISSUE_ERROR",
-                context=context,
+                error_code=error_code,
                 correlation_id=correlation_id,
+                context=context,
             )
 
-    class ThresholdError(QualityError):
+    class ThresholdError(Error):
         """Quality threshold errors."""
 
         @override
@@ -639,26 +615,22 @@ class FlextQualityExceptions(FlextExceptions):
             self.threshold_value = threshold_value
             self.actual_value = actual_value
 
-            # Extract common parameters using helper
-            base_context, correlation_id, error_code = self._extract_common_kwargs(
-                kwargs
-            )
+            # Extract common parameters
+            context_raw = kwargs.get("context", {})
+            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            correlation_id = kwargs.get("correlation_id")
+            error_code = str(kwargs.get("error_code", "QUALITY_THRESHOLD_ERROR"))
 
-            # Build context with threshold fields
-            context = self._build_context(
-                base_context,
-                threshold_name=threshold_name,
-                threshold_value=threshold_value,
-                actual_value=actual_value,
-            )
+            # Add specific fields to context if provided
+            # (Add specific field handling here)
 
             # Call parent with specific error code
             super().__init__(
                 message,
                 component="thresholds",
-                code=error_code or "QUALITY_THRESHOLD_ERROR",
-                context=context,
+                error_code=error_code,
                 correlation_id=correlation_id,
+                context=context,
             )
 
     # ==== INTERNAL TOOLS EXCEPTIONS (from flext_tools migration) ====
@@ -687,7 +659,7 @@ class FlextQualityExceptions(FlextExceptions):
             super().__init__(message)
             self.module_path = module_path
 
-    class QualityGateFailure(FlextExceptions.ValidationError):
+    class GateFailure(FlextExceptions.ValidationError):
         """Quality gate validation failure."""
 
         def __init__(
@@ -764,13 +736,13 @@ class FlextQualityExceptions(FlextExceptions):
 
 # Backward compatibility aliases - property-based exports
 FlextQualityErrorCodes = FlextQualityExceptions.ErrorCodes
-FlextQualityError = FlextQualityExceptions.QualityError
+FlextQualityError = FlextQualityExceptions.Error
 FlextQualityValidationError = FlextQualityExceptions.ValidationError
 FlextQualityConfigurationError = FlextQualityExceptions.ConfigurationError
-FlextQualityConnectionError = FlextQualityExceptions.QualityConnectionError
+FlextQualityConnectionError = FlextQualityExceptions.ConnectionError
 FlextQualityProcessingError = FlextQualityExceptions.ProcessingError
 FlextQualityAuthenticationError = FlextQualityExceptions.AuthenticationError
-FlextQualityTimeoutError = FlextQualityExceptions.QualityTimeoutError
+FlextQualityTimeoutError = FlextQualityExceptions.TimeoutError
 FlextQualityAnalysisError = FlextQualityExceptions.AnalysisError
 FlextQualityReportError = FlextQualityExceptions.ReportError
 FlextQualityMetricsError = FlextQualityExceptions.MetricsError

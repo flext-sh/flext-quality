@@ -1,13 +1,14 @@
-"""FLEXT Module.
+"""FLEXT Quality Value Objects - Domain value objects for quality analysis.
 
-Copyright (c) 2025 FLEXT Team. All rights reserved. SPDX-License-Identifier: MIT Copyright (c) 2025 FLEXT Team. All rights reserved. SPDX-License-Identifier: MIT
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
 
 from enum import StrEnum
 from pathlib import Path
-from typing import override
+from typing import ClassVar, override
 
 from flext_core import (
     FlextContainer,
@@ -17,346 +18,11 @@ from flext_core import (
 )
 from pydantic import Field
 
-# Quality Score Constants
-MIN_QUALITY_SCORE = 0.0
-MAX_QUALITY_SCORE = 100.0
-
-# Quality Grade Thresholds
-GRADE_A_PLUS_THRESHOLD = 95
-GRADE_A_THRESHOLD = 90
-GRADE_A_MINUS_THRESHOLD = 85
-GRADE_B_PLUS_THRESHOLD = 80
-GRADE_B_THRESHOLD = 75
-GRADE_B_MINUS_THRESHOLD = 70
-GRADE_C_PLUS_THRESHOLD = 65
-GRADE_C_THRESHOLD = 60
-GRADE_C_MINUS_THRESHOLD = 55
-GRADE_D_PLUS_THRESHOLD = 50
-GRADE_D_THRESHOLD = 45
-GRADE_D_MINUS_THRESHOLD = 40
-
-
-# Coverage Constants
-MIN_COVERAGE_REQUIREMENT = 90.0
-
-# Duplication Constants
-MAX_DUPLICATION_THRESHOLD = 5.0
-
-# File Path Constants
-MAX_PATH_LENGTH = 4096
-
-# Complexity Thresholds
-CYCLOMATIC_HIGH_THRESHOLD = 10
-COGNITIVE_HIGH_THRESHOLD = 15
-MAX_DEPTH_THRESHOLD = 4
-COMPLEXITY_SIMPLE_MAX = 5
-COMPLEXITY_MODERATE_MAX = 10
-COMPLEXITY_COMPLEX_MAX = 20
-
-# Quality Category Thresholds
-EXCELLENT_QUALITY_THRESHOLD = 90.0
-GOOD_QUALITY_THRESHOLD = 70.0
-
-
-class IssueSeverity(StrEnum):
-    """Issue severity levels using StrEnum."""
-
-    LOW = "low"
-    MEDIUM = "medium"
-    HIGH = "high"
-    CRITICAL = "critical"
-
-
-class IssueType(StrEnum):
-    """Issue type enumeration using StrEnum."""
-
-    # Code quality issues
-    SYNTAX_ERROR = "syntax_error"
-    STYLE_VIOLATION = "style_violation"
-    NAMING_CONVENTION = "naming_convention"
-    # Complexity issues
-    HIGH_COMPLEXITY = "high_complexity"
-    HIGH_COGNITIVE_COMPLEXITY = "high_cognitive_complexity"
-    LONG_METHOD = "long_method"
-    LONG_PARAMETER_LIST = "long_parameter_list"
-    # Security issues
-    SECURITY_VULNERABILITY = "security_vulnerability"
-    HARDCODED_CREDENTIAL = "hardcoded_credential"
-    SQL_INJECTION = "sql_injection"
-    XSS_VULNERABILITY = "xss_vulnerability"
-    # Dead code issues
-    UNUSED_IMPORT = "unused_import"
-    UNUSED_VARIABLE = "unused_variable"
-    UNUSED_FUNCTION = "unused_function"
-    UNREACHABLE_CODE = "unreachable_code"
-    # Duplication issues
-    DUPLICATE_CODE = "duplicate_code"
-    SIMILAR_CODE = "similar_code"
-
-    TYPE_ERROR = "type_error"
-    MISSING_TYPE_ANNOTATION = "missing_type_annotation"
-    # Documentation issues
-    MISSING_DOCSTRING = "missing_docstring"
-    INVALID_DOCSTRING = "invalid_docstring"
-
-
-class QualityGrade(StrEnum):
-    """Quality grade enumeration using StrEnum."""
-
-    A_PLUS = "A+"
-    A = "A"
-    A_MINUS = "A-"
-    B_PLUS = "B+"
-    B = "B"
-    B_MINUS = "B-"
-    C_PLUS = "C+"
-    C = "C"
-    C_MINUS = "C-"
-    D_PLUS = "D+"
-    D = "D"
-    D_MINUS = "D-"
-    F = "F"
-
-
-# Grade mapping for efficient lookup (defined after QualityGrade class)
-GRADE_THRESHOLDS = [
-    (GRADE_A_PLUS_THRESHOLD, QualityGrade.A_PLUS),
-    (GRADE_A_THRESHOLD, QualityGrade.A),
-    (GRADE_A_MINUS_THRESHOLD, QualityGrade.A_MINUS),
-    (GRADE_B_PLUS_THRESHOLD, QualityGrade.B_PLUS),
-    (GRADE_B_THRESHOLD, QualityGrade.B),
-    (GRADE_B_MINUS_THRESHOLD, QualityGrade.B_MINUS),
-    (GRADE_C_PLUS_THRESHOLD, QualityGrade.C_PLUS),
-    (GRADE_C_THRESHOLD, QualityGrade.C),
-    (GRADE_C_MINUS_THRESHOLD, QualityGrade.C_MINUS),
-    (GRADE_D_PLUS_THRESHOLD, QualityGrade.D_PLUS),
-    (GRADE_D_THRESHOLD, QualityGrade.D),
-    (GRADE_D_MINUS_THRESHOLD, QualityGrade.D_MINUS),
-]
-
-
-class QualityScore(FlextModels):
-    """Quality score value object with validation and grade calculation."""
-
-    value: float = Field(
-        ...,
-        ge=MIN_QUALITY_SCORE,
-        le=MAX_QUALITY_SCORE,
-        description="Quality score percentage",
-    )
-
-    def validate_business_rules(self) -> FlextResult[None]:
-        """Validate business rules for quality score."""
-        if not MIN_QUALITY_SCORE <= self.value <= MAX_QUALITY_SCORE:
-            return FlextResult[None].fail(
-                f"Quality score must be between {MIN_QUALITY_SCORE} and {MAX_QUALITY_SCORE}",
-            )
-        return FlextResult[None].ok(None)
-
-    @property
-    def percentage(self) -> str:
-        """Format score as percentage string."""
-        return f"{self.value:.1f}%"
-
-    @property
-    def grade(self) -> QualityGrade:
-        """Calculate quality grade from score using efficient lookup."""
-        for threshold, grade in GRADE_THRESHOLDS:
-            if self.value >= threshold:
-                return grade
-        return QualityGrade.F
-
-
-class IssueLocation(FlextModels):
-    """Represents location of an issue in source code."""
-
-    line: int = Field(..., ge=1, description="Line number")
-    column: int = Field(default=1, ge=1, description="Column number")
-    end_line: int | None = Field(default=None, ge=1, description="End line number")
-    end_column: int | None = Field(default=None, ge=1, description="End column number")
-
-    def validate_business_rules(self) -> FlextResult[None]:
-        """Validate issue location business rules."""
-        if self.end_line is not None and self.end_line < self.line:
-            return FlextResult[None].fail("End line must be >= start line")
-        return FlextResult[None].ok(None)
-
-    @property
-    def range_text(self) -> str:
-        """Human-readable range description."""
-        if self.end_line is None:
-            return f"line {self.line}, column {self.column}"
-        if self.end_line == self.line:
-            if self.end_column is None:
-                return f"line {self.line}, columns {self.column}-end"
-            return f"line {self.line}, columns {self.column}-{self.end_column}"
-        return f"lines {self.line}-{self.end_line}"
-
-
-class ComplexityMetric(FlextModels):
-    """Complexity metrics for code analysis."""
-
-    cyclomatic: int = Field(default=1, ge=1, description="Cyclomatic complexity")
-    cognitive: int = Field(default=0, ge=0, description="Cognitive complexity")
-    max_depth: int = Field(default=0, ge=0, description="Maximum nesting depth")
-
-    def validate_business_rules(self) -> FlextResult[None]:
-        """Validate complexity metrics business rules."""
-        if self.cyclomatic < 1:
-            return FlextResult[None].fail("Cyclomatic complexity must be >= 1")
-        return FlextResult[None].ok(None)
-
-    @property
-    def is_complex(self) -> bool:
-        """Check if complexity is too high."""
-        return (
-            self.cyclomatic > CYCLOMATIC_HIGH_THRESHOLD
-            or self.cognitive > COGNITIVE_HIGH_THRESHOLD
-            or self.max_depth > MAX_DEPTH_THRESHOLD
-        )
-
-    @property
-    def complexity_level(self) -> str:
-        """Get complexity level description."""
-        if self.cyclomatic <= COMPLEXITY_SIMPLE_MAX:
-            return "simple"
-        if self.cyclomatic <= COMPLEXITY_MODERATE_MAX:
-            return "moderate"
-        if self.cyclomatic <= COMPLEXITY_COMPLEX_MAX:
-            return "complex"
-        return "very complex"
-
-
-class CoverageMetric(FlextModels):
-    """Code coverage metrics with weighted calculations."""
-
-    line_coverage: float = Field(
-        default=MIN_QUALITY_SCORE,
-        ge=MIN_QUALITY_SCORE,
-        le=MAX_QUALITY_SCORE,
-        description="Line coverage %",
-    )
-    branch_coverage: float = Field(
-        default=MIN_QUALITY_SCORE,
-        ge=MIN_QUALITY_SCORE,
-        le=MAX_QUALITY_SCORE,
-        description="Branch coverage %",
-    )
-    function_coverage: float = Field(
-        default=MIN_QUALITY_SCORE,
-        ge=MIN_QUALITY_SCORE,
-        le=MAX_QUALITY_SCORE,
-        description="Function coverage %",
-    )
-
-    def validate_business_rules(self) -> FlextResult[None]:
-        """Validate coverage metrics business rules."""
-        for field_name in ["line_coverage", "branch_coverage", "function_coverage"]:
-            value = getattr(self, field_name)
-            if not MIN_QUALITY_SCORE <= value <= MAX_QUALITY_SCORE:
-                return FlextResult[None].fail(
-                    f"{field_name} must be between {MIN_QUALITY_SCORE} and {MAX_QUALITY_SCORE}",
-                )
-        return FlextResult[None].ok(None)
-
-    @property
-    def overall_coverage(self) -> float:
-        """Calculate weighted overall coverage."""
-        # Weighted average: line 50%, branch 30%, function 20%
-        return (
-            self.line_coverage * 0.5
-            + self.branch_coverage * 0.3
-            + self.function_coverage * 0.2
-        )
-
-    @property
-    def is_sufficient(self) -> bool:
-        """Check if coverage meets minimum requirements."""
-        return self.overall_coverage >= MIN_COVERAGE_REQUIREMENT
-
-
-class DuplicationMetric(FlextModels):
-    """Code duplication metrics."""
-
-    duplicate_lines: int = Field(
-        default=0,
-        ge=0,
-        description="Number of duplicate lines",
-    )
-    total_lines: int = Field(default=0, ge=0, description="Total lines of code")
-    duplicate_blocks: int = Field(
-        default=0,
-        ge=0,
-        description="Number of duplicate blocks",
-    )
-
-    def validate_business_rules(self) -> FlextResult[None]:
-        """Validate duplication metrics business rules."""
-        if (
-            self.duplicate_lines < 0
-            or self.total_lines < 0
-            or self.duplicate_blocks < 0
-        ):
-            return FlextResult[None].fail("All metrics must be >= 0")
-        return FlextResult[None].ok(None)
-
-    @property
-    def duplication_percentage(self) -> float:
-        """Calculate duplication percentage."""
-        if self.total_lines == 0:
-            return 0.0
-        return (self.duplicate_lines / self.total_lines) * MAX_QUALITY_SCORE
-
-    @property
-    def is_acceptable(self) -> bool:
-        """Check if duplication is within acceptable limits."""
-        return self.duplication_percentage < MAX_DUPLICATION_THRESHOLD
-
-
-class FilePath(FlextModels):
-    """File path value object with validation."""
-
-    value: str = Field(
-        ...,
-        min_length=1,
-        max_length=MAX_PATH_LENGTH,
-        description="File path string",
-    )
-    is_absolute: bool = Field(default=False, description="Whether path is absolute")
-
-    def validate_business_rules(self) -> FlextResult[None]:
-        """Validate file path business rules."""
-        try:
-            path_obj = Path(self.value)
-            if len(str(path_obj)) > MAX_PATH_LENGTH:
-                return FlextResult[None].fail("File path exceeds maximum length")
-            return FlextResult[None].ok(None)
-        except (ValueError, TypeError, OSError) as e:
-            return FlextResult[None].fail(f"Invalid file path: {e}")
-
-    @property
-    def path(self) -> Path:
-        """Get Path object."""
-        return Path(self.value)
-
-    @property
-    def filename(self) -> str:
-        """Get filename."""
-        return self.path.name
-
-    @property
-    def extension(self) -> str:
-        """Get file extension."""
-        return self.path.suffix
-
-    @property
-    def parent_dir(self) -> str:
-        """Get parent directory."""
-        return str(self.path.parent)
+from .constants import FlextQualityConstants
 
 
 class FlextQualityValueObjects:
-    """Unified value objects class following FLEXT pattern - ZERO DUPLICATION.
+    """Unified quality value objects class following FLEXT pattern - ZERO DUPLICATION.
 
     Single responsibility: Quality value objects and validation
     Contains all enums, models, and utilities as nested classes.
@@ -365,7 +31,6 @@ class FlextQualityValueObjects:
     @override
     def __init__(self, **data: object) -> None:
         """Initialize value objects service."""
-        super().__init__()
         self._container = FlextContainer.get_global()
         self._logger = FlextLogger(__name__)
         # Store initialization data if provided
@@ -378,10 +43,11 @@ class FlextQualityValueObjects:
     class IssueSeverity(StrEnum):
         """Issue severity levels using StrEnum."""
 
-        LOW = "low"
-        MEDIUM = "medium"
-        HIGH = "high"
-        CRITICAL = "critical"
+        CRITICAL = "CRITICAL"
+        HIGH = "HIGH"
+        MEDIUM = "MEDIUM"
+        LOW = "LOW"
+        INFO = "INFO"
 
     class IssueType(StrEnum):
         """Issue type enumeration using StrEnum."""
@@ -408,14 +74,13 @@ class FlextQualityValueObjects:
         # Duplication issues
         DUPLICATE_CODE = "duplicate_code"
         SIMILAR_CODE = "similar_code"
-
         TYPE_ERROR = "type_error"
         MISSING_TYPE_ANNOTATION = "missing_type_annotation"
         # Documentation issues
         MISSING_DOCSTRING = "missing_docstring"
         INVALID_DOCSTRING = "invalid_docstring"
 
-    class QualityGrade(StrEnum):
+    class Grade(StrEnum):
         """Quality grade enumeration using StrEnum."""
 
         A_PLUS = "A+"
@@ -432,16 +97,37 @@ class FlextQualityValueObjects:
         D_MINUS = "D-"
         F = "F"
 
+    class IssueSeverity(StrEnum):
+        """Issue severity enumeration using StrEnum."""
+
+        CRITICAL = "CRITICAL"
+        HIGH = "HIGH"
+        MEDIUM = "MEDIUM"
+        LOW = "LOW"
+        INFO = "INFO"
+
+    class IssueType(StrEnum):
+        """Issue type enumeration using StrEnum."""
+
+        SECURITY = "SECURITY"
+        COMPLEXITY = "COMPLEXITY"
+        DUPLICATION = "DUPLICATION"
+        COVERAGE = "COVERAGE"
+        STYLE = "STYLE"
+        BUG = "BUG"
+        PERFORMANCE = "PERFORMANCE"
+        MAINTAINABILITY = "MAINTAINABILITY"
+
     # =============================================================================
     # NESTED VALUE MODELS - All Pydantic models as nested classes
     # =============================================================================
 
-    class QualityScore(FlextModels):
+    class Score(FlextModels):
         """Quality score value object with validation."""
 
         value: float = Field(
-            ge=MIN_QUALITY_SCORE,
-            le=MAX_QUALITY_SCORE,
+            ge=0.0,
+            le=100.0,
             description="Quality score percentage",
         )
         grade: str = Field(description="Letter grade representation")
@@ -449,7 +135,7 @@ class FlextQualityValueObjects:
 
         def validate_business_rules(self) -> FlextResult[None]:
             """Validate business rules for quality score."""
-            if self.value < MIN_QUALITY_SCORE or self.value > MAX_QUALITY_SCORE:
+            if self.value < 0.0 or self.value > 100.0:
                 return FlextResult[None].fail("Quality score must be 0-100")
 
             # Validate grade matches score
@@ -464,10 +150,11 @@ class FlextQualityValueObjects:
         @staticmethod
         def _calculate_grade_from_score(score: float) -> str:
             """Calculate grade from score using GRADE_THRESHOLDS."""
-            for threshold, grade in GRADE_THRESHOLDS:
+            thresholds = FlextQualityValueObjects._GRADE_THRESHOLDS
+            for threshold, grade in thresholds:
                 if score >= threshold:
-                    return grade
-            return FlextQualityValueObjects.QualityGrade.F
+                    return grade.value
+            return FlextQualityValueObjects.Grade.F.value
 
     class IssueLocation(FlextModels):
         """Issue location value object."""
@@ -512,13 +199,16 @@ class FlextQualityValueObjects:
         def validate_business_rules(self) -> FlextResult[None]:
             """Validate complexity metric values."""
             if (
-                self.cyclomatic > CYCLOMATIC_HIGH_THRESHOLD * 5
+                self.cyclomatic
+                > FlextQualityValueObjects.COMPLEXITY_CYCLOMATIC_HIGH * 5
             ):  # Reasonable upper bound
                 return FlextResult[None].fail(
                     f"Cyclomatic complexity {self.cyclomatic} is extremely high",
                 )
 
-            if self.cognitive > COGNITIVE_HIGH_THRESHOLD * 5:  # Reasonable upper bound
+            if (
+                self.cognitive > FlextQualityValueObjects.COMPLEXITY_COGNITIVE_HIGH * 5
+            ):  # Reasonable upper bound
                 return FlextResult[None].fail(
                     f"Cognitive complexity {self.cognitive} is extremely high",
                 )
@@ -527,9 +217,9 @@ class FlextQualityValueObjects:
 
         def get_complexity_level(self) -> str:
             """Get complexity level based on thresholds."""
-            if self.cyclomatic <= COMPLEXITY_SIMPLE_MAX:
+            if self.cyclomatic <= FlextQualityValueObjects.COMPLEXITY_SIMPLE_MAX:
                 return "simple"
-            if self.cyclomatic <= COMPLEXITY_MODERATE_MAX:
+            if self.cyclomatic <= FlextQualityValueObjects.COMPLEXITY_MODERATE_MAX:
                 return "moderate"
             return "complex"
 
@@ -595,9 +285,9 @@ class FlextQualityValueObjects:
 
         def validate_business_rules(self) -> FlextResult[None]:
             """Validate file path."""
-            if len(self.path) > MAX_PATH_LENGTH:
+            if len(self.path) > FlextQualityValueObjects.FILE_PATH_MAX_LENGTH:
                 return FlextResult[None].fail(
-                    f"Path exceeds maximum length {MAX_PATH_LENGTH}",
+                    f"Path exceeds maximum length {FlextQualityValueObjects.FILE_PATH_MAX_LENGTH}",
                 )
 
             if not self.path.strip():
@@ -609,39 +299,71 @@ class FlextQualityValueObjects:
             """Convert to pathlib.Path object."""
             return Path(self.path)
 
+        @property
+        def extension(self) -> str:
+            """Get file extension."""
+            path_obj = self.as_path()
+            return path_obj.suffix
+
+        @property
+        def parent_dir(self) -> str:
+            """Get parent directory."""
+            path_obj = self.as_path()
+            return str(path_obj.parent)
+
     # =============================================================================
-    # CONSTANTS AND THRESHOLDS
+    # CONSTANTS AND THRESHOLDS - Using FlextQualityConstants
     # =============================================================================
 
+    # Quality score constants from FlextQualityConstants
+    MIN_QUALITY_SCORE = FlextQualityConstants.Validation.MINIMUM_PERCENTAGE
+    MAX_QUALITY_SCORE = FlextQualityConstants.Validation.MAXIMUM_PERCENTAGE
+
     # Quality grade thresholds (score percentages)
-    GRADE_A_PLUS = 95
-    GRADE_A = 90
-    GRADE_A_MINUS = 85
-    GRADE_B_PLUS = 80
+    GRADE_A_PLUS = int(FlextQualityConstants.Thresholds.OUTSTANDING_THRESHOLD)
+    GRADE_A = int(FlextQualityConstants.Thresholds.EXCELLENT_THRESHOLD)
+    GRADE_A_MINUS = int(FlextQualityConstants.Thresholds.ENTERPRISE_READY_THRESHOLD)
+    GRADE_B_PLUS = int(FlextQualityConstants.Thresholds.GOOD_THRESHOLD)
     GRADE_B = 75
-    GRADE_B_MINUS = 70
+    GRADE_B_MINUS = int(FlextQualityConstants.Thresholds.ACCEPTABLE_THRESHOLD)
     GRADE_C_PLUS = 65
-    GRADE_C = 60
+    GRADE_C = int(FlextQualityConstants.Thresholds.BELOW_AVERAGE_THRESHOLD)
     GRADE_C_MINUS = 55
     GRADE_D_PLUS = 50
     GRADE_D = 45
     GRADE_D_MINUS = 40
 
-    # Complexity thresholds
-    COMPLEXITY_CYCLOMATIC_HIGH = 10
+    # Complexity thresholds from FlextQualityConstants
+    COMPLEXITY_CYCLOMATIC_HIGH = FlextQualityConstants.Complexity.MAX_COMPLEXITY
     COMPLEXITY_COGNITIVE_HIGH = 15
     COMPLEXITY_DEPTH_HIGH = 4
-    COMPLEXITY_SIMPLE_MAX = 5
-    COMPLEXITY_MODERATE_MAX = 10
+    COMPLEXITY_SIMPLE_MAX = FlextQualityConstants.Complexity.IDEAL_COMPLEXITY
+    COMPLEXITY_MODERATE_MAX = FlextQualityConstants.Complexity.WARNING_COMPLEXITY
     COMPLEXITY_COMPLEX_MAX = 20
 
-    # Coverage and quality thresholds
-    COVERAGE_EXCELLENT = 95.0
-    COVERAGE_PERCENTAGE_MAX = 100.0
-    DUPLICATION_LOW_MAX = 5.0
+    # Coverage and quality thresholds from FlextQualityConstants
+    COVERAGE_EXCELLENT = FlextQualityConstants.Coverage.EXCELLENT_COVERAGE
+    COVERAGE_PERCENTAGE_MAX = FlextQualityConstants.Coverage.MAXIMUM_COVERAGE
+    DUPLICATION_LOW_MAX = FlextQualityConstants.Duplication.MAXIMUM_DUPLICATION
 
     # File system limits
     FILE_PATH_MAX_LENGTH = 4096
+
+    # Grade mapping for efficient lookup
+    _GRADE_THRESHOLDS: ClassVar[list[tuple[int, Grade]]] = [
+        (GRADE_A_PLUS, Grade.A_PLUS),
+        (GRADE_A, Grade.A),
+        (GRADE_A_MINUS, Grade.A_MINUS),
+        (GRADE_B_PLUS, Grade.B_PLUS),
+        (GRADE_B, Grade.B),
+        (GRADE_B_MINUS, Grade.B_MINUS),
+        (GRADE_C_PLUS, Grade.C_PLUS),
+        (GRADE_C, Grade.C),
+        (GRADE_C_MINUS, Grade.C_MINUS),
+        (GRADE_D_PLUS, Grade.D_PLUS),
+        (GRADE_D, Grade.D),
+        (GRADE_D_MINUS, Grade.D_MINUS),
+    ]
 
     # =============================================================================
     # VALIDATION HELPER METHODS
@@ -664,9 +386,13 @@ class FlextQualityValueObjects:
         @staticmethod
         def validate_quality_score(score: float) -> FlextResult[float]:
             """Validate quality score is in valid range."""
-            if not MIN_QUALITY_SCORE <= score <= MAX_QUALITY_SCORE:
+            if (
+                not FlextQualityValueObjects.MIN_QUALITY_SCORE
+                <= score
+                <= FlextQualityValueObjects.MAX_QUALITY_SCORE
+            ):
                 return FlextResult[float].fail(
-                    f"Quality score must be between {MIN_QUALITY_SCORE} and {MAX_QUALITY_SCORE}",
+                    f"Quality score must be between {FlextQualityValueObjects.MIN_QUALITY_SCORE} and {FlextQualityValueObjects.MAX_QUALITY_SCORE}",
                 )
             return FlextResult[float].ok(score)
 
@@ -674,10 +400,11 @@ class FlextQualityValueObjects:
         def get_grade_from_score(score: float) -> FlextResult[str]:
             """Get quality grade from numeric score."""
             try:
-                for threshold, grade in GRADE_THRESHOLDS:
+                thresholds = FlextQualityValueObjects._GRADE_THRESHOLDS
+                for threshold, grade in thresholds:
                     if score >= threshold:
-                        return FlextResult[str].ok(grade)
-                return FlextResult[str].ok(FlextQualityValueObjects.QualityGrade.F)
+                        return FlextResult[str].ok(grade.value)
+                return FlextResult[str].ok(FlextQualityValueObjects.Grade.F.value)
             except Exception as e:
                 return FlextResult[str].fail(f"Failed to calculate grade: {e}")
 
@@ -688,36 +415,36 @@ class FlextQualityValueObjects:
     def create_quality_score(
         self,
         percentage: float,
-    ) -> FlextResult[FlextQualityValueObjects.QualityScore]:
+    ) -> FlextResult[FlextQualityValueObjects.Score]:
         """Create a validated quality score."""
         try:
             # Calculate grade using helper
-            grade_result: FlextResult[object] = (
+            grade_result: FlextResult[str] = (
                 self._ValidationHelper.get_grade_from_score(percentage)
             )
             if grade_result.is_failure:
-                return FlextResult[FlextQualityValueObjects.QualityScore].fail(
+                return FlextResult[FlextQualityValueObjects.Score].fail(
                     f"Failed to calculate grade: {grade_result.error}",
                 )
 
             # Create instance using dict construction
             score_data = {
-                "value": "percentage",
-                "grade": "grade",
-                "category": "category",
+                "value": percentage,
+                "grade": grade_result.value,
+                "category": self._get_category_from_score(percentage),
             }
-            instance = self.QualityScore(**score_data)
+            instance = self.Score(**score_data)
 
             # Validate business rules
-            validation_result: FlextResult[object] = instance.validate_business_rules()
+            validation_result: FlextResult[None] = instance.validate_business_rules()
             if validation_result.is_failure:
-                return FlextResult[FlextQualityValueObjects.QualityScore].fail(
+                return FlextResult[FlextQualityValueObjects.Score].fail(
                     validation_result.error or "Validation failed",
                 )
 
-            return FlextResult[FlextQualityValueObjects.QualityScore].ok(instance)
+            return FlextResult[FlextQualityValueObjects.Score].ok(instance)
         except Exception as e:
-            return FlextResult[FlextQualityValueObjects.QualityScore].fail(
+            return FlextResult[FlextQualityValueObjects.Score].fail(
                 f"Failed to create QualityScore: {e}",
             )
 
@@ -733,43 +460,28 @@ class FlextQualityValueObjects:
         """Get grade from score using helper."""
         return self._ValidationHelper.get_grade_from_score(score)
 
+    def _get_category_from_score(self, score: float) -> str:
+        """Get category from score."""
+        if score >= self.COVERAGE_EXCELLENT:
+            return "excellent"
+        if score >= self.GRADE_B:
+            return "good"
+        if score >= self.GRADE_C:
+            return "acceptable"
+        return "poor"
+
 
 # Backward compatibility aliases
-FlextQualityThresholds = FlextQualityValueObjects
-FlextIssueSeverity = IssueSeverity
-FlextIssueType = IssueType
-FlextQualityGrade = QualityGrade
-FlextFilePath = FilePath
-FlextIssueLocation = IssueLocation
-FlextQualityScore = QualityScore
-FlextComplexityMetric = ComplexityMetric
-FlextCoverageMetric = CoverageMetric
-FlextDuplicationMetric = DuplicationMetric
-
+FlextIssueSeverity = FlextQualityValueObjects.IssueSeverity
+FlextIssueType = FlextQualityValueObjects.IssueType
+FlextQualityGrade = FlextQualityValueObjects.Grade
+IssueSeverity = FlextQualityValueObjects.IssueSeverity
 
 # Export all classes
 __all__ = [
-    # Independent classes (FLEXT pattern)
-    "ComplexityMetric",
-    "CoverageMetric",
-    "DuplicationMetric",
-    "FilePath",
-    # Backward compatibility aliases
-    "FlextComplexityMetric",
-    "FlextCoverageMetric",
-    "FlextDuplicationMetric",
-    "FlextFilePath",
-    "FlextIssueLocation",
     "FlextIssueSeverity",
     "FlextIssueType",
     "FlextQualityGrade",
-    "FlextQualityScore",
-    "FlextQualityThresholds",
-    # Consolidated namespace
     "FlextQualityValueObjects",
-    "IssueLocation",
     "IssueSeverity",
-    "IssueType",
-    "QualityGrade",
-    "QualityScore",
 ]

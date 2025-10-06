@@ -12,11 +12,13 @@ from __future__ import annotations
 
 import pathlib
 from datetime import UTC, datetime
+from pathlib import Path
 from typing import override
 from uuid import UUID
 
 from flext_core import FlextContainer, FlextLogger, FlextModels, FlextTypes
 from pydantic import (
+    BaseModel,
     ConfigDict,
     Field,
     SerializationInfo,
@@ -27,6 +29,7 @@ from pydantic import (
 )
 
 from .constants import FlextQualityConstants
+from .value_objects import FlextQualityValueObjects
 
 
 class FlextQualityModels(FlextModels):
@@ -418,7 +421,7 @@ class FlextQualityModels(FlextModels):
                 and self.maintainability_score
                 >= FlextQualityConstants.Maintainability.MINIMUM_MAINTAINABILITY
                 and self.overall_score
-                >= FlextQualityConstants.QualityThresholds.ENTERPRISE_READY_THRESHOLD
+                >= FlextQualityConstants.Thresholds.ENTERPRISE_READY_THRESHOLD
             )
 
         @field_validator(
@@ -910,7 +913,7 @@ class FlextQualityModels(FlextModels):
             """Check if configuration has strict quality thresholds."""
             return (
                 self.min_coverage
-                >= FlextQualityConstants.QualityThresholds.EXCELLENT_THRESHOLD
+                >= FlextQualityConstants.Thresholds.EXCELLENT_THRESHOLD
                 and self.security_threshold
                 >= FlextQualityConstants.Security.TARGET_SECURITY_SCORE
                 and self.max_complexity
@@ -928,6 +931,255 @@ class FlextQualityModels(FlextModels):
         def validate_percentage(cls, v: float) -> float:
             """Ensure percentage values are within valid range."""
             return max(0.0, min(100.0, v))
+
+    # ==== ANALYSIS RESULT MODELS (from analysis_types.py migration) ====
+
+    class FileAnalysisResult(FlextModels.Value):
+        """Result of analyzing a single file."""
+
+        file_path: Path = Field(..., description="Path to the analyzed file")
+        lines_of_code: int = Field(default=0, ge=0, description="Total lines of code")
+        complexity_score: float = Field(
+            default=0.0,
+            ge=0.0,
+            le=100.0,
+            description="Complexity score",
+        )
+        security_issues: int = Field(
+            default=0,
+            ge=0,
+            description="Number of security issues",
+        )
+        style_issues: int = Field(default=0, ge=0, description="Number of style issues")
+        dead_code_lines: int = Field(default=0, ge=0, description="Lines of dead code")
+
+    class CodeIssue(BaseModel):
+        """General code quality issue."""
+
+        file_path: str = Field(..., description="File where issue was found")
+        line_number: int = Field(..., ge=1, description="Line number of issue")
+        issue_type: str = Field(..., description="Type of code issue")
+        message: str = Field(..., description="Human-readable issue message")
+        severity: FlextQualityValueObjects.IssueSeverity = Field(
+            default=FlextQualityValueObjects.IssueSeverity.MEDIUM,
+            description="Issue severity level",
+        )
+        rule_id: str | None = Field(
+            default=None, description="Rule that detected the issue"
+        )
+
+    class ComplexityIssue(BaseModel):
+        """Complexity-related code issue."""
+
+        file_path: str = Field(..., description="File where issue was found")
+        line_number: int = Field(..., ge=1, description="Line number of issue")
+        complexity_score: float = Field(
+            ..., description="Complexity score that triggered issue"
+        )
+        complexity_type: str = Field(
+            ..., description="Type of complexity (cyclomatic/cognitive)"
+        )
+        severity: FlextQualityValueObjects.IssueSeverity = Field(
+            default=FlextQualityValueObjects.IssueSeverity.MEDIUM,
+            description="Issue severity level",
+        )
+        message: str = Field(..., description="Human-readable issue message")
+
+    class SecurityIssue(FlextModels.Value):
+        """Security-related code issue."""
+
+        file_path: str = Field(..., description="File where issue was found")
+        line_number: int = Field(..., ge=1, description="Line number of issue")
+        issue_type: FlextQualityValueObjects.IssueType = Field(
+            ...,
+            description="Type of security issue",
+        )
+        severity: FlextQualityValueObjects.IssueSeverity = Field(
+            default=FlextQualityValueObjects.IssueSeverity.HIGH,
+            description="Issue severity level",
+        )
+        message: str = Field(..., description="Human-readable issue message")
+        rule_id: str = Field(..., description="Security rule that detected the issue")
+
+    class DeadCodeIssue(FlextModels.Value):
+        """Dead code issue."""
+
+        file_path: str = Field(..., description="File where dead code was found")
+        line_number: int = Field(..., ge=1, description="Line number of dead code")
+        issue_type: FlextQualityValueObjects.IssueType = Field(
+            default=FlextQualityValueObjects.IssueType.UNREACHABLE_CODE,
+            description="Type of dead code issue",
+        )
+        severity: FlextQualityValueObjects.IssueSeverity = Field(
+            default=FlextQualityValueObjects.IssueSeverity.LOW,
+            description="Issue severity level",
+        )
+        message: str = Field(..., description="Human-readable issue message")
+
+    class DuplicationIssue(FlextModels.Value):
+        """Code duplication issue."""
+
+        files: list[str] = Field(..., description="Files containing duplicated code")
+        line_ranges: list[tuple[int, int]] = Field(
+            ...,
+            description="Line ranges of duplicated code in each file",
+        )
+        similarity_score: float = Field(
+            ge=0.0,
+            le=100.0,
+            description="Similarity score between duplicated blocks",
+        )
+        duplicated_lines: int = Field(..., description="Number of duplicated lines")
+        severity: FlextQualityValueObjects.IssueSeverity = Field(
+            default=FlextQualityValueObjects.IssueSeverity.MEDIUM,
+            description="Issue severity level",
+        )
+        message: str = Field(..., description="Human-readable issue message")
+
+    class Dependency(BaseModel):
+        """Project dependency information."""
+
+        name: str = Field(..., description="Dependency name")
+        version: str = Field(..., description="Dependency version")
+        type: str = Field(..., description="Dependency type (direct/dev/optional)")
+        license: str | None = Field(default=None, description="Dependency license")
+        vulnerabilities: list[str] = Field(
+            default_factory=list,
+            description="Known vulnerabilities",
+        )
+
+    class TestResults(BaseModel):
+        """Test execution results."""
+
+        total_tests: int = Field(default=0, description="Total number of tests")
+        passed_tests: int = Field(default=0, description="Number of passed tests")
+        failed_tests: int = Field(default=0, description="Number of failed tests")
+        skipped_tests: int = Field(default=0, description="Number of skipped tests")
+        coverage_percentage: float = Field(
+            default=0.0,
+            ge=0.0,
+            le=100.0,
+            description="Test coverage percentage",
+        )
+        execution_time: float = Field(
+            default=0.0, description="Test execution time in seconds"
+        )
+
+    class OverallMetrics(FlextModels.Value):
+        """Overall project quality metrics."""
+
+        files_analyzed: int = Field(default=0, description="Number of files analyzed")
+        total_lines: int = Field(default=0, description="Total lines of code")
+        functions_count: int = Field(default=0, description="Number of functions")
+        classes_count: int = Field(default=0, description="Number of classes")
+        average_complexity: float = Field(
+            default=0.0, description="Average complexity score"
+        )
+        max_complexity: float = Field(
+            default=0.0, description="Maximum complexity score"
+        )
+        quality_score: float = Field(
+            default=0.0,
+            ge=0.0,
+            le=100.0,
+            description="Overall quality score",
+        )
+        coverage_score: float = Field(
+            default=0.0,
+            ge=0.0,
+            le=100.0,
+            description="Coverage score",
+        )
+        security_score: float = Field(
+            default=0.0,
+            ge=0.0,
+            le=100.0,
+            description="Security score",
+        )
+        maintainability_score: float = Field(
+            default=0.0,
+            ge=0.0,
+            le=100.0,
+            description="Maintainability score",
+        )
+        complexity_score: float = Field(
+            default=0.0,
+            ge=0.0,
+            le=100.0,
+            description="Complexity score",
+        )
+
+    class AnalysisResults(BaseModel):
+        """Complete analysis results for a project."""
+
+        overall_metrics: FlextQualityTypes.OverallMetrics = Field(
+            ..., description="Overall project metrics"
+        )
+        file_metrics: list[FlextQualityTypes.FileAnalysisResult] = Field(
+            default_factory=list,
+            description="Metrics for individual files",
+        )
+        code_issues: list[FlextQualityTypes.CodeIssue] = Field(
+            default_factory=list,
+            description="General code issues",
+        )
+        complexity_issues: list[FlextQualityTypes.ComplexityIssue] = Field(
+            default_factory=list,
+            description="Complexity issues",
+        )
+        security_issues: list[FlextQualityTypes.SecurityIssue] = Field(
+            default_factory=list,
+            description="Security issues",
+        )
+        dead_code_issues: list[FlextQualityTypes.DeadCodeIssue] = Field(
+            default_factory=list,
+            description="Dead code issues",
+        )
+        duplication_issues: list[FlextQualityTypes.DuplicationIssue] = Field(
+            default_factory=list,
+            description="Code duplication issues",
+        )
+        dependencies: list[FlextQualityTypes.Dependency] = Field(
+            default_factory=list,
+            description="Project dependencies",
+        )
+        test_results: FlextQualityTypes.TestResults | None = Field(
+            default=None,
+            description="Test results if available",
+        )
+        analysis_config: FlextQualityTypes.Core.AnalysisDict = Field(
+            default_factory=dict,
+            description="Configuration used for analysis",
+        )
+        analysis_timestamp: str = Field(
+            default_factory=lambda: datetime.now(UTC).isoformat(),
+            description="When analysis was performed",
+        )
+
+        @property
+        def total_issues(self) -> int:
+            """Total number of issues found across all categories."""
+            return (
+                len(self.code_issues)
+                + len(self.complexity_issues)
+                + len(self.security_issues)
+                + len(self.dead_code_issues)
+                + len(self.duplication_issues)
+            )
+
+        def get_quality_score(self) -> float:
+            """Calculate overall quality score."""
+            return self.overall_metrics.quality_score
+
+    # ==== WEB MODELS (from web.py migration) ====
+
+    class AppConfig(BaseModel):
+        """Web app configuration."""
+
+        title: str = Field(..., description="App title")
+        version: str = Field(..., description="App version")
+        enable_cors: bool = Field(default=True, description="Enable CORS")
+        enable_docs: bool = Field(default=True, description="Enable docs")
 
     # ==== INTERNAL TOOLS MODELS (from flext_tools migration) ====
 
@@ -965,7 +1217,7 @@ class FlextQualityModels(FlextModels):
         errors: list[str]
         warnings: list[str]
 
-    class QualityCheckResult(FlextModels.Value):
+    class CheckResult(FlextModels.Value):
         """Quality check result."""
 
         lint_passed: bool
@@ -974,7 +1226,7 @@ class FlextQualityModels(FlextModels):
         violations: list[str]
 
     class ValidationResult(FlextModels.Value):
-        """Validation result."""
+        """Quality validation result."""
 
         passed: bool
         checks_run: int
@@ -1004,6 +1256,7 @@ FlextQualityAnalysisModel = FlextQualityModels.AnalysisModel
 FlextQualityIssueModel = FlextQualityModels.IssueModel
 FlextQualityReportModel = FlextQualityModels.ReportModel
 FlextAnalysisConfigModel = FlextQualityModels.ConfigModel
+ValidationResult = FlextQualityModels.ValidationResult
 
 # Export models for clean imports
 __all__ = [
@@ -1013,4 +1266,5 @@ __all__ = [
     "FlextQualityModels",
     "FlextQualityProjectModel",
     "FlextQualityReportModel",
+    "ValidationResult",
 ]
