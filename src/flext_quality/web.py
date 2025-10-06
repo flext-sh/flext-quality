@@ -63,7 +63,7 @@ class FlextQualityWeb:
     def __init__(self) -> None:
         """Initialize quality web interface with flext ecosystem integration."""
         self._container = FlextContainer.get_global()
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
 
         # Initialize quality configuration
         self._quality_config = FlextQualityConfig()
@@ -115,11 +115,11 @@ class FlextQualityWeb:
                 exclude_paths=["/health", "/docs", "/redoc", "/openapi.json"],
             )
 
-            self._logger.info("Authentication configured successfully")
+            self.logger.info("Authentication configured successfully")
             return auth
 
         except Exception as e:
-            self._logger.warning(
+            self.logger.warning(
                 f"Authentication setup failed: {e}, proceeding without auth"
             )
             # Return None if authentication setup fails (graceful degradation)
@@ -257,7 +257,7 @@ class FlextQualityWeb:
             analyzer = CodeAnalyzer(Path(project_path))
             result = analyzer.analyze_project()
         except Exception as e:
-            self._logger.exception("Analysis failed")
+            self.logger.exception("Analysis failed")
             raise HTTPException(status_code=500, detail=f"Analysis failed: {e}") from e
 
         if not hasattr(result, "overall_metrics"):
@@ -322,7 +322,7 @@ class FlextQualityWeb:
             reload: Enable auto-reload on code changes
 
         """
-        self._logger.info("Starting FLEXT Quality Web Interface on %s:%s", host, port)
+        self.logger.info("Starting FLEXT Quality Web Interface on %s:%s", host, port)
 
         uvicorn.run(
             self.app,

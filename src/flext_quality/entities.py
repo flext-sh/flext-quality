@@ -28,7 +28,7 @@ class FlextQualityEntities:
     def __init__(self) -> None:
         """Initialize quality entities with dependency injection."""
         self._container = FlextContainer.get_global()
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
 
     # =============================================================================
     # NESTED ENUM CLASSES - All status enumerations

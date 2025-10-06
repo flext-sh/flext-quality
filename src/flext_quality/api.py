@@ -53,7 +53,7 @@ class FlextQuality(FlextService[None]):
         self._dispatcher = FlextDispatcher()
         self._processors = FlextProcessors()
         self._registry = FlextRegistry(dispatcher=self._dispatcher)
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
 
         # Domain services
         self._services = FlextQualityServices()

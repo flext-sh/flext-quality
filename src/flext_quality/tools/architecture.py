@@ -109,7 +109,7 @@ class FlextQualityArchitectureTools(FlextService[None]):
     def __init__(self) -> None:
         """Initialize architecture tools service."""
         super().__init__()
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
 
         # Initialize helper services
         self.violations = self.ViolationAnalyzer()

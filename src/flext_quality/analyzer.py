@@ -33,7 +33,7 @@ class FlextQualityAnalyzer(FlextService[None]):
     _container: FlextContainer | None
     _context: object | None
     _bus: object | None
-    _logger: FlextLogger | None
+    logger: FlextLogger | None
     _quality_config: FlextQualityConfig
     project_path: Path
     _current_results: FlextQualityModels.AnalysisResults | None
@@ -54,7 +54,7 @@ class FlextQualityAnalyzer(FlextService[None]):
         self._container = FlextContainer.get_global()
         self._context = FlextContext()
         self._bus = FlextBus()
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
 
         self._quality_config = config or FlextQualityConfig()
         self.project_path = Path(project_path)
@@ -63,9 +63,9 @@ class FlextQualityAnalyzer(FlextService[None]):
     @property
     def logger(self) -> FlextLogger:
         """Get logger instance."""
-        if self._logger is None:
-            self._logger = FlextLogger(__name__)
-        return self._logger
+        if self.logger is None:
+            self.logger = FlextLogger(__name__)
+        return self.logger
 
     @property
     def container(self) -> FlextContainer:

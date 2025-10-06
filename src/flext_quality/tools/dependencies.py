@@ -104,7 +104,7 @@ class FlextQualityDependencyTools(FlextService[None]):
     def __init__(self) -> None:
         """Initialize dependency tools service."""
         super().__init__()
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
 
         # Initialize helper services
         self.analyzer = self.DependencyAnalyzer()

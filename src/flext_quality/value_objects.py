@@ -32,7 +32,7 @@ class FlextQualityValueObjects:
     def __init__(self, **data: object) -> None:
         """Initialize value objects service."""
         self._container = FlextContainer.get_global()
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
         # Store initialization data if provided
         self._init_data = data
 

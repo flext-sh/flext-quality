@@ -73,13 +73,13 @@ class FlextQualityCliService(FlextService[int]):
         self._dispatcher = FlextDispatcher()
         self._processors = FlextProcessors()
         self._registry = FlextRegistry(dispatcher=self._dispatcher)
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
 
     @override
     def execute(self) -> FlextResult[int]:
         """Execute CLI service - required abstract method implementation."""
-        if self._logger:
-            self._logger.info("CLI service execute called - this is a placeholder")
+        if self.logger:
+            self.logger.info("CLI service execute called - this is a placeholder")
         return FlextResult[int].ok(0)
 
     class _CliContextHelper:
@@ -96,7 +96,7 @@ class FlextQualityCliService(FlextService[int]):
 
         @override
         def __init__(self, logger: FlextLogger) -> None:
-            self._logger = logger
+            self.logger = logger
 
         def analyze_project_workflow(
             self,
@@ -310,7 +310,7 @@ class FlextQualityCliService(FlextService[int]):
 
         @override
         def __init__(self, logger: FlextLogger) -> None:
-            self._logger = logger
+            self.logger = logger
 
         def score_project_workflow(self, args: argparse.Namespace) -> FlextResult[int]:
             """Execute project scoring workflow."""
@@ -376,7 +376,7 @@ class FlextQualityCliService(FlextService[int]):
 
         @override
         def __init__(self, logger: FlextLogger) -> None:
-            self._logger = logger
+            self.logger = logger
 
         def run_web_server_workflow(self, args: argparse.Namespace) -> FlextResult[int]:
             """Execute web server startup workflow."""
@@ -398,30 +398,30 @@ class FlextQualityCliService(FlextService[int]):
 
     def analyze_project(self, args: argparse.Namespace) -> FlextResult[int]:
         """Analyze project quality using unified service pattern."""
-        if self._logger is None:
+        if self.logger is None:
             msg = "Logger must be initialized"
             raise RuntimeError(msg)
-        analysis_helper = self._ProjectAnalysisHelper(self._logger)
+        analysis_helper = self._ProjectAnalysisHelper(self.logger)
 
         analysis_result: FlextResult[int] = analysis_helper.analyze_project_workflow(
             args
         )
         if analysis_result.is_failure:
-            self._logger.error("Quality analysis failed")
+            self.logger.error("Quality analysis failed")
             return FlextResult[int].fail(f"Analysis failed: {analysis_result.error}")
 
         return analysis_result
 
     def score_project(self, args: argparse.Namespace) -> FlextResult[int]:
         """Get quick quality score for project using unified service pattern."""
-        if self._logger is None:
+        if self.logger is None:
             msg = "Logger must be initialized"
             raise RuntimeError(msg)
-        scoring_helper = self._ProjectScoringHelper(self._logger)
+        scoring_helper = self._ProjectScoringHelper(self.logger)
 
         scoring_result: FlextResult[int] = scoring_helper.score_project_workflow(args)
         if scoring_result.is_failure:
-            self._logger.error("Quality score calculation failed")
+            self.logger.error("Quality score calculation failed")
             return FlextResult[int].fail(
                 f"Score calculation failed: {scoring_result.error}",
             )
@@ -430,14 +430,14 @@ class FlextQualityCliService(FlextService[int]):
 
     def run_web_server(self, args: argparse.Namespace) -> FlextResult[int]:
         """Run quality web interface server using unified service pattern."""
-        if self._logger is None:
+        if self.logger is None:
             msg = "Logger must be initialized"
             raise RuntimeError(msg)
-        web_helper = self._WebServerHelper(self._logger)
+        web_helper = self._WebServerHelper(self.logger)
 
         web_result: FlextResult[int] = web_helper.run_web_server_workflow(args)
         if web_result.is_failure:
-            self._logger.error("Web server failed")
+            self.logger.error("Web server failed")
             return FlextResult[int].fail(f"Web server failed: {web_result.error}")
 
         return web_result

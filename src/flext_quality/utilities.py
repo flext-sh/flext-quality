@@ -25,7 +25,7 @@ class FlextQualityUtilities:
     def __init__(self) -> None:
         """Initialize utilities with dependency injection."""
         self._container = FlextContainer.get_global()
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
 
     class _IssueProcessor:
         """Nested helper class for issue processing operations."""

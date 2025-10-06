@@ -23,7 +23,7 @@ class FlextQualityFields:
     def __init__(self) -> None:
         """Initialize fields with dependency injection."""
         self._container = FlextContainer.get_global()
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
 
     @staticmethod
     def entity_id_field(description: str = "Unique entity identifier") -> FieldInfo:

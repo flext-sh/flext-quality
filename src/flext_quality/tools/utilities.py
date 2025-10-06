@@ -264,7 +264,7 @@ class FlextQualityToolsUtilities(FlextService[None]):
     def __init__(self: Self) -> None:
         """Initialize utilities service."""
         super().__init__()
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
         self._cli = FlextCli()  # MANDATORY: Use flext-cli
 
     def execute(self: Self) -> FlextResult[None]:

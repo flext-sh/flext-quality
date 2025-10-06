@@ -62,7 +62,7 @@ class FlextQualityHandlers:
         # Use placeholder services for now - these would be injected
         self._linting_service = None
         self._security_service = None
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
         self._observability = self._ObservabilityHelper()
 
     def analyze_project(self, project_id: UUID) -> FlextResult[QualityAnalysis]:
@@ -117,7 +117,7 @@ class FlextQualityHandlers:
                 service="flext-quality",
                 level="error",
             )
-            self._logger.exception("Unexpected error in analyze_project")
+            self.logger.exception("Unexpected error in analyze_project")
             return FlextResult[QualityAnalysis].fail(f"Unexpected error: {e!s}")
 
     def generate_report(self, analysis_id: UUID) -> FlextResult[QualityReport]:

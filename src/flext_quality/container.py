@@ -17,12 +17,12 @@ class FlextQualityContainer:
     """
 
     _container: FlextContainer
-    _logger: FlextLogger
+    logger: FlextLogger
 
     def __init__(self) -> None:
         """Initialize container with dependency injection."""
         self._container = FlextContainer.get_global()
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
 
     @staticmethod
     def get_quality_container() -> FlextContainer:

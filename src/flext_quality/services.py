@@ -45,7 +45,7 @@ class FlextQualityServices:
         self._dispatcher = FlextDispatcher()
         self._processors = FlextProcessors()
         self._registry = FlextRegistry(dispatcher=self._dispatcher)
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
 
         # Shared storage for all services
         self._projects: dict[str, FlextQualityEntities.Project] = {}
@@ -100,15 +100,15 @@ class FlextQualityServices:
             super().__init__()
             self._parent = parent
             # Initialize logger directly for type safety
-            self._logger = FlextLogger(__name__)
+            self.logger = FlextLogger(__name__)
 
         @property
         def logger(self) -> FlextLogger:
             """Get logger with type narrowing."""
-            if self._logger is None:
+            if self.logger is None:
                 msg = "Logger must be initialized"
                 raise RuntimeError(msg)
-            return self._logger
+            return self.logger
 
         def create_project(
             self,
@@ -154,15 +154,15 @@ class FlextQualityServices:
             super().__init__()
             self._parent = parent
             # Initialize logger directly for type safety
-            self._logger = FlextLogger(__name__)
+            self.logger = FlextLogger(__name__)
 
         @property
         def logger(self) -> FlextLogger:
             """Get logger with type narrowing."""
-            if self._logger is None:
+            if self.logger is None:
                 msg = "Logger must be initialized"
                 raise RuntimeError(msg)
-            return self._logger
+            return self.logger
 
         def create_issue(
             self,
@@ -298,15 +298,15 @@ class FlextQualityServices:
             super().__init__()
             self._parent = parent
             # Initialize logger directly for type safety
-            self._logger = FlextLogger(__name__)
+            self.logger = FlextLogger(__name__)
 
         @property
         def logger(self) -> FlextLogger:
             """Get logger with type narrowing."""
-            if self._logger is None:
+            if self.logger is None:
                 msg = "Logger must be initialized"
                 raise RuntimeError(msg)
-            return self._logger
+            return self.logger
 
         def create_analysis(
             self,
@@ -360,15 +360,15 @@ class FlextQualityServices:
             super().__init__()
             self._parent = parent
             # Initialize logger directly for type safety
-            self._logger = FlextLogger(__name__)
+            self.logger = FlextLogger(__name__)
 
         @property
         def logger(self) -> FlextLogger:
             """Get logger with type narrowing."""
-            if self._logger is None:
+            if self.logger is None:
                 msg = "Logger must be initialized"
                 raise RuntimeError(msg)
-            return self._logger
+            return self.logger
 
         def create_report(
             self,
@@ -441,15 +441,15 @@ class FlextQualityServices:
             self._parent = parent
             self._backend = FlextQualityExternalBackend()
             # Initialize logger directly for type safety
-            self._logger = FlextLogger(__name__)
+            self.logger = FlextLogger(__name__)
 
         @property
         def logger(self) -> FlextLogger:
             """Get logger with type narrowing."""
-            if self._logger is None:
+            if self.logger is None:
                 msg = "Logger must be initialized"
                 raise RuntimeError(msg)
-            return self._logger
+            return self.logger
 
         def analyze_with_backend(
             self,

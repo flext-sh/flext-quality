@@ -135,7 +135,7 @@ class TestFlextQualityToolsUtilities:
         """Test utilities service initialization."""
         utils = FlextQualityToolsUtilities()
         assert utils is not None
-        assert utils._logger is not None
+        assert utils.logger is not None
         assert utils._cli is not None
 
     def test_execute(self) -> None:

@@ -27,7 +27,7 @@ class FlextQualityIntegrations(FlextService[None]):
     def __init__(self) -> None:
         """Initialize quality integrations with flext-api."""
         super().__init__()
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
 
         # Initialize flext-api configuration as dict
         api_config_dict: FlextTypes.Dict = {
@@ -44,8 +44,8 @@ class FlextQualityIntegrations(FlextService[None]):
     @property
     def logger(self) -> FlextLogger:
         """Get logger with type narrowing."""
-        assert self._logger is not None
-        return self._logger
+        assert self.logger is not None
+        return self.logger
 
     def send_webhook_notification(
         self,

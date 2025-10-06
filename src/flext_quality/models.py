@@ -173,7 +173,7 @@ class FlextQualityModels(FlextModels):
     def __init__(self) -> None:
         """Initialize models with dependency injection."""
         self._container = FlextContainer.get_global()
-        self._logger = FlextLogger(__name__)
+        self.logger = FlextLogger(__name__)
 
     class ProjectModel(FlextModels.BaseModel):
         """Pydantic model for quality project representation."""
