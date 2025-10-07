@@ -72,7 +72,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
         """
 
         # Domain library violation patterns
-        _FORBIDDEN_DIRECT_IMPORTS: ClassVar[dict[str, str]] = {
+        FORBIDDEN_DIRECT_IMPORTS: ClassVar[dict[str, str]] = {
             "import ldap3": "flext-ldap",
             "from ldap3": "flext-ldap",
             "import click": "flext-cli",
@@ -117,7 +117,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             return FlextResult[Path].ok(temp_file)
 
         @staticmethod
-        def _calculate_complexity_score(tree: ast.Module, content: str) -> float:
+        def calculate_complexity_score(tree: ast.Module, content: str) -> float:
             """Calculate complexity score for module.
 
             Extracted from unified_module_optimizer.py.
@@ -142,7 +142,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
 
             # Check for nested complexity
             max_depth = (
-                FlextQualityOptimizerOperations.ModuleOptimizer._calculate_ast_depth(
+                FlextQualityOptimizerOperations.ModuleOptimizer.calculate_ast_depth(
                     tree
                 )
             )
@@ -157,7 +157,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             return min(score, 1.0)
 
         @staticmethod
-        def _calculate_ast_depth(node: ast.AST, depth: int = 0) -> int:
+        def calculate_ast_depth(node: ast.AST, depth: int = 0) -> int:
             """Calculate maximum AST depth.
 
             Extracted from unified_module_optimizer.py.
@@ -167,8 +167,10 @@ class FlextQualityOptimizerOperations(FlextService[None]):
 
             max_child_depth = depth
             for child in ast.iter_child_nodes(node):
-                child_depth = FlextQualityOptimizerOperations.ModuleOptimizer._calculate_ast_depth(
-                    child, depth + 1
+                child_depth = (
+                    FlextQualityOptimizerOperations.ModuleOptimizer.calculate_ast_depth(
+                        child, depth + 1
+                    )
                 )
                 max_child_depth = max(max_child_depth, child_depth)
 
@@ -227,7 +229,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             for (
                 forbidden_import,
                 required_library,
-            ) in FlextQualityOptimizerOperations.ModuleOptimizer._FORBIDDEN_DIRECT_IMPORTS.items():
+            ) in FlextQualityOptimizerOperations.ModuleOptimizer.FORBIDDEN_DIRECT_IMPORTS.items():
                 if forbidden_import in content:
                     violations.append(
                         f"Domain library violation: {forbidden_import} should use {required_library}"
@@ -242,7 +244,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
                     domain_library_usage[library] = True
 
             # Calculate complexity score
-            complexity_score = FlextQualityOptimizerOperations.ModuleOptimizer._calculate_complexity_score(
+            complexity_score = FlextQualityOptimizerOperations.ModuleOptimizer.calculate_complexity_score(
                 tree, content
             )
 
@@ -266,7 +268,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             return FlextResult[FlextQualityModels.AnalysisResult].ok(result)
 
         @staticmethod
-        def _count_changes(original: str, optimized: str) -> int:
+        def count_changes(original: str, optimized: str) -> int:
             """Count number of changes made.
 
             Extracted from unified_module_optimizer.py.
@@ -276,7 +278,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             return len(original_lines.symmetric_difference(optimized_lines))
 
         @staticmethod
-        def _fix_pattern_violations(content: str) -> str:
+        def fix_pattern_violations(content: str) -> str:
             """Fix pattern violations in module.
 
             Extracted from unified_module_optimizer.py.
@@ -287,7 +289,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             for (
                 forbidden_import,
                 required_library,
-            ) in FlextQualityOptimizerOperations.ModuleOptimizer._FORBIDDEN_DIRECT_IMPORTS.items():
+            ) in FlextQualityOptimizerOperations.ModuleOptimizer.FORBIDDEN_DIRECT_IMPORTS.items():
                 if forbidden_import in optimized:
                     # Replace with domain library import
                     library_class = f"Flext{required_library.split('-')[1].title()}"
@@ -308,7 +310,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             return optimized.replace(r"-> Any:", "-> object:")
 
         @staticmethod
-        def _add_missing_type_hints(content: str) -> str:
+        def add_missing_type_hints(content: str) -> str:
             """Add missing type hints (simplified implementation).
 
             Extracted from unified_module_optimizer.py.
@@ -318,7 +320,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             return content
 
         @staticmethod
-        def _general_improvements(content: str) -> str:
+        def general_improvements(content: str) -> str:
             """Apply general improvements.
 
             Extracted from unified_module_optimizer.py.
@@ -331,7 +333,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
 
             # Add proper type hints if missing
             return (
-                FlextQualityOptimizerOperations.ModuleOptimizer._add_missing_type_hints(
+                FlextQualityOptimizerOperations.ModuleOptimizer.add_missing_type_hints(
                     optimized
                 )
             )
@@ -383,7 +385,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             # Determine optimization type based on analysis
             if analysis.violations:
                 optimization_type = "pattern_violation"
-                optimized_content = FlextQualityOptimizerOperations.ModuleOptimizer._fix_pattern_violations(
+                optimized_content = FlextQualityOptimizerOperations.ModuleOptimizer.fix_pattern_violations(
                     original_content
                 )
             elif analysis.complexity_score > 0.7:
@@ -392,13 +394,13 @@ class FlextQualityOptimizerOperations(FlextService[None]):
                 optimized_content = original_content
             else:
                 optimization_type = "general_improvement"
-                optimized_content = FlextQualityOptimizerOperations.ModuleOptimizer._general_improvements(
+                optimized_content = FlextQualityOptimizerOperations.ModuleOptimizer.general_improvements(
                     original_content
                 )
 
             # Calculate changes
             changes_made = (
-                FlextQualityOptimizerOperations.ModuleOptimizer._count_changes(
+                FlextQualityOptimizerOperations.ModuleOptimizer.count_changes(
                     original_content, optimized_content
                 )
             )
@@ -459,7 +461,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
         """
 
         @staticmethod
-        def _remove_sys_path_hacks(content: str) -> tuple[str, bool]:
+        def remove_sys_path_hacks(content: str) -> tuple[str, bool]:
             """Remove sys.path manipulation hacks.
 
             Extracted from refactor_imports.py.
@@ -474,7 +476,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             return content, False
 
         @staticmethod
-        def _rewrite_submodule_imports(
+        def rewrite_submodule_imports(
             content: str, package_name: str
         ) -> tuple[str, bool]:
             """Rewrite from <pkg>.<sub> import X -> from <pkg> import X.
@@ -498,7 +500,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             return updated, changed
 
         @staticmethod
-        def _promote_type_checking_imports(content: str) -> tuple[str, bool]:
+        def promote_type_checking_imports(content: str) -> tuple[str, bool]:
             """Move imports from TYPE_CHECKING to module level.
 
             Extracted from refactor_imports.py.
@@ -596,7 +598,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             return content, changed
 
         @staticmethod
-        def _collect_import_stats(content: str, package_name: str) -> dict[str, int]:
+        def collect_import_stats(content: str, package_name: str) -> dict[str, int]:
             """Collect statistics about imports in the file.
 
             Helper for refactoring operations.
@@ -687,14 +689,14 @@ class FlextQualityOptimizerOperations(FlextService[None]):
 
             # Collect initial stats
             initial_stats = (
-                FlextQualityOptimizerOperations.ImportRefactorer._collect_import_stats(
+                FlextQualityOptimizerOperations.ImportRefactorer.collect_import_stats(
                     content, package_name
                 )
             )
 
             # Apply all refactorings
             content, sys_changed = (
-                FlextQualityOptimizerOperations.ImportRefactorer._remove_sys_path_hacks(
+                FlextQualityOptimizerOperations.ImportRefactorer.remove_sys_path_hacks(
                     content
                 )
             )
@@ -704,7 +706,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
                 )
 
             content, sub_changed = (
-                FlextQualityOptimizerOperations.ImportRefactorer._rewrite_submodule_imports(
+                FlextQualityOptimizerOperations.ImportRefactorer.rewrite_submodule_imports(
                     content, package_name
                 )
             )
@@ -714,7 +716,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
                 )
 
             content, tc_changed = (
-                FlextQualityOptimizerOperations.ImportRefactorer._promote_type_checking_imports(
+                FlextQualityOptimizerOperations.ImportRefactorer.promote_type_checking_imports(
                     content
                 )
             )
@@ -774,7 +776,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
         """
 
         @staticmethod
-        def _modernize_type_parameters(content: str) -> tuple[str, list[str]]:
+        def modernize_type_parameters(content: str) -> tuple[str, list[str]]:
             """Apply PEP 695: Type Parameter Syntax.
 
             Extracted from modernize_python_syntax.py.
@@ -852,7 +854,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             return content, changes
 
         @staticmethod
-        def _modernize_override_decorators(content: str) -> tuple[str, list[str]]:
+        def modernize_override_decorators(content: str) -> tuple[str, list[str]]:
             """Apply PEP 698: @override decorator.
 
             Extracted from modernize_python_syntax.py.
@@ -926,7 +928,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             return content, changes
 
         @staticmethod
-        def _modernize_union_syntax(content: str) -> tuple[str, list[str]]:
+        def modernize_union_syntax(content: str) -> tuple[str, list[str]]:
             """Modernize Union syntax to use | operator (Python 3.10+ syntax).
 
             Extracted from modernize_python_syntax.py.
@@ -982,7 +984,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             return content, changes
 
         @staticmethod
-        def _modernize_dict_list_syntax(content: str) -> tuple[str, list[str]]:
+        def modernize_dict_list_syntax(content: str) -> tuple[str, list[str]]:
             """Modernize Dict/List to use built-in types.
 
             Extracted from modernize_python_syntax.py.
@@ -1052,7 +1054,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             return content, changes
 
         @staticmethod
-        def _modernize_string_annotations(content: str) -> tuple[str, list[str]]:
+        def modernize_string_annotations(content: str) -> tuple[str, list[str]]:
             """Remove quotes from type annotations (Python 3.10+ with from __future__ import annotations).
 
             Extracted from modernize_python_syntax.py.
@@ -1132,35 +1134,35 @@ class FlextQualityOptimizerOperations(FlextService[None]):
 
             # Apply all modernizations
             content, changes = (
-                FlextQualityOptimizerOperations.SyntaxModernizer._modernize_type_parameters(
+                FlextQualityOptimizerOperations.SyntaxModernizer.modernize_type_parameters(
                     content
                 )
             )
             all_changes.extend(changes)
 
             content, changes = (
-                FlextQualityOptimizerOperations.SyntaxModernizer._modernize_override_decorators(
+                FlextQualityOptimizerOperations.SyntaxModernizer.modernize_override_decorators(
                     content
                 )
             )
             all_changes.extend(changes)
 
             content, changes = (
-                FlextQualityOptimizerOperations.SyntaxModernizer._modernize_union_syntax(
+                FlextQualityOptimizerOperations.SyntaxModernizer.modernize_union_syntax(
                     content
                 )
             )
             all_changes.extend(changes)
 
             content, changes = (
-                FlextQualityOptimizerOperations.SyntaxModernizer._modernize_dict_list_syntax(
+                FlextQualityOptimizerOperations.SyntaxModernizer.modernize_dict_list_syntax(
                     content
                 )
             )
             all_changes.extend(changes)
 
             content, changes = (
-                FlextQualityOptimizerOperations.SyntaxModernizer._modernize_string_annotations(
+                FlextQualityOptimizerOperations.SyntaxModernizer.modernize_string_annotations(
                     content
                 )
             )
@@ -1212,7 +1214,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
         """
 
         @staticmethod
-        def _update_pyproject_toml_content(content: str) -> tuple[str, list[str]]:
+        def update_pyproject_toml_content(content: str) -> tuple[str, list[str]]:
             """Update pyproject.toml content to modernize type checking.
 
             Extracted from modernize_type_checking.py.
@@ -1324,7 +1326,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             return content, changes
 
         @staticmethod
-        def _update_makefile_content(content: str) -> tuple[str, list[str]]:
+        def update_makefile_content(content: str) -> tuple[str, list[str]]:
             """Update Makefile content to use Pyrefly.
 
             Extracted from modernize_type_checking.py.
@@ -1414,7 +1416,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
                         original_content = f.read()
 
                     updated_content, changes = (
-                        FlextQualityOptimizerOperations.TypeModernizer._update_pyproject_toml_content(
+                        FlextQualityOptimizerOperations.TypeModernizer.update_pyproject_toml_content(
                             original_content
                         )
                     )
@@ -1440,7 +1442,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
                         original_content = f.read()
 
                     updated_content, changes = (
-                        FlextQualityOptimizerOperations.TypeModernizer._update_makefile_content(
+                        FlextQualityOptimizerOperations.TypeModernizer.update_makefile_content(
                             original_content
                         )
                     )

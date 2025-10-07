@@ -20,11 +20,16 @@ from __future__ import annotations
 
 import re
 import shutil
-import subprocess
 import tempfile
 from pathlib import Path
 
-from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
+from flext_core import (
+    FlextLogger,
+    FlextResult,
+    FlextService,
+    FlextTypes,
+    FlextUtilities,
+)
 from pydantic import ConfigDict
 
 from flext_quality.constants import FlextQualityConstants
@@ -85,12 +90,18 @@ class FlextQualityGitTools(FlextService[None]):
             repo = Path(repo_path)
             temp_repo = workspace / repo.name
 
-            result = subprocess.run(
-                ["git", "clone", str(repo), str(temp_repo)],
+            cmd_result = FlextUtilities.run_external_command(
+                cmd=["git", "clone", str(repo), str(temp_repo)],
                 capture_output=True,
                 text=True,
                 check=False,
             )
+
+            # Handle execution failure
+            if cmd_result.is_failure:
+                return FlextResult[Path].fail(f"Git clone failed: {cmd_result.error}")
+
+            result = cmd_result.value
 
             if result.returncode != 0:
                 return FlextResult[Path].fail(
@@ -157,12 +168,20 @@ class FlextQualityGitTools(FlextService[None]):
             )
 
             # Get commit list
-            result = subprocess.run(
-                ["git", "-C", str(work_repo), "rev-list", "--all", "--reverse"],
+            cmd_result = FlextUtilities.run_external_command(
+                cmd=["git", "-C", str(work_repo), "rev-list", "--all", "--reverse"],
                 capture_output=True,
                 text=True,
                 check=False,
             )
+
+            # Handle execution failure
+            if cmd_result.is_failure:
+                return FlextResult[FlextQualityModels.RewriteResult].fail(
+                    f"Git rev-list failed: {cmd_result.error}"
+                )
+
+            result = cmd_result.value
 
             if result.returncode != 0:
                 return FlextResult[FlextQualityModels.RewriteResult].fail(
@@ -176,8 +195,8 @@ class FlextQualityGitTools(FlextService[None]):
 
             for commit_hash in commits:
                 # Get commit message
-                result = subprocess.run(
-                    [
+                cmd_result = FlextUtilities.run_external_command(
+                    cmd=[
                         "git",
                         "-C",
                         str(work_repo),
@@ -191,6 +210,15 @@ class FlextQualityGitTools(FlextService[None]):
                     check=False,
                 )
 
+                # Handle execution failure
+                if cmd_result.is_failure:
+                    errors.append(
+                        f"Git log failed for {commit_hash}: {cmd_result.error}"
+                    )
+                    continue
+
+                result = cmd_result.value
+
                 if result.returncode != 0:
                     errors.append(f"Failed to get message for {commit_hash}")
                     continue
@@ -200,8 +228,8 @@ class FlextQualityGitTools(FlextService[None]):
 
                 if cleaned_message != original_message:
                     # Rewrite commit message
-                    amend_result = subprocess.run(
-                        [
+                    amend_cmd_result = FlextUtilities.run_external_command(
+                        cmd=[
                             "git",
                             "-C",
                             str(work_repo),
@@ -214,6 +242,15 @@ class FlextQualityGitTools(FlextService[None]):
                         text=True,
                         check=False,
                     )
+
+                    # Handle execution failure
+                    if amend_cmd_result.is_failure:
+                        errors.append(
+                            f"Git commit failed for {commit_hash}: {amend_cmd_result.error}"
+                        )
+                        continue
+
+                    amend_result = amend_cmd_result.value
 
                     if amend_result.returncode != 0:
                         errors.append(f"Failed to amend {commit_hash}")
@@ -271,26 +308,32 @@ class FlextQualityGitTools(FlextService[None]):
             errors: list[str] = []
 
             # Run git clean
-            cmd = ["git", "-C", str(repo), "clean", "-xfd"]
+            git_cmd = ["git", "-C", str(repo), "clean", "-xfd"]
             if dry_run:
-                cmd.insert(4, "-n")  # Dry-run flag
+                git_cmd.insert(4, "-n")  # Dry-run flag
 
-            result = subprocess.run(
-                cmd,
+            cmd_result = FlextUtilities.run_external_command(
+                cmd=git_cmd,
                 capture_output=True,
                 text=True,
                 check=False,
             )
 
-            if result.returncode != 0:
-                errors.append(f"Git clean failed: {result.stderr}")
+            # Handle execution failure
+            if cmd_result.is_failure:
+                errors.append(f"Git clean execution failed: {cmd_result.error}")
             else:
-                # Count removed items
-                removed_count = (
-                    len(result.stdout.strip().split("\n"))
-                    if result.stdout.strip()
-                    else 0
-                )
+                result = cmd_result.value
+
+                if result.returncode != 0:
+                    errors.append(f"Git clean failed: {result.stderr}")
+                else:
+                    # Count removed items
+                    removed_count = (
+                        len(result.stdout.strip().split("\n"))
+                        if result.stdout.strip()
+                        else 0
+                    )
 
             return FlextResult[FlextTypes.Dict].ok({
                 "removed_count": removed_count,

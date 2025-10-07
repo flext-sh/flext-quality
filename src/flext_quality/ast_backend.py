@@ -27,7 +27,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
     def __init__(self) -> None:
         """Initialize AST backend with dependency injection."""
-        self._container = FlextContainer.ensure_global_manager().get_or_create()
+        self._container = FlextContainer.get_global().clear()().get_or_create()
         self.logger = FlextLogger(__name__)
 
     class _ASTVisitor(ast.NodeVisitor):

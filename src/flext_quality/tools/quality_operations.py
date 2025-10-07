@@ -18,10 +18,14 @@ MANDATORY: Uses flext-cli for ALL output (NO direct rich/click)
 
 from __future__ import annotations
 
-import subprocess
-
 from flext_cli import FlextCli
-from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
+from flext_core import (
+    FlextLogger,
+    FlextResult,
+    FlextService,
+    FlextTypes,
+    FlextUtilities,
+)
 from pydantic import ConfigDict
 
 from flext_quality.models import FlextQualityModels
@@ -115,12 +119,20 @@ class FlextQualityOperations(FlextService[None]):
         @staticmethod
         def run_lint(project_path: str) -> FlextResult[FlextTypes.Dict]:
             """Run ruff linting."""
-            result = subprocess.run(
-                ["ruff", "check", project_path],
+            cmd_result = FlextUtilities.run_external_command(
+                cmd=["ruff", "check", project_path],
                 capture_output=True,
                 text=True,
                 check=False,
             )
+
+            # Handle execution failure
+            if cmd_result.is_failure:
+                return FlextResult[FlextTypes.Dict].fail(
+                    f"Ruff execution failed: {cmd_result.error}"
+                )
+
+            result = cmd_result.value
 
             if result.returncode == 0:
                 return FlextResult[FlextTypes.Dict].ok({"passed": True})
@@ -148,12 +160,20 @@ class FlextQualityOperations(FlextService[None]):
             if dry_run:
                 logger.info("DRY RUN: Would fix linting issues")
                 # Run check to see what would be fixed
-                result = subprocess.run(
-                    ["ruff", "check", module_path, "--fix", "--dry-run"],
+                cmd_result = FlextUtilities.run_external_command(
+                    cmd=["ruff", "check", module_path, "--fix", "--dry-run"],
                     capture_output=True,
                     text=True,
                     check=False,
                 )
+
+                # Handle execution failure
+                if cmd_result.is_failure:
+                    return FlextResult[FlextTypes.Dict].fail(
+                        f"Ruff dry-run failed: {cmd_result.error}"
+                    )
+
+                result = cmd_result.value
                 return FlextResult[FlextTypes.Dict].ok({
                     "dry_run": True,
                     "would_fix": result.stdout.count("Fixed"),
@@ -161,12 +181,20 @@ class FlextQualityOperations(FlextService[None]):
                 })
 
             # Real fix
-            result = subprocess.run(
-                ["ruff", "check", module_path, "--fix"],
+            cmd_result = FlextUtilities.run_external_command(
+                cmd=["ruff", "check", module_path, "--fix"],
                 capture_output=True,
                 text=True,
                 check=False,
             )
+
+            # Handle execution failure
+            if cmd_result.is_failure:
+                return FlextResult[FlextTypes.Dict].fail(
+                    f"Ruff fix failed: {cmd_result.error}"
+                )
+
+            result = cmd_result.value
 
             if result.returncode == 0:
                 return FlextResult[FlextTypes.Dict].ok({"fixed": True})
@@ -196,26 +224,40 @@ class FlextQualityOperations(FlextService[None]):
 
             """
             # Try pyrefly first
-            result = subprocess.run(
-                ["pyrefly", "check", project_path],
+            cmd_result = FlextUtilities.run_external_command(
+                cmd=["pyrefly", "check", project_path],
                 capture_output=True,
                 text=True,
                 check=False,
             )
 
-            if result.returncode == 0:
-                return FlextResult[FlextTypes.Dict].ok({
-                    "passed": True,
-                    "tool": "pyrefly",
-                })
+            # Handle execution failure
+            if cmd_result.is_failure:
+                # Pyrefly failed to execute, fall back to mypy
+                pass
+            else:
+                result = cmd_result.value
+                if result.returncode == 0:
+                    return FlextResult[FlextTypes.Dict].ok({
+                        "passed": True,
+                        "tool": "pyrefly",
+                    })
 
             # Fall back to mypy
-            result = subprocess.run(
-                ["mypy", project_path],
+            cmd_result = FlextUtilities.run_external_command(
+                cmd=["mypy", project_path],
                 capture_output=True,
                 text=True,
                 check=False,
             )
+
+            # Handle execution failure
+            if cmd_result.is_failure:
+                return FlextResult[FlextTypes.Dict].fail(
+                    f"Type checking failed: {cmd_result.error}"
+                )
+
+            result = cmd_result.value
 
             if result.returncode == 0:
                 return FlextResult[FlextTypes.Dict].ok({"passed": True, "tool": "mypy"})

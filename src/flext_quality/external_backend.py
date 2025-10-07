@@ -8,13 +8,12 @@ from __future__ import annotations
 
 import json
 import shutil
-import subprocess
 import tempfile
 from importlib import import_module, util
 from pathlib import Path
 from typing import override
 
-from flext_core import FlextResult, FlextTypes
+from flext_core import FlextResult, FlextTypes, FlextUtilities
 
 from .backend_type import BackendType
 from .base import BaseAnalyzer
@@ -130,27 +129,25 @@ class FlextQualityExternalBackend(BaseAnalyzer):
                 }  # Return empty dict if ruff is not available
 
             # Execute ruff with validated path and arguments only
-            result = subprocess.run(
-                [ruff_path, "check", str(abs_file_path), "--output-format", "json"],
+            cmd_result = FlextUtilities.run_external_command(
+                cmd=[ruff_path, "check", str(abs_file_path), "--output-format", "json"],
                 capture_output=True,
                 text=True,
-                timeout=30,  # Prevent hanging
+                timeout=30.0,  # Prevent hanging
                 check=False,  # Don't raise exception on non-zero exit
-                shell=False,  # Explicitly disable shell execution for security
             )
+
+            # Handle execution failure
+            if cmd_result.is_failure:
+                return {"error": f"Ruff execution failed: {cmd_result.error}"}
+
+            result = cmd_result.value
 
             # Parse output even if ruff found issues (non-zero exit is expected)
             (self._parse_ruff_output(result.stdout) if result.stdout else [])
 
             return {"issues": "issues", "code_length": len(code)}
 
-        except subprocess.TimeoutExpired:
-            return {"error": "Ruff execution timed out"}
-        except FileNotFoundError:
-            return {
-                "error": "Ruff not found; install with: pip install ruff",
-                "code_length": len(code),
-            }
         except Exception as e:
             return {"error": str(e)}
 
