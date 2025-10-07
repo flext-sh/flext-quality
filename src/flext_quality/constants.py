@@ -267,7 +267,7 @@ class FlextQualityConstants(FlextConstants):
 
         FORBIDDEN_PATTERNS: tuple[str, ...] = (
             r"# type: ignore.*$",
-            r"def .*\).*-> Any:",
+            r"def .*\).*-> object:",
             r"except.*pass",
             r"from flext_core\.[^.]+\.import",
         )

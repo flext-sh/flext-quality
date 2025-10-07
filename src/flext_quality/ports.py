@@ -8,8 +8,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Any
-
 from flext_core import FlextProtocols
 
 # Use FlextProtocols from flext-core instead of local definitions
@@ -25,7 +23,7 @@ DuplicateDetectorService = FlextProtocols.Domain.Service
 MetricsCollectorService = FlextProtocols.Domain.Service
 
 # Report generation uses Application.Handler protocol
-ReportGeneratorService = FlextProtocols.Application.Handler[Any, str]
+ReportGeneratorService = FlextProtocols.Application.Handler[object, str]
 
 
 # Export protocol aliases

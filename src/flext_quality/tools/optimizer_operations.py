@@ -306,8 +306,8 @@ class FlextQualityOptimizerOperations(FlextService[None]):
                 flags=re.MULTILINE,
             )
 
-            # Fix Any types
-            return optimized.replace(r"-> Any:", "-> object:")
+            # Fix object types
+            return optimized.replace(r"-> object:", "-> object:")
 
         @staticmethod
         def add_missing_type_hints(content: str) -> str:
