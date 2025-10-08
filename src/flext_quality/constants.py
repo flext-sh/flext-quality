@@ -38,7 +38,7 @@ class FlextQualityConstants(FlextConstants):
         """Coverage thresholds and limits."""
 
         MINIMUM_COVERAGE: float = 90.0
-        PRODUCTION_COVERAGE: float = 75.0
+        COVERAGE: float = 75.0
         TARGET_COVERAGE: float = 95.0
         EXCELLENT_COVERAGE: float = 98.0
         MAXIMUM_COVERAGE: float = 100.0

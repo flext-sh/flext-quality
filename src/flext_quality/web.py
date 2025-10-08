@@ -17,7 +17,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 
 # Domain library imports (ZERO TOLERANCE - NO direct FastAPI imports)
-from flext_auth import FlextAuth, JwtAuthProvider
+from flext_auth import FlextAuth, FlextAuthJwtProvider
 from flext_core import FlextContainer, FlextLogger, FlextResult, FlextTypes
 
 from .analyzer import CodeAnalyzer
@@ -103,7 +103,7 @@ class FlextQualityWeb:
             }
 
             # Create JWT auth provider for quality API
-            jwt_provider = JwtAuthProvider(config=auth_config)
+            jwt_provider = FlextAuthJwtProvider(config=auth_config)
 
             # Initialize FlextAuth
             auth = FlextAuth()

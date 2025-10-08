@@ -903,8 +903,7 @@ class FlextQualityModels(FlextModels):
             return (
                 self._is_configuration_complete()
                 and self.enable_security
-                and self.min_coverage
-                >= FlextQualityConstants.Coverage.PRODUCTION_COVERAGE
+                and self.min_coverage >= FlextQualityConstants.Coverage.COVERAGE
                 and self.security_threshold
                 >= FlextQualityConstants.Security.MINIMUM_SECURITY_SCORE
             )
