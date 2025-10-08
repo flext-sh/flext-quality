@@ -17,26 +17,17 @@ import tempfile
 from pathlib import Path
 
 from flext_core import FlextContainer, FlextLogger
-
-# Note: flext_observability imports are optional and may not be available
-try:
-    from flext_observability import (
-        flext_create_log_entry,
-        flext_create_metric,
-        flext_create_trace,
-    )
-
-    OBSERVABILITY_AVAILABLE = True
-except ImportError:
-    OBSERVABILITY_AVAILABLE = False
+from flext_observability import (
+    flext_create_log_entry,
+    flext_create_metric,
+    flext_create_trace,
+)
 
 from flext_quality import (
     CodeAnalyzer,
     QualityAPI,
     QualityMetrics,
 )
-
-# Import report generator
 from flext_quality.reports import FlextQualityReportGenerator
 
 # Import services from services module

@@ -26,7 +26,13 @@ import tempfile
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
+from flext_core import (
+    FlextConstants,
+    FlextLogger,
+    FlextResult,
+    FlextService,
+    FlextTypes,
+)
 from pydantic import ConfigDict
 
 from flext_quality.constants import FlextQualityConstants
@@ -137,7 +143,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             func_count = len([
                 node for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
             ])
-            if func_count > 10:
+            if func_count > FlextConstants.Config.MAX_FUNCTIONS_THRESHOLD:
                 score += 0.3
 
             # Check for nested complexity
@@ -146,12 +152,12 @@ class FlextQualityOptimizerOperations(FlextService[None]):
                     tree
                 )
             )
-            if max_depth > 5:
+            if max_depth > FlextConstants.Config.MAX_AST_DEPTH_THRESHOLD:
                 score += 0.2
 
             # Line count complexity
             line_count = len(content.split("\n"))
-            if line_count > 200:
+            if line_count > FlextConstants.Config.MAX_LINE_COUNT_THRESHOLD:
                 score += 0.2
 
             return min(score, 1.0)
@@ -251,7 +257,7 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             # Generate suggestions
             if violations:
                 suggestions.append("Fix violations to comply with FLEXT patterns")
-            if complexity_score > 0.7:
+            if complexity_score > FlextConstants.Config.COMPLEXITY_SCORE_THRESHOLD:
                 suggestions.append("Consider breaking down complex module")
             if not any(domain_library_usage.values()):
                 suggestions.append(
@@ -388,7 +394,10 @@ class FlextQualityOptimizerOperations(FlextService[None]):
                 optimized_content = FlextQualityOptimizerOperations.ModuleOptimizer.fix_pattern_violations(
                     original_content
                 )
-            elif analysis.complexity_score > 0.7:
+            elif (
+                analysis.complexity_score
+                > FlextConstants.Config.COMPLEXITY_SCORE_THRESHOLD
+            ):
                 optimization_type = "complexity_reduction"
                 # For now, complexity reduction is a placeholder
                 optimized_content = original_content
