@@ -26,6 +26,7 @@ import tempfile
 from pathlib import Path
 from typing import ClassVar
 
+import toml
 from flext_core import (
     FlextConstants,
     FlextLogger,
@@ -1228,8 +1229,6 @@ class FlextQualityOptimizerOperations(FlextService[None]):
 
             Extracted from modernize_type_checking.py.
             """
-            import toml
-
             changes = []
 
             try:

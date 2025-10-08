@@ -30,8 +30,6 @@ from flext_quality import (
 )
 from flext_quality.reports import FlextQualityReportGenerator
 
-# Import services from services module
-
 logger = FlextLogger(__name__)
 
 
@@ -217,30 +215,28 @@ def process_data(data):
         except Exception:
             return
 
-        # Demonstrate observability integration (if available)
-        if OBSERVABILITY_AVAILABLE:
-            try:
-                # Create metrics
-                score_value = analysis_data.get("quality_score", 0.0)
-                if isinstance(score_value, (int, float)):
-                    flext_create_metric(
-                        name="quality_analysis_score",
-                        value=float(score_value),
-                    )
-
-                # Create trace
-                flext_create_trace(
-                    name="ecosystem_demo_analysis",
-                    operation="api.analyze_project",
+        try:
+            # Create metrics
+            score_value = analysis_data.get("quality_score", 0.0)
+            if isinstance(score_value, (int, float)):
+                flext_create_metric(
+                    name="quality_analysis_score",
+                    value=float(score_value),
                 )
 
-                # Create log entry
-                flext_create_log_entry(
-                    message="FLEXT Quality ecosystem integration demonstration completed",
-                    level="info",
-                )
-            except Exception as e:
-                logger.warning(f"Observability integration failed: {e}")
+            # Create trace
+            flext_create_trace(
+                name="ecosystem_demo_analysis",
+                operation="api.analyze_project",
+            )
+
+            # Create log entry
+            flext_create_log_entry(
+                message="FLEXT Quality ecosystem integration demonstration completed",
+                level="info",
+            )
+        except Exception as e:
+            logger.warning(f"Observability integration failed: {e}")
 
         # Demonstrate container-based dependency injection
         logger.info("Container-based DI demonstration - using FlextContainer")
