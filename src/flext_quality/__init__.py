@@ -6,6 +6,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from flext_quality.__version__ import __version__, __version_info__
+
 from typing import Final
 
 # Import specific types from the nested class
@@ -58,14 +60,7 @@ from .value_objects import FlextQualityValueObjects
 from .version import VERSION, FlextQualityVersion
 from .web import FlextQualityWeb
 
-PROJECT_VERSION: Final[FlextQualityVersion] = VERSION
-
-__version__: str = VERSION.version
-__version_info__: tuple[int | str, ...] = VERSION.version_info
-
 __all__ = [
-    "PROJECT_VERSION",
-    "VERSION",
     "ASTBackend",
     # Additional exports for tests and examples
     "BackendType",
@@ -99,7 +94,6 @@ __all__ = [
     "FlextQualityTypes",
     "FlextQualityValidationError",
     "FlextQualityValueObjects",
-    "FlextQualityVersion",
     "FlextQualityWeb",
     "QualityAPI",
     "QualityGradeCalculator",
