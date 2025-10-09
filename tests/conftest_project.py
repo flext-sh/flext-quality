@@ -15,10 +15,13 @@ import os
 import tempfile
 from collections.abc import Generator
 from pathlib import Path
+from typing import TypeVar
 
 import pytest
 from django.test.utils import setup_test_environment, teardown_test_environment
-from flext_core import FlextResult, FlextTypes, T
+from flext_core import FlextResult, FlextTypes
+
+T = TypeVar("T")
 
 
 def assert_result_success_with_data[T](result: FlextResult[T]) -> T:
@@ -377,13 +380,13 @@ def temporary_project_structure(tmp_path: Path) -> str:
     src_dir.mkdir()
     main_py = src_dir / "main.py"
     main_py.write_text("""
-
 def main() -> int:
     print("Hello, World!")
     return 0
 if __name__ == "__main__":
     main()
 """)
+
     utils_py = src_dir / "utils.py"
     utils_py.write_text("""
 
@@ -402,15 +405,7 @@ def test_main() -> None:
     if main() != 0:
       raise AssertionError(f"Expected {0}, got {main()}")
 """)
-    # Create config files
-    pyproject_toml = project_dir / "pyproject.toml"
-    pyproject_toml.write_text("""
 
-[tool.ruff]
-line-length = 79
-[tool.mypy]
-strict = true
-""")
     return str(project_dir)
 
 
@@ -538,6 +533,7 @@ def mock_quality_analyzer() -> object:
 
         def __init__(self) -> None:
             """Initialize the instance."""
+            super().__init__()
             self.analyzed_files: FlextTypes.StringList = []
 
         def analyze_project(self, project_path: str) -> FlextTypes.Dict:
@@ -632,6 +628,7 @@ def mock_report_generator() -> object:
 
         def __init__(self) -> None:
             """Initialize the instance."""
+            super().__init__()
             self.generated_reports: list[FlextTypes.Dict] = []
 
         def generate_report(
