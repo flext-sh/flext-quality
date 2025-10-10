@@ -12,11 +12,11 @@ Documentation for FLEXT Quality - code quality analysis library for the FLEXT ec
 | ----------------------- | ----------------- | ---------------------------------------------------------------------- |
 | **Domain Architecture** | ✅ **Complete**   | Well-designed entities with FlextResult patterns, domain events        |
 | **Service Layer**       | ✅ **Functional** | services with proper error handling and FlextLogger integration        |
-| **Core Analyzer**       | ⚠️ **Hidden**     | FlextQualityCodeAnalyzer functional but not exported in main interface |
-| **Quality Gates**       | ❌ **Blocked**    | 2 MyPy type errors, test execution prevented by import issues          |
+| **Core Analyzer**       | ❌ **Inaccessible**| FlextQualityCodeAnalyzer implemented but blocked by model imports      |
+| **Quality Gates**       | ❌ **Blocked**    | Import failures prevent type checking and test execution               |
+| **FLEXT Integration**   | ⚠️ **Partial**    | Uses flext-core patterns but has BaseModel compatibility issues        |
 | **Modern Integration**  | ⚠️ **Limited**    | Basic external backend, missing 2025 Python ecosystem tools            |
-| **FLEXT Compliance**    | ✅ **Good**       | Proper FlextResult usage, domain patterns aligned with ecosystem       |
-| **Documentation**       | ⚠️ **Outdated**   | Implementation status indicators need synchronization                  |
+| **Documentation**       | ⚠️ **Outdated**   | Status indicators need synchronization across all files                |
 
 **See [TODO.md](../TODO.md) for accurate assessment based on investigation.**
 

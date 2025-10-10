@@ -49,14 +49,14 @@ As defined in [../CLAUDE.md](../CLAUDE.md), all FLEXT development MUST use:
 **CURRENT CAPABILITIES**:
 
 - ✅ **Domain Architecture**: Well-structured entities with FlextResult patterns and domain events
-- ✅ **Quality Analysis Engine**: AST-based analysis, complexity calculation, security checks
+- ⚠️ **Quality Analysis Engine**: AST-based analysis engine exists but has flext-core integration issues
 - ✅ **Service Layer**: Quality services with proper error handling and FlextLogger integration
 - ✅ **Grade Calculator**: Comprehensive quality scoring and grading system
 - ✅ **Report Generation**: Multiple format reporting (JSON, HTML, text)
-- ✅ **FLEXT Integration**: Uses flext-core patterns (FlextResult, FlextContainer, FlextModels)
-- ⚠️ **Accessibility**: Core analyzer not exported in main module interface
-- ⚠️ **Quality Gates**: Import errors and type issues blocking automated testing
-- ❌ **Integration Barriers**: Test execution blocked by import issues
+- ⚠️ **FLEXT Integration**: Uses flext-core patterns but has BaseModel compatibility issues
+- ❌ **Accessibility**: Core analyzer not accessible via standard imports due to model integration failures
+- ❌ **Quality Gates**: Import errors and type issues blocking automated testing and development
+- ❌ **Integration Barriers**: Test execution blocked by import issues and model compatibility problems
 
 **ECOSYSTEM USAGE**:
 
@@ -66,9 +66,9 @@ As defined in [../CLAUDE.md](../CLAUDE.md), all FLEXT development MUST use:
 
 **QUALITY STANDARDS**:
 
-- **Type Safety**: Pyrefly strict mode compliance (currently blocked by import issues)
-- **Test Coverage**: Comprehensive testing (currently blocked by import issues)
-- **FLEXT Integration**: Complete flext-core pattern adherence
+- **Type Safety**: Pyrefly strict mode compliance (currently blocked by import issues and model compatibility)
+- **Test Coverage**: Comprehensive testing (currently blocked by import issues and integration failures)
+- **FLEXT Integration**: Partial flext-core pattern adherence (BaseModel compatibility issues)
 - **Code Quality**: Ruff linting and formatting compliance
 
 ---
@@ -267,16 +267,18 @@ PYTHONPATH=src poetry run pytest -m integration -v
 ### Quality Gates Status
 
 **Current Blockers**:
-- ❌ **Type Checking**: MyPy errors in external_backend.py and metrics.py
-- ❌ **Testing**: ImportError due to missing exports and integration issues
+- ❌ **Import Issues**: FlextModels.BaseModel compatibility preventing module loading
+- ❌ **Type Checking**: MyPy errors in external_backend.py and metrics.py (cannot run due to import failures)
+- ❌ **Testing**: ImportError due to model integration issues preventing test execution
 - ✅ **Linting**: Ruff passes with no violations
 - ⚠️ **Security**: Bandit scanning functional but incomplete
 
 **Resolution Priority**:
-1. Fix import issues to enable test execution
-2. Resolve type errors for type safety compliance
-3. Validate test coverage once tests can run
-4. Enhance integration with modern Python quality ecosystem
+1. Fix flext-core integration issues (FlextModels.BaseModel compatibility)
+2. Resolve import failures to enable module loading
+3. Fix type errors once imports work
+4. Enable test execution and validate coverage
+5. Enhance integration with modern Python quality ecosystem
 
 ---
 
@@ -359,20 +361,21 @@ thresholds = FlextQualityConstants.QUALITY_THRESHOLDS
 
 - **Domain Architecture**: Complete - Well-designed entities with FlextResult patterns
 - **Service Layer**: Functional - Services with proper error handling and FlextLogger integration
-- **Analysis Engine**: Operational - AST analysis, complexity calculation, security checks
+- **Analysis Engine**: Implemented - AST analysis, complexity calculation, security checks (but blocked by imports)
 - **Grade Calculator**: Complete - Comprehensive quality scoring and grading system
 - **Report Generation**: Functional - Multiple format reporting capabilities
-- **FLEXT Integration**: Strong - Uses flext-core patterns throughout
+- **FLEXT Integration**: Partial - Uses flext-core patterns but has BaseModel compatibility issues
 - **Code Quality**: Good - Ruff linting compliance, proper structure
 - **Documentation**: Outdated - Implementation status indicators need synchronization
 
 ### Known Limitations
 
-- **Import Issues**: Core analyzer not accessible via standard imports (CodeAnalyzer alias exists but has issues)
-- **Type Safety**: MyPy errors preventing strict mode compliance
-- **Testing**: Import errors blocking automated test execution
+- **Import Issues**: FlextModels.BaseModel compatibility preventing module loading and accessibility
+- **Type Safety**: MyPy errors cannot be assessed due to import failures preventing type checking
+- **Testing**: Import errors blocking automated test execution and coverage measurement
 - **Modern Integration**: Limited integration with 2025 Python quality ecosystem tools
-- **CLI Integration**: Command-line interface has dependency issues
+- **CLI Integration**: Command-line interface blocked by import issues
+- **Core Analyzer**: Functional but inaccessible due to model integration problems
 
 ### Documentation Status
 
@@ -393,22 +396,22 @@ thresholds = FlextQualityConstants.QUALITY_THRESHOLDS
 
 #### Development Priorities
 
-#### Phase 1: Critical Accessibility (Immediate)
+#### Phase 1: Critical Integration Fixes (Immediate)
 
-1. **Fix Import Issues**
-   - Resolve CodeAnalyzer import problems
-   - Ensure all main components are properly exported
-   - Fix integration issues with flext-core dependencies
+1. **Fix Flext-Core Compatibility**
+   - Resolve FlextModels.BaseModel compatibility issues in models.py
+   - Fix model inheritance to use proper pydantic BaseModel
+   - Ensure all modules can be imported without AttributeError
 
-2. **Resolve Quality Gates**
-   - Fix MyPy type errors in external_backend.py and metrics.py
-   - Enable test execution by resolving import issues
-   - Validate quality standards compliance
+2. **Restore Module Accessibility**
+   - Enable standard imports for core analyzer and services
+   - Fix __init__.py exports to work with corrected models
+   - Validate all main components are accessible via standard import patterns
 
-3. **Enhance Integration**
-   - Complete flext-core integration (FlextModels.BaseModel issues)
-   - Fix CLI dependency problems
-   - Validate ecosystem compatibility
+3. **Resolve Quality Gates**
+   - Fix MyPy type errors in external_backend.py and metrics.py once imports work
+   - Enable test execution by resolving import failures
+   - Validate quality standards compliance and coverage measurement
 
 #### Phase 2: Modern Quality Ecosystem
 
@@ -529,33 +532,34 @@ PYTHONPATH=src poetry run pytest tests/unit/test_analyzer.py::TestAnalyzer::test
 
 ### Import Errors
 
-**Symptom**: `ModuleNotFoundError` or `ImportError` when importing flext_quality
+**Symptom**: `AttributeError: type object 'FlextModels' has no attribute 'BaseModel'` when importing flext_quality
 
-**Solutions**:
+**Root Cause**: Models.py attempts to inherit from FlextModels.BaseModel which doesn't exist in flext-core
+
+**Current Workaround**:
 ```bash
-# Ensure PYTHONPATH is set
+# Use direct analyzer import (bypasses models.py)
 export PYTHONPATH=src
-python -c "from flext_quality import FlextQuality; print('Import successful')"
+python -c "from flext_quality.analyzer import FlextQualityAnalyzer; print('Direct import successful')"
 
-# Check Poetry environment
-poetry env info
-poetry show --tree | grep flext
-
-# Reinstall dependencies
-make clean && make setup
+# Core analyzer is functional but not accessible via standard imports
+python -c "from flext_quality import CodeAnalyzer; print('Standard import fails')"
 ```
+
+**Resolution Required**: Fix model inheritance in models.py to use pydantic BaseModel directly
 
 ### Type Checking Errors
 
-**Symptom**: MyPy errors in external_backend.py and metrics.py
+**Symptom**: Cannot run type checking due to import failures
 
 **Current Issues**:
-- `external_backend.py`: Incompatible return types in Ruff backend
-- `metrics.py`: Type annotation issues in metrics calculation
+- Type checking blocked by FlextModels.BaseModel compatibility issues
+- `external_backend.py` and `metrics.py` have reported type errors but cannot be validated
+- Import failures prevent MyPy/Pyrefly execution
 
-**Resolution Steps**:
+**Resolution Steps** (After Import Fix):
 ```bash
-# Check specific errors
+# These commands will work once import issues are resolved
 PYTHONPATH=src poetry run pyrefly check src/flext_quality/external_backend.py
 PYTHONPATH=src poetry run pyrefly check src/flext_quality/metrics.py
 
@@ -565,47 +569,51 @@ PYTHONPATH=src poetry run pyrefly check . --show-error-codes | grep "error-code"
 
 ### Test Execution Failures
 
-**Symptom**: Tests fail with ImportError
+**Symptom**: Tests fail with AttributeError due to FlextModels.BaseModel
 
-**Root Cause**: CodeAnalyzer not properly exported, integration issues with flext-core
+**Root Cause**: Model compatibility issues preventing module imports, blocking all test execution
 
-**Immediate Fix**:
-```python
-# Use direct import for testing (temporary workaround)
-from flext_quality.analyzer import FlextQualityAnalyzer
+**Current Status**:
+```bash
+# All test execution blocked by import failures
+PYTHONPATH=src poetry run pytest tests/ -v  # AttributeError on import
 
-# Instead of:
-from flext_quality import CodeAnalyzer  # Currently broken
+# Cannot run any tests until model compatibility is fixed
+# Core analyzer exists and is functional but inaccessible via imports
 ```
 
 ### Flext-Core Integration Issues
 
-**Symptom**: AttributeError with FlextModels.BaseModel
+**Symptom**: AttributeError: type object 'FlextModels' has no attribute 'BaseModel'
 
-**Root Cause**: Version mismatch or incorrect import patterns
+**Root Cause**: flext_quality models.py incorrectly assumes FlextModels.BaseModel exists, but flext-core doesn't provide this
 
-**Resolution**:
+**Technical Details**:
 ```python
-# Check flext-core version compatibility
-poetry show flext-core
+# What flext_quality/models.py incorrectly tries to do:
+class ProjectModel(FlextModels.BaseModel):  # ❌ FlextModels.BaseModel doesn't exist
+    pass
 
-# Verify correct import pattern
-from flext_core import FlextModels
-print(hasattr(FlextModels, 'BaseModel'))  # Should be True
-
-# Update if necessary
-poetry update flext-core
+# What should be done:
+from pydantic import BaseModel
+class ProjectModel(BaseModel):  # ✅ Use pydantic BaseModel directly
+    pass
 ```
+
+**Resolution Required**: Update all model classes in models.py to inherit from pydantic BaseModel instead of FlextModels.BaseModel
 
 ### CLI Command Issues
 
 **Symptom**: CLI commands fail with import errors
 
-**Root Cause**: flext-cli dependency issues in CLI module
+**Root Cause**: Model compatibility issues prevent CLI module loading, blocking flext-cli integration
 
-**Workaround**:
+**Current Status**:
 ```bash
-# Use direct Python execution instead of CLI
+# CLI completely blocked by import failures
+flext-quality analyze  # AttributeError on module import
+
+# Workaround: Direct analyzer usage (when imports are fixed)
 PYTHONPATH=src python -c "
 from flext_quality.analyzer import FlextQualityAnalyzer
 analyzer = FlextQualityAnalyzer('.')
