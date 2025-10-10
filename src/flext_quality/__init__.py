@@ -8,8 +8,6 @@ from __future__ import annotations
 
 from flext_quality.__version__ import __version__, __version_info__
 
-from typing import Final
-
 # Import specific types from the nested class
 from .analysis_types import FlextQualityAnalysisTypes
 
@@ -61,6 +59,7 @@ from .version import VERSION, FlextQualityVersion
 from .web import FlextQualityWeb
 
 __all__ = [
+    "VERSION",
     "ASTBackend",
     # Additional exports for tests and examples
     "BackendType",
@@ -94,6 +93,7 @@ __all__ = [
     "FlextQualityTypes",
     "FlextQualityValidationError",
     "FlextQualityValueObjects",
+    "FlextQualityVersion",
     "FlextQualityWeb",
     "QualityAPI",
     "QualityGradeCalculator",

@@ -12,9 +12,10 @@
 
 - ✅ **Domain Architecture** - Complete entity design with FlextResult patterns
 - ✅ **Service Layer** - Functional services with proper error handling
-- ⚠️ **Core Analyzer** - FlextQualityCodeAnalyzer functional but not exported
-- ❌ **Quality Gates** - 2 MyPy type errors, test execution blocked by imports
+- ⚠️ **Core Analyzer** - FlextQualityCodeAnalyzer functional but not exported in main interface
+- ❌ **Quality Gates** - 2 MyPy type errors, test execution blocked by import issues
 - ⚠️ **Modern Integration** - Limited 2025 Python quality ecosystem integration
+- ⚠️ **Documentation** - Status indicators need synchronization with current state
 
 **For developers**: See [TODO.md](../TODO.md) for accurate technical assessment and priorities.
 

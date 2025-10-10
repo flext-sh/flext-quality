@@ -1,739 +1,816 @@
-# FLEXT-QUALITY CLAUDE.MD
+# CLAUDE.md
 
-**Enterprise Code Quality Analysis & Metrics Foundation for FLEXT Ecosystem**  
-**Version**: 0.9.9 RC | **Authority**: QUALITY ASSURANCE AUTHORITY | **Updated**: 2025-01-08  
-**Status**: Production-ready quality analysis platform with zero errors across all quality gates · 1.0.0 Release Preparation
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 🎯 FLEXT-QUALITY MISSION (QUALITY ASSURANCE AUTHORITY)
+---
 
-**CRITICAL ROLE**: flext-quality is the enterprise-grade code quality analysis and quality assurance foundation for the entire FLEXT ecosystem.
+**FLEXT Quality - Code Quality Analysis & Metrics Library**
+**Version**: 0.9.0 | **Updated**: 2025-10-10
+**Status**: Solid domain architecture with accessibility and integration barriers requiring resolution
 
-**ZERO TOLERANCE ENFORCEMENT (QUALITY ASSURANCE AUTHORITY)**:
+## 📋 DOCUMENT STRUCTURE & REFERENCES
 
-### ⛔ ABSOLUTELY FORBIDDEN (IMMEDIATE TERMINATION POLICIES)
+**Quick Links**:
+- **[~/.claude/commands/flext.md](~/.claude/commands/flext.md)**: Optimization command for module refactoring (USE with `/flext` command)
+- **[../CLAUDE.md](../CLAUDE.md)**: FLEXT ecosystem standards and domain library rules
+- **[README.md](README.md)**: Project overview and usage documentation
+- **[TODO.md](TODO.md)**: Current technical issues and development priorities
 
-#### 1. **Quality Analysis Violations**
+**Document Purpose**:
+- **This file (CLAUDE.md)**: Project-specific flext-quality standards and quality analysis patterns
+- **flext.md command**: Practical refactoring workflows and MCP tool usage patterns
+- **Workspace CLAUDE.md**: Domain library standards and ecosystem architectural principles
 
-- **FORBIDDEN**: Custom quality analysis implementations bypassing CodeAnalyzer
-- **FORBIDDEN**: Manual quality metric calculations outside domain entities
-- **FORBIDDEN**: Quality thresholds bypass or hardcoded overrides
-- **FORBIDDEN**: Code quality analysis without enterprise security validation
-- **MANDATORY**: ALL quality operations MUST use FlextQualityAnalysisService
+**DO NOT DUPLICATE**: This file focuses on flext-quality specifics. The `/flext` command provides HOW-TO workflows. The workspace CLAUDE.md provides ecosystem-wide standards.
 
-#### 2. **Quality Standards Violations**
+**Hierarchy**: This document provides project-specific standards based on workspace-level patterns defined in [../CLAUDE.md](../CLAUDE.md). For architectural principles, quality gates, and MCP server usage, reference the main workspace standards.
 
-- **FORBIDDEN**: Coverage below 90% minimum threshold
-- **FORBIDDEN**: Type errors in source code (zero tolerance policy)
-- **FORBIDDEN**: Security vulnerabilities in quality analysis infrastructure
-- **MANDATORY**: Use QualityGradeCalculator for ALL quality scoring operations
+---
 
-#### 3. **Enterprise Quality Reporting Violations**
-
-- **FORBIDDEN**: Custom quality report generation outside FlextQualityReportGenerator
-- **FORBIDDEN**: Quality metrics manipulation or false reporting
-- **FORBIDDEN**: Quality analysis results without proper audit logging
-- **MANDATORY**: Use QualityReport entities for ALL quality reporting
-
-## 🏛️ ENTERPRISE QUALITY ANALYSIS ARCHITECTURE (CLEAN ARCHITECTURE + DDD AUTHORITY)
-
-### **Zero Tolerance Quality Requirements**
-
-```bash
-# MANDATORY before ANY quality analysis development
-make validate                   # Complete pipeline: 100% type safety + 90% coverage + zero security issues
-make quality-check             # Validate quality thresholds compliance
-make workspace-analyze         # Complete FLEXT ecosystem analysis validation
-make report                    # Quality reporting system validation
-```
-
-### **Production Quality Analysis Configuration (MANDATORY)**
-
-#### Enterprise Quality Analysis Engine (FLEXT AUTHORITY)
-
-```python
-from flext_quality import CodeAnalyzer, FlextQualityAnalysisService
-from flext_core import FlextContainer
-
-# MANDATORY: Use enterprise quality analysis patterns
-container = FlextContainer()
-quality_service = FlextQualityAnalysisService(container)
-
-# MANDATORY: Enterprise quality analysis configuration
-analysis_config = QualityAnalysisConfig(
-    project_path="/opt/flext/projects",
-    min_coverage=90.0,                      # Enterprise coverage requirement
-    max_complexity=10,                      # Maximum complexity threshold
-    max_duplication=5.0,                    # Maximum duplication percentage
-    min_security_score=90.0,                # Enterprise security requirement
-    min_maintainability=80.0,               # Maintainability threshold
-    enable_ast_analysis=True,               # AST-based analysis enabled
-    enable_external_tools=True,             # External tool integration
-    enable_audit_logging=True,              # Enterprise audit logging
-)
-
-# MANDATORY: Enterprise quality analysis execution
-analyzer = CodeAnalyzer(analysis_config)
-analysis_result = await analyzer.analyze_project(project_path)
-if analysis_result.success:
-    quality_analysis = analysis_result.value
-    logger.info(f"Quality analysis completed: {quality_analysis.overall_score}")
-```
-
-### **Quality Metrics & Scoring (PRODUCTION PATTERNS)**
-
-#### Enterprise Quality Score Calculation (Clean Architecture)
-
-```python
-from flext_quality import (
-    QualityGradeCalculator,
-    QualityProject,
-    QualityAnalysis,
-    QualityReport
-)
-
-# MANDATORY: Use grade calculator for ALL scoring operations
-grade_calculator = QualityGradeCalculator()
-
-# Production quality scoring with enterprise patterns
-quality_analysis = QualityAnalysis.create(
-    project_id=project.id,
-    analysis_config=analysis_config,
-    status=AnalysisStatus.QUEUED
-)
-
-# Start analysis with enterprise validation
-started_analysis = quality_analysis.start_analysis()
-
-# Calculate comprehensive quality scores
-scoring_result = grade_calculator.calculate_quality_grade(
-    coverage_score=95.2,
-    complexity_score=8.5,
-    duplication_score=2.1,
-    security_score=98.5,
-    maintainability_score=87.3,
-    type_safety_score=100.0
-)
-
-if scoring_result.success:
-    # MANDATORY: Process via FlextResult patterns
-    quality_grade = scoring_result.value
-    logger.info(f"Quality grade calculated: {quality_grade.overall_grade}")
-```
-
-### **Quality Reporting System (ENTERPRISE AUTOMATION)**
-
-#### Production Quality Report Generation
-
-```python
-from flext_quality import FlextQualityReportGenerator, QualityReport
-
-# MANDATORY: Enterprise quality reporting with multiple formats
-report_generator = FlextQualityReportGenerator()
-
-# Production report generation with enterprise patterns
-report_config = QualityReportConfig(
-    format=ReportFormat.HTML,               # Enterprise HTML reporting
-    include_detailed_metrics=True,          # Comprehensive metrics
-    include_issue_breakdown=True,           # Detailed issue analysis
-    include_trend_analysis=True,            # Quality trend analysis
-    enable_executive_summary=True,          # Executive summary for stakeholders
-    enable_audit_trail=True,               # Complete audit information
-)
-
-# Generate comprehensive quality report
-report_result = await report_generator.generate_report(
-    quality_analysis=quality_analysis,
-    config=report_config
-)
-
-if report_result.success:
-    quality_report = report_result.value
-    await quality_report.save_to_file("/reports/quality_analysis.html")
-```
-
-## 🔒 ENTERPRISE QUALITY SECURITY (ZERO TOLERANCE)
-
-### **Quality Analysis Security Framework (PRODUCTION REQUIREMENTS)**
-
-#### Code Analysis Security & Validation
-
-```python
-from flext_quality import FlextQualitySecurity, QualitySecurityLevel
-
-# MANDATORY: Enterprise quality security patterns
-security_manager = FlextQualitySecurity()
-
-# Production code security validation during analysis
-security_result = await security_manager.validate_code_analysis(
-    project_path=project_path,
-    security_level=QualitySecurityLevel.HIGH,
-    enable_static_analysis=True,           # Static analysis security
-    enable_dependency_scan=True,           # Dependency vulnerability scan
-    enable_secret_detection=True,          # Secret detection in code
-    enable_license_compliance=True,        # License compliance check
-)
-
-if security_result.success:
-    # Code is safe for quality analysis
-    analysis_result = await analyzer.analyze_secure_project(project_path, security_context)
-```
-
-### **Quality Data Protection (ENTERPRISE COMPLIANCE)**
-
-- **Analysis Isolation**: All code analysis in secure sandboxes
-- **Data Encryption**: Quality metrics encrypted at rest and in transit
-- **Access Control**: Role-based quality analysis access via FlextAuth integration
-- **Audit Logging**: Complete quality operation audit via FlextObservability patterns
-
-## 🔧 ENTERPRISE QUALITY DEVELOPMENT COMMANDS (ZERO TOLERANCE WORKFLOWS)
-
-### **Mandatory Quality Analysis Gates (ZERO ERRORS TOLERANCE)**
-
-```bash
-# MANDATORY: Complete quality analysis validation pipeline
-make validate                   # 100% type safety + 90% coverage + zero security vulnerabilities
-make quality-check             # Enterprise quality thresholds validation
-make workspace-analyze         # Complete FLEXT ecosystem quality analysis
-make analyze                   # Production code quality analysis validation
-make report                    # Quality reporting system validation
-make security                  # Bandit + pip-audit: zero security vulnerabilities
-```
-
-### **Quality Analysis Standards (PRODUCTION REQUIREMENTS)**
-
-```bash
-# Type Safety & Code Quality (ZERO TOLERANCE)
-make type-check                # MyPy strict mode: zero errors across all quality modules
-make lint                      # Ruff comprehensive linting: enterprise quality standards
-make format                    # Auto-format with enterprise code standards
-
-# Enterprise Quality Testing (COMPREHENSIVE COVERAGE)
-make test                      # 90% minimum coverage with real quality analysis operations
-make test-unit                 # Isolated quality unit tests (domain entities, services)
-make test-integration          # Cross-layer quality integration testing
-make test-quality             # Quality analysis engine testing
-make test-analysis            # Backend analysis system testing
-make coverage-html            # Detailed HTML coverage report generation
-```
-
-### **Quality Analysis CLI Operations (ENTERPRISE QUALITY MANAGEMENT)**
-
-```bash
-# Enterprise Quality CLI Commands
-flext-quality analyze --project /opt/flext/projects --output html
-flext-quality check-thresholds --min-coverage 90.0 --max-complexity 10
-flext-quality collect-metrics --workspace /opt/flext --format json
-flext-quality generate-report --analysis-id 123 --format pdf
-flext-quality analyze-workspace --parallel --security-scan
-
-# Production Quality Operations
-flext-quality detect-issues --severity CRITICAL --export csv
-flext-quality calculate-scores --project enterprise-app --detailed
-flext-quality quality-grade --threshold-file quality_thresholds.yml
-flext-quality coverage-score --min-threshold 90.0 --fail-under
-```
-
-### **Quality Analysis Development Workflow (CLEAN ARCHITECTURE)**
-
-```bash
-# Environment Setup
-make setup                     # Complete quality analysis development environment
-make install                   # Install all enterprise dependencies
-make deps-update               # Update quality dependencies securely
-
-# Quality System Operations
-make metrics                   # Quality metrics collection validation
-make detect-issues             # Issue detection system validation
-make calculate-scores          # Quality scoring system validation
-make diagnose                  # Complete quality system diagnostics and health check
-```
-
-### **Quality Web Interface Operations (ENTERPRISE DASHBOARD)**
-
-```bash
-# Enterprise Quality Dashboard
-make web-start                 # Start Django web interface (production-ready)
-make web-migrate               # Django database migrations for quality data
-make web-shell                 # Django shell for quality data management
-make web-collectstatic         # Static files for enterprise dashboard
-make web-createsuperuser       # Admin access for quality management
-```
-
-## 🏗️ ENTERPRISE QUALITY SYSTEM ARCHITECTURE (CLEAN ARCHITECTURE + DDD)
-
-### **Quality Analysis Integration Layers (PRODUCTION SEPARATION)**
-
-#### 1. **Domain Layer (Quality Business Logic)**
-
-```python
-# Quality domain entities with business rules
-from flext_quality import (
-    QualityProject,                 # Core project entity
-    QualityAnalysis,                # Analysis run entity
-    QualityIssue,                   # Quality issue entity
-    QualityRule,                    # Quality rule entity
-    QualityReport,                  # Quality report entity
-    IssueSeverity,                  # Issue severity classification
-    IssueType,                      # Issue type classification
-    AnalysisStatus,                 # Analysis lifecycle status
-)
-```
-
-#### 2. **Application Layer (Quality Use Cases)**
-
-```python
-# Quality application services and handlers
-from flext_quality import (
-    FlextQualityAnalysisService,    # Core quality analysis service
-    QualityProjectService,          # Quality project management service
-    QualityReportService,           # Quality reporting service
-    QualityMetricsService,          # Quality metrics collection service
-)
-```
-
-#### 3. **Infrastructure Layer (Quality Analysis Engine)**
-
-```python
-# Quality analysis engine and infrastructure services
-from flext_quality import (
-    CodeAnalyzer,                   # Main quality analysis engine
-    FlextQualityReportGenerator,    # Quality report generation
-    QualityGradeCalculator,         # Quality scoring system
-    FlextAnalysisUtilities,         # Quality analysis utilities
-)
-```
-
-#### 4. **Backend Layer (Analysis Backends)**
-
-```python
-# Quality analysis backends and external tool integration
-from flext_quality import (
-    ASTBackend,                     # AST-based analysis backend
-    ExternalBackend,                # External tool integration backend
-    BaseAnalyzer,                   # Base analyzer for custom backends
-    BackendType,                    # Backend classification
-)
-```
-
-### **Quality Configuration Architecture (ENTERPRISE PATTERNS)**
-
-```python
-# MANDATORY: Enterprise quality configuration structure
-from flext_quality import QualityAnalysisConfig
-
-enterprise_config = QualityAnalysisConfig(
-    project_path="/opt/flext/enterprise-project",
-    min_coverage=90.0,              # Enterprise coverage requirement
-    max_complexity=10,              # Maximum cyclomatic complexity
-    max_duplication=5.0,            # Maximum code duplication percentage
-    min_security_score=90.0,        # Enterprise security score requirement
-    min_maintainability=80.0,       # Maintainability index threshold
-    quality_thresholds={
-        "critical_issues": 0,       # Zero critical issues tolerance
-        "high_issues": 5,           # Maximum high severity issues
-        "type_errors": 0,           # Zero type errors tolerance
-        "security_vulnerabilities": 0  # Zero security vulnerabilities
-    },
-    backend_config={
-        "enable_ast_analysis": True,
-        "enable_ruff": True,
-        "enable_mypy": True,
-        "enable_bandit": True,
-        "enable_dependency_scan": True
-    },
-    reporting_config={
-        "formats": ["html", "json", "pdf"],
-        "include_trend_analysis": True,
-        "include_executive_summary": True,
-        "enable_audit_trail": True
-    }
-)
-```
-
-### **Quality Exception Architecture (COMPREHENSIVE ERROR HANDLING)**
-
-```python
-# Complete quality system error hierarchy
-from flext_quality import (
-    FlextQualityError,              # Base quality error
-    QualityAnalysisError,           # Quality analysis failures
-    QualityValidationError,         # Quality validation failures
-    QualityReportError,             # Quality reporting failures
-    QualityThresholdError,          # Quality threshold violations
-    QualityBackendError,            # Analysis backend errors
-)
-```
-
-## 📦 FLEXT ECOSYSTEM INTEGRATION (MANDATORY QUALITY DEPENDENCIES)
-
-## 🔗 MCP SERVER INTEGRATION
-
-### Mandatory MCP Server Usage (QUALITY COMPLIANCE)
+## 🔗 MCP SERVER INTEGRATION (MANDATORY)
 
 As defined in [../CLAUDE.md](../CLAUDE.md), all FLEXT development MUST use:
 
-- **serena**: All semantic code operations, symbol analysis, and refactoring
-- **sequential-thinking**: Complex problem decomposition and planning
-- **context7**: Third-party library documentation and API references
-- **github**: Repository operations and pull request management
-- **puppeteer**: Web automation and testing interfaces
+| MCP Server              | Purpose                                                     | Status          |
+|-------------------------|-------------------------------------------------------------|-----------------|
+| **serena**              | Semantic code analysis, symbol manipulation, refactoring    | **MANDATORY**   |
+| **sequential-thinking** | Quality architecture and analysis problem decomposition     | **RECOMMENDED** |
+| **context7**            | Third-party library documentation (Pydantic, AST)           | **RECOMMENDED** |
+| **github**              | Repository operations and quality ecosystem PRs             | **ACTIVE**      |
 
-Quality analysis must leverage MCP servers for comprehensive code evaluation and metrics collection.
+**Usage**: Reference [~/.claude/commands/flext.md](~/.claude/commands/flext.md) for MCP workflows. Use `/flext` command for module optimization.
 
 ---
 
-## 📦 FLEXT Foundation Dependencies (ENTERPRISE QUALITY INTEGRATION)\*\*
+## 🎯 FLEXT-QUALITY MISSION
+
+**ROLE**: flext-quality provides comprehensive code quality analysis and metrics collection for the FLEXT ecosystem, enabling automated quality assessment, scoring, and reporting across Python projects.
+
+**CURRENT CAPABILITIES**:
+
+- ✅ **Domain Architecture**: Well-structured entities with FlextResult patterns and domain events
+- ✅ **Quality Analysis Engine**: AST-based analysis, complexity calculation, security checks
+- ✅ **Service Layer**: Quality services with proper error handling and FlextLogger integration
+- ✅ **Grade Calculator**: Comprehensive quality scoring and grading system
+- ✅ **Report Generation**: Multiple format reporting (JSON, HTML, text)
+- ✅ **FLEXT Integration**: Uses flext-core patterns (FlextResult, FlextContainer, FlextModels)
+- ⚠️ **Accessibility**: Core analyzer not exported in main module interface
+- ⚠️ **Quality Gates**: Import errors and type issues blocking automated testing
+- ❌ **Integration Barriers**: Test execution blocked by import issues
+
+**ECOSYSTEM USAGE**:
+
+- **FLEXT Projects**: Quality analysis and validation for entire ecosystem Python codebases
+- **CI/CD Integration**: Automated quality gates and reporting in build pipelines
+- **Development Workflow**: Real-time quality feedback during development
+
+**QUALITY STANDARDS**:
+
+- **Type Safety**: Pyrefly strict mode compliance (currently blocked by import issues)
+- **Test Coverage**: Comprehensive testing (currently blocked by import issues)
+- **FLEXT Integration**: Complete flext-core pattern adherence
+- **Code Quality**: Ruff linting and formatting compliance
+
+---
+
+## 🏗️ ARCHITECTURE
+
+### Clean Architecture with Domain-Driven Design
+
+**Design Philosophy**: Domain-first design with clean separation of concerns, following FLEXT ecosystem patterns with FlextResult[T] railway-oriented programming.
+
+**Core Architecture**:
+
+- **Domain Layer**: Quality business logic with entities, value objects, and domain services
+- **Application Layer**: Use cases and application services orchestrating domain operations
+- **Infrastructure Layer**: Analysis backends, external tools, and persistence
+- **Presentation Layer**: CLI interface, web API, and report generation
+
+### Module Organization
+
+```
+src/flext_quality/
+├── api.py                      # FlextQuality facade (main entry point)
+├── analyzer.py                 # FlextQualityAnalyzer (core analysis engine)
+├── services.py                 # FlextQualityServices (service orchestration)
+├── models.py                   # FlextQualityModels (ALL Pydantic models)
+├── entities.py                 # Quality domain entities
+├── value_objects.py            # Quality value objects
+├── constants.py                # FlextQualityConstants (system constants)
+├── config.py                   # FlextQualityConfig (configuration)
+├── container.py                # Dependency injection container
+├── exceptions.py               # FlextQualityExceptions (error hierarchy)
+├── handlers.py                 # FlextQualityHandlers (event handlers)
+├── integrations.py             # FlextQualityIntegrations (external systems)
+├── metrics.py                  # Quality metrics calculation
+├── grade_calculator.py         # QualityGradeCalculator (scoring system)
+├── reports.py                  # FlextQualityReportGenerator (reporting)
+├── cli.py                      # Command-line interface
+├── web.py                      # Web interface (Django)
+├── ports.py                    # Interface definitions
+├── protocols.py                # Protocol definitions
+├── typings.py                  # Type definitions
+├── utilities.py                # Helper utilities
+├── ast_backend.py              # AST analysis backend
+├── external_backend.py         # External tool integration
+├── base.py                     # Base classes and interfaces
+└── tools/                      # Internal quality tools
+    ├── architecture.py         # Architecture analysis tools
+    ├── dependencies.py         # Dependency analysis tools
+    ├── git.py                  # Git integration tools
+    ├── optimizer_operations.py # Optimization operations
+    ├── quality_operations.py   # Quality operations
+    └── validation.py           # Validation tools
+```
+
+### Key Architectural Components
+
+#### 1. Domain Layer (Business Logic)
 
 ```python
-# MANDATORY: Core FLEXT patterns for quality system
-from flext_core import (
-    FlextResult,              # Railway-oriented programming (ALL quality operations)
-    FlextLogger,              # Enterprise logging patterns for quality analysis
-    FlextContainer,           # Dependency injection container for quality services
-    FlextEntity,             # Base entity for quality domain entities
+# Domain entities with business rules
+from flext_quality.entities import (
+    QualityProject,      # Project entity with validation
+    QualityAnalysis,     # Analysis run entity
+    QualityIssue,        # Quality issue entity
+    QualityRule,         # Quality rule entity
+    QualityReport,       # Quality report entity
 )
 
-# MANDATORY: Observability integration for quality monitoring
-from flext_observability import (
-    FlextMetrics,            # Quality metrics collection and reporting
-    FlextTracing,            # Distributed tracing for quality analysis
-    FlextAlerting,           # Quality threshold alerting and notifications
-)
-
-# MANDATORY: Configuration management for quality ecosystem
-from flext_config import (
-    FlextConfigManager,      # Centralized quality configuration management
-    FlextSecretManager,      # Secure quality credential management
+# Value objects for immutable data
+from flext_quality.value_objects import (
+    QualityScore,        # Quality score value object
+    ComplexityMetrics,   # Complexity measurement
+    SecurityMetrics,     # Security assessment
 )
 ```
 
-### **Quality System Import Standards (ZERO TOLERANCE ENFORCEMENT)**
-
-#### ✅ **MANDATORY: Always Use These Quality Patterns**
+#### 2. Application Layer (Use Cases)
 
 ```python
-# CORRECT: Root-level quality imports ONLY
-from flext_quality import CodeAnalyzer
-from flext_quality import FlextQualityAnalysisService
-from flext_quality import QualityGradeCalculator
+# Application services orchestrating domain operations
+from flext_quality.services import FlextQualityServices
 
-# CORRECT: flext-core integration for quality operations
-from flext_core import FlextResult, get_logger
-quality_result: FlextResult[QualityAnalysis] = await analyzer.analyze_project(project_path)
+# Quality analysis service
+service = FlextQualityServices()
+result = service.analyze_project(project_path)
 ```
 
-#### ❌ **ABSOLUTELY FORBIDDEN: These Quality Import Patterns**
+#### 3. Infrastructure Layer (Analysis Engine)
 
 ```python
-# FORBIDDEN: Internal quality module imports
-from flext_quality.domain.entities import QualityProject    # ❌ VIOLATION
-from flext_quality.internal.analyzer import CustomAnalyzer  # ❌ VIOLATION
+# Analysis backends and external tool integration
+from flext_quality.analyzer import FlextQualityAnalyzer
+from flext_quality.ast_backend import FlextQualityASTBackend
+from flext_quality.external_backend import FlextQualityExternalBackend
 
-# FORBIDDEN: Direct analysis tool integrations
-import ast                                                  # ❌ VIOLATION (use CodeAnalyzer)
-import subprocess                                           # ❌ VIOLATION (use ExternalBackend)
-from ruff import lint                                       # ❌ VIOLATION (use quality backends)
-
-# FORBIDDEN: Custom quality implementations
-class MyQualityAnalyzer: pass                              # ❌ VIOLATION (use CodeAnalyzer)
+# Core analyzer with multiple backends
+analyzer = FlextQualityAnalyzer(project_path)
+result = analyzer.analyze_project()
 ```
 
-## 🔍 QUALITY SYSTEM REQUIREMENTS (ENTERPRISE STANDARDS)
-
-### **Quality Type Safety (100% COMPLIANCE MANDATORY)**
+#### 4. Quality Scoring and Grading
 
 ```python
-# MANDATORY: All quality operations must be typed
-async def analyze_project(
-    self,
-    project_path: Path,
-    analysis_config: QualityAnalysisConfig,
-) -> FlextResult[QualityAnalysis]:
-    """Analyze project with complete type safety."""
+# Quality grade calculation system
+from flext_quality.grade_calculator import QualityGradeCalculator
 
-# MANDATORY: Use FlextResult for ALL quality operations
-result = await analyzer.analyze_project(project_path, config)
-if result.success:
-    analysis: QualityAnalysis = result.value
-    logger.info(f"Quality analysis completed: score {analysis.overall_score}")
+calculator = QualityGradeCalculator()
+grade_result = calculator.calculate_quality_grade(
+    coverage_score=95.0,
+    complexity_score=8.5,
+    security_score=98.0,
+    maintainability_score=87.0
+)
+```
+
+### Railway-Oriented Programming (FLEXT Pattern)
+
+All operations return `FlextResult[T]` for composable error handling:
+
+```python
+from flext_core import FlextResult
+from flext_quality import FlextQualityAnalyzer
+
+def analyze_project(project_path: str) -> FlextResult[QualityAnalysis]:
+    """Analyze project with railway-oriented error handling."""
+    analyzer = FlextQualityAnalyzer(project_path)
+
+    return (
+        analyzer.analyze_project()
+        .flat_map(lambda result: validate_analysis(result))
+        .map(lambda result: generate_report(result))
+        .map_error(lambda error: log_analysis_error(error))
+    )
+
+# Safe usage
+result = analyze_project("/path/to/project")
+if result.is_success:
+    analysis = result.unwrap()
+    print(f"Quality score: {analysis.overall_score}")
 else:
-    logger.error(f"Quality analysis failed: {result.error}")
+    print(f"Analysis failed: {result.error}")
 ```
 
-### **Quality Analysis Framework (COMPREHENSIVE VALIDATION)**
+---
 
-```python
-# MANDATORY: Use quality analysis framework
-from flext_quality import FlextQualitySecurity, QualitySecurityLevel
+## 🔧 DEVELOPMENT WORKFLOW
 
-try:
-    analysis_result = await analyzer.analyze_secure_project(project_path, QualitySecurityLevel.HIGH)
-    if analysis_result.is_failure:
-        # Handle quality analysis failures via FlextResult
-        logger.error(f"Quality analysis failed: {analysis_result.error}")
-except QualityAnalysisError as e:
-    # Handle quality analysis-specific errors
-    await handle_quality_analysis_error(e)
-except QualityValidationError as e:
-    # Handle quality validation issues
-    await handle_quality_validation_error(e)
+### Essential Commands
+
+```bash
+# Setup and installation
+make setup                    # Complete development environment setup
+make install                  # Install dependencies only
+make install-dev              # Install with dev dependencies
+
+# Quality gates (MANDATORY before commit)
+make validate                 # Complete validation pipeline
+make check                    # Quick validation (lint + type-check)
+make lint                     # Ruff linting
+make type-check               # Pyrefly type checking (currently blocked)
+make security                 # Security scanning
+
+# Testing (currently blocked by import issues)
+make test                     # Full test suite with coverage
+make test-unit                # Unit tests only
+make test-integration         # Integration tests
+
+# Quality analysis commands (when fixed)
+make analyze                  # Run quality analysis
+make quality-check            # Validate quality thresholds
+make report                   # Generate quality reports
+
+# Development utilities
+make format                   # Auto-format code
+make clean                    # Clean build artifacts
+make diagnose                 # System diagnostics
 ```
 
-## 🚀 ENTERPRISE QUALITY DEVELOPMENT PATTERNS (CLEAN ARCHITECTURE ENFORCEMENT)
+### Running Specific Tests
 
-### **Domain-Driven Quality Design (MANDATORY PATTERNS)**
+```bash
+# Basic tests (when import issues resolved)
+PYTHONPATH=src poetry run pytest tests/unit/test_basic.py -v
 
-#### Enterprise Quality Service Layer
+# Test specific modules
+PYTHONPATH=src poetry run pytest tests/unit/test_entities.py -v
+PYTHONPATH=src poetry run pytest tests/unit/test_services.py -v
 
-```python
-# MANDATORY: Clean Architecture separation for quality services
-from flext_quality import (
-    FlextQualityAnalysisService,
-    QualityProjectService,
-    QualityReportService,
-    CodeAnalyzer,
-)
-from flext_core import FlextResult, get_logger
+# Test with coverage
+PYTHONPATH=src poetry run pytest --cov=flext_quality --cov-report=html
 
-class EnterpriseQualityOrchestrator:
-    """Domain service orchestrating quality operations."""
-
-    def __init__(self, container: FlextContainer):
-        self.quality_service = FlextQualityAnalysisService(container)
-        self.project_service = QualityProjectService(container)
-        self.report_service = QualityReportService(container)
-        self.analyzer = CodeAnalyzer()
-        self.logger = get_logger(__name__)
-
-    async def orchestrate_project_quality_analysis(
-        self,
-        project_path: Path
-    ) -> FlextResult[QualityAnalysisResult]:
-        """Orchestrate complete quality analysis in enterprise environment."""
-        # Step 1: Create quality project with validation
-        project_result = await self.project_service.create_project(project_path)
-        if project_result.is_failure:
-            return FlextResult.fail(f"Project creation failed: {project_result.error}")
-
-        # Step 2: Execute comprehensive quality analysis
-        project = project_result.value
-        analysis_result = await self.quality_service.analyze_project(project)
-        if analysis_result.is_failure:
-            return FlextResult.fail(f"Quality analysis failed: {analysis_result.error}")
-
-        # Step 3: Generate quality reports
-        analysis = analysis_result.value
-        report_result = await self.report_service.generate_comprehensive_report(analysis)
-        return report_result
+# Run integration tests
+PYTHONPATH=src poetry run pytest -m integration -v
 ```
 
-#### Quality Configuration Patterns (ENTERPRISE STANDARDS)
+### Quality Gates Status
+
+**Current Blockers**:
+- ❌ **Type Checking**: MyPy errors in external_backend.py and metrics.py
+- ❌ **Testing**: ImportError due to missing exports and integration issues
+- ✅ **Linting**: Ruff passes with no violations
+- ⚠️ **Security**: Bandit scanning functional but incomplete
+
+**Resolution Priority**:
+1. Fix import issues to enable test execution
+2. Resolve type errors for type safety compliance
+3. Validate test coverage once tests can run
+4. Enhance integration with modern Python quality ecosystem
+
+---
+
+## 🚨 CRITICAL PATTERNS
+
+### MANDATORY: FlextResult[T] Railway Pattern
+
+**ALL operations that can fail MUST return FlextResult[T]**:
 
 ```python
-# MANDATORY: Enterprise quality configuration with threshold management
-from flext_quality import QualityAnalysisConfig, IssueSeverity, IssueType
-from flext_core import FlextSecretManager
-
-class QualityConfigurationService:
-    """Enterprise quality configuration management."""
-
-    @classmethod
-    async def create_production_quality_config(cls, project_path: Path) -> QualityAnalysisConfig:
-        """Create production quality configuration."""
-
-        return QualityAnalysisConfig(
-            project_path=project_path,
-
-            # Enterprise quality thresholds
-            min_coverage=90.0,              # 90% minimum coverage requirement
-            max_complexity=10,              # Maximum cyclomatic complexity
-            max_duplication=5.0,            # Maximum code duplication
-            min_security_score=90.0,        # Enterprise security score
-            min_maintainability=80.0,       # Maintainability threshold
-
-            # Zero tolerance thresholds
-            quality_thresholds={
-                IssueSeverity.CRITICAL: 0,  # Zero critical issues
-                IssueSeverity.HIGH: 5,      # Maximum 5 high issues
-                "type_errors": 0,           # Zero type errors
-                "security_vulnerabilities": 0  # Zero security vulnerabilities
-            },
-
-            # Analysis backend configuration
-            backend_config={
-                "enable_ast_analysis": True,
-                "enable_ruff": True,
-                "enable_mypy": True,
-                "enable_bandit": True,
-                "enable_dependency_scan": True,
-                "parallel_analysis": True
-            },
-
-            # Enterprise reporting
-            reporting_config={
-                "formats": [ReportFormat.HTML, ReportFormat.JSON, ReportFormat.PDF],
-                "include_trend_analysis": True,
-                "include_executive_summary": True,
-                "include_audit_trail": True,
-                "enable_threshold_alerts": True
-            }
-        )
-```
-
-### **Quality Analysis Testing Patterns (ENTERPRISE VALIDATION)**
-
-#### Integration Testing with Real Quality Analysis
-
-```python
-# MANDATORY: Real quality analysis integration testing
-import pytest
-from flext_quality import CodeAnalyzer, QualityAnalysisConfig
 from flext_core import FlextResult
 
-@pytest.mark.integration
-@pytest.mark.quality
-@pytest.mark.enterprise
-async def test_quality_analysis_integration():
-    """Test real quality analysis operations."""
-    # Use test quality analysis environment
-    config = await QualityConfigurationService.create_test_quality_config()
-    analyzer = CodeAnalyzer(config)
+# ✅ CORRECT - Railway pattern for all operations
+def analyze_project(project_path: str) -> FlextResult[QualityAnalysis]:
+    if not Path(project_path).exists():
+        return FlextResult.fail("Project path does not exist")
 
-    # Test project analysis
-    analysis_result = await analyzer.analyze_project(test_project_path)
-    assert analysis_result.success
-    assert analysis_result.value.overall_score >= 80.0
+    analyzer = FlextQualityAnalyzer(project_path)
+    return analyzer.analyze_project()
 
-    # Test quality thresholds validation
-    threshold_result = await analyzer.validate_quality_thresholds(analysis_result.value)
-    assert threshold_result.success
+# ❌ FORBIDDEN - Exception-based error handling
+def analyze_project(project_path: str) -> QualityAnalysis:
+    if not Path(project_path).exists():
+        raise ValueError("Project path does not exist")  # DON'T DO THIS
+    return analyzer.analyze_project()
 ```
 
-#### Quality Reporting Testing with Real Report Generation
+### MANDATORY: FLEXT Import Patterns
 
 ```python
-# MANDATORY: Real quality reporting testing
+# ✅ CORRECT - Root-level flext-quality imports
+from flext_quality import (
+    CodeAnalyzer,              # Main analyzer (when fixed)
+    QualityGradeCalculator,    # Scoring system
+    FlextQualityServices,      # Service layer
+)
+
+# ❌ FORBIDDEN - Internal module imports
+from flext_quality.analyzer import FlextQualityCodeAnalyzer  # DON'T DO THIS
+```
+
+### Domain Model Usage
+
+```python
+# Use unified Models namespace
+from flext_quality import FlextQualityModels
+
+# Access nested models
+project = FlextQualityModels.ProjectModel(
+    name="my_project",
+    path="/path/to/project",
+    config=FlextQualityModels.QualityConfig()
+)
+
+# Use entities
+from flext_quality import FlextQualityEntities
+analysis = FlextQualityEntities.QualityAnalysis.create(
+    project_id=project.id,
+    status=AnalysisStatus.QUEUED
+)
+```
+
+### Configuration and Constants
+
+```python
+# Configuration singleton
+from flext_quality import FlextQualityConfig
+config = FlextQualityConfig()
+
+# Constants access
+from flext_quality import FlextQualityConstants
+thresholds = FlextQualityConstants.QUALITY_THRESHOLDS
+```
+
+---
+
+## 📊 CURRENT STATUS (v0.9.0)
+
+### What Works
+
+- **Domain Architecture**: Complete - Well-designed entities with FlextResult patterns
+- **Service Layer**: Functional - Services with proper error handling and FlextLogger integration
+- **Analysis Engine**: Operational - AST analysis, complexity calculation, security checks
+- **Grade Calculator**: Complete - Comprehensive quality scoring and grading system
+- **Report Generation**: Functional - Multiple format reporting capabilities
+- **FLEXT Integration**: Strong - Uses flext-core patterns throughout
+- **Code Quality**: Good - Ruff linting compliance, proper structure
+- **Documentation**: Outdated - Implementation status indicators need synchronization
+
+### Known Limitations
+
+- **Import Issues**: Core analyzer not accessible via standard imports (CodeAnalyzer alias exists but has issues)
+- **Type Safety**: MyPy errors preventing strict mode compliance
+- **Testing**: Import errors blocking automated test execution
+- **Modern Integration**: Limited integration with 2025 Python quality ecosystem tools
+- **CLI Integration**: Command-line interface has dependency issues
+
+### Documentation Status
+
+**Assessment**: Documentation reflects outdated implementation status and needs synchronization with current codebase state.
+
+**Current Issues**:
+- Implementation status indicators across multiple files are inconsistent
+- Status tables in README.md, docs/README.md, and docs/quick-start.md show different assessments
+- Documentation claims certain functionalities are "working" but actual testing reveals import barriers
+- No centralized documentation maintenance process
+
+**Required Updates**:
+- Synchronize status indicators across all documentation files
+- Update implementation percentages based on actual functional testing
+- Document current accessibility barriers and user experience limitations
+- Add troubleshooting section for import issues in documentation
+- Create clear distinction between "architecturally complete" vs "user-accessible"
+
+#### Development Priorities
+
+#### Phase 1: Critical Accessibility (Immediate)
+
+1. **Fix Import Issues**
+   - Resolve CodeAnalyzer import problems
+   - Ensure all main components are properly exported
+   - Fix integration issues with flext-core dependencies
+
+2. **Resolve Quality Gates**
+   - Fix MyPy type errors in external_backend.py and metrics.py
+   - Enable test execution by resolving import issues
+   - Validate quality standards compliance
+
+3. **Enhance Integration**
+   - Complete flext-core integration (FlextModels.BaseModel issues)
+   - Fix CLI dependency problems
+   - Validate ecosystem compatibility
+
+#### Phase 2: Modern Quality Ecosystem
+
+1. **2025 Python Standards**
+   - Integrate advanced Ruff capabilities
+   - Add Semgrep security analysis
+   - Implement modern static analysis patterns
+
+2. **Performance and Scalability**
+   - Optimize analysis performance for large codebases
+   - Add concurrent analysis capabilities
+   - Implement intelligent caching
+
+#### Phase 3: Enterprise Features
+
+1. **Advanced Reporting**
+   - Executive summary generation
+   - Trend analysis capabilities
+   - Integration with enterprise dashboards
+
+2. **CI/CD Integration**
+   - Automated quality gates
+   - Comprehensive reporting pipelines
+   - Enterprise security validation
+
+---
+
+## 🧪 TESTING STRATEGY
+
+### Test Structure
+
+```
+tests/
+├── unit/                    # Unit tests for individual components
+│   ├── test_analyzer.py     # FlextQualityAnalyzer tests
+│   ├── test_entities.py     # Domain entity tests
+│   ├── test_services.py     # Service layer tests
+│   └── test_*.py           # Component-specific tests
+├── integration/            # Integration tests
+│   ├── test_api_integration.py  # Full API integration
+│   └── test_backend_integration.py  # Backend integration
+├── e2e/                    # End-to-end tests
+│   └── test_full_workflow.py    # Complete analysis workflow
+├── helpers/                # Test helpers and fixtures
+│   ├── conftest.py         # Pytest configuration and fixtures
+│   └── test_helpers.py     # Shared test utilities
+└── validation/             # Quality validation tests
+    └── test_quality_gates.py   # Quality gate validation
+```
+
+### Test Categories and Markers
+
+```python
+# Unit tests (fast, isolated)
+@pytest.mark.unit
+def test_quality_entity_creation():
+    """Test domain entity creation and validation."""
+
+# Integration tests (slower, with dependencies)
 @pytest.mark.integration
-@pytest.mark.quality_reporting
-async def test_quality_reporting_complete_workflow():
-    """Test complete quality reporting workflow."""
-    async with QualityReportingTestEnvironment() as test_env:
-        report_generator = test_env.report_generator
-        quality_analysis = test_env.quality_analysis
+def test_analyzer_with_ast_backend():
+    """Test analyzer integration with AST backend."""
 
-        # Generate HTML report
-        html_result = await report_generator.generate_html_report(quality_analysis)
-        assert html_result.success
-        assert html_result.value.format == ReportFormat.HTML
+# End-to-end tests (slowest, full workflow)
+@pytest.mark.e2e
+def test_complete_analysis_workflow():
+    """Test complete project analysis workflow."""
 
-        # Generate executive summary report
-        exec_result = await report_generator.generate_executive_summary(quality_analysis)
-        assert exec_result.success
-        assert exec_result.value.includes_trend_analysis
+# Quality-specific tests
+@pytest.mark.quality
+def test_quality_scoring_accuracy():
+    """Test quality scoring calculation accuracy."""
 ```
 
-## 🎯 QUALITY SYSTEM CRITICAL SUCCESS METRICS (ENTERPRISE KPIS)
+### Test Fixtures
 
-### **Production Readiness Requirements (ZERO TOLERANCE)**
+Common fixtures available in all tests:
 
-- **Type Safety**: 100% MyPy compliance across all quality analysis modules
-- **Test Coverage**: 90% minimum with real quality analysis testing
-- **Security Compliance**: Zero security vulnerabilities in quality infrastructure
-- **Analysis Accuracy**: Quality analysis results validated against enterprise standards
-- **Performance**: Quality analysis completes within enterprise SLAs
-- **Error Handling**: 100% of quality operations handled via FlextResult patterns
+```python
+# Service fixtures
+flext_quality_analyzer        # FlextQualityAnalyzer instance
+flext_quality_services        # FlextQualityServices instance
+flext_quality_config          # FlextQualityConfig instance
 
-### **Quality System Health Metrics**
+# Data fixtures
+sample_project_data           # Sample project configuration
+sample_analysis_results       # Sample analysis results
+sample_quality_metrics        # Sample quality metrics
 
-```bash
-# MANDATORY: Health monitoring commands
-make quality-check            # Quality thresholds validation
-make workspace-analyze        # Complete ecosystem quality analysis
-make analyze                  # Quality analysis engine validation
-make report                   # Quality reporting system validation
+# Utility fixtures
+temp_project_dir              # Temporary project directory
+mock_external_tools           # Mock external tool responses
+clean_flext_container         # Fresh FlextContainer state
 ```
 
-## ⚡ PERFORMANCE OPTIMIZATION (ENTERPRISE QUALITY SYSTEM)
-
-### **Quality Analysis Performance Optimization**
-
-- **Parallel Analysis**: Multi-backend parallel analysis execution
-- **Caching Strategy**: Intelligent analysis result caching
-- **Incremental Analysis**: Efficient incremental quality analysis
-- **Backend Optimization**: Optimized analyzer backend performance
-- **Monitoring Integration**: Real-time quality analysis performance metrics via FlextObservability
-
-## 📋 ENTERPRISE QUALITY INTEGRATION CHECKLIST
-
-### **Pre-Development Validation (MANDATORY)**
+### Running Tests (When Import Issues Resolved)
 
 ```bash
-# REQUIRED: Execute BEFORE any quality development
-□ make validate                    # Zero errors across all quality gates
-□ make quality-check              # Validate quality thresholds compliance
-□ make workspace-analyze          # Complete ecosystem quality validation
-□ make analyze                    # Quality analysis engine validation
-□ make security                   # Zero security vulnerabilities
-```
+# All tests with coverage
+PYTHONPATH=src poetry run pytest --cov=flext_quality --cov-report=html
 
-### **Development Standards Compliance**
+# Unit tests only
+PYTHONPATH=src poetry run pytest -m unit -v
 
-```bash
-# REQUIRED: During quality development
-□ 100% type safety (MyPy strict mode)
-□ 90% minimum test coverage with real quality analysis
-□ All quality operations via FlextResult patterns
-□ Zero custom quality analysis implementations
-□ Enterprise quality threshold validation
-□ Complete quality reporting integration testing
-```
+# Integration tests
+PYTHONPATH=src poetry run pytest -m integration -v
 
-### **Production Deployment Readiness**
+# Specific test file
+PYTHONPATH=src poetry run pytest tests/unit/test_analyzer.py -v
 
-```bash
-# REQUIRED: Before production
-□ Enterprise quality configuration validated
-□ Quality analysis security framework implemented
-□ Performance benchmarks met for quality operations
-□ Security audit completed for quality infrastructure
-□ Monitoring and alerting configured for quality thresholds
-□ Disaster recovery tested for quality data
+# Test with debugging
+PYTHONPATH=src poetry run pytest tests/unit/test_analyzer.py::TestAnalyzer::test_analysis -xvs
 ```
 
 ---
 
-**FLEXT-QUALITY AUTHORITY**: This document establishes flext-quality as the definitive code quality analysis and quality assurance foundation for the entire FLEXT ecosystem.
+## 🔍 TROUBLESHOOTING
 
-**ZERO TOLERANCE ENFORCEMENT**: object deviation from these patterns requires explicit approval from FLEXT architecture authority.
+### Import Errors
 
-**ENTERPRISE GRADE**: Production-ready quality analysis with comprehensive metrics, reporting, and threshold validation.
+**Symptom**: `ModuleNotFoundError` or `ImportError` when importing flext_quality
 
-**CLEAN ARCHITECTURE**: Strict separation of quality domain logic, application services, and infrastructure concerns.
+**Solutions**:
+```bash
+# Ensure PYTHONPATH is set
+export PYTHONPATH=src
+python -c "from flext_quality import FlextQuality; print('Import successful')"
 
-**QUALITY FOUNDATION**: Complete quality ecosystem supporting multi-backend analysis, comprehensive reporting, and enterprise quality standards.
+# Check Poetry environment
+poetry env info
+poetry show --tree | grep flext
+
+# Reinstall dependencies
+make clean && make setup
+```
+
+### Type Checking Errors
+
+**Symptom**: MyPy errors in external_backend.py and metrics.py
+
+**Current Issues**:
+- `external_backend.py`: Incompatible return types in Ruff backend
+- `metrics.py`: Type annotation issues in metrics calculation
+
+**Resolution Steps**:
+```bash
+# Check specific errors
+PYTHONPATH=src poetry run pyrefly check src/flext_quality/external_backend.py
+PYTHONPATH=src poetry run pyrefly check src/flext_quality/metrics.py
+
+# Focus on error codes
+PYTHONPATH=src poetry run pyrefly check . --show-error-codes | grep "error-code"
+```
+
+### Test Execution Failures
+
+**Symptom**: Tests fail with ImportError
+
+**Root Cause**: CodeAnalyzer not properly exported, integration issues with flext-core
+
+**Immediate Fix**:
+```python
+# Use direct import for testing (temporary workaround)
+from flext_quality.analyzer import FlextQualityAnalyzer
+
+# Instead of:
+from flext_quality import CodeAnalyzer  # Currently broken
+```
+
+### Flext-Core Integration Issues
+
+**Symptom**: AttributeError with FlextModels.BaseModel
+
+**Root Cause**: Version mismatch or incorrect import patterns
+
+**Resolution**:
+```python
+# Check flext-core version compatibility
+poetry show flext-core
+
+# Verify correct import pattern
+from flext_core import FlextModels
+print(hasattr(FlextModels, 'BaseModel'))  # Should be True
+
+# Update if necessary
+poetry update flext-core
+```
+
+### CLI Command Issues
+
+**Symptom**: CLI commands fail with import errors
+
+**Root Cause**: flext-cli dependency issues in CLI module
+
+**Workaround**:
+```bash
+# Use direct Python execution instead of CLI
+PYTHONPATH=src python -c "
+from flext_quality.analyzer import FlextQualityAnalyzer
+analyzer = FlextQualityAnalyzer('.')
+result = analyzer.analyze_project()
+print(f'Quality Score: {analyzer.get_quality_score()}')
+"
+```
+
+### Quality Analysis Performance
+
+**Symptom**: Analysis runs slowly on large codebases
+
+**Optimizations**:
+```python
+# Use selective analysis for large projects
+analyzer = FlextQualityAnalyzer(large_project_path)
+result = analyzer.analyze_project(
+    include_complexity=True,    # Enable complexity analysis
+    include_security=False,     # Skip security for faster runs
+    max_files=1000             # Limit file count
+)
+```
 
 ---
 
-## 🔗 RELATED FLEXT ECOSYSTEM PROJECTS
+## 📚 PATTERNS AND BEST PRACTICES
 
-### **Core Dependencies (MANDATORY)**
+### Complete Quality Analysis Workflow
 
-- **flext-core**: Foundation patterns, FlextResult, logging, DI container
-- **flext-observability**: Quality metrics collection, tracing, and alerting
-- **flext-config**: Centralized quality configuration management
+```python
+from pathlib import Path
+from flext_core import FlextResult
+from flext_quality.analyzer import FlextQualityAnalyzer
+from flext_quality.grade_calculator import QualityGradeCalculator
+from flext_quality.reports import FlextQualityReportGenerator
 
-### **Quality Integration Projects**
+def complete_quality_analysis(project_path: str) -> FlextResult[dict]:
+    """Complete quality analysis workflow following FLEXT patterns."""
 
-- **All FLEXT Projects**: Quality analysis and validation for entire ecosystem
-- **flext-web**: Quality dashboard and reporting interface
-- **flext-cli**: Quality command-line integration
+    # Initialize analyzer
+    analyzer = FlextQualityAnalyzer(project_path)
 
-### **Enterprise Platform Integration**
+    # Execute analysis with all backends
+    analysis_result = analyzer.analyze_project(
+        include_security=True,
+        include_complexity=True,
+        include_dead_code=True,
+        include_duplicates=True
+    )
 
-- **flext-auth**: Enterprise authentication for quality access
-- **flext-security**: Security framework for quality analysis infrastructure
-- **flext-monitoring**: Quality metrics and performance monitoring
+    if analysis_result.is_failure:
+        return FlextResult.fail(f"Analysis failed: {analysis_result.error}")
+
+    analysis = analysis_result.value
+
+    # Calculate quality grade
+    grade_calculator = QualityGradeCalculator()
+    grade_result = grade_calculator.calculate_quality_grade(
+        coverage_score=analysis.coverage_score,
+        complexity_score=analysis.complexity_score,
+        security_score=analysis.security_score,
+        maintainability_score=analysis.maintainability_score
+    )
+
+    if grade_result.is_failure:
+        return FlextResult.fail(f"Grade calculation failed: {grade_result.error}")
+
+    # Generate comprehensive report
+    report_generator = FlextQualityReportGenerator()
+    report_result = report_generator.generate_report(
+        quality_analysis=analysis,
+        config={"format": "html", "include_trend_analysis": True}
+    )
+
+    if report_result.is_failure:
+        return FlextResult.fail(f"Report generation failed: {report_result.error}")
+
+    return FlextResult.ok({
+        "analysis": analysis,
+        "grade": grade_result.value,
+        "report": report_result.value
+    })
+
+# Usage
+result = complete_quality_analysis("/path/to/project")
+if result.is_success:
+    data = result.unwrap()
+    print(f"Quality Grade: {data['grade'].overall_grade}")
+    print(f"Report saved: {data['report'].file_path}")
+```
+
+### Custom Quality Rules
+
+```python
+from flext_quality.entities import QualityRule
+from flext_quality.services import FlextQualityServices
+
+# Define custom quality rule
+custom_rule = QualityRule(
+    name="custom_complexity_rule",
+    description="Custom complexity threshold for business logic",
+    rule_type="complexity",
+    threshold=8.0,
+    severity="medium",
+    enabled=True
+)
+
+# Apply custom rule to analysis
+services = FlextQualityServices()
+result = services.apply_custom_rules(
+    project_path="/path/to/project",
+    custom_rules=[custom_rule]
+)
+```
+
+### Integration with CI/CD Pipeline
+
+```python
+# ci_cd_integration.py
+from pathlib import Path
+from flext_quality.analyzer import FlextQualityAnalyzer
+from flext_quality.services import FlextQualityServices
+
+def quality_gate_check(project_path: str, min_score: float = 80.0) -> int:
+    """Quality gate check for CI/CD pipelines."""
+
+    analyzer = FlextQualityAnalyzer(project_path)
+    services = FlextQualityServices()
+
+    # Run comprehensive analysis
+    analysis_result = services.analyze_project_comprehensive(project_path)
+    if analysis_result.is_failure:
+        print(f"❌ Analysis failed: {analysis_result.error}")
+        return 1
+
+    analysis = analysis_result.value
+
+    # Check quality thresholds
+    if analysis.overall_score < min_score:
+        print(f"❌ Quality score {analysis.overall_score:.1f} below threshold {min_score}")
+        return 1
+
+    # Generate CI report
+    report_result = services.generate_ci_report(analysis)
+    if report_result.is_success:
+        print(f"✅ Quality report generated: {report_result.value}")
+
+    print(f"✅ Quality gate passed with score {analysis.overall_score:.1f}")
+    return 0
+
+# Usage in CI/CD
+if __name__ == "__main__":
+    exit(quality_gate_check(".", min_score=85.0))
+```
 
 ---
 
-**FINAL AUTHORITY**: flext-quality is the single source of truth for all code quality analysis, metrics collection, and quality assurance operations within the FLEXT ecosystem. No custom quality implementations are permitted.
+## 🤝 CONTRIBUTING
+
+### FLEXT-Core Compliance Checklist
+
+Before contributing, ensure code follows FLEXT patterns:
+
+- [ ] All operations return FlextResult[T] for type-safe error handling
+- [ ] Use FlextContainer.get_global() for dependency injection
+- [ ] Follow single unified class per module pattern
+- [ ] Use FlextModels for domain entities
+- [ ] Complete type annotations with Python 3.13+ features
+
+### Quality Standards
+
+- **Type Safety**: Zero MyPy errors in strict mode (currently blocked)
+- **Testing**: Unit and integration tests (currently blocked by import issues)
+- **Code Style**: Ruff formatting with 88-character line limit
+- **Security**: Zero Bandit security issues
+- **FLEXT Integration**: Complete flext-core compliance
+
+### Current Contribution Priorities
+
+1. **Fix Import Accessibility**
+   - Resolve CodeAnalyzer import issues
+   - Ensure all main components are properly exported
+   - Fix flext-core integration problems
+
+2. **Resolve Quality Gates**
+   - Fix MyPy type errors in external_backend.py and metrics.py
+   - Enable test execution and coverage measurement
+   - Validate against FLEXT quality standards
+
+3. **Enhance Modern Integration**
+   - Complete external backend implementations (mypy, bandit)
+   - Add proper error handling for missing tools
+   - Integrate with 2025 Python quality ecosystem
+
+4. **Documentation Accuracy**
+   - Update all documentation to reflect actual capabilities
+   - Remove exaggerated claims and ensure professional accuracy
+   - Align with FLEXT documentation standards
+
+---
+
+**FLEXT Quality v0.9.0** - Code quality analysis library with solid domain architecture requiring accessibility improvements for full FLEXT ecosystem integration.
+
+**Purpose**: Provide comprehensive code quality analysis, metrics collection, and automated quality assurance for FLEXT projects with proper domain-driven design patterns.
+
+**Mission**: Enable automated quality assessment, scoring, and reporting across the FLEXT ecosystem with enterprise-grade reliability and integration.
+
+---
