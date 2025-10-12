@@ -9,18 +9,18 @@ from __future__ import annotations
 import warnings
 from typing import Self
 
-from flext_core import FlextConfig, FlextResult, FlextTypes
+from flext_core import FlextCore
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import SettingsConfigDict
 
 from .constants import FlextQualityConstants
 
 
-class FlextQualityConfig(FlextConfig):
-    """Single Pydantic 2 Settings class for flext-quality extending FlextConfig.
+class FlextQualityConfig(FlextCore.Config):
+    """Single Pydantic 2 Settings class for flext-quality extending FlextCore.Config.
 
     Follows standardized pattern:
-    - Extends FlextConfig from flext-core with enhanced Pydantic 2.11+ features
+    - Extends FlextCore.Config from flext-core with enhanced Pydantic 2.11+ features
     - No nested classes within Config
     - All defaults from FlextQualityConstants
     - Uses direct instantiation pattern (no singleton)
@@ -31,12 +31,12 @@ class FlextQualityConfig(FlextConfig):
         env_prefix="FLEXT_QUALITY_",
         case_sensitive=False,
         extra="allow",
-        # Inherit enhanced Pydantic 2.11+ features from FlextConfig
+        # Inherit enhanced Pydantic 2.11+ features from FlextCore.Config
         validate_assignment=True,
         str_strip_whitespace=True,
         json_schema_extra={
             "title": "FLEXT Quality Configuration",
-            "description": "Code quality analysis configuration extending FlextConfig",
+            "description": "Code quality analysis configuration extending FlextCore.Config",
         },
     )
 
@@ -293,12 +293,12 @@ class FlextQualityConfig(FlextConfig):
 
         return self
 
-    def validate_business_rules(self) -> FlextResult[None]:
+    def validate_business_rules(self) -> FlextCore.Result[None]:
         """Validate quality analysis business rules."""
         try:
             # Validate analysis requirements
             if self.min_coverage > 0.0 and not self.enable_external_tools:
-                return FlextResult[None].fail(
+                return FlextCore.Result[None].fail(
                     "Coverage analysis requires external tools"
                 )
 
@@ -307,7 +307,7 @@ class FlextQualityConfig(FlextConfig):
                 self.analysis_timeout
                 < FlextQualityConstants.Performance.MINIMUM_ANALYSIS_TIMEOUT
             ):
-                return FlextResult[None].fail(
+                return FlextCore.Result[None].fail(
                     f"Analysis timeout too low (minimum {FlextQualityConstants.Performance.MINIMUM_ANALYSIS_TIMEOUT} seconds)"
                 )
 
@@ -317,19 +317,21 @@ class FlextQualityConfig(FlextConfig):
                 >= FlextQualityConstants.Validation.SECURITY_DEPENDENCY_SCAN_THRESHOLD
                 and not self.enable_dependency_scan
             ):
-                return FlextResult[None].fail(
+                return FlextCore.Result[None].fail(
                     "High security score requires dependency scanning"
                 )
 
             # Validate reporting requirements
             if self.include_trend_analysis and not self.enable_audit_logging:
-                return FlextResult[None].fail("Trend analysis requires audit logging")
+                return FlextCore.Result[None].fail(
+                    "Trend analysis requires audit logging"
+                )
 
-            return FlextResult[None].ok(None)
+            return FlextCore.Result[None].ok(None)
         except Exception as e:
-            return FlextResult[None].fail(f"Business rules validation failed: {e}")
+            return FlextCore.Result[None].fail(f"Business rules validation failed: {e}")
 
-    def get_analysis_config(self) -> FlextTypes.Dict:
+    def get_analysis_config(self) -> FlextCore.Types.Dict:
         """Get quality analysis configuration context."""
         return {
             "min_coverage": self.min_coverage,
@@ -341,7 +343,7 @@ class FlextQualityConfig(FlextConfig):
             "workers": self.parallel_workers,
         }
 
-    def get_backend_config(self) -> FlextTypes.Dict:
+    def get_backend_config(self) -> FlextCore.Types.Dict:
         """Get analysis backend configuration context."""
         return {
             "enable_ast_analysis": self.enable_ast_analysis,
@@ -352,7 +354,7 @@ class FlextQualityConfig(FlextConfig):
             "enable_dependency_scan": self.enable_dependency_scan,
         }
 
-    def get_reporting_config(self) -> FlextTypes.Dict:
+    def get_reporting_config(self) -> FlextCore.Types.Dict:
         """Get quality reporting configuration context."""
         return {
             "enable_html_reports": self.enable_html_reports,
@@ -362,7 +364,7 @@ class FlextQualityConfig(FlextConfig):
             "include_executive_summary": self.include_executive_summary,
         }
 
-    def get_observability_config(self) -> FlextTypes.Dict:
+    def get_observability_config(self) -> FlextCore.Types.Dict:
         """Get observability configuration context."""
         return {
             "quiet": self.observability_quiet,

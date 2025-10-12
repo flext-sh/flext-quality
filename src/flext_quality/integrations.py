@@ -11,10 +11,10 @@ from pathlib import Path
 from typing import cast
 
 from flext_api import FlextApiClient, FlextApiConfig
-from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
+from flext_core import FlextCore
 
 
-class FlextQualityIntegrations(FlextService[None]):
+class FlextQualityIntegrations(FlextCore.Service[None]):
     """Quality integrations service using flext-api for external communications.
 
     Provides:
@@ -27,10 +27,10 @@ class FlextQualityIntegrations(FlextService[None]):
     def __init__(self) -> None:
         """Initialize quality integrations with flext-api."""
         super().__init__()
-        self.logger = FlextLogger(__name__)
+        self.logger = FlextCore.Logger(__name__)
 
         # Initialize flext-api configuration as dict
-        api_config_dict: FlextTypes.Dict = {
+        api_config_dict: FlextCore.Types.Dict = {
             "base_url": "",  # Will be set per integration
             "timeout": 30,
             "max_retries": 3,
@@ -42,7 +42,7 @@ class FlextQualityIntegrations(FlextService[None]):
         self._api_client = FlextApiClient(config=self._api_config)
 
     @property
-    def logger(self) -> FlextLogger:
+    def logger(self) -> FlextCore.Logger:
         """Get logger with type narrowing."""
         assert self.logger is not None
         return self.logger
@@ -51,8 +51,8 @@ class FlextQualityIntegrations(FlextService[None]):
         self,
         webhook_url: str,
         event_type: str,
-        event_data: FlextTypes.Dict,
-    ) -> FlextResult[FlextTypes.Dict]:
+        event_data: FlextCore.Types.Dict,
+    ) -> FlextCore.Result[FlextCore.Types.Dict]:
         """Send webhook notification using flext-api.
 
         Args:
@@ -61,7 +61,7 @@ class FlextQualityIntegrations(FlextService[None]):
             event_data: Event payload data
 
         Returns:
-            FlextResult with webhook response data
+            FlextCore.Result with webhook response data
 
         """
         try:
@@ -80,25 +80,25 @@ class FlextQualityIntegrations(FlextService[None]):
             )
 
             if response_result.is_failure:
-                return FlextResult[FlextTypes.Dict].fail(
+                return FlextCore.Result[FlextCore.Types.Dict].fail(
                     f"Webhook failed: {response_result.error}"
                 )
 
             self.logger.info(f"Webhook sent successfully: {event_type}")
             # Cast HttpResponse to dict for type safety
-            response_dict = cast("FlextTypes.Dict", response_result.value)
-            return FlextResult[FlextTypes.Dict].ok(response_dict)
+            response_dict = cast("FlextCore.Types.Dict", response_result.value)
+            return FlextCore.Result[FlextCore.Types.Dict].ok(response_dict)
 
         except Exception as e:
             self.logger.exception("Webhook notification failed")
-            return FlextResult[FlextTypes.Dict].fail(f"Webhook error: {e}")
+            return FlextCore.Result[FlextCore.Types.Dict].fail(f"Webhook error: {e}")
 
     def send_slack_notification(
         self,
         webhook_url: str,
         message: str,
         severity: str = "info",
-    ) -> FlextResult[FlextTypes.Dict]:
+    ) -> FlextCore.Result[FlextCore.Types.Dict]:
         """Send Slack notification using flext-api.
 
         Args:
@@ -107,7 +107,7 @@ class FlextQualityIntegrations(FlextService[None]):
             severity: Message severity (info, warning, error)
 
         Returns:
-            FlextResult with Slack API response
+            FlextCore.Result with Slack API response
 
         """
         try:
@@ -135,24 +135,24 @@ class FlextQualityIntegrations(FlextService[None]):
             )
 
             if response_result.is_failure:
-                return FlextResult[FlextTypes.Dict].fail(
+                return FlextCore.Result[FlextCore.Types.Dict].fail(
                     f"Slack notification failed: {response_result.error}"
                 )
 
             self.logger.info("Slack notification sent successfully")
-            return FlextResult[FlextTypes.Dict].ok({"status": "sent"})
+            return FlextCore.Result[FlextCore.Types.Dict].ok({"status": "sent"})
 
         except Exception as e:
             self.logger.exception("Slack notification failed")
-            return FlextResult[FlextTypes.Dict].fail(f"Slack error: {e}")
+            return FlextCore.Result[FlextCore.Types.Dict].fail(f"Slack error: {e}")
 
     def integrate_sonarqube(
         self,
         sonarqube_url: str,
         project_key: str,
         token: str,
-        quality_data: FlextTypes.Dict,
-    ) -> FlextResult[FlextTypes.Dict]:
+        quality_data: FlextCore.Types.Dict,
+    ) -> FlextCore.Result[FlextCore.Types.Dict]:
         """Integrate with SonarQube using flext-api.
 
         Args:
@@ -162,7 +162,7 @@ class FlextQualityIntegrations(FlextService[None]):
             quality_data: Quality analysis data to send
 
         Returns:
-            FlextResult with SonarQube API response
+            FlextCore.Result with SonarQube API response
 
         """
         try:
@@ -181,7 +181,7 @@ class FlextQualityIntegrations(FlextService[None]):
             )
 
             if response_result.is_failure:
-                return FlextResult[FlextTypes.Dict].fail(
+                return FlextCore.Result[FlextCore.Types.Dict].fail(
                     f"SonarQube integration failed: {response_result.error}"
                 )
 
@@ -189,12 +189,12 @@ class FlextQualityIntegrations(FlextService[None]):
                 f"SonarQube integration successful for project: {project_key}"
             )
             # Cast HttpResponse to dict for type safety
-            response_dict = cast("FlextTypes.Dict", response_result.value)
-            return FlextResult[FlextTypes.Dict].ok(response_dict)
+            response_dict = cast("FlextCore.Types.Dict", response_result.value)
+            return FlextCore.Result[FlextCore.Types.Dict].ok(response_dict)
 
         except Exception as e:
             self.logger.exception("SonarQube integration failed")
-            return FlextResult[FlextTypes.Dict].fail(f"SonarQube error: {e}")
+            return FlextCore.Result[FlextCore.Types.Dict].fail(f"SonarQube error: {e}")
 
     def integrate_github_checks(
         self,
@@ -202,8 +202,8 @@ class FlextQualityIntegrations(FlextService[None]):
         repo: str,
         commit_sha: str,
         token: str,
-        check_results: FlextTypes.Dict,
-    ) -> FlextResult[FlextTypes.Dict]:
+        check_results: FlextCore.Types.Dict,
+    ) -> FlextCore.Result[FlextCore.Types.Dict]:
         """Integrate with GitHub Checks API using flext-api.
 
         Args:
@@ -214,7 +214,7 @@ class FlextQualityIntegrations(FlextService[None]):
             check_results: Quality check results
 
         Returns:
-            FlextResult with GitHub API response
+            FlextCore.Result with GitHub API response
 
         """
         try:
@@ -245,25 +245,25 @@ class FlextQualityIntegrations(FlextService[None]):
             )
 
             if response_result.is_failure:
-                return FlextResult[FlextTypes.Dict].fail(
+                return FlextCore.Result[FlextCore.Types.Dict].fail(
                     f"GitHub Checks integration failed: {response_result.error}"
                 )
 
             self.logger.info(f"GitHub Checks updated for commit: {commit_sha}")
             # Cast HttpResponse to dict for type safety
-            response_dict = cast("FlextTypes.Dict", response_result.value)
-            return FlextResult[FlextTypes.Dict].ok(response_dict)
+            response_dict = cast("FlextCore.Types.Dict", response_result.value)
+            return FlextCore.Result[FlextCore.Types.Dict].ok(response_dict)
 
         except Exception as e:
             self.logger.exception("GitHub Checks integration failed")
-            return FlextResult[FlextTypes.Dict].fail(f"GitHub error: {e}")
+            return FlextCore.Result[FlextCore.Types.Dict].fail(f"GitHub error: {e}")
 
     def deliver_report_to_external_storage(
         self,
         storage_url: str,
         report_file: Path,
         api_key: str,
-    ) -> FlextResult[FlextTypes.Dict]:
+    ) -> FlextCore.Result[FlextCore.Types.Dict]:
         """Deliver quality report to external storage using flext-api.
 
         Args:
@@ -272,7 +272,7 @@ class FlextQualityIntegrations(FlextService[None]):
             api_key: Storage API key
 
         Returns:
-            FlextResult with upload response
+            FlextCore.Result with upload response
 
         """
         try:
@@ -288,24 +288,24 @@ class FlextQualityIntegrations(FlextService[None]):
             )
 
             if response_result.is_failure:
-                return FlextResult[FlextTypes.Dict].fail(
+                return FlextCore.Result[FlextCore.Types.Dict].fail(
                     f"Report delivery failed: {response_result.error}"
                 )
 
             self.logger.info(f"Report delivered successfully: {report_file.name}")
             # Cast HttpResponse to dict for type safety
-            response_dict = cast("FlextTypes.Dict", response_result.value)
-            return FlextResult[FlextTypes.Dict].ok(response_dict)
+            response_dict = cast("FlextCore.Types.Dict", response_result.value)
+            return FlextCore.Result[FlextCore.Types.Dict].ok(response_dict)
 
         except Exception as e:
             self.logger.exception("Report delivery failed")
-            return FlextResult[FlextTypes.Dict].fail(f"Delivery error: {e}")
+            return FlextCore.Result[FlextCore.Types.Dict].fail(f"Delivery error: {e}")
 
     def notify_on_threshold_violation(
         self,
-        webhook_urls: list[str],
-        violation_data: FlextTypes.Dict,
-    ) -> FlextResult[list[FlextTypes.Dict]]:
+        webhook_urls: FlextCore.Types.StringList,
+        violation_data: FlextCore.Types.Dict,
+    ) -> FlextCore.Result[list[FlextCore.Types.Dict]]:
         """Notify multiple webhooks of quality threshold violations.
 
         Args:
@@ -313,10 +313,10 @@ class FlextQualityIntegrations(FlextService[None]):
             violation_data: Threshold violation details
 
         Returns:
-            FlextResult with list of webhook responses
+            FlextCore.Result with list of webhook responses
 
         """
-        results: list[FlextTypes.Dict] = []
+        results: list[FlextCore.Types.Dict] = []
 
         for webhook_url in webhook_urls:
             result = self.send_webhook_notification(
@@ -333,11 +333,11 @@ class FlextQualityIntegrations(FlextService[None]):
                 )
 
         if not results:
-            return FlextResult[list[FlextTypes.Dict]].fail(
+            return FlextCore.Result[list[FlextCore.Types.Dict]].fail(
                 "All webhook notifications failed"
             )
 
-        return FlextResult[list[FlextTypes.Dict]].ok(results)
+        return FlextCore.Result[list[FlextCore.Types.Dict]].ok(results)
 
 
 __all__ = ["FlextQualityIntegrations"]

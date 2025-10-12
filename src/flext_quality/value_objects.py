@@ -10,12 +10,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import ClassVar, override
 
-from flext_core import (
-    FlextContainer,
-    FlextLogger,
-    FlextModels,
-    FlextResult,
-)
+from flext_core import FlextCore
 from pydantic import Field
 
 from .constants import FlextQualityConstants
@@ -31,8 +26,8 @@ class FlextQualityValueObjects:
     @override
     def __init__(self, **data: object) -> None:
         """Initialize value objects service."""
-        self._container = FlextContainer.get_global()
-        self.logger = FlextLogger(__name__)
+        self._container = FlextCore.Container.get_global()
+        self.logger = FlextCore.Logger(__name__)
         # Store initialization data if provided
         self._init_data = data
 
@@ -101,7 +96,7 @@ class FlextQualityValueObjects:
     # NESTED VALUE MODELS - All Pydantic models as nested classes
     # =============================================================================
 
-    class Score(FlextModels):
+    class Score(FlextCore.Models):
         """Quality score value object with validation."""
 
         value: float = Field(
@@ -112,22 +107,22 @@ class FlextQualityValueObjects:
         grade: str = Field(description="Letter grade representation")
         category: str = Field(description="Score category")
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self) -> FlextCore.Result[None]:
             """Validate business rules for quality score."""
             if (
                 self.value < 0.0
                 or self.value > FlextQualityConstants.Validation.MAXIMUM_PERCENTAGE
             ):
-                return FlextResult[None].fail("Quality score must be 0-100")
+                return FlextCore.Result[None].fail("Quality score must be 0-100")
 
             # Validate grade matches score
             expected_grade = self._calculate_grade_from_score(self.value)
             if self.grade != expected_grade:
-                return FlextResult[None].fail(
+                return FlextCore.Result[None].fail(
                     f"Grade {self.grade} does not match score {self.value}",
                 )
 
-            return FlextResult[None].ok(None)
+            return FlextCore.Result[None].ok(None)
 
         @staticmethod
         def _calculate_grade_from_score(score: float) -> str:
@@ -138,7 +133,7 @@ class FlextQualityValueObjects:
                     return grade.value
             return FlextQualityValueObjects.Grade.F.value
 
-    class IssueLocation(FlextModels):
+    class IssueLocation(FlextCore.Models):
         """Issue location value object."""
 
         file_path: str = Field(description="File path where issue occurs")
@@ -155,47 +150,49 @@ class FlextQualityValueObjects:
             description="End column for multi-line issues",
         )
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self) -> FlextCore.Result[None]:
             """Validate business rules for issue location."""
             if self.end_line is not None and self.end_line < self.line_number:
-                return FlextResult[None].fail("End line cannot be before start line")
+                return FlextCore.Result[None].fail(
+                    "End line cannot be before start line"
+                )
 
             if (
                 self.end_line == self.line_number
                 and self.end_column is not None
                 and self.end_column < self.column_number
             ):
-                return FlextResult[None].fail(
+                return FlextCore.Result[None].fail(
                     "End column cannot be before start column on same line",
                 )
 
-            return FlextResult[None].ok(None)
+            return FlextCore.Result[None].ok(None)
 
-    class ComplexityMetric(FlextModels):
+    class ComplexityMetric(FlextCore.Models):
         """Complexity metric value object."""
 
         cyclomatic: int = Field(ge=0, description="Cyclomatic complexity")
         cognitive: int = Field(ge=0, description="Cognitive complexity")
         nesting_depth: int = Field(ge=0, description="Maximum nesting depth")
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self) -> FlextCore.Result[None]:
             """Validate complexity metric values."""
             if (
                 self.cyclomatic
                 > FlextQualityValueObjects.COMPLEXITY_CYCLOMATIC_HIGH * 5
             ):  # Reasonable upper bound
-                return FlextResult[None].fail(
+                return FlextCore.Result[None].fail(
                     f"Cyclomatic complexity {self.cyclomatic} is extremely high",
                 )
 
             if (
                 self.cognitive > FlextQualityValueObjects.COMPLEXITY_COGNITIVE_HIGH * 5
             ):  # Reasonable upper bound
-                return FlextResult[None].fail(
+                return FlextCore.Result[None].fail(
                     f"Cognitive complexity {self.cognitive} is extremely high",
                 )
 
-            return FlextResult[None].ok(None)
+            return FlextCore.Result[None].ok(None)
 
         def get_complexity_level(self) -> str:
             """Get complexity level based on thresholds."""
@@ -205,7 +202,7 @@ class FlextQualityValueObjects:
                 return "moderate"
             return "complex"
 
-    class CoverageMetric(FlextModels):
+    class CoverageMetric(FlextCore.Models):
         """Coverage metric value object."""
 
         line_coverage: float = Field(
@@ -224,10 +221,10 @@ class FlextQualityValueObjects:
             description="Function coverage percentage",
         )
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self) -> FlextCore.Result[None]:
             """Validate coverage metrics."""
             # All validations handled by Field constraints
-            return FlextResult[None].ok(None)
+            return FlextCore.Result[None].ok(None)
 
         def get_overall_coverage(self) -> float:
             """Calculate weighted overall coverage."""
@@ -237,7 +234,7 @@ class FlextQualityValueObjects:
                 + self.function_coverage * 0.2
             )
 
-    class DuplicationMetric(FlextModels):
+    class DuplicationMetric(FlextCore.Models):
         """Code duplication metric value object."""
 
         percentage: float = Field(
@@ -251,31 +248,31 @@ class FlextQualityValueObjects:
             description="Number of files with duplicates",
         )
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self) -> FlextCore.Result[None]:
             """Validate duplication metrics."""
             if self.lines_duplicated > 0 and self.files_with_duplicates == 0:
-                return FlextResult[None].fail(
+                return FlextCore.Result[None].fail(
                     "Cannot have duplicated lines without files containing duplicates",
                 )
 
-            return FlextResult[None].ok(None)
+            return FlextCore.Result[None].ok(None)
 
-    class FilePath(FlextModels):
+    class FilePath(FlextCore.Models):
         """File path value object with validation."""
 
         path: str = Field(description="File system path")
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self) -> FlextCore.Result[None]:
             """Validate file path."""
             if len(self.path) > FlextQualityValueObjects.FILE_PATH_MAX_LENGTH:
-                return FlextResult[None].fail(
+                return FlextCore.Result[None].fail(
                     f"Path exceeds maximum length {FlextQualityValueObjects.FILE_PATH_MAX_LENGTH}",
                 )
 
             if not self.path.strip():
-                return FlextResult[None].fail("Path cannot be empty")
+                return FlextCore.Result[None].fail("Path cannot be empty")
 
-            return FlextResult[None].ok(None)
+            return FlextCore.Result[None].ok(None)
 
         def as_path(self) -> Path:
             """Convert to pathlib.Path object."""
@@ -355,40 +352,42 @@ class FlextQualityValueObjects:
         """Nested validation helper class - no loose functions."""
 
         @staticmethod
-        def validate_file_path(path: str | Path) -> FlextResult[Path]:
+        def validate_file_path(path: str | Path) -> FlextCore.Result[Path]:
             """Validate and convert file path."""
             try:
                 path_obj = Path(path)
                 if len(str(path_obj)) > FlextQualityValueObjects.FILE_PATH_MAX_LENGTH:
-                    return FlextResult[Path].fail("File path exceeds maximum length")
-                return FlextResult[Path].ok(path_obj)
+                    return FlextCore.Result[Path].fail(
+                        "File path exceeds maximum length"
+                    )
+                return FlextCore.Result[Path].ok(path_obj)
             except (ValueError, TypeError, OSError) as e:
-                return FlextResult[Path].fail(f"Invalid file path: {e}")
+                return FlextCore.Result[Path].fail(f"Invalid file path: {e}")
 
         @staticmethod
-        def validate_quality_score(score: float) -> FlextResult[float]:
+        def validate_quality_score(score: float) -> FlextCore.Result[float]:
             """Validate quality score is in valid range."""
             if (
                 not FlextQualityValueObjects.MIN_QUALITY_SCORE
                 <= score
                 <= FlextQualityValueObjects.MAX_QUALITY_SCORE
             ):
-                return FlextResult[float].fail(
+                return FlextCore.Result[float].fail(
                     f"Quality score must be between {FlextQualityValueObjects.MIN_QUALITY_SCORE} and {FlextQualityValueObjects.MAX_QUALITY_SCORE}",
                 )
-            return FlextResult[float].ok(score)
+            return FlextCore.Result[float].ok(score)
 
         @staticmethod
-        def get_grade_from_score(score: float) -> FlextResult[str]:
+        def get_grade_from_score(score: float) -> FlextCore.Result[str]:
             """Get quality grade from numeric score."""
             try:
                 thresholds = FlextQualityValueObjects._GRADE_THRESHOLDS
                 for threshold, grade in thresholds:
                     if score >= threshold:
-                        return FlextResult[str].ok(grade.value)
-                return FlextResult[str].ok(FlextQualityValueObjects.Grade.F.value)
+                        return FlextCore.Result[str].ok(grade.value)
+                return FlextCore.Result[str].ok(FlextQualityValueObjects.Grade.F.value)
             except Exception as e:
-                return FlextResult[str].fail(f"Failed to calculate grade: {e}")
+                return FlextCore.Result[str].fail(f"Failed to calculate grade: {e}")
 
     # =============================================================================
     # PUBLIC API METHODS
@@ -397,15 +396,15 @@ class FlextQualityValueObjects:
     def create_quality_score(
         self,
         percentage: float,
-    ) -> FlextResult[FlextQualityValueObjects.Score]:
+    ) -> FlextCore.Result[FlextQualityValueObjects.Score]:
         """Create a validated quality score."""
         try:
             # Calculate grade using helper
-            grade_result: FlextResult[str] = (
+            grade_result: FlextCore.Result[str] = (
                 self._ValidationHelper.get_grade_from_score(percentage)
             )
             if grade_result.is_failure:
-                return FlextResult[FlextQualityValueObjects.Score].fail(
+                return FlextCore.Result[FlextQualityValueObjects.Score].fail(
                     f"Failed to calculate grade: {grade_result.error}",
                 )
 
@@ -418,27 +417,29 @@ class FlextQualityValueObjects:
             instance = self.Score(**score_data)
 
             # Validate business rules
-            validation_result: FlextResult[None] = instance.validate_business_rules()
+            validation_result: FlextCore.Result[None] = (
+                instance.validate_business_rules()
+            )
             if validation_result.is_failure:
-                return FlextResult[FlextQualityValueObjects.Score].fail(
+                return FlextCore.Result[FlextQualityValueObjects.Score].fail(
                     validation_result.error or "Validation failed",
                 )
 
-            return FlextResult[FlextQualityValueObjects.Score].ok(instance)
+            return FlextCore.Result[FlextQualityValueObjects.Score].ok(instance)
         except Exception as e:
-            return FlextResult[FlextQualityValueObjects.Score].fail(
+            return FlextCore.Result[FlextQualityValueObjects.Score].fail(
                 f"Failed to create QualityScore: {e}",
             )
 
-    def validate_file_path(self, path: str | Path) -> FlextResult[Path]:
+    def validate_file_path(self, path: str | Path) -> FlextCore.Result[Path]:
         """Validate file path using helper."""
         return self._ValidationHelper.validate_file_path(path)
 
-    def validate_quality_score(self, score: float) -> FlextResult[float]:
+    def validate_quality_score(self, score: float) -> FlextCore.Result[float]:
         """Validate quality score using helper."""
         return self._ValidationHelper.validate_quality_score(score)
 
-    def get_grade_from_score(self, score: float) -> FlextResult[str]:
+    def get_grade_from_score(self, score: float) -> FlextCore.Result[str]:
         """Get grade from score using helper."""
         return self._ValidationHelper.get_grade_from_score(score)
 

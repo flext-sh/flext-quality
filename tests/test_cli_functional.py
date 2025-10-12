@@ -544,7 +544,7 @@ class TestCLIIntegration:
 
 import sys
 
-def process_data(data: List[str]) -> Optional[List[str]]:
+def process_data(data: FlextCore.Types.StringList) -> Optional[FlextCore.Types.StringList]:
     """Process input data."""
 
     if not data:

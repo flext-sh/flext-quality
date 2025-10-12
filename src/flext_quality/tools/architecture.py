@@ -11,20 +11,20 @@ Consolidates architecture scripts:
 
 from __future__ import annotations
 
-from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
+from flext_core import FlextCore
 from pydantic import ConfigDict
 
 from flext_quality.models import FlextQualityModels
 
 
-class FlextQualityArchitectureTools(FlextService[None]):
+class FlextQualityArchitectureTools(FlextCore.Service[None]):
     """Unified architecture tools with flext-core integration for quality operations."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True, extra="allow")
 
-    def execute(self) -> FlextResult[None]:
-        """Execute architecture tools service - FlextService interface."""
-        return FlextResult[None].ok(None)
+    def execute(self) -> FlextCore.Result[None]:
+        """Execute architecture tools service - FlextCore.Service interface."""
+        return FlextCore.Result[None].ok(None)
 
     class ViolationAnalyzer:
         """Architectural violation analysis."""
@@ -32,17 +32,17 @@ class FlextQualityArchitectureTools(FlextService[None]):
         @staticmethod
         def analyze_violations(
             project_path: str,
-        ) -> FlextResult[FlextQualityModels.AnalysisResult]:
+        ) -> FlextCore.Result[FlextQualityModels.AnalysisResult]:
             """Analyze architectural violations.
 
             Args:
                 project_path: Path to project
 
             Returns:
-                FlextResult with analysis results
+                FlextCore.Result with analysis results
 
             """
-            logger = FlextLogger(__name__)
+            logger = FlextCore.Logger(__name__)
             logger.info(f"Analyzing violations for {project_path}")
 
             result = FlextQualityModels.AnalysisResult(
@@ -52,7 +52,7 @@ class FlextQualityArchitectureTools(FlextService[None]):
                 domain_library_usage={},
             )
 
-            return FlextResult[FlextQualityModels.AnalysisResult].ok(result)
+            return FlextCore.Result[FlextQualityModels.AnalysisResult].ok(result)
 
     class PatternEnforcer:
         """Pattern enforcement and validation."""
@@ -62,7 +62,7 @@ class FlextQualityArchitectureTools(FlextService[None]):
             project_path: str,
             *,
             dry_run: bool = True,
-        ) -> FlextResult[FlextTypes.Dict]:
+        ) -> FlextCore.Result[FlextCore.Types.Dict]:
             """Enforce architectural patterns.
 
             Args:
@@ -70,20 +70,20 @@ class FlextQualityArchitectureTools(FlextService[None]):
                 dry_run: Preview changes without applying
 
             Returns:
-                FlextResult with enforcement status
+                FlextCore.Result with enforcement status
 
             """
-            logger = FlextLogger(__name__)
+            logger = FlextCore.Logger(__name__)
 
             if dry_run:
                 logger.info(f"DRY RUN: Would enforce patterns in {project_path}")
-                return FlextResult[FlextTypes.Dict].ok({
+                return FlextCore.Result[FlextCore.Types.Dict].ok({
                     "enforced": False,
                     "dry_run": True,
                 })
 
             logger.info(f"Enforcing patterns in {project_path}")
-            return FlextResult[FlextTypes.Dict].ok({"enforced": True})
+            return FlextCore.Result[FlextCore.Types.Dict].ok({"enforced": True})
 
     class ImportTester:
         """Cross-project import testing."""
@@ -91,25 +91,28 @@ class FlextQualityArchitectureTools(FlextService[None]):
         @staticmethod
         def test_cross_project_imports(
             workspace_path: str,
-        ) -> FlextResult[FlextTypes.Dict]:
+        ) -> FlextCore.Result[FlextCore.Types.Dict]:
             """Test cross-project imports.
 
             Args:
                 workspace_path: Path to workspace
 
             Returns:
-                FlextResult with test results
+                FlextCore.Result with test results
 
             """
-            logger = FlextLogger(__name__)
+            logger = FlextCore.Logger(__name__)
             logger.info(f"Testing cross-project imports in {workspace_path}")
 
-            return FlextResult[FlextTypes.Dict].ok({"passed": True, "errors": []})
+            return FlextCore.Result[FlextCore.Types.Dict].ok({
+                "passed": True,
+                "errors": [],
+            })
 
     def __init__(self) -> None:
         """Initialize architecture tools service."""
         super().__init__()
-        self.logger = FlextLogger(__name__)
+        self.logger = FlextCore.Logger(__name__)
 
         # Initialize helper services
         self.violations = self.ViolationAnalyzer()

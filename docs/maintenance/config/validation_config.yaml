@@ -1,0 +1,268 @@
+# FLEXT Quality Documentation Validation Configuration
+#
+# Defines validation parameters, timeouts, and checking rules
+# for link validation, content verification, and quality assurance.
+
+validation:
+  # General validation settings
+  enabled: true
+  fail_on_errors: false
+  verbose_output: false
+  save_results: true
+
+  # Performance settings
+  max_concurrent_requests: 5
+  request_timeout: 10
+  retry_attempts: 3
+  retry_delay: 1
+
+  # Rate limiting
+  requests_per_second: 10
+  burst_limit: 20
+
+link_validation:
+  # External link checking
+  check_external: true
+  check_internal: true
+  check_images: true
+  timeout: 10
+  user_agent: "FLEXT-Quality-Doc-Validator/1.0"
+
+  # Follow redirects
+  follow_redirects: true
+  max_redirects: 5
+
+  # Status code validation
+  acceptable_status_codes: [200, 201, 202, 206, 301, 302, 303, 307, 308]
+
+  # Content type validation
+  validate_content_type: false
+  expected_content_types: ["text/html", "text/plain", "application/json"]
+
+  # Domain restrictions
+  allowed_domains: []  # Empty means all domains allowed
+  blocked_domains: []  # Domains to skip
+
+  # Link type specific settings
+  github_links:
+    validate_existence: true
+    check_rate_limits: false
+
+  documentation_links:
+    validate_structure: false
+    check_anchors: false
+
+internal_validation:
+  # Internal link checking
+  check_internal_links: true
+
+  # File existence validation
+  validate_file_existence: true
+  validate_file_extensions: true
+
+  # Supported file extensions
+  valid_extensions: [".md", ".mdx", ".txt", ".rst", ".html"]
+
+  # Path resolution
+  resolve_relative_paths: true
+  allow_symlinks: true
+
+  # Anchor validation
+  check_anchors: true
+  validate_anchor_format: true
+
+image_validation:
+  # Image reference checking
+  check_images: true
+
+  # Local image validation
+  validate_local_images: true
+  allowed_image_extensions: [".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"]
+
+  # External image validation
+  validate_external_images: false  # Can be slow
+  external_image_timeout: 5
+
+  # Alt text requirements
+  require_alt_text: true
+  min_alt_text_length: 3
+  max_alt_text_length: 125
+
+content_analysis:
+  # Content structure validation
+  check_structure: true
+  min_section_depth: 2
+
+  # Required sections for completeness checking
+  required_sections:
+    - "Overview|Introduction|Purpose"
+    - "Installation|Setup|Getting Started"
+    - "Usage|Examples"
+
+  # Minimum content requirements
+  min_word_count: 100
+
+  # Content quality checks
+  check_readability: false  # Requires additional libraries
+  readability_target_score: 60
+
+  # TODO/FIXME checking
+  check_todos: true
+  check_fixmes: true
+
+content_validation:
+  # Content structure validation
+  check_structure: true
+
+  # Required sections (by file pattern)
+  required_sections:
+    "README.md":
+      - "Purpose|Overview|Introduction"
+      - "Installation|Setup|Getting Started"
+      - "Usage|Examples"
+
+    "docs/**/*.md":
+      - "Overview|Introduction"
+
+    "CHANGELOG.md":
+      - "Version|Changes|History"
+
+    "CONTRIBUTING.md":
+      - "Development|Contributing|Guidelines"
+
+  # Minimum content requirements
+  min_word_count:
+    "README.md": 150
+    "docs/**/*.md": 50
+    "CHANGELOG.md": 20
+
+  # Content quality checks
+  check_readability: false  # Requires additional libraries
+  readability_target_score: 60
+
+  # Code example validation
+  validate_code_examples: false
+  check_code_syntax: false
+
+accessibility_validation:
+  # WCAG compliance checking
+  enabled: true
+
+  # Heading hierarchy
+  check_heading_hierarchy: true
+  require_logical_headings: true
+
+  # Link accessibility
+  check_link_accessibility: true
+  require_descriptive_links: true
+
+  # Image accessibility
+  check_image_accessibility: true
+  require_meaningful_alt_text: true
+
+  # Color and contrast (future feature)
+  check_color_contrast: false
+  minimum_contrast_ratio: 4.5
+
+structure_validation:
+  # Document structure checks
+  enabled: true
+
+  # Table of contents
+  check_table_of_contents: false  # Only for long documents
+  toc_min_headings: 5
+
+  # Frontmatter validation
+  validate_frontmatter: false
+  required_frontmatter_fields: []
+    # - "title"
+    # - "date"
+
+  # Metadata validation
+  validate_metadata: false
+
+security_validation:
+  # Security-focused checks
+  enabled: false  # Enable for security audits
+
+  # Dangerous link patterns
+  check_suspicious_links: true
+  blocked_url_patterns:
+    - "javascript:"
+    - "data:"
+    - "vbscript:"
+
+  # File inclusion risks
+  check_file_inclusion: true
+  blocked_file_patterns:
+    - "../"
+    - "..\\"
+    - "/etc/"
+    - "C:\\"
+
+performance_validation:
+  # Performance checks
+  enabled: false
+
+  # File size limits
+  max_file_size_kb: 1024
+
+  # Load time expectations
+  max_load_time_seconds: 5
+
+  # Resource size checks
+  check_resource_sizes: false
+
+reporting:
+  # Validation report settings
+  generate_reports: true
+  report_format: "json"
+
+  # Issue categorization
+  categorize_issues: true
+  severity_levels: ["critical", "high", "medium", "low", "info"]
+
+  # Output settings
+  include_raw_data: false
+  include_timestamps: true
+  include_request_details: false
+
+  # Notification settings
+  notify_on_failures: false
+  webhook_url: null
+
+automation:
+  # Automated validation settings
+  schedule_validation: false
+  validation_interval_hours: 24
+
+  # CI/CD integration
+  ci_mode: false
+  fail_build_on_errors: false
+
+  # Auto-fix capabilities
+  enable_auto_fix: false
+  safe_auto_fix_only: true
+
+  # Auto-fix rules
+  auto_fix_broken_links: false
+  auto_fix_missing_alt_text: false
+
+cache:
+  # Validation caching
+  enable_cache: true
+  cache_ttl_hours: 24
+  cache_directory: ".validation_cache"
+
+  # Cache invalidation
+  invalidate_on_changes: true
+
+debug:
+  # Debug settings
+  debug_mode: false
+  log_level: "INFO"
+  save_debug_logs: false
+
+  # Debug output
+  verbose_requests: false
+  save_response_headers: false

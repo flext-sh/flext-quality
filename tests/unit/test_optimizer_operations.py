@@ -105,7 +105,7 @@ class TestOptimizerOperations:
         assert result.value["dry_run"] is True
 
     def test_execute_interface(self) -> None:
-        """Test FlextService execute interface."""
+        """Test FlextCore.Service execute interface."""
         ops = FlextQualityOptimizerOperations()
 
         result = ops.execute()

@@ -10,12 +10,12 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from flext_core import FlextProtocols, FlextResult
+from flext_core import FlextCore
 
 from .models import FlextQualityModels
 
 
-class FlextQualityProtocols(FlextProtocols):
+class FlextQualityProtocols(FlextCore.Protocols):
     """Quality analysis protocol definitions."""
 
     class QualityAnalyzer(Protocol):
@@ -25,7 +25,7 @@ class FlextQualityProtocols(FlextProtocols):
             self,
             project_path: str,
             config: FlextQualityModels.Analysis.AnalysisConfiguration | None = None,
-        ) -> FlextResult[FlextQualityModels.AnalysisResults]:
+        ) -> FlextCore.Result[FlextQualityModels.AnalysisResults]:
             """Analyze a project for quality metrics."""
             ...
 
@@ -36,7 +36,7 @@ class FlextQualityProtocols(FlextProtocols):
             self,
             analysis_results: FlextQualityModels.AnalysisResults,
             format_type: str = "html",
-        ) -> FlextResult[str]:
+        ) -> FlextCore.Result[str]:
             """Generate a quality report from analysis results."""
             ...
 
@@ -47,7 +47,7 @@ class FlextQualityProtocols(FlextProtocols):
             self,
             analysis_results: FlextQualityModels.AnalysisResults,
             thresholds: FlextQualityModels.Analysis.AnalysisThresholds,
-        ) -> FlextResult[bool]:
+        ) -> FlextCore.Result[bool]:
             """Validate analysis results against quality thresholds."""
             ...
 
@@ -62,7 +62,7 @@ class FlextQualityProtocols(FlextProtocols):
             *,
             dry_run: bool = True,
             temp_path: str | None = None,
-        ) -> FlextResult[object]:
+        ) -> FlextCore.Result[object]:
             """Execute git operation with dry-run support."""
             ...
 
@@ -75,7 +75,7 @@ class FlextQualityProtocols(FlextProtocols):
             *,
             dry_run: bool = True,
             temp_path: str | None = None,
-        ) -> FlextResult[object]:
+        ) -> FlextCore.Result[object]:
             """Optimize module with dry-run support."""
             ...
 
@@ -86,7 +86,7 @@ class FlextQualityProtocols(FlextProtocols):
             self,
             project_path: str,
             config: dict | None = None,
-        ) -> FlextResult[object]:
+        ) -> FlextCore.Result[object]:
             """Run quality checks."""
             ...
 
@@ -96,7 +96,7 @@ class FlextQualityProtocols(FlextProtocols):
         def validate(
             self,
             target_path: str,
-        ) -> FlextResult[object]:
+        ) -> FlextCore.Result[object]:
             """Validate target."""
             ...
 
@@ -106,7 +106,7 @@ class FlextQualityProtocols(FlextProtocols):
         def analyze(
             self,
             project_path: str,
-        ) -> FlextResult[object]:
+        ) -> FlextCore.Result[object]:
             """Analyze architecture."""
             ...
 
@@ -117,7 +117,7 @@ class FlextQualityProtocols(FlextProtocols):
             self,
             project_path: str,
             operation: str,
-        ) -> FlextResult[object]:
+        ) -> FlextCore.Result[object]:
             """Manage dependencies."""
             ...
 

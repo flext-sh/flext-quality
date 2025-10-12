@@ -13,10 +13,10 @@ from __future__ import annotations
 from enum import Enum
 from typing import override
 
-from flext_core import FlextExceptions
+from flext_core import FlextCore
 
 
-class FlextQualityExceptions(FlextExceptions):
+class FlextQualityExceptions(FlextCore.Exceptions):
     """Single CONSOLIDATED class containing ALL quality exceptions."""
 
     class ErrorCodes(Enum):
@@ -38,7 +38,7 @@ class FlextQualityExceptions(FlextExceptions):
         QUALITY_THRESHOLD_ERROR = "QUALITY_THRESHOLD_ERROR"
 
     # Base quality exception classes as nested classes
-    class Error(FlextExceptions.BaseError):
+    class Error(FlextCore.Exceptions.BaseError):
         """Base exception for all quality domain errors."""
 
         @override
@@ -635,7 +635,7 @@ class FlextQualityExceptions(FlextExceptions):
 
     # ==== INTERNAL TOOLS EXCEPTIONS (from flext_tools migration) ====
 
-    class GitOperationError(FlextExceptions.BaseError):
+    class GitOperationError(FlextCore.Exceptions.BaseError):
         """Git operation error for quality tools."""
 
         def __init__(
@@ -647,7 +647,7 @@ class FlextQualityExceptions(FlextExceptions):
             super().__init__(message)
             self.repo_path = repo_path
 
-    class OptimizationError(FlextExceptions.BaseError):
+    class OptimizationError(FlextCore.Exceptions.BaseError):
         """Module optimization error."""
 
         def __init__(
@@ -659,19 +659,19 @@ class FlextQualityExceptions(FlextExceptions):
             super().__init__(message)
             self.module_path = module_path
 
-    class GateFailure(FlextExceptions.ValidationError):
+    class GateFailure(FlextCore.Exceptions.ValidationError):
         """Quality gate validation failure."""
 
         def __init__(
             self,
             message: str,
-            violations: list[str],
+            violations: FlextCore.Types.StringList,
         ) -> None:
             """Initialize quality gate failure."""
             super().__init__(message)
             self.violations = violations
 
-    class DomainLibraryViolation(FlextExceptions.ValidationError):
+    class DomainLibraryViolation(FlextCore.Exceptions.ValidationError):
         """Domain library usage violation."""
 
         def __init__(
@@ -685,19 +685,19 @@ class FlextQualityExceptions(FlextExceptions):
             self.forbidden_import = forbidden_import
             self.required_library = required_library
 
-    class ValidationFailure(FlextExceptions.ValidationError):
+    class ValidationFailure(FlextCore.Exceptions.ValidationError):
         """General validation failure."""
 
         def __init__(
             self,
             message: str,
-            failures: list[str],
+            failures: FlextCore.Types.StringList,
         ) -> None:
             """Initialize validation failure."""
             super().__init__(message)
             self.failures = failures
 
-    class ArchitectureViolation(FlextExceptions.ValidationError):
+    class ArchitectureViolation(FlextCore.Exceptions.ValidationError):
         """Architecture violation error."""
 
         def __init__(
@@ -709,7 +709,7 @@ class FlextQualityExceptions(FlextExceptions):
             super().__init__(message)
             self.violation_type = violation_type
 
-    class DependencyError(FlextExceptions.BaseError):
+    class DependencyError(FlextCore.Exceptions.BaseError):
         """Dependency management error."""
 
         def __init__(
@@ -721,7 +721,7 @@ class FlextQualityExceptions(FlextExceptions):
             super().__init__(message)
             self.dependency_name = dependency_name
 
-    class DryRunViolation(FlextExceptions.ValidationError):
+    class DryRunViolation(FlextCore.Exceptions.ValidationError):
         """Dry-run mode violation."""
 
         def __init__(

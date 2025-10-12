@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextTypes
+from flext_core import FlextCore
 from pydantic import BaseModel
 
 
@@ -19,8 +19,8 @@ class ClassInfo(BaseModel):
     package_name: str
     line_number: int
     end_line_number: int
-    base_classes: FlextTypes.StringList
-    decorators: FlextTypes.StringList
+    base_classes: FlextCore.Types.StringList
+    decorators: FlextCore.Types.StringList
     is_dataclass: bool
     is_abstract: bool
     has_docstring: bool

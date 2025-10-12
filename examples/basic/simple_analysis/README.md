@@ -23,7 +23,7 @@ The simple analysis example covers:
 
 ### FLEXT Integration Patterns
 
-- **FlextResult Usage**: Consistent error handling patterns
+- **FlextCore.Result Usage**: Consistent error handling patterns
 - **QualityMetrics Integration**: Working with quality value objects
 - **Type Safety**: Comprehensive type hints and validation
 - **Enterprise Standards**: Professional code structure and documentation
@@ -33,6 +33,7 @@ The simple analysis example covers:
 ### Basic Execution
 
 ```bash
+
 # Analyze current directory
 python example.py
 
@@ -126,6 +127,7 @@ Entry point handling command-line interface and execution flow:
 The example demonstrates FLEXT Quality's comprehensive scoring system:
 
 ```python
+
 # Basic analysis execution
 results = analyzer.analyze_project(
     include_security=True,      # Security vulnerability detection
@@ -166,6 +168,7 @@ for category, issue_list in issues.items():
 The example uses default analysis settings, but can be customized:
 
 ```python
+
 # Custom analysis configuration
 results = analyzer.analyze_project(
     include_security=True,       # Enable security analysis
@@ -225,6 +228,7 @@ The example provides contextual recommendations based on analysis results:
 ### Custom Analysis Backends
 
 ```python
+
 # Add custom analysis configuration
 analyzer = CodeAnalyzer(project_path)
 analyzer.configure_backends({

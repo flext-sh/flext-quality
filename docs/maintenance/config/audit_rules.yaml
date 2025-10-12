@@ -1,0 +1,182 @@
+# FLEXT Quality Documentation Audit Rules Configuration
+#
+# Defines quality thresholds, validation rules, and audit parameters
+# for comprehensive documentation quality assurance.
+
+quality_thresholds:
+  # Maximum age in days before content is considered outdated
+  max_age_days: 90
+
+  # Minimum word count for documentation files
+  min_word_count: 100
+
+  # Maximum number of broken links allowed
+  max_broken_links: 0
+
+  # Minimum completeness score (0.0 to 1.0)
+  min_completeness_score: 0.8
+
+  # Maximum file size for analysis (in MB)
+  max_file_size_mb: 10
+
+content_checks:
+  # Enable/disable various audit checks
+  check_freshness: true
+  check_completeness: true
+  check_consistency: true
+  check_links: true
+  check_structure: true
+  check_accessibility: true
+
+freshness_rules:
+  # Files older than this trigger warnings
+  warning_age_days: 60
+
+  # Files older than this trigger errors
+  error_age_days: 120
+
+  # Critical files that should never be outdated
+  critical_files:
+    - "README.md"
+    - "docs/README.md"
+    - "CHANGELOG.md"
+    - "CONTRIBUTING.md"
+
+completeness_rules:
+  # Required sections for main documentation files
+  required_sections:
+    - "Overview|Introduction|Purpose"
+    - "Installation|Setup|Getting Started"
+    - "Usage|Examples|Quick Start"
+
+  # Required elements in documentation
+  required_elements:
+    - "code_examples": true
+    - "table_of_contents": false  # Only for files > 2000 words
+    - "contact_information": false
+
+consistency_rules:
+  # Heading hierarchy enforcement
+  enforce_heading_hierarchy: true
+
+  # Maximum heading level allowed
+  max_heading_level: 4
+
+  # List style consistency
+  enforce_list_consistency: true
+
+  # Code block language specification
+  require_code_language: false
+
+link_validation:
+  # External link checking
+  check_external_links: true
+
+  # Internal link checking
+  check_internal_links: true
+
+  # Image reference validation
+  check_images: true
+
+  # Anchor link validation
+  check_anchors: true
+
+  # Timeout for external link checks (seconds)
+  external_timeout: 10
+
+  # Retry attempts for failed requests
+  retry_attempts: 3
+
+  # User agent for external requests
+  user_agent: "FLEXT-Quality-Doc-Auditor/1.0"
+
+  # Allowed URL schemes
+  allowed_schemes: ["http", "https", "ftp", "mailto"]
+
+structure_validation:
+  # Maximum line length
+  max_line_length: 88
+
+  # Trailing whitespace check
+  check_trailing_whitespace: true
+
+  # Tab vs spaces consistency
+  enforce_spaces: true
+
+  # Required indentation (spaces)
+  indentation_spaces: 4
+
+accessibility_rules:
+  # Require alt text for images
+  require_alt_text: true
+
+  # Check for descriptive link text
+  descriptive_links: true
+
+  # Heading structure validation
+  proper_headings: true
+
+  # Color contrast requirements (not implemented yet)
+  check_color_contrast: false
+
+severity_levels:
+  # Issue severity classification
+  critical:
+    - "broken_external_link"
+    - "missing_critical_file"
+    - "security_vulnerability"
+
+  high:
+    - "outdated_critical_content"
+    - "broken_internal_link"
+    - "missing_required_section"
+
+  medium:
+    - "outdated_content"
+    - "accessibility_issue"
+    - "formatting_inconsistency"
+
+  low:
+    - "style_violation"
+    - "minor_formatting_issue"
+    - "readability_warning"
+
+excluded_files:
+  # Files and directories to exclude from audit
+  - "**/.git/**"
+  - "**/__pycache__/**"
+  - "**/node_modules/**"
+  - "**/.pytest_cache/**"
+  - "**/build/**"
+  - "**/dist/**"
+  - "**/.vscode/**"
+  - "**/.idea/**"
+  - "**/.serena/memories/**"
+  - "**/*.min.js"
+  - "**/*.min.css"
+
+file_specific_rules:
+  # Special rules for specific file types or names
+  README:
+    required_sections: ["Purpose", "Installation", "Usage"]
+    min_word_count: 200
+
+  "docs/**/*.md":
+    required_sections: ["Overview"]
+    check_toc: true
+
+  "CHANGELOG.md":
+    required_sections: ["Version History", "Changes"]
+    check_date_format: true
+
+reporting:
+  # Report generation settings
+  include_trends: true
+  max_issues_per_report: 100
+  include_recommendations: true
+
+  # Output formats
+  supported_formats: ["html", "json", "markdown"]
+
+  # File naming patterns
+  report_filename_pattern: "audit_report_{timestamp}.{format}"

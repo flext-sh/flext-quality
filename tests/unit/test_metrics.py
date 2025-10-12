@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import pytest
-from flext_core import FlextTypes
+from flext_core import FlextCore
 from pydantic import ValidationError
 
 from flext_quality import (
@@ -300,19 +300,19 @@ class TestQualityMetrics:
     def test_from_analysis_results_missing_sections(self) -> None:
         """Test from_analysis_results with missing sections."""
         # Missing metrics section
-        results_no_metrics: FlextTypes.Dict = {"issues": {}}
+        results_no_metrics: FlextCore.Types.Dict = {"issues": {}}
         metrics = QualityMetrics.from_analysis_results(results_no_metrics)
         assert metrics.total_files == 0
 
         # Missing issues section
-        results_no_issues: FlextTypes.Dict = {"metrics": {"total_files": 5}}
+        results_no_issues: FlextCore.Types.Dict = {"metrics": {"total_files": 5}}
         metrics = QualityMetrics.from_analysis_results(results_no_issues)
         assert metrics.security_issues_count == 0
         assert metrics.total_files == 5
 
     def test_from_analysis_results_missing_issue_categories(self) -> None:
         """Test from_analysis_results with missing issue categories."""
-        results: FlextTypes.Dict = {
+        results: FlextCore.Types.Dict = {
             "metrics": {},
             "issues": {
                 "security": [{"issue": 1}],
@@ -329,7 +329,7 @@ class TestQualityMetrics:
 
     def test_edge_case_zero_complexity(self) -> None:
         """Test edge case with zero complexity."""
-        results: FlextTypes.Dict = {
+        results: FlextCore.Types.Dict = {
             "metrics": {"average_complexity": 0.0},
             "issues": {},
         }
@@ -343,7 +343,7 @@ class TestQualityMetrics:
         """Test edge case with high issue counts."""
         many_issues = [{"issue": i} for i in range(50)]  # 50 issues
 
-        results: FlextTypes.Dict = {
+        results: FlextCore.Types.Dict = {
             "metrics": {},
             "issues": {
                 "security": many_issues,

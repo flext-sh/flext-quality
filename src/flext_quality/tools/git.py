@@ -12,8 +12,8 @@ Provides git operations for quality tools:
 ALL operations support:
 - dry_run=True (default - MANDATORY)
 - temp_path for temporary workspace
-- FlextResult error handling (NO try/except)
-- FlextLogger structured logging
+- FlextCore.Result error handling (NO try/except)
+- FlextCore.Logger structured logging
 """
 
 from __future__ import annotations
@@ -23,20 +23,14 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from flext_core import (
-    FlextLogger,
-    FlextResult,
-    FlextService,
-    FlextTypes,
-    FlextUtilities,
-)
+from flext_core import FlextCore
 from pydantic import ConfigDict
 
 from flext_quality.constants import FlextQualityConstants
 from flext_quality.models import FlextQualityModels
 
 
-class FlextQualityGitTools(FlextService[None]):
+class FlextQualityGitTools(FlextCore.Service[None]):
     """Unified git operations for quality tools with complete flext-core integration.
 
     Example usage:
@@ -63,9 +57,9 @@ class FlextQualityGitTools(FlextService[None]):
 
     model_config = ConfigDict(arbitrary_types_allowed=True, extra="allow")
 
-    def execute(self) -> FlextResult[None]:
-        """Execute git tools service - FlextService interface."""
-        return FlextResult[None].ok(None)
+    def execute(self) -> FlextCore.Result[None]:
+        """Execute git tools service - FlextCore.Service interface."""
+        return FlextCore.Result[None].ok(None)
 
     class HistoryRewriter:
         """Git history rewriting with dry-run support."""
@@ -74,7 +68,7 @@ class FlextQualityGitTools(FlextService[None]):
         def _create_temp_workspace(
             repo_path: str,
             temp_path: str | None = None,
-        ) -> FlextResult[Path]:
+        ) -> FlextCore.Result[Path]:
             """Create temporary workspace for dry-run testing."""
             if temp_path:
                 workspace = Path(temp_path)
@@ -90,7 +84,7 @@ class FlextQualityGitTools(FlextService[None]):
             repo = Path(repo_path)
             temp_repo = workspace / repo.name
 
-            cmd_result = FlextUtilities.run_external_command(
+            cmd_result = FlextCore.Utilities.run_external_command(
                 cmd=["git", "clone", str(repo), str(temp_repo)],
                 capture_output=True,
                 text=True,
@@ -99,23 +93,25 @@ class FlextQualityGitTools(FlextService[None]):
 
             # Handle execution failure
             if cmd_result.is_failure:
-                return FlextResult[Path].fail(f"Git clone failed: {cmd_result.error}")
+                return FlextCore.Result[Path].fail(
+                    f"Git clone failed: {cmd_result.error}"
+                )
 
             result = cmd_result.value
 
             if result.returncode != 0:
-                return FlextResult[Path].fail(
+                return FlextCore.Result[Path].fail(
                     f"Failed to clone repo to temp workspace: {result.stderr}"
                 )
 
-            return FlextResult[Path].ok(temp_repo)
+            return FlextCore.Result[Path].ok(temp_repo)
 
         @staticmethod
-        def _cleanup_temp_workspace(workspace: Path) -> FlextResult[None]:
+        def _cleanup_temp_workspace(workspace: Path) -> FlextCore.Result[None]:
             """Cleanup temporary workspace."""
             if workspace.exists():
                 shutil.rmtree(workspace)
-            return FlextResult[None].ok(None)
+            return FlextCore.Result[None].ok(None)
 
         @staticmethod
         def _strip_ai_signatures(message: str) -> str:
@@ -137,7 +133,7 @@ class FlextQualityGitTools(FlextService[None]):
             *,
             dry_run: bool = True,
             temp_path: str | None = None,
-        ) -> FlextResult[FlextQualityModels.RewriteResult]:
+        ) -> FlextCore.Result[FlextQualityModels.RewriteResult]:
             """Rewrite git history to remove AI signatures.
 
             Args:
@@ -146,16 +142,16 @@ class FlextQualityGitTools(FlextService[None]):
                 temp_path: Custom temporary workspace path
 
             Returns:
-                FlextResult with RewriteResult containing statistics
+                FlextCore.Result with RewriteResult containing statistics
 
             """
-            logger = FlextLogger(__name__)
+            logger = FlextCore.Logger(__name__)
 
             # In dry-run, create temp workspace
             if dry_run:
                 workspace_result = cls._create_temp_workspace(repo_path, temp_path)
                 if workspace_result.is_failure:
-                    return FlextResult[FlextQualityModels.RewriteResult].fail(
+                    return FlextCore.Result[FlextQualityModels.RewriteResult].fail(
                         workspace_result.error
                     )
                 work_repo = workspace_result.value
@@ -168,7 +164,7 @@ class FlextQualityGitTools(FlextService[None]):
             )
 
             # Get commit list
-            cmd_result = FlextUtilities.run_external_command(
+            cmd_result = FlextCore.Utilities.run_external_command(
                 cmd=["git", "-C", str(work_repo), "rev-list", "--all", "--reverse"],
                 capture_output=True,
                 text=True,
@@ -177,25 +173,25 @@ class FlextQualityGitTools(FlextService[None]):
 
             # Handle execution failure
             if cmd_result.is_failure:
-                return FlextResult[FlextQualityModels.RewriteResult].fail(
+                return FlextCore.Result[FlextQualityModels.RewriteResult].fail(
                     f"Git rev-list failed: {cmd_result.error}"
                 )
 
             result = cmd_result.value
 
             if result.returncode != 0:
-                return FlextResult[FlextQualityModels.RewriteResult].fail(
+                return FlextCore.Result[FlextQualityModels.RewriteResult].fail(
                     f"Failed to get commit list: {result.stderr}"
                 )
 
             commits = result.stdout.strip().split("\n") if result.stdout.strip() else []
             commits_processed = 0
             commits_changed = 0
-            errors: list[str] = []
+            errors: FlextCore.Types.StringList = []
 
             for commit_hash in commits:
                 # Get commit message
-                cmd_result = FlextUtilities.run_external_command(
+                cmd_result = FlextCore.Utilities.run_external_command(
                     cmd=[
                         "git",
                         "-C",
@@ -228,7 +224,7 @@ class FlextQualityGitTools(FlextService[None]):
 
                 if cleaned_message != original_message:
                     # Rewrite commit message
-                    amend_cmd_result = FlextUtilities.run_external_command(
+                    amend_cmd_result = FlextCore.Utilities.run_external_command(
                         cmd=[
                             "git",
                             "-C",
@@ -275,7 +271,7 @@ class FlextQualityGitTools(FlextService[None]):
                 errors=errors,
             )
 
-            return FlextResult[FlextQualityModels.RewriteResult].ok(rewrite_result)
+            return FlextCore.Result[FlextQualityModels.RewriteResult].ok(rewrite_result)
 
     class CleanupService:
         """Repository cleanup operations."""
@@ -285,7 +281,7 @@ class FlextQualityGitTools(FlextService[None]):
             repo_path: str,
             *,
             dry_run: bool = True,
-        ) -> FlextResult[FlextTypes.Dict]:
+        ) -> FlextCore.Result[FlextCore.Types.Dict]:
             """Cleanup cruft files and directories.
 
             Args:
@@ -293,10 +289,10 @@ class FlextQualityGitTools(FlextService[None]):
                 dry_run: Preview changes without applying
 
             Returns:
-                FlextResult with cleanup statistics
+                FlextCore.Result with cleanup statistics
 
             """
-            logger = FlextLogger(__name__)
+            logger = FlextCore.Logger(__name__)
             repo = Path(repo_path)
 
             logger.info(
@@ -305,14 +301,14 @@ class FlextQualityGitTools(FlextService[None]):
             )
 
             removed_count = 0
-            errors: list[str] = []
+            errors: FlextCore.Types.StringList = []
 
             # Run git clean
             git_cmd = ["git", "-C", str(repo), "clean", "-xfd"]
             if dry_run:
                 git_cmd.insert(4, "-n")  # Dry-run flag
 
-            cmd_result = FlextUtilities.run_external_command(
+            cmd_result = FlextCore.Utilities.run_external_command(
                 cmd=git_cmd,
                 capture_output=True,
                 text=True,
@@ -335,7 +331,7 @@ class FlextQualityGitTools(FlextService[None]):
                         else 0
                     )
 
-            return FlextResult[FlextTypes.Dict].ok({
+            return FlextCore.Result[FlextCore.Types.Dict].ok({
                 "removed_count": removed_count,
                 "errors": errors,
                 "success": len(errors) == 0,

@@ -10,7 +10,7 @@ from pathlib import Path
 from textwrap import dedent
 from typing import cast
 
-from flext_core import FlextContainer, FlextLogger, FlextTypes, FlextUtilities
+from flext_core import FlextCore
 
 # Type aliases for better readability
 
@@ -24,8 +24,8 @@ class FlextQualityUtilities:
 
     def __init__(self) -> None:
         """Initialize utilities with dependency injection."""
-        self._container = FlextContainer.get_global()
-        self.logger = FlextLogger(__name__)
+        self._container = FlextCore.Container.get_global()
+        self.logger = FlextCore.Logger(__name__)
 
     class _IssueProcessor:
         """Nested helper class for issue processing operations."""
@@ -38,33 +38,33 @@ class FlextQualityUtilities:
             if not value:  # Empty list is valid
                 return True
             # Quality-specific check: issues have file_path and message
-            value_list: FlextTypes.List = cast("FlextTypes.List", value)
+            value_list: FlextCore.Types.List = cast("FlextCore.Types.List", value)
             first_item = value_list[0]
             return hasattr(first_item, "file_path") and hasattr(first_item, "message")
 
         @staticmethod
-        def safe_issue_list(value: object) -> FlextTypes.List:
+        def safe_issue_list(value: object) -> FlextCore.Types.List:
             """Safely convert value to typed issue list."""
             if FlextQualityUtilities._IssueProcessor.is_quality_issue_list(value):
-                return cast("FlextTypes.List", value)
+                return cast("FlextCore.Types.List", value)
             return []
 
         @staticmethod
         def get_issue_summary(issue: object) -> str:
             """Get a formatted summary string for any issue type."""
-            # Use FlextUtilities safe conversions instead of raw getattr
+            # Use FlextCore.Utilities safe conversions instead of raw getattr
             if hasattr(issue, "files") and hasattr(issue, "similarity"):
-                files: FlextTypes.List = getattr(issue, "files", [])
+                files: FlextCore.Types.List = getattr(issue, "files", [])
                 if files and isinstance(files, list):
                     files_str = ", ".join(str(f) for f in files[:2])
                     return f"Duplicated in: {files_str}"
 
             # For all other issue types - use safe string conversion
             if hasattr(issue, "file_path") and hasattr(issue, "line_number"):
-                file_path = FlextUtilities.TextProcessor.safe_string(
+                file_path = FlextCore.Utilities.TextProcessor.safe_string(
                     getattr(issue, "file_path", "") or "unknown",
                 )
-                line_number = FlextUtilities.TextProcessor.safe_string(
+                line_number = FlextCore.Utilities.TextProcessor.safe_string(
                     getattr(issue, "line_number", "") or "?",
                 )
                 return f"{file_path}:{line_number}"
@@ -75,7 +75,7 @@ class FlextQualityUtilities:
         """Nested helper class for report formatting operations."""
 
         @staticmethod
-        def format_issue_categories(results: object) -> dict[str, FlextTypes.List]:
+        def format_issue_categories(results: object) -> dict[str, FlextCore.Types.List]:
             """Format issue categories with proper typing."""
             return {
                 "SECURITY": FlextQualityUtilities._IssueProcessor.safe_issue_list(
@@ -93,19 +93,19 @@ class FlextQualityUtilities:
             }
 
         @staticmethod
-        def create_report_lines() -> FlextTypes.StringList:
+        def create_report_lines() -> FlextCore.Types.StringList:
             """Create a new report lines list with proper typing."""
             return []
 
         @staticmethod
         def safe_extend_lines(
-            target: FlextTypes.StringList,
+            target: FlextCore.Types.StringList,
             source: object,
         ) -> None:
             """Safely extend target list with source items."""
             if isinstance(source, list):
                 str_items = [
-                    FlextUtilities.TextProcessor.safe_string(item or "")
+                    FlextCore.Utilities.TextProcessor.safe_string(item or "")
                     for item in source
                 ]
                 target.extend(str_items)
@@ -176,7 +176,7 @@ def another_unused() -> object:
     pass
 
 # This is the only function that gets called
-result: FlextResult[object] = used_function()
+result: FlextCore.Result[object] = used_function()
 ''',
                 "duplication": '''
 
@@ -265,7 +265,7 @@ def process_data_type_b(data: object) -> object:
         return FlextQualityUtilities._IssueProcessor.is_quality_issue_list(value)
 
     @staticmethod
-    def safe_issue_list(value: object) -> FlextTypes.List:
+    def safe_issue_list(value: object) -> FlextCore.Types.List:
         """Safely convert value to typed issue list."""
         return FlextQualityUtilities._IssueProcessor.safe_issue_list(value)
 
@@ -275,17 +275,17 @@ def process_data_type_b(data: object) -> object:
         return FlextQualityUtilities._IssueProcessor.get_issue_summary(issue)
 
     @staticmethod
-    def format_issue_categories(results: object) -> dict[str, FlextTypes.List]:
+    def format_issue_categories(results: object) -> dict[str, FlextCore.Types.List]:
         """Format issue categories with proper typing."""
         return FlextQualityUtilities._ReportFormatter.format_issue_categories(results)
 
     @staticmethod
-    def create_report_lines() -> FlextTypes.StringList:
+    def create_report_lines() -> FlextCore.Types.StringList:
         """Create a new report lines list with proper typing."""
         return FlextQualityUtilities._ReportFormatter.create_report_lines()
 
     @staticmethod
-    def safe_extend_lines(target: FlextTypes.StringList, source: object) -> None:
+    def safe_extend_lines(target: FlextCore.Types.StringList, source: object) -> None:
         """Safely extend target list with source items."""
         return FlextQualityUtilities._ReportFormatter.safe_extend_lines(target, source)
 

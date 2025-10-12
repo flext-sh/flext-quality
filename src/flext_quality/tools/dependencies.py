@@ -11,20 +11,20 @@ Consolidates dependency scripts:
 
 from __future__ import annotations
 
-from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
+from flext_core import FlextCore
 from pydantic import ConfigDict
 
 from flext_quality.models import FlextQualityModels
 
 
-class FlextQualityDependencyTools(FlextService[None]):
+class FlextQualityDependencyTools(FlextCore.Service[None]):
     """Unified dependency tools with flext-core integration for quality operations."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True, extra="allow")
 
-    def execute(self) -> FlextResult[None]:
-        """Execute dependency tools service - FlextService interface."""
-        return FlextResult[None].ok(None)
+    def execute(self) -> FlextCore.Result[None]:
+        """Execute dependency tools service - FlextCore.Service interface."""
+        return FlextCore.Result[None].ok(None)
 
     class DependencyAnalyzer:
         """Dependency analysis operations."""
@@ -32,21 +32,21 @@ class FlextQualityDependencyTools(FlextService[None]):
         @staticmethod
         def analyze_dependencies(
             project_path: str,
-        ) -> FlextResult[list[FlextQualityModels.DependencyInfo]]:
+        ) -> FlextCore.Result[list[FlextQualityModels.DependencyInfo]]:
             """Analyze project dependencies.
 
             Args:
                 project_path: Path to project to analyze
 
             Returns:
-                FlextResult with list of dependency information
+                FlextCore.Result with list of dependency information
 
             """
-            logger = FlextLogger(__name__)
+            logger = FlextCore.Logger(__name__)
             logger.info(f"Analyzing dependencies for {project_path}")
 
             # Placeholder implementation - would use poetry/pip inspection
-            return FlextResult[list[FlextQualityModels.DependencyInfo]].ok([])
+            return FlextCore.Result[list[FlextQualityModels.DependencyInfo]].ok([])
 
     class DependencyConsolidator:
         """Dependency consolidation operations."""
@@ -56,7 +56,7 @@ class FlextQualityDependencyTools(FlextService[None]):
             workspace_path: str,
             *,
             dry_run: bool = True,
-        ) -> FlextResult[FlextTypes.Dict]:
+        ) -> FlextCore.Result[FlextCore.Types.Dict]:
             """Consolidate workspace dependencies.
 
             Args:
@@ -64,20 +64,20 @@ class FlextQualityDependencyTools(FlextService[None]):
                 dry_run: Preview changes without applying
 
             Returns:
-                FlextResult with consolidation statistics
+                FlextCore.Result with consolidation statistics
 
             """
-            logger = FlextLogger(__name__)
+            logger = FlextCore.Logger(__name__)
 
             if dry_run:
                 logger.info(f"DRY RUN: Would consolidate deps in {workspace_path}")
-                return FlextResult[FlextTypes.Dict].ok({
+                return FlextCore.Result[FlextCore.Types.Dict].ok({
                     "consolidated": False,
                     "dry_run": True,
                 })
 
             logger.info(f"Consolidating dependencies in {workspace_path}")
-            return FlextResult[FlextTypes.Dict].ok({"consolidated": True})
+            return FlextCore.Result[FlextCore.Types.Dict].ok({"consolidated": True})
 
     class PoetryOperations:
         """Poetry-specific operations."""
@@ -85,26 +85,26 @@ class FlextQualityDependencyTools(FlextService[None]):
         @staticmethod
         def sync_poetry_lock(
             project_path: str,
-        ) -> FlextResult[FlextTypes.Dict]:
+        ) -> FlextCore.Result[FlextCore.Types.Dict]:
             """Sync poetry.lock files.
 
             Args:
                 project_path: Path to project
 
             Returns:
-                FlextResult with sync status
+                FlextCore.Result with sync status
 
             """
-            logger = FlextLogger(__name__)
+            logger = FlextCore.Logger(__name__)
             logger.info(f"Syncing poetry.lock for {project_path}")
 
             # Placeholder implementation - would run poetry lock
-            return FlextResult[FlextTypes.Dict].ok({"synced": True})
+            return FlextCore.Result[FlextCore.Types.Dict].ok({"synced": True})
 
     def __init__(self) -> None:
         """Initialize dependency tools service."""
         super().__init__()
-        self.logger = FlextLogger(__name__)
+        self.logger = FlextCore.Logger(__name__)
 
         # Initialize helper services
         self.analyzer = self.DependencyAnalyzer()

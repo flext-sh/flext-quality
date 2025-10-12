@@ -16,7 +16,7 @@ from pathlib import Path
 from typing import override
 from uuid import UUID
 
-from flext_core import FlextContainer, FlextLogger, FlextModels, FlextTypes
+from flext_core import FlextCore
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -32,10 +32,10 @@ from .constants import FlextQualityConstants
 from .value_objects import FlextQualityValueObjects
 
 
-class FlextQualityModels(FlextModels):
+class FlextQualityModels(FlextCore.Models):
     """Unified quality models class following FLEXT architecture patterns.
 
-    Inherits from FlextModels to avoid duplication and ensure consistency.
+    Inherits from FlextCore.Models to avoid duplication and ensure consistency.
     Single responsibility: Quality data models and validation
     Contains all Pydantic models as nested classes with shared functionality.
     """
@@ -102,7 +102,7 @@ class FlextQualityModels(FlextModels):
 
     @computed_field
     @property
-    def quality_system_summary(self) -> FlextTypes.Dict:
+    def quality_system_summary(self) -> FlextCore.Types.Dict:
         """Computed field providing comprehensive quality system summary."""
         return {
             "system_info": {
@@ -172,10 +172,10 @@ class FlextQualityModels(FlextModels):
     @override
     def __init__(self) -> None:
         """Initialize models with dependency injection."""
-        self._container = FlextContainer.get_global()
-        self.logger = FlextLogger(__name__)
+        self._container = FlextCore.Container.get_global()
+        self.logger = FlextCore.Logger(__name__)
 
-    class ProjectModel(FlextModels.BaseModel):
+    class ProjectModel(FlextCore.Models.BaseModel):
         """Pydantic model for quality project representation."""
 
         model_config = ConfigDict(
@@ -204,7 +204,7 @@ class FlextQualityModels(FlextModels):
 
         @computed_field
         @property
-        def project_summary(self) -> FlextTypes.Dict:
+        def project_summary(self) -> FlextCore.Types.Dict:
             """Computed field providing comprehensive project summary."""
             return {
                 "project_info": {
@@ -263,7 +263,7 @@ class FlextQualityModels(FlextModels):
                 raise ValueError(msg)
             return v.strip()
 
-    class AnalysisModel(FlextModels.BaseModel):
+    class AnalysisModel(FlextCore.Models.BaseModel):
         """Pydantic model for quality analysis representation."""
 
         model_config = ConfigDict(
@@ -322,7 +322,7 @@ class FlextQualityModels(FlextModels):
 
         @computed_field
         @property
-        def analysis_summary(self) -> FlextTypes.Dict:
+        def analysis_summary(self) -> FlextCore.Types.Dict:
             """Computed field providing comprehensive analysis summary."""
             duration_seconds = 0
             if self.completed_at and self.started_at:
@@ -436,7 +436,7 @@ class FlextQualityModels(FlextModels):
             """Ensure scores are within valid range."""
             return max(0.0, min(100.0, v))
 
-    class IssueModel(FlextModels.BaseModel):
+    class IssueModel(FlextCore.Models.BaseModel):
         """Pydantic model for quality issue representation."""
 
         model_config = ConfigDict(
@@ -465,7 +465,7 @@ class FlextQualityModels(FlextModels):
 
         @computed_field
         @property
-        def issue_summary(self) -> FlextTypes.Dict:
+        def issue_summary(self) -> FlextCore.Types.Dict:
             """Computed field providing comprehensive issue summary."""
             return {
                 "issue_identity": {
@@ -586,7 +586,7 @@ class FlextQualityModels(FlextModels):
                 raise ValueError(msg)
             return v
 
-    class ReportModel(FlextModels.BaseModel):
+    class ReportModel(FlextCore.Models.BaseModel):
         """Pydantic model for quality report representation."""
 
         model_config = ConfigDict(
@@ -607,14 +607,14 @@ class FlextQualityModels(FlextModels):
             default_factory=datetime.now,
             description="Report generation time",
         )
-        metadata: FlextTypes.Dict = Field(
+        metadata: FlextCore.Types.Dict = Field(
             default_factory=dict,
             description="Additional report metadata",
         )
 
         @computed_field
         @property
-        def report_summary(self) -> FlextTypes.Dict:
+        def report_summary(self) -> FlextCore.Types.Dict:
             """Computed field providing comprehensive report summary."""
             return {
                 "report_identity": {
@@ -666,7 +666,7 @@ class FlextQualityModels(FlextModels):
             return self
 
         @field_serializer("content", when_used="json")
-        def serialize_content_efficiently(self, value: str) -> FlextTypes.Dict:
+        def serialize_content_efficiently(self, value: str) -> FlextCore.Types.Dict:
             """Field serializer for efficient content handling."""
             # For large content, provide summary instead of full content in JSON
             max_content_size = 10000  # 10KB limit for JSON serialization
@@ -685,7 +685,7 @@ class FlextQualityModels(FlextModels):
             }
 
         @field_serializer("metadata", when_used="json")
-        def serialize_metadata_with_context(self, value: dict) -> FlextTypes.Dict:
+        def serialize_metadata_with_context(self, value: dict) -> FlextCore.Types.Dict:
             """Field serializer for metadata with processing context."""
             return {
                 "report_metadata": value,
@@ -709,7 +709,7 @@ class FlextQualityModels(FlextModels):
             enterprise_formats = ["HTML", "PDF", "JSON"]
             return self.format_type in enterprise_formats
 
-        def _get_format_capabilities(self) -> FlextTypes.StringList:
+        def _get_format_capabilities(self) -> FlextCore.Types.StringList:
             """Get capabilities based on report format."""
             capabilities_map = {
                 "HTML": ["interactive", "styling", "charts", "responsive"],
@@ -721,7 +721,7 @@ class FlextQualityModels(FlextModels):
             }
             return capabilities_map.get(self.format_type, [])
 
-    class ConfigModel(FlextModels.BaseModel):
+    class ConfigModel(FlextCore.Models.BaseModel):
         """Pydantic model for analysis configuration."""
 
         model_config = ConfigDict(
@@ -732,11 +732,11 @@ class FlextQualityModels(FlextModels):
             validate_return=True,
         )
 
-        include_patterns: FlextTypes.StringList = Field(
+        include_patterns: FlextCore.Types.StringList = Field(
             default_factory=list,
             description="File patterns to include",
         )
-        exclude_patterns: FlextTypes.StringList = Field(
+        exclude_patterns: FlextCore.Types.StringList = Field(
             default_factory=list,
             description="File patterns to exclude",
         )
@@ -767,7 +767,7 @@ class FlextQualityModels(FlextModels):
 
         @computed_field
         @property
-        def config_summary(self) -> FlextTypes.Dict:
+        def config_summary(self) -> FlextCore.Types.Dict:
             """Computed field providing comprehensive configuration summary."""
             return {
                 "pattern_configuration": {
@@ -846,8 +846,8 @@ class FlextQualityModels(FlextModels):
 
         @field_serializer("include_patterns", when_used="json")
         def serialize_include_patterns_with_metadata(
-            self, value: FlextTypes.StringList
-        ) -> FlextTypes.Dict:
+            self, value: FlextCore.Types.StringList
+        ) -> FlextCore.Types.Dict:
             """Field serializer for include patterns with validation metadata."""
             return {
                 "patterns": value,
@@ -861,8 +861,8 @@ class FlextQualityModels(FlextModels):
 
         @field_serializer("exclude_patterns", when_used="json")
         def serialize_exclude_patterns_with_metadata(
-            self, value: FlextTypes.StringList
-        ) -> FlextTypes.Dict:
+            self, value: FlextCore.Types.StringList
+        ) -> FlextCore.Types.Dict:
             """Field serializer for exclude patterns with validation metadata."""
             return {
                 "patterns": value,
@@ -933,7 +933,7 @@ class FlextQualityModels(FlextModels):
 
     # ==== ANALYSIS RESULT MODELS (from analysis_types.py migration) ====
 
-    class FileAnalysisResult(FlextModels.Value):
+    class FileAnalysisResult(FlextCore.Models.Value):
         """Result of analyzing a single file."""
 
         file_path: Path = Field(..., description="Path to the analyzed file")
@@ -984,7 +984,7 @@ class FlextQualityModels(FlextModels):
         )
         message: str = Field(..., description="Human-readable issue message")
 
-    class SecurityIssue(FlextModels.Value):
+    class SecurityIssue(FlextCore.Models.Value):
         """Security-related code issue."""
 
         file_path: str = Field(..., description="File where issue was found")
@@ -1000,7 +1000,7 @@ class FlextQualityModels(FlextModels):
         message: str = Field(..., description="Human-readable issue message")
         rule_id: str = Field(..., description="Security rule that detected the issue")
 
-    class DeadCodeIssue(FlextModels.Value):
+    class DeadCodeIssue(FlextCore.Models.Value):
         """Dead code issue."""
 
         file_path: str = Field(..., description="File where dead code was found")
@@ -1015,10 +1015,12 @@ class FlextQualityModels(FlextModels):
         )
         message: str = Field(..., description="Human-readable issue message")
 
-    class DuplicationIssue(FlextModels.Value):
+    class DuplicationIssue(FlextCore.Models.Value):
         """Code duplication issue."""
 
-        files: list[str] = Field(..., description="Files containing duplicated code")
+        files: FlextCore.Types.StringList = Field(
+            ..., description="Files containing duplicated code"
+        )
         line_ranges: list[tuple[int, int]] = Field(
             ...,
             description="Line ranges of duplicated code in each file",
@@ -1042,7 +1044,7 @@ class FlextQualityModels(FlextModels):
         version: str = Field(..., description="Dependency version")
         type: str = Field(..., description="Dependency type (direct/dev/optional)")
         license: str | None = Field(default=None, description="Dependency license")
-        vulnerabilities: list[str] = Field(
+        vulnerabilities: FlextCore.Types.StringList = Field(
             default_factory=list,
             description="Known vulnerabilities",
         )
@@ -1064,7 +1066,7 @@ class FlextQualityModels(FlextModels):
             default=0.0, description="Test execution time in seconds"
         )
 
-    class OverallMetrics(FlextModels.Value):
+    class OverallMetrics(FlextCore.Models.Value):
         """Overall project quality metrics."""
 
         files_analyzed: int = Field(default=0, description="Number of files analyzed")
@@ -1182,7 +1184,7 @@ class FlextQualityModels(FlextModels):
 
     # ==== INTERNAL TOOLS MODELS (from flext_tools migration) ====
 
-    class GitOperation(FlextModels.Command):
+    class GitOperation(FlextCore.Models.Command):
         """Git operation command for quality tools."""
 
         repo_path: str
@@ -1190,15 +1192,15 @@ class FlextQualityModels(FlextModels):
         dry_run: bool = True
         temp_path: str | None = None
 
-    class RewriteResult(FlextModels.Value):
+    class RewriteResult(FlextCore.Models.Value):
         """Git history rewrite result."""
 
         commits_processed: int
         commits_changed: int
         success: bool
-        errors: list[str]
+        errors: FlextCore.Types.StringList
 
-    class OptimizationTarget(FlextModels.Entity):
+    class OptimizationTarget(FlextCore.Models.Entity):
         """Target for optimization."""
 
         project_path: str
@@ -1207,46 +1209,46 @@ class FlextQualityModels(FlextModels):
         optimization_type: str
         priority: int = 1
 
-    class OptimizationResult(FlextModels.Value):
+    class OptimizationResult(FlextCore.Models.Value):
         """Result of optimization operation."""
 
         target: FlextQualityModels.OptimizationTarget
         success: bool
         changes_made: int
-        errors: list[str]
-        warnings: list[str]
+        errors: FlextCore.Types.StringList
+        warnings: FlextCore.Types.StringList
 
-    class CheckResult(FlextModels.Value):
+    class CheckResult(FlextCore.Models.Value):
         """Quality check result."""
 
         lint_passed: bool
         type_check_passed: bool
         coverage: float
-        violations: list[str]
+        violations: FlextCore.Types.StringList
 
-    class QualityValidationResult(FlextModels.Value):
+    class QualityValidationResult(FlextCore.Models.Value):
         """Quality validation result."""
 
         passed: bool
         checks_run: int
         checks_passed: int
-        failures: list[str]
+        failures: FlextCore.Types.StringList
 
-    class AnalysisResult(FlextModels.Value):
+    class AnalysisResult(FlextCore.Models.Value):
         """Architecture analysis result."""
 
-        violations: list[str]
-        suggestions: list[str]
+        violations: FlextCore.Types.StringList
+        suggestions: FlextCore.Types.StringList
         complexity_score: float
         domain_library_usage: dict[str, bool]
 
-    class DependencyInfo(FlextModels.Value):
+    class DependencyInfo(FlextCore.Models.Value):
         """Dependency information."""
 
         name: str
         version: str
         source: str
-        required_by: list[str]
+        required_by: FlextCore.Types.StringList
 
 
 # Backward compatibility aliases for existing code

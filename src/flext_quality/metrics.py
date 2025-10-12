@@ -9,7 +9,7 @@ from __future__ import annotations
 import contextlib
 from typing import cast
 
-from flext_core import FlextModels, FlextResult, FlextTypes
+from flext_core import FlextCore
 from pydantic import Field
 
 from .grade_calculator import QualityGradeCalculator
@@ -19,7 +19,7 @@ from .models import FlextQualityModels
 MAX_QUALITY_SCORE = 100
 
 
-class QualityMetrics(FlextModels.Value):
+class QualityMetrics(FlextCore.Models.Value):
     """Comprehensive Quality Metrics Value Object.
 
     Immutable value object that encapsulates comprehensive code quality
@@ -257,7 +257,7 @@ class QualityMetrics(FlextModels.Value):
     @classmethod
     def from_analysis_results(
         cls,
-        results: FlextQualityModels.AnalysisResults | FlextTypes.Dict,
+        results: FlextQualityModels.AnalysisResults | FlextCore.Types.Dict,
     ) -> QualityMetrics:
         """Create QualityMetrics from FlextQualityModels.AnalysisResults using modern API only.
 
@@ -299,7 +299,7 @@ class QualityMetrics(FlextModels.Value):
     @classmethod
     def _from_analysis_results_dict(
         cls,
-        results: FlextTypes.Dict,
+        results: FlextCore.Types.Dict,
     ) -> QualityMetrics:
         """Create QualityMetrics from legacy dict format for test compatibility."""
 
@@ -395,7 +395,7 @@ class QualityMetrics(FlextModels.Value):
         total_classes = 0  # Would need to be calculated from file metrics
 
         # Complexity metrics - using getattr for type safety
-        complexity_values: list[int] = [
+        complexity_values: FlextCore.Types.IntList = [
             int(getattr(issue, "complexity_value", 0))
             for issue in results.complexity_issues
         ]
@@ -498,7 +498,7 @@ class QualityMetrics(FlextModels.Value):
         )
 
     @property
-    def scores_summary(self) -> FlextTypes.FloatDict:
+    def scores_summary(self) -> FlextCore.Types.FloatDict:
         """Get comprehensive summary of quality scores by category.
 
         Provides a structured view of all quality category scores for
@@ -556,7 +556,7 @@ class QualityMetrics(FlextModels.Value):
         *,
         by_alias: bool = False,
         exclude_none: bool = False,
-    ) -> FlextTypes.Dict:
+    ) -> FlextCore.Types.Dict:
         """Export metrics as dictionary for serialization and integration.
 
         Converts the immutable metrics object to a dictionary format suitable
@@ -575,7 +575,7 @@ class QualityMetrics(FlextModels.Value):
             computed fields for comprehensive data export.
 
         """
-        base: FlextTypes.Dict = {
+        base: FlextCore.Types.Dict = {
             "overall_score": self.overall_score,
             "quality_grade": self.quality_grade,
             "total_files": self.total_files,
@@ -627,7 +627,7 @@ class QualityMetrics(FlextModels.Value):
     # Architecture Note: Grade calculation centralized in QualityGradeCalculator
     # for consistency across FLEXT ecosystem quality services
 
-    def validate_business_rules(self) -> FlextResult[None]:
+    def validate_business_rules(self) -> FlextCore.Result[None]:
         """Validate quality metrics against domain business rules.
 
         Performs comprehensive validation of all metric values against
@@ -635,7 +635,7 @@ class QualityMetrics(FlextModels.Value):
         consistency within the quality analysis domain.
 
         Returns:
-            FlextResult indicating validation success or failure with
+            FlextCore.Result indicating validation success or failure with
             specific error messages for any rule violations
 
         Validation Rules:
@@ -651,7 +651,9 @@ class QualityMetrics(FlextModels.Value):
         """
         # Validate score consistency
         if self.overall_score < 0 or self.overall_score > MAX_QUALITY_SCORE:
-            return FlextResult[None].fail("Overall score must be between 0 and 100")
+            return FlextCore.Result[None].fail(
+                "Overall score must be between 0 and 100"
+            )
 
         # Validate counts are non-negative
         if any(
@@ -667,7 +669,7 @@ class QualityMetrics(FlextModels.Value):
                 self.complexity_issues_count,
             ]
         ):
-            return FlextResult[None].fail("All counts must be non-negative")
+            return FlextCore.Result[None].fail("All counts must be non-negative")
 
         # Validate complexity scores
         if (
@@ -675,9 +677,9 @@ class QualityMetrics(FlextModels.Value):
             or self.max_complexity < 0
             or self.max_complexity < self.average_complexity
         ):
-            return FlextResult[None].fail("Complexity scores must be valid")
+            return FlextCore.Result[None].fail("Complexity scores must be valid")
 
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
 
 # Rebuild model to resolve forward references - Pydantic v2 compatibility

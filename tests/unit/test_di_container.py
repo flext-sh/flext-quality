@@ -1,4 +1,4 @@
-"""Test DI container functionality using FlextContainer directly.
+"""Test DI container functionality using FlextCore.Container directly.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -6,20 +6,20 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextContainer, FlextTypes
+from flext_core import FlextCore
 
 
 class TestDIContainer:
-    """Test dependency injection using FlextContainer directly."""
+    """Test dependency injection using FlextCore.Container directly."""
 
     def test_flext_container_creation(self) -> None:
-        """Test creating FlextContainer instance directly."""
-        container = FlextContainer()
-        assert isinstance(container, FlextContainer)
+        """Test creating FlextCore.Container instance directly."""
+        container = FlextCore.Container()
+        assert isinstance(container, FlextCore.Container)
 
     def test_service_registration_and_retrieval(self) -> None:
         """Test registering and retrieving services from container."""
-        container = FlextContainer()
+        container = FlextCore.Container()
 
         # Create a test service
         test_service = "test_quality_service"
@@ -35,11 +35,11 @@ class TestDIContainer:
 
     def test_quality_service_registration(self) -> None:
         """Test registering quality-specific services."""
-        container = FlextContainer()
+        container = FlextCore.Container()
 
         # Register a quality analysis service (mock)
         class MockQualityAnalyzer:
-            def analyze(self, code: str, /) -> FlextTypes.Dict:
+            def analyze(self, code: str, /) -> FlextCore.Types.Dict:
                 return {"quality_score": 85, "issues": [], "analyzed_code": code}
 
         analyzer = MockQualityAnalyzer()
@@ -59,7 +59,7 @@ class TestDIContainer:
 
     def test_container_error_handling(self) -> None:
         """Test container handles errors properly."""
-        container = FlextContainer()
+        container = FlextCore.Container()
 
         # Test getting non-existent service
         result = container.get("non_existent_service")

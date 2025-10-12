@@ -1,0 +1,146 @@
+# FLEXT Quality Documentation Notification Configuration
+#
+# Configuration for automated notifications and alerts from the
+# documentation maintenance system. Supports multiple channels
+# including email, Slack, webhooks, and console output.
+
+# Global notification settings
+enabled: true
+verbose: false
+
+# Notification channels
+channels:
+  console:
+    enabled: true
+    show_details: true
+
+  email:
+    enabled: false  # Set to true and configure SMTP settings below
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    use_tls: true
+    username: ""  # Your email username
+    password: ""  # Your email password or app password
+    from_address: "docs-quality@yourcompany.com"
+    to_addresses:
+      - "team@yourcompany.com"
+      - "docs-maintainer@yourcompany.com"
+
+  slack:
+    enabled: false  # Set to true and add webhook URL below
+    webhook_url: ""  # Slack webhook URL
+    channel: "#docs-quality"
+    username: "FLEXT Quality Bot"
+    icon_emoji: ":book:"
+
+  webhook:
+    enabled: false  # Set to true and add webhook URL below
+    url: ""  # Generic webhook URL
+    method: "POST"
+    headers:
+      Content-Type: "application/json"
+      X-API-Key: ""  # Optional API key
+    timeout: 10
+
+  teams:
+    enabled: false  # Microsoft Teams webhook
+    webhook_url: ""  # Teams webhook URL
+
+  discord:
+    enabled: false  # Discord webhook
+    webhook_url: ""  # Discord webhook URL
+    username: "FLEXT Quality Bot"
+    avatar_url: ""
+
+# Alert types and thresholds
+alerts:
+  critical_issues:
+    enabled: true
+    threshold: 1  # Alert when 1+ critical issues found
+    channels: ["console", "email", "slack"]
+    cooldown_minutes: 60  # Don't send repeated alerts within this time
+
+  quality_drop:
+    enabled: true
+    threshold: 10  # Alert when quality score drops by 10+ points
+    channels: ["console", "slack"]
+    cooldown_minutes: 1440  # 24 hours
+
+  broken_links:
+    enabled: true
+    threshold: 5  # Alert when 5+ broken links found
+    channels: ["console", "slack"]
+    cooldown_minutes: 360  # 6 hours
+
+  weekly_report:
+    enabled: true
+    channels: ["console", "email"]
+    schedule: "monday 09:00"  # Send weekly reports every Monday at 9 AM
+
+  monthly_report:
+    enabled: true
+    channels: ["console", "email", "slack"]
+    schedule: "1st 10:00"  # Send monthly reports on the 1st of each month at 10 AM
+
+  audit_failures:
+    enabled: true
+    channels: ["console", "slack"]
+    cooldown_minutes: 30
+
+# Message templates
+templates:
+  critical_issues_subject: "🚨 CRITICAL: {{count}} Documentation Issues Require Immediate Attention"
+  quality_drop_subject: "📉 Quality Alert: Documentation Score Dropped {{drop}} Points"
+  broken_links_subject: "🔗 Alert: {{count}} Broken Links Detected"
+  weekly_report_subject: "📊 Weekly Documentation Quality Report - {{week}}"
+  monthly_report_subject: "📈 Monthly Documentation Quality Report - {{month}}"
+
+# Notification formatting
+formatting:
+  max_issues_in_notification: 10
+  include_recommendations: true
+  include_links_to_reports: true
+  timezone: "UTC"
+
+# Rate limiting
+rate_limiting:
+  max_notifications_per_hour: 10
+  max_notifications_per_day: 50
+
+# Error handling
+error_handling:
+  retry_attempts: 3
+  retry_delay_seconds: 5
+  fail_silently: false
+  log_errors: true
+
+# Integration settings
+integrations:
+  github:
+    enabled: false
+    repository: ""  # owner/repo format
+    token: ""  # GitHub personal access token
+    create_issues_for_critical: true
+    label_critical_issues: "documentation-critical"
+
+  gitlab:
+    enabled: false
+    project_id: ""
+    token: ""  # GitLab personal access token
+    create_issues_for_critical: true
+
+  jira:
+    enabled: false
+    server_url: ""
+    username: ""
+    api_token: ""
+    project_key: ""
+    issue_type: "Bug"
+    create_issues_for_critical: true
+
+# Debug settings
+debug:
+  enabled: false
+  log_level: "INFO"
+  save_notification_history: true
+  history_file: "docs/maintenance/reports/notification_history.json"

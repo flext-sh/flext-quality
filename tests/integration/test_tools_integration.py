@@ -164,7 +164,7 @@ class ExampleClass:
             Path(temp_path).unlink()
 
     def test_all_tools_execute_interface(self) -> None:
-        """Test FlextService execute interface for all tools."""
+        """Test FlextCore.Service execute interface for all tools."""
         tools = [
             FlextQualityOperations(),
             FlextQualityOptimizerOperations(),

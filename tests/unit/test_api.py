@@ -9,7 +9,7 @@ from __future__ import annotations
 from uuid import uuid4
 
 import pytest
-from flext_core import FlextTypes
+from flext_core import FlextCore
 
 from flext_quality import QualityAPI
 
@@ -73,7 +73,7 @@ class TestQualityAPI:
             api.project_service._projects[str(project_id)] = create_result.value
 
         # Update the project
-        updates: FlextTypes.Dict = {"language": "go"}
+        updates: FlextCore.Types.Dict = {"language": "go"}
         result = api.update_project(project_id, updates)
         assert result.success
 

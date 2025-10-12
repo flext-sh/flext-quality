@@ -1,0 +1,176 @@
+# FLEXT Quality Scheduled Maintenance Configuration
+#
+# Configuration for automated scheduled documentation maintenance tasks.
+# Defines when and what maintenance operations should run automatically.
+
+# Global settings
+enabled: true
+reports_dir: "docs/maintenance/reports/"
+backup_dir: "docs/maintenance/backups/"
+logs_dir: "docs/maintenance/logs/"
+
+# Maintenance schedules
+schedules:
+  daily_audit:
+    enabled: true
+    time: "09:00"  # 9 AM daily
+    description: "Daily quality audit for critical issues and basic validation"
+    tasks:
+      - "audit_quick"
+      - "validate_links"
+      - "check_critical"
+
+  daily_optimize:
+    enabled: true
+    time: "02:00"  # 2 AM daily (off-peak hours)
+    description: "Daily automatic optimization and formatting fixes"
+    tasks:
+      - "optimize_formatting"
+      - "update_toc"
+
+  weekly_comprehensive:
+    enabled: true
+    day: "monday"
+    time: "10:00"  # Monday 10 AM
+    description: "Weekly comprehensive audit with full validation and reporting"
+    tasks:
+      - "audit_comprehensive"
+      - "generate_report"
+      - "notify_weekly"
+
+  monthly_deep_clean:
+    enabled: true
+    day: "1st"  # 1st of each month
+    time: "11:00"  # 11 AM on the 1st
+    description: "Monthly deep cleaning with comprehensive optimization and cleanup"
+    tasks:
+      - "audit_comprehensive"
+      - "optimize_full"
+      - "generate_monthly_report"
+      - "cleanup_old_reports"
+      - "backup_archive"
+
+# Task definitions
+tasks:
+  audit_quick:
+    description: "Quick daily audit for critical issues"
+    command: "python docs/maintenance/scripts/audit.py --check-freshness --check-completeness --output docs/maintenance/reports/"
+    timeout: 300
+    critical: true
+
+  audit_comprehensive:
+    description: "Full comprehensive quality audit"
+    command: "python docs/maintenance/scripts/audit.py --comprehensive --output docs/maintenance/reports/"
+    timeout: 600
+    critical: true
+
+  validate_links:
+    description: "Validate all links and references"
+    command: "python docs/maintenance/scripts/validate.py --external-links --internal-links --images --output docs/maintenance/reports/"
+    timeout: 300
+    critical: false
+
+  check_critical:
+    description: "Check for critical issues and send alerts"
+    command: "python docs/maintenance/notifications.py --audit-data docs/maintenance/reports/latest_audit.json"
+    timeout: 60
+    critical: false
+
+  optimize_formatting:
+    description: "Auto-fix formatting and style issues"
+    command: "python docs/maintenance/scripts/optimize.py --fix-formatting --backup --output docs/maintenance/reports/"
+    timeout: 300
+    critical: false
+
+  optimize_full:
+    description: "Full optimization suite with all enhancements"
+    command: "python docs/maintenance/scripts/optimize.py --comprehensive --backup --output docs/maintenance/reports/"
+    timeout: 600
+    critical: false
+
+  update_toc:
+    description: "Update table of contents in documentation files"
+    command: "python docs/maintenance/scripts/optimize.py --update-toc --output docs/maintenance/reports/"
+    timeout: 180
+    critical: false
+
+  generate_report:
+    description: "Generate quality report in HTML format"
+    command: "python docs/maintenance/scripts/report.py --format html --output docs/maintenance/reports/"
+    timeout: 120
+    critical: false
+
+  generate_monthly_report:
+    description: "Generate comprehensive monthly quality trends report"
+    command: "python docs/maintenance/scripts/report.py --monthly-trends --format html --output docs/maintenance/reports/"
+    timeout: 180
+    critical: false
+
+  notify_weekly:
+    description: "Send weekly quality report notification"
+    command: "python docs/maintenance/notifications.py --weekly-report docs/maintenance/reports/latest_audit.json"
+    timeout: 60
+    critical: false
+
+  cleanup_old_reports:
+    description: "Clean up old report files older than 90 days"
+    command: "find docs/maintenance/reports/ -name \"*.json\" -mtime +90 -delete 2>/dev/null || true"
+    timeout: 30
+    critical: false
+
+  backup_archive:
+    description: "Create monthly backup archive of reports"
+    command: "tar -czf docs/maintenance/backups/monthly_backup_$(date +%Y%m%d).tar.gz docs/maintenance/reports/"
+    timeout: 120
+    critical: false
+
+# Error handling and recovery
+error_handling:
+  max_retries: 3
+  retry_delay_seconds: 60
+  fail_fast: false  # Continue with other tasks if one fails
+  notify_on_failure: true
+  notification_channels: ["console", "slack"]
+
+# Logging configuration
+logging:
+  enabled: true
+  log_file: "docs/maintenance/logs/scheduled_maintenance.log"
+  max_log_size: "10MB"
+  retention_days: 30
+  log_level: "INFO"
+
+# Resource limits
+resource_limits:
+  max_cpu_percent: 50
+  max_memory_mb: 512
+  max_disk_usage_percent: 80
+
+# Notification settings (integrates with notification_config.yaml)
+notifications:
+  enabled: true
+  on_success: false  # Only notify on failures or critical issues
+  on_failure: true
+  on_critical_issues: true
+  summary_report: true
+
+# Maintenance windows (when automated tasks can run)
+maintenance_windows:
+  enabled: true
+  allowed_days: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+  allowed_hours_start: "01:00"  # 1 AM
+  allowed_hours_end: "06:00"    # 6 AM
+  skip_if_high_load: true       # Skip if system load is high
+
+# Health monitoring
+health_monitoring:
+  enabled: true
+  ping_interval_minutes: 60
+  alert_if_no_runs_for_hours: 25  # Alert if no maintenance runs for 25+ hours
+  self_health_checks: true
+
+# Integration settings
+integrations:
+  systemd_service: false  # Set to true if running as systemd service
+  docker_container: false  # Set to true if running in Docker
+  kubernetes_cronjob: false  # Set to true if running as K8s CronJob

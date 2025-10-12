@@ -99,7 +99,7 @@ class TestQualityOperations:
         assert all(not r.get("false_positive", False) for r in result.value)
 
     def test_execute_interface(self) -> None:
-        """Test FlextService execute interface."""
+        """Test FlextCore.Service execute interface."""
         ops = FlextQualityOperations()
 
         result = ops.execute()

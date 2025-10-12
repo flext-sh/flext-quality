@@ -9,31 +9,24 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-from flext_core import (
-    FlextBus,
-    FlextContainer,
-    FlextContext,
-    FlextLogger,
-    FlextResult,
-    FlextService,
-)
+from flext_core import FlextCore
 
 from .config import FlextQualityConfig
 from .constants import FlextQualityConstants
 from .models import FlextQualityModels
 
 
-class FlextQualityAnalyzer(FlextService[None]):
+class FlextQualityAnalyzer(FlextCore.Service[None]):
     """Main quality analyzer following FLEXT [Project][Module] pattern.
 
     Single responsibility: Code quality analysis with complete flext-core integration.
     Contains all analysis functionality in one unified class with nested helpers.
     """
 
-    _container: FlextContainer | None
+    _container: FlextCore.Container | None
     _context: object | None
     _bus: object | None
-    logger: FlextLogger | None
+    logger: FlextCore.Logger | None
     _quality_config: FlextQualityConfig
     project_path: Path
     _current_results: FlextQualityModels.AnalysisResults | None
@@ -51,27 +44,27 @@ class FlextQualityAnalyzer(FlextService[None]):
         super().__init__()
 
         # Complete flext-core integration
-        self._container = FlextContainer.get_global()
-        self._context = FlextContext()
-        self._bus = FlextBus()
-        self.logger = FlextLogger(__name__)
+        self._container = FlextCore.Container.get_global()
+        self._context = FlextCore.Context()
+        self._bus = FlextCore.Bus()
+        self.logger = FlextCore.Logger(__name__)
 
         self._quality_config = config or FlextQualityConfig()
         self.project_path = Path(project_path)
         self._current_results: FlextQualityModels.AnalysisResults | None = None
 
     @property
-    def logger(self) -> FlextLogger:
+    def logger(self) -> FlextCore.Logger:
         """Get logger instance."""
         if self.logger is None:
-            self.logger = FlextLogger(__name__)
+            self.logger = FlextCore.Logger(__name__)
         return self.logger
 
     @property
-    def container(self) -> FlextContainer:
+    def container(self) -> FlextCore.Container:
         """Get container instance."""
         if self._container is None:
-            self._container = FlextContainer.get_global()
+            self._container = FlextCore.Container.get_global()
         return self._container
 
     def analyze_project(
@@ -186,7 +179,7 @@ class FlextQualityAnalyzer(FlextService[None]):
         include_security: bool = True,
         include_complexity: bool = True,
         include_dead_code: bool = True,
-    ) -> FlextResult[FlextQualityModels.FileAnalysisResult]:
+    ) -> FlextCore.Result[FlextQualityModels.FileAnalysisResult]:
         """Analyze a single Python file."""
         try:
             with file_path.open(encoding="utf-8") as f:
@@ -208,7 +201,7 @@ class FlextQualityAnalyzer(FlextService[None]):
             )  # Style issues often related to complexity
             dead_code_lines = self._detect_dead_code(tree) if include_dead_code else 0
 
-            return FlextResult.ok(
+            return FlextCore.Result.ok(
                 FlextQualityModels.FileAnalysisResult(
                     file_path=file_path,
                     lines_of_code=lines_of_code,
@@ -219,7 +212,7 @@ class FlextQualityAnalyzer(FlextService[None]):
                 )
             )
         except Exception as e:
-            return FlextResult.fail(f"Failed to analyze {file_path}: {e}")
+            return FlextCore.Result.fail(f"Failed to analyze {file_path}: {e}")
 
     def _calculate_file_complexity(self, tree: ast.AST) -> float:
         """Calculate complexity score for a file."""
@@ -428,11 +421,11 @@ class FlextQualityAnalyzer(FlextService[None]):
 
     def get_last_analysis_result(
         self,
-    ) -> FlextResult[FlextQualityModels.AnalysisResults]:
+    ) -> FlextCore.Result[FlextQualityModels.AnalysisResults]:
         """Get the result of the last analysis."""
         if not self._current_results:
-            return FlextResult.fail("No analysis results available")
-        return FlextResult.ok(self._current_results)
+            return FlextCore.Result.fail("No analysis results available")
+        return FlextCore.Result.ok(self._current_results)
 
     def _analyze_security(self) -> list[FlextQualityModels.CodeIssue]:
         """Analyze security issues in the project."""

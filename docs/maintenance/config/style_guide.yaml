@@ -1,0 +1,221 @@
+# FLEXT Quality Documentation Style Guide Configuration
+#
+# Defines formatting standards, consistency rules, and style guidelines
+# for maintaining uniform documentation quality across the project.
+
+markdown:
+  # Heading style preferences
+  heading_style: "atx"  # "atx" (# ## ###) or "setext" (underlines)
+
+  # List style consistency
+  list_style: "dash"    # "dash" (-), "asterisk" (*), or "plus" (+)
+
+  # Emphasis style preference
+  emphasis_style: "*"   # "*" or "_" for emphasis
+
+  # Code block formatting
+  code_block_style: "fenced"  # "fenced" (```) or "indented"
+
+  # Link style preference
+  link_style: "inline"  # "inline" ([text](url)) or "reference"
+
+formatting:
+  # Line length limits
+  max_line_length: 88
+  soft_line_limit: 80
+
+  # Whitespace handling
+  trailing_spaces: false
+  trailing_newlines: true
+  consistent_indentation: true
+
+  # Indentation preferences
+  indentation_type: "spaces"
+  indentation_size: 4
+
+  # Blank line rules
+  blank_lines_before_headings: true
+  blank_lines_after_headings: false
+  blank_lines_around_lists: true
+  blank_lines_around_code_blocks: true
+
+headings:
+  # Heading hierarchy enforcement
+  enforce_hierarchy: true
+  max_heading_level: 4
+
+  # Heading formatting
+  require_space_after_hash: true
+  allow_closing_hashes: false  # ## Heading ##
+
+  # Special heading rules
+  first_heading_level: 1  # Documents should start with H1
+  toc_heading_level: 2    # Table of contents heading level
+
+lists:
+  # List formatting rules
+  consistent_markers: true
+  require_space_after_marker: true
+
+  # Nested list indentation
+  nested_indent_size: 4
+  align_nested_markers: true
+
+  # List item formatting
+  max_list_item_length: 80
+  wrap_long_items: true
+
+code:
+  # Code block requirements
+  require_language_specifier: false
+  preferred_languages:
+    - "python"
+    - "bash"
+    - "json"
+    - "yaml"
+    - "sql"
+    - "javascript"
+    - "html"
+
+  # Inline code formatting
+  inline_code_style: "backticks"  # Only backticks supported
+
+  # Code block formatting
+  consistent_fencing: true
+  fence_style: "backticks"  # backticks (```) or tildes (~~~)
+
+links:
+  # Link formatting rules
+  reference_links: false  # Prefer inline links
+  angle_bracket_urls: false  # Don't use <url> format
+
+  # Link text quality
+  require_descriptive_text: true
+  max_link_text_length: 50
+
+  # URL formatting
+  encode_urls: false
+  lowercase_schemes: true
+
+tables:
+  # Table formatting preferences
+  alignment: "left"  # "left", "center", or "right"
+  padding: 1         # Spaces around content
+  borders: true      # Include borders
+
+  # Table structure
+  require_headers: true
+  consistent_column_width: false
+
+emphasis:
+  # Text emphasis rules
+  bold_style: "**"   # "**" or "__"
+  italic_style: "*"  # "*" or "_"
+
+  # Emphasis consistency
+  consistent_markers: true
+  no_nested_emphasis: true
+
+accessibility:
+  # WCAG compliance settings
+  require_alt_text: true
+  descriptive_link_text: true
+  proper_heading_hierarchy: true
+
+  # Alt text requirements
+  min_alt_text_length: 5
+  max_alt_text_length: 100
+
+  # Color and contrast (future implementation)
+  check_color_contrast: false
+  minimum_contrast_ratio: 4.5
+
+metadata:
+  # Frontmatter requirements
+  require_frontmatter: false
+  frontmatter_format: "yaml"  # "yaml", "toml", or "json"
+
+  # Required frontmatter fields
+  required_fields: []
+    # - "title"
+    # - "author"
+    # - "date"
+
+  # Metadata validation
+  validate_dates: true
+  validate_urls: true
+
+special_elements:
+  # Blockquote formatting
+  blockquote_marker: ">"
+
+  # Horizontal rule style
+  hr_style: "---"  # "---", "***", or "___"
+
+  # Task list formatting
+  task_list_style: "- [ ]"  # Style for task list items
+
+file_specific:
+  # Special rules for specific file types
+  README:
+    require_h1: true
+    max_headings: 10
+    require_installation_section: true
+
+  "docs/**/*.md":
+    require_toc: false  # Only for long documents
+    max_headings: 20
+    require_overview: true
+
+  "CHANGELOG.md":
+    version_format: "semantic"  # "semantic", "calendar", or "custom"
+    require_dates: true
+    require_descriptions: true
+
+  "CONTRIBUTING.md":
+    require_setup_instructions: true
+    require_guidelines: true
+
+spelling:
+  # Spelling check settings
+  enable_spell_check: false  # Requires additional tools
+  language: "en-us"
+  custom_dictionary: []
+    # - "FLEXT"
+    # - "codebase"
+
+  # Ignore patterns
+  ignore_patterns:
+    - "\\b[A-Z]{2,}\\b"  # Acronyms
+    - "\\d+"             # Numbers
+    - "[a-zA-Z]+_[a-zA-Z]+"  # Snake_case identifiers
+
+grammar:
+  # Grammar check settings
+  enable_grammar_check: false  # Requires additional tools
+  strict_mode: false
+
+  # Style preferences
+  oxford_comma: false
+  serial_comma: false
+
+automation:
+  # Auto-fix capabilities
+  enable_auto_fix: true
+  safe_auto_fix_only: true
+
+  # Auto-fix rules
+  auto_fix_trailing_spaces: true
+  auto_fix_multiple_blank_lines: true
+  auto_fix_heading_spacing: true
+  auto_fix_list_consistency: true
+
+reporting:
+  # Style violation reporting
+  report_severity_levels: true
+  group_similar_issues: true
+  include_suggestions: true
+
+  # Output preferences
+  color_output: true
+  verbose_mode: false

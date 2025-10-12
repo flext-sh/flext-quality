@@ -128,6 +128,7 @@ src/flext_quality/
 #### 1. Domain Layer (Business Logic)
 
 ```python
+
 # Domain entities with business rules
 from flext_quality.entities import (
     QualityProject,      # Project entity with validation
@@ -148,6 +149,7 @@ from flext_quality.value_objects import (
 #### 2. Application Layer (Use Cases)
 
 ```python
+
 # Application services orchestrating domain operations
 from flext_quality.services import FlextQualityServices
 
@@ -159,6 +161,7 @@ result = service.analyze_project(project_path)
 #### 3. Infrastructure Layer (Analysis Engine)
 
 ```python
+
 # Analysis backends and external tool integration
 from flext_quality.analyzer import FlextQualityAnalyzer
 from flext_quality.ast_backend import FlextQualityASTBackend
@@ -172,6 +175,7 @@ result = analyzer.analyze_project()
 #### 4. Quality Scoring and Grading
 
 ```python
+
 # Quality grade calculation system
 from flext_quality.grade_calculator import QualityGradeCalculator
 
@@ -219,6 +223,7 @@ else:
 ### Essential Commands
 
 ```bash
+
 # Setup and installation
 make setup                    # Complete development environment setup
 make install                  # Install dependencies only
@@ -250,6 +255,7 @@ make diagnose                 # System diagnostics
 ### Running Specific Tests
 
 ```bash
+
 # Basic tests (when import issues resolved)
 PYTHONPATH=src poetry run pytest tests/unit/test_basic.py -v
 
@@ -309,6 +315,7 @@ def analyze_project(project_path: str) -> QualityAnalysis:
 ### MANDATORY: FLEXT Import Patterns
 
 ```python
+
 # ✅ CORRECT - Root-level flext-quality imports
 from flext_quality import (
     CodeAnalyzer,              # Main analyzer (when fixed)
@@ -323,6 +330,7 @@ from flext_quality.analyzer import FlextQualityCodeAnalyzer  # DON'T DO THIS
 ### Domain Model Usage
 
 ```python
+
 # Use unified Models namespace
 from flext_quality import FlextQualityModels
 
@@ -344,6 +352,7 @@ analysis = FlextQualityEntities.QualityAnalysis.create(
 ### Configuration and Constants
 
 ```python
+
 # Configuration singleton
 from flext_quality import FlextQualityConfig
 config = FlextQualityConfig()
@@ -465,6 +474,7 @@ tests/
 ### Test Categories and Markers
 
 ```python
+
 # Unit tests (fast, isolated)
 @pytest.mark.unit
 def test_quality_entity_creation():
@@ -491,6 +501,7 @@ def test_quality_scoring_accuracy():
 Common fixtures available in all tests:
 
 ```python
+
 # Service fixtures
 flext_quality_analyzer        # FlextQualityAnalyzer instance
 flext_quality_services        # FlextQualityServices instance
@@ -510,6 +521,7 @@ clean_flext_container         # Fresh FlextContainer state
 ### Running Tests (When Import Issues Resolved)
 
 ```bash
+
 # All tests with coverage
 PYTHONPATH=src poetry run pytest --cov=flext_quality --cov-report=html
 
@@ -538,6 +550,7 @@ PYTHONPATH=src poetry run pytest tests/unit/test_analyzer.py::TestAnalyzer::test
 
 **Current Workaround**:
 ```bash
+
 # Use direct analyzer import (bypasses models.py)
 export PYTHONPATH=src
 python -c "from flext_quality.analyzer import FlextQualityAnalyzer; print('Direct import successful')"
@@ -559,6 +572,7 @@ python -c "from flext_quality import CodeAnalyzer; print('Standard import fails'
 
 **Resolution Steps** (After Import Fix):
 ```bash
+
 # These commands will work once import issues are resolved
 PYTHONPATH=src poetry run pyrefly check src/flext_quality/external_backend.py
 PYTHONPATH=src poetry run pyrefly check src/flext_quality/metrics.py
@@ -575,10 +589,12 @@ PYTHONPATH=src poetry run pyrefly check . --show-error-codes | grep "error-code"
 
 **Current Status**:
 ```bash
+
 # All test execution blocked by import failures
 PYTHONPATH=src poetry run pytest tests/ -v  # AttributeError on import
 
 # Cannot run any tests until model compatibility is fixed
+
 # Core analyzer exists and is functional but inaccessible via imports
 ```
 
@@ -590,6 +606,7 @@ PYTHONPATH=src poetry run pytest tests/ -v  # AttributeError on import
 
 **Technical Details**:
 ```python
+
 # What flext_quality/models.py incorrectly tries to do:
 class ProjectModel(FlextModels.BaseModel):  # ❌ FlextModels.BaseModel doesn't exist
     pass
@@ -610,6 +627,7 @@ class ProjectModel(BaseModel):  # ✅ Use pydantic BaseModel directly
 
 **Current Status**:
 ```bash
+
 # CLI completely blocked by import failures
 flext-quality analyze  # AttributeError on module import
 
@@ -628,6 +646,7 @@ print(f'Quality Score: {analyzer.get_quality_score()}')
 
 **Optimizations**:
 ```python
+
 # Use selective analysis for large projects
 analyzer = FlextQualityAnalyzer(large_project_path)
 result = analyzer.analyze_project(
@@ -732,6 +751,7 @@ result = services.apply_custom_rules(
 ### Integration with CI/CD Pipeline
 
 ```python
+
 # ci_cd_integration.py
 from pathlib import Path
 from flext_quality.analyzer import FlextQualityAnalyzer

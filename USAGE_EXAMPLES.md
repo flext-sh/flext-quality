@@ -35,6 +35,7 @@ else:
 ### Linting Service - Fix Issues Gradually
 
 ```python
+
 # ALWAYS test in dry-run first (MANDATORY default)
 result = quality.linting.fix_issues(
     module_path="src/my_module.py",
@@ -54,6 +55,7 @@ if result.is_success:
 ### Type Checker - Run Type Validation
 
 ```python
+
 # Run type checking with console output
 result = quality.types.check_types(
     module_path="src/my_module.py"
@@ -112,6 +114,7 @@ results = [
 ]
 
 result = quality.audit.audit_false_positives(results)
+
 # Returns only non-false positives
 ```
 
@@ -141,6 +144,7 @@ if result.is_success:
 ### Optimize Module with Dry-Run
 
 ```python
+
 # ALWAYS test in dry-run first (MANDATORY default)
 result = optimizer.module.optimize(
     module_path="src/my_module.py",
@@ -367,6 +371,7 @@ colored_text = colorize("Info", Colors.CYAN)
 ### Path Utilities
 
 ```python
+
 # Get project root
 project_root = get_project_root()
 print(f"Project root: {project_root}")
@@ -419,6 +424,7 @@ if arch_result.is_success:
 ### 1. ALWAYS Use Dry-Run First
 
 ```python
+
 # ✅ CORRECT: Test in dry-run first
 result = optimizer.module.optimize("module.py", dry_run=True)
 if result.is_success:
@@ -432,6 +438,7 @@ result = optimizer.module.optimize("module.py", dry_run=False)
 ### 2. ALWAYS Check FlextResult
 
 ```python
+
 # ✅ CORRECT: Check result before using value
 result = quality.linting.fix_issues("module.py")
 if result.is_success:
@@ -446,6 +453,7 @@ value = result.value  # May crash if result.is_failure
 ### 3. ALWAYS Use Keyword Arguments
 
 ```python
+
 # ✅ CORRECT: Use keyword arguments (enforced by *)
 result = optimizer.module.optimize(
     module_path="src/module.py",

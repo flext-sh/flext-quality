@@ -10,7 +10,7 @@ from datetime import UTC, datetime
 from enum import StrEnum
 from typing import override
 
-from flext_core import FlextContainer, FlextLogger, FlextResult
+from flext_core import FlextCore
 from pydantic import BaseModel, Field
 
 from .constants import FlextQualityConstants
@@ -27,8 +27,8 @@ class FlextQualityEntities:
     @override
     def __init__(self) -> None:
         """Initialize quality entities with dependency injection."""
-        self._container = FlextContainer.get_global()
-        self.logger = FlextLogger(__name__)
+        self._container = FlextCore.Container.get_global()
+        self.logger = FlextCore.Logger(__name__)
 
     # =============================================================================
     # NESTED ENUM CLASSES - All status enumerations
@@ -90,11 +90,11 @@ class FlextQualityEntities:
         last_analysis_at: datetime | None = None
         total_analyses: int = Field(default=0)
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self) -> FlextCore.Result[None]:
             """Validate domain rules for quality project."""
             if not self.project_path:
-                return FlextResult[None].fail("Project path is required")
-            return FlextResult[None].ok(None)
+                return FlextCore.Result[None].fail("Project path is required")
+            return FlextCore.Result[None].ok(None)
 
         def update_last_analysis(self) -> FlextQualityEntities.Project:
             """Update last analysis timestamp and return new instance."""
@@ -222,11 +222,11 @@ class FlextQualityEntities:
             """Check if analysis completed successfully."""
             return self.status == FlextQualityEntities.AnalysisStatus.COMPLETED
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self) -> FlextCore.Result[None]:
             """Validate domain rules for quality analysis."""
             if not self.project_id:
-                return FlextResult[None].fail("Project ID is required")
-            return FlextResult[None].ok(None)
+                return FlextCore.Result[None].fail("Project ID is required")
+            return FlextCore.Result[None].ok(None)
 
     class Issue(BaseModel):
         """Quality issue domain entity using enhanced mixins for code reduction."""
@@ -291,11 +291,11 @@ class FlextQualityEntities:
                 },
             )
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self) -> FlextCore.Result[None]:
             """Validate domain rules for quality issue."""
             if not self.analysis_id:
-                return FlextResult[None].fail("Analysis ID is required")
-            return FlextResult[None].ok(None)
+                return FlextCore.Result[None].fail("Analysis ID is required")
+            return FlextCore.Result[None].ok(None)
 
     class Rule(BaseModel):
         """Quality rule domain entity using enhanced mixins for code reduction."""
@@ -341,11 +341,11 @@ class FlextQualityEntities:
             new_parameters[key] = value
             return self.model_copy(update={"parameters": "new_parameters"})
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self) -> FlextCore.Result[None]:
             """Validate domain rules for quality rule."""
             if not self.rule_id:
-                return FlextResult[None].fail("Rule ID is required")
-            return FlextResult[None].ok(None)
+                return FlextCore.Result[None].fail("Rule ID is required")
+            return FlextCore.Result[None].ok(None)
 
     class Report(BaseModel):
         """Quality report domain entity using enhanced mixins for code reduction."""
@@ -377,11 +377,11 @@ class FlextQualityEntities:
                 },
             )
 
-        def validate_business_rules(self) -> FlextResult[None]:
+        def validate_business_rules(self) -> FlextCore.Result[None]:
             """Validate domain rules for quality report."""
             if not self.analysis_id:
-                return FlextResult[None].fail("Analysis ID is required")
-            return FlextResult[None].ok(None)
+                return FlextCore.Result[None].fail("Analysis ID is required")
+            return FlextCore.Result[None].ok(None)
 
     # =============================================================================
     # NESTED EVENT CLASSES - Domain events
@@ -457,6 +457,6 @@ try:
     FlextQualityEntities.ReportGeneratedEvent.model_rebuild()
 except Exception as e:
     # Log rebuild errors in development - should not affect runtime
-    from flext_core import FlextLogger, FlextResult
+    from flext_core import FlextCore
 
-    FlextLogger(__name__).debug("Model rebuild error: %s", e)
+    FlextCore.Logger(__name__).debug("Model rebuild error: %s", e)

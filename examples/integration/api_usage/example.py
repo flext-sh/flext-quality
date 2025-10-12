@@ -6,7 +6,7 @@ This example demonstrates comprehensive usage of the FLEXT Quality API including
 - Advanced service integration patterns
 - FLEXT ecosystem integration (flext-core, flext-observability)
 - /patterns for enterprise applications
-- Error handling with FlextResult patterns
+- Error handling with FlextCore.Result patterns
 - Custom quality workflows and automation
 
 This showcases complete API integration patterns for enterprise applications.
@@ -16,7 +16,7 @@ import sys
 import tempfile
 from pathlib import Path
 
-from flext_core import FlextContainer, FlextLogger
+from flext_core import FlextCore
 from flext_observability import (
     flext_create_log_entry,
     flext_create_metric,
@@ -30,7 +30,7 @@ from flext_quality import (
 )
 from flext_quality.reports import FlextQualityReportGenerator
 
-logger = FlextLogger(__name__)
+logger = FlextCore.Logger(__name__)
 
 
 def demonstrate_simple_api() -> None:
@@ -47,7 +47,7 @@ def demonstrate_simple_api() -> None:
 
 import os
 
-def calculate_score(values: List[float]) -> float:
+def calculate_score(values: FlextCore.Types.FloatList) -> float:
     """Calculate average score from values.
 
     Args:
@@ -69,7 +69,7 @@ class DataProcessor:
       self.threshold = threshold
       self.processed_count = 0
 
-    def process_item(self, item: object) -> FlextTypes.Optional[object]:
+    def process_item(self, item: object) -> FlextCore.Types.Optional[object]:
       """Process individual item with validation."""
       if item is None:
           return None
@@ -87,7 +87,7 @@ class DataProcessor:
           logger.warning(f"Unsupported item type: {type(item)}")
           return None
 
-    def get_stats(self) -> FlextTypes.Dict:
+    def get_stats(self) -> FlextCore.Types.Dict:
       """Get processing statistics."""
       return {
           "processed_count": self.processed_count,
@@ -116,7 +116,7 @@ if __name__ == "__main__":
         analyzer = CodeAnalyzer(str(project_path))
         result = analyzer.analyze_project()
 
-        # Unwrap FlextResult
+        # Unwrap FlextCore.Result
         if result.is_failure:
             logger.error(f"Analysis failed: {result.error}")
             return
@@ -167,7 +167,7 @@ def demonstrate_flext_ecosystem_integration() -> None:
     """Demonstrate FLEXT ecosystem integration patterns."""
     # FLEXT ecosystem integration is always available
 
-    # Demonstrate FlextResult pattern usage
+    # Demonstrate FlextCore.Result pattern usage
 
     # Create sample project for analysis
     with tempfile.TemporaryDirectory() as temp_dir:
@@ -197,7 +197,7 @@ def process_data(data):
             analyzer = CodeAnalyzer(str(project_path))
             result = analyzer.analyze_project()
 
-            # Unwrap FlextResult
+            # Unwrap FlextCore.Result
             if result.is_failure:
                 logger.error(f"Analysis failed: {result.error}")
                 return
@@ -239,8 +239,8 @@ def process_data(data):
             logger.warning(f"Observability integration failed: {e}")
 
         # Demonstrate container-based dependency injection
-        logger.info("Container-based DI demonstration - using FlextContainer")
-        container = FlextContainer()
+        logger.info("Container-based DI demonstration - using FlextCore.Container")
+        container = FlextCore.Container()
 
         # Register quality analyzer
         analyzer_instance = CodeAnalyzer(str(project_path))
@@ -279,12 +279,12 @@ def demonstrate_custom_workflows() -> None:
 """Main application module."""
 
 
-logger = FlextLogger(__name__)
+logger = FlextCore.Logger(__name__)
 
 class Application:
     """Main application class."""
 
-    def __init__(self, config: FlextTypes.Dict):
+    def __init__(self, config: FlextCore.Types.Dict):
       self.config = config
       self.initialized = False
 
@@ -299,7 +299,7 @@ class Application:
           logger.error(f"Initialization failed: {e}")
           return False
 
-    def process_data(self, data: List[object]) -> List[object]:
+    def process_data(self, data: FlextCore.Types.List) -> FlextCore.Types.List:
       """Process input data."""
       if not self.initialized:
           raise RuntimeError("Application not initialized")
@@ -334,7 +334,7 @@ if __name__ == "__main__":
             "utils.py": '''
 """Utility functions."""
 
-def calculate_average(numbers: List[float]) -> float:
+def calculate_average(numbers: FlextCore.Types.FloatList) -> float:
     """Calculate average of numbers."""
     if not numbers:
       return 0.0
@@ -403,7 +403,7 @@ if __name__ == "__main__":
             include_duplicates=True,
         )
 
-        # Unwrap FlextResult
+        # Unwrap FlextCore.Result
         if result.is_failure:
             logger.error(f"Analysis failed: {result.error}")
             return

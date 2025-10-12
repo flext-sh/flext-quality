@@ -120,6 +120,7 @@ Complete user journey testing with full system integration:
 #### Complete Test Suite
 
 ```bash
+
 # Run all tests with coverage
 make test                           # Complete test suite with 90% coverage requirement
 pytest --cov=src --cov-fail-under=90
@@ -131,6 +132,7 @@ pytest -v --cov=src --cov-report=html --cov-report=term-missing
 #### Test Categories
 
 ```bash
+
 # Unit tests only
 make test-unit
 pytest tests/unit/ -v
@@ -150,6 +152,7 @@ pytest tests/test_domain_entities.py -v
 #### Test Filtering
 
 ```bash
+
 # Run tests matching pattern
 pytest -k "analyzer" -v                    # All analyzer-related tests
 pytest -k "domain and not integration" -v  # Domain tests excluding integration
@@ -231,6 +234,7 @@ def test_should_do_something_when_condition():
 ### Test Data Management
 
 ```python
+
 # Test data builders for consistent test object creation
 class QualityProjectBuilder:
     def __init__(self):
@@ -251,12 +255,13 @@ class QualityProjectBuilder:
 ### Mock Standards
 
 ```python
+
 # Consistent mocking patterns for external dependencies
 @pytest.fixture
 def mock_external_analyzer():
     """Mock external analysis tool for unit testing."""
     mock = Mock(spec=ExternalAnalyzerService)
-    mock.analyze_project.return_value = FlextResult[None].ok(
+    mock.analyze_project.return_value = FlextCore.Result[None].ok(
         create_test_analysis_result()
     )
     return mock
@@ -309,6 +314,7 @@ def test_memory_usage_within_limits():
 ### CI/CD Pipeline Integration
 
 ```yaml
+
 # GitHub Actions example
 - name: Run Test Suite
   run: |
@@ -337,6 +343,7 @@ def test_memory_usage_within_limits():
 #### **Test Failures**
 
 ```bash
+
 # Run specific failing test with detailed output
 pytest tests/test_analyzer.py::test_specific_function -vvv --tb=long
 
@@ -350,6 +357,7 @@ pytest --cov=src --cov-report=term-missing --cov-debug=trace
 #### **Performance Issues**
 
 ```bash
+
 # Profile test execution
 pytest --profile
 
@@ -363,6 +371,7 @@ pytest -n auto  # Requires pytest-xdist
 #### **Environment Issues**
 
 ```bash
+
 # Clean test environment
 make clean-test-env
 

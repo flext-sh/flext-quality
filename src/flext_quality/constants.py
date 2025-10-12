@@ -9,13 +9,13 @@ from __future__ import annotations
 import tempfile
 from typing import ClassVar, Literal
 
-from flext_core import FlextConstants
+from flext_core import FlextCore
 
 
-class FlextQualityConstants(FlextConstants):
+class FlextQualityConstants(FlextCore.Constants):
     """Central container for quality assessment constants following FLEXT patterns.
 
-    Extends FlextConstants with quality-specific constants organized into
+    Extends FlextCore.Constants with quality-specific constants organized into
     logical categories with comprehensive type safety and enterprise standards.
     """
 

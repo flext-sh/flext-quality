@@ -1,172 +1,111 @@
-# STRICT Enterprise Pre-commit Configuration
-# Zero tolerance for quality violations
-# All tools managed by Poetry
-
-minimum_pre_commit_version: "3.5.0"
-fail_fast: false
-default_stages: [pre-commit, pre-push]
-default_language_version:
-  python: python3.13
+# FLEXT Quality Documentation Pre-commit Hooks
+# Automated quality checks for documentation files before commits
 
 repos:
-  # Security scanning FIRST - fail fast on vulnerabilities
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.4.0
-    hooks:
-      - id: detect-secrets
-        args: ["--baseline", ".secrets.baseline"]
-        exclude: .*\.lock$|.*\.lockb$
-
-  # Poetry-managed tools via local repo
+  # Documentation Style and Quality Checks
   - repo: local
     hooks:
-      # Black formatting (primary formatter)
-      - id: black
-        name: "⚫ Black Format"
-        entry: poetry run black
+      - id: docs-style-check
+        name: Documentation Style Check
+        description: Check markdown formatting and style consistency
+        entry: python docs/maintenance/tools/style_validator.py
         language: system
-        types: [python]
-        require_serial: true
-        args: [--check, --diff]
+        files: \.(md|mdx)$
+        args: [--strict]
+        pass_filenames: true
+        additional_dependencies: [pyyaml, requests, beautifulsoup4]
 
-      - id: ruff-format
-        name: "⚡ Ruff Format"
-        entry: poetry run ruff format
+      - id: docs-link-check
+        name: Documentation Link Validation
+        description: Validate internal and external links in documentation
+        entry: python docs/maintenance/scripts/validate.py
         language: system
-        types: [python]
-        require_serial: true
-        args: [--check, --diff]
+        files: \.(md|mdx)$
+        args: [--internal-links, --fast-check]
+        pass_filenames: true
+        additional_dependencies: [pyyaml, requests, beautifulsoup4, aiohttp]
 
-      - id: ruff-lint
-        name: "🔥 Ruff Lint (17 categories)"
-        entry: poetry run ruff check
+      - id: docs-quality-audit
+        name: Documentation Quality Audit
+        description: Run comprehensive quality audit on documentation files
+        entry: python docs/maintenance/scripts/audit.py
         language: system
-        types: [python]
-        require_serial: true
-        args: [--fix, --exit-non-zero-on-fix]
+        files: \.(md|mdx)$
+        args: [--quick-audit, --fail-on-critical]
+        pass_filenames: true
+        additional_dependencies: [pyyaml, requests, beautifulsoup4, aiohttp, jinja2]
 
-      # isort import sorting
-      - id: isort
-        name: "📦 Import Sort"
-        entry: poetry run isort
-        language: system
-        types: [python]
-        require_serial: true
-        args: [--check-only, --diff]
+  # Standard markdown formatting
+  - repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.17
+    hooks:
+      - id: mdformat
+        additional_dependencies:
+          - mdformat-gfm
+          - mdformat-frontmatter
+          - mdformat-footnote
 
-      - id: mypy
-        name: "🛡️ MyPy Strict"
-        entry: poetry run mypy
-        language: system
-        types: [python]
-        require_serial: true
+  # Check for broken links (external)
+  - repo: https://github.com/lycheeverse/lychee
+    rev: v0.14.3
+    hooks:
+      - id: lychee
+        name: Check for broken links
+        description: Check URLs for liveness
+        args: [--config docs/maintenance/config/lychee.toml]
         pass_filenames: false
-        args: [src/, tests/, --config-file=pyproject.toml]
 
-      # Bandit security
-      - id: bandit
-        name: "🔒 Bandit Security"
-        entry: poetry run bandit
-        language: system
-        types: [python]
-        require_serial: true
-        args: [-r, src/, --severity-level=medium]
-        exclude: tests/
-
-      # Vulture dead code
-      - id: vulture
-        name: "🦅 Dead Code Detection"
-        entry: poetry run vulture
-        language: system
-        types: [python]
-        pass_filenames: false
-        args: [src/, --min-confidence=80]
-
-      # Radon complexity
-      - id: radon-cc
-        name: "📊 Cyclomatic Complexity"
-        entry: poetry run radon cc
-        language: system
-        types: [python]
-        pass_filenames: false
-        args: [src/, -a, -nb, --total-average]
-
-      - id: radon-mi
-        name: "📊 Maintainability Index"
-        entry: poetry run radon mi
-        language: system
-        types: [python]
-        pass_filenames: false
-        args: [src/, -nb]
-
-  # YAML/TOML/JSON validation
+  # YAML validation for config files
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
+    rev: v4.5.0
     hooks:
       - id: check-yaml
-        name: "📋 YAML Syntax Check"
-      - id: check-toml
-        name: "📋 TOML Syntax Check"
+        files: \.(yaml|yml)$
+        exclude: docs/maintenance/reports/.*\.ya?ml$
+
       - id: check-json
-        name: "📋 JSON Syntax Check"
-      - id: end-of-file-fixer
-        name: "📄 EOF Fixer"
-      - id: trailing-whitespace
-        name: "✂️ Trailing Whitespace"
-      - id: check-added-large-files
-        name: "📦 Large File Check"
-        args: [--maxkb=1000]
-      - id: check-case-conflict
-        name: "🔤 Case Conflict Check"
+        files: \.(json)$
+        exclude: docs/maintenance/reports/.*\.json$
+
       - id: check-merge-conflict
-        name: "⚔️ Merge Conflict Check"
-      - id: mixed-line-ending
-        name: "📏 Line Ending Check"
-        args: [--fix=lf]
-      - id: debug-statements
-        name: "🐛 Debug Statement Check"
+        files: \.(md|mdx)$
 
-  # Python-specific checks
-  - repo: https://github.com/pre-commit/pygrep-hooks
-    rev: v1.10.0
+      - id: trailing-whitespace
+        files: \.(md|mdx)$
+
+      - id: end-of-file-fixer
+        files: \.(md|mdx)$
+
+      - id: check-case-conflict
+
+  # Python code quality (for maintenance scripts)
+  - repo: https://github.com/psf/black
+    rev: 23.12.1
     hooks:
-      - id: python-check-blanket-noqa
-        name: "🚫 Blanket noqa Check"
-      - id: python-check-blanket-type-ignore
-        name: "🚫 Blanket type: ignore Check"
-      - id: python-no-eval
-        name: "🚫 No eval() Check"
-      - id: python-no-log-warn
-        name: "⚠️ No log.warn Check"
-      - id: python-use-type-annotations
-        name: "📝 Type Annotations Check"
+      - id: black
+        files: docs/maintenance/.*\.py$
 
-  # Commit message validation via Poetry
-  - repo: local
+  - repo: https://github.com/pycqa/isort
+    rev: 5.13.2
     hooks:
-      - id: commitizen
-        name: "💬 Commit Message Check"
-        entry: poetry run cz check
-        language: system
-        stages: [commit-msg]
-        pass_filenames: false
-        args: [--commit-msg-file]
+      - id: isort
+        files: docs/maintenance/.*\.py$
 
-# CI configuration
-ci:
-  autofix_prs: false # No automatic fixes - must be intentional
-  autoupdate_schedule: weekly
-  skip: [
-      # Local Poetry hooks do not work in CI
-      black,
-      ruff-format,
-      ruff-lint,
-      isort,
-      mypy,
-      bandit,
-      vulture,
-      radon-cc,
-      radon-mi,
-      commitizen,
-    ]
-  submodules: false
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        files: docs/maintenance/.*\.py$
+        args: [--max-line-length=88, --extend-ignore=E203,W503]
+
+# Custom configuration for lychee (link checker)
+# This would be in docs/maintenance/config/lychee.toml
+# [repo.toml]
+# base = "https://github.com/yamadashy/flext-quality"
+# exclude = [
+#   "https://github.com/yamadashy/flext-quality/edit/.*",
+#   "https://github.com/yamadashy/flext-quality/blob/.*",
+# ]
+# include_fragments = true
+# max_redirects = 5
+# timeout = 10

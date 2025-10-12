@@ -8,7 +8,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import cast
 
-from flext_core import FlextContainer, FlextLogger
+from flext_core import FlextCore
 from pydantic import Field
 from pydantic.fields import FieldInfo
 
@@ -22,8 +22,8 @@ class FlextQualityFields:
 
     def __init__(self) -> None:
         """Initialize fields with dependency injection."""
-        self._container = FlextContainer.get_global()
-        self.logger = FlextLogger(__name__)
+        self._container = FlextCore.Container.get_global()
+        self.logger = FlextCore.Logger(__name__)
 
     @staticmethod
     def entity_id_field(description: str = "Unique entity identifier") -> FieldInfo:

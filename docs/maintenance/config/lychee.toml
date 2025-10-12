@@ -1,0 +1,93 @@
+# Lychee Configuration for FLEXT Quality Documentation
+# Link checking configuration for pre-commit hooks and CI/CD
+
+# Base URL for relative links (GitHub repository)
+base = "https://github.com/yamadashy/flext-quality"
+
+# Exclude patterns for links that shouldn't be checked
+exclude = [
+  # GitHub edit links (often broken for external checkers)
+  "https://github.com/yamadashy/flext-quality/edit/.*",
+  "https://github.com/yamadashy/flext-quality/blob/.*",
+
+  # Local development URLs
+  "http://localhost.*",
+  "http://127.0.0.1.*",
+
+  # Private/internal URLs that may not be accessible
+  "https://internal\\..*",
+  "https://corp\\..*",
+  "https://private\\..*",
+
+  # Social media and external platforms (may be rate-limited)
+  "https://twitter\\.com/.*",
+  "https://x\\.com/.*",
+  "https://linkedin\\.com/.*",
+
+  # Email links
+  "mailto:.*",
+
+  # JavaScript and special protocols
+  "javascript:.*",
+  "tel:.*",
+  "sms:.*",
+]
+
+# Include URL fragments in checks (anchors like #section)
+include_fragments = true
+
+# Maximum number of redirects to follow
+max_redirects = 5
+
+# Timeout for individual link checks (seconds)
+timeout = 10
+
+# Maximum number of concurrent requests
+max_concurrency = 10
+
+# User agent string
+user_agent = "FLEXT-Quality-Doc-Link-Checker/1.0 (https://github.com/yamadashy/flext-quality)"
+
+# Accept invalid SSL certificates (not recommended for production)
+accept_invalid_certificates = false
+
+# Include links from these file types
+include = ["**/*.md", "**/*.mdx", "**/*.html", "**/*.rst"]
+
+# Exclude these paths from link checking
+exclude_path = [
+  # Generated files
+  "**/node_modules/**",
+  "**/build/**",
+  "**/dist/**",
+  "**/.git/**",
+  "**/__pycache__/**",
+
+  # Documentation maintenance files
+  "docs/maintenance/reports/**",
+  "docs/maintenance/**/backup/**",
+
+  # Test files
+  "**/test*/**",
+  "**/*test*/**",
+]
+
+# Check links in code comments
+include_comments = false
+
+# Require HTTPS for external links
+require_https = false
+
+# Skip checking links that match these patterns
+skip_missing = [
+  # GitHub issue/PR references (may not exist yet)
+  "https://github\\.com/yamadashy/flext-quality/issues/\\d+",
+  "https://github\\.com/yamadashy/flext-quality/pull/\\d+",
+
+  # Version-specific documentation that may not exist
+  "https://github\\.com/yamadashy/flext-quality/tree/v.*",
+  "https://github\\.com/yamadashy/flext-quality/releases/tag/.*",
+]
+
+# Custom headers for requests
+# headers = { "Authorization" = "Bearer $GITHUB_TOKEN" }

@@ -11,20 +11,20 @@ Consolidates validation scripts:
 
 from __future__ import annotations
 
-from flext_core import FlextLogger, FlextResult, FlextService
+from flext_core import FlextCore
 from pydantic import ConfigDict
 
 from flext_quality.models import FlextQualityModels
 
 
-class FlextQualityValidationTools(FlextService[None]):
+class FlextQualityValidationTools(FlextCore.Service[None]):
     """Unified validation tools with flext-core integration for quality operations."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True, extra="allow")
 
-    def execute(self) -> FlextResult[None]:
-        """Execute validation tools service - FlextService interface."""
-        return FlextResult[None].ok(None)
+    def execute(self) -> FlextCore.Result[None]:
+        """Execute validation tools service - FlextCore.Service interface."""
+        return FlextCore.Result[None].ok(None)
 
     class EquilibriumValidator:
         """Equilibrium validation across ecosystem."""
@@ -32,17 +32,17 @@ class FlextQualityValidationTools(FlextService[None]):
         @staticmethod
         def validate_equilibrium(
             workspace_path: str,
-        ) -> FlextResult[FlextQualityModels.QualityValidationResult]:
+        ) -> FlextCore.Result[FlextQualityModels.QualityValidationResult]:
             """Validate ecosystem equilibrium.
 
             Args:
                 workspace_path: Path to workspace
 
             Returns:
-                FlextResult with validation results
+                FlextCore.Result with validation results
 
             """
-            logger = FlextLogger(__name__)
+            logger = FlextCore.Logger(__name__)
             logger.info(f"Validating equilibrium for {workspace_path}")
 
             result = FlextQualityModels.QualityValidationResult(
@@ -52,7 +52,9 @@ class FlextQualityValidationTools(FlextService[None]):
                 failures=[],
             )
 
-            return FlextResult[FlextQualityModels.QualityValidationResult].ok(result)
+            return FlextCore.Result[FlextQualityModels.QualityValidationResult].ok(
+                result
+            )
 
     class DomainValidator:
         """Domain separation validation."""
@@ -60,17 +62,17 @@ class FlextQualityValidationTools(FlextService[None]):
         @staticmethod
         def validate_domain_separation(
             project_path: str,
-        ) -> FlextResult[FlextQualityModels.QualityValidationResult]:
+        ) -> FlextCore.Result[FlextQualityModels.QualityValidationResult]:
             """Validate proper domain separation.
 
             Args:
                 project_path: Path to project
 
             Returns:
-                FlextResult with validation results
+                FlextCore.Result with validation results
 
             """
-            logger = FlextLogger(__name__)
+            logger = FlextCore.Logger(__name__)
             logger.info(f"Validating domain separation for {project_path}")
 
             result = FlextQualityModels.QualityValidationResult(
@@ -80,7 +82,9 @@ class FlextQualityValidationTools(FlextService[None]):
                 failures=[],
             )
 
-            return FlextResult[FlextQualityModels.QualityValidationResult].ok(result)
+            return FlextCore.Result[FlextQualityModels.QualityValidationResult].ok(
+                result
+            )
 
     class EcosystemValidator:
         """Ecosystem-wide quality validation."""
@@ -88,17 +92,17 @@ class FlextQualityValidationTools(FlextService[None]):
         @staticmethod
         def validate_ecosystem_quality(
             workspace_path: str,
-        ) -> FlextResult[FlextQualityModels.QualityValidationResult]:
+        ) -> FlextCore.Result[FlextQualityModels.QualityValidationResult]:
             """Validate complete ecosystem quality.
 
             Args:
                 workspace_path: Path to workspace
 
             Returns:
-                FlextResult with validation results
+                FlextCore.Result with validation results
 
             """
-            logger = FlextLogger(__name__)
+            logger = FlextCore.Logger(__name__)
             logger.info(f"Validating ecosystem quality for {workspace_path}")
 
             result = FlextQualityModels.QualityValidationResult(
@@ -108,12 +112,14 @@ class FlextQualityValidationTools(FlextService[None]):
                 failures=[],
             )
 
-            return FlextResult[FlextQualityModels.QualityValidationResult].ok(result)
+            return FlextCore.Result[FlextQualityModels.QualityValidationResult].ok(
+                result
+            )
 
     def __init__(self) -> None:
         """Initialize validation tools service."""
         super().__init__()
-        self.logger = FlextLogger(__name__)
+        self.logger = FlextCore.Logger(__name__)
 
         # Initialize helper services
         self.equilibrium = self.EquilibriumValidator()

@@ -18,7 +18,7 @@ from fastapi.responses import HTMLResponse
 
 # Domain library imports (ZERO TOLERANCE - NO direct FastAPI imports)
 from flext_auth import FlextAuth, FlextAuthJwtProvider
-from flext_core import FlextContainer, FlextLogger, FlextResult, FlextTypes
+from flext_core import FlextCore
 
 from .analyzer import CodeAnalyzer
 from .api import FlextQuality
@@ -31,13 +31,17 @@ from .models import FlextQualityModels
 # Mock WebAuthMiddleware until flext_auth is available
 class WebAuthMiddleware:
     def __init__(
-        self, auth_provider: object, exclude_paths: list[str] | None = None
+        self,
+        auth_provider: object,
+        exclude_paths: FlextCore.Types.StringList | None = None,
     ) -> None:
         self.auth_provider = auth_provider
         self.exclude_paths = exclude_paths or []
 
 
-def create_fastapi_app(config: FlextQualityModels.AppConfig) -> FlextResult[FastAPI]:
+def create_fastapi_app(
+    config: FlextQualityModels.AppConfig,
+) -> FlextCore.Result[FastAPI]:
     """Temporary mock implementation of create_fastapi_app."""
     try:
         app = FastAPI(
@@ -46,9 +50,9 @@ def create_fastapi_app(config: FlextQualityModels.AppConfig) -> FlextResult[Fast
             docs_url="/docs" if config.enable_docs else None,
             redoc_url="/redoc" if config.enable_docs else None,
         )
-        return FlextResult[FastAPI].ok(app)
+        return FlextCore.Result[FastAPI].ok(app)
     except Exception as e:
-        return FlextResult[FastAPI].fail(f"Failed to create FastAPI app: {e}")
+        return FlextCore.Result[FastAPI].fail(f"Failed to create FastAPI app: {e}")
 
 
 class FlextQualityWeb:
@@ -62,8 +66,8 @@ class FlextQualityWeb:
 
     def __init__(self) -> None:
         """Initialize quality web interface with flext ecosystem integration."""
-        self._container = FlextContainer.get_global()
-        self.logger = FlextLogger(__name__)
+        self._container = FlextCore.Container.get_global()
+        self.logger = FlextCore.Logger(__name__)
 
         # Initialize quality configuration
         self._quality_config = FlextQualityConfig()
@@ -96,7 +100,7 @@ class FlextQualityWeb:
         """Setup authentication using flext-auth with JWT provider."""
         try:
             # Create auth config dict for JWT provider
-            auth_config: FlextTypes.Dict = {
+            auth_config: FlextCore.Types.Dict = {
                 "secret_key": self._quality_config.project_name + "-secret-key",
                 "algorithm": "HS256",
                 "token_expiry_minutes": 60,
@@ -237,7 +241,7 @@ class FlextQualityWeb:
       </html>
       """
 
-    async def analyze_project(self, request: Request) -> FlextTypes.Dict:
+    async def analyze_project(self, request: Request) -> FlextCore.Types.Dict:
         """Analyze a project and return results (FastAPI endpoint).
 
         Requires authentication via WebAuthMiddleware.
@@ -283,7 +287,7 @@ class FlextQualityWeb:
             },
         }
 
-    def get_metrics(self) -> FlextTypes.Dict:
+    def get_metrics(self) -> FlextCore.Types.Dict:
         """Get quality metrics (FastAPI endpoint).
 
         Requires authentication via WebAuthMiddleware.
@@ -291,7 +295,7 @@ class FlextQualityWeb:
         # Use simple placeholder metrics for now
         return {"success": True, "data": {}}
 
-    def get_report(self, report_format: str) -> FlextTypes.Dict:
+    def get_report(self, report_format: str) -> FlextCore.Types.Dict:
         """Generate and return quality report (FastAPI endpoint).
 
         Args:

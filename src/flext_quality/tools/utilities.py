@@ -13,10 +13,10 @@ from pathlib import Path
 from typing import ClassVar, Self
 
 from flext_cli import FlextCli
-from flext_core import FlextLogger, FlextResult, FlextService
+from flext_core import FlextCore
 
 
-class FlextQualityToolsUtilities(FlextService[None]):
+class FlextQualityToolsUtilities(FlextCore.Service[None]):
     """Unified utilities with complete flext-core integration.
 
     Consolidates:
@@ -72,8 +72,8 @@ class FlextQualityToolsUtilities(FlextService[None]):
         def print_colored(
             message: str,
             color: str = "",
-            logger: FlextLogger | None = None,
-        ) -> FlextResult[None]:
+            logger: FlextCore.Logger | None = None,
+        ) -> FlextCore.Result[None]:
             """Print text with color formatting using flext-cli.
 
             MANDATORY: Uses FlextCli for output (NO direct rich/click).
@@ -84,7 +84,7 @@ class FlextQualityToolsUtilities(FlextService[None]):
                 logger: Optional logger for parallel logging
 
             Returns:
-                FlextResult indicating success/failure of print operation
+                FlextCore.Result indicating success/failure of print operation
 
             """
             if logger:
@@ -94,15 +94,15 @@ class FlextQualityToolsUtilities(FlextService[None]):
                 # Use print() directly since FlextCli doesn't have console attribute
                 if color:
                     FlextQualityToolsUtilities.Colors.colorize(message, color)
-                return FlextResult[None].ok(None)
+                return FlextCore.Result[None].ok(None)
             except Exception as e:
-                return FlextResult[None].fail(f"CLI output failed: {e}")
+                return FlextCore.Result[None].fail(f"CLI output failed: {e}")
 
     class Paths:
         """Path utilities for workspace navigation and file operations."""
 
         # Ignore patterns (common directories/files to skip)
-        IGNORE_PATTERNS: ClassVar[list[str]] = [
+        IGNORE_PATTERNS: ClassVar[FlextCore.Types.StringList] = [
             "__pycache__",
             ".git",
             ".venv",
@@ -172,7 +172,7 @@ class FlextQualityToolsUtilities(FlextService[None]):
         @staticmethod
         def find_python_files(
             root: str | Path,
-            exclude_patterns: list[str] | None = None,
+            exclude_patterns: FlextCore.Types.StringList | None = None,
         ) -> list[Path]:
             """Find all Python files in directory tree.
 
@@ -201,7 +201,7 @@ class FlextQualityToolsUtilities(FlextService[None]):
         """Standard library module detection."""
 
         @staticmethod
-        def get_stdlib_modules() -> list[str]:
+        def get_stdlib_modules() -> FlextCore.Types.StringList:
             """Get list of Python standard library modules.
 
             Returns:
@@ -264,17 +264,17 @@ class FlextQualityToolsUtilities(FlextService[None]):
     def __init__(self: Self) -> None:
         """Initialize utilities service."""
         super().__init__()
-        self.logger = FlextLogger(__name__)
+        self.logger = FlextCore.Logger(__name__)
         self._cli = FlextCli()  # MANDATORY: Use flext-cli
 
-    def execute(self: Self) -> FlextResult[None]:
-        """Execute utilities service - FlextService interface.
+    def execute(self: Self) -> FlextCore.Result[None]:
+        """Execute utilities service - FlextCore.Service interface.
 
         Returns:
-            FlextResult indicating service execution success
+            FlextCore.Result indicating service execution success
 
         """
-        return FlextResult[None].ok(None)
+        return FlextCore.Result[None].ok(None)
 
 
 # Backward compatibility aliases (for existing code)
@@ -342,7 +342,7 @@ def should_ignore_path(path: str | Path) -> bool:
     return FlextQualityToolsUtilities.Paths.should_ignore_path(path)
 
 
-def get_stdlib_modules() -> list[str]:
+def get_stdlib_modules() -> FlextCore.Types.StringList:
     """Convenience function for get_stdlib_modules.
 
     Returns:

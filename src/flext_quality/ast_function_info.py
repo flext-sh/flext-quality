@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextTypes
+from flext_core import FlextCore
 from pydantic import BaseModel
 
 
@@ -19,7 +19,7 @@ class FunctionInfo(BaseModel):
     package_name: str
     line_number: int
     end_line_number: int
-    decorators: FlextTypes.StringList
+    decorators: FlextCore.Types.StringList
     is_generator: bool
     is_method: bool
     is_property: bool

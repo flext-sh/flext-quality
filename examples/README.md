@@ -15,7 +15,7 @@ Fundamental quality analysis operations and simple API usage:
 - **Simple Analysis**: Basic project analysis with default settings
 - **Custom Configuration**: Analysis with custom thresholds and settings
 - **Result Processing**: Working with analysis results and quality metrics
-- **Error Handling**: Proper error handling with FlextResult patterns
+- **Error Handling**: Proper error handling with FlextCore.Result patterns
 
 ### **Advanced Analysis** (`advanced/`)
 
@@ -67,6 +67,7 @@ Report generation and dashboard integration examples:
 ### Basic Project Analysis
 
 ```python
+
 # examples/basic/simple_analysis.py
 from flext_quality import CodeAnalyzer
 
@@ -88,13 +89,14 @@ print(f"Issues Found: {len(results['issues']['security']) + len(results['issues'
 ### FLEXT Ecosystem Integration
 
 ```python
+
 # examples/integration/flext_ecosystem.py
 from flext_quality import QualityAPI
-from flext_core import FlextContainer
+from flext_core import FlextCore
 from flext_observability import create_metric
 
 # Initialize with dependency injection
-container = FlextContainer()
+container = FlextCore.Container()
 quality_api = QualityAPI(container)
 
 # Execute analysis with observability
@@ -119,6 +121,7 @@ def analyze_with_monitoring(project_path: str):
 ### CI/CD Quality Gate
 
 ```yaml
+
 # examples/ci-cd/github-actions.yml
 name: Quality Gate
 on: [push, pull_request]
@@ -176,6 +179,7 @@ Each example directory contains:
 ### Prerequisites
 
 ```bash
+
 # Install FLEXT Quality
 pip install flext-quality
 
@@ -188,6 +192,7 @@ make install
 ### Execute Examples
 
 ```bash
+
 # Navigate to example directory
 cd examples/basic/simple_analysis
 
@@ -204,6 +209,7 @@ ls -la reports/
 ### Docker Execution
 
 ```bash
+
 # Use Docker for isolated execution
 cd examples/advanced/multi_backend
 
@@ -223,7 +229,7 @@ docker-compose exec quality-analysis cat /app/reports/analysis_results.json
 | **simple_analysis**   | Basic project analysis        | Beginner     | None        |
 | **custom_config**     | Custom analysis configuration | Beginner     | flext-core  |
 | **result_processing** | Working with analysis results | Intermediate | flext-core  |
-| **error_handling**    | FlextResult error patterns    | Intermediate | flext-core  |
+| **error_handling**    | FlextCore.Result error patterns    | Intermediate | flext-core  |
 
 ### Advanced Examples
 
@@ -248,7 +254,7 @@ docker-compose exec quality-analysis cat /app/reports/analysis_results.json
 ### Code Quality
 
 - **Type Safety**: Comprehensive type hints and MyPy validation
-- **Error Handling**: Consistent FlextResult patterns throughout
+- **Error Handling**: Consistent FlextCore.Result patterns throughout
 - **Documentation**: Enterprise-grade docstrings and code comments
 - **Testing**: Unit tests and integration test examples
 
@@ -291,6 +297,7 @@ docker-compose exec quality-analysis cat /app/reports/analysis_results.json
 #### **Import Errors**
 
 ```bash
+
 # Ensure FLEXT Quality is properly installed
 pip install --upgrade flext-quality
 
@@ -301,6 +308,7 @@ python -c "import flext_quality; print(flext_quality.__version__)"
 #### **Configuration Issues**
 
 ```bash
+
 # Validate configuration file
 flext-quality validate-config config.yaml
 
@@ -311,6 +319,7 @@ flext-quality check-env
 #### **Permission Issues**
 
 ```bash
+
 # Ensure proper file permissions
 chmod +x example.py
 
