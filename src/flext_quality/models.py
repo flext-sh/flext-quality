@@ -952,7 +952,7 @@ class FlextQualityModels(FlextCore.Models):
         style_issues: int = Field(default=0, ge=0, description="Number of style issues")
         dead_code_lines: int = Field(default=0, ge=0, description="Lines of dead code")
 
-    class CodeIssue(BaseModel):
+    class CodeIssue(FlextCore.Models.BaseModel):
         """General code quality issue."""
 
         file_path: str = Field(..., description="File where issue was found")
@@ -967,7 +967,7 @@ class FlextQualityModels(FlextCore.Models):
             default=None, description="Rule that detected the issue"
         )
 
-    class ComplexityIssue(BaseModel):
+    class ComplexityIssue(FlextCore.Models.BaseModel):
         """Complexity-related code issue."""
 
         file_path: str = Field(..., description="File where issue was found")
@@ -1250,14 +1250,303 @@ class FlextQualityModels(FlextCore.Models):
         source: str
         required_by: FlextCore.Types.StringList
 
+    # =============================================================================
+    # DOMAIN ENTITY MODELS - Moved from entities.py
+    # =============================================================================
 
-# Backward compatibility aliases for existing code
-FlextQualityProjectModel = FlextQualityModels.ProjectModel
-FlextQualityAnalysisModel = FlextQualityModels.AnalysisModel
-FlextQualityIssueModel = FlextQualityModels.IssueModel
-FlextQualityReportModel = FlextQualityModels.ReportModel
-FlextAnalysisConfigModel = FlextQualityModels.ConfigModel
-QualityValidationResult = FlextQualityModels.QualityValidationResult
+    class DomainEvent(FlextCore.Models.BaseModel):
+        """Base class for domain events."""
+
+        event_type: str
+        timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+    class Project(FlextCore.Models.BaseModel):
+        """Quality project domain entity using enhanced mixins for code reduction."""
+
+        # Project identification
+        name: str = Field(..., min_length=1)
+        # Project paths
+        project_path: str = Field(..., min_length=1)
+        repository_url: str | None = None
+
+        # Configuration
+        config_path: str | None = None
+        language: str = Field(default="python")
+
+        # Analysis settings
+        auto_analyze: bool = Field(default=True)
+        analysis_schedule: str | None = None  # cron format
+
+        # Quality thresholds from constants
+        min_coverage: float = Field(
+            default=FlextQualityConstants.Coverage.MINIMUM_COVERAGE, ge=0.0, le=100.0
+        )
+        max_complexity: int = Field(
+            default=FlextQualityConstants.Complexity.MAX_COMPLEXITY, ge=1
+        )
+        max_duplication: float = Field(
+            default=FlextQualityConstants.Duplication.MAXIMUM_DUPLICATION,
+            ge=0.0,
+            le=100.0,
+        )
+
+        # Statistics
+        last_analysis_at: datetime | None = None
+        total_analyses: int = Field(default=0)
+
+    class Analysis(FlextCore.Models.BaseModel):
+        """Quality analysis domain entity with comprehensive analysis tracking."""
+
+        # Analysis identification
+        analysis_id: UUID = Field(
+            default_factory=UUID, description="Unique analysis ID"
+        )
+        project_id: UUID = Field(..., description="Project this analysis belongs to")
+
+        # Analysis metadata
+        status: FlextQualityEntities.AnalysisStatus = Field(
+            default=FlextQualityEntities.AnalysisStatus.QUEUED
+        )
+        started_at: datetime | None = None
+        completed_at: datetime | None = None
+        duration_seconds: float | None = None
+
+        # Analysis configuration
+        include_security: bool = Field(default=True)
+        include_complexity: bool = Field(default=True)
+        include_coverage: bool = Field(default=True)
+        include_duplication: bool = Field(default=False)
+        include_dependencies: bool = Field(default=True)
+
+        # Analysis results
+        overall_score: float | None = None
+        coverage_score: float | None = None
+        complexity_score: float | None = None
+        security_score: float | None = None
+        maintainability_score: float | None = None
+
+        # File and issue statistics
+        total_files: int = Field(default=0)
+        analyzed_files: int = Field(default=0)
+        total_lines: int = Field(default=0)
+        issues_found: int = Field(default=0)
+        critical_issues: int = Field(default=0)
+        high_issues: int = Field(default=0)
+        medium_issues: int = Field(default=0)
+        low_issues: int = Field(default=0)
+
+        # Analysis artifacts
+        report_path: str | None = None
+        log_path: str | None = None
+
+        # Error handling
+        error_message: str | None = None
+        retry_count: int = Field(default=0)
+
+    class Issue(FlextCore.Models.BaseModel):
+        """Quality issue domain entity with detailed issue tracking."""
+
+        # Issue identification
+        issue_id: UUID = Field(default_factory=UUID, description="Unique issue ID")
+        analysis_id: UUID = Field(..., description="Analysis that found this issue")
+
+        # Issue location
+        file_path: str = Field(..., description="File where issue was found")
+        line_number: int = Field(..., ge=1, description="Line number of issue")
+        column_number: int | None = None
+
+        # Issue details
+        issue_type: FlextQualityValueObjects.IssueType = Field(
+            ..., description="Type of quality issue"
+        )
+        severity: FlextQualityValueObjects.IssueSeverity = Field(
+            default=FlextQualityValueObjects.IssueSeverity.MEDIUM,
+            description="Issue severity level",
+        )
+        rule_id: str | None = None
+        rule_name: str | None = None
+
+        # Issue content
+        message: str = Field(..., description="Human-readable issue message")
+        description: str | None = None
+        suggestion: str | None = None
+
+        # Context information
+        context_lines: FlextCore.Types.StringList | None = None
+        related_code: str | None = None
+
+        # Issue metadata
+        tool_name: str | None = None  # ruff, mypy, bandit, etc.
+        tool_version: str | None = None
+        detected_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+        # Resolution tracking
+        resolved: bool = Field(default=False)
+        resolved_at: datetime | None = None
+        resolution_notes: str | None = None
+
+    class Rule(FlextCore.Models.BaseModel):
+        """Quality rule domain entity defining analysis rules and thresholds."""
+
+        # Rule identification
+        rule_id: str = Field(..., description="Unique rule identifier")
+        name: str = Field(..., description="Human-readable rule name")
+
+        # Rule metadata
+        category: str = Field(
+            ..., description="Rule category (security, complexity, style)"
+        )
+        tool: str = Field(..., description="Tool that implements this rule")
+
+        # Rule configuration
+        enabled: bool = Field(default=True)
+        severity: FlextQualityValueObjects.IssueSeverity = Field(
+            default=FlextQualityValueObjects.IssueSeverity.MEDIUM
+        )
+
+        # Rule parameters
+        parameters: dict[str, FlextQualityTypes.AnyValue] | None = None
+
+        # Rule description
+        description: str = Field(..., description="Rule description")
+        rationale: str | None = None
+        examples: FlextCore.Types.StringList | None = None
+
+        # Rule metadata
+        version: str = Field(default="1.0.0")
+        deprecated: bool = Field(default=False)
+        replacement_rule: str | None = None
+
+    class Report(FlextCore.Models.BaseModel):
+        """Quality report domain entity containing analysis summaries and insights."""
+
+        # Report identification
+        report_id: UUID = Field(default_factory=UUID, description="Unique report ID")
+        analysis_id: UUID = Field(..., description="Analysis this report is based on")
+
+        # Report metadata
+        generated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+        report_type: str = Field(default="comprehensive", description="Type of report")
+        format: str = Field(default="html", description="Report format")
+
+        # Report content
+        title: str = Field(..., description="Report title")
+        summary: str | None = None
+        executive_summary: str | None = None
+
+        # Quality scores
+        overall_score: float | None = None
+        coverage_score: float | None = None
+        complexity_score: float | None = None
+        security_score: float | None = None
+        maintainability_score: float | None = None
+
+        # Statistics
+        total_files: int = Field(default=0)
+        analyzed_files: int = Field(default=0)
+        total_lines: int = Field(default=0)
+        total_issues: int = Field(default=0)
+        critical_issues: int = Field(default=0)
+        high_issues: int = Field(default=0)
+        medium_issues: int = Field(default=0)
+        low_issues: int = Field(default=0)
+
+        # File paths
+        html_report_path: str | None = None
+        json_report_path: str | None = None
+        pdf_report_path: str | None = None
+
+        # Report sections
+        sections: dict[str, FlextQualityTypes.AnyValue] | None = None
+
+    # =============================================================================
+    # AST ANALYSIS MODELS - Moved from ast_*.py files
+    # =============================================================================
+
+    class FunctionInfo(FlextCore.Models.BaseModel):
+        """Strongly-typed function information from AST analysis."""
+
+        name: str
+        full_name: str
+        file_path: str
+        package_name: str
+        line_number: int
+        end_line_number: int
+        decorators: FlextCore.Types.StringList
+        is_generator: bool
+        is_method: bool
+        is_property: bool
+        is_class_method: bool
+        is_static_method: bool
+        parameter_count: int
+        returns_annotation: str | None
+        complexity: int
+        docstring: str | None
+
+    class ClassInfo(FlextCore.Models.BaseModel):
+        """Strongly-typed class information from AST analysis."""
+
+        name: str
+        full_name: str
+        file_path: str
+        package_name: str
+        line_number: int
+        end_line_number: int
+        base_classes: FlextCore.Types.StringList
+        decorators: FlextCore.Types.StringList
+        is_dataclass: bool
+        is_abstract: bool
+        has_docstring: bool
+        method_count: int
+        public_methods: int
+        private_methods: int
+        protected_methods: int
+        property_count: int = 0
+        class_method_count: int = 0
+        static_method_count: int = 0
+        complexity: int = 0
+
+    # =============================================================================
+    # DOMAIN EVENT MODELS - Moved from entities.py
+    # =============================================================================
+
+    class ProjectCreatedEvent(DomainEvent):
+        """Event fired when a quality project is created."""
+
+        project_id: UUID
+        project_name: str
+        project_path: str
+
+    class AnalysisStartedEvent(DomainEvent):
+        """Event fired when analysis starts."""
+
+        analysis_id: UUID
+        project_id: UUID
+
+    class AnalysisCompletedEvent(DomainEvent):
+        """Event fired when analysis completes."""
+
+        analysis_id: UUID
+        project_id: UUID
+        overall_score: float
+        issues_found: int
+
+    class IssueDetectedEvent(DomainEvent):
+        """Event fired when a quality issue is detected."""
+
+        issue_id: UUID
+        analysis_id: UUID
+        issue_type: str
+        severity: str
+
+    class ReportGeneratedEvent(DomainEvent):
+        """Event fired when a quality report is generated."""
+
+        report_id: UUID
+        analysis_id: UUID
+        report_type: str
+        format: str
+
 
 # Export models for clean imports
 __all__ = [

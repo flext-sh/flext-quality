@@ -47,7 +47,7 @@ class FlextQualityAnalyzer(FlextCore.Service[None]):
         self._container = FlextCore.Container.get_global()
         self._context = FlextCore.Context()
         self._bus = FlextCore.Bus()
-        self.logger = FlextCore.Logger(__name__)
+        self._logger = FlextCore.Logger(__name__)
 
         self._quality_config = config or FlextQualityConfig()
         self.project_path = Path(project_path)
@@ -56,15 +56,20 @@ class FlextQualityAnalyzer(FlextCore.Service[None]):
     @property
     def logger(self) -> FlextCore.Logger:
         """Get logger instance."""
-        if self.logger is None:
-            self.logger = FlextCore.Logger(__name__)
-        return self.logger
+        if self._logger is None:
+            self._logger = FlextCore.Logger(__name__)
+        return self._logger
 
     @property
     def container(self) -> FlextCore.Container:
         """Get container instance."""
         if self._container is None:
-            self._container = FlextCore.Container.get_global()
+            container = FlextCore.Container.get_global()
+            if container is not None:
+                self._container = container
+            else:
+                msg = "Failed to get global container"
+                raise RuntimeError(msg)
         return self._container
 
     def analyze_project(

@@ -8,7 +8,6 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from enum import StrEnum
-from typing import override
 
 from flext_core import FlextCore
 from pydantic import BaseModel, Field
@@ -17,18 +16,12 @@ from .constants import FlextQualityConstants
 from .typings import FlextQualityTypes
 
 
-class FlextQualityEntities:
+class FlextQualityEntities(FlextCore.Models.BaseModel):
     """Unified quality entities class following FLEXT pattern - ZERO DUPLICATION.
 
     Single responsibility: Quality domain entities management
     Contains all domain entities as nested classes with shared functionality.
     """
-
-    @override
-    def __init__(self) -> None:
-        """Initialize quality entities with dependency injection."""
-        self._container = FlextCore.Container.get_global()
-        self.logger = FlextCore.Logger(__name__)
 
     # =============================================================================
     # NESTED ENUM CLASSES - All status enumerations

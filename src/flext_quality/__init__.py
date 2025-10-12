@@ -16,6 +16,8 @@ from .analysis_types import FlextQualityAnalysisTypes
 from .analyzer import FlextQualityAnalyzer as CodeAnalyzer
 from .api import FlextQuality as FlextQuality, FlextQuality as QualityAPI
 from .ast_backend import FlextQualityASTBackend as ASTBackend
+from .ast_class_info import FlextQualityASTClassInfo
+from .ast_function_info import FlextQualityASTFunctionInfo
 from .backend_type import BackendType
 from .base import BaseAnalyzer
 
@@ -67,6 +69,8 @@ __all__ = [
     "CodeAnalyzer",
     "ExternalBackend",
     "FlextQuality",
+    "FlextQualityASTClassInfo",
+    "FlextQualityASTFunctionInfo",
     "FlextQualityAnalysisError",
     "FlextQualityAnalysisTypes",
     "FlextQualityAuthenticationError",

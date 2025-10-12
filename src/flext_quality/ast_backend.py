@@ -12,8 +12,8 @@ from typing import override
 
 from flext_core import FlextCore
 
-from .ast_class_info import ClassInfo
-from .ast_function_info import FunctionInfo
+from .ast_class_info import FlextQualityASTClassInfo
+from .ast_function_info import FlextQualityASTFunctionInfo
 from .backend_type import BackendType
 from .base import BaseAnalyzer
 
@@ -27,8 +27,8 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
     def __init__(self) -> None:
         """Initialize AST backend with dependency injection."""
-        self._container = FlextCore.Container.get_global().clear()().get_or_create()
-        self.logger = FlextCore.Logger(__name__)
+        self._container = FlextCore.Container.get_global()
+        self._logger = FlextCore.Logger(__name__)
 
     class _ASTVisitor(ast.NodeVisitor):
         """Nested AST visitor to extract detailed code structure information."""
@@ -37,13 +37,15 @@ class FlextQualityASTBackend(BaseAnalyzer):
             """Initialize AST visitor with file path and package name."""
             self.file_path = file_path
             self.package_name = package_name
-            self.current_class: ClassInfo | None = None
-            self.current_function: FunctionInfo | None = None
+            self.current_class: FlextQualityASTClassInfo.ClassInfo | None = None
+            self.current_function: FlextQualityASTFunctionInfo.FunctionInfo | None = (
+                None
+            )
             self.scope_stack: FlextCore.Types.StringList = []
 
             # Results - using strongly typed models
-            self.classes: list[ClassInfo] = []
-            self.functions: list[FunctionInfo] = []
+            self.classes: list[FlextQualityASTClassInfo.ClassInfo] = []
+            self.functions: list[FlextQualityASTFunctionInfo.FunctionInfo] = []
             self.variables: list[
                 FlextCore.Types.Dict
             ] = []  # Keeping as generic dict with object values
@@ -55,8 +57,8 @@ class FlextQualityASTBackend(BaseAnalyzer):
             ] = []  # Keeping as generic dict with object values
 
             # Context tracking
-            self.class_stack: list[ClassInfo] = []
-            self.function_stack: list[FunctionInfo] = []
+            self.class_stack: list[FlextQualityASTClassInfo.ClassInfo] = []
+            self.function_stack: list[FlextQualityASTFunctionInfo.FunctionInfo] = []
 
         @override
         def visit_ClassDef(self, node: ast.ClassDef) -> None:
@@ -67,7 +69,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
             decorators, is_dataclass, is_abstract = self._analyze_class_decorators(node)
             method_counts = self._count_class_methods(node)
 
-            class_info = ClassInfo(
+            class_info = FlextQualityASTClassInfo.ClassInfo(
                 name=node.name,
                 full_name=full_name,
                 file_path=str(self.file_path),
@@ -99,7 +101,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
             node: ast.FunctionDef,
         ) -> None:
             """Visit a function or method definition."""
-            function_info = FunctionInfo(
+            function_info = FlextQualityASTFunctionInfo.FunctionInfo(
                 name=node.name,
                 full_name=self._calculate_function_full_name(node),
                 file_path=str(self.file_path),

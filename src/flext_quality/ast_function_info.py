@@ -7,25 +7,31 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from flext_core import FlextCore
-from pydantic import BaseModel
 
 
-class FunctionInfo(BaseModel):
-    """Strongly-typed function information from AST analysis."""
+class FlextQualityASTFunctionInfo(FlextCore.Models.BaseModel):
+    """Unified AST function information class following FLEXT pattern.
 
-    name: str
-    full_name: str
-    file_path: str
-    package_name: str
-    line_number: int
-    end_line_number: int
-    decorators: FlextCore.Types.StringList
-    is_generator: bool
-    is_method: bool
-    is_property: bool
-    is_class_method: bool
-    is_static_method: bool
-    parameter_count: int
-    returns_annotation: str | None
-    complexity: int
-    docstring: str | None
+    Single responsibility: AST function information management
+    Contains all function-related models as nested classes.
+    """
+
+    class FunctionInfo(FlextCore.Models.BaseModel):
+        """Strongly-typed function information from AST analysis."""
+
+        name: str
+        full_name: str
+        file_path: str
+        package_name: str
+        line_number: int
+        end_line_number: int
+        decorators: FlextCore.Types.StringList
+        is_generator: bool
+        is_method: bool
+        is_property: bool
+        is_class_method: bool
+        is_static_method: bool
+        parameter_count: int
+        returns_annotation: str | None
+        complexity: int
+        docstring: str | None

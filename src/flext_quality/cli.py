@@ -63,13 +63,12 @@ class FlextQualityCliService(FlextCore.Service[int]):
         self._dispatcher = FlextCore.Dispatcher()
         self._processors = FlextCore.Processors()
         self._registry = FlextCore.Registry(dispatcher=self._dispatcher)
-        self.logger = FlextCore.Logger(__name__)
+        self._logger = FlextCore.Logger(__name__)
 
     @override
     def execute(self) -> FlextCore.Result[int]:
         """Execute CLI service - required abstract method implementation."""
-        if self.logger:
-            self.logger.info("CLI service execute called - this is a placeholder")
+        self._logger.info("CLI service execute called - this is a placeholder")
         return FlextCore.Result[int].ok(0)
 
     class _CliContextHelper:
@@ -114,10 +113,10 @@ class FlextQualityCliService(FlextCore.Service[int]):
 
             project_path = Path(args.path).resolve()
             if not project_path.exists():
-                cli_context.print_error(f"Path does not exist: {project_path}")
+                self._logger.error(f"Path does not exist: {project_path}")
                 return FlextCore.Result[int].ok(1)
 
-            cli_context.print_info(f"Analyzing project: {project_path}")
+            self._logger.info(f"Analyzing project: {project_path}")
 
             # Create analyzer
             analyzer = CodeAnalyzer(project_path)
@@ -136,7 +135,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
             # Check if any files were analyzed
             files_analyzed = getattr(results.overall_metrics, "files_analyzed", 0)
             if files_analyzed == 0:
-                cli_context.print_error("No files to analyze")
+                self._logger.error("No files to analyze")
                 return FlextCore.Result[int].ok(1)
 
             # Generate report
@@ -147,7 +146,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
                 args, report, cli_context
             )
             if output_result.is_failure:
-                cli_context.print_error(
+                self._logger.error(
                     output_result.error or "Output processing failed",
                 )
                 return FlextCore.Result[int].ok(1)
@@ -159,12 +158,12 @@ class FlextQualityCliService(FlextCore.Service[int]):
             # Return appropriate exit code based on quality
             quality_score = analyzer.get_quality_score()
             if quality_score >= good_quality_threshold:
-                cli_context.print_success(f"Good quality: {quality_score}%")
+                self._logger.info(f"Good quality: {quality_score}%")
                 return FlextCore.Result[int].ok(0)
             if quality_score >= medium_quality_threshold:
-                cli_context.print_warning(f"Medium quality: {quality_score}%")
+                self._logger.warning(f"Medium quality: {quality_score}%")
                 return FlextCore.Result[int].ok(1)
-            cli_context.print_error(f"Poor quality: {quality_score}%")
+            self._logger.error(f"Poor quality: {quality_score}%")
             return FlextCore.Result[int].ok(2)
 
         def _handle_output(
@@ -205,7 +204,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
                 elif args.format == "html":
                     # Write HTML directly since FlextCli doesn't handle HTML export
                     output_path.write_text(report.to_html(), encoding="utf-8")
-                    cli_context.print_success(f"HTML report saved to {output_path}")
+                    self._logger.info(f"HTML report saved to {output_path}")
                     return FlextCore.Result[None].ok(None)
                 else:
                     # Table format - export as JSON
@@ -232,7 +231,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
                         if export_result.value
                         else "Report saved successfully"
                     )
-                    cli_context.print_success(success_msg)
+                    self._logger.info(success_msg)
             else:
                 # Fallback without FlextCli
                 if args.format == "json":
@@ -241,7 +240,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
                     output_path.write_text(report.to_html(), encoding="utf-8")
                 else:
                     output_path.write_text(report.to_json(), encoding="utf-8")
-                cli_context.print_info(f"Report saved to {output_path}")
+                self._logger.info(f"Report saved to {output_path}")
 
             return FlextCore.Result[None].ok(None)
 
@@ -291,7 +290,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
                 report_dict: FlextQualityTypes.Core.ReportDict = json.loads(
                     report.to_json()
                 )
-                cli_context.print_info(str(report_dict))
+                self._logger.info(str(report_dict))
 
             return FlextCore.Result[None].ok(None)
 
@@ -314,11 +313,10 @@ class FlextQualityCliService(FlextCore.Service[int]):
                     cli_context_result.error or "CLI context creation failed",
                 )
 
-            cli_context = cli_context_result.value
             cli_api = _get_cli_api()
 
             project_path = Path(args.path).resolve()
-            cli_context.print_info(f"Calculating quality score for: {project_path}")
+            self._logger.info(f"Calculating quality score for: {project_path}")
 
             # Quick analysis
             analyzer = CodeAnalyzer(project_path)
@@ -331,7 +329,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
 
             # Unwrap FlextCore.Result
             if analysis_result.is_failure:
-                cli_context.print_error(f"Analysis failed: {analysis_result.error}")
+                self._logger.error(f"Analysis failed: {analysis_result.error}")
                 return FlextCore.Result[int].ok(1)
 
             score_value = analyzer.get_quality_score()
@@ -352,15 +350,15 @@ class FlextQualityCliService(FlextCore.Service[int]):
                 )
             else:
                 # Fallback display
-                cli_context.print_info(
+                self._logger.info(
                     f"Quality Score: {score_value}% (Grade: {grade})",
                 )
 
             # Exit based on score
             if score_value >= MIN_ACCEPTABLE_QUALITY_SCORE:
-                cli_context.print_success(f"Quality acceptable: {score_value}%")
+                self._logger.info(f"Quality acceptable: {score_value}%")
                 return FlextCore.Result[int].ok(0)
-            cli_context.print_warning(f"Quality needs improvement: {score_value}%")
+            self._logger.warning(f"Quality needs improvement: {score_value}%")
             return FlextCore.Result[int].ok(1)
 
     class _WebServerHelper:
@@ -382,9 +380,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
                     cli_context_result.error or "CLI context creation failed",
                 )
 
-            cli_context = cli_context_result.value
-
-            cli_context.print_info(f"Starting web server on {args.host}:{args.port}")
+            self._logger.info(f"Starting web server on {args.host}:{args.port}")
 
             interface = FlextQualityWeb()
             interface.run(host=args.host, port=args.port, debug=args.debug)
@@ -454,12 +450,12 @@ def get_cli_context() -> FlextCliContext:
 def analyze_project(args: argparse.Namespace) -> int:
     """Analyze project quality using FlextCli APIs."""
     logger = FlextCore.Logger(__name__)
-    cli_context = get_cli_context()
+    get_cli_context()
     cli_api = FlextCli()
 
     try:
         project_path = Path(args.path).resolve()
-        cli_context.print_info(f"Analyzing project: {project_path}")
+        self._logger.info(f"Analyzing project: {project_path}")
 
         # Use CodeAnalyzer for analysis
         analyzer = CodeAnalyzer(project_path)
@@ -472,7 +468,7 @@ def analyze_project(args: argparse.Namespace) -> int:
 
         # Unwrap FlextCore.Result
         if analysis_result.is_failure:
-            cli_context.print_error(f"Analysis failed: {analysis_result.error}")
+            self._logger.error(f"Analysis failed: {analysis_result.error}")
             return 1
 
         results = analysis_result.value
@@ -488,7 +484,7 @@ def analyze_project(args: argparse.Namespace) -> int:
             }
             cli_api.display_data(result_data, format_type="table")
         else:
-            cli_context.print_info(
+            self._logger.info(
                 f"Analysis complete: {getattr(results.overall_metrics, 'files_analyzed', 0)} files, "
                 f"score: {getattr(results.overall_metrics, 'quality_score', 0):.1f}%"
             )
@@ -497,7 +493,7 @@ def analyze_project(args: argparse.Namespace) -> int:
 
     except Exception as e:
         logger.exception("Quality analysis failed")
-        cli_context.print_error(f"Analysis failed: {e}")
+        self._logger.exception(f"Analysis failed: {e}")
         if getattr(args, "verbose", False):
             traceback.print_exc()
         return 1
@@ -506,12 +502,12 @@ def analyze_project(args: argparse.Namespace) -> int:
 def score_project(args: argparse.Namespace) -> int:
     """Get quick quality score for project using FlextCli APIs."""
     logger = FlextCore.Logger(__name__)
-    cli_context = get_cli_context()
+    get_cli_context()
     cli_api = FlextCli()
 
     try:
         project_path = Path(args.path).resolve()
-        cli_context.print_info(f"Calculating quality score for: {project_path}")
+        self._logger.info(f"Calculating quality score for: {project_path}")
 
         # Quick analysis
         analyzer = CodeAnalyzer(project_path)
@@ -521,7 +517,7 @@ def score_project(args: argparse.Namespace) -> int:
 
         # Unwrap FlextCore.Result
         if analysis_result.is_failure:
-            cli_context.print_error(f"Analysis failed: {analysis_result.error}")
+            self._logger.error(f"Analysis failed: {analysis_result.error}")
             return 1
 
         score_value = analyzer.get_quality_score()
@@ -539,38 +535,38 @@ def score_project(args: argparse.Namespace) -> int:
             cli_api.display_data(score_data, format_type="table")
         else:
             # Fallback display
-            cli_context.print_info(f"Quality Score: {score_value}% (Grade: {grade})")
+            self._logger.info(f"Quality Score: {score_value}% (Grade: {grade})")
 
         # Exit based on score
         if score_value >= MIN_ACCEPTABLE_QUALITY_SCORE:
-            cli_context.print_success(f"Quality acceptable: {score_value}%")
+            self._logger.info(f"Quality acceptable: {score_value}%")
             return 0
-        cli_context.print_warning(f"Quality needs improvement: {score_value}%")
+        self._logger.warning(f"Quality needs improvement: {score_value}%")
         return 1
 
     except Exception as e:
         logger.exception("Quality score calculation failed")
-        cli_context.print_error(f"Score calculation failed: {e}")
+        self._logger.exception(f"Score calculation failed: {e}")
         return 1
 
 
 def run_web_server(args: argparse.Namespace) -> int:
     """Run quality web interface server."""
     logger = FlextCore.Logger(__name__)
-    cli_context = get_cli_context()
+    get_cli_context()
 
     try:
-        cli_context.print_info(f"Starting web server on {args.host}:{args.port}")
+        self._logger.info(f"Starting web server on {args.host}:{args.port}")
 
         interface = FlextQualityWeb()
         interface.run(host=args.host, port=args.port, debug=args.debug)
         return 0
     except KeyboardInterrupt:
-        cli_context.print_info("Web server stopped by user")
+        self._logger.info("Web server stopped by user")
         return 0
     except Exception as e:
         logger.exception("Web server failed")
-        cli_context.print_error(f"Web server failed: {e}")
+        self._logger.exception(f"Web server failed: {e}")
         if getattr(args, "verbose", False):
             traceback.print_exc()
         return 1

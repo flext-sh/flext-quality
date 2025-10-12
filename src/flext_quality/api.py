@@ -42,7 +42,7 @@ class FlextQuality(FlextCore.Service[None]):
         self._dispatcher = FlextCore.Dispatcher()
         self._processors = FlextCore.Processors()
         self._registry = FlextCore.Registry(dispatcher=self._dispatcher)
-        self.logger = FlextCore.Logger(__name__)
+        self._logger = FlextCore.Logger(__name__)
 
         # Domain services
         self._services = FlextQualityServices()
