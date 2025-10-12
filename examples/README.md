@@ -121,7 +121,6 @@ def analyze_with_monitoring(project_path: str):
 ### CI/CD Quality Gate
 
 ```yaml
-
 # examples/ci-cd/github-actions.yml
 name: Quality Gate
 on: [push, pull_request]
@@ -224,12 +223,12 @@ docker-compose exec quality-analysis cat /app/reports/analysis_results.json
 
 ### Basic Examples
 
-| Example               | Description                   | Complexity   | Integration |
-| --------------------- | ----------------------------- | ------------ | ----------- |
-| **simple_analysis**   | Basic project analysis        | Beginner     | None        |
-| **custom_config**     | Custom analysis configuration | Beginner     | flext-core  |
-| **result_processing** | Working with analysis results | Intermediate | flext-core  |
-| **error_handling**    | FlextCore.Result error patterns    | Intermediate | flext-core  |
+| Example               | Description                     | Complexity   | Integration |
+| --------------------- | ------------------------------- | ------------ | ----------- |
+| **simple_analysis**   | Basic project analysis          | Beginner     | None        |
+| **custom_config**     | Custom analysis configuration   | Beginner     | flext-core  |
+| **result_processing** | Working with analysis results   | Intermediate | flext-core  |
+| **error_handling**    | FlextCore.Result error patterns | Intermediate | flext-core  |
 
 ### Advanced Examples
 

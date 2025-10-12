@@ -314,7 +314,6 @@ def test_memory_usage_within_limits():
 ### CI/CD Pipeline Integration
 
 ```yaml
-
 # GitHub Actions example
 - name: Run Test Suite
   run: |
