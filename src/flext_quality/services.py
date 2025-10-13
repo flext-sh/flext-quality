@@ -11,8 +11,8 @@ from typing import override
 
 from flext_core import FlextCore
 
-from .entities import FlextQualityEntities
 from .external_backend import FlextQualityExternalBackend
+from .models import FlextQualityModels
 
 
 class FlextQualityServices:
@@ -37,42 +37,42 @@ class FlextQualityServices:
         self.logger = FlextCore.Logger(__name__)
 
         # Shared storage for all services
-        self._projects: dict[str, FlextQualityEntities.Project] = {}
-        self._issues: dict[str, FlextQualityEntities.Issue] = {}
-        self._analyses: dict[str, FlextQualityEntities.Analysis] = {}
-        self._reports: dict[str, FlextQualityEntities.Report] = {}
+        self._projects: dict[str, FlextQualityModels.Project] = {}
+        self._issues: dict[str, FlextQualityModels.Issue] = {}
+        self._analyses: dict[str, FlextQualityModels.Analysis] = {}
+        self._reports: dict[str, FlextQualityModels.Report] = {}
 
-    def get_projects(self) -> dict[str, FlextQualityEntities.Project]:
+    def get_projects(self) -> dict[str, FlextQualityModels.Project]:
         """Get projects dictionary."""
         return self._projects
 
-    def set_project(self, name: str, project: FlextQualityEntities.Project) -> None:
+    def set_project(self, name: str, project: FlextQualityModels.Project) -> None:
         """Set a project in the projects dictionary."""
         self._projects[name] = project
 
-    def get_issues(self) -> dict[str, FlextQualityEntities.Issue]:
+    def get_issues(self) -> dict[str, FlextQualityModels.Issue]:
         """Get issues dictionary."""
         return self._issues
 
-    def set_issue(self, issue_id: str, issue: FlextQualityEntities.Issue) -> None:
+    def set_issue(self, issue_id: str, issue: FlextQualityModels.Issue) -> None:
         """Set an issue in the issues dictionary."""
         self._issues[issue_id] = issue
 
-    def get_analyses(self) -> dict[str, FlextQualityEntities.Analysis]:
+    def get_analyses(self) -> dict[str, FlextQualityModels.Analysis]:
         """Get analyses dictionary."""
         return self._analyses
 
     def set_analysis(
-        self, analysis_id: str, analysis: FlextQualityEntities.Analysis
+        self, analysis_id: str, analysis: FlextQualityModels.Analysis
     ) -> None:
         """Set an analysis in the analyses dictionary."""
         self._analyses[analysis_id] = analysis
 
-    def get_reports(self) -> dict[str, FlextQualityEntities.Report]:
+    def get_reports(self) -> dict[str, FlextQualityModels.Report]:
         """Get reports dictionary."""
         return self._reports
 
-    def set_report(self, report_id: str, report: FlextQualityEntities.Report) -> None:
+    def set_report(self, report_id: str, report: FlextQualityModels.Report) -> None:
         """Set a report in the reports dictionary."""
         self._reports[report_id] = report
 
@@ -111,11 +111,11 @@ class FlextQualityServices:
             _min_coverage: float = 95.0,
             _max_complexity: int = 10,
             _max_duplication: float = 5.0,
-        ) -> FlextCore.Result[FlextQualityEntities.Project]:
+        ) -> FlextCore.Result[FlextQualityModels.Project]:
             """Create a new quality project."""
             try:
                 # Create project entity
-                project = FlextQualityEntities.Project(
+                project = FlextQualityModels.Project(
                     name=name,
                     project_path=str(project_path),
                     repository_url=repository_url,
@@ -127,10 +127,10 @@ class FlextQualityServices:
                 # Store project in shared storage
                 self._parent.set_project(name, project)
                 self.logger.info("Created project: %s", project.name)
-                return FlextCore.Result[FlextQualityEntities.Project].ok(project)
+                return FlextCore.Result[FlextQualityModels.Project].ok(project)
             except (RuntimeError, ValueError, TypeError) as e:
                 self.logger.exception("Failed to create project")
-                return FlextCore.Result[FlextQualityEntities.Project].fail(
+                return FlextCore.Result[FlextQualityModels.Project].fail(
                     f"Failed to create project: {e}",
                 )
 
@@ -164,14 +164,14 @@ class FlextQualityServices:
             message: str,
             rule: str | None = None,
             _source: str = "ruff",
-        ) -> FlextCore.Result[FlextQualityEntities.Issue]:
+        ) -> FlextCore.Result[FlextQualityModels.Issue]:
             """Create a new quality issue."""
             try:
                 # Create issue ID
                 issue_id = f"{analysis_id}:{file_path}:{line_number}"
 
                 # Create quality issue
-                issue = FlextQualityEntities.Issue(
+                issue = FlextQualityModels.Issue(
                     analysis_id=analysis_id,
                     issue_type=issue_type,
                     severity=severity,
@@ -186,17 +186,17 @@ class FlextQualityServices:
                 self._parent.set_issue(issue_id, issue)
 
                 self.logger.debug(f"Created quality issue: {issue_id}")
-                return FlextCore.Result[FlextQualityEntities.Issue].ok(issue)
+                return FlextCore.Result[FlextQualityModels.Issue].ok(issue)
             except Exception as e:
                 self.logger.exception("Failed to create issue")
-                return FlextCore.Result[FlextQualityEntities.Issue].fail(
+                return FlextCore.Result[FlextQualityModels.Issue].fail(
                     f"Failed to create issue: {e}",
                 )
 
         def get_issues_by_analysis(
             self,
             analysis_id: str,
-        ) -> FlextCore.Result[list[FlextQualityEntities.Issue]]:
+        ) -> FlextCore.Result[list[FlextQualityModels.Issue]]:
             """Get all issues for a specific analysis."""
             try:
                 issues = [
@@ -204,27 +204,27 @@ class FlextQualityServices:
                     for issue in self._parent.get_issues().values()
                     if issue.analysis_id == analysis_id
                 ]
-                return FlextCore.Result[list[FlextQualityEntities.Issue]].ok(issues)
+                return FlextCore.Result[list[FlextQualityModels.Issue]].ok(issues)
             except Exception as e:
                 self.logger.exception(
                     "Failed to get issues for analysis %s",
                     analysis_id,
                 )
-                return FlextCore.Result[list[FlextQualityEntities.Issue]].fail(
+                return FlextCore.Result[list[FlextQualityModels.Issue]].fail(
                     f"Failed to get issues: {e}",
                 )
 
         def get_issue(
             self,
             issue_id: str,
-        ) -> FlextCore.Result[FlextQualityEntities.Issue | None]:
+        ) -> FlextCore.Result[FlextQualityModels.Issue | None]:
             """Get a specific issue by ID."""
             try:
                 issue = self._parent.get_issues().get(issue_id)
-                return FlextCore.Result[FlextQualityEntities.Issue | None].ok(issue)
+                return FlextCore.Result[FlextQualityModels.Issue | None].ok(issue)
             except Exception as e:
                 self.logger.exception(f"Failed to get issue {issue_id}")
-                return FlextCore.Result[FlextQualityEntities.Issue | None].fail(
+                return FlextCore.Result[FlextQualityModels.Issue | None].fail(
                     f"Failed to get issue: {e}",
                 )
 
@@ -232,12 +232,12 @@ class FlextQualityServices:
             self,
             issue_id: str,
             reason: str,
-        ) -> FlextCore.Result[FlextQualityEntities.Issue]:
+        ) -> FlextCore.Result[FlextQualityModels.Issue]:
             """Suppress a specific issue."""
             try:
                 issue = self._parent.get_issues().get(issue_id)
                 if not issue:
-                    return FlextCore.Result[FlextQualityEntities.Issue].fail(
+                    return FlextCore.Result[FlextQualityModels.Issue].fail(
                         f"Issue not found: {issue_id}",
                     )
 
@@ -245,22 +245,22 @@ class FlextQualityServices:
                 self._parent.set_issue(issue_id, suppressed_issue)
 
                 self.logger.debug(f"Suppressed issue: {issue_id}")
-                return FlextCore.Result[FlextQualityEntities.Issue].ok(suppressed_issue)
+                return FlextCore.Result[FlextQualityModels.Issue].ok(suppressed_issue)
             except Exception as e:
                 self.logger.exception(f"Failed to suppress issue {issue_id}")
-                return FlextCore.Result[FlextQualityEntities.Issue].fail(
+                return FlextCore.Result[FlextQualityModels.Issue].fail(
                     f"Failed to suppress issue: {e}",
                 )
 
         def unsuppress_issue(
             self,
             issue_id: str,
-        ) -> FlextCore.Result[FlextQualityEntities.Issue]:
+        ) -> FlextCore.Result[FlextQualityModels.Issue]:
             """Unsuppress a quality issue."""
             try:
                 issue = self._parent.get_issues().get(issue_id)
                 if not issue:
-                    return FlextCore.Result[FlextQualityEntities.Issue].fail(
+                    return FlextCore.Result[FlextQualityModels.Issue].fail(
                         "Issue not found"
                     )
 
@@ -271,10 +271,10 @@ class FlextQualityServices:
 
                 self._parent.set_issue(issue_id, updated_issue)
                 self.logger.info("Issue unsuppressed: %s", issue_id)
-                return FlextCore.Result[FlextQualityEntities.Issue].ok(updated_issue)
+                return FlextCore.Result[FlextQualityModels.Issue].ok(updated_issue)
             except (RuntimeError, ValueError, TypeError) as e:
                 self.logger.exception("Failed to unsuppress issue")
-                return FlextCore.Result[FlextQualityEntities.Issue].fail(
+                return FlextCore.Result[FlextQualityModels.Issue].fail(
                     f"Failed to unsuppress issue: {e}",
                 )
 
@@ -301,10 +301,10 @@ class FlextQualityServices:
             self,
             project_id: str,
             config: FlextCore.Types.Dict | None = None,
-        ) -> FlextCore.Result[FlextQualityEntities.Analysis]:
+        ) -> FlextCore.Result[FlextQualityModels.Analysis]:
             """Create a new quality analysis."""
             try:
-                analysis = FlextQualityEntities.Analysis(
+                analysis = FlextQualityModels.Analysis(
                     project_id=project_id,
                     analysis_config=config or {},
                 )
@@ -315,17 +315,17 @@ class FlextQualityServices:
                 )
                 self._parent.set_analysis(analysis_id, analysis)
                 self.logger.info("Created analysis: %s", analysis_id)
-                return FlextCore.Result[FlextQualityEntities.Analysis].ok(analysis)
+                return FlextCore.Result[FlextQualityModels.Analysis].ok(analysis)
             except (RuntimeError, ValueError, TypeError) as e:
                 self.logger.exception("Failed to create analysis")
-                return FlextCore.Result[FlextQualityEntities.Analysis].fail(
+                return FlextCore.Result[FlextQualityModels.Analysis].fail(
                     f"Failed to create analysis: {e}",
                 )
 
         def get_analyses_by_project(
             self,
             project_id: str,
-        ) -> FlextCore.Result[list[FlextQualityEntities.Analysis]]:
+        ) -> FlextCore.Result[list[FlextQualityModels.Analysis]]:
             """Get all analyses for a project."""
             try:
                 analyses = [
@@ -333,12 +333,10 @@ class FlextQualityServices:
                     for analysis in self._parent.get_analyses().values()
                     if analysis.project_id == project_id
                 ]
-                return FlextCore.Result[list[FlextQualityEntities.Analysis]].ok(
-                    analyses
-                )
+                return FlextCore.Result[list[FlextQualityModels.Analysis]].ok(analyses)
             except (RuntimeError, ValueError, TypeError) as e:
                 self.logger.exception("Failed to list analyses")
-                return FlextCore.Result[list[FlextQualityEntities.Analysis]].fail(
+                return FlextCore.Result[list[FlextQualityModels.Analysis]].fail(
                     f"Failed to list analyses: {e}",
                 )
 
@@ -368,10 +366,10 @@ class FlextQualityServices:
             content: str,
             file_path: str | None = None,
             _metadata: FlextCore.Types.Dict | None = None,
-        ) -> FlextCore.Result[FlextQualityEntities.Report]:
+        ) -> FlextCore.Result[FlextQualityModels.Report]:
             """Create a new quality report."""
             try:
-                report = FlextQualityEntities.Report(
+                report = FlextQualityModels.Report(
                     analysis_id=analysis_id,
                     report_type=format_type,
                     report_format="summary",
@@ -383,17 +381,17 @@ class FlextQualityServices:
                 report_id = f"{analysis_id}_report_{len(self._parent.get_reports())}"
                 self._parent.set_report(report_id, report)
                 self.logger.info("Created report: %s", report_id)
-                return FlextCore.Result[FlextQualityEntities.Report].ok(report)
+                return FlextCore.Result[FlextQualityModels.Report].ok(report)
             except (RuntimeError, ValueError, TypeError) as e:
                 self.logger.exception("Failed to create report")
-                return FlextCore.Result[FlextQualityEntities.Report].fail(
+                return FlextCore.Result[FlextQualityModels.Report].fail(
                     f"Failed to create report: {e}",
                 )
 
         def get_reports_by_analysis(
             self,
             analysis_id: str,
-        ) -> FlextCore.Result[list[FlextQualityEntities.Report]]:
+        ) -> FlextCore.Result[list[FlextQualityModels.Report]]:
             """Get all reports for an analysis."""
             try:
                 reports = [
@@ -401,10 +399,10 @@ class FlextQualityServices:
                     for report in self._parent.get_reports().values()
                     if report.analysis_id == analysis_id
                 ]
-                return FlextCore.Result[list[FlextQualityEntities.Report]].ok(reports)
+                return FlextCore.Result[list[FlextQualityModels.Report]].ok(reports)
             except (RuntimeError, ValueError, TypeError) as e:
                 self.logger.exception("Failed to list reports")
-                return FlextCore.Result[list[FlextQualityEntities.Report]].fail(
+                return FlextCore.Result[list[FlextQualityModels.Report]].fail(
                     f"Failed to list reports: {e}",
                 )
 
@@ -494,7 +492,7 @@ class FlextQualityServices:
 # Use FlextQualityServices directly instead of deprecated facade classes
 
 
-# FlextQualityEntities.QualityReportService removed for 1.0 production readiness
+# FlextQualityModels.QualityReportService removed for 1.0 production readiness
 
 # Aliases removed for 1.0 production readiness
 # Use FlextQualityServices directly

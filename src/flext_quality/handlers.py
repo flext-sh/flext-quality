@@ -14,12 +14,12 @@ from flext_observability import (
     flext_create_trace as _flext_create_trace,
 )
 
-from .entities import FlextQualityEntities
+from .models import FlextQualityModels
 from .services import FlextQualityServices
 
 # Type aliases for convenience
-QualityAnalysis = FlextQualityEntities.QualityAnalysis
-QualityReport = FlextQualityEntities.QualityReport
+QualityAnalysis = FlextQualityModels.Analysis
+QualityReport = FlextQualityModels.Report
 
 
 class FlextQualityHandlers:

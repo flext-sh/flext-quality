@@ -32,13 +32,31 @@ from .constants import FlextQualityConstants
 from .value_objects import FlextQualityValueObjects
 
 
-class FlextQualityModels(FlextCore.Models):
+class FlextQualityModels(BaseModel):
     """Unified quality models class following FLEXT architecture patterns.
 
-    Inherits from FlextCore.Models to avoid duplication and ensure consistency.
+    Inherits from BaseModel to avoid duplication and ensure consistency.
     Single responsibility: Quality data models and validation
     Contains all Pydantic models as nested classes with shared functionality.
     """
+
+    # =============================================================================
+    # ENUM CLASSES - Analysis status enumerations
+    # =============================================================================
+
+    from enum import StrEnum
+
+    class AnalysisStatus(StrEnum):
+        """Analysis status for quality analysis."""
+
+        QUEUED = "queued"
+        ANALYZING = "analyzing"
+        COMPLETED = "completed"
+        FAILED = "failed"
+
+    # =============================================================================
+    # MODEL CONFIGURATION - Pydantic settings
+    # =============================================================================
 
     model_config = ConfigDict(
         # Enhanced Pydantic 2.11 enterprise features
@@ -175,7 +193,7 @@ class FlextQualityModels(FlextCore.Models):
         self._container = FlextCore.Container.get_global()
         self.logger = FlextCore.Logger(__name__)
 
-    class ProjectModel(FlextCore.Models.BaseModel):
+    class ProjectModel(BaseModel):
         """Pydantic model for quality project representation."""
 
         model_config = ConfigDict(
@@ -263,7 +281,7 @@ class FlextQualityModels(FlextCore.Models):
                 raise ValueError(msg)
             return v.strip()
 
-    class AnalysisModel(FlextCore.Models.BaseModel):
+    class AnalysisModel(BaseModel):
         """Pydantic model for quality analysis representation."""
 
         model_config = ConfigDict(
@@ -436,7 +454,7 @@ class FlextQualityModels(FlextCore.Models):
             """Ensure scores are within valid range."""
             return max(0.0, min(100.0, v))
 
-    class IssueModel(FlextCore.Models.BaseModel):
+    class IssueModel(BaseModel):
         """Pydantic model for quality issue representation."""
 
         model_config = ConfigDict(
@@ -586,7 +604,7 @@ class FlextQualityModels(FlextCore.Models):
                 raise ValueError(msg)
             return v
 
-    class ReportModel(FlextCore.Models.BaseModel):
+    class ReportModel(BaseModel):
         """Pydantic model for quality report representation."""
 
         model_config = ConfigDict(
@@ -721,7 +739,7 @@ class FlextQualityModels(FlextCore.Models):
             }
             return capabilities_map.get(self.format_type, [])
 
-    class ConfigModel(FlextCore.Models.BaseModel):
+    class ConfigModel(BaseModel):
         """Pydantic model for analysis configuration."""
 
         model_config = ConfigDict(
@@ -933,7 +951,7 @@ class FlextQualityModels(FlextCore.Models):
 
     # ==== ANALYSIS RESULT MODELS (from analysis_types.py migration) ====
 
-    class FileAnalysisResult(FlextCore.Models.Value):
+    class FileAnalysisResult(BaseModel):
         """Result of analyzing a single file."""
 
         file_path: Path = Field(..., description="Path to the analyzed file")
@@ -952,7 +970,7 @@ class FlextQualityModels(FlextCore.Models):
         style_issues: int = Field(default=0, ge=0, description="Number of style issues")
         dead_code_lines: int = Field(default=0, ge=0, description="Lines of dead code")
 
-    class CodeIssue(FlextCore.Models.BaseModel):
+    class CodeIssue(BaseModel):
         """General code quality issue."""
 
         file_path: str = Field(..., description="File where issue was found")
@@ -967,7 +985,7 @@ class FlextQualityModels(FlextCore.Models):
             default=None, description="Rule that detected the issue"
         )
 
-    class ComplexityIssue(FlextCore.Models.BaseModel):
+    class ComplexityIssue(BaseModel):
         """Complexity-related code issue."""
 
         file_path: str = Field(..., description="File where issue was found")
@@ -984,7 +1002,7 @@ class FlextQualityModels(FlextCore.Models):
         )
         message: str = Field(..., description="Human-readable issue message")
 
-    class SecurityIssue(FlextCore.Models.Value):
+    class SecurityIssue(BaseModel):
         """Security-related code issue."""
 
         file_path: str = Field(..., description="File where issue was found")
@@ -1000,7 +1018,7 @@ class FlextQualityModels(FlextCore.Models):
         message: str = Field(..., description="Human-readable issue message")
         rule_id: str = Field(..., description="Security rule that detected the issue")
 
-    class DeadCodeIssue(FlextCore.Models.Value):
+    class DeadCodeIssue(BaseModel):
         """Dead code issue."""
 
         file_path: str = Field(..., description="File where dead code was found")
@@ -1015,7 +1033,7 @@ class FlextQualityModels(FlextCore.Models):
         )
         message: str = Field(..., description="Human-readable issue message")
 
-    class DuplicationIssue(FlextCore.Models.Value):
+    class DuplicationIssue(BaseModel):
         """Code duplication issue."""
 
         files: FlextCore.Types.StringList = Field(
@@ -1066,7 +1084,7 @@ class FlextQualityModels(FlextCore.Models):
             default=0.0, description="Test execution time in seconds"
         )
 
-    class OverallMetrics(FlextCore.Models.Value):
+    class OverallMetrics(BaseModel):
         """Overall project quality metrics."""
 
         files_analyzed: int = Field(default=0, description="Number of files analyzed")
@@ -1148,7 +1166,7 @@ class FlextQualityModels(FlextCore.Models):
             default=None,
             description="Test results if available",
         )
-        analysis_config: FlextQualityModels.Core.AnalysisDict = Field(
+        analysis_config: dict[str, Any] = Field(
             default_factory=dict,
             description="Configuration used for analysis",
         )
@@ -1184,7 +1202,7 @@ class FlextQualityModels(FlextCore.Models):
 
     # ==== INTERNAL TOOLS MODELS (from flext_tools migration) ====
 
-    class GitOperation(FlextCore.Models.Command):
+    class GitOperation(BaseModel):
         """Git operation command for quality tools."""
 
         repo_path: str
@@ -1192,7 +1210,7 @@ class FlextQualityModels(FlextCore.Models):
         dry_run: bool = True
         temp_path: str | None = None
 
-    class RewriteResult(FlextCore.Models.Value):
+    class RewriteResult(BaseModel):
         """Git history rewrite result."""
 
         commits_processed: int
@@ -1200,7 +1218,7 @@ class FlextQualityModels(FlextCore.Models):
         success: bool
         errors: FlextCore.Types.StringList
 
-    class OptimizationTarget(FlextCore.Models.Entity):
+    class OptimizationTarget(BaseModel):
         """Target for optimization."""
 
         project_path: str
@@ -1209,7 +1227,7 @@ class FlextQualityModels(FlextCore.Models):
         optimization_type: str
         priority: int = 1
 
-    class OptimizationResult(FlextCore.Models.Value):
+    class OptimizationResult(BaseModel):
         """Result of optimization operation."""
 
         target: FlextQualityModels.OptimizationTarget
@@ -1218,7 +1236,7 @@ class FlextQualityModels(FlextCore.Models):
         errors: FlextCore.Types.StringList
         warnings: FlextCore.Types.StringList
 
-    class CheckResult(FlextCore.Models.Value):
+    class CheckResult(BaseModel):
         """Quality check result."""
 
         lint_passed: bool
@@ -1226,7 +1244,7 @@ class FlextQualityModels(FlextCore.Models):
         coverage: float
         violations: FlextCore.Types.StringList
 
-    class QualityValidationResult(FlextCore.Models.Value):
+    class QualityValidationResult(BaseModel):
         """Quality validation result."""
 
         passed: bool
@@ -1234,7 +1252,7 @@ class FlextQualityModels(FlextCore.Models):
         checks_passed: int
         failures: FlextCore.Types.StringList
 
-    class AnalysisResult(FlextCore.Models.Value):
+    class AnalysisResult(BaseModel):
         """Architecture analysis result."""
 
         violations: FlextCore.Types.StringList
@@ -1242,7 +1260,7 @@ class FlextQualityModels(FlextCore.Models):
         complexity_score: float
         domain_library_usage: dict[str, bool]
 
-    class DependencyInfo(FlextCore.Models.Value):
+    class DependencyInfo(BaseModel):
         """Dependency information."""
 
         name: str
@@ -1254,13 +1272,13 @@ class FlextQualityModels(FlextCore.Models):
     # DOMAIN ENTITY MODELS - Moved from entities.py
     # =============================================================================
 
-    class DomainEvent(FlextCore.Models.BaseModel):
+    class DomainEvent(BaseModel):
         """Base class for domain events."""
 
         event_type: str
         timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
-    class Project(FlextCore.Models.BaseModel):
+    class Project(BaseModel):
         """Quality project domain entity using enhanced mixins for code reduction."""
 
         # Project identification
@@ -1294,7 +1312,7 @@ class FlextQualityModels(FlextCore.Models):
         last_analysis_at: datetime | None = None
         total_analyses: int = Field(default=0)
 
-    class Analysis(FlextCore.Models.BaseModel):
+    class Analysis(BaseModel):
         """Quality analysis domain entity with comprehensive analysis tracking."""
 
         # Analysis identification
@@ -1304,8 +1322,8 @@ class FlextQualityModels(FlextCore.Models):
         project_id: UUID = Field(..., description="Project this analysis belongs to")
 
         # Analysis metadata
-        status: FlextQualityEntities.AnalysisStatus = Field(
-            default=FlextQualityEntities.AnalysisStatus.QUEUED
+        status: FlextQualityModels.AnalysisStatus = Field(
+            default=FlextQualityModels.AnalysisStatus.QUEUED
         )
         started_at: datetime | None = None
         completed_at: datetime | None = None
@@ -1343,7 +1361,7 @@ class FlextQualityModels(FlextCore.Models):
         error_message: str | None = None
         retry_count: int = Field(default=0)
 
-    class Issue(FlextCore.Models.BaseModel):
+    class Issue(BaseModel):
         """Quality issue domain entity with detailed issue tracking."""
 
         # Issue identification
@@ -1385,7 +1403,7 @@ class FlextQualityModels(FlextCore.Models):
         resolved_at: datetime | None = None
         resolution_notes: str | None = None
 
-    class Rule(FlextCore.Models.BaseModel):
+    class Rule(BaseModel):
         """Quality rule domain entity defining analysis rules and thresholds."""
 
         # Rule identification
@@ -1405,7 +1423,7 @@ class FlextQualityModels(FlextCore.Models):
         )
 
         # Rule parameters
-        parameters: dict[str, FlextQualityTypes.AnyValue] | None = None
+        parameters: dict[str, Any] | None = None
 
         # Rule description
         description: str = Field(..., description="Rule description")
@@ -1417,7 +1435,7 @@ class FlextQualityModels(FlextCore.Models):
         deprecated: bool = Field(default=False)
         replacement_rule: str | None = None
 
-    class Report(FlextCore.Models.BaseModel):
+    class Report(BaseModel):
         """Quality report domain entity containing analysis summaries and insights."""
 
         # Report identification
@@ -1457,13 +1475,13 @@ class FlextQualityModels(FlextCore.Models):
         pdf_report_path: str | None = None
 
         # Report sections
-        sections: dict[str, FlextQualityTypes.AnyValue] | None = None
+        sections: dict[str, Any] | None = None
 
     # =============================================================================
     # AST ANALYSIS MODELS - Moved from ast_*.py files
     # =============================================================================
 
-    class FunctionInfo(FlextCore.Models.BaseModel):
+    class FunctionInfo(BaseModel):
         """Strongly-typed function information from AST analysis."""
 
         name: str
@@ -1483,7 +1501,7 @@ class FlextQualityModels(FlextCore.Models):
         complexity: int
         docstring: str | None
 
-    class ClassInfo(FlextCore.Models.BaseModel):
+    class ClassInfo(BaseModel):
         """Strongly-typed class information from AST analysis."""
 
         name: str
@@ -1550,11 +1568,6 @@ class FlextQualityModels(FlextCore.Models):
 
 # Export models for clean imports
 __all__ = [
-    "FlextAnalysisConfigModel",
-    "FlextQualityAnalysisModel",
-    "FlextQualityIssueModel",
     "FlextQualityModels",
-    "FlextQualityProjectModel",
-    "FlextQualityReportModel",
     "QualityValidationResult",
 ]

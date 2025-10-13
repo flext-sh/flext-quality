@@ -12,7 +12,6 @@ from uuid import UUID
 from flext_core import FlextCore
 
 from .analyzer import CodeAnalyzer
-from .entities import FlextQualityEntities
 from .models import FlextQualityModels
 from .services import FlextQualityServices
 from .value_objects import FlextIssueSeverity, FlextIssueType
@@ -80,7 +79,7 @@ class FlextQuality(FlextCore.Service[None]):
         min_coverage: float = 95.0,
         max_complexity: int = 10,
         max_duplication: float = 5.0,
-    ) -> FlextCore.Result[FlextQualityEntities.Project]:
+    ) -> FlextCore.Result[FlextQualityModels.Project]:
         """Create a new quality project."""
         return self.project_service.create_project(
             name=name,
@@ -97,15 +96,15 @@ class FlextQuality(FlextCore.Service[None]):
     def get_project(
         self,
         _project_id: UUID,
-    ) -> FlextCore.Result[FlextQualityEntities.Project]:
+    ) -> FlextCore.Result[FlextQualityModels.Project]:
         """Get a project by ID."""
-        return FlextCore.Result[FlextQualityEntities.Project].fail(
+        return FlextCore.Result[FlextQualityModels.Project].fail(
             "get_project not implemented"
         )
 
-    def list_projects(self) -> FlextCore.Result[list[FlextQualityEntities.Project]]:
+    def list_projects(self) -> FlextCore.Result[list[FlextQualityModels.Project]]:
         """List all projects."""
-        return FlextCore.Result[list[FlextQualityEntities.Project]].fail(
+        return FlextCore.Result[list[FlextQualityModels.Project]].fail(
             "list_projects not implemented"
         )
 
@@ -113,9 +112,9 @@ class FlextQuality(FlextCore.Service[None]):
         self,
         _project_id: UUID,
         _updates: FlextCore.Types.Dict,
-    ) -> FlextCore.Result[FlextQualityEntities.Project]:
+    ) -> FlextCore.Result[FlextQualityModels.Project]:
         """Update a project."""
-        return FlextCore.Result[FlextQualityEntities.Project].fail(
+        return FlextCore.Result[FlextQualityModels.Project].fail(
             "update_project not implemented"
         )
 
@@ -131,7 +130,7 @@ class FlextQuality(FlextCore.Service[None]):
         _branch: str | None = None,
         _pull_request_id: str | None = None,
         analysis_config: FlextCore.Types.JsonDict | None = None,
-    ) -> FlextCore.Result[FlextQualityEntities.Analysis]:
+    ) -> FlextCore.Result[FlextQualityModels.Analysis]:
         """Create a new quality analysis."""
         return self.analysis_service.create_analysis(
             project_id=str(project_id),
@@ -148,9 +147,9 @@ class FlextQuality(FlextCore.Service[None]):
         _code_lines: int,
         _comment_lines: int,
         _blank_lines: int,
-    ) -> FlextCore.Result[FlextQualityEntities.Analysis]:
+    ) -> FlextCore.Result[FlextQualityModels.Analysis]:
         """Update analysis metrics."""
-        return FlextCore.Result[FlextQualityEntities.Analysis].fail(
+        return FlextCore.Result[FlextQualityModels.Analysis].fail(
             "update_metrics not implemented"
         )
 
@@ -162,14 +161,14 @@ class FlextQuality(FlextCore.Service[None]):
         _duplication_score: float,
         security_score: float,
         maintainability_score: float,
-    ) -> FlextCore.Result[FlextQualityEntities.Analysis]:
+    ) -> FlextCore.Result[FlextQualityModels.Analysis]:
         """Update analysis quality scores."""
         # Calculate overall score as average
         (
             _coverage_score + complexity_score + security_score + maintainability_score
         ) / 4.0
 
-        return FlextCore.Result[FlextQualityEntities.Analysis].fail(
+        return FlextCore.Result[FlextQualityModels.Analysis].fail(
             "update_scores not implemented"
         )
 
@@ -180,20 +179,20 @@ class FlextQuality(FlextCore.Service[None]):
         high: int,
         medium: int,
         low: int,
-    ) -> FlextCore.Result[FlextQualityEntities.Analysis]:
+    ) -> FlextCore.Result[FlextQualityModels.Analysis]:
         """Update analysis issue counts by severity."""
         critical + high + medium + low
 
-        return FlextCore.Result[FlextQualityEntities.Analysis].fail(
+        return FlextCore.Result[FlextQualityModels.Analysis].fail(
             "update_issue_counts not implemented"
         )
 
     def complete_analysis(
         self,
         _analysis_id: UUID,
-    ) -> FlextCore.Result[FlextQualityEntities.Analysis]:
+    ) -> FlextCore.Result[FlextQualityModels.Analysis]:
         """Mark analysis as completed."""
-        return FlextCore.Result[FlextQualityEntities.Analysis].fail(
+        return FlextCore.Result[FlextQualityModels.Analysis].fail(
             "complete_analysis not implemented"
         )
 
@@ -201,27 +200,27 @@ class FlextQuality(FlextCore.Service[None]):
         self,
         _analysis_id: UUID,
         _error: str,
-    ) -> FlextCore.Result[FlextQualityEntities.Analysis]:
+    ) -> FlextCore.Result[FlextQualityModels.Analysis]:
         """Mark analysis as failed."""
-        return FlextCore.Result[FlextQualityEntities.Analysis].fail(
+        return FlextCore.Result[FlextQualityModels.Analysis].fail(
             "fail_analysis not implemented"
         )
 
     def get_analysis(
         self,
         _analysis_id: UUID,
-    ) -> FlextCore.Result[FlextQualityEntities.Analysis]:
+    ) -> FlextCore.Result[FlextQualityModels.Analysis]:
         """Get an analysis by ID."""
-        return FlextCore.Result[FlextQualityEntities.Analysis].fail(
+        return FlextCore.Result[FlextQualityModels.Analysis].fail(
             "get_analysis not implemented"
         )
 
     def list_analyses(
         self,
         _project_id: UUID,
-    ) -> FlextCore.Result[list[FlextQualityEntities.Analysis]]:
+    ) -> FlextCore.Result[list[FlextQualityModels.Analysis]]:
         """List all analyses for a project."""
-        return FlextCore.Result[list[FlextQualityEntities.Analysis]].fail(
+        return FlextCore.Result[list[FlextQualityModels.Analysis]].fail(
             "list_analyses not implemented"
         )
 
@@ -240,7 +239,7 @@ class FlextQuality(FlextCore.Service[None]):
         _end_column_number: int | None = None,
         _code_snippet: str | None = None,
         _suggestion: str | None = None,
-    ) -> FlextCore.Result[FlextQualityEntities.Issue]:
+    ) -> FlextCore.Result[FlextQualityModels.Issue]:
         """Create a new quality issue."""
         # Convert string parameters to enum types
 
@@ -248,19 +247,17 @@ class FlextQuality(FlextCore.Service[None]):
             FlextIssueSeverity(severity)
             FlextIssueType(issue_type)
         except ValueError as e:
-            return FlextCore.Result[FlextQualityEntities.Issue].fail(
+            return FlextCore.Result[FlextQualityModels.Issue].fail(
                 f"Invalid severity or issue type: {e}",
             )
 
-        return FlextCore.Result[FlextQualityEntities.Issue].fail(
+        return FlextCore.Result[FlextQualityModels.Issue].fail(
             "create_issue not implemented"
         )
 
-    def get_issue(
-        self, _issue_id: UUID
-    ) -> FlextCore.Result[FlextQualityEntities.Issue]:
+    def get_issue(self, _issue_id: UUID) -> FlextCore.Result[FlextQualityModels.Issue]:
         """Get an issue by ID."""
-        return FlextCore.Result[FlextQualityEntities.Issue].fail(
+        return FlextCore.Result[FlextQualityModels.Issue].fail(
             "get_issue not implemented"
         )
 
@@ -270,26 +267,26 @@ class FlextQuality(FlextCore.Service[None]):
         severity: str | None = None,
         _issue_type: str | None = None,
         _file_path: str | None = None,
-    ) -> FlextCore.Result[list[FlextQualityEntities.Issue]]:
+    ) -> FlextCore.Result[list[FlextQualityModels.Issue]]:
         """List issues for an analysis with optional filters."""
         # Convert string severity to enum if provided
         if severity:
             try:
                 FlextIssueSeverity(severity)
             except ValueError:
-                return FlextCore.Result[list[FlextQualityEntities.Issue]].fail(
+                return FlextCore.Result[list[FlextQualityModels.Issue]].fail(
                     f"Invalid severity: {severity}",
                 )
 
-        return FlextCore.Result[list[FlextQualityEntities.Issue]].fail(
+        return FlextCore.Result[list[FlextQualityModels.Issue]].fail(
             "list_issues not implemented"
         )
 
     def mark_issue_fixed(
         self, _issue_id: UUID
-    ) -> FlextCore.Result[FlextQualityEntities.Issue]:
+    ) -> FlextCore.Result[FlextQualityModels.Issue]:
         """Mark an issue as fixed."""
-        return FlextCore.Result[FlextQualityEntities.Issue].fail(
+        return FlextCore.Result[FlextQualityModels.Issue].fail(
             "mark_fixed not implemented"
         )
 
@@ -297,17 +294,17 @@ class FlextQuality(FlextCore.Service[None]):
         self,
         _issue_id: UUID,
         _reason: str,
-    ) -> FlextCore.Result[FlextQualityEntities.Issue]:
+    ) -> FlextCore.Result[FlextQualityModels.Issue]:
         """Suppress an issue with a reason."""
-        return FlextCore.Result[FlextQualityEntities.Issue].fail(
+        return FlextCore.Result[FlextQualityModels.Issue].fail(
             "suppress_issue not implemented"
         )
 
     def unsuppress_issue(
         self, _issue_id: UUID
-    ) -> FlextCore.Result[FlextQualityEntities.Issue]:
+    ) -> FlextCore.Result[FlextQualityModels.Issue]:
         """Remove suppression from an issue."""
-        return FlextCore.Result[FlextQualityEntities.Issue].fail(
+        return FlextCore.Result[FlextQualityModels.Issue].fail(
             "unsuppress_issue not implemented"
         )
 
@@ -319,26 +316,26 @@ class FlextQuality(FlextCore.Service[None]):
         _report_format: str = "summary",
         _report_path: str | None = None,
         _report_size_bytes: int = 0,
-    ) -> FlextCore.Result[FlextQualityEntities.Report]:
+    ) -> FlextCore.Result[FlextQualityModels.Report]:
         """Create a quality report."""
-        return FlextCore.Result[FlextQualityEntities.Report].fail(
+        return FlextCore.Result[FlextQualityModels.Report].fail(
             "create_report not implemented"
         )
 
     def get_report(
         self, _report_id: UUID
-    ) -> FlextCore.Result[FlextQualityEntities.Report]:
+    ) -> FlextCore.Result[FlextQualityModels.Report]:
         """Get a report by ID."""
-        return FlextCore.Result[FlextQualityEntities.Report].fail(
+        return FlextCore.Result[FlextQualityModels.Report].fail(
             "get_report not implemented"
         )
 
     def list_reports(
         self,
         _analysis_id: UUID,
-    ) -> FlextCore.Result[list[FlextQualityEntities.Report]]:
+    ) -> FlextCore.Result[list[FlextQualityModels.Report]]:
         """List all reports for an analysis."""
-        return FlextCore.Result[list[FlextQualityEntities.Report]].fail(
+        return FlextCore.Result[list[FlextQualityModels.Report]].fail(
             "list_reports not implemented"
         )
 
@@ -352,7 +349,7 @@ class FlextQuality(FlextCore.Service[None]):
         project_id: UUID,
         commit_hash: str | None = None,
         branch: str | None = None,
-    ) -> FlextCore.Result[FlextQualityEntities.Analysis]:
+    ) -> FlextCore.Result[FlextQualityModels.Analysis]:
         """Run a complete quality analysis for a project."""
         # Create analysis
         result = self.create_analysis(
@@ -369,7 +366,7 @@ class FlextQuality(FlextCore.Service[None]):
         # Get the project to access its path
         project_result = self.get_project(project_id)
         if project_result.is_failure:
-            return FlextCore.Result[FlextQualityEntities.Analysis].fail(
+            return FlextCore.Result[FlextQualityModels.Analysis].fail(
                 f"Failed to get project: {project_result.error}",
             )
 

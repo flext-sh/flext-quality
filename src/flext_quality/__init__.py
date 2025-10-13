@@ -48,7 +48,7 @@ from .grade_calculator import QualityGradeCalculator
 from .handlers import FlextQualityHandlers as FlextQualityHandler
 from .integrations import FlextQualityIntegrations
 from .metrics import QualityMetrics
-from .models import FlextQualityModels, FlextQualityReportModel
+from .models import FlextQualityModels
 from .protocols import FlextQualityProtocols
 from .reports import FlextQualityReportGenerator
 from .services import FlextQualityServices
@@ -78,7 +78,6 @@ __all__ = [
     "FlextQualityConfigurationError",
     "FlextQualityConnectionError",
     "FlextQualityConstants",
-    "FlextQualityEntities",
     "FlextQualityError",
     "FlextQualityExceptions",
     "FlextQualityGradeError",
@@ -90,7 +89,6 @@ __all__ = [
     "FlextQualityProtocols",
     "FlextQualityReportError",
     "FlextQualityReportGenerator",
-    "FlextQualityReportModel",
     "FlextQualityRuleError",
     "FlextQualityServices",
     "FlextQualityTimeoutError",
@@ -105,6 +103,6 @@ __all__ = [
     "QualityUtilities",
     "__version__",
     "__version_info__",
-    "get_quality_container",
+    "get_quality_container", "FlextQualityEntities",
     # CLI functions removed from __all__ - import directly from .cli if needed
 ]
