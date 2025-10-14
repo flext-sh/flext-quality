@@ -6,7 +6,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import contextlib
 from typing import cast
 
 from flext_core import FlextCore
@@ -305,7 +304,7 @@ class QualityMetrics(FlextCore.Models.Value):
 
         # Extract basic metrics from dict with proper type checking
         def get_int_from_dict(
-            source: FlextQualityModels.Core.MetricsDict, key: str, default: int = 0
+            source: FlextCore.Types.Dict, key: str, default: int = 0
         ) -> int:
             """Extract integer value with proper type checking."""
             value = source.get(key, default)
@@ -316,9 +315,7 @@ class QualityMetrics(FlextCore.Models.Value):
             return default
 
         metrics_raw = results.get("metrics", {})
-        metrics: FlextQualityModels.Core.MetricsDict = cast(
-            "FlextQualityModels.Core.MetricsDict", metrics_raw
-        )
+        metrics: FlextCore.Types.Dict = cast("FlextCore.Types.Dict", metrics_raw)
         if isinstance(metrics, dict):
             files_analyzed = get_int_from_dict(metrics, "total_files", 0)
             total_lines_of_code = get_int_from_dict(metrics, "total_lines_of_code", 0)
@@ -333,14 +330,12 @@ class QualityMetrics(FlextCore.Models.Value):
 
         # Extract issue counts from nested dict structure
         issues_raw = results.get("issues", {})
-        issues: FlextQualityModels.Core.IssueDict = cast(
-            "FlextQualityModels.Core.IssueDict", issues_raw
-        )
+        issues: FlextCore.Types.Dict = cast("FlextCore.Types.Dict", issues_raw)
         if isinstance(issues, dict):
-            security_list = cast("list", issues.get("security", []))
-            complexity_list = cast("list", issues.get("complexity", []))
-            dead_code_list = cast("list", issues.get("dead_code", []))
-            duplicates_list = cast("list", issues.get("duplicates", []))
+            security_list = cast("list[object]", issues.get("security", []))
+            complexity_list = cast("list[object]", issues.get("complexity", []))
+            dead_code_list = cast("list[object]", issues.get("dead_code", []))
+            duplicates_list = cast("list[object]", issues.get("duplicates", []))
 
             security_issues: int = len(security_list)
             complexity_issues: int = len(complexity_list)
@@ -680,8 +675,3 @@ class QualityMetrics(FlextCore.Models.Value):
             return FlextCore.Result[None].fail("Complexity scores must be valid")
 
         return FlextCore.Result[None].ok(None)
-
-
-# Rebuild model to resolve forward references - Pydantic v2 compatibility
-with contextlib.suppress(AttributeError):
-    QualityMetrics.model_rebuild()

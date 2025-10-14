@@ -158,9 +158,7 @@ class FlextQualityModels(BaseModel):
     def validate_quality_system_consistency(self) -> FlextQualityModels:
         """Model validator ensuring quality system consistency and standards."""
         # Validate that quality models maintain consistency
-        if hasattr(self, "_initialized") and not self._initialized:
-            msg = "Quality models must be properly initialized"
-            raise ValueError(msg)
+        # Note: _initialized attribute check removed as it's not defined in the model
 
         # Ensure enterprise quality standards are properly set
         if hasattr(self, "ConfigModel"):
@@ -190,6 +188,7 @@ class FlextQualityModels(BaseModel):
     @override
     def __init__(self) -> None:
         """Initialize models with dependency injection."""
+        super().__init__()
         self._container = FlextCore.Container.get_global()
         self.logger = FlextCore.Logger(__name__)
 
@@ -703,7 +702,9 @@ class FlextQualityModels(BaseModel):
             }
 
         @field_serializer("metadata", when_used="json")
-        def serialize_metadata_with_context(self, value: dict) -> FlextCore.Types.Dict:
+        def serialize_metadata_with_context(
+            self, value: dict[str, object]
+        ) -> FlextCore.Types.Dict:
             """Field serializer for metadata with processing context."""
             return {
                 "report_metadata": value,
@@ -1166,7 +1167,7 @@ class FlextQualityModels(BaseModel):
             default=None,
             description="Test results if available",
         )
-        analysis_config: dict[str, Any] = Field(
+        analysis_config: dict[str, object] = Field(
             default_factory=dict,
             description="Configuration used for analysis",
         )
@@ -1423,7 +1424,7 @@ class FlextQualityModels(BaseModel):
         )
 
         # Rule parameters
-        parameters: dict[str, Any] | None = None
+        parameters: dict[str, object] | None = None
 
         # Rule description
         description: str = Field(..., description="Rule description")
@@ -1475,7 +1476,7 @@ class FlextQualityModels(BaseModel):
         pdf_report_path: str | None = None
 
         # Report sections
-        sections: dict[str, Any] | None = None
+        sections: dict[str, object] | None = None
 
     # =============================================================================
     # AST ANALYSIS MODELS - Moved from ast_*.py files
@@ -1569,5 +1570,4 @@ class FlextQualityModels(BaseModel):
 # Export models for clean imports
 __all__ = [
     "FlextQualityModels",
-    "QualityValidationResult",
 ]

@@ -8,7 +8,6 @@ completeness checking, and structural validation for documentation.
 import re
 from collections import Counter
 from pathlib import Path
-from typing import Any
 
 import yaml
 from flext_core import FlextCore
@@ -49,7 +48,7 @@ class ContentAnalyzer:
                 },
             }
 
-    def analyze_file(self, file_path: Path) -> dict[str, Any]:
+    def analyze_file(self, file_path: Path) -> dict[str, object]:
         """Perform comprehensive content analysis on a single file."""
         try:
             content = file_path.read_text(encoding="utf-8")
@@ -91,7 +90,7 @@ class ContentAnalyzer:
                 "suggestions": [],
             }
 
-    def _calculate_content_metrics(self, content: str) -> dict[str, Any]:
+    def _calculate_content_metrics(self, content: str) -> dict[str, object]:
         """Calculate basic content metrics."""
         # Word analysis
         words = re.findall(r"\b\w+\b", content)
@@ -156,7 +155,7 @@ class ContentAnalyzer:
             "code_to_content_ratio": code_lines / total_lines if total_lines > 0 else 0,
         }
 
-    def _analyze_readability(self, content: str) -> dict[str, Any]:
+    def _analyze_readability(self, content: str) -> dict[str, object]:
         """Analyze content readability using various metrics."""
         words = re.findall(r"\b\w+\b", content)
         sentences = re.split(r"[.!?]+", content)
@@ -228,7 +227,7 @@ class ContentAnalyzer:
 
         return count
 
-    def _analyze_structure(self, content: str) -> dict[str, Any]:
+    def _analyze_structure(self, content: str) -> dict[str, object]:
         """Analyze document structure and organization."""
         structure = {
             "has_table_of_contents": False,
@@ -279,7 +278,7 @@ class ContentAnalyzer:
 
         return structure
 
-    def _check_completeness(self, content: str, filename: str) -> dict[str, Any]:
+    def _check_completeness(self, content: str, filename: str) -> dict[str, object]:
         """Check documentation completeness based on file type and content."""
         completeness = {
             "score": 100,
@@ -347,7 +346,7 @@ class ContentAnalyzer:
 
     def _check_required_sections(
         self, content: str, required_sections: FlextCore.Types.StringList
-    ) -> dict[str, Any]:
+    ) -> dict[str, object]:
         """Check for required sections in content."""
         result = {"required_sections_present": [], "missing_required_sections": []}
 
@@ -373,7 +372,7 @@ class ContentAnalyzer:
 
         return result
 
-    def _calculate_quality_score(self, analysis: dict[str, Any]) -> float:
+    def _calculate_quality_score(self, analysis: dict[str, object]) -> float:
         """Calculate overall quality score for the content."""
         score = 100.0
 
@@ -408,7 +407,7 @@ class ContentAnalyzer:
 
         return max(0, min(100, score))
 
-    def _identify_issues(self, analysis: dict[str, Any]) -> list[dict[str, Any]]:
+    def _identify_issues(self, analysis: dict[str, object]) -> list[dict[str, object]]:
         """Identify content issues that need attention."""
         issues = []
 
@@ -453,7 +452,7 @@ class ContentAnalyzer:
         return issues
 
     def _generate_suggestions(
-        self, analysis: dict[str, Any]
+        self, analysis: dict[str, object]
     ) -> FlextCore.Types.StringList:
         """Generate improvement suggestions based on analysis."""
         suggestions = []
@@ -485,7 +484,7 @@ class ContentAnalyzer:
 
         return suggestions
 
-    def analyze_files_batch(self, file_paths: list[Path]) -> dict[str, Any]:
+    def analyze_files_batch(self, file_paths: list[Path]) -> dict[str, object]:
         """Analyze multiple files and aggregate results."""
         for file_path in file_paths:
             self.analyze_file(file_path)
@@ -604,7 +603,7 @@ Top Recommendations:
 
 def analyze_file_content(
     file_path: str, config_path: str | None = None
-) -> dict[str, Any]:
+) -> dict[str, object]:
     """Convenience function to analyze a single file."""
     analyzer = ContentAnalyzer(config_path)
     return analyzer.analyze_file(Path(file_path))
@@ -612,7 +611,7 @@ def analyze_file_content(
 
 def analyze_files_content(
     file_paths: FlextCore.Types.StringList, config_path: str | None = None
-) -> dict[str, Any]:
+) -> dict[str, object]:
     """Convenience function to analyze multiple files."""
     analyzer = ContentAnalyzer(config_path)
     paths = [Path(fp) for fp in file_paths]

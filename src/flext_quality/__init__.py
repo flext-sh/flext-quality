@@ -78,6 +78,7 @@ __all__ = [
     "FlextQualityConfigurationError",
     "FlextQualityConnectionError",
     "FlextQualityConstants",
+    "FlextQualityEntities",
     "FlextQualityError",
     "FlextQualityExceptions",
     "FlextQualityGradeError",
@@ -103,6 +104,6 @@ __all__ = [
     "QualityUtilities",
     "__version__",
     "__version_info__",
-    "get_quality_container", "FlextQualityEntities",
+    "get_quality_container",
     # CLI functions removed from __all__ - import directly from .cli if needed
 ]

@@ -17,7 +17,6 @@ import re
 import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
 
 import requests
 import yaml
@@ -170,7 +169,7 @@ class DocumentationAuditor:
 
         return any(pattern in str(file_path) for pattern in ignored_patterns)
 
-    def run_comprehensive_audit(self) -> dict[str, Any]:
+    def run_comprehensive_audit(self) -> dict[str, object]:
         """Run complete documentation audit."""
         print("🔍 Starting comprehensive documentation audit...")
 

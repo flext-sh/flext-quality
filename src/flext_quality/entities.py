@@ -16,7 +16,7 @@ from .constants import FlextQualityConstants
 from .typings import FlextQualityTypes
 
 
-class FlextQualityEntities(FlextCore.Models.BaseModel):
+class FlextQualityEntities(FlextCore.Models):
     """Unified quality entities class following FLEXT pattern - ZERO DUPLICATION.
 
     Single responsibility: Quality domain entities management
@@ -199,8 +199,8 @@ class FlextQualityEntities(FlextCore.Models.BaseModel):
                 self.security_score,
                 self.maintainability_score,
             ]
-            sum(scores) / len(scores)
-            return self.model_copy(update={"overall_score": "overall_score"})
+            overall_score = sum(scores) / len(scores)
+            return self.model_copy(update={"overall_score": overall_score})
 
         @property
         def is_completed(self) -> bool:
@@ -423,33 +423,7 @@ class FlextQualityEntities(FlextCore.Models.BaseModel):
         report_path: str
         report_size_bytes: int
 
-    # =============================================================================
-    # ENTITY FACTORY METHODS - Removed for 1.0 production readiness
-    # =============================================================================
-    # Factory methods removed to eliminate object type usage and ensure type safety
-    # Users should instantiate entities directly: Project(name="...", project_path="...")
 
-
-# Rebuild models to resolve forward references and type annotations
-try:
-    _entities = FlextQualityEntities()
-
-    # Rebuild nested models
-    FlextQualityEntities.Project.model_rebuild()
-    FlextQualityEntities.Analysis.model_rebuild()
-    FlextQualityEntities.Issue.model_rebuild()
-    FlextQualityEntities.Rule.model_rebuild()
-    FlextQualityEntities.Report.model_rebuild()
-
-    # Also rebuild domain events
-    FlextQualityEntities.DomainEvent.model_rebuild()
-    FlextQualityEntities.ProjectCreatedEvent.model_rebuild()
-    FlextQualityEntities.AnalysisStartedEvent.model_rebuild()
-    FlextQualityEntities.AnalysisCompletedEvent.model_rebuild()
-    FlextQualityEntities.IssueDetectedEvent.model_rebuild()
-    FlextQualityEntities.ReportGeneratedEvent.model_rebuild()
-except Exception as e:
-    # Log rebuild errors in development - should not affect runtime
-    from flext_core import FlextCore
-
-    FlextCore.Logger(__name__).debug("Model rebuild error: %s", e)
+__all__ = [
+    "FlextQualityEntities",
+]

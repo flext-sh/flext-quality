@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Protocol
 
 from flext_core import FlextCore
 
@@ -23,9 +23,9 @@ class Issue:
     line: int | None = None
     description: str = ""
     recommendation: str = ""
-    context: dict[str, Any] | None = None
+    context: dict[str, object] | None = None
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> dict[str, object]:
         """Convert issue to dictionary representation."""
         return {
             "type": self.type,
@@ -48,7 +48,7 @@ class ValidationResult:
     issues: list[Issue] | None = None
     warnings: FlextCore.Types.StringList | None = None
     errors: FlextCore.Types.StringList | None = None
-    metadata: dict[str, Any] | None = None
+    metadata: dict[str, object] | None = None
 
     def __post_init__(self) -> None:
         """Initialize default values for None fields."""
@@ -76,7 +76,7 @@ class ValidationResult:
         else:
             self.valid_items += 1
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> dict[str, object]:
         """Convert result to dictionary representation."""
         return {
             "total_items": self.total_items,
@@ -136,7 +136,7 @@ class BaseAuditor(ABC):
     def audit(self, files: list[Path]) -> ValidationResult:
         """Perform the audit operation on given files."""
 
-    def get_summary(self) -> dict[str, Any]:
+    def get_summary(self) -> dict[str, object]:
         """Get a summary of the audit results."""
         return {
             "auditor": self.name,
@@ -163,7 +163,7 @@ class BaseValidator(ABC):
         self.name = name
         self.results: ValidationResult | None = None
 
-    def validate(self, items: list[Any]) -> ValidationResult:
+    def validate(self, items: list[object]) -> ValidationResult:
         """Perform validation on given items."""
         self.results = ValidationResult()
         self.results.total_items = len(items)
@@ -173,10 +173,10 @@ class BaseValidator(ABC):
         return self.results
 
     @abstractmethod
-    def _validate_items(self, items: list[Any]) -> None:
+    def _validate_items(self, items: list[object]) -> None:
         """Implementation-specific validation logic."""
 
-    def get_summary(self) -> dict[str, Any]:
+    def get_summary(self) -> dict[str, object]:
         """Get a summary of validation results."""
         if not self.results:
             return {"validator": self.name, "status": "not_run"}
@@ -205,7 +205,9 @@ class BaseReporter(ABC):
         self.template_dir = template_dir or Path(__file__).parent.parent / "templates"
 
     @abstractmethod
-    def generate_report(self, data: dict[str, Any], output_format: str = "html") -> str:
+    def generate_report(
+        self, data: dict[str, object], output_format: str = "html"
+    ) -> str:
         """Generate a report from the given data."""
 
     def save_report(self, content: str, filename: str, output_dir: Path) -> Path:
@@ -225,9 +227,9 @@ class BaseAnalyzer(ABC):
     def __init__(self, name: str) -> None:
         """Initialize the analyzer base class with a name."""
         self.name = name
-        self.metrics: dict[str, Any] = {}
+        self.metrics: dict[str, object] = {}
 
-    def analyze(self, content: str, filepath: Path | None = None) -> dict[str, Any]:
+    def analyze(self, content: str, filepath: Path | None = None) -> dict[str, object]:
         """Analyze the given content and return metrics."""
         self.metrics = {
             "analyzer": self.name,
@@ -295,7 +297,7 @@ class FileMetadata:
             # If we can't read the file, keep defaults (file not accessible or not text)
             pass
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> dict[str, object]:
         """Convert metadata to dictionary."""
         return {
             "path": str(self.path),
