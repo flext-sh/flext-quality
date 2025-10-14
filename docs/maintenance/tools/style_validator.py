@@ -123,16 +123,17 @@ class StyleValidator:
 
         for i, line in enumerate(lines, 1):
             # Check for mixed emphasis styles
-            if self.config["markdown"]["emphasis_style"] == "*":
+            if self.config["markdown"]["emphasis_style"] == "*" and re.search(
+                r"(?<!\\)_[^_]+_(?!\\)", line
+            ):
                 # Should not have _emphasis_ if * is preferred
-                if re.search(r"(?<!\\)_[^_]+_(?!\\)", line):
-                    violations.append({
-                        "type": "emphasis_style",
-                        "line": i,
-                        "content": line.strip(),
-                        "message": "Use * for emphasis instead of _",
-                        "severity": "low",
-                    })
+                violations.append({
+                    "type": "emphasis_style",
+                    "line": i,
+                    "content": line.strip(),
+                    "message": "Use * for emphasis instead of _",
+                    "severity": "low",
+                })
 
             # Check heading formatting
             if line.startswith("#") and not re.match(r"^#{1,6}\s", line):

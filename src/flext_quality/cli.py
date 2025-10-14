@@ -31,19 +31,6 @@ from .web import FlextQualityWeb
 # Quality score thresholds
 MIN_ACCEPTABLE_QUALITY_SCORE = 70
 
-# FlextCli availability flag
-FLEXT_CLI_AVAILABLE = True
-
-# Lazy-loaded CLI API instance for table creation
-_cli_api_holder: list[object | None] = [None]  # Use list to avoid global statement
-
-
-def _get_cli_api() -> FlextCli:
-    """Get CLI API instance with lazy loading."""
-    if _cli_api_holder[0] is None:
-        _cli_api_holder[0] = FlextCli()
-    return _cli_api_holder[0]
-
 
 class FlextQualityCliService(FlextCore.Service[int]):
     """Unified FLEXT Quality CLI service following enterprise patterns.
@@ -276,22 +263,16 @@ class FlextQualityCliService(FlextCore.Service[int]):
                     sys.stdout.write(report.to_json() + "\\n")
             elif args.format == "html":
                 sys.stdout.write(report.to_html() + "\\n")
-            elif FLEXT_CLI_AVAILABLE:
+            else:
                 # Get dict[str, object] from JSON report
                 report_dict: FlextQualityTypes.Core.ReportDict = json.loads(
                     report.to_json()
                 )
-                cli_api = _get_cli_api()
+                cli_api = self._get_cli_api()
                 # Display data as table using FlextCli
                 cli_api.display_data(
                     cast("FlextCore.Types.Dict", report_dict), format_type="table"
                 )
-            else:
-                # Fallback table display
-                report_dict: FlextQualityTypes.Core.ReportDict = json.loads(
-                    report.to_json()
-                )
-                self._logger.info(str(report_dict))
 
             return FlextCore.Result[None].ok(None)
 
@@ -314,7 +295,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
                     cli_context_result.error or "CLI context creation failed",
                 )
 
-            cli_api = _get_cli_api()
+            cli_api = self._get_cli_api()
 
             project_path = Path(args.path).resolve()
             self._logger.info(f"Calculating quality score for: {project_path}")
@@ -344,16 +325,10 @@ class FlextQualityCliService(FlextCore.Service[int]):
             }
 
             # Format and display using FlextCli or fallback
-            if FLEXT_CLI_AVAILABLE:
-                # Display score data as table using FlextCli
-                cli_api.display_data(
-                    cast("FlextCore.Types.Dict", score_data), format_type="table"
-                )
-            else:
-                # Fallback display
-                self._logger.info(
-                    f"Quality Score: {score_value}% (Grade: {grade})",
-                )
+            # Display score data as table using FlextCli
+            cli_api.display_data(
+                cast("FlextCore.Types.Dict", score_data), format_type="table"
+            )
 
             # Exit based on score
             if score_value >= MIN_ACCEPTABLE_QUALITY_SCORE:
@@ -441,41 +416,38 @@ class FlextQualityCliService(FlextCore.Service[int]):
         """Public method to get CLI context."""
         return self._CliContextHelper.get_cli_context()
 
+    # Legacy compatibility functions (required by __init__.py exports)
+    def get_cli_context(self) -> FlextCliContext:
+        """Get CLI context using flext-cli exclusively."""
+        return FlextCliContext()
 
-# Legacy compatibility functions (required by __init__.py exports)
-def get_cli_context() -> FlextCliContext:
-    """Get CLI context using flext-cli exclusively."""
-    return FlextCliContext()
+    def analyze_project(self, args: argparse.Namespace) -> int:
+        """Analyze project quality using FlextCli APIs."""
+        logger = FlextCore.Logger(__name__)
+        self._CliContextHelper.get_cli_context()
+        cli_api = FlextCli()
 
+        try:
+            project_path = Path(args.path).resolve()
+            self._logger.info(f"Analyzing project: {project_path}")
 
-def analyze_project(args: argparse.Namespace) -> int:
-    """Analyze project quality using FlextCli APIs."""
-    logger = FlextCore.Logger(__name__)
-    get_cli_context()
-    cli_api = FlextCli()
+            # Use CodeAnalyzer for analysis
+            analyzer = CodeAnalyzer(project_path)
+            analysis_result = analyzer.analyze_project(
+                include_security=getattr(args, "include_security", True),
+                include_complexity=getattr(args, "include_complexity", True),
+                include_dead_code=getattr(args, "include_dead_code", True),
+                include_duplicates=getattr(args, "include_duplicates", True),
+            )
 
-    try:
-        project_path = Path(args.path).resolve()
-        self._logger.info(f"Analyzing project: {project_path}")
+            # Unwrap FlextCore.Result
+            if analysis_result.is_failure:
+                self._logger.error(f"Analysis failed: {analysis_result.error}")
+                return 1
 
-        # Use CodeAnalyzer for analysis
-        analyzer = CodeAnalyzer(project_path)
-        analysis_result = analyzer.analyze_project(
-            include_security=getattr(args, "include_security", True),
-            include_complexity=getattr(args, "include_complexity", True),
-            include_dead_code=getattr(args, "include_dead_code", True),
-            include_duplicates=getattr(args, "include_duplicates", True),
-        )
+            results = analysis_result.value
 
-        # Unwrap FlextCore.Result
-        if analysis_result.is_failure:
-            self._logger.error(f"Analysis failed: {analysis_result.error}")
-            return 1
-
-        results = analysis_result.value
-
-        # Display results using FlextCli
-        if FLEXT_CLI_AVAILABLE:
+            # Display results using FlextCli
             result_data: FlextCore.Types.Dict = {
                 "files_analyzed": getattr(results.overall_metrics, "files_analyzed", 0),
                 "total_lines": getattr(results.overall_metrics, "total_lines", 0),
@@ -484,98 +456,86 @@ def analyze_project(args: argparse.Namespace) -> int:
                 "complexity_issues": len(results.complexity_issues),
             }
             cli_api.display_data(result_data, format_type="table")
-        else:
-            self._logger.info(
-                f"Analysis complete: {getattr(results.overall_metrics, 'files_analyzed', 0)} files, "
-                f"score: {getattr(results.overall_metrics, 'quality_score', 0):.1f}%"
-            )
 
-        return 0
+            return 0
 
-    except Exception as e:
-        logger.exception("Quality analysis failed")
-        self._logger.exception(f"Analysis failed: {e}")
-        if getattr(args, "verbose", False):
-            traceback.print_exc()
-        return 1
-
-
-def score_project(args: argparse.Namespace) -> int:
-    """Get quick quality score for project using FlextCli APIs."""
-    logger = FlextCore.Logger(__name__)
-    get_cli_context()
-    cli_api = FlextCli()
-
-    try:
-        project_path = Path(args.path).resolve()
-        self._logger.info(f"Calculating quality score for: {project_path}")
-
-        # Quick analysis
-        analyzer = CodeAnalyzer(project_path)
-        analysis_result = analyzer.analyze_project(
-            include_duplicates=False,  # Skip for speed
-        )
-
-        # Unwrap FlextCore.Result
-        if analysis_result.is_failure:
-            self._logger.error(f"Analysis failed: {analysis_result.error}")
+        except Exception as e:
+            logger.exception("Quality analysis failed")
+            self._logger.exception(f"Analysis failed: {e}")
+            if getattr(args, "verbose", False):
+                traceback.print_exc()
             return 1
 
-        score_value = analyzer.get_quality_score()
-        grade = analyzer.get_quality_grade()
+    def score_project(self, args: argparse.Namespace) -> int:
+        """Get quick quality score for project using FlextCli APIs."""
+        logger = FlextCore.Logger(__name__)
+        self._CliContextHelper.get_cli_context()
+        cli_api = FlextCli()
 
-        # Create score data for display
-        score_data: FlextCore.Types.Dict = {
-            "score": score_value,
-            "grade": grade,
-            "project": str(project_path),
-        }
+        try:
+            project_path = Path(args.path).resolve()
+            self._logger.info(f"Calculating quality score for: {project_path}")
 
-        # Format and display using FlextCli or fallback
-        if FLEXT_CLI_AVAILABLE:
+            # Quick analysis
+            analyzer = CodeAnalyzer(project_path)
+            analysis_result = analyzer.analyze_project(
+                include_duplicates=False,  # Skip for speed
+            )
+
+            # Unwrap FlextCore.Result
+            if analysis_result.is_failure:
+                self._logger.error(f"Analysis failed: {analysis_result.error}")
+                return 1
+
+            score_value = analyzer.get_quality_score()
+            grade = analyzer.get_quality_grade()
+
+            # Create score data for display
+            score_data: FlextCore.Types.Dict = {
+                "score": score_value,
+                "grade": grade,
+                "project": str(project_path),
+            }
+
+            # Format and display using FlextCli or fallback
             cli_api.display_data(score_data, format_type="table")
-        else:
-            # Fallback display
-            self._logger.info(f"Quality Score: {score_value}% (Grade: {grade})")
 
-        # Exit based on score
-        if score_value >= MIN_ACCEPTABLE_QUALITY_SCORE:
-            self._logger.info(f"Quality acceptable: {score_value}%")
+            # Exit based on score
+            if score_value >= MIN_ACCEPTABLE_QUALITY_SCORE:
+                self._logger.info(f"Quality acceptable: {score_value}%")
+                return 0
+            self._logger.warning(f"Quality needs improvement: {score_value}%")
+            return 1
+
+        except Exception as e:
+            logger.exception("Quality score calculation failed")
+            self._logger.exception(f"Score calculation failed: {e}")
+            return 1
+
+    def run_web_server(self, args: argparse.Namespace) -> int:
+        """Run quality web interface server."""
+        logger = FlextCore.Logger(__name__)
+        self._CliContextHelper.get_cli_context()
+
+        try:
+            self._logger.info(f"Starting web server on {args.host}:{args.port}")
+
+            interface = FlextQualityWeb()
+            interface.run(host=args.host, port=args.port, debug=args.debug)
             return 0
-        self._logger.warning(f"Quality needs improvement: {score_value}%")
-        return 1
+        except KeyboardInterrupt:
+            self._logger.info("Web server stopped by user")
+            return 0
+        except Exception as e:
+            logger.exception("Web server failed")
+            self._logger.exception(f"Web server failed: {e}")
+            if getattr(args, "verbose", False):
+                traceback.print_exc()
+            return 1
 
-    except Exception as e:
-        logger.exception("Quality score calculation failed")
-        self._logger.exception(f"Score calculation failed: {e}")
-        return 1
-
-
-def run_web_server(args: argparse.Namespace) -> int:
-    """Run quality web interface server."""
-    logger = FlextCore.Logger(__name__)
-    get_cli_context()
-
-    try:
-        self._logger.info(f"Starting web server on {args.host}:{args.port}")
-
-        interface = FlextQualityWeb()
-        interface.run(host=args.host, port=args.port, debug=args.debug)
-        return 0
-    except KeyboardInterrupt:
-        self._logger.info("Web server stopped by user")
-        return 0
-    except Exception as e:
-        logger.exception("Web server failed")
-        self._logger.exception(f"Web server failed: {e}")
-        if getattr(args, "verbose", False):
-            traceback.print_exc()
-        return 1
-
-
-def quality_main() -> int:
-    """Legacy quality main function alias."""
-    return main()
+    def quality_main() -> int:
+        """Legacy quality main function alias."""
+        return main()
 
 
 def main() -> int:
@@ -701,22 +661,13 @@ Examples:
 
     # Route to appropriate handler
     if args.command == "analyze":
-        return analyze_project(args)
+        return FlextQualityCliService.analyze_project(args)
     if args.command == "score":
-        return score_project(args)
+        return FlextQualityCliService.score_project(args)
     if args.command == "web":
-        return run_web_server(args)
+        return FlextQualityCliService.run_web_server(args)
     parser.print_help()
     return 1
-
-
-def another_function(_args: argparse.Namespace) -> int:
-    """Ultra-simple test compatibility function - returns success."""
-    return 0
-
-
-def setup_logging(level: str = "info") -> None:
-    """Ultra-simple test compatibility function - placeholder logging setup."""
 
 
 if __name__ == "__main__":
