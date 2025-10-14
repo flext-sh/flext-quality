@@ -48,13 +48,13 @@ class FlextQualityASTBackend(BaseAnalyzer):
             self.functions: list[FlextQualityASTFunctionInfo.FunctionInfo] = []
             self.variables: list[
                 FlextCore.Types.Dict
-            ] = []  # Keeping as generic dict with object values
+            ] = []  # Keeping as generic dict[str, object] with object values
             self.imports: list[
                 FlextCore.Types.Dict
-            ] = []  # Keeping as generic dict with object values
+            ] = []  # Keeping as generic dict[str, object] with object values
             self.constants: list[
                 FlextCore.Types.Dict
-            ] = []  # Keeping as generic dict with object values
+            ] = []  # Keeping as generic dict[str, object] with object values
 
             # Context tracking
             self.class_stack: list[FlextQualityASTClassInfo.ClassInfo] = []

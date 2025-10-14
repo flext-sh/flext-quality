@@ -106,7 +106,7 @@ def check_quality_thresholds(results: FlextCore.Types.Dict) -> FlextCore.Types.D
     # Extract metrics for threshold checking using modern AnalysisResults API
     analysis_results = results.get("analysis_results", {})
 
-    # Handle both dict and AnalysisResults object
+    # Handle both dict[str, object] and AnalysisResults object
     if isinstance(analysis_results, FlextQualityTypes.AnalysisResults):
         # Modern AnalysisResults format
         security_count = len(analysis_results.security_issues)
@@ -122,7 +122,7 @@ def check_quality_thresholds(results: FlextCore.Types.Dict) -> FlextCore.Types.D
         # Get total issues
         total_issues = analysis_results.total_issues
     else:
-        # Legacy dict format fallback
+        # Legacy dict[str, object] format fallback
         issues = (
             analysis_results.get("issues", {})
             if isinstance(analysis_results, dict)

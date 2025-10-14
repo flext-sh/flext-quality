@@ -136,7 +136,7 @@ class FlextQuality(FlextCore.Service[None]):
             project_id=str(project_id),
             config=analysis_config
             if analysis_config is None
-            else dict(analysis_config),
+            else dict[str, object](analysis_config),
         )
 
     def update_metrics(

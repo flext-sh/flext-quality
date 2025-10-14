@@ -32,7 +32,7 @@ from .constants import FlextQualityConstants
 from .value_objects import FlextQualityValueObjects
 
 
-class FlextQualityModels(BaseModel):
+class FlextQualityModels(FlextCore.Models):
     """Unified quality models class following FLEXT architecture patterns.
 
     Inherits from BaseModel to avoid duplication and ensure consistency.
@@ -61,11 +61,14 @@ class FlextQualityModels(BaseModel):
     model_config = ConfigDict(
         # Enhanced Pydantic 2.11 enterprise features
         validate_assignment=True,
+        validate_return=True,
+        validate_default=True,
         use_enum_values=True,
         arbitrary_types_allowed=True,
         extra="forbid",
         frozen=False,
-        validate_return=True,
+        strict=True,
+        str_strip_whitespace=True,
         ser_json_timedelta="iso8601",
         ser_json_bytes="base64",
         hide_input_in_errors=True,

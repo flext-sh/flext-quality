@@ -449,7 +449,7 @@ class FlextQualityServices:
             """Analyze code using external backend tools."""
             try:
                 self.logger.info("Running %s analysis", backend_tool)
-                # analyze() returns dict directly, not FlextCore.Result
+                # analyze() returns dict[str, object] directly, not FlextCore.Result
                 result_dict: FlextCore.Types.Dict = self._backend.analyze(
                     code, file_path, tool=backend_tool
                 )

@@ -66,7 +66,7 @@ class DocumentationAuditor:
         except FileNotFoundError:
             self.validation_config = self.get_default_validation_config()
 
-    def get_default_audit_rules(self) -> dict:
+    def get_default_audit_rules(self) -> dict[str, object]:
         """Default audit rules if config file not found."""
         return {
             "quality_thresholds": {
@@ -89,7 +89,7 @@ class DocumentationAuditor:
             },
         }
 
-    def get_default_style_guide(self) -> dict:
+    def get_default_style_guide(self) -> dict[str, object]:
         """Default style guide if config file not found."""
         return {
             "markdown": {
@@ -110,7 +110,7 @@ class DocumentationAuditor:
             },
         }
 
-    def get_default_validation_config(self) -> dict:
+    def get_default_validation_config(self) -> dict[str, object]:
         """Default validation config if config file not found."""
         return {
             "link_validation": {

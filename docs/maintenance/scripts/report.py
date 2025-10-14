@@ -39,7 +39,7 @@ class DocumentationReporter:
         self.validation_data = self._load_json_report("latest_validation.json")
         self.optimization_data = self._load_json_report("latest_optimization.json")
 
-    def _load_json_report(self, filename: str) -> dict | None:
+    def _load_json_report(self, filename: str) -> dict[str, object] | None:
         """Load a JSON report file."""
         filepath = self.reports_dir / filename
         if filepath.exists():
@@ -388,7 +388,9 @@ class DocumentationReporter:
 
         return "\n".join(md)
 
-    def _summarize_audit_data(self, audit_data: dict | None) -> dict | None:
+    def _summarize_audit_data(
+        self, audit_data: dict[str, object] | None
+    ) -> dict[str, object] | None:
         """Summarize audit data for reporting."""
         if not audit_data:
             return None
@@ -405,7 +407,9 @@ class DocumentationReporter:
             "low_issues": len([i for i in issues if i.get("severity") == "low"]),
         }
 
-    def _summarize_validation_data(self, validation_data: dict | None) -> dict | None:
+    def _summarize_validation_data(
+        self, validation_data: dict[str, object] | None
+    ) -> dict[str, object] | None:
         """Summarize validation data for reporting."""
         if not validation_data:
             return None
@@ -419,8 +423,8 @@ class DocumentationReporter:
         }
 
     def _summarize_optimization_data(
-        self, optimization_data: dict | None
-    ) -> dict | None:
+        self, optimization_data: dict[str, object] | None
+    ) -> dict[str, object] | None:
         """Summarize optimization data for reporting."""
         if not optimization_data:
             return None

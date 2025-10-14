@@ -16,7 +16,7 @@ from flext_core import FlextCore
 
 
 def assert_is_dict(value: object) -> TypeGuard[FlextCore.Types.Dict]:
-    """Type-safe dict assertion following Single Responsibility Principle.
+    """Type-safe dict[str, object] assertion following Single Responsibility Principle.
 
     Args:
       value: Object to check
@@ -60,7 +60,7 @@ def safe_dict_access(data: FlextCore.Types.Dict, key: str) -> object:
       Value from dict
 
     Raises:
-      AssertionError: If data is not a dict or key missing
+      AssertionError: If data is not a dict[str, object] or key missing
 
     """
     assert key in data, f"Key '{key}' not found in dict"
@@ -92,7 +92,7 @@ def assert_dict_structure(
     data: FlextCore.Types.Dict,
     required_keys: FlextCore.Types.StringList,
 ) -> FlextCore.Types.Dict:
-    """Assert that object is dict with required keys - DRY pattern.
+    """Assert that object is dict[str, object] with required keys - DRY pattern.
 
     Args:
       data: Object to check

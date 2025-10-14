@@ -408,7 +408,7 @@ class FlextQualityValueObjects:
                     f"Failed to calculate grade: {grade_result.error}",
                 )
 
-            # Create instance using dict construction
+            # Create instance using dict[str, object] construction
             score_data = {
                 "value": percentage,
                 "grade": grade_result.value,

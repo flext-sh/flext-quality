@@ -273,7 +273,7 @@ class ContentAnalyzer:
         structure["depth_analysis"] = {
             "max_depth": max(depths) if depths else 0,
             "avg_depth": sum(depths) / len(depths) if depths else 0,
-            "depth_distribution": dict(Counter(depths)),
+            "depth_distribution": dict[str, object](Counter(depths)),
         }
 
         return structure

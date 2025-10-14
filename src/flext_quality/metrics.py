@@ -262,7 +262,7 @@ class QualityMetrics(FlextCore.Models.Value):
 
         Factory method that processes FlextQualityModels.AnalysisResults and calculates
         comprehensive quality metrics including weighted scores, issue counts,
-        and overall quality grading. No legacy dict support.
+        and overall quality grading. No legacy dict[str, object] support.
 
         Args:
             results: FlextQualityModels.AnalysisResults object containing:
@@ -286,7 +286,7 @@ class QualityMetrics(FlextCore.Models.Value):
             - Quality grade calculated using standardized grade scale
 
         Note:
-            Uses modern FlextQualityModels.AnalysisResults type only - no legacy dict support.
+            Uses modern FlextQualityModels.AnalysisResults type only - no legacy dict[str, object] support.
             All legacy fallback code has been removed.
 
         """
@@ -300,9 +300,9 @@ class QualityMetrics(FlextCore.Models.Value):
         cls,
         results: FlextCore.Types.Dict,
     ) -> QualityMetrics:
-        """Create QualityMetrics from legacy dict format for test compatibility."""
+        """Create QualityMetrics from legacy dict[str, object] format for test compatibility."""
 
-        # Extract basic metrics from dict with proper type checking
+        # Extract basic metrics from dict[str, object] with proper type checking
         def get_int_from_dict(
             source: FlextCore.Types.Dict, key: str, default: int = 0
         ) -> int:
@@ -328,7 +328,7 @@ class QualityMetrics(FlextCore.Models.Value):
             total_functions = get_int_from_dict(results, "total_functions", 0)
             total_classes = get_int_from_dict(results, "total_classes", 0)
 
-        # Extract issue counts from nested dict structure
+        # Extract issue counts from nested dict[str, object] structure
         issues_raw = results.get("issues", {})
         issues: FlextCore.Types.Dict = cast("FlextCore.Types.Dict", issues_raw)
         if isinstance(issues, dict):

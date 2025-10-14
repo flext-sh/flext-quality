@@ -39,7 +39,7 @@ class FlextQualityVersion:
         return self._version_info
 
     @property
-    def metadata(self) -> dict:
+    def metadata(self) -> dict[str, object]:
         """Return project metadata."""
         return {
             "name": "flext-quality",
@@ -62,7 +62,7 @@ class FlextQualityVersion:
         return "flext-quality"
 
     @property
-    def urls(self) -> dict:
+    def urls(self) -> dict[str, object]:
         """Return project URLs."""
         return self.metadata["project_urls"]
 

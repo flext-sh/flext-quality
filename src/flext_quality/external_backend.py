@@ -96,15 +96,15 @@ class FlextQualityExternalBackend(BaseAnalyzer):
         self,
         result_list: FlextCore.Types.List,
     ) -> list[FlextCore.Types.Dict]:
-        """Convert result list to properly typed dict format."""
+        """Convert result list to properly typed dict[str, object] format."""
         typed_results: list[FlextCore.Types.Dict] = []
         for item in result_list:
             if isinstance(item, dict):
-                # Ensure all dict values are properly typed as object
-                typed_dict: FlextCore.Types.Dict = dict(item.items())
+                # Ensure all dict[str, object] values are properly typed as object
+                typed_dict: FlextCore.Types.Dict = dict[str, object](item.items())
                 typed_results.append(typed_dict)
             else:
-                # Convert non-dict items to dict format
+                # Convert non-dict items to dict[str, object] format
                 typed_results.append({"raw": str(item)})
         return typed_results
 
@@ -126,7 +126,7 @@ class FlextQualityExternalBackend(BaseAnalyzer):
                 return {
                     "issues": [],
                     "ruff_available": "False",
-                }  # Return empty dict if ruff is not available
+                }  # Return empty dict[str, object] if ruff is not available
 
             # Execute ruff with validated path and arguments only
             cmd_result = FlextCore.Utilities.run_external_command(

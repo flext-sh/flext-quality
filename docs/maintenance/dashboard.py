@@ -46,7 +46,7 @@ class DocumentationDashboard:
             limit = int(request.args.get("limit", 10))
             return jsonify(self.get_recent_reports(limit))
 
-    def get_current_metrics(self) -> dict:
+    def get_current_metrics(self) -> dict[str, object]:
         """Get current quality metrics from latest audit."""
         latest_audit = self.reports_dir / "latest_audit.json"
 
@@ -83,7 +83,7 @@ class DocumentationDashboard:
                 "status": f"Error: {e!s}",
             }
 
-    def get_quality_trends(self, days: int = 30) -> dict:
+    def get_quality_trends(self, days: int = 30) -> dict[str, object]:
         """Get quality trends over the specified number of days."""
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
 

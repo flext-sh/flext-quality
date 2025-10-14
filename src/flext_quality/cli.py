@@ -188,7 +188,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
 
             if FLEXT_CLI_AVAILABLE:
                 if args.format == "json":
-                    # Get dict from JSON report
+                    # Get dict[str, object] from JSON report
                     report_dict: FlextQualityTypes.Core.ReportDict = json.loads(
                         report.to_json()
                     )
@@ -253,7 +253,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
             """Output report to stdout."""
             if args.format == "json":
                 if FLEXT_CLI_AVAILABLE:
-                    # Get dict from JSON report
+                    # Get dict[str, object] from JSON report
                     report_dict: FlextQualityTypes.Core.ReportDict = json.loads(
                         report.to_json()
                     )
@@ -276,7 +276,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
             elif args.format == "html":
                 sys.stdout.write(report.to_html() + "\\n")
             elif FLEXT_CLI_AVAILABLE:
-                # Get dict from JSON report
+                # Get dict[str, object] from JSON report
                 report_dict: FlextQualityTypes.Core.ReportDict = json.loads(
                     report.to_json()
                 )

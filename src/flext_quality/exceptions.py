@@ -62,7 +62,9 @@ class FlextQualityExceptions(FlextCore.Exceptions):
 
             # Extract common parameters
             context_raw = kwargs.get("context", {})
-            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            context = (
+                dict[str, object](context_raw) if isinstance(context_raw, dict) else {}
+            )
             correlation_id = (
                 str(kwargs.get("correlation_id"))
                 if kwargs.get("correlation_id")
@@ -106,7 +108,9 @@ class FlextQualityExceptions(FlextCore.Exceptions):
 
             # Extract common parameters
             context_raw = kwargs.get("context", {})
-            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            context = (
+                dict[str, object](context_raw) if isinstance(context_raw, dict) else {}
+            )
             correlation_id = kwargs.get("correlation_id")
             error_code = str(kwargs.get("error_code", "QUALITY_VALIDATION_ERROR"))
 
@@ -150,7 +154,9 @@ class FlextQualityExceptions(FlextCore.Exceptions):
 
             # Extract common parameters
             context_raw = kwargs.get("context", {})
-            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            context = (
+                dict[str, object](context_raw) if isinstance(context_raw, dict) else {}
+            )
             correlation_id = kwargs.get("correlation_id")
             error_code = str(kwargs.get("error_code", "QUALITY_CONFIGURATION_ERROR"))
 
@@ -193,7 +199,9 @@ class FlextQualityExceptions(FlextCore.Exceptions):
 
             # Extract common parameters
             context_raw = kwargs.get("context", {})
-            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            context = (
+                dict[str, object](context_raw) if isinstance(context_raw, dict) else {}
+            )
             correlation_id = kwargs.get("correlation_id")
             error_code = str(kwargs.get("error_code", "QUALITY_CONNECTION_ERROR"))
 
@@ -233,7 +241,9 @@ class FlextQualityExceptions(FlextCore.Exceptions):
 
             # Extract common parameters
             context_raw = kwargs.get("context", {})
-            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            context = (
+                dict[str, object](context_raw) if isinstance(context_raw, dict) else {}
+            )
             correlation_id = kwargs.get("correlation_id")
             error_code = str(kwargs.get("error_code", "QUALITY_PROCESSING_ERROR"))
 
@@ -273,7 +283,9 @@ class FlextQualityExceptions(FlextCore.Exceptions):
 
             # Extract common parameters
             context_raw = kwargs.get("context", {})
-            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            context = (
+                dict[str, object](context_raw) if isinstance(context_raw, dict) else {}
+            )
             correlation_id = kwargs.get("correlation_id")
             error_code = str(kwargs.get("error_code", "QUALITY_AUTHENTICATION_ERROR"))
 
@@ -313,7 +325,9 @@ class FlextQualityExceptions(FlextCore.Exceptions):
 
             # Extract common parameters
             context_raw = kwargs.get("context", {})
-            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            context = (
+                dict[str, object](context_raw) if isinstance(context_raw, dict) else {}
+            )
             correlation_id = kwargs.get("correlation_id")
             error_code = str(kwargs.get("error_code", "QUALITY_TIMEOUT_ERROR"))
 
@@ -356,7 +370,9 @@ class FlextQualityExceptions(FlextCore.Exceptions):
 
             # Extract common parameters
             context_raw = kwargs.get("context", {})
-            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            context = (
+                dict[str, object](context_raw) if isinstance(context_raw, dict) else {}
+            )
             correlation_id = kwargs.get("correlation_id")
             error_code = str(kwargs.get("error_code", "QUALITY_ANALYSIS_ERROR"))
 
@@ -399,7 +415,9 @@ class FlextQualityExceptions(FlextCore.Exceptions):
 
             # Extract common parameters
             context_raw = kwargs.get("context", {})
-            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            context = (
+                dict[str, object](context_raw) if isinstance(context_raw, dict) else {}
+            )
             correlation_id = kwargs.get("correlation_id")
             error_code = str(kwargs.get("error_code", "QUALITY_REPORT_ERROR"))
 
@@ -442,7 +460,9 @@ class FlextQualityExceptions(FlextCore.Exceptions):
 
             # Extract common parameters
             context_raw = kwargs.get("context", {})
-            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            context = (
+                dict[str, object](context_raw) if isinstance(context_raw, dict) else {}
+            )
             correlation_id = kwargs.get("correlation_id")
             error_code = str(kwargs.get("error_code", "QUALITY_METRICS_ERROR"))
 
@@ -485,7 +505,9 @@ class FlextQualityExceptions(FlextCore.Exceptions):
 
             # Extract common parameters
             context_raw = kwargs.get("context", {})
-            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            context = (
+                dict[str, object](context_raw) if isinstance(context_raw, dict) else {}
+            )
             correlation_id = kwargs.get("correlation_id")
             error_code = str(kwargs.get("error_code", "QUALITY_GRADE_ERROR"))
 
@@ -528,7 +550,9 @@ class FlextQualityExceptions(FlextCore.Exceptions):
 
             # Extract common parameters
             context_raw = kwargs.get("context", {})
-            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            context = (
+                dict[str, object](context_raw) if isinstance(context_raw, dict) else {}
+            )
             correlation_id = kwargs.get("correlation_id")
             error_code = str(kwargs.get("error_code", "QUALITY_RULE_ERROR"))
 
@@ -571,7 +595,9 @@ class FlextQualityExceptions(FlextCore.Exceptions):
 
             # Extract common parameters
             context_raw = kwargs.get("context", {})
-            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            context = (
+                dict[str, object](context_raw) if isinstance(context_raw, dict) else {}
+            )
             correlation_id = kwargs.get("correlation_id")
             error_code = str(kwargs.get("error_code", "QUALITY_ISSUE_ERROR"))
 
@@ -617,7 +643,9 @@ class FlextQualityExceptions(FlextCore.Exceptions):
 
             # Extract common parameters
             context_raw = kwargs.get("context", {})
-            context = dict(context_raw) if isinstance(context_raw, dict) else {}
+            context = (
+                dict[str, object](context_raw) if isinstance(context_raw, dict) else {}
+            )
             correlation_id = kwargs.get("correlation_id")
             error_code = str(kwargs.get("error_code", "QUALITY_THRESHOLD_ERROR"))
 

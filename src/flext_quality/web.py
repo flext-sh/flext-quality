@@ -99,7 +99,7 @@ class FlextQualityWeb:
     def _setup_authentication(self) -> FlextAuth | None:
         """Setup authentication using flext-auth with JWT provider."""
         try:
-            # Create auth config dict for JWT provider
+            # Create auth config dict[str, object] for JWT provider
             auth_config: FlextCore.Types.Dict = {
                 "secret_key": self._quality_config.project_name + "-secret-key",
                 "algorithm": "HS256",

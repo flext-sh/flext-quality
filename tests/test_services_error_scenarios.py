@@ -29,11 +29,11 @@ from tests.conftest import (
 )
 
 
-# DRY pattern: Factory for exception-throwing dict classes with proper generics
+# DRY pattern: Factory for exception-throwing dict[str, object] classes with proper generics
 def create_exception_dict(exception: Exception) -> type[FlextCore.Types.Dict]:
-    """factory: Creates exception-throwing dict classes.
+    """factory: Creates exception-throwing dict[str, object] classes.
 
-    Single Responsibility: Creates mock dict that raises specific exceptions
+    Single Responsibility: Creates mock dict[str, object] that raises specific exceptions
     DRY principle: Eliminates duplicated ExceptionDict classes across tests
     Open/Closed: Extensible for different exception types without modification
     """

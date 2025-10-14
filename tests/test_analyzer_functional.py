@@ -234,7 +234,7 @@ def multiply(x: int, y: int) -> int:
 
         nonexistent_file = sample_project_dir / "nonexistent.py"
 
-        # Should return None or empty dict for non-existent file
+        # Should return None or empty dict[str, object] for non-existent file
         result = analyzer._analyze_file(nonexistent_file)
 
         # The method should gracefully handle missing files

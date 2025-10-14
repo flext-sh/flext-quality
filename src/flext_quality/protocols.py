@@ -85,7 +85,7 @@ class FlextQualityProtocols(FlextCore.Protocols):
         def check(
             self,
             project_path: str,
-            config: dict | None = None,
+            config: dict[str, object] | None = None,
         ) -> FlextCore.Result[object]:
             """Run quality checks."""
             ...

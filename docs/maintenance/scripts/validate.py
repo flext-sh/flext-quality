@@ -131,7 +131,9 @@ class LinkValidator:
                 return i
         return None
 
-    def validate_external_links(self, links: list[dict], verbose: bool = False) -> dict:
+    def validate_external_links(
+        self, links: list[dict], verbose: bool = False
+    ) -> dict[str, object]:
         """Validate external links with concurrent checking."""
         external_links = [link for link in links if link["type"] == "external"]
 
@@ -161,7 +163,9 @@ class LinkValidator:
 
         return self.results
 
-    def _check_single_external_link(self, link: dict, verbose: bool = False) -> dict:
+    def _check_single_external_link(
+        self, link: dict, verbose: bool = False
+    ) -> dict[str, object]:
         """Check a single external link."""
         url = link["url"]
 
@@ -247,7 +251,9 @@ class LinkValidator:
             "line": link.get("line_number"),
         }
 
-    def validate_internal_links(self, links: list[dict], doc_files: list[Path]) -> dict:
+    def validate_internal_links(
+        self, links: list[dict], doc_files: list[Path]
+    ) -> dict[str, object]:
         """Validate internal links and references."""
         internal_links = [
             link for link in links if link["type"] in {"internal", "reference"}
@@ -313,7 +319,9 @@ class LinkValidator:
             return base_dir.parent / target[3:]
         return Path(target)
 
-    def validate_images(self, links: list[dict], project_root: Path) -> dict:
+    def validate_images(
+        self, links: list[dict], project_root: Path
+    ) -> dict[str, object]:
         """Validate image references."""
         images = [link for link in links if link["type"] == "image"]
 
@@ -353,7 +361,9 @@ class LinkValidator:
 
         return self.results
 
-    def validate_anchors(self, links: list[dict], doc_files: list[Path]) -> dict:
+    def validate_anchors(
+        self, links: list[dict], doc_files: list[Path]
+    ) -> dict[str, object]:
         """Validate anchor links within documents."""
         anchor_links = [link for link in links if link["type"] == "anchor"]
 
@@ -415,7 +425,7 @@ class LinkValidator:
         )  # Remove special chars except spaces and hyphens
         return re.sub(r"\s+", "-", anchor)  # Replace spaces with hyphens
 
-    def check_link_text_quality(self, links: list[dict]) -> dict:
+    def check_link_text_quality(self, links: list[dict]) -> dict[str, object]:
         """Check quality of link text for accessibility and usability."""
         print("🎯 Checking link text quality...")
 
@@ -486,7 +496,7 @@ class ContentValidator:
             "quality_metrics": {},
         }
 
-    def validate_markdown_syntax(self, doc_files: list[Path]) -> dict:
+    def validate_markdown_syntax(self, doc_files: list[Path]) -> dict[str, object]:
         """Validate markdown syntax and formatting."""
         print("📝 Validating markdown syntax...")
 
@@ -554,7 +564,7 @@ class ContentValidator:
 
         return issues
 
-    def check_content_quality(self, doc_files: list[Path]) -> dict:
+    def check_content_quality(self, doc_files: list[Path]) -> dict[str, object]:
         """Check content quality metrics."""
         print("📊 Analyzing content quality...")
 
@@ -593,7 +603,7 @@ class ContentValidator:
 
         return self.results
 
-    def _calculate_content_metrics(self, content: str) -> dict:
+    def _calculate_content_metrics(self, content: str) -> dict[str, object]:
         """Calculate basic content quality metrics."""
         words = re.findall(r"\b\w+\b", content)
         sentences = re.split(r"[.!?]+", content)

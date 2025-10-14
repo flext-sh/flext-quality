@@ -67,7 +67,7 @@ class FlextQualityOperations(FlextCore.Service[None]):
             cls,
             project_path: str,
             *,
-            _config: dict | None = None,
+            _config: dict[str, object] | None = None,
         ) -> FlextCore.Result[FlextQualityModels.CheckResult]:
             """Run complete quality pipeline.
 

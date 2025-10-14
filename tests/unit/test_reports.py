@@ -29,7 +29,7 @@ class TestQualityReport:
     @pytest.fixture
     def minimal_results(
         self,
-    ) -> object:  # Legacy dict format for backward compatibility testing
+    ) -> object:  # Legacy dict[str, object] format for backward compatibility testing
         """Minimal analysis results for testing."""
         return {
             "issues": {},
@@ -42,7 +42,7 @@ class TestQualityReport:
     @pytest.fixture
     def good_results(
         self,
-    ) -> object:  # Legacy dict format for backward compatibility testing
+    ) -> object:  # Legacy dict[str, object] format for backward compatibility testing
         """Analysis results with good quality scores."""
         return {
             "issues": {
@@ -72,7 +72,7 @@ class TestQualityReport:
     @pytest.fixture
     def poor_results(
         self,
-    ) -> object:  # Legacy dict format for backward compatibility testing
+    ) -> object:  # Legacy dict[str, object] format for backward compatibility testing
         """Analysis results with poor quality scores."""
         return {
             "issues": {
@@ -131,7 +131,7 @@ class TestQualityReport:
     @pytest.fixture
     def mixed_results(
         self,
-    ) -> object:  # Legacy dict format for backward compatibility testing
+    ) -> object:  # Legacy dict[str, object] format for backward compatibility testing
         """Analysis results with mixed quality."""
         return {
             "issues": {
@@ -341,11 +341,11 @@ class TestQualityReport:
         poor_results: object,
     ) -> None:
         """Test that text report truncates long issue lists."""
-        # Cast to mutable dict and modify results to have many style issues
-        poor_dict: FlextCore.Types.Dict = dict(poor_results)
+        # Cast to mutable dict[str, object] and modify results to have many style issues
+        poor_dict: FlextCore.Types.Dict = dict[str, object](poor_results)
         issues_obj = poor_dict["issues"]
         assert isinstance(issues_obj, dict)
-        issues_dict: FlextCore.Types.Dict = dict(issues_obj)
+        issues_dict: FlextCore.Types.Dict = dict[str, object](issues_obj)
         issues_dict["style"] = [
             {"file": f"file{i}.py", "message": f"Issue {i}"}
             for i in range(ISSUE_PREVIEW_LIMIT + 3)

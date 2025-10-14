@@ -46,7 +46,7 @@ class ScheduledMaintenance:
         except FileNotFoundError:
             self.config = self.get_default_config()
 
-    def get_default_config(self) -> dict:
+    def get_default_config(self) -> dict[str, object]:
         """Default maintenance configuration."""
         return {
             "enabled": True,

@@ -94,7 +94,7 @@ class LinkChecker:
                 ref_links = re.findall(r"\[([^\]]+)\]\[([^\]]+)\]", content)
                 ref_defs = re.findall(r"\[([^\]]+)\]:\s*([^\s]+)", content)
 
-                ref_dict = dict(ref_defs)
+                ref_dict = dict[str, object](ref_defs)
                 for text, ref in ref_links:
                     if ref in ref_dict:
                         url = ref_dict[ref]
@@ -124,7 +124,9 @@ class LinkChecker:
             return "image"
         return "internal"
 
-    async def check_link_async(self, url: str, context: dict | None = None) -> dict:
+    async def check_link_async(
+        self, url: str, context: dict[str, object] | None = None
+    ) -> dict[str, object]:
         """Asynchronously check a single link."""
         start_time = time.time()
 
@@ -181,7 +183,9 @@ class LinkChecker:
                 "context": context or {},
             }
 
-    def check_link_sync(self, url: str, context: dict | None = None) -> dict:
+    def check_link_sync(
+        self, url: str, context: dict[str, object] | None = None
+    ) -> dict[str, object]:
         """Synchronously check a single link (fallback method)."""
         start_time = time.time()
 
@@ -321,7 +325,9 @@ class LinkChecker:
 
         return results
 
-    async def validate_links(self, links: list[dict], use_async: bool = True) -> dict:
+    async def validate_links(
+        self, links: list[dict], use_async: bool = True
+    ) -> dict[str, object]:
         """Main link validation method."""
         self.results["total_links"] = len(links)
 
@@ -477,7 +483,9 @@ Broken Links:
 
 
 # Synchronous wrapper for easy usage
-def validate_links_sync(links: list[dict], config_path: str | None = None) -> dict:
+def validate_links_sync(
+    links: list[dict], config_path: str | None = None
+) -> dict[str, object]:
     """Synchronous wrapper for link validation."""
     checker = LinkChecker(config_path)
     # Run async validation in new event loop

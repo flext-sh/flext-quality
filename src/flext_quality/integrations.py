@@ -85,7 +85,7 @@ class FlextQualityIntegrations(FlextCore.Service[None]):
                 )
 
             self.logger.info(f"Webhook sent successfully: {event_type}")
-            # Cast HttpResponse to dict for type safety
+            # Cast HttpResponse to dict[str, object] for type safety
             response_dict = cast("FlextCore.Types.Dict", response_result.value)
             return FlextCore.Result[FlextCore.Types.Dict].ok(response_dict)
 
@@ -188,7 +188,7 @@ class FlextQualityIntegrations(FlextCore.Service[None]):
             self.logger.info(
                 f"SonarQube integration successful for project: {project_key}"
             )
-            # Cast HttpResponse to dict for type safety
+            # Cast HttpResponse to dict[str, object] for type safety
             response_dict = cast("FlextCore.Types.Dict", response_result.value)
             return FlextCore.Result[FlextCore.Types.Dict].ok(response_dict)
 
@@ -250,7 +250,7 @@ class FlextQualityIntegrations(FlextCore.Service[None]):
                 )
 
             self.logger.info(f"GitHub Checks updated for commit: {commit_sha}")
-            # Cast HttpResponse to dict for type safety
+            # Cast HttpResponse to dict[str, object] for type safety
             response_dict = cast("FlextCore.Types.Dict", response_result.value)
             return FlextCore.Result[FlextCore.Types.Dict].ok(response_dict)
 
@@ -293,7 +293,7 @@ class FlextQualityIntegrations(FlextCore.Service[None]):
                 )
 
             self.logger.info(f"Report delivered successfully: {report_file.name}")
-            # Cast HttpResponse to dict for type safety
+            # Cast HttpResponse to dict[str, object] for type safety
             response_dict = cast("FlextCore.Types.Dict", response_result.value)
             return FlextCore.Result[FlextCore.Types.Dict].ok(response_dict)
 

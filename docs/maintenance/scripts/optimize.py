@@ -34,7 +34,7 @@ class DocumentationOptimizer:
             "optimizations": [],
         }
 
-    def optimize_formatting(self, doc_files: list[Path]) -> dict:
+    def optimize_formatting(self, doc_files: list[Path]) -> dict[str, object]:
         """Fix common formatting issues."""
         print("🎨 Optimizing formatting...")
 
@@ -96,7 +96,7 @@ class DocumentationOptimizer:
         # This is a basic implementation - could be more sophisticated
         return content
 
-    def update_table_of_contents(self, doc_files: list[Path]) -> dict:
+    def update_table_of_contents(self, doc_files: list[Path]) -> dict[str, object]:
         """Update or add table of contents for long documents."""
         print("📑 Updating table of contents...")
 
@@ -185,7 +185,7 @@ class DocumentationOptimizer:
         anchor = re.sub(r"[^\w\s-]", "", anchor)
         return re.sub(r"\s+", "-", anchor)
 
-    def enhance_accessibility(self, doc_files: list[Path]) -> dict:
+    def enhance_accessibility(self, doc_files: list[Path]) -> dict[str, object]:
         """Enhance accessibility of documentation."""
         print("♿ Enhancing accessibility...")
 
@@ -248,7 +248,7 @@ class DocumentationOptimizer:
 
         return content
 
-    def optimize_content_structure(self, doc_files: list[Path]) -> dict:
+    def optimize_content_structure(self, doc_files: list[Path]) -> dict[str, object]:
         """Optimize content structure and readability."""
         print("📖 Optimizing content structure...")
 
@@ -314,7 +314,7 @@ class DocumentationOptimizer:
 
         return "\n".join(enhanced_lines)
 
-    def update_metadata(self, doc_files: list[Path]) -> dict:
+    def update_metadata(self, doc_files: list[Path]) -> dict[str, object]:
         """Update frontmatter metadata and timestamps."""
         print("📝 Updating metadata...")
 

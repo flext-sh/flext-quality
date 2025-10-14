@@ -23,7 +23,7 @@ from flext_quality import (
     FileAnalysisResult,
 )
 
-# No longer need legacy dict helpers - using typed AnalysisResults API
+# No longer need legacy dict[str, object] helpers - using typed AnalysisResults API
 
 
 class TestCodeAnalyzerComprehensive:
@@ -92,7 +92,7 @@ class TestCodeAnalyzerComprehensive:
             include_duplicates=False,
         )
 
-        # Use modern AnalysisResults API instead of dict access
+        # Use modern AnalysisResults API instead of dict[str, object] access
         # Note: Security issues depend on the specific code content
         assert len(results.security_issues) >= 0  # May or may not have security issues
         assert (
@@ -254,7 +254,7 @@ class TestCodeAnalyzerComprehensive:
             analyzer = CodeAnalyzer(tmp_dir)
             overall = analyzer._calculate_overall_metrics([])
 
-            # Real implementation returns empty dict for empty input
+            # Real implementation returns empty dict[str, object] for empty input
             assert overall == {}
 
     def test_calculate_overall_metrics_single_file(self) -> None:
@@ -532,7 +532,7 @@ class DataProcessor:
       self.config_path = config_path
       self.config = self._load_config()
 
-    def _load_config(self) -> dict:
+    def _load_config(self) -> dict[str, object]:
       if os.path.exists(self.config_path):
           with open(self.config_path) as f:
               return json.load(f)
