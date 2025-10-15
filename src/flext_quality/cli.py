@@ -12,8 +12,7 @@ import json
 import sys
 import traceback
 from pathlib import Path
-from typing import cast
-from typing_extensions import override
+from typing import cast, override
 
 from flext_cli import (
     FlextCli,
@@ -263,7 +262,6 @@ class FlextQualityCliService(FlextCore.Service[int]):
                 )
                 # Display data as table using FlextCli
                 # Use print instead of display_data for table output
-                print(report_dict)
 
             return FlextCore.Result[None].ok(None)
 
@@ -309,7 +307,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
             grade = analyzer.get_quality_grade()
 
             # Create score data for display
-            score_data = {
+            {
                 "score": score_value,
                 "grade": grade,
                 "project": str(project_path),
@@ -407,7 +405,9 @@ class FlextQualityCliService(FlextCore.Service[int]):
         if instance.logger is None:
             msg = "Logger must be initialized"
             raise RuntimeError(msg)
-        web_helper = instance._WebServerHelper(cast("FlextCore.Logger", instance.logger))
+        web_helper = instance._WebServerHelper(
+            cast("FlextCore.Logger", instance.logger)
+        )
 
         web_result: FlextCore.Result[int] = web_helper.run_web_server_workflow(args)
         if web_result.is_failure:
@@ -452,7 +452,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
             )
 
             # Display results using FlextCli
-            result_data: FlextCore.Types.Dict = {
+            {
                 "files_analyzed": getattr(results.overall_metrics, "files_analyzed", 0),
                 "total_lines": getattr(results.overall_metrics, "total_lines", 0),
                 "quality_score": f"{getattr(results.overall_metrics, 'quality_score', 0):.1f}%",
@@ -464,7 +464,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
 
             return 0
 
-        except Exception as e:
+        except Exception:
             logger.exception("Quality analysis failed")
             if getattr(args, "verbose", False):
                 traceback.print_exc()
@@ -491,7 +491,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
             grade = analyzer.get_quality_grade()
 
             # Create score data for display
-            score_data: FlextCore.Types.Dict = {
+            {
                 "score": score_value,
                 "grade": grade,
                 "project": str(project_path),
@@ -508,7 +508,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
             self.logger.warning(f"Quality needs improvement: {score_value}%")
             return 1
 
-        except Exception as e:
+        except Exception:
             logger.exception("Quality score calculation failed")
             return 1
 
@@ -526,7 +526,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
         except KeyboardInterrupt:
             self.logger.info("Web server stopped by user")
             return 0
-        except Exception as e:
+        except Exception:
             logger.exception("Web server failed")
             if getattr(args, "verbose", False):
                 traceback.print_exc()
