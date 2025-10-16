@@ -47,7 +47,10 @@ from .exceptions import (
 from .external_backend import FlextQualityExternalBackend as ExternalBackend
 from .grade_calculator import QualityGradeCalculator
 from .handlers import FlextQualityHandlers as FlextQualityHandler
-from .integrations import FlextQualityIntegrations
+try:
+    from .integrations import FlextQualityIntegrations
+except ImportError:  # Optional dependency
+    FlextQualityIntegrations = None  # type: ignore[assignment]
 from .metrics import QualityMetrics
 from .models import FlextQualityModels
 from .protocols import FlextQualityProtocols
@@ -59,7 +62,10 @@ from .typings import FlextQualityTypes
 from .utilities import FlextQualityUtilities as QualityUtilities
 from .value_objects import FlextQualityValueObjects
 from .version import VERSION, FlextQualityVersion
-from .web import FlextQualityWeb
+try:
+    from .web import FlextQualityWeb
+except ImportError:  # Optional dependency
+    FlextQualityWeb = None  # type: ignore[assignment]
 
 __all__ = [
     "VERSION",
@@ -81,7 +87,6 @@ __all__ = [
     "FlextQualityConstants",
     "FlextQualityEntities",
     "FlextQualityError",
-    "FlextQualityExceptions",
     "FlextQualityGradeError",
     "FlextQualityHandler",
     "FlextQualityIntegrations",

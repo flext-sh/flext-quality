@@ -12,7 +12,7 @@ Consolidates flext_tools optimizer operations:
 ALL operations support:
 - dry_run=True (default - MANDATORY)
 - temp_path for temporary workspace
-- FlextCore.Result error handling (NO try/except)
+- FlextResult error handling (NO try/except)
 - Domain library enforcement (ZERO TOLERANCE)
 """
 
@@ -27,14 +27,20 @@ from pathlib import Path
 from typing import ClassVar
 
 import toml
-from flext_core import FlextCore
+from flext_core import (
+    FlextConstants,
+    FlextLogger,
+    FlextResult,
+    FlextService,
+    FlextTypes,
+)
 from pydantic import ConfigDict
 
 from flext_quality.constants import FlextQualityConstants
 from flext_quality.models import FlextQualityModels
 
 
-class FlextQualityOptimizerOperations(FlextCore.Service[None]):
+class FlextQualityOptimizerOperations(FlextService[None]):
     """Unified module optimization operations with complete flext-core integration.
 
     Example usage:
@@ -61,9 +67,9 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
 
     model_config = ConfigDict(arbitrary_types_allowed=True, extra="allow")
 
-    def execute(self) -> FlextCore.Result[None]:
-        """Execute optimizer operations service - FlextCore.Service interface."""
-        return FlextCore.Result[None].ok(None)
+    def execute(self) -> FlextResult[None]:
+        """Execute optimizer operations service - FlextService interface."""
+        return FlextResult[None].ok(None)
 
     class ModuleOptimizer:
         """Module optimization with AST analysis.
@@ -96,7 +102,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
         def _create_temp_file(
             module_path: str,
             temp_path: str | None = None,
-        ) -> FlextCore.Result[Path]:
+        ) -> FlextResult[Path]:
             """Create temporary copy of module for dry-run."""
             if temp_path:
                 workspace = Path(temp_path)
@@ -110,12 +116,12 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
 
             source = Path(module_path)
             if not source.exists():
-                return FlextCore.Result[Path].fail(f"Module not found: {module_path}")
+                return FlextResult[Path].fail(f"Module not found: {module_path}")
 
             temp_file = workspace / source.name
             shutil.copy2(source, temp_file)
 
-            return FlextCore.Result[Path].ok(temp_file)
+            return FlextResult[Path].ok(temp_file)
 
         @staticmethod
         def calculate_complexity_score(tree: ast.Module, content: str) -> float:
@@ -126,19 +132,19 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
             score = 0.0
 
             # Count classes (should be 1 per module)
-            class_count = len([
-                node for node in ast.walk(tree) if isinstance(node, ast.ClassDef)
-            ])
+            class_count = len(
+                [node for node in ast.walk(tree) if isinstance(node, ast.ClassDef)]
+            )
             if class_count > 1:
                 score += 0.3
             elif class_count == 0:
                 score += 0.2
 
             # Count functions (should be minimal in optimized modules)
-            func_count = len([
-                node for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
-            ])
-            if func_count > FlextCore.Constants.Config.MAX_FUNCTIONS_THRESHOLD:
+            func_count = len(
+                [node for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
+            )
+            if func_count > FlextConstants.Config.MAX_FUNCTIONS_THRESHOLD:
                 score += 0.3
 
             # Check for nested complexity
@@ -147,12 +153,12 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                     tree
                 )
             )
-            if max_depth > FlextCore.Constants.Config.MAX_AST_DEPTH_THRESHOLD:
+            if max_depth > FlextConstants.Config.MAX_AST_DEPTH_THRESHOLD:
                 score += 0.2
 
             # Line count complexity
             line_count = len(content.split("\n"))
-            if line_count > FlextCore.Constants.Config.MAX_LINE_COUNT_THRESHOLD:
+            if line_count > FlextConstants.Config.MAX_LINE_COUNT_THRESHOLD:
                 score += 0.2
 
             return min(score, 1.0)
@@ -180,7 +186,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
         @staticmethod
         def analyze_module(
             module_path: str,
-        ) -> FlextCore.Result[FlextQualityModels.AnalysisResult]:
+        ) -> FlextResult[FlextQualityModels.AnalysisResult]:
             """Analyze module for optimization opportunities.
 
             Complete implementation extracted from unified_module_optimizer.py.
@@ -189,12 +195,12 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 module_path: Path to Python module
 
             Returns:
-                FlextCore.Result with AnalysisResult
+                FlextResult with AnalysisResult
 
             """
             path = Path(module_path)
             if not path.exists():
-                return FlextCore.Result[FlextQualityModels.AnalysisResult].fail(
+                return FlextResult[FlextQualityModels.AnalysisResult].fail(
                     f"Module not found: {module_path}"
                 )
 
@@ -202,7 +208,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 with path.open(encoding="utf-8") as f:
                     content = f.read()
             except Exception as e:
-                return FlextCore.Result[FlextQualityModels.AnalysisResult].fail(
+                return FlextResult[FlextQualityModels.AnalysisResult].fail(
                     f"Failed to read file: {e}"
                 )
 
@@ -210,12 +216,12 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
             try:
                 tree = ast.parse(content, filename=str(path))
             except SyntaxError as e:
-                return FlextCore.Result[FlextQualityModels.AnalysisResult].fail(
+                return FlextResult[FlextQualityModels.AnalysisResult].fail(
                     f"Syntax error: {e}"
                 )
 
-            violations: FlextCore.Types.StringList = []
-            suggestions: FlextCore.Types.StringList = []
+            violations: FlextTypes.StringList = []
+            suggestions: FlextTypes.StringList = []
             domain_library_usage: dict[str, bool] = {
                 "flext-cli": False,
                 "flext-ldif": False,
@@ -252,7 +258,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
             # Generate suggestions
             if violations:
                 suggestions.append("Fix violations to comply with FLEXT patterns")
-            if complexity_score > FlextCore.Constants.Config.COMPLEXITY_SCORE_THRESHOLD:
+            if complexity_score > FlextConstants.Config.COMPLEXITY_SCORE_THRESHOLD:
                 suggestions.append("Consider breaking down complex module")
             if not any(domain_library_usage.values()):
                 suggestions.append(
@@ -266,7 +272,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 domain_library_usage=domain_library_usage,
             )
 
-            return FlextCore.Result[FlextQualityModels.AnalysisResult].ok(result)
+            return FlextResult[FlextQualityModels.AnalysisResult].ok(result)
 
         @staticmethod
         def count_changes(original: str, optimized: str) -> int:
@@ -321,31 +327,12 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
             return content
 
         @staticmethod
-        def general_improvements(content: str) -> str:
-            """Apply general improvements.
-
-            Extracted from unified_module_optimizer.py.
-            """
-            optimized = content
-
-            # Ensure from __future__ import annotations
-            if "from __future__ import annotations" not in optimized:
-                optimized = "from __future__ import annotations\n\n" + optimized
-
-            # Add proper type hints if missing
-            return (
-                FlextQualityOptimizerOperations.ModuleOptimizer.add_missing_type_hints(
-                    optimized
-                )
-            )
-
-        @staticmethod
         def optimize(
             module_path: str,
             *,
             dry_run: bool = True,
             _temp_path: str | None = None,
-        ) -> FlextCore.Result[FlextQualityModels.OptimizationResult]:
+        ) -> FlextResult[FlextQualityModels.OptimizationResult]:
             """Optimize Python module.
 
             Complete implementation extracted from unified_module_optimizer.py.
@@ -356,10 +343,10 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 temp_path: Custom temporary workspace path (reserved for future use)
 
             Returns:
-                FlextCore.Result with OptimizationResult
+                FlextResult with OptimizationResult
 
             """
-            logger = FlextCore.Logger(__name__)
+            logger = FlextLogger(__name__)
 
             # Analyze first
             analysis_result = (
@@ -368,7 +355,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 )
             )
             if analysis_result.is_failure:
-                return FlextCore.Result[FlextQualityModels.OptimizationResult].fail(
+                return FlextResult[FlextQualityModels.OptimizationResult].fail(
                     analysis_result.error
                 )
 
@@ -379,7 +366,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 with Path(module_path).open(encoding="utf-8") as f:
                     original_content = f.read()
             except Exception as e:
-                return FlextCore.Result[FlextQualityModels.OptimizationResult].fail(
+                return FlextResult[FlextQualityModels.OptimizationResult].fail(
                     f"Failed to read file: {e}"
                 )
 
@@ -391,7 +378,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 )
             elif (
                 analysis.complexity_score
-                > FlextCore.Constants.Config.COMPLEXITY_SCORE_THRESHOLD
+                > FlextConstants.Config.COMPLEXITY_SCORE_THRESHOLD
             ):
                 optimization_type = "complexity_reduction"
                 # For now, complexity reduction is a placeholder
@@ -425,9 +412,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                     errors=[],
                     warnings=[],
                 )
-                return FlextCore.Result[FlextQualityModels.OptimizationResult].ok(
-                    result
-                )
+                return FlextResult[FlextQualityModels.OptimizationResult].ok(result)
 
             # Real optimization - apply fixes
             if optimized_content != original_content:
@@ -436,7 +421,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                         f.write(optimized_content)
                     logger.info(f"Optimized {module_path} ({changes_made} changes)")
                 except Exception as e:
-                    return FlextCore.Result[FlextQualityModels.OptimizationResult].fail(
+                    return FlextResult[FlextQualityModels.OptimizationResult].fail(
                         f"Failed to write optimized file: {e}"
                     )
 
@@ -453,7 +438,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 warnings=[],
             )
 
-            return FlextCore.Result[FlextQualityModels.OptimizationResult].ok(result)
+            return FlextResult[FlextQualityModels.OptimizationResult].ok(result)
 
     class ImportRefactorer:
         """Import optimization and domain library enforcement.
@@ -522,7 +507,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 return content, changed
 
             lines = content.splitlines(keepends=True)
-            promoted_imports: FlextCore.Types.StringList = []
+            promoted_imports: FlextTypes.StringList = []
             keep_tc_blocks: list[tuple[int, int, str]] = []  # (start, end, text)
 
             for node in tree.body:
@@ -542,7 +527,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                     except SyntaxError:
                         continue
 
-                    kept_lines: FlextCore.Types.StringList = []
+                    kept_lines: FlextTypes.StringList = []
                     for tc_node in tc_tree.body:
                         if isinstance(tc_node, ast.Import):
                             for alias in tc_node.names:
@@ -650,7 +635,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
             *,
             dry_run: bool = True,
             package_name: str | None = None,
-        ) -> FlextCore.Result[FlextCore.Types.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Refactor imports to use domain libraries.
 
             Complete implementation extracted from refactor_imports.py.
@@ -661,14 +646,14 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 package_name: Package name for refactoring (auto-detected if None)
 
             Returns:
-                FlextCore.Result with refactoring statistics
+                FlextResult with refactoring statistics
 
             """
-            logger = FlextCore.Logger(__name__)
+            logger = FlextLogger(__name__)
 
             path = Path(module_path)
             if not path.exists():
-                return FlextCore.Result[FlextCore.Types.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Module not found: {module_path}"
                 )
 
@@ -680,11 +665,11 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                     if src_idx + 1 < len(path.parts):
                         package_name = path.parts[src_idx + 1]
                     else:
-                        return FlextCore.Result[FlextCore.Types.Dict].fail(
+                        return FlextResult[FlextTypes.Dict].fail(
                             "Could not auto-detect package name"
                         )
                 else:
-                    return FlextCore.Result[FlextCore.Types.Dict].fail(
+                    return FlextResult[FlextTypes.Dict].fail(
                         "Package name required for non-src layout"
                     )
 
@@ -692,12 +677,10 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 with path.open("r", encoding="utf-8") as f:
                     original_content = f.read()
             except Exception as e:
-                return FlextCore.Result[FlextCore.Types.Dict].fail(
-                    f"Failed to read file: {e}"
-                )
+                return FlextResult[FlextTypes.Dict].fail(f"Failed to read file: {e}")
 
             content = original_content
-            changes: FlextCore.Types.StringList = []
+            changes: FlextTypes.StringList = []
 
             # Collect initial stats
             initial_stats = (
@@ -741,12 +724,14 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 logger.info(
                     f"DRY RUN: Would refactor imports in {module_path} ({len(changes)} changes)"
                 )
-                return FlextCore.Result[FlextCore.Types.Dict].ok({
-                    "dry_run": True,
-                    "changes": changes,
-                    "file": str(module_path),
-                    "stats": initial_stats,
-                })
+                return FlextResult[FlextTypes.Dict].ok(
+                    {
+                        "dry_run": True,
+                        "changes": changes,
+                        "file": str(module_path),
+                        "stats": initial_stats,
+                    }
+                )
 
             # Write back if changes were made
             if content != original_content:
@@ -757,23 +742,27 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                         f"Refactored imports in {module_path} ({len(changes)} changes)"
                     )
                 except Exception as e:
-                    return FlextCore.Result[FlextCore.Types.Dict].fail(
+                    return FlextResult[FlextTypes.Dict].fail(
                         f"Failed to write file: {e}"
                     )
 
-                return FlextCore.Result[FlextCore.Types.Dict].ok({
-                    "status": "modified",
-                    "changes": changes,
+                return FlextResult[FlextTypes.Dict].ok(
+                    {
+                        "status": "modified",
+                        "changes": changes,
+                        "file": str(module_path),
+                        "stats": initial_stats,
+                    }
+                )
+
+            return FlextResult[FlextTypes.Dict].ok(
+                {
+                    "status": "unchanged",
+                    "changes": [],
                     "file": str(module_path),
                     "stats": initial_stats,
-                })
-
-            return FlextCore.Result[FlextCore.Types.Dict].ok({
-                "status": "unchanged",
-                "changes": [],
-                "file": str(module_path),
-                "stats": initial_stats,
-            })
+                }
+            )
 
     class SyntaxModernizer:
         """Python syntax modernization.
@@ -784,13 +773,34 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
         - PEP 698: @override decorator
         - Union[A, B] → A | B (Python 3.10+)
         - Dict/List/Set/Tuple → dict/list/set/tuple (Python 3.9+)
-        - Remove quoted type annotations (with from __future__ import annotations)
+        - Remove quoted type annotations (with from __future__ import annotations
+        from flext_core import FlextBus
+
+        from flext_core import FlextConfig
+        from flext_core import FlextConstants
+        from flext_core import FlextContainer
+        from flext_core import FlextContext
+        from flext_core import FlextDecorators
+        from flext_core import FlextDispatcher
+        from flext_core import FlextExceptions
+        from flext_core import FlextHandlers
+        from flext_core import FlextLogger
+        from flext_core import FlextMixins
+        from flext_core import FlextModels
+        from flext_core import FlextProcessors
+        from flext_core import FlextProtocols
+        from flext_core import FlextRegistry
+        from flext_core import FlextResult
+        from flext_core import FlextRuntime
+        from flext_core import FlextService
+        from flext_core import FlextTypes
+        from flext_core import FlextUtilities)
         """
 
         @staticmethod
         def modernize_type_parameters(
             content: str,
-        ) -> tuple[str, FlextCore.Types.StringList]:
+        ) -> tuple[str, FlextTypes.StringList]:
             """Apply PEP 695: Type Parameter Syntax.
 
             Extracted from modernize_python_syntax.py.
@@ -868,85 +878,9 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
             return content, changes
 
         @staticmethod
-        def modernize_override_decorators(
-            content: str,
-        ) -> tuple[str, FlextCore.Types.StringList]:
-            """Apply PEP 698: @override decorator.
-
-            Extracted from modernize_python_syntax.py.
-            Adds @override decorator to common overridden methods.
-            """
-            changes = []
-
-            # Find method definitions that might need @override
-            class_methods = re.finditer(
-                r"class\s+(\w+).*?:\s*\n(.*?)(?=\nclass|\nif\s+__name__|\n[A-Z]|\Z)",
-                content,
-                re.DOTALL,
-            )
-
-            for class_match in class_methods:
-                class_name = class_match.group(1)
-                class_body = class_match.group(2)
-
-                # Find methods that override common base methods
-                override_methods = [
-                    "__init__",
-                    "__str__",
-                    "__repr__",
-                    "__eq__",
-                    "__hash__",
-                    "process",
-                    "execute",
-                    "handle",
-                    "validate",
-                    "run",
-                ]
-
-                for method in override_methods:
-                    method_pattern = rf"(\s+)def\s+{method}\s*\("
-                    if (
-                        re.search(method_pattern, class_body)
-                        and "@override" not in class_body
-                    ):
-                        # Add typing import if needed
-                        if (
-                            "from typing import" in content
-                            and "override" not in content
-                        ):
-                            content = re.sub(
-                                r"from typing import ([^,\n]*,\s*)?override(,\s*[^,\n]*)?",
-                                lambda m: f"from typing import {m.group(1) or ''}{m.group(2) or ''}".replace(
-                                    ", ,", ","
-                                ).strip(", "),
-                                content,
-                            )
-                            changes.append("Added override import")
-                        elif "from typing import" not in content:
-                            # Add typing import at the top
-                            content = re.sub(
-                                r"(from __future__ import annotations\n)",
-                                r"\1\nfrom typing import override\n",
-                                content,
-                            )
-                            changes.append("Added typing override import")
-
-                        # Add @override decorator
-                        content = re.sub(
-                            rf"(\s+)def\s+{method}\s*\(",
-                            rf"\1@override\n\1def {method}(",
-                            content,
-                        )
-                        changes.append(
-                            f"Added @override decorator to {method} in {class_name}"
-                        )
-
-            return content, changes
-
-        @staticmethod
         def modernize_union_syntax(
             content: str,
-        ) -> tuple[str, FlextCore.Types.StringList]:
+        ) -> tuple[str, FlextTypes.StringList]:
             """Modernize Union syntax to use | operator (Python 3.10+ syntax).
 
             Extracted from modernize_python_syntax.py.
@@ -1002,129 +936,11 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
             return content, changes
 
         @staticmethod
-        def modernize_dict_list_syntax(
-            content: str,
-        ) -> tuple[str, FlextCore.Types.StringList]:
-            """Modernize Dict/List to use built-in types.
-
-            Extracted from modernize_python_syntax.py.
-            - Dict[K, V] → dict[K, V]
-            - List[T] → list[T]
-            - Set[T] → set[T]
-            - Tuple[...] → tuple[...]
-            """
-            changes = []
-
-            # Dict[K, V] → dict[K, V]
-            dict_pattern = r"Dict\[([^\]]+)\]"
-            dicts = re.findall(dict_pattern, content)
-
-            for dict_content in dicts:
-                content = content.replace(
-                    f"Dict[{dict_content}]", f"dict[{dict_content}]"
-                )
-                changes.append(
-                    f"Modernized Dict[{dict_content}] to dict[{dict_content}]"
-                )
-
-            # List[T] → list[T]
-            list_pattern = r"List\[([^\]]+)\]"
-            lists = re.findall(list_pattern, content)
-
-            for list_content in lists:
-                content = content.replace(
-                    f"List[{list_content}]", f"list[{list_content}]"
-                )
-                changes.append(
-                    f"Modernized List[{list_content}] to list[{list_content}]"
-                )
-
-            # Set[T] → set[T]
-            set_pattern = r"Set\[([^\]]+)\]"
-            sets = re.findall(set_pattern, content)
-
-            for set_content in sets:
-                content = content.replace(f"Set[{set_content}]", f"set[{set_content}]")
-                changes.append(f"Modernized Set[{set_content}] to set[{set_content}]")
-
-            # Tuple[...] → tuple[...]
-            tuple_pattern = r"Tuple\[([^\]]+)\]"
-            tuples = re.findall(tuple_pattern, content)
-
-            for tuple_content in tuples:
-                content = content.replace(
-                    f"Tuple[{tuple_content}]", f"tuple[{tuple_content}]"
-                )
-                changes.append(
-                    f"Modernized Tuple[{tuple_content}] to tuple[{tuple_content}]"
-                )
-
-            # Remove imports if no longer needed
-            for old_type in ["Dict", "List", "Set", "Tuple"]:
-                if not re.search(rf"{old_type}\[", content):
-                    content = re.sub(
-                        rf"from typing import ([^,\n]*,\s*)?{old_type}(,\s*[^,\n]*)?",
-                        lambda m: f"from typing import {m.group(1) or ''}{m.group(2) or ''}".replace(
-                            ", ,", ","
-                        ).strip(", "),
-                        content,
-                    )
-                    changes.append(f"Removed {old_type} import")
-
-            return content, changes
-
-        @staticmethod
-        def modernize_string_annotations(
-            content: str,
-        ) -> tuple[str, FlextCore.Types.StringList]:
-            """Remove quotes from type annotations (Python 3.10+ with from __future__ import annotations).
-
-            Extracted from modernize_python_syntax.py.
-            """
-            changes = []
-
-            # Ensure from __future__ import annotations is present
-            if "from __future__ import annotations" not in content:
-                # Add it at the top
-                content = (
-                    '"""Module docstring"""\n\nfrom __future__ import annotations\n\n'
-                    + content
-                )
-                changes.append("Added from __future__ import annotations")
-
-            # Remove quotes from type annotations in function signatures
-            # def func(param: "Type") -> "ReturnType":
-            annotation_pattern = r':\s*["\']([^"\']+)["\']'
-            annotations = re.findall(annotation_pattern, content)
-
-            for annotation in annotations:
-                content = re.sub(
-                    rf':\s*["\']({re.escape(annotation)})["\']',
-                    f": {annotation}",
-                    content,
-                )
-                changes.append(f"Removed quotes from type annotation: {annotation}")
-
-            # Remove quotes from return type annotations
-            return_pattern = r'->\s*["\']([^"\']+)["\']'
-            returns = re.findall(return_pattern, content)
-
-            for return_type in returns:
-                content = re.sub(
-                    rf'->\s*["\']({re.escape(return_type)})["\']',
-                    f"-> {return_type}",
-                    content,
-                )
-                changes.append(f"Removed quotes from return annotation: {return_type}")
-
-            return content, changes
-
-        @staticmethod
         def modernize_syntax(
             module_path: str,
             *,
             dry_run: bool = True,
-        ) -> FlextCore.Result[FlextCore.Types.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Modernize Python syntax.
 
             Complete implementation extracted from modernize_python_syntax.py.
@@ -1134,14 +950,14 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 dry_run: Run in dry-run mode (default True - MANDATORY)
 
             Returns:
-                FlextCore.Result with modernization statistics
+                FlextResult with modernization statistics
 
             """
-            logger = FlextCore.Logger(__name__)
+            logger = FlextLogger(__name__)
 
             path = Path(module_path)
             if not path.exists():
-                return FlextCore.Result[FlextCore.Types.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Module not found: {module_path}"
                 )
 
@@ -1149,9 +965,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 with path.open("r", encoding="utf-8") as f:
                     original_content = f.read()
             except Exception as e:
-                return FlextCore.Result[FlextCore.Types.Dict].fail(
-                    f"Failed to read file: {e}"
-                )
+                return FlextResult[FlextTypes.Dict].fail(f"Failed to read file: {e}")
 
             content = original_content
             all_changes = []
@@ -1196,11 +1010,13 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 logger.info(
                     f"DRY RUN: Would modernize {module_path} ({len(all_changes)} changes)"
                 )
-                return FlextCore.Result[FlextCore.Types.Dict].ok({
-                    "dry_run": True,
-                    "changes": all_changes,
-                    "file": str(module_path),
-                })
+                return FlextResult[FlextTypes.Dict].ok(
+                    {
+                        "dry_run": True,
+                        "changes": all_changes,
+                        "file": str(module_path),
+                    }
+                )
 
             # Write back if changes were made
             if content != original_content:
@@ -1211,21 +1027,25 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                         f"Modernized {module_path} ({len(all_changes)} changes)"
                     )
                 except Exception as e:
-                    return FlextCore.Result[FlextCore.Types.Dict].fail(
+                    return FlextResult[FlextTypes.Dict].fail(
                         f"Failed to write file: {e}"
                     )
 
-                return FlextCore.Result[FlextCore.Types.Dict].ok({
-                    "status": "modified",
-                    "changes": all_changes,
-                    "file": str(module_path),
-                })
+                return FlextResult[FlextTypes.Dict].ok(
+                    {
+                        "status": "modified",
+                        "changes": all_changes,
+                        "file": str(module_path),
+                    }
+                )
 
-            return FlextCore.Result[FlextCore.Types.Dict].ok({
-                "status": "unchanged",
-                "changes": [],
-                "file": str(module_path),
-            })
+            return FlextResult[FlextTypes.Dict].ok(
+                {
+                    "status": "unchanged",
+                    "changes": [],
+                    "file": str(module_path),
+                }
+            )
 
     class TypeModernizer:
         """Type annotation modernization.
@@ -1240,7 +1060,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
         @staticmethod
         def update_pyproject_toml_content(
             content: str,
-        ) -> tuple[str, FlextCore.Types.StringList]:
+        ) -> tuple[str, FlextTypes.StringList]:
             """Update pyproject.toml content to modernize type checking.
 
             Extracted from modernize_type_checking.py.
@@ -1352,7 +1172,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
         @staticmethod
         def update_makefile_content(
             content: str,
-        ) -> tuple[str, FlextCore.Types.StringList]:
+        ) -> tuple[str, FlextTypes.StringList]:
             """Update Makefile content to use Pyrefly.
 
             Extracted from modernize_type_checking.py.
@@ -1403,7 +1223,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
             module_path: str,
             *,
             dry_run: bool = True,
-        ) -> FlextCore.Result[FlextCore.Types.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Modernize type checking configuration.
 
             Complete implementation extracted from modernize_type_checking.py.
@@ -1413,10 +1233,10 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 dry_run: Run in dry-run mode (default True - MANDATORY)
 
             Returns:
-                FlextCore.Result with modernization statistics
+                FlextResult with modernization statistics
 
             """
-            logger = FlextCore.Logger(__name__)
+            logger = FlextLogger(__name__)
 
             path = Path(module_path)
 
@@ -1430,11 +1250,9 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 project_dir = path.parent
                 makefile_path = project_dir / "Makefile"
             else:
-                return FlextCore.Result[FlextCore.Types.Dict].fail(
-                    f"Invalid path: {module_path}"
-                )
+                return FlextResult[FlextTypes.Dict].fail(f"Invalid path: {module_path}")
 
-            all_changes: FlextCore.Types.StringList = []
+            all_changes: FlextTypes.StringList = []
             files_modified = []
 
             # Process pyproject.toml
@@ -1459,7 +1277,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                             logger.info(f"Updated {pyproject_path}")
 
                 except Exception as e:
-                    return FlextCore.Result[FlextCore.Types.Dict].fail(
+                    return FlextResult[FlextTypes.Dict].fail(
                         f"Failed to process pyproject.toml: {e}"
                     )
 
@@ -1485,7 +1303,7 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                             logger.info(f"Updated {makefile_path}")
 
                 except Exception as e:
-                    return FlextCore.Result[FlextCore.Types.Dict].fail(
+                    return FlextResult[FlextTypes.Dict].fail(
                         f"Failed to process Makefile: {e}"
                     )
 
@@ -1493,29 +1311,35 @@ class FlextQualityOptimizerOperations(FlextCore.Service[None]):
                 logger.info(
                     f"DRY RUN: Would modernize types in {module_path} ({len(all_changes)} changes)"
                 )
-                return FlextCore.Result[FlextCore.Types.Dict].ok({
-                    "dry_run": True,
-                    "changes": all_changes,
-                    "files_affected": [str(pyproject_path), str(makefile_path)],
-                })
+                return FlextResult[FlextTypes.Dict].ok(
+                    {
+                        "dry_run": True,
+                        "changes": all_changes,
+                        "files_affected": [str(pyproject_path), str(makefile_path)],
+                    }
+                )
 
             if all_changes:
-                return FlextCore.Result[FlextCore.Types.Dict].ok({
-                    "status": "modified",
-                    "changes": all_changes,
-                    "files_modified": files_modified,
-                })
+                return FlextResult[FlextTypes.Dict].ok(
+                    {
+                        "status": "modified",
+                        "changes": all_changes,
+                        "files_modified": files_modified,
+                    }
+                )
 
-            return FlextCore.Result[FlextCore.Types.Dict].ok({
-                "status": "unchanged",
-                "changes": [],
-                "files_modified": [],
-            })
+            return FlextResult[FlextTypes.Dict].ok(
+                {
+                    "status": "unchanged",
+                    "changes": [],
+                    "files_modified": [],
+                }
+            )
 
     def __init__(self) -> None:
         """Initialize optimizer operations service."""
         super().__init__()
-        self.logger = FlextCore.Logger(__name__)
+        self.logger = FlextLogger(__name__)
 
         # Initialize helper services
         self.module = self.ModuleOptimizer()

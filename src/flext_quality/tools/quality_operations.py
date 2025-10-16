@@ -18,14 +18,24 @@ MANDATORY: Uses flext-cli for ALL output (NO direct rich/click)
 
 from __future__ import annotations
 
+import re
+from pathlib import Path
+
 from flext_cli import FlextCli
-from flext_core import FlextCore
+from flext_core import (
+    FlextLogger,
+    FlextResult,
+    FlextService,
+    FlextTypes,
+    FlextUtilities,
+)
 from pydantic import ConfigDict
 
 from flext_quality.models import FlextQualityModels
+from .utilities import FlextQualityToolsUtilities
 
 
-class FlextQualityOperations(FlextCore.Service[None]):
+class FlextQualityOperations(FlextService[None]):
     """Unified quality checking operations with complete flext-core integration.
 
     Example usage:
@@ -52,9 +62,9 @@ class FlextQualityOperations(FlextCore.Service[None]):
 
     model_config = ConfigDict(arbitrary_types_allowed=True, extra="allow")
 
-    def execute(self) -> FlextCore.Result[None]:
-        """Execute quality operations service - FlextCore.Service interface."""
-        return FlextCore.Result[None].ok(None)
+    def execute(self) -> FlextResult[None]:
+        """Execute quality operations service - FlextService interface."""
+        return FlextResult[None].ok(None)
 
     class QualityGateway:
         """Quality gateway running all checks.
@@ -68,7 +78,7 @@ class FlextQualityOperations(FlextCore.Service[None]):
             project_path: str,
             *,
             _config: dict[str, object] | None = None,
-        ) -> FlextCore.Result[FlextQualityModels.CheckResult]:
+        ) -> FlextResult[FlextQualityModels.CheckResult]:
             """Run complete quality pipeline.
 
             Args:
@@ -76,10 +86,10 @@ class FlextQualityOperations(FlextCore.Service[None]):
                 config: Optional configuration (reserved for future use)
 
             Returns:
-                FlextCore.Result with QualityCheckResult
+                FlextResult with QualityCheckResult
 
             """
-            FlextCore.Logger(__name__)
+            FlextLogger(__name__)
             FlextCli()  # MANDATORY: Use flext-cli
 
             # Run lint check
@@ -102,7 +112,7 @@ class FlextQualityOperations(FlextCore.Service[None]):
                 violations=[],
             )
 
-            return FlextCore.Result[FlextQualityModels.CheckResult].ok(result)
+            return FlextResult[FlextQualityModels.CheckResult].ok(result)
 
     class LintingService:
         """Linting operations with gradual fixing.
@@ -111,9 +121,9 @@ class FlextQualityOperations(FlextCore.Service[None]):
         """
 
         @staticmethod
-        def run_lint(project_path: str) -> FlextCore.Result[FlextCore.Types.Dict]:
+        def run_lint(project_path: str) -> FlextResult[FlextTypes.Dict]:
             """Run ruff linting."""
-            cmd_result = FlextCore.Utilities.run_external_command(
+            cmd_result = FlextUtilities.run_external_command(
                 cmd=["ruff", "check", project_path],
                 capture_output=True,
                 text=True,
@@ -122,25 +132,23 @@ class FlextQualityOperations(FlextCore.Service[None]):
 
             # Handle execution failure
             if cmd_result.is_failure:
-                return FlextCore.Result[FlextCore.Types.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Ruff execution failed: {cmd_result.error}"
                 )
 
             result = cmd_result.value
 
             if result.returncode == 0:
-                return FlextCore.Result[FlextCore.Types.Dict].ok({"passed": True})
+                return FlextResult[FlextTypes.Dict].ok({"passed": True})
 
-            return FlextCore.Result[FlextCore.Types.Dict].fail(
-                f"Linting failed: {result.stdout}"
-            )
+            return FlextResult[FlextTypes.Dict].fail(f"Linting failed: {result.stdout}")
 
         @staticmethod
         def fix_issues(
             module_path: str,
             *,
             dry_run: bool = True,
-        ) -> FlextCore.Result[FlextCore.Types.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Fix linting issues gradually.
 
             Args:
@@ -148,15 +156,15 @@ class FlextQualityOperations(FlextCore.Service[None]):
                 dry_run: Run in dry-run mode (default True - MANDATORY)
 
             Returns:
-                FlextCore.Result with fixing statistics
+                FlextResult with fixing statistics
 
             """
-            logger = FlextCore.Logger(__name__)
+            logger = FlextLogger(__name__)
 
             if dry_run:
                 logger.info("DRY RUN: Would fix linting issues")
                 # Run check to see what would be fixed
-                cmd_result = FlextCore.Utilities.run_external_command(
+                cmd_result = FlextUtilities.run_external_command(
                     cmd=["ruff", "check", module_path, "--fix", "--dry-run"],
                     capture_output=True,
                     text=True,
@@ -165,19 +173,21 @@ class FlextQualityOperations(FlextCore.Service[None]):
 
                 # Handle execution failure
                 if cmd_result.is_failure:
-                    return FlextCore.Result[FlextCore.Types.Dict].fail(
+                    return FlextResult[FlextTypes.Dict].fail(
                         f"Ruff dry-run failed: {cmd_result.error}"
                     )
 
                 result = cmd_result.value
-                return FlextCore.Result[FlextCore.Types.Dict].ok({
-                    "dry_run": True,
-                    "would_fix": result.stdout.count("Fixed"),
-                    "message": result.stdout,
-                })
+                return FlextResult[FlextTypes.Dict].ok(
+                    {
+                        "dry_run": True,
+                        "would_fix": result.stdout.count("Fixed"),
+                        "message": result.stdout,
+                    }
+                )
 
             # Real fix
-            cmd_result = FlextCore.Utilities.run_external_command(
+            cmd_result = FlextUtilities.run_external_command(
                 cmd=["ruff", "check", module_path, "--fix"],
                 capture_output=True,
                 text=True,
@@ -186,18 +196,16 @@ class FlextQualityOperations(FlextCore.Service[None]):
 
             # Handle execution failure
             if cmd_result.is_failure:
-                return FlextCore.Result[FlextCore.Types.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Ruff fix failed: {cmd_result.error}"
                 )
 
             result = cmd_result.value
 
             if result.returncode == 0:
-                return FlextCore.Result[FlextCore.Types.Dict].ok({"fixed": True})
+                return FlextResult[FlextTypes.Dict].ok({"fixed": True})
 
-            return FlextCore.Result[FlextCore.Types.Dict].fail(
-                f"Fixing failed: {result.stderr}"
-            )
+            return FlextResult[FlextTypes.Dict].fail(f"Fixing failed: {result.stderr}")
 
     class TypeChecker:
         """Type checking with MyPy/PyRefly.
@@ -210,7 +218,7 @@ class FlextQualityOperations(FlextCore.Service[None]):
             project_path: str,
             *,
             _strict: bool = True,
-        ) -> FlextCore.Result[FlextCore.Types.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Run type checking.
 
             Args:
@@ -218,11 +226,11 @@ class FlextQualityOperations(FlextCore.Service[None]):
                 _strict: Use strict mode (reserved for future use)
 
             Returns:
-                FlextCore.Result with type checking results
+                FlextResult with type checking results
 
             """
             # Try pyrefly first
-            cmd_result = FlextCore.Utilities.run_external_command(
+            cmd_result = FlextUtilities.run_external_command(
                 cmd=["pyrefly", "check", project_path],
                 capture_output=True,
                 text=True,
@@ -236,13 +244,15 @@ class FlextQualityOperations(FlextCore.Service[None]):
             else:
                 result = cmd_result.value
                 if result.returncode == 0:
-                    return FlextCore.Result[FlextCore.Types.Dict].ok({
-                        "passed": True,
-                        "tool": "pyrefly",
-                    })
+                    return FlextResult[FlextTypes.Dict].ok(
+                        {
+                            "passed": True,
+                            "tool": "pyrefly",
+                        }
+                    )
 
             # Fall back to mypy
-            cmd_result = FlextCore.Utilities.run_external_command(
+            cmd_result = FlextUtilities.run_external_command(
                 cmd=["mypy", project_path],
                 capture_output=True,
                 text=True,
@@ -251,36 +261,38 @@ class FlextQualityOperations(FlextCore.Service[None]):
 
             # Handle execution failure
             if cmd_result.is_failure:
-                return FlextCore.Result[FlextCore.Types.Dict].fail(
+                return FlextResult[FlextTypes.Dict].fail(
                     f"Type checking failed: {cmd_result.error}"
                 )
 
             result = cmd_result.value
 
             if result.returncode == 0:
-                return FlextCore.Result[FlextCore.Types.Dict].ok({
-                    "passed": True,
-                    "tool": "mypy",
-                })
+                return FlextResult[FlextTypes.Dict].ok(
+                    {
+                        "passed": True,
+                        "tool": "mypy",
+                    }
+                )
 
-            return FlextCore.Result[FlextCore.Types.Dict].fail(
+            return FlextResult[FlextTypes.Dict].fail(
                 f"Type checking failed: {result.stdout}"
             )
 
         @staticmethod
         def check_types(
             module_path: str,
-        ) -> FlextCore.Result[FlextCore.Types.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Run type checking with console output.
 
             Args:
                 module_path: Path to Python module or project
 
             Returns:
-                FlextCore.Result with type checking results
+                FlextResult with type checking results
 
             """
-            FlextCore.Logger(__name__)
+            FlextLogger(__name__)
             FlextCli()  # MANDATORY: Use flext-cli
 
             return FlextQualityOperations.TypeChecker.run_type_check(module_path)
@@ -296,7 +308,7 @@ class FlextQualityOperations(FlextCore.Service[None]):
             _project_path: str,
             *,
             threshold: int = 10,
-        ) -> FlextCore.Result[FlextCore.Types.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Detect code duplicates.
 
             Args:
@@ -304,17 +316,19 @@ class FlextQualityOperations(FlextCore.Service[None]):
                 threshold: Minimum lines for duplicate detection
 
             Returns:
-                FlextCore.Result with duplicate detection results
+                FlextResult with duplicate detection results
 
             """
-            FlextCore.Logger(__name__)
+            FlextLogger(__name__)
             FlextCli()  # MANDATORY: Use flext-cli
 
             # Placeholder implementation - would use AST analysis or external tool
-            return FlextCore.Result[FlextCore.Types.Dict].ok({
-                "duplicates_found": 0,
-                "threshold": threshold,
-            })
+            return FlextResult[FlextTypes.Dict].ok(
+                {
+                    "duplicates_found": 0,
+                    "threshold": threshold,
+                }
+            )
 
     class ExportRepairer:
         """__init__.py export repair and validation.
@@ -327,7 +341,7 @@ class FlextQualityOperations(FlextCore.Service[None]):
             _package_path: str,
             *,
             dry_run: bool = True,
-        ) -> FlextCore.Result[FlextCore.Types.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Repair __init__.py exports.
 
             Args:
@@ -335,20 +349,22 @@ class FlextQualityOperations(FlextCore.Service[None]):
                 dry_run: Run in dry-run mode (default True - MANDATORY)
 
             Returns:
-                FlextCore.Result with repair statistics
+                FlextResult with repair statistics
 
             """
-            logger = FlextCore.Logger(__name__)
+            logger = FlextLogger(__name__)
 
             if dry_run:
                 logger.info("DRY RUN: Would repair exports")
-                return FlextCore.Result[FlextCore.Types.Dict].ok({
-                    "dry_run": True,
-                    "message": "Dry run - no changes made",
-                })
+                return FlextResult[FlextTypes.Dict].ok(
+                    {
+                        "dry_run": True,
+                        "message": "Dry run - no changes made",
+                    }
+                )
 
             # Would implement export repair logic here
-            return FlextCore.Result[FlextCore.Types.Dict].ok({"repaired": True})
+            return FlextResult[FlextTypes.Dict].ok({"repaired": True})
 
     class DocstringNormalizer:
         """Docstring normalization to Google style.
@@ -361,7 +377,7 @@ class FlextQualityOperations(FlextCore.Service[None]):
             _module_path: str,
             *,
             dry_run: bool = True,
-        ) -> FlextCore.Result[FlextCore.Types.Dict]:
+        ) -> FlextResult[FlextTypes.Dict]:
             """Normalize docstrings to Google style.
 
             Args:
@@ -369,20 +385,22 @@ class FlextQualityOperations(FlextCore.Service[None]):
                 dry_run: Run in dry-run mode (default True - MANDATORY)
 
             Returns:
-                FlextCore.Result with normalization statistics
+                FlextResult with normalization statistics
 
             """
-            logger = FlextCore.Logger(__name__)
+            logger = FlextLogger(__name__)
 
             if dry_run:
                 logger.info("DRY RUN: Would normalize docstrings")
-                return FlextCore.Result[FlextCore.Types.Dict].ok({
-                    "dry_run": True,
-                    "message": "Dry run - no changes made",
-                })
+                return FlextResult[FlextTypes.Dict].ok(
+                    {
+                        "dry_run": True,
+                        "message": "Dry run - no changes made",
+                    }
+                )
 
             # Would implement docstring normalization here
-            return FlextCore.Result[FlextCore.Types.Dict].ok({"normalized": True})
+            return FlextResult[FlextTypes.Dict].ok({"normalized": True})
 
     class PatternAuditor:
         """Pattern audit system for code quality.
@@ -392,22 +410,76 @@ class FlextQualityOperations(FlextCore.Service[None]):
 
         @staticmethod
         def audit_patterns(
-            _project_path: str,
-        ) -> FlextCore.Result[FlextCore.Types.Dict]:
+            project_path: str,
+        ) -> FlextResult[FlextTypes.Dict]:
             """Audit code patterns for quality issues.
 
             Args:
-                _project_path: Path to project (reserved for future implementation)
+                project_path: Path to project
 
             Returns:
-                FlextCore.Result with audit results
+                FlextResult with audit results
 
             """
-            FlextCore.Logger(__name__)
+            FlextLogger(__name__)
             FlextCli()  # MANDATORY: Use flext-cli
 
-            # Would implement pattern auditing here
-            return FlextCore.Result[FlextCore.Types.Dict].ok({"patterns_checked": 0})
+            workspace = Path(project_path).expanduser().resolve()
+            if not workspace.exists():
+                return FlextResult[FlextTypes.Dict].fail(
+                    f"Project path does not exist: {workspace}"
+                )
+
+            method_pattern = re.compile(
+                r"def\s+(?P<name>\w+)\([^)]*\)\s*->\s*FlextResult\[(?P<rtype>[^\]]+)\]:"
+            )
+            bad_return_pattern = re.compile(
+                r"return\s+FlextResult\.(?:ok|fail)\s*\("
+            )
+
+            issues: list[FlextTypes.StringDict] = []
+
+            for file_path in workspace.rglob("*.py"):
+                if FlextQualityToolsUtilities.Paths.should_ignore_path(file_path):
+                    continue
+
+                try:
+                    source = file_path.read_text(encoding="utf-8")
+                except OSError:
+                    continue
+
+                lines = source.splitlines()
+                for line_number, line in enumerate(lines, start=1):
+                    method_match = method_pattern.search(line)
+                    if not method_match:
+                        continue
+
+                    declared_type = method_match.group("rtype").strip()
+                    if declared_type.casefold() == "none":
+                        continue
+
+                    # Inspect the next ~50 lines for bad returns
+                    for candidate in lines[line_number : line_number + 50]:
+                        if candidate.strip().startswith("def "):
+                            break
+                        if bad_return_pattern.search(candidate):
+                            issues.append(
+                                {
+                                    "file": str(file_path.relative_to(workspace)),
+                                    "line": line_number,
+                                    "method": method_match.group("name"),
+                                    "declared_type": declared_type,
+                                    "issue": "FlextResult[T] method returns FlextResult.ok()/fail() directly",
+                                }
+                            )
+                            break
+
+            return FlextResult[FlextTypes.Dict].ok(
+                {
+                    "issues_found": len(issues),
+                    "issues": issues,
+                }
+            )
 
     class FalsePositiveAuditor:
         """False positive auditing and filtering.
@@ -417,28 +489,28 @@ class FlextQualityOperations(FlextCore.Service[None]):
 
         @staticmethod
         def audit_false_positives(
-            results: list[FlextCore.Types.Dict],
-        ) -> FlextCore.Result[list[FlextCore.Types.Dict]]:
+            results: list[FlextTypes.Dict],
+        ) -> FlextResult[list[FlextTypes.Dict]]:
             """Audit and filter false positives.
 
             Args:
                 results: List of check results to audit
 
             Returns:
-                FlextCore.Result with filtered results
+                FlextResult with filtered results
 
             """
-            FlextCore.Logger(__name__)
+            FlextLogger(__name__)
 
             # Filter false positives
             filtered = [r for r in results if not r.get("false_positive", False)]
 
-            return FlextCore.Result[list[FlextCore.Types.Dict]].ok(filtered)
+            return FlextResult[list[FlextTypes.Dict]].ok(filtered)
 
     def __init__(self) -> None:
         """Initialize quality operations service."""
         super().__init__()
-        self.logger = FlextCore.Logger(__name__)
+        self.logger = FlextLogger(__name__)
         # Note: FlextCli is created locally in methods that need it
 
         # Initialize helper services

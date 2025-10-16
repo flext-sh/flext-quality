@@ -8,7 +8,7 @@ from __future__ import annotations
 from typing import override
 from uuid import UUID
 
-from flext_core import FlextCore
+from flext_core import FlextLogger, FlextResult, FlextTypes
 from flext_observability import (
     flext_create_log_entry as _flext_create_log_entry,
     flext_create_trace as _flext_create_trace,
@@ -43,7 +43,7 @@ class FlextQualityHandlers:
         def create_trace(
             operation_name: str,
             service_name: str,
-            config: FlextCore.Types.StringDict,
+            config: FlextTypes.StringDict,
         ) -> None:
             """Create trace using flext-observability."""
             # Map to actual flext_create_trace API parameters
@@ -62,10 +62,10 @@ class FlextQualityHandlers:
         # Use placeholder services for now - these would be injected
         self._linting_service = None
         self._security_service = None
-        self.logger = FlextCore.Logger(__name__)
+        self.logger = FlextLogger(__name__)
         self._observability = self._ObservabilityHelper()
 
-    def analyze_project(self, project_id: UUID) -> FlextCore.Result[QualityAnalysis]:
+    def analyze_project(self, project_id: UUID) -> FlextResult[QualityAnalysis]:
         """Handle project analysis command."""
         # Create trace for observability (optional dependency)
         self._observability.create_trace(
@@ -109,7 +109,7 @@ class FlextQualityHandlers:
             )
 
             # Return the created analysis
-            return FlextCore.Result[QualityAnalysis].ok(analysis)
+            return FlextResult[QualityAnalysis].ok(analysis)
 
         except Exception as e:
             self._observability.create_log_entry(
@@ -118,9 +118,9 @@ class FlextQualityHandlers:
                 level="error",
             )
             self.logger.exception("Unexpected error in analyze_project")
-            return FlextCore.Result[QualityAnalysis].fail(f"Unexpected error: {e!s}")
+            return FlextResult[QualityAnalysis].fail(f"Unexpected error: {e!s}")
 
-    def generate_report(self, analysis_id: UUID) -> FlextCore.Result[QualityReport]:
+    def generate_report(self, analysis_id: UUID) -> FlextResult[QualityReport]:
         """Handle report generation command."""
         # Convert UUID to string for service compatibility
         analysis_id_str = str(analysis_id)
@@ -140,32 +140,32 @@ class FlextQualityHandlers:
         report = report_result.value
 
         # Return the created report
-        return FlextCore.Result[QualityReport].ok(report)
+        return FlextResult[QualityReport].ok(report)
 
-    def run_linting(self, project_id: UUID) -> FlextCore.Result[FlextCore.Types.Dict]:
+    def run_linting(self, project_id: UUID) -> FlextResult[FlextTypes.Dict]:
         """Handle linting command."""
         # Return placeholder result since linting service is not implemented
-        linting_data: FlextCore.Types.Dict = {
+        linting_data: FlextTypes.Dict = {
             "project_id": str(project_id),
             "status": "placeholder_implementation",
             "issues": [],
         }
 
-        return FlextCore.Result[FlextCore.Types.Dict].ok(linting_data)
+        return FlextResult[FlextTypes.Dict].ok(linting_data)
 
     def run_security_check(
         self,
         project_id: UUID,
-    ) -> FlextCore.Result[FlextCore.Types.Dict]:
+    ) -> FlextResult[FlextTypes.Dict]:
         """Handle security check command."""
         # Return placeholder result since security service is not implemented
-        security_data: FlextCore.Types.Dict = {
+        security_data: FlextTypes.Dict = {
             "project_id": str(project_id),
             "status": "placeholder_implementation",
             "vulnerabilities": [],
         }
 
-        return FlextCore.Result[FlextCore.Types.Dict].ok(security_data)
+        return FlextResult[FlextTypes.Dict].ok(security_data)
 
 
 # Backward compatibility aliases - following flext-cli pattern

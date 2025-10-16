@@ -15,7 +15,7 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from flext_core import FlextCore
+from flext_core import FlextTypes
 
 from flext_quality import CodeAnalyzer
 
@@ -35,7 +35,7 @@ class TestCodeAnalyzerFunctional:
 import os
 import sys
 
-def calculate_average(numbers: FlextCore.Types.FloatList) -> float:
+def calculate_average(numbers: FlextTypes.FloatList) -> float:
     """Calculate average of numbers."""
 
     if not numbers:
@@ -53,7 +53,7 @@ class DataProcessor:
       self.threshold = threshold
       self.processed_count = 0
 
-    def process_items(self, items: FlextCore.Types.List) -> FlextCore.Types.List:
+    def process_items(self, items: FlextTypes.List) -> FlextTypes.List:
       """Process list of items."""
 
       results = []
@@ -268,7 +268,7 @@ def multiply(x: int, y: int) -> int:
         ]
 
         # Cast to expected type to handle list invariance
-        file_metrics_typed: list[FlextCore.Types.Dict] = file_metrics
+        file_metrics_typed: list[FlextTypes.Dict] = file_metrics
         overall_metrics = analyzer._calculate_overall_metrics(file_metrics_typed)
 
         assert isinstance(overall_metrics, dict)

@@ -12,13 +12,23 @@ import json
 import sys
 import traceback
 from pathlib import Path
-from typing import cast, override
+from typing import override
 
 from flext_cli import (
     FlextCli,
     FlextCliContext,
 )
-from flext_core import FlextCore
+from flext_core import (
+    FlextBus,
+    FlextContainer,
+    FlextContext,
+    FlextDispatcher,
+    FlextLogger,
+    FlextProcessors,
+    FlextRegistry,
+    FlextResult,
+    FlextService,
+)
 
 from .analyzer import CodeAnalyzer
 from .config import FlextQualityConfig
@@ -30,11 +40,11 @@ from .web import FlextQualityWeb
 MIN_ACCEPTABLE_QUALITY_SCORE = 70
 
 
-class FlextQualityCliService(FlextCore.Service[int]):
+class FlextQualityCliService(FlextService[int]):
     """Unified FLEXT Quality CLI service following enterprise patterns.
 
     Single responsibility class that handles all CLI operations with
-    nested helper classes and explicit FlextCore.Result error handling.
+    nested helper classes and explicit FlextResult error handling.
     """
 
     @override
@@ -43,34 +53,34 @@ class FlextQualityCliService(FlextCore.Service[int]):
         super().__init__()
 
         # Complete FLEXT ecosystem integration
-        self._container = FlextCore.Container.get_global()
-        self._context = FlextCore.Context()
-        self._bus = FlextCore.Bus()
-        self._dispatcher = FlextCore.Dispatcher()
-        self._processors = FlextCore.Processors()
-        self._registry = FlextCore.Registry(dispatcher=self._dispatcher)
+        self._container = FlextContainer.get_global()
+        self._context = FlextContext()
+        self._bus = FlextBus()
+        self._dispatcher = FlextDispatcher()
+        self._processors = FlextProcessors()
+        self._registry = FlextRegistry(dispatcher=self._dispatcher)
         # Logger is provided by FlextMixins
 
     @override
-    def execute(self) -> FlextCore.Result[int]:
+    def execute(self) -> FlextResult[int]:
         """Execute CLI service - required abstract method implementation."""
         self.logger.info("CLI service execute called - this is a placeholder")
-        return FlextCore.Result[int].ok(0)
+        return FlextResult[int].ok(0)
 
     class _CliContextHelper:
         """Nested helper for CLI context management."""
 
         @staticmethod
-        def get_cli_context() -> FlextCore.Result[FlextCliContext]:
+        def get_cli_context() -> FlextResult[FlextCliContext]:
             """Get CLI context using flext-cli exclusively."""
             context = FlextCliContext()
-            return FlextCore.Result[FlextCliContext].ok(context)
+            return FlextResult[FlextCliContext].ok(context)
 
     class _ProjectAnalysisHelper:
         """Nested helper for project analysis operations."""
 
         @override
-        def __init__(self, logger: FlextCore.Logger) -> None:
+        def __init__(self, logger: FlextLogger) -> None:
             super().__init__()
             self.logger = logger
 
@@ -81,13 +91,13 @@ class FlextQualityCliService(FlextCore.Service[int]):
         def analyze_project_workflow(
             self,
             args: argparse.Namespace,
-        ) -> FlextCore.Result[int]:
+        ) -> FlextResult[int]:
             """Execute complete project analysis workflow."""
             cli_context_result = (
                 FlextQualityCliService._CliContextHelper.get_cli_context()
             )
             if cli_context_result.is_failure:
-                return FlextCore.Result[int].fail(
+                return FlextResult[int].fail(
                     cli_context_result.error or "CLI context creation failed",
                 )
 
@@ -105,7 +115,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
             project_path = Path(args.path).resolve()
             if not project_path.exists():
                 self.logger.error(f"Path does not exist: {project_path}")
-                return FlextCore.Result[int].ok(1)
+                return FlextResult[int].ok(1)
 
             self.logger.info(f"Analyzing project: {project_path}")
 
@@ -120,14 +130,14 @@ class FlextQualityCliService(FlextCore.Service[int]):
                 include_duplicates=args.include_duplicates,
             )
 
-            # analysis_result is now AnalysisResults directly, not FlextCore.Result
+            # analysis_result is now AnalysisResults directly, not FlextResult
             results = analysis_result
 
             # Check if any files were analyzed
             files_analyzed = getattr(results.overall_metrics, "files_analyzed", 0)
             if files_analyzed == 0:
                 self.logger.error("No files to analyze")
-                return FlextCore.Result[int].ok(1)
+                return FlextResult[int].ok(1)
 
             # Analysis completed successfully
 
@@ -135,14 +145,14 @@ class FlextQualityCliService(FlextCore.Service[int]):
             report = QualityReport(results)
 
             # Handle output based on format
-            output_result: FlextCore.Result[None] = self._handle_output(
+            output_result: FlextResult[None] = self._handle_output(
                 args, report, cli_context
             )
             if output_result.is_failure:
                 self.logger.error(
                     output_result.error or "Output processing failed",
                 )
-                return FlextCore.Result[int].ok(1)
+                return FlextResult[int].ok(1)
 
             # Quality thresholds
             good_quality_threshold = 80
@@ -152,19 +162,19 @@ class FlextQualityCliService(FlextCore.Service[int]):
             quality_score = analyzer.get_quality_score()
             if quality_score >= good_quality_threshold:
                 self.logger.info(f"Good quality: {quality_score}%")
-                return FlextCore.Result[int].ok(0)
+                return FlextResult[int].ok(0)
             if quality_score >= medium_quality_threshold:
                 self.logger.warning(f"Medium quality: {quality_score}%")
-                return FlextCore.Result[int].ok(1)
+                return FlextResult[int].ok(1)
             self.logger.error(f"Poor quality: {quality_score}%")
-            return FlextCore.Result[int].ok(2)
+            return FlextResult[int].ok(2)
 
         def _handle_output(
             self,
             args: argparse.Namespace,
             report: QualityReport,
             cli_context: FlextCliContext,
-        ) -> FlextCore.Result[None]:
+        ) -> FlextResult[None]:
             """Handle report output to file or stdout."""
             if args.output:
                 return self._save_to_file(args, report, cli_context)
@@ -174,8 +184,8 @@ class FlextQualityCliService(FlextCore.Service[int]):
             self,
             args: argparse.Namespace,
             report: QualityReport,
-            cli_context: FlextCliContext,
-        ) -> FlextCore.Result[None]:
+            cli_context: FlextCliContext,  # noqa: ARG002
+        ) -> FlextResult[None]:
             """Save report to file using FlextCli export."""
             output_path = Path(args.output)
 
@@ -188,16 +198,16 @@ class FlextQualityCliService(FlextCore.Service[int]):
                 try:
                     with Path(output_path).open("w", encoding="utf-8") as f:
                         json.dump(report_dict, f, indent=2)
-                    export_result = FlextCore.Result[object].ok(None)
+                    export_result = FlextResult[object].ok(None)
                 except Exception as e:
-                    export_result = FlextCore.Result[object].fail(
+                    export_result = FlextResult[object].fail(
                         f"Failed to export data: {e}"
                     )
             elif args.format == "html":
                 # Write HTML directly since FlextCli doesn't handle HTML export
                 output_path.write_text(report.to_html(), encoding="utf-8")
                 self.logger.info(f"HTML report saved to {output_path}")
-                return FlextCore.Result[None].ok(None)
+                return FlextResult[None].ok(None)
             else:
                 # Table format - export as JSON
                 report_dict: FlextQualityTypes.Core.ReportDict = json.loads(
@@ -207,14 +217,14 @@ class FlextQualityCliService(FlextCore.Service[int]):
                 try:
                     with Path(output_path).open("w", encoding="utf-8") as f:
                         json.dump(report_dict, f, indent=2)
-                    export_result = FlextCore.Result[object].ok(None)
+                    export_result = FlextResult[object].ok(None)
                 except Exception as e:
-                    export_result = FlextCore.Result[object].fail(
+                    export_result = FlextResult[object].fail(
                         f"Failed to export data: {e}"
                     )
 
             if export_result and export_result.is_failure:
-                return FlextCore.Result[None].fail(
+                return FlextResult[None].fail(
                     f"Failed to save report: {export_result.error}",
                 )
             if export_result and export_result.is_success:
@@ -225,14 +235,14 @@ class FlextQualityCliService(FlextCore.Service[int]):
                 )
                 self.logger.info(success_msg)
 
-            return FlextCore.Result[None].ok(None)
+            return FlextResult[None].ok(None)
 
         def _output_to_stdout(
             self,
             args: argparse.Namespace,
             report: QualityReport,
-            cli_context: FlextCliContext,
-        ) -> FlextCore.Result[None]:
+            cli_context: FlextCliContext,  # noqa: ARG002
+        ) -> FlextResult[None]:
             """Output report to stdout."""
             if args.format == "json":
                 # Get dict[str, object] from JSON report
@@ -242,15 +252,13 @@ class FlextQualityCliService(FlextCore.Service[int]):
                 # Format data as JSON
                 try:
                     formatted_data = json.dumps(report_dict, indent=2)
-                    format_result = FlextCore.Result[str].ok(formatted_data)
+                    format_result = FlextResult[str].ok(formatted_data)
                 except Exception as e:
-                    format_result = FlextCore.Result[str].fail(
-                        f"Failed to format data: {e}"
-                    )
+                    format_result = FlextResult[str].fail(f"Failed to format data: {e}")
                 if format_result.is_success:
                     sys.stdout.write(format_result.value + "\\n")
                 else:
-                    return FlextCore.Result[None].fail(
+                    return FlextResult[None].fail(
                         f"Failed to format as JSON: {format_result.error}",
                     )
             elif args.format == "html":
@@ -263,13 +271,13 @@ class FlextQualityCliService(FlextCore.Service[int]):
                 # Display data as table using FlextCli
                 # Use print instead of display_data for table output
 
-            return FlextCore.Result[None].ok(None)
+            return FlextResult[None].ok(None)
 
     class _ProjectScoringHelper:
         """Nested helper for project scoring operations."""
 
         @override
-        def __init__(self, logger: FlextCore.Logger) -> None:
+        def __init__(self, logger: FlextLogger) -> None:
             super().__init__()
             self.logger = logger
 
@@ -277,15 +285,13 @@ class FlextQualityCliService(FlextCore.Service[int]):
             """Get FlextCli API instance."""
             return FlextCli()
 
-        def score_project_workflow(
-            self, args: argparse.Namespace
-        ) -> FlextCore.Result[int]:
+        def score_project_workflow(self, args: argparse.Namespace) -> FlextResult[int]:
             """Execute project scoring workflow."""
             cli_context_result = (
                 FlextQualityCliService._CliContextHelper.get_cli_context()
             )
             if cli_context_result.is_failure:
-                return FlextCore.Result[int].fail(
+                return FlextResult[int].fail(
                     cli_context_result.error or "CLI context creation failed",
                 )
 
@@ -307,7 +313,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
             grade = analyzer.get_quality_grade()
 
             # Create score data for display
-            {
+            _score_data = {
                 "score": score_value,
                 "grade": grade,
                 "project": str(project_path),
@@ -321,27 +327,25 @@ class FlextQualityCliService(FlextCore.Service[int]):
             # Exit based on score
             if score_value >= MIN_ACCEPTABLE_QUALITY_SCORE:
                 self.logger.info(f"Quality acceptable: {score_value}%")
-                return FlextCore.Result[int].ok(0)
+                return FlextResult[int].ok(0)
             self.logger.warning(f"Quality needs improvement: {score_value}%")
-            return FlextCore.Result[int].ok(1)
+            return FlextResult[int].ok(1)
 
     class _WebServerHelper:
         """Nested helper for web server operations."""
 
         @override
-        def __init__(self, logger: FlextCore.Logger) -> None:
+        def __init__(self, logger: FlextLogger) -> None:
             super().__init__()
             self.logger = logger
 
-        def run_web_server_workflow(
-            self, args: argparse.Namespace
-        ) -> FlextCore.Result[int]:
+        def run_web_server_workflow(self, args: argparse.Namespace) -> FlextResult[int]:
             """Execute web server startup workflow."""
             cli_context_result = (
                 FlextQualityCliService._CliContextHelper.get_cli_context()
             )
             if cli_context_result.is_failure:
-                return FlextCore.Result[int].fail(
+                return FlextResult[int].fail(
                     cli_context_result.error or "CLI context creation failed",
                 )
 
@@ -349,10 +353,10 @@ class FlextQualityCliService(FlextCore.Service[int]):
 
             interface = FlextQualityWeb()
             interface.run(host=args.host, port=args.port, debug=args.debug)
-            return FlextCore.Result[int].ok(0)
+            return FlextResult[int].ok(0)
 
     @classmethod
-    def analyze_project(cls, args: argparse.Namespace) -> FlextCore.Result[int]:
+    def analyze_project(cls, args: argparse.Namespace) -> FlextResult[int]:
         """Analyze project quality using unified service pattern."""
         # Create instance for analysis
         instance = cls()
@@ -360,22 +364,20 @@ class FlextQualityCliService(FlextCore.Service[int]):
             msg = "Logger must be initialized"
             raise RuntimeError(msg)
         analysis_helper = instance._ProjectAnalysisHelper(
-            cast("FlextCore.Logger", instance.logger)
+            instance.logger
         )
 
-        analysis_result: FlextCore.Result[int] = (
-            analysis_helper.analyze_project_workflow(args)
+        analysis_result: FlextResult[int] = analysis_helper.analyze_project_workflow(
+            args
         )
         if analysis_result.is_failure:
             instance.logger.error("Quality analysis failed")
-            return FlextCore.Result[int].fail(
-                f"Analysis failed: {analysis_result.error}"
-            )
+            return FlextResult[int].fail(f"Analysis failed: {analysis_result.error}")
 
         return analysis_result
 
     @classmethod
-    def score_project(cls, args: argparse.Namespace) -> FlextCore.Result[int]:
+    def score_project(cls, args: argparse.Namespace) -> FlextResult[int]:
         """Get quick quality score for project using unified service pattern."""
         # Create instance for scoring
         instance = cls()
@@ -383,40 +385,36 @@ class FlextQualityCliService(FlextCore.Service[int]):
             msg = "Logger must be initialized"
             raise RuntimeError(msg)
         scoring_helper = instance._ProjectScoringHelper(
-            cast("FlextCore.Logger", instance.logger)
+            instance.logger
         )
 
-        scoring_result: FlextCore.Result[int] = scoring_helper.score_project_workflow(
-            args
-        )
+        scoring_result: FlextResult[int] = scoring_helper.score_project_workflow(args)
         if scoring_result.is_failure:
             instance.logger.error("Quality score calculation failed")
-            return FlextCore.Result[int].fail(
+            return FlextResult[int].fail(
                 f"Score calculation failed: {scoring_result.error}",
             )
 
         return scoring_result
 
     @classmethod
-    def run_web_server(cls, args: argparse.Namespace) -> FlextCore.Result[int]:
+    def run_web_server(cls, args: argparse.Namespace) -> FlextResult[int]:
         """Run quality web interface server using unified service pattern."""
         # Create instance for web server
         instance = cls()
         if instance.logger is None:
             msg = "Logger must be initialized"
             raise RuntimeError(msg)
-        web_helper = instance._WebServerHelper(
-            cast("FlextCore.Logger", instance.logger)
-        )
+        web_helper = instance._WebServerHelper(instance.logger)
 
-        web_result: FlextCore.Result[int] = web_helper.run_web_server_workflow(args)
+        web_result: FlextResult[int] = web_helper.run_web_server_workflow(args)
         if web_result.is_failure:
             instance.logger.error("Web server failed")
-            return FlextCore.Result[int].fail(f"Web server failed: {web_result.error}")
+            return FlextResult[int].fail(f"Web server failed: {web_result.error}")
 
         return web_result
 
-    def get_cli_context(self) -> FlextCore.Result[FlextCliContext]:
+    def get_cli_context(self) -> FlextResult[FlextCliContext]:
         """Public method to get CLI context."""
         return self._CliContextHelper.get_cli_context()
 
@@ -427,7 +425,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
 
     def analyze_project_legacy(self, args: argparse.Namespace) -> int:
         """Analyze project quality using FlextCli APIs."""
-        logger = FlextCore.Logger(__name__)
+        logger = FlextLogger(__name__)
         self._CliContextHelper.get_cli_context()
 
         try:
@@ -472,7 +470,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
 
     def score_project_legacy(self, args: argparse.Namespace) -> int:
         """Get quick quality score for project using FlextCli APIs."""
-        logger = FlextCore.Logger(__name__)
+        logger = FlextLogger(__name__)
         self._CliContextHelper.get_cli_context()
 
         try:
@@ -514,7 +512,7 @@ class FlextQualityCliService(FlextCore.Service[int]):
 
     def run_web_server_legacy(self, args: argparse.Namespace) -> int:
         """Run quality web interface server."""
-        logger = FlextCore.Logger(__name__)
+        logger = FlextLogger(__name__)
         self._CliContextHelper.get_cli_context()
 
         try:

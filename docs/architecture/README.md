@@ -14,7 +14,7 @@ FLEXT Quality provides comprehensive code quality analysis and metrics collectio
 
 - **Clean Architecture**: Clear separation of concerns with domain-first design
 - **Domain-Driven Design (DDD)**: Rich domain model with entities, value objects, and domain services
-- **Railway-Oriented Programming**: Functional error handling with `FlextCore.Result[T]` patterns
+- **Railway-Oriented Programming**: Functional error handling with `FlextResult[T]` patterns
 - **FLEXT Ecosystem Integration**: Native integration with flext-core, flext-cli, flext-web, and flext-observability
 
 ## 🏗️ Architecture Documentation Structure
@@ -56,7 +56,7 @@ Person(architect, "Software Architect", "Makes architectural decisions and revie
 
 System(flext_quality, "FLEXT Quality", "Code quality analysis and metrics collection library")
 
-System_Ext(flext_core, "FLEXT Core", "Foundation library providing FlextCore.Result, FlextCore.Container, FlextCore.Models")
+System_Ext(flext_core, "FLEXT Core", "Foundation library providing FlextResult, FlextContainer, FlextModels")
 System_Ext(flext_cli, "FLEXT CLI", "Command-line interface framework")
 System_Ext(flext_web, "FLEXT Web", "Web application framework")
 System_Ext(flext_observability, "FLEXT Observability", "Monitoring and metrics collection")
@@ -109,13 +109,13 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 
 ### Foundational Decisions
 
-| ADR                                           | Title                                              | Status   | Date       |
-| --------------------------------------------- | -------------------------------------------------- | -------- | ---------- |
-| [ADR-001](adrs/001-clean-architecture.md)     | Adopt Clean Architecture                           | Accepted | 2025-10-10 |
-| [ADR-002](adrs/002-flext-integration.md)      | Native FLEXT Ecosystem Integration                 | Accepted | 2025-10-10 |
-| [ADR-003](adrs/003-railway-patterns.md)       | Railway-Oriented Programming with FlextCore.Result | Accepted | 2025-10-10 |
-| [ADR-004](adrs/004-pydantic-models.md)        | Pydantic v2 for Domain Models                      | Accepted | 2025-10-10 |
-| [ADR-005](adrs/005-multi-backend-analysis.md) | Multi-Backend Analysis Architecture                | Accepted | 2025-10-10 |
+| ADR                                           | Title                                         | Status   | Date       |
+| --------------------------------------------- | --------------------------------------------- | -------- | ---------- |
+| [ADR-001](adrs/001-clean-architecture.md)     | Adopt Clean Architecture                      | Accepted | 2025-10-10 |
+| [ADR-002](adrs/002-flext-integration.md)      | Native FLEXT Ecosystem Integration            | Accepted | 2025-10-10 |
+| [ADR-003](adrs/003-railway-patterns.md)       | Railway-Oriented Programming with FlextResult | Accepted | 2025-10-10 |
+| [ADR-004](adrs/004-pydantic-models.md)        | Pydantic v2 for Domain Models                 | Accepted | 2025-10-10 |
+| [ADR-005](adrs/005-multi-backend-analysis.md) | Multi-Backend Analysis Architecture           | Accepted | 2025-10-10 |
 
 ### Technology Decisions
 

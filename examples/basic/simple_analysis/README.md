@@ -23,7 +23,7 @@ The simple analysis example covers:
 
 ### FLEXT Integration Patterns
 
-- **FlextCore.Result Usage**: Consistent error handling patterns
+- **FlextResult Usage**: Consistent error handling patterns
 - **QualityMetrics Integration**: Working with quality value objects
 - **Type Safety**: Comprehensive type hints and validation
 - **Enterprise Standards**: Professional code structure and documentation

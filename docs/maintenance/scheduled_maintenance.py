@@ -14,7 +14,7 @@ from pathlib import Path
 
 import schedule
 import yaml
-from flext_core import FlextCore
+from flext_core import FlextTypes
 
 
 class ScheduledMaintenance:
@@ -172,7 +172,7 @@ class ScheduledMaintenance:
         """Run monthly deep cleaning maintenance."""
         return self.run_tasks(self.config["schedules"]["monthly_deep_clean"]["tasks"])
 
-    def run_tasks(self, task_names: FlextCore.Types.StringList) -> bool:
+    def run_tasks(self, task_names: FlextTypes.StringList) -> bool:
         """Run a list of maintenance tasks."""
         success = True
 
@@ -276,12 +276,14 @@ class ScheduledMaintenance:
             "optimize": self.run_daily_optimize,
             "weekly": self.run_weekly_comprehensive,
             "monthly": self.run_monthly_deep_clean,
-            "all": lambda: all([
-                self.run_daily_audit(),
-                self.run_daily_optimize(),
-                self.run_weekly_comprehensive(),
-                self.run_monthly_deep_clean(),
-            ]),
+            "all": lambda: all(
+                [
+                    self.run_daily_audit(),
+                    self.run_daily_optimize(),
+                    self.run_weekly_comprehensive(),
+                    self.run_monthly_deep_clean(),
+                ]
+            ),
         }
 
         if task_type in task_map:

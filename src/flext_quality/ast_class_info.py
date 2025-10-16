@@ -7,17 +7,17 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextCore
+from flext_core import FlextModels, FlextTypes
 
 
-class FlextQualityASTClassInfo(FlextCore.Models.StrictArbitraryTypesModel):
+class FlextQualityASTClassInfo(FlextModels.StrictArbitraryTypesModel):
     """Unified AST class information class following FLEXT pattern.
 
     Single responsibility: AST class information management
     Contains all class-related models as nested classes.
     """
 
-    class ClassInfo(FlextCore.Models.StrictArbitraryTypesModel):
+    class ClassInfo(FlextModels.StrictArbitraryTypesModel):
         """Strongly-typed class information from AST analysis."""
 
         name: str
@@ -26,8 +26,8 @@ class FlextQualityASTClassInfo(FlextCore.Models.StrictArbitraryTypesModel):
         package_name: str
         line_number: int
         end_line_number: int
-        base_classes: FlextCore.Types.StringList
-        decorators: FlextCore.Types.StringList
+        base_classes: FlextTypes.StringList
+        decorators: FlextTypes.StringList
         is_dataclass: bool
         is_abstract: bool
         has_docstring: bool

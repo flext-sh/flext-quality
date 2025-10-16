@@ -37,51 +37,43 @@ class TestFlextQualityExceptions:
     def test_base_exception_creation(self) -> None:
         """Test FlextQualityError base exception creation."""
         exception = FlextQualityError("Test error")
-        assert "Test error" in str(exception)  # FlextCore.Exceptions adds prefixes
+        assert "Test error" in str(exception)  # FlextExceptions adds prefixes
         assert isinstance(exception, Exception)
 
     def test_validation_error_creation(self) -> None:
         """Test FlextQualityValidationError creation."""
         exception = FlextQualityValidationError("Validation failed")
-        assert "Validation failed" in str(
-            exception
-        )  # FlextCore.Exceptions adds prefixes
+        assert "Validation failed" in str(exception)  # FlextExceptions adds prefixes
         assert isinstance(exception, FlextQualityError)
 
     def test_configuration_error_creation(self) -> None:
         """Test FlextQualityConfigurationError creation."""
         exception = FlextQualityConfigurationError("Config error")
-        assert "Config error" in str(exception)  # FlextCore.Exceptions adds prefixes
+        assert "Config error" in str(exception)  # FlextExceptions adds prefixes
         assert isinstance(exception, FlextQualityError)
 
     def test_connection_error_creation(self) -> None:
         """Test FlextQualityConnectionError creation."""
         exception = FlextQualityConnectionError("Connection failed")
-        assert "Connection failed" in str(
-            exception
-        )  # FlextCore.Exceptions adds prefixes
+        assert "Connection failed" in str(exception)  # FlextExceptions adds prefixes
         assert isinstance(exception, FlextQualityError)
 
     def test_processing_error_creation(self) -> None:
         """Test FlextQualityProcessingError creation."""
         exception = FlextQualityProcessingError("Processing failed")
-        assert "Processing failed" in str(
-            exception
-        )  # FlextCore.Exceptions adds prefixes
+        assert "Processing failed" in str(exception)  # FlextExceptions adds prefixes
         assert isinstance(exception, FlextQualityError)
 
     def test_authentication_error_creation(self) -> None:
         """Test FlextQualityAuthenticationError creation."""
         exception = FlextQualityAuthenticationError("Auth failed")
-        assert "Auth failed" in str(exception)  # FlextCore.Exceptions adds prefixes
+        assert "Auth failed" in str(exception)  # FlextExceptions adds prefixes
         assert isinstance(exception, FlextQualityError)
 
     def test_timeout_error_creation(self) -> None:
         """Test FlextQualityTimeoutError creation."""
         exception = FlextQualityTimeoutError("Timeout occurred")
-        assert "Timeout occurred" in str(
-            exception
-        )  # FlextCore.Exceptions adds prefixes
+        assert "Timeout occurred" in str(exception)  # FlextExceptions adds prefixes
         assert isinstance(exception, FlextQualityError)
 
     def test_analysis_error_basic(self) -> None:

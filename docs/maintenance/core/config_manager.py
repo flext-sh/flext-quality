@@ -7,7 +7,7 @@ Handles loading, validation, and access to configuration files.
 from pathlib import Path
 
 import yaml
-from flext_core import FlextCore
+from flext_core import FlextTypes
 
 
 class AuditRules:
@@ -205,7 +205,7 @@ class ConfigManager:
         self._style_guide = None
         self._validation_config = None
 
-    def validate_configs(self) -> FlextCore.Types.StringList:
+    def validate_configs(self) -> FlextTypes.StringList:
         """Validate all configuration files and return any issues."""
         # Check required config files exist
         required_files = [

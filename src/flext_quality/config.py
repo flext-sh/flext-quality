@@ -10,18 +10,18 @@ from __future__ import annotations
 import warnings
 from typing import Self
 
-from flext_core import FlextCore
+from flext_core import FlextConfig, FlextResult, FlextTypes
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import SettingsConfigDict
 
 from .constants import FlextQualityConstants
 
 
-class FlextQualityConfig(FlextCore.Config):
-    """Single Pydantic 2 Settings class for flext-quality extending FlextCore.Config.
+class FlextQualityConfig(FlextConfig):
+    """Single Pydantic 2 Settings class for flext-quality extending FlextConfig.
 
     Follows standardized pattern:
-    - Extends FlextCore.Config from flext-core with enhanced Pydantic 2.11+ features
+    - Extends FlextConfig from flext-core with enhanced Pydantic 2.11+ features
     - No nested classes within Config
     - All defaults from FlextQualityConstants
     - Uses direct instantiation pattern (no singleton)
@@ -32,12 +32,12 @@ class FlextQualityConfig(FlextCore.Config):
         env_prefix="FLEXT_QUALITY_",
         case_sensitive=False,
         extra="allow",
-        # Inherit enhanced Pydantic 2.11+ features from FlextCore.Config
+        # Inherit enhanced Pydantic 2.11+ features from FlextConfig
         validate_assignment=True,
         str_strip_whitespace=True,
         json_schema_extra={
             "title": "FLEXT Quality Configuration",
-            "description": "Code quality analysis configuration extending FlextCore.Config",
+            "description": "Code quality analysis configuration extending FlextConfig",
         },
     )
 
@@ -274,13 +274,15 @@ class FlextQualityConfig(FlextCore.Config):
             raise ValueError(msg)
 
         # Validate analysis configuration
-        if not any([
-            self.enable_ast_analysis,
-            self.enable_external_tools,
-            self.enable_ruff,
-            self.enable_mypy,
-            self.enable_bandit,
-        ]):
+        if not any(
+            [
+                self.enable_ast_analysis,
+                self.enable_external_tools,
+                self.enable_ruff,
+                self.enable_mypy,
+                self.enable_bandit,
+            ]
+        ):
             msg = "At least one analysis method must be enabled"
             raise ValueError(msg)
 
@@ -294,12 +296,12 @@ class FlextQualityConfig(FlextCore.Config):
 
         return self
 
-    def validate_business_rules(self) -> FlextCore.Result[None]:
+    def validate_business_rules(self) -> FlextResult[None]:
         """Validate quality analysis business rules."""
         try:
             # Validate analysis requirements
             if self.min_coverage > 0.0 and not self.enable_external_tools:
-                return FlextCore.Result[None].fail(
+                return FlextResult[None].fail(
                     "Coverage analysis requires external tools"
                 )
 
@@ -308,7 +310,7 @@ class FlextQualityConfig(FlextCore.Config):
                 self.analysis_timeout
                 < FlextQualityConstants.Performance.MINIMUM_ANALYSIS_TIMEOUT
             ):
-                return FlextCore.Result[None].fail(
+                return FlextResult[None].fail(
                     f"Analysis timeout too low (minimum {FlextQualityConstants.Performance.MINIMUM_ANALYSIS_TIMEOUT} seconds)"
                 )
 
@@ -318,21 +320,19 @@ class FlextQualityConfig(FlextCore.Config):
                 >= FlextQualityConstants.Validation.SECURITY_DEPENDENCY_SCAN_THRESHOLD
                 and not self.enable_dependency_scan
             ):
-                return FlextCore.Result[None].fail(
+                return FlextResult[None].fail(
                     "High security score requires dependency scanning"
                 )
 
             # Validate reporting requirements
             if self.include_trend_analysis and not self.enable_audit_logging:
-                return FlextCore.Result[None].fail(
-                    "Trend analysis requires audit logging"
-                )
+                return FlextResult[None].fail("Trend analysis requires audit logging")
 
-            return FlextCore.Result[None].ok(None)
+            return FlextResult[None].ok(None)
         except Exception as e:
-            return FlextCore.Result[None].fail(f"Business rules validation failed: {e}")
+            return FlextResult[None].fail(f"Business rules validation failed: {e}")
 
-    def get_analysis_config(self) -> FlextCore.Types.Dict:
+    def get_analysis_config(self) -> FlextTypes.Dict:
         """Get quality analysis configuration context."""
         return {
             "min_coverage": self.min_coverage,
@@ -344,7 +344,7 @@ class FlextQualityConfig(FlextCore.Config):
             "workers": self.parallel_workers,
         }
 
-    def get_backend_config(self) -> FlextCore.Types.Dict:
+    def get_backend_config(self) -> FlextTypes.Dict:
         """Get analysis backend configuration context."""
         return {
             "enable_ast_analysis": self.enable_ast_analysis,
@@ -355,7 +355,7 @@ class FlextQualityConfig(FlextCore.Config):
             "enable_dependency_scan": self.enable_dependency_scan,
         }
 
-    def get_reporting_config(self) -> FlextCore.Types.Dict:
+    def get_reporting_config(self) -> FlextTypes.Dict:
         """Get quality reporting configuration context."""
         return {
             "enable_html_reports": self.enable_html_reports,
@@ -365,7 +365,7 @@ class FlextQualityConfig(FlextCore.Config):
             "include_executive_summary": self.include_executive_summary,
         }
 
-    def get_observability_config(self) -> FlextCore.Types.Dict:
+    def get_observability_config(self) -> FlextTypes.Dict:
         """Get observability configuration context."""
         return {
             "quiet": self.observability_quiet,
@@ -389,24 +389,28 @@ class FlextQualityConfig(FlextCore.Config):
     @classmethod
     def create_for_development(cls) -> FlextQualityConfig:
         """Create configuration optimized for development using model_validate."""
-        return cls.model_validate({
-            "min_coverage": 80.0,
-            "max_complexity": 15,
-            "analysis_timeout": 120,
-            "parallel_workers": 2,
-        })
+        return cls.model_validate(
+            {
+                "min_coverage": 80.0,
+                "max_complexity": 15,
+                "analysis_timeout": 120,
+                "parallel_workers": 2,
+            }
+        )
 
     @classmethod
     def create_for_production(cls) -> FlextQualityConfig:
         """Create configuration optimized for production using model_validate."""
-        return cls.model_validate({
-            "min_coverage": FlextQualityConstants.Coverage.TARGET_COVERAGE,
-            "max_complexity": 8,
-            "min_security_score": FlextQualityConstants.Security.TARGET_SECURITY_SCORE,
-            "min_maintainability": 85.0,
-            "analysis_timeout": 600,
-            "parallel_workers": 8,
-        })
+        return cls.model_validate(
+            {
+                "min_coverage": FlextQualityConstants.Coverage.TARGET_COVERAGE,
+                "max_complexity": 8,
+                "min_security_score": FlextQualityConstants.Security.TARGET_SECURITY_SCORE,
+                "min_maintainability": 85.0,
+                "analysis_timeout": 600,
+                "parallel_workers": 8,
+            }
+        )
 
 
 __all__ = [

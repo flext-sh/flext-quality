@@ -7,17 +7,17 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextCore
+from flext_core import FlextModels, FlextTypes
 
 
-class FlextQualityASTFunctionInfo(FlextCore.Models.StrictArbitraryTypesModel):
+class FlextQualityASTFunctionInfo(FlextModels.StrictArbitraryTypesModel):
     """Unified AST function information class following FLEXT pattern.
 
     Single responsibility: AST function information management
     Contains all function-related models as nested classes.
     """
 
-    class FunctionInfo(FlextCore.Models.StrictArbitraryTypesModel):
+    class FunctionInfo(FlextModels.StrictArbitraryTypesModel):
         """Strongly-typed function information from AST analysis."""
 
         name: str
@@ -26,7 +26,7 @@ class FlextQualityASTFunctionInfo(FlextCore.Models.StrictArbitraryTypesModel):
         package_name: str
         line_number: int
         end_line_number: int
-        decorators: FlextCore.Types.StringList
+        decorators: FlextTypes.StringList
         is_generator: bool
         is_method: bool
         is_property: bool

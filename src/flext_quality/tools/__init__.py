@@ -10,10 +10,19 @@ flext-quality's domain API and provide supporting functionality.
 from __future__ import annotations
 
 from .architecture import FlextQualityArchitectureTools
+from .backup import BackupManager
+from .config_manager import ConfigurationManager
+from .conflicts import ConflictAnalyzer
 from .dependencies import FlextQualityDependencyTools
+from .discovery import DependencyDiscovery
 from .git import FlextQualityGitTools
+from .mypy_checker import MyPyChecker
 from .optimizer_operations import FlextQualityOptimizerOperations
+from .paths import FlextPathService
+from .poetry import PoetryOperations, PoetryValidator
 from .quality_operations import FlextQualityOperations
+from .script_base import FlextScriptService, ScriptMetadata
+from .security import FlextSecurityService, SecretVaultDecryptor
 from .utilities import (
     Colors,
     FlextQualityToolsUtilities,
@@ -28,9 +37,12 @@ from .utilities import (
 from .validation import FlextQualityValidationTools
 
 __all__ = [
-    # Utility components
+    "BackupManager",
     "Colors",
-    # Tool services
+    "ConfigurationManager",
+    "ConflictAnalyzer",
+    "DependencyDiscovery",
+    "FlextPathService",
     "FlextQualityArchitectureTools",
     "FlextQualityDependencyTools",
     "FlextQualityGitTools",
@@ -38,7 +50,13 @@ __all__ = [
     "FlextQualityOptimizerOperations",
     "FlextQualityToolsUtilities",
     "FlextQualityValidationTools",
-    # Convenience functions
+    "FlextScriptService",
+    "FlextSecurityService",
+    "SecretVaultDecryptor",
+    "MyPyChecker",
+    "PoetryOperations",
+    "PoetryValidator",
+    "ScriptMetadata",
     "colorize",
     "get_project_root",
     "get_stdlib_modules",

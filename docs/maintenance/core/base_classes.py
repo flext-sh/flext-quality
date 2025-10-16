@@ -10,7 +10,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol
 
-from flext_core import FlextCore
+from flext_core import FlextTypes
 
 
 @dataclass
@@ -46,8 +46,8 @@ class ValidationResult:
     valid_items: int = 0
     invalid_items: int = 0
     issues: list[Issue] | None = None
-    warnings: FlextCore.Types.StringList | None = None
-    errors: FlextCore.Types.StringList | None = None
+    warnings: FlextTypes.StringList | None = None
+    errors: FlextTypes.StringList | None = None
     metadata: dict[str, object] | None = None
 
     def __post_init__(self) -> None:

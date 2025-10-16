@@ -10,14 +10,14 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from enum import StrEnum
 
-from flext_core import FlextCore
+from flext_core import FlextModels, FlextResult
 from pydantic import BaseModel, Field
 
 from .constants import FlextQualityConstants
 from .typings import FlextQualityTypes
 
 
-class FlextQualityEntities(FlextCore.Models):
+class FlextQualityEntities(FlextModels):
     """Unified quality entities class following FLEXT pattern - ZERO DUPLICATION.
 
     Single responsibility: Quality domain entities management
@@ -84,11 +84,11 @@ class FlextQualityEntities(FlextCore.Models):
         last_analysis_at: datetime | None = None
         total_analyses: int = Field(default=0)
 
-        def validate_business_rules(self) -> FlextCore.Result[None]:
+        def validate_business_rules(self) -> FlextResult[None]:
             """Validate domain rules for quality project."""
             if not self.project_path:
-                return FlextCore.Result[None].fail("Project path is required")
-            return FlextCore.Result[None].ok(None)
+                return FlextResult[None].fail("Project path is required")
+            return FlextResult[None].ok(None)
 
         def update_last_analysis(self) -> FlextQualityEntities.Project:
             """Update last analysis timestamp and return new instance."""
@@ -216,11 +216,11 @@ class FlextQualityEntities(FlextCore.Models):
             """Check if analysis completed successfully."""
             return self.status == FlextQualityEntities.AnalysisStatus.COMPLETED
 
-        def validate_business_rules(self) -> FlextCore.Result[None]:
+        def validate_business_rules(self) -> FlextResult[None]:
             """Validate domain rules for quality analysis."""
             if not self.project_id:
-                return FlextCore.Result[None].fail("Project ID is required")
-            return FlextCore.Result[None].ok(None)
+                return FlextResult[None].fail("Project ID is required")
+            return FlextResult[None].ok(None)
 
     class Issue(BaseModel):
         """Quality issue domain entity using enhanced mixins for code reduction."""
@@ -285,11 +285,11 @@ class FlextQualityEntities(FlextCore.Models):
                 },
             )
 
-        def validate_business_rules(self) -> FlextCore.Result[None]:
+        def validate_business_rules(self) -> FlextResult[None]:
             """Validate domain rules for quality issue."""
             if not self.analysis_id:
-                return FlextCore.Result[None].fail("Analysis ID is required")
-            return FlextCore.Result[None].ok(None)
+                return FlextResult[None].fail("Analysis ID is required")
+            return FlextResult[None].ok(None)
 
     class Rule(BaseModel):
         """Quality rule domain entity using enhanced mixins for code reduction."""
@@ -335,11 +335,11 @@ class FlextQualityEntities(FlextCore.Models):
             new_parameters[key] = value
             return self.model_copy(update={"parameters": "new_parameters"})
 
-        def validate_business_rules(self) -> FlextCore.Result[None]:
+        def validate_business_rules(self) -> FlextResult[None]:
             """Validate domain rules for quality rule."""
             if not self.rule_id:
-                return FlextCore.Result[None].fail("Rule ID is required")
-            return FlextCore.Result[None].ok(None)
+                return FlextResult[None].fail("Rule ID is required")
+            return FlextResult[None].ok(None)
 
     class Report(BaseModel):
         """Quality report domain entity using enhanced mixins for code reduction."""
@@ -371,11 +371,11 @@ class FlextQualityEntities(FlextCore.Models):
                 },
             )
 
-        def validate_business_rules(self) -> FlextCore.Result[None]:
+        def validate_business_rules(self) -> FlextResult[None]:
             """Validate domain rules for quality report."""
             if not self.analysis_id:
-                return FlextCore.Result[None].fail("Analysis ID is required")
-            return FlextCore.Result[None].ok(None)
+                return FlextResult[None].fail("Analysis ID is required")
+            return FlextResult[None].ok(None)
 
     # =============================================================================
     # NESTED EVENT CLASSES - Domain events

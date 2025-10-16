@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any, Self, override
 from uuid import UUID
 
-from flext_core import FlextCore
+from flext_core import FlextContainer, FlextLogger, FlextModels, FlextTypes
 from pydantic import (
     Field,
     SerializationInfo,
@@ -30,10 +30,10 @@ from .constants import FlextQualityConstants
 from .value_objects import FlextQualityValueObjects
 
 
-class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
+class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
     """Unified quality models class following FLEXT architecture patterns.
 
-    Inherits from FlextCore.Models.StrictArbitraryTypesModel for comprehensive validation.
+    Inherits from FlextModels.StrictArbitraryTypesModel for comprehensive validation.
     Single responsibility: Quality data models and validation
     Contains all Pydantic models as nested classes with shared functionality.
     """
@@ -56,7 +56,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         return len([cls for cls in quality_model_classes if cls])
 
     @property
-    def quality_system_summary(self) -> FlextCore.Types.Dict:
+    def quality_system_summary(self) -> FlextTypes.Dict:
         """Computed field providing comprehensive quality system summary."""
         return {
             "system_info": {
@@ -125,10 +125,10 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
     def __init__(self) -> None:
         """Initialize models with dependency injection."""
         super().__init__()
-        self._container = FlextCore.Container.get_global()
-        self.logger = FlextCore.Logger(__name__)
+        self._container = FlextContainer.get_global()
+        self.logger = FlextLogger(__name__)
 
-    class ProjectModel(FlextCore.Models.StrictArbitraryTypesModel):
+    class ProjectModel(FlextModels.StrictArbitraryTypesModel):
         """Pydantic model for quality project representation."""
 
         id: UUID = Field(..., description="Unique project identifier")
@@ -147,7 +147,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         )
 
         @property
-        def project_summary(self) -> FlextCore.Types.Dict:
+        def project_summary(self) -> FlextTypes.Dict:
             """Computed field providing comprehensive project summary."""
             return {
                 "project_info": {
@@ -206,7 +206,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
                 raise ValueError(msg)
             return v.strip()
 
-    class AnalysisModel(FlextCore.Models.StrictArbitraryTypesModel):
+    class AnalysisModel(FlextModels.StrictArbitraryTypesModel):
         """Pydantic model for quality analysis representation."""
 
         id: UUID = Field(..., description="Unique analysis identifier")
@@ -256,7 +256,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         )
 
         @property
-        def analysis_summary(self) -> FlextCore.Types.Dict:
+        def analysis_summary(self) -> FlextTypes.Dict:
             """Computed field providing comprehensive analysis summary."""
             duration_seconds: float = 0.0
             if self.completed_at and self.started_at:
@@ -370,7 +370,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
             """Ensure scores are within valid range."""
             return max(0.0, min(100.0, v))
 
-    class IssueModel(FlextCore.Models.StrictArbitraryTypesModel):
+    class IssueModel(FlextModels.StrictArbitraryTypesModel):
         """Pydantic model for quality issue representation."""
 
         id: UUID = Field(..., description="Unique issue identifier")
@@ -389,7 +389,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         source: str = Field(..., description="Analysis backend that detected the issue")
 
         @property
-        def issue_summary(self) -> FlextCore.Types.Dict:
+        def issue_summary(self) -> FlextTypes.Dict:
             """Computed field providing comprehensive issue summary."""
             return {
                 "issue_identity": {
@@ -510,7 +510,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
                 raise ValueError(msg)
             return v
 
-    class ReportModel(FlextCore.Models.StrictArbitraryTypesModel):
+    class ReportModel(FlextModels.StrictArbitraryTypesModel):
         """Pydantic model for quality report representation."""
 
         id: UUID = Field(..., description="Unique report identifier")
@@ -522,13 +522,13 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
             default_factory=datetime.now,
             description="Report generation time",
         )
-        metadata: FlextCore.Types.Dict = Field(
+        metadata: FlextTypes.Dict = Field(
             default_factory=dict,
             description="Additional report metadata",
         )
 
         @property
-        def report_summary(self) -> FlextCore.Types.Dict:
+        def report_summary(self) -> FlextTypes.Dict:
             """Computed field providing comprehensive report summary."""
             return {
                 "report_identity": {
@@ -580,7 +580,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
             return self
 
         @field_serializer("content", when_used="json")
-        def serialize_content_efficiently(self, value: str) -> FlextCore.Types.Dict:
+        def serialize_content_efficiently(self, value: str) -> FlextTypes.Dict:
             """Field serializer for efficient content handling."""
             # For large content, provide summary instead of full content in JSON
             max_content_size = 10000  # 10KB limit for JSON serialization
@@ -601,7 +601,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         @field_serializer("metadata", when_used="json")
         def serialize_metadata_with_context(
             self, value: dict[str, object]
-        ) -> FlextCore.Types.Dict:
+        ) -> FlextTypes.Dict:
             """Field serializer for metadata with processing context."""
             return {
                 "report_metadata": value,
@@ -625,7 +625,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
             enterprise_formats = ["HTML", "PDF", "JSON"]
             return self.format_type in enterprise_formats
 
-        def _get_format_capabilities(self) -> FlextCore.Types.StringList:
+        def _get_format_capabilities(self) -> FlextTypes.StringList:
             """Get capabilities based on report format."""
             capabilities_map = {
                 "HTML": ["interactive", "styling", "charts", "responsive"],
@@ -637,14 +637,14 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
             }
             return capabilities_map.get(self.format_type, [])
 
-    class ConfigModel(FlextCore.Models.StrictArbitraryTypesModel):
+    class ConfigModel(FlextModels.StrictArbitraryTypesModel):
         """Pydantic model for analysis configuration."""
 
-        include_patterns: FlextCore.Types.StringList = Field(
+        include_patterns: FlextTypes.StringList = Field(
             default_factory=list,
             description="File patterns to include",
         )
-        exclude_patterns: FlextCore.Types.StringList = Field(
+        exclude_patterns: FlextTypes.StringList = Field(
             default_factory=list,
             description="File patterns to exclude",
         )
@@ -674,7 +674,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         )
 
         @property
-        def config_summary(self) -> FlextCore.Types.Dict:
+        def config_summary(self) -> FlextTypes.Dict:
             """Computed field providing comprehensive configuration summary."""
             return {
                 "pattern_configuration": {
@@ -687,11 +687,13 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
                     "security_enabled": self.enable_security,
                     "complexity_enabled": self.enable_complexity,
                     "coverage_enabled": self.enable_coverage,
-                    "enabled_analyses_count": sum([
-                        self.enable_security,
-                        self.enable_complexity,
-                        self.enable_coverage,
-                    ]),
+                    "enabled_analyses_count": sum(
+                        [
+                            self.enable_security,
+                            self.enable_complexity,
+                            self.enable_coverage,
+                        ]
+                    ),
                 },
                 "quality_thresholds": {
                     "max_complexity": self.max_complexity,
@@ -741,11 +743,13 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
                 raise ValueError(msg)
 
             # Validate analysis enablement
-            if not any([
-                self.enable_security,
-                self.enable_complexity,
-                self.enable_coverage,
-            ]):
+            if not any(
+                [
+                    self.enable_security,
+                    self.enable_complexity,
+                    self.enable_coverage,
+                ]
+            ):
                 msg = "At least one analysis type must be enabled"
                 raise ValueError(msg)
 
@@ -753,8 +757,8 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
 
         @field_serializer("include_patterns", when_used="json")
         def serialize_include_patterns_with_metadata(
-            self, value: FlextCore.Types.StringList
-        ) -> FlextCore.Types.Dict:
+            self, value: FlextTypes.StringList
+        ) -> FlextTypes.Dict:
             """Field serializer for include patterns with validation metadata."""
             return {
                 "patterns": value,
@@ -768,8 +772,8 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
 
         @field_serializer("exclude_patterns", when_used="json")
         def serialize_exclude_patterns_with_metadata(
-            self, value: FlextCore.Types.StringList
-        ) -> FlextCore.Types.Dict:
+            self, value: FlextTypes.StringList
+        ) -> FlextTypes.Dict:
             """Field serializer for exclude patterns with validation metadata."""
             return {
                 "patterns": value,
@@ -840,7 +844,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
 
     # ==== ANALYSIS RESULT MODELS (from analysis_types.py migration) ====
 
-    class FileAnalysisResult(FlextCore.Models.StrictArbitraryTypesModel):
+    class FileAnalysisResult(FlextModels.StrictArbitraryTypesModel):
         """Result of analyzing a single file."""
 
         file_path: Path = Field(..., description="Path to the analyzed file")
@@ -859,7 +863,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         style_issues: int = Field(default=0, ge=0, description="Number of style issues")
         dead_code_lines: int = Field(default=0, ge=0, description="Lines of dead code")
 
-    class CodeIssue(FlextCore.Models.StrictArbitraryTypesModel):
+    class CodeIssue(FlextModels.StrictArbitraryTypesModel):
         """General code quality issue."""
 
         file_path: str = Field(..., description="File where issue was found")
@@ -874,7 +878,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
             default=None, description="Rule that detected the issue"
         )
 
-    class ComplexityIssue(FlextCore.Models.StrictArbitraryTypesModel):
+    class ComplexityIssue(FlextModels.StrictArbitraryTypesModel):
         """Complexity-related code issue."""
 
         file_path: str = Field(..., description="File where issue was found")
@@ -891,7 +895,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         )
         message: str = Field(..., description="Human-readable issue message")
 
-    class SecurityIssue(FlextCore.Models.StrictArbitraryTypesModel):
+    class SecurityIssue(FlextModels.StrictArbitraryTypesModel):
         """Security-related code issue."""
 
         file_path: str = Field(..., description="File where issue was found")
@@ -907,7 +911,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         message: str = Field(..., description="Human-readable issue message")
         rule_id: str = Field(..., description="Security rule that detected the issue")
 
-    class DeadCodeIssue(FlextCore.Models.StrictArbitraryTypesModel):
+    class DeadCodeIssue(FlextModels.StrictArbitraryTypesModel):
         """Dead code issue."""
 
         file_path: str = Field(..., description="File where dead code was found")
@@ -922,10 +926,10 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         )
         message: str = Field(..., description="Human-readable issue message")
 
-    class DuplicationIssue(FlextCore.Models.StrictArbitraryTypesModel):
+    class DuplicationIssue(FlextModels.StrictArbitraryTypesModel):
         """Code duplication issue."""
 
-        files: FlextCore.Types.StringList = Field(
+        files: FlextTypes.StringList = Field(
             ..., description="Files containing duplicated code"
         )
         line_ranges: list[tuple[int, int]] = Field(
@@ -944,19 +948,19 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         )
         message: str = Field(..., description="Human-readable issue message")
 
-    class Dependency(FlextCore.Models.StrictArbitraryTypesModel):
+    class Dependency(FlextModels.StrictArbitraryTypesModel):
         """Project dependency information."""
 
         name: str = Field(..., description="Dependency name")
         version: str = Field(..., description="Dependency version")
         type: str = Field(..., description="Dependency type (direct/dev/optional)")
         license: str | None = Field(default=None, description="Dependency license")
-        vulnerabilities: FlextCore.Types.StringList = Field(
+        vulnerabilities: FlextTypes.StringList = Field(
             default_factory=list,
             description="Known vulnerabilities",
         )
 
-    class TestResults(FlextCore.Models.StrictArbitraryTypesModel):
+    class TestResults(FlextModels.StrictArbitraryTypesModel):
         """Test execution results."""
 
         total_tests: int = Field(default=0, description="Total number of tests")
@@ -973,7 +977,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
             default=0.0, description="Test execution time in seconds"
         )
 
-    class OverallMetrics(FlextCore.Models.StrictArbitraryTypesModel):
+    class OverallMetrics(FlextModels.StrictArbitraryTypesModel):
         """Overall project quality metrics."""
 
         files_analyzed: int = Field(default=0, description="Number of files analyzed")
@@ -1017,7 +1021,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
             description="Complexity score",
         )
 
-    class AnalysisResults(FlextCore.Models.StrictArbitraryTypesModel):
+    class AnalysisResults(FlextModels.StrictArbitraryTypesModel):
         """Complete analysis results for a project."""
 
         overall_metrics: OverallMetrics = Field(
@@ -1081,7 +1085,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
 
     # ==== WEB MODELS (from web.py migration) ====
 
-    class AppConfig(FlextCore.Models.StrictArbitraryTypesModel):
+    class AppConfig(FlextModels.StrictArbitraryTypesModel):
         """Web app configuration."""
 
         title: str = Field(..., description="App title")
@@ -1091,7 +1095,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
 
     # ==== INTERNAL TOOLS MODELS (from flext_tools migration) ====
 
-    class GitOperation(FlextCore.Models.StrictArbitraryTypesModel):
+    class GitOperation(FlextModels.StrictArbitraryTypesModel):
         """Git operation command for quality tools."""
 
         repo_path: str
@@ -1099,15 +1103,15 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         dry_run: bool = True
         temp_path: str | None = None
 
-    class RewriteResult(FlextCore.Models.StrictArbitraryTypesModel):
+    class RewriteResult(FlextModels.StrictArbitraryTypesModel):
         """Git history rewrite result."""
 
         commits_processed: int
         commits_changed: int
         success: bool
-        errors: FlextCore.Types.StringList
+        errors: FlextTypes.StringList
 
-    class OptimizationTarget(FlextCore.Models.StrictArbitraryTypesModel):
+    class OptimizationTarget(FlextModels.StrictArbitraryTypesModel):
         """Target for optimization."""
 
         project_path: str
@@ -1116,58 +1120,58 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         optimization_type: str
         priority: int = 1
 
-    class OptimizationResult(FlextCore.Models.StrictArbitraryTypesModel):
+    class OptimizationResult(FlextModels.StrictArbitraryTypesModel):
         """Result of optimization operation."""
 
         target: OptimizationTarget
         success: bool
         changes_made: int
-        errors: FlextCore.Types.StringList
-        warnings: FlextCore.Types.StringList
+        errors: FlextTypes.StringList
+        warnings: FlextTypes.StringList
 
-    class CheckResult(FlextCore.Models.StrictArbitraryTypesModel):
+    class CheckResult(FlextModels.StrictArbitraryTypesModel):
         """Quality check result."""
 
         lint_passed: bool
         type_check_passed: bool
         coverage: float
-        violations: FlextCore.Types.StringList
+        violations: FlextTypes.StringList
 
-    class QualityValidationResult(FlextCore.Models.StrictArbitraryTypesModel):
+    class QualityValidationResult(FlextModels.StrictArbitraryTypesModel):
         """Quality validation result."""
 
         passed: bool
         checks_run: int
         checks_passed: int
-        failures: FlextCore.Types.StringList
+        failures: FlextTypes.StringList
 
-    class AnalysisResult(FlextCore.Models.StrictArbitraryTypesModel):
+    class AnalysisResult(FlextModels.StrictArbitraryTypesModel):
         """Architecture analysis result."""
 
-        violations: FlextCore.Types.StringList
-        suggestions: FlextCore.Types.StringList
+        violations: FlextTypes.StringList
+        suggestions: FlextTypes.StringList
         complexity_score: float
         domain_library_usage: dict[str, bool]
 
-    class DependencyInfo(FlextCore.Models.StrictArbitraryTypesModel):
+    class DependencyInfo(FlextModels.StrictArbitraryTypesModel):
         """Dependency information."""
 
         name: str
         version: str
         source: str
-        required_by: FlextCore.Types.StringList
+        required_by: FlextTypes.StringList
 
     # =============================================================================
     # DOMAIN ENTITY MODELS - Moved from entities.py
     # =============================================================================
 
-    class DomainEvent(FlextCore.Models.DomainEvent):
+    class DomainEvent(FlextModels.DomainEvent):
         """Base class for domain events."""
 
         event_type: str
         timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
-    class Project(FlextCore.Models.Entity):
+    class Project(FlextModels.Entity):
         """Quality project domain entity using enhanced mixins for code reduction."""
 
         # Project identification
@@ -1201,7 +1205,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         last_analysis_at: datetime | None = None
         total_analyses: int = Field(default=0)
 
-    class Analysis(FlextCore.Models.Entity):
+    class Analysis(FlextModels.Entity):
         """Quality analysis domain entity with comprehensive analysis tracking."""
 
         # Analysis identification
@@ -1248,7 +1252,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         error_message: str | None = None
         retry_count: int = Field(default=0)
 
-    class Issue(FlextCore.Models.Entity):
+    class Issue(FlextModels.Entity):
         """Quality issue domain entity with detailed issue tracking."""
 
         # Issue identification
@@ -1277,7 +1281,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         suggestion: str | None = None
 
         # Context information
-        context_lines: FlextCore.Types.StringList | None = None
+        context_lines: FlextTypes.StringList | None = None
         related_code: str | None = None
 
         # Issue metadata
@@ -1290,7 +1294,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         resolved_at: datetime | None = None
         resolution_notes: str | None = None
 
-    class Rule(FlextCore.Models.Entity):
+    class Rule(FlextModels.Entity):
         """Quality rule domain entity defining analysis rules and thresholds."""
 
         # Rule identification
@@ -1315,13 +1319,13 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         # Rule description
         description: str = Field(..., description="Rule description")
         rationale: str | None = None
-        examples: FlextCore.Types.StringList | None = None
+        examples: FlextTypes.StringList | None = None
 
         # Rule metadata
         deprecated: bool = Field(default=False)
         replacement_rule: str | None = None
 
-    class Report(FlextCore.Models.Entity):
+    class Report(FlextModels.Entity):
         """Quality report domain entity containing analysis summaries and insights."""
 
         # Report identification
@@ -1367,7 +1371,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
     # AST ANALYSIS MODELS - Moved from ast_*.py files
     # =============================================================================
 
-    class FunctionInfo(FlextCore.Models.StrictArbitraryTypesModel):
+    class FunctionInfo(FlextModels.StrictArbitraryTypesModel):
         """Strongly-typed function information from AST analysis."""
 
         name: str
@@ -1376,7 +1380,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         package_name: str
         line_number: int
         end_line_number: int
-        decorators: FlextCore.Types.StringList
+        decorators: FlextTypes.StringList
         is_generator: bool
         is_method: bool
         is_property: bool
@@ -1387,7 +1391,7 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         complexity: int
         docstring: str | None
 
-    class ClassInfo(FlextCore.Models.StrictArbitraryTypesModel):
+    class ClassInfo(FlextModels.StrictArbitraryTypesModel):
         """Strongly-typed class information from AST analysis."""
 
         name: str
@@ -1396,8 +1400,8 @@ class FlextQualityModels(FlextCore.Models.StrictArbitraryTypesModel):
         package_name: str
         line_number: int
         end_line_number: int
-        base_classes: FlextCore.Types.StringList
-        decorators: FlextCore.Types.StringList
+        base_classes: FlextTypes.StringList
+        decorators: FlextTypes.StringList
         is_dataclass: bool
         is_abstract: bool
         has_docstring: bool

@@ -17,7 +17,7 @@ class TestQualityContainer:
         """Test getting quality container."""
         container = get_quality_container()
         assert container is not None
-        # Should be a FlextCore.Container from flext-core
+        # Should be a FlextContainer from flext-core
         assert hasattr(container, "register")
         assert hasattr(container, "get")
         assert hasattr(container, "get_typed")

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Final
 
-from flext_core import FlextCore
+from flext_core import FlextTypes
 
 from .__version__ import __version__, __version_info__
 
@@ -87,12 +87,12 @@ class FlextQualityVersion:
         return self.maintainer
 
     @property
-    def authors(self) -> FlextCore.Types.StringList:
+    def authors(self) -> FlextTypes.StringList:
         """Return list of authors."""
         return self.metadata["authors"]
 
     @property
-    def maintainers(self) -> FlextCore.Types.StringList:
+    def maintainers(self) -> FlextTypes.StringList:
         """Return list of maintainers."""
         return self.metadata["maintainers"]
 

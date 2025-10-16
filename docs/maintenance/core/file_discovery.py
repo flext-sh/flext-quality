@@ -9,7 +9,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextCore
+from flext_core import FlextTypes
 
 from .base_classes import FileMetadata
 
@@ -70,8 +70,8 @@ class DocumentationFinder:
     def __init__(
         self,
         project_root: Path,
-        patterns: FlextCore.Types.StringList | None = None,
-        ignore_patterns: FlextCore.Types.StringList | None = None,
+        patterns: FlextTypes.StringList | None = None,
+        ignore_patterns: FlextTypes.StringList | None = None,
         ignore_file: str | None = None,
     ) -> None:
         """Initialize the documentation finder.
@@ -206,7 +206,7 @@ class DocumentationFinder:
         all_files = self.find_files()
         return [f for f in all_files if f.name.lower().startswith("readme")]
 
-    def find_by_extension(self, extensions: FlextCore.Types.StringList) -> list[Path]:
+    def find_by_extension(self, extensions: FlextTypes.StringList) -> list[Path]:
         """Find files by their extensions."""
         all_files = self.find_files()
         extensions = [ext.lower().lstrip(".") for ext in extensions]
@@ -292,28 +292,36 @@ class DocumentationFinder:
             "total_size": sum(meta.size for meta in metadata_list),
             "total_lines": sum(meta.lines for meta in metadata_list),
             "total_words": sum(meta.words for meta in metadata_list),
-            "markdown_files": len([
-                f for f in files if f.suffix.lower() in {".md", ".mdx"}
-            ]),
-            "other_files": len([
-                f for f in files if f.suffix.lower() not in {".md", ".mdx"}
-            ]),
+            "markdown_files": len(
+                [f for f in files if f.suffix.lower() in {".md", ".mdx"}]
+            ),
+            "other_files": len(
+                [f for f in files if f.suffix.lower() not in {".md", ".mdx"}]
+            ),
         }
 
         # File size distribution
         size_ranges = {
-            "small": len([
-                m for m in metadata_list if m.size < self.SIZE_SMALL
-            ]),  # < 1KB
-            "medium": len([
-                m for m in metadata_list if self.SIZE_SMALL <= m.size < self.SIZE_MEDIUM
-            ]),  # 1-10KB
-            "large": len([
-                m for m in metadata_list if self.SIZE_MEDIUM <= m.size < self.SIZE_LARGE
-            ]),  # 10-100KB
-            "huge": len([
-                m for m in metadata_list if m.size >= self.SIZE_LARGE
-            ]),  # > 100KB
+            "small": len(
+                [m for m in metadata_list if m.size < self.SIZE_SMALL]
+            ),  # < 1KB
+            "medium": len(
+                [
+                    m
+                    for m in metadata_list
+                    if self.SIZE_SMALL <= m.size < self.SIZE_MEDIUM
+                ]
+            ),  # 1-10KB
+            "large": len(
+                [
+                    m
+                    for m in metadata_list
+                    if self.SIZE_MEDIUM <= m.size < self.SIZE_LARGE
+                ]
+            ),  # 10-100KB
+            "huge": len(
+                [m for m in metadata_list if m.size >= self.SIZE_LARGE]
+            ),  # > 100KB
         }
         stats["size_distribution"] = size_ranges
 

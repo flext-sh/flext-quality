@@ -11,7 +11,7 @@ import warnings
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from flext_core import FlextCore
+from flext_core import FlextTypes
 
 from .backend_type import BackendType
 
@@ -24,7 +24,7 @@ class FlextQualityAnalyzer(ABC):
         self,
         _code: str,
         file_path: Path | None = None,
-    ) -> FlextCore.Types.Dict:
+    ) -> FlextTypes.Dict:
         """Analyze code and return results.
 
         Args:
@@ -48,7 +48,7 @@ class FlextQualityAnalyzer(ABC):
         ...
 
     @abstractmethod
-    def get_capabilities(self: object) -> FlextCore.Types.StringList:
+    def get_capabilities(self: object) -> FlextTypes.StringList:
         """Get list of capabilities this backend provides.
 
         Returns:

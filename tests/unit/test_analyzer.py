@@ -15,7 +15,7 @@ import tempfile
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
-from flext_core import FlextCore
+from flext_core import FlextTypes
 
 from flext_quality import (
     AnalysisResults,
@@ -218,7 +218,7 @@ class TestCodeAnalyzerComprehensive:
         """Test _calculate_overall_metrics with multiple file metrics."""
         analyzer = CodeAnalyzer(temporary_project_structure)
 
-        file_metrics: list[FlextCore.Types.Dict] = [
+        file_metrics: list[FlextTypes.Dict] = [
             {
                 "lines_of_code": 50,
                 "complexity": 5,
@@ -262,7 +262,7 @@ class TestCodeAnalyzerComprehensive:
         """Test _calculate_overall_metrics with single file."""
         with tempfile.TemporaryDirectory() as tmp_dir:
             analyzer = CodeAnalyzer(tmp_dir)
-        file_metrics: list[FlextCore.Types.Dict] = [
+        file_metrics: list[FlextTypes.Dict] = [
             {
                 "lines_of_code": 42,
                 "complexity": 7,

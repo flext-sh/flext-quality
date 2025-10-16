@@ -69,7 +69,7 @@ The C4 model provides four hierarchical levels of architectural documentation:
 ### System Characteristics
 
 - **Complexity**: Domain-driven design with clear bounded contexts
-- **Coupling**: Loose coupling through dependency injection (FlextCore.Container)
+- **Coupling**: Loose coupling through dependency injection (FlextContainer)
 - **Cohesion**: High cohesion within architectural layers
 - **Testability**: Comprehensive test coverage with isolated components
 

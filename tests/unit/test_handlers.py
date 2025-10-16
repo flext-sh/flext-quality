@@ -14,7 +14,7 @@ from __future__ import annotations
 from unittest.mock import patch
 from uuid import uuid4
 
-from flext_core import FlextCore
+from flext_core import FlextResult
 
 from flext_quality import (
     AnalyzeProjectHandler,
@@ -52,9 +52,7 @@ class TestAnalyzeProjectHandlerIntegration:
 
         # Mock the service to fail
         with patch.object(handler._analysis_service, "create_analysis") as mock_create:
-            mock_create.return_value = FlextCore.Result[None].fail(
-                "Service unavailable"
-            )
+            mock_create.return_value = FlextResult[None].fail("Service unavailable")
 
             result = handler.analyze_project(project_id)
 
@@ -69,7 +67,7 @@ class TestAnalyzeProjectHandlerIntegration:
 
         # Mock service to return success with None data
         with patch.object(handler._analysis_service, "create_analysis") as mock_create:
-            mock_create.return_value = FlextCore.Result[None].ok(None)
+            mock_create.return_value = FlextResult[None].ok(None)
 
             result = handler.analyze_project(project_id)
 
@@ -116,7 +114,7 @@ class TestGenerateReportHandlerIntegration:
 
         # Mock service to fail
         with patch.object(handler._report_service, "create_report") as mock_create:
-            mock_create.return_value = FlextCore.Result[None].fail("Analysis not found")
+            mock_create.return_value = FlextResult[None].fail("Analysis not found")
 
             result = handler.generate_report(analysis_id)
 
@@ -131,7 +129,7 @@ class TestGenerateReportHandlerIntegration:
 
         # Mock service to return success with None
         with patch.object(handler._report_service, "create_report") as mock_create:
-            mock_create.return_value = FlextCore.Result[None].ok(None)
+            mock_create.return_value = FlextResult[None].ok(None)
 
             result = handler.generate_report(analysis_id)
 
@@ -162,9 +160,7 @@ class TestRunLintingHandlerIntegration:
 
         # Mock service to fail
         with patch.object(handler._linting_service, "run_linting") as mock_lint:
-            mock_lint.return_value = FlextCore.Result[None].fail(
-                "Linting tool not found"
-            )
+            mock_lint.return_value = FlextResult[None].fail("Linting tool not found")
 
             result = handler.analyze_project(project_id)
 
@@ -179,7 +175,7 @@ class TestRunLintingHandlerIntegration:
 
         # Mock service to return success with None
         with patch.object(handler._linting_service, "run_linting") as mock_lint:
-            mock_lint.return_value = FlextCore.Result[None].ok(None)
+            mock_lint.return_value = FlextResult[None].ok(None)
 
             result = handler.analyze_project(project_id)
 
@@ -213,7 +209,7 @@ class TestRunSecurityCheckHandlerIntegration:
             handler._security_service,
             "analyze_security",
         ) as mock_security:
-            mock_security.return_value = FlextCore.Result[None].fail(
+            mock_security.return_value = FlextResult[None].fail(
                 "Security scanner failed",
             )
 
@@ -233,7 +229,7 @@ class TestRunSecurityCheckHandlerIntegration:
             handler._security_service,
             "analyze_security",
         ) as mock_security:
-            mock_security.return_value = FlextCore.Result[None].ok(None)
+            mock_security.return_value = FlextResult[None].ok(None)
 
             result = handler.analyze_project(project_id)
 

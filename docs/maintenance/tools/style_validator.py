@@ -12,7 +12,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
-from flext_core import FlextCore
+from flext_core import FlextTypes
 
 
 class StyleValidator:
@@ -127,23 +127,27 @@ class StyleValidator:
                 r"(?<!\\)_[^_]+_(?!\\)", line
             ):
                 # Should not have _emphasis_ if * is preferred
-                violations.append({
-                    "type": "emphasis_style",
-                    "line": i,
-                    "content": line.strip(),
-                    "message": "Use * for emphasis instead of _",
-                    "severity": "low",
-                })
+                violations.append(
+                    {
+                        "type": "emphasis_style",
+                        "line": i,
+                        "content": line.strip(),
+                        "message": "Use * for emphasis instead of _",
+                        "severity": "low",
+                    }
+                )
 
             # Check heading formatting
             if line.startswith("#") and not re.match(r"^#{1,6}\s", line):
-                violations.append({
-                    "type": "heading_format",
-                    "line": i,
-                    "content": line.strip(),
-                    "message": "Headings should have a space after #",
-                    "severity": "medium",
-                })
+                violations.append(
+                    {
+                        "type": "heading_format",
+                        "line": i,
+                        "content": line.strip(),
+                        "message": "Headings should have a space after #",
+                        "severity": "medium",
+                    }
+                )
 
         return violations
 
@@ -164,24 +168,28 @@ class StyleValidator:
             expected_level = 1
             for level, text, line_num in headings:
                 if level > expected_level + 1:
-                    violations.append({
-                        "type": "heading_hierarchy",
-                        "line": line_num,
-                        "content": f"{'#' * level} {text}",
-                        "message": f"Heading skips level (expected H{expected_level} or H{expected_level + 1}, got H{level})",
-                        "severity": "medium",
-                    })
+                    violations.append(
+                        {
+                            "type": "heading_hierarchy",
+                            "line": line_num,
+                            "content": f"{'#' * level} {text}",
+                            "message": f"Heading skips level (expected H{expected_level} or H{expected_level + 1}, got H{level})",
+                            "severity": "medium",
+                        }
+                    )
                 expected_level = level
 
         # Check for H1 as first heading
         if headings and headings[0][0] != 1:
-            violations.append({
-                "type": "first_heading_level",
-                "line": headings[0][2],
-                "content": f"{'#' * headings[0][0]} {headings[0][1]}",
-                "message": "Document should start with H1 heading",
-                "severity": "low",
-            })
+            violations.append(
+                {
+                    "type": "first_heading_level",
+                    "line": headings[0][2],
+                    "content": f"{'#' * headings[0][0]} {headings[0][1]}",
+                    "message": "Document should start with H1 heading",
+                    "severity": "low",
+                }
+            )
 
         return violations
 
@@ -209,13 +217,15 @@ class StyleValidator:
 
         inconsistent_markers = [m for m in markers if m != preferred]
         if inconsistent_markers:
-            violations.append({
-                "type": "list_marker_consistency",
-                "line": list_items[0][2],  # First occurrence
-                "content": f"List using {inconsistent_markers[0]}",
-                "message": f"Use {preferred} for list markers instead of mixed styles",
-                "severity": "low",
-            })
+            violations.append(
+                {
+                    "type": "list_marker_consistency",
+                    "line": list_items[0][2],  # First occurrence
+                    "content": f"List using {inconsistent_markers[0]}",
+                    "message": f"Use {preferred} for list markers instead of mixed styles",
+                    "severity": "low",
+                }
+            )
 
         return violations
 
@@ -253,13 +263,15 @@ class StyleValidator:
                     and re.search(r"[a-zA-Z0-9]`[^`]+`", line)  # Letter before code
                     and not re.search(r"\s`[^`]+`", line)
                 ):
-                    violations.append({
-                        "type": "inline_code_spacing",
-                        "line": i,
-                        "content": line.strip(),
-                        "message": "Add space before inline code",
-                        "severity": "low",
-                    })
+                    violations.append(
+                        {
+                            "type": "inline_code_spacing",
+                            "line": i,
+                            "content": line.strip(),
+                            "message": "Add space before inline code",
+                            "severity": "low",
+                        }
+                    )
 
         return violations
 
@@ -273,13 +285,15 @@ class StyleValidator:
             if images_without_alt:
                 for img in images_without_alt:
                     line_num = content[: content.find(img)].count("\n") + 1
-                    issues.append({
-                        "type": "missing_alt_text",
-                        "line": line_num,
-                        "content": img,
-                        "message": "Images must have descriptive alt text",
-                        "severity": "high",
-                    })
+                    issues.append(
+                        {
+                            "type": "missing_alt_text",
+                            "line": line_num,
+                            "content": img,
+                            "message": "Images must have descriptive alt text",
+                            "severity": "high",
+                        }
+                    )
 
         # Check for generic link text
         if self.config["accessibility"]["descriptive_links"]:
@@ -288,13 +302,15 @@ class StyleValidator:
             )
             for link in generic_links:
                 line_num = content[: content.find(link)].count("\n") + 1
-                issues.append({
-                    "type": "generic_link_text",
-                    "line": line_num,
-                    "content": link,
-                    "message": "Use descriptive link text instead of generic terms",
-                    "severity": "medium",
-                })
+                issues.append(
+                    {
+                        "type": "generic_link_text",
+                        "line": line_num,
+                        "content": link,
+                        "message": "Use descriptive link text instead of generic terms",
+                        "severity": "medium",
+                    }
+                )
 
         return issues
 
@@ -314,15 +330,17 @@ class StyleValidator:
                     or line.count("`") >= self.MIN_INLINE_CODE_BACKTICKS
                 )  # Code spans
             ):
-                violations.append({
-                    "type": "line_too_long",
-                    "line": i,
-                    "content": line[: self.MAX_LINE_PREVIEW_LENGTH] + "..."
-                    if len(line) > self.MAX_LINE_PREVIEW_LENGTH
-                    else line,
-                    "message": f"Line exceeds {max_length} characters ({len(line)} chars)",
-                    "severity": "low",
-                })
+                violations.append(
+                    {
+                        "type": "line_too_long",
+                        "line": i,
+                        "content": line[: self.MAX_LINE_PREVIEW_LENGTH] + "..."
+                        if len(line) > self.MAX_LINE_PREVIEW_LENGTH
+                        else line,
+                        "message": f"Line exceeds {max_length} characters ({len(line)} chars)",
+                        "severity": "low",
+                    }
+                )
 
         return violations
 
@@ -338,32 +356,34 @@ class StyleValidator:
                 self.config["formatting"]["trailing_spaces"] is False
                 and line.rstrip() != line
             ):
-                violations.append({
-                    "type": "trailing_whitespace",
-                    "line": i,
-                    "content": line,
-                    "message": "Remove trailing whitespace",
-                    "severity": "low",
-                })
+                violations.append(
+                    {
+                        "type": "trailing_whitespace",
+                        "line": i,
+                        "content": line,
+                        "message": "Remove trailing whitespace",
+                        "severity": "low",
+                    }
+                )
 
             # Check multiple consecutive blank lines
             if i < len(lines) - 1:
                 current_blank = not line.strip()
                 next_blank = not lines[i].strip()
                 if current_blank and next_blank:
-                    violations.append({
-                        "type": "multiple_blank_lines",
-                        "line": i,
-                        "content": "",
-                        "message": "Multiple consecutive blank lines",
-                        "severity": "low",
-                    })
+                    violations.append(
+                        {
+                            "type": "multiple_blank_lines",
+                            "line": i,
+                            "content": "",
+                            "message": "Multiple consecutive blank lines",
+                            "severity": "low",
+                        }
+                    )
 
         return violations
 
-    def _generate_suggestions(
-        self, violations: list[dict]
-    ) -> FlextCore.Types.StringList:
+    def _generate_suggestions(self, violations: list[dict]) -> FlextTypes.StringList:
         """Generate improvement suggestions based on violations."""
         suggestions = []
 
@@ -492,7 +512,7 @@ def validate_file_style(
 
 
 def validate_files_style(
-    file_paths: FlextCore.Types.StringList, config_path: str | None = None
+    file_paths: FlextTypes.StringList, config_path: str | None = None
 ) -> dict[str, object]:
     """Convenience function to validate multiple files."""
     validator = StyleValidator(config_path)

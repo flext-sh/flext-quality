@@ -52,11 +52,13 @@ class DocumentationOptimizer:
                 if content != original_content:
                     self._save_with_backup(file_path, content)
                     self.results["changes_made"] += 1
-                    self.results["optimizations"].append({
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "type": "formatting_fixes",
-                        "description": "Fixed trailing spaces, list indentation, and emphasis consistency",
-                    })
+                    self.results["optimizations"].append(
+                        {
+                            "file": str(file_path.relative_to(self.project_root)),
+                            "type": "formatting_fixes",
+                            "description": "Fixed trailing spaces, list indentation, and emphasis consistency",
+                        }
+                    )
 
                 self.results["files_processed"] += 1
 
@@ -113,11 +115,13 @@ class DocumentationOptimizer:
                 if content != original_content:
                     self._save_with_backup(file_path, content)
                     self.results["changes_made"] += 1
-                    self.results["optimizations"].append({
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "type": "toc_update",
-                        "description": "Added or updated table of contents",
-                    })
+                    self.results["optimizations"].append(
+                        {
+                            "file": str(file_path.relative_to(self.project_root)),
+                            "type": "toc_update",
+                            "description": "Added or updated table of contents",
+                        }
+                    )
 
                 self.results["files_processed"] += 1
 
@@ -203,11 +207,13 @@ class DocumentationOptimizer:
                 if content != original_content:
                     self._save_with_backup(file_path, content)
                     self.results["changes_made"] += 1
-                    self.results["optimizations"].append({
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "type": "accessibility_enhancement",
-                        "description": "Added alt text and improved link descriptions",
-                    })
+                    self.results["optimizations"].append(
+                        {
+                            "file": str(file_path.relative_to(self.project_root)),
+                            "type": "accessibility_enhancement",
+                            "description": "Added alt text and improved link descriptions",
+                        }
+                    )
 
                 self.results["files_processed"] += 1
 
@@ -269,11 +275,13 @@ class DocumentationOptimizer:
                 if content != original_content:
                     self._save_with_backup(file_path, content)
                     self.results["changes_made"] += 1
-                    self.results["optimizations"].append({
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "type": "structure_optimization",
-                        "description": "Improved paragraph breaks and section organization",
-                    })
+                    self.results["optimizations"].append(
+                        {
+                            "file": str(file_path.relative_to(self.project_root)),
+                            "type": "structure_optimization",
+                            "description": "Improved paragraph breaks and section organization",
+                        }
+                    )
 
                 self.results["files_processed"] += 1
 
@@ -340,11 +348,13 @@ class DocumentationOptimizer:
                 if content != original_content:
                     self._save_with_backup(file_path, content)
                     self.results["changes_made"] += 1
-                    self.results["optimizations"].append({
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "type": "metadata_update",
-                        "description": "Updated frontmatter and added modification timestamp",
-                    })
+                    self.results["optimizations"].append(
+                        {
+                            "file": str(file_path.relative_to(self.project_root)),
+                            "type": "metadata_update",
+                            "description": "Updated frontmatter and added modification timestamp",
+                        }
+                    )
 
                 self.results["files_processed"] += 1
 

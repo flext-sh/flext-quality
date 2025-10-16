@@ -27,10 +27,9 @@ import json
 import sys
 from pathlib import Path
 
-from flext_core import FlextCore
+from flext_core import FlextTypes
 from rich.console import Console
 
-# Using proper flext-quality imports
 from flext_quality import (
     CodeAnalyzer,
     QualityMetrics,
@@ -57,7 +56,7 @@ def format_number(num: float | str) -> str:
     return str(num)
 
 
-def _display_project_overview(analyzed_files: FlextCore.Types.StringList) -> None:
+def _display_project_overview(analyzed_files: FlextTypes.StringList) -> None:
     """Display project overview with file listing."""
     print_section("📈 Project Overview")
 
@@ -230,8 +229,8 @@ def analyze_project(project_path: str) -> None:
             include_duplicates=True,  # Code duplication analysis
         )
 
-        # Unwrap FlextCore.Result
-        # result is now AnalysisResults directly, not FlextCore.Result
+        # Unwrap FlextResult
+        # result is now AnalysisResults directly, not FlextResult
         results = result
 
         # Extract basic project information using modern AnalysisResults API

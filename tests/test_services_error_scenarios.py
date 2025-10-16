@@ -15,7 +15,7 @@ from typing import Never, override
 from unittest.mock import patch
 
 import pytest
-from flext_core import FlextCore
+from flext_core import FlextTypes
 
 from flext_quality import (
     IssueSeverity,
@@ -31,7 +31,7 @@ from tests.conftest import (
 
 
 # DRY pattern: Factory for exception-throwing dict[str, object] classes with proper generics
-def create_exception_dict(exception: Exception) -> type[FlextCore.Types.Dict]:
+def create_exception_dict(exception: Exception) -> type[FlextTypes.Dict]:
     """factory: Creates exception-throwing dict[str, object] classes.
 
     Single Responsibility: Creates mock dict[str, object] that raises specific exceptions
@@ -39,7 +39,7 @@ def create_exception_dict(exception: Exception) -> type[FlextCore.Types.Dict]:
     Open/Closed: Extensible for different exception types without modification
     """
 
-    class ExceptionDict(FlextCore.Types.Dict):
+    class ExceptionDict(FlextTypes.Dict):
         @override
         def get(self, key: str, default: object = None) -> Never:
             raise exception

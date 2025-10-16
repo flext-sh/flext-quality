@@ -43,7 +43,7 @@ def test_external_tool_missing_returns_error(tmp_path: Path) -> None:
 
 
 @patch("shutil.which", side_effect=lambda name: name)
-@patch("FlextCore.Utilities.run_external_command")
+@patch("FlextUtilities.run_external_command")
 def test_external_backend_empty_outputs(
     mock_run: MagicMock,
     tmp_path: Path,

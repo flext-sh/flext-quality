@@ -13,10 +13,11 @@ from pathlib import Path
 from typing import ClassVar, Self
 
 from flext_cli import FlextCli
-from flext_core import FlextCore
+from flext_cli.output import FlextCliOutput
+from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
 
 
-class FlextQualityToolsUtilities(FlextCore.Service[None]):
+class FlextQualityToolsUtilities(FlextService[None]):
     """Unified utilities with complete flext-core integration.
 
     Consolidates:
@@ -72,8 +73,8 @@ class FlextQualityToolsUtilities(FlextCore.Service[None]):
         def print_colored(
             message: str,
             color: str = "",
-            logger: FlextCore.Logger | None = None,
-        ) -> FlextCore.Result[None]:
+            logger: FlextLogger | None = None,
+        ) -> FlextResult[None]:
             """Print text with color formatting using flext-cli.
 
             MANDATORY: Uses FlextCli for output (NO direct rich/click).
@@ -84,25 +85,54 @@ class FlextQualityToolsUtilities(FlextCore.Service[None]):
                 logger: Optional logger for parallel logging
 
             Returns:
-                FlextCore.Result indicating success/failure of print operation
+                FlextResult indicating success/failure of print operation
 
             """
             if logger:
                 logger.info(message)
 
             try:
-                # Use print() directly since FlextCli doesn't have console attribute
-                if color:
-                    FlextQualityToolsUtilities.Colors.colorize(message, color)
-                return FlextCore.Result[None].ok(None)
+                output = FlextCliOutput()
+                style = FlextQualityToolsUtilities.Colors._ansi_to_style(color)
+                if style:
+                    print_result = output.print_message(message, style=style)
+                elif color:
+                    # Fallback to ANSI codes if style mapping unavailable
+                    colored_message = (
+                        FlextQualityToolsUtilities.Colors.colorize(message, color)
+                    )
+                    print_result = output.print_message(colored_message)
+                else:
+                    print_result = output.print_message(message)
+
+                if print_result.is_failure:
+                    return FlextResult[None].fail(
+                        print_result.error or "CLI output failed"
+                    )
+                return FlextResult[None].ok(None)
             except Exception as e:
-                return FlextCore.Result[None].fail(f"CLI output failed: {e}")
+                return FlextResult[None].fail(f"CLI output failed: {e}")
+
+        @staticmethod
+        def _ansi_to_style(color_code: str) -> str:
+            """Best-effort mapping from ANSI escape codes to flext-cli styles."""
+            mapping = {
+                FlextQualityToolsUtilities.Colors.RED: "bold red",
+                FlextQualityToolsUtilities.Colors.GREEN: "bold green",
+                FlextQualityToolsUtilities.Colors.YELLOW: "bold yellow",
+                FlextQualityToolsUtilities.Colors.BLUE: "bold blue",
+                FlextQualityToolsUtilities.Colors.CYAN: "bold cyan",
+                FlextQualityToolsUtilities.Colors.MAGENTA: "bold magenta",
+                FlextQualityToolsUtilities.Colors.GRAY: "dim",
+                FlextQualityToolsUtilities.Colors.ORANGE: "bold orange3",
+            }
+            return mapping.get(color_code, "")
 
     class Paths:
         """Path utilities for workspace navigation and file operations."""
 
         # Ignore patterns (common directories/files to skip)
-        IGNORE_PATTERNS: ClassVar[FlextCore.Types.StringList] = [
+        IGNORE_PATTERNS: ClassVar[FlextTypes.StringList] = [
             "__pycache__",
             ".git",
             ".venv",
@@ -172,7 +202,7 @@ class FlextQualityToolsUtilities(FlextCore.Service[None]):
         @staticmethod
         def find_python_files(
             root: str | Path,
-            exclude_patterns: FlextCore.Types.StringList | None = None,
+            exclude_patterns: FlextTypes.StringList | None = None,
         ) -> list[Path]:
             """Find all Python files in directory tree.
 
@@ -201,7 +231,7 @@ class FlextQualityToolsUtilities(FlextCore.Service[None]):
         """Standard library module detection."""
 
         @staticmethod
-        def get_stdlib_modules() -> FlextCore.Types.StringList:
+        def get_stdlib_modules() -> FlextTypes.StringList:
             """Get list of Python standard library modules.
 
             Returns:
@@ -264,17 +294,17 @@ class FlextQualityToolsUtilities(FlextCore.Service[None]):
     def __init__(self: Self) -> None:
         """Initialize utilities service."""
         super().__init__()
-        self.logger = FlextCore.Logger(__name__)
+        self.logger = FlextLogger(__name__)
         self._cli = FlextCli()  # MANDATORY: Use flext-cli
 
-    def execute(self: Self) -> FlextCore.Result[None]:
-        """Execute utilities service - FlextCore.Service interface.
+    def execute(self: Self) -> FlextResult[None]:
+        """Execute utilities service - FlextService interface.
 
         Returns:
-            FlextCore.Result indicating service execution success
+            FlextResult indicating service execution success
 
         """
-        return FlextCore.Result[None].ok(None)
+        return FlextResult[None].ok(None)
 
 
 # Backward compatibility aliases (for existing code)
@@ -342,7 +372,7 @@ def should_ignore_path(path: str | Path) -> bool:
     return FlextQualityToolsUtilities.Paths.should_ignore_path(path)
 
 
-def get_stdlib_modules() -> FlextCore.Types.StringList:
+def get_stdlib_modules() -> FlextTypes.StringList:
     """Convenience function for get_stdlib_modules.
 
     Returns:

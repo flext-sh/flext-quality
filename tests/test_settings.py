@@ -10,7 +10,7 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from flext_core import FlextCore
+from flext_core import FlextTypes
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -37,7 +37,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
 ]
 
-ROOT_URLCONF: FlextCore.Types.StringList = []
+ROOT_URLCONF: FlextTypes.StringList = []
 
 # Override database settings for testing
 DATABASES = {

@@ -12,7 +12,7 @@ import warnings
 from pathlib import Path
 from typing import override
 
-from flext_core import FlextCore
+from flext_core import FlextTypes
 
 from .grade_calculator import FlextQualityGradeCalculator
 from .models import FlextQualityModels
@@ -77,7 +77,7 @@ class FlextQualityReportGenerator:
         ]
 
         # Add issue details using utilities for proper typing
-        issue_categories: dict[str, FlextCore.Types.List] = (
+        issue_categories: dict[str, FlextTypes.List] = (
             FlextQualityUtilities.format_issue_categories(self.results)
         )
 
@@ -111,7 +111,7 @@ class FlextQualityReportGenerator:
 
     def generate_json_report(self) -> str:
         """Generate a JSON-formatted quality report."""
-        report_data: FlextCore.Types.Dict = {
+        report_data: FlextTypes.Dict = {
             "summary": {
                 "grade": self._get_quality_grade(),
                 "score": self._get_quality_score(),
@@ -276,10 +276,8 @@ class FlextQualityReportGenerator:
 
     def _generate_issues_html(self) -> str:
         """Generate HTML for issues section."""
-        html_parts: FlextCore.Types.StringList = (
-            FlextQualityUtilities.create_report_lines()
-        )
-        issue_categories: dict[str, FlextCore.Types.List] = {
+        html_parts: FlextTypes.StringList = FlextQualityUtilities.create_report_lines()
+        issue_categories: dict[str, FlextTypes.List] = {
             "security": FlextQualityUtilities.safe_issue_list(
                 self.results.security_issues,
             ),
@@ -338,9 +336,9 @@ class FlextQualityReportGenerator:
 
         return "\n".join(html_parts)
 
-    def _generate_recommendations(self) -> FlextCore.Types.StringList:
+    def _generate_recommendations(self) -> FlextTypes.StringList:
         """Generate recommendations based on analysis results."""
-        recommendations: FlextCore.Types.StringList = (
+        recommendations: FlextTypes.StringList = (
             FlextQualityUtilities.create_report_lines()
         )
 

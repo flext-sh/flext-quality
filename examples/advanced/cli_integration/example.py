@@ -18,19 +18,16 @@ import sys
 import tempfile
 from pathlib import Path
 
-from flext_core import FlextCore
+from flext_core import FlextTypes
 
-# CLI imports - lazy-loaded for performance
 from flext_quality.cli import main as quality_main
-
-# Note: CLI is lazy-loaded, don't import main directly
 from flext_quality.typings import FlextQualityTypes
 
 
 def run_cli_analysis(
     project_path: str,
     format_type: str = "json",
-) -> FlextCore.Types.Dict:
+) -> FlextTypes.Dict:
     """Run FLEXT Quality CLI analysis and return parsed results.
 
     Args:
@@ -84,7 +81,7 @@ def run_cli_analysis(
         return {"error": str(e)}
 
 
-def check_quality_thresholds(results: FlextCore.Types.Dict) -> FlextCore.Types.Dict:
+def check_quality_thresholds(results: FlextTypes.Dict) -> FlextTypes.Dict:
     """Check analysis results against quality thresholds.
 
     Args:
