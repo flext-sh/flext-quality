@@ -32,6 +32,7 @@ from flext_core import (
 from pydantic import ConfigDict
 
 from flext_quality.models import FlextQualityModels
+
 from .utilities import FlextQualityToolsUtilities
 
 
@@ -178,13 +179,11 @@ class FlextQualityOperations(FlextService[None]):
                     )
 
                 result = cmd_result.value
-                return FlextResult[FlextTypes.Dict].ok(
-                    {
-                        "dry_run": True,
-                        "would_fix": result.stdout.count("Fixed"),
-                        "message": result.stdout,
-                    }
-                )
+                return FlextResult[FlextTypes.Dict].ok({
+                    "dry_run": True,
+                    "would_fix": result.stdout.count("Fixed"),
+                    "message": result.stdout,
+                })
 
             # Real fix
             cmd_result = FlextUtilities.run_external_command(
@@ -244,12 +243,10 @@ class FlextQualityOperations(FlextService[None]):
             else:
                 result = cmd_result.value
                 if result.returncode == 0:
-                    return FlextResult[FlextTypes.Dict].ok(
-                        {
-                            "passed": True,
-                            "tool": "pyrefly",
-                        }
-                    )
+                    return FlextResult[FlextTypes.Dict].ok({
+                        "passed": True,
+                        "tool": "pyrefly",
+                    })
 
             # Fall back to mypy
             cmd_result = FlextUtilities.run_external_command(
@@ -268,12 +265,10 @@ class FlextQualityOperations(FlextService[None]):
             result = cmd_result.value
 
             if result.returncode == 0:
-                return FlextResult[FlextTypes.Dict].ok(
-                    {
-                        "passed": True,
-                        "tool": "mypy",
-                    }
-                )
+                return FlextResult[FlextTypes.Dict].ok({
+                    "passed": True,
+                    "tool": "mypy",
+                })
 
             return FlextResult[FlextTypes.Dict].fail(
                 f"Type checking failed: {result.stdout}"
@@ -323,12 +318,10 @@ class FlextQualityOperations(FlextService[None]):
             FlextCli()  # MANDATORY: Use flext-cli
 
             # Placeholder implementation - would use AST analysis or external tool
-            return FlextResult[FlextTypes.Dict].ok(
-                {
-                    "duplicates_found": 0,
-                    "threshold": threshold,
-                }
-            )
+            return FlextResult[FlextTypes.Dict].ok({
+                "duplicates_found": 0,
+                "threshold": threshold,
+            })
 
     class ExportRepairer:
         """__init__.py export repair and validation.
@@ -356,12 +349,10 @@ class FlextQualityOperations(FlextService[None]):
 
             if dry_run:
                 logger.info("DRY RUN: Would repair exports")
-                return FlextResult[FlextTypes.Dict].ok(
-                    {
-                        "dry_run": True,
-                        "message": "Dry run - no changes made",
-                    }
-                )
+                return FlextResult[FlextTypes.Dict].ok({
+                    "dry_run": True,
+                    "message": "Dry run - no changes made",
+                })
 
             # Would implement export repair logic here
             return FlextResult[FlextTypes.Dict].ok({"repaired": True})
@@ -392,12 +383,10 @@ class FlextQualityOperations(FlextService[None]):
 
             if dry_run:
                 logger.info("DRY RUN: Would normalize docstrings")
-                return FlextResult[FlextTypes.Dict].ok(
-                    {
-                        "dry_run": True,
-                        "message": "Dry run - no changes made",
-                    }
-                )
+                return FlextResult[FlextTypes.Dict].ok({
+                    "dry_run": True,
+                    "message": "Dry run - no changes made",
+                })
 
             # Would implement docstring normalization here
             return FlextResult[FlextTypes.Dict].ok({"normalized": True})
@@ -433,9 +422,7 @@ class FlextQualityOperations(FlextService[None]):
             method_pattern = re.compile(
                 r"def\s+(?P<name>\w+)\([^)]*\)\s*->\s*FlextResult\[(?P<rtype>[^\]]+)\]:"
             )
-            bad_return_pattern = re.compile(
-                r"return\s+FlextResult\.(?:ok|fail)\s*\("
-            )
+            bad_return_pattern = re.compile(r"return\s+FlextResult\.(?:ok|fail)\s*\(")
 
             issues: list[FlextTypes.StringDict] = []
 
@@ -463,23 +450,19 @@ class FlextQualityOperations(FlextService[None]):
                         if candidate.strip().startswith("def "):
                             break
                         if bad_return_pattern.search(candidate):
-                            issues.append(
-                                {
-                                    "file": str(file_path.relative_to(workspace)),
-                                    "line": line_number,
-                                    "method": method_match.group("name"),
-                                    "declared_type": declared_type,
-                                    "issue": "FlextResult[T] method returns FlextResult.ok()/fail() directly",
-                                }
-                            )
+                            issues.append({
+                                "file": str(file_path.relative_to(workspace)),
+                                "line": line_number,
+                                "method": method_match.group("name"),
+                                "declared_type": declared_type,
+                                "issue": "FlextResult[T] method returns FlextResult.ok()/fail() directly",
+                            })
                             break
 
-            return FlextResult[FlextTypes.Dict].ok(
-                {
-                    "issues_found": len(issues),
-                    "issues": issues,
-                }
-            )
+            return FlextResult[FlextTypes.Dict].ok({
+                "issues_found": len(issues),
+                "issues": issues,
+            })
 
     class FalsePositiveAuditor:
         """False positive auditing and filtering.

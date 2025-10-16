@@ -10,6 +10,7 @@ from __future__ import annotations
 import pytest
 
 from flext_quality import (
+    FlextQualityServices,
     IssueSeverity,
     IssueType,
     QualityAnalysisService,
@@ -30,7 +31,8 @@ class TestQualityProjectService:
     @pytest.fixture
     def service(self) -> QualityProjectService:
         """Create a QualityProjectService instance."""
-        return QualityProjectService()
+        container = FlextQualityServices()
+        return QualityProjectService(container)
 
     def test_create_project_success(
         self,
@@ -148,7 +150,8 @@ class TestQualityAnalysisService:
     @pytest.fixture
     def service(self) -> QualityAnalysisService:
         """Create a QualityAnalysisService instance."""
-        return QualityAnalysisService()
+        container = FlextQualityServices()
+        return QualityAnalysisService(container)
 
     def test_create_analysis_basic(self, service: QualityAnalysisService) -> None:
         """Test creating an analysis."""
@@ -200,7 +203,8 @@ class TestQualityIssueService:
     @pytest.fixture
     def service(self) -> QualityIssueService:
         """Create a QualityIssueService instance."""
-        return QualityIssueService()
+        container = FlextQualityServices()
+        return QualityIssueService(container)
 
     def test_create_issue_basic(self, service: QualityIssueService) -> None:
         """Test creating an issue."""
@@ -290,7 +294,8 @@ class TestQualityReportService:
     @pytest.fixture
     def service(self) -> QualityReportService:
         """Create a QualityReportService instance."""
-        return QualityReportService()
+        container = FlextQualityServices()
+        return QualityReportService(container)
 
     def test_create_report_basic(self, service: QualityReportService) -> None:
         """Test creating a report."""

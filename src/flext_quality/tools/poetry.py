@@ -78,13 +78,11 @@ class PoetryValidator(FlextService[FlextTypes.BoolDict]):
 
     def execute(self: Self) -> FlextResult[FlextTypes.BoolDict]:
         """Return default validation state."""
-        return FlextResult[FlextTypes.BoolDict].ok(
-            {
-                "pyproject_exists": False,
-                "poetry_section": False,
-                "dependencies_defined": False,
-            }
-        )
+        return FlextResult[FlextTypes.BoolDict].ok({
+            "pyproject_exists": False,
+            "poetry_section": False,
+            "dependencies_defined": False,
+        })
 
     def validate_pyproject(
         self,
@@ -95,13 +93,11 @@ class PoetryValidator(FlextService[FlextTypes.BoolDict]):
         pyproject = project / "pyproject.toml"
 
         if not pyproject.exists():
-            return FlextResult[FlextTypes.BoolDict].ok(
-                {
-                    "pyproject_exists": False,
-                    "poetry_section": False,
-                    "dependencies_defined": False,
-                }
-            )
+            return FlextResult[FlextTypes.BoolDict].ok({
+                "pyproject_exists": False,
+                "poetry_section": False,
+                "dependencies_defined": False,
+            })
 
         try:
             with pyproject.open("rb") as handle:

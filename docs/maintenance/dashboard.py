@@ -4,6 +4,7 @@ Real-time monitoring dashboard for documentation quality metrics.
 Provides web interface to view audit results, trends, and quality scores.
 """
 
+import argparse
 import json
 import operator
 from datetime import UTC, datetime, timedelta
@@ -97,28 +98,28 @@ class DocumentationDashboard:
                 date_str = report_file.stem.replace("audit_report_", "").replace(
                     "_", " "
                 )
-                report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S")
+                report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
+                    tzinfo=UTC
+                )
 
                 if report_date >= cutoff_date:
                     with Path(report_file).open(encoding="utf-8") as f:
                         data = json.load(f)
-                        trend_data.append(
-                            {
-                                "date": report_date.isoformat(),
-                                "quality_score": data.get("metrics", {}).get(
-                                    "quality_score", 0
-                                ),
-                                "total_issues": data.get("metrics", {}).get(
-                                    "total_issues", 0
-                                ),
-                                "critical_issues": data.get("metrics", {})
-                                .get("severity_breakdown", {})
-                                .get("critical", 0),
-                                "high_issues": data.get("metrics", {})
-                                .get("severity_breakdown", {})
-                                .get("high", 0),
-                            }
-                        )
+                        trend_data.append({
+                            "date": report_date.isoformat(),
+                            "quality_score": data.get("metrics", {}).get(
+                                "quality_score", 0
+                            ),
+                            "total_issues": data.get("metrics", {}).get(
+                                "total_issues", 0
+                            ),
+                            "critical_issues": data.get("metrics", {})
+                            .get("severity_breakdown", {})
+                            .get("critical", 0),
+                            "high_issues": data.get("metrics", {})
+                            .get("severity_breakdown", {})
+                            .get("high", 0),
+                        })
             except Exception:
                 continue
 
@@ -140,22 +141,20 @@ class DocumentationDashboard:
                 date_str = report_file.stem.replace("audit_report_", "").replace(
                     "_", " "
                 )
-                report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S")
+                report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
+                    tzinfo=UTC
+                )
 
                 with Path(report_file).open(encoding="utf-8") as f:
                     data = json.load(f)
 
-                reports.append(
-                    {
-                        "filename": report_file.name,
-                        "date": report_date.isoformat(),
-                        "quality_score": data.get("metrics", {}).get(
-                            "quality_score", 0
-                        ),
-                        "total_issues": data.get("metrics", {}).get("total_issues", 0),
-                        "files_analyzed": data.get("files_analyzed", 0),
-                    }
-                )
+                reports.append({
+                    "filename": report_file.name,
+                    "date": report_date.isoformat(),
+                    "quality_score": data.get("metrics", {}).get("quality_score", 0),
+                    "total_issues": data.get("metrics", {}).get("total_issues", 0),
+                    "files_analyzed": data.get("files_analyzed", 0),
+                })
             except Exception:
                 continue
 
@@ -483,7 +482,7 @@ class DocumentationDashboard:
         """
 
     def run(
-        self, host: str = "localhost", port: int = 8080, debug: bool = False
+        self, host: str = "localhost", port: int = 8080, *, debug: bool = False
     ) -> None:
         """Run the dashboard server."""
         self.app.run(host=host, port=port, debug=debug)
@@ -491,8 +490,6 @@ class DocumentationDashboard:
 
 def main() -> None:
     """Main entry point for the dashboard."""
-    import argparse
-
     parser = argparse.ArgumentParser(
         description="FLEXT Quality Documentation Dashboard"
     )

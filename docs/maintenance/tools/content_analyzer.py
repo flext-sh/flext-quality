@@ -12,6 +12,8 @@ from pathlib import Path
 import yaml
 from flext_core import FlextTypes
 
+from flext_quality.typings import FlextQualityTypes
+
 
 class ContentAnalyzer:
     """Advanced content quality analysis system."""
@@ -48,7 +50,7 @@ class ContentAnalyzer:
                 },
             }
 
-    def analyze_file(self, file_path: Path) -> dict[str, object]:
+    def analyze_file(self, file_path: Path) -> FlextQualityTypes.Core.AnalysisDict:
         """Perform comprehensive content analysis on a single file."""
         try:
             content = file_path.read_text(encoding="utf-8")
@@ -90,7 +92,9 @@ class ContentAnalyzer:
                 "suggestions": [],
             }
 
-    def _calculate_content_metrics(self, content: str) -> dict[str, object]:
+    def _calculate_content_metrics(
+        self, content: str
+    ) -> FlextQualityTypes.Core.MetricsDict:
         """Calculate basic content metrics."""
         # Word analysis
         words = re.findall(r"\b\w+\b", content)
@@ -108,9 +112,9 @@ class ContentAnalyzer:
         # Line analysis
         lines = content.split("\n")
         total_lines = len(lines)
-        code_lines = len(
-            [line for line in lines if line.strip().startswith(("```", "    ", "\t"))]
-        )
+        code_lines = len([
+            line for line in lines if line.strip().startswith(("```", "    ", "\t"))
+        ])
         empty_lines = len([line for line in lines if line.strip() == ""])
 
         # Heading analysis
@@ -155,7 +159,7 @@ class ContentAnalyzer:
             "code_to_content_ratio": code_lines / total_lines if total_lines > 0 else 0,
         }
 
-    def _analyze_readability(self, content: str) -> dict[str, object]:
+    def _analyze_readability(self, content: str) -> FlextQualityTypes.Core.MetricsDict:
         """Analyze content readability using various metrics."""
         words = re.findall(r"\b\w+\b", content)
         sentences = re.split(r"[.!?]+", content)
@@ -227,7 +231,7 @@ class ContentAnalyzer:
 
         return count
 
-    def _analyze_structure(self, content: str) -> dict[str, object]:
+    def _analyze_structure(self, content: str) -> FlextQualityTypes.Core.AnalysisDict:
         """Analyze document structure and organization."""
         structure = {
             "has_table_of_contents": False,
@@ -278,7 +282,9 @@ class ContentAnalyzer:
 
         return structure
 
-    def _check_completeness(self, content: str, filename: str) -> dict[str, object]:
+    def _check_completeness(
+        self, content: str, filename: str
+    ) -> FlextQualityTypes.Core.AnalysisDict:
         """Check documentation completeness based on file type and content."""
         completeness = {
             "score": 100,
@@ -346,7 +352,7 @@ class ContentAnalyzer:
 
     def _check_required_sections(
         self, content: str, required_sections: FlextTypes.StringList
-    ) -> dict[str, object]:
+    ) -> FlextQualityTypes.Core.AnalysisDict:
         """Check for required sections in content."""
         result = {"required_sections_present": [], "missing_required_sections": []}
 
@@ -372,7 +378,9 @@ class ContentAnalyzer:
 
         return result
 
-    def _calculate_quality_score(self, analysis: dict[str, object]) -> float:
+    def _calculate_quality_score(
+        self, analysis: FlextQualityTypes.Core.AnalysisDict
+    ) -> float:
         """Calculate overall quality score for the content."""
         score = 100.0
 
@@ -413,51 +421,41 @@ class ContentAnalyzer:
 
         # Completeness issues
         if not analysis["completeness"]["word_count_sufficient"]:
-            issues.append(
-                {
-                    "type": "insufficient_content",
-                    "severity": "medium",
-                    "message": f"Content too short ({analysis['metrics']['word_count']} words)",
-                }
-            )
+            issues.append({
+                "type": "insufficient_content",
+                "severity": "medium",
+                "message": f"Content too short ({analysis['metrics']['word_count']} words)",
+            })
 
         if analysis["completeness"]["missing_elements"]:
-            issues.append(
-                {
-                    "type": "missing_elements",
-                    "severity": "high",
-                    "message": f"Missing: {', '.join(analysis['completeness']['missing_elements'])}",
-                }
-            )
+            issues.append({
+                "type": "missing_elements",
+                "severity": "high",
+                "message": f"Missing: {', '.join(analysis['completeness']['missing_elements'])}",
+            })
 
         # Readability issues
         if analysis["readability"]["readability_score"] < 50:
-            issues.append(
-                {
-                    "type": "poor_readability",
-                    "severity": "medium",
-                    "message": f"Content difficult to read (score: {analysis['readability']['readability_score']})",
-                }
-            )
+            issues.append({
+                "type": "poor_readability",
+                "severity": "medium",
+                "message": f"Content difficult to read (score: {analysis['readability']['readability_score']})",
+            })
 
         # Structure issues
         if not analysis["structure"]["heading_hierarchy_valid"]:
-            issues.append(
-                {
-                    "type": "heading_hierarchy",
-                    "severity": "low",
-                    "message": "Heading hierarchy is not logical",
-                }
-            )
+            issues.append({
+                "type": "heading_hierarchy",
+                "severity": "low",
+                "message": "Heading hierarchy is not logical",
+            })
 
         if analysis["metrics"]["heading_count"] == 0:
-            issues.append(
-                {
-                    "type": "no_headings",
-                    "severity": "high",
-                    "message": "Document has no section headings",
-                }
-            )
+            issues.append({
+                "type": "no_headings",
+                "severity": "high",
+                "message": "Document has no section headings",
+            })
 
         return issues
 
@@ -514,18 +512,16 @@ class ContentAnalyzer:
         )
 
         if avg_score < 70:
-            self.results["recommendations"].append(
-                {
-                    "priority": "high",
-                    "type": "overall_quality",
-                    "message": f"Overall documentation quality needs improvement (avg score: {avg_score:.1f})",
-                    "actions": [
-                        "Focus on adding missing content and sections",
-                        "Improve readability and structure",
-                        "Add more examples and practical guidance",
-                    ],
-                }
-            )
+            self.results["recommendations"].append({
+                "priority": "high",
+                "type": "overall_quality",
+                "message": f"Overall documentation quality needs improvement (avg score: {avg_score:.1f})",
+                "actions": [
+                    "Focus on adding missing content and sections",
+                    "Improve readability and structure",
+                    "Add more examples and practical guidance",
+                ],
+            })
 
         # Check for common issues across files
         all_issues = []
@@ -541,17 +537,15 @@ class ContentAnalyzer:
             most_common = issue_types.most_common(1)
             if most_common:
                 common_issue = most_common[0][0]
-                self.results["recommendations"].append(
-                    {
-                        "priority": "medium",
-                        "type": "common_issue",
-                        "message": f"Address common issue across files: {common_issue.replace('_', ' ')}",
-                        "actions": [
-                            "Implement consistent fixes",
-                            "Update style guidelines",
-                        ],
-                    }
-                )
+                self.results["recommendations"].append({
+                    "priority": "medium",
+                    "type": "common_issue",
+                    "message": f"Address common issue across files: {common_issue.replace('_', ' ')}",
+                    "actions": [
+                        "Implement consistent fixes",
+                        "Update style guidelines",
+                    ],
+                })
 
     def generate_report(self, format: str = "json") -> str:
         """Generate content analysis report."""

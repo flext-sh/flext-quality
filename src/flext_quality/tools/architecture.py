@@ -77,12 +77,10 @@ class FlextQualityArchitectureTools(FlextService[None]):
 
             if dry_run:
                 logger.info(f"DRY RUN: Would enforce patterns in {project_path}")
-                return FlextResult[FlextTypes.Dict].ok(
-                    {
-                        "enforced": False,
-                        "dry_run": True,
-                    }
-                )
+                return FlextResult[FlextTypes.Dict].ok({
+                    "enforced": False,
+                    "dry_run": True,
+                })
 
             logger.info(f"Enforcing patterns in {project_path}")
             return FlextResult[FlextTypes.Dict].ok({"enforced": True})
@@ -106,17 +104,15 @@ class FlextQualityArchitectureTools(FlextService[None]):
             logger = FlextLogger(__name__)
             logger.info(f"Testing cross-project imports in {workspace_path}")
 
-            return FlextResult[FlextTypes.Dict].ok(
-                {
-                    "passed": True,
-                    "errors": [],
-                }
-            )
+            return FlextResult[FlextTypes.Dict].ok({
+                "passed": True,
+                "errors": [],
+            })
 
     def __init__(self) -> None:
         """Initialize architecture tools service."""
         super().__init__()
-        self.logger = FlextLogger(__name__)
+        self.logger: FlextLogger = FlextLogger(__name__)
 
         # Initialize helper services
         self.violations = self.ViolationAnalyzer()

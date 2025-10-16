@@ -98,8 +98,8 @@ class FlextQualityToolsUtilities(FlextService[None]):
                     print_result = output.print_message(message, style=style)
                 elif color:
                     # Fallback to ANSI codes if style mapping unavailable
-                    colored_message = (
-                        FlextQualityToolsUtilities.Colors.colorize(message, color)
+                    colored_message = FlextQualityToolsUtilities.Colors.colorize(
+                        message, color
                     )
                     print_result = output.print_message(colored_message)
                 else:

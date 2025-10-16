@@ -21,6 +21,10 @@ def print_step(step_num: int, description: str) -> None:
 
 def run_maintenance_demo() -> None:
     """Run the complete documentation maintenance demonstration."""
+    # Constants
+    MAX_FILES_TO_SHOW = 10
+    GOOD_SCORE_THRESHOLD = 80
+
     print_header("FLEXT Quality Documentation Maintenance Demo")
 
     # Change to project root
@@ -63,9 +67,11 @@ def run_maintenance_demo() -> None:
 
     doc_files = sorted(set(doc_files))  # Remove duplicates
 
-    for _i, _file in enumerate(doc_files[:10], 1):  # Show first 10
+    for _i, _file in enumerate(
+        doc_files[:MAX_FILES_TO_SHOW], 1
+    ):  # Show first MAX_FILES_TO_SHOW
         pass
-    if len(doc_files) > 10:
+    if len(doc_files) > MAX_FILES_TO_SHOW:
         pass
 
     # Step 2: Run comprehensive audit
@@ -195,7 +201,8 @@ def run_maintenance_demo() -> None:
 
         if analyzed_count > 0:
             avg_score = total_score / analyzed_count
-            if avg_score >= 80 or avg_score >= 60:
+            if avg_score >= GOOD_SCORE_THRESHOLD:
+                # Good score achieved
                 pass
 
     except ImportError:

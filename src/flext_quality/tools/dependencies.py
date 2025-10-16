@@ -67,16 +67,14 @@ class FlextQualityDependencyTools(FlextService[None]):
                 FlextResult with consolidation statistics
 
             """
-            logger = FlextLogger(__name__)
+            logger: FlextLogger = FlextLogger(__name__)
 
             if dry_run:
                 logger.info(f"DRY RUN: Would consolidate deps in {workspace_path}")
-                return FlextResult[FlextTypes.Dict].ok(
-                    {
-                        "consolidated": False,
-                        "dry_run": True,
-                    }
-                )
+                return FlextResult[FlextTypes.Dict].ok({
+                    "consolidated": False,
+                    "dry_run": True,
+                })
 
             logger.info(f"Consolidating dependencies in {workspace_path}")
             return FlextResult[FlextTypes.Dict].ok({"consolidated": True})

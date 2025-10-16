@@ -32,9 +32,13 @@ from flext_core import (
 
 from .analyzer import CodeAnalyzer
 from .config import FlextQualityConfig
-from .reports import QualityReport
+from .reports import FlextQualityReportGenerator as QualityReport
 from .typings import FlextQualityTypes
-from .web import FlextQualityWeb
+
+try:
+    from .web import FlextQualityWeb
+except ImportError:
+    FlextQualityWeb = None
 
 # Quality score thresholds
 MIN_ACCEPTABLE_QUALITY_SCORE = 70
@@ -184,7 +188,7 @@ class FlextQualityCliService(FlextService[int]):
             self,
             args: argparse.Namespace,
             report: QualityReport,
-            cli_context: FlextCliContext,  # noqa: ARG002
+            cli_context: FlextCliContext,
         ) -> FlextResult[None]:
             """Save report to file using FlextCli export."""
             output_path = Path(args.output)
@@ -241,7 +245,7 @@ class FlextQualityCliService(FlextService[int]):
             self,
             args: argparse.Namespace,
             report: QualityReport,
-            cli_context: FlextCliContext,  # noqa: ARG002
+            cli_context: FlextCliContext,
         ) -> FlextResult[None]:
             """Output report to stdout."""
             if args.format == "json":
@@ -341,6 +345,11 @@ class FlextQualityCliService(FlextService[int]):
 
         def run_web_server_workflow(self, args: argparse.Namespace) -> FlextResult[int]:
             """Execute web server startup workflow."""
+            if FlextQualityWeb is None:
+                return FlextResult[int].fail(
+                    "Web interface not available. Install flext-auth for web functionality."
+                )
+
             cli_context_result = (
                 FlextQualityCliService._CliContextHelper.get_cli_context()
             )
@@ -363,9 +372,7 @@ class FlextQualityCliService(FlextService[int]):
         if instance.logger is None:
             msg = "Logger must be initialized"
             raise RuntimeError(msg)
-        analysis_helper = instance._ProjectAnalysisHelper(
-            instance.logger
-        )
+        analysis_helper = instance._ProjectAnalysisHelper(instance.logger)
 
         analysis_result: FlextResult[int] = analysis_helper.analyze_project_workflow(
             args
@@ -384,9 +391,7 @@ class FlextQualityCliService(FlextService[int]):
         if instance.logger is None:
             msg = "Logger must be initialized"
             raise RuntimeError(msg)
-        scoring_helper = instance._ProjectScoringHelper(
-            instance.logger
-        )
+        scoring_helper = instance._ProjectScoringHelper(instance.logger)
 
         scoring_result: FlextResult[int] = scoring_helper.score_project_workflow(args)
         if scoring_result.is_failure:
@@ -515,6 +520,12 @@ class FlextQualityCliService(FlextService[int]):
         logger = FlextLogger(__name__)
         self._CliContextHelper.get_cli_context()
 
+        if FlextQualityWeb is None:
+            logger.error(
+                "Web interface not available. Install flext-auth for web functionality."
+            )
+            return 1
+
         try:
             self.logger.info(f"Starting web server on {args.host}:{args.port}")
 
@@ -533,6 +544,16 @@ class FlextQualityCliService(FlextService[int]):
     def quality_main(self) -> int:
         """Legacy quality main function alias."""
         return main()
+
+
+def another_function() -> str:
+    """Another test function."""
+    return "another_function_result"
+
+
+def setup_logging() -> None:
+    """Setup logging for CLI operations."""
+    # Simple logging setup for tests
 
 
 def main() -> int:

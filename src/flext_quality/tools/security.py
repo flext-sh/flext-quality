@@ -18,7 +18,9 @@ class FlextSecurityService(FlextService[FlextTypes.StringDict]):
         """Return an empty payload for service compliance."""
         return FlextResult[FlextTypes.StringDict].ok({})
 
-    def decrypt_vault(self, vault_path: str | Path) -> FlextResult[FlextTypes.StringDict]:
+    def decrypt_vault(
+        self, vault_path: str | Path
+    ) -> FlextResult[FlextTypes.StringDict]:
         """Placeholder vault decryption returning metadata only."""
         path = Path(vault_path).expanduser()
         if not path.exists():
@@ -26,12 +28,10 @@ class FlextSecurityService(FlextService[FlextTypes.StringDict]):
                 f"Vault path does not exist: {path}"
             )
 
-        return FlextResult[FlextTypes.StringDict].ok(
-            {
-                "vault_path": str(path),
-                "status": "decryption-not-implemented",
-            }
-        )
+        return FlextResult[FlextTypes.StringDict].ok({
+            "vault_path": str(path),
+            "status": "decryption-not-implemented",
+        })
 
     def scan_antipatterns(
         self,

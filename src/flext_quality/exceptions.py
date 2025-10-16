@@ -74,17 +74,17 @@ class FlextQualityExceptions:
 
 
 __all__ = [
-    "FlextQualityError",
     "FlextQualityAnalysisError",
     "FlextQualityAuthenticationError",
     "FlextQualityConfigurationError",
     "FlextQualityConnectionError",
-    "FlextQualityValidationError",
-    "FlextQualityProcessingError",
-    "FlextQualityTimeoutError",
+    "FlextQualityError",
+    "FlextQualityExceptions",
     "FlextQualityGradeError",
     "FlextQualityMetricsError",
+    "FlextQualityProcessingError",
     "FlextQualityReportError",
     "FlextQualityRuleError",
-    "FlextQualityExceptions",
+    "FlextQualityTimeoutError",
+    "FlextQualityValidationError",
 ]

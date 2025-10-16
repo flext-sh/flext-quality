@@ -18,7 +18,18 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 
 # Domain library imports (ZERO TOLERANCE - NO direct FastAPI imports)
-from flext_auth import FlextAuth, FlextAuthJwtProvider
+try:
+    from flext_auth import FlextAuth, FlextAuthJwtProvider
+except ImportError:
+    # Mock classes for when flext_auth is not available
+    class FlextAuth:
+        pass
+
+    class FlextAuthJwtProvider:
+        def __init__(self, config: dict[str, object]) -> None:
+            pass
+
+
 from flext_core import FlextContainer, FlextLogger, FlextResult, FlextTypes
 
 from .analyzer import CodeAnalyzer

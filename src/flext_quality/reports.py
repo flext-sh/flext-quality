@@ -10,7 +10,6 @@ from __future__ import annotations
 import json
 import warnings
 from pathlib import Path
-from typing import override
 
 from flext_core import FlextTypes
 
@@ -28,19 +27,9 @@ MIN_SCORE_THRESHOLD = 70
 HIGH_TYPE_ERROR_THRESHOLD = 10
 
 
-# Constants for display limits
-ISSUE_PREVIEW_LIMIT = 5
-HTML_ISSUE_LIMIT = 10
-HIGH_ISSUE_THRESHOLD = 50
-MIN_COVERAGE_THRESHOLD = 80
-MIN_SCORE_THRESHOLD = 70
-HIGH_TYPE_ERROR_THRESHOLD = 10
-
-
 class FlextQualityReportGenerator:
     """Generates quality reports from analysis results."""
 
-    @override
     def __init__(self, analysis_results: FlextQualityModels.AnalysisResults) -> None:
         """Initialize the quality report generator.
 

@@ -11,9 +11,30 @@ from flext_core import FlextLogger, FlextResult, FlextService
 class FlextPathService(FlextService[None]):
     """Expose convenience helpers mirroring the historical flext_tools API."""
 
+    class _ValidationHelper:
+        """Leverage legacy ignore pattern semantics."""
+
+        IGNORE_PATTERNS = [
+            "__pycache__",
+            ".git",
+            ".venv",
+            "node_modules",
+            ".pytest_cache",
+            ".mypy_cache",
+            ".ruff_cache",
+        ]
+
+        @classmethod
+        def should_ignore_path(cls, path: str | Path) -> bool:
+            path_str = str(path)
+            return any(pattern in path_str for pattern in cls.IGNORE_PATTERNS)
+
+    class Paths(_ValidationHelper):
+        """Alias matching the previous API surface."""
+
     def __init__(self: Self) -> None:
         super().__init__()
-        self.logger = FlextLogger(__name__)
+        self._logger = FlextLogger(__name__)
 
     def execute(self: Self) -> FlextResult[None]:
         """Return a simple success result."""

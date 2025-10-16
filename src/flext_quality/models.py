@@ -687,13 +687,11 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
                     "security_enabled": self.enable_security,
                     "complexity_enabled": self.enable_complexity,
                     "coverage_enabled": self.enable_coverage,
-                    "enabled_analyses_count": sum(
-                        [
-                            self.enable_security,
-                            self.enable_complexity,
-                            self.enable_coverage,
-                        ]
-                    ),
+                    "enabled_analyses_count": sum([
+                        self.enable_security,
+                        self.enable_complexity,
+                        self.enable_coverage,
+                    ]),
                 },
                 "quality_thresholds": {
                     "max_complexity": self.max_complexity,
@@ -743,13 +741,11 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
                 raise ValueError(msg)
 
             # Validate analysis enablement
-            if not any(
-                [
-                    self.enable_security,
-                    self.enable_complexity,
-                    self.enable_coverage,
-                ]
-            ):
+            if not any([
+                self.enable_security,
+                self.enable_complexity,
+                self.enable_coverage,
+            ]):
                 msg = "At least one analysis type must be enabled"
                 raise ValueError(msg)
 

@@ -132,18 +132,18 @@ class FlextQualityOptimizerOperations(FlextService[None]):
             score = 0.0
 
             # Count classes (should be 1 per module)
-            class_count = len(
-                [node for node in ast.walk(tree) if isinstance(node, ast.ClassDef)]
-            )
+            class_count = len([
+                node for node in ast.walk(tree) if isinstance(node, ast.ClassDef)
+            ])
             if class_count > 1:
                 score += 0.3
             elif class_count == 0:
                 score += 0.2
 
             # Count functions (should be minimal in optimized modules)
-            func_count = len(
-                [node for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
-            )
+            func_count = len([
+                node for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
+            ])
             if func_count > FlextConstants.Config.MAX_FUNCTIONS_THRESHOLD:
                 score += 0.3
 
@@ -724,14 +724,12 @@ class FlextQualityOptimizerOperations(FlextService[None]):
                 logger.info(
                     f"DRY RUN: Would refactor imports in {module_path} ({len(changes)} changes)"
                 )
-                return FlextResult[FlextTypes.Dict].ok(
-                    {
-                        "dry_run": True,
-                        "changes": changes,
-                        "file": str(module_path),
-                        "stats": initial_stats,
-                    }
-                )
+                return FlextResult[FlextTypes.Dict].ok({
+                    "dry_run": True,
+                    "changes": changes,
+                    "file": str(module_path),
+                    "stats": initial_stats,
+                })
 
             # Write back if changes were made
             if content != original_content:
@@ -746,23 +744,19 @@ class FlextQualityOptimizerOperations(FlextService[None]):
                         f"Failed to write file: {e}"
                     )
 
-                return FlextResult[FlextTypes.Dict].ok(
-                    {
-                        "status": "modified",
-                        "changes": changes,
-                        "file": str(module_path),
-                        "stats": initial_stats,
-                    }
-                )
-
-            return FlextResult[FlextTypes.Dict].ok(
-                {
-                    "status": "unchanged",
-                    "changes": [],
+                return FlextResult[FlextTypes.Dict].ok({
+                    "status": "modified",
+                    "changes": changes,
                     "file": str(module_path),
                     "stats": initial_stats,
-                }
-            )
+                })
+
+            return FlextResult[FlextTypes.Dict].ok({
+                "status": "unchanged",
+                "changes": [],
+                "file": str(module_path),
+                "stats": initial_stats,
+            })
 
     class SyntaxModernizer:
         """Python syntax modernization.
@@ -1010,13 +1004,11 @@ class FlextQualityOptimizerOperations(FlextService[None]):
                 logger.info(
                     f"DRY RUN: Would modernize {module_path} ({len(all_changes)} changes)"
                 )
-                return FlextResult[FlextTypes.Dict].ok(
-                    {
-                        "dry_run": True,
-                        "changes": all_changes,
-                        "file": str(module_path),
-                    }
-                )
+                return FlextResult[FlextTypes.Dict].ok({
+                    "dry_run": True,
+                    "changes": all_changes,
+                    "file": str(module_path),
+                })
 
             # Write back if changes were made
             if content != original_content:
@@ -1031,21 +1023,17 @@ class FlextQualityOptimizerOperations(FlextService[None]):
                         f"Failed to write file: {e}"
                     )
 
-                return FlextResult[FlextTypes.Dict].ok(
-                    {
-                        "status": "modified",
-                        "changes": all_changes,
-                        "file": str(module_path),
-                    }
-                )
-
-            return FlextResult[FlextTypes.Dict].ok(
-                {
-                    "status": "unchanged",
-                    "changes": [],
+                return FlextResult[FlextTypes.Dict].ok({
+                    "status": "modified",
+                    "changes": all_changes,
                     "file": str(module_path),
-                }
-            )
+                })
+
+            return FlextResult[FlextTypes.Dict].ok({
+                "status": "unchanged",
+                "changes": [],
+                "file": str(module_path),
+            })
 
     class TypeModernizer:
         """Type annotation modernization.
@@ -1311,30 +1299,24 @@ class FlextQualityOptimizerOperations(FlextService[None]):
                 logger.info(
                     f"DRY RUN: Would modernize types in {module_path} ({len(all_changes)} changes)"
                 )
-                return FlextResult[FlextTypes.Dict].ok(
-                    {
-                        "dry_run": True,
-                        "changes": all_changes,
-                        "files_affected": [str(pyproject_path), str(makefile_path)],
-                    }
-                )
+                return FlextResult[FlextTypes.Dict].ok({
+                    "dry_run": True,
+                    "changes": all_changes,
+                    "files_affected": [str(pyproject_path), str(makefile_path)],
+                })
 
             if all_changes:
-                return FlextResult[FlextTypes.Dict].ok(
-                    {
-                        "status": "modified",
-                        "changes": all_changes,
-                        "files_modified": files_modified,
-                    }
-                )
+                return FlextResult[FlextTypes.Dict].ok({
+                    "status": "modified",
+                    "changes": all_changes,
+                    "files_modified": files_modified,
+                })
 
-            return FlextResult[FlextTypes.Dict].ok(
-                {
-                    "status": "unchanged",
-                    "changes": [],
-                    "files_modified": [],
-                }
-            )
+            return FlextResult[FlextTypes.Dict].ok({
+                "status": "unchanged",
+                "changes": [],
+                "files_modified": [],
+            })
 
     def __init__(self) -> None:
         """Initialize optimizer operations service."""

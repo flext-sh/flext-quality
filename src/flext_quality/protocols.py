@@ -14,6 +14,7 @@ from typing import Protocol
 from flext_core import FlextProtocols, FlextResult
 
 from .models import FlextQualityModels
+from .typings import FlextQualityTypes
 
 
 class FlextQualityProtocols(FlextProtocols):
@@ -25,7 +26,7 @@ class FlextQualityProtocols(FlextProtocols):
         def analyze_project(
             self,
             project_path: str,
-            config: FlextQualityModels.Analysis.AnalysisConfiguration | None = None,
+            config: FlextQualityTypes.Analysis.AnalysisConfiguration | None = None,
         ) -> FlextResult[FlextQualityModels.AnalysisResults]:
             """Analyze a project for quality metrics."""
             ...
@@ -47,7 +48,7 @@ class FlextQualityProtocols(FlextProtocols):
         def validate_thresholds(
             self,
             analysis_results: FlextQualityModels.AnalysisResults,
-            thresholds: FlextQualityModels.Analysis.AnalysisThresholds,
+            thresholds: FlextQualityTypes.Analysis.AnalysisThresholds,
         ) -> FlextResult[bool]:
             """Validate analysis results against quality thresholds."""
             ...

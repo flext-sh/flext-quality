@@ -335,13 +335,11 @@ class FlextQualityGitTools(FlextService[None]):
                         else 0
                     )
 
-            return FlextResult[FlextTypes.Dict].ok(
-                {
-                    "removed_count": removed_count,
-                    "errors": errors,
-                    "success": len(errors) == 0,
-                }
-            )
+            return FlextResult[FlextTypes.Dict].ok({
+                "removed_count": removed_count,
+                "errors": errors,
+                "success": len(errors) == 0,
+            })
 
 
 __all__ = ["FlextQualityGitTools"]

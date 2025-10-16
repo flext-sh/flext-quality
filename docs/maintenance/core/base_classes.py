@@ -5,7 +5,7 @@ Provides consistent interfaces and shared functionality.
 """
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol
@@ -25,7 +25,7 @@ class Issue:
     recommendation: str = ""
     context: dict[str, object] | None = None
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> FlextTypes.Dict:
         """Convert issue to dictionary representation."""
         return {
             "type": self.type,
@@ -45,21 +45,10 @@ class ValidationResult:
     total_items: int = 0
     valid_items: int = 0
     invalid_items: int = 0
-    issues: list[Issue] | None = None
-    warnings: FlextTypes.StringList | None = None
-    errors: FlextTypes.StringList | None = None
-    metadata: dict[str, object] | None = None
-
-    def __post_init__(self) -> None:
-        """Initialize default values for None fields."""
-        if self.issues is None:
-            self.issues = []
-        if self.warnings is None:
-            self.warnings = []
-        if self.errors is None:
-            self.errors = []
-        if self.metadata is None:
-            self.metadata = {}
+    issues: list[Issue] = field(default_factory=list)
+    warnings: FlextTypes.StringList = field(default_factory=list)
+    errors: FlextTypes.StringList = field(default_factory=list)
+    metadata: dict[str, object] = field(default_factory=dict)
 
     @property
     def success_rate(self) -> float:
@@ -76,7 +65,7 @@ class ValidationResult:
         else:
             self.valid_items += 1
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> FlextTypes.Dict:
         """Convert result to dictionary representation."""
         return {
             "total_items": self.total_items,
@@ -262,11 +251,13 @@ class BaseAnalyzer(ABC):
 class ConfigProtocol(Protocol):
     """Protocol for configuration objects."""
 
-    def get(self, key: str, default: object = None) -> object:
+    def get(
+        self, key: str, default: FlextTypes.ConfigValue | None = None
+    ) -> FlextTypes.ConfigValue | None:
         """Get a configuration value."""
         ...
 
-    def __getitem__(self, key: str) -> object:
+    def __getitem__(self, key: str) -> FlextTypes.ConfigValue | None:
         """Get a configuration value with bracket notation."""
         ...
 
@@ -297,7 +288,7 @@ class FileMetadata:
             # If we can't read the file, keep defaults (file not accessible or not text)
             pass
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> FlextTypes.Dict:
         """Convert metadata to dictionary."""
         return {
             "path": str(self.path),

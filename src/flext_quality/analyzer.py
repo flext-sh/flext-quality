@@ -19,6 +19,7 @@ from flext_core import (
     FlextResult,
     FlextService,
 )
+from pydantic import Field
 
 from .config import FlextQualityConfig
 from .constants import FlextQualityConstants
@@ -34,7 +35,7 @@ class FlextQualityAnalyzer(FlextService[None]):
 
     _context: object | None
     _quality_config: FlextQualityConfig
-    project_path: Path
+    project_path: Path = Field(..., description="Path to the project to analyze")
 
     def __init__(
         self, project_path: str | Path, config: FlextQualityConfig | None = None
@@ -46,7 +47,8 @@ class FlextQualityAnalyzer(FlextService[None]):
             config: Optional FlextQualityConfig instance. If None, creates default instance.
 
         """
-        super().__init__()
+        # Initialize with project_path for flext-core service
+        super().__init__(project_path=Path(project_path))
 
         # Complete flext-core integration
         self._container = FlextContainer.get_global()
@@ -55,7 +57,6 @@ class FlextQualityAnalyzer(FlextService[None]):
         self._logger = FlextLogger(__name__)
 
         self._quality_config = config or FlextQualityConfig()
-        self.project_path = Path(project_path)
         self._current_results: FlextQualityModels.AnalysisResults | None = None
 
     @property

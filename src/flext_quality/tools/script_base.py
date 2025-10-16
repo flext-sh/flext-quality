@@ -60,7 +60,7 @@ class FlextScriptService(FlextService[object], ABC):
 
         try:
             return self.execute_implementation(args or {})
-        except Exception as error:  # noqa: BLE001
+        except Exception as error:
             self.logger.exception("Script execution failed")
             return FlextResult[object].fail(str(error))
 

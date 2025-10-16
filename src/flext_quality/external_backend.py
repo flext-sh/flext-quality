@@ -17,10 +17,10 @@ from typing import override
 from flext_core import FlextResult, FlextTypes, FlextUtilities
 
 from .backend_type import BackendType
-from .base import BaseAnalyzer
+from .base import FlextQualityAnalyzer
 
 
-class FlextQualityExternalBackend(BaseAnalyzer):
+class FlextQualityExternalBackend(FlextQualityAnalyzer):
     """Backend using external tools like ruff, mypy, bandit, vulture."""
 
     @override

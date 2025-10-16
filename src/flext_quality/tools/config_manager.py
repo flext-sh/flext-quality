@@ -35,10 +35,7 @@ class ConfigurationManager(FlextService[FlextTypes.StringDict]):
             if self._config_path.exists():
                 with self._config_path.open(encoding="utf-8") as handle:
                     raw_data = json.load(handle)
-                    self._config = {
-                        key: str(value)
-                        for key, value in raw_data.items()  # type: ignore[union-attr]
-                    }
+                    self._config = {key: str(value) for key, value in raw_data.items()}
             return FlextResult[FlextTypes.StringDict].ok(self._config)
         except (OSError, json.JSONDecodeError) as error:
             self._logger.exception("Failed to load configuration")
@@ -72,6 +69,10 @@ class ConfigurationManager(FlextService[FlextTypes.StringDict]):
     def delete(self, key: str) -> FlextResult[None]:
         """Delete a configuration value if present."""
         self._config.pop(key, None)
+        return FlextResult[None].ok(None)
+
+    def validate_config(self) -> FlextResult[None]:
+        """Validate configuration structure (placeholder for compatibility)."""
         return FlextResult[None].ok(None)
 
 

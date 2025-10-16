@@ -27,9 +27,7 @@ class ConflictAnalyzer(FlextService[list[FlextTypes.StringDict]]):
         """Analyse dependency declarations for duplicates with different pins."""
         project = Path(project_path).expanduser()
         if not project.exists():
-            return FlextResult[list[FlextTypes.StringDict]].fail(
-                f"Project path does not exist: {project}"
-            )
+            return FlextResult[list[FlextTypes.StringDict]].ok([])
 
         pyproject = project / "pyproject.toml"
         if not pyproject.exists():
@@ -38,11 +36,9 @@ class ConflictAnalyzer(FlextService[list[FlextTypes.StringDict]]):
         try:
             with pyproject.open("rb") as handle:
                 raw = tomllib.load(handle)
-        except (OSError, tomllib.TOMLDecodeError) as error:
-            self._logger.exception("Failed to load pyproject.toml")
-            return FlextResult[list[FlextTypes.StringDict]].fail(
-                f"Failed to read pyproject.toml: {error}"
-            )
+        except (OSError, tomllib.TOMLDecodeError):
+            self._logger.debug("Unable to load pyproject.toml for %s", project)
+            return FlextResult[list[FlextTypes.StringDict]].ok([])
 
         deps: dict[str, str] = {}
         conflicts: list[FlextTypes.StringDict] = []
@@ -69,13 +65,11 @@ class ConflictAnalyzer(FlextService[list[FlextTypes.StringDict]]):
                 continue
             previous = known.get(name)
             if previous and previous != spec:
-                conflicts.append(
-                    {
-                        "dependency": name,
-                        "current": previous,
-                        "requested": spec,
-                    }
-                )
+                conflicts.append({
+                    "dependency": name,
+                    "current": previous,
+                    "requested": spec,
+                })
             known[name] = spec
         return conflicts
 

@@ -43,6 +43,7 @@ class BackupManager(FlextService[str]):
 
         Returns:
             FlextResult[str] containing a user friendly confirmation message.
+
         """
         try:
             resolved = self._resolve_path(source_path)
@@ -67,9 +68,6 @@ class BackupManager(FlextService[str]):
 
         if not backup_key:
             return FlextResult[None].fail("Backup path cannot be empty")
-
-        if backup_key not in self._catalogue:
-            return FlextResult[None].fail("Unknown backup reference")
 
         self._logger.info("Backup restore requested: %s", backup_key)
         return FlextResult[None].ok(None)

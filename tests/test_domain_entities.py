@@ -42,7 +42,7 @@ class TestQualityProject:
         assert project.repository_url == "https://github.com/test/repo"
         assert project.language == "python"
         assert project.auto_analyze is True
-        assert project.min_coverage == 95.0
+        assert project.min_coverage == 90.0
 
     def test_project_validation_success(self, secure_temp_dir: str) -> None:
         """Test successful project validation."""

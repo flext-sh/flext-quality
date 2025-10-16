@@ -274,15 +274,13 @@ class FlextQualityConfig(FlextConfig):
             raise ValueError(msg)
 
         # Validate analysis configuration
-        if not any(
-            [
-                self.enable_ast_analysis,
-                self.enable_external_tools,
-                self.enable_ruff,
-                self.enable_mypy,
-                self.enable_bandit,
-            ]
-        ):
+        if not any([
+            self.enable_ast_analysis,
+            self.enable_external_tools,
+            self.enable_ruff,
+            self.enable_mypy,
+            self.enable_bandit,
+        ]):
             msg = "At least one analysis method must be enabled"
             raise ValueError(msg)
 
@@ -389,28 +387,24 @@ class FlextQualityConfig(FlextConfig):
     @classmethod
     def create_for_development(cls) -> FlextQualityConfig:
         """Create configuration optimized for development using model_validate."""
-        return cls.model_validate(
-            {
-                "min_coverage": 80.0,
-                "max_complexity": 15,
-                "analysis_timeout": 120,
-                "parallel_workers": 2,
-            }
-        )
+        return cls.model_validate({
+            "min_coverage": 80.0,
+            "max_complexity": 15,
+            "analysis_timeout": 120,
+            "parallel_workers": 2,
+        })
 
     @classmethod
     def create_for_production(cls) -> FlextQualityConfig:
         """Create configuration optimized for production using model_validate."""
-        return cls.model_validate(
-            {
-                "min_coverage": FlextQualityConstants.Coverage.TARGET_COVERAGE,
-                "max_complexity": 8,
-                "min_security_score": FlextQualityConstants.Security.TARGET_SECURITY_SCORE,
-                "min_maintainability": 85.0,
-                "analysis_timeout": 600,
-                "parallel_workers": 8,
-            }
-        )
+        return cls.model_validate({
+            "min_coverage": FlextQualityConstants.Coverage.TARGET_COVERAGE,
+            "max_complexity": 8,
+            "min_security_score": FlextQualityConstants.Security.TARGET_SECURITY_SCORE,
+            "min_maintainability": 85.0,
+            "analysis_timeout": 600,
+            "parallel_workers": 8,
+        })
 
 
 __all__ = [

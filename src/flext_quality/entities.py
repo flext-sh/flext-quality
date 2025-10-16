@@ -54,6 +54,10 @@ class FlextQualityEntities(FlextModels):
         """Quality project domain entity using enhanced mixins for code reduction."""
 
         # Project identification
+        id: str = Field(
+            default_factory=lambda: str(__import__("uuid").uuid4()),
+            description="Unique project ID",
+        )
         name: str = Field(..., min_length=1)
         # Project paths
         project_path: str = Field(..., min_length=1)

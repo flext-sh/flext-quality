@@ -111,6 +111,13 @@ class FlextQualityServices:
                 raise RuntimeError(msg)
             return self.logger
 
+        @override
+        def execute(self, data: object) -> FlextResult[None]:
+            """Execute service operation - not used for this service type."""
+            return FlextResult[None].fail(
+                "ProjectService does not support execute operation"
+            )
+
         def create_project(
             self,
             name: str,

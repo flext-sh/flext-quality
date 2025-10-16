@@ -13,7 +13,7 @@ from flext_core import FlextTypes
 class AuditRules:
     """Configuration for audit rules and thresholds."""
 
-    def __init__(self, data: dict[str, object]) -> None:
+    def __init__(self, data: FlextTypes.Dict) -> None:
         """Initialize audit rules configuration."""
         self.quality_thresholds = data.get("quality_thresholds", {})
         self.content_checks = data.get("content_checks", {})
@@ -21,7 +21,9 @@ class AuditRules:
         self.style_checks = data.get("style_checks", {})
         self.accessibility_checks = data.get("accessibility_checks", {})
 
-    def get_threshold(self, key: str, default: object = None) -> object:
+    def get_threshold(
+        self, key: str, default: FlextTypes.ConfigValue | None = None
+    ) -> FlextTypes.ConfigValue | None:
         """Get a quality threshold value."""
         return self.quality_thresholds.get(key, default)
 
@@ -34,17 +36,21 @@ class AuditRules:
 class StyleGuide:
     """Configuration for style and formatting guidelines."""
 
-    def __init__(self, data: dict[str, object]) -> None:
+    def __init__(self, data: FlextTypes.Dict) -> None:
         """Initialize style guidelines configuration."""
         self.markdown = data.get("markdown", {})
         self.accessibility = data.get("accessibility", {})
         self.formatting = data.get("formatting", {})
 
-    def get_markdown_rule(self, rule: str, default: object = None) -> object:
+    def get_markdown_rule(
+        self, rule: str, default: FlextTypes.ConfigValue | None = None
+    ) -> FlextTypes.ConfigValue | None:
         """Get a markdown formatting rule."""
         return self.markdown.get(rule, default)
 
-    def get_accessibility_rule(self, rule: str, default: object = None) -> object:
+    def get_accessibility_rule(
+        self, rule: str, default: FlextTypes.ConfigValue | None = None
+    ) -> FlextTypes.ConfigValue | None:
         """Get an accessibility rule."""
         return self.accessibility.get(rule, default)
 
@@ -52,7 +58,7 @@ class StyleGuide:
 class ValidationConfig:
     """Configuration for validation operations."""
 
-    def __init__(self, data: dict[str, object]) -> None:
+    def __init__(self, data: FlextTypes.Dict) -> None:
         """Initialize validation configuration."""
         self.link_validation = data.get("link_validation", {})
         self.content_validation = data.get("content_validation", {})
@@ -61,11 +67,15 @@ class ValidationConfig:
         self.security_validation = data.get("security_validation", {})
         self.performance_validation = data.get("performance_validation", {})
 
-    def get_link_setting(self, setting: str, default: object = None) -> object:
+    def get_link_setting(
+        self, setting: str, default: FlextTypes.ConfigValue | None = None
+    ) -> FlextTypes.ConfigValue | None:
         """Get a link validation setting."""
         return self.link_validation.get(setting, default)
 
-    def get_content_setting(self, setting: str, default: object = None) -> object:
+    def get_content_setting(
+        self, setting: str, default: FlextTypes.ConfigValue | None = None
+    ) -> FlextTypes.ConfigValue | None:
         """Get a content validation setting."""
         return self.content_validation.get(setting, default)
 
@@ -113,13 +123,13 @@ class ConfigManager:
             self._validation_config = ValidationConfig(data)
         return self._validation_config
 
-    def get_config(self, name: str) -> dict[str, object]:
+    def get_config(self, name: str) -> FlextTypes.Dict:
         """Get a configuration file by name."""
         if name not in self._cache:
             self._cache[name] = self._load_config_file(f"{name}.yaml")
         return self._cache[name]
 
-    def _load_config_file(self, filename: str) -> dict[str, object]:
+    def _load_config_file(self, filename: str) -> FlextTypes.Dict:
         """Load a YAML configuration file."""
         config_path = self.config_dir / filename
 
@@ -133,7 +143,7 @@ class ConfigManager:
         except Exception:
             return self._get_default_config(filename)
 
-    def _get_default_config(self, filename: str) -> dict[str, object]:
+    def _get_default_config(self, filename: str) -> FlextTypes.Dict:
         """Get default configuration for a file."""
         defaults = {
             "audit_rules.yaml": {
@@ -245,7 +255,7 @@ class ConfigManager:
 
         return issues
 
-    def get_all_configs(self) -> dict[str, object]:
+    def get_all_configs(self) -> FlextTypes.Dict:
         """Get all configurations as a single dictionary."""
         return {
             "audit_rules": self.get_audit_rules().__dict__,
@@ -257,7 +267,7 @@ class ConfigManager:
             },
         }
 
-    def save_config(self, name: str, data: dict[str, object]) -> bool:
+    def save_config(self, name: str, data: FlextTypes.Dict) -> bool:
         """Save a configuration to file."""
         try:
             config_path = self.config_dir / f"{name}.yaml"
