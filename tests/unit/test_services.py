@@ -15,6 +15,10 @@ import uuid
 
 import pytest
 from flext_core import FlextTypes
+from tests.conftest import (
+    assert_result_failure_with_error,
+    assert_result_success_with_data,
+)
 
 from flext_quality import (
     AnalysisStatus,
@@ -28,11 +32,6 @@ from flext_quality import (
     QualityProjectService,
     QualityReport,
     QualityReportService,
-)
-
-from .conftest import (
-    assert_result_failure_with_error,
-    assert_result_success_with_data,
 )
 
 

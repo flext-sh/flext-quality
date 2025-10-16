@@ -176,7 +176,6 @@ class FlextQualityAnalyzer(FlextService[None]):
             dependencies=[],  # Would need dependency scanning
             test_results=None,  # Would need test execution
             analysis_config={},  # Simplified for now
-            analysis_timestamp=None,  # Will be set by Pydantic
         )
 
         self._current_results = results

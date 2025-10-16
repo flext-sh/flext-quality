@@ -493,7 +493,6 @@ class FlextQualityOperations(FlextService[None]):
     def __init__(self) -> None:
         """Initialize quality operations service."""
         super().__init__()
-        self.logger = FlextLogger(__name__)
         # Note: FlextCli is created locally in methods that need it
 
         # Initialize helper services

@@ -1321,7 +1321,6 @@ class FlextQualityOptimizerOperations(FlextService[None]):
     def __init__(self) -> None:
         """Initialize optimizer operations service."""
         super().__init__()
-        self.logger = FlextLogger(__name__)
 
         # Initialize helper services
         self.module = self.ModuleOptimizer()

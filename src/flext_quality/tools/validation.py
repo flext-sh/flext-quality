@@ -113,7 +113,6 @@ class FlextQualityValidationTools(FlextService[None]):
     def __init__(self) -> None:
         """Initialize validation tools service."""
         super().__init__()
-        self.logger = FlextLogger(__name__)
 
         # Initialize helper services
         self.equilibrium = self.EquilibriumValidator()

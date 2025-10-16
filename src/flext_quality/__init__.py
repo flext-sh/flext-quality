@@ -27,7 +27,12 @@ from .base import BaseAnalyzer
 # CLI imports are lazy to avoid flext_cli dependency issues
 # Use: from .cli import main
 # Instead of: from flext_quality import main
-from .cli import another_function, main, setup_logging
+try:
+    from .cli import another_function, main, setup_logging
+except ImportError:  # Optional dependency or circular import issues
+    another_function = None
+    main = None
+    setup_logging = None
 from .config import FlextQualityConfig
 from .constants import FlextQualityConstants
 from .container import get_quality_container
@@ -62,6 +67,8 @@ from .reports import (
     HIGH_ISSUE_THRESHOLD,
     HTML_ISSUE_LIMIT,
     ISSUE_PREVIEW_LIMIT,
+    MIN_COVERAGE_THRESHOLD,
+    MIN_SCORE_THRESHOLD,
     FlextQualityReportGenerator,
 )
 from .services import FlextQualityServices
@@ -106,6 +113,7 @@ OverallMetrics = FlextQualityModels.OverallMetrics
 
 # Handler aliases for backward compatibility
 RunLintingHandler = FlextQualityHandler
+RunSecurityCheckHandler = FlextQualityHandler
 
 # Conditional web interface alias
 try:
@@ -129,6 +137,10 @@ except ImportError:  # Optional dependency
 __all__ = [
     "HIGH_ISSUE_THRESHOLD",
     "HTML_ISSUE_LIMIT",
+    "ISSUE_PREVIEW_LIMIT",
+    "ISSUE_PREVIEW_LIMIT",
+    "MIN_COVERAGE_THRESHOLD",
+    "MIN_SCORE_THRESHOLD",
     "VERSION",
     "ASTBackend",
     "AnalysisResults",
@@ -177,13 +189,11 @@ __all__ = [
     "FlextQualityWeb",
     "FlextQualityWebInterface",
     "GenerateReportHandler",
-    "ISSUE_PREVIEW_LIMIT",
     "IssueLocation",
-    "OverallMetrics",
-    "RunLintingHandler",
     # Backward compatibility aliases
     "IssueSeverity",
     "IssueType",
+    "OverallMetrics",
     "QualityAPI",
     # Entity aliases for backward compatibility
     "QualityAnalysis",
@@ -200,11 +210,13 @@ __all__ = [
     "QualityRule",
     "QualityScore",
     "QualityUtilities",
+    "RunLintingHandler",
+    "RunSecurityCheckHandler",
     "__version__",
     "__version_info__",
     "analyze_project",
     "another_function",
     "get_quality_container",
     "main",
-    "setup_logging", "ISSUE_PREVIEW_LIMIT",
+    "setup_logging",
 ]
