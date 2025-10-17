@@ -14,3 +14,5 @@ __all__ = [
     "get_project_root",
     "run_operation",
 ]
+
+# pragma: no cover

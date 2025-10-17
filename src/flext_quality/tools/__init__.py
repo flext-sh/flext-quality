@@ -76,3 +76,5 @@ __all__ = [
     "print_colored",
     "should_ignore_path",
 ]
+
+# pragma: no cover

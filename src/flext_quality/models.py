@@ -19,6 +19,7 @@ from uuid import UUID
 
 from flext_core import FlextContainer, FlextLogger, FlextModels, FlextTypes
 from pydantic import (
+    BaseModel,
     Field,
     SerializationInfo,
     field_serializer,
@@ -30,10 +31,10 @@ from .constants import FlextQualityConstants
 from .value_objects import FlextQualityValueObjects
 
 
-class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
+class FlextQualityModels(BaseModel):
     """Unified quality models class following FLEXT architecture patterns.
 
-    Inherits from FlextModels.StrictArbitraryTypesModel for comprehensive validation.
+    Inherits from Pydantic BaseModel for comprehensive validation.
     Single responsibility: Quality data models and validation
     Contains all Pydantic models as nested classes with shared functionality.
     """
@@ -105,7 +106,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
 
     @field_serializer("*", when_used="json")
     def serialize_with_quality_metadata(
-        self, value: object, _info: SerializationInfo
+        self, value: Any, _info: SerializationInfo
     ) -> Any:
         """Field serializer adding quality analysis metadata and compliance context."""
         if isinstance(value, dict):
@@ -121,14 +122,12 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
             }
         return value
 
-    @override
     def __init__(self) -> None:
         """Initialize models with dependency injection."""
-        super().__init__()
         self._container = FlextContainer.get_global()
         self.logger = FlextLogger(__name__)
 
-    class ProjectModel(FlextModels.StrictArbitraryTypesModel):
+    class ProjectModel(BaseModel):
         """Pydantic model for quality project representation."""
 
         id: UUID = Field(..., description="Unique project identifier")
@@ -206,7 +205,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
                 raise ValueError(msg)
             return v.strip()
 
-    class AnalysisModel(FlextModels.StrictArbitraryTypesModel):
+    class AnalysisModel(BaseModel):
         """Pydantic model for quality analysis representation."""
 
         id: UUID = Field(..., description="Unique analysis identifier")
@@ -370,7 +369,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
             """Ensure scores are within valid range."""
             return max(0.0, min(100.0, v))
 
-    class IssueModel(FlextModels.StrictArbitraryTypesModel):
+    class IssueModel(BaseModel):
         """Pydantic model for quality issue representation."""
 
         id: UUID = Field(..., description="Unique issue identifier")
@@ -510,7 +509,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
                 raise ValueError(msg)
             return v
 
-    class ReportModel(FlextModels.StrictArbitraryTypesModel):
+    class ReportModel(BaseModel):
         """Pydantic model for quality report representation."""
 
         id: UUID = Field(..., description="Unique report identifier")
@@ -637,7 +636,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
             }
             return capabilities_map.get(self.format_type, [])
 
-    class ConfigModel(FlextModels.StrictArbitraryTypesModel):
+    class ConfigModel(BaseModel):
         """Pydantic model for analysis configuration."""
 
         include_patterns: FlextTypes.StringList = Field(
@@ -840,7 +839,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
 
     # ==== ANALYSIS RESULT MODELS (from analysis_types.py migration) ====
 
-    class FileAnalysisResult(FlextModels.StrictArbitraryTypesModel):
+    class FileAnalysisResult(BaseModel):
         """Result of analyzing a single file."""
 
         file_path: Path = Field(..., description="Path to the analyzed file")
@@ -859,7 +858,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
         style_issues: int = Field(default=0, ge=0, description="Number of style issues")
         dead_code_lines: int = Field(default=0, ge=0, description="Lines of dead code")
 
-    class CodeIssue(FlextModels.StrictArbitraryTypesModel):
+    class CodeIssue(BaseModel):
         """General code quality issue."""
 
         file_path: str = Field(..., description="File where issue was found")
@@ -874,7 +873,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
             default=None, description="Rule that detected the issue"
         )
 
-    class ComplexityIssue(FlextModels.StrictArbitraryTypesModel):
+    class ComplexityIssue(BaseModel):
         """Complexity-related code issue."""
 
         file_path: str = Field(..., description="File where issue was found")
@@ -891,7 +890,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
         )
         message: str = Field(..., description="Human-readable issue message")
 
-    class SecurityIssue(FlextModels.StrictArbitraryTypesModel):
+    class SecurityIssue(BaseModel):
         """Security-related code issue."""
 
         file_path: str = Field(..., description="File where issue was found")
@@ -907,7 +906,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
         message: str = Field(..., description="Human-readable issue message")
         rule_id: str = Field(..., description="Security rule that detected the issue")
 
-    class DeadCodeIssue(FlextModels.StrictArbitraryTypesModel):
+    class DeadCodeIssue(BaseModel):
         """Dead code issue."""
 
         file_path: str = Field(..., description="File where dead code was found")
@@ -922,7 +921,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
         )
         message: str = Field(..., description="Human-readable issue message")
 
-    class DuplicationIssue(FlextModels.StrictArbitraryTypesModel):
+    class DuplicationIssue(BaseModel):
         """Code duplication issue."""
 
         files: FlextTypes.StringList = Field(
@@ -944,7 +943,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
         )
         message: str = Field(..., description="Human-readable issue message")
 
-    class Dependency(FlextModels.StrictArbitraryTypesModel):
+    class Dependency(BaseModel):
         """Project dependency information."""
 
         name: str = Field(..., description="Dependency name")
@@ -956,7 +955,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
             description="Known vulnerabilities",
         )
 
-    class TestResults(FlextModels.StrictArbitraryTypesModel):
+    class TestResults(BaseModel):
         """Test execution results."""
 
         total_tests: int = Field(default=0, description="Total number of tests")
@@ -973,7 +972,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
             default=0.0, description="Test execution time in seconds"
         )
 
-    class OverallMetrics(FlextModels.StrictArbitraryTypesModel):
+    class OverallMetrics(BaseModel):
         """Overall project quality metrics."""
 
         files_analyzed: int = Field(default=0, description="Number of files analyzed")
@@ -1017,7 +1016,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
             description="Complexity score",
         )
 
-    class AnalysisResults(FlextModels.StrictArbitraryTypesModel):
+    class AnalysisResults(BaseModel):
         """Complete analysis results for a project."""
 
         overall_metrics: OverallMetrics = Field(
@@ -1081,7 +1080,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
 
     # ==== WEB MODELS (from web.py migration) ====
 
-    class AppConfig(FlextModels.StrictArbitraryTypesModel):
+    class AppConfig(BaseModel):
         """Web app configuration."""
 
         title: str = Field(..., description="App title")
@@ -1091,7 +1090,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
 
     # ==== INTERNAL TOOLS MODELS (from flext_tools migration) ====
 
-    class GitOperation(FlextModels.StrictArbitraryTypesModel):
+    class GitOperation(BaseModel):
         """Git operation command for quality tools."""
 
         repo_path: str
@@ -1099,7 +1098,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
         dry_run: bool = True
         temp_path: str | None = None
 
-    class RewriteResult(FlextModels.StrictArbitraryTypesModel):
+    class RewriteResult(BaseModel):
         """Git history rewrite result."""
 
         commits_processed: int
@@ -1125,7 +1124,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
         errors: FlextTypes.StringList
         warnings: FlextTypes.StringList
 
-    class CheckResult(FlextModels.StrictArbitraryTypesModel):
+    class CheckResult(BaseModel):
         """Quality check result."""
 
         lint_passed: bool
@@ -1141,7 +1140,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
         checks_passed: int
         failures: FlextTypes.StringList
 
-    class AnalysisResult(FlextModels.StrictArbitraryTypesModel):
+    class AnalysisResult(BaseModel):
         """Architecture analysis result."""
 
         violations: FlextTypes.StringList
@@ -1167,7 +1166,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
         event_type: str
         timestamp: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
-    class Project(FlextModels.Entity):
+    class Project(BaseModel):
         """Quality project domain entity using enhanced mixins for code reduction."""
 
         # Project identification
@@ -1248,7 +1247,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
         error_message: str | None = None
         retry_count: int = Field(default=0)
 
-    class Issue(FlextModels.Entity):
+    class Issue(BaseModel):
         """Quality issue domain entity with detailed issue tracking."""
 
         # Issue identification
@@ -1367,7 +1366,7 @@ class FlextQualityModels(FlextModels.StrictArbitraryTypesModel):
     # AST ANALYSIS MODELS - Moved from ast_*.py files
     # =============================================================================
 
-    class FunctionInfo(FlextModels.StrictArbitraryTypesModel):
+    class FunctionInfo(BaseModel):
         """Strongly-typed function information from AST analysis."""
 
         name: str

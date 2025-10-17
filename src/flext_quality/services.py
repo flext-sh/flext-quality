@@ -101,15 +101,17 @@ class FlextQualityServices:
             super().__init__()
             self._parent = parent
             # Initialize logger directly for type safety
-            self.logger = FlextLogger(__name__)
+            self._logger = FlextLogger(__name__)
 
         @property
         def logger(self) -> FlextLogger:
             """Get logger with type narrowing."""
-            if self.logger is None:
-                msg = "Logger must be initialized"
-                raise RuntimeError(msg)
-            return self.logger
+            return self._logger
+
+        @logger.setter
+        def logger(self, value: FlextLogger) -> None:
+            """Set logger."""
+            self._logger = value
 
         @override
         def execute(self, data: object) -> FlextResult[None]:

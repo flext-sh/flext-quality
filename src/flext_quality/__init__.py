@@ -71,6 +71,10 @@ from .reports import (
     MIN_SCORE_THRESHOLD,
     FlextQualityReportGenerator,
 )
+from .typings import FlextQualityTypes
+from .utilities import FlextQualityUtilities as QualityUtilities
+from .value_objects import FlextQualityValueObjects
+from .version import VERSION, FlextQualityVersion
 from .services import FlextQualityServices
 
 # Service aliases for backward compatibility
@@ -78,12 +82,6 @@ QualityAnalysisService = FlextQualityServices.AnalysisService
 QualityIssueService = FlextQualityServices.IssueService
 QualityProjectService = FlextQualityServices.ProjectService
 QualityReportService = FlextQualityServices.ReportService
-
-# Type system and aliases
-from .typings import FlextQualityTypes
-from .utilities import FlextQualityUtilities as QualityUtilities
-from .value_objects import FlextQualityValueObjects
-from .version import VERSION, FlextQualityVersion
 
 # Backward compatibility aliases for tests
 IssueSeverity = FlextQualityValueObjects.IssueSeverity
