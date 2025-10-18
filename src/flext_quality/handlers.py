@@ -8,11 +8,21 @@ from __future__ import annotations
 from typing import override
 from uuid import UUID
 
-from flext_core import FlextLogger, FlextResult, FlextTypes
-from flext_observability import (
-    flext_create_log_entry as _flext_create_log_entry,
-    flext_create_trace as _flext_create_trace,
-)
+from flext_core import FlextLogger, FlextResult
+
+try:
+    from flext_observability import (
+        flext_create_log_entry as _flext_create_log_entry,
+        flext_create_trace as _flext_create_trace,
+    )
+except ImportError:
+    # Mock functions for when flext_observability is not available
+    def _flext_create_log_entry(*args, **kwargs) -> None:
+        pass
+
+    def _flext_create_trace(*args, **kwargs) -> None:
+        pass
+
 
 from .models import FlextQualityModels
 from .services import FlextQualityServices
@@ -43,7 +53,7 @@ class FlextQualityHandlers:
         def create_trace(
             operation_name: str,
             service_name: str,
-            config: FlextTypes.StringDict,
+            config: dict[str, str],
         ) -> None:
             """Create trace using flext-observability."""
             # Map to actual flext_create_trace API parameters
@@ -142,30 +152,30 @@ class FlextQualityHandlers:
         # Return the created report
         return FlextResult[QualityReport].ok(report)
 
-    def run_linting(self, project_id: UUID) -> FlextResult[FlextTypes.Dict]:
+    def run_linting(self, project_id: UUID) -> FlextResult[dict[str, object]]:
         """Handle linting command."""
         # Return placeholder result since linting service is not implemented
-        linting_data: FlextTypes.Dict = {
+        linting_data: dict[str, object] = {
             "project_id": str(project_id),
             "status": "placeholder_implementation",
             "issues": [],
         }
 
-        return FlextResult[FlextTypes.Dict].ok(linting_data)
+        return FlextResult[dict[str, object]].ok(linting_data)
 
     def run_security_check(
         self,
         project_id: UUID,
-    ) -> FlextResult[FlextTypes.Dict]:
+    ) -> FlextResult[dict[str, object]]:
         """Handle security check command."""
         # Return placeholder result since security service is not implemented
-        security_data: FlextTypes.Dict = {
+        security_data: dict[str, object] = {
             "project_id": str(project_id),
             "status": "placeholder_implementation",
             "vulnerabilities": [],
         }
 
-        return FlextResult[FlextTypes.Dict].ok(security_data)
+        return FlextResult[dict[str, object]].ok(security_data)
 
 
 # Backward compatibility aliases - following flext-cli pattern

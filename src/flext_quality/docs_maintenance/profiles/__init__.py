@@ -4,16 +4,19 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from importlib import import_module
+from types import ModuleType
 from typing import Any
 
+_ADVANCED_MODULE = "flext_quality.docs_maintenance.profiles.advanced"
+
 PROFILE_ALIASES: dict[str, str] = {
-    "advanced": "flext_quality.docs_maintenance.profiles.advanced",
-    "grpc": "flext_quality.docs_maintenance.profiles.grpc",
-    "default": "flext_quality.docs_maintenance.profiles.advanced",
+    "advanced": _ADVANCED_MODULE,
+    "default": _ADVANCED_MODULE,
+    "grpc": _ADVANCED_MODULE,  # Backward compatibility for legacy envs
 }
 
 
-def get_profile_module(profile: str) -> Any:
+def get_profile_module(profile: str) -> ModuleType:
     """Return the module implementing a maintenance profile."""
     module_path = PROFILE_ALIASES.get(profile, profile)
     return import_module(module_path)

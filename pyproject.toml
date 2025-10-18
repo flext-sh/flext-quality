@@ -20,6 +20,8 @@
         "pydantic-settings (>=2.10.1)",
         "pyright (>=1.1.406)",
         "mypy (>=1.18.2)",
+        "typer (>=0.12.3)",
+        "rich (>=13.9.2)",
     ]
     description = "FLEXT Quality - Code Quality Analysis and Metrics"
     keywords = [
@@ -51,6 +53,7 @@
 
     [project.scripts]
         flext-quality = "flext_quality.cli:main"
+        flext-docs = "flext_quality.docs_maintenance.cli:main"
 
 [tool.bandit]
     exclude_dirs = [
@@ -84,13 +87,10 @@
         "tests",
     ]
 
-
-        # SubConfig: Disable unknown-name error for models.py
-        # This handles forward references to classes defined later in the same file
-        [[tool.pyrefly.sub-config]]
-            matches = "**/models.py"
-            [tool.pyrefly.sub-config.errors]
-                unknown-name = false
+[[tool.pyrefly.sub-config]]
+    matches = "**/models.py"
+    [tool.pyrefly.sub-config.errors]
+        unknown-name = false
 [tool.ruff]
     extend = "../ruff-shared.toml"
 
@@ -160,15 +160,15 @@
             develop = true
             path    = "../flext-core"
 
-                [tool.poetry.dependencies.flext-observability]
+        [tool.poetry.dependencies.flext-observability]
             develop = true
             path    = "../flext-observability"
 
-                        [tool.poetry.dependencies.flext-web]
+        [tool.poetry.dependencies.flext-web]
             develop = true
             path    = "../flext-web"
 
-                                [tool.poetry.dependencies.flext-cli]
+        [tool.poetry.dependencies.flext-cli]
             develop = true
             path    = "../flext-cli"
 

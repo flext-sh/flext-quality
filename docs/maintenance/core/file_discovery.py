@@ -5,11 +5,10 @@ Finds, categorizes, and filters documentation files in a project.
 """
 
 import fnmatch
+import logging
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import ClassVar
-
-from flext_core import FlextTypes
 
 from .base_classes import FileMetadata
 
@@ -70,8 +69,8 @@ class DocumentationFinder:
     def __init__(
         self,
         project_root: Path,
-        patterns: FlextTypes.StringList | None = None,
-        ignore_patterns: FlextTypes.StringList | None = None,
+        patterns: list[str] | None = None,
+        ignore_patterns: list[str] | None = None,
         ignore_file: str | None = None,
     ) -> None:
         """Initialize the documentation finder.
@@ -117,10 +116,11 @@ class DocumentationFinder:
                                 # Add /** for directory patterns
                                 line = f"{line}/**"
                             self.ignore_patterns.append(line)
-            except Exception:
+            except Exception as e:
                 # If we can't read the ignore file, just continue silently
                 # This is acceptable as ignore files are optional
-                pass
+                logger = logging.getLogger(__name__)
+                logger.debug(f"Could not read ignore file {self.ignore_file}: {e}")
 
     def find_files(self, *, use_cache: bool = True) -> list[Path]:
         """Find all documentation files in the project.
@@ -146,10 +146,11 @@ class DocumentationFinder:
                     for match in matches
                     if match.is_file() and not self._is_ignored(match)
                 )
-            except Exception:
+            except Exception as e:
                 # Skip patterns that cause errors during glob matching
                 # This prevents crashes from malformed glob patterns
-                pass
+                logger = logging.getLogger(__name__)
+                logger.debug(f"Error during glob matching for pattern '{pattern}': {e}")
 
         # Remove duplicates while preserving order
         seen = set()
@@ -206,7 +207,7 @@ class DocumentationFinder:
         all_files = self.find_files()
         return [f for f in all_files if f.name.lower().startswith("readme")]
 
-    def find_by_extension(self, extensions: FlextTypes.StringList) -> list[Path]:
+    def find_by_extension(self, extensions: list[str]) -> list[Path]:
         """Find files by their extensions."""
         all_files = self.find_files()
         extensions = [ext.lower().lstrip(".") for ext in extensions]

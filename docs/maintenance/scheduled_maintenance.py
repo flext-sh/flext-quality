@@ -7,6 +7,7 @@ optimizations, and reporting. Designed to run as a cron job or scheduled task.
 
 import argparse
 import json
+import subprocess
 import sys
 import time
 from datetime import UTC, datetime
@@ -14,7 +15,6 @@ from pathlib import Path
 
 import schedule
 import yaml
-from flext_core import FlextTypes
 
 
 class ScheduledMaintenance:
@@ -23,6 +23,12 @@ class ScheduledMaintenance:
     def __init__(
         self, config_path: str = "docs/maintenance/config/schedule_config.yaml"
     ) -> None:
+        """Initialize scheduled maintenance system.
+
+        Args:
+            config_path: Path to configuration file for maintenance schedule.
+
+        """
         self.load_config(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.reports_dir = Path(
@@ -172,7 +178,7 @@ class ScheduledMaintenance:
         """Run monthly deep cleaning maintenance."""
         return self.run_tasks(self.config["schedules"]["monthly_deep_clean"]["tasks"])
 
-    def run_tasks(self, task_names: FlextTypes.StringList) -> bool:
+    def run_tasks(self, task_names: list[str]) -> bool:
         """Run a list of maintenance tasks."""
         success = True
 
@@ -193,11 +199,9 @@ class ScheduledMaintenance:
 
     def run_single_task(self, task_config: dict) -> bool:
         """Run a single maintenance task."""
-        import subprocess
-
         try:
             # Change to project root directory
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S602
                 task_config["command"],
                 check=False,
                 shell=True,

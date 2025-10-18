@@ -7,7 +7,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Self
 
-from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
+from flext_core import FlextLogger, FlextResult, FlextService
 
 
 @dataclass(slots=True)
@@ -50,7 +50,7 @@ class FlextScriptService(FlextService[object], ABC):
         """Hook used by subclasses to ensure prerequisites are satisfied."""
         return FlextResult[None].ok(None)
 
-    def run(self: Self, args: FlextTypes.Dict | None = None) -> FlextResult[object]:
+    def run(self: Self, args: dict[str, object] | None = None) -> FlextResult[object]:
         """Execute the script with validation and error handling."""
         validation = self.validate_preconditions()
         if validation.is_failure:
@@ -74,7 +74,7 @@ class FlextScriptService(FlextService[object], ABC):
     @abstractmethod
     def execute_implementation(
         self,
-        args: FlextTypes.Dict,
+        args: dict[str, object],
     ) -> FlextResult[object]:
         """Execute the script logic."""
 

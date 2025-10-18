@@ -27,7 +27,6 @@ import json
 import sys
 from pathlib import Path
 
-from flext_core import FlextTypes
 from rich.console import Console
 
 from flext_quality import (
@@ -56,7 +55,7 @@ def format_number(num: float | str) -> str:
     return str(num)
 
 
-def _display_project_overview(analyzed_files: FlextTypes.StringList) -> None:
+def _display_project_overview(analyzed_files: list[str]) -> None:
     """Display project overview with file listing."""
     print_section("📈 Project Overview")
 

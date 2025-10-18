@@ -12,12 +12,13 @@ from __future__ import annotations
 from .models import FlextQualityModels
 
 # Re-export classes from FlextQualityModels for backward compatibility
-FileAnalysisResult = FlextQualityModels.FileAnalysisResult
-CodeIssue = FlextQualityModels.CodeIssue
-ComplexityIssue = FlextQualityModels.ComplexityIssue
-SecurityIssue = FlextQualityModels.SecurityIssue
-DeadCodeIssue = FlextQualityModels.DeadCodeIssue
-DuplicationIssue = FlextQualityModels.DuplicationIssue
+# Note: Many classes consolidated into fewer using mixins and composition
+FileAnalysisResult = FlextQualityModels.AnalysisResults  # Consolidated
+CodeIssue = FlextQualityModels.IssueModel  # Consolidated
+ComplexityIssue = FlextQualityModels.IssueModel  # Consolidated
+SecurityIssue = FlextQualityModels.IssueModel  # Consolidated
+DeadCodeIssue = FlextQualityModels.IssueModel  # Consolidated
+DuplicationIssue = FlextQualityModels.IssueModel  # Consolidated
 Dependency = FlextQualityModels.Dependency
 TestResults = FlextQualityModels.TestResults
 OverallMetrics = FlextQualityModels.OverallMetrics
@@ -28,16 +29,17 @@ AnalysisResults = FlextQualityModels.AnalysisResults
 class FlextQualityAnalysisTypes:
     """Backward compatibility class - all models moved to FlextQualityModels."""
 
-    FileAnalysisResult = FileAnalysisResult
-    CodeIssue = CodeIssue
-    ComplexityIssue = ComplexityIssue
-    SecurityIssue = SecurityIssue
-    DeadCodeIssue = DeadCodeIssue
-    DuplicationIssue = DuplicationIssue
-    Dependency = Dependency
-    TestResults = TestResults
-    OverallMetrics = OverallMetrics
-    AnalysisResults = AnalysisResults
+    # Consolidated models for backward compatibility
+    FileAnalysisResult = FlextQualityModels.AnalysisResults
+    CodeIssue = FlextQualityModels.IssueModel
+    ComplexityIssue = FlextQualityModels.IssueModel
+    SecurityIssue = FlextQualityModels.IssueModel
+    DeadCodeIssue = FlextQualityModels.IssueModel
+    DuplicationIssue = FlextQualityModels.IssueModel
+    Dependency = FlextQualityModels.Dependency
+    TestResults = FlextQualityModels.TestResults
+    OverallMetrics = FlextQualityModels.OverallMetrics
+    AnalysisResults = FlextQualityModels.AnalysisResults
 
 
 # Export all classes

@@ -19,9 +19,13 @@ from flext_quality.docs_maintenance.utils import get_maintenance_dir, get_projec
 from .audit import DocumentationAuditor
 from .optimize import ContentOptimizer
 from .report import ReportGenerator
-from .sync import DocumentationSync
 from .validate_links import LinkValidator
 from .validate_style import StyleValidator
+
+try:  # Optional synchronization capability
+    from .sync import DocumentationSync
+except Exception:  # pragma: no cover - optional dependency
+    DocumentationSync = None  # type: ignore[assignment]
 
 # Constants for maintenance effectiveness calculation
 EXCELLENT_QUALITY_THRESHOLD = 90
@@ -299,6 +303,10 @@ class DocumentationMaintainer:
         start_time = time.time()
 
         try:
+            if DocumentationSync is None:
+                msg = "Synchronization module is unavailable in this environment"
+                raise RuntimeError(msg)
+
             sync_manager = DocumentationSync(self.config_path)
 
             # Get pending changes

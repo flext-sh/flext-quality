@@ -20,13 +20,18 @@ from pathlib import Path
 
 import requests
 import yaml
-from flext_core import FlextTypes
 
 
 class DocumentationAuditor:
     """Main documentation audit and quality assurance system."""
 
     def __init__(self, config_path: str = "docs/maintenance/config/") -> None:
+        """Initialize documentation audit system.
+
+        Args:
+            config_path: Path to configuration directory for audit rules.
+
+        """
         self.config_path = Path(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.load_config()
@@ -210,7 +215,7 @@ class DocumentationAuditor:
         for file_path in doc_files:
             try:
                 # Get file modification time
-                mtime = datetime.fromtimestamp(file_path.stat().st_mtime)
+                mtime = datetime.fromtimestamp(file_path.stat().st_mtime, tz=UTC)
 
                 if mtime < cutoff_date:
                     age_days = (datetime.now(UTC) - mtime).days
@@ -238,7 +243,7 @@ class DocumentationAuditor:
                     "error": str(e),
                 })
 
-    def _check_outdated_indicators(self, content: str) -> FlextTypes.StringList:
+    def _check_outdated_indicators(self, content: str) -> list[str]:
         """Check for indicators of outdated content."""
         indicators = []
 
@@ -327,8 +332,8 @@ class DocumentationAuditor:
                 })
 
     def _check_required_sections(
-        self, content: str, required_sections: FlextTypes.StringList
-    ) -> FlextTypes.StringList:
+        self, content: str, required_sections: list[str]
+    ) -> list[str]:
         """Check for required sections in documentation."""
         missing = []
 
@@ -398,7 +403,7 @@ class DocumentationAuditor:
                     "error": str(e),
                 })
 
-    def _check_markdown_formatting(self, content: str) -> FlextTypes.StringList:
+    def _check_markdown_formatting(self, content: str) -> list[str]:
         """Check for markdown formatting issues."""
         issues = []
 
@@ -462,7 +467,7 @@ class DocumentationAuditor:
 
         return issues
 
-    def _check_heading_hierarchy(self, content: str) -> FlextTypes.StringList:
+    def _check_heading_hierarchy(self, content: str) -> list[str]:
         """Check heading hierarchy for logical structure."""
         # Extract heading levels
         headings = re.findall(r"^(#+)\s+(.+)$", content, re.MULTILINE)
@@ -745,12 +750,20 @@ class DocumentationAuditor:
         self.results["recommendations"] = recommendations
 
     def generate_report(
-        self, format: str = "json", output_path: str | None = None
+        self,
+        output_format: str = "json",
+        output_path: str | None = None,  # noqa: ARG002
     ) -> str:
-        """Generate audit report in specified format."""
-        if format == "json":
+        """Generate audit report in specified format.
+
+        Args:
+            output_format: Format for the report ('json', 'html', 'summary').
+            output_path: Unused parameter for future extensibility.
+
+        """
+        if output_format == "json":
             return json.dumps(self.results, indent=2, default=str)
-        if format == "html":
+        if output_format == "html":
             return self._generate_html_report()
         return json.dumps(self.results, default=str)
 
@@ -853,17 +866,19 @@ class DocumentationAuditor:
         return "#dc3545"  # Red
 
     def save_report(
-        self, format: str = "json", output_path: str = "docs/maintenance/reports/"
-    ):
+        self,
+        output_format: str = "json",
+        output_path: str = "docs/maintenance/reports/",
+    ) -> str:
         """Save audit report to file."""
         output_dir = Path(output_path)
         output_dir.mkdir(parents=True, exist_ok=True)
 
         timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
-        filename = f"audit_report_{timestamp}.{format}"
+        filename = f"audit_report_{timestamp}.{output_format}"
         filepath = output_dir / filename
 
-        report_content = self.generate_report(format)
+        report_content = self.generate_report(output_format)
         filepath.write_text(report_content, encoding="utf-8")
 
         print(f"📄 Report saved to: {filepath}")

@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextContainer, FlextTypes
+from flext_core import FlextContainer
 
 
 class TestDIContainer:
@@ -40,7 +40,7 @@ class TestDIContainer:
 
         # Register a quality analysis service (mock)
         class MockQualityAnalyzer:
-            def analyze(self, code: str, /) -> FlextTypes.Dict:
+            def analyze(self, code: str, /) -> dict[str, object]:
                 return {"quality_score": 85, "issues": [], "analyzed_code": code}
 
         analyzer = MockQualityAnalyzer()

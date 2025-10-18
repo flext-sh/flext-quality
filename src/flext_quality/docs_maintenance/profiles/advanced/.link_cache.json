@@ -1,0 +1,552 @@
+{
+  "https://github.com/flext/flext/issues": {
+    "url": "https://github.com/flext/flext/issues",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0141847133636475,
+    "last_checked": 1760739370.4177666,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://img.shields.io/badge/Maintenance-automated-blue.svg": {
+    "url": "https://img.shields.io/badge/Maintenance-automated-blue.svg",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0010085105895996,
+    "last_checked": 1760739372.4203434,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://img.shields.io/badge/Coverage-comprehensive-orange.svg": {
+    "url": "https://img.shields.io/badge/Coverage-comprehensive-orange.svg",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0007107257843018,
+    "last_checked": 1760739372.4209976,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://img.shields.io/badge/Quality-monitored-green.svg": {
+    "url": "https://img.shields.io/badge/Quality-monitored-green.svg",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0014584064483643,
+    "last_checked": 1760739372.421114,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://www.markdownguide.org/": {
+    "url": "https://www.markdownguide.org/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.001215696334839,
+    "last_checked": 1760739374.4327514,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://github.github.com/gfm/": {
+    "url": "https://github.github.com/gfm/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0010170936584473,
+    "last_checked": 1760739374.432899,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://www.w3.org/WAI/WCAG21/quickref/": {
+    "url": "https://www.w3.org/WAI/WCAG21/quickref/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.000737428665161,
+    "last_checked": 1760739374.4329693,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://arc42.org/": {
+    "url": "https://arc42.org/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0011839866638184,
+    "last_checked": 1760739376.4449553,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html": {
+    "url": "https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0010085105895996,
+    "last_checked": 1760739376.4451003,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://martinfowler.com/bliki/DomainDrivenDesign.html": {
+    "url": "https://martinfowler.com/bliki/DomainDrivenDesign.html",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0008695125579834,
+    "last_checked": 1760739376.4451818,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://fsharpforfunandprofit.com/rop/": {
+    "url": "https://fsharpforfunandprofit.com/rop/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0009124279022217,
+    "last_checked": 1760739376.4454944,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://docs.python.org/3/library/typing.html": {
+    "url": "https://docs.python.org/3/library/typing.html",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.001349925994873,
+    "last_checked": 1760739378.4519756,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://github.com/flext-sh/flext-core": {
+    "url": "https://github.com/flext-sh/flext-core",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0011167526245117,
+    "last_checked": 1760739378.4520357,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "http://www.plantuml.com/plantuml/uml/": {
+    "url": "http://www.plantuml.com/plantuml/uml/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.000997304916382,
+    "last_checked": 1760739380.4548326,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://github.com/flext/flext-core/issues": {
+    "url": "https://github.com/flext/flext-core/issues",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.00116229057312,
+    "last_checked": 1760739382.4637141,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://github.com/flext/flext-core/discussions": {
+    "url": "https://github.com/flext/flext-core/discussions",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0009100437164307,
+    "last_checked": 1760739382.4637854,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://github.com/flext/flext-ldif/issues": {
+    "url": "https://github.com/flext/flext-ldif/issues",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.001265525817871,
+    "last_checked": 1760739384.466622,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://github.com/flext/flext-ldif/discussions": {
+    "url": "https://github.com/flext/flext-ldif/discussions",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0010528564453125,
+    "last_checked": 1760739384.4667003,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://img.shields.io/badge/docs-organized-blue.svg": {
+    "url": "https://img.shields.io/badge/docs-organized-blue.svg",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0014097690582275,
+    "last_checked": 1760739386.4702325,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://img.shields.io/badge/status-production--ready-brightgreen.svg": {
+    "url": "https://img.shields.io/badge/status-production--ready-brightgreen.svg",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0032148361206055,
+    "last_checked": 1760739386.4715168,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://img.shields.io/badge/python-3.13+-blue.svg": {
+    "url": "https://img.shields.io/badge/python-3.13+-blue.svg",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0046768188476562,
+    "last_checked": 1760739386.4724693,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://img.shields.io/badge/http-foundation-green.svg": {
+    "url": "https://img.shields.io/badge/http-foundation-green.svg",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.004380226135254,
+    "last_checked": 1760739386.4729261,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://docs.pydantic.dev/2.0/": {
+    "url": "https://docs.pydantic.dev/2.0/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0010225772857666,
+    "last_checked": 1760739388.4759874,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://github.com/flext/flext/discussions": {
+    "url": "https://github.com/flext/flext/discussions",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0016157627105713,
+    "last_checked": 1760739390.4787023,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://docs.pytest.org/": {
+    "url": "https://docs.pytest.org/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.001455068588257,
+    "last_checked": 1760739392.4846044,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://coverage.readthedocs.io/": {
+    "url": "https://coverage.readthedocs.io/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.001141309738159,
+    "last_checked": 1760739392.4846656,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://docs.flext.dev": {
+    "url": "https://docs.flext.dev",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.017531156539917,
+    "last_checked": 1760739882.851627,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://github.com/flext/flext-ldap/issues": {
+    "url": "https://github.com/flext/flext-ldap/issues",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0190722942352295,
+    "last_checked": 1760739882.8519862,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://github.com/flext-sh/flext/discussions": {
+    "url": "https://github.com/flext-sh/flext/discussions",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0010063648223877,
+    "last_checked": 1760739884.857252,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://github.com/flext-sh/flext/issues": {
+    "url": "https://github.com/flext-sh/flext/issues",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.001209020614624,
+    "last_checked": 1760739884.8571146,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://domainlanguage.com/ddd/": {
+    "url": "https://domainlanguage.com/ddd/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0018577575683594,
+    "last_checked": 1760739886.863686,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://www.oreilly.com/library/view/software-architecture-patterns/9781491971437/": {
+    "url": "https://www.oreilly.com/library/view/software-architecture-patterns/9781491971437/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0016930103302,
+    "last_checked": 1760739886.8637893,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://github.com/lyz-code/CleanArchitecture": {
+    "url": "https://github.com/lyz-code/CleanArchitecture",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 2.0013959407806396,
+    "last_checked": 1760739886.863849,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://plantuml.com/": {
+    "url": "https://plantuml.com/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.0141761302947998,
+    "last_checked": 1760739897.522953,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://c4model.com/": {
+    "url": "https://c4model.com/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.0163905620574951,
+    "last_checked": 1760739897.5234196,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://adr.github.io/": {
+    "url": "https://adr.github.io/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.0157699584960938,
+    "last_checked": 1760739897.5240288,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://alistair.cockburn.us/hexagonal-architecture/": {
+    "url": "https://alistair.cockburn.us/hexagonal-architecture/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.0008118152618408,
+    "last_checked": 1760739898.5266066,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://en.wikipedia.org/wiki/Dependency_inversion_principle": {
+    "url": "https://en.wikipedia.org/wiki/Dependency_inversion_principle",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.0008296966552734,
+    "last_checked": 1760739898.5269802,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://grpc.io/docs/languages/python/generated-code/": {
+    "url": "https://grpc.io/docs/languages/python/generated-code/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.000746250152588,
+    "last_checked": 1760739899.5287924,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://developers.google.com/protocol-buffers/docs/pythontutorial": {
+    "url": "https://developers.google.com/protocol-buffers/docs/pythontutorial",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.000760555267334,
+    "last_checked": 1760739899.529231,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://docs.docker.com/develop/dev-best-practices/": {
+    "url": "https://docs.docker.com/develop/dev-best-practices/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.0009112358093262,
+    "last_checked": 1760739899.5296881,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://semver.org/": {
+    "url": "https://semver.org/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.000598669052124,
+    "last_checked": 1760739899.5297492,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://iso.org/standard/35733.html": {
+    "url": "https://iso.org/standard/35733.html",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.014786958694458,
+    "last_checked": 1760739916.0987628,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://docs.python.org/3.13/whatsnew/3.13.html": {
+    "url": "https://docs.python.org/3.13/whatsnew/3.13.html",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.001053810119629,
+    "last_checked": 1760739917.1016705,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://docs.meltano.com/": {
+    "url": "https://docs.meltano.com/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.001952886581421,
+    "last_checked": 1760739917.1029584,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://github.com/singer-io/getting-started": {
+    "url": "https://github.com/singer-io/getting-started",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.002500295639038,
+    "last_checked": 1760739917.1038187,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://fsharpforfunandprofit.com/posts/recipe-part2/": {
+    "url": "https://fsharpforfunandprofit.com/posts/recipe-part2/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.0026204586029053,
+    "last_checked": 1760739917.1046388,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://docs.pydantic.dev/latest/": {
+    "url": "https://docs.pydantic.dev/latest/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.0041096210479736,
+    "last_checked": 1760739917.105747,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://docs.meltano.com/concepts/pipelines": {
+    "url": "https://docs.meltano.com/concepts/pipelines",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.0010943412780762,
+    "last_checked": 1760739918.1094453,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md#replication": {
+    "url": "https://github.com/singer-io/getting-started/blob/master/docs/SPEC.md#replication",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.000786304473877,
+    "last_checked": 1760739918.1095462,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://docs.oracle.com/en/cloud/saas/supply-chain-management/wms-api/": {
+    "url": "https://docs.oracle.com/en/cloud/saas/supply-chain-management/wms-api/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.0006463527679443,
+    "last_checked": 1760739918.1097887,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://www.oreilly.com/library/view/data-pipeline-design/9781492085708/": {
+    "url": "https://www.oreilly.com/library/view/data-pipeline-design/9781492085708/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.0005309581756592,
+    "last_checked": 1760739918.1102607,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://prometheus.io/docs/introduction/overview/": {
+    "url": "https://prometheus.io/docs/introduction/overview/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.0006070137023926,
+    "last_checked": 1760739919.11175,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://grafana.com/docs/grafana/latest/": {
+    "url": "https://grafana.com/docs/grafana/latest/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.0005807876586914,
+    "last_checked": 1760739919.1120589,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://landing.google.com/sre/sre-book/chapters/monitoring-distributed-systems/": {
+    "url": "https://landing.google.com/sre/sre-book/chapters/monitoring-distributed-systems/",
+    "status": "error",
+    "status_code": null,
+    "error_message": "<urlopen error [Errno -3] Temporary failure in name resolution>",
+    "response_time": 1.000539779663086,
+    "last_checked": 1760739919.1122487,
+    "content_type": null,
+    "redirect_url": null
+  }
+}

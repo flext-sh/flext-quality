@@ -17,7 +17,6 @@ from typing import TypedDict
 import yaml
 from flext_core import (
     FlextConstants,
-    FlextTypes,
 )
 
 from flext_quality.docs_maintenance.utils import (
@@ -98,7 +97,7 @@ class OptimizationSummary:
     optimizations_by_type: dict[str, int]
     files_modified: int
     errors_encountered: int
-    backup_files_created: FlextTypes.StringList
+    backup_files_created: list[str]
 
 
 class ContentOptimizer:
@@ -306,9 +305,7 @@ class ContentOptimizer:
 
         return "\n".join(lines), optimizations
 
-    def _detect_code_language(
-        self, lines: FlextTypes.StringList, start_index: int
-    ) -> str | None:
+    def _detect_code_language(self, lines: list[str], start_index: int) -> str | None:
         """Detect programming language from code block content."""
         # Look at the next few lines for language clues
         for i in range(start_index + 1, min(start_index + 10, len(lines))):

@@ -10,7 +10,6 @@ from __future__ import annotations
 from unittest.mock import MagicMock, patch
 
 from flask import Flask
-from flext_core import FlextTypes
 
 from flext_quality import FlextQualityWebInterface as QualityWebInterface, main
 
@@ -227,7 +226,7 @@ class TestQualityWebInterface:
 
         # Mock for error response - jsonify returns tuple for error cases
         def jsonify_side_effect(
-            data: FlextTypes.Dict | str,
+            data: dict[str, object] | str,
             *_: object,
         ) -> str:
             if "error" in data:

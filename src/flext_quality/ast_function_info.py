@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextModels, FlextTypes
+from flext_core import FlextModels
 
 
 class FlextQualityASTFunctionInfo(FlextModels.StrictArbitraryTypesModel):
@@ -26,7 +26,7 @@ class FlextQualityASTFunctionInfo(FlextModels.StrictArbitraryTypesModel):
         package_name: str
         line_number: int
         end_line_number: int
-        decorators: FlextTypes.StringList
+        decorators: list[str]
         is_generator: bool
         is_method: bool
         is_property: bool

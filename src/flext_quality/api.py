@@ -24,6 +24,7 @@ from flext_core import (
 )
 
 from .analyzer import CodeAnalyzer
+from .entities import FlextQualityEntities
 from .models import FlextQualityModels
 from .services import FlextQualityServices
 from .value_objects import FlextIssueSeverity, FlextIssueType
@@ -91,7 +92,7 @@ class FlextQuality(FlextService[None]):
         min_coverage: float = 95.0,
         max_complexity: int = 10,
         max_duplication: float = 5.0,
-    ) -> FlextResult[FlextQualityModels.Project]:
+    ) -> FlextResult[FlextQualityEntities.Project]:
         """Create a new quality project."""
         return self.project_service.create_project(
             name=name,
@@ -123,7 +124,7 @@ class FlextQuality(FlextService[None]):
     def update_project(
         self,
         _project_id: UUID,
-        _updates: FlextTypes.Dict,
+        _updates: dict[str, object],
     ) -> FlextResult[FlextQualityModels.Project]:
         """Update a project."""
         return FlextResult[FlextQualityModels.Project].fail(
@@ -382,8 +383,11 @@ class FlextQuality(FlextService[None]):
         analyzer = CodeAnalyzer(project_path)
         analysis_result = analyzer.analyze_project()
 
-        # analysis_result is now AnalysisResults directly, not FlextResult
-        analysis_results: FlextQualityModels.AnalysisResults = analysis_result
+        # Handle FlextResult from analyzer
+        if analysis_result.is_failure:
+            return FlextResult.fail(f"Analysis failed: {analysis_result.error}")
+
+        analysis_results: FlextQualityModels.AnalysisResults = analysis_result.value
 
         # Update with real metrics from analysis
         # Note: analysis_results is a Pydantic model

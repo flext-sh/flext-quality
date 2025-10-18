@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Self
 from uuid import uuid4
 
-from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
+from flext_core import FlextLogger, FlextResult, FlextService
 
 
 class BackupManager(FlextService[str]):
@@ -29,7 +29,7 @@ class BackupManager(FlextService[str]):
         """Initialize manager with in-memory catalogue."""
         super().__init__()
         self._logger = FlextLogger(__name__)
-        self._catalogue: dict[str, FlextTypes.StringDict] = {}
+        self._catalogue: dict[str, dict[str, str]] = {}
 
     def execute(self: Self) -> FlextResult[str]:
         """Satisfy :class:`FlextService` contract."""
@@ -72,9 +72,9 @@ class BackupManager(FlextService[str]):
         self._logger.info("Backup restore requested: %s", backup_key)
         return FlextResult[None].ok(None)
 
-    def list_backups(self: Self) -> FlextResult[FlextTypes.StringList]:
+    def list_backups(self: Self) -> FlextResult[list[str]]:
         """List known backup identifiers."""
-        return FlextResult[FlextTypes.StringList].ok(list(self._catalogue.keys()))
+        return FlextResult[list[str]].ok(list(self._catalogue.keys()))
 
     @staticmethod
     def _resolve_path(path: str | Path) -> Path:

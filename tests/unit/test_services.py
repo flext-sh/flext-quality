@@ -14,7 +14,6 @@ from __future__ import annotations
 import uuid
 
 import pytest
-from flext_core import FlextTypes
 from tests.conftest import (
     assert_result_failure_with_error,
     assert_result_success_with_data,
@@ -147,7 +146,7 @@ class TestQualityProjectServiceComprehensive:
         project = assert_result_success_with_data(create_result)
 
         # Update it
-        updates: FlextTypes.Dict = {
+        updates: dict[str, object] = {
             "language": "javascript",
         }
         result = service.update_project(str(project.id), updates)

@@ -10,36 +10,36 @@ import json
 from pathlib import Path
 from typing import Self
 
-from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
+from flext_core import FlextLogger, FlextResult, FlextService
 
 
-class ConfigurationManager(FlextService[FlextTypes.StringDict]):
+class ConfigurationManager(FlextService[dict[str, str]]):
     """Provide lightweight configuration storage for automation scripts."""
 
     def __init__(self: Self, config_path: str | Path | None = None) -> None:
         super().__init__()
         self._logger = FlextLogger(__name__)
         self._config_path = Path(config_path).expanduser() if config_path else None
-        self._config: FlextTypes.StringDict = {}
+        self._config: dict[str, str] = {}
 
-    def execute(self: Self) -> FlextResult[FlextTypes.StringDict]:
+    def execute(self: Self) -> FlextResult[dict[str, str]]:
         """Return the current configuration snapshot."""
-        return FlextResult[FlextTypes.StringDict].ok(self._config)
+        return FlextResult[dict[str, str]].ok(self._config)
 
-    def load_config(self) -> FlextResult[FlextTypes.StringDict]:
+    def load_config(self) -> FlextResult[dict[str, str]]:
         """Load configuration from disk if a path is configured."""
         if not self._config_path:
-            return FlextResult[FlextTypes.StringDict].ok(self._config)
+            return FlextResult[dict[str, str]].ok(self._config)
 
         try:
             if self._config_path.exists():
                 with self._config_path.open(encoding="utf-8") as handle:
                     raw_data = json.load(handle)
                     self._config = {key: str(value) for key, value in raw_data.items()}
-            return FlextResult[FlextTypes.StringDict].ok(self._config)
+            return FlextResult[dict[str, str]].ok(self._config)
         except (OSError, json.JSONDecodeError) as error:
             self._logger.exception("Failed to load configuration")
-            return FlextResult[FlextTypes.StringDict].fail(
+            return FlextResult[dict[str, str]].fail(
                 f"Failed to load configuration: {error}"
             )
 

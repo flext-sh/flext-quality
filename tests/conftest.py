@@ -19,7 +19,7 @@ from typing import TypeVar
 
 import pytest
 from django.test.utils import setup_test_environment, teardown_test_environment
-from flext_core import FlextResult, FlextTypes
+from flext_core import FlextResult
 
 T = TypeVar("T")
 
@@ -152,7 +152,7 @@ def secure_temp_dir() -> Generator[str]:
 
 
 @pytest.fixture
-def sample_code_repository(tmp_path: Path) -> FlextTypes.Dict:
+def sample_code_repository(tmp_path: Path) -> dict[str, object]:
     """Provide sample code repository metadata for quality analysis testing.
 
     Creates realistic repository metadata that simulates typical project
@@ -192,7 +192,7 @@ def sample_code_repository(tmp_path: Path) -> FlextTypes.Dict:
 
 
 @pytest.fixture
-def quality_metrics_data() -> FlextTypes.Dict:
+def quality_metrics_data() -> dict[str, object]:
     """Quality metrics data for testing."""
     return {
         "complexity": {
@@ -219,7 +219,7 @@ def quality_metrics_data() -> FlextTypes.Dict:
 
 
 @pytest.fixture
-def code_analysis_config() -> FlextTypes.Dict:
+def code_analysis_config() -> dict[str, object]:
     """Code analysis configuration for testing."""
     return {
         "analyzers": {
@@ -248,7 +248,7 @@ def code_analysis_config() -> FlextTypes.Dict:
 
 
 @pytest.fixture
-def analysis_results() -> list[FlextTypes.Dict]:
+def analysis_results() -> list[dict[str, object]]:
     """Analysis results for testing."""
     return [
         {
@@ -283,7 +283,7 @@ def analysis_results() -> list[FlextTypes.Dict]:
 
 # Report generation fixtures
 @pytest.fixture
-def report_config(tmp_path: Path) -> FlextTypes.Dict:
+def report_config(tmp_path: Path) -> dict[str, object]:
     """Report configuration for testing."""
     return {
         "format": "json",
@@ -295,7 +295,7 @@ def report_config(tmp_path: Path) -> FlextTypes.Dict:
 
 
 @pytest.fixture
-def dashboard_data() -> FlextTypes.Dict:
+def dashboard_data() -> dict[str, object]:
     """Dashboard data for testing."""
     return {
         "summary": {
@@ -319,7 +319,7 @@ def dashboard_data() -> FlextTypes.Dict:
 
 # Multi-backend fixtures
 @pytest.fixture
-def sonarqube_config() -> FlextTypes.Dict:
+def sonarqube_config() -> dict[str, object]:
     """SonarQube configuration for testing."""
     return {
         "host": "http://localhost:9000",
@@ -331,7 +331,7 @@ def sonarqube_config() -> FlextTypes.Dict:
 
 
 @pytest.fixture
-def codeclimate_config() -> FlextTypes.Dict:
+def codeclimate_config() -> dict[str, object]:
     """CodeClimate configuration for testing."""
     return {
         "api_token": "test-api-token",
@@ -411,7 +411,7 @@ def test_main() -> None:
 
 # Package discovery fixtures
 @pytest.fixture
-def package_metadata() -> FlextTypes.Dict:
+def package_metadata() -> dict[str, object]:
     """Package metadata for testing."""
     return {
         "name": "test-package",
@@ -433,7 +433,7 @@ def package_metadata() -> FlextTypes.Dict:
 
 # Task management fixtures
 @pytest.fixture
-def celery_config() -> FlextTypes.Dict:
+def celery_config() -> dict[str, object]:
     """Celery configuration for testing."""
     return {
         "broker_url": "redis://localhost:6379/0",
@@ -447,7 +447,7 @@ def celery_config() -> FlextTypes.Dict:
 
 
 @pytest.fixture
-def analysis_task_data() -> FlextTypes.Dict:
+def analysis_task_data() -> dict[str, object]:
     """Analysis task data for testing."""
     return {
         "task_id": "test-task-123",
@@ -534,9 +534,9 @@ def mock_quality_analyzer() -> object:
         def __init__(self) -> None:
             """Initialize the instance."""
             super().__init__()
-            self.analyzed_files: FlextTypes.StringList = []
+            self.analyzed_files: list[str] = []
 
-        def analyze_project(self, project_path: str) -> FlextTypes.Dict:
+        def analyze_project(self, project_path: str) -> dict[str, object]:
             """Simulate comprehensive project analysis.
 
             Args:
@@ -554,7 +554,7 @@ def mock_quality_analyzer() -> object:
                 "analysis_time": 2.5,
             }
 
-        def analyze_file(self, file_path: str) -> FlextTypes.Dict:
+        def analyze_file(self, file_path: str) -> dict[str, object]:
             """Simulate individual file analysis.
 
             Args:
@@ -571,7 +571,7 @@ def mock_quality_analyzer() -> object:
                 "coverage": 90.0,
             }
 
-        def get_metrics(self, _project_path: str) -> FlextTypes.Dict:
+        def get_metrics(self, _project_path: str) -> dict[str, object]:
             """Simulate project-wide quality metrics collection.
 
             Args:
@@ -629,11 +629,11 @@ def mock_report_generator() -> object:
         def __init__(self) -> None:
             """Initialize the instance."""
             super().__init__()
-            self.generated_reports: list[FlextTypes.Dict] = []
+            self.generated_reports: list[dict[str, object]] = []
 
         def generate_report(
             self,
-            data: FlextTypes.Dict,
+            data: dict[str, object],
             output_format: str = "json",
         ) -> str:
             """Simulate report generation in specified format.
@@ -646,7 +646,7 @@ def mock_report_generator() -> object:
                 Generated report filename
 
             """
-            report: FlextTypes.Dict = {
+            report: dict[str, object] = {
                 "format": output_format,
                 "data": data,
                 "timestamp": "2023-01-01T12:00:00Z",
@@ -654,7 +654,7 @@ def mock_report_generator() -> object:
             self.generated_reports.append(report)
             return f"report_{len(self.generated_reports)}.{output_format}"
 
-        def generate_dashboard_data(self) -> FlextTypes.Dict:
+        def generate_dashboard_data(self) -> dict[str, object]:
             """Simulate dashboard data generation.
 
             Returns:

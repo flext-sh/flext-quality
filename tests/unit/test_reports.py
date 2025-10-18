@@ -10,7 +10,6 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from flext_core import FlextTypes
 
 from flext_quality import (
     HIGH_ISSUE_THRESHOLD,
@@ -343,10 +342,10 @@ class TestQualityReport:
     ) -> None:
         """Test that text report truncates long issue lists."""
         # Cast to mutable dict[str, object] and modify results to have many style issues
-        poor_dict: FlextTypes.Dict = dict[str, object](poor_results)
+        poor_dict: dict[str, object] = dict[str, object](poor_results)
         issues_obj = poor_dict["issues"]
         assert isinstance(issues_obj, dict)
-        issues_dict: FlextTypes.Dict = dict[str, object](issues_obj)
+        issues_dict: dict[str, object] = dict[str, object](issues_obj)
         issues_dict["style"] = [
             {"file": f"file{i}.py", "message": f"Issue {i}"}
             for i in range(ISSUE_PREVIEW_LIMIT + 3)
@@ -432,7 +431,7 @@ class TestQualityReport:
     def test_generate_html_report_colors(self) -> None:
         """Test HTML report includes proper grade colors."""
         # Test A grade (green)
-        good_results: FlextTypes.Dict = {
+        good_results: dict[str, object] = {
             "issues": {},
             "metrics": {"files_analyzed": 5, "coverage_percent": 95.0},
         }
@@ -539,7 +538,7 @@ class TestQualityReport:
 
     def test_generate_recommendations_low_coverage(self) -> None:
         """Test recommendations for low coverage."""
-        low_coverage_results: FlextTypes.Dict = {
+        low_coverage_results: dict[str, object] = {
             "issues": {},
             "metrics": {"files_analyzed": 10, "coverage_percent": 60.0},
         }
@@ -658,7 +657,7 @@ class TestQualityReport:
 
     def test_edge_case_empty_metrics(self) -> None:
         """Test handling of empty or missing metrics."""
-        empty_results: FlextTypes.Dict = {"issues": {}}  # No metrics section
+        empty_results: dict[str, object] = {"issues": {}}  # No metrics section
 
         report = QualityReport(empty_results)
 

@@ -20,7 +20,7 @@ from fastapi.responses import HTMLResponse
 # Domain library imports (ZERO TOLERANCE - NO direct FastAPI imports)
 try:
     from flext_auth import FlextAuth, FlextAuthJwtProvider
-except ImportError:
+except Exception:  # Catch all import issues, not just ImportError
     # Mock classes for when flext_auth is not available
     class FlextAuth:
         pass
@@ -30,7 +30,7 @@ except ImportError:
             pass
 
 
-from flext_core import FlextContainer, FlextLogger, FlextResult, FlextTypes
+from flext_core import FlextContainer, FlextLogger, FlextResult
 
 from .analyzer import CodeAnalyzer
 from .api import FlextQuality
@@ -45,7 +45,7 @@ class WebAuthMiddleware:
     def __init__(
         self,
         auth_provider: object,
-        exclude_paths: FlextTypes.StringList | None = None,
+        exclude_paths: list[str] | None = None,
     ) -> None:
         self.auth_provider = auth_provider
         self.exclude_paths = exclude_paths or []
@@ -112,7 +112,7 @@ class FlextQualityWeb:
         """Setup authentication using flext-auth with JWT provider."""
         try:
             # Create auth config dict[str, object] for JWT provider
-            auth_config: FlextTypes.Dict = {
+            auth_config: dict[str, object] = {
                 "secret_key": self._quality_config.project_name + "-secret-key",
                 "algorithm": "HS256",
                 "token_expiry_minutes": 60,
@@ -253,7 +253,7 @@ class FlextQualityWeb:
       </html>
       """
 
-    async def analyze_project(self, request: Request) -> FlextTypes.Dict:
+    async def analyze_project(self, request: Request) -> dict[str, object]:
         """Analyze a project and return results (FastAPI endpoint).
 
         Requires authentication via WebAuthMiddleware.
@@ -271,7 +271,16 @@ class FlextQualityWeb:
         # Create analyzer for the specific path
         try:
             analyzer = CodeAnalyzer(Path(project_path))
-            result = analyzer.analyze_project()
+            analysis_result = analyzer.analyze_project()
+
+            if analysis_result.is_failure:
+                raise HTTPException(
+                    status_code=500, detail=f"Analysis failed: {analysis_result.error}"
+                )
+
+            result = analysis_result.value
+        except HTTPException:
+            raise  # Re-raise HTTP exceptions
         except Exception as e:
             self.logger.exception("Analysis failed")
             raise HTTPException(status_code=500, detail=f"Analysis failed: {e}") from e
@@ -299,7 +308,7 @@ class FlextQualityWeb:
             },
         }
 
-    def get_metrics(self) -> FlextTypes.Dict:
+    def get_metrics(self) -> dict[str, object]:
         """Get quality metrics (FastAPI endpoint).
 
         Requires authentication via WebAuthMiddleware.
@@ -307,7 +316,7 @@ class FlextQualityWeb:
         # Use simple placeholder metrics for now
         return {"success": True, "data": {}}
 
-    def get_report(self, report_format: str) -> FlextTypes.Dict:
+    def get_report(self, report_format: str) -> dict[str, object]:
         """Generate and return quality report (FastAPI endpoint).
 
         Args:

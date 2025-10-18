@@ -11,7 +11,7 @@ Consolidates dependency scripts:
 
 from __future__ import annotations
 
-from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
+from flext_core import FlextLogger, FlextResult, FlextService
 from pydantic import ConfigDict
 
 from flext_quality.models import FlextQualityModels
@@ -56,7 +56,7 @@ class FlextQualityDependencyTools(FlextService[None]):
             workspace_path: str,
             *,
             dry_run: bool = True,
-        ) -> FlextResult[FlextTypes.Dict]:
+        ) -> FlextResult[dict[str, object]]:
             """Consolidate workspace dependencies.
 
             Args:
@@ -71,13 +71,13 @@ class FlextQualityDependencyTools(FlextService[None]):
 
             if dry_run:
                 logger.info(f"DRY RUN: Would consolidate deps in {workspace_path}")
-                return FlextResult[FlextTypes.Dict].ok({
+                return FlextResult[dict[str, object]].ok({
                     "consolidated": False,
                     "dry_run": True,
                 })
 
             logger.info(f"Consolidating dependencies in {workspace_path}")
-            return FlextResult[FlextTypes.Dict].ok({"consolidated": True})
+            return FlextResult[dict[str, object]].ok({"consolidated": True})
 
     class PoetryOperations:
         """Poetry-specific operations."""
@@ -85,7 +85,7 @@ class FlextQualityDependencyTools(FlextService[None]):
         @staticmethod
         def sync_poetry_lock(
             project_path: str,
-        ) -> FlextResult[FlextTypes.Dict]:
+        ) -> FlextResult[dict[str, object]]:
             """Sync poetry.lock files.
 
             Args:
@@ -99,7 +99,7 @@ class FlextQualityDependencyTools(FlextService[None]):
             logger.info(f"Syncing poetry.lock for {project_path}")
 
             # Placeholder implementation - would run poetry lock
-            return FlextResult[FlextTypes.Dict].ok({"synced": True})
+            return FlextResult[dict[str, object]].ok({"synced": True})
 
     def __init__(self) -> None:
         """Initialize dependency tools service."""

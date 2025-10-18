@@ -11,7 +11,7 @@ Consolidates architecture scripts:
 
 from __future__ import annotations
 
-from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
+from flext_core import FlextLogger, FlextResult, FlextService
 from pydantic import ConfigDict
 
 from flext_quality.models import FlextQualityModels
@@ -62,7 +62,7 @@ class FlextQualityArchitectureTools(FlextService[None]):
             project_path: str,
             *,
             dry_run: bool = True,
-        ) -> FlextResult[FlextTypes.Dict]:
+        ) -> FlextResult[dict[str, object]]:
             """Enforce architectural patterns.
 
             Args:
@@ -77,13 +77,13 @@ class FlextQualityArchitectureTools(FlextService[None]):
 
             if dry_run:
                 logger.info(f"DRY RUN: Would enforce patterns in {project_path}")
-                return FlextResult[FlextTypes.Dict].ok({
+                return FlextResult[dict[str, object]].ok({
                     "enforced": False,
                     "dry_run": True,
                 })
 
             logger.info(f"Enforcing patterns in {project_path}")
-            return FlextResult[FlextTypes.Dict].ok({"enforced": True})
+            return FlextResult[dict[str, object]].ok({"enforced": True})
 
     class ImportTester:
         """Cross-project import testing."""
@@ -91,7 +91,7 @@ class FlextQualityArchitectureTools(FlextService[None]):
         @staticmethod
         def test_cross_project_imports(
             workspace_path: str,
-        ) -> FlextResult[FlextTypes.Dict]:
+        ) -> FlextResult[dict[str, object]]:
             """Test cross-project imports.
 
             Args:
@@ -104,7 +104,7 @@ class FlextQualityArchitectureTools(FlextService[None]):
             logger = FlextLogger(__name__)
             logger.info(f"Testing cross-project imports in {workspace_path}")
 
-            return FlextResult[FlextTypes.Dict].ok({
+            return FlextResult[dict[str, object]].ok({
                 "passed": True,
                 "errors": [],
             })

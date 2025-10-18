@@ -14,7 +14,7 @@ from typing import ClassVar, Self
 
 from flext_cli import FlextCli
 from flext_cli.output import FlextCliOutput
-from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes
+from flext_core import FlextLogger, FlextResult, FlextService
 
 
 class FlextQualityToolsUtilities(FlextService[None]):
@@ -93,17 +93,11 @@ class FlextQualityToolsUtilities(FlextService[None]):
 
             try:
                 output = FlextCliOutput()
-                style = FlextQualityToolsUtilities.Colors._ansi_to_style(color)
-                if style:
-                    print_result = output.print_message(message, style=style)
-                elif color:
-                    # Fallback to ANSI codes if style mapping unavailable
-                    colored_message = FlextQualityToolsUtilities.Colors.colorize(
-                        message, color
-                    )
-                    print_result = output.print_message(colored_message)
-                else:
-                    print_result = output.print_message(message)
+                # Use fallback to ANSI codes instead of accessing private method
+                colored_message = FlextQualityToolsUtilities.Colors.colorize(
+                    message, color
+                )
+                print_result = output.print_message(colored_message)
 
                 if print_result.is_failure:
                     return FlextResult[None].fail(
@@ -132,7 +126,7 @@ class FlextQualityToolsUtilities(FlextService[None]):
         """Path utilities for workspace navigation and file operations."""
 
         # Ignore patterns (common directories/files to skip)
-        IGNORE_PATTERNS: ClassVar[FlextTypes.StringList] = [
+        IGNORE_PATTERNS: ClassVar[list[str]] = [
             "__pycache__",
             ".git",
             ".venv",
@@ -202,7 +196,7 @@ class FlextQualityToolsUtilities(FlextService[None]):
         @staticmethod
         def find_python_files(
             root: str | Path,
-            exclude_patterns: FlextTypes.StringList | None = None,
+            exclude_patterns: list[str] | None = None,
         ) -> list[Path]:
             """Find all Python files in directory tree.
 
@@ -231,7 +225,7 @@ class FlextQualityToolsUtilities(FlextService[None]):
         """Standard library module detection."""
 
         @staticmethod
-        def get_stdlib_modules() -> FlextTypes.StringList:
+        def get_stdlib_modules() -> list[str]:
             """Get list of Python standard library modules.
 
             Returns:
@@ -372,7 +366,7 @@ def should_ignore_path(path: str | Path) -> bool:
     return FlextQualityToolsUtilities.Paths.should_ignore_path(path)
 
 
-def get_stdlib_modules() -> FlextTypes.StringList:
+def get_stdlib_modules() -> list[str]:
     """Convenience function for get_stdlib_modules.
 
     Returns:

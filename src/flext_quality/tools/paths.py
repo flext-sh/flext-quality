@@ -8,7 +8,7 @@ from typing import Self
 from flext_core import FlextLogger, FlextResult, FlextService
 
 
-class FlextPathService(FlextService[None]):
+class FlextPathService(FlextService[Path]):
     """Expose convenience helpers mirroring the historical flext_tools API."""
 
     class _ValidationHelper:

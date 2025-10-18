@@ -14,7 +14,6 @@ from typing import override
 from unittest.mock import patch
 
 import pytest
-from flext_core import FlextTypes
 
 from flext_quality import ASTBackend, BackendType, BaseAnalyzer, ExternalBackend
 
@@ -51,7 +50,7 @@ class TestBaseAnalyzer:
                 self,
                 code: str,
                 file_path: Path | None = None,
-            ) -> FlextTypes.Dict:
+            ) -> dict[str, object]:
                 """Implement abstract method."""
                 return {"analyzed": True, "code": code}
 
@@ -61,7 +60,7 @@ class TestBaseAnalyzer:
                 return BackendType.HYBRID
 
             @override
-            def get_capabilities(self) -> FlextTypes.StringList:
+            def get_capabilities(self) -> list[str]:
                 """Implement abstract method."""
                 return ["test", "mock"]
 

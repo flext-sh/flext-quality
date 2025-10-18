@@ -12,7 +12,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
-from flext_core import FlextTypes
 
 
 class StyleValidator:
@@ -28,6 +27,12 @@ class StyleValidator:
     def __init__(
         self, config_path: str = "docs/maintenance/config/style_guide.yaml"
     ) -> None:
+        """Initialize style validator with configuration.
+
+        Args:
+            config_path: Path to style guide configuration file
+
+        """
         self.load_config(config_path)
         self.results = {
             "files_checked": 0,
@@ -361,7 +366,7 @@ class StyleValidator:
 
         return violations
 
-    def _generate_suggestions(self, violations: list[dict]) -> FlextTypes.StringList:
+    def _generate_suggestions(self, violations: list[dict]) -> list[str]:
         """Generate improvement suggestions based on violations."""
         suggestions = []
 
@@ -490,7 +495,7 @@ def validate_file_style(
 
 
 def validate_files_style(
-    file_paths: FlextTypes.StringList, config_path: str | None = None
+    file_paths: list[str], config_path: str | None = None
 ) -> dict[str, object]:
     """Convenience function to validate multiple files."""
     validator = StyleValidator(config_path)

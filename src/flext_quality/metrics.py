@@ -257,7 +257,7 @@ class QualityMetrics(FlextModels.Value):
     @classmethod
     def from_analysis_results(
         cls,
-        results: FlextQualityModels.AnalysisResults | FlextTypes.Dict,
+        results: FlextQualityModels.AnalysisResults | dict[str, object],
     ) -> QualityMetrics:
         """Create QualityMetrics from FlextQualityModels.AnalysisResults using modern API only.
 
@@ -299,13 +299,13 @@ class QualityMetrics(FlextModels.Value):
     @classmethod
     def _from_analysis_results_dict(
         cls,
-        results: FlextTypes.Dict,
+        results: dict[str, object],
     ) -> QualityMetrics:
         """Create QualityMetrics from legacy dict[str, object] format for test compatibility."""
 
         # Extract basic metrics from dict[str, object] with proper type checking
         def get_int_from_dict(
-            source: FlextTypes.Dict, key: str, default: int = 0
+            source: dict[str, object], key: str, default: int = 0
         ) -> int:
             """Extract integer value with proper type checking."""
             value = source.get(key, default)
@@ -316,7 +316,7 @@ class QualityMetrics(FlextModels.Value):
             return default
 
         metrics_raw = results.get("metrics", {})
-        metrics: FlextTypes.Dict = cast("FlextTypes.Dict", metrics_raw)
+        metrics: dict[str, object] = cast("dict[str, object]", metrics_raw)
         if isinstance(metrics, dict):
             files_analyzed = get_int_from_dict(metrics, "total_files", 0)
             total_lines_of_code = get_int_from_dict(metrics, "total_lines_of_code", 0)
@@ -331,7 +331,7 @@ class QualityMetrics(FlextModels.Value):
 
         # Extract issue counts from nested dict[str, object] structure
         issues_raw = results.get("issues", {})
-        issues: FlextTypes.Dict = cast("FlextTypes.Dict", issues_raw)
+        issues: dict[str, object] = cast("dict[str, object]", issues_raw)
         if isinstance(issues, dict):
             security_list = cast("list[object]", issues.get("security", []))
             complexity_list = cast("list[object]", issues.get("complexity", []))
@@ -552,7 +552,7 @@ class QualityMetrics(FlextModels.Value):
         *,
         by_alias: bool = False,
         exclude_none: bool = False,
-    ) -> FlextTypes.Dict:
+    ) -> dict[str, object]:
         """Export metrics as dictionary for serialization and integration.
 
         Converts the immutable metrics object to a dictionary format suitable
@@ -571,7 +571,7 @@ class QualityMetrics(FlextModels.Value):
             computed fields for comprehensive data export.
 
         """
-        base: FlextTypes.Dict = {
+        base: dict[str, object] = {
             "overall_score": self.overall_score,
             "quality_grade": self.quality_grade,
             "total_files": self.total_files,

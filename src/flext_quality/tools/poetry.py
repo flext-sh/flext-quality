@@ -13,6 +13,7 @@ class PoetryOperations(FlextService[str]):
     """Execute simple Poetry commands with FlextResult wrapping."""
 
     def __init__(self: Self) -> None:
+        """Initialize the PoetryOperations service."""
         super().__init__()
 
     def execute(self: Self) -> FlextResult[str]:
@@ -33,9 +34,9 @@ class PoetryOperations(FlextService[str]):
         lock_file = project / "poetry.lock"
         return FlextResult[bool].ok(lock_file.exists())
 
-    def get_outdated_packages(self: Self) -> FlextResult[FlextTypes.StringList]:
+    def get_outdated_packages(self: Self) -> FlextResult[list[str]]:
         """Placeholder: poetry export of outdated packages is not yet implemented."""
-        return FlextResult[FlextTypes.StringList].ok([])
+        return FlextResult[list[str]].ok([])
 
     @staticmethod
     def _run_poetry(
@@ -74,6 +75,7 @@ class PoetryValidator(FlextService[FlextTypes.BoolDict]):
     """Validate ``pyproject.toml`` structure for basic sanity checks."""
 
     def __init__(self: Self) -> None:
+        """Initialize the PoetryValidator service."""
         super().__init__()
 
     def execute(self: Self) -> FlextResult[FlextTypes.BoolDict]:
@@ -129,25 +131,25 @@ class PoetryValidator(FlextService[FlextTypes.BoolDict]):
         lock_path = project / "poetry.lock"
         return FlextResult[bool].ok(lock_path.exists())
 
-    def get_dependency_issues(self: Self) -> FlextResult[FlextTypes.StringList]:
+    def get_dependency_issues(self: Self) -> FlextResult[list[str]]:
         """Placeholder that keeps interface compatibility."""
-        return FlextResult[FlextTypes.StringList].ok([])
+        return FlextResult[list[str]].ok([])
 
     def check_dependencies(
         self,
         project_path: str | Path,
-    ) -> FlextResult[FlextTypes.Dict]:
+    ) -> FlextResult[dict[str, object]]:
         """Return a coarse dependency summary."""
         validation = self.validate_pyproject(project_path)
         if validation.is_failure:
-            return FlextResult[FlextTypes.Dict].fail(
+            return FlextResult[dict[str, object]].fail(
                 validation.error or "Dependency check failed"
             )
 
         project = Path(project_path).expanduser()
         pyproject = project / "pyproject.toml"
 
-        summary: FlextTypes.Dict = {
+        summary: dict[str, object] = {
             "project_path": str(project),
             "pyproject_exists": validation.value["pyproject_exists"],
             "dependencies_valid": validation.value["dependencies_defined"],
@@ -157,13 +159,13 @@ class PoetryValidator(FlextService[FlextTypes.BoolDict]):
         }
 
         if not pyproject.exists():
-            return FlextResult[FlextTypes.Dict].ok(summary)
+            return FlextResult[dict[str, object]].ok(summary)
 
         try:
             with pyproject.open("rb") as handle:
                 data = tomllib.load(handle)
         except (OSError, tomllib.TOMLDecodeError) as error:
-            return FlextResult[FlextTypes.Dict].fail(
+            return FlextResult[dict[str, object]].fail(
                 f"Failed to read pyproject.toml: {error}"
             )
 
@@ -177,7 +179,7 @@ class PoetryValidator(FlextService[FlextTypes.BoolDict]):
         summary["dev_dependencies_valid"] = bool(dev_dependencies)
         summary["dev_dependency_count"] = len(dev_dependencies)
 
-        return FlextResult[FlextTypes.Dict].ok(summary)
+        return FlextResult[dict[str, object]].ok(summary)
 
 
 __all__ = ["PoetryOperations", "PoetryValidator"]

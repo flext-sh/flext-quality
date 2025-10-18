@@ -15,7 +15,6 @@ import tempfile
 from pathlib import Path
 
 import pytest
-from flext_core import FlextTypes
 
 from flext_quality import CodeAnalyzer
 
@@ -53,7 +52,7 @@ class DataProcessor:
       self.threshold = threshold
       self.processed_count = 0
 
-    def process_items(self, items: FlextTypes.List) -> FlextTypes.List:
+    def process_items(self, items: list[object]) -> list[object]:
       """Process list of items."""
 
       results = []
@@ -147,11 +146,15 @@ def multiply(x: int, y: int) -> int:
         assert hasattr(results.overall_metrics, "total_lines")
 
         # Verify basic metrics
-        assert results.overall_metrics.files_analyzed == 2  # __init__.py and utils.py (main.py failed to parse)
+        assert (
+            results.overall_metrics.files_analyzed == 2
+        )  # __init__.py and utils.py (main.py failed to parse)
         assert results.overall_metrics.total_lines > 0
 
         # Verify file metrics
-        assert len(results.file_metrics) == 2  # main.py failed to parse, so only 2 files analyzed
+        assert (
+            len(results.file_metrics) == 2
+        )  # main.py failed to parse, so only 2 files analyzed
 
         # Check that expected files are found (main.py should be missing due to syntax error)
         file_names = [f.file_path.name for f in results.file_metrics]
@@ -172,7 +175,9 @@ def multiply(x: int, y: int) -> int:
         )
 
         assert hasattr(results_all, "overall_metrics")
-        assert results_all.overall_metrics.files_analyzed == 2  # main.py failed to parse
+        assert (
+            results_all.overall_metrics.files_analyzed == 2
+        )  # main.py failed to parse
 
         # Test with some options disabled
         results_minimal = analyzer.analyze_project(
@@ -183,7 +188,9 @@ def multiply(x: int, y: int) -> int:
         )
 
         assert hasattr(results_minimal, "overall_metrics")
-        assert results_minimal.overall_metrics.files_analyzed == 2  # main.py failed to parse
+        assert (
+            results_minimal.overall_metrics.files_analyzed == 2
+        )  # main.py failed to parse
 
     def test_find_python_files_method(self, sample_project_dir: Path) -> None:
         """Test _find_python_files method."""
@@ -263,7 +270,7 @@ def multiply(x: int, y: int) -> int:
         ]
 
         # Cast to expected type to handle list invariance
-        file_metrics_typed: list[FlextTypes.Dict] = file_metrics
+        file_metrics_typed: list[dict[str, object]] = file_metrics
         overall_metrics = analyzer._calculate_overall_metrics(file_metrics_typed)
 
         assert isinstance(overall_metrics, dict)

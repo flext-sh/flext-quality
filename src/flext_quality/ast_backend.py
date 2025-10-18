@@ -11,7 +11,7 @@ import ast
 from pathlib import Path
 from typing import override
 
-from flext_core import FlextContainer, FlextLogger, FlextTypes
+from flext_core import FlextContainer, FlextLogger
 
 from .ast_class_info import FlextQualityASTClassInfo
 from .ast_function_info import FlextQualityASTFunctionInfo
@@ -42,19 +42,19 @@ class FlextQualityASTBackend(BaseAnalyzer):
             self.current_function: FlextQualityASTFunctionInfo.FunctionInfo | None = (
                 None
             )
-            self.scope_stack: FlextTypes.StringList = []
+            self.scope_stack: list[str] = []
 
             # Results - using strongly typed models
             self.classes: list[FlextQualityASTClassInfo.ClassInfo] = []
             self.functions: list[FlextQualityASTFunctionInfo.FunctionInfo] = []
             self.variables: list[
-                FlextTypes.Dict
+                dict[str, object]
             ] = []  # Keeping as generic dict[str, object] with object values
             self.imports: list[
-                FlextTypes.Dict
+                dict[str, object]
             ] = []  # Keeping as generic dict[str, object] with object values
             self.constants: list[
-                FlextTypes.Dict
+                dict[str, object]
             ] = []  # Keeping as generic dict[str, object] with object values
 
             # Context tracking
@@ -147,14 +147,14 @@ class FlextQualityASTBackend(BaseAnalyzer):
         def _extract_base_classes(
             self,
             node: ast.ClassDef,
-        ) -> FlextTypes.StringList:
+        ) -> list[str]:
             """Extract base class names."""
             return [self._get_name_from_node(base) for base in node.bases]
 
         def _analyze_class_decorators(
             self,
             node: ast.ClassDef,
-        ) -> tuple[FlextTypes.StringList, bool, bool]:
+        ) -> tuple[list[str], bool, bool]:
             """Analyze class decorators."""
             decorators = [self._get_name_from_node(dec) for dec in node.decorator_list]
             is_dataclass: bool = any("dataclass" in dec for dec in decorators)
@@ -278,12 +278,12 @@ class FlextQualityASTBackend(BaseAnalyzer):
         return BackendType.AST
 
     @override
-    def get_capabilities(self: object) -> FlextTypes.StringList:
+    def get_capabilities(self: object) -> list[str]:
         """Return the capabilities of this backend."""
         return ["complexity", "functions", "classes", "imports", "docstrings"]
 
     @override
-    def analyze(self, _code: str, file_path: Path | None = None) -> FlextTypes.Dict:
+    def analyze(self, _code: str, file_path: Path | None = None) -> dict[str, object]:
         """Analyze Python code using AST.
 
         Args:
@@ -294,7 +294,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
             Dictionary with analysis results
 
         """
-        result: FlextTypes.Dict = {}
+        result: dict[str, object] = {}
 
         if file_path:
             result["file_path"] = str(file_path)
@@ -318,12 +318,12 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
         return result
 
-    def _extract_functions(self, tree: ast.AST) -> list[FlextTypes.Dict]:
+    def _extract_functions(self, tree: ast.AST) -> list[dict[str, object]]:
         """Extract function information from AST."""
-        functions: list[FlextTypes.Dict] = []
+        functions: list[dict[str, object]] = []
         for node in ast.walk(tree):
             if isinstance(node, ast.FunctionDef):
-                func_info: FlextTypes.Dict = {
+                func_info: dict[str, object] = {
                     "name": node.name,
                     "args": len(node.args.args),
                     "lineno": node.lineno,
@@ -332,14 +332,14 @@ class FlextQualityASTBackend(BaseAnalyzer):
                 functions.append(func_info)
         return functions
 
-    def _extract_classes(self, tree: ast.AST) -> list[FlextTypes.Dict]:
+    def _extract_classes(self, tree: ast.AST) -> list[dict[str, object]]:
         """Extract class information from AST."""
-        classes: list[FlextTypes.Dict] = []
+        classes: list[dict[str, object]] = []
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
                 # Count methods
                 sum(1 for item in node.body if isinstance(item, ast.FunctionDef))
-                class_info: FlextTypes.Dict = {
+                class_info: dict[str, object] = {
                     "name": node.name,
                     "methods": "methods",
                     "lineno": node.lineno,
@@ -363,9 +363,9 @@ class FlextQualityASTBackend(BaseAnalyzer):
                 complexity += 1
         return complexity
 
-    def _extract_imports(self, tree: ast.AST) -> list[FlextTypes.Dict]:
+    def _extract_imports(self, tree: ast.AST) -> list[dict[str, object]]:
         """Extract import information."""
-        imports: list[FlextTypes.Dict] = []
+        imports: list[dict[str, object]] = []
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
                 imports.extend(
@@ -380,7 +380,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
                 )
         return imports
 
-    def _check_docstrings(self, tree: ast.AST) -> FlextTypes.StringList:
+    def _check_docstrings(self, tree: ast.AST) -> list[str]:
         """Check for missing docstrings."""
         return [
             node.name

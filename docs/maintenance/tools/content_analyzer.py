@@ -5,12 +5,13 @@ Advanced content quality analysis including readability assessment,
 completeness checking, and structural validation for documentation.
 """
 
+import json
 import re
 from collections import Counter
+from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
-from flext_core import FlextTypes
 
 from flext_quality.typings import FlextQualityTypes
 
@@ -18,9 +19,29 @@ from flext_quality.typings import FlextQualityTypes
 class ContentAnalyzer:
     """Advanced content quality analysis system."""
 
+    # Quality thresholds and constants
+    EXCELLENT_READABILITY_MIN = 90
+    GOOD_READABILITY_MIN = 80
+    FAIRLY_EASY_READABILITY_MIN = 70
+    STANDARD_READABILITY_MIN = 60
+    FAIRLY_DIFFICULT_READABILITY_MIN = 50
+    DIFFICULT_READABILITY_MIN = 30
+
+    MIN_WORD_COUNT = 100
+    MIN_READABILITY_SCORE = 60
+    MAX_AGE_DAYS = 90
+    MIN_HEADINGS_FOR_TOC = 3
+    MIN_ARGS_REQUIRED = 2
+
     def __init__(
         self, config_path: str = "docs/maintenance/config/audit_rules.yaml"
     ) -> None:
+        """Initialize content analyzer with configuration.
+
+        Args:
+            config_path: Path to configuration file for content analysis rules.
+
+        """
         self.load_config(config_path)
         self.results = {
             "files_analyzed": 0,
@@ -115,7 +136,7 @@ class ContentAnalyzer:
         code_lines = len([
             line for line in lines if line.strip().startswith(("```", "    ", "\t"))
         ])
-        empty_lines = len([line for line in lines if line.strip() == ""])
+        empty_lines = len([line for line in lines if not line.strip()])
 
         # Heading analysis
         headings = re.findall(r"^#{1,6}\s+.+", content, re.MULTILINE)
@@ -187,17 +208,17 @@ class ContentAnalyzer:
         )
 
         # Determine readability level
-        if reading_ease >= 90:
+        if reading_ease >= self.EXCELLENT_READABILITY_MIN:
             level = "Very Easy"
-        elif reading_ease >= 80:
+        elif reading_ease >= self.GOOD_READABILITY_MIN:
             level = "Easy"
-        elif reading_ease >= 70:
+        elif reading_ease >= self.FAIRLY_EASY_READABILITY_MIN:
             level = "Fairly Easy"
-        elif reading_ease >= 60:
+        elif reading_ease >= self.STANDARD_READABILITY_MIN:
             level = "Standard"
-        elif reading_ease >= 50:
+        elif reading_ease >= self.FAIRLY_DIFFICULT_READABILITY_MIN:
             level = "Fairly Difficult"
-        elif reading_ease >= 30:
+        elif reading_ease >= self.DIFFICULT_READABILITY_MIN:
             level = "Difficult"
         else:
             level = "Very Difficult"
@@ -351,7 +372,7 @@ class ContentAnalyzer:
         return completeness
 
     def _check_required_sections(
-        self, content: str, required_sections: FlextTypes.StringList
+        self, content: str, required_sections: list[str]
     ) -> FlextQualityTypes.Core.AnalysisDict:
         """Check for required sections in content."""
         result = {"required_sections_present": [], "missing_required_sections": []}
@@ -392,12 +413,14 @@ class ContentAnalyzer:
         score -= (100 - completeness["score"]) * 0.5
 
         # Readability score
-        if readability["readability_score"] < 60:
-            penalty = (60 - readability["readability_score"]) * 0.3
+        if readability["readability_score"] < self.MIN_READABILITY_SCORE:
+            penalty = (
+                self.MIN_READABILITY_SCORE - readability["readability_score"]
+            ) * 0.3
             score -= min(penalty, 20)
 
         # Content metrics
-        if metrics["word_count"] < 100:
+        if metrics["word_count"] < self.MIN_WORD_COUNT:
             score -= 10
 
         if metrics["heading_count"] == 0:
@@ -435,7 +458,10 @@ class ContentAnalyzer:
             })
 
         # Readability issues
-        if analysis["readability"]["readability_score"] < 50:
+        if (
+            analysis["readability"]["readability_score"]
+            < self.FAIRLY_DIFFICULT_READABILITY_MIN
+        ):
             issues.append({
                 "type": "poor_readability",
                 "severity": "medium",
@@ -459,9 +485,7 @@ class ContentAnalyzer:
 
         return issues
 
-    def _generate_suggestions(
-        self, analysis: dict[str, object]
-    ) -> FlextTypes.StringList:
+    def _generate_suggestions(self, analysis: dict[str, object]) -> list[str]:
         """Generate improvement suggestions based on analysis."""
         suggestions = []
 
@@ -469,17 +493,20 @@ class ContentAnalyzer:
         readability = analysis["readability"]
         structure = analysis["structure"]
 
-        if metrics["word_count"] < 200:
+        if metrics["word_count"] < 2 * self.MIN_WORD_COUNT:
             suggestions.append(
                 "Expand content with more detailed explanations and examples"
             )
 
-        if readability["readability_score"] < 60:
+        if readability["readability_score"] < self.MIN_READABILITY_SCORE:
             suggestions.append(
                 "Simplify language and sentence structure for better readability"
             )
 
-        if not structure["has_table_of_contents"] and metrics["heading_count"] > 3:
+        if (
+            not structure["has_table_of_contents"]
+            and metrics["heading_count"] > self.MIN_HEADINGS_FOR_TOC
+        ):
             suggestions.append("Add a table of contents for better navigation")
 
         if metrics["code_block_count"] == 0 and "tutorial" in analysis["file"].lower():
@@ -511,7 +538,7 @@ class ContentAnalyzer:
             self.results["content_scores"]
         )
 
-        if avg_score < 70:
+        if avg_score < self.GOOD_READABILITY_MIN:
             self.results["recommendations"].append({
                 "priority": "high",
                 "type": "overall_quality",
@@ -547,13 +574,11 @@ class ContentAnalyzer:
                     ],
                 })
 
-    def generate_report(self, format: str = "json") -> str:
+    def generate_report(self, output_format: str = "json") -> str:
         """Generate content analysis report."""
-        import json
-
-        if format == "json":
+        if output_format == "json":
             return json.dumps(self.results, indent=2, default=str)
-        if format == "summary":
+        if output_format == "summary":
             return self._generate_summary_report()
         return json.dumps(self.results, default=str)
 
@@ -573,10 +598,10 @@ Files Analyzed: {self.results["files_analyzed"]}
 Average Quality Score: {avg_score:.1f}/100
 
 Score Distribution:
-- Excellent (90-100): {len([s for s in scores if s >= 90])}
-- Good (70-89): {len([s for s in scores if 70 <= s < 90])}
-- Needs Improvement (50-69): {len([s for s in scores if 50 <= s < 70])}
-- Poor (<50): {len([s for s in scores if s < 50])}
+- Excellent ({self.EXCELLENT_READABILITY_MIN}-100): {len([s for s in scores if s >= self.EXCELLENT_READABILITY_MIN])}
+- Good ({self.GOOD_READABILITY_MIN}-{self.EXCELLENT_READABILITY_MIN - 1}): {len([s for s in scores if self.GOOD_READABILITY_MIN <= s < self.EXCELLENT_READABILITY_MIN])}
+- Needs Improvement ({self.FAIRLY_DIFFICULT_READABILITY_MIN}-{self.GOOD_READABILITY_MIN - 1}): {len([s for s in scores if self.FAIRLY_DIFFICULT_READABILITY_MIN <= s < self.GOOD_READABILITY_MIN])}
+- Poor (<{self.FAIRLY_DIFFICULT_READABILITY_MIN}): {len([s for s in scores if s < self.FAIRLY_DIFFICULT_READABILITY_MIN])}
 
 Top Recommendations:
 """
@@ -590,23 +615,26 @@ Top Recommendations:
 
         return report
 
-    def save_report(self, output_path: str = "docs/maintenance/reports/"):
-        """Save content analysis report."""
-        import os
-        from datetime import UTC, datetime
+    def save_report(self, output_path: str = "docs/maintenance/reports/") -> str:
+        """Save content analysis report.
 
+        Args:
+            output_path: Directory path where to save the report.
+
+        Returns:
+            File path of the saved report.
+
+        """
         Path(output_path).mkdir(exist_ok=True, parents=True)
 
         timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         filename = f"content_analysis_{timestamp}.json"
-        filepath = os.path.join(output_path, filename)
+        filepath = Path(output_path) / filename
 
         with Path(filepath).open("w", encoding="utf-8") as f:
-            import json
-
             json.dump(self.results, f, indent=2, default=str)
 
-        return filepath
+        return str(filepath)
 
 
 def analyze_file_content(
@@ -618,7 +646,7 @@ def analyze_file_content(
 
 
 def analyze_files_content(
-    file_paths: FlextTypes.StringList, config_path: str | None = None
+    file_paths: list[str], config_path: str | None = None
 ) -> dict[str, object]:
     """Convenience function to analyze multiple files."""
     analyzer = ContentAnalyzer(config_path)
@@ -630,18 +658,18 @@ if __name__ == "__main__":
     # Example usage
     import sys
 
-    if len(sys.argv) < 2:
+    if len(sys.argv) < 2:  # Require at least file path argument  # noqa: PLR2004
         sys.exit(1)
 
     file_path = sys.argv[1]
-    config_path = sys.argv[2] if len(sys.argv) > 2 else None
+    config_path = sys.argv[2] if len(sys.argv) > 2 else None  # noqa: PLR2004
 
     results = analyze_file_content(file_path, config_path)
 
     if results["issues"]:
-        for _issue in results["issues"][:2]:
+        for _issue in results["issues"][:2]:  # Show first 2 issues
             pass
 
     if results["suggestions"]:
-        for _suggestion in results["suggestions"][:2]:
+        for _suggestion in results["suggestions"][:2]:  # Show first 2 suggestions
             pass

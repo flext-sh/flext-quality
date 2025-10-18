@@ -37,7 +37,7 @@ from .typings import FlextQualityTypes
 
 try:
     from .web import FlextQualityWeb
-except ImportError:
+except Exception:  # Catch all import issues
     FlextQualityWeb = None
 
 # Quality score thresholds
@@ -134,8 +134,13 @@ class FlextQualityCliService(FlextService[int]):
                 include_duplicates=args.include_duplicates,
             )
 
-            # analysis_result is now AnalysisResults directly, not FlextResult
-            results = analysis_result
+            # Handle FlextResult from analyzer
+            if analysis_result.is_failure:
+                return FlextResult[int].fail(
+                    f"Analysis failed: {analysis_result.error}"
+                )
+
+            results = analysis_result.value
 
             # Check if any files were analyzed
             files_analyzed = getattr(results.overall_metrics, "files_analyzed", 0)
@@ -439,20 +444,19 @@ class FlextQualityCliService(FlextService[int]):
 
             # Use CodeAnalyzer for analysis
             analyzer = CodeAnalyzer(project_path)
-            analyzer.analyze_project(
+            analysis_result = analyzer.analyze_project(
                 include_security=getattr(args, "include_security", True),
                 include_complexity=getattr(args, "include_complexity", True),
                 include_dead_code=getattr(args, "include_dead_code", True),
                 include_duplicates=getattr(args, "include_duplicates", True),
             )
 
+            if analysis_result.is_failure:
+                logger.error(f"Analysis failed: {analysis_result.error}")
+                return 1
+
             # Analysis completed successfully
-            results = analyzer.analyze_project(
-                include_security=getattr(args, "include_security", True),
-                include_complexity=getattr(args, "include_complexity", True),
-                include_dead_code=getattr(args, "include_dead_code", True),
-                include_duplicates=getattr(args, "include_duplicates", True),
-            )
+            results = analysis_result.value
 
             # Display results using FlextCli
             {
@@ -551,9 +555,9 @@ def another_function() -> str:
     return "another_function_result"
 
 
-def setup_logging() -> None:
+def setup_logging(level: str = "INFO") -> None:
     """Setup logging for CLI operations."""
-    # Simple logging setup for tests
+    # Simple logging setup for tests - accepts level parameter for compatibility
 
 
 def main() -> int:

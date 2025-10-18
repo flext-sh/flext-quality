@@ -87,6 +87,37 @@ class ReportConfig(TypedDict):
     reporting: dict[str, object]
 
 
+DEFAULT_AUDIT_SUMMARY = cast(
+    "AuditSummary",
+    {
+        "total_files": 0,
+        "total_words": 0,
+        "average_quality": 0.0,
+        "critical_issues": 0,
+        "files_audited": 0,
+    },
+)
+
+DEFAULT_VALIDATION_SUMMARY = cast(
+    "ValidationSummary",
+    {
+        "broken_links": 0,
+        "external_links": 0,
+        "internal_links": 0,
+        "files_checked": 0,
+    },
+)
+
+DEFAULT_STYLE_SUMMARY = cast(
+    "StyleSummary",
+    {
+        "total_violations": 0,
+        "average_score": 100.0,
+        "files_with_violations": 0,
+    },
+)
+
+
 @dataclass
 class ReportData:
     """Container for all report data."""
@@ -162,22 +193,61 @@ class ReportGenerator:
         validation_data = self._load_validation_data(validation_file)
         style_data = self._load_style_data(style_file)
 
+        audit_summary = cast(
+            "AuditSummary",
+            self._merge_summary(audit_data, DEFAULT_AUDIT_SUMMARY),
+        )
+        validation_summary = cast(
+            "ValidationSummary",
+            self._merge_summary(validation_data, DEFAULT_VALIDATION_SUMMARY),
+        )
+        validation_summary["total_links"] = (
+            validation_summary["broken_links"]
+            + validation_summary["external_links"]
+            + validation_summary["internal_links"]
+        )
+        style_summary = cast(
+            "StyleSummary",
+            self._merge_summary(style_data, DEFAULT_STYLE_SUMMARY),
+        )
+
         # Calculate trends
         trends = self._calculate_trends()
 
         # Generate recommendations
         recommendations = self._generate_recommendations(
-            audit_data, validation_data, style_data
+            audit_summary, validation_summary, style_summary
         )
 
         return ReportData(
             timestamp=datetime.now(UTC),
-            audit_summary=audit_data.get("summary", {}),
-            validation_summary=validation_data.get("summary", {}),
-            style_summary=style_data.get("summary", {}),
+            audit_summary=audit_summary,
+            validation_summary=validation_summary,
+            style_summary=style_summary,
             trends=trends,
             recommendations=recommendations,
         )
+
+    def _merge_summary(
+        self, data: dict[str, object], defaults: dict[str, object]
+    ) -> dict[str, object]:
+        """Ensure summary dictionaries contain required keys."""
+        merged = dict(defaults)
+        summary_candidate: dict[str, object] | None = None
+
+        if isinstance(data, dict):
+            candidate = data.get("summary")
+            if isinstance(candidate, dict):
+                summary_candidate = candidate
+            else:
+                summary_candidate = {
+                    key: data.get(key) for key in defaults if key in data
+                }
+
+        if summary_candidate:
+            merged.update({k: v for k, v in summary_candidate.items() if v is not None})
+
+        return merged
 
     def _load_audit_data(self, audit_file: str | None) -> AuditSummary:
         """Load audit data."""
@@ -650,8 +720,8 @@ class ReportGenerator:
                     latest_path = Path(self.reports_dir) / "latest_dashboard.html"
                     shutil.copyfile(path, latest_path)
 
-            except Exception as exc:  # pragma: no cover - defensive logging
-                logger.exception("Failed to generate %s report: %s", fmt, exc)
+            except Exception:  # pragma: no cover - defensive logging
+                logger.exception("Failed to generate %s report", fmt)
 
         return generated
 

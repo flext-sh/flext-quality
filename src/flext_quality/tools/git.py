@@ -27,7 +27,6 @@ from flext_core import (
     FlextLogger,
     FlextResult,
     FlextService,
-    FlextTypes,
     FlextUtilities,
 )
 from pydantic import ConfigDict
@@ -191,7 +190,7 @@ class FlextQualityGitTools(FlextService[None]):
             commits = result.stdout.strip().split("\n") if result.stdout.strip() else []
             commits_processed = 0
             commits_changed = 0
-            errors: FlextTypes.StringList = []
+            errors: list[str] = []
 
             for commit_hash in commits:
                 # Get commit message
@@ -285,7 +284,7 @@ class FlextQualityGitTools(FlextService[None]):
             repo_path: str,
             *,
             dry_run: bool = True,
-        ) -> FlextResult[FlextTypes.Dict]:
+        ) -> FlextResult[dict[str, object]]:
             """Cleanup cruft files and directories.
 
             Args:
@@ -305,7 +304,7 @@ class FlextQualityGitTools(FlextService[None]):
             )
 
             removed_count = 0
-            errors: FlextTypes.StringList = []
+            errors: list[str] = []
 
             # Run git clean
             git_cmd = ["git", "-C", str(repo), "clean", "-xfd"]
@@ -335,7 +334,7 @@ class FlextQualityGitTools(FlextService[None]):
                         else 0
                     )
 
-            return FlextResult[FlextTypes.Dict].ok({
+            return FlextResult[dict[str, object]].ok({
                 "removed_count": removed_count,
                 "errors": errors,
                 "success": len(errors) == 0,

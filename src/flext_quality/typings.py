@@ -39,15 +39,13 @@ class FlextQualityTypes(FlextTypes):
     class Analysis:
         """Quality analysis complex types."""
 
-        type AnalysisConfiguration = dict[
-            str, str | int | bool | dict[str, FlextTypes.ConfigValue]
-        ]
+        type AnalysisConfiguration = dict[str, str | int | bool | dict[str, object]]
         type AnalysisMetrics = dict[str, float | int | dict[str, FlextTypes.JsonValue]]
-        type AnalysisResult = dict[str, bool | float | list[FlextTypes.Dict]]
+        type AnalysisResult = dict[str, bool | float | list[dict[str, object]]]
         type AnalysisContext = dict[
             str, str | int | bool | dict[str, FlextTypes.JsonValue]
         ]
-        type AnalysisReport = dict[str, str | int | float | list[FlextTypes.Dict]]
+        type AnalysisReport = dict[str, str | int | float | list[dict[str, object]]]
         type AnalysisThresholds = dict[str, float | int | bool]
 
     # =========================================================================
@@ -62,11 +60,11 @@ class FlextQualityTypes(FlextTypes):
         type QualityViolations = list[
             dict[str, str | int | dict[str, FlextTypes.JsonValue]]
         ]
-        type Thresholds = dict[str, float | int | bool | FlextTypes.Dict]
+        type Thresholds = dict[str, float | int | bool | dict[str, object]]
         type QualityMetrics = dict[
             str, float | int | bool | dict[str, FlextTypes.JsonValue]
         ]
-        type QualityReport = dict[str, str | float | list[FlextTypes.Dict]]
+        type QualityReport = dict[str, str | float | list[dict[str, object]]]
 
     # =========================================================================
     # METRICS COLLECTION TYPES - Complex metrics gathering types
@@ -75,14 +73,12 @@ class FlextQualityTypes(FlextTypes):
     class Metrics:
         """Quality metrics collection complex types."""
 
-        type MetricsConfiguration = dict[
-            str, bool | str | int | dict[str, FlextTypes.ConfigValue]
-        ]
+        type MetricsConfiguration = dict[str, bool | str | int | dict[str, object]]
         type MetricsCollection = dict[
             str, float | int | dict[str, FlextTypes.JsonValue]
         ]
         type MetricsAggregation = dict[str, float | dict[str, float | int]]
-        type MetricsReport = dict[str, str | float | list[FlextTypes.Dict]]
+        type MetricsReport = dict[str, str | float | list[dict[str, object]]]
         type MetricsTrend = list[dict[str, str | float | int]]
         type MetricsThreshold = dict[str, float | int | bool]
 
@@ -95,13 +91,13 @@ class FlextQualityTypes(FlextTypes):
 
         type ReportConfiguration = dict[
             str,
-            str | bool | FlextTypes.StringList | dict[str, FlextTypes.ConfigValue],
+            str | bool | list[str] | dict[str, object],
         ]
         type ReportData = dict[str, str | float | list[dict[str, FlextTypes.JsonValue]]]
-        type ReportFormat = dict[str, str | bool | FlextTypes.Dict]
-        type ReportTemplate = dict[str, str | FlextTypes.StringList | FlextTypes.Dict]
+        type ReportFormat = dict[str, str | bool | dict[str, object]]
+        type ReportTemplate = dict[str, str | list[str] | dict[str, object]]
         type ReportExport = dict[str, str | bool | dict[str, FlextTypes.JsonValue]]
-        type ReportDistribution = list[dict[str, str | FlextTypes.Dict]]
+        type ReportDistribution = list[dict[str, str | dict[str, object]]]
 
     # =========================================================================
     # ISSUE TRACKING TYPES - Complex issue management types
@@ -110,14 +106,14 @@ class FlextQualityTypes(FlextTypes):
     class IssueTracking:
         """Quality issue tracking complex types."""
 
-        type IssueDefinition = dict[str, str | int | bool | FlextTypes.StringList]
+        type IssueDefinition = dict[str, str | int | bool | list[str]]
         type IssueClassification = dict[
             str, str | int | dict[str, FlextTypes.JsonValue]
         ]
-        type IssueResolution = dict[str, str | bool | FlextTypes.Dict]
+        type IssueResolution = dict[str, str | bool | dict[str, object]]
         type IssueHistory = list[dict[str, str | int | dict[str, FlextTypes.JsonValue]]]
         type IssuePriority = dict[str, str | int | float | bool]
-        type IssueWorkflow = list[dict[str, str | FlextTypes.Dict]]
+        type IssueWorkflow = list[dict[str, str | dict[str, object]]]
 
     # =========================================================================
     # TOOL INTEGRATION TYPES - Complex tool integration types
@@ -126,15 +122,13 @@ class FlextQualityTypes(FlextTypes):
     class ToolIntegration:
         """Quality tool integration complex types."""
 
-        type ToolConfiguration = dict[
-            str, str | bool | dict[str, FlextTypes.ConfigValue]
-        ]
-        type ToolExecution = dict[str, str | int | bool | FlextTypes.StringList]
+        type ToolConfiguration = dict[str, str | bool | dict[str, object]]
+        type ToolExecution = dict[str, str | int | bool | list[str]]
         type ToolResult = dict[str, bool | str | dict[str, FlextTypes.JsonValue]]
-        type ToolChain = list[dict[str, str | FlextTypes.Dict]]
+        type ToolChain = list[dict[str, str | dict[str, object]]]
         type ToolMetrics = dict[str, float | int | dict[str, FlextTypes.JsonValue]]
         type ToolIntegrationConfig = dict[
-            str, str | bool | FlextTypes.StringList | FlextTypes.Dict
+            str, str | bool | list[str] | dict[str, object]
         ]
 
     # =========================================================================
@@ -149,35 +143,35 @@ class FlextQualityTypes(FlextTypes):
         """
 
         # Configuration and analysis types
-        type ConfigDict = dict[str, FlextTypes.ConfigValue | object]
-        type AnalysisDict = FlextTypes.Dict
-        type ResultDict = FlextTypes.Dict
-        type MetricsDict = FlextTypes.Dict
+        type ConfigDict = dict[str, object]
+        type AnalysisDict = dict[str, object]
+        type ResultDict = dict[str, object]
+        type MetricsDict = dict[str, object]
 
         # Quality assessment types
-        type QualityDict = dict[str, float | int | bool | FlextTypes.Dict]
-        type ThresholdDict = dict[str, bool | str | FlextTypes.Dict]
-        type ReportDict = dict[str, str | float | list[FlextTypes.Dict]]
-        type IssueDict = FlextTypes.Dict
+        type QualityDict = dict[str, float | int | bool | dict[str, object]]
+        type ThresholdDict = dict[str, bool | str | dict[str, object]]
+        type ReportDict = dict[str, str | float | list[dict[str, object]]]
+        type IssueDict = dict[str, object]
 
         # Tool integration types
-        type ToolDict = dict[str, str | FlextTypes.Dict]
-        type SettingsDict = FlextTypes.Dict
-        type ContextDict = FlextTypes.Dict
-        type DataDict = FlextTypes.Dict
+        type ToolDict = dict[str, str | dict[str, object]]
+        type SettingsDict = dict[str, object]
+        type ContextDict = dict[str, object]
+        type DataDict = dict[str, object]
 
         # Collection types for quality operations
         type AnalysisList = list[AnalysisDict]
         type ResultList = list[ResultDict]
         type IssueList = list[IssueDict]
-        type StringList = FlextTypes.StringList
+        type StringList = list[str]
 
     # =========================================================================
     # QUALITY PROJECT TYPES - Domain-specific project types extending FlextTypes
     # =========================================================================
 
-    class Project(FlextTypes.Project):
-        """Quality-specific project types extending FlextTypes.Project.
+    class Project(FlextTypes):
+        """Quality-specific project types extending FlextTypes.
 
         Adds quality/analysis-specific project types while inheriting
         generic types from FlextTypes. Follows domain separation principle:
@@ -186,7 +180,7 @@ class FlextQualityTypes(FlextTypes):
 
         # Quality-specific project types extending the generic ones
         type QualityProjectType = Literal[
-            # Generic types inherited from FlextTypes.Project
+            # Generic types inherited from FlextTypes
             "library",
             "application",
             "service",
@@ -210,16 +204,16 @@ class FlextQualityTypes(FlextTypes):
         ]
 
         # Quality-specific project configurations
-        type QualityProjectConfig = dict[str, FlextTypes.ConfigValue | object]
-        type AnalysisConfig = dict[str, str | int | bool | FlextTypes.StringList]
-        type Thresholds = dict[str, bool | str | FlextTypes.Dict]
-        type MetricsConfig = dict[str, FlextTypes.ConfigValue | object]
+        type QualityProjectConfig = dict[str, object]
+        type AnalysisConfig = dict[str, str | int | bool | list[str]]
+        type Thresholds = dict[str, bool | str | dict[str, object]]
+        type MetricsConfig = dict[str, object]
 
 
 # =============================================================================
 # PUBLIC API EXPORTS - Quality TypeVars and types
 # =============================================================================
 
-__all__: FlextTypes.StringList = [
+__all__: list[str] = [
     "FlextQualityTypes",
 ]

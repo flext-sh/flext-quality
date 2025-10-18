@@ -5,30 +5,29 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Self
 
-from flext_core import FlextResult, FlextService, FlextTypes
+from flext_core import FlextResult, FlextService
 
 
-class FlextSecurityService(FlextService[FlextTypes.StringDict]):
+class FlextSecurityService(FlextService[dict[str, str]]):
     """Provide vault decryption and antipattern scanning hooks."""
 
     def __init__(self: Self) -> None:
+        """Initialize the FlextSecurityService."""
         super().__init__()
 
-    def execute(self: Self) -> FlextResult[FlextTypes.StringDict]:
+    def execute(self: Self) -> FlextResult[dict[str, str]]:
         """Return an empty payload for service compliance."""
-        return FlextResult[FlextTypes.StringDict].ok({})
+        return FlextResult[dict[str, str]].ok({})
 
-    def decrypt_vault(
-        self, vault_path: str | Path
-    ) -> FlextResult[FlextTypes.StringDict]:
+    def decrypt_vault(self, vault_path: str | Path) -> FlextResult[dict[str, str]]:
         """Placeholder vault decryption returning metadata only."""
         path = Path(vault_path).expanduser()
         if not path.exists():
-            return FlextResult[FlextTypes.StringDict].fail(
+            return FlextResult[dict[str, str]].fail(
                 f"Vault path does not exist: {path}"
             )
 
-        return FlextResult[FlextTypes.StringDict].ok({
+        return FlextResult[dict[str, str]].ok({
             "vault_path": str(path),
             "status": "decryption-not-implemented",
         })
@@ -36,17 +35,17 @@ class FlextSecurityService(FlextService[FlextTypes.StringDict]):
     def scan_antipatterns(
         self,
         directory: str | Path,
-        config: FlextTypes.StringDict | None = None,
-    ) -> FlextResult[FlextTypes.StringList]:
+        config: dict[str, str] | None = None,
+    ) -> FlextResult[list[str]]:
         """Provide a placeholder antipattern scan result."""
         _ = directory, config
-        return FlextResult[FlextTypes.StringList].ok([])
+        return FlextResult[list[str]].ok([])
 
 
 class SecretVaultDecryptor(FlextSecurityService):
     """Compatibility wrapper used by legacy security scripts."""
 
-    def decrypt_vault(self, vault_path: str | Path) -> FlextTypes.StringDict:
+    def decrypt_vault(self, vault_path: str | Path) -> dict[str, str]:
         """Return decrypted vault metadata.
 
         The actual decryption logic is intentionally omitted until the secure

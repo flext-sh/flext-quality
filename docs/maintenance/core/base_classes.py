@@ -10,8 +10,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol
 
-from flext_core import FlextTypes
-
 
 @dataclass
 class Issue:
@@ -25,7 +23,7 @@ class Issue:
     recommendation: str = ""
     context: dict[str, object] | None = None
 
-    def to_dict(self) -> FlextTypes.Dict:
+    def to_dict(self) -> dict[str, object]:
         """Convert issue to dictionary representation."""
         return {
             "type": self.type,
@@ -46,8 +44,8 @@ class ValidationResult:
     valid_items: int = 0
     invalid_items: int = 0
     issues: list[Issue] = field(default_factory=list)
-    warnings: FlextTypes.StringList = field(default_factory=list)
-    errors: FlextTypes.StringList = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    errors: list[str] = field(default_factory=list)
     metadata: dict[str, object] = field(default_factory=dict)
 
     @property
@@ -65,7 +63,7 @@ class ValidationResult:
         else:
             self.valid_items += 1
 
-    def to_dict(self) -> FlextTypes.Dict:
+    def to_dict(self) -> dict[str, object]:
         """Convert result to dictionary representation."""
         return {
             "total_items": self.total_items,
@@ -251,13 +249,11 @@ class BaseAnalyzer(ABC):
 class ConfigProtocol(Protocol):
     """Protocol for configuration objects."""
 
-    def get(
-        self, key: str, default: FlextTypes.ConfigValue | None = None
-    ) -> FlextTypes.ConfigValue | None:
+    def get(self, key: str, default: object | None = None) -> object | None:
         """Get a configuration value."""
         ...
 
-    def __getitem__(self, key: str) -> FlextTypes.ConfigValue | None:
+    def __getitem__(self, key: str) -> object | None:
         """Get a configuration value with bracket notation."""
         ...
 
@@ -288,7 +284,7 @@ class FileMetadata:
             # If we can't read the file, keep defaults (file not accessible or not text)
             pass
 
-    def to_dict(self) -> FlextTypes.Dict:
+    def to_dict(self) -> dict[str, object]:
         """Convert metadata to dictionary."""
         return {
             "path": str(self.path),

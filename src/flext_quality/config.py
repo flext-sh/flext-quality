@@ -10,7 +10,7 @@ from __future__ import annotations
 import warnings
 from typing import Self
 
-from flext_core import FlextConfig, FlextResult, FlextTypes
+from flext_core import FlextConfig, FlextResult
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import SettingsConfigDict
 
@@ -330,7 +330,7 @@ class FlextQualityConfig(FlextConfig):
         except Exception as e:
             return FlextResult[None].fail(f"Business rules validation failed: {e}")
 
-    def get_analysis_config(self) -> FlextTypes.Dict:
+    def get_analysis_config(self) -> dict[str, object]:
         """Get quality analysis configuration context."""
         return {
             "min_coverage": self.min_coverage,
@@ -342,7 +342,7 @@ class FlextQualityConfig(FlextConfig):
             "workers": self.parallel_workers,
         }
 
-    def get_backend_config(self) -> FlextTypes.Dict:
+    def get_backend_config(self) -> dict[str, object]:
         """Get analysis backend configuration context."""
         return {
             "enable_ast_analysis": self.enable_ast_analysis,
@@ -353,7 +353,7 @@ class FlextQualityConfig(FlextConfig):
             "enable_dependency_scan": self.enable_dependency_scan,
         }
 
-    def get_reporting_config(self) -> FlextTypes.Dict:
+    def get_reporting_config(self) -> dict[str, object]:
         """Get quality reporting configuration context."""
         return {
             "enable_html_reports": self.enable_html_reports,
@@ -363,7 +363,7 @@ class FlextQualityConfig(FlextConfig):
             "include_executive_summary": self.include_executive_summary,
         }
 
-    def get_observability_config(self) -> FlextTypes.Dict:
+    def get_observability_config(self) -> dict[str, object]:
         """Get observability configuration context."""
         return {
             "quiet": self.observability_quiet,

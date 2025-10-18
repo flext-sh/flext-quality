@@ -9,7 +9,7 @@ import argparse
 import logging
 import os
 import shutil
-import subprocess
+import subprocess  # noqa: S404
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -18,7 +18,6 @@ from typing import TypedDict
 import yaml
 from flext_core import (
     FlextConstants,
-    FlextTypes,
 )
 
 from flext_quality.docs_maintenance.utils import get_project_root
@@ -63,7 +62,7 @@ class SyncResult:
     operation: str
     success: bool
     changes_made: int
-    files_affected: FlextTypes.StringList
+    files_affected: list[str]
     error_message: str | None
     timestamp: datetime
 
@@ -73,7 +72,7 @@ class SyncStatus:
     """Current synchronization status."""
 
     git_status: GitStatusInfo
-    pending_changes: FlextTypes.StringList
+    pending_changes: list[str]
     last_sync: datetime | None
     sync_needed: bool
     conflicts_present: bool
@@ -161,12 +160,13 @@ class DocumentationSync:
                     behind_count=0,
                 )
 
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603
                 [git_cmd, "rev-parse", "--git-dir"],
                 check=False,
                 cwd=self.working_dir,
                 capture_output=True,
                 text=True,
+                shell=False,  # Explicit for security
             )
 
             if result.returncode != 0:
@@ -180,12 +180,13 @@ class DocumentationSync:
                 )
 
             # Get branch info
-            branch_result = subprocess.run(
+            branch_result = subprocess.run(  # noqa: S603
                 [git_cmd, "branch", "--show-current"],
                 check=False,
                 cwd=self.working_dir,
                 capture_output=True,
                 text=True,
+                shell=False,  # Explicit for security
             )
             current_branch = (
                 branch_result.stdout.strip()
@@ -194,12 +195,13 @@ class DocumentationSync:
             )
 
             # Get status
-            status_result = subprocess.run(
+            status_result = subprocess.run(  # noqa: S603
                 [git_cmd, "status", "--porcelain"],
                 check=False,
                 cwd=self.working_dir,
                 capture_output=True,
                 text=True,
+                shell=False,  # Explicit for security
             )
 
             modified_files = []
@@ -234,7 +236,7 @@ class DocumentationSync:
                 behind_count=0,
             )
 
-    def _get_pending_changes(self) -> FlextTypes.StringList:
+    def _get_pending_changes(self) -> list[str]:
         """Get list of pending changes."""
         status = self._get_git_status()
         return status["modified_files"] + status["untracked_files"]
@@ -247,12 +249,13 @@ class DocumentationSync:
             if not git_cmd:
                 return None
 
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603
                 [git_cmd, "log", "-1", "--format=%ct", "--", "docs/"],
                 check=False,
                 cwd=self.working_dir,
                 capture_output=True,
                 text=True,
+                shell=False,  # Explicit for security
             )
 
             if result.returncode == 0 and result.stdout.strip():
@@ -272,12 +275,13 @@ class DocumentationSync:
             if not git_cmd:
                 return False
 
-            result = subprocess.run(
+            result = subprocess.run(  # noqa: S603
                 [git_cmd, "status", "--porcelain"],
                 check=False,
                 cwd=self.working_dir,
                 capture_output=True,
                 text=True,
+                shell=False,  # Explicit for security
             )
 
             if result.returncode == 0:
@@ -331,7 +335,7 @@ class DocumentationSync:
                 timestamp=datetime.now(UTC),
             )
 
-    def sync_changes(self, operation: str, files: FlextTypes.StringList) -> SyncResult:
+    def sync_changes(self, operation: str, files: list[str]) -> SyncResult:
         """Synchronize changes to git."""
         if not self.config["sync"]["auto_commit"]:
             return SyncResult(
@@ -356,11 +360,12 @@ class DocumentationSync:
                     timestamp=datetime.now(UTC),
                 )
 
-            subprocess.run(
+            subprocess.run(  # noqa: S603
                 [git_cmd, "add", *files],
                 cwd=str(self.working_dir),
                 check=True,
                 capture_output=True,
+                shell=False,  # Explicit for security
                 text=True,
             )
 
@@ -374,10 +379,11 @@ class DocumentationSync:
             )
 
             # Commit
-            subprocess.run(
+            subprocess.run(  # noqa: S603
                 [git_cmd, "commit", "-m", commit_message],
                 cwd=str(self.working_dir),
                 check=True,
+                shell=False,  # Explicit for security
                 capture_output=True,
                 text=True,
             )
@@ -386,11 +392,12 @@ class DocumentationSync:
             if self.config["sync"]["push_after_commit"]:
                 remote_name = str(self.config["git"]["remote_name"])
                 main_branch = str(self.config["git"]["main_branch"])
-                subprocess.run(
+                subprocess.run(  # noqa: S603
                     [git_cmd, "push", remote_name, main_branch],
                     cwd=str(self.working_dir),
                     check=True,
                     capture_output=True,
+                    shell=False,  # Explicit for security
                     text=True,
                 )
 
@@ -440,11 +447,12 @@ class DocumentationSync:
             timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
             branch_name = f"docs-backup-{timestamp}"
 
-            subprocess.run(
+            subprocess.run(  # noqa: S603
                 [git_cmd, "checkout", "-b", branch_name],
                 cwd=str(self.working_dir),
                 check=True,
                 capture_output=True,
+                shell=False,  # Explicit for security
                 text=True,
             )
 
@@ -467,7 +475,7 @@ class DocumentationSync:
                 timestamp=datetime.now(UTC),
             )
 
-    def rollback_changes(self, files: FlextTypes.StringList) -> SyncResult:
+    def rollback_changes(self, files: list[str]) -> SyncResult:
         """Rollback changes to specific files."""
         try:
             git_cmd = self._get_git_command()
@@ -481,10 +489,11 @@ class DocumentationSync:
                     timestamp=datetime.now(UTC),
                 )
 
-            subprocess.run(
+            subprocess.run(  # noqa: S603
                 [git_cmd, "checkout", "HEAD", "--", *files],
                 cwd=str(self.working_dir),
                 check=True,
+                shell=False,  # Explicit for security
                 capture_output=True,
                 text=True,
             )

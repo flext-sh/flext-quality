@@ -13,10 +13,8 @@ from __future__ import annotations
 
 from typing import TypeGuard, cast
 
-from flext_core import FlextTypes
 
-
-def assert_is_dict(value: object) -> TypeGuard[FlextTypes.Dict]:
+def assert_is_dict(value: object) -> TypeGuard[dict[str, object]]:
     """Type-safe dict[str, object] assertion following Single Responsibility Principle.
 
     Args:
@@ -33,7 +31,7 @@ def assert_is_dict(value: object) -> TypeGuard[FlextTypes.Dict]:
     return True
 
 
-def assert_is_list(value: object) -> TypeGuard[FlextTypes.List]:
+def assert_is_list(value: object) -> TypeGuard[list[object]]:
     """Type-safe list assertion following Single Responsibility Principle.
 
     Args:
@@ -50,7 +48,7 @@ def assert_is_list(value: object) -> TypeGuard[FlextTypes.List]:
     return True
 
 
-def safe_dict_access(data: FlextTypes.Dict, key: str) -> object:
+def safe_dict_access(data: dict[str, object], key: str) -> object:
     """Type-safe dictionary access with proper error handling.
 
     Args:
@@ -68,7 +66,7 @@ def safe_dict_access(data: FlextTypes.Dict, key: str) -> object:
     return data[key]
 
 
-def safe_list_access(data: FlextTypes.List, index: int) -> object:
+def safe_list_access(data: list[object], index: int) -> object:
     """Type-safe list access with proper error handling.
 
     Args:
@@ -90,9 +88,9 @@ def safe_list_access(data: FlextTypes.List, index: int) -> object:
 
 
 def assert_dict_structure(
-    data: FlextTypes.Dict,
-    required_keys: FlextTypes.StringList,
-) -> FlextTypes.Dict:
+    data: dict[str, object],
+    required_keys: list[str],
+) -> dict[str, object]:
     """Assert that object is dict[str, object] with required keys - DRY pattern.
 
     Args:
@@ -111,7 +109,7 @@ def assert_dict_structure(
     return data
 
 
-def assert_analysis_results_structure(results: object) -> FlextTypes.Dict:
+def assert_analysis_results_structure(results: object) -> dict[str, object]:
     """Assert analyzer results have expected structure - specialized helper.
 
     Args:
@@ -126,12 +124,12 @@ def assert_analysis_results_structure(results: object) -> FlextTypes.Dict:
     """
     assert_is_dict(results)
     return assert_dict_structure(
-        cast("FlextTypes.Dict", results),
+        cast("dict[str, object]", results),
         ["metrics", "issues", "python_files"],
     )
 
 
-def assert_metrics_structure(metrics: object) -> FlextTypes.Dict:
+def assert_metrics_structure(metrics: object) -> dict[str, object]:
     """Assert metrics have expected structure - specialized helper.
 
     Args:
@@ -146,12 +144,12 @@ def assert_metrics_structure(metrics: object) -> FlextTypes.Dict:
     """
     assert_is_dict(metrics)
     return assert_dict_structure(
-        cast("FlextTypes.Dict", metrics),
+        cast("dict[str, object]", metrics),
         ["total_files", "total_lines_of_code"],
     )
 
 
-def assert_issues_structure(issues: object) -> FlextTypes.Dict:
+def assert_issues_structure(issues: object) -> dict[str, object]:
     """Assert issues have expected structure - specialized helper.
 
     Args:
@@ -166,6 +164,6 @@ def assert_issues_structure(issues: object) -> FlextTypes.Dict:
     """
     assert_is_dict(issues)
     return assert_dict_structure(
-        cast("FlextTypes.Dict", issues),
+        cast("dict[str, object]", issues),
         ["security", "complexity", "dead_code", "duplicates"],
     )
