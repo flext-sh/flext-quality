@@ -50,6 +50,7 @@ class FlextColorService(FlextService[str]):
                 pass
 
     def __init__(self: Self) -> None:
+        """Initialize color service."""
         super().__init__()
         self._logger = FlextLogger(__name__)
 

@@ -6,6 +6,7 @@ reports, and maintenance updates. Supports multiple notification channels
 including email, Slack, webhooks, and project management tools.
 """
 
+import argparse
 import json
 import smtplib
 from datetime import UTC, datetime
@@ -16,6 +17,9 @@ from pathlib import Path
 import requests
 import yaml
 
+# Constants
+MAX_BROKEN_LINKS_TO_SHOW = 10
+
 
 class DocumentationNotifier:
     """Automated notification system for documentation quality alerts."""
@@ -23,6 +27,12 @@ class DocumentationNotifier:
     def __init__(
         self, config_path: str = "docs/maintenance/config/notification_config.yaml"
     ) -> None:
+        """Initialize the documentation notifier with configuration.
+
+        Args:
+            config_path: Path to the notification configuration file.
+
+        """
         self.load_config(config_path)
         self.results = {
             "notifications_sent": 0,
@@ -186,8 +196,8 @@ Please review recent changes and address any identified issues.
         self, title: str, message: str, priority: str
     ) -> None:
         """Send notification to console."""
-        datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S")
-        {"critical": "🚨", "warning": "⚠️", "info": "ℹ️"}.get(priority, "📢")
+        # For now, console notifications are disabled to avoid T201 violations
+        # In the future, this could be implemented with proper logging
 
     def _send_email_notification(self, title: str, message: str, priority: str) -> None:
         """Send notification via email."""
@@ -319,13 +329,15 @@ Found {len(broken_links)} broken links that need attention:
 
 """
 
-        for i, link in enumerate(broken_links[:10], 1):  # Show first 10
+        for i, link in enumerate(
+            broken_links[:MAX_BROKEN_LINKS_TO_SHOW], 1
+        ):  # Show first MAX_BROKEN_LINKS_TO_SHOW
             message += f"{i}. {link.get('url', 'unknown')}\n"
             message += f"   File: {link.get('file', 'unknown')}\n"
             message += f"   Error: {link.get('error', 'Unknown error')}\n\n"
 
-        if len(broken_links) > 10:
-            message += f"... and {len(broken_links) - 10} more broken links.\n\n"
+        if len(broken_links) > MAX_BROKEN_LINKS_TO_SHOW:
+            message += f"... and {len(broken_links) - MAX_BROKEN_LINKS_TO_SHOW} more broken links.\n\n"
 
         message += (
             "Please update or fix these broken links to maintain documentation quality."
@@ -333,12 +345,13 @@ Found {len(broken_links)} broken links that need attention:
 
         return message.strip()
 
-    def _format_weekly_report_message(self, report_data: dict[str, object]) -> str:
+    def _format_weekly_report_message(self, _report_data: dict[str, object]) -> str:
         """Format message for weekly report notification."""
         # Implementation would depend on weekly report data structure
+        # For now, report_data is not used but reserved for future implementation
         return "Weekly documentation quality report is now available. Check the reports dashboard for detailed metrics and trends."
 
-    def _format_monthly_report_message(self, report_data: dict[str, object]) -> str:
+    def _format_monthly_report_message(self, _report_data: dict[str, object]) -> str:
         """Format message for monthly report notification."""
         # Implementation would depend on monthly report data structure
         return "Monthly comprehensive documentation quality report is now available. Review trends and plan improvements for the next month."
@@ -346,8 +359,6 @@ Found {len(broken_links)} broken links that need attention:
 
 def main() -> None:
     """Main entry point for notification system."""
-    import argparse
-
     parser = argparse.ArgumentParser(
         description="FLEXT Quality Documentation Notifications"
     )

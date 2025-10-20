@@ -5,10 +5,24 @@ Complete demonstration of the documentation maintenance framework
 showing how to run comprehensive audits, validations, and optimizations.
 """
 
+import logging
 import os
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+
+logger = logging.getLogger(__name__)
+
+# Import maintenance tools
+try:
+    from scripts.audit import DocumentationAuditor
+    from scripts.report import DocumentationReporter
+    from tools.content_analyzer import ContentAnalyzer
+    from tools.link_checker import LinkChecker
+    from tools.style_validator import StyleValidator
+except ImportError:
+    # Tools may not be available in all environments
+    pass
 
 
 def print_header(title: str) -> None:
@@ -22,8 +36,8 @@ def print_step(step_num: int, description: str) -> None:
 def run_maintenance_demo() -> None:
     """Run the complete documentation maintenance demonstration."""
     # Constants
-    MAX_FILES_TO_SHOW = 10
-    GOOD_SCORE_THRESHOLD = 80
+    max_files_to_show = 10
+    good_score_threshold = 80
 
     print_header("FLEXT Quality Documentation Maintenance Demo")
 
@@ -68,18 +82,16 @@ def run_maintenance_demo() -> None:
     doc_files = sorted(set(doc_files))  # Remove duplicates
 
     for _i, _file in enumerate(
-        doc_files[:MAX_FILES_TO_SHOW], 1
-    ):  # Show first MAX_FILES_TO_SHOW
+        doc_files[:max_files_to_show], 1
+    ):  # Show first max_files_to_show
         pass
-    if len(doc_files) > MAX_FILES_TO_SHOW:
+    if len(doc_files) > max_files_to_show:
         pass
 
     # Step 2: Run comprehensive audit
     print_step(2, "Running Comprehensive Documentation Audit")
 
     try:
-        from scripts.audit import DocumentationAuditor
-
         auditor = DocumentationAuditor()
 
         audit_results = auditor.run_comprehensive_audit()
@@ -108,8 +120,6 @@ def run_maintenance_demo() -> None:
     print_step(3, "Validating Links and References")
 
     try:
-        from tools.link_checker import LinkChecker
-
         # Extract links from files
         link_checker = LinkChecker()
 
@@ -120,17 +130,14 @@ def run_maintenance_demo() -> None:
                 file_path.read_text(encoding="utf-8")
                 file_links = link_checker.find_all_links([file_path])
                 all_links.extend(file_links)
-            except Exception:
-                pass
+            except Exception as e:
+                logger.warning(f"Failed to extract links from {file_path}: {e}")
 
         # Categorize links
         link_types = {}
         for link in all_links:
             link_type = link.get("type", "unknown")
             link_types[link_type] = link_types.get(link_type, 0) + 1
-
-        for link_type in link_types:
-            pass
 
         # Save link validation results
         {
@@ -149,8 +156,6 @@ def run_maintenance_demo() -> None:
     print_step(4, "Checking Style Consistency")
 
     try:
-        from tools.style_validator import StyleValidator
-
         style_validator = StyleValidator()
 
         # Validate a few key files
@@ -178,8 +183,6 @@ def run_maintenance_demo() -> None:
     print_step(5, "Analyzing Content Quality")
 
     try:
-        from tools.content_analyzer import ContentAnalyzer
-
         content_analyzer = ContentAnalyzer()
 
         # Analyze key documentation files
@@ -201,7 +204,7 @@ def run_maintenance_demo() -> None:
 
         if analyzed_count > 0:
             avg_score = total_score / analyzed_count
-            if avg_score >= GOOD_SCORE_THRESHOLD:
+            if avg_score >= good_score_threshold:
                 # Good score achieved
                 pass
 
@@ -212,8 +215,6 @@ def run_maintenance_demo() -> None:
     print_step(6, "Generating Maintenance Report")
 
     try:
-        from scripts.report import DocumentationReporter
-
         reporter = DocumentationReporter()
         report_content = reporter.generate_quality_report("html")
 
@@ -243,6 +244,7 @@ if __name__ == "__main__":
         try:
             run_maintenance_demo()
         except KeyboardInterrupt:
-            pass
+            logger.info("Demo interrupted by user.")
         except Exception:
-            pass
+            logger.exception("Demo failed with error")
+            sys.exit(1)

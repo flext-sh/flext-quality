@@ -87,6 +87,13 @@ class FlextQualityConstants(FlextConstants):
         MAXIMUM_WORKERS: int = 16
         DEFAULT_WORKERS: int = 4
 
+    class Network:
+        """Network-related constants."""
+
+        MAX_CONNECTIONS: int = 100
+        DEFAULT_TIMEOUT: int = 30
+        RETRY_ATTEMPTS: int = 3
+
     class Validation:
         """Validation ranges and limits for quality analysis."""
 
@@ -162,6 +169,7 @@ class FlextQualityConstants(FlextConstants):
         MAX_FUNCTION_NAME_LENGTH: int = 50
         MIN_FILE_SIZE_FOR_DUPLICATION_CHECK: int = 100
         SIMILARITY_THRESHOLD: float = 0.8
+        MIN_FUNCTION_LENGTH_FOR_DEAD_CODE: int = 5
         GRADE_A_THRESHOLD: float = 90.0
         GRADE_B_THRESHOLD: float = 80.0
         GRADE_C_THRESHOLD: float = 70.0

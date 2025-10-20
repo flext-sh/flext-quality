@@ -2,124 +2,128 @@
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
-
 """
 
-# ruff: noqa: S101
 from __future__ import annotations
 
 from pathlib import Path
-from typing import cast
+from typing import override
 
 from flext_api import FlextApiClient, FlextApiConfig
 from flext_core import FlextLogger, FlextResult, FlextService
+from pydantic import BaseModel, Field
+
+# =====================================================================
+# Configuration Models (Pydantic 2) - Data-Driven Integrations
+# =====================================================================
+
+
+class ApiClientConfig(BaseModel):
+    """API client configuration."""
+
+    base_url: str = Field(default="")
+    timeout: int = Field(default=30, ge=1)
+    max_retries: int = Field(default=3, ge=0)
+    enable_circuit_breaker: bool = Field(default=True)
+
+
+class SeverityColorMap(BaseModel):
+    """Severity-to-color mapping for notifications."""
+
+    colors: dict[str, str] = Field(
+        default_factory=lambda: {
+            "info": "#36a64f",
+            "warning": "#ff9900",
+            "error": "#ff0000",
+        }
+    )
+
+
+# =====================================================================
+# Main Integration Service - SOLID Delegation Pattern
+# =====================================================================
 
 
 class FlextQualityIntegrations(FlextService[None]):
-    """Quality integrations service using flext-api for external communications.
+    """Quality integrations orchestrating external service communications."""
 
-    Provides:
-    - Webhook notifications for quality events
-    - External quality service integrations (SonarQube, GitHub, etc.)
-    - Slack/Teams notifications
-    - Report delivery to external platforms
-    """
-
-    def __init__(self) -> None:
-        """Initialize quality integrations with flext-api."""
+    def __init__(self, config: ApiClientConfig | None = None) -> None:
+        """Initialize quality integrations."""
         super().__init__()
-        self.logger = FlextLogger(__name__)
-
-        # Initialize flext-api configuration as dict
-        api_config_dict: dict[str, object] = {
-            "base_url": "",  # Will be set per integration
-            "timeout": 30,
-            "max_retries": 3,
-            "enable_circuit_breaker": True,
-        }
-        self._api_config = FlextApiConfig(**api_config_dict)
-
-        # Initialize API client
+        self._config = config or ApiClientConfig()
+        self._api_config = FlextApiConfig(**self._config.model_dump())
         self._api_client = FlextApiClient(config=self._api_config)
+        self._logger = FlextLogger(__name__)
 
     @property
     def logger(self) -> FlextLogger:
-        """Get logger with type narrowing."""
-        assert self.logger is not None
-        return self.logger
+        """Get logger."""
+        return self._logger
 
-    def send_webhook_notification(
-        self,
-        webhook_url: str,
-        event_type: str,
-        event_data: dict[str, object],
-    ) -> FlextResult[dict[str, object]]:
-        """Send webhook notification using flext-api.
+    @override
+    def execute(self) -> FlextResult[None]:
+        """Execute integration service."""
+        return FlextResult.ok(None)
 
-        Args:
-            webhook_url: Webhook endpoint URL
-            event_type: Type of quality event (analysis_complete, threshold_violation, etc.)
-            event_data: Event payload data
+    # =====================================================================
+    # Nested Utility Classes - Single Responsibility Each
+    # =====================================================================
 
-        Returns:
-            FlextResult with webhook response data
+    class _HttpOperations:
+        """Single responsibility: HTTP operations with flext-api."""
 
-        """
-        try:
-            payload = {
+        @staticmethod
+        def post(
+            client: FlextApiClient,
+            url: str,
+            json: dict[str, object] | None = None,
+            files: dict[str, tuple[str, bytes]] | None = None,
+            headers: dict[str, str] | None = None,
+        ) -> FlextResult[dict[str, object]]:
+            """Execute POST request and return result."""
+            result = client.post(url=url, json=json, files=files, headers=headers)
+            return (
+                result
+                if result.is_success
+                else FlextResult.fail(f"HTTP POST failed: {result.error}")
+            )
+
+        @staticmethod
+        def get(
+            client: FlextApiClient,
+            url: str,
+            params: dict[str, str] | None = None,
+            headers: dict[str, str] | None = None,
+        ) -> FlextResult[dict[str, object]]:
+            """Execute GET request and return result."""
+            result = client.get(url=url, params=params, headers=headers)
+            return (
+                result
+                if result.is_success
+                else FlextResult.fail(f"HTTP GET failed: {result.error}")
+            )
+
+    class _PayloadBuilders:
+        """Single responsibility: Build integration payloads."""
+
+        @staticmethod
+        def webhook_payload(
+            event_type: str, event_data: dict[str, object]
+        ) -> dict[str, object]:
+            """Build webhook notification payload."""
+            return {
                 "event_type": event_type,
                 "event_data": event_data,
                 "service": "flext-quality",
                 "version": "0.9.0",
             }
 
-            # Use flext-api for HTTP request with retry logic
-            response_result = self._api_client.post(
-                url=webhook_url,
-                json=payload,
-                headers={"Content-Type": "application/json"},
-            )
-
-            if response_result.is_failure:
-                return FlextResult[dict[str, object]].fail(
-                    f"Webhook failed: {response_result.error}"
-                )
-
-            self.logger.info(f"Webhook sent successfully: {event_type}")
-            # Cast FlextApiModels.HttpResponse to dict[str, object] for type safety
-            response_dict = cast("dict[str, object]", response_result.value)
-            return FlextResult[dict[str, object]].ok(response_dict)
-
-        except Exception as e:
-            self.logger.exception("Webhook notification failed")
-            return FlextResult[dict[str, object]].fail(f"Webhook error: {e}")
-
-    def send_slack_notification(
-        self,
-        webhook_url: str,
-        message: str,
-        severity: str = "info",
-    ) -> FlextResult[dict[str, object]]:
-        """Send Slack notification using flext-api.
-
-        Args:
-            webhook_url: Slack webhook URL
-            message: Notification message
-            severity: Message severity (info, warning, error)
-
-        Returns:
-            FlextResult with Slack API response
-
-        """
-        try:
-            # Format Slack message with severity colors
-            color_map = {
-                "info": "#36a64f",  # Green
-                "warning": "#ff9900",  # Orange
-                "error": "#ff0000",  # Red
-            }
-
-            payload = {
+        @staticmethod
+        def slack_payload(
+            message: str, severity: str, color_map: dict[str, str]
+        ) -> dict[str, object]:
+            """Build Slack message payload."""
+            return {
                 "attachments": [
                     {
                         "color": color_map.get(severity, "#36a64f"),
@@ -130,99 +134,12 @@ class FlextQualityIntegrations(FlextService[None]):
                 ]
             }
 
-            response_result = self._api_client.post(
-                url=webhook_url,
-                json=payload,
-            )
-
-            if response_result.is_failure:
-                return FlextResult[dict[str, object]].fail(
-                    f"Slack notification failed: {response_result.error}"
-                )
-
-            self.logger.info("Slack notification sent successfully")
-            return FlextResult[dict[str, object]].ok({"status": "sent"})
-
-        except Exception as e:
-            self.logger.exception("Slack notification failed")
-            return FlextResult[dict[str, object]].fail(f"Slack error: {e}")
-
-    def integrate_sonarqube(
-        self,
-        sonarqube_url: str,
-        project_key: str,
-        token: str,
-        quality_data: dict[str, object],
-    ) -> FlextResult[dict[str, object]]:
-        """Integrate with SonarQube using flext-api.
-
-        Args:
-            sonarqube_url: SonarQube server URL
-            project_key: SonarQube project key
-            token: SonarQube authentication token
-            quality_data: Quality analysis data to send
-
-        Returns:
-            FlextResult with SonarQube API response
-
-        """
-        try:
-            # Construct SonarQube API endpoint
-            api_url = f"{sonarqube_url}/api/measures/component"
-
-            # Use flext-api with authentication header
-            # Note: quality_data could be used for additional parameters or payload
-            # For now, we use it to potentially override project_key
-            component_key = quality_data.get("component", project_key)
-
-            response_result = self._api_client.get(
-                url=api_url,
-                params={"component": component_key},
-                headers={"Authorization": f"Bearer {token}"},
-            )
-
-            if response_result.is_failure:
-                return FlextResult[dict[str, object]].fail(
-                    f"SonarQube integration failed: {response_result.error}"
-                )
-
-            self.logger.info(
-                f"SonarQube integration successful for project: {project_key}"
-            )
-            # Cast FlextApiModels.HttpResponse to dict[str, object] for type safety
-            response_dict = cast("dict[str, object]", response_result.value)
-            return FlextResult[dict[str, object]].ok(response_dict)
-
-        except Exception as e:
-            self.logger.exception("SonarQube integration failed")
-            return FlextResult[dict[str, object]].fail(f"SonarQube error: {e}")
-
-    def integrate_github_checks(
-        self,
-        github_api_url: str,
-        repo: str,
-        commit_sha: str,
-        token: str,
-        check_results: dict[str, object],
-    ) -> FlextResult[dict[str, object]]:
-        """Integrate with GitHub Checks API using flext-api.
-
-        Args:
-            github_api_url: GitHub API base URL
-            repo: Repository name (owner/repo)
-            commit_sha: Commit SHA to attach check to
-            token: GitHub authentication token
-            check_results: Quality check results
-
-        Returns:
-            FlextResult with GitHub API response
-
-        """
-        try:
-            # Construct GitHub Checks API endpoint
-            api_url = f"{github_api_url}/repos/{repo}/check-runs"
-
-            payload = {
+        @staticmethod
+        def github_checks_payload(
+            commit_sha: str, check_results: dict[str, object]
+        ) -> dict[str, object]:
+            """Build GitHub Checks API payload."""
+            return {
                 "name": "FLEXT Quality Check",
                 "head_sha": commit_sha,
                 "status": "completed",
@@ -236,28 +153,81 @@ class FlextQualityIntegrations(FlextService[None]):
                 },
             }
 
-            response_result = self._api_client.post(
-                url=api_url,
+    # =====================================================================
+    # Public Integration Methods - Railway-Oriented
+    # =====================================================================
+
+    def send_webhook_notification(
+        self,
+        webhook_url: str,
+        event_type: str,
+        event_data: dict[str, object],
+    ) -> FlextResult[dict[str, object]]:
+        """Send webhook notification."""
+        payload = self._PayloadBuilders.webhook_payload(event_type, event_data)
+        return (
+            self._HttpOperations.post(
+                self._api_client,
+                webhook_url,
                 json=payload,
-                headers={
-                    "Authorization": f"Bearer {token}",
-                    "Accept": "application/vnd.github.v3+json",
-                },
+                headers={"Content-Type": "application/json"},
             )
+            .map(lambda _: {"status": "sent"})
+            .map_error(lambda e: self._log_error("webhook", e))
+        )
 
-            if response_result.is_failure:
-                return FlextResult[dict[str, object]].fail(
-                    f"GitHub Checks integration failed: {response_result.error}"
-                )
+    def send_slack_notification(
+        self,
+        webhook_url: str,
+        message: str,
+        severity: str = "info",
+    ) -> FlextResult[dict[str, object]]:
+        """Send Slack notification."""
+        color_map = SeverityColorMap().colors
+        payload = self._PayloadBuilders.slack_payload(message, severity, color_map)
+        return (
+            self._HttpOperations.post(self._api_client, webhook_url, json=payload)
+            .map(lambda _: {"status": "sent"})
+            .map_error(lambda e: self._log_error("slack", e))
+        )
 
-            self.logger.info(f"GitHub Checks updated for commit: {commit_sha}")
-            # Cast FlextApiModels.HttpResponse to dict[str, object] for type safety
-            response_dict = cast("dict[str, object]", response_result.value)
-            return FlextResult[dict[str, object]].ok(response_dict)
+    def integrate_sonarqube(
+        self,
+        sonarqube_url: str,
+        project_key: str,
+        token: str,
+        quality_data: dict[str, object],
+    ) -> FlextResult[dict[str, object]]:
+        """Integrate with SonarQube."""
+        api_url = f"{sonarqube_url}/api/measures/component"
+        component_key = quality_data.get("component", project_key)
+        return self._HttpOperations.get(
+            self._api_client,
+            api_url,
+            params={"component": component_key},
+            headers={"Authorization": f"Bearer {token}"},
+        ).map_error(lambda e: self._log_error("sonarqube", e))
 
-        except Exception as e:
-            self.logger.exception("GitHub Checks integration failed")
-            return FlextResult[dict[str, object]].fail(f"GitHub error: {e}")
+    def integrate_github_checks(
+        self,
+        github_api_url: str,
+        repo: str,
+        commit_sha: str,
+        token: str,
+        check_results: dict[str, object],
+    ) -> FlextResult[dict[str, object]]:
+        """Integrate with GitHub Checks API."""
+        api_url = f"{github_api_url}/repos/{repo}/check-runs"
+        payload = self._PayloadBuilders.github_checks_payload(commit_sha, check_results)
+        return self._HttpOperations.post(
+            self._api_client,
+            api_url,
+            json=payload,
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Accept": "application/vnd.github.v3+json",
+            },
+        ).map_error(lambda e: self._log_error("github", e))
 
     def deliver_report_to_external_storage(
         self,
@@ -265,80 +235,52 @@ class FlextQualityIntegrations(FlextService[None]):
         report_file: Path,
         api_key: str,
     ) -> FlextResult[dict[str, object]]:
-        """Deliver quality report to external storage using flext-api.
-
-        Args:
-            storage_url: External storage API URL
-            report_file: Path to report file to upload
-            api_key: Storage API key
-
-        Returns:
-            FlextResult with upload response
-
-        """
+        """Deliver quality report to external storage."""
         try:
-            # Read report file
-            with report_file.open("rb") as f:
-                report_content = f.read()
-
-            # Use flext-api for file upload
-            response_result = self._api_client.post(
-                url=storage_url,
-                files={"report": (report_file.name, report_content)},
+            content = report_file.read_bytes()
+            return self._HttpOperations.post(
+                self._api_client,
+                storage_url,
+                files={"report": (report_file.name, content)},
                 headers={"X-API-Key": api_key},
-            )
-
-            if response_result.is_failure:
-                return FlextResult[dict[str, object]].fail(
-                    f"Report delivery failed: {response_result.error}"
-                )
-
-            self.logger.info(f"Report delivered successfully: {report_file.name}")
-            # Cast FlextApiModels.HttpResponse to dict[str, object] for type safety
-            response_dict = cast("dict[str, object]", response_result.value)
-            return FlextResult[dict[str, object]].ok(response_dict)
-
+            ).map_error(lambda e: self._log_error("storage", e))
         except Exception as e:
-            self.logger.exception("Report delivery failed")
-            return FlextResult[dict[str, object]].fail(f"Delivery error: {e}")
+            return FlextResult.fail(self._log_error("storage_read", str(e)))
 
     def notify_on_threshold_violation(
         self,
         webhook_urls: list[str],
         violation_data: dict[str, object],
     ) -> FlextResult[list[dict[str, object]]]:
-        """Notify multiple webhooks of quality threshold violations.
-
-        Args:
-            webhook_urls: List of webhook URLs to notify
-            violation_data: Threshold violation details
-
-        Returns:
-            FlextResult with list of webhook responses
-
-        """
-        results: list[dict[str, object]] = []
-
-        for webhook_url in webhook_urls:
-            result = self.send_webhook_notification(
-                webhook_url=webhook_url,
-                event_type="threshold_violation",
-                event_data=violation_data,
-            )
-
-            if result.is_success:
-                results.append(result.value)
-            else:
-                self.logger.warning(
-                    f"Webhook notification failed for {webhook_url}: {result.error}"
+        """Notify multiple webhooks of threshold violations."""
+        results = [
+            r.value
+            for url in webhook_urls
+            if (
+                r := self.send_webhook_notification(
+                    url, "threshold_violation", violation_data
                 )
+            ).is_success
+        ]
 
-        if not results:
-            return FlextResult[list[dict[str, object]]].fail(
-                "All webhook notifications failed"
-            )
+        return (
+            FlextResult.ok(results)
+            if results
+            else FlextResult.fail("All webhook notifications failed")
+        )
 
-        return FlextResult[list[dict[str, object]]].ok(results)
+    # =====================================================================
+    # Private Helper Methods
+    # =====================================================================
+
+    def _log_error(self, operation: str, error: str) -> str:
+        """Log and return error."""
+        self._logger.error(f"{operation.upper()} integration failed: {error}")
+        return error
 
 
-__all__ = ["FlextQualityIntegrations"]
+__all__ = [
+    "ApiClientConfig",
+    "FlextQualityIntegrations",
+    "SeverityColorMap",
+]

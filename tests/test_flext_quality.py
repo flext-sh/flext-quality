@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_quality import CodeAnalyzer
+from flext_quality import FlextQualityAnalyzer
 
 # Constants
 EXPECTED_BULK_SIZE = 2
@@ -20,7 +20,7 @@ class TestCodeAnalyzer:
 
     def test_analyzer_initialization(self) -> None:
         """Test analyzer initialization function."""
-        analyzer = CodeAnalyzer(".")
+        analyzer = FlextQualityAnalyzer(".")
         assert analyzer is not None
         if analyzer.project_path != Path():
             msg: str = f"Expected {Path()}, got {analyzer.project_path}"
@@ -33,7 +33,7 @@ class TestCodeAnalyzer:
             tmp_path (Path): Description.
 
         """
-        analyzer = CodeAnalyzer(tmp_path)
+        analyzer = FlextQualityAnalyzer(tmp_path)
         if analyzer.project_path != tmp_path:
             msg: str = f"Expected {tmp_path}, got {analyzer.project_path}"
             raise AssertionError(msg)
@@ -50,7 +50,7 @@ class TestCodeAnalyzer:
         (tmp_path / "subdir").mkdir()
         (tmp_path / "subdir" / "test2.py").write_text("print('world')")
 
-        analyzer = CodeAnalyzer(tmp_path)
+        analyzer = FlextQualityAnalyzer(tmp_path)
         files = analyzer._find_python_files()
 
         if len(files) != EXPECTED_BULK_SIZE:
@@ -87,7 +87,7 @@ if __name__ == "__main__":
 """,
         )
 
-        analyzer = CodeAnalyzer(tmp_path)
+        analyzer = FlextQualityAnalyzer(tmp_path)
         results = analyzer.analyze_project(
             include_security=False,
             include_complexity=False,
@@ -109,7 +109,7 @@ if __name__ == "__main__":
 
     def test_quality_score(self) -> None:
         """Test quality score function."""
-        analyzer = CodeAnalyzer(".")
+        analyzer = FlextQualityAnalyzer(".")
         analyzer.analysis_results = {
             "issues": {
                 "security": [],

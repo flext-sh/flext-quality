@@ -11,6 +11,8 @@ Consolidates architecture scripts:
 
 from __future__ import annotations
 
+import uuid
+
 from flext_core import FlextLogger, FlextResult, FlextService
 from pydantic import ConfigDict
 
@@ -46,10 +48,16 @@ class FlextQualityArchitectureTools(FlextService[None]):
             logger.info(f"Analyzing violations for {project_path}")
 
             result = FlextQualityModels.AnalysisResult(
-                violations=[],
-                suggestions=[],
-                complexity_score=0.0,
-                domain_library_usage={},
+                analysis_id=str(uuid.uuid4()),
+                project_path=str(project_path),
+                status="completed",
+                issues_found=[],
+                metrics={
+                    "violations": 0,
+                    "suggestions": 0,
+                    "complexity_score": 0.0,
+                    "domain_library_usage": {},
+                },
             )
 
             return FlextResult[FlextQualityModels.AnalysisResult].ok(result)

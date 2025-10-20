@@ -7,19 +7,14 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import Annotated, Any, Literal, TypeVar
+from enum import StrEnum
+from typing import Any, Literal
 from uuid import UUID
 
 from flext_core import FlextModels
-from pydantic import Field, computed_field, field_validator
+from pydantic import BaseModel, Field, computed_field, field_validator
 
-T = TypeVar("T")
-ScoreT = TypeVar("ScoreT", bound=float)
-
-# Advanced validation using Python 3.13+ syntax
-type ScoreRange = Annotated[float, Field(ge=0.0, le=100.0)]
-type PositiveInt = Annotated[int, Field(ge=1)]
-type Timestamp = Annotated[datetime, Field(default_factory=lambda: datetime.now(UTC))]
+from flext_quality.typings import PositiveInt, ScoreRange, Timestamp
 
 
 class FlextQualityModels(FlextModels):
@@ -27,7 +22,86 @@ class FlextQualityModels(FlextModels):
 
     Single responsibility: Generic quality analysis models with proper DDD patterns.
     All models consolidated into focused, reusable components.
+
+    Architecture: Layer 2 (Domain)
+    Provides comprehensive domain models for quality analysis following FLEXT patterns:
+    - Value Objects: Immutable domain values (FlextModels.Value)
+    - Entities: Domain entities with identity (FlextModels.Entity)
+    - Aggregate Roots: Consistency boundaries (FlextModels.AggregateRoot)
+    - Commands: CQRS commands (FlextModels.Command)
+    - Queries: CQRS queries (FlextModels.Query)
+    - Domain Events: Event sourcing (FlextModels.DomainEvent)
     """
+
+    # =========================================================================
+    # ENUMERATIONS - Domain enums for quality analysis
+    # =========================================================================
+
+    class AnalysisStatus(StrEnum):
+        """Analysis status enumeration."""
+
+        QUEUED = "queued"
+        ANALYZING = "analyzing"
+        COMPLETED = "completed"
+        FAILED = "failed"
+
+    class IssueSeverity(StrEnum):
+        """Issue severity levels."""
+
+        CRITICAL = "CRITICAL"
+        HIGH = "HIGH"
+        MEDIUM = "MEDIUM"
+        LOW = "LOW"
+        INFO = "INFO"
+
+    class IssueType(StrEnum):
+        """Issue type enumeration."""
+
+        # Code quality issues
+        SYNTAX_ERROR = "syntax_error"
+        STYLE_VIOLATION = "style_violation"
+        NAMING_CONVENTION = "naming_convention"
+        # Complexity issues
+        HIGH_COMPLEXITY = "high_complexity"
+        HIGH_COGNITIVE_COMPLEXITY = "high_cognitive_complexity"
+        LONG_METHOD = "long_method"
+        LONG_PARAMETER_LIST = "long_parameter_list"
+        # Security issues
+        SECURITY_VULNERABILITY = "security_vulnerability"
+        HARDCODED_CREDENTIAL = "hardcoded_credential"
+        SQL_INJECTION = "sql_injection"
+        XSS_VULNERABILITY = "xss_vulnerability"
+        # Dead code issues
+        UNUSED_IMPORT = "unused_import"
+        UNUSED_VARIABLE = "unused_variable"
+        UNUSED_FUNCTION = "unused_function"
+        UNREACHABLE_CODE = "unreachable_code"
+        # Duplication issues
+        DUPLICATE_CODE = "duplicate_code"
+        SIMILAR_CODE = "similar_code"
+        # Type issues
+        TYPE_ERROR = "type_error"
+        MISSING_TYPE_ANNOTATION = "missing_type_annotation"
+        # Documentation issues
+        MISSING_DOCSTRING = "missing_docstring"
+        INVALID_DOCSTRING = "invalid_docstring"
+
+    class QualityGrade(StrEnum):
+        """Quality grade enumeration."""
+
+        A_PLUS = "A+"
+        A = "A"
+        A_MINUS = "A-"
+        B_PLUS = "B+"
+        B = "B"
+        B_MINUS = "B-"
+        C_PLUS = "C+"
+        C = "C"
+        C_MINUS = "C-"
+        D_PLUS = "D+"
+        D = "D"
+        D_MINUS = "D-"
+        F = "F"
 
     # Quality score thresholds - generic configuration
     GRADE_A_THRESHOLD = 90.0
@@ -35,7 +109,11 @@ class FlextQualityModels(FlextModels):
     GRADE_C_THRESHOLD = 70.0
     GRADE_D_THRESHOLD = 60.0
 
-    class QualityMixin:
+    # =========================================================================
+    # MIXINS - Reusable model behaviors (must extend BaseModel for Pydantic)
+    # =========================================================================
+
+    class QualityMixin(BaseModel):
         """Mixin providing common quality model functionality."""
 
         @computed_field
@@ -50,7 +128,7 @@ class FlextQualityModels(FlextModels):
                 "validation_status": "passed",
             }
 
-    class ScoreMixin:
+    class ScoreMixin(BaseModel):
         """Mixin for models with quality scores."""
 
         overall_score: ScoreRange = Field(0.0, description="Overall quality score")
@@ -89,10 +167,10 @@ class FlextQualityModels(FlextModels):
                 return "D"
             return "F"
 
-    class TimestampMixin:
+    class TimestampMixin(BaseModel):
         """Mixin for models with timestamp tracking."""
 
-        created_at: Timestamp
+        created_at: Timestamp = Field(default_factory=lambda: datetime.now(UTC))
         updated_at: datetime | None = Field(default_factory=lambda: datetime.now(UTC))
 
         @field_validator("updated_at", mode="before")
@@ -104,7 +182,6 @@ class FlextQualityModels(FlextModels):
     class ProjectModel(FlextModels.Entity, TimestampMixin, QualityMixin):
         """Project entity with advanced validation."""
 
-        id: str = Field(..., description="Unique project identifier")
         name: str = Field(min_length=1, max_length=255)
         path: str = Field(..., description="Project path for analysis")
         description: str | None = None
@@ -124,7 +201,6 @@ class FlextQualityModels(FlextModels):
     class AnalysisModel(FlextModels.Entity, ScoreMixin, TimestampMixin, QualityMixin):
         """Analysis entity with score tracking."""
 
-        id: str = Field(..., description="Unique analysis identifier")
         project_id: UUID = Field(..., description="Associated project")
         status: str = Field(..., description="Analysis status")
         started_at: Timestamp
@@ -158,7 +234,6 @@ class FlextQualityModels(FlextModels):
     class IssueModel(FlextModels.Entity, TimestampMixin, QualityMixin):
         """Quality issue entity."""
 
-        id: str = Field(..., description="Unique issue identifier")
         analysis_id: UUID = Field(..., description="Associated analysis")
         file_path: str = Field(..., description="File containing the issue")
         line_number: PositiveInt | None = None
@@ -183,7 +258,6 @@ class FlextQualityModels(FlextModels):
     class ReportModel(FlextModels.Entity, ScoreMixin, TimestampMixin, QualityMixin):
         """Quality report entity."""
 
-        id: str = Field(..., description="Unique report identifier")
         analysis_id: UUID = Field(..., description="Associated analysis")
         format_type: Literal["HTML", "JSON", "PDF", "CSV", "XML", "MARKDOWN"] = "HTML"
         file_path: str | None = None
@@ -290,6 +364,81 @@ class FlextQualityModels(FlextModels):
         functions_count: int = 0
         classes_count: int = 0
 
+    class AnalysisResult(FlextModels.Value, ScoreMixin, QualityMixin):
+        """Analysis result value object."""
+
+        analysis_id: str = Field(..., description="Analysis identifier")
+        project_path: str = Field(..., description="Project path analyzed")
+        status: str = Field(..., description="Analysis status")
+        issues_found: list[dict[str, Any]] = Field(default_factory=list)
+        metrics: dict[str, Any] = Field(default_factory=dict)
+
+        @computed_field
+        @property
+        def analysis_summary(self) -> dict[str, Any]:
+            """Analysis summary."""
+            return {
+                "analysis_id": self.analysis_id,
+                "project_path": self.project_path,
+                "status": self.status,
+                "issues_count": len(self.issues_found),
+                "metrics_count": len(self.metrics),
+                "scores": {
+                    "overall": self.overall_score,
+                    "grade": self.quality_grade,
+                },
+                **self.quality_metadata,
+            }
+
+    class RewriteResult(FlextModels.Value):
+        """Git rewrite operation result."""
+
+        original_commit: str = Field(..., description="Original commit hash")
+        new_commit: str = Field(..., description="New commit hash")
+        files_changed: list[str] = Field(default_factory=list)
+        operation_type: str = Field(..., description="Type of rewrite operation")
+
+    class OptimizationTarget(FlextModels.Value):
+        """Optimization target specification."""
+
+        file_path: str = Field(..., description="Target file path")
+        optimization_type: str = Field(..., description="Type of optimization")
+        priority: Literal["low", "medium", "high", "critical"] = "medium"
+
+    class OptimizationResult(FlextModels.Value, ScoreMixin):
+        """Optimization operation result."""
+
+        optimization_id: str = Field(..., description="Optimization identifier")
+        target_files: list[str] = Field(default_factory=list)
+        optimizations_applied: list[str] = Field(default_factory=list)
+        performance_improvement: float = Field(default=0.0)
+        target: str | None = Field(default=None, description="Optimization target")
+        changes_made: int = Field(default=0, description="Number of changes made")
+        success: bool = Field(
+            default=True, description="Whether the operation was successful"
+        )
+        errors: list[str] = Field(
+            default_factory=list, description="List of errors encountered"
+        )
+        warnings: list[str] = Field(
+            default_factory=list, description="List of warnings encountered"
+        )
+
+        @computed_field
+        @property
+        def optimization_summary(self) -> dict[str, Any]:
+            """Optimization summary."""
+            return {
+                "optimization_id": self.optimization_id,
+                "target_files_count": len(self.target_files),
+                "optimizations_count": len(self.optimizations_applied),
+                "performance_improvement": self.performance_improvement,
+                "scores": {
+                    "overall": self.overall_score,
+                    "grade": self.quality_grade,
+                },
+            }
+
     class FunctionInfo(FlextModels.Value):
         """Function information from AST."""
 
@@ -306,28 +455,89 @@ class FlextQualityModels(FlextModels):
         methods_count: int = 0
         attributes_count: int = 0
 
-    class DomainEvent(FlextModels.DomainEvent):
-        """Base domain event for quality analysis."""
+    # =========================================================================
+    # COMMANDS - CQRS commands (EXTEND FlextModels.Command)
+    # =========================================================================
 
-        event_type: str
-        timestamp: Timestamp
-        data: dict[str, Any] = Field(default_factory=dict)
+    class AnalyzeProjectCommand(FlextModels.Command):
+        """Command to analyze a project."""
 
-    # Export all nested model classes for direct access
-    ProjectModel = ProjectModel
-    AnalysisModel = AnalysisModel
-    IssueModel = IssueModel
-    ReportModel = ReportModel
-    ConfigModel = ConfigModel
-    AnalysisResults = AnalysisResults
-    Dependency = Dependency
-    TestResults = TestResults
-    OverallMetrics = OverallMetrics
-    FunctionInfo = FunctionInfo
-    ClassInfo = ClassInfo
-    DomainEvent = DomainEvent
+        project_path: str = Field(..., description="Path to project to analyze")
+        include_security: bool = Field(True, description="Include security analysis")
+        include_complexity: bool = Field(
+            True, description="Include complexity analysis"
+        )
+        include_dead_code: bool = Field(True, description="Include dead code detection")
+        include_duplicates: bool = Field(
+            True, description="Include duplication detection"
+        )
 
-    # Direct aliases for compatibility (no wrappers)
+    class GenerateReportCommand(FlextModels.Command):
+        """Command to generate quality report."""
+
+        analysis_id: UUID = Field(..., description="Analysis ID")
+        format_type: Literal["HTML", "JSON", "PDF", "CSV", "MARKDOWN"] = Field(
+            "HTML", description="Report format"
+        )
+
+    # =========================================================================
+    # QUERIES - CQRS queries (EXTEND FlextModels.Query)
+    # =========================================================================
+
+    class GetProjectQuery(FlextModels.Query):
+        """Query to get project details."""
+
+        project_id: str = Field(..., description="Project ID")
+
+    class GetAnalysisResultsQuery(FlextModels.Query):
+        """Query to get analysis results."""
+
+        analysis_id: UUID = Field(..., description="Analysis ID")
+
+    class GetQualityMetricsQuery(FlextModels.Query):
+        """Query to get quality metrics."""
+
+        project_id: str = Field(..., description="Project ID")
+
+    # =========================================================================
+    # DOMAIN EVENTS - Event sourcing (EXTEND FlextModels.DomainEvent)
+    # =========================================================================
+
+    class AnalysisStartedEvent(FlextModels.DomainEvent):
+        """Event when analysis starts."""
+
+        analysis_id: UUID = Field(..., description="Analysis ID")
+        project_path: str = Field(..., description="Project path")
+        timestamp: Timestamp = Field(default_factory=lambda: datetime.now(UTC))
+
+    class AnalysisCompletedEvent(FlextModels.DomainEvent):
+        """Event when analysis completes."""
+
+        analysis_id: UUID = Field(..., description="Analysis ID")
+        overall_score: float = Field(..., ge=0.0, le=100.0)
+        timestamp: Timestamp = Field(default_factory=lambda: datetime.now(UTC))
+
+    class IssueDetectedEvent(FlextModels.DomainEvent):
+        """Event when quality issue detected."""
+
+        issue_id: str = Field(..., description="Issue ID")
+        severity: str = Field(..., description="Issue severity")
+        file_path: str = Field(..., description="File path")
+        timestamp: Timestamp = Field(default_factory=lambda: datetime.now(UTC))
+
+    class ReportGeneratedEvent(FlextModels.DomainEvent):
+        """Event when report is generated."""
+
+        report_id: str = Field(..., description="Report ID")
+        analysis_id: UUID = Field(..., description="Analysis ID")
+        format_type: str = Field(..., description="Report format")
+        timestamp: Timestamp = Field(default_factory=lambda: datetime.now(UTC))
+
+    # =========================================================================
+    # EXPORT & ALIASES - Direct access patterns
+    # =========================================================================
+
+    # Direct aliases for backward compatibility (no wrappers)
     Project = ProjectModel
     Analysis = AnalysisModel
     Issue = IssueModel
@@ -340,7 +550,10 @@ class FlextQualityModels(FlextModels):
     DuplicationIssue = IssueModel
 
 
-# Rebuild models after all classes are defined to resolve forward references
+# =========================================================================
+# MODEL RECONSTRUCTION - Resolve forward references after all classes defined
+# =========================================================================
+
 FlextQualityModels.ProjectModel.model_rebuild()
 FlextQualityModels.AnalysisModel.model_rebuild()
 FlextQualityModels.IssueModel.model_rebuild()
@@ -349,11 +562,32 @@ FlextQualityModels.ConfigModel.model_rebuild()
 FlextQualityModels.AnalysisResults.model_rebuild()
 FlextQualityModels.TestResults.model_rebuild()
 FlextQualityModels.OverallMetrics.model_rebuild()
+FlextQualityModels.AnalysisResult.model_rebuild()
+FlextQualityModels.RewriteResult.model_rebuild()
+FlextQualityModels.OptimizationResult.model_rebuild()
+FlextQualityModels.OptimizationTarget.model_rebuild()
 FlextQualityModels.FunctionInfo.model_rebuild()
 FlextQualityModels.ClassInfo.model_rebuild()
-FlextQualityModels.DomainEvent.model_rebuild()
 
-# Export models for clean imports
+# CQRS Commands
+FlextQualityModels.AnalyzeProjectCommand.model_rebuild()
+FlextQualityModels.GenerateReportCommand.model_rebuild()
+
+# CQRS Queries
+FlextQualityModels.GetProjectQuery.model_rebuild()
+FlextQualityModels.GetAnalysisResultsQuery.model_rebuild()
+FlextQualityModels.GetQualityMetricsQuery.model_rebuild()
+
+# Domain Events
+FlextQualityModels.AnalysisStartedEvent.model_rebuild()
+FlextQualityModels.AnalysisCompletedEvent.model_rebuild()
+FlextQualityModels.IssueDetectedEvent.model_rebuild()
+FlextQualityModels.ReportGeneratedEvent.model_rebuild()
+
+# =========================================================================
+# PUBLIC API - Export models for clean imports
+# =========================================================================
+
 __all__ = [
     "FlextQualityModels",
 ]

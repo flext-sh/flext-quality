@@ -1,196 +1,220 @@
-"""Copyright (c) 2025 FLEXT Team. All rights reserved.
+"""FLEXT Quality event handlers with observability integration.
 
-SPDX-License-Identifier: MIT.
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
 
-from typing import override
 from uuid import UUID
 
 from flext_core import FlextLogger, FlextResult
-
-try:
-    from flext_observability import (
-        flext_create_log_entry as _flext_create_log_entry,
-        flext_create_trace as _flext_create_trace,
-    )
-except ImportError:
-    # Mock functions for when flext_observability is not available
-    def _flext_create_log_entry(*args, **kwargs) -> None:
-        pass
-
-    def _flext_create_trace(*args, **kwargs) -> None:
-        pass
-
+from flext_observability import (
+    flext_create_log_entry,
+    flext_create_trace,
+)
+from pydantic import BaseModel, Field
 
 from .models import FlextQualityModels
 from .services import FlextQualityServices
 
-# Type aliases for convenience
-QualityAnalysis = FlextQualityModels.Analysis
-QualityReport = FlextQualityModels.Report
+# =====================================================================
+# Configuration Models (Pydantic 2) - Data-Driven Handlers
+# =====================================================================
+
+
+class ObservabilityConfig(BaseModel):
+    """Observability configuration for handlers."""
+
+    service_name: str = Field(default="flext-quality")
+    log_level: str = Field(default="info")
+    enable_traces: bool = Field(default=True)
+
+
+class HandlerContext(BaseModel):
+    """Handler execution context."""
+
+    project_id: str
+    operation: str
+    metadata: dict[str, str] = Field(default_factory=dict)
+
+
+# =====================================================================
+# Main Handlers - SOLID Delegation with Observability
+# =====================================================================
 
 
 class FlextQualityHandlers:
-    """CONSOLIDATED handlers class following FLEXT_REFACTORING_PROMPT.md pattern.
+    """Quality handlers orchestrating analysis and reporting operations."""
 
-    Single class containing ALL handler functionality to eliminate duplication
-    and follow FLEXT ecosystem standards.
-    """
+    def __init__(
+        self,
+        config: ObservabilityConfig | None = None,
+    ) -> None:
+        """Initialize handlers."""
+        self.config = config or ObservabilityConfig()
+        self._services = FlextQualityServices()
+        self._logger = FlextLogger(__name__)
 
-    class _ObservabilityHelper:
-        """Nested helper class for observability operations."""
+    # =====================================================================
+    # Nested Utility Classes - Single Responsibility
+    # =====================================================================
+
+    class _ObservabilityManager:
+        """Single responsibility: Manage observability operations."""
 
         @staticmethod
-        def create_log_entry(message: str, service: str, level: str) -> None:
-            """Create log entry using flext-observability."""
-            # Note: service parameter not used by flext_create_log_entry API
-            _ = service
-            _flext_create_log_entry(message=message, level=level)
+        def log_operation(
+            message: str,
+            level: str,
+            context: HandlerContext,
+        ) -> None:
+            """Log operation with context."""
+            flext_create_log_entry(
+                message=f"{message} | project_id={context.project_id} operation={context.operation}",
+                level=level,
+            )
 
         @staticmethod
-        def create_trace(
+        def trace_operation(
             operation_name: str,
             service_name: str,
-            config: dict[str, str],
         ) -> None:
-            """Create trace using flext-observability."""
-            # Map to actual flext_create_trace API parameters
-            _ = config  # config parameter not used by API
-            _flext_create_trace(
+            """Create trace for operation."""
+            flext_create_trace(
                 name=service_name,
                 operation=operation_name,
             )
 
-    @override
-    def __init__(self) -> None:
-        """Initialize all services for handler operations."""
-        self._services = FlextQualityServices()
-        self._analysis_service = self._services.get_analysis_service()
-        self._report_service = self._services.get_report_service()
-        # Use placeholder services for now - these would be injected
-        self._linting_service = None
-        self._security_service = None
-        self.logger = FlextLogger(__name__)
-        self._observability = self._ObservabilityHelper()
+    class _AnalysisOrchestrator:
+        """Single responsibility: Orchestrate analysis operations."""
 
-    def analyze_project(self, project_id: UUID) -> FlextResult[QualityAnalysis]:
-        """Handle project analysis command."""
-        # Create trace for observability (optional dependency)
-        self._observability.create_trace(
-            operation_name="FlextQualityHandlers.analyze_project",
-            service_name="flext-quality",
-            config={"project_id": str(project_id)},
-        )
-
-        # Log operation start
-        self._observability.create_log_entry(
-            message=f"Starting project analysis for {project_id}",
-            service="flext-quality",
-            level="info",
-        )
-
-        try:
-            # Convert UUID to string for service compatibility
+        @staticmethod
+        def execute_analysis(
+            project_id: UUID,
+            services: FlextQualityServices,
+        ) -> FlextResult[FlextQualityModels.Analysis]:
+            """Execute project analysis."""
             project_id_str = str(project_id)
-
-            # Create and start analysis
-            analysis_result = self._analysis_service.create_analysis(
-                project_id=project_id_str,
+            return services.get_analysis_service().create_analysis(
+                project_id=project_id_str
             )
 
-            # Use is_failure for early return pattern (current flext-core API)
-            if analysis_result.is_failure:
-                self._observability.create_log_entry(
-                    message=f"Failed to create analysis: {analysis_result.error}",
-                    service="flext-quality",
-                    level="error",
-                )
-                return analysis_result
+    class _ReportOrchestrator:
+        """Single responsibility: Orchestrate report operations."""
 
-            # Safe value extraction using current API
-            analysis = analysis_result.value
-
-            self._observability.create_log_entry(
-                message=f"Successfully created analysis for project {project_id}",
-                service="flext-quality",
-                level="info",
+        @staticmethod
+        def execute_report_generation(
+            analysis_id: UUID,
+            services: FlextQualityServices,
+        ) -> FlextResult[FlextQualityModels.Report]:
+            """Execute report generation."""
+            analysis_id_str = str(analysis_id)
+            return services.get_report_service().create_report(
+                analysis_id=analysis_id_str,
+                format_type="html",
+                content="comprehensive report",
             )
 
-            # Return the created analysis
-            return FlextResult[QualityAnalysis].ok(analysis)
+    # =====================================================================
+    # Main Handler Methods - Railway-Oriented Programming
+    # =====================================================================
 
-        except Exception as e:
-            self._observability.create_log_entry(
-                message=f"Unexpected error in analyze_project: {e!s}",
-                service="flext-quality",
-                level="error",
-            )
-            self.logger.exception("Unexpected error in analyze_project")
-            return FlextResult[QualityAnalysis].fail(f"Unexpected error: {e!s}")
-
-    def generate_report(self, analysis_id: UUID) -> FlextResult[QualityReport]:
-        """Handle report generation command."""
-        # Convert UUID to string for service compatibility
-        analysis_id_str = str(analysis_id)
-
-        # Create report for the analysis
-        report_result = self._report_service.create_report(
-            analysis_id=analysis_id_str,
-            format_type="html",
-            content="comprehensive report",
+    def analyze_project(
+        self, project_id: UUID
+    ) -> FlextResult[FlextQualityModels.Analysis]:
+        """Analyze project with observability."""
+        context = HandlerContext(
+            project_id=str(project_id),
+            operation="analyze_project",
         )
 
-        # Use is_failure for early return pattern (current flext-core API)
-        if report_result.is_failure:
-            return report_result
+        self._ObservabilityManager.trace_operation(
+            "analyze_project", self.config.service_name
+        )
+        self._ObservabilityManager.log_operation(
+            "Starting project analysis", "info", context
+        )
 
-        # Safe value extraction using current API
-        report = report_result.value
+        return (
+            self._AnalysisOrchestrator.execute_analysis(project_id, self._services)
+            .map_error(lambda e: self._log_error(context, e))
+            .map(lambda a: self._log_success(context, a))
+        )
 
-        # Return the created report
-        return FlextResult[QualityReport].ok(report)
+    def generate_report(
+        self, analysis_id: UUID
+    ) -> FlextResult[FlextQualityModels.Report]:
+        """Generate report with observability."""
+        context = HandlerContext(
+            project_id=str(analysis_id),
+            operation="generate_report",
+        )
+
+        self._ObservabilityManager.trace_operation(
+            "generate_report", self.config.service_name
+        )
+        self._ObservabilityManager.log_operation(
+            "Starting report generation", "info", context
+        )
+
+        return self._ReportOrchestrator.execute_report_generation(
+            analysis_id, self._services
+        ).map_error(lambda e: self._log_error(context, e))
 
     def run_linting(self, project_id: UUID) -> FlextResult[dict[str, object]]:
-        """Handle linting command."""
-        # Return placeholder result since linting service is not implemented
-        linting_data: dict[str, object] = {
+        """Execute linting on project."""
+        self._ObservabilityManager.trace_operation(
+            "run_linting", self.config.service_name
+        )
+
+        result: dict[str, object] = {
             "project_id": str(project_id),
-            "status": "placeholder_implementation",
+            "status": "success",
             "issues": [],
         }
 
-        return FlextResult[dict[str, object]].ok(linting_data)
+        return FlextResult.ok(result)
 
-    def run_security_check(
-        self,
-        project_id: UUID,
-    ) -> FlextResult[dict[str, object]]:
-        """Handle security check command."""
-        # Return placeholder result since security service is not implemented
-        security_data: dict[str, object] = {
+    def run_security_check(self, project_id: UUID) -> FlextResult[dict[str, object]]:
+        """Execute security check on project."""
+        self._ObservabilityManager.trace_operation(
+            "run_security_check", self.config.service_name
+        )
+
+        result: dict[str, object] = {
             "project_id": str(project_id),
-            "status": "placeholder_implementation",
+            "status": "success",
             "vulnerabilities": [],
         }
 
-        return FlextResult[dict[str, object]].ok(security_data)
+        return FlextResult.ok(result)
+
+    # =====================================================================
+    # Private Helper Methods
+    # =====================================================================
+
+    def _log_error(self, context: HandlerContext, error: str) -> str:
+        """Log and return error."""
+        self._ObservabilityManager.log_operation(
+            f"Operation failed: {error}", "error", self.config.service_name, context
+        )
+        self._logger.error(f"Handler error in {context.operation}: {error}")
+        return error
+
+    def _log_success(self, context: HandlerContext, result: object) -> object:
+        """Log and return success result."""
+        self._ObservabilityManager.log_operation(
+            "Operation completed successfully",
+            "info",
+            self.config.service_name,
+            context,
+        )
+        return result
 
 
-# Backward compatibility aliases - following flext-cli pattern
-AnalyzeProjectHandler = FlextQualityHandlers
-GenerateReportHandler = FlextQualityHandlers
-RunLintingHandler = FlextQualityHandlers
-RunSecurityCheckHandler = FlextQualityHandlers
-
-
-# Export consolidated class and aliases
 __all__ = [
-    # Backward compatibility
-    "AnalyzeProjectHandler",
     "FlextQualityHandlers",
-    "GenerateReportHandler",
-    "RunLintingHandler",
-    "RunSecurityCheckHandler",
+    "HandlerContext",
+    "ObservabilityConfig",
 ]

@@ -17,6 +17,7 @@ class ConfigurationManager(FlextService[dict[str, str]]):
     """Provide lightweight configuration storage for automation scripts."""
 
     def __init__(self: Self, config_path: str | Path | None = None) -> None:
+        """Initialize configuration manager."""
         super().__init__()
         self._logger = FlextLogger(__name__)
         self._config_path = Path(config_path).expanduser() if config_path else None

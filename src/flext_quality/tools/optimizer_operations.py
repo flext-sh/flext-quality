@@ -1,1333 +1,544 @@
-"""Module optimization operations for code refactoring and modernization.
+"""Module optimization operations - SOLID pattern with delegated responsibilities.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 
-Consolidates flext_tools optimizer operations:
-- ModuleOptimizer → Complete module optimization
-- ImportRefactorer → Import optimization and domain library enforcement
-- SyntaxModernizer → Python syntax modernization
-- TypeModernizer → Type annotation modernization
+Operations:
+- ModuleOptimizer: AST analysis and pattern detection (via ASTAnalyzer)
+- ImportRefactorer: Import standardization (via ImportOptimizer)
+- SyntaxModernizer: Python 3.13+ syntax updates (via SyntaxUpdater)
+- TypeModernizer: Type checker migration (via ConfigUpdater)
 
-ALL operations support:
-- dry_run=True (default - MANDATORY)
-- temp_path for temporary workspace
-- FlextResult error handling (NO try/except)
-- Domain library enforcement (ZERO TOLERANCE)
+All operations delegate to utility services for SINGLE RESPONSIBILITY.
 """
 
 from __future__ import annotations
 
 import ast
-import operator
 import re
-import shutil
-import tempfile
 from pathlib import Path
-from typing import ClassVar
+from typing import Any
 
 import toml
-from flext_core import (
-    FlextConstants,
-    FlextLogger,
-    FlextResult,
-    FlextService,
-)
-from pydantic import ConfigDict
+from flext_core import FlextLogger, FlextResult, FlextService
+from pydantic import BaseModel, Field
 
-from flext_quality.constants import FlextQualityConstants
 from flext_quality.models import FlextQualityModels
+
+# =========================================================================
+# PYDANTIC CONFIGURATION MODELS - Replace hardcoded patterns with data
+# =========================================================================
+
+
+class DomainLibraryPattern(BaseModel):
+    """Forbidden import pattern and required replacement."""
+
+    import_pattern: str = Field(..., description="Forbidden import pattern")
+    required_library: str = Field(..., description="Required domain library")
+
+    class Config:
+        frozen = True
+
+
+class OptimizerConfig(BaseModel):
+    """Optimizer configuration with all patterns as data."""
+
+    domain_violations: list[DomainLibraryPattern] = Field(
+        default_factory=lambda: [
+            DomainLibraryPattern(
+                import_pattern="import ldap3", required_library="flext-ldap"
+            ),
+            DomainLibraryPattern(
+                import_pattern="from ldap3", required_library="flext-ldap"
+            ),
+            DomainLibraryPattern(
+                import_pattern="import click", required_library="flext-cli"
+            ),
+            DomainLibraryPattern(
+                import_pattern="from click", required_library="flext-cli"
+            ),
+            DomainLibraryPattern(
+                import_pattern="import httpx", required_library="flext-api"
+            ),
+            DomainLibraryPattern(
+                import_pattern="from httpx", required_library="flext-api"
+            ),
+            DomainLibraryPattern(
+                import_pattern="import oracledb", required_library="flext-db-oracle"
+            ),
+            DomainLibraryPattern(
+                import_pattern="from oracledb", required_library="flext-db-oracle"
+            ),
+        ]
+    )
+    temp_prefix: str = Field(default="flext-optim-")
+    complexity_threshold: float = Field(default=0.7)
+    max_functions: int = Field(default=15)
+    max_ast_depth: int = Field(default=8)
+    max_line_count: int = Field(default=500)
+
+
+# =========================================================================
+# UTILITY SERVICES - Focused, single-responsibility operations
+# =========================================================================
+
+
+class ASTAnalyzer:
+    """AST analysis utility - calculates metrics, finds violations."""
+
+    @staticmethod
+    def calculate_depth(node: ast.AST, depth: int = 0) -> int:
+        """Calculate maximum AST depth recursively."""
+        if not hasattr(node, "body"):
+            return depth
+
+        return max(
+            (
+                ASTAnalyzer.calculate_depth(child, depth + 1)
+                for child in ast.iter_child_nodes(node)
+            ),
+            default=depth,
+        )
+
+    @staticmethod
+    def calculate_complexity(
+        tree: ast.Module, content: str, config: OptimizerConfig
+    ) -> float:
+        """Calculate complexity score based on AST analysis."""
+        score = 0.0
+
+        class_count = sum(
+            1 for node in ast.walk(tree) if isinstance(node, ast.ClassDef)
+        )
+        if class_count > 1:
+            score += 0.3
+        elif class_count == 0:
+            score += 0.2
+
+        func_count = sum(
+            1 for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
+        )
+        if func_count > config.max_functions:
+            score += 0.3
+
+        depth = ASTAnalyzer.calculate_depth(tree)
+        if depth > config.max_ast_depth:
+            score += 0.2
+
+        lines = len(content.split("\n"))
+        if lines > config.max_line_count:
+            score += 0.2
+
+        return min(score, 1.0)
+
+    @staticmethod
+    def find_violations(content: str, config: OptimizerConfig) -> list[str]:
+        """Find domain library violations in content."""
+        return [
+            f"Domain violation: {pattern.import_pattern} should use {pattern.required_library}"
+            for pattern in config.domain_violations
+            if pattern.import_pattern in content
+        ]
+
+
+class ImportOptimizer:
+    """Import optimization - sys.path removal, submodule rewrites."""
+
+    @staticmethod
+    def remove_sys_path_hacks(content: str) -> tuple[str, bool]:
+        """Remove sys.path manipulation hacks."""
+        pattern = re.compile(r"^\s*sys\.path\.(insert|append)\(.*\)\s*$", re.MULTILINE)
+        if pattern.search(content):
+            return pattern.sub("", content), True
+        return content, False
+
+    @staticmethod
+    def rewrite_submodule_imports(content: str, package: str) -> tuple[str, bool]:
+        """Rewrite from pkg.sub import X → from pkg import X."""
+        pattern = re.compile(
+            rf"^\s*from\s+{re.escape(package)}\.(?P<sub>[A-Za-z0-9_\.]+)\s+import\s+(?P<names>[^\n]+)$",
+            re.MULTILINE,
+        )
+        if not pattern.search(content):
+            return content, False
+
+        def replace_sub(m: re.Match[str]) -> str:
+            return f"from {package} import {m.group('names')}"
+
+        return pattern.sub(replace_sub, content), True
+
+    @staticmethod
+    def promote_type_checking_imports(content: str) -> tuple[str, bool]:
+        """Promote non-typing imports from TYPE_CHECKING blocks."""
+        allowed = ("typing", "collections.abc")
+
+        try:
+            tree = ast.parse(content)
+        except SyntaxError:
+            return content, False
+
+        lines = content.splitlines(keepends=True)
+        promoted, changed = [], False
+
+        for node in tree.body:
+            if (
+                isinstance(node, ast.If)
+                and isinstance(node.test, ast.Name)
+                and node.test.id == "TYPE_CHECKING"
+            ):
+                start, end = (
+                    getattr(node, "lineno", None),
+                    getattr(node, "end_lineno", None),
+                )
+                if start and end:
+                    block = "".join(lines[start - 1 : end])
+                    try:
+                        for sub_node in ast.parse(block).body:
+                            if (
+                                isinstance(sub_node, ast.ImportFrom)
+                                and sub_node.module
+                                and not sub_node.module.startswith(allowed)
+                            ):
+                                promoted.append(
+                                    f"from {sub_node.module} import {', '.join(a.name for a in sub_node.names)}"
+                                )
+                                changed = True
+                    except SyntaxError:
+                        pass
+
+        if promoted and changed:
+            content = (
+                re.sub(r"if TYPE_CHECKING:.*?(?=\n\n|\Z)", "", content, flags=re.DOTALL)
+                + "\n"
+                + "\n".join(promoted)
+            )
+
+        return content, changed
+
+
+class SyntaxUpdater:
+    """Python 3.13+ syntax modernization."""
+
+    @staticmethod
+    def modernize_unions(content: str) -> tuple[str, list[str]]:
+        """Convert Union[A, B] → A | B and Optional[T] → T | None."""
+        changes = []
+
+        for union_match in re.finditer(r"Union\[([^\]]+)\]", content):
+            types = [t.strip() for t in union_match.group(1).split(",")]
+            new = " | ".join(types)
+            content = content.replace(union_match.group(0), new)
+            changes.append(f"Union → {new}")
+
+        for opt_match in re.finditer(r"Optional\[([^\]]+)\]", content):
+            new = f"{opt_match.group(1)} | None"
+            content = content.replace(opt_match.group(0), new)
+            changes.append(f"Optional → {new}")
+
+        return content, changes
+
+    @staticmethod
+    def modernize_collections(content: str) -> tuple[str, list[str]]:
+        """Convert Dict/List/Set/Tuple → dict/list/set/tuple."""
+        changes = []
+        replacements = {"Dict": "dict", "List": "list", "Set": "set", "Tuple": "tuple"}
+
+        for old, new in replacements.items():
+            pattern = rf"\b{old}\["
+            if re.search(pattern, content):
+                content = re.sub(pattern, f"{new}[", content)
+                changes.append(f"{old} → {new}")
+
+        return content, changes
+
+
+class ConfigUpdater:
+    """Configuration file modernization - pyproject.toml, Makefile."""
+
+    @staticmethod
+    def update_pyproject(content: str) -> tuple[str, list[str]]:
+        """Update pyproject.toml for Pyrefly instead of MyPy."""
+        changes = []
+        try:
+            data = toml.loads(content)
+        except Exception:
+            return content, []
+
+        # Remove MyPy, add Pyrefly
+        poetry_dev = (
+            data.get("tool", {})
+            .get("poetry", {})
+            .get("group", {})
+            .get("dev", {})
+            .get("dependencies", {})
+        )
+        if poetry_dev:
+            if "mypy" in poetry_dev:
+                del poetry_dev["mypy"]
+                changes.append("Removed MyPy")
+            if "pyrefly" not in poetry_dev:
+                poetry_dev["pyrefly"] = "^0.34.0"
+                changes.append("Added Pyrefly")
+
+        # Remove MyPy tool config
+        if "tool" in data:
+            for key in list(data["tool"].keys()):
+                if key in {"mypy", "pyright"}:
+                    del data["tool"][key]
+                    changes.append(f"Removed [tool.{key}]")
+
+        # Add Pyrefly config
+        if "tool" not in data:
+            data["tool"] = {}
+        if "pyrefly" not in data["tool"]:
+            data["tool"]["pyrefly"] = {
+                "python_version": "3.13",
+                "show_error_codes": True,
+            }
+            changes.append("Added Pyrefly config")
+
+        return (toml.dumps(data) if changes else content), changes
+
+    @staticmethod
+    def update_makefile(content: str) -> tuple[str, list[str]]:
+        """Update Makefile to use Pyrefly."""
+        changes = []
+        replacements = [
+            (r"mypy\s+\$\(SRC_DIR\)\s+--strict", "pyrefly check $(SRC_DIR)"),
+            (r"mypy\s+src/\s+--strict", "pyrefly check src/"),
+        ]
+
+        for pattern, replacement in replacements:
+            if re.search(pattern, content):
+                content = re.sub(pattern, replacement, content)
+                changes.append("Updated type-check command")
+
+        return content, changes
+
+
+# =========================================================================
+# MAIN SERVICE - Unified API delegating to utilities
+# =========================================================================
 
 
 class FlextQualityOptimizerOperations(FlextService[None]):
-    """Unified module optimization operations with complete flext-core integration.
+    """Unified optimizer service delegating to focused utilities.
 
-    Example usage:
-    ```python
-    from .tools import FlextQualityOptimizerOperations
-
-    optimizer = FlextQualityOptimizerOperations()
-
-    # ALWAYS test in dry-run first (default)
-    result = optimizer.module.optimize(
-        module_path="src/my_module.py",
-        dry_run=True,  # MANDATORY default
-        temp_path="/tmp/test-workspace",
-    )
-
-    # Review changes in temp workspace before applying
-    if result.is_success:
-        result = optimizer.module.optimize(
-            module_path="src/my_module.py",
-            dry_run=False,  # Explicit opt-in
-        )
-    ```
+    ONE CLASS PER MODULE - All utilities composed here.
     """
 
-    model_config = ConfigDict(arbitrary_types_allowed=True, extra="allow")
+    def __init__(self, config: OptimizerConfig | None = None) -> None:
+        """Initialize with optional custom config."""
+        super().__init__()
+        self._config = config or OptimizerConfig()
+        self._logger = FlextLogger(__name__)
 
     def execute(self) -> FlextResult[None]:
-        """Execute optimizer operations service - FlextService interface."""
+        """FlextService interface."""
         return FlextResult[None].ok(None)
 
-    class ModuleOptimizer:
-        """Module optimization with AST analysis.
-
-        Consolidates: unified_module_optimizer.py
-        Complete implementation extracted from standalone script.
-        """
-
-        # Domain library violation patterns
-        FORBIDDEN_DIRECT_IMPORTS: ClassVar[dict[str, str]] = {
-            "import ldap3": "flext-ldap",
-            "from ldap3": "flext-ldap",
-            "import click": "flext-cli",
-            "from click": "flext-cli",
-            "import rich": "flext-cli",
-            "from rich": "flext-cli",
-            "import httpx": "flext-api",
-            "from httpx": "flext-api",
-            "import requests": "flext-api",
-            "from requests": "flext-api",
-            "import oracledb": "flext-db-oracle",
-            "from oracledb": "flext-db-oracle",
-            "import meltano": "flext-meltano",
-            "from meltano": "flext-meltano",
-            "import fastapi": "flext-web",
-            "from fastapi": "flext-web",
-        }
-
-        @staticmethod
-        def _create_temp_file(
-            module_path: str,
-            temp_path: str | None = None,
-        ) -> FlextResult[Path]:
-            """Create temporary copy of module for dry-run."""
-            if temp_path:
-                workspace = Path(temp_path)
-                workspace.mkdir(parents=True, exist_ok=True)
-            else:
-                workspace = Path(
-                    tempfile.mkdtemp(
-                        prefix=FlextQualityConstants.DryRun.DEFAULT_TEMP_PREFIX
-                    )
-                )
-
-            source = Path(module_path)
-            if not source.exists():
-                return FlextResult[Path].fail(f"Module not found: {module_path}")
-
-            temp_file = workspace / source.name
-            shutil.copy2(source, temp_file)
-
-            return FlextResult[Path].ok(temp_file)
-
-        @staticmethod
-        def calculate_complexity_score(tree: ast.Module, content: str) -> float:
-            """Calculate complexity score for module.
-
-            Extracted from unified_module_optimizer.py.
-            """
-            score = 0.0
-
-            # Count classes (should be 1 per module)
-            class_count = len([
-                node for node in ast.walk(tree) if isinstance(node, ast.ClassDef)
-            ])
-            if class_count > 1:
-                score += 0.3
-            elif class_count == 0:
-                score += 0.2
-
-            # Count functions (should be minimal in optimized modules)
-            func_count = len([
-                node for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
-            ])
-            if func_count > FlextConstants.Config.MAX_FUNCTIONS_THRESHOLD:
-                score += 0.3
-
-            # Check for nested complexity
-            max_depth = (
-                FlextQualityOptimizerOperations.ModuleOptimizer.calculate_ast_depth(
-                    tree
-                )
-            )
-            if max_depth > FlextConstants.Config.MAX_AST_DEPTH_THRESHOLD:
-                score += 0.2
-
-            # Line count complexity
-            line_count = len(content.split("\n"))
-            if line_count > FlextConstants.Config.MAX_LINE_COUNT_THRESHOLD:
-                score += 0.2
-
-            return min(score, 1.0)
-
-        @staticmethod
-        def calculate_ast_depth(node: ast.AST, depth: int = 0) -> int:
-            """Calculate maximum AST depth.
-
-            Extracted from unified_module_optimizer.py.
-            """
-            if not hasattr(node, "body"):
-                return depth
-
-            max_child_depth = depth
-            for child in ast.iter_child_nodes(node):
-                child_depth = (
-                    FlextQualityOptimizerOperations.ModuleOptimizer.calculate_ast_depth(
-                        child, depth + 1
-                    )
-                )
-                max_child_depth = max(max_child_depth, child_depth)
-
-            return max_child_depth
-
-        @staticmethod
-        def analyze_module(
-            module_path: str,
-        ) -> FlextResult[FlextQualityModels.AnalysisResult]:
-            """Analyze module for optimization opportunities.
-
-            Complete implementation extracted from unified_module_optimizer.py.
-
-            Args:
-                module_path: Path to Python module
-
-            Returns:
-                FlextResult with AnalysisResult
-
-            """
-            path = Path(module_path)
-            if not path.exists():
-                return FlextResult[FlextQualityModels.AnalysisResult].fail(
-                    f"Module not found: {module_path}"
-                )
-
-            try:
-                with path.open(encoding="utf-8") as f:
-                    content = f.read()
-            except Exception as e:
-                return FlextResult[FlextQualityModels.AnalysisResult].fail(
-                    f"Failed to read file: {e}"
-                )
-
-            # Parse AST
-            try:
-                tree = ast.parse(content, filename=str(path))
-            except SyntaxError as e:
-                return FlextResult[FlextQualityModels.AnalysisResult].fail(
-                    f"Syntax error: {e}"
-                )
-
-            violations: list[str] = []
-            suggestions: list[str] = []
-            domain_library_usage: dict[str, bool] = {
-                "flext-cli": False,
-                "flext-ldif": False,
-                "flext-ldap": False,
-                "flext-api": False,
-                "flext-web": False,
-                "flext-db-oracle": False,
-                "flext-meltano": False,
-            }
-
-            # Check for domain library violations (CRITICAL)
-            for (
-                forbidden_import,
-                required_library,
-            ) in FlextQualityOptimizerOperations.ModuleOptimizer.FORBIDDEN_DIRECT_IMPORTS.items():
-                if forbidden_import in content:
-                    violations.append(
-                        f"Domain library violation: {forbidden_import} should use {required_library}"
-                    )
-
-            # Check for positive domain library usage
-            for library in domain_library_usage:
-                if (
-                    f"from {library.replace('-', '_')}" in content
-                    or f"import {library.replace('-', '_')}" in content
-                ):
-                    domain_library_usage[library] = True
-
-            # Calculate complexity score
-            complexity_score = FlextQualityOptimizerOperations.ModuleOptimizer.calculate_complexity_score(
-                tree, content
+    def analyze_module(
+        self,
+        module_path: str,
+    ) -> FlextResult[FlextQualityModels.AnalysisResult]:
+        """Analyze module for optimization opportunities."""
+        path = Path(module_path)
+        if not path.exists():
+            return FlextResult[FlextQualityModels.AnalysisResult].fail(
+                f"Module not found: {module_path}"
             )
 
-            # Generate suggestions
-            if violations:
-                suggestions.append("Fix violations to comply with FLEXT patterns")
-            if complexity_score > FlextConstants.Config.COMPLEXITY_SCORE_THRESHOLD:
-                suggestions.append("Consider breaking down complex module")
-            if not any(domain_library_usage.values()):
-                suggestions.append(
-                    "Consider using domain libraries for better architecture"
-                )
+        try:
+            content = path.read_text(encoding="utf-8")
+            tree = ast.parse(content, filename=str(path))
+        except Exception as e:
+            return FlextResult[FlextQualityModels.AnalysisResult].fail(str(e))
 
-            result = FlextQualityModels.AnalysisResult(
-                violations=violations,
-                suggestions=suggestions,
-                complexity_score=complexity_score,
-                domain_library_usage=domain_library_usage,
+        violations = ASTAnalyzer.find_violations(content, self._config)
+        complexity = ASTAnalyzer.calculate_complexity(tree, content, self._config)
+
+        result = FlextQualityModels.AnalysisResult(
+            violations=violations,
+            suggestions=[
+                "Fix domain violations" if violations else None,
+                "Reduce complexity"
+                if complexity > self._config.complexity_threshold
+                else None,
+            ],
+            complexity_score=complexity,
+            domain_library_usage={},
+        )
+
+        return FlextResult[FlextQualityModels.AnalysisResult].ok(result)
+
+    def optimize_module(
+        self,
+        module_path: str,
+        *,
+        dry_run: bool = True,
+    ) -> FlextResult[FlextQualityModels.OptimizationResult]:
+        """Optimize module - fix violations."""
+        path = Path(module_path)
+        if not path.exists():
+            return FlextResult[FlextQualityModels.OptimizationResult].fail(
+                f"Module not found: {module_path}"
             )
 
-            return FlextResult[FlextQualityModels.AnalysisResult].ok(result)
+        try:
+            content = path.read_text(encoding="utf-8")
+        except Exception as e:
+            return FlextResult[FlextQualityModels.OptimizationResult].fail(str(e))
 
-        @staticmethod
-        def count_changes(original: str, optimized: str) -> int:
-            """Count number of changes made.
-
-            Extracted from unified_module_optimizer.py.
-            """
-            original_lines = set(original.split("\n"))
-            optimized_lines = set(optimized.split("\n"))
-            return len(original_lines.symmetric_difference(optimized_lines))
-
-        @staticmethod
-        def fix_pattern_violations(content: str) -> str:
-            """Fix pattern violations in module.
-
-            Extracted from unified_module_optimizer.py.
-            """
-            optimized = content
-
-            # Fix forbidden direct imports
-            for (
-                forbidden_import,
-                required_library,
-            ) in FlextQualityOptimizerOperations.ModuleOptimizer.FORBIDDEN_DIRECT_IMPORTS.items():
-                if forbidden_import in optimized:
-                    # Replace with domain library import
-                    library_class = f"Flext{required_library.split('-')[1].title()}"
-                    optimized = optimized.replace(
-                        forbidden_import,
-                        f"from {required_library.replace('-', '_')} import {library_class}",
-                    )
-
-            # Fix generic type ignores
-            optimized = re.sub(
-                r"# type: ignore.*$",
-                "# type: ignore[explicit-error-code]",
-                optimized,
-                flags=re.MULTILINE,
-            )
-
-            # Fix object types
-            return optimized.replace(r"-> object:", "-> object:")
-
-        @staticmethod
-        def add_missing_type_hints(content: str) -> str:
-            """Add missing type hints (simplified implementation).
-
-            Extracted from unified_module_optimizer.py.
-            """
-            # This would be a complex analysis in practice
-            # For now, just ensure basic patterns are followed
-            return content
-
-        @staticmethod
-        def optimize(
-            module_path: str,
-            *,
-            dry_run: bool = True,
-            _temp_path: str | None = None,
-        ) -> FlextResult[FlextQualityModels.OptimizationResult]:
-            """Optimize Python module.
-
-            Complete implementation extracted from unified_module_optimizer.py.
-
-            Args:
-                module_path: Path to Python module
-                dry_run: Run in dry-run mode (default True - MANDATORY)
-                temp_path: Custom temporary workspace path (reserved for future use)
-
-            Returns:
-                FlextResult with OptimizationResult
-
-            """
-            logger = FlextLogger(__name__)
-
-            # Analyze first
-            analysis_result = (
-                FlextQualityOptimizerOperations.ModuleOptimizer.analyze_module(
-                    module_path
-                )
-            )
-            if analysis_result.is_failure:
-                return FlextResult[FlextQualityModels.OptimizationResult].fail(
-                    analysis_result.error
+        # Fix violations
+        for pattern in self._config.domain_violations:
+            if pattern.import_pattern in content:
+                lib_class = f"Flext{pattern.required_library.split('-')[1].title()}"
+                content = content.replace(
+                    pattern.import_pattern,
+                    f"from {pattern.required_library.replace('-', '_')} import {lib_class}",
                 )
 
-            analysis = analysis_result.value
+        if not dry_run and content != path.read_text(encoding="utf-8"):
+            path.write_text(content, encoding="utf-8")
 
-            try:
-                # Read current content
-                with Path(module_path).open(encoding="utf-8") as f:
-                    original_content = f.read()
-            except Exception as e:
-                return FlextResult[FlextQualityModels.OptimizationResult].fail(
-                    f"Failed to read file: {e}"
-                )
+        result = FlextQualityModels.OptimizationResult(
+            target=FlextQualityModels.OptimizationTarget(
+                project_path=".",
+                module_name=path.stem,
+                file_path=module_path,
+                optimization_type="pattern_violation",
+            ),
+            changes_made=1 if content != path.read_text(encoding="utf-8") else 0,
+            success=True,
+            errors=[],
+            warnings=[],
+        )
 
-            # Determine optimization type based on analysis
-            if analysis.violations:
-                optimization_type = "pattern_violation"
-                optimized_content = FlextQualityOptimizerOperations.ModuleOptimizer.fix_pattern_violations(
-                    original_content
-                )
-            elif (
-                analysis.complexity_score
-                > FlextConstants.Config.COMPLEXITY_SCORE_THRESHOLD
-            ):
-                optimization_type = "complexity_reduction"
-                # For now, complexity reduction is a placeholder
-                optimized_content = original_content
-            else:
-                optimization_type = "general_improvement"
-                optimized_content = FlextQualityOptimizerOperations.ModuleOptimizer.general_improvements(
-                    original_content
-                )
+        return FlextResult[FlextQualityModels.OptimizationResult].ok(result)
 
-            # Calculate changes
-            changes_made = (
-                FlextQualityOptimizerOperations.ModuleOptimizer.count_changes(
-                    original_content, optimized_content
-                )
-            )
+    def refactor_imports(
+        self,
+        module_path: str,
+        *,
+        dry_run: bool = True,
+        package_name: str | None = None,
+    ) -> FlextResult[dict[str, Any]]:
+        """Refactor imports using ImportOptimizer."""
+        path = Path(module_path)
+        if not path.exists():
+            return FlextResult[dict[str, Any]].fail(f"Module not found: {module_path}")
 
-            if dry_run:
-                logger.info(
-                    f"DRY RUN: Would optimize {module_path} (changes: {changes_made})"
-                )
-                result = FlextQualityModels.OptimizationResult(
-                    target=FlextQualityModels.OptimizationTarget(
-                        project_path=".",
-                        module_name=Path(module_path).stem,
-                        file_path=module_path,
-                        optimization_type=optimization_type,
-                    ),
-                    changes_made=0,  # Dry run makes no changes
-                    success=True,
-                    errors=[],
-                    warnings=[],
-                )
-                return FlextResult[FlextQualityModels.OptimizationResult].ok(result)
+        try:
+            content = path.read_text(encoding="utf-8")
+        except Exception as e:
+            return FlextResult[dict[str, Any]].fail(str(e))
 
-            # Real optimization - apply fixes
-            if optimized_content != original_content:
-                try:
-                    with Path(module_path).open("w", encoding="utf-8") as f:
-                        f.write(optimized_content)
-                    logger.info(f"Optimized {module_path} ({changes_made} changes)")
-                except Exception as e:
-                    return FlextResult[FlextQualityModels.OptimizationResult].fail(
-                        f"Failed to write optimized file: {e}"
-                    )
+        changes = []
 
-            result = FlextQualityModels.OptimizationResult(
-                target=FlextQualityModels.OptimizationTarget(
-                    project_path=".",
-                    module_name=Path(module_path).stem,
-                    file_path=module_path,
-                    optimization_type=optimization_type,
-                ),
-                changes_made=changes_made,
-                success=True,
-                errors=[],
-                warnings=[],
-            )
+        content, sys_changed = ImportOptimizer.remove_sys_path_hacks(content)
+        if sys_changed:
+            changes.append("Removed sys.path hacks")
 
-            return FlextResult[FlextQualityModels.OptimizationResult].ok(result)
-
-    class ImportRefactorer:
-        """Import optimization and domain library enforcement.
-
-        Consolidates: refactor_imports.py
-        Complete implementation of import refactoring:
-        - Rewrite `from <pkg>.<submod> import X` to `from <pkg> import X`
-        - Ensure re-exports in `__init__.py` for all used symbols
-        - Promote imports from `if TYPE_CHECKING:` to module level
-        - Remove `sys.path.insert/append` hacks
-        """
-
-        @staticmethod
-        def remove_sys_path_hacks(content: str) -> tuple[str, bool]:
-            """Remove sys.path manipulation hacks.
-
-            Extracted from refactor_imports.py.
-            """
-            sys_path_pattern = re.compile(
-                r"^\s*sys\.path\.(insert|append)\(.*\)\s*$",
-                re.MULTILINE,
-            )
-            if sys_path_pattern.search(content):
-                updated = sys_path_pattern.sub("", content)
-                return updated, True
-            return content, False
-
-        @staticmethod
-        def rewrite_submodule_imports(
-            content: str, package_name: str
-        ) -> tuple[str, bool]:
-            """Rewrite from <pkg>.<sub> import X -> from <pkg> import X.
-
-            Extracted from refactor_imports.py.
-            """
-            from_sub_pattern = re.compile(
-                rf"^\s*from\s+{re.escape(package_name)}\.(?P<sub>[A-Za-z0-9_\.]+)\s+import\s+(?P<names>[^\n]+)$",
-                re.MULTILINE,
-            )
-
-            changed = False
-
-            def _replace_from_sub(m: re.Match[str]) -> str:
-                nonlocal changed
-                names = m.group("names").strip()
-                changed = True
-                return f"from {package_name} import {names}"
-
-            updated = from_sub_pattern.sub(_replace_from_sub, content)
-            return updated, changed
-
-        @staticmethod
-        def promote_type_checking_imports(content: str) -> tuple[str, bool]:
-            """Move imports from TYPE_CHECKING to module level.
-
-            Extracted from refactor_imports.py.
-            Keeps only typing and collections.abc in TYPE_CHECKING block.
-            """
-            # Modules allowed to remain in TYPE_CHECKING blocks
-            allowed_type_checking_modules = ("typing", "collections.abc")
-
-            changed = False
-            try:
-                tree = ast.parse(content)
-            except SyntaxError:
-                return content, changed
-
-            lines = content.splitlines(keepends=True)
-            promoted_imports: list[str] = []
-            keep_tc_blocks: list[tuple[int, int, str]] = []  # (start, end, text)
-
-            for node in tree.body:
-                if (
-                    isinstance(node, ast.If)
-                    and isinstance(node.test, ast.Name)
-                    and node.test.id == "TYPE_CHECKING"
-                ):
-                    start = getattr(node, "lineno", None)
-                    end = getattr(node, "end_lineno", None)
-                    if start is None or end is None:
-                        continue
-                    block_text = "".join(lines[start - 1 : end])
-
-                    try:
-                        tc_tree = ast.parse(block_text)
-                    except SyntaxError:
-                        continue
-
-                    kept_lines: list[str] = []
-                    for tc_node in tc_tree.body:
-                        if isinstance(tc_node, ast.Import):
-                            for alias in tc_node.names:
-                                name = alias.name
-                                line = f"import {name}{' as ' + alias.asname if alias.asname else ''}"
-                                if name.startswith(allowed_type_checking_modules):
-                                    kept_lines.append(line)
-                                else:
-                                    promoted_imports.append(line)
-                        elif isinstance(tc_node, ast.ImportFrom):
-                            mod = tc_node.module or ""
-                            names = ", ".join(
-                                f"{a.name}{' as ' + a.asname if a.asname else ''}"
-                                for a in tc_node.names
-                            )
-                            if mod:
-                                importfrom_line = f"from {mod} import {names}"
-                                if mod.startswith(allowed_type_checking_modules):
-                                    kept_lines.append(importfrom_line)
-                                else:
-                                    promoted_imports.append(importfrom_line)
-
-                    kept_text = "\n".join(kept_lines).rstrip()
-                    if kept_text:
-                        new_block = (
-                            "if TYPE_CHECKING:\n    " + "\n    ".join(kept_lines) + "\n"
-                        )
-                        keep_tc_blocks.append((start, end, new_block))
-                    else:
-                        keep_tc_blocks.append((start, end, ""))
-
-            if keep_tc_blocks or promoted_imports:
-                header_insertion_index = 0
-                if content.startswith(("#!/", "# -*- coding:")):
-                    header_insertion_index = content.find("\n") + 1
-
-                promoted_text = (
-                    ("\n".join(dict.fromkeys(promoted_imports)) + "\n")
-                    if promoted_imports
-                    else ""
-                )
-
-                for start, end, new_block in sorted(
-                    keep_tc_blocks,
-                    key=operator.itemgetter(0),
-                    reverse=True,
-                ):
-                    block_slice = "".join(lines[start - 1 : end])
-                    content = content.replace(block_slice, new_block, 1)
-
-                if promoted_text:
-                    content = (
-                        content[:header_insertion_index]
-                        + promoted_text
-                        + content[header_insertion_index:]
-                    )
-
-                changed = True
-
-            return content, changed
-
-        @staticmethod
-        def collect_import_stats(content: str, package_name: str) -> dict[str, int]:
-            """Collect statistics about imports in the file.
-
-            Helper for refactoring operations.
-            """
-            try:
-                tree = ast.parse(content)
-            except SyntaxError:
-                return {}
-
-            stats = {
-                "total_imports": 0,
-                "submodule_imports": 0,
-                "sys_path_hacks": 0,
-                "type_checking_blocks": 0,
-            }
-
-            for node in ast.walk(tree):
-                if isinstance(node, (ast.Import, ast.ImportFrom)):
-                    stats["total_imports"] += 1
-                    if (
-                        isinstance(node, ast.ImportFrom)
-                        and node.module
-                        and node.module.startswith(f"{package_name}.")
-                    ):
-                        stats["submodule_imports"] += 1
-                elif isinstance(node, ast.If):
-                    if (
-                        isinstance(node.test, ast.Name)
-                        and node.test.id == "TYPE_CHECKING"
-                    ):
-                        stats["type_checking_blocks"] += 1
-
-            # Count sys.path hacks
-            sys_path_pattern = re.compile(r"sys\.path\.(insert|append)\(")
-            stats["sys_path_hacks"] = len(sys_path_pattern.findall(content))
-
-            return stats
-
-        @staticmethod
-        def refactor_imports(
-            module_path: str,
-            *,
-            dry_run: bool = True,
-            package_name: str | None = None,
-        ) -> FlextResult[dict[str, object]]:
-            """Refactor imports to use domain libraries.
-
-            Complete implementation extracted from refactor_imports.py.
-
-            Args:
-                module_path: Path to Python module
-                dry_run: Run in dry-run mode (default True - MANDATORY)
-                package_name: Package name for refactoring (auto-detected if None)
-
-            Returns:
-                FlextResult with refactoring statistics
-
-            """
-            logger = FlextLogger(__name__)
-
-            path = Path(module_path)
-            if not path.exists():
-                return FlextResult[dict[str, object]].fail(
-                    f"Module not found: {module_path}"
-                )
-
-            # Auto-detect package name from path if not provided
-            if package_name is None:
-                # Try to find package name from src/<pkg>/ pattern
-                if "src" in path.parts:
-                    src_idx = path.parts.index("src")
-                    if src_idx + 1 < len(path.parts):
-                        package_name = path.parts[src_idx + 1]
-                    else:
-                        return FlextResult[dict[str, object]].fail(
-                            "Could not auto-detect package name"
-                        )
-                else:
-                    return FlextResult[dict[str, object]].fail(
-                        "Package name required for non-src layout"
-                    )
-
-            try:
-                with path.open("r", encoding="utf-8") as f:
-                    original_content = f.read()
-            except Exception as e:
-                return FlextResult[dict[str, object]].fail(f"Failed to read file: {e}")
-
-            content = original_content
-            changes: list[str] = []
-
-            # Collect initial stats
-            initial_stats = (
-                FlextQualityOptimizerOperations.ImportRefactorer.collect_import_stats(
-                    content, package_name
-                )
-            )
-
-            # Apply all refactorings
-            content, sys_changed = (
-                FlextQualityOptimizerOperations.ImportRefactorer.remove_sys_path_hacks(
-                    content
-                )
-            )
-            if sys_changed:
-                changes.append(
-                    f"Removed {initial_stats.get('sys_path_hacks', 0)} sys.path hacks"
-                )
-
-            content, sub_changed = (
-                FlextQualityOptimizerOperations.ImportRefactorer.rewrite_submodule_imports(
-                    content, package_name
-                )
+        if package_name:
+            content, sub_changed = ImportOptimizer.rewrite_submodule_imports(
+                content, package_name
             )
             if sub_changed:
-                changes.append(
-                    f"Rewrote {initial_stats.get('submodule_imports', 0)} submodule imports"
-                )
+                changes.append("Rewrote submodule imports")
 
-            content, tc_changed = (
-                FlextQualityOptimizerOperations.ImportRefactorer.promote_type_checking_imports(
-                    content
-                )
-            )
-            if tc_changed:
-                changes.append(
-                    f"Promoted {initial_stats.get('type_checking_blocks', 0)} TYPE_CHECKING blocks"
-                )
+        content, tc_changed = ImportOptimizer.promote_type_checking_imports(content)
+        if tc_changed:
+            changes.append("Promoted TYPE_CHECKING imports")
 
-            if dry_run:
-                logger.info(
-                    f"DRY RUN: Would refactor imports in {module_path} ({len(changes)} changes)"
-                )
-                return FlextResult[dict[str, object]].ok({
-                    "dry_run": True,
-                    "changes": changes,
-                    "file": str(module_path),
-                    "stats": initial_stats,
-                })
+        if not dry_run and changes:
+            path.write_text(content, encoding="utf-8")
 
-            # Write back if changes were made
-            if content != original_content:
-                try:
-                    with path.open("w", encoding="utf-8") as f:
-                        f.write(content)
-                    logger.info(
-                        f"Refactored imports in {module_path} ({len(changes)} changes)"
-                    )
-                except Exception as e:
-                    return FlextResult[dict[str, object]].fail(
-                        f"Failed to write file: {e}"
-                    )
+        return FlextResult[dict[str, Any]].ok({
+            "changes": changes,
+            "file": str(module_path),
+        })
 
-                return FlextResult[dict[str, object]].ok({
-                    "status": "modified",
-                    "changes": changes,
-                    "file": str(module_path),
-                    "stats": initial_stats,
-                })
+    def modernize_syntax(
+        self,
+        module_path: str,
+        *,
+        dry_run: bool = True,
+    ) -> FlextResult[dict[str, Any]]:
+        """Modernize Python 3.13+ syntax."""
+        path = Path(module_path)
+        if not path.exists():
+            return FlextResult[dict[str, Any]].fail(f"Module not found: {module_path}")
 
-            return FlextResult[dict[str, object]].ok({
-                "status": "unchanged",
-                "changes": [],
-                "file": str(module_path),
-                "stats": initial_stats,
-            })
+        try:
+            content = path.read_text(encoding="utf-8")
+        except Exception as e:
+            return FlextResult[dict[str, Any]].fail(str(e))
 
-    class SyntaxModernizer:
-        """Python syntax modernization.
+        all_changes = []
 
-        Consolidates: modernize_python_syntax.py
-        Complete implementation of Python 3.10+ and 3.13+ syntax modernization:
-        - PEP 695: Type Parameter Syntax (def func[T]())
-        - PEP 698: @override decorator
-        - Union[A, B] → A | B (Python 3.10+)
-        - Dict/List/Set/Tuple → dict/list/set/tuple (Python 3.9+)
-        - Remove quoted type annotations (with from __future__ import annotations
-        from flext_core import FlextBus
+        content, union_changes = SyntaxUpdater.modernize_unions(content)
+        all_changes.extend(union_changes)
 
-        from flext_core import FlextConfig
-        from flext_core import FlextConstants
-        from flext_core import FlextContainer
-        from flext_core import FlextContext
-        from flext_core import FlextDecorators
-        from flext_core import FlextDispatcher
-        from flext_core import FlextExceptions
-        from flext_core import FlextHandlers
-        from flext_core import FlextLogger
-        from flext_core import FlextMixins
-        from flext_core import FlextModels
-        from flext_core import FlextProcessors
-        from flext_core import FlextProtocols
-        from flext_core import FlextRegistry
-        from flext_core import FlextResult
-        from flext_core import FlextRuntime
-        from flext_core import FlextService
-        from flext_core import FlextTypes
-        from flext_core import FlextUtilities)
-        """
+        content, coll_changes = SyntaxUpdater.modernize_collections(content)
+        all_changes.extend(coll_changes)
 
-        @staticmethod
-        def modernize_type_parameters(
-            content: str,
-        ) -> tuple[str, list[str]]:
-            """Apply PEP 695: Type Parameter Syntax.
+        if not dry_run and all_changes:
+            path.write_text(content, encoding="utf-8")
 
-            Extracted from modernize_python_syntax.py.
-            Converts TypeVar definitions to new syntax:
-            - T = TypeVar('T') + class MyClass(Generic[T]) → class MyClass[T]
-            - T = TypeVar('T') + def func(value: T) → T → def func[T](value: T) → T
-            """
-            changes = []
+        return FlextResult[dict[str, Any]].ok({
+            "changes": all_changes,
+            "file": str(module_path),
+        })
 
-            # Find TypeVar definitions
-            typevar_pattern = (
-                r'(\w+)\s*=\s*TypeVar\(\s*[\'"](\w+)[\'"]\s*(?:,\s*[^)]+)?\s*\)'
-            )
-            typevar_matches = re.findall(typevar_pattern, content)
+    def modernize_types(
+        self,
+        module_path: str,
+        *,
+        dry_run: bool = True,
+    ) -> FlextResult[dict[str, Any]]:
+        """Modernize type checking configuration."""
+        path = Path(module_path)
 
-            if typevar_matches:
-                # Remove TypeVar from imports
-                content = re.sub(
-                    r"from typing import ([^,\n]*,\s*)?TypeVar(,\s*[^,\n]*)?",
-                    lambda m: f"from typing import {m.group(1) or ''}{m.group(2) or ''}".replace(
-                        ", ,", ","
-                    ).strip(", "),
-                    content,
-                )
-                content = re.sub(r"import.*TypeVar.*\n", "", content)
+        if path.is_dir():
+            pyproject_path = path / "pyproject.toml"
+            makefile_path = path / "Makefile"
+        elif path.name == "pyproject.toml":
+            pyproject_path = path
+            makefile_path = path.parent / "Makefile"
+        else:
+            return FlextResult[dict[str, Any]].fail(f"Invalid path: {module_path}")
 
-                # Remove TypeVar definitions
-                for var_name, _type_name in typevar_matches:
-                    content = re.sub(
-                        rf"{var_name}\s*=\s*TypeVar\([^)]+\)\s*\n?", "", content
-                    )
-                    changes.append(f"Removed TypeVar definition for {var_name}")
+        all_changes = []
+        files_modified = []
 
-                # Update class definitions to use new syntax
-                for var_name, _type_name in typevar_matches:
-                    # Generic[T] → [T]
-                    content = re.sub(
-                        rf"class\s+(\w+)\s*\(\s*Generic\[{var_name}\]\s*\)",
-                        rf"class \1[{_type_name}]",
-                        content,
-                    )
-                    # class Name(BaseClass, Generic[T]) → class Name[T](BaseClass)
-                    content = re.sub(
-                        rf"class\s+(\w+)\s*\(\s*([^,]+),\s*Generic\[{var_name}\]\s*\)",
-                        rf"class \1[{_type_name}](\2)",
-                        content,
-                    )
-                    changes.append(
-                        f"Updated class definition to use PEP 695 syntax for {var_name}"
-                    )
-
-            # Function type parameters
-            function_pattern = r"def\s+(\w+)\s*\("
-            functions = re.finditer(function_pattern, content)
-
-            for match in functions:
-                func_start = match.start()
-                # Look for TypeVar usage in this function
-                for var_name, _type_name in typevar_matches:
-                    if (
-                        var_name in content[func_start : func_start + 500]
-                    ):  # Check next 500 chars
-                        # Add type parameter to function
-                        content = re.sub(
-                            rf"def\s+({re.escape(match.group(1))})\s*\(",
-                            rf"def \1[{_type_name}](",
-                            content,
-                            count=1,
-                        )
-                        changes.append(
-                            f"Added type parameter to function {match.group(1)}"
-                        )
-                        break
-
-            return content, changes
-
-        @staticmethod
-        def modernize_union_syntax(
-            content: str,
-        ) -> tuple[str, list[str]]:
-            """Modernize Union syntax to use | operator (Python 3.10+ syntax).
-
-            Extracted from modernize_python_syntax.py.
-            - Union[A, B] → A | B
-            - Optional[T] → T | None
-            """
-            changes = []
-
-            # Union[A, B] → A | B
-            union_pattern = r"Union\[([^\]]+)\]"
-            unions = re.findall(union_pattern, content)
-
-            for union_content in unions:
-                # Split union types and join with |
-                types = [t.strip() for t in union_content.split(",")]
-                new_syntax = " | ".join(types)
-                content = content.replace(f"Union[{union_content}]", new_syntax)
-                changes.append(f"Modernized Union[{union_content}] to {new_syntax}")
-
-            # Optional[T] → T | None
-            optional_pattern = r"Optional\[([^\]]+)\]"
-            optionals = re.findall(optional_pattern, content)
-
-            for optional_type in optionals:
-                content = content.replace(
-                    f"Optional[{optional_type}]", f"{optional_type} | None"
-                )
-                changes.append(
-                    f"Modernized Optional[{optional_type}] to {optional_type} | None"
-                )
-
-            # Remove Union and Optional from imports if no longer needed
-            if not re.search(r"Union\[", content):
-                content = re.sub(
-                    r"from typing import ([^,\n]*,\s*)?Union(,\s*[^,\n]*)?",
-                    lambda m: f"from typing import {m.group(1) or ''}{m.group(2) or ''}".replace(
-                        ", ,", ","
-                    ).strip(", "),
-                    content,
-                )
-                changes.append("Removed Union import")
-
-            if not re.search(r"Optional\[", content):
-                content = re.sub(
-                    r"from typing import ([^,\n]*,\s*)?Optional(,\s*[^,\n]*)?",
-                    lambda m: f"from typing import {m.group(1) or ''}{m.group(2) or ''}".replace(
-                        ", ,", ","
-                    ).strip(", "),
-                    content,
-                )
-                changes.append("Removed Optional import")
-
-            return content, changes
-
-        @staticmethod
-        def modernize_syntax(
-            module_path: str,
-            *,
-            dry_run: bool = True,
-        ) -> FlextResult[dict[str, object]]:
-            """Modernize Python syntax.
-
-            Complete implementation extracted from modernize_python_syntax.py.
-
-            Args:
-                module_path: Path to Python module
-                dry_run: Run in dry-run mode (default True - MANDATORY)
-
-            Returns:
-                FlextResult with modernization statistics
-
-            """
-            logger = FlextLogger(__name__)
-
-            path = Path(module_path)
-            if not path.exists():
-                return FlextResult[dict[str, object]].fail(
-                    f"Module not found: {module_path}"
-                )
-
+        if pyproject_path.exists():
             try:
-                with path.open("r", encoding="utf-8") as f:
-                    original_content = f.read()
+                content = pyproject_path.read_text(encoding="utf-8")
+                updated, changes = ConfigUpdater.update_pyproject(content)
+                all_changes.extend([f"pyproject.toml: {c}" for c in changes])
+
+                if not dry_run and updated != content:
+                    pyproject_path.write_text(updated, encoding="utf-8")
+                    files_modified.append(str(pyproject_path))
             except Exception as e:
-                return FlextResult[dict[str, object]].fail(f"Failed to read file: {e}")
+                return FlextResult[dict[str, Any]].fail(str(e))
 
-            content = original_content
-            all_changes = []
-
-            # Apply all modernizations
-            content, changes = (
-                FlextQualityOptimizerOperations.SyntaxModernizer.modernize_type_parameters(
-                    content
-                )
-            )
-            all_changes.extend(changes)
-
-            content, changes = (
-                FlextQualityOptimizerOperations.SyntaxModernizer.modernize_override_decorators(
-                    content
-                )
-            )
-            all_changes.extend(changes)
-
-            content, changes = (
-                FlextQualityOptimizerOperations.SyntaxModernizer.modernize_union_syntax(
-                    content
-                )
-            )
-            all_changes.extend(changes)
-
-            content, changes = (
-                FlextQualityOptimizerOperations.SyntaxModernizer.modernize_dict_list_syntax(
-                    content
-                )
-            )
-            all_changes.extend(changes)
-
-            content, changes = (
-                FlextQualityOptimizerOperations.SyntaxModernizer.modernize_string_annotations(
-                    content
-                )
-            )
-            all_changes.extend(changes)
-
-            if dry_run:
-                logger.info(
-                    f"DRY RUN: Would modernize {module_path} ({len(all_changes)} changes)"
-                )
-                return FlextResult[dict[str, object]].ok({
-                    "dry_run": True,
-                    "changes": all_changes,
-                    "file": str(module_path),
-                })
-
-            # Write back if changes were made
-            if content != original_content:
-                try:
-                    with path.open("w", encoding="utf-8") as f:
-                        f.write(content)
-                    logger.info(
-                        f"Modernized {module_path} ({len(all_changes)} changes)"
-                    )
-                except Exception as e:
-                    return FlextResult[dict[str, object]].fail(
-                        f"Failed to write file: {e}"
-                    )
-
-                return FlextResult[dict[str, object]].ok({
-                    "status": "modified",
-                    "changes": all_changes,
-                    "file": str(module_path),
-                })
-
-            return FlextResult[dict[str, object]].ok({
-                "status": "unchanged",
-                "changes": [],
-                "file": str(module_path),
-            })
-
-    class TypeModernizer:
-        """Type annotation modernization.
-
-        Consolidates: modernize_type_checking.py
-        Complete implementation of type checking tool migration:
-        - Update pyproject.toml to remove MyPy/PyRight and add Pyrefly
-        - Update Makefile to use Pyrefly instead of MyPy
-        - Add standardized Pyrefly configuration
-        """
-
-        @staticmethod
-        def update_pyproject_toml_content(
-            content: str,
-        ) -> tuple[str, list[str]]:
-            """Update pyproject.toml content to modernize type checking.
-
-            Extracted from modernize_type_checking.py.
-            """
-            changes = []
-
+        if makefile_path.exists():
             try:
-                data = toml.loads(content)
+                content = makefile_path.read_text(encoding="utf-8")
+                updated, changes = ConfigUpdater.update_makefile(content)
+                all_changes.extend([f"Makefile: {c}" for c in changes])
+
+                if not dry_run and updated != content:
+                    makefile_path.write_text(updated, encoding="utf-8")
+                    files_modified.append(str(makefile_path))
             except Exception as e:
-                return content, [f"Failed to parse TOML: {e}"]
+                return FlextResult[dict[str, Any]].fail(str(e))
 
-            # Remove MyPy from dev dependencies
-            dev_deps = (
-                data.get("project", {}).get("optional-dependencies", {}).get("dev", [])
-            )
-            if dev_deps:
-                original_count = len(dev_deps)
-                dev_deps[:] = [dep for dep in dev_deps if not dep.startswith("mypy")]
-                if len(dev_deps) < original_count:
-                    changes.append("Removed MyPy from dev dependencies")
-
-            # Remove/update Poetry dev dependencies
-            poetry_dev = (
-                data.get("tool", {})
-                .get("poetry", {})
-                .get("group", {})
-                .get("dev", {})
-                .get("dependencies", {})
-            )
-            if poetry_dev:
-                mypy_keys = [
-                    key
-                    for key in poetry_dev
-                    if "mypy" in key.lower() or "pyre" in key.lower()
-                ]
-                for key in mypy_keys:
-                    if key != "pyrefly":  # Keep pyrefly if it exists
-                        del poetry_dev[key]
-                        changes.append(f"Removed {key} from Poetry dev dependencies")
-
-                # Add pyrefly if not present
-                if "pyrefly" not in poetry_dev:
-                    poetry_dev["pyrefly"] = "^0.34.0"
-                    changes.append("Added Pyrefly to Poetry dev dependencies")
-
-            # Remove MyPy tool configuration
-            if "tool" in data:
-                tool_keys_to_remove = [
-                    key
-                    for key in data["tool"]
-                    if key in {"mypy", "pydantic-mypy", "pyright"}
-                ]
-                for key in tool_keys_to_remove:
-                    del data["tool"][key]
-                    changes.append(f"Removed [tool.{key}] configuration")
-
-            # Add Pyrefly configuration if not present
-            if "tool" not in data:
-                data["tool"] = {}
-
-            if "pyrefly" not in data["tool"]:
-                data["tool"]["pyrefly"] = {
-                    "python_version": "3.13",
-                    "target_version": "3.13",
-                    "show_error_codes": True,
-                }
-                changes.append("Added Pyrefly configuration")
-
-            # Update exclusion lists to include pyrefly_cache
-            for tool_name in ["bandit", "deptry", "vulture"]:
-                tool_config = data.get("tool", {}).get(tool_name, {})
-                if tool_config:
-                    exclude_key = "exclude_dirs" if tool_name == "bandit" else "exclude"
-                    if exclude_key in tool_config:
-                        excludes = tool_config[exclude_key]
-                        if isinstance(excludes, list) and (
-                            ".pyrefly_cache" not in excludes
-                            and ".pyrefly_cache/" not in excludes
-                        ):
-                            # Find mypy_cache and add pyrefly_cache after it
-                            mypy_idx = next(
-                                (
-                                    i
-                                    for i, item in enumerate(excludes)
-                                    if "mypy_cache" in item
-                                ),
-                                None,
-                            )
-                            if mypy_idx is not None:
-                                cache_entry = (
-                                    ".pyrefly_cache/"
-                                    if excludes[mypy_idx].endswith("/")
-                                    else ".pyrefly_cache"
-                                )
-                                excludes.insert(mypy_idx + 1, cache_entry)
-                                changes.append(
-                                    f"Added .pyrefly_cache to {tool_name} excludes"
-                                )
-
-            if changes:
-                try:
-                    updated_content = toml.dumps(data)
-                    return updated_content, changes
-                except Exception as e:
-                    return content, [f"Failed to serialize TOML: {e}"]
-
-            return content, changes
-
-        @staticmethod
-        def update_makefile_content(
-            content: str,
-        ) -> tuple[str, list[str]]:
-            """Update Makefile content to use Pyrefly.
-
-            Extracted from modernize_type_checking.py.
-            """
-            changes = []
-            updated = content
-
-            # Replace MyPy commands with Pyrefly
-            patterns = [
-                (r"mypy\s+\$\(SRC_DIR\)\s+--strict", "pyrefly check $(SRC_DIR)"),
-                (
-                    r"PYTHONPATH=src\s+\$\(POETRY\)\s+run\s+mypy\s+\$\(SRC_DIR\)\s+--strict",
-                    "$(POETRY) run pyrefly check $(SRC_DIR)",
-                ),
-                (
-                    r"\$\(POETRY\)\s+run\s+mypy\s+\$\(SRC_DIR\)\s+--strict",
-                    "$(POETRY) run pyrefly check $(SRC_DIR)",
-                ),
-                (r"mypy\s+\.\s+--strict", "pyrefly check src/"),
-                (r"mypy\s+src/\s+--strict", "pyrefly check src/"),
-            ]
-
-            for pattern, replacement in patterns:
-                new_content = re.sub(pattern, replacement, updated)
-                if new_content != updated:
-                    updated = new_content
-                    changes.append("Updated Makefile type-check target")
-
-            # Update type-check comment if present
-            updated = re.sub(
-                r"## Run type checking$",
-                "## Run type checking with Pyrefly",
-                updated,
-                flags=re.MULTILINE,
-            )
-
-            # Update clean targets to include pyrefly cache
-            if ".mypy_cache/" in updated and ".pyrefly_cache/" not in updated:
-                updated = updated.replace(
-                    ".mypy_cache/", ".mypy_cache/ .pyrefly_cache/"
-                )
-                changes.append("Updated Makefile clean targets")
-
-            return updated, changes
-
-        @staticmethod
-        def modernize_types(
-            module_path: str,
-            *,
-            dry_run: bool = True,
-        ) -> FlextResult[dict[str, object]]:
-            """Modernize type checking configuration.
-
-            Complete implementation extracted from modernize_type_checking.py.
-
-            Args:
-                module_path: Path to project directory or pyproject.toml
-                dry_run: Run in dry-run mode (default True - MANDATORY)
-
-            Returns:
-                FlextResult with modernization statistics
-
-            """
-            logger = FlextLogger(__name__)
-
-            path = Path(module_path)
-
-            # Handle both directory and file paths
-            if path.is_dir():
-                project_dir = path
-                pyproject_path = project_dir / "pyproject.toml"
-                makefile_path = project_dir / "Makefile"
-            elif path.name == "pyproject.toml":
-                pyproject_path = path
-                project_dir = path.parent
-                makefile_path = project_dir / "Makefile"
-            else:
-                return FlextResult[dict[str, object]].fail(
-                    f"Invalid path: {module_path}"
-                )
-
-            all_changes: list[str] = []
-            files_modified = []
-
-            # Process pyproject.toml
-            if pyproject_path.exists():
-                try:
-                    with pyproject_path.open("r", encoding="utf-8") as f:
-                        original_content = f.read()
-
-                    updated_content, changes = (
-                        FlextQualityOptimizerOperations.TypeModernizer.update_pyproject_toml_content(
-                            original_content
-                        )
-                    )
-
-                    if changes:
-                        all_changes.extend([f"pyproject.toml: {c}" for c in changes])
-
-                        if not dry_run and updated_content != original_content:
-                            with pyproject_path.open("w", encoding="utf-8") as f:
-                                f.write(updated_content)
-                            files_modified.append(str(pyproject_path))
-                            logger.info(f"Updated {pyproject_path}")
-
-                except Exception as e:
-                    return FlextResult[dict[str, object]].fail(
-                        f"Failed to process pyproject.toml: {e}"
-                    )
-
-            # Process Makefile
-            if makefile_path.exists():
-                try:
-                    with makefile_path.open("r", encoding="utf-8") as f:
-                        original_content = f.read()
-
-                    updated_content, changes = (
-                        FlextQualityOptimizerOperations.TypeModernizer.update_makefile_content(
-                            original_content
-                        )
-                    )
-
-                    if changes:
-                        all_changes.extend([f"Makefile: {c}" for c in changes])
-
-                        if not dry_run and updated_content != original_content:
-                            with makefile_path.open("w", encoding="utf-8") as f:
-                                f.write(updated_content)
-                            files_modified.append(str(makefile_path))
-                            logger.info(f"Updated {makefile_path}")
-
-                except Exception as e:
-                    return FlextResult[dict[str, object]].fail(
-                        f"Failed to process Makefile: {e}"
-                    )
-
-            if dry_run:
-                logger.info(
-                    f"DRY RUN: Would modernize types in {module_path} ({len(all_changes)} changes)"
-                )
-                return FlextResult[dict[str, object]].ok({
-                    "dry_run": True,
-                    "changes": all_changes,
-                    "files_affected": [str(pyproject_path), str(makefile_path)],
-                })
-
-            if all_changes:
-                return FlextResult[dict[str, object]].ok({
-                    "status": "modified",
-                    "changes": all_changes,
-                    "files_modified": files_modified,
-                })
-
-            return FlextResult[dict[str, object]].ok({
-                "status": "unchanged",
-                "changes": [],
-                "files_modified": [],
-            })
-
-    def __init__(self) -> None:
-        """Initialize optimizer operations service."""
-        super().__init__()
-
-        # Initialize helper services
-        self.module = self.ModuleOptimizer()
-        self.imports = self.ImportRefactorer()
-        self.syntax = self.SyntaxModernizer()
-        self.types = self.TypeModernizer()
+        return FlextResult[dict[str, Any]].ok({
+            "changes": all_changes,
+            "files_modified": files_modified,
+        })
 
 
-__all__ = ["FlextQualityOptimizerOperations"]
+__all__ = ["FlextQualityOptimizerOperations", "OptimizerConfig"]

@@ -103,16 +103,17 @@
   - `client-b-meltano-native`: single maintenance `README.md` identified; no automation scripts present yet.
   - Next: map each artifact to the shared capabilities matrix (audit/validation/optimization/reporting), evaluate gaps against target schema, and prepare normalization checklist.
 - **2025-10-16** – Capability mapping against shared maintenance pillars:
-  
-  | Repository | Audit | Validation | Optimization | Reporting | Sync | Config Format | Notes |
-  |------------|-------|------------|--------------|-----------|------|---------------|-------|
-  | `flext-grpc` | ✅ (`audit.py`) | ✅ (`validation.py`) | ✅ (`optimization.py`) | ✅ (`reporting.py`, HTML/CSV dashboards) | ✅ (`sync.py`) | `config.json` | Full standalone toolchain with Makefile + requirements. |
-  | `flext-ldap` | ✅ (wrappers to shared profile) | ✅ (`validate_links.py`, `validate_style.py`) | ✅ (`optimize.py`) | ✅ (`report.py`) | ✅ (`sync.py`) | `config.yaml` | Uses shared infrastructure plus legacy shell runner; includes cache artifacts. |
-  | `flext-observability` | ✅ (`audit/content-audit.py`) | ❌ | ❌ | ⚠️ Markdown summaries only | ❌ | config embedded in script (`yaml` optional) | Lightweight audit only; no automation scripts detected. |
-  | `client-b-meltano-native` | ❌ | ❌ | ❌ | ❌ | ❌ | None | Documentation guidance only; no executable maintenance code. |
+
+  | Repository                | Audit                           | Validation                                    | Optimization           | Reporting                                | Sync           | Config Format                               | Notes                                                                          |
+  | ------------------------- | ------------------------------- | --------------------------------------------- | ---------------------- | ---------------------------------------- | -------------- | ------------------------------------------- | ------------------------------------------------------------------------------ |
+  | `flext-grpc`              | ✅ (`audit.py`)                 | ✅ (`validation.py`)                          | ✅ (`optimization.py`) | ✅ (`reporting.py`, HTML/CSV dashboards) | ✅ (`sync.py`) | `config.json`                               | Full standalone toolchain with Makefile + requirements.                        |
+  | `flext-ldap`              | ✅ (wrappers to shared profile) | ✅ (`validate_links.py`, `validate_style.py`) | ✅ (`optimize.py`)     | ✅ (`report.py`)                         | ✅ (`sync.py`) | `config.yaml`                               | Uses shared infrastructure plus legacy shell runner; includes cache artifacts. |
+  | `flext-observability`     | ✅ (`audit/content-audit.py`)   | ❌                                            | ❌                     | ⚠️ Markdown summaries only               | ❌             | config embedded in script (`yaml` optional) | Lightweight audit only; no automation scripts detected.                        |
+  | `client-b-meltano-native` | ❌                              | ❌                                            | ❌                     | ❌                                       | ❌             | None                                        | Documentation guidance only; no executable maintenance code.                   |
 
   - Observed schema divergence: JSON-based config (`flext-grpc`) vs YAML (`flext-ldap`) vs inline defaults (`flext-observability`).
   - Next: draft normalization checklist (config schema conversion, capability gaps, wrapper migration plan) and define acceptance tests per capability pillar.
+
 - **2025-10-16** – Published detailed metadata inventory (`docs/maintenance/METADATA_INVENTORY.md`) summarizing directories, config formats, markdown deliverables, and automation scripts per repository. Established normalization checklist covering schema conversion, capability gap closure, report naming, and automation mapping.
 - **2025-10-16** – Completed initial tooling audit (`docs/maintenance/TOOLING_AUDIT.md`) highlighting candidate libraries for CLI modernization (Typer, Rich), async validation (`httpx`), templated reporting (Jinja2), configuration validation (pydantic), and supporting utilities (pathspec, rapidfuzz).
 - **2025-10-16** – Implemented shared reporting enhancements: default output format now Markdown, centralized export pipeline (`ReportGenerator.export_report`) produces timestamped Markdown/JSON/HTML artifacts with `latest_*` pointers, and `DocumentationMaintainer` records generated outputs plus quality metrics.

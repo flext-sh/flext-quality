@@ -12,6 +12,12 @@ class HealthCheckService(FlextService[bool]):
     """Provide a minimal health check service for maintenance scripts."""
 
     def __init__(self: Self, workspace_path: str | Path) -> None:
+        """Initialize health check service.
+
+        Args:
+            workspace_path: Path to the workspace to check
+
+        """
         super().__init__()
         self._workspace = Path(workspace_path)
         self._logger = FlextLogger(__name__)

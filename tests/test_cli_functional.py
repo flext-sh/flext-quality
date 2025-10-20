@@ -21,7 +21,8 @@ from unittest.mock import patch
 
 import pytest
 
-from flext_quality import analyze_project, another_function, setup_logging
+# NOTE: Old imports removed - functions moved to new API
+# from flext_quality import analyze_project, another_function, setup_logging
 
 
 # Global fixtures available to all test classes

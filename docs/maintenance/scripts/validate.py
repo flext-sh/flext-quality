@@ -28,6 +28,7 @@ class LinkValidator:
     def __init__(
         self, timeout: int = 10, retries: int = 3, max_workers: int = 5
     ) -> None:
+        """Initialize the link validator with timeout and retry settings."""
         self.timeout = timeout
         self.retries = retries
         self.max_workers = max_workers
@@ -140,8 +141,6 @@ class LinkValidator:
         if not external_links:
             return self.results
 
-        print(f"🔗 Checking {len(external_links)} external links...")
-
         # Use thread pool for concurrent checking
         with concurrent.futures.ThreadPoolExecutor(
             max_workers=self.max_workers
@@ -172,7 +171,7 @@ class LinkValidator:
         for attempt in range(self.retries):
             try:
                 if verbose:
-                    print(f"  Checking: {url}")
+                    pass
 
                 response = requests.head(
                     url,
@@ -262,8 +261,6 @@ class LinkValidator:
             str(f.relative_to(f.parents[2])) for f in doc_files
         }  # Relative to project root
 
-        print(f"📁 Checking {len(internal_links)} internal links...")
-
         for link in internal_links:
             target = link["url"].split("#")[0]  # Remove anchor
 
@@ -325,8 +322,6 @@ class LinkValidator:
         """Validate image references."""
         images = [link for link in links if link["type"] == "image"]
 
-        print(f"🖼️ Checking {len(images)} image references...")
-
         for image in images:
             src = image["url"]
 
@@ -366,8 +361,6 @@ class LinkValidator:
     ) -> dict[str, object]:
         """Validate anchor links within documents."""
         anchor_links = [link for link in links if link["type"] == "anchor"]
-
-        print(f"⚓ Checking {len(anchor_links)} anchor links...")
 
         # Build anchor index for each file
         file_anchors = {}
@@ -427,8 +420,6 @@ class LinkValidator:
 
     def check_link_text_quality(self, links: list[dict]) -> dict[str, object]:
         """Check quality of link text for accessibility and usability."""
-        print("🎯 Checking link text quality...")
-
         poor_link_texts = [
             "here",
             "click here",
@@ -489,6 +480,7 @@ class ContentValidator:
     """Content validation and quality checking system."""
 
     def __init__(self) -> None:
+        """Initialize the content validator."""
         self.results = {
             "timestamp": datetime.now(UTC).isoformat(),
             "files_checked": 0,
@@ -498,8 +490,6 @@ class ContentValidator:
 
     def validate_markdown_syntax(self, doc_files: list[Path]) -> dict[str, object]:
         """Validate markdown syntax and formatting."""
-        print("📝 Validating markdown syntax...")
-
         for file_path in doc_files:
             try:
                 content = file_path.read_text(encoding="utf-8")
@@ -566,8 +556,6 @@ class ContentValidator:
 
     def check_content_quality(self, doc_files: list[Path]) -> dict[str, object]:
         """Check content quality metrics."""
-        print("📊 Analyzing content quality...")
-
         for file_path in doc_files:
             try:
                 content = file_path.read_text(encoding="utf-8")
@@ -693,8 +681,6 @@ def main() -> None:
         if not any(pattern in str(f) for pattern in ignored_patterns)
     ]
 
-    print(f"📁 Found {len(doc_files)} documentation files")
-
     # Initialize validators
     link_validator = LinkValidator(
         timeout=args.timeout, retries=args.retries, max_workers=args.workers
@@ -736,7 +722,6 @@ def main() -> None:
         run_any_check = True
 
     if not run_any_check:
-        print("❌ No validation checks specified. Use --help for options.")
         sys.exit(1)
 
     # Combine results
@@ -752,31 +737,16 @@ def main() -> None:
     total_errors = len(link_validator.results.get("errors", [])) + len(
         content_validator.results.get("content_issues", [])
     )
-    total_warnings = link_validator.results.get("warnings", 0)
+    link_validator.results.get("warnings", 0)
 
     # Save reports
-    link_report = link_validator.save_report(args.output)
+    link_validator.save_report(args.output)
 
     # Print summary
-    print("📊 Validation Summary:")
-    print(f"   Files Analyzed: {len(doc_files)}")
-    print(f"   Links Found: {len(all_links)}")
-    print(f"   Links Checked: {link_validator.results.get('links_checked', 0)}")
-    print(f"   Valid Links: {link_validator.results.get('valid_links', 0)}")
-    print(f"   Broken Links: {link_validator.results.get('broken_links', 0)}")
-    print(
-        f"   Content Issues: {len(content_validator.results.get('content_issues', []))}"
-    )
-    print(f"   Warnings: {total_warnings}")
-    print(f"   Errors: {total_errors}")
-    print(f"   Link Report: {link_report}")
 
     # Exit with error code for CI/CD
     if total_errors > 0:
-        print(f"❌ Validation found {total_errors} errors")
         sys.exit(1)
-    else:
-        print("✅ All validations passed")
 
 
 if __name__ == "__main__":

@@ -14,10 +14,6 @@ from __future__ import annotations
 import uuid
 
 import pytest
-from tests.conftest import (
-    assert_result_failure_with_error,
-    assert_result_success_with_data,
-)
 
 from flext_quality import (
     AnalysisStatus,
@@ -31,6 +27,10 @@ from flext_quality import (
     QualityProjectService,
     QualityReport,
     QualityReportService,
+)
+from tests.conftest import (
+    assert_result_failure_with_error,
+    assert_result_success_with_data,
 )
 
 

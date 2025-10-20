@@ -6,11 +6,14 @@ Provides web interface to view audit results, trends, and quality scores.
 
 import argparse
 import json
+import logging
 import operator
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from flask import Flask, Response, jsonify, render_template_string, request
+
+logger = logging.getLogger(__name__)
 
 
 class DocumentationDashboard:
@@ -120,7 +123,8 @@ class DocumentationDashboard:
                             .get("severity_breakdown", {})
                             .get("high", 0),
                         })
-            except Exception:
+            except Exception as e:
+                logger.warning(f"Failed to process trend data: {e}")
                 continue
 
         # Sort by date
@@ -155,7 +159,8 @@ class DocumentationDashboard:
                     "total_issues": data.get("metrics", {}).get("total_issues", 0),
                     "files_analyzed": data.get("files_analyzed", 0),
                 })
-            except Exception:
+            except Exception as e:
+                logger.warning(f"Failed to process report file: {e}")
                 continue
 
         # Sort by date descending and limit

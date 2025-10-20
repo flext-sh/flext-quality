@@ -29,6 +29,7 @@ class LinkChecker:
     def __init__(
         self, config_path: str = "docs/maintenance/config/validation_config.yaml"
     ) -> None:
+        """Initialize the link checker with configuration."""
         self.load_config(config_path)
         self.session = None
         self.cache = {}

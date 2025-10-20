@@ -55,16 +55,6 @@
         flext-quality = "flext_quality.cli:main"
         flext-docs = "flext_quality.docs_maintenance.cli:main"
 
-[tool.bandit]
-    exclude_dirs = [
-        "build",
-        "dist",
-        "tests",
-    ]
-    skips = [
-        "B101",
-        "B601",
-    ]
 
 [tool.django-stubs]
     django_settings_module = "code_analyzer_web.settings"
@@ -79,18 +69,6 @@
         "flext_quality",
     ]
 
-[tool.pyrefly]
-    python-version = "3.13"
-    search-path = [
-        "examples",
-        "src",
-        "tests",
-    ]
-
-[[tool.pyrefly.sub-config]]
-    matches = "**/models.py"
-    [tool.pyrefly.sub-config.errors]
-        unknown-name = false
 [tool.ruff]
     extend = "../ruff-shared.toml"
 
@@ -122,39 +100,6 @@
     testpaths = [
         "tests",
     ]
-
-[tool.coverage.run]
-    branch = true
-    omit = [
-        "*/.venv/*",
-        "*/__pycache__/*",
-        "*/test_*",
-        "*/tests/*",
-        "*/venv/*",
-    ]
-    source = [
-        "src",
-    ]
-
-[tool.coverage.report]
-    exclude_lines = [
-        "@(abc\\.)?abstractmethod",
-        "class .*\\bProtocol\\):",
-        "def __repr__",
-        "if 0:",
-        "if __name__ == .__main__.:",
-        "if self.debug:",
-        "if settings.DEBUG",
-        "pragma: no cover",
-        "raise AssertionError",
-        "raise NotImplementedError",
-    ]
-
-[tool.coverage.html]
-    directory = "reports/coverage"
-
-[tool.coverage.xml]
-    output = "reports/coverage.xml"
 
         [tool.poetry.dependencies.flext-core]
             develop = true
@@ -216,7 +161,3 @@
         types-requests        = ">=2.32.4"
         types-setuptools      = ">=80.9.0"
         types-toml            = ">=0.10.8.20240310"
-
-    [tool.poetry.group.security.dependencies]
-        bandit    = ">=1.8.0"
-        pip-audit = ">=2.7.3"

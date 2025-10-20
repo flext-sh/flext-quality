@@ -28,6 +28,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
     def __init__(self) -> None:
         """Initialize AST backend with dependency injection."""
+        super().__init__()
         self._container = FlextContainer.get_global()
         self._logger = FlextLogger(__name__)
 
@@ -36,6 +37,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
         def __init__(self, file_path: Path, package_name: str) -> None:
             """Initialize AST visitor with file path and package name."""
+            super().__init__()
             self.file_path = file_path
             self.package_name = package_name
             self.current_class: FlextQualityASTClassInfo.ClassInfo | None = None

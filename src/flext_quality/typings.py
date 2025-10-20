@@ -14,9 +14,24 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Literal
+from datetime import datetime
+from typing import Annotated, Literal, TypeVar
 
 from flext_core import FlextTypes
+from pydantic import Field
+
+# =============================================================================
+# QUALITY MODULE-LEVEL TYPE ALIASES
+# =============================================================================
+
+T = TypeVar("T")
+ScoreT = TypeVar("ScoreT", bound=float)
+
+# Advanced validation using Python 3.13+ syntax
+type ScoreRange = Annotated[float, Field(ge=0.0, le=100.0)]
+type PositiveInt = Annotated[int, Field(ge=1)]
+# Timestamp - use in Field(default_factory=...) context
+type Timestamp = datetime
 
 # =============================================================================
 # QUALITY-SPECIFIC TYPE VARIABLES - Domain-specific TypeVars for quality operations
@@ -216,4 +231,10 @@ class FlextQualityTypes(FlextTypes):
 
 __all__: list[str] = [
     "FlextQualityTypes",
+    "PositiveInt",
+    "ScoreRange",
+    "ScoreT",
+    # Module-level type aliases
+    "T",
+    "Timestamp",
 ]

@@ -176,12 +176,8 @@ class DocumentationAuditor:
 
     def run_comprehensive_audit(self) -> dict[str, object]:
         """Run complete documentation audit."""
-        print("🔍 Starting comprehensive documentation audit...")
-
         doc_files = self.find_documentation_files()
         self.results["files_analyzed"] = len(doc_files)
-
-        print(f"📁 Found {len(doc_files)} documentation files")
 
         # Run all audit checks
         if self.audit_rules["content_checks"]["check_freshness"]:
@@ -202,13 +198,10 @@ class DocumentationAuditor:
         # Generate recommendations
         self.generate_recommendations()
 
-        print("✅ Comprehensive audit completed")
         return self.results
 
     def check_content_freshness(self, doc_files: list[Path]) -> None:
         """Check documentation freshness and identify outdated content."""
-        print("📅 Checking content freshness...")
-
         max_age_days = self.audit_rules["quality_thresholds"]["max_age_days"]
         cutoff_date = datetime.now(UTC) - timedelta(days=max_age_days)
 
@@ -271,8 +264,6 @@ class DocumentationAuditor:
 
     def check_content_completeness(self, doc_files: list[Path]) -> None:
         """Check documentation completeness and identify missing sections."""
-        print("📝 Checking content completeness...")
-
         min_word_count = self.audit_rules["quality_thresholds"]["min_word_count"]
         required_sections = self.validation_config["content_analysis"][
             "required_sections"
@@ -347,8 +338,6 @@ class DocumentationAuditor:
 
     def check_content_consistency(self, doc_files: list[Path]) -> None:
         """Check style consistency and formatting issues."""
-        print("🎨 Checking content consistency...")
-
         for file_path in doc_files:
             try:
                 content = file_path.read_text(encoding="utf-8")
@@ -488,8 +477,6 @@ class DocumentationAuditor:
 
     def check_links_and_references(self, doc_files: list[Path]) -> None:
         """Check links and references for validity."""
-        print("🔗 Checking links and references...")
-
         all_links = []
         image_refs = []
 
@@ -752,7 +739,7 @@ class DocumentationAuditor:
     def generate_report(
         self,
         output_format: str = "json",
-        output_path: str | None = None,  # noqa: ARG002
+        output_path: str | None = None,
     ) -> str:
         """Generate audit report in specified format.
 
@@ -881,8 +868,6 @@ class DocumentationAuditor:
         report_content = self.generate_report(output_format)
         filepath.write_text(report_content, encoding="utf-8")
 
-        print(f"📄 Report saved to: {filepath}")
-
         # Also save latest report
         latest_file = output_dir / "latest_audit.json"
         json.dump(self.results, latest_file.open("w"), indent=2, default=str)
@@ -968,19 +953,10 @@ def main() -> None:
             results = auditor.results
 
         # Save report
-        report_file = auditor.save_report(args.format, args.output)
+        auditor.save_report(args.format, args.output)
 
         # Print summary
         metrics = results["metrics"]
-        print("\n📊 Audit Summary:")
-        print(f"   Quality Score: {metrics['quality_score']}%")
-        print(f"   Files Analyzed: {metrics['files_analyzed']}")
-        print(f"   Total Issues: {metrics['total_issues']}")
-        print(f"   Critical: {metrics['severity_breakdown']['critical']}")
-        print(f"   High: {metrics['severity_breakdown']['high']}")
-        print(f"   Medium: {metrics['severity_breakdown']['medium']}")
-        print(f"   Low: {metrics['severity_breakdown']['low']}")
-        print(f"   Report: {report_file}")
 
         # Check for CI/CD failure conditions
         should_fail = False
@@ -991,21 +967,14 @@ def main() -> None:
             )
             if critical_high_issues > 0:
                 should_fail = True
-                print(
-                    f"❌ CI/CD failure: {critical_high_issues} critical/high severity issues found"
-                )
 
         if args.ci_mode and metrics["quality_score"] < 70:
             should_fail = True
-            print(
-                f"❌ CI/CD failure: Quality score {metrics['quality_score']}% below threshold (70%)"
-            )
 
         if should_fail:
             sys.exit(1)
 
-    except Exception as e:
-        print(f"❌ Audit failed: {e}")
+    except Exception:
         if args.ci_mode or args.fail_on_errors:
             sys.exit(1)
 

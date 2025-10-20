@@ -1,4 +1,4 @@
-"""Test suite for simple API.
+"""Test suite for FlextQualityServices.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -7,287 +7,88 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from uuid import uuid4
-
 import pytest
 
-from flext_quality import QualityAPI
+from flext_quality import FlextQualityServices
 
 
-class TestQualityAPI:
-    """Test QualityAPI functionality."""
+class TestFlextQualityServices:
+    """Test FlextQualityServices functionality."""
 
     @pytest.fixture
-    def api(self) -> QualityAPI:
-        """Create a QualityAPI instance."""
-        return QualityAPI()
+    def services(self) -> FlextQualityServices:
+        """Create FlextQualityServices instance."""
+        return FlextQualityServices()
 
-    def test_create_project_through_api(self, api: QualityAPI) -> None:
-        """Test creating a project through API."""
-        result = api.create_project(
+    def test_services_instantiation(self, services: FlextQualityServices) -> None:
+        """Test services can be instantiated."""
+        assert services is not None
+        assert services.project_service is not None
+        assert services.analysis_service is not None
+        assert services.issue_service is not None
+        assert services.report_service is not None
+
+    def test_create_project_through_services(
+        self,
+        services: FlextQualityServices,
+    ) -> None:
+        """Test creating a project through services."""
+        result = services.project_service.create_project(
             name="test_project",
-            project_path="./test_project",
-            repository_url="https://github.com/test/repo",
-            language="python",
+            path="./test_project",
         )
 
-        assert result.success
-        assert result.value is not None
-        assert result.value.project_path == "./test_project"
+        assert result.is_success
+        project = result.unwrap()
+        assert project is not None
+        assert project.name == "test_project"
+        assert project.path == "./test_project"
 
-    def test_get_project_through_api(self, api: QualityAPI) -> None:
-        """Test getting a project through API."""
-        # First create a project
-        create_result = api.create_project(
-            name="test_project",
-            project_path="./test_project",
+    def test_create_analysis_through_services(
+        self,
+        services: FlextQualityServices,
+    ) -> None:
+        """Test creating an analysis through services."""
+        result = services.analysis_service.create_analysis(
+            project_id="project_test",
         )
-        assert create_result.success
-        project_id = uuid4()  # Use UUID type as expected by API
 
-        # Mock the project in service for testing
-        api.project_service._projects[str(project_id)] = create_result.value
+        assert result.is_success
+        analysis = result.unwrap()
+        assert analysis is not None
+        assert analysis.project_id == "project_test"
 
-        # Get the project
-        result = api.get_project(project_id)
-        assert result.success
-
-    def test_list_projects_through_api(self, api: QualityAPI) -> None:
-        """Test listing projects through API."""
-        result = api.list_projects()
-        assert result.success
-        assert isinstance(result.value, list)
-
-    def test_update_project_through_api(self, api: QualityAPI) -> None:
-        """Test updating a project through API."""
-        # First create a project
-        create_result = api.create_project(
-            name="test_project",
-            project_path="./test_project",
-        )
-        assert create_result.success
-        project_id = uuid4()
-
-        # Mock the project in service (ensure data is not None)
-        if create_result.value is not None:
-            api.project_service._projects[str(project_id)] = create_result.value
-
-        # Update the project
-        updates: dict[str, object] = {"language": "go"}
-        result = api.update_project(project_id, updates)
-        assert result.success
-
-    def test_delete_project_through_api(self, api: QualityAPI) -> None:
-        """Test deleting a project through API."""
-        # First create a project
-        create_result = api.create_project(
-            name="test_project",
-            project_path="./test_project",
-        )
-        assert create_result.success
-        project_id = uuid4()
-
-        # Mock the project in service (ensure data is not None)
-        if create_result.value is not None:
-            api.project_service._projects[str(project_id)] = create_result.value
-
-        # Delete the project
-        result = api.delete_project(project_id)
-        assert result.success
-
-    def test_create_analysis_through_api(self, api: QualityAPI) -> None:
-        """Test creating an analysis through API."""
-        project_id = uuid4()
-
-        result = api.create_analysis(
-            project_id=project_id,
-            commit_hash="abc123",
-            branch="main",
-        )
-        assert result.success
-
-    def test_update_analysis_metrics_through_api(self, api: QualityAPI) -> None:
-        """Test updating analysis metrics through API."""
-        analysis_id = uuid4()
-
-        result = api.update_metrics(
-            analysis_id=analysis_id,
-            total_files=10,
-            total_lines=1000,
-            code_lines=800,
-            comment_lines=100,
-            blank_lines=100,
-        )
-        # This will fail because analysis doesn't exist, but tests the API call
-        assert result.is_failure
-
-    def test_update_analysis_scores_through_api(self, api: QualityAPI) -> None:
-        """Test updating analysis scores through API."""
-        analysis_id = uuid4()
-
-        result = api.update_scores(
-            analysis_id=analysis_id,
-            coverage_score=95.0,
-            complexity_score=90.0,
-            duplication_score=85.0,
-            security_score=100.0,
-            maintainability_score=88.0,
-        )
-        # This will fail because analysis doesn't exist
-        assert result.is_failure
-
-    def test_create_issue_through_api(self, api: QualityAPI) -> None:
-        """Test creating an issue through API."""
-        analysis_id = uuid4()
-
-        result = api.create_issue(
-            analysis_id=analysis_id,
-            issue_type="style",
-            severity="medium",
-            rule_id="E302",
+    def test_create_issue_through_services(
+        self,
+        services: FlextQualityServices,
+    ) -> None:
+        """Test creating an issue through services."""
+        result = services.issue_service.create_issue(
+            analysis_id="analysis_test",
+            severity="HIGH",
+            issue_type="style_violation",
             file_path="test.py",
-            message="Missing blank line",
-            line_number=10,
+            message="Test issue",
         )
-        assert result.success
 
-    def test_get_issue_through_api(self, api: QualityAPI) -> None:
-        """Test getting an issue through API."""
-        # First create an issue
-        analysis_id = uuid4()
-        create_result = api.create_issue(
-            analysis_id=analysis_id,
-            issue_type="style",
-            severity="medium",
-            rule_id="E302",
-            file_path="test.py",
-            message="Missing blank line",
+        assert result.is_success
+        issue = result.unwrap()
+        assert issue is not None
+        assert issue.analysis_id == "analysis_test"
+        assert issue.severity == "HIGH"
+
+    def test_create_report_through_services(
+        self,
+        services: FlextQualityServices,
+    ) -> None:
+        """Test creating a report through services."""
+        result = services.report_service.create_report(
+            analysis_id="analysis_test",
+            format_type="HTML",
         )
-        assert create_result.success
 
-        issue_id = uuid4()
-        # Mock the issue in service
-        api.issue_service._issues[str(issue_id)] = create_result.value
-
-        result = api.get_issue(issue_id)
-        assert result.success
-
-    def test_mark_issue_fixed_through_api(self, api: QualityAPI) -> None:
-        """Test marking an issue as fixed through API."""
-        # First create an issue
-        analysis_id = uuid4()
-        create_result = api.create_issue(
-            analysis_id=analysis_id,
-            issue_type="style",
-            severity="medium",
-            rule_id="E302",
-            file_path="test.py",
-            message="Missing blank line",
-        )
-        assert create_result.success
-
-        issue_id = uuid4()
-        # Mock the issue in service
-        api.issue_service._issues[str(issue_id)] = create_result.value
-
-        result = api.mark_issue_fixed(issue_id)
-        assert result.success
-
-    def test_suppress_issue_through_api(self, api: QualityAPI) -> None:
-        """Test suppressing an issue through API."""
-        # First create an issue
-        analysis_id = uuid4()
-        create_result = api.create_issue(
-            analysis_id=analysis_id,
-            issue_type="style",
-            severity="medium",
-            rule_id="E302",
-            file_path="test.py",
-            message="Missing blank line",
-        )
-        assert create_result.success
-
-        issue_id = uuid4()
-        # Mock the issue in service
-        api.issue_service._issues[str(issue_id)] = create_result.value
-
-        result = api.suppress_issue(issue_id, "False positive")
-        assert result.success
-
-    def test_create_report_through_api(self, api: QualityAPI) -> None:
-        """Test creating a report through API."""
-        analysis_id = uuid4()
-
-        result = api.create_report(
-            analysis_id=analysis_id,
-            report_type="html",
-            report_format="detailed",
-        )
-        assert result.success
-
-    def test_get_report_through_api(self, api: QualityAPI) -> None:
-        """Test getting a report through API."""
-        # First create a report
-        analysis_id = uuid4()
-        create_result = api.create_report(
-            analysis_id=analysis_id,
-            report_type="json",
-        )
-        assert create_result.success
-
-        report_id = uuid4()
-        # Mock the report in service
-        api.report_service._reports[str(report_id)] = create_result.value
-
-        result = api.get_report(report_id)
-        assert result.success
-
-    def test_delete_report_through_api(self, api: QualityAPI) -> None:
-        """Test deleting a report through API."""
-        # First create a report
-        analysis_id = uuid4()
-        create_result = api.create_report(
-            analysis_id=analysis_id,
-            report_type="pdf",
-        )
-        assert create_result.success
-
-        report_id = uuid4()
-        # Mock the report in service
-        api.report_service._reports[str(report_id)] = create_result.value
-
-        result = api.delete_report(report_id)
-        assert result.success
-
-    def test_run_full_analysis_through_api(self, api: QualityAPI) -> None:
-        """Test full project analysis through API."""
-        project_id = uuid4()
-
-        result = api.run_full_analysis(
-            project_id=project_id,
-            commit_hash="abc123",
-            branch="main",
-        )
-        # This is complex flow, just test it doesn't crash
-        assert result is not None
-
-    def test_list_analyses_through_api(self, api: QualityAPI) -> None:
-        """Test listing project analyses through API."""
-        project_id = uuid4()
-
-        result = api.list_analyses(project_id)
-        assert result.success
-
-    def test_list_issues_through_api(self, api: QualityAPI) -> None:
-        """Test listing analysis issues through API."""
-        analysis_id = uuid4()
-
-        result = api.list_issues(analysis_id)
-        assert result.success
-
-    def test_list_reports_through_api(self, api: QualityAPI) -> None:
-        """Test listing analysis reports through API."""
-        analysis_id = uuid4()
-
-        result = api.list_reports(analysis_id)
-        assert result.success
+        assert result.is_success
+        report = result.unwrap()
+        assert report is not None
+        assert report.analysis_id == "analysis_test"
+        assert report.format_type == "HTML"

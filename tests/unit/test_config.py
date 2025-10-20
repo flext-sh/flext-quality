@@ -141,10 +141,8 @@ class TestFlextQualityConfig:
         )
         result = invalid_config.validate_business_rules()
         assert result.is_failure
-        assert (
-            result.error is not None
-            and "Coverage analysis requires external tools" in result.error
-        )
+        assert result.error is not None
+        assert "Coverage analysis requires external tools" in result.error
 
     def test_reset_functionality(self) -> None:
         """Test singleton reset functionality."""

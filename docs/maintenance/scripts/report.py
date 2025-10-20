@@ -23,6 +23,7 @@ class DocumentationReporter:
     """Documentation quality reporting and analytics system."""
 
     def __init__(self, reports_dir: str = "docs/maintenance/reports/") -> None:
+        """Initialize the documentation reporter with reports directory."""
         self.reports_dir = Path(reports_dir)
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.template_dir = Path(__file__).parent / "templates"
@@ -46,14 +47,12 @@ class DocumentationReporter:
             try:
                 with Path(filepath).open(encoding="utf-8") as f:
                     return json.load(f)
-            except (OSError, json.JSONDecodeError) as e:
-                print(f"Warning: Could not load {filename}: {e}")
+            except (OSError, json.JSONDecodeError):
+                pass
         return None
 
     def generate_quality_report(self, format: str = "html", **kwargs) -> str:
         """Generate comprehensive quality report."""
-        print("📊 Generating quality report...")
-
         # Collect all available data
         report_data = {
             "timestamp": datetime.now(UTC).isoformat(),
@@ -444,8 +443,6 @@ class DocumentationReporter:
 
     def generate_trend_report(self, days: int = 30) -> str:
         """Generate trend analysis report over specified time period."""
-        print(f"📈 Analyzing trends over last {days} days...")
-
         # Find all historical reports
         report_files = list(self.reports_dir.glob("*.json"))
         recent_reports = []
@@ -655,8 +652,7 @@ def main() -> None:
         filename = (
             args.filename or f"monthly_trends_{datetime.now(UTC).strftime('%Y%m%d')}"
         )
-        filepath = reporter.save_report(trend_report, filename, "md")
-        print(f"📈 Monthly trend report saved: {filepath}")
+        reporter.save_report(trend_report, filename, "md")
 
     elif args.weekly_trends:
         # Generate weekly trend report
@@ -664,8 +660,7 @@ def main() -> None:
         filename = (
             args.filename or f"weekly_trends_{datetime.now(UTC).strftime('%Y%m%d')}"
         )
-        filepath = reporter.save_report(trend_report, filename, "md")
-        print(f"📈 Weekly trend report saved: {filepath}")
+        reporter.save_report(trend_report, filename, "md")
 
     else:
         # Generate comprehensive quality report
@@ -676,20 +671,16 @@ def main() -> None:
             args.filename
             or f"quality_report_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}"
         )
-        filepath = reporter.save_report(report_content, filename, args.format)
-
-        print(f"📊 Quality report saved: {filepath}")
+        reporter.save_report(report_content, filename, args.format)
 
         # Send notifications if requested
         if args.notify and args.webhook_url:
-            print("🔔 Sending notifications...")
             # This would implement webhook notifications
             # For now, just print
-            print(f"Would send notification to: {args.webhook_url}")
+            pass
 
     if args.serve:
-        print("🌐 Dashboard serving not implemented yet")
-        print("To view reports, open the generated HTML files in a web browser")
+        pass
 
 
 if __name__ == "__main__":

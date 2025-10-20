@@ -10,7 +10,10 @@ from __future__ import annotations
 import warnings
 from typing import ClassVar
 
-from .value_objects import FlextQualityGrade
+from .models import FlextQualityModels
+
+# Convenience alias for backward compatibility during transition
+FlextQualityGrade = FlextQualityModels.QualityGrade
 
 
 class FlextQualityGradeCalculator:

@@ -328,7 +328,8 @@ class FlextQualityConfig(FlextConfig):
 
             return FlextResult[None].ok(None)
         except Exception as e:
-            return FlextResult[None].fail(f"Business rules validation failed: {e}")
+            error_msg = f"Business rules validation failed: {e}"
+            return FlextResult[None].fail(error_msg)
 
     def get_analysis_config(self) -> dict[str, object]:
         """Get quality analysis configuration context."""

@@ -9,7 +9,7 @@ import argparse
 import logging
 import os
 import shutil
-import subprocess  # noqa: S404
+import subprocess
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -83,6 +83,7 @@ class DocumentationSync:
 
     def __init__(self, config_path: str | None = None) -> None:
         """Initialize documentation synchronization system."""
+        super().__init__()
         self.config: SyncConfig = self._load_config(config_path)
         self.project_root = get_project_root()
         self.working_dir = self.project_root
@@ -160,7 +161,17 @@ class DocumentationSync:
                     behind_count=0,
                 )
 
-            result = subprocess.run(  # noqa: S603
+            if not git_cmd:
+                return GitStatusInfo(
+                    branch="unknown",
+                    modified_files=[],
+                    untracked_files=[],
+                    staged_files=[],
+                    ahead_count=0,
+                    behind_count=0,
+                )
+
+            result = subprocess.run(
                 [git_cmd, "rev-parse", "--git-dir"],
                 check=False,
                 cwd=self.working_dir,
@@ -180,7 +191,7 @@ class DocumentationSync:
                 )
 
             # Get branch info
-            branch_result = subprocess.run(  # noqa: S603
+            branch_result = subprocess.run(
                 [git_cmd, "branch", "--show-current"],
                 check=False,
                 cwd=self.working_dir,
@@ -195,7 +206,7 @@ class DocumentationSync:
             )
 
             # Get status
-            status_result = subprocess.run(  # noqa: S603
+            status_result = subprocess.run(
                 [git_cmd, "status", "--porcelain"],
                 check=False,
                 cwd=self.working_dir,
@@ -249,7 +260,7 @@ class DocumentationSync:
             if not git_cmd:
                 return None
 
-            result = subprocess.run(  # noqa: S603
+            result = subprocess.run(
                 [git_cmd, "log", "-1", "--format=%ct", "--", "docs/"],
                 check=False,
                 cwd=self.working_dir,
@@ -275,7 +286,7 @@ class DocumentationSync:
             if not git_cmd:
                 return False
 
-            result = subprocess.run(  # noqa: S603
+            result = subprocess.run(
                 [git_cmd, "status", "--porcelain"],
                 check=False,
                 cwd=self.working_dir,
@@ -360,12 +371,11 @@ class DocumentationSync:
                     timestamp=datetime.now(UTC),
                 )
 
-            subprocess.run(  # noqa: S603
-                [git_cmd, "add", *files],
+            subprocess.run(
+                [git_cmd, "add"] + files,
                 cwd=str(self.working_dir),
                 check=True,
                 capture_output=True,
-                shell=False,  # Explicit for security
                 text=True,
             )
 
@@ -379,11 +389,10 @@ class DocumentationSync:
             )
 
             # Commit
-            subprocess.run(  # noqa: S603
+            subprocess.run(
                 [git_cmd, "commit", "-m", commit_message],
                 cwd=str(self.working_dir),
                 check=True,
-                shell=False,  # Explicit for security
                 capture_output=True,
                 text=True,
             )
@@ -392,12 +401,11 @@ class DocumentationSync:
             if self.config["sync"]["push_after_commit"]:
                 remote_name = str(self.config["git"]["remote_name"])
                 main_branch = str(self.config["git"]["main_branch"])
-                subprocess.run(  # noqa: S603
+                subprocess.run(
                     [git_cmd, "push", remote_name, main_branch],
                     cwd=str(self.working_dir),
                     check=True,
                     capture_output=True,
-                    shell=False,  # Explicit for security
                     text=True,
                 )
 
@@ -447,12 +455,11 @@ class DocumentationSync:
             timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
             branch_name = f"docs-backup-{timestamp}"
 
-            subprocess.run(  # noqa: S603
+            subprocess.run(
                 [git_cmd, "checkout", "-b", branch_name],
                 cwd=str(self.working_dir),
                 check=True,
                 capture_output=True,
-                shell=False,  # Explicit for security
                 text=True,
             )
 
@@ -489,11 +496,10 @@ class DocumentationSync:
                     timestamp=datetime.now(UTC),
                 )
 
-            subprocess.run(  # noqa: S603
-                [git_cmd, "checkout", "HEAD", "--", *files],
+            subprocess.run(
+                [git_cmd, "checkout", "HEAD", "--"] + files,
                 cwd=str(self.working_dir),
                 check=True,
-                shell=False,  # Explicit for security
                 capture_output=True,
                 text=True,
             )

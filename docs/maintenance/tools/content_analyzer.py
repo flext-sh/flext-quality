@@ -658,11 +658,12 @@ if __name__ == "__main__":
     # Example usage
     import sys
 
-    if len(sys.argv) < 2:  # Require at least file path argument  # noqa: PLR2004
+    MIN_ARGS = 2
+    if len(sys.argv) < MIN_ARGS:  # Require at least file path argument
         sys.exit(1)
 
     file_path = sys.argv[1]
-    config_path = sys.argv[2] if len(sys.argv) > 2 else None  # noqa: PLR2004
+    config_path = sys.argv[2] if len(sys.argv) > MIN_ARGS else None
 
     results = analyze_file_content(file_path, config_path)
 

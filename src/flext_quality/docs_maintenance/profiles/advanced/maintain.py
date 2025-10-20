@@ -25,7 +25,7 @@ from .validate_style import StyleValidator
 try:  # Optional synchronization capability
     from .sync import DocumentationSync
 except Exception:  # pragma: no cover - optional dependency
-    DocumentationSync = None  # type: ignore[assignment]
+    DocumentationSync = None
 
 # Constants for maintenance effectiveness calculation
 EXCELLENT_QUALITY_THRESHOLD = 90

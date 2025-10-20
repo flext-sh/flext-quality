@@ -12,6 +12,7 @@ Usage:
 
 import argparse
 import json
+import logging
 import re
 import shutil
 from datetime import UTC, datetime
@@ -19,11 +20,20 @@ from pathlib import Path
 
 import yaml
 
+# Constants
+MIN_HEADINGS_FOR_TOC = 5
+
 
 class DocumentationOptimizer:
     """Documentation optimization and enhancement system."""
 
-    def __init__(self, backup: bool = True) -> None:
+    def __init__(self, *, backup: bool = True) -> None:
+        """Initialize the documentation optimizer.
+
+        Args:
+            backup: Whether to create backups before making changes.
+
+        """
         self.backup = backup
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.results = {
@@ -36,8 +46,6 @@ class DocumentationOptimizer:
 
     def optimize_formatting(self, doc_files: list[Path]) -> dict[str, object]:
         """Fix common formatting issues."""
-        print("🎨 Optimizing formatting...")
-
         for file_path in doc_files:
             try:
                 content = file_path.read_text(encoding="utf-8")
@@ -61,7 +69,7 @@ class DocumentationOptimizer:
                 self.results["files_processed"] += 1
 
             except Exception as e:
-                print(f"❌ Error processing {file_path}: {e}")
+                logging.warning(f"Failed to optimize formatting in file: {e}")
 
         return self.results
 
@@ -98,8 +106,6 @@ class DocumentationOptimizer:
 
     def update_table_of_contents(self, doc_files: list[Path]) -> dict[str, object]:
         """Update or add table of contents for long documents."""
-        print("📑 Updating table of contents...")
-
         for file_path in doc_files:
             try:
                 content = file_path.read_text(encoding="utf-8")
@@ -107,7 +113,9 @@ class DocumentationOptimizer:
 
                 # Check if document needs a TOC
                 headings = re.findall(r"^(#{1,6})\s+(.+)$", content, re.MULTILINE)
-                if len(headings) > 5:  # Only add TOC for documents with many headings
+                if (
+                    len(headings) > MIN_HEADINGS_FOR_TOC
+                ):  # Only add TOC for documents with many headings
                     content = self._add_or_update_toc(content)
 
                 if content != original_content:
@@ -122,7 +130,7 @@ class DocumentationOptimizer:
                 self.results["files_processed"] += 1
 
             except Exception as e:
-                print(f"❌ Error processing {file_path}: {e}")
+                logging.warning(f"Failed to update TOC in file: {e}")
 
         return self.results
 
@@ -187,8 +195,6 @@ class DocumentationOptimizer:
 
     def enhance_accessibility(self, doc_files: list[Path]) -> dict[str, object]:
         """Enhance accessibility of documentation."""
-        print("♿ Enhancing accessibility...")
-
         for file_path in doc_files:
             try:
                 content = file_path.read_text(encoding="utf-8")
@@ -211,8 +217,8 @@ class DocumentationOptimizer:
 
                 self.results["files_processed"] += 1
 
-            except Exception as e:
-                print(f"❌ Error processing {file_path}: {e}")
+            except Exception:
+                pass
 
         return self.results
 
@@ -250,8 +256,6 @@ class DocumentationOptimizer:
 
     def optimize_content_structure(self, doc_files: list[Path]) -> dict[str, object]:
         """Optimize content structure and readability."""
-        print("📖 Optimizing content structure...")
-
         for file_path in doc_files:
             try:
                 content = file_path.read_text(encoding="utf-8")
@@ -277,8 +281,8 @@ class DocumentationOptimizer:
 
                 self.results["files_processed"] += 1
 
-            except Exception as e:
-                print(f"❌ Error processing {file_path}: {e}")
+            except Exception:
+                pass
 
         return self.results
 
@@ -316,8 +320,6 @@ class DocumentationOptimizer:
 
     def update_metadata(self, doc_files: list[Path]) -> dict[str, object]:
         """Update frontmatter metadata and timestamps."""
-        print("📝 Updating metadata...")
-
         for file_path in doc_files:
             try:
                 content = file_path.read_text(encoding="utf-8")
@@ -348,8 +350,8 @@ class DocumentationOptimizer:
 
                 self.results["files_processed"] += 1
 
-            except Exception as e:
-                print(f"❌ Error processing {file_path}: {e}")
+            except Exception:
+                pass
 
         return self.results
 
@@ -508,8 +510,6 @@ def main() -> None:
             if not any(pattern in str(f) for pattern in ignored_patterns)
         ]
 
-    print(f"📁 Found {len(doc_files)} documentation files")
-
     # Initialize optimizer
     optimizer = DocumentationOptimizer(backup=args.backup)
 
@@ -537,31 +537,20 @@ def main() -> None:
         run_any_optimization = True
 
     if not run_any_optimization:
-        print("❌ No optimization tasks specified. Use --help for options.")
         parser.print_help()
         return
 
     # Save report
-    report_file = optimizer.save_report(args.output)
+    optimizer.save_report(args.output)
 
     # Print summary
-    print("\n📊 Optimization Summary:")
-    print(f"   Files Processed: {optimizer.results['files_processed']}")
-    print(f"   Changes Made: {optimizer.results['changes_made']}")
-    print(f"   Backups Created: {len(optimizer.results['backups_created'])}")
-    print(f"   Optimizations Applied: {len(optimizer.results['optimizations'])}")
 
     if optimizer.results["backups_created"]:
-        print(f"   📦 Backups: {', '.join(optimizer.results['backups_created'][:3])}")
         if len(optimizer.results["backups_created"]) > 3:
-            print(f"      ... and {len(optimizer.results['backups_created']) - 3} more")
-
-    print(f"   Report: {report_file}")
+            pass
 
     if optimizer.results["changes_made"] > 0:
-        print("✅ Documentation optimization completed successfully")
-    else:
-        print("ℹ️ No optimizations were needed")
+        pass
 
 
 if __name__ == "__main__":

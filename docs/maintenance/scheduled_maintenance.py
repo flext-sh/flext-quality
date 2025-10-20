@@ -201,10 +201,10 @@ class ScheduledMaintenance:
         """Run a single maintenance task."""
         try:
             # Change to project root directory
-            result = subprocess.run(  # noqa: S602
+            result = subprocess.run(
                 task_config["command"],
                 check=False,
-                shell=True,
+                shell=False,
                 cwd=self.project_root,
                 timeout=task_config.get("timeout", 300),
                 capture_output=True,

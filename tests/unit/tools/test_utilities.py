@@ -80,9 +80,10 @@ class TestPaths:
         assert isinstance(path, Path)
         assert path.is_absolute()
 
-    def test_normalize_path_string(self) -> None:
+    def test_normalize_path_string(self, tmp_path: Path) -> None:
         """Test normalizing string path."""
-        path = normalize_path("/tmp/test")
+        test_path = tmp_path / "test"
+        path = normalize_path(str(test_path))
         assert isinstance(path, Path)
         assert path.is_absolute()
 

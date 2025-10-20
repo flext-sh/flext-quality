@@ -16,7 +16,7 @@ from pathlib import Path
 
 import pytest
 
-from flext_quality import CodeAnalyzer
+from flext_quality import FlextQualityAnalyzer
 
 
 class TestCodeAnalyzerFunctional:
@@ -128,14 +128,14 @@ def multiply(x: int, y: int) -> int:
 
     def test_analyzer_initialization(self, sample_project_dir: Path) -> None:
         """Test CodeAnalyzer initialization."""
-        analyzer = CodeAnalyzer(sample_project_dir)
+        analyzer = FlextQualityAnalyzer(sample_project_dir)
 
         assert analyzer.project_path == sample_project_dir
         assert analyzer._current_results is None
 
     def test_basic_project_analysis(self, sample_project_dir: Path) -> None:
         """Test basic project analysis functionality."""
-        analyzer = CodeAnalyzer(sample_project_dir)
+        analyzer = FlextQualityAnalyzer(sample_project_dir)
 
         results = analyzer.analyze_project()
 
@@ -164,7 +164,7 @@ def multiply(x: int, y: int) -> int:
 
     def test_project_analysis_with_options(self, sample_project_dir: Path) -> None:
         """Test project analysis with various options."""
-        analyzer = CodeAnalyzer(sample_project_dir)
+        analyzer = FlextQualityAnalyzer(sample_project_dir)
 
         # Test with all options enabled
         results_all = analyzer.analyze_project(
@@ -194,7 +194,7 @@ def multiply(x: int, y: int) -> int:
 
     def test_find_python_files_method(self, sample_project_dir: Path) -> None:
         """Test _find_python_files method."""
-        analyzer = CodeAnalyzer(sample_project_dir)
+        analyzer = FlextQualityAnalyzer(sample_project_dir)
 
         # Access private method for testing
         python_files = analyzer._find_python_files()
@@ -210,7 +210,7 @@ def multiply(x: int, y: int) -> int:
 
     def test_analyze_file_method_individual(self, sample_project_dir: Path) -> None:
         """Test _analyze_file method on individual files."""
-        analyzer = CodeAnalyzer(sample_project_dir)
+        analyzer = FlextQualityAnalyzer(sample_project_dir)
 
         utils_py = sample_project_dir / "utils.py"
 
@@ -232,7 +232,7 @@ def multiply(x: int, y: int) -> int:
 
     def test_analyze_nonexistent_file(self, sample_project_dir: Path) -> None:
         """Test analyzing a non-existent file."""
-        analyzer = CodeAnalyzer(sample_project_dir)
+        analyzer = FlextQualityAnalyzer(sample_project_dir)
 
         nonexistent_file = sample_project_dir / "nonexistent.py"
 
@@ -245,7 +245,7 @@ def multiply(x: int, y: int) -> int:
 
     def test_calculate_overall_metrics_method(self, sample_project_dir: Path) -> None:
         """Test _calculate_overall_metrics method."""
-        analyzer = CodeAnalyzer(sample_project_dir)
+        analyzer = FlextQualityAnalyzer(sample_project_dir)
 
         # Create sample file metrics matching actual structure
         file_metrics = [
@@ -280,7 +280,7 @@ def multiply(x: int, y: int) -> int:
 
     def test_get_quality_score_method(self, sample_project_dir: Path) -> None:
         """Test get_quality_score method."""
-        analyzer = CodeAnalyzer(sample_project_dir)
+        analyzer = FlextQualityAnalyzer(sample_project_dir)
 
         # Run analysis first
         analyzer.analyze_project()
@@ -293,7 +293,7 @@ def multiply(x: int, y: int) -> int:
 
     def test_get_quality_grade_method(self, sample_project_dir: Path) -> None:
         """Test get_quality_grade method."""
-        analyzer = CodeAnalyzer(sample_project_dir)
+        analyzer = FlextQualityAnalyzer(sample_project_dir)
 
         # Run analysis first
         analyzer.analyze_project()
@@ -322,7 +322,7 @@ def multiply(x: int, y: int) -> int:
         """Test analyzer with empty project directory."""
         with tempfile.TemporaryDirectory() as temp_dir:
             empty_dir = Path(temp_dir)
-            analyzer = CodeAnalyzer(empty_dir)
+            analyzer = FlextQualityAnalyzer(empty_dir)
 
             results = analyzer.analyze_project()
 
@@ -347,7 +347,7 @@ def broken_function(
 invalid_syntax here
 """)
 
-            analyzer = CodeAnalyzer(project_dir)
+            analyzer = FlextQualityAnalyzer(project_dir)
 
             # Should handle syntax errors gracefully
             results = analyzer.analyze_project()
@@ -372,7 +372,7 @@ invalid_syntax here
 
         large_file.write_text(large_content)
 
-        analyzer = CodeAnalyzer(sample_project_dir)
+        analyzer = FlextQualityAnalyzer(sample_project_dir)
         results = analyzer.analyze_project()
 
         assert hasattr(results, "overall_metrics")
@@ -383,14 +383,14 @@ invalid_syntax here
         """Test analyzer initialization with string path."""
         with tempfile.TemporaryDirectory() as temp_dir:
             # Pass string instead of Path
-            analyzer = CodeAnalyzer(temp_dir)
+            analyzer = FlextQualityAnalyzer(temp_dir)
 
             assert isinstance(analyzer.project_path, Path)
             assert str(analyzer.project_path) == temp_dir
 
     def test_analyzer_multiple_analyses(self, sample_project_dir: Path) -> None:
         """Test that analyzer can handle multiple analyses safely."""
-        analyzer = CodeAnalyzer(sample_project_dir)
+        analyzer = FlextQualityAnalyzer(sample_project_dir)
 
         # Run multiple analyses
         results1 = analyzer.analyze_project(include_security=True)
@@ -409,7 +409,7 @@ class TestCodeAnalyzerEdgeCases:
     def test_nonexistent_project_path(self) -> None:
         """Test analyzer with non-existent project path."""
         nonexistent_path = Path("/nonexistent/path/to/project")
-        analyzer = CodeAnalyzer(nonexistent_path)
+        analyzer = FlextQualityAnalyzer(nonexistent_path)
 
         # Should handle gracefully
         results = analyzer.analyze_project()
@@ -426,7 +426,7 @@ class TestCodeAnalyzerEdgeCases:
             test_file = project_dir / "test.py"
             test_file.write_text("# Simple test file\nprint('hello')\n")
 
-            analyzer = CodeAnalyzer(project_dir)
+            analyzer = FlextQualityAnalyzer(project_dir)
 
             # Should work normally in most cases
             results = analyzer.analyze_project()
@@ -458,7 +458,7 @@ class TestCodeAnalyzerEdgeCases:
                 "# Test file\ndef test(): assert True\n",
             )
 
-            analyzer = CodeAnalyzer(project_dir)
+            analyzer = FlextQualityAnalyzer(project_dir)
             results = analyzer.analyze_project()
 
             assert hasattr(results, "overall_metrics")
