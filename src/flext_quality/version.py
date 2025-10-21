@@ -18,27 +18,27 @@ class FlextQualityVersion:
             version_info: Version info tuple
 
         """
-        self._version = version
-        self._version_info = version_info
+ self._version = version
+ self._version_info = version_info
 
-    @property
-    def version(self) -> str:
-        """Return the version string."""
-        return self._version
+ @property
+ def version(self) -> str:
+ """Return the version string."""
+ return self._version
 
-    @property
-    def version_info(self) -> tuple[int | str, ...]:
-        """Return the version info tuple."""
-        return self._version_info
+ @property
+ def version_info(self) -> tuple[int | str,...]:
+ """Return the version info tuple."""
+ return self._version_info
 
-    @property
-    def version_tuple(self) -> tuple[int | str, ...]:
-        """Return the version info tuple (alias for compatibility)."""
-        return self._version_info
+ @property
+ def version_tuple(self) -> tuple[int | str,...]:
+ """Return the version info tuple (alias for compatibility)."""
+ return self._version_info
 
-    @property
-    def metadata(self) -> dict[str, object]:
-        """Return project metadata."""
+ @property
+ def metadata(self) -> dict[str, object]:
+ """Return project metadata."""
         return {
             "name": "flext-quality",
             "version": self._version,

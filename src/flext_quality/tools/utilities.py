@@ -58,11 +58,11 @@ class FlextQualityToolsUtilities(FlextService[None]):
             """Colorize text with ANSI color codes.
 
             Args:
-                message: Text to colorize
-                color: ANSI color code
+            message: Text to colorize
+            color: ANSI color code
 
             Returns:
-                Colorized text with reset at end
+            Colorized text with reset at end
 
             """
             if not color:
@@ -80,12 +80,12 @@ class FlextQualityToolsUtilities(FlextService[None]):
             MANDATORY: Uses FlextCli for output (NO direct rich/click).
 
             Args:
-                message: Text to print
-                color: ANSI color code (optional)
-                logger: Optional logger for parallel logging
+            message: Text to print
+            color: ANSI color code (optional)
+            logger: Optional logger for parallel logging
 
             Returns:
-                FlextResult indicating success/failure of print operation
+            FlextResult indicating success/failure of print operation
 
             """
             if logger:
@@ -145,10 +145,10 @@ class FlextQualityToolsUtilities(FlextService[None]):
             """Check if path should be ignored based on common patterns.
 
             Args:
-                path: Path to check
+            path: Path to check
 
             Returns:
-                True if path matches ignore patterns
+            True if path matches ignore patterns
 
             """
             path_str = str(path)
@@ -162,7 +162,7 @@ class FlextQualityToolsUtilities(FlextService[None]):
             """Get project root directory (current working directory).
 
             Returns:
-                Path to project root
+            Path to project root
 
             """
             return Path.cwd()
@@ -172,10 +172,10 @@ class FlextQualityToolsUtilities(FlextService[None]):
             """Normalize path to absolute resolved path.
 
             Args:
-                path: Path to normalize
+            path: Path to normalize
 
             Returns:
-                Absolute resolved Path
+            Absolute resolved Path
 
             """
             return Path(path).resolve()
@@ -185,10 +185,10 @@ class FlextQualityToolsUtilities(FlextService[None]):
             """Resolve path to absolute path (alias for normalize_path).
 
             Args:
-                path: Path to resolve
+            path: Path to resolve
 
             Returns:
-                Absolute resolved Path
+            Absolute resolved Path
 
             """
             return Path(path).resolve()
@@ -201,11 +201,11 @@ class FlextQualityToolsUtilities(FlextService[None]):
             """Find all Python files in directory tree.
 
             Args:
-                root: Root directory to search
-                exclude_patterns: Optional list of patterns to exclude
+            root: Root directory to search
+            exclude_patterns: Optional list of patterns to exclude
 
             Returns:
-                Sorted list of Python file paths
+            Sorted list of Python file paths
 
             """
             root_path = Path(root)
@@ -229,7 +229,7 @@ class FlextQualityToolsUtilities(FlextService[None]):
             """Get list of Python standard library modules.
 
             Returns:
-                Sorted list of stdlib module names
+            Sorted list of stdlib module names
 
             """
             stdlib_modules = [
@@ -275,10 +275,10 @@ class FlextQualityToolsUtilities(FlextService[None]):
             """Check if module is from standard library.
 
             Args:
-                module_name: Module name to check (e.g., 'os.path')
+            module_name: Module name to check (e.g., 'os.path')
 
             Returns:
-                True if module is from stdlib
+            True if module is from stdlib
 
             """
             # Extract base module name (before first dot)
@@ -295,7 +295,7 @@ class FlextQualityToolsUtilities(FlextService[None]):
         """Execute utilities service - FlextService interface.
 
         Returns:
-            FlextResult indicating service execution success
+        FlextResult indicating service execution success
 
         """
         return FlextResult[None].ok(None)
@@ -309,11 +309,11 @@ def colorize(message: str, color: str) -> str:
     """Convenience function for colorize.
 
     Args:
-        message: Text to colorize
-        color: ANSI color code
+    message: Text to colorize
+    color: ANSI color code
 
     Returns:
-        Colorized text
+    Colorized text
 
     """
     return FlextQualityToolsUtilities.Colors.colorize(message, color)
@@ -323,8 +323,8 @@ def print_colored(message: str, color: str = "") -> None:
     """Convenience function for print_colored.
 
     Args:
-        message: Text to print
-        color: ANSI color code (optional)
+    message: Text to print
+    color: ANSI color code (optional)
 
     """
     FlextQualityToolsUtilities.Colors.print_colored(message, color)
@@ -334,7 +334,7 @@ def get_project_root() -> Path:
     """Convenience function for get_project_root.
 
     Returns:
-        Path to project root
+    Path to project root
 
     """
     return FlextQualityToolsUtilities.Paths.get_project_root()
@@ -344,10 +344,10 @@ def normalize_path(path: str | Path) -> Path:
     """Convenience function for normalize_path.
 
     Args:
-        path: Path to normalize
+    path: Path to normalize
 
     Returns:
-        Absolute resolved Path
+    Absolute resolved Path
 
     """
     return FlextQualityToolsUtilities.Paths.normalize_path(path)
@@ -357,10 +357,10 @@ def should_ignore_path(path: str | Path) -> bool:
     """Convenience function for should_ignore_path.
 
     Args:
-        path: Path to check
+    path: Path to check
 
     Returns:
-        True if path should be ignored
+    True if path should be ignored
 
     """
     return FlextQualityToolsUtilities.Paths.should_ignore_path(path)
@@ -370,7 +370,7 @@ def get_stdlib_modules() -> list[str]:
     """Convenience function for get_stdlib_modules.
 
     Returns:
-        List of stdlib module names
+    List of stdlib module names
 
     """
     return FlextQualityToolsUtilities.Stdlib.get_stdlib_modules()
@@ -380,10 +380,10 @@ def is_stdlib_module(module_name: str) -> bool:
     """Convenience function for is_stdlib_module.
 
     Args:
-        module_name: Module name to check
+    module_name: Module name to check
 
     Returns:
-        True if module is from stdlib
+    True if module is from stdlib
 
     """
     return FlextQualityToolsUtilities.Stdlib.is_stdlib_module(module_name)

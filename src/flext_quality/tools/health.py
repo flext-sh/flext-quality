@@ -15,7 +15,7 @@ class HealthCheckService(FlextService[bool]):
         """Initialize health check service.
 
         Args:
-            workspace_path: Path to the workspace to check
+        workspace_path: Path to the workspace to check
 
         """
         super().__init__()

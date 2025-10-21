@@ -82,7 +82,7 @@ def _render_summary(report: Any) -> None:
         name = getattr(operation, "operation", "unknown")
         success = getattr(operation, "success", False)
         duration = getattr(operation, "duration", 0.0)
-        status = "✅" if success else "❌"
+        status = "" if success else ""
         operations_table.add_row(name, status, f"{duration:.2f}")
 
     console.print(operations_table)
@@ -121,7 +121,7 @@ def run_comprehensive(
         help="Show detailed logging in the terminal",
     ),
 ) -> None:
-    """Execute the comprehensive maintenance workflow."""
+    """Execute the complete maintenance workflow."""
     with _temporary_env(
         FLEXT_DOC_PROJECT_ROOT=project_root,
         FLEXT_DOC_PROFILE=profile,

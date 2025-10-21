@@ -43,12 +43,12 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer):
         """Analyze code using external tools.
 
         Args:
-            _code: Python source code to analyze
-            file_path: Optional file path for context
-            tool: Tool to use (ruff, mypy, bandit, vulture)
+        _code: Python source code to analyze
+        file_path: Optional file path for context
+        tool: Tool to use (ruff, mypy, bandit, vulture)
 
         Returns:
-            Dictionary with analysis results
+        Dictionary with analysis results
 
         """
         result: dict[str, object] = {"tool": "tool"}

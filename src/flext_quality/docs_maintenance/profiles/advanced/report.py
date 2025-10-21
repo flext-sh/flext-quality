@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Documentation Quality Assurance Reporting System.
 
-Generates comprehensive reports, dashboards, and analytics for documentation maintenance.
+Generates complete reports, dashboards, and analytics for documentation maintenance.
 Provides visualization and tracking of quality metrics over time.
 """
 
@@ -187,7 +187,7 @@ class ReportGenerator:
         validation_file: str | None = None,
         style_file: str | None = None,
     ) -> ReportData:
-        """Generate comprehensive report from audit results."""
+        """Generate complete report from audit results."""
         # Load data from files or run fresh audits
         audit_data = self._load_audit_data(audit_file)
         validation_data = self._load_validation_data(validation_file)
@@ -444,7 +444,7 @@ class ReportGenerator:
                     priority="info",
                     description="Documentation quality is good, continue regular maintenance",
                     actions=[
-                        "Run weekly comprehensive audits",
+                        "Run weekly complete audits",
                         "Monitor link health monthly",
                         "Review content freshness quarterly",
                     ],
@@ -891,7 +891,7 @@ def main() -> None:
     if args.verbose:
         pass
 
-    # Generate comprehensive report
+    # Generate complete report
     report_data = generator.generate_comprehensive_report(
         args.audit_file, args.validation_file, args.style_file
     )

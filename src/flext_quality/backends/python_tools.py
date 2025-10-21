@@ -223,10 +223,10 @@ class FlextQualityPythonTools:
         Ruff is the fastest Python linter, written in Rust.
 
         Args:
-            path: Path to analyze
+        path: Path to analyze
 
         Returns:
-            FlextResult with linting issues
+        FlextResult with linting issues
 
         """
         if not self._tools_available.get("ruff"):
@@ -275,10 +275,10 @@ class FlextQualityPythonTools:
         MyPy provides a Python API for programmatic type checking.
 
         Args:
-            path: Path to analyze
+        path: Path to analyze
 
         Returns:
-            FlextResult with type errors
+        FlextResult with type errors
 
         """
         if not _MYPY_API_AVAILABLE:
@@ -310,10 +310,10 @@ class FlextQualityPythonTools:
         """Run Bandit security scan via direct library import.
 
         Args:
-            path: Path to analyze
+        path: Path to analyze
 
         Returns:
-            FlextResult with security issues
+        FlextResult with security issues
 
         """
         if not _BANDIT_CORE_AVAILABLE:
@@ -342,10 +342,10 @@ class FlextQualityPythonTools:
         """Run Pylint analysis via direct library import.
 
         Args:
-            path: Path to analyze
+        path: Path to analyze
 
         Returns:
-            FlextResult with analysis results
+        FlextResult with analysis results
 
         """
         if not self._tools_available.get("pylint"):
@@ -385,10 +385,10 @@ class FlextQualityPythonTools:
         """Check Black formatting via direct library import.
 
         Args:
-            path: Path to analyze
+        path: Path to analyze
 
         Returns:
-            FlextResult with formatting check results
+        FlextResult with formatting check results
 
         """
         if not _BLACK_AVAILABLE:
@@ -422,10 +422,10 @@ class FlextQualityPythonTools:
         """Run pytest via direct library import.
 
         Args:
-            path: Path to test directory
+        path: Path to test directory
 
         Returns:
-            FlextResult with test results
+        FlextResult with test results
 
         """
         if not _PYTEST_AVAILABLE:
@@ -454,10 +454,10 @@ class FlextQualityPythonTools:
         """Run coverage analysis via direct library import.
 
         Args:
-            path: Path to analyze (currently unused, analyzes current directory)
+        path: Path to analyze (currently unused, analyzes current directory)
 
         Returns:
-            FlextResult with coverage data
+        FlextResult with coverage data
 
         """
         if not _COVERAGE_AVAILABLE:
@@ -486,10 +486,10 @@ class FlextQualityPythonTools:
         """Calculate code complexity via Radon library.
 
         Args:
-            path: Path to analyze
+        path: Path to analyze
 
         Returns:
-            FlextResult with complexity metrics
+        FlextResult with complexity metrics
 
         """
         if not _RADON_COMPLEXITY_AVAILABLE:
@@ -518,10 +518,10 @@ class FlextQualityPythonTools:
         """Detect dead code via Vulture library.
 
         Args:
-            path: Path to analyze
+        path: Path to analyze
 
         Returns:
-            FlextResult with dead code findings
+        FlextResult with dead code findings
 
         """
         if not _VULTURE_CLASS_AVAILABLE:

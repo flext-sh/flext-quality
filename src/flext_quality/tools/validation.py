@@ -36,10 +36,10 @@ class FlextQualityValidationTools(FlextService[None]):
             """Validate ecosystem equilibrium.
 
             Args:
-                workspace_path: Path to workspace
+            workspace_path: Path to workspace
 
             Returns:
-                FlextResult with validation results
+            FlextResult with validation results
 
             """
             logger = FlextLogger(__name__)
@@ -64,10 +64,10 @@ class FlextQualityValidationTools(FlextService[None]):
             """Validate proper domain separation.
 
             Args:
-                project_path: Path to project
+            project_path: Path to project
 
             Returns:
-                FlextResult with validation results
+            FlextResult with validation results
 
             """
             logger = FlextLogger(__name__)
@@ -92,10 +92,10 @@ class FlextQualityValidationTools(FlextService[None]):
             """Validate complete ecosystem quality.
 
             Args:
-                workspace_path: Path to workspace
+            workspace_path: Path to workspace
 
             Returns:
-                FlextResult with validation results
+            FlextResult with validation results
 
             """
             logger = FlextLogger(__name__)

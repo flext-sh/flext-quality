@@ -574,7 +574,7 @@ class DocumentationSync:
             if task == "validate_links":
                 result = self.validate_before_sync()
             elif task == "comprehensive_audit":
-                # Run comprehensive audit
+                # Run complete audit
                 result = self._run_comprehensive_audit()
             elif task == "optimize_content":
                 result = self._run_content_optimization()
@@ -597,7 +597,7 @@ class DocumentationSync:
         return results
 
     def _run_comprehensive_audit(self) -> SyncResult:
-        """Run comprehensive documentation audit."""
+        """Run complete documentation audit."""
         try:
             auditor = DocumentationAuditor()
             results = auditor.audit_directory(str(self.working_dir / "docs"))
@@ -818,7 +818,7 @@ def main() -> None:
 
         if args.verbose:
             for result in results:
-                status = "✅" if result.success else "❌"
+                status = "" if result.success else ""
 
     else:
         # Default: show status

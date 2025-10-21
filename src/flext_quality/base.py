@@ -26,11 +26,11 @@ class FlextQualityAnalyzer(ABC):
         """Analyze code and return results.
 
         Args:
-            code: Source code to analyze
-            file_path: Optional file path for context
+        code: Source code to analyze
+        file_path: Optional file path for context
 
         Returns:
-            Dictionary containing analysis results
+        Dictionary containing analysis results
 
         """
         ...
@@ -40,7 +40,7 @@ class FlextQualityAnalyzer(ABC):
         """Get the type of this backend.
 
         Returns:
-            BackendType enum value
+        BackendType enum value
 
         """
         ...
@@ -50,7 +50,7 @@ class FlextQualityAnalyzer(ABC):
         """Get list of capabilities this backend provides.
 
         Returns:
-            List of capability strings
+        List of capability strings
 
         """
         ...

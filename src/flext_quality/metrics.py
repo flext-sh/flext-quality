@@ -22,7 +22,7 @@ MAX_QUALITY_SCORE = 100
 class QualityMetrics(FlextModels.Value):
     """Immutable quality metrics value object.
 
-    Encapsulates comprehensive code quality measurements including overall scoring,
+    Encapsulates complete code quality measurements including overall scoring,
     category-specific scores, and detailed metrics from code analysis results.
 
     Use MetricsFactory to create instances, MetricsCalculator for score calculations.

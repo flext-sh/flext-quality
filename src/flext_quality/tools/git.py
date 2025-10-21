@@ -140,12 +140,12 @@ class FlextQualityGitTools(FlextService[None]):
             """Rewrite git history to remove AI signatures.
 
             Args:
-                repo_path: Path to repository
-                dry_run: Test in temporary workspace (MANDATORY default)
-                temp_path: Custom temporary workspace path
+            repo_path: Path to repository
+            dry_run: Test in temporary workspace (MANDATORY default)
+            temp_path: Custom temporary workspace path
 
             Returns:
-                FlextResult with RewriteResult containing statistics
+            FlextResult with RewriteResult containing statistics
 
             """
             logger = FlextLogger(__name__)
@@ -288,11 +288,11 @@ class FlextQualityGitTools(FlextService[None]):
             """Cleanup cruft files and directories.
 
             Args:
-                repo_path: Path to repository
-                dry_run: Preview changes without applying
+            repo_path: Path to repository
+            dry_run: Preview changes without applying
 
             Returns:
-                FlextResult with cleanup statistics
+            FlextResult with cleanup statistics
 
             """
             logger = FlextLogger(__name__)

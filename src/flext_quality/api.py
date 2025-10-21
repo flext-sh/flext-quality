@@ -36,7 +36,7 @@ class FlextQuality(FlextService[None]):
     - FlextDispatcher: Message routing
     - FlextProcessors: Processing utilities
     - FlextRegistry: Component registration
-    - FlextLogger: Advanced logging
+    - FlextLogger: logging
     """
 
     def __init__(self) -> None:

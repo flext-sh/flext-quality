@@ -45,7 +45,7 @@ class FlextQualityServices(FlextService[None]):
         """Initialize consolidated services with FLEXT integration.
 
         Args:
-            config: Optional quality configuration (uses default if None)
+        config: Optional quality configuration (uses default if None)
 
         """
         super().__init__()

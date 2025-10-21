@@ -1,6 +1,6 @@
 """Documentation Content Quality Audit System.
 
-Comprehensive auditing tool for documentation quality, freshness, and completeness.
+Complete auditing tool for documentation quality, freshness, and completeness.
 Performs multi-dimensional analysis of documentation content.
 """
 
@@ -136,7 +136,7 @@ class DocumentationAuditor:
         """Initialize documentation auditor with optional configuration file.
 
         Args:
-            config_path: Path to YAML configuration file, or None for defaults.
+        config_path: Path to YAML configuration file, or None for defaults.
 
         """
         self.config: AuditConfig = self._load_config(config_path)
@@ -579,7 +579,7 @@ def main() -> None:
         "--format", choices=["json", "yaml"], default="json", help="Output format"
     )
     parser.add_argument(
-        "--comprehensive", action="store_true", help="Run comprehensive audit"
+        "--comprehensive", action="store_true", help="Run complete audit"
     )
     parser.add_argument("--quick", action="store_true", help="Run quick audit")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")

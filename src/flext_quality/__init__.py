@@ -1,6 +1,6 @@
-"""FLEXT Quality - Enterprise-Grade Python Code Quality Analysis Library.
+"""FLEXT Quality - Python Code Quality Analysis Library.
 
-Provides comprehensive code quality analysis, metrics collection, and automated
+Provides complete code quality analysis, metrics collection, and automated
 quality assurance for FLEXT projects with proper domain-driven design patterns,
 railway-oriented programming, and deep FLEXT ecosystem integration.
 

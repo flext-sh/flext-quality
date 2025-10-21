@@ -49,7 +49,7 @@ class SecretVaultDecryptor(FlextSecurityService):
         """Return decrypted vault metadata.
 
         The actual decryption logic is intentionally omitted until the secure
-        implementation lands in flext-quality.  A structured dictionary is
+        implementation lands in flext-quality. A structured dictionary is
         returned so existing scripts can continue handling the result.
         """
         result = super().decrypt_vault(vault_path)

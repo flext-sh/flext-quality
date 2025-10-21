@@ -172,7 +172,7 @@ class FlextQualityReportGenerator:
             if score < thresholds.min_score_threshold:
                 recs.extend([
                     "Implement automated code quality checks in your CI/CD pipeline",
-                    "Add comprehensive unit tests to improve coverage",
+                    "Add complete unit tests to improve coverage",
                 ])
             if coverage < thresholds.min_coverage_threshold:
                 recs.append(

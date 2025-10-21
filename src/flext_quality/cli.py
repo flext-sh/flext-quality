@@ -344,11 +344,11 @@ def main() -> int:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-    flext-quality analyze ./my-project
-    flext-quality analyze ./my-project --output report.html --format html
-    flext-quality score ./my-project
-    flext-quality web --port 8080
-        """,
+ flext-quality analyze./my-project
+ flext-quality analyze./my-project --output report.html --format html
+ flext-quality score./my-project
+ flext-quality web --port 8080
+ """,
     )
     parser.add_argument(
         "--verbose", "-v", action="store_true", help="Enable verbose output"

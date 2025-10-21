@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Documentation Maintenance Orchestrator.
 
-Comprehensive maintenance system that coordinates all documentation quality assurance tasks.
-Provides automated workflows and comprehensive reporting.
+Complete maintenance system that coordinates all documentation quality assurance tasks.
+Provides automated workflows and complete reporting.
 """
 
 import argparse
@@ -51,7 +51,7 @@ class MaintenanceResult:
 
 @dataclass
 class MaintenanceReport:
-    """Comprehensive maintenance report."""
+    """Complete maintenance report."""
 
     session_id: str
     timestamp: datetime
@@ -82,7 +82,7 @@ class DocumentationMaintainer:
             return {}
 
     def run_comprehensive_maintenance(self) -> MaintenanceReport:
-        """Run comprehensive maintenance suite."""
+        """Run complete maintenance suite."""
         start_time = time.time()
 
         # 1. Content Quality Audit
@@ -447,7 +447,7 @@ def main() -> None:
     parser.add_argument(
         "--comprehensive",
         action="store_true",
-        help="Run comprehensive maintenance suite",
+        help="Run complete maintenance suite",
     )
     parser.add_argument("--config", help="Configuration file path")
     parser.add_argument("--output", "-o", help="Output report file")
@@ -462,8 +462,8 @@ def main() -> None:
 
     maintainer = DocumentationMaintainer(args.config)
 
-    if args.comprehensive or not any([args.comprehensive]):
-        # Default to comprehensive maintenance
+    if args.complete or not any([args.comprehensive]):
+        # Default to complete maintenance
         report = maintainer.run_comprehensive_maintenance()
 
         # Print results
@@ -507,15 +507,15 @@ def main() -> None:
 def run_comprehensive(
     config_path: str | None = None, *, verbose: bool = False, dry_run: bool = False
 ) -> MaintenanceReport:
-    """Run the comprehensive maintenance pipeline programmatically.
+    """Run the complete maintenance pipeline programmatically.
 
     Args:
-        config_path: Optional path to the YAML configuration file.
-        verbose: Whether to print verbose summaries to stdout.
-        dry_run: When True, operations that modify files should only simulate changes.
+    config_path: Optional path to the YAML configuration file.
+    verbose: Whether to print verbose summaries to stdout.
+    dry_run: When True, operations that modify files should only simulate changes.
 
     Returns:
-        The generated :class:`MaintenanceReport`.
+    The generated :class:`MaintenanceReport`.
 
     """
     maintainer = DocumentationMaintainer(config_path)

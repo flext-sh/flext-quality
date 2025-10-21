@@ -113,7 +113,7 @@ class FlextQualityHandlers:
             return services.get_report_service().create_report(
                 analysis_id=analysis_id_str,
                 format_type="html",
-                content="comprehensive report",
+                content="complete report",
             )
 
     # =====================================================================

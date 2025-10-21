@@ -38,10 +38,10 @@ class FlextQualityArchitectureTools(FlextService[None]):
             """Analyze architectural violations.
 
             Args:
-                project_path: Path to project
+            project_path: Path to project
 
             Returns:
-                FlextResult with analysis results
+            FlextResult with analysis results
 
             """
             logger = FlextLogger(__name__)
@@ -74,11 +74,11 @@ class FlextQualityArchitectureTools(FlextService[None]):
             """Enforce architectural patterns.
 
             Args:
-                project_path: Path to project
-                dry_run: Preview changes without applying
+            project_path: Path to project
+            dry_run: Preview changes without applying
 
             Returns:
-                FlextResult with enforcement status
+            FlextResult with enforcement status
 
             """
             logger = FlextLogger(__name__)
@@ -103,10 +103,10 @@ class FlextQualityArchitectureTools(FlextService[None]):
             """Test cross-project imports.
 
             Args:
-                workspace_path: Path to workspace
+            workspace_path: Path to workspace
 
             Returns:
-                FlextResult with test results
+            FlextResult with test results
 
             """
             logger = FlextLogger(__name__)

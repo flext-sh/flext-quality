@@ -19,7 +19,7 @@ from flext_core import FlextLogger, FlextResult, FlextService
 class BackupManager(FlextService[str]):
     """Small backup manager with FlextResult integration.
 
-    The legacy implementation returned canned responses.  This version keeps a
+    The legacy implementation returned canned responses. This version keeps a
     minimal catalogue of registered backups so consumers can inspect or reuse
     them during a workflow without touching the filesystem unless explicitly
     requested.
@@ -39,10 +39,10 @@ class BackupManager(FlextService[str]):
         """Register a backup for the given path.
 
         Args:
-            source_path: File or directory path that should be backed up.
+        source_path: File or directory path that should be backed up.
 
         Returns:
-            FlextResult[str] containing a user friendly confirmation message.
+        FlextResult[str] containing a user friendly confirmation message.
 
         """
         try:

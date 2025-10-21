@@ -24,7 +24,7 @@ class FlextQualityModels(FlextModels):
     All models consolidated into focused, reusable components.
 
     Architecture: Layer 2 (Domain)
-    Provides comprehensive domain models for quality analysis following FLEXT patterns:
+    Provides complete domain models for quality analysis following FLEXT patterns:
     - Value Objects: Immutable domain values (FlextModels.Value)
     - Entities: Domain entities with identity (FlextModels.Entity)
     - Aggregate Roots: Consistency boundaries (FlextModels.AggregateRoot)
@@ -180,7 +180,7 @@ class FlextQualityModels(FlextModels):
             return v or datetime.now(UTC)
 
     class ProjectModel(FlextModels.Entity, TimestampMixin, QualityMixin):
-        """Project entity with advanced validation."""
+        """Project entity with validation."""
 
         name: str = Field(min_length=1, max_length=255)
         path: str = Field(..., description="Project path for analysis")

@@ -36,10 +36,10 @@ class FlextQualityDependencyTools(FlextService[None]):
             """Analyze project dependencies.
 
             Args:
-                project_path: Path to project to analyze
+            project_path: Path to project to analyze
 
             Returns:
-                FlextResult with list of dependency information
+            FlextResult with list of dependency information
 
             """
             logger = FlextLogger(__name__)
@@ -60,11 +60,11 @@ class FlextQualityDependencyTools(FlextService[None]):
             """Consolidate workspace dependencies.
 
             Args:
-                workspace_path: Path to workspace
-                dry_run: Preview changes without applying
+            workspace_path: Path to workspace
+            dry_run: Preview changes without applying
 
             Returns:
-                FlextResult with consolidation statistics
+            FlextResult with consolidation statistics
 
             """
             logger: FlextLogger = FlextLogger(__name__)
@@ -89,10 +89,10 @@ class FlextQualityDependencyTools(FlextService[None]):
             """Sync poetry.lock files.
 
             Args:
-                project_path: Path to project
+            project_path: Path to project
 
             Returns:
-                FlextResult with sync status
+            FlextResult with sync status
 
             """
             logger = FlextLogger(__name__)

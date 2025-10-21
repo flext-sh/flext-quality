@@ -17,7 +17,7 @@ class FlextQualityConstants(FlextConstants):
     """Central container for quality assessment constants following FLEXT patterns.
 
     Extends FlextConstants with quality-specific constants organized into
-    logical categories with comprehensive type safety and enterprise standards.
+    logical categories with complete type safety and enterprise standards.
     """
 
     # =============================================================================

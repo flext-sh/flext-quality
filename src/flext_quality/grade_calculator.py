@@ -39,10 +39,10 @@ class FlextQualityGradeCalculator:
         """Calculate grade from score - DRY implementation.
 
         Args:
-            score: Quality score (0-100)
+        score: Quality score (0-100)
 
         Returns:
-            FlextQualityGrade enum value
+        FlextQualityGrade enum value
 
         """
         for threshold, grade in cls._GRADE_THRESHOLDS:
@@ -55,10 +55,10 @@ class FlextQualityGradeCalculator:
         """Get minimum threshold for a grade.
 
         Args:
-            grade: FlextQualityGrade enum value
+        grade: FlextQualityGrade enum value
 
         Returns:
-            Minimum score threshold for the grade
+        Minimum score threshold for the grade
 
         """
         for threshold, g in cls._GRADE_THRESHOLDS:

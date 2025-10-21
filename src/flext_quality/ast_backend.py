@@ -289,11 +289,11 @@ class FlextQualityASTBackend(BaseAnalyzer):
         """Analyze Python code using AST.
 
         Args:
-            code: Python source code to analyze
-            file_path: Optional file path for context
+        code: Python source code to analyze
+        file_path: Optional file path for context
 
         Returns:
-            Dictionary with analysis results
+        Dictionary with analysis results
 
         """
         result: dict[str, object] = {}
@@ -398,11 +398,11 @@ class FlextQualityASTBackend(BaseAnalyzer):
         This provides a proper interface instead of accessing private members.
 
         Args:
-            file_path: Path to the file being analyzed
-            package_name: Name of the package containing the file
+        file_path: Path to the file being analyzed
+        package_name: Name of the package containing the file
 
         Returns:
-            AST visitor instance for code analysis.
+        AST visitor instance for code analysis.
 
         """
         return self._ASTVisitor(file_path, package_name)

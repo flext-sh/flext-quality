@@ -82,11 +82,11 @@ class FlextQualityOperations(FlextService[None]):
             """Run complete quality pipeline.
 
             Args:
-                project_path: Path to project
-                config: Optional configuration (reserved for future use)
+            project_path: Path to project
+            config: Optional configuration (reserved for future use)
 
             Returns:
-                FlextResult with QualityCheckResult
+            FlextResult with QualityCheckResult
 
             """
             FlextLogger(__name__)
@@ -154,11 +154,11 @@ class FlextQualityOperations(FlextService[None]):
             """Fix linting issues gradually.
 
             Args:
-                module_path: Path to Python module or project
-                dry_run: Run in dry-run mode (default True - MANDATORY)
+            module_path: Path to Python module or project
+            dry_run: Run in dry-run mode (default True - MANDATORY)
 
             Returns:
-                FlextResult with fixing statistics
+            FlextResult with fixing statistics
 
             """
             logger = FlextLogger(__name__)
@@ -224,11 +224,11 @@ class FlextQualityOperations(FlextService[None]):
             """Run type checking.
 
             Args:
-                project_path: Path to Python module or project
-                _strict: Use strict mode (reserved for future use)
+            project_path: Path to Python module or project
+            _strict: Use strict mode (reserved for future use)
 
             Returns:
-                FlextResult with type checking results
+            FlextResult with type checking results
 
             """
             # Try pyrefly first
@@ -284,10 +284,10 @@ class FlextQualityOperations(FlextService[None]):
             """Run type checking with console output.
 
             Args:
-                module_path: Path to Python module or project
+            module_path: Path to Python module or project
 
             Returns:
-                FlextResult with type checking results
+            FlextResult with type checking results
 
             """
             FlextLogger(__name__)
@@ -310,11 +310,11 @@ class FlextQualityOperations(FlextService[None]):
             """Detect code duplicates.
 
             Args:
-                _project_path: Path to project (reserved for future implementation)
-                threshold: Minimum lines for duplicate detection
+            _project_path: Path to project (reserved for future implementation)
+            threshold: Minimum lines for duplicate detection
 
             Returns:
-                FlextResult with duplicate detection results
+            FlextResult with duplicate detection results
 
             """
             FlextLogger(__name__)
@@ -341,11 +341,11 @@ class FlextQualityOperations(FlextService[None]):
             """Repair __init__.py exports.
 
             Args:
-                _package_path: Path to Python package (reserved for future implementation)
-                dry_run: Run in dry-run mode (default True - MANDATORY)
+            _package_path: Path to Python package (reserved for future implementation)
+            dry_run: Run in dry-run mode (default True - MANDATORY)
 
             Returns:
-                FlextResult with repair statistics
+            FlextResult with repair statistics
 
             """
             logger = FlextLogger(__name__)
@@ -375,11 +375,11 @@ class FlextQualityOperations(FlextService[None]):
             """Normalize docstrings to Google style.
 
             Args:
-                _module_path: Path to Python module (reserved for future implementation)
-                dry_run: Run in dry-run mode (default True - MANDATORY)
+            _module_path: Path to Python module (reserved for future implementation)
+            dry_run: Run in dry-run mode (default True - MANDATORY)
 
             Returns:
-                FlextResult with normalization statistics
+            FlextResult with normalization statistics
 
             """
             logger = FlextLogger(__name__)
@@ -407,10 +407,10 @@ class FlextQualityOperations(FlextService[None]):
             """Audit code patterns for quality issues.
 
             Args:
-                project_path: Path to project
+            project_path: Path to project
 
             Returns:
-                FlextResult with audit results
+            FlextResult with audit results
 
             """
             FlextLogger(__name__)
@@ -480,10 +480,10 @@ class FlextQualityOperations(FlextService[None]):
             """Audit and filter false positives.
 
             Args:
-                results: List of check results to audit
+            results: List of check results to audit
 
             Returns:
-                FlextResult with filtered results
+            FlextResult with filtered results
 
             """
             FlextLogger(__name__)
