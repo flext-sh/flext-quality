@@ -10,14 +10,14 @@ from __future__ import annotations
 from flext_core import FlextModels
 
 
-class FlextQualityASTFunctionInfo(FlextModels.StrictArbitraryTypesModel):
+class FlextQualityASTFunctionInfo(FlextModels.ArbitraryTypesModel):
     """Unified AST function information class following FLEXT pattern.
 
     Single responsibility: AST function information management
     Contains all function-related models as nested classes.
     """
 
-    class FunctionInfo(FlextModels.StrictArbitraryTypesModel):
+    class FunctionInfo(FlextModels.ArbitraryTypesModel):
         """Strongly-typed function information from AST analysis."""
 
         name: str

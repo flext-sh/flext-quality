@@ -70,9 +70,9 @@ def create_fastapi_app(
 class FlextQualityWeb:
     """Unified quality web class following FLEXT architecture patterns.
 
- Single responsibility: Quality web interface and service management using flext-web.
- Integrates flext-auth for authentication and flext-web for FastAPI foundation.
- """
+    Single responsibility: Quality web interface and service management using flext-web.
+    Integrates flext-auth for authentication and flext-web for FastAPI foundation.
+    """
 
     app: FastAPI
 
@@ -253,8 +253,8 @@ class FlextQualityWeb:
       </html>
       """
 
- async def analyze_project(self, request: Request) -> dict[str, object]:
- """Analyze a project and return results (FastAPI endpoint).
+    async def analyze_project(self, request: Request) -> dict[str, object]:
+        """Analyze a project and return results (FastAPI endpoint).
 
         Requires authentication via WebAuthMiddleware.
         """
@@ -311,20 +311,20 @@ class FlextQualityWeb:
     def get_metrics(self) -> dict[str, object]:
         """Get quality metrics (FastAPI endpoint).
 
- Requires authentication via WebAuthMiddleware.
- """
+        Requires authentication via WebAuthMiddleware.
+        """
         # Use simple placeholder metrics for now
         return {"success": True, "data": {}}
 
     def get_report(self, report_format: str) -> dict[str, object]:
         """Generate and return quality report (FastAPI endpoint).
 
- Args:
- report_format: Report format (json, html, pdf)
+        Args:
+        report_format: Report format (json, html, pdf)
 
- Requires authentication via WebAuthMiddleware.
+        Requires authentication via WebAuthMiddleware.
 
- """
+        """
         if report_format not in {"json", "html", "pdf"}:
             raise HTTPException(status_code=400, detail="Invalid format")
 
@@ -340,13 +340,13 @@ class FlextQualityWeb:
     ) -> None:
         """Run the quality web server using uvicorn (FastAPI ASGI server).
 
- Args:
- host: Server host address (default: 127.0.0.1)
- port: Server port (default: 8080)
- debug: Enable debug mode
- reload: Enable auto-reload on code changes
+        Args:
+        host: Server host address (default: 127.0.0.1)
+        port: Server port (default: 8080)
+        debug: Enable debug mode
+        reload: Enable auto-reload on code changes
 
- """
+        """
         self.logger.info("Starting FLEXT Quality Web Interface on %s:%s", host, port)
 
         uvicorn.run(

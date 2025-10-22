@@ -8,7 +8,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import warnings
-from typing import Self
+from typing import Literal, Self
 
 from flext_core import FlextConfig, FlextResult
 from pydantic import Field, field_validator, model_validator
@@ -162,7 +162,9 @@ class FlextQualityConfig(FlextConfig):
         description="Enable quiet mode for observability (useful for JSON/HTML output)",
     )
 
-    observability_log_level: str = Field(
+    observability_log_level: Literal[
+        "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
+    ] = Field(
         default="INFO",
         description="Log level for observability components",
     )
@@ -178,29 +180,11 @@ class FlextQualityConfig(FlextConfig):
         description="Project version",
     )
 
-    # Pydantic 2.11+ field validators
-    @field_validator(
-        "min_coverage", "max_duplication", "min_security_score", "min_maintainability"
-    )
-    @classmethod
-    def validate_percentage_range(cls, v: float) -> float:
-        """Validate percentage values are in valid range."""
-        if not (
-            FlextQualityConstants.Validation.MINIMUM_PERCENTAGE
-            <= v
-            <= FlextQualityConstants.Validation.MAXIMUM_PERCENTAGE
-        ):
-            msg = f"Percentage values must be between {FlextQualityConstants.Validation.MINIMUM_PERCENTAGE} and {FlextQualityConstants.Validation.MAXIMUM_PERCENTAGE}"
-            raise ValueError(msg)
-        return v
-
+    # Pydantic 2.11+ field validators (warnings only - validation via Field constraints)
     @field_validator("max_complexity")
     @classmethod
     def validate_complexity_threshold(cls, v: int) -> int:
-        """Validate complexity threshold is reasonable."""
-        if v < 1:
-            msg = "Complexity threshold must be positive"
-            raise ValueError(msg)
+        """Warn if complexity threshold is high (validation via Field constraint)."""
         if v > FlextQualityConstants.Complexity.HIGH_COMPLEXITY_WARNING_THRESHOLD:
             warnings.warn(
                 f"High complexity threshold ({v}) may be too permissive",
@@ -212,10 +196,7 @@ class FlextQualityConfig(FlextConfig):
     @field_validator("analysis_timeout")
     @classmethod
     def validate_timeout(cls, v: int) -> int:
-        """Validate analysis timeout is reasonable."""
-        if v <= 0:
-            msg = "Analysis timeout must be positive"
-            raise ValueError(msg)
+        """Warn if analysis timeout is very high (validation via Field constraint)."""
         if v > FlextQualityConstants.Performance.MAXIMUM_ANALYSIS_TIMEOUT:
             warnings.warn(
                 f"Very long timeout ({v}s) may cause performance issues",
@@ -227,10 +208,7 @@ class FlextQualityConfig(FlextConfig):
     @field_validator("parallel_workers")
     @classmethod
     def validate_workers(cls, v: int) -> int:
-        """Validate number of parallel workers."""
-        if v < 1:
-            msg = "At least one worker required"
-            raise ValueError(msg)
+        """Warn if worker count is high (validation via Field constraint)."""
         if v > FlextQualityConstants.Performance.MAXIMUM_WORKERS:
             warnings.warn(
                 f"High worker count ({v}) may impact system performance",
@@ -238,16 +216,6 @@ class FlextQualityConfig(FlextConfig):
                 stacklevel=2,
             )
         return v
-
-    @field_validator("observability_log_level")
-    @classmethod
-    def validate_log_level(cls, v: str) -> str:
-        """Validate log level is supported."""
-        valid_levels = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
-        if v.upper() not in valid_levels:
-            msg = f"Log level must be one of {valid_levels}"
-            raise ValueError(msg)
-        return v.upper()
 
     @model_validator(mode="after")
     def validate_quality_configuration_consistency(self) -> Self:

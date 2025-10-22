@@ -29,7 +29,6 @@ ScoreT = TypeVar("ScoreT", bound=float)
 
 # Advanced validation using Python 3.13+ syntax
 type ScoreRange = Annotated[float, Field(ge=0.0, le=100.0)]
-type PositiveInt = Annotated[int, Field(ge=1)]
 # Timestamp - use in Field(default_factory=...) context
 type Timestamp = datetime
 
@@ -231,7 +230,6 @@ class FlextQualityTypes(FlextTypes):
 
 __all__: list[str] = [
     "FlextQualityTypes",
-    "PositiveInt",
     "ScoreRange",
     "ScoreT",
     # Module-level type aliases

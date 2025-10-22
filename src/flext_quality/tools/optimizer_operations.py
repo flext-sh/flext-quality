@@ -21,7 +21,7 @@ from typing import Any
 
 import toml
 from flext_core import FlextLogger, FlextResult, FlextService
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from flext_quality.models import FlextQualityModels
 
@@ -36,8 +36,7 @@ class DomainLibraryPattern(BaseModel):
     import_pattern: str = Field(..., description="Forbidden import pattern")
     required_library: str = Field(..., description="Required domain library")
 
-    class Config:
-        frozen = True
+    model_config = ConfigDict(frozen=True)
 
 
 class OptimizerConfig(BaseModel):
