@@ -13,6 +13,7 @@ from datetime import UTC, datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
+from typing import Any
 
 import requests
 import yaml
@@ -48,7 +49,7 @@ class DocumentationNotifier:
         except FileNotFoundError:
             self.config = self.get_default_config()
 
-    def get_default_config(self) -> dict[str, object]:
+    def get_default_config(self) -> dict[str, Any]:
         """Default notification configuration."""
         return {
             "enabled": True,
@@ -81,7 +82,7 @@ class DocumentationNotifier:
             "webhook": {"url": "", "headers": {}, "timeout": 10},
         }
 
-    def notify_critical_issues(self, audit_data: dict[str, object]) -> bool:
+    def notify_critical_issues(self, audit_data: dict[str, Any]) -> bool:
         """Send notification for critical documentation issues."""
         if not self.config["alerts"]["critical_issues"]["enabled"]:
             return True
@@ -121,7 +122,7 @@ Please review recent changes and address any identified issues.
 
         return True
 
-    def notify_broken_links(self, broken_links: list[dict[str, object]]) -> bool:
+    def notify_broken_links(self, broken_links: list[dict[str, Any]]) -> bool:
         """Send notification for broken links."""
         if not self.config["alerts"]["broken_links"]["enabled"]:
             return True
@@ -135,7 +136,7 @@ Please review recent changes and address any identified issues.
 
         return True
 
-    def notify_weekly_report(self, report_data: dict[str, object]) -> bool:
+    def notify_weekly_report(self, report_data: dict[str, Any]) -> bool:
         """Send weekly quality report notification."""
         if not self.config["alerts"]["weekly_report"]["enabled"]:
             return True
@@ -144,7 +145,7 @@ Please review recent changes and address any identified issues.
         message = self._format_weekly_report_message(report_data)
         return self.send_notification(title, message, "info")
 
-    def notify_monthly_report(self, report_data: dict[str, object]) -> bool:
+    def notify_monthly_report(self, report_data: dict[str, Any]) -> bool:
         """Send monthly comprehensive report notification."""
         if not self.config["alerts"]["monthly_report"]["enabled"]:
             return True
@@ -281,7 +282,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
         )
         response.raise_for_status()
 
-    def _format_critical_issues_message(self, audit_data: dict[str, object]) -> str:
+    def _format_critical_issues_message(self, audit_data: dict[str, Any]) -> str:
         """Format message for critical issues notification."""
         metrics = audit_data.get("metrics", {})
         severity_breakdown = metrics.get("severity_breakdown", {})
@@ -318,9 +319,7 @@ Top Critical Issues:
 
         return message.strip()
 
-    def _format_broken_links_message(
-        self, broken_links: list[dict[str, object]]
-    ) -> str:
+    def _format_broken_links_message(self, broken_links: list[dict[str, Any]]) -> str:
         """Format message for broken links notification."""
         message = f"""
 BROKEN LINKS DETECTED
@@ -345,13 +344,13 @@ Found {len(broken_links)} broken links that need attention:
 
         return message.strip()
 
-    def _format_weekly_report_message(self, _report_data: dict[str, object]) -> str:
+    def _format_weekly_report_message(self, _report_data: dict[str, Any]) -> str:
         """Format message for weekly report notification."""
         # Implementation would depend on weekly report data structure
         # For now, report_data is not used but reserved for future implementation
         return "Weekly documentation quality report is now available. Check the reports dashboard for detailed metrics and trends."
 
-    def _format_monthly_report_message(self, _report_data: dict[str, object]) -> str:
+    def _format_monthly_report_message(self, _report_data: dict[str, Any]) -> str:
         """Format message for monthly report notification."""
         # Implementation would depend on monthly report data structure
         return "Monthly comprehensive documentation quality report is now available. Review trends and plan improvements for the next month."

@@ -15,6 +15,7 @@ import json
 import operator
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Any
 
 from jinja2 import Template
 
@@ -40,7 +41,7 @@ class DocumentationReporter:
         self.validation_data = self._load_json_report("latest_validation.json")
         self.optimization_data = self._load_json_report("latest_optimization.json")
 
-    def _load_json_report(self, filename: str) -> dict[str, object] | None:
+    def _load_json_report(self, filename: str) -> dict[str, Any] | None:
         """Load a JSON report file."""
         filepath = self.reports_dir / filename
         if filepath.exists():
@@ -74,7 +75,7 @@ class DocumentationReporter:
         msg = f"Unsupported format: {format}"
         raise ValueError(msg)
 
-    def _calculate_summary_metrics(self) -> dict[str, object]:
+    def _calculate_summary_metrics(self) -> dict[str, Any]:
         """Calculate summary metrics from all available data."""
         summary = {
             "overall_score": 0,
@@ -127,13 +128,13 @@ class DocumentationReporter:
 
         return summary
 
-    def _analyze_trends(self) -> dict[str, object] | None:
+    def _analyze_trends(self) -> dict[str, Any] | None:
         """Analyze quality trends over time."""
         # This would require historical report data
         # For now, return None as we don't have historical data structure
         return None
 
-    def _generate_recommendations(self) -> list[dict[str, object]]:
+    def _generate_recommendations(self) -> list[dict[str, Any]]:
         """Generate actionable recommendations based on current data."""
         recommendations = []
 
@@ -226,7 +227,7 @@ class DocumentationReporter:
 
         return recommendations
 
-    def _generate_html_report(self, data: dict[str, object]) -> str:
+    def _generate_html_report(self, data: dict[str, Any]) -> str:
         """Generate HTML quality report."""
         template = self._get_html_template()
 
@@ -355,7 +356,7 @@ class DocumentationReporter:
         """
         return Template(template_content)
 
-    def _generate_markdown_report(self, data: dict[str, object]) -> str:
+    def _generate_markdown_report(self, data: dict[str, Any]) -> str:
         """Generate markdown quality report."""
         md = [f"# {data['title']}", "", f"**Generated:** {data['timestamp']}", ""]
 
@@ -388,8 +389,8 @@ class DocumentationReporter:
         return "\n".join(md)
 
     def _summarize_audit_data(
-        self, audit_data: dict[str, object] | None
-    ) -> dict[str, object] | None:
+        self, audit_data: dict[str, Any] | None
+    ) -> dict[str, Any] | None:
         """Summarize audit data for reporting."""
         if not audit_data:
             return None
@@ -407,8 +408,8 @@ class DocumentationReporter:
         }
 
     def _summarize_validation_data(
-        self, validation_data: dict[str, object] | None
-    ) -> dict[str, object] | None:
+        self, validation_data: dict[str, Any] | None
+    ) -> dict[str, Any] | None:
         """Summarize validation data for reporting."""
         if not validation_data:
             return None
@@ -422,8 +423,8 @@ class DocumentationReporter:
         }
 
     def _summarize_optimization_data(
-        self, optimization_data: dict[str, object] | None
-    ) -> dict[str, object] | None:
+        self, optimization_data: dict[str, Any] | None
+    ) -> dict[str, Any] | None:
         """Summarize optimization data for reporting."""
         if not optimization_data:
             return None
@@ -435,7 +436,7 @@ class DocumentationReporter:
             "optimizations_applied": len(optimization_data.get("optimizations", [])),
         }
 
-    def _generate_charts(self, data: dict[str, object]) -> dict[str, str] | None:
+    def _generate_charts(self, data: dict[str, Any]) -> dict[str, str] | None:
         """Generate charts for the report (placeholder for future implementation)."""
         # This would generate matplotlib charts and return base64 encoded images
         # For now, return None
@@ -474,7 +475,7 @@ class DocumentationReporter:
         # Generate report
         return self._generate_trend_report(trend_data, days)
 
-    def _analyze_trend_data(self, reports: list[dict]) -> dict[str, object]:
+    def _analyze_trend_data(self, reports: list[dict]) -> dict[str, Any]:
         """Analyze trend data from historical reports."""
         if not reports:
             return {"error": "No historical data available"}
@@ -516,7 +517,7 @@ class DocumentationReporter:
             ),
         }
 
-    def _generate_trend_report(self, trend_data: dict[str, object], days: int) -> str:
+    def _generate_trend_report(self, trend_data: dict[str, Any], days: int) -> str:
         """Generate trend analysis report."""
         md = [
             f"# Documentation Quality Trends - Last {days} Days",

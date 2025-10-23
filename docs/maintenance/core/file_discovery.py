@@ -8,7 +8,7 @@ import fnmatch
 import logging
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import ClassVar
+from typing import Any, ClassVar
 
 from .base_classes import FileMetadata
 
@@ -277,7 +277,7 @@ class DocumentationFinder:
 
         return categories
 
-    def get_statistics(self, files: list[Path] | None = None) -> dict[str, object]:
+    def get_statistics(self, files: list[Path] | None = None) -> dict[str, Any]:
         """Get statistics about found files."""
         if files is None:
             files = self.find_files()
@@ -288,7 +288,7 @@ class DocumentationFinder:
         metadata_list = self.get_files_metadata(files)
 
         # Basic statistics
-        stats = {
+        stats: dict[str, Any] = {
             "total_files": len(files),
             "total_size": sum(meta.size for meta in metadata_list),
             "total_lines": sum(meta.lines for meta in metadata_list),

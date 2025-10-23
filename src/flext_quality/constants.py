@@ -174,6 +174,11 @@ class FlextQualityConstants(FlextConstants):
         GRADE_B_THRESHOLD: float = 80.0
         GRADE_C_THRESHOLD: float = 70.0
         GRADE_D_THRESHOLD: float = 60.0
+        HIGH_ISSUE_THRESHOLD: int = 50
+        HTML_ISSUE_LIMIT: int = 100
+        ISSUE_PREVIEW_LIMIT: int = 10
+        MIN_COVERAGE_THRESHOLD: float = 75.0
+        MIN_SCORE_THRESHOLD: float = 60.0
 
     # =============================================================================
     # LITERAL TYPES - Type-safe string literals
@@ -239,7 +244,7 @@ class FlextQualityConstants(FlextConstants):
         """Module optimization constants."""
 
         DEFAULT_BATCH_SIZE: int = 5
-        MAX_FILE_SIZE: int = 1024 * 1024  # 1MB
+        MAX_FILE_SIZE: int = 512 * 1024 * 1024  # 512MB
         SUPPORTED_EXTENSIONS: frozenset[str] = frozenset({".py", ".pyi"})
         EXCLUDE_PATTERNS: tuple[str, ...] = (
             "__pycache__",

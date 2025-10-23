@@ -8,8 +8,6 @@ across documentation repositories.
 import argparse
 import logging
 import os
-import shutil
-import subprocess
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -19,6 +17,7 @@ import yaml
 from flext_core import (
     FlextConstants,
 )
+from git import InvalidGitRepositoryError, Repo
 
 from flext_quality.docs_maintenance.utils import get_project_root
 
@@ -88,9 +87,12 @@ class DocumentationSync:
         self.project_root = get_project_root()
         self.working_dir = self.project_root
 
-    def _get_git_command(self) -> str | None:
-        """Get the full path to git command."""
-        return shutil.which("git")
+    def _get_repo(self) -> Repo | None:
+        """Get GitPython Repo instance or None if not a git repository."""
+        try:
+            return Repo(str(self.working_dir))
+        except InvalidGitRepositoryError:
+            return None
 
     def _load_config(self, config_path: str | None = None) -> SyncConfig:
         """Load configuration."""
@@ -147,11 +149,11 @@ class DocumentationSync:
         )
 
     def _get_git_status(self) -> GitStatusInfo:
-        """Get git repository status."""
+        """Get git repository status using GitPython."""
         try:
             # Check if we're in a git repository
-            git_cmd = self._get_git_command()
-            if not git_cmd:
+            repo = self._get_repo()
+            if not repo:
                 return GitStatusInfo(
                     branch="unknown",
                     modified_files=[],
@@ -161,71 +163,28 @@ class DocumentationSync:
                     behind_count=0,
                 )
 
-            if not git_cmd:
-                return GitStatusInfo(
-                    branch="unknown",
-                    modified_files=[],
-                    untracked_files=[],
-                    staged_files=[],
-                    ahead_count=0,
-                    behind_count=0,
-                )
+            # Get current branch
+            try:
+                current_branch = repo.active_branch.name
+            except Exception:
+                # HEAD is detached or branch not available
+                current_branch = "unknown"
 
-            result = subprocess.run(
-                [git_cmd, "rev-parse", "--git-dir"],
-                check=False,
-                cwd=self.working_dir,
-                capture_output=True,
-                text=True,
-                shell=False,  # Explicit for security
-            )
-
-            if result.returncode != 0:
-                return GitStatusInfo(
-                    branch="unknown",
-                    modified_files=[],
-                    untracked_files=[],
-                    staged_files=[],
-                    ahead_count=0,
-                    behind_count=0,
-                )
-
-            # Get branch info
-            branch_result = subprocess.run(
-                [git_cmd, "branch", "--show-current"],
-                check=False,
-                cwd=self.working_dir,
-                capture_output=True,
-                text=True,
-                shell=False,  # Explicit for security
-            )
-            current_branch = (
-                branch_result.stdout.strip()
-                if branch_result.returncode == 0
-                else "unknown"
-            )
-
-            # Get status
-            status_result = subprocess.run(
-                [git_cmd, "status", "--porcelain"],
-                check=False,
-                cwd=self.working_dir,
-                capture_output=True,
-                text=True,
-                shell=False,  # Explicit for security
-            )
-
+            # Get modified and untracked files
             modified_files = []
             untracked_files = []
-            if status_result.returncode == 0:
-                for line in status_result.stdout.split("\n"):
-                    if line.strip():
-                        status_code = line[:2]
-                        filename = line[3:]
-                        if status_code in {"M ", "MM", "AM", "RM"}:
-                            modified_files.append(filename)
-                        elif status_code == "??":
-                            untracked_files.append(filename)
+
+            # Get untracked files
+            untracked_files = repo.untracked_files
+
+            # Get modified files using git status
+            status_output = repo.git.status(porcelain=True)
+            for line in status_output.split("\n"):
+                if line.strip():
+                    status_code = line[:2]
+                    filename = line[3:]
+                    if status_code in {"M ", "MM", "AM", "RM"}:
+                        modified_files.append(filename)
 
             return GitStatusInfo(
                 branch=current_branch,
@@ -253,25 +212,21 @@ class DocumentationSync:
         return status["modified_files"] + status["untracked_files"]
 
     def _get_last_sync_time(self) -> datetime | None:
-        """Get timestamp of last synchronization."""
-        # Look for a marker file or check git log
+        """Get timestamp of last synchronization using GitPython."""
         try:
-            git_cmd = self._get_git_command()
-            if not git_cmd:
+            repo = self._get_repo()
+            if not repo:
                 return None
 
-            result = subprocess.run(
-                [git_cmd, "log", "-1", "--format=%ct", "--", "docs/"],
-                check=False,
-                cwd=self.working_dir,
-                capture_output=True,
-                text=True,
-                shell=False,  # Explicit for security
-            )
-
-            if result.returncode == 0 and result.stdout.strip():
-                timestamp = int(result.stdout.strip())
-                return datetime.fromtimestamp(timestamp, tz=UTC)
+            # Get the last commit timestamp for docs/
+            try:
+                log_output = repo.git.log("-1", "--", "docs/", format="%ct").strip()
+                if log_output:
+                    timestamp = int(log_output)
+                    return datetime.fromtimestamp(timestamp, tz=UTC)
+            except Exception:
+                # No commits in docs/ path
+                return None
 
         except Exception as e:
             # Git operations are optional, continue without git info
@@ -280,23 +235,15 @@ class DocumentationSync:
         return None
 
     def _check_for_conflicts(self) -> bool:
-        """Check if there are merge conflicts."""
+        """Check if there are merge conflicts using GitPython."""
         try:
-            git_cmd = self._get_git_command()
-            if not git_cmd:
+            repo = self._get_repo()
+            if not repo:
                 return False
 
-            result = subprocess.run(
-                [git_cmd, "status", "--porcelain"],
-                check=False,
-                cwd=self.working_dir,
-                capture_output=True,
-                text=True,
-                shell=False,  # Explicit for security
-            )
-
-            if result.returncode == 0:
-                return any("U" in line[:2] for line in result.stdout.split("\n"))
+            # Check for unmerged paths (conflicts)
+            status_output = repo.git.status(porcelain=True)
+            return any("U" in line[:2] for line in status_output.split("\n"))
 
         except Exception as e:
             # Git operations are optional, continue without git info
@@ -347,7 +294,7 @@ class DocumentationSync:
             )
 
     def sync_changes(self, operation: str, files: list[str]) -> SyncResult:
-        """Synchronize changes to git."""
+        """Synchronize changes to git using GitPython."""
         if not self.config["sync"]["auto_commit"]:
             return SyncResult(
                 operation="sync",
@@ -359,25 +306,19 @@ class DocumentationSync:
             )
 
         try:
-            # Stage files
-            git_cmd = self._get_git_command()
-            if not git_cmd:
+            repo = self._get_repo()
+            if not repo:
                 return SyncResult(
                     operation="sync",
                     success=False,
                     changes_made=0,
                     files_affected=[],
-                    error_message="Git command not found",
+                    error_message="Not a git repository",
                     timestamp=datetime.now(UTC),
                 )
 
-            subprocess.run(
-                [git_cmd, "add"] + files,
-                cwd=str(self.working_dir),
-                check=True,
-                capture_output=True,
-                text=True,
-            )
+            # Stage files using GitPython
+            repo.index.add(files)
 
             # Create commit message
             changes_desc = f"{len(files)} files"
@@ -388,26 +329,15 @@ class DocumentationSync:
                 operation=operation, changes=changes_desc
             )
 
-            # Commit
-            subprocess.run(
-                [git_cmd, "commit", "-m", commit_message],
-                cwd=str(self.working_dir),
-                check=True,
-                capture_output=True,
-                text=True,
-            )
+            # Commit using GitPython
+            repo.index.commit(commit_message)
 
             # Push if configured
             if self.config["sync"]["push_after_commit"]:
                 remote_name = str(self.config["git"]["remote_name"])
                 main_branch = str(self.config["git"]["main_branch"])
-                subprocess.run(
-                    [git_cmd, "push", remote_name, main_branch],
-                    cwd=str(self.working_dir),
-                    check=True,
-                    capture_output=True,
-                    text=True,
-                )
+                origin = repo.remote(remote_name)
+                origin.push(main_branch)
 
             return SyncResult(
                 operation="sync",
@@ -418,7 +348,7 @@ class DocumentationSync:
                 timestamp=datetime.now(UTC),
             )
 
-        except subprocess.CalledProcessError as e:
+        except Exception as e:
             return SyncResult(
                 operation="sync",
                 success=False,
@@ -429,7 +359,7 @@ class DocumentationSync:
             )
 
     def create_backup_branch(self) -> SyncResult:
-        """Create a backup branch before making changes."""
+        """Create a backup branch before making changes using GitPython."""
         if not self.config["git"]["create_backup_branch"]:
             return SyncResult(
                 operation="backup_branch",
@@ -441,27 +371,23 @@ class DocumentationSync:
             )
 
         try:
-            git_cmd = self._get_git_command()
-            if not git_cmd:
+            repo = self._get_repo()
+            if not repo:
                 return SyncResult(
                     operation="backup_branch",
                     success=False,
                     changes_made=0,
                     files_affected=[],
-                    error_message="Git command not found",
+                    error_message="Not a git repository",
                     timestamp=datetime.now(UTC),
                 )
 
             timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
             branch_name = f"docs-backup-{timestamp}"
 
-            subprocess.run(
-                [git_cmd, "checkout", "-b", branch_name],
-                cwd=str(self.working_dir),
-                check=True,
-                capture_output=True,
-                text=True,
-            )
+            # Create and checkout new branch using GitPython
+            repo.create_head(branch_name)
+            repo.heads[branch_name].checkout()
 
             return SyncResult(
                 operation="backup_branch",
@@ -472,7 +398,7 @@ class DocumentationSync:
                 timestamp=datetime.now(UTC),
             )
 
-        except subprocess.CalledProcessError as e:
+        except Exception as e:
             return SyncResult(
                 operation="backup_branch",
                 success=False,
@@ -483,26 +409,21 @@ class DocumentationSync:
             )
 
     def rollback_changes(self, files: list[str]) -> SyncResult:
-        """Rollback changes to specific files."""
+        """Rollback changes to specific files using GitPython."""
         try:
-            git_cmd = self._get_git_command()
-            if not git_cmd:
+            repo = self._get_repo()
+            if not repo:
                 return SyncResult(
                     operation="rollback",
                     success=False,
                     changes_made=0,
                     files_affected=[],
-                    error_message="Git command not found",
+                    error_message="Not a git repository",
                     timestamp=datetime.now(UTC),
                 )
 
-            subprocess.run(
-                [git_cmd, "checkout", "HEAD", "--"] + files,
-                cwd=str(self.working_dir),
-                check=True,
-                capture_output=True,
-                text=True,
-            )
+            # Checkout files from HEAD using GitPython
+            repo.git.checkout("HEAD", "--", *files)
 
             return SyncResult(
                 operation="rollback",
@@ -513,7 +434,7 @@ class DocumentationSync:
                 timestamp=datetime.now(UTC),
             )
 
-        except subprocess.CalledProcessError as e:
+        except Exception as e:
             return SyncResult(
                 operation="rollback",
                 success=False,

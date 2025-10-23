@@ -15,12 +15,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import shutil
-import subprocess
 from pathlib import Path
 from typing import Any
 
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, FlextResult, FlextUtilities
 
 # =========================================================================
 # PYTHON QUALITY TOOLS - Optional imports with availability checking
@@ -218,7 +216,7 @@ class FlextQualityPythonTools:
     # =========================================================================
 
     def run_ruff_check(self, path: Path) -> FlextResult[dict[str, Any]]:
-        """Run Ruff linting via direct library import.
+        """Run Ruff linting via FlextUtilities.
 
         Ruff is the fastest Python linter, written in Rust.
 
@@ -237,30 +235,28 @@ class FlextQualityPythonTools:
             if not path.exists() or not path.is_file():
                 return FlextResult.fail(f"Invalid path for Ruff analysis: {path}")
 
-            # Use Ruff's command-line interface via subprocess
-            # (Ruff doesn't expose a Python API yet)
-            # Security: shell=False prevents shell injection, timeout prevents hanging
-            # Security: Use absolute path for executable and validate input
-            ruff_path = shutil.which("ruff")
-            if not ruff_path:
-                return FlextResult.fail("Ruff executable not found in PATH")
-
-            result = subprocess.run(
-                [ruff_path, "check", str(path), "--output-format=json"],
-                check=False,
+            # Use FlextUtilities for command execution with threading-based timeout
+            result = FlextUtilities.run_external_command(
+                ["ruff", "check", str(path), "--output-format=json"],
                 capture_output=True,
-                text=True,
                 timeout=60,
-                shell=False,  # Explicitly disable shell for security
             )
 
+            if result.is_failure:
+                error_msg = result.error or ""
+                if "not found" in error_msg.lower():
+                    return FlextResult.fail("Ruff executable not found in PATH")
+                if "timed out" in error_msg.lower():
+                    return FlextResult.fail("Ruff analysis timed out")
+                return FlextResult.fail(f"Ruff analysis failed: {error_msg}")
+
+            wrapper = result.unwrap()
+
             return FlextResult.ok({
-                "issues": result.stdout,
-                "exit_code": result.returncode,
-                "errors": result.stderr,
+                "issues": wrapper.stdout,
+                "exit_code": wrapper.returncode,
+                "errors": wrapper.stderr,
             })
-        except subprocess.TimeoutExpired:
-            return FlextResult.fail("Ruff analysis timed out")
         except Exception as e:
             self._logger.exception("Ruff check failed")
             return FlextResult.fail(f"Ruff analysis failed: {e}")
@@ -281,7 +277,7 @@ class FlextQualityPythonTools:
         FlextResult with type errors
 
         """
-        if not _MYPY_API_AVAILABLE:
+        if not _MYPY_API_AVAILABLE or api is None:
             return FlextResult.fail("MyPy API is not available")
 
         try:
@@ -316,7 +312,11 @@ class FlextQualityPythonTools:
         FlextResult with security issues
 
         """
-        if not _BANDIT_CORE_AVAILABLE:
+        if (
+            not _BANDIT_CORE_AVAILABLE
+            or bandit_config is None
+            or bandit_manager is None
+        ):
             return FlextResult.fail("Bandit core modules are not available")
 
         try:
@@ -339,7 +339,7 @@ class FlextQualityPythonTools:
     # =========================================================================
 
     def run_pylint_check(self, path: Path) -> FlextResult[dict[str, Any]]:
-        """Run Pylint analysis via direct library import.
+        """Run Pylint analysis via FlextUtilities.
 
         Args:
         path: Path to analyze
@@ -352,27 +352,28 @@ class FlextQualityPythonTools:
             return FlextResult.fail("Pylint is not installed")
 
         try:
-            # Security: Use absolute path for executable and validate input
-            pylint_path = shutil.which("pylint")
-            if not pylint_path:
-                return FlextResult.fail("Pylint executable not found in PATH")
-
-            # Pylint doesn't expose clean Python API, use subprocess
-            result = subprocess.run(
-                [pylint_path, str(path), "--output-format=json"],
-                check=False,
+            # Use FlextUtilities for command execution with threading-based timeout
+            # (Pylint doesn't expose clean Python API, use subprocess via FlextUtilities)
+            result = FlextUtilities.run_external_command(
+                ["pylint", str(path), "--output-format=json"],
                 capture_output=True,
-                text=True,
                 timeout=60,
-                shell=False,  # Explicitly disable shell for security
             )
 
+            if result.is_failure:
+                error_msg = result.error or ""
+                if "not found" in error_msg.lower():
+                    return FlextResult.fail("Pylint executable not found in PATH")
+                if "timed out" in error_msg.lower():
+                    return FlextResult.fail("Pylint analysis timed out")
+                return FlextResult.fail(f"Pylint analysis failed: {error_msg}")
+
+            wrapper = result.unwrap()
+
             return FlextResult.ok({
-                "output": result.stdout,
-                "exit_code": result.returncode,
+                "output": wrapper.stdout,
+                "exit_code": wrapper.returncode,
             })
-        except subprocess.TimeoutExpired:
-            return FlextResult.fail("Pylint analysis timed out")
         except Exception as e:
             self._logger.exception("Pylint check failed")
             return FlextResult.fail(f"Pylint analysis failed: {e}")
@@ -391,7 +392,7 @@ class FlextQualityPythonTools:
         FlextResult with formatting check results
 
         """
-        if not _BLACK_AVAILABLE:
+        if not _BLACK_AVAILABLE or black is None:
             return FlextResult.fail("Black is not available")
 
         try:
@@ -408,8 +409,12 @@ class FlextQualityPythonTools:
                     "needs_formatting": needs_formatting,
                     "issues": 1 if needs_formatting else 0,
                 })
-            except black.NothingChanged:
-                return FlextResult.ok({"needs_formatting": False, "issues": 0})
+            except Exception as e:
+                if (
+                    type(e).__name__ == "NothingChanged"
+                ):  # Handle black.NothingChanged without import
+                    return FlextResult.ok({"needs_formatting": False, "issues": 0})
+                raise
         except Exception as e:
             self._logger.exception("Black formatting check failed")
             return FlextResult.fail(f"Black formatting check failed: {e}")
@@ -428,7 +433,7 @@ class FlextQualityPythonTools:
         FlextResult with test results
 
         """
-        if not _PYTEST_AVAILABLE:
+        if not _PYTEST_AVAILABLE or pytest is None:
             return FlextResult.fail("Pytest is not available")
 
         try:
@@ -460,7 +465,7 @@ class FlextQualityPythonTools:
         FlextResult with coverage data
 
         """
-        if not _COVERAGE_AVAILABLE:
+        if not _COVERAGE_AVAILABLE or coverage is None:
             return FlextResult.fail("Coverage is not available")
 
         try:
@@ -492,7 +497,7 @@ class FlextQualityPythonTools:
         FlextResult with complexity metrics
 
         """
-        if not _RADON_COMPLEXITY_AVAILABLE:
+        if not _RADON_COMPLEXITY_AVAILABLE or cc_visit is None:
             return FlextResult.fail("Radon complexity is not available")
 
         try:
@@ -524,7 +529,7 @@ class FlextQualityPythonTools:
         FlextResult with dead code findings
 
         """
-        if not _VULTURE_CLASS_AVAILABLE:
+        if not _VULTURE_CLASS_AVAILABLE or Vulture is None:
             return FlextResult.fail("Vulture class is not available")
 
         try:

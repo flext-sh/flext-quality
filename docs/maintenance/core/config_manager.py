@@ -5,6 +5,7 @@ Handles loading, validation, and access to configuration files.
 """
 
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -12,7 +13,7 @@ import yaml
 class AuditRules:
     """Configuration for audit rules and thresholds."""
 
-    def __init__(self, data: dict[str, object]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Initialize audit rules configuration."""
         self.quality_thresholds = data.get("quality_thresholds", {})
         self.content_checks = data.get("content_checks", {})
@@ -33,7 +34,7 @@ class AuditRules:
 class StyleGuide:
     """Configuration for style and formatting guidelines."""
 
-    def __init__(self, data: dict[str, object]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Initialize style guidelines configuration."""
         self.markdown = data.get("markdown", {})
         self.accessibility = data.get("accessibility", {})
@@ -55,7 +56,7 @@ class StyleGuide:
 class ValidationConfig:
     """Configuration for validation operations."""
 
-    def __init__(self, data: dict[str, object]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         """Initialize validation configuration."""
         self.link_validation = data.get("link_validation", {})
         self.content_validation = data.get("content_validation", {})
@@ -94,7 +95,7 @@ class ConfigManager:
         else:
             self.config_dir = Path(config_dir)
 
-        self._cache: dict[str, object] = {}
+        self._cache: dict[str, Any] = {}
         self._audit_rules: AuditRules | None = None
         self._style_guide: StyleGuide | None = None
         self._validation_config: ValidationConfig | None = None
@@ -120,13 +121,13 @@ class ConfigManager:
             self._validation_config = ValidationConfig(data)
         return self._validation_config
 
-    def get_config(self, name: str) -> dict[str, object]:
+    def get_config(self, name: str) -> dict[str, Any]:
         """Get a configuration file by name."""
         if name not in self._cache:
             self._cache[name] = self._load_config_file(f"{name}.yaml")
         return self._cache[name]
 
-    def _load_config_file(self, filename: str) -> dict[str, object]:
+    def _load_config_file(self, filename: str) -> dict[str, Any]:
         """Load a YAML configuration file."""
         config_path = self.config_dir / filename
 
@@ -140,7 +141,7 @@ class ConfigManager:
         except Exception:
             return self._get_default_config(filename)
 
-    def _get_default_config(self, filename: str) -> dict[str, object]:
+    def _get_default_config(self, filename: str) -> dict[str, Any]:
         """Get default configuration for a file."""
         defaults = {
             "audit_rules.yaml": {
@@ -252,7 +253,7 @@ class ConfigManager:
 
         return issues
 
-    def get_all_configs(self) -> dict[str, object]:
+    def get_all_configs(self) -> dict[str, Any]:
         """Get all configurations as a single dictionary."""
         return {
             "audit_rules": self.get_audit_rules().__dict__,
@@ -264,7 +265,7 @@ class ConfigManager:
             },
         }
 
-    def save_config(self, name: str, data: dict[str, object]) -> bool:
+    def save_config(self, name: str, data: dict[str, Any]) -> bool:
         """Save a configuration to file."""
         try:
             config_path = self.config_dir / f"{name}.yaml"

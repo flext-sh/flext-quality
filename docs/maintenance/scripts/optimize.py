@@ -17,6 +17,7 @@ import re
 import shutil
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -44,7 +45,7 @@ class DocumentationOptimizer:
             "optimizations": [],
         }
 
-    def optimize_formatting(self, doc_files: list[Path]) -> dict[str, object]:
+    def optimize_formatting(self, doc_files: list[Path]) -> dict[str, Any]:
         """Fix common formatting issues."""
         for file_path in doc_files:
             try:
@@ -104,7 +105,7 @@ class DocumentationOptimizer:
         # This is a basic implementation - could be more sophisticated
         return content
 
-    def update_table_of_contents(self, doc_files: list[Path]) -> dict[str, object]:
+    def update_table_of_contents(self, doc_files: list[Path]) -> dict[str, Any]:
         """Update or add table of contents for long documents."""
         for file_path in doc_files:
             try:
@@ -193,7 +194,7 @@ class DocumentationOptimizer:
         anchor = re.sub(r"[^\w\s-]", "", anchor)
         return re.sub(r"\s+", "-", anchor)
 
-    def enhance_accessibility(self, doc_files: list[Path]) -> dict[str, object]:
+    def enhance_accessibility(self, doc_files: list[Path]) -> dict[str, Any]:
         """Enhance accessibility of documentation."""
         for file_path in doc_files:
             try:
@@ -254,7 +255,7 @@ class DocumentationOptimizer:
 
         return content
 
-    def optimize_content_structure(self, doc_files: list[Path]) -> dict[str, object]:
+    def optimize_content_structure(self, doc_files: list[Path]) -> dict[str, Any]:
         """Optimize content structure and readability."""
         for file_path in doc_files:
             try:
@@ -318,7 +319,7 @@ class DocumentationOptimizer:
 
         return "\n".join(enhanced_lines)
 
-    def update_metadata(self, doc_files: list[Path]) -> dict[str, object]:
+    def update_metadata(self, doc_files: list[Path]) -> dict[str, Any]:
         """Update frontmatter metadata and timestamps."""
         for file_path in doc_files:
             try:

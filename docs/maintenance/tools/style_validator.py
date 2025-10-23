@@ -10,6 +10,7 @@ import operator
 import re
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -25,7 +26,7 @@ class StyleValidator:
     CONFIG_ARG_INDEX: int = 2
 
     def __init__(
-        self, config_path: str = "docs/maintenance/config/style_guide.yaml"
+        self, config_path: str | None = "docs/maintenance/config/style_guide.yaml"
     ) -> None:
         """Initialize style validator with configuration.
 
@@ -48,7 +49,7 @@ class StyleValidator:
             },
         }
 
-    def load_config(self, config_path: str) -> None:
+    def load_config(self, config_path: str | None) -> None:
         """Load style guide configuration."""
         try:
             with Path(config_path).open(encoding="utf-8") as f:
@@ -74,7 +75,7 @@ class StyleValidator:
                 },
             }
 
-    def validate_file(self, file_path: Path) -> dict[str, object]:
+    def validate_file(self, file_path: Path) -> dict[str, Any]:
         """Validate a single documentation file."""
         try:
             content = file_path.read_text(encoding="utf-8")
@@ -120,7 +121,7 @@ class StyleValidator:
                 "suggestions": [],
             }
 
-    def _check_markdown_formatting(self, content: str) -> list[dict[str, object]]:
+    def _check_markdown_formatting(self, content: str) -> list[dict[str, Any]]:
         """Check basic markdown formatting consistency."""
         violations = []
 
@@ -152,7 +153,7 @@ class StyleValidator:
 
         return violations
 
-    def _check_heading_consistency(self, content: str) -> list[dict[str, object]]:
+    def _check_heading_consistency(self, content: str) -> list[dict[str, Any]]:
         """Check heading hierarchy and consistency."""
         violations = []
 
@@ -190,7 +191,7 @@ class StyleValidator:
 
         return violations
 
-    def _check_list_consistency(self, content: str) -> list[dict[str, object]]:
+    def _check_list_consistency(self, content: str) -> list[dict[str, Any]]:
         """Check list formatting consistency."""
         violations = []
 
@@ -224,7 +225,7 @@ class StyleValidator:
 
         return violations
 
-    def _check_code_formatting(self, content: str) -> list[dict[str, object]]:
+    def _check_code_formatting(self, content: str) -> list[dict[str, Any]]:
         """Check code block and inline code formatting."""
         violations = []
 
@@ -268,7 +269,7 @@ class StyleValidator:
 
         return violations
 
-    def _check_accessibility(self, content: str) -> list[dict[str, object]]:
+    def _check_accessibility(self, content: str) -> list[dict[str, Any]]:
         """Check accessibility compliance."""
         issues = []
 
@@ -303,7 +304,7 @@ class StyleValidator:
 
         return issues
 
-    def _check_line_length(self, content: str) -> list[dict[str, object]]:
+    def _check_line_length(self, content: str) -> list[dict[str, Any]]:
         """Check line length compliance."""
         violations = []
 
@@ -331,7 +332,7 @@ class StyleValidator:
 
         return violations
 
-    def _check_whitespace(self, content: str) -> list[dict[str, object]]:
+    def _check_whitespace(self, content: str) -> list[dict[str, Any]]:
         """Check whitespace formatting."""
         violations = []
 
@@ -398,7 +399,7 @@ class StyleValidator:
 
         return suggestions
 
-    def validate_files_batch(self, file_paths: list[Path]) -> dict[str, object]:
+    def validate_files_batch(self, file_paths: list[Path]) -> dict[str, Any]:
         """Validate multiple files and aggregate results."""
         for file_path in file_paths:
             self.validate_file(file_path)
@@ -488,7 +489,7 @@ Top Issues:
 
 def validate_file_style(
     file_path: str, config_path: str | None = None
-) -> dict[str, object]:
+) -> dict[str, Any]:
     """Convenience function to validate a single file."""
     validator = StyleValidator(config_path)
     return validator.validate_file(Path(file_path))
@@ -496,7 +497,7 @@ def validate_file_style(
 
 def validate_files_style(
     file_paths: list[str], config_path: str | None = None
-) -> dict[str, object]:
+) -> dict[str, Any]:
     """Convenience function to validate multiple files."""
     validator = StyleValidator(config_path)
     paths = [Path(fp) for fp in file_paths]

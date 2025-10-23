@@ -17,6 +17,7 @@ import re
 import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Any
 
 import requests
 import yaml
@@ -71,7 +72,7 @@ class DocumentationAuditor:
         except FileNotFoundError:
             self.validation_config = self.get_default_validation_config()
 
-    def get_default_audit_rules(self) -> dict[str, object]:
+    def get_default_audit_rules(self) -> dict[str, Any]:
         """Default audit rules if config file not found."""
         return {
             "quality_thresholds": {
@@ -94,7 +95,7 @@ class DocumentationAuditor:
             },
         }
 
-    def get_default_style_guide(self) -> dict[str, object]:
+    def get_default_style_guide(self) -> dict[str, Any]:
         """Default style guide if config file not found."""
         return {
             "markdown": {
@@ -115,7 +116,7 @@ class DocumentationAuditor:
             },
         }
 
-    def get_default_validation_config(self) -> dict[str, object]:
+    def get_default_validation_config(self) -> dict[str, Any]:
         """Default validation config if config file not found."""
         return {
             "link_validation": {
@@ -174,7 +175,7 @@ class DocumentationAuditor:
 
         return any(pattern in str(file_path) for pattern in ignored_patterns)
 
-    def run_comprehensive_audit(self) -> dict[str, object]:
+    def run_comprehensive_audit(self) -> dict[str, Any]:
         """Run complete documentation audit."""
         doc_files = self.find_documentation_files()
         self.results["files_analyzed"] = len(doc_files)

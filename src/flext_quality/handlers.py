@@ -10,7 +10,6 @@ from uuid import UUID
 
 from flext_core import FlextLogger, FlextResult
 from flext_observability import (
-    flext_create_log_entry,
     flext_create_trace,
 )
 from pydantic import BaseModel, Field
@@ -70,9 +69,11 @@ class FlextQualityHandlers:
             context: HandlerContext,
         ) -> None:
             """Log operation with context."""
-            flext_create_log_entry(
-                message=f"{message} | project_id={context.project_id} operation={context.operation}",
-                level=level,
+            # Use logger for operation logging with context
+            logger = FlextLogger(__name__)
+            logger_method = getattr(logger, level.lower(), logger.info)
+            logger_method(
+                f"{message} | project_id={context.project_id} operation={context.operation}"
             )
 
         @staticmethod
@@ -81,9 +82,10 @@ class FlextQualityHandlers:
             service_name: str,
         ) -> None:
             """Create trace for operation."""
+            # Create span for operation tracing
             flext_create_trace(
-                name=service_name,
-                operation=operation_name,
+                name=f"{service_name}:{operation_name}",
+                attributes={"operation": operation_name, "service": service_name},
             )
 
     class _AnalysisOrchestrator:
@@ -197,7 +199,7 @@ class FlextQualityHandlers:
     def _log_error(self, context: HandlerContext, error: str) -> str:
         """Log and return error."""
         self._ObservabilityManager.log_operation(
-            f"Operation failed: {error}", "error", self.config.service_name, context
+            f"Operation failed: {error}", "error", context
         )
         self._logger.error(f"Handler error in {context.operation}: {error}")
         return error
@@ -207,14 +209,122 @@ class FlextQualityHandlers:
         self._ObservabilityManager.log_operation(
             "Operation completed successfully",
             "info",
-            self.config.service_name,
             context,
         )
         return result
 
 
+# =====================================================================
+# Concrete Handler Classes - SOLID Single Responsibility Principle
+# =====================================================================
+
+
+class AnalyzeProjectHandler:
+    """Handler for project analysis operations."""
+
+    def __init__(self) -> None:
+        """Initialize handler."""
+        self._handlers = FlextQualityHandlers()
+        self._analysis_service = self._handlers._services.get_analysis_service()
+        self._logger = FlextLogger(__name__)
+
+    def analyze_project(self, project_id: object) -> FlextResult[object]:
+        """Analyze project and return analysis result."""
+        try:
+            result = self._analysis_service.create_analysis(project_id=str(project_id))
+
+            if result.is_failure:
+                return FlextResult.fail(f"Analysis failed: {result.error}")
+
+            if result.value is None:
+                return FlextResult.fail("Analysis data is None")
+
+            return FlextResult.ok(result.value)
+        except Exception as e:
+            error_msg = f"Unexpected error during analysis: {e!s}"
+            self._logger.exception(error_msg)
+            return FlextResult.fail(error_msg)
+
+
+class GenerateReportHandler:
+    """Handler for report generation operations."""
+
+    def __init__(self) -> None:
+        """Initialize handler."""
+        self._handlers = FlextQualityHandlers()
+        self._report_service = self._handlers._services.get_report_service()
+        self._logger = FlextLogger(__name__)
+
+    def generate_report(self, analysis_id: object) -> FlextResult[object]:
+        """Generate report from analysis."""
+        try:
+            result = self._report_service.generate_report(analysis_id=str(analysis_id))
+
+            if result.is_failure:
+                return FlextResult.fail(f"Report generation failed: {result.error}")
+
+            if result.value is None:
+                return FlextResult.fail("Report data is None")
+
+            return FlextResult.ok(result.value)
+        except Exception as e:
+            error_msg = f"Unexpected error during report generation: {e!s}"
+            self._logger.exception(error_msg)
+            return FlextResult.fail(error_msg)
+
+
+class RunLintingHandler:
+    """Handler for linting operations."""
+
+    def __init__(self) -> None:
+        """Initialize handler."""
+        self._handlers = FlextQualityHandlers()
+        self._logger = FlextLogger(__name__)
+
+    def run_linting(self, project_id: object) -> FlextResult[object]:
+        """Run linting checks on project."""
+        try:
+            result = self._handlers.run_linting(project_id)  # type: ignore
+
+            if result.is_failure:
+                return FlextResult.fail(f"Linting failed: {result.error}")
+
+            return FlextResult.ok(result.value)
+        except Exception as e:
+            error_msg = f"Unexpected error during linting: {e!s}"
+            self._logger.exception(error_msg)
+            return FlextResult.fail(error_msg)
+
+
+class RunSecurityCheckHandler:
+    """Handler for security check operations."""
+
+    def __init__(self) -> None:
+        """Initialize handler."""
+        self._handlers = FlextQualityHandlers()
+        self._logger = FlextLogger(__name__)
+
+    def run_security_check(self, project_id: object) -> FlextResult[object]:
+        """Run security checks on project."""
+        try:
+            result = self._handlers.run_security_check(project_id)  # type: ignore
+
+            if result.is_failure:
+                return FlextResult.fail(f"Security check failed: {result.error}")
+
+            return FlextResult.ok(result.value)
+        except Exception as e:
+            error_msg = f"Unexpected error during security check: {e!s}"
+            self._logger.exception(error_msg)
+            return FlextResult.fail(error_msg)
+
+
 __all__ = [
+    "AnalyzeProjectHandler",
     "FlextQualityHandlers",
+    "GenerateReportHandler",
     "HandlerContext",
     "ObservabilityConfig",
+    "RunLintingHandler",
+    "RunSecurityCheckHandler",
 ]

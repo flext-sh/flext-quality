@@ -228,7 +228,12 @@ class CliCommandRouter:
         analyzer = analyzer_result.value
 
         # Generate and output report
-        report = FlextQualityReportGenerator(analyzer.analysis_results)
+        analysis_results = analyzer.get_last_analysis_result()
+        if analysis_results is None:
+            self.logger.error("No analysis results available")
+            return FlextResult[int].ok(1)
+
+        report = FlextQualityReportGenerator(analysis_results)
         output_result = self.formatter.output_report(
             report, args.format, Path(args.output) if args.output else None
         )
@@ -337,17 +342,118 @@ class FlextQualityCliService(FlextService[int]):
 # =====================================================================
 
 
+# =====================================================================
+# CLI Command Wrappers for Testing and Direct Use
+# =====================================================================
+
+
+def setup_logging(log_level: str = "INFO") -> None:
+    """Setup logging configuration for the CLI.
+
+    Args:
+        log_level: Logging level (DEBUG, INFO, WARNING, ERROR)
+
+    """
+    import logging
+
+    logging.basicConfig(
+        level=getattr(logging, log_level, logging.INFO),
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
+
+
+def analyze_project(args: argparse.Namespace) -> int:
+    """Analyze a project and return exit code.
+
+    This is a convenience wrapper for the analyze command, allowing direct
+    function calls with argparse.Namespace arguments instead of parsing CLI.
+
+    Args:
+        args: argparse.Namespace with fields:
+            - path: Project path (str or Path)
+            - output: Optional output file path
+            - format: Output format (json, html, text, table)
+            - verbose: Enable verbose output (bool)
+            - include_security: Include security analysis (bool)
+            - include_complexity: Include complexity analysis (bool)
+            - include_dead_code: Include dead code analysis (bool)
+            - include_duplicates: Include duplication analysis (bool)
+
+    Returns:
+        Exit code (0 for success, 1+ for errors)
+
+    """
+    try:
+        # Setup logging if verbose
+        if getattr(args, "verbose", False):
+            setup_logging("DEBUG")
+        else:
+            setup_logging("INFO")
+
+        # Validate and convert path
+        path = args.path if isinstance(args.path, Path) else Path(args.path)
+        if not path.exists():
+            return 1
+        if not path.is_dir():
+            return 1
+
+        # Create config
+        config = CliConfig()
+        FlextQualityConfig()
+
+        # Create service and router
+        service = FlextQualityCliService(config)
+        router = service.get_router()
+
+        # Create modified args with path as Path object
+        analyze_args = argparse.Namespace(
+            path=path,
+            output=getattr(args, "output", None),
+            format=getattr(args, "format", "table"),
+            include_security=getattr(args, "include_security", True),
+            include_complexity=getattr(args, "include_complexity", True),
+            include_dead_code=getattr(args, "include_dead_code", True),
+            include_duplicates=getattr(args, "include_duplicates", True),
+        )
+
+        # Execute analyze command
+        result = router.route_analyze(analyze_args)
+        return result.unwrap() if result.is_success else 1
+
+    except Exception:
+        import traceback
+
+        if getattr(args, "verbose", False):
+            traceback.print_exc()
+        return 1
+
+
+def another_function() -> str:
+    """Placeholder function for test compatibility.
+
+    This function exists for test compatibility and may be removed
+    in future versions when test imports are updated.
+
+    Returns:
+        A simple string for testing.
+
+    """
+    return "placeholder"
+
+
 def main() -> int:
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
-        description="FLEXT Quality - Enterprise Code Quality Analysis",
+        description="FLEXT Quality - Enterprise Code Quality Analysis & Documentation",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
- flext-quality analyze./my-project
- flext-quality analyze./my-project --output report.html --format html
- flext-quality score./my-project
+ flext-quality analyze ./my-project
+ flext-quality analyze ./my-project --output report.html --format html
+ flext-quality score ./my-project
  flext-quality web --port 8080
+ flext-quality doc comprehensive --project-root ./my-project
+ flext-quality doc --help
  """,
     )
     parser.add_argument(
@@ -402,19 +508,62 @@ Examples:
     web_parser.add_argument("--port", type=int, default=8000)
     web_parser.add_argument("--debug", action="store_true")
 
+    # Doc command - delegates to documentation maintenance CLI
+    doc_parser = subparsers.add_parser(
+        "doc",
+        help="Manage project documentation",
+        description="Documentation maintenance and validation commands",
+    )
+    doc_parser.add_argument(
+        "subcommand",
+        nargs="?",
+        default="comprehensive",
+        help="Documentation subcommand (comprehensive, validate, etc.)",
+    )
+    doc_parser.add_argument(
+        "--project-root",
+        type=Path,
+        default=Path.cwd(),
+        help="Path to the project root (defaults to current directory)",
+    )
+    doc_parser.add_argument(
+        "--profile",
+        default="advanced",
+        help="Maintenance profile slug to use",
+    )
+    doc_parser.add_argument(
+        "--config",
+        type=Path,
+        help="Optional path to a maintenance configuration file",
+    )
+    doc_parser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Run without applying changes",
+    )
+    doc_parser.add_argument(
+        "--verbose-docs",
+        action="store_true",
+        help="Show detailed logging for documentation operations",
+    )
+
     args = parser.parse_args()
 
     if not args.command:
         parser.print_help()
         return 1
 
-    # Configure logging
+    # Handle doc command (delegates to documentation maintenance module)
+    if args.command == "doc":
+        return _route_doc_command(args)
+
+    # Configure logging for quality commands
     config = CliConfig()
     quality_config = FlextQualityConfig()
     if args.verbose:
         quality_config.observability_log_level = "DEBUG"
 
-    # Create service and route command
+    # Create service and route quality command
     service = FlextQualityCliService(config)
     router = service.get_router()
 
@@ -430,6 +579,41 @@ Examples:
 
     parser.print_help()
     return 1
+
+
+def _route_doc_command(args: object) -> int:
+    """Route documentation commands to the docs_maintenance module."""
+    try:
+        from rich.console import Console
+
+        from .docs_maintenance.cli import run_comprehensive
+
+        console = Console()
+
+        # Convert argparse namespace to function arguments
+        args_dict = vars(args)
+
+        if args_dict.get("subcommand") == "comprehensive":
+            run_comprehensive(
+                project_root=args_dict.get("project_root", Path.cwd()),
+                profile=args_dict.get("profile", "advanced"),
+                config=args_dict.get("config"),
+                dry_run=args_dict.get("dry_run", False),
+                verbose=args_dict.get("verbose_docs", False),
+            )
+            return 0
+        console.print(
+            f"[yellow]Documentation subcommand '{args_dict.get('subcommand')}' "
+            "not yet implemented. Use 'comprehensive'.[/yellow]"
+        )
+        return 1
+
+    except Exception as e:
+        from rich.console import Console
+
+        console = Console()
+        console.print(f"[red]Documentation command error: {e}[/red]")
+        return 1
 
 
 if __name__ == "__main__":

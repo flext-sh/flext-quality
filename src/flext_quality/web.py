@@ -32,7 +32,7 @@ except Exception:  # Catch all import issues, not just ImportError
 
 from flext_core import FlextContainer, FlextLogger, FlextResult
 
-from .analyzer import CodeAnalyzer
+from .analyzer import FlextQualityAnalyzer
 from .api import FlextQuality
 from .config import FlextQualityConfig
 
@@ -270,7 +270,7 @@ class FlextQualityWeb:
 
         # Create analyzer for the specific path
         try:
-            analyzer = CodeAnalyzer(Path(project_path))
+            analyzer = FlextQualityAnalyzer(Path(project_path))
             analysis_result = analyzer.analyze_project()
 
             if analysis_result.is_failure:

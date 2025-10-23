@@ -10,6 +10,7 @@ import re
 from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -34,7 +35,7 @@ class ContentAnalyzer:
     MIN_ARGS_REQUIRED = 2
 
     def __init__(
-        self, config_path: str = "docs/maintenance/config/audit_rules.yaml"
+        self, config_path: str | None = "docs/maintenance/config/audit_rules.yaml"
     ) -> None:
         """Initialize content analyzer with configuration.
 
@@ -52,7 +53,7 @@ class ContentAnalyzer:
             "recommendations": [],
         }
 
-    def load_config(self, config_path: str) -> None:
+    def load_config(self, config_path: str | None) -> None:
         """Load content analysis configuration."""
         try:
             with Path(config_path).open(encoding="utf-8") as f:
@@ -298,7 +299,7 @@ class ContentAnalyzer:
         structure["depth_analysis"] = {
             "max_depth": max(depths) if depths else 0,
             "avg_depth": sum(depths) / len(depths) if depths else 0,
-            "depth_distribution": dict[str, object](Counter(depths)),
+            "depth_distribution": dict[str, Any](Counter(depths)),
         }
 
         return structure
@@ -438,7 +439,7 @@ class ContentAnalyzer:
 
         return max(0, min(100, score))
 
-    def _identify_issues(self, analysis: dict[str, object]) -> list[dict[str, object]]:
+    def _identify_issues(self, analysis: dict[str, Any]) -> list[dict[str, Any]]:
         """Identify content issues that need attention."""
         issues = []
 
@@ -485,7 +486,7 @@ class ContentAnalyzer:
 
         return issues
 
-    def _generate_suggestions(self, analysis: dict[str, object]) -> list[str]:
+    def _generate_suggestions(self, analysis: dict[str, Any]) -> list[str]:
         """Generate improvement suggestions based on analysis."""
         suggestions = []
 
@@ -519,7 +520,7 @@ class ContentAnalyzer:
 
         return suggestions
 
-    def analyze_files_batch(self, file_paths: list[Path]) -> dict[str, object]:
+    def analyze_files_batch(self, file_paths: list[Path]) -> dict[str, Any]:
         """Analyze multiple files and aggregate results."""
         for file_path in file_paths:
             self.analyze_file(file_path)
@@ -639,7 +640,7 @@ Top Recommendations:
 
 def analyze_file_content(
     file_path: str, config_path: str | None = None
-) -> dict[str, object]:
+) -> dict[str, Any]:
     """Convenience function to analyze a single file."""
     analyzer = ContentAnalyzer(config_path)
     return analyzer.analyze_file(Path(file_path))
@@ -647,7 +648,7 @@ def analyze_file_content(
 
 def analyze_files_content(
     file_paths: list[str], config_path: str | None = None
-) -> dict[str, object]:
+) -> dict[str, Any]:
     """Convenience function to analyze multiple files."""
     analyzer = ContentAnalyzer(config_path)
     paths = [Path(fp) for fp in file_paths]

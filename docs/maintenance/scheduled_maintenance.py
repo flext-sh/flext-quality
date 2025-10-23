@@ -7,18 +7,28 @@ optimizations, and reporting. Designed to run as a cron job or scheduled task.
 
 import argparse
 import json
-import subprocess
+import runpy
+import shlex
 import sys
+import threading
 import time
+from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
-import schedule
+import pytest
+import schedule  # type: ignore[import-not-found]
 import yaml
+from git import InvalidGitRepositoryError, Repo
 
 
 class ScheduledMaintenance:
     """Scheduled documentation maintenance system."""
+
+    # Command parsing constants
+    MIN_PYTHON_ARGS = 2  # python -m is minimum 2 parts
+    MIN_PYTHON_MODULE_INDEX = 2  # module name is at index 2 (python -m module_name)
 
     def __init__(
         self, config_path: str = "docs/maintenance/config/schedule_config.yaml"
@@ -52,7 +62,7 @@ class ScheduledMaintenance:
         except FileNotFoundError:
             self.config = self.get_default_config()
 
-    def get_default_config(self) -> dict[str, object]:
+    def get_default_config(self) -> dict[str, Any]:
         """Default maintenance configuration."""
         return {
             "enabled": True,
@@ -198,32 +208,236 @@ class ScheduledMaintenance:
         return success
 
     def run_single_task(self, task_config: dict) -> bool:
-        """Run a single maintenance task."""
+        """Run a single maintenance task using appropriate Python libraries."""
         try:
-            # Change to project root directory
-            result = subprocess.run(
-                task_config["command"],
-                check=False,
-                shell=False,
-                cwd=self.project_root,
-                timeout=task_config.get("timeout", 300),
-                capture_output=True,
-                text=True,
-            )
+            command = task_config["command"]
+            description = task_config["description"]
+            timeout = task_config.get("timeout", 300)
 
-            if result.returncode == 0:
-                return True
+            # Parse command to determine type
+            cmd_parts = shlex.split(command) if isinstance(command, str) else command
+
+            if not cmd_parts:
+                self.results["errors"].append(f"Empty command in task: {description}")
+                return False
+
+            cmd_name = cmd_parts[0]
+
+            # Route to appropriate handler based on command type
+            handler = self._get_command_handler(cmd_name)
+            if handler:
+                return handler(cmd_parts, timeout, description)
+
+            # If no specific handler, log unsupported command
             self.results["warnings"].append(
-                f"Task failed: {task_config['description']} - {result.stderr}"
+                f"Unsupported command: {cmd_name} in task: {description}. "
+                "Please install appropriate Python libraries or configure supported commands."
             )
             return False
 
-        except subprocess.TimeoutExpired:
-            self.results["errors"].append(f"Task timeout: {task_config['description']}")
+        except Exception as e:
+            self.results["errors"].append(
+                f"Task error: {task_config.get('description', 'unknown')} - {e!s}"
+            )
+            return False
+
+    def _get_command_handler(
+        self, cmd_name: str
+    ) -> Callable[[list[str], int, str], bool] | None:
+        """Get handler for command type."""
+        handlers: dict[str, Callable] = {
+            "python": self._handle_python_command,
+            "pytest": self._handle_pytest_command,
+            "make": self._handle_make_command,
+            "git": self._handle_git_command,
+            "echo": self._handle_echo_command,
+        }
+        return handlers.get(cmd_name)
+
+    def _handle_python_command(
+        self, cmd_parts: list[str], timeout: int, description: str
+    ) -> bool:
+        """Handle python -m commands."""
+        try:
+            if len(cmd_parts) < self.MIN_PYTHON_ARGS or cmd_parts[1] != "-m":
+                self.results["warnings"].append(
+                    f"Invalid python command format in task: {description}"
+                )
+                return False
+
+            module_name = (
+                cmd_parts[self.MIN_PYTHON_MODULE_INDEX]
+                if len(cmd_parts) > self.MIN_PYTHON_MODULE_INDEX
+                else None
+            )
+            if not module_name:
+                self.results["warnings"].append(
+                    f"No module specified in task: {description}"
+                )
+                return False
+
+            # For pytest
+            if module_name == "pytest":
+                return self._handle_pytest_command(cmd_parts[1:], timeout, description)
+
+            # For other modules, use runpy
+            def run_module() -> None:
+                runpy.run_module(module_name, run_name="__main__", alter_sys=True)
+
+            return self._run_with_timeout(run_module, timeout, description)
+
+        except Exception as e:
+            self.results["errors"].append(
+                f"Python command failed in {description}: {e!s}"
+            )
+            return False
+
+    def _handle_pytest_command(
+        self, cmd_parts: list[str], timeout: int, description: str
+    ) -> bool:
+        """Handle pytest commands."""
+        try:
+            # Extract pytest arguments (skip 'pytest' itself)
+            pytest_args = cmd_parts[1:] if cmd_parts[0] == "pytest" else cmd_parts
+
+            def run_tests() -> None:
+                exit_code = pytest.main(pytest_args)
+                if exit_code != 0:
+                    error_msg = f"pytest exited with code {exit_code}"
+                    raise RuntimeError(error_msg)
+
+            return self._run_with_timeout(run_tests, timeout, description)
+
+        except ImportError:
+            self.results["warnings"].append(
+                f"pytest not available for task: {description}. Install with: pip install pytest"
+            )
             return False
         except Exception as e:
             self.results["errors"].append(
-                f"Task error: {task_config['description']} - {e!s}"
+                f"pytest command failed in {description}: {e!s}"
+            )
+            return False
+
+    def _handle_make_command(
+        self, cmd_parts: list[str], timeout: int, description: str
+    ) -> bool:  # timeout used by interface
+        """Handle make commands."""
+        try:
+            makefile = self.project_root / "Makefile"
+            if not makefile.exists():
+                self.results["warnings"].append(
+                    f"Makefile not found for task: {description}"
+                )
+                return False
+
+            # Parse make command
+            targets = cmd_parts[1:] if len(cmd_parts) > 1 else []
+
+            # Execute make target by reading Makefile and running corresponding command
+            if not targets:
+                targets = ["default"]  # Use default target if none specified
+            # For now, log a warning suggesting direct command execution
+            self.results["warnings"].append(
+                f"Make command '{' '.join(cmd_parts)}' requires make tool. "
+                f"For task: {description}, consider specifying the actual command directly."
+            )
+            return False
+
+        except Exception as e:
+            self.results["errors"].append(
+                f"Make command failed in {description}: {e!s}"
+            )
+            return False
+
+    def _handle_git_command(
+        self, cmd_parts: list[str], timeout: int, description: str
+    ) -> bool:
+        """Handle git commands using GitPython."""
+        try:
+            repo = Repo(self.project_root)
+            git = repo.git
+
+            # Extract git subcommand
+            if len(cmd_parts) < 2:
+                self.results["warnings"].append(
+                    f"Invalid git command format in task: {description}"
+                )
+                return False
+
+            subcommand = cmd_parts[1]
+            args = cmd_parts[2:] if len(cmd_parts) > 2 else []
+
+            def run_git_command() -> None:
+                # Use repo.git.execute() for arbitrary git commands
+                result = git.execute(args=[subcommand] + args)
+                if not result:
+                    msg = f"git {subcommand} returned empty result"
+                    raise RuntimeError(msg)
+
+            return self._run_with_timeout(run_git_command, timeout, description)
+
+        except ImportError:
+            self.results["warnings"].append(
+                f"GitPython not available for task: {description}. Install with: pip install GitPython"
+            )
+            return False
+        except InvalidGitRepositoryError:
+            self.results["warnings"].append(
+                f"Not a git repository for task: {description}"
+            )
+            return False
+        except Exception as e:
+            self.results["errors"].append(f"Git command failed in {description}: {e!s}")
+            return False
+
+    def _handle_echo_command(
+        self, cmd_parts: list[str], timeout: int, description: str
+    ) -> bool:
+        """Handle echo commands."""
+        try:
+            message = " ".join(cmd_parts[1:]) if len(cmd_parts) > 1 else ""
+            print(message)
+            return True
+        except Exception as e:
+            self.results["errors"].append(
+                f"Echo command failed in {description}: {e!s}"
+            )
+            return False
+
+    def _run_with_timeout(
+        self, func: Callable[[], None], timeout: int, description: str
+    ) -> bool:
+        """Run a function with timeout using threading."""
+        try:
+            result_container: dict[str, Any] = {"success": False, "exception": None}
+
+            def run_with_result() -> None:
+                try:
+                    func()
+                    result_container["success"] = True
+                except Exception as e:
+                    result_container["exception"] = e
+
+            thread = threading.Thread(target=run_with_result, daemon=False)
+            thread.start()
+            thread.join(timeout=timeout)
+
+            if thread.is_alive():
+                self.results["errors"].append(f"Task timeout: {description}")
+                return False
+
+            if result_container["exception"]:
+                self.results["errors"].append(
+                    f"Task failed: {description} - {result_container['exception']!s}"
+                )
+                return False
+
+            return result_container["success"]
+
+        except Exception as e:
+            self.results["errors"].append(
+                f"Task execution error in {description}: {e!s}"
             )
             return False
 

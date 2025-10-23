@@ -8,7 +8,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Protocol
+from typing import Any, Protocol
 
 
 @dataclass
@@ -21,9 +21,9 @@ class Issue:
     line: int | None = None
     description: str = ""
     recommendation: str = ""
-    context: dict[str, object] | None = None
+    context: dict[str, Any] | None = None
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert issue to dictionary representation."""
         return {
             "type": self.type,
@@ -46,7 +46,7 @@ class ValidationResult:
     issues: list[Issue] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
-    metadata: dict[str, object] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def success_rate(self) -> float:
@@ -63,7 +63,7 @@ class ValidationResult:
         else:
             self.valid_items += 1
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert result to dictionary representation."""
         return {
             "total_items": self.total_items,
@@ -123,7 +123,7 @@ class BaseAuditor(ABC):
     def audit(self, files: list[Path]) -> ValidationResult:
         """Perform the audit operation on given files."""
 
-    def get_summary(self) -> dict[str, object]:
+    def get_summary(self) -> dict[str, Any]:
         """Get a summary of the audit results."""
         return {
             "auditor": self.name,
@@ -163,7 +163,7 @@ class BaseValidator(ABC):
     def _validate_items(self, items: list[object]) -> None:
         """Implementation-specific validation logic."""
 
-    def get_summary(self) -> dict[str, object]:
+    def get_summary(self) -> dict[str, Any]:
         """Get a summary of validation results."""
         if not self.results:
             return {"validator": self.name, "status": "not_run"}
@@ -192,9 +192,7 @@ class BaseReporter(ABC):
         self.template_dir = template_dir or Path(__file__).parent.parent / "templates"
 
     @abstractmethod
-    def generate_report(
-        self, data: dict[str, object], output_format: str = "html"
-    ) -> str:
+    def generate_report(self, data: dict[str, Any], output_format: str = "html") -> str:
         """Generate a report from the given data."""
 
     def save_report(self, content: str, filename: str, output_dir: Path) -> Path:
@@ -214,9 +212,9 @@ class BaseAnalyzer(ABC):
     def __init__(self, name: str) -> None:
         """Initialize the analyzer base class with a name."""
         self.name = name
-        self.metrics: dict[str, object] = {}
+        self.metrics: dict[str, Any] = {}
 
-    def analyze(self, content: str, filepath: Path | None = None) -> dict[str, object]:
+    def analyze(self, content: str, filepath: Path | None = None) -> dict[str, Any]:
         """Analyze the given content and return metrics."""
         self.metrics = {
             "analyzer": self.name,
@@ -284,7 +282,7 @@ class FileMetadata:
             # If we can't read the file, keep defaults (file not accessible or not text)
             pass
 
-    def to_dict(self) -> dict[str, object]:
+    def to_dict(self) -> dict[str, Any]:
         """Convert metadata to dictionary."""
         return {
             "path": str(self.path),

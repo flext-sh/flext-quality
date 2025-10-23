@@ -10,9 +10,7 @@ from __future__ import annotations
 from uuid import UUID
 
 from flext_core import (
-    FlextBus,
     FlextContainer,
-    FlextContext,
     FlextDispatcher,
     FlextLogger,
     FlextProcessors,
@@ -44,13 +42,12 @@ class FlextQuality(FlextService[None]):
         super().__init__()
 
         # Complete FLEXT ecosystem integration
-        self._container = FlextContainer.get_global()
-        self._context = FlextContext()
-        self._bus = FlextBus()
-        self._dispatcher = FlextDispatcher()
-        self._processors = FlextProcessors()
-        self._registry = FlextRegistry(dispatcher=self._dispatcher)
-        self._logger = FlextLogger(__name__)
+        # Note: _context and _bus are inherited from FlextService parent class
+        self._container: FlextContainer = FlextContainer.get_global()
+        self._dispatcher: FlextDispatcher = FlextDispatcher()
+        self._processors: FlextProcessors = FlextProcessors()
+        self._registry: FlextRegistry = FlextRegistry(dispatcher=self._dispatcher)
+        self._logger: FlextLogger = FlextLogger(__name__)
 
         # Domain services
         self._services = FlextQualityServices()

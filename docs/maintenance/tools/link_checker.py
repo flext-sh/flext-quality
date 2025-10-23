@@ -10,6 +10,7 @@ import json
 import pathlib
 import time
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any
 from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
 
@@ -27,7 +28,7 @@ class LinkChecker:
     MAX_BROKEN_LINKS_TO_SHOW = 10
 
     def __init__(
-        self, config_path: str = "docs/maintenance/config/validation_config.yaml"
+        self, config_path: str | None = "docs/maintenance/config/validation_config.yaml"
     ) -> None:
         """Initialize the link checker with configuration."""
         self.load_config(config_path)
@@ -47,7 +48,7 @@ class LinkChecker:
             },
         }
 
-    def load_config(self, config_path: str) -> None:
+    def load_config(self, config_path: str | None) -> None:
         """Load validation configuration."""
         try:
             with pathlib.Path(config_path).open(encoding="utf-8") as f:
@@ -100,7 +101,7 @@ class LinkChecker:
                 ref_links = re.findall(r"\[([^\]]+)\]\[([^\]]+)\]", content)
                 ref_defs = re.findall(r"\[([^\]]+)\]:\s*([^\s]+)", content)
 
-                ref_dict = dict[str, object](ref_defs)
+                ref_dict = dict[str, Any](ref_defs)
                 for text, ref in ref_links:
                     if ref in ref_dict:
                         url = ref_dict[ref]
@@ -131,8 +132,8 @@ class LinkChecker:
         return "internal"
 
     async def check_link_async(
-        self, url: str, context: dict[str, object] | None = None
-    ) -> dict[str, object]:
+        self, url: str, context: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Asynchronously check a single link."""
         start_time = time.time()
 
@@ -190,8 +191,8 @@ class LinkChecker:
             }
 
     def check_link_sync(
-        self, url: str, context: dict[str, object] | None = None
-    ) -> dict[str, object]:
+        self, url: str, context: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """Synchronously check a single link (fallback method)."""
         start_time = time.time()
 
@@ -333,7 +334,7 @@ class LinkChecker:
 
     async def validate_links(
         self, links: list[dict], use_async: bool = True
-    ) -> dict[str, object]:
+    ) -> dict[str, Any]:
         """Main link validation method."""
         self.results["total_links"] = len(links)
 
@@ -491,7 +492,7 @@ Broken Links:
 # Synchronous wrapper for easy usage
 def validate_links_sync(
     links: list[dict], config_path: str | None = None
-) -> dict[str, object]:
+) -> dict[str, Any]:
     """Synchronous wrapper for link validation."""
     checker = LinkChecker(config_path)
     # Run async validation in new event loop

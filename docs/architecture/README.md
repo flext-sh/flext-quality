@@ -1,14 +1,57 @@
 # FLEXT Quality Architecture Documentation
+## Table of Contents
+
+- [FLEXT Quality Architecture Documentation](#flext-quality-architecture-documentation)
+  - [🎯 Architecture Overview](#-architecture-overview)
+    - [System Purpose](#system-purpose)
+    - [Key Architectural Principles](#key-architectural-principles)
+  - [🏗️ Architecture Documentation Structure](#-architecture-documentation-structure)
+    - [Documentation Framework](#documentation-framework)
+    - [Quick Navigation](#quick-navigation)
+  - [📊 System Context](#-system-context)
+    - [External Systems & Integrations](#external-systems--integrations)
+    - [Key Stakeholders & User Personas](#key-stakeholders--user-personas)
+  - [🏛️ Architecture Decisions](#-architecture-decisions)
+    - [Foundational Decisions](#foundational-decisions)
+    - [Technology Decisions](#technology-decisions)
+  - [📋 Quality Attributes & Architectural Characteristics](#-quality-attributes--architectural-characteristics)
+    - [Functional Requirements](#functional-requirements)
+    - [Quality Attributes](#quality-attributes)
+    - [Constraints & Assumptions](#constraints--assumptions)
+  - [🔧 Development & Deployment](#-development--deployment)
+    - [Development Environment](#development-environment)
+    - [Build & Deployment](#build--deployment)
+    - [Quality Gates](#quality-gates)
+  - [📚 Documentation Structure](#-documentation-structure)
+    - [Architecture Views](#architecture-views)
+    - [Cross-Cutting Concerns](#cross-cutting-concerns)
+    - [Operational Documentation](#operational-documentation)
+  - [🎨 Diagrams & Visualizations](#-diagrams--visualizations)
+    - [Diagram Types](#diagram-types)
+    - [Diagram Locations](#diagram-locations)
+  - [🔄 Evolution & Maintenance](#-evolution--maintenance)
+    - [Architecture Evolution](#architecture-evolution)
+    - [Documentation Maintenance](#documentation-maintenance)
+  - [🤝 Contributing to Architecture](#-contributing-to-architecture)
+    - [Architecture Decision Process](#architecture-decision-process)
+    - [Quality Standards](#quality-standards)
+  - [📖 Reading Guide](#-reading-guide)
+    - [For New Team Members](#for-new-team-members)
+    - [For Architects & Technical Leads](#for-architects--technical-leads)
+    - [For Developers](#for-developers)
+
 
 **Version**: 1.0.0 | **Status**: Production Architecture | **Updated**: 2025-10-10
 
-Comprehensive architecture documentation for FLEXT Quality - Enterprise-grade code quality analysis library with Clean Architecture, Domain-Driven Design, and FLEXT ecosystem integration.
+Comprehensive architecture documentation for FLEXT Quality - Enterprise-grade code quality analysis library with Clean Architecture,
+     Domain-Driven Design, and FLEXT ecosystem integration.
 
 ## 🎯 Architecture Overview
 
 ### System Purpose
 
-FLEXT Quality provides comprehensive code quality analysis and metrics collection for Python projects within the FLEXT ecosystem, enabling automated quality assessment, scoring, and reporting across enterprise Python codebases.
+FLEXT Quality provides comprehensive code quality analysis and metrics collection for Python projects within the FLEXT ecosystem,
+     enabling automated quality assessment, scoring, and reporting across enterprise Python codebases.
 
 ### Key Architectural Principles
 
@@ -277,4 +320,5 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 3. Check [Integration Architecture](views/integration.md) for external dependencies
 4. Reference [API Documentation](../api/) for interface specifications
 
-**FLEXT Quality Architecture** - Enterprise-grade code quality analysis with clean architecture, domain-driven design, and comprehensive ecosystem integration.
+**FLEXT Quality Architecture** - Enterprise-grade code quality analysis with clean architecture, domain-driven design,
+     and comprehensive ecosystem integration.

@@ -6,7 +6,7 @@ import tomllib
 from pathlib import Path
 from typing import Self
 
-from flext_core import FlextResult, FlextService, FlextTypes, FlextUtilities
+from flext_core import FlextResult, FlextService, FlextUtilities
 
 
 class PoetryOperations(FlextService[str]):
@@ -71,16 +71,16 @@ class PoetryOperations(FlextService[str]):
         )
 
 
-class PoetryValidator(FlextService[FlextTypes.BoolDict]):
+class PoetryValidator(FlextService[dict[str, bool]]):
     """Validate ``pyproject.toml`` structure for basic sanity checks."""
 
     def __init__(self: Self) -> None:
         """Initialize the PoetryValidator service."""
         super().__init__()
 
-    def execute(self: Self) -> FlextResult[FlextTypes.BoolDict]:
+    def execute(self: Self) -> FlextResult[dict[str, bool]]:
         """Return default validation state."""
-        return FlextResult[FlextTypes.BoolDict].ok({
+        return FlextResult[dict[str, bool]].ok({
             "pyproject_exists": False,
             "poetry_section": False,
             "dependencies_defined": False,
@@ -89,13 +89,13 @@ class PoetryValidator(FlextService[FlextTypes.BoolDict]):
     def validate_pyproject(
         self,
         project_path: str | Path,
-    ) -> FlextResult[FlextTypes.BoolDict]:
+    ) -> FlextResult[dict[str, bool]]:
         """Validate ``pyproject.toml`` at *project_path*."""
         project = Path(project_path).expanduser()
         pyproject = project / "pyproject.toml"
 
         if not pyproject.exists():
-            return FlextResult[FlextTypes.BoolDict].ok({
+            return FlextResult[dict[str, bool]].ok({
                 "pyproject_exists": False,
                 "poetry_section": False,
                 "dependencies_defined": False,
@@ -105,7 +105,7 @@ class PoetryValidator(FlextService[FlextTypes.BoolDict]):
             with pyproject.open("rb") as handle:
                 data = tomllib.load(handle)
         except (OSError, tomllib.TOMLDecodeError) as error:
-            return FlextResult[FlextTypes.BoolDict].fail(
+            return FlextResult[dict[str, bool]].fail(
                 f"Failed to read pyproject.toml: {error}"
             )
 
@@ -116,7 +116,7 @@ class PoetryValidator(FlextService[FlextTypes.BoolDict]):
             "poetry_section": bool(poetry_data),
             "dependencies_defined": bool(dependencies),
         }
-        return FlextResult[FlextTypes.BoolDict].ok(stats)
+        return FlextResult[dict[str, bool]].ok(stats)
 
     def validate_project(self, project_path: str | Path) -> FlextResult[bool]:
         """Return success if ``pyproject.toml`` passes validation."""

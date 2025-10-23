@@ -1,18 +1,24 @@
-"""External tools backend for security and quality analysis.
+"""External tools backend - pragmatic integration with Python ecosystem tools.
+
+Uses subprocess to run industry-standard quality analysis tools:
+- ruff: Fast linting and formatting
+- mypy: Static type checking
+- bandit: Security vulnerability scanning
+- vulture: Dead code detection
+- coverage: Test coverage measurement
+- radon: Cyclomatic complexity analysis
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
-
 """
 
 from __future__ import annotations
 
+import contextlib
 import json
-import shutil
 import tempfile
-from importlib import import_module, util
 from pathlib import Path
-from typing import override
+from typing import Any, override
 
 from flext_core import FlextResult, FlextUtilities
 
@@ -21,7 +27,7 @@ from .base import FlextQualityAnalyzer
 
 
 class FlextQualityExternalBackend(FlextQualityAnalyzer):
-    """Backend using external tools like ruff, mypy, bandit, vulture."""
+    """Backend using external Python quality tools via subprocess."""
 
     @override
     def get_backend_type(self: object) -> BackendType:
@@ -31,231 +37,353 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer):
     @override
     def get_capabilities(self: object) -> list[str]:
         """Return the capabilities of this backend."""
-        return ["ruff", "mypy", "bandit", "vulture"]
+        return ["ruff", "mypy", "bandit", "vulture", "coverage", "radon"]
 
-    @override
-    def analyze(
+    def analyze(  # type: ignore[override]
         self,
-        _code: str,
+        code: str,
         file_path: Path | None = None,
         tool: str = "ruff",
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[dict[str, Any]]:
         """Analyze code using external tools.
 
         Args:
-        _code: Python source code to analyze
-        file_path: Optional file path for context
-        tool: Tool to use (ruff, mypy, bandit, vulture)
+            code: Python source code to analyze
+            file_path: Optional file path for context
+            tool: Tool to use (ruff, mypy, bandit, vulture, coverage, radon)
 
         Returns:
-        Dictionary with analysis results
+            FlextResult containing analysis results dict
 
         """
-        result: dict[str, object] = {"tool": "tool"}
-        temp_path: Path | None = None
-
-        if file_path:
-            result["file_path"] = str(file_path)
-
         # Create temporary file for analysis
+        temp_path = None
         try:
             with tempfile.NamedTemporaryFile(
-                encoding="utf-8",
                 mode="w",
                 suffix=".py",
                 delete=False,
+                encoding="utf-8",
             ) as f:
-                f.write(_code)
+                f.write(code)
                 temp_path = Path(f.name)
 
-            # Run the specified tool
+            # Route to appropriate tool
             if tool == "ruff":
-                ruff_result = self._run_ruff(_code, temp_path)
-                if ruff_result.is_failure:
-                    return FlextResult.fail(
-                        f"Ruff analysis failed: {ruff_result.error}"
-                    )
-                result.update(ruff_result.value)
-            elif tool == "mypy":
-                mypy_result = self._run_mypy(_code, temp_path)
-                if mypy_result.is_failure:
-                    return FlextResult.fail(
-                        f"MyPy analysis failed: {mypy_result.error}"
-                    )
-                result.update(mypy_result.value)
-            elif tool == "bandit":
-                bandit_result = self._run_bandit(_code, temp_path)
-                if bandit_result.is_failure:
-                    return FlextResult.fail(
-                        f"Bandit analysis failed: {bandit_result.error}"
-                    )
-                result.update(bandit_result.value)
-            elif tool == "vulture":
-                vulture_result = self._run_vulture(_code, temp_path)
-                if vulture_result.is_failure:
-                    return FlextResult.fail(
-                        f"Vulture analysis failed: {vulture_result.error}"
-                    )
-                result.update(vulture_result.value)
-            else:
-                return FlextResult.fail(f"Unknown tool: {tool}")
+                return self._run_ruff(temp_path)
+            if tool == "mypy":
+                return self._run_mypy(temp_path)
+            if tool == "bandit":
+                return self._run_bandit(temp_path)
+            if tool == "vulture":
+                return self._run_vulture(temp_path)
+            if tool == "coverage":
+                return self._run_coverage(temp_path)
+            if tool == "radon":
+                return self._run_radon(temp_path)
+            return FlextResult.fail(f"Unknown tool: {tool}")
 
-        except FileNotFoundError as e:
-            return FlextResult.fail(f"Tool {tool} not found: {e}")
-        except TimeoutError as e:
-            return FlextResult.fail(f"Tool {tool} timed out: {e}")
         except Exception as e:
-            return FlextResult.fail(f"Analysis failed: {e}")
+            return FlextResult.fail(f"Analysis setup failed: {e}")
         finally:
-            # Clean up temp file
-            if temp_path is not None:
+            # Cleanup temp file
+            if temp_path and temp_path.exists():
                 temp_path.unlink(missing_ok=True)
 
-        return FlextResult.ok(result)
+    # =========================================================================
+    # RUFF - Fast linting and formatting
+    # =========================================================================
 
-    def _convert_result_to_typed_dicts(
-        self,
-        result_list: list[object],
-    ) -> list[dict[str, object]]:
-        """Convert result list to properly typed dict[str, object] format."""
-        typed_results: list[dict[str, object]] = []
-        for item in result_list:
-            if isinstance(item, dict):
-                # Ensure all dict[str, object] values are properly typed as object
-                typed_dict: dict[str, object] = dict[str, object](item.items())
-                typed_results.append(typed_dict)
-            else:
-                # Convert non-dict items to dict[str, object] format
-                typed_results.append({"raw": str(item)})
-        return typed_results
+    def _run_ruff(self, file_path: Path) -> FlextResult[dict[str, Any]]:
+        """Run ruff linter with JSON output."""
+        result = FlextUtilities.run_external_command(
+            ["ruff", "check", str(file_path), "--output-format=json"],
+            capture_output=True,
+            timeout=30.0,
+        )
 
-    def _run_ruff(self, code: str, file_path: Path) -> FlextResult[dict[str, object]]:
-        """Run ruff linter using subprocess."""
-        try:
-            # Validate file path is safe (no shell injection)
-            if not file_path.exists() or not file_path.is_file():
-                return FlextResult.fail("Invalid file path")
-
-            # Use absolute path for security
-            abs_file_path = file_path.resolve()
-
-            # Run ruff with JSON output format using validated executable path
-            ruff_path = shutil.which("ruff")
-            if not ruff_path:
+        if result.is_failure:
+            error_msg = result.error or ""
+            if "not found" in error_msg.lower():
                 return FlextResult.ok({
+                    "tool": "ruff",
                     "issues": [],
-                    "ruff_available": False,
+                    "issue_count": 0,
+                    "status": "tool_not_found",
+                    "message": "ruff not installed",
                 })
+            if "timed out" in error_msg.lower():
+                return FlextResult.fail("ruff analysis timed out")
+            return FlextResult.fail(f"ruff analysis failed: {error_msg}")
 
-            # Execute ruff with validated path and arguments only
-            cmd_result = FlextUtilities.run_external_command(
-                cmd=[ruff_path, "check", str(abs_file_path), "--output-format", "json"],
-                capture_output=True,
-                text=True,
-                timeout=30.0,
-                check=False,
-            )
+        wrapper = result.unwrap()
 
-            if cmd_result.is_failure:
-                return FlextResult.fail(f"Ruff execution failed: {cmd_result.error}")
+        issues = []
+        if wrapper.stdout.strip():
+            try:
+                data = json.loads(wrapper.stdout)
+                if isinstance(data, list):
+                    issues = data
+            except json.JSONDecodeError:
+                pass
 
-            result = cmd_result.value
-            issues = self._parse_ruff_output(result.stdout) if result.stdout else []
+        return FlextResult.ok({
+            "tool": "ruff",
+            "issues": issues,
+            "issue_count": len(issues),
+            "status": "success" if wrapper.returncode == 0 else "issues_found",
+        })
 
-            return FlextResult.ok({
-                "issues": issues,
-                "code_length": len(code),
-                "ruff_available": True,
-            })
+    # =========================================================================
+    # MYPY - Type checking
+    # =========================================================================
 
-        except Exception as e:
-            return FlextResult.fail(f"Ruff analysis failed: {e}")
-
-    def _run_mypy(self, code: str, file_path: Path) -> FlextResult[dict[str, object]]:
+    def _run_mypy(self, file_path: Path) -> FlextResult[dict[str, Any]]:
         """Run mypy type checker."""
-        try:
-            # Validate file path is safe (no shell injection)
-            if not file_path.exists() or not file_path.is_file():
-                return FlextResult.fail("Invalid file path")
+        result = FlextUtilities.run_external_command(
+            ["mypy", str(file_path), "--json-report=/tmp", "--no-incremental"],
+            capture_output=True,
+            timeout=30.0,
+        )
 
-            # Prefer in-process API; avoid subprocess PATH lookups per policy
-            mypy_api = import_module("mypy.api") if util.find_spec("mypy.api") else None
-            if mypy_api is None:
+        if result.is_failure:
+            error_msg = result.error or ""
+            if "not found" in error_msg.lower():
                 return FlextResult.ok({
+                    "tool": "mypy",
                     "issues": [],
-                    "code_length": len(code),
-                    "mypy_available": False,
+                    "issue_count": 0,
+                    "status": "tool_not_found",
+                    "message": "mypy not installed",
                 })
+            if "timed out" in error_msg.lower():
+                return FlextResult.fail("mypy analysis timed out")
+            return FlextResult.fail(f"mypy analysis failed: {error_msg}")
 
-            stdout, _stderr, _status = mypy_api.run([str(file_path.resolve())])
-            issues = self._parse_mypy_output(stdout)
-            return FlextResult.ok({
-                "issues": issues,
-                "code_length": len(code),
-                "mypy_available": True,
-            })
+        wrapper = result.unwrap()
 
-        except Exception as e:
-            return FlextResult.fail(f"MyPy analysis failed: {e}")
+        issues = []
+        # Parse mypy output line by line
+        for line in wrapper.stdout.splitlines():
+            if line.strip():
+                try:
+                    error_data = json.loads(line)
+                    issues.append(error_data)
+                except json.JSONDecodeError:
+                    # Fall back to simple parsing
+                    if "error:" in line or "note:" in line:
+                        issues.append({"message": line.strip()})
 
-    def _run_bandit(self, code: str, file_path: Path) -> FlextResult[dict[str, object]]:
+        return FlextResult.ok({
+            "tool": "mypy",
+            "issues": issues,
+            "issue_count": len(issues),
+            "status": "success" if wrapper.returncode == 0 else "issues_found",
+        })
+
+    # =========================================================================
+    # BANDIT - Security scanning
+    # =========================================================================
+
+    def _run_bandit(self, file_path: Path) -> FlextResult[dict[str, Any]]:
         """Run bandit security scanner."""
-        try:
-            # Validate file path is safe (no shell injection)
-            if not file_path.exists() or not file_path.is_file():
-                return {"error": "Invalid file path"}
+        result = FlextUtilities.run_external_command(
+            ["bandit", "-f", "json", str(file_path)],
+            capture_output=True,
+            timeout=30.0,
+        )
 
-            # Use absolute path for bandit to avoid S607
+        if result.is_failure:
+            error_msg = result.error or ""
+            if "not found" in error_msg.lower():
+                return FlextResult.ok({
+                    "tool": "bandit",
+                    "issues": [],
+                    "issue_count": 0,
+                    "status": "tool_not_found",
+                    "message": "bandit not installed",
+                })
+            if "timed out" in error_msg.lower():
+                return FlextResult.fail("bandit analysis timed out")
+            return FlextResult.fail(f"bandit analysis failed: {error_msg}")
 
-            # Bandit lacks a stable public Python API in our environment.
-            # For security policy compliance, avoid spawning external processes here.
-            # Advise manual execution through CLI integration.
-            return {
-                "error": "Bandit in-process execution not supported; run bandit -f json <file> manually",
-                "code_length": len(code),
-            }
+        wrapper = result.unwrap()
 
-        except Exception as e:
-            return {"error": str(e)}
+        issues = []
+        if wrapper.stdout.strip():
+            try:
+                data = json.loads(wrapper.stdout)
+                # Extract issues from bandit JSON output
+                if isinstance(data, dict) and "results" in data:
+                    issues = data["results"]
+            except json.JSONDecodeError:
+                pass
 
-    def _run_vulture(
-        self, code: str, file_path: Path
-    ) -> FlextResult[dict[str, object]]:
+        return FlextResult.ok({
+            "tool": "bandit",
+            "issues": issues,
+            "issue_count": len(issues),
+            "status": "success" if wrapper.returncode == 0 else "issues_found",
+        })
+
+    # =========================================================================
+    # VULTURE - Dead code detection
+    # =========================================================================
+
+    def _run_vulture(self, file_path: Path) -> FlextResult[dict[str, Any]]:
         """Run vulture dead code detector."""
-        try:
-            # Validate file path is safe (no shell injection)
-            if not file_path.exists() or not file_path.is_file():
-                return {"error": "Invalid file path"}
+        result = FlextUtilities.run_external_command(
+            ["vulture", str(file_path), "--json"],
+            capture_output=True,
+            timeout=30.0,
+        )
 
-            # Use absolute path for vulture to avoid S607
+        if result.is_failure:
+            error_msg = result.error or ""
+            if "not found" in error_msg.lower():
+                return FlextResult.ok({
+                    "tool": "vulture",
+                    "issues": [],
+                    "issue_count": 0,
+                    "status": "tool_not_found",
+                    "message": "vulture not installed",
+                })
+            if "timed out" in error_msg.lower():
+                return FlextResult.fail("vulture analysis timed out")
+            return FlextResult.fail(f"vulture analysis failed: {error_msg}")
 
-            # Vulture has no stable in-process API here; avoid subprocess for policy compliance.
-            return {
-                "error": "Vulture in-process execution not supported; run vulture <file> manually",
-                "code_length": len(code),
-            }
+        wrapper = result.unwrap()
 
-        except Exception as e:
-            return {"error": str(e)}
+        issues = []
+        if wrapper.stdout.strip():
+            try:
+                data = json.loads(wrapper.stdout)
+                if isinstance(data, list):
+                    issues = data
+            except json.JSONDecodeError:
+                pass
 
-    def _parse_ruff_output(self, output: str) -> list[dict[str, object]]:
-        """Parse ruff JSON output."""
-        try:
-            if output.strip():
-                result: FlextResult[object] = json.loads(output)
-                # Safe type conversion
-                if isinstance(result, list):
-                    return self._convert_result_to_typed_dicts(result)
-                return []
-            return []
-        except json.JSONDecodeError:
-            return []
+        return FlextResult.ok({
+            "tool": "vulture",
+            "issues": issues,
+            "issue_count": len(issues),
+            "status": "success" if wrapper.returncode == 0 else "issues_found",
+        })
 
-    def _parse_mypy_output(self, output: str) -> list[dict[str, object]]:
-        """Parse mypy text output."""
-        issues: list[dict[str, object]] = []
-        for line in output.splitlines():
-            if "error:" in line or "warning:" in line:
-                issue: dict[str, object] = {"message": line.strip()}
-                issues.append(issue)
-        return issues
+    # =========================================================================
+    # COVERAGE - Test coverage measurement
+    # =========================================================================
+
+    def _run_coverage(self, file_path: Path) -> FlextResult[dict[str, Any]]:
+        """Run coverage to measure test coverage."""
+        result = FlextUtilities.run_external_command(
+            [
+                "coverage",
+                "run",
+                "-m",
+                "pytest",
+                str(file_path),
+                "--cov=.",
+                "--cov-report=json",
+            ],
+            capture_output=True,
+            timeout=60.0,
+            cwd=tempfile.gettempdir(),
+        )
+
+        if result.is_failure:
+            error_msg = result.error or ""
+            if "not found" in error_msg.lower():
+                return FlextResult.ok({
+                    "tool": "coverage",
+                    "coverage_data": {},
+                    "status": "tool_not_found",
+                    "message": "coverage/pytest not installed",
+                })
+            if "timed out" in error_msg.lower():
+                return FlextResult.fail("coverage analysis timed out")
+            return FlextResult.fail(f"coverage analysis failed: {error_msg}")
+
+        wrapper = result.unwrap()
+
+        coverage_data = {}
+        if wrapper.stdout.strip():
+            # Try to parse coverage JSON if it was generated
+            coverage_path = Path(tempfile.gettempdir()) / ".coverage.json"
+            if coverage_path.exists():
+                try:
+                    with Path(coverage_path).open(encoding="utf-8") as f:
+                        coverage_data = json.load(f)
+                except json.JSONDecodeError:
+                    # Invalid JSON in coverage file - use empty data instead
+                    coverage_data = {}
+                except FileNotFoundError:
+                    # Coverage file was not created - use empty data
+                    coverage_data = {}
+                except Exception:
+                    # Unexpected error reading coverage file - use empty data
+                    coverage_data = {}
+
+        return FlextResult.ok({
+            "tool": "coverage",
+            "coverage_data": coverage_data,
+            "status": "success" if wrapper.returncode == 0 else "incomplete",
+            "message": "Coverage measurement complete"
+            if coverage_data
+            else "No coverage data",
+        })
+
+    # =========================================================================
+    # RADON - Complexity metrics
+    # =========================================================================
+
+    def _run_radon(self, file_path: Path) -> FlextResult[dict[str, Any]]:
+        """Run radon for complexity metrics."""
+        # First call: complexity
+        result_cc = FlextUtilities.run_external_command(
+            ["radon", "cc", str(file_path), "-j"],
+            capture_output=True,
+            timeout=30.0,
+        )
+
+        if result_cc.is_failure:
+            error_msg = result_cc.error or ""
+            if "not found" in error_msg.lower():
+                return FlextResult.ok({
+                    "tool": "radon",
+                    "complexity": {},
+                    "maintainability": {},
+                    "status": "tool_not_found",
+                    "message": "radon not installed",
+                })
+            if "timed out" in error_msg.lower():
+                return FlextResult.fail("radon analysis timed out")
+            return FlextResult.fail(f"radon analysis failed: {error_msg}")
+
+        wrapper_cc = result_cc.unwrap()
+
+        metrics = {}
+        if wrapper_cc.stdout.strip():
+            with contextlib.suppress(json.JSONDecodeError):
+                metrics = json.loads(wrapper_cc.stdout)
+
+        # Also get maintainability index
+        result_mi = FlextUtilities.run_external_command(
+            ["radon", "mi", str(file_path), "-j"],
+            capture_output=True,
+            timeout=30.0,
+        )
+
+        maintainability = {}
+        if result_mi.is_success:
+            wrapper_mi = result_mi.unwrap()
+            if wrapper_mi.stdout.strip():
+                with contextlib.suppress(json.JSONDecodeError):
+                    maintainability = json.loads(wrapper_mi.stdout)
+
+        return FlextResult.ok({
+            "tool": "radon",
+            "complexity": metrics,
+            "maintainability": maintainability,
+            "status": "success",
+        })

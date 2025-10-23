@@ -548,5 +548,155 @@
     "last_checked": 1760739919.1122487,
     "content_type": null,
     "redirect_url": null
+  },
+  "https://github.com/flext-sh/flext-quality/discussions": {
+    "url": "https://github.com/flext-sh/flext-quality/discussions",
+    "status": "broken",
+    "status_code": 404,
+    "error_message": "HTTP Error 404: Not Found",
+    "response_time": 0.3549966812133789,
+    "last_checked": 1761226919.5263352,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://github.com/flext-sh/flext-quality/issues": {
+    "url": "https://github.com/flext-sh/flext-quality/issues",
+    "status": "broken",
+    "status_code": 404,
+    "error_message": "HTTP Error 404: Not Found",
+    "response_time": 0.5156459808349609,
+    "last_checked": 1761226919.6863134,
+    "content_type": null,
+    "redirect_url": null
+  },
+  "https://www.python-httpx.org/": {
+    "url": "https://www.python-httpx.org/",
+    "status": "valid",
+    "status_code": 200,
+    "error_message": null,
+    "response_time": 0.35087108612060547,
+    "last_checked": 1761226920.0394785,
+    "content_type": "text/html; charset=utf-8",
+    "redirect_url": null
+  },
+  "https://typer.tiangolo.com/": {
+    "url": "https://typer.tiangolo.com/",
+    "status": "valid",
+    "status_code": 200,
+    "error_message": null,
+    "response_time": 0.4841644763946533,
+    "last_checked": 1761226920.1716492,
+    "content_type": "text/html; charset=utf-8",
+    "redirect_url": null
+  },
+  "https://pypi.org/project/tabulate/": {
+    "url": "https://pypi.org/project/tabulate/",
+    "status": "valid",
+    "status_code": 200,
+    "error_message": null,
+    "response_time": 0.24764466285705566,
+    "last_checked": 1761226920.4193769,
+    "content_type": "text/html; charset=UTF-8",
+    "redirect_url": null
+  },
+  "https://anyio.readthedocs.io/": {
+    "url": "https://anyio.readthedocs.io/",
+    "status": "valid",
+    "status_code": 200,
+    "error_message": null,
+    "response_time": 0.7982754707336426,
+    "last_checked": 1761226920.4870086,
+    "content_type": "text/html; charset=utf-8",
+    "redirect_url": "https://anyio.readthedocs.io/en/stable/"
+  },
+  "https://rich.readthedocs.io/": {
+    "url": "https://rich.readthedocs.io/",
+    "status": "valid",
+    "status_code": 200,
+    "error_message": null,
+    "response_time": 0.8016729354858398,
+    "last_checked": 1761226920.4893367,
+    "content_type": "text/html; charset=utf-8",
+    "redirect_url": "https://rich.readthedocs.io/en/stable/"
+  },
+  "https://markdown-it-py.readthedocs.io/": {
+    "url": "https://markdown-it-py.readthedocs.io/",
+    "status": "valid",
+    "status_code": 200,
+    "error_message": null,
+    "response_time": 1.0072953701019287,
+    "last_checked": 1761226920.6961434,
+    "content_type": "text/html; charset=utf-8",
+    "redirect_url": "https://markdown-it-py.readthedocs.io/en/latest/"
+  },
+  "https://jinja.palletsprojects.com/": {
+    "url": "https://jinja.palletsprojects.com/",
+    "status": "valid",
+    "status_code": 200,
+    "error_message": null,
+    "response_time": 0.859400749206543,
+    "last_checked": 1761226920.8989828,
+    "content_type": "text/html; charset=utf-8",
+    "redirect_url": "https://jinja.palletsprojects.com/en/stable/"
+  },
+  "https://pyyaml.org/": {
+    "url": "https://pyyaml.org/",
+    "status": "valid",
+    "status_code": 200,
+    "error_message": null,
+    "response_time": 0.4273700714111328,
+    "last_checked": 1761226920.9145095,
+    "content_type": "text/html; charset=utf-8",
+    "redirect_url": null
+  },
+  "https://pypi.org/project/pathspec/": {
+    "url": "https://pypi.org/project/pathspec/",
+    "status": "valid",
+    "status_code": 200,
+    "error_message": null,
+    "response_time": 0.2521188259124756,
+    "last_checked": 1761226920.9483802,
+    "content_type": "text/html; charset=utf-8",
+    "redirect_url": null
+  },
+  "https://maxbachmann.github.io/RapidFuzz/": {
+    "url": "https://maxbachmann.github.io/RapidFuzz/",
+    "status": "valid",
+    "status_code": 200,
+    "error_message": null,
+    "response_time": 0.30422377586364746,
+    "last_checked": 1761226921.203331,
+    "content_type": "text/html; charset=utf-8",
+    "redirect_url": null
+  },
+  "https://apscheduler.readthedocs.io/": {
+    "url": "https://apscheduler.readthedocs.io/",
+    "status": "valid",
+    "status_code": 200,
+    "error_message": null,
+    "response_time": 0.799353837966919,
+    "last_checked": 1761226921.288845,
+    "content_type": "text/html; charset=utf-8",
+    "redirect_url": "https://apscheduler.readthedocs.io/en/3.x/"
+  },
+  "https://docs.pydantic.dev/": {
+    "url": "https://docs.pydantic.dev/",
+    "status": "valid",
+    "status_code": 200,
+    "error_message": null,
+    "response_time": 1.003436803817749,
+    "last_checked": 1761226921.4229426,
+    "content_type": "text/html; charset=utf-8",
+    "redirect_url": "https://docs.pydantic.dev/latest/"
+  },
+  "https://www.structlog.org/": {
+    "url": "https://www.structlog.org/",
+    "status": "valid",
+    "status_code": 200,
+    "error_message": null,
+    "response_time": 0.8471715450286865,
+    "last_checked": 1761226921.7618065,
+    "content_type": "text/html; charset=utf-8",
+    "redirect_url": "https://www.structlog.org/en/stable/"
   }
 }

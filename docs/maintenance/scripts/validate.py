@@ -18,6 +18,7 @@ import re
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import requests
 
@@ -134,7 +135,7 @@ class LinkValidator:
 
     def validate_external_links(
         self, links: list[dict], verbose: bool = False
-    ) -> dict[str, object]:
+    ) -> dict[str, Any]:
         """Validate external links with concurrent checking."""
         external_links = [link for link in links if link["type"] == "external"]
 
@@ -164,7 +165,7 @@ class LinkValidator:
 
     def _check_single_external_link(
         self, link: dict, verbose: bool = False
-    ) -> dict[str, object]:
+    ) -> dict[str, Any]:
         """Check a single external link."""
         url = link["url"]
 
@@ -252,7 +253,7 @@ class LinkValidator:
 
     def validate_internal_links(
         self, links: list[dict], doc_files: list[Path]
-    ) -> dict[str, object]:
+    ) -> dict[str, Any]:
         """Validate internal links and references."""
         internal_links = [
             link for link in links if link["type"] in {"internal", "reference"}
@@ -316,9 +317,7 @@ class LinkValidator:
             return base_dir.parent / target[3:]
         return Path(target)
 
-    def validate_images(
-        self, links: list[dict], project_root: Path
-    ) -> dict[str, object]:
+    def validate_images(self, links: list[dict], project_root: Path) -> dict[str, Any]:
         """Validate image references."""
         images = [link for link in links if link["type"] == "image"]
 
@@ -358,7 +357,7 @@ class LinkValidator:
 
     def validate_anchors(
         self, links: list[dict], doc_files: list[Path]
-    ) -> dict[str, object]:
+    ) -> dict[str, Any]:
         """Validate anchor links within documents."""
         anchor_links = [link for link in links if link["type"] == "anchor"]
 
@@ -418,7 +417,7 @@ class LinkValidator:
         )  # Remove special chars except spaces and hyphens
         return re.sub(r"\s+", "-", anchor)  # Replace spaces with hyphens
 
-    def check_link_text_quality(self, links: list[dict]) -> dict[str, object]:
+    def check_link_text_quality(self, links: list[dict]) -> dict[str, Any]:
         """Check quality of link text for accessibility and usability."""
         poor_link_texts = [
             "here",
@@ -488,7 +487,7 @@ class ContentValidator:
             "quality_metrics": {},
         }
 
-    def validate_markdown_syntax(self, doc_files: list[Path]) -> dict[str, object]:
+    def validate_markdown_syntax(self, doc_files: list[Path]) -> dict[str, Any]:
         """Validate markdown syntax and formatting."""
         for file_path in doc_files:
             try:
@@ -554,7 +553,7 @@ class ContentValidator:
 
         return issues
 
-    def check_content_quality(self, doc_files: list[Path]) -> dict[str, object]:
+    def check_content_quality(self, doc_files: list[Path]) -> dict[str, Any]:
         """Check content quality metrics."""
         for file_path in doc_files:
             try:
@@ -591,7 +590,7 @@ class ContentValidator:
 
         return self.results
 
-    def _calculate_content_metrics(self, content: str) -> dict[str, object]:
+    def _calculate_content_metrics(self, content: str) -> dict[str, Any]:
         """Calculate basic content quality metrics."""
         words = re.findall(r"\b\w+\b", content)
         sentences = re.split(r"[.!?]+", content)
