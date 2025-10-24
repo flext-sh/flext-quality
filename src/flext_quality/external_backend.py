@@ -39,7 +39,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer):
         """Return the capabilities of this backend."""
         return ["ruff", "mypy", "bandit", "vulture", "coverage", "radon"]
 
-    def analyze(  # type: ignore[override]
+    def analyze(
         self,
         code: str,
         file_path: Path | None = None,

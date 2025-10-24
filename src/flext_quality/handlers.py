@@ -284,7 +284,7 @@ class RunLintingHandler:
     def run_linting(self, project_id: object) -> FlextResult[object]:
         """Run linting checks on project."""
         try:
-            result = self._handlers.run_linting(project_id)  # type: ignore
+            result = self._handlers.run_linting(project_id)
 
             if result.is_failure:
                 return FlextResult.fail(f"Linting failed: {result.error}")
@@ -307,7 +307,7 @@ class RunSecurityCheckHandler:
     def run_security_check(self, project_id: object) -> FlextResult[object]:
         """Run security checks on project."""
         try:
-            result = self._handlers.run_security_check(project_id)  # type: ignore
+            result = self._handlers.run_security_check(project_id)
 
             if result.is_failure:
                 return FlextResult.fail(f"Security check failed: {result.error}")

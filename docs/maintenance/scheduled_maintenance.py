@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
-import schedule  # type: ignore[import-not-found]
+import schedule
 import yaml
 from git import InvalidGitRepositoryError, Repo
 
