@@ -1,4 +1,5 @@
 # C4 Model - FLEXT Quality Architecture
+
 ## Table of Contents
 
 - [C4 Model - FLEXT Quality Architecture](#c4-model---flext-quality-architecture)
@@ -33,7 +34,6 @@
   - [📋 Quality Assurance](#-quality-assurance)
     - [Architecture Review Checklist](#architecture-review-checklist)
     - [Documentation Standards](#documentation-standards)
-
 
 **C4 Model Views**: System Context → Containers → Components → Code
 

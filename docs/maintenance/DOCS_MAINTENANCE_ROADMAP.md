@@ -1,4 +1,5 @@
 # Documentation Maintenance Modernization Roadmap
+
 ## Table of Contents
 
 - [Documentation Maintenance Modernization Roadmap](#documentation-maintenance-modernization-roadmap)
@@ -11,14 +12,13 @@
   - [Cross-Cutting Workstreams](#cross-cutting-workstreams)
   - [Progress Log](#progress-log)
 
-
 > Scope: Consolidate and enhance documentation maintenance across all FLEXT projects (32+ repos) using shared tooling provided by `flext-quality`.
 
 ## Guiding Principles
 
 - **Centralize capabilities** in `flext-quality`, exposing profile-based APIs so individual projects remain thin wrappers.
 - **Configuration over code**: project-specific behavior is driven entirely through metadata (`docs/maintenance/config.*`,
-     schedules, notifications).
+  schedules, notifications).
 - **Automation first**: every task produce machine-readable output (JSON) and human-friendly Markdown; HTML and dashboards extend the same data.
 - **Iterative rollout**: ship in slices (pilot repos → full portfolio) with validation gates at every stage.
 
@@ -103,7 +103,7 @@
 
 - **2025-10-16** – Initiated Phase 1 metadata inventory. Current findings:
   - Detected active maintenance directories in `flext-grpc`, `flext-ldap`, `flext-observability`, `flext-quality`,
-     and `client-b-meltano-native`.
+    and `client-b-meltano-native`.
   - Collected configuration files for shared tooling:
     - `flext-grpc/docs/maintenance/config.json`
     - `flext-ldap/docs/maintenance/config.yaml`
@@ -112,43 +112,43 @@
   - Next: expand search depth, document artifacts (Markdown/HTML/JSON) per repo, and align schema comparisons.
 - **2025-10-16** – Completed high-level artifact inventory for detected projects:
   - `flext-grpc`: maintenance scripts (`audit.py`, `validation.py`, `optimization.py`, `reporting.py`, `sync.py`),
-     user documentation (`README.md`, `user-guide.md`, `troubleshooting.md`, `api-reference.md`), `Makefile`,
-     and `requirements.txt`.
+    user documentation (`README.md`, `user-guide.md`, `troubleshooting.md`, `api-reference.md`), `Makefile`,
+    and `requirements.txt`.
   - `flext-ldap`: wrappers for shared tooling, configuration (`config.yaml`), legacy scripts (`run_maintenance.sh`),
-     documentation (`README.md`, `user-guide.md`, `troubleshooting.md`), and cache artifacts (`.link_cache.json`).
+    documentation (`README.md`, `user-guide.md`, `troubleshooting.md`), and cache artifacts (`.link_cache.json`).
   - `flext-observability`: standalone Audit script (`audit/content-audit.py`) with associated reports (`dead_code_analysis.md`,
-     `dead_code_cleanup_summary.md`, `README.md`).
+    `dead_code_cleanup_summary.md`, `README.md`).
   - `client-b-meltano-native`: single maintenance `README.md` identified; no automation scripts present yet.
   - Next: map each artifact to the shared capabilities matrix (audit/validation/optimization/reporting),
-     evaluate gaps against target schema, and prepare normalization checklist.
+    evaluate gaps against target schema, and prepare normalization checklist.
 - **2025-10-16** – Capability mapping against shared maintenance pillars:
 
-  | Repository                | Audit                           | Validation                                    | Optimization           | Reporting                                | Sync           | Config Format                               | Notes                                                                          |
-  | ------------------------- | ------------------------------- | --------------------------------------------- | ---------------------- | ---------------------------------------- | -------------- | ------------------------------------------- | ------------------------------------------------------------------------------ |
-  | `flext-grpc`              | ✅ (`audit.py`)                 | ✅ (`validation.py`)                          | ✅ (`optimization.py`) | ✅ (`reporting.py`,
-     HTML/CSV dashboards) | ✅ (`sync.py`) | `config.json`                               | Full standalone toolchain with Makefile + requirements.                        |
-  | `flext-ldap`              | ✅ (wrappers to shared profile) | ✅ (`validate_links.py`,
-     `validate_style.py`) | ✅ (`optimize.py`)     | ✅ (`report.py`)                         | ✅ (`sync.py`) | `config.yaml`                               | Uses shared infrastructure plus legacy shell runner; includes cache artifacts. |
-  | `flext-observability`     | ✅ (`audit/content-audit.py`)   | ❌                                            | ❌                     | ⚠️ Markdown summaries only               | ❌             | config embedded in script (`yaml` optional) | Lightweight audit only; no automation scripts detected.                        |
-  | `client-b-meltano-native` | ❌                              | ❌                                            | ❌                     | ❌                                       | ❌             | None                                        | Documentation guidance only; no executable maintenance code.                   |
+  | Repository                | Audit                           | Validation               | Optimization                                            | Reporting                  | Sync                                                                           | Config Format                               | Notes                                                        |
+  | ------------------------- | ------------------------------- | ------------------------ | ------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------- | ------------------------------------------------------------ |
+  | `flext-grpc`              | ✅ (`audit.py`)                 | ✅ (`validation.py`)     | ✅ (`optimization.py`)                                  | ✅ (`reporting.py`,        |
+  | HTML/CSV dashboards)      | ✅ (`sync.py`)                  | `config.json`            | Full standalone toolchain with Makefile + requirements. |
+  | `flext-ldap`              | ✅ (wrappers to shared profile) | ✅ (`validate_links.py`, |
+  | `validate_style.py`)      | ✅ (`optimize.py`)              | ✅ (`report.py`)         | ✅ (`sync.py`)                                          | `config.yaml`              | Uses shared infrastructure plus legacy shell runner; includes cache artifacts. |
+  | `flext-observability`     | ✅ (`audit/content-audit.py`)   | ❌                       | ❌                                                      | ⚠️ Markdown summaries only | ❌                                                                             | config embedded in script (`yaml` optional) | Lightweight audit only; no automation scripts detected.      |
+  | `client-b-meltano-native` | ❌                              | ❌                       | ❌                                                      | ❌                         | ❌                                                                             | None                                        | Documentation guidance only; no executable maintenance code. |
 
   - Observed schema divergence: JSON-based config (`flext-grpc`) vs YAML (`flext-ldap`) vs inline defaults (`flext-observability`).
   - Next: draft normalization checklist (config schema conversion, capability gaps,
-     wrapper migration plan) and define acceptance tests per capability pillar.
+    wrapper migration plan) and define acceptance tests per capability pillar.
 
 - **2025-10-16** – Published detailed metadata inventory (`docs/maintenance/METADATA_INVENTORY.md`) summarizing directories,
-     config formats, markdown deliverables,
-     and automation scripts per repository. Established normalization checklist covering schema conversion,
-     capability gap closure, report naming, and automation mapping.
+  config formats, markdown deliverables,
+  and automation scripts per repository. Established normalization checklist covering schema conversion,
+  capability gap closure, report naming, and automation mapping.
 - **2025-10-16** – Completed initial tooling audit (`docs/maintenance/TOOLING_AUDIT.md`) highlighting candidate libraries for CLI modernization (Typer,
-     Rich), async validation (`httpx`), templated reporting (Jinja2), configuration validation (pydantic),
-     and supporting utilities (pathspec, rapidfuzz).
+  Rich), async validation (`httpx`), templated reporting (Jinja2), configuration validation (pydantic),
+  and supporting utilities (pathspec, rapidfuzz).
 - **2025-10-16** – Implemented shared reporting enhancements: default output format now Markdown,
-     centralized export pipeline (`ReportGenerator.export_report`) produces timestamped Markdown/JSON/HTML artifacts with `latest_*` pointers,
-     and `DocumentationMaintainer` records generated outputs plus quality metrics.
+  centralized export pipeline (`ReportGenerator.export_report`) produces timestamped Markdown/JSON/HTML artifacts with `latest_*` pointers,
+  and `DocumentationMaintainer` records generated outputs plus quality metrics.
 - **2025-10-16** – Completed Phase 1 standardization wave: introduced the shared Typer CLI (`src/flext_quality/docs_maintenance/cli.py`) and extended the orchestrator to support programmatic handlers; removed legacy project-side scripts in `flext-ldap`,
-     `flext-grpc`, `flext-observability`,
-     and `client-b-meltano-native`; converted per-project configs to the normalized YAML schema; and wired new `docs-maintenance` Makefile targets that invoke the shared runner with Markdown-only output.
+  `flext-grpc`, `flext-observability`,
+  and `client-b-meltano-native`; converted per-project configs to the normalized YAML schema; and wired new `docs-maintenance` Makefile targets that invoke the shared runner with Markdown-only output.
 - **2025-10-16** – Unified profile layout: removed the dedicated `grpc` maintenance profile in favour of the shared advanced toolkit,
-     mapped legacy profile slugs to the consolidated module,
-     and confirmed all projects execute through the same Markdown-first workflow via their Makefile targets.
+  mapped legacy profile slugs to the consolidated module,
+  and confirmed all projects execute through the same Markdown-first workflow via their Makefile targets.

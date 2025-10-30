@@ -1,4 +1,5 @@
 # Documentation Maintenance & Quality Assurance System
+
 ## Table of Contents
 
 - [Documentation Maintenance & Quality Assurance System](#documentation-maintenance--quality-assurance-system)
@@ -12,32 +13,32 @@
 - [Install core dependencies](#install-core-dependencies)
 - [For full functionality (async validation, HTML reports)](#for-full-functionality-async-validation-html-reports)
 - [Optional: For advanced content analysis](#optional-for-advanced-content-analysis)
-    - [Directory Structure Setup](#directory-structure-setup)
+  - [Directory Structure Setup](#directory-structure-setup)
 - [Ensure you're in the project root](#ensure-youre-in-the-project-root)
 - [The maintenance system should be properly set up at:](#the-maintenance-system-should-be-properly-set-up-at)
-- [README.md  demo.py  scripts/  config/  tools/  reports/](#readmemd--demopy--scripts--config--tools--reports)
-    - [Configuration Validation](#configuration-validation)
+- [README.md demo.py scripts/ config/ tools/ reports/](#readmemd--demopy--scripts--config--tools--reports)
+  - [Configuration Validation](#configuration-validation)
 - [Verify configuration files exist](#verify-configuration-files-exist)
-- [audit_rules.yaml  style_guide.yaml  validation_config.yaml](#audit_rulesyaml--style_guideyaml--validation_configyaml)
+- [audit_rules.YAML style_guide.YAML validation_config.YAML](#audit_rulesyaml--style_guideyaml--validation_configyaml)
 - [Test configuration loading](#test-configuration-loading)
   - [🚀 Quick Start](#-quick-start)
     - [Interactive Demo](#interactive-demo)
 - [Run the complete interactive demonstration](#run-the-complete-interactive-demonstration)
-    - [Run Complete Audit](#run-complete-audit)
-    - [Validate Links and References](#validate-links-and-references)
-    - [Generate Quality Report](#generate-quality-report)
-    - [Automated Maintenance (CI/CD)](#automated-maintenance-cicd)
+  - [Run Complete Audit](#run-complete-audit)
+  - [Validate Links and References](#validate-links-and-references)
+  - [Generate Quality Report](#generate-quality-report)
+  - [Automated Maintenance (CI/CD)](#automated-maintenance-cicd)
 - [Add to CI/CD pipeline](#add-to-cicd-pipeline)
 - [Generate and publish reports](#generate-and-publish-reports)
   - [🔄 CI/CD Integration & Automation](#-cicd-integration--automation)
     - [GitHub Actions Example](#github-actions-example)
 - [.github/workflows/docs-maintenance.yml](#githubworkflowsdocs-maintenanceyml)
-    - [GitLab CI Example](#gitlab-ci-example)
+  - [GitLab CI Example](#gitlab-ci-example)
 - [.gitlab-ci.yml (partial)](#gitlab-ciyml-partial)
 - [Scheduled pipeline for regular maintenance](#scheduled-pipeline-for-regular-maintenance)
-    - [Pre-commit Hooks](#pre-commit-hooks)
-- [.pre-commit-config.yaml](#pre-commit-configyaml)
-    - [Scheduled Maintenance](#scheduled-maintenance)
+  - [Pre-commit Hooks](#pre-commit-hooks)
+- [.pre-commit-config.YAML](#pre-commit-configyaml)
+  - [Scheduled Maintenance](#scheduled-maintenance)
 - [Add to crontab for regular maintenance](#add-to-crontab-for-regular-maintenance)
 - [Daily quality checks](#daily-quality-checks)
 - [Weekly comprehensive audit](#weekly-comprehensive-audit)
@@ -54,15 +55,15 @@
 - [Full documentation quality assessment](#full-documentation-quality-assessment)
 - [Quick audit with specific checks](#quick-audit-with-specific-checks)
 - [CI/CD mode with exit codes](#cicd-mode-with-exit-codes)
-    - [Link Validation (`scripts/validate.py`)](#link-validation-scriptsvalidatepy)
+  - [Link Validation (`scripts/validate.py`)](#link-validation-scriptsvalidatepy)
 - [Check all external links](#check-all-external-links)
 - [Validate internal references](#validate-internal-references)
 - [Check image references](#check-image-references)
-    - [Content Optimization (`scripts/optimize.py`)](#content-optimization-scriptsoptimizepy)
+  - [Content Optimization (`scripts/optimize.py`)](#content-optimization-scriptsoptimizepy)
 - [Auto-fix formatting issues](#auto-fix-formatting-issues)
 - [Update table of contents](#update-table-of-contents)
 - [Optimize for readability](#optimize-for-readability)
-    - [Quality Reporting (`scripts/report.py`)](#quality-reporting-scriptsreportpy)
+  - [Quality Reporting (`scripts/report.py`)](#quality-reporting-scriptsreportpy)
 - [Generate HTML report](#generate-html-report)
 - [JSON data export](#json-data-export)
 - [Send notifications](#send-notifications)
@@ -74,7 +75,7 @@
 - [Daily quality checks](#daily-quality-checks)
 - [Weekly comprehensive audit](#weekly-comprehensive-audit)
 - [Monthly trend analysis](#monthly-trend-analysis)
-    - [CI/CD Integration](#cicd-integration)
+  - [CI/CD Integration](#cicd-integration)
 - [.github/workflows/docs-maintenance.yml](#githubworkflowsdocs-maintenanceyml)
   - [📋 Maintenance Procedures](#-maintenance-procedures)
     - [Weekly Maintenance](#weekly-maintenance)
@@ -91,7 +92,7 @@
 - [Check Python dependencies](#check-python-dependencies)
 - [Verify file permissions](#verify-file-permissions)
 - [Check configuration files](#check-configuration-files)
-- [Update timeout in config/validation_config.yaml](#update-timeout-in-configvalidation_configyaml)
+- [Update timeout in config/validation_config.YAML](#update-timeout-in-configvalidation_configyaml)
 - [Review style guide configuration](#review-style-guide-configuration)
 - [Run with verbose output](#run-with-verbose-output)
   - [📚 API Reference](#-api-reference)
@@ -110,11 +111,11 @@
     - [Performance Benchmarks](#performance-benchmarks)
   - [🔧 Customization & Extension](#-customization--extension)
     - [Adding Custom Rules](#adding-custom-rules)
-- [Extend audit_rules.yaml with custom checks](#extend-audit_rulesyaml-with-custom-checks)
+- [Extend audit_rules.YAML with custom checks](#extend-audit_rulesyaml-with-custom-checks)
 - [Create custom validator](#create-custom-validator)
-    - [Integrating New Tools](#integrating-new-tools)
+  - [Integrating New Tools](#integrating-new-tools)
 - [Add new validation tools to the pipeline](#add-new-validation-tools-to-the-pipeline)
-    - [API Integration](#api-integration)
+  - [API Integration](#api-integration)
 - [REST API for external integrations](#rest-api-for-external-integrations)
   - [📈 Roadmap & Future Enhancements](#-roadmap--future-enhancements)
     - [Phase 1: Core Features ✅](#phase-1-core-features-)
@@ -132,11 +133,10 @@
     - [✅ Automation Setup](#-automation-setup)
     - [✅ Team Training](#-team-training)
 
-
 **Version**: 1.0.0 | **Status**: Active | **Updated**: 2025-10-10
 
 Comprehensive documentation maintenance framework providing automated quality assurance, validation, optimization,
-     and reporting for FLEXT Quality documentation.
+and reporting for FLEXT Quality documentation.
 
 ## 🎯 Purpose
 
@@ -948,5 +948,5 @@ api.run(port=8080)
 ---
 
 **FLEXT Quality Documentation Maintenance System** - Enterprise-grade documentation quality assurance with comprehensive automation,
-     validation,
-     and reporting capabilities. Ensuring documentation excellence through intelligent analysis and continuous improvement. 🚀
+validation,
+and reporting capabilities. Ensuring documentation excellence through intelligent analysis and continuous improvement. 🚀

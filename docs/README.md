@@ -1,4 +1,5 @@
 # FLEXT Quality Documentation
+
 ## Table of Contents
 
 - [FLEXT Quality Documentation](#flext-quality-documentation)
@@ -24,7 +25,6 @@
   - [Documentation Maintenance Baseline](#documentation-maintenance-baseline)
   - [Contributing to Documentation](#contributing-to-documentation)
   - [Support and Feedback](#support-and-feedback)
-
 
 **Version**: 0.9.9 RC | **Status**: Solid Architecture with Critical Gaps · 1.0.0 Release Preparation | **Updated**: 2025-09-17
 
@@ -167,7 +167,7 @@ This documentation follows FLEXT ecosystem standards:
 - Project-level configurations are normalized to YAML (see [`maintenance/config`](maintenance/config/)) with defaults documented in [`DOCS_MAINTENANCE_ROADMAP.md`](maintenance/DOCS_MAINTENANCE_ROADMAP.md) and [`METADATA_INVENTORY.md`](maintenance/METADATA_INVENTORY.md).
 - Report generation now emits Markdown by default (timestamped artifacts plus `latest_report.*` pointers) with optional JSON/HTML outputs controlled through the `reporting.output_formats` config.
 - All repositories tethering to this tooling should keep metadata in `docs/maintenance/` (config, scripts,
-     reports) to benefit from shared audits, validation, optimization, and synchronization flows.
+  reports) to benefit from shared audits, validation, optimization, and synchronization flows.
 
 ## Contributing to Documentation
 
