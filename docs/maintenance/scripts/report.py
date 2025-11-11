@@ -438,6 +438,9 @@ class DocumentationReporter:
 
     def _generate_charts(self, data: dict[str, Any]) -> dict[str, str] | None:
         """Generate charts for the report (placeholder for future implementation)."""
+        # Reserved for future matplotlib chart generation
+        _ = data  # Reserved for future use
+
         # This would generate matplotlib charts and return base64 encoded images
         # For now, return None
         return None

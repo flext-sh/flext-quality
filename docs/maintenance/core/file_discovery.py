@@ -227,14 +227,9 @@ class DocumentationFinder:
 
         return [self.get_file_metadata(f) for f in files]
 
-    def categorize_files(
-        self, files: list[Path] | None = None
-    ) -> dict[str, list[Path]]:
-        """Categorize files by type and location."""
-        if files is None:
-            files = self.find_files()
-
-        categories = {
+    def _initialize_categories(self) -> dict[str, list[Path]]:
+        """Initialize empty category dictionaries."""
+        return {
             "readme": [],
             "changelog": [],
             "contributing": [],
@@ -244,35 +239,59 @@ class DocumentationFinder:
             "other": [],
         }
 
+    def _categorize_by_filename(self, filename: str) -> str | None:
+        """Categorize file by filename patterns."""
+        filename_lower = filename.lower()
+        if filename_lower.startswith("readme"):
+            return "readme"
+        if filename_lower.startswith("changelog"):
+            return "changelog"
+        if filename_lower.startswith("contributing"):
+            return "contributing"
+        return None
+
+    def _categorize_by_directory(self, path_parts: tuple[str, ...]) -> str:
+        """Categorize file by directory structure."""
+        if len(path_parts) <= 1:
+            return "other"
+
+        first_dir = path_parts[0].lower()
+        if first_dir == "docs":
+            return "docs_root" if len(path_parts) == self.DOCS_ROOT_DEPTH else "docs_subdir"
+        if first_dir in {"examples", "example", "samples", "demos"}:
+            return "examples"
+        return "other"
+
+    def _safe_get_relative_path(self, file_path: Path) -> tuple[str, ...] | None:
+        """Safely get relative path parts."""
+        try:
+            relative_path = file_path.relative_to(self.project_root)
+            return relative_path.parts
+        except Exception:
+            return None
+
+    def categorize_files(
+        self, files: list[Path] | None = None
+    ) -> dict[str, list[Path]]:
+        """Categorize files by type and location."""
+        if files is None:
+            files = self.find_files()
+
+        categories = self._initialize_categories()
+
         for file_path in files:
-            try:
-                relative_path = file_path.relative_to(self.project_root)
-                path_parts = relative_path.parts
+            # Try filename-based categorization first
+            filename_category = self._categorize_by_filename(file_path.name)
+            if filename_category:
+                categories[filename_category].append(file_path)
+                continue
 
-                # Categorize by filename
-                filename = file_path.name.lower()
-                if filename.startswith("readme"):
-                    categories["readme"].append(file_path)
-                elif filename.startswith("changelog"):
-                    categories["changelog"].append(file_path)
-                elif filename.startswith("contributing"):
-                    categories["contributing"].append(file_path)
-                # Categorize by directory
-                elif len(path_parts) > 1:
-                    first_dir = path_parts[0].lower()
-                    if first_dir == "docs":
-                        if len(path_parts) == self.DOCS_ROOT_DEPTH:
-                            categories["docs_root"].append(file_path)
-                        else:
-                            categories["docs_subdir"].append(file_path)
-                    elif first_dir in {"examples", "example", "samples", "demos"}:
-                        categories["examples"].append(file_path)
-                    else:
-                        categories["other"].append(file_path)
-                else:
-                    categories["other"].append(file_path)
-
-            except Exception:
+            # Fallback to directory-based categorization
+            path_parts = self._safe_get_relative_path(file_path)
+            if path_parts is not None:
+                dir_category = self._categorize_by_directory(path_parts)
+                categories[dir_category].append(file_path)
+            else:
                 categories["other"].append(file_path)
 
         return categories

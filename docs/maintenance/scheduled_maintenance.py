@@ -321,8 +321,11 @@ class ScheduledMaintenance:
 
     def _handle_make_command(
         self, cmd_parts: list[str], timeout: int, description: str
-    ) -> bool:  # timeout used by interface
+    ) -> bool:
         """Handle make commands."""
+        # Note: timeout parameter reserved for future make execution timeout implementation
+        _ = timeout  # Reserved for future use
+
         try:
             makefile = self.project_root / "Makefile"
             if not makefile.exists():
@@ -395,6 +398,9 @@ class ScheduledMaintenance:
         self, cmd_parts: list[str], timeout: int, description: str
     ) -> bool:
         """Handle echo commands."""
+        # Note: timeout parameter reserved for future echo execution timeout implementation
+        _ = timeout  # Reserved for future use
+
         try:
             message = " ".join(cmd_parts[1:]) if len(cmd_parts) > 1 else ""
             print(message)

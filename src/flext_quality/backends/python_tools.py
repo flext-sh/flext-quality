@@ -465,6 +465,9 @@ class FlextQualityPythonTools:
         FlextResult with coverage data
 
         """
+        # Reserved for future path-specific coverage analysis
+        _ = path  # Reserved for future use
+
         if not _COVERAGE_AVAILABLE or coverage is None:
             return FlextResult.fail("Coverage is not available")
 

@@ -749,6 +749,8 @@ class DocumentationAuditor:
             output_path: Unused parameter for future extensibility.
 
         """
+        # Reserved for future file output implementation
+        _ = output_path  # Reserved for future use
         if output_format == "json":
             return json.dumps(self.results, indent=2, default=str)
         if output_format == "html":

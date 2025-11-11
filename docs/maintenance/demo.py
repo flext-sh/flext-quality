@@ -33,204 +33,211 @@ def print_step(step_num: int, description: str) -> None:
     """Print a formatted step."""
 
 
-def run_maintenance_demo() -> None:
-    """Run the complete documentation maintenance demonstration."""
-    # Constants
-    max_files_to_show = 10
-    good_score_threshold = 80
+class DocumentationMaintenanceDemo:
+    """Documentation maintenance demonstration runner."""
 
-    print_header("FLEXT Quality Documentation Maintenance Demo")
+    def __init__(self) -> None:
+        """Initialize demo with constants."""
+        self.max_files_to_show = 10
+        self.good_score_threshold = 80
+        self.project_root = Path(__file__).parent.parent.parent
 
-    # Change to project root
-    project_root = Path(__file__).parent.parent.parent
-    os.chdir(project_root)
+    def _discover_documentation_files(self) -> list[Path]:
+        """Step 1: Discover documentation files."""
+        print_step(1, "Discovering Documentation Files")
 
-    # Step 1: Discover documentation files
-    print_step(1, "Discovering Documentation Files")
+        doc_files = []
+        patterns = [
+            "**/*.md",
+            "**/*.mdx",
+            "**/README*",
+            "**/docs/**/*.md",
+            "**/docs/**/*.mdx",
+        ]
 
-    doc_files = []
-    patterns = [
-        "**/*.md",
-        "**/*.mdx",
-        "**/README*",
-        "**/docs/**/*.md",
-        "**/docs/**/*.mdx",
-    ]
+        for pattern in patterns:
+            matches = list(Path().glob(pattern))
+            doc_files.extend(matches)
 
-    for pattern in patterns:
-        matches = list(Path().glob(pattern))
-        doc_files.extend(matches)
-
-    # Filter out maintenance files and internal docs
-    doc_files = [
-        f
-        for f in doc_files
-        if not any(
-            exclude in str(f)
-            for exclude in [
-                "docs/maintenance",
-                ".serena/memories",
-                "__pycache__",
-                ".git",
-                "node_modules",
-                "build",
-                "dist",
-            ]
-        )
-    ]
-
-    doc_files = sorted(set(doc_files))  # Remove duplicates
-
-    for _i, _file in enumerate(
-        doc_files[:max_files_to_show], 1
-    ):  # Show first max_files_to_show
-        pass
-    if len(doc_files) > max_files_to_show:
-        pass
-
-    # Step 2: Run comprehensive audit
-    print_step(2, "Running Comprehensive Documentation Audit")
-
-    try:
-        auditor = DocumentationAuditor()
-
-        audit_results = auditor.run_comprehensive_audit()
-        auditor.save_report("json", "docs/maintenance/reports/")
-
-        # Show top issues
-        if audit_results["issues"]:
-            severity_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
-            sorted_issues = sorted(
-                audit_results["issues"],
-                key=lambda x: (
-                    severity_order.get(x.get("severity", "low"), 3),
-                    x.get("type", ""),
-                ),
+        # Filter out maintenance files and internal docs
+        doc_files = [
+            f
+            for f in doc_files
+            if not any(
+                exclude in str(f)
+                for exclude in [
+                    "docs/maintenance",
+                    ".serena/memories",
+                    "__pycache__",
+                    ".git",
+                    "node_modules",
+                    "build",
+                    "dist",
+                ]
             )
+        ]
 
-            for issue in sorted_issues[:5]:
-                {"critical": "🔴", "high": "🟠", "medium": "🟡", "low": "🟢"}.get(
-                    issue.get("severity"), "⚪"
-                )
+        return sorted(set(doc_files))  # Remove duplicates
 
-    except ImportError:
-        pass
+    def _run_comprehensive_audit(self) -> None:
+        """Step 2: Run comprehensive documentation audit."""
+        print_step(2, "Running Comprehensive Documentation Audit")
 
-    # Step 3: Validate links and references
-    print_step(3, "Validating Links and References")
-
-    try:
-        # Extract links from files
-        link_checker = LinkChecker()
-
-        # Simple synchronous validation for demo
-        all_links = []
-        for file_path in doc_files[:5]:  # Check first 5 files for demo
-            try:
-                file_path.read_text(encoding="utf-8")
-                file_links = link_checker.find_all_links([file_path])
-                all_links.extend(file_links)
-            except Exception as e:
-                logger.warning(f"Failed to extract links from {file_path}: {e}")
-
-        # Categorize links
-        link_types = {}
-        for link in all_links:
-            link_type = link.get("type", "unknown")
-            link_types[link_type] = link_types.get(link_type, 0) + 1
-
-        # Save link validation results
-        {
-            "timestamp": datetime.now(UTC).isoformat(),
-            "links_found": len(all_links),
-            "link_types": link_types,
-            "files_checked": len(doc_files[:5]),
-        }
-
-        # Note: Full validation would require async processing and may take time
-
-    except ImportError:
-        pass
-
-    # Step 4: Check style consistency
-    print_step(4, "Checking Style Consistency")
-
-    try:
-        style_validator = StyleValidator()
-
-        # Validate a few key files
-        test_files = [
-            f for f in doc_files if f.name in {"README.md", "CLAUDE.md", "TODO.md"}
-        ][:3]
-
-        total_violations = 0
-        total_issues = 0
-
-        for file_path in test_files:
-            result = style_validator.validate_file(file_path)
-            violations = len(result.get("violations", []))
-            issues = len(result.get("issues", []))
-            total_violations += violations
-            total_issues += issues
-
-        if total_violations + total_issues == 0:
+        try:
+            auditor = DocumentationAuditor()
+            audit_results = auditor.run_comprehensive_audit()
+            auditor.save_report("json", "docs/maintenance/reports/")
+            self._display_audit_results(audit_results)
+        except ImportError:
             pass
 
-    except ImportError:
-        pass
+    def _display_audit_results(self, audit_results: dict) -> None:
+        """Display audit results summary."""
+        if not audit_results.get("issues"):
+            return
 
-    # Step 5: Analyze content quality
-    print_step(5, "Analyzing Content Quality")
+        severity_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
+        sorted_issues = sorted(
+            audit_results["issues"],
+            key=lambda x: (
+                severity_order.get(x.get("severity", "low"), 3),
+                x.get("type", ""),
+            ),
+        )
 
-    try:
-        content_analyzer = ContentAnalyzer()
+        for issue in sorted_issues[:5]:
+            # Display logic would go here
+            _ = issue  # Placeholder for future display implementation
 
-        # Analyze key documentation files
-        key_files = [f for f in doc_files if f.name in {"README.md", "CLAUDE.md"}][:2]
+    def _validate_links_and_references(self, doc_files: list[Path]) -> None:
+        """Step 3: Validate links and references."""
+        print_step(3, "Validating Links and References")
 
-        total_score = 0
-        analyzed_count = 0
+        try:
+            link_checker = LinkChecker()
+            all_links = []
+            for file_path in doc_files[:5]:  # Check first 5 files for demo
+                try:
+                    file_links = link_checker.find_all_links([file_path])
+                    all_links.extend(file_links)
+                except Exception as e:
+                    logger.warning(f"Failed to extract links from {file_path}: {e}")
 
-        for file_path in key_files:
-            analysis = content_analyzer.analyze_file(file_path)
-            score = analysis.get("quality_score", 0)
-            total_score += score
-            analyzed_count += 1
+            # Categorize links
+            link_types = {}
+            for link in all_links:
+                link_type = link.get("type", "unknown")
+                link_types[link_type] = link_types.get(link_type, 0) + 1
 
-            analysis.get("readability", {})
+            # Save link validation results
+            {
+                "timestamp": datetime.now(UTC).isoformat(),
+                "links_found": len(all_links),
+                "link_types": link_types,
+                "files_checked": len(doc_files[:5]),
+            }
+        except ImportError:
+            pass
 
-            if analysis.get("issues"):
-                pass
+    def _check_style_consistency(self, doc_files: list[Path]) -> None:
+        """Step 4: Check style consistency."""
+        print_step(4, "Checking Style Consistency")
 
-        if analyzed_count > 0:
-            avg_score = total_score / analyzed_count
-            if avg_score >= good_score_threshold:
-                # Good score achieved
-                pass
+        try:
+            style_validator = StyleValidator()
+            test_files = [
+                f for f in doc_files if f.name in {"README.md", "CLAUDE.md", "TODO.md"}
+            ][:3]
 
-    except ImportError:
-        pass
+            total_violations = 0
+            total_issues = 0
 
-    # Step 6: Generate comprehensive report
-    print_step(6, "Generating Maintenance Report")
+            for file_path in test_files:
+                result = style_validator.validate_file(file_path)
+                violations = len(result.get("violations", []))
+                issues = len(result.get("issues", []))
+                total_violations += violations
+                total_issues += issues
 
-    try:
-        reporter = DocumentationReporter()
-        report_content = reporter.generate_quality_report("html")
+            if total_violations + total_issues == 0:
+                pass  # Good style
+        except ImportError:
+            pass
 
-        # Save report
-        reporter.save_report(report_content, "maintenance_demo_report", "html")
+    def _analyze_content_quality(self, doc_files: list[Path]) -> None:
+        """Step 5: Analyze content quality."""
+        print_step(5, "Analyzing Content Quality")
 
-    except ImportError:
-        pass
+        try:
+            content_analyzer = ContentAnalyzer()
+            key_files = [f for f in doc_files if f.name in {"README.md", "CLAUDE.md"}][:2]
 
-    # Step 7: Show automation options
-    print_step(7, "Automation and Integration Options")
+            total_score = 0
+            analyzed_count = 0
 
-    # Step 8: Summary and next steps
-    print_step(8, "Summary and Recommendations")
+            for file_path in key_files:
+                analysis = content_analyzer.analyze_file(file_path)
+                score = analysis.get("quality_score", 0)
+                total_score += score
+                analyzed_count += 1
 
-    print_header("Demo Complete")
+            if analyzed_count > 0:
+                avg_score = total_score / analyzed_count
+                if avg_score >= self.good_score_threshold:
+                    pass  # Good score achieved
+        except ImportError:
+            pass
+
+    def _generate_comprehensive_report(self) -> None:
+        """Step 6: Generate comprehensive report."""
+        print_step(6, "Generating Maintenance Report")
+
+        try:
+            reporter = DocumentationReporter()
+            report_content = reporter.generate_quality_report("html")
+            reporter.save_report(report_content, "maintenance_demo_report", "html")
+        except ImportError:
+            pass
+
+    def _show_automation_options(self) -> None:
+        """Step 7: Show automation options."""
+        print_step(7, "Automation and Integration Options")
+        # Automation options logic would go here
+
+    def _show_summary_and_recommendations(self) -> None:
+        """Step 8: Summary and next steps."""
+        print_step(8, "Summary and Recommendations")
+        print_header("Demo Complete")
+
+    def run_maintenance_demo(self) -> None:
+        """Run the complete documentation maintenance demonstration."""
+        print_header("FLEXT Quality Documentation Maintenance Demo")
+
+        # Change to project root
+        os.chdir(self.project_root)
+
+        # Execute all steps
+        doc_files = self._discover_documentation_files()
+
+        # Display file count (simplified)
+        for _i, _file in enumerate(doc_files[:self.max_files_to_show], 1):
+            pass
+        if len(doc_files) > self.max_files_to_show:
+            pass
+
+        self._run_comprehensive_audit()
+        self._validate_links_and_references(doc_files)
+        self._check_style_consistency(doc_files)
+        self._analyze_content_quality(doc_files)
+        self._generate_comprehensive_report()
+        self._show_automation_options()
+        self._show_summary_and_recommendations()
+
+
+def run_maintenance_demo() -> None:
+    """Run the complete documentation maintenance demonstration."""
+    demo = DocumentationMaintenanceDemo()
+    demo.run_maintenance_demo()
 
 
 def show_help() -> None:

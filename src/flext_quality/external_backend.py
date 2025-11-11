@@ -56,6 +56,9 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer):
             FlextResult containing analysis results dict
 
         """
+        # Reserved for future file path context usage
+        _ = file_path  # Reserved for future use
+
         # Create temporary file for analysis
         temp_path = None
         try:

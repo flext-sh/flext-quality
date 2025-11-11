@@ -169,6 +169,9 @@ class FlextQuality(FlextService[None]):
         maintainability_score: float,
     ) -> FlextResult[FlextQualityModels.Analysis]:
         """Update analysis quality scores."""
+        # Reserved for future score calculation implementation
+        _ = complexity_score, security_score, maintainability_score  # Reserved for future use
+
         # TODO: Calculate overall score as average
         # overall_score = (_coverage_score + complexity_score + security_score + maintainability_score) / 4.0
 
@@ -185,6 +188,9 @@ class FlextQuality(FlextService[None]):
         low: int,
     ) -> FlextResult[FlextQualityModels.Analysis]:
         """Update analysis issue counts by severity."""
+        # Reserved for future issue count analysis implementation
+        _ = critical, high, medium, low  # Reserved for future use
+
         # TODO: Use issue counts for analysis
         # total_issues = critical + high + medium + low
 

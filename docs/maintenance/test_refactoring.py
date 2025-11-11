@@ -27,18 +27,24 @@ def test_config_manager() -> bool | None:
 
         # Test loading audit rules
         audit_rules = config_manager.get_audit_rules()
-        assert isinstance(audit_rules, AuditRules)
-        assert hasattr(audit_rules, "quality_thresholds")
+        if not isinstance(audit_rules, AuditRules):
+            raise ValueError(f"Expected AuditRules, got {type(audit_rules)}")
+        if not hasattr(audit_rules, "quality_thresholds"):
+            raise ValueError("AuditRules missing quality_thresholds attribute")
 
         # Test loading style guide
         style_guide = config_manager.get_style_guide()
-        assert isinstance(style_guide, StyleGuide)
-        assert hasattr(style_guide, "markdown")
+        if not isinstance(style_guide, StyleGuide):
+            raise ValueError(f"Expected StyleGuide, got {type(style_guide)}")
+        if not hasattr(style_guide, "markdown"):
+            raise ValueError("StyleGuide missing markdown attribute")
 
         # Test loading validation config
         validation_config = config_manager.get_validation_config()
-        assert isinstance(validation_config, ValidationConfig)
-        assert hasattr(validation_config, "link_validation")
+        if not isinstance(validation_config, ValidationConfig):
+            raise ValueError(f"Expected ValidationConfig, got {type(validation_config)}")
+        if not hasattr(validation_config, "link_validation"):
+            raise ValueError("ValidationConfig missing link_validation attribute")
 
         # Test config validation
         config_manager.validate_configs()
@@ -61,26 +67,33 @@ def test_documentation_finder() -> bool | None:
 
         # Test file discovery
         files = finder.find_files()
-        assert isinstance(files, list)
-        assert len(files) > 0  # Should find some files
+        if not isinstance(files, list):
+            raise ValueError(f"Expected list, got {type(files)}")
+        if len(files) == 0:
+            raise ValueError("Should find some files")
 
         # Test markdown file filtering
         finder.find_markdown_files()
 
         # Test file categorization
         categories = finder.categorize_files()
-        assert isinstance(categories, dict)
-        assert "readme" in categories
+        if not isinstance(categories, dict):
+            raise ValueError(f"Expected dict, got {type(categories)}")
+        if "readme" not in categories:
+            raise ValueError("Categories should contain 'readme'")
 
         # Test metadata
         if files:
             metadata = finder.get_file_metadata(files[0])
-            assert isinstance(metadata, FileMetadata)
+            if not isinstance(metadata, FileMetadata):
+                raise ValueError(f"Expected FileMetadata, got {type(metadata)}")
 
         # Test statistics
         stats = finder.get_statistics()
-        assert isinstance(stats, dict)
-        assert "total_files" in stats
+        if not isinstance(stats, dict):
+            raise ValueError(f"Expected dict, got {type(stats)}")
+        if "total_files" not in stats:
+            raise ValueError("Statistics should contain 'total_files'")
 
         return True
 
@@ -100,20 +113,25 @@ def test_base_classes() -> bool | None:
             file="test.md",
             description="Test issue description",
         )
-        assert issue.type == "test_issue"
-        assert issue.severity == "medium"
+        if issue.type != "test_issue":
+            raise ValueError(f"Expected type 'test_issue', got '{issue.type}'")
+        if issue.severity != "medium":
+            raise ValueError(f"Expected severity 'medium', got '{issue.severity}'")
 
         # Test ValidationResult class
         result = ValidationResult()
         result.total_items = 10
         result.valid_items = 8
-        assert result.success_rate == 80.0
+        if result.success_rate != 80.0:
+            raise ValueError(f"Expected success_rate 80.0, got {result.success_rate}")
 
         # Test FileMetadata class
         test_file = Path(__file__)
         metadata = FileMetadata(test_file)
-        assert metadata.path == test_file
-        assert metadata.size > 0
+        if metadata.path != test_file:
+            raise ValueError(f"Expected path {test_file}, got {metadata.path}")
+        if metadata.size <= 0:
+            raise ValueError(f"Expected size > 0, got {metadata.size}")
 
         return True
 
