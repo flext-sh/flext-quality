@@ -37,6 +37,7 @@ class DocumentationOptimizer:
         """
         self.backup = backup
         self.project_root = Path(__file__).parent.parent.parent.parent
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.results = {
             "timestamp": datetime.now(UTC).isoformat(),
             "files_processed": 0,
@@ -70,7 +71,7 @@ class DocumentationOptimizer:
                 self.results["files_processed"] += 1
 
             except Exception as e:
-                logging.warning(f"Failed to optimize formatting in file: {e}")
+                self.logger.warning(f"Failed to optimize formatting in file: {e}")
 
         return self.results
 
@@ -131,29 +132,29 @@ class DocumentationOptimizer:
                 self.results["files_processed"] += 1
 
             except Exception as e:
-                logging.warning(f"Failed to update TOC in file: {e}")
+                self.logger.warning(f"Failed to update TOC in file: {e}")
 
         return self.results
 
-    def _add_or_update_toc(self, content: str) -> str:
-        """Add or update table of contents."""
-        lines = content.split("\n")
-        toc_lines = []
+    def _find_existing_toc(self, lines: list[str]) -> tuple[int, int]:
+        """Find existing table of contents boundaries."""
         toc_start = -1
         toc_end = -1
 
-        # Find existing TOC
         for i, line in enumerate(lines):
             if re.match(r"^##+\s+Table of Contents", line, re.IGNORECASE):
                 toc_start = i
-            elif toc_start != -1 and (
-                line.strip() == "" or re.match(r"^#{1,6}\s", line)
-            ):
+            elif toc_start != -1 and (not line.strip() or re.match(r"^#{1,6}\s", line)):
                 toc_end = i
                 break
 
-        # Extract headings for TOC
-        for i, line in enumerate(lines):
+        return toc_start, toc_end
+
+    def _extract_toc_headings(self, lines: list[str]) -> list[str]:
+        """Extract headings for table of contents."""
+        toc_lines = []
+
+        for line in lines:
             match = re.match(r"^(#{1,6})\s+(.+)$", line)
             if match:
                 level = len(match.group(1))
@@ -164,8 +165,37 @@ class DocumentationOptimizer:
                     indent = "  " * (level - 1)
                     toc_lines.append(f"{indent}- [{title}](#{anchor})")
 
+        return toc_lines
+
+    def _generate_toc_content(self, headings: list[str]) -> list[str]:
+        """Generate the complete table of contents content."""
+        return ["## Table of Contents", "", *headings, "", "---", ""]
+
+    def _find_toc_insertion_point(self, lines: list[str]) -> int:
+        """Find the best position to insert table of contents."""
+        insert_pos = 0
+        for i, line in enumerate(lines):
+            if re.match(r"^##\s", line):  # First H2
+                return i
+            if re.match(r"^#{1,6}\s", line):
+                continue
+            if line.strip() and not re.match(r"^#{1,6}\s", line):
+                insert_pos = i + 1
+
+        return insert_pos
+
+    def _add_or_update_toc(self, content: str) -> str:
+        """Add or update table of contents."""
+        lines = content.split("\n")
+
+        # Find existing TOC
+        toc_start, toc_end = self._find_existing_toc(lines)
+
+        # Extract headings for TOC
+        toc_headings = self._extract_toc_headings(lines)
+
         # Generate new TOC
-        new_toc = ["## Table of Contents", "", *toc_lines, "", "---", ""]
+        new_toc = self._generate_toc_content(toc_headings)
 
         # Replace or insert TOC
         if toc_start != -1 and toc_end != -1:
@@ -173,16 +203,7 @@ class DocumentationOptimizer:
             lines = lines[:toc_start] + new_toc + lines[toc_end:]
         else:
             # Insert TOC after title but before first H2
-            insert_pos = 0
-            for i, line in enumerate(lines):
-                if re.match(r"^##\s", line):  # First H2
-                    insert_pos = i
-                    break
-                if re.match(r"^#{1,6}\s", line):
-                    continue
-                if line.strip() and not re.match(r"^#{1,6}\s", line):
-                    insert_pos = i + 1
-
+            insert_pos = self._find_toc_insertion_point(lines)
             lines = lines[:insert_pos] + [""] + new_toc + lines[insert_pos:]
 
         return "\n".join(lines)
@@ -218,8 +239,10 @@ class DocumentationOptimizer:
 
                 self.results["files_processed"] += 1
 
-            except Exception:
-                pass
+            except Exception as e:
+                self.logger.warning(
+                    f"Failed to enhance accessibility in {file_path}: {e}"
+                )
 
         return self.results
 
@@ -282,8 +305,10 @@ class DocumentationOptimizer:
 
                 self.results["files_processed"] += 1
 
-            except Exception:
-                pass
+            except Exception as e:
+                self.logger.warning(
+                    f"Failed to enhance accessibility in {file_path}: {e}"
+                )
 
         return self.results
 
@@ -313,7 +338,7 @@ class DocumentationOptimizer:
                 re.match(r"^##\s", line)
                 and i > 0
                 and not re.match(r"^#\s", lines[i - 1])
-                and lines[i - 1].strip() != ""
+                and lines[i - 1].strip()
             ):
                 enhanced_lines.extend(("", "---", ""))
 
@@ -351,8 +376,10 @@ class DocumentationOptimizer:
 
                 self.results["files_processed"] += 1
 
-            except Exception:
-                pass
+            except Exception as e:
+                self.logger.warning(
+                    f"Failed to enhance accessibility in {file_path}: {e}"
+                )
 
         return self.results
 
@@ -408,13 +435,13 @@ class DocumentationOptimizer:
 
         file_path.write_text(content, encoding="utf-8")
 
-    def generate_report(self, format: str = "json") -> str:
+    def generate_report(self, report_format: str = "json") -> str:
         """Generate optimization report."""
-        if format == "json":
+        if report_format == "json":
             return json.dumps(self.results, indent=2, default=str)
         return json.dumps(self.results, default=str)
 
-    def save_report(self, output_path: str = "docs/maintenance/reports/"):
+    def save_report(self, output_path: str = "docs/maintenance/reports/") -> str:
         """Save optimization report."""
         output_dir = Path(output_path)
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -433,8 +460,8 @@ class DocumentationOptimizer:
         return filepath
 
 
-def main() -> None:
-    """Main entry point for optimization system."""
+def _create_argument_parser() -> argparse.ArgumentParser:
+    """Create and configure the argument parser."""
     parser = argparse.ArgumentParser(
         description="FLEXT Quality Documentation Optimization"
     )
@@ -484,58 +511,76 @@ def main() -> None:
         default=[],
         help="Specific files to optimize (default: all docs)",
     )
+    return parser
 
-    args = parser.parse_args()
 
-    # Find documentation files
+def _discover_documentation_files(args: argparse.Namespace) -> list[Path]:
+    """Discover documentation files to optimize."""
     project_root = Path(__file__).parent.parent.parent.parent
     if args.files:
-        doc_files = [project_root / f for f in args.files]
-    else:
-        doc_files = []
-        for pattern in [
-            "**/*.md",
-            "**/*.mdx",
-            "**/README*",
-            "**/docs/**/*.md",
-            "**/docs/**/*.mdx",
-        ]:
-            doc_files.extend(project_root.glob(pattern))
+        return [project_root / f for f in args.files]
 
-        # Remove duplicates and ignored files
-        doc_files = list(set(doc_files))
-        ignored_patterns = [".git", "__pycache__", "node_modules", ".serena/memories"]
-        doc_files = [
-            f
-            for f in doc_files
-            if not any(pattern in str(f) for pattern in ignored_patterns)
-        ]
+    doc_files = []
+    for pattern in [
+        "**/*.md",
+        "**/*.mdx",
+        "**/README*",
+        "**/docs/**/*.md",
+        "**/docs/**/*.mdx",
+    ]:
+        doc_files.extend(project_root.glob(pattern))
+
+    # Remove duplicates and ignored files
+    doc_files = list(set(doc_files))
+    ignored_patterns = [".git", "__pycache__", "node_modules", ".serena/memories"]
+    return [
+        f
+        for f in doc_files
+        if not any(pattern in str(f) for pattern in ignored_patterns)
+    ]
+
+
+def _execute_optimizations(
+    optimizer: DocumentationOptimizer, args: argparse.Namespace
+) -> bool:
+    """Execute the requested optimizations and return if any were run."""
+    run_any_optimization = False
+
+    if args.fix_formatting or args.comprehensive:
+        optimizer.optimize_formatting(optimizer.project_root.glob("docs/**/*.md"))
+        run_any_optimization = True
+
+    if args.update_toc or args.comprehensive:
+        optimizer.update_table_of_contents(optimizer.project_root.glob("docs/**/*.md"))
+        run_any_optimization = True
+
+    if args.add_alt_text or args.improve_accessibility or args.comprehensive:
+        optimizer.enhance_accessibility(optimizer.project_root.glob("docs/**/*.md"))
+        run_any_optimization = True
+
+    if args.optimize_structure or args.comprehensive:
+        optimizer.optimize_content_structure(
+            optimizer.project_root.glob("docs/**/*.md")
+        )
+        run_any_optimization = True
+
+    if args.update_metadata or args.comprehensive:
+        optimizer.update_metadata(optimizer.project_root.glob("docs/**/*.md"))
+        run_any_optimization = True
+
+    return run_any_optimization
+
+
+def main() -> None:
+    """Main entry point for optimization system."""
+    parser = _create_argument_parser()
+    args = parser.parse_args()
 
     # Initialize optimizer
     optimizer = DocumentationOptimizer(backup=args.backup)
 
-    # Run requested optimizations
-    run_any_optimization = False
-
-    if args.fix_formatting or args.comprehensive:
-        optimizer.optimize_formatting(doc_files)
-        run_any_optimization = True
-
-    if args.update_toc or args.comprehensive:
-        optimizer.update_table_of_contents(doc_files)
-        run_any_optimization = True
-
-    if args.add_alt_text or args.improve_accessibility or args.comprehensive:
-        optimizer.enhance_accessibility(doc_files)
-        run_any_optimization = True
-
-    if args.optimize_structure or args.comprehensive:
-        optimizer.optimize_content_structure(doc_files)
-        run_any_optimization = True
-
-    if args.update_metadata or args.comprehensive:
-        optimizer.update_metadata(doc_files)
-        run_any_optimization = True
+    # Execute optimizations
+    run_any_optimization = _execute_optimizations(optimizer, args)
 
     if not run_any_optimization:
         parser.print_help()
@@ -543,15 +588,6 @@ def main() -> None:
 
     # Save report
     optimizer.save_report(args.output)
-
-    # Print summary
-
-    if optimizer.results["backups_created"]:
-        if len(optimizer.results["backups_created"]) > 3:
-            pass
-
-    if optimizer.results["changes_made"] > 0:
-        pass
 
 
 if __name__ == "__main__":

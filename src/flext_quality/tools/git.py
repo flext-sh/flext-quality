@@ -89,11 +89,13 @@ class FlextQualityGitTools(FlextService[None]):
             repo = Path(repo_path)
             temp_repo = workspace / repo.name
 
-            cmd_result = FlextUtilities.run_external_command(
-                cmd=["git", "clone", str(repo), str(temp_repo)],
-                capture_output=True,
-                text=True,
-                check=False,
+            cmd_result = (
+                FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
+                    cmd=["git", "clone", str(repo), str(temp_repo)],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
             )
 
             # Handle execution failure
@@ -130,6 +132,66 @@ class FlextQualityGitTools(FlextService[None]):
             return cleaned.strip()
 
         @classmethod
+        def _setup_workspace(
+            cls, repo_path: str, dry_run: bool, temp_path: str | None
+        ) -> FlextResult[Path]:
+            """Set up workspace for git operations."""
+            if dry_run:
+                workspace_result = cls._create_temp_workspace(repo_path, temp_path)
+                if workspace_result.is_failure:
+                    return FlextResult[Path].fail(workspace_result.error)
+                return workspace_result
+            return FlextResult[Path].ok(Path(repo_path))
+
+        @classmethod
+        def _get_commit_list(cls, work_repo: Path) -> FlextResult[list[str]]:
+            """Get list of all commits in repository."""
+            cmd_result = (
+                FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
+                    cmd=["git", "-C", str(work_repo), "rev-list", "--all", "--reverse"],
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
+            )
+
+            if cmd_result.is_failure:
+                return FlextResult[list[str]].fail(
+                    f"Git rev-list failed: {cmd_result.error}"
+                )
+
+            result = cmd_result.value
+            if result.returncode != 0:
+                return FlextResult[list[str]].fail(
+                    f"Failed to get commit list: {result.stderr}"
+                )
+
+            commits = result.stdout.strip().split("\n") if result.stdout.strip() else []
+            return FlextResult[list[str]].ok(commits)
+
+        @classmethod
+        def _process_commits(
+            cls, work_repo: Path, commits: list[str], logger: FlextLogger
+        ) -> tuple[int, int, list[str]]:
+            """Process commits and return statistics."""
+            commits_processed = 0
+            commits_changed = 0
+            errors: list[str] = []
+
+            for commit_hash in commits:
+                # Get commit message and process
+                success, changed = cls._process_single_commit(
+                    work_repo, commit_hash, logger
+                )
+                commits_processed += 1
+                if changed:
+                    commits_changed += 1
+                if not success:
+                    errors.append(f"Failed to process commit {commit_hash}")
+
+            return commits_processed, commits_changed, errors
+
+        @classmethod
         def rewrite_live(
             cls,
             repo_path: str,
@@ -150,16 +212,14 @@ class FlextQualityGitTools(FlextService[None]):
             """
             logger = FlextLogger(__name__)
 
-            # In dry-run, create temp workspace
-            if dry_run:
-                workspace_result = cls._create_temp_workspace(repo_path, temp_path)
-                if workspace_result.is_failure:
-                    return FlextResult[FlextQualityModels.RewriteResult].fail(
-                        workspace_result.error
-                    )
-                work_repo = workspace_result.value
-            else:
-                work_repo = Path(repo_path)
+            # Set up workspace
+            workspace_result = cls._setup_workspace(repo_path, dry_run, temp_path)
+            if workspace_result.is_failure:
+                return FlextResult[FlextQualityModels.RewriteResult].fail(
+                    workspace_result.error
+                )
+
+            work_repo = workspace_result.value
 
             logger.info(
                 f"Rewriting git history in {'DRY-RUN' if dry_run else 'LIVE'} mode",
@@ -167,34 +227,37 @@ class FlextQualityGitTools(FlextService[None]):
             )
 
             # Get commit list
-            cmd_result = FlextUtilities.run_external_command(
-                cmd=["git", "-C", str(work_repo), "rev-list", "--all", "--reverse"],
-                capture_output=True,
-                text=True,
-                check=False,
+            commits_result = cls._get_commit_list(work_repo)
+            if commits_result.is_failure:
+                return FlextResult[FlextQualityModels.RewriteResult].fail(
+                    commits_result.error
+                )
+
+            commits = commits_result.value
+
+            # Process commits
+            commits_processed, commits_changed, errors = cls._process_commits(
+                work_repo, commits, logger
             )
 
-            # Handle execution failure
-            if cmd_result.is_failure:
-                return FlextResult[FlextQualityModels.RewriteResult].fail(
-                    f"Git rev-list failed: {cmd_result.error}"
+            # Create result
+            return FlextResult[FlextQualityModels.RewriteResult].ok(
+                FlextQualityModels.RewriteResult(
+                    commits_processed=commits_processed,
+                    commits_changed=commits_changed,
+                    errors=errors,
+                    dry_run=dry_run,
                 )
+            )
 
-            result = cmd_result.value
-
-            if result.returncode != 0:
-                return FlextResult[FlextQualityModels.RewriteResult].fail(
-                    f"Failed to get commit list: {result.stderr}"
-                )
-
-            commits = result.stdout.strip().split("\n") if result.stdout.strip() else []
-            commits_processed = 0
-            commits_changed = 0
-            errors: list[str] = []
-
-            for commit_hash in commits:
-                # Get commit message
-                cmd_result = FlextUtilities.run_external_command(
+        @classmethod
+        def _process_single_commit(
+            cls, work_repo: Path, commit_hash: str, logger: FlextLogger
+        ) -> tuple[bool, bool]:
+            """Process a single commit and return (success, changed)."""
+            # Get commit message
+            cmd_result = (
+                FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
                     cmd=[
                         "git",
                         "-C",
@@ -208,26 +271,25 @@ class FlextQualityGitTools(FlextService[None]):
                     text=True,
                     check=False,
                 )
+            )
 
-                # Handle execution failure
-                if cmd_result.is_failure:
-                    errors.append(
-                        f"Git log failed for {commit_hash}: {cmd_result.error}"
-                    )
-                    continue
+            if cmd_result.is_failure:
+                logger.warning(f"Git log failed for {commit_hash}: {cmd_result.error}")
+                return False, False
 
-                result = cmd_result.value
+            result = cmd_result.value
 
-                if result.returncode != 0:
-                    errors.append(f"Failed to get message for {commit_hash}")
-                    continue
+            if result.returncode != 0:
+                logger.warning(f"Failed to get message for {commit_hash}")
+                return False, False
 
-                original_message = result.stdout.strip()
-                cleaned_message = cls._strip_ai_signatures(original_message)
+            original_message = result.stdout.strip()
+            cleaned_message = cls._strip_ai_signatures(original_message)
 
-                if cleaned_message != original_message:
-                    # Rewrite commit message
-                    amend_cmd_result = FlextUtilities.run_external_command(
+            if cleaned_message != original_message:
+                # Rewrite commit message
+                amend_cmd_result = (
+                    FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
                         cmd=[
                             "git",
                             "-C",
@@ -241,40 +303,18 @@ class FlextQualityGitTools(FlextService[None]):
                         text=True,
                         check=False,
                     )
+                )
 
-                    # Handle execution failure
-                    if amend_cmd_result.is_failure:
-                        errors.append(
-                            f"Git commit failed for {commit_hash}: {amend_cmd_result.error}"
-                        )
-                        continue
+                if (
+                    amend_cmd_result.is_failure
+                    or amend_cmd_result.value.returncode != 0
+                ):
+                    logger.warning(f"Failed to amend commit {commit_hash}")
+                    return False, False
 
-                    amend_result = amend_cmd_result.value
+                return True, True
 
-                    if amend_result.returncode != 0:
-                        errors.append(f"Failed to amend {commit_hash}")
-                        continue
-
-                    commits_changed += 1
-
-                commits_processed += 1
-
-            # Cleanup temp workspace if dry-run
-            if dry_run:
-                cleanup_result = cls._cleanup_temp_workspace(work_repo.parent)
-                if cleanup_result.is_failure:
-                    logger.warning(
-                        f"Failed to cleanup temp workspace: {cleanup_result.error}"
-                    )
-
-            rewrite_result = FlextQualityModels.RewriteResult(
-                commits_processed=commits_processed,
-                commits_changed=commits_changed,
-                success=len(errors) == 0,
-                errors=errors,
-            )
-
-            return FlextResult[FlextQualityModels.RewriteResult].ok(rewrite_result)
+            return True, False
 
     class CleanupService:
         """Repository cleanup operations."""
@@ -311,11 +351,13 @@ class FlextQualityGitTools(FlextService[None]):
             if dry_run:
                 git_cmd.insert(4, "-n")  # Dry-run flag
 
-            cmd_result = FlextUtilities.run_external_command(
-                cmd=git_cmd,
-                capture_output=True,
-                text=True,
-                check=False,
+            cmd_result = (
+                FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
+                    cmd=git_cmd,
+                    capture_output=True,
+                    text=True,
+                    check=False,
+                )
             )
 
             # Handle execution failure

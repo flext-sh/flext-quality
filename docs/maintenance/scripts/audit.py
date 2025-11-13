@@ -878,8 +878,8 @@ class DocumentationAuditor:
         return filepath
 
 
-def main() -> None:
-    """Main entry point for documentation audit."""
+def _create_argument_parser() -> argparse.ArgumentParser:
+    """Create and configure the argument parser."""
     parser = argparse.ArgumentParser(description="FLEXT Quality Documentation Audit")
     parser.add_argument(
         "--comprehensive",
@@ -929,52 +929,67 @@ def main() -> None:
         default="docs/maintenance/config/",
         help="Configuration directory path",
     )
+    return parser
 
+
+def _execute_audit_checks(
+    auditor: DocumentationAuditor, args: argparse.Namespace
+) -> dict[str, Any]:
+    """Execute the appropriate audit checks based on arguments."""
+    if args.comprehensive:
+        return auditor.run_comprehensive_audit()
+
+    doc_files = auditor.find_documentation_files()
+
+    if args.check_freshness:
+        auditor.check_content_freshness(doc_files)
+    if args.check_completeness:
+        auditor.check_content_completeness(doc_files)
+    if args.check_consistency:
+        auditor.check_content_consistency(doc_files)
+    if args.check_links:
+        auditor.check_links_and_references(doc_files)
+
+    auditor.calculate_quality_metrics()
+    auditor.generate_recommendations()
+    return auditor.results
+
+
+def _should_fail_on_results(args: argparse.Namespace, metrics: dict[str, Any]) -> bool:
+    """Determine if the process should fail based on results and arguments."""
+    should_fail = False
+    if args.fail_on_errors:
+        critical_high_issues = (
+            metrics["severity_breakdown"]["critical"]
+            + metrics["severity_breakdown"]["high"]
+        )
+        if critical_high_issues > 0:
+            should_fail = True
+
+    if args.ci_mode and metrics["quality_score"] < 70:
+        should_fail = True
+
+    return should_fail
+
+
+def main() -> None:
+    """Main entry point for documentation audit."""
+    parser = _create_argument_parser()
     args = parser.parse_args()
 
     # Initialize auditor
     auditor = DocumentationAuditor(args.config)
 
     try:
-        # Determine what checks to run
-        if args.comprehensive:
-            results = auditor.run_comprehensive_audit()
-        else:
-            doc_files = auditor.find_documentation_files()
-
-            if args.check_freshness:
-                auditor.check_content_freshness(doc_files)
-            if args.check_completeness:
-                auditor.check_content_completeness(doc_files)
-            if args.check_consistency:
-                auditor.check_content_consistency(doc_files)
-            if args.check_links:
-                auditor.check_links_and_references(doc_files)
-
-            auditor.calculate_quality_metrics()
-            auditor.generate_recommendations()
-            results = auditor.results
+        # Execute audit checks
+        results = _execute_audit_checks(auditor, args)
 
         # Save report
         auditor.save_report(args.format, args.output)
 
-        # Print summary
-        metrics = results["metrics"]
-
         # Check for CI/CD failure conditions
-        should_fail = False
-        if args.fail_on_errors:
-            critical_high_issues = (
-                metrics["severity_breakdown"]["critical"]
-                + metrics["severity_breakdown"]["high"]
-            )
-            if critical_high_issues > 0:
-                should_fail = True
-
-        if args.ci_mode and metrics["quality_score"] < 70:
-            should_fail = True
-
-        if should_fail:
+        metrics = results["metrics"]
+        if _should_fail_on_results(args, metrics):
             sys.exit(1)
 
     except Exception:

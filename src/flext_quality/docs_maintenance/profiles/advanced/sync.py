@@ -636,8 +636,8 @@ class DocumentationSync:
             )
 
 
-def main() -> None:
-    """Main entry point for the documentation synchronization system."""
+def _setup_argument_parser() -> argparse.ArgumentParser:
+    """Set up the argument parser for the sync system."""
     parser = argparse.ArgumentParser(
         description="Documentation Synchronization and Automated Maintenance System"
     )
@@ -668,79 +668,117 @@ def main() -> None:
     )
     parser.add_argument("--config", help="Configuration file path")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
+    return parser
 
+
+def _handle_status_command(sync: DocumentationSync, args: argparse.Namespace) -> None:
+    """Handle the status command."""
+    status = sync.get_sync_status()
+
+    git_info = status.git_status
+    # Check git status - branch "unknown" indicates not initialized
+    if git_info["branch"] != "unknown":
+        pass
+
+    if status.pending_changes and args.verbose:
+        for _change in status.pending_changes[:MAX_CHANGES_DISPLAY]:
+            pass
+        if len(status.pending_changes) > MAX_CHANGES_DISPLAY:
+            pass
+
+
+def _handle_validate_command(sync: DocumentationSync, args: argparse.Namespace) -> None:
+    """Handle the validate command."""
+    # Reserved for future args usage
+    _ = args  # Reserved for future use
+    result = sync.validate_before_sync()
+
+    if result.success:
+        pass
+
+
+def _handle_sync_command(sync: DocumentationSync, args: argparse.Namespace) -> None:
+    """Handle the sync command."""
+    files_to_sync = args.sync or sync.get_sync_status().pending_changes
+
+    if not files_to_sync:
+        return
+
+    # Validate first if configured
+    if sync.config["sync"]["validate_before_commit"]:
+        validation_result = sync.validate_before_sync()
+        if not validation_result.success:
+            return
+
+    # Create backup branch if configured
+    if sync.config["git"]["create_backup_branch"]:
+        backup_result = sync.create_backup_branch()
+        if not backup_result.success:
+            return
+
+    # Sync changes
+    result = sync.sync_changes("documentation_update", files_to_sync)
+
+    if result.success and result.files_affected and args.verbose:
+        for _file in result.files_affected[:10]:
+            pass
+
+
+def _handle_backup_branch_command(
+    sync: DocumentationSync, args: argparse.Namespace
+) -> None:
+    """Handle the backup-branch command."""
+    # Reserved for future args usage
+    _ = args  # Reserved for future use
+    result = sync.create_backup_branch()
+    if result.success:
+        pass
+
+
+def _handle_rollback_command(sync: DocumentationSync, args: argparse.Namespace) -> None:
+    """Handle the rollback command."""
+    if not args.rollback:
+        return
+
+    result = sync.rollback_changes(args.rollback)
+    if result.success:
+        pass
+
+
+def _handle_maintenance_command(
+    sync: DocumentationSync, args: argparse.Namespace
+) -> None:
+    """Handle the maintenance command."""
+    results = sync.run_maintenance_schedule(args.maintenance)
+
+    sum(1 for r in results if r.success)
+    len(results)
+
+    if args.verbose:
+        for result in results:
+            # Reserved for future status display
+            _ = "✓" if result.success else "✗"  # Reserved for future use
+
+
+def main() -> None:
+    """Main entry point for the documentation synchronization system."""
+    parser = _setup_argument_parser()
     args = parser.parse_args()
 
     sync = DocumentationSync(args.config)
 
     if args.status:
-        status = sync.get_sync_status()
-
-        git_info = status.git_status
-        # Check git status - branch "unknown" indicates not initialized
-        if git_info["branch"] != "unknown":
-            pass
-
-        if status.pending_changes and args.verbose:
-            for _change in status.pending_changes[:MAX_CHANGES_DISPLAY]:
-                pass
-            if len(status.pending_changes) > MAX_CHANGES_DISPLAY:
-                pass
-
+        _handle_status_command(sync, args)
     elif args.validate:
-        result = sync.validate_before_sync()
-
-        if result.success:
-            pass
-
+        _handle_validate_command(sync, args)
     elif args.sync is not None:
-        files_to_sync = args.sync or sync.get_sync_status().pending_changes
-
-        if not files_to_sync:
-            return
-
-        # Validate first if configured
-        if sync.config["sync"]["validate_before_commit"]:
-            validation_result = sync.validate_before_sync()
-            if not validation_result.success:
-                return
-
-        # Create backup branch if configured
-        if sync.config["git"]["create_backup_branch"]:
-            backup_result = sync.create_backup_branch()
-            if not backup_result.success:
-                return
-
-        # Sync changes
-        result = sync.sync_changes("documentation_update", files_to_sync)
-
-        if result.success and result.files_affected and args.verbose:
-            for _file in result.files_affected[:10]:
-                pass
-
+        _handle_sync_command(sync, args)
     elif args.backup_branch:
-        result = sync.create_backup_branch()
-        if result.success:
-            pass
-
+        _handle_backup_branch_command(sync, args)
     elif args.rollback:
-        if not args.rollback:
-            return
-
-        result = sync.rollback_changes(args.rollback)
-        if result.success:
-            pass
-
+        _handle_rollback_command(sync, args)
     elif args.maintenance:
-        results = sync.run_maintenance_schedule(args.maintenance)
-
-        sum(1 for r in results if r.success)
-        len(results)
-
-        if args.verbose:
-            for result in results:
-                status = "" if result.success else ""
-
+        _handle_maintenance_command(sync, args)
     else:
         # Default: show status
         args.status = True

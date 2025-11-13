@@ -54,10 +54,18 @@ class FlextQualityServices(FlextService[None]):
         self._container = FlextContainer.get_global()
 
         # Initialize inner services (lazy delegation pattern)
-        self._project_service = self.ProjectService(self._config, self._logger)
-        self._analysis_service = self.AnalysisService(self._config, self._logger)
-        self._issue_service = self.IssueService(self._config, self._logger)
-        self._report_service = self.ReportService(self._config, self._logger)
+        self._project_service = self.ProjectService(
+            config=self._config, logger=self._logger
+        )
+        self._analysis_service = self.AnalysisService(
+            config=self._config, logger=self._logger
+        )
+        self._issue_service = self.IssueService(
+            config=self._config, logger=self._logger
+        )
+        self._report_service = self.ReportService(
+            config=self._config, logger=self._logger
+        )
 
     @override
     def execute(self, data: object) -> FlextResult[None]:
@@ -97,14 +105,8 @@ class FlextQualityServices(FlextService[None]):
 
         def __init__(self, config: FlextQualityConfig, logger: FlextLogger) -> None:
             """Initialize project service."""
-            super().__init__()
             self._config = config
             self._logger = logger
-
-        @override
-        def execute(self, data: object) -> FlextResult[None]:
-            """Execute project service."""
-            return FlextResult[None].ok(None)
 
         def create_project(
             self,
@@ -131,7 +133,7 @@ class FlextQualityServices(FlextService[None]):
             self, project_id: str
         ) -> FlextResult[FlextQualityModels.ProjectModel | None]:
             """Get project by ID - DELEGATES to repository (future)."""
-            # TODO: Implement repository pattern for persistence
+            # TODO(marlonsc): Implement repository pattern for persistence #REPO-001
             self._logger.debug("Getting project", project_id=project_id)
             return FlextResult.ok(None)
 
@@ -139,19 +141,13 @@ class FlextQualityServices(FlextService[None]):
     # INNER SERVICE: AnalysisService - Single responsibility: Analysis lifecycle
     # =========================================================================
 
-    class AnalysisService(FlextService[None]):
+    class AnalysisService:
         """Service for analysis management - SOLID: Single Responsibility."""
 
         def __init__(self, config: FlextQualityConfig, logger: FlextLogger) -> None:
             """Initialize analysis service."""
-            super().__init__()
             self._config = config
             self._logger = logger
-
-        @override
-        def execute(self, data: object) -> FlextResult[None]:
-            """Execute analysis service."""
-            return FlextResult[None].ok(None)
 
         def create_analysis(
             self,
@@ -184,19 +180,13 @@ class FlextQualityServices(FlextService[None]):
     # INNER SERVICE: IssueService - Single responsibility: Issue lifecycle
     # =========================================================================
 
-    class IssueService(FlextService[None]):
+    class IssueService:
         """Service for issue management - SOLID: Single Responsibility."""
 
         def __init__(self, config: FlextQualityConfig, logger: FlextLogger) -> None:
             """Initialize issue service."""
-            super().__init__()
             self._config = config
             self._logger = logger
-
-        @override
-        def execute(self, data: object) -> FlextResult[None]:
-            """Execute issue service."""
-            return FlextResult[None].ok(None)
 
         def create_issue(
             self,
@@ -240,19 +230,13 @@ class FlextQualityServices(FlextService[None]):
     # INNER SERVICE: ReportService - Single responsibility: Report lifecycle
     # =========================================================================
 
-    class ReportService(FlextService[None]):
+    class ReportService:
         """Service for report management - SOLID: Single Responsibility."""
 
         def __init__(self, config: FlextQualityConfig, logger: FlextLogger) -> None:
             """Initialize report service."""
-            super().__init__()
             self._config = config
             self._logger = logger
-
-        @override
-        def execute(self, data: object) -> FlextResult[None]:
-            """Execute report service."""
-            return FlextResult[None].ok(None)
 
         def create_report(
             self,

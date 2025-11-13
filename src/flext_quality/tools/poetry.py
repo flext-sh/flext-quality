@@ -49,7 +49,7 @@ class PoetryOperations(FlextService[str]):
             return FlextResult[str].fail(f"Project path does not exist: {project}")
 
         poetry_cmd = ["poetry", *args]
-        result = FlextUtilities.run_external_command(
+        result = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
             poetry_cmd,
             cwd=project,
             capture_output=True,

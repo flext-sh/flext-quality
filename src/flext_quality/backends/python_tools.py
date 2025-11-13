@@ -236,10 +236,12 @@ class FlextQualityPythonTools:
                 return FlextResult.fail(f"Invalid path for Ruff analysis: {path}")
 
             # Use FlextUtilities for command execution with threading-based timeout
-            result = FlextUtilities.run_external_command(
-                ["ruff", "check", str(path), "--output-format=json"],
-                capture_output=True,
-                timeout=60,
+            result = (
+                FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
+                    ["ruff", "check", str(path), "--output-format=json"],
+                    capture_output=True,
+                    timeout=60,
+                )
             )
 
             if result.is_failure:
@@ -354,10 +356,12 @@ class FlextQualityPythonTools:
         try:
             # Use FlextUtilities for command execution with threading-based timeout
             # (Pylint doesn't expose clean Python API, use subprocess via FlextUtilities)
-            result = FlextUtilities.run_external_command(
-                ["pylint", str(path), "--output-format=json"],
-                capture_output=True,
-                timeout=60,
+            result = (
+                FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
+                    ["pylint", str(path), "--output-format=json"],
+                    capture_output=True,
+                    timeout=60,
+                )
             )
 
             if result.is_failure:

@@ -55,6 +55,7 @@ class FileMetricsData(BaseModel):
 class FlextQualityAnalyzer(FlextService[None]):
     """Main quality analyzer orchestrating focused analysis utilities."""
 
+    auto_execute = True
     project_path: Path
 
     def __init__(
@@ -299,6 +300,8 @@ class FlextQualityAnalyzer(FlextService[None]):
             tree: ast.AST, file_path: Path
         ) -> list[FlextQualityModels.CodeIssue]:
             r"""Analyze security issues using Bandit backend."""
+            # Reserved for future AST-based analysis
+            _ = tree  # Reserved for future use
             issues = []
             try:
                 result = FlextQualityAnalyzer._SecurityAnalyzer.backend.analyze(
@@ -338,6 +341,8 @@ class FlextQualityAnalyzer(FlextService[None]):
             tree: ast.AST, file_path: Path
         ) -> list[FlextQualityModels.CodeIssue]:
             """Analyze dead code - external backend with AST fallback."""
+            # Reserved for future AST-based analysis
+            _ = tree  # Reserved for future use
             issues = []
             try:
                 result = FlextQualityAnalyzer._DeadCodeAnalyzer.backend.analyze(

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Self
+from typing import ClassVar, Self
 
 from flext_core import FlextLogger, FlextResult, FlextService
 
@@ -14,7 +14,7 @@ class FlextPathService(FlextService[Path]):
     class _ValidationHelper:
         """Leverage legacy ignore pattern semantics."""
 
-        IGNORE_PATTERNS = [
+        IGNORE_PATTERNS: ClassVar[list[str]] = [
             "__pycache__",
             ".git",
             ".venv",
@@ -33,6 +33,7 @@ class FlextPathService(FlextService[Path]):
         """Alias matching the previous API surface."""
 
     def __init__(self: Self) -> None:
+        """Initialize paths service."""
         super().__init__()
         self._logger = FlextLogger(__name__)
 

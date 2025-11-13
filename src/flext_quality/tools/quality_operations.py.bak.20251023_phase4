@@ -123,7 +123,7 @@ class FlextQualityOperations(FlextService[None]):
         @staticmethod
         def run_lint(project_path: str) -> FlextResult[dict[str, object]]:
             """Run ruff linting."""
-            cmd_result = FlextUtilities.run_external_command(
+            cmd_result = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
                 cmd=["ruff", "check", project_path],
                 capture_output=True,
                 text=True,
@@ -166,7 +166,7 @@ class FlextQualityOperations(FlextService[None]):
             if dry_run:
                 logger.info("DRY RUN: Would fix linting issues")
                 # Run check to see what would be fixed
-                cmd_result = FlextUtilities.run_external_command(
+                cmd_result = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
                     cmd=["ruff", "check", module_path, "--fix", "--dry-run"],
                     capture_output=True,
                     text=True,
@@ -187,7 +187,7 @@ class FlextQualityOperations(FlextService[None]):
                 })
 
             # Real fix
-            cmd_result = FlextUtilities.run_external_command(
+            cmd_result = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
                 cmd=["ruff", "check", module_path, "--fix"],
                 capture_output=True,
                 text=True,
@@ -232,7 +232,7 @@ class FlextQualityOperations(FlextService[None]):
 
             """
             # Try pyrefly first
-            cmd_result = FlextUtilities.run_external_command(
+            cmd_result = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
                 cmd=["pyrefly", "check", project_path],
                 capture_output=True,
                 text=True,
@@ -252,7 +252,7 @@ class FlextQualityOperations(FlextService[None]):
                     })
 
             # Fall back to mypy
-            cmd_result = FlextUtilities.run_external_command(
+            cmd_result = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
                 cmd=["mypy", project_path],
                 capture_output=True,
                 text=True,

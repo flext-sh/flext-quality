@@ -28,6 +28,7 @@ class ScheduledMaintenance:
 
     # Command parsing constants
     MIN_PYTHON_ARGS = 2  # python -m is minimum 2 parts
+    MIN_GIT_ARGS = 2  # git <subcommand> is minimum 2 parts
     MIN_PYTHON_MODULE_INDEX = 2  # module name is at index 2 (python -m module_name)
 
     def __init__(
@@ -362,14 +363,18 @@ class ScheduledMaintenance:
             git = repo.git
 
             # Extract git subcommand
-            if len(cmd_parts) < 2:
+            if len(cmd_parts) < self.MIN_GIT_ARGS:
                 self.results["warnings"].append(
                     f"Invalid git command format in task: {description}"
                 )
                 return False
 
             subcommand = cmd_parts[1]
-            args = cmd_parts[2:] if len(cmd_parts) > 2 else []
+            args = (
+                cmd_parts[self.MIN_GIT_ARGS :]
+                if len(cmd_parts) > self.MIN_GIT_ARGS
+                else []
+            )
 
             def run_git_command() -> None:
                 # Use repo.git.execute() for arbitrary git commands

@@ -10,6 +10,9 @@ from flext_core import FlextLogger, FlextResult, FlextService
 
 
 class ConflictAnalyzer(FlextService[list[dict[str, str]]]):
+    """Analyze conflicts in code quality tools."""
+
+    auto_execute = True
     """Perform lightweight dependency conflict inspections."""
 
     def __init__(self: Self) -> None:

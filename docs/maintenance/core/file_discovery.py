@@ -257,7 +257,11 @@ class DocumentationFinder:
 
         first_dir = path_parts[0].lower()
         if first_dir == "docs":
-            return "docs_root" if len(path_parts) == self.DOCS_ROOT_DEPTH else "docs_subdir"
+            return (
+                "docs_root"
+                if len(path_parts) == self.DOCS_ROOT_DEPTH
+                else "docs_subdir"
+            )
         if first_dir in {"examples", "example", "samples", "demos"}:
             return "examples"
         return "other"

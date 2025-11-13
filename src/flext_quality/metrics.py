@@ -171,6 +171,15 @@ class QualityMetrics(FlextModels.Value):
 
         return FlextResult[None].ok(None)
 
+    @staticmethod
+    def from_analysis_results(
+        results: FlextQualityModels.AnalysisResults | dict[str, object],
+    ) -> QualityMetrics:
+        """Create QualityMetrics from analysis results."""
+        if isinstance(results, dict):
+            return MetricsCalculator.calculate_from_dict(results)
+        return MetricsCalculator.calculate_from_object(results)
+
 
 # =====================================================================
 # Factory - Single Responsibility: Object Creation
@@ -240,15 +249,6 @@ class MetricsFactory:
             duplication_score=get_float("duplication_score", 100.0),
             documentation_score=get_float("documentation_score", 100.0),
         )
-
-    @staticmethod
-    def from_analysis_results(
-        results: FlextQualityModels.AnalysisResults | dict[str, object],
-    ) -> QualityMetrics:
-        """Create QualityMetrics from analysis results."""
-        if isinstance(results, dict):
-            return MetricsCalculator.calculate_from_dict(results)
-        return MetricsCalculator.calculate_from_object(results)
 
 
 # =====================================================================
@@ -331,27 +331,21 @@ class MetricsCalculator:
         results: FlextQualityModels.AnalysisResults,
     ) -> QualityMetrics:
         """Calculate metrics from typed analysis results object."""
-        # Extract file metrics
-        total_files = len(results.file_metrics)
-        total_loc = sum(file.lines_of_code for file in results.file_metrics)
+        # Extract metrics from the results.metrics dict
+        metrics = results.metrics
 
-        # Extract complexity metrics
-        complexity_values: FlextTypes.IntList = [
-            int(getattr(issue, "complexity_value", 0))
-            for issue in results.complexity_issues
-        ]
-        avg_complexity = (
-            sum(complexity_values) / len(complexity_values)
-            if complexity_values
-            else 0.0
-        )
-        max_complexity = float(max(complexity_values)) if complexity_values else 0.0
+        # Extract issue counts from results.issues
+        issues = results.issues
+        security_count = len([i for i in issues if i.get("type") == "security"])
+        dead_code_count = len([i for i in issues if i.get("type") == "dead_code"])
+        duplicate_count = len([i for i in issues if i.get("type") == "duplication"])
+        complexity_count = len([i for i in issues if i.get("type") == "complexity"])
 
-        # Extract issue counts
-        security_count = len(results.security_issues)
-        dead_code_count = len(results.dead_code_issues)
-        duplicate_count = len(results.duplication_issues)
-        complexity_count = len(results.complexity_issues)
+        # Extract basic metrics
+        total_files = metrics.get("total_files", 0)
+        total_loc = metrics.get("total_lines_of_code", 0)
+        avg_complexity = metrics.get("average_complexity", 0.0)
+        max_complexity = metrics.get("max_complexity", 0.0)
 
         # Calculate component scores
         complexity_score = max(0.0, 100.0 - (avg_complexity * 5))

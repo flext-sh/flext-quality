@@ -7,13 +7,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import override
 from uuid import UUID
 
 from flext_core import (
     FlextContainer,
     FlextDispatcher,
     FlextLogger,
-    FlextProcessors,
     FlextRegistry,
     FlextResult,
     FlextService,
@@ -32,7 +32,7 @@ class FlextQuality(FlextService[None]):
     - FlextContainer: Dependency injection
     - FlextContext: Operation context
     - FlextDispatcher: Message routing
-    - FlextProcessors: Processing utilities
+    - FlextUtilities: Processing utilities
     - FlextRegistry: Component registration
     - FlextLogger: logging
     """
@@ -45,7 +45,6 @@ class FlextQuality(FlextService[None]):
         # Note: _context and _bus are inherited from FlextService parent class
         self._container: FlextContainer = FlextContainer.get_global()
         self._dispatcher: FlextDispatcher = FlextDispatcher()
-        self._processors: FlextProcessors = FlextProcessors()
         self._registry: FlextRegistry = FlextRegistry(dispatcher=self._dispatcher)
         self._logger: FlextLogger = FlextLogger(__name__)
 
@@ -170,9 +169,13 @@ class FlextQuality(FlextService[None]):
     ) -> FlextResult[FlextQualityModels.Analysis]:
         """Update analysis quality scores."""
         # Reserved for future score calculation implementation
-        _ = complexity_score, security_score, maintainability_score  # Reserved for future use
+        _ = (
+            complexity_score,
+            security_score,
+            maintainability_score,
+        )  # Reserved for future use
 
-        # TODO: Calculate overall score as average
+        # TODO(marlonsc): Calculate overall score as average #123
         # overall_score = (_coverage_score + complexity_score + security_score + maintainability_score) / 4.0
 
         return FlextResult[FlextQualityModels.Analysis].fail(
@@ -191,7 +194,7 @@ class FlextQuality(FlextService[None]):
         # Reserved for future issue count analysis implementation
         _ = critical, high, medium, low  # Reserved for future use
 
-        # TODO: Use issue counts for analysis
+        # TODO(marlonsc): Use issue counts for analysis #ISSUES-001
         # total_issues = critical + high + medium + low
 
         return FlextResult[FlextQualityModels.Analysis].fail(
@@ -440,3 +443,8 @@ class FlextQuality(FlextService[None]):
 
         # Complete the analysis
         return self.complete_analysis(UUID(str(analysis.id)))
+
+    @override
+    def execute(self, data: object) -> FlextResult[None]:
+        """Execute quality operations (facade entry point)."""
+        return FlextResult[None].ok(None)

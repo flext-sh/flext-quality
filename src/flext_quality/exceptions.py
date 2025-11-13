@@ -5,26 +5,26 @@ SPDX-License-Identifier: MIT
 """
 
 
-class FlextQualityException(Exception):
+class FlextQualityError(Exception):
     """Base exception for FLEXT Quality."""
 
 
-class AnalysisError(FlextQualityException):
+class AnalysisError(FlextQualityError):
     """Raised when analysis fails."""
 
 
-class ConfigError(FlextQualityException):
+class ConfigError(FlextQualityError):
     """Raised when configuration is invalid."""
 
 
-class ModelError(FlextQualityException):
+class ModelError(FlextQualityError):
     """Raised when model creation/validation fails."""
 
 
 class FlextQualityExceptions:
     """Exception classes namespace."""
 
-    Base = FlextQualityException
+    Base = FlextQualityError
     Analysis = AnalysisError
     Config = ConfigError
     Model = ModelError

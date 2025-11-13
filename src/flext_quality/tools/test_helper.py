@@ -16,6 +16,9 @@ from pathlib import Path
 
 from flext_core import FlextResult, FlextUtilities
 
+# Test coverage thresholds
+MIN_TEST_COVERAGE_THRESHOLD = 80
+
 
 def suggest_tests_from_coverage(project_path: Path) -> FlextResult[list[str]]:
     """Suggest tests for untested code based on coverage analysis.
@@ -29,7 +32,7 @@ def suggest_tests_from_coverage(project_path: Path) -> FlextResult[list[str]]:
     """
     try:
         # Run coverage to generate report
-        result = FlextUtilities.run_external_command(
+        result = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
             [
                 "pytest",
                 str(project_path),
@@ -64,7 +67,7 @@ def suggest_tests_from_coverage(project_path: Path) -> FlextResult[list[str]]:
                 for file_path, file_data in coverage_data["files"].items():
                     if "summary" in file_data:
                         coverage = file_data["summary"].get("percent_covered", 100)
-                        if coverage < 80:
+                        if coverage < MIN_TEST_COVERAGE_THRESHOLD:
                             suggestions.append(
                                 f"Add tests for {file_path} ({coverage:.1f}% coverage)"
                             )
@@ -133,7 +136,7 @@ def validate_test_execution(test_path: Path) -> FlextResult[dict[str, object]]:
 
     """
     try:
-        result = FlextUtilities.run_external_command(
+        result = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
             ["pytest", str(test_path), "-v", "--tb=short"],
             capture_output=True,
             timeout=120.0,
@@ -154,7 +157,9 @@ def validate_test_execution(test_path: Path) -> FlextResult[dict[str, object]]:
 
         # Parse output for summary
         output_lines = wrapper.stdout.splitlines()
-        summary_line = [l for l in output_lines if "passed" in l or "failed" in l]
+        summary_line = [
+            line for line in output_lines if "passed" in line or "failed" in line
+        ]
 
         return FlextResult.ok({
             "file": str(test_path),

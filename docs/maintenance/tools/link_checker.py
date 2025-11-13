@@ -8,8 +8,10 @@ and comprehensive validation capabilities.
 import asyncio
 import json
 import pathlib
+import re
 import time
 from concurrent.futures import ThreadPoolExecutor
+from datetime import UTC, datetime
 from typing import Any
 from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
@@ -24,6 +26,7 @@ class LinkChecker:
 
     # Constants for URL validation
     MIN_PATH_PARTS_FOR_REPO = 2
+    MIN_PATH_PARTS_FOR_DETAILED_REPO = 3
     MIN_PATH_PARTS_FOR_BRANCH = 3
     MAX_BROKEN_LINKS_TO_SHOW = 10
 
@@ -76,8 +79,6 @@ class LinkChecker:
 
     def find_all_links(self, file_paths: list[pathlib.Path]) -> list[dict]:
         """Extract all links from the given files."""
-        import re
-
         all_links = []
 
         for file_path in file_paths:
@@ -114,8 +115,9 @@ class LinkChecker:
                             "reference": ref,
                         })
 
-            except Exception:
-                pass
+            except Exception as e:
+                # Log the exception for debugging but continue processing
+                print(f"Warning: Failed to extract links from {file_path}: {e}")
 
         return all_links
 
@@ -267,7 +269,7 @@ class LinkChecker:
         # Create semaphore for rate limiting
         semaphore = asyncio.Semaphore(10)  # Max 10 concurrent requests
 
-        async def check_with_semaphore(link_info):
+        async def check_with_semaphore(link_info: dict[str, Any]) -> dict[str, Any]:
             async with semaphore:
                 await asyncio.sleep(0.1)  # Rate limiting
                 return await self.check_link_async(
@@ -310,7 +312,7 @@ class LinkChecker:
         """Check multiple links synchronously with thread pool."""
         start_time = time.time()
 
-        def check_single(link_info):
+        def check_single(link_info: dict[str, Any]) -> dict[str, Any]:
             time.sleep(0.1)  # Rate limiting
             return self.check_link_sync(link_info["url"], link_info.get("context"))
 
@@ -333,7 +335,7 @@ class LinkChecker:
         return results
 
     async def validate_links(
-        self, links: list[dict], use_async: bool = True
+        self, links: list[dict], *, use_async: bool = True
     ) -> dict[str, Any]:
         """Main link validation method."""
         self.results["total_links"] = len(links)
@@ -419,7 +421,7 @@ class LinkChecker:
         if len(path_parts) >= self.MIN_PATH_PARTS_FOR_REPO:
             # user/repo or user/repo/tree/branch or user/repo/blob/branch/file
             if path_parts[1] in {"tree", "blob", "pull", "issues", "wiki", "releases"}:
-                return len(path_parts) >= 3
+                return len(path_parts) >= self.MIN_PATH_PARTS_FOR_DETAILED_REPO
             if path_parts[1] in {"pulls", "issues", "wikis", "releases"}:
                 return True
             # Assume it's a valid repo reference
@@ -427,11 +429,11 @@ class LinkChecker:
 
         return False
 
-    def generate_report(self, format: str = "json") -> str:
+    def generate_report(self, report_format: str = "json") -> str:
         """Generate validation report."""
-        if format == "json":
+        if report_format == "json":
             return json.dumps(self.results, indent=2, default=str)
-        if format == "summary":
+        if report_format == "summary":
             return self._generate_summary_report()
         return json.dumps(self.results, default=str)
 
@@ -462,8 +464,8 @@ Broken Links:
             error_msg = error.get("error", "Unknown error")
             report += f"- {url} (Status: {status}, Error: {error_msg})\n"
 
-        if len(r["errors"]) > 10:
-            report += f"... and {len(r['errors']) - 10} more broken links\n"
+        if len(r["errors"]) > self.MAX_BROKEN_LINKS_TO_SHOW:
+            report += f"... and {len(r['errors']) - self.MAX_BROKEN_LINKS_TO_SHOW} more broken links\n"
 
         if r["warnings_list"]:
             report += "\nWarnings:\n"
@@ -472,16 +474,15 @@ Broken Links:
 
         return report
 
-    def save_report(self, output_path: str = "docs/maintenance/reports/"):
+    def save_report(
+        self, output_path: str = "docs/maintenance/reports/"
+    ) -> pathlib.Path:
         """Save validation report."""
-        import os
-        from datetime import UTC, datetime
-
         pathlib.Path(output_path).mkdir(exist_ok=True, parents=True)
 
         timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         filename = f"link_validation_{timestamp}.json"
-        filepath = os.path.join(output_path, filename)
+        filepath = pathlib.Path(output_path) / filename
 
         with pathlib.Path(filepath).open("w", encoding="utf-8") as f:
             json.dump(self.results, f, indent=2, default=str)
@@ -496,7 +497,6 @@ def validate_links_sync(
     """Synchronous wrapper for link validation."""
     checker = LinkChecker(config_path)
     # Run async validation in new event loop
-    import asyncio
 
     return asyncio.run(checker.validate_links(links, use_async=True))
 
@@ -518,6 +518,7 @@ if __name__ == "__main__":
     import asyncio
 
     async def main() -> None:
+        """Run example link validation."""
         checker = LinkChecker()
         await checker.validate_links(test_links)
         checker.save_report()

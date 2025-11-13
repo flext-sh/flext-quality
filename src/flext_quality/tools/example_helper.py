@@ -39,10 +39,12 @@ def validate_examples_directory(
         # Find all example.py files
         for example_file in examples_dir.rglob("example.py"):
             try:
-                result = FlextUtilities.run_external_command(
-                    ["python3", str(example_file)],
-                    capture_output=True,
-                    timeout=30.0,
+                result = (
+                    FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
+                        ["python3", str(example_file)],
+                        capture_output=True,
+                        timeout=30.0,
+                    )
                 )
 
                 if result.is_failure:
@@ -161,7 +163,7 @@ def validate_example_imports(
         # Try to verify imports work by running a test script
         test_code = "\n".join(imports) + "\nprint('✅ All imports successful')"
 
-        result = FlextUtilities.run_external_command(
+        result = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
             ["python3", "-c", test_code],
             capture_output=True,
             timeout=10.0,
@@ -204,7 +206,7 @@ def run_example_safely(
         if not example_file.exists():
             return FlextResult.fail(f"File not found: {example_file}")
 
-        result = FlextUtilities.run_external_command(
+        result = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
             ["python3", str(example_file)],
             capture_output=True,
             timeout=timeout,

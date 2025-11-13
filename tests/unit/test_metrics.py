@@ -145,12 +145,13 @@ class TestQualityMetrics:
     def test_score_calculations(self) -> None:
         """Test score calculations in from_analysis_results using AnalysisResults."""
         results = AnalysisResults(
-            overall_metrics=OverallMetrics(average_complexity=4.0),
-            file_metrics=[],
-            security_issues=[{"issue": 1}],  # 1 issue = -10 points
-            complexity_issues=[{"issue": 1}, {"issue": 2}],  # 2 issues = -10 points
-            duplication_issues=[{"issue": 1}],  # 1 issue = -10 points
-            dead_code_issues=[],
+            metrics={"average_complexity": 4.0},
+            issues=[
+                {"type": "security", "issue": 1},  # 1 security issue
+                {"type": "complexity", "issue": 1},  # 1 complexity issue
+                {"type": "complexity", "issue": 2},  # 2 complexity issues total
+                {"type": "duplication", "issue": 1},  # 1 duplication issue
+            ],
         )
 
         metrics = QualityMetrics.from_analysis_results(results)

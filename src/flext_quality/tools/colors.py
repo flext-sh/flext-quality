@@ -46,6 +46,8 @@ class FlextColorService(FlextService[str]):
 
         @staticmethod
         def print_colored(message: str, color: str = "") -> None:
+            # Reserved for future colored output implementation
+            _ = message  # Reserved for future use
             if color:
                 pass
 

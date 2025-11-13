@@ -9,7 +9,9 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import sys
+import traceback
 from pathlib import Path
 from typing import override
 
@@ -19,9 +21,11 @@ from flext_core import (
     FlextService,
 )
 from pydantic import BaseModel, Field
+from rich.console import Console
 
 from .analyzer import FlextQualityAnalyzer
 from .config import FlextQualityConfig
+from .docs_maintenance.cli import run_comprehensive
 from .reports import FlextQualityReportGenerator
 
 try:
@@ -354,8 +358,6 @@ def setup_logging(log_level: str = "INFO") -> None:
         log_level: Logging level (DEBUG, INFO, WARNING, ERROR)
 
     """
-    import logging
-
     logging.basicConfig(
         level=getattr(logging, log_level, logging.INFO),
         format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -421,8 +423,6 @@ def analyze_project(args: argparse.Namespace) -> int:
         return result.unwrap() if result.is_success else 1
 
     except Exception:
-        import traceback
-
         if getattr(args, "verbose", False):
             traceback.print_exc()
         return 1
@@ -584,10 +584,6 @@ Examples:
 def _route_doc_command(args: object) -> int:
     """Route documentation commands to the docs_maintenance module."""
     try:
-        from rich.console import Console
-
-        from .docs_maintenance.cli import run_comprehensive
-
         console = Console()
 
         # Convert argparse namespace to function arguments
@@ -609,8 +605,6 @@ def _route_doc_command(args: object) -> int:
         return 1
 
     except Exception as e:
-        from rich.console import Console
-
         console = Console()
         console.print(f"[red]Documentation command error: {e}[/red]")
         return 1

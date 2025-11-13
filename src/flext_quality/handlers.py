@@ -55,6 +55,14 @@ class FlextQualityHandlers:
         self._services = FlextQualityServices()
         self._logger = FlextLogger(__name__)
 
+    def get_analysis_service(self) -> object:
+        """Get analysis service instance."""
+        return self._services.get_analysis_service()
+
+    def get_report_service(self) -> object:
+        """Get report service instance."""
+        return self._services.get_report_service()
+
     # =====================================================================
     # Nested Utility Classes - Single Responsibility
     # =====================================================================
@@ -225,7 +233,7 @@ class AnalyzeProjectHandler:
     def __init__(self) -> None:
         """Initialize handler."""
         self._handlers = FlextQualityHandlers()
-        self._analysis_service = self._handlers._services.get_analysis_service()
+        self._analysis_service = self._handlers.get_analysis_service()
         self._logger = FlextLogger(__name__)
 
     def analyze_project(self, project_id: object) -> FlextResult[object]:
@@ -252,7 +260,7 @@ class GenerateReportHandler:
     def __init__(self) -> None:
         """Initialize handler."""
         self._handlers = FlextQualityHandlers()
-        self._report_service = self._handlers._services.get_report_service()
+        self._report_service = self._handlers.get_report_service()
         self._logger = FlextLogger(__name__)
 
     def generate_report(self, analysis_id: object) -> FlextResult[object]:

@@ -52,7 +52,9 @@ class DocumentationReporter:
                 pass
         return None
 
-    def generate_quality_report(self, format: str = "html", **kwargs) -> str:
+    def generate_quality_report(
+        self, report_format: str = "html", **kwargs: Any
+    ) -> str:
         """Generate comprehensive quality report."""
         # Collect all available data
         report_data = {
@@ -66,13 +68,13 @@ class DocumentationReporter:
             "recommendations": self._generate_recommendations(),
         }
 
-        if format == "html":
+        if report_format == "html":
             return self._generate_html_report(report_data)
-        if format == "json":
+        if report_format == "json":
             return json.dumps(report_data, indent=2, default=str)
-        if format == "markdown":
+        if report_format == "markdown":
             return self._generate_markdown_report(report_data)
-        msg = f"Unsupported format: {format}"
+        msg = f"Unsupported format: {report_format}"
         raise ValueError(msg)
 
     def _calculate_summary_metrics(self) -> dict[str, Any]:
@@ -462,7 +464,9 @@ class DocumentationReporter:
                 date_str = report_file.name.split("_")[
                     1
                 ]  # e.g., audit_report_20241201_120000.json
-                report_date = datetime.strptime(date_str[:8], "%Y%m%d")
+                report_date = datetime.strptime(date_str[:8], "%Y%m%d").replace(
+                    tzinfo=UTC
+                )
 
                 if report_date >= cutoff_date:
                     with Path(report_file).open(encoding="utf-8") as f:
@@ -598,9 +602,11 @@ class DocumentationReporter:
 
         return "\n".join(md)
 
-    def save_report(self, content: str, filename: str, format: str = "html"):
+    def save_report(
+        self, content: str, filename: str, report_format: str = "html"
+    ) -> Path:
         """Save report to file."""
-        filepath = self.reports_dir / f"{filename}.{format}"
+        filepath = self.reports_dir / f"{filename}.{report_format}"
         filepath.write_text(content, encoding="utf-8")
         return filepath
 

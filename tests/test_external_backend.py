@@ -25,25 +25,31 @@ def test_external_tool_missing_returns_error(tmp_path: Path) -> None:
     backend = ExternalBackend()
     temp = _temp_py(tmp_path)
 
-    res1 = backend._run_ruff("code", temp)
-    assert "error" in res1
-    assert "Ruff not found" in str(res1["error"])
+    res1 = backend._run_ruff(temp)
+    assert res1.is_success
+    assert res1.data["status"] == "tool_not_found"
+    assert "ruff not installed" in res1.data["message"]
 
-    res2 = backend._run_mypy("code", temp)
-    assert "error" in res2
-    assert "MyPy not found" in str(res2["error"])
+    res2 = backend._run_mypy(temp)
+    assert res2.is_success
+    assert res2.data["status"] == "tool_not_found"
+    assert "mypy not installed" in res2.data["message"]
+
     # Bandit
-    res3 = backend._run_bandit("code", temp)
-    assert "error" in res3
-    assert "Bandit not found" in str(res3["error"])
+    res3 = backend._run_bandit(temp)
+    assert res3.is_success
+    assert res3.data["status"] == "tool_not_found"
+    assert "bandit not installed" in res3.data["message"]
+
     # Vulture
-    res4 = backend._run_vulture("code", temp)
-    assert "error" in res4
-    assert "Vulture not found" in str(res4["error"])
+    res4 = backend._run_vulture(temp)
+    assert res4.is_success
+    assert res4.data["status"] == "tool_not_found"
+    assert "vulture not installed" in res4.data["message"]
 
 
 @patch("shutil.which", side_effect=lambda name: name)
-@patch("FlextUtilities.run_external_command")
+@patch("flext_core.FlextUtilities.FlextUtilities.CommandExecution.run_external_command")
 def test_external_backend_empty_outputs(
     mock_run: MagicMock,
     tmp_path: Path,
@@ -52,23 +58,37 @@ def test_external_backend_empty_outputs(
     backend = ExternalBackend()
     temp = _temp_py(tmp_path)
 
-    mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
-    out1 = backend._run_ruff("code", temp)
-    assert out1["issues"] == []
+    from flext_core import FlextResult
 
-    mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
-    out2 = backend._run_mypy("code", temp)
-    assert isinstance(out2["issues"], list)
+    mock_run.return_value = FlextResult.ok(
+        MagicMock(returncode=0, stdout="[]", stderr="")
+    )
+    out1 = backend._run_ruff(temp)
+    assert out1.is_success
+    assert out1.data["issues"] == []
+
+    mock_run.return_value = FlextResult.ok(
+        MagicMock(returncode=0, stdout="", stderr="")
+    )
+    out2 = backend._run_mypy(temp)
+    assert out2.is_success
+    assert isinstance(out2.data["issues"], list)
 
     # Bandit with empty stdout -> default path
-    mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
-    out3 = backend._run_bandit("code", temp)
-    assert out3["issues"] == []
+    mock_run.return_value = FlextResult.ok(
+        MagicMock(returncode=0, stdout="", stderr="")
+    )
+    out3 = backend._run_bandit(temp)
+    assert out3.is_success
+    assert out3.data["issues"] == []
 
-    # Vulture with empty stdout -> dead_code []
-    mock_run.return_value = MagicMock(returncode=0, stdout="", stderr="")
-    out4 = backend._run_vulture("code", temp)
-    assert out4["dead_code"] == []
+    # Vulture with empty stdout -> issues []
+    mock_run.return_value = FlextResult.ok(
+        MagicMock(returncode=0, stdout="[]", stderr="")
+    )
+    out4 = backend._run_vulture(temp)
+    assert out4.is_success
+    assert out4.data["issues"] == []
 
 
 def test_external_backend_invalid_path_handling(tmp_path: Path) -> None:
@@ -76,9 +96,9 @@ def test_external_backend_invalid_path_handling(tmp_path: Path) -> None:
     backend = ExternalBackend()
     # Use non-existent file to trigger invalid path
     missing = tmp_path / "missing.py"
-    res = backend._run_ruff("code", missing)
-    assert "error" in res
-    assert res["error"] == "Invalid file path"
+    res = backend._run_ruff(missing)
+    assert res.is_failure
+    assert "Invalid file path" in str(res.error)
 
 
 def test_parse_ruff_output_invalid_json() -> None:

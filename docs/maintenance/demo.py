@@ -170,7 +170,9 @@ class DocumentationMaintenanceDemo:
 
         try:
             content_analyzer = ContentAnalyzer()
-            key_files = [f for f in doc_files if f.name in {"README.md", "CLAUDE.md"}][:2]
+            key_files = [f for f in doc_files if f.name in {"README.md", "CLAUDE.md"}][
+                :2
+            ]
 
             total_score = 0
             analyzed_count = 0
@@ -220,7 +222,7 @@ class DocumentationMaintenanceDemo:
         doc_files = self._discover_documentation_files()
 
         # Display file count (simplified)
-        for _i, _file in enumerate(doc_files[:self.max_files_to_show], 1):
+        for _i, _file in enumerate(doc_files[: self.max_files_to_show], 1):
             pass
         if len(doc_files) > self.max_files_to_show:
             pass

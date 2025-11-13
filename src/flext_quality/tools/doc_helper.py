@@ -16,6 +16,13 @@ from pathlib import Path
 
 from flext_core import FlextResult
 
+# Coverage grade thresholds
+COVERAGE_GRADE_A_THRESHOLD = 90
+COVERAGE_GRADE_B_THRESHOLD = 80
+COVERAGE_GRADE_C_THRESHOLD = 70
+COVERAGE_GRADE_D_THRESHOLD = 50
+COVERAGE_RECOMMENDATION_THRESHOLD = 80
+
 
 def check_docstring_coverage(
     module_path: Path,
@@ -57,13 +64,13 @@ def check_docstring_coverage(
             "coverage_percent": coverage_pct,
             "coverage_grade": (
                 "A"
-                if coverage_pct >= 90
+                if coverage_pct >= COVERAGE_GRADE_A_THRESHOLD
                 else "B"
-                if coverage_pct >= 80
+                if coverage_pct >= COVERAGE_GRADE_B_THRESHOLD
                 else "C"
-                if coverage_pct >= 70
+                if coverage_pct >= COVERAGE_GRADE_C_THRESHOLD
                 else "D"
-                if coverage_pct >= 50
+                if coverage_pct >= COVERAGE_GRADE_D_THRESHOLD
                 else "F"
             ),
             "missing_docs": missing_docs[:10],  # First 10
@@ -192,12 +199,12 @@ def analyze_api_documentation(
 
         for node in ast.walk(tree):
             # Only check top-level definitions (first level)
-            if isinstance(node, (ast.FunctionDef, ast.ClassDef)):
-                # Skip private/magic methods
-                if not node.name.startswith("_"):
-                    public_items.append(node.name)
-                    if ast.get_docstring(node):
-                        documented_items += 1
+            if isinstance(
+                node, (ast.FunctionDef, ast.ClassDef)
+            ) and not node.name.startswith("_"):
+                public_items.append(node.name)
+                if ast.get_docstring(node):
+                    documented_items += 1
 
         coverage = (documented_items / len(public_items) * 100) if public_items else 0
 
@@ -209,7 +216,7 @@ def analyze_api_documentation(
             "public_names": public_items[:20],
             "recommendation": (
                 "Good API documentation coverage"
-                if coverage >= 80
+                if coverage >= COVERAGE_RECOMMENDATION_THRESHOLD
                 else "Enhance API documentation"
             ),
         })

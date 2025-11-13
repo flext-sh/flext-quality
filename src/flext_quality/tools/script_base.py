@@ -24,6 +24,7 @@ class FlextScriptService(FlextService[object], ABC):
     """Provide a consistent execution harness for CLI-style scripts."""
 
     def __init__(self: Self) -> None:
+        """Initialize script service."""
         super().__init__()
         self.logger = FlextLogger(__name__)
 

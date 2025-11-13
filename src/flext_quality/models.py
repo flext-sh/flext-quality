@@ -196,6 +196,16 @@ class TestResults(BaseModel):
     coverage_percent: ScoreRange = 0.0
 
 
+class CheckResult(BaseModel):
+    """Quality check result value object."""
+
+    check_name: str = Field(description="Name of the quality check")
+    status: str = Field(description="Check status: passed, failed, warning")
+    issues_found: int = 0
+    score: ScoreRange = 0.0
+    details: dict[str, object] | None = None
+
+
 class AnalysisResult(BaseModel):
     """Simple analysis result for API responses."""
 
@@ -314,6 +324,7 @@ class FlextQualityModels:
     OverallMetrics = OverallMetrics
 
     # Value objects
+    CheckResult = CheckResult
     ComplexityMetric = ComplexityMetric
     CoverageMetric = CoverageMetric
     DuplicationMetric = DuplicationMetric

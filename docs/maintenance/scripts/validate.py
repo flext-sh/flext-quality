@@ -134,7 +134,7 @@ class LinkValidator:
         return None
 
     def validate_external_links(
-        self, links: list[dict], verbose: bool = False
+        self, links: list[dict], *, verbose: bool = False
     ) -> dict[str, Any]:
         """Validate external links with concurrent checking."""
         external_links = [link for link in links if link["type"] == "external"]
@@ -163,93 +163,93 @@ class LinkValidator:
 
         return self.results
 
-    def _check_single_external_link(
-        self, link: dict, verbose: bool = False
+    def _create_link_result(
+        self,
+        link: dict,
+        *,
+        valid: bool,
+        url: str,
+        status_code: int | None = None,
+        error: str | None = None,
     ) -> dict[str, Any]:
-        """Check a single external link."""
-        url = link["url"]
-
-        for attempt in range(self.retries):
-            try:
-                if verbose:
-                    pass
-
-                response = requests.head(
-                    url,
-                    timeout=self.timeout,
-                    headers={"User-Agent": self.user_agent, "Accept": "*/*"},
-                    allow_redirects=True,
-                )
-
-                if response.status_code < 400:
-                    return {
-                        "valid": True,
-                        "url": url,
-                        "status_code": response.status_code,
-                        "file": link["file"],
-                        "line": link.get("line_number"),
-                    }
-                # Try GET request for some status codes
-                if response.status_code in {405, 406, 409, 410, 500, 502, 503}:
-                    response = requests.get(
-                        url,
-                        timeout=self.timeout,
-                        headers={"User-Agent": self.user_agent},
-                        allow_redirects=True,
-                    )
-
-                if response.status_code < 400:
-                    return {
-                        "valid": True,
-                        "url": url,
-                        "status_code": response.status_code,
-                        "file": link["file"],
-                        "line": link.get("line_number"),
-                    }
-
-                return {
-                    "valid": False,
-                    "url": url,
-                    "status_code": response.status_code,
-                    "error": f"HTTP {response.status_code}",
-                    "file": link["file"],
-                    "line": link.get("line_number"),
-                }
-
-            except requests.exceptions.Timeout:
-                if attempt == self.retries - 1:
-                    return {
-                        "valid": False,
-                        "url": url,
-                        "error": f"Timeout after {self.timeout}s",
-                        "file": link["file"],
-                        "line": link.get("line_number"),
-                    }
-            except requests.exceptions.RequestException as e:
-                if attempt == self.retries - 1:
-                    return {
-                        "valid": False,
-                        "url": url,
-                        "error": str(e),
-                        "file": link["file"],
-                        "line": link.get("line_number"),
-                    }
-            except Exception as e:
-                return {
-                    "valid": False,
-                    "url": url,
-                    "error": f"Unexpected error: {e!s}",
-                    "file": link["file"],
-                    "line": link.get("line_number"),
-                }
-
-        return {
-            "valid": False,
+        """Create a standardized link validation result."""
+        result = {
+            "valid": valid,
             "url": url,
-            "error": "Max retries exceeded",
             "file": link["file"],
             "line": link.get("line_number"),
         }
+        if status_code is not None:
+            result["status_code"] = status_code
+        if error is not None:
+            result["error"] = error
+        return result
+
+    def _make_http_request(self, url: str, method: str = "head") -> requests.Response:
+        """Make an HTTP request with appropriate headers."""
+        headers = {"User-Agent": self.user_agent}
+        if method == "head":
+            headers["Accept"] = "*/*"
+
+        request_func = requests.head if method == "head" else requests.get
+
+        return request_func(
+            url,
+            timeout=self.timeout,
+            headers=headers,
+            allow_redirects=True,
+        )
+
+    def _should_retry_with_get(self, status_code: int) -> bool:
+        """Check if we should retry with GET for certain status codes."""
+        return status_code in {405, 406, 409, 410, 500, 502, 503}
+
+    def _handle_request_attempt(
+        self, url: str, attempt: int
+    ) -> tuple[bool, dict[str, Any] | None]:
+        """Handle a single request attempt."""
+        try:
+            response = self._make_http_request(url)
+
+            if response.status_code < 400:
+                return True, {"status_code": response.status_code}
+
+            # Try GET for certain error codes
+            if self._should_retry_with_get(response.status_code):
+                response = self._make_http_request(url, "get")
+                if response.status_code < 400:
+                    return True, {"status_code": response.status_code}
+
+            return False, {
+                "status_code": response.status_code,
+                "error": f"HTTP {response.status_code}",
+            }
+
+        except requests.exceptions.Timeout:
+            if attempt == self.retries - 1:
+                return False, {"error": f"Timeout after {self.timeout}s"}
+        except requests.exceptions.RequestException as e:
+            if attempt == self.retries - 1:
+                return False, {"error": str(e)}
+        except Exception as e:
+            return False, {"error": f"Unexpected error: {e!s}"}
+
+        return False, None
+
+    def _check_single_external_link(
+        self, link: dict, *, verbose: bool = False
+    ) -> dict[str, Any]:
+        """Check a single external link."""
+        # Reserved for future verbose output functionality
+        _ = verbose  # Reserved for future use
+        url = link["url"]
+
+        for attempt in range(self.retries):
+            success, result = self._handle_request_attempt(url, attempt)
+            if result is not None:
+                return self._create_link_result(link, success, url, **result)
+
+        return self._create_link_result(link, False, url, error="Max retries exceeded")
 
     def validate_internal_links(
         self, links: list[dict], doc_files: list[Path]
@@ -450,13 +450,13 @@ class LinkValidator:
 
         return self.results
 
-    def generate_report(self, format: str = "json") -> str:
+    def generate_report(self, report_format: str = "json") -> str:
         """Generate validation report."""
-        if format == "json":
+        if report_format == "json":
             return json.dumps(self.results, indent=2, default=str)
         return json.dumps(self.results, default=str)
 
-    def save_report(self, output_path: str = "docs/maintenance/reports/"):
+    def save_report(self, output_path: str = "docs/maintenance/reports/") -> Path:
         """Save validation report."""
         output_dir = Path(output_path)
         output_dir.mkdir(parents=True, exist_ok=True)
@@ -616,8 +616,8 @@ class ContentValidator:
         }
 
 
-def main() -> None:
-    """Main entry point for validation system."""
+def _create_validation_parser() -> argparse.ArgumentParser:
+    """Create and configure the validation argument parser."""
     parser = argparse.ArgumentParser(
         description="FLEXT Quality Documentation Validation"
     )
@@ -655,10 +655,11 @@ def main() -> None:
         "--retries", type=int, default=3, help="Retry attempts for external links"
     )
     parser.add_argument("--workers", type=int, default=5, help="Max concurrent workers")
+    return parser
 
-    args = parser.parse_args()
 
-    # Find documentation files
+def _discover_validation_files() -> list[Path]:
+    """Discover documentation files for validation."""
     project_root = Path(__file__).parent.parent.parent.parent
     doc_files = []
 
@@ -674,26 +675,25 @@ def main() -> None:
     # Remove duplicates and ignored files
     doc_files = list(set(doc_files))
     ignored_patterns = [".git", "__pycache__", "node_modules", ".serena/memories"]
-    doc_files = [
+    return [
         f
         for f in doc_files
         if not any(pattern in str(f) for pattern in ignored_patterns)
     ]
 
-    # Initialize validators
-    link_validator = LinkValidator(
-        timeout=args.timeout, retries=args.retries, max_workers=args.workers
-    )
-    content_validator = ContentValidator()
 
-    # Find all links
-    all_links = link_validator.find_all_links(doc_files)
-
-    # Run requested validations
+def _execute_validations(
+    link_validator: LinkValidator,
+    content_validator: ContentValidator,
+    all_links: list[dict],
+    doc_files: list[Path],
+    args: argparse.Namespace,
+) -> bool:
+    """Execute the requested validations and return if any were run."""
     run_any_check = False
 
     if args.external_links or args.all:
-        link_validator.validate_external_links(all_links, args.verbose)
+        link_validator.validate_external_links(all_links, verbose=args.verbose)
         run_any_check = True
 
     if args.internal_links or args.all:
@@ -701,6 +701,7 @@ def main() -> None:
         run_any_check = True
 
     if args.images or args.all:
+        project_root = Path(__file__).parent.parent.parent.parent
         link_validator.validate_images(all_links, project_root)
         run_any_check = True
 
@@ -720,33 +721,40 @@ def main() -> None:
         content_validator.check_content_quality(doc_files)
         run_any_check = True
 
+    return run_any_check
+
+
+def main() -> None:
+    """Main entry point for documentation validation."""
+    parser = _create_validation_parser()
+    args = parser.parse_args()
+
+    # Discover documentation files
+    doc_files = _discover_validation_files()
+
+    # Initialize validators
+    link_validator = LinkValidator(
+        timeout=args.timeout, retries=args.retries, max_workers=args.workers
+    )
+    content_validator = ContentValidator()
+
+    # Find all links
+    all_links = link_validator.find_all_links(doc_files)
+
+    # Execute validations
+    run_any_check = _execute_validations(
+        link_validator, content_validator, all_links, doc_files, args
+    )
+
     if not run_any_check:
         sys.exit(1)
 
-    # Combine results
-    {
-        "timestamp": datetime.now(UTC).isoformat(),
-        "files_analyzed": len(doc_files),
-        "links_found": len(all_links),
-        "link_validation": link_validator.results,
-        "content_validation": content_validator.results,
-    }
-
-    # Calculate summary
+    # Calculate summary and save reports
     total_errors = len(link_validator.results.get("errors", [])) + len(
         content_validator.results.get("content_issues", [])
     )
-    link_validator.results.get("warnings", 0)
-
-    # Save reports
     link_validator.save_report(args.output)
-
-    # Print summary
 
     # Exit with error code for CI/CD
     if total_errors > 0:
         sys.exit(1)
-
-
-if __name__ == "__main__":
-    main()

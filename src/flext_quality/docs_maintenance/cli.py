@@ -31,6 +31,27 @@ if __package__ in {None, ""}:  # Support execution as a standalone script
 else:
     from .orchestrator import DEFAULT_PROFILE, DocumentationMaintenanceOrchestrator
 
+# Typer option defaults (module-level singletons to avoid B008)
+DEFAULT_PROJECT_ROOT_OPTION = typer.Option(
+    None,
+    "--project-root",
+    help="Path to the project root (defaults to current directory)",
+    file_okay=False,
+    resolve_path=True,
+)
+DEFAULT_PROFILE_OPTION = typer.Option(
+    None,
+    "--profile",
+    help="Maintenance profile slug to use",
+)
+DEFAULT_CONFIG_OPTION = typer.Option(
+    None,
+    "--config",
+    help="Optional path to a maintenance configuration file",
+    exists=True,
+    dir_okay=False,
+    resolve_path=True,
+)
 
 console = Console()
 app = typer.Typer(help="Shared documentation maintenance commands")
@@ -82,7 +103,7 @@ def _render_summary(report: Any) -> None:
         name = getattr(operation, "operation", "unknown")
         success = getattr(operation, "success", False)
         duration = getattr(operation, "duration", 0.0)
-        status = "" if success else ""
+        status = "✓" if success else "✗"
         operations_table.add_row(name, status, f"{duration:.2f}")
 
     console.print(operations_table)
@@ -90,26 +111,9 @@ def _render_summary(report: Any) -> None:
 
 @app.command("comprehensive")
 def run_comprehensive(
-    project_root: Path = typer.Option(
-        Path.cwd(),
-        "--project-root",
-        help="Path to the project root (defaults to current directory)",
-        file_okay=False,
-        resolve_path=True,
-    ),
-    profile: str = typer.Option(
-        DEFAULT_PROFILE,
-        "--profile",
-        help="Maintenance profile slug to use",
-    ),
-    config: Path | None = typer.Option(
-        None,
-        "--config",
-        help="Optional path to a maintenance configuration file",
-        exists=True,
-        dir_okay=False,
-        resolve_path=True,
-    ),
+    project_root: Path = DEFAULT_PROJECT_ROOT_OPTION,
+    profile: str = DEFAULT_PROFILE_OPTION,
+    config: Path | None = DEFAULT_CONFIG_OPTION,
     dry_run: bool = typer.Option(
         False,
         "--dry-run",
@@ -122,8 +126,14 @@ def run_comprehensive(
     ),
 ) -> None:
     """Execute the complete maintenance workflow."""
+    # Set defaults for None values
+    if project_root is None:
+        project_root = Path.cwd()
+    if profile is None:
+        profile = DEFAULT_PROFILE
+
     with _temporary_env(
-        FLEXT_DOC_PROJECT_ROOT=project_root,
+        FLEXT_DOC_PROJECT_ROOT=str(project_root),
         FLEXT_DOC_PROFILE=profile,
     ):
         orchestrator = DocumentationMaintenanceOrchestrator(profile=profile)

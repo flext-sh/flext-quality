@@ -16,6 +16,8 @@ from pathlib import Path
 
 from flext_core import FlextResult
 
+from .quality_operations import FlextQualityOperations
+
 
 def check_all_flext_patterns(
     project_path: Path,
@@ -30,8 +32,6 @@ def check_all_flext_patterns(
 
     """
     try:
-        from .quality_operations import FlextQualityOperations
-
         pattern_auditor = FlextQualityOperations.PatternAuditor()
 
         # Run all pattern checks
@@ -98,8 +98,6 @@ def check_import_patterns(
 
     """
     try:
-        from .quality_operations import FlextQualityOperations
-
         pattern_auditor = FlextQualityOperations.PatternAuditor()
         return pattern_auditor.check_import_patterns(str(project_path))
 
@@ -124,8 +122,6 @@ def check_exception_patterns(
 
     """
     try:
-        from .quality_operations import FlextQualityOperations
-
         pattern_auditor = FlextQualityOperations.PatternAuditor()
         return pattern_auditor.check_exception_patterns(str(project_path))
 
@@ -150,8 +146,6 @@ def check_module_structure(
 
     """
     try:
-        from .quality_operations import FlextQualityOperations
-
         pattern_auditor = FlextQualityOperations.PatternAuditor()
         return pattern_auditor.check_module_structure(str(project_path))
 
@@ -177,8 +171,6 @@ def check_flext_result_usage(
 
     """
     try:
-        from .quality_operations import FlextQualityOperations
-
         pattern_auditor = FlextQualityOperations.PatternAuditor()
         return pattern_auditor.check_flext_result_usage(str(project_path))
 
@@ -202,8 +194,6 @@ def audit_flext_patterns(
 
     """
     try:
-        from .quality_operations import FlextQualityOperations
-
         pattern_auditor = FlextQualityOperations.PatternAuditor()
         return pattern_auditor.audit_patterns(str(project_path))
 
