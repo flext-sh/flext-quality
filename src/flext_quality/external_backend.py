@@ -54,14 +54,13 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
     def analyze(
         self,
         code: str,
-        file_path: Path | None = None,
+        _file_path: Path | None = None,
         tool: str = "ruff",
     ) -> FlextResult[dict[str, Any]]:
         """Analyze code using external tools.
 
         Args:
             code: Python source code to analyze
-            file_path: Optional file path for context
             tool: Tool to use (ruff, mypy, bandit, vulture, coverage, radon)
 
         Returns:

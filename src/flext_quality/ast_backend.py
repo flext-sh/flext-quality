@@ -289,7 +289,6 @@ class FlextQualityASTBackend(BaseAnalyzer):
         """Analyze Python code using AST.
 
         Args:
-        code: Python source code to analyze
         file_path: Optional file path for context
 
         Returns:

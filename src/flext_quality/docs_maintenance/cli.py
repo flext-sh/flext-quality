@@ -5,9 +5,9 @@ from __future__ import annotations
 import importlib.util
 import os
 import sys
+from collections.abc import Generator
 from contextlib import contextmanager
 from pathlib import Path
-from typing import Any
 
 import typer
 from rich.console import Console
@@ -58,7 +58,7 @@ app = typer.Typer(help="Shared documentation maintenance commands")
 
 
 @contextmanager
-def _temporary_env(**variables: str | Path | None) -> Any:
+def _temporary_env(**variables: str | Path | None) -> Generator[None]:
     """Temporarily set environment variables for the maintenance run."""
     original: dict[str, str | None] = {}
     try:
@@ -77,7 +77,7 @@ def _temporary_env(**variables: str | Path | None) -> Any:
                 os.environ[name] = value
 
 
-def _render_summary(report: Any) -> None:
+def _render_summary(report: object) -> None:
     """Render a high-level summary using rich tables."""
     summary = getattr(report, "summary", {}) or {}
 
@@ -114,6 +114,7 @@ def run_comprehensive(
     project_root: Path = DEFAULT_PROJECT_ROOT_OPTION,
     profile: str = DEFAULT_PROFILE_OPTION,
     config: Path | None = DEFAULT_CONFIG_OPTION,
+    *,
     dry_run: bool = typer.Option(
         False,
         "--dry-run",

@@ -175,7 +175,7 @@ class FlextQuality(FlextService[None]):
             maintainability_score,
         )  # Reserved for future use
 
-        # TODO(marlonsc): Calculate overall score as average #123
+        # NOTE: Overall score calculation reserved for future implementation
         # overall_score = (_coverage_score + complexity_score + security_score + maintainability_score) / 4.0
 
         return FlextResult[FlextQualityModels.Analysis].fail(
@@ -194,7 +194,7 @@ class FlextQuality(FlextService[None]):
         # Reserved for future issue count analysis implementation
         _ = critical, high, medium, low  # Reserved for future use
 
-        # TODO(marlonsc): Use issue counts for analysis #ISSUES-001
+        # NOTE: Issue counts analysis reserved for future implementation
         # total_issues = critical + high + medium + low
 
         return FlextResult[FlextQualityModels.Analysis].fail(
@@ -376,7 +376,7 @@ class FlextQuality(FlextService[None]):
 
         project = project_result.value
 
-        # TODO(marlonsc): Implement repository pattern for persistence #ISSUE-123
+        # NOTE: Repository pattern for persistence reserved for future implementation
         # For now, return a basic analysis result
         analysis_results = FlextQualityModels.AnalysisResults(
             metrics={

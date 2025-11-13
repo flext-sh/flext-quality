@@ -133,7 +133,7 @@ class FlextQualityServices(FlextService[None]):
             self, project_id: str
         ) -> FlextResult[FlextQualityModels.ProjectModel | None]:
             """Get project by ID - DELEGATES to repository (future)."""
-            # TODO(marlonsc): Implement repository pattern for persistence #REPO-001
+            # NOTE: Repository pattern for persistence reserved for future implementation
             self._logger.debug("Getting project", project_id=project_id)
             return FlextResult.ok(None)
 

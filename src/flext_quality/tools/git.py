@@ -133,7 +133,7 @@ class FlextQualityGitTools(FlextService[None]):
 
         @classmethod
         def _setup_workspace(
-            cls, repo_path: str, dry_run: bool, temp_path: str | None
+            cls, repo_path: str, *, dry_run: bool, temp_path: str | None = None
         ) -> FlextResult[Path]:
             """Set up workspace for git operations."""
             if dry_run:

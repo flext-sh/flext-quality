@@ -39,26 +39,26 @@ def ensure_directory(path: Path) -> Path:
     return path
 
 
-def get_reports_dir(project_root: Path | None = None, create: bool = True) -> Path:
+def get_reports_dir(project_root: Path | None = None, *, create: bool = True) -> Path:
     """Return the reports directory, creating it if requested."""
     path = get_maintenance_dir(project_root) / "reports"
     return ensure_directory(path) if create else path
 
 
-def get_backups_dir(project_root: Path | None = None, create: bool = True) -> Path:
+def get_backups_dir(project_root: Path | None = None, *, create: bool = True) -> Path:
     """Return the backups directory, creating it if requested."""
     path = get_maintenance_dir(project_root) / "backups"
     return ensure_directory(path) if create else path
 
 
-def get_cache_dir(project_root: Path | None = None, create: bool = True) -> Path:
+def get_cache_dir(project_root: Path | None = None, *, create: bool = True) -> Path:
     """Return the cache directory, creating it if requested."""
     path = get_maintenance_dir(project_root) / ".cache"
     return ensure_directory(path) if create else path
 
 
 def get_cache_file(
-    filename: str, project_root: Path | None = None, create_dir: bool = True
+    filename: str, project_root: Path | None = None, *, create_dir: bool = True
 ) -> Path:
     """Return a cache file path within the maintenance cache directory."""
     directory = get_cache_dir(project_root, create=create_dir)
@@ -66,7 +66,7 @@ def get_cache_file(
 
 
 def get_config_path(
-    filename: str, project_root: Path | None = None, ensure_exists: bool = False
+    filename: str, project_root: Path | None = None, *, ensure_exists: bool = False
 ) -> Path:
     """Return the path to a configuration file."""
     path = get_maintenance_dir(project_root) / "config" / filename
