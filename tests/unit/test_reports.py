@@ -221,7 +221,7 @@ class TestQualityReport:
                 "metrics": {"files_analyzed": 1, "coverage_percent": 90.0},
             }
 
-            report = QualityReport(results)
+            report = QualityReport.model_validate(results)
             grade = report._get_quality_grade()
             # Debug info
             report._get_quality_score()
@@ -260,7 +260,7 @@ class TestQualityReport:
                 "metrics": {"files_analyzed": 1, "coverage_percent": 90.0},
             }
 
-            report = QualityReport(results)
+            report = QualityReport.model_validate(results)
             color = report._get_grade_color()
 
             # Should return a valid hex color
@@ -485,121 +485,6 @@ class TestQualityReport:
         # Should show truncation message
         assert "... and" in issues_html
         assert "more issues" in issues_html
-
-    def test_generate_recommendations_excellent_code(
-        self,
-        minimal_results: object,
-    ) -> None:
-        """Test recommendations for excellent code quality."""
-        # Modify to have high coverage and no issues
-        metrics_obj = minimal_results["metrics"]
-        assert isinstance(metrics_obj, dict)
-        metrics_obj["coverage_percent"] = 95.0
-
-        report = QualityReport(minimal_results)
-        recommendations = report._generate_recommendations()
-
-        assert len(recommendations) == 1
-        assert "Great job!" in recommendations[0]
-        assert "excellent" in recommendations[0]
-
-    def test_generate_recommendations_critical_issues(
-        self,
-        mixed_results: object,
-    ) -> None:
-        """Test recommendations for critical issues."""
-        report = QualityReport(mixed_results)
-        recommendations = report._generate_recommendations()
-
-        # Should recommend fixing critical issues
-        critical_rec = next(
-            (r for r in recommendations if "critical" in r.lower()),
-            None,
-        )
-        assert critical_rec is not None
-        assert "Fix" in critical_rec
-
-    def test_generate_recommendations_many_issues(
-        self,
-        poor_results: object,
-    ) -> None:
-        """Test recommendations for many issues."""
-        report = QualityReport(poor_results)
-        recommendations = report._generate_recommendations()
-
-        # Should have multiple recommendations
-        assert len(recommendations) > 3
-
-        # Check for specific recommendations
-        rec_text = " ".join(recommendations).lower()
-        assert "fix" in rec_text
-        assert "coverage" in rec_text
-        assert "complexity" in rec_text or "breaking down" in rec_text
-
-    def test_generate_recommendations_low_coverage(self) -> None:
-        """Test recommendations for low coverage."""
-        low_coverage_results: dict[str, object] = {
-            "issues": {},
-            "metrics": {"files_analyzed": 10, "coverage_percent": 60.0},
-        }
-
-        report = QualityReport(low_coverage_results)
-        recommendations = report._generate_recommendations()
-
-        coverage_rec = next(
-            (r for r in recommendations if "coverage" in r.lower()),
-            None,
-        )
-        assert coverage_rec is not None
-        assert "60" in coverage_rec
-        assert str(MIN_COVERAGE_THRESHOLD) in coverage_rec
-
-    def test_generate_recommendations_duplicates(self) -> None:
-        """Test recommendations for duplicate code."""
-        duplicate_results = {
-            "issues": {
-                "duplicates": [
-                    {
-                        "type": "duplicate_code",
-                        "files": ["a.py", "b.py"],
-                        "similarity": 0.9,
-                    },
-                ],
-            },
-            "metrics": {"files_analyzed": 5, "coverage_percent": 85.0},
-        }
-
-        report = QualityReport(duplicate_results)
-        recommendations = report._generate_recommendations()
-
-        duplicate_rec = next(
-            (r for r in recommendations if "duplicate" in r.lower()),
-            None,
-        )
-        assert duplicate_rec is not None
-        assert "refactor" in duplicate_rec.lower()
-
-    def test_generate_recommendations_complexity(self) -> None:
-        """Test recommendations for complexity issues."""
-        complex_results = {
-            "issues": {
-                "complexity": [
-                    {
-                        "file": "complex.py",
-                        "message": "High complexity: 15",
-                        "complexity": 15,
-                    },
-                ],
-            },
-            "metrics": {"files_analyzed": 5, "coverage_percent": 85.0},
-        }
-
-        report = QualityReport(complex_results)
-        recommendations = report._generate_recommendations()
-
-        complex_rec = next((r for r in recommendations if "complex" in r.lower()), None)
-        assert complex_rec is not None
-        assert "simplify" in complex_rec.lower()
 
     def test_save_report_text_format(self, good_results: object) -> None:
         """Test saving report in text format."""

@@ -574,9 +574,6 @@ def mock_quality_analyzer() -> object:
         def get_metrics(self, _project_path: str) -> dict[str, object]:
             """Simulate project-wide quality metrics collection.
 
-            Args:
-                project_path: Path to project for metrics
-
             Returns:
                 Comprehensive quality metrics across all categories
 

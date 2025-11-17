@@ -8,7 +8,7 @@ from typing import Self
 from flext_core import FlextLogger, FlextResult, FlextService
 
 
-class FlextObservabilityService(FlextService[None]):
+class FlextObservabilityService(FlextService[bool]):
     """Provide lightweight observability utilities."""
 
     class DetailedLogger:
@@ -35,6 +35,6 @@ class FlextObservabilityService(FlextService[None]):
         super().__init__()
         self._logger = FlextLogger(__name__)
 
-    def execute(self: Self) -> FlextResult[None]:
+    def execute(self: Self) -> FlextResult[bool]:
         """Execute observability service."""
-        return FlextResult[None].ok(None)
+        return FlextResult[bool].ok(True)

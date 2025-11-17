@@ -10,7 +10,7 @@ from __future__ import annotations
 from flext_core import FlextResult, FlextService
 
 
-class FlextQualityOperations(FlextService[None]):
+class FlextQualityOperations(FlextService[bool]):
     """Unified quality checking operations with complete flext-core integration.
 
     **ARCHITECTURE LAYER 3** - Domain Service Implementation
@@ -20,9 +20,9 @@ class FlextQualityOperations(FlextService[None]):
     pattern_auditor.py, false_positive_auditor.py
     """
 
-    def execute(self) -> FlextResult[None]:
+    def execute(self) -> FlextResult[bool]:
         """Execute quality operations service - FlextService interface."""
-        return FlextResult.ok(None)
+        return FlextResult[bool].ok(True)
 
     def __init__(self) -> None:
         """Initialize quality operations service."""

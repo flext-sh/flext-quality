@@ -292,3 +292,18 @@ class FlextQualityConstants(FlextConstants):
         DEFAULT_TEMP_PREFIX: str = f"{tempfile.gettempdir()}/flext-tools-"
         BACKUP_SUFFIX: str = ".backup"
         DRY_RUN_DEFAULT: bool = True
+
+    # =============================================================================
+    # SCORING AND PENALTIES - Quality score calculation constants
+    # =============================================================================
+
+    class Scoring:
+        """Score calculation and penalty constants."""
+
+        MAX_QUALITY_SCORE: float = 100.0
+        MIN_QUALITY_SCORE: float = 0.0
+        BASE_SCORE: float = 100.0
+        CRITICAL_ISSUE_PENALTY: int = 10
+        HIGH_ISSUE_PENALTY: int = 5
+        NORMAL_ISSUE_PENALTY: int = 2
+        LOW_ISSUE_PENALTY: int = 1

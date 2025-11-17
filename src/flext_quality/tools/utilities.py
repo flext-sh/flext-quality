@@ -17,7 +17,7 @@ from flext_cli.output import FlextCliOutput
 from flext_core import FlextLogger, FlextResult, FlextService
 
 
-class FlextQualityToolsUtilities(FlextService[None]):
+class FlextQualityToolsUtilities(FlextService[bool]):
     """Unified utilities with complete flext-core integration.
 
     Consolidates:
@@ -74,7 +74,7 @@ class FlextQualityToolsUtilities(FlextService[None]):
             message: str,
             color: str = "",
             logger: FlextLogger | None = None,
-        ) -> FlextResult[None]:
+        ) -> FlextResult[bool]:
             """Print text with color formatting using flext-cli.
 
             MANDATORY: Uses FlextCli for output (NO direct rich/click).
@@ -85,7 +85,7 @@ class FlextQualityToolsUtilities(FlextService[None]):
             logger: Optional logger for parallel logging
 
             Returns:
-            FlextResult indicating success/failure of print operation
+            FlextResult[bool] indicating success (True) or failure (False)
 
             """
             if logger:
@@ -100,12 +100,12 @@ class FlextQualityToolsUtilities(FlextService[None]):
                 print_result = output.print_message(colored_message)
 
                 if print_result.is_failure:
-                    return FlextResult[None].fail(
+                    return FlextResult[bool].fail(
                         print_result.error or "CLI output failed"
                     )
-                return FlextResult[None].ok(None)
+                return FlextResult[bool].ok(True)
             except Exception as e:
-                return FlextResult[None].fail(f"CLI output failed: {e}")
+                return FlextResult[bool].fail(f"CLI output failed: {e}")
 
         @staticmethod
         def _ansi_to_style(color_code: str) -> str:
@@ -288,17 +288,23 @@ class FlextQualityToolsUtilities(FlextService[None]):
     def __init__(self: Self) -> None:
         """Initialize utilities service."""
         super().__init__()
-        self.logger = FlextLogger(__name__)
+        # Use private attribute to avoid conflict with parent class logger property
+        self._logger = FlextLogger(__name__)
         self._cli = FlextCli()  # MANDATORY: Use flext-cli
 
-    def execute(self: Self) -> FlextResult[None]:
+    @property
+    def logger(self) -> FlextLogger:
+        """Get logger instance."""
+        return self._logger
+
+    def execute(self: Self) -> FlextResult[bool]:
         """Execute utilities service - FlextService interface.
 
         Returns:
-        FlextResult indicating service execution success
+        FlextResult[bool] indicating service execution success (True)
 
         """
-        return FlextResult[None].ok(None)
+        return FlextResult[bool].ok(True)
 
 
 # Backward compatibility aliases (for existing code)

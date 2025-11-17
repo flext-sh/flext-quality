@@ -7,17 +7,19 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextModels
+from pydantic import BaseModel, ConfigDict
 
 
-class FlextQualityASTClassInfo(FlextModels.ArbitraryTypesModel):
+class FlextQualityASTClassInfo(BaseModel):
     """Unified AST class information class following FLEXT pattern.
 
     Single responsibility: AST class information management
     Contains all class-related models as nested classes.
     """
 
-    class ClassInfo(FlextModels.ArbitraryTypesModel):
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    class ClassInfo(BaseModel):
         """Strongly-typed class information from AST analysis."""
 
         name: str

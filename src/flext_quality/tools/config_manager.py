@@ -44,37 +44,37 @@ class ConfigurationManager(FlextService[dict[str, str]]):
                 f"Failed to load configuration: {error}"
             )
 
-    def save_config(self) -> FlextResult[None]:
+    def save_config(self) -> FlextResult[bool]:
         """Persist the configuration to disk if a path has been provided."""
         if not self._config_path:
-            return FlextResult[None].ok(None)
+            return FlextResult[bool].ok(True)
 
         try:
             self._config_path.parent.mkdir(parents=True, exist_ok=True)
             with self._config_path.open("w", encoding="utf-8") as handle:
                 json.dump(self._config, handle, indent=2, ensure_ascii=False)
-            return FlextResult[None].ok(None)
+            return FlextResult[bool].ok(True)
         except OSError as error:
             self._logger.exception("Failed to save configuration")
-            return FlextResult[None].fail(f"Failed to save configuration: {error}")
+            return FlextResult[bool].fail(f"Failed to save configuration: {error}")
 
     def get(self, key: str, default: str | None = None) -> FlextResult[str | None]:
         """Retrieve a configuration value."""
         return FlextResult[str | None].ok(self._config.get(key, default))
 
-    def set(self, key: str, value: str) -> FlextResult[None]:
+    def set(self, key: str, value: str) -> FlextResult[bool]:
         """Set a configuration value."""
         self._config[key] = value
-        return FlextResult[None].ok(None)
+        return FlextResult[bool].ok(True)
 
-    def delete(self, key: str) -> FlextResult[None]:
+    def delete(self, key: str) -> FlextResult[bool]:
         """Delete a configuration value if present."""
         self._config.pop(key, None)
-        return FlextResult[None].ok(None)
+        return FlextResult[bool].ok(True)
 
-    def validate_config(self) -> FlextResult[None]:
+    def validate_config(self) -> FlextResult[bool]:
         """Validate configuration structure (placeholder for compatibility)."""
-        return FlextResult[None].ok(None)
+        return FlextResult[bool].ok(True)
 
 
 __all__ = ["ConfigurationManager"]

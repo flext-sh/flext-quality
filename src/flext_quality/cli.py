@@ -8,31 +8,26 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import argparse
-import json
 import logging
-import sys
+import os
 import traceback
 from pathlib import Path
-from typing import override
+from typing import Self, override
 
+from flext_cli import FlextCli, FlextCliFileTools
 from flext_core import (
     FlextLogger,
     FlextResult,
     FlextService,
+    FlextUtilities,
 )
 from pydantic import BaseModel, Field
-from rich.console import Console
 
 from .analyzer import FlextQualityAnalyzer
 from .config import FlextQualityConfig
 from .docs_maintenance.cli import run_comprehensive
-from .reports import FlextQualityReportGenerator
-
-try:
-    from .web import FlextQualityWeb
-except Exception:  # Catch all import issues
-    FlextQualityWeb = None
-
+from .reports import FlextQualityReportGenerator, ReportFormat
+from .web import FlextQualityWeb
 
 # =====================================================================
 # Configuration Models - Data-Driven Approach (Pydantic 2)
@@ -95,53 +90,74 @@ class CliArgumentValidator:
 
 
 class QualityReportFormatter:
-    """Formats and outputs quality reports."""
+    """Formats and outputs quality reports using FlextCli."""
 
     def __init__(self, logger: FlextLogger) -> None:
-        """Initialize formatter with logger."""
+        """Initialize formatter with logger and FlextCli."""
         super().__init__()
         self.logger = logger
+        self._cli = FlextCli()
+        self._file_tools = FlextCliFileTools()
 
     def output_report(
         self,
         report: FlextQualityReportGenerator,
         fmt: str,
         output_path: Path | None = None,
-    ) -> FlextResult[None]:
-        """Output report to file or stdout."""
+    ) -> FlextResult[bool]:
+        """Output report to file or stdout using FlextCli."""
         if output_path:
             return self._save_to_file(report, fmt, output_path)
         return self._output_to_stdout(report, fmt)
 
     def _save_to_file(
         self, report: FlextQualityReportGenerator, fmt: str, output_path: Path
-    ) -> FlextResult[None]:
-        """Save report to file."""
+    ) -> FlextResult[bool]:
+        """Save report to file with proper directory creation and error handling."""
+        # Determine report format
+        format_type = ReportFormat.JSON
+        if fmt == "html":
+            format_type = ReportFormat.HTML
+        elif fmt == "csv":
+            format_type = ReportFormat.TEXT  # Default to text for unsupported formats
+
+        # Create parent directories if they don't exist
         try:
-            if fmt == "html":
-                output_path.write_text(report.to_html(), encoding="utf-8")
-            else:
-                report_dict = json.loads(report.to_json())
-                with output_path.open("w", encoding="utf-8") as f:
-                    json.dump(report_dict, f, indent=2)
+            output_path.parent.mkdir(parents=True, exist_ok=True)
+        except OSError as e:
+            return FlextResult[bool].fail(f"Failed to create output directory: {e}")
+
+        # Save report using proper API
+        save_result = report.save_report(output_path, format_type)
+
+        if save_result.is_success:
             self.logger.info(f"Report saved to {output_path}")
-            return FlextResult[None].ok(None)
-        except Exception as e:
-            return FlextResult[None].fail(f"Failed to save report: {e}")
+            return FlextResult[bool].ok(True)
+        return save_result
 
     def _output_to_stdout(
         self, report: FlextQualityReportGenerator, fmt: str
-    ) -> FlextResult[None]:
-        """Output report to stdout."""
+    ) -> FlextResult[bool]:
+        """Output report to stdout using proper report generation methods."""
+        # Determine report format
+        if fmt == "html":
+            report_result = report.generate_html_report()
+        elif fmt == "json":
+            report_result = report.generate_json_report()
+        else:
+            report_result = report.generate_text_report()
+
+        if report_result.is_failure:
+            return FlextResult[bool].fail(
+                f"Failed to generate report: {report_result.error}"
+            )
+
+        # Output to stdout
         try:
-            if fmt == "html":
-                sys.stdout.write(report.to_html() + "\n")
-            elif fmt == "json":
-                report_dict = json.loads(report.to_json())
-                sys.stdout.write(json.dumps(report_dict, indent=2) + "\n")
-            return FlextResult[None].ok(None)
+            self._cli.formatters.print(report_result.value)
+            return FlextResult[bool].ok(True)
         except Exception as e:
-            return FlextResult[None].fail(f"Failed to output report: {e}")
+            return FlextResult[bool].fail(f"Failed to output report: {e}")
 
 
 class AnalysisOptions(BaseModel):
@@ -169,7 +185,7 @@ class ProjectQualityAnalyzer:
     ) -> FlextResult[FlextQualityAnalyzer]:
         """Execute project analysis."""
         try:
-            opts = options or AnalysisOptions()
+            opts = options if options is not None else AnalysisOptions()
             analyzer = FlextQualityAnalyzer(project_path)
             result = analyzer.analyze_project(
                 include_security=opts.include_security,
@@ -211,7 +227,8 @@ class CliCommandRouter:
         # Validate project path
         path_result = CliArgumentValidator.validate_project_path(args.path)
         if path_result.is_failure:
-            self.logger.error(path_result.error or "Unknown error")
+            error_msg = path_result.error or "Unknown error in path validation"
+            self.logger.error(error_msg)
             return FlextResult[int].ok(1)
 
         project_path = path_result.value
@@ -226,7 +243,10 @@ class CliCommandRouter:
         analyzer_result = self.analyzer_wrapper.analyze(project_path, options)
 
         if analyzer_result.is_failure:
-            self.logger.error(analyzer_result.error or "Unknown error")
+            if analyzer_result.is_failure:
+                self.logger.error(analyzer_result.error or "Unknown error")
+            else:
+                self.logger.error("Unknown error in analyzer")
             return FlextResult[int].ok(1)
 
         analyzer = analyzer_result.value
@@ -243,7 +263,10 @@ class CliCommandRouter:
         )
 
         if output_result.is_failure:
-            self.logger.error(output_result.error or "Unknown error")
+            if output_result.is_failure:
+                self.logger.error(output_result.error or "Unknown error")
+            else:
+                self.logger.error("Unknown error in output")
             return FlextResult[int].ok(1)
 
         # Return appropriate exit code
@@ -263,7 +286,8 @@ class CliCommandRouter:
         # Validate project path
         path_result = CliArgumentValidator.validate_project_path(args.path)
         if path_result.is_failure:
-            self.logger.error(path_result.error or "Unknown error")
+            error_msg = path_result.error or "Unknown error in path validation"
+            self.logger.error(error_msg)
             return FlextResult[int].ok(1)
 
         project_path = path_result.value
@@ -278,7 +302,10 @@ class CliCommandRouter:
         analyzer_result = self.analyzer_wrapper.analyze(project_path, options)
 
         if analyzer_result.is_failure:
-            self.logger.error(analyzer_result.error or "Unknown error")
+            if analyzer_result.is_failure:
+                self.logger.error(analyzer_result.error or "Unknown error")
+            else:
+                self.logger.error("Unknown error in analyzer")
             return FlextResult[int].ok(1)
 
         analyzer = analyzer_result.value
@@ -298,11 +325,6 @@ class CliCommandRouter:
 
     def route_web(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route web command."""
-        if FlextQualityWeb is None:
-            return FlextResult[int].fail(
-                "Web interface not available. Install flext-auth for web functionality."
-            )
-
         self.logger.info(f"Starting web server on {args.host}:{args.port}")
         try:
             interface = FlextQualityWeb()
@@ -324,10 +346,27 @@ class CliCommandRouter:
 class FlextQualityCliService(FlextService[int]):
     """Main CLI service with SOLID delegation."""
 
+    def __new__(
+        cls,
+        _config: CliConfig | None = None,
+        **_data: object,
+    ) -> Self:
+        """Create new CLI service instance.
+
+        Args:
+            _config: Configuration (ignored in __new__, used in __init__).
+            **_data: Additional keyword arguments.
+
+        Returns:
+            New FlextQualityCliService instance.
+
+        """
+        return super().__new__(cls)
+
     def __init__(self, config: CliConfig | None = None, **_data: object) -> None:
         """Initialize CLI service with optional config."""
         super().__init__()
-        self._config = config or CliConfig()
+        self._config = config if config is not None else CliConfig()
         self._router = CliCommandRouter(self.logger, self._config)
 
     def get_router(self) -> CliCommandRouter:
@@ -508,6 +547,29 @@ Examples:
     web_parser.add_argument("--port", type=int, default=8000)
     web_parser.add_argument("--debug", action="store_true")
 
+    # Make command - execute Makefile targets
+    make_parser = subparsers.add_parser(
+        "make",
+        help="Execute project Makefile targets",
+        description="Run make targets across FLEXT projects",
+    )
+    make_parser.add_argument(
+        "target",
+        help="Makefile target to execute (e.g., docs, fix, validate)",
+    )
+    make_parser.add_argument(
+        "--project-path",
+        type=Path,
+        default=Path.cwd(),
+        help="Path to the project (defaults to current directory)",
+    )
+    make_parser.add_argument(
+        "--env",
+        action="append",
+        nargs="?",
+        help="Environment variables (format: KEY=VALUE)",
+    )
+
     # Doc command - delegates to documentation maintenance CLI
     doc_parser = subparsers.add_parser(
         "doc",
@@ -553,6 +615,10 @@ Examples:
         parser.print_help()
         return 1
 
+    # Handle make command (execute Makefile targets)
+    if args.command == "make":
+        return _run_make_target(args)
+
     # Handle doc command (delegates to documentation maintenance module)
     if args.command == "doc":
         return _route_doc_command(args)
@@ -581,10 +647,61 @@ Examples:
     return 1
 
 
+def _run_make_target(args: object) -> int:
+    """Execute a Makefile target using flext-core utilities."""
+    cli = FlextCli()
+    args_dict = vars(args)
+
+    project_path = Path(args_dict.get("project_path", Path.cwd()))
+    target = args_dict.get("target")
+
+    # Validate project path
+    if not project_path.exists():
+        cli.formatters.print(
+            f"Project path does not exist: {project_path}", style="red"
+        )
+        return 1
+
+    # Build environment with custom variables
+    env = os.environ.copy()
+    if args_dict.get("env"):
+        for env_var in args_dict["env"]:
+            if env_var and "=" in env_var:
+                key, value = env_var.split("=", 1)
+                env[key.strip()] = value.strip()
+
+    # Execute make target using flext-core utilities (no code duplication)
+    cli.formatters.print(f"Running: make {target}", style="cyan")
+    result = FlextUtilities.CommandExecution.run_external_command(
+        ["make", target],
+        cwd=project_path,
+        env=env,
+        capture_output=False,
+        check=False,
+    )
+
+    if result.is_success:
+        process = result.value
+        if process.returncode == 0:
+            cli.formatters.print(
+                f"✓ make {target} completed successfully", style="green"
+            )
+            return 0
+        cli.formatters.print(
+            f"✗ make {target} failed with code {process.returncode}", style="red"
+        )
+        return process.returncode
+
+    # Error executing command
+    error = result.error
+    cli.formatters.print(f"Make execution error: {error}", style="red")
+    return 1
+
+
 def _route_doc_command(args: object) -> int:
     """Route documentation commands to the docs_maintenance module."""
     try:
-        console = Console()
+        cli = FlextCli()
 
         # Convert argparse namespace to function arguments
         args_dict = vars(args)
@@ -598,15 +715,16 @@ def _route_doc_command(args: object) -> int:
                 verbose=args_dict.get("verbose_docs", False),
             )
             return 0
-        console.print(
-            f"[yellow]Documentation subcommand '{args_dict.get('subcommand')}' "
-            "not yet implemented. Use 'comprehensive'.[/yellow]"
+        cli.formatters.print(
+            f"Documentation subcommand '{args_dict.get('subcommand')}' "
+            "not yet implemented. Use 'comprehensive'.",
+            style="yellow",
         )
         return 1
 
     except Exception as e:
-        console = Console()
-        console.print(f"[red]Documentation command error: {e}[/red]")
+        cli = FlextCli()
+        cli.formatters.print(f"Documentation command error: {e}", style="red")
         return 1
 
 

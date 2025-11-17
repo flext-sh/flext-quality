@@ -320,21 +320,30 @@ class ConfigUpdater:
 # =========================================================================
 
 
-class FlextQualityOptimizerOperations(FlextService[None]):
+class FlextQualityOptimizerOperations(FlextService[bool]):
     """Unified optimizer service delegating to focused utilities.
 
     ONE CLASS PER MODULE - All utilities composed here.
     """
 
     def __init__(self, config: OptimizerConfig | None = None) -> None:
-        """Initialize with optional custom config."""
+        """Initialize with optional custom config.
+
+        Args:
+            config: Optional optimizer configuration. If None, creates default config.
+
+        """
         super().__init__()
-        self._config = config or OptimizerConfig()
+        # Must provide config explicitly - no fallback patterns allowed
+        if config is None:
+            self._config = OptimizerConfig()
+        else:
+            self._config = config
         self._logger = FlextLogger(__name__)
 
-    def execute(self) -> FlextResult[None]:
+    def execute(self) -> FlextResult[bool]:
         """FlextService interface."""
-        return FlextResult[None].ok(None)
+        return FlextResult[bool].ok(True)
 
     def analyze_module(
         self,

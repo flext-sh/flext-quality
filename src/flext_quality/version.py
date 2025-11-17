@@ -62,7 +62,10 @@ class FlextQualityVersion:
     @property
     def urls(self) -> dict[str, object]:
         """Return project URLs."""
-        return self.metadata["project_urls"]
+        urls = self.metadata["project_urls"]
+        if isinstance(urls, dict):
+            return urls
+        return {}
 
     @property
     def author(self) -> str:
@@ -87,12 +90,18 @@ class FlextQualityVersion:
     @property
     def authors(self) -> list[str]:
         """Return list of authors."""
-        return self.metadata["authors"]
+        authors = self.metadata["authors"]
+        if isinstance(authors, list):
+            return authors
+        return ["FLEXT Team"]
 
     @property
     def maintainers(self) -> list[str]:
         """Return list of maintainers."""
-        return self.metadata["maintainers"]
+        maintainers = self.metadata["maintainers"]
+        if isinstance(maintainers, list):
+            return maintainers
+        return ["FLEXT Team"]
 
     @classmethod
     def current(cls) -> FlextQualityVersion:

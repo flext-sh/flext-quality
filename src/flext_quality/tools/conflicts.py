@@ -81,9 +81,9 @@ class ConflictAnalyzer(FlextService[list[dict[str, str]]]):
         """Compat method retained for script expectations."""
         return FlextResult[list[str]].ok([])
 
-    def resolve_conflicts(self: Self) -> FlextResult[None]:
+    def resolve_conflicts(self: Self) -> FlextResult[bool]:
         """Placeholder resolution hook."""
-        return FlextResult[None].ok(None)
+        return FlextResult[bool].ok(True)
 
     def get_conflicts(self: Self) -> FlextResult[list[dict[str, str]]]:
         """Get conflicts for the current working directory."""

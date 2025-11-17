@@ -17,14 +17,14 @@ from pydantic import ConfigDict
 from flext_quality.models import FlextQualityModels
 
 
-class FlextQualityValidationTools(FlextService[None]):
+class FlextQualityValidationTools(FlextService[bool]):
     """Unified validation tools with flext-core integration for quality operations."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True, extra="allow")
 
-    def execute(self) -> FlextResult[None]:
+    def execute(self) -> FlextResult[bool]:
         """Execute validation tools service - FlextService interface."""
-        return FlextResult[None].ok(None)
+        return FlextResult[bool].ok(True)
 
     class EquilibriumValidator:
         """Equilibrium validation across ecosystem."""

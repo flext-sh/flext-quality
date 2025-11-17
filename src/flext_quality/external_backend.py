@@ -123,7 +123,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
         if not file_path.exists():
             return FlextResult.fail("Invalid file path")
 
-        result = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
+        result = FlextUtilities.CommandExecution.run_external_command(
             command,
             capture_output=True,
             timeout=timeout,
@@ -238,7 +238,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
 
     def _run_coverage(self, file_path: Path) -> FlextResult[dict[str, Any]]:
         """Run coverage to measure test coverage."""
-        result = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
+        result = FlextUtilities.CommandExecution.run_external_command(
             [
                 "coverage",
                 "run",
@@ -300,7 +300,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
     def _run_radon(self, file_path: Path) -> FlextResult[dict[str, Any]]:
         """Run radon for complexity metrics."""
         # First call: complexity
-        result_cc = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
+        result_cc = FlextUtilities.CommandExecution.run_external_command(
             ["radon", "cc", str(file_path), "-j"],
             capture_output=True,
             timeout=30.0,
@@ -338,7 +338,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
 
     def _run_radon_maintainability(self, file_path: Path) -> dict[str, Any]:
         """Run radon maintainability index analysis."""
-        result_mi = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
+        result_mi = FlextUtilities.CommandExecution.run_external_command(
             ["radon", "mi", str(file_path), "-j"],
             capture_output=True,
             timeout=30.0,

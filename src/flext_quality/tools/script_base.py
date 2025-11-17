@@ -47,9 +47,9 @@ class FlextScriptService(FlextService[object], ABC):
         parser.add_argument("--version", action="version", version=meta.version)
         return parser
 
-    def validate_preconditions(self: Self) -> FlextResult[None]:
+    def validate_preconditions(self: Self) -> FlextResult[bool]:
         """Hook used by subclasses to ensure prerequisites are satisfied."""
-        return FlextResult[None].ok(None)
+        return FlextResult[bool].ok(True)
 
     def run(self: Self, args: dict[str, object] | None = None) -> FlextResult[object]:
         """Execute the script with validation and error handling."""

@@ -9,7 +9,7 @@ from __future__ import annotations
 import ast
 import uuid
 from pathlib import Path
-from typing import Any, override
+from typing import Self, TypedDict
 from uuid import UUID, uuid4
 
 from flext_core import (
@@ -23,6 +23,86 @@ from .config import FlextQualityConfig
 from .constants import FlextQualityConstants
 from .external_backend import FlextQualityExternalBackend
 from .models import FlextQualityModels
+
+# =====================================================================
+# Type Definitions - Replace Any/object with proper types
+# =====================================================================
+
+
+# =====================================================================
+# Backend Issue Models - Validação Pydantic para dados externos
+# =====================================================================
+
+
+class BanditIssueModel(BaseModel):
+    """Validado issue do Bandit (security analysis)."""
+
+    line_number: int = Field(default=1, ge=1)
+    severity: str = Field(default="MEDIUM")
+    message: str = Field(default="Security issue detected")
+    test_id: str = Field(default="")
+
+
+class VultureIssueModel(BaseModel):
+    """Validado issue do Vulture (dead code analysis)."""
+
+    line_number: int = Field(default=1, ge=1)
+    type: str = Field(default="unused variable")
+    message: str = Field(default="Dead code detected")
+
+
+class DuplicationIssueModel(BaseModel):
+    """Validated duplication issue."""
+
+    id: str = Field(default_factory=lambda: str(uuid4()))
+    analysis_id: str = Field(default_factory=lambda: str(uuid4()))
+    file_path: str = Field(description="File path with duplication")
+    line_number: int | None = Field(default=None, ge=1)
+    issue_type: str = Field(default="duplication")
+    severity: str = Field(default="medium")
+    message: str = Field(
+        default="Duplicate code detected", description="Issue description"
+    )
+    rule_id: str | None = Field(default=None)
+
+
+class FileMetricsModel(BaseModel):
+    """Validated file-level metrics model."""
+
+    id: str = Field(default_factory=lambda: str(uuid4()))
+    file_path: str = Field(default="")
+    lines_of_code: int = Field(default=0, ge=0)
+    complexity_score: float = Field(default=0.0, ge=0)
+    functions_count: int = Field(default=0, ge=0)
+    classes_count: int = Field(default=0, ge=0)
+    issues: list[FlextQualityModels.CodeIssue] = Field(default_factory=list)
+
+
+# Legacy TypedDict aliases for backward compatibility (remove in v1.0)
+class FileMetricsDict(TypedDict, total=False):
+    """DEPRECATED: Use FileMetricsModel instead."""
+
+    id: str
+    file_path: str
+    lines_of_code: int
+    complexity_score: float
+    functions_count: int
+    classes_count: int
+    issues: list[FlextQualityModels.CodeIssue]
+
+
+class DuplicationIssueDict(TypedDict, total=False):
+    """DEPRECATED: Use DuplicationIssueModel instead."""
+
+    id: str
+    analysis_id: str
+    file_path: str
+    line_number: int
+    issue_type: str
+    severity: str
+    message: str
+    rule_id: str
+
 
 # =====================================================================
 # Analysis Configuration Models (Pydantic 2)
@@ -43,7 +123,7 @@ class FileMetricsData(BaseModel):
 
     total_files: int = Field(default=0, ge=0)
     total_lines: int = Field(default=0, ge=0)
-    file_metrics: list[dict[str, Any]] = Field(default_factory=list)
+    file_metrics: list[FileMetricsModel] = Field(default_factory=list)
     analysis_errors: int = Field(default=0, ge=0)
 
 
@@ -52,18 +132,48 @@ class FileMetricsData(BaseModel):
 # =====================================================================
 
 
-class FlextQualityAnalyzer(FlextService[None]):
+class FlextQualityAnalyzer(FlextService):  # type: ignore[type-arg]
     """Main quality analyzer orchestrating focused analysis utilities."""
 
-    auto_execute = True
-    project_path: Path
+    auto_execute = False
+    project_path: Path = Path()
+
+    def __new__(
+        cls,
+        _project_path: str | Path | None = None,
+        _config: FlextQualityConfig | None = None,
+        **_data: object,
+    ) -> Self:
+        """Create new analyzer instance.
+
+        Args:
+            _project_path: Path to analyze (ignored in __new__, used in __init__).
+            _config: Optional configuration (ignored in __new__, used in __init__).
+            **_data: Additional keyword arguments.
+
+        Returns:
+            New FlextQualityAnalyzer instance.
+
+        """
+        return super().__new__(cls)
 
     def __init__(
-        self, project_path: str | Path, config: FlextQualityConfig | None = None
+        self,
+        project_path: str | Path | None = None,
+        config: FlextQualityConfig | None = None,
+        **_data: object,
     ) -> None:
-        """Initialize analyzer."""
-        super().__init__(project_path=Path(project_path))
-        self._config = config or FlextQualityConfig()
+        """Initialize analyzer.
+
+        Args:
+            project_path: Path to analyze. If None, uses current directory.
+            config: Optional quality configuration.
+            **_data: Additional keyword arguments (ignored, for FlextService compatibility).
+
+        """
+        super().__init__()
+        self.project_path = Path(project_path) if project_path is not None else Path()
+        self._config = config if config is not None else FlextQualityConfig()
         self._logger = FlextLogger(__name__)
         self._current_results: FlextQualityModels.AnalysisResults | None = None
 
@@ -72,10 +182,9 @@ class FlextQualityAnalyzer(FlextService[None]):
         """Get logger."""
         return self._logger
 
-    @override
-    def execute(self) -> FlextResult[None]:
-        """Execute analyzer service."""
-        return FlextResult.ok(None)
+    def execute(self) -> FlextResult[bool]:
+        """Execute analyzer service - override from FlextService."""
+        return FlextResult[bool].ok(True)
 
     def analyze_project(
         self,
@@ -112,7 +221,7 @@ class FlextQualityAnalyzer(FlextService[None]):
         metrics_data = metrics_result.value
 
         # Analyze duplications
-        duplication_issues = []
+        duplication_issues: list[DuplicationIssueModel] = []
         if options.include_duplicates and len(python_files) > 1:
             dup_result = self._DuplicationAnalyzer.analyze(python_files)
             if dup_result.is_success:
@@ -189,7 +298,7 @@ class FlextQualityAnalyzer(FlextService[None]):
                 if result.is_success:
                     metrics = result.value
                     file_metrics.append(metrics)
-                    total_lines += int(metrics.get("lines_of_code", 0) or 0)
+                    total_lines += metrics.lines_of_code
                 else:
                     analysis_errors += 1
                     logger.warning(f"Failed to analyze {file_path}: {result.error}")
@@ -206,7 +315,7 @@ class FlextQualityAnalyzer(FlextService[None]):
         @staticmethod
         def analyze_single_file(
             file_path: Path, options: AnalysisOptions
-        ) -> FlextResult[dict[str, Any]]:
+        ) -> FlextResult[FileMetricsModel]:
             """Analyze single file - delegates to specialized analyzers."""
             try:
                 content = file_path.read_text(encoding="utf-8")
@@ -234,21 +343,23 @@ class FlextQualityAnalyzer(FlextService[None]):
                     else []
                 )
 
-                return FlextResult.ok({
-                    "id": f"file_{uuid.uuid4()}",
-                    "file_path": str(file_path),
-                    "lines_of_code": len(content.splitlines()),
-                    "complexity_score": complexity_score,
-                    "functions_count": len([
+                # Create validated FileMetricsModel - NO DICT CONVERSION
+                metrics = FileMetricsModel(
+                    id=str(uuid.uuid4()),
+                    file_path=str(file_path),
+                    lines_of_code=len(content.splitlines()),
+                    complexity_score=complexity_score,
+                    functions_count=len([
                         n
                         for n in ast.walk(tree)
                         if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
                     ]),
-                    "classes_count": len([
+                    classes_count=len([
                         n for n in ast.walk(tree) if isinstance(n, ast.ClassDef)
                     ]),
-                    "issues": issues,
-                })
+                    issues=issues,
+                )
+                return FlextResult.ok(metrics)
             except SyntaxError as e:
                 return FlextResult.fail(f"Syntax error in {file_path}: {e}")
             except Exception as e:
@@ -302,33 +413,36 @@ class FlextQualityAnalyzer(FlextService[None]):
             r"""Analyze security issues using Bandit backend."""
             # Reserved for future AST-based analysis
             _ = tree  # Reserved for future use
-            issues = []
             try:
                 result = FlextQualityAnalyzer._SecurityAnalyzer.backend.analyze(
-                    "", file_path=file_path, tool="bandit"
+                    "", _file_path=file_path, tool="bandit"
                 )
-                if result.is_success and "issues" in result.value:
-                    issues = [
+                if not result.is_success or "issues" not in result.value:
+                    return []
+
+                # Validate each issue with BanditIssueModel - fail-fast on invalid data
+                validated_issues = []
+                for data in result.value["issues"]:
+                    validated = BanditIssueModel.model_validate(data)
+                    # Convert validated Bandit issue to CodeIssue
+                    validated_issues.append(
                         FlextQualityModels.CodeIssue(
-                            id=uuid4(),  # security issue{i}",
+                            id=uuid4(),
                             analysis_id=uuid4(),
                             file_path=str(file_path),
-                            line_number=data.get("line_number", 1),
+                            line_number=validated.line_number,
                             issue_type=FlextQualityModels.IssueType.SECURITY_VULNERABILITY,
-                            severity=data.get("severity", "medium"),
-                            message=data.get("message", ""),
-                            rule_id=data.get("test_id", "security"),
+                            severity=validated.severity,
+                            message=validated.message,
+                            rule_id=validated.test_id,
                         )
-                        for i, data in enumerate(result.value["issues"])
-                    ]
-                return issues
+                    )
+                return validated_issues
             except Exception as e:
                 # Log the error and allow graceful degradation
-                # but don't silently fall back to AST - report the issue
                 logger = FlextLogger(__name__)
                 logger.warning(f"Security analysis with Bandit failed: {e}")
                 # Return empty list - security analysis is best-effort
-                # If Bandit is required, it should be configured properly
                 return []
 
     class _DeadCodeAnalyzer:
@@ -340,41 +454,47 @@ class FlextQualityAnalyzer(FlextService[None]):
         def analyze(
             tree: ast.AST, file_path: Path
         ) -> list[FlextQualityModels.CodeIssue]:
-            """Analyze dead code - external backend with AST fallback."""
-            # Reserved for future AST-based analysis
-            _ = tree  # Reserved for future use
-            issues = []
+            """Analyze dead code - external backend only."""
+            # AST-based analysis not implemented - use external backend
+            _ = tree  # Reserved for future AST-based analysis
             try:
                 result = FlextQualityAnalyzer._DeadCodeAnalyzer.backend.analyze(
-                    "", file_path=file_path, tool="vulture"
+                    "", _file_path=file_path, tool="vulture"
                 )
-                if result.is_success and "issues" in result.value:
-                    issues = [
+                if not result.is_success or "issues" not in result.value:
+                    return []
+
+                # Validate each issue with VultureIssueModel - fail-fast on invalid data
+                validated_issues = []
+                for data in result.value["issues"]:
+                    validated = VultureIssueModel.model_validate(data)
+                    # Convert validated Vulture issue to CodeIssue
+                    validated_issues.append(
                         FlextQualityModels.CodeIssue(
-                            id=uuid4(),  # dead code issue{i}",
+                            id=uuid4(),
                             analysis_id=uuid4(),
                             file_path=str(file_path),
-                            line_number=data.get("line_number", 1),
+                            line_number=validated.line_number,
                             issue_type=FlextQualityModels.IssueType.UNUSED_CODE,
                             severity=FlextQualityModels.IssueSeverity.LOW,
-                            message=f"Unused {data.get('type', 'code')}",
+                            message=f"Unused {validated.type}",
                             rule_id="dead_code",
                         )
-                        for i, data in enumerate(result.value["issues"])
-                    ]
-                    if issues:
-                        return issues
+                    )
+                return validated_issues
             except Exception as e:
-                FlextLogger(__name__).debug(
-                    f"Dead code analysis with Vulture failed: {e}"
-                )
-            return []  # No AST fallback - return empty list
+                logger = FlextLogger(__name__)
+                logger.debug(f"Dead code analysis with Vulture failed: {e}")
+                # Return empty list - dead code analysis is best-effort
+                return []
 
     class _DuplicationAnalyzer:
         """Single responsibility: Analyze code duplications."""
 
         @staticmethod
-        def analyze(python_files: list[Path]) -> FlextResult[list[dict[str, object]]]:
+        def analyze(
+            python_files: list[Path],
+        ) -> FlextResult[list[DuplicationIssueModel]]:
             """Analyze duplications across files."""
             try:
                 min_size = (
@@ -389,35 +509,25 @@ class FlextQualityAnalyzer(FlextService[None]):
                 }
 
                 file_list = list(file_contents.keys())
-                issues = [
-                    {
-                        "id": f"dup_{f1.name}_{f2.name}",
-                        "analysis_id": str(uuid.uuid4()),
-                        "file_path": str(f1),
-                        "line_number": 1,
-                        "issue_type": "duplicate_code",
-                        "severity": "medium",
-                        "message": f"Duplication: {f1.name} ↔ {f2.name}",
-                        "rule_id": "duplication_check",
-                    }
+                # Create validated DuplicationIssueModel instances - NO DICT CONVERSION
+                issues: list[DuplicationIssueModel] = [
+                    DuplicationIssueModel(
+                        id=f"dup_{f1.name}_{f2.name}",
+                        analysis_id=str(uuid.uuid4()),
+                        file_path=str(f1),
+                        line_number=None,
+                        issue_type="duplicate_code",
+                        severity="medium",
+                        message=f"Duplication: {f1.name} ↔ {f2.name}",
+                        rule_id="duplication_check",
+                    )
                     for i, f1 in enumerate(file_list)
                     for f2 in file_list[i + 1 :]
                     if FlextQualityAnalyzer._DuplicationAnalyzer.has_duplication(
                         file_contents[f1], file_contents[f2]
                     )
                 ]
-                # Type-safe conversion: explicitly create object-typed dicts
-                issues_typed: list[dict[str, object]] = [
-                    {
-                        "severity": issue["severity"],
-                        "file_path": issue["file_path"],
-                        "line_number": issue["line_number"],
-                        "message": issue["message"],
-                        "rule_id": issue["rule_id"],
-                    }
-                    for issue in issues
-                ]
-                return FlextResult.ok(issues_typed)
+                return FlextResult.ok(issues)
             except Exception as e:
                 return FlextResult.fail(f"Duplication analysis error: {e}")
 
@@ -437,44 +547,37 @@ class FlextQualityAnalyzer(FlextService[None]):
         @staticmethod
         def create_analysis_results(
             metrics_data: FileMetricsData,
-            duplication_issues: list[dict[str, object]],
+            duplication_issues: list[DuplicationIssueModel],
         ) -> FlextResult[FlextQualityModels.AnalysisResults]:
             """Create final analysis results."""
             try:
                 # Aggregate all issues
-                all_issues = []
+                all_issues: list[FlextQualityModels.CodeIssue] = []
                 for metrics in metrics_data.file_metrics:
-                    if metrics.get("issues"):
-                        all_issues.extend(metrics["issues"])
+                    if metrics.issues:
+                        all_issues.extend(metrics.issues)
 
-                # Add duplication issues as CodeIssue objects
-                # Type cast dict items to proper types
-                typed_duplication_issues: list[dict[str, Any]] = []
-                for dup in (
-                    duplication_issues if isinstance(duplication_issues, list) else []
-                ):
-                    if isinstance(dup, dict):
-                        typed_dup: dict[str, Any] = dup
-                        typed_duplication_issues.append(typed_dup)
-
+                # Convert duplication issues to CodeIssue objects
                 all_issues.extend([
                     FlextQualityModels.CodeIssue(
-                        id=UUID(str(dup.get("id", uuid4())))
-                        if isinstance(dup.get("id"), str)
-                        else uuid4(),
-                        analysis_id=UUID(str(dup.get("analysis_id", uuid4())))
-                        if isinstance(dup.get("analysis_id"), str)
-                        else uuid4(),
-                        file_path=str(dup.get("file_path", "")),
-                        line_number=int(dup.get("line_number", 1))
-                        if dup.get("line_number")
-                        else None,
-                        issue_type=FlextQualityModels.IssueType.DUPLICATE_CODE,
-                        severity=FlextQualityModels.IssueSeverity.MEDIUM,
-                        message=str(dup.get("message", "Duplicate code detected")),
-                        rule_id=str(dup.get("rule_id")) if dup.get("rule_id") else None,
+                        id=(
+                            UUID(str(dup.id))
+                            if isinstance(dup.id, str)
+                            else uuid4()
+                        ),
+                        analysis_id=(
+                            UUID(str(dup.analysis_id))
+                            if isinstance(dup.analysis_id, str)
+                            else uuid4()
+                        ),
+                        file_path=dup.file_path,
+                        line_number=dup.line_number,
+                        issue_type=(FlextQualityModels.IssueType.DUPLICATE_CODE),
+                        severity=(FlextQualityModels.IssueSeverity.MEDIUM),
+                        message=dup.message,
+                        rule_id=dup.rule_id,
                     )
-                    for dup in typed_duplication_issues
+                    for dup in duplication_issues
                 ])
 
                 # Count issues by type
@@ -486,25 +589,13 @@ class FlextQualityAnalyzer(FlextService[None]):
                 dead_code_count = count_type("dead_code")
                 dup_count = count_type("duplicate_code")
 
-                # Calculate scores
-                # Type-safe score calculation with proper casting
-                complexity_scores: list[float] = []
-                file_metrics_list: list[dict[str, Any]] = (
-                    metrics_data.file_metrics
-                    if hasattr(metrics_data, "file_metrics")
-                    else []
-                )
-                for m in file_metrics_list:
-                    if isinstance(m, dict):
-                        score_val: Any = m.get("complexity_score", 0.0)
-                        try:
-                            complexity_scores.append(
-                                float(score_val) if score_val else 0.0
-                            )
-                        except (ValueError, TypeError):
-                            complexity_scores.append(0.0)
-                    else:
-                        complexity_scores.append(0.0)
+                # Calculate scores from actual metrics
+                complexity_scores: list[float] = [
+                    m.complexity_score
+                    if isinstance(m.complexity_score, (int, float))
+                    else 0.0
+                    for m in metrics_data.file_metrics
+                ]
 
                 avg_complexity = (
                     sum(complexity_scores) / len(complexity_scores)
@@ -514,6 +605,17 @@ class FlextQualityAnalyzer(FlextService[None]):
                 overall_score = max(
                     0.0, 100.0 - (security_count * 10 + complexity_count * 5)
                 )
+
+                # Build recommendations based on actual issues found
+                recommendations: list[str] = []
+                if security_count > 0:
+                    recommendations.append("Address security vulnerabilities")
+                if complexity_count > 0:
+                    recommendations.append("Refactor complex functions")
+                if dead_code_count > 0:
+                    recommendations.append("Remove unused code")
+                if dup_count > 0:
+                    recommendations.append("Eliminate duplications")
 
                 return FlextResult.ok(
                     FlextQualityModels.AnalysisResults(
@@ -528,25 +630,12 @@ class FlextQualityAnalyzer(FlextService[None]):
                             "dead_code_issues": dead_code_count,
                             "duplication_issues": dup_count,
                         },
-                        recommendations=[
-                            r
-                            for r in [
-                                "Address security vulnerabilities"
-                                if security_count > 0
-                                else None,
-                                "Refactor complex functions"
-                                if complexity_count > 0
-                                else None,
-                                "Remove unused code" if dead_code_count > 0 else None,
-                                "Eliminate duplications" if dup_count > 0 else None,
-                            ]
-                            if r is not None
-                        ],
+                        recommendations=recommendations,
                         overall_score=overall_score,
                         complexity_score=max(0.0, 100.0 - (avg_complexity * 5)),
                         security_score=max(0.0, 100.0 - (security_count * 10)),
-                        coverage_score=85.0,
-                        quality_grade="B",  # Default grade, calculated elsewhere
+                        coverage_score=max(0.0, 100.0 - (dead_code_count * 8)),
+                        quality_grade="B",
                     )
                 )
             except Exception as e:

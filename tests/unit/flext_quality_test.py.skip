@@ -1,0 +1,27 @@
+"""Test-only minimal flext_quality module without flext-cli dependencies."""
+
+from __future__ import annotations
+
+from flext_quality.config import FlextQualityConfig
+from flext_quality.models import FlextQualityModels
+
+# This module provides minimal imports for tests, avoiding flext-cli imports
+# which have syntax errors
+# Re-export only what tests need
+from flext_quality.services import (
+    AnalysisServiceBuilder,
+    FlextQualityServices,
+    IssueServiceBuilder,
+    ProjectServiceBuilder,
+    ReportServiceBuilder,
+)
+
+__all__ = [
+    "AnalysisServiceBuilder",
+    "FlextQualityConfig",
+    "FlextQualityModels",
+    "FlextQualityServices",
+    "IssueServiceBuilder",
+    "ProjectServiceBuilder",
+    "ReportServiceBuilder",
+]

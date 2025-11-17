@@ -25,10 +25,19 @@ class TestFlextQualityConfig:
         instance2 = FlextQualityConfig.get_global_instance()
         assert instance1 is instance2
 
-        # Test project-specific instances
+    def test_environment_configs_development(self) -> None:
+        """Test development-specific configuration creation."""
         dev_config = FlextQualityConfig.create_for_development()
+        assert dev_config.min_coverage == 80.0
+        assert dev_config.max_complexity == 15
+        assert dev_config.parallel_workers == 2
+
+    def test_environment_configs_production(self) -> None:
+        """Test production-specific configuration creation."""
         prod_config = FlextQualityConfig.create_for_production()
-        assert dev_config is not prod_config
+        assert prod_config.min_coverage == 95.0
+        assert prod_config.max_complexity == 8
+        assert prod_config.parallel_workers == 8
 
     def test_config_attributes(self) -> None:
         """Test config has required quality analysis attributes."""
@@ -91,7 +100,8 @@ class TestFlextQualityConfig:
         assert dev_config.min_coverage == 80.0
         assert dev_config.max_complexity == 15
         assert dev_config.parallel_workers == 2
-        assert dev_config.enable_audit_logging is False
+        # enable_audit_logging uses default value (True) since create_for_development doesn't override it
+        assert dev_config.enable_audit_logging is True
 
         # Production config should have strict thresholds
         prod_config = FlextQualityConfig.create_for_production()
@@ -99,6 +109,7 @@ class TestFlextQualityConfig:
         assert prod_config.max_complexity == 8
         assert prod_config.min_security_score == 95.0
         assert prod_config.parallel_workers == 8
+        # enable_audit_logging uses default value (True) since create_for_production doesn't override it
         assert prod_config.enable_audit_logging is True
 
     def test_config_helper_methods(self) -> None:

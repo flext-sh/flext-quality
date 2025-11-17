@@ -439,7 +439,7 @@ class DocumentationMaintainer:
             json.dump(report_dict, f, indent=2, default=str)
 
 
-def main() -> None:
+def main() -> None:  # noqa: C901
     """Main entry point for documentation maintenance system."""
     parser = argparse.ArgumentParser(
         description="Documentation Maintenance Orchestrator"

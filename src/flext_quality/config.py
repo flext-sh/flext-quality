@@ -262,12 +262,12 @@ class FlextQualityConfig(FlextConfig):
 
         return self
 
-    def validate_business_rules(self) -> FlextResult[None]:
+    def validate_business_rules(self) -> FlextResult[bool]:
         """Validate quality analysis business rules."""
         try:
             # Validate analysis requirements
             if self.min_coverage > 0.0 and not self.enable_external_tools:
-                return FlextResult[None].fail(
+                return FlextResult[bool].fail(
                     "Coverage analysis requires external tools"
                 )
 
@@ -276,7 +276,7 @@ class FlextQualityConfig(FlextConfig):
                 self.analysis_timeout
                 < FlextQualityConstants.Performance.MINIMUM_ANALYSIS_TIMEOUT
             ):
-                return FlextResult[None].fail(
+                return FlextResult[bool].fail(
                     f"Analysis timeout too low (minimum {FlextQualityConstants.Performance.MINIMUM_ANALYSIS_TIMEOUT} seconds)"
                 )
 
@@ -286,18 +286,18 @@ class FlextQualityConfig(FlextConfig):
                 >= FlextQualityConstants.Validation.SECURITY_DEPENDENCY_SCAN_THRESHOLD
                 and not self.enable_dependency_scan
             ):
-                return FlextResult[None].fail(
+                return FlextResult[bool].fail(
                     "High security score requires dependency scanning"
                 )
 
             # Validate reporting requirements
             if self.include_trend_analysis and not self.enable_audit_logging:
-                return FlextResult[None].fail("Trend analysis requires audit logging")
+                return FlextResult[bool].fail("Trend analysis requires audit logging")
 
-            return FlextResult[None].ok(None)
+            return FlextResult[bool].ok(True)
         except Exception as e:
             error_msg = f"Business rules validation failed: {e}"
-            return FlextResult[None].fail(error_msg)
+            return FlextResult[bool].fail(error_msg)
 
     def get_analysis_config(self) -> dict[str, object]:
         """Get quality analysis configuration context."""

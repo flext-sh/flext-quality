@@ -53,7 +53,7 @@ class DocumentationReporter:
         return None
 
     def generate_quality_report(
-        self, report_format: str = "html", **kwargs: Any
+        self, report_format: str = "html", **kwargs: dict
     ) -> str:
         """Generate comprehensive quality report."""
         # Collect all available data

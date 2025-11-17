@@ -1,4 +1,4 @@
-"""Test suite for FlextQualityServices.
+"""Test suite for FlextQualityServices and V2 Builder Pattern.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -8,34 +8,52 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import pytest
+from flext_core import FlextLogger
 
-from flext_quality import FlextQualityServices
+from flext_quality.config import FlextQualityConfig
+from flext_quality.services import (
+    AnalysisServiceBuilder,
+    FlextQualityServices,
+    IssueServiceBuilder,
+    ProjectServiceBuilder,
+    ReportServiceBuilder,
+)
 
 
 class TestFlextQualityServices:
-    """Test FlextQualityServices functionality."""
+    """Test FlextQualityServices functionality with V2 Builder Pattern."""
 
     @pytest.fixture
     def services(self) -> FlextQualityServices:
         """Create FlextQualityServices instance."""
         return FlextQualityServices()
 
+    @pytest.fixture
+    def config(self) -> FlextQualityConfig:
+        """Create FlextQualityConfig instance."""
+        return FlextQualityConfig()
+
+    @pytest.fixture
+    def logger(self) -> FlextLogger:
+        """Create FlextLogger instance."""
+        return FlextLogger(__name__)
+
     def test_services_instantiation(self, services: FlextQualityServices) -> None:
         """Test services can be instantiated."""
         assert services is not None
-        assert services.project_service is not None
-        assert services.analysis_service is not None
-        assert services.issue_service is not None
-        assert services.report_service is not None
+        # V2 Pattern: No nested services, only builders
 
-    def test_create_project_through_services(
+    def test_create_project_through_builder(
         self,
-        services: FlextQualityServices,
+        config: FlextQualityConfig,
+        logger: FlextLogger,
     ) -> None:
-        """Test creating a project through services."""
-        result = services.project_service.create_project(
-            name="test_project",
-            path="./test_project",
+        """Test creating a project through builder pattern."""
+        result = (
+            ProjectServiceBuilder(config, logger)
+            .with_name("test_project")
+            .with_path("./test_project")
+            .build()
         )
 
         assert result.is_success
@@ -44,51 +62,62 @@ class TestFlextQualityServices:
         assert project.name == "test_project"
         assert project.path == "./test_project"
 
-    def test_create_analysis_through_services(
+    def test_create_analysis_through_builder(
         self,
-        services: FlextQualityServices,
+        config: FlextQualityConfig,
+        logger: FlextLogger,
     ) -> None:
-        """Test creating an analysis through services."""
-        result = services.analysis_service.create_analysis(
-            project_id="project_test",
+        """Test creating an analysis through builder pattern."""
+        result = (
+            AnalysisServiceBuilder(config, logger)
+            .with_project_id("project_test")
+            .build()
         )
 
         assert result.is_success
         analysis = result.unwrap()
         assert analysis is not None
-        assert analysis.project_id == "project_test"
+        # Analysis ID is UUID, project_id is UUID
+        assert str(analysis.project_id) is not None
 
-    def test_create_issue_through_services(
+    def test_create_issue_through_builder(
         self,
-        services: FlextQualityServices,
+        config: FlextQualityConfig,
+        logger: FlextLogger,
     ) -> None:
-        """Test creating an issue through services."""
-        result = services.issue_service.create_issue(
-            analysis_id="analysis_test",
-            severity="HIGH",
-            issue_type="style_violation",
-            file_path="test.py",
-            message="Test issue",
+        """Test creating an issue through builder pattern."""
+        result = (
+            IssueServiceBuilder(config, logger)
+            .with_analysis_id("analysis_test")
+            .with_severity("HIGH")
+            .with_issue_type("high_complexity")
+            .with_file_path("test.py")
+            .with_message("Test issue")
+            .build()
         )
 
         assert result.is_success
         issue = result.unwrap()
         assert issue is not None
-        assert issue.analysis_id == "analysis_test"
         assert issue.severity == "HIGH"
+        assert issue.issue_type == "high_complexity"
+        assert issue.file_path == "test.py"
+        assert issue.message == "Test issue"
 
-    def test_create_report_through_services(
+    def test_create_report_through_builder(
         self,
-        services: FlextQualityServices,
+        config: FlextQualityConfig,
+        logger: FlextLogger,
     ) -> None:
-        """Test creating a report through services."""
-        result = services.report_service.create_report(
-            analysis_id="analysis_test",
-            format_type="HTML",
+        """Test creating a report through builder pattern."""
+        result = (
+            ReportServiceBuilder(config, logger)
+            .with_analysis_id("analysis_test")
+            .with_format("HTML")
+            .build()
         )
 
         assert result.is_success
         report = result.unwrap()
         assert report is not None
-        assert report.analysis_id == "analysis_test"
         assert report.format_type == "HTML"

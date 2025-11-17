@@ -17,44 +17,22 @@ import uvicorn
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 
-# Domain library imports (Zero Tolerance - NO direct FastAPI imports)
-try:
-    from flext_auth import FlextAuth, FlextAuthJwtProvider
-except Exception:  # Catch all import issues, not just ImportError
-    # Mock classes for when flext_auth is not available
-    class FlextAuth:
-        pass
-
-    class FlextAuthJwtProvider:
-        def __init__(self, config: dict[str, object]) -> None:
-            pass
-
-
+# Domain library imports (FAIL FAST if dependencies not available)
+from flext_auth import FlextAuth, FlextAuthJwtProvider
 from flext_core import FlextContainer, FlextLogger, FlextResult
 
 from .analyzer import FlextQualityAnalyzer
 from .api import FlextQuality
 from .config import FlextQualityConfig
 
-# Import from models instead of flext_web mock
+# Import from models instead of fallback mock
 from .models import FlextQualityModels
-
-
-# Mock WebAuthMiddleware until flext_auth is available
-class WebAuthMiddleware:
-    def __init__(
-        self,
-        auth_provider: object,
-        exclude_paths: list[str] | None = None,
-    ) -> None:
-        self.auth_provider = auth_provider
-        self.exclude_paths = exclude_paths or []
 
 
 def create_fastapi_app(
     config: FlextQualityModels.AppConfig,
 ) -> FlextResult[FastAPI]:
-    """Temporary mock implementation of create_fastapi_app."""
+    """Create FastAPI app with proper error handling via FlextResult."""
     try:
         app = FastAPI(
             title=config.title,
@@ -110,36 +88,21 @@ class FlextQualityWeb:
 
     def _setup_authentication(self) -> FlextAuth | None:
         """Setup authentication using flext-auth with JWT provider."""
-        try:
-            # Create auth config dict[str, object] for JWT provider
-            auth_config: dict[str, object] = {
-                "secret_key": self._quality_config.project_name + "-secret-key",
-                "algorithm": "HS256",
-                "token_expiry_minutes": 60,
-            }
+        # Create auth config dict[str, object] for JWT provider
+        auth_config: dict[str, object] = {
+            "secret_key": self._quality_config.project_name + "-secret-key",
+            "algorithm": "HS256",
+            "token_expiry_minutes": 60,
+        }
 
-            # Create JWT auth provider for quality API
-            jwt_provider = FlextAuthJwtProvider(config=auth_config)
+        # Create JWT auth provider for quality API
+        _jwt_provider = FlextAuthJwtProvider(config=auth_config)
 
-            # Initialize FlextAuth
-            auth = FlextAuth()
+        # Initialize FlextAuth
+        auth = FlextAuth()
 
-            # Add web auth middleware to FastAPI app
-            self.app.add_middleware(
-                WebAuthMiddleware,
-                auth_provider=jwt_provider,
-                exclude_paths=["/health", "/docs", "/redoc", "/openapi.json"],
-            )
-
-            self.logger.info("Authentication configured successfully")
-            return auth
-
-        except Exception as e:
-            self.logger.warning(
-                f"Authentication setup failed: {e}, proceeding without auth"
-            )
-            # Return None if authentication setup fails (graceful degradation)
-            return None
+        self.logger.info("Authentication configured successfully")
+        return auth
 
     def _register_routes(self) -> None:
         """Register quality analysis routes with FastAPI app."""

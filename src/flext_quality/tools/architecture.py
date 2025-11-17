@@ -19,14 +19,14 @@ from pydantic import ConfigDict
 from flext_quality.models import FlextQualityModels
 
 
-class FlextQualityArchitectureTools(FlextService[None]):
+class FlextQualityArchitectureTools(FlextService[bool]):
     """Unified architecture tools with flext-core integration for quality operations."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True, extra="allow")
 
-    def execute(self) -> FlextResult[None]:
+    def execute(self) -> FlextResult[bool]:
         """Execute architecture tools service - FlextService interface."""
-        return FlextResult[None].ok(None)
+        return FlextResult[bool].ok(True)
 
     class ViolationAnalyzer:
         """Architectural violation analysis."""

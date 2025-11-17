@@ -44,7 +44,7 @@ class SeverityColorMap(BaseModel):
 # =====================================================================
 
 
-class FlextQualityIntegrations(FlextService[None]):
+class FlextQualityIntegrations(FlextService[bool]):
     """Quality integrations orchestrating external service communications."""
 
     def __init__(self, config: ApiClientConfig | None = None) -> None:
@@ -61,9 +61,9 @@ class FlextQualityIntegrations(FlextService[None]):
         return self._logger
 
     @override
-    def execute(self) -> FlextResult[None]:
+    def execute(self) -> FlextResult[bool]:
         """Execute integration service."""
-        return FlextResult.ok(None)
+        return FlextResult[bool].ok(True)
 
     # =====================================================================
     # Nested Utility Classes - Single Responsibility Each

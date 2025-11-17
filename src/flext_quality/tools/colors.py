@@ -65,10 +65,10 @@ class FlextColorService(FlextService[str]):
         colored = self._FormattingHelper.colorize(message, color)
         return FlextResult[str].ok(colored)
 
-    def print_colored(self, message: str, color: str = "") -> FlextResult[None]:
+    def print_colored(self, message: str, color: str = "") -> FlextResult[bool]:
         """Print a colored message."""
         self._OutputHelper.print_colored(message, color)
-        return FlextResult[None].ok(None)
+        return FlextResult[bool].ok(True)
 
 
 Colors = FlextColorService.Colors

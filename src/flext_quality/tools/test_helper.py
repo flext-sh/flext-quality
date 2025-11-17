@@ -32,7 +32,7 @@ def suggest_tests_from_coverage(project_path: Path) -> FlextResult[list[str]]:
     """
     try:
         # Run coverage to generate report
-        result = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
+        result = FlextUtilities.CommandExecution.run_external_command(
             [
                 "pytest",
                 str(project_path),
@@ -136,7 +136,7 @@ def validate_test_execution(test_path: Path) -> FlextResult[dict[str, object]]:
 
     """
     try:
-        result = FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
+        result = FlextUtilities.CommandExecution.run_external_command(
             ["pytest", str(test_path), "-v", "--tb=short"],
             capture_output=True,
             timeout=120.0,

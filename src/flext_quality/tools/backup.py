@@ -59,7 +59,7 @@ class BackupManager(FlextService[str]):
         self._logger.info(message)
         return FlextResult[str].ok(message)
 
-    def restore_backup(self, backup_path: str | Path) -> FlextResult[None]:
+    def restore_backup(self, backup_path: str | Path) -> FlextResult[bool]:
         """Validate that a backup identifier/path is available."""
         if isinstance(backup_path, Path):
             backup_key = backup_path.name
@@ -67,10 +67,10 @@ class BackupManager(FlextService[str]):
             backup_key = str(backup_path).strip()
 
         if not backup_key:
-            return FlextResult[None].fail("Backup path cannot be empty")
+            return FlextResult[bool].fail("Backup path cannot be empty")
 
         self._logger.info("Backup restore requested: %s", backup_key)
-        return FlextResult[None].ok(None)
+        return FlextResult[bool].ok(True)
 
     def list_backups(self: Self) -> FlextResult[list[str]]:
         """List known backup identifiers."""

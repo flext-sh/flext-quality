@@ -33,13 +33,11 @@ class MyPyChecker(FlextService[list[str]]):
             # Environment without mypy – treat as success to keep workflows moving.
             return FlextResult[list[str]].ok([])
 
-        run_result = (
-            FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
-                ["mypy", str(root)],
-                capture_output=True,
-                text=True,
-                check=False,
-            )
+        run_result = FlextUtilities.CommandExecution.run_external_command(
+            ["mypy", str(root)],
+            capture_output=True,
+            text=True,
+            check=False,
         )
         if run_result.is_failure:
             return FlextResult[list[str]].fail(

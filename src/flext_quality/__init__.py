@@ -32,12 +32,7 @@ from .container import get_quality_container
 from .exceptions import FlextQualityExceptions
 from .external_backend import FlextQualityExternalBackend as ExternalBackend
 from .grade_calculator import FlextQualityGradeCalculator
-from .handlers import (
-    AnalyzeProjectHandler,
-    GenerateReportHandler,
-    RunLintingHandler,
-    RunSecurityCheckHandler,
-)
+from .handlers import FlextQualityHandlers
 from .metrics import QualityMetrics
 from .models import (
     ComplexityMetric,
@@ -47,6 +42,7 @@ from .models import (
     IssueLocation,
     QualityScore,
 )
+from .reports import FlextQualityReportGenerator, ReportFormat, ReportThresholds
 from .services import FlextQualityServices
 from .web import FlextQualityWeb as FlextQualityWebInterface
 
@@ -78,8 +74,9 @@ QualityReportService = FlextQualityServices
 QualityProject = FlextQualityModels.ProjectModel
 QualityAnalysis = FlextQualityModels.AnalysisModel
 QualityIssue = FlextQualityModels.IssueModel
-QualityReport = FlextQualityModels.ReportModel
 QualityRule = FlextQualityModels.RuleModel
+# QualityReport is the generator for backward compatibility
+QualityReport = FlextQualityReportGenerator
 
 # Analysis results exports
 AnalysisResults = FlextQualityModels.AnalysisResults
@@ -103,11 +100,9 @@ __all__ = [
     "ISSUE_PREVIEW_LIMIT",
     "MIN_COVERAGE_THRESHOLD",
     "MIN_SCORE_THRESHOLD",
-    # Core components
     "ASTBackend",
     "AnalysisResults",
     "AnalysisStatus",
-    "AnalyzeProjectHandler",
     "BackendType",
     "BaseAnalyzer",
     "CodeAnalyzer",
@@ -123,14 +118,14 @@ __all__ = [
     "FlextQualityConfig",
     "FlextQualityConstants",
     "FlextQualityExceptions",
+    "FlextQualityHandlers",
     "FlextQualityModels",
+    "FlextQualityReportGenerator",
     "FlextQualityServices",
     "FlextQualityWebInterface",
-    "GenerateReportHandler",
     "IssueLocation",
     "IssueSeverity",
     "IssueType",
-    # Quality helper commands
     "OverallMetrics",
     "QualityAnalysis",
     "QualityAnalysisService",
@@ -146,8 +141,8 @@ __all__ = [
     "QualityReportService",
     "QualityRule",
     "QualityScore",
-    "RunLintingHandler",
-    "RunSecurityCheckHandler",
+    "ReportFormat",
+    "ReportThresholds",
     "__version__",
     "__version_info__",
     "analyze_project",

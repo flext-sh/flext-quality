@@ -11,13 +11,58 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from enum import StrEnum
-from typing import Any, Literal
+from typing import Literal, Protocol, TypedDict
 from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
 # Type aliases (from typings.py)
 from flext_quality.typings import PositiveInt, ScoreRange, Timestamp
+
+# Type alias for rule parameter values - no Any type
+ParameterValue = str | int | float | bool
+
+
+# =====================================================================
+# TYPE DEFINITIONS - Replacing dict[str, Any] with proper TypedDicts
+# =====================================================================
+
+
+class IssueDict(TypedDict, total=False):
+    """Typed representation of a quality issue."""
+
+    type: str
+    message: str
+    severity: str
+    file_path: str
+    line_number: int
+    column_number: int
+
+
+class MetricsDict(TypedDict, total=False):
+    """Typed representation of analysis metrics."""
+
+    total_issues: int
+    security_issues: int
+    complexity_issues: int
+    dead_code_issues: int
+    duplication_issues: int
+    critical_issues: int
+    high_issues: int
+    medium_issues: int
+    low_issues: int
+    info_issues: int
+    files_analyzed: int
+
+
+class CheckDetailsDict(TypedDict, total=False):
+    """Typed representation of check details."""
+
+    violations: int
+    warnings: int
+    info: int
+    last_checked: str
+
 
 # =====================================================================
 # STATUS & SEVERITY ENUMERATIONS (Module-level)
@@ -74,6 +119,35 @@ class QualityGrade(StrEnum):
 
 
 # =====================================================================
+# PROTOCOLS - Structural typing for report generation (no getattr)
+# =====================================================================
+
+
+class IssueProtocol(Protocol):
+    """Protocol for code quality issues - enables type-safe access without getattr."""
+
+    @property
+    def severity(self) -> IssueSeverity:
+        """Issue severity level."""
+        ...
+
+    @property
+    def message(self) -> str:
+        """Issue description message."""
+        ...
+
+    @property
+    def file_path(self) -> str:
+        """File path containing the issue."""
+        ...
+
+    @property
+    def line_number(self) -> int | None:
+        """Line number of the issue (optional)."""
+        ...
+
+
+# =====================================================================
 # DOMAIN MODELS - Simple, pragmatic Pydantic models
 # =====================================================================
 
@@ -125,7 +199,7 @@ class RuleModel(BaseModel):
     category: IssueType = Field(description="Type of issue the rule checks")
     severity: IssueSeverity = Field(default=IssueSeverity.MEDIUM)
     enabled: bool = Field(default=True, description="Whether rule is active")
-    parameters: dict[str, Any] = Field(
+    parameters: dict[str, ParameterValue] = Field(
         default_factory=dict, description="Rule parameters"
     )
     description: str | None = Field(default=None, description="Rule description")
@@ -142,7 +216,7 @@ class RuleModel(BaseModel):
         """Update rule severity."""
         return self.model_copy(update={"severity": severity})
 
-    def set_parameter(self, key: str, value: Any) -> RuleModel:
+    def set_parameter(self, key: str, value: ParameterValue) -> RuleModel:
         """Set a rule parameter."""
         new_params = self.parameters.copy()
         new_params[key] = value
@@ -171,11 +245,37 @@ class ConfigModel(BaseModel):
     min_coverage: ScoreRange = 80.0
 
 
+class AnalysisMetricsModel(BaseModel):
+    """Validated metrics for analysis results - replacing MetricsDict fallbacks."""
+
+    project_path: str = Field(default="", description="Project path analyzed")
+    files_analyzed: int = Field(default=0, ge=0, description="Number of files analyzed")
+    total_lines: int = Field(default=0, ge=0, description="Total lines of code")
+    code_lines: int = Field(default=0, ge=0, description="Lines of actual code")
+    comment_lines: int | None = Field(
+        default=None, ge=0, description="Lines with comments"
+    )
+    blank_lines: int | None = Field(default=None, ge=0, description="Blank lines")
+    overall_score: ScoreRange = Field(default=0.0, description="Overall quality score")
+    coverage_score: ScoreRange = Field(default=0.0, description="Test coverage score")
+    complexity_score: ScoreRange = Field(
+        default=0.0, description="Code complexity score"
+    )
+    security_score: ScoreRange = Field(default=0.0, description="Security score")
+    maintainability_score: ScoreRange = Field(
+        default=0.0, description="Maintainability score"
+    )
+    duplication_score: ScoreRange = Field(default=0.0, description="Duplication score")
+
+
 class AnalysisResults(BaseModel):
     """Analysis results value object."""
 
-    issues: list[dict[str, Any]] = Field(default_factory=list)
-    metrics: dict[str, Any] = Field(default_factory=dict)
+    issues: list[IssueDict] = Field(default_factory=list)
+    metrics: AnalysisMetricsModel | dict[str, object] = Field(
+        default_factory=AnalysisMetricsModel,
+        description="Analysis metrics - use AnalysisMetricsModel for new code",
+    )
     recommendations: list[str] = Field(default_factory=list)
     overall_score: ScoreRange = 0.0
     coverage_score: ScoreRange = 0.0
@@ -184,6 +284,53 @@ class AnalysisResults(BaseModel):
     quality_grade: str = Field(
         default="F", description="Quality grade letter (A+ to F)"
     )
+
+    # Optional issue type lists for compatibility
+    security_issues: list[IssueModel] = Field(default_factory=list)
+    complexity_issues: list[IssueModel] = Field(default_factory=list)
+    dead_code_issues: list[IssueModel] = Field(default_factory=list)
+    duplication_issues: list[IssueModel] = Field(default_factory=list)
+
+    # Metrics property for compatibility
+    @property
+    def overall_metrics(self) -> OverallMetrics:
+        """Get overall metrics object."""
+        metrics = (
+            self.metrics
+            if isinstance(self.metrics, AnalysisMetricsModel)
+            else AnalysisMetricsModel()
+        )
+        return OverallMetrics(
+            files_analyzed=metrics.files_analyzed,
+            coverage_score=metrics.coverage_score,
+            total_issues=len(
+                self.security_issues
+                + self.complexity_issues
+                + self.dead_code_issues
+                + self.duplication_issues
+            ),
+            critical_issues=len([
+                i
+                for i in (self.security_issues + self.complexity_issues)
+                if i.severity == IssueSeverity.CRITICAL
+            ]),
+            high_issues=len([
+                i
+                for i in (self.security_issues + self.complexity_issues)
+                if i.severity == IssueSeverity.HIGH
+            ]),
+            overall_score=self.overall_score,
+        )
+
+    @property
+    def total_issues(self) -> int:
+        """Calculate total issue count."""
+        return (
+            len(self.security_issues)
+            + len(self.complexity_issues)
+            + len(self.dead_code_issues)
+            + len(self.duplication_issues)
+        )
 
 
 class TestResults(BaseModel):
@@ -203,7 +350,7 @@ class CheckResult(BaseModel):
     status: str = Field(description="Check status: passed, failed, warning")
     issues_found: int = 0
     score: ScoreRange = 0.0
-    details: dict[str, object] | None = None
+    details: CheckDetailsDict | None = None
 
 
 class AnalysisResult(BaseModel):
@@ -235,6 +382,7 @@ class OverallMetrics(BaseModel):
     medium_issues: int = 0
     low_issues: int = 0
     info_issues: int = 0
+    coverage_score: ScoreRange = 0.0
     overall_score: ScoreRange = 0.0
 
 
@@ -302,6 +450,28 @@ class QualityScore(BaseModel):
     model_config = {"frozen": True}
 
 
+class QualityValidationResult(BaseModel):
+    """Quality validation result value object."""
+
+    passed: bool = Field(description="Whether validation passed")
+    checks_run: int = Field(ge=0, description="Number of checks run")
+    checks_passed: int = Field(ge=0, description="Number of checks passed")
+    failures: list[str] = Field(default_factory=list, description="List of failures")
+    message: str | None = Field(default=None, description="Optional message")
+
+
+class AppConfig(BaseModel):
+    """Application configuration for web interface."""
+
+    title: str = Field(default="flext-quality", description="Application title")
+    version: str = Field(default="0.9.0", description="Application version")
+    enable_cors: bool = Field(default=True, description="Enable CORS")
+    enable_docs: bool = Field(default=True, description="Enable API documentation")
+    debug: bool = Field(default=False, description="Debug mode")
+    host: str = Field(default="0.0.0.0", description="Server host")  # noqa: S104
+    port: int = Field(default=8000, ge=1, le=65535, description="Server port")
+
+
 # =====================================================================
 # NAMESPACE CLASS - Maintains backwards compatibility with test code
 # =====================================================================
@@ -317,11 +487,14 @@ class FlextQualityModels:
     RuleModel = RuleModel
     ReportModel = ReportModel
     ConfigModel = ConfigModel
+    AnalysisMetricsModel = AnalysisMetricsModel
     AnalysisResults = AnalysisResults
     TestResults = TestResults
     AnalysisResult = AnalysisResult
     Dependency = Dependency
     OverallMetrics = OverallMetrics
+    QualityValidationResult = QualityValidationResult
+    AppConfig = AppConfig
 
     # Value objects
     CheckResult = CheckResult
@@ -336,6 +509,14 @@ class FlextQualityModels:
     IssueSeverity = IssueSeverity
     IssueType = IssueType
     QualityGrade = QualityGrade
+
+    # Type definitions
+    IssueDict = IssueDict
+    MetricsDict = MetricsDict
+    CheckDetailsDict = CheckDetailsDict
+
+    # Protocols for structural typing (no getattr needed)
+    IssueProtocol = IssueProtocol
 
     # Aliases for compatibility
     CodeIssue = IssueModel  # For analysis_types.py compatibility

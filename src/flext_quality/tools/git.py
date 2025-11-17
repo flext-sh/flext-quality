@@ -35,7 +35,7 @@ from flext_quality.constants import FlextQualityConstants
 from flext_quality.models import FlextQualityModels
 
 
-class FlextQualityGitTools(FlextService[None]):
+class FlextQualityGitTools(FlextService[bool]):
     """Unified git operations for quality tools with complete flext-core integration.
 
     Example usage:
@@ -62,9 +62,9 @@ class FlextQualityGitTools(FlextService[None]):
 
     model_config = ConfigDict(arbitrary_types_allowed=True, extra="allow")
 
-    def execute(self) -> FlextResult[None]:
+    def execute(self) -> FlextResult[bool]:
         """Execute git tools service - FlextService interface."""
-        return FlextResult[None].ok(None)
+        return FlextResult[bool].ok(True)
 
     class HistoryRewriter:
         """Git history rewriting with dry-run support."""
@@ -89,13 +89,11 @@ class FlextQualityGitTools(FlextService[None]):
             repo = Path(repo_path)
             temp_repo = workspace / repo.name
 
-            cmd_result = (
-                FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
-                    cmd=["git", "clone", str(repo), str(temp_repo)],
-                    capture_output=True,
-                    text=True,
-                    check=False,
-                )
+            cmd_result = FlextUtilities.CommandExecution.run_external_command(
+                cmd=["git", "clone", str(repo), str(temp_repo)],
+                capture_output=True,
+                text=True,
+                check=False,
             )
 
             # Handle execution failure
@@ -112,11 +110,11 @@ class FlextQualityGitTools(FlextService[None]):
             return FlextResult[Path].ok(temp_repo)
 
         @staticmethod
-        def _cleanup_temp_workspace(workspace: Path) -> FlextResult[None]:
+        def _cleanup_temp_workspace(workspace: Path) -> FlextResult[bool]:
             """Cleanup temporary workspace."""
             if workspace.exists():
                 shutil.rmtree(workspace)
-            return FlextResult[None].ok(None)
+            return FlextResult[bool].ok(True)
 
         @staticmethod
         def _strip_ai_signatures(message: str) -> str:
@@ -146,13 +144,11 @@ class FlextQualityGitTools(FlextService[None]):
         @classmethod
         def _get_commit_list(cls, work_repo: Path) -> FlextResult[list[str]]:
             """Get list of all commits in repository."""
-            cmd_result = (
-                FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
-                    cmd=["git", "-C", str(work_repo), "rev-list", "--all", "--reverse"],
-                    capture_output=True,
-                    text=True,
-                    check=False,
-                )
+            cmd_result = FlextUtilities.CommandExecution.run_external_command(
+                cmd=["git", "-C", str(work_repo), "rev-list", "--all", "--reverse"],
+                capture_output=True,
+                text=True,
+                check=False,
             )
 
             if cmd_result.is_failure:
@@ -256,21 +252,19 @@ class FlextQualityGitTools(FlextService[None]):
         ) -> tuple[bool, bool]:
             """Process a single commit and return (success, changed)."""
             # Get commit message
-            cmd_result = (
-                FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
-                    cmd=[
-                        "git",
-                        "-C",
-                        str(work_repo),
-                        "log",
-                        "-1",
-                        "--format=%B",
-                        commit_hash,
-                    ],
-                    capture_output=True,
-                    text=True,
-                    check=False,
-                )
+            cmd_result = FlextUtilities.CommandExecution.run_external_command(
+                cmd=[
+                    "git",
+                    "-C",
+                    str(work_repo),
+                    "log",
+                    "-1",
+                    "--format=%B",
+                    commit_hash,
+                ],
+                capture_output=True,
+                text=True,
+                check=False,
             )
 
             if cmd_result.is_failure:
@@ -288,21 +282,19 @@ class FlextQualityGitTools(FlextService[None]):
 
             if cleaned_message != original_message:
                 # Rewrite commit message
-                amend_cmd_result = (
-                    FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
-                        cmd=[
-                            "git",
-                            "-C",
-                            str(work_repo),
-                            "commit",
-                            "--amend",
-                            "-m",
-                            cleaned_message,
-                        ],
-                        capture_output=True,
-                        text=True,
-                        check=False,
-                    )
+                amend_cmd_result = FlextUtilities.CommandExecution.run_external_command(
+                    cmd=[
+                        "git",
+                        "-C",
+                        str(work_repo),
+                        "commit",
+                        "--amend",
+                        "-m",
+                        cleaned_message,
+                    ],
+                    capture_output=True,
+                    text=True,
+                    check=False,
                 )
 
                 if (
@@ -351,13 +343,11 @@ class FlextQualityGitTools(FlextService[None]):
             if dry_run:
                 git_cmd.insert(4, "-n")  # Dry-run flag
 
-            cmd_result = (
-                FlextUtilities.FlextUtilities.CommandExecution.run_external_command(
-                    cmd=git_cmd,
-                    capture_output=True,
-                    text=True,
-                    check=False,
-                )
+            cmd_result = FlextUtilities.CommandExecution.run_external_command(
+                cmd=git_cmd,
+                capture_output=True,
+                text=True,
+                check=False,
             )
 
             # Handle execution failure

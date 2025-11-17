@@ -172,34 +172,6 @@ class FlextQualityHandlers:
             analysis_id, self._services
         ).map_error(lambda e: self._log_error(context, e))
 
-    def run_linting(self, project_id: UUID) -> FlextResult[dict[str, object]]:
-        """Execute linting on project."""
-        self._ObservabilityManager.trace_operation(
-            "run_linting", self.config.service_name
-        )
-
-        result: dict[str, object] = {
-            "project_id": str(project_id),
-            "status": "success",
-            "issues": [],
-        }
-
-        return FlextResult.ok(result)
-
-    def run_security_check(self, project_id: UUID) -> FlextResult[dict[str, object]]:
-        """Execute security check on project."""
-        self._ObservabilityManager.trace_operation(
-            "run_security_check", self.config.service_name
-        )
-
-        result: dict[str, object] = {
-            "project_id": str(project_id),
-            "status": "success",
-            "vulnerabilities": [],
-        }
-
-        return FlextResult.ok(result)
-
     # =====================================================================
     # Private Helper Methods
     # =====================================================================
@@ -222,117 +194,8 @@ class FlextQualityHandlers:
         return result
 
 
-# =====================================================================
-# Concrete Handler Classes - SOLID Single Responsibility Principle
-# =====================================================================
-
-
-class AnalyzeProjectHandler:
-    """Handler for project analysis operations."""
-
-    def __init__(self) -> None:
-        """Initialize handler."""
-        self._handlers = FlextQualityHandlers()
-        self._analysis_service = self._handlers.get_analysis_service()
-        self._logger = FlextLogger(__name__)
-
-    def analyze_project(self, project_id: object) -> FlextResult[object]:
-        """Analyze project and return analysis result."""
-        try:
-            result = self._analysis_service.create_analysis(project_id=str(project_id))
-
-            if result.is_failure:
-                return FlextResult.fail(f"Analysis failed: {result.error}")
-
-            if result.value is None:
-                return FlextResult.fail("Analysis data is None")
-
-            return FlextResult.ok(result.value)
-        except Exception as e:
-            error_msg = f"Unexpected error during analysis: {e!s}"
-            self._logger.exception(error_msg)
-            return FlextResult.fail(error_msg)
-
-
-class GenerateReportHandler:
-    """Handler for report generation operations."""
-
-    def __init__(self) -> None:
-        """Initialize handler."""
-        self._handlers = FlextQualityHandlers()
-        self._report_service = self._handlers.get_report_service()
-        self._logger = FlextLogger(__name__)
-
-    def generate_report(self, analysis_id: object) -> FlextResult[object]:
-        """Generate report from analysis."""
-        try:
-            result = self._report_service.generate_report(analysis_id=str(analysis_id))
-
-            if result.is_failure:
-                return FlextResult.fail(f"Report generation failed: {result.error}")
-
-            if result.value is None:
-                return FlextResult.fail("Report data is None")
-
-            return FlextResult.ok(result.value)
-        except Exception as e:
-            error_msg = f"Unexpected error during report generation: {e!s}"
-            self._logger.exception(error_msg)
-            return FlextResult.fail(error_msg)
-
-
-class RunLintingHandler:
-    """Handler for linting operations."""
-
-    def __init__(self) -> None:
-        """Initialize handler."""
-        self._handlers = FlextQualityHandlers()
-        self._logger = FlextLogger(__name__)
-
-    def run_linting(self, project_id: object) -> FlextResult[object]:
-        """Run linting checks on project."""
-        try:
-            result = self._handlers.run_linting(project_id)
-
-            if result.is_failure:
-                return FlextResult.fail(f"Linting failed: {result.error}")
-
-            return FlextResult.ok(result.value)
-        except Exception as e:
-            error_msg = f"Unexpected error during linting: {e!s}"
-            self._logger.exception(error_msg)
-            return FlextResult.fail(error_msg)
-
-
-class RunSecurityCheckHandler:
-    """Handler for security check operations."""
-
-    def __init__(self) -> None:
-        """Initialize handler."""
-        self._handlers = FlextQualityHandlers()
-        self._logger = FlextLogger(__name__)
-
-    def run_security_check(self, project_id: object) -> FlextResult[object]:
-        """Run security checks on project."""
-        try:
-            result = self._handlers.run_security_check(project_id)
-
-            if result.is_failure:
-                return FlextResult.fail(f"Security check failed: {result.error}")
-
-            return FlextResult.ok(result.value)
-        except Exception as e:
-            error_msg = f"Unexpected error during security check: {e!s}"
-            self._logger.exception(error_msg)
-            return FlextResult.fail(error_msg)
-
-
 __all__ = [
-    "AnalyzeProjectHandler",
     "FlextQualityHandlers",
-    "GenerateReportHandler",
     "HandlerContext",
     "ObservabilityConfig",
-    "RunLintingHandler",
-    "RunSecurityCheckHandler",
 ]

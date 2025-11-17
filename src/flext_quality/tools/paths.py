@@ -8,7 +8,7 @@ from typing import ClassVar, Self
 from flext_core import FlextLogger, FlextResult, FlextService
 
 
-class FlextPathService(FlextService[Path]):
+class FlextPathService(FlextService[bool]):
     """Expose convenience helpers mirroring the historical flext_tools API."""
 
     class _ValidationHelper:
@@ -37,9 +37,9 @@ class FlextPathService(FlextService[Path]):
         super().__init__()
         self._logger = FlextLogger(__name__)
 
-    def execute(self: Self) -> FlextResult[None]:
+    def execute(self: Self) -> FlextResult[bool]:
         """Return a simple success result."""
-        return FlextResult[None].ok(None)
+        return FlextResult[bool].ok(True)
 
     @staticmethod
     def resolve(path: str | Path) -> Path:

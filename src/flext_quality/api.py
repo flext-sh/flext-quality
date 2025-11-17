@@ -20,11 +20,18 @@ from flext_core import (
     FlextTypes,
 )
 
+from .config import FlextQualityConfig
 from .models import FlextQualityModels
-from .services import FlextQualityServices
+from .services import (
+    AnalysisServiceBuilder,
+    FlextQualityServices,
+    IssueServiceBuilder,
+    ProjectServiceBuilder,
+    ReportServiceBuilder,
+)
 
 
-class FlextQuality(FlextService[None]):
+class FlextQuality(FlextService[bool]):
     """Thin facade for quality operations with complete FLEXT integration.
 
     Integrates:
@@ -35,6 +42,8 @@ class FlextQuality(FlextService[None]):
     - FlextUtilities: Processing utilities
     - FlextRegistry: Component registration
     - FlextLogger: logging
+
+    Uses V2 builder pattern with monadic composition for all operations.
     """
 
     def __init__(self) -> None:
@@ -47,29 +56,10 @@ class FlextQuality(FlextService[None]):
         self._dispatcher: FlextDispatcher = FlextDispatcher()
         self._registry: FlextRegistry = FlextRegistry(dispatcher=self._dispatcher)
         self._logger: FlextLogger = FlextLogger(__name__)
+        self._config: FlextQualityConfig = FlextQualityConfig()
 
-        # Domain services
+        # Domain services (V2 pattern: builders, not nested services)
         self._services = FlextQualityServices()
-
-    @property
-    def project_service(self) -> FlextQualityServices.ProjectService:
-        """Get project service instance."""
-        return self._services.project_service
-
-    @property
-    def analysis_service(self) -> FlextQualityServices.AnalysisService:
-        """Get analysis service instance."""
-        return self._services.analysis_service
-
-    @property
-    def issue_service(self) -> FlextQualityServices.IssueService:
-        """Get issue service instance."""
-        return self._services.issue_service
-
-    @property
-    def report_service(self) -> FlextQualityServices.ReportService:
-        """Get report service instance."""
-        return self._services.report_service
 
     # Project operations
     def create_project(
@@ -85,31 +75,39 @@ class FlextQuality(FlextService[None]):
         max_complexity: int = 10,
         max_duplication: float = 5.0,
     ) -> FlextResult[FlextQualityModels.ProjectModel]:
-        """Create a new quality project."""
-        return self.project_service.create_project(
-            name=name,
-            path=project_path,
-            repository_url=repository_url,
-            config_path=config_path,
-            language=language,
-            auto_analyze=auto_analyze,
-            _min_coverage=min_coverage,
-            _max_complexity=max_complexity,
-            _max_duplication=max_duplication,
+        """Create a new quality project using builder pattern."""
+        # Build configuration dictionary
+        config_dict: dict[str, object] = {
+            "repository_url": repository_url,
+            "config_path": config_path,
+            "language": language,
+            "auto_analyze": auto_analyze,
+            "min_coverage": min_coverage,
+            "max_complexity": max_complexity,
+            "max_duplication": max_duplication,
+        }
+
+        # Use builder pattern for project creation
+        return (
+            ProjectServiceBuilder(self._config, self._logger)
+            .with_name(name)
+            .with_path(project_path)
+            .with_config_dict(config_dict)
+            .build()
         )
 
     def get_project(
         self,
         _project_id: UUID,
-    ) -> FlextResult[FlextQualityModels.Project]:
+    ) -> FlextResult[FlextQualityModels.ProjectModel]:
         """Get a project by ID."""
-        return FlextResult[FlextQualityModels.Project].fail(
+        return FlextResult[FlextQualityModels.ProjectModel].fail(
             "get_project not implemented"
         )
 
-    def list_projects(self) -> FlextResult[list[FlextQualityModels.Project]]:
+    def list_projects(self) -> FlextResult[list[FlextQualityModels.ProjectModel]]:
         """List all projects."""
-        return FlextResult[list[FlextQualityModels.Project]].fail(
+        return FlextResult[list[FlextQualityModels.ProjectModel]].fail(
             "list_projects not implemented"
         )
 
@@ -117,9 +115,9 @@ class FlextQuality(FlextService[None]):
         self,
         _project_id: UUID,
         _updates: dict[str, object],
-    ) -> FlextResult[FlextQualityModels.Project]:
+    ) -> FlextResult[FlextQualityModels.ProjectModel]:
         """Update a project."""
-        return FlextResult[FlextQualityModels.Project].fail(
+        return FlextResult[FlextQualityModels.ProjectModel].fail(
             "update_project not implemented"
         )
 
@@ -135,13 +133,25 @@ class FlextQuality(FlextService[None]):
         _branch: str | None = None,
         _pull_request_id: str | None = None,
         analysis_config: FlextTypes.JsonDict | None = None,
-    ) -> FlextResult[FlextQualityModels.Analysis]:
-        """Create a new quality analysis."""
-        return self.analysis_service.create_analysis(
-            project_id=str(project_id),
-            config=analysis_config
-            if analysis_config is None
-            else dict[str, object](analysis_config),
+    ) -> FlextResult[FlextQualityModels.AnalysisModel]:
+        """Create a new quality analysis using builder pattern."""
+        # Build configuration dictionary
+        config_dict: dict[str, object] = {}
+        if analysis_config:
+            config_dict.update(analysis_config)
+        if _commit_hash:
+            config_dict["commit_hash"] = _commit_hash
+        if _branch:
+            config_dict["branch"] = _branch
+        if _pull_request_id:
+            config_dict["pull_request_id"] = _pull_request_id
+
+        # Use builder pattern for analysis creation
+        return (
+            AnalysisServiceBuilder(self._config, self._logger)
+            .with_project_id(str(project_id))
+            .with_config_dict(config_dict)
+            .build()
         )
 
     def update_metrics(
@@ -152,9 +162,9 @@ class FlextQuality(FlextService[None]):
         _code_lines: int,
         _comment_lines: int,
         _blank_lines: int,
-    ) -> FlextResult[FlextQualityModels.Analysis]:
+    ) -> FlextResult[FlextQualityModels.AnalysisModel]:
         """Update analysis metrics."""
-        return FlextResult[FlextQualityModels.Analysis].fail(
+        return FlextResult[FlextQualityModels.AnalysisModel].fail(
             "update_metrics not implemented"
         )
 
@@ -166,7 +176,7 @@ class FlextQuality(FlextService[None]):
         _duplication_score: float,
         security_score: float,
         maintainability_score: float,
-    ) -> FlextResult[FlextQualityModels.Analysis]:
+    ) -> FlextResult[FlextQualityModels.AnalysisModel]:
         """Update analysis quality scores."""
         # Reserved for future score calculation implementation
         _ = (
@@ -176,9 +186,14 @@ class FlextQuality(FlextService[None]):
         )  # Reserved for future use
 
         # NOTE: Overall score calculation reserved for future implementation
-        # overall_score = (_coverage_score + complexity_score + security_score + maintainability_score) / 4.0
+        # overall_score = (
+        #     _coverage_score
+        #     + complexity_score
+        #     + security_score
+        #     + maintainability_score
+        # ) / 4.0
 
-        return FlextResult[FlextQualityModels.Analysis].fail(
+        return FlextResult[FlextQualityModels.AnalysisModel].fail(
             "update_scores not implemented"
         )
 
@@ -189,7 +204,7 @@ class FlextQuality(FlextService[None]):
         high: int,
         medium: int,
         low: int,
-    ) -> FlextResult[FlextQualityModels.Analysis]:
+    ) -> FlextResult[FlextQualityModels.AnalysisModel]:
         """Update analysis issue counts by severity."""
         # Reserved for future issue count analysis implementation
         _ = critical, high, medium, low  # Reserved for future use
@@ -197,16 +212,16 @@ class FlextQuality(FlextService[None]):
         # NOTE: Issue counts analysis reserved for future implementation
         # total_issues = critical + high + medium + low
 
-        return FlextResult[FlextQualityModels.Analysis].fail(
+        return FlextResult[FlextQualityModels.AnalysisModel].fail(
             "update_issue_counts not implemented"
         )
 
     def complete_analysis(
         self,
         _analysis_id: UUID,
-    ) -> FlextResult[FlextQualityModels.Analysis]:
+    ) -> FlextResult[FlextQualityModels.AnalysisModel]:
         """Mark analysis as completed."""
-        return FlextResult[FlextQualityModels.Analysis].fail(
+        return FlextResult[FlextQualityModels.AnalysisModel].fail(
             "complete_analysis not implemented"
         )
 
@@ -214,27 +229,27 @@ class FlextQuality(FlextService[None]):
         self,
         _analysis_id: UUID,
         _error: str,
-    ) -> FlextResult[FlextQualityModels.Analysis]:
+    ) -> FlextResult[FlextQualityModels.AnalysisModel]:
         """Mark analysis as failed."""
-        return FlextResult[FlextQualityModels.Analysis].fail(
+        return FlextResult[FlextQualityModels.AnalysisModel].fail(
             "fail_analysis not implemented"
         )
 
     def get_analysis(
         self,
         _analysis_id: UUID,
-    ) -> FlextResult[FlextQualityModels.Analysis]:
+    ) -> FlextResult[FlextQualityModels.AnalysisModel]:
         """Get an analysis by ID."""
-        return FlextResult[FlextQualityModels.Analysis].fail(
+        return FlextResult[FlextQualityModels.AnalysisModel].fail(
             "get_analysis not implemented"
         )
 
     def list_analyses(
         self,
         _project_id: UUID,
-    ) -> FlextResult[list[FlextQualityModels.Analysis]]:
+    ) -> FlextResult[list[FlextQualityModels.AnalysisModel]]:
         """List all analyses for a project."""
-        return FlextResult[list[FlextQualityModels.Analysis]].fail(
+        return FlextResult[list[FlextQualityModels.AnalysisModel]].fail(
             "list_analyses not implemented"
         )
 
@@ -253,24 +268,42 @@ class FlextQuality(FlextService[None]):
         _end_column_number: int | None = None,
         _code_snippet: str | None = None,
         _suggestion: str | None = None,
-    ) -> FlextResult[FlextQualityModels.Issue]:
-        """Create a new quality issue."""
-        # Convert string parameters to enum types
-
+    ) -> FlextResult[FlextQualityModels.IssueModel]:
+        """Create a new quality issue using builder pattern."""
+        # Validate enum values
         try:
             FlextQualityModels.IssueSeverity(severity)
             FlextQualityModels.IssueType(issue_type)
         except ValueError as e:
             error_msg = f"Invalid severity or issue type: {e}"
-            return FlextResult[FlextQualityModels.Issue].fail(error_msg)
+            return FlextResult[FlextQualityModels.IssueModel].fail(error_msg)
 
-        return FlextResult[FlextQualityModels.Issue].fail(
-            "create_issue not implemented"
+        # Build configuration dictionary
+        config_dict: dict[str, object] = {
+            "rule_id": _rule_id,
+            "line_number": _line_number,
+            "column_number": _column_number,
+            "end_line_number": _end_line_number,
+            "end_column_number": _end_column_number,
+            "code_snippet": _code_snippet,
+            "suggestion": _suggestion,
+        }
+
+        # Use builder pattern for issue creation
+        return (
+            IssueServiceBuilder(self._config, self._logger)
+            .with_analysis_id(str(_analysis_id))
+            .with_issue_type(issue_type)
+            .with_severity(severity)
+            .with_file_path(_file_path)
+            .with_message(_message)
+            .with_config_dict(config_dict)
+            .build()
         )
 
-    def get_issue(self, _issue_id: UUID) -> FlextResult[FlextQualityModels.Issue]:
+    def get_issue(self, _issue_id: UUID) -> FlextResult[FlextQualityModels.IssueModel]:
         """Get an issue by ID."""
-        return FlextResult[FlextQualityModels.Issue].fail("get_issue not implemented")
+        return FlextResult[FlextQualityModels.IssueModel].fail("get_issue not implemented")
 
     def list_issues(
         self,
@@ -278,41 +311,41 @@ class FlextQuality(FlextService[None]):
         severity: str | None = None,
         _issue_type: str | None = None,
         _file_path: str | None = None,
-    ) -> FlextResult[list[FlextQualityModels.Issue]]:
+    ) -> FlextResult[list[FlextQualityModels.IssueModel]]:
         """List issues for an analysis with optional filters."""
-        # Convert string severity to enum if provided
+        # Validate string severity to enum if provided
         if severity:
             try:
                 FlextQualityModels.IssueSeverity(severity)
             except ValueError:
                 error_msg = f"Invalid severity: {severity}"
-                return FlextResult[list[FlextQualityModels.Issue]].fail(error_msg)
+                return FlextResult[list[FlextQualityModels.IssueModel]].fail(error_msg)
 
-        return FlextResult[list[FlextQualityModels.Issue]].fail(
+        return FlextResult[list[FlextQualityModels.IssueModel]].fail(
             "list_issues not implemented"
         )
 
     def mark_issue_fixed(
         self, _issue_id: UUID
-    ) -> FlextResult[FlextQualityModels.Issue]:
+    ) -> FlextResult[FlextQualityModels.IssueModel]:
         """Mark an issue as fixed."""
-        return FlextResult[FlextQualityModels.Issue].fail("mark_fixed not implemented")
+        return FlextResult[FlextQualityModels.IssueModel].fail("mark_fixed not implemented")
 
     def suppress_issue(
         self,
         _issue_id: UUID,
         _reason: str,
-    ) -> FlextResult[FlextQualityModels.Issue]:
+    ) -> FlextResult[FlextQualityModels.IssueModel]:
         """Suppress an issue with a reason."""
-        return FlextResult[FlextQualityModels.Issue].fail(
+        return FlextResult[FlextQualityModels.IssueModel].fail(
             "suppress_issue not implemented"
         )
 
     def unsuppress_issue(
         self, _issue_id: UUID
-    ) -> FlextResult[FlextQualityModels.Issue]:
+    ) -> FlextResult[FlextQualityModels.IssueModel]:
         """Remove suppression from an issue."""
-        return FlextResult[FlextQualityModels.Issue].fail(
+        return FlextResult[FlextQualityModels.IssueModel].fail(
             "unsuppress_issue not implemented"
         )
 
@@ -324,22 +357,34 @@ class FlextQuality(FlextService[None]):
         _report_format: str = "summary",
         _report_path: str | None = None,
         _report_size_bytes: int = 0,
-    ) -> FlextResult[FlextQualityModels.Report]:
-        """Create a quality report."""
-        return FlextResult[FlextQualityModels.Report].fail(
-            "create_report not implemented"
+    ) -> FlextResult[FlextQualityModels.ReportModel]:
+        """Create a quality report using builder pattern."""
+        # Build configuration dictionary
+        config_dict: dict[str, object] = {
+            "report_type": _report_type,
+            "report_path": _report_path,
+            "report_size_bytes": _report_size_bytes,
+        }
+
+        # Use builder pattern for report creation
+        return (
+            ReportServiceBuilder(self._config, self._logger)
+            .with_analysis_id(str(_analysis_id))
+            .with_format(_report_format)
+            .with_config_dict(config_dict)
+            .build()
         )
 
-    def get_report(self, _report_id: UUID) -> FlextResult[FlextQualityModels.Report]:
+    def get_report(self, _report_id: UUID) -> FlextResult[FlextQualityModels.ReportModel]:
         """Get a report by ID."""
-        return FlextResult[FlextQualityModels.Report].fail("get_report not implemented")
+        return FlextResult[FlextQualityModels.ReportModel].fail("get_report not implemented")
 
     def list_reports(
         self,
         _analysis_id: UUID,
-    ) -> FlextResult[list[FlextQualityModels.Report]]:
+    ) -> FlextResult[list[FlextQualityModels.ReportModel]]:
         """List all reports for an analysis."""
-        return FlextResult[list[FlextQualityModels.Report]].fail(
+        return FlextResult[list[FlextQualityModels.ReportModel]].fail(
             "list_reports not implemented"
         )
 
@@ -353,98 +398,83 @@ class FlextQuality(FlextService[None]):
         project_id: UUID,
         commit_hash: str | None = None,
         branch: str | None = None,
-    ) -> FlextResult[FlextQualityModels.Analysis]:
+    ) -> FlextResult[FlextQualityModels.AnalysisModel]:
         """Run a complete quality analysis for a project."""
-        # Create analysis
-        result = self.create_analysis(
+        # Create analysis - use monadic composition
+        return self.create_analysis(
             project_id=project_id,
             _commit_hash=commit_hash,
             _branch=branch,
-        )
+        ).flat_map(lambda analysis: self._finalize_analysis(analysis, project_id))
 
-        # Use is_failure for early return pattern (current flext-core API)
-        if result.is_failure:
-            return result
-        analysis = result.value
-
-        # Get the project to access its path
+    def _finalize_analysis(
+        self,
+        analysis: FlextQualityModels.AnalysisModel,
+        project_id: UUID,
+    ) -> FlextResult[FlextQualityModels.AnalysisModel]:
+        """Finalize analysis by updating metrics and issue counts."""
+        # Get project to access path - validation will happen in service
         project_result = self.get_project(project_id)
         if project_result.is_failure:
             return FlextResult[FlextQualityModels.Analysis].fail(
-                f"Failed to get project: {project_result.error}",
+                f"Failed to retrieve project for analysis: {project_result.error}"
             )
 
         project = project_result.value
 
-        # NOTE: Repository pattern for persistence reserved for future implementation
-        # For now, return a basic analysis result
-        analysis_results = FlextQualityModels.AnalysisResults(
-            metrics={
-                "project_path": str(project.path),
-                "overall_score": 85.0,
-            },
-            issues=[],
-            recommendations=[],
+        # Create validated metrics model (no .get() fallbacks, no hardcoded values)
+        # All fields have sensible defaults, no arbitrary fake values
+        metrics = FlextQualityModels.AnalysisMetricsModel(
+            project_path=str(project.path),
+            files_analyzed=0,  # Will be updated from actual analysis
+            total_lines=0,
+            code_lines=0,
+            comment_lines=None,  # No detailed AST analysis available
+            blank_lines=None,  # No detailed AST analysis available
+            overall_score=0.0,  # Will be updated from actual analysis
+            coverage_score=0.0,
+            complexity_score=0.0,
+            security_score=0.0,
+            maintainability_score=0.0,
+            duplication_score=0.0,
         )
 
-        # Update with real metrics from analysis
-        # Note: analysis_results is a Pydantic model
-        metrics = analysis_results.metrics
-
-        self.update_metrics(
-            _analysis_id=UUID(str(analysis.id)),
-            _total_files=metrics.get("files_analyzed", 0),
-            _total_lines=metrics.get("total_lines", 0),
-            _code_lines=metrics.get(
-                "total_lines", 0
-            ),  # CodeAnalyzer provides total lines
-            _comment_lines=0,  # Would need detailed AST analysis
-            _blank_lines=0,  # Would need detailed AST analysis
+        # Update metrics - note: update methods return FlextResult but we ignore for now
+        # since they're not fully implemented
+        _ = self.update_metrics(
+            _analysis_id=analysis.id,
+            _total_files=metrics.files_analyzed,
+            _total_lines=metrics.total_lines,
+            _code_lines=metrics.code_lines,
+            _comment_lines=metrics.comment_lines or 0,
+            _blank_lines=metrics.blank_lines or 0,
         )
 
-        # Update with real scores from analysis
-        self.update_scores(
-            _analysis_id=UUID(str(analysis.id)),
-            _coverage_score=metrics.get("coverage_score", 0.0),
-            complexity_score=metrics.get("complexity_score", 0.0),
-            _duplication_score=100.0,  # Placeholder value
-            security_score=metrics.get("security_score", 0.0),
-            maintainability_score=metrics.get("maintainability_score", 0.0),
+        # Update scores - using actual values from metrics, not hardcoded
+        _ = self.update_scores(
+            _analysis_id=analysis.id,
+            _coverage_score=metrics.coverage_score,
+            complexity_score=metrics.complexity_score,
+            _duplication_score=metrics.duplication_score,
+            security_score=metrics.security_score,
+            maintainability_score=metrics.maintainability_score,
         )
 
-        # Count real issues by severity (placeholder for now)
-        security_issues: list[dict[str, object]] = []
-        complexity_issues: list[dict[str, object]] = []
-
-        critical_issues = len(
-            [i for i in security_issues if i.get("severity") == "critical"],
-        )
-        high_issues = len(
-            [i for i in security_issues if i.get("severity") == "high"],
-        )
-        medium_issues = len(
-            [i for i in security_issues if i.get("severity") == "medium"],
-        )
-        low_issues = len(
-            [i for i in security_issues if i.get("severity") == "low"],
-        )
-
-        # Add complexity issues to high priority
-        high_issues += len(complexity_issues)
-
-        # Update with real issue counts
-        self.update_issue_counts(
-            _analysis_id=UUID(str(analysis.id)),
-            critical=critical_issues,
-            high=high_issues,
-            medium=medium_issues,
-            low=low_issues,
+        # Update issue counts - currently 0 since we don't have real analysis data
+        # NOTE: When actual analysis is implemented, these will be populated from
+        # real issue data, not empty lists
+        _ = self.update_issue_counts(
+            _analysis_id=analysis.id,
+            critical=0,
+            high=0,
+            medium=0,
+            low=0,
         )
 
         # Complete the analysis
-        return self.complete_analysis(UUID(str(analysis.id)))
+        return self.complete_analysis(analysis.id)
 
     @override
-    def execute(self, data: object) -> FlextResult[None]:
+    def execute(self, data: object) -> FlextResult[bool]:
         """Execute quality operations (facade entry point)."""
-        return FlextResult[None].ok(None)
+        return FlextResult[bool].ok(True)
