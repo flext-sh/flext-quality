@@ -560,11 +560,7 @@ class FlextQualityAnalyzer(FlextService):  # type: ignore[type-arg]
                 # Convert duplication issues to CodeIssue objects
                 all_issues.extend([
                     FlextQualityModels.CodeIssue(
-                        id=(
-                            UUID(str(dup.id))
-                            if isinstance(dup.id, str)
-                            else uuid4()
-                        ),
+                        id=(UUID(str(dup.id)) if isinstance(dup.id, str) else uuid4()),
                         analysis_id=(
                             UUID(str(dup.analysis_id))
                             if isinstance(dup.analysis_id, str)

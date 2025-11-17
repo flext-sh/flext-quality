@@ -13,7 +13,6 @@ from pathlib import Path
 from flext_core import FlextResult
 from pydantic import BaseModel, Field
 
-from .constants import FlextQualityConstants
 from .grade_calculator import FlextQualityGradeCalculator
 from .models import FlextQualityModels
 

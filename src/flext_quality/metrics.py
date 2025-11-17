@@ -361,10 +361,26 @@ class MetricsCalculator:
             # Legacy: metrics is a dict with average_complexity
             avg_complexity = float(results.metrics.get("average_complexity", 0.0))
             # Count issues from results.issues list (legacy format: [{"type": "...", ...}])
-            security_count = sum(1 for i in results.issues if isinstance(i, dict) and i.get("type") == "security")
-            complexity_count = sum(1 for i in results.issues if isinstance(i, dict) and i.get("type") == "complexity")
-            dead_code_count = sum(1 for i in results.issues if isinstance(i, dict) and i.get("type") == "dead_code")
-            duplicate_count = sum(1 for i in results.issues if isinstance(i, dict) and i.get("type") == "duplication")
+            security_count = sum(
+                1
+                for i in results.issues
+                if isinstance(i, dict) and i.get("type") == "security"
+            )
+            complexity_count = sum(
+                1
+                for i in results.issues
+                if isinstance(i, dict) and i.get("type") == "complexity"
+            )
+            dead_code_count = sum(
+                1
+                for i in results.issues
+                if isinstance(i, dict) and i.get("type") == "dead_code"
+            )
+            duplicate_count = sum(
+                1
+                for i in results.issues
+                if isinstance(i, dict) and i.get("type") == "duplication"
+            )
             total_files = 0
             total_loc = 0
         else:

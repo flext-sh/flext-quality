@@ -303,7 +303,9 @@ class FlextQuality(FlextService[bool]):
 
     def get_issue(self, _issue_id: UUID) -> FlextResult[FlextQualityModels.IssueModel]:
         """Get an issue by ID."""
-        return FlextResult[FlextQualityModels.IssueModel].fail("get_issue not implemented")
+        return FlextResult[FlextQualityModels.IssueModel].fail(
+            "get_issue not implemented"
+        )
 
     def list_issues(
         self,
@@ -329,7 +331,9 @@ class FlextQuality(FlextService[bool]):
         self, _issue_id: UUID
     ) -> FlextResult[FlextQualityModels.IssueModel]:
         """Mark an issue as fixed."""
-        return FlextResult[FlextQualityModels.IssueModel].fail("mark_fixed not implemented")
+        return FlextResult[FlextQualityModels.IssueModel].fail(
+            "mark_fixed not implemented"
+        )
 
     def suppress_issue(
         self,
@@ -375,9 +379,13 @@ class FlextQuality(FlextService[bool]):
             .build()
         )
 
-    def get_report(self, _report_id: UUID) -> FlextResult[FlextQualityModels.ReportModel]:
+    def get_report(
+        self, _report_id: UUID
+    ) -> FlextResult[FlextQualityModels.ReportModel]:
         """Get a report by ID."""
-        return FlextResult[FlextQualityModels.ReportModel].fail("get_report not implemented")
+        return FlextResult[FlextQualityModels.ReportModel].fail(
+            "get_report not implemented"
+        )
 
     def list_reports(
         self,
