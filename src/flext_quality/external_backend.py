@@ -67,13 +67,16 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
             FlextResult containing analysis results dict
 
         """
-        return (
-            self._create_temp_file(code)
-            .flat_map(lambda temp_path: self._route_tool_analysis(tool, temp_path))
-            .tap(
-                lambda _: None,
-                cleanup=lambda temp_path: temp_path.unlink(missing_ok=True),
-            )
+        temp_file_result = self._create_temp_file(code)
+        if temp_file_result.is_failure:
+            return temp_file_result.map(lambda _: {})
+        
+        # Use with_resource pattern for automatic cleanup
+        temp_path = temp_file_result.unwrap()
+        return temp_file_result.with_resource(
+            resource_factory=lambda: temp_path,
+            operation=lambda _, temp_path: self._route_tool_analysis(tool, temp_path),
+            cleanup=lambda temp_path: temp_path.unlink(missing_ok=True),
         )
 
     def _create_temp_file(self, code: str) -> FlextResult[Path]:

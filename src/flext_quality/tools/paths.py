@@ -22,12 +22,36 @@ class FlextPathService(FlextService[bool]):
             ".pytest_cache",
             ".mypy_cache",
             ".ruff_cache",
+            "*.pyc",
+            "*.pyo",
         ]
 
         @classmethod
         def should_ignore_path(cls, path: str | Path) -> bool:
             path_str = str(path)
-            return any(pattern in path_str for pattern in cls.IGNORE_PATTERNS)
+            for pattern in cls.IGNORE_PATTERNS:
+                if pattern.startswith("*."):
+                    # Wildcard pattern like *.pyc
+                    extension = pattern[1:]  # Remove * to get .pyc
+                    if path_str.endswith(extension):
+                        return True
+                elif pattern in path_str:
+                    # Direct substring match
+                    return True
+            return False
+
+    class _UtilityHelper:
+        """Utility helper for path operations."""
+
+        @staticmethod
+        def normalize_path(path: str | Path) -> Path:
+            """Normalize a path by resolving it."""
+            return FlextPathService.resolve(path)
+
+        @staticmethod
+        def resolve_path(path: str | Path) -> Path:
+            """Resolve a path to an absolute Path."""
+            return FlextPathService.resolve(path)
 
     class Paths(_ValidationHelper):
         """Alias matching the previous API surface."""

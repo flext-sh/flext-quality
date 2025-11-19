@@ -17,14 +17,22 @@ from pydantic_settings import SettingsConfigDict
 from .constants import FlextQualityConstants
 
 
-class FlextQualityConfig(FlextConfig):
-    """Single Pydantic 2 Settings class for flext-quality extending FlextConfig.
+@FlextConfig.auto_register("quality")
+class FlextQualityConfig(FlextConfig.AutoConfig):
+    """Single Pydantic 2 Settings class for flext-quality using AutoConfig pattern.
+
+    **ARCHITECTURAL PATTERN**: Zero-Boilerplate Auto-Registration
+
+    This class uses FlextConfig.AutoConfig for automatic:
+    - Singleton pattern (thread-safe)
+    - Namespace registration (accessible via config.quality)
+    - Environment variable loading from FLEXT_QUALITY_* variables
+    - .env file loading (production/development)
+    - Automatic type conversion and validation via Pydantic v2
 
     Follows standardized pattern:
-    - Extends FlextConfig from flext-core with enhanced Pydantic 2.11+ features
     - No nested classes within Config
     - All defaults from FlextQualityConstants
-    - Uses direct instantiation pattern (no singleton)
     - Uses Pydantic 2.11+ field_validator and model_validator
     """
 
