@@ -132,7 +132,7 @@ class FileMetricsData(BaseModel):
 # =====================================================================
 
 
-class FlextQualityAnalyzer(FlextService):  # type: ignore[type-arg]
+class FlextQualityAnalyzer(FlextService):
     """Main quality analyzer orchestrating focused analysis utilities."""
 
     auto_execute = False

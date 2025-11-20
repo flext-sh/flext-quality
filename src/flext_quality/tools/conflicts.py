@@ -27,12 +27,14 @@ class ConflictAnalyzer(FlextService[list[dict[str, str]]]):
     ) -> FlextResult[list[dict[str, str]]]:
         """Analyse dependency declarations for duplicates with different pins."""
         # Validate project path is not empty
-        if not project_path or (isinstance(project_path, str) and not project_path.strip()):
+        if not project_path or (
+            isinstance(project_path, str) and not project_path.strip()
+        ):
             return FlextResult[list[dict[str, str]]].fail(
                 "Project path cannot be empty",
                 error_code="VALIDATION_ERROR",
             )
-        
+
         project = Path(project_path).expanduser()
         if not project.exists():
             return FlextResult[list[dict[str, str]]].ok([])

@@ -70,7 +70,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
         temp_file_result = self._create_temp_file(code)
         if temp_file_result.is_failure:
             return temp_file_result.map(lambda _: {})
-        
+
         # Use with_resource pattern for automatic cleanup
         temp_path = temp_file_result.unwrap()
         return temp_file_result.with_resource(
