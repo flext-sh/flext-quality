@@ -46,13 +46,14 @@ def suggest_tests_from_coverage(project_path: Path) -> FlextResult[list[str]]:
         )
 
         if result.is_failure:
-            if "not found" in result.error.lower():
+            error_msg = result.error or ""
+            if "not found" in error_msg.lower():
                 return FlextResult.ok([
                     "Install pytest and coverage to analyze test coverage"
                 ])
-            if "timed out" in result.error.lower():
+            if "timed out" in error_msg.lower():
                 return FlextResult.fail("Coverage analysis timed out")
-            return FlextResult.fail(f"Coverage analysis failed: {result.error}")
+            return FlextResult.fail(f"Coverage analysis failed: {error_msg}")
 
         suggestions = []
 

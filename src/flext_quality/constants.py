@@ -20,6 +20,17 @@ class FlextQualityConstants(FlextConstants):
     logical categories with complete type safety and enterprise standards.
     """
 
+    # =========================================================================
+    # COMPOSITION REFERENCES (Standardization Pattern)
+    # =========================================================================
+
+    # Core composition - reference core constants for easy access
+    CoreErrors = FlextConstants.Errors
+    CoreNetwork = FlextConstants.Network
+    CoreSecurity = FlextConstants.Security
+    CorePlatform = FlextConstants.Platform
+    CoreValidation = FlextConstants.Validation
+
     # =============================================================================
     # QUALITY THRESHOLDS - Enterprise quality standards
     # =============================================================================
@@ -53,7 +64,7 @@ class FlextQualityConstants(FlextConstants):
         STRICT_COMPLEXITY: int = 8
         HIGH_COMPLEXITY_WARNING_THRESHOLD: int = 50
 
-    class Security:
+    class QualitySecurity:
         """Security scoring thresholds for quality analysis."""
 
         MINIMUM_SECURITY_SCORE: float = 90.0
@@ -77,7 +88,7 @@ class FlextQualityConstants(FlextConstants):
     # PERFORMANCE AND TIMEOUTS - Analysis performance limits
     # =============================================================================
 
-    class Performance:
+    class QualityPerformance:
         """Performance and timeout limits for quality analysis."""
 
         MINIMUM_ANALYSIS_TIMEOUT: int = 30
@@ -87,14 +98,14 @@ class FlextQualityConstants(FlextConstants):
         MAXIMUM_WORKERS: int = 16
         DEFAULT_WORKERS: int = 4
 
-    class Network:
+    class QualityNetwork:
         """Network-related constants."""
 
         MAX_CONNECTIONS: int = 100
         DEFAULT_TIMEOUT: int = 30
         RETRY_ATTEMPTS: int = 3
 
-    class Validation:
+    class QualityValidation:
         """Validation ranges and limits for quality analysis."""
 
         MINIMUM_PERCENTAGE: float = 0.0

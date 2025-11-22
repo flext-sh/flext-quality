@@ -13,6 +13,7 @@ from pydantic import ValidationError
 from flext_quality import (
     AnalysisResults,
     FileAnalysisResult,
+    FlextQualityModels,
     OverallMetrics,
     QualityGradeCalculator,
     QualityMetrics,

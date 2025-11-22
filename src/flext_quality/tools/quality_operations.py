@@ -20,7 +20,7 @@ class FlextQualityOperations(FlextService[bool]):
     pattern_auditor.py, false_positive_auditor.py
     """
 
-    def execute(self) -> FlextResult[bool]:
+    def execute(self, **kwargs: object) -> FlextResult[bool]:
         """Execute quality operations service - FlextService interface."""
         return FlextResult[bool].ok(True)
 

@@ -182,7 +182,7 @@ class FlextQualityAnalyzer(FlextService):
         """Get logger."""
         return self._logger
 
-    def execute(self) -> FlextResult[bool]:
+    def execute(self, **kwargs: object) -> FlextResult[bool]:
         """Execute analyzer service - override from FlextService."""
         return FlextResult[bool].ok(True)
 

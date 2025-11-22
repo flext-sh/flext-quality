@@ -374,7 +374,7 @@ class FlextQualityCliService(FlextService[int]):
         return self._router
 
     @override
-    def execute(self) -> FlextResult[int]:
+    def execute(self, **kwargs: object) -> FlextResult[int]:
         """Execute CLI service - required abstract method."""
         self.logger.info("CLI service running")
         return FlextResult[int].ok(0)

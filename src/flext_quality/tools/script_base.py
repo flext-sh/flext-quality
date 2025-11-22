@@ -7,7 +7,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Self
 
-from flext_core import FlextLogger, FlextResult, FlextService
+from flext_core import FlextResult, FlextService
 
 
 @dataclass(slots=True)
@@ -26,14 +26,13 @@ class FlextScriptService(FlextService[object], ABC):
     def __init__(self: Self) -> None:
         """Initialize script service."""
         super().__init__()
-        self.logger = FlextLogger(__name__)
 
     @property
     @abstractmethod
     def metadata(self: Self) -> ScriptMetadata:
         """Return metadata describing the script."""
 
-    def execute(self: Self) -> FlextResult[object]:
+    def execute(self: Self, **kwargs: object) -> FlextResult[object]:
         """Alias for :meth:`run` to satisfy FlextService contract."""
         return self.run({})
 

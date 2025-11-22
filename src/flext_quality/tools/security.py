@@ -15,7 +15,7 @@ class FlextSecurityService(FlextService[dict[str, str]]):
         """Initialize the FlextSecurityService."""
         super().__init__()
 
-    def execute(self: Self) -> FlextResult[dict[str, str]]:
+    def execute(self: Self, **kwargs: object) -> FlextResult[dict[str, str]]:
         """Return an empty payload for service compliance."""
         return FlextResult[dict[str, str]].ok({})
 
@@ -45,7 +45,7 @@ class FlextSecurityService(FlextService[dict[str, str]]):
 class SecretVaultDecryptor(FlextSecurityService):
     """Compatibility wrapper used by legacy security scripts."""
 
-    def decrypt_vault(self, vault_path: str | Path) -> dict[str, str]:
+    def decrypt_vault(self, vault_path: str | Path) -> FlextResult[dict[str, str]]:
         """Return decrypted vault metadata.
 
         The actual decryption logic is intentionally omitted until the secure
@@ -54,11 +54,11 @@ class SecretVaultDecryptor(FlextSecurityService):
         """
         result = super().decrypt_vault(vault_path)
         if result.is_failure:
-            return {}
-        return {
+            return FlextResult[dict[str, str]].fail("Decryption failed")
+        return FlextResult[dict[str, str]].ok({
             "details": result.value,
             "status": "decryption-not-implemented",
-        }
+        })
 
 
 __all__ = ["FlextSecurityService", "SecretVaultDecryptor"]

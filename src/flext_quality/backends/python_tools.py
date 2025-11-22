@@ -18,107 +18,14 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+import black
+import coverage
+import pytest
+from bandit.core import config as bandit_config, manager as bandit_manager
 from flext_core import FlextLogger, FlextResult, FlextUtilities
-
-# =========================================================================
-# PYTHON QUALITY TOOLS - Optional imports with availability checking
-# =========================================================================
-
-# Optional tool imports - these may not be installed
-try:
-    import ruff
-
-    _RUFF_AVAILABLE = True
-except ImportError:
-    ruff = None
-    _RUFF_AVAILABLE = False
-
-try:
-    import mypy
-    from mypy import api
-
-    _MYPY_AVAILABLE = True
-    _MYPY_API_AVAILABLE = True
-except ImportError:
-    mypy = None
-    api = None
-    _MYPY_AVAILABLE = False
-    _MYPY_API_AVAILABLE = False
-
-try:
-    import bandit
-    from bandit.core import config as bandit_config, manager as bandit_manager
-
-    _BANDIT_AVAILABLE = True
-    _BANDIT_CORE_AVAILABLE = True
-except ImportError:
-    bandit = None
-    bandit_config = None
-    bandit_manager = None
-    _BANDIT_AVAILABLE = False
-    _BANDIT_CORE_AVAILABLE = False
-
-try:
-    import pylint
-
-    _PYLINT_AVAILABLE = True
-except ImportError:
-    pylint = None
-    _PYLINT_AVAILABLE = False
-
-try:
-    import black
-
-    _BLACK_AVAILABLE = True
-except ImportError:
-    black = None
-    _BLACK_AVAILABLE = False
-
-try:
-    import isort
-
-    _ISORT_AVAILABLE = True
-except ImportError:
-    isort = None
-    _ISORT_AVAILABLE = False
-
-try:
-    import coverage
-
-    _COVERAGE_AVAILABLE = True
-except ImportError:
-    coverage = None
-    _COVERAGE_AVAILABLE = False
-
-try:
-    import pytest
-
-    _PYTEST_AVAILABLE = True
-except ImportError:
-    pytest = None
-    _PYTEST_AVAILABLE = False
-
-try:
-    import radon
-    from radon.complexity import cc_visit
-
-    _RADON_AVAILABLE = True
-    _RADON_COMPLEXITY_AVAILABLE = True
-except ImportError:
-    radon = None
-    cc_visit = None
-    _RADON_AVAILABLE = False
-    _RADON_COMPLEXITY_AVAILABLE = False
-
-try:
-    from vulture import Vulture
-
-    _VULTURE_AVAILABLE = True
-    _VULTURE_CLASS_AVAILABLE = True
-except ImportError:
-    Vulture = None
-    _VULTURE_AVAILABLE = False
-    _VULTURE_CLASS_AVAILABLE = False
+from mypy import api
+from radon.complexity import cc_visit
+from vulture import Vulture
 
 
 class FlextQualityPythonTools:
@@ -136,80 +43,6 @@ class FlextQualityPythonTools:
     def __init__(self) -> None:
         """Initialize Python tools backend."""
         self._logger = FlextLogger(__name__)
-        self._tools_available: dict[str, bool] = {}
-        self._check_tools_availability()
-
-    def _check_tools_availability(self) -> None:
-        """Check which Python quality tools are available."""
-        tools = {
-            "ruff": self._check_ruff,
-            "mypy": self._check_mypy,
-            "bandit": self._check_bandit,
-            "pylint": self._check_pylint,
-            "black": self._check_black,
-            "isort": self._check_isort,
-            "coverage": self._check_coverage,
-            "pytest": self._check_pytest,
-            "radon": self._check_radon,
-            "vulture": self._check_vulture,
-        }
-
-        for tool_name, check_func in tools.items():
-            self._tools_available[tool_name] = check_func()
-
-    # =========================================================================
-    # AVAILABILITY CHECKS - Verify tools are installed
-    # =========================================================================
-
-    @staticmethod
-    def _check_ruff() -> bool:
-        """Check if Ruff is available."""
-        return _RUFF_AVAILABLE
-
-    @staticmethod
-    def _check_mypy() -> bool:
-        """Check if MyPy is available."""
-        return _MYPY_AVAILABLE
-
-    @staticmethod
-    def _check_bandit() -> bool:
-        """Check if Bandit is available."""
-        return _BANDIT_AVAILABLE
-
-    @staticmethod
-    def _check_pylint() -> bool:
-        """Check if Pylint is available."""
-        return _PYLINT_AVAILABLE
-
-    @staticmethod
-    def _check_black() -> bool:
-        """Check if Black is available."""
-        return _BLACK_AVAILABLE
-
-    @staticmethod
-    def _check_isort() -> bool:
-        """Check if isort is available."""
-        return _ISORT_AVAILABLE
-
-    @staticmethod
-    def _check_coverage() -> bool:
-        """Check if Coverage is available."""
-        return _COVERAGE_AVAILABLE
-
-    @staticmethod
-    def _check_pytest() -> bool:
-        """Check if Pytest is available."""
-        return _PYTEST_AVAILABLE
-
-    @staticmethod
-    def _check_radon() -> bool:
-        """Check if Radon is available."""
-        return _RADON_AVAILABLE
-
-    @staticmethod
-    def _check_vulture() -> bool:
-        """Check if Vulture is available."""
-        return _VULTURE_AVAILABLE
 
     # =========================================================================
     # RUFF LINTER - Python's fastest linter (Rust-based)
@@ -227,9 +60,6 @@ class FlextQualityPythonTools:
         FlextResult with linting issues
 
         """
-        if not self._tools_available.get("ruff"):
-            return FlextResult.fail("Ruff is not installed")
-
         try:
             # Validate path for security
             if not path.exists() or not path.is_file():
@@ -277,9 +107,6 @@ class FlextQualityPythonTools:
         FlextResult with type errors
 
         """
-        if not _MYPY_API_AVAILABLE or api is None:
-            return FlextResult.fail("MyPy API is not available")
-
         try:
             # Direct API call - no subprocess
             stdout, stderr, exit_code = api.run([
@@ -312,13 +139,6 @@ class FlextQualityPythonTools:
         FlextResult with security issues
 
         """
-        if (
-            not _BANDIT_CORE_AVAILABLE
-            or bandit_config is None
-            or bandit_manager is None
-        ):
-            return FlextResult.fail("Bandit core modules are not available")
-
         try:
             # Direct API usage
             conf = bandit_config.BanditConfig()
@@ -348,9 +168,6 @@ class FlextQualityPythonTools:
         FlextResult with analysis results
 
         """
-        if not self._tools_available.get("pylint"):
-            return FlextResult.fail("Pylint is not installed")
-
         try:
             # Use FlextUtilities for command execution with threading-based timeout
             # (Pylint doesn't expose clean Python API, use subprocess via FlextUtilities)
@@ -392,9 +209,6 @@ class FlextQualityPythonTools:
         FlextResult with formatting check results
 
         """
-        if not _BLACK_AVAILABLE or black is None:
-            return FlextResult.fail("Black is not available")
-
         try:
             # Direct API usage
             mode = black.Mode()
@@ -433,9 +247,6 @@ class FlextQualityPythonTools:
         FlextResult with test results
 
         """
-        if not _PYTEST_AVAILABLE or pytest is None:
-            return FlextResult.fail("Pytest is not available")
-
         try:
             # Direct API call
             result = pytest.main([
@@ -468,9 +279,6 @@ class FlextQualityPythonTools:
         # Reserved for future path-specific coverage analysis
         _ = path  # Reserved for future use
 
-        if not _COVERAGE_AVAILABLE or coverage is None:
-            return FlextResult.fail("Coverage is not available")
-
         try:
             # Direct API usage
             cov = coverage.Coverage()
@@ -500,9 +308,6 @@ class FlextQualityPythonTools:
         FlextResult with complexity metrics
 
         """
-        if not _RADON_COMPLEXITY_AVAILABLE or cc_visit is None:
-            return FlextResult.fail("Radon complexity is not available")
-
         try:
             with Path(path).open(encoding="utf-8") as f:
                 code = f.read()
@@ -532,9 +337,6 @@ class FlextQualityPythonTools:
         FlextResult with dead code findings
 
         """
-        if not _VULTURE_CLASS_AVAILABLE or Vulture is None:
-            return FlextResult.fail("Vulture class is not available")
-
         try:
             v = Vulture()
             v.scavenge([str(path)])

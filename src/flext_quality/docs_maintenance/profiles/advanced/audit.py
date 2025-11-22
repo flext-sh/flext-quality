@@ -23,9 +23,9 @@ from flext_quality.docs_maintenance.utils import get_docs_dir
 
 # Constants for audit configuration
 MAX_AGE_DAYS: int = FlextConstants.Validation.MAX_AGE
-EXCELLENT_QUALITY_SCORE: float = FlextConstants.Validation.MAX_PERCENTAGE - 10
-GOOD_QUALITY_SCORE: float = FlextConstants.Validation.MAX_PERCENTAGE - 20
-FAIR_QUALITY_SCORE: float = FlextConstants.Validation.MAX_PERCENTAGE - 30
+EXCELLENT_QUALITY_SCORE: float = 90.0  # Excellent quality threshold
+GOOD_QUALITY_SCORE: float = 80.0  # Good quality threshold
+FAIR_QUALITY_SCORE: float = 70.0  # Fair quality threshold
 EXCELLENT_FRESHNESS_DAYS: int = MAX_AGE_DAYS
 LONG_PARAGRAPH_WORD_LIMIT: int = FlextConstants.Validation.PREVIEW_LENGTH * 3
 
