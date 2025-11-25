@@ -176,7 +176,7 @@ class FlextQualityHandlers:
     # Private Helper Methods
     # =====================================================================
 
-    def _log_error(self, context: HandlerContext, error: str) -> str:
+    def _log_error(self, _context: HandlerContext, error: str) -> str:
         """Log and return error."""
         self._ObservabilityManager.log_operation(
             f"Operation failed: {error}", "error", context
@@ -184,7 +184,7 @@ class FlextQualityHandlers:
         self._logger.error(f"Handler error in {context.operation}: {error}")
         return error
 
-    def _log_success(self, context: HandlerContext, result: object) -> object:
+    def _log_success(self, _context: HandlerContext, result: object) -> object:
         """Log and return success result."""
         self._ObservabilityManager.log_operation(
             "Operation completed successfully",

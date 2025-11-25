@@ -483,6 +483,6 @@ class FlextQuality(FlextService[bool]):
         return self.complete_analysis(analysis.id)
 
     @override
-    def execute(self, **kwargs: object) -> FlextResult[bool]:
+    def execute(self, **_kwargs: object) -> FlextResult[bool]:
         """Execute quality operations (facade entry point)."""
         return FlextResult[bool].ok(True)

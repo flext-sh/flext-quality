@@ -145,7 +145,8 @@ class DocumentationAuditor:
 
     def _load_config(self, config_path: str | None) -> AuditConfig:
         """Load configuration from YAML file."""
-        default_config = {
+        # Use dict for merging operations, then cast to AuditConfig
+        default_config: dict[str, object] = {
             "audit": {
                 "include_patterns": ["*.md", "*.mdx"],
                 "exclude_patterns": ["node_modules/**", ".git/**", "**/.*"],
@@ -165,47 +166,52 @@ class DocumentationAuditor:
         if config_path and Path(config_path).exists():
             with Path(config_path).open(encoding="utf-8") as f:
                 user_config = yaml.safe_load(f)
-                # Merge configs
-                for key, value in user_config.items():
-                    if key in default_config:
-                        if isinstance(default_config[key], dict) and isinstance(
-                            value, dict
-                        ):
-                            default_config[key].update(value)
-                        elif isinstance(default_config[key], list) and isinstance(
-                            value, list
-                        ):
-                            default_config[key].extend(value)
+                if isinstance(user_config, dict):
+                    # Merge configs safely
+                    for key, value in user_config.items():
+                        if key in default_config:
+                            existing = default_config[key]
+                            if isinstance(existing, dict) and isinstance(value, dict):
+                                # Merge dicts
+                                default_config[key] = {**existing, **value}
+                            elif isinstance(existing, list) and isinstance(value, list):
+                                # Extend lists
+                                default_config[key] = existing + value
+                            else:
+                                # Replace if types don't match
+                                default_config[key] = value
                         else:
-                            # Replace if types don't match
                             default_config[key] = value
-                    else:
-                        default_config[key] = value
+
+        # Extract nested dicts with proper type casting
+        audit_dict = default_config.get("audit", {})
+        content_dict = default_config.get("content", {})
+
+        if not isinstance(audit_dict, dict):
+            audit_dict = {}
+        if not isinstance(content_dict, dict):
+            content_dict = {}
+
+        thresholds_dict = audit_dict.get("thresholds", {})
+        if not isinstance(thresholds_dict, dict):
+            thresholds_dict = {}
 
         return AuditConfig(
             audit=AuditSettings(
-                include_patterns=list(default_config["audit"]["include_patterns"]),
-                exclude_patterns=list(default_config["audit"]["exclude_patterns"]),
+                include_patterns=list(audit_dict.get("include_patterns", [])),
+                exclude_patterns=list(audit_dict.get("exclude_patterns", [])),
                 thresholds=AuditThresholds(
-                    min_word_count=int(
-                        default_config["audit"]["thresholds"]["min_word_count"]
-                    ),
-                    max_age_days=int(
-                        default_config["audit"]["thresholds"]["max_age_days"]
-                    ),
-                    min_quality_score=int(
-                        default_config["audit"]["thresholds"]["min_quality_score"]
-                    ),
+                    min_word_count=int(thresholds_dict.get("min_word_count", 100)),
+                    max_age_days=int(thresholds_dict.get("max_age_days", 90)),
+                    min_quality_score=int(thresholds_dict.get("min_quality_score", 70)),
                     min_completeness_score=int(
-                        default_config["audit"]["thresholds"]["min_completeness_score"]
+                        thresholds_dict.get("min_completeness_score", 60)
                     ),
                 ),
             ),
             content=ContentSettings(
-                required_sections=list(default_config["content"]["required_sections"]),
-                prohibited_patterns=list(
-                    default_config["content"]["prohibited_patterns"]
-                ),
+                required_sections=list(content_dict.get("required_sections", [])),
+                prohibited_patterns=list(content_dict.get("prohibited_patterns", [])),
             ),
         )
 

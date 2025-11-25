@@ -374,7 +374,7 @@ class FlextQualityCliService(FlextService[int]):
         return self._router
 
     @override
-    def execute(self, **kwargs: object) -> FlextResult[int]:
+    def execute(self, **_kwargs: object) -> FlextResult[int]:
         """Execute CLI service - required abstract method."""
         self.logger.info("CLI service running")
         return FlextResult[int].ok(0)
@@ -654,6 +654,11 @@ def _run_make_target(args: object) -> int:
 
     project_path = Path(args_dict.get("project_path", Path.cwd()))
     target = args_dict.get("target")
+
+    # Validate target
+    if not target or not isinstance(target, str):
+        cli.formatters.print("Invalid target specified", style="red")
+        return 1
 
     # Validate project path
     if not project_path.exists():

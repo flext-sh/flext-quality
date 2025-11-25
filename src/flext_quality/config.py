@@ -377,7 +377,7 @@ class FlextQualityConfig(FlextConfig.AutoConfig):
         return cls.model_validate({
             "min_coverage": FlextQualityConstants.Coverage.TARGET_COVERAGE,
             "max_complexity": 8,
-            "min_security_score": FlextQualityConstants.Security.TARGET_SECURITY_SCORE,
+            "min_security_score": FlextQualityConstants.QualitySecurity.TARGET_SECURITY_SCORE,
             "min_maintainability": 85.0,
             "analysis_timeout": 600,
             "parallel_workers": 8,

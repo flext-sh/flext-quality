@@ -16,7 +16,7 @@ class PoetryOperations(FlextService[str]):
         """Initialize the PoetryOperations service."""
         super().__init__()
 
-    def execute(self: Self, **kwargs: object) -> FlextResult[str]:
+    def execute(self: Self, **_kwargs: object) -> FlextResult[str]:
         """Return a status message for compatibility."""
         return FlextResult[str].ok("Poetry operations ready")
 
@@ -78,7 +78,7 @@ class PoetryValidator(FlextService[dict[str, bool]]):
         """Initialize the PoetryValidator service."""
         super().__init__()
 
-    def execute(self: Self, **kwargs: object) -> FlextResult[dict[str, bool]]:
+    def execute(self: Self, **_kwargs: object) -> FlextResult[dict[str, bool]]:
         """Return default validation state."""
         return FlextResult[dict[str, bool]].ok({
             "pyproject_exists": False,

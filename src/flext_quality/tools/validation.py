@@ -22,7 +22,7 @@ class FlextQualityValidationTools(FlextService[bool]):
 
     model_config = ConfigDict(arbitrary_types_allowed=True, extra="allow")
 
-    def execute(self, **kwargs: object) -> FlextResult[bool]:
+    def execute(self, **_kwargs: object) -> FlextResult[bool]:
         """Execute validation tools service - FlextService interface."""
         return FlextResult[bool].ok(True)
 

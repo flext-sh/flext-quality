@@ -134,7 +134,7 @@ class LinkChecker:
         return "internal"
 
     async def check_link_async(
-        self, url: str, context: dict[str, Any] | None = None
+        self, url: str, _context: dict[str, Any] | None = None
     ) -> dict[str, Any]:
         """Asynchronously check a single link."""
         start_time = time.time()
@@ -193,7 +193,7 @@ class LinkChecker:
             }
 
     def check_link_sync(
-        self, url: str, context: dict[str, Any] | None = None
+        self, url: str, _context: dict[str, Any] | None = None
     ) -> dict[str, Any]:
         """Synchronously check a single link (fallback method)."""
         start_time = time.time()

@@ -15,7 +15,7 @@ class FlextSecurityService(FlextService[dict[str, str]]):
         """Initialize the FlextSecurityService."""
         super().__init__()
 
-    def execute(self: Self, **kwargs: object) -> FlextResult[dict[str, str]]:
+    def execute(self: Self, **_kwargs: object) -> FlextResult[dict[str, str]]:
         """Return an empty payload for service compliance."""
         return FlextResult[dict[str, str]].ok({})
 
@@ -55,8 +55,10 @@ class SecretVaultDecryptor(FlextSecurityService):
         result = super().decrypt_vault(vault_path)
         if result.is_failure:
             return FlextResult[dict[str, str]].fail("Decryption failed")
+        # Convert result.value to string for the dict
+        details = str(result.value) if result.value is not None else ""
         return FlextResult[dict[str, str]].ok({
-            "details": result.value,
+            "details": details,
             "status": "decryption-not-implemented",
         })
 

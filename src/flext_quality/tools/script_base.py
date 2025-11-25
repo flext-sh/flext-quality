@@ -32,7 +32,7 @@ class FlextScriptService(FlextService[object], ABC):
     def metadata(self: Self) -> ScriptMetadata:
         """Return metadata describing the script."""
 
-    def execute(self: Self, **kwargs: object) -> FlextResult[object]:
+    def execute(self: Self, **_kwargs: object) -> FlextResult[object]:
         """Alias for :meth:`run` to satisfy FlextService contract."""
         return self.run({})
 
