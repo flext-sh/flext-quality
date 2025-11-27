@@ -10,6 +10,8 @@ from __future__ import annotations
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+from flext_core import FlextResult
+
 from flext_quality import ExternalBackend
 
 
@@ -57,8 +59,6 @@ def test_external_backend_empty_outputs(
     """Empty stdout from tools should produce empty lists in outputs."""
     backend = ExternalBackend()
     temp = _temp_py(tmp_path)
-
-    from flext_core import FlextResult
 
     mock_run.return_value = FlextResult.ok(
         MagicMock(returncode=0, stdout="[]", stderr="")

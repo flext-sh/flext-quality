@@ -140,7 +140,7 @@ class ProjectServiceBuilder:
         return (
             self._validate_required_fields()
             .flat_map(lambda _: self._create_project_model())
-            .map(lambda project: self._log_project_creation(project))  # noqa: PLW0108
+            .map(lambda project: self._log_project_creation(project))
         )
 
     def _validate_required_fields(self) -> FlextResult[bool]:
@@ -232,7 +232,7 @@ class AnalysisServiceBuilder:
             self._validate_project_id()
             .flat_map(lambda _: self._validate_status())
             .flat_map(lambda _: self._create_analysis_model())
-            .map(lambda analysis: self._log_analysis_creation(analysis))  # noqa: PLW0108
+            .map(lambda analysis: self._log_analysis_creation(analysis))
         )
 
     def _validate_project_id(self) -> FlextResult[bool]:
@@ -352,7 +352,7 @@ class IssueServiceBuilder:
             self._validate_required_fields()
             .flat_map(lambda _: self._validate_enums())
             .flat_map(lambda _: self._create_issue_model())
-            .map(lambda issue: self._log_issue_creation(issue))  # noqa: PLW0108
+            .map(lambda issue: self._log_issue_creation(issue))
         )
 
     def _validate_required_fields(self) -> FlextResult[bool]:
@@ -464,7 +464,7 @@ class ReportServiceBuilder:
             self._validate_analysis_id()
             .flat_map(lambda _: self._validate_format())
             .flat_map(lambda _: self._create_report_model())
-            .map(lambda report: self._log_report_creation(report))  # noqa: PLW0108
+            .map(lambda report: self._log_report_creation(report))
         )
 
     def _validate_analysis_id(self) -> FlextResult[bool]:

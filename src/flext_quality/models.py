@@ -468,7 +468,7 @@ class AppConfig(BaseModel):
     enable_cors: bool = Field(default=True, description="Enable CORS")
     enable_docs: bool = Field(default=True, description="Enable API documentation")
     debug: bool = Field(default=False, description="Debug mode")
-    host: str = Field(default="0.0.0.0", description="Server host")  # noqa: S104
+    host: str = Field(default="0.0.0.0", description="Server host")
     port: int = Field(default=8000, ge=1, le=65535, description="Server port")
 
 

@@ -524,7 +524,7 @@ class ContentOptimizer:
         )
 
 
-def main() -> None:  # noqa: C901
+def main() -> None:
     """Main entry point for documentation optimization system."""
     parser = argparse.ArgumentParser(
         description="Documentation Content Optimization and Enhancement System"
