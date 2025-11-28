@@ -17,7 +17,7 @@ from __future__ import annotations
 import json
 import tempfile
 from pathlib import Path
-from typing import Any, override
+, override
 
 from flext_core import (
     FlextDecorators,
@@ -45,7 +45,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
         """Return the capabilities of this backend."""
         return ["ruff", "mypy", "bandit", "vulture", "coverage", "radon"]
 
-    def execute(self) -> FlextResult[dict[str, Any]]:
+    def execute(self) -> FlextResult[dict[str, object]]:
         """Execute main analysis operation."""
         # For external backend, execute a basic ruff check as default operation
         return self.analyze("", tool="ruff")
@@ -56,7 +56,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
         code: str,
         _file_path: Path | None = None,
         tool: str = "ruff",
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Analyze code using external tools.
 
         Args:
@@ -95,7 +95,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
 
     def _route_tool_analysis(
         self, tool: str, file_path: Path
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Route analysis to appropriate tool method."""
         tool_runners = {
             "ruff": self._run_ruff,
@@ -121,7 +121,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
         json_parser: callable = lambda stdout: json.loads(stdout)
         if stdout.strip()
         else [],
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Generic method for running tools that output JSON."""
         if not file_path.exists():
             return FlextResult.fail("Invalid file path")
@@ -153,7 +153,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
 
     def _handle_tool_error(
         self, error_msg: str, tool_name: str
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Handle common tool execution errors."""
         if "not found" in error_msg.lower():
             return FlextResult.ok({
@@ -171,7 +171,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
     # RUFF - Fast linting and formatting
     # =========================================================================
 
-    def _run_ruff(self, file_path: Path) -> FlextResult[dict[str, Any]]:
+    def _run_ruff(self, file_path: Path) -> FlextResult[dict[str, object]]:
         """Run ruff linter with JSON output."""
         return self._run_tool_with_json_output(
             tool_name="ruff",
@@ -184,7 +184,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
     # MYPY - Type checking
     # =========================================================================
 
-    def _run_mypy(self, file_path: Path) -> FlextResult[dict[str, Any]]:
+    def _run_mypy(self, file_path: Path) -> FlextResult[dict[str, object]]:
         """Run mypy type checker."""
         return self._run_tool_with_json_output(
             tool_name="mypy",
@@ -193,7 +193,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
             json_parser=self._parse_mypy_output,
         )
 
-    def _parse_mypy_output(self, stdout: str) -> list[dict[str, Any]]:
+    def _parse_mypy_output(self, stdout: str) -> list[dict[str, object]]:
         """Parse mypy JSON output from stdout string."""
         issues = []
         for line in stdout.splitlines():
@@ -211,7 +211,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
     # BANDIT - Security scanning
     # =========================================================================
 
-    def _run_bandit(self, file_path: Path) -> FlextResult[dict[str, Any]]:
+    def _run_bandit(self, file_path: Path) -> FlextResult[dict[str, object]]:
         """Run bandit security scanner."""
         return self._run_tool_with_json_output(
             tool_name="bandit",
@@ -226,7 +226,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
     # VULTURE - Dead code detection
     # =========================================================================
 
-    def _run_vulture(self, file_path: Path) -> FlextResult[dict[str, Any]]:
+    def _run_vulture(self, file_path: Path) -> FlextResult[dict[str, object]]:
         """Run vulture dead code detector."""
         return self._run_tool_with_json_output(
             tool_name="vulture",
@@ -239,7 +239,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
     # COVERAGE - Test coverage measurement
     # =========================================================================
 
-    def _run_coverage(self, file_path: Path) -> FlextResult[dict[str, Any]]:
+    def _run_coverage(self, file_path: Path) -> FlextResult[dict[str, object]]:
         """Run coverage to measure test coverage."""
         result = FlextUtilities.CommandExecution.run_external_command(
             [
@@ -271,7 +271,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
             else "No coverage data",
         })
 
-    def _handle_coverage_error(self, error_msg: str) -> FlextResult[dict[str, Any]]:
+    def _handle_coverage_error(self, error_msg: str) -> FlextResult[dict[str, object]]:
         """Handle coverage-specific errors."""
         if "not found" in error_msg.lower():
             return FlextResult.ok({
@@ -284,7 +284,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
             return FlextResult.fail("coverage analysis timed out")
         return FlextResult.fail(f"coverage analysis failed: {error_msg}")
 
-    def _parse_coverage_data(self) -> dict[str, Any]:
+    def _parse_coverage_data(self) -> dict[str, object]:
         """Parse coverage JSON data from temp directory."""
         coverage_path = Path(tempfile.gettempdir()) / ".coverage.json"
         if not coverage_path.exists():
@@ -300,7 +300,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
     # RADON - Complexity metrics
     # =========================================================================
 
-    def _run_radon(self, file_path: Path) -> FlextResult[dict[str, Any]]:
+    def _run_radon(self, file_path: Path) -> FlextResult[dict[str, object]]:
         """Run radon for complexity metrics."""
         # First call: complexity
         result_cc = FlextUtilities.CommandExecution.run_external_command(
@@ -325,7 +325,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
             "status": "success",
         })
 
-    def _handle_radon_error(self, error_msg: str) -> FlextResult[dict[str, Any]]:
+    def _handle_radon_error(self, error_msg: str) -> FlextResult[dict[str, object]]:
         """Handle radon-specific errors."""
         if "not found" in error_msg.lower():
             return FlextResult.ok({
@@ -339,7 +339,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
             return FlextResult.fail("radon analysis timed out")
         return FlextResult.fail(f"radon analysis failed: {error_msg}")
 
-    def _run_radon_maintainability(self, file_path: Path) -> dict[str, Any]:
+    def _run_radon_maintainability(self, file_path: Path) -> dict[str, object]:
         """Run radon maintainability index analysis."""
         result_mi = FlextUtilities.CommandExecution.run_external_command(
             ["radon", "mi", str(file_path), "-j"],
@@ -351,7 +351,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
             return self._parse_radon_json(result_mi.unwrap().stdout)
         return {}
 
-    def _parse_radon_json(self, stdout: str) -> dict[str, Any]:
+    def _parse_radon_json(self, stdout: str) -> dict[str, object]:
         """Parse radon JSON output."""
         if not stdout.strip():
             return {}
@@ -360,7 +360,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
         except json.JSONDecodeError:
             return {}
 
-    def _parse_ruff_output(self, output: str) -> list[dict[str, Any]]:
+    def _parse_ruff_output(self, output: str) -> list[dict[str, object]]:
         """Parse ruff JSON output into structured format."""
         try:
             return json.loads(output) if output.strip() else []

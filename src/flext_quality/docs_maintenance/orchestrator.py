@@ -7,7 +7,6 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from importlib import import_module
 from inspect import Parameter, signature
-from typing import Any
 
 from .profiles import PROFILE_ALIASES
 

@@ -5,7 +5,6 @@ from __future__ import annotations
 from collections.abc import Callable
 from importlib import import_module
 from types import ModuleType
-from typing import Any
 
 _ADVANCED_MODULE = "flext_quality.docs_maintenance.profiles.advanced"
 

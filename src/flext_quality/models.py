@@ -17,6 +17,7 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel, Field
 
 # Type aliases (from typings.py)
+from flext_quality.constants import FlextQualityConstants
 from flext_quality.typings import PositiveInt, ScoreRange, Timestamp
 
 # Type alias for rule parameter values - no Any type
@@ -347,7 +348,9 @@ class CheckResult(BaseModel):
     """Quality check result value object."""
 
     check_name: str = Field(description="Name of the quality check")
-    status: str = Field(description="Check status: passed, failed, warning")
+    status: FlextQualityConstants.Literals.CheckStatusLiteral | str = Field(
+        description="Check status: passed, failed, warning"
+    )
     issues_found: int = 0
     score: ScoreRange = 0.0
     details: CheckDetailsDict | None = None
@@ -358,7 +361,9 @@ class AnalysisResult(BaseModel):
 
     analysis_id: str = Field(description="Analysis identifier")
     project_path: str = Field(description="Project path analyzed")
-    status: str = Field(description="Analysis status")
+    status: FlextQualityConstants.Literals.AnalysisStatusLiteral | str = Field(
+        description="Analysis status"
+    )
     issues_found: int = 0
     overall_score: ScoreRange = 0.0
     quality_grade: str = "F"

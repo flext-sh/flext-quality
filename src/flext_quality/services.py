@@ -61,6 +61,7 @@ from flext_core import FlextLogger, FlextResult
 
 from .base_service import FlextQualityBaseService
 from .config import FlextQualityConfig
+from .constants import FlextQualityConstants
 from .models import FlextQualityModels
 
 
@@ -140,7 +141,7 @@ class ProjectServiceBuilder:
         return (
             self._validate_required_fields()
             .flat_map(lambda _: self._create_project_model())
-            .map(lambda project: self._log_project_creation(project))
+            .map(self._log_project_creation)
         )
 
     def _validate_required_fields(self) -> FlextResult[bool]:
@@ -199,7 +200,9 @@ class AnalysisServiceBuilder:
         self._config = config
         self._logger = logger
         self._project_id: str | UUID | None = None
-        self._status: str = "queued"
+        self._status: FlextQualityConstants.Literals.AnalysisStatusLiteral | str = (
+            "queued"
+        )
         self._kwargs: dict[str, object] = {}
 
     def with_project_id(self, project_id: str | UUID) -> AnalysisServiceBuilder:
@@ -208,7 +211,12 @@ class AnalysisServiceBuilder:
         return self
 
     def with_status(
-        self, status: str | FlextQualityModels.AnalysisStatus
+        self,
+        status: (
+            FlextQualityConstants.Literals.AnalysisStatusLiteral
+            | str
+            | FlextQualityModels.AnalysisStatus
+        ),
     ) -> AnalysisServiceBuilder:
         """Set analysis status (fluent)."""
         self._status = str(status.value) if hasattr(status, "value") else str(status)
@@ -232,7 +240,7 @@ class AnalysisServiceBuilder:
             self._validate_project_id()
             .flat_map(lambda _: self._validate_status())
             .flat_map(lambda _: self._create_analysis_model())
-            .map(lambda analysis: self._log_analysis_creation(analysis))
+            .map(self._log_analysis_creation)
         )
 
     def _validate_project_id(self) -> FlextResult[bool]:
@@ -321,7 +329,10 @@ class IssueServiceBuilder:
         self._severity = severity
         return self
 
-    def with_issue_type(self, issue_type: str) -> IssueServiceBuilder:
+    def with_issue_type(
+        self,
+        issue_type: FlextQualityConstants.Literals.IssueTypeLiteral | str,
+    ) -> IssueServiceBuilder:
         """Set issue type (fluent)."""
         self._issue_type = issue_type
         return self
@@ -352,7 +363,7 @@ class IssueServiceBuilder:
             self._validate_required_fields()
             .flat_map(lambda _: self._validate_enums())
             .flat_map(lambda _: self._create_issue_model())
-            .map(lambda issue: self._log_issue_creation(issue))
+            .map(self._log_issue_creation)
         )
 
     def _validate_required_fields(self) -> FlextResult[bool]:
@@ -435,7 +446,9 @@ class ReportServiceBuilder:
         self._config = config
         self._logger = logger
         self._analysis_id: str | UUID | None = None
-        self._format_type: str = "HTML"
+        self._format_type: FlextQualityConstants.Literals.ReportFormatLiteral | str = (
+            "HTML"
+        )
         self._kwargs: dict[str, object] = {}
 
     def with_analysis_id(self, analysis_id: str | UUID) -> ReportServiceBuilder:
@@ -443,7 +456,10 @@ class ReportServiceBuilder:
         self._analysis_id = analysis_id
         return self
 
-    def with_format(self, format_type: str) -> ReportServiceBuilder:
+    def with_format(
+        self,
+        format_type: FlextQualityConstants.Literals.ReportFormatLiteral | str,
+    ) -> ReportServiceBuilder:
         """Set report format (fluent)."""
         self._format_type = format_type
         return self
@@ -464,7 +480,7 @@ class ReportServiceBuilder:
             self._validate_analysis_id()
             .flat_map(lambda _: self._validate_format())
             .flat_map(lambda _: self._create_report_model())
-            .map(lambda report: self._log_report_creation(report))
+            .map(self._log_report_creation)
         )
 
     def _validate_analysis_id(self) -> FlextResult[bool]:

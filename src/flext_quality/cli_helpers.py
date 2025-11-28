@@ -13,7 +13,6 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
 
 from flext_core import FlextResult
 
@@ -59,7 +58,7 @@ class QualityHelperCommands:
         return suggest_tests_from_coverage(Path(project_path))
 
     @staticmethod
-    def test_quality(test_file: str) -> FlextResult[dict[str, Any]]:
+    def test_quality(test_file: str) -> FlextResult[dict[str, object]]:
         """Check test file quality and patterns.
 
         Args:
@@ -72,7 +71,7 @@ class QualityHelperCommands:
         return check_test_quality(Path(test_file))
 
     @staticmethod
-    def test_execute(test_path: str) -> FlextResult[dict[str, Any]]:
+    def test_execute(test_path: str) -> FlextResult[dict[str, object]]:
         """Validate that tests execute successfully.
 
         Args:
@@ -89,7 +88,7 @@ class QualityHelperCommands:
     # ==========================================================================
 
     @staticmethod
-    def docs_coverage(module_path: str) -> FlextResult[dict[str, Any]]:
+    def docs_coverage(module_path: str) -> FlextResult[dict[str, object]]:
         """Check docstring coverage percentage in module.
 
         Args:
@@ -102,7 +101,7 @@ class QualityHelperCommands:
         return check_docstring_coverage(Path(module_path))
 
     @staticmethod
-    def docs_validate(module_path: str) -> FlextResult[dict[str, Any]]:
+    def docs_validate(module_path: str) -> FlextResult[dict[str, object]]:
         """Validate docstrings follow Google style format.
 
         Args:
@@ -128,7 +127,7 @@ class QualityHelperCommands:
         return suggest_docstring_improvements(Path(module_path))
 
     @staticmethod
-    def docs_analyze(module_path: str) -> FlextResult[dict[str, Any]]:
+    def docs_analyze(module_path: str) -> FlextResult[dict[str, object]]:
         """Analyze API documentation completeness.
 
         Args:
@@ -145,7 +144,7 @@ class QualityHelperCommands:
     # ==========================================================================
 
     @staticmethod
-    def examples_validate(examples_dir: str) -> FlextResult[dict[str, Any]]:
+    def examples_validate(examples_dir: str) -> FlextResult[dict[str, object]]:
         """Run all example.py files and validate they work.
 
         Args:
@@ -158,7 +157,7 @@ class QualityHelperCommands:
         return validate_examples_directory(Path(examples_dir))
 
     @staticmethod
-    def examples_structure(example_dir: str) -> FlextResult[dict[str, Any]]:
+    def examples_structure(example_dir: str) -> FlextResult[dict[str, object]]:
         """Check if example directory has proper structure.
 
         Args:
@@ -171,7 +170,7 @@ class QualityHelperCommands:
         return check_example_structure(Path(example_dir))
 
     @staticmethod
-    def examples_imports(example_file: str) -> FlextResult[dict[str, Any]]:
+    def examples_imports(example_file: str) -> FlextResult[dict[str, object]]:
         """Check that all imports in example file are available.
 
         Args:
@@ -186,7 +185,7 @@ class QualityHelperCommands:
     @staticmethod
     def examples_run(
         example_file: str, timeout: int = 30
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Safely run an example file with timeout and output capture.
 
         Args:
@@ -204,7 +203,7 @@ class QualityHelperCommands:
     # ==========================================================================
 
     @staticmethod
-    def patterns_all(project_path: str) -> FlextResult[dict[str, Any]]:
+    def patterns_all(project_path: str) -> FlextResult[dict[str, object]]:
         """Run all FLEXT pattern validation checks.
 
         Validates:
@@ -223,7 +222,7 @@ class QualityHelperCommands:
         return check_all_flext_patterns(Path(project_path))
 
     @staticmethod
-    def patterns_imports(project_path: str) -> FlextResult[dict[str, Any]]:
+    def patterns_imports(project_path: str) -> FlextResult[dict[str, object]]:
         """Check for FLEXT import pattern violations.
 
         FLEXT requires root-level imports only:
@@ -240,7 +239,7 @@ class QualityHelperCommands:
         return check_import_patterns(Path(project_path))
 
     @staticmethod
-    def patterns_exceptions(project_path: str) -> FlextResult[dict[str, Any]]:
+    def patterns_exceptions(project_path: str) -> FlextResult[dict[str, object]]:
         """Check for exception-based error handling (should use FlextResult).
 
         FLEXT requires FlextResult[T] for business logic errors:
@@ -257,7 +256,7 @@ class QualityHelperCommands:
         return check_exception_patterns(Path(project_path))
 
     @staticmethod
-    def patterns_structure(project_path: str) -> FlextResult[dict[str, Any]]:
+    def patterns_structure(project_path: str) -> FlextResult[dict[str, object]]:
         """Check for single-class-per-module FLEXT rule.
 
         FLEXT requires each module to contain one primary class:
@@ -274,7 +273,7 @@ class QualityHelperCommands:
         return check_module_structure(Path(project_path))
 
     @staticmethod
-    def patterns_result(project_path: str) -> FlextResult[dict[str, Any]]:
+    def patterns_result(project_path: str) -> FlextResult[dict[str, object]]:
         """Check FlextResult[T] usage patterns comprehensively.
 
         Validates:
@@ -292,7 +291,7 @@ class QualityHelperCommands:
         return check_flext_result_usage(Path(project_path))
 
     @staticmethod
-    def patterns_audit(project_path: str) -> FlextResult[dict[str, Any]]:
+    def patterns_audit(project_path: str) -> FlextResult[dict[str, object]]:
         """Run foundational pattern audit (validates FlextResult return patterns).
 
         This checks that FlextResult[T] methods are using proper return patterns.

@@ -17,7 +17,6 @@ from __future__ import annotations
 import ast
 import re
 from pathlib import Path
-from typing import Any
 
 import toml
 from flext_core import FlextLogger, FlextResult, FlextService
@@ -430,16 +429,18 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         *,
         dry_run: bool = True,
         package_name: str | None = None,
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Refactor imports using ImportOptimizer."""
         path = Path(module_path)
         if not path.exists():
-            return FlextResult[dict[str, Any]].fail(f"Module not found: {module_path}")
+            return FlextResult[dict[str, object]].fail(
+                f"Module not found: {module_path}"
+            )
 
         try:
             content = path.read_text(encoding="utf-8")
         except Exception as e:
-            return FlextResult[dict[str, Any]].fail(str(e))
+            return FlextResult[dict[str, object]].fail(str(e))
 
         changes = []
 
@@ -461,7 +462,7 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         if not dry_run and changes:
             path.write_text(content, encoding="utf-8")
 
-        return FlextResult[dict[str, Any]].ok({
+        return FlextResult[dict[str, object]].ok({
             "changes": changes,
             "file": str(module_path),
         })
@@ -471,16 +472,18 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         module_path: str,
         *,
         dry_run: bool = True,
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Modernize Python 3.13+ syntax."""
         path = Path(module_path)
         if not path.exists():
-            return FlextResult[dict[str, Any]].fail(f"Module not found: {module_path}")
+            return FlextResult[dict[str, object]].fail(
+                f"Module not found: {module_path}"
+            )
 
         try:
             content = path.read_text(encoding="utf-8")
         except Exception as e:
-            return FlextResult[dict[str, Any]].fail(str(e))
+            return FlextResult[dict[str, object]].fail(str(e))
 
         all_changes = []
 
@@ -493,7 +496,7 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         if not dry_run and all_changes:
             path.write_text(content, encoding="utf-8")
 
-        return FlextResult[dict[str, Any]].ok({
+        return FlextResult[dict[str, object]].ok({
             "changes": all_changes,
             "file": str(module_path),
         })
@@ -503,7 +506,7 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         module_path: str,
         *,
         dry_run: bool = True,
-    ) -> FlextResult[dict[str, Any]]:
+    ) -> FlextResult[dict[str, object]]:
         """Modernize type checking configuration."""
         path = Path(module_path)
 
@@ -514,7 +517,7 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
             pyproject_path = path
             makefile_path = path.parent / "Makefile"
         else:
-            return FlextResult[dict[str, Any]].fail(f"Invalid path: {module_path}")
+            return FlextResult[dict[str, object]].fail(f"Invalid path: {module_path}")
 
         all_changes = []
         files_modified = []
@@ -529,7 +532,7 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
                     pyproject_path.write_text(updated, encoding="utf-8")
                     files_modified.append(str(pyproject_path))
             except Exception as e:
-                return FlextResult[dict[str, Any]].fail(str(e))
+                return FlextResult[dict[str, object]].fail(str(e))
 
         if makefile_path.exists():
             try:
@@ -541,9 +544,9 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
                     makefile_path.write_text(updated, encoding="utf-8")
                     files_modified.append(str(makefile_path))
             except Exception as e:
-                return FlextResult[dict[str, Any]].fail(str(e))
+                return FlextResult[dict[str, object]].fail(str(e))
 
-        return FlextResult[dict[str, Any]].ok({
+        return FlextResult[dict[str, object]].ok({
             "changes": all_changes,
             "files_modified": files_modified,
         })

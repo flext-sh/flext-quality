@@ -14,6 +14,7 @@ from flext_observability import (
 )
 from pydantic import BaseModel, Field
 
+from .constants import FlextQualityConstants
 from .models import FlextQualityModels
 from .services import FlextQualityServices
 
@@ -26,7 +27,9 @@ class ObservabilityConfig(BaseModel):
     """Observability configuration for handlers."""
 
     service_name: str = Field(default="flext-quality")
-    log_level: str = Field(default="info")
+    log_level: FlextQualityConstants.Literals.LogLevelLiteral | str = Field(
+        default="info"
+    )
     enable_traces: bool = Field(default=True)
 
 
@@ -73,7 +76,7 @@ class FlextQualityHandlers:
         @staticmethod
         def log_operation(
             message: str,
-            level: str,
+            level: FlextQualityConstants.Literals.LogLevelLiteral | str,
             context: HandlerContext,
         ) -> None:
             """Log operation with context."""

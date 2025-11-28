@@ -196,11 +196,24 @@ class FlextQualityConstants(FlextConstants):
     # =============================================================================
 
     class Literals:
-        """Type-safe string literals for quality analysis."""
+        """Type-safe string literals for quality analysis (Python 3.13+ best practices).
 
-        AnalysisStatus = Literal["queued", "analyzing", "completed", "failed"]
-        IssueSeverity = Literal["CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"]
-        IssueType = Literal[
+        These type aliases provide strict type checking for common string values
+        used throughout the flext-quality codebase.
+        """
+
+        # Analysis status literal
+        AnalysisStatusLiteral: type = Literal[
+            "queued", "analyzing", "completed", "failed"
+        ]
+
+        # Issue severity literal
+        IssueSeverityLiteral: type = Literal[
+            "CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"
+        ]
+
+        # Issue type literal
+        IssueTypeLiteral: type = Literal[
             "SECURITY",
             "COMPLEXITY",
             "DUPLICATION",
@@ -210,9 +223,25 @@ class FlextQualityConstants(FlextConstants):
             "PERFORMANCE",
             "MAINTAINABILITY",
         ]
-        ReportFormat = Literal["HTML", "JSON", "PDF", "CSV", "XML", "MARKDOWN"]
-        BackendType = Literal["AST", "EXTERNAL", "HYBRID"]
-        Language = Literal["python", "javascript", "typescript", "java", "go", "rust"]
+
+        # Report format literal
+        ReportFormatLiteral: type = Literal[
+            "HTML", "JSON", "PDF", "CSV", "XML", "MARKDOWN"
+        ]
+
+        # Backend type literal
+        BackendTypeLiteral: type = Literal["AST", "EXTERNAL", "HYBRID"]
+
+        # Language literal
+        LanguageLiteral: type = Literal[
+            "python", "javascript", "typescript", "java", "go", "rust"
+        ]
+
+        # Check status literal
+        CheckStatusLiteral: type = Literal["passed", "failed", "warning"]
+
+        # Log level literal (reusing from flext-core)
+        LogLevelLiteral: type = Literal["debug", "info", "warning", "error", "critical"]
 
     # =============================================================================
     # QUALITY TOOLS - Internal tools constants
