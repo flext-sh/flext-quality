@@ -17,7 +17,7 @@ from __future__ import annotations
 import json
 import tempfile
 from pathlib import Path
-, override
+from typing import override
 
 from flext_core import (
     FlextDecorators,
