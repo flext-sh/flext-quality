@@ -1,11 +1,11 @@
 """FLEXT Quality Types - Domain-specific quality analysis type definitions.
 
-This module provides quality analysis-specific type definitions extending FlextTypes.
+This module provides quality analysis-specific type definitions extending t.
 Follows FLEXT standards:
 - Domain-specific complex types only
 - No simple aliases to primitive types
 - Python 3.13+ syntax
-- Extends FlextTypes properly
+- Extends t properly
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -41,7 +41,7 @@ type PositiveInt = Annotated[int, Field(ge=1)]
 
 # Quality domain TypeVars
 class FlextQualityTypes:
-    """Quality analysis-specific type definitions extending FlextTypes.
+    """Quality analysis-specific type definitions extending t.
 
     Domain-specific type system for code quality analysis operations.
     Contains ONLY complex quality-specific types, no simple aliases.
@@ -138,7 +138,7 @@ class FlextQualityTypes:
         ]
 
     # =========================================================================
-    # CORE TYPES - Essential Quality types extending FlextTypes
+    # CORE TYPES - Essential Quality types extending t
     # =========================================================================
 
     class Core:
@@ -172,7 +172,7 @@ class FlextQualityTypes:
         type StringList = list[str]
 
     # =========================================================================
-    # QUALITY PROJECT TYPES - Domain-specific project types extending FlextTypes
+    # QUALITY PROJECT TYPES - Domain-specific project types extending t
     # =========================================================================
 
     class Project:
@@ -184,7 +184,7 @@ class FlextQualityTypes:
 
         # Quality-specific project types extending the generic ones
         type QualityProjectType = Literal[
-            # Generic types inherited from FlextTypes
+            # Generic types inherited from t
             "library",
             "application",
             "service",

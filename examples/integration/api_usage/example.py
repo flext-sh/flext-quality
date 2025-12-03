@@ -47,7 +47,7 @@ def demonstrate_simple_api() -> None:
 
 import os
 
-def calculate_score(values: FlextTypes.FloatList) -> float:
+def calculate_score(values: t.FloatList) -> float:
     """Calculate average score from values.
 
     Args:
@@ -69,7 +69,7 @@ class DataProcessor:
       self.threshold = threshold
       self.processed_count = 0
 
-    def process_item(self, item: object) -> FlextTypes.Optional[object]:
+    def process_item(self, item: object) -> t.Optional[object]:
       """Process individual item with validation."""
       if item is None:
           return None
@@ -334,7 +334,7 @@ if __name__ == "__main__":
             "utils.py": '''
 """Utility functions."""
 
-def calculate_average(numbers: FlextTypes.FloatList) -> float:
+def calculate_average(numbers: t.FloatList) -> float:
     """Calculate average of numbers."""
     if not numbers:
       return 0.0

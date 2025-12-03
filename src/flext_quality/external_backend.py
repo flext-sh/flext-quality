@@ -22,17 +22,16 @@ from typing import override
 from flext_core import (
     FlextDecorators,
     FlextLogger,
-    FlextMixins,
     FlextResult,
     FlextService,
-    FlextUtilities,
+    x,
 )
 
 from .backend_type import BackendType
 from .base import FlextQualityAnalyzer
 
 
-class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixins):
+class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
     """Backend using external Python quality tools via subprocess."""
 
     @override
@@ -126,7 +125,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
         if not file_path.exists():
             return FlextResult.fail("Invalid file path")
 
-        result = FlextUtilities.CommandExecution.run_external_command(
+        result = ution.run_external_command(
             command,
             capture_output=True,
             timeout=timeout,
@@ -241,7 +240,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
 
     def _run_coverage(self, file_path: Path) -> FlextResult[dict[str, object]]:
         """Run coverage to measure test coverage."""
-        result = FlextUtilities.CommandExecution.run_external_command(
+        result = ution.run_external_command(
             [
                 "coverage",
                 "run",
@@ -303,7 +302,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
     def _run_radon(self, file_path: Path) -> FlextResult[dict[str, object]]:
         """Run radon for complexity metrics."""
         # First call: complexity
-        result_cc = FlextUtilities.CommandExecution.run_external_command(
+        result_cc = ution.run_external_command(
             ["radon", "cc", str(file_path), "-j"],
             capture_output=True,
             timeout=30.0,
@@ -341,7 +340,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, FlextMixin
 
     def _run_radon_maintainability(self, file_path: Path) -> dict[str, object]:
         """Run radon maintainability index analysis."""
-        result_mi = FlextUtilities.CommandExecution.run_external_command(
+        result_mi = ution.run_external_command(
             ["radon", "mi", str(file_path), "-j"],
             capture_output=True,
             timeout=30.0,

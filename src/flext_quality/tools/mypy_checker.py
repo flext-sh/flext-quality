@@ -6,7 +6,7 @@ import shutil
 from pathlib import Path
 from typing import Self
 
-from flext_core import FlextResult, FlextService, FlextUtilities
+from flext_core import FlextResult, FlextService
 
 
 class MyPyChecker(FlextService[list[str]]):
@@ -33,7 +33,7 @@ class MyPyChecker(FlextService[list[str]]):
             # Environment without mypy – treat as success to keep workflows moving.
             return FlextResult[list[str]].ok([])
 
-        run_result = FlextUtilities.CommandExecution.run_external_command(
+        run_result = ution.run_external_command(
             ["mypy", str(root)],
             capture_output=True,
             text=True,

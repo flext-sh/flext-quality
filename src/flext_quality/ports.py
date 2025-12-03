@@ -9,22 +9,22 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextProtocols
+from flext_core import p
 
-# Use FlextProtocols from flext-core instead of local definitions
+# Use p from flext-core instead of local definitions
 # Following FLEXT_REFACTORING_PROMPT.md to eliminate duplication
 
 # Analysis services use Domain.Service protocol
-AnalysisService = FlextProtocols.Service
-SecurityAnalyzerService = FlextProtocols.Service
-LintingService = FlextProtocols.Service
-ComplexityAnalyzerService = FlextProtocols.Service
-DeadCodeDetectorService = FlextProtocols.Service
-DuplicateDetectorService = FlextProtocols.Service
-MetricsCollectorService = FlextProtocols.Service
+AnalysisService = p.Service
+SecurityAnalyzerService = p.Service
+LintingService = p.Service
+ComplexityAnalyzerService = p.Service
+DeadCodeDetectorService = p.Service
+DuplicateDetectorService = p.Service
+MetricsCollectorService = p.Service
 
 # Report generation uses Application.Handler protocol
-ReportGeneratorService = FlextProtocols.Handler[object]
+ReportGeneratorService = p.Handler[object]
 
 
 # Export protocol aliases

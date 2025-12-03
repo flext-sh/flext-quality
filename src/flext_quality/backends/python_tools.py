@@ -21,7 +21,7 @@ import black
 import coverage
 import pytest
 from bandit.core import config as bandit_config, manager as bandit_manager
-from flext_core import FlextLogger, FlextResult, FlextUtilities
+from flext_core import FlextLogger, FlextResult
 from mypy import api
 from radon.complexity import cc_visit
 from vulture import Vulture
@@ -48,7 +48,7 @@ class FlextQualityPythonTools:
     # =========================================================================
 
     def run_ruff_check(self, path: Path) -> FlextResult[dict[str, object]]:
-        """Run Ruff linting via FlextUtilities.
+        """Run Ruff linting via u.
 
         Ruff is the fastest Python linter, written in Rust.
 
@@ -64,8 +64,8 @@ class FlextQualityPythonTools:
             if not path.exists() or not path.is_file():
                 return FlextResult.fail(f"Invalid path for Ruff analysis: {path}")
 
-            # Use FlextUtilities for command execution with threading-based timeout
-            result = FlextUtilities.CommandExecution.run_external_command(
+            # Use uexecution with threading-based timeout
+            result = ution.run_external_command(
                 ["ruff", "check", str(path), "--output-format=json"],
                 capture_output=True,
                 timeout=60,
@@ -158,7 +158,7 @@ class FlextQualityPythonTools:
     # =========================================================================
 
     def run_pylint_check(self, path: Path) -> FlextResult[dict[str, object]]:
-        """Run Pylint analysis via FlextUtilities.
+        """Run Pylint analysis via u.
 
         Args:
         path: Path to analyze
@@ -168,9 +168,9 @@ class FlextQualityPythonTools:
 
         """
         try:
-            # Use FlextUtilities for command execution with threading-based timeout
-            # (Pylint doesn't expose clean Python API, use subprocess via FlextUtilities)
-            result = FlextUtilities.CommandExecution.run_external_command(
+            # Use uexecution with threading-based timeout
+            # (Pylint doesn't expose clean Python API, use subprocess via u
+            result = ution.run_external_command(
                 ["pylint", str(path), "--output-format=json"],
                 capture_output=True,
                 timeout=60,

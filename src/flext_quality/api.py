@@ -17,7 +17,7 @@ from flext_core import (
     FlextRegistry,
     FlextResult,
     FlextService,
-    FlextTypes,
+    t,
 )
 
 from .config import FlextQualityConfig
@@ -39,7 +39,7 @@ class FlextQuality(FlextService[bool]):
     - FlextContainer: Dependency injection
     - FlextContext: Operation context
     - FlextDispatcher: Message routing
-    - FlextUtilities: Processing utilities
+    - u: Processing utilities
     - FlextRegistry: Component registration
     - FlextLogger: logging
 
@@ -132,7 +132,7 @@ class FlextQuality(FlextService[bool]):
         _commit_hash: str | None = None,
         _branch: str | None = None,
         _pull_request_id: str | None = None,
-        analysis_config: FlextTypes.JsonDict | None = None,
+        analysis_config: t.JsonDict | None = None,
     ) -> FlextResult[FlextQualityModels.AnalysisModel]:
         """Create a new quality analysis using builder pattern."""
         # Build configuration dictionary

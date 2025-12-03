@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextResult, FlextTypes
+from flext_core import FlextResult, t
 from pydantic import BaseModel, ConfigDict, Field
 
 from .constants import FlextQualityConstants
@@ -113,7 +113,7 @@ class QualityMetrics(BaseModel):
     )
 
     @property
-    def scores_summary(self) -> FlextTypes.FloatDict:
+    def scores_summary(self) -> t.FloatDict:
         """Get summary of all category scores."""
         return {
             "complexity": self.complexity_score,

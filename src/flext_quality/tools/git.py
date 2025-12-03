@@ -27,7 +27,6 @@ from flext_core import (
     FlextLogger,
     FlextResult,
     FlextService,
-    FlextUtilities,
 )
 from pydantic import ConfigDict
 
@@ -89,7 +88,7 @@ class FlextQualityGitTools(FlextService[bool]):
             repo = Path(repo_path)
             temp_repo = workspace / repo.name
 
-            cmd_result = FlextUtilities.CommandExecution.run_external_command(
+            cmd_result = ution.run_external_command(
                 cmd=["git", "clone", str(repo), str(temp_repo)],
                 capture_output=True,
                 text=True,
@@ -144,7 +143,7 @@ class FlextQualityGitTools(FlextService[bool]):
         @classmethod
         def _get_commit_list(cls, work_repo: Path) -> FlextResult[list[str]]:
             """Get list of all commits in repository."""
-            cmd_result = FlextUtilities.CommandExecution.run_external_command(
+            cmd_result = ution.run_external_command(
                 cmd=["git", "-C", str(work_repo), "rev-list", "--all", "--reverse"],
                 capture_output=True,
                 text=True,
@@ -252,7 +251,7 @@ class FlextQualityGitTools(FlextService[bool]):
         ) -> tuple[bool, bool]:
             """Process a single commit and return (success, changed)."""
             # Get commit message
-            cmd_result = FlextUtilities.CommandExecution.run_external_command(
+            cmd_result = ution.run_external_command(
                 cmd=[
                     "git",
                     "-C",
@@ -282,7 +281,7 @@ class FlextQualityGitTools(FlextService[bool]):
 
             if cleaned_message != original_message:
                 # Rewrite commit message
-                amend_cmd_result = FlextUtilities.CommandExecution.run_external_command(
+                amend_cmd_result = ution.run_external_command(
                     cmd=[
                         "git",
                         "-C",
@@ -343,7 +342,7 @@ class FlextQualityGitTools(FlextService[bool]):
             if dry_run:
                 git_cmd.insert(4, "-n")  # Dry-run flag
 
-            cmd_result = FlextUtilities.CommandExecution.run_external_command(
+            cmd_result = ution.run_external_command(
                 cmd=git_cmd,
                 capture_output=True,
                 text=True,

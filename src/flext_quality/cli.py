@@ -19,7 +19,6 @@ from flext_core import (
     FlextLogger,
     FlextResult,
     FlextService,
-    FlextUtilities,
 )
 from pydantic import BaseModel, Field
 
@@ -677,7 +676,7 @@ def _run_make_target(args: object) -> int:
 
     # Execute make target using flext-core utilities (no code duplication)
     cli.formatters.print(f"Running: make {target}", style="cyan")
-    result = FlextUtilities.CommandExecution.run_external_command(
+    result = ution.run_external_command(
         ["make", target],
         cwd=project_path,
         env=env,

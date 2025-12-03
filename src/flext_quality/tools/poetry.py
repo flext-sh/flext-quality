@@ -6,7 +6,7 @@ import tomllib
 from pathlib import Path
 from typing import Self
 
-from flext_core import FlextResult, FlextService, FlextUtilities
+from flext_core import FlextResult, FlextService
 
 
 class PoetryOperations(FlextService[str]):
@@ -49,7 +49,7 @@ class PoetryOperations(FlextService[str]):
             return FlextResult[str].fail(f"Project path does not exist: {project}")
 
         poetry_cmd = ["poetry", *args]
-        result = FlextUtilities.CommandExecution.run_external_command(
+        result = ution.run_external_command(
             poetry_cmd,
             cwd=project,
             capture_output=True,

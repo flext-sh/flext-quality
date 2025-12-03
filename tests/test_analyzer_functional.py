@@ -34,7 +34,7 @@ class TestCodeAnalyzerFunctional:
 import os
 import sys
 
-def calculate_average(numbers: FlextTypes.FloatList) -> float:
+def calculate_average(numbers: t.FloatList) -> float:
     """Calculate average of numbers."""
 
     if not numbers:
