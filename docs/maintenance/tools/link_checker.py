@@ -31,7 +31,8 @@ class LinkChecker:
     MAX_BROKEN_LINKS_TO_SHOW = 10
 
     def __init__(
-        self, config_path: str | None = "docs/maintenance/config/validation_config.yaml"
+        self,
+        config_path: str | None = "docs/maintenance/config/validation_config.yaml",
     ) -> None:
         """Initialize the link checker with configuration."""
         self.load_config(config_path)
@@ -134,7 +135,9 @@ class LinkChecker:
         return "internal"
 
     async def check_link_async(
-        self, url: str, context: dict[str, object] | None = None
+        self,
+        url: str,
+        context: dict[str, object] | None = None,
     ) -> dict[str, object]:
         """Asynchronously check a single link."""
         start_time = time.time()
@@ -162,7 +165,8 @@ class LinkChecker:
 
                 # Update performance metrics
                 self.results["performance"]["slowest_response"] = max(
-                    self.results["performance"]["slowest_response"], response_time
+                    self.results["performance"]["slowest_response"],
+                    response_time,
                 )
 
                 return result
@@ -193,7 +197,9 @@ class LinkChecker:
             }
 
     def check_link_sync(
-        self, url: str, context: dict[str, object] | None = None
+        self,
+        url: str,
+        context: dict[str, object] | None = None,
     ) -> dict[str, object]:
         """Synchronously check a single link (fallback method)."""
         start_time = time.time()
@@ -223,7 +229,8 @@ class LinkChecker:
 
                 # Update performance metrics
                 self.results["performance"]["slowest_response"] = max(
-                    self.results["performance"]["slowest_response"], response_time
+                    self.results["performance"]["slowest_response"],
+                    response_time,
                 )
 
                 return result
@@ -273,7 +280,8 @@ class LinkChecker:
             async with semaphore:
                 await asyncio.sleep(0.1)  # Rate limiting
                 return await self.check_link_async(
-                    link_info["url"], link_info.get("context")
+                    link_info["url"],
+                    link_info.get("context"),
                 )
 
         # Create tasks
@@ -303,7 +311,7 @@ class LinkChecker:
         ]
         if valid_times:
             self.results["performance"]["average_response_time"] = sum(
-                valid_times
+                valid_times,
             ) / len(valid_times)
 
         return processed_results
@@ -329,13 +337,16 @@ class LinkChecker:
         ]
         if valid_times:
             self.results["performance"]["average_response_time"] = sum(
-                valid_times
+                valid_times,
             ) / len(valid_times)
 
         return results
 
     async def validate_links(
-        self, links: list[dict], *, use_async: bool = True
+        self,
+        links: list[dict],
+        *,
+        use_async: bool = True,
     ) -> dict[str, Any]:
         """Main link validation method."""
         self.results["total_links"] = len(links)
@@ -475,7 +486,8 @@ Broken Links:
         return report
 
     def save_report(
-        self, output_path: str = "docs/maintenance/reports/"
+        self,
+        output_path: str = "docs/maintenance/reports/",
     ) -> pathlib.Path:
         """Save validation report."""
         pathlib.Path(output_path).mkdir(exist_ok=True, parents=True)
@@ -492,7 +504,8 @@ Broken Links:
 
 # Synchronous wrapper for easy usage
 def validate_links_sync(
-    links: list[dict], config_path: str | None = None
+    links: list[dict],
+    config_path: str | None = None,
 ) -> dict[str, Any]:
     """Synchronous wrapper for link validation."""
     checker = LinkChecker(config_path)

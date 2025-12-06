@@ -21,15 +21,24 @@ class FlextQualityConstants(FlextConstants):
     """
 
     # =========================================================================
-    # COMPOSITION REFERENCES (Standardization Pattern)
+    # COMPOSITION REFERENCES (Standardization Pattern) - Real Inheritance
     # =========================================================================
 
-    # Core composition - reference core constants for easy access
-    CoreErrors = FlextConstants.Errors
-    CoreNetwork = FlextConstants.Network
-    CoreSecurity = FlextConstants.Security
-    CorePlatform = FlextConstants.Platform
-    CoreValidation = FlextConstants.Validation
+    # Core composition - real inheritance classes
+    class CoreErrors(FlextConstants.Errors):
+        """Core errors constants - real inheritance."""
+
+    class CoreNetwork(FlextConstants.Network):
+        """Core network constants - real inheritance."""
+
+    class CoreSecurity(FlextConstants.Security):
+        """Core security constants - real inheritance."""
+
+    class CorePlatform(FlextConstants.Platform):
+        """Core platform constants - real inheritance."""
+
+    class CoreValidation(FlextConstants.Validation):
+        """Core validation constants - real inheritance."""
 
     # =============================================================================
     # QUALITY THRESHOLDS - Enterprise quality standards
@@ -204,12 +213,19 @@ class FlextQualityConstants(FlextConstants):
 
         # Analysis status literal
         AnalysisStatusLiteral: type = Literal[
-            "queued", "analyzing", "completed", "failed"
+            "queued",
+            "analyzing",
+            "completed",
+            "failed",
         ]
 
         # Issue severity literal
         IssueSeverityLiteral: type = Literal[
-            "CRITICAL", "HIGH", "MEDIUM", "LOW", "INFO"
+            "CRITICAL",
+            "HIGH",
+            "MEDIUM",
+            "LOW",
+            "INFO",
         ]
 
         # Issue type literal
@@ -226,7 +242,12 @@ class FlextQualityConstants(FlextConstants):
 
         # Report format literal
         ReportFormatLiteral: type = Literal[
-            "HTML", "JSON", "PDF", "CSV", "XML", "MARKDOWN"
+            "HTML",
+            "JSON",
+            "PDF",
+            "CSV",
+            "XML",
+            "MARKDOWN",
         ]
 
         # Backend type literal
@@ -234,7 +255,12 @@ class FlextQualityConstants(FlextConstants):
 
         # Language literal
         LanguageLiteral: type = Literal[
-            "python", "javascript", "typescript", "java", "go", "rust"
+            "python",
+            "javascript",
+            "typescript",
+            "java",
+            "go",
+            "rust",
         ]
 
         # Check status literal

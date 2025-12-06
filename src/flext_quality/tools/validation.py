@@ -43,7 +43,7 @@ class FlextQualityValidationTools(FlextService[bool]):
 
             """
             logger = FlextLogger(__name__)
-            logger.info(f"Validating equilibrium for {workspace_path}")
+            logger.info("Validating equilibrium for %s", workspace_path)
 
             result = FlextQualityModels.QualityValidationResult(
                 passed=True,
@@ -71,7 +71,7 @@ class FlextQualityValidationTools(FlextService[bool]):
 
             """
             logger = FlextLogger(__name__)
-            logger.info(f"Validating domain separation for {project_path}")
+            logger.info("Validating domain separation for %s", project_path)
 
             result = FlextQualityModels.QualityValidationResult(
                 passed=True,
@@ -99,7 +99,7 @@ class FlextQualityValidationTools(FlextService[bool]):
 
             """
             logger = FlextLogger(__name__)
-            logger.info(f"Validating ecosystem quality for {workspace_path}")
+            logger.info("Validating ecosystem quality for %s", workspace_path)
 
             result = FlextQualityModels.QualityValidationResult(
                 passed=True,

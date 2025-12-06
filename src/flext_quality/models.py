@@ -201,7 +201,8 @@ class RuleModel(BaseModel):
     severity: IssueSeverity = Field(default=IssueSeverity.MEDIUM)
     enabled: bool = Field(default=True, description="Whether rule is active")
     parameters: dict[str, ParameterValue] = Field(
-        default_factory=dict, description="Rule parameters"
+        default_factory=dict,
+        description="Rule parameters",
     )
     description: str | None = Field(default=None, description="Rule description")
 
@@ -254,17 +255,21 @@ class AnalysisMetricsModel(BaseModel):
     total_lines: int = Field(default=0, ge=0, description="Total lines of code")
     code_lines: int = Field(default=0, ge=0, description="Lines of actual code")
     comment_lines: int | None = Field(
-        default=None, ge=0, description="Lines with comments"
+        default=None,
+        ge=0,
+        description="Lines with comments",
     )
     blank_lines: int | None = Field(default=None, ge=0, description="Blank lines")
     overall_score: ScoreRange = Field(default=0.0, description="Overall quality score")
     coverage_score: ScoreRange = Field(default=0.0, description="Test coverage score")
     complexity_score: ScoreRange = Field(
-        default=0.0, description="Code complexity score"
+        default=0.0,
+        description="Code complexity score",
     )
     security_score: ScoreRange = Field(default=0.0, description="Security score")
     maintainability_score: ScoreRange = Field(
-        default=0.0, description="Maintainability score"
+        default=0.0,
+        description="Maintainability score",
     )
     duplication_score: ScoreRange = Field(default=0.0, description="Duplication score")
 
@@ -283,7 +288,8 @@ class AnalysisResults(BaseModel):
     security_score: ScoreRange = 0.0
     complexity_score: ScoreRange = 0.0
     quality_grade: str = Field(
-        default="F", description="Quality grade letter (A+ to F)"
+        default="F",
+        description="Quality grade letter (A+ to F)",
     )
 
     # Optional issue type lists for compatibility
@@ -308,7 +314,7 @@ class AnalysisResults(BaseModel):
                 self.security_issues
                 + self.complexity_issues
                 + self.dead_code_issues
-                + self.duplication_issues
+                + self.duplication_issues,
             ),
             critical_issues=len([
                 i
@@ -349,7 +355,7 @@ class CheckResult(BaseModel):
 
     check_name: str = Field(description="Name of the quality check")
     status: FlextQualityConstants.Literals.CheckStatusLiteral | str = Field(
-        description="Check status: passed, failed, warning"
+        description="Check status: passed, failed, warning",
     )
     issues_found: int = 0
     score: ScoreRange = 0.0
@@ -362,7 +368,7 @@ class AnalysisResult(BaseModel):
     analysis_id: str = Field(description="Analysis identifier")
     project_path: str = Field(description="Project path analyzed")
     status: FlextQualityConstants.Literals.AnalysisStatusLiteral | str = Field(
-        description="Analysis status"
+        description="Analysis status",
     )
     issues_found: int = 0
     overall_score: ScoreRange = 0.0
@@ -410,13 +416,22 @@ class CoverageMetric(BaseModel):
     """Value object for test coverage metrics."""
 
     line_coverage: float = Field(
-        default=0.0, ge=0.0, le=100.0, description="Line coverage percentage"
+        default=0.0,
+        ge=0.0,
+        le=100.0,
+        description="Line coverage percentage",
     )
     branch_coverage: float = Field(
-        default=0.0, ge=0.0, le=100.0, description="Branch coverage percentage"
+        default=0.0,
+        ge=0.0,
+        le=100.0,
+        description="Branch coverage percentage",
     )
     function_coverage: float = Field(
-        default=0.0, ge=0.0, le=100.0, description="Function coverage percentage"
+        default=0.0,
+        ge=0.0,
+        le=100.0,
+        description="Function coverage percentage",
     )
 
     model_config = {"frozen": True}
@@ -426,7 +441,10 @@ class DuplicationMetric(BaseModel):
     """Value object for code duplication metrics."""
 
     percentage: float = Field(
-        default=0.0, ge=0.0, le=100.0, description="Duplication percentage"
+        default=0.0,
+        ge=0.0,
+        le=100.0,
+        description="Duplication percentage",
     )
     lines: int = Field(default=0, ge=0, description="Number of duplicate lines")
 
@@ -449,7 +467,8 @@ class QualityScore(BaseModel):
     score: float = Field(ge=0.0, le=100.0, description="Quality score")
     grade: str = Field(description="Quality grade (A+, A, B, etc.)")
     timestamp: Timestamp = Field(
-        default_factory=lambda: datetime.now(UTC), description="Score timestamp"
+        default_factory=lambda: datetime.now(UTC),
+        description="Score timestamp",
     )
 
     model_config = {"frozen": True}
@@ -473,7 +492,7 @@ class AppConfig(BaseModel):
     enable_cors: bool = Field(default=True, description="Enable CORS")
     enable_docs: bool = Field(default=True, description="Enable API documentation")
     debug: bool = Field(default=False, description="Debug mode")
-    host: str = Field(default="0.0.0.0", description="Server host")
+    host: str = Field(default="127.0.0.1", description="Server host")
     port: int = Field(default=8000, ge=1, le=65535, description="Server port")
 
 

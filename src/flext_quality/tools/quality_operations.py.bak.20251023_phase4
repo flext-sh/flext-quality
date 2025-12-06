@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 Consolidates flext_tools quality operations:
 - QualityGateway → Complete quality pipeline
 - LintingService → Ruff linting operations
-- TypeChecker → MyPy/PyRefly type checking
+- Checker → MyPy/PyRefly type checking
 - DuplicateDetector → Code duplicate detection
 - ExportRepairer → __init__.py export fixing
 - DocstringNormalizer → Google-style docstring normalization
@@ -97,7 +97,7 @@ class FlextQualityOperations(FlextService[None]):
             lint_passed = lint_result.is_success
 
             # Run type check
-            type_result = FlextQualityOperations.TypeChecker.run_type_check(
+            type_result = FlextQualityOperations.Checker.run_type_check(
                 project_path
             )
             type_passed = type_result.is_success
@@ -209,7 +209,7 @@ class FlextQualityOperations(FlextService[None]):
                 f"Fixing failed: {result.stderr}"
             )
 
-    class TypeChecker:
+    class Checker:
         """Type checking with MyPy/PyRefly.
 
         Consolidates: mypy_checker.py, mypy_analyzer.py
@@ -293,7 +293,7 @@ class FlextQualityOperations(FlextService[None]):
             FlextLogger(__name__)
             FlextCli()  # MANDATORY: Use flext-cli
 
-            return FlextQualityOperations.TypeChecker.run_type_check(module_path)
+            return FlextQualityOperations.Checker.run_type_check(module_path)
 
     class DuplicateDetector:
         """Code duplicate detection and analysis.
@@ -501,7 +501,7 @@ class FlextQualityOperations(FlextService[None]):
         # Initialize helper services
         self.gateway = self.QualityGateway()
         self.linting = self.LintingService()
-        self.types = self.TypeChecker()
+        self.types = self.Checker()
         self.duplicates = self.DuplicateDetector()
         self.exports = self.ExportRepairer()
         self.docstrings = self.DocstringNormalizer()

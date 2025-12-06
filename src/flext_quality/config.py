@@ -171,7 +171,11 @@ class FlextQualityConfig(FlextConfig.AutoConfig):
     )
 
     observability_log_level: Literal[
-        "DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"
+        "DEBUG",
+        "INFO",
+        "WARNING",
+        "ERROR",
+        "CRITICAL",
     ] = Field(
         default="INFO",
         description="Log level for observability components",
@@ -276,7 +280,7 @@ class FlextQualityConfig(FlextConfig.AutoConfig):
             # Validate analysis requirements
             if self.min_coverage > 0.0 and not self.enable_external_tools:
                 return FlextResult[bool].fail(
-                    "Coverage analysis requires external tools"
+                    "Coverage analysis requires external tools",
                 )
 
             # Validate performance requirements
@@ -285,7 +289,7 @@ class FlextQualityConfig(FlextConfig.AutoConfig):
                 < FlextQualityConstants.QualityPerformance.MINIMUM_ANALYSIS_TIMEOUT
             ):
                 return FlextResult[bool].fail(
-                    f"Analysis timeout too low (minimum {FlextQualityConstants.QualityPerformance.MINIMUM_ANALYSIS_TIMEOUT} seconds)"
+                    f"Analysis timeout too low (minimum {FlextQualityConstants.QualityPerformance.MINIMUM_ANALYSIS_TIMEOUT} seconds)",
                 )
 
             # Validate threshold consistency
@@ -295,7 +299,7 @@ class FlextQualityConfig(FlextConfig.AutoConfig):
                 and not self.enable_dependency_scan
             ):
                 return FlextResult[bool].fail(
-                    "High security score requires dependency scanning"
+                    "High security score requires dependency scanning",
                 )
 
             # Validate reporting requirements
@@ -349,7 +353,9 @@ class FlextQualityConfig(FlextConfig.AutoConfig):
 
     @classmethod
     def create_for_environment(
-        cls, environment: str, **overrides: object
+        cls,
+        environment: str,
+        **overrides: object,
     ) -> FlextQualityConfig:
         """Create configuration for specific environment using direct instantiation."""
         # Note: environment parameter reserved for future use

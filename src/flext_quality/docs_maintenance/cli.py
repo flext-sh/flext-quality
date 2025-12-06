@@ -16,7 +16,8 @@ from rich.table import Table
 if __package__ in {None, ""}:  # Support execution as a standalone script
     orchestrator_path = Path(__file__).resolve().with_name("orchestrator.py")
     spec = importlib.util.spec_from_file_location(
-        "flext_quality.docs_maintenance.orchestrator", orchestrator_path
+        "flext_quality.docs_maintenance.orchestrator",
+        orchestrator_path,
     )
     if spec is None or spec.loader is None:  # pragma: no cover - defensive
         msg = "Unable to load documentation orchestrator module"
@@ -146,7 +147,7 @@ def run_comprehensive(
         )
 
     console.print(
-        f"[bold green]Documentation maintenance completed for[/] {project_root}"
+        f"[bold green]Documentation maintenance completed for[/] {project_root}",
     )
     _render_summary(report)
 

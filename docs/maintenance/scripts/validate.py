@@ -27,7 +27,10 @@ class LinkValidator:
     """Advanced link validation and checking system."""
 
     def __init__(
-        self, timeout: int = 10, retries: int = 3, max_workers: int = 5
+        self,
+        timeout: int = 10,
+        retries: int = 3,
+        max_workers: int = 5,
     ) -> None:
         """Initialize the link validator with timeout and retry settings."""
         self.timeout = timeout
@@ -54,7 +57,7 @@ class LinkValidator:
             try:
                 content = file_path.read_text(encoding="utf-8")
                 file_rel_path = str(
-                    file_path.relative_to(file_path.parents[2])
+                    file_path.relative_to(file_path.parents[2]),
                 )  # Relative to project root
 
                 # Extract markdown links: [text](url)
@@ -69,7 +72,8 @@ class LinkValidator:
                         "type": link_type,
                         "file": file_rel_path,
                         "line_number": self._find_line_number(
-                            content, f"[{text}]({url})"
+                            content,
+                            f"[{text}]({url})",
                         ),
                     })
 
@@ -98,7 +102,8 @@ class LinkValidator:
                         "type": "image",
                         "file": file_rel_path,
                         "line_number": self._find_line_number(
-                            content, f"![{alt_text}]({src})"
+                            content,
+                            f"![{alt_text}]({src})",
                         ),
                     })
 
@@ -134,7 +139,10 @@ class LinkValidator:
         return None
 
     def validate_external_links(
-        self, links: list[dict], *, verbose: bool = False
+        self,
+        links: list[dict],
+        *,
+        verbose: bool = False,
     ) -> dict[str, Any]:
         """Validate external links with concurrent checking."""
         external_links = [link for link in links if link["type"] == "external"]
@@ -144,7 +152,7 @@ class LinkValidator:
 
         # Use thread pool for concurrent checking
         with concurrent.futures.ThreadPoolExecutor(
-            max_workers=self.max_workers
+            max_workers=self.max_workers,
         ) as executor:
             futures = [
                 executor.submit(self._check_single_external_link, link, verbose)
@@ -205,7 +213,9 @@ class LinkValidator:
         return status_code in {405, 406, 409, 410, 500, 502, 503}
 
     def _handle_request_attempt(
-        self, url: str, attempt: int
+        self,
+        url: str,
+        attempt: int,
     ) -> tuple[bool, dict[str, Any] | None]:
         """Handle a single request attempt."""
         try:
@@ -237,7 +247,10 @@ class LinkValidator:
         return False, None
 
     def _check_single_external_link(
-        self, link: dict, *, verbose: bool = False
+        self,
+        link: dict,
+        *,
+        verbose: bool = False,
     ) -> dict[str, Any]:
         """Check a single external link."""
         # Reserved for future verbose output functionality
@@ -252,7 +265,9 @@ class LinkValidator:
         return self._create_link_result(link, False, url, error="Max retries exceeded")
 
     def validate_internal_links(
-        self, links: list[dict], doc_files: list[Path]
+        self,
+        links: list[dict],
+        doc_files: list[Path],
     ) -> dict[str, Any]:
         """Validate internal links and references."""
         internal_links = [
@@ -356,7 +371,9 @@ class LinkValidator:
         return self.results
 
     def validate_anchors(
-        self, links: list[dict], doc_files: list[Path]
+        self,
+        links: list[dict],
+        doc_files: list[Path],
     ) -> dict[str, Any]:
         """Validate anchor links within documents."""
         anchor_links = [link for link in links if link["type"] == "anchor"]
@@ -374,7 +391,8 @@ class LinkValidator:
 
                 # Extract explicit anchor definitions
                 explicit_anchors = re.findall(
-                    r'<a[^>]+id=["\']([^"\']+)["\'][^>]*>', content
+                    r'<a[^>]+id=["\']([^"\']+)["\'][^>]*>',
+                    content,
                 )
                 anchors.extend(explicit_anchors)
 
@@ -413,7 +431,9 @@ class LinkValidator:
         # GitHub-style anchor generation
         anchor = heading.lower()
         anchor = re.sub(
-            r"[^\w\s-]", "", anchor
+            r"[^\w\s-]",
+            "",
+            anchor,
         )  # Remove special chars except spaces and hyphens
         return re.sub(r"\s+", "-", anchor)  # Replace spaces with hyphens
 
@@ -600,7 +620,8 @@ class ContentValidator:
         if sentences:
             avg_words_per_sentence = len(words) / len(sentences)
             readability_score = max(
-                0, min(100, 100 - (avg_words_per_sentence - 15) * 2)
+                0,
+                min(100, 100 - (avg_words_per_sentence - 15) * 2),
             )
         else:
             readability_score = 0
@@ -619,26 +640,38 @@ class ContentValidator:
 def _create_validation_parser() -> argparse.ArgumentParser:
     """Create and configure the validation argument parser."""
     parser = argparse.ArgumentParser(
-        description="FLEXT Quality Documentation Validation"
+        description="FLEXT Quality Documentation Validation",
     )
     parser.add_argument(
-        "--external-links", action="store_true", help="Validate external links"
+        "--external-links",
+        action="store_true",
+        help="Validate external links",
     )
     parser.add_argument(
-        "--internal-links", action="store_true", help="Validate internal links"
+        "--internal-links",
+        action="store_true",
+        help="Validate internal links",
     )
     parser.add_argument(
-        "--images", action="store_true", help="Validate image references"
+        "--images",
+        action="store_true",
+        help="Validate image references",
     )
     parser.add_argument("--anchors", action="store_true", help="Validate anchor links")
     parser.add_argument(
-        "--link-text", action="store_true", help="Check link text quality"
+        "--link-text",
+        action="store_true",
+        help="Check link text quality",
     )
     parser.add_argument(
-        "--markdown-syntax", action="store_true", help="Validate markdown syntax"
+        "--markdown-syntax",
+        action="store_true",
+        help="Validate markdown syntax",
     )
     parser.add_argument(
-        "--content-quality", action="store_true", help="Analyze content quality"
+        "--content-quality",
+        action="store_true",
+        help="Analyze content quality",
     )
     parser.add_argument("--all", action="store_true", help="Run all validation checks")
     parser.add_argument("--verbose", action="store_true", help="Verbose output")
@@ -649,10 +682,16 @@ def _create_validation_parser() -> argparse.ArgumentParser:
         help="Output directory for reports",
     )
     parser.add_argument(
-        "--timeout", type=int, default=10, help="Timeout for external link checks"
+        "--timeout",
+        type=int,
+        default=10,
+        help="Timeout for external link checks",
     )
     parser.add_argument(
-        "--retries", type=int, default=3, help="Retry attempts for external links"
+        "--retries",
+        type=int,
+        default=3,
+        help="Retry attempts for external links",
     )
     parser.add_argument("--workers", type=int, default=5, help="Max concurrent workers")
     return parser
@@ -734,7 +773,9 @@ def main() -> None:
 
     # Initialize validators
     link_validator = LinkValidator(
-        timeout=args.timeout, retries=args.retries, max_workers=args.workers
+        timeout=args.timeout,
+        retries=args.retries,
+        max_workers=args.workers,
     )
     content_validator = ContentValidator()
 
@@ -743,7 +784,11 @@ def main() -> None:
 
     # Execute validations
     run_any_check = _execute_validations(
-        link_validator, content_validator, all_links, doc_files, args
+        link_validator,
+        content_validator,
+        all_links,
+        doc_files,
+        args,
     )
 
     if not run_any_check:
@@ -751,7 +796,7 @@ def main() -> None:
 
     # Calculate summary and save reports
     total_errors = len(link_validator.results.get("errors", [])) + len(
-        content_validator.results.get("content_issues", [])
+        content_validator.results.get("content_issues", []),
     )
     link_validator.save_report(args.output)
 

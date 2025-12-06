@@ -53,7 +53,9 @@ class DocumentationReporter:
         return None
 
     def generate_quality_report(
-        self, report_format: str = "html", **kwargs: dict
+        self,
+        report_format: str = "html",
+        **kwargs: dict,
     ) -> str:
         """Generate comprehensive quality report."""
         # Collect all available data
@@ -91,31 +93,36 @@ class DocumentationReporter:
         # Aggregate from audit data
         if self.audit_data:
             summary["overall_score"] = self.audit_data.get("metrics", {}).get(
-                "quality_score", 0
+                "quality_score",
+                0,
             )
             summary["total_issues"] += len(self.audit_data.get("issues", []))
             summary["files_analyzed"] = max(
-                summary["files_analyzed"], self.audit_data.get("files_analyzed", 0)
+                summary["files_analyzed"],
+                self.audit_data.get("files_analyzed", 0),
             )
 
         # Aggregate from validation data
         if self.validation_data:
             summary["links_checked"] = self.validation_data.get(
-                "link_validation", {}
+                "link_validation",
+                {},
             ).get("links_checked", 0)
             summary["total_issues"] += len(
-                self.validation_data.get("link_validation", {}).get("errors", [])
+                self.validation_data.get("link_validation", {}).get("errors", []),
             )
             summary["total_issues"] += len(
                 self.validation_data.get("content_validation", {}).get(
-                    "content_issues", []
-                )
+                    "content_issues",
+                    [],
+                ),
             )
 
         # Aggregate from optimization data
         if self.optimization_data:
             summary["optimizations_applied"] = self.optimization_data.get(
-                "changes_made", 0
+                "changes_made",
+                0,
             )
 
         # Determine quality trend (simplified - would need historical data)
@@ -177,7 +184,8 @@ class DocumentationReporter:
 
         if self.validation_data:
             validation_errors = self.validation_data.get("link_validation", {}).get(
-                "errors", []
+                "errors",
+                [],
             )
             if validation_errors:
                 broken_links = [
@@ -237,13 +245,13 @@ class DocumentationReporter:
         template_data = {
             "title": data["title"],
             "timestamp": datetime.fromisoformat(data["timestamp"]).strftime(
-                "%Y-%m-%d %H:%M:%S"
+                "%Y-%m-%d %H:%M:%S",
             ),
             "summary": data["summary"],
             "audit_summary": self._summarize_audit_data(data["audit"]),
             "validation_summary": self._summarize_validation_data(data["validation"]),
             "optimization_summary": self._summarize_optimization_data(
-                data["optimization"]
+                data["optimization"],
             ),
             "recommendations": data["recommendations"],
             "charts": self._generate_charts(data) if data.get("trends") else None,
@@ -391,7 +399,8 @@ class DocumentationReporter:
         return "\n".join(md)
 
     def _summarize_audit_data(
-        self, audit_data: dict[str, Any] | None
+        self,
+        audit_data: dict[str, Any] | None,
     ) -> dict[str, Any] | None:
         """Summarize audit data for reporting."""
         if not audit_data:
@@ -410,7 +419,8 @@ class DocumentationReporter:
         }
 
     def _summarize_validation_data(
-        self, validation_data: dict[str, Any] | None
+        self,
+        validation_data: dict[str, Any] | None,
     ) -> dict[str, Any] | None:
         """Summarize validation data for reporting."""
         if not validation_data:
@@ -425,7 +435,8 @@ class DocumentationReporter:
         }
 
     def _summarize_optimization_data(
-        self, optimization_data: dict[str, Any] | None
+        self,
+        optimization_data: dict[str, Any] | None,
     ) -> dict[str, Any] | None:
         """Summarize optimization data for reporting."""
         if not optimization_data:
@@ -465,7 +476,7 @@ class DocumentationReporter:
                     1
                 ]  # e.g., audit_report_20241201_120000.json
                 report_date = datetime.strptime(date_str[:8], "%Y%m%d").replace(
-                    tzinfo=UTC
+                    tzinfo=UTC,
                 )
 
                 if report_date >= cutoff_date:
@@ -517,10 +528,12 @@ class DocumentationReporter:
         return {
             "audit_trends": sorted(audit_trends, key=operator.itemgetter("date")),
             "validation_trends": sorted(
-                validation_trends, key=operator.itemgetter("date")
+                validation_trends,
+                key=operator.itemgetter("date"),
             ),
             "optimization_trends": sorted(
-                optimization_trends, key=operator.itemgetter("date")
+                optimization_trends,
+                key=operator.itemgetter("date"),
             ),
         }
 
@@ -553,7 +566,7 @@ class DocumentationReporter:
                     else str(trend["date"])[:10]
                 )
                 md.append(
-                    f"| {date_str} | {trend['quality_score']}% | {trend['total_issues']} |"
+                    f"| {date_str} | {trend['quality_score']}% | {trend['total_issues']} |",
                 )
 
             md.append("")
@@ -574,7 +587,7 @@ class DocumentationReporter:
                     else str(trend["date"])[:10]
                 )
                 md.append(
-                    f"| {date_str} | {trend['links_checked']} | {trend['broken_links']} |"
+                    f"| {date_str} | {trend['links_checked']} | {trend['broken_links']} |",
                 )
 
             md.append("")
@@ -595,7 +608,7 @@ class DocumentationReporter:
                     else str(trend["date"])[:10]
                 )
                 md.append(
-                    f"| {date_str} | {trend['files_processed']} | {trend['changes_made']} |"
+                    f"| {date_str} | {trend['files_processed']} | {trend['changes_made']} |",
                 )
 
             md.append("")
@@ -603,7 +616,10 @@ class DocumentationReporter:
         return "\n".join(md)
 
     def save_report(
-        self, content: str, filename: str, report_format: str = "html"
+        self,
+        content: str,
+        filename: str,
+        report_format: str = "html",
     ) -> Path:
         """Save report to file."""
         filepath = self.reports_dir / f"{filename}.{report_format}"
@@ -614,7 +630,7 @@ class DocumentationReporter:
 def main() -> None:
     """Main entry point for reporting system."""
     parser = argparse.ArgumentParser(
-        description="FLEXT Quality Documentation Reporting"
+        description="FLEXT Quality Documentation Reporting",
     )
     parser.add_argument(
         "--format",
@@ -631,10 +647,14 @@ def main() -> None:
     )
     parser.add_argument("--filename", type=str, help="Custom filename for the report")
     parser.add_argument(
-        "--monthly-trends", action="store_true", help="Generate monthly trend analysis"
+        "--monthly-trends",
+        action="store_true",
+        help="Generate monthly trend analysis",
     )
     parser.add_argument(
-        "--weekly-trends", action="store_true", help="Generate weekly trend analysis"
+        "--weekly-trends",
+        action="store_true",
+        help="Generate weekly trend analysis",
     )
     parser.add_argument(
         "--include-trends",
@@ -648,7 +668,9 @@ def main() -> None:
     )
     parser.add_argument("--webhook-url", type=str, help="Webhook URL for notifications")
     parser.add_argument(
-        "--serve", action="store_true", help="Serve dashboard (not implemented yet)"
+        "--serve",
+        action="store_true",
+        help="Serve dashboard (not implemented yet)",
     )
 
     args = parser.parse_args()

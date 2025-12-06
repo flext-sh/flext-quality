@@ -50,7 +50,7 @@ class DocumentationAuditor:
         """Load audit configuration files."""
         try:
             with Path(self.config_path / "audit_rules.yaml").open(
-                encoding="utf-8"
+                encoding="utf-8",
             ) as f:
                 self.audit_rules = yaml.safe_load(f)
         except FileNotFoundError:
@@ -58,7 +58,7 @@ class DocumentationAuditor:
 
         try:
             with Path(self.config_path / "style_guide.yaml").open(
-                encoding="utf-8"
+                encoding="utf-8",
             ) as f:
                 self.style_guide = yaml.safe_load(f)
         except FileNotFoundError:
@@ -66,7 +66,7 @@ class DocumentationAuditor:
 
         try:
             with Path(self.config_path / "validation_config.yaml").open(
-                encoding="utf-8"
+                encoding="utf-8",
             ) as f:
                 self.validation_config = yaml.safe_load(f)
         except FileNotFoundError:
@@ -243,7 +243,9 @@ class DocumentationAuditor:
 
         # Check for version placeholders
         if re.search(
-            r"\b\d+\.\d+\.\d+.*TODO|FIXME|placeholder", content, re.IGNORECASE
+            r"\b\d+\.\d+\.\d+.*TODO|FIXME|placeholder",
+            content,
+            re.IGNORECASE,
         ):
             indicators.append("version placeholders")
 
@@ -253,7 +255,9 @@ class DocumentationAuditor:
 
         # Check for incomplete sections
         if re.search(
-            r"#+\s*(TODO|FIXME|Coming Soon|Work in Progress)", content, re.IGNORECASE
+            r"#+\s*(TODO|FIXME|Coming Soon|Work in Progress)",
+            content,
+            re.IGNORECASE,
         ):
             indicators.append("incomplete sections")
 
@@ -289,7 +293,8 @@ class DocumentationAuditor:
                 # Check for required sections (for main docs)
                 if "README.md" in str(file_path) or "docs/" in str(file_path):
                     missing_sections = self._check_required_sections(
-                        content, required_sections
+                        content,
+                        required_sections,
                     )
                     if missing_sections:
                         self.results["issues"].append({
@@ -303,7 +308,8 @@ class DocumentationAuditor:
                 # Check for TODO/FIXME markers
                 if self.validation_config["content_analysis"]["check_todos"]:
                     todos = re.findall(
-                        r"(?i)(?:TODO|FIXME|XXX):\s*(.+?)(?:\n|$)", content
+                        r"(?i)(?:TODO|FIXME|XXX):\s*(.+?)(?:\n|$)",
+                        content,
                     )
                     if todos:
                         self.results["issues"].append({
@@ -324,7 +330,9 @@ class DocumentationAuditor:
                 })
 
     def _check_required_sections(
-        self, content: str, required_sections: list[str]
+        self,
+        content: str,
+        required_sections: list[str],
     ) -> list[str]:
         """Check for required sections in documentation."""
         missing = []
@@ -444,7 +452,9 @@ class DocumentationAuditor:
         # Check for non-descriptive links
         if self.style_guide["accessibility"]["descriptive_links"]:
             generic_links = re.findall(
-                r"\[here|click here|link|read more\]\([^)]+\)", content, re.IGNORECASE
+                r"\[here|click here|link|read more\]\([^)]+\)",
+                content,
+                re.IGNORECASE,
             )
             if generic_links:
                 issues.extend([
@@ -488,7 +498,8 @@ class DocumentationAuditor:
 
                 # Extract external links
                 external_links = re.findall(
-                    r"\[([^\]]+)\]\((https?://[^)]+)\)", content
+                    r"\[([^\]]+)\]\((https?://[^)]+)\)",
+                    content,
                 )
                 for text, url in external_links:
                     all_links.append({
@@ -550,7 +561,7 @@ class DocumentationAuditor:
                     headers={
                         "User-Agent": self.validation_config["link_validation"][
                             "user_agent"
-                        ]
+                        ],
                     },
                     allow_redirects=True,
                 )
@@ -576,7 +587,9 @@ class DocumentationAuditor:
                 })
 
     def _validate_internal_links(
-        self, links: list[dict], doc_files: list[Path]
+        self,
+        links: list[dict],
+        doc_files: list[Path],
     ) -> None:
         """Validate internal links."""
         internal_links = [link for link in links if link["type"] == "internal"]
@@ -887,7 +900,9 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         help="Run complete audit with all checks",
     )
     parser.add_argument(
-        "--check-freshness", action="store_true", help="Check content freshness only"
+        "--check-freshness",
+        action="store_true",
+        help="Check content freshness only",
     )
     parser.add_argument(
         "--check-completeness",
@@ -895,10 +910,14 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         help="Check content completeness only",
     )
     parser.add_argument(
-        "--check-consistency", action="store_true", help="Check style consistency only"
+        "--check-consistency",
+        action="store_true",
+        help="Check style consistency only",
     )
     parser.add_argument(
-        "--check-links", action="store_true", help="Check links and references only"
+        "--check-links",
+        action="store_true",
+        help="Check links and references only",
     )
     parser.add_argument(
         "--ci-mode",
@@ -933,7 +952,8 @@ def _create_argument_parser() -> argparse.ArgumentParser:
 
 
 def _execute_audit_checks(
-    auditor: DocumentationAuditor, args: argparse.Namespace
+    auditor: DocumentationAuditor,
+    args: argparse.Namespace,
 ) -> dict[str, Any]:
     """Execute the appropriate audit checks based on arguments."""
     if args.comprehensive:

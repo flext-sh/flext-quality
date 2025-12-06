@@ -31,7 +31,10 @@ class TestDryRunValidation:
 
         # Create temp test file
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".py", delete=False
+            encoding="utf-8",
+            mode="w",
+            suffix=".py",
+            delete=False,
         ) as f:
             f.write('"""Test module."""\n\ndef test_function():\n    pass\n')
             temp_path = f.name
@@ -49,7 +52,8 @@ class TestDryRunValidation:
 
             # Test docstring normalizer dry-run
             doc_result = quality.docstrings.normalize_docstrings(
-                temp_path, dry_run=True
+                temp_path,
+                dry_run=True,
             )
             assert doc_result.is_success
             assert doc_result.value["dry_run"] is True
@@ -63,7 +67,10 @@ class TestDryRunValidation:
 
         # Create temp test file
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".py", delete=False
+            encoding="utf-8",
+            mode="w",
+            suffix=".py",
+            delete=False,
         ) as f:
             f.write('"""Test module."""\n\ndef test_function():\n    pass\n')
             temp_path = f.name
@@ -107,7 +114,8 @@ class TestDryRunValidation:
 
         # Test dependency consolidator dry-run
         consolidate_result = deps.consolidator.consolidate_dependencies(
-            ".", dry_run=True
+            ".",
+            dry_run=True,
         )
         assert consolidate_result.is_success
         assert consolidate_result.value["dry_run"] is True
@@ -154,7 +162,10 @@ class TestDryRunValidation:
 
         # Create temp test file
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".py", delete=False
+            encoding="utf-8",
+            mode="w",
+            suffix=".py",
+            delete=False,
         ) as f:
             original_content = '"""Test module."""\n\ndef test_function():\n    pass\n'
             f.write(original_content)

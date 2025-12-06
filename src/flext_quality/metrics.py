@@ -70,7 +70,10 @@ class QualityMetrics(BaseModel):
 
     # Overall metrics
     overall_score: float = Field(
-        0.0, description="Overall quality score (0-100)", ge=0, le=100
+        0.0,
+        description="Overall quality score (0-100)",
+        ge=0,
+        le=100,
     )
     quality_grade: str = Field("F", description="Quality grade letter (A+ to F)")
 
@@ -89,27 +92,46 @@ class QualityMetrics(BaseModel):
     security_issues_count: int = Field(0, description="Number of security issues", ge=0)
     dead_code_items_count: int = Field(0, description="Number of dead code items", ge=0)
     duplicate_blocks_count: int = Field(
-        0, description="Number of duplicate blocks", ge=0
+        0,
+        description="Number of duplicate blocks",
+        ge=0,
     )
     complexity_issues_count: int = Field(
-        0, description="Number of complexity issues", ge=0
+        0,
+        description="Number of complexity issues",
+        ge=0,
     )
 
     # Scores by category (0-100)
     complexity_score: float = Field(
-        100.0, description="Complexity score (0-100)", ge=0, le=100
+        100.0,
+        description="Complexity score (0-100)",
+        ge=0,
+        le=100,
     )
     security_score: float = Field(
-        100.0, description="Security score (0-100)", ge=0, le=100
+        100.0,
+        description="Security score (0-100)",
+        ge=0,
+        le=100,
     )
     maintainability_score: float = Field(
-        100.0, description="Maintainability score (0-100)", ge=0, le=100
+        100.0,
+        description="Maintainability score (0-100)",
+        ge=0,
+        le=100,
     )
     duplication_score: float = Field(
-        100.0, description="Duplication score (0-100)", ge=0, le=100
+        100.0,
+        description="Duplication score (0-100)",
+        ge=0,
+        le=100,
     )
     documentation_score: float = Field(
-        100.0, description="Documentation score (0-100)", ge=0, le=100
+        100.0,
+        description="Documentation score (0-100)",
+        ge=0,
+        le=100,
     )
 
     @property
@@ -199,7 +221,7 @@ class QualityMetrics(BaseModel):
         for score_name, score_value in self.scores_summary.items():
             if score_value < 0 or score_value > MAX_QUALITY_SCORE:
                 return FlextResult[bool].fail(
-                    f"{score_name} score must be between 0 and 100"
+                    f"{score_name} score must be between 0 and 100",
                 )
 
         return FlextResult[bool].ok(True)

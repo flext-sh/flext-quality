@@ -110,7 +110,10 @@ class TestToolsIntegration:
         """Test complete quality workflow integration."""
         # Create temp Python file for testing
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".py", delete=False
+            encoding="utf-8",
+            mode="w",
+            suffix=".py",
+            delete=False,
         ) as f:
             f.write("""
 '''Test module for quality workflow.'''
@@ -170,14 +173,14 @@ class ExampleClass:
 
             # Duplicate detection
             dup_result = quality.duplicates.detect_duplicates(
-                str(Path(temp_path).parent)
+                str(Path(temp_path).parent),
             )
             assert dup_result.is_success
 
             # Step 3: Validate with architecture tools
             arch = FlextQualityArchitectureTools()
             violation_result = arch.violations.analyze_violations(
-                str(Path(temp_path).parent)
+                str(Path(temp_path).parent),
             )
             assert violation_result.is_success
 
@@ -203,7 +206,10 @@ class ExampleClass:
         """Test data flowing between different tools."""
         # Create temp module
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".py", delete=False
+            encoding="utf-8",
+            mode="w",
+            suffix=".py",
+            delete=False,
         ) as f:
             f.write("""
 import ldap3  # Domain library violation for testing
@@ -233,7 +239,7 @@ def test_function():
             # Step 3: Architecture tools can validate
             arch = FlextQualityArchitectureTools()
             arch_result = arch.violations.analyze_violations(
-                str(Path(temp_path).parent)
+                str(Path(temp_path).parent),
             )
             assert arch_result.is_success
 

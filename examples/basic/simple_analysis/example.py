@@ -116,7 +116,8 @@ def _display_issues(results: FlextQualityTypes.AnalysisResults) -> None:
 
 
 def _generate_reports(
-    _results: FlextQualityTypes.AnalysisResults, project_path: str
+    _results: FlextQualityTypes.AnalysisResults,
+    project_path: str,
 ) -> None:
     """Generate quality reports in different formats."""
     print_section("📊 Generating Quality Reports")
@@ -158,7 +159,8 @@ def _generate_reports(
 
 
 def _show_recommendations(
-    analyzer: CodeAnalyzer, results: FlextQualityTypes.AnalysisResults
+    analyzer: CodeAnalyzer,
+    results: FlextQualityTypes.AnalysisResults,
 ) -> None:
     """Show quality recommendations and final summary."""
     print_section("💡 Comprehensive Recommendations")

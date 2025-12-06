@@ -15,7 +15,7 @@ class FlextQualityOperations(FlextService[bool]):
 
     **ARCHITECTURE LAYER 3** - Domain Service Implementation
 
-    Consolidates: quality_operations.py, linting_service.py, type_checker.py,
+    Consolidates: quality_operations.py, linting_service.py, checker.py,
     duplicate_detector.py, export_repairer.py, docstring_normalizer.py,
     pattern_auditor.py, false_positive_auditor.py
     """

@@ -236,7 +236,7 @@ def process_data(data):
                 level="info",
             )
         except Exception as e:
-            logger.warning(f"Observability integration failed: {e}")
+            logger.warning("Observability integration failed: %s", e)
 
         # Demonstrate container-based dependency injection
         logger.info("Container-based DI demonstration - using FlextContainer")

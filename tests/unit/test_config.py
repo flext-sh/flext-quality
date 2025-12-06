@@ -148,7 +148,8 @@ class TestFlextQualityConfig:
 
         # Test configuration with conflicting settings
         invalid_config = FlextQualityConfig(
-            min_coverage=95.0, enable_external_tools=False
+            min_coverage=95.0,
+            enable_external_tools=False,
         )
         result = invalid_config.validate_business_rules()
         assert result.is_failure

@@ -184,7 +184,8 @@ class QualityHelperCommands:
 
     @staticmethod
     def examples_run(
-        example_file: str, timeout: int = 30
+        example_file: str,
+        timeout: int = 30,
     ) -> FlextResult[dict[str, object]]:
         """Safely run an example file with timeout and output capture.
 

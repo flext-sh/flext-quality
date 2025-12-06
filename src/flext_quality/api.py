@@ -102,13 +102,13 @@ class FlextQuality(FlextService[bool]):
     ) -> FlextResult[FlextQualityModels.ProjectModel]:
         """Get a project by ID."""
         return FlextResult[FlextQualityModels.ProjectModel].fail(
-            "get_project not implemented"
+            "get_project not implemented",
         )
 
     def list_projects(self) -> FlextResult[list[FlextQualityModels.ProjectModel]]:
         """List all projects."""
         return FlextResult[list[FlextQualityModels.ProjectModel]].fail(
-            "list_projects not implemented"
+            "list_projects not implemented",
         )
 
     def update_project(
@@ -118,7 +118,7 @@ class FlextQuality(FlextService[bool]):
     ) -> FlextResult[FlextQualityModels.ProjectModel]:
         """Update a project."""
         return FlextResult[FlextQualityModels.ProjectModel].fail(
-            "update_project not implemented"
+            "update_project not implemented",
         )
 
     def delete_project(self, _project_id: UUID) -> FlextResult[bool]:
@@ -165,7 +165,7 @@ class FlextQuality(FlextService[bool]):
     ) -> FlextResult[FlextQualityModels.AnalysisModel]:
         """Update analysis metrics."""
         return FlextResult[FlextQualityModels.AnalysisModel].fail(
-            "update_metrics not implemented"
+            "update_metrics not implemented",
         )
 
     def update_scores(
@@ -194,7 +194,7 @@ class FlextQuality(FlextService[bool]):
         # ) / 4.0
 
         return FlextResult[FlextQualityModels.AnalysisModel].fail(
-            "update_scores not implemented"
+            "update_scores not implemented",
         )
 
     def update_issue_counts(
@@ -213,7 +213,7 @@ class FlextQuality(FlextService[bool]):
         # total_issues = critical + high + medium + low
 
         return FlextResult[FlextQualityModels.AnalysisModel].fail(
-            "update_issue_counts not implemented"
+            "update_issue_counts not implemented",
         )
 
     def complete_analysis(
@@ -222,7 +222,7 @@ class FlextQuality(FlextService[bool]):
     ) -> FlextResult[FlextQualityModels.AnalysisModel]:
         """Mark analysis as completed."""
         return FlextResult[FlextQualityModels.AnalysisModel].fail(
-            "complete_analysis not implemented"
+            "complete_analysis not implemented",
         )
 
     def fail_analysis(
@@ -232,7 +232,7 @@ class FlextQuality(FlextService[bool]):
     ) -> FlextResult[FlextQualityModels.AnalysisModel]:
         """Mark analysis as failed."""
         return FlextResult[FlextQualityModels.AnalysisModel].fail(
-            "fail_analysis not implemented"
+            "fail_analysis not implemented",
         )
 
     def get_analysis(
@@ -241,7 +241,7 @@ class FlextQuality(FlextService[bool]):
     ) -> FlextResult[FlextQualityModels.AnalysisModel]:
         """Get an analysis by ID."""
         return FlextResult[FlextQualityModels.AnalysisModel].fail(
-            "get_analysis not implemented"
+            "get_analysis not implemented",
         )
 
     def list_analyses(
@@ -250,7 +250,7 @@ class FlextQuality(FlextService[bool]):
     ) -> FlextResult[list[FlextQualityModels.AnalysisModel]]:
         """List all analyses for a project."""
         return FlextResult[list[FlextQualityModels.AnalysisModel]].fail(
-            "list_analyses not implemented"
+            "list_analyses not implemented",
         )
 
     # Issue operations
@@ -304,7 +304,7 @@ class FlextQuality(FlextService[bool]):
     def get_issue(self, _issue_id: UUID) -> FlextResult[FlextQualityModels.IssueModel]:
         """Get an issue by ID."""
         return FlextResult[FlextQualityModels.IssueModel].fail(
-            "get_issue not implemented"
+            "get_issue not implemented",
         )
 
     def list_issues(
@@ -324,15 +324,16 @@ class FlextQuality(FlextService[bool]):
                 return FlextResult[list[FlextQualityModels.IssueModel]].fail(error_msg)
 
         return FlextResult[list[FlextQualityModels.IssueModel]].fail(
-            "list_issues not implemented"
+            "list_issues not implemented",
         )
 
     def mark_issue_fixed(
-        self, _issue_id: UUID
+        self,
+        _issue_id: UUID,
     ) -> FlextResult[FlextQualityModels.IssueModel]:
         """Mark an issue as fixed."""
         return FlextResult[FlextQualityModels.IssueModel].fail(
-            "mark_fixed not implemented"
+            "mark_fixed not implemented",
         )
 
     def suppress_issue(
@@ -342,15 +343,16 @@ class FlextQuality(FlextService[bool]):
     ) -> FlextResult[FlextQualityModels.IssueModel]:
         """Suppress an issue with a reason."""
         return FlextResult[FlextQualityModels.IssueModel].fail(
-            "suppress_issue not implemented"
+            "suppress_issue not implemented",
         )
 
     def unsuppress_issue(
-        self, _issue_id: UUID
+        self,
+        _issue_id: UUID,
     ) -> FlextResult[FlextQualityModels.IssueModel]:
         """Remove suppression from an issue."""
         return FlextResult[FlextQualityModels.IssueModel].fail(
-            "unsuppress_issue not implemented"
+            "unsuppress_issue not implemented",
         )
 
     # Report operations
@@ -380,11 +382,12 @@ class FlextQuality(FlextService[bool]):
         )
 
     def get_report(
-        self, _report_id: UUID
+        self,
+        _report_id: UUID,
     ) -> FlextResult[FlextQualityModels.ReportModel]:
         """Get a report by ID."""
         return FlextResult[FlextQualityModels.ReportModel].fail(
-            "get_report not implemented"
+            "get_report not implemented",
         )
 
     def list_reports(
@@ -393,7 +396,7 @@ class FlextQuality(FlextService[bool]):
     ) -> FlextResult[list[FlextQualityModels.ReportModel]]:
         """List all reports for an analysis."""
         return FlextResult[list[FlextQualityModels.ReportModel]].fail(
-            "list_reports not implemented"
+            "list_reports not implemented",
         )
 
     def delete_report(self, _report_id: UUID) -> FlextResult[bool]:
@@ -425,7 +428,7 @@ class FlextQuality(FlextService[bool]):
         project_result = self.get_project(project_id)
         if project_result.is_failure:
             return FlextResult[FlextQualityModels.Analysis].fail(
-                f"Failed to retrieve project for analysis: {project_result.error}"
+                f"Failed to retrieve project for analysis: {project_result.error}",
             )
 
         project = project_result.value

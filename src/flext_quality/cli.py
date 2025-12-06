@@ -26,6 +26,7 @@ from .analyzer import FlextQualityAnalyzer
 from .config import FlextQualityConfig
 from .docs_maintenance.cli import run_comprehensive
 from .reports import FlextQualityReportGenerator, ReportFormat
+from .subprocess_utils import SubprocessUtils
 from .web import FlextQualityWeb
 
 # =====================================================================
@@ -49,7 +50,7 @@ class CliOutputFormats(BaseModel):
             "json": "JSON format output",
             "html": "HTML format output",
             "table": "Table format output",
-        }
+        },
     )
 
 
@@ -83,7 +84,7 @@ class CliArgumentValidator:
         """Validate output format is supported."""
         if fmt not in supported:
             return FlextResult[str].fail(
-                f"Unsupported format: {fmt}. Choose from: {', '.join(supported)}"
+                f"Unsupported format: {fmt}. Choose from: {', '.join(supported)}",
             )
         return FlextResult[str].ok(fmt)
 
@@ -110,7 +111,10 @@ class QualityReportFormatter:
         return self._output_to_stdout(report, fmt)
 
     def _save_to_file(
-        self, report: FlextQualityReportGenerator, fmt: str, output_path: Path
+        self,
+        report: FlextQualityReportGenerator,
+        fmt: str,
+        output_path: Path,
     ) -> FlextResult[bool]:
         """Save report to file with proper directory creation and error handling."""
         # Determine report format
@@ -130,12 +134,14 @@ class QualityReportFormatter:
         save_result = report.save_report(output_path, format_type)
 
         if save_result.is_success:
-            self.logger.info(f"Report saved to {output_path}")
+            self.logger.info("Report saved to %s", output_path)
             return FlextResult[bool].ok(True)
         return save_result
 
     def _output_to_stdout(
-        self, report: FlextQualityReportGenerator, fmt: str
+        self,
+        report: FlextQualityReportGenerator,
+        fmt: str,
     ) -> FlextResult[bool]:
         """Output report to stdout using proper report generation methods."""
         # Determine report format
@@ -148,7 +154,7 @@ class QualityReportFormatter:
 
         if report_result.is_failure:
             return FlextResult[bool].fail(
-                f"Failed to generate report: {report_result.error}"
+                f"Failed to generate report: {report_result.error}",
             )
 
         # Output to stdout
@@ -194,7 +200,7 @@ class ProjectQualityAnalyzer:
             )
             if result.is_failure:
                 return FlextResult[FlextQualityAnalyzer].fail(
-                    f"Analysis failed: {result.error}"
+                    f"Analysis failed: {result.error}",
                 )
             return FlextResult[FlextQualityAnalyzer].ok(analyzer)
         except Exception as e:
@@ -258,7 +264,9 @@ class CliCommandRouter:
 
         report = FlextQualityReportGenerator(analysis_results)
         output_result = self.formatter.output_report(
-            report, args.format, Path(args.output) if args.output else None
+            report,
+            args.format,
+            Path(args.output) if args.output else None,
         )
 
         if output_result.is_failure:
@@ -495,7 +503,10 @@ Examples:
  """,
     )
     parser.add_argument(
-        "--verbose", "-v", action="store_true", help="Enable verbose output"
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="Enable verbose output",
     )
     parser.add_argument(
         "--log-level",
@@ -511,29 +522,46 @@ Examples:
     analyze_parser.add_argument("path", type=Path, help="Path to project")
     analyze_parser.add_argument("--output", "-o", type=Path, help="Output file path")
     analyze_parser.add_argument(
-        "--format", "-f", default="table", choices=["table", "json", "html"]
+        "--format",
+        "-f",
+        default="table",
+        choices=["table", "json", "html"],
     )
     analyze_parser.add_argument("--include-security", action="store_true", default=True)
     analyze_parser.add_argument(
-        "--no-security", dest="include_security", action="store_false"
+        "--no-security",
+        dest="include_security",
+        action="store_false",
     )
     analyze_parser.add_argument(
-        "--include-complexity", action="store_true", default=True
+        "--include-complexity",
+        action="store_true",
+        default=True,
     )
     analyze_parser.add_argument(
-        "--no-complexity", dest="include_complexity", action="store_false"
+        "--no-complexity",
+        dest="include_complexity",
+        action="store_false",
     )
     analyze_parser.add_argument(
-        "--include-dead-code", action="store_true", default=True
+        "--include-dead-code",
+        action="store_true",
+        default=True,
     )
     analyze_parser.add_argument(
-        "--no-dead-code", dest="include_dead_code", action="store_false"
+        "--no-dead-code",
+        dest="include_dead_code",
+        action="store_false",
     )
     analyze_parser.add_argument(
-        "--include-duplicates", action="store_true", default=True
+        "--include-duplicates",
+        action="store_true",
+        default=True,
     )
     analyze_parser.add_argument(
-        "--no-duplicates", dest="include_duplicates", action="store_false"
+        "--no-duplicates",
+        dest="include_duplicates",
+        action="store_false",
     )
 
     # Score command
@@ -662,7 +690,8 @@ def _run_make_target(args: object) -> int:
     # Validate project path
     if not project_path.exists():
         cli.formatters.print(
-            f"Project path does not exist: {project_path}", style="red"
+            f"Project path does not exist: {project_path}",
+            style="red",
         )
         return 1
 
@@ -676,7 +705,7 @@ def _run_make_target(args: object) -> int:
 
     # Execute make target using flext-core utilities (no code duplication)
     cli.formatters.print(f"Running: make {target}", style="cyan")
-    result = ution.run_external_command(
+    result = SubprocessUtils.run_external_command(
         ["make", target],
         cwd=project_path,
         env=env,
@@ -688,11 +717,13 @@ def _run_make_target(args: object) -> int:
         process = result.value
         if process.returncode == 0:
             cli.formatters.print(
-                f"✓ make {target} completed successfully", style="green"
+                f"✓ make {target} completed successfully",
+                style="green",
             )
             return 0
         cli.formatters.print(
-            f"✗ make {target} failed with code {process.returncode}", style="red"
+            f"✗ make {target} failed with code {process.returncode}",
+            style="red",
         )
         return process.returncode
 

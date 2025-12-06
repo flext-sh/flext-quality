@@ -73,7 +73,8 @@ class DocumentationDashboard:
                     "files_analyzed": data.get("files_analyzed", 0),
                     "total_issues": data.get("metrics", {}).get("total_issues", 0),
                     "severity_breakdown": data.get("metrics", {}).get(
-                        "severity_breakdown", {}
+                        "severity_breakdown",
+                        {},
                     ),
                     "timestamp": data.get("timestamp", datetime.now(UTC).isoformat()),
                     "status": "Current",
@@ -100,10 +101,11 @@ class DocumentationDashboard:
             try:
                 # Extract date from filename
                 date_str = report_file.stem.replace("audit_report_", "").replace(
-                    "_", " "
+                    "_",
+                    " ",
                 )
                 report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
-                    tzinfo=UTC
+                    tzinfo=UTC,
                 )
 
                 if report_date >= cutoff_date:
@@ -112,10 +114,12 @@ class DocumentationDashboard:
                         trend_data.append({
                             "date": report_date.isoformat(),
                             "quality_score": data.get("metrics", {}).get(
-                                "quality_score", 0
+                                "quality_score",
+                                0,
                             ),
                             "total_issues": data.get("metrics", {}).get(
-                                "total_issues", 0
+                                "total_issues",
+                                0,
                             ),
                             "critical_issues": data.get("metrics", {})
                             .get("severity_breakdown", {})
@@ -125,7 +129,7 @@ class DocumentationDashboard:
                             .get("high", 0),
                         })
             except Exception as e:
-                logger.warning(f"Failed to process trend data: {e}")
+                logger.warning("Failed to process trend data: %s", e)
                 continue
 
         # Sort by date
@@ -144,10 +148,11 @@ class DocumentationDashboard:
         for report_file in self.reports_dir.glob("audit_report_*.json"):
             try:
                 date_str = report_file.stem.replace("audit_report_", "").replace(
-                    "_", " "
+                    "_",
+                    " ",
                 )
                 report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
-                    tzinfo=UTC
+                    tzinfo=UTC,
                 )
 
                 with Path(report_file).open(encoding="utf-8") as f:
@@ -161,7 +166,7 @@ class DocumentationDashboard:
                     "files_analyzed": data.get("files_analyzed", 0),
                 })
             except Exception as e:
-                logger.warning(f"Failed to process report file: {e}")
+                logger.warning("Failed to process report file: %s", e)
                 continue
 
         # Sort by date descending and limit
@@ -488,7 +493,11 @@ class DocumentationDashboard:
         """
 
     def run(
-        self, host: str = "localhost", port: int = 8080, *, debug: bool = False
+        self,
+        host: str = "localhost",
+        port: int = 8080,
+        *,
+        debug: bool = False,
     ) -> None:
         """Run the dashboard server."""
         self.app.run(host=host, port=port, debug=debug)
@@ -497,7 +506,7 @@ class DocumentationDashboard:
 def main() -> None:
     """Main entry point for the dashboard."""
     parser = argparse.ArgumentParser(
-        description="FLEXT Quality Documentation Dashboard"
+        description="FLEXT Quality Documentation Dashboard",
     )
     parser.add_argument("--host", default="localhost", help="Host to bind to")
     parser.add_argument("--port", type=int, default=8080, help="Port to bind to")

@@ -128,7 +128,8 @@ class TestFlextQualityReportGenerator:
         )
 
     def test_text_report_generation_empty(
-        self, empty_analysis_results: FlextQualityModels.AnalysisResults
+        self,
+        empty_analysis_results: FlextQualityModels.AnalysisResults,
     ) -> None:
         """Test text report generation with empty results."""
         generator = FlextQualityReportGenerator(empty_analysis_results)
@@ -141,7 +142,8 @@ class TestFlextQualityReportGenerator:
         assert "Quality Score:" in content
 
     def test_text_report_generation_with_issues(
-        self, poor_analysis_results: FlextQualityModels.AnalysisResults
+        self,
+        poor_analysis_results: FlextQualityModels.AnalysisResults,
     ) -> None:
         """Test text report generation with issues."""
         generator = FlextQualityReportGenerator(poor_analysis_results)
@@ -154,7 +156,8 @@ class TestFlextQualityReportGenerator:
         assert "complexity" in content.lower()
 
     def test_json_report_generation(
-        self, good_analysis_results: FlextQualityModels.AnalysisResults
+        self,
+        good_analysis_results: FlextQualityModels.AnalysisResults,
     ) -> None:
         """Test JSON report generation."""
         generator = FlextQualityReportGenerator(good_analysis_results)
@@ -169,7 +172,8 @@ class TestFlextQualityReportGenerator:
         assert "score" in data["summary"]
 
     def test_html_report_generation(
-        self, good_analysis_results: FlextQualityModels.AnalysisResults
+        self,
+        good_analysis_results: FlextQualityModels.AnalysisResults,
     ) -> None:
         """Test HTML report generation."""
         generator = FlextQualityReportGenerator(good_analysis_results)
@@ -182,7 +186,8 @@ class TestFlextQualityReportGenerator:
         assert "</html>" in content
 
     def test_save_report_text_format(
-        self, good_analysis_results: FlextQualityModels.AnalysisResults
+        self,
+        good_analysis_results: FlextQualityModels.AnalysisResults,
     ) -> None:
         """Test saving report in text format."""
         generator = FlextQualityReportGenerator(good_analysis_results)
@@ -197,7 +202,8 @@ class TestFlextQualityReportGenerator:
             assert "FLEXT QUALITY REPORT" in content
 
     def test_save_report_json_format(
-        self, good_analysis_results: FlextQualityModels.AnalysisResults
+        self,
+        good_analysis_results: FlextQualityModels.AnalysisResults,
     ) -> None:
         """Test saving report in JSON format."""
         generator = FlextQualityReportGenerator(good_analysis_results)
@@ -213,7 +219,8 @@ class TestFlextQualityReportGenerator:
             assert "summary" in data
 
     def test_save_report_html_format(
-        self, good_analysis_results: FlextQualityModels.AnalysisResults
+        self,
+        good_analysis_results: FlextQualityModels.AnalysisResults,
     ) -> None:
         """Test saving report in HTML format."""
         generator = FlextQualityReportGenerator(good_analysis_results)
@@ -228,7 +235,8 @@ class TestFlextQualityReportGenerator:
             assert "<!DOCTYPE html>" in content
 
     def test_save_report_invalid_path(
-        self, good_analysis_results: FlextQualityModels.AnalysisResults
+        self,
+        good_analysis_results: FlextQualityModels.AnalysisResults,
     ) -> None:
         """Test save_report with invalid path returns failure."""
         generator = FlextQualityReportGenerator(good_analysis_results)
@@ -241,7 +249,8 @@ class TestFlextQualityReportGenerator:
         assert "Failed to write report file" in result.error
 
     def test_format_enum_dispatch(
-        self, good_analysis_results: FlextQualityModels.AnalysisResults
+        self,
+        good_analysis_results: FlextQualityModels.AnalysisResults,
     ) -> None:
         """Test that ReportFormat enum dispatches correctly."""
         generator = FlextQualityReportGenerator(good_analysis_results)
@@ -257,7 +266,8 @@ class TestFlextQualityReportGenerator:
         assert html_result.is_success
 
     def test_none_analysis_results_returns_failure(
-        self, thresholds: ReportThresholds
+        self,
+        thresholds: ReportThresholds,
     ) -> None:
         """Test that passing None as results returns FlextResult.fail()."""
         # Create a generator with empty results, then test failure case

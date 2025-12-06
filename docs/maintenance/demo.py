@@ -121,7 +121,7 @@ class DocumentationMaintenanceDemo:
                     file_links = link_checker.find_all_links([file_path])
                     all_links.extend(file_links)
                 except Exception as e:
-                    logger.warning(f"Failed to extract links from {file_path}: {e}")
+                    logger.warning("Failed to extract links from %s: %s", file_path, e)
 
             # Categorize links
             link_types = {}

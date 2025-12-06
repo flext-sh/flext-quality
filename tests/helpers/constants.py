@@ -14,7 +14,7 @@ from typing import Final, TypeAlias
 from flext_quality.constants import FlextQualityConstants
 
 
-class TestConstants:
+class TestsConstants(FlextQualityConstants):
     """Centralized test constants following flext-core nested class pattern."""
 
     class Paths:
@@ -74,4 +74,7 @@ class TestConstants:
         LogLevelLiteral: TypeAlias = FlextQualityConstants.Literals.LogLevelLiteral
 
 
-__all__ = ["TestConstants"]
+# Standardized short name for use in tests (same pattern as flext-core)
+c = TestsConstants
+
+__all__ = ["TestsConstants", "c"]

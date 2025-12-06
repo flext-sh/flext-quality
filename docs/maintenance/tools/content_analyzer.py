@@ -35,7 +35,8 @@ class ContentAnalyzer:
     MIN_ARGS_REQUIRED = 2
 
     def __init__(
-        self, config_path: str | None = "docs/maintenance/config/audit_rules.yaml"
+        self,
+        config_path: str | None = "docs/maintenance/config/audit_rules.yaml",
     ) -> None:
         """Initialize content analyzer with configuration.
 
@@ -115,7 +116,8 @@ class ContentAnalyzer:
             }
 
     def _calculate_content_metrics(
-        self, content: str
+        self,
+        content: str,
     ) -> FlextQualityTypes.Core.MetricsDict:
         """Calculate basic content metrics."""
         # Word analysis
@@ -305,7 +307,9 @@ class ContentAnalyzer:
         return structure
 
     def _check_completeness(
-        self, content: str, filename: str
+        self,
+        content: str,
+        filename: str,
     ) -> FlextQualityTypes.Core.AnalysisDict:
         """Check documentation completeness based on file type and content."""
         completeness = {
@@ -333,13 +337,13 @@ class ContentAnalyzer:
                 "Usage",
             ]
             completeness.update(
-                self._check_required_sections(content, required_sections)
+                self._check_required_sections(content, required_sections),
             )
 
         elif filename.startswith("docs/"):
             required_sections = ["Overview|Introduction"]
             completeness.update(
-                self._check_required_sections(content, required_sections)
+                self._check_required_sections(content, required_sections),
             )
 
         # Check for common documentation elements
@@ -373,7 +377,9 @@ class ContentAnalyzer:
         return completeness
 
     def _check_required_sections(
-        self, content: str, required_sections: list[str]
+        self,
+        content: str,
+        required_sections: list[str],
     ) -> FlextQualityTypes.Core.AnalysisDict:
         """Check for required sections in content."""
         result = {"required_sections_present": [], "missing_required_sections": []}
@@ -395,13 +401,14 @@ class ContentAnalyzer:
             if not found:
                 result["missing_required_sections"].append(section_pattern)
                 self.results["recommendations"].append(
-                    f"Add '{section_pattern}' section"
+                    f"Add '{section_pattern}' section",
                 )
 
         return result
 
     def _calculate_quality_score(
-        self, analysis: FlextQualityTypes.Core.AnalysisDict
+        self,
+        analysis: FlextQualityTypes.Core.AnalysisDict,
     ) -> float:
         """Calculate overall quality score for the content."""
         score = 100.0
@@ -496,12 +503,12 @@ class ContentAnalyzer:
 
         if metrics["word_count"] < 2 * self.MIN_WORD_COUNT:
             suggestions.append(
-                "Expand content with more detailed explanations and examples"
+                "Expand content with more detailed explanations and examples",
             )
 
         if readability["readability_score"] < self.MIN_READABILITY_SCORE:
             suggestions.append(
-                "Simplify language and sentence structure for better readability"
+                "Simplify language and sentence structure for better readability",
             )
 
         if (
@@ -515,7 +522,7 @@ class ContentAnalyzer:
 
         if metrics["link_count"] == 0:
             suggestions.append(
-                "Add relevant links to related documentation or external resources"
+                "Add relevant links to related documentation or external resources",
             )
 
         return suggestions
@@ -536,7 +543,7 @@ class ContentAnalyzer:
             return
 
         avg_score = sum(self.results["content_scores"].values()) / len(
-            self.results["content_scores"]
+            self.results["content_scores"],
         )
 
         if avg_score < self.GOOD_READABILITY_MIN:
@@ -639,7 +646,8 @@ Top Recommendations:
 
 
 def analyze_file_content(
-    file_path: str, config_path: str | None = None
+    file_path: str,
+    config_path: str | None = None,
 ) -> dict[str, Any]:
     """Convenience function to analyze a single file."""
     analyzer = ContentAnalyzer(config_path)
@@ -647,7 +655,8 @@ def analyze_file_content(
 
 
 def analyze_files_content(
-    file_paths: list[str], config_path: str | None = None
+    file_paths: list[str],
+    config_path: str | None = None,
 ) -> dict[str, Any]:
     """Convenience function to analyze multiple files."""
     analyzer = ContentAnalyzer(config_path)

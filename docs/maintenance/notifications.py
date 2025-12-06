@@ -26,7 +26,8 @@ class DocumentationNotifier:
     """Automated notification system for documentation quality alerts."""
 
     def __init__(
-        self, config_path: str = "docs/maintenance/config/notification_config.yaml"
+        self,
+        config_path: str = "docs/maintenance/config/notification_config.yaml",
     ) -> None:
         """Initialize the documentation notifier with configuration.
 
@@ -155,7 +156,10 @@ Please review recent changes and address any identified issues.
         return self.send_notification(title, message, "info")
 
     def send_notification(
-        self, title: str, message: str, priority: str = "info"
+        self,
+        title: str,
+        message: str,
+        priority: str = "info",
     ) -> bool:
         """Send notification through all enabled channels."""
         success = True
@@ -194,7 +198,10 @@ Please review recent changes and address any identified issues.
         return success
 
     def _send_console_notification(
-        self, title: str, message: str, priority: str
+        self,
+        title: str,
+        message: str,
+        priority: str,
     ) -> None:
         """Send notification to console."""
         # For now, console notifications are disabled to avoid T201 violations
@@ -228,7 +235,9 @@ Timestamp: {datetime.now(UTC).isoformat()}
         server.login(email_config["username"], email_config["password"])
         text = msg.as_string()
         server.sendmail(
-            email_config["from_address"], email_config["to_addresses"], text
+            email_config["from_address"],
+            email_config["to_addresses"],
+            text,
         )
         server.quit()
 
@@ -237,7 +246,8 @@ Timestamp: {datetime.now(UTC).isoformat()}
         slack_config = self.config["slack"]
 
         color = {"critical": "danger", "warning": "warning", "info": "good"}.get(
-            priority, "good"
+            priority,
+            "good",
         )
 
         payload = {
@@ -250,7 +260,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
                     "text": message,
                     "footer": "FLEXT Quality Documentation System",
                     "ts": datetime.now(UTC).timestamp(),
-                }
+                },
             ],
         }
 
@@ -258,7 +268,10 @@ Timestamp: {datetime.now(UTC).isoformat()}
         response.raise_for_status()
 
     def _send_webhook_notification(
-        self, title: str, message: str, priority: str
+        self,
+        title: str,
+        message: str,
+        priority: str,
     ) -> None:
         """Send notification via webhook."""
         webhook_config = self.config["webhook"]
@@ -329,7 +342,8 @@ Found {len(broken_links)} broken links that need attention:
 """
 
         for i, link in enumerate(
-            broken_links[:MAX_BROKEN_LINKS_TO_SHOW], 1
+            broken_links[:MAX_BROKEN_LINKS_TO_SHOW],
+            1,
         ):  # Show first MAX_BROKEN_LINKS_TO_SHOW
             message += f"{i}. {link.get('url', 'unknown')}\n"
             message += f"   File: {link.get('file', 'unknown')}\n"
@@ -359,7 +373,7 @@ Found {len(broken_links)} broken links that need attention:
 def main() -> None:
     """Main entry point for notification system."""
     parser = argparse.ArgumentParser(
-        description="FLEXT Quality Documentation Notifications"
+        description="FLEXT Quality Documentation Notifications",
     )
     parser.add_argument(
         "--config",

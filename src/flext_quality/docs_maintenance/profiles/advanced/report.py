@@ -216,7 +216,9 @@ class ReportGenerator:
 
         # Generate recommendations
         recommendations = self._generate_recommendations(
-            audit_summary, validation_summary, style_summary
+            audit_summary,
+            validation_summary,
+            style_summary,
         )
 
         return ReportData(
@@ -229,7 +231,9 @@ class ReportGenerator:
         )
 
     def _merge_summary(
-        self, data: dict[str, object], defaults: dict[str, object]
+        self,
+        data: dict[str, object],
+        defaults: dict[str, object],
     ) -> dict[str, object]:
         """Ensure summary dictionaries contain required keys."""
         merged = dict(defaults)
@@ -296,7 +300,8 @@ class ReportGenerator:
 
         auditor = DocumentationAuditor()
         results = auditor.audit_directory(
-            str(self.project_root / "docs"), recursive=False
+            str(self.project_root / "docs"),
+            recursive=False,
         )
         summary = auditor.generate_summary()
 
@@ -403,7 +408,7 @@ class ReportGenerator:
                         "Update outdated content (>90 days old)",
                         "Fix broken internal references",
                     ],
-                )
+                ),
             )
 
         # Link validation recommendations
@@ -418,7 +423,7 @@ class ReportGenerator:
                         "Fix incorrect internal references",
                         "Review most broken domains",
                     ],
-                )
+                ),
             )
 
         # Style recommendations
@@ -433,7 +438,7 @@ class ReportGenerator:
                         "Add language specifications to code blocks",
                         "Remove trailing whitespace",
                     ],
-                )
+                ),
             )
 
         # Default recommendations
@@ -448,7 +453,7 @@ class ReportGenerator:
                         "Monitor link health monthly",
                         "Review content freshness quarterly",
                     ],
-                )
+                ),
             )
 
         return recommendations
@@ -516,7 +521,9 @@ class ReportGenerator:
         )
 
     def generate_dashboard(
-        self, report_data: ReportData, output_file: str = "dashboard.html"
+        self,
+        report_data: ReportData,
+        output_file: str = "dashboard.html",
     ) -> str:
         """Generate HTML dashboard (requires visualization libraries)."""
         template = self._get_dashboard_template()
@@ -551,7 +558,9 @@ class ReportGenerator:
         return output_path
 
     def write_json_report(
-        self, report_data: ReportData, output_file: str = "report.json"
+        self,
+        report_data: ReportData,
+        output_file: str = "report.json",
     ) -> str:
         """Persist report data as JSON."""
         Path(self.reports_dir).mkdir(exist_ok=True, parents=True)
@@ -574,7 +583,9 @@ class ReportGenerator:
         return output_path
 
     def generate_markdown_report(
-        self, report_data: ReportData, output_file: str = "report.md"
+        self,
+        report_data: ReportData,
+        output_file: str = "report.md",
     ) -> str:
         """Generate a markdown summary for the provided report data."""
         Path(self.reports_dir).mkdir(exist_ok=True, parents=True)
@@ -677,11 +688,14 @@ class ReportGenerator:
         )
 
     def export_report(
-        self, report_data: ReportData, formats: list[str] | None = None
+        self,
+        report_data: ReportData,
+        formats: list[str] | None = None,
     ) -> dict[str, list[str]]:
         """Generate report outputs for the requested formats."""
         requested_formats = formats or self.config["reporting"].get(
-            "output_formats", ["markdown"]
+            "output_formats",
+            ["markdown"],
         )
 
         timestamp_slug = report_data.timestamp.strftime("%Y%m%d_%H%M%S")
@@ -691,15 +705,18 @@ class ReportGenerator:
             try:
                 if fmt == "markdown":
                     path = self.generate_markdown_report(
-                        report_data, output_file=f"report_{timestamp_slug}.md"
+                        report_data,
+                        output_file=f"report_{timestamp_slug}.md",
                     )
                 elif fmt == "json":
                     path = self.write_json_report(
-                        report_data, output_file=f"report_{timestamp_slug}.json"
+                        report_data,
+                        output_file=f"report_{timestamp_slug}.json",
                     )
                 elif fmt == "html":
                     path = self.generate_dashboard(
-                        report_data, output_file=f"dashboard_{timestamp_slug}.html"
+                        report_data,
+                        output_file=f"dashboard_{timestamp_slug}.html",
                     )
                 else:
                     logger.warning("Unsupported report format requested: %s", fmt)
@@ -852,7 +869,9 @@ class ReportGenerator:
 </html>"""
 
     def generate_weekly_summary(
-        self, report_data: ReportData, output_file: str = "weekly-summary.md"
+        self,
+        report_data: ReportData,
+        output_file: str = "weekly-summary.md",
     ) -> str:
         """Backward-compatible wrapper for markdown report generation."""
         return self.generate_markdown_report(report_data, output_file=output_file)
@@ -861,24 +880,33 @@ class ReportGenerator:
 def main() -> None:
     """Main entry point for documentation reporting system."""
     parser = argparse.ArgumentParser(
-        description="Documentation Quality Assurance Reporting System"
+        description="Documentation Quality Assurance Reporting System",
     )
     parser.add_argument("--audit-file", help="Path to audit results JSON file")
     parser.add_argument(
-        "--validation-file", help="Path to validation results JSON file"
+        "--validation-file",
+        help="Path to validation results JSON file",
     )
     parser.add_argument("--style-file", help="Path to style results JSON file")
     parser.add_argument(
-        "--generate-dashboard", action="store_true", help="Generate HTML dashboard"
+        "--generate-dashboard",
+        action="store_true",
+        help="Generate HTML dashboard",
     )
     parser.add_argument(
-        "--weekly-summary", action="store_true", help="Generate weekly markdown summary"
+        "--weekly-summary",
+        action="store_true",
+        help="Generate weekly markdown summary",
     )
     parser.add_argument(
-        "--monthly-report", action="store_true", help="Generate detailed monthly report"
+        "--monthly-report",
+        action="store_true",
+        help="Generate detailed monthly report",
     )
     parser.add_argument(
-        "--output-dir", default="reports", help="Output directory for reports"
+        "--output-dir",
+        default="reports",
+        help="Output directory for reports",
     )
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
 
@@ -893,7 +921,9 @@ def main() -> None:
 
     # Generate complete report
     report_data = generator.generate_comprehensive_report(
-        args.audit_file, args.validation_file, args.style_file
+        args.audit_file,
+        args.validation_file,
+        args.style_file,
     )
 
     generated_files = []

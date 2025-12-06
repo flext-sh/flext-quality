@@ -35,7 +35,7 @@ class SeverityColorMap(BaseModel):
             "info": "#36a64f",
             "warning": "#ff9900",
             "error": "#ff0000",
-        }
+        },
     )
 
 
@@ -108,7 +108,8 @@ class FlextQualityIntegrations(FlextService[bool]):
 
         @staticmethod
         def webhook_payload(
-            event_type: str, event_data: dict[str, object]
+            event_type: str,
+            event_data: dict[str, object],
         ) -> dict[str, object]:
             """Build webhook notification payload."""
             return {
@@ -120,7 +121,9 @@ class FlextQualityIntegrations(FlextService[bool]):
 
         @staticmethod
         def slack_payload(
-            message: str, severity: str, color_map: dict[str, str]
+            message: str,
+            severity: str,
+            color_map: dict[str, str],
         ) -> dict[str, object]:
             """Build Slack message payload."""
             return {
@@ -130,13 +133,14 @@ class FlextQualityIntegrations(FlextService[bool]):
                         "title": "FLEXT Quality Alert",
                         "text": message,
                         "footer": "flext-quality v0.9.0",
-                    }
-                ]
+                    },
+                ],
             }
 
         @staticmethod
         def github_checks_payload(
-            commit_sha: str, check_results: dict[str, object]
+            commit_sha: str,
+            check_results: dict[str, object],
         ) -> dict[str, object]:
             """Build GitHub Checks API payload."""
             return {
@@ -147,7 +151,8 @@ class FlextQualityIntegrations(FlextService[bool]):
                 "output": {
                     "title": "Quality Analysis Results",
                     "summary": check_results.get(
-                        "summary", "Quality analysis completed"
+                        "summary",
+                        "Quality analysis completed",
                     ),
                     "text": check_results.get("details", ""),
                 },
@@ -258,7 +263,9 @@ class FlextQualityIntegrations(FlextService[bool]):
             for url in webhook_urls
             if (
                 r := self.send_webhook_notification(
-                    url, "threshold_violation", violation_data
+                    url,
+                    "threshold_violation",
+                    violation_data,
                 )
             ).is_success
         ]

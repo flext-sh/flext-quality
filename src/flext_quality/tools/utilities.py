@@ -95,13 +95,14 @@ class FlextQualityToolsUtilities(FlextService[bool]):
                 output = FlextCliOutput()
                 # Use fallback to ANSI codes instead of accessing private method
                 colored_message = FlextQualityToolsUtilities.Colors.colorize(
-                    message, color
+                    message,
+                    color,
                 )
                 print_result = output.print_message(colored_message)
 
                 if print_result.is_failure:
                     return FlextResult[bool].fail(
-                        print_result.error or "CLI output failed"
+                        print_result.error or "CLI output failed",
                     )
                 return FlextResult[bool].ok(True)
             except Exception as e:
@@ -308,7 +309,8 @@ class FlextQualityToolsUtilities(FlextService[bool]):
 
 
 # Backward compatibility aliases (for existing code)
-Colors = FlextQualityToolsUtilities.Colors
+class Colors(FlextQualityToolsUtilities.Colors):
+    """Colors - real inheritance."""
 
 
 def colorize(message: str, color: str) -> str:

@@ -229,7 +229,7 @@ class TestAnalysisServiceBuilder:
         analysis_result = project_result.flat_map(
             lambda proj: AnalysisServiceBuilder(config, logger)
             .with_project_id(proj.id)
-            .build()
+            .build(),
         )
 
         assert analysis_result.is_success
@@ -615,7 +615,7 @@ class TestMonadicChaining:
             .flat_map(
                 lambda proj: AnalysisServiceBuilder(config, logger)
                 .with_project_id(proj.id)
-                .build()
+                .build(),
             )
             .flat_map(
                 lambda analysis: IssueServiceBuilder(config, logger)
@@ -624,13 +624,13 @@ class TestMonadicChaining:
                 .with_issue_type("high_complexity")
                 .with_file_path("src/main.py")
                 .with_message("Complex function")
-                .build()
+                .build(),
             )
             .flat_map(
                 lambda issue: ReportServiceBuilder(config, logger)
                 .with_analysis_id(issue.analysis_id)
                 .with_format("HTML")
-                .build()
+                .build(),
             )
             .map(lambda report: f"Report ID: {report.id}")
         )

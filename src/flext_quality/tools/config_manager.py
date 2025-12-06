@@ -41,7 +41,7 @@ class ConfigurationManager(FlextService[dict[str, str]]):
         except (OSError, json.JSONDecodeError) as error:
             self._logger.exception("Failed to load configuration")
             return FlextResult[dict[str, str]].fail(
-                f"Failed to load configuration: {error}"
+                f"Failed to load configuration: {error}",
             )
 
     def save_config(self) -> FlextResult[bool]:

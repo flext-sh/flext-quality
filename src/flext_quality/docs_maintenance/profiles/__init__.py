@@ -21,7 +21,7 @@ def get_profile_module(profile: str) -> ModuleType:
     return import_module(module_path)
 
 
-def get_profile_callable(profile: str, attribute: str) -> Callable[..., Any]:
+def get_profile_callable(profile: str, attribute: str) -> Callable[..., object]:
     """Return a callable attribute from a profile module."""
     module = get_profile_module(profile)
     try:

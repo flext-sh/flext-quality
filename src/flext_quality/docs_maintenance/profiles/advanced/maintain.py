@@ -269,12 +269,14 @@ class DocumentationMaintainer:
 
             report_data = generator.generate_comprehensive_report()
             output_formats = generator.config["reporting"].get(
-                "output_formats", ["markdown"]
+                "output_formats",
+                ["markdown"],
             )
             if isinstance(output_formats, str):
                 output_formats = [output_formats]
             generated_outputs = generator.export_report(
-                report_data, formats=list(output_formats)
+                report_data,
+                formats=list(output_formats),
             )
             metrics = generator.calculate_quality_metrics(report_data)
 
@@ -313,7 +315,8 @@ class DocumentationMaintainer:
             status = sync_manager.get_sync_status()
             if status.pending_changes:
                 result = sync_manager.sync_changes(
-                    "automated_maintenance", status.pending_changes
+                    "automated_maintenance",
+                    status.pending_changes,
                 )
 
                 return MaintenanceResult(
@@ -402,7 +405,8 @@ class DocumentationMaintainer:
             "total_issues": total_issues,
             "average_quality_score": average_quality,
             "maintenance_effectiveness": self._calculate_effectiveness(
-                average_quality, total_issues
+                average_quality,
+                total_issues,
             ),
         }
 
@@ -441,8 +445,23 @@ class DocumentationMaintainer:
 
 def main() -> None:
     """Main entry point for documentation maintenance system."""
+    args = _parse_maintenance_args()
+    maintainer = DocumentationMaintainer(args.config)
+
+    if args.complete or not any([args.comprehensive]):
+        report = maintainer.run_comprehensive_maintenance()
+        _process_maintenance_report(report, maintainer, args)
+
+
+def _parse_maintenance_args() -> argparse.Namespace:
+    """Parse command line arguments for maintenance.
+
+    Returns:
+        Parsed arguments namespace
+
+    """
     parser = argparse.ArgumentParser(
-        description="Documentation Maintenance Orchestrator"
+        description="Documentation Maintenance Orchestrator",
     )
     parser.add_argument(
         "--comprehensive",
@@ -457,55 +476,83 @@ def main() -> None:
         action="store_true",
         help="Show what would be done without making changes",
     )
+    return parser.parse_args()
 
-    args = parser.parse_args()
 
-    maintainer = DocumentationMaintainer(args.config)
+def _process_maintenance_report(
+    report: MaintenanceReport,
+    maintainer: DocumentationMaintainer,
+    args: argparse.Namespace,
+) -> None:
+    """Process and display maintenance report.
 
-    if args.complete or not any([args.comprehensive]):
-        # Default to complete maintenance
-        report = maintainer.run_comprehensive_maintenance()
+    Args:
+        report: Maintenance report to process
+        maintainer: Maintainer instance
+        args: Command line arguments
 
-        # Print results
-        report.summary["success_rate"]
-        # Overall status
-        if report.overall_success:
-            pass
+    """
+    # Print results
+    _ = report.summary["success_rate"]
 
-        # Operation results
-        for result in report.operations_run:
-            details = result.details
+    # Operation results
+    if args.verbose:
+        _print_operation_details(report.operations_run)
 
-            if args.verbose and details:
-                for key in details:
-                    if key != "error":
-                        pass
+    # Recommendations
+    _print_recommendations(report.summary)
 
-        # Recommendations
-        effectiveness = report.summary["maintenance_effectiveness"]
-        total_issues = report.summary.get("total_issues", 0)
-        avg_quality_score = report.summary.get("average_quality_score", 100)
+    # Save report if requested
+    if args.output:
+        maintainer.save_report(report)
 
-        if effectiveness in {"needs_attention", "fair"}:
-            if (
-                isinstance(total_issues, (int, float))
-                and total_issues > CRITICAL_ISSUES_THRESHOLD
-            ):
-                pass
-            if (
-                isinstance(avg_quality_score, (int, float))
-                and avg_quality_score < CRITICAL_QUALITY_THRESHOLD
-            ):
-                pass
-        elif effectiveness == "good":
-            pass
-        # Save report if requested
-        if args.output:
-            maintainer.save_report(report)
+
+def _print_operation_details(operations: list[object]) -> None:
+    """Print details of operations.
+
+    Args:
+        operations: List of operation results
+
+    """
+    for result in operations:
+        details = result.details
+        if details:
+            for key in details:
+                if key != "error":
+                    _ = details[key]  # Process detail if needed
+
+
+def _print_recommendations(summary: dict[str, object]) -> None:
+    """Print maintenance recommendations.
+
+    Args:
+        summary: Report summary dictionary
+
+    """
+    effectiveness = summary["maintenance_effectiveness"]
+    total_issues = summary.get("total_issues", 0)
+    avg_quality_score = summary.get("average_quality_score", 100)
+
+    if effectiveness in {"needs_attention", "fair"}:
+        if (
+            isinstance(total_issues, (int, float))
+            and total_issues > CRITICAL_ISSUES_THRESHOLD
+        ):
+            _ = total_issues  # Process if needed
+        if (
+            isinstance(avg_quality_score, (int, float))
+            and avg_quality_score < CRITICAL_QUALITY_THRESHOLD
+        ):
+            _ = avg_quality_score  # Process if needed
+    elif effectiveness == "good":
+        _ = effectiveness  # Process if needed
 
 
 def run_comprehensive(
-    config_path: str | None = None, *, verbose: bool = False, dry_run: bool = False
+    config_path: str | None = None,
+    *,
+    verbose: bool = False,
+    dry_run: bool = False,
 ) -> MaintenanceReport:
     """Run the complete maintenance pipeline programmatically.
 

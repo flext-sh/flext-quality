@@ -166,7 +166,8 @@ class ProjectServiceBuilder:
             return FlextResult.fail(f"Project creation failed: {e}")
 
     def _log_project_creation(
-        self, project: FlextQualityModels.ProjectModel
+        self,
+        project: FlextQualityModels.ProjectModel,
     ) -> FlextQualityModels.ProjectModel:
         """Log project creation and return (monadic final step)."""
         self._logger.info(
@@ -223,7 +224,8 @@ class AnalysisServiceBuilder:
         return self
 
     def with_config_dict(
-        self, config_dict: dict[str, object]
+        self,
+        config_dict: dict[str, object],
     ) -> AnalysisServiceBuilder:
         """Set additional configuration (fluent)."""
         self._kwargs.update(config_dict)
@@ -275,7 +277,8 @@ class AnalysisServiceBuilder:
             return FlextResult.fail(f"Analysis creation failed: {e}")
 
     def _log_analysis_creation(
-        self, analysis: FlextQualityModels.AnalysisModel
+        self,
+        analysis: FlextQualityModels.AnalysisModel,
     ) -> FlextQualityModels.AnalysisModel:
         """Log analysis creation and return (monadic final step)."""
         self._logger.info(
@@ -410,7 +413,8 @@ class IssueServiceBuilder:
             return FlextResult.fail(f"Issue creation failed: {e}")
 
     def _log_issue_creation(
-        self, issue: FlextQualityModels.IssueModel
+        self,
+        issue: FlextQualityModels.IssueModel,
     ) -> FlextQualityModels.IssueModel:
         """Log issue creation and return (monadic final step)."""
         self._logger.info(
@@ -494,7 +498,7 @@ class ReportServiceBuilder:
         valid_formats = {"JSON", "HTML", "CSV"}
         if self._format_type.upper() not in valid_formats:
             return FlextResult.fail(
-                f"Invalid format. Must be one of: {', '.join(valid_formats)}"
+                f"Invalid format. Must be one of: {', '.join(valid_formats)}",
             )
         return FlextResult.ok(True)
 
@@ -516,7 +520,8 @@ class ReportServiceBuilder:
             return FlextResult.fail(f"Report creation failed: {e}")
 
     def _log_report_creation(
-        self, report: FlextQualityModels.ReportModel
+        self,
+        report: FlextQualityModels.ReportModel,
     ) -> FlextQualityModels.ReportModel:
         """Log report creation and return (monadic final step)."""
         self._logger.info(

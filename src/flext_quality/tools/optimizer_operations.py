@@ -44,30 +44,38 @@ class OptimizerConfig(BaseModel):
     domain_violations: list[DomainLibraryPattern] = Field(
         default_factory=lambda: [
             DomainLibraryPattern(
-                import_pattern="import ldap3", required_library="flext-ldap"
+                import_pattern="import ldap3",
+                required_library="flext-ldap",
             ),
             DomainLibraryPattern(
-                import_pattern="from ldap3", required_library="flext-ldap"
+                import_pattern="from ldap3",
+                required_library="flext-ldap",
             ),
             DomainLibraryPattern(
-                import_pattern="import click", required_library="flext-cli"
+                import_pattern="import click",
+                required_library="flext-cli",
             ),
             DomainLibraryPattern(
-                import_pattern="from click", required_library="flext-cli"
+                import_pattern="from click",
+                required_library="flext-cli",
             ),
             DomainLibraryPattern(
-                import_pattern="import httpx", required_library="flext-api"
+                import_pattern="import httpx",
+                required_library="flext-api",
             ),
             DomainLibraryPattern(
-                import_pattern="from httpx", required_library="flext-api"
+                import_pattern="from httpx",
+                required_library="flext-api",
             ),
             DomainLibraryPattern(
-                import_pattern="import oracledb", required_library="flext-db-oracle"
+                import_pattern="import oracledb",
+                required_library="flext-db-oracle",
             ),
             DomainLibraryPattern(
-                import_pattern="from oracledb", required_library="flext-db-oracle"
+                import_pattern="from oracledb",
+                required_library="flext-db-oracle",
             ),
-        ]
+        ],
     )
     temp_prefix: str = Field(default="flext-optim-")
     complexity_threshold: float = Field(default=0.7)
@@ -100,7 +108,9 @@ class ASTAnalyzer:
 
     @staticmethod
     def calculate_complexity(
-        tree: ast.Module, content: str, config: OptimizerConfig
+        tree: ast.Module,
+        content: str,
+        config: OptimizerConfig,
     ) -> float:
         """Calculate complexity score based on AST analysis."""
         score = 0.0
@@ -179,30 +189,21 @@ class ImportOptimizer:
         promoted, changed = [], False
 
         for node in tree.body:
-            if (
-                isinstance(node, ast.If)
-                and isinstance(node.test, ast.Name)
-                and node.test.id == "TYPE_CHECKING"
-            ):
-                start, end = (
-                    getattr(node, "lineno", None),
-                    getattr(node, "end_lineno", None),
-                )
-                if start and end:
-                    block = "".join(lines[start - 1 : end])
-                    try:
-                        for sub_node in ast.parse(block).body:
-                            if (
-                                isinstance(sub_node, ast.ImportFrom)
-                                and sub_node.module
-                                and not sub_node.module.startswith(allowed)
-                            ):
-                                promoted.append(
-                                    f"from {sub_node.module} import {', '.join(a.name for a in sub_node.names)}"
-                                )
-                                changed = True
-                    except SyntaxError:
-                        pass
+            if not ImportOptimizer._is_type_checking_node(node):
+                continue
+
+            start, end = (
+                getattr(node, "lineno", None),
+                getattr(node, "end_lineno", None),
+            )
+            if not (start and end):
+                continue
+
+            block = "".join(lines[start - 1 : end])
+            block_promoted = ImportOptimizer._extract_imports_from_block(block, allowed)
+            if block_promoted:
+                promoted.extend(block_promoted)
+                changed = True
 
         if promoted and changed:
             content = (
@@ -210,8 +211,55 @@ class ImportOptimizer:
                 + "\n"
                 + "\n".join(promoted)
             )
+            return content, True
 
-        return content, changed
+        return content, False
+
+    @staticmethod
+    def _is_type_checking_node(node: ast.AST) -> bool:
+        """Check if node is a TYPE_CHECKING if statement.
+
+        Args:
+            node: AST node to check
+
+        Returns:
+            True if node is TYPE_CHECKING if statement
+
+        """
+        return (
+            isinstance(node, ast.If)
+            and isinstance(node.test, ast.Name)
+            and node.test.id == "TYPE_CHECKING"
+        )
+
+    @staticmethod
+    def _extract_imports_from_block(
+        block: str,
+        allowed: tuple[str, ...],
+    ) -> list[str]:
+        """Extract imports from TYPE_CHECKING block.
+
+        Args:
+            block: Code block string
+            allowed: Allowed module prefixes
+
+        Returns:
+            List of import statements to promote
+
+        """
+        try:
+            promoted = [
+                f"from {sub_node.module} import {', '.join(a.name for a in sub_node.names)}"
+                for sub_node in ast.parse(block).body
+                if (
+                    isinstance(sub_node, ast.ImportFrom)
+                    and sub_node.module
+                    and not sub_node.module.startswith(allowed)
+                )
+            ]
+        except SyntaxError:
+            promoted = []
+        return promoted
 
 
 class SyntaxUpdater:
@@ -352,7 +400,7 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         path = Path(module_path)
         if not path.exists():
             return FlextResult[FlextQualityModels.AnalysisResult].fail(
-                f"Module not found: {module_path}"
+                f"Module not found: {module_path}",
             )
 
         try:
@@ -388,7 +436,7 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         path = Path(module_path)
         if not path.exists():
             return FlextResult[FlextQualityModels.OptimizationResult].fail(
-                f"Module not found: {module_path}"
+                f"Module not found: {module_path}",
             )
 
         try:
@@ -434,7 +482,7 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         path = Path(module_path)
         if not path.exists():
             return FlextResult[dict[str, object]].fail(
-                f"Module not found: {module_path}"
+                f"Module not found: {module_path}",
             )
 
         try:
@@ -450,7 +498,8 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
 
         if package_name:
             content, sub_changed = ImportOptimizer.rewrite_submodule_imports(
-                content, package_name
+                content,
+                package_name,
             )
             if sub_changed:
                 changes.append("Rewrote submodule imports")
@@ -477,7 +526,7 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         path = Path(module_path)
         if not path.exists():
             return FlextResult[dict[str, object]].fail(
-                f"Module not found: {module_path}"
+                f"Module not found: {module_path}",
             )
 
         try:

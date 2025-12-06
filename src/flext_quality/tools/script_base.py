@@ -55,7 +55,7 @@ class FlextScriptService(FlextService[object], ABC):
         validation = self.validate_preconditions()
         if validation.is_failure:
             return FlextResult[object].fail(
-                validation.error or "Preconditions validation failed"
+                validation.error or "Preconditions validation failed",
             )
 
         try:

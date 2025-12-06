@@ -97,30 +97,55 @@ class DocumentationFinder:
     def _load_ignore_file(self) -> None:
         """Load ignore patterns from .gitignore or similar file."""
         ignore_path = self.project_root / self.ignore_file
-        if ignore_path.exists():
-            try:
-                with ignore_path.open("r", encoding="utf-8") as f:
-                    for raw_line in f:
-                        line = raw_line.strip()
-                        if line and not line.startswith("#"):
-                            # Convert gitignore patterns to glob patterns
-                            line = line.removeprefix("/")
-                            if not line.startswith("**/"):
-                                line = f"**/{line}"
-                            if (
-                                not line.endswith("/**")
-                                and "." not in Path(line).name
-                                and "/" in line
-                                and not line.endswith("**")
-                            ):
-                                # Add /** for directory patterns
-                                line = f"{line}/**"
-                            self.ignore_patterns.append(line)
-            except Exception as e:
-                # If we can't read the ignore file, just continue silently
-                # This is acceptable as ignore files are optional
-                logger = logging.getLogger(__name__)
-                logger.debug(f"Could not read ignore file {self.ignore_file}: {e}")
+        if not ignore_path.exists():
+            return
+
+        try:
+            self._load_ignore_patterns_from_file(ignore_path)
+        except Exception as e:
+            # If we can't read the ignore file, just continue silently
+            # This is acceptable as ignore files are optional
+            logger = logging.getLogger(__name__)
+            logger.debug(f"Could not read ignore file {self.ignore_file}: {e}")
+
+    def _load_ignore_patterns_from_file(self, ignore_path: Path) -> None:
+        """Load and process ignore patterns from file.
+
+        Args:
+            ignore_path: Path to ignore file
+
+        """
+        with ignore_path.open("r", encoding="utf-8") as f:
+            for raw_line in f:
+                line = raw_line.strip()
+                if line and not line.startswith("#"):
+                    processed_line = self._process_ignore_line(line)
+                    if processed_line:
+                        self.ignore_patterns.append(processed_line)
+
+    def _process_ignore_line(self, line: str) -> str:
+        """Process a single ignore line into a glob pattern.
+
+        Args:
+            line: Raw ignore line from file
+
+        Returns:
+            Processed glob pattern
+
+        """
+        # Convert gitignore patterns to glob patterns
+        line = line.removeprefix("/")
+        if not line.startswith("**/"):
+            line = f"**/{line}"
+        if (
+            not line.endswith("/**")
+            and "." not in Path(line).name
+            and "/" in line
+            and not line.endswith("**")
+        ):
+            # Add /** for directory patterns
+            line = f"{line}/**"
+        return line
 
     def find_files(self, *, use_cache: bool = True) -> list[Path]:
         """Find all documentation files in the project.
@@ -150,7 +175,9 @@ class DocumentationFinder:
                 # Skip patterns that cause errors during glob matching
                 # This prevents crashes from malformed glob patterns
                 logger = logging.getLogger(__name__)
-                logger.debug(f"Error during glob matching for pattern '{pattern}': {e}")
+                logger.debug(
+                    "Error during glob matching for pattern '%s': %s", pattern, e
+                )
 
         # Remove duplicates while preserving order
         seen = set()
@@ -192,7 +219,8 @@ class DocumentationFinder:
         # Simple glob matching - could be enhanced with more sophisticated matching
         try:
             return fnmatch.fnmatch(path_str, pattern) or fnmatch.fnmatch(
-                path_str, pattern.rstrip("/")
+                path_str,
+                pattern.rstrip("/"),
             )
         except Exception:
             return False
@@ -275,7 +303,8 @@ class DocumentationFinder:
             return None
 
     def categorize_files(
-        self, files: list[Path] | None = None
+        self,
+        files: list[Path] | None = None,
     ) -> dict[str, list[Path]]:
         """Categorize files by type and location."""
         if files is None:
@@ -377,7 +406,10 @@ class DocumentationFinder:
         return [f for f in files if f.stat().st_mtime >= cutoff_time]
 
     def filter_by_size(
-        self, files: list[Path], min_size: int = 0, max_size: int | None = None
+        self,
+        files: list[Path],
+        min_size: int = 0,
+        max_size: int | None = None,
     ) -> list[Path]:
         """Filter files by size range."""
         filtered = [f for f in files if f.stat().st_size >= min_size]

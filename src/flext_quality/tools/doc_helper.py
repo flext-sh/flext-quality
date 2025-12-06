@@ -115,7 +115,7 @@ def validate_google_style_docstrings(
                         and not has_args
                     ):
                         issues.append(
-                            f"{node.name} has parameters but no Args: section"
+                            f"{node.name} has parameters but no Args: section",
                         )
 
                     # Check for proper formatting
@@ -159,11 +159,11 @@ def suggest_docstring_improvements(
                 if docstring and len(docstring.splitlines()) == 1:
                     if len(node.args.args) > 0:
                         suggestions.append(
-                            f"{node.name}: Add Args section to docstring"
+                            f"{node.name}: Add Args section to docstring",
                         )
                     if node.returns:
                         suggestions.append(
-                            f"{node.name}: Add Returns section to docstring"
+                            f"{node.name}: Add Returns section to docstring",
                         )
 
                 # Check for functions without docstrings
@@ -171,7 +171,7 @@ def suggest_docstring_improvements(
                     suggestions.append(f"{node.name}: Missing docstring")
 
         return FlextResult.ok(
-            suggestions[:15] if suggestions else ["Docstrings look good!"]
+            suggestions[:15] if suggestions else ["Docstrings look good!"],
         )
 
     except Exception as e:
@@ -200,7 +200,8 @@ def analyze_api_documentation(
         for node in ast.walk(tree):
             # Only check top-level definitions (first level)
             if isinstance(
-                node, (ast.FunctionDef, ast.ClassDef)
+                node,
+                (ast.FunctionDef, ast.ClassDef),
             ) and not node.name.startswith("_"):
                 public_items.append(node.name)
                 if ast.get_docstring(node):

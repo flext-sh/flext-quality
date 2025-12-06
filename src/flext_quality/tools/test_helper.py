@@ -16,6 +16,8 @@ from pathlib import Path
 
 from flext_core import FlextResult
 
+from flext_quality.subprocess_utils import SubprocessUtils
+
 # Test coverage thresholds
 MIN_TEST_COVERAGE_THRESHOLD = 80
 
@@ -32,7 +34,7 @@ def suggest_tests_from_coverage(project_path: Path) -> FlextResult[list[str]]:
     """
     try:
         # Run coverage to generate report
-        result = ution.run_external_command(
+        result = SubprocessUtils.run_external_command(
             [
                 "pytest",
                 str(project_path),
@@ -46,39 +48,68 @@ def suggest_tests_from_coverage(project_path: Path) -> FlextResult[list[str]]:
         )
 
         if result.is_failure:
-            error_msg = result.error or ""
-            if "not found" in error_msg.lower():
-                return FlextResult.ok([
-                    "Install pytest and coverage to analyze test coverage"
-                ])
-            if "timed out" in error_msg.lower():
-                return FlextResult.fail("Coverage analysis timed out")
-            return FlextResult.fail(f"Coverage analysis failed: {error_msg}")
+            return _handle_coverage_error(result.error or "")
 
-        suggestions = []
-
-        # Try to parse coverage JSON
-        coverage_file = project_path / ".coverage.json"
-        if coverage_file.exists():
-            with Path(coverage_file).open(encoding="utf-8") as f:
-                coverage_data = json.load(f)
-
-            # Extract files with low coverage
-            if "files" in coverage_data:
-                for file_path, file_data in coverage_data["files"].items():
-                    if "summary" in file_data:
-                        coverage = file_data["summary"].get("percent_covered", 100)
-                        if coverage < MIN_TEST_COVERAGE_THRESHOLD:
-                            suggestions.append(
-                                f"Add tests for {file_path} ({coverage:.1f}% coverage)"
-                            )
-
+        suggestions = _extract_low_coverage_files(project_path)
         return FlextResult.ok(
-            suggestions or ["All modules have >80% coverage - good job!"]
+            suggestions or ["All modules have >80% coverage - good job!"],
         )
 
     except Exception as e:
         return FlextResult.fail(f"Coverage analysis failed: {e}")
+
+
+def _handle_coverage_error(error_msg: str) -> FlextResult[list[str]]:
+    """Handle coverage command errors.
+
+    Args:
+        error_msg: Error message from command
+
+    Returns:
+        FlextResult with appropriate message
+
+    """
+    if "not found" in error_msg.lower():
+        return FlextResult.ok([
+            "Install pytest and coverage to analyze test coverage",
+        ])
+    if "timed out" in error_msg.lower():
+        return FlextResult.fail("Coverage analysis timed out")
+    return FlextResult.fail(f"Coverage analysis failed: {error_msg}")
+
+
+def _extract_low_coverage_files(project_path: Path) -> list[str]:
+    """Extract files with low test coverage.
+
+    Args:
+        project_path: Path to project root
+
+    Returns:
+        List of suggestions for files with low coverage
+
+    """
+    suggestions = []
+    coverage_file = project_path / ".coverage.json"
+    if not coverage_file.exists():
+        return suggestions
+
+    with Path(coverage_file).open(encoding="utf-8") as f:
+        coverage_data = json.load(f)
+
+    # Extract files with low coverage
+    if "files" not in coverage_data:
+        return suggestions
+
+    for file_path, file_data in coverage_data["files"].items():
+        if "summary" not in file_data:
+            continue
+        coverage = file_data["summary"].get("percent_covered", 100)
+        if coverage < MIN_TEST_COVERAGE_THRESHOLD:
+            suggestions.append(
+                f"Add tests for {file_path} ({coverage:.1f}% coverage)",
+            )
+
+    return suggestions
 
 
 def check_test_quality(test_file: Path) -> FlextResult[dict[str, object]]:
@@ -137,7 +168,7 @@ def validate_test_execution(test_path: Path) -> FlextResult[dict[str, object]]:
 
     """
     try:
-        result = ution.run_external_command(
+        result = SubprocessUtils.run_external_command(
             ["pytest", str(test_path), "-v", "--tb=short"],
             capture_output=True,
             timeout=120.0,

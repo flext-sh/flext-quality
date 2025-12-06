@@ -8,6 +8,8 @@ from typing import Self
 
 from flext_core import FlextResult, FlextService
 
+from flext_quality.subprocess_utils import SubprocessUtils
+
 
 class MyPyChecker(FlextService[list[str]]):
     """Run mypy (or a fallback) against a project path."""
@@ -33,7 +35,7 @@ class MyPyChecker(FlextService[list[str]]):
             # Environment without mypy – treat as success to keep workflows moving.
             return FlextResult[list[str]].ok([])
 
-        run_result = ution.run_external_command(
+        run_result = SubprocessUtils.run_external_command(
             ["mypy", str(root)],
             capture_output=True,
             text=True,
@@ -41,7 +43,7 @@ class MyPyChecker(FlextService[list[str]]):
         )
         if run_result.is_failure:
             return FlextResult[list[str]].fail(
-                f"MyPy execution failed: {run_result.error}"
+                f"MyPy execution failed: {run_result.error}",
             )
 
         completed = run_result.value

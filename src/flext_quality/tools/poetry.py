@@ -8,6 +8,8 @@ from typing import Self
 
 from flext_core import FlextResult, FlextService
 
+from flext_quality.subprocess_utils import SubprocessUtils
+
 
 class PoetryOperations(FlextService[str]):
     """Execute simple Poetry commands with FlextResult wrapping."""
@@ -49,7 +51,7 @@ class PoetryOperations(FlextService[str]):
             return FlextResult[str].fail(f"Project path does not exist: {project}")
 
         poetry_cmd = ["poetry", *args]
-        result = ution.run_external_command(
+        result = SubprocessUtils.run_external_command(
             poetry_cmd,
             cwd=project,
             capture_output=True,
@@ -64,7 +66,7 @@ class PoetryOperations(FlextService[str]):
         completed = result.value
         if completed.returncode != 0:
             return FlextResult[str].fail(
-                f"Poetry {operation} failed: {completed.stderr}"
+                f"Poetry {operation} failed: {completed.stderr}",
             )
         return FlextResult[str].ok(
             f"Poetry {operation} completed for {project}",
@@ -106,7 +108,7 @@ class PoetryValidator(FlextService[dict[str, bool]]):
                 data = tomllib.load(handle)
         except (OSError, tomllib.TOMLDecodeError) as error:
             return FlextResult[dict[str, bool]].fail(
-                f"Failed to read pyproject.toml: {error}"
+                f"Failed to read pyproject.toml: {error}",
             )
 
         poetry_data = data.get("tool", {}).get("poetry", {})
@@ -143,7 +145,7 @@ class PoetryValidator(FlextService[dict[str, bool]]):
         validation = self.validate_pyproject(project_path)
         if validation.is_failure:
             return FlextResult[dict[str, object]].fail(
-                validation.error or "Dependency check failed"
+                validation.error or "Dependency check failed",
             )
 
         project = Path(project_path).expanduser()
@@ -166,7 +168,7 @@ class PoetryValidator(FlextService[dict[str, bool]]):
                 data = tomllib.load(handle)
         except (OSError, tomllib.TOMLDecodeError) as error:
             return FlextResult[dict[str, object]].fail(
-                f"Failed to read pyproject.toml: {error}"
+                f"Failed to read pyproject.toml: {error}",
             )
 
         poetry_data = data.get("tool", {}).get("poetry", {})

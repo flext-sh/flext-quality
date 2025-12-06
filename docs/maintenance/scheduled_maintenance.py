@@ -32,7 +32,8 @@ class ScheduledMaintenance:
     MIN_PYTHON_MODULE_INDEX = 2  # module name is at index 2 (python -m module_name)
 
     def __init__(
-        self, config_path: str = "docs/maintenance/config/schedule_config.yaml"
+        self,
+        config_path: str = "docs/maintenance/config/schedule_config.yaml",
     ) -> None:
         """Initialize scheduled maintenance system.
 
@@ -43,7 +44,7 @@ class ScheduledMaintenance:
         self.load_config(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.reports_dir = Path(
-            self.config.get("reports_dir", "docs/maintenance/reports/")
+            self.config.get("reports_dir", "docs/maintenance/reports/"),
         )
         self.reports_dir.mkdir(parents=True, exist_ok=True)
 
@@ -232,18 +233,19 @@ class ScheduledMaintenance:
             # If no specific handler, log unsupported command
             self.results["warnings"].append(
                 f"Unsupported command: {cmd_name} in task: {description}. "
-                "Please install appropriate Python libraries or configure supported commands."
+                "Please install appropriate Python libraries or configure supported commands.",
             )
             return False
 
         except Exception as e:
             self.results["errors"].append(
-                f"Task error: {task_config.get('description', 'unknown')} - {e!s}"
+                f"Task error: {task_config.get('description', 'unknown')} - {e!s}",
             )
             return False
 
     def _get_command_handler(
-        self, cmd_name: str
+        self,
+        cmd_name: str,
     ) -> Callable[[list[str], int, str], bool] | None:
         """Get handler for command type."""
         handlers: dict[str, Callable] = {
@@ -256,13 +258,16 @@ class ScheduledMaintenance:
         return handlers.get(cmd_name)
 
     def _handle_python_command(
-        self, cmd_parts: list[str], timeout: int, description: str
+        self,
+        cmd_parts: list[str],
+        timeout: int,
+        description: str,
     ) -> bool:
         """Handle python -m commands."""
         try:
             if len(cmd_parts) < self.MIN_PYTHON_ARGS or cmd_parts[1] != "-m":
                 self.results["warnings"].append(
-                    f"Invalid python command format in task: {description}"
+                    f"Invalid python command format in task: {description}",
                 )
                 return False
 
@@ -273,7 +278,7 @@ class ScheduledMaintenance:
             )
             if not module_name:
                 self.results["warnings"].append(
-                    f"No module specified in task: {description}"
+                    f"No module specified in task: {description}",
                 )
                 return False
 
@@ -289,12 +294,15 @@ class ScheduledMaintenance:
 
         except Exception as e:
             self.results["errors"].append(
-                f"Python command failed in {description}: {e!s}"
+                f"Python command failed in {description}: {e!s}",
             )
             return False
 
     def _handle_pytest_command(
-        self, cmd_parts: list[str], timeout: int, description: str
+        self,
+        cmd_parts: list[str],
+        timeout: int,
+        description: str,
     ) -> bool:
         """Handle pytest commands."""
         try:
@@ -311,17 +319,20 @@ class ScheduledMaintenance:
 
         except ImportError:
             self.results["warnings"].append(
-                f"pytest not available for task: {description}. Install with: pip install pytest"
+                f"pytest not available for task: {description}. Install with: pip install pytest",
             )
             return False
         except Exception as e:
             self.results["errors"].append(
-                f"pytest command failed in {description}: {e!s}"
+                f"pytest command failed in {description}: {e!s}",
             )
             return False
 
     def _handle_make_command(
-        self, cmd_parts: list[str], timeout: int, description: str
+        self,
+        cmd_parts: list[str],
+        timeout: int,
+        description: str,
     ) -> bool:
         """Handle make commands."""
         # Note: timeout parameter reserved for future make execution timeout implementation
@@ -331,7 +342,7 @@ class ScheduledMaintenance:
             makefile = self.project_root / "Makefile"
             if not makefile.exists():
                 self.results["warnings"].append(
-                    f"Makefile not found for task: {description}"
+                    f"Makefile not found for task: {description}",
                 )
                 return False
 
@@ -344,18 +355,21 @@ class ScheduledMaintenance:
             # For now, log a warning suggesting direct command execution
             self.results["warnings"].append(
                 f"Make command '{' '.join(cmd_parts)}' requires make tool. "
-                f"For task: {description}, consider specifying the actual command directly."
+                f"For task: {description}, consider specifying the actual command directly.",
             )
             return False
 
         except Exception as e:
             self.results["errors"].append(
-                f"Make command failed in {description}: {e!s}"
+                f"Make command failed in {description}: {e!s}",
             )
             return False
 
     def _handle_git_command(
-        self, cmd_parts: list[str], timeout: int, description: str
+        self,
+        cmd_parts: list[str],
+        timeout: int,
+        description: str,
     ) -> bool:
         """Handle git commands using GitPython."""
         try:
@@ -365,7 +379,7 @@ class ScheduledMaintenance:
             # Extract git subcommand
             if len(cmd_parts) < self.MIN_GIT_ARGS:
                 self.results["warnings"].append(
-                    f"Invalid git command format in task: {description}"
+                    f"Invalid git command format in task: {description}",
                 )
                 return False
 
@@ -387,12 +401,12 @@ class ScheduledMaintenance:
 
         except ImportError:
             self.results["warnings"].append(
-                f"GitPython not available for task: {description}. Install with: pip install GitPython"
+                f"GitPython not available for task: {description}. Install with: pip install GitPython",
             )
             return False
         except InvalidGitRepositoryError:
             self.results["warnings"].append(
-                f"Not a git repository for task: {description}"
+                f"Not a git repository for task: {description}",
             )
             return False
         except Exception as e:
@@ -400,7 +414,10 @@ class ScheduledMaintenance:
             return False
 
     def _handle_echo_command(
-        self, cmd_parts: list[str], timeout: int, description: str
+        self,
+        cmd_parts: list[str],
+        timeout: int,
+        description: str,
     ) -> bool:
         """Handle echo commands."""
         # Note: timeout parameter reserved for future echo execution timeout implementation
@@ -412,12 +429,15 @@ class ScheduledMaintenance:
             return True
         except Exception as e:
             self.results["errors"].append(
-                f"Echo command failed in {description}: {e!s}"
+                f"Echo command failed in {description}: {e!s}",
             )
             return False
 
     def _run_with_timeout(
-        self, func: Callable[[], None], timeout: int, description: str
+        self,
+        func: Callable[[], None],
+        timeout: int,
+        description: str,
     ) -> bool:
         """Run a function with timeout using threading."""
         try:
@@ -440,7 +460,7 @@ class ScheduledMaintenance:
 
             if result_container["exception"]:
                 self.results["errors"].append(
-                    f"Task failed: {description} - {result_container['exception']!s}"
+                    f"Task failed: {description} - {result_container['exception']!s}",
                 )
                 return False
 
@@ -448,7 +468,7 @@ class ScheduledMaintenance:
 
         except Exception as e:
             self.results["errors"].append(
-                f"Task execution error in {description}: {e!s}"
+                f"Task execution error in {description}: {e!s}",
             )
             return False
 
@@ -459,13 +479,13 @@ class ScheduledMaintenance:
         # Daily audit
         if schedules["daily_audit"]["enabled"]:
             schedule.every().day.at(schedules["daily_audit"]["time"]).do(
-                self.run_daily_audit
+                self.run_daily_audit,
             )
 
         # Daily optimization
         if schedules["daily_optimize"]["enabled"]:
             schedule.every().day.at(schedules["daily_optimize"]["time"]).do(
-                self.run_daily_optimize
+                self.run_daily_optimize,
             )
 
         # Weekly comprehensive
@@ -474,7 +494,7 @@ class ScheduledMaintenance:
             time_str = schedules["weekly_comprehensive"]["time"]
 
             getattr(schedule.every(), day).at(time_str).do(
-                self.run_weekly_comprehensive
+                self.run_weekly_comprehensive,
             )
 
         # Monthly deep clean
@@ -539,7 +559,7 @@ class ScheduledMaintenance:
 def main() -> None:
     """Main entry point for scheduled maintenance."""
     parser = argparse.ArgumentParser(
-        description="FLEXT Quality Scheduled Documentation Maintenance"
+        description="FLEXT Quality Scheduled Documentation Maintenance",
     )
     parser.add_argument(
         "--config",
@@ -547,7 +567,9 @@ def main() -> None:
         help="Maintenance schedule configuration file",
     )
     parser.add_argument(
-        "--daemon", action="store_true", help="Run as daemon with scheduled tasks"
+        "--daemon",
+        action="store_true",
+        help="Run as daemon with scheduled tasks",
     )
     parser.add_argument(
         "--manual",
@@ -555,7 +577,9 @@ def main() -> None:
         help="Run specific maintenance tasks manually",
     )
     parser.add_argument(
-        "--list-schedules", action="store_true", help="List all configured schedules"
+        "--list-schedules",
+        action="store_true",
+        help="List all configured schedules",
     )
 
     args = parser.parse_args()

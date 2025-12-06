@@ -114,7 +114,7 @@ class DocumentationSync:
                     "daily": ["validate_links"],
                     "weekly": ["comprehensive_audit", "optimize_content"],
                     "monthly": ["update_metadata", "generate_reports"],
-                }
+                },
             },
         }
 
@@ -196,7 +196,7 @@ class DocumentationSync:
             )
 
         except Exception as e:
-            logger.debug(f"Git operations failed, using default status: {e}")
+            logger.debug("Git operations failed, using default status: %s", e)
             return GitStatusInfo(
                 branch="unknown",
                 modified_files=[],
@@ -230,7 +230,7 @@ class DocumentationSync:
 
         except Exception as e:
             # Git operations are optional, continue without git info
-            logger.debug(f"Git operations failed, continuing without git info: {e}")
+            logger.debug("Git operations failed, continuing without git info: %s", e)
 
         return None
 
@@ -247,7 +247,7 @@ class DocumentationSync:
 
         except Exception as e:
             # Git operations are optional, continue without git info
-            logger.debug(f"Git operations failed, continuing without git info: {e}")
+            logger.debug("Git operations failed, continuing without git info: %s", e)
 
         return False
 
@@ -261,10 +261,11 @@ class DocumentationSync:
 
             # Quick validation
             link_results = validator.validate_directory(
-                str(self.working_dir / "docs"), check_external=False
+                str(self.working_dir / "docs"),
+                check_external=False,
             )
             style_results = style_validator.validate_directory(
-                str(self.working_dir / "docs")
+                str(self.working_dir / "docs"),
             )
 
             broken_links = sum(len(r.broken_links) for r in link_results)
@@ -323,10 +324,11 @@ class DocumentationSync:
             # Create commit message
             changes_desc = f"{len(files)} files"
             commit_message_template = str(
-                self.config["sync"]["commit_message_template"]
+                self.config["sync"]["commit_message_template"],
             )
             commit_message = commit_message_template.format(
-                operation=operation, changes=changes_desc
+                operation=operation,
+                changes=changes_desc,
             )
 
             # Commit using GitPython
@@ -459,7 +461,7 @@ class DocumentationSync:
                     files_affected=[],
                     error_message="Invalid maintenance configuration",
                     timestamp=datetime.now(UTC),
-                )
+                ),
             ]
 
         schedule = maintenance_config["schedule"]
@@ -472,7 +474,7 @@ class DocumentationSync:
                     files_affected=[],
                     error_message=f"Unknown schedule type: {schedule_type}",
                     timestamp=datetime.now(UTC),
-                )
+                ),
             ]
 
         tasks_obj = schedule[schedule_type]
@@ -485,7 +487,7 @@ class DocumentationSync:
                     files_affected=[],
                     error_message="Invalid schedule tasks configuration",
                     timestamp=datetime.now(UTC),
-                )
+                ),
             ]
 
         tasks: list[str] = [str(task) for task in tasks_obj]
@@ -639,16 +641,23 @@ class DocumentationSync:
 def _setup_argument_parser() -> argparse.ArgumentParser:
     """Set up the argument parser for the sync system."""
     parser = argparse.ArgumentParser(
-        description="Documentation Synchronization and Automated Maintenance System"
+        description="Documentation Synchronization and Automated Maintenance System",
     )
     parser.add_argument(
-        "--status", action="store_true", help="Show current synchronization status"
+        "--status",
+        action="store_true",
+        help="Show current synchronization status",
     )
     parser.add_argument(
-        "--validate", action="store_true", help="Validate documentation before sync"
+        "--validate",
+        action="store_true",
+        help="Validate documentation before sync",
     )
     parser.add_argument(
-        "--sync", nargs="*", metavar="FILE", help="Synchronize specific files to git"
+        "--sync",
+        nargs="*",
+        metavar="FILE",
+        help="Synchronize specific files to git",
     )
     parser.add_argument(
         "--backup-branch",
@@ -725,7 +734,8 @@ def _handle_sync_command(sync: DocumentationSync, args: argparse.Namespace) -> N
 
 
 def _handle_backup_branch_command(
-    sync: DocumentationSync, args: argparse.Namespace
+    sync: DocumentationSync,
+    args: argparse.Namespace,
 ) -> None:
     """Handle the backup-branch command."""
     # Reserved for future args usage
@@ -746,7 +756,8 @@ def _handle_rollback_command(sync: DocumentationSync, args: argparse.Namespace) 
 
 
 def _handle_maintenance_command(
-    sync: DocumentationSync, args: argparse.Namespace
+    sync: DocumentationSync,
+    args: argparse.Namespace,
 ) -> None:
     """Handle the maintenance command."""
     results = sync.run_maintenance_schedule(args.maintenance)

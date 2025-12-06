@@ -45,7 +45,7 @@ class FlextQualityArchitectureTools(FlextService[bool]):
 
             """
             logger = FlextLogger(__name__)
-            logger.info(f"Analyzing violations for {project_path}")
+            logger.info("Analyzing violations for %s", project_path)
 
             result = FlextQualityModels.AnalysisResult(
                 analysis_id=str(uuid.uuid4()),
@@ -84,13 +84,13 @@ class FlextQualityArchitectureTools(FlextService[bool]):
             logger = FlextLogger(__name__)
 
             if dry_run:
-                logger.info(f"DRY RUN: Would enforce patterns in {project_path}")
+                logger.info("DRY RUN: Would enforce patterns in %s", project_path)
                 return FlextResult[dict[str, object]].ok({
                     "enforced": False,
                     "dry_run": True,
                 })
 
-            logger.info(f"Enforcing patterns in {project_path}")
+            logger.info("Enforcing patterns in %s", project_path)
             return FlextResult[dict[str, object]].ok({"enforced": True})
 
     class ImportTester:
@@ -110,7 +110,7 @@ class FlextQualityArchitectureTools(FlextService[bool]):
 
             """
             logger = FlextLogger(__name__)
-            logger.info(f"Testing cross-project imports in {workspace_path}")
+            logger.info("Testing cross-project imports in %s", workspace_path)
 
             return FlextResult[dict[str, object]].ok({
                 "passed": True,

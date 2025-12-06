@@ -26,7 +26,8 @@ class StyleValidator:
     CONFIG_ARG_INDEX: int = 2
 
     def __init__(
-        self, config_path: str | None = "docs/maintenance/config/style_guide.yaml"
+        self,
+        config_path: str | None = "docs/maintenance/config/style_guide.yaml",
     ) -> None:
         """Initialize style validator with configuration.
 
@@ -80,7 +81,7 @@ class StyleValidator:
         try:
             content = file_path.read_text(encoding="utf-8")
             filename = str(
-                file_path.relative_to(file_path.parents[2])
+                file_path.relative_to(file_path.parents[2]),
             )  # Relative to project root
 
             file_results = {
@@ -101,7 +102,7 @@ class StyleValidator:
 
             # Generate suggestions
             file_results["suggestions"] = self._generate_suggestions(
-                file_results["violations"]
+                file_results["violations"],
             )
 
             # Add to global results
@@ -130,7 +131,8 @@ class StyleValidator:
         for i, line in enumerate(lines, 1):
             # Check for mixed emphasis styles
             if self.config["markdown"]["emphasis_style"] == "*" and re.search(
-                r"(?<!\\)_[^_]+_(?!\\)", line
+                r"(?<!\\)_[^_]+_(?!\\)",
+                line,
             ):
                 # Should not have _emphasis_ if * is preferred
                 violations.append({
@@ -243,7 +245,8 @@ class StyleValidator:
                 }
                 for block in code_blocks
                 if not re.match(
-                    r"```\w+", content[content.find(block) - 10 : content.find(block)]
+                    r"```\w+",
+                    content[content.find(block) - 10 : content.find(block)],
                 )
             )
 
@@ -290,7 +293,9 @@ class StyleValidator:
         # Check for generic link text
         if self.config["accessibility"]["descriptive_links"]:
             generic_links = re.findall(
-                r"\[here|click here|link|read more\]\([^)]+\)", content, re.IGNORECASE
+                r"\[here|click here|link|read more\]\([^)]+\)",
+                content,
+                re.IGNORECASE,
             )
             for link in generic_links:
                 line_num = content[: content.find(link)].count("\n") + 1
@@ -379,7 +384,7 @@ class StyleValidator:
         # Generate suggestions based on violation patterns
         if violation_types.get("emphasis_style", 0) > 0:
             suggestions.append(
-                "Standardize emphasis markers (*bold* and _italic_ vs mixed usage)"
+                "Standardize emphasis markers (*bold* and _italic_ vs mixed usage)",
             )
 
         if violation_types.get("heading_hierarchy", 0) > 0:
@@ -391,7 +396,7 @@ class StyleValidator:
 
         if violation_types.get("missing_alt_text", 0) > 0:
             suggestions.append(
-                "Add descriptive alt text to all images for accessibility"
+                "Add descriptive alt text to all images for accessibility",
             )
 
         if violation_types.get("line_too_long", 0) > self.MAX_LINE_TOO_LONG_VIOLATIONS:
@@ -406,10 +411,10 @@ class StyleValidator:
 
         # Update summary
         self.results["summary"]["total_violations"] = len(
-            self.results["style_violations"]
+            self.results["style_violations"],
         )
         self.results["summary"]["accessibility_issues"] = len(
-            self.results["accessibility_issues"]
+            self.results["accessibility_issues"],
         )
         self.results["summary"]["suggestions_count"] = len(self.results["suggestions"])
 
@@ -461,7 +466,9 @@ Top Issues:
 
         # Show top 5 issues
         sorted_issues = sorted(
-            issue_types.items(), key=operator.itemgetter(1), reverse=True
+            issue_types.items(),
+            key=operator.itemgetter(1),
+            reverse=True,
         )
         for issue_type, count in sorted_issues[:5]:
             report += f"- {issue_type.replace('_', ' ').title()}: {count}\n"
@@ -488,7 +495,8 @@ Top Issues:
 
 
 def validate_file_style(
-    file_path: str, config_path: str | None = None
+    file_path: str,
+    config_path: str | None = None,
 ) -> dict[str, Any]:
     """Convenience function to validate a single file."""
     validator = StyleValidator(config_path)
@@ -496,7 +504,8 @@ def validate_file_style(
 
 
 def validate_files_style(
-    file_paths: list[str], config_path: str | None = None
+    file_paths: list[str],
+    config_path: str | None = None,
 ) -> dict[str, Any]:
     """Convenience function to validate multiple files."""
     validator = StyleValidator(config_path)

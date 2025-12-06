@@ -50,7 +50,9 @@ class FlextQualityBaseService(FlextService[T]):
         return super().__new__(cls)
 
     def __init__(
-        self, config: FlextQualityConfig | None = None, **_data: object
+        self,
+        config: FlextQualityConfig | None = None,
+        **_data: object,
     ) -> None:
         """Initialize base service with standard pattern.
 

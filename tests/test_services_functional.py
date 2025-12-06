@@ -262,7 +262,8 @@ class TestQualityAnalysisServiceFunctional:
         assert "Analysis not found" in result.error
 
     def test_analysis_scores_update_success(
-        self, service: QualityAnalysisService
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test successful scores update - covers lines 177-204."""
         # Create analysis first
@@ -406,7 +407,8 @@ class TestQualityAnalysisServiceFunctional:
             assert analysis.project_id == "project-1"
 
     def test_analyses_listing_empty_result(
-        self, service: QualityAnalysisService
+        self,
+        service: QualityAnalysisService,
     ) -> None:
         """Test list analyses when none exist - covers empty filter case."""
         result = service.list_analyses("non-existent-project")

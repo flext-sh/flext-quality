@@ -29,6 +29,7 @@ from flext_core import (
 
 from .backend_type import BackendType
 from .base import FlextQualityAnalyzer
+from .subprocess_utils import SubprocessUtils
 
 
 class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
@@ -93,7 +94,9 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
             return FlextResult.fail(f"Failed to create temp file: {e}")
 
     def _route_tool_analysis(
-        self, tool: str, file_path: Path
+        self,
+        tool: str,
+        file_path: Path,
     ) -> FlextResult[dict[str, object]]:
         """Route analysis to appropriate tool method."""
         tool_runners = {
@@ -125,7 +128,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
         if not file_path.exists():
             return FlextResult.fail("Invalid file path")
 
-        result = ution.run_external_command(
+        result = SubprocessUtils.run_external_command(
             command,
             capture_output=True,
             timeout=timeout,
@@ -151,7 +154,9 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
         })
 
     def _handle_tool_error(
-        self, error_msg: str, tool_name: str
+        self,
+        error_msg: str,
+        tool_name: str,
     ) -> FlextResult[dict[str, object]]:
         """Handle common tool execution errors."""
         if "not found" in error_msg.lower():
@@ -240,7 +245,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
 
     def _run_coverage(self, file_path: Path) -> FlextResult[dict[str, object]]:
         """Run coverage to measure test coverage."""
-        result = ution.run_external_command(
+        result = SubprocessUtils.run_external_command(
             [
                 "coverage",
                 "run",
@@ -302,7 +307,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
     def _run_radon(self, file_path: Path) -> FlextResult[dict[str, object]]:
         """Run radon for complexity metrics."""
         # First call: complexity
-        result_cc = ution.run_external_command(
+        result_cc = SubprocessUtils.run_external_command(
             ["radon", "cc", str(file_path), "-j"],
             capture_output=True,
             timeout=30.0,
@@ -340,7 +345,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
 
     def _run_radon_maintainability(self, file_path: Path) -> dict[str, object]:
         """Run radon maintainability index analysis."""
-        result_mi = ution.run_external_command(
+        result_mi = SubprocessUtils.run_external_command(
             ["radon", "mi", str(file_path), "-j"],
             capture_output=True,
             timeout=30.0,

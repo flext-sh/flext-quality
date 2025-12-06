@@ -61,14 +61,14 @@ def test_external_backend_empty_outputs(
     temp = _temp_py(tmp_path)
 
     mock_run.return_value = FlextResult.ok(
-        MagicMock(returncode=0, stdout="[]", stderr="")
+        MagicMock(returncode=0, stdout="[]", stderr=""),
     )
     out1 = backend._run_ruff(temp)
     assert out1.is_success
     assert out1.data["issues"] == []
 
     mock_run.return_value = FlextResult.ok(
-        MagicMock(returncode=0, stdout="", stderr="")
+        MagicMock(returncode=0, stdout="", stderr=""),
     )
     out2 = backend._run_mypy(temp)
     assert out2.is_success
@@ -76,7 +76,7 @@ def test_external_backend_empty_outputs(
 
     # Bandit with empty stdout -> default path
     mock_run.return_value = FlextResult.ok(
-        MagicMock(returncode=0, stdout="", stderr="")
+        MagicMock(returncode=0, stdout="", stderr=""),
     )
     out3 = backend._run_bandit(temp)
     assert out3.is_success
@@ -84,7 +84,7 @@ def test_external_backend_empty_outputs(
 
     # Vulture with empty stdout -> issues []
     mock_run.return_value = FlextResult.ok(
-        MagicMock(returncode=0, stdout="[]", stderr="")
+        MagicMock(returncode=0, stdout="[]", stderr=""),
     )
     out4 = backend._run_vulture(temp)
     assert out4.is_success

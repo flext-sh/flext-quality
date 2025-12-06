@@ -164,24 +164,50 @@ class DocumentationAuditor:
         }
 
         if config_path and Path(config_path).exists():
-            with Path(config_path).open(encoding="utf-8") as f:
-                user_config = yaml.safe_load(f)
-                if isinstance(user_config, dict):
-                    # Merge configs safely
-                    for key, value in user_config.items():
-                        if key in default_config:
-                            existing = default_config[key]
-                            if isinstance(existing, dict) and isinstance(value, dict):
-                                # Merge dicts
-                                default_config[key] = {**existing, **value}
-                            elif isinstance(existing, list) and isinstance(value, list):
-                                # Extend lists
-                                default_config[key] = existing + value
-                            else:
-                                # Replace if types don't match
-                                default_config[key] = value
-                        else:
-                            default_config[key] = value
+            user_config = self._load_user_config(config_path)
+            if isinstance(user_config, dict):
+                self._merge_configs(default_config, user_config)
+
+    def _load_user_config(self, config_path: str | Path) -> dict[str, object] | None:
+        """Load user configuration from YAML file.
+
+        Args:
+            config_path: Path to configuration file
+
+        Returns:
+            User configuration dict or None
+
+        """
+        with Path(config_path).open(encoding="utf-8") as f:
+            user_config = yaml.safe_load(f)
+            return user_config if isinstance(user_config, dict) else None
+
+    def _merge_configs(
+        self,
+        default_config: dict[str, object],
+        user_config: dict[str, object],
+    ) -> None:
+        """Merge user config into default config.
+
+        Args:
+            default_config: Default configuration to merge into
+            user_config: User configuration to merge
+
+        """
+        for key, value in user_config.items():
+            if key in default_config:
+                existing = default_config[key]
+                if isinstance(existing, dict) and isinstance(value, dict):
+                    # Merge dicts
+                    default_config[key] = {**existing, **value}
+                elif isinstance(existing, list) and isinstance(value, list):
+                    # Extend lists
+                    default_config[key] = existing + value
+                else:
+                    # Replace if types don't match
+                    default_config[key] = value
+            else:
+                default_config[key] = value
 
         # Extract nested dicts with proper type casting
         audit_dict = default_config.get("audit", {})
@@ -205,7 +231,7 @@ class DocumentationAuditor:
                     max_age_days=int(thresholds_dict.get("max_age_days", 90)),
                     min_quality_score=int(thresholds_dict.get("min_quality_score", 70)),
                     min_completeness_score=int(
-                        thresholds_dict.get("min_completeness_score", 60)
+                        thresholds_dict.get("min_completeness_score", 60),
                     ),
                 ),
             ),
@@ -241,7 +267,7 @@ class DocumentationAuditor:
                         "url": None,
                         "line_number": None,
                         "severity": "error",
-                    }
+                    },
                 ],
                 warnings=[],
                 suggestions=[],
@@ -271,7 +297,9 @@ class DocumentationAuditor:
 
         # Quality analysis
         quality_score = self._calculate_quality_score(
-            freshness_score, completeness_score, structure_score
+            freshness_score,
+            completeness_score,
+            structure_score,
         )
 
         # Issue detection
@@ -304,7 +332,7 @@ class DocumentationAuditor:
                     1
                     - (age_days - EXCELLENT_FRESHNESS_DAYS)
                     / (max_age - EXCELLENT_FRESHNESS_DAYS)
-                )
+                ),
             )
         return max(0, int(50 * (1 - (age_days - max_age) / max_age)))
 
@@ -324,7 +352,9 @@ class DocumentationAuditor:
         found_sections = 0
         for section in required_sections:
             if re.search(
-                rf"^#+\s*{re.escape(section)}", content, re.MULTILINE | re.IGNORECASE
+                rf"^#+\s*{re.escape(section)}",
+                content,
+                re.MULTILINE | re.IGNORECASE,
             ):
                 found_sections += 1
 
@@ -372,7 +402,10 @@ class DocumentationAuditor:
         return max(0, score)
 
     def _calculate_quality_score(
-        self, freshness: int, completeness: int, structure: int
+        self,
+        freshness: int,
+        completeness: int,
+        structure: int,
     ) -> int:
         """Calculate overall quality score."""
         return int((freshness * 0.3) + (completeness * 0.4) + (structure * 0.3))
@@ -445,7 +478,10 @@ class DocumentationAuditor:
                 })
 
     def audit_directory(
-        self, directory: str, *, recursive: bool = True
+        self,
+        directory: str,
+        *,
+        recursive: bool = True,
     ) -> list[AuditResult]:
         """Audit all documentation files in a directory."""
         results = []
@@ -576,16 +612,21 @@ class DocumentationAuditor:
 def main() -> None:
     """Main entry point for the documentation audit system."""
     parser = argparse.ArgumentParser(
-        description="Documentation Content Quality Audit System"
+        description="Documentation Content Quality Audit System",
     )
     parser.add_argument("directory", help="Directory to audit")
     parser.add_argument("--config", help="Configuration file path")
     parser.add_argument("--output", "-o", help="Output file path")
     parser.add_argument(
-        "--format", choices=["json", "yaml"], default="json", help="Output format"
+        "--format",
+        choices=["json", "yaml"],
+        default="json",
+        help="Output format",
     )
     parser.add_argument(
-        "--comprehensive", action="store_true", help="Run complete audit"
+        "--comprehensive",
+        action="store_true",
+        help="Run complete audit",
     )
     parser.add_argument("--quick", action="store_true", help="Run quick audit")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
@@ -613,7 +654,9 @@ def main() -> None:
         pass
 
     for _category, _count in sorted(
-        summary.issues_by_category.items(), key=operator.itemgetter(1), reverse=True
+        summary.issues_by_category.items(),
+        key=operator.itemgetter(1),
+        reverse=True,
     )[:5]:
         pass
 

@@ -698,7 +698,8 @@ class TestCLIIntegration:
         assert result == 0
 
     def test_complete_end_to_end_score_flow(
-        self, temporary_project_structure: str
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test complete end-to-end score flow."""
         # This test uses real implementations without mocking
@@ -710,7 +711,8 @@ class TestCLIIntegration:
         assert result in {0, 1}  # Valid return codes
 
     def test_main_function_integration_no_mocking(
-        self, temporary_project_structure: str
+        self,
+        temporary_project_structure: str,
     ) -> None:
         """Test main function integration without mocking."""
         test_args = ["flext-quality", "analyze", temporary_project_structure]

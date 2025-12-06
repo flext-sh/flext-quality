@@ -61,7 +61,8 @@ class DuplicationIssueModel(BaseModel):
     issue_type: str = Field(default="duplication")
     severity: str = Field(default="medium")
     message: str = Field(
-        default="Duplicate code detected", description="Issue description"
+        default="Duplicate code detected",
+        description="Issue description",
     )
     rule_id: str | None = Field(default=None)
 
@@ -213,7 +214,9 @@ class FlextQualityAnalyzer(FlextService):
 
         # Analyze each file
         metrics_result = self._FileAnalysisHelper.analyze_files(
-            python_files, options, self.logger
+            python_files,
+            options,
+            self.logger,
         )
         if metrics_result.is_failure:
             return FlextResult.fail(f"File analysis failed: {metrics_result.error}")
@@ -229,7 +232,8 @@ class FlextQualityAnalyzer(FlextService):
 
         # Create final results
         results_result = self._ResultsBuilder.create_analysis_results(
-            metrics_data, duplication_issues
+            metrics_data,
+            duplication_issues,
         )
         if results_result.is_failure:
             return FlextResult.fail(f"Results creation failed: {results_result.error}")
@@ -293,7 +297,8 @@ class FlextQualityAnalyzer(FlextService):
 
             for file_path in python_files:
                 result = FlextQualityAnalyzer._FileAnalysisHelper.analyze_single_file(
-                    file_path, options
+                    file_path,
+                    options,
                 )
                 if result.is_success:
                     metrics = result.value
@@ -309,12 +314,13 @@ class FlextQualityAnalyzer(FlextService):
                     total_lines=total_lines,
                     file_metrics=file_metrics,
                     analysis_errors=analysis_errors,
-                )
+                ),
             )
 
         @staticmethod
         def analyze_single_file(
-            file_path: Path, options: AnalysisOptions
+            file_path: Path,
+            options: AnalysisOptions,
         ) -> FlextResult[FileMetricsModel]:
             """Analyze single file - delegates to specialized analyzers."""
             try:
@@ -332,15 +338,16 @@ class FlextQualityAnalyzer(FlextService):
                 )
                 issues.extend(
                     FlextQualityAnalyzer._ComplexityAnalyzer.find_issues(
-                        file_path, complexity_score
+                        file_path,
+                        complexity_score,
                     )
                     if options.include_complexity
-                    else []
+                    else [],
                 )
                 issues.extend(
                     FlextQualityAnalyzer._DeadCodeAnalyzer.analyze(tree, file_path)
                     if options.include_dead_code
-                    else []
+                    else [],
                 )
 
                 # Create validated FileMetricsModel - NO DICT CONVERSION
@@ -383,7 +390,8 @@ class FlextQualityAnalyzer(FlextService):
 
         @staticmethod
         def find_issues(
-            file_path: Path, complexity_score: float
+            file_path: Path,
+            complexity_score: float,
         ) -> list[FlextQualityModels.CodeIssue]:
             """Find complexity issues."""
             if complexity_score > FlextQualityConstants.Complexity.MAX_COMPLEXITY:
@@ -397,7 +405,7 @@ class FlextQualityAnalyzer(FlextService):
                         severity=FlextQualityModels.IssueSeverity.MEDIUM,
                         message=f"High complexity: {complexity_score:.1f}",
                         rule_id="complexity_check",
-                    )
+                    ),
                 ]
             return []
 
@@ -408,14 +416,17 @@ class FlextQualityAnalyzer(FlextService):
 
         @staticmethod
         def analyze(
-            tree: ast.AST, file_path: Path
+            tree: ast.AST,
+            file_path: Path,
         ) -> list[FlextQualityModels.CodeIssue]:
             r"""Analyze security issues using Bandit backend."""
             # Reserved for future AST-based analysis
             _ = tree  # Reserved for future use
             try:
                 result = FlextQualityAnalyzer._SecurityAnalyzer.backend.analyze(
-                    "", _file_path=file_path, tool="bandit"
+                    "",
+                    _file_path=file_path,
+                    tool="bandit",
                 )
                 if not result.is_success or "issues" not in result.value:
                     return []
@@ -435,13 +446,13 @@ class FlextQualityAnalyzer(FlextService):
                             severity=validated.severity,
                             message=validated.message,
                             rule_id=validated.test_id,
-                        )
+                        ),
                     )
                 return validated_issues
             except Exception as e:
                 # Log the error and allow graceful degradation
                 logger = FlextLogger(__name__)
-                logger.warning(f"Security analysis with Bandit failed: {e}")
+                logger.warning("Security analysis with Bandit failed: %s", e)
                 # Return empty list - security analysis is best-effort
                 return []
 
@@ -452,14 +463,17 @@ class FlextQualityAnalyzer(FlextService):
 
         @staticmethod
         def analyze(
-            tree: ast.AST, file_path: Path
+            tree: ast.AST,
+            file_path: Path,
         ) -> list[FlextQualityModels.CodeIssue]:
             """Analyze dead code - external backend only."""
             # AST-based analysis not implemented - use external backend
             _ = tree  # Reserved for future AST-based analysis
             try:
                 result = FlextQualityAnalyzer._DeadCodeAnalyzer.backend.analyze(
-                    "", _file_path=file_path, tool="vulture"
+                    "",
+                    _file_path=file_path,
+                    tool="vulture",
                 )
                 if not result.is_success or "issues" not in result.value:
                     return []
@@ -479,12 +493,12 @@ class FlextQualityAnalyzer(FlextService):
                             severity=FlextQualityModels.IssueSeverity.LOW,
                             message=f"Unused {validated.type}",
                             rule_id="dead_code",
-                        )
+                        ),
                     )
                 return validated_issues
             except Exception as e:
                 logger = FlextLogger(__name__)
-                logger.debug(f"Dead code analysis with Vulture failed: {e}")
+                logger.debug("Dead code analysis with Vulture failed: %s", e)
                 # Return empty list - dead code analysis is best-effort
                 return []
 
@@ -524,7 +538,8 @@ class FlextQualityAnalyzer(FlextService):
                     for i, f1 in enumerate(file_list)
                     for f2 in file_list[i + 1 :]
                     if FlextQualityAnalyzer._DuplicationAnalyzer.has_duplication(
-                        file_contents[f1], file_contents[f2]
+                        file_contents[f1],
+                        file_contents[f2],
                     )
                 ]
                 return FlextResult.ok(issues)
@@ -599,7 +614,8 @@ class FlextQualityAnalyzer(FlextService):
                     else 0.0
                 )
                 overall_score = max(
-                    0.0, 100.0 - (security_count * 10 + complexity_count * 5)
+                    0.0,
+                    100.0 - (security_count * 10 + complexity_count * 5),
                 )
 
                 # Build recommendations based on actual issues found
@@ -632,7 +648,7 @@ class FlextQualityAnalyzer(FlextService):
                         security_score=max(0.0, 100.0 - (security_count * 10)),
                         coverage_score=max(0.0, 100.0 - (dead_code_count * 8)),
                         quality_grade="B",
-                    )
+                    ),
                 )
             except Exception as e:
                 return FlextResult.fail(f"Results creation error: {e}")

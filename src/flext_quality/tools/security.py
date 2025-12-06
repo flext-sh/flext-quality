@@ -24,7 +24,7 @@ class FlextSecurityService(FlextService[dict[str, str]]):
         path = Path(vault_path).expanduser()
         if not path.exists():
             return FlextResult[dict[str, str]].fail(
-                f"Vault path does not exist: {path}"
+                f"Vault path does not exist: {path}",
             )
 
         return FlextResult[dict[str, str]].ok({

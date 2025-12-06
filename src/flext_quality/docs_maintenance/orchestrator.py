@@ -19,8 +19,10 @@ def _resolve_profile_module(profile: str) -> str:
 
 
 def _load_profile_handler(
-    profile: str, module_name: str, attributes: tuple[str, ...]
-) -> Callable[..., Any]:
+    profile: str,
+    module_name: str,
+    attributes: tuple[str, ...],
+) -> Callable[..., object]:
     """Load the first available callable for a maintenance command."""
     module_path = _resolve_profile_module(profile)
     module = import_module(f"{module_path}.{module_name}")

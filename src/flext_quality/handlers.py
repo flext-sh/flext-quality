@@ -28,7 +28,7 @@ class ObservabilityConfig(BaseModel):
 
     service_name: str = Field(default="flext-quality")
     log_level: FlextQualityConstants.Literals.LogLevelLiteral | str = Field(
-        default="info"
+        default="info",
     )
     enable_traces: bool = Field(default=True)
 
@@ -84,7 +84,7 @@ class FlextQualityHandlers:
             logger = FlextLogger(__name__)
             logger_method = getattr(logger, level.lower(), logger.info)
             logger_method(
-                f"{message} | project_id={context.project_id} operation={context.operation}"
+                f"{message} | project_id={context.project_id} operation={context.operation}",
             )
 
         @staticmethod
@@ -110,7 +110,7 @@ class FlextQualityHandlers:
             """Execute project analysis."""
             project_id_str = str(project_id)
             return services.get_analysis_service().create_analysis(
-                project_id=project_id_str
+                project_id=project_id_str,
             )
 
     class _ReportOrchestrator:
@@ -134,7 +134,8 @@ class FlextQualityHandlers:
     # =====================================================================
 
     def analyze_project(
-        self, project_id: UUID
+        self,
+        project_id: UUID,
     ) -> FlextResult[FlextQualityModels.Analysis]:
         """Analyze project with observability."""
         context = HandlerContext(
@@ -143,10 +144,13 @@ class FlextQualityHandlers:
         )
 
         self._ObservabilityManager.trace_operation(
-            "analyze_project", self.config.service_name
+            "analyze_project",
+            self.config.service_name,
         )
         self._ObservabilityManager.log_operation(
-            "Starting project analysis", "info", context
+            "Starting project analysis",
+            "info",
+            context,
         )
 
         return (
@@ -156,7 +160,8 @@ class FlextQualityHandlers:
         )
 
     def generate_report(
-        self, analysis_id: UUID
+        self,
+        analysis_id: UUID,
     ) -> FlextResult[FlextQualityModels.Report]:
         """Generate report with observability."""
         context = HandlerContext(
@@ -165,14 +170,18 @@ class FlextQualityHandlers:
         )
 
         self._ObservabilityManager.trace_operation(
-            "generate_report", self.config.service_name
+            "generate_report",
+            self.config.service_name,
         )
         self._ObservabilityManager.log_operation(
-            "Starting report generation", "info", context
+            "Starting report generation",
+            "info",
+            context,
         )
 
         return self._ReportOrchestrator.execute_report_generation(
-            analysis_id, self._services
+            analysis_id,
+            self._services,
         ).map_error(lambda e: self._log_error(context, e))
 
     # =====================================================================
@@ -182,7 +191,9 @@ class FlextQualityHandlers:
     def _log_error(self, context: HandlerContext, error: str) -> str:
         """Log and return error."""
         self._ObservabilityManager.log_operation(
-            f"Operation failed: {error}", "error", context
+            f"Operation failed: {error}",
+            "error",
+            context,
         )
         self._logger.error(f"Handler error in {context.operation}: {error}")
         return error

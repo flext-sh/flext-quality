@@ -10,6 +10,7 @@ import json
 import operator
 import os
 import re
+import time
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import TypedDict
@@ -133,7 +134,7 @@ class ContentOptimizer:
                     "defininig": "defining",
                     "configuraiton": "configuration",
                     "documenation": "documentation",
-                }
+                },
             },
         }
 
@@ -149,7 +150,10 @@ class ContentOptimizer:
         return default_config
 
     def optimize_file(
-        self, file_path: str, *, dry_run: bool = False
+        self,
+        file_path: str,
+        *,
+        dry_run: bool = False,
     ) -> OptimizationResult:
         """Optimize a single documentation file."""
         try:
@@ -167,7 +171,7 @@ class ContentOptimizer:
                         "description": f"Failed to read file: {e}",
                         "line_number": None,
                         "severity": "error",
-                    }
+                    },
                 ],
             )
 
@@ -415,7 +419,9 @@ class ContentOptimizer:
         """Check if document already has a table of contents."""
         return (
             re.search(
-                r"## Table of Contents|## Contents|## TOC", content, re.IGNORECASE
+                r"## Table of Contents|## Contents|## TOC",
+                content,
+                re.IGNORECASE,
             )
             is not None
         )
@@ -469,7 +475,10 @@ class ContentOptimizer:
             return None
 
     def optimize_directory(
-        self, directory: str, *, dry_run: bool = False
+        self,
+        directory: str,
+        *,
+        dry_run: bool = False,
     ) -> list[OptimizationResult]:
         """Optimize all files in a directory."""
         results = []
@@ -493,7 +502,8 @@ class ContentOptimizer:
         return ".git" in path or "node_modules" in path or "backups" in path
 
     def generate_summary(
-        self, results: list[OptimizationResult]
+        self,
+        results: list[OptimizationResult],
     ) -> OptimizationSummary:
         """Generate summary of optimization results."""
         total_files = len(results)
@@ -526,8 +536,25 @@ class ContentOptimizer:
 
 def main() -> None:
     """Main entry point for documentation optimization system."""
+    args = _parse_optimize_args()
+    optimizer = ContentOptimizer(args.config)
+
+    results = optimizer.optimize_directory(args.directory, dry_run=args.dry_run)
+    summary = optimizer.generate_summary(results)
+
+    _save_optimization_results(args.output, results, summary)
+    _print_optimization_summary(summary, results, args)
+
+
+def _parse_optimize_args() -> argparse.Namespace:
+    """Parse command line arguments for optimization.
+
+    Returns:
+        Parsed arguments namespace
+
+    """
     parser = argparse.ArgumentParser(
-        description="Documentation Content Optimization and Enhancement System"
+        description="Documentation Content Optimization and Enhancement System",
     )
     parser.add_argument("directory", help="Directory to optimize")
     parser.add_argument("--config", help="Configuration file path")
@@ -538,10 +565,14 @@ def main() -> None:
         help="Show what would be changed without making changes",
     )
     parser.add_argument(
-        "--enhance-all", action="store_true", help="Apply all available optimizations"
+        "--enhance-all",
+        action="store_true",
+        help="Apply all available optimizations",
     )
     parser.add_argument(
-        "--fix-typos", action="store_true", help="Only fix common typos"
+        "--fix-typos",
+        action="store_true",
+        help="Only fix common typos",
     )
     parser.add_argument(
         "--add-toc",
@@ -549,45 +580,64 @@ def main() -> None:
         help="Only add table of contents to long documents",
     )
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
+    return parser.parse_args()
 
-    args = parser.parse_args()
 
-    optimizer = ContentOptimizer(args.config)
+def _save_optimization_results(
+    output_path: str | None,
+    results: list[object],
+    summary: object,
+) -> None:
+    """Save optimization results to file.
 
-    if args.verbose:
-        pass
+    Args:
+        output_path: Path to output file
+        results: Optimization results
+        summary: Summary object
 
-    results = optimizer.optimize_directory(args.directory, dry_run=args.dry_run)
-    summary = optimizer.generate_summary(results)
+    """
+    if not output_path:
+        return
 
-    if args.output:
-        output_data = {
-            "timestamp": __import__("time").time(),
-            "summary": asdict(summary),
-            "results": [asdict(r) for r in results],
-        }
-        with Path(args.output).open("w", encoding="utf-8") as f:
-            json.dump(output_data, f, indent=2, default=str)
+    output_data = {
+        "timestamp": time.time(),
+        "summary": asdict(summary),
+        "results": [asdict(r) for r in results],
+    }
+    with Path(output_path).open("w", encoding="utf-8") as f:
+        json.dump(output_data, f, indent=2, default=str)
 
-    # Print summary
 
+def _print_optimization_summary(
+    summary: object,
+    results: list[object],
+    args: argparse.Namespace,
+) -> None:
+    """Print optimization summary.
+
+    Args:
+        summary: Summary object
+        results: Optimization results
+        args: Command line arguments
+
+    """
     if summary.optimizations_by_type:
         for _opt_type, _count in sorted(
             summary.optimizations_by_type.items(),
             key=operator.itemgetter(1),
             reverse=True,
         ):
-            pass
+            _ = (_opt_type, _count)  # Process if needed
 
     if summary.backup_files_created and args.verbose:
         for _file_path in summary.backup_files_created[:5]:
-            pass
+            _ = _file_path  # Process if needed
 
-    (
-        summary.files_modified / summary.total_files * 100
-    ) if summary.total_files > 0 else 0
-    if args.dry_run:
-        pass
+    _ = (
+        (summary.files_modified / summary.total_files * 100)
+        if summary.total_files > 0
+        else 0
+    )
 
     # Show files with most changes
     if args.verbose and results:
@@ -599,7 +649,7 @@ def main() -> None:
 
         if files_by_changes:
             for _file_path, _changes in files_by_changes[:5]:
-                pass
+                _ = (_file_path, _changes)  # Process if needed
 
 
 if __name__ == "__main__":

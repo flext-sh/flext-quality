@@ -43,7 +43,7 @@ class FlextQualityDependencyTools(FlextService[bool]):
 
             """
             logger = FlextLogger(__name__)
-            logger.info(f"Analyzing dependencies for {project_path}")
+            logger.info("Analyzing dependencies for %s", project_path)
 
             # Placeholder implementation - would use poetry/pip inspection
             return FlextResult[list[FlextQualityModels.DependencyInfo]].ok([])
@@ -70,13 +70,13 @@ class FlextQualityDependencyTools(FlextService[bool]):
             logger: FlextLogger = FlextLogger(__name__)
 
             if dry_run:
-                logger.info(f"DRY RUN: Would consolidate deps in {workspace_path}")
+                logger.info("DRY RUN: Would consolidate deps in %s", workspace_path)
                 return FlextResult[dict[str, object]].ok({
                     "consolidated": False,
                     "dry_run": True,
                 })
 
-            logger.info(f"Consolidating dependencies in {workspace_path}")
+            logger.info("Consolidating dependencies in %s", workspace_path)
             return FlextResult[dict[str, object]].ok({"consolidated": True})
 
     class PoetryOperations:
@@ -96,7 +96,7 @@ class FlextQualityDependencyTools(FlextService[bool]):
 
             """
             logger = FlextLogger(__name__)
-            logger.info(f"Syncing poetry.lock for {project_path}")
+            logger.info("Syncing poetry.lock for %s", project_path)
 
             # Placeholder implementation - would run poetry lock
             return FlextResult[dict[str, object]].ok({"synced": True})

@@ -26,6 +26,8 @@ from mypy import api
 from radon.complexity import cc_visit
 from vulture import Vulture
 
+from flext_quality.subprocess_utils import SubprocessUtils
+
 
 class FlextQualityPythonTools:
     """Direct integration with Python quality tools via library imports.
@@ -65,7 +67,7 @@ class FlextQualityPythonTools:
                 return FlextResult.fail(f"Invalid path for Ruff analysis: {path}")
 
             # Use uexecution with threading-based timeout
-            result = ution.run_external_command(
+            result = SubprocessUtils.run_external_command(
                 ["ruff", "check", str(path), "--output-format=json"],
                 capture_output=True,
                 timeout=60,
@@ -170,7 +172,7 @@ class FlextQualityPythonTools:
         try:
             # Use uexecution with threading-based timeout
             # (Pylint doesn't expose clean Python API, use subprocess via u
-            result = ution.run_external_command(
+            result = SubprocessUtils.run_external_command(
                 ["pylint", str(path), "--output-format=json"],
                 capture_output=True,
                 timeout=60,

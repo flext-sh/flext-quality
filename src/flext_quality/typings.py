@@ -134,7 +134,8 @@ class FlextQualityTypes:
         type ToolChain = list[dict[str, str | dict[str, object]]]
         type ToolMetrics = dict[str, float | int | dict[str, object]]
         type ToolIntegrationConfig = dict[
-            str, str | bool | list[str] | dict[str, object]
+            str,
+            str | bool | list[str] | dict[str, object],
         ]
 
     # =========================================================================

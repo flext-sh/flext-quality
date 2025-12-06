@@ -81,7 +81,9 @@ class ReportData(BaseModel):
     total_issues: int = Field(ge=0, description="Total number of issues")
     files_analyzed: int = Field(ge=0, description="Number of files analyzed")
     coverage_percent: float = Field(
-        ge=0.0, le=100.0, description="Test coverage percentage"
+        ge=0.0,
+        le=100.0,
+        description="Test coverage percentage",
     )
 
 
@@ -150,7 +152,7 @@ class RecommendationGenerator:
         recommendations: list[str] = []
 
         critical = len(results.security_issues or []) + len(
-            results.complexity_issues or []
+            results.complexity_issues or [],
         )
         total = (
             len(results.security_issues or [])
@@ -167,11 +169,11 @@ class RecommendationGenerator:
 
         if critical > 0:
             recommendations.append(
-                f"Fix {critical} critical security/error issues immediately"
+                f"Fix {critical} critical security/error issues immediately",
             )
         if total > thresholds.high_issue_threshold:
             recommendations.append(
-                "Consider breaking down large files and reducing complexity"
+                "Consider breaking down large files and reducing complexity",
             )
         if score < thresholds.min_score_threshold:
             recommendations.extend([
@@ -180,7 +182,7 @@ class RecommendationGenerator:
             ])
         if coverage < thresholds.min_coverage_threshold:
             recommendations.append(
-                f"Increase test coverage from {coverage:.1f}% to at least {thresholds.min_coverage_threshold}%"
+                f"Increase test coverage from {coverage:.1f}% to at least {thresholds.min_coverage_threshold}%",
             )
         if results.duplication_issues:
             recommendations.append("Refactor duplicate code to improve maintainability")
@@ -215,7 +217,7 @@ class TextReportBuilder:
         duplication_issues = results.duplication_issues or []
 
         critical = ScoreCalculator.count_critical_issues(
-            security_issues + complexity_issues
+            security_issues + complexity_issues,
         )
         total = (
             len(security_issues)
@@ -295,7 +297,7 @@ class JsonReportBuilder:
         duplication_issues = results.duplication_issues or []
 
         critical = ScoreCalculator.count_critical_issues(
-            security_issues + complexity_issues
+            security_issues + complexity_issues,
         )
         total = (
             len(security_issues)
@@ -356,7 +358,7 @@ class HtmlReportBuilder:
         duplication_issues = results.duplication_issues or []
 
         critical = ScoreCalculator.count_critical_issues(
-            security_issues + complexity_issues
+            security_issues + complexity_issues,
         )
         total = (
             len(security_issues)
@@ -441,12 +443,12 @@ class HtmlReportBuilder:
                         f" (line {issue.line_number})" if issue.line_number else ""
                     )
                     lines.append(
-                        f'        <div class="issue {severity_class}"><strong>{issue.file_path}{line_info}:</strong> {issue.message}</div>'
+                        f'        <div class="issue {severity_class}"><strong>{issue.file_path}{line_info}:</strong> {issue.message}</div>',
                     )
                 if len(issues) > thresholds.html_issue_limit:
                     remaining = len(issues) - thresholds.html_issue_limit
                     lines.append(
-                        f'        <div class="issue">... and {remaining} more issues</div>'
+                        f'        <div class="issue">... and {remaining} more issues</div>',
                     )
                 lines.append("    </div>")
 
@@ -518,7 +520,7 @@ class FlextQualityReportGenerator:
 
         if report_result.is_failure:
             return FlextResult[bool].fail(
-                f"Failed to generate report: {report_result.error}"
+                f"Failed to generate report: {report_result.error}",
             )
 
         content = report_result.value

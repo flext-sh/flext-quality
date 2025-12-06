@@ -13,20 +13,24 @@ class FlextQualityExceptions:
     """Quality-specific exception namespace using FlextExceptions from flext-core.
 
     All exceptions extend FlextExceptions.BaseError with quality-specific context.
-    Uses composition pattern - delegates to FlextExceptions for all functionality.
+    Uses real inheritance to expose the full hierarchy.
     """
 
-    # Base exception - use FlextExceptions.BaseError directly
-    Base = FlextExceptions.BaseError
+    # Base exception - real inheritance from FlextExceptions.BaseError
+    class Base(FlextExceptions.BaseError):
+        """Base exception for quality operations - real inheritance from BaseError."""
 
-    # Analysis errors - use OperationError with analysis context
-    Analysis = FlextExceptions.OperationError
+    # Analysis errors - real inheritance from OperationError with analysis context
+    class Analysis(FlextExceptions.OperationError):
+        """Analysis error for quality operations - inherits from OperationError."""
 
-    # Configuration errors - use ConfigurationError directly
-    Config = FlextExceptions.ConfigurationError
+    # Configuration errors - real inheritance from ConfigurationError
+    class Config(FlextExceptions.ConfigurationError):
+        """Configuration error - real inheritance from ConfigurationError."""
 
-    # Model errors - use ValidationError for model validation failures
-    Model = FlextExceptions.ValidationError
+    # Model errors - real inheritance from ValidationError for model validation failures
+    class Model(FlextExceptions.ValidationError):
+        """Model validation error - real inheritance from ValidationError."""
 
     # Convenience factory methods for quality-specific exceptions
     @staticmethod
@@ -34,9 +38,9 @@ class FlextQualityExceptions:
         message: str,
         operation: str | None = None,
         **kwargs: object,
-    ) -> FlextExceptions.OperationError:
+    ) -> FlextQualityExceptions.Analysis:
         """Create analysis error with quality-specific context."""
-        return FlextExceptions.OperationError(
+        return FlextQualityExceptions.Analysis(
             message,
             operation=operation or "quality_analysis",
             **kwargs,
@@ -47,9 +51,9 @@ class FlextQualityExceptions:
         message: str,
         config_key: str | None = None,
         **kwargs: object,
-    ) -> FlextExceptions.ConfigurationError:
+    ) -> FlextQualityExceptions.Config:
         """Create configuration error with quality-specific context."""
-        return FlextExceptions.ConfigurationError(
+        return FlextQualityExceptions.Config(
             message,
             config_key=config_key,
             **kwargs,
@@ -60,9 +64,9 @@ class FlextQualityExceptions:
         message: str,
         field: str | None = None,
         **kwargs: object,
-    ) -> FlextExceptions.ValidationError:
+    ) -> FlextQualityExceptions.Model:
         """Create model validation error with quality-specific context."""
-        return FlextExceptions.ValidationError(
+        return FlextQualityExceptions.Model(
             message,
             field=field,
             **kwargs,

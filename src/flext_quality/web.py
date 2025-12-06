@@ -111,7 +111,7 @@ class FlextQualityWeb:
 
         # Dashboard endpoint (public)
         self.app.get("/quality", response_class=HTMLResponse, tags=["Dashboard"])(
-            self.quality_dashboard
+            self.quality_dashboard,
         )
 
         # API endpoints (require authentication via middleware)
@@ -238,7 +238,8 @@ class FlextQualityWeb:
 
             if analysis_result.is_failure:
                 raise HTTPException(
-                    status_code=500, detail=f"Analysis failed: {analysis_result.error}"
+                    status_code=500,
+                    detail=f"Analysis failed: {analysis_result.error}",
                 )
 
             result = analysis_result.value
@@ -259,13 +260,19 @@ class FlextQualityWeb:
                 "issues": getattr(result, "total_issues", 0),
                 "metrics": {
                     "quality_score": getattr(
-                        result.overall_metrics, "quality_score", 0.0
+                        result.overall_metrics,
+                        "quality_score",
+                        0.0,
                     ),
                     "security_score": getattr(
-                        result.overall_metrics, "security_score", 0.0
+                        result.overall_metrics,
+                        "security_score",
+                        0.0,
                     ),
                     "coverage_score": getattr(
-                        result.overall_metrics, "coverage_score", 0.0
+                        result.overall_metrics,
+                        "coverage_score",
+                        0.0,
                     ),
                 },
             },
