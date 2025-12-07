@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import subprocess  # noqa: S404
+import subprocess
 import threading
 from dataclasses import dataclass
 from pathlib import Path
@@ -63,7 +63,7 @@ class SubprocessUtils:
         def run_command() -> None:
             try:
                 # Command is a list[str] from internal code, not user input - safe to execute
-                proc = subprocess.run(  # noqa: S603
+                proc = subprocess.run(
                     command,
                     capture_output=capture_output,
                     text=True,

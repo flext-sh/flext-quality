@@ -9,7 +9,7 @@ from __future__ import annotations
 import ast
 import uuid
 from pathlib import Path
-from typing import Self, TypedDict
+from typing import ClassVar, Self, TypedDict
 from uuid import UUID, uuid4
 
 from flext_core import (
@@ -136,7 +136,7 @@ class FileMetricsData(BaseModel):
 class FlextQualityAnalyzer(FlextService):
     """Main quality analyzer orchestrating focused analysis utilities."""
 
-    auto_execute = False
+    auto_execute: ClassVar[bool] = False
     project_path: Path = Path()
 
     def __new__(
@@ -174,7 +174,10 @@ class FlextQualityAnalyzer(FlextService):
         """
         super().__init__()
         self.project_path = Path(project_path) if project_path is not None else Path()
-        self._config = config if config is not None else FlextQualityConfig()
+        # Use object.__setattr__ to bypass Pydantic's custom __setattr__ for private attributes
+        object.__setattr__(
+            self, "_config", config if config is not None else FlextQualityConfig()
+        )
         self._logger = FlextLogger(__name__)
         self._current_results: FlextQualityModels.AnalysisResults | None = None
 

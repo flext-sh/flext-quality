@@ -54,7 +54,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import override
+from typing import ClassVar, override
 from uuid import NAMESPACE_DNS, UUID, uuid5
 
 from flext_core import FlextLogger, FlextResult
@@ -76,7 +76,7 @@ class FlextQualityServices(FlextQualityBaseService[bool]):
     """
 
     # FlextService V2: Property pattern (auto_execute=False)
-    auto_execute = False
+    auto_execute: ClassVar[bool] = False
 
     @override
     def execute(self, data: object = None) -> FlextResult[bool]:

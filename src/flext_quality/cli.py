@@ -373,7 +373,10 @@ class FlextQualityCliService(FlextService[int]):
     def __init__(self, config: CliConfig | None = None, **_data: object) -> None:
         """Initialize CLI service with optional config."""
         super().__init__()
-        self._config = config if config is not None else CliConfig()
+        # Use object.__setattr__ to bypass Pydantic's custom __setattr__ for private attributes
+        object.__setattr__(
+            self, "_config", config if config is not None else CliConfig()
+        )
         self._router = CliCommandRouter(self.logger, self._config)
 
     def get_router(self) -> CliCommandRouter:

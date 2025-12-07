@@ -50,7 +50,8 @@ class FlextQualityIntegrations(FlextService[bool]):
     def __init__(self, config: ApiClientConfig | None = None) -> None:
         """Initialize quality integrations."""
         super().__init__()
-        self._config = config or ApiClientConfig()
+        # Use object.__setattr__ to bypass Pydantic's custom __setattr__ for private attributes
+        object.__setattr__(self, "_config", config or ApiClientConfig())
         self._api_config = FlextApiConfig(**self._config.model_dump())
         self._api_client = FlextApiClient(config=self._api_config)
         self._logger = FlextLogger(__name__)

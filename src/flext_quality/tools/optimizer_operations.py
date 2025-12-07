@@ -382,10 +382,11 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         """
         super().__init__()
         # Must provide config explicitly - no fallback patterns allowed
+        # Use object.__setattr__ to bypass Pydantic's custom __setattr__ for private attributes
         if config is None:
-            self._config = OptimizerConfig()
+            object.__setattr__(self, "_config", OptimizerConfig())
         else:
-            self._config = config
+            object.__setattr__(self, "_config", config)
         self._logger = FlextLogger(__name__)
 
     def execute(self) -> FlextResult[bool]:

@@ -17,6 +17,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Literal, TypeVar
 
+from flext_core import t
 from pydantic import Field
 
 # =============================================================================
@@ -40,7 +41,7 @@ type PositiveInt = Annotated[int, Field(ge=1)]
 
 
 # Quality domain TypeVars
-class FlextQualityTypes:
+class FlextQualityTypes(t):
     """Quality analysis-specific type definitions extending t.
 
     Domain-specific type system for code quality analysis operations.
@@ -142,7 +143,7 @@ class FlextQualityTypes:
     # CORE TYPES - Essential Quality types extending t
     # =========================================================================
 
-    class Core:
+    class QualityCore:
         """Core Quality analysis types.
 
         Essential domain-specific types for quality analysis operations.
@@ -214,16 +215,40 @@ class FlextQualityTypes:
         type Thresholds = dict[str, bool | str | dict[str, object]]
         type MetricsConfig = dict[str, object]
 
+    class Quality:
+        """Quality types namespace for cross-project access.
 
-# =============================================================================
-# PUBLIC API EXPORTS - Quality TypeVars and types
-# =============================================================================
+        Provides organized access to all Quality types for other FLEXT projects.
+        Usage: Other projects can reference `t.Quality.Analysis.*`, `t.Quality.Project.*`, etc.
+        This enables consistent namespace patterns for cross-project type access.
 
-__all__: list[str] = [
+        Examples:
+            from flext_quality.typings import t
+            config: t.Quality.Analysis.AnalysisConfiguration = ...
+            score: t.Quality.Code.QualityScore = ...
+
+        Note: Namespace composition via inheritance - no aliases needed.
+        Access parent namespaces directly through inheritance.
+
+        """
+
+
+# Alias for simplified usage
+t = FlextQualityTypes
+
+# Namespace composition via class inheritance
+# Quality namespace provides access to nested classes through inheritance
+# Access patterns:
+# - t.Quality.* for Quality-specific types
+# - t.Project.* for project types
+# - t.Core.* for core types (inherited from parent)
+
+__all__ = [
     "FlextQualityTypes",
     "ScoreRange",
     "ScoreT",
     # Module-level type aliases
     "T",
     "Timestamp",
+    "t",
 ]

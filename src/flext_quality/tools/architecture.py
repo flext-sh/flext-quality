@@ -13,20 +13,21 @@ from __future__ import annotations
 
 import uuid
 
-from flext_core import FlextLogger, FlextResult, FlextService
+from flext_core import r, s
+from flext_core.loggings import FlextLogger
 from pydantic import ConfigDict
 
 from flext_quality.models import FlextQualityModels
 
 
-class FlextQualityArchitectureTools(FlextService[bool]):
+class FlextQualityArchitectureTools(s[bool]):
     """Unified architecture tools with flext-core integration for quality operations."""
 
     model_config = ConfigDict(arbitrary_types_allowed=True, extra="allow")
 
-    def execute(self) -> FlextResult[bool]:
+    def execute(self) -> r[bool]:
         """Execute architecture tools service - FlextService interface."""
-        return FlextResult[bool].ok(True)
+        return r[bool].ok(True)
 
     class ViolationAnalyzer:
         """Architectural violation analysis."""
@@ -34,14 +35,14 @@ class FlextQualityArchitectureTools(FlextService[bool]):
         @staticmethod
         def analyze_violations(
             project_path: str,
-        ) -> FlextResult[FlextQualityModels.AnalysisResult]:
+        ) -> r[FlextQualityModels.AnalysisResult]:
             """Analyze architectural violations.
 
             Args:
             project_path: Path to project
 
             Returns:
-            FlextResult with analysis results
+            r with analysis results
 
             """
             logger = FlextLogger(__name__)
@@ -60,7 +61,7 @@ class FlextQualityArchitectureTools(FlextService[bool]):
                 },
             )
 
-            return FlextResult[FlextQualityModels.AnalysisResult].ok(result)
+            return r[FlextQualityModels.AnalysisResult].ok(result)
 
     class PatternEnforcer:
         """Pattern enforcement and validation."""
@@ -70,7 +71,7 @@ class FlextQualityArchitectureTools(FlextService[bool]):
             project_path: str,
             *,
             dry_run: bool = True,
-        ) -> FlextResult[dict[str, object]]:
+        ) -> r[dict[str, object]]:
             """Enforce architectural patterns.
 
             Args:
@@ -78,20 +79,20 @@ class FlextQualityArchitectureTools(FlextService[bool]):
             dry_run: Preview changes without applying
 
             Returns:
-            FlextResult with enforcement status
+            r with enforcement status
 
             """
             logger = FlextLogger(__name__)
 
             if dry_run:
                 logger.info("DRY RUN: Would enforce patterns in %s", project_path)
-                return FlextResult[dict[str, object]].ok({
+                return r[dict[str, object]].ok({
                     "enforced": False,
                     "dry_run": True,
                 })
 
             logger.info("Enforcing patterns in %s", project_path)
-            return FlextResult[dict[str, object]].ok({"enforced": True})
+            return r[dict[str, object]].ok({"enforced": True})
 
     class ImportTester:
         """Cross-project import testing."""
@@ -99,20 +100,20 @@ class FlextQualityArchitectureTools(FlextService[bool]):
         @staticmethod
         def test_cross_project_imports(
             workspace_path: str,
-        ) -> FlextResult[dict[str, object]]:
+        ) -> r[dict[str, object]]:
             """Test cross-project imports.
 
             Args:
             workspace_path: Path to workspace
 
             Returns:
-            FlextResult with test results
+            r with test results
 
             """
             logger = FlextLogger(__name__)
             logger.info("Testing cross-project imports in %s", workspace_path)
 
-            return FlextResult[dict[str, object]].ok({
+            return r[dict[str, object]].ok({
                 "passed": True,
                 "errors": [],
             })

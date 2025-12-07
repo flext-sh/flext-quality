@@ -131,6 +131,7 @@
   | `validate_style.py`)      | ✅ (`optimize.py`)              | ✅ (`report.py`)         | ✅ (`sync.py`)                                          | `config.yaml`              | Uses shared infrastructure plus legacy shell runner; includes cache artifacts. |
   | `flext-observability`     | ✅ (`audit/content-audit.py`)   | ❌                       | ❌                                                      | ⚠️ Markdown summaries only | ❌                                                                             | config embedded in script (`yaml` optional) | Lightweight audit only; no automation scripts detected.      |
   | `client-b-meltano-native` | ❌                              | ❌                       | ❌                                                      | ❌                         | ❌                                                                             | None                                        | Documentation guidance only; no executable maintenance code. |
+
   - Observed schema divergence: JSON-based config (`flext-grpc`) vs YAML (`flext-ldap`) vs inline defaults (`flext-observability`).
   - Next: draft normalization checklist (config schema conversion, capability gaps,
     wrapper migration plan) and define acceptance tests per capability pillar.

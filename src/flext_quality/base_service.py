@@ -63,8 +63,11 @@ class FlextQualityBaseService(FlextService[T]):
         """
         super().__init__()
         self._logger = FlextLogger(__name__)
-        self._config = config if config is not None else FlextQualityConfig()
-        self._container = FlextContainer.get_global()
+        # Use object.__setattr__ to bypass Pydantic's custom __setattr__ for private attributes
+        object.__setattr__(
+            self, "_config", config if config is not None else FlextQualityConfig()
+        )
+        object.__setattr__(self, "_container", FlextContainer.get_global())
 
     @property
     def logger(self) -> FlextLogger:

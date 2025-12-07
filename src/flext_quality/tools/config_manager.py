@@ -36,7 +36,12 @@ class ConfigurationManager(FlextService[dict[str, str]]):
             if self._config_path.exists():
                 with self._config_path.open(encoding="utf-8") as handle:
                     raw_data = json.load(handle)
-                    self._config = {key: str(value) for key, value in raw_data.items()}
+                    # Use object.__setattr__ to bypass Pydantic's custom __setattr__ for private attributes
+                    object.__setattr__(
+                        self,
+                        "_config",
+                        {key: str(value) for key, value in raw_data.items()},
+                    )
             return FlextResult[dict[str, str]].ok(self._config)
         except (OSError, json.JSONDecodeError) as error:
             self._logger.exception("Failed to load configuration")
