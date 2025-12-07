@@ -10,12 +10,11 @@ from __future__ import annotations
 from flext_core import FlextResult, t
 from pydantic import BaseModel, ConfigDict, Field
 
-from .constants import FlextQualityConstants
+from .constants import c
 from .grade_calculator import QualityGradeCalculator
-from .models import FlextQualityModels
+from .models import m
 
-# Import constants into module namespace for backward compatibility
-MAX_QUALITY_SCORE = FlextQualityConstants.Scoring.MAX_QUALITY_SCORE
+MAX_QUALITY_SCORE = c.Quality.Scoring.MAX_QUALITY_SCORE
 
 
 # =====================================================================
@@ -228,7 +227,7 @@ class QualityMetrics(BaseModel):
 
     @staticmethod
     def from_analysis_results(
-        results: FlextQualityModels.AnalysisResults | dict[str, object],
+        results: m.AnalysisResults | dict[str, object],
     ) -> QualityMetrics:
         """Create QualityMetrics from analysis results."""
         if isinstance(results, dict):
@@ -375,7 +374,7 @@ class MetricsCalculator:
 
     @staticmethod
     def calculate_from_object(
-        results: FlextQualityModels.AnalysisResults,
+        results: m.AnalysisResults,
     ) -> QualityMetrics:
         """Calculate metrics from typed analysis results object with no fallbacks."""
         # Handle both legacy dict metrics and typed AnalysisMetricsModel

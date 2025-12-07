@@ -75,12 +75,10 @@ This architecture documentation follows a multi-framework approach:
 
 | View Type           | Purpose                         | Location                                |
 | ------------------- | ------------------------------- | --------------------------------------- |
-| **System Context**  | External systems and users      | [C4-Context](c4-model/context.md)       |
-| **Container View**  | High-level system components    | [C4-Containers](c4-model/containers.md) |
-| **Component View**  | Detailed component interactions | [C4-Components](c4-model/components.md) |
-| **Code View**       | Implementation details          | [C4-Code](c4-model/code.md)             |
-| **Deployment View** | Infrastructure and deployment   | [deployment.md](views/deployment.md)    |
-| **Security View**   | Security architecture           | [security.md](views/security.md)        |
+| **System Context**  | External systems and users      | [C4 Model](c4-model/)                  |
+| **Container View**  | High-level system components    | [C4 Model](c4-model/)                  |
+| **Component View**  | Detailed component interactions | [C4 Model](c4-model/)                  |
+| **Code View**       | Implementation details          | [C4 Model](c4-model/)                  |
 | **ADRs**            | Architectural decisions         | [adrs/](adrs/)                          |
 
 ## 📊 System Context
@@ -155,18 +153,11 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 | ADR                                           | Title                                         | Status   | Date       |
 | --------------------------------------------- | --------------------------------------------- | -------- | ---------- |
 | [ADR-001](adrs/001-clean-architecture.md)     | Adopt Clean Architecture                      | Accepted | 2025-10-10 |
-| [ADR-002](adrs/002-flext-integration.md)      | Native FLEXT Ecosystem Integration            | Accepted | 2025-10-10 |
-| [ADR-003](adrs/003-railway-patterns.md)       | Railway-Oriented Programming with FlextResult | Accepted | 2025-10-10 |
-| [ADR-004](adrs/004-pydantic-models.md)        | Pydantic v2 for Domain Models                 | Accepted | 2025-10-10 |
-| [ADR-005](adrs/005-multi-backend-analysis.md) | Multi-Backend Analysis Architecture           | Accepted | 2025-10-10 |
 
 ### Technology Decisions
 
 | ADR                                 | Title                            | Status   | Date       |
 | ----------------------------------- | -------------------------------- | -------- | ---------- |
-| [ADR-006](adrs/006-python-313.md)   | Python 3.13+ Exclusive Support   | Accepted | 2025-10-10 |
-| [ADR-007](adrs/007-poetry-build.md) | Poetry for Dependency Management | Accepted | 2025-10-10 |
-| [ADR-008](adrs/008-ruff-linting.md) | Ruff as Primary Linter           | Accepted | 2025-10-10 |
 | [ADR-009](adrs/009-mypy-types.md)   | MyPy for Type Safety             | Accepted | 2025-10-10 |
 
 ## 📋 Quality Attributes & Architectural Characteristics

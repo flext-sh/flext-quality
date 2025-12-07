@@ -11,7 +11,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-# All imports at the top - in order
 from flext_quality.__version__ import __version__, __version_info__
 
 from .analyzer import FlextQualityAnalyzer
@@ -47,11 +46,11 @@ from .services import FlextQualityServices
 from .web import FlextQualityWeb as FlextQualityWebInterface
 
 # Direct constant imports for convenience
-HIGH_ISSUE_THRESHOLD = FlextQualityConstants.Analysis.HIGH_ISSUE_THRESHOLD
-HTML_ISSUE_LIMIT = FlextQualityConstants.Analysis.HTML_ISSUE_LIMIT
-ISSUE_PREVIEW_LIMIT = FlextQualityConstants.Analysis.ISSUE_PREVIEW_LIMIT
-MIN_COVERAGE_THRESHOLD = FlextQualityConstants.Analysis.MIN_COVERAGE_THRESHOLD
-MIN_SCORE_THRESHOLD = FlextQualityConstants.Analysis.MIN_SCORE_THRESHOLD
+HIGH_ISSUE_THRESHOLD = FlextQualityConstants.Quality.Analysis.HIGH_ISSUE_THRESHOLD
+HTML_ISSUE_LIMIT = FlextQualityConstants.Quality.Analysis.HTML_ISSUE_LIMIT
+ISSUE_PREVIEW_LIMIT = FlextQualityConstants.Quality.Analysis.ISSUE_PREVIEW_LIMIT
+MIN_COVERAGE_THRESHOLD = FlextQualityConstants.Quality.Analysis.MIN_COVERAGE_THRESHOLD
+MIN_SCORE_THRESHOLD = FlextQualityConstants.Quality.Analysis.MIN_SCORE_THRESHOLD
 
 # =========================================================================
 # COMPATIBILITY EXPORTS (for test migration and backward compatibility)

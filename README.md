@@ -263,9 +263,6 @@ Ecosystem integration and enhancement:
 
 - **[TODO & Development Status](TODO.md)** - Current technical issues and development priorities
 - **[Getting Started](docs/getting-started.md)** - Installation and basic usage
-- **[Architecture](docs/architecture.md)** - System design and patterns
-- **[Development](docs/development.md)** - Contributing and workflows
-- **[Troubleshooting](docs/troubleshooting.md)** - Common issues and solutions
 
 ---
 

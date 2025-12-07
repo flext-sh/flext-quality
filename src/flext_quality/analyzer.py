@@ -397,7 +397,10 @@ class FlextQualityAnalyzer(FlextService):
             complexity_score: float,
         ) -> list[FlextQualityModels.CodeIssue]:
             """Find complexity issues."""
-            if complexity_score > FlextQualityConstants.Complexity.MAX_COMPLEXITY:
+            if (
+                complexity_score
+                > FlextQualityConstants.Quality.Complexity.MAX_COMPLEXITY
+            ):
                 return [
                     FlextQualityModels.CodeIssue(
                         id=uuid4(),  # complexity issue{file_path.name}",
@@ -514,9 +517,7 @@ class FlextQualityAnalyzer(FlextService):
         ) -> FlextResult[list[DuplicationIssueModel]]:
             """Analyze duplications across files."""
             try:
-                min_size = (
-                    FlextQualityConstants.Analysis.MIN_FILE_SIZE_FOR_DUPLICATION_CHECK
-                )
+                min_size = FlextQualityConstants.Quality.Analysis.MIN_FILE_SIZE_FOR_DUPLICATION_CHECK
                 file_contents = {
                     pf: pf.read_text(encoding="utf-8")
                     for pf in python_files
@@ -556,7 +557,10 @@ class FlextQualityAnalyzer(FlextService):
             lines2 = set(content2.splitlines())
             if lines1 and lines2:
                 similarity = len(lines1 & lines2) / max(len(lines1), len(lines2))
-                return similarity > FlextQualityConstants.Analysis.SIMILARITY_THRESHOLD
+                return (
+                    similarity
+                    > FlextQualityConstants.Quality.Analysis.SIMILARITY_THRESHOLD
+                )
             return False
 
     class _ResultsBuilder:

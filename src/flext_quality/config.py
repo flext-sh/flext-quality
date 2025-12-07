@@ -51,57 +51,58 @@ class FlextQualityConfig(FlextConfig.AutoConfig):
 
     # Quality Analysis Configuration using FlextQualityConstants for defaults
     min_coverage: float = Field(
-        default=FlextQualityConstants.Coverage.MINIMUM_COVERAGE,
-        ge=FlextQualityConstants.QualityValidation.MINIMUM_PERCENTAGE,
-        le=FlextQualityConstants.QualityValidation.MAXIMUM_PERCENTAGE,
+        default=FlextQualityConstants.Quality.Coverage.MINIMUM_COVERAGE,
+        ge=FlextQualityConstants.Quality.QualityValidation.MINIMUM_PERCENTAGE,
+        le=FlextQualityConstants.Quality.QualityValidation.MAXIMUM_PERCENTAGE,
         description="Minimum test coverage percentage required",
     )
 
     max_complexity: int = Field(
-        default=FlextQualityConstants.Complexity.MAX_COMPLEXITY,
+        default=FlextQualityConstants.Quality.Complexity.MAX_COMPLEXITY,
         ge=1,
-        le=FlextQualityConstants.Complexity.HIGH_COMPLEXITY_WARNING_THRESHOLD,
+        le=FlextQualityConstants.Quality.Complexity.HIGH_COMPLEXITY_WARNING_THRESHOLD,
         description="Maximum cyclomatic complexity allowed",
     )
 
     max_duplication: float = Field(
-        default=FlextQualityConstants.Duplication.MAXIMUM_DUPLICATION,
-        ge=FlextQualityConstants.QualityValidation.MINIMUM_PERCENTAGE,
-        le=FlextQualityConstants.QualityValidation.MAXIMUM_PERCENTAGE,
+        default=FlextQualityConstants.Quality.Duplication.MAXIMUM_DUPLICATION,
+        ge=FlextQualityConstants.Quality.QualityValidation.MINIMUM_PERCENTAGE,
+        le=FlextQualityConstants.Quality.QualityValidation.MAXIMUM_PERCENTAGE,
         description="Maximum code duplication percentage allowed",
     )
 
     min_security_score: float = Field(
-        default=FlextQualityConstants.QualitySecurity.MINIMUM_SECURITY_SCORE,
-        ge=FlextQualityConstants.QualityValidation.MINIMUM_PERCENTAGE,
-        le=FlextQualityConstants.QualityValidation.MAXIMUM_PERCENTAGE,
+        default=FlextQualityConstants.Quality.QualitySecurity.MINIMUM_SECURITY_SCORE,
+        ge=FlextQualityConstants.Quality.QualityValidation.MINIMUM_PERCENTAGE,
+        le=FlextQualityConstants.Quality.QualityValidation.MAXIMUM_PERCENTAGE,
         description="Minimum security score required",
     )
 
     min_maintainability: float = Field(
-        default=FlextQualityConstants.Maintainability.MINIMUM_MAINTAINABILITY,
-        ge=FlextQualityConstants.QualityValidation.MINIMUM_PERCENTAGE,
-        le=FlextQualityConstants.QualityValidation.MAXIMUM_PERCENTAGE,
+        default=FlextQualityConstants.Quality.Maintainability.MINIMUM_MAINTAINABILITY,
+        ge=FlextQualityConstants.Quality.QualityValidation.MINIMUM_PERCENTAGE,
+        le=FlextQualityConstants.Quality.QualityValidation.MAXIMUM_PERCENTAGE,
         description="Minimum maintainability index required",
     )
 
     # Service Configuration using FlextQualityConstants for defaults
     analysis_timeout: int = Field(
-        default=FlextQualityConstants.QualityPerformance.DEFAULT_ANALYSIS_TIMEOUT,
+        default=FlextQualityConstants.Quality.QualityPerformance.DEFAULT_ANALYSIS_TIMEOUT,
         gt=0,
-        le=FlextQualityConstants.QualityPerformance.MAXIMUM_ANALYSIS_TIMEOUT,
+        le=FlextQualityConstants.Quality.QualityPerformance.MAXIMUM_ANALYSIS_TIMEOUT,
         description="Quality analysis timeout in seconds",
     )
 
     parallel_workers: int = Field(
-        default=FlextQualityConstants.QualityPerformance.DEFAULT_WORKERS,
+        default=FlextQualityConstants.Quality.QualityPerformance.DEFAULT_WORKERS,
         ge=1,
-        le=FlextQualityConstants.QualityPerformance.MAXIMUM_WORKERS,
+        le=FlextQualityConstants.Quality.QualityPerformance.MAXIMUM_WORKERS,
         description="Number of parallel workers for analysis",
     )
 
     memory_limit_mb: int = Field(
-        default=FlextQualityConstants.Optimization.MAX_FILE_SIZE // (1024 * 1024),
+        default=FlextQualityConstants.Quality.Optimization.MAX_FILE_SIZE
+        // (1024 * 1024),
         gt=0,
         le=2048,
         description="Memory limit per file in MB",
@@ -197,7 +198,10 @@ class FlextQualityConfig(FlextConfig.AutoConfig):
     @classmethod
     def validate_complexity_threshold(cls, v: int) -> int:
         """Warn if complexity threshold is high (validation via Field constraint)."""
-        if v > FlextQualityConstants.Complexity.HIGH_COMPLEXITY_WARNING_THRESHOLD:
+        if (
+            v
+            > FlextQualityConstants.Quality.Complexity.HIGH_COMPLEXITY_WARNING_THRESHOLD
+        ):
             warnings.warn(
                 f"High complexity threshold ({v}) may be too permissive",
                 UserWarning,
@@ -209,7 +213,10 @@ class FlextQualityConfig(FlextConfig.AutoConfig):
     @classmethod
     def validate_timeout(cls, v: int) -> int:
         """Warn if analysis timeout is very high (validation via Field constraint)."""
-        if v > FlextQualityConstants.QualityPerformance.MAXIMUM_ANALYSIS_TIMEOUT:
+        if (
+            v
+            > FlextQualityConstants.Quality.QualityPerformance.MAXIMUM_ANALYSIS_TIMEOUT
+        ):
             warnings.warn(
                 f"Very long timeout ({v}s) may cause performance issues",
                 UserWarning,
@@ -221,7 +228,7 @@ class FlextQualityConfig(FlextConfig.AutoConfig):
     @classmethod
     def validate_workers(cls, v: int) -> int:
         """Warn if worker count is high (validation via Field constraint)."""
-        if v > FlextQualityConstants.QualityPerformance.MAXIMUM_WORKERS:
+        if v > FlextQualityConstants.Quality.QualityPerformance.MAXIMUM_WORKERS:
             warnings.warn(
                 f"High worker count ({v}) may impact system performance",
                 UserWarning,
@@ -235,7 +242,7 @@ class FlextQualityConfig(FlextConfig.AutoConfig):
         # Validate threshold relationships
         if (
             self.min_coverage
-            >= FlextQualityConstants.QualityValidation.COVERAGE_EXTERNAL_TOOLS_THRESHOLD
+            >= FlextQualityConstants.Quality.QualityValidation.COVERAGE_EXTERNAL_TOOLS_THRESHOLD
             and not self.enable_external_tools
         ):
             warnings.warn(
@@ -247,7 +254,7 @@ class FlextQualityConfig(FlextConfig.AutoConfig):
         # Validate security configuration
         if (
             self.min_security_score
-            >= FlextQualityConstants.QualityValidation.SECURITY_BANDIT_THRESHOLD
+            >= FlextQualityConstants.Quality.QualityValidation.SECURITY_BANDIT_THRESHOLD
             and not self.enable_bandit
         ):
             msg = "High security score requires Bandit security analysis"
@@ -286,16 +293,16 @@ class FlextQualityConfig(FlextConfig.AutoConfig):
             # Validate performance requirements
             if (
                 self.analysis_timeout
-                < FlextQualityConstants.QualityPerformance.MINIMUM_ANALYSIS_TIMEOUT
+                < FlextQualityConstants.Quality.QualityPerformance.MINIMUM_ANALYSIS_TIMEOUT
             ):
                 return FlextResult[bool].fail(
-                    f"Analysis timeout too low (minimum {FlextQualityConstants.QualityPerformance.MINIMUM_ANALYSIS_TIMEOUT} seconds)",
+                    f"Analysis timeout too low (minimum {FlextQualityConstants.Quality.QualityPerformance.MINIMUM_ANALYSIS_TIMEOUT} seconds)",
                 )
 
             # Validate threshold consistency
             if (
                 self.min_security_score
-                >= FlextQualityConstants.QualityValidation.SECURITY_DEPENDENCY_SCAN_THRESHOLD
+                >= FlextQualityConstants.Quality.QualityValidation.SECURITY_DEPENDENCY_SCAN_THRESHOLD
                 and not self.enable_dependency_scan
             ):
                 return FlextResult[bool].fail(
@@ -381,9 +388,9 @@ class FlextQualityConfig(FlextConfig.AutoConfig):
     def create_for_production(cls) -> FlextQualityConfig:
         """Create configuration optimized for production using model_validate."""
         return cls.model_validate({
-            "min_coverage": FlextQualityConstants.Coverage.TARGET_COVERAGE,
+            "min_coverage": FlextQualityConstants.Quality.Coverage.TARGET_COVERAGE,
             "max_complexity": 8,
-            "min_security_score": FlextQualityConstants.QualitySecurity.TARGET_SECURITY_SCORE,
+            "min_security_score": FlextQualityConstants.Quality.QualitySecurity.TARGET_SECURITY_SCORE,
             "min_maintainability": 85.0,
             "analysis_timeout": 600,
             "parallel_workers": 8,

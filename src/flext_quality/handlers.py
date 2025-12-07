@@ -14,8 +14,8 @@ from flext_observability import (
 )
 from pydantic import BaseModel, Field
 
-from .constants import FlextQualityConstants
-from .models import FlextQualityModels
+from .constants import c
+from .models import m
 from .services import FlextQualityServices
 
 # =====================================================================
@@ -27,7 +27,7 @@ class ObservabilityConfig(BaseModel):
     """Observability configuration for handlers."""
 
     service_name: str = Field(default="flext-quality")
-    log_level: FlextQualityConstants.Literals.LogLevelLiteral | str = Field(
+    log_level: c.Quality.Literals.LogLevelLiteral | str = Field(
         default="info",
     )
     enable_traces: bool = Field(default=True)
@@ -76,7 +76,7 @@ class FlextQualityHandlers:
         @staticmethod
         def log_operation(
             message: str,
-            level: FlextQualityConstants.Literals.LogLevelLiteral | str,
+            level: c.Quality.Literals.LogLevelLiteral | str,
             context: HandlerContext,
         ) -> None:
             """Log operation with context."""
@@ -106,7 +106,7 @@ class FlextQualityHandlers:
         def execute_analysis(
             project_id: UUID,
             services: FlextQualityServices,
-        ) -> FlextResult[FlextQualityModels.Analysis]:
+        ) -> FlextResult[m.Analysis]:
             """Execute project analysis."""
             project_id_str = str(project_id)
             return services.get_analysis_service().create_analysis(
@@ -120,7 +120,7 @@ class FlextQualityHandlers:
         def execute_report_generation(
             analysis_id: UUID,
             services: FlextQualityServices,
-        ) -> FlextResult[FlextQualityModels.Report]:
+        ) -> FlextResult[m.Report]:
             """Execute report generation."""
             analysis_id_str = str(analysis_id)
             return services.get_report_service().create_report(
@@ -136,7 +136,7 @@ class FlextQualityHandlers:
     def analyze_project(
         self,
         project_id: UUID,
-    ) -> FlextResult[FlextQualityModels.Analysis]:
+    ) -> FlextResult[m.Analysis]:
         """Analyze project with observability."""
         context = HandlerContext(
             project_id=str(project_id),
@@ -162,7 +162,7 @@ class FlextQualityHandlers:
     def generate_report(
         self,
         analysis_id: UUID,
-    ) -> FlextResult[FlextQualityModels.Report]:
+    ) -> FlextResult[m.Report]:
         """Generate report with observability."""
         context = HandlerContext(
             project_id=str(analysis_id),

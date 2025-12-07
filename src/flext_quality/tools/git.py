@@ -81,7 +81,7 @@ class FlextQualityGitTools(FlextService[bool]):
             else:
                 workspace = Path(
                     tempfile.mkdtemp(
-                        prefix=FlextQualityConstants.DryRun.DEFAULT_TEMP_PREFIX,
+                        prefix=FlextQualityConstants.Quality.DryRun.DEFAULT_TEMP_PREFIX,
                     ),
                 )
 
@@ -119,7 +119,7 @@ class FlextQualityGitTools(FlextService[bool]):
         @staticmethod
         def _strip_ai_signatures(message: str) -> str:
             """Strip AI signatures from commit messages."""
-            patterns = FlextQualityConstants.Git.AI_PATTERNS
+            patterns = FlextQualityConstants.Quality.Git.AI_PATTERNS
 
             cleaned = message
             for pattern in patterns:

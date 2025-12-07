@@ -17,7 +17,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Literal, TypeVar
 
-from flext_core import t
+from flext_core import FlextTypes
 from pydantic import Field
 
 # =============================================================================
@@ -25,7 +25,7 @@ from pydantic import Field
 # =============================================================================
 
 T = TypeVar("T")
-ScoreT = TypeVar("ScoreT", bound=float)
+FlextQualityScoreT = TypeVar("FlextQualityScoreT", bound=float)
 
 # Advanced validation using Python 3.13+ syntax
 type ScoreRange = Annotated[float, Field(ge=0.0, le=100.0)]
@@ -41,7 +41,7 @@ type PositiveInt = Annotated[int, Field(ge=1)]
 
 
 # Quality domain TypeVars
-class FlextQualityTypes(t):
+class FlextQualityTypes(FlextTypes):
     """Quality analysis-specific type definitions extending t.
 
     Domain-specific type system for code quality analysis operations.
@@ -244,9 +244,9 @@ t = FlextQualityTypes
 # - t.Core.* for core types (inherited from parent)
 
 __all__ = [
+    "FlextQualityScoreT",
     "FlextQualityTypes",
     "ScoreRange",
-    "ScoreT",
     # Module-level type aliases
     "T",
     "Timestamp",

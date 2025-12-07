@@ -9,119 +9,153 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Protocol
+from collections.abc import Mapping
+from typing import Protocol, runtime_checkable
 
-from flext_core import FlextResult, p
-
-from .models import FlextQualityModels
-from .typings import FlextQualityTypes
+from flext_core.protocols import FlextProtocols as p_core
 
 
-class FlextQualityProtocols(p):
-    """Quality analysis protocol definitions."""
+class FlextQualityProtocols(p_core):
+    """Unified quality protocols extending p_core.
 
-    class QualityAnalyzer(Protocol):
-        """Protocol for quality analysis operations."""
+    Extends p_core to inherit all foundation protocols (Result, Service, etc.)
+    and adds quality-specific protocols in the Quality namespace.
 
-        def analyze_project(
-            self,
-            project_path: str,
-            config: FlextQualityTypes.Analysis.AnalysisConfiguration | None = None,
-        ) -> FlextResult[FlextQualityModels.AnalysisResults]:
-            """Analyze a project for quality metrics."""
-            ...
+    Architecture:
+    - EXTENDS: p_core (inherits Foundation, Domain, Application, etc.)
+    - ADDS: Quality-specific protocols in Quality namespace
+    - PROVIDES: Root-level alias `p` for convenient access
 
-    class QualityReporter(Protocol):
-        """Protocol for quality reporting operations."""
+    Usage:
+    from flext_quality.protocols import p
 
-        def generate_report(
-            self,
-            analysis_results: FlextQualityModels.AnalysisResults,
-            format_type: str = "html",
-        ) -> FlextResult[str]:
-            """Generate a quality report from analysis results."""
-            ...
+    # Foundation protocols (inherited)
+    result: p.Result[str]
+    service: p.Service[str]
 
-    class QualityValidator(Protocol):
-        """Protocol for quality validation operations."""
+    # Quality-specific protocols
+    analyzer: p.Quality.QualityAnalyzer
+    reporter: p.Quality.QualityReporter
+    """
 
-        def validate_thresholds(
-            self,
-            analysis_results: FlextQualityModels.AnalysisResults,
-            thresholds: FlextQualityTypes.Analysis.AnalysisThresholds,
-        ) -> FlextResult[bool]:
-            """Validate analysis results against quality thresholds."""
-            ...
+    class Quality:
+        """Quality domain-specific protocols."""
 
-    # ==== INTERNAL TOOLS PROTOCOLS (from flext_tools migration) ====
+        @runtime_checkable
+        class QualityAnalyzer(Protocol):
+            """Protocol for quality analysis operations."""
 
-    class GitService(Protocol):
-        """Git service protocol for quality tools."""
+            def analyze_project(
+                self,
+                project_path: str,
+                config: Mapping[str, object] | None = None,
+            ) -> p_core.Result[Mapping[str, object]]:
+                """Analyze a project for quality metrics."""
+                ...
 
-        def execute(
-            self,
-            repo_path: str,
-            *,
-            dry_run: bool = True,
-            temp_path: str | None = None,
-        ) -> FlextResult[object]:
-            """Execute git operation with dry-run support."""
-            ...
+        @runtime_checkable
+        class QualityReporter(Protocol):
+            """Protocol for quality reporting operations."""
 
-    class OptimizationStrategy(Protocol):
-        """Module optimization strategy protocol."""
+            def generate_report(
+                self,
+                analysis_results: Mapping[str, object],
+                format_type: str = "html",
+            ) -> p_core.Result[str]:
+                """Generate a quality report from analysis results."""
+                ...
 
-        def optimize(
-            self,
-            module_path: str,
-            *,
-            dry_run: bool = True,
-            temp_path: str | None = None,
-        ) -> FlextResult[object]:
-            """Optimize module with dry-run support."""
-            ...
+        @runtime_checkable
+        class QualityValidator(Protocol):
+            """Protocol for quality validation operations."""
 
-    class QualityChecker(Protocol):
-        """Quality checking protocol."""
+            def validate_thresholds(
+                self,
+                analysis_results: Mapping[str, object],
+                thresholds: Mapping[str, object],
+            ) -> p_core.Result[bool]:
+                """Validate analysis results against quality thresholds."""
+                ...
 
-        def check(
-            self,
-            project_path: str,
-            config: dict[str, object] | None = None,
-        ) -> FlextResult[object]:
-            """Run quality checks."""
-            ...
+        @runtime_checkable
+        class GitService(Protocol):
+            """Git service protocol for quality tools."""
 
-    class Validator(Protocol):
-        """Validation protocol."""
+            def execute(
+                self,
+                repo_path: str,
+                *,
+                dry_run: bool = True,
+                temp_path: str | None = None,
+            ) -> p_core.Result[object]:
+                """Execute git operation with dry-run support."""
+                ...
 
-        def validate(
-            self,
-            target_path: str,
-        ) -> FlextResult[object]:
-            """Validate target."""
-            ...
+        @runtime_checkable
+        class OptimizationStrategy(Protocol):
+            """Module optimization strategy protocol."""
 
-    class ArchitectureAnalyzer(Protocol):
-        """Architecture analysis protocol."""
+            def optimize(
+                self,
+                module_path: str,
+                *,
+                dry_run: bool = True,
+                temp_path: str | None = None,
+            ) -> p_core.Result[object]:
+                """Optimize module with dry-run support."""
+                ...
 
-        def analyze(
-            self,
-            project_path: str,
-        ) -> FlextResult[object]:
-            """Analyze architecture."""
-            ...
+        @runtime_checkable
+        class QualityChecker(Protocol):
+            """Quality checking protocol."""
 
-    class DependencyManager(Protocol):
-        """Dependency management protocol."""
+            def check(
+                self,
+                project_path: str,
+                config: dict[str, object] | None = None,
+            ) -> p_core.Result[object]:
+                """Run quality checks."""
+                ...
 
-        def manage(
-            self,
-            project_path: str,
-            operation: str,
-        ) -> FlextResult[object]:
-            """Manage dependencies."""
-            ...
+        @runtime_checkable
+        class Validator(Protocol):
+            """Validation protocol."""
+
+            def validate(
+                self,
+                target_path: str,
+            ) -> p_core.Result[object]:
+                """Validate target."""
+                ...
+
+        @runtime_checkable
+        class ArchitectureAnalyzer(Protocol):
+            """Architecture analysis protocol."""
+
+            def analyze(
+                self,
+                project_path: str,
+            ) -> p_core.Result[object]:
+                """Analyze architecture."""
+                ...
+
+        @runtime_checkable
+        class DependencyManager(Protocol):
+            """Dependency management protocol."""
+
+            def manage(
+                self,
+                project_path: str,
+                operation: str,
+            ) -> p_core.Result[object]:
+                """Manage dependencies."""
+                ...
 
 
-__all__ = ["FlextQualityProtocols"]
+# Runtime alias for simplified usage
+p = FlextQualityProtocols
+
+__all__ = [
+    "FlextQualityProtocols",
+    "p",
+]

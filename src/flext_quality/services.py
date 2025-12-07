@@ -57,12 +57,12 @@ from __future__ import annotations
 from typing import ClassVar, override
 from uuid import NAMESPACE_DNS, UUID, uuid5
 
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, r
 
 from .base_service import FlextQualityBaseService
 from .config import FlextQualityConfig
-from .constants import FlextQualityConstants
-from .models import FlextQualityModels
+from .constants import c
+from .models import m
 
 
 class FlextQualityServices(FlextQualityBaseService[bool]):
@@ -79,12 +79,12 @@ class FlextQualityServices(FlextQualityBaseService[bool]):
     auto_execute: ClassVar[bool] = False
 
     @override
-    def execute(self, data: object = None) -> FlextResult[bool]:
+    def execute(self, data: object = None) -> r[bool]:
         """Execute services - returns True to indicate service is ready.
 
         V2 pattern: No meaningless data, just success/failure indication.
         """
-        return FlextResult.ok(True)
+        return r.ok(True)
 
 
 # ============================================================================
@@ -129,11 +129,11 @@ class ProjectServiceBuilder:
         self._kwargs.update(config_dict)
         return self
 
-    def build(self) -> FlextResult[FlextQualityModels.ProjectModel]:
+    def build(self) -> r[m.ProjectModel]:
         """Build project using monadic validation chain.
 
         Returns:
-            FlextResult[ProjectModel] via railway pattern:
+            r[ProjectModel] via railway pattern:
             - Success: ProjectModel instance
             - Failure: Error message with validation details
 
@@ -144,31 +144,31 @@ class ProjectServiceBuilder:
             .map(self._log_project_creation)
         )
 
-    def _validate_required_fields(self) -> FlextResult[bool]:
+    def _validate_required_fields(self) -> r[bool]:
         """Validate required project fields (monadic step 1)."""
         if not self._name:
-            return FlextResult.fail("Project name is required")
+            return r.fail("Project name is required")
         if not self._path:
-            return FlextResult.fail("Project path is required")
-        return FlextResult.ok(True)
+            return r.fail("Project path is required")
+        return r.ok(True)
 
-    def _create_project_model(self) -> FlextResult[FlextQualityModels.ProjectModel]:
+    def _create_project_model(self) -> r[m.ProjectModel]:
         """Create project model (monadic step 2)."""
         try:
-            project = FlextQualityModels.ProjectModel(
+            project = m.ProjectModel(
                 id=f"project_{self._name.lower().replace(' ', '_')}",
                 name=self._name,
                 path=self._path,
                 **self._kwargs,
             )
-            return FlextResult.ok(project)
+            return r.ok(project)
         except (ValueError, TypeError) as e:
-            return FlextResult.fail(f"Project creation failed: {e}")
+            return r.fail(f"Project creation failed: {e}")
 
     def _log_project_creation(
         self,
-        project: FlextQualityModels.ProjectModel,
-    ) -> FlextQualityModels.ProjectModel:
+        project: m.ProjectModel,
+    ) -> m.ProjectModel:
         """Log project creation and return (monadic final step)."""
         self._logger.info(
             "Project created successfully",
@@ -201,9 +201,7 @@ class AnalysisServiceBuilder:
         self._config = config
         self._logger = logger
         self._project_id: str | UUID | None = None
-        self._status: FlextQualityConstants.Literals.AnalysisStatusLiteral | str = (
-            "queued"
-        )
+        self._status: c.Quality.Literals.AnalysisStatusLiteral | str = "queued"
         self._kwargs: dict[str, object] = {}
 
     def with_project_id(self, project_id: str | UUID) -> AnalysisServiceBuilder:
@@ -213,11 +211,7 @@ class AnalysisServiceBuilder:
 
     def with_status(
         self,
-        status: (
-            FlextQualityConstants.Literals.AnalysisStatusLiteral
-            | str
-            | FlextQualityModels.AnalysisStatus
-        ),
+        status: (c.Quality.Literals.AnalysisStatusLiteral | str | m.AnalysisStatus),
     ) -> AnalysisServiceBuilder:
         """Set analysis status (fluent)."""
         self._status = str(status.value) if hasattr(status, "value") else str(status)
@@ -231,11 +225,11 @@ class AnalysisServiceBuilder:
         self._kwargs.update(config_dict)
         return self
 
-    def build(self) -> FlextResult[FlextQualityModels.AnalysisModel]:
+    def build(self) -> r[m.AnalysisModel]:
         """Build analysis using monadic validation chain.
 
         Returns:
-            FlextResult[AnalysisModel] via railway pattern
+            r[AnalysisModel] via railway pattern
 
         """
         return (
@@ -245,21 +239,21 @@ class AnalysisServiceBuilder:
             .map(self._log_analysis_creation)
         )
 
-    def _validate_project_id(self) -> FlextResult[bool]:
+    def _validate_project_id(self) -> r[bool]:
         """Validate project ID (monadic step 1)."""
         if not self._project_id:
-            return FlextResult.fail("Project ID is required for analysis")
-        return FlextResult.ok(True)
+            return r.fail("Project ID is required for analysis")
+        return r.ok(True)
 
-    def _validate_status(self) -> FlextResult[bool]:
+    def _validate_status(self) -> r[bool]:
         """Validate analysis status enum (monadic step 2)."""
         try:
-            FlextQualityModels.AnalysisStatus(self._status)
-            return FlextResult.ok(True)
+            m.AnalysisStatus(self._status)
+            return r.ok(True)
         except ValueError:
-            return FlextResult.fail(f"Invalid analysis status: {self._status}")
+            return r.fail(f"Invalid analysis status: {self._status}")
 
-    def _create_analysis_model(self) -> FlextResult[FlextQualityModels.AnalysisModel]:
+    def _create_analysis_model(self) -> r[m.AnalysisModel]:
         """Create analysis model (monadic step 3)."""
         try:
             project_uuid = (
@@ -267,19 +261,19 @@ class AnalysisServiceBuilder:
                 if isinstance(self._project_id, UUID)
                 else uuid5(NAMESPACE_DNS, str(self._project_id))
             )
-            analysis = FlextQualityModels.AnalysisModel(
+            analysis = m.AnalysisModel(
                 project_id=project_uuid,
                 status=self._status,
                 **self._kwargs,
             )
-            return FlextResult.ok(analysis)
+            return r.ok(analysis)
         except (ValueError, TypeError) as e:
-            return FlextResult.fail(f"Analysis creation failed: {e}")
+            return r.fail(f"Analysis creation failed: {e}")
 
     def _log_analysis_creation(
         self,
-        analysis: FlextQualityModels.AnalysisModel,
-    ) -> FlextQualityModels.AnalysisModel:
+        analysis: m.AnalysisModel,
+    ) -> m.AnalysisModel:
         """Log analysis creation and return (monadic final step)."""
         self._logger.info(
             "Analysis created successfully",
@@ -334,7 +328,7 @@ class IssueServiceBuilder:
 
     def with_issue_type(
         self,
-        issue_type: FlextQualityConstants.Literals.IssueTypeLiteral | str,
+        issue_type: c.Quality.Literals.IssueTypeLiteral | str,
     ) -> IssueServiceBuilder:
         """Set issue type (fluent)."""
         self._issue_type = issue_type
@@ -355,11 +349,11 @@ class IssueServiceBuilder:
         self._kwargs.update(config_dict)
         return self
 
-    def build(self) -> FlextResult[FlextQualityModels.IssueModel]:
+    def build(self) -> r[m.IssueModel]:
         """Build issue using monadic validation chain.
 
         Returns:
-            FlextResult[IssueModel] via railway pattern with multi-step validation
+            r[IssueModel] via railway pattern with multi-step validation
 
         """
         return (
@@ -369,30 +363,30 @@ class IssueServiceBuilder:
             .map(self._log_issue_creation)
         )
 
-    def _validate_required_fields(self) -> FlextResult[bool]:
+    def _validate_required_fields(self) -> r[bool]:
         """Validate all required fields (monadic step 1)."""
         if not self._analysis_id:
-            return FlextResult.fail("Analysis ID is required")
+            return r.fail("Analysis ID is required")
         if not self._severity:
-            return FlextResult.fail("Severity is required")
+            return r.fail("Severity is required")
         if not self._issue_type:
-            return FlextResult.fail("Issue type is required")
+            return r.fail("Issue type is required")
         if not self._file_path:
-            return FlextResult.fail("File path is required")
+            return r.fail("File path is required")
         if not self._message:
-            return FlextResult.fail("Message is required")
-        return FlextResult.ok(True)
+            return r.fail("Message is required")
+        return r.ok(True)
 
-    def _validate_enums(self) -> FlextResult[bool]:
+    def _validate_enums(self) -> r[bool]:
         """Validate enum values (monadic step 2)."""
         try:
-            FlextQualityModels.IssueSeverity(self._severity)
-            FlextQualityModels.IssueType(self._issue_type)
-            return FlextResult.ok(True)
+            m.IssueSeverity(self._severity)
+            m.IssueType(self._issue_type)
+            return r.ok(True)
         except ValueError as e:
-            return FlextResult.fail(f"Invalid enum value: {e}")
+            return r.fail(f"Invalid enum value: {e}")
 
-    def _create_issue_model(self) -> FlextResult[FlextQualityModels.IssueModel]:
+    def _create_issue_model(self) -> r[m.IssueModel]:
         """Create issue model (monadic step 3)."""
         try:
             analysis_uuid = (
@@ -400,7 +394,7 @@ class IssueServiceBuilder:
                 if isinstance(self._analysis_id, UUID)
                 else uuid5(NAMESPACE_DNS, str(self._analysis_id))
             )
-            issue = FlextQualityModels.IssueModel(
+            issue = m.IssueModel(
                 analysis_id=analysis_uuid,
                 severity=self._severity,
                 issue_type=self._issue_type,
@@ -408,14 +402,14 @@ class IssueServiceBuilder:
                 message=self._message,
                 **self._kwargs,
             )
-            return FlextResult.ok(issue)
+            return r.ok(issue)
         except (ValueError, TypeError) as e:
-            return FlextResult.fail(f"Issue creation failed: {e}")
+            return r.fail(f"Issue creation failed: {e}")
 
     def _log_issue_creation(
         self,
-        issue: FlextQualityModels.IssueModel,
-    ) -> FlextQualityModels.IssueModel:
+        issue: m.IssueModel,
+    ) -> m.IssueModel:
         """Log issue creation and return (monadic final step)."""
         self._logger.info(
             "Issue created successfully",
@@ -450,9 +444,7 @@ class ReportServiceBuilder:
         self._config = config
         self._logger = logger
         self._analysis_id: str | UUID | None = None
-        self._format_type: FlextQualityConstants.Literals.ReportFormatLiteral | str = (
-            "HTML"
-        )
+        self._format_type: c.Quality.Literals.ReportFormatLiteral | str = "HTML"
         self._kwargs: dict[str, object] = {}
 
     def with_analysis_id(self, analysis_id: str | UUID) -> ReportServiceBuilder:
@@ -462,7 +454,7 @@ class ReportServiceBuilder:
 
     def with_format(
         self,
-        format_type: FlextQualityConstants.Literals.ReportFormatLiteral | str,
+        format_type: c.Quality.Literals.ReportFormatLiteral | str,
     ) -> ReportServiceBuilder:
         """Set report format (fluent)."""
         self._format_type = format_type
@@ -473,11 +465,11 @@ class ReportServiceBuilder:
         self._kwargs.update(config_dict)
         return self
 
-    def build(self) -> FlextResult[FlextQualityModels.ReportModel]:
+    def build(self) -> r[m.ReportModel]:
         """Build report using monadic validation chain.
 
         Returns:
-            FlextResult[ReportModel] via railway pattern
+            r[ReportModel] via railway pattern
 
         """
         return (
@@ -487,22 +479,22 @@ class ReportServiceBuilder:
             .map(self._log_report_creation)
         )
 
-    def _validate_analysis_id(self) -> FlextResult[bool]:
+    def _validate_analysis_id(self) -> r[bool]:
         """Validate analysis ID (monadic step 1)."""
         if not self._analysis_id:
-            return FlextResult.fail("Analysis ID is required for report")
-        return FlextResult.ok(True)
+            return r.fail("Analysis ID is required for report")
+        return r.ok(True)
 
-    def _validate_format(self) -> FlextResult[bool]:
+    def _validate_format(self) -> r[bool]:
         """Validate report format (monadic step 2)."""
         valid_formats = {"JSON", "HTML", "CSV"}
         if self._format_type.upper() not in valid_formats:
-            return FlextResult.fail(
+            return r.fail(
                 f"Invalid format. Must be one of: {', '.join(valid_formats)}",
             )
-        return FlextResult.ok(True)
+        return r.ok(True)
 
-    def _create_report_model(self) -> FlextResult[FlextQualityModels.ReportModel]:
+    def _create_report_model(self) -> r[m.ReportModel]:
         """Create report model (monadic step 3)."""
         try:
             analysis_uuid = (
@@ -510,19 +502,19 @@ class ReportServiceBuilder:
                 if isinstance(self._analysis_id, UUID)
                 else uuid5(NAMESPACE_DNS, str(self._analysis_id))
             )
-            report = FlextQualityModels.ReportModel(
+            report = m.ReportModel(
                 analysis_id=analysis_uuid,
                 format_type=self._format_type,
                 **self._kwargs,
             )
-            return FlextResult.ok(report)
+            return r.ok(report)
         except (ValueError, TypeError) as e:
-            return FlextResult.fail(f"Report creation failed: {e}")
+            return r.fail(f"Report creation failed: {e}")
 
     def _log_report_creation(
         self,
-        report: FlextQualityModels.ReportModel,
-    ) -> FlextQualityModels.ReportModel:
+        report: m.ReportModel,
+    ) -> m.ReportModel:
         """Log report creation and return (monadic final step)."""
         self._logger.info(
             "Report created successfully",
