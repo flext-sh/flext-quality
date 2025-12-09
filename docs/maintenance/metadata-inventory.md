@@ -16,7 +16,7 @@
 | client-b-meltano-native | `client-b-meltano-native/docs/maintenance` | `config.yaml` | `README.md` | _(shared runner invoked via Makefile)_ | Added first-class config + Makefile target powered by shared runner. |
 | flext-quality | `flext-quality/docs/maintenance` | `config/audit_rules.yaml`,
 `config/style_guide.yaml`, `config/validation_config.yaml`, `config/schedule_config.yaml`,
-`config/notification_config.yaml`, `config/lychee.toml` | `README.md`, `MAINTENANCE_PROCEDURES.md`,
+`config/notification_config.yaml`, `config/lychee.toml` | `README.md`, `maintenance-procedures.md`,
 `REFACTORING_PLAN.md` | Shared core (`scripts/*.py`, `dashboard.py`,
 `scheduled_maintenance.py`) | Source of shared tooling; serves as target schema for alignment. |
 

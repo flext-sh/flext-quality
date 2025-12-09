@@ -34,7 +34,7 @@ from flext_quality import (
     QualityMetrics,
 )
 from flext_quality.reports import FlextQualityReportGenerator
-from flext_quality.typings import FlextQualityTypes
+from flext_quality.typings import t
 
 # Initialize rich console for output
 console = Console()
@@ -69,7 +69,7 @@ def _display_project_overview(analyzed_files: list[str]) -> None:
 
 def _display_quality_metrics(
     analyzer: CodeAnalyzer,
-    results: FlextQualityTypes.AnalysisResults,
+    results: t.AnalysisResults,
 ) -> None:
     """Display quality metrics and scores."""
     print_section("🎯 Quality Assessment")
@@ -98,7 +98,7 @@ def _display_quality_metrics(
         pass
 
 
-def _display_issues(results: FlextQualityTypes.AnalysisResults) -> None:
+def _display_issues(results: t.AnalysisResults) -> None:
     """Display issues detection summary."""
     print_section("🚨 Issues Detection Summary")
 
@@ -116,7 +116,7 @@ def _display_issues(results: FlextQualityTypes.AnalysisResults) -> None:
 
 
 def _generate_reports(
-    _results: FlextQualityTypes.AnalysisResults,
+    _results: t.AnalysisResults,
     project_path: str,
 ) -> None:
     """Generate quality reports in different formats."""
@@ -160,7 +160,7 @@ def _generate_reports(
 
 def _show_recommendations(
     analyzer: CodeAnalyzer,
-    results: FlextQualityTypes.AnalysisResults,
+    results: t.AnalysisResults,
 ) -> None:
     """Show quality recommendations and final summary."""
     print_section("💡 Comprehensive Recommendations")

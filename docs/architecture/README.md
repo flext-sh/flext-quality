@@ -152,13 +152,13 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 
 | ADR                                           | Title                                         | Status   | Date       |
 | --------------------------------------------- | --------------------------------------------- | -------- | ---------- |
-| [ADR-001](adrs/001-clean-architecture.md)     | Adopt Clean Architecture                      | Accepted | 2025-10-10 |
+| ADR-001                                       | Adopt Clean Architecture                      | Accepted | 2025-10-10 |
 
 ### Technology Decisions
 
 | ADR                                 | Title                            | Status   | Date       |
 | ----------------------------------- | -------------------------------- | -------- | ---------- |
-| [ADR-009](adrs/009-mypy-types.md)   | MyPy for Type Safety             | Accepted | 2025-10-10 |
+| ADR-009                             | MyPy for Type Safety             | Accepted | 2025-10-10 |
 
 ## 📋 Quality Attributes & Architectural Characteristics
 
@@ -217,23 +217,23 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 
 ### Architecture Views
 
-- **[System Context](c4-model/context.md)**: External system relationships
-- **[Container Architecture](c4-model/containers.md)**: High-level system components
-- **[Component Architecture](c4-model/components.md)**: Detailed component interactions
-- **[Code Architecture](c4-model/code.md)**: Implementation-level details
+- **System Context**: External system relationships (*Documentation coming soon*)
+- **Container Architecture**: High-level system components (*Documentation coming soon*)
+- **Component Architecture**: Detailed component interactions (*Documentation coming soon*)
+- **Code Architecture**: Implementation-level details (*Documentation coming soon*)
 
 ### Cross-Cutting Concerns
 
-- **[Security Architecture](views/security.md)**: Security controls and threat modeling
-- **[Deployment Architecture](views/deployment.md)**: Infrastructure and deployment patterns
-- **[Data Architecture](views/data.md)**: Data models and persistence strategies
-- **[Integration Architecture](views/integration.md)**: External system integrations
+- **Security Architecture**: Security controls and threat modeling (*Documentation coming soon*)
+- **Deployment Architecture**: Infrastructure and deployment patterns (*Documentation coming soon*)
+- **Data Architecture**: Data models and persistence strategies (*Documentation coming soon*)
+- **Integration Architecture**: External system integrations (*Documentation coming soon*)
 
 ### Operational Documentation
 
-- **[Monitoring & Observability](views/monitoring.md)**: System monitoring and alerting
-- **[Disaster Recovery](views/disaster-recovery.md)**: Backup and recovery procedures
-- **[Performance Characteristics](views/performance.md)**: Performance benchmarks and optimization
+- **Monitoring & Observability**: System monitoring and alerting (*Documentation coming soon*)
+- **Disaster Recovery**: Backup and recovery procedures (*Documentation coming soon*)
+- **Performance Characteristics**: Performance benchmarks and optimization (*Documentation coming soon*)
 
 ## 🎨 Diagrams & Visualizations
 
@@ -292,23 +292,23 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 
 ### For New Team Members
 
-1. Start with [System Context](c4-model/context.md) to understand the big picture
-2. Review [Container Architecture](c4-model/containers.md) for high-level components
-3. Read key [Architecture Decisions](adrs/) to understand foundational choices
+1. Start with System Context to understand the big picture (*Documentation coming soon*)
+2. Review Container Architecture for high-level components (*Documentation coming soon*)
+3. Read key Architecture Decisions to understand foundational choices (*Documentation coming soon*)
 4. Explore [Component Architecture](c4-model/components.md) for detailed interactions
 
 ### For Architects & Technical Leads
 
 1. Review [ADRs](adrs/) for decision history and rationale
 2. Examine [Cross-Cutting Concerns](views/) for quality attributes
-3. Analyze [Security Architecture](views/security.md) for security considerations
-4. Review [Deployment Architecture](views/deployment.md) for infrastructure patterns
+3. Analyze **Security Architecture** for security considerations (*Documentation coming soon*)
+4. Review **Deployment Architecture** for infrastructure patterns (*Documentation coming soon*)
 
 ### For Developers
 
-1. Understand [Component Architecture](c4-model/components.md) for implementation guidance
-2. Review [Code Architecture](c4-model/code.md) for implementation patterns
-3. Check [Integration Architecture](views/integration.md) for external dependencies
+1. Understand **Component Architecture** for implementation guidance (*Documentation coming soon*)
+2. Review **Code Architecture** for implementation patterns (*Documentation coming soon*)
+3. Check **Integration Architecture** for external dependencies (*Documentation coming soon*)
 4. Reference [API Documentation](../api/) for interface specifications
 
 **FLEXT Quality Architecture** - Enterprise-grade code quality analysis with clean architecture, domain-driven design,

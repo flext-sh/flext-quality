@@ -13,7 +13,7 @@ from flext_core import FlextResult, FlextService
 class FlextQualityOperations(FlextService[bool]):
     """Unified quality checking operations with complete flext-core integration.
 
-    **ARCHITECTURE LAYER 3** - Domain Service Implementation
+    **ARCHITECTURE LAYER 3** - Service Implementation
 
     Consolidates: quality_operations.py, linting_service.py, checker.py,
     duplicate_detector.py, export_repairer.py, docstring_normalizer.py,

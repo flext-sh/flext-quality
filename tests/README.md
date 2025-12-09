@@ -383,7 +383,7 @@ poetry install --group test
 
 ## Related Documentation
 
-- **[Source Code Documentation](../src/flext_quality/README.md)** - Implementation details
-- **[Development Guide](../docs/development/README.md)** - Development setup and workflows
+- **Source Code Documentation** - Implementation details (*Documentation coming soon*)
+- **Development Guide** - Development setup and workflows (*Documentation coming soon*)
 - **[Architecture Documentation](../docs/architecture/README.md)** - System design and patterns
-- **[Quality Standards](../docs/development/quality-standards.md)** - Quality requirements and validation
+- **Quality Standards** - Quality requirements and validation (*Documentation coming soon*)

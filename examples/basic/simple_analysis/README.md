@@ -300,22 +300,22 @@ pdf_report = report.generate_pdf_report()
 
 For additional support:
 
-- Review the [API Documentation](../../../docs/api/README.md)
-- Check [Integration Examples](../../integration/README.md)
-- Consult [Troubleshooting Guide](../../../docs/development/troubleshooting.md)
+- Review the **API Documentation** (*Documentation coming soon*)
+- Check **Integration Examples** (*Documentation coming soon*)
+- Consult **Troubleshooting Guide** (*Documentation coming soon*)
 
 ## Next Steps
 
 After mastering this basic example:
 
-1. **Explore Advanced Examples**: [Multi-Backend Analysis](../../advanced/multi_backend/)
-2. **Learn Integration Patterns**: [FLEXT Ecosystem Integration](../../integration/observability/)
-3. **Implement CI/CD**: [GitHub Actions Integration](../../ci-cd/github-actions/)
-4. **Create Custom Reports**: [Report Generation Examples](../../reports/custom_templates/)
+1. **Explore Advanced Examples** - (*Documentation coming soon*)
+2. **Learn Integration Patterns** - (*Documentation coming soon*)
+3. **Implement CI/CD** - (*Documentation coming soon*)
+4. **Create Custom Reports** - (*Documentation coming soon*)
 
 ## Related Resources
 
 - **[FLEXT Quality Documentation](../../../docs/README.md)** - Complete system documentation
-- **[CodeAnalyzer API](../../../docs/api/analyzer.md)** - Detailed API reference
-- **[Quality Metrics Guide](../../../docs/development/quality-metrics.md)** - Understanding quality scoring
-- **[Integration Patterns](../../../docs/integration/README.md)** - FLEXT ecosystem integration
+- **CodeAnalyzer API** - Detailed API reference (*Documentation coming soon*)
+- **Quality Metrics Guide** - Understanding quality scoring (*Documentation coming soon*)
+- **Integration Patterns** - FLEXT ecosystem integration (*Documentation coming soon*)

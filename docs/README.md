@@ -50,106 +50,106 @@ Documentation for FLEXT Quality - code quality analysis library for the FLEXT ec
 
 ### Getting Started
 
-- **[Quick Start Guide](quick-start.md)** - Get up and running with FLEXT Quality
-- **[Installation Guide](installation.md)** - Detailed installation and setup instructions
-- **[Configuration Guide](configuration.md)** - Environment and service configuration
+- **Quick Start Guide** - Get up and running with FLEXT Quality (*Documentation coming soon*)
+- **Installation Guide** - Detailed installation and setup instructions (*Documentation coming soon*)
+- **Configuration Guide** - Environment and service configuration (*Documentation coming soon*)
 
 ### Architecture & Design
 
 - **[Architecture Overview](architecture/README.md)** - High-level system architecture
-- **[Clean Architecture Implementation](architecture/clean-architecture.md)** - Domain-driven design patterns
-- **[FLEXT Integration](architecture/flext-integration.md)** - Integration with FLEXT ecosystem
-- **[API Design](architecture/api-design.md)** - REST API architecture and patterns
+- **Clean Architecture Implementation** - Domain-driven design patterns (*Documentation coming soon*)
+- **FLEXT Integration** - Integration with FLEXT ecosystem (*Documentation coming soon*)
+- **API Design** - REST API architecture and patterns (*Documentation coming soon*)
 
 ### Development
 
-- **[Development Guide](development/README.md)** - Development environment and workflows
-- **[Coding Standards](development/coding-standards.md)** - Code quality and style guidelines
-- **[Testing Strategy](development/testing.md)** - Test implementation and coverage requirements
-- **[Contributing Guide](development/contributing.md)** - How to contribute to FLEXT Quality
+- **Development Guide** - Development environment and workflows (*Documentation coming soon*)
+- **Coding Standards** - Code quality and style guidelines (*Documentation coming soon*)
+- **Testing Strategy** - Test implementation and coverage requirements (*Documentation coming soon*)
+- **Contributing Guide** - How to contribute to FLEXT Quality (*Documentation coming soon*)
 
 ### API Reference
 
-- **[REST API](api/README.md)** - Complete REST API documentation
-- **[Python SDK](api/python-sdk.md)** - Python client library
-- **[GraphQL API](api/graphql.md)** - GraphQL endpoints and schema
-- **[Webhooks](api/webhooks.md)** - Webhook integrations
+- **REST API** - Complete REST API documentation (*Documentation coming soon*)
+- **Python SDK** - Python client library (*Documentation coming soon*)
+- **GraphQL API** - GraphQL endpoints and schema (*Documentation coming soon*)
+- **Webhooks** - Webhook integrations (*Documentation coming soon*)
 
 ### Integration
 
-- **[FLEXT Ecosystem Integration](integration/README.md)** - Integration with other FLEXT services
-- **[CI/CD Integration](integration/cicd.md)** - Quality gates in CI/CD pipelines
-- **[IDE Integration](integration/ide.md)** - Development environment integration
-- **[Monitoring Integration](integration/monitoring.md)** - Observability and metrics
+- **FLEXT Ecosystem Integration** - Integration with other FLEXT services (*Documentation coming soon*)
+- **CI/CD Integration** - Quality gates in CI/CD pipelines (*Documentation coming soon*)
+- **IDE Integration** - Development environment integration (*Documentation coming soon*)
+- **Monitoring Integration** - Observability and metrics (*Documentation coming soon*)
 
 ### Deployment
 
-- **[Deployment Guide](deployment/README.md)** - Production deployment strategies
-- **[Docker Deployment](deployment/docker.md)** - Containerized deployment
-- **[Kubernetes Deployment](deployment/kubernetes.md)** - Kubernetes orchestration
-- **[Cloud Deployment](deployment/cloud.md)** - Cloud-specific deployment guides
+- **Deployment Guide** - Production deployment strategies (*Documentation coming soon*)
+- **Docker Deployment** - Containerized deployment (*Documentation coming soon*)
+- **Kubernetes Deployment** - Kubernetes orchestration (*Documentation coming soon*)
+- **Cloud Deployment** - Cloud-specific deployment guides (*Documentation coming soon*)
 
 ### Operations
 
-- **[Monitoring & Observability](operations/monitoring.md)** - System monitoring and metrics
-- **[Troubleshooting](operations/troubleshooting.md)** - Common issues and solutions
-- **[Performance Tuning](operations/performance.md)** - Optimization guidelines
-- **[Backup & Recovery](operations/backup.md)** - Data protection strategies
+- **Monitoring & Observability** - System monitoring and metrics (*Documentation coming soon*)
+- **Troubleshooting** - Common issues and solutions (*Documentation coming soon*)
+- **Performance Tuning** - Optimization guidelines (*Documentation coming soon*)
+- **Backup & Recovery** - Data protection strategies (*Documentation coming soon*)
 
 ### Quality Analysis
 
-- **[Analysis Engine](analysis/README.md)** - Quality analysis capabilities
-- **[Quality Metrics](analysis/metrics.md)** - Comprehensive metric definitions
-- **[Rule Configuration](analysis/rules.md)** - Quality rule customization
-- **[Report Generation](analysis/reports.md)** - Report formats and customization
+- **Analysis Engine** - Quality analysis capabilities (*Documentation coming soon*)
+- **Quality Metrics** - Comprehensive metric definitions (*Documentation coming soon*)
+- **Rule Configuration** - Quality rule customization (*Documentation coming soon*)
+- **Report Generation** - Report formats and customization (*Documentation coming soon*)
 
 ### Tutorials
 
-- **[Basic Quality Analysis](tutorials/basic-analysis.md)** - Step-by-step analysis tutorial
-- **[Custom Analyzers](tutorials/custom-analyzers.md)** - Building custom analysis backends
-- **[Quality Dashboards](tutorials/dashboards.md)** - Creating quality dashboards
-- **[Ecosystem Integration](tutorials/ecosystem-integration.md)** - Multi-project analysis
+- **Basic Quality Analysis** - Step-by-step analysis tutorial (*Documentation coming soon*)
+- **Custom Analyzers** - Building custom analysis backends (*Documentation coming soon*)
+- **Quality Dashboards** - Creating quality dashboards (*Documentation coming soon*)
+- **Ecosystem Integration** - Multi-project analysis (*Documentation coming soon*)
 
 ### Reference
 
-- **[Configuration Reference](reference/configuration.md)** - Complete configuration options
-- **[CLI Reference](reference/cli.md)** - Command-line interface documentation
-- **[Environment Variables](reference/environment.md)** - Environment configuration
-- **[Error Codes](reference/errors.md)** - Error code reference
+- **Configuration Reference** - Complete configuration options (*Documentation coming soon*)
+- **CLI Reference** - Command-line interface documentation (*Documentation coming soon*)
+- **Environment Variables** - Environment configuration (*Documentation coming soon*)
+- **Error Codes** - Error code reference (*Documentation coming soon*)
 
 ### Project Information
 
-- **[TODO & Issues](TODO.md)** - Known issues and architectural improvements needed
-- **[Changelog](CHANGELOG.md)** - Version history and changes
-- **[Roadmap](ROADMAP.md)** - Future development plans
+- **[TODO & Issues](../TODO.md)** - Known issues and architectural improvements needed
+- **Changelog** - Version history and changes (*Documentation coming soon*)
+- **Roadmap** - Future development plans (*Documentation coming soon*)
 - **[License](../LICENSE)** - Project license information
 
 ## Quick Navigation
 
 ### For New Users
 
-1. Start with [Quick Start Guide](quick-start.md)
+1. Start with **Quick Start Guide** (*Documentation coming soon*)
 2. Review [Architecture Overview](architecture/README.md)
-3. Follow [Installation Guide](installation.md)
+3. Follow **Installation Guide** (*Documentation coming soon*)
 
 ### For Developers
 
-1. Review [Development Guide](development/README.md)
-2. Understand [Clean Architecture Implementation](architecture/clean-architecture.md)
-3. Check [Coding Standards](development/coding-standards.md)
-4. See [TODO & Issues](TODO.md) for current development priorities
+1. Review **Development Guide** (*Documentation coming soon*)
+2. Understand **Clean Architecture Implementation** (*Documentation coming soon*)
+3. Check **Coding Standards** (*Documentation coming soon*)
+4. See [TODO & Issues](../TODO.md) for current development priorities
 
 ### For DevOps/Operations
 
-1. Follow [Deployment Guide](deployment/README.md)
-2. Configure [Monitoring & Observability](operations/monitoring.md)
-3. Review [Troubleshooting](operations/troubleshooting.md)
+1. Follow **Deployment Guide** (*Documentation coming soon*)
+2. Configure **Monitoring & Observability** (*Documentation coming soon*)
+3. Review **Troubleshooting** (*Documentation coming soon*)
 
 ### For API Users
 
-1. Check [REST API Documentation](api/README.md)
-2. Use [Python SDK Guide](api/python-sdk.md)
-3. Review [Integration Examples](integration/README.md)
+1. Check **REST API Documentation** (*Documentation coming soon*)
+2. Use **Python SDK Guide** (*Documentation coming soon*)
+3. Review **Integration Examples** (*Documentation coming soon*)
 
 ## Documentation Standards
 
@@ -164,7 +164,7 @@ This documentation follows FLEXT ecosystem standards:
 ## Documentation Maintenance Baseline
 
 - Shared automation resides in [`docs/maintenance`](maintenance/) and is exposed via profile-based runners in `flext_quality.docs_maintenance`.
-- Project-level configurations are normalized to YAML (see [`maintenance/config`](maintenance/config/)) with defaults documented in [`DOCS_MAINTENANCE_ROADMAP.md`](maintenance/DOCS_MAINTENANCE_ROADMAP.md) and [`METADATA_INVENTORY.md`](maintenance/METADATA_INVENTORY.md).
+- Project-level configurations are normalized to YAML (see [`maintenance/config`](maintenance/config/)) with defaults documented in [`docs-maintenance-roadmap.md`](maintenance/docs-maintenance-roadmap.md) and [`metadata-inventory.md`](maintenance/metadata-inventory.md).
 - Report generation now emits Markdown by default (timestamped artifacts plus `latest_report.*` pointers) with optional JSON/HTML outputs controlled through the `reporting.output_formats` config.
 - All repositories tethering to this tooling should keep metadata in `docs/maintenance/` (config, scripts,
   reports) to benefit from shared audits, validation, optimization, and synchronization flows.

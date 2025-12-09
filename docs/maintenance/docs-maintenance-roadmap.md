@@ -135,11 +135,11 @@
   - Next: draft normalization checklist (config schema conversion, capability gaps,
     wrapper migration plan) and define acceptance tests per capability pillar.
 
-- **2025-10-16** – Published detailed metadata inventory (`docs/maintenance/METADATA_INVENTORY.md`) summarizing directories,
+- **2025-10-16** – Published detailed metadata inventory (`docs/maintenance/metadata-inventory.md`) summarizing directories,
   config formats, markdown deliverables,
   and automation scripts per repository. Established normalization checklist covering schema conversion,
   capability gap closure, report naming, and automation mapping.
-- **2025-10-16** – Completed initial tooling audit (`docs/maintenance/TOOLING_AUDIT.md`) highlighting candidate libraries for CLI modernization (Typer,
+- **2025-10-16** – Completed initial tooling audit (`docs/maintenance/tooling-audit.md`) highlighting candidate libraries for CLI modernization (Typer,
   Rich), async validation (`httpx`), templated reporting (Jinja2), configuration validation (pydantic),
   and supporting utilities (pathspec, rapidfuzz).
 - **2025-10-16** – Implemented shared reporting enhancements: default output format now Markdown,

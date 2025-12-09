@@ -348,13 +348,13 @@ ls -la /path/to/project
 ### Getting Help
 
 - **Documentation**: [docs/README.md](../docs/README.md)
-- **API Reference**: [docs/api/README.md](../docs/api/README.md)
-- **Integration Guide**: [docs/integration/README.md](../docs/integration/README.md)
-- **Troubleshooting**: [docs/development/troubleshooting.md](../docs/development/troubleshooting.md)
+- **API Reference** - (*Documentation coming soon*)
+- **Integration Guide** - (*Documentation coming soon*)
+- **Troubleshooting** - (*Documentation coming soon*)
 
 ## Related Resources
 
 - **[FLEXT Quality Documentation](../docs/README.md)** - Complete system documentation
-- **[API Reference](../docs/api/README.md)** - REST API and Python SDK documentation
-- **[Integration Guide](../docs/integration/README.md)** - FLEXT ecosystem integration patterns
-- **[Development Guide](../docs/development/README.md)** - Development setup and contribution guidelines
+- **API Reference** - REST API and Python SDK documentation (*Documentation coming soon*)
+- **Integration Guide** - FLEXT ecosystem integration patterns (*Documentation coming soon*)
+- **Development Guide** - Development setup and contribution guidelines (*Documentation coming soon*)

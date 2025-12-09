@@ -19,7 +19,7 @@ import tempfile
 from pathlib import Path
 
 from flext_quality.cli import main as quality_main
-from flext_quality.typings import FlextQualityTypes
+from flext_quality.typings import t
 
 
 def run_cli_analysis(
@@ -102,7 +102,7 @@ def check_quality_thresholds(results: dict[str, object]) -> dict[str, object]:
     analysis_results = results.get("analysis_results", {})
 
     # Handle both dict[str, object] and AnalysisResults object
-    if isinstance(analysis_results, FlextQualityTypes.AnalysisResults):
+    if isinstance(analysis_results, t.AnalysisResults):
         # Modern AnalysisResults format
         security_count = len(analysis_results.security_issues)
         complexity_count = len(analysis_results.complexity_issues)

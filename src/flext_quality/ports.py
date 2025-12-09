@@ -14,7 +14,7 @@ from flext_core import p
 # Use p from flext-core instead of local definitions
 # Following FLEXT_REFACTORING_PROMPT.md to eliminate duplication
 
-# Analysis services use Domain.Service protocol
+# Analysis services use Service protocol
 AnalysisService = p.Service
 SecurityAnalyzerService = p.Service
 LintingService = p.Service
@@ -23,7 +23,7 @@ DeadCodeDetectorService = p.Service
 DuplicateDetectorService = p.Service
 MetricsCollectorService = p.Service
 
-# Report generation uses Application.Handler protocol
+# Report generation uses Handler protocol
 ReportGeneratorService = p.Handler[object]
 
 

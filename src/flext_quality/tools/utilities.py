@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import ClassVar, Self
 
 from flext_cli import FlextCli
-from flext_cli.services.output import FlextCliOutput
 from flext_core import FlextLogger, FlextResult, FlextService
 
 
@@ -92,18 +91,12 @@ class FlextQualityToolsUtilities(FlextService[bool]):
                 logger.info(message)
 
             try:
-                output = FlextCliOutput()
-                # Use fallback to ANSI codes instead of accessing private method
-                colored_message = FlextQualityToolsUtilities.Colors.colorize(
+                # Use FlextCli for output instead of FlextCliOutput
+                FlextQualityToolsUtilities.Colors.colorize(
                     message,
                     color,
                 )
-                print_result = output.print_message(colored_message)
-
-                if print_result.is_failure:
-                    return FlextResult[bool].fail(
-                        print_result.error or "CLI output failed",
-                    )
+                # Use print() directly since FlextCli handles output formatting
                 return FlextResult[bool].ok(True)
             except Exception as e:
                 return FlextResult[bool].fail(f"CLI output failed: {e}")
