@@ -21,28 +21,26 @@ class ConfigurationManager(FlextService[dict[str, str]]):
         super().__init__()
         self._logger = FlextLogger(__name__)
         self._config_path = Path(config_path).expanduser() if config_path else None
-        self._config: dict[str, str] = {}
+        self._raw_config: dict[str, str] = {}
 
     def execute(self: Self) -> FlextResult[dict[str, str]]:
         """Return the current configuration snapshot."""
-        return FlextResult[dict[str, str]].ok(self._config)
+        return FlextResult[dict[str, str]].ok(self._raw_config)
 
     def load_config(self) -> FlextResult[dict[str, str]]:
         """Load configuration from disk if a path is configured."""
         if not self._config_path:
-            return FlextResult[dict[str, str]].ok(self._config)
+            return FlextResult[dict[str, str]].ok(self._raw_config)
 
         try:
             if self._config_path.exists():
                 with self._config_path.open(encoding="utf-8") as handle:
                     raw_data = json.load(handle)
-                    # Use object.__setattr__ to bypass Pydantic's custom __setattr__ for private attributes
-                    object.__setattr__(
-                        self,
-                        "_config",
-                        {key: str(value) for key, value in raw_data.items()},
-                    )
-            return FlextResult[dict[str, str]].ok(self._config)
+                    # Direct assignment for private attribute
+                    self._raw_config = {
+                        key: str(value) for key, value in raw_data.items()
+                    }
+            return FlextResult[dict[str, str]].ok(self._raw_config)
         except (OSError, json.JSONDecodeError) as error:
             self._logger.exception("Failed to load configuration")
             return FlextResult[dict[str, str]].fail(
@@ -57,7 +55,7 @@ class ConfigurationManager(FlextService[dict[str, str]]):
         try:
             self._config_path.parent.mkdir(parents=True, exist_ok=True)
             with self._config_path.open("w", encoding="utf-8") as handle:
-                json.dump(self._config, handle, indent=2, ensure_ascii=False)
+                json.dump(self._raw_config, handle, indent=2, ensure_ascii=False)
             return FlextResult[bool].ok(True)
         except OSError as error:
             self._logger.exception("Failed to save configuration")
@@ -65,16 +63,16 @@ class ConfigurationManager(FlextService[dict[str, str]]):
 
     def get(self, key: str, default: str | None = None) -> FlextResult[str | None]:
         """Retrieve a configuration value."""
-        return FlextResult[str | None].ok(self._config.get(key, default))
+        return FlextResult[str | None].ok(self._raw_config.get(key, default))
 
     def set(self, key: str, value: str) -> FlextResult[bool]:
         """Set a configuration value."""
-        self._config[key] = value
+        self._raw_config[key] = value
         return FlextResult[bool].ok(True)
 
     def delete(self, key: str) -> FlextResult[bool]:
         """Delete a configuration value if present."""
-        self._config.pop(key, None)
+        self._raw_config.pop(key, None)
         return FlextResult[bool].ok(True)
 
     def validate_config(self) -> FlextResult[bool]:

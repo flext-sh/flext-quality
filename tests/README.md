@@ -383,7 +383,7 @@ poetry install --group test
 
 ## Related Documentation
 
-- **Source Code Documentation** - Implementation details (*Documentation coming soon*)
-- **Development Guide** - Development setup and workflows (*Documentation coming soon*)
+- **Source Code Documentation** - Implementation details (_Documentation coming soon_)
+- **Development Guide** - Development setup and workflows (_Documentation coming soon_)
 - **[Architecture Documentation](../docs/architecture/README.md)** - System design and patterns
-- **Quality Standards** - Quality requirements and validation (*Documentation coming soon*)
+- **Quality Standards** - Quality requirements and validation (_Documentation coming soon_)

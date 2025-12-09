@@ -11,6 +11,8 @@ import warnings
 from abc import ABC, abstractmethod
 from pathlib import Path
 
+from flext_core import FlextResult
+
 from .backend_type import BackendType
 
 
@@ -22,15 +24,15 @@ class FlextQualityAnalyzer(ABC):
         self,
         _code: str,
         file_path: Path | None = None,
-    ) -> dict[str, object]:
+    ) -> FlextResult[dict[str, object]]:
         """Analyze code and return results.
 
         Args:
-        code: Source code to analyze
+        _code: Source code to analyze
         file_path: Optional file path for context
 
         Returns:
-        Dictionary containing analysis results
+        FlextResult containing analysis results dictionary
 
         """
         ...

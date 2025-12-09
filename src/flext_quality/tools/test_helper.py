@@ -70,9 +70,11 @@ def _handle_coverage_error(error_msg: str) -> FlextResult[list[str]]:
 
     """
     if "not found" in error_msg.lower():
-        return FlextResult.ok([
-            "Install pytest and coverage to analyze test coverage",
-        ])
+        return FlextResult.ok(
+            [
+                "Install pytest and coverage to analyze test coverage",
+            ]
+        )
     if "timed out" in error_msg.lower():
         return FlextResult.fail("Coverage analysis timed out")
     return FlextResult.fail(f"Coverage analysis failed: {error_msg}")
@@ -131,10 +133,11 @@ def check_test_quality(test_file: Path) -> FlextResult[dict[str, object]]:
         # Simple pattern checks
         lines = content.splitlines()
         for i, line in enumerate(lines, 1):
+            # Look ahead for assertions
+            next_lines = "\n".join(lines[i : min(i + 20, len(lines))])
+
             # Check for tests without assertions
             if "def test_" in line:
-                # Look ahead for assertions
-                next_lines = "\n".join(lines[i : min(i + 20, len(lines))])
                 if "assert" not in next_lines and "assert" not in next_lines:
                     issues.append(f"Line {i}: Test function may lack assertions")
 
@@ -146,12 +149,14 @@ def check_test_quality(test_file: Path) -> FlextResult[dict[str, object]]:
             if "except:" in line and "pass" in next_lines:
                 issues.append(f"Line {i}: Exception caught and ignored with pass")
 
-        return FlextResult.ok({
-            "file": str(test_file),
-            "total_issues": len(issues),
-            "issues": issues,
-            "quality": "good" if len(issues) == 0 else "needs_improvement",
-        })
+        return FlextResult.ok(
+            {
+                "file": str(test_file),
+                "total_issues": len(issues),
+                "issues": issues,
+                "quality": "good" if len(issues) == 0 else "needs_improvement",
+            }
+        )
 
     except Exception as e:
         return FlextResult.fail(f"Test quality check failed: {e}")
@@ -175,15 +180,18 @@ def validate_test_execution(test_path: Path) -> FlextResult[dict[str, object]]:
         )
 
         if result.is_failure:
-            if "not found" in result.error.lower():
-                return FlextResult.ok({
-                    "file": str(test_path),
-                    "status": "tool_not_found",
-                    "message": "pytest not installed",
-                })
-            if "timed out" in result.error.lower():
+            error_msg = result.error or ""
+            if "not found" in error_msg.lower():
+                return FlextResult.ok(
+                    {
+                        "file": str(test_path),
+                        "status": "tool_not_found",
+                        "message": "pytest not installed",
+                    }
+                )
+            if "timed out" in error_msg.lower():
                 return FlextResult.fail("Test execution timed out")
-            return FlextResult.fail(f"Test execution failed: {result.error}")
+            return FlextResult.fail(f"Test execution failed: {error_msg}")
 
         wrapper = result.unwrap()
 
@@ -193,12 +201,14 @@ def validate_test_execution(test_path: Path) -> FlextResult[dict[str, object]]:
             line for line in output_lines if "passed" in line or "failed" in line
         ]
 
-        return FlextResult.ok({
-            "file": str(test_path),
-            "status": "passed" if wrapper.returncode == 0 else "failed",
-            "return_code": wrapper.returncode,
-            "summary": summary_line[-1] if summary_line else "No summary",
-        })
+        return FlextResult.ok(
+            {
+                "file": str(test_path),
+                "status": "passed" if wrapper.returncode == 0 else "failed",
+                "return_code": wrapper.returncode,
+                "summary": summary_line[-1] if summary_line else "No summary",
+            }
+        )
 
     except Exception as e:
         return FlextResult.fail(f"Test execution failed: {e}")

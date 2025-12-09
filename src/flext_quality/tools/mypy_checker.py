@@ -38,7 +38,6 @@ class MyPyChecker(FlextService[list[str]]):
         run_result = SubprocessUtils.run_external_command(
             ["mypy", str(root)],
             capture_output=True,
-            text=True,
             check=False,
         )
         if run_result.is_failure:

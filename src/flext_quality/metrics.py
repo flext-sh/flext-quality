@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextResult, t
+from flext_core import FlextResult
 from pydantic import BaseModel, ConfigDict, Field
 
 from .constants import c
@@ -134,7 +134,7 @@ class QualityMetrics(BaseModel):
     )
 
     @property
-    def scores_summary(self) -> t.FloatDict:
+    def scores_summary(self) -> dict[str, float]:
         """Get summary of all category scores."""
         return {
             "complexity": self.complexity_score,
@@ -154,7 +154,7 @@ class QualityMetrics(BaseModel):
             + self.complexity_issues_count
         )
 
-    def to_dict(self) -> dict[str, float | int | str]:
+    def to_dict(self) -> dict[str, float | int | str | dict[str, float]]:
         """Export metrics as dictionary for serialization."""
         return {
             "overall_score": self.overall_score,
@@ -380,7 +380,12 @@ class MetricsCalculator:
         # Handle both legacy dict metrics and typed AnalysisMetricsModel
         if isinstance(results.metrics, dict):
             # Legacy: metrics is a dict with average_complexity
-            avg_complexity = float(results.metrics.get("average_complexity", 0.0))
+            complexity_val: object = results.metrics.get("average_complexity", 0.0)
+            # Convert to float, handling None and non-numeric values
+            if isinstance(complexity_val, (int, float)):
+                avg_complexity = float(complexity_val)
+            else:
+                avg_complexity = 0.0
             # Count issues from results.issues list (legacy format: [{"type": "...", ...}])
             security_count = sum(
                 1

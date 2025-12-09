@@ -380,15 +380,18 @@ absorbing workspace functionality and providing unified interfaces to Python's b
 ## Related Documentation
 
 **Within Project**:
+
 - [Architecture](architecture/README.md) - Architecture and design patterns
 - [API Reference](api-reference.md) - Complete API documentation
 - [Examples](../examples/) - Working code examples
 
 **Across Projects**:
+
 - [flext-core Foundation](https://github.com/organization/flext/tree/main/flext-core/docs/architecture/overview.md) - Clean architecture and CQRS patterns
 - [flext-core Service Patterns](https://github.com/organization/flext/tree/main/flext-core/docs/guides/service-patterns.md) - Service patterns and dependency injection
 - [FLEXT Workspace Documentation](../README.md) - Ecosystem overview
 
 **External Resources**:
+
 - [PEP 257 - Docstring Conventions](https://peps.python.org/pep-0257/)
 - [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)

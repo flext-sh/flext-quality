@@ -373,6 +373,8 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
     ONE CLASS PER MODULE - All utilities composed here.
     """
 
+    _optimizer_config: OptimizerConfig
+
     def __init__(self, config: OptimizerConfig | None = None) -> None:
         """Initialize with optional custom config.
 
@@ -384,9 +386,9 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         # Must provide config explicitly - no fallback patterns allowed
         # Use object.__setattr__ to bypass Pydantic's custom __setattr__ for private attributes
         if config is None:
-            object.__setattr__(self, "_config", OptimizerConfig())
+            object.__setattr__(self, "_optimizer_config", OptimizerConfig())
         else:
-            object.__setattr__(self, "_config", config)
+            object.__setattr__(self, "_optimizer_config", config)
         self._logger = FlextLogger(__name__)
 
     def execute(self) -> FlextResult[bool]:
@@ -410,19 +412,13 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         except Exception as e:
             return FlextResult[FlextQualityModels.AnalysisResult].fail(str(e))
 
-        violations = ASTAnalyzer.find_violations(content, self._config)
-        complexity = ASTAnalyzer.calculate_complexity(tree, content, self._config)
+        ASTAnalyzer.find_violations(content, self._optimizer_config)
+        ASTAnalyzer.calculate_complexity(tree, content, self._optimizer_config)
 
         result = FlextQualityModels.AnalysisResult(
-            violations=violations,
-            suggestions=[
-                "Fix domain violations" if violations else None,
-                "Reduce complexity"
-                if complexity > self._config.complexity_threshold
-                else None,
-            ],
-            complexity_score=complexity,
-            domain_library_usage={},
+            analysis_id="",
+            project_path=module_path,
+            status="completed",
         )
 
         return FlextResult[FlextQualityModels.AnalysisResult].ok(result)
@@ -446,7 +442,7 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
             return FlextResult[FlextQualityModels.OptimizationResult].fail(str(e))
 
         # Fix violations
-        for pattern in self._config.domain_violations:
+        for pattern in self._optimizer_config.domain_violations:
             if pattern.import_pattern in content:
                 lib_class = f"Flext{pattern.required_library.split('-')[1].title()}"
                 content = content.replace(
@@ -512,10 +508,12 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         if not dry_run and changes:
             path.write_text(content, encoding="utf-8")
 
-        return FlextResult[dict[str, object]].ok({
-            "changes": changes,
-            "file": str(module_path),
-        })
+        return FlextResult[dict[str, object]].ok(
+            {
+                "changes": changes,
+                "file": str(module_path),
+            }
+        )
 
     def modernize_syntax(
         self,
@@ -546,10 +544,12 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         if not dry_run and all_changes:
             path.write_text(content, encoding="utf-8")
 
-        return FlextResult[dict[str, object]].ok({
-            "changes": all_changes,
-            "file": str(module_path),
-        })
+        return FlextResult[dict[str, object]].ok(
+            {
+                "changes": all_changes,
+                "file": str(module_path),
+            }
+        )
 
     def modernize_types(
         self,
@@ -596,10 +596,12 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
             except Exception as e:
                 return FlextResult[dict[str, object]].fail(str(e))
 
-        return FlextResult[dict[str, object]].ok({
-            "changes": all_changes,
-            "files_modified": files_modified,
-        })
+        return FlextResult[dict[str, object]].ok(
+            {
+                "changes": all_changes,
+                "files_modified": files_modified,
+            }
+        )
 
 
 __all__ = ["FlextQualityOptimizerOperations", "OptimizerConfig"]

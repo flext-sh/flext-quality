@@ -52,14 +52,33 @@ class FlextQuality(FlextService[bool]):
 
         # Complete FLEXT ecosystem integration
         # Note: _context and _bus are inherited from FlextService parent class
-        self._container: FlextContainer = FlextContainer.get_global()
+        # Use object.__setattr__ to bypass Pydantic's custom __setattr__
+        # Use unique names (_quality_*) to avoid overriding parent attributes
+        object.__setattr__(self, "_quality_container", FlextContainer.get_global())
         self._dispatcher: FlextDispatcher = FlextDispatcher()
-        self._registry: FlextRegistry = FlextRegistry(dispatcher=self._dispatcher)
-        self._logger: FlextLogger = FlextLogger(__name__)
-        self._config: FlextQualityConfig = FlextQualityConfig()
+        # Note: FlextRegistry creates its own dispatcher if None is passed
+        # This avoids protocol compatibility issues between FlextDispatcher and p.CommandBus
+        self._registry: FlextRegistry = FlextRegistry()
+        object.__setattr__(self, "_quality_logger", FlextLogger(__name__))
+        object.__setattr__(self, "_quality_config", FlextQualityConfig())
 
         # Domain services (V2 pattern: builders, not nested services)
         self._services = FlextQualityServices()
+
+    @property
+    def quality_config(self) -> FlextQualityConfig:
+        """Access quality configuration (read-only)."""
+        return self._quality_config  # type: ignore[attr-defined]
+
+    @property
+    def quality_logger(self) -> FlextLogger:
+        """Access quality logger (read-only)."""
+        return self._quality_logger  # type: ignore[attr-defined]
+
+    @property
+    def quality_container(self) -> FlextContainer:
+        """Access quality container (read-only)."""
+        return self._quality_container  # type: ignore[attr-defined]
 
     # Project operations
     def create_project(
@@ -89,7 +108,7 @@ class FlextQuality(FlextService[bool]):
 
         # Use builder pattern for project creation
         return (
-            ProjectServiceBuilder(self._config, self._logger)
+            ProjectServiceBuilder(self.quality_config, self.quality_logger)
             .with_name(name)
             .with_path(project_path)
             .with_config_dict(config_dict)
@@ -148,7 +167,7 @@ class FlextQuality(FlextService[bool]):
 
         # Use builder pattern for analysis creation
         return (
-            AnalysisServiceBuilder(self._config, self._logger)
+            AnalysisServiceBuilder(self.quality_config, self.quality_logger)
             .with_project_id(str(project_id))
             .with_config_dict(config_dict)
             .build()
@@ -291,7 +310,7 @@ class FlextQuality(FlextService[bool]):
 
         # Use builder pattern for issue creation
         return (
-            IssueServiceBuilder(self._config, self._logger)
+            IssueServiceBuilder(self.quality_config, self.quality_logger)
             .with_analysis_id(str(_analysis_id))
             .with_issue_type(issue_type)
             .with_severity(severity)
@@ -374,7 +393,7 @@ class FlextQuality(FlextService[bool]):
 
         # Use builder pattern for report creation
         return (
-            ReportServiceBuilder(self._config, self._logger)
+            ReportServiceBuilder(self.quality_config, self.quality_logger)
             .with_analysis_id(str(_analysis_id))
             .with_format(_report_format)
             .with_config_dict(config_dict)
@@ -427,7 +446,7 @@ class FlextQuality(FlextService[bool]):
         # Get project to access path - validation will happen in service
         project_result = self.get_project(project_id)
         if project_result.is_failure:
-            return FlextResult[FlextQualityModels.Analysis].fail(
+            return FlextResult[FlextQualityModels.AnalysisModel].fail(
                 f"Failed to retrieve project for analysis: {project_result.error}",
             )
 

@@ -6,17 +6,20 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import TypeVar
 from uuid import UUID
 
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, FlextResult, FlextRuntime
 from flext_observability import (
     flext_create_trace,
 )
 from pydantic import BaseModel, Field
 
-from .constants import c
+from .config import FlextQualityConfig
 from .models import m
-from .services import FlextQualityServices
+from .services import AnalysisServiceBuilder, FlextQualityServices, ReportServiceBuilder
+
+_T = TypeVar("_T")
 
 # =====================================================================
 # Configuration Models (Pydantic 2) - Data-Driven Handlers
@@ -27,7 +30,7 @@ class ObservabilityConfig(BaseModel):
     """Observability configuration for handlers."""
 
     service_name: str = Field(default="flext-quality")
-    log_level: c.Quality.Literals.LogLevelLiteral | str = Field(
+    log_level: str = Field(
         default="info",
     )
     enable_traces: bool = Field(default=True)
@@ -58,13 +61,9 @@ class FlextQualityHandlers:
         self._services = FlextQualityServices()
         self._logger = FlextLogger(__name__)
 
-    def get_analysis_service(self) -> object:
-        """Get analysis service instance."""
-        return self._services.get_analysis_service()
-
-    def get_report_service(self) -> object:
-        """Get report service instance."""
-        return self._services.get_report_service()
+    def get_services(self) -> object:
+        """Get services instance."""
+        return self._services
 
     # =====================================================================
     # Nested Utility Classes - Single Responsibility
@@ -76,7 +75,7 @@ class FlextQualityHandlers:
         @staticmethod
         def log_operation(
             message: str,
-            level: c.Quality.Literals.LogLevelLiteral | str,
+            level: str,
             context: HandlerContext,
         ) -> None:
             """Log operation with context."""
@@ -105,12 +104,15 @@ class FlextQualityHandlers:
         @staticmethod
         def execute_analysis(
             project_id: UUID,
-            services: FlextQualityServices,
-        ) -> FlextResult[m.Analysis]:
-            """Execute project analysis."""
-            project_id_str = str(project_id)
-            return services.get_analysis_service().create_analysis(
-                project_id=project_id_str,
+            _services: object,
+        ) -> FlextResult[m.AnalysisModel]:
+            """Execute project analysis using builder pattern."""
+            config = FlextQualityConfig()
+            logger = FlextLogger(__name__)
+            return (
+                AnalysisServiceBuilder(config, logger)
+                .with_project_id(project_id)
+                .build()
             )
 
     class _ReportOrchestrator:
@@ -119,14 +121,16 @@ class FlextQualityHandlers:
         @staticmethod
         def execute_report_generation(
             analysis_id: UUID,
-            services: FlextQualityServices,
-        ) -> FlextResult[m.Report]:
-            """Execute report generation."""
-            analysis_id_str = str(analysis_id)
-            return services.get_report_service().create_report(
-                analysis_id=analysis_id_str,
-                format_type="html",
-                content="complete report",
+            _services: object,
+        ) -> FlextResult[m.ReportModel]:
+            """Execute report generation using builder pattern."""
+            config = FlextQualityConfig()
+            logger = FlextLogger(__name__)
+            return (
+                ReportServiceBuilder(config, logger)
+                .with_analysis_id(analysis_id)
+                .with_format("HTML")
+                .build()
             )
 
     # =====================================================================
@@ -136,7 +140,7 @@ class FlextQualityHandlers:
     def analyze_project(
         self,
         project_id: UUID,
-    ) -> FlextResult[m.Analysis]:
+    ) -> FlextRuntime.RuntimeResult[m.AnalysisModel]:
         """Analyze project with observability."""
         context = HandlerContext(
             project_id=str(project_id),
@@ -162,7 +166,7 @@ class FlextQualityHandlers:
     def generate_report(
         self,
         analysis_id: UUID,
-    ) -> FlextResult[m.Report]:
+    ) -> FlextRuntime.RuntimeResult[m.ReportModel]:
         """Generate report with observability."""
         context = HandlerContext(
             project_id=str(analysis_id),
@@ -198,7 +202,7 @@ class FlextQualityHandlers:
         self._logger.error(f"Handler error in {context.operation}: {error}")
         return error
 
-    def _log_success(self, context: HandlerContext, result: object) -> object:
+    def _log_success(self, context: HandlerContext, result: _T) -> _T:
         """Log and return success result."""
         self._ObservabilityManager.log_operation(
             "Operation completed successfully",

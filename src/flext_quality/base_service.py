@@ -28,7 +28,7 @@ class FlextQualityBaseService(FlextService[T]):
 
     Subclasses should:
     1. Call super().__init__() with optional config
-    2. Use self._logger, self._config, self._container directly
+    2. Use self.quality_config, self.quality_container, self.logger directly
     3. Implement execute() for FlextService contract
     """
 
@@ -62,24 +62,26 @@ class FlextQualityBaseService(FlextService[T]):
 
         """
         super().__init__()
-        self._logger = FlextLogger(__name__)
-        # Use object.__setattr__ to bypass Pydantic's custom __setattr__ for private attributes
+        # Store quality-specific instances with unique names (avoid overriding parent attributes)
+        object.__setattr__(self, "_quality_logger", FlextLogger(__name__))
         object.__setattr__(
-            self, "_config", config if config is not None else FlextQualityConfig()
+            self,
+            "_quality_config",
+            config if config is not None else FlextQualityConfig(),
         )
-        object.__setattr__(self, "_container", FlextContainer.get_global())
+        object.__setattr__(self, "_quality_container", FlextContainer.get_global())
 
     @property
-    def logger(self) -> FlextLogger:
-        """Access logger (read-only)."""
-        return self._logger
+    def quality_logger(self) -> FlextLogger:
+        """Access quality logger (read-only)."""
+        return self._quality_logger  # type: ignore[attr-defined]
 
     @property
-    def config(self) -> FlextQualityConfig:
-        """Access configuration (read-only)."""
-        return self._config
+    def quality_config(self) -> FlextQualityConfig:
+        """Access quality configuration (read-only)."""
+        return self._quality_config  # type: ignore[attr-defined]
 
     @property
-    def container(self) -> FlextContainer:
-        """Access container (read-only)."""
-        return self._container
+    def quality_container(self) -> FlextContainer:
+        """Access quality container (read-only)."""
+        return self._quality_container  # type: ignore[attr-defined]

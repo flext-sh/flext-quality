@@ -18,12 +18,12 @@ from .constants import FlextQualityConstants
 
 
 @FlextConfig.auto_register("quality")
-class FlextQualityConfig(FlextConfig.AutoConfig):
-    """Single Pydantic 2 Settings class for flext-quality using AutoConfig pattern.
+class FlextQualityConfig(FlextConfig):
+    """Single Pydantic 2 Settings class for flext-quality extending FlextConfig.
 
     **ARCHITECTURAL PATTERN**: Zero-Boilerplate Auto-Registration
 
-    This class uses FlextConfig.AutoConfig for automatic:
+    This class extends FlextConfig (BaseSettings) for automatic:
     - Singleton pattern (thread-safe)
     - Namespace registration (accessible via config.quality)
     - Environment variable loading from FLEXT_QUALITY_* variables
@@ -261,13 +261,15 @@ class FlextQualityConfig(FlextConfig.AutoConfig):
             raise ValueError(msg)
 
         # Validate analysis configuration
-        if not any([
-            self.enable_ast_analysis,
-            self.enable_external_tools,
-            self.enable_ruff,
-            self.enable_mypy,
-            self.enable_bandit,
-        ]):
+        if not any(
+            [
+                self.enable_ast_analysis,
+                self.enable_external_tools,
+                self.enable_ruff,
+                self.enable_mypy,
+                self.enable_bandit,
+            ]
+        ):
             msg = "At least one analysis method must be enabled"
             raise ValueError(msg)
 
@@ -377,24 +379,28 @@ class FlextQualityConfig(FlextConfig.AutoConfig):
     @classmethod
     def create_for_development(cls) -> FlextQualityConfig:
         """Create configuration optimized for development using model_validate."""
-        return cls.model_validate({
-            "min_coverage": 80.0,
-            "max_complexity": 15,
-            "analysis_timeout": 120,
-            "parallel_workers": 2,
-        })
+        return cls.model_validate(
+            {
+                "min_coverage": 80.0,
+                "max_complexity": 15,
+                "analysis_timeout": 120,
+                "parallel_workers": 2,
+            }
+        )
 
     @classmethod
     def create_for_production(cls) -> FlextQualityConfig:
         """Create configuration optimized for production using model_validate."""
-        return cls.model_validate({
-            "min_coverage": FlextQualityConstants.Quality.Coverage.TARGET_COVERAGE,
-            "max_complexity": 8,
-            "min_security_score": FlextQualityConstants.Quality.QualitySecurity.TARGET_SECURITY_SCORE,
-            "min_maintainability": 85.0,
-            "analysis_timeout": 600,
-            "parallel_workers": 8,
-        })
+        return cls.model_validate(
+            {
+                "min_coverage": FlextQualityConstants.Quality.Coverage.TARGET_COVERAGE,
+                "max_complexity": 8,
+                "min_security_score": FlextQualityConstants.Quality.QualitySecurity.TARGET_SECURITY_SCORE,
+                "min_maintainability": 85.0,
+                "analysis_timeout": 600,
+                "parallel_workers": 8,
+            }
+        )
 
 
 __all__ = [

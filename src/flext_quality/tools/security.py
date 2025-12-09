@@ -27,10 +27,12 @@ class FlextSecurityService(FlextService[dict[str, str]]):
                 f"Vault path does not exist: {path}",
             )
 
-        return FlextResult[dict[str, str]].ok({
-            "vault_path": str(path),
-            "status": "decryption-not-implemented",
-        })
+        return FlextResult[dict[str, str]].ok(
+            {
+                "vault_path": str(path),
+                "status": "decryption-not-implemented",
+            }
+        )
 
     def scan_antipatterns(
         self,
@@ -57,10 +59,12 @@ class SecretVaultDecryptor(FlextSecurityService):
             return FlextResult[dict[str, str]].fail("Decryption failed")
         # Convert result.value to string for the dict
         details = str(result.value) if result.value is not None else ""
-        return FlextResult[dict[str, str]].ok({
-            "details": details,
-            "status": "decryption-not-implemented",
-        })
+        return FlextResult[dict[str, str]].ok(
+            {
+                "details": details,
+                "status": "decryption-not-implemented",
+            }
+        )
 
 
 __all__ = ["FlextSecurityService", "SecretVaultDecryptor"]

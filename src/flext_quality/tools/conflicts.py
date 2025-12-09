@@ -75,11 +75,13 @@ class ConflictAnalyzer(FlextService[list[dict[str, str]]]):
                 continue
             previous = known.get(name)
             if previous and previous != spec:
-                conflicts.append({
-                    "dependency": name,
-                    "current": previous,
-                    "requested": spec,
-                })
+                conflicts.append(
+                    {
+                        "dependency": name,
+                        "current": previous,
+                        "requested": spec,
+                    }
+                )
             known[name] = spec
         return conflicts
 

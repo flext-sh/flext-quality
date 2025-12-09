@@ -6,7 +6,20 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
+
 from flext_core import FlextExceptions
+
+# Type alias for extra kwargs - matches FlextExceptions type requirements
+type ExtraKwargsValue = (
+    Mapping[str, bool | float | int | str | None]
+    | list[bool | float | int | str | None]
+    | bool
+    | float
+    | int
+    | str
+    | None
+)
 
 
 class FlextQualityExceptions:
@@ -37,37 +50,31 @@ class FlextQualityExceptions:
     def analysis_error(
         message: str,
         operation: str | None = None,
-        **kwargs: object,
     ) -> FlextQualityExceptions.Analysis:
         """Create analysis error with quality-specific context."""
         return FlextQualityExceptions.Analysis(
             message,
             operation=operation or "quality_analysis",
-            **kwargs,
         )
 
     @staticmethod
     def config_error(
         message: str,
         config_key: str | None = None,
-        **kwargs: object,
     ) -> FlextQualityExceptions.Config:
         """Create configuration error with quality-specific context."""
         return FlextQualityExceptions.Config(
             message,
             config_key=config_key,
-            **kwargs,
         )
 
     @staticmethod
     def model_error(
         message: str,
         field: str | None = None,
-        **kwargs: object,
     ) -> FlextQualityExceptions.Model:
         """Create model validation error with quality-specific context."""
         return FlextQualityExceptions.Model(
             message,
             field=field,
-            **kwargs,
         )

@@ -56,25 +56,27 @@ def check_docstring_coverage(
 
         coverage_pct = (documented_items / total_items * 100) if total_items > 0 else 0
 
-        return FlextResult.ok({
-            "file": str(module_path),
-            "total_items": total_items,
-            "documented_items": documented_items,
-            "undocumented_items": total_items - documented_items,
-            "coverage_percent": coverage_pct,
-            "coverage_grade": (
-                "A"
-                if coverage_pct >= COVERAGE_GRADE_A_THRESHOLD
-                else "B"
-                if coverage_pct >= COVERAGE_GRADE_B_THRESHOLD
-                else "C"
-                if coverage_pct >= COVERAGE_GRADE_C_THRESHOLD
-                else "D"
-                if coverage_pct >= COVERAGE_GRADE_D_THRESHOLD
-                else "F"
-            ),
-            "missing_docs": missing_docs[:10],  # First 10
-        })
+        return FlextResult.ok(
+            {
+                "file": str(module_path),
+                "total_items": total_items,
+                "documented_items": documented_items,
+                "undocumented_items": total_items - documented_items,
+                "coverage_percent": coverage_pct,
+                "coverage_grade": (
+                    "A"
+                    if coverage_pct >= COVERAGE_GRADE_A_THRESHOLD
+                    else "B"
+                    if coverage_pct >= COVERAGE_GRADE_B_THRESHOLD
+                    else "C"
+                    if coverage_pct >= COVERAGE_GRADE_C_THRESHOLD
+                    else "D"
+                    if coverage_pct >= COVERAGE_GRADE_D_THRESHOLD
+                    else "F"
+                ),
+                "missing_docs": missing_docs[:10],  # First 10
+            }
+        )
 
     except SyntaxError as e:
         return FlextResult.fail(f"Syntax error in {module_path}: {e}")
@@ -122,12 +124,14 @@ def validate_google_style_docstrings(
                     if docstring.startswith(" "):
                         issues.append(f"{node.name}: Docstring indentation issue")
 
-        return FlextResult.ok({
-            "file": str(module_path),
-            "issues_found": len(issues),
-            "issues": issues[:10],  # First 10
-            "status": "compliant" if len(issues) == 0 else "needs_fixes",
-        })
+        return FlextResult.ok(
+            {
+                "file": str(module_path),
+                "issues_found": len(issues),
+                "issues": issues[:10],  # First 10
+                "status": "compliant" if len(issues) == 0 else "needs_fixes",
+            }
+        )
 
     except Exception as e:
         return FlextResult.fail(f"Google style validation failed: {e}")
@@ -209,18 +213,20 @@ def analyze_api_documentation(
 
         coverage = (documented_items / len(public_items) * 100) if public_items else 0
 
-        return FlextResult.ok({
-            "file": str(module_path),
-            "public_items": len(public_items),
-            "documented_items": documented_items,
-            "coverage_percent": coverage,
-            "public_names": public_items[:20],
-            "recommendation": (
-                "Good API documentation coverage"
-                if coverage >= COVERAGE_RECOMMENDATION_THRESHOLD
-                else "Enhance API documentation"
-            ),
-        })
+        return FlextResult.ok(
+            {
+                "file": str(module_path),
+                "public_items": len(public_items),
+                "documented_items": documented_items,
+                "coverage_percent": coverage,
+                "public_names": public_items[:20],
+                "recommendation": (
+                    "Good API documentation coverage"
+                    if coverage >= COVERAGE_RECOMMENDATION_THRESHOLD
+                    else "Enhance API documentation"
+                ),
+            }
+        )
 
     except Exception as e:
         return FlextResult.fail(f"API documentation analysis failed: {e}")

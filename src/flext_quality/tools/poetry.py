@@ -55,7 +55,6 @@ class PoetryOperations(FlextService[str]):
             poetry_cmd,
             cwd=project,
             capture_output=True,
-            text=True,
             check=False,
         )
         if result.is_failure:
@@ -82,11 +81,13 @@ class PoetryValidator(FlextService[dict[str, bool]]):
 
     def execute(self: Self, **_kwargs: object) -> FlextResult[dict[str, bool]]:
         """Return default validation state."""
-        return FlextResult[dict[str, bool]].ok({
-            "pyproject_exists": False,
-            "poetry_section": False,
-            "dependencies_defined": False,
-        })
+        return FlextResult[dict[str, bool]].ok(
+            {
+                "pyproject_exists": False,
+                "poetry_section": False,
+                "dependencies_defined": False,
+            }
+        )
 
     def validate_pyproject(
         self,
@@ -97,11 +98,13 @@ class PoetryValidator(FlextService[dict[str, bool]]):
         pyproject = project / "pyproject.toml"
 
         if not pyproject.exists():
-            return FlextResult[dict[str, bool]].ok({
-                "pyproject_exists": False,
-                "poetry_section": False,
-                "dependencies_defined": False,
-            })
+            return FlextResult[dict[str, bool]].ok(
+                {
+                    "pyproject_exists": False,
+                    "poetry_section": False,
+                    "dependencies_defined": False,
+                }
+            )
 
         try:
             with pyproject.open("rb") as handle:

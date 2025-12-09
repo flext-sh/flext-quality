@@ -282,12 +282,11 @@ class FlextQualityToolsUtilities(FlextService[bool]):
     def __init__(self: Self) -> None:
         """Initialize utilities service."""
         super().__init__()
-        # Use private attribute to avoid conflict with parent class logger property
-        self._logger = FlextLogger(__name__)
+        # Use private attribute
+        object.__setattr__(self, "_logger", FlextLogger(__name__))
         self._cli = FlextCli()  # MANDATORY: Use flext-cli
 
-    @property
-    def logger(self) -> FlextLogger:
+    def _get_logger(self) -> FlextLogger:
         """Get logger instance."""
         return self._logger
 

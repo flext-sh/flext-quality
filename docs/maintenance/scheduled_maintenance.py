@@ -525,12 +525,14 @@ class ScheduledMaintenance:
             "optimize": self.run_daily_optimize,
             "weekly": self.run_weekly_comprehensive,
             "monthly": self.run_monthly_deep_clean,
-            "all": lambda: all([
-                self.run_daily_audit(),
-                self.run_daily_optimize(),
-                self.run_weekly_comprehensive(),
-                self.run_monthly_deep_clean(),
-            ]),
+            "all": lambda: all(
+                [
+                    self.run_daily_audit(),
+                    self.run_daily_optimize(),
+                    self.run_weekly_comprehensive(),
+                    self.run_monthly_deep_clean(),
+                ]
+            ),
         }
 
         if task_type in task_map:

@@ -1,4 +1,5 @@
 # Documentation Maintenance Tooling Audit
+
 ## Table of Contents
 
 - [Documentation Maintenance Tooling Audit](#documentation-maintenance-tooling-audit)
@@ -10,7 +11,6 @@
   - [File & Data Processing](#file--data-processing)
   - [Observability](#observability)
     - [Immediate Recommendations (Phase 2+)](#immediate-recommendations-phase-2)
-
 
 **Goal:** Identify modern Python libraries to streamline documentation maintenance across FLEXT projects while reducing bespoke code.
 

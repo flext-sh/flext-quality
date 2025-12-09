@@ -402,7 +402,7 @@ class FlextQualityConstants(FlextConstants):
             ]
 
             # Log level literal (reusing from flext-core)
-            type LogLevelLiteral = FlextConstants.Literals.LogLevelLiteral
+            type LogLevelLiteral = FlextConstants.Settings.LogLevel
 
         # =============================================================================
         # QUALITY TOOLS - Internal tools constants

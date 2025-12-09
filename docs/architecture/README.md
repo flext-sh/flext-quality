@@ -73,13 +73,13 @@ This architecture documentation follows a multi-framework approach:
 
 ### Quick Navigation
 
-| View Type           | Purpose                         | Location                                |
-| ------------------- | ------------------------------- | --------------------------------------- |
-| **System Context**  | External systems and users      | [C4 Model](c4-model/)                  |
-| **Container View**  | High-level system components    | [C4 Model](c4-model/)                  |
-| **Component View**  | Detailed component interactions | [C4 Model](c4-model/)                  |
-| **Code View**       | Implementation details          | [C4 Model](c4-model/)                  |
-| **ADRs**            | Architectural decisions         | [adrs/](adrs/)                          |
+| View Type          | Purpose                         | Location              |
+| ------------------ | ------------------------------- | --------------------- |
+| **System Context** | External systems and users      | [C4 Model](c4-model/) |
+| **Container View** | High-level system components    | [C4 Model](c4-model/) |
+| **Component View** | Detailed component interactions | [C4 Model](c4-model/) |
+| **Code View**      | Implementation details          | [C4 Model](c4-model/) |
+| **ADRs**           | Architectural decisions         | [adrs/](adrs/)        |
 
 ## 📊 System Context
 
@@ -150,15 +150,15 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 
 ### Foundational Decisions
 
-| ADR                                           | Title                                         | Status   | Date       |
-| --------------------------------------------- | --------------------------------------------- | -------- | ---------- |
-| ADR-001                                       | Adopt Clean Architecture                      | Accepted | 2025-10-10 |
+| ADR     | Title                    | Status   | Date       |
+| ------- | ------------------------ | -------- | ---------- |
+| ADR-001 | Adopt Clean Architecture | Accepted | 2025-10-10 |
 
 ### Technology Decisions
 
-| ADR                                 | Title                            | Status   | Date       |
-| ----------------------------------- | -------------------------------- | -------- | ---------- |
-| ADR-009                             | MyPy for Type Safety             | Accepted | 2025-10-10 |
+| ADR     | Title                | Status   | Date       |
+| ------- | -------------------- | -------- | ---------- |
+| ADR-009 | MyPy for Type Safety | Accepted | 2025-10-10 |
 
 ## 📋 Quality Attributes & Architectural Characteristics
 
@@ -217,23 +217,23 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 
 ### Architecture Views
 
-- **System Context**: External system relationships (*Documentation coming soon*)
-- **Container Architecture**: High-level system components (*Documentation coming soon*)
-- **Component Architecture**: Detailed component interactions (*Documentation coming soon*)
-- **Code Architecture**: Implementation-level details (*Documentation coming soon*)
+- **System Context**: External system relationships (_Documentation coming soon_)
+- **Container Architecture**: High-level system components (_Documentation coming soon_)
+- **Component Architecture**: Detailed component interactions (_Documentation coming soon_)
+- **Code Architecture**: Implementation-level details (_Documentation coming soon_)
 
 ### Cross-Cutting Concerns
 
-- **Security Architecture**: Security controls and threat modeling (*Documentation coming soon*)
-- **Deployment Architecture**: Infrastructure and deployment patterns (*Documentation coming soon*)
-- **Data Architecture**: Data models and persistence strategies (*Documentation coming soon*)
-- **Integration Architecture**: External system integrations (*Documentation coming soon*)
+- **Security Architecture**: Security controls and threat modeling (_Documentation coming soon_)
+- **Deployment Architecture**: Infrastructure and deployment patterns (_Documentation coming soon_)
+- **Data Architecture**: Data models and persistence strategies (_Documentation coming soon_)
+- **Integration Architecture**: External system integrations (_Documentation coming soon_)
 
 ### Operational Documentation
 
-- **Monitoring & Observability**: System monitoring and alerting (*Documentation coming soon*)
-- **Disaster Recovery**: Backup and recovery procedures (*Documentation coming soon*)
-- **Performance Characteristics**: Performance benchmarks and optimization (*Documentation coming soon*)
+- **Monitoring & Observability**: System monitoring and alerting (_Documentation coming soon_)
+- **Disaster Recovery**: Backup and recovery procedures (_Documentation coming soon_)
+- **Performance Characteristics**: Performance benchmarks and optimization (_Documentation coming soon_)
 
 ## 🎨 Diagrams & Visualizations
 
@@ -292,23 +292,23 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 
 ### For New Team Members
 
-1. Start with System Context to understand the big picture (*Documentation coming soon*)
-2. Review Container Architecture for high-level components (*Documentation coming soon*)
-3. Read key Architecture Decisions to understand foundational choices (*Documentation coming soon*)
+1. Start with System Context to understand the big picture (_Documentation coming soon_)
+2. Review Container Architecture for high-level components (_Documentation coming soon_)
+3. Read key Architecture Decisions to understand foundational choices (_Documentation coming soon_)
 4. Explore [Component Architecture](c4-model/components.md) for detailed interactions
 
 ### For Architects & Technical Leads
 
 1. Review [ADRs](adrs/) for decision history and rationale
 2. Examine [Cross-Cutting Concerns](views/) for quality attributes
-3. Analyze **Security Architecture** for security considerations (*Documentation coming soon*)
-4. Review **Deployment Architecture** for infrastructure patterns (*Documentation coming soon*)
+3. Analyze **Security Architecture** for security considerations (_Documentation coming soon_)
+4. Review **Deployment Architecture** for infrastructure patterns (_Documentation coming soon_)
 
 ### For Developers
 
-1. Understand **Component Architecture** for implementation guidance (*Documentation coming soon*)
-2. Review **Code Architecture** for implementation patterns (*Documentation coming soon*)
-3. Check **Integration Architecture** for external dependencies (*Documentation coming soon*)
+1. Understand **Component Architecture** for implementation guidance (_Documentation coming soon_)
+2. Review **Code Architecture** for implementation patterns (_Documentation coming soon_)
+3. Check **Integration Architecture** for external dependencies (_Documentation coming soon_)
 4. Reference [API Documentation](../api/) for interface specifications
 
 **FLEXT Quality Architecture** - Enterprise-grade code quality analysis with clean architecture, domain-driven design,

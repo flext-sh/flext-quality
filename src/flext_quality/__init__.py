@@ -33,14 +33,7 @@ from .external_backend import FlextQualityExternalBackend as ExternalBackend
 from .grade_calculator import FlextQualityGradeCalculator
 from .handlers import FlextQualityHandlers
 from .metrics import QualityMetrics
-from .models import (
-    ComplexityMetric,
-    CoverageMetric,
-    DuplicationMetric,
-    FlextQualityModels,
-    IssueLocation,
-    QualityScore,
-)
+from .models import FlextQualityModels
 from .reports import FlextQualityReportGenerator, ReportFormat, ReportThresholds
 from .services import FlextQualityServices
 from .web import FlextQualityWeb as FlextQualityWebInterface
@@ -82,6 +75,13 @@ AnalysisResults = FlextQualityModels.AnalysisResults
 OverallMetrics = FlextQualityModels.OverallMetrics
 FileAnalysisResult = FlextQualityModels.AnalysisResults
 DuplicationIssue = FlextQualityModels.IssueModel
+
+# Value object exports
+ComplexityMetric = FlextQualityModels.ComplexityMetric
+CoverageMetric = FlextQualityModels.CoverageMetric
+DuplicationMetric = FlextQualityModels.DuplicationMetric
+IssueLocation = FlextQualityModels.IssueLocation
+QualityScore = FlextQualityModels.QualityScore
 
 # Backend exports
 CodeAnalyzer = FlextQualityAnalyzer

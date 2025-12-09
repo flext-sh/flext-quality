@@ -136,9 +136,9 @@ class ContentAnalyzer:
         # Line analysis
         lines = content.split("\n")
         total_lines = len(lines)
-        code_lines = len([
-            line for line in lines if line.strip().startswith(("```", "    ", "\t"))
-        ])
+        code_lines = len(
+            [line for line in lines if line.strip().startswith(("```", "    ", "\t"))]
+        )
         empty_lines = len([line for line in lines if not line.strip()])
 
         # Heading analysis
@@ -452,44 +452,54 @@ class ContentAnalyzer:
 
         # Completeness issues
         if not analysis["completeness"]["word_count_sufficient"]:
-            issues.append({
-                "type": "insufficient_content",
-                "severity": "medium",
-                "message": f"Content too short ({analysis['metrics']['word_count']} words)",
-            })
+            issues.append(
+                {
+                    "type": "insufficient_content",
+                    "severity": "medium",
+                    "message": f"Content too short ({analysis['metrics']['word_count']} words)",
+                }
+            )
 
         if analysis["completeness"]["missing_elements"]:
-            issues.append({
-                "type": "missing_elements",
-                "severity": "high",
-                "message": f"Missing: {', '.join(analysis['completeness']['missing_elements'])}",
-            })
+            issues.append(
+                {
+                    "type": "missing_elements",
+                    "severity": "high",
+                    "message": f"Missing: {', '.join(analysis['completeness']['missing_elements'])}",
+                }
+            )
 
         # Readability issues
         if (
             analysis["readability"]["readability_score"]
             < self.FAIRLY_DIFFICULT_READABILITY_MIN
         ):
-            issues.append({
-                "type": "poor_readability",
-                "severity": "medium",
-                "message": f"Content difficult to read (score: {analysis['readability']['readability_score']})",
-            })
+            issues.append(
+                {
+                    "type": "poor_readability",
+                    "severity": "medium",
+                    "message": f"Content difficult to read (score: {analysis['readability']['readability_score']})",
+                }
+            )
 
         # Structure issues
         if not analysis["structure"]["heading_hierarchy_valid"]:
-            issues.append({
-                "type": "heading_hierarchy",
-                "severity": "low",
-                "message": "Heading hierarchy is not logical",
-            })
+            issues.append(
+                {
+                    "type": "heading_hierarchy",
+                    "severity": "low",
+                    "message": "Heading hierarchy is not logical",
+                }
+            )
 
         if analysis["metrics"]["heading_count"] == 0:
-            issues.append({
-                "type": "no_headings",
-                "severity": "high",
-                "message": "Document has no section headings",
-            })
+            issues.append(
+                {
+                    "type": "no_headings",
+                    "severity": "high",
+                    "message": "Document has no section headings",
+                }
+            )
 
         return issues
 
@@ -547,16 +557,18 @@ class ContentAnalyzer:
         )
 
         if avg_score < self.GOOD_READABILITY_MIN:
-            self.results["recommendations"].append({
-                "priority": "high",
-                "type": "overall_quality",
-                "message": f"Overall documentation quality needs improvement (avg score: {avg_score:.1f})",
-                "actions": [
-                    "Focus on adding missing content and sections",
-                    "Improve readability and structure",
-                    "Add more examples and practical guidance",
-                ],
-            })
+            self.results["recommendations"].append(
+                {
+                    "priority": "high",
+                    "type": "overall_quality",
+                    "message": f"Overall documentation quality needs improvement (avg score: {avg_score:.1f})",
+                    "actions": [
+                        "Focus on adding missing content and sections",
+                        "Improve readability and structure",
+                        "Add more examples and practical guidance",
+                    ],
+                }
+            )
 
         # Check for common issues across files
         all_issues = []
@@ -572,15 +584,17 @@ class ContentAnalyzer:
             most_common = issue_types.most_common(1)
             if most_common:
                 common_issue = most_common[0][0]
-                self.results["recommendations"].append({
-                    "priority": "medium",
-                    "type": "common_issue",
-                    "message": f"Address common issue across files: {common_issue.replace('_', ' ')}",
-                    "actions": [
-                        "Implement consistent fixes",
-                        "Update style guidelines",
-                    ],
-                })
+                self.results["recommendations"].append(
+                    {
+                        "priority": "medium",
+                        "type": "common_issue",
+                        "message": f"Address common issue across files: {common_issue.replace('_', ' ')}",
+                        "actions": [
+                            "Implement consistent fixes",
+                            "Update style guidelines",
+                        ],
+                    }
+                )
 
     def generate_report(self, output_format: str = "json") -> str:
         """Generate content analysis report."""

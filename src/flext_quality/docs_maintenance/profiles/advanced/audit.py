@@ -168,6 +168,8 @@ class DocumentationAuditor:
             if isinstance(user_config, dict):
                 self._merge_configs(default_config, user_config)
 
+        return self._build_audit_config(default_config)
+
     def _load_user_config(self, config_path: str | Path) -> dict[str, object] | None:
         """Load user configuration from YAML file.
 
@@ -209,9 +211,22 @@ class DocumentationAuditor:
             else:
                 default_config[key] = value
 
+    def _build_audit_config(
+        self,
+        config_dict: dict[str, object],
+    ) -> AuditConfig:
+        """Build AuditConfig from config dictionary.
+
+        Args:
+            config_dict: Configuration dictionary to build from
+
+        Returns:
+            Constructed AuditConfig
+
+        """
         # Extract nested dicts with proper type casting
-        audit_dict = default_config.get("audit", {})
-        content_dict = default_config.get("content", {})
+        audit_dict = config_dict.get("audit", {})
+        content_dict = config_dict.get("content", {})
 
         if not isinstance(audit_dict, dict):
             audit_dict = {}
@@ -424,16 +439,18 @@ class DocumentationAuditor:
         for pattern in prohibited:
             matches = re.findall(rf"\b{re.escape(pattern)}\b", content, re.IGNORECASE)
             if matches:
-                issues.append({
-                    "type": "prohibited_pattern",
-                    "pattern": pattern,
-                    "count": len(matches),
-                    "message": f'Found {len(matches)} instances of prohibited pattern "{pattern}"',
-                    "link_text": None,
-                    "url": None,
-                    "line_number": None,
-                    "severity": "warning",
-                })
+                issues.append(
+                    {
+                        "type": "prohibited_pattern",
+                        "pattern": pattern,
+                        "count": len(matches),
+                        "message": f'Found {len(matches)} instances of prohibited pattern "{pattern}"',
+                        "link_text": None,
+                        "url": None,
+                        "line_number": None,
+                        "severity": "warning",
+                    }
+                )
 
         # Check for broken internal links
         internal_links = re.findall(r"\[([^\]]+)\]\(([^)]+)\)", content)
@@ -442,40 +459,46 @@ class DocumentationAuditor:
                 continue
             full_path = Path(file_path).parent / url
             if not Path(full_path).exists():
-                issues.append({
-                    "type": "broken_link",
-                    "pattern": None,
-                    "count": None,
-                    "message": f"Broken internal link: {url}",
-                    "link_text": text,
-                    "url": url,
-                    "line_number": None,
-                    "severity": "error",
-                })
+                issues.append(
+                    {
+                        "type": "broken_link",
+                        "pattern": None,
+                        "count": None,
+                        "message": f"Broken internal link: {url}",
+                        "link_text": text,
+                        "url": url,
+                        "line_number": None,
+                        "severity": "error",
+                    }
+                )
 
         # Check for images without alt text
         images = re.findall(r"!\[([^\]]*)\]\(([^)]+)\)", content)
         for alt_text, url in images:
             if not alt_text.strip():
-                warnings.append({
-                    "type": "missing_alt_text",
-                    "url": url,
-                    "alt_text": None,
-                    "message": f"Image missing alt text: {url}",
-                    "line_number": None,
-                })
+                warnings.append(
+                    {
+                        "type": "missing_alt_text",
+                        "url": url,
+                        "alt_text": None,
+                        "message": f"Image missing alt text: {url}",
+                        "line_number": None,
+                    }
+                )
 
         # Check for long paragraphs
         paragraphs = re.split(r"\n\s*\n", content)
         for para in paragraphs:
             words = len(para.split())
             if words > LONG_PARAGRAPH_WORD_LIMIT:  # Very long paragraph
-                suggestions.append({
-                    "type": "long_paragraph",
-                    "improvement": f"Consider breaking up long paragraph ({words} words)",
-                    "line_number": None,
-                    "message": f"Consider breaking up long paragraph ({words} words)",
-                })
+                suggestions.append(
+                    {
+                        "type": "long_paragraph",
+                        "improvement": f"Consider breaking up long paragraph ({words} words)",
+                        "line_number": None,
+                        "message": f"Consider breaking up long paragraph ({words} words)",
+                    }
+                )
 
     def audit_directory(
         self,

@@ -11,7 +11,7 @@ import ast
 from pathlib import Path
 from typing import override
 
-from flext_core import FlextContainer, FlextLogger
+from flext_core import FlextContainer, FlextLogger, FlextResult
 
 from .ast_class_info import FlextQualityASTClassInfo
 from .ast_function_info import FlextQualityASTFunctionInfo
@@ -285,14 +285,17 @@ class FlextQualityASTBackend(BaseAnalyzer):
         return ["complexity", "functions", "classes", "imports", "docstrings"]
 
     @override
-    def analyze(self, _code: str, file_path: Path | None = None) -> dict[str, object]:
+    def analyze(
+        self, _code: str, file_path: Path | None = None
+    ) -> FlextResult[dict[str, object]]:
         """Analyze Python code using AST.
 
         Args:
-        file_path: Optional file path for context
+            _code: Python source code to analyze
+            file_path: Optional file path for context
 
         Returns:
-        Dictionary with analysis results
+            FlextResult containing analysis results dictionary
 
         """
         result: dict[str, object] = {}
@@ -315,9 +318,9 @@ class FlextQualityASTBackend(BaseAnalyzer):
                 result["missing_docstrings"] = missing_docs
 
         except SyntaxError as e:
-            result["error"] = f"Syntax error: {e}"
+            return FlextResult.fail(f"Syntax error: {e}")
 
-        return result
+        return FlextResult.ok(result)
 
     def _extract_functions(self, tree: ast.AST) -> list[dict[str, object]]:
         """Extract function information from AST."""

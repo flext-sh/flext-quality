@@ -9,6 +9,7 @@ import argparse
 import json
 import logging
 import shutil
+from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -53,6 +54,7 @@ class ValidationSummary(TypedDict):
     external_links: int
     internal_links: int
     files_checked: int
+    total_links: int
 
 
 class StyleSummary(TypedDict):
@@ -105,6 +107,7 @@ DEFAULT_VALIDATION_SUMMARY = cast(
         "external_links": 0,
         "internal_links": 0,
         "files_checked": 0,
+        "total_links": 0,
     },
 )
 
@@ -232,8 +235,8 @@ class ReportGenerator:
 
     def _merge_summary(
         self,
-        data: dict[str, object],
-        defaults: dict[str, object],
+        data: Mapping[str, object],
+        defaults: Mapping[str, object],
     ) -> dict[str, object]:
         """Ensure summary dictionaries contain required keys."""
         merged = dict(defaults)
@@ -278,6 +281,7 @@ class ReportGenerator:
             external_links=0,
             internal_links=0,
             files_checked=0,
+            total_links=0,
         )
 
     def _load_style_data(self, style_file: str | None) -> StyleSummary:
@@ -648,17 +652,19 @@ class ReportGenerator:
 
     def calculate_quality_metrics(self, report_data: ReportData) -> QualityMetrics:
         """Calculate overall quality metrics."""
-        audit_score = report_data.audit_summary.get("average_quality", 100)
-        link_broken = report_data.validation_summary.get("broken_links", 0)
-        link_total = report_data.validation_summary.get("total_links", 1)
-        style_score = report_data.style_summary.get("average_score", 100)
+        audit_score = float(report_data.audit_summary["average_quality"])
+        link_broken = int(report_data.validation_summary["broken_links"])
+        link_total = int(report_data.validation_summary["total_links"])
+        style_score = float(report_data.style_summary["average_score"])
 
         # Content health (60% weight on audit)
         content_health = audit_score * 0.6
 
         # Link health (inverse of broken link ratio)
-        link_health = (
-            max(0, 100 - (link_broken / link_total * 100)) if link_total > 0 else 100
+        link_health: float = (
+            max(0.0, 100.0 - (link_broken / link_total * 100.0))
+            if link_total > 0
+            else 100.0
         )
 
         # Style consistency (40% weight on style)
@@ -693,10 +699,15 @@ class ReportGenerator:
         formats: list[str] | None = None,
     ) -> dict[str, list[str]]:
         """Generate report outputs for the requested formats."""
-        requested_formats = formats or self.config["reporting"].get(
+        raw_formats = formats or self.config["reporting"].get(
             "output_formats",
             ["markdown"],
         )
+        # Ensure we have a proper list of strings
+        if isinstance(raw_formats, list):
+            requested_formats: list[str] = [str(f) for f in raw_formats]
+        else:
+            requested_formats = ["markdown"]
 
         timestamp_slug = report_data.timestamp.strftime("%Y%m%d_%H%M%S")
         generated: dict[str, list[str]] = {}
@@ -945,10 +956,12 @@ def main() -> None:
     if not any([args.generate_dashboard, args.weekly_summary, args.monthly_report]):
         dashboard_file = generator.generate_dashboard(report_data)
         summary_file = generator.generate_weekly_summary(report_data)
-        generated_files.extend([
-            ("Dashboard", dashboard_file),
-            ("Weekly Summary", summary_file),
-        ])
+        generated_files.extend(
+            [
+                ("Dashboard", dashboard_file),
+                ("Weekly Summary", summary_file),
+            ]
+        )
 
     # Generate quality metrics for display
     generator.calculate_quality_metrics(report_data)

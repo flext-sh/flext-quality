@@ -88,15 +88,9 @@ class FlextQualityWeb:
 
     def _setup_authentication(self) -> FlextAuth | None:
         """Setup authentication using flext-auth with JWT provider."""
-        # Create auth config dict[str, object] for JWT provider
-        auth_config: dict[str, object] = {
-            "secret_key": self._quality_config.project_name + "-secret-key",
-            "algorithm": "HS256",
-            "token_expiry_minutes": 60,
-        }
-
         # Create JWT auth provider for quality API
-        _jwt_provider = FlextAuthJwtProvider(config=auth_config)
+        # FlextAuthJwtProvider() takes no config parameter - it extends FlextAuthRfcProvider
+        _jwt_provider = FlextAuthJwtProvider()
 
         # Initialize FlextAuth
         auth = FlextAuth()

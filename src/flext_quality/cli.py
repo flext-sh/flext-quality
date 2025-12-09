@@ -134,7 +134,7 @@ class QualityReportFormatter:
         save_result = report.save_report(output_path, format_type)
 
         if save_result.is_success:
-            self.logger.info("Report saved to %s", output_path)
+            self.logger.info("Report saved to %s", str(output_path))
             return FlextResult[bool].ok(True)
         return save_result
 
@@ -374,10 +374,22 @@ class FlextQualityCliService(FlextService[int]):
         """Initialize CLI service with optional config."""
         super().__init__()
         # Use object.__setattr__ to bypass Pydantic's custom __setattr__ for private attributes
+        # Use unique names (_cli_*) to avoid overriding parent attributes
         object.__setattr__(
-            self, "_config", config if config is not None else CliConfig()
+            self, "_cli_config", config if config is not None else CliConfig()
         )
-        self._router = CliCommandRouter(self.logger, self._config)
+        object.__setattr__(self, "_cli_logger", FlextLogger(__name__))
+        self._router = CliCommandRouter(self._cli_logger, self._cli_config)  # type: ignore[attr-defined]
+
+    @property
+    def cli_config(self) -> CliConfig:
+        """Access CLI configuration (read-only)."""
+        return self._cli_config  # type: ignore[attr-defined]
+
+    @property
+    def cli_logger(self) -> FlextLogger:
+        """Access CLI logger (read-only)."""
+        return self._cli_logger  # type: ignore[attr-defined]
 
     def get_router(self) -> CliCommandRouter:
         """Get command router for dispatching CLI commands."""

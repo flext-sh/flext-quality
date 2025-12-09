@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from enum import StrEnum
-from typing import Literal, Protocol, TypedDict
+from typing import Literal, Protocol, Self, TypedDict
 from uuid import UUID, uuid4
 
 from flext_core.utilities import u as flext_u
@@ -125,7 +125,7 @@ class FlextQualityModels:
         """Protocol for code quality issues - enables type-safe access without getattr."""
 
         @property
-        def severity(self) -> IssueSeverity:
+        def severity(self) -> FlextQualityModels.IssueSeverity:
             """Issue severity level."""
             ...
 
@@ -162,7 +162,7 @@ class FlextQualityModels:
 
         id: UUID = Field(default_factory=uuid4)
         project_id: UUID = Field(description="Associated project")
-        status: AnalysisStatus = Field(default=AnalysisStatus.QUEUED)
+        status: str = Field(default="queued", description="Analysis status")
         started_at: Timestamp = Field(default_factory=lambda: datetime.now(UTC))
         completed_at: datetime | None = None
         overall_score: ScoreRange = 0.0
@@ -179,18 +179,23 @@ class FlextQualityModels:
         file_path: str = Field(description="File path")
         line_number: PositiveInt | None = None
         column_number: PositiveInt | None = None
-        issue_type: IssueType = Field(description="Type of issue")
-        severity: IssueSeverity = Field(default=IssueSeverity.MEDIUM)
+        issue_type: FlextQualityModels.IssueType = Field(description="Type of issue")
+        severity: str = Field(default="MEDIUM", description="Issue severity level")
         message: str = Field(description="Issue description")
         rule_id: str | None = None
+
+    # Alias for backward compatibility (analyzer.py uses CodeIssue)
+    CodeIssue = IssueModel
 
     class RuleModel(BaseModel):
         """Quality rule entity - represents a configurable quality check."""
 
         id: str = Field(description="Unique rule identifier")
         rule_id: str = Field(description="Rule code (e.g., E302, W605)")
-        category: IssueType = Field(description="Type of issue the rule checks")
-        severity: IssueSeverity = Field(default=IssueSeverity.MEDIUM)
+        category: FlextQualityModels.IssueType = Field(
+            description="Type of issue the rule checks"
+        )
+        severity: str = Field(default="MEDIUM", description="Issue severity level")
         enabled: bool = Field(default=True, description="Whether rule is active")
         parameters: dict[str, ParameterValue] = Field(
             default_factory=dict,
@@ -198,19 +203,19 @@ class FlextQualityModels:
         )
         description: str | None = Field(default=None, description="Rule description")
 
-        def enable(self) -> RuleModel:
+        def enable(self) -> Self:
             """Enable this rule."""
             return self.model_copy(update={"enabled": True})
 
-        def disable(self) -> RuleModel:
+        def disable(self) -> Self:
             """Disable this rule."""
             return self.model_copy(update={"enabled": False})
 
-        def update_severity(self, severity: IssueSeverity) -> RuleModel:
+        def update_severity(self, severity: FlextQualityModels.IssueSeverity) -> Self:
             """Update rule severity."""
             return self.model_copy(update={"severity": severity})
 
-        def set_parameter(self, key: str, value: ParameterValue) -> RuleModel:
+        def set_parameter(self, key: str, value: ParameterValue) -> Self:
             """Set a rule parameter."""
             new_params = self.parameters.copy()
             new_params[key] = value
@@ -273,9 +278,9 @@ class FlextQualityModels:
     class AnalysisResults(BaseModel):
         """Analysis results value object."""
 
-        issues: list[IssueDict] = Field(default_factory=list)
-        metrics: AnalysisMetricsModel | dict[str, object] = Field(
-            default_factory=AnalysisMetricsModel,
+        issues: list[FlextQualityModels.IssueDict] = Field(default_factory=list)
+        metrics: FlextQualityModels.AnalysisMetricsModel | dict[str, object] = Field(
+            default_factory=dict,
             description="Analysis metrics - use AnalysisMetricsModel for new code",
         )
         recommendations: list[str] = Field(default_factory=list)
@@ -289,21 +294,29 @@ class FlextQualityModels:
         )
 
         # Optional issue type lists for compatibility
-        security_issues: list[IssueModel] = Field(default_factory=list)
-        complexity_issues: list[IssueModel] = Field(default_factory=list)
-        dead_code_issues: list[IssueModel] = Field(default_factory=list)
-        duplication_issues: list[IssueModel] = Field(default_factory=list)
+        security_issues: list[FlextQualityModels.IssueModel] = Field(
+            default_factory=list
+        )
+        complexity_issues: list[FlextQualityModels.IssueModel] = Field(
+            default_factory=list
+        )
+        dead_code_issues: list[FlextQualityModels.IssueModel] = Field(
+            default_factory=list
+        )
+        duplication_issues: list[FlextQualityModels.IssueModel] = Field(
+            default_factory=list
+        )
 
         # Metrics property for compatibility
         @property
-        def overall_metrics(self) -> OverallMetrics:
+        def overall_metrics(self) -> FlextQualityModels.OverallMetrics:
             """Get overall metrics object."""
             metrics = (
                 self.metrics
-                if isinstance(self.metrics, AnalysisMetricsModel)
-                else AnalysisMetricsModel()
+                if isinstance(self.metrics, FlextQualityModels.AnalysisMetricsModel)
+                else FlextQualityModels.AnalysisMetricsModel()
             )
-            return OverallMetrics(
+            return FlextQualityModels.OverallMetrics(
                 files_analyzed=metrics.files_analyzed,
                 coverage_score=metrics.coverage_score,
                 total_issues=len(
@@ -312,16 +325,20 @@ class FlextQualityModels:
                     + self.dead_code_issues
                     + self.duplication_issues,
                 ),
-                critical_issues=len([
-                    i
-                    for i in (self.security_issues + self.complexity_issues)
-                    if i.severity == IssueSeverity.CRITICAL
-                ]),
-                high_issues=len([
-                    i
-                    for i in (self.security_issues + self.complexity_issues)
-                    if i.severity == IssueSeverity.HIGH
-                ]),
+                critical_issues=len(
+                    [
+                        i
+                        for i in (self.security_issues + self.complexity_issues)
+                        if i.severity == FlextQualityModels.IssueSeverity.CRITICAL
+                    ]
+                ),
+                high_issues=len(
+                    [
+                        i
+                        for i in (self.security_issues + self.complexity_issues)
+                        if i.severity == FlextQualityModels.IssueSeverity.HIGH
+                    ]
+                ),
                 overall_score=self.overall_score,
             )
 
@@ -353,7 +370,7 @@ class FlextQualityModels:
         )
         issues_found: int = 0
         score: ScoreRange = 0.0
-        details: CheckDetailsDict | None = None
+        details: FlextQualityModels.CheckDetailsDict | None = None
 
     class AnalysisResult(BaseModel):
         """Simple analysis result for API responses."""
@@ -481,6 +498,63 @@ class FlextQualityModels:
         debug: bool = Field(default=False, description="Debug mode")
         host: str = Field(default="127.0.0.1", description="Server host")
         port: int = Field(default=8000, ge=1, le=65535, description="Server port")
+
+    class RewriteResult(BaseModel):
+        """Git history rewrite operation result."""
+
+        commits_processed: int = Field(
+            default=0, description="Number of commits processed"
+        )
+        commits_changed: int = Field(default=0, description="Number of commits changed")
+        errors: list[str] = Field(default_factory=list, description="List of errors")
+        dry_run: bool = Field(default=True, description="Whether this was a dry run")
+
+    class OptimizationTarget(BaseModel):
+        """Optimization target specification."""
+
+        project_path: str = Field(default=".", description="Path to project")
+        module_name: str = Field(default="", description="Module name")
+        file_path: str = Field(default="", description="Path to file")
+        optimization_type: str = Field(default="", description="Type of optimization")
+
+    class OptimizationResult(BaseModel):
+        """Code optimization operation result."""
+
+        target: FlextQualityModels.OptimizationTarget = Field(
+            description="Optimization target"
+        )
+        changes_made: int = Field(default=0, description="Number of changes made")
+        success: bool = Field(
+            default=True, description="Whether optimization succeeded"
+        )
+        errors: list[str] = Field(default_factory=list, description="List of errors")
+        warnings: list[str] = Field(
+            default_factory=list, description="List of warnings"
+        )
+
+    class DependencyInfo(BaseModel):
+        """Dependency information model."""
+
+        name: str = Field(description="Dependency name")
+        version: str = Field(default="", description="Version constraint")
+        source: str = Field(default="", description="Source of dependency")
+        is_direct: bool = Field(default=True, description="Whether direct dependency")
+
+    class Analysis(BaseModel):
+        """Analysis model for analysis operations."""
+
+        analysis_id: str = Field(description="Unique analysis ID")
+        project_path: str = Field(description="Path to analyzed project")
+        status: str = Field(default="pending", description="Analysis status")
+        results: dict[str, object] = Field(default_factory=dict, description="Results")
+
+    class Report(BaseModel):
+        """Report model for report operations."""
+
+        report_id: str = Field(description="Unique report ID")
+        analysis_id: str = Field(description="Related analysis ID")
+        format: str = Field(default="json", description="Report format")
+        content: dict[str, object] = Field(default_factory=dict, description="Content")
 
 
 m = FlextQualityModels

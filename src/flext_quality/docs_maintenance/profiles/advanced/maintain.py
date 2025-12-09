@@ -268,15 +268,20 @@ class DocumentationMaintainer:
             generator = ReportGenerator(self.config_path)
 
             report_data = generator.generate_comprehensive_report()
-            output_formats = generator.config["reporting"].get(
+            raw_output_formats = generator.config["reporting"].get(
                 "output_formats",
                 ["markdown"],
             )
-            if isinstance(output_formats, str):
-                output_formats = [output_formats]
+            # Ensure we have a proper list of strings
+            if isinstance(raw_output_formats, str):
+                output_formats: list[str] = [raw_output_formats]
+            elif isinstance(raw_output_formats, list):
+                output_formats = [str(f) for f in raw_output_formats]
+            else:
+                output_formats = ["markdown"]
             generated_outputs = generator.export_report(
                 report_data,
-                formats=list(output_formats),
+                formats=output_formats,
             )
             metrics = generator.calculate_quality_metrics(report_data)
 
@@ -507,7 +512,7 @@ def _process_maintenance_report(
         maintainer.save_report(report)
 
 
-def _print_operation_details(operations: list[object]) -> None:
+def _print_operation_details(operations: list[MaintenanceResult]) -> None:
     """Print details of operations.
 
     Args:

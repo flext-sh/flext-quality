@@ -71,7 +71,7 @@ class TestsConstants(FlextQualityConstants):
         )
 
         # Log level literal (reusing production type)
-        LogLevelLiteral: TypeAlias = FlextQualityConstants.Literals.LogLevelLiteral
+        LogLevelLiteral: TypeAlias = FlextQualityConstants.Settings.LogLevel
 
 
 # Standardized short name for use in tests (same pattern as flext-core)

@@ -23,8 +23,8 @@ DeadCodeDetectorService = p.Service
 DuplicateDetectorService = p.Service
 MetricsCollectorService = p.Service
 
-# Report generation uses Handler protocol
-ReportGeneratorService = p.Handler[object]
+# Report generation uses Handler protocol (no type specialization needed)
+ReportGeneratorService = p.Handler
 
 
 # Export protocol aliases

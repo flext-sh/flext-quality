@@ -155,10 +155,13 @@ class ProjectServiceBuilder:
     def _create_project_model(self) -> r[m.ProjectModel]:
         """Create project model (monadic step 2)."""
         try:
+            # Type narrowing after validation
+            name = self._name if isinstance(self._name, str) else ""
+            path = self._path if isinstance(self._path, str) else ""
             project = m.ProjectModel(
-                id=f"project_{self._name.lower().replace(' ', '_')}",
-                name=self._name,
-                path=self._path,
+                id=f"project_{name.lower().replace(' ', '_')}",
+                name=name,
+                path=path,
                 **self._kwargs,
             )
             return r.ok(project)
@@ -191,7 +194,7 @@ class AnalysisServiceBuilder:
         result = (
             AnalysisServiceBuilder(config, logger)
             .with_project_id("project_123")
-            .with_status(AnalysisStatus.QUEUED)
+            .with_status(m.AnalysisStatus.QUEUED)
             .build()
         )
     """
@@ -214,7 +217,10 @@ class AnalysisServiceBuilder:
         status: (c.Quality.Literals.AnalysisStatusLiteral | str | m.AnalysisStatus),
     ) -> AnalysisServiceBuilder:
         """Set analysis status (fluent)."""
-        self._status = str(status.value) if hasattr(status, "value") else str(status)
+        if isinstance(status, m.AnalysisStatus):
+            self._status = status.value
+        else:
+            self._status = str(status)
         return self
 
     def with_config_dict(
@@ -264,7 +270,6 @@ class AnalysisServiceBuilder:
             analysis = m.AnalysisModel(
                 project_id=project_uuid,
                 status=self._status,
-                **self._kwargs,
             )
             return r.ok(analysis)
         except (ValueError, TypeError) as e:
@@ -277,8 +282,8 @@ class AnalysisServiceBuilder:
         """Log analysis creation and return (monadic final step)."""
         self._logger.info(
             "Analysis created successfully",
-            analysis_id=analysis.id,
-            project_id=analysis.project_id,
+            analysis_id=str(analysis.id),
+            project_id=str(analysis.project_id),
             status=self._status,
         )
         return analysis
@@ -380,8 +385,11 @@ class IssueServiceBuilder:
     def _validate_enums(self) -> r[bool]:
         """Validate enum values (monadic step 2)."""
         try:
-            m.IssueSeverity(self._severity)
-            m.IssueType(self._issue_type)
+            # Type narrowing for enum values
+            severity = self._severity if isinstance(self._severity, str) else ""
+            issue_type = self._issue_type if isinstance(self._issue_type, str) else ""
+            m.IssueSeverity(severity)
+            m.IssueType(issue_type)
             return r.ok(True)
         except ValueError as e:
             return r.fail(f"Invalid enum value: {e}")
@@ -389,18 +397,22 @@ class IssueServiceBuilder:
     def _create_issue_model(self) -> r[m.IssueModel]:
         """Create issue model (monadic step 3)."""
         try:
+            # Type narrowing after validation
             analysis_uuid = (
                 self._analysis_id
                 if isinstance(self._analysis_id, UUID)
                 else uuid5(NAMESPACE_DNS, str(self._analysis_id))
             )
+            severity = self._severity if isinstance(self._severity, str) else "MEDIUM"
+            issue_type = self._issue_type if isinstance(self._issue_type, str) else "UNKNOWN"
+            file_path = self._file_path if isinstance(self._file_path, str) else ""
+            message = self._message if isinstance(self._message, str) else ""
             issue = m.IssueModel(
                 analysis_id=analysis_uuid,
-                severity=self._severity,
-                issue_type=self._issue_type,
-                file_path=self._file_path,
-                message=self._message,
-                **self._kwargs,
+                severity=severity,
+                issue_type=issue_type,
+                file_path=file_path,
+                message=message,
             )
             return r.ok(issue)
         except (ValueError, TypeError) as e:

@@ -129,10 +129,16 @@ class ScoreCalculator:
 
     @staticmethod
     def count_critical_issues(
-        issues: list[FlextQualityModels.IssueProtocol],
+        issues: list[FlextQualityModels.IssueModel],
     ) -> int:
-        """Count critical issues - type-safe using Protocol."""
-        return len([i for i in issues if i.severity == IssueSeverity.CRITICAL])
+        """Count critical issues - type-safe using IssueModel."""
+        return len(
+            [
+                i
+                for i in issues
+                if i.severity == FlextQualityModels.IssueSeverity.CRITICAL
+            ]
+        )
 
 
 # =====================================================================
@@ -176,10 +182,12 @@ class RecommendationGenerator:
                 "Consider breaking down large files and reducing complexity",
             )
         if score < thresholds.min_score_threshold:
-            recommendations.extend([
-                "Implement automated code quality checks in your CI/CD pipeline",
-                "Add complete unit tests to improve coverage",
-            ])
+            recommendations.extend(
+                [
+                    "Implement automated code quality checks in your CI/CD pipeline",
+                    "Add complete unit tests to improve coverage",
+                ]
+            )
         if coverage < thresholds.min_coverage_threshold:
             recommendations.append(
                 f"Increase test coverage from {coverage:.1f}% to at least {thresholds.min_coverage_threshold}%",
@@ -262,10 +270,12 @@ class TextReportBuilder:
         ]:
             if issues:
                 lines.append(f"\n{category} ({len(issues)} issues):")
-                lines.extend([
-                    f"  - {issue.message}"
-                    for issue in issues[: thresholds.issue_preview_limit]
-                ])
+                lines.extend(
+                    [
+                        f"  - {issue.message}"
+                        for issue in issues[: thresholds.issue_preview_limit]
+                    ]
+                )
                 if len(issues) > thresholds.issue_preview_limit:
                     remaining = len(issues) - thresholds.issue_preview_limit
                     lines.append(f"  ... and {remaining} more")
@@ -427,16 +437,18 @@ class HtmlReportBuilder:
             ("duplication", duplication_issues),
         ]:
             if issues:
-                lines.extend([
-                    '    <div class="section">',
-                    f"        <h2>{category.title()} Issues ({len(issues)})</h2>",
-                ])
+                lines.extend(
+                    [
+                        '    <div class="section">',
+                        f"        <h2>{category.title()} Issues ({len(issues)})</h2>",
+                    ]
+                )
                 for issue in issues[: thresholds.html_issue_limit]:
                     severity_class = (
                         "high-severity"
-                        if issue.severity == IssueSeverity.CRITICAL
+                        if issue.severity == FlextQualityModels.IssueSeverity.CRITICAL
                         else "medium-severity"
-                        if issue.severity == IssueSeverity.HIGH
+                        if issue.severity == FlextQualityModels.IssueSeverity.HIGH
                         else "low-severity"
                     )
                     line_info = (
@@ -454,11 +466,13 @@ class HtmlReportBuilder:
 
         # Add recommendations
         recommendations = RecommendationGenerator.generate(results, thresholds)
-        lines.extend([
-            '    <div class="section">',
-            "        <h2>Recommendations</h2>",
-            "        <ul>",
-        ])
+        lines.extend(
+            [
+                '    <div class="section">',
+                "        <h2>Recommendations</h2>",
+                "        <ul>",
+            ]
+        )
         if recommendations:
             lines.extend([f"            <li>{rec}</li>" for rec in recommendations])
         lines.extend(["        </ul>", "    </div>", "</body>", "</html>"])
@@ -497,6 +511,8 @@ class FlextQualityReportGenerator:
                 return JsonReportBuilder.build(self.results, self.thresholds)
             case ReportFormat.HTML:
                 return HtmlReportBuilder.build(self.results, self.thresholds)
+            case _:
+                return FlextResult[str].fail(f"Unknown report format: {format_type}")
 
     def generate_text_report(self) -> FlextResult[str]:
         """Generate text-formatted report."""

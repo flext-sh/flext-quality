@@ -14,9 +14,6 @@ from pathlib import Path
 from typing import TypedDict
 
 import yaml
-from flext_core import (
-    FlextConstants,
-)
 from git import InvalidGitRepositoryError, Repo
 
 from flext_quality.docs_maintenance.utils import get_project_root
@@ -51,7 +48,7 @@ class SyncConfig(TypedDict):
 
 
 # Constants for synchronization
-MAX_CHANGES_DISPLAY: int = FlextConstants.Network.MAX_CONNECTIONS // 10
+MAX_CHANGES_DISPLAY: int = 10
 
 
 @dataclass
@@ -96,7 +93,8 @@ class DocumentationSync:
 
     def _load_config(self, config_path: str | None = None) -> SyncConfig:
         """Load configuration."""
-        default_config: SyncConfig = {
+        # Use plain dict for construction, then cast to SyncConfig
+        config_dict: dict[str, dict[str, object]] = {
             "sync": {
                 "auto_commit": False,
                 "commit_message_template": "docs: {operation} - {changes} changes",
@@ -122,15 +120,20 @@ class DocumentationSync:
             with Path(config_path).open(encoding="utf-8") as f:
                 user_config: dict[str, object] = yaml.safe_load(f)
                 for key, value in user_config.items():
-                    if key in default_config and isinstance(value, dict):
+                    if key in config_dict and isinstance(value, dict):
                         # Merge nested configs
-                        current_val = default_config.get(key)
+                        current_val = config_dict.get(key)
                         if isinstance(current_val, dict):
                             current_val.update(value)
-                    else:
-                        default_config[key] = value
+                    elif isinstance(value, dict):
+                        config_dict[key] = value
 
-        return default_config
+        # Return as SyncConfig (compatible structure)
+        return SyncConfig(
+            sync=config_dict.get("sync", {}),
+            git=config_dict.get("git", {}),
+            maintenance=config_dict.get("maintenance", {}),
+        )
 
     def get_sync_status(self) -> SyncStatus:
         """Get current synchronization status."""

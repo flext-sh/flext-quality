@@ -90,14 +90,18 @@ class LinkChecker:
                 md_links = re.findall(r"\[([^\]]+)\]\(([^)]+)\)", content)
                 for text, url in md_links:
                     link_type = self._classify_link(url)
-                    all_links.append({
-                        "url": url,
-                        "text": text,
-                        "type": link_type,
-                        "file": str(file_path),
-                        "line": content.count("\n", 0, content.find(f"[{text}]({url})"))
-                        + 1,
-                    })
+                    all_links.append(
+                        {
+                            "url": url,
+                            "text": text,
+                            "type": link_type,
+                            "file": str(file_path),
+                            "line": content.count(
+                                "\n", 0, content.find(f"[{text}]({url})")
+                            )
+                            + 1,
+                        }
+                    )
 
                 # Find reference-style links [text][ref] and [ref]: url
                 ref_links = re.findall(r"\[([^\]]+)\]\[([^\]]+)\]", content)
@@ -108,13 +112,15 @@ class LinkChecker:
                     if ref in ref_dict:
                         url = ref_dict[ref]
                         link_type = self._classify_link(url)
-                        all_links.append({
-                            "url": url,
-                            "text": text,
-                            "type": link_type,
-                            "file": str(file_path),
-                            "reference": ref,
-                        })
+                        all_links.append(
+                            {
+                                "url": url,
+                                "text": text,
+                                "type": link_type,
+                                "file": str(file_path),
+                                "reference": ref,
+                            }
+                        )
 
             except Exception as e:
                 # Log the exception for debugging but continue processing
@@ -294,10 +300,12 @@ class LinkChecker:
         processed_results = []
         for result in results:
             if isinstance(result, Exception):
-                processed_results.append({
-                    "error": f"task_exception: {result!s}",
-                    "valid": False,
-                })
+                processed_results.append(
+                    {
+                        "error": f"task_exception: {result!s}",
+                        "valid": False,
+                    }
+                )
             else:
                 processed_results.append(result)
 
@@ -373,11 +381,13 @@ class LinkChecker:
                 # Add warnings for specific cases
                 if result.get("error") == "timeout":
                     self.results["warnings"] += 1
-                    self.results["warnings_list"].append({
-                        "type": "slow_response",
-                        "url": result["url"],
-                        "message": f"Link timed out after {self.config['external_timeout']}s",
-                    })
+                    self.results["warnings_list"].append(
+                        {
+                            "type": "slow_response",
+                            "url": result["url"],
+                            "message": f"Link timed out after {self.config['external_timeout']}s",
+                        }
+                    )
 
         return self.results
 
@@ -405,17 +415,21 @@ class LinkChecker:
 
             # Basic URL structure validation for GitHub
             if self._validate_github_url_structure(url):
-                validated_links.append({
-                    **link,
-                    "valid": True,
-                    "github_validated": True,
-                })
+                validated_links.append(
+                    {
+                        **link,
+                        "valid": True,
+                        "github_validated": True,
+                    }
+                )
             else:
-                validated_links.append({
-                    **link,
-                    "valid": False,
-                    "error": "invalid_github_url_structure",
-                })
+                validated_links.append(
+                    {
+                        **link,
+                        "valid": False,
+                        "error": "invalid_github_url_structure",
+                    }
+                )
 
         return validated_links
 

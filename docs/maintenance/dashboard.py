@@ -111,23 +111,25 @@ class DocumentationDashboard:
                 if report_date >= cutoff_date:
                     with Path(report_file).open(encoding="utf-8") as f:
                         data = json.load(f)
-                        trend_data.append({
-                            "date": report_date.isoformat(),
-                            "quality_score": data.get("metrics", {}).get(
-                                "quality_score",
-                                0,
-                            ),
-                            "total_issues": data.get("metrics", {}).get(
-                                "total_issues",
-                                0,
-                            ),
-                            "critical_issues": data.get("metrics", {})
-                            .get("severity_breakdown", {})
-                            .get("critical", 0),
-                            "high_issues": data.get("metrics", {})
-                            .get("severity_breakdown", {})
-                            .get("high", 0),
-                        })
+                        trend_data.append(
+                            {
+                                "date": report_date.isoformat(),
+                                "quality_score": data.get("metrics", {}).get(
+                                    "quality_score",
+                                    0,
+                                ),
+                                "total_issues": data.get("metrics", {}).get(
+                                    "total_issues",
+                                    0,
+                                ),
+                                "critical_issues": data.get("metrics", {})
+                                .get("severity_breakdown", {})
+                                .get("critical", 0),
+                                "high_issues": data.get("metrics", {})
+                                .get("severity_breakdown", {})
+                                .get("high", 0),
+                            }
+                        )
             except Exception as e:
                 logger.warning("Failed to process trend data: %s", e)
                 continue
@@ -158,13 +160,17 @@ class DocumentationDashboard:
                 with Path(report_file).open(encoding="utf-8") as f:
                     data = json.load(f)
 
-                reports.append({
-                    "filename": report_file.name,
-                    "date": report_date.isoformat(),
-                    "quality_score": data.get("metrics", {}).get("quality_score", 0),
-                    "total_issues": data.get("metrics", {}).get("total_issues", 0),
-                    "files_analyzed": data.get("files_analyzed", 0),
-                })
+                reports.append(
+                    {
+                        "filename": report_file.name,
+                        "date": report_date.isoformat(),
+                        "quality_score": data.get("metrics", {}).get(
+                            "quality_score", 0
+                        ),
+                        "total_issues": data.get("metrics", {}).get("total_issues", 0),
+                        "files_analyzed": data.get("files_analyzed", 0),
+                    }
+                )
             except Exception as e:
                 logger.warning("Failed to process report file: %s", e)
                 continue
