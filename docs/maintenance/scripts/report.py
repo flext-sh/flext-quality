@@ -155,36 +155,32 @@ class DocumentationReporter:
                 i for i in audit_issues if i.get("severity") == "critical"
             ]
             if critical_issues:
-                recommendations.append(
-                    {
-                        "priority": "critical",
-                        "category": "immediate_fixes",
-                        "title": f"Fix {len(critical_issues)} Critical Issues",
-                        "description": "Address critical documentation issues immediately",
-                        "actions": [
-                            "Review critical issues in audit report",
-                            "Prioritize fixes",
-                            "Re-run audit after fixes",
-                        ],
-                    }
-                )
+                recommendations.append({
+                    "priority": "critical",
+                    "category": "immediate_fixes",
+                    "title": f"Fix {len(critical_issues)} Critical Issues",
+                    "description": "Address critical documentation issues immediately",
+                    "actions": [
+                        "Review critical issues in audit report",
+                        "Prioritize fixes",
+                        "Re-run audit after fixes",
+                    ],
+                })
 
             # Check for outdated content
             outdated = [i for i in audit_issues if i.get("type") == "outdated_content"]
             if outdated:
-                recommendations.append(
-                    {
-                        "priority": "high",
-                        "category": "content_freshness",
-                        "title": f"Update {len(outdated)} Outdated Documents",
-                        "description": "Review and update documentation that hasn't been modified recently",
-                        "actions": [
-                            "Identify documents needing updates",
-                            "Review content accuracy",
-                            "Update timestamps and version info",
-                        ],
-                    }
-                )
+                recommendations.append({
+                    "priority": "high",
+                    "category": "content_freshness",
+                    "title": f"Update {len(outdated)} Outdated Documents",
+                    "description": "Review and update documentation that hasn't been modified recently",
+                    "actions": [
+                        "Identify documents needing updates",
+                        "Review content accuracy",
+                        "Update timestamps and version info",
+                    ],
+                })
 
         if self.validation_data:
             validation_errors = self.validation_data.get("link_validation", {}).get(
@@ -198,52 +194,46 @@ class DocumentationReporter:
                     if e.get("type") in {"broken_external_link", "broken_internal_link"}
                 ]
                 if broken_links:
-                    recommendations.append(
-                        {
-                            "priority": "high",
-                            "category": "link_maintenance",
-                            "title": f"Fix {len(broken_links)} Broken Links",
-                            "description": "Repair or remove broken internal and external links",
-                            "actions": [
-                                "Review broken link report",
-                                "Update or remove invalid URLs",
-                                "Test links after fixes",
-                            ],
-                        }
-                    )
+                    recommendations.append({
+                        "priority": "high",
+                        "category": "link_maintenance",
+                        "title": f"Fix {len(broken_links)} Broken Links",
+                        "description": "Repair or remove broken internal and external links",
+                        "actions": [
+                            "Review broken link report",
+                            "Update or remove invalid URLs",
+                            "Test links after fixes",
+                        ],
+                    })
 
         if self.optimization_data:
             optimizations = self.optimization_data.get("optimizations", [])
             if not optimizations:
-                recommendations.append(
-                    {
-                        "priority": "medium",
-                        "category": "automation_setup",
-                        "title": "Set Up Automated Optimization",
-                        "description": "Configure automated formatting and style fixes",
-                        "actions": [
-                            "Set up pre-commit hooks",
-                            "Configure CI/CD optimization",
-                            "Schedule regular optimization runs",
-                        ],
-                    }
-                )
+                recommendations.append({
+                    "priority": "medium",
+                    "category": "automation_setup",
+                    "title": "Set Up Automated Optimization",
+                    "description": "Configure automated formatting and style fixes",
+                    "actions": [
+                        "Set up pre-commit hooks",
+                        "Configure CI/CD optimization",
+                        "Schedule regular optimization runs",
+                    ],
+                })
 
         # Default recommendations if no specific issues found
         if not recommendations:
-            recommendations.append(
-                {
-                    "priority": "low",
-                    "category": "maintenance_setup",
-                    "title": "Establish Regular Maintenance Schedule",
-                    "description": "Set up automated quality checks and maintenance procedures",
-                    "actions": [
-                        "Schedule weekly audits",
-                        "Configure automated reporting",
-                        "Set up team notifications",
-                    ],
-                }
-            )
+            recommendations.append({
+                "priority": "low",
+                "category": "maintenance_setup",
+                "title": "Establish Regular Maintenance Schedule",
+                "description": "Set up automated quality checks and maintenance procedures",
+                "actions": [
+                    "Schedule weekly audits",
+                    "Configure automated reporting",
+                    "Set up team notifications",
+                ],
+            })
 
         return recommendations
 
@@ -382,31 +372,27 @@ class DocumentationReporter:
 
         # Summary
         summary = data["summary"]
-        md.extend(
-            [
-                "## Summary",
-                "",
-                f"- **Overall Quality Score:** {summary['overall_score']}% ({summary['quality_trend']})",
-                f"- **Files Analyzed:** {summary['files_analyzed']}",
-                f"- **Total Issues:** {summary['total_issues']}",
-                f"- **Links Checked:** {summary['links_checked']}",
-                "",
-            ]
-        )
+        md.extend([
+            "## Summary",
+            "",
+            f"- **Overall Quality Score:** {summary['overall_score']}% ({summary['quality_trend']})",
+            f"- **Files Analyzed:** {summary['files_analyzed']}",
+            f"- **Total Issues:** {summary['total_issues']}",
+            f"- **Links Checked:** {summary['links_checked']}",
+            "",
+        ])
 
         # Recommendations
         if data["recommendations"]:
             md.extend(["## Recommendations", ""])
             for rec in data["recommendations"]:
-                md.extend(
-                    [
-                        f"### {rec['title']} ({rec['priority'].upper()})",
-                        "",
-                        rec["description"],
-                        "",
-                        "**Actions:**",
-                    ]
-                )
+                md.extend([
+                    f"### {rec['title']} ({rec['priority'].upper()})",
+                    "",
+                    rec["description"],
+                    "",
+                    "**Actions:**",
+                ])
                 md.extend(f"- {action}" for action in rec["actions"])
                 md.append("")
 
@@ -424,9 +410,9 @@ class DocumentationReporter:
         return {
             "quality_score": audit_data.get("metrics", {}).get("quality_score", 0),
             "total_issues": len(issues),
-            "critical_issues": len(
-                [i for i in issues if i.get("severity") == "critical"]
-            ),
+            "critical_issues": len([
+                i for i in issues if i.get("severity") == "critical"
+            ]),
             "high_issues": len([i for i in issues if i.get("severity") == "high"]),
             "medium_issues": len([i for i in issues if i.get("severity") == "medium"]),
             "low_issues": len([i for i in issues if i.get("severity") == "low"]),
@@ -521,33 +507,23 @@ class DocumentationReporter:
             date = report.get("date", report.get("timestamp", datetime.now(UTC)))
 
             if "metrics" in report and "quality_score" in report["metrics"]:
-                audit_trends.append(
-                    {
-                        "date": date,
-                        "quality_score": report["metrics"]["quality_score"],
-                        "total_issues": len(report.get("issues", [])),
-                    }
-                )
+                audit_trends.append({
+                    "date": date,
+                    "quality_score": report["metrics"]["quality_score"],
+                    "total_issues": len(report.get("issues", [])),
+                })
             elif "link_validation" in report:
-                validation_trends.append(
-                    {
-                        "date": date,
-                        "links_checked": report["link_validation"].get(
-                            "links_checked", 0
-                        ),
-                        "broken_links": report["link_validation"].get(
-                            "broken_links", 0
-                        ),
-                    }
-                )
+                validation_trends.append({
+                    "date": date,
+                    "links_checked": report["link_validation"].get("links_checked", 0),
+                    "broken_links": report["link_validation"].get("broken_links", 0),
+                })
             elif "changes_made" in report:
-                optimization_trends.append(
-                    {
-                        "date": date,
-                        "changes_made": report["changes_made"],
-                        "files_processed": report["files_processed"],
-                    }
-                )
+                optimization_trends.append({
+                    "date": date,
+                    "changes_made": report["changes_made"],
+                    "files_processed": report["files_processed"],
+                })
 
         return {
             "audit_trends": sorted(audit_trends, key=operator.itemgetter("date")),
@@ -578,12 +554,10 @@ class DocumentationReporter:
         if trend_data["audit_trends"]:
             md.extend(["## Quality Score Trends", ""])
             audit_trends = trend_data["audit_trends"]
-            md.extend(
-                (
-                    "| Date | Quality Score | Issues |",
-                    "|------|---------------|--------|",
-                )
-            )
+            md.extend((
+                "| Date | Quality Score | Issues |",
+                "|------|---------------|--------|",
+            ))
 
             for trend in audit_trends[-10:]:  # Last 10 entries
                 date_str = (
@@ -601,12 +575,10 @@ class DocumentationReporter:
         if trend_data["validation_trends"]:
             md.extend(["## Link Validation Trends", ""])
             validation_trends = trend_data["validation_trends"]
-            md.extend(
-                (
-                    "| Date | Links Checked | Broken Links |",
-                    "|------|---------------|--------------|",
-                )
-            )
+            md.extend((
+                "| Date | Links Checked | Broken Links |",
+                "|------|---------------|--------------|",
+            ))
 
             for trend in validation_trends[-10:]:
                 date_str = (
@@ -624,12 +596,10 @@ class DocumentationReporter:
         if trend_data["optimization_trends"]:
             md.extend(["## Optimization Trends", ""])
             optimization_trends = trend_data["optimization_trends"]
-            md.extend(
-                (
-                    "| Date | Files Processed | Changes Made |",
-                    "|------|-----------------|--------------|",
-                )
-            )
+            md.extend((
+                "| Date | Files Processed | Changes Made |",
+                "|------|-----------------|--------------|",
+            ))
 
             for trend in optimization_trends[-10:]:
                 date_str = (

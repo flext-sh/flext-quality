@@ -47,7 +47,7 @@ class ConflictAnalyzer(FlextService[list[dict[str, str]]]):
             with pyproject.open("rb") as handle:
                 raw = tomllib.load(handle)
         except (OSError, tomllib.TOMLDecodeError):
-            self._logger.debug("Unable to load pyproject.toml for %s", project)
+            self._logger.debug("Unable to load pyproject.toml for %s", str(project))
             return FlextResult[list[dict[str, str]]].ok([])
 
         deps: dict[str, str] = {}
@@ -75,13 +75,11 @@ class ConflictAnalyzer(FlextService[list[dict[str, str]]]):
                 continue
             previous = known.get(name)
             if previous and previous != spec:
-                conflicts.append(
-                    {
-                        "dependency": name,
-                        "current": previous,
-                        "requested": spec,
-                    }
-                )
+                conflicts.append({
+                    "dependency": name,
+                    "current": previous,
+                    "requested": spec,
+                })
             known[name] = spec
         return conflicts
 

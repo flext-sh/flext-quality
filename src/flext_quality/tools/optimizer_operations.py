@@ -508,12 +508,10 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         if not dry_run and changes:
             path.write_text(content, encoding="utf-8")
 
-        return FlextResult[dict[str, object]].ok(
-            {
-                "changes": changes,
-                "file": str(module_path),
-            }
-        )
+        return FlextResult[dict[str, object]].ok({
+            "changes": changes,
+            "file": str(module_path),
+        })
 
     def modernize_syntax(
         self,
@@ -544,12 +542,10 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         if not dry_run and all_changes:
             path.write_text(content, encoding="utf-8")
 
-        return FlextResult[dict[str, object]].ok(
-            {
-                "changes": all_changes,
-                "file": str(module_path),
-            }
-        )
+        return FlextResult[dict[str, object]].ok({
+            "changes": all_changes,
+            "file": str(module_path),
+        })
 
     def modernize_types(
         self,
@@ -596,12 +592,10 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
             except Exception as e:
                 return FlextResult[dict[str, object]].fail(str(e))
 
-        return FlextResult[dict[str, object]].ok(
-            {
-                "changes": all_changes,
-                "files_modified": files_modified,
-            }
-        )
+        return FlextResult[dict[str, object]].ok({
+            "changes": all_changes,
+            "files_modified": files_modified,
+        })
 
 
 __all__ = ["FlextQualityOptimizerOperations", "OptimizerConfig"]

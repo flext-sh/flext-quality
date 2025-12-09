@@ -379,17 +379,17 @@ class FlextQualityCliService(FlextService[int]):
             self, "_cli_config", config if config is not None else CliConfig()
         )
         object.__setattr__(self, "_cli_logger", FlextLogger(__name__))
-        self._router = CliCommandRouter(self._cli_logger, self._cli_config)  # type: ignore[attr-defined]
+        self._router = CliCommandRouter(self._cli_logger, self._cli_config)
 
     @property
     def cli_config(self) -> CliConfig:
         """Access CLI configuration (read-only)."""
-        return self._cli_config  # type: ignore[attr-defined]
+        return self._cli_config
 
     @property
     def cli_logger(self) -> FlextLogger:
         """Access CLI logger (read-only)."""
-        return self._cli_logger  # type: ignore[attr-defined]
+        return self._cli_logger
 
     def get_router(self) -> CliCommandRouter:
         """Get command router for dispatching CLI commands."""

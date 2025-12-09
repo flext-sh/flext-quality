@@ -18,7 +18,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 
 # Domain library imports (FAIL FAST if dependencies not available)
-from flext_auth import FlextAuth, FlextAuthJwtProvider
+from flext_auth import FlextAuth
 from flext_core import FlextContainer, FlextLogger, FlextResult
 
 from .analyzer import FlextQualityAnalyzer
@@ -87,12 +87,9 @@ class FlextQualityWeb:
         self._register_routes()
 
     def _setup_authentication(self) -> FlextAuth | None:
-        """Setup authentication using flext-auth with JWT provider."""
-        # Create JWT auth provider for quality API
-        # FlextAuthJwtProvider() takes no config parameter - it extends FlextAuthRfcProvider
-        _jwt_provider = FlextAuthJwtProvider()
-
-        # Initialize FlextAuth
+        """Setup authentication using flext-auth."""
+        # Initialize FlextAuth - providers are registered via the registry
+        # FlextAuthJwtProvider is abstract and should not be instantiated directly
         auth = FlextAuth()
 
         self.logger.info("Authentication configured successfully")

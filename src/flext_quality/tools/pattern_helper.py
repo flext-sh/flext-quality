@@ -29,15 +29,13 @@ def check_all_flext_patterns(
         FlextResult with comprehensive pattern validation results
 
     """
-    return FlextResult.ok(
-        {
-            "project": str(project_path),
-            "total_issues": 0,
-            "issues": [],
-            "checks": {},
-            "status": "all_passed",
-        }
-    )
+    return FlextResult.ok({
+        "project": str(project_path),
+        "total_issues": 0,
+        "issues": [],
+        "checks": {},
+        "status": "all_passed",
+    })
 
 
 def check_import_patterns(

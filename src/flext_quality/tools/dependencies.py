@@ -71,12 +71,10 @@ class FlextQualityDependencyTools(FlextService[bool]):
 
             if dry_run:
                 logger.info("DRY RUN: Would consolidate deps in %s", workspace_path)
-                return FlextResult[dict[str, object]].ok(
-                    {
-                        "consolidated": False,
-                        "dry_run": True,
-                    }
-                )
+                return FlextResult[dict[str, object]].ok({
+                    "consolidated": False,
+                    "dry_run": True,
+                })
 
             logger.info("Consolidating dependencies in %s", workspace_path)
             return FlextResult[dict[str, object]].ok({"consolidated": True})

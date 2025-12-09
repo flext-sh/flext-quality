@@ -162,7 +162,6 @@ class ProjectServiceBuilder:
                 id=f"project_{name.lower().replace(' ', '_')}",
                 name=name,
                 path=path,
-                **self._kwargs,
             )
             return r.ok(project)
         except (ValueError, TypeError) as e:
@@ -404,13 +403,18 @@ class IssueServiceBuilder:
                 else uuid5(NAMESPACE_DNS, str(self._analysis_id))
             )
             severity = self._severity if isinstance(self._severity, str) else "MEDIUM"
-            issue_type = self._issue_type if isinstance(self._issue_type, str) else "UNKNOWN"
+            issue_type_str = (
+                self._issue_type if isinstance(self._issue_type, str) else "UNKNOWN"
+            )
+            # Convert to enum - validation already confirmed these are valid
+            severity_enum = m.IssueSeverity(severity)
+            issue_type_enum = m.IssueType(issue_type_str)
             file_path = self._file_path if isinstance(self._file_path, str) else ""
             message = self._message if isinstance(self._message, str) else ""
             issue = m.IssueModel(
                 analysis_id=analysis_uuid,
-                severity=severity,
-                issue_type=issue_type,
+                severity=severity_enum,
+                issue_type=issue_type_enum,
                 file_path=file_path,
                 message=message,
             )
@@ -425,7 +429,7 @@ class IssueServiceBuilder:
         """Log issue creation and return (monadic final step)."""
         self._logger.info(
             "Issue created successfully",
-            issue_id=issue.id,
+            issue_id=str(issue.id),
             severity=self._severity,
             issue_type=self._issue_type,
         )
@@ -514,13 +518,17 @@ class ReportServiceBuilder:
                 if isinstance(self._analysis_id, UUID)
                 else uuid5(NAMESPACE_DNS, str(self._analysis_id))
             )
+            # Validation already confirmed format_type is valid
+            # Safe to assert the proper type after validation
+            assert isinstance(self._format_type, str)
+            if self._format_type not in {"HTML", "JSON", "CSV"}:
+                return r.fail(f"Invalid format type: {self._format_type}")
             report = m.ReportModel(
                 analysis_id=analysis_uuid,
                 format_type=self._format_type,
-                **self._kwargs,
             )
             return r.ok(report)
-        except (ValueError, TypeError) as e:
+        except (ValueError, TypeError, AssertionError) as e:
             return r.fail(f"Report creation failed: {e}")
 
     def _log_report_creation(
@@ -530,7 +538,7 @@ class ReportServiceBuilder:
         """Log report creation and return (monadic final step)."""
         self._logger.info(
             "Report created successfully",
-            report_id=report.id,
+            report_id=str(report.id),
             format=self._format_type,
         )
         return report

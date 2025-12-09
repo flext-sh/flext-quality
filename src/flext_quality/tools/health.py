@@ -30,5 +30,7 @@ class HealthCheckService(FlextService[bool]):
         """Run placeholder health checks."""
         exists = self._workspace.exists()
         if not exists:
-            self._logger.warning("Workspace path does not exist: %s", self._workspace)
+            self._logger.warning(
+                "Workspace path does not exist: %s", str(self._workspace)
+            )
         return FlextResult[bool].ok(exists)

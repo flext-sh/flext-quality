@@ -187,12 +187,12 @@ class FlextQualityAnalyzer(FlextService):
     @property
     def analyzer_config(self) -> FlextQualityConfig:
         """Access analyzer configuration (read-only)."""
-        return self._analyzer_config  # type: ignore[attr-defined]
+        return self._analyzer_config
 
     @property
     def analyzer_logger(self) -> FlextLogger:
         """Access analyzer logger (read-only)."""
-        return self._analyzer_logger  # type: ignore[attr-defined]
+        return self._analyzer_logger
 
     def execute(self, **_kwargs: object) -> FlextResult[bool]:
         """Execute analyzer service - override from FlextService."""
@@ -367,16 +367,14 @@ class FlextQualityAnalyzer(FlextService):
                     file_path=str(file_path),
                     lines_of_code=len(content.splitlines()),
                     complexity_score=complexity_score,
-                    functions_count=len(
-                        [
-                            n
-                            for n in ast.walk(tree)
-                            if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
-                        ]
-                    ),
-                    classes_count=len(
-                        [n for n in ast.walk(tree) if isinstance(n, ast.ClassDef)]
-                    ),
+                    functions_count=len([
+                        n
+                        for n in ast.walk(tree)
+                        if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+                    ]),
+                    classes_count=len([
+                        n for n in ast.walk(tree) if isinstance(n, ast.ClassDef)
+                    ]),
                     issues=issues,
                 )
                 return FlextResult.ok(metrics)
@@ -598,29 +596,23 @@ class FlextQualityAnalyzer(FlextService):
                         all_issues.extend(metrics.issues)
 
                 # Convert duplication issues to CodeIssue objects
-                all_issues.extend(
-                    [
-                        FlextQualityModels.CodeIssue(
-                            id=(
-                                UUID(str(dup.id))
-                                if isinstance(dup.id, str)
-                                else uuid4()
-                            ),
-                            analysis_id=(
-                                UUID(str(dup.analysis_id))
-                                if isinstance(dup.analysis_id, str)
-                                else uuid4()
-                            ),
-                            file_path=dup.file_path,
-                            line_number=dup.line_number,
-                            issue_type=(FlextQualityModels.IssueType.DUPLICATE_CODE),
-                            severity=(FlextQualityModels.IssueSeverity.MEDIUM),
-                            message=dup.message,
-                            rule_id=dup.rule_id,
-                        )
-                        for dup in duplication_issues
-                    ]
-                )
+                all_issues.extend([
+                    FlextQualityModels.CodeIssue(
+                        id=(UUID(str(dup.id)) if isinstance(dup.id, str) else uuid4()),
+                        analysis_id=(
+                            UUID(str(dup.analysis_id))
+                            if isinstance(dup.analysis_id, str)
+                            else uuid4()
+                        ),
+                        file_path=dup.file_path,
+                        line_number=dup.line_number,
+                        issue_type=(FlextQualityModels.IssueType.DUPLICATE_CODE),
+                        severity=(FlextQualityModels.IssueSeverity.MEDIUM),
+                        message=dup.message,
+                        rule_id=dup.rule_id,
+                    )
+                    for dup in duplication_issues
+                ])
 
                 # Count issues by type
                 def count_type(issue_type: str) -> int:

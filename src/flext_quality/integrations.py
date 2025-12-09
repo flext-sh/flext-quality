@@ -91,9 +91,9 @@ class FlextQualityIntegrations(FlextService[bool]):
             if isinstance(body, dict):
                 # Reconstruct dict with JsonValue for type safety
                 return FlextResult[dict[str, FlextTypes.Json.JsonValue]].ok(dict(body))
-            return FlextResult[dict[str, FlextTypes.Json.JsonValue]].ok(
-                {"response": str(body)}
-            )
+            return FlextResult[dict[str, FlextTypes.Json.JsonValue]].ok({
+                "response": str(body)
+            })
 
         @staticmethod
         def get(
@@ -116,9 +116,9 @@ class FlextQualityIntegrations(FlextService[bool]):
             if isinstance(body, dict):
                 # Reconstruct dict with JsonValue for type safety
                 return FlextResult[dict[str, FlextTypes.Json.JsonValue]].ok(dict(body))
-            return FlextResult[dict[str, FlextTypes.Json.JsonValue]].ok(
-                {"response": str(body)}
-            )
+            return FlextResult[dict[str, FlextTypes.Json.JsonValue]].ok({
+                "response": str(body)
+            })
 
     class _PayloadBuilders:
         """Single responsibility: Build integration payloads."""

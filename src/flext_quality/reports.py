@@ -132,13 +132,9 @@ class ScoreCalculator:
         issues: list[FlextQualityModels.IssueModel],
     ) -> int:
         """Count critical issues - type-safe using IssueModel."""
-        return len(
-            [
-                i
-                for i in issues
-                if i.severity == FlextQualityModels.IssueSeverity.CRITICAL
-            ]
-        )
+        return len([
+            i for i in issues if i.severity == FlextQualityModels.IssueSeverity.CRITICAL
+        ])
 
 
 # =====================================================================
@@ -182,12 +178,10 @@ class RecommendationGenerator:
                 "Consider breaking down large files and reducing complexity",
             )
         if score < thresholds.min_score_threshold:
-            recommendations.extend(
-                [
-                    "Implement automated code quality checks in your CI/CD pipeline",
-                    "Add complete unit tests to improve coverage",
-                ]
-            )
+            recommendations.extend([
+                "Implement automated code quality checks in your CI/CD pipeline",
+                "Add complete unit tests to improve coverage",
+            ])
         if coverage < thresholds.min_coverage_threshold:
             recommendations.append(
                 f"Increase test coverage from {coverage:.1f}% to at least {thresholds.min_coverage_threshold}%",
@@ -270,12 +264,10 @@ class TextReportBuilder:
         ]:
             if issues:
                 lines.append(f"\n{category} ({len(issues)} issues):")
-                lines.extend(
-                    [
-                        f"  - {issue.message}"
-                        for issue in issues[: thresholds.issue_preview_limit]
-                    ]
-                )
+                lines.extend([
+                    f"  - {issue.message}"
+                    for issue in issues[: thresholds.issue_preview_limit]
+                ])
                 if len(issues) > thresholds.issue_preview_limit:
                     remaining = len(issues) - thresholds.issue_preview_limit
                     lines.append(f"  ... and {remaining} more")
@@ -437,12 +429,10 @@ class HtmlReportBuilder:
             ("duplication", duplication_issues),
         ]:
             if issues:
-                lines.extend(
-                    [
-                        '    <div class="section">',
-                        f"        <h2>{category.title()} Issues ({len(issues)})</h2>",
-                    ]
-                )
+                lines.extend([
+                    '    <div class="section">',
+                    f"        <h2>{category.title()} Issues ({len(issues)})</h2>",
+                ])
                 for issue in issues[: thresholds.html_issue_limit]:
                     severity_class = (
                         "high-severity"
@@ -466,13 +456,11 @@ class HtmlReportBuilder:
 
         # Add recommendations
         recommendations = RecommendationGenerator.generate(results, thresholds)
-        lines.extend(
-            [
-                '    <div class="section">',
-                "        <h2>Recommendations</h2>",
-                "        <ul>",
-            ]
-        )
+        lines.extend([
+            '    <div class="section">',
+            "        <h2>Recommendations</h2>",
+            "        <ul>",
+        ])
         if recommendations:
             lines.extend([f"            <li>{rec}</li>" for rec in recommendations])
         lines.extend(["        </ul>", "    </div>", "</body>", "</html>"])

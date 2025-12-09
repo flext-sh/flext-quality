@@ -72,16 +72,14 @@ def validate_examples_directory(
                 results[str(example_file)] = f"⚠️ ERROR: {str(e)[:100]}"
                 failed += 1
 
-        return FlextResult.ok(
-            {
-                "directory": str(examples_dir),
-                "total_examples": passed + failed,
-                "passed": passed,
-                "failed": failed,
-                "results": results,
-                "status": "all_passed" if failed == 0 else "some_failures",
-            }
-        )
+        return FlextResult.ok({
+            "directory": str(examples_dir),
+            "total_examples": passed + failed,
+            "passed": passed,
+            "failed": failed,
+            "results": results,
+            "status": "all_passed" if failed == 0 else "some_failures",
+        })
 
     except Exception as e:
         return FlextResult.fail(f"Example validation failed: {e}")
@@ -132,14 +130,12 @@ def check_example_structure(
         if missing_recommended:
             issues.append(f"Missing recommended: {', '.join(missing_recommended)}")
 
-        return FlextResult.ok(
-            {
-                "directory": str(example_dir),
-                "valid": len(issues) == 0,
-                "issues": issues,
-                "structure": "complete" if not issues else "incomplete",
-            }
-        )
+        return FlextResult.ok({
+            "directory": str(example_dir),
+            "valid": len(issues) == 0,
+            "issues": issues,
+            "structure": "complete" if not issues else "incomplete",
+        })
 
     except Exception as e:
         return FlextResult.fail(f"Structure check failed: {e}")
@@ -185,15 +181,13 @@ def validate_example_imports(
 
         wrapper = result.unwrap()
 
-        return FlextResult.ok(
-            {
-                "file": str(example_file),
-                "imports_count": len(imports),
-                "imports": imports,
-                "status": "valid" if wrapper.returncode == 0 else "invalid",
-                "error": wrapper.stderr if wrapper.returncode != 0 else None,
-            }
-        )
+        return FlextResult.ok({
+            "file": str(example_file),
+            "imports_count": len(imports),
+            "imports": imports,
+            "status": "valid" if wrapper.returncode == 0 else "invalid",
+            "error": wrapper.stderr if wrapper.returncode != 0 else None,
+        })
 
     except Exception as e:
         return FlextResult.fail(f"Import validation failed: {e}")
@@ -231,15 +225,13 @@ def run_example_safely(
 
         wrapper = result.unwrap()
 
-        return FlextResult.ok(
-            {
-                "file": str(example_file),
-                "exit_code": wrapper.returncode,
-                "status": "passed" if wrapper.returncode == 0 else "failed",
-                "stdout": wrapper.stdout[:500],  # First 500 chars
-                "stderr": wrapper.stderr[:500],  # First 500 chars
-            }
-        )
+        return FlextResult.ok({
+            "file": str(example_file),
+            "exit_code": wrapper.returncode,
+            "status": "passed" if wrapper.returncode == 0 else "failed",
+            "stdout": wrapper.stdout[:500],  # First 500 chars
+            "stderr": wrapper.stderr[:500],  # First 500 chars
+        })
 
     except Exception as e:
         return FlextResult.fail(f"Example execution failed: {e}")

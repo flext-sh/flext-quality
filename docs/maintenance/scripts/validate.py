@@ -66,18 +66,16 @@ class LinkValidator:
 
                 for text, url in matches:
                     link_type = self._classify_link(url)
-                    all_links.append(
-                        {
-                            "text": text,
-                            "url": url,
-                            "type": link_type,
-                            "file": file_rel_path,
-                            "line_number": self._find_line_number(
-                                content,
-                                f"[{text}]({url})",
-                            ),
-                        }
-                    )
+                    all_links.append({
+                        "text": text,
+                        "url": url,
+                        "type": link_type,
+                        "file": file_rel_path,
+                        "line_number": self._find_line_number(
+                            content,
+                            f"[{text}]({url})",
+                        ),
+                    })
 
                 # Extract HTML links: <a href="url">text</a>
                 html_link_pattern = r'<a[^>]+href=["\']([^"\']+)["\'][^>]*>([^<]+)</a>'
@@ -85,44 +83,36 @@ class LinkValidator:
 
                 for url, text in html_matches:
                     link_type = self._classify_link(url)
-                    all_links.append(
-                        {
-                            "text": text.strip(),
-                            "url": url,
-                            "type": link_type,
-                            "file": file_rel_path,
-                            "line_number": self._find_line_number(
-                                content, f'href="{url}"'
-                            ),
-                        }
-                    )
+                    all_links.append({
+                        "text": text.strip(),
+                        "url": url,
+                        "type": link_type,
+                        "file": file_rel_path,
+                        "line_number": self._find_line_number(content, f'href="{url}"'),
+                    })
 
                 # Extract image references: ![alt](src)
                 image_pattern = r"!\[([^\]]*)\]\(([^)]+)\)"
                 image_matches = re.findall(image_pattern, content)
 
                 for alt_text, src in image_matches:
-                    all_links.append(
-                        {
-                            "text": alt_text,
-                            "url": src,
-                            "type": "image",
-                            "file": file_rel_path,
-                            "line_number": self._find_line_number(
-                                content,
-                                f"![{alt_text}]({src})",
-                            ),
-                        }
-                    )
+                    all_links.append({
+                        "text": alt_text,
+                        "url": src,
+                        "type": "image",
+                        "file": file_rel_path,
+                        "line_number": self._find_line_number(
+                            content,
+                            f"![{alt_text}]({src})",
+                        ),
+                    })
 
             except Exception as e:
-                self.results["errors"].append(
-                    {
-                        "type": "file_read_error",
-                        "file": file_rel_path,
-                        "error": str(e),
-                    }
-                )
+                self.results["errors"].append({
+                    "type": "file_read_error",
+                    "file": file_rel_path,
+                    "error": str(e),
+                })
 
         return all_links
 
@@ -316,16 +306,14 @@ class LinkValidator:
                         break
 
                 if not target_exists:
-                    self.results["errors"].append(
-                        {
-                            "type": "broken_internal_link",
-                            "url": link["url"],
-                            "target": target,
-                            "file": link["file"],
-                            "line": link.get("line_number"),
-                            "error": "Target file not found",
-                        }
-                    )
+                    self.results["errors"].append({
+                        "type": "broken_internal_link",
+                        "url": link["url"],
+                        "target": target,
+                        "file": link["file"],
+                        "line": link.get("line_number"),
+                        "error": "Target file not found",
+                    })
                     self.results["broken_links"] += 1
                 else:
                     self.results["valid_links"] += 1
@@ -369,15 +357,13 @@ class LinkValidator:
             if full_path.exists():
                 self.results["valid_links"] += 1
             else:
-                self.results["errors"].append(
-                    {
-                        "type": "missing_image",
-                        "src": src,
-                        "file": image["file"],
-                        "line": image.get("line_number"),
-                        "error": f"Image file not found: {full_path}",
-                    }
-                )
+                self.results["errors"].append({
+                    "type": "missing_image",
+                    "src": src,
+                    "file": image["file"],
+                    "line": image.get("line_number"),
+                    "error": f"Image file not found: {full_path}",
+                })
                 self.results["broken_links"] += 1
 
             self.results["links_checked"] += 1
@@ -413,13 +399,11 @@ class LinkValidator:
                 file_anchors[file_rel_path] = set(anchors)
 
             except Exception as e:
-                self.results["warnings_list"].append(
-                    {
-                        "type": "anchor_index_error",
-                        "file": file_rel_path,
-                        "warning": f"Could not build anchor index: {e!s}",
-                    }
-                )
+                self.results["warnings_list"].append({
+                    "type": "anchor_index_error",
+                    "file": file_rel_path,
+                    "warning": f"Could not build anchor index: {e!s}",
+                })
 
         # Check anchor links
         for link in anchor_links:
@@ -429,15 +413,13 @@ class LinkValidator:
             if file_path in file_anchors and anchor in file_anchors[file_path]:
                 self.results["valid_links"] += 1
             else:
-                self.results["errors"].append(
-                    {
-                        "type": "broken_anchor",
-                        "anchor": anchor,
-                        "file": file_path,
-                        "line": link.get("line_number"),
-                        "error": f"Anchor '{anchor}' not found in {file_path}",
-                    }
-                )
+                self.results["errors"].append({
+                    "type": "broken_anchor",
+                    "anchor": anchor,
+                    "file": file_path,
+                    "line": link.get("line_number"),
+                    "error": f"Anchor '{anchor}' not found in {file_path}",
+                })
                 self.results["broken_links"] += 1
 
             self.results["links_checked"] += 1
@@ -476,16 +458,14 @@ class LinkValidator:
             text = link["text"].lower().strip()
 
             if text in poor_link_texts or len(text) < 3:
-                self.results["warnings_list"].append(
-                    {
-                        "type": "poor_link_text",
-                        "text": link["text"],
-                        "url": link["url"],
-                        "file": link["file"],
-                        "line": link.get("line_number"),
-                        "warning": "Link text is not descriptive enough for accessibility",
-                    }
-                )
+                self.results["warnings_list"].append({
+                    "type": "poor_link_text",
+                    "text": link["text"],
+                    "url": link["url"],
+                    "file": link["file"],
+                    "line": link.get("line_number"),
+                    "warning": "Link text is not descriptive enough for accessibility",
+                })
                 self.results["warnings"] += 1
 
         return self.results
@@ -537,20 +517,18 @@ class ContentValidator:
                 issues = self._check_markdown_issues(content)
 
                 if issues:
-                    self.results["content_issues"].extend(
-                        [{**issue, "file": file_rel_path} for issue in issues]
-                    )
+                    self.results["content_issues"].extend([
+                        {**issue, "file": file_rel_path} for issue in issues
+                    ])
 
                 self.results["files_checked"] += 1
 
             except Exception as e:
-                self.results["content_issues"].append(
-                    {
-                        "type": "syntax_validation_error",
-                        "file": file_rel_path,
-                        "error": str(e),
-                    }
-                )
+                self.results["content_issues"].append({
+                    "type": "syntax_validation_error",
+                    "file": file_rel_path,
+                    "error": str(e),
+                })
 
         return self.results
 
@@ -563,25 +541,21 @@ class ContentValidator:
         for i, line in enumerate(lines, 1):
             # Check for broken links (unclosed brackets)
             if "[" in line and "]" in line and "(" in line and ")" not in line:
-                issues.append(
-                    {
-                        "type": "broken_link_syntax",
-                        "line": i,
-                        "content": line.strip(),
-                        "error": "Unclosed link syntax",
-                    }
-                )
+                issues.append({
+                    "type": "broken_link_syntax",
+                    "line": i,
+                    "content": line.strip(),
+                    "error": "Unclosed link syntax",
+                })
 
             # Check for broken images (unclosed brackets)
             if "![" in line and "]" in line and "(" in line and ")" not in line:
-                issues.append(
-                    {
-                        "type": "broken_image_syntax",
-                        "line": i,
-                        "content": line.strip(),
-                        "error": "Unclosed image syntax",
-                    }
-                )
+                issues.append({
+                    "type": "broken_image_syntax",
+                    "line": i,
+                    "content": line.strip(),
+                    "error": "Unclosed image syntax",
+                })
 
             # Check for inconsistent list indentation
             if line.strip().startswith(("- ", "* ", "+ ")):
@@ -590,14 +564,12 @@ class ContentValidator:
 
             # Check for trailing spaces (configurable)
             if line.rstrip() != line:
-                issues.append(
-                    {
-                        "type": "trailing_spaces",
-                        "line": i,
-                        "content": line,
-                        "error": "Line has trailing spaces",
-                    }
-                )
+                issues.append({
+                    "type": "trailing_spaces",
+                    "line": i,
+                    "content": line,
+                    "error": "Line has trailing spaces",
+                })
 
         return issues
 
@@ -612,35 +584,29 @@ class ContentValidator:
 
                 # Check against quality thresholds
                 if metrics["word_count"] < 50:
-                    self.results["content_issues"].append(
-                        {
-                            "type": "insufficient_content",
-                            "file": file_rel_path,
-                            "word_count": metrics["word_count"],
-                            "warning": "Document appears to be too short",
-                        }
-                    )
+                    self.results["content_issues"].append({
+                        "type": "insufficient_content",
+                        "file": file_rel_path,
+                        "word_count": metrics["word_count"],
+                        "warning": "Document appears to be too short",
+                    })
 
                 if metrics["readability_score"] < 60:
-                    self.results["content_issues"].append(
-                        {
-                            "type": "readability_issue",
-                            "file": file_rel_path,
-                            "readability_score": metrics["readability_score"],
-                            "warning": "Content may be difficult to read",
-                        }
-                    )
+                    self.results["content_issues"].append({
+                        "type": "readability_issue",
+                        "file": file_rel_path,
+                        "readability_score": metrics["readability_score"],
+                        "warning": "Content may be difficult to read",
+                    })
 
                 self.results["files_checked"] += 1
 
             except Exception as e:
-                self.results["content_issues"].append(
-                    {
-                        "type": "quality_analysis_error",
-                        "file": file_rel_path,
-                        "error": str(e),
-                    }
-                )
+                self.results["content_issues"].append({
+                    "type": "quality_analysis_error",
+                    "file": file_rel_path,
+                    "error": str(e),
+                })
 
         return self.results
 

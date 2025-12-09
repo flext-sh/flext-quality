@@ -228,12 +228,10 @@ class ContentOptimizer:
             toc_result = self._add_table_of_contents(content)
             if toc_result["added"]:
                 content = str(toc_result["content"])
-                optimizations.append(
-                    {
-                        "type": "toc_added",
-                        "description": "Added table of contents to long document",
-                    }
-                )
+                optimizations.append({
+                    "type": "toc_added",
+                    "description": "Added table of contents to long document",
+                })
 
         # Check for issues
         issues.extend(self._check_for_issues(content, file_path))
@@ -256,14 +254,12 @@ class ContentOptimizer:
                 with Path(file_path).open("w", encoding="utf-8") as f:
                     f.write(str(content))
             except Exception as e:
-                issues.append(
-                    {
-                        "type": "write_error",
-                        "description": f"Failed to write optimized content: {e}",
-                        "line_number": None,
-                        "severity": "error",
-                    }
-                )
+                issues.append({
+                    "type": "write_error",
+                    "description": f"Failed to write optimized content: {e}",
+                    "line_number": None,
+                    "severity": "error",
+                })
 
         return OptimizationResult(
             file_path=file_path,
@@ -289,12 +285,10 @@ class ContentOptimizer:
 
             if new_content != content:
                 content = new_content
-                optimizations.append(
-                    {
-                        "type": "trailing_whitespace",
-                        "description": "Removed trailing whitespace from lines",
-                    }
-                )
+                optimizations.append({
+                    "type": "trailing_whitespace",
+                    "description": "Removed trailing whitespace from lines",
+                })
 
         # Fix common typos
         if self.config["optimization"]["fix_common_typos"]:
@@ -302,14 +296,12 @@ class ContentOptimizer:
                 pattern = rf"\b{re.escape(typo)}\b"
                 if re.search(pattern, content, re.IGNORECASE):
                     content = re.sub(pattern, correction, content, flags=re.IGNORECASE)
-                    optimizations.append(
-                        {
-                            "type": "typo_fix",
-                            "typo": typo,
-                            "correction": correction,
-                            "description": f"Fixed typo: {typo} → {correction}",
-                        }
-                    )
+                    optimizations.append({
+                        "type": "typo_fix",
+                        "typo": typo,
+                        "correction": correction,
+                        "description": f"Fixed typo: {typo} → {correction}",
+                    })
 
         # Enhance code blocks
         if self.config["optimization"]["enhance_code_blocks"]:
@@ -346,13 +338,11 @@ class ContentOptimizer:
                         detected_lang = self._detect_code_language(lines, i)
                         if detected_lang:
                             lines[i] = f"``` {detected_lang}"
-                            optimizations.append(
-                                {
-                                    "type": "code_block_language",
-                                    "description": f"Added language specification: {detected_lang}",
-                                    "line_number": i + 1,
-                                }
-                            )
+                            optimizations.append({
+                                "type": "code_block_language",
+                                "description": f"Added language specification: {detected_lang}",
+                                "line_number": i + 1,
+                            })
                 else:
                     # End of code block
                     in_code_block = False
@@ -420,12 +410,10 @@ class ContentOptimizer:
                     new_lines.append(current_line)
 
                     lines[i] = "\n".join(new_lines)
-                    optimizations.append(
-                        {
-                            "type": "line_length",
-                            "description": f"Fixed long line by breaking at commas (line {i + 1})",
-                        }
-                    )
+                    optimizations.append({
+                        "type": "line_length",
+                        "description": f"Fixed long line by breaking at commas (line {i + 1})",
+                    })
 
         return "\n".join(lines), optimizations
 
@@ -490,28 +478,24 @@ class ContentOptimizer:
                 file_dir = Path(file_path).parent
                 full_path = str(file_dir / url)
                 if not Path(full_path).exists():
-                    issues.append(
-                        {
-                            "type": "broken_link",
-                            "description": f"Broken internal link: {url}",
-                            "line_number": None,
-                            "severity": "warning",
-                        }
-                    )
+                    issues.append({
+                        "type": "broken_link",
+                        "description": f"Broken internal link: {url}",
+                        "line_number": None,
+                        "severity": "warning",
+                    })
 
         # Check for very long paragraphs
         paragraphs = re.split(r"\n\s*\n", content)
         for para in paragraphs:
             word_count = len(para.split())
             if word_count > LONG_PARAGRAPH_WORD_LIMIT:  # Very long paragraph
-                issues.append(
-                    {
-                        "type": "long_paragraph",
-                        "description": f"Very long paragraph ({word_count} words) - consider breaking up",
-                        "line_number": None,
-                        "severity": "info",
-                    }
-                )
+                issues.append({
+                    "type": "long_paragraph",
+                    "description": f"Very long paragraph ({word_count} words) - consider breaking up",
+                    "line_number": None,
+                    "severity": "info",
+                })
 
         return issues
 

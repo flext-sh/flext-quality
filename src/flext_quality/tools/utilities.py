@@ -27,6 +27,10 @@ class FlextQualityToolsUtilities(FlextService[bool]):
     MANDATORY: Uses flext-cli for ALL terminal output (NO direct rich/click).
     """
 
+    # Instance attributes
+    _logger: FlextLogger
+    _cli: FlextCli
+
     class Colors:
         """Terminal colors using flext-cli (MANDATORY - NO direct rich)."""
 

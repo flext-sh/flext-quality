@@ -83,13 +83,11 @@ class FlextQualityPythonTools:
 
             wrapper = result.unwrap()
 
-            return FlextResult.ok(
-                {
-                    "issues": wrapper.stdout,
-                    "exit_code": wrapper.returncode,
-                    "errors": wrapper.stderr,
-                }
-            )
+            return FlextResult.ok({
+                "issues": wrapper.stdout,
+                "exit_code": wrapper.returncode,
+                "errors": wrapper.stderr,
+            })
         except Exception as e:
             self._logger.exception("Ruff check failed")
             return FlextResult.fail(f"Ruff analysis failed: {e}")
@@ -112,22 +110,18 @@ class FlextQualityPythonTools:
         """
         try:
             # Direct API call - no subprocess
-            stdout, stderr, exit_code = api.run(
-                [
-                    str(path),
-                    "--strict",
-                    "--show-error-codes",
-                    "--no-color-output",
-                ]
-            )
+            stdout, stderr, exit_code = api.run([
+                str(path),
+                "--strict",
+                "--show-error-codes",
+                "--no-color-output",
+            ])
 
-            return FlextResult.ok(
-                {
-                    "stdout": stdout,
-                    "stderr": stderr,
-                    "exit_code": exit_code,
-                }
-            )
+            return FlextResult.ok({
+                "stdout": stdout,
+                "stderr": stderr,
+                "exit_code": exit_code,
+            })
         except Exception as e:
             self._logger.exception("MyPy check failed")
             return FlextResult.fail(f"MyPy analysis failed: {e}")
@@ -153,12 +147,10 @@ class FlextQualityPythonTools:
             mgr.discover_files([str(path)])
             mgr.run_tests()
 
-            return FlextResult.ok(
-                {
-                    "issues": len(mgr.results),
-                    "metrics": mgr.metrics.data if mgr.metrics else {},
-                }
-            )
+            return FlextResult.ok({
+                "issues": len(mgr.results),
+                "metrics": mgr.metrics.data if mgr.metrics else {},
+            })
         except Exception as e:
             self._logger.exception("Bandit scan failed")
             return FlextResult.fail(f"Bandit security scan failed: {e}")
@@ -196,12 +188,10 @@ class FlextQualityPythonTools:
 
             wrapper = result.unwrap()
 
-            return FlextResult.ok(
-                {
-                    "output": wrapper.stdout,
-                    "exit_code": wrapper.returncode,
-                }
-            )
+            return FlextResult.ok({
+                "output": wrapper.stdout,
+                "exit_code": wrapper.returncode,
+            })
         except Exception as e:
             self._logger.exception("Pylint check failed")
             return FlextResult.fail(f"Pylint analysis failed: {e}")
@@ -230,12 +220,10 @@ class FlextQualityPythonTools:
                 formatted = black.format_file_contents(content, fast=False, mode=mode)
                 needs_formatting = content != formatted
 
-                return FlextResult.ok(
-                    {
-                        "needs_formatting": needs_formatting,
-                        "issues": 1 if needs_formatting else 0,
-                    }
-                )
+                return FlextResult.ok({
+                    "needs_formatting": needs_formatting,
+                    "issues": 1 if needs_formatting else 0,
+                })
             except Exception as e:
                 if (
                     type(e).__name__ == "NothingChanged"
@@ -262,19 +250,15 @@ class FlextQualityPythonTools:
         """
         try:
             # Direct API call
-            result = pytest.main(
-                [
-                    str(path),
-                    "--collect-only",
-                    "--quiet",
-                ]
-            )
+            result = pytest.main([
+                str(path),
+                "--collect-only",
+                "--quiet",
+            ])
 
-            return FlextResult.ok(
-                {
-                    "exit_code": result,
-                }
-            )
+            return FlextResult.ok({
+                "exit_code": result,
+            })
         except Exception as e:
             self._logger.exception("Pytest failed")
             return FlextResult.fail(f"Pytest execution failed: {e}")
@@ -304,11 +288,9 @@ class FlextQualityPythonTools:
             cov.stop()
             cov.save()
 
-            return FlextResult.ok(
-                {
-                    "percentage": cov.report(),
-                }
-            )
+            return FlextResult.ok({
+                "percentage": cov.report(),
+            })
         except Exception as e:
             self._logger.exception("Coverage analysis failed")
             return FlextResult.fail(f"Coverage analysis failed: {e}")
@@ -334,12 +316,10 @@ class FlextQualityPythonTools:
             # Direct API usage
             cyclomatic = cc_visit(code)
 
-            return FlextResult.ok(
-                {
-                    "functions": len(cyclomatic),
-                    "complexity_scores": [c.complexity for c in cyclomatic],
-                }
-            )
+            return FlextResult.ok({
+                "functions": len(cyclomatic),
+                "complexity_scores": [c.complexity for c in cyclomatic],
+            })
         except Exception as e:
             self._logger.exception("Complexity analysis failed")
             return FlextResult.fail(f"Complexity analysis failed: {e}")
@@ -364,19 +344,17 @@ class FlextQualityPythonTools:
 
             unused_code = list(v.get_unused_code())
 
-            return FlextResult.ok(
-                {
-                    "unused_count": len(unused_code),
-                    "unused_items": [
-                        {
-                            "name": item.name,
-                            "line": item.first_lineno,
-                            "confidence": item.confidence,
-                        }
-                        for item in unused_code
-                    ],
-                }
-            )
+            return FlextResult.ok({
+                "unused_count": len(unused_code),
+                "unused_items": [
+                    {
+                        "name": item.name,
+                        "line": item.first_lineno,
+                        "confidence": item.confidence,
+                    }
+                    for item in unused_code
+                ],
+            })
         except Exception as e:
             self._logger.exception("Dead code detection failed")
             return FlextResult.fail(f"Dead code detection failed: {e}")

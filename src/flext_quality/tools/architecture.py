@@ -52,13 +52,9 @@ class FlextQualityArchitectureTools(s[bool]):
                 analysis_id=str(uuid.uuid4()),
                 project_path=str(project_path),
                 status="completed",
-                issues_found=[],
-                metrics={
-                    "violations": 0,
-                    "suggestions": 0,
-                    "complexity_score": 0.0,
-                    "domain_library_usage": {},
-                },
+                issues_found=0,
+                overall_score=0.0,
+                quality_grade="F",
             )
 
             return r[FlextQualityModels.AnalysisResult].ok(result)
@@ -86,12 +82,10 @@ class FlextQualityArchitectureTools(s[bool]):
 
             if dry_run:
                 logger.info("DRY RUN: Would enforce patterns in %s", project_path)
-                return r[dict[str, object]].ok(
-                    {
-                        "enforced": False,
-                        "dry_run": True,
-                    }
-                )
+                return r[dict[str, object]].ok({
+                    "enforced": False,
+                    "dry_run": True,
+                })
 
             logger.info("Enforcing patterns in %s", project_path)
             return r[dict[str, object]].ok({"enforced": True})
@@ -115,12 +109,10 @@ class FlextQualityArchitectureTools(s[bool]):
             logger = FlextLogger(__name__)
             logger.info("Testing cross-project imports in %s", workspace_path)
 
-            return r[dict[str, object]].ok(
-                {
-                    "passed": True,
-                    "errors": [],
-                }
-            )
+            return r[dict[str, object]].ok({
+                "passed": True,
+                "errors": [],
+            })
 
     def __init__(self) -> None:
         """Initialize architecture tools service."""

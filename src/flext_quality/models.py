@@ -325,20 +325,16 @@ class FlextQualityModels:
                     + self.dead_code_issues
                     + self.duplication_issues,
                 ),
-                critical_issues=len(
-                    [
-                        i
-                        for i in (self.security_issues + self.complexity_issues)
-                        if i.severity == FlextQualityModels.IssueSeverity.CRITICAL
-                    ]
-                ),
-                high_issues=len(
-                    [
-                        i
-                        for i in (self.security_issues + self.complexity_issues)
-                        if i.severity == FlextQualityModels.IssueSeverity.HIGH
-                    ]
-                ),
+                critical_issues=len([
+                    i
+                    for i in (self.security_issues + self.complexity_issues)
+                    if i.severity == FlextQualityModels.IssueSeverity.CRITICAL
+                ]),
+                high_issues=len([
+                    i
+                    for i in (self.security_issues + self.complexity_issues)
+                    if i.severity == FlextQualityModels.IssueSeverity.HIGH
+                ]),
                 overall_score=self.overall_score,
             )
 

@@ -230,14 +230,12 @@ class DocumentationAuditor:
                     self.results["issues"].append(issue)
 
             except Exception as e:
-                self.results["issues"].append(
-                    {
-                        "type": "file_access_error",
-                        "severity": "medium",
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "error": str(e),
-                    }
-                )
+                self.results["issues"].append({
+                    "type": "file_access_error",
+                    "severity": "medium",
+                    "file": str(file_path.relative_to(self.project_root)),
+                    "error": str(e),
+                })
 
     def _check_outdated_indicators(self, content: str) -> list[str]:
         """Check for indicators of outdated content."""
@@ -283,16 +281,14 @@ class DocumentationAuditor:
                 # Word count check
                 word_count = len(content.split())
                 if word_count < min_word_count:
-                    self.results["issues"].append(
-                        {
-                            "type": "insufficient_content",
-                            "severity": "low",
-                            "file": str(file_path.relative_to(self.project_root)),
-                            "word_count": word_count,
-                            "minimum_required": min_word_count,
-                            "recommendation": f"Expand content (currently {word_count} words, minimum {min_word_count})",
-                        }
-                    )
+                    self.results["issues"].append({
+                        "type": "insufficient_content",
+                        "severity": "low",
+                        "file": str(file_path.relative_to(self.project_root)),
+                        "word_count": word_count,
+                        "minimum_required": min_word_count,
+                        "recommendation": f"Expand content (currently {word_count} words, minimum {min_word_count})",
+                    })
 
                 # Check for required sections (for main docs)
                 if "README.md" in str(file_path) or "docs/" in str(file_path):
@@ -301,15 +297,13 @@ class DocumentationAuditor:
                         required_sections,
                     )
                     if missing_sections:
-                        self.results["issues"].append(
-                            {
-                                "type": "missing_sections",
-                                "severity": "medium",
-                                "file": str(file_path.relative_to(self.project_root)),
-                                "missing_sections": missing_sections,
-                                "recommendation": f"Add missing sections: {', '.join(missing_sections)}",
-                            }
-                        )
+                        self.results["issues"].append({
+                            "type": "missing_sections",
+                            "severity": "medium",
+                            "file": str(file_path.relative_to(self.project_root)),
+                            "missing_sections": missing_sections,
+                            "recommendation": f"Add missing sections: {', '.join(missing_sections)}",
+                        })
 
                 # Check for TODO/FIXME markers
                 if self.validation_config["content_analysis"]["check_todos"]:
@@ -318,26 +312,22 @@ class DocumentationAuditor:
                         content,
                     )
                     if todos:
-                        self.results["issues"].append(
-                            {
-                                "type": "todo_markers",
-                                "severity": "low",
-                                "file": str(file_path.relative_to(self.project_root)),
-                                "todo_count": len(todos),
-                                "todos": todos[:5],  # First 5 for brevity
-                                "recommendation": f"Address {len(todos)} TODO/FIXME items",
-                            }
-                        )
+                        self.results["issues"].append({
+                            "type": "todo_markers",
+                            "severity": "low",
+                            "file": str(file_path.relative_to(self.project_root)),
+                            "todo_count": len(todos),
+                            "todos": todos[:5],  # First 5 for brevity
+                            "recommendation": f"Address {len(todos)} TODO/FIXME items",
+                        })
 
             except Exception as e:
-                self.results["issues"].append(
-                    {
-                        "type": "content_analysis_error",
-                        "severity": "medium",
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "error": str(e),
-                    }
-                )
+                self.results["issues"].append({
+                    "type": "content_analysis_error",
+                    "severity": "medium",
+                    "file": str(file_path.relative_to(self.project_root)),
+                    "error": str(e),
+                })
 
     def _check_required_sections(
         self,
@@ -364,15 +354,13 @@ class DocumentationAuditor:
                 # Check markdown formatting
                 formatting_issues = self._check_markdown_formatting(content)
                 if formatting_issues:
-                    self.results["issues"].append(
-                        {
-                            "type": "formatting_issues",
-                            "severity": "low",
-                            "file": str(file_path.relative_to(self.project_root)),
-                            "issues": formatting_issues,
-                            "recommendation": f"Fix {len(formatting_issues)} formatting issues",
-                        }
-                    )
+                    self.results["issues"].append({
+                        "type": "formatting_issues",
+                        "severity": "low",
+                        "file": str(file_path.relative_to(self.project_root)),
+                        "issues": formatting_issues,
+                        "recommendation": f"Fix {len(formatting_issues)} formatting issues",
+                    })
 
                 # Check accessibility compliance
                 accessibility_issues = self._check_accessibility(content)
@@ -385,39 +373,33 @@ class DocumentationAuditor:
                         )
                         else "medium"
                     )
-                    self.results["issues"].append(
-                        {
-                            "type": "accessibility_issues",
-                            "severity": severity,
-                            "file": str(file_path.relative_to(self.project_root)),
-                            "issues": accessibility_issues,
-                            "recommendation": f"Address {len(accessibility_issues)} accessibility issues",
-                        }
-                    )
+                    self.results["issues"].append({
+                        "type": "accessibility_issues",
+                        "severity": severity,
+                        "file": str(file_path.relative_to(self.project_root)),
+                        "issues": accessibility_issues,
+                        "recommendation": f"Address {len(accessibility_issues)} accessibility issues",
+                    })
 
                 # Check heading hierarchy
                 if self.style_guide["accessibility"]["heading_structure"]:
                     heading_issues = self._check_heading_hierarchy(content)
                     if heading_issues:
-                        self.results["issues"].append(
-                            {
-                                "type": "heading_hierarchy",
-                                "severity": "medium",
-                                "file": str(file_path.relative_to(self.project_root)),
-                                "issues": heading_issues,
-                                "recommendation": "Fix heading hierarchy structure",
-                            }
-                        )
+                        self.results["issues"].append({
+                            "type": "heading_hierarchy",
+                            "severity": "medium",
+                            "file": str(file_path.relative_to(self.project_root)),
+                            "issues": heading_issues,
+                            "recommendation": "Fix heading hierarchy structure",
+                        })
 
             except Exception as e:
-                self.results["issues"].append(
-                    {
-                        "type": "consistency_check_error",
-                        "severity": "medium",
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "error": str(e),
-                    }
-                )
+                self.results["issues"].append({
+                    "type": "consistency_check_error",
+                    "severity": "medium",
+                    "file": str(file_path.relative_to(self.project_root)),
+                    "error": str(e),
+                })
 
     def _check_markdown_formatting(self, content: str) -> list[str]:
         """Check for markdown formatting issues."""
@@ -459,15 +441,13 @@ class DocumentationAuditor:
         if self.style_guide["accessibility"]["require_alt_text"]:
             images_without_alt = re.findall(r"!\[\]\([^)]+\)", content)
             if images_without_alt:
-                issues.extend(
-                    [
-                        {
-                            "type": "missing_alt_text",
-                            "description": f"Image without alt text: {img}",
-                        }
-                        for img in images_without_alt
-                    ]
-                )
+                issues.extend([
+                    {
+                        "type": "missing_alt_text",
+                        "description": f"Image without alt text: {img}",
+                    }
+                    for img in images_without_alt
+                ])
 
         # Check for non-descriptive links
         if self.style_guide["accessibility"]["descriptive_links"]:
@@ -477,15 +457,13 @@ class DocumentationAuditor:
                 re.IGNORECASE,
             )
             if generic_links:
-                issues.extend(
-                    [
-                        {
-                            "type": "generic_link_text",
-                            "description": f"Non-descriptive link text: {link}",
-                        }
-                        for link in generic_links
-                    ]
-                )
+                issues.extend([
+                    {
+                        "type": "generic_link_text",
+                        "description": f"Non-descriptive link text: {link}",
+                    }
+                    for link in generic_links
+                ])
 
         return issues
 
@@ -524,48 +502,40 @@ class DocumentationAuditor:
                     content,
                 )
                 for text, url in external_links:
-                    all_links.append(
-                        {
-                            "url": url,
-                            "text": text,
-                            "file": str(file_path.relative_to(self.project_root)),
-                            "type": "external",
-                        }
-                    )
+                    all_links.append({
+                        "url": url,
+                        "text": text,
+                        "file": str(file_path.relative_to(self.project_root)),
+                        "type": "external",
+                    })
 
                 # Extract internal links
                 internal_links = re.findall(r"\[([^\]]+)\]\(([^)]+)\)", content)
                 for text, link in internal_links:
                     if not link.startswith(("http://", "https://", "#", "mailto:")):
-                        all_links.append(
-                            {
-                                "url": link,
-                                "text": text,
-                                "file": str(file_path.relative_to(self.project_root)),
-                                "type": "internal",
-                            }
-                        )
+                        all_links.append({
+                            "url": link,
+                            "text": text,
+                            "file": str(file_path.relative_to(self.project_root)),
+                            "type": "internal",
+                        })
 
                 # Extract image references
                 images = re.findall(r"!\[([^\]]*)\]\(([^)]+)\)", content)
                 for alt_text, src in images:
-                    image_refs.append(
-                        {
-                            "src": src,
-                            "alt": alt_text,
-                            "file": str(file_path.relative_to(self.project_root)),
-                        }
-                    )
+                    image_refs.append({
+                        "src": src,
+                        "alt": alt_text,
+                        "file": str(file_path.relative_to(self.project_root)),
+                    })
 
             except Exception as e:
-                self.results["issues"].append(
-                    {
-                        "type": "link_extraction_error",
-                        "severity": "medium",
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "error": str(e),
-                    }
-                )
+                self.results["issues"].append({
+                    "type": "link_extraction_error",
+                    "severity": "medium",
+                    "file": str(file_path.relative_to(self.project_root)),
+                    "error": str(e),
+                })
 
         # Validate external links
         if self.validation_config["link_validation"]["check_external"]:
@@ -597,28 +567,24 @@ class DocumentationAuditor:
                 )
 
                 if response.status_code >= 400:
-                    self.results["issues"].append(
-                        {
-                            "type": "broken_external_link",
-                            "severity": "high",
-                            "file": link["file"],
-                            "url": link["url"],
-                            "status_code": response.status_code,
-                            "recommendation": f"Fix or remove broken link (HTTP {response.status_code})",
-                        }
-                    )
-
-            except requests.RequestException as e:
-                self.results["issues"].append(
-                    {
-                        "type": "unreachable_external_link",
+                    self.results["issues"].append({
+                        "type": "broken_external_link",
                         "severity": "high",
                         "file": link["file"],
                         "url": link["url"],
-                        "error": str(e),
-                        "recommendation": "Verify link URL and accessibility",
-                    }
-                )
+                        "status_code": response.status_code,
+                        "recommendation": f"Fix or remove broken link (HTTP {response.status_code})",
+                    })
+
+            except requests.RequestException as e:
+                self.results["issues"].append({
+                    "type": "unreachable_external_link",
+                    "severity": "high",
+                    "file": link["file"],
+                    "url": link["url"],
+                    "error": str(e),
+                    "recommendation": "Verify link URL and accessibility",
+                })
 
     def _validate_internal_links(
         self,
@@ -639,15 +605,13 @@ class DocumentationAuditor:
                 potential_target = (link_file_dir / target_file).resolve()
 
                 if not potential_target.exists():
-                    self.results["issues"].append(
-                        {
-                            "type": "broken_internal_link",
-                            "severity": "high",
-                            "file": link["file"],
-                            "target": link["url"],
-                            "recommendation": f"Fix broken internal link to '{link['url']}'",
-                        }
-                    )
+                    self.results["issues"].append({
+                        "type": "broken_internal_link",
+                        "severity": "high",
+                        "file": link["file"],
+                        "target": link["url"],
+                        "recommendation": f"Fix broken internal link to '{link['url']}'",
+                    })
 
     def _validate_images(self, images: list[dict]) -> None:
         """Validate image references."""
@@ -666,15 +630,13 @@ class DocumentationAuditor:
                 full_path = image_path
 
             if not full_path.exists():
-                self.results["issues"].append(
-                    {
-                        "type": "missing_image",
-                        "severity": "medium",
-                        "file": image["file"],
-                        "image_src": image["src"],
-                        "recommendation": f"Add missing image file: {image['src']}",
-                    }
-                )
+                self.results["issues"].append({
+                    "type": "missing_image",
+                    "severity": "medium",
+                    "file": image["file"],
+                    "image_src": image["src"],
+                    "recommendation": f"Add missing image file: {image['src']}",
+                })
 
     def calculate_quality_metrics(self) -> None:
         """Calculate overall quality metrics."""
@@ -718,31 +680,27 @@ class DocumentationAuditor:
 
         # Quality score based recommendations
         if metrics["quality_score"] < 50:
-            recommendations.append(
-                {
-                    "priority": "critical",
-                    "category": "overall_quality",
-                    "recommendation": "Immediate attention required - documentation quality is poor",
-                    "actions": [
-                        "Address all critical and high-severity issues immediately",
-                        "Implement automated quality gates in CI/CD",
-                        "Schedule regular maintenance reviews",
-                    ],
-                }
-            )
+            recommendations.append({
+                "priority": "critical",
+                "category": "overall_quality",
+                "recommendation": "Immediate attention required - documentation quality is poor",
+                "actions": [
+                    "Address all critical and high-severity issues immediately",
+                    "Implement automated quality gates in CI/CD",
+                    "Schedule regular maintenance reviews",
+                ],
+            })
         elif metrics["quality_score"] < 75:
-            recommendations.append(
-                {
-                    "priority": "high",
-                    "category": "quality_improvement",
-                    "recommendation": "Documentation quality needs improvement",
-                    "actions": [
-                        "Focus on fixing high-severity issues",
-                        "Implement regular audit schedule",
-                        "Consider documentation training for team",
-                    ],
-                }
-            )
+            recommendations.append({
+                "priority": "high",
+                "category": "quality_improvement",
+                "recommendation": "Documentation quality needs improvement",
+                "actions": [
+                    "Focus on fixing high-severity issues",
+                    "Implement regular audit schedule",
+                    "Consider documentation training for team",
+                ],
+            })
 
         # Issue-specific recommendations
         broken_links = [
@@ -751,50 +709,44 @@ class DocumentationAuditor:
             if "link" in i["type"] and i["severity"] in {"critical", "high"}
         ]
         if broken_links:
-            recommendations.append(
-                {
-                    "priority": "high",
-                    "category": "link_maintenance",
-                    "recommendation": f"Fix {len(broken_links)} broken links",
-                    "actions": [
-                        "Update or remove broken external links",
-                        "Fix internal reference paths",
-                        "Implement automated link checking in CI/CD",
-                    ],
-                }
-            )
+            recommendations.append({
+                "priority": "high",
+                "category": "link_maintenance",
+                "recommendation": f"Fix {len(broken_links)} broken links",
+                "actions": [
+                    "Update or remove broken external links",
+                    "Fix internal reference paths",
+                    "Implement automated link checking in CI/CD",
+                ],
+            })
 
         outdated_content = [i for i in issues if i["type"] == "outdated_content"]
         if outdated_content:
-            recommendations.append(
-                {
-                    "priority": "medium",
-                    "category": "content_freshness",
-                    "recommendation": f"Update {len(outdated_content)} outdated documents",
-                    "actions": [
-                        "Review content for accuracy",
-                        "Update version numbers and dates",
-                        "Implement content freshness monitoring",
-                    ],
-                }
-            )
+            recommendations.append({
+                "priority": "medium",
+                "category": "content_freshness",
+                "recommendation": f"Update {len(outdated_content)} outdated documents",
+                "actions": [
+                    "Review content for accuracy",
+                    "Update version numbers and dates",
+                    "Implement content freshness monitoring",
+                ],
+            })
 
         accessibility_issues = [
             i for i in issues if i["type"] == "accessibility_issues"
         ]
         if accessibility_issues:
-            recommendations.append(
-                {
-                    "priority": "medium",
-                    "category": "accessibility",
-                    "recommendation": "Improve documentation accessibility",
-                    "actions": [
-                        "Add alt text to all images",
-                        "Use descriptive link text",
-                        "Ensure proper heading hierarchy",
-                    ],
-                }
-            )
+            recommendations.append({
+                "priority": "medium",
+                "category": "accessibility",
+                "recommendation": "Improve documentation accessibility",
+                "actions": [
+                    "Add alt text to all images",
+                    "Use descriptive link text",
+                    "Ensure proper heading hierarchy",
+                ],
+            })
 
         self.results["recommendations"] = recommendations
 

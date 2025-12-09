@@ -956,12 +956,10 @@ def main() -> None:
     if not any([args.generate_dashboard, args.weekly_summary, args.monthly_report]):
         dashboard_file = generator.generate_dashboard(report_data)
         summary_file = generator.generate_weekly_summary(report_data)
-        generated_files.extend(
-            [
-                ("Dashboard", dashboard_file),
-                ("Weekly Summary", summary_file),
-            ]
-        )
+        generated_files.extend([
+            ("Dashboard", dashboard_file),
+            ("Weekly Summary", summary_file),
+        ])
 
     # Generate quality metrics for display
     generator.calculate_quality_metrics(report_data)

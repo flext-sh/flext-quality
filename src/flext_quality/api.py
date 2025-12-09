@@ -68,17 +68,17 @@ class FlextQuality(FlextService[bool]):
     @property
     def quality_config(self) -> FlextQualityConfig:
         """Access quality configuration (read-only)."""
-        return self._quality_config  # type: ignore[attr-defined]
+        return self._quality_config
 
     @property
     def quality_logger(self) -> FlextLogger:
         """Access quality logger (read-only)."""
-        return self._quality_logger  # type: ignore[attr-defined]
+        return self._quality_logger
 
     @property
     def quality_container(self) -> FlextContainer:
         """Access quality container (read-only)."""
-        return self._quality_container  # type: ignore[attr-defined]
+        return self._quality_container
 
     # Project operations
     def create_project(

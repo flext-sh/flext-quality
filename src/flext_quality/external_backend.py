@@ -173,14 +173,12 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
             except json.JSONDecodeError:
                 _logger.warning(f"Failed to parse {tool_name} JSON output")
 
-        return FlextResult.ok(
-            {
-                "tool": tool_name,
-                "issues": issues,
-                "issue_count": len(issues),
-                "status": "success" if wrapper.returncode == 0 else "issues_found",
-            }
-        )
+        return FlextResult.ok({
+            "tool": tool_name,
+            "issues": issues,
+            "issue_count": len(issues),
+            "status": "success" if wrapper.returncode == 0 else "issues_found",
+        })
 
     def _handle_tool_error(
         self,
@@ -189,15 +187,13 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
     ) -> FlextResult[dict[str, object]]:
         """Handle common tool execution errors."""
         if "not found" in error_msg.lower():
-            return FlextResult.ok(
-                {
-                    "tool": tool_name,
-                    "issues": [],
-                    "issue_count": 0,
-                    "status": "tool_not_found",
-                    "message": f"{tool_name} not installed",
-                }
-            )
+            return FlextResult.ok({
+                "tool": tool_name,
+                "issues": [],
+                "issue_count": 0,
+                "status": "tool_not_found",
+                "message": f"{tool_name} not installed",
+            })
         if "timed out" in error_msg.lower():
             return FlextResult.fail(f"{tool_name} analysis timed out")
         return FlextResult.fail(f"{tool_name} analysis failed: {error_msg}")
@@ -297,28 +293,24 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
         wrapper = result.unwrap()
         coverage_data = self._parse_coverage_data()
 
-        return FlextResult.ok(
-            {
-                "tool": "coverage",
-                "coverage_data": coverage_data,
-                "status": "success" if wrapper.returncode == 0 else "incomplete",
-                "message": "Coverage measurement complete"
-                if coverage_data
-                else "No coverage data",
-            }
-        )
+        return FlextResult.ok({
+            "tool": "coverage",
+            "coverage_data": coverage_data,
+            "status": "success" if wrapper.returncode == 0 else "incomplete",
+            "message": "Coverage measurement complete"
+            if coverage_data
+            else "No coverage data",
+        })
 
     def _handle_coverage_error(self, error_msg: str) -> FlextResult[dict[str, object]]:
         """Handle coverage-specific errors."""
         if "not found" in error_msg.lower():
-            return FlextResult.ok(
-                {
-                    "tool": "coverage",
-                    "coverage_data": {},
-                    "status": "tool_not_found",
-                    "message": "coverage/pytest not installed",
-                }
-            )
+            return FlextResult.ok({
+                "tool": "coverage",
+                "coverage_data": {},
+                "status": "tool_not_found",
+                "message": "coverage/pytest not installed",
+            })
         if "timed out" in error_msg.lower():
             return FlextResult.fail("coverage analysis timed out")
         return FlextResult.fail(f"coverage analysis failed: {error_msg}")
@@ -357,27 +349,23 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
         # Also get maintainability index
         maintainability = self._run_radon_maintainability(file_path)
 
-        return FlextResult.ok(
-            {
-                "tool": "radon",
-                "complexity": metrics,
-                "maintainability": maintainability,
-                "status": "success",
-            }
-        )
+        return FlextResult.ok({
+            "tool": "radon",
+            "complexity": metrics,
+            "maintainability": maintainability,
+            "status": "success",
+        })
 
     def _handle_radon_error(self, error_msg: str) -> FlextResult[dict[str, object]]:
         """Handle radon-specific errors."""
         if "not found" in error_msg.lower():
-            return FlextResult.ok(
-                {
-                    "tool": "radon",
-                    "complexity": {},
-                    "maintainability": {},
-                    "status": "tool_not_found",
-                    "message": "radon not installed",
-                }
-            )
+            return FlextResult.ok({
+                "tool": "radon",
+                "complexity": {},
+                "maintainability": {},
+                "status": "tool_not_found",
+                "message": "radon not installed",
+            })
         if "timed out" in error_msg.lower():
             return FlextResult.fail("radon analysis timed out")
         return FlextResult.fail(f"radon analysis failed: {error_msg}")

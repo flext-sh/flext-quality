@@ -34,12 +34,10 @@ class DependencyDiscovery(FlextService[list[dict[str, object]]]):
         for file_path in python_files:
             imports = self.analyze_imports(str(file_path))
             if imports.is_success:
-                discovery_results.append(
-                    {
-                        "file": str(file_path.relative_to(root)),
-                        "imports": imports.value,
-                    }
-                )
+                discovery_results.append({
+                    "file": str(file_path.relative_to(root)),
+                    "imports": imports.value,
+                })
 
         return FlextResult[list[dict[str, object]]].ok(discovery_results)
 
