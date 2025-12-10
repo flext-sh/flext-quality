@@ -135,7 +135,11 @@ def check_test_quality(test_file: Path) -> FlextResult[dict[str, object]]:
             next_lines = "\n".join(lines[i : min(i + 20, len(lines))])
 
             # Check for tests without assertions
-            if "def test_" in line and "assert" not in next_lines and "assert" not in next_lines:
+            if (
+                "def test_" in line
+                and "assert" not in next_lines
+                and "assert" not in next_lines
+            ):
                 issues.append(f"Line {i}: Test function may lack assertions")
 
             # Check for bare except
@@ -186,7 +190,7 @@ def validate_test_execution(test_path: Path) -> FlextResult[dict[str, object]]:
                 return FlextResult.fail("Test execution timed out")
             return FlextResult.fail(f"Test execution failed: {error_msg}")
 
-        wrapper = result.unwrap()
+        wrapper = result.value
 
         # Parse output for summary
         output_lines = wrapper.stdout.splitlines()

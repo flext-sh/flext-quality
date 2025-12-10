@@ -21,19 +21,11 @@ from flext_core import FlextTypes
 from pydantic import Field
 
 # =============================================================================
-# QUALITY MODULE-LEVEL TYPE ALIASES
+# QUALITY MODULE-LEVEL TYPEVARS
 # =============================================================================
 
 T = TypeVar("T")
 FlextQualityScoreT = TypeVar("FlextQualityScoreT", bound=float)
-
-# Advanced validation using Python 3.13+ syntax
-type ScoreRange = Annotated[float, Field(ge=0.0, le=100.0)]
-# Timestamp - use in Field(default_factory=...) context
-type Timestamp = datetime
-
-# Simple type aliases for common patterns
-type PositiveInt = Annotated[int, Field(ge=1)]
 
 # =============================================================================
 # QUALITY-SPECIFIC TYPE VARIABLES - Domain-specific TypeVars for quality operations
@@ -48,6 +40,17 @@ class FlextQualityTypes(FlextTypes):
     Contains ONLY complex quality-specific types, no simple aliases.
     Uses Python 3.13+ type syntax and patterns.
     """
+
+    # =========================================================================
+    # BASE TYPES - Foundational type aliases for Quality domain
+    # =========================================================================
+
+    class Base:
+        """Foundational type aliases for Quality domain."""
+
+        type ScoreRange = Annotated[float, Field(ge=0.0, le=100.0)]
+        type Timestamp = datetime
+        type PositiveInt = Annotated[int, Field(ge=1)]
 
     # =========================================================================
     # QUALITY ANALYSIS TYPES - Complex analysis operation types
@@ -243,9 +246,18 @@ t = FlextQualityTypes
 # - t.Project.* for project types
 # - t.Core.* for core types (inherited from parent)
 
+# =============================================================================
+# MODULE-LEVEL RE-EXPORTS - For backward compatibility
+# =============================================================================
+
+ScoreRange = t.Base.ScoreRange
+Timestamp = t.Base.Timestamp
+PositiveInt = t.Base.PositiveInt
+
 __all__ = [
     "FlextQualityScoreT",
     "FlextQualityTypes",
+    "PositiveInt",
     "ScoreRange",
     # Module-level type aliases
     "T",

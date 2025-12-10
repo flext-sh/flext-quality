@@ -481,7 +481,7 @@ def analyze_project(args: argparse.Namespace) -> int:
 
         # Execute analyze command
         result = router.route_analyze(analyze_args)
-        return result.unwrap() if result.is_success else 1
+        return result.value if result.is_success else 1
 
     except Exception:
         if getattr(args, "verbose", False):
@@ -677,13 +677,13 @@ Examples:
 
     if args.command == "analyze":
         result = router.route_analyze(args)
-        return result.unwrap() if result.is_success else 1
+        return result.value if result.is_success else 1
     if args.command == "score":
         result = router.route_score(args)
-        return result.unwrap() if result.is_success else 1
+        return result.value if result.is_success else 1
     if args.command == "web":
         result = router.route_web(args)
-        return result.unwrap() if result.is_success else 1
+        return result.value if result.is_success else 1
 
     parser.print_help()
     return 1

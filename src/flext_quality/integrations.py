@@ -86,7 +86,7 @@ class FlextQualityIntegrations(FlextService[bool]):
                     f"HTTP POST failed: {result.error}",
                 )
             # Extract body from HttpResponse
-            response = result.unwrap()
+            response = result.value
             body = response.body
             if isinstance(body, dict):
                 # Reconstruct dict with JsonValue for type safety
@@ -111,7 +111,7 @@ class FlextQualityIntegrations(FlextService[bool]):
                     f"HTTP GET failed: {result.error}",
                 )
             # Extract body from HttpResponse
-            response = result.unwrap()
+            response = result.value
             body = response.body
             if isinstance(body, dict):
                 # Reconstruct dict with JsonValue for type safety

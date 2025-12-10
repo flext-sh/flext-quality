@@ -219,7 +219,7 @@ def multiply(x: int, y: int) -> int:
 
         # Should return FlextResult with FileAnalysisResult on success
         assert result.is_success
-        metrics = result.unwrap()
+        metrics = result.value
 
         assert hasattr(metrics, "file_path")
         assert hasattr(metrics, "lines_of_code")

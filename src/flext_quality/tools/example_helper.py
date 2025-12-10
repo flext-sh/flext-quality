@@ -58,7 +58,7 @@ def validate_examples_directory(
                         results[str(example_file)] = f"❌ FAILED: {error_snippet}"
                     failed += 1
                 else:
-                    wrapper = result.unwrap()
+                    wrapper = result.value
                     if wrapper.returncode == 0:
                         results[str(example_file)] = "✅ PASSED"
                         passed += 1
@@ -179,7 +179,7 @@ def validate_example_imports(
                 return FlextResult.fail("Import validation timed out")
             return FlextResult.fail(f"Import validation failed: {error_msg}")
 
-        wrapper = result.unwrap()
+        wrapper = result.value
 
         return FlextResult.ok({
             "file": str(example_file),
@@ -223,7 +223,7 @@ def run_example_safely(
                 return FlextResult.fail(f"Example execution timed out after {timeout}s")
             return FlextResult.fail(f"Example execution failed: {error_msg}")
 
-        wrapper = result.unwrap()
+        wrapper = result.value
 
         return FlextResult.ok({
             "file": str(example_file),

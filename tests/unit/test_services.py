@@ -72,7 +72,7 @@ class TestProjectServiceBuilder:
         )
 
         assert result.is_success
-        project = result.unwrap()
+        project = result.value
         assert project.name == "test_project"
         assert project.path == temp_project_path
         assert project.id.startswith("project_test_project")
@@ -131,7 +131,7 @@ class TestProjectServiceBuilder:
         mapped_result = project_result.map(lambda proj: f"Project: {proj.name}")
 
         assert mapped_result.is_success
-        assert mapped_result.unwrap() == "Project: chain_test"
+        assert mapped_result.value == "Project: chain_test"
 
 
 class TestAnalysisServiceBuilder:
@@ -160,7 +160,7 @@ class TestAnalysisServiceBuilder:
         )
 
         assert result.is_success
-        analysis = result.unwrap()
+        analysis = result.value
         # project_id is UUID (converted from string), just verify it exists
         assert analysis.project_id is not None
         # id is auto-generated UUID
@@ -181,7 +181,7 @@ class TestAnalysisServiceBuilder:
         )
 
         assert result.is_success
-        analysis = result.unwrap()
+        analysis = result.value
         assert analysis.status == "analyzing"
 
     def test_analysis_builder_fail_missing_project_id(
@@ -233,7 +233,7 @@ class TestAnalysisServiceBuilder:
         )
 
         assert analysis_result.is_success
-        analysis = analysis_result.unwrap()
+        analysis = analysis_result.value
         # Project ID is UUID, just verify it exists
         assert analysis.project_id is not None
 
@@ -268,7 +268,7 @@ class TestIssueServiceBuilder:
         )
 
         assert result.is_success
-        issue = result.unwrap()
+        issue = result.value
         # analysis_id is UUID (converted from string), just verify it exists
         assert issue.analysis_id is not None
         assert issue.severity == "HIGH"
@@ -422,7 +422,7 @@ class TestIssueServiceBuilder:
             )
 
             assert result.is_success
-            issue = result.unwrap()
+            issue = result.value
             assert issue.severity == severity
 
     def test_issue_builder_all_issue_types(
@@ -450,7 +450,7 @@ class TestIssueServiceBuilder:
             )
 
             assert result.is_success
-            issue = result.unwrap()
+            issue = result.value
             assert issue.issue_type == issue_type
 
 
@@ -480,7 +480,7 @@ class TestReportServiceBuilder:
         )
 
         assert result.is_success
-        report = result.unwrap()
+        report = result.value
         # analysis_id is UUID (converted from string), just verify it exists
         assert report.analysis_id is not None
         assert report.format_type == "HTML"
@@ -499,7 +499,7 @@ class TestReportServiceBuilder:
         )
 
         assert result.is_success
-        report = result.unwrap()
+        report = result.value
         assert report.format_type == "JSON"
 
     def test_report_builder_success_csv_format(
@@ -516,7 +516,7 @@ class TestReportServiceBuilder:
         )
 
         assert result.is_success
-        report = result.unwrap()
+        report = result.value
         assert report.format_type == "CSV"
 
     def test_report_builder_fail_missing_analysis_id(
@@ -557,9 +557,9 @@ class TestFlextQualityServicesV2:
 
     def test_services_v2_property_pattern(self, services: FlextQualityServices) -> None:
         """Test services V2 property pattern access."""
-        result = services.execute(None).unwrap()
+        result = services.execute(None).value
 
-        assert result is True  # FlextResult.ok(True).unwrap()
+        assert result is True  # FlextResult.ok(True).value
 
     def test_services_config_access(self, services: FlextQualityServices) -> None:
         """Test accessing config via property."""
@@ -636,6 +636,6 @@ class TestMonadicChaining:
         )
 
         assert workflow_result.is_success
-        result_msg = workflow_result.unwrap()
+        result_msg = workflow_result.value
         # Report ID is UUID, just verify the message structure
         assert result_msg.startswith("Report ID: ")

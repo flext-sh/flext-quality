@@ -520,7 +520,9 @@ class ReportServiceBuilder:
             )
             # Validation already confirmed format_type is valid
             if not isinstance(self._format_type, str):
-                return r.fail(f"Invalid format type: expected str, got {type(self._format_type)}")
+                return r.fail(
+                    f"Invalid format type: expected str, got {type(self._format_type)}"
+                )
             if self._format_type not in {"HTML", "JSON", "CSV"}:
                 return r.fail(f"Invalid format type: {self._format_type}")
             report = m.ReportModel(

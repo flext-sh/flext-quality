@@ -81,7 +81,7 @@ class FlextQualityPythonTools:
                     return FlextResult.fail("Ruff analysis timed out")
                 return FlextResult.fail(f"Ruff analysis failed: {error_msg}")
 
-            wrapper = result.unwrap()
+            wrapper = result.value
 
             return FlextResult.ok({
                 "issues": wrapper.stdout,
@@ -186,7 +186,7 @@ class FlextQualityPythonTools:
                     return FlextResult.fail("Pylint analysis timed out")
                 return FlextResult.fail(f"Pylint analysis failed: {error_msg}")
 
-            wrapper = result.unwrap()
+            wrapper = result.value
 
             return FlextResult.ok({
                 "output": wrapper.stdout,

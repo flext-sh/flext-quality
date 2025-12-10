@@ -57,7 +57,7 @@ class TestFlextQualityServices:
         )
 
         assert result.is_success
-        project = result.unwrap()
+        project = result.value
         assert project is not None
         assert project.name == "test_project"
         assert project.path == "./test_project"
@@ -75,7 +75,7 @@ class TestFlextQualityServices:
         )
 
         assert result.is_success
-        analysis = result.unwrap()
+        analysis = result.value
         assert analysis is not None
         # Analysis ID is UUID, project_id is UUID
         assert str(analysis.project_id) is not None
@@ -97,7 +97,7 @@ class TestFlextQualityServices:
         )
 
         assert result.is_success
-        issue = result.unwrap()
+        issue = result.value
         assert issue is not None
         assert issue.severity == "HIGH"
         assert issue.issue_type == "high_complexity"
@@ -118,6 +118,6 @@ class TestFlextQualityServices:
         )
 
         assert result.is_success
-        report = result.unwrap()
+        report = result.value
         assert report is not None
         assert report.format_type == "HTML"

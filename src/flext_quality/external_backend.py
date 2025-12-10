@@ -96,7 +96,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
             )
 
         # Execute analysis with cleanup
-        temp_path = temp_file_result.unwrap()
+        temp_path = temp_file_result.value
         try:
             return self._route_tool_analysis(tool, temp_path)
         finally:
@@ -158,7 +158,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
         if result.is_failure:
             return self._handle_tool_error(result.error or "", tool_name)
 
-        wrapper = result.unwrap()
+        wrapper = result.value
 
         # Default parser: parse JSON array from stdout
         def _default_parser(stdout: str) -> list[dict[str, object]]:
@@ -290,7 +290,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
         if result.is_failure:
             return self._handle_coverage_error(result.error or "")
 
-        wrapper = result.unwrap()
+        wrapper = result.value
         coverage_data = self._parse_coverage_data()
 
         return FlextResult.ok({
@@ -343,7 +343,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
         if result_cc.is_failure:
             return self._handle_radon_error(result_cc.error or "")
 
-        wrapper_cc = result_cc.unwrap()
+        wrapper_cc = result_cc.value
         metrics = self._parse_radon_json(wrapper_cc.stdout)
 
         # Also get maintainability index
@@ -378,8 +378,8 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
             timeout=30.0,
         )
 
-        if result_mi.is_success and result_mi.unwrap().stdout.strip():
-            return self._parse_radon_json(result_mi.unwrap().stdout)
+        if result_mi.is_success and result_mi.value.stdout.strip():
+            return self._parse_radon_json(result_mi.value.stdout)
         return {}
 
     def _parse_radon_json(self, stdout: str) -> dict[str, object]:
