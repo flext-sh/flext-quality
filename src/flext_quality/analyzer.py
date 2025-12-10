@@ -9,7 +9,7 @@ from __future__ import annotations
 import ast
 import uuid
 from pathlib import Path
-from typing import ClassVar, Self, TypedDict
+from typing import ClassVar, TypedDict
 from uuid import UUID, uuid4
 
 from flext_core import (
@@ -17,7 +17,7 @@ from flext_core import (
     FlextResult,
     FlextService,
 )
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, PrivateAttr
 
 from .config import FlextQualityConfig
 from .constants import FlextQualityConstants
@@ -133,30 +133,16 @@ class FileMetricsData(BaseModel):
 # =====================================================================
 
 
-class FlextQualityAnalyzer(FlextService):
+class FlextQualityAnalyzer(FlextService[FlextQualityModels.AnalysisResults]):
     """Main quality analyzer orchestrating focused analysis utilities."""
 
     auto_execute: ClassVar[bool] = False
     project_path: Path = Path()
-
-    def __new__(
-        cls,
-        _project_path: str | Path | None = None,
-        _config: FlextQualityConfig | None = None,
-        **_data: object,
-    ) -> Self:
-        """Create new analyzer instance.
-
-        Args:
-            _project_path: Path to analyze (ignored in __new__, used in __init__).
-            _config: Optional configuration (ignored in __new__, used in __init__).
-            **_data: Additional keyword arguments.
-
-        Returns:
-            New FlextQualityAnalyzer instance.
-
-        """
-        return super().__new__(cls)
+    _analyzer_config: FlextQualityConfig = PrivateAttr()
+    _analyzer_logger: FlextLogger = PrivateAttr()
+    _current_results: FlextQualityModels.AnalysisResults | None = PrivateAttr(
+        default=None,
+    )
 
     def __init__(
         self,
@@ -174,15 +160,9 @@ class FlextQualityAnalyzer(FlextService):
         """
         super().__init__()
         self.project_path = Path(project_path) if project_path is not None else Path()
-        # Use object.__setattr__ to bypass Pydantic's custom __setattr__ for private attributes
-        # Use unique names to avoid overriding parent's _config attribute
-        object.__setattr__(
-            self,
-            "_analyzer_config",
-            config if config is not None else FlextQualityConfig(),
-        )
-        object.__setattr__(self, "_analyzer_logger", FlextLogger(__name__))
-        self._current_results: FlextQualityModels.AnalysisResults | None = None
+        self._analyzer_config = config if config is not None else FlextQualityConfig()
+        self._analyzer_logger = FlextLogger(__name__)
+        self._current_results = None
 
     @property
     def analyzer_config(self) -> FlextQualityConfig:
@@ -194,9 +174,13 @@ class FlextQualityAnalyzer(FlextService):
         """Access analyzer logger (read-only)."""
         return self._analyzer_logger
 
-    def execute(self, **_kwargs: object) -> FlextResult[bool]:
+    def execute(
+        self,
+        **_kwargs: object,
+    ) -> FlextResult[FlextQualityModels.AnalysisResults]:
         """Execute analyzer service - override from FlextService."""
-        return FlextResult[bool].ok(True)
+        _ = _kwargs
+        return self.analyze_project()
 
     def analyze_project(
         self,
@@ -214,7 +198,7 @@ class FlextQualityAnalyzer(FlextService):
             include_duplicates=include_duplicates,
         )
 
-        self.logger.info("Starting project analysis: %s", str(self.project_path))
+        self.logger.info("Starting project analysis: %s", self.project_path)
 
         # Discover files
         files_result = self._FileDiscovery.discover_python_files(self.project_path)
@@ -470,7 +454,7 @@ class FlextQualityAnalyzer(FlextService):
             except Exception as e:
                 # Log the error and allow graceful degradation
                 logger = FlextLogger(__name__)
-                logger.warning("Security analysis with Bandit failed: %s", str(e))
+                logger.warning("Security analysis with Bandit failed: %s", e)
                 # Return empty list - security analysis is best-effort
                 return []
 
@@ -520,7 +504,7 @@ class FlextQualityAnalyzer(FlextService):
                 return validated_issues
             except Exception as e:
                 logger = FlextLogger(__name__)
-                logger.debug("Dead code analysis with Vulture failed: %s", str(e))
+                logger.debug("Dead code analysis with Vulture failed: %s", e)
                 # Return empty list - dead code analysis is best-effort
                 return []
 
@@ -598,12 +582,8 @@ class FlextQualityAnalyzer(FlextService):
                 # Convert duplication issues to CodeIssue objects
                 all_issues.extend([
                     FlextQualityModels.CodeIssue(
-                        id=(UUID(str(dup.id)) if isinstance(dup.id, str) else uuid4()),
-                        analysis_id=(
-                            UUID(str(dup.analysis_id))
-                            if isinstance(dup.analysis_id, str)
-                            else uuid4()
-                        ),
+                        id=UUID(str(dup.id)),
+                        analysis_id=UUID(str(dup.analysis_id)),
                         file_path=dup.file_path,
                         line_number=dup.line_number,
                         issue_type=(FlextQualityModels.IssueType.DUPLICATE_CODE),
@@ -625,10 +605,7 @@ class FlextQualityAnalyzer(FlextService):
 
                 # Calculate scores from actual metrics
                 complexity_scores: list[float] = [
-                    m.complexity_score
-                    if isinstance(m.complexity_score, (int, float))
-                    else 0.0
-                    for m in metrics_data.file_metrics
+                    metric.complexity_score for metric in metrics_data.file_metrics
                 ]
 
                 avg_complexity = (

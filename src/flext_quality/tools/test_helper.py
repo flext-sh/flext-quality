@@ -135,9 +135,8 @@ def check_test_quality(test_file: Path) -> FlextResult[dict[str, object]]:
             next_lines = "\n".join(lines[i : min(i + 20, len(lines))])
 
             # Check for tests without assertions
-            if "def test_" in line:
-                if "assert" not in next_lines and "assert" not in next_lines:
-                    issues.append(f"Line {i}: Test function may lack assertions")
+            if "def test_" in line and "assert" not in next_lines and "assert" not in next_lines:
+                issues.append(f"Line {i}: Test function may lack assertions")
 
             # Check for bare except
             if "except:" in line and "Exception" not in line:

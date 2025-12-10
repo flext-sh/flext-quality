@@ -47,7 +47,7 @@ class ConflictAnalyzer(FlextService[list[dict[str, str]]]):
             with pyproject.open("rb") as handle:
                 raw = tomllib.load(handle)
         except (OSError, tomllib.TOMLDecodeError):
-            self._logger.debug("Unable to load pyproject.toml for %s", str(project))
+            self._logger.debug("Unable to load pyproject.toml for %s", project)
             return FlextResult[list[dict[str, str]]].ok([])
 
         deps: dict[str, str] = {}

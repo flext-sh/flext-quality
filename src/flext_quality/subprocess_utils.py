@@ -56,21 +56,28 @@ class SubprocessUtils:
 
         """
         _ = check  # Unused - we always use check=False internally
+        if not command or any(not arg or not arg.strip() for arg in command):
+            return FlextResult[CommandOutput].fail(
+                "Command must contain non-empty arguments"
+            )
+
         result_holder: list[CommandOutput | None] = [None]
         error_holder: list[str | None] = [None]
         cwd_path = Path(cwd) if cwd else None
+        safe_command = [str(arg) for arg in command]
 
         def run_command() -> None:
             try:
                 # Command is a list[str] from internal code, not user input - safe to execute
                 proc = subprocess.run(
-                    command,
+                    safe_command,
                     capture_output=capture_output,
                     text=True,
                     timeout=timeout,
                     cwd=cwd_path,
                     env=env,
                     check=False,
+                    shell=False,
                 )
                 result_holder[0] = CommandOutput(
                     stdout=proc.stdout or "",

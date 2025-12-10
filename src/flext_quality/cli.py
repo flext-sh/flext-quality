@@ -134,7 +134,7 @@ class QualityReportFormatter:
         save_result = report.save_report(output_path, format_type)
 
         if save_result.is_success:
-            self.logger.info("Report saved to %s", str(output_path))
+            self.logger.info("Report saved to %s", output_path)
             return FlextResult[bool].ok(True)
         return save_result
 
