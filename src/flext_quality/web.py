@@ -23,7 +23,7 @@ from flext_core import FlextContainer, FlextLogger, FlextResult
 
 from .analyzer import FlextQualityAnalyzer
 from .api import FlextQuality
-from .config import FlextQualityConfig
+from .config import FlextQualitySettings
 
 # Import from models instead of fallback mock
 from .models import FlextQualityModels
@@ -60,7 +60,7 @@ class FlextQualityWeb:
         self.logger = FlextLogger(__name__)
 
         # Initialize quality configuration
-        self._quality_config = FlextQualityConfig()
+        self._quality_config = FlextQualitySettings()
 
         # Initialize flext-web configuration
         app_config = FlextQualityModels.AppConfig(

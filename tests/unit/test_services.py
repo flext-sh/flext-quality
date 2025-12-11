@@ -29,7 +29,7 @@ from flext_quality.services import (
 
 
 # Minimal config that doesn't trigger flext-cli imports
-class MinimalFlextQualityConfig:
+class MinimalFlextQualitySettings:
     """Test-only minimal config."""
 
     def __init__(self) -> None:
@@ -42,9 +42,9 @@ class TestProjectServiceBuilder:
     """Test ProjectServiceBuilder with real fixtures."""
 
     @pytest.fixture
-    def config(self) -> MinimalFlextQualityConfig:
+    def config(self) -> MinimalFlextQualitySettings:
         """Real config instance."""
-        return MinimalFlextQualityConfig()
+        return MinimalFlextQualitySettings()
 
     @pytest.fixture
     def logger(self) -> FlextLogger:
@@ -58,7 +58,7 @@ class TestProjectServiceBuilder:
 
     def test_project_builder_success_with_all_fields(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
         temp_project_path: str,
     ) -> None:
@@ -79,7 +79,7 @@ class TestProjectServiceBuilder:
 
     def test_project_builder_fail_missing_name(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
         temp_project_path: str,
     ) -> None:
@@ -93,7 +93,7 @@ class TestProjectServiceBuilder:
 
     def test_project_builder_fail_missing_path(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test project builder fails when path is missing."""
@@ -104,7 +104,7 @@ class TestProjectServiceBuilder:
 
     def test_project_builder_fail_both_required_fields_missing(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test project builder fails with both name and path missing."""
@@ -115,7 +115,7 @@ class TestProjectServiceBuilder:
 
     def test_project_builder_monadic_chain(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
         temp_project_path: str,
     ) -> None:
@@ -138,9 +138,9 @@ class TestAnalysisServiceBuilder:
     """Test AnalysisServiceBuilder with real fixtures."""
 
     @pytest.fixture
-    def config(self) -> MinimalFlextQualityConfig:
+    def config(self) -> MinimalFlextQualitySettings:
         """Real config instance."""
-        return MinimalFlextQualityConfig()
+        return MinimalFlextQualitySettings()
 
     @pytest.fixture
     def logger(self) -> FlextLogger:
@@ -149,7 +149,7 @@ class TestAnalysisServiceBuilder:
 
     def test_analysis_builder_success_minimal(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test analysis builder with minimal required fields."""
@@ -169,7 +169,7 @@ class TestAnalysisServiceBuilder:
 
     def test_analysis_builder_success_with_status(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test analysis builder with custom status."""
@@ -186,7 +186,7 @@ class TestAnalysisServiceBuilder:
 
     def test_analysis_builder_fail_missing_project_id(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test analysis builder fails without project ID."""
@@ -197,7 +197,7 @@ class TestAnalysisServiceBuilder:
 
     def test_analysis_builder_fail_invalid_status(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test analysis builder fails with invalid status."""
@@ -213,7 +213,7 @@ class TestAnalysisServiceBuilder:
 
     def test_analysis_builder_monadic_flat_map_chain(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test monadic flat_map chaining with analysis builder."""
@@ -242,9 +242,9 @@ class TestIssueServiceBuilder:
     """Test IssueServiceBuilder with real fixtures."""
 
     @pytest.fixture
-    def config(self) -> MinimalFlextQualityConfig:
+    def config(self) -> MinimalFlextQualitySettings:
         """Real config instance."""
-        return MinimalFlextQualityConfig()
+        return MinimalFlextQualitySettings()
 
     @pytest.fixture
     def logger(self) -> FlextLogger:
@@ -253,7 +253,7 @@ class TestIssueServiceBuilder:
 
     def test_issue_builder_success_all_required_fields(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test issue builder with all required fields."""
@@ -278,7 +278,7 @@ class TestIssueServiceBuilder:
 
     def test_issue_builder_fail_missing_analysis_id(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test issue builder fails without analysis ID."""
@@ -296,7 +296,7 @@ class TestIssueServiceBuilder:
 
     def test_issue_builder_fail_missing_severity(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test issue builder fails without severity."""
@@ -314,7 +314,7 @@ class TestIssueServiceBuilder:
 
     def test_issue_builder_fail_missing_issue_type(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test issue builder fails without issue type."""
@@ -332,7 +332,7 @@ class TestIssueServiceBuilder:
 
     def test_issue_builder_fail_missing_file_path(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test issue builder fails without file path."""
@@ -350,7 +350,7 @@ class TestIssueServiceBuilder:
 
     def test_issue_builder_fail_missing_message(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test issue builder fails without message."""
@@ -368,7 +368,7 @@ class TestIssueServiceBuilder:
 
     def test_issue_builder_fail_invalid_severity(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test issue builder fails with invalid severity."""
@@ -387,7 +387,7 @@ class TestIssueServiceBuilder:
 
     def test_issue_builder_fail_invalid_issue_type(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test issue builder fails with invalid issue type."""
@@ -406,7 +406,7 @@ class TestIssueServiceBuilder:
 
     def test_issue_builder_all_severity_levels(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test issue builder with all severity levels."""
@@ -427,7 +427,7 @@ class TestIssueServiceBuilder:
 
     def test_issue_builder_all_issue_types(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test issue builder with all issue types."""
@@ -458,9 +458,9 @@ class TestReportServiceBuilder:
     """Test ReportServiceBuilder with real fixtures."""
 
     @pytest.fixture
-    def config(self) -> MinimalFlextQualityConfig:
+    def config(self) -> MinimalFlextQualitySettings:
         """Real config instance."""
-        return MinimalFlextQualityConfig()
+        return MinimalFlextQualitySettings()
 
     @pytest.fixture
     def logger(self) -> FlextLogger:
@@ -469,7 +469,7 @@ class TestReportServiceBuilder:
 
     def test_report_builder_success_default_format(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test report builder with default HTML format."""
@@ -487,7 +487,7 @@ class TestReportServiceBuilder:
 
     def test_report_builder_success_json_format(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test report builder with JSON format."""
@@ -504,7 +504,7 @@ class TestReportServiceBuilder:
 
     def test_report_builder_success_csv_format(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test report builder with CSV format."""
@@ -521,7 +521,7 @@ class TestReportServiceBuilder:
 
     def test_report_builder_fail_missing_analysis_id(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test report builder fails without analysis ID."""
@@ -532,7 +532,7 @@ class TestReportServiceBuilder:
 
     def test_report_builder_fail_invalid_format(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test report builder fails with invalid format."""
@@ -578,7 +578,7 @@ class TestFlextQualityServicesV2:
 
     def test_services_custom_config(self) -> None:
         """Test services with custom config."""
-        config = MinimalFlextQualityConfig()
+        config = MinimalFlextQualitySettings()
         services = FlextQualityServices(config=config)
 
         assert services.config is config
@@ -588,9 +588,9 @@ class TestMonadicChaining:
     """Test complex monadic chaining patterns."""
 
     @pytest.fixture
-    def config(self) -> MinimalFlextQualityConfig:
+    def config(self) -> MinimalFlextQualitySettings:
         """Real config instance."""
-        return MinimalFlextQualityConfig()
+        return MinimalFlextQualitySettings()
 
     @pytest.fixture
     def logger(self) -> FlextLogger:
@@ -599,7 +599,7 @@ class TestMonadicChaining:
 
     def test_complete_workflow_monadic_chain(
         self,
-        config: MinimalFlextQualityConfig,
+        config: MinimalFlextQualitySettings,
         logger: FlextLogger,
         tmp_path: object,
     ) -> None:

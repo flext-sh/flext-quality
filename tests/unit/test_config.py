@@ -7,41 +7,41 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_quality.config import FlextQualityConfig
+from flext_quality.settings import FlextQualitySettings
 
 
-class TestFlextQualityConfig:
-    """Test FlextQualityConfig functionality."""
+class TestFlextQualitySettings:
+    """Test FlextQualitySettings functionality."""
 
     def test_config_creation(self) -> None:
-        """Test FlextQualityConfig can be created."""
-        config = FlextQualityConfig()
-        assert isinstance(config, FlextQualityConfig)
+        """Test FlextQualitySettings can be created."""
+        config = FlextQualitySettings()
+        assert isinstance(config, FlextQualitySettings)
 
     def test_enhanced_singleton_pattern(self) -> None:
         """Test enhanced singleton pattern implementation."""
         # Test global instance
-        instance1 = FlextQualityConfig.get_global_instance()
-        instance2 = FlextQualityConfig.get_global_instance()
+        instance1 = FlextQualitySettings.get_global_instance()
+        instance2 = FlextQualitySettings.get_global_instance()
         assert instance1 is instance2
 
     def test_environment_configs_development(self) -> None:
         """Test development-specific configuration creation."""
-        dev_config = FlextQualityConfig.create_for_development()
+        dev_config = FlextQualitySettings.create_for_development()
         assert dev_config.min_coverage == 80.0
         assert dev_config.max_complexity == 15
         assert dev_config.parallel_workers == 2
 
     def test_environment_configs_production(self) -> None:
         """Test production-specific configuration creation."""
-        prod_config = FlextQualityConfig.create_for_production()
+        prod_config = FlextQualitySettings.create_for_production()
         assert prod_config.min_coverage == 95.0
         assert prod_config.max_complexity == 8
         assert prod_config.parallel_workers == 8
 
     def test_config_attributes(self) -> None:
         """Test config has required quality analysis attributes."""
-        config = FlextQualityConfig()
+        config = FlextQualitySettings()
 
         # Quality Analysis Configuration
         assert hasattr(config, "min_coverage")
@@ -72,7 +72,7 @@ class TestFlextQualityConfig:
 
     def test_default_values(self) -> None:
         """Test config has proper default values."""
-        config = FlextQualityConfig()
+        config = FlextQualitySettings()
 
         # Test quality thresholds
         assert config.min_coverage == 90.0
@@ -96,7 +96,7 @@ class TestFlextQualityConfig:
     def test_environment_specific_configs(self) -> None:
         """Test environment-specific configuration creation."""
         # Development config should have relaxed thresholds
-        dev_config = FlextQualityConfig.create_for_development()
+        dev_config = FlextQualitySettings.create_for_development()
         assert dev_config.min_coverage == 80.0
         assert dev_config.max_complexity == 15
         assert dev_config.parallel_workers == 2
@@ -104,7 +104,7 @@ class TestFlextQualityConfig:
         assert dev_config.enable_audit_logging is True
 
         # Production config should have strict thresholds
-        prod_config = FlextQualityConfig.create_for_production()
+        prod_config = FlextQualitySettings.create_for_production()
         assert prod_config.min_coverage == 95.0
         assert prod_config.max_complexity == 8
         assert prod_config.min_security_score == 95.0
@@ -114,7 +114,7 @@ class TestFlextQualityConfig:
 
     def test_config_helper_methods(self) -> None:
         """Test configuration helper methods."""
-        config = FlextQualityConfig()
+        config = FlextQualitySettings()
 
         # Test analysis config
         analysis_config = config.get_analysis_config()
@@ -140,14 +140,14 @@ class TestFlextQualityConfig:
 
     def test_business_rules_validation(self) -> None:
         """Test business rules validation."""
-        config = FlextQualityConfig()
+        config = FlextQualitySettings()
 
         # Test valid configuration
         result = config.validate_business_rules()
         assert result.is_success
 
         # Test configuration with conflicting settings
-        invalid_config = FlextQualityConfig(
+        invalid_config = FlextQualitySettings(
             min_coverage=95.0,
             enable_external_tools=False,
         )
@@ -159,11 +159,11 @@ class TestFlextQualityConfig:
     def test_reset_functionality(self) -> None:
         """Test singleton reset functionality."""
         # Get initial instance
-        instance1 = FlextQualityConfig.get_global_instance()
+        instance1 = FlextQualitySettings.get_global_instance()
 
         # Reset and get new instance
-        FlextQualityConfig.reset_global_instance()
-        instance2 = FlextQualityConfig.get_global_instance()
+        FlextQualitySettings.reset_global_instance()
+        instance2 = FlextQualitySettings.get_global_instance()
 
         # Should be different instances after reset
         assert instance1 is not instance2

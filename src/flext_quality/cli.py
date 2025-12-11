@@ -23,7 +23,7 @@ from flext_core import (
 from pydantic import BaseModel, Field
 
 from .analyzer import FlextQualityAnalyzer
-from .config import FlextQualityConfig
+from .config import FlextQualitySettings
 from .docs_maintenance.cli import run_comprehensive
 from .reports import FlextQualityReportGenerator, ReportFormat
 from .subprocess_utils import SubprocessUtils
@@ -462,7 +462,7 @@ def analyze_project(args: argparse.Namespace) -> int:
 
         # Create config
         config = CliConfig()
-        FlextQualityConfig()
+        FlextQualitySettings()
 
         # Create service and router
         service = FlextQualityCliService(config)
@@ -667,7 +667,7 @@ Examples:
 
     # Configure logging for quality commands
     config = CliConfig()
-    quality_config = FlextQualityConfig()
+    quality_config = FlextQualitySettings()
     if args.verbose:
         quality_config.observability_log_level = "DEBUG"
 

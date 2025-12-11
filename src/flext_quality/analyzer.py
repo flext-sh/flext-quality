@@ -19,7 +19,7 @@ from flext_core import (
 )
 from pydantic import BaseModel, Field, PrivateAttr
 
-from .config import FlextQualityConfig
+from .config import FlextQualitySettings
 from .constants import FlextQualityConstants
 from .external_backend import FlextQualityExternalBackend
 from .models import FlextQualityModels
@@ -138,7 +138,7 @@ class FlextQualityAnalyzer(FlextService[FlextQualityModels.AnalysisResults]):
 
     auto_execute: ClassVar[bool] = False
     project_path: Path = Path()
-    _analyzer_config: FlextQualityConfig = PrivateAttr()
+    _analyzer_config: FlextQualitySettings = PrivateAttr()
     _analyzer_logger: FlextLogger = PrivateAttr()
     _current_results: FlextQualityModels.AnalysisResults | None = PrivateAttr(
         default=None,
@@ -147,7 +147,7 @@ class FlextQualityAnalyzer(FlextService[FlextQualityModels.AnalysisResults]):
     def __init__(
         self,
         project_path: str | Path | None = None,
-        config: FlextQualityConfig | None = None,
+        config: FlextQualitySettings | None = None,
         **_data: object,
     ) -> None:
         """Initialize analyzer.
@@ -160,12 +160,12 @@ class FlextQualityAnalyzer(FlextService[FlextQualityModels.AnalysisResults]):
         """
         super().__init__()
         self.project_path = Path(project_path) if project_path is not None else Path()
-        self._analyzer_config = config if config is not None else FlextQualityConfig()
+        self._analyzer_config = config if config is not None else FlextQualitySettings()
         self._analyzer_logger = FlextLogger(__name__)
         self._current_results = None
 
     @property
-    def analyzer_config(self) -> FlextQualityConfig:
+    def analyzer_config(self) -> FlextQualitySettings:
         """Access analyzer configuration (read-only)."""
         return self._analyzer_config
 

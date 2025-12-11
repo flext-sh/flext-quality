@@ -20,7 +20,7 @@ from flext_core import (
     t,
 )
 
-from .config import FlextQualityConfig
+from .config import FlextQualitySettings
 from .models import FlextQualityModels
 from .services import (
     AnalysisServiceBuilder,
@@ -60,13 +60,13 @@ class FlextQuality(FlextService[bool]):
         # This avoids protocol compatibility issues between FlextDispatcher and p.CommandBus
         self._registry: FlextRegistry = FlextRegistry()
         object.__setattr__(self, "_quality_logger", FlextLogger(__name__))
-        object.__setattr__(self, "_quality_config", FlextQualityConfig())
+        object.__setattr__(self, "_quality_config", FlextQualitySettings())
 
         # Domain services (V2 pattern: builders, not nested services)
         self._services = FlextQualityServices()
 
     @property
-    def quality_config(self) -> FlextQualityConfig:
+    def quality_config(self) -> FlextQualitySettings:
         """Access quality configuration (read-only)."""
         return self._quality_config
 

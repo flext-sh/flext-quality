@@ -9,7 +9,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import override
 
-from flext_api import FlextApi, FlextApiConfig
+from flext_api import FlextApi, FlextApiSettings
 from flext_core import FlextLogger, FlextResult, FlextRuntime, FlextService, FlextTypes
 from pydantic import BaseModel, Field
 
@@ -53,7 +53,7 @@ class FlextQualityIntegrations(FlextService[bool]):
         # Use object.__setattr__ to bypass Pydantic's custom __setattr__ for private attributes
         api_config = config or ApiClientConfig()
         object.__setattr__(self, "_config", api_config)
-        self._api_config = FlextApiConfig(**api_config.model_dump())
+        self._api_config = FlextApiSettings(**api_config.model_dump())
         self._api_client = FlextApi(config=self._api_config)
         self._logger = FlextLogger(__name__)
 
@@ -73,16 +73,16 @@ class FlextQualityIntegrations(FlextService[bool]):
         def post(
             client: FlextApi,
             url: str,
-            json: dict[str, FlextTypes.Json.JsonValue] | None = None,
+            json: dict[str, FlextTypes.JsonValue] | None = None,
             files: dict[str, tuple[str, bytes]] | None = None,
             headers: dict[str, str] | None = None,
-        ) -> FlextResult[dict[str, FlextTypes.Json.JsonValue]]:
+        ) -> FlextResult[dict[str, FlextTypes.JsonValue]]:
             """Execute POST request and return result."""
             # Note: files not directly supported by FlextApi, would need multipart encoding
             _ = files  # Acknowledge unused parameter
             result = client.post(url=url, data=json, headers=headers)
             if result.is_failure:
-                return FlextResult[dict[str, FlextTypes.Json.JsonValue]].fail(
+                return FlextResult[dict[str, FlextTypes.JsonValue]].fail(
                     f"HTTP POST failed: {result.error}",
                 )
             # Extract body from HttpResponse
@@ -90,8 +90,8 @@ class FlextQualityIntegrations(FlextService[bool]):
             body = response.body
             if isinstance(body, dict):
                 # Reconstruct dict with JsonValue for type safety
-                return FlextResult[dict[str, FlextTypes.Json.JsonValue]].ok(dict(body))
-            return FlextResult[dict[str, FlextTypes.Json.JsonValue]].ok({
+                return FlextResult[dict[str, FlextTypes.JsonValue]].ok(dict(body))
+            return FlextResult[dict[str, FlextTypes.JsonValue]].ok({
                 "response": str(body)
             })
 
@@ -101,13 +101,13 @@ class FlextQualityIntegrations(FlextService[bool]):
             url: str,
             params: dict[str, str] | None = None,
             headers: dict[str, str] | None = None,
-        ) -> FlextResult[dict[str, FlextTypes.Json.JsonValue]]:
+        ) -> FlextResult[dict[str, FlextTypes.JsonValue]]:
             """Execute GET request and return result."""
             # FlextApi.get uses request_kwargs for params
             request_kwargs = {"params": params} if params else None
             result = client.get(url=url, headers=headers, request_kwargs=request_kwargs)
             if result.is_failure:
-                return FlextResult[dict[str, FlextTypes.Json.JsonValue]].fail(
+                return FlextResult[dict[str, FlextTypes.JsonValue]].fail(
                     f"HTTP GET failed: {result.error}",
                 )
             # Extract body from HttpResponse
@@ -115,8 +115,8 @@ class FlextQualityIntegrations(FlextService[bool]):
             body = response.body
             if isinstance(body, dict):
                 # Reconstruct dict with JsonValue for type safety
-                return FlextResult[dict[str, FlextTypes.Json.JsonValue]].ok(dict(body))
-            return FlextResult[dict[str, FlextTypes.Json.JsonValue]].ok({
+                return FlextResult[dict[str, FlextTypes.JsonValue]].ok(dict(body))
+            return FlextResult[dict[str, FlextTypes.JsonValue]].ok({
                 "response": str(body)
             })
 
@@ -126,8 +126,8 @@ class FlextQualityIntegrations(FlextService[bool]):
         @staticmethod
         def webhook_payload(
             event_type: str,
-            event_data: dict[str, FlextTypes.Json.JsonValue],
-        ) -> dict[str, FlextTypes.Json.JsonValue]:
+            event_data: dict[str, FlextTypes.JsonValue],
+        ) -> dict[str, FlextTypes.JsonValue]:
             """Build webhook notification payload."""
             return {
                 "event_type": event_type,
@@ -141,7 +141,7 @@ class FlextQualityIntegrations(FlextService[bool]):
             message: str,
             severity: str,
             color_map: dict[str, str],
-        ) -> dict[str, FlextTypes.Json.JsonValue]:
+        ) -> dict[str, FlextTypes.JsonValue]:
             """Build Slack message payload."""
             return {
                 "attachments": [
@@ -157,8 +157,8 @@ class FlextQualityIntegrations(FlextService[bool]):
         @staticmethod
         def github_checks_payload(
             commit_sha: str,
-            check_results: dict[str, FlextTypes.Json.JsonValue],
-        ) -> dict[str, FlextTypes.Json.JsonValue]:
+            check_results: dict[str, FlextTypes.JsonValue],
+        ) -> dict[str, FlextTypes.JsonValue]:
             """Build GitHub Checks API payload."""
             return {
                 "name": "FLEXT Quality Check",
@@ -183,7 +183,7 @@ class FlextQualityIntegrations(FlextService[bool]):
         self,
         webhook_url: str,
         event_type: str,
-        event_data: dict[str, FlextTypes.Json.JsonValue],
+        event_data: dict[str, FlextTypes.JsonValue],
     ) -> FlextRuntime.RuntimeResult[dict[str, str]]:
         """Send webhook notification."""
         payload = self._PayloadBuilders.webhook_payload(event_type, event_data)
@@ -218,8 +218,8 @@ class FlextQualityIntegrations(FlextService[bool]):
         sonarqube_url: str,
         project_key: str,
         token: str,
-        quality_data: dict[str, FlextTypes.Json.JsonValue],
-    ) -> FlextRuntime.RuntimeResult[dict[str, FlextTypes.Json.JsonValue]]:
+        quality_data: dict[str, FlextTypes.JsonValue],
+    ) -> FlextRuntime.RuntimeResult[dict[str, FlextTypes.JsonValue]]:
         """Integrate with SonarQube."""
         api_url = f"{sonarqube_url}/api/measures/component"
         component_key = quality_data.get("component", project_key)
@@ -236,8 +236,8 @@ class FlextQualityIntegrations(FlextService[bool]):
         repo: str,
         commit_sha: str,
         token: str,
-        check_results: dict[str, FlextTypes.Json.JsonValue],
-    ) -> FlextRuntime.RuntimeResult[dict[str, FlextTypes.Json.JsonValue]]:
+        check_results: dict[str, FlextTypes.JsonValue],
+    ) -> FlextRuntime.RuntimeResult[dict[str, FlextTypes.JsonValue]]:
         """Integrate with GitHub Checks API."""
         api_url = f"{github_api_url}/repos/{repo}/check-runs"
         payload = self._PayloadBuilders.github_checks_payload(commit_sha, check_results)
@@ -256,7 +256,7 @@ class FlextQualityIntegrations(FlextService[bool]):
         storage_url: str,
         report_file: Path,
         api_key: str,
-    ) -> FlextRuntime.RuntimeResult[dict[str, FlextTypes.Json.JsonValue]]:
+    ) -> FlextRuntime.RuntimeResult[dict[str, FlextTypes.JsonValue]]:
         """Deliver quality report to external storage."""
         try:
             content = report_file.read_bytes()
@@ -267,14 +267,14 @@ class FlextQualityIntegrations(FlextService[bool]):
                 headers={"X-API-Key": api_key},
             ).map_error(lambda e: self._log_error("storage", e))
         except Exception as exc:
-            return FlextResult[dict[str, FlextTypes.Json.JsonValue]].fail(
+            return FlextResult[dict[str, FlextTypes.JsonValue]].fail(
                 self._log_error("storage_read", str(exc)),
             )
 
     def notify_on_threshold_violation(
         self,
         webhook_urls: list[str],
-        violation_data: dict[str, FlextTypes.Json.JsonValue],
+        violation_data: dict[str, FlextTypes.JsonValue],
     ) -> FlextResult[list[dict[str, str]]]:
         """Notify multiple webhooks of threshold violations."""
         results: list[dict[str, str]] = []

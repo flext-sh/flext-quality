@@ -25,7 +25,7 @@ from .cli import (
     setup_logging,
 )
 from .cli_helpers import QualityHelperCommands
-from .config import FlextQualityConfig
+from .config import FlextQualitySettings
 from .constants import FlextQualityConstants
 from .container import get_quality_container
 from .exceptions import FlextQualityExceptions
@@ -114,13 +114,13 @@ __all__ = [
     "FlextAnalysisStatus",
     "FlextQuality",
     "FlextQualityAnalyzer",
-    "FlextQualityConfig",
     "FlextQualityConstants",
     "FlextQualityExceptions",
     "FlextQualityHandlers",
     "FlextQualityModels",
     "FlextQualityReportGenerator",
     "FlextQualityServices",
+    "FlextQualitySettings",
     "FlextQualityWebInterface",
     "IssueLocation",
     "IssueSeverity",

@@ -10,7 +10,6 @@ from __future__ import annotations
 import pytest
 from flext_core import FlextLogger
 
-from flext_quality.config import FlextQualityConfig
 from flext_quality.services import (
     AnalysisServiceBuilder,
     FlextQualityServices,
@@ -18,6 +17,7 @@ from flext_quality.services import (
     ProjectServiceBuilder,
     ReportServiceBuilder,
 )
+from flext_quality.settings import FlextQualitySettings
 
 
 class TestFlextQualityServices:
@@ -29,9 +29,9 @@ class TestFlextQualityServices:
         return FlextQualityServices()
 
     @pytest.fixture
-    def config(self) -> FlextQualityConfig:
-        """Create FlextQualityConfig instance."""
-        return FlextQualityConfig()
+    def config(self) -> FlextQualitySettings:
+        """Create FlextQualitySettings instance."""
+        return FlextQualitySettings()
 
     @pytest.fixture
     def logger(self) -> FlextLogger:
@@ -45,7 +45,7 @@ class TestFlextQualityServices:
 
     def test_create_project_through_builder(
         self,
-        config: FlextQualityConfig,
+        config: FlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test creating a project through builder pattern."""
@@ -64,7 +64,7 @@ class TestFlextQualityServices:
 
     def test_create_analysis_through_builder(
         self,
-        config: FlextQualityConfig,
+        config: FlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test creating an analysis through builder pattern."""
@@ -82,7 +82,7 @@ class TestFlextQualityServices:
 
     def test_create_issue_through_builder(
         self,
-        config: FlextQualityConfig,
+        config: FlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test creating an issue through builder pattern."""
@@ -106,7 +106,7 @@ class TestFlextQualityServices:
 
     def test_create_report_through_builder(
         self,
-        config: FlextQualityConfig,
+        config: FlextQualitySettings,
         logger: FlextLogger,
     ) -> None:
         """Test creating a report through builder pattern."""

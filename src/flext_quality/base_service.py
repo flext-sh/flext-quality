@@ -13,7 +13,7 @@ from typing import TypeVar
 
 from flext_core import FlextContainer, FlextLogger, FlextService
 
-from .config import FlextQualityConfig
+from .config import FlextQualitySettings
 
 T = TypeVar("T")
 
@@ -23,7 +23,7 @@ class FlextQualityBaseService(FlextService[T]):
 
     Consolidates repeated initialization patterns:
     - FlextLogger(__name__) instantiation
-    - FlextQualityConfig initialization
+    - FlextQualitySettings initialization
     - FlextContainer.get_global() access
 
     Subclasses should:
@@ -34,7 +34,7 @@ class FlextQualityBaseService(FlextService[T]):
 
     def __new__(
         cls,
-        _config: FlextQualityConfig | None = None,
+        _config: FlextQualitySettings | None = None,
         **_data: object,
     ) -> FlextQualityBaseService[T]:
         """Create new service instance.
@@ -51,7 +51,7 @@ class FlextQualityBaseService(FlextService[T]):
 
     def __init__(
         self,
-        config: FlextQualityConfig | None = None,
+        config: FlextQualitySettings | None = None,
         **_data: object,
     ) -> None:
         """Initialize base service with standard pattern.
@@ -67,7 +67,7 @@ class FlextQualityBaseService(FlextService[T]):
         object.__setattr__(
             self,
             "_quality_config",
-            config if config is not None else FlextQualityConfig(),
+            config if config is not None else FlextQualitySettings(),
         )
         object.__setattr__(self, "_quality_container", FlextContainer.get_global())
 
@@ -77,7 +77,7 @@ class FlextQualityBaseService(FlextService[T]):
         return self._quality_logger
 
     @property
-    def quality_config(self) -> FlextQualityConfig:
+    def quality_config(self) -> FlextQualitySettings:
         """Access quality configuration (read-only)."""
         return self._quality_config
 

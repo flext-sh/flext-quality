@@ -16,7 +16,7 @@ class TestFlextQualityWeb:
     """Test FlextQualityWeb class."""
 
     @patch("flext_quality.web.create_fastapi_app")
-    @patch("flext_quality.web.FlextQualityConfig")
+    @patch("flext_quality.web.FlextQualitySettings")
     def test_init(
         self,
         mock_config: MagicMock,

@@ -10,20 +10,20 @@ from __future__ import annotations
 import warnings
 from typing import Literal, Self
 
-from flext_core import FlextConfig, FlextResult
+from flext_core import FlextResult, FlextSettings
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import SettingsConfigDict
 
 from .constants import FlextQualityConstants
 
 
-@FlextConfig.auto_register("quality")
-class FlextQualityConfig(FlextConfig):
-    """Single Pydantic 2 Settings class for flext-quality extending FlextConfig.
+@FlextSettings.auto_register("quality")
+class FlextQualitySettings(FlextSettings):
+    """Single Pydantic 2 Settings class for flext-quality extending FlextSettings.
 
     **ARCHITECTURAL PATTERN**: Zero-Boilerplate Auto-Registration
 
-    This class extends FlextConfig (BaseSettings) for automatic:
+    This class extends FlextSettings (BaseSettings) for automatic:
     - Singleton pattern (thread-safe)
     - Namespace registration (accessible via config.quality)
     - Environment variable loading from FLEXT_QUALITY_* variables
@@ -40,12 +40,12 @@ class FlextQualityConfig(FlextConfig):
         env_prefix="FLEXT_QUALITY_",
         case_sensitive=False,
         extra="allow",
-        # Inherit enhanced Pydantic 2.11+ features from FlextConfig
+        # Inherit enhanced Pydantic 2.11+ features from FlextSettings
         validate_assignment=True,
         str_strip_whitespace=True,
         json_schema_extra={
             "title": "FLEXT Quality Configuration",
-            "description": "Code quality analysis configuration extending FlextConfig",
+            "description": "Code quality analysis configuration extending FlextSettings",
         },
     )
 
@@ -363,19 +363,19 @@ class FlextQualityConfig(FlextConfig):
         cls,
         environment: str,
         **overrides: object,
-    ) -> FlextQualityConfig:
+    ) -> FlextQualitySettings:
         """Create configuration for specific environment using direct instantiation."""
         # Note: environment parameter reserved for future use
         _ = environment  # Unused but maintains parent signature
         return cls.model_validate(overrides)
 
     @classmethod
-    def create_default(cls) -> FlextQualityConfig:
+    def create_default(cls) -> FlextQualitySettings:
         """Create default configuration instance using direct instantiation."""
         return cls()
 
     @classmethod
-    def create_for_development(cls) -> FlextQualityConfig:
+    def create_for_development(cls) -> FlextQualitySettings:
         """Create configuration optimized for development using model_validate."""
         return cls.model_validate({
             "min_coverage": 80.0,
@@ -385,7 +385,7 @@ class FlextQualityConfig(FlextConfig):
         })
 
     @classmethod
-    def create_for_production(cls) -> FlextQualityConfig:
+    def create_for_production(cls) -> FlextQualitySettings:
         """Create configuration optimized for production using model_validate."""
         return cls.model_validate({
             "min_coverage": FlextQualityConstants.Quality.Coverage.TARGET_COVERAGE,
@@ -398,5 +398,5 @@ class FlextQualityConfig(FlextConfig):
 
 
 __all__ = [
-    "FlextQualityConfig",
+    "FlextQualitySettings",
 ]

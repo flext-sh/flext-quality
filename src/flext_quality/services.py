@@ -60,7 +60,7 @@ from uuid import NAMESPACE_DNS, UUID, uuid5
 from flext_core import FlextLogger, r
 
 from .base_service import FlextQualityBaseService
-from .config import FlextQualityConfig
+from .config import FlextQualitySettings
 from .constants import c
 from .models import m
 
@@ -106,7 +106,7 @@ class ProjectServiceBuilder:
         )
     """
 
-    def __init__(self, config: FlextQualityConfig, logger: FlextLogger) -> None:
+    def __init__(self, config: FlextQualitySettings, logger: FlextLogger) -> None:
         """Initialize project builder."""
         self._config = config
         self._logger = logger
@@ -198,7 +198,7 @@ class AnalysisServiceBuilder:
         )
     """
 
-    def __init__(self, config: FlextQualityConfig, logger: FlextLogger) -> None:
+    def __init__(self, config: FlextQualitySettings, logger: FlextLogger) -> None:
         """Initialize analysis builder."""
         self._config = config
         self._logger = logger
@@ -309,7 +309,7 @@ class IssueServiceBuilder:
         )
     """
 
-    def __init__(self, config: FlextQualityConfig, logger: FlextLogger) -> None:
+    def __init__(self, config: FlextQualitySettings, logger: FlextLogger) -> None:
         """Initialize issue builder."""
         self._config = config
         self._logger = logger
@@ -455,7 +455,7 @@ class ReportServiceBuilder:
         )
     """
 
-    def __init__(self, config: FlextQualityConfig, logger: FlextLogger) -> None:
+    def __init__(self, config: FlextQualitySettings, logger: FlextLogger) -> None:
         """Initialize report builder."""
         self._config = config
         self._logger = logger

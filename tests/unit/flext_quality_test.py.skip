@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from flext_quality.config import FlextQualityConfig
+from flext_quality.settings import FlextQualitySettings
 from flext_quality.models import FlextQualityModels
 
 # This module provides minimal imports for tests, avoiding flext-cli imports
@@ -18,7 +18,7 @@ from flext_quality.services import (
 
 __all__ = [
     "AnalysisServiceBuilder",
-    "FlextQualityConfig",
+    "FlextQualitySettings",
     "FlextQualityModels",
     "FlextQualityServices",
     "IssueServiceBuilder",

@@ -15,7 +15,7 @@ from flext_observability import (
 )
 from pydantic import BaseModel, Field
 
-from .config import FlextQualityConfig
+from .config import FlextQualitySettings
 from .models import m
 from .services import AnalysisServiceBuilder, FlextQualityServices, ReportServiceBuilder
 
@@ -107,7 +107,7 @@ class FlextQualityHandlers:
             _services: object,
         ) -> FlextResult[m.AnalysisModel]:
             """Execute project analysis using builder pattern."""
-            config = FlextQualityConfig()
+            config = FlextQualitySettings()
             logger = FlextLogger(__name__)
             return (
                 AnalysisServiceBuilder(config, logger)
@@ -124,7 +124,7 @@ class FlextQualityHandlers:
             _services: object,
         ) -> FlextResult[m.ReportModel]:
             """Execute report generation using builder pattern."""
-            config = FlextQualityConfig()
+            config = FlextQualitySettings()
             logger = FlextLogger(__name__)
             return (
                 ReportServiceBuilder(config, logger)
