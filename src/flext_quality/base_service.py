@@ -13,7 +13,7 @@ from typing import TypeVar
 
 from flext_core import FlextContainer, FlextLogger, FlextService
 
-from .config import FlextQualitySettings
+from .settings import FlextQualitySettings
 
 T = TypeVar("T")
 

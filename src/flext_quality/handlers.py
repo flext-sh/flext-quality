@@ -15,9 +15,9 @@ from flext_observability import (
 )
 from pydantic import BaseModel, Field
 
-from .config import FlextQualitySettings
 from .models import m
 from .services import AnalysisServiceBuilder, FlextQualityServices, ReportServiceBuilder
+from .settings import FlextQualitySettings
 
 _T = TypeVar("_T")
 

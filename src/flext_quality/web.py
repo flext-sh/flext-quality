@@ -23,10 +23,10 @@ from flext_core import FlextContainer, FlextLogger, FlextResult
 
 from .analyzer import FlextQualityAnalyzer
 from .api import FlextQuality
-from .config import FlextQualitySettings
 
 # Import from models instead of fallback mock
 from .models import FlextQualityModels
+from .settings import FlextQualitySettings
 
 
 def create_fastapi_app(
