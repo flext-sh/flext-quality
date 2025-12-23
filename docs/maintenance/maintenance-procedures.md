@@ -17,7 +17,7 @@
     - [Monthly Automated Maintenance](#monthly-automated-maintenance)
       - [Tasks Performed](#tasks-performed)
       - [Deliverables](#deliverables)
-  - [🛠️ Manual Maintenance Procedures](#-manual-maintenance-procedures)
+  - [🛠️ Manual Maintenance Procedures](#manual-maintenance-procedures)
     - [Emergency Response (Critical Issues)](#emergency-response-critical-issues)
       - [Procedure](#procedure)
     - [Weekly Team Review](#weekly-team-review)

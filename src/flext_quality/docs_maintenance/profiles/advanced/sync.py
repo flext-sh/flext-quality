@@ -586,8 +586,7 @@ class DocumentationSync:
                     if file.endswith((".md", ".mdx")):
                         file_path = Path(root) / file
                         # Simple metadata update - could be more sophisticated
-                        with Path(file_path).open(encoding="utf-8") as f:
-                            content = f.read()
+                        content = Path(file_path).read_text(encoding="utf-8")
 
                         # Update last modified timestamp if present
                         if "last_updated:" in content or "updated:" in content:

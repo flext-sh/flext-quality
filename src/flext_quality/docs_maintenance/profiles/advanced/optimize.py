@@ -197,8 +197,7 @@ class ContentOptimizer:
     ) -> OptimizationResult:
         """Optimize a single documentation file."""
         try:
-            with Path(file_path).open(encoding="utf-8") as f:
-                original_content = f.read()
+            original_content = Path(file_path).read_text(encoding="utf-8")
         except Exception as e:
             return OptimizationResult(
                 file_path=file_path,
@@ -251,8 +250,7 @@ class ContentOptimizer:
         # Write optimized content
         if not dry_run and content != original_content:
             try:
-                with Path(file_path).open("w", encoding="utf-8") as f:
-                    f.write(str(content))
+                Path(file_path).write_text(str(content), encoding="utf-8")
             except Exception as e:
                 issues.append({
                     "type": "write_error",
@@ -507,8 +505,7 @@ class ContentOptimizer:
             backup_name = f"{filename}.{timestamp}.backup"
             backup_path = str(self.backup_dir / backup_name)
 
-            with Path(backup_path).open("w", encoding="utf-8") as f:
-                f.write(content)
+            Path(backup_path).write_text(content, encoding="utf-8")
 
             return backup_path
         except Exception:

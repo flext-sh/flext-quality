@@ -1,13 +1,13 @@
 # FLEXT Quality
 
 [![Python 3.13+](https://img.shields.io/badge/python-3.13+-blue.svg)](https://www.python.org/downloads/)
-[![Development Status](https://img.shields.io/badge/status-v0.9.9-green.svg)](#current-status)
+[![Development Status](https://img.shields.io/badge/status-v0.9.9-green.svg)](https://github.com/flext-sh/flext-quality)
 
 **Code quality analysis library** for the FLEXT ecosystem, providing quality metrics and analysis capabilities using Domain-Driven Design patterns.
 
 > **📊 STATUS**: Version 0.9.9 - Solid domain architecture with critical accessibility and integration gaps
 
-______________________________________________________________________
+---
 
 ## 🎯 Purpose and Role in FLEXT Ecosystem
 
@@ -29,20 +29,20 @@ FLEXT Quality serves as the centralized code quality analysis platform for all F
 - **flext-web** → Web dashboard integration (planned)
 - **All FLEXT Projects** → Quality analysis and validation for Python codebases
 
-______________________________________________________________________
+---
 
 ## 🏗️ Architecture and Patterns
 
 ### **Implementation Status Assessment**
 
-| Component               | Status              | Details                                                     |
-| ----------------------- | ------------------- | ----------------------------------------------------------- |
-| **Domain Architecture** | ✅ **Complete**     | Proper entity design, FlextResult patterns, domain events   |
-| **Service Layer**       | ✅ **Functional**   | services with FlextLogger integration                       |
-| **Core Analyzer**       | ❌ **Inaccessible** | FlextQualityCodeAnalyzer implemented but blocked by imports |
-| **Quality Gates**       | ❌ **Blocked**      | Import failures prevent type checking and testing           |
-| **FLEXT Integration**   | ⚠️ **Partial**      | Uses flext-core patterns but has BaseModel compatibility    |
-| **Documentation**       | ⚠️ **Outdated**     | Status indicators need synchronization across files         |
+| Component | Status | Details |
+| --- | --- | --- |
+| **Domain Architecture** | ✅ **Complete** | Proper entity design, FlextResult patterns, domain events |
+| **Service Layer** | ✅ **Functional** | services with FlextLogger integration |
+| **Core Analyzer** | ❌ **Inaccessible** | FlextQualityCodeAnalyzer implemented but blocked by imports |
+| **Quality Gates** | ❌ **Blocked** | Import failures prevent type checking and testing |
+| **FLEXT Integration** | ⚠️ **Partial** | Uses flext-core patterns but has BaseModel compatibility |
+| **Documentation** | ⚠️ **Outdated** | Status indicators need synchronization across files |
 
 > **Status**: Solid foundation with accessibility and integration barriers requiring resolution · 1.0.0 Release Preparation
 
@@ -65,7 +65,7 @@ graph TB
     Reporting --> Dashboard[Web Dashboard]
 ```
 
-______________________________________________________________________
+---
 
 ## 🚀 Quick Start
 
@@ -124,7 +124,7 @@ run(main())
 analyze_code()
 ```
 
-______________________________________________________________________
+---
 
 ## 🔧 Development
 
@@ -178,7 +178,7 @@ make type-check  # Blocked by import failures
 python -c "from flext_quality.analyzer import FlextQualityCodeAnalyzer"  # Works
 ```
 
-______________________________________________________________________
+---
 
 ## 🧪 Testing
 
@@ -205,7 +205,7 @@ make test-unit                        # Individual test modules work
 make diagnose          # Check system status and dependencies
 ```
 
-______________________________________________________________________
+---
 
 ## 📊 Status and Metrics
 
@@ -235,7 +235,7 @@ Evidence-based analysis of current state:
 - **Test Infrastructure**: Fix import issues to enable automated testing and coverage
 - **FLEXT Integration**: Complete flext-core integration and model compatibility
 
-______________________________________________________________________
+---
 
 ## 🗺️ Roadmap
 
@@ -257,14 +257,14 @@ Ecosystem integration and enhancement:
 - Add advanced analysis capabilities (Semgrep, AI-assisted analysis)
 - Optimize performance for large codebase analysis
 
-______________________________________________________________________
+---
 
 ## 📚 Documentation
 
 - **[TODO & Development Status](TODO.md)** - Current technical issues and development priorities
 - **[Getting Started](docs/getting-started.md)** - Installation and basic usage
 
-______________________________________________________________________
+---
 
 ## 🤝 Contributing
 
@@ -292,13 +292,13 @@ Before contributing, ensure code follows FLEXT patterns:
 1. **Fix test imports** to enable automated testing and coverage measurement
 1. **Enhance modern tool integration** with 2025 Python quality ecosystem
 
-______________________________________________________________________
+---
 
 ## 📄 License
 
 MIT License - see [LICENSE](LICENSE) for details.
 
-______________________________________________________________________
+---
 
 ## 🆘 Support
 
@@ -306,10 +306,8 @@ ______________________________________________________________________
 - **Issues**: [GitHub Issues](https://github.com/flext-sh/flext-quality/issues)
 - **Security**: Report security issues privately to maintainers
 
-______________________________________________________________________
+---
 
 **FLEXT Quality v0.9.9** - Code quality analysis library with solid domain architecture and functional analysis capabilities requiring accessibility improvements.
 
 **Mission**: Provide comprehensive code quality analysis for FLEXT projects with proper domain-driven design patterns and integration with modern Python quality ecosystem tools.
-
-# Test fix

@@ -154,8 +154,7 @@ def validate_example_imports(
 
     """
     try:
-        with Path(example_file).open(encoding="utf-8") as f:
-            content = f.read()
+        content = Path(example_file).read_text(encoding="utf-8")
 
         # Extract import statements
         imports = [

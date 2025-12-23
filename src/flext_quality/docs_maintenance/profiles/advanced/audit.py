@@ -259,8 +259,7 @@ class DocumentationAuditor:
     def audit_file(self, file_path: str) -> AuditResult:
         """Audit a single documentation file."""
         try:
-            with Path(file_path).open(encoding="utf-8") as f:
-                content = f.read()
+            content = Path(file_path).read_text(encoding="utf-8")
         except Exception as e:
             return AuditResult(
                 file_path=file_path,

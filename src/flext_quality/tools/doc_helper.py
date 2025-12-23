@@ -37,8 +37,8 @@ def check_docstring_coverage(
 
     """
     try:
-        with Path(module_path).open(encoding="utf-8") as f:
-            tree = ast.parse(f.read())
+        content = Path(module_path).read_text(encoding="utf-8")
+        tree = ast.parse(content)
 
         total_items = 0
         documented_items = 0
@@ -95,9 +95,8 @@ def validate_google_style_docstrings(
 
     """
     try:
-        with Path(module_path).open(encoding="utf-8") as f:
-            content = f.read()
-            tree = ast.parse(content)
+        content = Path(module_path).read_text(encoding="utf-8")
+        tree = ast.parse(content)
 
         issues = []
 
@@ -146,8 +145,8 @@ def suggest_docstring_improvements(
 
     """
     try:
-        with Path(module_path).open(encoding="utf-8") as f:
-            tree = ast.parse(f.read())
+        content = Path(module_path).read_text(encoding="utf-8")
+        tree = ast.parse(content)
 
         suggestions = []
 
@@ -191,8 +190,8 @@ def analyze_api_documentation(
 
     """
     try:
-        with Path(module_path).open(encoding="utf-8") as f:
-            tree = ast.parse(f.read())
+        content = Path(module_path).read_text(encoding="utf-8")
+        tree = ast.parse(content)
 
         public_items = []
         documented_items = 0

@@ -556,8 +556,7 @@ class ReportGenerator:
 
         Path(self.reports_dir).mkdir(exist_ok=True, parents=True)
         output_path = str(Path(self.reports_dir) / output_file)
-        with Path(output_path).open("w", encoding="utf-8") as f:
-            f.write(dashboard_html)
+        Path(output_path).write_text(dashboard_html, encoding="utf-8")
 
         return output_path
 
@@ -645,8 +644,7 @@ class ReportGenerator:
             )
 
         output_path = str(Path(self.reports_dir) / output_file)
-        with Path(output_path).open("w", encoding="utf-8") as f:
-            f.write(summary)
+        Path(output_path).write_text(summary, encoding="utf-8")
 
         return output_path
 

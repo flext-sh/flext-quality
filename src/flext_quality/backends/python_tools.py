@@ -213,8 +213,7 @@ class FlextQualityPythonTools:
         try:
             # Direct API usage
             mode = black.Mode()
-            with Path(path).open(encoding="utf-8") as f:
-                content = f.read()
+            content = Path(path).read_text(encoding="utf-8")
 
             try:
                 formatted = black.format_file_contents(content, fast=False, mode=mode)
@@ -310,8 +309,7 @@ class FlextQualityPythonTools:
 
         """
         try:
-            with Path(path).open(encoding="utf-8") as f:
-                code = f.read()
+            code = Path(path).read_text(encoding="utf-8")
 
             # Direct API usage
             cyclomatic = cc_visit(code)
