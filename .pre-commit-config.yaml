@@ -9,7 +9,7 @@ repos:
         name: Documentation Style Check
         description: Check markdown formatting and style consistency
         entry: python docs/maintenance/tools/style_validator.py
-        language: system
+        language: python
         files: \.(md|mdx)$
         args: [--strict]
         pass_filenames: true
@@ -19,7 +19,7 @@ repos:
         name: Documentation Link Validation
         description: Validate internal and external links in documentation
         entry: python docs/maintenance/scripts/validate.py
-        language: system
+        language: python
         files: \.(md|mdx)$
         args: [--internal-links, --fast-check]
         pass_filenames: true
@@ -29,7 +29,7 @@ repos:
         name: Documentation Quality Audit
         description: Run comprehensive quality audit on documentation files
         entry: python docs/maintenance/scripts/audit.py
-        language: system
+        language: python
         files: \.(md|mdx)$
         args: [--quick-audit, --fail-on-critical]
         pass_filenames: true
@@ -46,15 +46,15 @@ repos:
           - mdformat-frontmatter
           - mdformat-footnote
 
-  # Check for broken links (external)
-  - repo: https://github.com/lycheeverse/lychee
-    rev: v0.14.3
-    hooks:
-      - id: lychee
-        name: Check for broken links
-        description: Check URLs for liveness
-        args: [--config docs/maintenance/config/lychee.toml]
-        pass_filenames: false
+  # Check for broken links (external) - temporarily disabled due to repo issues
+  # - repo: https://github.com/lycheeverse/lychee
+  #   rev: v0.14.3
+  #   hooks:
+  #     - id: lychee
+  #       name: Check for broken links
+  #       description: Check URLs for liveness
+  #       args: [--config docs/maintenance/config/lychee.toml]
+  #       pass_filenames: false
 
   # YAML validation for config files
   - repo: https://github.com/pre-commit/pre-commit-hooks
