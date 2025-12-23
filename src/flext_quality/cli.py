@@ -23,9 +23,9 @@ from flext_core import (
 from pydantic import BaseModel, Field
 
 from .analyzer import FlextQualityAnalyzer
+from .config import FlextQualitySettings
 from .docs_maintenance.cli import run_comprehensive
 from .reports import FlextQualityReportGenerator, ReportFormat
-from .settings import FlextQualitySettings
 from .subprocess_utils import SubprocessUtils
 from .web import FlextQualityWeb
 

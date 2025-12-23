@@ -19,10 +19,10 @@ from flext_core import (
 )
 from pydantic import BaseModel, Field, PrivateAttr
 
+from .config import FlextQualitySettings
 from .constants import FlextQualityConstants
 from .external_backend import FlextQualityExternalBackend
 from .models import FlextQualityModels
-from .settings import FlextQualitySettings
 
 # =====================================================================
 # Type Definitions - Replace Any/object with proper types

@@ -12,7 +12,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Protocol, runtime_checkable
 
-from flext_core.protocols import p_core
+from flext_core.protocols import FlextProtocols as p_core
 
 
 class FlextQualityProtocols(p_core):

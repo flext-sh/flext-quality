@@ -60,9 +60,9 @@ from uuid import NAMESPACE_DNS, UUID, uuid5
 from flext_core import FlextLogger, r
 
 from .base_service import FlextQualityBaseService
+from .config import FlextQualitySettings
 from .constants import c
 from .models import m
-from .settings import FlextQualitySettings
 
 
 class FlextQualityServices(FlextQualityBaseService[bool]):

@@ -20,6 +20,7 @@ from flext_core import (
     t,
 )
 
+from .config import FlextQualitySettings
 from .models import FlextQualityModels
 from .services import (
     AnalysisServiceBuilder,
@@ -28,7 +29,6 @@ from .services import (
     ProjectServiceBuilder,
     ReportServiceBuilder,
 )
-from .settings import FlextQualitySettings
 
 
 class FlextQuality(FlextService[bool]):
