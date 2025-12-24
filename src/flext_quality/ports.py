@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext import p
+from flext_core import p
 
 # Use p from flext-core instead of local definitions
 # Following FLEXT_REFACTORING_PROMPT.md to eliminate duplication

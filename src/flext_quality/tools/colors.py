@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Self
 
-from flext import FlextLogger, FlextResult, FlextService
+from flext_core import FlextLogger, FlextResult, FlextService
 
 
 class FlextColorService(FlextService[str]):

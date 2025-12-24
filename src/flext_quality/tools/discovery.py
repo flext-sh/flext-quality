@@ -6,7 +6,7 @@ import ast
 from pathlib import Path
 from typing import Self
 
-from flext import FlextResult, FlextService
+from flext_core import FlextResult, FlextService
 
 
 class DependencyDiscovery(FlextService[list[dict[str, object]]]):

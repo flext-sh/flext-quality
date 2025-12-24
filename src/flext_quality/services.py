@@ -57,7 +57,7 @@ from __future__ import annotations
 from typing import ClassVar, cast, override
 from uuid import NAMESPACE_DNS, UUID, uuid5
 
-from flext import FlextLogger, r
+from flext_core import FlextLogger, r
 
 from .base_service import FlextQualityBaseService
 from .constants import c

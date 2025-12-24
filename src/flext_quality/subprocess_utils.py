@@ -14,7 +14,7 @@ import threading
 from dataclasses import dataclass
 from pathlib import Path
 
-from flext import FlextResult
+from flext_core import FlextResult
 
 
 @dataclass(frozen=True)

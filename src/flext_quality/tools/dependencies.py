@@ -11,9 +11,9 @@ Consolidates dependency scripts:
 
 from __future__ import annotations
 
+from flext_core import FlextLogger, FlextResult, FlextService
 from pydantic import ConfigDict
 
-from flext import FlextLogger, FlextResult, FlextService
 from flext_quality.models import FlextQualityModels
 
 

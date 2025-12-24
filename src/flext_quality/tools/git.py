@@ -23,7 +23,7 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from flext import FlextLogger,
+from flext_core import  FlextLogger,
     FlextResult,
     FlextService
 from pydantic import ConfigDict

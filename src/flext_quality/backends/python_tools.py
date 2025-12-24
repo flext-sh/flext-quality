@@ -21,11 +21,11 @@ import black
 import coverage
 import pytest
 from bandit.core import config as bandit_config, manager as bandit_manager
+from flext_core import FlextLogger, FlextResult
 from mypy import api
 from radon.complexity import cc_visit
 from vulture import Vulture
 
-from flext import FlextLogger, FlextResult
 from flext_quality.subprocess_utils import SubprocessUtils
 
 

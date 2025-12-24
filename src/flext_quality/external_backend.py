@@ -20,7 +20,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import override
 
-from flext import FlextDecorators,
+from flext_core import  FlextDecorators,
     FlextLogger,
     FlextResult,
     FlextService,

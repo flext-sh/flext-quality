@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext import FlextResult
+from flext_core import FlextResult
 
 
 def check_all_flext_patterns(
@@ -44,7 +44,7 @@ def check_import_patterns(
     """Check for FLEXT import pattern violations.
 
     FLEXT requires root-level imports:
-    ✅ from flext import FlextResult
+    ✅ from flext_core import  FlextResult
     ❌ from flext_core.result import FlextResult
 
     Args:

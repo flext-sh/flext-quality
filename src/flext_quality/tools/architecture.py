@@ -13,10 +13,10 @@ from __future__ import annotations
 
 import uuid
 
+from flext_core import r, s
 from flext_core.loggings import FlextLogger
 from pydantic import ConfigDict
 
-from flext import r, s
 from flext_quality.models import FlextQualityModels
 
 

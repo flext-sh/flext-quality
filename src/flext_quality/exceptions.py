@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from flext import FlextExceptions
+from flext_core import FlextExceptions
 
 # Type alias for extra kwargs - matches FlextExceptions type requirements
 type ExtraKwargsValue = (

@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import TypeVar
 
-from flext import FlextContainer, FlextLogger, FlextService
+from flext_core import FlextContainer, FlextLogger, FlextService
 
 from .settings import FlextQualitySettings
 

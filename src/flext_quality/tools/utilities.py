@@ -13,8 +13,7 @@ from pathlib import Path
 from typing import ClassVar, Self
 
 from flext_cli import FlextCli
-
-from flext import FlextLogger, FlextResult, FlextService
+from flext_core import FlextLogger, FlextResult, FlextService
 
 
 class FlextQualityToolsUtilities(FlextService[bool]):

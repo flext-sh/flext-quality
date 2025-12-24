@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Self
 
-from flext import FlextResult, FlextService
+from flext_core import FlextResult, FlextService
 
 
 class FlextSecurityService(FlextService[dict[str, str]]):

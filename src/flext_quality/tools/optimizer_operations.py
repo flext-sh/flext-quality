@@ -19,9 +19,9 @@ import re
 from pathlib import Path
 
 import toml
+from flext_core import FlextLogger, FlextResult, FlextService
 from pydantic import BaseModel, ConfigDict, Field
 
-from flext import FlextLogger, FlextResult, FlextService
 from flext_quality.models import FlextQualityModels
 
 # =========================================================================
@@ -312,7 +312,8 @@ class ConfigUpdater:
 
         # Remove MyPy, add Pyrefly
         poetry_dev = (
-            data.get("tool", {})
+            data
+            .get("tool", {})
             .get("poetry", {})
             .get("group", {})
             .get("dev", {})

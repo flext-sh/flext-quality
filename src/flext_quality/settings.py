@@ -10,10 +10,9 @@ from __future__ import annotations
 import warnings
 from typing import Literal, Self
 
+from flext_core import FlextResult, FlextSettings
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import SettingsConfigDict
-
-from flext import FlextResult, FlextSettings
 
 from .constants import FlextQualityConstants
 

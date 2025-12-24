@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import ClassVar, TypedDict
 from uuid import UUID, uuid4
 
-from flext import FlextLogger,
+from flext_core import  FlextLogger,
     FlextResult,
     FlextService
 from pydantic import BaseModel, Field, PrivateAttr

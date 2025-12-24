@@ -11,7 +11,7 @@ import tempfile
 from enum import StrEnum
 from typing import ClassVar, Literal
 
-from flext import FlextConstants
+from flext_core import FlextConstants
 
 
 class FlextQualityConstants(FlextConstants):

@@ -9,9 +9,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from flext_core import FlextResult
 from pydantic import BaseModel, Field
 
-from flext import FlextResult
 from flext_quality.constants import c
 from flext_quality.grade_calculator import FlextQualityGradeCalculator
 from flext_quality.models import FlextQualityModels

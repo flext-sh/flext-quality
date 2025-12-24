@@ -7,9 +7,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from flext_core import FlextResult
 from pydantic import BaseModel, ConfigDict, Field
-
-from flext import FlextResult
 
 from .constants import c
 from .grade_calculator import QualityGradeCalculator

@@ -15,9 +15,8 @@ from pathlib import Path
 from typing import Self, override
 
 from flext_cli import FlextCli, FlextCliFileTools
+from flext_core import FlextContainer, FlextLogger, FlextResult, FlextService
 from pydantic import BaseModel, Field
-
-from flext import FlextContainer, FlextLogger, FlextResult, FlextService
 
 from .analyzer import FlextQualityAnalyzer
 from .docs_maintenance.cli import run_comprehensive

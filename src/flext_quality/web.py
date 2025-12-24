@@ -19,8 +19,7 @@ from fastapi.responses import HTMLResponse
 
 # Domain library imports (FAIL FAST if dependencies not available)
 from flext_auth import FlextAuth
-
-from flext import FlextContainer, FlextLogger, FlextResult
+from flext_core import FlextContainer, FlextLogger, FlextResult
 
 from .analyzer import FlextQualityAnalyzer
 from .api import FlextQuality

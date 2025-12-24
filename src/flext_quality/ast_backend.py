@@ -11,7 +11,7 @@ import ast
 from pathlib import Path
 from typing import override
 
-from flext import FlextContainer, FlextLogger, FlextResult
+from flext_core import FlextContainer, FlextLogger, FlextResult
 
 from .ast_class_info import FlextQualityASTClassInfo
 from .ast_function_info import FlextQualityASTFunctionInfo
@@ -286,7 +286,9 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
     @override
     def analyze(
-        self, _code: str, file_path: Path | None = None,
+        self,
+        _code: str,
+        file_path: Path | None = None,
     ) -> FlextResult[dict[str, object]]:
         """Analyze Python code using AST.
 

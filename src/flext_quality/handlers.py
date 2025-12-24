@@ -9,12 +9,11 @@ from __future__ import annotations
 from typing import TypeVar
 from uuid import UUID
 
+from flext_core import FlextLogger, FlextResult, FlextRuntime
 from flext_observability import (
     flext_create_trace,
 )
 from pydantic import BaseModel, Field
-
-from flext import FlextLogger, FlextResult, FlextRuntime
 
 from .models import m
 from .services import AnalysisServiceBuilder, FlextQualityServices, ReportServiceBuilder
@@ -159,7 +158,8 @@ class FlextQualityHandlers:
         )
 
         return (
-            self._AnalysisOrchestrator.execute_analysis(project_id, self._services)
+            self._AnalysisOrchestrator
+            .execute_analysis(project_id, self._services)
             .map_error(lambda e: self._log_error(context, e))
             .map(lambda a: self._log_success(context, a))
         )

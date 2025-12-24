@@ -17,9 +17,8 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Annotated, Literal, TypeVar
 
+from flext_core import FlextTypes
 from pydantic import Field
-
-from flext import FlextTypes
 
 # =============================================================================
 # QUALITY MODULE-LEVEL TYPEVARS

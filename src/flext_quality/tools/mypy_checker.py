@@ -6,7 +6,8 @@ import shutil
 from pathlib import Path
 from typing import Self
 
-from flext import FlextResult, FlextService
+from flext_core import FlextResult, FlextService
+
 from flext_quality.subprocess_utils import SubprocessUtils
 
 

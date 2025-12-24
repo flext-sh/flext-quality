@@ -10,7 +10,7 @@ from __future__ import annotations
 from typing import override
 from uuid import UUID
 
-from flext import FlextContainer,
+from flext_core import  FlextContainer,
     FlextDispatcher,
     FlextLogger,
     FlextRegistry,
