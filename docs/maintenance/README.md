@@ -2,136 +2,136 @@
 
 ## Table of Contents
 
-- [Documentation Maintenance & Quality Assurance System](#documentation-maintenance--quality-assurance-system)
-  - [🎯 Purpose](#-purpose)
-  - [🏗️ System Architecture](#-system-architecture)
-    - [Core Components](#core-components)
-    - [Data Flow Architecture](#data-flow-architecture)
-  - [📦 Installation & Setup](#-installation--setup)
-    - [Prerequisites](#prerequisites)
-    - [Quick Installation](#quick-installation)
-- [Install core dependencies](#install-core-dependencies)
-- [For full functionality (async validation, HTML reports)](#for-full-functionality-async-validation-html-reports)
-- [Optional: For advanced content analysis](#optional-for-advanced-content-analysis)
-  - [Directory Structure Setup](#directory-structure-setup)
-- [Ensure you're in the project root](#ensure-youre-in-the-project-root)
-- [The maintenance system should be properly set up at:](#the-maintenance-system-should-be-properly-set-up-at)
-- [README.md demo.py scripts/ config/ tools/ reports/](#readmemd--demopy--scripts--config--tools--reports)
-  - [Configuration Validation](#configuration-validation)
-- [Verify configuration files exist](#verify-configuration-files-exist)
-- [audit_rules.YAML style_guide.YAML validation_config.YAML](#audit_rulesyaml--style_guideyaml--validation_configyaml)
-- [Test configuration loading](#test-configuration-loading)
-  - [🚀 Quick Start](#-quick-start)
-    - [Interactive Demo](#interactive-demo)
-- [Run the complete interactive demonstration](#run-the-complete-interactive-demonstration)
-  - [Run Complete Audit](#run-complete-audit)
-  - [Validate Links and References](#validate-links-and-references)
-  - [Generate Quality Report](#generate-quality-report)
-  - [Automated Maintenance (CI/CD)](#automated-maintenance-cicd)
-- [Add to CI/CD pipeline](#add-to-cicd-pipeline)
-- [Generate and publish reports](#generate-and-publish-reports)
-  - [🔄 CI/CD Integration & Automation](#-cicd-integration--automation)
-    - [GitHub Actions Example](#github-actions-example)
-- [.github/workflows/docs-maintenance.yml](#githubworkflowsdocs-maintenanceyml)
-  - [GitLab CI Example](#gitlab-ci-example)
-- [.gitlab-ci.yml (partial)](#gitlab-ciyml-partial)
-- [Scheduled pipeline for regular maintenance](#scheduled-pipeline-for-regular-maintenance)
-  - [Pre-commit Hooks](#pre-commit-hooks)
-- [.pre-commit-config.YAML](#pre-commit-configyaml)
-  - [Scheduled Maintenance](#scheduled-maintenance)
-- [Add to crontab for regular maintenance](#add-to-crontab-for-regular-maintenance)
-- [Daily quality checks](#daily-quality-checks)
-- [Weekly comprehensive audit](#weekly-comprehensive-audit)
-- [Monthly trend analysis and reporting](#monthly-trend-analysis-and-reporting)
-  - [📊 Quality Metrics](#-quality-metrics)
-    - [Content Quality Audit](#content-quality-audit)
-    - [Link & Reference Validation](#link--reference-validation)
-    - [Style & Accessibility](#style--accessibility)
-  - [⚙️ Configuration](#-configuration)
-    - [Audit Rules (`config/audit_rules.yaml`)](#audit-rules-configaudit_rulesyaml)
-    - [Style Guide (`config/style_guide.yaml`)](#style-guide-configstyle_guideyaml)
-  - [🔧 Maintenance Scripts](#-maintenance-scripts)
-    - [Comprehensive Audit (`scripts/audit.py`)](#comprehensive-audit-scriptsauditpy)
-- [Full documentation quality assessment](#full-documentation-quality-assessment)
-- [Quick audit with specific checks](#quick-audit-with-specific-checks)
-- [CI/CD mode with exit codes](#cicd-mode-with-exit-codes)
-  - [Link Validation (`scripts/validate.py`)](#link-validation-scriptsvalidatepy)
-- [Check all external links](#check-all-external-links)
-- [Validate internal references](#validate-internal-references)
-- [Check image references](#check-image-references)
-  - [Content Optimization (`scripts/optimize.py`)](#content-optimization-scriptsoptimizepy)
-- [Auto-fix formatting issues](#auto-fix-formatting-issues)
-- [Update table of contents](#update-table-of-contents)
-- [Optimize for readability](#optimize-for-readability)
-  - [Quality Reporting (`scripts/report.py`)](#quality-reporting-scriptsreportpy)
-- [Generate HTML report](#generate-html-report)
-- [JSON data export](#json-data-export)
-- [Send notifications](#send-notifications)
-  - [📈 Quality Assurance Dashboard](#-quality-assurance-dashboard)
-    - [Real-time Monitoring](#real-time-monitoring)
-    - [Integration Points](#integration-points)
-  - [🔄 Automated Maintenance](#-automated-maintenance)
-    - [Scheduled Tasks](#scheduled-tasks)
-- [Daily quality checks](#daily-quality-checks)
-- [Weekly comprehensive audit](#weekly-comprehensive-audit)
-- [Monthly trend analysis](#monthly-trend-analysis)
-  - [CI/CD Integration](#cicd-integration)
-- [.github/workflows/docs-maintenance.yml](#githubworkflowsdocs-maintenanceyml)
-  - [📋 Maintenance Procedures](#-maintenance-procedures)
-    - [Weekly Maintenance](#weekly-maintenance)
-    - [Monthly Review](#monthly-review)
-    - [Emergency Response](#emergency-response)
-  - [🤝 Team Integration](#-team-integration)
-    - [Contributor Guidelines](#contributor-guidelines)
-    - [Collaboration Workflows](#collaboration-workflows)
-  - [📊 Reporting and Analytics](#-reporting-and-analytics)
-    - [Quality Metrics Dashboard](#quality-metrics-dashboard)
-    - [Trend Analysis](#trend-analysis)
-  - [🛠️ Troubleshooting](#-troubleshooting)
-    - [Common Issues](#common-issues)
-- [Check Python dependencies](#check-python-dependencies)
-- [Verify file permissions](#verify-file-permissions)
-- [Check configuration files](#check-configuration-files)
-- [Update timeout in config/validation_config.YAML](#update-timeout-in-configvalidation_configyaml)
-- [Review style guide configuration](#review-style-guide-configuration)
-- [Run with verbose output](#run-with-verbose-output)
-  - [📚 API Reference](#-api-reference)
-    - [Audit Script API](#audit-script-api)
-    - [Validation Tools](#validation-tools)
-  - [🤝 Contributing](#-contributing)
-    - [Development Guidelines](#development-guidelines)
-    - [Adding New Checks](#adding-new-checks)
-  - [🎯 Key Features & Benefits](#-key-features--benefits)
-    - [✅ Quality Assurance](#-quality-assurance)
-    - [✅ Developer Experience](#-developer-experience)
-    - [✅ Maintenance Automation](#-maintenance-automation)
-    - [✅ Enterprise Ready](#-enterprise-ready)
-  - [🏆 Success Metrics](#-success-metrics)
-    - [Quality Improvements Expected](#quality-improvements-expected)
-    - [Performance Benchmarks](#performance-benchmarks)
-  - [🔧 Customization & Extension](#-customization--extension)
-    - [Adding Custom Rules](#adding-custom-rules)
-- [Extend audit_rules.YAML with custom checks](#extend-audit_rulesyaml-with-custom-checks)
-- [Create custom validator](#create-custom-validator)
-  - [Integrating New Tools](#integrating-new-tools)
-- [Add new validation tools to the pipeline](#add-new-validation-tools-to-the-pipeline)
-  - [API Integration](#api-integration)
-- [REST API for external integrations](#rest-api-for-external-integrations)
-  - [📈 Roadmap & Future Enhancements](#-roadmap--future-enhancements)
-    - [Phase 1: Core Features ✅](#phase-1-core-features-)
-    - [Phase 2: Advanced Features (Next Release)](#phase-2-advanced-features-next-release)
-    - [Phase 3: Enterprise Features (Future)](#phase-3-enterprise-features-future)
-  - [🤝 Contributing & Support](#-contributing--support)
-    - [Development Guidelines](#development-guidelines)
-    - [Community Support](#community-support)
-    - [Professional Services](#professional-services)
-  - [📄 License & Attribution](#-license--attribution)
-  - [🎉 Getting Started Checklist](#-getting-started-checklist)
-    - [✅ Installation Complete](#-installation-complete)
-    - [✅ Configuration Ready](#-configuration-ready)
-    - [✅ First Audit Run](#-first-audit-run)
-    - [✅ Automation Setup](#-automation-setup)
-    - [✅ Team Training](#-team-training)
+- Documentation Maintenance & Quality Assurance System
+  - 🎯 Purpose
+  - 🏗️ System Architecture
+    - Core Components
+    - Data Flow Architecture
+  - 📦 Installation & Setup
+    - Prerequisites
+    - Quick Installation
+- Install core dependencies
+- For full functionality (async validation, HTML reports)
+- Optional: For advanced content analysis
+  - Directory Structure Setup
+- Ensure you're in the project root
+- The maintenance system should be properly set up at:
+- README.md demo.py scripts/ config/ tools/ reports/
+  - Configuration Validation
+- Verify configuration files exist
+- audit_rules.YAML style_guide.YAML validation_config.YAML
+- Test configuration loading
+  - 🚀 Quick Start
+    - Interactive Demo
+- Run the complete interactive demonstration
+  - Run Complete Audit
+  - Validate Links and References
+  - Generate Quality Report
+  - Automated Maintenance (CI/CD)
+- Add to CI/CD pipeline
+- Generate and publish reports
+  - 🔄 CI/CD Integration & Automation
+    - GitHub Actions Example
+- .github/workflows/docs-maintenance.yml
+  - GitLab CI Example
+- .gitlab-ci.yml (partial)
+- Scheduled pipeline for regular maintenance
+  - Pre-commit Hooks
+- .pre-commit-config.YAML
+  - Scheduled Maintenance
+- Add to crontab for regular maintenance
+- Daily quality checks
+- Weekly comprehensive audit
+- Monthly trend analysis and reporting
+  - 📊 Quality Metrics
+    - Content Quality Audit
+    - Link & Reference Validation
+    - Style & Accessibility
+  - ⚙️ Configuration
+    - Audit Rules (`config/audit_rules.yaml`)
+    - Style Guide (`config/style_guide.yaml`)
+  - 🔧 Maintenance Scripts
+    - Comprehensive Audit (`scripts/audit.py`)
+- Full documentation quality assessment
+- Quick audit with specific checks
+- CI/CD mode with exit codes
+  - Link Validation (`scripts/validate.py`)
+- Check all external links
+- Validate internal references
+- Check image references
+  - Content Optimization (`scripts/optimize.py`)
+- Auto-fix formatting issues
+- Update table of contents
+- Optimize for readability
+  - Quality Reporting (`scripts/report.py`)
+- Generate HTML report
+- JSON data export
+- Send notifications
+  - 📈 Quality Assurance Dashboard
+    - Real-time Monitoring
+    - Integration Points
+  - 🔄 Automated Maintenance
+    - Scheduled Tasks
+- Daily quality checks
+- Weekly comprehensive audit
+- Monthly trend analysis
+  - CI/CD Integration
+- .github/workflows/docs-maintenance.yml
+  - 📋 Maintenance Procedures
+    - Weekly Maintenance
+    - Monthly Review
+    - Emergency Response
+  - 🤝 Team Integration
+    - Contributor Guidelines
+    - Collaboration Workflows
+  - 📊 Reporting and Analytics
+    - Quality Metrics Dashboard
+    - Trend Analysis
+  - 🛠️ Troubleshooting
+    - Common Issues
+- Check Python dependencies
+- Verify file permissions
+- Check configuration files
+- Update timeout in config/validation_config.YAML
+- Review style guide configuration
+- Run with verbose output
+  - 📚 API Reference
+    - Audit Script API
+    - Validation Tools
+  - 🤝 Contributing
+    - Development Guidelines
+    - Adding New Checks
+  - 🎯 Key Features & Benefits
+    - ✅ Quality Assurance
+    - ✅ Developer Experience
+    - ✅ Maintenance Automation
+    - ✅ Enterprise Ready
+  - 🏆 Success Metrics
+    - Quality Improvements Expected
+    - Performance Benchmarks
+  - 🔧 Customization & Extension
+    - Adding Custom Rules
+- Extend audit_rules.YAML with custom checks
+- Create custom validator
+  - Integrating New Tools
+- Add new validation tools to the pipeline
+  - API Integration
+- REST API for external integrations
+  - 📈 Roadmap & Future Enhancements
+    - Phase 1: Core Features ✅
+    - Phase 2: Advanced Features (Next Release)
+    - Phase 3: Enterprise Features (Future)
+  - 🤝 Contributing & Support
+    - Development Guidelines
+    - Community Support
+    - Professional Services
+  - 📄 License & Attribution
+  - 🎉 Getting Started Checklist
+    - ✅ Installation Complete
+    - ✅ Configuration Ready
+    - ✅ First Audit Run
+    - ✅ Automation Setup
+    - ✅ Team Training
 
 **Version**: 1.0.0 | **Status**: Active | **Updated**: 2025-10-10
 
