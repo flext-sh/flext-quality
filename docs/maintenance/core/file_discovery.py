@@ -176,7 +176,7 @@ class DocumentationFinder:
                 # This prevents crashes from malformed glob patterns
                 logger = logging.getLogger(__name__)
                 logger.debug(
-                    "Error during glob matching for pattern '%s': %s", pattern, e
+                    "Error during glob matching for pattern '%s': %s", pattern, e,
                 )
 
         # Remove duplicates while preserving order

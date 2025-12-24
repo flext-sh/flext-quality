@@ -16,13 +16,13 @@ import sys
 import tempfile
 from pathlib import Path
 
-from flext_core import FlextContainer, FlextLogger
 from flext_observability import (
     flext_create_log_entry,
     flext_create_metric,
     flext_create_trace,
 )
 
+from flext import FlextContainer, FlextLogger
 from flext_quality import (
     CodeAnalyzer,
     QualityAPI,

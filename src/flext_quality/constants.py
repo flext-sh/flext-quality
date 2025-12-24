@@ -11,7 +11,7 @@ import tempfile
 from enum import StrEnum
 from typing import ClassVar, Literal
 
-from flext_core import FlextConstants
+from flext import FlextConstants
 
 
 class FlextQualityConstants(FlextConstants):
@@ -303,6 +303,27 @@ class FlextQualityConstants(FlextConstants):
             PASSED = "passed"
             FAILED = "failed"
             WARNING = "warning"
+
+        class QualityGrade(StrEnum):
+            """Quality grades with comprehensive scale (A+ through F).
+
+            DRY Pattern:
+                StrEnum is the single source of truth. Use QualityGrade.A_PLUS.value
+                or QualityGrade.A_PLUS directly - no base strings needed.
+            """
+
+            A_PLUS = "A+"
+            A = "A"
+            A_MINUS = "A-"
+            B_PLUS = "B+"
+            B = "B"
+            B_MINUS = "B-"
+            C_PLUS = "C+"
+            C = "C"
+            C_MINUS = "C-"
+            D_PLUS = "D+"
+            D = "D"
+            F = "F"
 
         # Generated tuples from StrEnum members (DRY principle)
         # These replace the hardcoded tuples to avoid duplication

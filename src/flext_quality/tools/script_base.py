@@ -7,7 +7,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Self
 
-from flext_core import FlextResult, FlextService
+from flext import FlextResult, FlextService
 
 
 @dataclass(slots=True)

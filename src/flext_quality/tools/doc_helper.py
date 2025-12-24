@@ -14,7 +14,7 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-from flext_core import FlextResult
+from flext import FlextResult
 
 # Coverage grade thresholds
 COVERAGE_GRADE_A_THRESHOLD = 90

@@ -25,7 +25,6 @@ from .cli import (
     setup_logging,
 )
 from .cli_helpers import QualityHelperCommands
-from .config import FlextQualitySettings
 from .constants import FlextQualityConstants
 from .container import get_quality_container
 from .exceptions import FlextQualityExceptions
@@ -36,6 +35,7 @@ from .metrics import QualityMetrics
 from .models import FlextQualityModels
 from .reports import FlextQualityReportGenerator, ReportFormat, ReportThresholds
 from .services import FlextQualityServices
+from .settings import FlextQualitySettings
 from .web import FlextQualityWeb as FlextQualityWebInterface
 
 # Direct constant imports for convenience

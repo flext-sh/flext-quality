@@ -20,13 +20,11 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import override
 
-from flext_core import (
-    FlextDecorators,
+from flext import FlextDecorators,
     FlextLogger,
     FlextResult,
     FlextService,
-    x,
-)
+    x
 
 from .backend_type import BackendType
 from .base import FlextQualityAnalyzer
@@ -92,7 +90,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
         temp_file_result = self._create_temp_file(code)
         if temp_file_result.is_failure:
             return FlextResult.fail(
-                temp_file_result.error or "Failed to create temp file"
+                temp_file_result.error or "Failed to create temp file",
             )
 
         # Execute analysis with cleanup
@@ -171,7 +169,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
             try:
                 issues = parser(wrapper.stdout)
             except json.JSONDecodeError:
-                _logger.warning(f"Failed to parse {tool_name} JSON output")
+                _logger.warning("Failed to parse %s JSON output", tool_name)
 
         return FlextResult.ok({
             "tool": tool_name,

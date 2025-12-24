@@ -14,7 +14,7 @@ import threading
 from dataclasses import dataclass
 from pathlib import Path
 
-from flext_core import FlextResult
+from flext import FlextResult
 
 
 @dataclass(frozen=True)
@@ -58,7 +58,7 @@ class SubprocessUtils:
         _ = check  # Unused - we always use check=False internally
         if not command or any(not arg or not arg.strip() for arg in command):
             return FlextResult[CommandOutput].fail(
-                "Command must contain non-empty arguments"
+                "Command must contain non-empty arguments",
             )
 
         result_holder: list[CommandOutput | None] = [None]
@@ -97,7 +97,7 @@ class SubprocessUtils:
 
         if thread.is_alive():
             return FlextResult[CommandOutput].fail(
-                f"Command timed out after {timeout}s"
+                f"Command timed out after {timeout}s",
             )
 
         if error_holder[0]:

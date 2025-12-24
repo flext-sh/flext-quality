@@ -14,7 +14,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from flext_core import FlextResult
+from flext import FlextResult
 
 from flext_quality.subprocess_utils import SubprocessUtils
 

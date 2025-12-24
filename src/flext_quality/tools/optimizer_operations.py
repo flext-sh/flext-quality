@@ -19,9 +19,9 @@ import re
 from pathlib import Path
 
 import toml
-from flext_core import FlextLogger, FlextResult, FlextService
 from pydantic import BaseModel, ConfigDict, Field
 
+from flext import FlextLogger, FlextResult, FlextService
 from flext_quality.models import FlextQualityModels
 
 # =========================================================================

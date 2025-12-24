@@ -11,7 +11,7 @@ import warnings
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from flext_core import FlextResult
+from flext import FlextResult
 
 from .backend_type import BackendType
 

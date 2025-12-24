@@ -10,17 +10,14 @@ from __future__ import annotations
 from typing import override
 from uuid import UUID
 
-from flext_core import (
-    FlextContainer,
+from flext import FlextContainer,
     FlextDispatcher,
     FlextLogger,
     FlextRegistry,
     FlextResult,
     FlextService,
-    t,
-)
+    t
 
-from .config import FlextQualitySettings
 from .models import FlextQualityModels
 from .services import (
     AnalysisServiceBuilder,
@@ -29,6 +26,7 @@ from .services import (
     ProjectServiceBuilder,
     ReportServiceBuilder,
 )
+from .settings import FlextQualitySettings
 
 
 class FlextQuality(FlextService[bool]):
@@ -45,6 +43,11 @@ class FlextQuality(FlextService[bool]):
 
     Uses V2 builder pattern with monadic composition for all operations.
     """
+
+    # Type hints for private attributes
+    _quality_config: FlextQualitySettings
+    _quality_logger: FlextLogger
+    _quality_container: FlextContainer
 
     def __init__(self) -> None:
         """Initialize the Quality API with complete FLEXT ecosystem integration."""
@@ -63,7 +66,7 @@ class FlextQuality(FlextService[bool]):
         object.__setattr__(self, "_quality_config", FlextQualitySettings())
 
         # Domain services (V2 pattern: builders, not nested services)
-        self._services = FlextQualityServices()
+        self._services = FlextQualityServices(config=self._quality_config)
 
     @property
     def quality_config(self) -> FlextQualitySettings:

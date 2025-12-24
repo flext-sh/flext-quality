@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from typing import Self
 
-from flext_core import FlextLogger, FlextResult, FlextService
+from flext import FlextLogger, FlextResult, FlextService
 
 
 class FlextObservabilityService(FlextService[bool]):

@@ -10,8 +10,9 @@ from pathlib import Path
 from typing import override
 
 from flext_api import FlextApi, FlextApiSettings
-from flext_core import FlextLogger, FlextResult, FlextRuntime, FlextService, FlextTypes
 from pydantic import BaseModel, Field
+
+from flext import FlextLogger, FlextResult, FlextRuntime, FlextService, FlextTypes
 
 # =====================================================================
 # Configuration Models (Pydantic 2) - Data-Driven Integrations
@@ -92,7 +93,7 @@ class FlextQualityIntegrations(FlextService[bool]):
                 # Reconstruct dict with JsonValue for type safety
                 return FlextResult[dict[str, FlextTypes.JsonValue]].ok(dict(body))
             return FlextResult[dict[str, FlextTypes.JsonValue]].ok({
-                "response": str(body)
+                "response": str(body),
             })
 
         @staticmethod
@@ -117,7 +118,7 @@ class FlextQualityIntegrations(FlextService[bool]):
                 # Reconstruct dict with JsonValue for type safety
                 return FlextResult[dict[str, FlextTypes.JsonValue]].ok(dict(body))
             return FlextResult[dict[str, FlextTypes.JsonValue]].ok({
-                "response": str(body)
+                "response": str(body),
             })
 
     class _PayloadBuilders:

@@ -19,7 +19,8 @@ from typing import TypeVar
 
 import pytest
 from django.test.utils import setup_test_environment, teardown_test_environment
-from flext_core import FlextResult
+
+from flext import FlextResult
 
 T = TypeVar("T")
 

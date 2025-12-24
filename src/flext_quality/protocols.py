@@ -151,6 +151,30 @@ class FlextQualityProtocols(p_core):
                 """Manage dependencies."""
                 ...
 
+        @runtime_checkable
+        class IssueProtocol(Protocol):
+            """Protocol for code quality issues - enables type-safe access."""
+
+            @property
+            def severity(self) -> object:
+                """Issue severity level."""
+                ...
+
+            @property
+            def message(self) -> str:
+                """Issue description message."""
+                ...
+
+            @property
+            def file_path(self) -> str:
+                """File path containing the issue."""
+                ...
+
+            @property
+            def line_number(self) -> int | None:
+                """Line number of the issue (optional)."""
+                ...
+
 
 # Runtime alias for simplified usage
 p = FlextQualityProtocols

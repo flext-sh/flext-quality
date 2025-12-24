@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextContainer
+from flext import FlextContainer
 
 
 class TestDIContainer:

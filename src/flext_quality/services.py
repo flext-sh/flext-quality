@@ -54,15 +54,15 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import ClassVar, override
+from typing import ClassVar, cast, override
 from uuid import NAMESPACE_DNS, UUID, uuid5
 
-from flext_core import FlextLogger, r
+from flext import FlextLogger, r
 
 from .base_service import FlextQualityBaseService
-from .config import FlextQualitySettings
 from .constants import c
 from .models import m
+from .settings import FlextQualitySettings
 
 
 class FlextQualityServices(FlextQualityBaseService[bool]):
@@ -139,7 +139,8 @@ class ProjectServiceBuilder:
 
         """
         return (
-            self._validate_required_fields()
+            self
+            ._validate_required_fields()
             .flat_map(lambda _: self._create_project_model())
             .map(self._log_project_creation)
         )
@@ -238,7 +239,8 @@ class AnalysisServiceBuilder:
 
         """
         return (
-            self._validate_project_id()
+            self
+            ._validate_project_id()
             .flat_map(lambda _: self._validate_status())
             .flat_map(lambda _: self._create_analysis_model())
             .map(self._log_analysis_creation)
@@ -361,7 +363,8 @@ class IssueServiceBuilder:
 
         """
         return (
-            self._validate_required_fields()
+            self
+            ._validate_required_fields()
             .flat_map(lambda _: self._validate_enums())
             .flat_map(lambda _: self._create_issue_model())
             .map(self._log_issue_creation)
@@ -489,7 +492,8 @@ class ReportServiceBuilder:
 
         """
         return (
-            self._validate_analysis_id()
+            self
+            ._validate_analysis_id()
             .flat_map(lambda _: self._validate_format())
             .flat_map(lambda _: self._create_report_model())
             .map(self._log_report_creation)
@@ -521,13 +525,16 @@ class ReportServiceBuilder:
             # Validation already confirmed format_type is valid
             if not isinstance(self._format_type, str):
                 return r.fail(
-                    f"Invalid format type: expected str, got {type(self._format_type)}"
+                    f"Invalid format type: expected str, got {type(self._format_type)}",
                 )
             if self._format_type not in {"HTML", "JSON", "CSV"}:
                 return r.fail(f"Invalid format type: {self._format_type}")
             report = m.ReportModel(
                 analysis_id=analysis_uuid,
-                format_type=self._format_type,
+                format_type=cast(
+                    "c.Quality.Literals.ReportFormatLiteral",
+                    self._format_type,
+                ),
             )
             return r.ok(report)
         except (ValueError, TypeError, AssertionError) as e:

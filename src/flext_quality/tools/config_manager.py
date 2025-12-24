@@ -10,7 +10,7 @@ import json
 from pathlib import Path
 from typing import Self
 
-from flext_core import FlextLogger, FlextResult, FlextService
+from flext import FlextLogger, FlextResult, FlextService
 
 
 class ConfigurationManager(FlextService[dict[str, str]]):

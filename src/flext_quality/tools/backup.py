@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Self
 from uuid import uuid4
 
-from flext_core import FlextLogger, FlextResult, FlextService
+from flext import FlextLogger, FlextResult, FlextService
 
 
 class BackupManager(FlextService[str]):

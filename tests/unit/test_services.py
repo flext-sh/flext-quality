@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 import pytest
-from flext_core import FlextLogger
+from flext import FlextLogger
 
 # Add src to path to avoid circular flext-cli imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))

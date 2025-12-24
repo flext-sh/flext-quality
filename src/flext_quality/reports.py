@@ -7,29 +7,18 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import json
-from enum import StrEnum
 from pathlib import Path
 
-from flext_core import FlextResult
 from pydantic import BaseModel, Field
 
-from .grade_calculator import FlextQualityGradeCalculator
-from .models import FlextQualityModels
+from flext import FlextResult
+from flext_quality.constants import c
+from flext_quality.grade_calculator import FlextQualityGradeCalculator
+from flext_quality.models import FlextQualityModels
 
-IssueSeverity = FlextQualityModels.IssueSeverity
-
-
-# =====================================================================
-# Configuration Models (Pydantic 2) - SOLID Data-Driven Approach
-# =====================================================================
-
-
-class ReportFormat(StrEnum):
-    """Supported report formats - removes .get() fallback."""
-
-    TEXT = "text"
-    JSON = "json"
-    HTML = "html"
+# Aliases from constants.py (single source of truth)
+IssueSeverity = c.Quality.IssueSeverity
+ReportFormat = c.Quality.ReportFormat
 
 
 class ReportThresholds(BaseModel):

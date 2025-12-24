@@ -6,8 +6,7 @@ import tomllib
 from pathlib import Path
 from typing import Self
 
-from flext_core import FlextResult, FlextService
-
+from flext import FlextResult, FlextService
 from flext_quality.subprocess_utils import SubprocessUtils
 
 

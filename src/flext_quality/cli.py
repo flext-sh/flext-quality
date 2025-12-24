@@ -15,17 +15,14 @@ from pathlib import Path
 from typing import Self, override
 
 from flext_cli import FlextCli, FlextCliFileTools
-from flext_core import (
-    FlextLogger,
-    FlextResult,
-    FlextService,
-)
 from pydantic import BaseModel, Field
 
+from flext import FlextContainer, FlextLogger, FlextResult, FlextService
+
 from .analyzer import FlextQualityAnalyzer
-from .config import FlextQualitySettings
 from .docs_maintenance.cli import run_comprehensive
 from .reports import FlextQualityReportGenerator, ReportFormat
+from .settings import FlextQualitySettings
 from .subprocess_utils import SubprocessUtils
 from .web import FlextQualityWeb
 
@@ -191,7 +188,7 @@ class ProjectQualityAnalyzer:
         """Execute project analysis."""
         try:
             opts = options if options is not None else AnalysisOptions()
-            analyzer = FlextQualityAnalyzer(project_path)
+            analyzer = FlextQualityAnalyzer(project_path=project_path)
             result = analyzer.analyze_project(
                 include_security=opts.include_security,
                 include_complexity=opts.include_complexity,
@@ -353,6 +350,11 @@ class CliCommandRouter:
 class FlextQualityCliService(FlextService[int]):
     """Main CLI service with SOLID delegation."""
 
+    # Type hints for private attributes
+    _cli_logger: FlextLogger
+    _cli_config: CliConfig
+    _cli_container: FlextContainer
+
     def __new__(
         cls,
         _config: CliConfig | None = None,
@@ -376,7 +378,9 @@ class FlextQualityCliService(FlextService[int]):
         # Use object.__setattr__ to bypass Pydantic's custom __setattr__ for private attributes
         # Use unique names (_cli_*) to avoid overriding parent attributes
         object.__setattr__(
-            self, "_cli_config", config if config is not None else CliConfig()
+            self,
+            "_cli_config",
+            config if config is not None else CliConfig(),
         )
         object.__setattr__(self, "_cli_logger", FlextLogger(__name__))
         self._router = CliCommandRouter(self._cli_logger, self._cli_config)

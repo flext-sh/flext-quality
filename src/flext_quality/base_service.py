@@ -11,9 +11,9 @@ from __future__ import annotations
 
 from typing import TypeVar
 
-from flext_core import FlextContainer, FlextLogger, FlextService
+from flext import FlextContainer, FlextLogger, FlextService
 
-from .config import FlextQualitySettings
+from .settings import FlextQualitySettings
 
 T = TypeVar("T")
 
@@ -31,6 +31,11 @@ class FlextQualityBaseService(FlextService[T]):
     2. Use self.quality_config, self.quality_container, self.logger directly
     3. Implement execute() for FlextService contract
     """
+
+    # Type hints for private attributes
+    _quality_logger: FlextLogger
+    _quality_config: FlextQualitySettings
+    _quality_container: FlextContainer
 
     def __new__(
         cls,

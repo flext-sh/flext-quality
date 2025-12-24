@@ -23,11 +23,9 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from flext_core import (
-    FlextLogger,
+from flext import FlextLogger,
     FlextResult,
-    FlextService,
-)
+    FlextService
 from pydantic import ConfigDict
 
 from flext_quality.constants import FlextQualityConstants
@@ -215,7 +213,7 @@ class FlextQualityGitTools(FlextService[bool]):
 
             # Set up workspace
             workspace_result = cls._setup_workspace(
-                repo_path, dry_run=dry_run, temp_path=temp_path
+                repo_path, dry_run=dry_run, temp_path=temp_path,
             )
             if workspace_result.is_failure:
                 return FlextResult[FlextQualityModels.RewriteResult].fail(

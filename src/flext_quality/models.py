@@ -10,14 +10,14 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from enum import StrEnum
-from typing import Literal, Protocol, Self, TypedDict
+from typing import Literal, Self, TypedDict
 from uuid import UUID, uuid4
 
 from flext_core.utilities import u as flext_u
 from pydantic import BaseModel, Field
 
 from flext_quality.constants import c
+from flext_quality.protocols import p
 from flext_quality.typings import PositiveInt, ScoreRange, Timestamp
 
 # Type alias for rule parameter values - no Any type
@@ -69,80 +69,22 @@ class FlextQualityModels:
         last_checked: str
 
     # =====================================================================
-    # STATUS & SEVERITY ENUMERATIONS (Module-level)
+    # STATUS & SEVERITY ENUMERATIONS - Aliases from constants.py
     # =====================================================================
 
-    class AnalysisStatus(StrEnum):
-        """Analysis status values."""
-
-        QUEUED = "queued"
-        ANALYZING = "analyzing"
-        COMPLETED = "completed"
-        FAILED = "failed"
-
-    class IssueSeverity(StrEnum):
-        """Issue severity levels."""
-
-        CRITICAL = "CRITICAL"
-        HIGH = "HIGH"
-        MEDIUM = "MEDIUM"
-        LOW = "LOW"
-        INFO = "INFO"
-
-    class IssueType(StrEnum):
-        """Issue types for categorization."""
-
-        SYNTAX_ERROR = "syntax_error"
-        STYLE_VIOLATION = "style_violation"
-        SECURITY_VULNERABILITY = "security_vulnerability"
-        HIGH_COMPLEXITY = "high_complexity"
-        DUPLICATE_CODE = "duplicate_code"
-        MISSING_DOCSTRING = "missing_docstring"
-        UNUSED_CODE = "unused_code"
-        TYPE_ERROR = "type_error"
-
-    class QualityGrade(StrEnum):
-        """Quality grades with comprehensive scale (A+ through F)."""
-
-        A_PLUS = "A+"
-        A = "A"
-        A_MINUS = "A-"
-        B_PLUS = "B+"
-        B = "B"
-        B_MINUS = "B-"
-        C_PLUS = "C+"
-        C = "C"
-        C_MINUS = "C-"
-        D_PLUS = "D+"
-        D = "D"
-        F = "F"
+    AnalysisStatus = c.Quality.AnalysisStatus
+    IssueSeverity = c.Quality.IssueSeverity
+    IssueType = c.Quality.IssueType
+    QualityGrade = c.Quality.QualityGrade
 
     # =====================================================================
-    # PROTOCOLS - Structural typing for report generation (no getattr)
+    # PROTOCOLS - Moved to protocols.py
     # =====================================================================
+    # All protocol definitions are centralized in protocols.py
+    # Use p.Quality.IssueProtocol for the issue protocol
 
-    class IssueProtocol(Protocol):
-        """Protocol for code quality issues - enables type-safe access without getattr."""
-
-        @property
-        def severity(self) -> FlextQualityModels.IssueSeverity:
-            """Issue severity level."""
-            ...
-
-        @property
-        def message(self) -> str:
-            """Issue description message."""
-            ...
-
-        @property
-        def file_path(self) -> str:
-            """File path containing the issue."""
-            ...
-
-        @property
-        def line_number(self) -> int | None:
-            """Line number of the issue (optional)."""
-            ...
+    # Protocol reference from centralized protocols.py for backward compatibility
+    IssueProtocol = p.Quality.IssueProtocol
 
     # =====================================================================
     # DOMAIN MODELS - Simple, pragmatic Pydantic models
@@ -193,7 +135,7 @@ class FlextQualityModels:
         id: str = Field(description="Unique rule identifier")
         rule_id: str = Field(description="Rule code (e.g., E302, W605)")
         category: FlextQualityModels.IssueType = Field(
-            description="Type of issue the rule checks"
+            description="Type of issue the rule checks",
         )
         severity: str = Field(default="MEDIUM", description="Issue severity level")
         enabled: bool = Field(default=True, description="Whether rule is active")
@@ -246,7 +188,7 @@ class FlextQualityModels:
 
         project_path: str = Field(default="", description="Project path analyzed")
         files_analyzed: int = Field(
-            default=0, ge=0, description="Number of files analyzed"
+            default=0, ge=0, description="Number of files analyzed",
         )
         total_lines: int = Field(default=0, ge=0, description="Total lines of code")
         code_lines: int = Field(default=0, ge=0, description="Lines of actual code")
@@ -257,10 +199,10 @@ class FlextQualityModels:
         )
         blank_lines: int | None = Field(default=None, ge=0, description="Blank lines")
         overall_score: ScoreRange = Field(
-            default=0.0, description="Overall quality score"
+            default=0.0, description="Overall quality score",
         )
         coverage_score: ScoreRange = Field(
-            default=0.0, description="Test coverage score"
+            default=0.0, description="Test coverage score",
         )
         complexity_score: ScoreRange = Field(
             default=0.0,
@@ -272,7 +214,7 @@ class FlextQualityModels:
             description="Maintainability score",
         )
         duplication_score: ScoreRange = Field(
-            default=0.0, description="Duplication score"
+            default=0.0, description="Duplication score",
         )
 
     class AnalysisResults(BaseModel):
@@ -295,16 +237,16 @@ class FlextQualityModels:
 
         # Optional issue type lists for compatibility
         security_issues: list[FlextQualityModels.IssueModel] = Field(
-            default_factory=list
+            default_factory=list,
         )
         complexity_issues: list[FlextQualityModels.IssueModel] = Field(
-            default_factory=list
+            default_factory=list,
         )
         dead_code_issues: list[FlextQualityModels.IssueModel] = Field(
-            default_factory=list
+            default_factory=list,
         )
         duplication_issues: list[FlextQualityModels.IssueModel] = Field(
-            default_factory=list
+            default_factory=list,
         )
 
         # Metrics property for compatibility
@@ -386,7 +328,7 @@ class FlextQualityModels:
         name: str = Field(description="Package name")
         version: str | None = Field(default=None, description="Package version")
         requirement: str | None = Field(
-            default=None, description="Requirement specifier"
+            default=None, description="Requirement specifier",
         )
 
     class OverallMetrics(BaseModel):
@@ -480,7 +422,7 @@ class FlextQualityModels:
         checks_run: int = Field(ge=0, description="Number of checks run")
         checks_passed: int = Field(ge=0, description="Number of checks passed")
         failures: list[str] = Field(
-            default_factory=list, description="List of failures"
+            default_factory=list, description="List of failures",
         )
         message: str | None = Field(default=None, description="Optional message")
 
@@ -499,7 +441,7 @@ class FlextQualityModels:
         """Git history rewrite operation result."""
 
         commits_processed: int = Field(
-            default=0, description="Number of commits processed"
+            default=0, description="Number of commits processed",
         )
         commits_changed: int = Field(default=0, description="Number of commits changed")
         errors: list[str] = Field(default_factory=list, description="List of errors")
@@ -517,15 +459,15 @@ class FlextQualityModels:
         """Code optimization operation result."""
 
         target: FlextQualityModels.OptimizationTarget = Field(
-            description="Optimization target"
+            description="Optimization target",
         )
         changes_made: int = Field(default=0, description="Number of changes made")
         success: bool = Field(
-            default=True, description="Whether optimization succeeded"
+            default=True, description="Whether optimization succeeded",
         )
         errors: list[str] = Field(default_factory=list, description="List of errors")
         warnings: list[str] = Field(
-            default_factory=list, description="List of warnings"
+            default_factory=list, description="List of warnings",
         )
 
     class DependencyInfo(BaseModel):

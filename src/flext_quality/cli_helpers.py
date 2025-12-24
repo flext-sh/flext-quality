@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextResult
+from flext import FlextResult
 
 from .tools import (
     analyze_api_documentation,
@@ -227,7 +227,7 @@ class QualityHelperCommands:
         """Check for FLEXT import pattern violations.
 
         FLEXT requires root-level imports only:
-        ✅ from flext_core import FlextResult
+        ✅ from flext import FlextResult
         ❌ from flext_core.result import FlextResult
 
         Args:

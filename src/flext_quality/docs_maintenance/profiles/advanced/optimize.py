@@ -16,10 +16,8 @@ from pathlib import Path
 from typing import TypedDict
 
 import yaml
-from flext_core import (
-    FlextConstants,
-)
 
+from flext import FlextConstants
 from flext_quality.docs_maintenance.utils import (
     get_backups_dir,
     get_docs_dir,

@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Self
 
-from flext_core import FlextLogger, FlextResult, FlextService
+from flext import FlextLogger, FlextResult, FlextService
 
 
 class HealthCheckService(FlextService[bool]):
