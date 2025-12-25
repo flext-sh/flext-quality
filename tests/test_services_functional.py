@@ -15,7 +15,8 @@ import tempfile
 
 import pytest
 
-from flext_quality import (
+
+
     FlextAnalysisStatus,
     IssueSeverity,
     IssueType,

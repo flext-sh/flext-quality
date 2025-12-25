@@ -9,7 +9,8 @@ from __future__ import annotations
 
 import pytest
 
-from flext_quality import (
+
+
     FlextQualityServices,
     IssueSeverity,
     IssueType,
@@ -19,7 +20,8 @@ from flext_quality import (
     QualityReportService,
 )
 
-from .conftest import (
+
+
     assert_result_failure_with_error,
     assert_result_success_with_data,
 )

@@ -15,7 +15,6 @@ import json
 from pathlib import Path
 
 from flext import FlextResult
-
 from flext_quality.subprocess_utils import SubprocessUtils
 
 # Test coverage thresholds

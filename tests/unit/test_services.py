@@ -19,7 +19,8 @@ from flext import FlextLogger
 # Add src to path to avoid circular flext-cli imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
-from flext_quality.services import (
+
+
     AnalysisServiceBuilder,
     FlextQualityServices,
     IssueServiceBuilder,

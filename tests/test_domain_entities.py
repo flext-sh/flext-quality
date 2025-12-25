@@ -12,7 +12,8 @@ from datetime import datetime
 import pytest
 from pydantic import ValidationError
 
-from ..src.flext_quality import (
+
+
     AnalysisStatus,
     IssueSeverity,
     IssueType,

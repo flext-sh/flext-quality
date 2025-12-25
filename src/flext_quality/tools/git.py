@@ -23,9 +23,11 @@ import shutil
 import tempfile
 from pathlib import Path
 
-from flext_core import  FlextLogger,
+from flext_core import (
+    FlextLogger,
     FlextResult,
-    FlextService
+    FlextService,
+)
 from pydantic import ConfigDict
 
 from flext_quality.constants import FlextQualityConstants

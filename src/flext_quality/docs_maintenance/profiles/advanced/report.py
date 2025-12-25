@@ -3,7 +3,12 @@
 
 Generates complete reports, dashboards, and analytics for documentation maintenance.
 Provides visualization and tracking of quality metrics over time.
+
+Copyright (c) 2025 FLEXT Team. All rights reserved.
+SPDX-License-Identifier: MIT
 """
+
+from __future__ import annotations
 
 import argparse
 import json

@@ -17,7 +17,8 @@ from unittest.mock import patch
 
 import pytest
 
-from flext_quality import (
+
+
     IssueSeverity,
     IssueType,
     QualityAnalysisService,
@@ -25,7 +26,8 @@ from flext_quality import (
     QualityProjectService,
     QualityReportService,
 )
-from tests.conftest import (
+
+
     assert_result_failure_with_error,
 )
 

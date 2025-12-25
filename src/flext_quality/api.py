@@ -10,13 +10,15 @@ from __future__ import annotations
 from typing import override
 from uuid import UUID
 
-from flext_core import  FlextContainer,
+from flext_core import (
+    FlextContainer,
     FlextDispatcher,
     FlextLogger,
     FlextRegistry,
     FlextResult,
     FlextService,
-    t
+    FlextTypes as t,
+)
 
 from .models import FlextQualityModels
 from .services import (

@@ -11,7 +11,8 @@ from pathlib import Path
 
 import pytest
 
-from flext_quality import (
+
+
     HIGH_ISSUE_THRESHOLD,
     HTML_ISSUE_LIMIT,
     ISSUE_PREVIEW_LIMIT,

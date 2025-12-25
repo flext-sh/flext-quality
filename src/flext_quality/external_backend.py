@@ -20,11 +20,13 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import override
 
-from flext_core import  FlextDecorators,
+from flext_core import (
+    FlextDecorators as d,
     FlextLogger,
+    FlextMixins as x,
     FlextResult,
     FlextService,
-    x
+)
 
 from .backend_type import BackendType
 from .base import FlextQualityAnalyzer
@@ -71,7 +73,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
         _ = file_path  # Unused in external backend, analysis uses temp file
         return self.analyze_with_tool(_code, tool="ruff")
 
-    @FlextDecorators.log_operation("analyze_code")
+    @d.log_operation("analyze_code")
     def analyze_with_tool(
         self,
         code: str,

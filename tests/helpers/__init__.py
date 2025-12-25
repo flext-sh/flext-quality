@@ -12,10 +12,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from .constants import TestsConstants, c
-from .models import TestsModels, m
-from .protocols import TestsProtocols, p
-from .typing_helpers import (
+from .assertions import (
     assert_analysis_results_structure,
     assert_dict_structure,
     assert_is_dict,
@@ -25,6 +22,9 @@ from .typing_helpers import (
     safe_dict_access,
     safe_list_access,
 )
+from .constants import TestsConstants, c
+from .models import TestsModels, m
+from .protocols import TestsProtocols, p
 from .typings import TestsTypings, t
 
 __all__ = [

@@ -20,7 +20,8 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from flext_quality import (
+
+
     AnalysisResults,
     OverallMetrics,
     analyze_project,
