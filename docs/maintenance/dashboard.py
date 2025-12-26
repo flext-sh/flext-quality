@@ -121,10 +121,12 @@ class DocumentationDashboard:
                                 "total_issues",
                                 0,
                             ),
-                            "critical_issues": data.get("metrics", {})
+                            "critical_issues": data
+                            .get("metrics", {})
                             .get("severity_breakdown", {})
                             .get("critical", 0),
-                            "high_issues": data.get("metrics", {})
+                            "high_issues": data
+                            .get("metrics", {})
                             .get("severity_breakdown", {})
                             .get("high", 0),
                         })

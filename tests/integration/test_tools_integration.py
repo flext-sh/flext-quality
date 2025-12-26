@@ -120,27 +120,29 @@ class TestToolsIntegration:
 '''Test module for quality workflow.'''
 
 from __future__ import annotations
-from flext import FlextBus
+from flext_core import FlextBus
 
-from flext import FlextSettings
-from flext import FlextConstants
-from flext import FlextContainer
-from flext import FlextContext
-from flext import FlextDecorators
-from flext import FlextDispatcher
-from flext import FlextExceptions
-from flext import h
-from flext import FlextLogger
-from flext import x
-from flext import FlextModels
-from flext import FlextProcessors
-from flext import p
-from flext import FlextRegistry
-from flext import FlextResult
-from flext import FlextRuntime
-from flext import FlextService
-from flext import t
-from flext import u
+from flext_core import FlextSettings
+from flext_core import FlextConstants
+from flext_core import FlextContainer
+from flext_core import (
+    FlextContext,
+    FlextDecorators,
+    FlextDispatcher,
+    FlextExceptions,
+    FlextLogger,
+    FlextModels,
+    FlextProcessors,
+    FlextRegistry,
+    FlextResult,
+    FlextRuntime,
+    FlextService,
+    h,
+    p,
+    t,
+    u,
+    x,
+)
 
 
 def example_function() -> str:

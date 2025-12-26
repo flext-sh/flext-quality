@@ -215,7 +215,9 @@ class FlextQualityGitTools(FlextService[bool]):
 
             # Set up workspace
             workspace_result = cls._setup_workspace(
-                repo_path, dry_run=dry_run, temp_path=temp_path,
+                repo_path,
+                dry_run=dry_run,
+                temp_path=temp_path,
             )
             if workspace_result.is_failure:
                 return FlextResult[FlextQualityModels.RewriteResult].fail(

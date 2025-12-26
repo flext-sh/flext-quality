@@ -188,7 +188,9 @@ class FlextQualityModels:
 
         project_path: str = Field(default="", description="Project path analyzed")
         files_analyzed: int = Field(
-            default=0, ge=0, description="Number of files analyzed",
+            default=0,
+            ge=0,
+            description="Number of files analyzed",
         )
         total_lines: int = Field(default=0, ge=0, description="Total lines of code")
         code_lines: int = Field(default=0, ge=0, description="Lines of actual code")
@@ -199,10 +201,12 @@ class FlextQualityModels:
         )
         blank_lines: int | None = Field(default=None, ge=0, description="Blank lines")
         overall_score: ScoreRange = Field(
-            default=0.0, description="Overall quality score",
+            default=0.0,
+            description="Overall quality score",
         )
         coverage_score: ScoreRange = Field(
-            default=0.0, description="Test coverage score",
+            default=0.0,
+            description="Test coverage score",
         )
         complexity_score: ScoreRange = Field(
             default=0.0,
@@ -214,7 +218,8 @@ class FlextQualityModels:
             description="Maintainability score",
         )
         duplication_score: ScoreRange = Field(
-            default=0.0, description="Duplication score",
+            default=0.0,
+            description="Duplication score",
         )
 
     class AnalysisResults(BaseModel):
@@ -328,7 +333,8 @@ class FlextQualityModels:
         name: str = Field(description="Package name")
         version: str | None = Field(default=None, description="Package version")
         requirement: str | None = Field(
-            default=None, description="Requirement specifier",
+            default=None,
+            description="Requirement specifier",
         )
 
     class OverallMetrics(BaseModel):
@@ -422,7 +428,8 @@ class FlextQualityModels:
         checks_run: int = Field(ge=0, description="Number of checks run")
         checks_passed: int = Field(ge=0, description="Number of checks passed")
         failures: list[str] = Field(
-            default_factory=list, description="List of failures",
+            default_factory=list,
+            description="List of failures",
         )
         message: str | None = Field(default=None, description="Optional message")
 
@@ -441,7 +448,8 @@ class FlextQualityModels:
         """Git history rewrite operation result."""
 
         commits_processed: int = Field(
-            default=0, description="Number of commits processed",
+            default=0,
+            description="Number of commits processed",
         )
         commits_changed: int = Field(default=0, description="Number of commits changed")
         errors: list[str] = Field(default_factory=list, description="List of errors")
@@ -463,11 +471,13 @@ class FlextQualityModels:
         )
         changes_made: int = Field(default=0, description="Number of changes made")
         success: bool = Field(
-            default=True, description="Whether optimization succeeded",
+            default=True,
+            description="Whether optimization succeeded",
         )
         errors: list[str] = Field(default_factory=list, description="List of errors")
         warnings: list[str] = Field(
-            default_factory=list, description="List of warnings",
+            default_factory=list,
+            description="List of warnings",
         )
 
     class DependencyInfo(BaseModel):

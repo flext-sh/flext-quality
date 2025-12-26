@@ -80,7 +80,7 @@ class TestsFlextQualityConstants(FlextTestsConstants, FlextQualityConstants):
 
 # Short aliases per FLEXT convention
 tc = TestsFlextQualityConstants  # Primary test constants alias
-c = TestsFlextQualityConstants   # Alternative alias for compatibility
+c = TestsFlextQualityConstants  # Alternative alias for compatibility
 
 __all__ = [
     "TestsFlextQualityConstants",

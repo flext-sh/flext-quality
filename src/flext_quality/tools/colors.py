@@ -78,7 +78,7 @@ def colorize(message: str, color: str) -> str:
     """Convenience wrapper using FlextColorService."""
     service = FlextColorService()
     result = service.colorize(message, color)
-    return result.value if result.is_success else message
+    return result.map_or(message)
 
 
 def print_colored(message: str, color: str = "") -> None:

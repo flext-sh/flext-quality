@@ -248,9 +248,9 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
             tool_name="bandit",
             command=["bandit", "-f", "json", str(file_path)],
             file_path=file_path,
-            json_parser=lambda stdout: json.loads(stdout).get("results", [])
-            if stdout.strip()
-            else [],
+            json_parser=lambda stdout: (
+                json.loads(stdout).get("results", []) if stdout.strip() else []
+            ),
         )
 
     # =========================================================================
