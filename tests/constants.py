@@ -59,21 +59,25 @@ class TestsFlextQualityConstants(FlextTestsConstants, FlextQualityConstants):
         """Literal type aliases for test constants (Python 3.13 pattern)."""
 
         AnalysisStatusLiteral: TypeAlias = (
-            FlextQualityConstants.Literals.AnalysisStatusLiteral
+            FlextQualityConstants.Quality.Literals.AnalysisStatusLiteral
         )
         IssueSeverityLiteral: TypeAlias = (
-            FlextQualityConstants.Literals.IssueSeverityLiteral
+            FlextQualityConstants.Quality.Literals.IssueSeverityLiteral
         )
-        IssueTypeLiteral: TypeAlias = FlextQualityConstants.Literals.IssueTypeLiteral
+        IssueTypeLiteral: TypeAlias = (
+            FlextQualityConstants.Quality.Literals.IssueTypeLiteral
+        )
         ReportFormatLiteral: TypeAlias = (
-            FlextQualityConstants.Literals.ReportFormatLiteral
+            FlextQualityConstants.Quality.Literals.ReportFormatLiteral
         )
         BackendTypeLiteral: TypeAlias = (
-            FlextQualityConstants.Literals.BackendTypeLiteral
+            FlextQualityConstants.Quality.Literals.BackendTypeLiteral
         )
-        LanguageLiteral: TypeAlias = FlextQualityConstants.Literals.LanguageLiteral
+        LanguageLiteral: TypeAlias = (
+            FlextQualityConstants.Quality.Literals.LanguageLiteral
+        )
         CheckStatusLiteral: TypeAlias = (
-            FlextQualityConstants.Literals.CheckStatusLiteral
+            FlextQualityConstants.Quality.Literals.CheckStatusLiteral
         )
         LogLevelLiteral: TypeAlias = FlextQualityConstants.Settings.LogLevel
 

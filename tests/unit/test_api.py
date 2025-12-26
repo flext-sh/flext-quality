@@ -10,8 +10,7 @@ from __future__ import annotations
 import pytest
 from flext_core import FlextLogger
 
-
-
+from flext_quality.services import (
     AnalysisServiceBuilder,
     FlextQualityServices,
     IssueServiceBuilder,

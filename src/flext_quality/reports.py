@@ -7,6 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import json
+from enum import StrEnum
 from pathlib import Path
 
 from flext_core import FlextResult
@@ -18,7 +19,18 @@ from flext_quality.models import FlextQualityModels
 
 # Aliases from constants.py (single source of truth)
 IssueSeverity = c.Quality.IssueSeverity
-ReportFormat = c.Quality.ReportFormat
+
+
+class ReportFormat(StrEnum):
+    """Report output format options."""
+
+    TEXT = "TEXT"
+    HTML = "HTML"
+    JSON = "JSON"
+    PDF = "PDF"
+    CSV = "CSV"
+    XML = "XML"
+    MARKDOWN = "MARKDOWN"
 
 
 class ReportThresholds(BaseModel):

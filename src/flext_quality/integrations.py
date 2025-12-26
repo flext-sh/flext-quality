@@ -188,8 +188,7 @@ class FlextQualityIntegrations(FlextService[bool]):
         """Send webhook notification."""
         payload = self._PayloadBuilders.webhook_payload(event_type, event_data)
         return (
-            self._HttpOperations
-            .post(
+            self._HttpOperations.post(
                 self._api_client,
                 webhook_url,
                 json=payload,
@@ -209,8 +208,7 @@ class FlextQualityIntegrations(FlextService[bool]):
         color_map = SeverityColorMap().colors
         payload = self._PayloadBuilders.slack_payload(message, severity, color_map)
         return (
-            self._HttpOperations
-            .post(self._api_client, webhook_url, json=payload)
+            self._HttpOperations.post(self._api_client, webhook_url, json=payload)
             .map(lambda _: {"status": "sent"})
             .map_error(lambda e: self._log_error("slack", e))
         )

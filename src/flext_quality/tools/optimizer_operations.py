@@ -312,8 +312,7 @@ class ConfigUpdater:
 
         # Remove MyPy, add Pyrefly
         poetry_dev = (
-            data
-            .get("tool", {})
+            data.get("tool", {})
             .get("poetry", {})
             .get("group", {})
             .get("dev", {})
