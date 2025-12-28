@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextTypes as t
 from pydantic import BaseModel, ConfigDict, Field
 
 from .constants import c
@@ -227,7 +227,7 @@ class QualityMetrics(BaseModel):
 
     @staticmethod
     def from_analysis_results(
-        results: m.AnalysisResults | dict[str, object],
+        results: m.AnalysisResults | dict[str, t.GeneralValueType],
     ) -> QualityMetrics:
         """Create QualityMetrics from analysis results."""
         if isinstance(results, dict):
@@ -312,7 +312,9 @@ class MetricsCalculator:
     """Calculates quality metrics from analysis results."""
 
     @staticmethod
-    def calculate_from_dict(results: dict[str, object]) -> QualityMetrics:
+    def calculate_from_dict(
+        results: dict[str, t.GeneralValueType],
+    ) -> QualityMetrics:
         """Calculate metrics from legacy dict format.
 
         Validates structure with Pydantic - fail-fast on invalid data.

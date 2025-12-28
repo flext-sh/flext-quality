@@ -14,7 +14,7 @@ from __future__ import annotations
 import ast
 from pathlib import Path
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextTypes as t
 
 # Coverage grade thresholds
 COVERAGE_GRADE_A_THRESHOLD = 90
@@ -26,7 +26,7 @@ COVERAGE_RECOMMENDATION_THRESHOLD = 80
 
 def check_docstring_coverage(
     module_path: Path,
-) -> FlextResult[dict[str, object]]:
+) -> FlextResult[dict[str, t.GeneralValueType]]:
     """Check percentage of functions/classes with docstrings.
 
     Args:
@@ -84,7 +84,7 @@ def check_docstring_coverage(
 
 def validate_google_style_docstrings(
     module_path: Path,
-) -> FlextResult[dict[str, object]]:
+) -> FlextResult[dict[str, t.GeneralValueType]]:
     """Validate docstrings follow Google style format.
 
     Args:
@@ -179,7 +179,7 @@ def suggest_docstring_improvements(
 
 def analyze_api_documentation(
     module_path: Path,
-) -> FlextResult[dict[str, object]]:
+) -> FlextResult[dict[str, t.GeneralValueType]]:
     """Analyze API documentation completeness.
 
     Args:

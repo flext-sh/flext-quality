@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
+from flext_core import FlextTypes as t
 
 import tempfile
 from pathlib import Path
@@ -52,7 +53,7 @@ class DataProcessor:
       self.threshold = threshold
       self.processed_count = 0
 
-    def process_items(self, items: list[object]) -> list[object]:
+    def process_items(self, items: list[t.GeneralValueType]) -> list[t.GeneralValueType]:
       """Process list of items."""
 
       results = []
@@ -270,7 +271,7 @@ def multiply(x: int, y: int) -> int:
         ]
 
         # Cast to expected type to handle list invariance
-        file_metrics_typed: list[dict[str, object]] = file_metrics
+        file_metrics_typed: list[dict[str, t.GeneralValueType]] = file_metrics
         overall_metrics = analyzer._calculate_overall_metrics(file_metrics_typed)
 
         assert isinstance(overall_metrics, dict)

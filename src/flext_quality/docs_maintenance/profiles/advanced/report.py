@@ -14,13 +14,13 @@ import argparse
 import json
 import logging
 import shutil
-from collections.abc import Mapping
 from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TypedDict, cast
 
 import yaml
+from flext_core import FlextTypes as t
 
 from flext_quality.docs_maintenance.utils import (
     get_maintenance_dir,
@@ -91,39 +91,30 @@ class RecommendationInfo(TypedDict):
 class ReportConfig(TypedDict):
     """Configuration for report generation."""
 
-    reporting: dict[str, object]
+    reporting: dict[str, t.GeneralValueType]
 
 
-DEFAULT_AUDIT_SUMMARY = cast(
-    "AuditSummary",
-    {
-        "total_files": 0,
-        "total_words": 0,
-        "average_quality": 0.0,
-        "critical_issues": 0,
-        "files_audited": 0,
-    },
-)
+DEFAULT_AUDIT_SUMMARY: AuditSummary = {
+    "total_files": 0,
+    "total_words": 0,
+    "average_quality": 0.0,
+    "critical_issues": 0,
+    "files_audited": 0,
+}
 
-DEFAULT_VALIDATION_SUMMARY = cast(
-    "ValidationSummary",
-    {
-        "broken_links": 0,
-        "external_links": 0,
-        "internal_links": 0,
-        "files_checked": 0,
-        "total_links": 0,
-    },
-)
+DEFAULT_VALIDATION_SUMMARY: ValidationSummary = {
+    "broken_links": 0,
+    "external_links": 0,
+    "internal_links": 0,
+    "files_checked": 0,
+    "total_links": 0,
+}
 
-DEFAULT_STYLE_SUMMARY = cast(
-    "StyleSummary",
-    {
-        "total_violations": 0,
-        "average_score": 100.0,
-        "files_with_violations": 0,
-    },
-)
+DEFAULT_STYLE_SUMMARY: StyleSummary = {
+    "total_violations": 0,
+    "average_score": 100.0,
+    "files_with_violations": 0,
+}
 
 
 @dataclass
@@ -162,32 +153,23 @@ class ReportGenerator:
 
     def _load_config(self, config_path: str | None = None) -> ReportConfig:
         """Load configuration."""
-        default_config = {
-            "reporting": {
-                "output_formats": ["markdown"],
-                "include_charts": True,
-                "chart_style": "seaborn",
-                "metrics_history_days": 30,
-                "dashboard_template": "default",
-            },
-            "thresholds": {
-                "excellent_score": 90,
-                "good_score": 70,
-                "fair_score": 50,
-                "critical_issues_threshold": 10,
-            },
+        reporting_config: dict[str, t.GeneralValueType] = {
+            "output_formats": ["markdown"],
+            "include_charts": True,
+            "chart_style": "seaborn",
+            "metrics_history_days": 30,
+            "dashboard_template": "default",
         }
 
         if config_path and Path(config_path).exists():
             with Path(config_path).open(encoding="utf-8") as f:
                 user_config = yaml.safe_load(f)
-                for key, value in user_config.items():
-                    if key in default_config:
-                        default_config[key].update(value)
-                    else:
-                        default_config[key] = value
+                if isinstance(user_config, dict):
+                    reporting_data = user_config.get("reporting")
+                    if isinstance(reporting_data, dict):
+                        reporting_config.update(reporting_data)
 
-        return cast("ReportConfig", default_config)
+        return ReportConfig(reporting=reporting_config)
 
     def generate_comprehensive_report(
         self,
@@ -196,27 +178,18 @@ class ReportGenerator:
         style_file: str | None = None,
     ) -> ReportData:
         """Generate complete report from audit results."""
-        # Load data from files or run fresh audits
-        audit_data = self._load_audit_data(audit_file)
-        validation_data = self._load_validation_data(validation_file)
-        style_data = self._load_style_data(style_file)
+        # Load data from files - these methods return properly typed TypedDicts
+        audit_summary: AuditSummary = self._load_audit_data(audit_file)
+        validation_summary: ValidationSummary = self._load_validation_data(
+            validation_file,
+        )
+        style_summary: StyleSummary = self._load_style_data(style_file)
 
-        audit_summary = cast(
-            "AuditSummary",
-            self._merge_summary(audit_data, DEFAULT_AUDIT_SUMMARY),
-        )
-        validation_summary = cast(
-            "ValidationSummary",
-            self._merge_summary(validation_data, DEFAULT_VALIDATION_SUMMARY),
-        )
+        # Calculate total links (mutable TypedDict allows item assignment)
         validation_summary["total_links"] = (
             validation_summary["broken_links"]
             + validation_summary["external_links"]
             + validation_summary["internal_links"]
-        )
-        style_summary = cast(
-            "StyleSummary",
-            self._merge_summary(style_data, DEFAULT_STYLE_SUMMARY),
         )
 
         # Calculate trends
@@ -238,34 +211,11 @@ class ReportGenerator:
             recommendations=recommendations,
         )
 
-    def _merge_summary(
-        self,
-        data: Mapping[str, object],
-        defaults: Mapping[str, object],
-    ) -> dict[str, object]:
-        """Ensure summary dictionaries contain required keys."""
-        merged = dict(defaults)
-        summary_candidate: dict[str, object] | None = None
-
-        if isinstance(data, dict):
-            candidate = data.get("summary")
-            if isinstance(candidate, dict):
-                summary_candidate = candidate
-            else:
-                summary_candidate = {
-                    key: data.get(key) for key in defaults if key in data
-                }
-
-        if summary_candidate:
-            merged.update({k: v for k, v in summary_candidate.items() if v is not None})
-
-        return merged
-
     def _load_audit_data(self, audit_file: str | None) -> AuditSummary:
         """Load audit data."""
         if audit_file and Path(audit_file).exists():
             with Path(audit_file).open(encoding="utf-8") as f:
-                return json.load(f)
+                return cast("AuditSummary", json.load(f))
         # For now, return a default audit summary
         return AuditSummary(
             total_files=0,
@@ -279,7 +229,7 @@ class ReportGenerator:
         """Load validation data."""
         if validation_file and Path(validation_file).exists():
             with Path(validation_file).open(encoding="utf-8") as f:
-                return json.load(f)
+                return cast("ValidationSummary", json.load(f))
         # For now, return a default validation summary
         return ValidationSummary(
             broken_links=0,
@@ -293,7 +243,7 @@ class ReportGenerator:
         """Load style data."""
         if style_file and Path(style_file).exists():
             with Path(style_file).open(encoding="utf-8") as f:
-                return json.load(f)
+                return cast("StyleSummary", json.load(f))
         # For now, return a default style summary
         return StyleSummary(
             total_violations=0,
@@ -303,7 +253,7 @@ class ReportGenerator:
 
     def _run_quick_audit(
         self,
-    ) -> dict[str, object]:  # Keep for compatibility, will refactor later
+    ) -> dict[str, t.GeneralValueType]:  # Keep for compatibility, will refactor later
         """Run a quick audit for basic metrics."""
         # Import here to avoid circular imports
 
@@ -319,7 +269,9 @@ class ReportGenerator:
             "results": [asdict(r) for r in results[:10]],  # Limit for quick audit
         }
 
-    def _run_quick_validation(self) -> dict[str, object]:  # Keep for compatibility
+    def _run_quick_validation(
+        self,
+    ) -> dict[str, t.GeneralValueType]:  # Keep for compatibility
         """Run quick link validation."""
         validator = LinkValidator()
         results = validator.validate_directory(
@@ -330,7 +282,9 @@ class ReportGenerator:
 
         return {"summary": asdict(summary), "results": [asdict(r) for r in results[:5]]}
 
-    def _run_quick_style_check(self) -> dict[str, object]:  # Keep for compatibility
+    def _run_quick_style_check(
+        self,
+    ) -> dict[str, t.GeneralValueType]:  # Keep for compatibility
         """Run quick style validation."""
         validator = StyleValidator()
         results = validator.validate_directory(str(self.project_root / "docs"))

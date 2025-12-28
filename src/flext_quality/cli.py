@@ -244,10 +244,7 @@ class CliCommandRouter:
         analyzer_result = self.analyzer_wrapper.analyze(project_path, options)
 
         if analyzer_result.is_failure:
-            if analyzer_result.is_failure:
-                self.logger.error(analyzer_result.error or "Unknown error")
-            else:
-                self.logger.error("Unknown error in analyzer")
+            self.logger.error(analyzer_result.error or "Unknown error")
             return FlextResult[int].ok(1)
 
         analyzer = analyzer_result.value
@@ -266,10 +263,7 @@ class CliCommandRouter:
         )
 
         if output_result.is_failure:
-            if output_result.is_failure:
-                self.logger.error(output_result.error or "Unknown error")
-            else:
-                self.logger.error("Unknown error in output")
+            self.logger.error(output_result.error or "Unknown error")
             return FlextResult[int].ok(1)
 
         # Return appropriate exit code
@@ -305,10 +299,7 @@ class CliCommandRouter:
         analyzer_result = self.analyzer_wrapper.analyze(project_path, options)
 
         if analyzer_result.is_failure:
-            if analyzer_result.is_failure:
-                self.logger.error(analyzer_result.error or "Unknown error")
-            else:
-                self.logger.error("Unknown error in analyzer")
+            self.logger.error(analyzer_result.error or "Unknown error")
             return FlextResult[int].ok(1)
 
         analyzer = analyzer_result.value

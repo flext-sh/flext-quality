@@ -6,7 +6,7 @@ import tomllib
 from pathlib import Path
 from typing import Self
 
-from flext_core import FlextLogger, FlextResult, FlextService
+from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes as t
 
 
 class ConflictAnalyzer(FlextService[list[dict[str, str]]]):
@@ -66,7 +66,7 @@ class ConflictAnalyzer(FlextService[list[dict[str, str]]]):
 
     @staticmethod
     def _collect_conflicts(
-        new_deps: dict[str, object],
+        new_deps: dict[str, t.GeneralValueType],
         known: dict[str, str],
     ) -> list[dict[str, str]]:
         conflicts: list[dict[str, str]] = []

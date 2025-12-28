@@ -12,6 +12,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Protocol, runtime_checkable
 
+from flext_core import FlextTypes as t
 from flext_core.protocols import FlextProtocols as p_core
 
 
@@ -48,8 +49,8 @@ class FlextQualityProtocols(p_core):
             def analyze_project(
                 self,
                 project_path: str,
-                config: Mapping[str, object] | None = None,
-            ) -> p_core.Result[Mapping[str, object]]:
+                config: Mapping[str, t.GeneralValueType] | None = None,
+            ) -> p_core.Result[Mapping[str, t.GeneralValueType]]:
                 """Analyze a project for quality metrics."""
                 ...
 
@@ -59,7 +60,7 @@ class FlextQualityProtocols(p_core):
 
             def generate_report(
                 self,
-                analysis_results: Mapping[str, object],
+                analysis_results: Mapping[str, t.GeneralValueType],
                 format_type: str = "html",
             ) -> p_core.Result[str]:
                 """Generate a quality report from analysis results."""
@@ -71,8 +72,8 @@ class FlextQualityProtocols(p_core):
 
             def validate_thresholds(
                 self,
-                analysis_results: Mapping[str, object],
-                thresholds: Mapping[str, object],
+                analysis_results: Mapping[str, t.GeneralValueType],
+                thresholds: Mapping[str, t.GeneralValueType],
             ) -> p_core.Result[bool]:
                 """Validate analysis results against quality thresholds."""
                 ...
@@ -87,7 +88,7 @@ class FlextQualityProtocols(p_core):
                 *,
                 dry_run: bool = True,
                 temp_path: str | None = None,
-            ) -> p_core.Result[object]:
+            ) -> p_core.Result[t.GeneralValueType]:
                 """Execute git operation with dry-run support."""
                 ...
 
@@ -101,7 +102,7 @@ class FlextQualityProtocols(p_core):
                 *,
                 dry_run: bool = True,
                 temp_path: str | None = None,
-            ) -> p_core.Result[object]:
+            ) -> p_core.Result[t.GeneralValueType]:
                 """Optimize module with dry-run support."""
                 ...
 
@@ -112,8 +113,8 @@ class FlextQualityProtocols(p_core):
             def check(
                 self,
                 project_path: str,
-                config: dict[str, object] | None = None,
-            ) -> p_core.Result[object]:
+                config: dict[str, t.GeneralValueType] | None = None,
+            ) -> p_core.Result[t.GeneralValueType]:
                 """Run quality checks."""
                 ...
 
@@ -124,7 +125,7 @@ class FlextQualityProtocols(p_core):
             def validate(
                 self,
                 target_path: str,
-            ) -> p_core.Result[object]:
+            ) -> p_core.Result[t.GeneralValueType]:
                 """Validate target."""
                 ...
 
@@ -135,7 +136,7 @@ class FlextQualityProtocols(p_core):
             def analyze(
                 self,
                 project_path: str,
-            ) -> p_core.Result[object]:
+            ) -> p_core.Result[t.GeneralValueType]:
                 """Analyze architecture."""
                 ...
 
@@ -147,7 +148,7 @@ class FlextQualityProtocols(p_core):
                 self,
                 project_path: str,
                 operation: str,
-            ) -> p_core.Result[object]:
+            ) -> p_core.Result[t.GeneralValueType]:
                 """Manage dependencies."""
                 ...
 

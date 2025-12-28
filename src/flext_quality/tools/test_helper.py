@@ -14,7 +14,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextTypes as t
+
 from flext_quality.subprocess_utils import SubprocessUtils
 
 # Test coverage thresholds
@@ -87,7 +88,7 @@ def _extract_low_coverage_files(project_path: Path) -> list[str]:
         List of suggestions for files with low coverage
 
     """
-    suggestions = []
+    suggestions: list[str] = []
     coverage_file = project_path / ".coverage.json"
     if not coverage_file.exists():
         return suggestions
@@ -111,7 +112,7 @@ def _extract_low_coverage_files(project_path: Path) -> list[str]:
     return suggestions
 
 
-def check_test_quality(test_file: Path) -> FlextResult[dict[str, object]]:
+def check_test_quality(test_file: Path) -> FlextResult[dict[str, t.GeneralValueType]]:
     """Check test file quality and patterns.
 
     Args:
@@ -122,8 +123,7 @@ def check_test_quality(test_file: Path) -> FlextResult[dict[str, object]]:
 
     """
     try:
-        with Path(test_file).open(encoding="utf-8") as f:
-            content = f.read()
+        content = Path(test_file).read_text(encoding="utf-8")
 
         issues = []
 
@@ -160,7 +160,9 @@ def check_test_quality(test_file: Path) -> FlextResult[dict[str, object]]:
         return FlextResult.fail(f"Test quality check failed: {e}")
 
 
-def validate_test_execution(test_path: Path) -> FlextResult[dict[str, object]]:
+def validate_test_execution(
+    test_path: Path,
+) -> FlextResult[dict[str, t.GeneralValueType]]:
     """Validate that tests execute successfully.
 
     Args:

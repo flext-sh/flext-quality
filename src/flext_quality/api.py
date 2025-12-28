@@ -17,7 +17,6 @@ from flext_core import (
     FlextRegistry,
     FlextResult,
     FlextService,
-    FlextTypes as t,
 )
 
 from .models import FlextQualityModels
@@ -29,6 +28,7 @@ from .services import (
     ReportServiceBuilder,
 )
 from .settings import FlextQualitySettings
+from .typings import t
 
 
 class FlextQuality(FlextService[bool]):
@@ -101,7 +101,7 @@ class FlextQuality(FlextService[bool]):
     ) -> FlextResult[FlextQualityModels.ProjectModel]:
         """Create a new quality project using builder pattern."""
         # Build configuration dictionary
-        config_dict: dict[str, object] = {
+        config_dict: dict[str, t.GeneralValueType] = {
             "repository_url": repository_url,
             "config_path": config_path,
             "language": language,
@@ -138,7 +138,7 @@ class FlextQuality(FlextService[bool]):
     def update_project(
         self,
         _project_id: UUID,
-        _updates: dict[str, object],
+        _updates: dict[str, t.GeneralValueType],
     ) -> FlextResult[FlextQualityModels.ProjectModel]:
         """Update a project."""
         return FlextResult[FlextQualityModels.ProjectModel].fail(
@@ -160,7 +160,7 @@ class FlextQuality(FlextService[bool]):
     ) -> FlextResult[FlextQualityModels.AnalysisModel]:
         """Create a new quality analysis using builder pattern."""
         # Build configuration dictionary
-        config_dict: dict[str, object] = {}
+        config_dict: dict[str, t.GeneralValueType] = {}
         if analysis_config:
             config_dict.update(analysis_config)
         if _commit_hash:
@@ -303,7 +303,7 @@ class FlextQuality(FlextService[bool]):
             return FlextResult[FlextQualityModels.IssueModel].fail(error_msg)
 
         # Build configuration dictionary
-        config_dict: dict[str, object] = {
+        config_dict: dict[str, t.GeneralValueType] = {
             "rule_id": _rule_id,
             "line_number": _line_number,
             "column_number": _column_number,
@@ -390,7 +390,7 @@ class FlextQuality(FlextService[bool]):
     ) -> FlextResult[FlextQualityModels.ReportModel]:
         """Create a quality report using builder pattern."""
         # Build configuration dictionary
-        config_dict: dict[str, object] = {
+        config_dict: dict[str, t.GeneralValueType] = {
             "report_type": _report_type,
             "report_path": _report_path,
             "report_size_bytes": _report_size_bytes,

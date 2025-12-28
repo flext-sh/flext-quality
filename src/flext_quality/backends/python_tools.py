@@ -21,7 +21,7 @@ import black
 import coverage
 import pytest
 from bandit.core import config as bandit_config, manager as bandit_manager
-from flext_core import FlextLogger, FlextResult
+from flext_core import FlextLogger, FlextResult, FlextTypes as t
 from mypy import api
 from radon.complexity import cc_visit
 from vulture import Vulture
@@ -49,7 +49,10 @@ class FlextQualityPythonTools:
     # RUFF LINTER - Python's fastest linter (Rust-based)
     # =========================================================================
 
-    def run_ruff_check(self, path: Path) -> FlextResult[dict[str, object]]:
+    def run_ruff_check(
+        self,
+        path: Path,
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Run Ruff linting via u.
 
         Ruff is the fastest Python linter, written in Rust.
@@ -96,7 +99,10 @@ class FlextQualityPythonTools:
     # MYPY - Static type checker with direct API
     # =========================================================================
 
-    def run_mypy_check(self, path: Path) -> FlextResult[dict[str, object]]:
+    def run_mypy_check(
+        self,
+        path: Path,
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Run MyPy type checking via direct API.
 
         MyPy provides a Python API for programmatic type checking.
@@ -130,7 +136,10 @@ class FlextQualityPythonTools:
     # BANDIT - Security vulnerability scanner
     # =========================================================================
 
-    def run_bandit_scan(self, path: Path) -> FlextResult[dict[str, object]]:
+    def run_bandit_scan(
+        self,
+        path: Path,
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Run Bandit security scan via direct library import.
 
         Args:
@@ -159,7 +168,10 @@ class FlextQualityPythonTools:
     # PYLINT - Code analysis and style checking
     # =========================================================================
 
-    def run_pylint_check(self, path: Path) -> FlextResult[dict[str, object]]:
+    def run_pylint_check(
+        self,
+        path: Path,
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Run Pylint analysis via u.
 
         Args:
@@ -200,7 +212,10 @@ class FlextQualityPythonTools:
     # BLACK - Code formatter
     # =========================================================================
 
-    def check_black_formatting(self, path: Path) -> FlextResult[dict[str, object]]:
+    def check_black_formatting(
+        self,
+        path: Path,
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Check Black formatting via direct library import.
 
         Args:
@@ -237,7 +252,10 @@ class FlextQualityPythonTools:
     # PYTEST - Testing framework
     # =========================================================================
 
-    def run_pytest(self, path: Path) -> FlextResult[dict[str, object]]:
+    def run_pytest(
+        self,
+        path: Path,
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Run pytest via direct library import.
 
         Args:
@@ -266,7 +284,10 @@ class FlextQualityPythonTools:
     # COVERAGE - Test coverage analysis
     # =========================================================================
 
-    def run_coverage(self, path: Path) -> FlextResult[dict[str, object]]:
+    def run_coverage(
+        self,
+        path: Path,
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Run coverage analysis via direct library import.
 
         Args:
@@ -298,7 +319,10 @@ class FlextQualityPythonTools:
     # RADON - Code complexity metrics
     # =========================================================================
 
-    def calculate_complexity(self, path: Path) -> FlextResult[dict[str, object]]:
+    def calculate_complexity(
+        self,
+        path: Path,
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Calculate code complexity via Radon library.
 
         Args:
@@ -326,7 +350,10 @@ class FlextQualityPythonTools:
     # VULTURE - Dead code detection
     # =========================================================================
 
-    def detect_dead_code(self, path: Path) -> FlextResult[dict[str, object]]:
+    def detect_dead_code(
+        self,
+        path: Path,
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Detect dead code via Vulture library.
 
         Args:

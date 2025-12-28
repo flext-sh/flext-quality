@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import uuid
 
-from flext_core import r, s
+from flext_core import FlextTypes as t, r, s
 from flext_core.loggings import FlextLogger
 from pydantic import ConfigDict
 
@@ -67,7 +67,7 @@ class FlextQualityArchitectureTools(s[bool]):
             project_path: str,
             *,
             dry_run: bool = True,
-        ) -> r[dict[str, object]]:
+        ) -> r[dict[str, t.GeneralValueType]]:
             """Enforce architectural patterns.
 
             Args:
@@ -82,13 +82,13 @@ class FlextQualityArchitectureTools(s[bool]):
 
             if dry_run:
                 logger.info("DRY RUN: Would enforce patterns in %s", project_path)
-                return r[dict[str, object]].ok({
+                return r[dict[str, t.GeneralValueType]].ok({
                     "enforced": False,
                     "dry_run": True,
                 })
 
             logger.info("Enforcing patterns in %s", project_path)
-            return r[dict[str, object]].ok({"enforced": True})
+            return r[dict[str, t.GeneralValueType]].ok({"enforced": True})
 
     class ImportTester:
         """Cross-project import testing."""
@@ -96,7 +96,7 @@ class FlextQualityArchitectureTools(s[bool]):
         @staticmethod
         def test_cross_project_imports(
             workspace_path: str,
-        ) -> r[dict[str, object]]:
+        ) -> r[dict[str, t.GeneralValueType]]:
             """Test cross-project imports.
 
             Args:
@@ -109,7 +109,7 @@ class FlextQualityArchitectureTools(s[bool]):
             logger = FlextLogger(__name__)
             logger.info("Testing cross-project imports in %s", workspace_path)
 
-            return r[dict[str, object]].ok({
+            return r[dict[str, t.GeneralValueType]].ok({
                 "passed": True,
                 "errors": [],
             })

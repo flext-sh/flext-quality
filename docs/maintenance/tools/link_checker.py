@@ -19,6 +19,7 @@ from urllib.robotparser import RobotFileParser
 import aiohttp
 import requests
 import yaml
+from flext_core import FlextTypes as t
 
 
 class LinkChecker:
@@ -137,8 +138,8 @@ class LinkChecker:
     async def check_link_async(
         self,
         url: str,
-        context: dict[str, object] | None = None,
-    ) -> dict[str, object]:
+        context: dict[str, t.GeneralValueType] | None = None,
+    ) -> dict[str, t.GeneralValueType]:
         """Asynchronously check a single link."""
         start_time = time.time()
 
@@ -199,8 +200,8 @@ class LinkChecker:
     def check_link_sync(
         self,
         url: str,
-        context: dict[str, object] | None = None,
-    ) -> dict[str, object]:
+        context: dict[str, t.GeneralValueType] | None = None,
+    ) -> dict[str, t.GeneralValueType]:
         """Synchronously check a single link (fallback method)."""
         start_time = time.time()
 

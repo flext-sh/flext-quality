@@ -30,11 +30,11 @@ from pathlib import Path
 from rich.console import Console
 
 from flext_quality import (
+    AnalysisResults,
     CodeAnalyzer,
     QualityMetrics,
 )
 from flext_quality.reports import FlextQualityReportGenerator
-from flext_quality.typings import t
 
 # Initialize rich console for output
 console = Console()
@@ -69,7 +69,7 @@ def _display_project_overview(analyzed_files: list[str]) -> None:
 
 def _display_quality_metrics(
     analyzer: CodeAnalyzer,
-    results: t.AnalysisResults,
+    results: AnalysisResults,
 ) -> None:
     """Display quality metrics and scores."""
     print_section("🎯 Quality Assessment")
@@ -98,7 +98,7 @@ def _display_quality_metrics(
         pass
 
 
-def _display_issues(results: t.AnalysisResults) -> None:
+def _display_issues(results: AnalysisResults) -> None:
     """Display issues detection summary."""
     print_section("🚨 Issues Detection Summary")
 
@@ -116,7 +116,7 @@ def _display_issues(results: t.AnalysisResults) -> None:
 
 
 def _generate_reports(
-    _results: t.AnalysisResults,
+    _results: AnalysisResults,
     project_path: str,
 ) -> None:
     """Generate quality reports in different formats."""
@@ -160,7 +160,7 @@ def _generate_reports(
 
 def _show_recommendations(
     analyzer: CodeAnalyzer,
-    results: t.AnalysisResults,
+    results: AnalysisResults,
 ) -> None:
     """Show quality recommendations and final summary."""
     print_section("💡 Comprehensive Recommendations")
@@ -231,11 +231,19 @@ def analyze_project(project_path: str) -> None:
         )
 
         # Unwrap FlextResult
+        if not result.is_success:
+            console.print(f"[red]❌ Analysis failed: {result.error}[/red]")
+            return
+
         # result is now AnalysisResults directly, not FlextResult
-        results = result
+        results = result.value
 
         # Extract basic project information using modern AnalysisResults API
-        analyzed_files = [str(fm.file_path) for fm in results.file_metrics]
+        analyzed_files = getattr(results.overall_metrics, "analyzed_files", [])
+        if not analyzed_files:
+            # Fallback: try to get files_analyzed count
+            files_count = getattr(results.overall_metrics, "files_analyzed", 0)
+            analyzed_files = [f"file_{i + 1}.py" for i in range(files_count)]
 
         _display_project_overview(analyzed_files)
         _display_quality_metrics(analyzer, results)

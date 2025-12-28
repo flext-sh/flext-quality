@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import TypedDict
 
 import yaml
-from flext_core import FlextConstants
+from flext_core import FlextConstants, FlextTypes as t
 
 from flext_quality.docs_maintenance.utils import (
     get_backups_dir,
@@ -120,7 +120,7 @@ class ContentOptimizer:
     def _load_config(self, config_path: str | None = None) -> OptimizationConfig:
         """Load configuration."""
         # Use plain dict for merging, then validate structure
-        optimization_settings: dict[str, object] = {
+        optimization_settings: dict[str, t.GeneralValueType] = {
             "auto_fix": True,
             "create_backups": True,
             "max_line_length": 120,
@@ -130,7 +130,7 @@ class ContentOptimizer:
             "enhance_code_blocks": True,
             "improve_formatting": True,
         }
-        content_settings: dict[str, object] = {
+        content_settings: dict[str, t.GeneralValueType] = {
             "common_typos": {
                 "teh": "the",
                 "recieve": "receive",
@@ -157,8 +157,8 @@ class ContentOptimizer:
 
     def _build_optimization_config(
         self,
-        opt: dict[str, object],
-        content: dict[str, object],
+        opt: dict[str, t.GeneralValueType],
+        content: dict[str, t.GeneralValueType],
     ) -> OptimizationConfig:
         """Build OptimizationConfig from dictionaries."""
         common_typos = content.get("common_typos", {})
@@ -421,7 +421,7 @@ class ContentOptimizer:
     def _add_table_of_contents(
         self,
         content: str,
-    ) -> dict[str, str | bool]:
+    ) -> dict[str, t.GeneralValueType]:
         """Add table of contents to long documents."""
         lines = content.split("\n")
 
@@ -549,7 +549,7 @@ class ContentOptimizer:
         total_files = len(results)
         total_changes = sum(r.changes_made for r in results)
 
-        optimizations_by_type = {}
+        optimizations_by_type: dict[str, int] = {}
         files_modified = sum(1 for r in results if r.changes_made > 0)
         errors_encountered = sum(1 for r in results if r.issues_found)
         backup_files_created = []

@@ -13,14 +13,14 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextTypes as t
 
 from flext_quality.subprocess_utils import SubprocessUtils
 
 
 def validate_examples_directory(
     examples_dir: Path,
-) -> FlextResult[dict[str, object]]:
+) -> FlextResult[dict[str, t.GeneralValueType]]:
     """Run all example.py files in directory and validate they work.
 
     Args:
@@ -87,7 +87,7 @@ def validate_examples_directory(
 
 def check_example_structure(
     example_dir: Path,
-) -> FlextResult[dict[str, object]]:
+) -> FlextResult[dict[str, t.GeneralValueType]]:
     """Check if example directory has proper structure.
 
     Expected structure:
@@ -143,7 +143,7 @@ def check_example_structure(
 
 def validate_example_imports(
     example_file: Path,
-) -> FlextResult[dict[str, object]]:
+) -> FlextResult[dict[str, t.GeneralValueType]]:
     """Check that all imports in example file are available.
 
     Args:
@@ -195,7 +195,7 @@ def validate_example_imports(
 def run_example_safely(
     example_file: Path,
     timeout: int = 30,
-) -> FlextResult[dict[str, object]]:
+) -> FlextResult[dict[str, t.GeneralValueType]]:
     """Safely run an example file with timeout and output capture.
 
     Args:

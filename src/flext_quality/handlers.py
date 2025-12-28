@@ -158,7 +158,8 @@ class FlextQualityHandlers:
         )
 
         return (
-            self._AnalysisOrchestrator.execute_analysis(project_id, self._services)
+            self._AnalysisOrchestrator
+            .execute_analysis(project_id, self._services)
             .map_error(lambda e: self._log_error(context, e))
             .map(lambda a: self._log_success(context, a))
         )

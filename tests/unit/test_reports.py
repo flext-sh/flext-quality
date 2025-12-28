@@ -30,7 +30,7 @@ class TestQualityReport:
     @pytest.fixture
     def minimal_results(
         self,
-    ) -> object:  # Legacy dict[str, object] format for backward compatibility testing
+    ) -> object:  # Legacy dict[str, t.GeneralValueType] format for backward compatibility testing
         """Minimal analysis results for testing."""
         return {
             "issues": {},
@@ -43,7 +43,7 @@ class TestQualityReport:
     @pytest.fixture
     def good_results(
         self,
-    ) -> object:  # Legacy dict[str, object] format for backward compatibility testing
+    ) -> object:  # Legacy dict[str, t.GeneralValueType] format for backward compatibility testing
         """Analysis results with good quality scores."""
         return {
             "issues": {
@@ -73,7 +73,7 @@ class TestQualityReport:
     @pytest.fixture
     def poor_results(
         self,
-    ) -> object:  # Legacy dict[str, object] format for backward compatibility testing
+    ) -> object:  # Legacy dict[str, t.GeneralValueType] format for backward compatibility testing
         """Analysis results with poor quality scores."""
         return {
             "issues": {
@@ -132,7 +132,7 @@ class TestQualityReport:
     @pytest.fixture
     def mixed_results(
         self,
-    ) -> object:  # Legacy dict[str, object] format for backward compatibility testing
+    ) -> object:  # Legacy dict[str, t.GeneralValueType] format for backward compatibility testing
         """Analysis results with mixed quality."""
         return {
             "issues": {
@@ -342,11 +342,11 @@ class TestQualityReport:
         poor_results: object,
     ) -> None:
         """Test that text report truncates long issue lists."""
-        # Cast to mutable dict[str, object] and modify results to have many style issues
-        poor_dict: dict[str, object] = dict[str, object](poor_results)
+        # Cast to mutable dict[str, t.GeneralValueType] and modify results to have many style issues
+        poor_dict: dict[str, t.GeneralValueType] = dict[str, t.GeneralValueType](poor_results)
         issues_obj = poor_dict["issues"]
         assert isinstance(issues_obj, dict)
-        issues_dict: dict[str, object] = dict[str, object](issues_obj)
+        issues_dict: dict[str, t.GeneralValueType] = dict[str, t.GeneralValueType](issues_obj)
         issues_dict["style"] = [
             {"file": f"file{i}.py", "message": f"Issue {i}"}
             for i in range(ISSUE_PREVIEW_LIMIT + 3)
@@ -432,7 +432,7 @@ class TestQualityReport:
     def test_generate_html_report_colors(self) -> None:
         """Test HTML report includes proper grade colors."""
         # Test A grade (green)
-        good_results: dict[str, object] = {
+        good_results: dict[str, t.GeneralValueType] = {
             "issues": {},
             "metrics": {"files_analyzed": 5, "coverage_percent": 95.0},
         }
@@ -543,7 +543,7 @@ class TestQualityReport:
 
     def test_edge_case_empty_metrics(self) -> None:
         """Test handling of empty or missing metrics."""
-        empty_results: dict[str, object] = {"issues": {}}  # No metrics section
+        empty_results: dict[str, t.GeneralValueType] = {"issues": {}}  # No metrics section
 
         report = QualityReport(empty_results)
 

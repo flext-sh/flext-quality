@@ -27,6 +27,7 @@ from flext_core import (
     FlextLogger,
     FlextResult,
     FlextService,
+    FlextTypes as t,
 )
 from pydantic import ConfigDict
 
@@ -326,7 +327,7 @@ class FlextQualityGitTools(FlextService[bool]):
             repo_path: str,
             *,
             dry_run: bool = True,
-        ) -> FlextResult[dict[str, object]]:
+        ) -> FlextResult[dict[str, t.GeneralValueType]]:
             """Cleanup cruft files and directories.
 
             Args:
@@ -374,7 +375,7 @@ class FlextQualityGitTools(FlextService[bool]):
                         else 0
                     )
 
-            return FlextResult[dict[str, object]].ok({
+            return FlextResult[dict[str, t.GeneralValueType]].ok({
                 "removed_count": removed_count,
                 "errors": errors,
                 "success": len(errors) == 0,

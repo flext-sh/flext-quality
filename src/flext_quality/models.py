@@ -13,6 +13,7 @@ from datetime import UTC, datetime
 from typing import Literal, Self, TypedDict
 from uuid import UUID, uuid4
 
+from flext_core import FlextTypes as t
 from flext_core.utilities import u as flext_u
 from pydantic import BaseModel, Field
 
@@ -121,7 +122,7 @@ class FlextQualityModels:
         file_path: str = Field(description="File path")
         line_number: PositiveInt | None = None
         column_number: PositiveInt | None = None
-        issue_type: FlextQualityModels.IssueType = Field(description="Type of issue")
+        issue_type: c.Quality.IssueType = Field(description="Type of issue")
         severity: str = Field(default="MEDIUM", description="Issue severity level")
         message: str = Field(description="Issue description")
         rule_id: str | None = None
@@ -134,7 +135,7 @@ class FlextQualityModels:
 
         id: str = Field(description="Unique rule identifier")
         rule_id: str = Field(description="Rule code (e.g., E302, W605)")
-        category: FlextQualityModels.IssueType = Field(
+        category: c.Quality.IssueType = Field(
             description="Type of issue the rule checks",
         )
         severity: str = Field(default="MEDIUM", description="Issue severity level")
@@ -153,7 +154,7 @@ class FlextQualityModels:
             """Disable this rule."""
             return self.model_copy(update={"enabled": False})
 
-        def update_severity(self, severity: FlextQualityModels.IssueSeverity) -> Self:
+        def update_severity(self, severity: c.Quality.IssueSeverity) -> Self:
             """Update rule severity."""
             return self.model_copy(update={"severity": severity})
 
@@ -226,7 +227,9 @@ class FlextQualityModels:
         """Analysis results value object."""
 
         issues: list[FlextQualityModels.IssueDict] = Field(default_factory=list)
-        metrics: FlextQualityModels.AnalysisMetricsModel | dict[str, object] = Field(
+        metrics: (
+            FlextQualityModels.AnalysisMetricsModel | dict[str, t.GeneralValueType]
+        ) = Field(
             default_factory=dict,
             description="Analysis metrics - use AnalysisMetricsModel for new code",
         )
@@ -494,7 +497,9 @@ class FlextQualityModels:
         analysis_id: str = Field(description="Unique analysis ID")
         project_path: str = Field(description="Path to analyzed project")
         status: str = Field(default="pending", description="Analysis status")
-        results: dict[str, object] = Field(default_factory=dict, description="Results")
+        results: dict[str, t.GeneralValueType] = Field(
+            default_factory=dict, description="Results"
+        )
 
     class Report(BaseModel):
         """Report model for report operations."""
@@ -502,7 +507,9 @@ class FlextQualityModels:
         report_id: str = Field(description="Unique report ID")
         analysis_id: str = Field(description="Related analysis ID")
         format: str = Field(default="json", description="Report format")
-        content: dict[str, object] = Field(default_factory=dict, description="Content")
+        content: dict[str, t.GeneralValueType] = Field(
+            default_factory=dict, description="Content"
+        )
 
 
 m = FlextQualityModels

@@ -14,12 +14,12 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextTypes as t
 
 
 def check_all_flext_patterns(
     project_path: Path,
-) -> FlextResult[dict[str, object]]:
+) -> FlextResult[dict[str, t.GeneralValueType]]:
     """Run all FLEXT pattern validation checks on a project.
 
     Args:
@@ -40,7 +40,7 @@ def check_all_flext_patterns(
 
 def check_import_patterns(
     _project_path: Path,
-) -> FlextResult[dict[str, object]]:
+) -> FlextResult[dict[str, t.GeneralValueType]]:
     """Check for FLEXT import pattern violations.
 
     FLEXT requires root-level imports:
@@ -59,7 +59,7 @@ def check_import_patterns(
 
 def check_exception_patterns(
     _project_path: Path,
-) -> FlextResult[dict[str, object]]:
+) -> FlextResult[dict[str, t.GeneralValueType]]:
     """Check for exception-based error handling in business logic.
 
     FLEXT requires FlextResult[T] for business logic errors:
@@ -78,7 +78,7 @@ def check_exception_patterns(
 
 def check_module_structure(
     _project_path: Path,
-) -> FlextResult[dict[str, object]]:
+) -> FlextResult[dict[str, t.GeneralValueType]]:
     """Check for single-class-per-module FLEXT rule.
 
     FLEXT requires each module to contain one primary class:
@@ -97,7 +97,7 @@ def check_module_structure(
 
 def check_flext_result_usage(
     _project_path: Path,
-) -> FlextResult[dict[str, object]]:
+) -> FlextResult[dict[str, t.GeneralValueType]]:
     """Check FlextResult[T] usage patterns comprehensively.
 
     Validates:
@@ -117,7 +117,7 @@ def check_flext_result_usage(
 
 def audit_flext_patterns(
     _project_path: Path,
-) -> FlextResult[dict[str, object]]:
+) -> FlextResult[dict[str, t.GeneralValueType]]:
     """Run the original pattern audit (validates FlextResult return patterns).
 
     This is the foundational pattern check that validates FlextResult[T]

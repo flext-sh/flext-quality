@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import TypedDict
 
 import yaml
+from flext_core import FlextTypes as t
 from git import InvalidGitRepositoryError, Repo
 
 from flext_quality.docs_maintenance.utils import get_project_root
@@ -47,9 +48,9 @@ class GitStatusInfo(TypedDict):
 class SyncConfig(TypedDict):
     """Configuration for documentation synchronization."""
 
-    sync: dict[str, object]
-    git: dict[str, object]
-    maintenance: dict[str, object]
+    sync: dict[str, t.GeneralValueType]
+    git: dict[str, t.GeneralValueType]
+    maintenance: dict[str, t.GeneralValueType]
 
 
 # Constants for synchronization
@@ -99,7 +100,7 @@ class DocumentationSync:
     def _load_config(self, config_path: str | None = None) -> SyncConfig:
         """Load configuration."""
         # Use plain dict for construction, then cast to SyncConfig
-        config_dict: dict[str, dict[str, object]] = {
+        config_dict: dict[str, dict[str, t.GeneralValueType]] = {
             "sync": {
                 "auto_commit": False,
                 "commit_message_template": "docs: {operation} - {changes} changes",
@@ -123,7 +124,7 @@ class DocumentationSync:
 
         if config_path and Path(config_path).exists():
             with Path(config_path).open(encoding="utf-8") as f:
-                user_config: dict[str, object] = yaml.safe_load(f)
+                user_config: dict[str, t.GeneralValueType] = yaml.safe_load(f)
                 for key, value in user_config.items():
                     if key in config_dict and isinstance(value, dict):
                         # Merge nested configs

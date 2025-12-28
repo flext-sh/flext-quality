@@ -59,11 +59,21 @@ class FlextQualityTypes(FlextTypes):
     class Analysis:
         """Quality analysis complex types."""
 
-        type AnalysisConfiguration = dict[str, str | int | bool | dict[str, object]]
-        type AnalysisMetrics = dict[str, float | int | dict[str, object]]
-        type AnalysisResult = dict[str, bool | float | list[dict[str, object]]]
-        type AnalysisContext = dict[str, str | int | bool | dict[str, object]]
-        type AnalysisReport = dict[str, str | int | float | list[dict[str, object]]]
+        type AnalysisConfiguration = dict[
+            str, str | int | bool | dict[str, FlextTypes.GeneralValueType]
+        ]
+        type AnalysisMetrics = dict[
+            str, float | int | dict[str, FlextTypes.GeneralValueType]
+        ]
+        type AnalysisResult = dict[
+            str, bool | float | list[dict[str, FlextTypes.GeneralValueType]]
+        ]
+        type AnalysisContext = dict[
+            str, str | int | bool | dict[str, FlextTypes.GeneralValueType]
+        ]
+        type AnalysisReport = dict[
+            str, str | int | float | list[dict[str, FlextTypes.GeneralValueType]]
+        ]
         type AnalysisThresholds = dict[str, float | int | bool]
 
     # =========================================================================
@@ -75,10 +85,18 @@ class FlextQualityTypes(FlextTypes):
 
         type QualityScore = dict[str, float | int | dict[str, float]]
         type QualityRules = list[dict[str, str | bool | int | float]]
-        type QualityViolations = list[dict[str, str | int | dict[str, object]]]
-        type Thresholds = dict[str, float | int | bool | dict[str, object]]
-        type QualityMetrics = dict[str, float | int | bool | dict[str, object]]
-        type QualityReport = dict[str, str | float | list[dict[str, object]]]
+        type QualityViolations = list[
+            dict[str, str | int | dict[str, FlextTypes.GeneralValueType]]
+        ]
+        type Thresholds = dict[
+            str, float | int | bool | dict[str, FlextTypes.GeneralValueType]
+        ]
+        type QualityMetrics = dict[
+            str, float | int | bool | dict[str, FlextTypes.GeneralValueType]
+        ]
+        type QualityReport = dict[
+            str, str | float | list[dict[str, FlextTypes.GeneralValueType]]
+        ]
 
     # =========================================================================
     # METRICS COLLECTION TYPES - Complex metrics gathering types
@@ -87,10 +105,16 @@ class FlextQualityTypes(FlextTypes):
     class Metrics:
         """Quality metrics collection complex types."""
 
-        type MetricsConfiguration = dict[str, bool | str | int | dict[str, object]]
-        type MetricsCollection = dict[str, float | int | dict[str, object]]
+        type MetricsConfiguration = dict[
+            str, bool | str | int | dict[str, FlextTypes.GeneralValueType]
+        ]
+        type MetricsCollection = dict[
+            str, float | int | dict[str, FlextTypes.GeneralValueType]
+        ]
         type MetricsAggregation = dict[str, float | dict[str, float | int]]
-        type MetricsReport = dict[str, str | float | list[dict[str, object]]]
+        type MetricsReport = dict[
+            str, str | float | list[dict[str, FlextTypes.GeneralValueType]]
+        ]
         type MetricsTrend = list[dict[str, str | float | int]]
         type MetricsThreshold = dict[str, float | int | bool]
 
@@ -103,13 +127,23 @@ class FlextQualityTypes(FlextTypes):
 
         type ReportConfiguration = dict[
             str,
-            str | bool | list[str] | dict[str, object],
+            str | bool | list[str] | dict[str, FlextTypes.GeneralValueType],
         ]
-        type ReportData = dict[str, str | float | list[dict[str, object]]]
-        type ReportFormat = dict[str, str | bool | dict[str, object]]
-        type ReportTemplate = dict[str, str | list[str] | dict[str, object]]
-        type ReportExport = dict[str, str | bool | dict[str, object]]
-        type ReportDistribution = list[dict[str, str | dict[str, object]]]
+        type ReportData = dict[
+            str, str | float | list[dict[str, FlextTypes.GeneralValueType]]
+        ]
+        type ReportFormat = dict[
+            str, str | bool | dict[str, FlextTypes.GeneralValueType]
+        ]
+        type ReportTemplate = dict[
+            str, str | list[str] | dict[str, FlextTypes.GeneralValueType]
+        ]
+        type ReportExport = dict[
+            str, str | bool | dict[str, FlextTypes.GeneralValueType]
+        ]
+        type ReportDistribution = list[
+            dict[str, str | dict[str, FlextTypes.GeneralValueType]]
+        ]
 
     # =========================================================================
     # ISSUE TRACKING TYPES - Complex issue management types
@@ -119,11 +153,19 @@ class FlextQualityTypes(FlextTypes):
         """Quality issue tracking complex types."""
 
         type IssueDefinition = dict[str, str | int | bool | list[str]]
-        type IssueClassification = dict[str, str | int | dict[str, object]]
-        type IssueResolution = dict[str, str | bool | dict[str, object]]
-        type IssueHistory = list[dict[str, str | int | dict[str, object]]]
+        type IssueClassification = dict[
+            str, str | int | dict[str, FlextTypes.GeneralValueType]
+        ]
+        type IssueResolution = dict[
+            str, str | bool | dict[str, FlextTypes.GeneralValueType]
+        ]
+        type IssueHistory = list[
+            dict[str, str | int | dict[str, FlextTypes.GeneralValueType]]
+        ]
         type IssuePriority = dict[str, str | int | float | bool]
-        type IssueWorkflow = list[dict[str, str | dict[str, object]]]
+        type IssueWorkflow = list[
+            dict[str, str | dict[str, FlextTypes.GeneralValueType]]
+        ]
 
     # =========================================================================
     # TOOL INTEGRATION TYPES - Complex tool integration types
@@ -132,14 +174,18 @@ class FlextQualityTypes(FlextTypes):
     class ToolIntegration:
         """Quality tool integration complex types."""
 
-        type ToolConfiguration = dict[str, str | bool | dict[str, object]]
+        type ToolConfiguration = dict[
+            str, str | bool | dict[str, FlextTypes.GeneralValueType]
+        ]
         type ToolExecution = dict[str, str | int | bool | list[str]]
-        type ToolResult = dict[str, bool | str | dict[str, object]]
-        type ToolChain = list[dict[str, str | dict[str, object]]]
-        type ToolMetrics = dict[str, float | int | dict[str, object]]
+        type ToolResult = dict[str, bool | str | dict[str, FlextTypes.GeneralValueType]]
+        type ToolChain = list[dict[str, str | dict[str, FlextTypes.GeneralValueType]]]
+        type ToolMetrics = dict[
+            str, float | int | dict[str, FlextTypes.GeneralValueType]
+        ]
         type ToolIntegrationConfig = dict[
             str,
-            str | bool | list[str] | dict[str, object],
+            str | bool | list[str] | dict[str, FlextTypes.GeneralValueType],
         ]
 
     # =========================================================================
@@ -153,22 +199,28 @@ class FlextQualityTypes(FlextTypes):
         """
 
         # Configuration and analysis types
-        type ConfigDict = dict[str, object]
-        type AnalysisDict = dict[str, object]
-        type ResultDict = dict[str, object]
-        type MetricsDict = dict[str, object]
+        type ConfigDict = dict[str, FlextTypes.GeneralValueType]
+        type AnalysisDict = dict[str, FlextTypes.GeneralValueType]
+        type ResultDict = dict[str, FlextTypes.GeneralValueType]
+        type MetricsDict = dict[str, FlextTypes.GeneralValueType]
 
         # Quality assessment types
-        type QualityDict = dict[str, float | int | bool | dict[str, object]]
-        type ThresholdDict = dict[str, bool | str | dict[str, object]]
-        type ReportDict = dict[str, str | float | list[dict[str, object]]]
-        type IssueDict = dict[str, object]
+        type QualityDict = dict[
+            str, float | int | bool | dict[str, FlextTypes.GeneralValueType]
+        ]
+        type ThresholdDict = dict[
+            str, bool | str | dict[str, FlextTypes.GeneralValueType]
+        ]
+        type ReportDict = dict[
+            str, str | float | list[dict[str, FlextTypes.GeneralValueType]]
+        ]
+        type IssueDict = dict[str, FlextTypes.GeneralValueType]
 
         # Tool integration types
-        type ToolDict = dict[str, str | dict[str, object]]
-        type SettingsDict = dict[str, object]
-        type ContextDict = dict[str, object]
-        type DataDict = dict[str, object]
+        type ToolDict = dict[str, str | dict[str, FlextTypes.GeneralValueType]]
+        type SettingsDict = dict[str, FlextTypes.GeneralValueType]
+        type ContextDict = dict[str, FlextTypes.GeneralValueType]
+        type DataDict = dict[str, FlextTypes.GeneralValueType]
 
         # Collection types for quality operations
         type AnalysisList = list[AnalysisDict]
@@ -213,10 +265,10 @@ class FlextQualityTypes(FlextTypes):
         ]
 
         # Quality-specific project configurations
-        type QualityProjectConfig = dict[str, object]
+        type QualityProjectConfig = dict[str, FlextTypes.GeneralValueType]
         type AnalysisConfig = dict[str, str | int | bool | list[str]]
-        type Thresholds = dict[str, bool | str | dict[str, object]]
-        type MetricsConfig = dict[str, object]
+        type Thresholds = dict[str, bool | str | dict[str, FlextTypes.GeneralValueType]]
+        type MetricsConfig = dict[str, FlextTypes.GeneralValueType]
 
     class Quality:
         """Quality types namespace for cross-project access.

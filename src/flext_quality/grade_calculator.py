@@ -10,29 +10,29 @@ from __future__ import annotations
 import warnings
 from typing import ClassVar
 
-from .models import FlextQualityModels
+from .constants import c
 
 
 class FlextQualityGradeCalculator:
     """Centralized quality grade calculation following DRY principle."""
 
     # Grade thresholds - single source of truth
-    _GRADE_THRESHOLDS: ClassVar[list[tuple[int, FlextQualityModels.QualityGrade]]] = [
-        (95, FlextQualityModels.QualityGrade.A_PLUS),
-        (90, FlextQualityModels.QualityGrade.A),
-        (85, FlextQualityModels.QualityGrade.A_MINUS),
-        (80, FlextQualityModels.QualityGrade.B_PLUS),
-        (75, FlextQualityModels.QualityGrade.B),
-        (70, FlextQualityModels.QualityGrade.B_MINUS),
-        (65, FlextQualityModels.QualityGrade.C_PLUS),
-        (60, FlextQualityModels.QualityGrade.C),
-        (55, FlextQualityModels.QualityGrade.C_MINUS),
-        (50, FlextQualityModels.QualityGrade.D_PLUS),
-        (45, FlextQualityModels.QualityGrade.D),
+    _GRADE_THRESHOLDS: ClassVar[list[tuple[int, c.Quality.QualityGrade]]] = [
+        (95, c.Quality.QualityGrade.A_PLUS),
+        (90, c.Quality.QualityGrade.A),
+        (85, c.Quality.QualityGrade.A_MINUS),
+        (80, c.Quality.QualityGrade.B_PLUS),
+        (75, c.Quality.QualityGrade.B),
+        (70, c.Quality.QualityGrade.B_MINUS),
+        (65, c.Quality.QualityGrade.C_PLUS),
+        (60, c.Quality.QualityGrade.C),
+        (55, c.Quality.QualityGrade.C_MINUS),
+        (50, c.Quality.QualityGrade.D_PLUS),
+        (45, c.Quality.QualityGrade.D),
     ]
 
     @classmethod
-    def calculate_grade(cls, score: float) -> FlextQualityModels.QualityGrade:
+    def calculate_grade(cls, score: float) -> c.Quality.QualityGrade:
         """Calculate grade from score - DRY implementation.
 
         Args:
@@ -45,10 +45,10 @@ class FlextQualityGradeCalculator:
         for threshold, grade in cls._GRADE_THRESHOLDS:
             if score >= threshold:
                 return grade
-        return FlextQualityModels.QualityGrade.F
+        return c.Quality.QualityGrade.F
 
     @classmethod
-    def get_grade_threshold(cls, grade: FlextQualityModels.QualityGrade) -> int:
+    def get_grade_threshold(cls, grade: c.Quality.QualityGrade) -> int:
         """Get minimum threshold for a grade.
 
         Args:

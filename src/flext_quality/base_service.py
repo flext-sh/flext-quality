@@ -32,10 +32,8 @@ class FlextQualityBaseService(FlextService[T]):
     3. Implement execute() for FlextService contract
     """
 
-    # Type hints for private attributes
-    _quality_logger: FlextLogger
-    _quality_config: FlextQualitySettings
-    _quality_container: FlextContainer
+    # Private slots - initialized in __init__, not Pydantic fields
+    __slots__ = ("_quality_config", "_quality_container", "_quality_logger")
 
     def __new__(
         cls,

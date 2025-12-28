@@ -11,7 +11,7 @@ import warnings
 from abc import ABC, abstractmethod
 from pathlib import Path
 
-from flext_core import FlextResult
+from flext_core import FlextResult, FlextTypes as t
 
 from .backend_type import BackendType
 
@@ -24,7 +24,7 @@ class FlextQualityAnalyzer(ABC):
         self,
         _code: str,
         file_path: Path | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Analyze code and return results.
 
         Args:

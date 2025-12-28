@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import TypedDict
 
 import yaml
-from flext_core import FlextConstants
+from flext_core import FlextConstants, FlextTypes as t
 
 from flext_quality.docs_maintenance.utils import get_docs_dir
 
@@ -149,7 +149,7 @@ class DocumentationAuditor:
     def _load_config(self, config_path: str | None) -> AuditConfig:
         """Load configuration from YAML file."""
         # Use dict for merging operations, then cast to AuditConfig
-        default_config: dict[str, object] = {
+        default_config: dict[str, t.GeneralValueType] = {
             "audit": {
                 "include_patterns": ["*.md", "*.mdx"],
                 "exclude_patterns": ["node_modules/**", ".git/**", "**/.*"],
@@ -173,7 +173,9 @@ class DocumentationAuditor:
 
         return self._build_audit_config(default_config)
 
-    def _load_user_config(self, config_path: str | Path) -> dict[str, object] | None:
+    def _load_user_config(
+        self, config_path: str | Path
+    ) -> dict[str, t.GeneralValueType] | None:
         """Load user configuration from YAML file.
 
         Args:
@@ -189,8 +191,8 @@ class DocumentationAuditor:
 
     def _merge_configs(
         self,
-        default_config: dict[str, object],
-        user_config: dict[str, object],
+        default_config: dict[str, t.GeneralValueType],
+        user_config: dict[str, t.GeneralValueType],
     ) -> None:
         """Merge user config into default config.
 
@@ -216,7 +218,7 @@ class DocumentationAuditor:
 
     def _build_audit_config(
         self,
-        config_dict: dict[str, object],
+        config_dict: dict[str, t.GeneralValueType],
     ) -> AuditConfig:
         """Build AuditConfig from config dictionary.
 
@@ -240,22 +242,75 @@ class DocumentationAuditor:
         if not isinstance(thresholds_dict, dict):
             thresholds_dict = {}
 
+        # Extract values with proper type handling
+        include_patterns_raw = audit_dict.get("include_patterns", [])
+        exclude_patterns_raw = audit_dict.get("exclude_patterns", [])
+        include_patterns: list[str] = (
+            [str(p) for p in include_patterns_raw]
+            if isinstance(include_patterns_raw, (list, tuple))
+            else []
+        )
+        exclude_patterns: list[str] = (
+            [str(p) for p in exclude_patterns_raw]
+            if isinstance(exclude_patterns_raw, (list, tuple))
+            else []
+        )
+
+        # Extract threshold values with defaults
+        min_word_count_raw = thresholds_dict.get("min_word_count", 100)
+        max_age_days_raw = thresholds_dict.get("max_age_days", 90)
+        min_quality_score_raw = thresholds_dict.get("min_quality_score", 70)
+        min_completeness_raw = thresholds_dict.get("min_completeness_score", 60)
+
+        min_word_count = (
+            int(min_word_count_raw)
+            if isinstance(min_word_count_raw, (int, float, str))
+            else 100
+        )
+        max_age_days = (
+            int(max_age_days_raw)
+            if isinstance(max_age_days_raw, (int, float, str))
+            else 90
+        )
+        min_quality_score = (
+            int(min_quality_score_raw)
+            if isinstance(min_quality_score_raw, (int, float, str))
+            else 70
+        )
+        min_completeness = (
+            int(min_completeness_raw)
+            if isinstance(min_completeness_raw, (int, float, str))
+            else 60
+        )
+
+        # Extract content settings
+        required_sections_raw = content_dict.get("required_sections", [])
+        prohibited_patterns_raw = content_dict.get("prohibited_patterns", [])
+        required_sections: list[str] = (
+            [str(s) for s in required_sections_raw]
+            if isinstance(required_sections_raw, (list, tuple))
+            else []
+        )
+        prohibited_patterns: list[str] = (
+            [str(p) for p in prohibited_patterns_raw]
+            if isinstance(prohibited_patterns_raw, (list, tuple))
+            else []
+        )
+
         return AuditConfig(
             audit=AuditSettings(
-                include_patterns=list(audit_dict.get("include_patterns", [])),
-                exclude_patterns=list(audit_dict.get("exclude_patterns", [])),
+                include_patterns=include_patterns,
+                exclude_patterns=exclude_patterns,
                 thresholds=AuditThresholds(
-                    min_word_count=int(thresholds_dict.get("min_word_count", 100)),
-                    max_age_days=int(thresholds_dict.get("max_age_days", 90)),
-                    min_quality_score=int(thresholds_dict.get("min_quality_score", 70)),
-                    min_completeness_score=int(
-                        thresholds_dict.get("min_completeness_score", 60),
-                    ),
+                    min_word_count=min_word_count,
+                    max_age_days=max_age_days,
+                    min_quality_score=min_quality_score,
+                    min_completeness_score=min_completeness,
                 ),
             ),
             content=ContentSettings(
-                required_sections=list(content_dict.get("required_sections", [])),
-                prohibited_patterns=list(content_dict.get("prohibited_patterns", [])),
+                required_sections=required_sections,
+                prohibited_patterns=prohibited_patterns,
             ),
         )
 
@@ -299,9 +354,9 @@ class DocumentationAuditor:
 
         # Analyze content
         word_count = len(content.split())
-        issues = []
-        warnings = []
-        suggestions = []
+        issues: list[IssueInfo] = []
+        warnings: list[WarningInfo] = []
+        suggestions: list[SuggestionInfo] = []
 
         # Freshness analysis
         freshness_score = self._calculate_freshness_score(age_days)
@@ -690,7 +745,7 @@ def run_audit(
     *,
     directory: str | None = None,
     recursive: bool = True,
-) -> dict[str, object]:
+) -> dict[str, t.GeneralValueType]:
     """Programmatic helper to execute the documentation audit."""
     auditor = DocumentationAuditor(config_path)
     target_dir = Path(directory) if directory else get_docs_dir()

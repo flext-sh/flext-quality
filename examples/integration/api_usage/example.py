@@ -87,7 +87,7 @@ class DataProcessor:
           logger.warning(f"Unsupported item type: {type(item)}")
           return None
 
-    def get_stats(self) -> dict[str, object]:
+    def get_stats(self) -> dict[str, t.GeneralValueType]:
       """Get processing statistics."""
       return {
           "processed_count": self.processed_count,
@@ -284,7 +284,7 @@ logger = FlextLogger(__name__)
 class Application:
     """Main application class."""
 
-    def __init__(self, config: dict[str, object]):
+    def __init__(self, config: dict[str, t.GeneralValueType]):
       self.config = config
       self.initialized = False
 
@@ -299,7 +299,7 @@ class Application:
           logger.error(f"Initialization failed: {e}")
           return False
 
-    def process_data(self, data: list[object]) -> list[object]:
+    def process_data(self, data: list[t.GeneralValueType]) -> list[t.GeneralValueType]:
       """Process input data."""
       if not self.initialized:
           raise RuntimeError("Application not initialized")

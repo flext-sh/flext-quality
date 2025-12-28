@@ -19,7 +19,7 @@ from fastapi.responses import HTMLResponse
 
 # Domain library imports (FAIL FAST if dependencies not available)
 from flext_auth import FlextAuth
-from flext_core import FlextContainer, FlextLogger, FlextResult
+from flext_core import FlextContainer, FlextLogger, FlextResult, FlextTypes as t
 
 from .analyzer import FlextQualityAnalyzer
 from .api import FlextQuality
@@ -207,7 +207,7 @@ class FlextQualityWeb:
       </html>
       """
 
-    async def analyze_project(self, request: Request) -> dict[str, object]:
+    async def analyze_project(self, request: Request) -> dict[str, t.GeneralValueType]:
         """Analyze a project and return results (FastAPI endpoint).
 
         Requires authentication via WebAuthMiddleware.
@@ -269,7 +269,7 @@ class FlextQualityWeb:
             },
         }
 
-    def get_metrics(self) -> dict[str, object]:
+    def get_metrics(self) -> dict[str, t.GeneralValueType]:
         """Get quality metrics (FastAPI endpoint).
 
         Requires authentication via WebAuthMiddleware.
@@ -277,7 +277,7 @@ class FlextQualityWeb:
         # Use simple placeholder metrics for now
         return {"success": True, "data": {}}
 
-    def get_report(self, report_format: str) -> dict[str, object]:
+    def get_report(self, report_format: str) -> dict[str, t.GeneralValueType]:
         """Generate and return quality report (FastAPI endpoint).
 
         Args:

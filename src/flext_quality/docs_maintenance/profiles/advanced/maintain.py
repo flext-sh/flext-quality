@@ -18,6 +18,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
+from flext_core import FlextTypes as t
 
 from flext_quality.docs_maintenance.utils import get_maintenance_dir, get_project_root
 
@@ -46,7 +47,7 @@ class MaintenanceResult:
     operation: str
     success: bool
     duration: float
-    details: dict[str, object]
+    details: dict[str, t.GeneralValueType]
     timestamp: datetime
 
 
@@ -59,7 +60,7 @@ class MaintenanceReport:
     operations_run: list[MaintenanceResult]
     overall_success: bool
     total_duration: float
-    summary: dict[str, object]
+    summary: dict[str, t.GeneralValueType]
 
 
 class DocumentationMaintainer:
@@ -74,7 +75,7 @@ class DocumentationMaintainer:
         self.session_id = f"maintenance_{int(time.time())}"
         self.results: list[MaintenanceResult] = []
 
-    def _load_config(self) -> dict[str, object]:
+    def _load_config(self) -> dict[str, t.GeneralValueType]:
         """Load configuration."""
         try:
             with Path(self.config_path).open(encoding="utf-8") as f:
@@ -352,7 +353,7 @@ class DocumentationMaintainer:
                 timestamp=datetime.now(UTC),
             )
 
-    def _generate_summary(self) -> dict[str, object]:
+    def _generate_summary(self) -> dict[str, t.GeneralValueType]:
         """Generate overall maintenance summary."""
         successful_ops = sum(1 for r in self.results if r.success)
         total_ops = len(self.results)
@@ -528,7 +529,7 @@ def _print_operation_details(operations: list[MaintenanceResult]) -> None:
                     _ = details[key]  # Process detail if needed
 
 
-def _print_recommendations(summary: dict[str, object]) -> None:
+def _print_recommendations(summary: dict[str, t.GeneralValueType]) -> None:
     """Print maintenance recommendations.
 
     Args:

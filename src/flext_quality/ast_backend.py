@@ -11,7 +11,7 @@ import ast
 from pathlib import Path
 from typing import override
 
-from flext_core import FlextContainer, FlextLogger, FlextResult
+from flext_core import FlextContainer, FlextLogger, FlextResult, FlextTypes as t
 
 from .ast_class_info import FlextQualityASTClassInfo
 from .ast_function_info import FlextQualityASTFunctionInfo
@@ -50,14 +50,14 @@ class FlextQualityASTBackend(BaseAnalyzer):
             self.classes: list[FlextQualityASTClassInfo.ClassInfo] = []
             self.functions: list[FlextQualityASTFunctionInfo.FunctionInfo] = []
             self.variables: list[
-                dict[str, object]
-            ] = []  # Keeping as generic dict[str, object] with object values
+                dict[str, t.GeneralValueType]
+            ] = []  # Generic dict with GeneralValueType values
             self.imports: list[
-                dict[str, object]
-            ] = []  # Keeping as generic dict[str, object] with object values
+                dict[str, t.GeneralValueType]
+            ] = []  # Generic dict with GeneralValueType values
             self.constants: list[
-                dict[str, object]
-            ] = []  # Keeping as generic dict[str, object] with object values
+                dict[str, t.GeneralValueType]
+            ] = []  # Generic dict with GeneralValueType values
 
             # Context tracking
             self.class_stack: list[FlextQualityASTClassInfo.ClassInfo] = []
@@ -289,7 +289,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
         self,
         _code: str,
         file_path: Path | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Analyze Python code using AST.
 
         Args:
@@ -300,7 +300,7 @@ class FlextQualityASTBackend(BaseAnalyzer):
             FlextResult containing analysis results dictionary
 
         """
-        result: dict[str, object] = {}
+        result: dict[str, t.GeneralValueType] = {}
 
         if file_path:
             result["file_path"] = str(file_path)
@@ -324,12 +324,12 @@ class FlextQualityASTBackend(BaseAnalyzer):
 
         return FlextResult.ok(result)
 
-    def _extract_functions(self, tree: ast.AST) -> list[dict[str, object]]:
+    def _extract_functions(self, tree: ast.AST) -> list[dict[str, t.GeneralValueType]]:
         """Extract function information from AST."""
-        functions: list[dict[str, object]] = []
+        functions: list[dict[str, t.GeneralValueType]] = []
         for node in ast.walk(tree):
             if isinstance(node, ast.FunctionDef):
-                func_info: dict[str, object] = {
+                func_info: dict[str, t.GeneralValueType] = {
                     "name": node.name,
                     "args": len(node.args.args),
                     "lineno": node.lineno,
@@ -338,14 +338,14 @@ class FlextQualityASTBackend(BaseAnalyzer):
                 functions.append(func_info)
         return functions
 
-    def _extract_classes(self, tree: ast.AST) -> list[dict[str, object]]:
+    def _extract_classes(self, tree: ast.AST) -> list[dict[str, t.GeneralValueType]]:
         """Extract class information from AST."""
-        classes: list[dict[str, object]] = []
+        classes: list[dict[str, t.GeneralValueType]] = []
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
                 # Count methods
                 sum(1 for item in node.body if isinstance(item, ast.FunctionDef))
-                class_info: dict[str, object] = {
+                class_info: dict[str, t.GeneralValueType] = {
                     "name": node.name,
                     "methods": "methods",
                     "lineno": node.lineno,
@@ -369,9 +369,9 @@ class FlextQualityASTBackend(BaseAnalyzer):
                 complexity += 1
         return complexity
 
-    def _extract_imports(self, tree: ast.AST) -> list[dict[str, object]]:
+    def _extract_imports(self, tree: ast.AST) -> list[dict[str, t.GeneralValueType]]:
         """Extract import information."""
-        imports: list[dict[str, object]] = []
+        imports: list[dict[str, t.GeneralValueType]] = []
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
                 imports.extend(

@@ -11,7 +11,7 @@ Consolidates dependency scripts:
 
 from __future__ import annotations
 
-from flext_core import FlextLogger, FlextResult, FlextService
+from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes as t
 from pydantic import ConfigDict
 
 from flext_quality.models import FlextQualityModels
@@ -56,7 +56,7 @@ class FlextQualityDependencyTools(FlextService[bool]):
             workspace_path: str,
             *,
             dry_run: bool = True,
-        ) -> FlextResult[dict[str, object]]:
+        ) -> FlextResult[dict[str, t.GeneralValueType]]:
             """Consolidate workspace dependencies.
 
             Args:
@@ -71,13 +71,13 @@ class FlextQualityDependencyTools(FlextService[bool]):
 
             if dry_run:
                 logger.info("DRY RUN: Would consolidate deps in %s", workspace_path)
-                return FlextResult[dict[str, object]].ok({
+                return FlextResult[dict[str, t.GeneralValueType]].ok({
                     "consolidated": False,
                     "dry_run": True,
                 })
 
             logger.info("Consolidating dependencies in %s", workspace_path)
-            return FlextResult[dict[str, object]].ok({"consolidated": True})
+            return FlextResult[dict[str, t.GeneralValueType]].ok({"consolidated": True})
 
     class PoetryOperations:
         """Poetry-specific operations."""
@@ -85,7 +85,7 @@ class FlextQualityDependencyTools(FlextService[bool]):
         @staticmethod
         def sync_poetry_lock(
             project_path: str,
-        ) -> FlextResult[dict[str, object]]:
+        ) -> FlextResult[dict[str, t.GeneralValueType]]:
             """Sync poetry.lock files.
 
             Args:
@@ -99,7 +99,7 @@ class FlextQualityDependencyTools(FlextService[bool]):
             logger.info("Syncing poetry.lock for %s", project_path)
 
             # Placeholder implementation - would run poetry lock
-            return FlextResult[dict[str, object]].ok({"synced": True})
+            return FlextResult[dict[str, t.GeneralValueType]].ok({"synced": True})
 
     def __init__(self) -> None:
         """Initialize dependency tools service."""

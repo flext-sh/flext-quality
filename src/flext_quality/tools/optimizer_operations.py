@@ -18,8 +18,7 @@ import ast
 import re
 from pathlib import Path
 
-import toml
-from flext_core import FlextLogger, FlextResult, FlextService
+from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes as t
 from pydantic import BaseModel, ConfigDict, Field
 
 from flext_quality.models import FlextQualityModels
@@ -305,45 +304,63 @@ class ConfigUpdater:
     def update_pyproject(content: str) -> tuple[str, list[str]]:
         """Update pyproject.toml for Pyrefly instead of MyPy."""
         changes = []
-        try:
-            data = toml.loads(content)
-        except Exception:
-            return content, []
+        lines = content.splitlines()
+        modified_lines = []
+        in_tool_section = False
+        in_pyrefly_section = False
 
-        # Remove MyPy, add Pyrefly
-        poetry_dev = (
-            data.get("tool", {})
-            .get("poetry", {})
-            .get("group", {})
-            .get("dev", {})
-            .get("dependencies", {})
-        )
-        if poetry_dev:
-            if "mypy" in poetry_dev:
-                del poetry_dev["mypy"]
+        for line in lines:
+            # Check if we're entering a tool section
+            if line.strip().startswith("[tool"):
+                in_tool_section = True
+                if ".mypy]" in line or ".pyright]" in line:
+                    changes.append(f"Removed {line.strip()}")
+                    continue
+                if ".pyrefly]" in line:
+                    in_pyrefly_section = True
+            elif line.strip().startswith("[") and not line.strip().startswith("[tool"):
+                in_tool_section = False
+                in_pyrefly_section = False
+
+            # Skip mypy/pyright tool sections
+            if in_tool_section and (".mypy]" in line or ".pyright]" in line):
+                continue
+            if in_pyrefly_section:
+                # Keep existing pyrefly config
+                modified_lines.append(line)
+                continue
+
+            # Remove mypy from dev dependencies
+            if 'mypy = "' in line or "mypy = '" in line:
                 changes.append("Removed MyPy")
-            if "pyrefly" not in poetry_dev:
-                poetry_dev["pyrefly"] = "^0.34.0"
-                changes.append("Added Pyrefly")
+                continue
 
-        # Remove MyPy tool config
-        if "tool" in data:
-            for key in list(data["tool"].keys()):
-                if key in {"mypy", "pyright"}:
-                    del data["tool"][key]
-                    changes.append(f"Removed [tool.{key}]")
+            modified_lines.append(line)
 
-        # Add Pyrefly config
-        if "tool" not in data:
-            data["tool"] = {}
-        if "pyrefly" not in data["tool"]:
-            data["tool"]["pyrefly"] = {
-                "python_version": "3.13",
-                "show_error_codes": True,
-            }
+        # Add pyrefly if not present
+        pyrefly_config = """
+[tool.pyrefly]
+python_version = "3.13"
+show_error_codes = true
+"""
+        if "[tool.pyrefly]" not in content:
+            modified_lines.append(pyrefly_config.strip())
             changes.append("Added Pyrefly config")
 
-        return (toml.dumps(data) if changes else content), changes
+        # Add pyrefly to dev dependencies if poetry section exists
+        if (
+            "[tool.poetry.group.dev.dependencies]" in content
+            and 'pyrefly = "' not in content
+        ):
+            # Find the dev dependencies section and add pyrefly
+            for i, line in enumerate(modified_lines):
+                if line.strip() == "[tool.poetry.group.dev.dependencies]":
+                    modified_lines.insert(i + 1, 'pyrefly = "^0.34.0"')
+                    changes.append("Added Pyrefly")
+                    break
+
+        result = "\n".join(modified_lines)
+        return (result if changes else content), changes
 
     @staticmethod
     def update_makefile(content: str) -> tuple[str, list[str]]:
@@ -474,18 +491,18 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         *,
         dry_run: bool = True,
         package_name: str | None = None,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Refactor imports using ImportOptimizer."""
         path = Path(module_path)
         if not path.exists():
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[dict[str, t.GeneralValueType]].fail(
                 f"Module not found: {module_path}",
             )
 
         try:
             content = path.read_text(encoding="utf-8")
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(str(e))
+            return FlextResult[dict[str, t.GeneralValueType]].fail(str(e))
 
         changes = []
 
@@ -508,7 +525,7 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         if not dry_run and changes:
             path.write_text(content, encoding="utf-8")
 
-        return FlextResult[dict[str, object]].ok({
+        return FlextResult[dict[str, t.GeneralValueType]].ok({
             "changes": changes,
             "file": str(module_path),
         })
@@ -518,18 +535,18 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         module_path: str,
         *,
         dry_run: bool = True,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Modernize Python 3.13+ syntax."""
         path = Path(module_path)
         if not path.exists():
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[dict[str, t.GeneralValueType]].fail(
                 f"Module not found: {module_path}",
             )
 
         try:
             content = path.read_text(encoding="utf-8")
         except Exception as e:
-            return FlextResult[dict[str, object]].fail(str(e))
+            return FlextResult[dict[str, t.GeneralValueType]].fail(str(e))
 
         all_changes = []
 
@@ -542,7 +559,7 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         if not dry_run and all_changes:
             path.write_text(content, encoding="utf-8")
 
-        return FlextResult[dict[str, object]].ok({
+        return FlextResult[dict[str, t.GeneralValueType]].ok({
             "changes": all_changes,
             "file": str(module_path),
         })
@@ -552,7 +569,7 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         module_path: str,
         *,
         dry_run: bool = True,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Modernize type checking configuration."""
         path = Path(module_path)
 
@@ -563,7 +580,9 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
             pyproject_path = path
             makefile_path = path.parent / "Makefile"
         else:
-            return FlextResult[dict[str, object]].fail(f"Invalid path: {module_path}")
+            return FlextResult[dict[str, t.GeneralValueType]].fail(
+                f"Invalid path: {module_path}"
+            )
 
         all_changes = []
         files_modified = []
@@ -578,7 +597,7 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
                     pyproject_path.write_text(updated, encoding="utf-8")
                     files_modified.append(str(pyproject_path))
             except Exception as e:
-                return FlextResult[dict[str, object]].fail(str(e))
+                return FlextResult[dict[str, t.GeneralValueType]].fail(str(e))
 
         if makefile_path.exists():
             try:
@@ -590,9 +609,9 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
                     makefile_path.write_text(updated, encoding="utf-8")
                     files_modified.append(str(makefile_path))
             except Exception as e:
-                return FlextResult[dict[str, object]].fail(str(e))
+                return FlextResult[dict[str, t.GeneralValueType]].fail(str(e))
 
-        return FlextResult[dict[str, object]].ok({
+        return FlextResult[dict[str, t.GeneralValueType]].ok({
             "changes": all_changes,
             "files_modified": files_modified,
         })

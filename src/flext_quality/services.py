@@ -54,10 +54,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import ClassVar, cast, override
+from typing import ClassVar, Literal, TypeGuard, override
 from uuid import NAMESPACE_DNS, UUID, uuid5
 
-from flext_core import FlextLogger, r
+from flext_core import FlextLogger, FlextTypes as t, r
 
 from .base_service import FlextQualityBaseService
 from .constants import c
@@ -77,6 +77,20 @@ class FlextQualityServices(FlextQualityBaseService[bool]):
 
     # FlextService V2: Property pattern (auto_execute=False)
     auto_execute: ClassVar[bool] = False
+
+    def __init__(
+        self,
+        config: FlextQualitySettings | None = None,
+        **_data: object,
+    ) -> None:
+        """Initialize services.
+
+        Args:
+            config: Optional quality configuration.
+            **_data: Additional keyword arguments.
+
+        """
+        super().__init__(config=config, **_data)
 
     @override
     def execute(self, data: object = None) -> r[bool]:
@@ -112,7 +126,7 @@ class ProjectServiceBuilder:
         self._logger = logger
         self._name: str | None = None
         self._path: str | None = None
-        self._kwargs: dict[str, object] = {}
+        self._kwargs: dict[str, t.GeneralValueType] = {}
 
     def with_name(self, name: str) -> ProjectServiceBuilder:
         """Set project name (fluent)."""
@@ -124,7 +138,10 @@ class ProjectServiceBuilder:
         self._path = path
         return self
 
-    def with_config_dict(self, config_dict: dict[str, object]) -> ProjectServiceBuilder:
+    def with_config_dict(
+        self,
+        config_dict: dict[str, t.GeneralValueType],
+    ) -> ProjectServiceBuilder:
         """Set additional configuration (fluent)."""
         self._kwargs.update(config_dict)
         return self
@@ -139,7 +156,8 @@ class ProjectServiceBuilder:
 
         """
         return (
-            self._validate_required_fields()
+            self
+            ._validate_required_fields()
             .flat_map(lambda _: self._create_project_model())
             .map(self._log_project_creation)
         )
@@ -204,7 +222,7 @@ class AnalysisServiceBuilder:
         self._logger = logger
         self._project_id: str | UUID | None = None
         self._status: c.Quality.Literals.AnalysisStatusLiteral | str = "queued"
-        self._kwargs: dict[str, object] = {}
+        self._kwargs: dict[str, t.GeneralValueType] = {}
 
     def with_project_id(self, project_id: str | UUID) -> AnalysisServiceBuilder:
         """Set project ID (fluent)."""
@@ -213,10 +231,12 @@ class AnalysisServiceBuilder:
 
     def with_status(
         self,
-        status: (c.Quality.Literals.AnalysisStatusLiteral | str | m.AnalysisStatus),
+        status: (
+            c.Quality.Literals.AnalysisStatusLiteral | str | c.Quality.AnalysisStatus
+        ),
     ) -> AnalysisServiceBuilder:
         """Set analysis status (fluent)."""
-        if isinstance(status, m.AnalysisStatus):
+        if isinstance(status, c.Quality.AnalysisStatus):
             self._status = status.value
         else:
             self._status = str(status)
@@ -224,7 +244,7 @@ class AnalysisServiceBuilder:
 
     def with_config_dict(
         self,
-        config_dict: dict[str, object],
+        config_dict: dict[str, t.GeneralValueType],
     ) -> AnalysisServiceBuilder:
         """Set additional configuration (fluent)."""
         self._kwargs.update(config_dict)
@@ -238,7 +258,8 @@ class AnalysisServiceBuilder:
 
         """
         return (
-            self._validate_project_id()
+            self
+            ._validate_project_id()
             .flat_map(lambda _: self._validate_status())
             .flat_map(lambda _: self._create_analysis_model())
             .map(self._log_analysis_creation)
@@ -318,7 +339,7 @@ class IssueServiceBuilder:
         self._issue_type: str | None = None
         self._file_path: str | None = None
         self._message: str | None = None
-        self._kwargs: dict[str, object] = {}
+        self._kwargs: dict[str, t.GeneralValueType] = {}
 
     def with_analysis_id(self, analysis_id: str | UUID) -> IssueServiceBuilder:
         """Set analysis ID (fluent)."""
@@ -348,7 +369,10 @@ class IssueServiceBuilder:
         self._message = message
         return self
 
-    def with_config_dict(self, config_dict: dict[str, object]) -> IssueServiceBuilder:
+    def with_config_dict(
+        self,
+        config_dict: dict[str, t.GeneralValueType],
+    ) -> IssueServiceBuilder:
         """Set additional configuration (fluent)."""
         self._kwargs.update(config_dict)
         return self
@@ -361,7 +385,8 @@ class IssueServiceBuilder:
 
         """
         return (
-            self._validate_required_fields()
+            self
+            ._validate_required_fields()
             .flat_map(lambda _: self._validate_enums())
             .flat_map(lambda _: self._create_issue_model())
             .map(self._log_issue_creation)
@@ -441,6 +466,21 @@ class IssueServiceBuilder:
 # ============================================================================
 
 
+def _is_valid_report_format(
+    value: str,
+) -> TypeGuard[Literal["HTML", "JSON", "CSV"]]:
+    """Type guard to narrow str to valid ReportFormat literals.
+
+    Args:
+        value: String to check
+
+    Returns:
+        True if value is a valid report format literal
+
+    """
+    return value in {"HTML", "JSON", "CSV"}
+
+
 class ReportServiceBuilder:
     """Fluent builder for ReportModel with monadic validation chain.
 
@@ -461,7 +501,7 @@ class ReportServiceBuilder:
         self._logger = logger
         self._analysis_id: str | UUID | None = None
         self._format_type: c.Quality.Literals.ReportFormatLiteral | str = "HTML"
-        self._kwargs: dict[str, object] = {}
+        self._kwargs: dict[str, t.GeneralValueType] = {}
 
     def with_analysis_id(self, analysis_id: str | UUID) -> ReportServiceBuilder:
         """Set analysis ID (fluent)."""
@@ -476,7 +516,10 @@ class ReportServiceBuilder:
         self._format_type = format_type
         return self
 
-    def with_config_dict(self, config_dict: dict[str, object]) -> ReportServiceBuilder:
+    def with_config_dict(
+        self,
+        config_dict: dict[str, t.GeneralValueType],
+    ) -> ReportServiceBuilder:
         """Set additional configuration (fluent)."""
         self._kwargs.update(config_dict)
         return self
@@ -489,7 +532,8 @@ class ReportServiceBuilder:
 
         """
         return (
-            self._validate_analysis_id()
+            self
+            ._validate_analysis_id()
             .flat_map(lambda _: self._validate_format())
             .flat_map(lambda _: self._create_report_model())
             .map(self._log_report_creation)
@@ -523,14 +567,13 @@ class ReportServiceBuilder:
                 return r.fail(
                     f"Invalid format type: expected str, got {type(self._format_type)}",
                 )
-            if self._format_type not in {"HTML", "JSON", "CSV"}:
+            # Use type guard to narrow type properly
+            if not _is_valid_report_format(self._format_type):
                 return r.fail(f"Invalid format type: {self._format_type}")
+            # Type is now narrowed to Literal["HTML", "JSON", "CSV"]
             report = m.ReportModel(
                 analysis_id=analysis_uuid,
-                format_type=cast(
-                    "c.Quality.Literals.ReportFormatLiteral",
-                    self._format_type,
-                ),
+                format_type=self._format_type,
             )
             return r.ok(report)
         except (ValueError, TypeError, AssertionError) as e:

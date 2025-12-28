@@ -10,6 +10,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Protocol
 
+from flext_core import FlextTypes as t
+
 
 @dataclass
 class Issue:
@@ -150,7 +152,7 @@ class BaseValidator(ABC):
         self.name = name
         self.results: ValidationResult | None = None
 
-    def validate(self, items: list[object]) -> ValidationResult:
+    def validate(self, items: list[t.GeneralValueType]) -> ValidationResult:
         """Perform validation on given items."""
         self.results = ValidationResult()
         self.results.total_items = len(items)
@@ -160,7 +162,7 @@ class BaseValidator(ABC):
         return self.results
 
     @abstractmethod
-    def _validate_items(self, items: list[object]) -> None:
+    def _validate_items(self, items: list[t.GeneralValueType]) -> None:
         """Implementation-specific validation logic."""
 
     def get_summary(self) -> dict[str, Any]:

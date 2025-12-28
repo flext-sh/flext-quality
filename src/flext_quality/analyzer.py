@@ -76,7 +76,7 @@ class FileMetricsModel(BaseModel):
     complexity_score: float = Field(default=0.0, ge=0)
     functions_count: int = Field(default=0, ge=0)
     classes_count: int = Field(default=0, ge=0)
-    issues: list[m.CodeIssue] = Field(default_factory=list)
+    issues: list[m.IssueModel] = Field(default_factory=list)
 
 
 # Legacy TypedDict aliases for backward compatibility (remove in v1.0)
@@ -89,7 +89,7 @@ class FileMetricsDict(TypedDict, total=False):
     complexity_score: float
     functions_count: int
     classes_count: int
-    issues: list[m.CodeIssue]
+    issues: list[m.IssueModel]
 
 
 class DuplicationIssueDict(TypedDict, total=False):
@@ -387,17 +387,17 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
         def find_issues(
             file_path: Path,
             complexity_score: float,
-        ) -> list[m.CodeIssue]:
+        ) -> list[m.IssueModel]:
             """Find complexity issues."""
             if complexity_score > c.Quality.Complexity.MAX_COMPLEXITY:
                 return [
-                    m.CodeIssue(
+                    m.IssueModel(
                         id=uuid4(),  # complexity issue{file_path.name}",
                         analysis_id=uuid4(),
                         file_path=str(file_path),
                         line_number=1,
-                        issue_type=m.IssueType.HIGH_COMPLEXITY,
-                        severity=m.IssueSeverity.MEDIUM,
+                        issue_type=c.Quality.IssueType.COMPLEXITY,
+                        severity=c.Quality.IssueSeverity.MEDIUM.value,
                         message=f"High complexity: {complexity_score:.1f}",
                         rule_id="complexity_check",
                     ),
@@ -413,7 +413,7 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
         def analyze(
             tree: ast.AST,
             file_path: Path,
-        ) -> list[m.CodeIssue]:
+        ) -> list[m.IssueModel]:
             r"""Analyze security issues using Bandit backend."""
             # Reserved for future AST-based analysis
             _ = tree  # Reserved for future use
@@ -436,12 +436,12 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
                     validated = BanditIssueModel.model_validate(data)
                     # Convert validated Bandit issue to CodeIssue
                     validated_issues.append(
-                        m.CodeIssue(
+                        m.IssueModel(
                             id=uuid4(),
                             analysis_id=uuid4(),
                             file_path=str(file_path),
                             line_number=validated.line_number,
-                            issue_type=m.IssueType.SECURITY_VULNERABILITY,
+                            issue_type=c.Quality.IssueType.SECURITY,
                             severity=validated.severity,
                             message=validated.message,
                             rule_id=validated.test_id,
@@ -451,7 +451,7 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
             except Exception as e:
                 # Log the error and allow graceful degradation
                 logger = FlextLogger(__name__)
-                logger.warning("Security analysis with Bandit failed: %s", e)
+                logger.warning(f"Security analysis with Bandit failed: {e}")
                 # Return empty list - security analysis is best-effort
                 return []
 
@@ -464,7 +464,7 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
         def analyze(
             tree: ast.AST,
             file_path: Path,
-        ) -> list[m.CodeIssue]:
+        ) -> list[m.IssueModel]:
             """Analyze dead code - external backend only."""
             # AST-based analysis not implemented - use external backend
             _ = tree  # Reserved for future AST-based analysis
@@ -487,13 +487,13 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
                     validated = VultureIssueModel.model_validate(data)
                     # Convert validated Vulture issue to CodeIssue
                     validated_issues.append(
-                        m.CodeIssue(
+                        m.IssueModel(
                             id=uuid4(),
                             analysis_id=uuid4(),
                             file_path=str(file_path),
                             line_number=validated.line_number,
-                            issue_type=m.IssueType.UNUSED_CODE,
-                            severity=m.IssueSeverity.LOW,
+                            issue_type=c.Quality.IssueType.MAINTAINABILITY,
+                            severity=c.Quality.IssueSeverity.LOW.value,
                             message=f"Unused {validated.type}",
                             rule_id="dead_code",
                         ),
@@ -501,7 +501,7 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
                 return validated_issues
             except Exception as e:
                 logger = FlextLogger(__name__)
-                logger.debug("Dead code analysis with Vulture failed: %s", e)
+                logger.debug(f"Dead code analysis with Vulture failed: {e}")
                 # Return empty list - dead code analysis is best-effort
                 return []
 
@@ -568,20 +568,20 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
             """Create final analysis results."""
             try:
                 # Aggregate all issues
-                all_issues: list[m.CodeIssue] = []
+                all_issues: list[m.IssueModel] = []
                 for metrics in metrics_data.file_metrics:
                     if metrics.issues:
                         all_issues.extend(metrics.issues)
 
                 # Convert duplication issues to CodeIssue objects
                 all_issues.extend([
-                    m.CodeIssue(
+                    m.IssueModel(
                         id=UUID(str(dup.id)),
                         analysis_id=UUID(str(dup.analysis_id)),
                         file_path=dup.file_path,
                         line_number=dup.line_number,
-                        issue_type=(m.IssueType.DUPLICATE_CODE),
-                        severity=(m.IssueSeverity.MEDIUM),
+                        issue_type=c.Quality.IssueType.DUPLICATION,
+                        severity=c.Quality.IssueSeverity.MEDIUM.value,
                         message=dup.message,
                         rule_id=dup.rule_id,
                     )

@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
+from flext_core import FlextTypes as t
 
 from collections import UserDict
 from typing import Never, override
@@ -32,11 +33,11 @@ import pytest
 )
 
 
-# DRY pattern: Factory for exception-throwing dict[str, object] classes with proper generics
-def create_exception_dict(exception: Exception) -> type[dict[str, object]]:
-    """factory: Creates exception-throwing dict[str, object] classes.
+# DRY pattern: Factory for exception-throwing dict[str, t.GeneralValueType] classes with proper generics
+def create_exception_dict(exception: Exception) -> type[dict[str, t.GeneralValueType]]:
+    """factory: Creates exception-throwing dict[str, t.GeneralValueType] classes.
 
-    Single Responsibility: Creates mock dict[str, object] that raises specific exceptions
+    Single Responsibility: Creates mock dict[str, t.GeneralValueType] that raises specific exceptions
     DRY principle: Eliminates duplicated ExceptionDict classes across tests
     Open/Closed: Extensible for different exception types without modification
     """

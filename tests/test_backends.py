@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
+from flext_core import FlextTypes as t
 
 import ast
 import tempfile
@@ -50,7 +51,7 @@ class TestBaseAnalyzer:
                 self,
                 code: str,
                 file_path: Path | None = None,
-            ) -> dict[str, object]:
+            ) -> dict[str, t.GeneralValueType]:
                 """Implement abstract method."""
                 return {"analyzed": True, "code": code}
 

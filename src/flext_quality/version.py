@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import Final
 
+from flext_core import FlextTypes as t
+
 from .__version__ import __version__, __version_info__
 
 
@@ -37,7 +39,7 @@ class FlextQualityVersion:
         return self._version_info
 
     @property
-    def metadata(self) -> dict[str, object]:
+    def metadata(self) -> dict[str, t.GeneralValueType]:
         """Return project metadata."""
         return {
             "name": "flext-quality",
@@ -60,7 +62,7 @@ class FlextQualityVersion:
         return "flext-quality"
 
     @property
-    def urls(self) -> dict[str, object]:
+    def urls(self) -> dict[str, t.GeneralValueType]:
         """Return project URLs."""
         urls = self.metadata["project_urls"]
         if isinstance(urls, dict):

@@ -6,7 +6,7 @@ import tomllib
 from pathlib import Path
 from typing import Self
 
-from flext_core import FlextResult, FlextService
+from flext_core import FlextResult, FlextService, FlextTypes as t
 
 from flext_quality.subprocess_utils import SubprocessUtils
 
@@ -139,18 +139,18 @@ class PoetryValidator(FlextService[dict[str, bool]]):
     def check_dependencies(
         self,
         project_path: str | Path,
-    ) -> FlextResult[dict[str, object]]:
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Return a coarse dependency summary."""
         validation = self.validate_pyproject(project_path)
         if validation.is_failure:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[dict[str, t.GeneralValueType]].fail(
                 validation.error or "Dependency check failed",
             )
 
         project = Path(project_path).expanduser()
         pyproject = project / "pyproject.toml"
 
-        summary: dict[str, object] = {
+        summary: dict[str, t.GeneralValueType] = {
             "project_path": str(project),
             "pyproject_exists": validation.value["pyproject_exists"],
             "dependencies_valid": validation.value["dependencies_defined"],
@@ -160,13 +160,13 @@ class PoetryValidator(FlextService[dict[str, bool]]):
         }
 
         if not pyproject.exists():
-            return FlextResult[dict[str, object]].ok(summary)
+            return FlextResult[dict[str, t.GeneralValueType]].ok(summary)
 
         try:
             with pyproject.open("rb") as handle:
                 data = tomllib.load(handle)
         except (OSError, tomllib.TOMLDecodeError) as error:
-            return FlextResult[dict[str, object]].fail(
+            return FlextResult[dict[str, t.GeneralValueType]].fail(
                 f"Failed to read pyproject.toml: {error}",
             )
 
@@ -180,7 +180,7 @@ class PoetryValidator(FlextService[dict[str, bool]]):
         summary["dev_dependencies_valid"] = bool(dev_dependencies)
         summary["dev_dependency_count"] = len(dev_dependencies)
 
-        return FlextResult[dict[str, object]].ok(summary)
+        return FlextResult[dict[str, t.GeneralValueType]].ok(summary)
 
 
 __all__ = ["PoetryOperations", "PoetryValidator"]

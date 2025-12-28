@@ -25,7 +25,7 @@ from flext_quality.typings import t
 def run_cli_analysis(
     project_path: str,
     format_type: str = "json",
-) -> dict[str, object]:
+) -> dict[str, t.GeneralValueType]:
     """Run FLEXT Quality CLI analysis and return parsed results.
 
     Args:
@@ -79,7 +79,9 @@ def run_cli_analysis(
         return {"error": str(e)}
 
 
-def check_quality_thresholds(results: dict[str, object]) -> dict[str, object]:
+def check_quality_thresholds(
+    results: dict[str, t.GeneralValueType],
+) -> dict[str, t.GeneralValueType]:
     """Check analysis results against quality thresholds.
 
     Args:
@@ -101,7 +103,7 @@ def check_quality_thresholds(results: dict[str, object]) -> dict[str, object]:
     # Extract metrics for threshold checking using modern AnalysisResults API
     analysis_results = results.get("analysis_results", {})
 
-    # Handle both dict[str, object] and AnalysisResults object
+    # Handle both dict[str, t.GeneralValueType] and AnalysisResults object
     if isinstance(analysis_results, t.AnalysisResults):
         # Modern AnalysisResults format
         security_count = len(analysis_results.security_issues)
@@ -117,7 +119,7 @@ def check_quality_thresholds(results: dict[str, object]) -> dict[str, object]:
         # Get total issues
         total_issues = analysis_results.total_issues
     else:
-        # Legacy dict[str, object] format fallback
+        # Legacy dict[str, t.GeneralValueType] format fallback
         issues = (
             analysis_results.get("issues", {})
             if isinstance(analysis_results, dict)

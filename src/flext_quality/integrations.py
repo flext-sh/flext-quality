@@ -6,11 +6,18 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import override
+from typing import TypeAlias, override
 
 from flext_api import FlextApi, FlextApiSettings
 from flext_core import FlextLogger, FlextResult, FlextRuntime, FlextService, FlextTypes
+
+# Type alias for JSON-compatible values (use TypeAlias for better pyright compat)
+JsonCompatValue: TypeAlias = (
+    str | int | float | bool | Sequence[object] | Mapping[str, object] | None
+)
+JsonCompatDict: TypeAlias = dict[str, JsonCompatValue]
 from pydantic import BaseModel, Field
 
 # =====================================================================
@@ -73,16 +80,16 @@ class FlextQualityIntegrations(FlextService[bool]):
         def post(
             client: FlextApi,
             url: str,
-            json: dict[str, FlextTypes.JsonValue] | None = None,
+            json: JsonCompatDict | None = None,
             files: dict[str, tuple[str, bytes]] | None = None,
             headers: dict[str, str] | None = None,
-        ) -> FlextResult[dict[str, FlextTypes.JsonValue]]:
+        ) -> FlextResult[JsonCompatDict]:
             """Execute POST request and return result."""
             # Note: files not directly supported by FlextApi, would need multipart encoding
             _ = files  # Acknowledge unused parameter
             result = client.post(url=url, data=json, headers=headers)
             if result.is_failure:
-                return FlextResult[dict[str, FlextTypes.JsonValue]].fail(
+                return FlextResult[JsonCompatDict].fail(
                     f"HTTP POST failed: {result.error}",
                 )
             # Extract body from HttpResponse
@@ -90,8 +97,8 @@ class FlextQualityIntegrations(FlextService[bool]):
             body = response.body
             if isinstance(body, dict):
                 # Reconstruct dict with JsonValue for type safety
-                return FlextResult[dict[str, FlextTypes.JsonValue]].ok(dict(body))
-            return FlextResult[dict[str, FlextTypes.JsonValue]].ok({
+                return FlextResult[JsonCompatDict].ok(dict(body))
+            return FlextResult[JsonCompatDict].ok({
                 "response": str(body),
             })
 
@@ -101,13 +108,13 @@ class FlextQualityIntegrations(FlextService[bool]):
             url: str,
             params: dict[str, str] | None = None,
             headers: dict[str, str] | None = None,
-        ) -> FlextResult[dict[str, FlextTypes.JsonValue]]:
+        ) -> FlextResult[JsonCompatDict]:
             """Execute GET request and return result."""
             # FlextApi.get uses request_kwargs for params
             request_kwargs = {"params": params} if params else None
             result = client.get(url=url, headers=headers, request_kwargs=request_kwargs)
             if result.is_failure:
-                return FlextResult[dict[str, FlextTypes.JsonValue]].fail(
+                return FlextResult[JsonCompatDict].fail(
                     f"HTTP GET failed: {result.error}",
                 )
             # Extract body from HttpResponse
@@ -115,8 +122,8 @@ class FlextQualityIntegrations(FlextService[bool]):
             body = response.body
             if isinstance(body, dict):
                 # Reconstruct dict with JsonValue for type safety
-                return FlextResult[dict[str, FlextTypes.JsonValue]].ok(dict(body))
-            return FlextResult[dict[str, FlextTypes.JsonValue]].ok({
+                return FlextResult[JsonCompatDict].ok(dict(body))
+            return FlextResult[JsonCompatDict].ok({
                 "response": str(body),
             })
 
@@ -188,7 +195,8 @@ class FlextQualityIntegrations(FlextService[bool]):
         """Send webhook notification."""
         payload = self._PayloadBuilders.webhook_payload(event_type, event_data)
         return (
-            self._HttpOperations.post(
+            self._HttpOperations
+            .post(
                 self._api_client,
                 webhook_url,
                 json=payload,
@@ -208,7 +216,8 @@ class FlextQualityIntegrations(FlextService[bool]):
         color_map = SeverityColorMap().colors
         payload = self._PayloadBuilders.slack_payload(message, severity, color_map)
         return (
-            self._HttpOperations.post(self._api_client, webhook_url, json=payload)
+            self._HttpOperations
+            .post(self._api_client, webhook_url, json=payload)
             .map(lambda _: {"status": "sent"})
             .map_error(lambda e: self._log_error("slack", e))
         )

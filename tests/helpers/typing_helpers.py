@@ -11,11 +11,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TypeGuard, cast
+from typing import TypeGuard
+
+from flext_core import FlextTypes as t
 
 
-def assert_is_dict(value: object) -> TypeGuard[dict[str, object]]:
-    """Type-safe dict[str, object] assertion following Single Responsibility Principle.
+def assert_is_dict(value: object) -> TypeGuard[dict[str, t.GeneralValueType]]:
+    """Type-safe dict[str, t.GeneralValueType] assertion following Single Responsibility Principle.
 
     Args:
       value: Object to check
@@ -31,7 +33,7 @@ def assert_is_dict(value: object) -> TypeGuard[dict[str, object]]:
     return True
 
 
-def assert_is_list(value: object) -> TypeGuard[list[object]]:
+def assert_is_list(value: object) -> TypeGuard[list[t.GeneralValueType]]:
     """Type-safe list assertion following Single Responsibility Principle.
 
     Args:
@@ -48,7 +50,7 @@ def assert_is_list(value: object) -> TypeGuard[list[object]]:
     return True
 
 
-def safe_dict_access(data: dict[str, object], key: str) -> object:
+def safe_dict_access(data: dict[str, t.GeneralValueType], key: str) -> object:
     """Type-safe dictionary access with proper error handling.
 
     Args:
@@ -59,14 +61,14 @@ def safe_dict_access(data: dict[str, object], key: str) -> object:
       Value from dict
 
     Raises:
-      AssertionError: If data is not a dict[str, object] or key missing
+      AssertionError: If data is not a dict[str, t.GeneralValueType] or key missing
 
     """
     assert key in data, f"Key '{key}' not found in dict"
     return data[key]
 
 
-def safe_list_access(data: list[object], index: int) -> object:
+def safe_list_access(data: list[t.GeneralValueType], index: int) -> object:
     """Type-safe list access with proper error handling.
 
     Args:
@@ -88,10 +90,10 @@ def safe_list_access(data: list[object], index: int) -> object:
 
 
 def assert_dict_structure(
-    data: dict[str, object],
+    data: dict[str, t.GeneralValueType],
     required_keys: list[str],
-) -> dict[str, object]:
-    """Assert that object is dict[str, object] with required keys - DRY pattern.
+) -> dict[str, t.GeneralValueType]:
+    """Assert that object is dict[str, t.GeneralValueType] with required keys - DRY pattern.
 
     Args:
       data: Object to check
@@ -109,7 +111,7 @@ def assert_dict_structure(
     return data
 
 
-def assert_analysis_results_structure(results: object) -> dict[str, object]:
+def assert_analysis_results_structure(results: object) -> dict[str, t.GeneralValueType]:
     """Assert analyzer results have expected structure - specialized helper.
 
     Args:
@@ -122,14 +124,17 @@ def assert_analysis_results_structure(results: object) -> dict[str, object]:
       AssertionError: If structure is invalid
 
     """
-    assert_is_dict(results)
+    # Type narrowing via TypeGuard - assert_is_dict confirms results is dict
+    if not assert_is_dict(results):
+        raise AssertionError(f"Expected dict, got {type(results)}")
+    # Type narrowing: results is now dict[str, t.GeneralValueType] after TypeGuard
     return assert_dict_structure(
-        cast("dict[str, object]", results),
+        results,
         ["metrics", "issues", "python_files"],
     )
 
 
-def assert_metrics_structure(metrics: object) -> dict[str, object]:
+def assert_metrics_structure(metrics: object) -> dict[str, t.GeneralValueType]:
     """Assert metrics have expected structure - specialized helper.
 
     Args:
@@ -142,14 +147,17 @@ def assert_metrics_structure(metrics: object) -> dict[str, object]:
       AssertionError: If structure is invalid
 
     """
-    assert_is_dict(metrics)
+    # Type narrowing via TypeGuard - assert_is_dict confirms metrics is dict
+    if not assert_is_dict(metrics):
+        raise AssertionError(f"Expected dict, got {type(metrics)}")
+    # Type narrowing: metrics is now dict[str, t.GeneralValueType] after TypeGuard
     return assert_dict_structure(
-        cast("dict[str, object]", metrics),
+        metrics,
         ["total_files", "total_lines_of_code"],
     )
 
 
-def assert_issues_structure(issues: object) -> dict[str, object]:
+def assert_issues_structure(issues: object) -> dict[str, t.GeneralValueType]:
     """Assert issues have expected structure - specialized helper.
 
     Args:
@@ -162,8 +170,11 @@ def assert_issues_structure(issues: object) -> dict[str, object]:
       AssertionError: If structure is invalid
 
     """
-    assert_is_dict(issues)
+    # Type narrowing via TypeGuard - assert_is_dict confirms issues is dict
+    if not assert_is_dict(issues):
+        raise AssertionError(f"Expected dict, got {type(issues)}")
+    # Type narrowing: issues is now dict[str, t.GeneralValueType] after TypeGuard
     return assert_dict_structure(
-        cast("dict[str, object]", issues),
+        issues,
         ["security", "complexity", "dead_code", "duplicates"],
     )

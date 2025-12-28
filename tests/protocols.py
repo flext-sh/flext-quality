@@ -23,14 +23,14 @@ class TestsFlextQualityProtocols(FlextTestsProtocols, FlextQualityProtocols):
     - tp.Quality.* (from FlextQualityProtocols)
     """
 
-    class Tests:
-        """Project-specific test protocols.
+    # class Tests:
+    #     """Project-specific test protocols.
+    #
+    #     Extends FlextTestsProtocols.Tests with Quality-specific protocols.
+    #     """
 
-        Extends FlextTestsProtocols.Tests with Quality-specific protocols.
-        """
-
-        class Quality:
-            """Quality-specific test protocols."""
+    # class Quality:
+    #     """Quality-specific test protocols."""
 
 
 # Runtime aliases
