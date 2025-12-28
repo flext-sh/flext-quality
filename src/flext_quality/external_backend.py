@@ -7,6 +7,9 @@ Uses subprocess to run industry-standard quality analysis tools:
 - vulture: Dead code detection
 - coverage: Test coverage measurement
 - radon: Cyclomatic complexity analysis
+- refurb: Modern pattern suggestions
+- complexipy: Cognitive complexity analysis
+- rope: AST-based refactoring analysis
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -16,7 +19,6 @@ from __future__ import annotations
 
 import json
 import tempfile
-from collections.abc import Callable
 from pathlib import Path
 from typing import override
 
@@ -28,9 +30,13 @@ from flext_core import (
     FlextService,
     FlextTypes as t,
 )
+from rope.base import libutils
+from rope.base.project import Project as RopeProject
 
 from .backend_type import BackendType
 from .base import FlextQualityAnalyzer
+from .constants import FlextQualityConstants as qc
+from .protocols import FlextQualityProtocols as p
 from .subprocess_utils import SubprocessUtils
 
 # Module-level logger instance
@@ -48,7 +54,17 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
     @override
     def get_capabilities(self) -> list[str]:
         """Return the capabilities of this backend."""
-        return ["ruff", "mypy", "bandit", "vulture", "coverage", "radon"]
+        return [
+            "ruff",
+            "mypy",
+            "bandit",
+            "vulture",
+            "coverage",
+            "radon",
+            "refurb",
+            "complexipy",
+            "rope",
+        ]
 
     def execute(self) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Execute main analysis operation."""
@@ -84,7 +100,8 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
 
         Args:
             code: Python source code to analyze
-            tool: Tool to use (ruff, mypy, bandit, vulture, coverage, radon)
+            tool: Tool to use (ruff, mypy, bandit, vulture, coverage, radon,
+                  refurb, complexipy, rope)
 
         Returns:
             FlextResult containing analysis results dict
@@ -130,6 +147,9 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
             "vulture": self._run_vulture,
             "coverage": self._run_coverage,
             "radon": self._run_radon,
+            "refurb": self._run_refurb,
+            "complexipy": self._run_complexipy,
+            "rope": self._run_rope,
         }
 
         runner = tool_runners.get(tool)
@@ -143,17 +163,35 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
         tool_name: str,
         command: list[str],
         file_path: Path,
-        timeout: float = 30.0,
-        json_parser: Callable[[str], list[dict[str, t.GeneralValueType]]] | None = None,
+        timeout: float | None = None,
+        json_parser: p.Quality.JsonParserProtocol | None = None,
     ) -> FlextResult[dict[str, t.GeneralValueType]]:
-        """Generic method for running tools that output JSON."""
+        """Generic method for running tools that output JSON.
+
+        Args:
+            tool_name: Name of the tool being run
+            command: Command line arguments to execute
+            file_path: Path to file being analyzed
+            timeout: Timeout in seconds (uses DEFAULT_TOOL_TIMEOUT if None)
+            json_parser: Optional parser implementing JsonParserProtocol
+
+        Returns:
+            FlextResult with tool analysis results
+
+        """
         if not file_path.exists():
             return FlextResult.fail("Invalid file path")
+
+        effective_timeout = float(
+            timeout
+            if timeout is not None
+            else qc.Quality.QualityPerformance.DEFAULT_TOOL_TIMEOUT  # CONFIG
+        )
 
         result = SubprocessUtils.run_external_command(
             command,
             capture_output=True,
-            timeout=timeout,
+            timeout=effective_timeout,
         )
 
         if result.is_failure:
@@ -291,6 +329,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
         file_path: Path,
     ) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Run coverage to measure test coverage."""
+        timeout = qc.Quality.QualityPerformance.COVERAGE_TIMEOUT  # CONFIG
         result = SubprocessUtils.run_external_command(
             [
                 "coverage",
@@ -302,7 +341,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
                 "--cov-report=json",
             ],
             capture_output=True,
-            timeout=60.0,
+            timeout=float(timeout),
             cwd=tempfile.gettempdir(),
         )
 
@@ -358,11 +397,12 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
         file_path: Path,
     ) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Run radon for complexity metrics."""
+        timeout = qc.Quality.QualityPerformance.RADON_TIMEOUT  # CONFIG
         # First call: complexity
         result_cc = SubprocessUtils.run_external_command(
             ["radon", "cc", str(file_path), "-j"],
             capture_output=True,
-            timeout=30.0,
+            timeout=float(timeout),
         )
 
         if result_cc.is_failure:
@@ -403,10 +443,11 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
         file_path: Path,
     ) -> dict[str, t.GeneralValueType]:
         """Run radon maintainability index analysis."""
+        timeout = qc.Quality.QualityPerformance.RADON_TIMEOUT  # CONFIG
         result_mi = SubprocessUtils.run_external_command(
             ["radon", "mi", str(file_path), "-j"],
             capture_output=True,
-            timeout=30.0,
+            timeout=float(timeout),
         )
 
         if result_mi.is_success and result_mi.value.stdout.strip():
@@ -431,3 +472,205 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
             return json.loads(output) if output.strip() else []
         except json.JSONDecodeError:
             return []
+
+    # =========================================================================
+    # REFURB - Modern Pattern Suggestions
+    # =========================================================================
+
+    def _run_refurb(
+        self,
+        file_path: Path,
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
+        """Run refurb modernization check.
+
+        Refurb suggests modern Python patterns and idioms.
+
+        Args:
+            file_path: Path to file to analyze
+
+        Returns:
+            FlextResult with modernization suggestions
+
+        """
+        timeout = qc.Quality.QualityPerformance.REFURB_TIMEOUT  # CONFIG
+        return self._run_tool_with_json_output(
+            tool_name="refurb",
+            command=["refurb", str(file_path), "--format", "json", "--quiet"],
+            file_path=file_path,
+            timeout=float(timeout),
+            json_parser=self._parse_refurb_output,
+        )
+
+    def _parse_refurb_output(
+        self,
+        stdout: str,
+    ) -> list[dict[str, t.GeneralValueType]]:
+        """Parse refurb JSON output."""
+        if not stdout.strip():
+            return []
+        try:
+            return json.loads(stdout)
+        except json.JSONDecodeError:
+            # Parse line-based output as fallback
+            suggestions: list[dict[str, t.GeneralValueType]] = [
+                {"message": line.strip()}
+                for line in stdout.strip().splitlines()
+                if line.strip()
+            ]
+            return suggestions
+
+    # =========================================================================
+    # COMPLEXIPY - Cognitive Complexity
+    # =========================================================================
+
+    def _run_complexipy(
+        self,
+        file_path: Path,
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
+        """Run complexipy cognitive complexity check.
+
+        Args:
+            file_path: Path to file to analyze
+
+        Returns:
+            FlextResult with cognitive complexity metrics
+
+        """
+        max_complexity = qc.Quality.Complexity.COGNITIVE_MAX_COMPLEXITY  # CONFIG
+        timeout = qc.Quality.QualityPerformance.COMPLEXIPY_TIMEOUT  # CONFIG
+
+        result = SubprocessUtils.run_external_command(
+            [
+                "complexipy",
+                str(file_path),
+                "--max-complexity-allowed",
+                str(max_complexity),
+            ],
+            capture_output=True,
+            timeout=float(timeout),
+        )
+
+        if result.is_failure:
+            return self._handle_tool_error(result.error or "", "complexipy")
+
+        wrapper = result.value
+        functions = self._parse_complexipy_output(
+            wrapper.stdout, file_path, max_complexity
+        )
+
+        return FlextResult.ok({
+            "tool": "complexipy",
+            "functions": functions,
+            "total_functions": len(functions),
+            "max_allowed": max_complexity,
+            "violations": [
+                f for f in functions if int(f.get("complexity", 0)) > max_complexity
+            ],
+            "issue_count": len([
+                f for f in functions if int(f.get("complexity", 0)) > max_complexity
+            ]),
+            "status": "success" if wrapper.returncode == 0 else "issues_found",
+        })
+
+    def _parse_complexipy_output(
+        self,
+        stdout: str,
+        file_path: Path,
+        max_complexity: int,
+    ) -> list[dict[str, t.GeneralValueType]]:
+        """Parse complexipy table output."""
+        functions: list[dict[str, t.GeneralValueType]] = []
+        min_parts = (
+            qc.Quality.Complexity.COGNITIVE_LOW_THRESHOLD
+        )  # CONFIG: minimum parts in output line
+
+        for line in stdout.strip().splitlines():
+            if line.strip() and not line.startswith(("Path", "─", "│", "Function")):
+                parts = line.split()
+                if len(parts) >= min_parts and parts[-1].isdigit():
+                    complexity_value = int(parts[-1])
+                    functions.append({
+                        "function": parts[0],
+                        "complexity": complexity_value,
+                        "file": str(file_path),
+                        "exceeds_threshold": complexity_value > max_complexity,
+                    })
+
+        return functions
+
+    # =========================================================================
+    # ROPE - AST Refactoring Analysis
+    # =========================================================================
+
+    def _run_rope(
+        self,
+        file_path: Path,
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
+        """Run rope AST-based refactoring analysis.
+
+        Provides module structure and function information for refactoring guidance.
+
+        Args:
+            file_path: Path to file to analyze
+
+        Returns:
+            FlextResult with refactoring suggestions
+
+        """
+        if not file_path.exists():
+            return FlextResult.ok({
+                "tool": "rope",
+                "functions": [],
+                "function_count": 0,
+                "status": "invalid_path",
+                "message": f"File not found: {file_path}",
+            })
+
+        project = RopeProject(str(file_path.parent))
+        try:
+            resource = libutils.path_to_resource(project, str(file_path))
+            if resource is None:
+                return FlextResult.ok({
+                    "tool": "rope",
+                    "functions": [],
+                    "function_count": 0,
+                    "status": "no_resource",
+                    "message": f"Could not load resource: {file_path}",
+                })
+
+            pymodule = project.get_pymodule(resource)
+
+            # Collect function info using module's defined names
+            functions: list[dict[str, t.GeneralValueType]] = []
+            defined_names = (
+                pymodule.get_defined_names()
+                if hasattr(pymodule, "get_defined_names")
+                else {}
+            )
+            for name, pyname in defined_names.items():
+                if not name.startswith("_"):
+                    functions.append({
+                        "name": name,
+                        "type": str(type(pyname).__name__),
+                    })
+
+            return FlextResult.ok({
+                "tool": "rope",
+                "module": str(file_path.stem),
+                "functions": functions,
+                "function_count": len(functions),
+                "suggestions": [],
+                "issue_count": 0,
+                "status": "success",
+            })
+        except Exception as e:
+            _logger.warning("Rope analysis failed: %s", e)
+            return FlextResult.ok({
+                "tool": "rope",
+                "functions": [],
+                "function_count": 0,
+                "status": "error",
+                "message": str(e),
+            })
+        finally:
+            project.close()

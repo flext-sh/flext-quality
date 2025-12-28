@@ -142,6 +142,9 @@
         radon          = ">=6.0.1"
         ruff           = ">=0.12.3"
         vulture        = ">=2.13"
+    refurb = "^2.2.0"
+    complexipy = "^5.1.0"
+    rope = "^1.14.0"
 
     [tool.poetry.group.test.dependencies]
         

@@ -85,6 +85,11 @@ class FlextQualityConstants(FlextConstants):
             IDEAL_COMPLEXITY: int = 5
             STRICT_COMPLEXITY: int = 8
             HIGH_COMPLEXITY_WARNING_THRESHOLD: int = 50
+            # Cognitive complexity (Complexipy)
+            COGNITIVE_MAX_COMPLEXITY: int = 15
+            COGNITIVE_LOW_THRESHOLD: int = 10
+            COGNITIVE_MEDIUM_THRESHOLD: int = 15
+            COGNITIVE_HIGH_THRESHOLD: int = 25
 
         class QualitySecurity:
             """Security scoring thresholds for quality analysis."""
@@ -119,6 +124,13 @@ class FlextQualityConstants(FlextConstants):
             MINIMUM_WORKERS: int = 1
             MAXIMUM_WORKERS: int = 16
             DEFAULT_WORKERS: int = 4
+            # Tool-specific timeouts
+            DEFAULT_TOOL_TIMEOUT: int = 30
+            REFURB_TIMEOUT: int = 60
+            COMPLEXIPY_TIMEOUT: int = 60
+            ROPE_TIMEOUT: int = 60
+            COVERAGE_TIMEOUT: int = 60
+            RADON_TIMEOUT: int = 30
 
         class QualityNetwork:
             """Network-related constants."""
@@ -126,6 +138,9 @@ class FlextQualityConstants(FlextConstants):
             MAX_CONNECTIONS: int = 100
             DEFAULT_TIMEOUT: int = 30
             RETRY_ATTEMPTS: int = 3
+            DEFAULT_PORT: int = 8000
+            MIN_PORT: int = 1
+            MAX_PORT: int = 65535
 
         class QualityValidation:
             """Validation ranges and limits for quality analysis."""
@@ -189,6 +204,7 @@ class FlextQualityConstants(FlextConstants):
                 ".DS_Store",
             )
             MAX_FUNCTION_NAME_LENGTH: int = 50
+            MAX_PROJECT_NAME_LENGTH: int = 255
             MIN_FILE_SIZE_FOR_DUPLICATION_CHECK: int = 100
             SIMILARITY_THRESHOLD: float = 0.8
             MIN_FUNCTION_LENGTH_FOR_DEAD_CODE: int = 5
@@ -533,6 +549,71 @@ class FlextQualityConstants(FlextConstants):
             HIGH_ISSUE_PENALTY: int = 5
             NORMAL_ISSUE_PENALTY: int = 2
             LOW_ISSUE_PENALTY: int = 1
+
+        # =========================================================================
+        # CYCLE - Refactoring cycle management constants
+        # =========================================================================
+
+        class Cycle:
+            """Refactoring cycle management constants."""
+
+            class Status(StrEnum):
+                """Status values for files and projects in refactoring cycle."""
+
+                PENDING = "pending"
+                IN_PROGRESS = "in_progress"
+                COMPLETED = "completed"
+                MANUAL_REVIEW = "manual_review"
+                SKIPPED = "skipped"
+
+            class Severity(StrEnum):
+                """Severity levels for discovered patterns."""
+
+                BLOCK = "block"
+                WARN = "warn"
+
+            # Default project processing order (dependency-based)
+            PROJECT_ORDER: tuple[str, ...] = (
+                "flext-core",
+                "flext-cli",
+                "flext-ldif",
+                "flext-ldap",
+                "flext-api",
+                "flext-grpc",
+                "flext-auth",
+                "flext-plugin",
+                "flext-quality",
+                "flext-observability",
+                "flext-web",
+                "flext-db-oracle",
+                "flext-oracle-oic",
+                "flext-oracle-wms",
+                "flext-dbt-ldap",
+                "flext-dbt-ldif",
+                "flext-dbt-oracle",
+                "flext-dbt-oracle-wms",
+                "flext-tap-ldap",
+                "flext-tap-ldif",
+                "flext-tap-oracle",
+                "flext-tap-oracle-oic",
+                "flext-tap-oracle-wms",
+                "flext-target-ldap",
+                "flext-target-ldif",
+                "flext-target-oracle",
+                "flext-target-oracle-oic",
+                "flext-target-oracle-wms",
+                "flext-meltano",
+                "client-a-oud-mig",
+                "flexcore",
+            )
+
+            # Directory processing order
+            DIRECTORY_ORDER: tuple[str, ...] = (
+                "src/",
+                "tests/",
+                "scripts/",
+                "examples/",
+            )
 
 
 c = FlextQualityConstants

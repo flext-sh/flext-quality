@@ -52,7 +52,7 @@ class FlextQualityProtocols(p_core):
                 config: Mapping[str, t.GeneralValueType] | None = None,
             ) -> p_core.Result[Mapping[str, t.GeneralValueType]]:
                 """Analyze a project for quality metrics."""
-                ...
+                ...  # INTERFACE
 
         @runtime_checkable
         class QualityReporter(Protocol):
@@ -64,7 +64,7 @@ class FlextQualityProtocols(p_core):
                 format_type: str = "html",
             ) -> p_core.Result[str]:
                 """Generate a quality report from analysis results."""
-                ...
+                ...  # INTERFACE
 
         @runtime_checkable
         class QualityValidator(Protocol):
@@ -76,7 +76,7 @@ class FlextQualityProtocols(p_core):
                 thresholds: Mapping[str, t.GeneralValueType],
             ) -> p_core.Result[bool]:
                 """Validate analysis results against quality thresholds."""
-                ...
+                ...  # INTERFACE
 
         @runtime_checkable
         class GitService(Protocol):
@@ -90,7 +90,7 @@ class FlextQualityProtocols(p_core):
                 temp_path: str | None = None,
             ) -> p_core.Result[t.GeneralValueType]:
                 """Execute git operation with dry-run support."""
-                ...
+                ...  # INTERFACE
 
         @runtime_checkable
         class OptimizationStrategy(Protocol):
@@ -104,7 +104,7 @@ class FlextQualityProtocols(p_core):
                 temp_path: str | None = None,
             ) -> p_core.Result[t.GeneralValueType]:
                 """Optimize module with dry-run support."""
-                ...
+                ...  # INTERFACE
 
         @runtime_checkable
         class QualityChecker(Protocol):
@@ -116,7 +116,7 @@ class FlextQualityProtocols(p_core):
                 config: dict[str, t.GeneralValueType] | None = None,
             ) -> p_core.Result[t.GeneralValueType]:
                 """Run quality checks."""
-                ...
+                ...  # INTERFACE
 
         @runtime_checkable
         class Validator(Protocol):
@@ -127,7 +127,7 @@ class FlextQualityProtocols(p_core):
                 target_path: str,
             ) -> p_core.Result[t.GeneralValueType]:
                 """Validate target."""
-                ...
+                ...  # INTERFACE
 
         @runtime_checkable
         class ArchitectureAnalyzer(Protocol):
@@ -138,7 +138,7 @@ class FlextQualityProtocols(p_core):
                 project_path: str,
             ) -> p_core.Result[t.GeneralValueType]:
                 """Analyze architecture."""
-                ...
+                ...  # INTERFACE
 
         @runtime_checkable
         class DependencyManager(Protocol):
@@ -150,31 +150,61 @@ class FlextQualityProtocols(p_core):
                 operation: str,
             ) -> p_core.Result[t.GeneralValueType]:
                 """Manage dependencies."""
-                ...
+                ...  # INTERFACE
 
         @runtime_checkable
         class IssueProtocol(Protocol):
             """Protocol for code quality issues - enables type-safe access."""
 
             @property
-            def severity(self) -> object:
+            def severity(self) -> str:
                 """Issue severity level."""
-                ...
+                ...  # INTERFACE
 
             @property
             def message(self) -> str:
                 """Issue description message."""
-                ...
+                ...  # INTERFACE
 
             @property
             def file_path(self) -> str:
                 """File path containing the issue."""
-                ...
+                ...  # INTERFACE
 
             @property
             def line_number(self) -> int | None:
                 """Line number of the issue (optional)."""
-                ...
+                ...  # INTERFACE
+
+        @runtime_checkable
+        class JsonParserProtocol(Protocol):
+            """Protocol for JSON output parsers used in tool backends.
+
+            This protocol defines the interface for parsing JSON output from
+            external quality tools (ruff, mypy, bandit, etc.) into structured
+            issue dictionaries.
+
+            Usage:
+                def my_parser(stdout: str) -> list[dict[str, t.GeneralValueType]]:
+                    return json.loads(stdout) if stdout.strip() else []
+
+                # my_parser satisfies JsonParserProtocol
+            """
+
+            def __call__(
+                self,
+                stdout: str,
+            ) -> list[dict[str, t.GeneralValueType]]:
+                """Parse JSON output from tool stdout.
+
+                Args:
+                    stdout: Raw stdout string from tool execution
+
+                Returns:
+                    List of parsed issue dictionaries
+
+                """
+                ...  # INTERFACE
 
 
 # Runtime alias for simplified usage

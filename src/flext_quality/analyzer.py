@@ -76,7 +76,7 @@ class FileMetricsModel(BaseModel):
     complexity_score: float = Field(default=0.0, ge=0)
     functions_count: int = Field(default=0, ge=0)
     classes_count: int = Field(default=0, ge=0)
-    issues: list[m.IssueModel] = Field(default_factory=list)
+    issues: list[m.Quality.IssueModel] = Field(default_factory=list)
 
 
 # Legacy TypedDict aliases for backward compatibility (remove in v1.0)
@@ -89,7 +89,7 @@ class FileMetricsDict(TypedDict, total=False):
     complexity_score: float
     functions_count: int
     classes_count: int
-    issues: list[m.IssueModel]
+    issues: list[m.Quality.IssueModel]
 
 
 class DuplicationIssueDict(TypedDict, total=False):
@@ -133,14 +133,14 @@ class FileMetricsData(BaseModel):
 # =====================================================================
 
 
-class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
+class FlextQualityAnalyzer(FlextService[m.Quality.AnalysisResults]):
     """Main quality analyzer orchestrating focused analysis utilities."""
 
     auto_execute: ClassVar[bool] = False
     project_path: Path = Path()
     _analyzer_config: FlextQualitySettings = PrivateAttr()
     _analyzer_logger: FlextLogger = PrivateAttr()
-    _current_results: m.AnalysisResults | None = PrivateAttr(
+    _current_results: m.Quality.AnalysisResults | None = PrivateAttr(
         default=None,
     )
 
@@ -177,7 +177,7 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
     def execute(
         self,
         **_kwargs: object,
-    ) -> FlextResult[m.AnalysisResults]:
+    ) -> FlextResult[m.Quality.AnalysisResults]:
         """Execute analyzer service - override from FlextService."""
         _ = _kwargs
         return self.analyze_project()
@@ -189,7 +189,7 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
         include_complexity: bool = True,
         include_dead_code: bool = True,
         include_duplicates: bool = True,
-    ) -> FlextResult[m.AnalysisResults]:
+    ) -> FlextResult[m.Quality.AnalysisResults]:
         """Analyze entire project - delegates to focused analyzers."""
         options = AnalysisOptions(
             include_security=include_security,
@@ -244,7 +244,7 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
         """Get quality grade."""
         return self._current_results.quality_grade if self._current_results else "F"
 
-    def get_last_analysis_result(self) -> m.AnalysisResults | None:
+    def get_last_analysis_result(self) -> m.Quality.AnalysisResults | None:
         """Get last analysis results."""
         return self._current_results
 
@@ -387,11 +387,11 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
         def find_issues(
             file_path: Path,
             complexity_score: float,
-        ) -> list[m.IssueModel]:
+        ) -> list[m.Quality.IssueModel]:
             """Find complexity issues."""
             if complexity_score > c.Quality.Complexity.MAX_COMPLEXITY:
                 return [
-                    m.IssueModel(
+                    m.Quality.IssueModel(
                         id=uuid4(),  # complexity issue{file_path.name}",
                         analysis_id=uuid4(),
                         file_path=str(file_path),
@@ -413,7 +413,7 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
         def analyze(
             tree: ast.AST,
             file_path: Path,
-        ) -> list[m.IssueModel]:
+        ) -> list[m.Quality.IssueModel]:
             r"""Analyze security issues using Bandit backend."""
             # Reserved for future AST-based analysis
             _ = tree  # Reserved for future use
@@ -436,7 +436,7 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
                     validated = BanditIssueModel.model_validate(data)
                     # Convert validated Bandit issue to CodeIssue
                     validated_issues.append(
-                        m.IssueModel(
+                        m.Quality.IssueModel(
                             id=uuid4(),
                             analysis_id=uuid4(),
                             file_path=str(file_path),
@@ -464,7 +464,7 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
         def analyze(
             tree: ast.AST,
             file_path: Path,
-        ) -> list[m.IssueModel]:
+        ) -> list[m.Quality.IssueModel]:
             """Analyze dead code - external backend only."""
             # AST-based analysis not implemented - use external backend
             _ = tree  # Reserved for future AST-based analysis
@@ -487,7 +487,7 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
                     validated = VultureIssueModel.model_validate(data)
                     # Convert validated Vulture issue to CodeIssue
                     validated_issues.append(
-                        m.IssueModel(
+                        m.Quality.IssueModel(
                             id=uuid4(),
                             analysis_id=uuid4(),
                             file_path=str(file_path),
@@ -564,18 +564,18 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
         def create_analysis_results(
             metrics_data: FileMetricsData,
             duplication_issues: list[DuplicationIssueModel],
-        ) -> FlextResult[m.AnalysisResults]:
+        ) -> FlextResult[m.Quality.AnalysisResults]:
             """Create final analysis results."""
             try:
                 # Aggregate all issues
-                all_issues: list[m.IssueModel] = []
+                all_issues: list[m.Quality.IssueModel] = []
                 for metrics in metrics_data.file_metrics:
                     if metrics.issues:
                         all_issues.extend(metrics.issues)
 
                 # Convert duplication issues to CodeIssue objects
                 all_issues.extend([
-                    m.IssueModel(
+                    m.Quality.IssueModel(
                         id=UUID(str(dup.id)),
                         analysis_id=UUID(str(dup.analysis_id)),
                         file_path=dup.file_path,
@@ -624,7 +624,7 @@ class FlextQualityAnalyzer(FlextService[m.AnalysisResults]):
                     recommendations.append("Eliminate duplications")
 
                 return FlextResult.ok(
-                    m.AnalysisResults(
+                    m.Quality.AnalysisResults(
                         issues=[
                             {"type": str(i.issue_type), "message": i.message}
                             for i in all_issues

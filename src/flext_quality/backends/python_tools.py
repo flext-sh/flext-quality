@@ -15,6 +15,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import black
@@ -24,8 +25,11 @@ from bandit.core import config as bandit_config, manager as bandit_manager
 from flext_core import FlextLogger, FlextResult, FlextTypes as t
 from mypy import api
 from radon.complexity import cc_visit
+from rope.base import libutils
+from rope.base.project import Project as RopeProject
 from vulture import Vulture
 
+from flext_quality.constants import FlextQualityConstants as qc
 from flext_quality.subprocess_utils import SubprocessUtils
 
 
@@ -53,15 +57,15 @@ class FlextQualityPythonTools:
         self,
         path: Path,
     ) -> FlextResult[dict[str, t.GeneralValueType]]:
-        """Run Ruff linting via u.
+        """Run Ruff linting via subprocess.
 
         Ruff is the fastest Python linter, written in Rust.
 
         Args:
-        path: Path to analyze
+            path: Path to analyze
 
         Returns:
-        FlextResult with linting issues
+            FlextResult with linting issues
 
         """
         try:
@@ -69,11 +73,11 @@ class FlextQualityPythonTools:
             if not path.exists() or not path.is_file():
                 return FlextResult.fail(f"Invalid path for Ruff analysis: {path}")
 
-            # Use uexecution with threading-based timeout
+            timeout = qc.Quality.QualityPerformance.REFURB_TIMEOUT  # CONFIG
             result = SubprocessUtils.run_external_command(
                 ["ruff", "check", str(path), "--output-format=json"],
                 capture_output=True,
-                timeout=60,
+                timeout=timeout,
             )
 
             if result.is_failure:
@@ -108,10 +112,10 @@ class FlextQualityPythonTools:
         MyPy provides a Python API for programmatic type checking.
 
         Args:
-        path: Path to analyze
+            path: Path to analyze
 
         Returns:
-        FlextResult with type errors
+            FlextResult with type errors
 
         """
         try:
@@ -143,10 +147,10 @@ class FlextQualityPythonTools:
         """Run Bandit security scan via direct library import.
 
         Args:
-        path: Path to analyze
+            path: Path to analyze
 
         Returns:
-        FlextResult with security issues
+            FlextResult with security issues
 
         """
         try:
@@ -172,22 +176,21 @@ class FlextQualityPythonTools:
         self,
         path: Path,
     ) -> FlextResult[dict[str, t.GeneralValueType]]:
-        """Run Pylint analysis via u.
+        """Run Pylint analysis via subprocess.
 
         Args:
-        path: Path to analyze
+            path: Path to analyze
 
         Returns:
-        FlextResult with analysis results
+            FlextResult with analysis results
 
         """
         try:
-            # Use uexecution with threading-based timeout
-            # (Pylint doesn't expose clean Python API, use subprocess via u
+            timeout = qc.Quality.QualityPerformance.REFURB_TIMEOUT  # CONFIG
             result = SubprocessUtils.run_external_command(
                 ["pylint", str(path), "--output-format=json"],
                 capture_output=True,
-                timeout=60,
+                timeout=timeout,
             )
 
             if result.is_failure:
@@ -219,10 +222,10 @@ class FlextQualityPythonTools:
         """Check Black formatting via direct library import.
 
         Args:
-        path: Path to analyze
+            path: Path to analyze
 
         Returns:
-        FlextResult with formatting check results
+            FlextResult with formatting check results
 
         """
         try:
@@ -259,10 +262,10 @@ class FlextQualityPythonTools:
         """Run pytest via direct library import.
 
         Args:
-        path: Path to test directory
+            path: Path to test directory
 
         Returns:
-        FlextResult with test results
+            FlextResult with test results
 
         """
         try:
@@ -291,10 +294,10 @@ class FlextQualityPythonTools:
         """Run coverage analysis via direct library import.
 
         Args:
-        path: Path to analyze (currently unused, analyzes current directory)
+            path: Path to analyze (currently unused, analyzes current directory)
 
         Returns:
-        FlextResult with coverage data
+            FlextResult with coverage data
 
         """
         # Reserved for future path-specific coverage analysis
@@ -326,10 +329,10 @@ class FlextQualityPythonTools:
         """Calculate code complexity via Radon library.
 
         Args:
-        path: Path to analyze
+            path: Path to analyze
 
         Returns:
-        FlextResult with complexity metrics
+            FlextResult with complexity metrics
 
         """
         try:
@@ -340,7 +343,7 @@ class FlextQualityPythonTools:
 
             return FlextResult.ok({
                 "functions": len(cyclomatic),
-                "complexity_scores": [c.complexity for c in cyclomatic],
+                "complexity_scores": [item.complexity for item in cyclomatic],
             })
         except Exception as e:
             self._logger.exception("Complexity analysis failed")
@@ -357,10 +360,10 @@ class FlextQualityPythonTools:
         """Detect dead code via Vulture library.
 
         Args:
-        path: Path to analyze
+            path: Path to analyze
 
         Returns:
-        FlextResult with dead code findings
+            FlextResult with dead code findings
 
         """
         try:
@@ -383,6 +386,203 @@ class FlextQualityPythonTools:
         except Exception as e:
             self._logger.exception("Dead code detection failed")
             return FlextResult.fail(f"Dead code detection failed: {e}")
+
+    # =========================================================================
+    # REFURB - Modern Pattern Suggestions
+    # =========================================================================
+
+    def run_refurb_check(
+        self,
+        path: Path,
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
+        """Run Refurb modernization analysis via subprocess.
+
+        Refurb suggests modern Python patterns and idioms.
+
+        Args:
+            path: Path to analyze
+
+        Returns:
+            FlextResult with modernization suggestions
+
+        """
+        try:
+            if not path.exists() or not path.is_file():
+                return FlextResult.fail(f"Invalid path for Refurb analysis: {path}")
+
+            timeout = qc.Quality.QualityPerformance.REFURB_TIMEOUT  # CONFIG
+            result = SubprocessUtils.run_external_command(
+                ["refurb", str(path), "--format", "json", "--quiet"],
+                capture_output=True,
+                timeout=timeout,
+            )
+
+            if result.is_failure:
+                error_msg = result.error or ""
+                if "not found" in error_msg.lower():
+                    return FlextResult.fail("Refurb executable not found in PATH")
+                if "timed out" in error_msg.lower():
+                    return FlextResult.fail("Refurb analysis timed out")
+                return FlextResult.fail(f"Refurb analysis failed: {error_msg}")
+
+            wrapper = result.value
+            suggestions: list[dict[str, t.GeneralValueType]] = []
+
+            if wrapper.stdout.strip():
+                try:
+                    suggestions = json.loads(wrapper.stdout)
+                except json.JSONDecodeError:
+                    # Parse line-based output as fallback
+                    for line in wrapper.stdout.strip().splitlines():
+                        if line.strip():
+                            suggestions.append({"message": line.strip()})
+
+            return FlextResult.ok({
+                "suggestions": suggestions,
+                "suggestion_count": len(suggestions),
+                "exit_code": wrapper.returncode,
+            })
+        except Exception as e:
+            self._logger.exception("Refurb check failed")
+            return FlextResult.fail(f"Refurb analysis failed: {e}")
+
+    # =========================================================================
+    # COMPLEXIPY - Cognitive Complexity
+    # =========================================================================
+
+    def run_complexipy_check(
+        self,
+        path: Path,
+        max_complexity: int | None = None,
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
+        """Run Complexipy cognitive complexity analysis.
+
+        Args:
+            path: Path to analyze
+            max_complexity: Maximum allowed complexity (uses constant if None)
+
+        Returns:
+            FlextResult with cognitive complexity metrics
+
+        """
+        if max_complexity is None:
+            max_complexity = qc.Quality.Complexity.COGNITIVE_MAX_COMPLEXITY  # CONFIG
+
+        try:
+            if not path.exists() or not path.is_file():
+                return FlextResult.fail(f"Invalid path for Complexipy analysis: {path}")
+
+            timeout = qc.Quality.QualityPerformance.COMPLEXIPY_TIMEOUT  # CONFIG
+            result = SubprocessUtils.run_external_command(
+                [
+                    "complexipy",
+                    str(path),
+                    "--max-complexity-allowed",
+                    str(max_complexity),
+                ],
+                capture_output=True,
+                timeout=timeout,
+            )
+
+            if result.is_failure:
+                error_msg = result.error or ""
+                if "not found" in error_msg.lower():
+                    return FlextResult.fail("Complexipy executable not found in PATH")
+                if "timed out" in error_msg.lower():
+                    return FlextResult.fail("Complexipy analysis timed out")
+                return FlextResult.fail(f"Complexipy analysis failed: {error_msg}")
+
+            wrapper = result.value
+            functions: list[dict[str, t.GeneralValueType]] = []
+
+            # Parse complexipy output (table format)
+            min_parts = (
+                qc.Quality.Complexity.COGNITIVE_LOW_THRESHOLD
+            )  # CONFIG: minimum parts in output line
+            for line in wrapper.stdout.strip().splitlines():
+                if line.strip() and not line.startswith(("Path", "─", "│")):
+                    parts = line.split()
+                    if len(parts) >= min_parts and parts[-1].isdigit():
+                        functions.append({
+                            "function": parts[0],
+                            "complexity": int(parts[-1]),
+                            "file": str(path),
+                        })
+
+            return FlextResult.ok({
+                "functions": functions,
+                "total_functions": len(functions),
+                "max_allowed": max_complexity,
+                "violations": [
+                    f for f in functions if int(f.get("complexity", 0)) > max_complexity
+                ],
+                "exit_code": wrapper.returncode,
+            })
+        except Exception as e:
+            self._logger.exception("Complexipy check failed")
+            return FlextResult.fail(f"Complexipy analysis failed: {e}")
+
+    # =========================================================================
+    # ROPE - AST Refactoring Suggestions
+    # =========================================================================
+
+    def run_rope_analysis(
+        self,
+        path: Path,
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
+        """Run Rope AST-based refactoring analysis.
+
+        Provides suggestions for function extraction and code structure.
+
+        Args:
+            path: Path to analyze
+
+        Returns:
+            FlextResult with refactoring suggestions
+
+        """
+        try:
+            if not path.exists() or not path.is_file():
+                return FlextResult.fail(f"Invalid path for Rope analysis: {path}")
+
+            # Create temporary project
+            project_path = path.parent
+            project = RopeProject(str(project_path))
+
+            try:
+                resource = libutils.path_to_resource(project, str(path))
+                if resource is None:
+                    return FlextResult.fail(f"Could not load resource: {path}")
+
+                # Get module structure
+                pymodule = project.get_pymodule(resource)
+
+                # Collect function info using module's defined names
+                functions: list[dict[str, t.GeneralValueType]] = []
+                defined_names = (
+                    pymodule.get_defined_names()
+                    if hasattr(pymodule, "get_defined_names")
+                    else {}
+                )
+                for name, pyname in defined_names.items():
+                    if not name.startswith("_"):
+                        functions.append({
+                            "name": name,
+                            "type": str(type(pyname).__name__),
+                        })
+
+                return FlextResult.ok({
+                    "module": str(path.stem),
+                    "functions": functions,
+                    "function_count": len(functions),
+                    "suggestions": [],
+                })
+            finally:
+                project.close()
+
+        except Exception as e:
+            self._logger.exception("Rope analysis failed")
+            return FlextResult.fail(f"Rope analysis failed: {e}")
 
 
 __all__ = ["FlextQualityPythonTools"]

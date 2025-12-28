@@ -146,7 +146,7 @@ class ProjectServiceBuilder:
         self._kwargs.update(config_dict)
         return self
 
-    def build(self) -> r[m.ProjectModel]:
+    def build(self) -> r[m.Quality.ProjectModel]:
         """Build project using monadic validation chain.
 
         Returns:
@@ -156,8 +156,7 @@ class ProjectServiceBuilder:
 
         """
         return (
-            self
-            ._validate_required_fields()
+            self._validate_required_fields()
             .flat_map(lambda _: self._create_project_model())
             .map(self._log_project_creation)
         )
@@ -170,13 +169,13 @@ class ProjectServiceBuilder:
             return r.fail("Project path is required")
         return r.ok(True)
 
-    def _create_project_model(self) -> r[m.ProjectModel]:
+    def _create_project_model(self) -> r[m.Quality.ProjectModel]:
         """Create project model (monadic step 2)."""
         try:
             # Type narrowing after validation
             name = self._name if isinstance(self._name, str) else ""
             path = self._path if isinstance(self._path, str) else ""
-            project = m.ProjectModel(
+            project = m.Quality.ProjectModel(
                 id=f"project_{name.lower().replace(' ', '_')}",
                 name=name,
                 path=path,
@@ -187,8 +186,8 @@ class ProjectServiceBuilder:
 
     def _log_project_creation(
         self,
-        project: m.ProjectModel,
-    ) -> m.ProjectModel:
+        project: m.Quality.ProjectModel,
+    ) -> m.Quality.ProjectModel:
         """Log project creation and return (monadic final step)."""
         self._logger.info(
             "Project created successfully",
@@ -211,7 +210,7 @@ class AnalysisServiceBuilder:
         result = (
             AnalysisServiceBuilder(config, logger)
             .with_project_id("project_123")
-            .with_status(m.AnalysisStatus.QUEUED)
+            .with_status(m.Quality.AnalysisStatus.QUEUED)
             .build()
         )
     """
@@ -250,7 +249,7 @@ class AnalysisServiceBuilder:
         self._kwargs.update(config_dict)
         return self
 
-    def build(self) -> r[m.AnalysisModel]:
+    def build(self) -> r[m.Quality.AnalysisModel]:
         """Build analysis using monadic validation chain.
 
         Returns:
@@ -258,8 +257,7 @@ class AnalysisServiceBuilder:
 
         """
         return (
-            self
-            ._validate_project_id()
+            self._validate_project_id()
             .flat_map(lambda _: self._validate_status())
             .flat_map(lambda _: self._create_analysis_model())
             .map(self._log_analysis_creation)
@@ -274,12 +272,12 @@ class AnalysisServiceBuilder:
     def _validate_status(self) -> r[bool]:
         """Validate analysis status enum (monadic step 2)."""
         try:
-            m.AnalysisStatus(self._status)
+            m.Quality.AnalysisStatus(self._status)
             return r.ok(True)
         except ValueError:
             return r.fail(f"Invalid analysis status: {self._status}")
 
-    def _create_analysis_model(self) -> r[m.AnalysisModel]:
+    def _create_analysis_model(self) -> r[m.Quality.AnalysisModel]:
         """Create analysis model (monadic step 3)."""
         try:
             project_uuid = (
@@ -287,7 +285,7 @@ class AnalysisServiceBuilder:
                 if isinstance(self._project_id, UUID)
                 else uuid5(NAMESPACE_DNS, str(self._project_id))
             )
-            analysis = m.AnalysisModel(
+            analysis = m.Quality.AnalysisModel(
                 project_id=project_uuid,
                 status=self._status,
             )
@@ -297,8 +295,8 @@ class AnalysisServiceBuilder:
 
     def _log_analysis_creation(
         self,
-        analysis: m.AnalysisModel,
-    ) -> m.AnalysisModel:
+        analysis: m.Quality.AnalysisModel,
+    ) -> m.Quality.AnalysisModel:
         """Log analysis creation and return (monadic final step)."""
         self._logger.info(
             "Analysis created successfully",
@@ -377,7 +375,7 @@ class IssueServiceBuilder:
         self._kwargs.update(config_dict)
         return self
 
-    def build(self) -> r[m.IssueModel]:
+    def build(self) -> r[m.Quality.IssueModel]:
         """Build issue using monadic validation chain.
 
         Returns:
@@ -385,8 +383,7 @@ class IssueServiceBuilder:
 
         """
         return (
-            self
-            ._validate_required_fields()
+            self._validate_required_fields()
             .flat_map(lambda _: self._validate_enums())
             .flat_map(lambda _: self._create_issue_model())
             .map(self._log_issue_creation)
@@ -412,13 +409,13 @@ class IssueServiceBuilder:
             # Type narrowing for enum values
             severity = self._severity if isinstance(self._severity, str) else ""
             issue_type = self._issue_type if isinstance(self._issue_type, str) else ""
-            m.IssueSeverity(severity)
-            m.IssueType(issue_type)
+            m.Quality.IssueSeverity(severity)
+            m.Quality.IssueType(issue_type)
             return r.ok(True)
         except ValueError as e:
             return r.fail(f"Invalid enum value: {e}")
 
-    def _create_issue_model(self) -> r[m.IssueModel]:
+    def _create_issue_model(self) -> r[m.Quality.IssueModel]:
         """Create issue model (monadic step 3)."""
         try:
             # Type narrowing after validation
@@ -432,11 +429,11 @@ class IssueServiceBuilder:
                 self._issue_type if isinstance(self._issue_type, str) else "UNKNOWN"
             )
             # Convert to enum - validation already confirmed these are valid
-            severity_enum = m.IssueSeverity(severity)
-            issue_type_enum = m.IssueType(issue_type_str)
+            severity_enum = m.Quality.IssueSeverity(severity)
+            issue_type_enum = m.Quality.IssueType(issue_type_str)
             file_path = self._file_path if isinstance(self._file_path, str) else ""
             message = self._message if isinstance(self._message, str) else ""
-            issue = m.IssueModel(
+            issue = m.Quality.IssueModel(
                 analysis_id=analysis_uuid,
                 severity=severity_enum,
                 issue_type=issue_type_enum,
@@ -449,8 +446,8 @@ class IssueServiceBuilder:
 
     def _log_issue_creation(
         self,
-        issue: m.IssueModel,
-    ) -> m.IssueModel:
+        issue: m.Quality.IssueModel,
+    ) -> m.Quality.IssueModel:
         """Log issue creation and return (monadic final step)."""
         self._logger.info(
             "Issue created successfully",
@@ -524,7 +521,7 @@ class ReportServiceBuilder:
         self._kwargs.update(config_dict)
         return self
 
-    def build(self) -> r[m.ReportModel]:
+    def build(self) -> r[m.Quality.ReportModel]:
         """Build report using monadic validation chain.
 
         Returns:
@@ -532,8 +529,7 @@ class ReportServiceBuilder:
 
         """
         return (
-            self
-            ._validate_analysis_id()
+            self._validate_analysis_id()
             .flat_map(lambda _: self._validate_format())
             .flat_map(lambda _: self._create_report_model())
             .map(self._log_report_creation)
@@ -554,7 +550,7 @@ class ReportServiceBuilder:
             )
         return r.ok(True)
 
-    def _create_report_model(self) -> r[m.ReportModel]:
+    def _create_report_model(self) -> r[m.Quality.ReportModel]:
         """Create report model (monadic step 3)."""
         try:
             analysis_uuid = (
@@ -571,7 +567,7 @@ class ReportServiceBuilder:
             if not _is_valid_report_format(self._format_type):
                 return r.fail(f"Invalid format type: {self._format_type}")
             # Type is now narrowed to Literal["HTML", "JSON", "CSV"]
-            report = m.ReportModel(
+            report = m.Quality.ReportModel(
                 analysis_id=analysis_uuid,
                 format_type=self._format_type,
             )
@@ -581,8 +577,8 @@ class ReportServiceBuilder:
 
     def _log_report_creation(
         self,
-        report: m.ReportModel,
-    ) -> m.ReportModel:
+        report: m.Quality.ReportModel,
+    ) -> m.Quality.ReportModel:
         """Log report creation and return (monadic final step)."""
         self._logger.info(
             "Report created successfully",
