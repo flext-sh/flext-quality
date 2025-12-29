@@ -80,10 +80,13 @@ class FlextQualityTestAntipatternOperation(FlextService[dict[str, t.GeneralValue
             if isinstance(module, cst.Name):
                 return module.value
             if isinstance(module, cst.Attribute):
-                base = FlextQualityTestAntipatternOperation.Helpers.get_module_name(
-                    module.value
-                )
-                return f"{base}.{module.attr.value}"
+                # Recursively extract the base name
+                base_node = module.value
+                if isinstance(base_node, cst.Attribute | cst.Name):
+                    base = FlextQualityTestAntipatternOperation.Helpers.get_module_name(
+                        base_node
+                    )
+                    return f"{base}.{module.attr.value}"
             return ""
 
         @staticmethod
@@ -194,29 +197,35 @@ class FlextQualityTestAntipatternOperation(FlextService[dict[str, t.GeneralValue
 
         """
         if not file_path.exists():
-            return r[self.AnalysisResult].fail(f"File not found: {file_path}")
+            return r[FlextQualityTestAntipatternOperation.AnalysisResult].fail(
+                f"File not found: {file_path}"
+            )
 
         if file_path.suffix != ".py":
-            return r[self.AnalysisResult].fail(f"Not a Python file: {file_path}")
+            return r[FlextQualityTestAntipatternOperation.AnalysisResult].fail(
+                f"Not a Python file: {file_path}"
+            )
 
         try:
             source = file_path.read_text(encoding="utf-8")
-            module = cst.parse_module(source)
+            parsed_module = cst.parse_module(source)
 
             # Use metadata wrapper for position tracking
-            wrapper = cst.metadata.MetadataWrapper(module)
-            visitor = self.MetadataVisitor()
+            wrapper = cst.metadata.MetadataWrapper(parsed_module)
+            visitor = FlextQualityTestAntipatternOperation.MetadataVisitor()
             wrapper.visit(visitor)
 
-            result = self.AnalysisResult(
+            result = FlextQualityTestAntipatternOperation.AnalysisResult(
                 file_path=file_path,
                 violations=visitor.violations,
             )
 
-            return r[self.AnalysisResult].ok(result)
+            return r[FlextQualityTestAntipatternOperation.AnalysisResult].ok(result)
 
         except cst.ParserSyntaxError as e:
-            return r[self.AnalysisResult].fail(f"Syntax error in {file_path}: {e}")
+            return r[FlextQualityTestAntipatternOperation.AnalysisResult].fail(
+                f"Syntax error in {file_path}: {e}"
+            )
 
     def analyze_directory(
         self: Self,
@@ -234,18 +243,18 @@ class FlextQualityTestAntipatternOperation(FlextService[dict[str, t.GeneralValue
 
         """
         if not directory.exists():
-            return r[list[self.AnalysisResult]].fail(
+            return r[list[FlextQualityTestAntipatternOperation.AnalysisResult]].fail(
                 f"Directory not found: {directory}"
             )
 
-        results: list[self.AnalysisResult] = []
+        results: list[FlextQualityTestAntipatternOperation.AnalysisResult] = []
 
         for file_path in directory.rglob(pattern):
             result = self.analyze(file_path)
             if result.is_success:
                 results.append(result.value)
 
-        return r[list[self.AnalysisResult]].ok(results)
+        return r[list[FlextQualityTestAntipatternOperation.AnalysisResult]].ok(results)
 
     def dry_run(
         self: Self, targets: list[Path]

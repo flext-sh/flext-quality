@@ -36,6 +36,7 @@ from .tools.test_operations import (
     TestInheritanceOperation,
     TestStructureOperation,
 )
+from .tools.workspace_discovery import FlextWorkspaceDiscovery
 from .web import FlextQualityWeb
 
 # Type alias for test quality operation results
@@ -598,13 +599,16 @@ class CliCommandRouter:
                 targets.append(project_path)
             return targets
 
-        # Workspace (all projects)
+        # Workspace (all projects via discovery)
         if args.workspace:
-            targets.extend(
-                proj
-                for proj in workspace_root.iterdir()
-                if proj.is_dir() and (proj / "pyproject.toml").exists()
-            )
+            discovery = FlextWorkspaceDiscovery(workspace_root=workspace_root)
+            result = discovery.get_ordered_projects()
+            if result.is_success:
+                targets.extend(
+                    workspace_root / project_name
+                    for project_name in result.value
+                    if (workspace_root / project_name).exists()
+                )
             return targets
 
         # Default: current directory

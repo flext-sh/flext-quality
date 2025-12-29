@@ -78,6 +78,7 @@ from .utilities import (
     should_ignore_path,
 )
 from .validation import FlextQualityValidationTools
+from .workspace_discovery import FlextWorkspaceDiscovery
 
 colorize = colorize_text
 print_colored = print_colored_text
@@ -109,6 +110,7 @@ __all__ = [
     "FlextQualityValidationTools",
     "FlextScriptService",
     "FlextSecurityService",
+    "FlextWorkspaceDiscovery",
     "HealthCheckService",
     "MyPyChecker",
     "PoetryOperations",

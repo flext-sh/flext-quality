@@ -18,6 +18,7 @@ from typing import ClassVar, Self
 
 import libcst as cst
 from flext_core import FlextResult as r, FlextService, FlextTypes as t
+from libcst.metadata import MetadataWrapper, PositionProvider
 from rope.base import libutils
 from rope.base.project import Project as RopeProject
 
@@ -87,7 +88,7 @@ class FlextQualityTestInheritanceOperation(FlextService[dict[str, t.GeneralValue
         """Visitor with position metadata support for inheritance detection."""
 
         # Required by libcst MetadataDependent  # CONFIG
-        METADATA_DEPENDENCIES = (cst.metadata.PositionProvider,)  # CONFIG
+        METADATA_DEPENDENCIES = (PositionProvider,)  # CONFIG
 
         def __init__(self: Self, file_path: str) -> None:
             """Initialize with file path for context."""
@@ -120,7 +121,7 @@ class FlextQualityTestInheritanceOperation(FlextService[dict[str, t.GeneralValue
 
             if not has_valid_base and current_bases != ["object"]:
                 # This test class is missing proper inheritance
-                pos = self.get_metadata(cst.metadata.PositionProvider, node)
+                pos = self.get_metadata(PositionProvider, node)
                 self.issues.append(
                     FlextQualityTestInheritanceOperation.InheritanceIssue(
                         class_name=class_name,
@@ -219,35 +220,45 @@ class FlextQualityTestInheritanceOperation(FlextService[dict[str, t.GeneralValue
 
         """
         if not file_path.exists():
-            return r[self.AnalysisResult].fail(f"File not found: {file_path}")
+            return r[FlextQualityTestInheritanceOperation.AnalysisResult].fail(
+                f"File not found: {file_path}"
+            )
 
         if file_path.suffix != ".py":
-            return r[self.AnalysisResult].fail(f"Not a Python file: {file_path}")
+            return r[FlextQualityTestInheritanceOperation.AnalysisResult].fail(
+                f"Not a Python file: {file_path}"
+            )
 
         # Only analyze test files
         if not file_path.name.startswith("test_"):
-            return r[self.AnalysisResult].ok(
-                self.AnalysisResult(file_path=file_path, issues=[])
+            return r[FlextQualityTestInheritanceOperation.AnalysisResult].ok(
+                FlextQualityTestInheritanceOperation.AnalysisResult(
+                    file_path=file_path, issues=[]
+                )
             )
 
         try:
             source = file_path.read_text(encoding="utf-8")
-            module = cst.parse_module(source)
+            parsed_module = cst.parse_module(source)
 
             # Use metadata wrapper for position tracking
-            wrapper = cst.metadata.MetadataWrapper(module)
-            visitor = self.MetadataVisitor(str(file_path))
+            wrapper = MetadataWrapper(parsed_module)
+            visitor = FlextQualityTestInheritanceOperation.MetadataVisitor(
+                str(file_path)
+            )
             wrapper.visit(visitor)
 
-            result = self.AnalysisResult(
+            result = FlextQualityTestInheritanceOperation.AnalysisResult(
                 file_path=file_path,
                 issues=visitor.issues,
             )
 
-            return r[self.AnalysisResult].ok(result)
+            return r[FlextQualityTestInheritanceOperation.AnalysisResult].ok(result)
 
         except cst.ParserSyntaxError as e:
-            return r[self.AnalysisResult].fail(f"Syntax error in {file_path}: {e}")
+            return r[FlextQualityTestInheritanceOperation.AnalysisResult].fail(
+                f"Syntax error in {file_path}: {e}"
+            )
 
     def analyze_directory(
         self: Self,
@@ -265,18 +276,18 @@ class FlextQualityTestInheritanceOperation(FlextService[dict[str, t.GeneralValue
 
         """
         if not directory.exists():
-            return r[list[self.AnalysisResult]].fail(
+            return r[list[FlextQualityTestInheritanceOperation.AnalysisResult]].fail(
                 f"Directory not found: {directory}"
             )
 
-        results: list[self.AnalysisResult] = []
+        results: list[FlextQualityTestInheritanceOperation.AnalysisResult] = []
 
         for file_path in directory.rglob(pattern):
             result = self.analyze(file_path)
             if result.is_success:
                 results.append(result.value)
 
-        return r[list[self.AnalysisResult]].ok(results)
+        return r[list[FlextQualityTestInheritanceOperation.AnalysisResult]].ok(results)
 
     def dry_run(
         self: Self, targets: list[Path]
@@ -297,10 +308,10 @@ class FlextQualityTestInheritanceOperation(FlextService[dict[str, t.GeneralValue
 
         for target in targets:
             if target.is_file():
-                result = self.analyze(target)
-                if result.is_success:
+                file_result = self.analyze(target)
+                if file_result.is_success:
                     file_count += 1
-                    for issue in result.value.issues:
+                    for issue in file_result.value.issues:
                         total_issues += 1
                         issues_by_class[issue.class_name] = (
                             issues_by_class.get(issue.class_name, 0) + 1
@@ -313,9 +324,9 @@ class FlextQualityTestInheritanceOperation(FlextService[dict[str, t.GeneralValue
                             "suggested": issue.suggested_base,
                         })
             elif target.is_dir():
-                result = self.analyze_directory(target)
-                if result.is_success:
-                    for analysis in result.value:
+                dir_result = self.analyze_directory(target)
+                if dir_result.is_success:
+                    for analysis in dir_result.value:
                         file_count += 1
                         for issue in analysis.issues:
                             total_issues += 1
@@ -339,12 +350,12 @@ class FlextQualityTestInheritanceOperation(FlextService[dict[str, t.GeneralValue
 
         return r[dict[str, t.GeneralValueType]].ok(summary)
 
-    def execute(
+    def run(
         self: Self,
         targets: list[Path],
         _backup_path: Path | None = None,
     ) -> r[dict[str, t.GeneralValueType]]:
-        """Execute inheritance issue detection (same as dry_run for detection-only).
+        """Run inheritance issue detection (same as dry_run for detection-only).
 
         Args:
             targets: List of files or directories to analyze

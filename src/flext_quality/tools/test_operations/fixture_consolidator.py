@@ -186,22 +186,24 @@ class FlextQualityFixtureConsolidateOperation(
 
         """
         if not conftest_path.exists():
-            return r[list[self.FixtureInfo]].fail(
+            return r[list[FlextQualityFixtureConsolidateOperation.FixtureInfo]].fail(
                 f"File not found: {conftest_path}"
             )
 
         if conftest_path.name != "conftest.py":
-            return r[list[self.FixtureInfo]].fail(
+            return r[list[FlextQualityFixtureConsolidateOperation.FixtureInfo]].fail(
                 f"Not a conftest.py file: {conftest_path}"
             )
 
         source = conftest_path.read_text(encoding="utf-8")
-        module = cst.parse_module(source)
+        parsed_module = cst.parse_module(source)
 
-        visitor = self.FixtureVisitor(conftest_path)
-        module.walk(visitor)
+        visitor = FlextQualityFixtureConsolidateOperation.FixtureVisitor(conftest_path)
+        parsed_module.walk(visitor)
 
-        return r[list[self.FixtureInfo]].ok(visitor.fixtures)
+        return r[list[FlextQualityFixtureConsolidateOperation.FixtureInfo]].ok(
+            visitor.fixtures
+        )
 
     def find_duplicates(
         self: Self, workspace_path: Path
@@ -216,12 +218,14 @@ class FlextQualityFixtureConsolidateOperation(
 
         """
         if not workspace_path.exists():
-            return r[self.AnalysisResult].fail(
+            return r[FlextQualityFixtureConsolidateOperation.AnalysisResult].fail(
                 f"Workspace not found: {workspace_path}"
             )
 
         # Collect all fixtures by name and hash
-        fixtures_by_name: dict[str, list[self.FixtureInfo]] = {}
+        fixtures_by_name: dict[
+            str, list[FlextQualityFixtureConsolidateOperation.FixtureInfo]
+        ] = {}
         total_fixtures = 0
 
         for conftest in workspace_path.rglob("conftest.py"):
@@ -232,29 +236,37 @@ class FlextQualityFixtureConsolidateOperation(
                     fixtures_by_name.setdefault(fixture.name, []).append(fixture)
 
         # Find groups with duplicates (same name AND same body hash)
-        duplicate_groups: list[self.DuplicateGroup] = []
+        duplicate_groups: list[
+            FlextQualityFixtureConsolidateOperation.DuplicateGroup
+        ] = []
 
         for name, fixtures in fixtures_by_name.items():
             if len(fixtures) < self.MIN_DUPLICATE_COUNT:
                 continue
 
             # Group by body hash to find truly identical fixtures
-            by_hash: dict[str, list[self.FixtureInfo]] = {}
+            by_hash: dict[
+                str, list[FlextQualityFixtureConsolidateOperation.FixtureInfo]
+            ] = {}
             for fixture in fixtures:
                 by_hash.setdefault(fixture.body_hash, []).append(fixture)
 
             # Only report groups where multiple fixtures have same hash
             duplicate_groups.extend(
-                self.DuplicateGroup(name=name, fixtures=hash_fixtures)
+                FlextQualityFixtureConsolidateOperation.DuplicateGroup(
+                    name=name, fixtures=hash_fixtures
+                )
                 for hash_fixtures in by_hash.values()
                 if len(hash_fixtures) > 1
             )
 
-        return r[self.AnalysisResult].ok(self.AnalysisResult(
-            workspace_path=workspace_path,
-            total_fixtures=total_fixtures,
-            duplicate_groups=duplicate_groups,
-        ))
+        return r[FlextQualityFixtureConsolidateOperation.AnalysisResult].ok(
+            FlextQualityFixtureConsolidateOperation.AnalysisResult(
+                workspace_path=workspace_path,
+                total_fixtures=total_fixtures,
+                duplicate_groups=duplicate_groups,
+            )
+        )
 
     def dry_run(
         self: Self, targets: list[Path]

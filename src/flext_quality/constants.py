@@ -778,8 +778,14 @@ class FlextQualityConstants(FlextConstants):
                 BLOCK = "block"
                 WARN = "warn"
 
-            # Default project processing order (dependency-based)
-            PROJECT_ORDER: tuple[str, ...] = (
+            # Foundation projects always processed first
+            FOUNDATION_PROJECTS: tuple[str, ...] = (
+                "flext-core",
+                "flext-cli",
+            )
+
+            # Fallback project order (used when discovery fails)
+            _FALLBACK_PROJECT_ORDER: tuple[str, ...] = (
                 "flext-core",
                 "flext-cli",
                 "flext-ldif",
@@ -812,6 +818,9 @@ class FlextQualityConstants(FlextConstants):
                 "client-a-oud-mig",
                 "flexcore",
             )
+
+            # Backward compatibility alias
+            PROJECT_ORDER = _FALLBACK_PROJECT_ORDER
 
             # Directory processing order
             DIRECTORY_ORDER: tuple[str, ...] = (
