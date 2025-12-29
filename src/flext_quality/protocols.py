@@ -266,6 +266,53 @@ class FlextQualityProtocols(p_core):
                 ...  # INTERFACE
 
         @runtime_checkable
+        class LibcstHelpers(Protocol):
+            """Protocol for libcst helper methods used in code transformation.
+
+            Defines the interface for helper classes that provide libcst CST
+            node manipulation utilities like converting between dotted names
+            and CST node representations.
+
+            Usage:
+                class MyHelpers:
+                    @staticmethod
+                    def get_dotted_name(node: cst.Attribute | cst.Name) -> str:
+                        ...
+
+                    @staticmethod
+                    def create_dotted_name(name: str) -> cst.BaseExpression:
+                        ...
+
+                helpers: p.Quality.LibcstHelpers = MyHelpers
+            """
+
+            @staticmethod
+            def get_dotted_name(node: t.GeneralValueType) -> str:
+                """Convert CST node to dotted name string.
+
+                Args:
+                    node: CST Attribute or Name node
+
+                Returns:
+                    Dotted name string representation
+
+                """
+                ...  # INTERFACE
+
+            @staticmethod
+            def create_dotted_name(name: str) -> t.GeneralValueType:
+                """Create CST node from dotted name string.
+
+                Args:
+                    name: Dotted name string (e.g., "module.class.attr")
+
+                Returns:
+                    CST BaseExpression node
+
+                """
+                ...  # INTERFACE
+
+        @runtime_checkable
         class BatchOperation(Protocol):
             """Protocol for batch operations with validation.
 

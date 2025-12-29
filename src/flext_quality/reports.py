@@ -134,7 +134,9 @@ class ScoreCalculator:
     ) -> int:
         """Count critical issues - type-safe using IssueModel."""
         return len([
-            i for i in issues if i.severity == FlextQualityModels.Quality.IssueSeverity.CRITICAL
+            i
+            for i in issues
+            if i.severity == FlextQualityModels.Quality.IssueSeverity.CRITICAL
         ])
 
 
@@ -437,9 +439,11 @@ class HtmlReportBuilder:
                 for issue in issues[: thresholds.html_issue_limit]:
                     severity_class = (
                         "high-severity"
-                        if issue.severity == FlextQualityModels.Quality.IssueSeverity.CRITICAL
+                        if issue.severity
+                        == FlextQualityModels.Quality.IssueSeverity.CRITICAL
                         else "medium-severity"
-                        if issue.severity == FlextQualityModels.Quality.IssueSeverity.HIGH
+                        if issue.severity
+                        == FlextQualityModels.Quality.IssueSeverity.HIGH
                         else "low-severity"
                     )
                     line_info = (

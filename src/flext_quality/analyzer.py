@@ -261,7 +261,9 @@ class FlextQualityAnalyzer(FlextService[m.Quality.AnalysisResults]):
             plugin = FlextDuplicationPlugin()
             check_result = plugin.check(python_files)
             if check_result.is_failure:
-                return FlextResult.fail(check_result.error or "Duplication check failed")
+                return FlextResult.fail(
+                    check_result.error or "Duplication check failed"
+                )
 
             result = check_result.value
             issues: list[DuplicationIssueModel] = [

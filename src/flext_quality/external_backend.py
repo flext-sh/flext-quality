@@ -761,5 +761,7 @@ class FlextQualityExternalBackend(
             "duplicate_count": check_result.duplicate_count,
             "files_checked": check_result.files_checked,
             "duplicates": duplicates_list,
-            "status": "success" if check_result.duplicate_count == 0 else "issues_found",
+            "status": "success"
+            if check_result.duplicate_count == 0
+            else "issues_found",
         })

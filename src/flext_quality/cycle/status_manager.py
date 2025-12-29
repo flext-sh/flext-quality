@@ -152,7 +152,9 @@ class FlextQualityCycleServices(FlextService[bool]):
                     save_result.error or "Save failed"
                 )
 
-            return r[m.Quality.Cycle.CycleStatus].ok(self._status)
+            # Type narrowing: _status is guaranteed non-None after initialize_cycle
+            status = self._status or m.Quality.Cycle.CycleStatus()
+            return r[m.Quality.Cycle.CycleStatus].ok(status)
 
         def _get_next_file_in_project(self, project_name: str) -> str | None:
             """Get the next pending file in a project."""
@@ -325,9 +327,7 @@ class FlextQualityCycleServices(FlextService[bool]):
                     str(self.status.started_at) if self.status.started_at else None
                 ),
                 "last_updated": (
-                    str(self.status.last_updated)
-                    if self.status.last_updated
-                    else None
+                    str(self.status.last_updated) if self.status.last_updated else None
                 ),
                 "current_project": self.status.current_project,
                 "current_file": self.status.current_file,

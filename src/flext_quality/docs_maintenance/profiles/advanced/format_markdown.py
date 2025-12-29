@@ -115,17 +115,23 @@ class FlextQualityMarkdownFormatting:
             data = result.value
             # Narrow types from GeneralValueType to concrete types
             original_lines_val = data.get("original_lines", 0)
-            original_lines = original_lines_val if isinstance(original_lines_val, int) else 0
+            original_lines = (
+                original_lines_val if isinstance(original_lines_val, int) else 0
+            )
             formatted_lines_val = data.get("formatted_lines", 0)
-            formatted_lines = formatted_lines_val if isinstance(formatted_lines_val, int) else 0
+            formatted_lines = (
+                formatted_lines_val if isinstance(formatted_lines_val, int) else 0
+            )
 
-            return FlextResult.ok(FlextQualityMarkdownFormatting.FormatResult(
-                path=str(data.get("path", path)),
-                modified=bool(data.get("modified", False)),
-                message=str(data.get("message", "")),
-                original_lines=original_lines,
-                formatted_lines=formatted_lines,
-            ))
+            return FlextResult.ok(
+                FlextQualityMarkdownFormatting.FormatResult(
+                    path=str(data.get("path", path)),
+                    modified=bool(data.get("modified", False)),
+                    message=str(data.get("message", "")),
+                    original_lines=original_lines,
+                    formatted_lines=formatted_lines,
+                )
+            )
 
         def format_directory(
             self,
@@ -185,13 +191,15 @@ class FlextQualityMarkdownFormatting:
                     dry_run=dry_run,
                 )
 
-                return FlextResult.ok(FlextQualityMarkdownFormatting.FormatReport(
-                    summary=summary,
-                    results=results,
-                    errors=errors,
-                    generated_at=datetime.now(UTC).isoformat(),
-                    docs_directory=str(target_dir),
-                ))
+                return FlextResult.ok(
+                    FlextQualityMarkdownFormatting.FormatReport(
+                        summary=summary,
+                        results=results,
+                        errors=errors,
+                        generated_at=datetime.now(UTC).isoformat(),
+                        docs_directory=str(target_dir),
+                    )
+                )
 
             except Exception as e:
                 return FlextResult.fail(f"Directory formatting failed: {e}")

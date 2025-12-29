@@ -89,8 +89,10 @@ class FlextHookValidator(FlextService[bool]):
         pattern_result = self.check_patterns(file_path, content)
         if not pattern_result[0]:
             violations = pattern_result[1]
-            return False, f"BLOCKED: {len(violations)} pattern violations\n" + "\n".join(
-                violations
+            return (
+                False,
+                f"BLOCKED: {len(violations)} pattern violations\n"
+                + "\n".join(violations),
             )
 
         # Run lint check via operations

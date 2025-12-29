@@ -289,9 +289,7 @@ class FlextQualityTestInheritanceOperation(FlextService[dict[str, t.GeneralValue
 
         return r[list[FlextQualityTestInheritanceOperation.AnalysisResult]].ok(results)
 
-    def dry_run(
-        self: Self, targets: list[Path]
-    ) -> r[dict[str, t.GeneralValueType]]:
+    def dry_run(self: Self, targets: list[Path]) -> r[dict[str, t.GeneralValueType]]:
         """Preview inheritance issue detection without modifications.
 
         Args:
@@ -368,9 +366,7 @@ class FlextQualityTestInheritanceOperation(FlextService[dict[str, t.GeneralValue
         # Detection-only operation - same as dry_run
         return self.dry_run(targets)
 
-    def rollback(
-        self: Self, _backup_path: Path
-    ) -> r[dict[str, t.GeneralValueType]]:
+    def rollback(self: Self, _backup_path: Path) -> r[dict[str, t.GeneralValueType]]:
         """Rollback not applicable for detection-only operation.
 
         Args:

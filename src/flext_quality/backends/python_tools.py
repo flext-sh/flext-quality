@@ -520,7 +520,10 @@ class FlextQualityPythonTools:
             violations = []
             for func in functions:
                 complexity_val = func.get("complexity", 0)
-                if isinstance(complexity_val, (int, float)) and complexity_val > max_complexity:
+                if (
+                    isinstance(complexity_val, (int, float))
+                    and complexity_val > max_complexity
+                ):
                     violations.append(func)
 
             return FlextResult.ok({

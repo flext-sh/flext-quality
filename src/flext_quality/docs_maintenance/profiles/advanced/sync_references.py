@@ -167,13 +167,15 @@ class FlextQualityCrossReferenceSync:
                         if not dry_run:
                             path.write_text(new_content, encoding="utf-8")
 
-                return FlextResult.ok(FlextQualityCrossReferenceSync.SyncResult(
-                    file_path=str(path),
-                    toc_updated=toc_updated,
-                    references_updated=0,
-                    errors=errors,
-                    synced_at=datetime.now(UTC).isoformat(),
-                ))
+                return FlextResult.ok(
+                    FlextQualityCrossReferenceSync.SyncResult(
+                        file_path=str(path),
+                        toc_updated=toc_updated,
+                        references_updated=0,
+                        errors=errors,
+                        synced_at=datetime.now(UTC).isoformat(),
+                    )
+                )
 
             except Exception as e:
                 return FlextResult.fail(f"TOC sync failed: {e}")
@@ -217,7 +219,8 @@ class FlextQualityCrossReferenceSync:
                             if not target_path.exists():
                                 # Try to find the file
                                 fixed_path = self._find_moved_file(
-                                    target_url, path.parent,
+                                    target_url,
+                                    path.parent,
                                 )
                                 if fixed_path:
                                     old_ref = str(link["url"])
@@ -237,13 +240,15 @@ class FlextQualityCrossReferenceSync:
                 if new_content != content and not dry_run:
                     path.write_text(new_content, encoding="utf-8")
 
-                return FlextResult.ok(FlextQualityCrossReferenceSync.SyncResult(
-                    file_path=str(path),
-                    toc_updated=False,
-                    references_updated=references_updated,
-                    errors=errors,
-                    synced_at=datetime.now(UTC).isoformat(),
-                ))
+                return FlextResult.ok(
+                    FlextQualityCrossReferenceSync.SyncResult(
+                        file_path=str(path),
+                        toc_updated=False,
+                        references_updated=references_updated,
+                        errors=errors,
+                        synced_at=datetime.now(UTC).isoformat(),
+                    )
+                )
 
             except Exception as e:
                 return FlextResult.fail(f"Reference sync failed: {e}")
@@ -293,9 +298,8 @@ class FlextQualityCrossReferenceSync:
                         file_result = ref_result.value
                         results.append(file_result)
                         total_refs_fixed += file_result.references_updated
-                        if (
-                            file_result.references_updated > 0
-                            or (toc_result.is_success and toc_result.value.toc_updated)
+                        if file_result.references_updated > 0 or (
+                            toc_result.is_success and toc_result.value.toc_updated
                         ):
                             files_updated += 1
                         if file_result.errors:
@@ -311,13 +315,15 @@ class FlextQualityCrossReferenceSync:
                     errors=error_count,
                 )
 
-                return FlextResult.ok(FlextQualityCrossReferenceSync.SyncReport(
-                    summary=summary,
-                    results=results,
-                    reference_updates=reference_updates,
-                    generated_at=datetime.now(UTC).isoformat(),
-                    docs_directory=str(target_dir),
-                ))
+                return FlextResult.ok(
+                    FlextQualityCrossReferenceSync.SyncReport(
+                        summary=summary,
+                        results=results,
+                        reference_updates=reference_updates,
+                        generated_at=datetime.now(UTC).isoformat(),
+                        docs_directory=str(target_dir),
+                    )
+                )
 
             except Exception as e:
                 return FlextResult.fail(f"Directory sync failed: {e}")
@@ -341,12 +347,14 @@ class FlextQualityCrossReferenceSync:
                 if level > 1:  # Skip H1 (document title)
                     text = str(header.get("text", ""))
                     anchor = self._text_to_anchor(text)
-                    entries.append(FlextQualityCrossReferenceSync.TocEntry(
-                        text=text,
-                        anchor=anchor,
-                        level=level,
-                        line=int(header.get("line", 0)),
-                    ))
+                    entries.append(
+                        FlextQualityCrossReferenceSync.TocEntry(
+                            text=text,
+                            anchor=anchor,
+                            level=level,
+                            line=int(header.get("line", 0)),
+                        )
+                    )
             return entries
 
         def _text_to_anchor(self, text: str) -> str:
@@ -464,18 +472,22 @@ class FlextQualityCrossReferenceSync:
                     file_result = synchronizer.sync_toc(target, dry_run=args.dry_run)
                 elif args.refs_only:
                     file_result = synchronizer.sync_references(
-                        target, dry_run=args.dry_run,
+                        target,
+                        dry_run=args.dry_run,
                     )
                 else:
                     # Sync both
                     toc_result = synchronizer.sync_toc(target, dry_run=args.dry_run)
                     ref_result = synchronizer.sync_references(
-                        target, dry_run=args.dry_run,
+                        target,
+                        dry_run=args.dry_run,
                     )
                     if toc_result.is_success and ref_result.is_success:
                         file_result = ref_result
                     else:
-                        file_result = toc_result if toc_result.is_failure else ref_result
+                        file_result = (
+                            toc_result if toc_result.is_failure else ref_result
+                        )
 
                 if file_result.is_success:
                     data = file_result.value

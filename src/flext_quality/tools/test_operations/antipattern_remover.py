@@ -34,12 +34,15 @@ class FlextQualityTestAntipatternOperation(FlextService[dict[str, t.GeneralValue
 
     # Forbidden mock function names
     FORBIDDEN_MOCKS: ClassVar[frozenset[str]] = frozenset({
-        "Mock", "MagicMock", "AsyncMock",
+        "Mock",
+        "MagicMock",
+        "AsyncMock",
     })
 
     # Forbidden import modules
     FORBIDDEN_MODULES: ClassVar[frozenset[str]] = frozenset({
-        "unittest.mock", "unittest",
+        "unittest.mock",
+        "unittest",
     })
 
     @dataclass
@@ -106,13 +109,9 @@ class FlextQualityTestAntipatternOperation(FlextService[dict[str, t.GeneralValue
 
         def __init__(self: Self) -> None:
             """Initialize with empty violations list."""
-            self.violations: list[
-                FlextQualityTestAntipatternOperation.Violation
-            ] = []
+            self.violations: list[FlextQualityTestAntipatternOperation.Violation] = []
 
-        def visit_ImportFrom(
-            self: Self, node: cst.ImportFrom
-        ) -> bool | None:
+        def visit_ImportFrom(self: Self, node: cst.ImportFrom) -> bool | None:
             """Detect forbidden mock imports with position."""
             if node.module is None:
                 return None
@@ -260,9 +259,7 @@ class FlextQualityTestAntipatternOperation(FlextService[dict[str, t.GeneralValue
 
         return r[list[FlextQualityTestAntipatternOperation.AnalysisResult]].ok(results)
 
-    def dry_run(
-        self: Self, targets: list[Path]
-    ) -> r[dict[str, t.GeneralValueType]]:
+    def dry_run(self: Self, targets: list[Path]) -> r[dict[str, t.GeneralValueType]]:
         """Preview anti-pattern detection without modifications.
 
         Args:
@@ -335,9 +332,7 @@ class FlextQualityTestAntipatternOperation(FlextService[dict[str, t.GeneralValue
         """
         return self.dry_run([Path.cwd()])
 
-    def rollback(
-        self: Self, _backup_path: Path
-    ) -> r[dict[str, t.GeneralValueType]]:
+    def rollback(self: Self, _backup_path: Path) -> r[dict[str, t.GeneralValueType]]:
         """Rollback not applicable for detection-only operation.
 
         Args:

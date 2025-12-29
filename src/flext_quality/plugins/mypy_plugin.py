@@ -109,9 +109,7 @@ class FlextMyPyPlugin(FlextService[int]):
             )
 
             # Parse errors from output
-            error_lines = [
-                ln for ln in result.stdout.split("\n") if "error:" in ln
-            ]
+            error_lines = [ln for ln in result.stdout.split("\n") if "error:" in ln]
 
             check_result = FlextMyPyPlugin.CheckResult(
                 error_count=len(error_lines),
@@ -183,7 +181,11 @@ class FlextMyPyPlugin(FlextService[int]):
             file_path = Path(parts[0])
             line_num = int(parts[1])
             col_num = int(parts[2]) if len(parts) > c.Parser.MYPY_MIN_PARTS else 0
-            rest = parts[c.Parser.MYPY_MIN_PARTS].strip() if len(parts) > c.Parser.MYPY_MIN_PARTS else ""
+            rest = (
+                parts[c.Parser.MYPY_MIN_PARTS].strip()
+                if len(parts) > c.Parser.MYPY_MIN_PARTS
+                else ""
+            )
 
             # Parse severity and message
             if ": " in rest:

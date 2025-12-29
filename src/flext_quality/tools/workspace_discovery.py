@@ -247,7 +247,10 @@ class FlextWorkspaceDiscovery(FlextService[list[str]]):
             if not item.is_dir():
                 continue
             # Skip hidden directories and common non-project dirs
-            if item.name.startswith(".") or item.name in {"node_modules", "__pycache__"}:
+            if item.name.startswith(".") or item.name in {
+                "node_modules",
+                "__pycache__",
+            }:
                 continue
             pyproject = item / "pyproject.toml"
             if pyproject.exists() and self.PyprojectParser.is_flext_project(pyproject):

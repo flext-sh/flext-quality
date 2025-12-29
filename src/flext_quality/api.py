@@ -151,7 +151,9 @@ class FlextQuality(FlextService[bool]):
             "get_project not implemented",
         )
 
-    def list_projects(self) -> FlextResult[list[FlextQualityModels.Quality.ProjectModel]]:
+    def list_projects(
+        self,
+    ) -> FlextResult[list[FlextQualityModels.Quality.ProjectModel]]:
         """List all projects."""
         return FlextResult[list[FlextQualityModels.Quality.ProjectModel]].fail(
             "list_projects not implemented",
@@ -347,7 +349,9 @@ class FlextQuality(FlextService[bool]):
             .build()
         )
 
-    def get_issue(self, _issue_id: UUID) -> FlextResult[FlextQualityModels.Quality.IssueModel]:
+    def get_issue(
+        self, _issue_id: UUID
+    ) -> FlextResult[FlextQualityModels.Quality.IssueModel]:
         """Get an issue by ID."""
         return FlextResult[FlextQualityModels.Quality.IssueModel].fail(
             "get_issue not implemented",
@@ -367,7 +371,9 @@ class FlextQuality(FlextService[bool]):
                 FlextQualityModels.Quality.IssueSeverity(severity)
             except ValueError:
                 error_msg = f"Invalid severity: {severity}"
-                return FlextResult[list[FlextQualityModels.Quality.IssueModel]].fail(error_msg)
+                return FlextResult[list[FlextQualityModels.Quality.IssueModel]].fail(
+                    error_msg
+                )
 
         return FlextResult[list[FlextQualityModels.Quality.IssueModel]].fail(
             "list_issues not implemented",

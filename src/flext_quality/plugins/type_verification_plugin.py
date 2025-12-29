@@ -23,7 +23,9 @@ from flext_core import FlextLogger, FlextResult, FlextService
 from ..constants import FlextQualityConstants
 
 
-class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.CheckResult"]):
+class FlextTypeVerificationPlugin(
+    FlextService["FlextTypeVerificationPlugin.CheckResult"]
+):
     """Type verification plugin for detecting type issues.
 
     Implements AST-based analysis for TV001-TV018 rules.
@@ -126,9 +128,7 @@ class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.Chec
             try:
                 source = file_path.read_text(encoding="utf-8")
                 tree = ast.parse(source, filename=str(file_path))
-                file_violations = self._analyze_file(
-                    tree, str(file_path), categories
-                )
+                file_violations = self._analyze_file(tree, str(file_path), categories)
                 all_violations.extend(file_violations)
             except SyntaxError:
                 self._logger.warning("Syntax error in %s", file_path)
@@ -228,8 +228,7 @@ class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.Chec
 
         if stats.by_category.get("needs_protocol", 0) > 0:
             guidance.append(
-                "Consider defining Protocol types for complex Callable "
-                "signatures"
+                "Consider defining Protocol types for complex Callable signatures"
             )
 
         if stats.by_category.get("needs_model", 0) > 0:
@@ -420,9 +419,8 @@ class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.Chec
                 return
 
             tv = FlextQualityConstants.Quality.TypeVerification
-            if (
-                isinstance(node.annotation, ast.Subscript)
-                and self._is_complex_callable(node.annotation)
+            if isinstance(node.annotation, ast.Subscript) and self._is_complex_callable(
+                node.annotation
             ):
                 self._add_violation(
                     tv.RuleId.COMPLEX_CALLABLE_NEEDS_PROTOCOL,
@@ -502,7 +500,9 @@ class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.Chec
                 if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                     self._analyze_function(node)
 
-        def _analyze_function(self: Self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> None:
+        def _analyze_function(
+            self: Self, node: ast.FunctionDef | ast.AsyncFunctionDef
+        ) -> None:
             """Analyze a function for coupling issues."""
             isinstance_count = 0
             for child in ast.walk(node):
@@ -564,10 +564,7 @@ class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.Chec
 
             # TV015: Returning None directly - simplified check
             # Would need context to know if in FlextResult-returning method
-            if (
-                isinstance(node.value, ast.Constant)
-                and node.value.value is None
-            ):
+            if isinstance(node.value, ast.Constant) and node.value.value is None:
                 # This is a simplified check - would need context
                 pass
 

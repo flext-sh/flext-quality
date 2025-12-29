@@ -17,6 +17,8 @@ from typing import Self
 
 import libcst as cst
 
+from flext_quality.protocols import p
+
 
 class FlextQualityLibcstVisitors:
     """Centralized libcst visitor implementations for code transformation.
@@ -31,7 +33,7 @@ class FlextQualityLibcstVisitors:
         def __init__(
             self: Self,
             module_name: str,
-            helpers: type,
+            helpers: p.Quality.LibcstHelpers,
         ) -> None:
             """Initialize with module name to remove.
 
@@ -51,8 +53,7 @@ class FlextQualityLibcstVisitors:
             """Remove ImportFrom if it matches the target module."""
             del original_node  # Required by libcst API
             if updated_node.module is not None:
-                # type: ignore[attr-defined] - helpers class has get_dotted_name static method
-                module_str = self.helpers.get_dotted_name(updated_node.module)  # type: ignore[attr-defined]
+                module_str = self.helpers.get_dotted_name(updated_node.module)
                 if module_str == self.module_name or module_str.startswith(
                     f"{self.module_name}."
                 ):
@@ -62,7 +63,9 @@ class FlextQualityLibcstVisitors:
     class StatementCheckerVisitor(cst.CSTVisitor):
         """Check if source has statement from specific module."""
 
-        def __init__(self: Self, module_name: str, helpers: type) -> None:
+        def __init__(
+            self: Self, module_name: str, helpers: p.Quality.LibcstHelpers
+        ) -> None:
             """Initialize with module name to find."""
             super().__init__()
             self.module_name = module_name
@@ -72,8 +75,7 @@ class FlextQualityLibcstVisitors:
         def visit_ImportFrom(self: Self, node: cst.ImportFrom) -> bool:
             """Check ImportFrom nodes."""
             if node.module is not None:
-                # type: ignore[attr-defined] - helpers class has get_dotted_name static method
-                module_str = self.helpers.get_dotted_name(node.module)  # type: ignore[attr-defined]
+                module_str = self.helpers.get_dotted_name(node.module)
                 if module_str == self.module_name or module_str.startswith(
                     f"{self.module_name}."
                 ):
@@ -84,7 +86,11 @@ class FlextQualityLibcstVisitors:
         """Change a class's base class."""
 
         def __init__(
-            self: Self, class_name: str, old_base: str, new_base: str, helpers: type
+            self: Self,
+            class_name: str,
+            old_base: str,
+            new_base: str,
+            helpers: p.Quality.LibcstHelpers,
         ) -> None:
             """Initialize with class and base names."""
             super().__init__()
@@ -111,13 +117,11 @@ class FlextQualityLibcstVisitors:
                 ):
                     new_bases.append(base.with_changes(value=cst.Name(self.new_base)))
                 elif isinstance(base.value, cst.Attribute):
-                    # type: ignore[attr-defined] - helpers class has get_dotted_name static method
-                    base_str = self.helpers.get_dotted_name(base.value)  # type: ignore[attr-defined]
+                    base_str = self.helpers.get_dotted_name(base.value)
                     if base_str == self.old_base:
                         new_bases.append(
                             base.with_changes(
-                                # type: ignore[attr-defined] - helpers class has create_dotted_name static method
-                                value=self.helpers.create_dotted_name(self.new_base)  # type: ignore[attr-defined]
+                                value=self.helpers.create_dotted_name(self.new_base)
                             )
                         )
                     else:
@@ -131,7 +135,7 @@ class FlextQualityLibcstVisitors:
         """Add a base class to an existing class."""
 
         def __init__(
-            self: Self, class_name: str, new_base: str, helpers: type
+            self: Self, class_name: str, new_base: str, helpers: p.Quality.LibcstHelpers
         ) -> None:
             """Initialize with class and new base names."""
             super().__init__()
@@ -149,10 +153,7 @@ class FlextQualityLibcstVisitors:
             if updated_node.name.value != self.class_name:
                 return updated_node
 
-            # type: ignore[attr-defined] - helpers class has create_dotted_name static method
-            new_base_arg = cst.Arg(
-                value=self.helpers.create_dotted_name(self.new_base)  # type: ignore[attr-defined]
-            )
+            new_base_arg = cst.Arg(value=self.helpers.create_dotted_name(self.new_base))
             new_bases = [*updated_node.bases, new_base_arg]
 
             return updated_node.with_changes(bases=new_bases)
@@ -160,7 +161,7 @@ class FlextQualityLibcstVisitors:
     class ClassFinderVisitor(cst.CSTVisitor):
         """Find all classes in source code."""
 
-        def __init__(self: Self, helpers: type) -> None:
+        def __init__(self: Self, helpers: p.Quality.LibcstHelpers) -> None:
             """Initialize class finder."""
             super().__init__()
             self.classes: list[dict[str, str | list[str] | int]] = []
@@ -173,8 +174,7 @@ class FlextQualityLibcstVisitors:
                 if isinstance(base.value, cst.Name):
                     bases.append(base.value.value)
                 elif isinstance(base.value, cst.Attribute):
-                    # type: ignore[attr-defined] - helpers class has get_dotted_name static method
-                    bases.append(self.helpers.get_dotted_name(base.value))  # type: ignore[attr-defined]
+                    bases.append(self.helpers.get_dotted_name(base.value))
 
             self.classes.append({
                 "name": node.name.value,
@@ -185,9 +185,7 @@ class FlextQualityLibcstVisitors:
     class NestInClassVisitor(cst.CSTTransformer):
         """Move top-level functions into a class as methods."""
 
-        def __init__(
-            self: Self, class_name: str, function_names: list[str]
-        ) -> None:
+        def __init__(self: Self, class_name: str, function_names: list[str]) -> None:
             """Initialize with class and function names."""
             super().__init__()
             self.class_name = class_name
@@ -262,9 +260,7 @@ class FlextQualityLibcstVisitors:
                     and stmt.name.value in self.method_names
                 ):
                     # Remove self parameter
-                    params = [
-                        p for p in stmt.params.params if p.name.value != "self"
-                    ]
+                    params = [p for p in stmt.params.params if p.name.value != "self"]
                     extracted_func = stmt.with_changes(
                         params=stmt.params.with_changes(params=params)
                     )

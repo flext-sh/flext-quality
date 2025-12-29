@@ -98,9 +98,7 @@ class FlextQualityFixtureConsolidateOperation(
             ] = []
             self._current_line = 0
 
-        def visit_FunctionDef(
-            self: Self, node: cst.FunctionDef
-        ) -> bool | None:
+        def visit_FunctionDef(self: Self, node: cst.FunctionDef) -> bool | None:
             """Visit function definitions to find fixtures."""
             # Check if function has @pytest.fixture decorator
             is_fixture = False
@@ -209,9 +207,7 @@ class FlextQualityFixtureConsolidateOperation(
             visitor.fixtures
         )
 
-    def find_duplicates(
-        self: Self, workspace_path: Path
-    ) -> r[AnalysisResult]:
+    def find_duplicates(self: Self, workspace_path: Path) -> r[AnalysisResult]:
         """Find duplicate fixtures across a workspace.
 
         Args:
@@ -272,9 +268,7 @@ class FlextQualityFixtureConsolidateOperation(
             )
         )
 
-    def dry_run(
-        self: Self, targets: list[Path]
-    ) -> r[dict[str, t.GeneralValueType]]:
+    def dry_run(self: Self, targets: list[Path]) -> r[dict[str, t.GeneralValueType]]:
         """Preview fixture consolidation opportunities.
 
         Args:
@@ -305,7 +299,9 @@ class FlextQualityFixtureConsolidateOperation(
                         "name": group.name,
                         "count": group.count,
                         "files": group.files,
-                        "body_hash": group.fixtures[0].body_hash if group.fixtures else "",
+                        "body_hash": group.fixtures[0].body_hash
+                        if group.fixtures
+                        else "",
                     }
                     for group in analysis.duplicate_groups
                 )
@@ -351,9 +347,7 @@ class FlextQualityFixtureConsolidateOperation(
         """
         return self.dry_run([Path.cwd()])
 
-    def rollback(
-        self: Self, _backup_path: Path
-    ) -> r[dict[str, t.GeneralValueType]]:
+    def rollback(self: Self, _backup_path: Path) -> r[dict[str, t.GeneralValueType]]:
         """Rollback not applicable for detection-only operation.
 
         Args:

@@ -93,7 +93,9 @@ class FlextDuplicationPlugin(FlextService[int]):
         similarity: float
         shared_lines: int
         consolidation_target: str
-        consolidation_strategy: str  # "extract-to-flext-tests", "refactor-src", "unify-locally"
+        consolidation_strategy: (
+            str  # "extract-to-flext-tests", "refactor-src", "unify-locally"
+        )
 
     @dataclass(frozen=True, slots=True)
     class WorkspaceTestCheckResult:
@@ -326,7 +328,7 @@ class FlextDuplicationPlugin(FlextService[int]):
         projects = sorted(project_files.keys())
 
         for i, proj1 in enumerate(projects):
-            for proj2 in projects[i + 1:]:
+            for proj2 in projects[i + 1 :]:
                 files1 = project_files[proj1]
                 files2 = project_files[proj2]
 
@@ -366,7 +368,9 @@ class FlextDuplicationPlugin(FlextService[int]):
             FlextDuplicationPlugin.WorkspaceCheckResult(
                 total_projects=len(projects),
                 total_duplicates=len(duplicates),
-                cross_project_duplicates=len([d for d in duplicates if d.file1_project != d.file2_project]),
+                cross_project_duplicates=len([
+                    d for d in duplicates if d.file1_project != d.file2_project
+                ]),
                 duplicates=tuple(duplicates),
             )
         )
@@ -433,7 +437,9 @@ class FlextDuplicationPlugin(FlextService[int]):
         flext_tests_files: list[tuple[Path, str]] = []
 
         # Scan all projects
-        for proj_dir in sorted(list(workspace_dir.glob("flext-*")) + list(workspace_dir.glob("client-a-*"))):
+        for proj_dir in sorted(
+            list(workspace_dir.glob("flext-*")) + list(workspace_dir.glob("client-a-*"))
+        ):
             if not proj_dir.is_dir():
                 continue
 
@@ -483,7 +489,7 @@ class FlextDuplicationPlugin(FlextService[int]):
         # 1. Test vs Test (within project)
         for proj_name, test_files in project_tests.items():
             for i, (path1, content1) in enumerate(test_files):
-                for path2, content2 in test_files[i + 1:]:
+                for path2, content2 in test_files[i + 1 :]:
                     pair = self._analyze_pair(
                         path1,
                         content1,
@@ -508,7 +514,7 @@ class FlextDuplicationPlugin(FlextService[int]):
         # 2. Test vs Test (cross-project) - consolidate to flext-tests
         projects_with_tests = sorted(project_tests.keys())
         for i, proj1 in enumerate(projects_with_tests):
-            for proj2 in projects_with_tests[i + 1:]:
+            for proj2 in projects_with_tests[i + 1 :]:
                 for path1, content1 in project_tests[proj1]:
                     for path2, content2 in project_tests[proj2]:
                         pair = self._analyze_pair(
@@ -588,9 +594,7 @@ class FlextDuplicationPlugin(FlextService[int]):
         test_dups = sum(1 for d in duplicates if "test-test" in d.source_type)
         test_src_dups = sum(1 for d in duplicates if d.source_type == "test-src")
         cross_proj_dups = sum(
-            1
-            for d in duplicates
-            if d.source_type == "test-test-cross"
+            1 for d in duplicates if d.source_type == "test-test-cross"
         )
 
         self._logger.debug(

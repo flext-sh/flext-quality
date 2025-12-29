@@ -29,7 +29,7 @@ from rich.table import Table
 from rich.tree import Tree
 
 from .analyzer import FlextQualityAnalyzer
-from .command_strategies import CommandStrategies
+from .command_strategies import CommandStrategies as c
 from .docs_maintenance.cli import run_comprehensive
 from .plugins.code_quality_plugin import FlextCodeQualityPlugin
 from .reports import FlextQualityReportGenerator, ReportFormat
@@ -257,12 +257,13 @@ class CliCommandRouter:
         self._cli = FlextCli()
         self._console = Console()
         self._quiet_mode = False
-        self._strategies = CommandStrategies()
 
     def _configure_from_args(self, args: argparse.Namespace) -> None:
         """Configure CLI based on command arguments (quiet mode, etc)."""
         # Enable quiet mode if requested
-        if (hasattr(args, "quiet") and args.quiet) or (hasattr(args, "no_color") and args.no_color):
+        if (hasattr(args, "quiet") and args.quiet) or (
+            hasattr(args, "no_color") and args.no_color
+        ):
             self._quiet_mode = True
 
     def _maybe_print(self, message: str, style: str = "info") -> None:
@@ -443,14 +444,16 @@ class CliCommandRouter:
             self.logger.error(output_result.error or "Unknown error")
             return FlextResult[int].ok(1)
 
-        # Return appropriate exit code with Rich output (respects quiet mode)
+        # Determine exit code using strategy thresholds (strategy-driven)
         quality_score = analyzer.get_quality_score()
-        exit_code = self.analyzer_wrapper.get_exit_code(quality_score)
-        if exit_code == 0:
+        if quality_score >= c.ANALYZE_SUCCESS_THRESHOLD:
+            exit_code = 0
             self._maybe_print(f"✅ Good quality: {quality_score:.1f}%", "success")
-        elif exit_code == 1:
+        elif quality_score >= c.ANALYZE_WARNING_THRESHOLD:
+            exit_code = 1
             self._maybe_print(f"⚠️  Medium quality: {quality_score:.1f}%", "warning")
         else:
+            exit_code = 2
             self._maybe_print(f"❌ Poor quality: {quality_score:.1f}%", "error")
 
         return FlextResult[int].ok(exit_code)
@@ -489,13 +492,16 @@ class CliCommandRouter:
         # Display score (respects quiet mode)
         self._maybe_print(f"📊 Quality Score: {quality_score:.1f}% ({grade})", "info")
 
-        # Return exit code
-        if quality_score >= self.config.thresholds.minimum_acceptable:
+        # Return exit code using strategy thresholds
+        if quality_score >= c.SCORE_SUCCESS_THRESHOLD:
             self._maybe_print("✅ Quality acceptable", "success")
             return FlextResult[int].ok(0)
+        if quality_score >= c.SCORE_WARNING_THRESHOLD:
+            self._maybe_print("⚠️  Quality needs improvement", "warning")
+            return FlextResult[int].ok(1)
 
-        self._maybe_print("⚠️  Quality needs improvement", "warning")
-        return FlextResult[int].ok(1)
+        self._maybe_print("❌ Quality critically low", "error")
+        return FlextResult[int].ok(2)
 
     def route_web(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route web command."""
@@ -509,7 +515,7 @@ class CliCommandRouter:
             return FlextResult[int].ok(0)
         except Exception:
             self.logger.exception("Web server failed")
-            return FlextResult[int].ok(1)
+            return FlextResult[int].ok(2)
 
     def route_check(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route check command (lint + type)."""
@@ -523,7 +529,7 @@ class CliCommandRouter:
 
         if result.is_failure:
             self.logger.error(f"Check failed: {result.error}")
-            return FlextResult[int].ok(1)
+            return FlextResult[int].ok(2)
 
         report = result.value
         if report.passed:
@@ -535,7 +541,7 @@ class CliCommandRouter:
         self.logger.error(
             f"Check FAILED - lint: {report.lint_errors}, type: {report.type_errors}",
         )
-        return FlextResult[int].ok(1)
+        return FlextResult[int].ok(2)
 
     def route_validate(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route validate command (lint + type + security + test) with Rich UI."""
@@ -558,12 +564,13 @@ class CliCommandRouter:
         if not self._quiet_mode:
             self._display_validation_report(report)
 
+        # Use strategy-driven validation result (report.passed)
         if report.passed:
             self._maybe_print("✅ Validation PASSED", "success")
             return FlextResult[int].ok(0)
 
         self._maybe_print("❌ Validation FAILED", "error")
-        return FlextResult[int].ok(1)
+        return FlextResult[int].ok(2)
 
     def _display_validation_report(
         self,
@@ -585,7 +592,7 @@ class CliCommandRouter:
 
         if result.is_failure:
             self.logger.error(f"Lint failed: {result.error}")
-            return FlextResult[int].ok(1)
+            return FlextResult[int].ok(2)
 
         report = result.value
         if report.passed:
@@ -593,7 +600,7 @@ class CliCommandRouter:
             return FlextResult[int].ok(0)
 
         self.logger.error(f"Lint FAILED - {report.errors} errors")
-        return FlextResult[int].ok(1)
+        return FlextResult[int].ok(2)
 
     def route_type_check(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route type-check command."""
@@ -607,7 +614,7 @@ class CliCommandRouter:
 
         if result.is_failure:
             self.logger.error(f"Type check failed: {result.error}")
-            return FlextResult[int].ok(1)
+            return FlextResult[int].ok(2)
 
         report = result.value
         if report.passed:
@@ -617,7 +624,7 @@ class CliCommandRouter:
             return FlextResult[int].ok(0)
 
         self.logger.error(f"Type check FAILED - {report.errors} errors")
-        return FlextResult[int].ok(1)
+        return FlextResult[int].ok(2)
 
     def route_security(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route security command."""
@@ -631,7 +638,7 @@ class CliCommandRouter:
 
         if result.is_failure:
             self.logger.error(f"Security scan failed: {result.error}")
-            return FlextResult[int].ok(1)
+            return FlextResult[int].ok(2)
 
         report = result.value
         if report.passed:
@@ -641,7 +648,7 @@ class CliCommandRouter:
         self.logger.error(
             f"Security scan FAILED - high={report.high}, medium={report.medium}",
         )
-        return FlextResult[int].ok(1)
+        return FlextResult[int].ok(2)
 
     def route_test(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route test command."""
@@ -655,7 +662,7 @@ class CliCommandRouter:
 
         if result.is_failure:
             self.logger.error(f"Test execution failed: {result.error}")
-            return FlextResult[int].ok(1)
+            return FlextResult[int].ok(2)
 
         report = result.value
         if report.passed:
@@ -665,7 +672,7 @@ class CliCommandRouter:
             return FlextResult[int].ok(0)
 
         self.logger.error(f"Tests FAILED - {report.failed_count} failures")
-        return FlextResult[int].ok(1)
+        return FlextResult[int].ok(2)
 
     def route_test_antipatterns(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route test antipatterns subcommand."""
@@ -675,7 +682,7 @@ class CliCommandRouter:
         targets = self._resolve_test_quality_targets(args)
         if not targets:
             self.logger.error("No valid targets found")
-            return FlextResult[int].ok(1)
+            return FlextResult[int].ok(2)
 
         operation = TestAntipatternOperation()
         return self._execute_test_operation(operation, args, targets, "antipatterns")
@@ -688,7 +695,7 @@ class CliCommandRouter:
         targets = self._resolve_test_quality_targets(args)
         if not targets:
             self.logger.error("No valid targets found")
-            return FlextResult[int].ok(1)
+            return FlextResult[int].ok(2)
 
         operation = TestInheritanceOperation()
         return self._execute_test_operation(operation, args, targets, "inheritance")
@@ -701,7 +708,7 @@ class CliCommandRouter:
         targets = self._resolve_test_quality_targets(args)
         if not targets:
             self.logger.error("No valid targets found")
-            return FlextResult[int].ok(1)
+            return FlextResult[int].ok(2)
 
         operation = TestStructureOperation()
         return self._execute_test_operation(operation, args, targets, "structure")
@@ -714,7 +721,7 @@ class CliCommandRouter:
         targets = self._resolve_test_quality_targets(args)
         if not targets:
             self.logger.error("No valid targets found")
-            return FlextResult[int].ok(1)
+            return FlextResult[int].ok(2)
 
         operation = FixtureConsolidateOperation()
         return self._execute_test_operation(operation, args, targets, "fixtures")
@@ -734,7 +741,7 @@ class CliCommandRouter:
             result = operation.dry_run(targets)
             if result.is_failure:
                 self.logger.error(f"Dry run failed: {result.error}")
-                return FlextResult[int].ok(1)
+                return FlextResult[int].ok(2)
             if not self._quiet_mode:
                 self._print_test_quality_result(result.value, name, "dry-run")
             return FlextResult[int].ok(0)
@@ -743,7 +750,7 @@ class CliCommandRouter:
             result = operation.run(targets, None)
             if result.is_failure:
                 self.logger.error(f"Execute failed: {result.error}")
-                return FlextResult[int].ok(1)
+                return FlextResult[int].ok(2)
             if not self._quiet_mode:
                 self._print_test_quality_result(result.value, name, "execute")
             return FlextResult[int].ok(0)
@@ -753,7 +760,7 @@ class CliCommandRouter:
             result = operation.rollback(backup_dir)
             if result.is_failure:
                 self.logger.error(f"Rollback failed: {result.error}")
-                return FlextResult[int].ok(1)
+                return FlextResult[int].ok(2)
             self._maybe_print("Rollback completed", "success")
             return FlextResult[int].ok(0)
 
@@ -761,7 +768,7 @@ class CliCommandRouter:
         result = operation.dry_run(targets)
         if result.is_failure:
             self.logger.error(f"Analysis failed: {result.error}")
-            return FlextResult[int].ok(1)
+            return FlextResult[int].ok(2)
         if not self._quiet_mode:
             self._print_test_quality_result(result.value, name, "dry-run")
         return FlextResult[int].ok(0)
@@ -864,7 +871,7 @@ class CliCommandRouter:
             )
             if result.is_failure:
                 self.logger.error(f"Code quality check failed: {result.error}")
-                return FlextResult[int].ok(1)
+                return FlextResult[int].ok(2)
             workspace_result = result.value
 
             # Display workspace analysis with Rich table (respects quiet mode)
@@ -878,23 +885,26 @@ class CliCommandRouter:
             critical = workspace_result.violations_by_severity.get("ERROR", 0)
             if critical > 0:
                 self._maybe_print(
-                    f"❌ Code quality FAILED - {critical} critical violations",
-                    "error"
+                    f"❌ Code quality FAILED - {critical} critical violations", "error"
                 )
                 return FlextResult[int].ok(2)
 
             self._maybe_print(
                 f"⚠️  Completed with {workspace_result.total_violations} warnings",
-                "warning"
+                "warning",
             )
             return FlextResult[int].ok(1)
 
         target_path = Path(args.target) if args.target else Path.cwd()
         if not target_path.exists():
             self.logger.error(f"Target does not exist: {target_path}")
-            return FlextResult[int].ok(1)
-        targets = [target_path] if target_path.is_file() else list(
-            target_path.rglob("*.py"),
+            return FlextResult[int].ok(2)
+        targets = (
+            [target_path]
+            if target_path.is_file()
+            else list(
+                target_path.rglob("*.py"),
+            )
         )
         result_check: FlextResult[FlextCodeQualityPlugin.CheckResult] = plugin.check(
             targets=targets,
@@ -902,7 +912,7 @@ class CliCommandRouter:
         )
         if result_check.is_failure:
             self.logger.error(f"Code quality check failed: {result_check.error}")
-            return FlextResult[int].ok(1)
+            return FlextResult[int].ok(2)
         check_result: FlextCodeQualityPlugin.CheckResult = result_check.value
 
         # Display single-target analysis with Rich table (respects quiet mode)
@@ -916,14 +926,12 @@ class CliCommandRouter:
         critical = check_result.violations_by_severity.get("ERROR", 0)
         if critical > 0:
             self._maybe_print(
-                f"❌ Code quality FAILED - {critical} critical violations",
-                "error"
+                f"❌ Code quality FAILED - {critical} critical violations", "error"
             )
             return FlextResult[int].ok(2)
 
         self._maybe_print(
-            f"⚠️  Completed with {check_result.total_violations} warnings",
-            "warning"
+            f"⚠️  Completed with {check_result.total_violations} warnings", "warning"
         )
         return FlextResult[int].ok(1)
 
@@ -974,7 +982,7 @@ class CliCommandRouter:
 
         if result.is_failure:
             self.logger.error(f"Report generation failed: {result.error}")
-            return FlextResult[int].ok(1)
+            return FlextResult[int].ok(2)
 
         check_result = result.value
         output_path = Path(args.output) if args.output else Path(".quality-reports")

@@ -68,7 +68,9 @@ class FlextQualityCodeTransformer:
                 return node.value
             if isinstance(node, cst.Attribute):
                 if isinstance(node.value, (cst.Attribute, cst.Name)):
-                    prefix = FlextQualityCodeTransformer.Helpers.get_dotted_name(node.value)
+                    prefix = FlextQualityCodeTransformer.Helpers.get_dotted_name(
+                        node.value
+                    )
                     return f"{prefix}.{node.attr.value}"
                 return node.attr.value
             return ""

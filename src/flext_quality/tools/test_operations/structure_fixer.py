@@ -96,7 +96,8 @@ class FlextQualityTestStructureOperation(FlextService[dict[str, t.GeneralValueTy
             test_dirs = [d for d in project_path.rglob("tests") if d.is_dir()]
             # Also check for test/ (singular), avoiding duplicates
             test_dirs.extend(
-                d for d in project_path.rglob("test")
+                d
+                for d in project_path.rglob("test")
                 if d.is_dir() and d not in test_dirs
             )
             return test_dirs
@@ -133,7 +134,9 @@ class FlextQualityTestStructureOperation(FlextService[dict[str, t.GeneralValueTy
         # Collect all test files
         test_files: set[str] = set()
         for test_dir in test_dirs:
-            test_files.update(test_file.stem for test_file in test_dir.rglob("test_*.py"))
+            test_files.update(
+                test_file.stem for test_file in test_dir.rglob("test_*.py")
+            )
 
         # Analyze source modules
         modules: list[FlextQualityTestStructureOperation.ModuleCoverage] = []
@@ -163,14 +166,16 @@ class FlextQualityTestStructureOperation(FlextService[dict[str, t.GeneralValueTy
                         test_path = subtest
                         break
 
-            modules.append(self.ModuleCoverage(
-                module_name=module_name,
-                module_path=py_file,
-                has_test=has_test,
-                test_path=test_path,
-                class_count=module_info.get("class_count", 0),
-                function_count=module_info.get("function_count", 0),
-            ))
+            modules.append(
+                self.ModuleCoverage(
+                    module_name=module_name,
+                    module_path=py_file,
+                    has_test=has_test,
+                    test_path=test_path,
+                    class_count=module_info.get("class_count", 0),
+                    function_count=module_info.get("function_count", 0),
+                )
+            )
 
         analysis_result = FlextQualityTestStructureOperation.AnalysisResult(
             project_path=project_path,
@@ -194,7 +199,9 @@ class FlextQualityTestStructureOperation(FlextService[dict[str, t.GeneralValueTy
         result = self._ast_backend.analyze(source, file_path)
 
         if result.is_failure:
-            self._logger.debug("AST analysis failed for %s: %s", file_path, result.error)
+            self._logger.debug(
+                "AST analysis failed for %s: %s", file_path, result.error
+            )
             return default_counts
 
         if not result.value:
@@ -207,9 +214,7 @@ class FlextQualityTestStructureOperation(FlextService[dict[str, t.GeneralValueTy
             "function_count": len(functions) if isinstance(functions, list) else 0,
         }
 
-    def dry_run(
-        self: Self, targets: list[Path]
-    ) -> r[dict[str, t.GeneralValueType]]:
+    def dry_run(self: Self, targets: list[Path]) -> r[dict[str, t.GeneralValueType]]:
         """Preview test structure analysis without modifications.
 
         Args:
@@ -289,9 +294,7 @@ class FlextQualityTestStructureOperation(FlextService[dict[str, t.GeneralValueTy
         """
         return self.dry_run([Path.cwd()])
 
-    def rollback(
-        self: Self, _backup_path: Path
-    ) -> r[dict[str, t.GeneralValueType]]:
+    def rollback(self: Self, _backup_path: Path) -> r[dict[str, t.GeneralValueType]]:
         """Rollback not applicable for detection-only operation.
 
         Args:

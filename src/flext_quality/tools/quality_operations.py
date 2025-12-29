@@ -161,9 +161,7 @@ class FlextQualityOperations(FlextService[bool]):
             details["type_error"] = type_result.error
 
         if security_result.is_success:
-            security_issues = (
-                security_result.value.high + security_result.value.medium
-            )
+            security_issues = security_result.value.high + security_result.value.medium
             details["security"] = security_result.value.model_dump()
         else:
             details["security_error"] = security_result.error
@@ -333,7 +331,9 @@ class FlextQualityOperations(FlextService[bool]):
 
         data = result.value
         issues_value = data.get("issues", 0)
-        total_issues = int(issues_value) if isinstance(issues_value, (int, float, str)) else 0
+        total_issues = (
+            int(issues_value) if isinstance(issues_value, (int, float, str)) else 0
+        )
 
         # Simple severity distribution (bandit doesn't separate in basic API)
         high = total_issues // 3  # Estimate
@@ -388,7 +388,11 @@ class FlextQualityOperations(FlextService[bool]):
 
         data = result.value
         exit_code_value = data.get("exit_code", 1)
-        exit_code = int(exit_code_value) if isinstance(exit_code_value, (int, float, str)) else 1
+        exit_code = (
+            int(exit_code_value)
+            if isinstance(exit_code_value, (int, float, str))
+            else 1
+        )
 
         # Basic result from exit code
         passed = exit_code == 0

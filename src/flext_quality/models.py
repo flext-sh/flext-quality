@@ -786,9 +786,9 @@ class FlextQualityModels:
                     default=False,
                     description="Whether rollback was performed",
                 )
-                backup_info: (
-                    FlextQualityModels.Quality.Operations.BackupInfo | None
-                ) = Field(default=None, description="Backup info if created")
+                backup_info: FlextQualityModels.Quality.Operations.BackupInfo | None = (
+                    Field(default=None, description="Backup info if created")
+                )
 
         # =====================================================================
         # ANALYZERS NAMESPACE - Tool-specific analyzer models
@@ -982,8 +982,8 @@ class FlextQualityModels:
                 last_updated: datetime | None = Field(default=None)
                 current_project: str | None = Field(default=None)
                 current_file: str | None = Field(default=None)
-                statistics: FlextQualityModels.Quality.Cycle.CycleStatistics | None = Field(
-                    default=None
+                statistics: FlextQualityModels.Quality.Cycle.CycleStatistics | None = (
+                    Field(default=None)
                 )
                 project_order: list[str] = Field(
                     default_factory=lambda: list(c.Quality.Cycle.PROJECT_ORDER),

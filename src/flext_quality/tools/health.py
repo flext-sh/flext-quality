@@ -69,7 +69,9 @@ class HealthCheckService(FlextService[bool]):
         """
         exists = DMYPY_STATUS_FILE.exists()
         if not exists:
-            self._logger.debug("MyPy daemon status file not found: %s", DMYPY_STATUS_FILE)
+            self._logger.debug(
+                "MyPy daemon status file not found: %s", DMYPY_STATUS_FILE
+            )
         return FlextResult[bool].ok(exists)
 
     def check_daemons(self: Self) -> FlextResult[dict[str, bool]]:

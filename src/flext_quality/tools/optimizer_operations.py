@@ -456,7 +456,9 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         try:
             content = path.read_text(encoding="utf-8")
         except Exception as e:
-            return FlextResult[FlextQualityModels.Quality.OptimizationResult].fail(str(e))
+            return FlextResult[FlextQualityModels.Quality.OptimizationResult].fail(
+                str(e)
+            )
 
         # Fix violations
         for pattern in self._optimizer_config.domain_violations:

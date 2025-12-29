@@ -263,7 +263,8 @@ class FlextCodeQualityPlugin(FlextService[int]):
             # Get all Python files in project
             python_files = list(project_path.rglob("*.py"))
             python_files = [
-                f for f in python_files
+                f
+                for f in python_files
                 if "__pycache__" not in str(f) and ".venv" not in str(f)
             ]
 
@@ -279,7 +280,10 @@ class FlextCodeQualityPlugin(FlextService[int]):
         # Run cross-project duplication check
         if not categories or "DRY" in categories:
             workspace_dup = self._duplication_plugin.check_workspace(root)
-            if workspace_dup.is_success and workspace_dup.value.cross_project_duplicates > 0:
+            if (
+                workspace_dup.is_success
+                and workspace_dup.value.cross_project_duplicates > 0
+            ):
                 for dup in workspace_dup.value.duplicates:
                     violation = FlextCodeQualityPlugin.Violation(
                         category="DRY",
@@ -349,23 +353,27 @@ class FlextCodeQualityPlugin(FlextService[int]):
             return FlextResult[list[FlextCodeQualityPlugin.Violation]].ok([])
 
         if not self._semgrep_rules_path.exists():
-            self._logger.warning("Semgrep rules not found at %s", self._semgrep_rules_path)
+            self._logger.warning(
+                "Semgrep rules not found at %s", self._semgrep_rules_path
+            )
             return FlextResult[list[FlextCodeQualityPlugin.Violation]].ok([])
 
         try:
             # Build command
             cmd = [
                 "semgrep",
-                "--config", str(self._semgrep_rules_path),
+                "--config",
+                str(self._semgrep_rules_path),
                 "--json",
                 "--no-git-ignore",
             ]
-            cmd.extend(str(f) for f in files[:c.Quality.Analysis.MAX_FILES_PER_RUN])
+            cmd.extend(str(f) for f in files[: c.Quality.Analysis.MAX_FILES_PER_RUN])
 
             # Run Semgrep
             result = subprocess.run(
                 cmd,
-                check=False, capture_output=True,
+                check=False,
+                capture_output=True,
                 text=True,
                 timeout=c.Quality.Analysis.SEMGREP_TIMEOUT_SECONDS,
             )
@@ -374,7 +382,9 @@ class FlextCodeQualityPlugin(FlextService[int]):
             if result.stdout:
                 data = json.loads(result.stdout)
                 violations = self._parse_semgrep_output(data)
-                return FlextResult[list[FlextCodeQualityPlugin.Violation]].ok(violations)
+                return FlextResult[list[FlextCodeQualityPlugin.Violation]].ok(
+                    violations
+                )
 
             return FlextResult[list[FlextCodeQualityPlugin.Violation]].ok([])
 
@@ -383,7 +393,11 @@ class FlextCodeQualityPlugin(FlextService[int]):
             return FlextResult[list[FlextCodeQualityPlugin.Violation]].fail(
                 "Semgrep analysis timed out"
             )
-        except (subprocess.SubprocessError, json.JSONDecodeError, FileNotFoundError) as e:
+        except (
+            subprocess.SubprocessError,
+            json.JSONDecodeError,
+            FileNotFoundError,
+        ) as e:
             error_msg = str(e)
             self._logger.warning("Semgrep error: %s", error_msg)
             return FlextResult[list[FlextCodeQualityPlugin.Violation]].fail(
@@ -424,7 +438,9 @@ class FlextCodeQualityPlugin(FlextService[int]):
             severity_val = extra_dict.get("severity", "WARNING")
             severity = str(severity_val).upper()
 
-            metadata_data: str | int | dict[str, str | int] = extra_dict.get("metadata", {})
+            metadata_data: str | int | dict[str, str | int] = extra_dict.get(
+                "metadata", {}
+            )
             metadata = metadata_data if isinstance(metadata_data, dict) else {}
             category = str(metadata.get("category", "UNKNOWN"))
             principle = str(metadata.get("principle", "UNKNOWN"))
@@ -470,7 +486,10 @@ class FlextCodeQualityPlugin(FlextService[int]):
             by_category[v.category] = by_category.get(v.category, 0) + 1
 
         # Generate guidance based on patterns
-        if by_category.get("FLEXT_ARCHITECTURE", 0) > c.Quality.Thresholds.ARCHITECTURE_VIOLATION_THRESHOLD:
+        if (
+            by_category.get("FLEXT_ARCHITECTURE", 0)
+            > c.Quality.Thresholds.ARCHITECTURE_VIOLATION_THRESHOLD
+        ):
             guidance.append(
                 "Multiple FLEXT architecture violations detected. "
                 "Review namespace usage (c.*, m.*, p.*, u.*) and FlextResult patterns."
@@ -495,10 +514,7 @@ class FlextCodeQualityPlugin(FlextService[int]):
             )
 
         # Project-specific guidance
-        reimpl_count = sum(
-            1 for v in violations
-            if v.principle == "REIMPLEMENTATION"
-        )
+        reimpl_count = sum(1 for v in violations if v.principle == "REIMPLEMENTATION")
         if reimpl_count > 0:
             guidance.append(
                 f"{reimpl_count} reimplementations detected. "

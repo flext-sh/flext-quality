@@ -57,7 +57,9 @@ class FlextQualityValidationTools(FlextService[bool]):
                 failures=[],
             )
 
-            return FlextResult[FlextQualityModels.Quality.QualityValidationResult].ok(result)
+            return FlextResult[FlextQualityModels.Quality.QualityValidationResult].ok(
+                result
+            )
 
     class DomainValidator:
         """Domain separation validation."""
@@ -85,7 +87,9 @@ class FlextQualityValidationTools(FlextService[bool]):
                 failures=[],
             )
 
-            return FlextResult[FlextQualityModels.Quality.QualityValidationResult].ok(result)
+            return FlextResult[FlextQualityModels.Quality.QualityValidationResult].ok(
+                result
+            )
 
     class EcosystemValidator:
         """Ecosystem-wide quality validation."""
@@ -113,7 +117,9 @@ class FlextQualityValidationTools(FlextService[bool]):
                 failures=[],
             )
 
-            return FlextResult[FlextQualityModels.Quality.QualityValidationResult].ok(result)
+            return FlextResult[FlextQualityModels.Quality.QualityValidationResult].ok(
+                result
+            )
 
     def __init__(self: Self) -> None:
         """Initialize validation tools service."""

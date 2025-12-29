@@ -217,7 +217,9 @@ class FlextQualityConstants(FlextConstants):
             MAX_PROJECT_NAME_LENGTH: int = 255
             MIN_FILE_SIZE_FOR_DUPLICATION_CHECK: int = 100
             MIN_FILES_FOR_PAIR_COMPARISON: int = 2
-            SIMILARITY_THRESHOLD: float = 0.65  # Aggressive: 65% detects more duplication to force refactoring
+            SIMILARITY_THRESHOLD: float = (
+                0.65  # Aggressive: 65% detects more duplication to force refactoring
+            )
             MIN_FUNCTION_LENGTH_FOR_DEAD_CODE: int = 5
             GRADE_A_THRESHOLD: float = 90.0
             GRADE_B_THRESHOLD: float = 80.0
@@ -766,7 +768,9 @@ class FlextQualityConstants(FlextConstants):
             PROJECT_ORDER = _FALLBACK_PROJECT_ORDER
 
             @classmethod
-            def get_project_order(cls, _workspace_root: Path | None = None) -> tuple[str, ...]:
+            def get_project_order(
+                cls, _workspace_root: Path | None = None
+            ) -> tuple[str, ...]:
                 """Retorna ordem de projetos descoberta dinamicamente.
 
                 Usa FlextWorkspaceDiscovery para descobrir e ordenar.
@@ -883,9 +887,21 @@ class FlextQualityConstants(FlextConstants):
 
             # Types that should NOT be flagged as uncentralized
             EXCLUDED_SIMPLE_TYPES: frozenset[str] = frozenset({
-                "str", "int", "float", "bool", "None", "bytes",
-                "list", "dict", "set", "tuple", "frozenset",
-                "object", "type", "Self", "Never",
+                "str",
+                "int",
+                "float",
+                "bool",
+                "None",
+                "bytes",
+                "list",
+                "dict",
+                "set",
+                "tuple",
+                "frozenset",
+                "object",
+                "type",
+                "Self",
+                "Never",
             })
 
             # Type prefixes to exclude from TV018
@@ -895,8 +911,13 @@ class FlextQualityConstants(FlextConstants):
                 "m.",  # Model usage
                 "r[",  # FlextResult
                 "FlextResult[",
-                "list[str]", "list[int]", "list[float]", "list[bool]",
-                "tuple[", "set[str]", "set[int]",
+                "list[str]",
+                "list[int]",
+                "list[float]",
+                "list[bool]",
+                "tuple[",
+                "set[str]",
+                "set[int]",
             )
 
             # Protocol namespace prefixes
