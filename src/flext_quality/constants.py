@@ -510,6 +510,20 @@ class FlextQualityConstants(FlextConstants):
             )
             REQUIRED_DIRS: tuple[str, ...] = ("src", "tests")
 
+        class CommandStrategies:
+            """Command execution strategy thresholds."""
+
+            ANALYZE_SUCCESS_THRESHOLD: float = 80.0
+            ANALYZE_WARNING_THRESHOLD: float = 60.0
+            VALIDATE_SUCCESS_THRESHOLD: float = 70.0
+            SCORE_SUCCESS_THRESHOLD: float = 80.0
+            SCORE_WARNING_THRESHOLD: float = 60.0
+            CHECK_SUCCESS_THRESHOLD: float = 70.0
+            TEST_ANTIPATTERNS_THRESHOLD: float = 80.0
+            TEST_INHERITANCE_THRESHOLD: float = 80.0
+            TEST_STRUCTURE_THRESHOLD: float = 80.0
+            TEST_FIXTURES_THRESHOLD: float = 80.0
+
         class Git:
             """Git tool constants for quality operations."""
 

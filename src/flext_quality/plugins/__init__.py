@@ -10,6 +10,7 @@ Usage:
     from flext_quality.plugins import FlextMyPyPlugin
     from flext_quality.plugins import FlextDuplicationPlugin
     from flext_quality.plugins import FlextCodeQualityPlugin
+    from flext_quality.plugins import FlextTypeVerificationPlugin
 """
 
 from __future__ import annotations
@@ -18,10 +19,12 @@ from .code_quality_plugin import FlextCodeQualityPlugin
 from .duplication_plugin import FlextDuplicationPlugin
 from .mypy_plugin import FlextMyPyPlugin
 from .ruff_plugin import FlextRuffPlugin
+from .type_verification_plugin import FlextTypeVerificationPlugin
 
 __all__ = [
     "FlextCodeQualityPlugin",
     "FlextDuplicationPlugin",
     "FlextMyPyPlugin",
     "FlextRuffPlugin",
+    "FlextTypeVerificationPlugin",
 ]

@@ -12,7 +12,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Self
+from typing import ClassVar, Self
 
 from flext_core import FlextResult, FlextService
 
@@ -42,9 +42,9 @@ class FlextCodeQualityPlugin(FlextService[int]):
     """
 
     # Expose nested dataclasses for external API
-    Violation = _FlextCodeQualityPluginImpl.Violation
-    CheckResult = _FlextCodeQualityPluginImpl.CheckResult
-    WorkspaceCheckResult = _FlextCodeQualityPluginImpl.WorkspaceCheckResult
+    Violation: ClassVar = _FlextCodeQualityPluginImpl.Violation
+    CheckResult: ClassVar = _FlextCodeQualityPluginImpl.CheckResult
+    WorkspaceCheckResult: ClassVar = _FlextCodeQualityPluginImpl.WorkspaceCheckResult
 
     def __init__(
         self: Self,

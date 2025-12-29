@@ -130,8 +130,8 @@ class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.Chec
                     tree, str(file_path), categories
                 )
                 all_violations.extend(file_violations)
-            except SyntaxError as err:
-                self._logger.warning("Syntax error in %s: %s", file_path, err)
+            except SyntaxError:
+                self._logger.warning("Syntax error in %s", file_path)
             except UnicodeDecodeError:
                 self._logger.warning("Encoding error in %s", file_path)
 
@@ -163,7 +163,7 @@ class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.Chec
         """Analyze a single file for type violations."""
         violations: list[FlextTypeVerificationPlugin.TypeViolation] = []
 
-        # Run all analyzers
+        # Run all analyzers using dispatch pattern
         analyzers = [
             self._AnnotationAnalyzer(filename, categories),
             self._CentralizationAnalyzer(filename, categories),
@@ -175,7 +175,7 @@ class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.Chec
         ]
 
         for analyzer in analyzers:
-            analyzer.visit(tree)
+            analyzer.analyze(tree)
             violations.extend(analyzer.violations)
 
         return violations
@@ -241,11 +241,11 @@ class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.Chec
         return tuple(guidance)
 
     # =========================================================================
-    # ANALYZER CLASSES - Nested for SOLID compliance
+    # ANALYZER CLASSES - Using dispatch pattern for FLEXT compliance
     # =========================================================================
 
-    class _BaseAnalyzer(ast.NodeVisitor):
-        """Base analyzer with common functionality."""
+    class _BaseAnalyzer:
+        """Base analyzer with dispatch pattern (no ast.NodeVisitor)."""
 
         def __init__(
             self: Self,
@@ -255,6 +255,14 @@ class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.Chec
             self.filename = filename
             self.categories = categories
             self.violations: list[FlextTypeVerificationPlugin.TypeViolation] = []
+            self._dispatch: dict[type, object] = {}
+
+        def analyze(self: Self, tree: ast.AST) -> None:
+            """Analyze AST tree using dispatch pattern."""
+            for node in ast.walk(tree):
+                handler = self._dispatch.get(type(node))
+                if handler and callable(handler):
+                    handler(node)
 
         def _should_check(self: Self, category: str) -> bool:
             """Check if category should be analyzed."""
@@ -272,14 +280,16 @@ class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.Chec
             """Add a violation to the list."""
             tv = FlextQualityConstants.Quality.TypeVerification
             severity = tv.RULE_SEVERITIES.get(rule_id, "warning")
+            line = node.lineno if hasattr(node, "lineno") else 0
+            col = node.col_offset if hasattr(node, "col_offset") else 0
             self.violations.append(
                 FlextTypeVerificationPlugin.TypeViolation(
                     rule_id=rule_id,
                     category=category,
                     severity=severity,
                     file=self.filename,
-                    line=node.lineno if hasattr(node, "lineno") else 0,
-                    column=node.col_offset if hasattr(node, "col_offset") else 0,
+                    line=line,
+                    column=col,
                     message=message,
                     suggestion=suggestion,
                     raw_type=raw_type,
@@ -289,10 +299,20 @@ class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.Chec
     class _AnnotationAnalyzer(_BaseAnalyzer):
         """Analyzer for TV001 (missing annotations) and TV002 (excessive)."""
 
-        def visit_FunctionDef(self: Self, node: ast.FunctionDef) -> None:
+        def __init__(
+            self: Self,
+            filename: str,
+            categories: set[str] | None,
+        ) -> None:
+            super().__init__(filename, categories)
+            self._dispatch = {
+                ast.FunctionDef: self._handle_function_def,
+                ast.AsyncFunctionDef: self._handle_function_def,
+            }
+
+        def _handle_function_def(self: Self, node: ast.FunctionDef) -> None:
             """Check function for annotation issues."""
             if not self._should_check("missing_annotation"):
-                self.generic_visit(node)
                 return
 
             tv = FlextQualityConstants.Quality.TypeVerification
@@ -305,39 +325,44 @@ class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.Chec
                     tv.MESSAGES["TV001"].format(target=node.name),
                 )
 
-            self.generic_visit(node)
-
-        visit_AsyncFunctionDef = visit_FunctionDef
-
     class _CentralizationAnalyzer(_BaseAnalyzer):
         """Analyzer for TV003-TV005 (centralization violations)."""
 
-        def visit_Assign(self: Self, node: ast.Assign) -> None:
+        def __init__(
+            self: Self,
+            filename: str,
+            categories: set[str] | None,
+        ) -> None:
+            super().__init__(filename, categories)
+            self._dispatch = {
+                ast.Assign: self._handle_assign,
+                ast.ClassDef: self._handle_class_def,
+            }
+
+        def _handle_assign(self: Self, node: ast.Assign) -> None:
             """Check for TypeAlias outside typings.py."""
             if not self._should_check("decentralized_type"):
-                self.generic_visit(node)
                 return
 
             tv = FlextQualityConstants.Quality.TypeVerification
             # TV003: TypeAlias outside typings.py
-            if not self.filename.endswith("typings.py"):
-                if isinstance(node.value, ast.Subscript):
-                    if self._is_type_alias(node.value):
-                        target_name = self._get_target_name(node.targets)
-                        self._add_violation(
-                            tv.RuleId.TYPEALIAS_OUTSIDE_TYPINGS,
-                            "decentralized_type",
-                            node,
-                            tv.MESSAGES["TV003"].format(file=self.filename),
-                            suggestion=f"Move {target_name} to typings.py",
-                        )
+            if (
+                not self.filename.endswith("typings.py")
+                and isinstance(node.value, ast.Subscript)
+                and self._is_type_alias(node.value)
+            ):
+                target_name = self._get_target_name(node.targets)
+                self._add_violation(
+                    tv.RuleId.TYPEALIAS_OUTSIDE_TYPINGS,
+                    "decentralized_type",
+                    node,
+                    tv.MESSAGES["TV003"].format(file=self.filename),
+                    suggestion=f"Move {target_name} to typings.py",
+                )
 
-            self.generic_visit(node)
-
-        def visit_ClassDef(self: Self, node: ast.ClassDef) -> None:
+        def _handle_class_def(self: Self, node: ast.ClassDef) -> None:
             """Check for Protocol outside protocols.py."""
             if not self._should_check("decentralized_type"):
-                self.generic_visit(node)
                 return
 
             tv = FlextQualityConstants.Quality.TypeVerification
@@ -353,8 +378,6 @@ class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.Chec
                             suggestion=f"Move {node.name} to protocols.py",
                         )
                         break
-
-            self.generic_visit(node)
 
         def _is_type_alias(self: Self, node: ast.Subscript) -> bool:
             """Check if node is a TypeAlias."""
@@ -381,71 +404,82 @@ class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.Chec
     class _ProtocolRecommendationAnalyzer(_BaseAnalyzer):
         """Analyzer for TV006-TV008 (Protocol recommendations)."""
 
-        def visit_AnnAssign(self: Self, node: ast.AnnAssign) -> None:
+        def __init__(
+            self: Self,
+            filename: str,
+            categories: set[str] | None,
+        ) -> None:
+            super().__init__(filename, categories)
+            self._dispatch = {
+                ast.AnnAssign: self._handle_ann_assign,
+            }
+
+        def _handle_ann_assign(self: Self, node: ast.AnnAssign) -> None:
             """Check for Callable that should use Protocol."""
             if not self._should_check("needs_protocol"):
-                self.generic_visit(node)
                 return
 
             tv = FlextQualityConstants.Quality.TypeVerification
-            if isinstance(node.annotation, ast.Subscript):
-                if self._is_complex_callable(node.annotation):
-                    self._add_violation(
-                        tv.RuleId.COMPLEX_CALLABLE_NEEDS_PROTOCOL,
-                        "needs_protocol",
-                        node,
-                        tv.MESSAGES["TV007"],
-                        suggestion="Define a Protocol with __call__ method",
-                    )
-
-            self.generic_visit(node)
+            if (
+                isinstance(node.annotation, ast.Subscript)
+                and self._is_complex_callable(node.annotation)
+            ):
+                self._add_violation(
+                    tv.RuleId.COMPLEX_CALLABLE_NEEDS_PROTOCOL,
+                    "needs_protocol",
+                    node,
+                    tv.MESSAGES["TV007"],
+                    suggestion="Define a Protocol with __call__ method",
+                )
 
         def _is_complex_callable(self: Self, node: ast.Subscript) -> bool:
             """Check if node is a complex Callable."""
             tv = FlextQualityConstants.Quality.TypeVerification
-            if isinstance(node.value, ast.Name):
-                if node.value.id == "Callable":
-                    # Check parameter count
-                    if isinstance(node.slice, ast.Tuple):
-                        if len(node.slice.elts) > tv.MAX_CALLABLE_PARAMS:
-                            return True
-            return False
+            return (
+                isinstance(node.value, ast.Name)
+                and node.value.id == "Callable"
+                and isinstance(node.slice, ast.Tuple)
+                and len(node.slice.elts) > tv.MAX_CALLABLE_PARAMS
+            )
 
     class _ModelRecommendationAnalyzer(_BaseAnalyzer):
         """Analyzer for TV009-TV011 (Model recommendations)."""
 
-        def visit_ClassDef(self: Self, node: ast.ClassDef) -> None:
+        def __init__(
+            self: Self,
+            filename: str,
+            categories: set[str] | None,
+        ) -> None:
+            super().__init__(filename, categories)
+            self._dispatch = {
+                ast.ClassDef: self._handle_class_def,
+            }
+
+        def _handle_class_def(self: Self, node: ast.ClassDef) -> None:
             """Check for dataclass that should use Pydantic."""
             if not self._should_check("needs_model"):
-                self.generic_visit(node)
                 return
 
             tv = FlextQualityConstants.Quality.TypeVerification
             # TV010: dataclass should use Pydantic
             for decorator in node.decorator_list:
-                if isinstance(decorator, ast.Name):
-                    if decorator.id == "dataclass":
-                        self._add_violation(
-                            tv.RuleId.DATACLASS_NEEDS_PYDANTIC,
-                            "needs_model",
-                            node,
-                            tv.MESSAGES["TV010"],
-                            suggestion="Use Pydantic BaseModel instead",
-                        )
-                        break
-                elif isinstance(decorator, ast.Call):
-                    if isinstance(decorator.func, ast.Name):
-                        if decorator.func.id == "dataclass":
-                            self._add_violation(
-                                tv.RuleId.DATACLASS_NEEDS_PYDANTIC,
-                                "needs_model",
-                                node,
-                                tv.MESSAGES["TV010"],
-                                suggestion="Use Pydantic BaseModel instead",
-                            )
-                            break
-
-            self.generic_visit(node)
+                is_dataclass_name = (
+                    isinstance(decorator, ast.Name) and decorator.id == "dataclass"
+                )
+                is_dataclass_call = (
+                    isinstance(decorator, ast.Call)
+                    and isinstance(decorator.func, ast.Name)
+                    and decorator.func.id == "dataclass"
+                )
+                if is_dataclass_name or is_dataclass_call:
+                    self._add_violation(
+                        tv.RuleId.DATACLASS_NEEDS_PYDANTIC,
+                        "needs_model",
+                        node,
+                        tv.MESSAGES["TV010"],
+                        suggestion="Use Pydantic BaseModel instead",
+                    )
+                    break
 
     class _CouplingAnalyzer(_BaseAnalyzer):
         """Analyzer for TV012-TV014 (coupling and complexity)."""
@@ -459,99 +493,120 @@ class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.Chec
             self._isinstance_counts: dict[str, int] = {}
             self._none_check_count = 0
             self._current_function: str | None = None
+            # Use a two-pass approach: first collect, then validate
+            self._function_nodes: list[ast.FunctionDef] = []
 
-        def visit_FunctionDef(self: Self, node: ast.FunctionDef) -> None:
-            """Track function context for isinstance counting."""
-            self._current_function = node.name
-            self._isinstance_counts[node.name] = 0
-            self.generic_visit(node)
+        def analyze(self: Self, tree: ast.AST) -> None:
+            """Analyze using custom walk for function context."""
+            for node in ast.walk(tree):
+                if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                    self._analyze_function(node)
 
-            tv = FlextQualityConstants.Quality.TypeVerification
+        def _analyze_function(self: Self, node: ast.FunctionDef | ast.AsyncFunctionDef) -> None:
+            """Analyze a function for coupling issues."""
+            isinstance_count = 0
+            for child in ast.walk(node):
+                if (
+                    isinstance(child, ast.Call)
+                    and isinstance(child.func, ast.Name)
+                    and child.func.id == "isinstance"
+                ):
+                    isinstance_count += 1
+                if isinstance(child, ast.Compare):
+                    self._check_none_comparison(child)
+
             # TV012: Check isinstance count
-            if self._should_check("excessive_coupling"):
-                count = self._isinstance_counts.get(node.name, 0)
-                if count > tv.MAX_ISINSTANCE_PER_FUNCTION:
-                    self._add_violation(
-                        tv.RuleId.EXCESSIVE_ISINSTANCE,
-                        "excessive_coupling",
-                        node,
-                        tv.MESSAGES["TV012"].format(count=count),
-                        suggestion="Consider using Protocol or pattern matching",
-                    )
+            tv = FlextQualityConstants.Quality.TypeVerification
+            if (
+                self._should_check("excessive_coupling")
+                and isinstance_count > tv.MAX_ISINSTANCE_PER_FUNCTION
+            ):
+                self._add_violation(
+                    tv.RuleId.EXCESSIVE_ISINSTANCE,
+                    "excessive_coupling",
+                    node,
+                    tv.MESSAGES["TV012"].format(count=isinstance_count),
+                    suggestion="Consider using Protocol or pattern matching",
+                )
 
-            self._current_function = None
-
-        visit_AsyncFunctionDef = visit_FunctionDef
-
-        def visit_Call(self: Self, node: ast.Call) -> None:
-            """Count isinstance calls."""
-            if isinstance(node.func, ast.Name):
-                if node.func.id == "isinstance":
-                    if self._current_function:
-                        self._isinstance_counts[self._current_function] = (
-                            self._isinstance_counts.get(self._current_function, 0) + 1
-                        )
-
-            self.generic_visit(node)
-
-        def visit_Compare(self: Self, node: ast.Compare) -> None:
+        def _check_none_comparison(self: Self, node: ast.Compare) -> None:
             """Count None checks."""
-            if self._should_check("excessive_none"):
-                for op in node.ops:
-                    if isinstance(op, (ast.Is, ast.IsNot)):
-                        for comparator in node.comparators:
-                            if isinstance(comparator, ast.Constant):
-                                if comparator.value is None:
-                                    self._none_check_count += 1
+            if not self._should_check("excessive_none"):
+                return
 
-            self.generic_visit(node)
+            for op in node.ops:
+                if isinstance(op, (ast.Is, ast.IsNot)):
+                    for comparator in node.comparators:
+                        if (
+                            isinstance(comparator, ast.Constant)
+                            and comparator.value is None
+                        ):
+                            self._none_check_count += 1
 
     class _ResultUsageAnalyzer(_BaseAnalyzer):
         """Analyzer for TV015-TV017 (FlextResult misuse)."""
 
-        def visit_Return(self: Self, node: ast.Return) -> None:
+        def __init__(
+            self: Self,
+            filename: str,
+            categories: set[str] | None,
+        ) -> None:
+            super().__init__(filename, categories)
+            self._dispatch = {
+                ast.Return: self._handle_return,
+                ast.Subscript: self._handle_subscript,
+            }
+
+        def _handle_return(self: Self, node: ast.Return) -> None:
             """Check for returning None from FlextResult method."""
             if not self._should_check("result_misuse"):
-                self.generic_visit(node)
                 return
 
-            # TV015: Returning None directly
-            if isinstance(node.value, ast.Constant):
-                if node.value.value is None:
-                    # This is a simplified check - would need context
-                    # to know if we're in a FlextResult-returning method
-                    pass
+            # TV015: Returning None directly - simplified check
+            # Would need context to know if in FlextResult-returning method
+            if (
+                isinstance(node.value, ast.Constant)
+                and node.value.value is None
+            ):
+                # This is a simplified check - would need context
+                pass
 
-            self.generic_visit(node)
-
-        def visit_Subscript(self: Self, node: ast.Subscript) -> None:
+        def _handle_subscript(self: Self, node: ast.Subscript) -> None:
             """Check for FlextResult without type parameter."""
             if not self._should_check("result_misuse"):
-                self.generic_visit(node)
                 return
 
             tv = FlextQualityConstants.Quality.TypeVerification
-            # TV016: FlextResult without type param - simplified check
-            if isinstance(node.value, ast.Name):
-                if node.value.id == "FlextResult":
-                    if not isinstance(node.slice, (ast.Name, ast.Subscript)):
-                        self._add_violation(
-                            tv.RuleId.RESULT_MISSING_TYPE_PARAM,
-                            "result_misuse",
-                            node,
-                            tv.MESSAGES["TV016"],
-                            suggestion="Add type parameter: FlextResult[T]",
-                        )
-
-            self.generic_visit(node)
+            # TV016: FlextResult without type param
+            if (
+                isinstance(node.value, ast.Name)
+                and node.value.id == "FlextResult"
+                and not isinstance(node.slice, (ast.Name, ast.Subscript))
+            ):
+                self._add_violation(
+                    tv.RuleId.RESULT_MISSING_TYPE_PARAM,
+                    "result_misuse",
+                    node,
+                    tv.MESSAGES["TV016"],
+                    suggestion="Add type parameter: FlextResult[T]",
+                )
 
     class _UncentralizedTypeAnalyzer(_BaseAnalyzer):
         """Analyzer for TV018 (uncentralized types)."""
 
-        def visit_AnnAssign(self: Self, node: ast.AnnAssign) -> None:
+        def __init__(
+            self: Self,
+            filename: str,
+            categories: set[str] | None,
+        ) -> None:
+            super().__init__(filename, categories)
+            self._dispatch = {
+                ast.AnnAssign: self._handle_ann_assign,
+            }
+
+        def _handle_ann_assign(self: Self, node: ast.AnnAssign) -> None:
             """Check for types that should be centralized."""
             if not self._should_check("uncentralized_type"):
-                self.generic_visit(node)
                 return
 
             tv = FlextQualityConstants.Quality.TypeVerification
@@ -570,8 +625,6 @@ class FlextTypeVerificationPlugin(FlextService["FlextTypeVerificationPlugin.Chec
                         suggestion=f"Use {suggestion}",
                         raw_type=type_str,
                     )
-
-            self.generic_visit(node)
 
         def _get_annotation_string(self: Self, node: ast.expr) -> str | None:
             """Convert annotation AST to string representation."""

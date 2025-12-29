@@ -8,6 +8,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import argparse
+import json
 import logging
 import os
 import traceback
@@ -23,10 +24,12 @@ from flext_core import (
     FlextTypes as t,
 )
 from pydantic import BaseModel, Field
+from rich.console import Console
 from rich.table import Table
 from rich.tree import Tree
 
 from .analyzer import FlextQualityAnalyzer
+from .command_strategies import CommandStrategies
 from .docs_maintenance.cli import run_comprehensive
 from .plugins.code_quality_plugin import FlextCodeQualityPlugin
 from .reports import FlextQualityReportGenerator, ReportFormat
@@ -82,6 +85,10 @@ class CliConfig(BaseModel):
     formats: CliOutputFormats = Field(default_factory=CliOutputFormats)
     default_host: str = Field(default="127.0.0.1")
     default_port: int = Field(default=8000)
+    # Display configuration (Fase 4)
+    max_display_items: int = Field(default=5, ge=1)
+    coverage_good_threshold: float = Field(default=80.0, ge=0, le=100)
+    coverage_acceptable_threshold: float = Field(default=70.0, ge=0, le=100)
 
 
 # =====================================================================
@@ -248,7 +255,9 @@ class CliCommandRouter:
         self.formatter = QualityReportFormatter(logger)
         self.analyzer_wrapper = ProjectQualityAnalyzer(logger, config)
         self._cli = FlextCli()
+        self._console = Console()
         self._quiet_mode = False
+        self._strategies = CommandStrategies()
 
     def _configure_from_args(self, args: argparse.Namespace) -> None:
         """Configure CLI based on command arguments (quiet mode, etc)."""
@@ -266,6 +275,127 @@ class CliCommandRouter:
             self.logger.warning(message)
         else:
             self.logger.info(message)
+
+    def _format_and_display_result(
+        self,
+        result: t.GeneralValueType,
+        fmt: str = "table",
+    ) -> None:
+        """Auto-dispatch result formatting based on type.
+
+        Uses isinstance checks for type-safe routing without getattr().
+        Respects quiet_mode and selected format.
+        """
+        if self._quiet_mode:
+            return
+
+        # Dispatch based on result type with explicit routing
+        if isinstance(result, FlextCodeQualityPlugin.CheckResult):
+            self._display_check_result(result, fmt)
+        elif isinstance(result, FlextCodeQualityPlugin.WorkspaceCheckResult):
+            self._display_workspace_result(result, fmt)
+        elif isinstance(result, dict):
+            self._display_analysis_result(result, fmt)
+
+    def _display_check_result(
+        self,
+        result: FlextCodeQualityPlugin.CheckResult,
+        fmt: str,
+    ) -> None:
+        """Display CheckResult as table or JSON."""
+        if fmt == "json":
+            data = {
+                "total_violations": result.total_violations,
+                "files_checked": result.files_checked,
+                "violations_by_category": result.violations_by_category,
+                "violations_by_severity": result.violations_by_severity,
+            }
+            self._cli.formatters.print(json.dumps(data, indent=2))
+            return
+
+        # Table format (default)
+        summary_table = Table(title="📊 Check Summary")
+        summary_table.add_column("Metric", style="cyan")
+        summary_table.add_column("Value", style="green")
+        summary_table.add_row("Files Checked", str(result.files_checked))
+        summary_table.add_row("Total Violations", str(result.total_violations))
+
+        category_table = Table(title="By Category")
+        category_table.add_column("Category", style="cyan")
+        category_table.add_column("Count", style="yellow")
+        for category, count in result.violations_by_category.items():
+            category_table.add_row(category, str(count))
+
+        severity_table = Table(title="By Severity")
+        severity_table.add_column("Severity", style="cyan")
+        severity_table.add_column("Count", style="magenta")
+        for severity, count in result.violations_by_severity.items():
+            severity_table.add_row(severity, str(count))
+
+        self._cli.formatters.print(summary_table)
+        self._cli.formatters.print(category_table)
+        self._cli.formatters.print(severity_table)
+
+    def _display_workspace_result(
+        self,
+        result: FlextCodeQualityPlugin.WorkspaceCheckResult,
+        fmt: str,
+    ) -> None:
+        """Display WorkspaceCheckResult as table or JSON."""
+        if fmt == "json":
+            data = {
+                "total_projects": result.total_projects,
+                "total_files": result.total_files,
+                "total_violations": result.total_violations,
+                "violations_by_project": result.violations_by_project,
+                "violations_by_category": result.violations_by_category,
+                "violations_by_severity": result.violations_by_severity,
+            }
+            self._cli.formatters.print(json.dumps(data, indent=2))
+            return
+
+        # Table format (default)
+        summary_table = Table(title="📊 Workspace Check Summary")
+        summary_table.add_column("Metric", style="cyan")
+        summary_table.add_column("Value", style="green")
+        summary_table.add_row("Total Projects", str(result.total_projects))
+        summary_table.add_row("Total Files", str(result.total_files))
+        summary_table.add_row("Total Violations", str(result.total_violations))
+
+        project_table = Table(title="By Project")
+        project_table.add_column("Project", style="cyan")
+        project_table.add_column("Violations", style="yellow")
+        for project, violations in result.violations_by_project.items():
+            project_table.add_row(project, str(violations))
+
+        category_table = Table(title="By Category")
+        category_table.add_column("Category", style="cyan")
+        category_table.add_column("Count", style="yellow")
+        for category, count in result.violations_by_category.items():
+            category_table.add_row(category, str(count))
+
+        self._cli.formatters.print(summary_table)
+        self._cli.formatters.print(project_table)
+        self._cli.formatters.print(category_table)
+
+    def _display_analysis_result(
+        self,
+        result: dict,
+        fmt: str,
+    ) -> None:
+        """Display analysis result as table or JSON."""
+        if fmt == "json":
+            self._cli.formatters.print(json.dumps(result, indent=2))
+            return
+
+        # Table format (default)
+        quality_table = Table(title="📊 Quality Analysis")
+        quality_table.add_column("Metric", style="cyan")
+        quality_table.add_column("Value", style="green")
+        for key, value in result.items():
+            quality_table.add_row(str(key), str(value))
+
+        self._cli.formatters.print(quality_table)
 
     def route_analyze(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route analyze command."""
@@ -439,76 +569,9 @@ class CliCommandRouter:
         self,
         report: t.GeneralValueType,  # Would be ValidationReport type
     ) -> None:
-        """Display validation report with Rich UI."""
+        """Display validation report."""
         self.logger.info("🔍 Validation Report")
-
-        # Create validation table
-        val_table = Table(title="Quality Checks", show_header=True)
-        val_table.add_column("Check", style="cyan")
-        val_table.add_column("Status", style="magenta")
-        val_table.add_column("Details", style="yellow")
-
-        # Helper function for status
-        def get_status(count: int) -> tuple[str, str]:
-            if count == 0:
-                return "✅ PASS", "green"
-            return f"❌ FAIL ({count})", "red"
-
-        # Get values from report
-        lint_status, lint_color = get_status(
-            report.lint_errors if hasattr(report, "lint_errors") else 0
-        )
-        type_status, type_color = get_status(
-            report.type_errors if hasattr(report, "type_errors") else 0
-        )
-        sec_status, sec_color = get_status(
-            report.security_issues if hasattr(report, "security_issues") else 0
-        )
-        test_status, test_color = get_status(
-            report.test_failures if hasattr(report, "test_failures") else 0
-        )
-
-        # Add rows
-        val_table.add_row(
-            "Lint",
-            f"[{lint_color}]{lint_status}[/{lint_color}]",
-            f"Errors: {report.lint_errors if hasattr(report, 'lint_errors') else 0}",
-        )
-        val_table.add_row(
-            "Type Check",
-            f"[{type_color}]{type_status}[/{type_color}]",
-            f"Errors: {report.type_errors if hasattr(report, 'type_errors') else 0}",
-        )
-        val_table.add_row(
-            "Security",
-            f"[{sec_color}]{sec_status}[/{sec_color}]",
-            f"Issues: {report.security_issues if hasattr(report, 'security_issues') else 0}",
-        )
-        val_table.add_row(
-            "Tests",
-            f"[{test_color}]{test_status}[/{test_color}]",
-            f"Failures: {report.test_failures if hasattr(report, 'test_failures') else 0}",
-        )
-
-        # Coverage row
-        coverage = report.coverage_percent if hasattr(report, "coverage_percent") else 0
-        coverage_color = (
-            "green"
-            if coverage >= COVERAGE_GOOD_THRESHOLD
-            else "yellow"
-            if coverage >= COVERAGE_ACCEPTABLE_THRESHOLD
-            else "red"
-        )
-        val_table.add_row(
-            "Coverage",
-            f"[{coverage_color}]{coverage:.1f}%[/{coverage_color}]",
-            "Code coverage metric",
-        )
-
-        # Render table to string and print
-        table_str = self._cli.formatters.render_table_to_string(val_table)
-        if table_str.is_success:
-            self._cli.formatters.print(table_str.value)
+        self.logger.info(str(report))
 
     def route_lint(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route lint command."""
@@ -782,7 +845,9 @@ class CliCommandRouter:
                 tree.add(f"[cyan]{key}[/cyan]: {value}")
 
         # Display tree
-        self._cli.formatters.print(tree)
+        tree_str = self._cli.formatters.render_tree_to_string(tree)
+        if tree_str.is_success:
+            self._cli.formatters.print(tree_str.value)
 
     def route_code_quality(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route code-quality command (SOLID/DRY/KISS validation) with Rich UI."""
@@ -868,68 +933,38 @@ class CliCommandRouter:
     ) -> None:
         """Display workspace analysis."""
         self.logger.info("📊 Code Quality Analysis (Workspace)")
+        self.logger.info(f"  Projects: {result.total_projects}")
+        self.logger.info(f"  Files Checked: {result.total_files}")
+        self.logger.info(f"  Total Violations: {result.total_violations}")
 
-        # Summary table
-        summary_table = Table(title="Workspace Summary", show_header=True)
-        summary_table.add_column("Metric", style="cyan")
-        summary_table.add_column("Count", style="magenta")
-        summary_table.add_row("Projects", str(result.total_projects))
-        summary_table.add_row("Files Checked", str(result.total_files))
-        summary_table.add_row("Total Violations", str(result.total_violations))
-
-        self._cli.formatters.print(summary_table)
-
-        # Violations by category table
         if result.violations_by_category:
-            cat_table = Table(title="Violations by Category", show_header=True)
-            cat_table.add_column("Category", style="cyan")
-            cat_table.add_column("Count", style="yellow")
+            self.logger.info("  Violations by Category:")
             for cat, count in result.violations_by_category.items():
-                cat_table.add_row(cat, str(count))
-            self._cli.formatters.print(cat_table)
+                self.logger.info(f"    {cat}: {count}")
 
-        # Violations by severity table
         if result.violations_by_severity:
-            sev_table = Table(title="Violations by Severity", show_header=True)
-            sev_table.add_column("Severity", style="cyan")
-            sev_table.add_column("Count", style="red")
+            self.logger.info("  Violations by Severity:")
             for sev, count in result.violations_by_severity.items():
-                sev_table.add_row(sev, str(count))
-            self._cli.formatters.print(sev_table)
+                self.logger.info(f"    {sev}: {count}")
 
     def _display_check_analysis(
         self,
         result: FlextCodeQualityPlugin.CheckResult,
     ) -> None:
-        """Display single-target analysis with Rich UI."""
-        self._cli.output.print_info("📊 Code Quality Analysis")
+        """Display single-target analysis."""
+        self.logger.info("📊 Code Quality Analysis")
+        self.logger.info(f"  Files Checked: {result.files_checked}")
+        self.logger.info(f"  Total Violations: {result.total_violations}")
 
-        # Summary table
-        summary_table = Table(title="Analysis Summary", show_header=True)
-        summary_table.add_column("Metric", style="cyan")
-        summary_table.add_column("Count", style="magenta")
-        summary_table.add_row("Files Checked", str(result.files_checked))
-        summary_table.add_row("Total Violations", str(result.total_violations))
-
-        self._cli.formatters.print(summary_table)
-
-        # Violations by category table
         if result.violations_by_category:
-            cat_table = Table(title="Violations by Category", show_header=True)
-            cat_table.add_column("Category", style="cyan")
-            cat_table.add_column("Count", style="yellow")
+            self.logger.info("  Violations by Category:")
             for cat, count in result.violations_by_category.items():
-                cat_table.add_row(cat, str(count))
-            self._cli.formatters.print(cat_table)
+                self.logger.info(f"    {cat}: {count}")
 
-        # Violations by severity table
         if result.violations_by_severity:
-            sev_table = Table(title="Violations by Severity", show_header=True)
-            sev_table.add_column("Severity", style="cyan")
-            sev_table.add_column("Count", style="red")
+            self.logger.info("  Violations by Severity:")
             for sev, count in result.violations_by_severity.items():
-                sev_table.add_row(sev, str(count))
-            self._cli.formatters.print(sev_table)
+                self.logger.info(f"    {sev}: {count}")
 
     def route_report(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route report command - generate quality reports."""
