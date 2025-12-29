@@ -24,6 +24,7 @@ from flext_core import (
 )
 from pydantic import BaseModel, Field
 from rich.table import Table
+from rich.tree import Tree
 
 from .analyzer import FlextQualityAnalyzer
 from .docs_maintenance.cli import run_comprehensive
@@ -43,6 +44,11 @@ from .web import FlextQualityWeb
 
 # Type alias for test quality operation results
 TestQualityResult = dict[str, t.GeneralValueType]
+
+# CLI Display Constants
+MAX_ITEMS_TO_DISPLAY = 5  # Maximum items to show in tree/table output
+COVERAGE_GOOD_THRESHOLD = 80  # Excellent coverage percentage
+COVERAGE_ACCEPTABLE_THRESHOLD = 70  # Minimum acceptable coverage
 
 # =====================================================================
 # Configuration Models - Data-Driven Approach (Pydantic 2)
@@ -378,7 +384,7 @@ class CliCommandRouter:
         return FlextResult[int].ok(1)
 
     def route_validate(self, args: argparse.Namespace) -> FlextResult[int]:
-        """Route validate command (lint + type + security + test)."""
+        """Route validate command (lint + type + security + test) with Rich UI."""
         path_result = CliArgumentValidator.validate_project_path(args.path)
         if path_result.is_failure:
             self.logger.error(path_result.error or "Invalid path")
@@ -392,18 +398,86 @@ class CliCommandRouter:
             return FlextResult[int].ok(1)
 
         report = result.value
-        self.logger.info(
-            f"Validation: lint={report.lint_errors}, type={report.type_errors}, "
-            f"security={report.security_issues}, tests={report.test_failures}, "
-            f"coverage={report.coverage_percent:.1f}%",
-        )
+        self._display_validation_report(report)
 
         if report.passed:
-            self.logger.info("Validation PASSED")
+            self._cli.output.print_success("✅ Validation PASSED")
             return FlextResult[int].ok(0)
 
-        self.logger.error("Validation FAILED")
+        self._cli.output.print_error("❌ Validation FAILED")
         return FlextResult[int].ok(1)
+
+    def _display_validation_report(
+        self,
+        report: t.GeneralValueType,  # Would be ValidationReport type
+    ) -> None:
+        """Display validation report with Rich UI."""
+        self._cli.output.print_info("🔍 Validation Report")
+
+        # Create validation table
+        val_table = Table(title="Quality Checks", show_header=True)
+        val_table.add_column("Check", style="cyan")
+        val_table.add_column("Status", style="magenta")
+        val_table.add_column("Details", style="yellow")
+
+        # Helper function for status
+        def get_status(count: int) -> tuple[str, str]:
+            if count == 0:
+                return "✅ PASS", "green"
+            return f"❌ FAIL ({count})", "red"
+
+        # Get values from report
+        lint_status, lint_color = get_status(
+            report.lint_errors if hasattr(report, "lint_errors") else 0
+        )
+        type_status, type_color = get_status(
+            report.type_errors if hasattr(report, "type_errors") else 0
+        )
+        sec_status, sec_color = get_status(
+            report.security_issues if hasattr(report, "security_issues") else 0
+        )
+        test_status, test_color = get_status(
+            report.test_failures if hasattr(report, "test_failures") else 0
+        )
+
+        # Add rows
+        val_table.add_row(
+            "Lint",
+            f"[{lint_color}]{lint_status}[/{lint_color}]",
+            f"Errors: {report.lint_errors if hasattr(report, 'lint_errors') else 0}",
+        )
+        val_table.add_row(
+            "Type Check",
+            f"[{type_color}]{type_status}[/{type_color}]",
+            f"Errors: {report.type_errors if hasattr(report, 'type_errors') else 0}",
+        )
+        val_table.add_row(
+            "Security",
+            f"[{sec_color}]{sec_status}[/{sec_color}]",
+            f"Issues: {report.security_issues if hasattr(report, 'security_issues') else 0}",
+        )
+        val_table.add_row(
+            "Tests",
+            f"[{test_color}]{test_status}[/{test_color}]",
+            f"Failures: {report.test_failures if hasattr(report, 'test_failures') else 0}",
+        )
+
+        # Coverage row
+        coverage = report.coverage_percent if hasattr(report, "coverage_percent") else 0
+        coverage_color = (
+            "green"
+            if coverage >= COVERAGE_GOOD_THRESHOLD
+            else "yellow"
+            if coverage >= COVERAGE_ACCEPTABLE_THRESHOLD
+            else "red"
+        )
+        val_table.add_row(
+            "Coverage",
+            f"[{coverage_color}]{coverage:.1f}%[/{coverage_color}]",
+            "Code coverage metric",
+        )
+
+        self._cli.formatters.print(val_table)
 
     def route_lint(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route lint command."""
@@ -624,24 +698,45 @@ class CliCommandRouter:
         subcommand: str,
         mode: str,
     ) -> None:
-        """Print test quality operation result."""
-        self.logger.info(f"=== Test Quality: {subcommand} ({mode}) ===")
+        """Print test quality operation result with Rich UI."""
+        # Create root tree
+        mode_symbol = "🔍" if mode == "dry-run" else "⚙️" if mode == "execute" else "↩️"
+        tree = Tree(
+            f"{mode_symbol} Test Quality: {subcommand.upper()} ({mode.upper()})"
+        )
+
+        # Process results
         for key, value in result.items():
             if key == "duplicates" and isinstance(value, list):
-                self.logger.info(f"  {key}: {len(value)} groups")
-                for dup in value[:5]:  # Show first 5
+                dup_branch = tree.add(f"📋 Duplicates: {len(value)} groups")
+                for dup in value[:MAX_ITEMS_TO_DISPLAY]:
                     if isinstance(dup, dict):
-                        self.logger.info(f"    - {dup.get('name', 'unknown')}")
+                        name = dup.get("name", "unknown")
+                        dup_branch.add(f"[yellow]{name}[/yellow]")
+                if len(value) > MAX_ITEMS_TO_DISPLAY:
+                    dup_branch.add(
+                        f"[dim]... and {len(value) - MAX_ITEMS_TO_DISPLAY} more[/dim]"
+                    )
+
             elif key == "issues" and isinstance(value, list):
-                self.logger.info(f"  {key}: {len(value)} found")
-                for issue in value[:5]:  # Show first 5
+                issues_branch = tree.add(f"⚠️  Issues: {len(value)} found")
+                for issue in value[:MAX_ITEMS_TO_DISPLAY]:
                     if isinstance(issue, dict):
-                        self.logger.info(
-                            f"    - {issue.get('file', 'unknown')}: "
-                            f"{issue.get('message', '')}",
-                        )
+                        file = issue.get("file", "unknown")
+                        msg = issue.get("message", "")
+                        issues_branch.add(f"[red]{file}[/red]: {msg}")
+                if len(value) > MAX_ITEMS_TO_DISPLAY:
+                    issues_branch.add(
+                        f"[dim]... and {len(value) - MAX_ITEMS_TO_DISPLAY} more[/dim]"
+                    )
+
+            elif isinstance(value, (int, float)):
+                tree.add(f"[cyan]{key}[/cyan]: [magenta]{value}[/magenta]")
             else:
-                self.logger.info(f"  {key}: {value}")
+                tree.add(f"[cyan]{key}[/cyan]: {value}")
+
+        # Display tree
+        self._cli.formatters.print(tree)
 
     def route_code_quality(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route code-quality command (SOLID/DRY/KISS validation) with Rich UI."""
