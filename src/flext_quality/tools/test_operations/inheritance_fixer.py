@@ -385,6 +385,18 @@ class FlextQualityTestInheritanceOperation(FlextService[dict[str, t.GeneralValue
             "message": "Detection-only operation has no changes to rollback",
         })
 
+    def execute(self: Self) -> r[dict[str, t.GeneralValueType]]:
+        """Execute the service operation.
+
+        Implementation of FlextService abstract method.
+        Uses current directory as default target.
+
+        Returns:
+            FlextResult with operation summary
+
+        """
+        return self.dry_run([Path.cwd()])
+
 
 # Short alias for convenience
 TestInheritanceOperation = FlextQualityTestInheritanceOperation
