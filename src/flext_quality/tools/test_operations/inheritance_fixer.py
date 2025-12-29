@@ -84,10 +84,10 @@ class FlextQualityTestInheritanceOperation(FlextService[dict[str, t.GeneralValue
             """Get the number of issues."""
             return len(self.issues)
 
-    class MetadataVisitor(cst.MetadataDependent):
+    class MetadataVisitor(cst.CSTVisitor):
         """Visitor with position metadata support for inheritance detection."""
 
-        # Required by libcst MetadataDependent  # CONFIG
+        # Required by libcst for position tracking  # CONFIG
         METADATA_DEPENDENCIES = (PositionProvider,)  # CONFIG
 
         def __init__(self: Self, file_path: str) -> None:
