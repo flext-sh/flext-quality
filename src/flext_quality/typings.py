@@ -235,6 +235,83 @@ class FlextQualityTypes(FlextTypes):
         type StringList = list[str]
 
     # =========================================================================
+    # LITERAL TYPES - StrEnum-based Literal types for type safety
+    # =========================================================================
+
+    class Literals:
+        """Literal types based on StrEnum members for type safety.
+
+        All Literal types reference StrEnum members to avoid string duplication (DRY principle).
+        Using PEP 695 type statement for better type checking and IDE support.
+        """
+
+        # Analysis status literal - references AnalysisStatus StrEnum members
+        type AnalysisStatusLiteral = Literal[
+            "queued",
+            "analyzing",
+            "completed",
+            "failed",
+        ]
+
+        # Issue severity literal - references IssueSeverity StrEnum members
+        type IssueSeverityLiteral = Literal[
+            "critical",
+            "high",
+            "medium",
+            "low",
+            "info",
+        ]
+
+        # Issue type literal - references IssueType StrEnum members
+        type IssueTypeLiteral = Literal[
+            "security",
+            "complexity",
+            "duplication",
+            "coverage",
+            "style",
+            "bug",
+            "performance",
+            "maintainability",
+        ]
+
+        # Report format literal - references ReportFormat StrEnum members
+        type ReportFormatLiteral = Literal[
+            "html",
+            "json",
+            "pdf",
+            "csv",
+            "xml",
+            "markdown",
+        ]
+
+        # Backend type literal - references BackendType StrEnum members
+        type BackendTypeLiteral = Literal[
+            "ast",
+            "external",
+            "hybrid",
+        ]
+
+        # Language literal - references Language StrEnum members
+        type LanguageLiteral = Literal[
+            "python",
+            "javascript",
+            "typescript",
+            "java",
+            "go",
+            "rust",
+        ]
+
+        # Check status literal - references CheckStatus StrEnum members
+        type CheckStatusLiteral = Literal[
+            "passed",
+            "failed",
+            "warning",
+        ]
+
+        # Log level literal (reusing from flext-core)
+        type LogLevelLiteral = FlextTypes.Settings.LogLevel
+
+    # =========================================================================
     # QUALITY PROJECT TYPES - Domain-specific project types extending t
     # =========================================================================
 

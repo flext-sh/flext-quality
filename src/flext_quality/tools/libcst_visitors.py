@@ -246,7 +246,7 @@ class FlextQualityLibcstVisitors:
 
         def leave_ClassDef(
             self: Self,
-            original_node: cst.ClassDef,
+            original_node: cst.ClassDef,  # noqa: ARG002
             updated_node: cst.ClassDef,
         ) -> cst.ClassDef | cst.FlattenSentinel[cst.BaseStatement]:
             """Extract methods from target class."""

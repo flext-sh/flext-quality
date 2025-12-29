@@ -63,6 +63,7 @@ from .base_service import FlextQualityBaseService
 from .constants import c
 from .models import m
 from .settings import FlextQualitySettings
+from .typings import t as qt
 
 
 class FlextQualityServices(FlextQualityBaseService[bool]):
@@ -220,7 +221,7 @@ class AnalysisServiceBuilder:
         self._config = config
         self._logger = logger
         self._project_id: str | UUID | None = None
-        self._status: c.Quality.Literals.AnalysisStatusLiteral | str = "queued"
+        self._status: qt.Literals.AnalysisStatusLiteral | str = "queued"
         self._kwargs: dict[str, t.GeneralValueType] = {}
 
     def with_project_id(self, project_id: str | UUID) -> AnalysisServiceBuilder:
@@ -231,7 +232,7 @@ class AnalysisServiceBuilder:
     def with_status(
         self,
         status: (
-            c.Quality.Literals.AnalysisStatusLiteral | str | c.Quality.AnalysisStatus
+            qt.Literals.AnalysisStatusLiteral | str | c.Quality.AnalysisStatus
         ),
     ) -> AnalysisServiceBuilder:
         """Set analysis status (fluent)."""
@@ -351,7 +352,7 @@ class IssueServiceBuilder:
 
     def with_issue_type(
         self,
-        issue_type: c.Quality.Literals.IssueTypeLiteral | str,
+        issue_type: qt.Literals.IssueTypeLiteral | str,
     ) -> IssueServiceBuilder:
         """Set issue type (fluent)."""
         self._issue_type = issue_type
@@ -497,7 +498,7 @@ class ReportServiceBuilder:
         self._config = config
         self._logger = logger
         self._analysis_id: str | UUID | None = None
-        self._format_type: c.Quality.Literals.ReportFormatLiteral | str = "HTML"
+        self._format_type: qt.Literals.ReportFormatLiteral | str = "HTML"
         self._kwargs: dict[str, t.GeneralValueType] = {}
 
     def with_analysis_id(self, analysis_id: str | UUID) -> ReportServiceBuilder:
@@ -507,7 +508,7 @@ class ReportServiceBuilder:
 
     def with_format(
         self,
-        format_type: c.Quality.Literals.ReportFormatLiteral | str,
+        format_type: qt.Literals.ReportFormatLiteral | str,
     ) -> ReportServiceBuilder:
         """Set report format (fluent)."""
         self._format_type = format_type

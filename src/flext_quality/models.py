@@ -19,7 +19,7 @@ from pydantic import BaseModel, Field
 
 from flext_quality.constants import c
 from flext_quality.protocols import p
-from flext_quality.typings import PositiveInt, ScoreRange, Timestamp
+from flext_quality.typings import PositiveInt, ScoreRange, Timestamp, t as qt
 
 # Type alias for rule parameter values - no Any type
 ParameterValue = str | int | float | bool
@@ -194,7 +194,7 @@ class FlextQualityModels:
 
             id: UUID = Field(default_factory=uuid4)
             analysis_id: UUID = Field(description="Associated analysis")
-            format_type: c.Quality.Literals.ReportFormatLiteral | str = Field(
+            format_type: qt.Literals.ReportFormatLiteral | str = Field(
                 default=c.Quality.ReportFormat.JSON,
             )
             file_path: str | None = None
@@ -364,7 +364,7 @@ class FlextQualityModels:
             """Quality check result value object."""
 
             check_name: str = Field(description="Name of the quality check")
-            status: c.Quality.Literals.CheckStatusLiteral | str = Field(
+            status: qt.Literals.CheckStatusLiteral | str = Field(
                 description="Check status: passed, failed, warning",
             )
             issues_found: int = 0
@@ -376,7 +376,7 @@ class FlextQualityModels:
 
             analysis_id: str = Field(description="Analysis identifier")
             project_path: str = Field(description="Project path analyzed")
-            status: c.Quality.Literals.AnalysisStatusLiteral | str = Field(
+            status: qt.Literals.AnalysisStatusLiteral | str = Field(
                 description="Analysis status",
             )
             issues_found: int = 0

@@ -18,6 +18,7 @@ from typing import Final, TypeAlias
 from flext_tests.constants import FlextTestsConstants
 
 from flext_quality.constants import FlextQualityConstants
+from flext_quality.typings import t as qt
 
 
 class TestsFlextQualityConstants(FlextTestsConstants, FlextQualityConstants):
@@ -58,27 +59,13 @@ class TestsFlextQualityConstants(FlextTestsConstants, FlextQualityConstants):
     class Literals:
         """Literal type aliases for test constants (Python 3.13 pattern)."""
 
-        AnalysisStatusLiteral: TypeAlias = (
-            FlextQualityConstants.Quality.Literals.AnalysisStatusLiteral
-        )
-        IssueSeverityLiteral: TypeAlias = (
-            FlextQualityConstants.Quality.Literals.IssueSeverityLiteral
-        )
-        IssueTypeLiteral: TypeAlias = (
-            FlextQualityConstants.Quality.Literals.IssueTypeLiteral
-        )
-        ReportFormatLiteral: TypeAlias = (
-            FlextQualityConstants.Quality.Literals.ReportFormatLiteral
-        )
-        BackendTypeLiteral: TypeAlias = (
-            FlextQualityConstants.Quality.Literals.BackendTypeLiteral
-        )
-        LanguageLiteral: TypeAlias = (
-            FlextQualityConstants.Quality.Literals.LanguageLiteral
-        )
-        CheckStatusLiteral: TypeAlias = (
-            FlextQualityConstants.Quality.Literals.CheckStatusLiteral
-        )
+        AnalysisStatusLiteral: TypeAlias = qt.Literals.AnalysisStatusLiteral
+        IssueSeverityLiteral: TypeAlias = qt.Literals.IssueSeverityLiteral
+        IssueTypeLiteral: TypeAlias = qt.Literals.IssueTypeLiteral
+        ReportFormatLiteral: TypeAlias = qt.Literals.ReportFormatLiteral
+        BackendTypeLiteral: TypeAlias = qt.Literals.BackendTypeLiteral
+        LanguageLiteral: TypeAlias = qt.Literals.LanguageLiteral
+        CheckStatusLiteral: TypeAlias = qt.Literals.CheckStatusLiteral
         LogLevelLiteral: TypeAlias = FlextQualityConstants.Settings.LogLevel
 
 

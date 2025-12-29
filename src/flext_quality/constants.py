@@ -10,7 +10,7 @@ from __future__ import annotations
 import tempfile
 from enum import StrEnum
 from pathlib import Path
-from typing import ClassVar, Literal
+from typing import ClassVar
 
 from flext_core import FlextConstants
 
@@ -417,81 +417,6 @@ class FlextQualityConstants(FlextConstants):
         # =============================================================================
         # All Literal types reference StrEnum members - NO string duplication!
 
-        class Literals:
-            """Type-safe string literals for quality analysis (Python 3.13+ best practices).
-
-            These type aliases provide strict type checking for common string values
-            used throughout the flext-quality codebase.
-            All Literal types reference StrEnum members to avoid string duplication (DRY principle).
-            Using PEP 695 type statement for better type checking and IDE support.
-            """
-
-            # Analysis status literal - references AnalysisStatus StrEnum members
-            type AnalysisStatusLiteral = Literal[
-                FlextQualityConstants.Quality.AnalysisStatus.QUEUED,
-                FlextQualityConstants.Quality.AnalysisStatus.ANALYZING,
-                FlextQualityConstants.Quality.AnalysisStatus.COMPLETED,
-                FlextQualityConstants.Quality.AnalysisStatus.FAILED,
-            ]
-
-            # Issue severity literal - references IssueSeverity StrEnum members
-            type IssueSeverityLiteral = Literal[
-                FlextQualityConstants.Quality.IssueSeverity.CRITICAL,
-                FlextQualityConstants.Quality.IssueSeverity.HIGH,
-                FlextQualityConstants.Quality.IssueSeverity.MEDIUM,
-                FlextQualityConstants.Quality.IssueSeverity.LOW,
-                FlextQualityConstants.Quality.IssueSeverity.INFO,
-            ]
-
-            # Issue type literal - references IssueType StrEnum members
-            type IssueTypeLiteral = Literal[
-                FlextQualityConstants.Quality.IssueType.SECURITY,
-                FlextQualityConstants.Quality.IssueType.COMPLEXITY,
-                FlextQualityConstants.Quality.IssueType.DUPLICATION,
-                FlextQualityConstants.Quality.IssueType.COVERAGE,
-                FlextQualityConstants.Quality.IssueType.STYLE,
-                FlextQualityConstants.Quality.IssueType.BUG,
-                FlextQualityConstants.Quality.IssueType.PERFORMANCE,
-                FlextQualityConstants.Quality.IssueType.MAINTAINABILITY,
-            ]
-
-            # Report format literal - references ReportFormat StrEnum members
-            type ReportFormatLiteral = Literal[
-                FlextQualityConstants.Quality.ReportFormat.HTML,
-                FlextQualityConstants.Quality.ReportFormat.JSON,
-                FlextQualityConstants.Quality.ReportFormat.PDF,
-                FlextQualityConstants.Quality.ReportFormat.CSV,
-                FlextQualityConstants.Quality.ReportFormat.XML,
-                FlextQualityConstants.Quality.ReportFormat.MARKDOWN,
-            ]
-
-            # Backend type literal - references BackendType StrEnum members
-            type BackendTypeLiteral = Literal[
-                FlextQualityConstants.Quality.BackendType.AST,
-                FlextQualityConstants.Quality.BackendType.EXTERNAL,
-                FlextQualityConstants.Quality.BackendType.HYBRID,
-            ]
-
-            # Language literal - references Language StrEnum members
-            type LanguageLiteral = Literal[
-                FlextQualityConstants.Quality.Language.PYTHON,
-                FlextQualityConstants.Quality.Language.JAVASCRIPT,
-                FlextQualityConstants.Quality.Language.TYPESCRIPT,
-                FlextQualityConstants.Quality.Language.JAVA,
-                FlextQualityConstants.Quality.Language.GO,
-                FlextQualityConstants.Quality.Language.RUST,
-            ]
-
-            # Check status literal - references CheckStatus StrEnum members
-            type CheckStatusLiteral = Literal[
-                FlextQualityConstants.Quality.CheckStatus.PASSED,
-                FlextQualityConstants.Quality.CheckStatus.FAILED,
-                FlextQualityConstants.Quality.CheckStatus.WARNING,
-            ]
-
-            # Log level literal (reusing from flext-core)
-            type LogLevelLiteral = FlextConstants.Settings.LogLevel
-
         # =============================================================================
         # QUALITY TOOLS - Internal tools constants
         # =============================================================================
@@ -509,20 +434,6 @@ class FlextQualityConstants(FlextConstants):
                 "README.md",
             )
             REQUIRED_DIRS: tuple[str, ...] = ("src", "tests")
-
-        class CommandStrategies:
-            """Command execution strategy thresholds."""
-
-            ANALYZE_SUCCESS_THRESHOLD: float = 80.0
-            ANALYZE_WARNING_THRESHOLD: float = 60.0
-            VALIDATE_SUCCESS_THRESHOLD: float = 70.0
-            SCORE_SUCCESS_THRESHOLD: float = 80.0
-            SCORE_WARNING_THRESHOLD: float = 60.0
-            CHECK_SUCCESS_THRESHOLD: float = 70.0
-            TEST_ANTIPATTERNS_THRESHOLD: float = 80.0
-            TEST_INHERITANCE_THRESHOLD: float = 80.0
-            TEST_STRUCTURE_THRESHOLD: float = 80.0
-            TEST_FIXTURES_THRESHOLD: float = 80.0
 
         class Git:
             """Git tool constants for quality operations."""
@@ -603,9 +514,10 @@ class FlextQualityConstants(FlextConstants):
 
             FORBIDDEN_PATTERNS: tuple[str, ...] = (
                 r"# type: ignore.*$",
-                r"def .*\).*-> object:",
+                r"def .*\).*->\s+object:",  # Regex pattern: function returning object
                 r"except.*pass",
                 r"from flext_core\.[^.]+\.import",
+                r"class\s+\w+\s*\([^)]*\b[mptu]\b[^)]*\)",  # Runtime alias in class declaration/inheritance
             )
 
         class DryRun:
@@ -646,6 +558,12 @@ class FlextQualityConstants(FlextConstants):
                 "utilities",
                 "constants",
                 "typings",
+            )
+
+            # Directories where local constants are allowed (scripts, examples, etc.)
+            LOCAL_CONSTANTS_ALLOWED: tuple[str, ...] = (
+                "scripts/",
+                "examples/",
             )
 
             # Tier violation patterns for foundation modules
@@ -721,10 +639,10 @@ class FlextQualityConstants(FlextConstants):
             - Workspace-level: All FLEXT projects
 
             Usage:
-                from flext_quality.constants import c
+                from flext_quality.constants import FlextQualityConstants
 
-                scope = c.Quality.Refactoring.Scope.SRC
-                projects = c.Quality.Refactoring.PROJECTS
+                scope = FlextQualityConstants.Quality.Refactoring.Scope.SRC
+                projects = FlextQualityConstants.Quality.Refactoring.PROJECTS
             """
 
             class Scope(StrEnum):
