@@ -200,7 +200,7 @@ class FlextQualityGitTools(FlextService[bool]):
             *,
             dry_run: bool = True,
             temp_path: str | None = None,
-        ) -> FlextResult[FlextQualityModels.RewriteResult]:
+        ) -> FlextResult[FlextQualityModels.Quality.RewriteResult]:
             """Rewrite git history to remove AI signatures.
 
             Args:
@@ -221,7 +221,7 @@ class FlextQualityGitTools(FlextService[bool]):
                 temp_path=temp_path,
             )
             if workspace_result.is_failure:
-                return FlextResult[FlextQualityModels.RewriteResult].fail(
+                return FlextResult[FlextQualityModels.Quality.RewriteResult].fail(
                     workspace_result.error,
                 )
 
@@ -235,7 +235,7 @@ class FlextQualityGitTools(FlextService[bool]):
             # Get commit list
             commits_result = cls._get_commit_list(work_repo)
             if commits_result.is_failure:
-                return FlextResult[FlextQualityModels.RewriteResult].fail(
+                return FlextResult[FlextQualityModels.Quality.RewriteResult].fail(
                     commits_result.error,
                 )
 
@@ -249,8 +249,8 @@ class FlextQualityGitTools(FlextService[bool]):
             )
 
             # Create result
-            return FlextResult[FlextQualityModels.RewriteResult].ok(
-                FlextQualityModels.RewriteResult(
+            return FlextResult[FlextQualityModels.Quality.RewriteResult].ok(
+                FlextQualityModels.Quality.RewriteResult(
                     commits_processed=commits_processed,
                     commits_changed=commits_changed,
                     errors=errors,

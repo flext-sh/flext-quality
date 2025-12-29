@@ -32,7 +32,7 @@ class FlextQualityDependencyTools(FlextService[bool]):
         @staticmethod
         def analyze_dependencies(
             project_path: str,
-        ) -> FlextResult[list[FlextQualityModels.DependencyInfo]]:
+        ) -> FlextResult[list[FlextQualityModels.Quality.DependencyInfo]]:
             """Analyze project dependencies.
 
             Args:
@@ -46,7 +46,7 @@ class FlextQualityDependencyTools(FlextService[bool]):
             logger.info("Analyzing dependencies for %s", project_path)
 
             # Placeholder implementation - would use poetry/pip inspection
-            return FlextResult[list[FlextQualityModels.DependencyInfo]].ok([])
+            return FlextResult[list[FlextQualityModels.Quality.DependencyInfo]].ok([])
 
     class DependencyConsolidator:
         """Dependency consolidation operations."""

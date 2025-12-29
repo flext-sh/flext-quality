@@ -131,6 +131,9 @@ class FlextQualityConstants(FlextConstants):
             ROPE_TIMEOUT: int = 60
             COVERAGE_TIMEOUT: int = 60
             RADON_TIMEOUT: int = 30
+            # Validation tool timeouts
+            RUFF_CHECK_TIMEOUT: int = 30
+            MYPY_CHECK_TIMEOUT: int = 60
 
         class QualityNetwork:
             """Network-related constants."""
@@ -206,7 +209,8 @@ class FlextQualityConstants(FlextConstants):
             MAX_FUNCTION_NAME_LENGTH: int = 50
             MAX_PROJECT_NAME_LENGTH: int = 255
             MIN_FILE_SIZE_FOR_DUPLICATION_CHECK: int = 100
-            SIMILARITY_THRESHOLD: float = 0.8
+            MIN_FILES_FOR_PAIR_COMPARISON: int = 2
+            SIMILARITY_THRESHOLD: float = 0.65  # Aggressive: 65% detects more duplication to force refactoring
             MIN_FUNCTION_LENGTH_FOR_DEAD_CODE: int = 5
             GRADE_A_THRESHOLD: float = 90.0
             GRADE_B_THRESHOLD: float = 80.0
@@ -217,6 +221,13 @@ class FlextQualityConstants(FlextConstants):
             ISSUE_PREVIEW_LIMIT: int = 10
             MIN_COVERAGE_THRESHOLD: float = 75.0
             MIN_SCORE_THRESHOLD: float = 60.0
+
+        class Baseline:
+            """Baseline file format constants."""
+
+            PARTS_COUNT: int = 2
+            DEFAULT_CONFIDENCE: int = 80
+            EXCLUDED_DIRS: tuple[str, ...] = ("tests", "examples")
 
         # =============================================================================
         # STRENUM CLASSES - Single source of truth for string enumerations
@@ -340,6 +351,35 @@ class FlextQualityConstants(FlextConstants):
             D_PLUS = "D+"
             D = "D"
             F = "F"
+
+        class ModernizationCategory(StrEnum):
+            """Categories for Refurb modernization suggestions.
+
+            DRY Pattern:
+                StrEnum is the single source of truth. Use ModernizationCategory.SYNTAX
+                or ModernizationCategory.SYNTAX.value directly - no base strings needed.
+            """
+
+            SYNTAX = "syntax"
+            PATTERN = "pattern"
+            PERFORMANCE = "performance"
+            READABILITY = "readability"
+
+        class ComplexityLevel(StrEnum):
+            """Cognitive complexity thresholds for Complexipy analysis.
+
+            DRY Pattern:
+                StrEnum is the single source of truth. Maps to Complexity class thresholds.
+                LOW: <= COGNITIVE_LOW_THRESHOLD (10)
+                MEDIUM: <= COGNITIVE_MEDIUM_THRESHOLD (15)
+                HIGH: <= COGNITIVE_HIGH_THRESHOLD (25)
+                CRITICAL: > COGNITIVE_HIGH_THRESHOLD
+            """
+
+            LOW = "low"
+            MEDIUM = "medium"
+            HIGH = "high"
+            CRITICAL = "critical"
 
         # Generated tuples from StrEnum members (DRY principle)
         # These replace the hardcoded tuples to avoid duplication
@@ -499,6 +539,21 @@ class FlextQualityConstants(FlextConstants):
                 ".DS_Store",
             )
 
+        class Markdown:
+            """Markdown documentation analysis constants."""
+
+            # Header levels
+            HEADER_H1_LEVEL: int = 1
+            HEADER_H2_LEVEL: int = 2
+            HEADER_H3_LEVEL: int = 3
+            MAX_HEADER_HIERARCHY_JUMP: int = 1
+
+            # Formatting defaults
+            DEFAULT_WRAP_WIDTH: int = 88  # CONFIG
+
+            # File patterns
+            DEFAULT_GLOB_PATTERN: str = "**/*.md"
+
         class Patterns:
             """Pattern matching constants for quality analysis enforcement."""
 
@@ -535,6 +590,45 @@ class FlextQualityConstants(FlextConstants):
             BACKUP_SUFFIX: str = ".backup"
             DRY_RUN_DEFAULT: bool = True
 
+        class Operations:
+            """Quality operations constants for centralized validation."""
+
+            # Coverage thresholds
+            DEFAULT_MIN_COVERAGE: float = 80.0
+            STRICT_MIN_COVERAGE: float = 90.0
+
+            # Lint ratchet (errors must not increase)
+            LINT_RATCHET_TOLERANCE: int = 0
+
+            # Type checker selection
+            DEFAULT_TYPE_CHECKER: str = "mypy"
+            FALLBACK_TYPE_CHECKER: str = "pyrefly"
+
+            # Batch operation settings
+            MAX_FILES_PER_BATCH: int = 50
+            AUTO_ROLLBACK_THRESHOLD: int = 0
+
+        class Hooks:
+            """Hook validation constants for shell integration.
+
+            Provides patterns and module lists for FLEXT enforcement hooks.
+            """
+
+            # Foundation modules that cannot import from services/api
+            FOUNDATION_MODULES: tuple[str, ...] = (
+                "models",
+                "protocols",
+                "utilities",
+                "constants",
+                "typings",
+            )
+
+            # Tier violation patterns for foundation modules
+            FORBIDDEN_IN_FOUNDATION: tuple[str, ...] = (
+                r"from.*\.(services|api)\s",
+                r"import.*\.(services|api)\s",
+            )
+
         # =============================================================================
         # SCORING AND PENALTIES - Quality score calculation constants
         # =============================================================================
@@ -551,8 +645,120 @@ class FlextQualityConstants(FlextConstants):
             LOW_ISSUE_PENALTY: int = 1
 
         # =========================================================================
+        # BATCH - Centralized batch operations constants
+        # =========================================================================
+
+        class Batch:
+            """Batch operations constants for centralized fix scripts and hooks.
+
+            Provides standardized modes, exit codes, and defaults for:
+            - dry-run: Preview changes without modifying
+            - backup: Create timestamped backups
+            - execute: Apply changes with validation
+            - rollback: Restore from backup on failure
+            """
+
+            class Mode(StrEnum):
+                """Batch operation execution modes."""
+
+                DRY_RUN = "dry-run"
+                BACKUP = "backup"
+                EXECUTE = "execute"
+                ROLLBACK = "rollback"
+
+            class ExitCode:
+                """Standard exit codes for batch operations."""
+
+                SUCCESS: int = 0
+                VALIDATION_FAILED: int = 1
+                BLOCKED: int = 2
+                ROLLBACK_NEEDED: int = 3
+
+            class Defaults:
+                """Default configuration for batch operations."""
+
+                BACKUP_DIR: str = tempfile.gettempdir()
+                BACKUP_PREFIX: str = "flext_batch"
+                BACKUP_EXTENSION: str = ".tar.gz"
+                CLEANUP_HOURS: int = 24
+                RATCHET_TOLERANCE: int = 0
+
+        # =========================================================================
         # CYCLE - Refactoring cycle management constants
         # =========================================================================
+
+        class Refactoring:
+            """Refactoring scope and target constants for batch operations.
+
+            Provides standardized scopes for:
+            - Project-level: Single FLEXT project
+            - Directory-level: src, tests, scripts, examples
+            - Workspace-level: All FLEXT projects
+
+            Usage:
+                from flext_quality.constants import c
+
+                scope = c.Quality.Refactoring.Scope.SRC
+                projects = c.Quality.Refactoring.PROJECTS
+            """
+
+            class Scope(StrEnum):
+                """Refactoring target scopes."""
+
+                SRC = "src"
+                TESTS = "tests"
+                SCRIPTS = "scripts"
+                EXAMPLES = "examples"
+                ALL = "all"  # All directories
+
+            class Target(StrEnum):
+                """Refactoring operation targets."""
+
+                PROJECT = "project"
+                WORKSPACE = "workspace"
+
+            # FLEXT projects in dependency order
+            PROJECTS: tuple[str, ...] = (
+                "flext-core",
+                "flext-cli",
+                "flext-ldif",
+                "flext-ldap",
+                "client-a-oud-mig",
+            )
+
+            # Workspace root path
+            WORKSPACE_ROOT: str = "/home/marlonsc/flext"
+
+            # Directories by scope
+            SCOPE_DIRECTORIES: ClassVar[dict[str, tuple[str, ...]]] = {
+                "src": ("src/",),
+                "tests": ("tests/",),
+                "scripts": ("scripts/",),
+                "examples": ("examples/",),
+                "all": ("src/", "tests/", "scripts/", "examples/"),
+            }
+
+            # Pattern replacements for namespace fixes
+            class Patterns:
+                """Common patterns for namespace refactoring."""
+
+                # Nested namespace to flat namespace
+                NESTED_TO_FLAT: ClassVar[dict[str, str]] = {
+                    r"m\.Snapshot\.Configuration": "m.Configuration",
+                    r"m\.Snapshot\.Service": "m.Service",
+                    r"m\.Snapshot\.Health": "m.Health",
+                    r"m\.Progress\.Operation": "m.Operation",
+                }
+
+                # Python 3.13+ syntax updates
+                MODERN_SYNTAX: ClassVar[dict[str, str]] = {
+                    r"Optional\[([^\]]+)\]": r"\1 | None",
+                    r"Union\[([^,]+),\s*None\]": r"\1 | None",
+                    r"Dict\[": "dict[",
+                    r"List\[": "list[",
+                    r"Tuple\[": "tuple[",
+                    r"Set\[": "set[",
+                }
 
         class Cycle:
             """Refactoring cycle management constants."""

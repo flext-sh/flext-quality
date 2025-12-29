@@ -79,7 +79,10 @@ class DocumentationMaintainer:
         """Load configuration."""
         try:
             with Path(self.config_path).open(encoding="utf-8") as f:
-                return yaml.safe_load(f)
+                loaded = yaml.safe_load(f)
+                if isinstance(loaded, dict):
+                    return loaded  # type narrowing validates dict type
+                return {}
         except Exception:
             return {}
 
@@ -362,7 +365,7 @@ class DocumentationMaintainer:
         # Aggregate key metrics
         total_files_processed = 0
         total_issues = 0
-        quality_scores = []
+        quality_scores: list[float] = []
 
         for result in self.results:
             if result.operation == "content_audit":
@@ -375,8 +378,9 @@ class DocumentationMaintainer:
                 total_issues += (
                     critical_issues if isinstance(critical_issues, int) else 0
                 )
-                if "average_quality" in result.details:
-                    quality_scores.append(result.details["average_quality"])
+                avg_quality = result.details.get("average_quality")
+                if isinstance(avg_quality, (int, float)):
+                    quality_scores.append(float(avg_quality))
 
             elif result.operation in {"link_validation", "style_validation"}:
                 files_checked = result.details.get("files_checked", 0)
@@ -393,11 +397,13 @@ class DocumentationMaintainer:
                         total_violations if isinstance(total_violations, int) else 0
                     )
 
-            elif (
+            if (
                 result.operation == "style_validation"
                 and "average_score" in result.details
             ):
-                quality_scores.append(result.details["average_score"])
+                avg_score = result.details["average_score"]
+                if isinstance(avg_score, (int, float)):
+                    quality_scores.append(float(avg_score))
 
         average_quality = (
             sum(quality_scores) / len(quality_scores) if quality_scores else 0

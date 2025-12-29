@@ -35,7 +35,7 @@ class FlextQualityArchitectureTools(s[bool]):
         @staticmethod
         def analyze_violations(
             project_path: str,
-        ) -> r[FlextQualityModels.AnalysisResult]:
+        ) -> r[FlextQualityModels.Quality.AnalysisResult]:
             """Analyze architectural violations.
 
             Args:
@@ -48,7 +48,7 @@ class FlextQualityArchitectureTools(s[bool]):
             logger = FlextLogger(__name__)
             logger.info("Analyzing violations for %s", project_path)
 
-            result = FlextQualityModels.AnalysisResult(
+            result = FlextQualityModels.Quality.AnalysisResult(
                 analysis_id=str(uuid.uuid4()),
                 project_path=str(project_path),
                 status="completed",
@@ -57,7 +57,7 @@ class FlextQualityArchitectureTools(s[bool]):
                 quality_grade="F",
             )
 
-            return r[FlextQualityModels.AnalysisResult].ok(result)
+            return r[FlextQualityModels.Quality.AnalysisResult].ok(result)
 
     class PatternEnforcer:
         """Pattern enforcement and validation."""

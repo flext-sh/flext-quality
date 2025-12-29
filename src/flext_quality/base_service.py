@@ -35,6 +35,11 @@ class FlextQualityBaseService(FlextService[T]):
     # Private slots - initialized in __init__, not Pydantic fields
     __slots__ = ("_quality_config", "_quality_container", "_quality_logger")
 
+    # Type annotations for slots (required for mypy strict)
+    _quality_logger: FlextLogger
+    _quality_config: FlextQualitySettings
+    _quality_container: FlextContainer
+
     def __new__(
         cls,
         _config: FlextQualitySettings | None = None,

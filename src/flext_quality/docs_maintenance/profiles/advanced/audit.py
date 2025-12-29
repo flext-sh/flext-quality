@@ -410,7 +410,7 @@ class DocumentationAuditor:
 
     def _calculate_completeness_score(self, content: str, word_count: int) -> int:
         """Calculate completeness score based on content analysis."""
-        score = 0
+        score: float = 0.0
 
         # Word count check
         min_words = self.config["audit"]["thresholds"]["min_word_count"]
@@ -634,7 +634,7 @@ class DocumentationAuditor:
                 quality_ranges["poor"] += 1
 
         # Issues by category
-        issues_by_category = {}
+        issues_by_category: dict[str, int] = {}
         for result in self.results:
             for issue in result.issues:
                 category = issue.get("type", "unknown")
@@ -671,7 +671,7 @@ class DocumentationAuditor:
             }
             with Path(output_file).open("w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2, default=str)
-        elif format == "yaml":
+        elif output_format == "yaml":
             data = {
                 "timestamp": datetime.now(UTC).isoformat(),
                 "summary": asdict(self.summary) if self.summary else None,

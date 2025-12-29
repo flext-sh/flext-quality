@@ -10,9 +10,10 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Mapping
+from pathlib import Path
 from typing import Protocol, runtime_checkable
 
-from flext_core import FlextTypes as t
+from flext_core import FlextResult, FlextTypes as t
 from flext_core.protocols import FlextProtocols as p_core
 
 
@@ -177,6 +178,37 @@ class FlextQualityProtocols(p_core):
                 ...  # INTERFACE
 
         @runtime_checkable
+        class OperationExecutor(Protocol):
+            """Protocol for batch operations that can be executed on files.
+
+            Replaces Callable[[Path], FlextResult[bool]] to satisfy FLEXT
+            architecture rules (use Protocol instead of Callable).
+
+            Usage:
+                class MyFixer:
+                    def __call__(self, file_path: Path) -> p.Result[bool]:
+                        # Fix something in the file
+                        return r.ok(True)
+
+                fixer: p.Quality.OperationExecutor = MyFixer()
+            """
+
+            def __call__(
+                self,
+                file_path: t.GeneralValueType,
+            ) -> p_core.Result[bool]:
+                """Execute operation on a file.
+
+                Args:
+                    file_path: Path to file to operate on
+
+                Returns:
+                    Result[bool] indicating success
+
+                """
+                ...  # INTERFACE
+
+        @runtime_checkable
         class JsonParserProtocol(Protocol):
             """Protocol for JSON output parsers used in tool backends.
 
@@ -202,6 +234,127 @@ class FlextQualityProtocols(p_core):
 
                 Returns:
                     List of parsed issue dictionaries
+
+                """
+                ...  # INTERFACE
+
+        @runtime_checkable
+        class FixFunction(Protocol):
+            """Protocol for fix functions used in fix_with_validation.
+
+            This protocol defines the interface for functions that apply fixes
+            to files with FlextResult[bool] return type.
+
+            Usage:
+                def my_fix(file_path: str) -> FlextResult[bool]:
+                    # Apply fix to file
+                    return FlextResult[bool].ok(True)
+
+                # my_fix satisfies FixFunction protocol
+            """
+
+            def __call__(self, file_path: str) -> p_core.Result[bool]:
+                """Apply fix to a file.
+
+                Args:
+                    file_path: Path to the file to fix.
+
+                Returns:
+                    FlextResult[bool] indicating success or failure.
+
+                """
+                ...  # INTERFACE
+
+        @runtime_checkable
+        class BatchOperation(Protocol):
+            """Protocol for batch operations with validation.
+
+            Provides a standardized interface for fix scripts and hooks
+            that need dry-run, backup, execute, and rollback capabilities.
+
+            All methods return FlextResult for consistent error handling.
+
+            Usage:
+                class MyBatchOperation:
+                    def dry_run(self, targets: list[Path]) -> FlextResult[dict]:
+                        # Preview changes
+                        ...
+
+                    def backup(self, targets: list[Path]) -> FlextResult[Path]:
+                        # Create backup
+                        ...
+
+                    def execute(
+                        self,
+                        targets: list[Path],
+                        backup_path: Path | None,
+                    ) -> FlextResult[dict]:
+                        # Apply changes
+                        ...
+
+                    def rollback(self, backup_path: Path) -> FlextResult[bool]:
+                        # Restore from backup
+                        ...
+            """
+
+            def dry_run(
+                self,
+                targets: list[Path],
+            ) -> FlextResult[dict[str, t.GeneralValueType]]:
+                """Preview changes without modifying files.
+
+                Args:
+                    targets: List of file paths to analyze.
+
+                Returns:
+                    FlextResult with preview information (files, changes, etc).
+
+                """
+                ...  # INTERFACE
+
+            def backup(
+                self,
+                targets: list[Path],
+            ) -> FlextResult[Path]:
+                """Create timestamped backup of target files.
+
+                Args:
+                    targets: List of file paths to backup.
+
+                Returns:
+                    FlextResult with path to backup archive.
+
+                """
+                ...  # INTERFACE
+
+            def execute(
+                self,
+                targets: list[Path],
+                backup_path: Path | None,
+            ) -> FlextResult[dict[str, t.GeneralValueType]]:
+                """Execute operation with validation.
+
+                Args:
+                    targets: List of file paths to modify.
+                    backup_path: Optional path to backup for rollback.
+
+                Returns:
+                    FlextResult with execution results.
+
+                """
+                ...  # INTERFACE
+
+            def rollback(
+                self,
+                backup_path: Path,
+            ) -> FlextResult[bool]:
+                """Restore files from backup.
+
+                Args:
+                    backup_path: Path to backup archive.
+
+                Returns:
+                    FlextResult indicating success or failure.
 
                 """
                 ...  # INTERFACE

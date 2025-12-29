@@ -15,7 +15,13 @@ from pathlib import Path
 from typing import Self, override
 
 from flext_cli import FlextCli, FlextCliFileTools
-from flext_core import FlextContainer, FlextLogger, FlextResult, FlextService
+from flext_core import (
+    FlextContainer,
+    FlextLogger,
+    FlextResult,
+    FlextService,
+    FlextTypes as t,
+)
 from pydantic import BaseModel, Field
 
 from .analyzer import FlextQualityAnalyzer
@@ -23,7 +29,17 @@ from .docs_maintenance.cli import run_comprehensive
 from .reports import FlextQualityReportGenerator, ReportFormat
 from .settings import FlextQualitySettings
 from .subprocess_utils import SubprocessUtils
+from .tools.quality_operations import FlextQualityOperations
+from .tools.test_operations import (
+    FixtureConsolidateOperation,
+    TestAntipatternOperation,
+    TestInheritanceOperation,
+    TestStructureOperation,
+)
 from .web import FlextQualityWeb
+
+# Type alias for test quality operation results
+TestQualityResult = dict[str, t.GeneralValueType]
 
 # =====================================================================
 # Configuration Models - Data-Driven Approach (Pydantic 2)
@@ -331,6 +347,295 @@ class CliCommandRouter:
             self.logger.exception("Web server failed")
             return FlextResult[int].ok(1)
 
+    def route_check(self, args: argparse.Namespace) -> FlextResult[int]:
+        """Route check command (lint + type)."""
+        path_result = CliArgumentValidator.validate_project_path(args.path)
+        if path_result.is_failure:
+            self.logger.error(path_result.error or "Invalid path")
+            return FlextResult[int].ok(1)
+
+        ops = FlextQualityOperations(path_result.value)
+        result = ops.check()
+
+        if result.is_failure:
+            self.logger.error(f"Check failed: {result.error}")
+            return FlextResult[int].ok(1)
+
+        report = result.value
+        if report.passed:
+            self.logger.info(
+                f"Check PASSED - lint: {report.lint_errors}, type: {report.type_errors}",
+            )
+            return FlextResult[int].ok(0)
+
+        self.logger.error(
+            f"Check FAILED - lint: {report.lint_errors}, type: {report.type_errors}",
+        )
+        return FlextResult[int].ok(1)
+
+    def route_validate(self, args: argparse.Namespace) -> FlextResult[int]:
+        """Route validate command (lint + type + security + test)."""
+        path_result = CliArgumentValidator.validate_project_path(args.path)
+        if path_result.is_failure:
+            self.logger.error(path_result.error or "Invalid path")
+            return FlextResult[int].ok(1)
+
+        ops = FlextQualityOperations(path_result.value)
+        result = ops.validate_project(min_coverage=args.min_coverage)
+
+        if result.is_failure:
+            self.logger.error(f"Validate failed: {result.error}")
+            return FlextResult[int].ok(1)
+
+        report = result.value
+        self.logger.info(
+            f"Validation: lint={report.lint_errors}, type={report.type_errors}, "
+            f"security={report.security_issues}, tests={report.test_failures}, "
+            f"coverage={report.coverage_percent:.1f}%",
+        )
+
+        if report.passed:
+            self.logger.info("Validation PASSED")
+            return FlextResult[int].ok(0)
+
+        self.logger.error("Validation FAILED")
+        return FlextResult[int].ok(1)
+
+    def route_lint(self, args: argparse.Namespace) -> FlextResult[int]:
+        """Route lint command."""
+        path_result = CliArgumentValidator.validate_project_path(args.path)
+        if path_result.is_failure:
+            self.logger.error(path_result.error or "Invalid path")
+            return FlextResult[int].ok(1)
+
+        ops = FlextQualityOperations(path_result.value)
+        result = ops.lint(fix=args.fix)
+
+        if result.is_failure:
+            self.logger.error(f"Lint failed: {result.error}")
+            return FlextResult[int].ok(1)
+
+        report = result.value
+        if report.passed:
+            self.logger.info(f"Lint PASSED - {report.files_checked} files checked")
+            return FlextResult[int].ok(0)
+
+        self.logger.error(f"Lint FAILED - {report.errors} errors")
+        return FlextResult[int].ok(1)
+
+    def route_type_check(self, args: argparse.Namespace) -> FlextResult[int]:
+        """Route type-check command."""
+        path_result = CliArgumentValidator.validate_project_path(args.path)
+        if path_result.is_failure:
+            self.logger.error(path_result.error or "Invalid path")
+            return FlextResult[int].ok(1)
+
+        ops = FlextQualityOperations(path_result.value)
+        result = ops.type_check(strict=args.strict)
+
+        if result.is_failure:
+            self.logger.error(f"Type check failed: {result.error}")
+            return FlextResult[int].ok(1)
+
+        report = result.value
+        if report.passed:
+            self.logger.info(
+                f"Type check PASSED ({report.tool}) - {report.files_checked} files",
+            )
+            return FlextResult[int].ok(0)
+
+        self.logger.error(f"Type check FAILED - {report.errors} errors")
+        return FlextResult[int].ok(1)
+
+    def route_security(self, args: argparse.Namespace) -> FlextResult[int]:
+        """Route security command."""
+        path_result = CliArgumentValidator.validate_project_path(args.path)
+        if path_result.is_failure:
+            self.logger.error(path_result.error or "Invalid path")
+            return FlextResult[int].ok(1)
+
+        ops = FlextQualityOperations(path_result.value)
+        result = ops.security()
+
+        if result.is_failure:
+            self.logger.error(f"Security scan failed: {result.error}")
+            return FlextResult[int].ok(1)
+
+        report = result.value
+        if report.passed:
+            self.logger.info("Security scan PASSED")
+            return FlextResult[int].ok(0)
+
+        self.logger.error(
+            f"Security scan FAILED - high={report.high}, medium={report.medium}",
+        )
+        return FlextResult[int].ok(1)
+
+    def route_test(self, args: argparse.Namespace) -> FlextResult[int]:
+        """Route test command."""
+        path_result = CliArgumentValidator.validate_project_path(args.path)
+        if path_result.is_failure:
+            self.logger.error(path_result.error or "Invalid path")
+            return FlextResult[int].ok(1)
+
+        ops = FlextQualityOperations(path_result.value)
+        result = ops.test(min_coverage=args.min_coverage)
+
+        if result.is_failure:
+            self.logger.error(f"Test execution failed: {result.error}")
+            return FlextResult[int].ok(1)
+
+        report = result.value
+        if report.passed:
+            self.logger.info(
+                f"Tests PASSED - coverage={report.coverage_percent:.1f}%",
+            )
+            return FlextResult[int].ok(0)
+
+        self.logger.error(f"Tests FAILED - {report.failed_count} failures")
+        return FlextResult[int].ok(1)
+
+    def route_test_antipatterns(self, args: argparse.Namespace) -> FlextResult[int]:
+        """Route test antipatterns subcommand."""
+        targets = self._resolve_test_quality_targets(args)
+        if not targets:
+            self.logger.error("No valid targets found")
+            return FlextResult[int].ok(1)
+
+        operation = TestAntipatternOperation()
+        return self._execute_test_operation(operation, args, targets, "antipatterns")
+
+    def route_test_inheritance(self, args: argparse.Namespace) -> FlextResult[int]:
+        """Route test inheritance subcommand."""
+        targets = self._resolve_test_quality_targets(args)
+        if not targets:
+            self.logger.error("No valid targets found")
+            return FlextResult[int].ok(1)
+
+        operation = TestInheritanceOperation()
+        return self._execute_test_operation(operation, args, targets, "inheritance")
+
+    def route_test_structure(self, args: argparse.Namespace) -> FlextResult[int]:
+        """Route test structure subcommand."""
+        targets = self._resolve_test_quality_targets(args)
+        if not targets:
+            self.logger.error("No valid targets found")
+            return FlextResult[int].ok(1)
+
+        operation = TestStructureOperation()
+        return self._execute_test_operation(operation, args, targets, "structure")
+
+    def route_test_fixtures(self, args: argparse.Namespace) -> FlextResult[int]:
+        """Route test fixtures subcommand."""
+        targets = self._resolve_test_quality_targets(args)
+        if not targets:
+            self.logger.error("No valid targets found")
+            return FlextResult[int].ok(1)
+
+        operation = FixtureConsolidateOperation()
+        return self._execute_test_operation(operation, args, targets, "fixtures")
+
+    def _execute_test_operation(
+        self,
+        operation: TestAntipatternOperation
+        | TestInheritanceOperation
+        | TestStructureOperation
+        | FixtureConsolidateOperation,
+        args: argparse.Namespace,
+        targets: list[Path],
+        name: str,
+    ) -> FlextResult[int]:
+        """Execute test quality operation with appropriate mode."""
+        if args.dry_run:
+            result = operation.dry_run(targets)
+            if result.is_failure:
+                self.logger.error(f"Dry run failed: {result.error}")
+                return FlextResult[int].ok(1)
+            self._print_test_quality_result(result.value, name, "dry-run")
+            return FlextResult[int].ok(0)
+
+        if args.execute:
+            result = operation.execute(targets, None)
+            if result.is_failure:
+                self.logger.error(f"Execute failed: {result.error}")
+                return FlextResult[int].ok(1)
+            self._print_test_quality_result(result.value, name, "execute")
+            return FlextResult[int].ok(0)
+
+        if args.rollback:
+            backup_dir = Path.home() / ".flext" / "backups"
+            result = operation.rollback(backup_dir)
+            if result.is_failure:
+                self.logger.error(f"Rollback failed: {result.error}")
+                return FlextResult[int].ok(1)
+            self.logger.info("Rollback completed")
+            return FlextResult[int].ok(0)
+
+        # Default: dry-run
+        result = operation.dry_run(targets)
+        if result.is_failure:
+            self.logger.error(f"Analysis failed: {result.error}")
+            return FlextResult[int].ok(1)
+        self._print_test_quality_result(result.value, name, "dry-run")
+        return FlextResult[int].ok(0)
+
+    def _resolve_test_quality_targets(self, args: argparse.Namespace) -> list[Path]:
+        """Resolve target paths for test quality operations."""
+        targets: list[Path] = []
+        workspace_root = Path.home() / "flext"
+
+        # Single target file
+        if args.target:
+            path = Path(args.target)
+            if path.exists():
+                targets.append(path)
+            return targets
+
+        # Single project
+        if args.project:
+            project_path = workspace_root / args.project
+            if project_path.exists():
+                targets.append(project_path)
+            return targets
+
+        # Workspace (all projects)
+        if args.workspace:
+            targets.extend(
+                proj
+                for proj in workspace_root.iterdir()
+                if proj.is_dir() and (proj / "pyproject.toml").exists()
+            )
+            return targets
+
+        # Default: current directory
+        targets.append(Path.cwd())
+        return targets
+
+    def _print_test_quality_result(
+        self,
+        result: TestQualityResult,
+        subcommand: str,
+        mode: str,
+    ) -> None:
+        """Print test quality operation result."""
+        self.logger.info(f"=== Test Quality: {subcommand} ({mode}) ===")
+        for key, value in result.items():
+            if key == "duplicates" and isinstance(value, list):
+                self.logger.info(f"  {key}: {len(value)} groups")
+                for dup in value[:5]:  # Show first 5
+                    if isinstance(dup, dict):
+                        self.logger.info(f"    - {dup.get('name', 'unknown')}")
+            elif key == "issues" and isinstance(value, list):
+                self.logger.info(f"  {key}: {len(value)} found")
+                for issue in value[:5]:  # Show first 5
+                    if isinstance(issue, dict):
+                        self.logger.info(
+                            f"    - {issue.get('file', 'unknown')}: "
+                            f"{issue.get('message', '')}",
+                        )
+            else:
+                self.logger.info(f"  {key}: {value}")
+
 
 # =====================================================================
 # Main Service Class - Delegates to Utilities
@@ -606,6 +911,35 @@ Examples:
         help="Environment variables (format: KEY=VALUE)",
     )
 
+    # Check command - quick lint + type (matches 'make check')
+    check_parser = subparsers.add_parser("check", help="Quick check: lint + type")
+    check_parser.add_argument(
+        "path",
+        type=Path,
+        nargs="?",
+        default=Path.cwd(),
+        help="Path to project",
+    )
+
+    # Validate command - full validation (matches 'make validate')
+    validate_parser = subparsers.add_parser(
+        "validate",
+        help="Full validation: lint + type + security + test",
+    )
+    validate_parser.add_argument(
+        "path",
+        type=Path,
+        nargs="?",
+        default=Path.cwd(),
+        help="Path to project",
+    )
+    validate_parser.add_argument(
+        "--min-coverage",
+        type=float,
+        default=None,
+        help="Minimum test coverage percentage (default from constants)",
+    )
+
     # Doc command - delegates to documentation maintenance CLI
     doc_parser = subparsers.add_parser(
         "doc",
@@ -645,6 +979,79 @@ Examples:
         help="Show detailed logging for documentation operations",
     )
 
+    # Test quality command - test quality operations
+    test_quality_parser = subparsers.add_parser(
+        "test-quality",
+        help="Test quality operations (antipatterns, inheritance, structure, fixtures)",
+        description="Analyze and fix test quality issues across FLEXT projects",
+    )
+    test_quality_subparsers = test_quality_parser.add_subparsers(
+        dest="test_subcommand",
+        help="Test quality subcommands",
+    )
+
+    # Common arguments for all test-quality subcommands
+    def _add_test_quality_args(subparser: argparse.ArgumentParser) -> None:
+        """Add common arguments to test quality subparsers."""
+        subparser.add_argument(
+            "--dry-run",
+            action="store_true",
+            default=True,
+            help="Preview changes without modification (default)",
+        )
+        subparser.add_argument(
+            "--execute",
+            action="store_true",
+            help="Apply changes with backup",
+        )
+        subparser.add_argument(
+            "--rollback",
+            action="store_true",
+            help="Restore from backup",
+        )
+        subparser.add_argument(
+            "--project",
+            help="Target project name (e.g., flext-core)",
+        )
+        subparser.add_argument(
+            "--workspace",
+            action="store_true",
+            help="Apply to all projects in workspace",
+        )
+        subparser.add_argument(
+            "--target",
+            type=Path,
+            help="Specific file path to analyze",
+        )
+
+    # Test antipatterns subcommand
+    antipatterns_parser = test_quality_subparsers.add_parser(
+        "antipatterns",
+        help="Detect and remove test anti-patterns (Mock, type:ignore, Any, cast)",
+    )
+    _add_test_quality_args(antipatterns_parser)
+
+    # Test inheritance subcommand
+    inheritance_parser = test_quality_subparsers.add_parser(
+        "inheritance",
+        help="Fix test class inheritance patterns",
+    )
+    _add_test_quality_args(inheritance_parser)
+
+    # Test structure subcommand
+    structure_parser = test_quality_subparsers.add_parser(
+        "structure",
+        help="Ensure test structure matches src/ modules",
+    )
+    _add_test_quality_args(structure_parser)
+
+    # Test fixtures subcommand
+    fixtures_parser = test_quality_subparsers.add_parser(
+        "fixtures",
+        help="Consolidate duplicate fixtures across projects",
+    )
+    _add_test_quality_args(fixtures_parser)
+
     args = parser.parse_args()
 
     if not args.command:
@@ -678,6 +1085,28 @@ Examples:
     if args.command == "web":
         result = router.route_web(args)
         return result.map_or(1)
+    if args.command == "check":
+        result = router.route_check(args)
+        return result.map_or(1)
+    if args.command == "validate":
+        result = router.route_validate(args)
+        return result.map_or(1)
+    if args.command == "test-quality":
+        subcommand = args.test_subcommand
+        if subcommand == "antipatterns":
+            result = router.route_test_antipatterns(args)
+            return result.map_or(1)
+        if subcommand == "inheritance":
+            result = router.route_test_inheritance(args)
+            return result.map_or(1)
+        if subcommand == "structure":
+            result = router.route_test_structure(args)
+            return result.map_or(1)
+        if subcommand == "fixtures":
+            result = router.route_test_fixtures(args)
+            return result.map_or(1)
+        test_quality_parser.print_help()
+        return 1
 
     parser.print_help()
     return 1

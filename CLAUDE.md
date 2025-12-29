@@ -2,7 +2,7 @@
 
 **Hierarchy**: PROJECT
 **Parent**: [../CLAUDE.md](../CLAUDE.md) - Workspace standards
-**Last Update**: 2025-12-07
+**Last Update**: 2025-12-28
 
 ---
 
@@ -20,6 +20,10 @@
 - ✅ Automated quality assessment
 - ✅ Quality scoring and reporting
 - ✅ Integration with FLEXT ecosystem tools
+- ✅ Dead code detection (Vulture)
+- ✅ Modernization suggestions (Refurb)
+- ✅ Cognitive complexity analysis (Complexipy)
+- ✅ AST-based refactoring suggestions (Rope)
 
 ---
 
@@ -40,6 +44,11 @@ make test                     # Run tests
 # Quality analysis
 make quality-analysis         # Run quality analysis
 make quality-report           # Generate quality report
+
+# Extended quality tools
+make dead-code                # Vulture dead code detection
+make modernize                # Refurb modernization suggestions
+make cognitive-complexity     # Complexipy cognitive complexity
 ```
 
 ---
@@ -59,6 +68,26 @@ result = quality.analyze_project("path/to/project")
 if result.is_success:
     metrics = result.unwrap()
     print(f"Quality score: {metrics.score}")
+```
+
+### Extended Quality Analysis
+
+```python
+from flext_quality import FlextQuality
+
+quality = FlextQuality()
+
+# Dead code detection
+result = quality.detect_dead_code("path/to/file.py")
+
+# Modernization suggestions (Refurb)
+result = quality.check_modernization("path/to/file.py")
+
+# Cognitive complexity analysis
+result = quality.check_cognitive_complexity("path/to/file.py", max_complexity=15)
+
+# Refactoring suggestions (Rope)
+result = quality.get_refactoring_suggestions("path/to/file.py")
 ```
 
 ---

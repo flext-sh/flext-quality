@@ -11,6 +11,11 @@ from __future__ import annotations
 
 from .architecture import FlextQualityArchitectureTools
 from .backup import BackupManager
+from .batch_backup import FlextQualityBatchBackup
+from .batch_operations import FlextQualityBatchOperations
+from .batch_validators import FlextQualityBatchValidators
+
+# FlextBatchRunner is the main() entry point, not a class - use via CLI
 from .colors import (
     Colors,
     FlextColorService,
@@ -35,7 +40,15 @@ from .example_helper import (
 )
 from .git import FlextQualityGitTools
 from .health import HealthCheckService
+from .markdown_tools import (
+    FlextQualityCrossReferenceManager,
+    FlextQualityLinkValidator,
+    FlextQualityMarkdownFormatter,
+    FlextQualityMarkdownParser,
+    FlextQualityMarkdownUtilities,
+)
 from .mypy_checker import MyPyChecker
+from .namespace_refactoring import FlextQualityNamespaceRefactoring
 from .observability import FlextObservabilityService
 from .optimizer_operations import FlextQualityOptimizerOperations
 from .paths import FlextPathService
@@ -70,7 +83,6 @@ colorize = colorize_text
 print_colored = print_colored_text
 
 __all__ = [
-    # Architecture and core tools
     "BackupManager",
     "Colors",
     "ConfigurationManager",
@@ -80,8 +92,17 @@ __all__ = [
     "FlextObservabilityService",
     "FlextPathService",
     "FlextQualityArchitectureTools",
+    "FlextQualityBatchBackup",
+    "FlextQualityBatchOperations",
+    "FlextQualityBatchValidators",
+    "FlextQualityCrossReferenceManager",
     "FlextQualityDependencyTools",
     "FlextQualityGitTools",
+    "FlextQualityLinkValidator",
+    "FlextQualityMarkdownFormatter",
+    "FlextQualityMarkdownParser",
+    "FlextQualityMarkdownUtilities",
+    "FlextQualityNamespaceRefactoring",
     "FlextQualityOperations",
     "FlextQualityOptimizerOperations",
     "FlextQualityToolsUtilities",
@@ -94,21 +115,16 @@ __all__ = [
     "PoetryValidator",
     "ScriptMetadata",
     "SecretVaultDecryptor",
-    # Helper functions - Documentation
     "analyze_api_documentation",
-    # Helper functions - FLEXT Patterns
     "audit_flext_patterns",
     "check_all_flext_patterns",
     "check_docstring_coverage",
-    # Helper functions - Examples
     "check_example_structure",
     "check_exception_patterns",
     "check_flext_result_usage",
     "check_import_patterns",
     "check_module_structure",
-    # Helper functions - Tests
     "check_test_quality",
-    # Utilities
     "colorize",
     "get_project_root",
     "get_stdlib_modules",

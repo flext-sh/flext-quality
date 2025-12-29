@@ -31,11 +31,13 @@ from .exceptions import FlextQualityExceptions
 from .external_backend import FlextQualityExternalBackend as ExternalBackend
 from .grade_calculator import FlextQualityGradeCalculator
 from .handlers import FlextQualityHandlers
+from .hooks import FlextHookValidator
 from .metrics import QualityMetrics
 from .models import FlextQualityModels
 from .reports import FlextQualityReportGenerator, ReportFormat, ReportThresholds
 from .services import FlextQualityServices
 from .settings import FlextQualitySettings
+from .tools.quality_operations import FlextQualityOperations
 from .web import FlextQualityWeb as FlextQualityWebInterface
 
 # Direct constant imports for convenience
@@ -45,49 +47,6 @@ ISSUE_PREVIEW_LIMIT = FlextQualityConstants.Quality.Analysis.ISSUE_PREVIEW_LIMIT
 MIN_COVERAGE_THRESHOLD = FlextQualityConstants.Quality.Analysis.MIN_COVERAGE_THRESHOLD
 MIN_SCORE_THRESHOLD = FlextQualityConstants.Quality.Analysis.MIN_SCORE_THRESHOLD
 
-# =========================================================================
-# COMPATIBILITY EXPORTS (for test migration and backward compatibility)
-# =========================================================================
-
-# Model enums
-IssueSeverity = FlextQualityModels.IssueSeverity
-IssueType = FlextQualityModels.IssueType
-AnalysisStatus = FlextQualityModels.AnalysisStatus
-FlextAnalysisStatus = FlextQualityModels.AnalysisStatus
-QualityGrade = FlextQualityModels.QualityGrade
-
-# Service exports (all use same service class)
-QualityProjectService = FlextQualityServices
-QualityAnalysisService = FlextQualityServices
-QualityIssueService = FlextQualityServices
-QualityReportService = FlextQualityServices
-
-# Entity model exports
-QualityProject = FlextQualityModels.ProjectModel
-QualityAnalysis = FlextQualityModels.AnalysisModel
-QualityIssue = FlextQualityModels.IssueModel
-QualityRule = FlextQualityModels.RuleModel
-# QualityReport is the generator for backward compatibility
-QualityReport = FlextQualityReportGenerator
-
-# Analysis results exports
-AnalysisResults = FlextQualityModels.AnalysisResults
-OverallMetrics = FlextQualityModels.OverallMetrics
-FileAnalysisResult = FlextQualityModels.AnalysisResults
-DuplicationIssue = FlextQualityModels.IssueModel
-
-# Value object exports
-ComplexityMetric = FlextQualityModels.ComplexityMetric
-CoverageMetric = FlextQualityModels.CoverageMetric
-DuplicationMetric = FlextQualityModels.DuplicationMetric
-IssueLocation = FlextQualityModels.IssueLocation
-QualityScore = FlextQualityModels.QualityScore
-
-# Backend exports
-CodeAnalyzer = FlextQualityAnalyzer
-
-# Grade calculator exports
-QualityGradeCalculator = FlextQualityGradeCalculator
 
 # =========================================================================
 # PUBLIC API - FLEXT patterns only
@@ -100,46 +59,24 @@ __all__ = [
     "MIN_COVERAGE_THRESHOLD",
     "MIN_SCORE_THRESHOLD",
     "ASTBackend",
-    "AnalysisResults",
-    "AnalysisStatus",
     "BackendType",
     "BaseAnalyzer",
-    "CodeAnalyzer",
-    "ComplexityMetric",
-    "CoverageMetric",
-    "DuplicationIssue",
-    "DuplicationMetric",
     "ExternalBackend",
-    "FileAnalysisResult",
-    "FlextAnalysisStatus",
+    "FlextHookValidator",
     "FlextQuality",
     "FlextQualityAnalyzer",
     "FlextQualityConstants",
     "FlextQualityExceptions",
+    "FlextQualityGradeCalculator",
     "FlextQualityHandlers",
     "FlextQualityModels",
+    "FlextQualityOperations",
     "FlextQualityReportGenerator",
     "FlextQualityServices",
     "FlextQualitySettings",
     "FlextQualityWebInterface",
-    "IssueLocation",
-    "IssueSeverity",
-    "IssueType",
-    "OverallMetrics",
-    "QualityAnalysis",
-    "QualityAnalysisService",
-    "QualityGrade",
-    "QualityGradeCalculator",
     "QualityHelperCommands",
-    "QualityIssue",
-    "QualityIssueService",
     "QualityMetrics",
-    "QualityProject",
-    "QualityProjectService",
-    "QualityReport",
-    "QualityReportService",
-    "QualityRule",
-    "QualityScore",
     "ReportFormat",
     "ReportThresholds",
     "__version__",

@@ -227,7 +227,7 @@ class QualityMetrics(BaseModel):
 
     @staticmethod
     def from_analysis_results(
-        results: m.AnalysisResults | dict[str, t.GeneralValueType],
+        results: m.Quality.AnalysisResults | dict[str, t.GeneralValueType],
     ) -> QualityMetrics:
         """Create QualityMetrics from analysis results."""
         if isinstance(results, dict):
@@ -376,7 +376,7 @@ class MetricsCalculator:
 
     @staticmethod
     def calculate_from_object(
-        results: m.AnalysisResults,
+        results: m.Quality.AnalysisResults,
     ) -> QualityMetrics:
         """Calculate metrics from typed analysis results object with no fallbacks."""
         # Handle both legacy dict metrics and typed AnalysisMetricsModel

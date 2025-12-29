@@ -188,6 +188,12 @@ class FlextQualityTypes(FlextTypes):
             str | bool | list[str] | dict[str, FlextTypes.GeneralValueType],
         ]
 
+        # JSON-compatible types for integrations and API communication
+        type JsonCompatValue = (
+            str | int | float | bool | list[object] | dict[str, object] | None
+        )
+        type JsonCompatDict = dict[str, JsonCompatValue]
+
     # =========================================================================
     # CORE TYPES - Essential Quality types extending t
     # =========================================================================

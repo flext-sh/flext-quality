@@ -36,6 +36,7 @@ from rope.base.project import Project as RopeProject
 from .backend_type import BackendType
 from .base import FlextQualityAnalyzer
 from .constants import FlextQualityConstants as qc
+from .plugins.duplication_plugin import FlextDuplicationPlugin
 from .protocols import FlextQualityProtocols as p
 from .subprocess_utils import SubprocessUtils
 
@@ -43,7 +44,11 @@ from .subprocess_utils import SubprocessUtils
 _logger = FlextLogger(name="flext_quality.external_backend")
 
 
-class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
+class FlextQualityExternalBackend(
+    FlextQualityAnalyzer,
+    FlextService[dict[str, t.GeneralValueType]],
+    x,
+):
     """Backend using external Python quality tools via subprocess."""
 
     @override
@@ -64,6 +69,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
             "refurb",
             "complexipy",
             "rope",
+            "duplication",
         ]
 
     def execute(self) -> FlextResult[dict[str, t.GeneralValueType]]:
@@ -150,6 +156,7 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
             "refurb": self._run_refurb,
             "complexipy": self._run_complexipy,
             "rope": self._run_rope,
+            "duplication": self._run_duplication,
         }
 
         runner = tool_runners.get(tool)
@@ -384,8 +391,15 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
 
         try:
             with coverage_path.open(encoding="utf-8") as f:
-                return json.load(f)
-        except (json.JSONDecodeError, FileNotFoundError, Exception):
+                raw_data = json.load(f)
+            # Validate and convert to proper type
+            if isinstance(raw_data, dict):
+                parsed: dict[str, t.GeneralValueType] = {
+                    str(k): v for k, v in raw_data.items()
+                }
+                return parsed
+            return {}
+        except (json.JSONDecodeError, FileNotFoundError, TypeError, Exception):
             return {}
 
     # =========================================================================
@@ -459,8 +473,14 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
         if not stdout.strip():
             return {}
         try:
-            return json.loads(stdout)
-        except json.JSONDecodeError:
+            raw_data = json.loads(stdout)
+            if isinstance(raw_data, dict):
+                parsed: dict[str, t.GeneralValueType] = {
+                    str(k): v for k, v in raw_data.items()
+                }
+                return parsed
+            return {}
+        except (json.JSONDecodeError, TypeError):
             return {}
 
     def _parse_ruff_output(
@@ -509,8 +529,16 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
         if not stdout.strip():
             return []
         try:
-            return json.loads(stdout)
-        except json.JSONDecodeError:
+            raw_data = json.loads(stdout)
+            if isinstance(raw_data, list):
+                parsed: list[dict[str, t.GeneralValueType]] = [
+                    {str(k): v for k, v in item.items()}
+                    for item in raw_data
+                    if isinstance(item, dict)
+                ]
+                return parsed
+            return []
+        except (json.JSONDecodeError, TypeError):
             # Parse line-based output as fallback
             suggestions: list[dict[str, t.GeneralValueType]] = [
                 {"message": line.strip()}
@@ -558,17 +586,26 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
             wrapper.stdout, file_path, max_complexity
         )
 
+        # Helper to safely extract complexity
+        def get_complexity(func: dict[str, t.GeneralValueType]) -> int:
+            complexity = func.get("complexity", 0)
+            if isinstance(complexity, int):
+                return complexity
+            if isinstance(complexity, float):
+                return int(complexity)
+            if isinstance(complexity, str) and complexity.isdigit():
+                return int(complexity)
+            return 0
+
+        violations = [f for f in functions if get_complexity(f) > max_complexity]
+
         return FlextResult.ok({
             "tool": "complexipy",
             "functions": functions,
             "total_functions": len(functions),
             "max_allowed": max_complexity,
-            "violations": [
-                f for f in functions if int(f.get("complexity", 0)) > max_complexity
-            ],
-            "issue_count": len([
-                f for f in functions if int(f.get("complexity", 0)) > max_complexity
-            ]),
+            "violations": violations,
+            "issue_count": len(violations),
             "status": "success" if wrapper.returncode == 0 else "issues_found",
         })
 
@@ -663,14 +700,66 @@ class FlextQualityExternalBackend(FlextQualityAnalyzer, FlextService, x):
                 "issue_count": 0,
                 "status": "success",
             })
-        except Exception as e:
-            _logger.warning("Rope analysis failed: %s", e)
+        except Exception as err:
+            _logger.warning(f"Rope analysis failed: {err}")
             return FlextResult.ok({
                 "tool": "rope",
                 "functions": [],
                 "function_count": 0,
                 "status": "error",
-                "message": str(e),
+                "message": str(err),
             })
         finally:
             project.close()
+
+    # =========================================================================
+    # DUPLICATION - Code clone detection
+    # =========================================================================
+
+    def _run_duplication(
+        self,
+        file_path: Path,
+    ) -> FlextResult[dict[str, t.GeneralValueType]]:
+        """Run duplication analysis on a file/directory.
+
+        Uses FlextDuplicationPlugin for line-based similarity detection.
+
+        Args:
+            file_path: Path to file or directory to analyze.
+
+        Returns:
+            FlextResult with duplication analysis results.
+
+        """
+        plugin = FlextDuplicationPlugin()
+
+        # If file, analyze against siblings in same directory
+        if file_path.is_file():
+            parent = file_path.parent
+            python_files = list(parent.glob("*.py"))
+        else:
+            python_files = list(file_path.rglob("*.py"))
+
+        result = plugin.check(python_files)
+
+        if result.is_failure:
+            return FlextResult.fail(result.error or "Duplication check failed")
+
+        check_result = result.value
+        duplicates_list: list[dict[str, t.GeneralValueType]] = [
+            {
+                "file1": str(d.file1),
+                "file2": str(d.file2),
+                "similarity": d.similarity,
+                "shared_lines": d.shared_lines,
+            }
+            for d in check_result.duplicates
+        ]
+
+        return FlextResult.ok({
+            "tool": "duplication",
+            "duplicate_count": check_result.duplicate_count,
+            "files_checked": check_result.files_checked,
+            "duplicates": duplicates_list,
+            "status": "success" if check_result.duplicate_count == 0 else "issues_found",
+        })

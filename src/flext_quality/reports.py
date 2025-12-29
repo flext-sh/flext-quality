@@ -130,11 +130,11 @@ class ScoreCalculator:
 
     @staticmethod
     def count_critical_issues(
-        issues: list[FlextQualityModels.IssueModel],
+        issues: list[FlextQualityModels.Quality.IssueModel],
     ) -> int:
         """Count critical issues - type-safe using IssueModel."""
         return len([
-            i for i in issues if i.severity == FlextQualityModels.IssueSeverity.CRITICAL
+            i for i in issues if i.severity == FlextQualityModels.Quality.IssueSeverity.CRITICAL
         ])
 
 
@@ -148,7 +148,7 @@ class RecommendationGenerator:
 
     @staticmethod
     def generate(
-        results: FlextQualityModels.AnalysisResults,
+        results: FlextQualityModels.Quality.AnalysisResults,
         thresholds: ReportThresholds,
     ) -> list[str]:
         """Generate recommendations - returns empty list if no issues."""
@@ -206,7 +206,7 @@ class TextReportBuilder:
 
     @staticmethod
     def build(
-        results: FlextQualityModels.AnalysisResults,
+        results: FlextQualityModels.Quality.AnalysisResults,
         thresholds: ReportThresholds,
     ) -> FlextResult[str]:
         """Build text report with proper validation."""
@@ -286,7 +286,7 @@ class JsonReportBuilder:
 
     @staticmethod
     def build(
-        results: FlextQualityModels.AnalysisResults,
+        results: FlextQualityModels.Quality.AnalysisResults,
         thresholds: ReportThresholds,
     ) -> FlextResult[str]:
         """Build JSON report with proper validation."""
@@ -347,7 +347,7 @@ class HtmlReportBuilder:
 
     @staticmethod
     def build(
-        results: FlextQualityModels.AnalysisResults,
+        results: FlextQualityModels.Quality.AnalysisResults,
         thresholds: ReportThresholds,
     ) -> FlextResult[str]:
         """Build HTML report with proper validation."""
@@ -437,9 +437,9 @@ class HtmlReportBuilder:
                 for issue in issues[: thresholds.html_issue_limit]:
                     severity_class = (
                         "high-severity"
-                        if issue.severity == FlextQualityModels.IssueSeverity.CRITICAL
+                        if issue.severity == FlextQualityModels.Quality.IssueSeverity.CRITICAL
                         else "medium-severity"
-                        if issue.severity == FlextQualityModels.IssueSeverity.HIGH
+                        if issue.severity == FlextQualityModels.Quality.IssueSeverity.HIGH
                         else "low-severity"
                     )
                     line_info = (
@@ -479,7 +479,7 @@ class FlextQualityReportGenerator:
 
     def __init__(
         self,
-        analysis_results: FlextQualityModels.AnalysisResults,
+        analysis_results: FlextQualityModels.Quality.AnalysisResults,
         thresholds: ReportThresholds | None = None,
         colors: GradeColors | None = None,
     ) -> None:

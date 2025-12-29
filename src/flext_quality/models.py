@@ -615,6 +615,182 @@ class FlextQualityModels:
             )
 
         # =====================================================================
+        # OPERATIONS NAMESPACE - Quality operations models
+        # =====================================================================
+
+        class Operations:
+            """Quality operations models namespace.
+
+            Models for centralized quality operations (lint, type, security, test).
+            Used by FlextQualityOperations service.
+
+            Usage:
+                from flext_quality.models import m
+                lint_result = m.Quality.Operations.LintReport(...)
+                exec_report = m.Quality.Operations.ExecReport(...)
+            """
+
+            class LintReport(BaseModel):
+                """Ruff lint operation report."""
+
+                passed: bool = Field(
+                    default=True,
+                    description="Whether lint check passed",
+                )
+                errors: int = Field(default=0, ge=0, description="Number of errors")
+                warnings: int = Field(default=0, ge=0, description="Number of warnings")
+                fixed: int = Field(default=0, ge=0, description="Issues auto-fixed")
+                files_checked: int = Field(
+                    default=0,
+                    ge=0,
+                    description="Files checked",
+                )
+
+                model_config = {"frozen": True}
+
+            class TypeReport(BaseModel):
+                """Type check operation report (mypy/pyrefly)."""
+
+                passed: bool = Field(
+                    default=True,
+                    description="Whether type check passed",
+                )
+                errors: int = Field(default=0, ge=0, description="Number of errors")
+                files_checked: int = Field(
+                    default=0,
+                    ge=0,
+                    description="Files checked",
+                )
+                tool: str = Field(
+                    default="mypy",
+                    description="Type checker tool used",
+                )
+
+                model_config = {"frozen": True}
+
+            class SecurityReport(BaseModel):
+                """Security scan operation report (bandit)."""
+
+                passed: bool = Field(
+                    default=True,
+                    description="Whether security check passed",
+                )
+                high: int = Field(default=0, ge=0, description="High severity issues")
+                medium: int = Field(
+                    default=0,
+                    ge=0,
+                    description="Medium severity issues",
+                )
+                low: int = Field(default=0, ge=0, description="Low severity issues")
+
+                model_config = {"frozen": True}
+
+            class TestReport(BaseModel):
+                """Test execution operation report."""
+
+                passed: bool = Field(
+                    default=True,
+                    description="Whether all tests passed",
+                )
+                total: int = Field(default=0, ge=0, description="Total tests")
+                passed_count: int = Field(default=0, ge=0, description="Tests passed")
+                failed_count: int = Field(default=0, ge=0, description="Tests failed")
+                skipped: int = Field(default=0, ge=0, description="Tests skipped")
+                coverage_percent: ScoreRange = Field(
+                    default=0.0,
+                    description="Test coverage percentage",
+                )
+
+                model_config = {"frozen": True}
+
+            class QualityReport(BaseModel):
+                """Aggregated quality operation report."""
+
+                passed: bool = Field(
+                    default=True,
+                    description="Whether all checks passed",
+                )
+                lint_errors: int = Field(default=0, ge=0, description="Lint errors")
+                type_errors: int = Field(default=0, ge=0, description="Type errors")
+                security_issues: int = Field(
+                    default=0,
+                    ge=0,
+                    description="Security issues",
+                )
+                test_failures: int = Field(
+                    default=0,
+                    ge=0,
+                    description="Test failures",
+                )
+                coverage_percent: ScoreRange = Field(
+                    default=0.0,
+                    description="Test coverage percentage",
+                )
+                duration_seconds: float = Field(
+                    default=0.0,
+                    ge=0.0,
+                    description="Duration in seconds",
+                )
+                details: dict[str, t.GeneralValueType] = Field(
+                    default_factory=dict,
+                    description="Additional details",
+                )
+
+            class DryRunReport(BaseModel):
+                """Dry run preview report."""
+
+                would_change: list[str] = Field(
+                    default_factory=list,
+                    description="Files that would be changed",
+                )
+                estimated_impact: str = Field(
+                    default="",
+                    description="Estimated impact description",
+                )
+
+                model_config = {"frozen": True}
+
+            class BackupInfo(BaseModel):
+                """Backup operation metadata."""
+
+                backup_path: str = Field(description="Path to backup file/dir")
+                files: list[str] = Field(
+                    default_factory=list,
+                    description="Files included in backup",
+                )
+                timestamp: str = Field(
+                    default="",
+                    description="Backup timestamp",
+                )
+
+                model_config = {"frozen": True}
+
+            class ExecReport(BaseModel):
+                """Execution with validation report."""
+
+                success: bool = Field(
+                    default=True,
+                    description="Whether execution succeeded",
+                )
+                errors_before: int = Field(
+                    default=0,
+                    ge=0,
+                    description="Errors before operation",
+                )
+                errors_after: int = Field(
+                    default=0,
+                    ge=0,
+                    description="Errors after operation",
+                )
+                rolled_back: bool = Field(
+                    default=False,
+                    description="Whether rollback was performed",
+                )
+                backup_info: (
+                    FlextQualityModels.Quality.Operations.BackupInfo | None
+                ) = Field(default=None, description="Backup info if created")
+
+        # =====================================================================
         # ANALYZERS NAMESPACE - Tool-specific analyzer models
         # =====================================================================
 
@@ -806,10 +982,8 @@ class FlextQualityModels:
                 last_updated: datetime | None = Field(default=None)
                 current_project: str | None = Field(default=None)
                 current_file: str | None = Field(default=None)
-                statistics: FlextQualityModels.Quality.Cycle.CycleStatistics = Field(
-                    default_factory=lambda: (
-                        FlextQualityModels.Quality.Cycle.CycleStatistics()
-                    ),
+                statistics: FlextQualityModels.Quality.Cycle.CycleStatistics | None = Field(
+                    default=None
                 )
                 project_order: list[str] = Field(
                     default_factory=lambda: list(c.Quality.Cycle.PROJECT_ORDER),

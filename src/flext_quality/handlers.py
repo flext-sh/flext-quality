@@ -105,7 +105,7 @@ class FlextQualityHandlers:
         def execute_analysis(
             project_id: UUID,
             _services: object,
-        ) -> FlextResult[m.AnalysisModel]:
+        ) -> FlextResult[m.Quality.AnalysisModel]:
             """Execute project analysis using builder pattern."""
             config = FlextQualitySettings()
             logger = FlextLogger(__name__)
@@ -122,7 +122,7 @@ class FlextQualityHandlers:
         def execute_report_generation(
             analysis_id: UUID,
             _services: object,
-        ) -> FlextResult[m.ReportModel]:
+        ) -> FlextResult[m.Quality.ReportModel]:
             """Execute report generation using builder pattern."""
             config = FlextQualitySettings()
             logger = FlextLogger(__name__)
@@ -140,7 +140,7 @@ class FlextQualityHandlers:
     def analyze_project(
         self,
         project_id: UUID,
-    ) -> FlextRuntime.RuntimeResult[m.AnalysisModel]:
+    ) -> FlextRuntime.RuntimeResult[m.Quality.AnalysisModel]:
         """Analyze project with observability."""
         context = HandlerContext(
             project_id=str(project_id),
@@ -166,7 +166,7 @@ class FlextQualityHandlers:
     def generate_report(
         self,
         analysis_id: UUID,
-    ) -> FlextRuntime.RuntimeResult[m.ReportModel]:
+    ) -> FlextRuntime.RuntimeResult[m.Quality.ReportModel]:
         """Generate report with observability."""
         context = HandlerContext(
             project_id=str(analysis_id),

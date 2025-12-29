@@ -19,9 +19,10 @@ from flext_core import (
 )
 from pydantic import BaseModel, Field, PrivateAttr
 
-from .constants import FlextQualityConstants, c
+from .constants import c
 from .external_backend import FlextQualityExternalBackend
 from .models import m
+from .plugins.duplication_plugin import FlextDuplicationPlugin
 from .settings import FlextQualitySettings
 
 # =====================================================================
@@ -221,7 +222,7 @@ class FlextQualityAnalyzer(FlextService[m.Quality.AnalysisResults]):
         # Analyze duplications
         duplication_issues: list[DuplicationIssueModel] = []
         if options.include_duplicates and len(python_files) > 1:
-            dup_result = self._DuplicationAnalyzer.analyze(python_files)
+            dup_result = self._analyze_duplications(python_files)
             if dup_result.is_success:
                 duplication_issues = dup_result.value
 
@@ -247,6 +248,38 @@ class FlextQualityAnalyzer(FlextService[m.Quality.AnalysisResults]):
     def get_last_analysis_result(self) -> m.Quality.AnalysisResults | None:
         """Get last analysis results."""
         return self._current_results
+
+    def _analyze_duplications(
+        self,
+        python_files: list[Path],
+    ) -> FlextResult[list[DuplicationIssueModel]]:
+        """Analyze duplications across files using FlextDuplicationPlugin.
+
+        Converts plugin results to DuplicationIssueModel format.
+        """
+        try:
+            plugin = FlextDuplicationPlugin()
+            check_result = plugin.check(python_files)
+            if check_result.is_failure:
+                return FlextResult.fail(check_result.error or "Duplication check failed")
+
+            result = check_result.value
+            issues: list[DuplicationIssueModel] = [
+                DuplicationIssueModel(
+                    id=f"dup_{dup.file1.name}_{dup.file2.name}",
+                    analysis_id=str(uuid.uuid4()),
+                    file_path=str(dup.file1),
+                    line_number=None,
+                    issue_type="duplicate_code",
+                    severity="medium",
+                    message=f"Duplication: {dup.file1.name} ↔ {dup.file2.name} ({dup.similarity:.1%})",
+                    rule_id="duplication_check",
+                )
+                for dup in result.duplicates
+            ]
+            return FlextResult.ok(issues)
+        except Exception as e:
+            return FlextResult.fail(f"Duplication analysis error: {e}")
 
     # =====================================================================
     # Nested Analysis Utilities - Single Responsibility
@@ -504,58 +537,6 @@ class FlextQualityAnalyzer(FlextService[m.Quality.AnalysisResults]):
                 logger.debug(f"Dead code analysis with Vulture failed: {e}")
                 # Return empty list - dead code analysis is best-effort
                 return []
-
-    class _DuplicationAnalyzer:
-        """Single responsibility: Analyze code duplications."""
-
-        @staticmethod
-        def analyze(
-            python_files: list[Path],
-        ) -> FlextResult[list[DuplicationIssueModel]]:
-            """Analyze duplications across files."""
-            try:
-                min_size = FlextQualityConstants.Quality.Analysis.MIN_FILE_SIZE_FOR_DUPLICATION_CHECK
-                file_contents = {
-                    pf: content
-                    for pf in python_files
-                    if pf.is_file()
-                    and (content := pf.read_text(encoding="utf-8"))
-                    and len(content.strip()) > min_size
-                }
-
-                file_list = list(file_contents.keys())
-                # Create validated DuplicationIssueModel instances - NO DICT CONVERSION
-                issues: list[DuplicationIssueModel] = [
-                    DuplicationIssueModel(
-                        id=f"dup_{f1.name}_{f2.name}",
-                        analysis_id=str(uuid.uuid4()),
-                        file_path=str(f1),
-                        line_number=None,
-                        issue_type="duplicate_code",
-                        severity="medium",
-                        message=f"Duplication: {f1.name} ↔ {f2.name}",
-                        rule_id="duplication_check",
-                    )
-                    for i, f1 in enumerate(file_list)
-                    for f2 in file_list[i + 1 :]
-                    if FlextQualityAnalyzer._DuplicationAnalyzer.has_duplication(
-                        file_contents[f1],
-                        file_contents[f2],
-                    )
-                ]
-                return FlextResult.ok(issues)
-            except Exception as e:
-                return FlextResult.fail(f"Duplication analysis error: {e}")
-
-        @staticmethod
-        def has_duplication(content1: str, content2: str) -> bool:
-            """Check if files have significant duplication."""
-            lines1 = set(content1.splitlines())
-            lines2 = set(content2.splitlines())
-            if lines1 and lines2:
-                similarity = len(lines1 & lines2) / max(len(lines1), len(lines2))
-                return similarity > c.Quality.Analysis.SIMILARITY_THRESHOLD
-            return False
 
     class _ResultsBuilder:
         """Single responsibility: Build final analysis results."""

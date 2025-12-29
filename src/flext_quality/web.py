@@ -29,22 +29,6 @@ from .models import FlextQualityModels
 from .settings import FlextQualitySettings
 
 
-def create_fastapi_app(
-    config: FlextQualityModels.AppConfig,
-) -> FlextResult[FastAPI]:
-    """Create FastAPI app with proper error handling via FlextResult."""
-    try:
-        app = FastAPI(
-            title=config.title,
-            version=config.version,
-            docs_url="/docs" if config.enable_docs else None,
-            redoc_url="/redoc" if config.enable_docs else None,
-        )
-        return FlextResult[FastAPI].ok(app)
-    except Exception as e:
-        return FlextResult[FastAPI].fail(f"Failed to create FastAPI app: {e}")
-
-
 class FlextQualityWeb:
     """Unified quality web class following FLEXT architecture patterns.
 
@@ -53,6 +37,22 @@ class FlextQualityWeb:
     """
 
     app: FastAPI
+
+    @staticmethod
+    def _create_fastapi_app(
+        config: FlextQualityModels.Quality.AppConfig,
+    ) -> FlextResult[FastAPI]:
+        """Create FastAPI app with proper error handling via FlextResult."""
+        try:
+            app = FastAPI(
+                title=config.title,
+                version=config.version,
+                docs_url="/docs" if config.enable_docs else None,
+                redoc_url="/redoc" if config.enable_docs else None,
+            )
+            return FlextResult[FastAPI].ok(app)
+        except Exception as e:
+            return FlextResult[FastAPI].fail(f"Failed to create FastAPI app: {e}")
 
     def __init__(self) -> None:
         """Initialize quality web interface with flext ecosystem integration."""
@@ -63,7 +63,7 @@ class FlextQualityWeb:
         self._quality_config = FlextQualitySettings()
 
         # Initialize flext-web configuration
-        app_config = FlextQualityModels.AppConfig(
+        app_config = FlextQualityModels.Quality.AppConfig(
             title="flext-quality",
             version="0.9.0",
             enable_cors=True,
@@ -71,7 +71,7 @@ class FlextQualityWeb:
         )
 
         # Create FastAPI app via flext-web
-        app_result = create_fastapi_app(config=app_config)
+        app_result = self._create_fastapi_app(config=app_config)
         if app_result.is_failure:
             msg = f"Failed to create FastAPI app: {app_result.error}"
             raise RuntimeError(msg)

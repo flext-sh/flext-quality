@@ -6,19 +6,16 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
 from pathlib import Path
-from typing import TypeAlias, override
+from typing import override
 
 from flext_api import FlextApi, FlextApiSettings
-from flext_core import FlextLogger, FlextResult, FlextRuntime, FlextService, FlextTypes
-
-# Type alias for JSON-compatible values (use TypeAlias for better pyright compat)
-JsonCompatValue: TypeAlias = (
-    str | int | float | bool | Sequence[object] | Mapping[str, object] | None
-)
-JsonCompatDict: TypeAlias = dict[str, JsonCompatValue]
+from flext_api.typings import FlextApiTypes as ta
+from flext_core import FlextLogger, FlextResult, FlextService
 from pydantic import BaseModel, Field
+
+# Type alias for JSON-compatible dicts
+JsonCompatDict = dict[str, object]
 
 # =====================================================================
 # Configuration Models (Pydantic 2) - Data-Driven Integrations
@@ -80,25 +77,26 @@ class FlextQualityIntegrations(FlextService[bool]):
         def post(
             client: FlextApi,
             url: str,
-            json: JsonCompatDict | None = None,
+            json: ta.JsonObject | None = None,
             files: dict[str, tuple[str, bytes]] | None = None,
             headers: dict[str, str] | None = None,
-        ) -> FlextResult[JsonCompatDict]:
+        ) -> FlextResult[ta.JsonObject]:
             """Execute POST request and return result."""
             # Note: files not directly supported by FlextApi, would need multipart encoding
             _ = files  # Acknowledge unused parameter
             result = client.post(url=url, data=json, headers=headers)
             if result.is_failure:
-                return FlextResult[JsonCompatDict].fail(
+                return FlextResult[ta.JsonObject].fail(
                     f"HTTP POST failed: {result.error}",
                 )
             # Extract body from HttpResponse
             response = result.value
             body = response.body
             if isinstance(body, dict):
-                # Reconstruct dict with JsonValue for type safety
-                return FlextResult[JsonCompatDict].ok(dict(body))
-            return FlextResult[JsonCompatDict].ok({
+                # Reconstruct dict with proper type
+                result_dict: ta.JsonObject = dict(body)
+                return FlextResult[ta.JsonObject].ok(result_dict)
+            return FlextResult[ta.JsonObject].ok({
                 "response": str(body),
             })
 
@@ -108,22 +106,23 @@ class FlextQualityIntegrations(FlextService[bool]):
             url: str,
             params: dict[str, str] | None = None,
             headers: dict[str, str] | None = None,
-        ) -> FlextResult[JsonCompatDict]:
+        ) -> FlextResult[ta.JsonObject]:
             """Execute GET request and return result."""
             # FlextApi.get uses request_kwargs for params
             request_kwargs = {"params": params} if params else None
             result = client.get(url=url, headers=headers, request_kwargs=request_kwargs)
             if result.is_failure:
-                return FlextResult[JsonCompatDict].fail(
+                return FlextResult[ta.JsonObject].fail(
                     f"HTTP GET failed: {result.error}",
                 )
             # Extract body from HttpResponse
             response = result.value
             body = response.body
             if isinstance(body, dict):
-                # Reconstruct dict with JsonValue for type safety
-                return FlextResult[JsonCompatDict].ok(dict(body))
-            return FlextResult[JsonCompatDict].ok({
+                # Reconstruct dict with proper type
+                result_dict: ta.JsonObject = dict(body)
+                return FlextResult[ta.JsonObject].ok(result_dict)
+            return FlextResult[ta.JsonObject].ok({
                 "response": str(body),
             })
 
@@ -133,54 +132,55 @@ class FlextQualityIntegrations(FlextService[bool]):
         @staticmethod
         def webhook_payload(
             event_type: str,
-            event_data: dict[str, FlextTypes.JsonValue],
-        ) -> dict[str, FlextTypes.JsonValue]:
+            event_data: ta.JsonObject,
+        ) -> ta.JsonObject:
             """Build webhook notification payload."""
-            return {
+            payload: ta.JsonObject = {
                 "event_type": event_type,
-                "event_data": event_data,
                 "service": "flext-quality",
                 "version": "0.9.0",
+                "event_data": event_data,
             }
+            return payload
 
         @staticmethod
         def slack_payload(
             message: str,
             severity: str,
             color_map: dict[str, str],
-        ) -> dict[str, FlextTypes.JsonValue]:
+        ) -> ta.JsonObject:
             """Build Slack message payload."""
-            return {
-                "attachments": [
-                    {
-                        "color": color_map.get(severity, "#36a64f"),
-                        "title": "FLEXT Quality Alert",
-                        "text": message,
-                        "footer": "flext-quality v0.9.0",
-                    },
-                ],
+            attachment: ta.JsonObject = {
+                "color": color_map.get(severity, "#36a64f"),
+                "title": "FLEXT Quality Alert",
+                "text": message,
+                "footer": "flext-quality v0.9.0",
             }
+            payload: ta.JsonObject = {"attachments": [attachment]}
+            return payload
 
         @staticmethod
         def github_checks_payload(
             commit_sha: str,
-            check_results: dict[str, FlextTypes.JsonValue],
-        ) -> dict[str, FlextTypes.JsonValue]:
+            check_results: ta.JsonObject,
+        ) -> ta.JsonObject:
             """Build GitHub Checks API payload."""
-            return {
+            output: ta.JsonObject = {
+                "title": "Quality Analysis Results",
+                "summary": check_results.get(
+                    "summary",
+                    "Quality analysis completed",
+                ),
+                "text": check_results.get("details", ""),
+            }
+            payload: ta.JsonObject = {
                 "name": "FLEXT Quality Check",
                 "head_sha": commit_sha,
                 "status": "completed",
                 "conclusion": check_results.get("conclusion", "success"),
-                "output": {
-                    "title": "Quality Analysis Results",
-                    "summary": check_results.get(
-                        "summary",
-                        "Quality analysis completed",
-                    ),
-                    "text": check_results.get("details", ""),
-                },
+                "output": output,
             }
+            return payload
 
     # =====================================================================
     # Public Integration Methods - Railway-Oriented
@@ -190,8 +190,8 @@ class FlextQualityIntegrations(FlextService[bool]):
         self,
         webhook_url: str,
         event_type: str,
-        event_data: dict[str, FlextTypes.JsonValue],
-    ) -> FlextRuntime.RuntimeResult[dict[str, str]]:
+        event_data: ta.JsonObject,
+    ) -> FlextResult[dict[str, str]]:
         """Send webhook notification."""
         payload = self._PayloadBuilders.webhook_payload(event_type, event_data)
         return (
@@ -210,7 +210,7 @@ class FlextQualityIntegrations(FlextService[bool]):
         webhook_url: str,
         message: str,
         severity: str = "info",
-    ) -> FlextRuntime.RuntimeResult[dict[str, str]]:
+    ) -> FlextResult[dict[str, str]]:
         """Send Slack notification."""
         color_map = SeverityColorMap().colors
         payload = self._PayloadBuilders.slack_payload(message, severity, color_map)
@@ -225,8 +225,8 @@ class FlextQualityIntegrations(FlextService[bool]):
         sonarqube_url: str,
         project_key: str,
         token: str,
-        quality_data: dict[str, FlextTypes.JsonValue],
-    ) -> FlextRuntime.RuntimeResult[dict[str, FlextTypes.JsonValue]]:
+        quality_data: ta.JsonObject,
+    ) -> FlextResult[ta.JsonObject]:
         """Integrate with SonarQube."""
         api_url = f"{sonarqube_url}/api/measures/component"
         component_key = quality_data.get("component", project_key)
@@ -243,8 +243,8 @@ class FlextQualityIntegrations(FlextService[bool]):
         repo: str,
         commit_sha: str,
         token: str,
-        check_results: dict[str, FlextTypes.JsonValue],
-    ) -> FlextRuntime.RuntimeResult[dict[str, FlextTypes.JsonValue]]:
+        check_results: ta.JsonObject,
+    ) -> FlextResult[ta.JsonObject]:
         """Integrate with GitHub Checks API."""
         api_url = f"{github_api_url}/repos/{repo}/check-runs"
         payload = self._PayloadBuilders.github_checks_payload(commit_sha, check_results)
@@ -263,7 +263,7 @@ class FlextQualityIntegrations(FlextService[bool]):
         storage_url: str,
         report_file: Path,
         api_key: str,
-    ) -> FlextRuntime.RuntimeResult[dict[str, FlextTypes.JsonValue]]:
+    ) -> FlextResult[ta.JsonObject]:
         """Deliver quality report to external storage."""
         try:
             content = report_file.read_bytes()
@@ -274,14 +274,14 @@ class FlextQualityIntegrations(FlextService[bool]):
                 headers={"X-API-Key": api_key},
             ).map_error(lambda e: self._log_error("storage", e))
         except Exception as exc:
-            return FlextResult[dict[str, FlextTypes.JsonValue]].fail(
+            return FlextResult[ta.JsonObject].fail(
                 self._log_error("storage_read", str(exc)),
             )
 
     def notify_on_threshold_violation(
         self,
         webhook_urls: list[str],
-        violation_data: dict[str, FlextTypes.JsonValue],
+        violation_data: ta.JsonObject,
     ) -> FlextResult[list[dict[str, str]]]:
         """Notify multiple webhooks of threshold violations."""
         results: list[dict[str, str]] = []

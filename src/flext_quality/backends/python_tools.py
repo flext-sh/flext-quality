@@ -69,9 +69,9 @@ class FlextQualityPythonTools:
 
         """
         try:
-            # Validate path for security
-            if not path.exists() or not path.is_file():
-                return FlextResult.fail(f"Invalid path for Ruff analysis: {path}")
+            # Validate path for security (accept files or directories)
+            if not path.exists():
+                return FlextResult.fail(f"Path does not exist: {path}")
 
             timeout = qc.Quality.QualityPerformance.REFURB_TIMEOUT  # CONFIG
             result = SubprocessUtils.run_external_command(
@@ -112,20 +112,28 @@ class FlextQualityPythonTools:
         MyPy provides a Python API for programmatic type checking.
 
         Args:
-            path: Path to analyze
+            path: Path to analyze (project root or src directory)
 
         Returns:
             FlextResult with type errors
 
         """
         try:
-            # Direct API call - no subprocess
-            stdout, stderr, exit_code = api.run([
-                str(path),
+            # For src-layout projects, analyze src/ directory
+            src_path = path / "src"
+            analyze_path = src_path if src_path.exists() and src_path.is_dir() else path
+
+            # Build mypy arguments - use --namespace-packages for proper import resolution
+            mypy_args = [
+                str(analyze_path),
                 "--strict",
                 "--show-error-codes",
                 "--no-color-output",
-            ])
+                "--namespace-packages",
+            ]
+
+            # Direct API call - no subprocess
+            stdout, stderr, exit_code = api.run(mypy_args)
 
             return FlextResult.ok({
                 "stdout": stdout,
@@ -509,13 +517,17 @@ class FlextQualityPythonTools:
                             "file": str(path),
                         })
 
+            violations = []
+            for func in functions:
+                complexity_val = func.get("complexity", 0)
+                if isinstance(complexity_val, (int, float)) and complexity_val > max_complexity:
+                    violations.append(func)
+
             return FlextResult.ok({
                 "functions": functions,
                 "total_functions": len(functions),
                 "max_allowed": max_complexity,
-                "violations": [
-                    f for f in functions if int(f.get("complexity", 0)) > max_complexity
-                ],
+                "violations": violations,
                 "exit_code": wrapper.returncode,
             })
         except Exception as e:

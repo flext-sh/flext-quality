@@ -415,11 +415,11 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
     def analyze_module(
         self,
         module_path: str,
-    ) -> FlextResult[FlextQualityModels.AnalysisResult]:
+    ) -> FlextResult[FlextQualityModels.Quality.AnalysisResult]:
         """Analyze module for optimization opportunities."""
         path = Path(module_path)
         if not path.exists():
-            return FlextResult[FlextQualityModels.AnalysisResult].fail(
+            return FlextResult[FlextQualityModels.Quality.AnalysisResult].fail(
                 f"Module not found: {module_path}",
             )
 
@@ -427,36 +427,36 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
             content = path.read_text(encoding="utf-8")
             tree = ast.parse(content, filename=str(path))
         except Exception as e:
-            return FlextResult[FlextQualityModels.AnalysisResult].fail(str(e))
+            return FlextResult[FlextQualityModels.Quality.AnalysisResult].fail(str(e))
 
         ASTAnalyzer.find_violations(content, self._optimizer_config)
         ASTAnalyzer.calculate_complexity(tree, content, self._optimizer_config)
 
-        result = FlextQualityModels.AnalysisResult(
+        result = FlextQualityModels.Quality.AnalysisResult(
             analysis_id="",
             project_path=module_path,
             status="completed",
         )
 
-        return FlextResult[FlextQualityModels.AnalysisResult].ok(result)
+        return FlextResult[FlextQualityModels.Quality.AnalysisResult].ok(result)
 
     def optimize_module(
         self,
         module_path: str,
         *,
         dry_run: bool = True,
-    ) -> FlextResult[FlextQualityModels.OptimizationResult]:
+    ) -> FlextResult[FlextQualityModels.Quality.OptimizationResult]:
         """Optimize module - fix violations."""
         path = Path(module_path)
         if not path.exists():
-            return FlextResult[FlextQualityModels.OptimizationResult].fail(
+            return FlextResult[FlextQualityModels.Quality.OptimizationResult].fail(
                 f"Module not found: {module_path}",
             )
 
         try:
             content = path.read_text(encoding="utf-8")
         except Exception as e:
-            return FlextResult[FlextQualityModels.OptimizationResult].fail(str(e))
+            return FlextResult[FlextQualityModels.Quality.OptimizationResult].fail(str(e))
 
         # Fix violations
         for pattern in self._optimizer_config.domain_violations:
@@ -470,8 +470,8 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
         if not dry_run and content != path.read_text(encoding="utf-8"):
             path.write_text(content, encoding="utf-8")
 
-        result = FlextQualityModels.OptimizationResult(
-            target=FlextQualityModels.OptimizationTarget(
+        result = FlextQualityModels.Quality.OptimizationResult(
+            target=FlextQualityModels.Quality.OptimizationTarget(
                 project_path=".",
                 module_name=path.stem,
                 file_path=module_path,
@@ -483,7 +483,7 @@ class FlextQualityOptimizerOperations(FlextService[bool]):
             warnings=[],
         )
 
-        return FlextResult[FlextQualityModels.OptimizationResult].ok(result)
+        return FlextResult[FlextQualityModels.Quality.OptimizationResult].ok(result)
 
     def refactor_imports(
         self,
