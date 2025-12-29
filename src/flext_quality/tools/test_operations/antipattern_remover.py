@@ -98,10 +98,10 @@ class FlextQualityTestAntipatternOperation(FlextService[dict[str, t.GeneralValue
                 return func.attr.value
             return ""
 
-    class MetadataVisitor(cst.MetadataDependent):
+    class MetadataVisitor(cst.CSTVisitor):
         """Visitor with position metadata support for anti-pattern detection."""
 
-        # Required by libcst MetadataDependent - cannot change structure  # CONFIG
+        # Required by libcst for position tracking  # CONFIG
         METADATA_DEPENDENCIES = (cst.metadata.PositionProvider,)  # CONFIG
 
         def __init__(self: Self) -> None:

@@ -19,6 +19,7 @@ from typing import Self
 
 import libcst as cst
 from flext_core import FlextLogger, FlextResult as r, FlextService, FlextTypes as t
+from libcst.metadata import MetadataWrapper
 
 
 class FlextQualityFixtureConsolidateOperation(
@@ -199,7 +200,10 @@ class FlextQualityFixtureConsolidateOperation(
         parsed_module = cst.parse_module(source)
 
         visitor = FlextQualityFixtureConsolidateOperation.FixtureVisitor(conftest_path)
-        parsed_module.walk(visitor)
+        # Use MetadataWrapper for proper visitor traversal
+
+        wrapper = MetadataWrapper(parsed_module)
+        wrapper.visit(visitor)
 
         return r[list[FlextQualityFixtureConsolidateOperation.FixtureInfo]].ok(
             visitor.fixtures
@@ -317,12 +321,12 @@ class FlextQualityFixtureConsolidateOperation(
 
         return r[dict[str, t.GeneralValueType]].ok(summary)
 
-    def execute(
+    def run(
         self: Self,
         targets: list[Path],
         _backup_path: Path | None = None,
     ) -> r[dict[str, t.GeneralValueType]]:
-        """Execute fixture consolidation detection (same as dry_run).
+        """Run fixture consolidation detection (same as dry_run).
 
         Args:
             targets: List of workspace directories to analyze
@@ -334,6 +338,18 @@ class FlextQualityFixtureConsolidateOperation(
         """
         # Detection-only operation - same as dry_run
         return self.dry_run(targets)
+
+    def execute(self: Self) -> r[dict[str, t.GeneralValueType]]:
+        """Execute the service operation.
+
+        Implementation of FlextService abstract method.
+        Uses current directory as default target.
+
+        Returns:
+            FlextResult with operation summary
+
+        """
+        return self.dry_run([Path.cwd()])
 
     def rollback(
         self: Self, _backup_path: Path
