@@ -49,6 +49,7 @@ class FlextQualityLibcstVisitors:
             updated_node: cst.ImportFrom,
         ) -> cst.ImportFrom | cst.RemovalSentinel:
             """Remove ImportFrom if it matches the target module."""
+            del original_node  # Required by libcst API
             if updated_node.module is not None:
                 # type: ignore[attr-defined] - helpers class has get_dotted_name static method
                 module_str = self.helpers.get_dotted_name(updated_node.module)  # type: ignore[attr-defined]
@@ -98,6 +99,7 @@ class FlextQualityLibcstVisitors:
             updated_node: cst.ClassDef,
         ) -> cst.ClassDef:
             """Replace base class if it matches."""
+            del original_node  # Required by libcst API
             if updated_node.name.value != self.class_name:
                 return updated_node
 
@@ -143,6 +145,7 @@ class FlextQualityLibcstVisitors:
             updated_node: cst.ClassDef,
         ) -> cst.ClassDef:
             """Add base class if it matches the target class."""
+            del original_node  # Required by libcst API
             if updated_node.name.value != self.class_name:
                 return updated_node
 
@@ -197,6 +200,7 @@ class FlextQualityLibcstVisitors:
             updated_node: cst.FunctionDef,
         ) -> cst.FunctionDef | cst.RemovalSentinel:
             """Remove function if it should be nested."""
+            del original_node  # Required by libcst API
             if updated_node.name.value in self.function_names:
                 self.functions_to_add.append(updated_node)
                 return cst.RemovalSentinel.REMOVE
@@ -204,10 +208,11 @@ class FlextQualityLibcstVisitors:
 
         def leave_ClassDef(
             self: Self,
-            _original_node: cst.ClassDef,
+            original_node: cst.ClassDef,
             updated_node: cst.ClassDef,
         ) -> cst.ClassDef:
             """Add functions to target class."""
+            del original_node  # Required by libcst API
             if updated_node.name.value != self.class_name:
                 return updated_node
 
@@ -225,7 +230,7 @@ class FlextQualityLibcstVisitors:
                 new_methods.append(new_func)
 
             new_body = updated_node.body.with_changes(
-                body=[*updated_node.body.body, *new_methods]
+                body=list(updated_node.body.body) + new_methods
             )
             return updated_node.with_changes(body=new_body)
 
@@ -241,7 +246,7 @@ class FlextQualityLibcstVisitors:
 
         def leave_ClassDef(
             self: Self,
-            _original_node: cst.ClassDef,
+            original_node: cst.ClassDef,
             updated_node: cst.ClassDef,
         ) -> cst.ClassDef | cst.FlattenSentinel[cst.BaseStatement]:
             """Extract methods from target class."""
