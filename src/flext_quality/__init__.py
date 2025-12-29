@@ -25,13 +25,17 @@ from .cli import (
     setup_logging,
 )
 from .cli_helpers import QualityHelperCommands
+from .compat import (
+    FlextCodeQualityPlugin,
+    FlextDuplicationPlugin,
+    FlextHookValidator,
+)
 from .constants import FlextQualityConstants
 from .container import get_quality_container
 from .exceptions import FlextQualityExceptions
 from .external_backend import FlextQualityExternalBackend as ExternalBackend
 from .grade_calculator import FlextQualityGradeCalculator
 from .handlers import FlextQualityHandlers
-from .hooks import FlextHookValidator
 from .metrics import QualityMetrics
 from .models import FlextQualityModels
 from .reports import FlextQualityReportGenerator, ReportFormat, ReportThresholds
@@ -62,6 +66,8 @@ __all__ = [
     "BackendType",
     "BaseAnalyzer",
     "ExternalBackend",
+    "FlextCodeQualityPlugin",
+    "FlextDuplicationPlugin",
     "FlextHookValidator",
     "FlextQuality",
     "FlextQualityAnalyzer",

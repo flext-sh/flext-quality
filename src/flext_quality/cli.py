@@ -23,9 +23,11 @@ from flext_core import (
     FlextTypes as t,
 )
 from pydantic import BaseModel, Field
+from rich.table import Table
 
 from .analyzer import FlextQualityAnalyzer
 from .docs_maintenance.cli import run_comprehensive
+from .plugins.code_quality_plugin import FlextCodeQualityPlugin
 from .reports import FlextQualityReportGenerator, ReportFormat
 from .settings import FlextQualitySettings
 from .subprocess_utils import SubprocessUtils
@@ -239,6 +241,7 @@ class CliCommandRouter:
         self.config = config
         self.formatter = QualityReportFormatter(logger)
         self.analyzer_wrapper = ProjectQualityAnalyzer(logger, config)
+        self._cli = FlextCli()
 
     def route_analyze(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route analyze command."""
@@ -283,15 +286,15 @@ class CliCommandRouter:
             self.logger.error(output_result.error or "Unknown error")
             return FlextResult[int].ok(1)
 
-        # Return appropriate exit code
+        # Return appropriate exit code with Rich output
         quality_score = analyzer.get_quality_score()
         exit_code = self.analyzer_wrapper.get_exit_code(quality_score)
         if exit_code == 0:
-            self.logger.info(f"Good quality: {quality_score:.1f}%")
+            self._cli.output.print_success(f"✅ Good quality: {quality_score:.1f}%")
         elif exit_code == 1:
-            self.logger.warning(f"Medium quality: {quality_score:.1f}%")
+            self._cli.output.print_warning(f"⚠️  Medium quality: {quality_score:.1f}%")
         else:
-            self.logger.error(f"Poor quality: {quality_score:.1f}%")
+            self._cli.output.print_error(f"❌ Poor quality: {quality_score:.1f}%")
 
         return FlextResult[int].ok(exit_code)
 
@@ -323,15 +326,15 @@ class CliCommandRouter:
         quality_score = analyzer.get_quality_score()
         grade = analyzer.get_quality_grade()
 
-        # Display score
-        self.logger.info(f"Quality Score: {quality_score:.1f}% ({grade})")
+        # Display score with Rich output
+        self._cli.output.print_info(f"📊 Quality Score: {quality_score:.1f}% ({grade})")
 
         # Return exit code
         if quality_score >= self.config.thresholds.minimum_acceptable:
-            self.logger.info("Quality acceptable")
+            self._cli.output.print_success("✅ Quality acceptable")
             return FlextResult[int].ok(0)
 
-        self.logger.warning("Quality needs improvement")
+        self._cli.output.print_warning("⚠️  Quality needs improvement")
         return FlextResult[int].ok(1)
 
     def route_web(self, args: argparse.Namespace) -> FlextResult[int]:
@@ -556,7 +559,7 @@ class CliCommandRouter:
             return FlextResult[int].ok(0)
 
         if args.execute:
-            result = operation.execute(targets, None)
+            result = operation.run(targets, None)
             if result.is_failure:
                 self.logger.error(f"Execute failed: {result.error}")
                 return FlextResult[int].ok(1)
@@ -639,6 +642,174 @@ class CliCommandRouter:
                         )
             else:
                 self.logger.info(f"  {key}: {value}")
+
+    def route_code_quality(self, args: argparse.Namespace) -> FlextResult[int]:
+        """Route code-quality command (SOLID/DRY/KISS validation) with Rich UI."""
+        plugin = FlextCodeQualityPlugin()
+        workspace_root = Path.home() / "flext"
+
+        if args.workspace:
+            result = plugin.check_workspace(
+                workspace_root=workspace_root,
+                categories=args.categories if hasattr(args, "categories") else None,
+            )
+            if result.is_failure:
+                self.logger.error(f"Code quality check failed: {result.error}")
+                return FlextResult[int].ok(1)
+            workspace_result = result.value
+
+            # Display workspace analysis with Rich table
+            self._display_workspace_analysis(workspace_result)
+
+            if workspace_result.total_violations == 0:
+                self._cli.output.print_success("✅ Code quality check PASSED")
+                return FlextResult[int].ok(0)
+
+            critical = workspace_result.violations_by_severity.get("ERROR", 0)
+            if critical > 0:
+                self._cli.output.print_error(
+                    f"❌ Code quality FAILED - {critical} critical violations"
+                )
+                return FlextResult[int].ok(2)
+
+            self._cli.output.print_warning(
+                f"⚠️  Completed with {workspace_result.total_violations} warnings"
+            )
+            return FlextResult[int].ok(1)
+
+        target_path = Path(args.target) if args.target else Path.cwd()
+        if not target_path.exists():
+            self.logger.error(f"Target does not exist: {target_path}")
+            return FlextResult[int].ok(1)
+        targets = [target_path] if target_path.is_file() else list(
+            target_path.rglob("*.py"),
+        )
+        result_check: FlextResult[FlextCodeQualityPlugin.CheckResult] = plugin.check(
+            targets=targets,
+            categories=args.categories if hasattr(args, "categories") else None,
+        )
+        if result_check.is_failure:
+            self.logger.error(f"Code quality check failed: {result_check.error}")
+            return FlextResult[int].ok(1)
+        check_result: FlextCodeQualityPlugin.CheckResult = result_check.value
+
+        # Display single-target analysis with Rich table
+        self._display_check_analysis(check_result)
+
+        if check_result.total_violations == 0:
+            self._cli.output.print_success("✅ Code quality check PASSED")
+            return FlextResult[int].ok(0)
+
+        critical = check_result.violations_by_severity.get("ERROR", 0)
+        if critical > 0:
+            self._cli.output.print_error(
+                f"❌ Code quality FAILED - {critical} critical violations"
+            )
+            return FlextResult[int].ok(2)
+
+        self._cli.output.print_warning(
+            f"⚠️  Completed with {check_result.total_violations} warnings"
+        )
+        return FlextResult[int].ok(1)
+
+    def _display_workspace_analysis(
+        self,
+        result: FlextCodeQualityPlugin.WorkspaceCheckResult,
+    ) -> None:
+        """Display workspace analysis with Rich UI."""
+        self._cli.output.print_info("📊 Code Quality Analysis (Workspace)")
+
+        # Summary table
+        summary_table = Table(title="Workspace Summary", show_header=True)
+        summary_table.add_column("Metric", style="cyan")
+        summary_table.add_column("Count", style="magenta")
+        summary_table.add_row("Projects", str(result.total_projects))
+        summary_table.add_row("Files Checked", str(result.total_files))
+        summary_table.add_row("Total Violations", str(result.total_violations))
+
+        self._cli.formatters.print(summary_table)
+
+        # Violations by category table
+        if result.violations_by_category:
+            cat_table = Table(title="Violations by Category", show_header=True)
+            cat_table.add_column("Category", style="cyan")
+            cat_table.add_column("Count", style="yellow")
+            for cat, count in result.violations_by_category.items():
+                cat_table.add_row(cat, str(count))
+            self._cli.formatters.print(cat_table)
+
+        # Violations by severity table
+        if result.violations_by_severity:
+            sev_table = Table(title="Violations by Severity", show_header=True)
+            sev_table.add_column("Severity", style="cyan")
+            sev_table.add_column("Count", style="red")
+            for sev, count in result.violations_by_severity.items():
+                sev_table.add_row(sev, str(count))
+            self._cli.formatters.print(sev_table)
+
+    def _display_check_analysis(
+        self,
+        result: FlextCodeQualityPlugin.CheckResult,
+    ) -> None:
+        """Display single-target analysis with Rich UI."""
+        self._cli.output.print_info("📊 Code Quality Analysis")
+
+        # Summary table
+        summary_table = Table(title="Analysis Summary", show_header=True)
+        summary_table.add_column("Metric", style="cyan")
+        summary_table.add_column("Count", style="magenta")
+        summary_table.add_row("Files Checked", str(result.files_checked))
+        summary_table.add_row("Total Violations", str(result.total_violations))
+
+        self._cli.formatters.print(summary_table)
+
+        # Violations by category table
+        if result.violations_by_category:
+            cat_table = Table(title="Violations by Category", show_header=True)
+            cat_table.add_column("Category", style="cyan")
+            cat_table.add_column("Count", style="yellow")
+            for cat, count in result.violations_by_category.items():
+                cat_table.add_row(cat, str(count))
+            self._cli.formatters.print(cat_table)
+
+        # Violations by severity table
+        if result.violations_by_severity:
+            sev_table = Table(title="Violations by Severity", show_header=True)
+            sev_table.add_column("Severity", style="cyan")
+            sev_table.add_column("Count", style="red")
+            for sev, count in result.violations_by_severity.items():
+                sev_table.add_row(sev, str(count))
+            self._cli.formatters.print(sev_table)
+
+    def route_report(self, args: argparse.Namespace) -> FlextResult[int]:
+        """Route report command - generate quality reports."""
+        plugin = FlextCodeQualityPlugin()
+        ws = Path(args.workspace) if args.workspace else Path.home() / "flext"
+        result = plugin.check_workspace(workspace_root=ws)
+
+        if result.is_failure:
+            self.logger.error(f"Report generation failed: {result.error}")
+            return FlextResult[int].ok(1)
+
+        check_result = result.value
+        output_path = Path(args.output) if args.output else Path(".quality-reports")
+        output_path.mkdir(parents=True, exist_ok=True)
+
+        report_file = output_path / "code-quality-report.txt"
+        lines = [
+            "FLEXT Code Quality Report",
+            f"Workspace: {ws}",
+            f"Total violations: {check_result.total_violations}",
+            f"Files checked: {check_result.total_files}",
+            "",
+            "By Project:",
+        ]
+        for proj, count in check_result.violations_by_project.items():
+            lines.append(f"  {proj}: {count}")
+
+        report_file.write_text("\n".join(lines))
+        self.logger.info(f"Report saved to: {report_file}")
+        return FlextResult[int].ok(0)
 
 
 # =====================================================================
