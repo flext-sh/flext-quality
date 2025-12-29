@@ -397,6 +397,140 @@ class FlextQualitySettings(FlextSettings):
         })
 
 
+@FlextSettings.auto_register("type_verification")
+class TypeVerificationSettings(FlextSettings):
+    """Type verification plugin configuration.
+
+    Configures the TV001-TV018 type verification rules.
+    Environment variables: FLEXT_TYPE_VERIFICATION_*
+    """
+
+    model_config = SettingsConfigDict(
+        env_prefix="FLEXT_TYPE_VERIFICATION_",
+        case_sensitive=False,
+        extra="allow",
+        validate_assignment=True,
+        str_strip_whitespace=True,
+        json_schema_extra={
+            "title": "FLEXT Type Verification Configuration",
+            "description": "Type system compliance checking configuration",
+        },
+    )
+
+    # Thresholds
+    max_isinstance_per_function: int = Field(
+        default=FlextQualityConstants.Quality.TypeVerification.MAX_ISINSTANCE_PER_FUNCTION,
+        ge=1,
+        le=20,
+        description="Maximum isinstance checks allowed per function",
+    )
+
+    max_none_checks_per_file: int = Field(
+        default=FlextQualityConstants.Quality.TypeVerification.MAX_NONE_CHECKS_PER_FILE,
+        ge=1,
+        le=50,
+        description="Maximum None checks allowed per file",
+    )
+
+    max_callable_params: int = Field(
+        default=FlextQualityConstants.Quality.TypeVerification.MAX_CALLABLE_PARAMS,
+        ge=1,
+        le=10,
+        description="Maximum Callable parameters before Protocol recommendation",
+    )
+
+    # Category enable flags
+    check_missing_annotation: bool = Field(
+        default=True,
+        description="Check for missing type annotations (TV001)",
+    )
+
+    check_excessive_typing: bool = Field(
+        default=True,
+        description="Check for excessive typing complexity (TV002)",
+    )
+
+    check_decentralized_types: bool = Field(
+        default=True,
+        description="Check for TypeAlias/Protocol outside proper modules (TV003-TV005)",
+    )
+
+    check_protocol_recommendations: bool = Field(
+        default=True,
+        description="Check for Callable types needing Protocol (TV006-TV008)",
+    )
+
+    check_model_recommendations: bool = Field(
+        default=True,
+        description="Check for dict/dataclass needing Model (TV009-TV011)",
+    )
+
+    check_coupling: bool = Field(
+        default=True,
+        description="Check for excessive isinstance/type narrowing (TV012-TV014)",
+    )
+
+    check_result_misuse: bool = Field(
+        default=True,
+        description="Check for FlextResult misuse patterns (TV015-TV017)",
+    )
+
+    check_uncentralized_types: bool = Field(
+        default=True,
+        description="Check for types that should use centralized aliases (TV018)",
+    )
+
+    # Exclusion patterns
+    exclude_patterns: list[str] = Field(
+        default_factory=lambda: ["**/tests/**", "**/conftest.py"],
+        description="Glob patterns for files to exclude from type verification",
+    )
+
+    def get_enabled_categories(self) -> set[str]:
+        """Get set of enabled category names."""
+        categories: set[str] = set()
+        if self.check_missing_annotation:
+            categories.add("missing_annotation")
+        if self.check_excessive_typing:
+            categories.add("excessive_typing")
+        if self.check_decentralized_types:
+            categories.add("decentralized_type")
+        if self.check_protocol_recommendations:
+            categories.add("needs_protocol")
+        if self.check_model_recommendations:
+            categories.add("needs_model")
+        if self.check_coupling:
+            categories.add("excessive_coupling")
+            categories.add("type_narrowing")
+            categories.add("excessive_none")
+        if self.check_result_misuse:
+            categories.add("result_misuse")
+        if self.check_uncentralized_types:
+            categories.add("uncentralized_type")
+        return categories
+
+    @classmethod
+    def create_strict(cls) -> TypeVerificationSettings:
+        """Create strict configuration that enables all checks."""
+        return cls.model_validate({
+            "max_isinstance_per_function": 3,
+            "max_none_checks_per_file": 10,
+            "max_callable_params": 2,
+        })
+
+    @classmethod
+    def create_lenient(cls) -> TypeVerificationSettings:
+        """Create lenient configuration for legacy code."""
+        return cls.model_validate({
+            "max_isinstance_per_function": 10,
+            "max_none_checks_per_file": 30,
+            "max_callable_params": 5,
+            "check_model_recommendations": False,
+            "check_uncentralized_types": False,
+        })
+
+
 __all__ = [
     "FlextQualitySettings",
+    "TypeVerificationSettings",
 ]

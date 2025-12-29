@@ -21,6 +21,7 @@ from flext_core import FlextLogger, FlextResult, FlextService, FlextTypes as t
 from pydantic import ConfigDict
 from rope.base import libutils
 from rope.base.project import Project as RopeProject
+from rope.base.resources import Resource as RopeResource
 from rope.contrib.findit import find_occurrences as rope_find_occurrences
 from rope.refactor.rename import Rename
 
@@ -299,7 +300,7 @@ class FlextQualityNamespaceRefactoring(FlextService[dict[str, t.GeneralValueType
             project: RopeProject,
             project_path: Path,
             name: str,
-        ) -> t.GeneralValueType:
+        ) -> RopeResource | None:
             """Find resource containing a name definition."""
             src_path = project_path / "src"
             search_paths = [src_path] if src_path.exists() else [project_path]
@@ -312,18 +313,19 @@ class FlextQualityNamespaceRefactoring(FlextService[dict[str, t.GeneralValueType
                         content = py_file.read_text()
                         if f"class {name}" in content or f"def {name}" in content:
                             rel_path = py_file.relative_to(project_path)
-                            return project.get_resource(str(rel_path))
+                            resource: RopeResource = project.get_resource(str(rel_path))
+                            return resource
                     except (OSError, UnicodeDecodeError):
                         continue
             return None
 
         def _find_offset(
             self: Self,
-            resource: t.GeneralValueType,
+            resource: RopeResource,
             name: str,
         ) -> int | None:
             """Find offset of a name in resource."""
-            content = resource.read()
+            content: str = resource.read()
 
             # Look for class definition
             class_idx = content.find(f"class {name}")
@@ -415,10 +417,7 @@ class FlextQualityNamespaceRefactoring(FlextService[dict[str, t.GeneralValueType
         self.operations = self.Operations()
         self._logger = FlextLogger(__name__)
 
-    def execute(
-        self: Self,
-        **_kwargs: t.GeneralValueType,
-    ) -> FlextResult[dict[str, t.GeneralValueType]]:
+    def execute(self: Self) -> FlextResult[dict[str, t.GeneralValueType]]:
         """Execute namespace refactoring service."""
         return FlextResult[dict[str, t.GeneralValueType]].ok({
             "service": "namespace_refactoring",

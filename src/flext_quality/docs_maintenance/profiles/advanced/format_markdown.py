@@ -113,12 +113,18 @@ class FlextQualityMarkdownFormatting:
                 return FlextResult.fail(result.error)
 
             data = result.value
+            # Narrow types from GeneralValueType to concrete types
+            original_lines_val = data.get("original_lines", 0)
+            original_lines = original_lines_val if isinstance(original_lines_val, int) else 0
+            formatted_lines_val = data.get("formatted_lines", 0)
+            formatted_lines = formatted_lines_val if isinstance(formatted_lines_val, int) else 0
+
             return FlextResult.ok(FlextQualityMarkdownFormatting.FormatResult(
                 path=str(data.get("path", path)),
                 modified=bool(data.get("modified", False)),
                 message=str(data.get("message", "")),
-                original_lines=int(data.get("original_lines", 0)),
-                formatted_lines=int(data.get("formatted_lines", 0)),
+                original_lines=original_lines,
+                formatted_lines=formatted_lines,
             ))
 
         def format_directory(
@@ -168,7 +174,7 @@ class FlextQualityMarkdownFormatting:
                     else:
                         errors.append({
                             "path": str(md_file),
-                            "error": result.error,
+                            "error": result.error or "Unknown error",
                         })
 
                 summary = FlextQualityMarkdownFormatting.FormatSummary(
@@ -208,9 +214,9 @@ class FlextQualityMarkdownFormatting:
             formatter = FlextQualityMarkdownFormatting.Formatter()
 
             if target.is_file():
-                result = formatter.format_file(target, dry_run=args.dry_run)
-                if result.is_success:
-                    data = result.value
+                file_result = formatter.format_file(target, dry_run=args.dry_run)
+                if file_result.is_success:
+                    data = file_result.value
                     if args.format == "json":
                         logger.info(json.dumps(data, indent=2))  # DEBUG
                     else:
@@ -218,10 +224,12 @@ class FlextQualityMarkdownFormatting:
                         mode = "(dry-run)" if args.dry_run else ""
                         logger.info(f"{data['path']}: {status} {mode}")  # DEBUG
                     return 0
-                logger.error(f"Error: {result.error}")  # DEBUG
+                logger.error(f"Error: {file_result.error}")  # DEBUG
                 return 1
 
-            result = formatter.format_directory(target, dry_run=args.dry_run)
+            result: FlextResult[FlextQualityMarkdownFormatting.FormatReport] = (
+                formatter.format_directory(target, dry_run=args.dry_run)
+            )
             if result.is_success:
                 report = result.value
                 if args.format == "json":

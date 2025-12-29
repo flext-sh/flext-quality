@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import tempfile
 from enum import StrEnum
+from pathlib import Path
 from typing import ClassVar, Literal
 
 from flext_core import FlextConstants
@@ -67,6 +68,12 @@ class FlextQualityConstants(FlextConstants):
             ACCEPTABLE_THRESHOLD: float = 70.0
             BELOW_AVERAGE_THRESHOLD: float = 60.0
             ENTERPRISE_READY_THRESHOLD: float = 85.0
+
+            # Code Quality Guardian thresholds
+            ARCHITECTURE_VIOLATION_THRESHOLD: int = 5
+            SOLID_VIOLATION_THRESHOLD: int = 10
+            DRY_VIOLATION_THRESHOLD: int = 5
+            KISS_VIOLATION_THRESHOLD: int = 5
 
         class Coverage:
             """Coverage thresholds and limits."""
@@ -221,6 +228,10 @@ class FlextQualityConstants(FlextConstants):
             ISSUE_PREVIEW_LIMIT: int = 10
             MIN_COVERAGE_THRESHOLD: float = 75.0
             MIN_SCORE_THRESHOLD: float = 60.0
+
+            # Code Quality Guardian analysis limits
+            MAX_FILES_PER_RUN: int = 100
+            SEMGREP_TIMEOUT_SECONDS: int = 120
 
         class Baseline:
             """Baseline file format constants."""
@@ -822,6 +833,23 @@ class FlextQualityConstants(FlextConstants):
             # Backward compatibility alias
             PROJECT_ORDER = _FALLBACK_PROJECT_ORDER
 
+            @classmethod
+            def get_project_order(cls, _workspace_root: Path | None = None) -> tuple[str, ...]:
+                """Retorna ordem de projetos descoberta dinamicamente.
+
+                Usa FlextWorkspaceDiscovery para descobrir e ordenar.
+                Fallback para lista hardcoded se discovery falhar.
+
+                Args:
+                    _workspace_root: Path to workspace root (default: ~/flext)
+
+                Returns:
+                    Tuple of project names in dependency order
+
+                """
+                # Discovery logic moved to cli.py to avoid circular imports
+                return cls._FALLBACK_PROJECT_ORDER
+
             # Directory processing order
             DIRECTORY_ORDER: tuple[str, ...] = (
                 "src/",
@@ -829,6 +857,175 @@ class FlextQualityConstants(FlextConstants):
                 "scripts/",
                 "examples/",
             )
+
+        # =========================================================================
+        # TYPE VERIFICATION - Type system compliance checking
+        # =========================================================================
+
+        class TypeVerification:
+            """Type verification plugin constants for detecting type issues.
+
+            Implements TV001-TV018 detection rules for:
+            - Missing/excessive type annotations
+            - Type centralization violations
+            - Protocol/Model recommendations
+            - FlextResult usage patterns
+            """
+
+            class RuleId:
+                """Type verification rule identifiers (TV001-TV018)."""
+
+                # Annotation issues
+                MISSING_ANNOTATION = "TV001"
+                EXCESSIVE_TYPING = "TV002"
+
+                # Centralization violations
+                TYPEALIAS_OUTSIDE_TYPINGS = "TV003"
+                PROTOCOL_OUTSIDE_PROTOCOLS = "TV004"
+                LOCAL_TYPEVAR = "TV005"
+
+                # Protocol recommendations
+                CALLABLE_NEEDS_PROTOCOL = "TV006"
+                COMPLEX_CALLABLE_NEEDS_PROTOCOL = "TV007"
+                UNION_CALLABLE_NEEDS_PROTOCOL = "TV008"
+
+                # Model recommendations
+                DICT_NEEDS_MODEL = "TV009"
+                DATACLASS_NEEDS_PYDANTIC = "TV010"
+                COMPLEX_UNION_NEEDS_MODEL = "TV011"
+
+                # Coupling and complexity
+                EXCESSIVE_ISINSTANCE = "TV012"
+                TYPE_NARROWING_HINT = "TV013"
+                EXCESSIVE_NONE_CHECKS = "TV014"
+
+                # FlextResult misuse
+                RESULT_RETURNING_NONE = "TV015"
+                RESULT_MISSING_TYPE_PARAM = "TV016"
+                RESULT_INCORRECT_UNWRAP = "TV017"
+
+                # Uncentralized types
+                UNCENTRALIZED_TYPE = "TV018"
+
+            class Severity(StrEnum):
+                """Type violation severity levels."""
+
+                ERROR = "error"
+                WARNING = "warning"
+                INFO = "info"
+
+            class Category(StrEnum):
+                """Type violation categories."""
+
+                MISSING_ANNOTATION = "missing_annotation"
+                EXCESSIVE_TYPING = "excessive_typing"
+                DECENTRALIZED_TYPE = "decentralized_type"
+                NEEDS_PROTOCOL = "needs_protocol"
+                NEEDS_MODEL = "needs_model"
+                EXCESSIVE_COUPLING = "excessive_coupling"
+                TYPE_NARROWING = "type_narrowing"
+                EXCESSIVE_NONE = "excessive_none"
+                RESULT_MISUSE = "result_misuse"
+                UNCENTRALIZED_TYPE = "uncentralized_type"
+
+            # Type mapping: raw type -> centralized type suggestion
+            TYPE_MAPPING: ClassVar[dict[str, str]] = {
+                # String dicts
+                "dict[str, str]": "t.StringDict",
+                "Mapping[str, str]": "t.StringMapping",
+                # Int dicts
+                "dict[str, int]": "t.StringIntDict",
+                "Mapping[str, int]": "t.StringIntMapping",
+                # Float/Bool/Numeric dicts
+                "dict[str, float]": "t.StringFloatDict",
+                "dict[str, bool]": "t.StringBoolDict",
+                # Configuration dicts
+                "dict[str, object]": "t.ConfigurationDict",
+                "Mapping[str, object]": "t.ConfigurationMapping",
+                # Nested dicts
+                "dict[str, dict[str, int]]": "t.NestedStringIntDict",
+                "dict[str, list[object]]": "t.StringListDict",
+                # JSON/Scalar types
+                "str | int | float | bool | None": "t.JsonPrimitive",
+            }
+
+            # Types that should NOT be flagged as uncentralized
+            EXCLUDED_SIMPLE_TYPES: frozenset[str] = frozenset({
+                "str", "int", "float", "bool", "None", "bytes",
+                "list", "dict", "set", "tuple", "frozenset",
+                "object", "type", "Self", "Never",
+            })
+
+            # Type prefixes to exclude from TV018
+            EXCLUDED_TYPE_PREFIXES: tuple[str, ...] = (
+                "t.",  # Already centralized
+                "p.",  # Protocol usage
+                "m.",  # Model usage
+                "r[",  # FlextResult
+                "FlextResult[",
+                "list[str]", "list[int]", "list[float]", "list[bool]",
+                "tuple[", "set[str]", "set[int]",
+            )
+
+            # Protocol namespace prefixes
+            PROTOCOL_PREFIX: str = "p."
+            FLEXT_PROTOCOLS_PREFIX: str = "Flext" + "Protocols."
+
+            # Rule severity mapping
+            RULE_SEVERITIES: ClassVar[dict[str, str]] = {
+                "TV001": "warning",
+                "TV002": "info",
+                "TV003": "warning",
+                "TV004": "warning",
+                "TV005": "warning",
+                "TV006": "info",
+                "TV007": "warning",
+                "TV008": "info",
+                "TV009": "info",
+                "TV010": "warning",
+                "TV011": "info",
+                "TV012": "warning",
+                "TV013": "info",
+                "TV014": "info",
+                "TV015": "error",
+                "TV016": "warning",
+                "TV017": "warning",
+                "TV018": "warning",
+            }
+
+            # Rules that should BLOCK in hooks
+            BLOCKING_RULES: frozenset[str] = frozenset({
+                "TV003",  # TypeAlias outside typings.py
+                "TV004",  # Protocol outside protocols.py
+                "TV015",  # FlextResult returning None
+            })
+
+            # Message templates
+            MESSAGES: ClassVar[dict[str, str]] = {
+                "TV001": "Missing type annotation for {target}",
+                "TV002": "Excessive typing complexity in {target}",
+                "TV003": "TypeAlias must be defined in typings.py, not {file}",
+                "TV004": "Protocol must be defined in protocols.py, not {file}",
+                "TV005": "TypeVar should be centralized in typings.py",
+                "TV006": "Callable type should use Protocol for clarity",
+                "TV007": "Complex Callable needs Protocol definition",
+                "TV008": "Union with Callable should use Protocol",
+                "TV009": "Complex dict type should use a Model",
+                "TV010": "Consider using Pydantic model instead of dataclass",
+                "TV011": "Complex Union type should use a Model",
+                "TV012": "Excessive isinstance checks ({count} found)",
+                "TV013": "Type narrowing opportunity detected",
+                "TV014": "Excessive None checks ({count} found)",
+                "TV015": "FlextResult method returning None directly",
+                "TV016": "FlextResult missing type parameter",
+                "TV017": "Incorrect FlextResult.unwrap() usage pattern",
+                "TV018": "Use centralized type {suggestion} instead of {raw_type}",
+            }
+
+            # Thresholds
+            MAX_ISINSTANCE_PER_FUNCTION: int = 5
+            MAX_NONE_CHECKS_PER_FILE: int = 15
+            MAX_CALLABLE_PARAMS: int = 3
 
 
 c = FlextQualityConstants

@@ -135,9 +135,15 @@ class FlextQualityCrossReferenceSync:
                     return FlextResult.fail(headers_result.error)
 
                 headers = headers_result.value
+                # Narrow type: extract_headers returns GeneralValueType values,
+                # but we know they're actually str | int based on the implementation
+                narrowed_headers: list[dict[str, str | int]] = [
+                    {k: v for k, v in h.items() if isinstance(v, (str, int))}
+                    for h in headers
+                ]
 
                 # Generate TOC from headers
-                toc_entries = self._generate_toc_entries(headers)
+                toc_entries = self._generate_toc_entries(narrowed_headers)
 
                 # Find existing TOC section
                 toc_start, toc_end = self._find_toc_section(content)
@@ -455,9 +461,9 @@ class FlextQualityCrossReferenceSync:
 
             if target.is_file():
                 if args.toc_only:
-                    result = synchronizer.sync_toc(target, dry_run=args.dry_run)
+                    file_result = synchronizer.sync_toc(target, dry_run=args.dry_run)
                 elif args.refs_only:
-                    result = synchronizer.sync_references(
+                    file_result = synchronizer.sync_references(
                         target, dry_run=args.dry_run,
                     )
                 else:
@@ -467,12 +473,12 @@ class FlextQualityCrossReferenceSync:
                         target, dry_run=args.dry_run,
                     )
                     if toc_result.is_success and ref_result.is_success:
-                        result = ref_result
+                        file_result = ref_result
                     else:
-                        result = toc_result if toc_result.is_failure else ref_result
+                        file_result = toc_result if toc_result.is_failure else ref_result
 
-                if result.is_success:
-                    data = result.value
+                if file_result.is_success:
+                    data = file_result.value
                     if args.format == "json":
                         logger.info(json.dumps(asdict(data), indent=2))  # DEBUG
                     else:
@@ -487,10 +493,12 @@ class FlextQualityCrossReferenceSync:
                         for error in data.errors:
                             logger.warning(f"  Warning: {error}")  # DEBUG
                     return 0
-                logger.error(f"Error: {result.error}")  # DEBUG
+                logger.error(f"Error: {file_result.error}")  # DEBUG
                 return 1
 
-            result = synchronizer.sync_directory(target, dry_run=args.dry_run)
+            result: FlextResult[FlextQualityCrossReferenceSync.SyncReport] = (
+                synchronizer.sync_directory(target, dry_run=args.dry_run)
+            )
             if result.is_success:
                 report = result.value
                 if args.format == "json":

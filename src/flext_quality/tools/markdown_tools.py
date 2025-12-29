@@ -232,9 +232,12 @@ class FlextQualityMarkdownParser(FlextService[dict[str, t.GeneralValueType]]):
             prev_level = 0
 
             for header in headers:
-                level = int(header["level"])
-                text = str(header["text"])
-                line = int(header["line"])
+                level_val = header["level"]
+                level = int(level_val) if isinstance(level_val, int) else int(str(level_val))
+                text_val = header["text"]
+                text = str(text_val) if text_val is not None else ""
+                line_val = header["line"]
+                line = int(line_val) if isinstance(line_val, int) else int(str(line_val))
 
                 # Check for multiple H1
                 if level == c.Quality.Markdown.HEADER_H1_LEVEL:
@@ -417,9 +420,11 @@ class FlextQualityMarkdownFormatter(FlextService[str]):
                 )
                 if result.is_success:
                     if result.value.get("modified"):
-                        results["modified"] = int(results["modified"]) + 1
+                        mod_val = results["modified"]
+                        results["modified"] = (int(mod_val) if isinstance(mod_val, int) else int(str(mod_val))) + 1
                     else:
-                        results["unchanged"] = int(results["unchanged"]) + 1
+                        unmod_val = results["unchanged"]
+                        results["unchanged"] = (int(unmod_val) if isinstance(unmod_val, int) else int(str(unmod_val))) + 1
                     file_list = results["files"]
                     if isinstance(file_list, list):
                         file_list.append(result.value)
@@ -586,11 +591,17 @@ class FlextQualityLinkValidator(FlextService[dict[str, t.GeneralValueType]]):
                 file_result = self.validate_file(md_file)
                 if file_result.is_success:
                     data = file_result.value
+                    total_val = results["total_links"]
+                    data_total = data["total_links"]
                     results["total_links"] = (
-                        int(results["total_links"]) + int(data["total_links"])
+                        (int(total_val) if isinstance(total_val, int) else int(str(total_val)))
+                        + (int(data_total) if isinstance(data_total, int) else int(str(data_total)))
                     )
+                    valid_val = results["valid_links"]
+                    data_valid = data["valid_links"]
                     results["valid_links"] = (
-                        int(results["valid_links"]) + int(data["valid_links"])
+                        (int(valid_val) if isinstance(valid_val, int) else int(str(valid_val)))
+                        + (int(data_valid) if isinstance(data_valid, int) else int(str(data_valid)))
                     )
                     broken_list = results["broken_links"]
                     if isinstance(broken_list, list):
@@ -601,8 +612,10 @@ class FlextQualityLinkValidator(FlextService[dict[str, t.GeneralValueType]]):
                     if isinstance(file_list, list):
                         file_list.append(data)
 
-            total = int(results["total_links"])
-            valid = int(results["valid_links"])
+            total_val = results["total_links"]
+            total = int(total_val) if isinstance(total_val, int) else int(str(total_val))
+            valid_val = results["valid_links"]
+            valid = int(valid_val) if isinstance(valid_val, int) else int(str(valid_val))
             results["health_percent"] = (valid / total * 100) if total > 0 else 100.0
 
             return FlextResult.ok(results)

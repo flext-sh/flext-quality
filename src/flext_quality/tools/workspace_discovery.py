@@ -91,9 +91,7 @@ class FlextWorkspaceDiscovery(FlextService[list[str]]):
             if "project" in data and "dependencies" in data["project"]:
                 for dep in data["project"]["dependencies"]:
                     # Handle formats like "flext-core>=0.1.0" or "flext-core @ file:..."
-                    if isinstance(dep, str) and (
-                        dep.startswith("flext-") or dep.startswith("flext_")
-                    ):
+                    if isinstance(dep, str) and dep.startswith(("flext-", "flext_")):
                         # Extract just the package name
                         name = dep.split()[0].split("@")[0].split("[")[0]
                         name = name.split(">=")[0].split("<=")[0].split("==")[0]
@@ -103,9 +101,11 @@ class FlextWorkspaceDiscovery(FlextService[list[str]]):
             # [tool.poetry.dependencies] - Poetry format
             if "tool" in data and "poetry" in data["tool"]:
                 poetry_deps = data["tool"]["poetry"].get("dependencies", {})
-                for name in poetry_deps:
-                    if name.startswith("flext-") or name.startswith("flext_"):
-                        deps.append(name.replace("_", "-"))
+                deps.extend(
+                    name.replace("_", "-")
+                    for name in poetry_deps
+                    if name.startswith(("flext-", "flext_"))
+                )
 
             return r[list[str]].ok(deps)
 
@@ -312,7 +312,7 @@ class FlextWorkspaceDiscovery(FlextService[list[str]]):
         all_projects = list(dict.fromkeys(gitmodules_projects + workspace_projects))
 
         if not all_projects:
-            return r[list[str]].failure("No projects discovered")
+            return r[list[str]].fail("No projects discovered")
 
         # Build dependency graph
         graph_result = self.build_dependency_graph(all_projects)

@@ -118,7 +118,7 @@ class FlextQualityTestStructureOperation(FlextService[dict[str, t.GeneralValueTy
 
         """
         if not project_path.exists():
-            return r[self.AnalysisResult].fail(
+            return r[FlextQualityTestStructureOperation.AnalysisResult].fail(
                 f"Project path not found: {project_path}"
             )
 
@@ -136,7 +136,7 @@ class FlextQualityTestStructureOperation(FlextService[dict[str, t.GeneralValueTy
             test_files.update(test_file.stem for test_file in test_dir.rglob("test_*.py"))
 
         # Analyze source modules
-        modules: list[self.ModuleCoverage] = []
+        modules: list[FlextQualityTestStructureOperation.ModuleCoverage] = []
 
         for py_file in src_path.rglob("*.py"):
             if not self.Helpers.is_testable_module(py_file):
@@ -172,12 +172,12 @@ class FlextQualityTestStructureOperation(FlextService[dict[str, t.GeneralValueTy
                 function_count=module_info.get("function_count", 0),
             ))
 
-        result = self.AnalysisResult(
+        analysis_result = FlextQualityTestStructureOperation.AnalysisResult(
             project_path=project_path,
             modules=modules,
         )
 
-        return r[self.AnalysisResult].ok(result)
+        return r[FlextQualityTestStructureOperation.AnalysisResult].ok(analysis_result)
 
     def _analyze_module(self: Self, file_path: Path) -> dict[str, int]:
         """Analyze a module using AST backend.
@@ -259,12 +259,12 @@ class FlextQualityTestStructureOperation(FlextService[dict[str, t.GeneralValueTy
 
         return r[dict[str, t.GeneralValueType]].ok(summary)
 
-    def execute(
+    def run(
         self: Self,
         targets: list[Path],
         _backup_path: Path | None = None,
     ) -> r[dict[str, t.GeneralValueType]]:
-        """Execute test structure analysis (same as dry_run for detection-only).
+        """Run test structure analysis (same as dry_run for detection-only).
 
         Args:
             targets: List of project directories to analyze
@@ -276,6 +276,18 @@ class FlextQualityTestStructureOperation(FlextService[dict[str, t.GeneralValueTy
         """
         # Detection-only operation - same as dry_run
         return self.dry_run(targets)
+
+    def execute(self: Self) -> r[dict[str, t.GeneralValueType]]:
+        """Execute the service operation.
+
+        Implementation of FlextService abstract method.
+        Uses current directory as default target.
+
+        Returns:
+            FlextResult with operation summary
+
+        """
+        return self.dry_run([Path.cwd()])
 
     def rollback(
         self: Self, _backup_path: Path

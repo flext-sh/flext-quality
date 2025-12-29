@@ -248,9 +248,30 @@ class CliCommandRouter:
         self.formatter = QualityReportFormatter(logger)
         self.analyzer_wrapper = ProjectQualityAnalyzer(logger, config)
         self._cli = FlextCli()
+        self._quiet_mode = False
+
+    def _configure_from_args(self, args: argparse.Namespace) -> None:
+        """Configure CLI based on command arguments (quiet mode, etc)."""
+        # Enable quiet mode if requested
+        if (hasattr(args, "quiet") and args.quiet) or (hasattr(args, "no_color") and args.no_color):
+            self._quiet_mode = True
+
+    def _maybe_print(self, message: str, style: str = "info") -> None:
+        """Print message only if not in quiet mode."""
+        if self._quiet_mode:
+            return
+        if style == "error":
+            self.logger.error(message)
+        elif style == "warning":
+            self.logger.warning(message)
+        else:
+            self.logger.info(message)
 
     def route_analyze(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route analyze command."""
+        # Configure quiet mode and other settings from args
+        self._configure_from_args(args)
+
         # Validate project path
         path_result = CliArgumentValidator.validate_project_path(args.path)
         if path_result.is_failure:
@@ -292,20 +313,23 @@ class CliCommandRouter:
             self.logger.error(output_result.error or "Unknown error")
             return FlextResult[int].ok(1)
 
-        # Return appropriate exit code with Rich output
+        # Return appropriate exit code with Rich output (respects quiet mode)
         quality_score = analyzer.get_quality_score()
         exit_code = self.analyzer_wrapper.get_exit_code(quality_score)
         if exit_code == 0:
-            self._cli.output.print_success(f"✅ Good quality: {quality_score:.1f}%")
+            self._maybe_print(f"✅ Good quality: {quality_score:.1f}%", "success")
         elif exit_code == 1:
-            self._cli.output.print_warning(f"⚠️  Medium quality: {quality_score:.1f}%")
+            self._maybe_print(f"⚠️  Medium quality: {quality_score:.1f}%", "warning")
         else:
-            self._cli.output.print_error(f"❌ Poor quality: {quality_score:.1f}%")
+            self._maybe_print(f"❌ Poor quality: {quality_score:.1f}%", "error")
 
         return FlextResult[int].ok(exit_code)
 
     def route_score(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route score command."""
+        # Configure quiet mode and other settings from args
+        self._configure_from_args(args)
+
         # Validate project path
         path_result = CliArgumentValidator.validate_project_path(args.path)
         if path_result.is_failure:
@@ -332,15 +356,15 @@ class CliCommandRouter:
         quality_score = analyzer.get_quality_score()
         grade = analyzer.get_quality_grade()
 
-        # Display score with Rich output
-        self._cli.output.print_info(f"📊 Quality Score: {quality_score:.1f}% ({grade})")
+        # Display score (respects quiet mode)
+        self._maybe_print(f"📊 Quality Score: {quality_score:.1f}% ({grade})", "info")
 
         # Return exit code
         if quality_score >= self.config.thresholds.minimum_acceptable:
-            self._cli.output.print_success("✅ Quality acceptable")
+            self._maybe_print("✅ Quality acceptable", "success")
             return FlextResult[int].ok(0)
 
-        self._cli.output.print_warning("⚠️  Quality needs improvement")
+        self._maybe_print("⚠️  Quality needs improvement", "warning")
         return FlextResult[int].ok(1)
 
     def route_web(self, args: argparse.Namespace) -> FlextResult[int]:
@@ -385,6 +409,9 @@ class CliCommandRouter:
 
     def route_validate(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route validate command (lint + type + security + test) with Rich UI."""
+        # Configure quiet mode and other settings from args
+        self._configure_from_args(args)
+
         path_result = CliArgumentValidator.validate_project_path(args.path)
         if path_result.is_failure:
             self.logger.error(path_result.error or "Invalid path")
@@ -398,13 +425,14 @@ class CliCommandRouter:
             return FlextResult[int].ok(1)
 
         report = result.value
-        self._display_validation_report(report)
+        if not self._quiet_mode:
+            self._display_validation_report(report)
 
         if report.passed:
-            self._cli.output.print_success("✅ Validation PASSED")
+            self._maybe_print("✅ Validation PASSED", "success")
             return FlextResult[int].ok(0)
 
-        self._cli.output.print_error("❌ Validation FAILED")
+        self._maybe_print("❌ Validation FAILED", "error")
         return FlextResult[int].ok(1)
 
     def _display_validation_report(
@@ -412,7 +440,7 @@ class CliCommandRouter:
         report: t.GeneralValueType,  # Would be ValidationReport type
     ) -> None:
         """Display validation report with Rich UI."""
-        self._cli.output.print_info("🔍 Validation Report")
+        self.logger.info("🔍 Validation Report")
 
         # Create validation table
         val_table = Table(title="Quality Checks", show_header=True)
@@ -477,7 +505,10 @@ class CliCommandRouter:
             "Code coverage metric",
         )
 
-        self._cli.formatters.print(val_table)
+        # Render table to string and print
+        table_str = self._cli.formatters.render_table_to_string(val_table)
+        if table_str.is_success:
+            self._cli.formatters.print(table_str.value)
 
     def route_lint(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route lint command."""
@@ -575,6 +606,9 @@ class CliCommandRouter:
 
     def route_test_antipatterns(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route test antipatterns subcommand."""
+        # Configure quiet mode and other settings from args
+        self._configure_from_args(args)
+
         targets = self._resolve_test_quality_targets(args)
         if not targets:
             self.logger.error("No valid targets found")
@@ -585,6 +619,9 @@ class CliCommandRouter:
 
     def route_test_inheritance(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route test inheritance subcommand."""
+        # Configure quiet mode and other settings from args
+        self._configure_from_args(args)
+
         targets = self._resolve_test_quality_targets(args)
         if not targets:
             self.logger.error("No valid targets found")
@@ -595,6 +632,9 @@ class CliCommandRouter:
 
     def route_test_structure(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route test structure subcommand."""
+        # Configure quiet mode and other settings from args
+        self._configure_from_args(args)
+
         targets = self._resolve_test_quality_targets(args)
         if not targets:
             self.logger.error("No valid targets found")
@@ -605,6 +645,9 @@ class CliCommandRouter:
 
     def route_test_fixtures(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route test fixtures subcommand."""
+        # Configure quiet mode and other settings from args
+        self._configure_from_args(args)
+
         targets = self._resolve_test_quality_targets(args)
         if not targets:
             self.logger.error("No valid targets found")
@@ -629,7 +672,8 @@ class CliCommandRouter:
             if result.is_failure:
                 self.logger.error(f"Dry run failed: {result.error}")
                 return FlextResult[int].ok(1)
-            self._print_test_quality_result(result.value, name, "dry-run")
+            if not self._quiet_mode:
+                self._print_test_quality_result(result.value, name, "dry-run")
             return FlextResult[int].ok(0)
 
         if args.execute:
@@ -637,7 +681,8 @@ class CliCommandRouter:
             if result.is_failure:
                 self.logger.error(f"Execute failed: {result.error}")
                 return FlextResult[int].ok(1)
-            self._print_test_quality_result(result.value, name, "execute")
+            if not self._quiet_mode:
+                self._print_test_quality_result(result.value, name, "execute")
             return FlextResult[int].ok(0)
 
         if args.rollback:
@@ -646,7 +691,7 @@ class CliCommandRouter:
             if result.is_failure:
                 self.logger.error(f"Rollback failed: {result.error}")
                 return FlextResult[int].ok(1)
-            self.logger.info("Rollback completed")
+            self._maybe_print("Rollback completed", "success")
             return FlextResult[int].ok(0)
 
         # Default: dry-run
@@ -654,7 +699,8 @@ class CliCommandRouter:
         if result.is_failure:
             self.logger.error(f"Analysis failed: {result.error}")
             return FlextResult[int].ok(1)
-        self._print_test_quality_result(result.value, name, "dry-run")
+        if not self._quiet_mode:
+            self._print_test_quality_result(result.value, name, "dry-run")
         return FlextResult[int].ok(0)
 
     def _resolve_test_quality_targets(self, args: argparse.Namespace) -> list[Path]:
@@ -740,6 +786,9 @@ class CliCommandRouter:
 
     def route_code_quality(self, args: argparse.Namespace) -> FlextResult[int]:
         """Route code-quality command (SOLID/DRY/KISS validation) with Rich UI."""
+        # Configure quiet mode and other settings from args
+        self._configure_from_args(args)
+
         plugin = FlextCodeQualityPlugin()
         workspace_root = Path.home() / "flext"
 
@@ -753,22 +802,25 @@ class CliCommandRouter:
                 return FlextResult[int].ok(1)
             workspace_result = result.value
 
-            # Display workspace analysis with Rich table
-            self._display_workspace_analysis(workspace_result)
+            # Display workspace analysis with Rich table (respects quiet mode)
+            if not self._quiet_mode:
+                self._display_workspace_analysis(workspace_result)
 
             if workspace_result.total_violations == 0:
-                self._cli.output.print_success("✅ Code quality check PASSED")
+                self._maybe_print("✅ Code quality check PASSED", "success")
                 return FlextResult[int].ok(0)
 
             critical = workspace_result.violations_by_severity.get("ERROR", 0)
             if critical > 0:
-                self._cli.output.print_error(
-                    f"❌ Code quality FAILED - {critical} critical violations"
+                self._maybe_print(
+                    f"❌ Code quality FAILED - {critical} critical violations",
+                    "error"
                 )
                 return FlextResult[int].ok(2)
 
-            self._cli.output.print_warning(
-                f"⚠️  Completed with {workspace_result.total_violations} warnings"
+            self._maybe_print(
+                f"⚠️  Completed with {workspace_result.total_violations} warnings",
+                "warning"
             )
             return FlextResult[int].ok(1)
 
@@ -788,22 +840,25 @@ class CliCommandRouter:
             return FlextResult[int].ok(1)
         check_result: FlextCodeQualityPlugin.CheckResult = result_check.value
 
-        # Display single-target analysis with Rich table
-        self._display_check_analysis(check_result)
+        # Display single-target analysis with Rich table (respects quiet mode)
+        if not self._quiet_mode:
+            self._display_check_analysis(check_result)
 
         if check_result.total_violations == 0:
-            self._cli.output.print_success("✅ Code quality check PASSED")
+            self._maybe_print("✅ Code quality check PASSED", "success")
             return FlextResult[int].ok(0)
 
         critical = check_result.violations_by_severity.get("ERROR", 0)
         if critical > 0:
-            self._cli.output.print_error(
-                f"❌ Code quality FAILED - {critical} critical violations"
+            self._maybe_print(
+                f"❌ Code quality FAILED - {critical} critical violations",
+                "error"
             )
             return FlextResult[int].ok(2)
 
-        self._cli.output.print_warning(
-            f"⚠️  Completed with {check_result.total_violations} warnings"
+        self._maybe_print(
+            f"⚠️  Completed with {check_result.total_violations} warnings",
+            "warning"
         )
         return FlextResult[int].ok(1)
 
@@ -811,8 +866,8 @@ class CliCommandRouter:
         self,
         result: FlextCodeQualityPlugin.WorkspaceCheckResult,
     ) -> None:
-        """Display workspace analysis with Rich UI."""
-        self._cli.output.print_info("📊 Code Quality Analysis (Workspace)")
+        """Display workspace analysis."""
+        self.logger.info("📊 Code Quality Analysis (Workspace)")
 
         # Summary table
         summary_table = Table(title="Workspace Summary", show_header=True)

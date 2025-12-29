@@ -207,7 +207,11 @@ class FlextQualityTestAntipatternOperation(FlextService[dict[str, t.GeneralValue
             )
 
         try:
-            source = file_path.read_text(encoding="utf-8")
+            # Try UTF-8 first, fall back to latin-1 if needed
+            try:
+                source = file_path.read_text(encoding="utf-8")
+            except UnicodeDecodeError:
+                source = file_path.read_text(encoding="latin-1")
             parsed_module = cst.parse_module(source)
 
             # Use metadata wrapper for position tracking

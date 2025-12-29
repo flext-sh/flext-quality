@@ -252,9 +252,13 @@ class FlextQualityMarkdownValidation:
                         target_url = str(link["url"]).split("#")[0]
                         target_path = (path.parent / target_url).resolve()
                         if not target_path.exists():
+                            # Narrow line type from GeneralValueType to int
+                            line_num = link["line"]
+                            if not isinstance(line_num, int):
+                                line_num = 0
                             issues.append(FlextQualityMarkdownValidation.ValidationIssue(
                                 file=str(path),
-                                line=int(link["line"]),
+                                line=line_num,
                                 severity="error",
                                 message=f"Broken internal link: {link['url']}",
                                 rule=self.RULE_BROKEN_LINK,
@@ -373,9 +377,9 @@ class FlextQualityMarkdownValidation:
             validator = FlextQualityMarkdownValidation.Validator()
 
             if target.is_file():
-                result = validator.validate_structure(target)
-                if result.is_success:
-                    data = result.value
+                file_result = validator.validate_structure(target)
+                if file_result.is_success:
+                    data = file_result.value
                     if args.format == "json":
                         logger.info(json.dumps(asdict(data), indent=2))  # DEBUG
                     else:
@@ -388,10 +392,12 @@ class FlextQualityMarkdownValidation:
                                     f"Line {issue['line']}: {issue['message']}",
                                 )
                     return 0
-                logger.error(f"Error: {result.error}")  # DEBUG
+                logger.error(f"Error: {file_result.error}")  # DEBUG
                 return 1
 
-            result = validator.validate_directory(target)
+            result: FlextResult[FlextQualityMarkdownValidation.ValidationReport] = (
+                validator.validate_directory(target)
+            )
             if result.is_success:
                 report = result.value
                 if args.format == "json":

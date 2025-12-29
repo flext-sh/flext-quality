@@ -30,6 +30,7 @@ from typing import Self
 
 import libcst as cst
 from flext_core import FlextLogger, FlextResult
+from libcst.metadata import MetadataWrapper
 
 
 class FlextQualityCodeTransformer:
@@ -65,7 +66,7 @@ class FlextQualityCodeTransformer:
 
         def leave_ImportFrom(
             self: Self,
-            original_node: cst.ImportFrom,
+            _original_node: cst.ImportFrom,
             updated_node: cst.ImportFrom,
         ) -> cst.ImportFrom | cst.RemovalSentinel:
             """Remove ImportFrom if it matches the target module."""
@@ -114,7 +115,7 @@ class FlextQualityCodeTransformer:
 
         def leave_ClassDef(
             self: Self,
-            original_node: cst.ClassDef,
+            _original_node: cst.ClassDef,
             updated_node: cst.ClassDef,
         ) -> cst.ClassDef:
             """Replace base class if it matches."""
@@ -158,7 +159,7 @@ class FlextQualityCodeTransformer:
 
         def leave_ClassDef(
             self: Self,
-            original_node: cst.ClassDef,
+            _original_node: cst.ClassDef,
             updated_node: cst.ClassDef,
         ) -> cst.ClassDef:
             """Add base class if it matches the target class."""
@@ -211,7 +212,7 @@ class FlextQualityCodeTransformer:
 
         def leave_FunctionDef(
             self: Self,
-            original_node: cst.FunctionDef,
+            _original_node: cst.FunctionDef,
             updated_node: cst.FunctionDef,
         ) -> cst.FunctionDef | cst.RemovalSentinel:
             """Remove function if it should be nested."""
@@ -222,7 +223,7 @@ class FlextQualityCodeTransformer:
 
         def leave_ClassDef(
             self: Self,
-            original_node: cst.ClassDef,
+            _original_node: cst.ClassDef,
             updated_node: cst.ClassDef,
         ) -> cst.ClassDef:
             """Add functions to target class."""
@@ -259,7 +260,7 @@ class FlextQualityCodeTransformer:
 
         def leave_ClassDef(
             self: Self,
-            original_node: cst.ClassDef,
+            _original_node: cst.ClassDef,
             updated_node: cst.ClassDef,
         ) -> cst.ClassDef | cst.FlattenSentinel[cst.BaseStatement]:
             """Extract methods from target class."""
@@ -280,7 +281,7 @@ class FlextQualityCodeTransformer:
                         params=stmt.params.with_changes(params=params)
                     )
                     extracted.append(extracted_func)
-                else:
+                elif isinstance(stmt, cst.BaseStatement):
                     remaining_body.append(stmt)
 
             if not extracted:
@@ -306,8 +307,10 @@ class FlextQualityCodeTransformer:
             if isinstance(node, cst.Name):
                 return node.value
             if isinstance(node, cst.Attribute):
-                prefix = FlextQualityCodeTransformer.Helpers.get_dotted_name(node.value)
-                return f"{prefix}.{node.attr.value}"
+                if isinstance(node.value, (cst.Attribute, cst.Name)):
+                    prefix = FlextQualityCodeTransformer.Helpers.get_dotted_name(node.value)
+                    return f"{prefix}.{node.attr.value}"
+                return node.attr.value
             return ""
 
         @staticmethod
@@ -442,7 +445,8 @@ class FlextQualityCodeTransformer:
                 checker = FlextQualityCodeTransformer._StatementCheckerVisitor(
                     module_name
                 )
-                module.walk(checker)
+                wrapper = MetadataWrapper(module)
+                wrapper.visit(checker)
                 return FlextResult[bool].ok(checker.found)
 
             except cst.ParserSyntaxError as e:
@@ -535,7 +539,8 @@ class FlextQualityCodeTransformer:
             try:
                 module = cst.parse_module(source)
                 finder = FlextQualityCodeTransformer._ClassFinderVisitor()
-                module.walk(finder)
+                wrapper = MetadataWrapper(module)
+                wrapper.visit(finder)
                 return FlextResult[list[dict[str, str | list[str] | int]]].ok(
                     finder.classes
                 )
