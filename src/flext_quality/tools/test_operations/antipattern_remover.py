@@ -274,18 +274,18 @@ class FlextQualityTestAntipatternOperation(FlextService[dict[str, t.GeneralValue
 
         for target in targets:
             if target.is_file():
-                result = self.analyze(target)
-                if result.is_success:
+                file_result = self.analyze(target)
+                if file_result.is_success:
                     file_count += 1
-                    for violation in result.value.violations:
+                    for violation in file_result.value.violations:
                         total_violations += 1
                         violations_by_type[violation.pattern_type] = (
                             violations_by_type.get(violation.pattern_type, 0) + 1
                         )
             elif target.is_dir():
-                result = self.analyze_directory(target)
-                if result.is_success:
-                    for analysis in result.value:
+                dir_result = self.analyze_directory(target)
+                if dir_result.is_success:
+                    for analysis in dir_result.value:
                         file_count += 1
                         for violation in analysis.violations:
                             total_violations += 1
