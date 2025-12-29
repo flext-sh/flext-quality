@@ -231,7 +231,7 @@ class FlextQualityTestAntipatternOperation(FlextService[dict[str, t.GeneralValue
         self: Self,
         directory: Path,
         pattern: str = "test_*.py",
-    ) -> r[list[AnalysisResult]]:
+    ) -> r[list[FlextQualityTestAntipatternOperation.AnalysisResult]]:
         """Analyze all test files in a directory.
 
         Args:
@@ -301,12 +301,12 @@ class FlextQualityTestAntipatternOperation(FlextService[dict[str, t.GeneralValue
 
         return r[dict[str, t.GeneralValueType]].ok(summary)
 
-    def execute(
+    def run(
         self: Self,
         targets: list[Path],
         _backup_path: Path | None = None,
     ) -> r[dict[str, t.GeneralValueType]]:
-        """Execute anti-pattern detection (same as dry_run for detection-only).
+        """Run anti-pattern detection (same as dry_run for detection-only).
 
         Args:
             targets: List of files or directories to analyze
@@ -318,6 +318,18 @@ class FlextQualityTestAntipatternOperation(FlextService[dict[str, t.GeneralValue
         """
         # Detection-only operation - same as dry_run
         return self.dry_run(targets)
+
+    def execute(self: Self) -> r[dict[str, t.GeneralValueType]]:
+        """Execute the service operation.
+
+        Implementation of FlextService abstract method.
+        Uses current directory as default target.
+
+        Returns:
+            FlextResult with operation summary
+
+        """
+        return self.dry_run([Path.cwd()])
 
     def rollback(
         self: Self, _backup_path: Path
