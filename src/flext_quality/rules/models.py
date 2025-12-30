@@ -27,6 +27,7 @@ class RuleCategory(StrEnum):
     - Language-specific: PYTHON_CODE, TYPESCRIPT_CODE, JAVASCRIPT_CODE, GO_CODE, RUST_CODE
     - Domain-specific: BASH_COMMAND, TYPE_SYSTEM, ARCHITECTURE, FILE_PROTECTION
     - Configuration: YAML_QUALITY, JSON_QUALITY
+    - Operations: SECURITY, GIT_OPERATIONS, CODE_QUALITY, FILE_OPERATIONS, PROJECT_FILES, DEPENDENCIES
     """
 
     # Language-specific categories
@@ -45,6 +46,20 @@ class RuleCategory(StrEnum):
     # Configuration file categories
     YAML_QUALITY = "yaml_quality"
     JSON_QUALITY = "json_quality"
+
+    # Operations and quality categories
+    SECURITY = "security"
+    GIT_OPERATIONS = "git_operations"
+    CODE_QUALITY = "code_quality"
+    FILE_OPERATIONS = "file_operations"
+    PROJECT_FILES = "project_files"
+    DEPENDENCIES = "dependencies"
+    BEHAVIORAL = "behavioral"
+    DRY_PRINCIPLE = "dry_principle"
+    FLEXTRESULT = "flextresult"
+    NAMESPACE = "namespace"
+    QUALITY_GATES = "quality_gates"
+    SOLID_PRINCIPLES = "solid_principles"
 
 
 class RuleSeverity(StrEnum):

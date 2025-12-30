@@ -28,12 +28,21 @@ Supports:
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 from typing import Any
 
 import yaml
 
 from .models import RuleCategory, RuleSeverity, ValidationRule
+
+logger = logging.getLogger(__name__)
+
+# Import PyprojectParser for dependency resolution
+try:
+    from flext_quality.tools.workspace_discovery import FlextWorkspaceDiscovery
+except ImportError:
+    FlextWorkspaceDiscovery = None
 
 
 class RuleLoader:
@@ -62,20 +71,31 @@ class RuleLoader:
     def load_all(cls) -> list[ValidationRule]:
         """Load all global rules from data/*.yaml files.
 
-        Returns:
-            List of ValidationRule objects from all global YAML files.
+        Loads as many rules as possible, reporting errors for files that fail.
 
-        Raises:
-            ValueError: If any YAML file has parsing or validation errors.
+        Returns:
+            List of ValidationRule objects from all successfully loaded YAML files.
 
         """
         rules: list[ValidationRule] = []
+        errors: list[tuple[str, str]] = []
 
         if not cls.DATA_DIR.exists():
             return rules
 
         for yaml_file in sorted(cls.DATA_DIR.glob("*.yaml")):
-            rules.extend(cls.load_file(yaml_file))
+            try:
+                rules.extend(cls.load_file(yaml_file))
+            except (ValueError, OSError) as e:
+                errors.append((yaml_file.name, str(e)))
+
+        # Report errors after loading all files
+        if errors:
+            error_lines = [f"  ❌ {fname}: {err.split(chr(10))[0]}" for fname, err in errors]
+            logger.warning(f"Errors loading {len(errors)} YAML files")
+            for line in error_lines:
+                logger.warning(line)
+            logger.info(f"Loaded {len(rules)} rules from {len(list(cls.DATA_DIR.glob('*.yaml'))) - len(errors)} valid files")
 
         return rules
 
@@ -296,6 +316,88 @@ class RuleLoader:
             for f in cls.FRAMEWORKS_DIR.glob("*.yaml")
             if f.is_file()
         ])
+
+    @classmethod
+    def get_project_dependencies(cls, project_path: Path) -> list[str]:
+        """Get flext-* dependencies from project's pyproject.toml.
+
+        Uses existing FlextWorkspaceDiscovery.PyprojectParser to read dependencies.
+
+        Args:
+            project_path: Path to project root (e.g., /home/user/flext/flext-core)
+
+        Returns:
+            List of flext-* dependency names (e.g., ["flext-core", "flext-cli"])
+            Empty list if no dependencies found or pyproject.toml missing
+
+        """
+        if FlextWorkspaceDiscovery is None:
+            return []
+
+        pyproject = project_path / "pyproject.toml"
+
+        if not pyproject.exists():
+            return []
+
+        # Use existing PyprojectParser from workspace_discovery
+        result = FlextWorkspaceDiscovery.PyprojectParser.parse_dependencies(pyproject)
+
+        # PyprojectParser returns FlextResult[list[str]]
+        if hasattr(result, "is_failure") and result.is_failure:
+            return []
+
+        if hasattr(result, "unwrap"):
+            return result.unwrap()
+
+        # Fallback: if not FlextResult, assume it's a list
+        return result if isinstance(result, list) else []
+
+    @classmethod
+    def load_project_with_dependencies(
+        cls, project_path: Path, workspace_root: Path | None = None
+    ) -> list[ValidationRule]:
+        """Load rules for project and all its dependencies recursively.
+
+        Reads project dependencies from pyproject.toml and loads rules from all
+        dependent projects, ensuring proper ordering (foundation libs first).
+
+        Args:
+            project_path: Path to project root
+            workspace_root: Path to workspace root (parent of all projects).
+                           Auto-detected from project_path if None.
+
+        Returns:
+            Combined list of rules from project and all dependencies
+
+        """
+        # Auto-detect workspace root if not provided
+        if workspace_root is None:
+            workspace_root = project_path.parent
+
+        # Get this project's dependencies
+        dependencies = cls.get_project_dependencies(project_path)
+
+        rules: list[ValidationRule] = []
+        seen: set[str] = set()
+
+        # Load dependencies first (in order - foundation first)
+        for dep_name in dependencies:
+            if dep_name in seen:
+                continue  # Skip already processed
+
+            dep_path = workspace_root / dep_name
+
+            if dep_path.exists() and dep_path.is_dir():
+                # Recursively load this dependency's rules and its dependencies
+                dep_rules = cls.load_project_with_dependencies(dep_path, workspace_root)
+                rules.extend(dep_rules)
+                seen.add(dep_name)
+
+        # Load this project's rules last (higher precedence)
+        project_rules = cls.load_all()  # Global rules always included
+        rules.extend(project_rules)
+
+        return rules
 
 
 __all__ = ["RuleLoader"]

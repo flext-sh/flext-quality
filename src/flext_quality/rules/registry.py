@@ -9,10 +9,14 @@ for fast filtering and lookup.
 
 from __future__ import annotations
 
+import logging
 from fnmatch import fnmatch
+from typing import ClassVar, Self
 
 from .loader import RuleLoader
 from .models import RuleCategory, RuleSeverity, ValidationRule
+
+logger = logging.getLogger(__name__)
 
 
 class RuleRegistry:
@@ -36,39 +40,32 @@ class RuleRegistry:
 
     """
 
-    _instance: RuleRegistry | None = None
-    _initialized: bool = False
-    _rules: dict[str, ValidationRule] = {}
-    _by_category: dict[RuleCategory, list[ValidationRule]] = {}
-    _by_severity: dict[RuleSeverity, list[ValidationRule]] = {}
-    _by_tag: dict[str, list[ValidationRule]] = {}
+    _instance: ClassVar[RuleRegistry | None] = None
+    _initialized: ClassVar[bool] = False
+    _rules: ClassVar[dict[str, ValidationRule]] = {}
+    _by_category: ClassVar[dict[RuleCategory, list[ValidationRule]]] = {}
+    _by_severity: ClassVar[dict[RuleSeverity, list[ValidationRule]]] = {}
+    _by_tag: ClassVar[dict[str, list[ValidationRule]]] = {}
 
-    def __new__(cls) -> RuleRegistry:
+    def __new__(cls) -> Self:
         """Implement singleton pattern."""
         if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._instance._initialize()
-        return cls._instance
-
-    def _initialize(self) -> None:
-        """Initialize registry by loading all rules from YAML files."""
-        if self._initialized:
-            return
-
-        self._rules = {}
-        self._by_category = {cat: [] for cat in RuleCategory}
-        self._by_severity = {sev: [] for sev in RuleSeverity}
-        self._by_tag = {}
-
-        try:
+            instance = super().__new__(cls)
+            cls._instance = instance
+            # Initialize registry data
+            instance._rules = {}
+            instance._by_category = {cat: [] for cat in RuleCategory}
+            instance._by_severity = {sev: [] for sev in RuleSeverity}
+            instance._by_tag = {}
+            instance._initialized = False
+            # Load rules
             rules = RuleLoader.load_all()
+            if not rules:
+                logger.warning("No validation rules loaded from YAML files")
             for rule in rules:
-                self._register(rule)
-        except (ValueError, OSError, ImportError):
-            # Silently continue if rules cannot be loaded
-            pass
-
-        self._initialized = True
+                instance._register(rule)
+            instance._initialized = True
+        return cls._instance
 
     def _register(self, rule: ValidationRule) -> None:
         """Register a rule in all indices."""
@@ -163,11 +160,11 @@ class RuleRegistry:
             List of applicable rules
 
         """
-        result = []
-        for rule in self._rules.values():
-            if self._rule_applies_to_file(rule, file_path):
-                result.append(rule)
-        return result
+        return [
+            rule
+            for rule in self._rules.values()
+            if self._rule_applies_to_file(rule, file_path)
+        ]
 
     def _rule_applies_to_file(self, rule: ValidationRule, file_path: str) -> bool:
         """Check if a rule applies to a specific file.

@@ -18,6 +18,7 @@ import ast
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import ClassVar
 
 from flext_core import FlextLogger, FlextResult, FlextService
 
@@ -42,7 +43,7 @@ class FlextConstantsPlugin(FlextService[int]):
     __slots__ = ("_constant_mappings", "_logger", "_pattern_mappings")
 
     # Hardcoded patterns to detect
-    HARDCODED_PATTERNS = {
+    HARDCODED_PATTERNS: ClassVar[dict[str, str]] = {
         "localhost": "FlextConstants.Network.LOCALHOST",
         "127.0.0.1": "FlextConstants.Network.LOOPBACK_IP",
         "8000": "FlextConstants.Platform.FLEXT_API_PORT",
@@ -51,7 +52,7 @@ class FlextConstantsPlugin(FlextService[int]):
     }
 
     # FLEXT architectural violation patterns
-    ARCHITECTURAL_PATTERNS = {
+    ARCHITECTURAL_PATTERNS: ClassVar[dict[str, str]] = {
         r"from\s+click\s+import": "Direct CLI library import (use flext-cli)",
         r"from\s+rich\s+import": "Direct rich import (use flext-cli)",
         r"from\s+sqlalchemy\s+import": "Direct ORM import (use flext-db-*)",
@@ -99,7 +100,7 @@ class FlextConstantsPlugin(FlextService[int]):
         # Pre-compile regex patterns for performance
         self._hardcoded_regexes = {
             pattern: re.compile(rf"\b{re.escape(pattern)}\b")
-            for pattern in self.HARDCODED_PATTERNS.keys()
+            for pattern in self.HARDCODED_PATTERNS
         }
 
         self._architectural_regexes = {
@@ -191,7 +192,7 @@ class FlextConstantsPlugin(FlextService[int]):
             return FlextResult.success(result)
 
         except Exception as e:
-            self._logger.error(f"Constants check failed for {project_path}: {e}")
+            self._logger.exception(f"Constants check failed for {project_path}")
             return FlextResult.failure(f"Constants check failed: {e}")
 
     def _check_directory(
@@ -205,7 +206,7 @@ class FlextConstantsPlugin(FlextService[int]):
 
         try:
             for py_file in directory.rglob("*.py"):
-                if self._should_check_file(py_file, context):
+                if self._should_check_file(py_file):
                     file_result = self._check_file(py_file, context)
                     violations.extend(file_result.violations)
                     constants_found += file_result.constants_found
@@ -244,7 +245,7 @@ class FlextConstantsPlugin(FlextService[int]):
 
             # Check for architectural violations
             arch_violations = self._check_architectural_patterns(
-                file_path, content, lines
+                file_path, content
             )
             violations.extend(arch_violations)
 
@@ -279,7 +280,7 @@ class FlextConstantsPlugin(FlextService[int]):
         violations = []
 
         # Skip certain contexts where hardcoded values are acceptable
-        if context in ["tests", "examples"] or "test" in str(file_path).lower():
+        if context in {"tests", "examples"} or "test" in str(file_path).lower():
             return violations
 
         for pattern, regex in self._hardcoded_regexes.items():
@@ -317,7 +318,7 @@ class FlextConstantsPlugin(FlextService[int]):
         return violations
 
     def _check_architectural_patterns(
-        self, file_path: Path, content: str, lines: list[str]
+        self, file_path: Path, content: str
     ) -> list[Violation]:
         """Check for architectural pattern violations."""
         violations = []
@@ -409,7 +410,7 @@ class FlextConstantsPlugin(FlextService[int]):
 
         return violations
 
-    def _should_check_file(self, file_path: Path, context: str) -> bool:
+    def _should_check_file(self, file_path: Path) -> bool:
         """Determine if file should be checked."""
         # Skip certain directories and files
         skip_patterns = [
@@ -437,7 +438,4 @@ class FlextConstantsPlugin(FlextService[int]):
             return True
 
         # Basic docstring detection (would need more sophisticated parsing for multi-line)
-        if '"""' in line or "'''" in line:
-            return True
-
-        return False
+        return bool('"""' in line or "'''" in line)

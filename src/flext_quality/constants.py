@@ -694,33 +694,6 @@ class FlextQualityConstants(FlextConstants):
             MAX_FILES_PER_BATCH: int = 50
             AUTO_ROLLBACK_THRESHOLD: int = 0
 
-        class Hooks:
-            """Hook validation constants for shell integration.
-
-            Provides patterns and module lists for FLEXT enforcement hooks.
-            """
-
-            # Foundation modules that cannot import from services/api
-            FOUNDATION_MODULES: tuple[str, ...] = (
-                "models",
-                "protocols",
-                "utilities",
-                "constants",
-                "typings",
-            )
-
-            # Directories where local constants are allowed (scripts, examples, etc.)
-            LOCAL_CONSTANTS_ALLOWED: tuple[str, ...] = (
-                "scripts/",
-                "examples/",
-            )
-
-            # Tier violation patterns for foundation modules
-            FORBIDDEN_IN_FOUNDATION: tuple[str, ...] = (
-                r"from.*\.(services|api)\s",
-                r"import.*\.(services|api)\s",
-            )
-
         # =============================================================================
         # SCORING AND PENALTIES - Quality score calculation constants
         # =============================================================================

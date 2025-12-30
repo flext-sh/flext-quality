@@ -1,4 +1,4 @@
-"""FLEXT Centralized Validation Rules System.
+r"""FLEXT Centralized Validation Rules System.
 
 This package provides a centralized, extensible system for validation rules
 used across all FLEXT projects and Claude Code hooks.
