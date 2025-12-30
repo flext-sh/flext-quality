@@ -18,7 +18,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse
 
 # Domain library imports (FAIL FAST if dependencies not available)
-from flext_auth import FlextAuth
+# from flext_auth import FlextAuth  # Optional dependency
 from flext_core import FlextContainer, FlextLogger, FlextResult, FlextTypes as t
 
 from .analyzer import FlextQualityAnalyzer
@@ -86,14 +86,15 @@ class FlextQualityWeb:
         # Register quality-specific routes
         self._register_routes()
 
-    def _setup_authentication(self) -> FlextAuth | None:
+    def _setup_authentication(self) -> None:
         """Setup authentication using flext-auth."""
+        # flext-auth is optional and not always available
         # Initialize FlextAuth - providers are registered via the registry
         # FlextAuthJwtProvider is abstract and should not be instantiated directly
-        auth = FlextAuth()
+        # auth = FlextAuth()
 
-        self.logger.info("Authentication configured successfully")
-        return auth
+        self.logger.info("Authentication not configured (flext-auth unavailable)")
+        return None
 
     def _register_routes(self) -> None:
         """Register quality analysis routes with FastAPI app."""

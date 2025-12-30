@@ -18,6 +18,7 @@ from __future__ import annotations
 from .code_quality_plugin import FlextCodeQualityPlugin
 from .duplication_plugin import FlextDuplicationPlugin
 from .mypy_plugin import FlextMyPyPlugin
+from .registry import FlextQualityPluginRegistry
 from .ruff_plugin import FlextRuffPlugin
 from .type_verification_plugin import FlextTypeVerificationPlugin
 
@@ -25,6 +26,7 @@ __all__ = [
     "FlextCodeQualityPlugin",
     "FlextDuplicationPlugin",
     "FlextMyPyPlugin",
+    "FlextQualityPluginRegistry",
     "FlextRuffPlugin",
     "FlextTypeVerificationPlugin",
 ]

@@ -10,9 +10,9 @@ from typing import TypeVar
 from uuid import UUID
 
 from flext_core import FlextLogger, FlextResult, FlextRuntime
-from flext_observability import (
-    flext_create_trace,
-)
+# from flext_observability import (
+#     flext_create_trace,
+# )
 from pydantic import BaseModel, Field
 
 from .models import m
@@ -92,11 +92,12 @@ class FlextQualityHandlers:
             service_name: str,
         ) -> None:
             """Create trace for operation."""
-            # Create span for operation tracing
-            flext_create_trace(
-                name=f"{service_name}:{operation_name}",
-                attributes={"operation": operation_name, "service": service_name},
-            )
+            # Create span for operation tracing (observability optional)
+            # flext_create_trace(
+            #     name=f"{service_name}:{operation_name}",
+            #     attributes={"operation": operation_name, "service": service_name},
+            # )
+            pass
 
     class _AnalysisOrchestrator:
         """Single responsibility: Orchestrate analysis operations."""

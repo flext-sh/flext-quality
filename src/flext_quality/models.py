@@ -18,6 +18,7 @@ from flext_core import FlextTypes as t
 from flext_core.utilities import u as flext_u
 from pydantic import BaseModel, Field
 
+from flext_quality._models.plugin import FlextQualityPlugin
 from flext_quality.constants import c
 from flext_quality.protocols import p
 from flext_quality.typings import PositiveInt, ScoreRange, Timestamp, t as qt

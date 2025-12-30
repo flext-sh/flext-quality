@@ -1,10 +1,13 @@
-"""Progressive Reporter for Hook Violations.
+"""Progressive Reporter for Hook Violations and Messages.
 
 Improves UX of error messages by:
 1. Showing BLOCKING violations first (TOP 3)
 2. Grouping violations by type
+3. Supporting exit codes 0/1/2
 3. Providing actionable guidance
 4. Showing count of additional violations
+5. JSON output formatting for hooks
+6. Educational message generation
 
 Usage:
     from flext_quality.hooks.reporter import ProgressiveReporter
@@ -12,11 +15,16 @@ Usage:
     reporter = ProgressiveReporter()
     formatted = reporter.format(violations)
     print(formatted)
+
+    # For hook output
+    json_output = reporter.format_json(violations, "allow")
+    print(json_output)
 """
 
 from __future__ import annotations
 
-from typing import NotRequired, TypedDict
+import json
+from typing import Any, NotRequired, TypedDict
 
 
 class ViolationDict(TypedDict):
@@ -155,3 +163,155 @@ class ProgressiveReporter:
             grouped[code].append(v)
 
         return grouped
+
+    def format_json(
+        self,
+        violations: list[ViolationDict],
+        decision: str = "allow",
+        exit_code: int | None = None,
+    ) -> str:
+        """Format violations and decision as JSON for hook output.
+
+        Args:
+            violations: List of violation dicts
+            decision: Hook decision ('allow', 'warn', 'block')
+            exit_code: Optional exit code (0=allow, 1=warn, 2=block)
+
+        Returns:
+            JSON string with structured hook output
+
+        """
+        blocking_count = len(
+            [v for v in violations if v.get("blocking", False)]
+        )
+
+        # CRITICAL: Override decision to "block" if blocking violations exist
+        if blocking_count > 0 and decision != "block":
+            decision = "block"
+
+        if exit_code is None:
+            # Infer exit code from decision (with blocking violations override)
+            exit_code = {"allow": 0, "warn": 1, "block": 2}.get(decision, 0)
+        elif blocking_count > 0:
+            # Force exit_code=2 if blocking violations present
+            exit_code = 2
+
+        output: dict[str, Any] = {
+            "decision": decision,
+            "exit_code": exit_code,
+            "reason": self._get_reason(decision, len(violations), blocking_count),
+            "violations_count": len(violations),
+            "blocking_count": blocking_count,
+        }
+
+        if violations:
+            output["violations"] = violations
+
+        return json.dumps(output)
+
+    def format_educational_message(
+        self,
+        violations: list[ViolationDict],
+        context: str = "code-quality",
+    ) -> str:
+        """Format educational message for learning from violations.
+
+        Args:
+            violations: List of violation dicts
+            context: Context for message ('code-quality', 'security', 'testing')
+
+        Returns:
+            Educational message string
+
+        """
+        if not violations:
+            return "✅ No violations found!\n\n"
+
+        lines: list[str] = []
+
+        # Header based on context
+        headers = {
+            "code-quality": "📚 Code Quality Learning",
+            "security": "🔒 Security Patterns",
+            "testing": "🧪 Testing Best Practices",
+        }
+
+        lines.extend([
+            f"\n{headers.get(context, '📚 Learning')}",
+            "=" * 50,
+        ])
+
+        # Group by code and provide education
+        grouped = self.group_by_code(violations)
+
+        for code, items in list(grouped.items())[:3]:  # Top 3 violation types
+            lines.append(
+                f"\n📌 {code} ({len(items)} occurrence{'s' if len(items) > 1 else ''})"
+            )
+            lines.append(f"   Message: {items[0].get('message', 'N/A')}")
+            lines.append("   How to fix: Review documentation and update code")
+
+        if len(grouped) > 3:
+            lines.append(f"\n... and {len(grouped) - 3} more violation types")
+
+        lines.append("\n" + "=" * 50)
+        return "\n".join(lines)
+
+    def _get_reason(
+        self,
+        decision: str,
+        total_count: int,
+        blocking_count: int,
+    ) -> str:
+        """Get human-readable reason for decision.
+
+        Args:
+            decision: Hook decision
+            total_count: Total violations
+            blocking_count: Blocking violations count
+
+        Returns:
+            Reason string
+
+        """
+        if decision == "block":
+            return f"Execution blocked: {blocking_count} blocking violation(s) found"
+        if decision == "warn":
+            return f"Execution allowed with warnings: {total_count} violation(s) found"
+        return "Execution allowed: no violations found"
+
+    def format_summary(
+        self,
+        violations: list[ViolationDict],
+        file_path: str | None = None,
+    ) -> str:
+        """Format concise summary of violations.
+
+        Args:
+            violations: List of violation dicts
+            file_path: Optional file path for context
+
+        Returns:
+            Summary string
+
+        """
+        if not violations:
+            return "✅ All checks passed"
+
+        blocking_count = len(
+            [v for v in violations if v.get("blocking", False)]
+        )
+        warning_count = len(violations) - blocking_count
+
+        parts = []
+        if file_path:
+            parts.append(f"📄 {file_path}")
+
+        if blocking_count > 0:
+            parts.append(f"🚫 {blocking_count} blocking")
+
+        if warning_count > 0:
+            plural = "s" if warning_count > 1 else ""
+            parts.append(f"⚠️  {warning_count} warning{plural}")
+
+        return " | ".join(parts) if parts else "No violations"
