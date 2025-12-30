@@ -3127,7 +3127,6 @@ files = [
     {file = "pyyaml-6.0.3-cp39-cp39-win_amd64.whl", hash = "sha256:2e71d11abed7344e42a8849600193d15b6def118602c4c176f748e4583246007"},
     {file = "pyyaml-6.0.3.tar.gz", hash = "sha256:d76623373421df22fb4cf8817020cbb7ef15c725b9d5e45f17e189bfc384190f"},
 ]
-markers = {main = "extra == \"tools\""}
 
 [[package]]
 name = "pyyaml-ft"
@@ -3997,4 +3996,4 @@ tools = ["bandit", "black", "complexipy", "coverage", "isort", "mypy", "pylint",
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "b7e05cda1f543051724b38925f615283fe81e8579cfbc124b08c8798bf10a2ed"
+content-hash = "5d06dfb1528846cf27049331bc488ac026a699e377d5a934956ada0551d97c16"

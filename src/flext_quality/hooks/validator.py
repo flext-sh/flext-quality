@@ -9,13 +9,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import re
 from pathlib import Path
 from typing import Self
 
 from flext_core import FlextResult, FlextService, FlextTypes as t
 
-from flext_quality.constants import c
+from flext_quality.rules.validators import validate_content
 from flext_quality.tools.batch_validators import FlextQualityBatchValidators
 from flext_quality.tools.quality_operations import FlextQualityOperations
 
@@ -112,7 +111,7 @@ class FlextHookValidator(FlextService[bool]):
         file_path: str,
         content: str,
     ) -> tuple[bool, list[str]]:
-        """Check FLEXT patterns in content.
+        """Check FLEXT patterns using centralized rule registry.
 
         Args:
             file_path: Path to the file (for context)
@@ -122,26 +121,25 @@ class FlextHookValidator(FlextService[bool]):
             (passed, violations) - list of violation messages
 
         """
-        violations: list[str] = []
-        path = Path(file_path)
-
-        # Check forbidden patterns from constants
-        violations.extend(
-            f"FORBIDDEN: Pattern {pattern!r} detected"
-            for pattern in c.Quality.Patterns.FORBIDDEN_PATTERNS
-            if re.search(pattern, content)
+        result = validate_content(
+            content=content,
+            file_path=file_path,
+            blocking_only=True,
         )
 
-        # Check architecture tier violations
-        module_name = path.stem
-        if module_name in c.Quality.Hooks.FOUNDATION_MODULES:
-            violations.extend(
-                "TIER VIOLATION: Foundation module importing from services/api"
-                for pattern in c.Quality.Hooks.FORBIDDEN_IN_FOUNDATION
-                if re.search(pattern, content)
-            )
+        if result.is_failure:
+            return False, [f"VALIDATION ERROR: {result.error}"]
 
-        return len(violations) == 0, violations
+        violations = result.unwrap()
+        if not violations:
+            return True, []
+
+        # Format messages with rule code and line number
+        messages = [
+            f"[{v.rule.code}] L{v.line}: {v.rule.guidance.strip()}"
+            for v in violations
+        ]
+        return False, messages
 
     def check_lint(
         self: Self,

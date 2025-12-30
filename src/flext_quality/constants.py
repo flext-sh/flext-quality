@@ -323,6 +323,29 @@ class FlextQualityConstants(FlextConstants):
                 "pytest",
             )
 
+        class Hooks:
+            """Claude Code hooks validation patterns and rules.
+
+            Centralizes all hook-specific validation patterns to avoid duplication
+            between ~/.claude/hooks and flext-quality.
+            """
+
+            # Foundation modules that should NOT import from higher tiers
+            FOUNDATION_MODULES: tuple[str, ...] = (
+                "constants.py",
+                "typings.py",
+                "protocols.py",
+                "models.py",
+                "utilities.py",
+            )
+
+            # Patterns forbidden at foundation tier
+            FORBIDDEN_IN_FOUNDATION: tuple[str, ...] = (
+                "from flext_*.services import",
+                "from flext_*.api import",
+                "from flext_*.servers import",
+            )
+
         class Analysis:
             """Analysis configuration constants."""
 

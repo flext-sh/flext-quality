@@ -224,6 +224,154 @@ make diagnose          # Check system status and dependencies
 
 ---
 
+## 🔒 Centralized Validation Rules System
+
+### **Overview**
+
+The **Centralized Validation Rules System** provides enterprise-grade validation rules defined in YAML with Python integration, eliminating fallbacks and ensuring consistency across all FLEXT tools and hooks.
+
+**Status**: ✅ **COMPLETE AND OPERATIONAL** (v0.2.0)
+
+### **Architecture**
+
+**Hybrid YAML+Python Approach:**
+- **YAML**: Rule definitions (pattern, code, severity, guidance)
+- **Python**: Pydantic models, RuleRegistry singleton, Validators
+
+**Key Components:**
+
+```
+flext_quality/rules/
+├── models.py              # Pydantic: ValidationRule, RuleViolation, enums
+├── loader.py              # YAML→Python: RuleLoader with FlextResult error handling
+├── registry.py            # Singleton: RuleRegistry with indexed queries
+├── validators.py          # Validators: RuleValidator, validate_content()
+├── __init__.py            # Public API: registry, validate_content
+└── data/                  # YAML Rule Files (11 files)
+    ├── bash_commands.yaml
+    ├── type_system.yaml
+    ├── python_code.yaml
+    ├── architecture.yaml
+    ├── file_protection.yaml
+    ├── namespace.yaml
+    ├── solid_principles.yaml
+    ├── behavioral.yaml
+    ├── dry_principle.yaml
+    ├── quality_gates.yaml
+    └── flextresult.yaml
+```
+
+### **Integration Points**
+
+1. **flext-quality/hooks/patterns.py** → Pure registry-based (NO fallback)
+   - `registry.as_dangerous_commands()`
+   - Backward-compatible tuple format
+
+2. **flext-quality/hooks/validator.py** → Uses `validate_content()`
+   - RuleRegistry for blocking violations
+   - Complete pattern checking
+
+3. **~/.claude/hooks/utils/validators.py** → Hook patterns load from registry
+   - `DANGEROUS_COMMANDS` = `registry.as_dangerous_commands() + local`
+   - `TYPE_VERIFICATION_PATTERNS` = `registry.as_type_verification_patterns() + local`
+   - `CODE_QUALITY_VIOLATIONS` = `registry.as_code_quality_violations() + local`
+
+### **Zero Fallback Guarantee**
+
+✅ **NO fallback code anywhere**
+- Registry MUST be available or fail explicitly
+- All pattern sources use centralized rules
+- No try/except ImportError for missing dependencies
+
+### **How to Add/Modify Rules**
+
+#### **Option 1: Add Rule to Existing YAML**
+
+Edit `/home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/python_code.yaml`:
+
+```yaml
+rules:
+  - code: PC001
+    name: my_pattern
+    pattern: 'regex_pattern_here'
+    severity: high
+    guidance: |
+      Educational message explaining the issue.
+      Multiple lines supported.
+    blocking: true
+    tags: [tag1, tag2]
+```
+
+#### **Option 2: Create New YAML Category**
+
+Create `/home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/mycategory.yaml`:
+
+```yaml
+metadata:
+  category: mycategory  # Must match RuleCategory enum
+  version: "1.0.0"
+  description: "Category description"
+
+rules:
+  - code: MC001
+    name: my_rule
+    pattern: 'regex'
+    severity: critical
+    guidance: "Guidance message"
+    blocking: true
+```
+
+#### **Option 3: Add Project-Specific Rule**
+
+Edit `~/.claude/hooks/utils/validators.py` to append local rules:
+
+```python
+DANGEROUS_COMMANDS = registry.as_dangerous_commands() + [
+    (r"my_pattern", "my_code", "My guidance"),
+]
+```
+
+### **Testing Rules**
+
+```python
+from flext_quality.rules import registry
+
+# Test registry
+print(f"Total rules: {len(registry.all())}")
+
+# Test specific category
+bash_rules = registry.by_category(RuleCategory.BASH_COMMAND)
+print(f"Bash rules: {len(bash_rules)}")
+
+# Test validation
+from flext_quality.rules.validators import validate_content
+result = validate_content("code to check", file_path="test.py")
+if result.is_success:
+    violations = result.unwrap()
+    print(f"Violations: {len(violations)}")
+```
+
+### **Backward Compatibility**
+
+Registry exports legacy tuple format for existing code:
+
+```python
+# Old format still works
+DANGEROUS_COMMANDS: list[tuple[str, str, str]] = registry.as_dangerous_commands()
+
+# Each tuple: (regex_pattern, command_name, guidance_message)
+for pattern, name, guidance in DANGEROUS_COMMANDS:
+    # Check pattern...
+```
+
+### **Performance**
+
+- **Startup**: Rules loaded once via singleton
+- **Memory**: ~10KB for all 11 YAML files + rule objects
+- **Queries**: O(1) lookups by code, O(n) filtered queries with caching
+
+---
+
 ## 📊 Status and Metrics
 
 ### **Implementation Assessment**
