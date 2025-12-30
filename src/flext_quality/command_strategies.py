@@ -1,7 +1,13 @@
-"""FLEXT Quality Command Strategies - Execution thresholds and strategy constants.
+"""FLEXT Quality Command Strategies - Re-export from constants module.
 
-Command execution strategy thresholds for quality operations.
-Follows FLEXT standards for constants organization.
+Command execution strategy thresholds are defined in FlextQualityConstants.Quality.CommandStrategies.
+
+Import from constants directly:
+```python
+from flext_quality.constants import FlextQualityConstants as c
+
+threshold = c.Quality.CommandStrategies.Analysis.SUCCESS_THRESHOLD
+```
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -9,17 +15,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from flext_quality.constants import FlextQualityConstants
 
-class CommandStrategies:
-    """Command execution strategy thresholds."""
+# Re-export CommandStrategies for backward compatibility
+CommandStrategies = FlextQualityConstants.Quality.CommandStrategies
 
-    ANALYZE_SUCCESS_THRESHOLD: float = 80.0
-    ANALYZE_WARNING_THRESHOLD: float = 60.0
-    VALIDATE_SUCCESS_THRESHOLD: float = 70.0
-    SCORE_SUCCESS_THRESHOLD: float = 80.0
-    SCORE_WARNING_THRESHOLD: float = 60.0
-    CHECK_SUCCESS_THRESHOLD: float = 70.0
-    TEST_ANTIPATTERNS_THRESHOLD: float = 80.0
-    TEST_INHERITANCE_THRESHOLD: float = 80.0
-    TEST_STRUCTURE_THRESHOLD: float = 80.0
-    TEST_FIXTURES_THRESHOLD: float = 80.0
+__all__ = ["CommandStrategies"]

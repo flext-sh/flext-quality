@@ -35,6 +35,67 @@ class FlextQualityConstants(FlextConstants):
         """
 
         # =========================================================================
+        # COMMAND STRATEGY THRESHOLDS
+        # =========================================================================
+
+        class CommandStrategies:
+            """Command execution strategy thresholds for quality operations.
+
+            Provides both nested class access and convenience attributes:
+            - Nested: c.Analysis.SUCCESS_THRESHOLD, c.Scoring.SUCCESS_THRESHOLD
+            - Convenience: c.ANALYZE_SUCCESS_THRESHOLD, c.SCORE_SUCCESS_THRESHOLD
+            """
+
+            class Analysis:
+                """Analysis command thresholds."""
+
+                SUCCESS_THRESHOLD: float = 80.0
+                WARNING_THRESHOLD: float = 60.0
+                CRITICAL_THRESHOLD: float = 40.0
+
+            class Validation:
+                """Validation command thresholds."""
+
+                SUCCESS_THRESHOLD: float = 70.0
+                WARNING_THRESHOLD: float = 50.0
+                CRITICAL_THRESHOLD: float = 30.0
+
+            class Scoring:
+                """Quality scoring thresholds."""
+
+                SUCCESS_THRESHOLD: float = 80.0
+                WARNING_THRESHOLD: float = 60.0
+                CRITICAL_THRESHOLD: float = 40.0
+
+            class Testing:
+                """Testing-related thresholds."""
+
+                ANTIPATTERNS_THRESHOLD: float = 80.0
+                INHERITANCE_THRESHOLD: float = 80.0
+                STRUCTURE_THRESHOLD: float = 80.0
+                FIXTURES_THRESHOLD: float = 80.0
+                COVERAGE_MIN: float = 75.0
+
+            # =========================================================================
+            # Convenience attributes for CLI integration (backward compatibility)
+            # =========================================================================
+
+            # Analyze command shortcuts
+            ANALYZE_SUCCESS_THRESHOLD: float = Analysis.SUCCESS_THRESHOLD
+            ANALYZE_WARNING_THRESHOLD: float = Analysis.WARNING_THRESHOLD
+            ANALYZE_CRITICAL_THRESHOLD: float = Analysis.CRITICAL_THRESHOLD
+
+            # Score command shortcuts
+            SCORE_SUCCESS_THRESHOLD: float = Scoring.SUCCESS_THRESHOLD
+            SCORE_WARNING_THRESHOLD: float = Scoring.WARNING_THRESHOLD
+            SCORE_CRITICAL_THRESHOLD: float = Scoring.CRITICAL_THRESHOLD
+
+            # Validate command shortcuts
+            VALIDATE_SUCCESS_THRESHOLD: float = Validation.SUCCESS_THRESHOLD
+            VALIDATE_WARNING_THRESHOLD: float = Validation.WARNING_THRESHOLD
+            VALIDATE_CRITICAL_THRESHOLD: float = Validation.CRITICAL_THRESHOLD
+
+        # =========================================================================
         # COMPOSITION REFERENCES (Standardization Pattern) - Real Inheritance
         # =========================================================================
 
@@ -117,6 +178,69 @@ class FlextQualityConstants(FlextConstants):
             MAXIMUM_DUPLICATION: float = 5.0
             TARGET_DUPLICATION: float = 3.0
             EXCELLENT_DUPLICATION: float = 1.0
+
+        # =============================================================================
+        # COMMAND EXECUTION STRATEGIES - CLI command exit code thresholds
+        # =============================================================================
+
+        class Commands:
+            """Command execution strategy thresholds for CLI operations."""
+
+            # Analyze command thresholds
+            ANALYZE_SUCCESS_THRESHOLD: float = 80.0
+            ANALYZE_WARNING_THRESHOLD: float = 60.0
+
+            # Score command thresholds
+            SCORE_SUCCESS_THRESHOLD: float = 80.0
+            SCORE_WARNING_THRESHOLD: float = 60.0
+
+            # Check command thresholds (lint + type)
+            CHECK_SUCCESS_THRESHOLD: float = 70.0
+            CHECK_WARNING_THRESHOLD: float = 50.0
+
+            # Validate command thresholds
+            VALIDATE_SUCCESS_THRESHOLD: float = 70.0
+            VALIDATE_WARNING_THRESHOLD: float = 50.0
+
+            # Lint command thresholds
+            LINT_SUCCESS_THRESHOLD: float = 0.0
+            LINT_WARNING_THRESHOLD: float = 0.0
+
+            # Type check command thresholds
+            TYPE_CHECK_SUCCESS_THRESHOLD: float = 0.0
+            TYPE_CHECK_WARNING_THRESHOLD: float = 0.0
+
+            # Security command thresholds
+            SECURITY_SUCCESS_THRESHOLD: float = 0.0
+            SECURITY_WARNING_THRESHOLD: float = 0.0
+
+            # Test command thresholds
+            TEST_SUCCESS_THRESHOLD: float = 85.0
+            TEST_WARNING_THRESHOLD: float = 70.0
+
+            # Test antipatterns thresholds
+            TEST_ANTIPATTERNS_THRESHOLD: float = 80.0
+            TEST_ANTIPATTERNS_WARNING: float = 60.0
+
+            # Test inheritance thresholds
+            TEST_INHERITANCE_THRESHOLD: float = 80.0
+            TEST_INHERITANCE_WARNING: float = 60.0
+
+            # Test structure thresholds
+            TEST_STRUCTURE_THRESHOLD: float = 80.0
+            TEST_STRUCTURE_WARNING: float = 60.0
+
+            # Test fixtures thresholds
+            TEST_FIXTURES_THRESHOLD: float = 80.0
+            TEST_FIXTURES_WARNING: float = 60.0
+
+            # Code quality command thresholds
+            CODE_QUALITY_SUCCESS_THRESHOLD: float = 80.0
+            CODE_QUALITY_WARNING_THRESHOLD: float = 60.0
+
+            # Report command thresholds
+            REPORT_SUCCESS_THRESHOLD: float = 70.0
+            REPORT_WARNING_THRESHOLD: float = 50.0
 
         # =============================================================================
         # PERFORMANCE AND TIMEOUTS - Analysis performance limits

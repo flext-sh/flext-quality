@@ -13,6 +13,7 @@ from datetime import UTC, datetime
 from typing import Self, TypedDict
 from uuid import UUID, uuid4
 
+from flext_cli import FlextCliModels as cli_m
 from flext_core import FlextTypes as t
 from flext_core.utilities import u as flext_u
 from pydantic import BaseModel, Field
@@ -25,16 +26,19 @@ from flext_quality.typings import PositiveInt, ScoreRange, Timestamp, t as qt
 ParameterValue = str | int | float | bool
 
 
-class FlextQualityModels:
-    """FLEXT Quality Models - Unified namespace for models."""
+class FlextQualityModels(cli_m):
+    """FLEXT Quality Models - Extends FlextCliModels with quality-specific models.
+
+    Inherits all base models from FlextCliModels (which extends FlextModels)
+    and adds quality-specific models in the Quality namespace.
+    """
 
     def __init_subclass__(cls, **kwargs: t.GeneralValueType) -> None:
         """Warn when FlextQualityModels is subclassed directly."""
         super().__init_subclass__(**kwargs)
         flext_u.Deprecation.warn_once(
             f"subclass:{cls.__name__}",
-            "Subclassing FlextQualityModels is deprecated. "
-            "Use FlextModels directly with composition instead.",
+            "Subclassing FlextQualityModels is deprecated. Use composition instead.",
         )
 
     # =========================================================================
