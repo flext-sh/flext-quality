@@ -234,15 +234,6 @@ class ProjectQualityAnalyzer:
         except Exception as e:
             return FlextResult[FlextQualityAnalyzer].fail(f"Analysis error: {e}")
 
-    def get_exit_code(self, quality_score: float) -> int:
-        """Determine exit code based on quality score."""
-        thresholds = self.config.thresholds
-        if quality_score >= thresholds.good_threshold:
-            return 0
-        if quality_score >= thresholds.medium_threshold:
-            return 1
-        return 2
-
 
 class CliCommandRouter:
     """Routes CLI commands to appropriate handlers."""
@@ -253,7 +244,6 @@ class CliCommandRouter:
         self.logger = logger
         self.config = config
         self.formatter = QualityReportFormatter(logger)
-        self.analyzer_wrapper = ProjectQualityAnalyzer(logger, config)
         self._cli = FlextCli()
         self._console = Console()
         self._quiet_mode = False
@@ -419,7 +409,8 @@ class CliCommandRouter:
             include_dead_code=args.include_dead_code,
             include_duplicates=args.include_duplicates,
         )
-        analyzer_result = self.analyzer_wrapper.analyze(project_path, options)
+        analyzer_wrapper = ProjectQualityAnalyzer(self.logger, self.config)
+        analyzer_result = analyzer_wrapper.analyze(project_path, options)
 
         if analyzer_result.is_failure:
             self.logger.error(analyzer_result.error or "Unknown error")
@@ -479,7 +470,8 @@ class CliCommandRouter:
             include_dead_code=False,
             include_duplicates=False,
         )
-        analyzer_result = self.analyzer_wrapper.analyze(project_path, options)
+        analyzer_wrapper = ProjectQualityAnalyzer(self.logger, self.config)
+        analyzer_result = analyzer_wrapper.analyze(project_path, options)
 
         if analyzer_result.is_failure:
             self.logger.error(analyzer_result.error or "Unknown error")
