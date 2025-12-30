@@ -94,7 +94,6 @@ class FlextQualityWeb:
         # auth = FlextAuth()
 
         self.logger.info("Authentication not configured (flext-auth unavailable)")
-        return None
 
     def _register_routes(self) -> None:
         """Register quality analysis routes with FastAPI app."""

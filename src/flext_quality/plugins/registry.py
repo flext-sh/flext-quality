@@ -4,19 +4,22 @@ Following patterns from:
 - flext-api/src/flext_api/registry.py (FlextApiRegistry)
 - flext-ldif/src/flext_ldif/services/registry.py (FlextLdifServiceRegistry)
 """
+
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, ClassVar, Self
+from typing import ClassVar, Self
 
-from flext_core import FlextRegistry
-from flext_core import FlextResult as r
-from flext_core import FlextProtocols as p
-from flext_core import FlextTypes as t
+from flext_core import (
+    FlextProtocols as p,
+    FlextRegistry,
+    FlextResult as r,
+    FlextTypes as t,
+)
 
 from flext_quality._models.plugin import FlextQualityPlugin
-
-if TYPE_CHECKING:
-    from flext_quality.plugins.base import FlextQualityPlugin as FlextQualityPluginProtocol
+from flext_quality.plugins.base import (
+    FlextQualityPlugin as FlextQualityPluginProtocol,
+)
 
 
 class FlextQualityPluginRegistry(FlextRegistry):
@@ -67,6 +70,7 @@ class FlextQualityPluginRegistry(FlextRegistry):
         Args:
             dispatcher: Optional CQRS dispatcher (not used for quality plugins).
             **data: Additional Pydantic model data.
+
         """
         super().__init__(dispatcher=dispatcher, **data)
         # Local cache for instantiated plugins (following FlextApiRegistry pattern)
@@ -84,6 +88,7 @@ class FlextQualityPluginRegistry(FlextRegistry):
 
         Returns:
             Global FlextQualityPluginRegistry instance.
+
         """
         if cls._global_instance is None:
             cls._global_instance = cls()
@@ -119,6 +124,7 @@ class FlextQualityPluginRegistry(FlextRegistry):
 
         Returns:
             r[bool]: Success if registered (idempotent for same metadata).
+
         """
         # Determine category based on plugin type
         category = self.QUALITY_PLUGINS
@@ -148,11 +154,10 @@ class FlextQualityPluginRegistry(FlextRegistry):
 
         Returns:
             r[bool]: Success if registered.
+
         """
         if FlextQualityPlugin.Category.LANGUAGE not in metadata.categories:
-            return r[bool].fail(
-                f"Plugin {metadata.name} is not a language detector"
-            )
+            return r[bool].fail(f"Plugin {metadata.name} is not a language detector")
 
         self._metadata_cache[metadata.name] = metadata
         return self.register_class_plugin(
@@ -176,6 +181,7 @@ class FlextQualityPluginRegistry(FlextRegistry):
 
         Returns:
             r[Metadata]: Plugin metadata or failure.
+
         """
         # Check local cache first
         if name in self._metadata_cache:
@@ -188,9 +194,7 @@ class FlextQualityPluginRegistry(FlextRegistry):
             result = self.get_class_plugin(self.LANGUAGE_DETECTORS, name)
 
         if result.is_failure:
-            return r[FlextQualityPlugin.Metadata].fail(
-                f"Plugin '{name}' not found"
-            )
+            return r[FlextQualityPlugin.Metadata].fail(f"Plugin '{name}' not found")
 
         # Type narrow and cache
         if not isinstance(result.value, FlextQualityPlugin.Metadata):
@@ -214,6 +218,7 @@ class FlextQualityPluginRegistry(FlextRegistry):
 
         Returns:
             r[Plugin]: Instantiated plugin or failure.
+
         """
         # Check instance cache
         if name in self._plugin_instances:
@@ -239,6 +244,7 @@ class FlextQualityPluginRegistry(FlextRegistry):
 
         Returns:
             r[list[str]]: List of plugin names.
+
         """
         result = self.list_class_plugins(self.QUALITY_PLUGINS)
         if result.is_failure:
@@ -250,6 +256,7 @@ class FlextQualityPluginRegistry(FlextRegistry):
 
         Returns:
             r[list[str]]: List of detector names.
+
         """
         result = self.list_class_plugins(self.LANGUAGE_DETECTORS)
         if result.is_failure:
@@ -263,6 +270,7 @@ class FlextQualityPluginRegistry(FlextRegistry):
 
         Returns:
             List of all plugin metadata objects.
+
         """
         # Combine both categories
         all_names: set[str] = set()
@@ -294,11 +302,9 @@ class FlextQualityPluginRegistry(FlextRegistry):
 
         Returns:
             List of metadata for plugins in the category.
+
         """
-        return [
-            m for m in self.get_all_metadata()
-            if category in m.categories
-        ]
+        return [m for m in self.get_all_metadata() if category in m.categories]
 
     def filter_by_language(
         self: Self,
@@ -311,11 +317,9 @@ class FlextQualityPluginRegistry(FlextRegistry):
 
         Returns:
             List of metadata for plugins supporting the language.
+
         """
-        return [
-            m for m in self.get_all_metadata()
-            if m.applies_to_language(language)
-        ]
+        return [m for m in self.get_all_metadata() if m.applies_to_language(language)]
 
     def filter_applicable(
         self: Self,
@@ -334,18 +338,19 @@ class FlextQualityPluginRegistry(FlextRegistry):
 
         Returns:
             Sorted list of applicable plugin metadata (by priority).
+
         """
         applicable = self.filter_by_language(language)
 
         if categories:
             applicable = [
-                m for m in applicable
-                if any(cat in m.categories for cat in categories)
+                m for m in applicable if any(cat in m.categories for cat in categories)
             ]
 
         if exclude_language_detectors:
             applicable = [
-                m for m in applicable
+                m
+                for m in applicable
                 if FlextQualityPlugin.Category.LANGUAGE not in m.categories
             ]
 
@@ -363,6 +368,7 @@ class FlextQualityPluginRegistry(FlextRegistry):
 
         Returns:
             r[bool]: Success if registry is ready.
+
         """
         # Registry is always ready (stateless)
         return r[bool].ok(True)

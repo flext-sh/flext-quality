@@ -91,11 +91,15 @@ class RuleLoader:
 
         # Report errors after loading all files
         if errors:
-            error_lines = [f"  ❌ {fname}: {err.split(chr(10))[0]}" for fname, err in errors]
+            error_lines = [
+                f"  ❌ {fname}: {err.split(chr(10))[0]}" for fname, err in errors
+            ]
             logger.warning(f"Errors loading {len(errors)} YAML files")
             for line in error_lines:
                 logger.warning(line)
-            logger.info(f"Loaded {len(rules)} rules from {len(list(cls.DATA_DIR.glob('*.yaml'))) - len(errors)} valid files")
+            logger.info(
+                f"Loaded {len(rules)} rules from {len(list(cls.DATA_DIR.glob('*.yaml'))) - len(errors)} valid files"
+            )
 
         return rules
 
@@ -131,7 +135,9 @@ class RuleLoader:
                 category = RuleCategory(category_str)
             except ValueError as e:
                 valid = ", ".join(c.value for c in RuleCategory)
-                msg = f"Invalid category '{category_str}' in {path.name}. Valid: {valid}"
+                msg = (
+                    f"Invalid category '{category_str}' in {path.name}. Valid: {valid}"
+                )
                 raise ValueError(msg) from e
 
             rules: list[ValidationRule] = []
@@ -312,9 +318,7 @@ class RuleLoader:
             return []
 
         return sorted([
-            f.stem
-            for f in cls.FRAMEWORKS_DIR.glob("*.yaml")
-            if f.is_file()
+            f.stem for f in cls.FRAMEWORKS_DIR.glob("*.yaml") if f.is_file()
         ])
 
     @classmethod

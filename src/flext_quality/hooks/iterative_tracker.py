@@ -168,9 +168,7 @@ class IterativeEditTracker(FlextService[dict[str, t.GeneralValueType]]):
             return FlextResult[PendingEdit].ok(edit)
 
         except Exception as e:
-            return FlextResult[PendingEdit].error(
-                f"Failed to start edit: {e!s}"
-            )
+            return FlextResult[PendingEdit].error(f"Failed to start edit: {e!s}")
 
     def mark_complete(
         self: Self,
@@ -213,9 +211,7 @@ class IterativeEditTracker(FlextService[dict[str, t.GeneralValueType]]):
             return FlextResult[bool].ok(True)
 
         except Exception as e:
-            return FlextResult[bool].error(
-                f"Failed to mark complete: {e!s}"
-            )
+            return FlextResult[bool].error(f"Failed to mark complete: {e!s}")
 
     def cleanup_stale(
         self: Self,
@@ -263,9 +259,7 @@ class IterativeEditTracker(FlextService[dict[str, t.GeneralValueType]]):
             return FlextResult[int].ok(removed_count)
 
         except Exception as e:
-            return FlextResult[int].error(
-                f"Failed to cleanup: {e!s}"
-            )
+            return FlextResult[int].error(f"Failed to cleanup: {e!s}")
 
     def _save_edit(self: Self, edit: PendingEdit) -> None:
         """Save edit to state.
@@ -291,6 +285,7 @@ class IterativeEditTracker(FlextService[dict[str, t.GeneralValueType]]):
             except Exception as e:
                 # State file corrupted, return empty dict
                 import logging
+
                 logging.warning(f"Failed to load state file: {e}")
         return {}
 

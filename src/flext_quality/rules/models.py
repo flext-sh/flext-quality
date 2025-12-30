@@ -127,7 +127,9 @@ class ValidationRule(BaseModel):
     patterns: dict[str, str] = Field(default_factory=dict)  # language → pattern
 
     # Multi-language support
-    language: str | None = Field(default=None)  # Target language (python, typescript, etc.)
+    language: str | None = Field(
+        default=None
+    )  # Target language (python, typescript, etc.)
     file_types: tuple[str, ...] = Field(default=())  # File extensions (.py, .ts, etc.)
 
     # Classification
@@ -165,7 +167,9 @@ class ValidationRule(BaseModel):
             return frozenset(v)
         return v
 
-    @field_validator("applies_to", "exceptions", "context_required", "file_types", mode="before")
+    @field_validator(
+        "applies_to", "exceptions", "context_required", "file_types", mode="before"
+    )
     @classmethod
     def convert_to_tuple(cls, v: tuple[str, ...] | list[str]) -> tuple[str, ...]:
         """Convert lists to tuples for immutability."""
@@ -200,15 +204,21 @@ class ValidationRule(BaseModel):
 
         """
         # Check file extension (combined condition for SIM102)
-        if self.file_types and not any(file_path.endswith(ext) for ext in self.file_types):
+        if self.file_types and not any(
+            file_path.endswith(ext) for ext in self.file_types
+        ):
             return False
 
         # Check applies_to patterns (combined condition for SIM102)
-        if self.applies_to and not any(fnmatch(file_path, pat) for pat in self.applies_to):
+        if self.applies_to and not any(
+            fnmatch(file_path, pat) for pat in self.applies_to
+        ):
             return False
 
         # Check exception patterns (combined condition for SIM102)
-        return not (self.exceptions and any(fnmatch(file_path, pat) for pat in self.exceptions))
+        return not (
+            self.exceptions and any(fnmatch(file_path, pat) for pat in self.exceptions)
+        )
 
 
 class RuleViolation(BaseModel):

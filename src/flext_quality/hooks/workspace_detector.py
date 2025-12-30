@@ -73,10 +73,7 @@ class WorkspaceDetector(FlextService[WorkspaceContext]):
             FlextResult with WorkspaceContext
 
         """
-        if start_path is None:
-            start_path = Path.cwd()
-        else:
-            start_path = Path(start_path)
+        start_path = Path.cwd() if start_path is None else Path(start_path)
 
         # Ensure it's a directory
         if start_path.is_file():

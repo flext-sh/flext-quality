@@ -10,6 +10,7 @@ from typing import TypeVar
 from uuid import UUID
 
 from flext_core import FlextLogger, FlextResult, FlextRuntime
+
 # from flext_observability import (
 #     flext_create_trace,
 # )
@@ -97,7 +98,6 @@ class FlextQualityHandlers:
             #     name=f"{service_name}:{operation_name}",
             #     attributes={"operation": operation_name, "service": service_name},
             # )
-            pass
 
     class _AnalysisOrchestrator:
         """Single responsibility: Orchestrate analysis operations."""
@@ -159,7 +159,8 @@ class FlextQualityHandlers:
         )
 
         return (
-            self._AnalysisOrchestrator.execute_analysis(project_id, self._services)
+            self._AnalysisOrchestrator
+            .execute_analysis(project_id, self._services)
             .map_error(lambda e: self._log_error(context, e))
             .map(lambda a: self._log_success(context, a))
         )

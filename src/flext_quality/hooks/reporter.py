@@ -181,9 +181,7 @@ class ProgressiveReporter:
             JSON string with structured hook output
 
         """
-        blocking_count = len(
-            [v for v in violations if v.get("blocking", False)]
-        )
+        blocking_count = len([v for v in violations if v.get("blocking", False)])
 
         # CRITICAL: Override decision to "block" if blocking violations exist
         if blocking_count > 0 and decision != "block":
@@ -245,11 +243,11 @@ class ProgressiveReporter:
         grouped = self.group_by_code(violations)
 
         for code, items in list(grouped.items())[:3]:  # Top 3 violation types
-            lines.append(
-                f"\n📌 {code} ({len(items)} occurrence{'s' if len(items) > 1 else ''})"
-            )
-            lines.append(f"   Message: {items[0].get('message', 'N/A')}")
-            lines.append("   How to fix: Review documentation and update code")
+            lines.extend((
+                f"\n📌 {code} ({len(items)} occurrence{'s' if len(items) > 1 else ''})",
+                f"   Message: {items[0].get('message', 'N/A')}",
+                "   How to fix: Review documentation and update code",
+            ))
 
         if len(grouped) > 3:
             lines.append(f"\n... and {len(grouped) - 3} more violation types")
@@ -298,9 +296,7 @@ class ProgressiveReporter:
         if not violations:
             return "✅ All checks passed"
 
-        blocking_count = len(
-            [v for v in violations if v.get("blocking", False)]
-        )
+        blocking_count = len([v for v in violations if v.get("blocking", False)])
         warning_count = len(violations) - blocking_count
 
         parts = []

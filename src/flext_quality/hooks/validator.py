@@ -136,8 +136,7 @@ class FlextHookValidator(FlextService[bool]):
 
         # Format messages with rule code and line number
         messages = [
-            f"[{v.rule.code}] L{v.line}: {v.rule.guidance.strip()}"
-            for v in violations
+            f"[{v.rule.code}] L{v.line}: {v.rule.guidance.strip()}" for v in violations
         ]
         return False, messages
 

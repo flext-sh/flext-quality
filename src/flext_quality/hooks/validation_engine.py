@@ -140,7 +140,7 @@ class PreToolValidator(FlextService[list[ValidationViolation]]):
             violations.extend(cmd_violations)
 
         # Check file operations (Edit, Write tools)
-        if tool_name in ("Edit", "Write"):
+        if tool_name in {"Edit", "Write"}:
             file_path = str(tool_input.get("file_path", ""))
             if file_path:
                 file_violations = self.check_file_operations(file_path)

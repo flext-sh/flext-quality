@@ -244,9 +244,7 @@ class FlextConstantsPlugin(FlextService[int]):
             violations.extend(hardcoded_violations)
 
             # Check for architectural violations
-            arch_violations = self._check_architectural_patterns(
-                file_path, content
-            )
+            arch_violations = self._check_architectural_patterns(file_path, content)
             violations.extend(arch_violations)
 
             # Check for duplicate constants (only in constants.py files)

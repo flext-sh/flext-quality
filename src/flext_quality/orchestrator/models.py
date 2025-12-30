@@ -12,6 +12,7 @@ Migration path:
     Violation = FlextQualityPlugin.Violation
     ValidationResult = FlextQualityPlugin.ValidationResult
 """
+
 from __future__ import annotations
 
 import warnings
@@ -35,6 +36,6 @@ ValidationResult = FlextQualityPlugin.ValidationResult
 __all__ = [
     "PluginCategory",
     "PluginMetadata",
-    "Violation",
     "ValidationResult",
+    "Violation",
 ]

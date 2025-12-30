@@ -165,9 +165,7 @@ class PluginOrchestrator(FlextService[ValidationResult]):
         if not self._initialized:
             init_result = self.initialize()
             if init_result.is_failure:
-                return r[ValidationResult].fail(
-                    f"Init failed: {init_result.error}"
-                )
+                return r[ValidationResult].fail(f"Init failed: {init_result.error}")
 
         file_path = Path(file_path) if isinstance(file_path, str) else file_path
 
@@ -276,8 +274,7 @@ class PluginOrchestrator(FlextService[ValidationResult]):
             if not detector:
                 detector = detector_meta.plugin_class()
 
-            detect_result = detector.detect(file_path, content)
-            return detect_result
+            return detector.detect(file_path, content)
         except Exception as e:
             return r[str].fail(f"Language detection error: {e}")
 
@@ -338,9 +335,7 @@ class PluginOrchestrator(FlextService[ValidationResult]):
         """
         plugin_results = {}
 
-        with ProcessPoolExecutor(
-            max_workers=self.max_parallel_workers
-        ) as executor:
+        with ProcessPoolExecutor(max_workers=self.max_parallel_workers) as executor:
             # Submit all plugins
             futures = {
                 executor.submit(
@@ -360,7 +355,7 @@ class PluginOrchestrator(FlextService[ValidationResult]):
                     result = future.result(timeout=self.plugin_timeout)
                     plugin_results[plugin_name] = result
                 except Exception as e:
-                    logger.error(f"Plugin {plugin_name} failed: {e}")
+                    logger.exception(f"Plugin {plugin_name} failed: {e}")
                     plugin_results[plugin_name] = {
                         "status": "error",
                         "error": str(e),
@@ -399,7 +394,7 @@ class PluginOrchestrator(FlextService[ValidationResult]):
             for v in violations:
                 if v.blocking:
                     all_violations.append(v)
-                elif v.severity in ["high", "medium"]:
+                elif v.severity in {"high", "medium"}:
                     all_warnings.append(v)
                 else:
                     all_suggestions.append(v)
@@ -439,53 +434,53 @@ class PluginOrchestrator(FlextService[ValidationResult]):
 
         # Handle different plugin result formats
         if plugin_name == "ruff":
-            for item in result.get("violations", []):
-                violations.append(
-                    Violation(
-                        code=item.get("code", "RUFF-???"),
-                        name=item.get("message", "Ruff violation"),
-                        severity="high",
-                        blocking=True,
-                        guidance=item.get("message", ""),
-                        category="lint",
-                        source_plugin="ruff",
-                        line=item.get("location", {}).get("row"),
-                        column=item.get("location", {}).get("column"),
-                    )
+            violations.extend(
+                Violation(
+                    code=item.get("code", "RUFF-???"),
+                    name=item.get("message", "Ruff violation"),
+                    severity="high",
+                    blocking=True,
+                    guidance=item.get("message", ""),
+                    category="lint",
+                    source_plugin="ruff",
+                    line=item.get("location", {}).get("row"),
+                    column=item.get("location", {}).get("column"),
                 )
+                for item in result.get("violations", [])
+            )
 
         elif plugin_name == "mypy":
-            for item in result.get("violations", []):
-                violations.append(
-                    Violation(
-                        code="MYPY-TYPE",
-                        name=item.get("message", "Type error"),
-                        severity="high",
-                        blocking=True,
-                        guidance=item.get("message", ""),
-                        category="type_check",
-                        source_plugin="mypy",
-                        line=item.get("line"),
-                        column=item.get("column"),
-                    )
+            violations.extend(
+                Violation(
+                    code="MYPY-TYPE",
+                    name=item.get("message", "Type error"),
+                    severity="high",
+                    blocking=True,
+                    guidance=item.get("message", ""),
+                    category="type_check",
+                    source_plugin="mypy",
+                    line=item.get("line"),
+                    column=item.get("column"),
                 )
+                for item in result.get("violations", [])
+            )
 
         elif plugin_name == "rule-registry":
             # RuleRegistry already returns normalized format
-            for item in result.get("violations", []):
-                violations.append(
-                    Violation(
-                        code=item["code"],
-                        name=item["name"],
-                        severity=item["severity"],
-                        blocking=item["blocking"],
-                        guidance=item["guidance"],
-                        category=item["category"],
-                        source_plugin="rule-registry",
-                        line=item.get("line"),
-                        column=item.get("column"),
-                    )
+            violations.extend(
+                Violation(
+                    code=item["code"],
+                    name=item["name"],
+                    severity=item["severity"],
+                    blocking=item["blocking"],
+                    guidance=item["guidance"],
+                    category=item["category"],
+                    source_plugin="rule-registry",
+                    line=item.get("line"),
+                    column=item.get("column"),
                 )
+                for item in result.get("violations", [])
+            )
 
         # Add more plugin-specific extractors as needed
 

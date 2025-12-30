@@ -157,7 +157,8 @@ class ProjectServiceBuilder:
 
         """
         return (
-            self._validate_required_fields()
+            self
+            ._validate_required_fields()
             .flat_map(lambda _: self._create_project_model())
             .map(self._log_project_creation)
         )
@@ -256,7 +257,8 @@ class AnalysisServiceBuilder:
 
         """
         return (
-            self._validate_project_id()
+            self
+            ._validate_project_id()
             .flat_map(lambda _: self._validate_status())
             .flat_map(lambda _: self._create_analysis_model())
             .map(self._log_analysis_creation)
@@ -382,7 +384,8 @@ class IssueServiceBuilder:
 
         """
         return (
-            self._validate_required_fields()
+            self
+            ._validate_required_fields()
             .flat_map(lambda _: self._validate_enums())
             .flat_map(lambda _: self._create_issue_model())
             .map(self._log_issue_creation)
@@ -528,7 +531,8 @@ class ReportServiceBuilder:
 
         """
         return (
-            self._validate_analysis_id()
+            self
+            ._validate_analysis_id()
             .flat_map(lambda _: self._validate_format())
             .flat_map(lambda _: self._create_report_model())
             .map(self._log_report_creation)

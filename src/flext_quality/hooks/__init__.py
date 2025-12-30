@@ -11,4 +11,9 @@ from flext_quality.hooks.validation_engine import PreToolValidator, ValidationVi
 from flext_quality.hooks.validator import FlextHookValidator
 from flext_quality.hooks.workspace_detector import WorkspaceDetector
 
-__all__ = ["FlextHookValidator", "PreToolValidator", "ValidationViolation", "WorkspaceDetector"]
+__all__ = [
+    "FlextHookValidator",
+    "PreToolValidator",
+    "ValidationViolation",
+    "WorkspaceDetector",
+]

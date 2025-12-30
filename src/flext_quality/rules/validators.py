@@ -123,7 +123,7 @@ class RuleValidator:
         violations = []
 
         for match in self._compiled.finditer(content):
-            line_num = content[:match.start()].count("\n") + 1
+            line_num = content[: match.start()].count("\n") + 1
             snippet = match.group(0)[:80]
 
             violations.append(

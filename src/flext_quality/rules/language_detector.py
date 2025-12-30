@@ -80,8 +80,10 @@ class LanguageDetector:
 
         # Check for TypeScript/JavaScript specific syntax
         content_lower = content.lower()
-        if "interface " in content_lower and ":" in content and (
-            "extends" in content_lower or "implements" in content_lower
+        if (
+            "interface " in content_lower
+            and ":" in content
+            and ("extends" in content_lower or "implements" in content_lower)
         ):
             return "typescript"
 
