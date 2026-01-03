@@ -1,12 +1,7 @@
-"""CLI entry point for flext-quality.
+"""CLI service for flext-quality.
 
-Provides Typer-based command-line interface for quality operations including:
-- Code quality checks (lint, type, security, test)
-- Memory search via claude-mem
-- Code search via claude-context
-- Hook execution
-- Rules validation
-- Code execution command building
+Provides FLEXT-integrated CLI service for quality operations.
+Uses flext-cli for consistent output formatting.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -14,150 +9,172 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import os
-import subprocess
 import sys
 from pathlib import Path
+from typing import NoReturn, final
 
-import typer
+from flext_cli.services.output import FlextCliOutput
+from flext_core import FlextResult as r
 
-# Main application
-app = typer.Typer(
-    name="flext-quality",
-    help="FLEXT Quality - Code quality analysis and Claude Code integration",
-    no_args_is_help=True,
-)
-
-# Subcommands
-memory_app = typer.Typer(help="Cross-session memory operations via claude-mem")
-code_app = typer.Typer(help="Semantic code search via claude-context")
-hook_app = typer.Typer(help="Hook execution and management")
-rules_app = typer.Typer(help="YAML rules validation")
-exec_app = typer.Typer(help="Code execution command building")
-
-app.add_typer(memory_app, name="memory")
-app.add_typer(code_app, name="code")
-app.add_typer(hook_app, name="hook")
-app.add_typer(rules_app, name="rules")
-app.add_typer(exec_app, name="exec")
+from flext_quality.api import FlextQuality
+from flext_quality.constants import FlextQualityConstants as c
+from flext_quality.integrations.code_execution import FlextQualityCodeExecutionBridge
 
 
-def _run_lint(path: Path) -> int:
-    """Run ruff linting on path."""
-    result = subprocess.run(
-        ["ruff", "check", str(path)],  # noqa: S607 - CLI tool execution
-        check=False,
-    )
-    return result.returncode
+@final
+class FlextQualityCliService:
+    """CLI service for flext-quality operations."""
 
+    def __init__(self) -> None:
+        """Initialize the CLI service."""
+        self._output = FlextCliOutput()
+        self._quality = FlextQuality.get_instance()
+        self._executor = FlextQualityCodeExecutionBridge()
 
-def _run_type_check(path: Path) -> int:
-    """Run type checking on path."""
-    src_path = path / "src"
-    if not src_path.exists():
-        src_path = path
-    result = subprocess.run(
-        ["pyrefly", "check", str(src_path)],  # noqa: S607 - CLI tool execution
-        check=False,
-    )
-    return result.returncode
+    def display_status(self) -> r[dict[str, object]]:
+        """Display quality service status."""
+        status = self._quality.get_status()
+        return r[dict[str, object]].ok(status)
 
+    def build_check_commands(self, target_path: Path) -> r[list[list[str]]]:
+        """Build commands for quick check (lint + type)."""
+        commands: list[list[str]] = []
 
-def _run_tests(path: Path, min_coverage: int = 80) -> int:
-    """Run tests with coverage."""
-    env = os.environ.copy()
-    env["PYTHONPATH"] = str(path / "src")
-    result = subprocess.run(
-        [  # noqa: S607 - CLI tool execution
+        lint_result = self._executor.build_ruff_command(target_path)
+        if lint_result.is_failure:
+            return r[list[list[str]]].fail(lint_result.error)
+        commands.append(lint_result.value)
+
+        type_result = self._executor.build_basedpyright_command(target_path)
+        if type_result.is_failure:
+            return r[list[list[str]]].fail(type_result.error)
+        commands.append(type_result.value)
+
+        return r[list[list[str]]].ok(commands)
+
+    def build_validate_commands(
+        self,
+        target_path: Path,
+        *,
+        min_coverage: int = 80,
+    ) -> r[list[list[str]]]:
+        """Build commands for full validation."""
+        commands: list[list[str]] = []
+
+        lint_result = self._executor.build_ruff_command(target_path)
+        if lint_result.is_failure:
+            return r[list[list[str]]].fail(lint_result.error)
+        commands.append(lint_result.value)
+
+        type_result = self._executor.build_basedpyright_command(target_path)
+        if type_result.is_failure:
+            return r[list[list[str]]].fail(type_result.error)
+        commands.append(type_result.value)
+
+        src_path = (
+            target_path / "src" if (target_path / "src").exists() else target_path
+        )
+        commands.append(["bandit", "-r", str(src_path), "-c", "pyproject.toml"])
+
+        test_path = target_path / "tests"
+        src_for_cov = target_path / "src"
+        commands.append([
             "pytest",
-            str(path / "tests"),
-            f"--cov={path / 'src'}",
+            str(test_path),
+            f"--cov={src_for_cov}",
             f"--cov-fail-under={min_coverage}",
             "--cov-report=term-missing",
-        ],
-        check=False,
-        env=env,
-    )
-    return result.returncode
+        ])
+
+        return r[list[list[str]]].ok(commands)
 
 
-def _run_security(path: Path) -> int:
-    """Run security scanning."""
-    src_path = path / "src"
-    if not src_path.exists():
-        src_path = path
-    result = subprocess.run(
-        ["bandit", "-r", str(src_path), "-c", "pyproject.toml"],  # noqa: S607 - CLI tool execution
-        check=False,
-    )
-    return result.returncode
+class _CommandHandlers:
+    """Command handlers for CLI operations."""
+
+    @staticmethod
+    def handle_status(service: FlextQualityCliService) -> r[int]:
+        """Handle status command."""
+        result = service.display_status()
+        if result.is_failure:
+            service._output.print_error(f"Status failed: {result.error}")
+            return r[int].ok(1)
+
+        service._output.print_success("flext-quality status")
+        service._output.print_message(f"Version: {c.Quality.Mcp.SERVER_VERSION}")
+        return r[int].ok(0)
+
+    @staticmethod
+    def handle_check(service: FlextQualityCliService, target_path: Path) -> r[int]:
+        """Handle check command."""
+        result = service.build_check_commands(target_path)
+        if result.is_failure:
+            service._output.print_error(f"Failed: {result.error}")
+            return r[int].ok(1)
+
+        service._output.print_message(f"Running check on {target_path}...")
+        for cmd in result.value:
+            service._output.print_message(f"  {' '.join(cmd)}")
+        return r[int].ok(0)
+
+    @staticmethod
+    def handle_validate(
+        service: FlextQualityCliService,
+        target_path: Path,
+        *,
+        min_coverage: int = 80,
+    ) -> r[int]:
+        """Handle validate command."""
+        result = service.build_validate_commands(target_path, min_coverage=min_coverage)
+        if result.is_failure:
+            service._output.print_error(f"Failed: {result.error}")
+            return r[int].ok(1)
+
+        service._output.print_message(f"Running validation on {target_path}...")
+        for cmd in result.value:
+            service._output.print_message(f"  {' '.join(cmd)}")
+        return r[int].ok(0)
 
 
-def main() -> int:
-    """Main CLI entry point for flext-quality.
-
-    Returns:
-        int: Exit code (0 for success, 1 for error)
-
-    """
-    args = sys.argv[1:]
-
-    # No arguments - show status
-    if not args:
-        sys.stdout.write("flext-quality v0.9.0\n")
-        sys.stdout.write("Usage: flext-quality <command> <path>\n")
-        sys.stdout.write("Commands: check, validate\n")
-        return 0
-
-    command = args[0]
-    path = Path(args[1]) if len(args) > 1 else Path()
+def _dispatch(service: FlextQualityCliService, command: str, args: list[str]) -> int:
+    """Dispatch command to handler."""
+    if command == "status":
+        result = _CommandHandlers.handle_status(service)
+        return result.value if result.is_success else 1
 
     if command == "check":
-        # Quick check: lint + type
-        sys.stdout.write(f"Running check on {path}...\n")
-        lint_result = _run_lint(path)
-        if lint_result != 0:
-            sys.stderr.write("Lint check failed\n")
-            return lint_result
-        type_result = _run_type_check(path)
-        if type_result != 0:
-            sys.stderr.write("Type check failed\n")
-            return type_result
-        sys.stdout.write("All checks passed!\n")
-        return 0
+        target_path = Path(args[0]) if args else Path.cwd()
+        result = _CommandHandlers.handle_check(service, target_path)
+        return result.value if result.is_success else 1
 
     if command == "validate":
-        # Full validation: lint + type + security + test
-        sys.stdout.write(f"Running validation on {path}...\n")
-
-        # Parse --min-coverage if provided
+        target_path = Path(args[0]) if args else Path.cwd()
         min_coverage = 80
         for i, arg in enumerate(args):
             if arg == "--min-coverage" and i + 1 < len(args):
                 min_coverage = int(args[i + 1])
+        result = _CommandHandlers.handle_validate(
+            service, target_path, min_coverage=min_coverage
+        )
+        return result.value if result.is_success else 1
 
-        lint_result = _run_lint(path)
-        if lint_result != 0:
-            return lint_result
-
-        type_result = _run_type_check(path)
-        if type_result != 0:
-            return type_result
-
-        security_result = _run_security(path)
-        if security_result != 0:
-            return security_result
-
-        test_result = _run_tests(path, min_coverage)
-        if test_result != 0:
-            return test_result
-
-        sys.stdout.write("All validations passed!\n")
-        return 0
-
-    sys.stderr.write(f"Unknown command: {command}\n")
+    service._output.print_error(f"Unknown command: {command}")
+    service._output.print_message("Commands: status, check, validate")
     return 1
 
 
+def main() -> NoReturn:
+    """Main CLI entry point."""
+    service = FlextQualityCliService()
+    args = sys.argv[1:]
+
+    if not args:
+        result = _CommandHandlers.handle_status(service)
+        sys.exit(result.value if result.is_success else 1)
+
+    exit_code = _dispatch(service, args[0], args[1:])
+    sys.exit(exit_code)
+
+
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
