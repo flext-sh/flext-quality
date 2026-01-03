@@ -21,6 +21,7 @@ The hook system is **fully operational in warning-only mode** with:
 ### Configuration Checks
 
 **✅ pre_tool_use.py**
+
 - Location: `~/.claude/hooks/pre_tool_use.py`
 - Status: ACTIVE in warning-only mode
 - Exit codes:
@@ -29,6 +30,7 @@ The hook system is **fully operational in warning-only mode** with:
 - NO blocking exit codes defined
 
 **✅ post_tool_use.py**
+
 - Location: `~/.claude/hooks/post_tool_use.py`
 - Status: DISABLED (exits 0 immediately)
 - Behavior: Non-intrusive, allows all operations
@@ -36,6 +38,7 @@ The hook system is **fully operational in warning-only mode** with:
 ### Rule System Verification
 
 **✅ 16 YAML Files Loaded**
+
 ```
 architecture.yaml        → 12 rules
 bash_commands.yaml       → 21 rules
@@ -63,6 +66,7 @@ TOTAL: 197 validation rules
 ## 🎯 Category Coverage
 
 ### 1. Security Warnings (16 rules) ✅
+
 - **SEC001-003**: File deletion (rm, sudo rm)
 - **SEC004-006**: In-place editing (sed -i, awk -i, perl -i)
 - **SEC007-011**: System destructive (dd, mkfs, fdisk, parted, chmod 777)
@@ -71,6 +75,7 @@ TOTAL: 197 validation rules
 **Testing**: Try dangerous commands → Warnings appear → Operations proceed
 
 ### 2. Git Operations Warnings (29 rules) ✅
+
 - **GIT001-007**: Destructive operations (reset --hard, clean -f)
 - **GIT008-010**: Staging & push operations (git stage, force push)
 - **GIT011-013**: Rebase & merge (interactive rebase, abort)
@@ -81,6 +86,7 @@ TOTAL: 197 validation rules
 **Testing**: Try git destructive commands → Warnings shown → Commands allowed
 
 ### 3. Code Quality Warnings (14 rules) ✅
+
 - **CQ001-005**: Type annotations & system
 - **CQ006-007**: Data structures & isinstance checks
 - **CQ008-010**: FlextResult patterns
@@ -89,6 +95,7 @@ TOTAL: 197 validation rules
 **Testing**: Use forbidden patterns → Warnings shown → Code allowed
 
 ### 4. File Operations Warnings (19 rules) ✅
+
 - **FO001-004**: Script creation in project
 - **FO005-009**: Batch operations (sed -i, find -exec, xargs)
 - **FO010-011**: Backup conventions
@@ -97,6 +104,7 @@ TOTAL: 197 validation rules
 **Testing**: Create scripts in project → Warnings → Creation allowed
 
 ### 5. Project Files Warnings (14 rules) ✅
+
 - **PF001-002**: Configuration (pyproject.toml, poetry.lock)
 - **PF003-005**: Git & build files
 - **PF006-011**: Secrets & credentials
@@ -187,12 +195,14 @@ touch /home/marlonsc/flext/fix_script.sh
 ## 📊 Verification Checklist
 
 ### Hook Configuration
+
 - [x] pre_tool_use.py exits with 0 (allow) or 1 (warn), never blocks
 - [x] post_tool_use.py exits 0 immediately (non-intrusive)
 - [x] Exit codes properly defined (no blocking code)
 - [x] Warning messages enhanced with actionable guidance
 
 ### Rule System
+
 - [x] All 197 rules loaded from YAML files
 - [x] Rules organized in 16 categories
 - [x] All severity levels used (critical, high, medium, low)
@@ -200,6 +210,7 @@ touch /home/marlonsc/flext/fix_script.sh
 - [x] Rule reload works (automatic on next execution)
 
 ### Warning Messages
+
 - [x] Include violation code (SEC001, GIT003, etc.)
 - [x] Show line number
 - [x] Provide actionable suggestion
@@ -207,6 +218,7 @@ touch /home/marlonsc/flext/fix_script.sh
 - [x] Allow execution to proceed
 
 ### Iterative Edit Tracking
+
 - [x] Backup created before first edit
 - [x] Original compared to current for change detection
 - [x] Multiple attempts allowed until clean
@@ -217,15 +229,18 @@ touch /home/marlonsc/flext/fix_script.sh
 ## 📖 Documentation
 
 ### User Guides
+
 - **HOOK_WARNINGS.md** - Complete reference of all 197 rules
 - **RULE_MODIFICATION.md** - How to customize rules during testing
 
 ### Implementation Details
+
 - **pre_tool_use.py** - Hook implementation (warning-only)
 - **validators.py** - Rule evaluation logic
 - **registry.py** - Rule loading & caching
 
 ### Rule Files
+
 - Location: `/home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/`
 - Format: YAML with Pydantic validation
 - Reload: Automatic (no restart needed)
@@ -235,11 +250,13 @@ touch /home/marlonsc/flext/fix_script.sh
 ## 🔄 Typical Testing Workflow
 
 ### 1. Enable Hooks (Already Enabled)
+
 ```bash
 ls ~/.claude/hooks/pre_tool_use.py  # Should exist and be executable
 ```
 
 ### 2. Make Intentional Violations
+
 ```bash
 # Create files/code that trigger rules
 echo 'rm -rf /tmp/test' > /tmp/test.sh
@@ -247,6 +264,7 @@ echo 'def test(): pass  # type: ignore' > /tmp/test.py
 ```
 
 ### 3. Observe Warnings
+
 ```bash
 # Warnings appear in hook output
 # But execution proceeds
@@ -254,12 +272,14 @@ echo 'def test(): pass  # type: ignore' > /tmp/test.py
 ```
 
 ### 4. Fix Violations
+
 ```bash
 # Use guidance from warnings to correct code
 # Re-run to verify fixes
 ```
 
 ### 5. Verify Clean Code
+
 ```bash
 # Hook shows no violations
 # Execution clean, no warnings
@@ -283,18 +303,21 @@ echo 'def test(): pass  # type: ignore' > /tmp/test.py
 ## 🎯 Next Steps for User
 
 ### For Daily Development
+
 1. Monitor hook warnings as you work
 2. Fix violations based on guidance
 3. Adjust rules as needed using RULE_MODIFICATION.md
 4. Track progress in iterative edits
 
 ### For Validation & Testing
+
 1. Create intentional violations to test each category
 2. Verify warnings appear correctly
 3. Confirm operations are never blocked
 4. Test rule modification workflow
 
 ### For Integration
+
 1. Hooks are safe to use in daily workflow
 2. Warnings help improve code quality
 3. No risk of blocked operations

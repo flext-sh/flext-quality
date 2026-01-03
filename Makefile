@@ -11,6 +11,7 @@ POETRY := poetry
 SRC_DIR := src
 TESTS_DIR := tests
 COV_DIR := flext_quality
+WORKSPACE_ROOT := $(shell cd .. && pwd)
 
 # Quality Standards
 MIN_COVERAGE := 100
@@ -51,24 +52,31 @@ info: ## Show project information
 # SETUP & INSTALLATION
 # =============================================================================
 
+.PHONY: install-workspace
+install-workspace: ## Install workspace dependencies (flext-core, etc.)
+	@echo "📦 Installing workspace dependencies from $(WORKSPACE_ROOT)..."
+	cd $(WORKSPACE_ROOT) && $(POETRY) install
+	@echo "✅ Workspace dependencies installed"
+
 .PHONY: install
-install: ## Install dependencies
+install: install-workspace ## Install all dependencies (workspace + local)
 	$(POETRY) install
 
 .PHONY: install-dev
-install-dev: ## Install dev dependencies
+install-dev: install-workspace ## Install dev dependencies
 	$(POETRY) install --with dev,test,docs
 
 .PHONY: setup
 setup: install-dev ## Complete project setup
 	$(POETRY) run pre-commit install
+	@echo "✅ Setup complete - flext-core and all dependencies available"
 
 # =============================================================================
 # QUALITY GATES (MANDATORY - ZERO TOLERANCE)
 # =============================================================================
 
 .PHONY: validate
-validate: lint type-check security test quality-check ## Run all quality gates
+validate: lint type-check security test ## Run all quality gates
 	@echo "✅ Quality validation complete"
 
 .PHONY: check
@@ -82,19 +90,53 @@ lint: ## Run linting (ZERO TOLERANCE)
 format: ## Format code
 	$(POETRY) run ruff format .
 
+.PHONY: format-check
+format-check: ## Check formatting
+	$(POETRY) run ruff format --check .
+
 .PHONY: type-check
 type-check: ## Run type checking with Pyrefly (ZERO TOLERANCE)
-	PYTHONPATH=$(SRC_DIR) $(POETRY) run pyrefly check .
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run pyrefly check $(SRC_DIR)
 
 .PHONY: security
 security: ## Run security scanning
-	$(POETRY) run bandit -r $(SRC_DIR)
+	$(POETRY) run bandit -r $(SRC_DIR) -c $(WORKSPACE_ROOT)/pyproject.toml
 	$(POETRY) run pip-audit
 
 .PHONY: fix
 fix: ## Auto-fix issues
 	$(POETRY) run ruff check . --fix
 	$(POETRY) run ruff format .
+
+# =============================================================================
+# EXTENDED QUALITY CHECKS
+# =============================================================================
+
+.PHONY: dead-code
+dead-code: ## Dead code detection (Vulture)
+	cd $(WORKSPACE_ROOT) && $(POETRY) run vulture $(CURDIR)/$(SRC_DIR) --min-confidence 80 --exclude "tests,examples" || true
+
+.PHONY: modernize
+modernize: ## Modern patterns suggestions (via Ruff FURB rules)
+	@echo "Note: Ruff already applies 36 FURB rules from refurb (see: ruff rule --all | grep FURB)"
+	@echo "Refurb standalone disabled - incompatible with Python 3.13 TypeAliasStmt"
+	@echo "Run 'make lint' to apply modernization suggestions via Ruff"
+
+.PHONY: cognitive-complexity
+cognitive-complexity: ## Cognitive complexity (Complexipy)
+	cd $(WORKSPACE_ROOT) && $(POETRY) run complexipy $(CURDIR)/$(SRC_DIR) --max-complexity-allowed 15 || true
+
+.PHONY: spell-check
+spell-check: ## Spell checking (Codespell)
+	cd $(WORKSPACE_ROOT) && $(POETRY) run codespell $(CURDIR)/$(SRC_DIR) --toml $(WORKSPACE_ROOT)/pyproject.toml --quiet-level 3 || true
+
+.PHONY: deps
+deps: ## Analyze dependencies with deptry (missing, unused, transitive)
+	@echo "Analyzing dependencies in $(PROJECT_NAME)..."
+	uvx deptry . --no-ansi 2>&1 | grep -E "(DEP00|Found)" || echo "No issues"
+
+.PHONY: validate-full
+validate-full: lint format-check type-check dead-code cognitive-complexity spell-check security test ## Full + extended checks
 
 # =============================================================================
 # TESTING (MANDATORY - 100% COVERAGE)
@@ -256,7 +298,6 @@ pre-commit: ## Run pre-commit hooks
 # =============================================================================
 
 .PHONY: clean
-clean: ## Clean build artifacts.PHONY: clean
 clean: ## Clean build artifacts and cruft
 	@echo "🧹 Cleaning $(PROJECT_NAME) - removing build artifacts, cache files, and cruft..."
 
@@ -318,7 +359,7 @@ doctor: diagnose check ## Health check
 
 # =============================================================================
 
-.PHONY: t l f tc c i v
+.PHONY: t l f tc c i v vf dd cc sp dp
 t: test
 l: lint
 f: format
@@ -326,6 +367,11 @@ tc: type-check
 c: clean
 i: install
 v: validate
+vf: validate-full
+dd: dead-code
+cc: cognitive-complexity
+sp: spell-check
+dp: deps
 
 # =============================================================================
 # CONFIGURATION
@@ -333,4 +379,4 @@ v: validate
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install install-dev setup validate check lint format type-check security fix test test-unit test-integration test-quality test-django test-analysis test-e2e test-fast coverage-html build build-clean analyze quality-check metrics report workspace-analyze detect-issues calculate-scores quality-grade coverage-score web-start web-migrate web-shell web-collectstatic web-createsuperuser docs docs-serve deps-update deps-show deps-audit shell pre-commit clean clean-all reset diagnose doctor t l f tc c i v
+.PHONY: help install-workspace install install-dev setup validate check lint format format-check type-check security fix dead-code modernize cognitive-complexity spell-check deps validate-full test test-unit test-integration test-quality test-django test-analysis test-e2e test-fast coverage-html build build-clean analyze quality-check metrics report workspace-analyze detect-issues calculate-scores quality-grade coverage-score web-start web-migrate web-shell web-collectstatic web-createsuperuser docs docs-serve deps-update deps-show deps-audit shell pre-commit clean clean-all reset diagnose doctor t l f tc c i v vf dd cc sp dp

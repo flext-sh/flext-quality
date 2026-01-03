@@ -1,305 +1,191 @@
-"""Rule validators implementing ValidatorSpec protocol.
-
-This module provides validators that can check content against rules
-and find violations with line numbers and snippets.
-
-Classes:
-    - RuleValidator: Single rule validator with pattern matching
-    - CompositeValidator: Combines multiple validators with AND/OR logic
-    - NegatedValidator: Negates a validator's result
-
-Functions:
-    - validate_content: Validate content against rules from registry
-"""
+"""Rule validators for specific validation types."""
 
 from __future__ import annotations
 
+import contextlib
 import re
+from abc import ABC, abstractmethod
+from pathlib import Path
 
 from flext_core import FlextResult as r
 
-from .models import RuleCategory, RuleViolation, ValidationRule
-from .registry import registry
+from flext_quality.constants import FlextQualityConstants as c
+
+
+class FlextQualityValidators:
+    """Namespace for flext-quality validators (one class per module pattern)."""
+
+    class Base(ABC):
+        """Abstract base for rule validators."""
+
+        @property
+        @abstractmethod
+        def name(self) -> str:
+            """Return validator name."""
+            ...
+
+        @abstractmethod
+        def validate(
+            self,
+            content: str,
+            file_path: Path | None = None,
+        ) -> r[list[dict[str, object]]]:
+            """Validate content and return violations."""
+            ...
+
+    class Pattern(Base):
+        """Validates content against regex patterns."""
+
+        def __init__(self, patterns: dict[str, str]) -> None:
+            """Initialize with patterns."""
+            self._patterns = patterns
+            self._compiled: dict[str, re.Pattern[str]] = {}
+
+            for pname, pattern in patterns.items():
+                with contextlib.suppress(re.error):
+                    self._compiled[pname] = re.compile(pattern)
+
+        @property
+        def name(self) -> str:
+            """Return validator name."""
+            return "pattern"
+
+        def validate(
+            self,
+            content: str,
+            file_path: Path | None = None,
+        ) -> r[list[dict[str, object]]]:
+            """Validate content against patterns."""
+            violations: list[dict[str, object]] = []
+            filename = str(file_path) if file_path else "<string>"
+            lines = content.splitlines()
+
+            for line_num, line in enumerate(lines, start=1):
+                for pattern_name, compiled in self._compiled.items():
+                    if compiled.search(line):
+                        violations.append({
+                            "rule": f"pattern-{pattern_name}",
+                            "file": filename,
+                            "line": line_num,
+                            "message": f"Pattern violation: {pattern_name}",
+                            "severity": c.Quality.Severity.ERROR,
+                        })
+
+            return r[list[dict[str, object]]].ok(violations)
+
+    class ForbiddenPattern(Pattern):
+        """Validates against FLEXT forbidden patterns."""
+
+        def __init__(self) -> None:
+            """Initialize with FLEXT forbidden patterns."""
+            patterns = {
+                "type-ignore": c.Quality.Patterns.TYPE_IGNORE,
+                "cast-usage": c.Quality.Patterns.CAST_USAGE,
+                "any-type": c.Quality.Patterns.ANY_TYPE,
+                "type-checking": c.Quality.Patterns.TYPE_CHECKING,
+                "optional-pattern": c.Quality.Patterns.OPTIONAL_PATTERN,
+                "union-pattern": c.Quality.Patterns.UNION_PATTERN,
+            }
+            super().__init__(patterns)
+
+        @property
+        def name(self) -> str:
+            """Return validator name."""
+            return "forbidden-patterns"
+
+    class Tier(Base):
+        """Validates architecture tier violations."""
+
+        @property
+        def name(self) -> str:
+            """Return validator name."""
+            return "tier"
+
+        def validate(
+            self,
+            content: str,
+            file_path: Path | None = None,
+        ) -> r[list[dict[str, object]]]:
+            """Validate tier violations."""
+            violations: list[dict[str, object]] = []
+            filename = str(file_path) if file_path else "<string>"
+
+            if file_path is None:
+                return r[list[dict[str, object]]].ok(violations)
 
+            file_tier = self._get_file_tier(file_path)
+            if file_tier is None:
+                return r[list[dict[str, object]]].ok(violations)
 
-class RuleValidator:
-    """Validator that checks content against a single ValidationRule.
+            tier_pattern = re.compile(c.Quality.Patterns.TIER_VIOLATION)
+            lines = content.splitlines()
 
-    This validator implements a subset of the ValidatorSpec protocol,
-    allowing composition with AND, OR, and NOT operators.
+            for line_num, line in enumerate(lines, start=1):
+                if tier_pattern.search(line):
+                    violations.append({
+                        "rule": "tier-violation",
+                        "file": filename,
+                        "line": line_num,
+                        "message": "Tier 0/1 modules cannot import from services/api",
+                        "severity": c.Quality.Severity.ERROR,
+                    })
 
-    Attributes:
-        rule: The validation rule to check
-        pattern: Compiled regex pattern
+            return r[list[dict[str, object]]].ok(violations)
 
-    """
+        def _get_file_tier(self, path: Path) -> int | None:
+            """Determine file tier from path."""
+            name = path.name
 
-    def __init__(self, rule: ValidationRule) -> None:
-        """Initialize validator with a rule.
+            if name in {"constants.py", "typings.py", "protocols.py"}:
+                return 0
 
-        Args:
-            rule: The ValidationRule to validate against
+            if name in {"models.py", "utilities.py"}:
+                return 1
 
-        """
-        self._rule = rule
-        self._compiled = re.compile(rule.pattern, re.MULTILINE)
+            if "servers" in path.parts:
+                return 2
 
-    def __call__(self, content: str) -> bool:
-        """Check if content violates the rule.
+            if "services" in path.parts or name == "api.py":
+                return 3
 
-        Args:
-            content: Content to validate
+            return None
 
-        Returns:
-            True if content matches the pattern (violates the rule)
+    class Registry:
+        """Registry of available validators."""
 
-        """
-        return bool(self._compiled.search(content))
+        def __init__(self) -> None:
+            """Initialize with default validators."""
+            self._validators: dict[str, FlextQualityValidators.Base] = {}
+            self._register_defaults()
 
-    def __and__(self, other: RuleValidator | CompositeValidator) -> CompositeValidator:
-        """Combine validators with AND logic.
+        def _register_defaults(self) -> None:
+            """Register default validators."""
+            self.register(FlextQualityValidators.ForbiddenPattern())
+            self.register(FlextQualityValidators.Tier())
 
-        Both validators must match for the result to be True.
+        def register(self, validator: FlextQualityValidators.Base) -> None:
+            """Register a validator."""
+            self._validators[validator.name] = validator
 
-        Args:
-            other: Another validator to combine with
+        def get(self, name: str) -> FlextQualityValidators.Base | None:
+            """Get validator by name."""
+            return self._validators.get(name)
 
-        Returns:
-            CompositeValidator with AND mode
+        def all(self) -> list[FlextQualityValidators.Base]:
+            """Get all registered validators."""
+            return list(self._validators.values())
 
-        """
-        validators = [self]
-        if isinstance(other, CompositeValidator) and other._mode == "and":
-            validators.extend(other._validators)
-        else:
-            validators.append(other)
-        return CompositeValidator(validators, mode="and")
+        def validate_all(
+            self,
+            content: str,
+            file_path: Path | None = None,
+        ) -> r[list[dict[str, object]]]:
+            """Run all validators."""
+            all_violations: list[dict[str, object]] = []
 
-    def __or__(self, other: RuleValidator | CompositeValidator) -> CompositeValidator:
-        """Combine validators with OR logic.
+            for validator in self._validators.values():
+                result = validator.validate(content, file_path)
+                if result.is_success:
+                    all_violations.extend(result.value)
 
-        At least one validator must match for the result to be True.
-
-        Args:
-            other: Another validator to combine with
-
-        Returns:
-            CompositeValidator with OR mode
-
-        """
-        validators = [self]
-        if isinstance(other, CompositeValidator) and other._mode == "or":
-            validators.extend(other._validators)
-        else:
-            validators.append(other)
-        return CompositeValidator(validators, mode="or")
-
-    def __invert__(self) -> NegatedValidator:
-        """Negate the validator.
-
-        Returns True when pattern does NOT match.
-
-        Returns:
-            NegatedValidator
-
-        """
-        return NegatedValidator(self)
-
-    def find_violations(
-        self,
-        content: str,
-        file_path: str | None = None,
-    ) -> list[RuleViolation]:
-        """Find all violations in content.
-
-        Args:
-            content: Content to check
-            file_path: Optional file path for context
-
-        Returns:
-            List of RuleViolation objects found
-
-        """
-        violations = []
-
-        for match in self._compiled.finditer(content):
-            line_num = content[: match.start()].count("\n") + 1
-            snippet = match.group(0)[:80]
-
-            violations.append(
-                RuleViolation(
-                    rule=self._rule,
-                    line=line_num,
-                    snippet=snippet,
-                    file_path=file_path,
-                )
-            )
-
-        return violations
-
-    @property
-    def rule(self) -> ValidationRule:
-        """Get the underlying rule."""
-        return self._rule
-
-
-class CompositeValidator:
-    """Validator combining multiple validators with AND/OR logic.
-
-    Attributes:
-        validators: List of validators to combine
-        mode: Either "and" or "or"
-
-    """
-
-    def __init__(
-        self,
-        validators: list[RuleValidator | CompositeValidator],
-        mode: str,
-    ) -> None:
-        """Initialize composite validator.
-
-        Args:
-            validators: List of validators to combine
-            mode: "and" or "or" logic
-
-        """
-        self._validators = validators
-        self._mode = mode
-
-    def __call__(self, content: str) -> bool:
-        """Check if content matches the composite condition.
-
-        Args:
-            content: Content to validate
-
-        Returns:
-            True if condition is met (AND all match, OR any match)
-
-        """
-        if self._mode == "and":
-            return all(v(content) for v in self._validators)
-        return any(v(content) for v in self._validators)
-
-    def __and__(
-        self,
-        other: RuleValidator | CompositeValidator,
-    ) -> CompositeValidator:
-        """Combine with AND logic."""
-        validators = list(self._validators)
-        if isinstance(other, CompositeValidator) and other._mode == "and":
-            validators.extend(other._validators)
-        else:
-            validators.append(other)
-        return CompositeValidator(validators, mode="and")
-
-    def __or__(
-        self,
-        other: RuleValidator | CompositeValidator,
-    ) -> CompositeValidator:
-        """Combine with OR logic."""
-        validators = list(self._validators)
-        if isinstance(other, CompositeValidator) and other._mode == "or":
-            validators.extend(other._validators)
-        else:
-            validators.append(other)
-        return CompositeValidator(validators, mode="or")
-
-    def __invert__(self) -> NegatedValidator:
-        """Negate the composite validator."""
-        return NegatedValidator(self)
-
-
-class NegatedValidator:
-    """Validator that negates another validator.
-
-    Returns True when the wrapped validator returns False.
-    """
-
-    def __init__(self, validator: RuleValidator | CompositeValidator) -> None:
-        """Initialize with validator to negate.
-
-        Args:
-            validator: Validator to negate
-
-        """
-        self._validator = validator
-
-    def __call__(self, content: str) -> bool:
-        """Check if content does NOT match the wrapped validator.
-
-        Args:
-            content: Content to validate
-
-        Returns:
-            Opposite of wrapped validator's result
-
-        """
-        return not self._validator(content)
-
-    def __invert__(self) -> RuleValidator | CompositeValidator:
-        """Double negation returns original validator."""
-        if isinstance(self._validator, NegatedValidator):
-            return self._validator.unwrap()
-        return self._validator
-
-    def unwrap(self) -> RuleValidator | CompositeValidator:
-        """Get the wrapped validator.
-
-        Returns:
-            The wrapped validator
-
-        """
-        return self._validator
-
-
-def validate_content(
-    content: str,
-    *,
-    file_path: str | None = None,
-    category: str | None = None,
-    blocking_only: bool = False,
-) -> r[list[RuleViolation]]:
-    """Validate content against rules from registry.
-
-    Args:
-        content: Content to validate
-        file_path: Optional file path for filtering applicable rules
-        category: Optional category name to filter by
-        blocking_only: If True, only check blocking rules
-
-    Returns:
-        FlextResult containing list of RuleViolation objects
-
-    """
-    violations: list[RuleViolation] = []
-
-    # Get applicable rules
-    rules = registry.for_file(file_path) if file_path else registry.all()
-
-    # Filter by category if specified
-    if category is not None:
-        try:
-            cat = RuleCategory(category)
-            rules = [r for r in rules if r.category == cat]
-        except ValueError:
-            return r[list[RuleViolation]].fail(f"Unknown category: {category}")
-
-    # Filter by blocking if specified
-    if blocking_only:
-        rules = [r for r in rules if r.blocking]
-
-    # Validate each rule
-    for rule in rules:
-        validator = RuleValidator(rule)
-        violations.extend(validator.find_violations(content, file_path))
-
-    return r[list[RuleViolation]].ok(violations)
-
-
-__all__ = [
-    "CompositeValidator",
-    "NegatedValidator",
-    "RuleValidator",
-    "validate_content",
-]
+            return r[list[dict[str, object]]].ok(all_violations)

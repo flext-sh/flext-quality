@@ -1,536 +1,260 @@
-"""Quality configuration management using flext-core patterns.
+"""FlextQualitySettings - Configuration for flext-quality.
+
+Extends FlextSettings with quality-specific configuration for hooks,
+rules, MCP integration, and quality thresholds.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
-
 """
 
 from __future__ import annotations
 
-import warnings
-from typing import Literal, Self
+from pathlib import Path
+from typing import ClassVar
 
-from flext_core import FlextResult, FlextSettings, FlextTypes as t
-from pydantic import Field, field_validator, model_validator
+from flext_core import FlextResult as r, FlextSettings
+from pydantic import Field
 from pydantic_settings import SettingsConfigDict
 
-from .constants import FlextQualityConstants
+from flext_quality.constants import FlextQualityConstants as c
 
 
 @FlextSettings.auto_register("quality")
 class FlextQualitySettings(FlextSettings):
-    """Single Pydantic 2 Settings class for flext-quality extending FlextSettings.
+    """Settings for flext-quality project.
 
-    **ARCHITECTURAL PATTERN**: Zero-Boilerplate Auto-Registration
+    Provides configuration for:
+    - Hook processing (timeouts, events)
+    - Rule engine (batch size, parallelism)
+    - MCP server integration
+    - Quality thresholds
+    - Cache configuration
 
-    This class extends FlextSettings (BaseSettings) for automatic:
-    - Singleton pattern (thread-safe)
-    - Namespace registration (accessible via config.quality)
-    - Environment variable loading from FLEXT_QUALITY_* variables
-    - .env file loading (production/development)
-    - Automatic type conversion and validation via Pydantic v2
+    Usage:
+        from flext_quality.settings import FlextQualitySettings
 
-    Follows standardized pattern:
-    - No nested classes within Config
-    - All defaults from FlextQualityConstants
-    - Uses Pydantic 2.11+ field_validator and model_validator
+        settings = FlextQualitySettings.get_global_instance()
+        timeout = settings.hook_timeout_ms
     """
 
     model_config = SettingsConfigDict(
         env_prefix="FLEXT_QUALITY_",
-        case_sensitive=False,
-        extra="allow",
-        # Inherit enhanced Pydantic 2.11+ features from FlextSettings
-        validate_assignment=True,
-        str_strip_whitespace=True,
-        json_schema_extra={
-            "title": "FLEXT Quality Configuration",
-            "description": "Code quality analysis configuration extending FlextSettings",
-        },
+        env_nested_delimiter="__",
+        env_file=FlextSettings.resolve_env_file(),
+        env_file_encoding="utf-8",
+        extra="ignore",
+        validate_default=True,
     )
 
-    # Quality Analysis Configuration using FlextQualityConstants for defaults
-    min_coverage: float = Field(
-        default=FlextQualityConstants.Quality.Coverage.MINIMUM_COVERAGE,
-        ge=FlextQualityConstants.Quality.QualityValidation.MINIMUM_PERCENTAGE,
-        le=FlextQualityConstants.Quality.QualityValidation.MAXIMUM_PERCENTAGE,
-        description="Minimum test coverage percentage required",
+    # =========================================================================
+    # Class Variables (not config fields)
+    # =========================================================================
+    _instance: ClassVar[FlextQualitySettings | None] = None
+
+    # =========================================================================
+    # Hook Configuration
+    # =========================================================================
+    hook_timeout_ms: int = Field(
+        default=c.Quality.Defaults.HOOK_TIMEOUT_MS,
+        ge=100,
+        le=60000,
+        description="Timeout for hook execution in milliseconds",
+    )
+    hook_enabled: bool = Field(
+        default=True,
+        description="Enable/disable hook processing",
     )
 
-    max_complexity: int = Field(
-        default=FlextQualityConstants.Quality.Complexity.MAX_COMPLEXITY,
+    # =========================================================================
+    # Rule Engine Configuration
+    # =========================================================================
+    rule_timeout_seconds: int = Field(
+        default=c.Quality.Defaults.RULE_TIMEOUT_SECONDS,
         ge=1,
-        le=FlextQualityConstants.Quality.Complexity.HIGH_COMPLEXITY_WARNING_THRESHOLD,
-        description="Maximum cyclomatic complexity allowed",
+        le=300,
+        description="Timeout for rule evaluation in seconds",
     )
-
-    max_duplication: float = Field(
-        default=FlextQualityConstants.Quality.Duplication.MAXIMUM_DUPLICATION,
-        ge=FlextQualityConstants.Quality.QualityValidation.MINIMUM_PERCENTAGE,
-        le=FlextQualityConstants.Quality.QualityValidation.MAXIMUM_PERCENTAGE,
-        description="Maximum code duplication percentage allowed",
-    )
-
-    min_security_score: float = Field(
-        default=FlextQualityConstants.Quality.QualitySecurity.MINIMUM_SECURITY_SCORE,
-        ge=FlextQualityConstants.Quality.QualityValidation.MINIMUM_PERCENTAGE,
-        le=FlextQualityConstants.Quality.QualityValidation.MAXIMUM_PERCENTAGE,
-        description="Minimum security score required",
-    )
-
-    min_maintainability: float = Field(
-        default=FlextQualityConstants.Quality.Maintainability.MINIMUM_MAINTAINABILITY,
-        ge=FlextQualityConstants.Quality.QualityValidation.MINIMUM_PERCENTAGE,
-        le=FlextQualityConstants.Quality.QualityValidation.MAXIMUM_PERCENTAGE,
-        description="Minimum maintainability index required",
-    )
-
-    # Service Configuration using FlextQualityConstants for defaults
-    analysis_timeout: int = Field(
-        default=FlextQualityConstants.Quality.QualityPerformance.DEFAULT_ANALYSIS_TIMEOUT,
-        gt=0,
-        le=FlextQualityConstants.Quality.QualityPerformance.MAXIMUM_ANALYSIS_TIMEOUT,
-        description="Quality analysis timeout in seconds",
-    )
-
-    parallel_workers: int = Field(
-        default=FlextQualityConstants.Quality.QualityPerformance.DEFAULT_WORKERS,
+    rule_batch_size: int = Field(
+        default=c.Quality.Defaults.BATCH_SIZE,
         ge=1,
-        le=FlextQualityConstants.Quality.QualityPerformance.MAXIMUM_WORKERS,
-        description="Number of parallel workers for analysis",
+        le=1000,
+        description="Batch size for rule processing",
     )
-
-    memory_limit_mb: int = Field(
-        default=FlextQualityConstants.Quality.Optimization.MAX_FILE_SIZE
-        // (1024 * 1024),
-        gt=0,
-        le=2048,
-        description="Memory limit per file in MB",
-    )
-
-    # Backend Configuration using FlextQualityConstants for defaults
-    enable_ast_analysis: bool = Field(
-        default=True,
-        description="Enable AST-based code analysis",
-    )
-
-    enable_external_tools: bool = Field(
-        default=True,
-        description="Enable external tool integration",
-    )
-
-    enable_ruff: bool = Field(
-        default=True,
-        description="Enable Ruff linting analysis",
-    )
-
-    enable_mypy: bool = Field(
-        default=True,
-        description="Enable MyPy type checking analysis",
-    )
-
-    enable_bandit: bool = Field(
-        default=True,
-        description="Enable Bandit security analysis",
-    )
-
-    enable_dependency_scan: bool = Field(
-        default=True,
-        description="Enable dependency vulnerability scanning",
-    )
-
-    # Reporting Configuration using FlextQualityConstants for defaults
-    enable_html_reports: bool = Field(
-        default=True,
-        description="Enable HTML report generation",
-    )
-
-    enable_json_reports: bool = Field(
-        default=True,
-        description="Enable JSON report generation",
-    )
-
-    enable_audit_logging: bool = Field(
-        default=True,
-        description="Enable audit logging for quality operations",
-    )
-
-    include_trend_analysis: bool = Field(
-        default=True,
-        description="Include trend analysis in reports",
-    )
-
-    include_executive_summary: bool = Field(
-        default=True,
-        description="Include executive summary in reports",
-    )
-
-    # Observability Configuration using FlextQualityConstants for defaults
-    observability_quiet: bool = Field(
-        default=False,
-        description="Enable quiet mode for observability (useful for JSON/HTML output)",
-    )
-
-    observability_log_level: Literal[
-        "DEBUG",
-        "INFO",
-        "WARNING",
-        "ERROR",
-        "CRITICAL",
-    ] = Field(
-        default="INFO",
-        description="Log level for observability components",
-    )
-
-    # Project Identification
-    project_name: str = Field(
-        default="flext-quality",
-        description="Project name",
-    )
-
-    project_version: str = Field(
-        default="0.9.0",
-        description="Project version",
-    )
-
-    # Pydantic 2.11+ field validators (warnings only - validation via Field constraints)
-    @field_validator("max_complexity")
-    @classmethod
-    def validate_complexity_threshold(cls, v: int) -> int:
-        """Warn if complexity threshold is high (validation via Field constraint)."""
-        if (
-            v
-            > FlextQualityConstants.Quality.Complexity.HIGH_COMPLEXITY_WARNING_THRESHOLD
-        ):
-            warnings.warn(
-                f"High complexity threshold ({v}) may be too permissive",
-                UserWarning,
-                stacklevel=2,
-            )
-        return v
-
-    @field_validator("analysis_timeout")
-    @classmethod
-    def validate_timeout(cls, v: int) -> int:
-        """Warn if analysis timeout is very high (validation via Field constraint)."""
-        if (
-            v
-            > FlextQualityConstants.Quality.QualityPerformance.MAXIMUM_ANALYSIS_TIMEOUT
-        ):
-            warnings.warn(
-                f"Very long timeout ({v}s) may cause performance issues",
-                UserWarning,
-                stacklevel=2,
-            )
-        return v
-
-    @field_validator("parallel_workers")
-    @classmethod
-    def validate_workers(cls, v: int) -> int:
-        """Warn if worker count is high (validation via Field constraint)."""
-        if v > FlextQualityConstants.Quality.QualityPerformance.MAXIMUM_WORKERS:
-            warnings.warn(
-                f"High worker count ({v}) may impact system performance",
-                UserWarning,
-                stacklevel=2,
-            )
-        return v
-
-    @model_validator(mode="after")
-    def validate_quality_configuration_consistency(self) -> Self:
-        """Validate quality configuration consistency."""
-        # Validate threshold relationships
-        if (
-            self.min_coverage
-            >= FlextQualityConstants.Quality.QualityValidation.COVERAGE_EXTERNAL_TOOLS_THRESHOLD
-            and not self.enable_external_tools
-        ):
-            warnings.warn(
-                "100% coverage target requires external tools for validation",
-                UserWarning,
-                stacklevel=2,
-            )
-
-        # Validate security configuration
-        if (
-            self.min_security_score
-            >= FlextQualityConstants.Quality.QualityValidation.SECURITY_BANDIT_THRESHOLD
-            and not self.enable_bandit
-        ):
-            msg = "High security score requires Bandit security analysis"
-            raise ValueError(msg)
-
-        # Validate analysis configuration
-        if not any([
-            self.enable_ast_analysis,
-            self.enable_external_tools,
-            self.enable_ruff,
-            self.enable_mypy,
-            self.enable_bandit,
-        ]):
-            msg = "At least one analysis method must be enabled"
-            raise ValueError(msg)
-
-        # Validate reporting configuration
-        if not any([self.enable_html_reports, self.enable_json_reports]):
-            warnings.warn(
-                "No report formats enabled, analysis results may not be accessible",
-                UserWarning,
-                stacklevel=2,
-            )
-
-        return self
-
-    def validate_business_rules(self) -> FlextResult[bool]:
-        """Validate quality analysis business rules."""
-        try:
-            # Validate analysis requirements
-            if self.min_coverage > 0.0 and not self.enable_external_tools:
-                return FlextResult[bool].fail(
-                    "Coverage analysis requires external tools",
-                )
-
-            # Validate performance requirements
-            if (
-                self.analysis_timeout
-                < FlextQualityConstants.Quality.QualityPerformance.MINIMUM_ANALYSIS_TIMEOUT
-            ):
-                return FlextResult[bool].fail(
-                    f"Analysis timeout too low (minimum {FlextQualityConstants.Quality.QualityPerformance.MINIMUM_ANALYSIS_TIMEOUT} seconds)",
-                )
-
-            # Validate threshold consistency
-            if (
-                self.min_security_score
-                >= FlextQualityConstants.Quality.QualityValidation.SECURITY_DEPENDENCY_SCAN_THRESHOLD
-                and not self.enable_dependency_scan
-            ):
-                return FlextResult[bool].fail(
-                    "High security score requires dependency scanning",
-                )
-
-            # Validate reporting requirements
-            if self.include_trend_analysis and not self.enable_audit_logging:
-                return FlextResult[bool].fail("Trend analysis requires audit logging")
-
-            return FlextResult[bool].ok(True)
-        except Exception as e:
-            error_msg = f"Business rules validation failed: {e}"
-            return FlextResult[bool].fail(error_msg)
-
-    def get_analysis_config(self) -> dict[str, t.GeneralValueType]:
-        """Get quality analysis configuration context."""
-        return {
-            "min_coverage": self.min_coverage,
-            "max_complexity": self.max_complexity,
-            "max_duplication": self.max_duplication,
-            "min_security_score": self.min_security_score,
-            "min_maintainability": self.min_maintainability,
-            "timeout": self.analysis_timeout,
-            "workers": self.parallel_workers,
-        }
-
-    def get_backend_config(self) -> dict[str, t.GeneralValueType]:
-        """Get analysis backend configuration context."""
-        return {
-            "enable_ast_analysis": self.enable_ast_analysis,
-            "enable_external_tools": self.enable_external_tools,
-            "enable_ruff": self.enable_ruff,
-            "enable_mypy": self.enable_mypy,
-            "enable_bandit": self.enable_bandit,
-            "enable_dependency_scan": self.enable_dependency_scan,
-        }
-
-    def get_reporting_config(self) -> dict[str, t.GeneralValueType]:
-        """Get quality reporting configuration context."""
-        return {
-            "enable_html_reports": self.enable_html_reports,
-            "enable_json_reports": self.enable_json_reports,
-            "enable_audit_logging": self.enable_audit_logging,
-            "include_trend_analysis": self.include_trend_analysis,
-            "include_executive_summary": self.include_executive_summary,
-        }
-
-    def get_observability_config(self) -> dict[str, t.GeneralValueType]:
-        """Get observability configuration context."""
-        return {
-            "quiet": self.observability_quiet,
-            "log_level": self.observability_log_level,
-        }
-
-    @classmethod
-    def create_for_environment(
-        cls,
-        environment: str,
-        **overrides: object,
-    ) -> FlextQualitySettings:
-        """Create configuration for specific environment using direct instantiation."""
-        # Note: environment parameter reserved for future use
-        _ = environment  # Unused but maintains parent signature
-        return cls.model_validate(overrides)
-
-    @classmethod
-    def create_default(cls) -> FlextQualitySettings:
-        """Create default configuration instance using direct instantiation."""
-        return cls()
-
-    @classmethod
-    def create_for_development(cls) -> FlextQualitySettings:
-        """Create configuration optimized for development using model_validate."""
-        return cls.model_validate({
-            "min_coverage": 80.0,
-            "max_complexity": 15,
-            "analysis_timeout": 120,
-            "parallel_workers": 2,
-        })
-
-    @classmethod
-    def create_for_production(cls) -> FlextQualitySettings:
-        """Create configuration optimized for production using model_validate."""
-        return cls.model_validate({
-            "min_coverage": FlextQualityConstants.Quality.Coverage.TARGET_COVERAGE,
-            "max_complexity": 8,
-            "min_security_score": FlextQualityConstants.Quality.QualitySecurity.TARGET_SECURITY_SCORE,
-            "min_maintainability": 85.0,
-            "analysis_timeout": 600,
-            "parallel_workers": 8,
-        })
-
-
-@FlextSettings.auto_register("type_verification")
-class TypeVerificationSettings(FlextSettings):
-    """Type verification plugin configuration.
-
-    Configures the TV001-TV018 type verification rules.
-    Environment variables: FLEXT_TYPE_VERIFICATION_*
-    """
-
-    model_config = SettingsConfigDict(
-        env_prefix="FLEXT_TYPE_VERIFICATION_",
-        case_sensitive=False,
-        extra="allow",
-        validate_assignment=True,
-        str_strip_whitespace=True,
-        json_schema_extra={
-            "title": "FLEXT Type Verification Configuration",
-            "description": "Type system compliance checking configuration",
-        },
-    )
-
-    # Thresholds
-    max_isinstance_per_function: int = Field(
-        default=FlextQualityConstants.Quality.TypeVerification.MAX_ISINSTANCE_PER_FUNCTION,
+    max_parallel_rules: int = Field(
+        default=c.Quality.Defaults.MAX_PARALLEL_RULES,
         ge=1,
-        le=20,
-        description="Maximum isinstance checks allowed per function",
+        le=32,
+        description="Maximum parallel rule evaluations",
     )
 
-    max_none_checks_per_file: int = Field(
-        default=FlextQualityConstants.Quality.TypeVerification.MAX_NONE_CHECKS_PER_FILE,
+    # =========================================================================
+    # MCP Server Configuration
+    # =========================================================================
+    mcp_server_name: str = Field(
+        default=c.Quality.Mcp.SERVER_NAME,
+        description="MCP server name",
+    )
+    mcp_server_port: int = Field(
+        default=c.Quality.Mcp.DEFAULT_PORT,
+        ge=1024,
+        le=65535,
+        description="MCP server port",
+    )
+    mcp_timeout_ms: int = Field(
+        default=c.Quality.Defaults.MCP_TIMEOUT_MS,
+        ge=1000,
+        le=300000,
+        description="Timeout for MCP operations in milliseconds",
+    )
+
+    # =========================================================================
+    # Integration Configuration
+    # =========================================================================
+    integration_timeout_ms: int = Field(
+        default=c.Quality.Defaults.INTEGRATION_TIMEOUT_MS,
+        ge=1000,
+        le=60000,
+        description="Timeout for external integrations in milliseconds",
+    )
+
+    # =========================================================================
+    # Cache Configuration
+    # =========================================================================
+    cache_enabled: bool = Field(
+        default=True,
+        description="Enable/disable caching",
+    )
+    cache_ttl_seconds: int = Field(
+        default=c.Quality.Defaults.CACHE_TTL_SECONDS,
+        ge=0,
+        le=86400,
+        description="Cache time-to-live in seconds",
+    )
+    max_cache_entries: int = Field(
+        default=c.Quality.Defaults.MAX_CACHE_ENTRIES,
+        ge=0,
+        le=100000,
+        description="Maximum number of cache entries",
+    )
+
+    # =========================================================================
+    # Quality Thresholds
+    # =========================================================================
+    max_cyclomatic_complexity: int = Field(
+        default=c.Quality.Threshold.MAX_CYCLOMATIC_COMPLEXITY,
         ge=1,
         le=50,
-        description="Maximum None checks allowed per file",
+        description="Maximum allowed cyclomatic complexity",
     )
-
-    max_callable_params: int = Field(
-        default=FlextQualityConstants.Quality.TypeVerification.MAX_CALLABLE_PARAMS,
+    max_cognitive_complexity: int = Field(
+        default=c.Quality.Threshold.MAX_COGNITIVE_COMPLEXITY,
         ge=1,
-        le=10,
-        description="Maximum Callable parameters before Protocol recommendation",
+        le=50,
+        description="Maximum allowed cognitive complexity",
+    )
+    max_function_length: int = Field(
+        default=c.Quality.Threshold.MAX_FUNCTION_LENGTH,
+        ge=1,
+        le=500,
+        description="Maximum function length in lines",
+    )
+    max_class_length: int = Field(
+        default=c.Quality.Threshold.MAX_CLASS_LENGTH,
+        ge=1,
+        le=2000,
+        description="Maximum class length in lines",
+    )
+    min_test_coverage: float = Field(
+        default=c.Quality.Threshold.MIN_TEST_COVERAGE,
+        ge=0.0,
+        le=100.0,
+        description="Minimum required test coverage percentage",
+    )
+    max_line_length: int = Field(
+        default=c.Quality.Threshold.MAX_LINE_LENGTH,
+        ge=40,
+        le=200,
+        description="Maximum line length",
     )
 
-    # Category enable flags
-    check_missing_annotation: bool = Field(
-        default=True,
-        description="Check for missing type annotations (TV001)",
+    # =========================================================================
+    # Paths Configuration
+    # =========================================================================
+    rules_dir: str = Field(
+        default=c.Quality.Paths.RULES_DIR,
+        description="Directory for rule definitions",
+    )
+    config_file: str = Field(
+        default=c.Quality.Paths.CONFIG_FILE,
+        description="Quality configuration file name",
+    )
+    cache_dir: str = Field(
+        default=c.Quality.Paths.CACHE_DIR,
+        description="Cache directory name",
+    )
+    reports_dir: str = Field(
+        default=c.Quality.Paths.REPORTS_DIR,
+        description="Reports output directory",
     )
 
-    check_excessive_typing: bool = Field(
-        default=True,
-        description="Check for excessive typing complexity (TV002)",
-    )
-
-    check_decentralized_types: bool = Field(
-        default=True,
-        description="Check for TypeAlias/Protocol outside proper modules (TV003-TV005)",
-    )
-
-    check_protocol_recommendations: bool = Field(
-        default=True,
-        description="Check for Callable types needing Protocol (TV006-TV008)",
-    )
-
-    check_model_recommendations: bool = Field(
-        default=True,
-        description="Check for dict/dataclass needing Model (TV009-TV011)",
-    )
-
-    check_coupling: bool = Field(
-        default=True,
-        description="Check for excessive isinstance/type narrowing (TV012-TV014)",
-    )
-
-    check_result_misuse: bool = Field(
-        default=True,
-        description="Check for FlextResult misuse patterns (TV015-TV017)",
-    )
-
-    check_uncentralized_types: bool = Field(
-        default=True,
-        description="Check for types that should use centralized aliases (TV018)",
-    )
-
-    # Exclusion patterns
-    exclude_patterns: list[str] = Field(
-        default_factory=lambda: ["**/tests/**", "**/conftest.py"],
-        description="Glob patterns for files to exclude from type verification",
-    )
-
-    def get_enabled_categories(self) -> set[str]:
-        """Get set of enabled category names."""
-        categories: set[str] = set()
-        if self.check_missing_annotation:
-            categories.add("missing_annotation")
-        if self.check_excessive_typing:
-            categories.add("excessive_typing")
-        if self.check_decentralized_types:
-            categories.add("decentralized_type")
-        if self.check_protocol_recommendations:
-            categories.add("needs_protocol")
-        if self.check_model_recommendations:
-            categories.add("needs_model")
-        if self.check_coupling:
-            categories.add("excessive_coupling")
-            categories.add("type_narrowing")
-            categories.add("excessive_none")
-        if self.check_result_misuse:
-            categories.add("result_misuse")
-        if self.check_uncentralized_types:
-            categories.add("uncentralized_type")
-        return categories
+    # =========================================================================
+    # Instance Management
+    # =========================================================================
+    @classmethod
+    def get_instance(cls) -> FlextQualitySettings:
+        """Get or create singleton instance."""
+        if cls._instance is None:
+            cls._instance = cls()
+        return cls._instance
 
     @classmethod
-    def create_strict(cls) -> TypeVerificationSettings:
-        """Create strict configuration that enables all checks."""
-        return cls.model_validate({
-            "max_isinstance_per_function": 3,
-            "max_none_checks_per_file": 10,
-            "max_callable_params": 2,
-        })
+    def _reset_instance(cls) -> None:
+        """Reset singleton instance (for testing)."""
+        cls._instance = None
 
-    @classmethod
-    def create_lenient(cls) -> TypeVerificationSettings:
-        """Create lenient configuration for legacy code."""
-        return cls.model_validate({
-            "max_isinstance_per_function": 10,
-            "max_none_checks_per_file": 30,
-            "max_callable_params": 5,
-            "check_model_recommendations": False,
-            "check_uncentralized_types": False,
-        })
+    # =========================================================================
+    # Path Resolution
+    # =========================================================================
+    def get_rules_path(self, base_path: Path | None = None) -> Path:
+        """Get the rules directory path."""
+        base = base_path or Path.cwd()
+        return base / self.rules_dir
+
+    def get_cache_path(self, base_path: Path | None = None) -> Path:
+        """Get the cache directory path."""
+        base = base_path or Path.cwd()
+        return base / self.cache_dir
+
+    def get_reports_path(self, base_path: Path | None = None) -> Path:
+        """Get the reports directory path."""
+        base = base_path or Path.cwd()
+        return base / self.reports_dir
+
+    def get_config_path(self, base_path: Path | None = None) -> Path:
+        """Get the config file path."""
+        base = base_path or Path.cwd()
+        return base / self.config_file
+
+    # =========================================================================
+    # Validation
+    # =========================================================================
+    def validate_thresholds(self) -> r[bool]:
+        """Validate threshold configuration.
+
+        Note: Range validation is handled by Pydantic Field constraints.
+        This method validates logical constraints between fields.
+        """
+        if self.max_function_length > self.max_class_length:
+            return r[bool].fail("max_function_length cannot exceed max_class_length")
+        return r[bool].ok(True)
+
+    def validate_paths(self, base_path: Path | None = None) -> r[bool]:
+        """Validate that required paths exist or can be created."""
+        base = base_path or Path.cwd()
+        rules_path = base / self.rules_dir
+        if not rules_path.exists():
+            return r[bool].fail(f"Rules directory not found: {rules_path}")
+        return r[bool].ok(True)
 
 
-__all__ = [
-    "FlextQualitySettings",
-    "TypeVerificationSettings",
-]
+__all__ = ["FlextQualitySettings"]

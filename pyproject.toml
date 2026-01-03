@@ -21,14 +21,20 @@
         "pyright (>=1.1.406)",
         "mypy (>=1.18.2)",
         "typer (>=0.12.3)",
-        "rich (>=13.9.2)",
+        "rich (>=14.2.0,<15.0.0)",
         "pydantic-core (>=2.41.4)",
         "fastapi (>=0.115.0)",
         "uvicorn (>=0.30.0)",
         "libcst (>=1.8.6,<2.0.0)",
         "pyyaml (>=6.0.3,<7.0.0)",
+        "fastmcp (>=2.14.2,<3.0.0)",
+        "httpx (>=0.28.0)",
+        "click (>=8.1.0)",
+        "pytest (>=9.0.2,<10.0.0)",
+        "wrapt (>=1.17.0,<2.0.0)",
+        "referencing (>=0.28.4,<0.37.0)",
     ]
-    description = "FLEXT Quality - Code Quality Analysis and Metrics"
+    description = "FLEXT Quality - Unified orchestration platform for Claude Code tooling"
     keywords = [
         "adapter",
         "enterprise",
@@ -74,9 +80,11 @@
         ]
 
     [project.scripts]
-        flext-quality = "flext_quality.cli:main"
-        flext-docs = "flext_quality.docs_maintenance.cli:main"
+        flext-quality = "flext_quality.services.cli:main"
 
+
+[tool.pyrefly]
+    search-path = ["src"]
 
 [tool.django-stubs]
     django_settings_module = "code_analyzer_web.settings"
@@ -128,6 +136,21 @@
         "tests",
     ]
 
+# Coverage inherits from workspace but with project-specific source
+[tool.coverage.run]
+    source = ["src/flext_quality"]
+    branch = true
+
+[tool.coverage.report]
+    exclude_lines = [
+        "pragma: no cover",
+        'if __name__ == "__main__":',
+        "if TYPE_CHECKING:",
+        "raise NotImplementedError",
+        "@abstractmethod",
+        '^\s*\.\.\.\s*$',
+    ]
+
     [tool.ruff.lint.isort]
         known-first-party = [
             "flext_quality",
@@ -142,7 +165,7 @@
         isort          = ">=6.0.1"
         pre-commit     = ">=4.0.1"
         pylint         = ">=3.3.0"
-        pyrefly        = "^0.34.0"
+        pyrefly        = "^0.46.3"
         pyupgrade      = ">=3.19.0"
         radon          = ">=6.0.1"
         ruff           = ">=0.12.3"
@@ -150,6 +173,16 @@
     refurb = "^2.2.0"
     complexipy = "^5.1.0"
     rope = "^1.14.0"
+    docker = "^7.1.0"
+    python-on-whales = "^0.79.0"
+    pytest-cov = "^7.0.0"
+    pytest = "^9.0.2"
+    bandit = "^1.9.2"
+    pip-audit = "^2.10.0"
+    opentelemetry-api = ">=1.39.1"
+    opentelemetry-sdk = ">=1.39.1"
+    prompt-toolkit = ">=3.0.52"
+    sqlparse = ">=0.5.5"
 
     [tool.poetry.group.test.dependencies]
         
@@ -159,7 +192,7 @@ factory-boy         = ">=3.3.1"
         pytest              = ">=8.4.0"
         pytest-benchmark    = ">=5.1.0"
         pytest-clarity      = ">=1.0.1"
-        pytest-cov = "=7.0.0"
+        pytest-cov = ">=7.0.0"
         pytest-deadfixtures = ">=2.2.1"
         pytest-env          = ">=1.1.5"
         pytest-mock         = ">=3.14.0"

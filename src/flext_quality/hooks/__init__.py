@@ -1,19 +1,8 @@
-"""FLEXT Quality Hooks Integration - Python interface for shell hooks.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-
-"""
+"""Hooks system - Protocol-based hook lifecycle management."""
 
 from __future__ import annotations
 
-from flext_quality.hooks.validation_engine import PreToolValidator, ValidationViolation
-from flext_quality.hooks.validator import FlextHookValidator
-from flext_quality.hooks.workspace_detector import WorkspaceDetector
+from .base import BaseHookImpl
+from .manager import HookManager
 
-__all__ = [
-    "FlextHookValidator",
-    "PreToolValidator",
-    "ValidationViolation",
-    "WorkspaceDetector",
-]
+__all__ = ["BaseHookImpl", "HookManager"]

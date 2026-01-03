@@ -9,19 +9,19 @@ from flext_quality.models import FlextQualityModels
 # which have syntax errors
 # Re-export only what tests need
 from flext_quality.services import (
-    AnalysisServiceBuilder,
+    FlextAnalysisServiceBuilder,
     FlextQualityServices,
-    IssueServiceBuilder,
-    ProjectServiceBuilder,
-    ReportServiceBuilder,
+    FlextIssueServiceBuilder,
+    FlextProjectServiceBuilder,
+    FlextReportServiceBuilder,
 )
 
 __all__ = [
-    "AnalysisServiceBuilder",
+    "FlextAnalysisServiceBuilder",
     "FlextQualitySettings",
     "FlextQualityModels",
     "FlextQualityServices",
-    "IssueServiceBuilder",
-    "ProjectServiceBuilder",
-    "ReportServiceBuilder",
+    "FlextIssueServiceBuilder",
+    "FlextProjectServiceBuilder",
+    "FlextReportServiceBuilder",
 ]

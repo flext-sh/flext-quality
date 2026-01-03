@@ -1,11 +1,6 @@
 """Constants for flext-quality tests.
 
-Provides TestsFlextQualityConstants, extending FlextTestsConstants with flext-quality-specific
-constants using COMPOSITION INHERITANCE.
-
-Inheritance hierarchy:
-- FlextTestsConstants (flext_tests) - Provides .Tests.* namespace
-- FlextQualityConstants (production) - Provides .Quality.* namespace
+Provides TestsFlextQualityConstants extending FlextQualityConstants with test-specific constants.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -13,33 +8,19 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Final, TypeAlias
-
-from flext_tests.constants import FlextTestsConstants
+from typing import Final
 
 from flext_quality.constants import FlextQualityConstants
-from flext_quality.typings import t as qt
 
 
-class TestsFlextQualityConstants(FlextTestsConstants, FlextQualityConstants):
-    """Constants for flext-quality tests using COMPOSITION INHERITANCE.
-
-    MANDATORY: Inherits from BOTH:
-    1. FlextTestsConstants - for test infrastructure (.Tests.*)
-    2. FlextQualityConstants - for domain constants (.Quality.*)
+class TestsFlextQualityConstants(FlextQualityConstants):
+    """Constants for flext-quality tests.
 
     Access patterns:
-    - tc.Tests.Docker.* (container testing)
-    - tc.Tests.Matcher.* (assertion messages)
-    - tc.Tests.Factory.* (test data generation)
     - tc.Quality.* (domain constants from production)
+    - tc.Quality.Literals.* (type literals from production)
+    - tc.Paths.* (test path constants)
     - tc.TestQuality.* (project-specific test data)
-
-    Rules:
-    - NEVER duplicate constants from FlextTestsConstants or FlextQualityConstants
-    - Only flext-quality-specific test constants allowed
-    - All generic constants come from FlextTestsConstants
-    - All production constants come from FlextQualityConstants
     """
 
     class Paths:
@@ -56,22 +37,10 @@ class TestsFlextQualityConstants(FlextTestsConstants, FlextQualityConstants):
         TEST_ANALYSIS_TIMEOUT: Final[int] = 60
         TEST_WORKERS: Final[int] = 2
 
-    class Literals:
-        """Literal type aliases for test constants (Python 3.13 pattern)."""
-
-        AnalysisStatusLiteral: TypeAlias = qt.Literals.AnalysisStatusLiteral
-        IssueSeverityLiteral: TypeAlias = qt.Literals.IssueSeverityLiteral
-        IssueTypeLiteral: TypeAlias = qt.Literals.IssueTypeLiteral
-        ReportFormatLiteral: TypeAlias = qt.Literals.ReportFormatLiteral
-        BackendTypeLiteral: TypeAlias = qt.Literals.BackendTypeLiteral
-        LanguageLiteral: TypeAlias = qt.Literals.LanguageLiteral
-        CheckStatusLiteral: TypeAlias = qt.Literals.CheckStatusLiteral
-        LogLevelLiteral: TypeAlias = FlextQualityConstants.Settings.LogLevel
-
 
 # Short aliases per FLEXT convention
-tc = TestsFlextQualityConstants  # Primary test constants alias
-c = TestsFlextQualityConstants  # Alternative alias for compatibility
+tc = TestsFlextQualityConstants
+c = TestsFlextQualityConstants
 
 __all__ = [
     "TestsFlextQualityConstants",

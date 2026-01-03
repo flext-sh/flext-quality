@@ -18,7 +18,6 @@ from pathlib import Path
 from typing import TypeVar
 
 import pytest
-from django.test.utils import setup_test_environment, teardown_test_environment
 from flext_core import FlextResult, FlextTypes as t
 
 T = TypeVar("T")
@@ -50,7 +49,7 @@ def assert_result_success_with_data[T](result: FlextResult[T]) -> T:
       messages for test debugging and failure analysis.
 
     """
-    assert result.success, f"Expected success but got failure: {result.error}"
+    assert result.is_success, f"Expected success but got failure: {result.error}"
     assert result.value is not None, "Expected data but got None"
     return result.value
 
@@ -93,12 +92,11 @@ def set_test_environment() -> Generator[None]:
 
     Automatically sets up the test environment for all tests, ensuring
     proper isolation from development and production environments.
-    Configures logging, Django settings, and FLEXT-specific variables.
+    Configures logging and FLEXT-specific variables.
 
     Environment Variables:
       FLEXT_ENV: Set to 'test' for test-specific behavior
       FLEXT_LOG_LEVEL: Set to 'debug' for comprehensive test logging
-      DJANGO_SETTINGS_MODULE: Django configuration for web interface testing
 
     Note:
       This fixture runs automatically for all tests and handles
@@ -106,21 +104,11 @@ def set_test_environment() -> Generator[None]:
 
     """
     os.environ["FLEXT_ENV"] = "test"
-    os.environ["FLEXT_LOG_LEVEL"] = "debug"
-    os.environ["DJANGO_SETTINGS_MODULE"] = "code_analyzer_web.settings"
+    os.environ["FLEXT_LOG_LEVEL"] = "DEBUG"
     yield
     # Cleanup
     os.environ.pop("FLEXT_ENV", None)
     os.environ.pop("FLEXT_LOG_LEVEL", None)
-
-
-# Django fixtures
-@pytest.fixture
-def django_db_setup() -> Generator[None]:
-    """Django database setup for testing."""
-    setup_test_environment()
-    yield
-    teardown_test_environment()
 
 
 # Quality analysis fixtures
@@ -174,7 +162,7 @@ def sample_code_repository(tmp_path: Path) -> dict[str, t.GeneralValueType]:
       >>> def test_repo_analysis(sample_code_repository):
       ...     analyzer = CodeAnalyzer(sample_code_repository["path"])
       ...     result = analyzer.analyze_project()
-      ...     assert result.success
+      ...     assert result.is_success
 
     """
     return {
@@ -491,7 +479,6 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line("markers", "quality: Quality analysis tests")
     config.addinivalue_line("markers", "backend: Backend integration tests")
     config.addinivalue_line("markers", "celery: Celery task tests")
-    config.addinivalue_line("markers", "django: Django framework tests")
     config.addinivalue_line("markers", "slow: Slow tests")
 
 
