@@ -45,7 +45,7 @@
     name = "flext-quality"
     readme = "README.md"
     requires-python = ">=3.13,<3.14"
-    version = "0.9.0"
+    version = "0.10.0-dev"
     [[project.authors]]
         email = "team@flext.sh"
         name  = "FLEXT Team"
@@ -84,7 +84,7 @@
 
 
 [tool.pyrefly]
-    search-path = ["src"]
+    search-path = ["src", "../flext-cli/src"]
 
 [tool.django-stubs]
     django_settings_module = "code_analyzer_web.settings"
