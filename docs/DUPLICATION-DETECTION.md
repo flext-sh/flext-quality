@@ -50,8 +50,8 @@ if result.is_success:
 
 - `get_duplicate_count(directory: Path) -> FlextResult[int]`
   - Count duplicate pairs in a directory
-  - Recursively scans for *.py files
-  - Ignores __pycache__ and .venv directories
+  - Recursively scans for \*.py files
+  - Ignores **pycache** and .venv directories
 
 ### 2. Pre-Tool Hook (07-duplicate-code-detector.sh)
 
@@ -305,34 +305,34 @@ class Quality:
 **Scope**:
 
 - Only FLEXT projects (directories with `/src` subdirectory)
-- Only Python files (*.py)
+- Only Python files (\*.py)
 - Only when `include_duplicates` option enabled
 - Baseline must exist
 
 ## Architecture Decisions
 
-### Why Line-Based Similarity?
+### Why Line-Based Similarity
 
 - **Simple**: No AST parsing needed
 - **Fast**: Efficient set operations
 - **Effective**: Catches 90%+ of meaningful clones
 - **Deterministic**: Reproducible results
 
-### Why 80% Threshold?
+### Why 80% Threshold
 
 - **Balances precision and recall**
 - **Filters out minor variations** (different variable names)
 - **Catches significant clones** (copy-paste code)
 - **Configurable per-use** if needed
 
-### Why Retry on Hash Match?
+### Why Retry on Hash Match
 
 - **Prevents accidental repeats** from typos or tool glitches
 - **Allows intentional duplicates** after confirmation
 - **No manual baseline intervention** needed
 - **Educational** (teaches DRY principle)
 
-### Why Project-Scoped?
+### Why Project-Scoped
 
 - **Accurate** (no false positives from unrelated projects)
 - **Fast** (doesn't scan entire workspace)

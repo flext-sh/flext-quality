@@ -9,6 +9,7 @@
 ## What's New (v2.0)
 
 Previously: Manual workflow with 4 separate modes
+
 ```bash
 ./fix_[name].sh dry-run     # Mode 1
 ./fix_[name].sh backup      # Mode 2
@@ -17,6 +18,7 @@ Previously: Manual workflow with 4 separate modes
 ```
 
 **Now: Complete automated workflow (default)**
+
 ```bash
 ./fix_[name].sh             # All 5 steps in one command!
 ```
@@ -58,43 +60,52 @@ chmod +x fix_my_issue.sh
 **Default behavior (no arguments) runs 5 steps:**
 
 ### STEP 1: DRY-RUN (Preview)
+
 ```bash
 [INFO] === DRY-RUN MODE ===
 [INFO] Would fix: file1.py
 [INFO] Would fix: file2.py
 [✓] Dry-run: Would affect 2 file(s)
 ```
+
 ✅ Safe - no files modified
 ✅ Shows what will change
 
 ### STEP 2: RUFF CHECK (Baseline)
+
 ```bash
 [INFO] Checking ruff errors BEFORE fixes...
 [INFO]   file1.py: 5 errors
 [INFO]   file2.py: 3 errors
 ```
+
 ✅ Captures error counts before changes
 ✅ Used for ratchet validation
 
 ### STEP 3: BACKUP (Safety)
+
 ```bash
 [INFO] Creating backup...
 [✓] Backup created: /tmp/fix_my_issue.20251229_110654.tar.gz
 ```
+
 ✅ Creates tar.gz archive
 ✅ Timestamped filename
 ✅ Retained for recovery
 
 ### STEP 4: EXECUTE (Apply Fixes)
+
 ```bash
 [INFO] Applying fixes...
 [✓] Fixed: file1.py
 [✓] Fixed: file2.py
 ```
+
 ✅ Applies fix to all files
 ✅ Rolls back all on failure
 
 ### STEP 5: VALIDATE (Ratchet Check)
+
 ```bash
 [INFO] Validating fixes with ruff...
 [✓] Ratchet OK: file1.py (5 → 2 errors)
@@ -103,6 +114,7 @@ chmod +x fix_my_issue.sh
 ✅ WORKFLOW COMPLETED SUCCESSFULLY
 Backup retained at: /tmp/fix_my_issue.20251229_110654.tar.gz
 ```
+
 ✅ Errors DECREASED or same - OK!
 ✅ If errors INCREASED - selective rollback only that file
 ✅ Backup retained for manual recovery
@@ -125,26 +137,32 @@ If you need manual control, all 4 modes still work:
 ## Key Features
 
 ### 🎯 Complete Automation
+
 - Run one command = entire workflow
 - No manual steps needed
 - Suitable for CI/CD integration
 
 ### 🛡️ Safety Guarantees
+
 - ✅ Dry-run preview (no changes)
 - ✅ Automatic backup before execution
 - ✅ Ratchet validation (errors cannot increase)
 - ✅ Selective rollback (only failed files)
 
 ### 📊 Ratchet Validation
+
 **Rule**: Error count must NOT increase
 
 **Valid outcomes**:
+
 - `5 → 2 errors` ✅ Decreased (GOOD!)
 - `5 → 5 errors` ✅ Same (OK)
 - `5 → 8 errors` ❌ Increased (ROLLED BACK!)
 
 ### 🔄 Selective Rollback
+
 If validation fails for specific files:
+
 - Only those files are rolled back
 - Files that passed stay fixed
 - Full backup retained for manual recovery
@@ -188,6 +206,7 @@ bash ~/.claude/hooks/lib/batch_fix_validator.sh fix_whitespace.sh
 ```
 
 Validator checks:
+
 - ✅ Script uses batch operations (sources batch_bridge.sh)
 - ✅ Script implements all required functions
 - ❌ Blocks scripts that don't use batch system
@@ -199,11 +218,13 @@ Validator checks:
 Every fix script **MUST**:
 
 1. ✅ Source `batch_bridge.sh`
+
    ```bash
    source ~/.claude/hooks/lib/batch_bridge.sh
    ```
 
 2. ✅ Implement `discover_target_files()`
+
    ```bash
    discover_target_files() {
        find "$PROJECT_ROOT" -name "*.py" -type f
@@ -211,6 +232,7 @@ Every fix script **MUST**:
    ```
 
 3. ✅ Implement `apply_fix()`
+
    ```bash
    apply_fix() {
        local file="$1"
@@ -219,6 +241,7 @@ Every fix script **MUST**:
    ```
 
 4. ✅ Use case statement for modes
+
    ```bash
    case "${1:-auto}" in
        auto) auto_workflow ;;
@@ -232,17 +255,20 @@ Every fix script **MUST**:
 ## File Locations
 
 ### Templates/Examples (Reference)
+
 - Location: `flext-quality/examples/batch_operations/`
 - Purpose: Copy and customize
 - Status: Read-only reference
 
 ### Active Scripts (Usage)
+
 - Location: `/tmp/fix_*.sh` (temporary)
 - Location: `./fix_*.sh` (project-local)
 - Purpose: Execute workflows
 - Status: Run the scripts here
 
 ### Batch Bridge (Runtime)
+
 - Location: `~/.claude/hooks/lib/batch_bridge.sh`
 - Purpose: Shell functions for batch operations
 - Status: Automatically sourced
@@ -276,9 +302,11 @@ Do you want to...?
 ## Common Patterns
 
 ### Pattern 1: Remove Trailing Whitespace
+
 See: `fix_template.sh` (example implementation)
 
 ### Pattern 2: Update Type Annotations
+
 ```bash
 apply_fix() {
     local file="$1"
@@ -291,6 +319,7 @@ discover_target_files() {
 ```
 
 ### Pattern 3: Fix Import Order
+
 ```bash
 apply_fix() {
     python -m isort "$1" 2>/dev/null || true
@@ -315,6 +344,7 @@ Hook automatically validates all fix scripts:
 ```
 
 Guidance shown:
+
 ```
 📚 FOR COMPLETE GUIDANCE, USE THE INTERACTIVE SKILL:
    /batch-fix-help
@@ -325,17 +355,20 @@ Guidance shown:
 ## Troubleshooting
 
 ### "Backup failed - aborting"
+
 - Ensure `/tmp` has space: `df /tmp`
 - Check write permissions: `ls -la /tmp`
 - Old backups: `rm /tmp/fix_*.tar.gz`
 
 ### "Ratchet violation detected"
+
 - Errors INCREASED after fix
 - Likely the fix introduced new issues
 - File was rolled back automatically
 - Check the fix logic in `apply_fix()`
 
 ### "Script not validated"
+
 - Script must source `batch_bridge.sh`
 - Script must have `discover_target_files()`
 - Script must have `apply_fix()`
@@ -346,11 +379,13 @@ Guidance shown:
 ## For Help
 
 Interactive guidance available:
+
 ```bash
 /batch-fix-help
 ```
 
 Covers:
+
 - 5-minute quick start
 - Real-world examples
 - Common mistakes
@@ -361,14 +396,14 @@ Covers:
 
 ## Safety Summary
 
-| Aspect | Guarantee |
-|--------|-----------|
-| **Preview** | ✅ Dry-run shows changes without modifying |
-| **Backup** | ✅ Automatic tar.gz before execution |
-| **Validation** | ✅ Ratchet check (errors cannot increase) |
-| **Rollback** | ✅ Selective (only failed files) |
-| **Recovery** | ✅ Full backup retained for manual restore |
-| **Audit** | ✅ Complete logging of all steps |
+| Aspect         | Guarantee                                  |
+| -------------- | ------------------------------------------ |
+| **Preview**    | ✅ Dry-run shows changes without modifying |
+| **Backup**     | ✅ Automatic tar.gz before execution       |
+| **Validation** | ✅ Ratchet check (errors cannot increase)  |
+| **Rollback**   | ✅ Selective (only failed files)           |
+| **Recovery**   | ✅ Full backup retained for manual restore |
+| **Audit**      | ✅ Complete logging of all steps           |
 
 ---
 
@@ -376,4 +411,3 @@ Covers:
 **Pattern**: Proven in 100+ automated fixes
 **Quality**: Enterprise Grade
 **Safety**: Guaranteed
-

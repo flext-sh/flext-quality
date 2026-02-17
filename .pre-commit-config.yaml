@@ -1,8 +1,8 @@
 # FLEXT Quality Documentation Pre-commit Hooks
 # Automated quality checks for documentation files before commits
 
-repos: []  # DISABLED BY SCRIPT - All hooks disabled
-# 
+repos: [] # DISABLED BY SCRIPT - All hooks disabled
+#
 #       - id: docs-link-check
 #         name: Documentation Link Validation
 #         description: Validate internal and external links in documentation
@@ -12,7 +12,7 @@ repos: []  # DISABLED BY SCRIPT - All hooks disabled
 #         args: [--internal-links, --fast-check]
 #         pass_filenames: true
 #         additional_dependencies: [pyyaml, requests, beautifulsoup4, aiohttp]
-# 
+#
 #       - id: docs-quality-audit
 #         name: Documentation Quality Audit
 #         description: Run comprehensive quality audit on documentation files
@@ -23,7 +23,7 @@ repos: []  # DISABLED BY SCRIPT - All hooks disabled
 #         pass_filenames: true
 #         additional_dependencies:
 #           [pyyaml, requests, beautifulsoup4, aiohttp, jinja2]
-# 
+#
 #   # Standard markdown formatting
 #   - repo: https://github.com/executablebooks/mdformat
 #     rev: 0.7.17
@@ -33,7 +33,7 @@ repos: []  # DISABLED BY SCRIPT - All hooks disabled
 #           - mdformat-gfm
 #           - mdformat-frontmatter
 #           - mdformat-footnote
-# 
+#
 #   # Check for broken links (external) - temporarily disabled due to repo issues
 #   # - repo: https://github.com/lycheeverse/lychee
 #   #   rev: v0.14.3
@@ -43,7 +43,7 @@ repos: []  # DISABLED BY SCRIPT - All hooks disabled
 #   #       description: Check URLs for liveness
 #   #       args: [--config docs/maintenance/config/lychee.toml]
 #   #       pass_filenames: false
-# 
+#
 #   # YAML validation for config files
 #   - repo: https://github.com/pre-commit/pre-commit-hooks
 #     rev: v4.5.0
@@ -51,35 +51,35 @@ repos: []  # DISABLED BY SCRIPT - All hooks disabled
 #       - id: check-yaml
 #         files: \.(yaml|yml)$
 #         exclude: docs/maintenance/reports/.*\.ya?ml$
-# 
+#
 #       - id: check-json
 #         files: \.(json)$
 #         exclude: docs/maintenance/reports/.*\.json$
-# 
+#
 #       - id: check-merge-conflict
 #         files: \.(md|mdx)$
-# 
+#
 #       - id: trailing-whitespace
 #         files: \.(md|mdx)$
-# 
+#
 #       - id: end-of-file-fixer
 #         files: \.(md|mdx)$
-# 
+#
 #       - id: check-case-conflict
-# 
+#
 #   # Python code quality (for maintenance scripts)
 #   - repo: https://github.com/psf/black
 #     rev: 23.12.1
 #     hooks:
 #       - id: black
 #         files: docs/maintenance/.*\.py$
-# 
+#
 #   - repo: https://github.com/pycqa/isort
 #     rev: 5.13.2
 #     hooks:
 #       - id: isort
 #         files: docs/maintenance/.*\.py$
-# 
+#
 #   - repo: https://github.com/pycqa/flake8
 #     rev: 7.0.0
 #     hooks:

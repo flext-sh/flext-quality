@@ -3,6 +3,7 @@
 ## Current State
 
 flext-quality already integrates:
+
 - **Ruff** - Fast Python linter (via subprocess)
 - **Mypy** - Static type checker (via library API)
 - **Vulture** - Dead code detection (via library import)
@@ -15,6 +16,7 @@ flext-quality already integrates:
 ## MCP Python Refactoring Integration
 
 The MCP project at `~/mcp-python-refactoring` provides additional analyzers:
+
 - **Rope** - AST-based refactoring
 - **Refurb** - Modern pattern suggestions
 - **Complexipy** - Cognitive complexity
@@ -26,12 +28,14 @@ The MCP project at `~/mcp-python-refactoring` provides additional analyzers:
 ### 1. Hook-Based Integration (Implemented)
 
 Hooks in `~/.claude/hooks/` use CLI tools directly:
+
 - `05-dead-code-detector.sh` - Vulture with baseline tracking
 - `06-modernization-advisor.sh` - Refurb for suggestions
 
 ### 2. Makefile Targets (Implemented)
 
 Added to `~/flext/base.mk`:
+
 ```makefile
 dead-code: ## Dead code detection (Vulture)
 modernize: ## Modern patterns suggestions (Refurb)
@@ -42,6 +46,7 @@ validate-full: ## Full validation including dead code
 ### 3. MCP Server Access (Available)
 
 The MCP server provides tools via Claude Code:
+
 - `analyze_python_code` - Comprehensive analysis
 - `extract_function` - Guided refactoring
 - `quick_analyze` - Fast function/complexity check
@@ -91,6 +96,7 @@ class QualityPlugin(Protocol):
 ### 5. Baseline Management
 
 Baseline tracking for dead code:
+
 - File: `~/flext/.dead-code-baseline`
 - Generator: `~/flext/scripts/create-dead-code-baseline.sh`
 - Hook auto-updates on retry
@@ -144,6 +150,7 @@ Baseline tracking for dead code:
 ## Summary
 
 The integration follows a layered approach:
+
 1. **Hooks** - Real-time quality gates during development
 2. **Makefile** - CLI-accessible quality commands
 3. **MCP Server** - On-demand analysis via Claude Code

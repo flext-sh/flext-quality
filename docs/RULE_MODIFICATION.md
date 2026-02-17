@@ -52,6 +52,7 @@ After editing YAML files, rules reload on next hook execution:
 ### 1. Reduce Severity of a Rule
 
 **Before** (Critical):
+
 ```yaml
 - code: SEC001
   name: file_deletion_recursive
@@ -63,12 +64,13 @@ After editing YAML files, rules reload on next hook execution:
 ```
 
 **After** (Medium warning):
+
 ```yaml
 - code: SEC001
   name: file_deletion_recursive
   pattern: 'rm\s+-rf?\s+[^|;&]+'
-  severity: medium          # Reduced from critical
-  blocking: false           # Optional: warning only
+  severity: medium # Reduced from critical
+  blocking: false # Optional: warning only
   guidance: |
     Use 'mv file file.bak' instead of rm...
 ```
@@ -86,9 +88,9 @@ After editing YAML files, rules reload on next hook execution:
   severity: critical
   blocking: true
   exceptions:
-    - "**/tests/**"         # Skip in tests directory
-    - "**/scripts/**"       # Skip in scripts directory
-    - "**/build/**"         # Skip in build output
+    - "**/tests/**" # Skip in tests directory
+    - "**/scripts/**" # Skip in scripts directory
+    - "**/build/**" # Skip in build output
   guidance: |
     Use /tmp/ for temporary scripts...
 ```
@@ -137,12 +139,13 @@ Update guidance for clarity:
 Create new rule in appropriate YAML file:
 
 **In `code_quality.yaml`**:
+
 ```yaml
-- code: CQ999                     # Unique code
-  name: my_custom_pattern         # Short name
-  pattern: 'some_pattern'         # Regex pattern
-  severity: medium                # critical, high, medium, low
-  blocking: false                 # Block or warn only
+- code: CQ999 # Unique code
+  name: my_custom_pattern # Short name
+  pattern: "some_pattern" # Regex pattern
+  severity: medium # critical, high, medium, low
+  blocking: false # Block or warn only
   guidance: |
     Explanation of the issue.
 
@@ -153,10 +156,10 @@ Create new rule in appropriate YAML file:
     Example:
       WRONG: code that triggers rule
       RIGHT: corrected version
-  tags: [custom, testing]         # Optional tags
-  applies_to:                     # Optional: file patterns
-    - "**/*.py"                   # Python files only
-    - "!**/tests/**"              # Except tests
+  tags: [custom, testing] # Optional tags
+  applies_to: # Optional: file patterns
+    - "**/*.py" # Python files only
+    - "!**/tests/**" # Except tests
 ```
 
 ---
@@ -182,28 +185,28 @@ Update what triggers the rule:
 **Complete rule anatomy**:
 
 ```yaml
-- code: CATXXX                    # Unique identifier (CAT = category)
-  name: descriptive_name          # Human-readable name
-  pattern: 'regex_pattern'        # Pattern to match
-  category: category_name         # From RuleCategory enum
-  severity: critical              # critical | high | medium | low
-  blocking: true                  # Whether it blocks execution
-  guidance: |                     # Multi-line guidance text
+- code: CATXXX # Unique identifier (CAT = category)
+  name: descriptive_name # Human-readable name
+  pattern: "regex_pattern" # Pattern to match
+  category: category_name # From RuleCategory enum
+  severity: critical # critical | high | medium | low
+  blocking: true # Whether it blocks execution
+  guidance: | # Multi-line guidance text
     Explanation of issue
     How to fix it
     Examples if helpful
-  tags: [tag1, tag2]             # Optional categorization
-  applies_to:                     # Optional file patterns
+  tags: [tag1, tag2] # Optional categorization
+  applies_to: # Optional file patterns
     - "**/*.py"
     - "!**/tests/**"
-  exceptions:                     # Optional exclusions
+  exceptions: # Optional exclusions
     - "**/tests/**"
     - "**/scripts/**"
-  language: python               # Optional language
-  file_types:                     # Optional file extensions
+  language: python # Optional language
+  file_types: # Optional file extensions
     - ".py"
     - ".pyi"
-  context_required:              # Optional required context
+  context_required: # Optional required context
     - "FLEXT_PROJECT"
 ```
 
@@ -342,6 +345,7 @@ echo 'rm -rf /tmp/test' > /tmp/test_rule.sh
 ```
 
 **Fix**: Use YAML validator:
+
 ```bash
 python3 -c "import yaml; yaml.safe_load(open('file.yaml'))"
 ```
@@ -357,6 +361,7 @@ pattern: 'rm\s+-rf\s+'
 ```
 
 **Test regex**:
+
 ```bash
 python3 -c "import re; re.compile(r'your_pattern_here')"
 ```

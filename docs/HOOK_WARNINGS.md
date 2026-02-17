@@ -17,6 +17,7 @@ Tool execution → Hook validates → Violations found? →
 ```
 
 **Key behavior**:
+
 - ✅ **All operations proceed** (no blocking)
 - ⚠️ **Warnings are informational** (help you improve code)
 - 📖 **Guidance provided** (how to fix violations)
@@ -31,6 +32,7 @@ Tool execution → Hook validates → Violations found? →
 **Purpose**: Protect against dangerous shell operations and destructive commands.
 
 #### File Deletion (SEC001-003)
+
 - **SEC001**: `rm -rf` detected
   - Problem: Permanent, irreversible file deletion
   - Fix: Use `mv file file.bak` instead
@@ -45,6 +47,7 @@ Tool execution → Hook validates → Violations found? →
   - Fix: Ask user first, use `sudo mv file file.bak` if needed
 
 #### In-Place Editing (SEC004-006)
+
 - **SEC004**: `sed -i` (sed in-place)
   - Problem: No backup created automatically
   - Fix: Use Edit tool or create `/tmp/fix_*.sh` with backup modes
@@ -58,6 +61,7 @@ Tool execution → Hook validates → Violations found? →
   - Fix: Create `/tmp` script with 4 modes (dry-run, backup, exec, rollback)
 
 #### System Destructive Operations (SEC007-011)
+
 - **SEC007**: `dd if=` (disk write)
   - ⛔ CRITICAL: Can overwrite entire disks
   - Fix: Double-check paths, ask user for explicit approval
@@ -79,6 +83,7 @@ Tool execution → Hook validates → Violations found? →
   - Fix: Use specific permissions: `chmod 755`, `chmod 644`, `chmod 700`
 
 #### Piping & Package Management (SEC012-016)
+
 - **SEC012**: Truncation redirection (`>`)
   - Problem: Can overwrite existing files
   - Fix: Use Write tool or verify file doesn't exist
@@ -106,6 +111,7 @@ Tool execution → Hook validates → Violations found? →
 **Purpose**: Prevent accidental loss of git commits, branches, and stashes.
 
 #### Destructive Operations (GIT001-007)
+
 - **GIT001**: `git restore`
   - Problem: Discards working directory changes
   - Fix: Review with `git diff`, fix manually with Edit tool
@@ -135,6 +141,7 @@ Tool execution → Hook validates → Violations found? →
   - Fix: Use `git clean -n` (dry-run) first to preview
 
 #### Staging & Push Operations (GIT008-010)
+
 - **GIT008**: `git stage`
   - Problem: Can cause code loss in hook sequences
   - Fix: Use `git add <file>` or `git add -p` (interactive)
@@ -148,6 +155,7 @@ Tool execution → Hook validates → Violations found? →
   - Fix: Never force push to main/master branch
 
 #### Rebase & Merge (GIT011-013)
+
 - **GIT011**: `git rebase -i` (interactive rebase)
   - Problem: Requires terminal interaction
   - Fix: User must run manually or use non-interactive rebase
@@ -161,6 +169,7 @@ Tool execution → Hook validates → Violations found? →
   - Fix: Resolve conflicts manually, use `git commit`
 
 #### Conflict Resolution (GIT014-018)
+
 - **GIT014**: `git checkout --ours`
   - Problem: Discards changes from other branch
   - Fix: Resolve conflicts manually with Edit tool
@@ -182,6 +191,7 @@ Tool execution → Hook validates → Violations found? →
   - Fix: Resolve conflicts with Edit tool manually
 
 #### Branch & Stash (GIT019-024)
+
 - **GIT019**: `git branch -d/-D`
   - ⛔ CRITICAL: Deletes branch permanently
   - Fix: Verify merged first, ask user for confirmation
@@ -207,6 +217,7 @@ Tool execution → Hook validates → Violations found? →
   - Fix: Resolve conflicts, use `git cherry-pick --continue`
 
 #### Automation Scripts (GIT025-029)
+
 - **GIT025-029**: Git commands in scripts
   - Problem: Automated git operations need explicit review
   - Fix: Execute git directly or ask user to run command
@@ -218,6 +229,7 @@ Tool execution → Hook validates → Violations found? →
 **Purpose**: Ensure proper type safety, organization, and testing practices.
 
 #### Type Annotations (CQ001-005)
+
 - **CQ001**: Missing return type on function
   - Problem: Type checking is incomplete
   - Fix: Add `-> ReturnType` annotation to all public functions
@@ -239,6 +251,7 @@ Tool execution → Hook validates → Violations found? →
   - Fix: Use `Protocol` with `__call__` method for clarity
 
 #### Data Structures (CQ006-007)
+
 - **CQ006**: `@dataclass` instead of Pydantic
   - Problem: Missing validation and serialization
   - Fix: Use `pydantic.BaseModel` for data validation
@@ -248,6 +261,7 @@ Tool execution → Hook validates → Violations found? →
   - Fix: Use `Protocol` for structural typing instead
 
 #### FLEXT Patterns (CQ008-010)
+
 - **CQ008**: `FlextResult` returning None
   - ⛔ CRITICAL: FlextResult never returns None
   - Fix: Use `.ok(value)` for success, `.fail(error)` for failure
@@ -261,6 +275,7 @@ Tool execution → Hook validates → Violations found? →
   - Fix: Use centralized types like `t.StringDict` from typings.py
 
 #### Testing (CQ011)
+
 - **CQ011**: Mock usage in tests
   - ⛔ CRITICAL: FLEXT uses real implementations
   - Problem: Mocks hide implementation details, create brittle tests
@@ -273,6 +288,7 @@ Tool execution → Hook validates → Violations found? →
 **Purpose**: Prevent project pollution and maintain organization standards.
 
 #### Script Creation (FO001-004)
+
 - **FO001**: Script in project root
   - Problem: Clogs project with temporary scripts
   - Fix: Create in `/tmp/fix_*.sh` with validation modes
@@ -290,6 +306,7 @@ Tool execution → Hook validates → Violations found? →
   - Fix: Use `/tmp/file` for temporary
 
 #### Batch Operations (FO005-009)
+
 - **FO005**: `sed -i` on multiple Python files
   - ⛔ CRITICAL: No validation or rollback
   - Fix: Create `/tmp/fix_*.sh` with 4 modes:
@@ -315,6 +332,7 @@ Tool execution → Hook validates → Violations found? →
   - Fix: Use Edit tool or `/tmp` script
 
 #### Backup Conventions (FO010-011)
+
 - **FO010**: `.backup` extension (wrong)
   - Problem: Inconsistent backup naming
   - Fix: Use `.bak` convention only
@@ -324,6 +342,7 @@ Tool execution → Hook validates → Violations found? →
   - Fix: Use `.bak` for consistency
 
 #### Temporary Files (FO012-019)
+
 - **FO012**: fix/verify/check scripts in project
   - Problem: Ad-hoc scripts clutter project
   - Fix: Use `/tmp/fix_*.sh` for temporary scripts
@@ -363,6 +382,7 @@ Tool execution → Hook validates → Violations found? →
 **Purpose**: Protect critical configuration and security files.
 
 #### Configuration Management (PF001-002)
+
 - **PF001**: `pyproject.toml` direct edit
   - Problem: Manual edits cause inconsistencies
   - Fix: Use Poetry commands:
@@ -376,6 +396,7 @@ Tool execution → Hook validates → Violations found? →
   - Fix: Use `poetry lock` or `poetry update` only
 
 #### Git Configuration (PF003-014)
+
 - **PF003**: `.git/hooks/` modifications
   - Problem: Git hooks should be in `.claude/hooks/`
   - Fix: Use `~/.claude/hooks/` for user hooks, `./.claude/hooks/` for project
@@ -470,8 +491,8 @@ Edit the YAML file to adjust severity:
   # blocking: false        # Warning only (not blocking)
   # Or add exceptions:
   exceptions:
-    - "**/tests/**"        # Skip in test scripts
-    - "**/scripts/**"      # Skip in scripts
+    - "**/tests/**" # Skip in test scripts
+    - "**/scripts/**" # Skip in scripts
 ```
 
 ---
@@ -486,14 +507,14 @@ Edit the YAML file to adjust severity:
 
 ## 🎯 Summary
 
-| Category | Count | Severity | Purpose |
-|----------|-------|----------|---------|
-| Security | 16 | Critical | Protect against dangerous operations |
-| Git Operations | 29 | Critical | Prevent commit/branch loss |
-| Code Quality | 14 | High | Ensure type safety & testing |
-| File Operations | 19 | High | Maintain project organization |
-| Project Files | 14 | Critical | Protect configuration & secrets |
-| **TOTAL** | **92** | - | **5 main categories** |
+| Category        | Count  | Severity | Purpose                              |
+| --------------- | ------ | -------- | ------------------------------------ |
+| Security        | 16     | Critical | Protect against dangerous operations |
+| Git Operations  | 29     | Critical | Prevent commit/branch loss           |
+| Code Quality    | 14     | High     | Ensure type safety & testing         |
+| File Operations | 19     | High     | Maintain project organization        |
+| Project Files   | 14     | Critical | Protect configuration & secrets      |
+| **TOTAL**       | **92** | -        | **5 main categories**                |
 
 **All warnings are informational and allow execution to proceed.**
 
