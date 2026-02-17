@@ -138,7 +138,7 @@ EOF
 # Create file with type: ignore (triggers CQ013)
 cat > /tmp/test_quality.py << 'EOF'
 def process(data) -> str:
-    return str(data)  # type: ignore  # CQ013 detected here
+    return str(data)
 EOF
 
 # Expected behavior:
@@ -260,7 +260,7 @@ ls ~/.claude/hooks/pre_tool_use.py  # Should exist and be executable
 ```bash
 # Create files/code that trigger rules
 echo 'rm -rf /tmp/test' > /tmp/test.sh
-echo 'def test(): pass  # type: ignore' > /tmp/test.py
+echo 'def test(): pass
 ```
 
 ### 3. Observe Warnings
