@@ -11,7 +11,7 @@
 All 197 rules are in YAML files:
 
 ```bash
-ls /home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/*.yaml
+ls flext-quality/src/flext_quality/rules/data/*.yaml
 ```
 
 **16 YAML files with rule categories**:
@@ -221,7 +221,7 @@ Update what triggers the rule:
 #    [SEC001] rm -rf: ... (appears 5 times in test scripts)
 
 # 2. Edit the YAML file
-nano /home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/security.yaml
+nano flext-quality/src/flext_quality/rules/data/security.yaml
 
 # 3. Add exception for test scripts
 #    exceptions:
@@ -241,7 +241,7 @@ nano /home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/security.ya
 #    [CQ999] my_rule: ...
 
 # 2. Edit guidance to be clearer
-nano /home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/code_quality.yaml
+nano flext-quality/src/flext_quality/rules/data/code_quality.yaml
 #    Update guidance: | section with better explanation
 
 # 3. Save and trigger rule again
@@ -252,7 +252,7 @@ nano /home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/code_qualit
 
 ```bash
 # Option A: Reduce severity
-nano /home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/security.yaml
+nano flext-quality/src/flext_quality/rules/data/security.yaml
 # Change: severity: critical → severity: low
 
 # Option B: Add exceptions
@@ -271,18 +271,18 @@ nano /home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/security.ya
 
 ```bash
 # Find the rule file
-grep -l "SEC001" /home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/*.yaml
+grep -l "SEC001" flext-quality/src/flext_quality/rules/data/*.yaml
 # Output: security.yaml
 
 # Edit that file
-nano /home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/security.yaml
+nano flext-quality/src/flext_quality/rules/data/security.yaml
 ```
 
 ### By pattern name
 
 ```bash
 # Find rule by name
-grep -l "file_deletion" /home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/*.yaml
+grep -l "file_deletion" flext-quality/src/flext_quality/rules/data/*.yaml
 # Output: security.yaml
 ```
 
@@ -290,10 +290,10 @@ grep -l "file_deletion" /home/marlonsc/flext/flext-quality/src/flext_quality/rul
 
 ```bash
 # All code quality rules
-cat /home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/code_quality.yaml
+cat flext-quality/src/flext_quality/rules/data/code_quality.yaml
 
 # All git operations rules
-cat /home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/git_operations.yaml
+cat flext-quality/src/flext_quality/rules/data/git_operations.yaml
 ```
 
 ---
@@ -303,7 +303,7 @@ cat /home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/git_operatio
 ### Test Rule Loads
 
 ```bash
-cd /home/marlonsc/flext/flext-quality
+cd flext-quality
 
 # Python test (requires dependencies)
 # python3 -c "from flext_quality.rules import registry; print(f'Loaded {len(registry.all())} rules')"
@@ -404,7 +404,7 @@ When modifying a rule:
 
 ---
 
-**Quick Reference**: All rules in `/home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/`
+**Quick Reference**: All rules in `flext-quality/src/flext_quality/rules/data/`
 
 **Reload**: Automatic on next hook execution (no restart needed)
 

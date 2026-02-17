@@ -168,7 +168,7 @@ EOF
 
 ```bash
 # Try to create script in project root (triggers FO001)
-touch /home/marlonsc/flext/fix_script.sh
+touch fix_script.sh
 
 # Expected behavior:
 # 1. Hook detects: Script in project root
@@ -241,7 +241,7 @@ touch /home/marlonsc/flext/fix_script.sh
 
 ### Rule Files
 
-- Location: `/home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/`
+- Location: `flext-quality/src/flext_quality/rules/data/`
 - Format: YAML with Pydantic validation
 - Reload: Automatic (no restart needed)
 

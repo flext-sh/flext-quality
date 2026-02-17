@@ -28,7 +28,7 @@ class HookManager:
         if event not in self._hooks:
             self._hooks[event] = []
         self._hooks[event].append(hook)
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
     def execute(self, event: str, input_data: HookInput) -> r[HookOutput]:
         """Execute all hooks for an event."""

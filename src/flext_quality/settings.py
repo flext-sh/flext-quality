@@ -246,7 +246,7 @@ class FlextQualitySettings(FlextSettings):
         """
         if self.max_function_length > self.max_class_length:
             return r[bool].fail("max_function_length cannot exceed max_class_length")
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
     def validate_paths(self, base_path: Path | None = None) -> r[bool]:
         """Validate that required paths exist or can be created."""
@@ -254,7 +254,7 @@ class FlextQualitySettings(FlextSettings):
         rules_path = base / self.rules_dir
         if not rules_path.exists():
             return r[bool].fail(f"Rules directory not found: {rules_path}")
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
 
 __all__ = ["FlextQualitySettings"]

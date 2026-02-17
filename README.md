@@ -288,7 +288,7 @@ flext_quality/rules/
 
 #### **Option 1: Add Rule to Existing YAML**
 
-Edit `/home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/python_code.yaml`:
+Edit `flext-quality/src/flext_quality/rules/data/python_code.yaml`:
 
 ```yaml
 rules:
@@ -305,7 +305,7 @@ rules:
 
 #### **Option 2: Create New YAML Category**
 
-Create `/home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/mycategory.yaml`:
+Create `flext-quality/src/flext_quality/rules/data/mycategory.yaml`:
 
 ```yaml
 metadata:

@@ -479,7 +479,7 @@ If the violation is truly intentional and necessary:
 Edit the YAML file to adjust severity:
 
 ```yaml
-# File: /home/marlonsc/flext/flext-quality/src/flext_quality/rules/data/security.yaml
+# File: flext-quality/src/flext_quality/rules/data/security.yaml
 
 - code: SEC001
   name: file_deletion_recursive

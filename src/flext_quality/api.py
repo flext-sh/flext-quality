@@ -240,7 +240,7 @@ class FlextQuality:
         threshold_result = self.config.validate_thresholds()
         if threshold_result.is_failure:
             return r[bool].fail(threshold_result.error or "Threshold validation failed")
-        return r[bool].ok(True)
+        return r[bool].ok(value=True)
 
     def get_status(self) -> dict[str, object]:
         """Get quality service status.
