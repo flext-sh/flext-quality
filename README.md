@@ -6,7 +6,9 @@
 
 **FLEXT-Quality** is the centralized quality control library for the FLEXT ecosystem. It enforces rigorous architectural standards, checks for anti-patterns, and ensures code health across all projects.
 
-Part of the [FLEXT](https://github.com/flext-sh/flext) ecosystem.
+**Reviewed**: 2026-02-17 | **Version**: 0.10.0-dev
+
+Part of the [FLEXT](https://github.com/flext/flext) ecosystem.
 
 ## 🚀 Key Features
 
