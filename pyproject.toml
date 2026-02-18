@@ -84,7 +84,9 @@
 
 
 [tool.pyrefly]
-    search-path = ["src", "../flext-cli/src"]
+    search-path = [
+            "../typings",
+            "../typings/generated","src", "../flext-cli/src"]
 
 [tool.django-stubs]
     django_settings_module = "code_analyzer_web.settings"
