@@ -1,7 +1,7 @@
 # Documentation Maintenance Metadata Inventory
 
-| Repository | Maintenance Directory         | Config Files  | Markdown Assets | Automation Scripts | Notes |
-| ---------- | ----------------------------- | ------------- | --------------- | ------------------ | ----- |
+| Repository | Maintenance Directory         | Config Files  | Markdown Assets                                                        | Automation Scripts                     | Notes                                                           |
+| ---------- | ----------------------------- | ------------- | ---------------------------------------------------------------------- | -------------------------------------- | --------------------------------------------------------------- |
 | flext-grpc | `flext-grpc/docs/maintenance` | `config.yaml` | `README.md`, `user-guide.md`, `troubleshooting.md`, `api-reference.md` | _(shared runner invoked via Makefile)_ | Migrated to shared `flext-quality` CLI; legacy scripts removed. |
 
 | flext-ldap | `flext-ldap/docs/maintenance` | `config.yaml` | `README.md`,
@@ -22,7 +22,7 @@ All repositories now execute through the consolidated **advanced** profile; the 
 ## Normalization Checklist
 
 1. ✅ Convert JSON-based configs (`flext-grpc`) to shared YAML schema.
-2. ✅ Extract inline/implicit configs (`flext-observability`) into explicit YAML files.
-3. Align capability coverage with shared CLI options (identify profile gaps before Phase 2 upgrades).
-4. Document required Markdown deliverables and ensure consistent naming/location (`docs/maintenance/reports/*.md`).
-5. Replace bespoke automation entry points with shared Makefile targets invoking `flext-quality` profiles (completed for initial wave; extend to remaining repos during rollout).
+1. ✅ Extract inline/implicit configs (`flext-observability`) into explicit YAML files.
+1. Align capability coverage with shared CLI options (identify profile gaps before Phase 2 upgrades).
+1. Document required Markdown deliverables and ensure consistent naming/location (`docs/maintenance/reports/*.md`).
+1. Replace bespoke automation entry points with shared Makefile targets invoking `flext-quality` profiles (completed for initial wave; extend to remaining repos during rollout).
