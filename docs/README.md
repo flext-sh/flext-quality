@@ -1,6 +1,7 @@
 # FLEXT Quality Documentation
 
 <!-- TOC START -->
+
 - [Table of Contents](#table-of-contents)
 - [Current Implementation Status](#current-implementation-status)
 - [Documentation Structure](#documentation-structure)
@@ -24,6 +25,7 @@
 - [Documentation Maintenance Baseline](#documentation-maintenance-baseline)
 - [Contributing to Documentation](#contributing-to-documentation)
 - [Support and Feedback](#support-and-feedback)
+
 <!-- TOC END -->
 
 ## Table of Contents

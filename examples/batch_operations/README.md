@@ -45,7 +45,7 @@
 **Version**: 2.0.0 (Improved Auto-Workflow)
 **Pattern**: dry-run → ruff-check → backup → exec → validate → selective-rollback
 
----
+______________________________________________________________________
 
 ## What's New (v2.0)
 
@@ -64,7 +64,7 @@ Previously: Manual workflow with 4 separate modes
 ./fix_[name].sh             # All 5 steps in one command!
 ```
 
----
+______________________________________________________________________
 
 ## Quick Start
 
@@ -94,7 +94,7 @@ chmod +x fix_my_issue.sh
 ./fix_my_issue.sh           # Runs complete workflow!
 ```
 
----
+______________________________________________________________________
 
 ## Auto-Workflow Explained
 
@@ -160,7 +160,7 @@ Backup retained at: /tmp/fix_my_issue.20251229_110654.tar.gz
 ✅ If errors INCREASED - selective rollback only that file
 ✅ Backup retained for manual recovery
 
----
+______________________________________________________________________
 
 ## Individual Modes (Still Available)
 
@@ -173,7 +173,7 @@ If you need manual control, all 4 modes still work:
 ./fix_[name].sh rollback     # Restore from backup
 ```
 
----
+______________________________________________________________________
 
 ## Key Features
 
@@ -208,7 +208,7 @@ If validation fails for specific files:
 - Files that passed stay fixed
 - Full backup retained for manual recovery
 
----
+______________________________________________________________________
 
 ## Real Example: Remove Trailing Whitespace
 
@@ -232,7 +232,7 @@ cp flext-quality/examples/batch_operations/fix_template.sh fix_whitespace.sh
 # ✅ WORKFLOW COMPLETED SUCCESSFULLY
 ```
 
----
+______________________________________________________________________
 
 ## Integration with Validator
 
@@ -252,7 +252,7 @@ Validator checks:
 - ✅ Script implements all required functions
 - ❌ Blocks scripts that don't use batch system
 
----
+______________________________________________________________________
 
 ## Compliance Requirements
 
@@ -291,7 +291,7 @@ Every fix script **MUST**:
    esac
    ```
 
----
+______________________________________________________________________
 
 ## File Locations
 
@@ -314,7 +314,7 @@ Every fix script **MUST**:
 - Purpose: Shell functions for batch operations
 - Status: Automatically sourced
 
----
+______________________________________________________________________
 
 ## Workflow Decision Tree
 
@@ -338,7 +338,7 @@ Do you want to...?
   (no arguments = auto-workflow)
 ```
 
----
+______________________________________________________________________
 
 ## Common Patterns
 
@@ -371,7 +371,7 @@ discover_target_files() {
 }
 ```
 
----
+______________________________________________________________________
 
 ## Validation Integration
 
@@ -391,7 +391,7 @@ Guidance shown:
    /batch-fix-help
 ```
 
----
+______________________________________________________________________
 
 ## Troubleshooting
 
@@ -415,7 +415,7 @@ Guidance shown:
 - Script must have `apply_fix()`
 - Must use case statement for modes
 
----
+______________________________________________________________________
 
 ## For Help
 
@@ -433,7 +433,7 @@ Covers:
 - Troubleshooting
 - Complete reference template
 
----
+______________________________________________________________________
 
 ## Safety Summary
 
@@ -446,7 +446,7 @@ Covers:
 | **Recovery**   | ✅ Full backup retained for manual restore |
 | **Audit**      | ✅ Complete logging of all steps           |
 
----
+______________________________________________________________________
 
 **Status**: ✅ Production Ready
 **Pattern**: Proven in 100+ automated fixes

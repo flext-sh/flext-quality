@@ -1,7 +1,9 @@
 # Documentation Maintenance Metadata Inventory
 
 <!-- TOC START -->
+
 - [Normalization Checklist](#normalization-checklist)
+
 <!-- TOC END -->
 
 | Repository | Maintenance Directory         | Config Files  | Markdown Assets                                                        | Automation Scripts                     | Notes                                                           |

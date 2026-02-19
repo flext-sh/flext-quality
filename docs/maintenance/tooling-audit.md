@@ -1,6 +1,7 @@
 # Documentation Maintenance Tooling Audit
 
 <!-- TOC START -->
+
 - [Table of Contents](#table-of-contents)
 - [CLI & UX](#cli-ux)
 - [HTTP & Concurrency](#http-concurrency)
@@ -10,6 +11,7 @@
 - [File & Data Processing](#file-data-processing)
 - [Observability](#observability)
   - [Immediate Recommendations (Phase 2+)](#immediate-recommendations-phase-2)
+
 <!-- TOC END -->
 
 ## Table of Contents
@@ -60,7 +62,7 @@
 
 - **[structlog](https://www.structlog.org/)** or Rich log handler for structured outputs that can be harvested by CI pipelines.
 
----
+______________________________________________________________________
 
 ### Immediate Recommendations (Phase 2+)
 

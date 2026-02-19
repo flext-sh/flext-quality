@@ -1,38 +1,40 @@
 # C4 Model - FLEXT Quality Architecture
 
 <!-- TOC START -->
+
 - [Table of Contents](#table-of-contents)
-- [🎯 C4 Model Overview](#-c4-model-overview)
+- [🎯 C4 Model Overview](#c4-model-overview)
   - [1. Context (Level 1)](#1-context-level-1)
   - [2. Containers (Level 2)](#2-containers-level-2)
   - [3. Components (Level 3)](#3-components-level-3)
   - [4. Code (Level 4)](#4-code-level-4)
-- [📋 FLEXT Quality C4 Views](#-flext-quality-c4-views)
-- [🏗️ Architecture Principles Applied](#-architecture-principles-applied)
+- [📋 FLEXT Quality C4 Views](#flext-quality-c4-views)
+- [🏗️ Architecture Principles Applied](#architecture-principles-applied)
   - [Clean Architecture Layers](#clean-architecture-layers)
   - [FLEXT Ecosystem Integration](#flext-ecosystem-integration)
   - [Quality Attributes](#quality-attributes)
-- [📊 Key Metrics](#-key-metrics)
+- [📊 Key Metrics](#key-metrics)
   - [System Characteristics](#system-characteristics)
   - [Quality Metrics](#quality-metrics)
-- [🔗 Relationships & Dependencies](#-relationships-dependencies)
+- [🔗 Relationships & Dependencies](#relationships-dependencies)
   - [Internal Dependencies](#internal-dependencies)
   - [External Dependencies](#external-dependencies)
   - [Analysis Backends](#analysis-backends)
-- [🚀 Evolution & Scaling](#-evolution-scaling)
+- [🚀 Evolution & Scaling](#evolution-scaling)
   - [Current Architecture Status](#current-architecture-status)
   - [Scaling Considerations](#scaling-considerations)
   - [Future Enhancements](#future-enhancements)
-- [📚 Navigation Guide](#-navigation-guide)
+- [📚 Navigation Guide](#navigation-guide)
   - [Understanding the Architecture](#understanding-the-architecture)
   - [For Different Audiences](#for-different-audiences)
-- [🛠️ Tooling & Automation](#-tooling-automation)
+- [🛠️ Tooling & Automation](#tooling-automation)
   - [Diagram Generation](#diagram-generation)
   - [Documentation Automation](#documentation-automation)
   - [Maintenance Tools](#maintenance-tools)
-- [📋 Quality Assurance](#-quality-assurance)
+- [📋 Quality Assurance](#quality-assurance)
   - [Architecture Review Checklist](#architecture-review-checklist)
   - [Documentation Standards](#documentation-standards)
+
 <!-- TOC END -->
 
 ## Table of Contents
@@ -268,6 +270,6 @@ Domain Layer ← Application Layer ← Infrastructure Layer ← Presentation Lay
 - **Accuracy**: Diagrams and documentation reflect actual implementation
 - **Maintenance**: Regular review and update process established
 
----
+______________________________________________________________________
 
 **C4 Model Documentation** - Structured architectural understanding from system context to implementation details.

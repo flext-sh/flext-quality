@@ -14,6 +14,12 @@ WORKSPACE_ROOT := $(shell cd .. && pwd)
 WORKSPACE_VENV := $(WORKSPACE_ROOT)/.venv
 POETRY_ENV := VIRTUAL_ENV=$(WORKSPACE_VENV) PATH=$(WORKSPACE_VENV)/bin:$$PATH POETRY_VIRTUALENVS_CREATE=false POETRY_VIRTUALENVS_IN_PROJECT=false
 
+ifneq ("$(wildcard ../base.mk)", "")
+include ../base.mk
+else
+include base.mk
+endif
+
 # Quality Standards
 QUALITY_MIN_COVERAGE := 100.0
 QUALITY_MAX_COMPLEXITY := 10
@@ -32,8 +38,8 @@ export PROJECT_NAME PYTHON_VERSION QUALITY_MIN_COVERAGE QUALITY_MAX_COMPLEXITY Q
 # HELP & INFORMATION
 # =============================================================================
 
-.PHONY: help
-help: ## Show available commands
+.PHONY: help-local
+help-local: ## Show flext-quality-specific commands
 	@echo "FLEXT-QUALITY - Code Quality Analysis & Metrics Service"
 	@echo "======================================================="
 	@echo ""
@@ -67,8 +73,8 @@ install: install-workspace ## Install all dependencies (workspace + local)
 install-dev: install-workspace ## Install dev dependencies
 	$(POETRY) install --with dev,test,docs
 
-.PHONY: setup
-setup: install-dev ## Complete project setup
+.PHONY: setup-local
+setup-local: install-dev ## Complete project setup (local legacy)
 	$(POETRY) run pre-commit install
 	@echo "✅ Setup complete - flext-core and all dependencies available"
 
@@ -76,15 +82,15 @@ setup: install-dev ## Complete project setup
 # QUALITY GATES (MANDATORY - ZERO TOLERANCE)
 # =============================================================================
 
-.PHONY: validate
-validate: ## Run validate gates only (optional: FIX=1)
+.PHONY: validate-local
+validate-local: ## Run validate gates only (local legacy)
 	@echo "WARNING: optional mode available - run 'make validate FIX=1' to auto-run fix before validate gates"
 	@if [ "$(FIX)" = "1" ]; then $(MAKE) fix; fi
 	$(MAKE) dead-code cognitive-complexity spell-check
 	@echo "✅ Validate gates complete"
 
-.PHONY: check
-check: lint ## Run the 6 lint gates
+.PHONY: check-local
+check-local: lint ## Run lint gates (local legacy)
 
 
 .PHONY: lint
@@ -131,8 +137,8 @@ lint: ## Run the 6 lint gates
 		$(MAKE) security; \
 	fi
 
-.PHONY: format
-format: ## Format code
+.PHONY: format-local
+format-local: ## Format code (local legacy)
 	$(POETRY) run ruff format .
 
 .PHONY: format-check
@@ -151,8 +157,8 @@ mypy-check: ## Run type checking with Mypy
 pyright-check: ## Run type checking with Pyright
 	$(POETRY) run pyright $(SRC_DIR)
 
-.PHONY: security
-security: ## Run security scanning
+.PHONY: security-local
+security-local: ## Run security scanning (local legacy)
 	$(POETRY) run bandit -r $(SRC_DIR) -c $(WORKSPACE_ROOT)/pyproject.toml
 	$(POETRY) run pip-audit
 
@@ -195,8 +201,8 @@ validate-full: lint format-check type-check dead-code cognitive-complexity spell
 # TESTING (MANDATORY - 100% COVERAGE)
 # =============================================================================
 
-.PHONY: test
-test: ## Run tests with coverage (threshold in pyproject.toml)
+.PHONY: test-local
+test-local: ## Run tests with coverage (local legacy)
 	PYTHONPATH=$(SRC_DIR) $(POETRY) run pytest -q --maxfail=10000 --cov --cov-report=term-missing:skip-covered
 
 .PHONY: test-unit
@@ -310,8 +316,8 @@ web-createsuperuser: ## Create Django superuser
 # DOCUMENTATION
 # =============================================================================
 
-.PHONY: docs
-docs: ## Build documentation
+.PHONY: docs-local
+docs-local: ## Build documentation (local legacy)
 	$(POETRY) run mkdocs build
 
 .PHONY: docs-serve
@@ -350,8 +356,8 @@ pre-commit: ## Run pre-commit hooks
 # MAINTENANCE
 # =============================================================================
 
-.PHONY: clean
-clean: ## Clean build artifacts and cruft
+.PHONY: clean-local
+clean-local: ## Clean build artifacts and cruft (local legacy)
 	@echo "🧹 Cleaning $(PROJECT_NAME) - removing build artifacts, cache files, and cruft..."
 
 	# Build artifacts

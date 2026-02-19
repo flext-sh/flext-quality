@@ -1,26 +1,28 @@
 # Hook Warning Reference Guide
 
 <!-- TOC START -->
-- [⚠️ How Warning-Only Mode Works](#-how-warning-only-mode-works)
-- [📂 Warning Categories](#-warning-categories)
+
+- [⚠️ How Warning-Only Mode Works](#how-warning-only-mode-works)
+- [📂 Warning Categories](#warning-categories)
   - [1. Security Warnings (16 rules)](#1-security-warnings-16-rules)
   - [2. Git Operations Warnings (29 rules)](#2-git-operations-warnings-29-rules)
   - [3. Code Quality Warnings (14 rules)](#3-code-quality-warnings-14-rules)
   - [4. File Operations Warnings (19 rules)](#4-file-operations-warnings-19-rules)
   - [5. Project Files Warnings (14 rules)](#5-project-files-warnings-14-rules)
-- [🔄 How to Respond to Warnings](#-how-to-respond-to-warnings)
+- [🔄 How to Respond to Warnings](#how-to-respond-to-warnings)
   - [Option 1: Fix the Violation ✅ (Recommended)](#option-1-fix-the-violation-recommended)
   - [Option 2: Acknowledge and Proceed (If Intentional)](#option-2-acknowledge-and-proceed-if-intentional)
   - [Option 3: Disable Rule Temporarily (For Testing)](#option-3-disable-rule-temporarily-for-testing)
-- [📖 Documentation References](#-documentation-references)
-- [🎯 Summary](#-summary)
+- [📖 Documentation References](#documentation-references)
+- [🎯 Summary](#summary)
+
 <!-- TOC END -->
 
 **Status**: ⚠️ **WARNING-ONLY MODE** - All warnings allow execution to proceed
 
 This guide explains the 197 validation rules that hooks monitor, organized into 5 warning categories.
 
----
+______________________________________________________________________
 
 ## ⚠️ How Warning-Only Mode Works
 
@@ -39,7 +41,7 @@ Tool execution → Hook validates → Violations found? →
 - 📖 **Guidance provided** (how to fix violations)
 - 🔄 **Iterative validation** (fix and try again)
 
----
+______________________________________________________________________
 
 ## 📂 Warning Categories
 
@@ -136,7 +138,7 @@ Tool execution → Hook validates → Violations found? →
   - Problem: Inconsistent with FLEXT Poetry approach
   - Fix: Use Poetry for FLEXT projects
 
----
+______________________________________________________________________
 
 ### 2. Git Operations Warnings (29 rules)
 
@@ -278,7 +280,7 @@ Tool execution → Hook validates → Violations found? →
   - Problem: Automated git operations need explicit review
   - Fix: Execute git directly or ask user to run command
 
----
+______________________________________________________________________
 
 ### 3. Code Quality Warnings (14 rules)
 
@@ -347,7 +349,7 @@ Tool execution → Hook validates → Violations found? →
   - Problem: Mocks hide implementation details, create brittle tests
   - Fix: Use real objects, fixtures, factories instead
 
----
+______________________________________________________________________
 
 ### 4. File Operations Warnings (19 rules)
 
@@ -460,7 +462,7 @@ Tool execution → Hook validates → Violations found? →
   - Problem: Generated output clogs project
   - Fix: `/tmp/output_*.txt` for temporary
 
----
+______________________________________________________________________
 
 ### 5. Project Files Warnings (14 rules)
 
@@ -545,7 +547,7 @@ Tool execution → Hook validates → Violations found? →
   - Problem: HEAD points to current branch
   - Fix: Use `git checkout`, `git switch` commands
 
----
+______________________________________________________________________
 
 ## 🔄 How to Respond to Warnings
 
@@ -594,7 +596,7 @@ Edit the YAML file to adjust severity:
     - "**/scripts/**" # Skip in scripts
 ```
 
----
+______________________________________________________________________
 
 ## 📖 Documentation References
 
@@ -602,7 +604,7 @@ Edit the YAML file to adjust severity:
 - **Dependencies**: See `../README.md` section on dependency rules
 - **Testing**: See `../CLAUDE.md` section on quality gates
 
----
+______________________________________________________________________
 
 ## 🎯 Summary
 
@@ -617,7 +619,7 @@ Edit the YAML file to adjust severity:
 
 **All warnings are informational and allow execution to proceed.**
 
----
+______________________________________________________________________
 
 **Last Updated**: 2025-12-30
 **Status**: ⚠️ WARNING-ONLY MODE - All operations proceed after warning
