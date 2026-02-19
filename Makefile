@@ -10,11 +10,9 @@ PYTHON_VERSION := 3.13
 POETRY := poetry
 SRC_DIR := src
 TESTS_DIR := tests
-COV_DIR := flext_quality
 WORKSPACE_ROOT := $(shell cd .. && pwd)
 
 # Quality Standards
-MIN_COVERAGE := 100
 QUALITY_MIN_COVERAGE := 100.0
 QUALITY_MAX_COMPLEXITY := 10
 QUALITY_MAX_DUPLICATION := 5.0

@@ -5576,4 +5576,4 @@ tools = ["bandit", "black", "complexipy", "coverage", "isort", "mypy", "pylint",
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.13,<3.14"
-content-hash = "095d599a6c02bc2abd7fb447532ccd3b52771de3482500338fa3c6e79afcc1f9"
+content-hash = "f1cfc0f78dfb76313b0658557dc1425faeae69404022f9de5925a9ab0fb78de4"

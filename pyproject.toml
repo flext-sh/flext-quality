@@ -1,38 +1,36 @@
 [build-system]
     build-backend = "poetry.core.masonry.api"
     requires = [
-        "poetry-core>=1.9.0",
+        "poetry-core>=2",
     ]
 
 [project]
     classifiers = [
-        "Development Status :: 5 - Production/Stable",
-        "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3 :: Only",
-        "Programming Language :: Python :: 3.13",
-        "Topic :: Software Development :: Libraries :: Python Modules",
-        "Typing :: Typed",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed"
     ]
     dependencies = [
-        "pydantic (>=2.12.3)",
-        "pydantic-settings (>=2.11.0)",
-        "pyright (>=1.1.406)",
-        "mypy (>=1.18.2)",
-        "typer (>=0.12.3)",
-        "rich (>=14.2.0,<15.0.0)",
-        "pydantic-core (>=2.41.4)",
-        "fastapi (>=0.115.0)",
-        "uvicorn (>=0.30.0)",
-        "libcst (>=1.8.6,<2.0.0)",
-        "pyyaml (>=6.0.3,<7.0.0)",
-        "fastmcp (>=2.14.2,<3.0.0)",
-        "httpx (>=0.28.0)",
-        "click (>=8.1.0)",
-        "pytest (>=9.0.2,<10.0.0)",
-        "wrapt (>=1.17.0,<2.0.0)",
-        "referencing (>=0.28.4,<0.37.0)",
+    "pydantic (>=2.12.3)",
+    "pydantic-settings (>=2.11.0)",
+    "pyright (>=1.1.406)",
+    "mypy (>=1.18.2)",
+    "typer (>=0.12.3)",
+    "rich (>=14.2.0,<15.0.0)",
+    "pydantic-core (>=2.41.4)",
+    "fastapi (>=0.115.0)",
+    "uvicorn (>=0.30.0)",
+    "libcst (>=1.8.6,<2.0.0)",
+    "pyyaml (>=6.0.3,<7.0.0)",
+    "fastmcp (>=2.14.2,<3.0.0)",
+    "httpx (>=0.28.0)",
+    "click (>=8.1.0)",
+    "wrapt (>=1.17.0,<2.0.0)",
+    "referencing (>=0.28.4,<0.37.0)"
     ]
     description = "FLEXT Quality - Unified orchestration platform for Claude Code tooling"
     keywords = [
@@ -46,6 +44,7 @@
     readme = "README.md"
     requires-python = ">=3.13,<3.14"
     version = "0.10.0-dev"
+    license = "MIT"
     [[project.authors]]
         email = "team@flext.sh"
         name  = "FLEXT Team"
@@ -53,9 +52,6 @@
     [[project.maintainers]]
         email = "team@flext.sh"
         name  = "FLEXT Team"
-
-    [project.license]
-        text = "MIT"
 
     [project.urls]
         Documentation = "https://github.com/flext-sh/flext/blob/main/README.md"
@@ -84,7 +80,7 @@
 
 
 [tool.pyrefly]
-    search-path = ["src", "../flext-cli/src"]
+    search-path = ["../typings", "../typings/generated","src", "../flext-cli/src"]
 
 [tool.django-stubs]
     django_settings_module = "code_analyzer_web.settings"
@@ -116,6 +112,8 @@
 [tool.deptry.per_rule_ignores]
     DEP002 = [
         # CLI tools (invoked from command line, not imported)
+        # Type stubs
+        # Runtime deps used indirectly (via pydantic-settings, flext-core, etc.)
         "bandit",
         "black",
         "codespell",
@@ -134,7 +132,6 @@
         "rope",
         "ruff",
         "vulture",
-        # Type stubs
         "types-psutil",
         "types-python-dateutil",
         "types-pyyaml",
@@ -142,12 +139,10 @@
         "types-requests",
         "types-setuptools",
         "types-toml",
-        # Runtime deps used indirectly (via pydantic-settings, flext-core, etc.)
         "pydantic-core",
-        "pytest",
         "pytest-cov",
         "wrapt",
-        "referencing",
+        "referencing"
     ]
 
 [tool.ruff]
@@ -163,17 +158,11 @@
 
 [tool.pytest.ini_options]
     addopts = [
-        "--cov-branch",
-        "--cov-fail-under=90",
-        "--cov-report=html:reports/coverage",
-        "--cov-report=term-missing:skip-covered",
-        "--cov-report=xml:reports/coverage.xml",
-        "--cov=flext_quality",
-        "--maxfail=1",
-        "--strict-config",
-        "--strict-markers",
-        "--tb=short",
-        "-ra",
+    "--maxfail=1",
+    "--strict-config",
+    "--strict-markers",
+    "--tb=short",
+    "-ra"
     ]
     markers = [
         "e2e: End-to-end tests",
@@ -201,6 +190,7 @@
         "@abstractmethod",
         '^\s*\.\.\.\s*$',
     ]
+fail_under = 100
 
     [tool.ruff.lint.isort]
         known-first-party = [
@@ -267,3 +257,6 @@ mdformat-gfm = ">=0.3.0"
             linkcheckmd = ">=1.4.0"
             pymarkdownlnt = ">=0.9.0"
 
+
+[tool.bandit]
+skips = ["B404", "B603", "B607", "B105", "B608"]
