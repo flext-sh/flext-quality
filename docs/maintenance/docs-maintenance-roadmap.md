@@ -1,7 +1,6 @@
 # Documentation Maintenance Modernization Roadmap
 
 <!-- TOC START -->
-
 - [Table of Contents](#table-of-contents)
 - [Guiding Principles](#guiding-principles)
 - [Phase 1 – Foundation (Weeks 1-2)](#phase-1-foundation-weeks-1-2)
@@ -11,7 +10,6 @@
 - [Phase 5 – Optimization & Governance (Weeks 15+)](#phase-5-optimization-governance-weeks-15)
 - [Cross-Cutting Workstreams](#cross-cutting-workstreams)
 - [Progress Log](#progress-log)
-
 <!-- TOC END -->
 
 ## Table of Contents

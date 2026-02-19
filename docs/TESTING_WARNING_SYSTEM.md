@@ -1,7 +1,6 @@
 # Testing Hook Warning System
 
 <!-- TOC START -->
-
 - [✅ System Status: WARNING-ONLY MODE ACTIVE](#-system-status-warning-only-mode-active)
 - [🧪 Test Verification Results](#-test-verification-results)
   - [Configuration Checks](#configuration-checks)
@@ -38,7 +37,6 @@
   - [For Daily Development](#for-daily-development)
   - [For Validation & Testing](#for-validation-testing)
   - [For Integration](#for-integration)
-
 <!-- TOC END -->
 
 **Comprehensive guide to verify the warning-only hook system is working correctly**

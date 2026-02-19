@@ -1,7 +1,6 @@
 # Code Duplication Detection System
 
 <!-- TOC START -->
-
 - [Overview](#overview)
 - [Components](#components)
   - [1. FlextDuplicationPlugin](#1-flextduplicationplugin)
@@ -24,7 +23,6 @@
 - [Limitations and Future Improvements](#limitations-and-future-improvements)
 - [References](#references)
 - [FAQ](#faq)
-
 <!-- TOC END -->
 
 ## Overview

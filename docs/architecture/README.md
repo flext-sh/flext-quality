@@ -1,7 +1,6 @@
 # FLEXT Quality Architecture Documentation
 
 <!-- TOC START -->
-
 - [Table of Contents](#table-of-contents)
 - [🎯 Architecture Overview](#-architecture-overview)
   - [System Purpose](#system-purpose)
@@ -40,7 +39,6 @@
   - [For New Team Members](#for-new-team-members)
   - [For Architects & Technical Leads](#for-architects-technical-leads)
   - [For Developers](#for-developers)
-
 <!-- TOC END -->
 
 ## Table of Contents

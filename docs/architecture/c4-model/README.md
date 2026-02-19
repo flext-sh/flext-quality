@@ -1,7 +1,6 @@
 # C4 Model - FLEXT Quality Architecture
 
 <!-- TOC START -->
-
 - [Table of Contents](#table-of-contents)
 - [🎯 C4 Model Overview](#-c4-model-overview)
   - [1. Context (Level 1)](#1-context-level-1)
@@ -34,7 +33,6 @@
 - [📋 Quality Assurance](#-quality-assurance)
   - [Architecture Review Checklist](#architecture-review-checklist)
   - [Documentation Standards](#documentation-standards)
-
 <!-- TOC END -->
 
 ## Table of Contents

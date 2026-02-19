@@ -1,7 +1,6 @@
 # Documentation Maintenance & Quality Assurance System
 
 <!-- TOC START -->
-
 - [Table of Contents](#table-of-contents)
 - [🎯 Purpose](#-purpose)
 - [🏗️ System Architecture](#-system-architecture)
@@ -86,7 +85,6 @@
   - [✅ First Audit Run](#-first-audit-run)
   - [✅ Automation Setup](#-automation-setup)
   - [✅ Team Training](#-team-training)
-
 <!-- TOC END -->
 
 ## Table of Contents

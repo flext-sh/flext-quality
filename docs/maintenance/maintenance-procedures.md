@@ -1,7 +1,6 @@
 # FLEXT Quality Documentation Maintenance Procedures
 
 <!-- TOC START -->
-
 - [Table of Contents](#table-of-contents)
 - [🎯 Purpose](#-purpose)
 - [📋 Maintenance Overview](#-maintenance-overview)
@@ -47,7 +46,6 @@
 - [📞 Support and Resources](#-support-and-resources)
   - [Getting Help](#getting-help)
   - [Additional Resources](#additional-resources)
-
 <!-- TOC END -->
 
 ## Table of Contents

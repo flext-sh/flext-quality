@@ -1,7 +1,6 @@
 # FLEXT Quality Quick Start Guide
 
 <!-- TOC START -->
-
 - [Table of Contents](#table-of-contents)
 - [Current Status Notice](#current-status-notice)
   - [**Implementation Status:**](#implementation-status)
@@ -30,7 +29,6 @@
   - [**For Enterprise Teams**](#for-enterprise-teams)
 - [Support During Transformation](#support-during-transformation)
 - [Related Documentation](#related-documentation)
-
 <!-- TOC END -->
 
 ## Table of Contents
