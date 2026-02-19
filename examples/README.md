@@ -1,7 +1,7 @@
 # FLEXT Quality Examples
 
-
 <!-- TOC START -->
+
 - [Overview](#overview)
 - [Example Categories](#example-categories)
   - [**Basic Usage** (`basic/`)](#basic-usage-basic)
@@ -36,6 +36,7 @@
   - [Common Issues](#common-issues)
   - [Getting Help](#getting-help)
 - [Related Resources](#related-resources)
+
 <!-- TOC END -->
 
 Comprehensive examples demonstrating FLEXT Quality usage patterns, integration scenarios, and best practices for code quality analysis within the FLEXT ecosystem.
@@ -333,18 +334,18 @@ docker-compose exec quality-analysis cat /app/reports/analysis_results.json
 ### Example Development Guidelines
 
 1. **Follow Structure**: Use the standard example directory structure
-2. **Comprehensive Documentation**: Include detailed README and code comments
-3. **Realistic Scenarios**: Use realistic data and use cases
-4. **Test Coverage**: Include unit tests validating example functionality
-5. **Integration Focus**: Demonstrate FLEXT ecosystem integration patterns
+1. **Comprehensive Documentation**: Include detailed README and code comments
+1. **Realistic Scenarios**: Use realistic data and use cases
+1. **Test Coverage**: Include unit tests validating example functionality
+1. **Integration Focus**: Demonstrate FLEXT ecosystem integration patterns
 
 ### Submission Process
 
 1. **Create Branch**: `feature/example-<example-name>`
-2. **Follow Standards**: Adhere to FLEXT coding and documentation standards
-3. **Test Thoroughly**: Ensure examples work in clean environments
-4. **Update Index**: Add example to the main README index
-5. **Submit PR**: Include comprehensive description and testing notes
+1. **Follow Standards**: Adhere to FLEXT coding and documentation standards
+1. **Test Thoroughly**: Ensure examples work in clean environments
+1. **Update Index**: Add example to the main README index
+1. **Submit PR**: Include comprehensive description and testing notes
 
 ## Troubleshooting
 

@@ -1,7 +1,7 @@
 # FLEXT Quality Test Suite
 
-
 <!-- TOC START -->
+
 - [Test Architecture](#test-architecture)
   - [Test Structure](#test-structure)
   - [Test Categories](#test-categories)
@@ -34,6 +34,7 @@
 - [Troubleshooting](#troubleshooting)
   - [Common Test Issues](#common-test-issues)
 - [Related Documentation](#related-documentation)
+
 <!-- TOC END -->
 
 Comprehensive test suite for FLEXT Quality ensuring robust validation of code quality analysis functionality, domain business rules, and ecosystem integration.

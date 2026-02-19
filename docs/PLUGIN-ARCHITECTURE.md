@@ -1,7 +1,7 @@
 # FLEXT Quality Plugin Architecture Plan
 
-
 <!-- TOC START -->
+
 - [Current State](#current-state)
 - [MCP Python Refactoring Integration](#mcp-python-refactoring-integration)
 - [Integration Points](#integration-points)
@@ -12,6 +12,7 @@
   - [5. Baseline Management](#5-baseline-management)
 - [Architecture Diagram](#architecture-diagram)
 - [Summary](#summary)
+
 <!-- TOC END -->
 
 ## Current State
@@ -166,6 +167,6 @@ Baseline tracking for dead code:
 The integration follows a layered approach:
 
 1. **Hooks** - Real-time quality gates during development
-2. **Makefile** - CLI-accessible quality commands
-3. **MCP Server** - On-demand analysis via Claude Code
-4. **flext-quality** - Unified API for programmatic access
+1. **Makefile** - CLI-accessible quality commands
+1. **MCP Server** - On-demand analysis via Claude Code
+1. **flext-quality** - Unified API for programmatic access

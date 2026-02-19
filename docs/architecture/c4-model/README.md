@@ -1,7 +1,7 @@
 # C4 Model - FLEXT Quality Architecture
 
-
 <!-- TOC START -->
+
 - [Table of Contents](#table-of-contents)
 - [🎯 C4 Model Overview](#-c4-model-overview)
   - [1. Context (Level 1)](#1-context-level-1)
@@ -34,6 +34,7 @@
 - [📋 Quality Assurance](#-quality-assurance)
   - [Architecture Review Checklist](#architecture-review-checklist)
   - [Documentation Standards](#documentation-standards)
+
 <!-- TOC END -->
 
 ## Table of Contents
@@ -200,9 +201,9 @@ Domain Layer ← Application Layer ← Infrastructure Layer ← Presentation Lay
 ### Understanding the Architecture
 
 1. **Start Here**: [System Context](context.md) - Understand the big picture
-2. **Technical View**: [Container Architecture](containers.md) - Technology choices
-3. **Implementation**: [Component Architecture](components.md) - How components work together
-4. **Deep Dive**: [Code Architecture](code.md) - Implementation details
+1. **Technical View**: [Container Architecture](containers.md) - Technology choices
+1. **Implementation**: [Component Architecture](components.md) - How components work together
+1. **Deep Dive**: [Code Architecture](code.md) - Implementation details
 
 ### For Different Audiences
 

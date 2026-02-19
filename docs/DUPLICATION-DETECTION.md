@@ -1,7 +1,7 @@
 # Code Duplication Detection System
 
-
 <!-- TOC START -->
+
 - [Overview](#overview)
 - [Components](#components)
   - [1. FlextDuplicationPlugin](#1-flextduplicationplugin)
@@ -24,6 +24,7 @@
 - [Limitations and Future Improvements](#limitations-and-future-improvements)
 - [References](#references)
 - [FAQ](#faq)
+
 <!-- TOC END -->
 
 ## Overview
@@ -31,9 +32,9 @@
 The FLEXT ecosystem now includes comprehensive code duplication detection via:
 
 1. **FlextDuplicationPlugin** - Python plugin for detecting code clones
-2. **07-duplicate-code-detector.sh** - Pre-tool hook that blocks duplication increases
-3. **create-duplicate-baseline.sh** - Baseline generation and management script
-4. **~/.duplicate-code-baseline** - Project baseline tracking file
+1. **07-duplicate-code-detector.sh** - Pre-tool hook that blocks duplication increases
+1. **create-duplicate-baseline.sh** - Baseline generation and management script
+1. **~/.duplicate-code-baseline** - Project baseline tracking file
 
 This system prevents code duplication from accumulating while allowing intentional duplicates through a smart retry mechanism.
 
@@ -71,10 +72,12 @@ if result.is_success:
 **Methods**:
 
 - `check(files: list[Path], threshold: float | None) -> FlextResult[CheckResult]`
+
   - Analyze files for duplication
   - Returns duplication pairs exceeding threshold
 
 - `get_duplicate_count(directory: Path) -> FlextResult[int]`
+
   - Count duplicate pairs in a directory
   - Recursively scans for \*.py files
   - Ignores **pycache** and .venv directories
@@ -369,17 +372,17 @@ class Quality:
 **Current Limitations**:
 
 1. Line-based (doesn't understand semantics)
-2. Requires exact line matches (whitespace matters)
-3. Cross-project duplicates not detected (by design)
-4. No suppression mechanism (use manual baseline update)
+1. Requires exact line matches (whitespace matters)
+1. Cross-project duplicates not detected (by design)
+1. No suppression mechanism (use manual baseline update)
 
 **Future Improvements**:
 
 1. AST-based semantic similarity
-2. Normalized line comparison (ignore whitespace)
-3. Cross-project duplication detection
-4. Suppression comments (`# flext: ignore-duplication`)
-5. Detailed clone ranking (similarity score in reports)
+1. Normalized line comparison (ignore whitespace)
+1. Cross-project duplication detection
+1. Suppression comments (`# flext: ignore-duplication`)
+1. Detailed clone ranking (similarity score in reports)
 
 ## References
 

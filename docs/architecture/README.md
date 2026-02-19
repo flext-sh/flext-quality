@@ -1,7 +1,7 @@
 # FLEXT Quality Architecture Documentation
 
-
 <!-- TOC START -->
+
 - [Table of Contents](#table-of-contents)
 - [🎯 Architecture Overview](#-architecture-overview)
   - [System Purpose](#system-purpose)
@@ -40,6 +40,7 @@
   - [For New Team Members](#for-new-team-members)
   - [For Architects & Technical Leads](#for-architects-technical-leads)
   - [For Developers](#for-developers)
+
 <!-- TOC END -->
 
 ## Table of Contents
@@ -169,21 +170,25 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 ### Key Stakeholders & User Personas
 
 1. **Python Developer**
+
    - Uses FLEXT Quality for local development quality checks
    - Integrates quality analysis into development workflows
    - Requires fast, accurate quality feedback
 
-2. **DevOps Engineer**
+1. **DevOps Engineer**
+
    - Integrates quality gates into CI/CD pipelines
    - Monitors quality trends across projects
    - Requires automated, reliable quality enforcement
 
-3. **Software Architect**
+1. **Software Architect**
+
    - Reviews quality metrics for architectural decisions
    - Analyzes quality trends and patterns
    - Requires comprehensive quality reporting and insights
 
-4. **FLEXT Ecosystem**
+1. **FLEXT Ecosystem**
+
    - Provides standardized quality analysis across FLEXT projects
    - Ensures consistent quality standards and practices
    - Enables ecosystem-wide quality governance
@@ -315,11 +320,11 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 ### Architecture Decision Process
 
 1. **Identify Need**: Document architectural requirement or problem
-2. **Research Options**: Analyze multiple solution approaches
-3. **Create ADR**: Write Architecture Decision Record
-4. **Review & Approval**: Domain expert and stakeholder review
-5. **Implementation**: Implement approved architectural changes
-6. **Documentation**: Update all relevant architecture documentation
+1. **Research Options**: Analyze multiple solution approaches
+1. **Create ADR**: Write Architecture Decision Record
+1. **Review & Approval**: Domain expert and stakeholder review
+1. **Implementation**: Implement approved architectural changes
+1. **Documentation**: Update all relevant architecture documentation
 
 ### Quality Standards
 
@@ -335,23 +340,23 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 ### For New Team Members
 
 1. Start with System Context to understand the big picture (_Documentation coming soon_)
-2. Review Container Architecture for high-level components (_Documentation coming soon_)
-3. Read key Architecture Decisions to understand foundational choices (_Documentation coming soon_)
-4. Explore [Component Architecture](c4-model/components.md) for detailed interactions
+1. Review Container Architecture for high-level components (_Documentation coming soon_)
+1. Read key Architecture Decisions to understand foundational choices (_Documentation coming soon_)
+1. Explore [Component Architecture](c4-model/components.md) for detailed interactions
 
 ### For Architects & Technical Leads
 
 1. Review [ADRs](adrs/) for decision history and rationale
-2. Examine [Cross-Cutting Concerns](views/) for quality attributes
-3. Analyze **Security Architecture** for security considerations (_Documentation coming soon_)
-4. Review **Deployment Architecture** for infrastructure patterns (_Documentation coming soon_)
+1. Examine [Cross-Cutting Concerns](views/) for quality attributes
+1. Analyze **Security Architecture** for security considerations (_Documentation coming soon_)
+1. Review **Deployment Architecture** for infrastructure patterns (_Documentation coming soon_)
 
 ### For Developers
 
 1. Understand **Component Architecture** for implementation guidance (_Documentation coming soon_)
-2. Review **Code Architecture** for implementation patterns (_Documentation coming soon_)
-3. Check **Integration Architecture** for external dependencies (_Documentation coming soon_)
-4. Reference [API Documentation](../api/) for interface specifications
+1. Review **Code Architecture** for implementation patterns (_Documentation coming soon_)
+1. Check **Integration Architecture** for external dependencies (_Documentation coming soon_)
+1. Reference [API Documentation](../api/) for interface specifications
 
 **FLEXT Quality Architecture** - Enterprise-grade code quality analysis with clean architecture, domain-driven design,
 and comprehensive ecosystem integration.

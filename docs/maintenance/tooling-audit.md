@@ -1,7 +1,7 @@
 # Documentation Maintenance Tooling Audit
 
-
 <!-- TOC START -->
+
 - [Table of Contents](#table-of-contents)
 - [CLI & UX](#cli-ux)
 - [HTTP & Concurrency](#http-concurrency)
@@ -11,6 +11,7 @@
 - [File & Data Processing](#file-data-processing)
 - [Observability](#observability)
   - [Immediate Recommendations (Phase 2+)](#immediate-recommendations-phase-2)
+
 <!-- TOC END -->
 
 ## Table of Contents
@@ -66,8 +67,8 @@
 ### Immediate Recommendations (Phase 2+)
 
 1. Adopt Typer + Rich for all shared CLI entry points (`audit`, `validate`, `optimize`, `report`).
-2. Migrate link validation to `httpx.AsyncClient` with backoff/retry helpers.
-3. Use Jinja2 for Markdown templates (reports, dashboards) alongside Rich tables for CLI previews.
-4. Validate project configs via pydantic models to enforce schema normalization.
+1. Migrate link validation to `httpx.AsyncClient` with backoff/retry helpers.
+1. Use Jinja2 for Markdown templates (reports, dashboards) alongside Rich tables for CLI previews.
+1. Validate project configs via pydantic models to enforce schema normalization.
 
 This audit informs upcoming phases of the roadmap; selections can be revisited as requirements evolve.

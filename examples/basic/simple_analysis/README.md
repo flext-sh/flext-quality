@@ -1,7 +1,7 @@
 # Simple Analysis Example
 
-
 <!-- TOC START -->
+
 - [Overview](#overview)
 - [Features Demonstrated](#features-demonstrated)
   - [Core Analysis Capabilities](#core-analysis-capabilities)
@@ -28,6 +28,7 @@
   - [Getting Help](#getting-help)
 - [Next Steps](#next-steps)
 - [Related Resources](#related-resources)
+
 <!-- TOC END -->
 
 This example demonstrates the fundamental usage of FLEXT Quality for analyzing a Python project and generating quality reports. It showcases the core functionality and basic integration patterns that form the foundation of quality analysis workflows.
@@ -339,9 +340,9 @@ For additional support:
 After mastering this basic example:
 
 1. **Explore Advanced Examples** - (_Documentation coming soon_)
-2. **Learn Integration Patterns** - (_Documentation coming soon_)
-3. **Implement CI/CD** - (_Documentation coming soon_)
-4. **Create Custom Reports** - (_Documentation coming soon_)
+1. **Learn Integration Patterns** - (_Documentation coming soon_)
+1. **Implement CI/CD** - (_Documentation coming soon_)
+1. **Create Custom Reports** - (_Documentation coming soon_)
 
 ## Related Resources
 

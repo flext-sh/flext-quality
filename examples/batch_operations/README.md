@@ -1,7 +1,7 @@
 # Batch Operations Fix Scripts - Improved Pattern
 
-
 <!-- TOC START -->
+
 - [What's New (v2.0)](#whats-new-v20)
 - [Quick Start](#quick-start)
   - [1. Copy Template to Your Project](#1-copy-template-to-your-project)
@@ -38,6 +38,7 @@
   - ["Script not validated"](#script-not-validated)
 - [For Help](#for-help)
 - [Safety Summary](#safety-summary)
+
 <!-- TOC END -->
 
 **Status**: ✅ Production Ready
@@ -263,7 +264,7 @@ Every fix script **MUST**:
    source ~/.claude/hooks/lib/batch_bridge.sh
    ```
 
-2. ✅ Implement `discover_target_files()`
+1. ✅ Implement `discover_target_files()`
 
    ```bash
    discover_target_files() {
@@ -271,7 +272,7 @@ Every fix script **MUST**:
    }
    ```
 
-3. ✅ Implement `apply_fix()`
+1. ✅ Implement `apply_fix()`
 
    ```bash
    apply_fix() {
@@ -280,7 +281,7 @@ Every fix script **MUST**:
    }
    ```
 
-4. ✅ Use case statement for modes
+1. ✅ Use case statement for modes
 
    ```bash
    case "${1:-auto}" in
