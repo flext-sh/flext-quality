@@ -1,5 +1,35 @@
 # Simple Analysis Example
 
+
+<!-- TOC START -->
+- [Overview](#overview)
+- [Features Demonstrated](#features-demonstrated)
+  - [Core Analysis Capabilities](#core-analysis-capabilities)
+  - [FLEXT Integration Patterns](#flext-integration-patterns)
+- [Usage](#usage)
+  - [Basic Execution](#basic-execution)
+  - [Expected Output](#expected-output)
+- [Code Structure](#code-structure)
+  - [Main Components](#main-components)
+  - [Quality Assessment Logic](#quality-assessment-logic)
+  - [Issue Processing](#issue-processing)
+- [Configuration](#configuration)
+  - [Analysis Configuration](#analysis-configuration)
+  - [Quality Thresholds](#quality-thresholds)
+- [Understanding Results](#understanding-results)
+  - [Quality Metrics Interpretation](#quality-metrics-interpretation)
+  - [Recommendations System](#recommendations-system)
+- [Extending the Example](#extending-the-example)
+  - [Custom Analysis Backends](#custom-analysis-backends)
+  - [Integration with FLEXT Services](#integration-with-flext-services)
+  - [Report Generation](#report-generation)
+- [Troubleshooting](#troubleshooting)
+  - [Common Issues](#common-issues)
+  - [Getting Help](#getting-help)
+- [Next Steps](#next-steps)
+- [Related Resources](#related-resources)
+<!-- TOC END -->
+
 This example demonstrates the fundamental usage of FLEXT Quality for analyzing a Python project and generating quality reports. It showcases the core functionality and basic integration patterns that form the foundation of quality analysis workflows.
 
 ## Overview

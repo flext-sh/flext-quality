@@ -48,9 +48,7 @@ class TestFlextQualityCliService:
         assert "ruff" in ruff_cmd
         assert "check" in ruff_cmd
 
-    def test_build_check_commands_includes_basedpyright(
-        self, tmp_path: Path
-    ) -> None:
+    def test_build_check_commands_includes_basedpyright(self, tmp_path: Path) -> None:
         """Test build_check_commands includes basedpyright command."""
         service = FlextQualityCliService()
         result = service.build_check_commands(tmp_path)
@@ -59,9 +57,7 @@ class TestFlextQualityCliService:
         pyright_cmd = commands[1]
         assert "basedpyright" in pyright_cmd
 
-    def test_build_validate_commands_returns_all_commands(
-        self, tmp_path: Path
-    ) -> None:
+    def test_build_validate_commands_returns_all_commands(self, tmp_path: Path) -> None:
         """Test build_validate_commands returns all validation commands."""
         src_dir = tmp_path / "src"
         src_dir.mkdir()
@@ -73,21 +69,23 @@ class TestFlextQualityCliService:
         assert result.is_success
         commands = result.value
         assert isinstance(commands, list)
-        assert len(commands) == 4
+        assert len(commands) == 5
 
-    def test_build_validate_commands_includes_coverage(self, tmp_path: Path) -> None:
-        """Test build_validate_commands includes coverage setting."""
+    def test_build_validate_commands_includes_coverage_report(
+        self, tmp_path: Path
+    ) -> None:
+        """Test build_validate_commands includes explicit coverage report command."""
         src_dir = tmp_path / "src"
         src_dir.mkdir()
         tests_dir = tmp_path / "tests"
         tests_dir.mkdir()
 
         service = FlextQualityCliService()
-        result = service.build_validate_commands(tmp_path, min_coverage=90)
+        result = service.build_validate_commands(tmp_path)
         assert result.is_success
         commands = result.value
-        pytest_cmd = commands[3]
-        assert "--cov-fail-under=90" in pytest_cmd
+        coverage_report_cmd = commands[4]
+        assert coverage_report_cmd == ["python", "-m", "coverage", "report"]
 
     def test_build_validate_commands_includes_bandit(self, tmp_path: Path) -> None:
         """Test build_validate_commands includes bandit command."""

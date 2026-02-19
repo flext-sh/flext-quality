@@ -1,5 +1,37 @@
 # FLEXT Quality Quick Start Guide
 
+
+<!-- TOC START -->
+- [Table of Contents](#table-of-contents)
+- [Current Status Notice](#current-status-notice)
+  - [**Implementation Status:**](#implementation-status)
+- [Prerequisites](#prerequisites)
+- [Current Setup (Development/Transformation)](#current-setup-developmenttransformation)
+  - [**Step 1: Clone and Install**](#step-1-clone-and-install)
+  - [**Step 2: Verify Current State**](#step-2-verify-current-state)
+  - [**Step 3: Review Architecture**](#step-3-review-architecture)
+- [Intended Usage (Post-Transformation)](#intended-usage-post-transformation)
+  - [**Basic Quality Analysis** (WORKING)](#basic-quality-analysis-working)
+  - [**CLI Usage** (PLANNED - Pure FLEXT-CLI)](#cli-usage-planned-pure-flext-cli)
+  - [**Enterprise Dashboard** (PLANNED - FLEXT-WEB)](#enterprise-dashboard-planned-flext-web)
+  - [**Integration with FLEXT Ecosystem** (PLANNED)](#integration-with-flext-ecosystem-planned)
+- [Enterprise Features (Post-Transformation)](#enterprise-features-post-transformation)
+  - [**Workspace Integration** (Research-Based 2025 Patterns)](#workspace-integration-research-based-2025-patterns)
+  - [**Modern Tool Stack** (Research-Based)](#modern-tool-stack-research-based)
+  - [**Configuration Management** (Modern Standards)](#configuration-management-modern-standards)
+- [Development Status & Roadmap](#development-status-roadmap)
+  - [**Phase 1: Critical Integration Fixes (Immediate)**](#phase-1-critical-integration-fixes-immediate)
+  - [**Phase 2: Workspace Absorption (Week 2)**](#phase-2-workspace-absorption-week-2)
+  - [**Phase 3: FLEXT Ecosystem Integration (Week 3)**](#phase-3-flext-ecosystem-integration-week-3)
+  - [**Phase 4: Enterprise Features (Week 4)**](#phase-4-enterprise-features-week-4)
+- [Getting Involved in Transformation](#getting-involved-in-transformation)
+  - [**For Developers**](#for-developers)
+  - [**For FLEXT Users**](#for-flext-users)
+  - [**For Enterprise Teams**](#for-enterprise-teams)
+- [Support During Transformation](#support-during-transformation)
+- [Related Documentation](#related-documentation)
+<!-- TOC END -->
+
 ## Table of Contents
 
 - [FLEXT Quality Quick Start Guide](#flext-quality-quick-start-guide)

@@ -1,5 +1,45 @@
 # Testing Hook Warning System
 
+
+<!-- TOC START -->
+- [✅ System Status: WARNING-ONLY MODE ACTIVE](#-system-status-warning-only-mode-active)
+- [🧪 Test Verification Results](#-test-verification-results)
+  - [Configuration Checks](#configuration-checks)
+  - [Rule System Verification](#rule-system-verification)
+- [🎯 Category Coverage](#-category-coverage)
+  - [1. Security Warnings (16 rules) ✅](#1-security-warnings-16-rules-)
+  - [2. Git Operations Warnings (29 rules) ✅](#2-git-operations-warnings-29-rules-)
+  - [3. Code Quality Warnings (14 rules) ✅](#3-code-quality-warnings-14-rules-)
+  - [4. File Operations Warnings (19 rules) ✅](#4-file-operations-warnings-19-rules-)
+  - [5. Project Files Warnings (14 rules) ✅](#5-project-files-warnings-14-rules-)
+- [🚀 Quick Test Scenarios](#-quick-test-scenarios)
+  - [Scenario 1: Security Warning (SEC001)](#scenario-1-security-warning-sec001)
+  - [Scenario 2: Code Quality Warning (CQ013)](#scenario-2-code-quality-warning-cq013)
+  - [Scenario 3: Git Warning (GIT003)](#scenario-3-git-warning-git003)
+  - [Scenario 4: File Operations Warning (FO001)](#scenario-4-file-operations-warning-fo001)
+  - [Scenario 5: Project Files Warning (PF001)](#scenario-5-project-files-warning-pf001)
+- [📊 Verification Checklist](#-verification-checklist)
+  - [Hook Configuration](#hook-configuration)
+  - [Rule System](#rule-system)
+  - [Warning Messages](#warning-messages)
+  - [Iterative Edit Tracking](#iterative-edit-tracking)
+- [📖 Documentation](#-documentation)
+  - [User Guides](#user-guides)
+  - [Implementation Details](#implementation-details)
+  - [Rule Files](#rule-files)
+- [🔄 Typical Testing Workflow](#-typical-testing-workflow)
+  - [1. Enable Hooks (Already Enabled)](#1-enable-hooks-already-enabled)
+  - [2. Make Intentional Violations](#2-make-intentional-violations)
+  - [3. Observe Warnings](#3-observe-warnings)
+  - [4. Fix Violations](#4-fix-violations)
+  - [5. Verify Clean Code](#5-verify-clean-code)
+- [✅ Success Criteria (All Met)](#-success-criteria-all-met)
+- [🎯 Next Steps for User](#-next-steps-for-user)
+  - [For Daily Development](#for-daily-development)
+  - [For Validation & Testing](#for-validation-testing)
+  - [For Integration](#for-integration)
+<!-- TOC END -->
+
 **Comprehensive guide to verify the warning-only hook system is working correctly**
 
 ---

@@ -1,5 +1,31 @@
 # Code Duplication Detection System
 
+
+<!-- TOC START -->
+- [Overview](#overview)
+- [Components](#components)
+  - [1. FlextDuplicationPlugin](#1-flextduplicationplugin)
+  - [2. Pre-Tool Hook (07-duplicate-code-detector.sh)](#2-pre-tool-hook-07-duplicate-code-detectorsh)
+  - [3. Baseline Generation Script](#3-baseline-generation-script)
+  - [4. Baseline File](#4-baseline-file)
+- [Integration with flext-quality](#integration-with-flext-quality)
+- [Workflow Examples](#workflow-examples)
+  - [Example 1: Preventing Accidental Duplication](#example-1-preventing-accidental-duplication)
+  - [Example 2: Intentional Duplication with Retry](#example-2-intentional-duplication-with-retry)
+  - [Example 3: Updating Baseline Manually](#example-3-updating-baseline-manually)
+- [Quality Gate](#quality-gate)
+- [Constants and Configuration](#constants-and-configuration)
+- [Hook Configuration](#hook-configuration)
+- [Architecture Decisions](#architecture-decisions)
+  - [Why Line-Based Similarity](#why-line-based-similarity)
+  - [Why 80% Threshold](#why-80-threshold)
+  - [Why Retry on Hash Match](#why-retry-on-hash-match)
+  - [Why Project-Scoped](#why-project-scoped)
+- [Limitations and Future Improvements](#limitations-and-future-improvements)
+- [References](#references)
+- [FAQ](#faq)
+<!-- TOC END -->
+
 ## Overview
 
 The FLEXT ecosystem now includes comprehensive code duplication detection via:

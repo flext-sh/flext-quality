@@ -1,5 +1,41 @@
 # FLEXT Quality Test Suite
 
+
+<!-- TOC START -->
+- [Test Architecture](#test-architecture)
+  - [Test Structure](#test-structure)
+  - [Test Categories](#test-categories)
+- [Test Categories by Component](#test-categories-by-component)
+  - [Core Analysis Engine](#core-analysis-engine)
+  - [Domain Layer Testing](#domain-layer-testing)
+  - [Application Layer Testing](#application-layer-testing)
+  - [Infrastructure Layer Testing](#infrastructure-layer-testing)
+  - [API and Interface Testing](#api-and-interface-testing)
+  - [Quality and Metrics Testing](#quality-and-metrics-testing)
+  - [Configuration and Setup Testing](#configuration-and-setup-testing)
+- [Quality Standards](#quality-standards)
+  - [Coverage Requirements](#coverage-requirements)
+  - [Test Quality Metrics](#test-quality-metrics)
+  - [Validation Standards](#validation-standards)
+- [Test Execution](#test-execution)
+  - [Running Tests](#running-tests)
+  - [Test Configuration](#test-configuration)
+- [Test Development Guidelines](#test-development-guidelines)
+  - [Test Structure Standards](#test-structure-standards)
+  - [Naming Conventions](#naming-conventions)
+  - [Test Data Management](#test-data-management)
+  - [Mock Standards](#mock-standards)
+- [Performance Testing](#performance-testing)
+  - [Benchmarking Tests](#benchmarking-tests)
+  - [Resource Usage Testing](#resource-usage-testing)
+- [Continuous Integration](#continuous-integration)
+  - [CI/CD Pipeline Integration](#cicd-pipeline-integration)
+  - [Quality Gates](#quality-gates)
+- [Troubleshooting](#troubleshooting)
+  - [Common Test Issues](#common-test-issues)
+- [Related Documentation](#related-documentation)
+<!-- TOC END -->
+
 Comprehensive test suite for FLEXT Quality ensuring robust validation of code quality analysis functionality, domain business rules, and ecosystem integration.
 
 ## Test Architecture
@@ -121,12 +157,11 @@ Complete user journey testing with full system integration:
 
 ```bash
 
-# Run all tests with coverage
-make test                           # Complete test suite with 90% coverage requirement
-pytest --cov=src --cov-fail-under=90
+# Run all tests with coverage (thresholds configured in pyproject.toml)
+make test
 
 # Run with detailed output
-pytest -v --cov=src --cov-report=html --cov-report=term-missing
+pytest -v --cov --cov-report=html --cov-report=term-missing
 ```
 
 #### Test Categories
@@ -168,27 +203,26 @@ pytest -m "not slow" -v                    # Fast tests only
 
 #### pytest Configuration (`pytest.ini`)
 
-```ini
-[tool:pytest]
-testpaths = tests
-python_files = test_*.py
-python_classes = Test*
-python_functions = test_*
-addopts =
-    --strict-markers
-    --disable-warnings
-    --cov=src
-    --cov-fail-under=90
-    --cov-report=term-missing
-    --cov-report=html:htmlcov
+```toml
+# pyproject.toml — pytest and coverage are configured here
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "--strict-markers --disable-warnings --cov --cov-report=term-missing"
 
-markers =
-    unit: Unit tests with mocking and isolation
-    integration: Integration tests with real dependencies
-    e2e: End-to-end tests with full system
-    slow: Long-running tests (>5 seconds)
-    security: Security-related testing
-    performance: Performance and benchmarking tests
+[tool.coverage.report]
+fail_under = 90  # Coverage threshold — single source of truth
+
+markers = [
+    "unit: Unit tests with mocking and isolation",
+    "integration: Integration tests with real dependencies",
+    "e2e: End-to-end tests with full system",
+    "slow: Long-running tests (>5 seconds)",
+    "security: Security-related testing",
+    "performance: Performance and benchmarking tests",
+]
 ```
 
 #### Test Fixtures (`conftest.py`)

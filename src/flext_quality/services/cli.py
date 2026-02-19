@@ -55,8 +55,6 @@ class FlextQualityCliService:
     def build_validate_commands(
         self,
         target_path: Path,
-        *,
-        min_coverage: int = 80,
     ) -> r[list[list[str]]]:
         """Build commands for full validation."""
         commands: list[list[str]] = []
@@ -78,12 +76,14 @@ class FlextQualityCliService:
 
         test_path = target_path / "tests"
         src_for_cov = target_path / "src"
-        commands.append([
-            "pytest",
-            str(test_path),
-            f"--cov={src_for_cov}",
-            f"--cov-fail-under={min_coverage}",
-            "--cov-report=term-missing",
+        commands.extend([
+            [
+                "pytest",
+                str(test_path),
+                f"--cov={src_for_cov}",
+                "--cov-report=term-missing",
+            ],
+            ["python", "-m", "coverage", "report"],
         ])
 
         return r[list[list[str]]].ok(commands)
@@ -121,11 +121,9 @@ class _CommandHandlers:
     def handle_validate(
         service: FlextQualityCliService,
         target_path: Path,
-        *,
-        min_coverage: int = 80,
     ) -> r[int]:
         """Handle validate command."""
-        result = service.build_validate_commands(target_path, min_coverage=min_coverage)
+        result = service.build_validate_commands(target_path)
         if result.is_failure:
             service._output.print_error(f"Failed: {result.error}")
             return r[int].ok(1)
@@ -149,13 +147,7 @@ def _dispatch(service: FlextQualityCliService, command: str, args: list[str]) ->
 
     if command == "validate":
         target_path = Path(args[0]) if args else Path.cwd()
-        min_coverage = 80
-        for i, arg in enumerate(args):
-            if arg == "--min-coverage" and i + 1 < len(args):
-                min_coverage = int(args[i + 1])
-        result = _CommandHandlers.handle_validate(
-            service, target_path, min_coverage=min_coverage
-        )
+        result = _CommandHandlers.handle_validate(service, target_path)
         return result.value if result.is_success else 1
 
     service._output.print_error(f"Unknown command: {command}")

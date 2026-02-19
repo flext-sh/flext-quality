@@ -139,10 +139,10 @@ jobs:
           echo "::group::Test Suite"
           poetry run pytest tests/ \
             --cov=src \
-            --cov-fail-under=90 \
             --maxfail=1 \
             --tb=short \
             -q
+          poetry run python -m coverage report
           echo "::endgroup::"
 
   # ===== BUILD & PACKAGE =====

@@ -1,5 +1,18 @@
 # Documentation Maintenance Tooling Audit
 
+
+<!-- TOC START -->
+- [Table of Contents](#table-of-contents)
+- [CLI & UX](#cli-ux)
+- [HTTP & Concurrency](#http-concurrency)
+- [Markdown & Reporting](#markdown-reporting)
+- [Configuration & Validation](#configuration-validation)
+- [Scheduling & Automation](#scheduling-automation)
+- [File & Data Processing](#file-data-processing)
+- [Observability](#observability)
+  - [Immediate Recommendations (Phase 2+)](#immediate-recommendations-phase-2)
+<!-- TOC END -->
+
 ## Table of Contents
 
 - [Documentation Maintenance Tooling Audit](#documentation-maintenance-tooling-audit)

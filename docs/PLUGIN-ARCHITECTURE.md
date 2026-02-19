@@ -1,5 +1,19 @@
 # FLEXT Quality Plugin Architecture Plan
 
+
+<!-- TOC START -->
+- [Current State](#current-state)
+- [MCP Python Refactoring Integration](#mcp-python-refactoring-integration)
+- [Integration Points](#integration-points)
+  - [1. Hook-Based Integration (Implemented)](#1-hook-based-integration-implemented)
+  - [2. Makefile Targets (Implemented)](#2-makefile-targets-implemented)
+  - [3. MCP Server Access (Available)](#3-mcp-server-access-available)
+  - [4. Future: Plugin Interface](#4-future-plugin-interface)
+  - [5. Baseline Management](#5-baseline-management)
+- [Architecture Diagram](#architecture-diagram)
+- [Summary](#summary)
+<!-- TOC END -->
+
 ## Current State
 
 flext-quality already integrates:

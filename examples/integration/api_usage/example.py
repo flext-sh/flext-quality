@@ -22,7 +22,6 @@ from flext_observability import (
     flext_create_metric,
     flext_create_trace,
 )
-
 from flext_quality import (
     CodeAnalyzer,
     QualityAPI,

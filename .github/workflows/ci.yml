@@ -310,13 +310,13 @@ jobs:
             --cov-report=xml \
             --cov-report=html \
             --cov-report=term-missing \
-            --cov-fail-under=90 \
             --maxfail=1 \
             --tb=short \
             --durations=10 \
             --strict-markers \
             --strict-config \
             -v
+          poetry run python -m coverage report
 
       - name: 📊 Upload Coverage Reports
         uses: codecov/codecov-action@v4

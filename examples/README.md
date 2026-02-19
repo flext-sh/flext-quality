@@ -1,5 +1,43 @@
 # FLEXT Quality Examples
 
+
+<!-- TOC START -->
+- [Overview](#overview)
+- [Example Categories](#example-categories)
+  - [**Basic Usage** (`basic/`)](#basic-usage-basic)
+  - [**Advanced Analysis** (`advanced/`)](#advanced-analysis-advanced)
+  - [**FLEXT Ecosystem Integration** (`integration/`)](#flext-ecosystem-integration-integration)
+  - [**CI/CD Integration** (`ci-cd/`)](#cicd-integration-ci-cd)
+  - [**API Examples** (`api/`)](#api-examples-api)
+  - [**Reports and Dashboards** (`reports/`)](#reports-and-dashboards-reports)
+- [Quick Start Examples](#quick-start-examples)
+  - [Basic Project Analysis](#basic-project-analysis)
+  - [FLEXT Ecosystem Integration](#flext-ecosystem-integration)
+  - [CI/CD Quality Gate](#cicd-quality-gate)
+- [Example Structure](#example-structure)
+  - [Standard Files](#standard-files)
+  - [Optional Files](#optional-files)
+- [Running Examples](#running-examples)
+  - [Prerequisites](#prerequisites)
+  - [Execute Examples](#execute-examples)
+  - [Docker Execution](#docker-execution)
+- [Example Index](#example-index)
+  - [Basic Examples](#basic-examples)
+  - [Advanced Examples](#advanced-examples)
+  - [Integration Examples](#integration-examples)
+- [Best Practices Demonstrated](#best-practices-demonstrated)
+  - [Code Quality](#code-quality)
+  - [Architecture Patterns](#architecture-patterns)
+  - [Integration Standards](#integration-standards)
+- [Contributing Examples](#contributing-examples)
+  - [Example Development Guidelines](#example-development-guidelines)
+  - [Submission Process](#submission-process)
+- [Troubleshooting](#troubleshooting)
+  - [Common Issues](#common-issues)
+  - [Getting Help](#getting-help)
+- [Related Resources](#related-resources)
+<!-- TOC END -->
+
 Comprehensive examples demonstrating FLEXT Quality usage patterns, integration scenarios, and best practices for code quality analysis within the FLEXT ecosystem.
 
 ## Overview

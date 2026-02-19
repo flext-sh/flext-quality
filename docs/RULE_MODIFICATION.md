@@ -1,5 +1,36 @@
 # Rule Modification Quick Reference
 
+
+<!-- TOC START -->
+- [🚀 Quick Start](#-quick-start)
+  - [Find Rule Files](#find-rule-files)
+  - [Reload Rules Automatically](#reload-rules-automatically)
+- [📝 Common Modifications](#-common-modifications)
+  - [1. Reduce Severity of a Rule](#1-reduce-severity-of-a-rule)
+  - [2. Disable Rule Temporarily](#2-disable-rule-temporarily)
+  - [3. Modify Guidance Message](#3-modify-guidance-message)
+  - [4. Add Custom Rule](#4-add-custom-rule)
+  - [5. Change Pattern (Regex)](#5-change-pattern-regex)
+- [🔍 Rule Structure Reference](#-rule-structure-reference)
+- [🔄 Workflow: Test → Adjust → Verify](#-workflow-test-adjust-verify)
+  - [Scenario: Rule is too strict](#scenario-rule-is-too-strict)
+  - [Scenario: Rule warning is unclear](#scenario-rule-warning-is-unclear)
+  - [Scenario: Need to disable rule for time being](#scenario-need-to-disable-rule-for-time-being)
+- [🎯 Finding Your Rule](#-finding-your-rule)
+  - [By rule code (e.g., SEC001)](#by-rule-code-eg-sec001)
+  - [By pattern name](#by-pattern-name)
+  - [By category](#by-category)
+- [✅ Validation After Changes](#-validation-after-changes)
+  - [Test Rule Loads](#test-rule-loads)
+  - [Trigger Rule to Test](#trigger-rule-to-test)
+- [🚨 Common Mistakes](#-common-mistakes)
+  - [❌ Mistake 1: Invalid YAML syntax](#-mistake-1-invalid-yaml-syntax)
+  - [❌ Mistake 2: Invalid regex pattern](#-mistake-2-invalid-regex-pattern)
+  - [❌ Mistake 3: Breaking YAML structure](#-mistake-3-breaking-yaml-structure)
+- [📋 Rule Modification Checklist](#-rule-modification-checklist)
+- [🔗 Related Documentation](#-related-documentation)
+<!-- TOC END -->
+
 **How to customize validation rules during testing and development**
 
 ---

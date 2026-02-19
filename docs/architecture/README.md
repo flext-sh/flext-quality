@@ -1,5 +1,47 @@
 # FLEXT Quality Architecture Documentation
 
+
+<!-- TOC START -->
+- [Table of Contents](#table-of-contents)
+- [🎯 Architecture Overview](#-architecture-overview)
+  - [System Purpose](#system-purpose)
+  - [Key Architectural Principles](#key-architectural-principles)
+- [🏗️ Architecture Documentation Structure](#-architecture-documentation-structure)
+  - [Documentation Framework](#documentation-framework)
+  - [Quick Navigation](#quick-navigation)
+- [📊 System Context](#-system-context)
+  - [External Systems & Integrations](#external-systems-integrations)
+  - [Key Stakeholders & User Personas](#key-stakeholders-user-personas)
+- [🏛️ Architecture Decisions](#-architecture-decisions)
+  - [Foundational Decisions](#foundational-decisions)
+  - [Technology Decisions](#technology-decisions)
+- [📋 Quality Attributes & Architectural Characteristics](#-quality-attributes-architectural-characteristics)
+  - [Functional Requirements](#functional-requirements)
+  - [Quality Attributes](#quality-attributes)
+  - [Constraints & Assumptions](#constraints-assumptions)
+- [🔧 Development & Deployment](#-development-deployment)
+  - [Development Environment](#development-environment)
+  - [Build & Deployment](#build-deployment)
+  - [Quality Gates](#quality-gates)
+- [📚 Documentation Structure](#-documentation-structure)
+  - [Architecture Views](#architecture-views)
+  - [Cross-Cutting Concerns](#cross-cutting-concerns)
+  - [Operational Documentation](#operational-documentation)
+- [🎨 Diagrams & Visualizations](#-diagrams-visualizations)
+  - [Diagram Types](#diagram-types)
+  - [Diagram Locations](#diagram-locations)
+- [🔄 Evolution & Maintenance](#-evolution-maintenance)
+  - [Architecture Evolution](#architecture-evolution)
+  - [Documentation Maintenance](#documentation-maintenance)
+- [🤝 Contributing to Architecture](#-contributing-to-architecture)
+  - [Architecture Decision Process](#architecture-decision-process)
+  - [Quality Standards](#quality-standards)
+- [📖 Reading Guide](#-reading-guide)
+  - [For New Team Members](#for-new-team-members)
+  - [For Architects & Technical Leads](#for-architects-technical-leads)
+  - [For Developers](#for-developers)
+<!-- TOC END -->
+
 ## Table of Contents
 
 - [FLEXT Quality Architecture Documentation](#flext-quality-architecture-documentation)

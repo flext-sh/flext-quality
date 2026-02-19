@@ -1,5 +1,22 @@
 # Hook Warning Reference Guide
 
+
+<!-- TOC START -->
+- [⚠️ How Warning-Only Mode Works](#-how-warning-only-mode-works)
+- [📂 Warning Categories](#-warning-categories)
+  - [1. Security Warnings (16 rules)](#1-security-warnings-16-rules)
+  - [2. Git Operations Warnings (29 rules)](#2-git-operations-warnings-29-rules)
+  - [3. Code Quality Warnings (14 rules)](#3-code-quality-warnings-14-rules)
+  - [4. File Operations Warnings (19 rules)](#4-file-operations-warnings-19-rules)
+  - [5. Project Files Warnings (14 rules)](#5-project-files-warnings-14-rules)
+- [🔄 How to Respond to Warnings](#-how-to-respond-to-warnings)
+  - [Option 1: Fix the Violation ✅ (Recommended)](#option-1-fix-the-violation-recommended)
+  - [Option 2: Acknowledge and Proceed (If Intentional)](#option-2-acknowledge-and-proceed-if-intentional)
+  - [Option 3: Disable Rule Temporarily (For Testing)](#option-3-disable-rule-temporarily-for-testing)
+- [📖 Documentation References](#-documentation-references)
+- [🎯 Summary](#-summary)
+<!-- TOC END -->
+
 **Status**: ⚠️ **WARNING-ONLY MODE** - All warnings allow execution to proceed
 
 This guide explains the 197 validation rules that hooks monitor, organized into 5 warning categories.

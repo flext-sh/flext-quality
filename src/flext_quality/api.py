@@ -83,7 +83,7 @@ class FlextQuality:
         self._version = c.Quality.Mcp.SERVER_VERSION
 
         # Auto self.logger and self.config via FlextSettings pattern
-        self.logger = FlextLogger.get_logger(__name__)
+        self.logger = FlextLogger.create_module_logger(__name__)
         self.config = FlextQualitySettings.get_instance()
 
         # Container registration (singleton via __new__)

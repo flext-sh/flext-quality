@@ -1,5 +1,45 @@
 # Batch Operations Fix Scripts - Improved Pattern
 
+
+<!-- TOC START -->
+- [What's New (v2.0)](#whats-new-v20)
+- [Quick Start](#quick-start)
+  - [1. Copy Template to Your Project](#1-copy-template-to-your-project)
+  - [2. Edit Your Fix](#2-edit-your-fix)
+  - [3. Run Auto-Workflow](#3-run-auto-workflow)
+- [Auto-Workflow Explained](#auto-workflow-explained)
+  - [STEP 1: DRY-RUN (Preview)](#step-1-dry-run-preview)
+  - [STEP 2: RUFF CHECK (Baseline)](#step-2-ruff-check-baseline)
+  - [STEP 3: BACKUP (Safety)](#step-3-backup-safety)
+  - [STEP 4: EXECUTE (Apply Fixes)](#step-4-execute-apply-fixes)
+  - [STEP 5: VALIDATE (Ratchet Check)](#step-5-validate-ratchet-check)
+- [Individual Modes (Still Available)](#individual-modes-still-available)
+- [Key Features](#key-features)
+  - [🎯 Complete Automation](#-complete-automation)
+  - [🛡️ Safety Guarantees](#-safety-guarantees)
+  - [📊 Ratchet Validation](#-ratchet-validation)
+  - [🔄 Selective Rollback](#-selective-rollback)
+- [Real Example: Remove Trailing Whitespace](#real-example-remove-trailing-whitespace)
+- [Integration with Validator](#integration-with-validator)
+- [Compliance Requirements](#compliance-requirements)
+- [File Locations](#file-locations)
+  - [Templates/Examples (Reference)](#templatesexamples-reference)
+  - [Active Scripts (Usage)](#active-scripts-usage)
+  - [Batch Bridge (Runtime)](#batch-bridge-runtime)
+- [Workflow Decision Tree](#workflow-decision-tree)
+- [Common Patterns](#common-patterns)
+  - [Pattern 1: Remove Trailing Whitespace](#pattern-1-remove-trailing-whitespace)
+  - [Pattern 2: Update Type Annotations](#pattern-2-update-type-annotations)
+  - [Pattern 3: Fix Import Order](#pattern-3-fix-import-order)
+- [Validation Integration](#validation-integration)
+- [Troubleshooting](#troubleshooting)
+  - ["Backup failed - aborting"](#backup-failed-aborting)
+  - ["Ratchet violation detected"](#ratchet-violation-detected)
+  - ["Script not validated"](#script-not-validated)
+- [For Help](#for-help)
+- [Safety Summary](#safety-summary)
+<!-- TOC END -->
+
 **Status**: ✅ Production Ready
 **Version**: 2.0.0 (Improved Auto-Workflow)
 **Pattern**: dry-run → ruff-check → backup → exec → validate → selective-rollback

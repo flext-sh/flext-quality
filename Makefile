@@ -10,14 +10,15 @@ PYTHON_VERSION := 3.13
 POETRY := poetry
 SRC_DIR := src
 TESTS_DIR := tests
-COV_DIR := flext_quality
 WORKSPACE_ROOT := $(shell cd .. && pwd)
+WORKSPACE_VENV := $(WORKSPACE_ROOT)/.venv
+POETRY_ENV := VIRTUAL_ENV=$(WORKSPACE_VENV) PATH=$(WORKSPACE_VENV)/bin:$$PATH POETRY_VIRTUALENVS_CREATE=false POETRY_VIRTUALENVS_IN_PROJECT=false
 
 # Quality Standards
-MIN_COVERAGE := 100
 QUALITY_MIN_COVERAGE := 100.0
 QUALITY_MAX_COMPLEXITY := 10
 QUALITY_MAX_DUPLICATION := 5.0
+CHECK_GATES ?=
 
 # Django Configuration
 DJANGO_PORT := 8000
@@ -25,7 +26,7 @@ DATABASE_URL := postgresql://postgres:postgres@localhost:5432/dc_analyzer
 REDIS_URL := redis://localhost:6379/0
 
 # Export Configuration
-export PROJECT_NAME PYTHON_VERSION MIN_COVERAGE QUALITY_MIN_COVERAGE QUALITY_MAX_COMPLEXITY QUALITY_MAX_DUPLICATION DJANGO_PORT DATABASE_URL REDIS_URL
+export PROJECT_NAME PYTHON_VERSION QUALITY_MIN_COVERAGE QUALITY_MAX_COMPLEXITY QUALITY_MAX_DUPLICATION DJANGO_PORT DATABASE_URL REDIS_URL
 
 # =============================================================================
 # HELP & INFORMATION
@@ -43,7 +44,7 @@ info: ## Show project information
 	@echo "Project: $(PROJECT_NAME)"
 	@echo "Python: $(PYTHON_VERSION)+"
 	@echo "Poetry: $(POETRY)"
-	@echo "Coverage: $(MIN_COVERAGE)% minimum (MANDATORY)"
+	@echo "Coverage: see pyproject.toml [tool.coverage.report] fail_under"
 	@echo "Django Port: $(DJANGO_PORT)"
 	@echo "Quality Thresholds: Coverage $(QUALITY_MIN_COVERAGE)%, Complexity $(QUALITY_MAX_COMPLEXITY), Duplication $(QUALITY_MAX_DUPLICATION)%"
 	@echo "Architecture: Clean Architecture + DDD + Django + Quality Analysis"
@@ -76,15 +77,59 @@ setup: install-dev ## Complete project setup
 # =============================================================================
 
 .PHONY: validate
-validate: lint type-check security test ## Run all quality gates
-	@echo "✅ Quality validation complete"
+validate: ## Run validate gates only (optional: FIX=1)
+	@echo "WARNING: optional mode available - run 'make validate FIX=1' to auto-run fix before validate gates"
+	@if [ "$(FIX)" = "1" ]; then $(MAKE) fix; fi
+	$(MAKE) dead-code cognitive-complexity spell-check
+	@echo "✅ Validate gates complete"
 
 .PHONY: check
-check: lint type-check ## Quick health check
+check: lint ## Run the 6 lint gates
+
 
 .PHONY: lint
-lint: ## Run linting (ZERO TOLERANCE)
-	$(POETRY) run ruff check .
+lint: ## Run the 6 lint gates
+	@gates="$(CHECK_GATES)"; \
+	if [ -d "$(WORKSPACE_VENV)" ] && [ -d ".venv" ]; then \
+		echo "Enforcing workspace venv: removing local .venv in $(CURDIR)"; \
+		rm -rf .venv; \
+	fi; \
+	if [ -n "$$gates" ]; then \
+		for g in $$(echo "$$gates" | tr ',' ' '); do \
+			case "$$g" in \
+				lint|format|pyrefly|mypy|pyright|security|type) ;; \
+				*) echo "ERROR: unknown CHECK_GATES value '$$g' (allowed: lint,format,pyrefly,mypy,pyright,security,type)"; exit 2;; \
+			esac; \
+		done; \
+	else \
+		gates="lint,format,pyrefly,mypy,pyright,security"; \
+	fi; \
+	gates=$$(echo "$$gates" | tr ',' ' ' | sed 's/\btype\b/pyrefly/g' | tr ' ' ','); \
+	if [ -f "$(WORKSPACE_ROOT)/scripts/check/workspace_check.py" ] && [ -d "$(WORKSPACE_VENV)" ]; then \
+		if [ -f "$(WORKSPACE_ROOT)/scripts/check/fix_pyrefly_config.py" ]; then \
+			$(POETRY_ENV) python "$(WORKSPACE_ROOT)/scripts/check/fix_pyrefly_config.py" "$(PROJECT_NAME)"; \
+		fi; \
+		$(POETRY_ENV) python "$(WORKSPACE_ROOT)/scripts/check/workspace_check.py" --gates "$$gates" --reports-dir "$(CURDIR)/.reports/check" "$(PROJECT_NAME)"; \
+		exit $$?; \
+	fi; \
+	if echo "$$gates" | grep -qw lint; then \
+		$(POETRY) run ruff check .; \
+	fi; \
+	if echo "$$gates" | grep -qw format; then \
+		$(MAKE) format-check; \
+	fi; \
+	if echo "$$gates" | grep -qw pyrefly; then \
+		$(MAKE) type-check; \
+	fi; \
+	if echo "$$gates" | grep -qw mypy; then \
+		$(MAKE) mypy-check; \
+	fi; \
+	if echo "$$gates" | grep -qw pyright; then \
+		$(MAKE) pyright-check; \
+	fi; \
+	if echo "$$gates" | grep -qw security; then \
+		$(MAKE) security; \
+	fi
 
 .PHONY: format
 format: ## Format code
@@ -96,7 +141,15 @@ format-check: ## Check formatting
 
 .PHONY: type-check
 type-check: ## Run type checking with Pyrefly (ZERO TOLERANCE)
-	PYTHONPATH=$(SRC_DIR) $(POETRY) run pyrefly check $(SRC_DIR)
+	$(POETRY) run pyrefly check $(SRC_DIR) --config pyproject.toml --count-errors=0 --summarize-errors=1 --summary full
+
+.PHONY: mypy-check
+mypy-check: ## Run type checking with Mypy
+	$(POETRY) run mypy $(SRC_DIR)
+
+.PHONY: pyright-check
+pyright-check: ## Run type checking with Pyright
+	$(POETRY) run pyright $(SRC_DIR)
 
 .PHONY: security
 security: ## Run security scanning
@@ -143,8 +196,8 @@ validate-full: lint format-check type-check dead-code cognitive-complexity spell
 # =============================================================================
 
 .PHONY: test
-test: ## Run tests with 100% coverage (MANDATORY)
-	PYTHONPATH=$(SRC_DIR) $(POETRY) run pytest -q --maxfail=10000 --cov=$(COV_DIR) --cov-report=term-missing:skip-covered --cov-fail-under=$(MIN_COVERAGE)
+test: ## Run tests with coverage (threshold in pyproject.toml)
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run pytest -q --maxfail=10000 --cov --cov-report=term-missing:skip-covered
 
 .PHONY: test-unit
 test-unit: ## Run unit tests
@@ -176,7 +229,7 @@ test-fast: ## Run tests without coverage
 
 .PHONY: coverage-html
 coverage-html: ## Generate HTML coverage report
-	PYTHONPATH=$(SRC_DIR) $(POETRY) run pytest --cov=$(COV_DIR) --cov-report=html
+	PYTHONPATH=$(SRC_DIR) $(POETRY) run pytest --cov --cov-report=html
 
 # =============================================================================
 # BUILD & DISTRIBUTION
@@ -359,24 +412,10 @@ doctor: diagnose check ## Health check
 
 # =============================================================================
 
-.PHONY: t l f tc c i v vf dd cc sp dp
-t: test
-l: lint
-f: format
-tc: type-check
-c: clean
-i: install
-v: validate
-vf: validate-full
-dd: dead-code
-cc: cognitive-complexity
-sp: spell-check
-dp: deps
-
 # =============================================================================
 # CONFIGURATION
 # =============================================================================
 
 .DEFAULT_GOAL := help
 
-.PHONY: help install-workspace install install-dev setup validate check lint format format-check type-check security fix dead-code modernize cognitive-complexity spell-check deps validate-full test test-unit test-integration test-quality test-django test-analysis test-e2e test-fast coverage-html build build-clean analyze quality-check metrics report workspace-analyze detect-issues calculate-scores quality-grade coverage-score web-start web-migrate web-shell web-collectstatic web-createsuperuser docs docs-serve deps-update deps-show deps-audit shell pre-commit clean clean-all reset diagnose doctor t l f tc c i v vf dd cc sp dp
+.PHONY: help install-workspace install install-dev setup validate check lint format format-check type-check security fix dead-code modernize cognitive-complexity spell-check deps validate-full test test-unit test-integration test-quality test-django test-analysis test-e2e test-fast coverage-html build build-clean analyze quality-check metrics report workspace-analyze detect-issues calculate-scores quality-grade coverage-score web-start web-migrate web-shell web-collectstatic web-createsuperuser docs docs-serve deps-update deps-show deps-audit shell pre-commit clean clean-all reset diagnose doctor
