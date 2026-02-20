@@ -18,9 +18,9 @@ from pathlib import Path
 
 from flext_core import FlextContainer, FlextLogger
 from flext_observability import (
-    flext_create_log_entry,
-    flext_create_metric,
-    flext_create_trace,
+    flext_log_entry,
+    flext_metric,
+    flext_trace,
 )
 from flext_quality import (
     CodeAnalyzer,
@@ -218,19 +218,16 @@ def process_data(data):
             # Create metrics
             score_value = analysis_data.get("quality_score", 0.0)
             if isinstance(score_value, (int, float)):
-                flext_create_metric(
+                flext_metric(
                     name="quality_analysis_score",
                     value=float(score_value),
                 )
 
             # Create trace
-            flext_create_trace(
-                name="ecosystem_demo_analysis",
-                operation="api.analyze_project",
-            )
+            flext_trace("api.analyze_project")
 
             # Create log entry
-            flext_create_log_entry(
+            flext_log_entry(
                 message="FLEXT Quality ecosystem integration demonstration completed",
                 level="info",
             )
