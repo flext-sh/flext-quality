@@ -1,5 +1,19 @@
 # Documentation Maintenance Modernization Roadmap
 
+<!-- TOC START -->
+
+- [Table of Contents](#table-of-contents)
+- [Guiding Principles](#guiding-principles)
+- [Phase 1 – Foundation (Weeks 1-2)](#phase-1-foundation-weeks-1-2)
+- [Phase 2 – Platform Upgrades (Weeks 3-5)](#phase-2-platform-upgrades-weeks-3-5)
+- [Phase 3 – Pilot Migrations (Weeks 6-8)](#phase-3-pilot-migrations-weeks-6-8)
+- [Phase 4 – Portfolio Rollout (Weeks 9-14)](#phase-4-portfolio-rollout-weeks-9-14)
+- [Phase 5 – Optimization & Governance (Weeks 15+)](#phase-5-optimization-governance-weeks-15)
+- [Cross-Cutting Workstreams](#cross-cutting-workstreams)
+- [Progress Log](#progress-log)
+
+<!-- TOC END -->
+
 ## Table of Contents
 
 - [Documentation Maintenance Modernization Roadmap](#documentation-maintenance-modernization-roadmap)
