@@ -1,12 +1,10 @@
 [build-system]
 build-backend = "poetry.core.masonry.api"
-requires = [
-  "poetry-core>=2",
-]
+requires = [ "poetry-core>=2.0", "poetry-core>=2" ]
 
 [project]
 name = "flext-quality"
-version = "0.10.0-dev"
+version = "0.10.0"
 description = "FLEXT Quality - Unified orchestration platform for Claude Code tooling"
 readme = "README.md"
 keywords = [
@@ -17,17 +15,18 @@ keywords = [
   "typed",
 ]
 license = "MIT"
-maintainers = [ { email = "team@flext.sh", name = "FLEXT Team" } ]
-authors = [ { email = "team@flext.sh", name = "FLEXT Team" } ]
+maintainers = [ {email = "team@flext.sh", name = "FLEXT Team"} ]
+authors = [ {email = "team@flext.sh", name = "FLEXT Team"} ]
 requires-python = ">=3.13,<3.14"
 classifiers = [
-  "Development Status :: 5 - Production/Stable",
+  "Development Status :: 4 - Beta",
   "Intended Audience :: Developers",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.13",
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Typing :: Typed",
+  "Development Status :: 5 - Production/Stable",
 ]
 dependencies = [
   "click>=8.1",
@@ -45,7 +44,7 @@ dependencies = [
   "rich>=14.2,<15",
   "typer>=0.12.3",
   "uvicorn>=0.30",
-  "wrapt>=1.17,<2"
+  "wrapt>=1.17,<2",
 ]
 optional-dependencies.tools = [
   "bandit>=1.8",
@@ -68,11 +67,11 @@ scripts.flext-quality = "flext_quality.services.cli:main"
 
 [tool.poetry]
 dependencies.python = ">=3.13,<3.14"
-dependencies.flext-core = { path = "../flext-core", develop = true }
-dependencies.flext-auth = { path = "../flext-auth", develop = true }
-dependencies.flext-cli = { path = "../flext-cli", develop = true }
-dependencies.flext-observability = { path = "../flext-observability", develop = true }
-dependencies.flext-web = { path = "../flext-web", develop = true }
+dependencies.flext-core = {path = "../flext-core", develop = true}
+dependencies.flext-auth = {path = "../flext-auth", develop = true}
+dependencies.flext-cli = {path = "../flext-cli", develop = true}
+dependencies.flext-observability = {path = "../flext-observability", develop = true}
+dependencies.flext-web = {path = "../flext-web", develop = true}
 group.dev.dependencies.autoflake = ">=2.3.1"
 group.dev.dependencies.black = ">=25.1.0"
 group.dev.dependencies.codespell = ">=2.3.0"
@@ -125,7 +124,7 @@ group.typings.dependencies.types-redis = ">=4.6.0"
 group.typings.dependencies.types-requests = ">=2.32.4"
 group.typings.dependencies.types-setuptools = ">=80.9.0"
 group.typings.dependencies.types-toml = ">=0.10.8.20240310"
-packages = [ { from = "src", include = "flext_quality" } ]
+packages = [ {from = "src", include = "flext_quality"} ]
 
 [tool.ruff]
 extend = "../ruff-shared.toml"
@@ -139,13 +138,13 @@ known_first_party = [
   "flext_observability",
   "flext_web",
 ]
+package_module_name_map.pyyaml = "yaml"
 pep621_dev_dependency_groups = [
   "dev",
   "test",
   "typings",
   "docs",
 ]
-package_module_name_map.pyyaml = "yaml"
 per_rule_ignores.DEP002 = [
   # CLI tools (invoked from command line, not imported)
   # Type stubs
@@ -178,7 +177,7 @@ per_rule_ignores.DEP002 = [
   "pydantic-core",
   "pytest-cov",
   "wrapt",
-  "referencing"
+  "referencing",
 ]
 
 [tool.pytest]
@@ -208,7 +207,6 @@ ini_options.testpaths = [
 [tool.coverage]
 run.branch = true
 # Coverage inherits from workspace but with project-specific source
-run.source = [ "src/flext_quality" ]
 report.exclude_lines = [
   "@abstractmethod",
   "^\\s*\\.\\.\\.\\s*$",
@@ -217,10 +215,22 @@ report.exclude_lines = [
   "pragma: no cover",
   "raise NotImplementedError",
 ]
-report.fail_under = 59
+report.fail_under = 100
+report.precision = 2
+run.source = [ "src/flext_quality" ]
 
 [tool.pyrefly]
-search-path = [ "../typings", "../typings/generated", "src", "../flext-core/src", "../flext-cli/src" ]
+project-excludes = [ "**/*_pb2*.py", "**/*_pb2_grpc*.py" ]
+search-path = [
+  "../typings",
+  "../typings/generated",
+  "src",
+  "tests",
+  "examples",
+  "scripts",
+  "../flext-core/src",
+  "../flext-cli/src",
+]
 
 [tool.django-stubs]
 django_settings_module = "code_analyzer_web.settings"
