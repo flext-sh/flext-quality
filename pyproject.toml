@@ -1,6 +1,6 @@
 [build-system]
 build-backend = "poetry.core.masonry.api"
-requires = [ "poetry-core>=2.0", "poetry-core>=2" ]
+requires = [ "poetry-core>=2", "poetry-core>=2" ]
 
 [project]
 name = "flext-quality"
@@ -15,23 +15,23 @@ keywords = [
   "typed",
 ]
 license = "MIT"
-maintainers = [ {email = "team@flext.sh", name = "FLEXT Team"} ]
-authors = [ {email = "team@flext.sh", name = "FLEXT Team"} ]
+maintainers = [ { email = "team@flext.sh", name = "FLEXT Team" } ]
+authors = [ { email = "team@flext.sh", name = "FLEXT Team" } ]
 requires-python = ">=3.13,<3.14"
 classifiers = [
   "Development Status :: 4 - Beta",
+  "Development Status :: 5 - Production/Stable",
   "Intended Audience :: Developers",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.13",
   "Topic :: Software Development :: Libraries :: Python Modules",
   "Typing :: Typed",
-  "Development Status :: 5 - Production/Stable",
 ]
 dependencies = [
   "click>=8.1",
   "fastapi>=0.115",
-  "fastmcp>=3.0.0,<4",
+  "fastmcp>=3,<4",
   "httpx>=0.28",
   "libcst>=1.8.6,<2",
   "mypy>=1.18.2",
@@ -67,11 +67,11 @@ scripts.flext-quality = "flext_quality.services.cli:main"
 
 [tool.poetry]
 dependencies.python = ">=3.13,<3.14"
-dependencies.flext-core = {path = "../flext-core", develop = true}
-dependencies.flext-auth = {path = "../flext-auth", develop = true}
-dependencies.flext-cli = {path = "../flext-cli", develop = true}
-dependencies.flext-observability = {path = "../flext-observability", develop = true}
-dependencies.flext-web = {path = "../flext-web", develop = true}
+dependencies.flext-core = { path = "../flext-core", develop = true }
+dependencies.flext-auth = { path = "../flext-auth", develop = true }
+dependencies.flext-cli = { path = "../flext-cli", develop = true }
+dependencies.flext-observability = { path = "../flext-observability", develop = true }
+dependencies.flext-web = { path = "../flext-web", develop = true }
 group.dev.dependencies.autoflake = ">=2.3.1"
 group.dev.dependencies.black = ">=25.1.0"
 group.dev.dependencies.codespell = ">=2.3.0"
@@ -124,7 +124,7 @@ group.typings.dependencies.types-redis = ">=4.6.0"
 group.typings.dependencies.types-requests = ">=2.32.4"
 group.typings.dependencies.types-setuptools = ">=80.9.0"
 group.typings.dependencies.types-toml = ">=0.10.8.20240310"
-packages = [ {from = "src", include = "flext_quality"} ]
+packages = [ { from = "src", include = "flext_quality" } ]
 
 [tool.ruff]
 extend = "../ruff-shared.toml"
@@ -206,6 +206,7 @@ ini_options.testpaths = [
 
 [tool.coverage]
 run.branch = true
+run.source = [ "src/flext_quality" ]
 # Coverage inherits from workspace but with project-specific source
 report.exclude_lines = [
   "@abstractmethod",
@@ -217,18 +218,10 @@ report.exclude_lines = [
 ]
 report.fail_under = 100
 report.precision = 2
-run.source = [ "src/flext_quality" ]
 
 [tool.pyrefly]
 project-excludes = [ "**/*_pb2*.py", "**/*_pb2_grpc*.py" ]
-search-path = [
-    "../typings",
-    "../typings/generated",
-    "src",
-    "tests",
-    "examples",
-    "scripts"
-]
+search-path = [ "../typings", "../typings/generated", "src", "tests", "examples", "scripts" ]
 
 [tool.django-stubs]
 django_settings_module = "code_analyzer_web.settings"
