@@ -8,7 +8,7 @@ from pathlib import Path
 from flext_core import FlextResult as r
 
 from flext_quality.constants import FlextQualityConstants as c
-from flext_quality.models import FlextQualityModels as m
+from flext_quality.models import RuleDefinition
 from flext_quality.rules.loader import FlextQualityRulesLoader
 
 
@@ -18,7 +18,7 @@ class FlextQualityRulesEngine:
     def __init__(self, rules_path: Path | None = None) -> None:
         """Initialize rules engine."""
         self._rules_path: Path | None = rules_path
-        self._rules: list[m.Quality.RuleDefinition] = []
+        self._rules: list[RuleDefinition] = []
         self._loaded: bool = False
 
     def load_rules(self, rules_path: Path | None = None) -> r[int]:
@@ -82,7 +82,7 @@ class FlextQualityRulesEngine:
 
         return r[list[dict[str, object]]].ok(violations)
 
-    def get_rules(self) -> list[m.Quality.RuleDefinition]:
+    def get_rules(self) -> list[RuleDefinition]:
         """Get loaded rules."""
         return self._rules.copy()
 
@@ -123,7 +123,7 @@ class FlextQualityRulesEngine:
 
     def _check_rule(
         self,
-        rule: m.Quality.RuleDefinition,
+        rule: RuleDefinition,
         content: str,
         filename: str,
     ) -> list[dict[str, object]]:

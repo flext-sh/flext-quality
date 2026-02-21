@@ -105,5 +105,6 @@ class FlextQualityModels:
 
 # Short alias for imports
 m = FlextQualityModels
+RuleDefinition = _RuleDefinition
 
-__all__ = ["FlextQualityModels", "m"]
+__all__ = ["FlextQualityModels", "RuleDefinition", "m"]

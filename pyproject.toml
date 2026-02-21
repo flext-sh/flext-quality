@@ -222,14 +222,12 @@ run.source = [ "src/flext_quality" ]
 [tool.pyrefly]
 project-excludes = [ "**/*_pb2*.py", "**/*_pb2_grpc*.py" ]
 search-path = [
-  "../typings",
-  "../typings/generated",
-  "src",
-  "tests",
-  "examples",
-  "scripts",
-  "../flext-core/src",
-  "../flext-cli/src",
+    "../typings",
+    "../typings/generated",
+    "src",
+    "tests",
+    "examples",
+    "scripts"
 ]
 
 [tool.django-stubs]
