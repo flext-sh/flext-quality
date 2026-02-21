@@ -14,7 +14,7 @@ from pathlib import Path
 from typing import NoReturn, final
 
 from flext_cli.services.output import FlextCliOutput
-from flext_core import FlextResult as r
+from flext_core import r
 
 from flext_quality.api import FlextQuality
 from flext_quality.constants import FlextQualityConstants as c

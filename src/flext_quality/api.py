@@ -17,7 +17,7 @@ from typing import ClassVar
 from flext_core import (
     FlextContainer,
     FlextLogger,
-    FlextResult as r,
+    r,
 )
 from flext_core.protocols import p
 

@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from typing import final
 
-from flext_core import FlextResult as r
+from flext_core import r
 
 from flext_quality.constants import FlextQualityConstants as c
 from flext_quality.integrations.mcp_client import (

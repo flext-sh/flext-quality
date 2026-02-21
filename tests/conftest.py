@@ -18,7 +18,7 @@ from pathlib import Path
 from typing import TypeVar
 
 import pytest
-from flext_core import FlextResult, FlextTypes as t
+from flext_core import FlextResult, t
 
 T = TypeVar("T")
 
@@ -483,8 +483,70 @@ def pytest_configure(config: pytest.Config) -> None:
 
 
 # Mock services
+class MockQualityAnalyzer:
+    """Mock implementation of quality analyzer for testing.
+
+    Provides realistic analyzer behavior without external dependencies,
+    enabling fast and reliable unit testing of analysis workflows.
+    """
+
+    def __init__(self) -> None:
+        """Initialize the instance."""
+        super().__init__()
+        self.analyzed_files: list[str] = []
+
+    def analyze_project(self, project_path: str) -> dict[str, t.GeneralValueType]:
+        """Simulate comprehensive project analysis.
+
+        Args:
+            project_path: Path to project for analysis
+
+        Returns:
+            Realistic analysis results with quality metrics
+
+        """
+        self.analyzed_files.append(project_path)
+        return {
+            "quality_score": 85.0,
+            "issues": 5,
+            "files_analyzed": 10,
+            "analysis_time": 2.5,
+        }
+
+    def analyze_file(self, file_path: str) -> dict[str, t.GeneralValueType]:
+        """Simulate individual file analysis.
+
+        Args:
+            file_path: Path to file for analysis
+
+        Returns:
+            File-level quality metrics and statistics
+
+        """
+        return {
+            "file": file_path,
+            "complexity": 3.2,
+            "issues": 2,
+            "coverage": 90.0,
+        }
+
+    def get_metrics(self, _project_path: str) -> dict[str, t.GeneralValueType]:
+        """Simulate project-wide quality metrics collection.
+
+        Returns:
+            Comprehensive quality metrics across all categories
+
+        """
+        return {
+            "maintainability": 78.5,
+            "complexity": 5.2,
+            "duplication": 2.1,
+            "security": 95.0,
+        }
+
+
 @pytest.fixture
-def mock_quality_analyzer() -> object:
+def mock_quality_analyzer() -> MockQualityAnalyzer:
     """Provide mock quality analyzer for isolated unit testing.
 
     Creates a comprehensive mock implementation of the quality analyzer
@@ -510,73 +572,61 @@ def mock_quality_analyzer() -> object:
       ...     assert result["issues"] == 5
 
     """
-
-    class MockQualityAnalyzer:
-        """Mock implementation of quality analyzer for testing.
-
-        Provides realistic analyzer behavior without external dependencies,
-        enabling fast and reliable unit testing of analysis workflows.
-        """
-
-        def __init__(self) -> None:
-            """Initialize the instance."""
-            super().__init__()
-            self.analyzed_files: list[str] = []
-
-        def analyze_project(self, project_path: str) -> dict[str, t.GeneralValueType]:
-            """Simulate comprehensive project analysis.
-
-            Args:
-                project_path: Path to project for analysis
-
-            Returns:
-                Realistic analysis results with quality metrics
-
-            """
-            self.analyzed_files.append(project_path)
-            return {
-                "quality_score": 85.0,
-                "issues": 5,
-                "files_analyzed": 10,
-                "analysis_time": 2.5,
-            }
-
-        def analyze_file(self, file_path: str) -> dict[str, t.GeneralValueType]:
-            """Simulate individual file analysis.
-
-            Args:
-                file_path: Path to file for analysis
-
-            Returns:
-                File-level quality metrics and statistics
-
-            """
-            return {
-                "file": file_path,
-                "complexity": 3.2,
-                "issues": 2,
-                "coverage": 90.0,
-            }
-
-        def get_metrics(self, _project_path: str) -> dict[str, t.GeneralValueType]:
-            """Simulate project-wide quality metrics collection.
-
-            Returns:
-                Comprehensive quality metrics across all categories
-
-            """
-            return {
-                "maintainability": 78.5,
-                "complexity": 5.2,
-                "duplication": 2.1,
-                "security": 95.0,
-            }
-
     return MockQualityAnalyzer()
 
 
+class MockReportGenerator:
+    """Mock implementation of report generator for testing.
+
+    Simulates report generation capabilities without file system
+    operations, enabling isolated testing of reporting workflows.
+    """
+
+    def __init__(self) -> None:
+        """Initialize the instance."""
+        super().__init__()
+        self.generated_reports: list[dict[str, t.GeneralValueType]] = []
+
+    def generate_report(
+        self,
+        data: dict[str, t.GeneralValueType],
+        output_format: str = "json",
+    ) -> str:
+        """Simulate report generation in specified format.
+
+        Args:
+            data: Analysis data for report generation
+            output_format: Desired report format (json, html, pdf)
+
+        Returns:
+            Generated report filename
+
+        """
+        report: dict[str, t.GeneralValueType] = {
+            "format": output_format,
+            "data": data,
+            "timestamp": "2023-01-01T12:00:00Z",
+        }
+        self.generated_reports.append(report)
+        return f"report_{len(self.generated_reports)}.{output_format}"
+
+    def generate_dashboard_data(self) -> dict[str, t.GeneralValueType]:
+        """Simulate dashboard data generation.
+
+        Returns:
+            Dashboard metrics and summary information
+
+        """
+        return {
+            "projects": 5,
+            "recent_analyses": 3,
+            "avg_quality_score": 82.5,
+            "trend": "improving",
+        }
+
+
 @pytest.fixture
-def mock_report_generator() -> object:
+def mock_report_generator() -> MockReportGenerator:
     """Provide mock report generator for isolated reporting tests.
 
     Creates a mock implementation of the report generation system that
@@ -602,54 +652,4 @@ def mock_report_generator() -> object:
       ...     assert len(mock_report_generator.generated_reports) == 1
 
     """
-
-    class MockReportGenerator:
-        """Mock implementation of report generator for testing.
-
-        Simulates report generation capabilities without file system
-        operations, enabling isolated testing of reporting workflows.
-        """
-
-        def __init__(self) -> None:
-            """Initialize the instance."""
-            super().__init__()
-            self.generated_reports: list[dict[str, t.GeneralValueType]] = []
-
-        def generate_report(
-            self,
-            data: dict[str, t.GeneralValueType],
-            output_format: str = "json",
-        ) -> str:
-            """Simulate report generation in specified format.
-
-            Args:
-                data: Analysis data for report generation
-                output_format: Desired report format (json, html, pdf)
-
-            Returns:
-                Generated report filename
-
-            """
-            report: dict[str, t.GeneralValueType] = {
-                "format": output_format,
-                "data": data,
-                "timestamp": "2023-01-01T12:00:00Z",
-            }
-            self.generated_reports.append(report)
-            return f"report_{len(self.generated_reports)}.{output_format}"
-
-        def generate_dashboard_data(self) -> dict[str, t.GeneralValueType]:
-            """Simulate dashboard data generation.
-
-            Returns:
-                Dashboard metrics and summary information
-
-            """
-            return {
-                "projects": 5,
-                "recent_analyses": 3,
-                "avg_quality_score": 82.5,
-                "trend": "improving",
-            }
-
     return MockReportGenerator()

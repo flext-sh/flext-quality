@@ -296,7 +296,7 @@ ______________________________________________________________________
 - **CQ002**: `TypeAlias` outside typings.py
 
   - Problem: Type aliases scattered across codebase
-  - Fix: Move to `src/*/typings.py`, import as `from flext_core import FlextTypes as t`
+  - Fix: Move to `src/*/typings.py`, import as `from flext_core import t`
 
 - **CQ003**: `Protocol` outside protocols.py
 

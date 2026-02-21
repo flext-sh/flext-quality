@@ -10,7 +10,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Protocol
 
-from flext_core import FlextTypes as t
+from flext_core import t
 
 
 @dataclass

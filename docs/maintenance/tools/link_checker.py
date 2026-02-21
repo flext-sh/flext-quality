@@ -19,7 +19,7 @@ from urllib.robotparser import RobotFileParser
 import aiohttp
 import requests
 import yaml
-from flext_core import FlextTypes as t
+from flext_core import t
 
 
 class LinkChecker:

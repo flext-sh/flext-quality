@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import TypeGuard
 
 import yaml
-from flext_core import FlextResult as r
+from flext_core import r
 
 from flext_quality.constants import FlextQualityConstants as c
 from flext_quality.models import RuleDefinition

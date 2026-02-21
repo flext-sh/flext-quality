@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Protocol
 
-from flext_core import FlextProtocols, FlextResult as r
+from flext_core import FlextProtocols, r
 
 from .typings import FlextQualityTypes as t
 

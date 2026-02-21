@@ -12,7 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextResult as r, FlextSettings
+from flext_core import FlextSettings, r
 from pydantic import Field
 from pydantic_settings import SettingsConfigDict
 

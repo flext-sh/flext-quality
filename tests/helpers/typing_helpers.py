@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import TypeGuard
 
-from flext_core import FlextTypes as t
+from flext_core import t
 
 
 def assert_is_dict(value: object) -> TypeGuard[dict[str, t.GeneralValueType]]:
@@ -50,7 +50,9 @@ def assert_is_list(value: object) -> TypeGuard[list[t.GeneralValueType]]:
     return True
 
 
-def safe_dict_access(data: dict[str, t.GeneralValueType], key: str) -> object:
+def safe_dict_access(
+    data: dict[str, t.GeneralValueType], key: str
+) -> t.GeneralValueType:
     """Type-safe dictionary access with proper error handling.
 
     Args:
@@ -68,7 +70,7 @@ def safe_dict_access(data: dict[str, t.GeneralValueType], key: str) -> object:
     return data[key]
 
 
-def safe_list_access(data: list[t.GeneralValueType], index: int) -> object:
+def safe_list_access(data: list[t.GeneralValueType], index: int) -> t.GeneralValueType:
     """Type-safe list access with proper error handling.
 
     Args:
