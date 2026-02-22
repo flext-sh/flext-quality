@@ -27,14 +27,13 @@ import json
 import sys
 from pathlib import Path
 
-from rich.console import Console
-
 from flext_quality import (
     AnalysisResults,
     CodeAnalyzer,
     QualityMetrics,
 )
 from flext_quality.reports import FlextQualityReportGenerator
+from rich.console import Console
 
 # Initialize rich console for output
 console = Console()
