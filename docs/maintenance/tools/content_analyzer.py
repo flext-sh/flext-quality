@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+
 from flext_quality.typings import FlextQualityTypes
 
 
