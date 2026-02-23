@@ -113,9 +113,9 @@ lint: ## Run the 6 lint gates
 	gates=$$(echo "$$gates" | tr ',' ' ' | sed 's/\btype\b/pyrefly/g' | tr ' ' ','); \
 	if [ -d "$(WORKSPACE_VENV)" ]; then \
 		if [ -f "$(WORKSPACE_ROOT)/scripts/check/fix_pyrefly_config.py" ]; then \
-			$(POETRY_ENV) python -m flext_infra.check.fix_pyrefly_config "$(PROJECT_NAME)"; \
+			$(POETRY_ENV) python -m flext_infra check fix-pyrefly-config "$(PROJECT_NAME)"; \
 		fi; \
-		$(POETRY_ENV) python -m flext_infra.check.workspace_check --gates "$$gates" --reports-dir "$(CURDIR)/.reports/check" "$(PROJECT_NAME)"; \
+		$(POETRY_ENV) python -m flext_infra check run --gates "$$gates" --reports-dir "$(CURDIR)/.reports/check" --project "$(PROJECT_NAME)"; \
 		exit $$?; \
 	fi; \
 	if echo "$$gates" | grep -qw lint; then \
