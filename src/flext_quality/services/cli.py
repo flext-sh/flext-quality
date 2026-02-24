@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
+from collections.abc import Mapping
 from pathlib import Path
 from typing import NoReturn, final
 
@@ -31,10 +32,10 @@ class FlextQualityCliService:
         self._quality = FlextQuality.get_instance()
         self._executor = FlextQualityCodeExecutionBridge()
 
-    def display_status(self) -> r[dict[str, object]]:
+    def display_status(self) -> r[Mapping[str, object]]:
         """Display quality service status."""
         status = self._quality.get_status()
-        return r[dict[str, object]].ok(status)
+        return r[Mapping[str, object]].ok(status)
 
     def build_check_commands(self, target_path: Path) -> r[list[list[str]]]:
         """Build commands for quick check (lint + type)."""

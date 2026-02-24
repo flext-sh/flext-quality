@@ -11,6 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import threading
+from collections.abc import Mapping
 from pathlib import Path
 from typing import ClassVar
 
@@ -242,7 +243,7 @@ class FlextQuality:
             return r[bool].fail(threshold_result.error or "Threshold validation failed")
         return r[bool].ok(value=True)
 
-    def get_status(self) -> dict[str, object]:
+    def get_status(self) -> Mapping[str, object]:
         """Get quality service status.
 
         Returns:

@@ -17,10 +17,10 @@ class TestsFlextQualityConstants(FlextQualityConstants):
     """Constants for flext-quality tests.
 
     Access patterns:
-    - tc.Quality.* (domain constants from production)
-    - tc.Quality.Literals.* (type literals from production)
-    - tc.Paths.* (test path constants)
-    - tc.TestQuality.* (project-specific test data)
+    - c.Quality.* (domain constants from production)
+    - c.Quality.Literals.* (type literals from production)
+    - c.Paths.* (test path constants)
+    - c.TestQuality.* (project-specific test data)
     """
 
     class Paths:
@@ -39,11 +39,11 @@ class TestsFlextQualityConstants(FlextQualityConstants):
 
 
 # Short aliases per FLEXT convention
-tc = TestsFlextQualityConstants
+c = TestsFlextQualityConstants
 c = TestsFlextQualityConstants
 
 __all__ = [
     "TestsFlextQualityConstants",
     "c",
-    "tc",
+    "c",
 ]

@@ -17,9 +17,9 @@ class TestsFlextQualityProtocols(FlextTestsProtocols, FlextQualityProtocols):
     """Test protocols combining FlextTestsProtocols and FlextQualityProtocols.
 
     Provides access to:
-    - tp.Tests.Docker.* (from FlextTestsProtocols)
-    - tp.Tests.Factory.* (from FlextTestsProtocols)
-    - tp.Quality.* (from FlextQualityProtocols)
+    - p.Tests.Docker.* (from FlextTestsProtocols)
+    - p.Tests.Factory.* (from FlextTestsProtocols)
+    - p.Quality.* (from FlextQualityProtocols)
     """
 
     # class Tests:
@@ -34,6 +34,6 @@ class TestsFlextQualityProtocols(FlextTestsProtocols, FlextQualityProtocols):
 
 # Runtime aliases
 p = TestsFlextQualityProtocols
-tp = TestsFlextQualityProtocols
+p = TestsFlextQualityProtocols
 
-__all__ = ["TestsFlextQualityProtocols", "p", "tp"]
+__all__ = ["TestsFlextQualityProtocols", "p", "p"]

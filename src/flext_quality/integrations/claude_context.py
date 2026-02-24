@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import final
 
 from flext_core import r
@@ -101,11 +102,11 @@ class FlextQualityClaudeContextClient:
 
         return self._mcp.build_call_command(call_result.value)
 
-    def health_check(self) -> r[dict[str, object]]:
+    def health_check(self) -> r[Mapping[str, object]]:
         """Check if claude-context is available."""
         mcp_health = self._mcp.health_check()
         if mcp_health.is_failure:
-            return r[dict[str, object]].fail(mcp_health.error)
+            return r[Mapping[str, object]].fail(mcp_health.error)
 
         health_data = mcp_health.value
         status = (
@@ -114,7 +115,7 @@ class FlextQualityClaudeContextClient:
             else c.Quality.IntegrationStatus.DISCONNECTED
         )
 
-        return r[dict[str, object]].ok({
+        return r[Mapping[str, object]].ok({
             "server": self.SERVER_NAME,
             "status": status,
             "available": health_data.get("available", False),

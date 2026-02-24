@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from collections.abc import Mapping
 from pathlib import Path
 
 from flext_core import r
@@ -39,39 +40,39 @@ class FlextQualityRulesEngine:
     def validate(
         self,
         path: str,
-        context: dict[str, object] | None = None,
-    ) -> r[list[dict[str, object]]]:
+        context: Mapping[str, object] | None = None,
+    ) -> r[list[Mapping[str, object]]]:
         """Validate code against loaded rules."""
         if not self._loaded:
             load_result = self.load_rules()
             if load_result.is_failure:
-                return r[list[dict[str, object]]].fail(load_result.error)
+                return r[list[Mapping[str, object]]].fail(load_result.error)
 
         target_path = Path(path)
         if not target_path.exists():
-            return r[list[dict[str, object]]].fail(f"Path does not exist: {path}")
+            return r[list[Mapping[str, object]]].fail(f"Path does not exist: {path}")
 
-        violations: list[dict[str, object]] = []
+        violations: list[Mapping[str, object]] = []
         files = self._get_files(target_path)
 
         for file_path in files:
             file_violations = self._validate_file(file_path, context or {})
             violations.extend(file_violations)
 
-        return r[list[dict[str, object]]].ok(violations)
+        return r[list[Mapping[str, object]]].ok(violations)
 
     def validate_content(
         self,
         content: str,
         filename: str = "<string>",
-    ) -> r[list[dict[str, object]]]:
+    ) -> r[list[Mapping[str, object]]]:
         """Validate content string against loaded rules."""
         if not self._loaded:
             load_result = self.load_rules()
             if load_result.is_failure:
-                return r[list[dict[str, object]]].fail(load_result.error)
+                return r[list[Mapping[str, object]]].fail(load_result.error)
 
-        violations: list[dict[str, object]] = []
+        violations: list[Mapping[str, object]] = []
 
         for rule in self._rules:
             if not rule.enabled:
@@ -80,7 +81,7 @@ class FlextQualityRulesEngine:
             rule_violations = self._check_rule(rule, content, filename)
             violations.extend(rule_violations)
 
-        return r[list[dict[str, object]]].ok(violations)
+        return r[list[Mapping[str, object]]].ok(violations)
 
     def get_rules(self) -> list[RuleDefinition]:
         """Get loaded rules."""
@@ -95,8 +96,8 @@ class FlextQualityRulesEngine:
     def _validate_file(
         self,
         file_path: Path,
-        _context: dict[str, object],
-    ) -> list[dict[str, object]]:
+        _context: Mapping[str, object],
+    ) -> list[Mapping[str, object]]:
         """Validate a single file against rules."""
         try:
             content = file_path.read_text(encoding="utf-8")
@@ -110,7 +111,7 @@ class FlextQualityRulesEngine:
                 }
             ]
 
-        violations: list[dict[str, object]] = []
+        violations: list[Mapping[str, object]] = []
 
         for rule in self._rules:
             if not rule.enabled:
@@ -126,9 +127,9 @@ class FlextQualityRulesEngine:
         rule: RuleDefinition,
         content: str,
         filename: str,
-    ) -> list[dict[str, object]]:
+    ) -> list[Mapping[str, object]]:
         """Check a single rule against content."""
-        violations: list[dict[str, object]] = []
+        violations: list[Mapping[str, object]] = []
 
         if rule.pattern is None:
             return violations

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Mapping
 from pathlib import Path
 from typing import final
 
@@ -53,7 +54,7 @@ class HookManager:
 
         return r[HookOutput].ok({"continue": True})
 
-    def get_config(self) -> dict[str, list[dict[str, object]]]:
+    def get_config(self) -> Mapping[str, list[Mapping[str, object]]]:
         """Get hooks configuration as dict."""
         return {
             event.value: [{"matcher": h.matcher} for h in hooks]

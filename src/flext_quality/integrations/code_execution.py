@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import final
@@ -131,13 +132,13 @@ class FlextQualityCodeExecutionBridge:
             )
         )
 
-    def health_check(self) -> r[dict[str, object]]:
+    def health_check(self) -> r[Mapping[str, object]]:
         """Check availability of execution runtimes.
 
         Returns configuration status - actual runtime checks
         should be done via shell wrapper execution.
         """
-        return r[dict[str, object]].ok({
+        return r[Mapping[str, object]].ok({
             "status": c.Quality.IntegrationStatus.CONNECTED,
             "available": True,
             "working_dir": str(self._working_dir),

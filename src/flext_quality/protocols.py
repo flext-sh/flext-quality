@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Protocol
 
 from flext_core import FlextProtocols, r
@@ -37,7 +38,9 @@ class FlextQualityProtocols(FlextProtocols):
             rule_type: str
 
             def validate(
-                self, config: t.Quality.RuleConfig, context: dict[str, object]
+                self,
+                config: t.Quality.RuleConfig,
+                context: Mapping[str, object],
             ) -> r[t.Quality.RuleResult]:
                 """Validate according to rule."""
                 ...
@@ -53,7 +56,7 @@ class FlextQualityProtocols(FlextProtocols):
                 """Disconnect from external service."""
                 ...
 
-            def health_check(self) -> r[dict[str, str]]:
+            def health_check(self) -> r[Mapping[str, str]]:
                 """Check integration health."""
                 ...
 
@@ -63,7 +66,10 @@ class FlextQualityProtocols(FlextProtocols):
             name: str
             description: str
 
-            def execute(self, params: dict[str, object]) -> r[dict[str, object]]:
+            def execute(
+                self,
+                params: Mapping[str, object],
+            ) -> r[Mapping[str, object]]:
                 """Execute MCP tool."""
                 ...
 

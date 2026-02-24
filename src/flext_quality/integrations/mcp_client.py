@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import shutil
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import final
 
@@ -113,30 +114,32 @@ class FlextQualityMcpClient:
             )
 
         try:
-            data = json.loads(output)
-            if isinstance(data, dict):
-                return r[McpToolResult].ok(
-                    McpToolResult(
-                        success=True,
-                        data=data,
-                        error=None,
+            data: object = json.loads(output)
+            match data:
+                case dict():
+                    return r[McpToolResult].ok(
+                        McpToolResult(
+                            success=True,
+                            data=data,
+                            error=None,
+                        )
                     )
-                )
-            if isinstance(data, list):
-                return r[McpToolResult].ok(
-                    McpToolResult(
-                        success=True,
-                        data=data,
-                        error=None,
+                case list():
+                    return r[McpToolResult].ok(
+                        McpToolResult(
+                            success=True,
+                            data=data,
+                            error=None,
+                        )
                     )
-                )
-            return r[McpToolResult].ok(
-                McpToolResult(
-                    success=True,
-                    data={"value": data},
-                    error=None,
-                )
-            )
+                case _:
+                    return r[McpToolResult].ok(
+                        McpToolResult(
+                            success=True,
+                            data={"value": data},
+                            error=None,
+                        )
+                    )
         except json.JSONDecodeError:
             # Return raw output as data if not valid JSON
             return r[McpToolResult].ok(
@@ -147,7 +150,7 @@ class FlextQualityMcpClient:
                 )
             )
 
-    def health_check(self) -> r[dict[str, object]]:
+    def health_check(self) -> r[Mapping[str, object]]:
         """Check if MCP infrastructure is available."""
         available = self.is_mcp_cli_available()
         status = (
@@ -156,7 +159,7 @@ class FlextQualityMcpClient:
             else c.Quality.IntegrationStatus.DISCONNECTED
         )
 
-        return r[dict[str, object]].ok({
+        return r[Mapping[str, object]].ok({
             "status": status,
             "available": available,
             "mcp_cli": available,

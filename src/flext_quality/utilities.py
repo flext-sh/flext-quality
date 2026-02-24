@@ -5,29 +5,14 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+from collections.abc import Mapping
 from pathlib import Path
-from typing import TypeGuard
 
 import yaml
 from flext_core import FlextUtilities, r
 
 from flext_quality.constants import FlextQualityConstants as c
 from flext_quality.typings import HookInput
-
-
-def _is_dict(value: object) -> TypeGuard[dict[str, object]]:
-    """Type guard for dict validation."""
-    return isinstance(value, dict)
-
-
-def _is_hook_input(value: object) -> TypeGuard[HookInput]:
-    """Type guard for HookInput validation (dict from JSON parsing)."""
-    return isinstance(value, dict)
-
-
-def _is_list(value: object) -> TypeGuard[list[object]]:
-    """Type guard for list validation."""
-    return isinstance(value, list)
 
 
 class FlextQualityUtilities(FlextUtilities):
@@ -50,9 +35,11 @@ class FlextQualityUtilities(FlextUtilities):
             """Parse hook input JSON."""
             try:
                 parsed: object = json.loads(raw)
-                if not _is_hook_input(parsed):
-                    return r[HookInput].fail("Expected JSON object")
-                return r[HookInput].ok(parsed)
+                match parsed:
+                    case dict() as hook_input:
+                        return r[HookInput].ok(hook_input)
+                    case _:
+                        return r[HookInput].fail("Expected JSON object")
             except json.JSONDecodeError as e:
                 return r[HookInput].fail(f"Invalid JSON: {e}")
 
@@ -72,20 +59,26 @@ class FlextQualityUtilities(FlextUtilities):
             return json.dumps(output)
 
         @staticmethod
-        def load_yaml_rules(path: Path) -> r[list[dict[str, object]]]:
+        def load_yaml_rules(path: Path) -> r[list[Mapping[str, object]]]:
             """Load rules from YAML file."""
             try:
                 with path.open(encoding="utf-8") as f:
                     parsed: object = yaml.safe_load(f)
-                if not _is_dict(parsed):
-                    return r[list[dict[str, object]]].fail("Expected YAML dict")
-                raw_rules = parsed.get("rules", [])
-                if not _is_list(raw_rules):
-                    return r[list[dict[str, object]]].fail("Expected rules list")
-                rules = [item for item in raw_rules if _is_dict(item)]
-                return r[list[dict[str, object]]].ok(rules)
+                match parsed:
+                    case dict() as parsed_dict:
+                        raw_rules = parsed_dict.get("rules", [])
+                    case _:
+                        return r[list[Mapping[str, object]]].fail("Expected YAML dict")
+                match raw_rules:
+                    case list() as rules_list:
+                        rules: list[dict[str, object]] = [
+                            item for item in rules_list if item.__class__ is dict
+                        ]
+                    case _:
+                        return r[list[Mapping[str, object]]].fail("Expected rules list")
+                return r[list[Mapping[str, object]]].ok(rules)
             except Exception as e:
-                return r[list[dict[str, object]]].fail(f"Failed to load rules: {e}")
+                return r[list[Mapping[str, object]]].fail(f"Failed to load rules: {e}")
 
         @staticmethod
         def run_shell_command(
