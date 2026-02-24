@@ -45,5 +45,4 @@ c = TestsFlextQualityConstants
 __all__ = [
     "TestsFlextQualityConstants",
     "c",
-    "c",
 ]
