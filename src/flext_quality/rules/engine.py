@@ -101,7 +101,15 @@ class FlextQualityRulesEngine:
         """Validate a single file against rules."""
         try:
             content = file_path.read_text(encoding="utf-8")
-        except Exception as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             return [
                 {
                     "rule": "file-read-error",

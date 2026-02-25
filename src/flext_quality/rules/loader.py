@@ -23,7 +23,15 @@ class FlextQualityRulesLoader:
         try:
             with path.open(encoding="utf-8") as f:
                 parsed: object = yaml.safe_load(f)
-        except Exception as e:
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
             return r[list[RuleDefinition]].fail(f"Failed to parse YAML: {e}")
 
         match parsed:

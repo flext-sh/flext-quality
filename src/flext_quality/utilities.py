@@ -27,7 +27,15 @@ class FlextQualityUtilities(FlextUtilities):
             try:
                 data = sys.stdin.read()
                 return r[str].ok(data)
-            except Exception as e:
+            except (
+                ValueError,
+                TypeError,
+                KeyError,
+                AttributeError,
+                OSError,
+                RuntimeError,
+                ImportError,
+            ) as e:
                 return r[str].fail(f"Failed to read stdin: {e}")
 
         @staticmethod
@@ -77,7 +85,15 @@ class FlextQualityUtilities(FlextUtilities):
                     case _:
                         return r[list[Mapping[str, object]]].fail("Expected rules list")
                 return r[list[Mapping[str, object]]].ok(rules)
-            except Exception as e:
+            except (
+                ValueError,
+                TypeError,
+                KeyError,
+                AttributeError,
+                OSError,
+                RuntimeError,
+                ImportError,
+            ) as e:
                 return r[list[Mapping[str, object]]].fail(f"Failed to load rules: {e}")
 
         @staticmethod
@@ -99,7 +115,15 @@ class FlextQualityUtilities(FlextUtilities):
                 return r[str].ok(result.stdout)
             except subprocess.TimeoutExpired:
                 return r[str].fail(f"Command timed out after {timeout_ms}ms")
-            except Exception as e:
+            except (
+                ValueError,
+                TypeError,
+                KeyError,
+                AttributeError,
+                OSError,
+                RuntimeError,
+                ImportError,
+            ) as e:
                 return r[str].fail(f"Command error: {e}")
 
 
