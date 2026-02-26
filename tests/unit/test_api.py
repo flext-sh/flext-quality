@@ -2,7 +2,10 @@
 
 from __future__ import annotations
 
+import io
+import sys
 import tempfile
+import threading
 from pathlib import Path
 
 from flext_quality.api import FlextQuality
@@ -89,7 +92,7 @@ class TestFlextQualityAPI:
 
         assert isinstance(config_json, str)
         # Should be valid JSON (empty or with hooks)
-        assert config_json in ["{}", "{}"]
+        assert config_json == "{}"
 
     def test_load_rules_from_config_with_no_rules_dir(self) -> None:
         """Test load_rules_from_config when rules dir doesn't exist."""
@@ -114,7 +117,7 @@ rules:
     enabled: true
 """
         with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".yaml", delete=False
+            encoding="utf-8", mode="w", suffix=".yaml", delete=False
         ) as f:
             f.write(rules_yaml)
             rules_path = Path(f.name)
@@ -177,8 +180,6 @@ class TestFlextQualitySingleton:
 
     def test_double_check_locking_concurrent(self) -> None:
         """Test singleton creation with concurrent threads."""
-        import threading
-
         instances: list[FlextQuality] = []
         errors: list[Exception] = []
 
@@ -282,9 +283,6 @@ class TestFlextQualityStdinProcessing:
 
     def test_process_stdin_hook_success(self) -> None:
         """Test process_stdin_hook with valid input."""
-        import io
-        import sys
-
         quality = FlextQuality.get_instance()
 
         # Mock stdin
@@ -300,9 +298,6 @@ class TestFlextQualityStdinProcessing:
 
     def test_process_stdin_hook_empty_event(self) -> None:
         """Test process_stdin_hook with empty event returns continue."""
-        import io
-        import sys
-
         quality = FlextQuality.get_instance()
 
         original_stdin = sys.stdin
@@ -317,9 +312,6 @@ class TestFlextQualityStdinProcessing:
 
     def test_process_stdin_hook_invalid_json(self) -> None:
         """Test process_stdin_hook with invalid JSON fails."""
-        import io
-        import sys
-
         quality = FlextQuality.get_instance()
 
         original_stdin = sys.stdin
@@ -328,15 +320,15 @@ class TestFlextQualityStdinProcessing:
         try:
             result = quality.process_stdin_hook()
             assert result.is_failure
-            assert "parse" in (result.error or "").lower() or "invalid" in (result.error or "").lower()
+            assert (
+                "parse" in (result.error or "").lower()
+                or "invalid" in (result.error or "").lower()
+            )
         finally:
             sys.stdin = original_stdin
 
     def test_process_stdin_hook_with_unknown_event(self) -> None:
         """Test process_stdin_hook with unknown event fails."""
-        import io
-        import sys
-
         quality = FlextQuality.get_instance()
 
         original_stdin = sys.stdin

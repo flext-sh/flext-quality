@@ -48,12 +48,14 @@ def assert_analysis_results_structure(results: Mapping[str, Any]) -> None:
     assert isinstance(results, dict), f"Expected dict, got {type(results).__name__}"
 
 
-def safe_dict_access(data: Mapping[str, Any], key: str, default: Any = None) -> Any:
+def safe_dict_access(
+    data: Mapping[str, Any], key: str, default: object = None
+) -> object:
     """Safely access a dict key with a default value."""
     return data.get(key, default)
 
 
-def safe_list_access(data: Sequence[Any], index: int, default: Any = None) -> Any:
+def safe_list_access(data: Sequence[Any], index: int, default: object = None) -> object:
     """Safely access a list index with a default value."""
     try:
         return data[index]
