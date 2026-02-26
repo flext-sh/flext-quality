@@ -62,7 +62,7 @@
 
 - **[structlog](https://www.structlog.org/)** or Rich log handler for structured outputs that can be harvested by CI pipelines.
 
----
+______________________________________________________________________
 
 ### Immediate Recommendations (Phase 2+)
 
