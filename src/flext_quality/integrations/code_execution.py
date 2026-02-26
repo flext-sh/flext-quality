@@ -10,33 +10,39 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Mapping
-from dataclasses import dataclass
 from pathlib import Path
 from typing import final
 
 from flext_core import r
+from pydantic import BaseModel, ConfigDict, Field
 
 from flext_quality.constants import FlextQualityConstants as c
 
 
-@dataclass(frozen=True)
-class ExecutionRequest:
+class ExecutionRequest(BaseModel):
     """Request for code execution."""
 
-    script_path: Path
-    runtime: str
-    args: list[str]
-    timeout_ms: int
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    script_path: Path = Field(..., description="Path to the script to execute")
+    runtime: str = Field(
+        ..., description="Runtime environment (python, typescript, ruff, basedpyright)"
+    )
+    args: list[str] = Field(default_factory=list, description="Command-line arguments")
+    timeout_ms: int = Field(..., gt=0, description="Timeout in milliseconds")
 
 
-@dataclass(frozen=True)
-class ExecutionResult:
+class ExecutionResult(BaseModel):
     """Result of code execution."""
 
-    runtime: str
-    exit_code: int
-    output: str
-    parsed: dict[str, object] | None
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    runtime: str = Field(..., description="Runtime environment used")
+    exit_code: int = Field(..., description="Exit code from execution")
+    output: str = Field(default="", description="Standard output from execution")
+    parsed: dict[str, object] | None = Field(
+        default=None, description="Parsed output if applicable"
+    )
 
 
 @final

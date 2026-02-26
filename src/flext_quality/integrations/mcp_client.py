@@ -12,30 +12,37 @@ from __future__ import annotations
 import json
 import shutil
 from collections.abc import Mapping
-from dataclasses import dataclass
 from typing import final
 
 from flext_core import r
+from pydantic import BaseModel, ConfigDict, Field
 
 from flext_quality.constants import FlextQualityConstants as c
 
 
-@dataclass(frozen=True)
-class McpToolCall:
+class McpToolCall(BaseModel):
     """Represents a call to an MCP server tool."""
 
-    server: str
-    tool: str
-    params: dict[str, object]
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    server: str = Field(..., description="MCP server name")
+    tool: str = Field(..., description="Tool name on the server")
+    params: dict[str, object] = Field(
+        default_factory=dict, description="Tool parameters"
+    )
 
 
-@dataclass(frozen=True)
-class McpToolResult:
+class McpToolResult(BaseModel):
     """Result from an MCP tool call."""
 
-    success: bool
-    data: dict[str, object] | list[dict[str, object]] | None
-    error: str | None
+    model_config = ConfigDict(frozen=True, extra="forbid")
+
+    success: bool = Field(..., description="Whether the tool call succeeded")
+    data: dict[str, object] | list[dict[str, object]] | None = Field(
+        default=None,
+        description="Result data from the tool call",
+    )
+    error: str | None = Field(default=None, description="Error message if call failed")
 
 
 @final
