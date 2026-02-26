@@ -888,7 +888,7 @@ class DocumentationAuditor:
         latest_file = output_dir / "latest_audit.json"
         json.dump(self.results, latest_file.open("w"), indent=2, default=str)
 
-        return filepath
+        return str(filepath)
 
 
 def _create_argument_parser() -> argparse.ArgumentParser:

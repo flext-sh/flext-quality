@@ -30,7 +30,7 @@ class DocumentationDashboard:
         """Setup Flask routes for the dashboard."""
 
         @self.app.route("/")
-        def index() -> Response:
+        def index() -> str:
             """Main dashboard page."""
             return render_template_string(self.get_dashboard_html())
 

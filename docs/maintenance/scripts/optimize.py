@@ -464,7 +464,7 @@ class DocumentationOptimizer:
         latest_file = output_dir / "latest_optimization.json"
         json.dump(self.results, latest_file.open("w"), indent=2, default=str)
 
-        return filepath
+        return str(filepath)
 
 
 def _create_argument_parser() -> argparse.ArgumentParser:
@@ -568,25 +568,29 @@ def _execute_optimizations(
     run_any_optimization = False
 
     if args.fix_formatting or args.comprehensive:
-        optimizer.optimize_formatting(optimizer.project_root.glob("docs/**/*.md"))
+        optimizer.optimize_formatting(list(optimizer.project_root.glob("docs/**/*.md")))
         run_any_optimization = True
 
     if args.update_toc or args.comprehensive:
-        optimizer.update_table_of_contents(optimizer.project_root.glob("docs/**/*.md"))
+        optimizer.update_table_of_contents(
+            list(optimizer.project_root.glob("docs/**/*.md"))
+        )
         run_any_optimization = True
 
     if args.add_alt_text or args.improve_accessibility or args.comprehensive:
-        optimizer.enhance_accessibility(optimizer.project_root.glob("docs/**/*.md"))
+        optimizer.enhance_accessibility(
+            list(optimizer.project_root.glob("docs/**/*.md"))
+        )
         run_any_optimization = True
 
     if args.optimize_structure or args.comprehensive:
         optimizer.optimize_content_structure(
-            optimizer.project_root.glob("docs/**/*.md"),
+            list(optimizer.project_root.glob("docs/**/*.md")),
         )
         run_any_optimization = True
 
     if args.update_metadata or args.comprehensive:
-        optimizer.update_metadata(optimizer.project_root.glob("docs/**/*.md"))
+        optimizer.update_metadata(list(optimizer.project_root.glob("docs/**/*.md")))
         run_any_optimization = True
 
     return run_any_optimization

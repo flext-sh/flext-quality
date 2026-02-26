@@ -27,7 +27,7 @@ class TestsFlextQualityModels(FlextTestsModels, FlextQualityModels):
     - FlextTestsModels.Tests.* - Generic test utilities
     """
 
-    class Tests:
+    class Tests(FlextTestsModels.Tests):
         """Test fixtures namespace for flext-quality.
 
         Contains test-specific models and fixtures that should not
