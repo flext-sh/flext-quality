@@ -5,19 +5,19 @@
 
 markdown:
   # Heading style preferences
-  heading_style: "atx"  # "atx" (# ## ###) or "setext" (underlines)
+  heading_style: "atx" # "atx" (# ## ###) or "setext" (underlines)
 
   # List style consistency
-  list_style: "dash"    # "dash" (-), "asterisk" (*), or "plus" (+)
+  list_style: "dash" # "dash" (-), "asterisk" (*), or "plus" (+)
 
   # Emphasis style preference
-  emphasis_style: "*"   # "*" or "_" for emphasis
+  emphasis_style: "*" # "*" or "_" for emphasis
 
   # Code block formatting
-  code_block_style: "fenced"  # "fenced" (```) or "indented"
+  code_block_style: "fenced" # "fenced" (```) or "indented"
 
   # Link style preference
-  link_style: "inline"  # "inline" ([text](url)) or "reference"
+  link_style: "inline" # "inline" ([text](url)) or "reference"
 
 formatting:
   # Line length limits
@@ -46,11 +46,11 @@ headings:
 
   # Heading formatting
   require_space_after_hash: true
-  allow_closing_hashes: false  # ## Heading ##
+  allow_closing_hashes: false # ## Heading ##
 
   # Special heading rules
-  first_heading_level: 1  # Documents should start with H1
-  toc_heading_level: 2    # Table of contents heading level
+  first_heading_level: 1 # Documents should start with H1
+  toc_heading_level: 2 # Table of contents heading level
 
 lists:
   # List formatting rules
@@ -78,16 +78,16 @@ code:
     - "html"
 
   # Inline code formatting
-  inline_code_style: "backticks"  # Only backticks supported
+  inline_code_style: "backticks" # Only backticks supported
 
   # Code block formatting
   consistent_fencing: true
-  fence_style: "backticks"  # backticks (```) or tildes (~~~)
+  fence_style: "backticks" # backticks (```) or tildes (~~~)
 
 links:
   # Link formatting rules
-  reference_links: false  # Prefer inline links
-  angle_bracket_urls: false  # Don't use <url> format
+  reference_links: false # Prefer inline links
+  angle_bracket_urls: false # Don't use <url> format
 
   # Link text quality
   require_descriptive_text: true
@@ -99,9 +99,9 @@ links:
 
 tables:
   # Table formatting preferences
-  alignment: "left"  # "left", "center", or "right"
-  padding: 1         # Spaces around content
-  borders: true      # Include borders
+  alignment: "left" # "left", "center", or "right"
+  padding: 1 # Spaces around content
+  borders: true # Include borders
 
   # Table structure
   require_headers: true
@@ -109,8 +109,8 @@ tables:
 
 emphasis:
   # Text emphasis rules
-  bold_style: "**"   # "**" or "__"
-  italic_style: "*"  # "*" or "_"
+  bold_style: "**" # "**" or "__"
+  italic_style: "*" # "*" or "_"
 
   # Emphasis consistency
   consistent_markers: true
@@ -133,7 +133,7 @@ accessibility:
 metadata:
   # Frontmatter requirements
   require_frontmatter: false
-  frontmatter_format: "yaml"  # "yaml", "toml", or "json"
+  frontmatter_format: "yaml" # "yaml", "toml", or "json"
 
   # Required frontmatter fields
   required_fields: []
@@ -150,10 +150,10 @@ special_elements:
   blockquote_marker: ">"
 
   # Horizontal rule style
-  hr_style: "---"  # "---", "***", or "___"
+  hr_style: "---" # "---", "***", or "___"
 
   # Task list formatting
-  task_list_style: "- [ ]"  # Style for task list items
+  task_list_style: "- [ ]" # Style for task list items
 
 file_specific:
   # Special rules for specific file types
@@ -163,12 +163,12 @@ file_specific:
     require_installation_section: true
 
   "docs/**/*.md":
-    require_toc: false  # Only for long documents
+    require_toc: false # Only for long documents
     max_headings: 20
     require_overview: true
 
   "CHANGELOG.md":
-    version_format: "semantic"  # "semantic", "calendar", or "custom"
+    version_format: "semantic" # "semantic", "calendar", or "custom"
     require_dates: true
     require_descriptions: true
 
@@ -178,7 +178,7 @@ file_specific:
 
 spelling:
   # Spelling check settings
-  enable_spell_check: false  # Requires additional tools
+  enable_spell_check: false # Requires additional tools
   language: "en-us"
   custom_dictionary: []
     # - "FLEXT"
@@ -186,13 +186,13 @@ spelling:
 
   # Ignore patterns
   ignore_patterns:
-    - "\\b[A-Z]{2,}\\b"  # Acronyms
-    - "\\d+"             # Numbers
-    - "[a-zA-Z]+_[a-zA-Z]+"  # Snake_case identifiers
+    - "\\b[A-Z]{2,}\\b" # Acronyms
+    - "\\d+" # Numbers
+    - "[a-zA-Z]+_[a-zA-Z]+" # Snake_case identifiers
 
 grammar:
   # Grammar check settings
-  enable_grammar_check: false  # Requires additional tools
+  enable_grammar_check: false # Requires additional tools
   strict_mode: false
 
   # Style preferences

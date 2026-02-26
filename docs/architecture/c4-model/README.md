@@ -270,6 +270,6 @@ Domain Layer ← Application Layer ← Infrastructure Layer ← Presentation Lay
 - **Accuracy**: Diagrams and documentation reflect actual implementation
 - **Maintenance**: Regular review and update process established
 
-______________________________________________________________________
+---
 
 **C4 Model Documentation** - Structured architectural understanding from system context to implementation details.

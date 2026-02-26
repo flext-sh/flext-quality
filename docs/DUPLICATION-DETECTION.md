@@ -72,12 +72,10 @@ if result.is_success:
 **Methods**:
 
 - `check(files: list[Path], threshold: float | None) -> FlextResult[CheckResult]`
-
   - Analyze files for duplication
   - Returns duplication pairs exceeding threshold
 
 - `get_duplicate_count(directory: Path) -> FlextResult[int]`
-
   - Count duplicate pairs in a directory
   - Recursively scans for \*.py files
   - Ignores **pycache** and .venv directories
@@ -415,7 +413,7 @@ A: Currently line-based only. Semantic detection is a future improvement.
 
 A: They're included in the analysis. Test duplication is often intentional, so use the retry mechanism.
 
-______________________________________________________________________
+---
 
 **Last Updated**: 2025-12-29
 **Status**: Production Ready
