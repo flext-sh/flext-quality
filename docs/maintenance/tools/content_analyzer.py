@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from flext_quality.typings import FlextQualityTypes
 
 
 class ContentAnalyzer:
@@ -55,6 +54,20 @@ class ContentAnalyzer:
 
     def load_config(self, config_path: str | None) -> None:
         """Load content analysis configuration."""
+        if config_path is None:
+            self.config = {
+                "content_checks": {
+                    "check_freshness": True,
+                    "check_completeness": True,
+                    "check_readability": False,
+                },
+                "quality_thresholds": {
+                    "min_word_count": 100,
+                    "min_readability_score": 60,
+                    "max_age_days": 90,
+                },
+            }
+            return
         try:
             with Path(config_path).open(encoding="utf-8") as f:
                 self.config = yaml.safe_load(f)
@@ -72,7 +85,7 @@ class ContentAnalyzer:
                 },
             }
 
-    def analyze_file(self, file_path: Path) -> FlextQualityTypes.Core.AnalysisDict:
+    def analyze_file(self, file_path: Path) -> dict[str, Any]:
         """Perform comprehensive content analysis on a single file."""
         try:
             content = file_path.read_text(encoding="utf-8")
@@ -84,7 +97,7 @@ class ContentAnalyzer:
                 "readability": self._analyze_readability(content),
                 "structure": self._analyze_structure(content),
                 "completeness": self._check_completeness(content, filename),
-                "quality_score": 0,
+                "quality_score": 0.0,
                 "issues": [],
                 "suggestions": [],
             }
@@ -117,7 +130,7 @@ class ContentAnalyzer:
     def _calculate_content_metrics(
         self,
         content: str,
-    ) -> FlextQualityTypes.Core.MetricsDict:
+    ) -> dict[str, Any]:
         """Calculate basic content metrics."""
         # Word analysis
         words = re.findall(r"\b\w+\b", content)
@@ -182,7 +195,7 @@ class ContentAnalyzer:
             "code_to_content_ratio": code_lines / total_lines if total_lines > 0 else 0,
         }
 
-    def _analyze_readability(self, content: str) -> FlextQualityTypes.Core.MetricsDict:
+    def _analyze_readability(self, content: str) -> dict[str, Any]:
         """Analyze content readability using various metrics."""
         words = re.findall(r"\b\w+\b", content)
         sentences = re.split(r"[.!?]+", content)
@@ -202,7 +215,7 @@ class ContentAnalyzer:
         reading_ease = (
             206.835 - (1.015 * avg_words_per_sentence) - (84.6 * avg_syllables_per_word)
         )
-        reading_ease = max(0, min(100, reading_ease))  # Clamp to 0-100
+        reading_ease = max(0.0, min(100.0, reading_ease))  # Clamp to 0-100
 
         # Automated Readability Index (simplified)
         grade_level = (
@@ -254,7 +267,7 @@ class ContentAnalyzer:
 
         return count
 
-    def _analyze_structure(self, content: str) -> FlextQualityTypes.Core.AnalysisDict:
+    def _analyze_structure(self, content: str) -> dict[str, Any]:
         """Analyze document structure and organization."""
         structure = {
             "has_table_of_contents": False,
@@ -309,7 +322,7 @@ class ContentAnalyzer:
         self,
         content: str,
         filename: str,
-    ) -> FlextQualityTypes.Core.AnalysisDict:
+    ) -> dict[str, Any]:
         """Check documentation completeness based on file type and content."""
         completeness = {
             "score": 100,
@@ -379,7 +392,7 @@ class ContentAnalyzer:
         self,
         content: str,
         required_sections: list[str],
-    ) -> FlextQualityTypes.Core.AnalysisDict:
+    ) -> dict[str, Any]:
         """Check for required sections in content."""
         result = {"required_sections_present": [], "missing_required_sections": []}
 
@@ -407,7 +420,7 @@ class ContentAnalyzer:
 
     def _calculate_quality_score(
         self,
-        analysis: FlextQualityTypes.Core.AnalysisDict,
+        analysis: dict[str, Any],
     ) -> float:
         """Calculate overall quality score for the content."""
         score = 100.0
@@ -443,7 +456,7 @@ class ContentAnalyzer:
         if analysis["structure"]["heading_hierarchy_valid"]:
             score += 5
 
-        return max(0, min(100, score))
+        return max(0.0, min(100.0, score))
 
     def _identify_issues(self, analysis: dict[str, Any]) -> list[dict[str, Any]]:
         """Identify content issues that need attention."""

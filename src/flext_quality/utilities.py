@@ -79,8 +79,8 @@ class FlextQualityUtilities(FlextUtilities):
                         return r[list[Mapping[str, object]]].fail("Expected YAML dict")
                 match raw_rules:
                     case list() as rules_list:
-                        rules: list[dict[str, object]] = [
-                            item for item in rules_list if item.__class__ is dict
+                        rules: list[Mapping[str, object]] = [
+                            item for item in rules_list if isinstance(item, dict)
                         ]
                     case _:
                         return r[list[Mapping[str, object]]].fail("Expected rules list")

@@ -276,7 +276,7 @@ class ScheduledMaintenance:
                 if len(cmd_parts) > self.MIN_PYTHON_MODULE_INDEX
                 else None
             )
-            if not module_name:
+            if module_name is None:
                 self.results["warnings"].append(
                     f"No module specified in task: {description}",
                 )
@@ -287,8 +287,10 @@ class ScheduledMaintenance:
                 return self._handle_pytest_command(cmd_parts[1:], timeout, description)
 
             # For other modules, use runpy
+            mod_name = module_name
+
             def run_module() -> None:
-                runpy.run_module(module_name, run_name="__main__", alter_sys=True)
+                runpy.run_module(mod_name, run_name="__main__", alter_sys=True)
 
             return self._run_with_timeout(run_module, timeout, description)
 
@@ -392,7 +394,7 @@ class ScheduledMaintenance:
 
             def run_git_command() -> None:
                 # Use repo.git.execute() for arbitrary git commands
-                result = git.execute(args=[subcommand] + args)
+                result = git.execute([subcommand] + args)
                 if not result:
                     msg = f"git {subcommand} returned empty result"
                     raise RuntimeError(msg)
@@ -500,7 +502,7 @@ class ScheduledMaintenance:
         # Monthly deep clean
         if schedules["monthly_deep_clean"]["enabled"]:
             # Schedule for the 1st of every month
-            schedule.every().month.at("01 11:00").do(self.run_monthly_deep_clean)
+            schedule.every(4).weeks.at("11:00").do(self.run_monthly_deep_clean)
 
     def run_daemon(self) -> None:
         """Run the maintenance system as a daemon."""
@@ -542,10 +544,12 @@ class ScheduledMaintenance:
     def save_results(self) -> None:
         """Save maintenance results to file."""
         self.results["end_time"] = datetime.now(UTC).isoformat()
-        self.results["duration_seconds"] = (
-            datetime.fromisoformat(self.results["end_time"])
-            - datetime.fromisoformat(self.results["start_time"])
-        ).total_seconds()
+        self.results["duration_seconds"] = int(
+            (
+                datetime.fromisoformat(self.results["end_time"])
+                - datetime.fromisoformat(self.results["start_time"])
+            ).total_seconds()
+        )
 
         results_file = (
             self.reports_dir

@@ -54,6 +54,7 @@ class LinkValidator:
         all_links = []
 
         for file_path in doc_files:
+            file_rel_path = str(file_path)
             try:
                 content = file_path.read_text(encoding="utf-8")
                 file_rel_path = str(
@@ -155,7 +156,7 @@ class LinkValidator:
             max_workers=self.max_workers,
         ) as executor:
             futures = [
-                executor.submit(self._check_single_external_link, link, verbose)
+                executor.submit(self._check_single_external_link, link, verbose=verbose)
                 for link in external_links
             ]
 
@@ -260,9 +261,11 @@ class LinkValidator:
         for attempt in range(self.retries):
             success, result = self._handle_request_attempt(url, attempt)
             if result is not None:
-                return self._create_link_result(link, success, url, **result)
+                return self._create_link_result(link, valid=success, url=url, **result)
 
-        return self._create_link_result(link, False, url, error="Max retries exceeded")
+        return self._create_link_result(
+            link, valid=False, url=url, error="Max retries exceeded"
+        )
 
     def validate_internal_links(
         self,
@@ -381,6 +384,7 @@ class LinkValidator:
         # Build anchor index for each file
         file_anchors = {}
         for file_path in doc_files:
+            file_rel_path = str(file_path)
             try:
                 content = file_path.read_text(encoding="utf-8")
                 file_rel_path = str(file_path.relative_to(file_path.parents[2]))
@@ -510,6 +514,7 @@ class ContentValidator:
     def validate_markdown_syntax(self, doc_files: list[Path]) -> dict[str, Any]:
         """Validate markdown syntax and formatting."""
         for file_path in doc_files:
+            file_rel_path = str(file_path)
             try:
                 content = file_path.read_text(encoding="utf-8")
                 file_rel_path = str(file_path.relative_to(file_path.parents[2]))
@@ -576,6 +581,7 @@ class ContentValidator:
     def check_content_quality(self, doc_files: list[Path]) -> dict[str, Any]:
         """Check content quality metrics."""
         for file_path in doc_files:
+            file_rel_path = str(file_path)
             try:
                 content = file_path.read_text(encoding="utf-8")
                 file_rel_path = str(file_path.relative_to(file_path.parents[2]))
@@ -617,19 +623,20 @@ class ContentValidator:
         sentences = [s.strip() for s in sentences if s.strip()]
 
         # Basic readability calculation (simplified)
+        avg_words_per_sentence: float = 0.0
         if sentences:
             avg_words_per_sentence = len(words) / len(sentences)
             readability_score = max(
-                0,
-                min(100, 100 - (avg_words_per_sentence - 15) * 2),
+                0.0,
+                min(100.0, 100.0 - (avg_words_per_sentence - 15) * 2),
             )
         else:
-            readability_score = 0
+            readability_score = 0.0
 
         return {
             "word_count": len(words),
             "sentence_count": len(sentences),
-            "avg_words_per_sentence": avg_words_per_sentence if sentences else 0,
+            "avg_words_per_sentence": avg_words_per_sentence,
             "readability_score": readability_score,
             "has_code_blocks": bool(r"```" in content),
             "has_lists": bool(re.search(r"^[\s]*[-\*\+]", content, re.MULTILINE)),
@@ -795,8 +802,10 @@ def main() -> None:
         sys.exit(1)
 
     # Calculate summary and save reports
-    total_errors = len(link_validator.results.get("errors", [])) + len(
-        content_validator.results.get("content_issues", []),
+    link_errors = link_validator.results.get("errors", [])
+    content_issues = content_validator.results.get("content_issues", [])
+    total_errors = (len(link_errors) if isinstance(link_errors, list) else 0) + (
+        len(content_issues) if isinstance(content_issues, list) else 0
     )
     link_validator.save_report(args.output)
 

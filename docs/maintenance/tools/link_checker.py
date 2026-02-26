@@ -47,14 +47,34 @@ class LinkChecker:
             "errors": [],
             "warnings_list": [],
             "performance": {
-                "total_time": 0,
-                "average_response_time": 0,
-                "slowest_response": 0,
+                "total_time": 0.0,
+                "average_response_time": 0.0,
+                "slowest_response": 0.0,
             },
         }
 
     def load_config(self, config_path: str | None) -> None:
         """Load validation configuration."""
+        if config_path is None:
+            self.config = {
+                "external_timeout": 10,
+                "retry_attempts": 3,
+                "user_agent": "FLEXT-Quality-Link-Validator/1.0",
+                "follow_redirects": True,
+                "max_redirects": 5,
+                "acceptable_status_codes": [
+                    200,
+                    201,
+                    202,
+                    206,
+                    301,
+                    302,
+                    303,
+                    307,
+                    308,
+                ],
+            }
+            return
         try:
             with pathlib.Path(config_path).open(encoding="utf-8") as f:
                 self.config = yaml.safe_load(f)["link_validation"]
@@ -144,6 +164,13 @@ class LinkChecker:
         start_time = time.time()
 
         try:
+            if self.session is None:
+                return {
+                    "url": url,
+                    "error": "session_not_initialized",
+                    "valid": False,
+                    "context": context or {},
+                }
             async with self.session.head(
                 url,
                 timeout=aiohttp.ClientTimeout(total=self.config["external_timeout"]),
@@ -216,7 +243,7 @@ class LinkChecker:
 
                 response_time = time.time() - start_time
 
-                result = {
+                result: dict[str, t.GeneralValueType] = {
                     "url": url,
                     "status_code": response.status_code,
                     "response_time": response_time,
@@ -292,9 +319,9 @@ class LinkChecker:
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         # Handle exceptions
-        processed_results = []
+        processed_results: list[dict[str, Any]] = []
         for result in results:
-            if isinstance(result, Exception):
+            if isinstance(result, BaseException):
                 processed_results.append({
                     "error": f"task_exception: {result!s}",
                     "valid": False,

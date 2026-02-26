@@ -35,8 +35,9 @@ class StyleValidator:
             config_path: Path to style guide configuration file
 
         """
+        self.config: dict[str, Any] = {}
         self.load_config(config_path)
-        self.results = {
+        self.results: dict[str, Any] = {
             "files_checked": 0,
             "style_violations": [],
             "accessibility_issues": [],
@@ -52,6 +53,20 @@ class StyleValidator:
 
     def load_config(self, config_path: str | None) -> None:
         """Load style guide configuration."""
+        if config_path is None:
+            self.config = {
+                "markdown": {
+                    "heading_style": "atx",
+                    "list_style": "dash",
+                    "emphasis_style": "*",
+                },
+                "accessibility": {
+                    "require_alt_text": True,
+                    "descriptive_links": True,
+                    "heading_structure": True,
+                },
+            }
+            return
         try:
             with Path(config_path).open(encoding="utf-8") as f:
                 self.config = yaml.safe_load(f)
@@ -313,7 +328,7 @@ class StyleValidator:
         """Check line length compliance."""
         violations = []
 
-        max_length = self.config["formatting"]["max_line_length"]
+        max_length = int(self.config["formatting"]["max_line_length"])
         lines = content.split("\n")
 
         for i, line in enumerate(lines, 1):
@@ -480,7 +495,7 @@ Top Issues:
 
         return report
 
-    def save_report(self, output_path: str = "docs/maintenance/reports/") -> None:
+    def save_report(self, output_path: str = "docs/maintenance/reports/") -> Path:
         """Save style validation report."""
         Path(output_path).mkdir(exist_ok=True, parents=True)
 
