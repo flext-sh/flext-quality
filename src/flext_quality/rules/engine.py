@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import override
+
 import re
 from collections.abc import Mapping
 from pathlib import Path
@@ -36,6 +38,8 @@ class FlextQualityRulesEngine:
         self._rules = result.value
         self._loaded = True
         return r[int].ok(len(self._rules))
+
+    @override
 
     def validate(
         self,

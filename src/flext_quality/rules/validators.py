@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import override
+
 import contextlib
 import re
 from abc import ABC, abstractmethod

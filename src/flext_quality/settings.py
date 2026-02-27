@@ -9,6 +9,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import override
+
 from pathlib import Path
 from typing import ClassVar
 
@@ -208,6 +210,8 @@ class FlextQualitySettings(FlextSettings):
         return cls._instance
 
     @classmethod
+    @override
+
     def _reset_instance(cls) -> None:
         """Reset singleton instance (for testing)."""
         cls._instance = None

@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import override
+
 import json
 from collections.abc import Mapping
 from pathlib import Path

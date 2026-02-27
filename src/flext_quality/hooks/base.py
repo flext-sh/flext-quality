@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import override
+
 import fnmatch
 from abc import ABC, abstractmethod
 from typing import ClassVar
