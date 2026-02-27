@@ -9,16 +9,14 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import override
-
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, override
 
 from flext_core import FlextSettings, r
 from pydantic import Field
 from pydantic_settings import SettingsConfigDict
 
-from flext_quality.constants import FlextQualityConstants as c
+from flext_quality.constants import c
 
 
 @FlextSettings.auto_register("quality")
@@ -211,7 +209,6 @@ class FlextQualitySettings(FlextSettings):
 
     @classmethod
     @override
-
     def _reset_instance(cls) -> None:
         """Reset singleton instance (for testing)."""
         cls._instance = None

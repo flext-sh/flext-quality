@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-from typing import override
-
 import fnmatch
 from abc import ABC, abstractmethod
 from typing import ClassVar
 
 from flext_core import r
 
-from flext_quality.constants import FlextQualityConstants as c
+from flext_quality.constants import c
 from flext_quality.typings import HookInput, HookOutput
 
 

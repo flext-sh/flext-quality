@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import override
-
 import json
 from collections.abc import Mapping
 from pathlib import Path
@@ -11,7 +9,7 @@ from typing import final
 
 from flext_core import r
 
-from flext_quality.constants import FlextQualityConstants as c
+from flext_quality.constants import c
 from flext_quality.hooks.base import BaseHookImpl
 from flext_quality.typings import HookInput, HookOutput
 

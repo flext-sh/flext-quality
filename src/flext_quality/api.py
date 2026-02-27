@@ -10,12 +10,10 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import override
-
 import threading
 from collections.abc import Mapping
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, override
 
 from flext_core import (
     FlextContainer,
@@ -24,13 +22,13 @@ from flext_core import (
 )
 from flext_core.protocols import p
 
-from flext_quality.constants import FlextQualityConstants as c
+from flext_quality.constants import c
 from flext_quality.hooks.manager import HookManager
 from flext_quality.models import RuleDefinition
 from flext_quality.rules.loader import FlextQualityRulesLoader
 from flext_quality.settings import FlextQualitySettings
 from flext_quality.typings import HookInput, HookOutput
-from flext_quality.utilities import FlextQualityUtilities as u
+from flext_quality.utilities import u
 
 
 class FlextQuality:
@@ -116,7 +114,6 @@ class FlextQuality:
 
     @classmethod
     @override
-
     def _reset_instance(cls) -> None:
         """Reset singleton instance (for testing)."""
         cls._instance = None

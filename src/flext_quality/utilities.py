@@ -11,7 +11,7 @@ from pathlib import Path
 import yaml
 from flext_core import FlextUtilities, r
 
-from flext_quality.constants import FlextQualityConstants as c
+from flext_quality.constants import c
 from flext_quality.typings import HookInput
 
 

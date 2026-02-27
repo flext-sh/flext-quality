@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from typing import override
-
 import contextlib
 import re
 from abc import ABC, abstractmethod
@@ -12,7 +10,7 @@ from pathlib import Path
 
 from flext_core import r
 
-from flext_quality.constants import FlextQualityConstants as c
+from flext_quality.constants import c
 
 
 class FlextQualityValidators:

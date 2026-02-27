@@ -17,7 +17,7 @@ from typing import final
 from flext_core import r
 from pydantic import BaseModel, ConfigDict, Field
 
-from flext_quality.constants import FlextQualityConstants as c
+from flext_quality.constants import c
 
 
 class McpToolCall(BaseModel):

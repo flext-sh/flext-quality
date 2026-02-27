@@ -18,7 +18,7 @@ from flext_cli.services.output import FlextCliOutput
 from flext_core import r
 
 from flext_quality.api import FlextQuality
-from flext_quality.constants import FlextQualityConstants as c
+from flext_quality.constants import c
 from flext_quality.integrations.code_execution import FlextQualityCodeExecutionBridge
 
 

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
-from flext_quality.constants import FlextQualityConstants as c
+from flext_quality.constants import c
 
 # =============================================================================
 # Module-level model definitions (following flext-core pattern)

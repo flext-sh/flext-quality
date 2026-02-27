@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-from typing import override
-
 from collections.abc import Mapping
 from typing import Protocol
 
 from flext_core import FlextProtocols, r
 
-from .typings import FlextQualityTypes as t
+from .typings import t
 
 
 class FlextQualityProtocols(FlextProtocols):
