@@ -139,7 +139,7 @@ class FlextQuality:
         rules_path = self.config.get_rules_path()
         if not rules_path.exists():
             return r[list[m.Quality.RuleDefinition]].fail(
-                f"Rules directory not found: {rules_path}"
+                f"Rules directory not found: {rules_path}",
             )
 
         yaml_files = list(rules_path.glob("*.yaml")) + list(rules_path.glob("*.yml"))
@@ -179,13 +179,13 @@ class FlextQuality:
         stdin_result = u.Quality.read_stdin()
         if stdin_result.is_failure:
             return r[t.Quality.HookOutput].fail(
-                stdin_result.error or "Failed to read stdin"
+                stdin_result.error or "Failed to read stdin",
             )
 
         parse_result = u.Quality.parse_hook_input(stdin_result.value)
         if parse_result.is_failure:
             return r[t.Quality.HookOutput].fail(
-                parse_result.error or "Failed to parse input"
+                parse_result.error or "Failed to parse input",
             )
 
         input_data = parse_result.value

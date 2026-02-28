@@ -264,7 +264,10 @@ class LinkValidator:
                 return self._create_link_result(link, valid=success, url=url, **result)
 
         return self._create_link_result(
-            link, valid=False, url=url, error="Max retries exceeded"
+            link,
+            valid=False,
+            url=url,
+            error="Max retries exceeded",
         )
 
     def validate_internal_links(

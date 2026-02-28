@@ -28,7 +28,8 @@ class McpToolCall(BaseModel):
     server: str = Field(..., description="MCP server name")
     tool: str = Field(..., description="Tool name on the server")
     params: dict[str, object] = Field(
-        default_factory=dict, description="Tool parameters"
+        default_factory=dict,
+        description="Tool parameters",
     )
 
 
@@ -77,7 +78,7 @@ class FlextQualityMcpClient:
                 server=server,
                 tool=tool,
                 params=params or {},
-            )
+            ),
         )
 
     def build_call_command(
@@ -117,7 +118,7 @@ class FlextQualityMcpClient:
                     success=False,
                     data=None,
                     error=output or f"Command failed with exit code {exit_code}",
-                )
+                ),
             )
 
         try:
@@ -129,7 +130,7 @@ class FlextQualityMcpClient:
                             success=True,
                             data=data,
                             error=None,
-                        )
+                        ),
                     )
                 case list() as data_list:
                     coerced_data: list[dict[str, object]] = []
@@ -143,7 +144,7 @@ class FlextQualityMcpClient:
                             success=True,
                             data=coerced_data,
                             error=None,
-                        )
+                        ),
                     )
                 case _:
                     return r[McpToolResult].ok(
@@ -151,7 +152,7 @@ class FlextQualityMcpClient:
                             success=True,
                             data={"value": data},
                             error=None,
-                        )
+                        ),
                     )
         except json.JSONDecodeError:
             # Return raw output as data if not valid JSON
@@ -160,7 +161,7 @@ class FlextQualityMcpClient:
                     success=True,
                     data={"raw": output},
                     error=None,
-                )
+                ),
             )
 
     def health_check(self) -> r[Mapping[str, object]]:

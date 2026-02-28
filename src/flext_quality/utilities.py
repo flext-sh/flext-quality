@@ -47,7 +47,8 @@ class FlextQualityUtilities(FlextUtilities):
                         coerced_input: t.Quality.HookInput = {
                             str(k): v
                             if isinstance(
-                                v, (str, int, float, bool, type(None), dict, list)
+                                v,
+                                (str, int, float, bool, type(None), dict, list),
                             )
                             else str(v)
                             for k, v in hook_input.items()
@@ -84,7 +85,7 @@ class FlextQualityUtilities(FlextUtilities):
                         raw_rules = parsed_dict.get("rules", [])
                     case _:
                         return r[list[Mapping[str, t.GeneralValueType]]].fail(
-                            "Expected YAML dict"
+                            "Expected YAML dict",
                         )
                 match raw_rules:
                     case list() as rules_list:

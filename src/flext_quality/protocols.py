@@ -25,7 +25,8 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
             matcher: list[str] | None
 
             def execute(
-                self, input_data: t.Quality.HookInput
+                self,
+                input_data: t.Quality.HookInput,
             ) -> FlextResult[t.Quality.HookOutput]:
                 """Execute the hook logic."""
                 ...

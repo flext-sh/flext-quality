@@ -548,7 +548,7 @@ class ScheduledMaintenance:
             (
                 datetime.fromisoformat(self.results["end_time"])
                 - datetime.fromisoformat(self.results["start_time"])
-            ).total_seconds()
+            ).total_seconds(),
         )
 
         results_file = (

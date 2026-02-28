@@ -71,7 +71,8 @@ class TestFlextQualityCliService:
         assert len(commands) == 5
 
     def test_build_validate_commands_includes_coverage_report(
-        self, tmp_path: Path
+        self,
+        tmp_path: Path,
     ) -> None:
         """Test build_validate_commands includes explicit coverage report command."""
         src_dir = tmp_path / "src"

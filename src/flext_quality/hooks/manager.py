@@ -31,7 +31,9 @@ class HookManager:
         return r[bool].ok(value=True)
 
     def execute(
-        self, event: str, input_data: t.Quality.HookInput
+        self,
+        event: str,
+        input_data: t.Quality.HookInput,
     ) -> r[t.Quality.HookOutput]:
         """Execute all hooks for an event."""
         try:

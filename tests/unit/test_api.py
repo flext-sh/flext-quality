@@ -117,7 +117,10 @@ rules:
     enabled: true
 """
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".yaml", delete=False
+            encoding="utf-8",
+            mode="w",
+            suffix=".yaml",
+            delete=False,
         ) as f:
             f.write(rules_yaml)
             rules_path = Path(f.name)

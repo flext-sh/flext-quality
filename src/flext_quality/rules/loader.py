@@ -18,7 +18,7 @@ class FlextQualityRulesLoader:
         """Load rules from YAML file."""
         if not path.exists():
             return r[list[m.Quality.RuleDefinition]].fail(
-                f"Rules file not found: {path}"
+                f"Rules file not found: {path}",
             )
 
         try:
@@ -40,7 +40,7 @@ class FlextQualityRulesLoader:
                 rules_data = parsed_dict.get("rules", [])
             case _:
                 return r[list[m.Quality.RuleDefinition]].fail(
-                    "Invalid YAML: expected dict at root"
+                    "Invalid YAML: expected dict at root",
                 )
 
         match rules_data:
@@ -48,7 +48,7 @@ class FlextQualityRulesLoader:
                 pass
             case _:
                 return r[list[m.Quality.RuleDefinition]].fail(
-                    "Invalid YAML: 'rules' must be a list"
+                    "Invalid YAML: 'rules' must be a list",
                 )
 
         rules: list[m.Quality.RuleDefinition] = []
@@ -59,7 +59,7 @@ class FlextQualityRulesLoader:
                     pass
                 case _:
                     return r[list[m.Quality.RuleDefinition]].fail(
-                        f"Rule {idx}: expected dict"
+                        f"Rule {idx}: expected dict",
                     )
             result = self._parse_rule(rule_dict, idx)
             if result.is_failure:
@@ -88,7 +88,7 @@ class FlextQualityRulesLoader:
             # Show VALUES not keys - users need lowercase: "blocking", "warning", "info"
             valid_types = [m.value for m in c.Quality.RuleType.__members__.values()]
             return r[m.Quality.RuleDefinition].fail(
-                f"Rule {index}: invalid type '{rule_type_str}'. Valid: {valid_types}"
+                f"Rule {index}: invalid type '{rule_type_str}'. Valid: {valid_types}",
             )
 
         description = data.get("description", "")
@@ -115,7 +115,7 @@ class FlextQualityRulesLoader:
             result = self.load(path)
             if result.is_failure:
                 return r[list[m.Quality.RuleDefinition]].fail(
-                    f"Error loading {path}: {result.error}"
+                    f"Error loading {path}: {result.error}",
                 )
             all_rules.extend(result.value)
 

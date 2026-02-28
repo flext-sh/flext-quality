@@ -115,7 +115,7 @@ class FlextQualityRulesEngine:
                     "file": str(file_path),
                     "message": f"Failed to read file: {e}",
                     "severity": c.Quality.Severity.ERROR,
-                }
+                },
             ]
 
         violations: list[Mapping[str, object]] = []

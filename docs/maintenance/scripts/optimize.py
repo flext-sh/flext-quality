@@ -573,13 +573,13 @@ def _execute_optimizations(
 
     if args.update_toc or args.comprehensive:
         optimizer.update_table_of_contents(
-            list(optimizer.project_root.glob("docs/**/*.md"))
+            list(optimizer.project_root.glob("docs/**/*.md")),
         )
         run_any_optimization = True
 
     if args.add_alt_text or args.improve_accessibility or args.comprehensive:
         optimizer.enhance_accessibility(
-            list(optimizer.project_root.glob("docs/**/*.md"))
+            list(optimizer.project_root.glob("docs/**/*.md")),
         )
         run_any_optimization = True
 

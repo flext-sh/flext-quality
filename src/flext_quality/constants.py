@@ -35,22 +35,48 @@ class FlextQualityConstants(FlextConstants):
             """Literal type aliases for quality domain values."""
 
             AnalysisStatusLiteral: TypeAlias = Literal[
-                "pending", "running", "completed", "failed", "cancelled"
+                "pending",
+                "running",
+                "completed",
+                "failed",
+                "cancelled",
             ]
             IssueSeverityLiteral: TypeAlias = Literal[
-                "critical", "error", "warning", "info", "hint"
+                "critical",
+                "error",
+                "warning",
+                "info",
+                "hint",
             ]
             IssueTypeLiteral: TypeAlias = Literal[
-                "lint", "type", "security", "complexity", "style", "documentation"
+                "lint",
+                "type",
+                "security",
+                "complexity",
+                "style",
+                "documentation",
             ]
             ReportFormatLiteral: TypeAlias = Literal[
-                "json", "html", "markdown", "text", "sarif"
+                "json",
+                "html",
+                "markdown",
+                "text",
+                "sarif",
             ]
             BackendTypeLiteral: TypeAlias = Literal[
-                "ruff", "mypy", "pyrefly", "bandit", "vulture", "radon"
+                "ruff",
+                "mypy",
+                "pyrefly",
+                "bandit",
+                "vulture",
+                "radon",
             ]
             LanguageLiteral: TypeAlias = Literal[
-                "python", "typescript", "javascript", "go", "rust"
+                "python",
+                "typescript",
+                "javascript",
+                "go",
+                "rust",
             ]
             CheckStatusLiteral: TypeAlias = Literal["pass", "fail", "skip", "error"]
 

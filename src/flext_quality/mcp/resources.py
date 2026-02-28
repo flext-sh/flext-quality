@@ -26,7 +26,8 @@ def get_rules_config() -> str:
     engine = FlextQualityRulesEngine()
     rules = engine.get_rules()
     return json.dumps(
-        [rule.model_dump() for rule in rules], indent=c.Quality.Defaults.JSON_INDENT
+        [rule.model_dump() for rule in rules],
+        indent=c.Quality.Defaults.JSON_INDENT,
     )
 
 
