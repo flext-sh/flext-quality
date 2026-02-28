@@ -43,15 +43,16 @@ class FlextQualityClaudeMemClient:
         self,
         query: str,
         *,
-        limit: int = 10,
+        limit: int | None = None,
     ) -> r[McpToolCall]:
         """Build a search tool call."""
+        search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
         return self._mcp.build_tool_call(
             self.SERVER_NAME,
             "search",
             {
                 "query": query,
-                "limit": limit,
+                "limit": search_limit,
             },
         )
 
@@ -59,17 +60,19 @@ class FlextQualityClaudeMemClient:
         self,
         anchor: int,
         *,
-        depth_before: int = 5,
-        depth_after: int = 5,
+        depth_before: int | None = None,
+        depth_after: int | None = None,
     ) -> r[McpToolCall]:
         """Build a timeline tool call."""
+        before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
+        after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
         return self._mcp.build_tool_call(
             self.SERVER_NAME,
             "timeline",
             {
                 "anchor": anchor,
-                "depth_before": depth_before,
-                "depth_after": depth_after,
+                "depth_before": before,
+                "depth_after": after,
             },
         )
 
@@ -90,10 +93,11 @@ class FlextQualityClaudeMemClient:
         self,
         query: str,
         *,
-        limit: int = 10,
+        limit: int | None = None,
     ) -> r[list[str]]:
         """Get the mcp-cli command for memory search."""
-        call_result = self.build_search_call(query, limit=limit)
+        search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
+        call_result = self.build_search_call(query, limit=search_limit)
         if call_result.is_failure:
             return r[list[str]].fail(call_result.error)
 
@@ -103,14 +107,16 @@ class FlextQualityClaudeMemClient:
         self,
         anchor: int,
         *,
-        depth_before: int = 5,
-        depth_after: int = 5,
+        depth_before: int | None = None,
+        depth_after: int | None = None,
     ) -> r[list[str]]:
         """Get the mcp-cli command for timeline query."""
+        before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
+        after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
         call_result = self.build_timeline_call(
             anchor,
-            depth_before=depth_before,
-            depth_after=depth_after,
+            depth_before=before,
+            depth_after=after,
         )
         if call_result.is_failure:
             return r[list[str]].fail(call_result.error)

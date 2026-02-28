@@ -24,7 +24,7 @@ from flext_core import (
 
 from flext_quality.constants import c
 from flext_quality.hooks.manager import HookManager
-from flext_quality.models import RuleDefinition
+from flext_quality.models import m
 from flext_quality.rules.loader import FlextQualityRulesLoader
 from flext_quality.settings import FlextQualitySettings
 from flext_quality.typings import HookInput, HookOutput
@@ -122,7 +122,7 @@ class FlextQuality:
     # RULES OPERATIONS
     # =========================================================================
 
-    def load_rules(self, path: Path) -> r[list[RuleDefinition]]:
+    def load_rules(self, path: Path) -> r[list[m.Quality.RuleDefinition]]:
         """Load rules from a YAML file.
 
         Args:
@@ -134,7 +134,7 @@ class FlextQuality:
         """
         return self.rules_loader.load(path)
 
-    def load_rules_from_config(self) -> r[list[RuleDefinition]]:
+    def load_rules_from_config(self) -> r[list[m.Quality.RuleDefinition]]:
         """Load rules from configured rules directory.
 
         Returns:
@@ -143,13 +143,13 @@ class FlextQuality:
         """
         rules_path = self.config.get_rules_path()
         if not rules_path.exists():
-            return r[list[RuleDefinition]].fail(
+            return r[list[m.Quality.RuleDefinition]].fail(
                 f"Rules directory not found: {rules_path}"
             )
 
         yaml_files = list(rules_path.glob("*.yaml")) + list(rules_path.glob("*.yml"))
         if not yaml_files:
-            return r[list[RuleDefinition]].ok([])
+            return r[list[m.Quality.RuleDefinition]].ok([])
 
         return self.rules_loader.load_multiple(yaml_files)
 

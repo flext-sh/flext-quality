@@ -63,4 +63,4 @@ class HookManager:
 
     def get_config_json(self) -> str:
         """Get hooks configuration as JSON."""
-        return json.dumps(self.get_config(), indent=2)
+        return json.dumps(self.get_config(), indent=c.Quality.Defaults.JSON_INDENT)

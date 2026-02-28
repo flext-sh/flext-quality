@@ -107,7 +107,7 @@ class FlextQualityUtilities(FlextUtilities):
                     cmd,
                     capture_output=True,
                     text=True,
-                    timeout=timeout_ms / 1000,
+                    timeout=timeout_ms / c.Quality.Defaults.MS_TO_SECONDS_DIVISOR,
                     check=False,
                 )
                 if result.returncode != 0:

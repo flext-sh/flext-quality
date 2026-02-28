@@ -168,6 +168,17 @@ class FlextQualityConstants(FlextConstants):
             CACHE_TTL_SECONDS: Final[int] = 300
             MAX_CACHE_ENTRIES: Final[int] = 1000
 
+            # Search/Query defaults
+            DEFAULT_SEARCH_LIMIT: Final[int] = 20
+            DEFAULT_MEMORY_SEARCH_LIMIT: Final[int] = 10
+            DEFAULT_TIMELINE_DEPTH: Final[int] = 5
+
+            # JSON formatting
+            JSON_INDENT: Final[int] = 2
+
+            # Subprocess timeout conversion
+            MS_TO_SECONDS_DIVISOR: Final[int] = 1000
+
         class Mcp:
             """MCP Server configuration."""
 

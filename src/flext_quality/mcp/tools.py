@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
+from flext_quality.constants import c
 from flext_quality.hooks.manager import HookManager
 from flext_quality.integrations.claude_context import FlextQualityClaudeContextClient
 from flext_quality.integrations.claude_mem import FlextQualityClaudeMemClient
@@ -17,7 +18,7 @@ def search_memory(
     query: str,
     *,
     search_type: str = "observations",
-    limit: int = 10,
+    limit: int | None = None,
 ) -> Mapping[str, object]:
     """Build command to search cross-session memory via claude-mem.
 
@@ -25,11 +26,12 @@ def search_memory(
     The actual execution is left to the caller for security.
     """
     client = FlextQualityClaudeMemClient()
-    result = client.build_search_call(query=query, limit=limit)
+    search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
+    result = client.build_search_call(query=query, limit=search_limit)
     if result.is_failure:
         return {"error": result.error}
 
-    command_result = client.get_search_command(query=query, limit=limit)
+    command_result = client.get_search_command(query=query, limit=search_limit)
     if command_result.is_failure:
         return {"error": command_result.error}
 
@@ -48,7 +50,7 @@ def search_memory(
 def search_code(
     query: str,
     *,
-    limit: int = 20,
+    limit: int | None = None,
 ) -> Mapping[str, object]:
     """Build command for semantic code search via claude-context.
 
@@ -56,11 +58,12 @@ def search_code(
     The actual execution is left to the caller for security.
     """
     client = FlextQualityClaudeContextClient()
-    result = client.build_search_call(query=query, limit=limit)
+    search_limit = limit or c.Quality.Defaults.DEFAULT_SEARCH_LIMIT
+    result = client.build_search_call(query=query, limit=search_limit)
     if result.is_failure:
         return {"error": result.error}
 
-    command_result = client.get_search_command(query=query, limit=limit)
+    command_result = client.get_search_command(query=query, limit=search_limit)
     if command_result.is_failure:
         return {"error": command_result.error}
 

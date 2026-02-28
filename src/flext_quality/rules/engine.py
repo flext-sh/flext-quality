@@ -10,7 +10,7 @@ from typing import override
 from flext_core import r
 
 from flext_quality.constants import c
-from flext_quality.models import RuleDefinition
+from flext_quality.models import m
 from flext_quality.rules.loader import FlextQualityRulesLoader
 
 
@@ -20,7 +20,7 @@ class FlextQualityRulesEngine:
     def __init__(self, rules_path: Path | None = None) -> None:
         """Initialize rules engine."""
         self._rules_path: Path | None = rules_path
-        self._rules: list[RuleDefinition] = []
+        self._rules: list[m.Quality.RuleDefinition] = []
         self._loaded: bool = False
 
     def load_rules(self, rules_path: Path | None = None) -> r[int]:
@@ -85,7 +85,7 @@ class FlextQualityRulesEngine:
 
         return r[list[Mapping[str, object]]].ok(violations)
 
-    def get_rules(self) -> list[RuleDefinition]:
+    def get_rules(self) -> list[m.Quality.RuleDefinition]:
         """Get loaded rules."""
         return self._rules.copy()
 
@@ -134,7 +134,7 @@ class FlextQualityRulesEngine:
 
     def _check_rule(
         self,
-        rule: RuleDefinition,
+        rule: m.Quality.RuleDefinition,
         content: str,
         filename: str,
     ) -> list[Mapping[str, object]]:

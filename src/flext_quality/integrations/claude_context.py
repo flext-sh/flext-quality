@@ -43,15 +43,16 @@ class FlextQualityClaudeContextClient:
         self,
         query: str,
         *,
-        limit: int = 20,
+        limit: int | None = None,
     ) -> r[McpToolCall]:
         """Build a search_code tool call."""
+        search_limit = limit or c.Quality.Defaults.DEFAULT_SEARCH_LIMIT
         return self._mcp.build_tool_call(
             self.SERVER_NAME,
             "search_code",
             {
                 "query": query,
-                "limit": limit,
+                "limit": search_limit,
             },
         )
 
@@ -82,10 +83,11 @@ class FlextQualityClaudeContextClient:
         self,
         query: str,
         *,
-        limit: int = 20,
+        limit: int | None = None,
     ) -> r[list[str]]:
         """Get the mcp-cli command for code search."""
-        call_result = self.build_search_call(query, limit=limit)
+        search_limit = limit or c.Quality.Defaults.DEFAULT_SEARCH_LIMIT
+        call_result = self.build_search_call(query, limit=search_limit)
         if call_result.is_failure:
             return r[list[str]].fail(call_result.error)
 
