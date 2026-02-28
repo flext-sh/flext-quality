@@ -42,7 +42,7 @@ class FlextQualityUtilities(FlextUtilities):
         def parse_hook_input(raw: str) -> r[t.Quality.HookInput]:
             """Parse hook input JSON."""
             try:
-                parsed: object = json.loads(raw)
+                parsed: t.GeneralValueType = json.loads(raw)
                 match parsed:
                     case dict() as hook_input:
                         return r[t.Quality.HookInput].ok(hook_input)
@@ -59,7 +59,7 @@ class FlextQualityUtilities(FlextUtilities):
             blocked_reason: str | None = None,
         ) -> str:
             """Format hook output JSON."""
-            output: dict[str, object] = {"continue": continue_exec}
+            output: dict[str, t.GeneralValueType] = {"continue": continue_exec}
             if message:
                 output["systemMessage"] = message
             if blocked_reason:
@@ -67,16 +67,16 @@ class FlextQualityUtilities(FlextUtilities):
             return json.dumps(output)
 
         @staticmethod
-        def load_yaml_rules(path: Path) -> r[list[Mapping[str, object]]]:
+        def load_yaml_rules(path: Path) -> r[list[Mapping[str, t.GeneralValueType]]]:
             """Load rules from YAML file."""
             try:
                 with path.open(encoding="utf-8") as f:
-                    parsed: object = yaml.safe_load(f)
+                    parsed: t.GeneralValueType = yaml.safe_load(f)
                 match parsed:
                     case dict() as parsed_dict:
                         raw_rules = parsed_dict.get("rules", [])
                     case _:
-                        return r[list[Mapping[str, object]]].fail("Expected YAML dict")
+                        return r[list[Mapping[str, t.GeneralValueType]]].fail("Expected YAML dict")
                 match raw_rules:
                     case list() as rules_list:
                         rules: list[Mapping[str, object]] = [

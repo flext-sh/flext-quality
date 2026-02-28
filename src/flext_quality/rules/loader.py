@@ -10,6 +10,7 @@ from flext_core import r
 
 from flext_quality.constants import c
 from flext_quality.models import m
+from flext_quality.typings import t
 
 
 class FlextQualityRulesLoader:
@@ -22,7 +23,7 @@ class FlextQualityRulesLoader:
 
         try:
             with path.open(encoding="utf-8") as f:
-                parsed: object = yaml.safe_load(f)
+                parsed: t.GeneralValueType = yaml.safe_load(f)
         except (
             ValueError,
             TypeError,
