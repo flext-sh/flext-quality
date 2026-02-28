@@ -13,18 +13,9 @@ if TYPE_CHECKING:
 
 # Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
-    "FlextQualityRulesEngine": (
-        "flext_quality.rules.engine",
-        "FlextQualityRulesEngine",
-    ),
-    "FlextQualityRulesLoader": (
-        "flext_quality.rules.loader",
-        "FlextQualityRulesLoader",
-    ),
-    "FlextQualityValidators": (
-        "flext_quality.rules.validators",
-        "FlextQualityValidators",
-    ),
+    "FlextQualityRulesEngine": ("flext_quality.rules.engine", "FlextQualityRulesEngine"),
+    "FlextQualityRulesLoader": ("flext_quality.rules.loader", "FlextQualityRulesLoader"),
+    "FlextQualityValidators": ("flext_quality.rules.validators", "FlextQualityValidators"),
 }
 
 __all__ = [

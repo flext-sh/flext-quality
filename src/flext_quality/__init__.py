@@ -24,17 +24,19 @@ if TYPE_CHECKING:
         FlextService as s,
     )
 
-    from flext_quality import (
-        FlextQuality,
+    from flext_quality.api import FlextQuality
+    from flext_quality.constants import (
         FlextQualityConstants,
         FlextQualityConstants as c,
-        FlextQualityModels,
-        FlextQualityModels as m,
+    )
+    from flext_quality.models import FlextQualityModels, FlextQualityModels as m
+    from flext_quality.protocols import (
         FlextQualityProtocols,
         FlextQualityProtocols as p,
-        FlextQualitySettings,
-        FlextQualityTypes,
-        FlextQualityTypes as t,
+    )
+    from flext_quality.settings import FlextQualitySettings
+    from flext_quality.typings import FlextQualityTypes, FlextQualityTypes as t
+    from flext_quality.utilities import (
         FlextQualityUtilities,
         FlextQualityUtilities as u,
     )
