@@ -12,10 +12,12 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import Final, Literal, TypeAlias
 
+from flext_cli import FlextCliConstants
 from flext_core import FlextConstants
+from flext_web import FlextWebConstants
 
 
-class FlextQualityConstants(FlextConstants):
+class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
     """Centralized constants for flext-quality (Layer 0).
 
     Provides immutable, namespace-organized constants for hook processing,

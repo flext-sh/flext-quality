@@ -8,7 +8,9 @@ from __future__ import annotations
 
 from typing import Final
 
+from flext_cli import FlextCliModels
 from flext_core import FlextModels
+from flext_web import FlextWebModels
 from pydantic import BaseModel, Field
 
 from flext_quality import c
@@ -76,7 +78,7 @@ class _ContextSearchResult(BaseModel):
     line_number: int | None = None
 
 
-class FlextQualityModels(FlextModels):
+class FlextQualityModels(FlextWebModels, FlextCliModels):
     """Namespace for flext-quality models.
 
     Usage:

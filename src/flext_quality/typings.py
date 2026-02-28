@@ -4,10 +4,12 @@ from __future__ import annotations
 
 from typing import TypeAlias
 
+from flext_cli import FlextCliTypes
 from flext_core import FlextTypes
+from flext_web import FlextWebTypes
 
 
-class FlextQualityTypes(FlextTypes):
+class FlextQualityTypes(FlextWebTypes, FlextCliTypes):
     """Namespace for flext-quality type definitions."""
 
     class Quality:
