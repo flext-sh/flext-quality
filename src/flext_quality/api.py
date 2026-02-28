@@ -22,13 +22,9 @@ from flext_core import (
     r,
 )
 
-from flext_quality.constants import c
+from flext_quality import FlextQualitySettings, c, m, t, u
 from flext_quality.hooks.manager import HookManager
-from flext_quality.models import m
 from flext_quality.rules.loader import FlextQualityRulesLoader
-from flext_quality.settings import FlextQualitySettings
-from flext_quality.typings import t
-from flext_quality.utilities import u
 
 
 class FlextQuality:
@@ -182,11 +178,15 @@ class FlextQuality:
         """
         stdin_result = u.Quality.read_stdin()
         if stdin_result.is_failure:
-            return r[t.Quality.HookOutput].fail(stdin_result.error or "Failed to read stdin")
+            return r[t.Quality.HookOutput].fail(
+                stdin_result.error or "Failed to read stdin"
+            )
 
         parse_result = u.Quality.parse_hook_input(stdin_result.value)
         if parse_result.is_failure:
-            return r[t.Quality.HookOutput].fail(parse_result.error or "Failed to parse input")
+            return r[t.Quality.HookOutput].fail(
+                parse_result.error or "Failed to parse input"
+            )
 
         input_data = parse_result.value
         event = str(input_data.get("event", ""))

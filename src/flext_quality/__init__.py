@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
+from flext_core import cleanup_submodule_namespace, lazy_getattr
 
 if TYPE_CHECKING:
     from flext_core import (
@@ -24,19 +24,17 @@ if TYPE_CHECKING:
         FlextService as s,
     )
 
-    from flext_quality.api import FlextQuality
-    from flext_quality.constants import (
+    from flext_quality import (
+        FlextQuality,
         FlextQualityConstants,
         FlextQualityConstants as c,
-    )
-    from flext_quality.models import FlextQualityModels, FlextQualityModels as m
-    from flext_quality.protocols import (
+        FlextQualityModels,
+        FlextQualityModels as m,
         FlextQualityProtocols,
         FlextQualityProtocols as p,
-    )
-    from flext_quality.settings import FlextQualitySettings
-    from flext_quality.typings import FlextQualityTypes, FlextQualityTypes as t
-    from flext_quality.utilities import (
+        FlextQualitySettings,
+        FlextQualityTypes,
+        FlextQualityTypes as t,
         FlextQualityUtilities,
         FlextQualityUtilities as u,
     )

@@ -16,7 +16,7 @@ from flext_core import FlextSettings, r
 from pydantic import Field
 from pydantic_settings import SettingsConfigDict
 
-from flext_quality.constants import c
+from flext_quality import c
 
 
 @FlextSettings.auto_register("quality")
@@ -31,7 +31,7 @@ class FlextQualitySettings(FlextSettings):
     - Cache configuration
 
     Usage:
-        from flext_quality.settings import FlextQualitySettings
+        from flext_quality import FlextQualitySettings
 
         settings = FlextQualitySettings.get_global_instance()
         timeout = settings.hook_timeout_ms

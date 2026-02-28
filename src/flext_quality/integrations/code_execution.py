@@ -16,7 +16,7 @@ from typing import final
 from flext_core import r
 from pydantic import BaseModel, ConfigDict, Field
 
-from flext_quality.constants import c
+from flext_quality import c
 
 
 class ExecutionRequest(BaseModel):

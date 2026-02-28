@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 
-from flext_quality.constants import c
+from flext_quality import c
 from flext_quality.hooks.manager import HookManager
 from flext_quality.integrations.claude_context import FlextQualityClaudeContextClient
 from flext_quality.integrations.claude_mem import FlextQualityClaudeMemClient
@@ -25,7 +25,9 @@ def get_rules_config() -> str:
     """Get current rules configuration."""
     engine = FlextQualityRulesEngine()
     rules = engine.get_rules()
-    return json.dumps([rule.model_dump() for rule in rules], indent=c.Quality.Defaults.JSON_INDENT)
+    return json.dumps(
+        [rule.model_dump() for rule in rules], indent=c.Quality.Defaults.JSON_INDENT
+    )
 
 
 @mcp.resource("status://integrations")

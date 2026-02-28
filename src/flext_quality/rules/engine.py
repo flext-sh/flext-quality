@@ -8,8 +8,7 @@ from pathlib import Path
 
 from flext_core import r
 
-from flext_quality.constants import c
-from flext_quality.models import m
+from flext_quality import c, m
 from flext_quality.rules.loader import FlextQualityRulesLoader
 
 

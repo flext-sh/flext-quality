@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_quality.typings import FlextQualityTypes
+from flext_quality import FlextQualityTypes
 
 
 class TestsTypings(FlextQualityTypes):

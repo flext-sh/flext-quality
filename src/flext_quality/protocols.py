@@ -5,9 +5,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Protocol
 
-from flext_cli.protocols import FlextCliProtocols
-from flext_core.result import FlextResult
-from flext_web.protocols import FlextWebProtocols
+from flext_cli import FlextCliProtocols
+from flext_core import FlextResult
+from flext_web import FlextWebProtocols
 
 from .typings import t
 

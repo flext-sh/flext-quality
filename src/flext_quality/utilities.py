@@ -11,8 +11,7 @@ from pathlib import Path
 import yaml
 from flext_core import FlextUtilities, r
 
-from flext_quality.constants import c
-from flext_quality.typings import t
+from flext_quality import c, t
 
 
 class FlextQualityUtilities(FlextUtilities):
@@ -46,7 +45,11 @@ class FlextQualityUtilities(FlextUtilities):
                 match parsed:
                     case dict() as hook_input:
                         coerced_input: t.Quality.HookInput = {
-                            str(k): v if isinstance(v, (str, int, float, bool, type(None), dict, list)) else str(v)
+                            str(k): v
+                            if isinstance(
+                                v, (str, int, float, bool, type(None), dict, list)
+                            )
+                            else str(v)
                             for k, v in hook_input.items()
                         }
                         return r[t.Quality.HookInput].ok(coerced_input)
@@ -80,12 +83,15 @@ class FlextQualityUtilities(FlextUtilities):
                     case dict() as parsed_dict:
                         raw_rules = parsed_dict.get("rules", [])
                     case _:
-                        return r[list[Mapping[str, t.GeneralValueType]]].fail("Expected YAML dict")
+                        return r[list[Mapping[str, t.GeneralValueType]]].fail(
+                            "Expected YAML dict"
+                        )
                 match raw_rules:
                     case list() as rules_list:
                         rules: list[Mapping[str, object]] = [
                             {str(k): v for k, v in item.items()}
-                            for item in rules_list if isinstance(item, dict)
+                            for item in rules_list
+                            if isinstance(item, dict)
                         ]
                         rules: list[Mapping[str, object]] = [
                             item for item in rules_list if isinstance(item, dict)

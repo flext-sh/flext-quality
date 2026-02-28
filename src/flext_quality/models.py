@@ -11,7 +11,7 @@ from typing import Final
 from flext_core import FlextModels
 from pydantic import BaseModel, Field
 
-from flext_quality.constants import c
+from flext_quality import c
 
 
 class _HookConfig(BaseModel):
@@ -80,7 +80,7 @@ class FlextQualityModels(FlextModels):
     """Namespace for flext-quality models.
 
     Usage:
-        from flext_quality.models import m
+        from flext_quality import m
 
         config = m.Quality.HookConfig(event=c.Quality.HookEvent.PRE_TOOL_USE, command="...")
         rule = m.Quality.RuleDefinition(name="rule1", type=c.Quality.RuleType.BLOCKING, ...)

@@ -11,7 +11,7 @@ from typing import override
 
 from flext_core import r
 
-from flext_quality.constants import c
+from flext_quality import c
 
 
 class FlextQualityValidators:

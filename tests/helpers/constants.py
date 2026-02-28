@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_quality.constants import FlextQualityConstants
+from flext_quality import FlextQualityConstants
 
 
 class TestsConstants(FlextQualityConstants):

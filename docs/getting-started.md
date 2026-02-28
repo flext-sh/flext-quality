@@ -123,7 +123,7 @@ mypy src/flext_quality/ --strict  # Cannot run until imports work
 pytest tests/ -v  # AttributeError expected
 
 # Direct analyzer import works (bypasses model issues)
-python -c "from flext_quality.analyzer import FlextQualityCodeAnalyzer; print('Direct import successful')"
+python -c "from flext_quality import FlextQualityCodeAnalyzer; print('Direct import successful')"
 ```
 
 ### **Step 3: Review Architecture**
@@ -152,7 +152,7 @@ ______________________________________________________________________
 
 ```python
 from flext_quality import FlextQualityService
-from flext_quality.analyzer import FlextQualityCodeAnalyzer
+from flext_quality import FlextQualityCodeAnalyzer
 
 # Option 1: Service Layer Approach
 def service_analysis():

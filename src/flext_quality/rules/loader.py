@@ -8,9 +8,7 @@ from pathlib import Path
 import yaml
 from flext_core import r
 
-from flext_quality.constants import c
-from flext_quality.models import m
-from flext_quality.typings import t
+from flext_quality import c, m, t
 
 
 class FlextQualityRulesLoader:
@@ -19,7 +17,9 @@ class FlextQualityRulesLoader:
     def load(self, path: Path) -> r[list[m.Quality.RuleDefinition]]:
         """Load rules from YAML file."""
         if not path.exists():
-            return r[list[m.Quality.RuleDefinition]].fail(f"Rules file not found: {path}")
+            return r[list[m.Quality.RuleDefinition]].fail(
+                f"Rules file not found: {path}"
+            )
 
         try:
             with path.open(encoding="utf-8") as f:
@@ -58,7 +58,9 @@ class FlextQualityRulesLoader:
                 case dict() as rule_dict:
                     pass
                 case _:
-                    return r[list[m.Quality.RuleDefinition]].fail(f"Rule {idx}: expected dict")
+                    return r[list[m.Quality.RuleDefinition]].fail(
+                        f"Rule {idx}: expected dict"
+                    )
             result = self._parse_rule(rule_dict, idx)
             if result.is_failure:
                 return r[list[m.Quality.RuleDefinition]].fail(result.error)

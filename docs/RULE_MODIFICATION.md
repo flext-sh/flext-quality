@@ -338,7 +338,7 @@ ______________________________________________________________________
 cd flext-quality
 
 # Python test (requires dependencies)
-# python3 -c "from flext_quality.rules import registry; print(f'Loaded {len(registry.all())} rules')"
+# python3 -c "from flext_quality import registry; print(f'Loaded {len(registry.all())} rules')"
 
 # Or validate YAML syntax
 python3 -c "import yaml; yaml.safe_load(open('src/flext_quality/rules/data/security.yaml'))"

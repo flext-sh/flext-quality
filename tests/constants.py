@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Final
 
-from flext_quality.constants import FlextQualityConstants
+from flext_quality import FlextQualityConstants
 
 
 class TestsFlextQualityConstants(FlextQualityConstants):
