@@ -13,7 +13,6 @@ from enum import StrEnum
 from typing import Final, Literal, TypeAlias
 
 from flext_cli import FlextCliConstants
-from flext_core import FlextConstants
 from flext_web import FlextWebConstants
 
 

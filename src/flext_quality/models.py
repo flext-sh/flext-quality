@@ -9,7 +9,6 @@ from __future__ import annotations
 from typing import Final
 
 from flext_cli import FlextCliModels
-from flext_core import FlextModels
 from flext_web import FlextWebModels
 from pydantic import BaseModel, Field
 

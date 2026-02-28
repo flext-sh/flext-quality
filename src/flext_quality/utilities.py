@@ -10,7 +10,7 @@ from pathlib import Path
 
 import yaml
 from flext_cli import FlextCliUtilities
-from flext_core import FlextUtilities, r
+from flext_core import r
 from flext_web import FlextWebUtilities
 
 from flext_quality import c, t
