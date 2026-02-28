@@ -13,7 +13,7 @@ from __future__ import annotations
 import threading
 from collections.abc import Mapping
 from pathlib import Path
-from typing import ClassVar, override
+from typing import ClassVar
 
 from flext_core import (
     FlextContainer,
@@ -113,7 +113,6 @@ class FlextQuality:
         return cls._instance
 
     @classmethod
-    @override
     def _reset_instance(cls) -> None:
         """Reset singleton instance (for testing)."""
         cls._instance = None
