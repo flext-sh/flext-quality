@@ -5,12 +5,14 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Protocol
 
-from flext_core import FlextProtocols, r
+from flext_cli.protocols import FlextCliProtocols
+from flext_core import r
+from flext_web.protocols import FlextWebProtocols
 
 from .typings import t
 
 
-class FlextQualityProtocols(FlextProtocols):
+class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
     """Namespace for flext-quality protocols."""
 
     class Quality:
@@ -76,3 +78,8 @@ class FlextQualityProtocols(FlextProtocols):
 
 # Short alias for imports
 p = FlextQualityProtocols
+
+__all__ = [
+    "FlextQualityProtocols",
+    "p",
+]
