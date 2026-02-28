@@ -10,7 +10,7 @@ from flext_quality.integrations.claude_context import FlextQualityClaudeContextC
 from flext_quality.integrations.claude_mem import FlextQualityClaudeMemClient
 from flext_quality.mcp.server import mcp
 from flext_quality.rules.engine import FlextQualityRulesEngine
-from flext_quality.typings import HookInput, HookOutput
+from flext_quality.typings import t
 
 
 @mcp.tool()
@@ -78,8 +78,8 @@ def search_code(
 @mcp.tool()
 def execute_hook(
     event: str,
-    input_data: HookInput,
-) -> HookOutput:
+    input_data: t.Quality.HookInput,
+) -> t.Quality.HookOutput:
     """Execute a hook manually."""
     manager = HookManager()
     result = manager.execute(event=event, input_data=input_data)

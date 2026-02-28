@@ -25,12 +25,12 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
             matcher: list[str] | None
 
             def execute(
-                self, input_data: t.Quality.HookInput
-            ) -> FlextResult[t.Quality.HookOutput]:
+                self, input_data: t.Quality.t.Quality.HookInput
+            ) -> FlextResult[t.Quality.t.Quality.HookOutput]:
                 """Execute the hook logic."""
                 ...
 
-            def should_run(self, input_data: t.Quality.HookInput) -> bool:
+            def should_run(self, input_data: t.Quality.t.Quality.HookInput) -> bool:
                 """Check if hook should run for this input."""
                 ...
 

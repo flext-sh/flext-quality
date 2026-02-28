@@ -27,7 +27,7 @@ from flext_quality.hooks.manager import HookManager
 from flext_quality.models import m
 from flext_quality.rules.loader import FlextQualityRulesLoader
 from flext_quality.settings import FlextQualitySettings
-from flext_quality.typings import HookInput, HookOutput
+from flext_quality.typings import t
 from flext_quality.utilities import u
 
 
@@ -159,8 +159,8 @@ class FlextQuality:
     def execute_hook(
         self,
         event: str,
-        input_data: HookInput,
-    ) -> r[HookOutput]:
+        input_data: t.Quality.HookInput,
+    ) -> r[t.Quality.HookOutput]:
         """Execute hooks for an event.
 
         Args:
@@ -168,30 +168,30 @@ class FlextQuality:
             input_data: Hook input data
 
         Returns:
-            r[HookOutput]: Hook execution result or error
+            r[t.Quality.HookOutput]: Hook execution result or error
 
         """
         return self.hooks.execute(event, input_data)
 
-    def process_stdin_hook(self) -> r[HookOutput]:
+    def process_stdin_hook(self) -> r[t.Quality.HookOutput]:
         """Process hook input from stdin (for Claude Code hooks).
 
         Returns:
-            r[HookOutput]: Hook execution result or error
+            r[t.Quality.HookOutput]: Hook execution result or error
 
         """
         stdin_result = u.Quality.read_stdin()
         if stdin_result.is_failure:
-            return r[HookOutput].fail(stdin_result.error or "Failed to read stdin")
+            return r[t.Quality.HookOutput].fail(stdin_result.error or "Failed to read stdin")
 
         parse_result = u.Quality.parse_hook_input(stdin_result.value)
         if parse_result.is_failure:
-            return r[HookOutput].fail(parse_result.error or "Failed to parse input")
+            return r[t.Quality.HookOutput].fail(parse_result.error or "Failed to parse input")
 
         input_data = parse_result.value
         event = str(input_data.get("event", ""))
         if not event:
-            return r[HookOutput].ok({"continue": True})
+            return r[t.Quality.HookOutput].ok({"continue": True})
 
         return self.execute_hook(event, input_data)
 

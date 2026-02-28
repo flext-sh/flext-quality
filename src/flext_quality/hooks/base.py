@@ -9,7 +9,7 @@ from typing import ClassVar
 from flext_core import r
 
 from flext_quality.constants import c
-from flext_quality.typings import HookInput, HookOutput
+from flext_quality.typings import t
 
 
 class BaseHookImpl(ABC):
@@ -18,7 +18,7 @@ class BaseHookImpl(ABC):
     event: ClassVar[c.Quality.HookEvent]
     matcher: ClassVar[list[str] | None]
 
-    def should_run(self, input_data: HookInput) -> bool:
+    def should_run(self, input_data: t.Quality.HookInput) -> bool:
         """Check if hook should run for this input."""
         if self.matcher is None:
             return True
@@ -30,6 +30,6 @@ class BaseHookImpl(ABC):
         return fnmatch.fnmatch(value, pattern)
 
     @abstractmethod
-    def execute(self, input_data: HookInput) -> r[HookOutput]:
+    def execute(self, input_data: t.Quality.HookInput) -> r[t.Quality.HookOutput]:
         """Execute the hook logic."""
         ...

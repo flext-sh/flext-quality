@@ -11,7 +11,7 @@ from flext_core import r
 
 from flext_quality.constants import c
 from flext_quality.hooks.base import BaseHookImpl
-from flext_quality.typings import HookInput, HookOutput
+from flext_quality.typings import t
 
 
 @final
@@ -31,12 +31,12 @@ class HookManager:
         self._hooks[event].append(hook)
         return r[bool].ok(value=True)
 
-    def execute(self, event: str, input_data: HookInput) -> r[HookOutput]:
+    def execute(self, event: str, input_data: t.Quality.HookInput) -> r[t.Quality.HookOutput]:
         """Execute all hooks for an event."""
         try:
             hook_event = c.Quality.HookEvent(event)
         except ValueError:
-            return r[HookOutput].fail(f"Unknown event: {event}")
+            return r[t.Quality.HookOutput].fail(f"Unknown event: {event}")
 
         hooks = self._hooks.get(hook_event, [])
 
@@ -52,7 +52,7 @@ class HookManager:
             if not output.get("continue", True):
                 return result
 
-        return r[HookOutput].ok({"continue": True})
+        return r[t.Quality.HookOutput].ok({"continue": True})
 
     def get_config(self) -> Mapping[str, list[Mapping[str, object]]]:
         """Get hooks configuration as dict."""

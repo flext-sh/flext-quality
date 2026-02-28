@@ -12,7 +12,7 @@ import yaml
 from flext_core import FlextUtilities, r
 
 from flext_quality.constants import c
-from flext_quality.typings import HookInput
+from flext_quality.typings import t
 
 
 class FlextQualityUtilities(FlextUtilities):
@@ -39,17 +39,17 @@ class FlextQualityUtilities(FlextUtilities):
                 return r[str].fail(f"Failed to read stdin: {e}")
 
         @staticmethod
-        def parse_hook_input(raw: str) -> r[HookInput]:
+        def parse_hook_input(raw: str) -> r[t.Quality.HookInput]:
             """Parse hook input JSON."""
             try:
                 parsed: object = json.loads(raw)
                 match parsed:
                     case dict() as hook_input:
-                        return r[HookInput].ok(hook_input)
+                        return r[t.Quality.HookInput].ok(hook_input)
                     case _:
-                        return r[HookInput].fail("Expected JSON object")
+                        return r[t.Quality.HookInput].fail("Expected JSON object")
             except json.JSONDecodeError as e:
-                return r[HookInput].fail(f"Invalid JSON: {e}")
+                return r[t.Quality.HookInput].fail(f"Invalid JSON: {e}")
 
         @staticmethod
         def format_hook_output(

@@ -33,8 +33,3 @@ class FlextQualityTypes(FlextTypes):
 
 # Short alias for imports
 t = FlextQualityTypes
-
-# Convenience aliases for common types
-HookInput = FlextQualityTypes.Quality.HookInput
-HookOutput = FlextQualityTypes.Quality.HookOutput
-HookMatcher = FlextQualityTypes.Quality.HookMatcher
