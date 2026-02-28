@@ -132,11 +132,17 @@ class FlextQualityMcpClient:
                             error=None,
                         )
                     )
-                case list():
+                case list() as data_list:
+                    coerced_data: list[dict[str, object]] = []
+                    for item in data_list:
+                        if isinstance(item, dict):
+                            coerced_data.append({str(k): v for k, v in item.items()})
+                        else:
+                            coerced_data.append({"value": item})
                     return r[McpToolResult].ok(
                         McpToolResult(
                             success=True,
-                            data=data,
+                            data=coerced_data,
                             error=None,
                         )
                     )

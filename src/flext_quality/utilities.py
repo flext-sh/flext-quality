@@ -45,7 +45,11 @@ class FlextQualityUtilities(FlextUtilities):
                 parsed: t.GeneralValueType = json.loads(raw)
                 match parsed:
                     case dict() as hook_input:
-                        return r[t.Quality.HookInput].ok(hook_input)
+                        coerced_input: t.Quality.HookInput = {
+                            str(k): v if isinstance(v, (str, int, float, bool, type(None), dict, list)) else str(v)
+                            for k, v in hook_input.items()
+                        }
+                        return r[t.Quality.HookInput].ok(coerced_input)
                     case _:
                         return r[t.Quality.HookInput].fail("Expected JSON object")
             except json.JSONDecodeError as e:
@@ -67,7 +71,7 @@ class FlextQualityUtilities(FlextUtilities):
             return json.dumps(output)
 
         @staticmethod
-        def load_yaml_rules(path: Path) -> r[list[Mapping[str, t.GeneralValueType]]]:
+        def load_yaml_rules(path: Path) -> r[list[Mapping[str, object]]]:
             """Load rules from YAML file."""
             try:
                 with path.open(encoding="utf-8") as f:
@@ -79,6 +83,10 @@ class FlextQualityUtilities(FlextUtilities):
                         return r[list[Mapping[str, t.GeneralValueType]]].fail("Expected YAML dict")
                 match raw_rules:
                     case list() as rules_list:
+                        rules: list[Mapping[str, object]] = [
+                            {str(k): v for k, v in item.items()}
+                            for item in rules_list if isinstance(item, dict)
+                        ]
                         rules: list[Mapping[str, object]] = [
                             item for item in rules_list if isinstance(item, dict)
                         ]

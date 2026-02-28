@@ -98,10 +98,11 @@ class _CommandHandlers:
         """Handle status command."""
         result = service.display_status()
         if result.is_failure:
-            service._output.print_error(f"Status failed: {result.error}")
+            service._output.display_message(f"Status failed: {result.error}", message_type="error")
             return r[int].ok(1)
 
-        service._output.print_success("flext-quality status")
+        service._output.display_message("flext-quality status", message_type="success")
+        service._output.display_message(f"Version: {c.Quality.Mcp.SERVER_VERSION}", message_type="info")
         service._output.print_message(f"Version: {c.Quality.Mcp.SERVER_VERSION}")
         return r[int].ok(0)
 
@@ -110,12 +111,12 @@ class _CommandHandlers:
         """Handle check command."""
         result = service.build_check_commands(target_path)
         if result.is_failure:
-            service._output.print_error(f"Failed: {result.error}")
+            service._output.display_message(f"Failed: {result.error}", message_type="error")
             return r[int].ok(1)
 
-        service._output.print_message(f"Running check on {target_path}...")
+        service._output.display_message(f"Running check on {target_path}...", message_type="info")
         for cmd in result.value:
-            service._output.print_message(f"  {' '.join(cmd)}")
+            service._output.display_message(f"  {' '.join(cmd)}", message_type="info")
         return r[int].ok(0)
 
     @staticmethod
@@ -126,12 +127,12 @@ class _CommandHandlers:
         """Handle validate command."""
         result = service.build_validate_commands(target_path)
         if result.is_failure:
-            service._output.print_error(f"Failed: {result.error}")
+            service._output.display_message(f"Failed: {result.error}", message_type="error")
             return r[int].ok(1)
 
-        service._output.print_message(f"Running validation on {target_path}...")
+        service._output.display_message(f"Running validation on {target_path}...", message_type="info")
         for cmd in result.value:
-            service._output.print_message(f"  {' '.join(cmd)}")
+            service._output.display_message(f"  {' '.join(cmd)}", message_type="info")
         return r[int].ok(0)
 
 
@@ -151,7 +152,8 @@ def _dispatch(service: FlextQualityCliService, command: str, args: list[str]) ->
         result = _CommandHandlers.handle_validate(service, target_path)
         return result.value if result.is_success else 1
 
-    service._output.print_error(f"Unknown command: {command}")
+    service._output.display_message(f"Unknown command: {command}", message_type="error")
+    service._output.display_message("Commands: status, check, validate", message_type="info")
     service._output.print_message("Commands: status, check, validate")
     return 1
 

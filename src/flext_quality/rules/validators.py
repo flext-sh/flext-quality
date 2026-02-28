@@ -7,6 +7,7 @@ import re
 from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from pathlib import Path
+from typing import override
 
 from flext_core import r
 
@@ -47,10 +48,12 @@ class FlextQualityValidators:
                     self._compiled[pname] = re.compile(pattern)
 
         @property
+        @override
         def name(self) -> str:
             """Return validator name."""
             return "pattern"
 
+        @override
         def validate(
             self,
             content: str,
@@ -90,6 +93,7 @@ class FlextQualityValidators:
             super().__init__(patterns)
 
         @property
+        @override
         def name(self) -> str:
             """Return validator name."""
             return "forbidden-patterns"
@@ -98,10 +102,12 @@ class FlextQualityValidators:
         """Validates architecture tier violations."""
 
         @property
+        @override
         def name(self) -> str:
             """Return validator name."""
             return "tier"
 
+        @override
         def validate(
             self,
             content: str,
