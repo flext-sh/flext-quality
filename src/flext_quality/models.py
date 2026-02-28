@@ -6,13 +6,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import Final
+
+from flext_core import FlextModels
 from pydantic import BaseModel, Field
 
 from flext_quality.constants import c
-
-# =============================================================================
-# Module-level model definitions (following flext-core pattern)
-# =============================================================================
 
 
 class _HookConfig(BaseModel):
@@ -77,12 +76,7 @@ class _ContextSearchResult(BaseModel):
     line_number: int | None = None
 
 
-# =============================================================================
-# Facade class with namespace (following flext-core pattern)
-# =============================================================================
-
-
-class FlextQualityModels:
+class FlextQualityModels(FlextModels):
     """Namespace for flext-quality models.
 
     Usage:
@@ -95,16 +89,14 @@ class FlextQualityModels:
     class Quality:
         """Quality-specific models namespace."""
 
-        HookConfig = _HookConfig
-        HookResult = _HookResult
-        RuleDefinition = _RuleDefinition
-        IntegrationConfig = _IntegrationConfig
-        MemoryObservation = _MemoryObservation
-        ContextSearchResult = _ContextSearchResult
+        HookConfig: Final = _HookConfig
+        HookResult: Final = _HookResult
+        RuleDefinition: Final = _RuleDefinition
+        IntegrationConfig: Final = _IntegrationConfig
+        MemoryObservation: Final = _MemoryObservation
+        ContextSearchResult: Final = _ContextSearchResult
 
 
-# Short alias for imports
 m = FlextQualityModels
-RuleDefinition = _RuleDefinition
 
-__all__ = ["FlextQualityModels", "RuleDefinition", "m"]
+__all__ = ["FlextQualityModels", "m"]
