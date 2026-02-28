@@ -18,9 +18,9 @@ from typing import ClassVar, override
 from flext_core import (
     FlextContainer,
     FlextLogger,
+    p,
     r,
 )
-from flext_core.protocols import p
 
 from flext_quality.constants import c
 from flext_quality.hooks.manager import HookManager
