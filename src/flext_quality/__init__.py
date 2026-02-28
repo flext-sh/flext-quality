@@ -34,6 +34,7 @@ if TYPE_CHECKING:
         FlextQualityProtocols,
         FlextQualityProtocols as p,
     )
+    from flext_quality.services.cli import FlextQualityCliService, main
     from flext_quality.settings import FlextQualitySettings
     from flext_quality.typings import FlextQualityTypes, FlextQualityTypes as t
     from flext_quality.utilities import (
@@ -46,6 +47,7 @@ __version__ = "0.9.0"
 # Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextQuality": ("flext_quality.api", "FlextQuality"),
+    "FlextQualityCliService": ("flext_quality.services.cli", "FlextQualityCliService"),
     "FlextQualityConstants": ("flext_quality.constants", "FlextQualityConstants"),
     "FlextQualityModels": ("flext_quality.models", "FlextQualityModels"),
     "FlextQualityProtocols": ("flext_quality.protocols", "FlextQualityProtocols"),
@@ -57,6 +59,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "e": ("flext_core", "FlextExceptions"),
     "h": ("flext_core", "FlextHandlers"),
     "m": ("flext_quality.models", "FlextQualityModels"),
+    "main": ("flext_quality.services.cli", "main"),
     "p": ("flext_quality.protocols", "FlextQualityProtocols"),
     "r": ("flext_core", "FlextResult"),
     "s": ("flext_core", "FlextService"),
@@ -67,6 +70,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
 
 __all__ = [
     "FlextQuality",
+    "FlextQualityCliService",
     "FlextQualityConstants",
     "FlextQualityModels",
     "FlextQualityProtocols",
@@ -79,6 +83,7 @@ __all__ = [
     "e",
     "h",
     "m",
+    "main",
     "p",
     "r",
     "s",
