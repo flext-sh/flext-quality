@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import Final
+from typing import TypeAlias
 
 from flext_cli import FlextCliModels
 from flext_web import FlextWebModels
@@ -90,12 +90,12 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
     class Quality:
         """Quality-specific models namespace."""
 
-        HookConfig: Final = _HookConfig
-        HookResult: Final = _HookResult
-        RuleDefinition: Final = _RuleDefinition
-        IntegrationConfig: Final = _IntegrationConfig
-        MemoryObservation: Final = _MemoryObservation
-        ContextSearchResult: Final = _ContextSearchResult
+        HookConfig: TypeAlias = _HookConfig
+        HookResult: TypeAlias = _HookResult
+        RuleDefinition: TypeAlias = _RuleDefinition
+        IntegrationConfig: TypeAlias = _IntegrationConfig
+        MemoryObservation: TypeAlias = _MemoryObservation
+        ContextSearchResult: TypeAlias = _ContextSearchResult
 
 
 m = FlextQualityModels

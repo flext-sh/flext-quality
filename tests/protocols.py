@@ -34,6 +34,5 @@ class TestsFlextQualityProtocols(FlextTestsProtocols, FlextQualityProtocols):
 
 # Runtime aliases
 p = TestsFlextQualityProtocols
-p = TestsFlextQualityProtocols
 
 __all__ = ["TestsFlextQualityProtocols", "p"]

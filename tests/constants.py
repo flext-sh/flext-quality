@@ -40,7 +40,6 @@ class TestsFlextQualityConstants(FlextQualityConstants):
 
 # Short aliases per FLEXT convention
 c = TestsFlextQualityConstants
-c = TestsFlextQualityConstants
 
 __all__ = [
     "TestsFlextQualityConstants",

@@ -43,7 +43,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
         def parse_hook_input(raw: str) -> r[t.Quality.HookInput]:
             """Parse hook input JSON."""
             try:
-                parsed: t.GeneralValueType = json.loads(raw)
+                parsed: object = json.loads(raw)
                 match parsed:
                     case dict() as hook_input:
                         coerced_input: t.Quality.HookInput = {
@@ -69,7 +69,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
             blocked_reason: str | None = None,
         ) -> str:
             """Format hook output JSON."""
-            output: dict[str, t.GeneralValueType] = {"continue": continue_exec}
+            output: dict[str, str | bool | None] = {"continue": continue_exec}
             if message:
                 output["systemMessage"] = message
             if blocked_reason:
@@ -81,21 +81,16 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
             """Load rules from YAML file."""
             try:
                 with path.open(encoding="utf-8") as f:
-                    parsed: t.GeneralValueType = yaml.safe_load(f)
+                    parsed: object = yaml.safe_load(f)
                 match parsed:
                     case dict() as parsed_dict:
                         raw_rules = parsed_dict.get("rules", [])
                     case _:
-                        return r[list[Mapping[str, t.GeneralValueType]]].fail(
+                        return r[list[Mapping[str, object]]].fail(
                             "Expected YAML dict",
                         )
                 match raw_rules:
                     case list() as rules_list:
-                        rules: list[Mapping[str, object]] = [
-                            {str(k): v for k, v in item.items()}
-                            for item in rules_list
-                            if isinstance(item, dict)
-                        ]
                         rules: list[Mapping[str, object]] = [
                             item for item in rules_list if isinstance(item, dict)
                         ]

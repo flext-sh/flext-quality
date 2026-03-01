@@ -17,7 +17,7 @@ from typing import final
 from flext_core import r
 from pydantic import BaseModel, ConfigDict, Field
 
-from flext_quality import c, t
+from flext_quality import c
 
 
 class McpToolCall(BaseModel):
@@ -122,7 +122,7 @@ class FlextQualityMcpClient:
             )
 
         try:
-            data: t.GeneralValueType = json.loads(output)
+            data: object = json.loads(output)
             match data:
                 case dict():
                     return r[McpToolResult].ok(
