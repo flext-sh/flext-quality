@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import Any
 
 from flask import Flask, Response, jsonify, render_template_string, request
+from flext_core import FlextLogger
 
 
 class DocumentationDashboard:
@@ -21,7 +22,7 @@ class DocumentationDashboard:
         """Initialize documentation dashboard with reports directory."""
         self.reports_dir = Path(reports_dir)
         self.app = Flask(__name__)
-        self._logger_instance: logging.Logger | None = None
+        self._logger_instance: FlextLogger = FlextLogger(__name__)
         self.setup_routes()
 
     def setup_routes(self) -> None:
@@ -129,7 +130,7 @@ class DocumentationDashboard:
                             .get("high", 0),
                         })
             except Exception as e:
-                self.logger.warning("Failed to process trend data: %s", e)
+                self._logger_instance.warning("Failed to process trend data: %s", e)
                 continue
 
         # Sort by date
@@ -141,7 +142,7 @@ class DocumentationDashboard:
             "trends": trend_data,
         }
 
-    def get_recent_reports(self, limit: int = 10) -> list:
+    def get_recent_reports(self, limit: int = 10) -> list[dict[str, Any]]:
         """Get list of recent audit reports."""
         reports = []
 
@@ -166,7 +167,7 @@ class DocumentationDashboard:
                     "files_analyzed": data.get("files_analyzed", 0),
                 })
             except Exception as e:
-                self.logger.warning("Failed to process report file: %s", e)
+                self._logger_instance.warning("Failed to process report file: %s", e)
                 continue
 
         # Sort by date descending and limit
