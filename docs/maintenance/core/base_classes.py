@@ -152,7 +152,7 @@ class BaseValidator(ABC):
         self.name = name
         self.results: ValidationResult | None = None
 
-    def validate(self, items: list[t.GeneralValueType]) -> ValidationResult:
+    def validate(self, items: list[t.ContainerValue]) -> ValidationResult:
         """Perform validation on given items."""
         self.results = ValidationResult()
         self.results.total_items = len(items)
@@ -162,7 +162,7 @@ class BaseValidator(ABC):
         return self.results
 
     @abstractmethod
-    def _validate_items(self, items: list[t.GeneralValueType]) -> None:
+    def _validate_items(self, items: list[t.ContainerValue]) -> None:
         """Implementation-specific validation logic."""
 
     def get_summary(self) -> dict[str, Any]:

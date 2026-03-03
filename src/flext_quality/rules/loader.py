@@ -23,7 +23,7 @@ class FlextQualityRulesLoader:
 
         try:
             with path.open(encoding="utf-8") as f:
-                parsed: t.GeneralValueType = yaml.safe_load(f)
+                parsed: t.ContainerValue = yaml.safe_load(f)
         except (
             ValueError,
             TypeError,

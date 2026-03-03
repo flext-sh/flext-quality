@@ -158,8 +158,8 @@ class LinkChecker:
     async def check_link_async(
         self,
         url: str,
-        context: dict[str, t.GeneralValueType] | None = None,
-    ) -> dict[str, t.GeneralValueType]:
+        context: dict[str, t.ContainerValue] | None = None,
+    ) -> dict[str, t.ContainerValue]:
         """Asynchronously check a single link."""
         start_time = time.time()
 
@@ -227,8 +227,8 @@ class LinkChecker:
     def check_link_sync(
         self,
         url: str,
-        context: dict[str, t.GeneralValueType] | None = None,
-    ) -> dict[str, t.GeneralValueType]:
+        context: dict[str, t.ContainerValue] | None = None,
+    ) -> dict[str, t.ContainerValue]:
         """Synchronously check a single link (fallback method)."""
         start_time = time.time()
 
@@ -243,7 +243,7 @@ class LinkChecker:
 
                 response_time = time.time() - start_time
 
-                result: dict[str, t.GeneralValueType] = {
+                result: dict[str, t.ContainerValue] = {
                     "url": url,
                     "status_code": response.status_code,
                     "response_time": response_time,

@@ -140,7 +140,7 @@ def secure_temp_dir() -> Generator[str]:
 
 
 @pytest.fixture
-def sample_code_repository(tmp_path: Path) -> dict[str, t.GeneralValueType]:
+def sample_code_repository(tmp_path: Path) -> dict[str, t.ContainerValue]:
     """Provide sample code repository metadata for quality analysis testing.
 
     Creates realistic repository metadata that simulates typical project
@@ -180,7 +180,7 @@ def sample_code_repository(tmp_path: Path) -> dict[str, t.GeneralValueType]:
 
 
 @pytest.fixture
-def quality_metrics_data() -> dict[str, t.GeneralValueType]:
+def quality_metrics_data() -> dict[str, t.ContainerValue]:
     """Quality metrics data for testing."""
     return {
         "complexity": {
@@ -207,7 +207,7 @@ def quality_metrics_data() -> dict[str, t.GeneralValueType]:
 
 
 @pytest.fixture
-def code_analysis_config() -> dict[str, t.GeneralValueType]:
+def code_analysis_config() -> dict[str, t.ContainerValue]:
     """Code analysis configuration for testing."""
     return {
         "analyzers": {
@@ -236,7 +236,7 @@ def code_analysis_config() -> dict[str, t.GeneralValueType]:
 
 
 @pytest.fixture
-def analysis_results() -> list[dict[str, t.GeneralValueType]]:
+def analysis_results() -> list[dict[str, t.ContainerValue]]:
     """Analysis results for testing."""
     return [
         {
@@ -271,7 +271,7 @@ def analysis_results() -> list[dict[str, t.GeneralValueType]]:
 
 # Report generation fixtures
 @pytest.fixture
-def report_config(tmp_path: Path) -> dict[str, t.GeneralValueType]:
+def report_config(tmp_path: Path) -> dict[str, t.ContainerValue]:
     """Report configuration for testing."""
     return {
         "format": "json",
@@ -283,7 +283,7 @@ def report_config(tmp_path: Path) -> dict[str, t.GeneralValueType]:
 
 
 @pytest.fixture
-def dashboard_data() -> dict[str, t.GeneralValueType]:
+def dashboard_data() -> dict[str, t.ContainerValue]:
     """Dashboard data for testing."""
     return {
         "summary": {
@@ -307,7 +307,7 @@ def dashboard_data() -> dict[str, t.GeneralValueType]:
 
 # Multi-backend fixtures
 @pytest.fixture
-def sonarqube_config() -> dict[str, t.GeneralValueType]:
+def sonarqube_config() -> dict[str, t.ContainerValue]:
     """SonarQube configuration for testing."""
     return {
         "host": "http://localhost:9000",
@@ -319,7 +319,7 @@ def sonarqube_config() -> dict[str, t.GeneralValueType]:
 
 
 @pytest.fixture
-def codeclimate_config() -> dict[str, t.GeneralValueType]:
+def codeclimate_config() -> dict[str, t.ContainerValue]:
     """CodeClimate configuration for testing."""
     return {
         "api_token": "test-api-token",
@@ -399,7 +399,7 @@ def test_main() -> None:
 
 # Package discovery fixtures
 @pytest.fixture
-def package_metadata() -> dict[str, t.GeneralValueType]:
+def package_metadata() -> dict[str, t.ContainerValue]:
     """Package metadata for testing."""
     return {
         "name": "test-package",
@@ -421,7 +421,7 @@ def package_metadata() -> dict[str, t.GeneralValueType]:
 
 # Task management fixtures
 @pytest.fixture
-def celery_config() -> dict[str, t.GeneralValueType]:
+def celery_config() -> dict[str, t.ContainerValue]:
     """Celery configuration for testing."""
     return {
         "broker_url": "redis://localhost:6379/0",
@@ -435,7 +435,7 @@ def celery_config() -> dict[str, t.GeneralValueType]:
 
 
 @pytest.fixture
-def analysis_task_data() -> dict[str, t.GeneralValueType]:
+def analysis_task_data() -> dict[str, t.ContainerValue]:
     """Analysis task data for testing."""
     return {
         "task_id": "test-task-123",
@@ -495,7 +495,7 @@ class MockQualityAnalyzer:
         super().__init__()
         self.analyzed_files: list[str] = []
 
-    def analyze_project(self, project_path: str) -> dict[str, t.GeneralValueType]:
+    def analyze_project(self, project_path: str) -> dict[str, t.ContainerValue]:
         """Simulate comprehensive project analysis.
 
         Args:
@@ -513,7 +513,7 @@ class MockQualityAnalyzer:
             "analysis_time": 2.5,
         }
 
-    def analyze_file(self, file_path: str) -> dict[str, t.GeneralValueType]:
+    def analyze_file(self, file_path: str) -> dict[str, t.ContainerValue]:
         """Simulate individual file analysis.
 
         Args:
@@ -530,7 +530,7 @@ class MockQualityAnalyzer:
             "coverage": 90.0,
         }
 
-    def get_metrics(self, _project_path: str) -> dict[str, t.GeneralValueType]:
+    def get_metrics(self, _project_path: str) -> dict[str, t.ContainerValue]:
         """Simulate project-wide quality metrics collection.
 
         Returns:
@@ -585,11 +585,11 @@ class MockReportGenerator:
     def __init__(self) -> None:
         """Initialize the instance."""
         super().__init__()
-        self.generated_reports: list[dict[str, t.GeneralValueType]] = []
+        self.generated_reports: list[dict[str, t.ContainerValue]] = []
 
     def generate_report(
         self,
-        data: dict[str, t.GeneralValueType],
+        data: dict[str, t.ContainerValue],
         output_format: str = "json",
     ) -> str:
         """Simulate report generation in specified format.
@@ -602,7 +602,7 @@ class MockReportGenerator:
             Generated report filename
 
         """
-        report: dict[str, t.GeneralValueType] = {
+        report: dict[str, t.ContainerValue] = {
             "format": output_format,
             "data": data,
             "timestamp": "2023-01-01T12:00:00Z",
@@ -610,7 +610,7 @@ class MockReportGenerator:
         self.generated_reports.append(report)
         return f"report_{len(self.generated_reports)}.{output_format}"
 
-    def generate_dashboard_data(self) -> dict[str, t.GeneralValueType]:
+    def generate_dashboard_data(self) -> dict[str, t.ContainerValue]:
         """Simulate dashboard data generation.
 
         Returns:
