@@ -10,6 +10,7 @@ import sys
 from pathlib import Path
 
 import pytest
+
 from flext_quality import FlextQualityCliService, main
 
 
