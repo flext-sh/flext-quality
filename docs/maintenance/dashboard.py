@@ -22,8 +22,13 @@ class DocumentationDashboard:
         """Initialize documentation dashboard with reports directory."""
         self.reports_dir = Path(reports_dir)
         self.app = Flask(__name__)
-        self._logger_instance: FlextLogger = FlextLogger(__name__)
+        self._logger_instance: FlextLogger = FlextLogger.create_module_logger(__name__)
         self.setup_routes()
+
+    @property
+    def logger(self) -> FlextLogger:
+        """Return the module logger."""
+        return self._logger_instance
 
     def setup_routes(self) -> None:
         """Setup Flask routes for the dashboard."""
@@ -130,7 +135,9 @@ class DocumentationDashboard:
                             .get("high", 0),
                         })
             except Exception as e:
-                self._logger_instance.warning("Failed to process trend data: %s", e)
+                self._logger_instance.warning(
+                    "Failed to process trend data: %s", str(e)
+                )
                 continue
 
         # Sort by date
@@ -167,7 +174,9 @@ class DocumentationDashboard:
                     "files_analyzed": data.get("files_analyzed", 0),
                 })
             except Exception as e:
-                self._logger_instance.warning("Failed to process report file: %s", e)
+                self._logger_instance.warning(
+                    "Failed to process report file: %s", str(e)
+                )
                 continue
 
         # Sort by date descending and limit
