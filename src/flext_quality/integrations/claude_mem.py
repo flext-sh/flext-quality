@@ -39,6 +39,19 @@ class FlextQualityClaudeMemClient:
         """Initialize the Claude Mem client."""
         self._mcp = FlextQualityMcpClient(timeout_ms=timeout_ms)
 
+    def build_get_observations_call(
+        self,
+        ids: list[int],
+    ) -> r[McpToolCall]:
+        """Build a get_observations tool call."""
+        return self._mcp.build_tool_call(
+            self.SERVER_NAME,
+            "get_observations",
+            {
+                "ids": ids,
+            },
+        )
+
     def build_search_call(
         self,
         query: str,
@@ -76,18 +89,16 @@ class FlextQualityClaudeMemClient:
             },
         )
 
-    def build_get_observations_call(
+    def get_observations_command(
         self,
         ids: list[int],
-    ) -> r[McpToolCall]:
-        """Build a get_observations tool call."""
-        return self._mcp.build_tool_call(
-            self.SERVER_NAME,
-            "get_observations",
-            {
-                "ids": ids,
-            },
-        )
+    ) -> r[list[str]]:
+        """Get the mcp-cli command for fetching observations."""
+        call_result = self.build_get_observations_call(ids)
+        if call_result.is_failure:
+            return r[list[str]].fail(call_result.error)
+
+        return self._mcp.build_call_command(call_result.value)
 
     def get_search_command(
         self,
@@ -118,17 +129,6 @@ class FlextQualityClaudeMemClient:
             depth_before=before,
             depth_after=after,
         )
-        if call_result.is_failure:
-            return r[list[str]].fail(call_result.error)
-
-        return self._mcp.build_call_command(call_result.value)
-
-    def get_observations_command(
-        self,
-        ids: list[int],
-    ) -> r[list[str]]:
-        """Get the mcp-cli command for fetching observations."""
-        call_result = self.build_get_observations_call(ids)
         if call_result.is_failure:
             return r[list[str]].fail(call_result.error)
 

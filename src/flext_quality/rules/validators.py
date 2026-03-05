@@ -165,22 +165,17 @@ class FlextQualityValidators:
             self._validators: dict[str, FlextQualityValidators.Base] = {}
             self._register_defaults()
 
-        def _register_defaults(self) -> None:
-            """Register default validators."""
-            self.register(FlextQualityValidators.ForbiddenPattern())
-            self.register(FlextQualityValidators.Tier())
-
-        def register(self, validator: FlextQualityValidators.Base) -> None:
-            """Register a validator."""
-            self._validators[validator.name] = validator
+        def all(self) -> list[FlextQualityValidators.Base]:
+            """Get all registered validators."""
+            return list(self._validators.values())
 
         def get(self, name: str) -> FlextQualityValidators.Base | None:
             """Get validator by name."""
             return self._validators.get(name)
 
-        def all(self) -> list[FlextQualityValidators.Base]:
-            """Get all registered validators."""
-            return list(self._validators.values())
+        def register(self, validator: FlextQualityValidators.Base) -> None:
+            """Register a validator."""
+            self._validators[validator.name] = validator
 
         def validate_all(
             self,
@@ -196,3 +191,8 @@ class FlextQualityValidators:
                     all_violations.extend(result.value)
 
             return r[list[Mapping[str, object]]].ok(all_violations)
+
+        def _register_defaults(self) -> None:
+            """Register default validators."""
+            self.register(FlextQualityValidators.ForbiddenPattern())
+            self.register(FlextQualityValidators.Tier())

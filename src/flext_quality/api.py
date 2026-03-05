@@ -100,6 +100,11 @@ class FlextQuality:
         self.rules_loader = FlextQualityRulesLoader()
 
     @classmethod
+    def _reset_instance(cls) -> None:
+        """Reset singleton instance (for testing)."""
+        cls._instance = None
+
+    @classmethod
     def get_instance(cls) -> FlextQuality:
         """Get singleton FlextQuality instance."""
         if cls._instance is None:
@@ -108,10 +113,77 @@ class FlextQuality:
                     cls._instance = cls()
         return cls._instance
 
-    @classmethod
-    def _reset_instance(cls) -> None:
-        """Reset singleton instance (for testing)."""
-        cls._instance = None
+    # =========================================================================
+    # HOOK OPERATIONS
+    # =========================================================================
+
+    def execute_hook(
+        self,
+        event: str,
+        input_data: t.Quality.HookInput,
+    ) -> r[t.Quality.HookOutput]:
+        """Execute hooks for an event.
+
+        Args:
+            event: Hook event name (e.g., "PreToolUse")
+            input_data: Hook input data
+
+        Returns:
+            r[t.Quality.HookOutput]: Hook execution result or error
+
+        """
+        return self.hooks.execute(event, input_data)
+
+    # =========================================================================
+    # UTILITY OPERATIONS
+    # =========================================================================
+
+    def format_hook_output(
+        self,
+        *,
+        continue_exec: bool = True,
+        message: str | None = None,
+        blocked_reason: str | None = None,
+    ) -> str:
+        """Format hook output for Claude Code.
+
+        Args:
+            continue_exec: Whether to continue execution
+            message: Optional system message
+            blocked_reason: Optional reason for blocking
+
+        Returns:
+            str: JSON-formatted hook output
+
+        """
+        return u.Quality.format_hook_output(
+            continue_exec=continue_exec,
+            message=message,
+            blocked_reason=blocked_reason,
+        )
+
+    def get_hook_config_json(self) -> str:
+        """Get hooks configuration as JSON string."""
+        return self.hooks.get_config_json()
+
+    def get_status(self) -> Mapping[str, object]:
+        """Get quality service status.
+
+        Returns:
+            dict[str, object]: Status information
+
+        """
+        return {
+            "name": self._name,
+            "version": self._version,
+            "config": {
+                "hook_timeout_ms": self.config.hook_timeout_ms,
+                "rule_timeout_seconds": self.config.rule_timeout_seconds,
+                "cache_enabled": self.config.cache_enabled,
+                "mcp_server_port": self.config.mcp_server_port,
+            },
+            "hooks_registered": len(self.hooks.get_config()),
+        }
 
     # =========================================================================
     # RULES OPERATIONS
@@ -148,27 +220,6 @@ class FlextQuality:
 
         return self.rules_loader.load_multiple(yaml_files)
 
-    # =========================================================================
-    # HOOK OPERATIONS
-    # =========================================================================
-
-    def execute_hook(
-        self,
-        event: str,
-        input_data: t.Quality.HookInput,
-    ) -> r[t.Quality.HookOutput]:
-        """Execute hooks for an event.
-
-        Args:
-            event: Hook event name (e.g., "PreToolUse")
-            input_data: Hook input data
-
-        Returns:
-            r[t.Quality.HookOutput]: Hook execution result or error
-
-        """
-        return self.hooks.execute(event, input_data)
-
     def process_stdin_hook(self) -> r[t.Quality.HookOutput]:
         """Process hook input from stdin (for Claude Code hooks).
 
@@ -195,38 +246,6 @@ class FlextQuality:
 
         return self.execute_hook(event, input_data)
 
-    def get_hook_config_json(self) -> str:
-        """Get hooks configuration as JSON string."""
-        return self.hooks.get_config_json()
-
-    # =========================================================================
-    # UTILITY OPERATIONS
-    # =========================================================================
-
-    def format_hook_output(
-        self,
-        *,
-        continue_exec: bool = True,
-        message: str | None = None,
-        blocked_reason: str | None = None,
-    ) -> str:
-        """Format hook output for Claude Code.
-
-        Args:
-            continue_exec: Whether to continue execution
-            message: Optional system message
-            blocked_reason: Optional reason for blocking
-
-        Returns:
-            str: JSON-formatted hook output
-
-        """
-        return u.Quality.format_hook_output(
-            continue_exec=continue_exec,
-            message=message,
-            blocked_reason=blocked_reason,
-        )
-
     # =========================================================================
     # VALIDATION OPERATIONS
     # =========================================================================
@@ -242,25 +261,6 @@ class FlextQuality:
         if threshold_result.is_failure:
             return r[bool].fail(threshold_result.error or "Threshold validation failed")
         return r[bool].ok(value=True)
-
-    def get_status(self) -> Mapping[str, object]:
-        """Get quality service status.
-
-        Returns:
-            dict[str, object]: Status information
-
-        """
-        return {
-            "name": self._name,
-            "version": self._version,
-            "config": {
-                "hook_timeout_ms": self.config.hook_timeout_ms,
-                "rule_timeout_seconds": self.config.rule_timeout_seconds,
-                "cache_enabled": self.config.cache_enabled,
-                "mcp_server_port": self.config.mcp_server_port,
-            },
-            "hooks_registered": len(self.hooks.get_config()),
-        }
 
 
 __all__ = ["FlextQuality"]

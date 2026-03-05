@@ -17,6 +17,11 @@ class BaseHookImpl(ABC):
     event: ClassVar[c.Quality.HookEvent]
     matcher: ClassVar[list[str] | None]
 
+    @abstractmethod
+    def execute(self, input_data: t.Quality.HookInput) -> r[t.Quality.HookOutput]:
+        """Execute the hook logic."""
+        ...
+
     def should_run(self, input_data: t.Quality.HookInput) -> bool:
         """Check if hook should run for this input."""
         if self.matcher is None:
@@ -27,8 +32,3 @@ class BaseHookImpl(ABC):
     def _match_pattern(self, pattern: str, value: str) -> bool:
         """Match pattern against value (supports wildcards)."""
         return fnmatch.fnmatch(value, pattern)
-
-    @abstractmethod
-    def execute(self, input_data: t.Quality.HookInput) -> r[t.Quality.HookOutput]:
-        """Execute the hook logic."""
-        ...

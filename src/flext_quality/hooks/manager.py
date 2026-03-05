@@ -22,14 +22,6 @@ class HookManager:
         self._hooks: dict[c.Quality.HookEvent, list[BaseHookImpl]] = {}
         self._config_path = config_path
 
-    def register(self, hook: BaseHookImpl) -> r[bool]:
-        """Register a hook."""
-        event = hook.event
-        if event not in self._hooks:
-            self._hooks[event] = []
-        self._hooks[event].append(hook)
-        return r[bool].ok(value=True)
-
     def execute(
         self,
         event: str,
@@ -67,3 +59,11 @@ class HookManager:
     def get_config_json(self) -> str:
         """Get hooks configuration as JSON."""
         return json.dumps(self.get_config(), indent=c.Quality.Defaults.JSON_INDENT)
+
+    def register(self, hook: BaseHookImpl) -> r[bool]:
+        """Register a hook."""
+        event = hook.event
+        if event not in self._hooks:
+            self._hooks[event] = []
+        self._hooks[event].append(hook)
+        return r[bool].ok(value=True)

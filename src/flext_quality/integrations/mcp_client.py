@@ -62,25 +62,6 @@ class FlextQualityMcpClient:
         """Initialize the MCP client."""
         self._timeout_ms = timeout_ms or c.Quality.Defaults.MCP_TIMEOUT_MS
 
-    def is_mcp_cli_available(self) -> bool:
-        """Check if mcp-cli is available in PATH."""
-        return shutil.which("mcp-cli") is not None
-
-    def build_tool_call(
-        self,
-        server: str,
-        tool: str,
-        params: dict[str, object] | None = None,
-    ) -> r[McpToolCall]:
-        """Build an MCP tool call request."""
-        return r[McpToolCall].ok(
-            McpToolCall(
-                server=server,
-                tool=tool,
-                params=params or {},
-            ),
-        )
-
     def build_call_command(
         self,
         call: McpToolCall,
@@ -105,6 +86,41 @@ class FlextQualityMcpClient:
 
         tool_path = f"{server}/{tool}"
         return r[list[str]].ok(["mcp-cli", "info", tool_path])
+
+    def build_tool_call(
+        self,
+        server: str,
+        tool: str,
+        params: dict[str, object] | None = None,
+    ) -> r[McpToolCall]:
+        """Build an MCP tool call request."""
+        return r[McpToolCall].ok(
+            McpToolCall(
+                server=server,
+                tool=tool,
+                params=params or {},
+            ),
+        )
+
+    def health_check(self) -> r[Mapping[str, object]]:
+        """Check if MCP infrastructure is available."""
+        available = self.is_mcp_cli_available()
+        status = (
+            c.Quality.IntegrationStatus.CONNECTED
+            if available
+            else c.Quality.IntegrationStatus.DISCONNECTED
+        )
+
+        return r[Mapping[str, object]].ok({
+            "status": status,
+            "available": available,
+            "mcp_cli": available,
+            "timeout_ms": self._timeout_ms,
+        })
+
+    def is_mcp_cli_available(self) -> bool:
+        """Check if mcp-cli is available in PATH."""
+        return shutil.which("mcp-cli") is not None
 
     def parse_result(
         self,
@@ -163,19 +179,3 @@ class FlextQualityMcpClient:
                     error=None,
                 ),
             )
-
-    def health_check(self) -> r[Mapping[str, object]]:
-        """Check if MCP infrastructure is available."""
-        available = self.is_mcp_cli_available()
-        status = (
-            c.Quality.IntegrationStatus.CONNECTED
-            if available
-            else c.Quality.IntegrationStatus.DISCONNECTED
-        )
-
-        return r[Mapping[str, object]].ok({
-            "status": status,
-            "available": available,
-            "mcp_cli": available,
-            "timeout_ms": self._timeout_ms,
-        })

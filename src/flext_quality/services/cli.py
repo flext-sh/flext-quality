@@ -31,11 +31,6 @@ class FlextQualityCliService:
         self._quality = FlextQuality.get_instance()
         self._executor = FlextQualityCodeExecutionBridge()
 
-    def display_status(self) -> r[Mapping[str, object]]:
-        """Display quality service status."""
-        status = self._quality.get_status()
-        return r[Mapping[str, object]].ok(status)
-
     def build_check_commands(self, target_path: Path) -> r[list[list[str]]]:
         """Build commands for quick check (lint + type)."""
         commands: list[list[str]] = []
@@ -88,28 +83,14 @@ class FlextQualityCliService:
 
         return r[list[list[str]]].ok(commands)
 
+    def display_status(self) -> r[Mapping[str, object]]:
+        """Display quality service status."""
+        status = self._quality.get_status()
+        return r[Mapping[str, object]].ok(status)
+
 
 class _CommandHandlers:
     """Command handlers for CLI operations."""
-
-    @staticmethod
-    def handle_status(service: FlextQualityCliService) -> r[int]:
-        """Handle status command."""
-        result = service.display_status()
-        if result.is_failure:
-            service._output.display_message(
-                f"Status failed: {result.error}",
-                message_type="error",
-            )
-            return r[int].ok(1)
-
-        service._output.display_message("flext-quality status", message_type="success")
-        service._output.display_message(
-            f"Version: {c.Quality.Mcp.SERVER_VERSION}",
-            message_type="info",
-        )
-        service._output.print_message(f"Version: {c.Quality.Mcp.SERVER_VERSION}")
-        return r[int].ok(0)
 
     @staticmethod
     def handle_check(service: FlextQualityCliService, target_path: Path) -> r[int]:
@@ -128,6 +109,25 @@ class _CommandHandlers:
         )
         for cmd in result.value:
             service._output.display_message(f"  {' '.join(cmd)}", message_type="info")
+        return r[int].ok(0)
+
+    @staticmethod
+    def handle_status(service: FlextQualityCliService) -> r[int]:
+        """Handle status command."""
+        result = service.display_status()
+        if result.is_failure:
+            service._output.display_message(
+                f"Status failed: {result.error}",
+                message_type="error",
+            )
+            return r[int].ok(1)
+
+        service._output.display_message("flext-quality status", message_type="success")
+        service._output.display_message(
+            f"Version: {c.Quality.Mcp.SERVER_VERSION}",
+            message_type="info",
+        )
+        service._output.print_message(f"Version: {c.Quality.Mcp.SERVER_VERSION}")
         return r[int].ok(0)
 
     @staticmethod

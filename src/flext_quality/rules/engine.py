@@ -21,6 +21,10 @@ class FlextQualityRulesEngine:
         self._rules: list[m.Quality.RuleDefinition] = []
         self._loaded: bool = False
 
+    def get_rules(self) -> list[m.Quality.RuleDefinition]:
+        """Get loaded rules."""
+        return self._rules.copy()
+
     def load_rules(self, rules_path: Path | None = None) -> r[int]:
         """Load rules from YAML file."""
         path = rules_path or self._rules_path
@@ -82,53 +86,6 @@ class FlextQualityRulesEngine:
 
         return r[list[Mapping[str, object]]].ok(violations)
 
-    def get_rules(self) -> list[m.Quality.RuleDefinition]:
-        """Get loaded rules."""
-        return self._rules.copy()
-
-    def _get_files(self, path: Path) -> list[Path]:
-        """Get Python files from path."""
-        if path.is_file():
-            return [path] if path.suffix == ".py" else []
-        return list(path.rglob("*.py"))
-
-    def _validate_file(
-        self,
-        file_path: Path,
-        _context: Mapping[str, object],
-    ) -> list[Mapping[str, object]]:
-        """Validate a single file against rules."""
-        try:
-            content = file_path.read_text(encoding="utf-8")
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
-            return [
-                {
-                    "rule": "file-read-error",
-                    "file": str(file_path),
-                    "message": f"Failed to read file: {e}",
-                    "severity": c.Quality.Severity.ERROR,
-                },
-            ]
-
-        violations: list[Mapping[str, object]] = []
-
-        for rule in self._rules:
-            if not rule.enabled:
-                continue
-
-            rule_violations = self._check_rule(rule, content, str(file_path))
-            violations.extend(rule_violations)
-
-        return violations
-
     def _check_rule(
         self,
         rule: m.Quality.RuleDefinition,
@@ -169,6 +126,12 @@ class FlextQualityRulesEngine:
 
         return violations
 
+    def _get_files(self, path: Path) -> list[Path]:
+        """Get Python files from path."""
+        if path.is_file():
+            return [path] if path.suffix == ".py" else []
+        return list(path.rglob("*.py"))
+
     def _rule_type_to_severity(self, rule_type: c.Quality.RuleType) -> str:
         """Convert rule type to severity."""
         mapping = {
@@ -177,3 +140,40 @@ class FlextQualityRulesEngine:
             c.Quality.RuleType.INFO: c.Quality.Severity.INFO,
         }
         return mapping.get(rule_type, c.Quality.Severity.INFO)
+
+    def _validate_file(
+        self,
+        file_path: Path,
+        _context: Mapping[str, object],
+    ) -> list[Mapping[str, object]]:
+        """Validate a single file against rules."""
+        try:
+            content = file_path.read_text(encoding="utf-8")
+        except (
+            ValueError,
+            TypeError,
+            KeyError,
+            AttributeError,
+            OSError,
+            RuntimeError,
+            ImportError,
+        ) as e:
+            return [
+                {
+                    "rule": "file-read-error",
+                    "file": str(file_path),
+                    "message": f"Failed to read file: {e}",
+                    "severity": c.Quality.Severity.ERROR,
+                },
+            ]
+
+        violations: list[Mapping[str, object]] = []
+
+        for rule in self._rules:
+            if not rule.enabled:
+                continue
+
+            rule_violations = self._check_rule(rule, content, str(file_path))
+            violations.extend(rule_violations)
+
+        return violations

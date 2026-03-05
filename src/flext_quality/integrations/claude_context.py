@@ -39,6 +39,21 @@ class FlextQualityClaudeContextClient:
         """Initialize the Claude Context client."""
         self._mcp = FlextQualityMcpClient(timeout_ms=timeout_ms)
 
+    def build_index_call(
+        self,
+        path: str | None = None,
+    ) -> r[McpToolCall]:
+        """Build an index_codebase tool call."""
+        params: dict[str, object] = {}
+        if path:
+            params["path"] = path
+
+        return self._mcp.build_tool_call(
+            self.SERVER_NAME,
+            "index_codebase",
+            params,
+        )
+
     def build_search_call(
         self,
         query: str,
@@ -56,21 +71,6 @@ class FlextQualityClaudeContextClient:
             },
         )
 
-    def build_index_call(
-        self,
-        path: str | None = None,
-    ) -> r[McpToolCall]:
-        """Build an index_codebase tool call."""
-        params: dict[str, object] = {}
-        if path:
-            params["path"] = path
-
-        return self._mcp.build_tool_call(
-            self.SERVER_NAME,
-            "index_codebase",
-            params,
-        )
-
     def build_status_call(self) -> r[McpToolCall]:
         """Build a get_indexing_status tool call."""
         return self._mcp.build_tool_call(
@@ -78,6 +78,17 @@ class FlextQualityClaudeContextClient:
             "get_indexing_status",
             {},
         )
+
+    def get_index_command(
+        self,
+        path: str | None = None,
+    ) -> r[list[str]]:
+        """Get the mcp-cli command for codebase indexing."""
+        call_result = self.build_index_call(path)
+        if call_result.is_failure:
+            return r[list[str]].fail(call_result.error)
+
+        return self._mcp.build_call_command(call_result.value)
 
     def get_search_command(
         self,
@@ -88,17 +99,6 @@ class FlextQualityClaudeContextClient:
         """Get the mcp-cli command for code search."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_SEARCH_LIMIT
         call_result = self.build_search_call(query, limit=search_limit)
-        if call_result.is_failure:
-            return r[list[str]].fail(call_result.error)
-
-        return self._mcp.build_call_command(call_result.value)
-
-    def get_index_command(
-        self,
-        path: str | None = None,
-    ) -> r[list[str]]:
-        """Get the mcp-cli command for codebase indexing."""
-        call_result = self.build_index_call(path)
         if call_result.is_failure:
             return r[list[str]].fail(call_result.error)
 

@@ -23,45 +23,6 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
         """Quality-specific utilities namespace."""
 
         @staticmethod
-        def read_stdin() -> r[str]:
-            """Read JSON from stdin (for hooks)."""
-            try:
-                data = sys.stdin.read()
-                return r[str].ok(data)
-            except (
-                ValueError,
-                TypeError,
-                KeyError,
-                AttributeError,
-                OSError,
-                RuntimeError,
-                ImportError,
-            ) as e:
-                return r[str].fail(f"Failed to read stdin: {e}")
-
-        @staticmethod
-        def parse_hook_input(raw: str) -> r[t.Quality.HookInput]:
-            """Parse hook input JSON."""
-            try:
-                parsed: object = json.loads(raw)
-                match parsed:
-                    case dict() as hook_input:
-                        coerced_input: t.Quality.HookInput = {
-                            str(k): v
-                            if isinstance(
-                                v,
-                                (str, int, float, bool, type(None), dict, list),
-                            )
-                            else str(v)
-                            for k, v in hook_input.items()
-                        }
-                        return r[t.Quality.HookInput].ok(coerced_input)
-                    case _:
-                        return r[t.Quality.HookInput].fail("Expected JSON object")
-            except json.JSONDecodeError as e:
-                return r[t.Quality.HookInput].fail(f"Invalid JSON: {e}")
-
-        @staticmethod
         def format_hook_output(
             *,
             continue_exec: bool = True,
@@ -107,6 +68,45 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                 ImportError,
             ) as e:
                 return r[list[Mapping[str, object]]].fail(f"Failed to load rules: {e}")
+
+        @staticmethod
+        def parse_hook_input(raw: str) -> r[t.Quality.HookInput]:
+            """Parse hook input JSON."""
+            try:
+                parsed: object = json.loads(raw)
+                match parsed:
+                    case dict() as hook_input:
+                        coerced_input: t.Quality.HookInput = {
+                            str(k): v
+                            if isinstance(
+                                v,
+                                (str, int, float, bool, type(None), dict, list),
+                            )
+                            else str(v)
+                            for k, v in hook_input.items()
+                        }
+                        return r[t.Quality.HookInput].ok(coerced_input)
+                    case _:
+                        return r[t.Quality.HookInput].fail("Expected JSON object")
+            except json.JSONDecodeError as e:
+                return r[t.Quality.HookInput].fail(f"Invalid JSON: {e}")
+
+        @staticmethod
+        def read_stdin() -> r[str]:
+            """Read JSON from stdin (for hooks)."""
+            try:
+                data = sys.stdin.read()
+                return r[str].ok(data)
+            except (
+                ValueError,
+                TypeError,
+                KeyError,
+                AttributeError,
+                OSError,
+                RuntimeError,
+                ImportError,
+            ) as e:
+                return r[str].fail(f"Failed to read stdin: {e}")
 
         @staticmethod
         def run_shell_command(

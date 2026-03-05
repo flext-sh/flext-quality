@@ -68,6 +68,20 @@ class FlextQualityRulesLoader:
 
         return r[list[m.Quality.RuleDefinition]].ok(rules)
 
+    def load_multiple(self, paths: list[Path]) -> r[list[m.Quality.RuleDefinition]]:
+        """Load rules from multiple YAML files."""
+        all_rules: list[m.Quality.RuleDefinition] = []
+
+        for path in paths:
+            result = self.load(path)
+            if result.is_failure:
+                return r[list[m.Quality.RuleDefinition]].fail(
+                    f"Error loading {path}: {result.error}",
+                )
+            all_rules.extend(result.value)
+
+        return r[list[m.Quality.RuleDefinition]].ok(all_rules)
+
     def _parse_rule(
         self,
         data: Mapping[str, object],
@@ -106,17 +120,3 @@ class FlextQualityRulesLoader:
         )
 
         return r[m.Quality.RuleDefinition].ok(rule)
-
-    def load_multiple(self, paths: list[Path]) -> r[list[m.Quality.RuleDefinition]]:
-        """Load rules from multiple YAML files."""
-        all_rules: list[m.Quality.RuleDefinition] = []
-
-        for path in paths:
-            result = self.load(path)
-            if result.is_failure:
-                return r[list[m.Quality.RuleDefinition]].fail(
-                    f"Error loading {path}: {result.error}",
-                )
-            all_rules.extend(result.value)
-
-        return r[list[m.Quality.RuleDefinition]].ok(all_rules)

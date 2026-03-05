@@ -197,6 +197,12 @@ class FlextQualitySettings(FlextSettings):
         description="Reports output directory",
     )
 
+    @classmethod
+    @override
+    def _reset_instance(cls) -> None:
+        """Reset singleton instance (for testing)."""
+        cls._instance = None
+
     # =========================================================================
     # Instance Management
     # =========================================================================
@@ -207,11 +213,20 @@ class FlextQualitySettings(FlextSettings):
             cls._instance = cls()
         return cls._instance
 
-    @classmethod
-    @override
-    def _reset_instance(cls) -> None:
-        """Reset singleton instance (for testing)."""
-        cls._instance = None
+    def get_cache_path(self, base_path: Path | None = None) -> Path:
+        """Get the cache directory path."""
+        base = base_path or Path.cwd()
+        return base / self.cache_dir
+
+    def get_config_path(self, base_path: Path | None = None) -> Path:
+        """Get the config file path."""
+        base = base_path or Path.cwd()
+        return base / self.config_file
+
+    def get_reports_path(self, base_path: Path | None = None) -> Path:
+        """Get the reports directory path."""
+        base = base_path or Path.cwd()
+        return base / self.reports_dir
 
     # =========================================================================
     # Path Resolution
@@ -221,20 +236,13 @@ class FlextQualitySettings(FlextSettings):
         base = base_path or Path.cwd()
         return base / self.rules_dir
 
-    def get_cache_path(self, base_path: Path | None = None) -> Path:
-        """Get the cache directory path."""
+    def validate_paths(self, base_path: Path | None = None) -> r[bool]:
+        """Validate that required paths exist or can be created."""
         base = base_path or Path.cwd()
-        return base / self.cache_dir
-
-    def get_reports_path(self, base_path: Path | None = None) -> Path:
-        """Get the reports directory path."""
-        base = base_path or Path.cwd()
-        return base / self.reports_dir
-
-    def get_config_path(self, base_path: Path | None = None) -> Path:
-        """Get the config file path."""
-        base = base_path or Path.cwd()
-        return base / self.config_file
+        rules_path = base / self.rules_dir
+        if not rules_path.exists():
+            return r[bool].fail(f"Rules directory not found: {rules_path}")
+        return r[bool].ok(value=True)
 
     # =========================================================================
     # Validation
@@ -247,14 +255,6 @@ class FlextQualitySettings(FlextSettings):
         """
         if self.max_function_length > self.max_class_length:
             return r[bool].fail("max_function_length cannot exceed max_class_length")
-        return r[bool].ok(value=True)
-
-    def validate_paths(self, base_path: Path | None = None) -> r[bool]:
-        """Validate that required paths exist or can be created."""
-        base = base_path or Path.cwd()
-        rules_path = base / self.rules_dir
-        if not rules_path.exists():
-            return r[bool].fail(f"Rules directory not found: {rules_path}")
         return r[bool].ok(value=True)
 
 

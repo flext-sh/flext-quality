@@ -66,20 +66,12 @@ class FlextQualityCodeExecutionBridge:
         self._timeout_ms = timeout_ms or c.Quality.Defaults.INTEGRATION_TIMEOUT_MS
         self._working_dir = working_dir or Path.cwd()
 
-    def build_typescript_command(
+    def build_basedpyright_command(
         self,
-        script_path: Path,
-        *,
-        args: list[str] | None = None,
+        target_path: Path,
     ) -> r[list[str]]:
-        """Build command for TypeScript execution via npx tsx."""
-        if not script_path.exists():
-            return r[list[str]].fail(f"Script not found: {script_path}")
-
-        cmd = ["npx", "tsx", str(script_path)]
-        if args:
-            cmd.extend(args)
-
+        """Build command for basedpyright type checker."""
+        cmd = ["basedpyright", "--outputjson", str(target_path.resolve())]
         return r[list[str]].ok(cmd)
 
     def build_python_command(
@@ -112,12 +104,20 @@ class FlextQualityCodeExecutionBridge:
 
         return r[list[str]].ok(cmd)
 
-    def build_basedpyright_command(
+    def build_typescript_command(
         self,
-        target_path: Path,
+        script_path: Path,
+        *,
+        args: list[str] | None = None,
     ) -> r[list[str]]:
-        """Build command for basedpyright type checker."""
-        cmd = ["basedpyright", "--outputjson", str(target_path.resolve())]
+        """Build command for TypeScript execution via npx tsx."""
+        if not script_path.exists():
+            return r[list[str]].fail(f"Script not found: {script_path}")
+
+        cmd = ["npx", "tsx", str(script_path)]
+        if args:
+            cmd.extend(args)
+
         return r[list[str]].ok(cmd)
 
     def create_execution_request(
