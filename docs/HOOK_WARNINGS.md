@@ -602,7 +602,7 @@ ______________________________________________________________________
 
 - **Rule Modification**: See `RULE_MODIFICATION.md` for detailed guide
 - **Dependencies**: See `../README.md` section on dependency rules
-- **Testing**: See `../CLAUDE.md` section on quality gates
+- **Testing**: See `../AGENTS.md` section on quality gates
 
 ______________________________________________________________________
 
