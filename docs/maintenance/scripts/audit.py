@@ -10,17 +10,29 @@ Usage:
     python audit.py --ci-mode --fail-on-errors
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import re
 import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-
-from flext_core import t
+from typing import TypedDict
 
 import requests
 import yaml
+from flext_core import t
+
+
+class _AuditorResults(TypedDict):
+    """Type for DocumentationAuditor.results."""
+
+    timestamp: str
+    files_analyzed: int
+    issues: list[t.ConfigurationMapping]
+    metrics: t.ConfigurationMapping
+    recommendations: list[t.ConfigurationMapping]
 
 
 class DocumentationAuditor:
@@ -35,13 +47,15 @@ class DocumentationAuditor:
         """
         self.config_path = Path(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
-        self.audit_rules = self.get_default_audit_rules()
-        self.style_guide = self.get_default_style_guide()
-        self.validation_config = self.get_default_validation_config()
+        self.audit_rules: t.ConfigurationMapping = self.get_default_audit_rules()
+        self.style_guide: t.ConfigurationMapping = self.get_default_style_guide()
+        self.validation_config: t.ConfigurationMapping = (
+            self.get_default_validation_config()
+        )
         self.load_config()
-        issues_list: list[dict[str, str | int | list[str] | list[dict[str, str]]]] = []
-        recommendations_list: list[dict[str, str | list[str]]] = []
-        self.results = {
+        issues_list: list[t.ConfigurationMapping] = []
+        recommendations_list: list[t.ConfigurationMapping] = []
+        self.results: _AuditorResults = {
             "timestamp": datetime.now(UTC).isoformat(),
             "files_analyzed": 0,
             "issues": issues_list,
@@ -57,7 +71,9 @@ class DocumentationAuditor:
             ) as f:
                 loaded = yaml.safe_load(f)
                 self.audit_rules = (
-                    loaded if isinstance(loaded, dict) else self.get_default_audit_rules()
+                    loaded
+                    if isinstance(loaded, dict)
+                    else self.get_default_audit_rules()
                 )
         except FileNotFoundError:
             self.audit_rules = self.get_default_audit_rules()
@@ -67,7 +83,9 @@ class DocumentationAuditor:
             ) as f:
                 loaded = yaml.safe_load(f)
                 self.style_guide = (
-                    loaded if isinstance(loaded, dict) else self.get_default_style_guide()
+                    loaded
+                    if isinstance(loaded, dict)
+                    else self.get_default_style_guide()
                 )
         except FileNotFoundError:
             self.style_guide = self.get_default_style_guide()
@@ -84,7 +102,7 @@ class DocumentationAuditor:
         except FileNotFoundError:
             self.validation_config = self.get_default_validation_config()
 
-    def get_default_audit_rules(self) -> t.ConfigMap:
+    def get_default_audit_rules(self) -> t.ConfigurationMapping:
         """Default audit rules if config file not found."""
         return {
             "quality_thresholds": {
@@ -107,7 +125,7 @@ class DocumentationAuditor:
             },
         }
 
-    def get_default_style_guide(self) -> t.ConfigMap:
+    def get_default_style_guide(self) -> t.ConfigurationMapping:
         """Default style guide if config file not found."""
         return {
             "markdown": {
@@ -128,7 +146,7 @@ class DocumentationAuditor:
             },
         }
 
-    def get_default_validation_config(self) -> t.ConfigMap:
+    def get_default_validation_config(self) -> t.ConfigurationMapping:
         """Default validation config if config file not found."""
         return {
             "link_validation": {
@@ -180,7 +198,7 @@ class DocumentationAuditor:
         ]
         return any(pattern in str(file_path) for pattern in ignored_patterns)
 
-    def run_comprehensive_audit(self) -> t.ConfigMap:
+    def run_comprehensive_audit(self) -> t.ConfigurationMapping:
         """Run complete documentation audit."""
         doc_files = self.find_documentation_files()
         _ = self.results["files_analyzed"] = len(doc_files)
@@ -507,10 +525,14 @@ class DocumentationAuditor:
         doc_file_names = {str(f.relative_to(self.project_root)) for f in doc_files}
         for link in internal_links:
             url_val = link["url"]
-            target_file = (str(url_val).split("#")[0]) if isinstance(url_val, str) else ""
+            target_file = (
+                (str(url_val).split("#")[0]) if isinstance(url_val, str) else ""
+            )
             if target_file and target_file not in doc_file_names:
                 file_val = link["file"]
-                link_file_dir = Path(str(file_val)).parent if isinstance(file_val, str) else Path(".")
+                link_file_dir = (
+                    Path(str(file_val)).parent if isinstance(file_val, str) else Path()
+                )
                 potential_target = (link_file_dir / target_file).resolve()
                 if not potential_target.exists():
                     _ = self.results["issues"].append({

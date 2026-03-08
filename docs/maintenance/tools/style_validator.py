@@ -5,14 +5,17 @@ Comprehensive style checking and consistency validation for documentation.
 Enforces style guides, formatting standards, and accessibility requirements.
 """
 
+from __future__ import annotations
+
 import json
 import operator
 import re
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 import yaml
+
+from flext_core import t
 
 
 class StyleValidator:
@@ -35,9 +38,9 @@ class StyleValidator:
             config_path: Path to style guide configuration file
 
         """
-        self.config: dict[str, Any] = {}
+        self.config: dict[str, t.ContainerValue] = {}
         self.load_config(config_path)
-        _ = self.results: dict[str, Any] = {
+        _ = self.results: dict[str, t.ContainerValue] = {
             "files_checked": 0,
             "style_violations": [],
             "accessibility_issues": [],
@@ -91,7 +94,7 @@ class StyleValidator:
                 },
             }
 
-    def validate_file(self, file_path: Path) -> dict[str, Any]:
+    def validate_file(self, file_path: Path) -> dict[str, t.ContainerValue]:
         """Validate a single documentation file."""
         try:
             content = file_path.read_text(encoding="utf-8")
@@ -137,7 +140,9 @@ class StyleValidator:
                 "suggestions": [],
             }
 
-    def _check_markdown_formatting(self, content: str) -> list[dict[str, Any]]:
+    def _check_markdown_formatting(
+        self, content: str
+    ) -> list[dict[str, t.ContainerValue]]:
         """Check basic markdown formatting consistency."""
         violations = []
 
@@ -170,7 +175,9 @@ class StyleValidator:
 
         return violations
 
-    def _check_heading_consistency(self, content: str) -> list[dict[str, Any]]:
+    def _check_heading_consistency(
+        self, content: str
+    ) -> list[dict[str, t.ContainerValue]]:
         """Check heading hierarchy and consistency."""
         violations = []
 
@@ -208,7 +215,9 @@ class StyleValidator:
 
         return violations
 
-    def _check_list_consistency(self, content: str) -> list[dict[str, Any]]:
+    def _check_list_consistency(
+        self, content: str
+    ) -> list[dict[str, t.ContainerValue]]:
         """Check list formatting consistency."""
         violations = []
 
@@ -242,7 +251,9 @@ class StyleValidator:
 
         return violations
 
-    def _check_code_formatting(self, content: str) -> list[dict[str, Any]]:
+    def _check_code_formatting(
+        self, content: str
+    ) -> list[dict[str, t.ContainerValue]]:
         """Check code block and inline code formatting."""
         violations = []
 

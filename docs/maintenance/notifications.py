@@ -19,7 +19,6 @@ from typing import TypedDict
 
 import requests
 import yaml
-
 from flext_core import t
 
 # Constants
@@ -47,7 +46,7 @@ class DocumentationNotifier:
             config_path: Path to the notification configuration file.
 
         """
-        self.config: t.ConfigMap = self.get_default_config()
+        self.config: t.ConfigurationMapping = self.get_default_config()
         self.load_config(config_path)
         errors: list[str] = []
         self.results: _NotifierResults = {
@@ -67,7 +66,7 @@ class DocumentationNotifier:
         except FileNotFoundError:
             self.config = self.get_default_config()
 
-    def get_default_config(self) -> t.ConfigMap:
+    def get_default_config(self) -> t.ConfigurationMapping:
         """Default notification configuration."""
         return {
             "enabled": True,
@@ -100,7 +99,7 @@ class DocumentationNotifier:
             "webhook": {"url": "", "headers": {}, "timeout": 10},
         }
 
-    def notify_critical_issues(self, audit_data: t.ConfigMap) -> bool:
+    def notify_critical_issues(self, audit_data: t.ConfigurationMapping) -> bool:
         """Send notification for critical documentation issues."""
         if not self.config["alerts"]["critical_issues"]["enabled"]:
             return True
@@ -140,7 +139,7 @@ Please review recent changes and address any identified issues.
 
         return True
 
-    def notify_broken_links(self, broken_links: list[t.ConfigMap]) -> bool:
+    def notify_broken_links(self, broken_links: list[t.ConfigurationMapping]) -> bool:
         """Send notification for broken links."""
         if not self.config["alerts"]["broken_links"]["enabled"]:
             return True
@@ -154,7 +153,7 @@ Please review recent changes and address any identified issues.
 
         return True
 
-    def notify_weekly_report(self, report_data: t.ConfigMap) -> bool:
+    def notify_weekly_report(self, report_data: t.ConfigurationMapping) -> bool:
         """Send weekly quality report notification."""
         if not self.config["alerts"]["weekly_report"]["enabled"]:
             return True
@@ -163,7 +162,7 @@ Please review recent changes and address any identified issues.
         message = self._format_weekly_report_message(report_data)
         return self.send_notification(title, message, "info")
 
-    def notify_monthly_report(self, report_data: t.ConfigMap) -> bool:
+    def notify_monthly_report(self, report_data: t.ConfigurationMapping) -> bool:
         """Send monthly comprehensive report notification."""
         if not self.config["alerts"]["monthly_report"]["enabled"]:
             return True
@@ -226,13 +225,11 @@ Please review recent changes and address any identified issues.
 
     def _send_email_notification(self, title: str, message: str, priority: str) -> None:
         """Send notification via email."""
-        email_config: t.ConfigMap = self.config["email"]
+        email_config: t.ConfigurationMapping = self.config["email"]
 
         msg = MIMEMultipart()
         msg["From"] = str(email_config["from_address"])
-        msg["To"] = ", ".join(
-            str(x) for x in (email_config.get("to_addresses") or [])
-        )
+        msg["To"] = ", ".join(str(x) for x in (email_config.get("to_addresses") or []))
         msg["Subject"] = f"[{priority.upper()}] {title}"
 
         body = f"""
@@ -268,14 +265,14 @@ Timestamp: {datetime.now(UTC).isoformat()}
 
     def _send_slack_notification(self, title: str, message: str, priority: str) -> None:
         """Send notification to Slack."""
-        slack_config: t.ConfigMap = self.config["slack"]
+        slack_config: t.ConfigurationMapping = self.config["slack"]
 
         color = {"critical": "danger", "warning": "warning", "info": "good"}.get(
             priority,
             "good",
         )
 
-        payload: t.ConfigMap = {
+        payload: t.ConfigurationMapping = {
             "channel": slack_config["channel"],
             "username": slack_config["username"],
             "attachments": [
@@ -303,9 +300,9 @@ Timestamp: {datetime.now(UTC).isoformat()}
         priority: str,
     ) -> None:
         """Send notification via webhook."""
-        webhook_config: t.ConfigMap = self.config["webhook"]
+        webhook_config: t.ConfigurationMapping = self.config["webhook"]
 
-        payload: t.ConfigMap = {
+        payload: t.ConfigurationMapping = {
             "title": title,
             "message": message,
             "priority": priority,
@@ -330,15 +327,17 @@ Timestamp: {datetime.now(UTC).isoformat()}
         )
         response.raise_for_status()
 
-    def _format_critical_issues_message(self, audit_data: t.ConfigMap) -> str:
+    def _format_critical_issues_message(
+        self, audit_data: t.ConfigurationMapping
+    ) -> str:
         """Format message for critical issues notification."""
-        metrics: t.ConfigMap = audit_data.get("metrics") or {}
-        severity_breakdown: t.ConfigMap = metrics.get("severity_breakdown") or {}
+        metrics: t.ConfigurationMapping = audit_data.get("metrics") or {}
+        severity_breakdown: t.ConfigurationMapping = (
+            metrics.get("severity_breakdown") or {}
+        )
 
-        issues: list[t.ConfigMap] = audit_data.get("issues") or []
-        critical_issues = [
-            i for i in issues if i.get("severity") == "critical"
-        ][:5]
+        issues: list[t.ConfigurationMapping] = audit_data.get("issues") or []
+        critical_issues = [i for i in issues if i.get("severity") == "critical"][:5]
 
         message = f"""
 CRITICAL DOCUMENTATION ISSUES DETECTED
@@ -369,7 +368,9 @@ Top Critical Issues:
 
         return message.strip()
 
-    def _format_broken_links_message(self, broken_links: list[t.ConfigMap]) -> str:
+    def _format_broken_links_message(
+        self, broken_links: list[t.ConfigurationMapping]
+    ) -> str:
         """Format message for broken links notification."""
         message = f"""
 BROKEN LINKS DETECTED
@@ -395,13 +396,17 @@ Found {len(broken_links)} broken links that need attention:
 
         return message.strip()
 
-    def _format_weekly_report_message(self, _report_data: t.ConfigMap) -> str:
+    def _format_weekly_report_message(
+        self, _report_data: t.ConfigurationMapping
+    ) -> str:
         """Format message for weekly report notification."""
         # Implementation would depend on weekly report data structure
         # For now, report_data is not used but reserved for future implementation
         return "Weekly documentation quality report is now available. Check the reports dashboard for detailed metrics and trends."
 
-    def _format_monthly_report_message(self, _report_data: t.ConfigMap) -> str:
+    def _format_monthly_report_message(
+        self, _report_data: t.ConfigurationMapping
+    ) -> str:
         """Format message for monthly report notification."""
         # Implementation would depend on monthly report data structure
         return "Monthly comprehensive documentation quality report is now available. Review trends and plan improvements for the next month."
@@ -437,8 +442,8 @@ def main() -> None:
             "info",
         )
         if not success:
-            for _err in notifier.results["errors"]:
-                _ = _err  # consumed
+            for err in notifier.results["errors"]:
+                _ = err  # consumed
     elif args.audit_data:
         # Process audit data and send appropriate notifications
         with Path(args.audit_data).open(encoding="utf-8") as f:

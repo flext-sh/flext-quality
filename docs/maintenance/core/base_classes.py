@@ -25,9 +25,9 @@ class Issue:
     line: int | None = None
     description: str = ""
     recommendation: str = ""
-    context: t.ConfigMap | None = None
+    context: t.ConfigurationMapping | None = None
 
-    def to_dict(self) -> t.ConfigMap:
+    def to_dict(self) -> t.ConfigurationMapping:
         """Convert issue to dictionary representation."""
         return {
             "type": self.type,
@@ -50,8 +50,7 @@ class ValidationResult:
     issues: list[Issue] = field(default_factory=list)
     warnings: list[str] = field(default_factory=list)
     errors: list[str] = field(default_factory=list)
-    metadata: t.ConfigMap = field(default_factory=dict)
-
+    metadata: t.ConfigurationMapping = field(default_factory=dict)
 
     @property
     def success_rate(self) -> float:
@@ -68,7 +67,7 @@ class ValidationResult:
         else:
             self.valid_items += 1
 
-    def to_dict(self) -> t.ConfigMap:
+    def to_dict(self) -> t.ConfigurationMapping:
         """Convert result to dictionary representation."""
         return {
             "total_items": self.total_items,
@@ -128,7 +127,7 @@ class BaseAuditor(ABC):
     def audit(self, files: list[Path]) -> ValidationResult:
         """Perform the audit operation on given files."""
 
-    def get_summary(self) -> t.ConfigMap:
+    def get_summary(self) -> t.ConfigurationMapping:
         """Get a summary of the audit results."""
         return {
             "auditor": self.name,
@@ -168,7 +167,7 @@ class BaseValidator(ABC):
     def _validate_items(self, items: list[t.ContainerValue]) -> None:
         """Implementation-specific validation logic."""
 
-    def get_summary(self) -> t.ConfigMap:
+    def get_summary(self) -> t.ConfigurationMapping:
         """Get a summary of validation results."""
         if not self.results:
             return {"validator": self.name, "status": "not_run"}
@@ -197,7 +196,9 @@ class BaseReporter(ABC):
         self.template_dir = template_dir or Path(__file__).parent.parent / "templates"
 
     @abstractmethod
-    def generate_report(self, data: t.ConfigMap, output_format: str = "html") -> str:
+    def generate_report(
+        self, data: t.ConfigurationMapping, output_format: str = "html"
+    ) -> str:
         """Generate a report from the given data."""
 
     def save_report(self, content: str, filename: str, output_dir: Path) -> Path:
@@ -217,9 +218,11 @@ class BaseAnalyzer(ABC):
     def __init__(self, name: str) -> None:
         """Initialize the analyzer base class with a name."""
         self.name = name
-        self.metrics: t.ConfigMap = {}
+        self.metrics: t.ConfigurationMapping = {}
 
-    def analyze(self, content: str, filepath: Path | None = None) -> t.ConfigMap:
+    def analyze(
+        self, content: str, filepath: Path | None = None
+    ) -> t.ConfigurationMapping:
         """Analyze the given content and return metrics."""
         self.metrics = {
             "analyzer": self.name,
@@ -254,11 +257,13 @@ class BaseAnalyzer(ABC):
 class ConfigProtocol(Protocol):
     """Protocol for configuration objects."""
 
-    def get(self, key: str, default: object | None = None) -> object | None:
+    def get(
+        self, key: str, default: t.ContainerValue | None = None
+    ) -> t.ContainerValue:
         """Get a configuration value."""
         ...
 
-    def __getitem__(self, key: str) -> object | None:
+    def __getitem__(self, key: str) -> t.ContainerValue:
         """Get a configuration value with bracket notation."""
         ...
 
@@ -289,7 +294,7 @@ class FileMetadata:
             # If we can't read the file, keep defaults (file not accessible or not text)
             pass
 
-    def to_dict(self) -> t.ConfigMap:
+    def to_dict(self) -> t.ConfigurationMapping:
         """Convert metadata to dictionary."""
         return {
             "path": str(self.path),

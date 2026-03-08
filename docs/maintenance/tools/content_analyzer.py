@@ -5,14 +5,17 @@ Advanced content quality analysis including readability assessment,
 completeness checking, and structural validation for documentation.
 """
 
+from __future__ import annotations
+
 import json
 import re
 from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 import yaml
+
+from flext_core import t
 
 
 class ContentAnalyzer:
@@ -85,7 +88,7 @@ class ContentAnalyzer:
                 },
             }
 
-    def analyze_file(self, file_path: Path) -> dict[str, Any]:
+    def analyze_file(self, file_path: Path) -> dict[str, t.ContainerValue]:
         """Perform comprehensive content analysis on a single file."""
         try:
             content = file_path.read_text(encoding="utf-8")
@@ -130,7 +133,7 @@ class ContentAnalyzer:
     def _calculate_content_metrics(
         self,
         content: str,
-    ) -> dict[str, Any]:
+    ) -> dict[str, t.ContainerValue]:
         """Calculate basic content metrics."""
         # Word analysis
         words = re.findall(r"\b\w+\b", content)
@@ -195,7 +198,7 @@ class ContentAnalyzer:
             "code_to_content_ratio": code_lines / total_lines if total_lines > 0 else 0,
         }
 
-    def _analyze_readability(self, content: str) -> dict[str, Any]:
+    def _analyze_readability(self, content: str) -> dict[str, t.ContainerValue]:
         """Analyze content readability using various metrics."""
         words = re.findall(r"\b\w+\b", content)
         sentences = re.split(r"[.!?]+", content)
@@ -267,7 +270,7 @@ class ContentAnalyzer:
 
         return count
 
-    def _analyze_structure(self, content: str) -> dict[str, Any]:
+    def _analyze_structure(self, content: str) -> dict[str, t.ContainerValue]:
         """Analyze document structure and organization."""
         structure = {
             "has_table_of_contents": False,
@@ -313,7 +316,7 @@ class ContentAnalyzer:
         structure["depth_analysis"] = {
             "max_depth": max(depths) if depths else 0,
             "avg_depth": sum(depths) / len(depths) if depths else 0,
-            "depth_distribution": dict[str, Any](Counter(depths)),
+            "depth_distribution": dict(Counter(depths)),
         }
 
         return structure
@@ -322,7 +325,7 @@ class ContentAnalyzer:
         self,
         content: str,
         filename: str,
-    ) -> dict[str, Any]:
+    ) -> dict[str, t.ContainerValue]:
         """Check documentation completeness based on file type and content."""
         completeness = {
             "score": 100,
@@ -392,7 +395,7 @@ class ContentAnalyzer:
         self,
         content: str,
         required_sections: list[str],
-    ) -> dict[str, Any]:
+    ) -> dict[str, t.ContainerValue]:
         """Check for required sections in content."""
         result = {"required_sections_present": [], "missing_required_sections": []}
 
@@ -420,7 +423,7 @@ class ContentAnalyzer:
 
     def _calculate_quality_score(
         self,
-        analysis: dict[str, Any],
+        analysis: dict[str, t.ContainerValue],
     ) -> float:
         """Calculate overall quality score for the content."""
         score = 100.0
@@ -458,7 +461,9 @@ class ContentAnalyzer:
 
         return max(0.0, min(100.0, score))
 
-    def _identify_issues(self, analysis: dict[str, Any]) -> list[dict[str, Any]]:
+    def _identify_issues(
+        self, analysis: dict[str, t.ContainerValue]
+    ) -> list[dict[str, t.ContainerValue]]:
         """Identify content issues that need attention."""
         issues = []
 
@@ -505,7 +510,9 @@ class ContentAnalyzer:
 
         return issues
 
-    def _generate_suggestions(self, analysis: dict[str, Any]) -> list[str]:
+    def _generate_suggestions(
+        self, analysis: dict[str, t.ContainerValue]
+    ) -> list[str]:
         """Generate improvement suggestions based on analysis."""
         suggestions = []
 
@@ -539,7 +546,7 @@ class ContentAnalyzer:
 
         return suggestions
 
-    def analyze_files_batch(self, file_paths: list[Path]) -> dict[str, Any]:
+    def analyze_files_batch(self, file_paths: list[Path]) -> dict[str, t.ContainerValue]:
         """Analyze multiple files and aggregate results."""
         for file_path in file_paths:
             self.analyze_file(file_path)
@@ -660,7 +667,7 @@ Top Recommendations:
 def analyze_file_content(
     file_path: str,
     config_path: str | None = None,
-) -> dict[str, Any]:
+) -> dict[str, t.ContainerValue]:
     """Convenience function to analyze a single file."""
     analyzer = ContentAnalyzer(config_path)
     return analyzer.analyze_file(Path(file_path))
@@ -669,7 +676,7 @@ def analyze_file_content(
 def analyze_files_content(
     file_paths: list[str],
     config_path: str | None = None,
-) -> dict[str, Any]:
+) -> dict[str, t.ContainerValue]:
     """Convenience function to analyze multiple files."""
     analyzer = ContentAnalyzer(config_path)
     paths = [Path(fp) for fp in file_paths]

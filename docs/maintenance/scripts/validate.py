@@ -10,6 +10,8 @@ Usage:
     python validate.py --all --verbose
 """
 
+from __future__ import annotations
+
 import argparse
 import concurrent.futures
 import json
@@ -17,10 +19,44 @@ import re
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TypedDict
 
 from flext_core import t
 
 import requests
+
+
+class _LinkValidatorResults(TypedDict):
+    """Type for LinkValidator.results."""
+
+    timestamp: str
+    links_checked: int
+    valid_links: int
+    broken_links: int
+    warnings: int
+    errors: list[t.ConfigurationMapping]
+    warnings_list: list[t.ConfigurationMapping]
+
+
+class _ContentValidatorResults(TypedDict):
+    """Type for ContentValidator.results."""
+
+    timestamp: str
+    files_checked: int
+    content_issues: list[t.ConfigurationMapping]
+    quality_metrics: dict[str, t.ContainerValue]
+
+
+class _ContentMetrics(TypedDict):
+    """Return type for _calculate_content_metrics."""
+
+    word_count: int
+    sentence_count: int
+    avg_words_per_sentence: float
+    readability_score: float
+    has_code_blocks: bool
+    has_lists: bool
+    has_headers: bool
 
 
 class LinkValidator:
@@ -34,7 +70,7 @@ class LinkValidator:
         self.retries = retries
         self.max_workers = max_workers
         self.user_agent = "FLEXT-Quality-Link-Validator/1.0"
-        _ = self.results = {
+        self.results: _LinkValidatorResults = {
             "timestamp": datetime.now(UTC).isoformat(),
             "links_checked": 0,
             "valid_links": 0,
@@ -44,7 +80,7 @@ class LinkValidator:
             "warnings_list": [],
         }
 
-    def find_all_links(self, doc_files: list[Path]) -> list[t.ConfigMap]:
+    def find_all_links(self, doc_files: list[Path]) -> list[t.ConfigurationMapping]:
         """Extract all links from documentation files."""
         all_links = []
         for file_path in doc_files:
@@ -121,8 +157,8 @@ class LinkValidator:
         return None
 
     def validate_external_links(
-        self, links: list[dict], *, verbose: bool = False
-    ) -> dict[str, Any]:
+        self, links: list[t.ConfigurationMapping], *, verbose: bool = False
+    ) -> t.ConfigurationMapping:
         """Validate external links with concurrent checking."""
         external_links = [link for link in links if link["type"] == "external"]
         if not external_links:
@@ -146,13 +182,13 @@ class LinkValidator:
 
     def _create_link_result(
         self,
-        link: dict,
+        link: t.ConfigurationMapping,
         *,
         valid: bool,
         url: str,
         status_code: int | None = None,
         error: str | None = None,
-    ) -> dict[str, Any]:
+    ) -> t.ConfigurationMapping:
         """Create a standardized link validation result."""
         result = {
             "valid": valid,
@@ -182,7 +218,7 @@ class LinkValidator:
 
     def _handle_request_attempt(
         self, url: str, attempt: int
-    ) -> tuple[bool, dict[str, Any] | None]:
+    ) -> tuple[bool, t.ConfigurationMapping | None]:
         """Handle a single request attempt."""
         try:
             response = self._make_http_request(url)
@@ -210,8 +246,8 @@ class LinkValidator:
         return (False, None)
 
     def _check_single_external_link(
-        self, link: dict, *, verbose: bool = False
-    ) -> dict[str, Any]:
+        self, link: t.ConfigurationMapping, *, verbose: bool = False
+    ) -> t.ConfigurationMapping:
         """Check a single external link."""
         _ = verbose
         url = link["url"]
@@ -224,8 +260,8 @@ class LinkValidator:
         )
 
     def validate_internal_links(
-        self, links: list[dict], doc_files: list[Path]
-    ) -> dict[str, Any]:
+        self, links: list[t.ConfigurationMapping], doc_files: list[Path]
+    ) -> t.ConfigurationMapping:
         """Validate internal links and references."""
         internal_links = [
             link for link in links if link["type"] in {"internal", "reference"}
@@ -278,7 +314,7 @@ class LinkValidator:
             return base_dir.parent / target[3:]
         return Path(target)
 
-    def validate_images(self, links: list[dict], project_root: Path) -> dict[str, Any]:
+    def validate_images(self, links: list[t.ConfigurationMapping], project_root: Path) -> t.ConfigurationMapping:
         """Validate image references."""
         images = [link for link in links if link["type"] == "image"]
         for image in images:
@@ -307,8 +343,8 @@ class LinkValidator:
         return self.results
 
     def validate_anchors(
-        self, links: list[dict], doc_files: list[Path]
-    ) -> dict[str, Any]:
+        self, links: list[t.ConfigurationMapping], doc_files: list[Path]
+    ) -> t.ConfigurationMapping:
         """Validate anchor links within documents."""
         anchor_links = [link for link in links if link["type"] == "anchor"]
         file_anchors = {}
@@ -353,7 +389,7 @@ class LinkValidator:
         anchor = re.sub("[^\\w\\s-]", "", anchor)
         return re.sub("\\s+", "-", anchor)
 
-    def check_link_text_quality(self, links: list[dict]) -> dict[str, Any]:
+    def check_link_text_quality(self, links: list[t.ConfigurationMapping]) -> t.ConfigurationMapping:
         """Check quality of link text for accessibility and usability."""
         poor_link_texts = [
             "here",
@@ -408,14 +444,14 @@ class ContentValidator:
 
     def __init__(self) -> None:
         """Initialize the content validator."""
-        _ = self.results = {
+        self.results: _ContentValidatorResults = {
             "timestamp": datetime.now(UTC).isoformat(),
             "files_checked": 0,
             "content_issues": [],
             "quality_metrics": {},
         }
 
-    def validate_markdown_syntax(self, doc_files: list[Path]) -> dict[str, Any]:
+    def validate_markdown_syntax(self, doc_files: list[Path]) -> _ContentValidatorResults:
         """Validate markdown syntax and formatting."""
         for file_path in doc_files:
             file_rel_path = str(file_path)
@@ -436,7 +472,7 @@ class ContentValidator:
                 })
         return self.results
 
-    def _check_markdown_issues(self, content: str) -> list[dict]:
+    def _check_markdown_issues(self, content: str) -> list[t.ConfigurationMapping]:
         """Check for markdown syntax issues."""
         issues = []
         lines = content.split("\n")
@@ -466,7 +502,7 @@ class ContentValidator:
                 })
         return issues
 
-    def check_content_quality(self, doc_files: list[Path]) -> dict[str, Any]:
+    def check_content_quality(self, doc_files: list[Path]) -> _ContentValidatorResults:
         """Check content quality metrics."""
         for file_path in doc_files:
             file_rel_path = str(file_path)
@@ -497,7 +533,7 @@ class ContentValidator:
                 })
         return self.results
 
-    def _calculate_content_metrics(self, content: str) -> dict[str, Any]:
+    def _calculate_content_metrics(self, content: str) -> _ContentMetrics:
         """Calculate basic content quality metrics."""
         words = re.findall("\\b\\w+\\b", content)
         sentences = re.split(r"[.!?]+", content)
@@ -566,7 +602,7 @@ def _create_validation_parser() -> argparse.ArgumentParser:
 def _discover_validation_files() -> list[Path]:
     """Discover documentation files for validation."""
     project_root = Path(__file__).parent.parent.parent.parent
-    doc_files = []
+    doc_files: list[Path] = []
     for pattern in [
         "**/*.md",
         "**/*.mdx",
@@ -575,11 +611,16 @@ def _discover_validation_files() -> list[Path]:
         "**/docs/**/*.mdx",
     ]:
         doc_files.extend(project_root.glob(pattern))
-    doc_files = list(set(doc_files))
+    seen: set[Path] = set()
+    unique: list[Path] = []
+    for f in doc_files:
+        if f not in seen:
+            seen.add(f)
+            unique.append(f)
     ignored_patterns = [".git", "__pycache__", "node_modules", ".serena/memories"]
     return [
         f
-        for f in doc_files
+        for f in unique
         if not any(pattern in str(f) for pattern in ignored_patterns)
     ]
 
@@ -587,7 +628,7 @@ def _discover_validation_files() -> list[Path]:
 def _execute_validations(
     link_validator: LinkValidator,
     content_validator: ContentValidator,
-    all_links: list[dict],
+    all_links: list[t.ConfigurationMapping],
     doc_files: list[Path],
     args: argparse.Namespace,
 ) -> bool:
@@ -635,9 +676,7 @@ def main() -> None:
         sys.exit(1)
     link_errors = link_validator.results.get("errors", [])
     content_issues = content_validator.results.get("content_issues", [])
-    total_errors = (len(link_errors) if isinstance(link_errors, list) else 0) + (
-        len(content_issues) if isinstance(content_issues, list) else 0
-    )
+    total_errors = len(link_errors) + len(content_issues)
     link_validator.save_report(args.output)
     if total_errors > 0:
         sys.exit(1)

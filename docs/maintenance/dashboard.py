@@ -13,7 +13,6 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from flask import Flask, Response, jsonify, render_template_string, request
-
 from flext_core import FlextLogger, t
 
 
@@ -57,7 +56,7 @@ class DocumentationDashboard:
             limit = int(request.args.get("limit", 10))
             return jsonify(self.get_recent_reports(limit))
 
-    def get_current_metrics(self) -> t.ConfigMap:
+    def get_current_metrics(self) -> t.ConfigurationMapping:
         """Get current quality metrics from latest audit."""
         latest_audit = self.reports_dir / "latest_audit.json"
 
@@ -95,11 +94,11 @@ class DocumentationDashboard:
                 "status": f"Error: {e!s}",
             }
 
-    def get_quality_trends(self, days: int = 30) -> t.ConfigMap:
+    def get_quality_trends(self, days: int = 30) -> t.ConfigurationMapping:
         """Get quality trends over the specified number of days."""
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
 
-        trend_data: list[t.ConfigMap] = []
+        trend_data: list[t.ConfigurationMapping] = []
         reports_dir = self.reports_dir
 
         # Find all audit reports
@@ -119,23 +118,23 @@ class DocumentationDashboard:
                         data = json.load(f)
                     trend_data.append({
                         "date": report_date.isoformat(),
-                            "quality_score": data.get("metrics", {}).get(
-                                "quality_score",
-                                0,
-                            ),
-                            "total_issues": data.get("metrics", {}).get(
-                                "total_issues",
-                                0,
-                            ),
-                            "critical_issues": data
-                            .get("metrics", {})
-                            .get("severity_breakdown", {})
-                            .get("critical", 0),
-                            "high_issues": data
-                            .get("metrics", {})
-                            .get("severity_breakdown", {})
-                            .get("high", 0),
-                        })
+                        "quality_score": data.get("metrics", {}).get(
+                            "quality_score",
+                            0,
+                        ),
+                        "total_issues": data.get("metrics", {}).get(
+                            "total_issues",
+                            0,
+                        ),
+                        "critical_issues": data
+                        .get("metrics", {})
+                        .get("severity_breakdown", {})
+                        .get("critical", 0),
+                        "high_issues": data
+                        .get("metrics", {})
+                        .get("severity_breakdown", {})
+                        .get("high", 0),
+                    })
             except Exception as e:
                 self._logger_instance.warning(
                     "Failed to process trend data: %s", str(e)
@@ -151,9 +150,9 @@ class DocumentationDashboard:
             "trends": trend_data,
         }
 
-    def get_recent_reports(self, limit: int = 10) -> list[t.ConfigMap]:
+    def get_recent_reports(self, limit: int = 10) -> list[t.ConfigurationMapping]:
         """Get list of recent audit reports."""
-        reports: list[t.ConfigMap] = []
+        reports: list[t.ConfigurationMapping] = []
 
         for report_file in self.reports_dir.glob("audit_report_*.json"):
             try:

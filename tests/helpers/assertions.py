@@ -42,21 +42,25 @@ def assert_issues_structure(issues: t.ContainerValue) -> None:
     assert isinstance(issues, list), f"Expected list, got {type(issues).__name__}"
 
 
-def assert_analysis_results_structure(
-    results: Mapping[str, t.ContainerValue]
-) -> None:
+def assert_analysis_results_structure(results: Mapping[str, t.ContainerValue]) -> None:
     """Assert that analysis results have expected structure."""
     assert isinstance(results, dict), f"Expected dict, got {type(results).__name__}"
 
 
 def safe_dict_access(
-    data: Mapping[str, Any], key: str, default: object = None
-) -> object:
+    data: Mapping[str, t.ContainerValue],
+    key: str,
+    default: t.ContainerValue | None = None,
+) -> t.ContainerValue | None:
     """Safely access a dict key with a default value."""
     return data.get(key, default)
 
 
-def safe_list_access(data: Sequence[Any], index: int, default: object = None) -> object:
+def safe_list_access(
+    data: Sequence[t.ContainerValue],
+    index: int,
+    default: t.ContainerValue | None = None,
+) -> t.ContainerValue | None:
     """Safely access a list index with a default value."""
     try:
         return data[index]

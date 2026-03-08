@@ -14,7 +14,7 @@ import shlex
 import sys
 import threading
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TypedDict
@@ -22,18 +22,28 @@ from typing import TypedDict
 import pytest
 import schedule
 import yaml
+from flext_core import t
 from git import InvalidGitRepositoryError, Repo
 
-from flext_core import t
 
-
-class _ScheduleResults(TypedDict):
-    """Type for ScheduledMaintenance.results."""
+class _ScheduleResultsRequired(TypedDict):
+    """Required keys for ScheduledMaintenance.results."""
 
     start_time: str
     tasks_completed: int
     errors: list[str]
     warnings: list[str]
+
+
+class _ScheduleResultsOptional(TypedDict, total=False):
+    """Optional keys added by save_results."""
+
+    end_time: str
+    duration_seconds: int
+
+
+class _ScheduleResults(_ScheduleResultsRequired, _ScheduleResultsOptional):
+    """Type for ScheduledMaintenance.results."""
 
 
 class ScheduledMaintenance:
@@ -77,13 +87,13 @@ class ScheduledMaintenance:
         try:
             with Path(config_path).open(encoding="utf-8") as f:
                 loaded = yaml.safe_load(f)
-                self.config: t.ConfigMap = (
+                self.config: t.ConfigurationMapping = (
                     loaded if isinstance(loaded, dict) else self.get_default_config()
                 )
         except FileNotFoundError:
             self.config = self.get_default_config()
 
-    def get_default_config(self) -> t.ConfigMap:
+    def get_default_config(self) -> t.ConfigurationMapping:
         """Default maintenance configuration."""
         return {
             "enabled": True,
@@ -195,8 +205,8 @@ class ScheduledMaintenance:
 
     def _get_task_names(self, schedule_key: str) -> list[str]:
         """Extract task name list from config for a schedule key."""
-        schedules: t.ConfigMap = self.config.get("schedules") or {}
-        schedule_entry: t.ConfigMap = schedules.get(schedule_key) or {}
+        schedules: t.ConfigurationMapping = self.config.get("schedules") or {}
+        schedule_entry: t.ConfigurationMapping = schedules.get(schedule_key) or {}
         raw = schedule_entry.get("tasks")
         if isinstance(raw, (list, tuple)):
             return [str(t) for t in raw]
@@ -223,21 +233,24 @@ class ScheduledMaintenance:
         success = True
 
         for task_name in task_names:
-            if task_name in self.config["tasks"]:
-                task_config = self.config["tasks"][task_name]
+            tasks_map = self.config.get("tasks")
+            if isinstance(tasks_map, Mapping) and task_name in tasks_map:
+                task_cfg = tasks_map[task_name]
+                if isinstance(task_cfg, Mapping):
+                    if self.run_single_task(task_cfg):
+                        self.results["tasks_completed"] += 1
+                    else:
+                        self.results["errors"].append(f"Task {task_name} failed")
+                        success = False
 
-                if self.run_single_task(task_config):
-                    self.results["tasks_completed"] += 1
-                else:
-                    self.results["errors"].append(f"Task {task_name} failed")
-                    success = False
-
-                    if self.config["error_handling"]["fail_fast"]:
-                        break
+                    if isinstance(self.config.get("error_handling"), Mapping):
+                        eh = self.config["error_handling"]
+                        if eh.get("fail_fast"):
+                            break
 
         return success
 
-    def run_single_task(self, task_config: t.ConfigMap) -> bool:
+    def run_single_task(self, task_config: t.ConfigurationMapping) -> bool:
         """Run a single maintenance task using appropriate Python libraries."""
         try:
             command_raw = task_config.get("command")
@@ -245,11 +258,7 @@ class ScheduledMaintenance:
             description_raw = task_config.get("description")
             description = str(description_raw) if description_raw is not None else ""
             timeout_val = task_config.get("timeout", 300)
-            timeout = (
-                int(timeout_val)
-                if isinstance(timeout_val, (int, float))
-                else 300
-            )
+            timeout = int(timeout_val) if isinstance(timeout_val, (int, float)) else 300
 
             # Parse command to determine type
             cmd_parts = shlex.split(command) if command else []
@@ -385,11 +394,7 @@ class ScheduledMaintenance:
 
             # Parse make command
             empty_targets: list[str] = []
-            targets = (
-                cmd_parts[1:]
-                if len(cmd_parts) > 1
-                else empty_targets
-            )
+            targets = cmd_parts[1:] if len(cmd_parts) > 1 else empty_targets
 
             # Execute make target by reading Makefile and running corresponding command
             if not targets:
@@ -453,7 +458,9 @@ class ScheduledMaintenance:
             )
             return False
         except Exception as e:
-            _ = self.results["errors"].append(f"Git command failed in {description}: {e!s}")
+            _ = self.results["errors"].append(
+                f"Git command failed in {description}: {e!s}"
+            )
             return False
 
     def _handle_echo_command(
@@ -484,7 +491,10 @@ class ScheduledMaintenance:
     ) -> bool:
         """Run a function with timeout using threading."""
         try:
-            result_container: dict[str, Any] = {"success": False, "exception": None}
+            result_container: dict[str, bool | Exception | None] = {
+                "success": False,
+                "exception": None,
+            }
 
             def run_with_result() -> None:
                 try:
