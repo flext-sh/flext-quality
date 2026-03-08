@@ -10,8 +10,6 @@ if TYPE_CHECKING:
     from flext_quality.rules.engine import FlextQualityRulesEngine
     from flext_quality.rules.loader import FlextQualityRulesLoader
     from flext_quality.rules.validators import FlextQualityValidators
-
-# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextQualityRulesEngine": (
         "flext_quality.rules.engine",
@@ -26,7 +24,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "FlextQualityValidators",
     ),
 }
-
 __all__ = [
     "FlextQualityRulesEngine",
     "FlextQualityRulesLoader",
@@ -34,7 +31,7 @@ __all__ = [
 ]
 
 
-def __getattr__(name: str) -> Any:  # noqa: ANN401
+def __getattr__(name: str) -> Any:
     """Lazy-load module attributes on first access (PEP 562)."""
     return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
 

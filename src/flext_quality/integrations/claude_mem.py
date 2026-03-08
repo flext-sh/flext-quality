@@ -15,10 +15,7 @@ from typing import final
 from flext_core import r
 
 from flext_quality import c
-from flext_quality.integrations.mcp_client import (
-    FlextQualityMcpClient,
-    McpToolCall,
-)
+from flext_quality.integrations.mcp_client import FlextQualityMcpClient, McpToolCall
 
 
 @final
@@ -31,42 +28,23 @@ class FlextQualityClaudeMemClient:
 
     SERVER_NAME = "claude-mem"
 
-    def __init__(
-        self,
-        *,
-        timeout_ms: int | None = None,
-    ) -> None:
+    def __init__(self, *, timeout_ms: int | None = None) -> None:
         """Initialize the Claude Mem client."""
         self._mcp = FlextQualityMcpClient(timeout_ms=timeout_ms)
 
-    def build_get_observations_call(
-        self,
-        ids: list[int],
-    ) -> r[McpToolCall]:
+    def build_get_observations_call(self, ids: list[int]) -> r[McpToolCall]:
         """Build a get_observations tool call."""
         return self._mcp.build_tool_call(
-            self.SERVER_NAME,
-            "get_observations",
-            {
-                "ids": ids,
-            },
+            self.SERVER_NAME, "get_observations", {"ids": ids}
         )
 
     def build_search_call(
-        self,
-        query: str,
-        *,
-        limit: int | None = None,
+        self, query: str, *, limit: int | None = None
     ) -> r[McpToolCall]:
         """Build a search tool call."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
         return self._mcp.build_tool_call(
-            self.SERVER_NAME,
-            "search",
-            {
-                "query": query,
-                "limit": search_limit,
-            },
+            self.SERVER_NAME, "search", {"query": query, "limit": search_limit}
         )
 
     def build_timeline_call(
@@ -82,36 +60,24 @@ class FlextQualityClaudeMemClient:
         return self._mcp.build_tool_call(
             self.SERVER_NAME,
             "timeline",
-            {
-                "anchor": anchor,
-                "depth_before": before,
-                "depth_after": after,
-            },
+            {"anchor": anchor, "depth_before": before, "depth_after": after},
         )
 
-    def get_observations_command(
-        self,
-        ids: list[int],
-    ) -> r[list[str]]:
+    def get_observations_command(self, ids: list[int]) -> r[list[str]]:
         """Get the mcp-cli command for fetching observations."""
         call_result = self.build_get_observations_call(ids)
         if call_result.is_failure:
             return r[list[str]].fail(call_result.error)
-
         return self._mcp.build_call_command(call_result.value)
 
     def get_search_command(
-        self,
-        query: str,
-        *,
-        limit: int | None = None,
+        self, query: str, *, limit: int | None = None
     ) -> r[list[str]]:
         """Get the mcp-cli command for memory search."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
         call_result = self.build_search_call(query, limit=search_limit)
         if call_result.is_failure:
             return r[list[str]].fail(call_result.error)
-
         return self._mcp.build_call_command(call_result.value)
 
     def get_timeline_command(
@@ -125,13 +91,10 @@ class FlextQualityClaudeMemClient:
         before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
         call_result = self.build_timeline_call(
-            anchor,
-            depth_before=before,
-            depth_after=after,
+            anchor, depth_before=before, depth_after=after
         )
         if call_result.is_failure:
             return r[list[str]].fail(call_result.error)
-
         return self._mcp.build_call_command(call_result.value)
 
     def health_check(self) -> r[Mapping[str, object]]:
@@ -139,14 +102,12 @@ class FlextQualityClaudeMemClient:
         mcp_health = self._mcp.health_check()
         if mcp_health.is_failure:
             return r[Mapping[str, object]].fail(mcp_health.error)
-
         health_data = mcp_health.value
         status = (
             c.Quality.IntegrationStatus.CONNECTED
             if health_data.get("available", False)
             else c.Quality.IntegrationStatus.DISCONNECTED
         )
-
         return r[Mapping[str, object]].ok({
             "server": self.SERVER_NAME,
             "status": status,

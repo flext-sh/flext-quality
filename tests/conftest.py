@@ -85,7 +85,6 @@ def assert_result_failure_with_error[T](result: FlextResult[T]) -> str:
     return result.error
 
 
-# Test environment setup
 @pytest.fixture(autouse=True)
 def set_test_environment() -> Generator[None]:
     """Configure test environment variables for isolated testing.
@@ -106,12 +105,10 @@ def set_test_environment() -> Generator[None]:
     os.environ["FLEXT_ENV"] = "test"
     os.environ["FLEXT_LOG_LEVEL"] = "DEBUG"
     yield
-    # Cleanup
     os.environ.pop("FLEXT_ENV", None)
     os.environ.pop("FLEXT_LOG_LEVEL", None)
 
 
-# Quality analysis fixtures
 @pytest.fixture
 def secure_temp_dir() -> Generator[str]:
     """Provide secure temporary directory for file system testing.
@@ -169,11 +166,7 @@ def sample_code_repository(tmp_path: Path) -> dict[str, t.ContainerValue]:
         "name": "test-repository",
         "path": str(tmp_path / "test-repo"),
         "language": "python",
-        "files": [
-            "src/main.py",
-            "src/utils.py",
-            "tests/test_main.py",
-        ],
+        "files": ["src/main.py", "src/utils.py", "tests/test_main.py"],
         "size": 1024,
         "last_modified": "2023-01-01T12:00:00Z",
     }
@@ -183,26 +176,10 @@ def sample_code_repository(tmp_path: Path) -> dict[str, t.ContainerValue]:
 def quality_metrics_data() -> dict[str, t.ContainerValue]:
     """Quality metrics data for testing."""
     return {
-        "complexity": {
-            "cyclomatic": 5.2,
-            "cognitive": 3.8,
-            "average": 4.5,
-        },
-        "maintainability": {
-            "index": 78.5,
-            "rating": "A",
-            "debt_ratio": 0.15,
-        },
-        "coverage": {
-            "line": 85.0,
-            "branch": 78.5,
-            "function": 92.0,
-        },
-        "security": {
-            "vulnerabilities": 2,
-            "hotspots": 1,
-            "rating": "B",
-        },
+        "complexity": {"cyclomatic": 5.2, "cognitive": 3.8, "average": 4.5},
+        "maintainability": {"index": 78.5, "rating": "A", "debt_ratio": 0.15},
+        "coverage": {"line": 85.0, "branch": 78.5, "function": 92.0},
+        "security": {"vulnerabilities": 2, "hotspots": 1, "rating": "B"},
     }
 
 
@@ -216,22 +193,10 @@ def code_analysis_config() -> dict[str, t.ContainerValue]:
                 "config_file": "pyproject.toml",
                 "rules": ["E", "W", "F"],
             },
-            "mypy": {
-                "enabled": True,
-                "strict": True,
-                "ignore_missing_imports": False,
-            },
-            "bandit": {
-                "enabled": True,
-                "confidence": "medium",
-                "severity": "low",
-            },
+            "mypy": {"enabled": True, "strict": True, "ignore_missing_imports": False},
+            "bandit": {"enabled": True, "confidence": "medium", "severity": "low"},
         },
-        "thresholds": {
-            "complexity": 10,
-            "coverage": 80.0,
-            "maintainability": 70.0,
-        },
+        "thresholds": {"complexity": 10, "coverage": 80.0, "maintainability": 70.0},
     }
 
 
@@ -269,7 +234,6 @@ def analysis_results() -> list[dict[str, t.ContainerValue]]:
     ]
 
 
-# Report generation fixtures
 @pytest.fixture
 def report_config(tmp_path: Path) -> dict[str, t.ContainerValue]:
     """Report configuration for testing."""
@@ -305,7 +269,6 @@ def dashboard_data() -> dict[str, t.ContainerValue]:
     }
 
 
-# Multi-backend fixtures
 @pytest.fixture
 def sonarqube_config() -> dict[str, t.ContainerValue]:
     """SonarQube configuration for testing."""
@@ -329,7 +292,6 @@ def codeclimate_config() -> dict[str, t.ContainerValue]:
     }
 
 
-# File system fixtures
 @pytest.fixture
 def temporary_project_structure(tmp_path: Path) -> str:
     """Create realistic temporary project structure for integration testing.
@@ -363,41 +325,25 @@ def temporary_project_structure(tmp_path: Path) -> str:
     """
     project_dir = tmp_path / "test_project"
     project_dir.mkdir()
-    # Create source files
     src_dir = project_dir / "src"
     src_dir.mkdir()
     main_py = src_dir / "main.py"
-    main_py.write_text("""
-def main() -> int:
-    print("Hello, World!")
-    return 0
-if __name__ == "__main__":
-    main()
-""")
-
+    main_py.write_text(
+        '\ndef main() -> int:\n    print("Hello, World!")\n    return 0\nif __name__ == "__main__":\n    main()\n'
+    )
     utils_py = src_dir / "utils.py"
-    utils_py.write_text("""
-
-import sys
-def get_env_var(name: str) -> Union[str, None]:
-    return os.environ.get(name)
-""")
-    # Create test files
+    utils_py.write_text(
+        "\n\nimport sys\ndef get_env_var(name: str) -> Union[str, None]:\n    return os.environ.get(name)\n"
+    )
     tests_dir = project_dir / "tests"
     tests_dir.mkdir()
     test_main_py = tests_dir / "test_main.py"
-    test_main_py.write_text("""
-
-from src.main import main
-def test_main() -> None:
-    if main() != 0:
-      raise AssertionError(f"Expected {0}, got {main()}")
-""")
-
+    test_main_py.write_text(
+        '\n\nfrom src.main import main\ndef test_main() -> None:\n    if main() != 0:\n      raise AssertionError(f"Expected {0}, got {main()}")\n'
+    )
     return str(project_dir)
 
 
-# Package discovery fixtures
 @pytest.fixture
 def package_metadata() -> dict[str, t.ContainerValue]:
     """Package metadata for testing."""
@@ -406,20 +352,11 @@ def package_metadata() -> dict[str, t.ContainerValue]:
         "version": "0.9.0",
         "description": "Test package for quality analysis",
         "author": "Test Author",
-        "dependencies": [
-            "requests>=2.25.0",
-            "pandas>=1.3.0",
-            "pytest>=6.0.0",
-        ],
-        "dev_dependencies": [
-            "ruff>=0.1.0",
-            "mypy>=1.0.0",
-            "coverage>=6.0.0",
-        ],
+        "dependencies": ["requests>=2.25.0", "pandas>=1.3.0", "pytest>=6.0.0"],
+        "dev_dependencies": ["ruff>=0.1.0", "mypy>=1.0.0", "coverage>=6.0.0"],
     }
 
 
-# Task management fixtures
 @pytest.fixture
 def celery_config() -> dict[str, t.ContainerValue]:
     """Celery configuration for testing."""
@@ -449,7 +386,6 @@ def analysis_task_data() -> dict[str, t.ContainerValue]:
     }
 
 
-# Pytest markers for test categorization
 def pytest_configure(config: pytest.Config) -> None:
     """Configure pytest markers for test categorization and execution control.
 
@@ -482,7 +418,6 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line("markers", "slow: Slow tests")
 
 
-# Mock services
 class MockQualityAnalyzer:
     """Mock implementation of quality analyzer for testing.
 
@@ -523,12 +458,7 @@ class MockQualityAnalyzer:
             File-level quality metrics and statistics
 
         """
-        return {
-            "file": file_path,
-            "complexity": 3.2,
-            "issues": 2,
-            "coverage": 90.0,
-        }
+        return {"file": file_path, "complexity": 3.2, "issues": 2, "coverage": 90.0}
 
     def get_metrics(self, _project_path: str) -> dict[str, t.ContainerValue]:
         """Simulate project-wide quality metrics collection.
@@ -588,9 +518,7 @@ class MockReportGenerator:
         self.generated_reports: list[dict[str, t.ContainerValue]] = []
 
     def generate_report(
-        self,
-        data: dict[str, t.ContainerValue],
-        output_format: str = "json",
+        self, data: dict[str, t.ContainerValue], output_format: str = "json"
     ) -> str:
         """Simulate report generation in specified format.
 

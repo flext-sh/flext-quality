@@ -20,11 +20,6 @@ class TestsConstants(FlextQualityConstants):
     expose the full hierarchy without duplication.
     """
 
-    # Test-specific constants can be added here as nested classes
-    # All parent constants are accessible via inheritance
 
-
-# Standardized short name for use in tests (same pattern as flext-core)
 c = TestsConstants
-
 __all__ = ["TestsConstants", "c"]

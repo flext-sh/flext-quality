@@ -6,7 +6,6 @@ from fastmcp import FastMCP
 
 from flext_quality import c
 
-# Initialize FastMCP server
 mcp = FastMCP(name=c.Quality.Mcp.SERVER_NAME, version=c.Quality.Mcp.SERVER_VERSION)
 
 

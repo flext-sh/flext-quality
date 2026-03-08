@@ -23,30 +23,23 @@ class HookManager:
         self._config_path = config_path
 
     def execute(
-        self,
-        event: str,
-        input_data: t.Quality.HookInput,
+        self, event: str, input_data: t.Quality.HookInput
     ) -> r[t.Quality.HookOutput]:
         """Execute all hooks for an event."""
         try:
             hook_event = c.Quality.HookEvent(event)
         except ValueError:
             return r[t.Quality.HookOutput].fail(f"Unknown event: {event}")
-
         hooks = self._hooks.get(hook_event, [])
-
         for hook in hooks:
             if not hook.should_run(input_data):
                 continue
-
             result = hook.execute(input_data)
             if result.is_failure:
                 return result
-
             output = result.value
             if not output.get("continue", True):
                 return result
-
         return r[t.Quality.HookOutput].ok({"continue": True})
 
     def get_config(self) -> Mapping[str, list[Mapping[str, object]]]:

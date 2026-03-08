@@ -15,12 +15,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import (
-    FlextContainer,
-    FlextLogger,
-    p,
-    r,
-)
+from flext_core import FlextContainer, FlextLogger, p, r
 
 from flext_quality import FlextQualitySettings, c, m, t, u
 from flext_quality.hooks.manager import HookManager
@@ -52,23 +47,17 @@ class FlextQuality:
         result = quality.load_rules(Path("rules.yaml"))
     """
 
-    # Nested classes - FLEXT pattern with real inheritance
     class Settings(FlextQualitySettings):
         """Quality settings extending FlextQualitySettings via inheritance."""
 
     class RulesLoader(FlextQualityRulesLoader):
         """Rules loader extending FlextQualityRulesLoader via inheritance."""
 
-    # Singleton management
     _instance: ClassVar[FlextQuality | None] = None
     _lock: ClassVar[threading.Lock] = threading.Lock()
-
-    # Private instance variables
     _name: str
     _version: str
     _container: FlextContainer
-
-    # Public service instances (typed at class level for documentation)
     logger: p.Log.StructlogLogger
     config: FlextQualitySettings
     hooks: HookManager
@@ -78,24 +67,15 @@ class FlextQuality:
         """Initialize consolidated quality API with all functionality integrated."""
         self._name = c.Quality.Mcp.SERVER_NAME
         self._version = c.Quality.Mcp.SERVER_VERSION
-
-        # Auto self.logger and self.config via FlextSettings pattern
         self.logger = FlextLogger.create_module_logger(__name__)
         self.config = FlextQualitySettings.get_instance()
-
-        # Container registration (singleton via __new__)
         self._container = FlextContainer.get_global()
         if not self._container.has_service("flext_quality"):
-            register_result = self._container.register(
-                "flext_quality",
-                "flext_quality",
-            )
+            register_result = self._container.register("flext_quality", "flext_quality")
             if register_result.is_failure:
                 self.logger.warning(
-                    f"Failed to register quality service: {register_result.error}",
+                    f"Failed to register quality service: {register_result.error}"
                 )
-
-        # Domain services
         self.hooks = HookManager()
         self.rules_loader = FlextQualityRulesLoader()
 
@@ -109,18 +89,12 @@ class FlextQuality:
         """Get singleton FlextQuality instance."""
         if cls._instance is None:
             with cls._lock:
-                if cls._instance is None:  # pragma: no branch
+                if cls._instance is None:
                     cls._instance = cls()
         return cls._instance
 
-    # =========================================================================
-    # HOOK OPERATIONS
-    # =========================================================================
-
     def execute_hook(
-        self,
-        event: str,
-        input_data: t.Quality.HookInput,
+        self, event: str, input_data: t.Quality.HookInput
     ) -> r[t.Quality.HookOutput]:
         """Execute hooks for an event.
 
@@ -133,10 +107,6 @@ class FlextQuality:
 
         """
         return self.hooks.execute(event, input_data)
-
-    # =========================================================================
-    # UTILITY OPERATIONS
-    # =========================================================================
 
     def format_hook_output(
         self,
@@ -157,9 +127,7 @@ class FlextQuality:
 
         """
         return u.Quality.format_hook_output(
-            continue_exec=continue_exec,
-            message=message,
-            blocked_reason=blocked_reason,
+            continue_exec=continue_exec, message=message, blocked_reason=blocked_reason
         )
 
     def get_hook_config_json(self) -> str:
@@ -185,10 +153,6 @@ class FlextQuality:
             "hooks_registered": len(self.hooks.get_config()),
         }
 
-    # =========================================================================
-    # RULES OPERATIONS
-    # =========================================================================
-
     def load_rules(self, path: Path) -> r[list[m.Quality.RuleDefinition]]:
         """Load rules from a YAML file.
 
@@ -211,13 +175,11 @@ class FlextQuality:
         rules_path = self.config.get_rules_path()
         if not rules_path.exists():
             return r[list[m.Quality.RuleDefinition]].fail(
-                f"Rules directory not found: {rules_path}",
+                f"Rules directory not found: {rules_path}"
             )
-
         yaml_files = list(rules_path.glob("*.yaml")) + list(rules_path.glob("*.yml"))
         if not yaml_files:
             return r[list[m.Quality.RuleDefinition]].ok([])
-
         return self.rules_loader.load_multiple(yaml_files)
 
     def process_stdin_hook(self) -> r[t.Quality.HookOutput]:
@@ -230,25 +192,18 @@ class FlextQuality:
         stdin_result = u.Quality.read_stdin()
         if stdin_result.is_failure:
             return r[t.Quality.HookOutput].fail(
-                stdin_result.error or "Failed to read stdin",
+                stdin_result.error or "Failed to read stdin"
             )
-
         parse_result = u.Quality.parse_hook_input(stdin_result.value)
         if parse_result.is_failure:
             return r[t.Quality.HookOutput].fail(
-                parse_result.error or "Failed to parse input",
+                parse_result.error or "Failed to parse input"
             )
-
         input_data = parse_result.value
         event = str(input_data.get("event", ""))
         if not event:
             return r[t.Quality.HookOutput].ok({"continue": True})
-
         return self.execute_hook(event, input_data)
-
-    # =========================================================================
-    # VALIDATION OPERATIONS
-    # =========================================================================
 
     def validate_configuration(self) -> r[bool]:
         """Validate the current configuration.

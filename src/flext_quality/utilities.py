@@ -47,9 +47,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                     case dict() as parsed_dict:
                         raw_rules = parsed_dict.get("rules", [])
                     case _:
-                        return r[list[Mapping[str, object]]].fail(
-                            "Expected YAML dict",
-                        )
+                        return r[list[Mapping[str, object]]].fail("Expected YAML dict")
                 match raw_rules:
                     case list() as rules_list:
                         rules: list[Mapping[str, object]] = [
@@ -79,8 +77,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                         coerced_input: t.Quality.HookInput = {
                             str(k): v
                             if isinstance(
-                                v,
-                                (str, int, float, bool, type(None), dict, list),
+                                v, (str, int, float, bool, type(None), dict, list)
                             )
                             else str(v)
                             for k, v in hook_input.items()
@@ -110,8 +107,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
 
         @staticmethod
         def run_shell_command(
-            cmd: list[str],
-            timeout_ms: int = c.Quality.Defaults.HOOK_TIMEOUT_MS,
+            cmd: list[str], timeout_ms: int = c.Quality.Defaults.HOOK_TIMEOUT_MS
         ) -> r[str]:
             """Run a shell command with timeout."""
             try:
@@ -139,5 +135,4 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                 return r[str].fail(f"Command error: {e}")
 
 
-# Short alias for imports
 u = FlextQualityUtilities

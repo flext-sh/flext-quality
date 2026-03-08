@@ -50,10 +50,7 @@ def assert_is_list(value: object) -> TypeGuard[list[t.ContainerValue]]:
     return True
 
 
-def safe_dict_access(
-    data: dict[str, t.ContainerValue],
-    key: str,
-) -> t.ContainerValue:
+def safe_dict_access(data: dict[str, t.ContainerValue], key: str) -> t.ContainerValue:
     """Type-safe dictionary access with proper error handling.
 
     Args:
@@ -93,8 +90,7 @@ def safe_list_access(data: list[t.ContainerValue], index: int) -> t.ContainerVal
 
 
 def assert_dict_structure(
-    data: dict[str, t.ContainerValue],
-    required_keys: list[str],
+    data: dict[str, t.ContainerValue], required_keys: list[str]
 ) -> dict[str, t.ContainerValue]:
     """Assert that object is dict[str, t.ContainerValue] with required keys - DRY pattern.
 
@@ -127,14 +123,9 @@ def assert_analysis_results_structure(results: object) -> dict[str, t.ContainerV
       AssertionError: If structure is invalid
 
     """
-    # Type narrowing via TypeGuard - assert_is_dict confirms results is dict
     if not assert_is_dict(results):
         raise AssertionError(f"Expected dict, got {type(results)}")
-    # Type narrowing: results is now dict[str, t.ContainerValue] after TypeGuard
-    return assert_dict_structure(
-        results,
-        ["metrics", "issues", "python_files"],
-    )
+    return assert_dict_structure(results, ["metrics", "issues", "python_files"])
 
 
 def assert_metrics_structure(metrics: object) -> dict[str, t.ContainerValue]:
@@ -150,14 +141,9 @@ def assert_metrics_structure(metrics: object) -> dict[str, t.ContainerValue]:
       AssertionError: If structure is invalid
 
     """
-    # Type narrowing via TypeGuard - assert_is_dict confirms metrics is dict
     if not assert_is_dict(metrics):
         raise AssertionError(f"Expected dict, got {type(metrics)}")
-    # Type narrowing: metrics is now dict[str, t.ContainerValue] after TypeGuard
-    return assert_dict_structure(
-        metrics,
-        ["total_files", "total_lines_of_code"],
-    )
+    return assert_dict_structure(metrics, ["total_files", "total_lines_of_code"])
 
 
 def assert_issues_structure(issues: object) -> dict[str, t.ContainerValue]:
@@ -173,11 +159,8 @@ def assert_issues_structure(issues: object) -> dict[str, t.ContainerValue]:
       AssertionError: If structure is invalid
 
     """
-    # Type narrowing via TypeGuard - assert_is_dict confirms issues is dict
     if not assert_is_dict(issues):
         raise AssertionError(f"Expected dict, got {type(issues)}")
-    # Type narrowing: issues is now dict[str, t.ContainerValue] after TypeGuard
     return assert_dict_structure(
-        issues,
-        ["security", "complexity", "dead_code", "duplicates"],
+        issues, ["security", "complexity", "dead_code", "duplicates"]
     )

@@ -24,9 +24,7 @@ def assert_is_list(value: object, msg: str = "") -> None:
 
 
 def assert_dict_structure(
-    data: Mapping[str, Any],
-    required_keys: Sequence[str],
-    msg: str = "",
+    data: Mapping[str, Any], required_keys: Sequence[str], msg: str = ""
 ) -> None:
     """Assert that a dict contains all required keys."""
     missing = [k for k in required_keys if k not in data]
@@ -49,9 +47,7 @@ def assert_analysis_results_structure(results: Mapping[str, Any]) -> None:
 
 
 def safe_dict_access(
-    data: Mapping[str, Any],
-    key: str,
-    default: object = None,
+    data: Mapping[str, Any], key: str, default: object = None
 ) -> object:
     """Safely access a dict key with a default value."""
     return data.get(key, default)

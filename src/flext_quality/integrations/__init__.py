@@ -28,8 +28,6 @@ if TYPE_CHECKING:
         McpToolCall,
         McpToolResult,
     )
-
-# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "ExecutionRequest": (
         "flext_quality.integrations.code_execution",
@@ -55,7 +53,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "McpToolCall": ("flext_quality.integrations.mcp_client", "McpToolCall"),
     "McpToolResult": ("flext_quality.integrations.mcp_client", "McpToolResult"),
 }
-
 __all__ = [
     "ExecutionRequest",
     "ExecutionResult",
@@ -68,7 +65,7 @@ __all__ = [
 ]
 
 
-def __getattr__(name: str) -> Any:  # noqa: ANN401
+def __getattr__(name: str) -> Any:
     """Lazy-load module attributes on first access (PEP 562)."""
     return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
 

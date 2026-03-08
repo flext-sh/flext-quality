@@ -36,48 +36,22 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
             """Literal type aliases for quality domain values."""
 
             AnalysisStatusLiteral: TypeAlias = Literal[
-                "pending",
-                "running",
-                "completed",
-                "failed",
-                "cancelled",
+                "pending", "running", "completed", "failed", "cancelled"
             ]
             IssueSeverityLiteral: TypeAlias = Literal[
-                "critical",
-                "error",
-                "warning",
-                "info",
-                "hint",
+                "critical", "error", "warning", "info", "hint"
             ]
             IssueTypeLiteral: TypeAlias = Literal[
-                "lint",
-                "type",
-                "security",
-                "complexity",
-                "style",
-                "documentation",
+                "lint", "type", "security", "complexity", "style", "documentation"
             ]
             ReportFormatLiteral: TypeAlias = Literal[
-                "json",
-                "html",
-                "markdown",
-                "text",
-                "sarif",
+                "json", "html", "markdown", "text", "sarif"
             ]
             BackendTypeLiteral: TypeAlias = Literal[
-                "ruff",
-                "mypy",
-                "pyrefly",
-                "bandit",
-                "vulture",
-                "radon",
+                "ruff", "mypy", "pyrefly", "bandit", "vulture", "radon"
             ]
             LanguageLiteral: TypeAlias = Literal[
-                "python",
-                "typescript",
-                "javascript",
-                "go",
-                "rust",
+                "python", "typescript", "javascript", "go", "rust"
             ]
             CheckStatusLiteral: TypeAlias = Literal["pass", "fail", "skip", "error"]
 
@@ -149,22 +123,15 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
         class Threshold:
             """Quality thresholds for validation."""
 
-            # File size limits
             DEFAULT_LINES: Final[int] = 500
             MAX_LINES: Final[int] = 1000
             MIN_LINES: Final[int] = 1
-
-            # Complexity limits
             MAX_CYCLOMATIC_COMPLEXITY: Final[int] = 10
             MAX_COGNITIVE_COMPLEXITY: Final[int] = 15
             MAX_FUNCTION_LENGTH: Final[int] = 50
             MAX_CLASS_LENGTH: Final[int] = 300
-
-            # Coverage limits
             MIN_TEST_COVERAGE: Final[float] = 80.0
             MIN_DOCSTRING_COVERAGE: Final[float] = 80.0
-
-            # Line length
             MAX_LINE_LENGTH: Final[int] = 88
             FLEXT_CORE_LINE_LENGTH: Final[int] = 79
 
@@ -181,29 +148,18 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
         class Defaults:
             """Default configuration values."""
 
-            # Timeouts (milliseconds for hooks)
             HOOK_TIMEOUT_MS: Final[int] = 5000
             MCP_TIMEOUT_MS: Final[int] = 30000
             INTEGRATION_TIMEOUT_MS: Final[int] = 10000
             RULE_TIMEOUT_SECONDS: Final[int] = 30
-
-            # Batch processing
             BATCH_SIZE: Final[int] = 100
             MAX_PARALLEL_RULES: Final[int] = 4
-
-            # Caching
             CACHE_TTL_SECONDS: Final[int] = 300
             MAX_CACHE_ENTRIES: Final[int] = 1000
-
-            # Search/Query defaults
             DEFAULT_SEARCH_LIMIT: Final[int] = 20
             DEFAULT_MEMORY_SEARCH_LIMIT: Final[int] = 10
             DEFAULT_TIMELINE_DEPTH: Final[int] = 5
-
-            # JSON formatting
             JSON_INDENT: Final[int] = 2
-
-            # Subprocess timeout conversion
             MS_TO_SECONDS_DIVISOR: Final[int] = 1000
 
         class Mcp:
@@ -224,19 +180,14 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
         class Patterns:
             """Regex patterns for validation."""
 
-            # Python patterns
-            TYPE_IGNORE: Final[str] = r"#\s*type:\s*ignore"
-            CAST_USAGE: Final[str] = r"cast\s*\("
-            ANY_TYPE: Final[str] = r":\s*Any\b"
-            TYPE_CHECKING: Final[str] = r"if\s+TYPE_CHECKING\s*:"
-
-            # Import patterns
-            TIER_VIOLATION: Final[str] = r"from flext_.*\.(services|api) import"
-            OPTIONAL_PATTERN: Final[str] = r"Optional\["
-            UNION_PATTERN: Final[str] = r"Union\["
+            TYPE_IGNORE: Final[str] = "#\\s*type:\\s*ignore"
+            CAST_USAGE: Final[str] = "cast\\s*\\("
+            ANY_TYPE: Final[str] = ":\\s*Any\\b"
+            TYPE_CHECKING: Final[str] = "if\\s+TYPE_CHECKING\\s*:"
+            TIER_VIOLATION: Final[str] = "from flext_.*\\.(services|api) import"
+            OPTIONAL_PATTERN: Final[str] = "Optional\\["
+            UNION_PATTERN: Final[str] = "Union\\["
 
 
-# Short alias for runtime access
 c = FlextQualityConstants
-
 __all__ = ["FlextQualityConstants", "c"]

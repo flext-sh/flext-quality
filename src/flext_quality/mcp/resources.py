@@ -26,8 +26,7 @@ def get_rules_config() -> str:
     engine = FlextQualityRulesEngine()
     rules = engine.get_rules()
     return json.dumps(
-        [rule.model_dump() for rule in rules],
-        indent=c.Quality.Defaults.JSON_INDENT,
+        [rule.model_dump() for rule in rules], indent=c.Quality.Defaults.JSON_INDENT
     )
 
 
@@ -35,17 +34,14 @@ def get_rules_config() -> str:
 def get_integrations_status() -> str:
     """Get status of all integrations."""
     status: dict[str, object] = {}
-
     mem_client = FlextQualityClaudeMemClient()
     mem_health = mem_client.health_check()
     status["claude_mem"] = (
         mem_health.value if mem_health.is_success else {"error": mem_health.error}
     )
-
     ctx_client = FlextQualityClaudeContextClient()
     ctx_health = ctx_client.health_check()
     status["claude_context"] = (
         ctx_health.value if ctx_health.is_success else {"error": ctx_health.error}
     )
-
     return json.dumps(status, indent=c.Quality.Defaults.JSON_INDENT)

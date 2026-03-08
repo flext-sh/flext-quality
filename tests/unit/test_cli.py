@@ -63,7 +63,6 @@ class TestFlextQualityCliService:
         src_dir.mkdir()
         tests_dir = tmp_path / "tests"
         tests_dir.mkdir()
-
         service = FlextQualityCliService()
         result = service.build_validate_commands(tmp_path)
         assert result.is_success
@@ -72,15 +71,13 @@ class TestFlextQualityCliService:
         assert len(commands) == 5
 
     def test_build_validate_commands_includes_coverage_report(
-        self,
-        tmp_path: Path,
+        self, tmp_path: Path
     ) -> None:
         """Test build_validate_commands includes explicit coverage report command."""
         src_dir = tmp_path / "src"
         src_dir.mkdir()
         tests_dir = tmp_path / "tests"
         tests_dir.mkdir()
-
         service = FlextQualityCliService()
         result = service.build_validate_commands(tmp_path)
         assert result.is_success
@@ -94,7 +91,6 @@ class TestFlextQualityCliService:
         src_dir.mkdir()
         tests_dir = tmp_path / "tests"
         tests_dir.mkdir()
-
         service = FlextQualityCliService()
         result = service.build_validate_commands(tmp_path)
         assert result.is_success
@@ -133,7 +129,6 @@ class TestMainFunction:
         src_dir.mkdir()
         tests_dir = tmp_path / "tests"
         tests_dir.mkdir()
-
         sys.argv = ["flext-quality", "validate", str(tmp_path)]
         with pytest.raises(SystemExit) as exc_info:
             main()

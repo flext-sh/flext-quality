@@ -14,10 +14,7 @@ from flext_quality.rules.engine import FlextQualityRulesEngine
 
 @mcp.tool()
 def search_memory(
-    query: str,
-    *,
-    search_type: str = "observations",
-    limit: int | None = None,
+    query: str, *, search_type: str = "observations", limit: int | None = None
 ) -> Mapping[str, object]:
     """Build command to search cross-session memory via claude-mem.
 
@@ -29,14 +26,11 @@ def search_memory(
     result = client.build_search_call(query=query, limit=search_limit)
     if result.is_failure:
         return {"error": result.error}
-
     command_result = client.get_search_command(query=query, limit=search_limit)
     if command_result.is_failure:
         return {"error": command_result.error}
-
     params = dict(result.value.params)
     params["search_type"] = search_type
-
     return {
         "server": result.value.server,
         "tool": result.value.tool,
@@ -46,11 +40,7 @@ def search_memory(
 
 
 @mcp.tool()
-def search_code(
-    query: str,
-    *,
-    limit: int | None = None,
-) -> Mapping[str, object]:
+def search_code(query: str, *, limit: int | None = None) -> Mapping[str, object]:
     """Build command for semantic code search via claude-context.
 
     Returns the mcp-cli command that can be used to execute the search.
@@ -61,11 +51,9 @@ def search_code(
     result = client.build_search_call(query=query, limit=search_limit)
     if result.is_failure:
         return {"error": result.error}
-
     command_result = client.get_search_command(query=query, limit=search_limit)
     if command_result.is_failure:
         return {"error": command_result.error}
-
     return {
         "server": result.value.server,
         "tool": result.value.tool,
@@ -75,10 +63,7 @@ def search_code(
 
 
 @mcp.tool()
-def execute_hook(
-    event: str,
-    input_data: t.Quality.HookInput,
-) -> t.Quality.HookOutput:
+def execute_hook(event: str, input_data: t.Quality.HookInput) -> t.Quality.HookOutput:
     """Execute a hook manually."""
     manager = HookManager()
     result = manager.execute(event=event, input_data=input_data)
@@ -89,9 +74,7 @@ def execute_hook(
 
 @mcp.tool()
 def validate_rules(
-    path: str,
-    *,
-    context: Mapping[str, object] | None = None,
+    path: str, *, context: Mapping[str, object] | None = None
 ) -> Mapping[str, object]:
     """Validate code against YAML rules."""
     engine = FlextQualityRulesEngine()

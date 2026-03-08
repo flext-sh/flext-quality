@@ -25,8 +25,7 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
             matcher: list[str] | None
 
             def execute(
-                self,
-                input_data: t.Quality.HookInput,
+                self, input_data: t.Quality.HookInput
             ) -> FlextResult[t.Quality.HookOutput]:
                 """Execute the hook logic."""
                 ...
@@ -41,9 +40,7 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
             rule_type: str
 
             def validate(
-                self,
-                config: t.Quality.RuleConfig,
-                context: Mapping[str, object],
+                self, config: t.Quality.RuleConfig, context: Mapping[str, object]
             ) -> FlextResult[t.Quality.RuleResult]:
                 """Validate according to rule."""
                 ...
@@ -70,17 +67,11 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
             description: str
 
             def execute(
-                self,
-                params: Mapping[str, object],
+                self, params: Mapping[str, object]
             ) -> FlextResult[Mapping[str, object]]:
                 """Execute MCP tool."""
                 ...
 
 
-# Short alias for imports
 p = FlextQualityProtocols
-
-__all__ = [
-    "FlextQualityProtocols",
-    "p",
-]
+__all__ = ["FlextQualityProtocols", "p"]

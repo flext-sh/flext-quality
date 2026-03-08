@@ -23,17 +23,6 @@ class TestsFlextQualityProtocols(FlextTestsProtocols, FlextQualityProtocols):
     - p.Quality.* (from FlextQualityProtocols)
     """
 
-    # class Tests:
-    #     """Project-specific test protocols.
-    #
-    #     Extends FlextTestsProtocols.Tests with Quality-specific protocols.
-    #     """
 
-    # class Quality:
-    #     """Quality-specific test protocols."""
-
-
-# Runtime aliases
 p = TestsFlextQualityProtocols
-
 __all__ = ["TestsFlextQualityProtocols", "p"]

@@ -28,9 +28,7 @@ class FlextQualityValidators:
 
         @abstractmethod
         def validate(
-            self,
-            content: str,
-            file_path: Path | None = None,
+            self, content: str, file_path: Path | None = None
         ) -> r[list[Mapping[str, object]]]:
             """Validate content and return violations."""
             ...
@@ -42,7 +40,6 @@ class FlextQualityValidators:
             """Initialize with patterns."""
             self._patterns = patterns
             self._compiled: dict[str, re.Pattern[str]] = {}
-
             for pname, pattern in patterns.items():
                 with contextlib.suppress(re.error):
                     self._compiled[pname] = re.compile(pattern)
@@ -55,15 +52,12 @@ class FlextQualityValidators:
 
         @override
         def validate(
-            self,
-            content: str,
-            file_path: Path | None = None,
+            self, content: str, file_path: Path | None = None
         ) -> r[list[Mapping[str, object]]]:
             """Validate content against patterns."""
             violations: list[Mapping[str, object]] = []
             filename = str(file_path) if file_path else "<string>"
             lines = content.splitlines()
-
             for line_num, line in enumerate(lines, start=1):
                 for pattern_name, compiled in self._compiled.items():
                     if compiled.search(line):
@@ -74,7 +68,6 @@ class FlextQualityValidators:
                             "message": f"Pattern violation: {pattern_name}",
                             "severity": c.Quality.Severity.ERROR,
                         })
-
             return r[list[Mapping[str, object]]].ok(violations)
 
     class ForbiddenPattern(Pattern):
@@ -109,24 +102,18 @@ class FlextQualityValidators:
 
         @override
         def validate(
-            self,
-            content: str,
-            file_path: Path | None = None,
+            self, content: str, file_path: Path | None = None
         ) -> r[list[Mapping[str, object]]]:
             """Validate tier violations."""
             violations: list[Mapping[str, object]] = []
             filename = str(file_path) if file_path else "<string>"
-
             if file_path is None:
                 return r[list[Mapping[str, object]]].ok(violations)
-
             file_tier = self._get_file_tier(file_path)
             if file_tier is None:
                 return r[list[Mapping[str, object]]].ok(violations)
-
             tier_pattern = re.compile(c.Quality.Patterns.TIER_VIOLATION)
             lines = content.splitlines()
-
             for line_num, line in enumerate(lines, start=1):
                 if tier_pattern.search(line):
                     violations.append({
@@ -136,25 +123,19 @@ class FlextQualityValidators:
                         "message": "Tier 0/1 modules cannot import from services/api",
                         "severity": c.Quality.Severity.ERROR,
                     })
-
             return r[list[Mapping[str, object]]].ok(violations)
 
         def _get_file_tier(self, path: Path) -> int | None:
             """Determine file tier from path."""
             name = path.name
-
             if name in {"constants.py", "typings.py", "protocols.py"}:
                 return 0
-
             if name in {"models.py", "utilities.py"}:
                 return 1
-
             if "servers" in path.parts:
                 return 2
-
             if "services" in path.parts or name == "api.py":
                 return 3
-
             return None
 
     class Registry:
@@ -178,18 +159,14 @@ class FlextQualityValidators:
             self._validators[validator.name] = validator
 
         def validate_all(
-            self,
-            content: str,
-            file_path: Path | None = None,
+            self, content: str, file_path: Path | None = None
         ) -> r[list[Mapping[str, object]]]:
             """Run all validators."""
             all_violations: list[Mapping[str, object]] = []
-
             for validator in self._validators.values():
                 result = validator.validate(content, file_path)
                 if result.is_success:
                     all_violations.extend(result.value)
-
             return r[list[Mapping[str, object]]].ok(all_violations)
 
         def _register_defaults(self) -> None:

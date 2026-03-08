@@ -38,10 +38,5 @@ class TestsFlextQualityConstants(FlextQualityConstants):
         TEST_WORKERS: Final[int] = 2
 
 
-# Short aliases per FLEXT convention
 c = TestsFlextQualityConstants
-
-__all__ = [
-    "TestsFlextQualityConstants",
-    "c",
-]
+__all__ = ["TestsFlextQualityConstants", "c"]
