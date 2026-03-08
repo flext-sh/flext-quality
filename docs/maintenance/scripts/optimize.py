@@ -335,7 +335,7 @@ class DocumentationOptimizer:
             _ = self.results["backups_created"].append(
                 str(backup_path.relative_to(self.project_root))
             )
-        file_path.write_text(content, encoding="utf-8")
+        _ = filepath.write_text(content, encoding="utf-8")
 
     def generate_report(self, report_format: str = "json") -> str:
         """Generate optimization report."""
