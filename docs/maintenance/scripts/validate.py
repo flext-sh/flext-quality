@@ -21,9 +21,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import TypedDict
 
-from flext_core import t
-
 import requests
+from flext_core import t
 
 
 class _LinkValidatorResults(TypedDict):
@@ -66,6 +65,7 @@ class LinkValidator:
         self, timeout: int = 10, retries: int = 3, max_workers: int = 5
     ) -> None:
         """Initialize the link validator with timeout and retry settings."""
+        super().__init__()
         self.timeout = timeout
         self.retries = retries
         self.max_workers = max_workers
@@ -158,7 +158,7 @@ class LinkValidator:
 
     def validate_external_links(
         self, links: list[t.ConfigurationMapping], *, verbose: bool = False
-    ) -> t.ConfigurationMapping:
+    ) -> _LinkValidatorResults:
         """Validate external links with concurrent checking."""
         external_links = [link for link in links if link["type"] == "external"]
         if not external_links:
@@ -172,11 +172,11 @@ class LinkValidator:
             ]
             for future in concurrent.futures.as_completed(futures):
                 result = future.result()
-                _ = self.results["links_checked"] += 1
+                self.results["links_checked"] += 1
                 if result["valid"]:
-                    _ = self.results["valid_links"] += 1
+                    self.results["valid_links"] += 1
                 else:
-                    _ = self.results["broken_links"] += 1
+                    self.results["broken_links"] += 1
                     _ = self.results["errors"].append(result)
         return self.results
 
@@ -261,7 +261,7 @@ class LinkValidator:
 
     def validate_internal_links(
         self, links: list[t.ConfigurationMapping], doc_files: list[Path]
-    ) -> t.ConfigurationMapping:
+    ) -> _LinkValidatorResults:
         """Validate internal links and references."""
         internal_links = [
             link for link in links if link["type"] in {"internal", "reference"}
@@ -298,12 +298,12 @@ class LinkValidator:
                         "line": link.get("line_number"),
                         "error": "Target file not found",
                     })
-                    _ = self.results["broken_links"] += 1
+                    self.results["broken_links"] += 1
                 else:
-                    _ = self.results["valid_links"] += 1
+                    self.results["valid_links"] += 1
             else:
-                _ = self.results["valid_links"] += 1
-            _ = self.results["links_checked"] += 1
+                self.results["valid_links"] += 1
+            self.results["links_checked"] += 1
         return self.results
 
     def _resolve_relative_path(self, base_dir: Path, target: str) -> Path:
@@ -314,13 +314,15 @@ class LinkValidator:
             return base_dir.parent / target[3:]
         return Path(target)
 
-    def validate_images(self, links: list[t.ConfigurationMapping], project_root: Path) -> t.ConfigurationMapping:
+    def validate_images(
+        self, links: list[t.ConfigurationMapping], project_root: Path
+    ) -> _LinkValidatorResults:
         """Validate image references."""
         images = [link for link in links if link["type"] == "image"]
         for image in images:
             src = image["url"]
             if src.startswith(("http://", "https://")):
-                _ = self.results["valid_links"] += 1
+                self.results["valid_links"] += 1
                 continue
             image_path = Path(src)
             if not image_path.is_absolute():
@@ -329,7 +331,7 @@ class LinkValidator:
             else:
                 full_path = image_path
             if full_path.exists():
-                _ = self.results["valid_links"] += 1
+                self.results["valid_links"] += 1
             else:
                 _ = self.results["errors"].append({
                     "type": "missing_image",
@@ -338,13 +340,13 @@ class LinkValidator:
                     "line": image.get("line_number"),
                     "error": f"Image file not found: {full_path}",
                 })
-                _ = self.results["broken_links"] += 1
-            _ = self.results["links_checked"] += 1
+                self.results["broken_links"] += 1
+            self.results["links_checked"] += 1
         return self.results
 
     def validate_anchors(
         self, links: list[t.ConfigurationMapping], doc_files: list[Path]
-    ) -> t.ConfigurationMapping:
+    ) -> _LinkValidatorResults:
         """Validate anchor links within documents."""
         anchor_links = [link for link in links if link["type"] == "anchor"]
         file_anchors = {}
@@ -370,7 +372,7 @@ class LinkValidator:
             anchor = link["url"][1:]
             file_path = link["file"]
             if file_path in file_anchors and anchor in file_anchors[file_path]:
-                _ = self.results["valid_links"] += 1
+                self.results["valid_links"] += 1
             else:
                 _ = self.results["errors"].append({
                     "type": "broken_anchor",
@@ -379,8 +381,8 @@ class LinkValidator:
                     "line": link.get("line_number"),
                     "error": f"Anchor '{anchor}' not found in {file_path}",
                 })
-                _ = self.results["broken_links"] += 1
-            _ = self.results["links_checked"] += 1
+                self.results["broken_links"] += 1
+            self.results["links_checked"] += 1
         return self.results
 
     def _heading_to_anchor(self, heading: str) -> str:
@@ -389,7 +391,9 @@ class LinkValidator:
         anchor = re.sub("[^\\w\\s-]", "", anchor)
         return re.sub("\\s+", "-", anchor)
 
-    def check_link_text_quality(self, links: list[t.ConfigurationMapping]) -> t.ConfigurationMapping:
+    def check_link_text_quality(
+        self, links: list[t.ConfigurationMapping]
+    ) -> _LinkValidatorResults:
         """Check quality of link text for accessibility and usability."""
         poor_link_texts = [
             "here",
@@ -416,7 +420,7 @@ class LinkValidator:
                     "line": link.get("line_number"),
                     "warning": "Link text is not descriptive enough for accessibility",
                 })
-                _ = self.results["warnings"] += 1
+                self.results["warnings"] += 1
         return self.results
 
     def generate_report(self, report_format: str = "json") -> str:
@@ -444,6 +448,7 @@ class ContentValidator:
 
     def __init__(self) -> None:
         """Initialize the content validator."""
+        super().__init__()
         self.results: _ContentValidatorResults = {
             "timestamp": datetime.now(UTC).isoformat(),
             "files_checked": 0,
@@ -451,7 +456,9 @@ class ContentValidator:
             "quality_metrics": {},
         }
 
-    def validate_markdown_syntax(self, doc_files: list[Path]) -> _ContentValidatorResults:
+    def validate_markdown_syntax(
+        self, doc_files: list[Path]
+    ) -> _ContentValidatorResults:
         """Validate markdown syntax and formatting."""
         for file_path in doc_files:
             file_rel_path = str(file_path)
@@ -460,10 +467,10 @@ class ContentValidator:
                 file_rel_path = str(file_path.relative_to(file_path.parents[2]))
                 issues = self._check_markdown_issues(content)
                 if issues:
-                    _ = self.results["content_issues"].extend([
+                    self.results["content_issues"].extend([
                         {**issue, "file": file_rel_path} for issue in issues
                     ])
-                _ = self.results["files_checked"] += 1
+                self.results["files_checked"] += 1
             except Exception as e:
                 _ = self.results["content_issues"].append({
                     "type": "syntax_validation_error",
@@ -524,7 +531,7 @@ class ContentValidator:
                         "readability_score": metrics["readability_score"],
                         "warning": "Content may be difficult to read",
                     })
-                _ = self.results["files_checked"] += 1
+                self.results["files_checked"] += 1
             except Exception as e:
                 _ = self.results["content_issues"].append({
                     "type": "quality_analysis_error",
@@ -571,7 +578,9 @@ def _create_validation_parser() -> argparse.ArgumentParser:
     _ = parser.add_argument(
         "--images", action="store_true", help="Validate image references"
     )
-    _ = parser.add_argument("--anchors", action="store_true", help="Validate anchor links")
+    _ = parser.add_argument(
+        "--anchors", action="store_true", help="Validate anchor links"
+    )
     _ = parser.add_argument(
         "--link-text", action="store_true", help="Check link text quality"
     )
@@ -581,7 +590,9 @@ def _create_validation_parser() -> argparse.ArgumentParser:
     _ = parser.add_argument(
         "--content-quality", action="store_true", help="Analyze content quality"
     )
-    _ = parser.add_argument("--all", action="store_true", help="Run all validation checks")
+    _ = parser.add_argument(
+        "--all", action="store_true", help="Run all validation checks"
+    )
     _ = parser.add_argument("--verbose", action="store_true", help="Verbose output")
     _ = parser.add_argument(
         "--output",
@@ -595,7 +606,9 @@ def _create_validation_parser() -> argparse.ArgumentParser:
     _ = parser.add_argument(
         "--retries", type=int, default=3, help="Retry attempts for external links"
     )
-    _ = parser.add_argument("--workers", type=int, default=5, help="Max concurrent workers")
+    _ = parser.add_argument(
+        "--workers", type=int, default=5, help="Max concurrent workers"
+    )
     return parser
 
 
@@ -619,9 +632,7 @@ def _discover_validation_files() -> list[Path]:
             unique.append(f)
     ignored_patterns = [".git", "__pycache__", "node_modules", ".serena/memories"]
     return [
-        f
-        for f in unique
-        if not any(pattern in str(f) for pattern in ignored_patterns)
+        f for f in unique if not any(pattern in str(f) for pattern in ignored_patterns)
     ]
 
 
@@ -635,26 +646,26 @@ def _execute_validations(
     """Execute the requested validations and return if any were run."""
     run_any_check = False
     if args.external_links or args.all:
-        link_validator.validate_external_links(all_links, verbose=args.verbose)
+        _ = link_validator.validate_external_links(all_links, verbose=args.verbose)
         run_any_check = True
     if args.internal_links or args.all:
-        link_validator.validate_internal_links(all_links, doc_files)
+        _ = link_validator.validate_internal_links(all_links, doc_files)
         run_any_check = True
     if args.images or args.all:
         project_root = Path(__file__).parent.parent.parent.parent
-        link_validator.validate_images(all_links, project_root)
+        _ = link_validator.validate_images(all_links, project_root)
         run_any_check = True
     if args.anchors or args.all:
-        link_validator.validate_anchors(all_links, doc_files)
+        _ = link_validator.validate_anchors(all_links, doc_files)
         run_any_check = True
     if args.link_text or args.all:
-        link_validator.check_link_text_quality(all_links)
+        _ = link_validator.check_link_text_quality(all_links)
         run_any_check = True
     if args.markdown_syntax or args.all:
-        content_validator.validate_markdown_syntax(doc_files)
+        _ = content_validator.validate_markdown_syntax(doc_files)
         run_any_check = True
     if args.content_quality or args.all:
-        content_validator.check_content_quality(doc_files)
+        _ = content_validator.check_content_quality(doc_files)
         run_any_check = True
     return run_any_check
 
@@ -677,6 +688,6 @@ def main() -> None:
     link_errors = link_validator.results.get("errors", [])
     content_issues = content_validator.results.get("content_issues", [])
     total_errors = len(link_errors) + len(content_issues)
-    link_validator.save_report(args.output)
+    _ = link_validator.save_report(args.output)
     if total_errors > 0:
         sys.exit(1)
