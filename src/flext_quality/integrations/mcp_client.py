@@ -15,35 +15,8 @@ from collections.abc import Mapping
 from typing import final
 
 from flext_core import r
-from pydantic import BaseModel, ConfigDict, Field
 
 from flext_quality import c
-
-
-class McpToolCall(BaseModel):
-    """Represents a call to an MCP server tool."""
-
-    model_config = ConfigDict(frozen=True, extra="forbid")
-
-    server: str = Field(..., description="MCP server name")
-    tool: str = Field(..., description="Tool name on the server")
-    params: dict[str, object] = Field(
-        default_factory=dict,
-        description="Tool parameters",
-    )
-
-
-class McpToolResult(BaseModel):
-    """Result from an MCP tool call."""
-
-    model_config = ConfigDict(frozen=True, extra="forbid")
-
-    success: bool = Field(..., description="Whether the tool call succeeded")
-    data: dict[str, object] | list[dict[str, object]] | None = Field(
-        default=None,
-        description="Result data from the tool call",
-    )
-    error: str | None = Field(default=None, description="Error message if call failed")
 
 
 @final
