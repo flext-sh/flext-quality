@@ -201,7 +201,7 @@ class BaseReporter(ABC):
         """Save report content to a file."""
         output_dir.mkdir(parents=True, exist_ok=True)
         filepath = output_dir / f"{filename}.html"
-        filepath.write_text(content, encoding="utf-8")
+        _ = filepath.write_text(content, encoding="utf-8")
         return filepath
 
 

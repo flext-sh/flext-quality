@@ -43,7 +43,7 @@ class ContentAnalyzer:
 
         """
         self.load_config(config_path)
-        self.results = {
+        _ = self.results = {
             "files_analyzed": 0,
             "quality_metrics": {},
             "content_scores": {},
@@ -110,11 +110,11 @@ class ContentAnalyzer:
             analysis["suggestions"] = self._generate_suggestions(analysis)
 
             # Update global results
-            self.results["files_analyzed"] += 1
-            self.results["quality_metrics"][filename] = analysis["metrics"]
-            self.results["content_scores"][filename] = analysis["quality_score"]
-            self.results["readability_stats"][filename] = analysis["readability"]
-            self.results["completeness_checks"][filename] = analysis["completeness"]
+            _ = self.results["files_analyzed"] += 1
+            _ = self.results["quality_metrics"][filename] = analysis["metrics"]
+            _ = self.results["content_scores"][filename] = analysis["quality_score"]
+            _ = self.results["readability_stats"][filename] = analysis["readability"]
+            _ = self.results["completeness_checks"][filename] = analysis["completeness"]
 
             return analysis
 
@@ -412,7 +412,7 @@ class ContentAnalyzer:
 
             if not found:
                 result["missing_required_sections"].append(section_pattern)
-                self.results["recommendations"].append(
+                _ = self.results["recommendations"].append(
                     f"Add '{section_pattern}' section",
                 )
 
@@ -555,11 +555,11 @@ class ContentAnalyzer:
             return
 
         avg_score = sum(self.results["content_scores"].values()) / len(
-            self.results["content_scores"],
+            _ = self.results["content_scores"],
         )
 
         if avg_score < self.GOOD_READABILITY_MIN:
-            self.results["recommendations"].append({
+            _ = self.results["recommendations"].append({
                 "priority": "high",
                 "type": "overall_quality",
                 "message": f"Overall documentation quality needs improvement (avg score: {avg_score:.1f})",
@@ -584,7 +584,7 @@ class ContentAnalyzer:
             most_common = issue_types.most_common(1)
             if most_common:
                 common_issue = most_common[0][0]
-                self.results["recommendations"].append({
+                _ = self.results["recommendations"].append({
                     "priority": "medium",
                     "type": "common_issue",
                     "message": f"Address common issue across files: {common_issue.replace('_', ' ')}",

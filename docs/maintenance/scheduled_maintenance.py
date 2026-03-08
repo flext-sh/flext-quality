@@ -199,9 +199,9 @@ class ScheduledMaintenance:
                 task_config = self.config["tasks"][task_name]
 
                 if self.run_single_task(task_config):
-                    self.results["tasks_completed"] += 1
+                    _ = self.results["tasks_completed"] += 1
                 else:
-                    self.results["errors"].append(f"Task {task_name} failed")
+                    _ = self.results["errors"].append(f"Task {task_name} failed")
                     success = False
 
                     if self.config["error_handling"]["fail_fast"]:
@@ -220,7 +220,7 @@ class ScheduledMaintenance:
             cmd_parts = shlex.split(command) if isinstance(command, str) else command
 
             if not cmd_parts:
-                self.results["errors"].append(f"Empty command in task: {description}")
+                _ = self.results["errors"].append(f"Empty command in task: {description}")
                 return False
 
             cmd_name = cmd_parts[0]
@@ -231,14 +231,14 @@ class ScheduledMaintenance:
                 return handler(cmd_parts, timeout, description)
 
             # If no specific handler, log unsupported command
-            self.results["warnings"].append(
+            _ = self.results["warnings"].append(
                 f"Unsupported command: {cmd_name} in task: {description}. "
                 "Please install appropriate Python libraries or configure supported commands.",
             )
             return False
 
         except Exception as e:
-            self.results["errors"].append(
+            _ = self.results["errors"].append(
                 f"Task error: {task_config.get('description', 'unknown')} - {e!s}",
             )
             return False
@@ -266,7 +266,7 @@ class ScheduledMaintenance:
         """Handle python -m commands."""
         try:
             if len(cmd_parts) < self.MIN_PYTHON_ARGS or cmd_parts[1] != "-m":
-                self.results["warnings"].append(
+                _ = self.results["warnings"].append(
                     f"Invalid python command format in task: {description}",
                 )
                 return False
@@ -277,7 +277,7 @@ class ScheduledMaintenance:
                 else None
             )
             if module_name is None:
-                self.results["warnings"].append(
+                _ = self.results["warnings"].append(
                     f"No module specified in task: {description}",
                 )
                 return False
@@ -295,7 +295,7 @@ class ScheduledMaintenance:
             return self._run_with_timeout(run_module, timeout, description)
 
         except Exception as e:
-            self.results["errors"].append(
+            _ = self.results["errors"].append(
                 f"Python command failed in {description}: {e!s}",
             )
             return False
@@ -320,12 +320,12 @@ class ScheduledMaintenance:
             return self._run_with_timeout(run_tests, timeout, description)
 
         except ImportError:
-            self.results["warnings"].append(
+            _ = self.results["warnings"].append(
                 f"pytest not available for task: {description}. Install with: pip install pytest",
             )
             return False
         except Exception as e:
-            self.results["errors"].append(
+            _ = self.results["errors"].append(
                 f"pytest command failed in {description}: {e!s}",
             )
             return False
@@ -343,7 +343,7 @@ class ScheduledMaintenance:
         try:
             makefile = self.project_root / "Makefile"
             if not makefile.exists():
-                self.results["warnings"].append(
+                _ = self.results["warnings"].append(
                     f"Makefile not found for task: {description}",
                 )
                 return False
@@ -355,14 +355,14 @@ class ScheduledMaintenance:
             if not targets:
                 targets = ["default"]  # Use default target if none specified
             # For now, log a warning suggesting direct command execution
-            self.results["warnings"].append(
+            _ = self.results["warnings"].append(
                 f"Make command '{' '.join(cmd_parts)}' requires make tool. "
                 f"For task: {description}, consider specifying the actual command directly.",
             )
             return False
 
         except Exception as e:
-            self.results["errors"].append(
+            _ = self.results["errors"].append(
                 f"Make command failed in {description}: {e!s}",
             )
             return False
@@ -380,7 +380,7 @@ class ScheduledMaintenance:
 
             # Extract git subcommand
             if len(cmd_parts) < self.MIN_GIT_ARGS:
-                self.results["warnings"].append(
+                _ = self.results["warnings"].append(
                     f"Invalid git command format in task: {description}",
                 )
                 return False
@@ -402,17 +402,17 @@ class ScheduledMaintenance:
             return self._run_with_timeout(run_git_command, timeout, description)
 
         except ImportError:
-            self.results["warnings"].append(
+            _ = self.results["warnings"].append(
                 f"GitPython not available for task: {description}. Install with: pip install GitPython",
             )
             return False
         except InvalidGitRepositoryError:
-            self.results["warnings"].append(
+            _ = self.results["warnings"].append(
                 f"Not a git repository for task: {description}",
             )
             return False
         except Exception as e:
-            self.results["errors"].append(f"Git command failed in {description}: {e!s}")
+            _ = self.results["errors"].append(f"Git command failed in {description}: {e!s}")
             return False
 
     def _handle_echo_command(
@@ -430,7 +430,7 @@ class ScheduledMaintenance:
             print(message)
             return True
         except Exception as e:
-            self.results["errors"].append(
+            _ = self.results["errors"].append(
                 f"Echo command failed in {description}: {e!s}",
             )
             return False
@@ -457,11 +457,11 @@ class ScheduledMaintenance:
             thread.join(timeout=timeout)
 
             if thread.is_alive():
-                self.results["errors"].append(f"Task timeout: {description}")
+                _ = self.results["errors"].append(f"Task timeout: {description}")
                 return False
 
             if result_container["exception"]:
-                self.results["errors"].append(
+                _ = self.results["errors"].append(
                     f"Task failed: {description} - {result_container['exception']!s}",
                 )
                 return False
@@ -469,7 +469,7 @@ class ScheduledMaintenance:
             return result_container["success"]
 
         except Exception as e:
-            self.results["errors"].append(
+            _ = self.results["errors"].append(
                 f"Task execution error in {description}: {e!s}",
             )
             return False
@@ -543,8 +543,8 @@ class ScheduledMaintenance:
 
     def save_results(self) -> None:
         """Save maintenance results to file."""
-        self.results["end_time"] = datetime.now(UTC).isoformat()
-        self.results["duration_seconds"] = int(
+        _ = self.results["end_time"] = datetime.now(UTC).isoformat()
+        _ = self.results["duration_seconds"] = int(
             (
                 datetime.fromisoformat(self.results["end_time"])
                 - datetime.fromisoformat(self.results["start_time"])
@@ -565,22 +565,22 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="FLEXT Quality Scheduled Documentation Maintenance",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--config",
         default="docs/maintenance/config/schedule_config.yaml",
         help="Maintenance schedule configuration file",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--daemon",
         action="store_true",
         help="Run as daemon with scheduled tasks",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--manual",
         choices=["daily", "optimize", "weekly", "monthly", "all"],
         help="Run specific maintenance tasks manually",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--list-schedules",
         action="store_true",
         help="List all configured schedules",

@@ -33,7 +33,7 @@ class LinkValidator:
         self.retries = retries
         self.max_workers = max_workers
         self.user_agent = "FLEXT-Quality-Link-Validator/1.0"
-        self.results = {
+        _ = self.results = {
             "timestamp": datetime.now(UTC).isoformat(),
             "links_checked": 0,
             "valid_links": 0,
@@ -90,7 +90,7 @@ class LinkValidator:
                         ),
                     })
             except Exception as e:
-                self.results["errors"].append({
+                _ = self.results["errors"].append({
                     "type": "file_read_error",
                     "file": file_rel_path,
                     "error": str(e),
@@ -135,12 +135,12 @@ class LinkValidator:
             ]
             for future in concurrent.futures.as_completed(futures):
                 result = future.result()
-                self.results["links_checked"] += 1
+                _ = self.results["links_checked"] += 1
                 if result["valid"]:
-                    self.results["valid_links"] += 1
+                    _ = self.results["valid_links"] += 1
                 else:
-                    self.results["broken_links"] += 1
-                    self.results["errors"].append(result)
+                    _ = self.results["broken_links"] += 1
+                    _ = self.results["errors"].append(result)
         return self.results
 
     def _create_link_result(
@@ -253,7 +253,7 @@ class LinkValidator:
                         target_exists = True
                         break
                 if not target_exists:
-                    self.results["errors"].append({
+                    _ = self.results["errors"].append({
                         "type": "broken_internal_link",
                         "url": link["url"],
                         "target": target,
@@ -261,12 +261,12 @@ class LinkValidator:
                         "line": link.get("line_number"),
                         "error": "Target file not found",
                     })
-                    self.results["broken_links"] += 1
+                    _ = self.results["broken_links"] += 1
                 else:
-                    self.results["valid_links"] += 1
+                    _ = self.results["valid_links"] += 1
             else:
-                self.results["valid_links"] += 1
-            self.results["links_checked"] += 1
+                _ = self.results["valid_links"] += 1
+            _ = self.results["links_checked"] += 1
         return self.results
 
     def _resolve_relative_path(self, base_dir: Path, target: str) -> Path:
@@ -283,7 +283,7 @@ class LinkValidator:
         for image in images:
             src = image["url"]
             if src.startswith(("http://", "https://")):
-                self.results["valid_links"] += 1
+                _ = self.results["valid_links"] += 1
                 continue
             image_path = Path(src)
             if not image_path.is_absolute():
@@ -292,17 +292,17 @@ class LinkValidator:
             else:
                 full_path = image_path
             if full_path.exists():
-                self.results["valid_links"] += 1
+                _ = self.results["valid_links"] += 1
             else:
-                self.results["errors"].append({
+                _ = self.results["errors"].append({
                     "type": "missing_image",
                     "src": src,
                     "file": image["file"],
                     "line": image.get("line_number"),
                     "error": f"Image file not found: {full_path}",
                 })
-                self.results["broken_links"] += 1
-            self.results["links_checked"] += 1
+                _ = self.results["broken_links"] += 1
+            _ = self.results["links_checked"] += 1
         return self.results
 
     def validate_anchors(
@@ -324,7 +324,7 @@ class LinkValidator:
                 anchors.extend(explicit_anchors)
                 file_anchors[file_rel_path] = set(anchors)
             except Exception as e:
-                self.results["warnings_list"].append({
+                _ = self.results["warnings_list"].append({
                     "type": "anchor_index_error",
                     "file": file_rel_path,
                     "warning": f"Could not build anchor index: {e!s}",
@@ -333,17 +333,17 @@ class LinkValidator:
             anchor = link["url"][1:]
             file_path = link["file"]
             if file_path in file_anchors and anchor in file_anchors[file_path]:
-                self.results["valid_links"] += 1
+                _ = self.results["valid_links"] += 1
             else:
-                self.results["errors"].append({
+                _ = self.results["errors"].append({
                     "type": "broken_anchor",
                     "anchor": anchor,
                     "file": file_path,
                     "line": link.get("line_number"),
                     "error": f"Anchor '{anchor}' not found in {file_path}",
                 })
-                self.results["broken_links"] += 1
-            self.results["links_checked"] += 1
+                _ = self.results["broken_links"] += 1
+            _ = self.results["links_checked"] += 1
         return self.results
 
     def _heading_to_anchor(self, heading: str) -> str:
@@ -371,7 +371,7 @@ class LinkValidator:
         for link in links:
             text = link["text"].lower().strip()
             if text in poor_link_texts or len(text) < 3:
-                self.results["warnings_list"].append({
+                _ = self.results["warnings_list"].append({
                     "type": "poor_link_text",
                     "text": link["text"],
                     "url": link["url"],
@@ -379,7 +379,7 @@ class LinkValidator:
                     "line": link.get("line_number"),
                     "warning": "Link text is not descriptive enough for accessibility",
                 })
-                self.results["warnings"] += 1
+                _ = self.results["warnings"] += 1
         return self.results
 
     def generate_report(self, report_format: str = "json") -> str:
@@ -396,7 +396,7 @@ class LinkValidator:
         filename = f"validation_report_{timestamp}.json"
         filepath = output_dir / filename
         report_content = self.generate_report("json")
-        filepath.write_text(report_content, encoding="utf-8")
+        _ = filepath.write_text(report_content, encoding="utf-8")
         latest_file = output_dir / "latest_validation.json"
         json.dump(self.results, latest_file.open("w"), indent=2, default=str)
         return filepath
@@ -407,7 +407,7 @@ class ContentValidator:
 
     def __init__(self) -> None:
         """Initialize the content validator."""
-        self.results = {
+        _ = self.results = {
             "timestamp": datetime.now(UTC).isoformat(),
             "files_checked": 0,
             "content_issues": [],
@@ -423,12 +423,12 @@ class ContentValidator:
                 file_rel_path = str(file_path.relative_to(file_path.parents[2]))
                 issues = self._check_markdown_issues(content)
                 if issues:
-                    self.results["content_issues"].extend([
+                    _ = self.results["content_issues"].extend([
                         {**issue, "file": file_rel_path} for issue in issues
                     ])
-                self.results["files_checked"] += 1
+                _ = self.results["files_checked"] += 1
             except Exception as e:
-                self.results["content_issues"].append({
+                _ = self.results["content_issues"].append({
                     "type": "syntax_validation_error",
                     "file": file_rel_path,
                     "error": str(e),
@@ -474,22 +474,22 @@ class ContentValidator:
                 file_rel_path = str(file_path.relative_to(file_path.parents[2]))
                 metrics = self._calculate_content_metrics(content)
                 if metrics["word_count"] < 50:
-                    self.results["content_issues"].append({
+                    _ = self.results["content_issues"].append({
                         "type": "insufficient_content",
                         "file": file_rel_path,
                         "word_count": metrics["word_count"],
                         "warning": "Document appears to be too short",
                     })
                 if metrics["readability_score"] < 60:
-                    self.results["content_issues"].append({
+                    _ = self.results["content_issues"].append({
                         "type": "readability_issue",
                         "file": file_rel_path,
                         "readability_score": metrics["readability_score"],
                         "warning": "Content may be difficult to read",
                     })
-                self.results["files_checked"] += 1
+                _ = self.results["files_checked"] += 1
             except Exception as e:
-                self.results["content_issues"].append({
+                _ = self.results["content_issues"].append({
                     "type": "quality_analysis_error",
                     "file": file_rel_path,
                     "error": str(e),
@@ -525,40 +525,40 @@ def _create_validation_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="FLEXT Quality Documentation Validation"
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--external-links", action="store_true", help="Validate external links"
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--internal-links", action="store_true", help="Validate internal links"
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--images", action="store_true", help="Validate image references"
     )
-    parser.add_argument("--anchors", action="store_true", help="Validate anchor links")
-    parser.add_argument(
+    _ = parser.add_argument("--anchors", action="store_true", help="Validate anchor links")
+    _ = parser.add_argument(
         "--link-text", action="store_true", help="Check link text quality"
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--markdown-syntax", action="store_true", help="Validate markdown syntax"
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--content-quality", action="store_true", help="Analyze content quality"
     )
-    parser.add_argument("--all", action="store_true", help="Run all validation checks")
-    parser.add_argument("--verbose", action="store_true", help="Verbose output")
-    parser.add_argument(
+    _ = parser.add_argument("--all", action="store_true", help="Run all validation checks")
+    _ = parser.add_argument("--verbose", action="store_true", help="Verbose output")
+    _ = parser.add_argument(
         "--output",
         type=str,
         default="docs/maintenance/reports/",
         help="Output directory for reports",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--timeout", type=int, default=10, help="Timeout for external link checks"
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--retries", type=int, default=3, help="Retry attempts for external links"
     )
-    parser.add_argument("--workers", type=int, default=5, help="Max concurrent workers")
+    _ = parser.add_argument("--workers", type=int, default=5, help="Max concurrent workers")
     return parser
 
 

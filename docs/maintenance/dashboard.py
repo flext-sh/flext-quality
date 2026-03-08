@@ -518,10 +518,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="FLEXT Quality Documentation Dashboard",
     )
-    parser.add_argument("--host", default="localhost", help="Host to bind to")
-    parser.add_argument("--port", type=int, default=8080, help="Port to bind to")
-    parser.add_argument("--debug", action="store_true", help="Enable debug mode")
-    parser.add_argument(
+    _ = parser.add_argument("--host", default="localhost", help="Host to bind to")
+    _ = parser.add_argument("--port", type=int, default=8080, help="Port to bind to")
+    _ = parser.add_argument("--debug", action="store_true", help="Enable debug mode")
+    _ = parser.add_argument(
         "--reports-dir",
         default="docs/maintenance/reports/",
         help="Directory containing audit reports",

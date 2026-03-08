@@ -929,7 +929,7 @@ class ExtendedAuditor(DocumentationAuditor):
     def run_custom_checks(self, doc_files: List[Path]):
         # Integrate your custom tools
         custom_results = self.custom_validator.validate_files(doc_files)
-        self.results["custom_checks"] = custom_results
+        _ = self.results["custom_checks"] = custom_results
 ```
 
 ### API Integration

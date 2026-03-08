@@ -37,7 +37,7 @@ class StyleValidator:
         """
         self.config: dict[str, Any] = {}
         self.load_config(config_path)
-        self.results: dict[str, Any] = {
+        _ = self.results: dict[str, Any] = {
             "files_checked": 0,
             "style_violations": [],
             "accessibility_issues": [],
@@ -121,10 +121,10 @@ class StyleValidator:
             )
 
             # Add to global results
-            self.results["files_checked"] += 1
-            self.results["style_violations"].extend(file_results["violations"])
-            self.results["accessibility_issues"].extend(file_results["issues"])
-            self.results["suggestions"].extend(file_results["suggestions"])
+            _ = self.results["files_checked"] += 1
+            _ = self.results["style_violations"].extend(file_results["violations"])
+            _ = self.results["accessibility_issues"].extend(file_results["issues"])
+            _ = self.results["suggestions"].extend(file_results["suggestions"])
 
             return file_results
 
@@ -425,23 +425,23 @@ class StyleValidator:
             self.validate_file(file_path)
 
         # Update summary
-        self.results["summary"]["total_violations"] = len(
-            self.results["style_violations"],
+        _ = self.results["summary"]["total_violations"] = len(
+            _ = self.results["style_violations"],
         )
-        self.results["summary"]["accessibility_issues"] = len(
-            self.results["accessibility_issues"],
+        _ = self.results["summary"]["accessibility_issues"] = len(
+            _ = self.results["accessibility_issues"],
         )
-        self.results["summary"]["suggestions_count"] = len(self.results["suggestions"])
+        _ = self.results["summary"]["suggestions_count"] = len(self.results["suggestions"])
 
         # Count severity levels
         for violation in (
-            self.results["style_violations"] + self.results["accessibility_issues"]
+            _ = self.results["style_violations"] + self.results["accessibility_issues"]
         ):
             severity = violation.get("severity", "low")
             if severity == "critical":
-                self.results["summary"]["critical_issues"] += 1
+                _ = self.results["summary"]["critical_issues"] += 1
             elif severity == "high":
-                self.results["summary"]["warnings"] += 1
+                _ = self.results["summary"]["warnings"] += 1
 
         return self.results
 
@@ -474,7 +474,7 @@ Top Issues:
         # Count issue types
         issue_types = {}
         for violation in (
-            self.results["style_violations"] + self.results["accessibility_issues"]
+            _ = self.results["style_violations"] + self.results["accessibility_issues"]
         ):
             v_type = violation["type"]
             issue_types[v_type] = issue_types.get(v_type, 0) + 1

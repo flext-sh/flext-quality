@@ -431,7 +431,7 @@ class DocumentationReporter:
     ) -> Path:
         """Save report to file."""
         filepath = self.reports_dir / f"{filename}.{report_format}"
-        filepath.write_text(content, encoding="utf-8")
+        _ = filepath.write_text(content, encoding="utf-8")
         return filepath
 
 
@@ -440,38 +440,38 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="FLEXT Quality Documentation Reporting"
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--format",
         type=str,
         choices=["html", "json", "markdown"],
         default="html",
         help="Report format",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--output",
         type=str,
         default="docs/maintenance/reports/",
         help="Output directory for reports",
     )
-    parser.add_argument("--filename", type=str, help="Custom filename for the report")
-    parser.add_argument(
+    _ = parser.add_argument("--filename", type=str, help="Custom filename for the report")
+    _ = parser.add_argument(
         "--monthly-trends", action="store_true", help="Generate monthly trend analysis"
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--weekly-trends", action="store_true", help="Generate weekly trend analysis"
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--include-trends",
         action="store_true",
         help="Include trend analysis in quality report",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--notify",
         action="store_true",
         help="Send notifications (requires webhook URL)",
     )
-    parser.add_argument("--webhook-url", type=str, help="Webhook URL for notifications")
-    parser.add_argument(
+    _ = parser.add_argument("--webhook-url", type=str, help="Webhook URL for notifications")
+    _ = parser.add_argument(
         "--serve", action="store_true", help="Serve dashboard (not implemented yet)"
     )
     args = parser.parse_args()

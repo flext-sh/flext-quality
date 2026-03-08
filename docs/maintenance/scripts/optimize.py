@@ -36,7 +36,7 @@ class DocumentationOptimizer:
         self.backup = backup
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.results = {
+        _ = self.results = {
             "timestamp": datetime.now(UTC).isoformat(),
             "files_processed": 0,
             "changes_made": 0,
@@ -56,13 +56,13 @@ class DocumentationOptimizer:
                 content = self._normalize_emphasis_style(content)
                 if content != original_content:
                     self._save_with_backup(file_path, content)
-                    self.results["changes_made"] += 1
-                    self.results["optimizations"].append({
+                    _ = self.results["changes_made"] += 1
+                    _ = self.results["optimizations"].append({
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "formatting_fixes",
                         "description": "Fixed trailing spaces, list indentation, and emphasis consistency",
                     })
-                self.results["files_processed"] += 1
+                _ = self.results["files_processed"] += 1
             except Exception as e:
                 self.logger.warning("Failed to optimize formatting in file: %s", e)
         return self.results
@@ -102,13 +102,13 @@ class DocumentationOptimizer:
                     content = self._add_or_update_toc(content)
                 if content != original_content:
                     self._save_with_backup(file_path, content)
-                    self.results["changes_made"] += 1
-                    self.results["optimizations"].append({
+                    _ = self.results["changes_made"] += 1
+                    _ = self.results["optimizations"].append({
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "toc_update",
                         "description": "Added or updated table of contents",
                     })
-                self.results["files_processed"] += 1
+                _ = self.results["files_processed"] += 1
             except Exception as e:
                 self.logger.warning("Failed to update TOC in file: %s", e)
         return self.results
@@ -184,13 +184,13 @@ class DocumentationOptimizer:
                 content = self._improve_link_text(content)
                 if content != original_content:
                     self._save_with_backup(file_path, content)
-                    self.results["changes_made"] += 1
-                    self.results["optimizations"].append({
+                    _ = self.results["changes_made"] += 1
+                    _ = self.results["optimizations"].append({
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "accessibility_enhancement",
                         "description": "Added alt text and improved link descriptions",
                     })
-                self.results["files_processed"] += 1
+                _ = self.results["files_processed"] += 1
             except Exception as e:
                 self.logger.warning(
                     "Failed to enhance accessibility in %s: %s", file_path, e
@@ -232,13 +232,13 @@ class DocumentationOptimizer:
                 content = self._add_section_breaks(content)
                 if content != original_content:
                     self._save_with_backup(file_path, content)
-                    self.results["changes_made"] += 1
-                    self.results["optimizations"].append({
+                    _ = self.results["changes_made"] += 1
+                    _ = self.results["optimizations"].append({
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "structure_optimization",
                         "description": "Improved paragraph breaks and section organization",
                     })
-                self.results["files_processed"] += 1
+                _ = self.results["files_processed"] += 1
             except Exception as e:
                 self.logger.warning(
                     "Failed to enhance accessibility in %s: %s", file_path, e
@@ -286,13 +286,13 @@ class DocumentationOptimizer:
                         content = "\n".join(lines)
                 if content != original_content:
                     self._save_with_backup(file_path, content)
-                    self.results["changes_made"] += 1
-                    self.results["optimizations"].append({
+                    _ = self.results["changes_made"] += 1
+                    _ = self.results["optimizations"].append({
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "metadata_update",
                         "description": "Updated frontmatter and added modification timestamp",
                     })
-                self.results["files_processed"] += 1
+                _ = self.results["files_processed"] += 1
             except Exception as e:
                 self.logger.warning(
                     "Failed to enhance accessibility in %s: %s", file_path, e
@@ -330,7 +330,7 @@ class DocumentationOptimizer:
         if self.backup:
             backup_path = file_path.with_suffix(f"{file_path.suffix}.backup")
             shutil.copy2(file_path, backup_path)
-            self.results["backups_created"].append(
+            _ = self.results["backups_created"].append(
                 str(backup_path.relative_to(self.project_root))
             )
         file_path.write_text(content, encoding="utf-8")
@@ -349,7 +349,7 @@ class DocumentationOptimizer:
         filename = f"optimization_report_{timestamp}.json"
         filepath = output_dir / filename
         report_content = self.generate_report("json")
-        filepath.write_text(report_content, encoding="utf-8")
+        _ = filepath.write_text(report_content, encoding="utf-8")
         latest_file = output_dir / "latest_optimization.json"
         json.dump(self.results, latest_file.open("w"), indent=2, default=str)
         return str(filepath)
@@ -360,47 +360,47 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="FLEXT Quality Documentation Optimization"
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--fix-formatting", action="store_true", help="Fix common formatting issues"
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--update-toc", action="store_true", help="Update table of contents"
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--add-alt-text", action="store_true", help="Add missing alt text to images"
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--improve-accessibility",
         action="store_true",
         help="Enhance accessibility features",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--optimize-structure",
         action="store_true",
         help="Optimize content structure and readability",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--update-metadata", action="store_true", help="Update frontmatter and metadata"
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--comprehensive", action="store_true", help="Run all optimization checks"
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--backup",
         action="store_true",
         default=True,
         help="Create backups before making changes",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--no-backup", action="store_false", dest="backup", help="Don't create backups"
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--output",
         type=str,
         default="docs/maintenance/reports/",
         help="Output directory for reports",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--files",
         nargs="*",
         default=[],

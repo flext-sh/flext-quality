@@ -15,6 +15,8 @@ from email.mime.text import MIMEText
 from pathlib import Path
 from typing import Any
 
+from flext_core import t
+
 import requests
 import yaml
 
@@ -35,10 +37,12 @@ class DocumentationNotifier:
             config_path: Path to the notification configuration file.
 
         """
+        self.config: t.ConfigMap = {}
         self.load_config(config_path)
-        self.results = {
+        errors: list[str] = []
+        self.results: t.ConfigMap = {
             "notifications_sent": 0,
-            "errors": [],
+            "errors": errors,
             "timestamp": datetime.now(UTC).isoformat(),
         }
 
@@ -46,7 +50,8 @@ class DocumentationNotifier:
         """Load notification configuration."""
         try:
             with Path(config_path).open(encoding="utf-8") as f:
-                self.config = yaml.safe_load(f)
+                loaded = yaml.safe_load(f)
+                self.config = loaded if isinstance(loaded, dict) else self.get_default_config()
         except FileNotFoundError:
             self.config = self.get_default_config()
 
@@ -173,7 +178,7 @@ Please review recent changes and address any identified issues.
             try:
                 self._send_email_notification(title, message, priority)
             except Exception as e:
-                self.results["errors"].append(f"Email notification failed: {e}")
+                _ = self.results["errors"].append(f"Email notification failed: {e}")
                 success = False
 
         # Slack notification
@@ -181,7 +186,7 @@ Please review recent changes and address any identified issues.
             try:
                 self._send_slack_notification(title, message, priority)
             except Exception as e:
-                self.results["errors"].append(f"Slack notification failed: {e}")
+                _ = self.results["errors"].append(f"Slack notification failed: {e}")
                 success = False
 
         # Webhook notification
@@ -189,7 +194,7 @@ Please review recent changes and address any identified issues.
             try:
                 self._send_webhook_notification(title, message, priority)
             except Exception as e:
-                self.results["errors"].append(f"Webhook notification failed: {e}")
+                _ = self.results["errors"].append(f"Webhook notification failed: {e}")
                 success = False
 
         if success:
@@ -234,7 +239,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
         server.starttls()
         server.login(email_config["username"], email_config["password"])
         text = msg.as_string()
-        server.sendmail(
+        _ = server.sendmail(
             email_config["from_address"],
             email_config["to_addresses"],
             text,
@@ -375,19 +380,19 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="FLEXT Quality Documentation Notifications",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--config",
         default="docs/maintenance/config/notification_config.yaml",
         help="Notification configuration file",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--test",
         action="store_true",
         help="Send test notification to verify configuration",
     )
-    parser.add_argument("--audit-data", help="Path to audit data JSON file")
-    parser.add_argument("--weekly-report", help="Path to weekly report JSON file")
-    parser.add_argument("--monthly-report", help="Path to monthly report JSON file")
+    _ = parser.add_argument("--audit-data", help="Path to audit data JSON file")
+    _ = parser.add_argument("--weekly-report", help="Path to weekly report JSON file")
+    _ = parser.add_argument("--monthly-report", help="Path to monthly report JSON file")
 
     args = parser.parse_args()
 
@@ -412,7 +417,7 @@ def main() -> None:
             audit_data = json.load(f)
 
         # Check for critical issues
-        notifier.notify_critical_issues(audit_data)
+        _ = notifier.notify_critical_issues(audit_data)
 
         # Check for broken links (would need to extract from audit data)
         # This is a simplified example
@@ -422,19 +427,19 @@ def main() -> None:
             if "broken" in i.get("type", "").lower()
         ]
         if broken_links:
-            notifier.notify_broken_links(broken_links)
+            _ = notifier.notify_broken_links(broken_links)
 
     elif args.weekly_report:
         # Send weekly report notification
         with Path(args.weekly_report).open(encoding="utf-8") as f:
             report_data = json.load(f)
-        notifier.notify_weekly_report(report_data)
+        _ = notifier.notify_weekly_report(report_data)
 
     elif args.monthly_report:
         # Send monthly report notification
         with Path(args.monthly_report).open(encoding="utf-8") as f:
             report_data = json.load(f)
-        notifier.notify_monthly_report(report_data)
+        _ = notifier.notify_monthly_report(report_data)
 
     else:
         parser.print_help()
