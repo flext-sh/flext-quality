@@ -17,7 +17,8 @@ import re
 import sys
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+
+from flext_core import t
 
 import requests
 
@@ -43,7 +44,7 @@ class LinkValidator:
             "warnings_list": [],
         }
 
-    def find_all_links(self, doc_files: list[Path]) -> list[dict]:
+    def find_all_links(self, doc_files: list[Path]) -> list[t.ConfigMap]:
         """Extract all links from documentation files."""
         all_links = []
         for file_path in doc_files:

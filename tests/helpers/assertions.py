@@ -10,38 +10,41 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from typing import Any
+
+from flext_core import t
 
 
-def assert_is_dict(value: object, msg: str = "") -> None:
+def assert_is_dict(value: t.ContainerValue, msg: str = "") -> None:
     """Assert that value is a dict."""
     assert isinstance(value, dict), msg or f"Expected dict, got {type(value).__name__}"
 
 
-def assert_is_list(value: object, msg: str = "") -> None:
+def assert_is_list(value: t.ContainerValue, msg: str = "") -> None:
     """Assert that value is a list."""
     assert isinstance(value, list), msg or f"Expected list, got {type(value).__name__}"
 
 
 def assert_dict_structure(
-    data: Mapping[str, Any], required_keys: Sequence[str], msg: str = ""
+    data: Mapping[str, t.ContainerValue], required_keys: Sequence[str], msg: str = ""
 ) -> None:
     """Assert that a dict contains all required keys."""
     missing = [k for k in required_keys if k not in data]
     assert not missing, msg or f"Missing keys: {missing}"
 
 
-def assert_metrics_structure(metrics: Mapping[str, Any]) -> None:
+def assert_metrics_structure(metrics: Mapping[str, t.ContainerValue]) -> None:
     """Assert that metrics dict has expected structure."""
     assert isinstance(metrics, dict), f"Expected dict, got {type(metrics).__name__}"
 
 
-def assert_issues_structure(issues: object) -> None:
+def assert_issues_structure(issues: t.ContainerValue) -> None:
     """Assert that issues data has expected structure."""
     assert isinstance(issues, list), f"Expected list, got {type(issues).__name__}"
 
 
-def assert_analysis_results_structure(results: Mapping[str, Any]) -> None:
+def assert_analysis_results_structure(
+    results: Mapping[str, t.ContainerValue]
+) -> None:
     """Assert that analysis results have expected structure."""
     assert isinstance(results, dict), f"Expected dict, got {type(results).__name__}"
 

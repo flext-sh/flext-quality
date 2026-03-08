@@ -16,7 +16,8 @@ import re
 import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
+
+from flext_core import t
 
 import requests
 import yaml
@@ -34,13 +35,18 @@ class DocumentationAuditor:
         """
         self.config_path = Path(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
+        self.audit_rules = self.get_default_audit_rules()
+        self.style_guide = self.get_default_style_guide()
+        self.validation_config = self.get_default_validation_config()
         self.load_config()
-        _ = self.results = {
+        issues_list: list[dict[str, str | int | list[str] | list[dict[str, str]]]] = []
+        recommendations_list: list[dict[str, str | list[str]]] = []
+        self.results = {
             "timestamp": datetime.now(UTC).isoformat(),
             "files_analyzed": 0,
-            "issues": [],
+            "issues": issues_list,
             "metrics": {},
-            "recommendations": [],
+            "recommendations": recommendations_list,
         }
 
     def load_config(self) -> None:
@@ -49,25 +55,36 @@ class DocumentationAuditor:
             with Path(self.config_path / "audit_rules.yaml").open(
                 encoding="utf-8"
             ) as f:
-                self.audit_rules = yaml.safe_load(f)
+                loaded = yaml.safe_load(f)
+                self.audit_rules = (
+                    loaded if isinstance(loaded, dict) else self.get_default_audit_rules()
+                )
         except FileNotFoundError:
             self.audit_rules = self.get_default_audit_rules()
         try:
             with Path(self.config_path / "style_guide.yaml").open(
                 encoding="utf-8"
             ) as f:
-                self.style_guide = yaml.safe_load(f)
+                loaded = yaml.safe_load(f)
+                self.style_guide = (
+                    loaded if isinstance(loaded, dict) else self.get_default_style_guide()
+                )
         except FileNotFoundError:
             self.style_guide = self.get_default_style_guide()
         try:
             with Path(self.config_path / "validation_config.yaml").open(
                 encoding="utf-8"
             ) as f:
-                self.validation_config = yaml.safe_load(f)
+                loaded = yaml.safe_load(f)
+                self.validation_config = (
+                    loaded
+                    if isinstance(loaded, dict)
+                    else self.get_default_validation_config()
+                )
         except FileNotFoundError:
             self.validation_config = self.get_default_validation_config()
 
-    def get_default_audit_rules(self) -> dict[str, Any]:
+    def get_default_audit_rules(self) -> t.ConfigMap:
         """Default audit rules if config file not found."""
         return {
             "quality_thresholds": {
@@ -90,7 +107,7 @@ class DocumentationAuditor:
             },
         }
 
-    def get_default_style_guide(self) -> dict[str, Any]:
+    def get_default_style_guide(self) -> t.ConfigMap:
         """Default style guide if config file not found."""
         return {
             "markdown": {
@@ -111,7 +128,7 @@ class DocumentationAuditor:
             },
         }
 
-    def get_default_validation_config(self) -> dict[str, Any]:
+    def get_default_validation_config(self) -> t.ConfigMap:
         """Default validation config if config file not found."""
         return {
             "link_validation": {
@@ -163,7 +180,7 @@ class DocumentationAuditor:
         ]
         return any(pattern in str(file_path) for pattern in ignored_patterns)
 
-    def run_comprehensive_audit(self) -> dict[str, Any]:
+    def run_comprehensive_audit(self) -> t.ConfigMap:
         """Run complete documentation audit."""
         doc_files = self.find_documentation_files()
         _ = self.results["files_analyzed"] = len(doc_files)
@@ -359,7 +376,7 @@ class DocumentationAuditor:
             issues.append(f"{len(long_lines)} lines exceed {max_length} characters")
         return issues
 
-    def _check_accessibility(self, content: str) -> list[dict]:
+    def _check_accessibility(self, content: str) -> list[dict[str, str]]:
         """Check accessibility compliance."""
         issues = []
         if self.style_guide["accessibility"]["require_alt_text"]:
@@ -448,13 +465,13 @@ class DocumentationAuditor:
         if self.validation_config["link_validation"]["check_images"]:
             self._validate_images(image_refs)
 
-    def _validate_external_links(self, links: list[dict]) -> None:
+    def _validate_external_links(self, links: list[dict[str, str | int]]) -> None:
         """Validate external links."""
         external_links = [link for link in links if link["type"] == "external"]
         for link in external_links:
             try:
                 response = requests.head(
-                    link["url"],
+                    str(link["url"]),
                     timeout=self.validation_config["link_validation"]["timeout"],
                     headers={
                         "User-Agent": self.validation_config["link_validation"][
@@ -483,15 +500,17 @@ class DocumentationAuditor:
                 })
 
     def _validate_internal_links(
-        self, links: list[dict], doc_files: list[Path]
+        self, links: list[dict[str, str | int]], doc_files: list[Path]
     ) -> None:
         """Validate internal links."""
         internal_links = [link for link in links if link["type"] == "internal"]
         doc_file_names = {str(f.relative_to(self.project_root)) for f in doc_files}
         for link in internal_links:
-            target_file = link["url"].split("#")[0]
+            url_val = link["url"]
+            target_file = (str(url_val).split("#")[0]) if isinstance(url_val, str) else ""
             if target_file and target_file not in doc_file_names:
-                link_file_dir = Path(link["file"]).parent
+                file_val = link["file"]
+                link_file_dir = Path(str(file_val)).parent if isinstance(file_val, str) else Path(".")
                 potential_target = (link_file_dir / target_file).resolve()
                 if not potential_target.exists():
                     _ = self.results["issues"].append({
@@ -502,7 +521,7 @@ class DocumentationAuditor:
                         "recommendation": f"Fix broken internal link to '{link['url']}'",
                     })
 
-    def _validate_images(self, images: list[dict]) -> None:
+    def _validate_images(self, images: list[dict[str, str]]) -> None:
         """Validate image references."""
         for image in images:
             if image["src"].startswith(("http://", "https://")):
@@ -577,7 +596,8 @@ class DocumentationAuditor:
         broken_links = [
             i
             for i in issues
-            if "link" in i["type"] and i["severity"] in {"critical", "high"}
+            if "link" in (i["type"] if isinstance(i.get("type"), str) else "")
+            and i.get("severity") in {"critical", "high"}
         ]
         if broken_links:
             recommendations.append({
@@ -640,8 +660,10 @@ class DocumentationAuditor:
         metrics = self.results["metrics"]
         html = f"""\n<!DOCTYPE html>\n<html>\n<head>\n    <title>FLEXT Quality Documentation Audit Report</title>\n    <style>\n        body {{ font-family: Arial, sans-serif; margin: 40px; }}\n        .header {{ background: #f0f0f0; padding: 20px; border-radius: 5px; }}\n        .metrics {{ display: flex; gap: 20px; margin: 20px 0; }}\n        .metric {{ background: #e8f4fd; padding: 15px; border-radius: 5px; flex: 1; }}\n        .issues {{ margin: 20px 0; }}\n        .issue {{ border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; }}\n        .severity-critical {{ border-left: 5px solid #dc3545; }}\n        .severity-high {{ border-left: 5px solid #fd7e14; }}\n        .severity-medium {{ border-left: 5px solid #ffc107; }}\n        .severity-low {{ border-left: 5px solid #28a745; }}\n    </style>\n</head>\n<body>\n    <div class="header">\n        <h1>FLEXT Quality Documentation Audit Report</h1>\n        <p>Generated: {self.results["timestamp"]}</p>\n        <p>Files Analyzed: {metrics["files_analyzed"]}</p>\n    </div>\n\n    <div class="metrics">\n        <div class="metric">\n            <h3>Quality Score</h3>\n            <div style="font-size: 2em; font-weight: bold; color: {self._get_score_color(metrics["quality_score"])};">\n                {metrics["quality_score"]}%\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Total Issues</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                {metrics["total_issues"]}\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Issues per File</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                {metrics["issues_per_file"]:.1f}\n            </div>\n        </div>\n    </div>\n\n    <h2>Issues by Severity</h2>\n    <ul>\n        <li>Critical: {metrics["severity_breakdown"]["critical"]}</li>\n        <li>High: {metrics["severity_breakdown"]["high"]}</li>\n        <li>Medium: {metrics["severity_breakdown"]["medium"]}</li>\n        <li>Low: {metrics["severity_breakdown"]["low"]}</li>\n    </ul>\n\n    <div class="issues">\n        <h2>Detailed Issues</h2>\n"""
         for issue in self.results["issues"]:
-            severity_class = f"severity-{issue['severity']}"
-            html += f"""\n        <div class="issue {severity_class}">\n            <h4>{issue["type"].replace("_", " ").title()} ({issue["severity"].upper()})</h4>\n            <p><strong>File:</strong> {issue["file"]}</p>\n            <p><strong>Recommendation:</strong> {issue.get("recommendation", "N/A")}</p>\n"""
+            severity_class = f"severity-{issue.get('severity', 'info')}"
+            type_str = str(issue.get("type", ""))
+            sev_str = str(issue.get("severity", ""))
+            html += f"""\n        <div class="issue {severity_class}">\n            <h4>{type_str.replace("_", " ").title()} ({sev_str.upper()})</h4>\n            <p><strong>File:</strong> {issue.get("file", "N/A")}</p>\n            <p><strong>Recommendation:</strong> {issue.get("recommendation", "N/A")}</p>\n"""
             if "age_days" in issue:
                 html += f"<p><strong>Age:</strong> {issue['age_days']} days</p>"
             if "word_count" in issue:

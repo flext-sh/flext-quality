@@ -14,7 +14,6 @@ import json
 import operator
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
 
 from jinja2 import Template
 
@@ -36,7 +35,7 @@ class DocumentationReporter:
         self.validation_data = self._load_json_report("latest_validation.json")
         self.optimization_data = self._load_json_report("latest_optimization.json")
 
-    def _load_json_report(self, filename: str) -> dict[str, Any] | None:
+    def _load_json_report(self, filename: str) -> t.JsonDict | None:
         """Load a JSON report file."""
         filepath = self.reports_dir / filename
         if filepath.exists():
@@ -70,7 +69,7 @@ class DocumentationReporter:
         msg = f"Unsupported format: {report_format}"
         raise ValueError(msg)
 
-    def _calculate_summary_metrics(self) -> dict[str, Any]:
+    def _calculate_summary_metrics(self) -> t.JsonDict:
         """Calculate summary metrics from all available data."""
         summary = {
             "overall_score": 0,
@@ -114,11 +113,11 @@ class DocumentationReporter:
             summary["quality_trend"] = "critical"
         return summary
 
-    def _analyze_trends(self) -> dict[str, Any] | None:
+    def _analyze_trends(self) -> t.JsonDict | None:
         """Analyze quality trends over time."""
         return None
 
-    def _generate_recommendations(self) -> list[dict[str, Any]]:
+    def _generate_recommendations(self) -> list[t.JsonDict]:
         """Generate actionable recommendations based on current data."""
         recommendations = []
         if self.audit_data:
@@ -201,7 +200,7 @@ class DocumentationReporter:
             })
         return recommendations
 
-    def _generate_html_report(self, data: dict[str, Any]) -> str:
+    def _generate_html_report(self, data: t.JsonDict) -> str:
         """Generate HTML quality report."""
         template = self._get_html_template()
         template_data = {
@@ -253,8 +252,8 @@ class DocumentationReporter:
         return "\n".join(md)
 
     def _summarize_audit_data(
-        self, audit_data: dict[str, Any] | None
-    ) -> dict[str, Any] | None:
+        self, audit_data: t.JsonDict | None
+    ) -> t.JsonDict | None:
         """Summarize audit data for reporting."""
         if not audit_data:
             return None
@@ -271,8 +270,8 @@ class DocumentationReporter:
         }
 
     def _summarize_validation_data(
-        self, validation_data: dict[str, Any] | None
-    ) -> dict[str, Any] | None:
+        self, validation_data: t.JsonDict | None
+    ) -> t.JsonDict | None:
         """Summarize validation data for reporting."""
         if not validation_data:
             return None
@@ -285,8 +284,8 @@ class DocumentationReporter:
         }
 
     def _summarize_optimization_data(
-        self, optimization_data: dict[str, Any] | None
-    ) -> dict[str, Any] | None:
+        self, optimization_data: t.JsonDict | None
+    ) -> t.JsonDict | None:
         """Summarize optimization data for reporting."""
         if not optimization_data:
             return None
@@ -297,7 +296,7 @@ class DocumentationReporter:
             "optimizations_applied": len(optimization_data.get("optimizations", [])),
         }
 
-    def _generate_charts(self, data: dict[str, Any]) -> dict[str, str] | None:
+    def _generate_charts(self, data: t.JsonDict) -> dict[str, str] | None:
         """Generate charts for the report (placeholder for future implementation)."""
         _ = data
         return None
@@ -325,7 +324,7 @@ class DocumentationReporter:
         trend_data = self._analyze_trend_data(recent_reports)
         return self._generate_trend_report(trend_data, days)
 
-    def _analyze_trend_data(self, reports: list[dict]) -> dict[str, Any]:
+    def _analyze_trend_data(self, reports: list[t.JsonDict]) -> t.JsonDict:
         """Analyze trend data from historical reports."""
         if not reports:
             return {"error": "No historical data available"}
@@ -362,7 +361,7 @@ class DocumentationReporter:
             ),
         }
 
-    def _generate_trend_report(self, trend_data: dict[str, Any], days: int) -> str:
+    def _generate_trend_report(self, trend_data: t.JsonDict, days: int) -> str:
         """Generate trend analysis report."""
         md = [
             f"# Documentation Quality Trends - Last {days} Days",

@@ -5,6 +5,8 @@ Automated scheduled maintenance system for regular documentation quality checks,
 optimizations, and reporting. Designed to run as a cron job or scheduled task.
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import runpy
@@ -15,12 +17,23 @@ import time
 from collections.abc import Callable
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import TypedDict
 
 import pytest
 import schedule
 import yaml
 from git import InvalidGitRepositoryError, Repo
+
+from flext_core import t
+
+
+class _ScheduleResults(TypedDict):
+    """Type for ScheduledMaintenance.results."""
+
+    start_time: str
+    tasks_completed: int
+    errors: list[str]
+    warnings: list[str]
 
 
 class ScheduledMaintenance:
@@ -41,6 +54,7 @@ class ScheduledMaintenance:
             config_path: Path to configuration file for maintenance schedule.
 
         """
+        self.config = self.get_default_config()
         self.load_config(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.reports_dir = Path(
@@ -49,22 +63,27 @@ class ScheduledMaintenance:
         self.reports_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize results tracking
-        self.results = {
+        errors_list: list[str] = []
+        warnings_list: list[str] = []
+        self.results: _ScheduleResults = {
             "start_time": datetime.now(UTC).isoformat(),
             "tasks_completed": 0,
-            "errors": [],
-            "warnings": [],
+            "errors": errors_list,
+            "warnings": warnings_list,
         }
 
     def load_config(self, config_path: str) -> None:
         """Load maintenance schedule configuration."""
         try:
             with Path(config_path).open(encoding="utf-8") as f:
-                self.config = yaml.safe_load(f)
+                loaded = yaml.safe_load(f)
+                self.config: t.ConfigMap = (
+                    loaded if isinstance(loaded, dict) else self.get_default_config()
+                )
         except FileNotFoundError:
             self.config = self.get_default_config()
 
-    def get_default_config(self) -> dict[str, Any]:
+    def get_default_config(self) -> t.ConfigMap:
         """Default maintenance configuration."""
         return {
             "enabled": True,
@@ -174,21 +193,30 @@ class ScheduledMaintenance:
             },
         }
 
+    def _get_task_names(self, schedule_key: str) -> list[str]:
+        """Extract task name list from config for a schedule key."""
+        schedules: t.ConfigMap = self.config.get("schedules") or {}
+        schedule_entry: t.ConfigMap = schedules.get(schedule_key) or {}
+        raw = schedule_entry.get("tasks")
+        if isinstance(raw, (list, tuple)):
+            return [str(t) for t in raw]
+        return []
+
     def run_daily_audit(self) -> bool:
         """Run daily audit tasks."""
-        return self.run_tasks(self.config["schedules"]["daily_audit"]["tasks"])
+        return self.run_tasks(self._get_task_names("daily_audit"))
 
     def run_daily_optimize(self) -> bool:
         """Run daily optimization tasks."""
-        return self.run_tasks(self.config["schedules"]["daily_optimize"]["tasks"])
+        return self.run_tasks(self._get_task_names("daily_optimize"))
 
     def run_weekly_comprehensive(self) -> bool:
         """Run weekly comprehensive maintenance."""
-        return self.run_tasks(self.config["schedules"]["weekly_comprehensive"]["tasks"])
+        return self.run_tasks(self._get_task_names("weekly_comprehensive"))
 
     def run_monthly_deep_clean(self) -> bool:
         """Run monthly deep cleaning maintenance."""
-        return self.run_tasks(self.config["schedules"]["monthly_deep_clean"]["tasks"])
+        return self.run_tasks(self._get_task_names("monthly_deep_clean"))
 
     def run_tasks(self, task_names: list[str]) -> bool:
         """Run a list of maintenance tasks."""
@@ -199,9 +227,9 @@ class ScheduledMaintenance:
                 task_config = self.config["tasks"][task_name]
 
                 if self.run_single_task(task_config):
-                    _ = self.results["tasks_completed"] += 1
+                    self.results["tasks_completed"] += 1
                 else:
-                    _ = self.results["errors"].append(f"Task {task_name} failed")
+                    self.results["errors"].append(f"Task {task_name} failed")
                     success = False
 
                     if self.config["error_handling"]["fail_fast"]:
@@ -209,18 +237,25 @@ class ScheduledMaintenance:
 
         return success
 
-    def run_single_task(self, task_config: dict) -> bool:
+    def run_single_task(self, task_config: t.ConfigMap) -> bool:
         """Run a single maintenance task using appropriate Python libraries."""
         try:
-            command = task_config["command"]
-            description = task_config["description"]
-            timeout = task_config.get("timeout", 300)
+            command_raw = task_config.get("command")
+            command = str(command_raw) if command_raw is not None else ""
+            description_raw = task_config.get("description")
+            description = str(description_raw) if description_raw is not None else ""
+            timeout_val = task_config.get("timeout", 300)
+            timeout = (
+                int(timeout_val)
+                if isinstance(timeout_val, (int, float))
+                else 300
+            )
 
             # Parse command to determine type
-            cmd_parts = shlex.split(command) if isinstance(command, str) else command
+            cmd_parts = shlex.split(command) if command else []
 
             if not cmd_parts:
-                _ = self.results["errors"].append(f"Empty command in task: {description}")
+                self.results["errors"].append(f"Empty command in task: {description}")
                 return False
 
             cmd_name = cmd_parts[0]
@@ -248,7 +283,7 @@ class ScheduledMaintenance:
         cmd_name: str,
     ) -> Callable[[list[str], int, str], bool] | None:
         """Get handler for command type."""
-        handlers: dict[str, Callable] = {
+        handlers: dict[str, Callable[[list[str], int, str], bool]] = {
             "python": self._handle_python_command,
             "pytest": self._handle_pytest_command,
             "make": self._handle_make_command,
@@ -349,7 +384,12 @@ class ScheduledMaintenance:
                 return False
 
             # Parse make command
-            targets = cmd_parts[1:] if len(cmd_parts) > 1 else []
+            empty_targets: list[str] = []
+            targets = (
+                cmd_parts[1:]
+                if len(cmd_parts) > 1
+                else empty_targets
+            )
 
             # Execute make target by reading Makefile and running corresponding command
             if not targets:
@@ -386,10 +426,11 @@ class ScheduledMaintenance:
                 return False
 
             subcommand = cmd_parts[1]
+            empty_args: list[str] = []
             args = (
                 cmd_parts[self.MIN_GIT_ARGS :]
                 if len(cmd_parts) > self.MIN_GIT_ARGS
-                else []
+                else empty_args
             )
 
             def run_git_command() -> None:

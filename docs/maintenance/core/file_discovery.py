@@ -4,11 +4,15 @@ Documentation file discovery and filtering system.
 Finds, categorizes, and filters documentation files in a project.
 """
 
+from __future__ import annotations
+
 import fnmatch
 import logging
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, ClassVar
+from typing import ClassVar
+
+from flext_core import t
 
 from .base_classes import FileMetadata
 
@@ -160,7 +164,7 @@ class DocumentationFinder:
         if use_cache and self._file_cache is not None:
             return self._file_cache.copy()
 
-        found_files = []
+        found_files: list[Path] = []
 
         for pattern in self.patterns:
             try:
@@ -182,8 +186,8 @@ class DocumentationFinder:
                 )
 
         # Remove duplicates while preserving order
-        seen = set()
-        unique_files = []
+        seen: set[str] = set()
+        unique_files: list[Path] = []
         for file_path in found_files:
             file_str = str(file_path)
             if file_str not in seen:
@@ -331,7 +335,7 @@ class DocumentationFinder:
 
         return categories
 
-    def get_statistics(self, files: list[Path] | None = None) -> dict[str, Any]:
+    def get_statistics(self, files: list[Path] | None = None) -> t.ConfigMap:
         """Get statistics about found files."""
         if files is None:
             files = self.find_files()
@@ -342,7 +346,7 @@ class DocumentationFinder:
         metadata_list = self.get_files_metadata(files)
 
         # Basic statistics
-        stats: dict[str, Any] = {
+        stats: t.ConfigMap = {
             "total_files": len(files),
             "total_size": sum(meta.size for meta in metadata_list),
             "total_lines": sum(meta.lines for meta in metadata_list),

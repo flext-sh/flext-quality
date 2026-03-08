@@ -4,15 +4,17 @@ Real-time monitoring dashboard for documentation quality metrics.
 Provides web interface to view audit results, trends, and quality scores.
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import operator
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
 
 from flask import Flask, Response, jsonify, render_template_string, request
-from flext_core import FlextLogger
+
+from flext_core import FlextLogger, t
 
 
 class DocumentationDashboard:
@@ -55,7 +57,7 @@ class DocumentationDashboard:
             limit = int(request.args.get("limit", 10))
             return jsonify(self.get_recent_reports(limit))
 
-    def get_current_metrics(self) -> dict[str, Any]:
+    def get_current_metrics(self) -> t.ConfigMap:
         """Get current quality metrics from latest audit."""
         latest_audit = self.reports_dir / "latest_audit.json"
 
@@ -93,11 +95,11 @@ class DocumentationDashboard:
                 "status": f"Error: {e!s}",
             }
 
-    def get_quality_trends(self, days: int = 30) -> dict[str, Any]:
+    def get_quality_trends(self, days: int = 30) -> t.ConfigMap:
         """Get quality trends over the specified number of days."""
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
 
-        trend_data = []
+        trend_data: list[t.ConfigMap] = []
         reports_dir = self.reports_dir
 
         # Find all audit reports
@@ -115,8 +117,8 @@ class DocumentationDashboard:
                 if report_date >= cutoff_date:
                     with Path(report_file).open(encoding="utf-8") as f:
                         data = json.load(f)
-                        trend_data.append({
-                            "date": report_date.isoformat(),
+                    trend_data.append({
+                        "date": report_date.isoformat(),
                             "quality_score": data.get("metrics", {}).get(
                                 "quality_score",
                                 0,
@@ -149,9 +151,9 @@ class DocumentationDashboard:
             "trends": trend_data,
         }
 
-    def get_recent_reports(self, limit: int = 10) -> list[dict[str, Any]]:
+    def get_recent_reports(self, limit: int = 10) -> list[t.ConfigMap]:
         """Get list of recent audit reports."""
-        reports = []
+        reports: list[t.ConfigMap] = []
 
         for report_file in self.reports_dir.glob("audit_report_*.json"):
             try:

@@ -36,12 +36,14 @@ class DocumentationOptimizer:
         self.backup = backup
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.logger = logging.getLogger(self.__class__.__name__)
-        _ = self.results = {
+        backups_created: list[str] = []
+        optimizations_list: list[dict[str, str]] = []
+        self.results = {
             "timestamp": datetime.now(UTC).isoformat(),
             "files_processed": 0,
             "changes_made": 0,
-            "backups_created": [],
-            "optimizations": [],
+            "backups_created": backups_created,
+            "optimizations": optimizations_list,
         }
 
     def optimize_formatting(self, doc_files: list[Path]) -> dict[str, Any]:
@@ -56,13 +58,13 @@ class DocumentationOptimizer:
                 content = self._normalize_emphasis_style(content)
                 if content != original_content:
                     self._save_with_backup(file_path, content)
-                    _ = self.results["changes_made"] += 1
-                    _ = self.results["optimizations"].append({
+                    self.results["changes_made"] += 1
+                    self.results["optimizations"].append({
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "formatting_fixes",
                         "description": "Fixed trailing spaces, list indentation, and emphasis consistency",
                     })
-                _ = self.results["files_processed"] += 1
+                self.results["files_processed"] += 1
             except Exception as e:
                 self.logger.warning("Failed to optimize formatting in file: %s", e)
         return self.results
@@ -102,13 +104,13 @@ class DocumentationOptimizer:
                     content = self._add_or_update_toc(content)
                 if content != original_content:
                     self._save_with_backup(file_path, content)
-                    _ = self.results["changes_made"] += 1
-                    _ = self.results["optimizations"].append({
+                    self.results["changes_made"] += 1
+                    self.results["optimizations"].append({
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "toc_update",
                         "description": "Added or updated table of contents",
                     })
-                _ = self.results["files_processed"] += 1
+                self.results["files_processed"] += 1
             except Exception as e:
                 self.logger.warning("Failed to update TOC in file: %s", e)
         return self.results
@@ -184,13 +186,13 @@ class DocumentationOptimizer:
                 content = self._improve_link_text(content)
                 if content != original_content:
                     self._save_with_backup(file_path, content)
-                    _ = self.results["changes_made"] += 1
-                    _ = self.results["optimizations"].append({
+                    self.results["changes_made"] += 1
+                    self.results["optimizations"].append({
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "accessibility_enhancement",
                         "description": "Added alt text and improved link descriptions",
                     })
-                _ = self.results["files_processed"] += 1
+                self.results["files_processed"] += 1
             except Exception as e:
                 self.logger.warning(
                     "Failed to enhance accessibility in %s: %s", file_path, e
@@ -232,13 +234,13 @@ class DocumentationOptimizer:
                 content = self._add_section_breaks(content)
                 if content != original_content:
                     self._save_with_backup(file_path, content)
-                    _ = self.results["changes_made"] += 1
-                    _ = self.results["optimizations"].append({
+                    self.results["changes_made"] += 1
+                    self.results["optimizations"].append({
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "structure_optimization",
                         "description": "Improved paragraph breaks and section organization",
                     })
-                _ = self.results["files_processed"] += 1
+                self.results["files_processed"] += 1
             except Exception as e:
                 self.logger.warning(
                     "Failed to enhance accessibility in %s: %s", file_path, e
@@ -286,13 +288,13 @@ class DocumentationOptimizer:
                         content = "\n".join(lines)
                 if content != original_content:
                     self._save_with_backup(file_path, content)
-                    _ = self.results["changes_made"] += 1
-                    _ = self.results["optimizations"].append({
+                    self.results["changes_made"] += 1
+                    self.results["optimizations"].append({
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "metadata_update",
                         "description": "Updated frontmatter and added modification timestamp",
                     })
-                _ = self.results["files_processed"] += 1
+                self.results["files_processed"] += 1
             except Exception as e:
                 self.logger.warning(
                     "Failed to enhance accessibility in %s: %s", file_path, e
