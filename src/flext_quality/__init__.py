@@ -41,7 +41,10 @@ if TYPE_CHECKING:
         FlextQualityUtilities,
         FlextQualityUtilities as u,
     )
+
 __version__ = "0.9.0"
+
+# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextQuality": ("flext_quality.api", "FlextQuality"),
     "FlextQualityCliService": ("flext_quality.services.cli", "FlextQualityCliService"),
@@ -64,6 +67,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "u": ("flext_quality.utilities", "FlextQualityUtilities"),
     "x": ("flext_core", "FlextMixins"),
 }
+
 __all__ = [
     "FlextQuality",
     "FlextQualityCliService",
@@ -89,7 +93,7 @@ __all__ = [
 ]
 
 
-def __getattr__(name: str) -> Any:
+def __getattr__(name: str) -> Any:  # noqa: ANN401  # JUSTIFIED: Ruff (any-type) with PEP 562 dynamic module exports — https://docs.astral.sh/ruff/rules/any-type/
     """Lazy-load module attributes on first access (PEP 562)."""
     return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
 
