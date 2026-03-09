@@ -18,21 +18,27 @@ import re
 import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import TypedDict
 
 import requests
 import yaml
+from pydantic import BaseModel, Field
 from flext_core import t
 
 
-class _AuditorResults(TypedDict):
-    """Type for DocumentationAuditor.results."""
+class AuditorResults(BaseModel):
+    """Results for DocumentationAuditor execution."""
 
-    timestamp: str
-    files_analyzed: int
-    issues: list[t.ConfigurationMapping]
-    metrics: t.ConfigurationMapping
-    recommendations: list[t.ConfigurationMapping]
+    timestamp: str = Field(description="ISO timestamp when audit ran")
+    files_analyzed: int = Field(default=0, description="Number of files analyzed")
+    issues: list[t.ConfigurationMapping] = Field(
+        default_factory=list, description="List of issues found"
+    )
+    metrics: t.ConfigurationMapping = Field(
+        default_factory=dict, description="Quality metrics"
+    )
+    recommendations: list[t.ConfigurationMapping] = Field(
+        default_factory=list, description="List of recommendations"
+    )
 
 
 class DocumentationAuditor:
@@ -53,15 +59,9 @@ class DocumentationAuditor:
             self.get_default_validation_config()
         )
         self.load_config()
-        issues_list: list[t.ConfigurationMapping] = []
-        recommendations_list: list[t.ConfigurationMapping] = []
-        self.results: _AuditorResults = {
-            "timestamp": datetime.now(UTC).isoformat(),
-            "files_analyzed": 0,
-            "issues": issues_list,
-            "metrics": {},
-            "recommendations": recommendations_list,
-        }
+        self.results: AuditorResults = AuditorResults(
+            timestamp=datetime.now(UTC).isoformat(),
+        )
 
     def load_config(self) -> None:
         """Load audit configuration files."""
@@ -201,7 +201,7 @@ class DocumentationAuditor:
     def run_comprehensive_audit(self) -> t.ConfigurationMapping:
         """Run complete documentation audit."""
         doc_files = self.find_documentation_files()
-        _ = self.results["files_analyzed"] = len(doc_files)
+        self.results.files_analyzed = len(doc_files)
         if self.audit_rules["content_checks"]["check_freshness"]:
             self.check_content_freshness(doc_files)
         if self.audit_rules["content_checks"]["check_completeness"]:
@@ -234,9 +234,9 @@ class DocumentationAuditor:
                         "outdated_indicators": outdated_indicators,
                         "recommendation": f"Review and update content (last modified {age_days} days ago)",
                     }
-                    _ = self.results["issues"].append(issue)
+                    _ = self.results.issues.append(issue)
             except Exception as e:
-                _ = self.results["issues"].append({
+                _ = self.results.issues.append({
                     "type": "file_access_error",
                     "severity": "medium",
                     "file": str(file_path.relative_to(self.project_root)),
@@ -271,7 +271,7 @@ class DocumentationAuditor:
                 content = file_path.read_text(encoding="utf-8")
                 word_count = len(content.split())
                 if word_count < min_word_count:
-                    _ = self.results["issues"].append({
+                    _ = self.results.issues.append({
                         "type": "insufficient_content",
                         "severity": "low",
                         "file": str(file_path.relative_to(self.project_root)),
@@ -284,7 +284,7 @@ class DocumentationAuditor:
                         content, required_sections
                     )
                     if missing_sections:
-                        _ = self.results["issues"].append({
+                        _ = self.results.issues.append({
                             "type": "missing_sections",
                             "severity": "medium",
                             "file": str(file_path.relative_to(self.project_root)),
@@ -296,7 +296,7 @@ class DocumentationAuditor:
                         "(?i)(?:TODO|FIXME|XXX):\\s*(.+?)(?:\\n|$)", content
                     )
                     if todos:
-                        _ = self.results["issues"].append({
+                        _ = self.results.issues.append({
                             "type": "todo_markers",
                             "severity": "low",
                             "file": str(file_path.relative_to(self.project_root)),
@@ -305,7 +305,7 @@ class DocumentationAuditor:
                             "recommendation": f"Address {len(todos)} TODO/FIXME items",
                         })
             except Exception as e:
-                _ = self.results["issues"].append({
+                _ = self.results.issues.append({
                     "type": "content_analysis_error",
                     "severity": "medium",
                     "file": str(file_path.relative_to(self.project_root)),
@@ -330,7 +330,7 @@ class DocumentationAuditor:
                 content = file_path.read_text(encoding="utf-8")
                 formatting_issues = self._check_markdown_formatting(content)
                 if formatting_issues:
-                    _ = self.results["issues"].append({
+                    _ = self.results.issues.append({
                         "type": "formatting_issues",
                         "severity": "low",
                         "file": str(file_path.relative_to(self.project_root)),
@@ -347,7 +347,7 @@ class DocumentationAuditor:
                         )
                         else "medium"
                     )
-                    _ = self.results["issues"].append({
+                    _ = self.results.issues.append({
                         "type": "accessibility_issues",
                         "severity": severity,
                         "file": str(file_path.relative_to(self.project_root)),
@@ -357,7 +357,7 @@ class DocumentationAuditor:
                 if self.style_guide["accessibility"]["heading_structure"]:
                     heading_issues = self._check_heading_hierarchy(content)
                     if heading_issues:
-                        _ = self.results["issues"].append({
+                        _ = self.results.issues.append({
                             "type": "heading_hierarchy",
                             "severity": "medium",
                             "file": str(file_path.relative_to(self.project_root)),
@@ -365,7 +365,7 @@ class DocumentationAuditor:
                             "recommendation": "Fix heading hierarchy structure",
                         })
             except Exception as e:
-                _ = self.results["issues"].append({
+                _ = self.results.issues.append({
                     "type": "consistency_check_error",
                     "severity": "medium",
                     "file": str(file_path.relative_to(self.project_root)),
@@ -470,7 +470,7 @@ class DocumentationAuditor:
                         "file": str(file_path.relative_to(self.project_root)),
                     })
             except Exception as e:
-                _ = self.results["issues"].append({
+                _ = self.results.issues.append({
                     "type": "link_extraction_error",
                     "severity": "medium",
                     "file": str(file_path.relative_to(self.project_root)),
@@ -499,7 +499,7 @@ class DocumentationAuditor:
                     allow_redirects=True,
                 )
                 if response.status_code >= 400:
-                    _ = self.results["issues"].append({
+                    _ = self.results.issues.append({
                         "type": "broken_external_link",
                         "severity": "high",
                         "file": link["file"],
@@ -508,7 +508,7 @@ class DocumentationAuditor:
                         "recommendation": f"Fix or remove broken link (HTTP {response.status_code})",
                     })
             except requests.RequestException as e:
-                _ = self.results["issues"].append({
+                _ = self.results.issues.append({
                     "type": "unreachable_external_link",
                     "severity": "high",
                     "file": link["file"],
@@ -535,7 +535,7 @@ class DocumentationAuditor:
                 )
                 potential_target = (link_file_dir / target_file).resolve()
                 if not potential_target.exists():
-                    _ = self.results["issues"].append({
+                    _ = self.results.issues.append({
                         "type": "broken_internal_link",
                         "severity": "high",
                         "file": link["file"],
@@ -555,7 +555,7 @@ class DocumentationAuditor:
             else:
                 full_path = image_path
             if not full_path.exists():
-                _ = self.results["issues"].append({
+                _ = self.results.issues.append({
                     "type": "missing_image",
                     "severity": "medium",
                     "file": image["file"],
@@ -578,20 +578,20 @@ class DocumentationAuditor:
             severity_counts[level] * weights[level] for level in severity_counts
         )
         quality_score = max(0, 100 - weighted_score)
-        _ = self.results["metrics"] = {
+        self.results.metrics = {
             "total_issues": total_issues,
             "severity_breakdown": severity_counts,
             "quality_score": quality_score,
-            "files_analyzed": self.results["files_analyzed"],
-            "issues_per_file": total_issues / self.results["files_analyzed"]
-            if self.results["files_analyzed"] > 0
+            "files_analyzed": self.results.files_analyzed,
+            "issues_per_file": total_issues / self.results.files_analyzed
+            if self.results.files_analyzed > 0
             else 0,
         }
 
     def generate_recommendations(self) -> None:
         """Generate actionable recommendations based on audit results."""
-        metrics = self.results["metrics"]
-        issues = self.results["issues"]
+        metrics = self.results.metrics
+        issues = self.results.issues
         recommendations = []
         if metrics["quality_score"] < 50:
             recommendations.append({
@@ -658,7 +658,7 @@ class DocumentationAuditor:
                     "Ensure proper heading hierarchy",
                 ],
             })
-        _ = self.results["recommendations"] = recommendations
+        self.results.recommendations = recommendations
 
     def generate_report(
         self, output_format: str = "json", output_path: str | None = None
