@@ -1,0 +1,25 @@
+docs/maintenance/notifications.py
+  f555a8e66f910775 21,28-29,31-37,55-57
+docs/maintenance/scheduled_maintenance.py
+  f555a8e66f910775 29-30,32-38,40-43,73-75,233,589-590,592-593,603
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "81fcbe51a393e394307a6e508ccfbdd396f904e7",
+  "prompts": {
+    "f555a8e66f910775": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_32ddde744ffeZtVsnvYKY6KcXP",
+        "model": "anthropic/claude-haiku-4-5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 91,
+      "total_deletions": 64,
+      "accepted_lines": 35,
+      "overriden_lines": 0
+    }
+  }
+}
