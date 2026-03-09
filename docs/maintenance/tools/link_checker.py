@@ -38,7 +38,7 @@ class LinkChecker:
         self.load_config(config_path)
         self.session = None
         self.cache = {}
-        _ = self.results = {
+        self.results = {
             "total_links": 0,
             "valid_links": 0,
             "broken_links": 0,
@@ -191,8 +191,8 @@ class LinkChecker:
                 }
 
                 # Update performance metrics
-                _ = self.results["performance"]["slowest_response"] = max(
-                    _ = self.results["performance"]["slowest_response"],
+                self.results["performance"]["slowest_response"] = max(
+                    self.results["performance"]["slowest_response"],
                     response_time,
                 )
 
@@ -255,8 +255,8 @@ class LinkChecker:
                 }
 
                 # Update performance metrics
-                _ = self.results["performance"]["slowest_response"] = max(
-                    _ = self.results["performance"]["slowest_response"],
+                self.results["performance"]["slowest_response"] = max(
+                    self.results["performance"]["slowest_response"],
                     response_time,
                 )
 
@@ -328,7 +328,7 @@ class LinkChecker:
             else:
                 processed_results.append(result)
 
-        _ = self.results["performance"]["total_time"] = time.time() - start_time
+        self.results["performance"]["total_time"] = time.time() - start_time
 
         # Calculate average response time
         valid_times = [
@@ -337,7 +337,7 @@ class LinkChecker:
             if "response_time" in r and r.get("valid")
         ]
         if valid_times:
-            _ = self.results["performance"]["average_response_time"] = sum(
+            self.results["performance"]["average_response_time"] = sum(
                 valid_times,
             ) / len(valid_times)
 
@@ -354,7 +354,7 @@ class LinkChecker:
         with ThreadPoolExecutor(max_workers=5) as executor:
             results = list(executor.map(check_single, links))
 
-        _ = self.results["performance"]["total_time"] = time.time() - start_time
+        self.results["performance"]["total_time"] = time.time() - start_time
 
         # Calculate average response time
         valid_times = [
@@ -363,7 +363,7 @@ class LinkChecker:
             if "response_time" in r and r.get("valid")
         ]
         if valid_times:
-            _ = self.results["performance"]["average_response_time"] = sum(
+            self.results["performance"]["average_response_time"] = sum(
                 valid_times,
             ) / len(valid_times)
 
@@ -376,7 +376,7 @@ class LinkChecker:
         use_async: bool = True,
     ) -> dict[str, Any]:
         """Main link validation method."""
-        _ = self.results["total_links"] = len(links)
+        self.results["total_links"] = len(links)
 
         if use_async:
             try:
@@ -392,15 +392,15 @@ class LinkChecker:
         # Process results
         for result in results:
             if result.get("valid"):
-                _ = self.results["valid_links"] += 1
+                self.results["valid_links"] += 1
             else:
-                _ = self.results["broken_links"] += 1
-                _ = self.results["errors"].append(result)
+                self.results["broken_links"] += 1
+                self.results["errors"].append(result)
 
                 # Add warnings for specific cases
                 if result.get("error") == "timeout":
-                    _ = self.results["warnings"] += 1
-                    _ = self.results["warnings_list"].append({
+                    self.results["warnings"] += 1
+                    self.results["warnings_list"].append({
                         "type": "slow_response",
                         "url": result["url"],
                         "message": f"Link timed out after {self.config['external_timeout']}s",

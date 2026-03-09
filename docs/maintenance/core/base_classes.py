@@ -7,25 +7,28 @@ Provides consistent interfaces and shared functionality.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol
 
 from flext_core import t
+from pydantic import BaseModel, Field
 
 
-@dataclass
-class Issue:
+class Issue(BaseModel):
     """Represents a documentation quality issue."""
 
-    type: str
-    severity: str  # 'critical', 'high', 'medium', 'low', 'info'
-    file: str
-    line: int | None = None
-    description: str = ""
-    recommendation: str = ""
-    context: t.ConfigurationMapping | None = None
+    type: str = Field(description="Issue type identifier")
+    severity: str = Field(
+        description="Severity level: critical, high, medium, low, info"
+    )
+    file: str = Field(description="File path where issue was found")
+    line: int | None = Field(default=None, description="Line number of the issue")
+    description: str = Field(default="", description="Detailed issue description")
+    recommendation: str = Field(default="", description="Recommended fix for the issue")
+    context: t.ConfigurationMapping | None = Field(
+        default=None, description="Additional context data"
+    )
 
     def to_dict(self) -> t.ConfigurationMapping:
         """Convert issue to dictionary representation."""
@@ -40,17 +43,20 @@ class Issue:
         }
 
 
-@dataclass
-class ValidationResult:
+class ValidationResult(BaseModel):
     """Result of a validation operation."""
 
-    total_items: int = 0
-    valid_items: int = 0
-    invalid_items: int = 0
-    issues: list[Issue] = field(default_factory=list)
-    warnings: list[str] = field(default_factory=list)
-    errors: list[str] = field(default_factory=list)
-    metadata: t.ConfigurationMapping = field(default_factory=dict)
+    total_items: int = Field(default=0, description="Total items validated")
+    valid_items: int = Field(default=0, description="Number of valid items")
+    invalid_items: int = Field(default=0, description="Number of invalid items")
+    issues: list[Issue] = Field(
+        default_factory=list, description="List of issues found"
+    )
+    warnings: list[str] = Field(default_factory=list, description="Warning messages")
+    errors: list[str] = Field(default_factory=list, description="Error messages")
+    metadata: t.ConfigurationMapping = Field(
+        default_factory=dict, description="Additional metadata"
+    )
 
     @property
     def success_rate(self) -> float:

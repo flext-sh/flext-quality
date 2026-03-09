@@ -14,7 +14,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
-
 from flext_core import t
 
 
@@ -113,11 +112,11 @@ class ContentAnalyzer:
             analysis["suggestions"] = self._generate_suggestions(analysis)
 
             # Update global results
-            _ = self.results["files_analyzed"] += 1
-            _ = self.results["quality_metrics"][filename] = analysis["metrics"]
-            _ = self.results["content_scores"][filename] = analysis["quality_score"]
-            _ = self.results["readability_stats"][filename] = analysis["readability"]
-            _ = self.results["completeness_checks"][filename] = analysis["completeness"]
+            self.results["files_analyzed"] += 1
+            self.results["quality_metrics"][filename] = analysis["metrics"]
+            self.results["content_scores"][filename] = analysis["quality_score"]
+            self.results["readability_stats"][filename] = analysis["readability"]
+            self.results["completeness_checks"][filename] = analysis["completeness"]
 
             return analysis
 
@@ -510,9 +509,7 @@ class ContentAnalyzer:
 
         return issues
 
-    def _generate_suggestions(
-        self, analysis: dict[str, t.ContainerValue]
-    ) -> list[str]:
+    def _generate_suggestions(self, analysis: dict[str, t.ContainerValue]) -> list[str]:
         """Generate improvement suggestions based on analysis."""
         suggestions = []
 
@@ -546,7 +543,9 @@ class ContentAnalyzer:
 
         return suggestions
 
-    def analyze_files_batch(self, file_paths: list[Path]) -> dict[str, t.ContainerValue]:
+    def analyze_files_batch(
+        self, file_paths: list[Path]
+    ) -> dict[str, t.ContainerValue]:
         """Analyze multiple files and aggregate results."""
         for file_path in file_paths:
             self.analyze_file(file_path)
@@ -562,7 +561,7 @@ class ContentAnalyzer:
             return
 
         avg_score = sum(self.results["content_scores"].values()) / len(
-            _ = self.results["content_scores"],
+            _=self.results["content_scores"],
         )
 
         if avg_score < self.GOOD_READABILITY_MIN:

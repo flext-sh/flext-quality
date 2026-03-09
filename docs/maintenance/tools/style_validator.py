@@ -14,7 +14,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
-
 from flext_core import t
 
 
@@ -40,7 +39,7 @@ class StyleValidator:
         """
         self.config: dict[str, t.ContainerValue] = {}
         self.load_config(config_path)
-        _ = self.results: dict[str, t.ContainerValue] = {
+        self.results: dict[str, t.ContainerValue] = {
             "files_checked": 0,
             "style_violations": [],
             "accessibility_issues": [],
@@ -124,10 +123,10 @@ class StyleValidator:
             )
 
             # Add to global results
-            _ = self.results["files_checked"] += 1
-            _ = self.results["style_violations"].extend(file_results["violations"])
-            _ = self.results["accessibility_issues"].extend(file_results["issues"])
-            _ = self.results["suggestions"].extend(file_results["suggestions"])
+            self.results["files_checked"] += 1
+            self.results["style_violations"].extend(file_results["violations"])
+            self.results["accessibility_issues"].extend(file_results["issues"])
+            self.results["suggestions"].extend(file_results["suggestions"])
 
             return file_results
 
@@ -251,9 +250,7 @@ class StyleValidator:
 
         return violations
 
-    def _check_code_formatting(
-        self, content: str
-    ) -> list[dict[str, t.ContainerValue]]:
+    def _check_code_formatting(self, content: str) -> list[dict[str, t.ContainerValue]]:
         """Check code block and inline code formatting."""
         violations = []
 
@@ -436,23 +433,23 @@ class StyleValidator:
             self.validate_file(file_path)
 
         # Update summary
-        _ = self.results["summary"]["total_violations"] = len(
-            _ = self.results["style_violations"],
+        self.results["summary"]["total_violations"] = len(
+            self.results["style_violations"],
         )
-        _ = self.results["summary"]["accessibility_issues"] = len(
-            _ = self.results["accessibility_issues"],
+        self.results["summary"]["accessibility_issues"] = len(
+            self.results["accessibility_issues"],
         )
-        _ = self.results["summary"]["suggestions_count"] = len(self.results["suggestions"])
+        self.results["summary"]["suggestions_count"] = len(self.results["suggestions"])
 
         # Count severity levels
         for violation in (
-            _ = self.results["style_violations"] + self.results["accessibility_issues"]
+            self.results["style_violations"] + self.results["accessibility_issues"]
         ):
             severity = violation.get("severity", "low")
             if severity == "critical":
-                _ = self.results["summary"]["critical_issues"] += 1
+                self.results["summary"]["critical_issues"] += 1
             elif severity == "high":
-                _ = self.results["summary"]["warnings"] += 1
+                self.results["summary"]["warnings"] += 1
 
         return self.results
 
@@ -485,7 +482,7 @@ Top Issues:
         # Count issue types
         issue_types = {}
         for violation in (
-            _ = self.results["style_violations"] + self.results["accessibility_issues"]
+            self.results["style_violations"] + self.results["accessibility_issues"]
         ):
             v_type = violation["type"]
             issue_types[v_type] = issue_types.get(v_type, 0) + 1
