@@ -15,10 +15,12 @@ from datetime import UTC, datetime
 from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
 
-import aiohttp
 import requests
 import yaml
+from aiohttp import ClientError, ClientSession, ClientTimeout
 from flext_core import t
+
+_AsyncSession = ClientSession
 
 
 class LinkChecker:
@@ -35,9 +37,10 @@ class LinkChecker:
         config_path: str | None = "docs/maintenance/config/validation_config.yaml",
     ) -> None:
         """Initialize the link checker with configuration."""
+        self.config: dict[str, t.ContainerValue] = {}
         self.load_config(config_path)
-        self.session = None
-        self.cache = {}
+        self.session: _AsyncSession | None = None
+        self.cache: dict[str, t.ContainerValue] = {}
         self.results = {
             "total_links": 0,
             "valid_links": 0,
@@ -98,7 +101,9 @@ class LinkChecker:
                 ],
             }
 
-    def find_all_links(self, file_paths: list[pathlib.Path]) -> list[dict]:
+    def find_all_links(
+        self, file_paths: list[pathlib.Path]
+    ) -> list[dict[str, t.ContainerValue]]:
         """Extract all links from the given files."""
         all_links = []
 
@@ -123,7 +128,7 @@ class LinkChecker:
                 ref_links = re.findall(r"\[([^\]]+)\]\[([^\]]+)\]", content)
                 ref_defs = re.findall(r"\[([^\]]+)\]:\s*([^\s]+)", content)
 
-                ref_dict = dict[str, Any](ref_defs)
+                ref_dict: dict[str, str] = dict(ref_defs)
                 for text, ref in ref_links:
                     if ref in ref_dict:
                         url = ref_dict[ref]
@@ -172,7 +177,7 @@ class LinkChecker:
                 }
             async with self.session.head(
                 url,
-                timeout=aiohttp.ClientTimeout(total=self.config["external_timeout"]),
+                timeout=ClientTimeout(total=self.config["external_timeout"]),
                 allow_redirects=self.config["follow_redirects"],
                 max_redirects=self.config["max_redirects"],
                 headers={"User-Agent": self.config["user_agent"]},
@@ -206,7 +211,7 @@ class LinkChecker:
                 "valid": False,
                 "context": context or {},
             }
-        except aiohttp.ClientError as e:
+        except ClientError as e:
             return {
                 "url": url,
                 "error": str(e),
@@ -296,14 +301,18 @@ class LinkChecker:
             "context": context or {},
         }
 
-    async def check_links_batch_async(self, links: list[dict]) -> list[dict]:
+    async def check_links_batch_async(
+        self, links: list[dict[str, t.ContainerValue]]
+    ) -> list[dict[str, t.ContainerValue]]:
         """Check multiple links asynchronously."""
         start_time = time.time()
 
         # Create semaphore for rate limiting
         semaphore = asyncio.Semaphore(10)  # Max 10 concurrent requests
 
-        async def check_with_semaphore(link_info: dict[str, Any]) -> dict[str, Any]:
+        async def check_with_semaphore(
+            link_info: dict[str, t.ContainerValue],
+        ) -> dict[str, t.ContainerValue]:
             async with semaphore:
                 await asyncio.sleep(0.1)  # Rate limiting
                 return await self.check_link_async(
@@ -318,7 +327,7 @@ class LinkChecker:
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         # Handle exceptions
-        processed_results: list[dict[str, Any]] = []
+        processed_results: list[dict[str, t.ContainerValue]] = []
         for result in results:
             if isinstance(result, BaseException):
                 processed_results.append({
@@ -343,11 +352,15 @@ class LinkChecker:
 
         return processed_results
 
-    def check_links_batch_sync(self, links: list[dict]) -> list[dict]:
+    def check_links_batch_sync(
+        self, links: list[dict[str, t.ContainerValue]]
+    ) -> list[dict[str, t.ContainerValue]]:
         """Check multiple links synchronously with thread pool."""
         start_time = time.time()
 
-        def check_single(link_info: dict[str, Any]) -> dict[str, Any]:
+        def check_single(
+            link_info: dict[str, t.ContainerValue],
+        ) -> dict[str, t.ContainerValue]:
             time.sleep(0.1)  # Rate limiting
             return self.check_link_sync(link_info["url"], link_info.get("context"))
 
@@ -371,16 +384,16 @@ class LinkChecker:
 
     async def validate_links(
         self,
-        links: list[dict],
+        links: list[dict[str, t.ContainerValue]],
         *,
         use_async: bool = True,
-    ) -> dict[str, Any]:
+    ) -> dict[str, t.ContainerValue]:
         """Main link validation method."""
         self.results["total_links"] = len(links)
 
         if use_async:
             try:
-                async with aiohttp.ClientSession() as session:
+                async with ClientSession() as session:
                     self.session = session
                     results = await self.check_links_batch_async(links)
             except ImportError:
@@ -420,7 +433,9 @@ class LinkChecker:
             # If robots.txt can't be read, assume crawling is allowed
             return True
 
-    def validate_github_links(self, links: list[dict]) -> list[dict]:
+    def validate_github_links(
+        self, links: list[dict[str, t.ContainerValue]]
+    ) -> list[dict[str, t.ContainerValue]]:
         """Special validation for GitHub links."""
         github_links = [link for link in links if "github.com" in link["url"]]
 
@@ -531,9 +546,9 @@ Broken Links:
 
 # Synchronous wrapper for easy usage
 def validate_links_sync(
-    links: list[dict],
+    links: list[dict[str, t.ContainerValue]],
     config_path: str | None = None,
-) -> dict[str, Any]:
+) -> dict[str, t.ContainerValue]:
     """Synchronous wrapper for link validation."""
     checker = LinkChecker(config_path)
     # Run async validation in new event loop

@@ -47,6 +47,7 @@ dependencies = [
   "typer>=0.12.3",
   "uvicorn>=0.30",
   "wrapt>=1.17",
+  "aiohttp (>=3.13.3,<4.0.0)",
 ]
 # [CUSTOM] poetry dev extensions
 # [MANAGED] consolidated development dependencies
