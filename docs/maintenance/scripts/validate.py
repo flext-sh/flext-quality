@@ -21,8 +21,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import requests
-from pydantic import BaseModel, Field
 from flext_core import t
+from pydantic import BaseModel, Field
 
 
 class LinkValidatorResults(BaseModel):

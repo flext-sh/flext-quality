@@ -18,8 +18,8 @@ from pathlib import Path
 
 import requests
 import yaml
-from pydantic import BaseModel, Field
 from flext_core import t
+from pydantic import BaseModel, Field
 
 # Constants
 MAX_BROKEN_LINKS_TO_SHOW = 10
