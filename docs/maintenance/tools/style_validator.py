@@ -101,11 +101,14 @@ class StyleValidator:
                 file_path.relative_to(file_path.parents[2]),
             )  # Relative to project root
 
+            violations_list: list[dict[str, t.ContainerValue]] = []
+            issues_list: list[dict[str, t.ContainerValue]] = []
+            suggestions_list: list[str] = []
             file_results = {
                 "file": filename,
-                "violations": [],
-                "issues": [],
-                "suggestions": [],
+                "violations": violations_list,
+                "issues": issues_list,
+                "suggestions": suggestions_list,
             }
 
             # Run all validation checks
@@ -181,7 +184,7 @@ class StyleValidator:
         violations = []
 
         # Extract headings
-        headings = []
+        headings: list[tuple[int, str, int]] = []
         for match in re.finditer(r"^(#{1,6})\s+(.+)$", content, re.MULTILINE):
             level = len(match.group(1))
             text = match.group(2).strip()
@@ -221,7 +224,7 @@ class StyleValidator:
         violations = []
 
         # Find all list items
-        list_items = []
+        list_items: list[tuple[str, str, int]] = []
         for match in re.finditer(r"^(\s*)([-\*\+])\s+", content, re.MULTILINE):
             indent = match.group(1)
             marker = match.group(2)

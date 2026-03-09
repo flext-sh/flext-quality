@@ -44,14 +44,20 @@ class ContentAnalyzer:
             config_path: Path to configuration file for content analysis rules.
 
         """
+        self.config: dict[str, t.ContainerValue] = {}
         self.load_config(config_path)
-        _ = self.results = {
+        quality_metrics: dict[str, t.ContainerValue] = {}
+        content_scores: dict[str, t.ContainerValue] = {}
+        readability_stats: dict[str, t.ContainerValue] = {}
+        completeness_checks: dict[str, t.ContainerValue] = {}
+        recommendations: list[t.ContainerValue] = []
+        self.results = {
             "files_analyzed": 0,
-            "quality_metrics": {},
-            "content_scores": {},
-            "readability_stats": {},
-            "completeness_checks": {},
-            "recommendations": [],
+            "quality_metrics": quality_metrics,
+            "content_scores": content_scores,
+            "readability_stats": readability_stats,
+            "completeness_checks": completeness_checks,
+            "recommendations": recommendations,
         }
 
     def load_config(self, config_path: str | None) -> None:
@@ -92,7 +98,8 @@ class ContentAnalyzer:
         try:
             content = file_path.read_text(encoding="utf-8")
             filename = str(file_path.relative_to(file_path.parents[2]))
-
+            issues_list: list[t.ContainerValue] = []
+            suggestions_list: list[t.ContainerValue] = []
             analysis = {
                 "file": filename,
                 "metrics": self._calculate_content_metrics(content),
@@ -100,8 +107,8 @@ class ContentAnalyzer:
                 "structure": self._analyze_structure(content),
                 "completeness": self._check_completeness(content, filename),
                 "quality_score": 0.0,
-                "issues": [],
-                "suggestions": [],
+                "issues": issues_list,
+                "suggestions": suggestions_list,
             }
 
             # Calculate overall quality score
@@ -271,12 +278,14 @@ class ContentAnalyzer:
 
     def _analyze_structure(self, content: str) -> dict[str, t.ContainerValue]:
         """Analyze document structure and organization."""
+        sections_list: list[t.ContainerValue] = []
+        depth_analysis_dict: dict[str, t.ContainerValue] = {}
         structure = {
             "has_table_of_contents": False,
-            "toc_position": None,
+            "toc_position": 0,
             "heading_hierarchy_valid": True,
-            "sections": [],
-            "depth_analysis": {},
+            "sections": sections_list,
+            "depth_analysis": depth_analysis_dict,
         }
 
         # Check for table of contents
@@ -294,7 +303,7 @@ class ContentAnalyzer:
                 break
 
         # Analyze heading hierarchy
-        headings = []
+        headings: list[dict[str, int | str]] = []
         for match in re.finditer(r"^(#{1,6})\s+(.+)$", content, re.MULTILINE):
             level = len(match.group(1))
             title = match.group(2).strip()
@@ -306,12 +315,14 @@ class ContentAnalyzer:
         # Check heading hierarchy
         if len(headings) > 1:
             for i in range(1, len(headings)):
-                if headings[i]["level"] > headings[i - 1]["level"] + 1:
+                cur_level = int(headings[i]["level"])
+                prev_level = int(headings[i - 1]["level"])
+                if cur_level > prev_level + 1:
                     structure["heading_hierarchy_valid"] = False
                     break
 
         # Analyze heading depth distribution
-        depths = [h["level"] for h in headings]
+        depths: list[int] = [int(h["level"]) for h in headings]
         structure["depth_analysis"] = {
             "max_depth": max(depths) if depths else 0,
             "avg_depth": sum(depths) / len(depths) if depths else 0,
@@ -326,11 +337,14 @@ class ContentAnalyzer:
         filename: str,
     ) -> dict[str, t.ContainerValue]:
         """Check documentation completeness based on file type and content."""
+        missing_elems: list[t.ContainerValue] = []
+        required_present: list[t.ContainerValue] = []
+        optional_present: list[t.ContainerValue] = []
         completeness = {
             "score": 100,
-            "missing_elements": [],
-            "required_sections_present": [],
-            "optional_sections_present": [],
+            "missing_elements": missing_elems,
+            "required_sections_present": required_present,
+            "optional_sections_present": optional_present,
             "word_count_sufficient": True,
         }
 
@@ -396,7 +410,12 @@ class ContentAnalyzer:
         required_sections: list[str],
     ) -> dict[str, t.ContainerValue]:
         """Check for required sections in content."""
-        result = {"required_sections_present": [], "missing_required_sections": []}
+        required_present: list[t.ContainerValue] = []
+        missing_required: list[t.ContainerValue] = []
+        result = {
+            "required_sections_present": required_present,
+            "missing_required_sections": missing_required,
+        }
 
         for section_pattern in required_sections:
             patterns = section_pattern.split("|")
@@ -561,7 +580,7 @@ class ContentAnalyzer:
             return
 
         avg_score = sum(self.results["content_scores"].values()) / len(
-            _=self.results["content_scores"],
+            self.results["content_scores"],
         )
 
         if avg_score < self.GOOD_READABILITY_MIN:
@@ -577,7 +596,7 @@ class ContentAnalyzer:
             })
 
         # Check for common issues across files
-        all_issues = []
+        all_issues: list[t.ContainerValue] = []
         for file_issues in [
             analysis.get("issues", [])
             for analysis in self.results.values()

@@ -15,22 +15,26 @@ from datetime import UTC, datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
-from typing import TypedDict
 
 import requests
 import yaml
+from pydantic import BaseModel, Field
 from flext_core import t
 
 # Constants
 MAX_BROKEN_LINKS_TO_SHOW = 10
 
 
-class _NotifierResults(TypedDict):
-    """Type for DocumentationNotifier.results."""
+class NotifierResults(BaseModel):
+    """Results for DocumentationNotifier execution."""
 
-    notifications_sent: int
-    errors: list[str]
-    timestamp: str
+    notifications_sent: int = Field(
+        default=0, description="Number of notifications sent"
+    )
+    errors: list[str] = Field(
+        default_factory=list, description="List of error messages"
+    )
+    timestamp: str = Field(description="ISO timestamp when notifier ran")
 
 
 class DocumentationNotifier:
@@ -48,12 +52,9 @@ class DocumentationNotifier:
         """
         self.config: t.ConfigurationMapping = self.get_default_config()
         self.load_config(config_path)
-        errors: list[str] = []
-        self.results: _NotifierResults = {
-            "notifications_sent": 0,
-            "errors": errors,
-            "timestamp": datetime.now(UTC).isoformat(),
-        }
+        self.results: NotifierResults = NotifierResults(
+            timestamp=datetime.now(UTC).isoformat(),
+        )
 
     def load_config(self, config_path: str) -> None:
         """Load notification configuration."""
@@ -189,7 +190,7 @@ Please review recent changes and address any identified issues.
             try:
                 self._send_email_notification(title, message, priority)
             except Exception as e:
-                self.results["errors"].append(f"Email notification failed: {e}")
+                self.results.errors.append(f"Email notification failed: {e}")
                 success = False
 
         # Slack notification
@@ -197,7 +198,7 @@ Please review recent changes and address any identified issues.
             try:
                 self._send_slack_notification(title, message, priority)
             except Exception as e:
-                self.results["errors"].append(f"Slack notification failed: {e}")
+                self.results.errors.append(f"Slack notification failed: {e}")
                 success = False
 
         # Webhook notification
@@ -205,11 +206,11 @@ Please review recent changes and address any identified issues.
             try:
                 self._send_webhook_notification(title, message, priority)
             except Exception as e:
-                self.results["errors"].append(f"Webhook notification failed: {e}")
+                self.results.errors.append(f"Webhook notification failed: {e}")
                 success = False
 
         if success:
-            self.results["notifications_sent"] += 1
+            self.results.notifications_sent += 1
 
         return success
 
