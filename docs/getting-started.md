@@ -154,6 +154,7 @@ ______________________________________________________________________
 from flext_quality import FlextQualityService
 from flext_quality import FlextQualityCodeAnalyzer
 
+
 # Option 1: Service Layer Approach
 def service_analysis():
     service = FlextQualityService()
@@ -163,7 +164,7 @@ def service_analysis():
         name="my_project",
         project_path="./src",
         _min_coverage=85.0,  # Note: internal parameter name
-        _max_complexity=10
+        _max_complexity=10,
     )
 
     if project_result.success:
@@ -171,6 +172,7 @@ def service_analysis():
         print(f"✅ Project: {project.name}")
         print(f"📁 Path: {project.project_path}")
         print(f"🎯 Min Coverage: {project.min_coverage}")
+
 
 # Option 2: Direct Analysis Engine
 def direct_analysis():
@@ -182,7 +184,7 @@ def direct_analysis():
         include_security=True,
         include_complexity=True,
         include_dead_code=True,
-        include_duplicates=True
+        include_duplicates=True,
     )
 
     # Get results
@@ -193,6 +195,7 @@ def direct_analysis():
     print(f"🏆 Quality Grade: {grade}")
     print(f"📄 Files Analyzed: {analysis_result.overall_metrics.files_analyzed}")
     print(f"📏 Total Lines: {analysis_result.overall_metrics.total_lines}")
+
 
 # Run both approaches
 run(service_analysis())
@@ -244,7 +247,6 @@ dashboard = quality_web.create_enterprise_dashboard()
 ### **Integration with FLEXT Ecosystem** (PLANNED)
 
 ```python
-
 # FLEXT-API integration for programmatic access
 from flext_api import FlextApiRouter
 from flext_quality import FlextQualityApiRouter
@@ -270,7 +272,6 @@ ______________________________________________________________________
 FLEXT Quality will absorb and modernize all workspace quality functionality:
 
 ```python
-
 # Absorbing workspace scripts into unified architecture:
 WORKSPACE_INTEGRATION = {
     "quality_gateway.py": "FlextQualityGateway - Enterprise quality gates",
@@ -278,32 +279,31 @@ WORKSPACE_INTEGRATION = {
     "gradual_lint_fixer.py": "FlextQualityFixer - Automated code remediation",
     "mypy_analyzer.py": "Type analysis integration with dual MyPy/PyRight",
     "pattern_audit_system.py": "FlextQualityValidator - Pattern detection",
-    "flext_tools/quality_*": "Core quality bridge and gateway integration"
+    "flext_tools/quality_*": "Core quality bridge and gateway integration",
 }
 ```
 
 ### **Modern Tool Stack** (Research-Based)
 
 ```python
-
 # 2025 Enterprise Quality Stack Integration
 ENTERPRISE_TOOLS = {
     "ruff": {
         "description": "Rust-based linting, 3453+ patterns, extremely fast",
-        "features": "TOML config, hierarchical overrides, pre-commit integration"
+        "features": "TOML config, hierarchical overrides, pre-commit integration",
     },
     "mypy": {
         "description": "Industry standard type checking with plugin system",
-        "features": "Strict mode, incremental cache, enterprise reporting"
+        "features": "Strict mode, incremental cache, enterprise reporting",
     },
     "bandit": {
         "description": "Security vulnerability scanning",
-        "features": "CVE detection, custom rules, CI/CD integration"
+        "features": "CVE detection, custom rules, CI/CD integration",
     },
     "coverage.py": {
         "description": "Test coverage measurement and reporting",
-        "features": "Branch coverage, HTML/XML reports, threshold enforcement"
-    }
+        "features": "Branch coverage, HTML/XML reports, threshold enforcement",
+    },
 }
 ```
 

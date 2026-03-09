@@ -816,9 +816,9 @@ python scripts/audit.py --style-check --verbose
 ```python
 from docs.maintenance.scripts.audit import DocumentationAuditor
 
-auditor = DocumentationAuditor(config_path='docs/maintenance/config/')
+auditor = DocumentationAuditor(config_path="docs/maintenance/config/")
 results = auditor.run_comprehensive_audit()
-report = auditor.generate_report(format='json')
+report = auditor.generate_report(format="json")
 ```
 
 ### Validation Tools
@@ -921,9 +921,9 @@ class CustomValidator(BaseValidator):
 ### Integrating New Tools
 
 ```python
-
 # Add new validation tools to the pipeline
 from docs.maintenance.scripts.audit import DocumentationAuditor
+
 
 class ExtendedAuditor(DocumentationAuditor):
     def run_custom_checks(self, doc_files: List[Path]):
@@ -935,7 +935,6 @@ class ExtendedAuditor(DocumentationAuditor):
 ### API Integration
 
 ```python
-
 # REST API for external integrations
 from docs.maintenance.api.server import MaintenanceAPI
 

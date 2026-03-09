@@ -74,6 +74,7 @@ Planned plugin interface for flext-quality:
 from typing import Protocol
 from flext_core import FlextResult
 
+
 class QualityPlugin(Protocol):
     """Plugin interface for quality analyzers."""
 
