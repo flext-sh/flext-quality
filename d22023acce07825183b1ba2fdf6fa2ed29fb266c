@@ -1,0 +1,25 @@
+docs/pydantic-v2-modernization/audit_pydantic_v2.py
+  7a8702a10615611c 28,31-36,39,42-45,47-48,50-51,53-54,56-57
+docs/maintenance/core/base_classes.py
+  7a8702a10615611c 18,21-31,46,49-53,55-58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.8",
+  "base_commit_sha": "d22023acce07825183b1ba2fdf6fa2ed29fb266c",
+  "prompts": {
+    "7a8702a10615611c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3304f0500ffeBJ0y3REuww4EtV",
+        "model": "anthropic/claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 53,
+      "total_deletions": 37,
+      "accepted_lines": 42,
+      "overriden_lines": 0
+    }
+  }
+}
