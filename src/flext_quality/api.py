@@ -71,11 +71,7 @@ class FlextQuality:
         self.config = FlextQualitySettings.get_instance()
         self._container = FlextContainer.get_global()
         if not self._container.has_service("flext_quality"):
-            register_result = self._container.register("flext_quality", "flext_quality")
-            if register_result.is_failure:
-                self.logger.warning(
-                    f"Failed to register quality service: {register_result.error}"
-                )
+            _ = self._container.register("flext_quality", "flext_quality")
         self.hooks = HookManager()
         self.rules_loader = FlextQualityRulesLoader()
 

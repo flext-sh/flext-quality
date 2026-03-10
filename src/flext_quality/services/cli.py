@@ -12,7 +12,7 @@ from __future__ import annotations
 import sys
 from collections.abc import Mapping
 from pathlib import Path
-from typing import NoReturn, final
+from typing import final
 
 from flext_cli import FlextCliOutput
 from flext_core import r
@@ -151,16 +151,11 @@ def _dispatch(service: FlextQualityCliService, command: str, args: list[str]) ->
     return 1
 
 
-def main() -> NoReturn:
+def main() -> int:
     """Main CLI entry point."""
     service = FlextQualityCliService()
     args = sys.argv[1:]
     if not args:
         result = _CommandHandlers.handle_status(service)
-        sys.exit(result.value if result.is_success else 1)
-    exit_code = _dispatch(service, args[0], args[1:])
-    sys.exit(exit_code)
-
-
-if __name__ == "__main__":
-    main()
+        return result.value if result.is_success else 1
+    return _dispatch(service, args[0], args[1:])
