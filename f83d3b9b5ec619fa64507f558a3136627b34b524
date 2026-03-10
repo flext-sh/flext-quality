@@ -1,0 +1,25 @@
+src/flext_quality/integrations/claude_context.py
+  16e3f8326408a176 64-65
+src/flext_quality/integrations/claude_mem.py
+  16e3f8326408a176 71,80,94,96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "f83d3b9b5ec619fa64507f558a3136627b34b524",
+  "prompts": {
+    "16e3f8326408a176": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_3269fa848ffetcSIXZd0FmluN5",
+        "model": "anthropic/claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 11,
+      "total_deletions": 17,
+      "accepted_lines": 6,
+      "overriden_lines": 0
+    }
+  }
+}
