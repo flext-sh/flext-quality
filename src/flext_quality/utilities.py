@@ -42,10 +42,10 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
             """Load rules from YAML file."""
             try:
                 with path.open(encoding="utf-8") as f:
-                    parsed: object = yaml.safe_load(f)
+                    parsed: t.JsonValue = yaml.safe_load(f)
                 match parsed:
                     case dict() as parsed_dict:
-                        raw_rules = parsed_dict.get("rules", [])
+                        raw_rules: t.JsonValue = parsed_dict.get("rules", [])
                     case _:
                         return r[list[Mapping[str, object]]].fail("Expected YAML dict")
                 match raw_rules:
@@ -71,17 +71,13 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
         def parse_hook_input(raw: str) -> r[t.Quality.HookInput]:
             """Parse hook input JSON."""
             try:
-                parsed: object = json.loads(raw)
+                parsed: t.JsonValue = json.loads(raw)
                 match parsed:
                     case dict() as hook_input:
-                        coerced_input: t.Quality.HookInput = {
-                            str(k): v
-                            if isinstance(
-                                v, (str, int, float, bool, type(None), dict, list)
-                            )
-                            else str(v)
-                            for k, v in hook_input.items()
-                        }
+                        coerced_items: dict[str, t.JsonValue] = {}
+                        for k, v in hook_input.items():
+                            coerced_items[str(k)] = v
+                        coerced_input: t.Quality.HookInput = coerced_items
                         return r[t.Quality.HookInput].ok(coerced_input)
                     case _:
                         return r[t.Quality.HookInput].fail("Expected JSON object")
@@ -91,19 +87,10 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
         @staticmethod
         def read_stdin() -> r[str]:
             """Read JSON from stdin (for hooks)."""
-            try:
-                data = sys.stdin.read()
-                return r[str].ok(data)
-            except (
-                ValueError,
-                TypeError,
-                KeyError,
-                AttributeError,
-                OSError,
-                RuntimeError,
-                ImportError,
-            ) as e:
-                return r[str].fail(f"Failed to read stdin: {e}")
+            return u.try_(
+                sys.stdin.read,
+                catch=Exception,
+            ).map_error(lambda e: f"Failed to read stdin: {e}")
 
         @staticmethod
         def run_shell_command(
