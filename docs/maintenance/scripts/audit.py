@@ -10,6 +10,8 @@ Usage:
     python audit.py --ci-mode --fail-on-errors
 """
 
+from typing import Any
+
 from __future__ import annotations
 
 import argparse
@@ -247,13 +249,13 @@ class DocumentationAuditor:
         """Check for indicators of outdated content."""
         indicators = []
         if re.search(
-            "\\b\\d+\\.\\d+\\.\\d+.*TODO|FIXME|placeholder", content, re.IGNORECASE
+            r"\\b\\d+\\.\\d+\\.\\d+.*TODO|FIXME|placeholder", content, re.IGNORECASE
         ):
             indicators.append("version placeholders")
-        if re.search("\\b202\\d.*TODO|FIXME|update.*date", content, re.IGNORECASE):
+        if re.search(r"\\b202\\d.*TODO|FIXME|update.*date", content, re.IGNORECASE):
             indicators.append("date placeholders")
         if re.search(
-            "#+\\s*(TODO|FIXME|Coming Soon|Work in Progress)", content, re.IGNORECASE
+            r"#+\\s*(TODO|FIXME|Coming Soon|Work in Progress)", content, re.IGNORECASE
         ):
             indicators.append("incomplete sections")
         if re.search(r"❌.*working|✅.*broken|⚠️.*complete", content, re.IGNORECASE):
@@ -293,7 +295,7 @@ class DocumentationAuditor:
                         })
                 if self.validation_config["content_analysis"]["check_todos"]:
                     todos = re.findall(
-                        "(?i)(?:TODO|FIXME|XXX):\\s*(.+?)(?:\\n|$)", content
+                        r"(?i)(?:TODO|FIXME|XXX):\\s*(.+?)(?:\\n|$)", content
                     )
                     if todos:
                         _ = self.results.issues.append({
@@ -375,7 +377,7 @@ class DocumentationAuditor:
     def _check_markdown_formatting(self, content: str) -> list[str]:
         """Check for markdown formatting issues."""
         issues = []
-        unordered_lists = re.findall("^[\\s]*[-\\*\\+]", content, re.MULTILINE)
+        unordered_lists = re.findall(r"^[\\s]*[-\\*\\+]", content, re.MULTILINE)
         if len(set(unordered_lists)) > 1:
             issues.append("mixed unordered list styles")
         emphasis_patterns = ["\\*[^*]+\\*", "_[^_]+_"]
@@ -385,7 +387,7 @@ class DocumentationAuditor:
         if len(emphasis_usage) > 1:
             issues.append("mixed emphasis styles (* vs _)")
         if self.style_guide["formatting"]["trailing_spaces"]:
-            trailing_spaces = re.findall("[ \\t]+$", content, re.MULTILINE)
+            trailing_spaces = re.findall(r"[ \\t]+$", content, re.MULTILINE)
             if trailing_spaces:
                 issues.append(f"{len(trailing_spaces)} lines with trailing spaces")
         max_length = self.style_guide["formatting"]["max_line_length"]
@@ -398,7 +400,7 @@ class DocumentationAuditor:
         """Check accessibility compliance."""
         issues = []
         if self.style_guide["accessibility"]["require_alt_text"]:
-            images_without_alt = re.findall("!\\[\\]\\([^)]+\\)", content)
+            images_without_alt = re.findall(r"!\\[\\]\\([^)]+\\)", content)
             if images_without_alt:
                 issues.extend([
                     {
@@ -409,7 +411,7 @@ class DocumentationAuditor:
                 ])
         if self.style_guide["accessibility"]["descriptive_links"]:
             generic_links = re.findall(
-                "\\[here|click here|link|read more\\]\\([^)]+\\)",
+                r"\\[here|click here|link|read more\\]\\([^)]+\\)",
                 content,
                 re.IGNORECASE,
             )
@@ -425,7 +427,7 @@ class DocumentationAuditor:
 
     def _check_heading_hierarchy(self, content: str) -> list[str]:
         """Check heading hierarchy for logical structure."""
-        headings = re.findall("^(#+)\\s+(.+)$", content, re.MULTILINE)
+        headings = re.findall(r"^(#+)\\s+(.+)$", content, re.MULTILINE)
         heading_levels = [len(level) for level, _ in headings]
         issues = [
             f"Skipped heading level at line with H{heading_levels[i]}"
@@ -444,7 +446,7 @@ class DocumentationAuditor:
             try:
                 content = file_path.read_text(encoding="utf-8")
                 external_links = re.findall(
-                    "\\[([^\\]]+)\\]\\((https?://[^)]+)\\)", content
+                    r"\\[([^\\]]+)\\]\\((https?://[^)]+)\\)", content
                 )
                 for text, url in external_links:
                     all_links.append({
@@ -453,7 +455,7 @@ class DocumentationAuditor:
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "external",
                     })
-                internal_links = re.findall("\\[([^\\]]+)\\]\\(([^)]+)\\)", content)
+                internal_links = re.findall(r"\\[([^\\]]+)\\]\\(([^)]+)\\)", content)
                 for text, link in internal_links:
                     if not link.startswith(("http://", "https://", "#", "mailto:")):
                         all_links.append({
@@ -462,7 +464,7 @@ class DocumentationAuditor:
                             "file": str(file_path.relative_to(self.project_root)),
                             "type": "internal",
                         })
-                images = re.findall("!\\[([^\\]]*)\\]\\(([^)]+)\\)", content)
+                images = re.findall(r"!\\[([^\\]]*)\\]\\(([^)]+)\\)", content)
                 for alt_text, src in images:
                     image_refs.append({
                         "src": src,

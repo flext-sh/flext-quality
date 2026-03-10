@@ -361,10 +361,10 @@ class LinkValidator:
             try:
                 content = file_path.read_text(encoding="utf-8")
                 file_rel_path = str(file_path.relative_to(file_path.parents[2]))
-                headings = re.findall("^#{1,6}\\s+(.+)$", content, re.MULTILINE)
+                headings = re.findall(r"^#{1,6}\\s+(.+)$", content, re.MULTILINE)
                 anchors = [self._heading_to_anchor(heading) for heading in headings]
                 explicit_anchors = re.findall(
-                    "<a[^>]+id=[\"\\']([^\"\\']+)[\"\\'][^>]*>", content
+                    r"<a[^>]+id=[\"\\']([^\"\\']+)[\"\\'][^>]*>", content
                 )
                 anchors.extend(explicit_anchors)
                 file_anchors[file_rel_path] = set(anchors)
@@ -394,8 +394,8 @@ class LinkValidator:
     def _heading_to_anchor(self, heading: str) -> str:
         """Convert heading text to anchor format."""
         anchor = heading.lower()
-        anchor = re.sub("[^\\w\\s-]", "", anchor)
-        return re.sub("\\s+", "-", anchor)
+        anchor = re.sub(r"[^\\w\\s-]", "", anchor)
+        return re.sub(r"\\s+", "-", anchor)
 
     def check_link_text_quality(
         self, links: list[t.ConfigurationMapping]
@@ -545,7 +545,7 @@ class ContentValidator:
 
     def _calculate_content_metrics(self, content: str) -> _ContentMetrics:
         """Calculate basic content quality metrics."""
-        words = re.findall("\\b\\w+\\b", content)
+        words = re.findall(r"\\b\\w+\\b", content)
         sentences = re.split(r"[.!?]+", content)
         sentences = [s.strip() for s in sentences if s.strip()]
         avg_words_per_sentence: float = 0.0
@@ -562,8 +562,8 @@ class ContentValidator:
             "avg_words_per_sentence": avg_words_per_sentence,
             "readability_score": readability_score,
             "has_code_blocks": bool("```" in content),
-            "has_lists": bool(re.search("^[\\s]*[-\\*\\+]", content, re.MULTILINE)),
-            "has_headers": bool(re.search("^#{1,6}\\s", content, re.MULTILINE)),
+            "has_lists": bool(re.search(r"^[\\s]*[-\\*\\+]", content, re.MULTILINE)),
+            "has_headers": bool(re.search(r"^#{1,6}\\s", content, re.MULTILINE)),
         }
 
 

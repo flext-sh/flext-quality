@@ -84,7 +84,7 @@ class DocumentationOptimizer:
         lines = content.split("\n")
         fixed_lines = []
         for i, line in enumerate(lines):
-            if re.match("^#{1,6}\\s", line) and i > 0 and lines[i - 1].strip():
+            if re.match(r"^#{1,6}\\s", line) and i > 0 and lines[i - 1].strip():
                 fixed_lines.append("")
             fixed_lines.append(line)
         return "\n".join(fixed_lines)
@@ -99,7 +99,7 @@ class DocumentationOptimizer:
             try:
                 content = file_path.read_text(encoding="utf-8")
                 original_content = content
-                headings = re.findall("^(#{1,6})\\s+(.+)$", content, re.MULTILINE)
+                headings = re.findall(r"^(#{1,6})\\s+(.+)$", content, re.MULTILINE)
                 if len(headings) > MIN_HEADINGS_FOR_TOC:
                     content = self._add_or_update_toc(content)
                 if content != original_content:
@@ -120,9 +120,9 @@ class DocumentationOptimizer:
         toc_start = -1
         toc_end = -1
         for i, line in enumerate(lines):
-            if re.match("^##+\\s+Table of Contents", line, re.IGNORECASE):
+            if re.match(r"^##+\\s+Table of Contents", line, re.IGNORECASE):
                 toc_start = i
-            elif toc_start != -1 and (not line.strip() or re.match("^#{1,6}\\s", line)):
+            elif toc_start != -1 and (not line.strip() or re.match(r"^#{1,6}\\s", line)):
                 toc_end = i
                 break
         return (toc_start, toc_end)
@@ -131,7 +131,7 @@ class DocumentationOptimizer:
         """Extract headings for table of contents."""
         toc_lines = []
         for line in lines:
-            match = re.match("^(#{1,6})\\s+(.+)$", line)
+            match = re.match(r"^(#{1,6})\\s+(.+)$", line)
             if match:
                 level = len(match.group(1))
                 title = match.group(2)
@@ -149,11 +149,11 @@ class DocumentationOptimizer:
         """Find the best position to insert table of contents."""
         insert_pos = 0
         for i, line in enumerate(lines):
-            if re.match("^##\\s", line):
+            if re.match(r"^##\\s", line):
                 return i
-            if re.match("^#{1,6}\\s", line):
+            if re.match(r"^#{1,6}\\s", line):
                 continue
-            if line.strip() and (not re.match("^#{1,6}\\s", line)):
+            if line.strip() and (not re.match(r"^#{1,6}\\s", line)):
                 insert_pos = i + 1
         return insert_pos
 
@@ -173,8 +173,8 @@ class DocumentationOptimizer:
     def _heading_to_anchor(self, heading: str) -> str:
         """Convert heading to anchor link."""
         anchor = heading.lower()
-        anchor = re.sub("[^\\w\\s-]", "", anchor)
-        return re.sub("\\s+", "-", anchor)
+        anchor = re.sub(r"[^\\w\\s-]", "", anchor)
+        return re.sub(r"\\s+", "-", anchor)
 
     def enhance_accessibility(self, doc_files: list[Path]) -> dict[str, Any]:
         """Enhance accessibility of documentation."""
@@ -262,9 +262,9 @@ class DocumentationOptimizer:
         for i, line in enumerate(lines):
             enhanced_lines.append(line)
             if (
-                re.match("^##\\s", line)
+                re.match(r"^##\\s", line)
                 and i > 0
-                and (not re.match("^#\\s", lines[i - 1]))
+                and (not re.match(r"^#\\s", lines[i - 1]))
                 and lines[i - 1].strip()
             ):
                 enhanced_lines.extend(("", "---", ""))
