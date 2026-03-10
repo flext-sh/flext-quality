@@ -54,10 +54,7 @@ class FlextQualityClaudeContextClient:
 
     def get_index_command(self, path: str | None = None) -> r[list[str]]:
         """Get the mcp-cli command for codebase indexing."""
-        call_result = self.build_index_call(path)
-        if call_result.is_failure:
-            return r[list[str]].fail(call_result.error)
-        return self._mcp.build_call_command(call_result.value)
+        return self.build_index_call(path).flat_map(self._mcp.build_call_command)
 
     def get_search_command(
         self, query: str, *, limit: int | None = None
