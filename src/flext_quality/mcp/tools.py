@@ -68,7 +68,9 @@ def execute_hook(event: str, input_data: t.Quality.HookInput) -> t.Quality.HookO
     manager = HookManager()
     result = manager.execute(event=event, input_data=input_data)
     if result.is_failure:
-        return {"error": result.error}
+        error_msg = result.error if result.error is not None else "Unknown error"
+        output: t.Quality.HookOutput = {"error": error_msg}
+        return output
     return result.value
 
 

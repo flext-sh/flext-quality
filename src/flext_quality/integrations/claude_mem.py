@@ -12,7 +12,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import final
 
-from flext_core import r
+from flext_core import r, t
 
 from flext_quality import c
 from flext_quality.integrations.mcp_client import FlextQualityMcpClient, McpToolCall
@@ -34,18 +34,16 @@ class FlextQualityClaudeMemClient:
 
     def build_get_observations_call(self, ids: list[int]) -> r[McpToolCall]:
         """Build a get_observations tool call."""
-        return self._mcp.build_tool_call(
-            self.SERVER_NAME, "get_observations", {"ids": ids}
-        )
+        params: t.ConfigurationMapping = {"ids": ids}
+        return self._mcp.build_tool_call(self.SERVER_NAME, "get_observations", params)
 
     def build_search_call(
         self, query: str, *, limit: int | None = None
     ) -> r[McpToolCall]:
         """Build a search tool call."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
-        return self._mcp.build_tool_call(
-            self.SERVER_NAME, "search", {"query": query, "limit": search_limit}
-        )
+        params: t.ConfigurationMapping = {"query": query, "limit": search_limit}
+        return self._mcp.build_tool_call(self.SERVER_NAME, "search", params)
 
     def build_timeline_call(
         self,
@@ -57,10 +55,15 @@ class FlextQualityClaudeMemClient:
         """Build a timeline tool call."""
         before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
+        params: t.ConfigurationMapping = {
+            "anchor": anchor,
+            "depth_before": before,
+            "depth_after": after,
+        }
         return self._mcp.build_tool_call(
             self.SERVER_NAME,
             "timeline",
-            {"anchor": anchor, "depth_before": before, "depth_after": after},
+            params,
         )
 
     def get_observations_command(self, ids: list[int]) -> r[list[str]]:

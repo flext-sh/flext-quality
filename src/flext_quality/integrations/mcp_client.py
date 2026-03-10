@@ -14,7 +14,7 @@ import shutil
 from collections.abc import Mapping
 from typing import final
 
-from flext_core import r
+from flext_core import r, t
 from pydantic import BaseModel, Field
 
 from flext_quality import c
@@ -25,7 +25,7 @@ class McpToolCall(BaseModel):
 
     server: str
     tool: str
-    params: dict[str, str] = Field(default_factory=dict)
+    params: t.ConfigurationMapping = Field(default_factory=dict)
 
 
 class McpToolResult(BaseModel):
@@ -64,11 +64,12 @@ class FlextQualityMcpClient:
         return r[list[str]].ok(["mcp-cli", "info", tool_path])
 
     def build_tool_call(
-        self, server: str, tool: str, params: dict[str, str] | None = None
+        self, server: str, tool: str, params: t.ConfigurationMapping | None = None
     ) -> r[McpToolCall]:
         """Build an MCP tool call request."""
+        call_params: t.ConfigurationMapping = params if params is not None else {}
         return r[McpToolCall].ok(
-            McpToolCall(server=server, tool=tool, params=params or {})
+            McpToolCall(server=server, tool=tool, params=call_params)
         )
 
     def health_check(self) -> r[Mapping[str, object]]:
@@ -101,13 +102,16 @@ class FlextQualityMcpClient:
                 )
             )
         try:
-            data: object = json.loads(output)
-            match data:
-                case dict():
+            parsed: t.JsonValue = json.loads(output)
+            match parsed:
+                case dict() as data_dict:
+                    result_data: dict[str, str] = {
+                        str(k): str(v) for k, v in data_dict.items()
+                    }
                     return r[McpToolResult].ok(
                         McpToolResult(
                             success=True,
-                            data={str(k): str(v) for k, v in data.items()},
+                            data=result_data,
                             error=None,
                         )
                     )
@@ -130,7 +134,7 @@ class FlextQualityMcpClient:
                 case _:
                     return r[McpToolResult].ok(
                         McpToolResult(
-                            success=True, data={"value": str(data)}, error=None
+                            success=True, data={"value": str(parsed)}, error=None
                         )
                     )
         except json.JSONDecodeError:
