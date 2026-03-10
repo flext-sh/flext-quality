@@ -68,20 +68,18 @@ class FlextQualityClaudeMemClient:
 
     def get_observations_command(self, ids: list[int]) -> r[list[str]]:
         """Get the mcp-cli command for fetching observations."""
-        call_result = self.build_get_observations_call(ids)
-        if call_result.is_failure:
-            return r[list[str]].fail(call_result.error)
-        return self._mcp.build_call_command(call_result.value)
+        return self.build_get_observations_call(ids).flat_map(
+            self._mcp.build_call_command
+        )
 
     def get_search_command(
         self, query: str, *, limit: int | None = None
     ) -> r[list[str]]:
         """Get the mcp-cli command for memory search."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
-        call_result = self.build_search_call(query, limit=search_limit)
-        if call_result.is_failure:
-            return r[list[str]].fail(call_result.error)
-        return self._mcp.build_call_command(call_result.value)
+        return self.build_search_call(query, limit=search_limit).flat_map(
+            self._mcp.build_call_command
+        )
 
     def get_timeline_command(
         self,
@@ -93,12 +91,9 @@ class FlextQualityClaudeMemClient:
         """Get the mcp-cli command for timeline query."""
         before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
-        call_result = self.build_timeline_call(
+        return self.build_timeline_call(
             anchor, depth_before=before, depth_after=after
-        )
-        if call_result.is_failure:
-            return r[list[str]].fail(call_result.error)
-        return self._mcp.build_call_command(call_result.value)
+        ).flat_map(self._mcp.build_call_command)
 
     def health_check(self) -> r[Mapping[str, object]]:
         """Check if claude-mem is available."""

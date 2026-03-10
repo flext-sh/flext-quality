@@ -61,10 +61,9 @@ class FlextQualityClaudeContextClient:
     ) -> r[list[str]]:
         """Get the mcp-cli command for code search."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_SEARCH_LIMIT
-        call_result = self.build_search_call(query, limit=search_limit)
-        if call_result.is_failure:
-            return r[list[str]].fail(call_result.error)
-        return self._mcp.build_call_command(call_result.value)
+        return self.build_search_call(query, limit=search_limit).flat_map(
+            self._mcp.build_call_command
+        )
 
     def health_check(self) -> r[Mapping[str, object]]:
         """Check if claude-context is available."""
