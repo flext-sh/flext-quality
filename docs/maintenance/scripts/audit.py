@@ -10,8 +10,6 @@ Usage:
     python audit.py --ci-mode --fail-on-errors
 """
 
-from typing import Any
-
 from __future__ import annotations
 
 import argparse
@@ -20,6 +18,7 @@ import re
 import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Any
 
 import requests
 import yaml

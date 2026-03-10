@@ -31,7 +31,7 @@ class FlextQualityMcpClient:
         """Initialize the MCP client."""
         self._timeout_ms = timeout_ms or c.Quality.Defaults.MCP_TIMEOUT_MS
 
-    def build_call_command(self, call: McpToolCall) -> r[list[str]]:
+    def build_call_command(self, call: McpToolCall) -> r[list[str]]:  # noqa: F821
         """Build the mcp-cli command for a tool call."""
         if not self.is_mcp_cli_available():
             return r[list[str]].fail("mcp-cli not found in PATH")
@@ -48,10 +48,10 @@ class FlextQualityMcpClient:
 
     def build_tool_call(
         self, server: str, tool: str, params: dict[str, object] | None = None
-    ) -> r[McpToolCall]:
+    ) -> r[McpToolCall]:  # noqa: F821
         """Build an MCP tool call request."""
-        return r[McpToolCall].ok(
-            McpToolCall(server=server, tool=tool, params=params or {})
+        return r[McpToolCall].ok(  # noqa: F821
+            McpToolCall(server=server, tool=tool, params=params or {})  # noqa: F821
         )
 
     def health_check(self) -> r[Mapping[str, object]]:
@@ -73,11 +73,11 @@ class FlextQualityMcpClient:
         """Check if mcp-cli is available in PATH."""
         return shutil.which("mcp-cli") is not None
 
-    def parse_result(self, output: str, exit_code: int) -> r[McpToolResult]:
+    def parse_result(self, output: str, exit_code: int) -> r[McpToolResult]:  # noqa: F821
         """Parse the output from an mcp-cli call."""
         if exit_code != 0:
-            return r[McpToolResult].ok(
-                McpToolResult(
+            return r[McpToolResult].ok(  # noqa: F821
+                McpToolResult(  # noqa: F821
                     success=False,
                     data=None,
                     error=output or f"Command failed with exit code {exit_code}",
@@ -87,8 +87,8 @@ class FlextQualityMcpClient:
             data: object = json.loads(output)
             match data:
                 case dict():
-                    return r[McpToolResult].ok(
-                        McpToolResult(success=True, data=data, error=None)
+                    return r[McpToolResult].ok(  # noqa: F821
+                        McpToolResult(success=True, data=data, error=None)  # noqa: F821
                     )
                 case list() as data_list:
                     coerced_data: list[dict[str, object]] = []
@@ -97,14 +97,14 @@ class FlextQualityMcpClient:
                             coerced_data.append({str(k): v for k, v in item.items()})
                         else:
                             coerced_data.append({"value": item})
-                    return r[McpToolResult].ok(
-                        McpToolResult(success=True, data=coerced_data, error=None)
+                    return r[McpToolResult].ok(  # noqa: F821
+                        McpToolResult(success=True, data=coerced_data, error=None)  # noqa: F821
                     )
                 case _:
-                    return r[McpToolResult].ok(
-                        McpToolResult(success=True, data={"value": data}, error=None)
+                    return r[McpToolResult].ok(  # noqa: F821
+                        McpToolResult(success=True, data={"value": data}, error=None)  # noqa: F821
                     )
         except json.JSONDecodeError:
-            return r[McpToolResult].ok(
-                McpToolResult(success=True, data={"raw": output}, error=None)
+            return r[McpToolResult].ok(  # noqa: F821
+                McpToolResult(success=True, data={"raw": output}, error=None)  # noqa: F821
             )

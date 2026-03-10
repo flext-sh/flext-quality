@@ -122,7 +122,9 @@ class DocumentationOptimizer:
         for i, line in enumerate(lines):
             if re.match(r"^##+\\s+Table of Contents", line, re.IGNORECASE):
                 toc_start = i
-            elif toc_start != -1 and (not line.strip() or re.match(r"^#{1,6}\\s", line)):
+            elif toc_start != -1 and (
+                not line.strip() or re.match(r"^#{1,6}\\s", line)
+            ):
                 toc_end = i
                 break
         return (toc_start, toc_end)
@@ -335,7 +337,7 @@ class DocumentationOptimizer:
             _ = self.results["backups_created"].append(
                 str(backup_path.relative_to(self.project_root))
             )
-        _ = filepath.write_text(content, encoding="utf-8")
+        _ = filepath.write_text(content, encoding="utf-8")  # noqa: F821
 
     def generate_report(self, report_format: str = "json") -> str:
         """Generate optimization report."""

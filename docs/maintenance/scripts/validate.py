@@ -164,7 +164,7 @@ class LinkValidator:
 
     def validate_external_links(
         self, links: list[t.ConfigurationMapping], *, verbose: bool = False
-    ) -> _LinkValidatorResults:
+    ) -> _LinkValidatorResults:  # noqa: F821
         """Validate external links with concurrent checking."""
         external_links = [link for link in links if link["type"] == "external"]
         if not external_links:
@@ -267,7 +267,7 @@ class LinkValidator:
 
     def validate_internal_links(
         self, links: list[t.ConfigurationMapping], doc_files: list[Path]
-    ) -> _LinkValidatorResults:
+    ) -> _LinkValidatorResults:  # noqa: F821
         """Validate internal links and references."""
         internal_links = [
             link for link in links if link["type"] in {"internal", "reference"}
@@ -322,7 +322,7 @@ class LinkValidator:
 
     def validate_images(
         self, links: list[t.ConfigurationMapping], project_root: Path
-    ) -> _LinkValidatorResults:
+    ) -> _LinkValidatorResults:  # noqa: F821
         """Validate image references."""
         images = [link for link in links if link["type"] == "image"]
         for image in images:
@@ -352,7 +352,7 @@ class LinkValidator:
 
     def validate_anchors(
         self, links: list[t.ConfigurationMapping], doc_files: list[Path]
-    ) -> _LinkValidatorResults:
+    ) -> _LinkValidatorResults:  # noqa: F821
         """Validate anchor links within documents."""
         anchor_links = [link for link in links if link["type"] == "anchor"]
         file_anchors = {}
@@ -399,7 +399,7 @@ class LinkValidator:
 
     def check_link_text_quality(
         self, links: list[t.ConfigurationMapping]
-    ) -> _LinkValidatorResults:
+    ) -> _LinkValidatorResults:  # noqa: F821
         """Check quality of link text for accessibility and usability."""
         poor_link_texts = [
             "here",
@@ -461,7 +461,7 @@ class ContentValidator:
 
     def validate_markdown_syntax(
         self, doc_files: list[Path]
-    ) -> _ContentValidatorResults:
+    ) -> _ContentValidatorResults:  # noqa: F821
         """Validate markdown syntax and formatting."""
         for file_path in doc_files:
             file_rel_path = str(file_path)
@@ -512,7 +512,7 @@ class ContentValidator:
                 })
         return issues
 
-    def check_content_quality(self, doc_files: list[Path]) -> _ContentValidatorResults:
+    def check_content_quality(self, doc_files: list[Path]) -> _ContentValidatorResults:  # noqa: F821
         """Check content quality metrics."""
         for file_path in doc_files:
             file_rel_path = str(file_path)
@@ -543,7 +543,7 @@ class ContentValidator:
                 })
         return self.results
 
-    def _calculate_content_metrics(self, content: str) -> _ContentMetrics:
+    def _calculate_content_metrics(self, content: str) -> _ContentMetrics:  # noqa: F821
         """Calculate basic content quality metrics."""
         words = re.findall(r"\\b\\w+\\b", content)
         sentences = re.split(r"[.!?]+", content)

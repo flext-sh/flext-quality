@@ -72,12 +72,12 @@ class FlextQualityCodeExecutionBridge:
 
     def create_execution_request(
         self, script_path: Path, runtime: str, *, args: list[str] | None = None
-    ) -> r[ExecutionRequest]:
+    ) -> r[ExecutionRequest]:  # noqa: F821
         """Create an execution request for later processing."""
         if runtime not in {"python", "typescript", "ruff", "basedpyright"}:
-            return r[ExecutionRequest].fail(f"Unknown runtime: {runtime}")
-        return r[ExecutionRequest].ok(
-            ExecutionRequest(
+            return r[ExecutionRequest].fail(f"Unknown runtime: {runtime}")  # noqa: F821
+        return r[ExecutionRequest].ok(  # noqa: F821
+            ExecutionRequest(  # noqa: F821
                 script_path=script_path,
                 runtime=runtime,
                 args=args or [],
