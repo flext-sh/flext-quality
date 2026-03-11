@@ -294,9 +294,7 @@ class QualityProjectBuilder:
 def mock_external_analyzer():
     """Mock external analysis tool for unit testing."""
     mock = Mock(spec=ExternalAnalyzerService)
-    mock.analyze_project.return_value = FlextResult[bool].ok(
-        create_test_analysis_result()
-    )
+    mock.analyze_project.return_value = r[bool].ok(create_test_analysis_result())
     return mock
 ```
 

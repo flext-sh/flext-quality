@@ -57,7 +57,7 @@ dependencies.yaml          (16 rules)  - FLEXT ecosystem dependencies
 dry_principle.yaml         (3 rules)   - DRY principle
 file_operations.yaml       (19 rules)  - File operation safety
 file_protection.yaml       (13 rules)  - File access control
-flextresult.yaml           (3 rules)   - FlextResult patterns
+flextresult.yaml           (3 rules)   - r patterns
 git_operations.yaml        (29 rules)  - Git command safety
 namespace.yaml             (14 rules)  - Module organization
 project_files.yaml         (14 rules)  - Project file protection
@@ -149,19 +149,19 @@ Update guidance for clarity:
   severity: critical
   blocking: true
   guidance: |
-    ❌ WRONG: FlextResult should never return None directly.
+    ❌ WRONG: r should never return None directly.
 
-    ✅ CORRECT: Use FlextResult patterns:
+    ✅ CORRECT: Use r patterns:
       - Return .ok(value) for success
       - Return .fail(error) for failure
       - Never return bare None
 
     Example:
-      def get_user(id: int) -> FlextResult[User]:
+      def get_user(id: int) -> r[User]:
           user = db.find(id)
           if not user:
-              return FlextResult.fail(UserNotFound(id))
-          return FlextResult.ok(user)
+              return r.fail(UserNotFound(id))
+          return r.ok(user)
 ```
 
 ______________________________________________________________________

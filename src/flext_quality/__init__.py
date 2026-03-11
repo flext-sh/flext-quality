@@ -1,7 +1,7 @@
 """FLEXT Quality - Unified orchestration platform for Claude Code tooling.
 
 Exposes `FlextQuality` as the main API facade, along with domain models,
-settings, and utilities. Uses flext-core patterns: `FlextResult[T]`
+settings, and utilities. Uses flext-core patterns: `r[T]`
 railway pattern, `FlextSettings`.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -20,8 +20,8 @@ if TYPE_CHECKING:
         FlextExceptions as e,
         FlextHandlers as h,
         FlextMixins as x,
-        FlextResult as r,
         FlextService as s,
+        r as r,
     )
 
     from flext_quality.api import FlextQuality
@@ -61,7 +61,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "m": ("flext_quality.models", "FlextQualityModels"),
     "main": ("flext_quality.services.cli", "main"),
     "p": ("flext_quality.protocols", "FlextQualityProtocols"),
-    "r": ("flext_core", "FlextResult"),
+    "r": ("flext_core", "r"),
     "s": ("flext_core", "FlextService"),
     "t": ("flext_quality.typings", "FlextQualityTypes"),
     "u": ("flext_quality.utilities", "FlextQualityUtilities"),

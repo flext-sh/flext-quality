@@ -18,20 +18,20 @@ from pathlib import Path
 from typing import TypeVar
 
 import pytest
-from flext_core import FlextResult, t
+from flext_core import r, t
 
 T = TypeVar("T")
 
 
-def assert_result_success_with_data[T](result: FlextResult[T]) -> T:
-    """Assert FlextResult success and return validated data with type safety.
+def assert_result_success_with_data[T](result: r[T]) -> T:
+    """Assert r success and return validated data with type safety.
 
-    Provides a DRY helper for the common test pattern of validating FlextResult
+    Provides a DRY helper for the common test pattern of validating r
     success and extracting data with proper null safety checks. Eliminates
     boilerplate code while maintaining type safety and clear error messages.
 
     Args:
-      result: FlextResult instance to validate for success state
+      result: r instance to validate for success state
 
     Returns:
       The validated data from the successful result
@@ -54,15 +54,15 @@ def assert_result_success_with_data[T](result: FlextResult[T]) -> T:
     return result.value
 
 
-def assert_result_failure_with_error[T](result: FlextResult[T]) -> str:
-    """Assert FlextResult failure and return validated error message.
+def assert_result_failure_with_error[T](result: r[T]) -> str:
+    """Assert r failure and return validated error message.
 
-    Provides a DRY helper for validating FlextResult failure states and
+    Provides a DRY helper for validating r failure states and
     extracting error messages with proper null safety. Essential for
     testing error handling and negative test scenarios.
 
     Args:
-      result: FlextResult instance to validate for failure state
+      result: r instance to validate for failure state
 
     Returns:
       The validated error message from the failed result

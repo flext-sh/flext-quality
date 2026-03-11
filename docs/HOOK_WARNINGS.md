@@ -327,15 +327,15 @@ ______________________________________________________________________
 
 #### FLEXT Patterns (CQ008-010)
 
-- **CQ008**: `FlextResult` returning None
+- **CQ008**: `r` returning None
 
-  - ⛔ CRITICAL: FlextResult never returns None
+  - ⛔ CRITICAL: r never returns None
   - Fix: Use `.ok(value)` for success, `.fail(error)` for failure
 
-- **CQ009**: `FlextResult` without type parameter
+- **CQ009**: `r` without type parameter
 
   - ⛔ CRITICAL: Must specify type parameter
-  - Fix: `FlextResult[T]` always, never bare `FlextResult`
+  - Fix: `r[T]` always, never bare `r`
 
 - **CQ010**: Uncentralized dict types
 

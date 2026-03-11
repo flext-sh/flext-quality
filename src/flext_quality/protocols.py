@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from typing import Protocol
 
 from flext_cli import FlextCliProtocols
-from flext_core import FlextResult
+from flext_core import r
 from flext_web import FlextWebProtocols
 
 from .typings import t
@@ -26,7 +26,7 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
 
             def execute(
                 self, input_data: t.Quality.HookInput
-            ) -> FlextResult[t.Quality.HookOutput]:
+            ) -> r[t.Quality.HookOutput]:
                 """Execute the hook logic."""
                 ...
 
@@ -41,22 +41,22 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
 
             def validate(
                 self, config: t.Quality.RuleConfig, context: Mapping[str, object]
-            ) -> FlextResult[t.Quality.RuleResult]:
+            ) -> r[t.Quality.RuleResult]:
                 """Validate according to rule."""
                 ...
 
         class IntegrationClient(Protocol):
             """Protocol for external integrations."""
 
-            def connect(self) -> FlextResult[bool]:
+            def connect(self) -> r[bool]:
                 """Connect to external service."""
                 ...
 
-            def disconnect(self) -> FlextResult[bool]:
+            def disconnect(self) -> r[bool]:
                 """Disconnect from external service."""
                 ...
 
-            def health_check(self) -> FlextResult[Mapping[str, str]]:
+            def health_check(self) -> r[Mapping[str, str]]:
                 """Check integration health."""
                 ...
 
@@ -66,9 +66,7 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
             name: str
             description: str
 
-            def execute(
-                self, params: Mapping[str, object]
-            ) -> FlextResult[Mapping[str, object]]:
+            def execute(self, params: Mapping[str, object]) -> r[Mapping[str, object]]:
                 """Execute MCP tool."""
                 ...
 

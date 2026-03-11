@@ -37,7 +37,7 @@ class FlextQuality:
     ───────────────────────────
     - Singleton pattern with thread-safe locking prevents race conditions
     - Service instances are created on-demand (lazy initialization)
-    - Railway-Oriented Programming via FlextResult for composable errors
+    - Railway-Oriented Programming via r for composable errors
     - FlextSettings provides auto self.config and self.logger
 
     Usage:

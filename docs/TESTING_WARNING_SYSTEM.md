@@ -130,7 +130,7 @@ ______________________________________________________________________
 
 - **CQ001-005**: Type annotations & system
 - **CQ006-007**: Data structures & isinstance checks
-- **CQ008-010**: FlextResult patterns
+- **CQ008-010**: r patterns
 - **CQ011**: Mock usage in tests
 
 **Testing**: Use forbidden patterns → Warnings shown → Code allowed

@@ -23,7 +23,7 @@ class TestFlextQualityCliService:
         assert service is not None
 
     def test_display_status_returns_result(self) -> None:
-        """Test display_status returns a FlextResult with dict."""
+        """Test display_status returns a r with dict."""
         service = FlextQualityCliService()
         result = service.display_status()
         assert result.is_success

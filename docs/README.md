@@ -64,7 +64,7 @@ Documentation for FLEXT Quality - code quality analysis library for the FLEXT ec
 
 | Component               | Status              | Assessment                                                        |
 | ----------------------- | ------------------- | ----------------------------------------------------------------- |
-| **Domain Architecture** | ✅ **Complete**     | Well-designed entities with FlextResult patterns, domain events   |
+| **Domain Architecture** | ✅ **Complete**     | Well-designed entities with r patterns, domain events   |
 | **Service Layer**       | ✅ **Functional**   | services with proper error handling and FlextLogger integration   |
 | **Core Analyzer**       | ❌ **Inaccessible** | FlextQualityCodeAnalyzer implemented but blocked by model imports |
 | **Quality Gates**       | ❌ **Blocked**      | Import failures prevent type checking and test execution          |
