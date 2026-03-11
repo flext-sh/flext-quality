@@ -25,7 +25,7 @@ class McpToolCall(BaseModel):
 
     server: str
     tool: str
-    params: t.ConfigurationMapping = Field(default_factory=dict)
+    params: dict[str, t.ContainerValue] = Field(default_factory=dict)
 
 
 class McpToolResult(BaseModel):
@@ -67,7 +67,9 @@ class FlextQualityMcpClient:
         self, server: str, tool: str, params: t.ConfigurationMapping | None = None
     ) -> r[McpToolCall]:
         """Build an MCP tool call request."""
-        call_params: t.ConfigurationMapping = params if params is not None else {}
+        call_params: dict[str, t.ContainerValue] = (
+            dict(params) if params is not None else {}
+        )
         return r[McpToolCall].ok(
             McpToolCall(server=server, tool=tool, params=call_params)
         )

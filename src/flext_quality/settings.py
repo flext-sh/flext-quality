@@ -12,13 +12,14 @@ from __future__ import annotations
 from pathlib import Path
 
 from flext_core import FlextSettings, r
-from pydantic import ConfigDict, Field
+from pydantic import Field
+from pydantic_settings import SettingsConfigDict
 
 
 class FlextQualitySettings(FlextSettings):
     """Runtime configuration for flext-quality services."""
 
-    model_config = ConfigDict(extra="ignore")
+    model_config = SettingsConfigDict(extra="ignore")
 
     hook_timeout_ms: int = Field(default=5000, ge=100, le=60000)
     rule_timeout_seconds: int = Field(default=30, ge=1, le=3600)
