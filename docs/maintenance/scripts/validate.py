@@ -355,7 +355,7 @@ class LinkValidator:
     ) -> _LinkValidatorResults:  # noqa: F821
         """Validate anchor links within documents."""
         anchor_links = [link for link in links if link["type"] == "anchor"]
-        file_anchors = {}
+        file_anchors: dict[str, set[str]] = {}
         for file_path in doc_files:
             file_rel_path = str(file_path)
             try:
@@ -484,7 +484,7 @@ class ContentValidator:
 
     def _check_markdown_issues(self, content: str) -> list[t.ConfigurationMapping]:
         """Check for markdown syntax issues."""
-        issues = []
+        issues: list[dict[str, int | str]] = []
         lines = content.split("\n")
         for i, line in enumerate(lines, 1):
             if "[" in line and "]" in line and ("(" in line) and (")" not in line):

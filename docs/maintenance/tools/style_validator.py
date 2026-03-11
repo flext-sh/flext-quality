@@ -146,7 +146,7 @@ class StyleValidator:
         self, content: str
     ) -> list[dict[str, t.ContainerValue]]:
         """Check basic markdown formatting consistency."""
-        violations = []
+        violations: list[dict[str, int | str]] = []
 
         lines = content.split("\n")
 
@@ -181,7 +181,7 @@ class StyleValidator:
         self, content: str
     ) -> list[dict[str, t.ContainerValue]]:
         """Check heading hierarchy and consistency."""
-        violations = []
+        violations: list[dict[str, int | str]] = []
 
         # Extract headings
         headings: list[tuple[int, str, int]] = []
@@ -337,7 +337,7 @@ class StyleValidator:
 
     def _check_line_length(self, content: str) -> list[dict[str, t.ContainerValue]]:
         """Check line length compliance."""
-        violations = []
+        violations: list[dict[str, int | str]] = []
 
         max_length = int(self.config["formatting"]["max_line_length"])
         lines = content.split("\n")
@@ -365,7 +365,7 @@ class StyleValidator:
 
     def _check_whitespace(self, content: str) -> list[dict[str, t.ContainerValue]]:
         """Check whitespace formatting."""
-        violations = []
+        violations: list[dict[str, int | str]] = []
 
         lines = content.split("\n")
 
@@ -402,7 +402,7 @@ class StyleValidator:
         self, violations: list[dict[str, t.ContainerValue]]
     ) -> list[str]:
         """Generate improvement suggestions based on violations."""
-        suggestions = []
+        suggestions: list[str] = []
 
         violation_types = {}
         for violation in violations:

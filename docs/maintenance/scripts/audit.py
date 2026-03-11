@@ -168,7 +168,7 @@ class DocumentationAuditor:
 
     def find_documentation_files(self) -> list[Path]:
         """Find all documentation files in the project."""
-        doc_files = []
+        doc_files: list[Path] = []
         patterns = [
             "**/*.md",
             "**/*.mdx",
@@ -246,7 +246,7 @@ class DocumentationAuditor:
 
     def _check_outdated_indicators(self, content: str) -> list[str]:
         """Check for indicators of outdated content."""
-        indicators = []
+        indicators: list[str] = []
         if re.search(
             r"\\b\\d+\\.\\d+\\.\\d+.*TODO|FIXME|placeholder", content, re.IGNORECASE
         ):
@@ -317,7 +317,7 @@ class DocumentationAuditor:
         self, content: str, required_sections: list[str]
     ) -> list[str]:
         """Check for required sections in documentation."""
-        missing = []
+        missing: list[str] = []
         for section in required_sections:
             pattern = f"^#+\\s.*{re.escape(section)}.*$"
             if not re.search(pattern, content, re.MULTILINE | re.IGNORECASE):
@@ -375,7 +375,7 @@ class DocumentationAuditor:
 
     def _check_markdown_formatting(self, content: str) -> list[str]:
         """Check for markdown formatting issues."""
-        issues = []
+        issues: list[str] = []
         unordered_lists = re.findall(r"^[\\s]*[-\\*\\+]", content, re.MULTILINE)
         if len(set(unordered_lists)) > 1:
             issues.append("mixed unordered list styles")
@@ -397,7 +397,7 @@ class DocumentationAuditor:
 
     def _check_accessibility(self, content: str) -> list[dict[str, str]]:
         """Check accessibility compliance."""
-        issues = []
+        issues: list[dict[str, str]] = []
         if self.style_guide["accessibility"]["require_alt_text"]:
             images_without_alt = re.findall(r"!\\[\\]\\([^)]+\\)", content)
             if images_without_alt:
@@ -593,7 +593,7 @@ class DocumentationAuditor:
         """Generate actionable recommendations based on audit results."""
         metrics = self.results.metrics
         issues = self.results.issues
-        recommendations = []
+        recommendations: list[dict[str, list[str] | str]] = []
         if metrics["quality_score"] < 50:
             recommendations.append({
                 "priority": "critical",

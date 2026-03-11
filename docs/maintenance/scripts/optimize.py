@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Any
 
 import yaml
+from fix_tests import filepath
 
 MIN_HEADINGS_FOR_TOC = 5
 
@@ -82,7 +83,7 @@ class DocumentationOptimizer:
     def _fix_heading_spacing(self, content: str) -> str:
         """Ensure proper spacing around headings."""
         lines = content.split("\n")
-        fixed_lines = []
+        fixed_lines: list[str] = []
         for i, line in enumerate(lines):
             if re.match(r"^#{1,6}\\s", line) and i > 0 and lines[i - 1].strip():
                 fixed_lines.append("")
@@ -131,7 +132,7 @@ class DocumentationOptimizer:
 
     def _extract_toc_headings(self, lines: list[str]) -> list[str]:
         """Extract headings for table of contents."""
-        toc_lines = []
+        toc_lines: list[str] = []
         for line in lines:
             match = re.match(r"^(#{1,6})\\s+(.+)$", line)
             if match:
@@ -260,7 +261,7 @@ class DocumentationOptimizer:
     def _add_section_breaks(self, content: str) -> str:
         """Add horizontal rules between major sections."""
         lines = content.split("\n")
-        enhanced_lines = []
+        enhanced_lines: list[str] = []
         for i, line in enumerate(lines):
             enhanced_lines.append(line)
             if (
@@ -337,7 +338,7 @@ class DocumentationOptimizer:
             _ = self.results["backups_created"].append(
                 str(backup_path.relative_to(self.project_root))
             )
-        _ = filepath.write_text(content, encoding="utf-8")  # noqa: F821
+        _ = filepath.write_text(content, encoding="utf-8")
 
     def generate_report(self, report_format: str = "json") -> str:
         """Generate optimization report."""
@@ -418,7 +419,7 @@ def _discover_documentation_files(args: argparse.Namespace) -> list[Path]:
     project_root = Path(__file__).parent.parent.parent.parent
     if args.files:
         return [project_root / f for f in args.files]
-    doc_files = []
+    doc_files: list[Path] = []
     for pattern in [
         "**/*.md",
         "**/*.mdx",
