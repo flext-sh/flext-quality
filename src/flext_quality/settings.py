@@ -26,6 +26,8 @@ class FlextQualitySettings(FlextSettings):
     cache_enabled: bool = Field(default=True)
     mcp_server_port: int = Field(default=8765, ge=1, le=65535)
     rules_dir: str = Field(default="rules")
+    max_function_length: int = Field(default=50)
+    max_class_length: int = Field(default=200)
 
     @classmethod
     def get_instance(cls) -> FlextQualitySettings:
@@ -38,6 +40,11 @@ class FlextQualitySettings(FlextSettings):
 
     def validate_thresholds(self) -> r[bool]:
         """Validate numeric thresholds and feature toggles."""
+        if self.max_function_length > self.max_class_length:
+            return r[bool].fail(
+                f"max_function_length ({self.max_function_length}) must be <= "
+                f"max_class_length ({self.max_class_length})"
+            )
         return r[bool].ok(True)
 
 

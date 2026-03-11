@@ -130,32 +130,32 @@ class _CommandHandlers:
         return r[int].ok(0)
 
 
-def _dispatch(service: FlextQualityCliService, command: str, args: list[str]) -> int:
+def _dispatch(service: FlextQualityCliService, command: str, args: list[str]) -> None:
     """Dispatch command to handler."""
     if command == "status":
         result = _CommandHandlers.handle_status(service)
-        return result.value_or(1)
+        raise SystemExit(result.value_or(1))
     if command == "check":
         target_path = Path(args[0]) if args else Path.cwd()
         result = _CommandHandlers.handle_check(service, target_path)
-        return result.value_or(1)
+        raise SystemExit(result.value_or(1))
     if command == "validate":
         target_path = Path(args[0]) if args else Path.cwd()
         result = _CommandHandlers.handle_validate(service, target_path)
-        return result.value_or(1)
+        raise SystemExit(result.value_or(1))
     service.output.display_message(f"Unknown command: {command}", message_type="error")
     service.output.display_message(
         "Commands: status, check, validate", message_type="info"
     )
     service.output.print_message("Commands: status, check, validate")
-    return 1
+    raise SystemExit(1)
 
 
-def main() -> int:
+def main() -> None:
     """Main CLI entry point."""
     service = FlextQualityCliService()
     args = sys.argv[1:]
     if not args:
         result = _CommandHandlers.handle_status(service)
-        return result.value_or(1)
-    return _dispatch(service, args[0], args[1:])
+        raise SystemExit(result.value_or(1))
+    _dispatch(service, args[0], args[1:])
