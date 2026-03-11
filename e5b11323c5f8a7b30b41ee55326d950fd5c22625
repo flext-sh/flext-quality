@@ -1,0 +1,25 @@
+src/flext_quality/integrations/mcp_client.py
+  0d3e5eafd1c4d9d8 28,70-72
+src/flext_quality/integrations/claude_context.py
+  0d3e5eafd1c4d9d8 37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.10",
+  "base_commit_sha": "e5b11323c5f8a7b30b41ee55326d950fd5c22625",
+  "prompts": {
+    "0d3e5eafd1c4d9d8": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_32697f3bbffeJYW8HyihR5eo0B",
+        "model": "anthropic/claude-haiku-4-5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 5,
+      "total_deletions": 3,
+      "accepted_lines": 5,
+      "overriden_lines": 0
+    }
+  }
+}
