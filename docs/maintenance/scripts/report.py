@@ -18,7 +18,6 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import TypedDict, Unpack
 
-from flext_core import t
 from jinja2 import Template
 
 
@@ -36,9 +35,9 @@ class DocumentationReporter:
         self.reports_dir = Path(reports_dir)
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.template_dir = Path(__file__).parent / "templates"
-        self.audit_data: t.JsonDict | None = None
-        self.validation_data: t.JsonDict | None = None
-        self.optimization_data: t.JsonDict | None = None
+        self.audit_data: object | None = None
+        self.validation_data: object | None = None
+        self.optimization_data: object | None = None
         self.reports_dir.mkdir(parents=True, exist_ok=True)
         self.load_latest_reports()
 
@@ -48,7 +47,7 @@ class DocumentationReporter:
         self.validation_data = self._load_json_report("latest_validation.json")
         self.optimization_data = self._load_json_report("latest_optimization.json")
 
-    def _load_json_report(self, filename: str) -> t.JsonDict | None:
+    def _load_json_report(self, filename: str) -> object | None:
         """Load a JSON report file."""
         filepath = self.reports_dir / filename
         if filepath.exists():
@@ -82,7 +81,7 @@ class DocumentationReporter:
         msg = f"Unsupported format: {report_format}"
         raise ValueError(msg)
 
-    def _calculate_summary_metrics(self) -> t.JsonDict:
+    def _calculate_summary_metrics(self) -> object:
         """Calculate summary metrics from all available data."""
         summary = {
             "overall_score": 0,
@@ -126,11 +125,11 @@ class DocumentationReporter:
             summary["quality_trend"] = "critical"
         return summary
 
-    def _analyze_trends(self) -> t.JsonDict | None:
+    def _analyze_trends(self) -> object | None:
         """Analyze quality trends over time."""
         return None
 
-    def _generate_recommendations(self) -> list[t.JsonDict]:
+    def _generate_recommendations(self) -> list[object]:
         """Generate actionable recommendations based on current data."""
         recommendations = []
         if self.audit_data:
@@ -213,7 +212,7 @@ class DocumentationReporter:
             })
         return recommendations
 
-    def _generate_html_report(self, data: t.JsonDict) -> str:
+    def _generate_html_report(self, data: object) -> str:
         """Generate HTML quality report."""
         template = self._get_html_template()
         template_data = {
@@ -237,7 +236,7 @@ class DocumentationReporter:
         template_content = '\n<!DOCTYPE html>\n<html>\n<head>\n    <title>{{ title }}</title>\n    <style>\n        body { font-family: \'Segoe UI\', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }\n        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }\n        .header { text-align: center; border-bottom: 2px solid #007acc; padding-bottom: 20px; margin-bottom: 30px; }\n        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0; }\n        .metric-card { background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; border-left: 4px solid #007acc; }\n        .metric-value { font-size: 2.5em; font-weight: bold; color: #007acc; margin: 10px 0; }\n        .metric-label { color: #666; font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; }\n        .section { margin: 40px 0; }\n        .section h2 { color: #333; border-bottom: 1px solid #ddd; padding-bottom: 10px; }\n        .recommendations { display: grid; gap: 15px; }\n        .recommendation { background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 15px; }\n        .priority-critical { border-left: 4px solid #dc3545; background: #f8d7da; }\n        .priority-high { border-left: 4px solid #fd7e14; background: #fff3cd; }\n        .priority-medium { border-left: 4px solid #ffc107; background: #fff3cd; }\n        .priority-low { border-left: 4px solid #28a745; background: #d4edda; }\n        .issue-list { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0; max-height: 300px; overflow-y: auto; }\n        .issue-item { background: white; margin: 5px 0; padding: 8px; border-radius: 3px; border-left: 3px solid #dc3545; }\n        .timestamp { color: #666; font-size: 0.9em; text-align: center; margin-top: 30px; }\n    </style>\n</head>\n<body>\n    <div class="container">\n        <div class="header">\n            <h1>{{ title }}</h1>\n            <p>Generated: {{ timestamp }}</p>\n        </div>\n\n        <div class="summary-grid">\n            <div class="metric-card">\n                <div class="metric-label">Overall Quality Score</div>\n                <div class="metric-value">{{ summary.overall_score }}%</div>\n                <div>Trend: {{ summary.quality_trend|title }}</div>\n            </div>\n            <div class="metric-card">\n                <div class="metric-label">Files Analyzed</div>\n                <div class="metric-value">{{ summary.files_analyzed }}</div>\n            </div>\n            <div class="metric-card">\n                <div class="metric-label">Total Issues</div>\n                <div class="metric-value">{{ summary.total_issues }}</div>\n            </div>\n            <div class="metric-card">\n                <div class="metric-label">Links Checked</div>\n                <div class="metric-value">{{ summary.links_checked }}</div>\n            </div>\n        </div>\n\n        {% if audit_summary %}\n        <div class="section">\n            <h2>Content Audit Results</h2>\n            <p>Quality Score: {{ audit_summary.quality_score }}%</p>\n            <p>Issues Found: {{ audit_summary.total_issues }}</p>\n            <p>Critical: {{ audit_summary.critical_issues }}, High: {{ audit_summary.high_issues }}</p>\n        </div>\n        {% endif %}\n\n        {% if validation_summary %}\n        <div class="section">\n            <h2>Link Validation Results</h2>\n            <p>Links Checked: {{ validation_summary.links_checked }}</p>\n            <p>Valid: {{ validation_summary.valid_links }}, Broken: {{ validation_summary.broken_links }}</p>\n        </div>\n        {% endif %}\n\n        {% if optimization_summary %}\n        <div class="section">\n            <h2>Optimization Results</h2>\n            <p>Files Processed: {{ optimization_summary.files_processed }}</p>\n            <p>Changes Made: {{ optimization_summary.changes_made }}</p>\n            <p>Backups Created: {{ optimization_summary.backups_created }}</p>\n        </div>\n        {% endif %}\n\n        <div class="section">\n            <h2>Recommendations</h2>\n            <div class="recommendations">\n                {% for rec in recommendations %}\n                <div class="recommendation priority-{{ rec.priority }}">\n                    <h3>{{ rec.title }}</h3>\n                    <p>{{ rec.description }}</p>\n                    <ul>\n                        {% for action in rec.actions %}\n                        <li>{{ action }}</li>\n                        {% endfor %}\n                    </ul>\n                </div>\n                {% endfor %}\n            </div>\n        </div>\n\n        <div class="timestamp">\n            Report generated by FLEXT Quality Documentation Maintenance System\n        </div>\n    </div>\n</body>\n</html>\n        '
         return Template(template_content)
 
-    def _generate_markdown_report(self, data: t.JsonDict) -> str:
+    def _generate_markdown_report(self, data: object) -> str:
         """Generate markdown quality report."""
         md = [f"# {data['title']}", "", f"**Generated:** {data['timestamp']}", ""]
         summary = data["summary"]
@@ -264,7 +263,7 @@ class DocumentationReporter:
                 md.append("")
         return "\n".join(md)
 
-    def _summarize_audit_data(self, audit_data: t.JsonDict | None) -> t.JsonDict | None:
+    def _summarize_audit_data(self, audit_data: object | None) -> object | None:
         """Summarize audit data for reporting."""
         if not audit_data:
             return None
@@ -281,8 +280,8 @@ class DocumentationReporter:
         }
 
     def _summarize_validation_data(
-        self, validation_data: t.JsonDict | None
-    ) -> t.JsonDict | None:
+        self, validation_data: object | None
+    ) -> object | None:
         """Summarize validation data for reporting."""
         if not validation_data:
             return None
@@ -295,8 +294,8 @@ class DocumentationReporter:
         }
 
     def _summarize_optimization_data(
-        self, optimization_data: t.JsonDict | None
-    ) -> t.JsonDict | None:
+        self, optimization_data: object | None
+    ) -> object | None:
         """Summarize optimization data for reporting."""
         if not optimization_data:
             return None
@@ -307,7 +306,7 @@ class DocumentationReporter:
             "optimizations_applied": len(optimization_data.get("optimizations", [])),
         }
 
-    def _generate_charts(self, data: t.JsonDict) -> dict[str, str] | None:
+    def _generate_charts(self, data: object) -> dict[str, str] | None:
         """Generate charts for the report (placeholder for future implementation)."""
         _ = data
         return None
@@ -335,7 +334,7 @@ class DocumentationReporter:
         trend_data = self._analyze_trend_data(recent_reports)
         return self._generate_trend_report(trend_data, days)
 
-    def _analyze_trend_data(self, reports: list[t.JsonDict]) -> t.JsonDict:
+    def _analyze_trend_data(self, reports: list[object]) -> object:
         """Analyze trend data from historical reports."""
         if not reports:
             return {"error": "No historical data available"}
@@ -372,7 +371,7 @@ class DocumentationReporter:
             ),
         }
 
-    def _generate_trend_report(self, trend_data: t.JsonDict, days: int) -> str:
+    def _generate_trend_report(self, trend_data: object, days: int) -> str:
         """Generate trend analysis report."""
         md = [
             f"# Documentation Quality Trends - Last {days} Days",

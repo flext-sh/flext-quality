@@ -79,13 +79,13 @@ class ScheduledMaintenance:
         try:
             with Path(config_path).open(encoding="utf-8") as f:
                 loaded = yaml.safe_load(f)
-                self.config: t.ConfigurationMapping = (
+                self.config: object = (
                     loaded if isinstance(loaded, dict) else self.get_default_config()
                 )
         except FileNotFoundError:
             self.config = self.get_default_config()
 
-    def get_default_config(self) -> t.ConfigurationMapping:
+    def get_default_config(self) -> object:
         """Default maintenance configuration."""
         return {
             "enabled": True,
@@ -197,8 +197,8 @@ class ScheduledMaintenance:
 
     def _get_task_names(self, schedule_key: str) -> list[str]:
         """Extract task name list from config for a schedule key."""
-        schedules: t.ConfigurationMapping = self.config.get("schedules") or {}
-        schedule_entry: t.ConfigurationMapping = schedules.get(schedule_key) or {}
+        schedules: object = self.config.get("schedules") or {}
+        schedule_entry: object = schedules.get(schedule_key) or {}
         raw = schedule_entry.get("tasks")
         if isinstance(raw, (list, tuple)):
             return [str(t) for t in raw]
@@ -242,7 +242,7 @@ class ScheduledMaintenance:
 
         return success
 
-    def run_single_task(self, task_config: t.ConfigurationMapping) -> bool:
+    def run_single_task(self, task_config: object) -> bool:
         """Run a single maintenance task using appropriate Python libraries."""
         try:
             command_raw = task_config.get("command")

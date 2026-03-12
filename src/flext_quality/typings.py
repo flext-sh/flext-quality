@@ -5,7 +5,6 @@ from __future__ import annotations
 from typing import TypeAlias
 
 from flext_cli import FlextCliTypes
-from flext_core import FlextTypes
 from flext_web import FlextWebTypes
 
 
@@ -15,12 +14,12 @@ class FlextQualityTypes(FlextWebTypes, FlextCliTypes):
     class Quality:
         """Quality-specific types namespace."""
 
-        HookInput: TypeAlias = dict[str, FlextTypes.JsonValue]
-        HookOutput: TypeAlias = dict[str, FlextTypes.JsonValue]
+        HookInput: TypeAlias = dict[str, object]
+        HookOutput: TypeAlias = dict[str, object]
         HookMatcher: TypeAlias = list[str] | None
-        RuleConfig: TypeAlias = dict[str, FlextTypes.JsonValue]
+        RuleConfig: TypeAlias = dict[str, object]
         RuleResult: TypeAlias = tuple[bool, str | None]
-        McpToolResult: TypeAlias = dict[str, FlextTypes.JsonValue]
+        McpToolResult: TypeAlias = dict[str, object]
         McpResource: TypeAlias = dict[str, str]
         MemoryQuery: TypeAlias = dict[str, str | int | list[str]]
         ContextQuery: TypeAlias = dict[str, str | int]

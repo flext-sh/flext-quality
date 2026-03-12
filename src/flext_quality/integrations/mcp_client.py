@@ -64,7 +64,7 @@ class FlextQualityMcpClient:
         return r[list[str]].ok(["mcp-cli", "info", tool_path])
 
     def build_tool_call(
-        self, server: str, tool: str, params: t.ConfigurationMapping | None = None
+        self, server: str, tool: str, params: object | None = None
     ) -> r[McpToolCall]:
         """Build an MCP tool call request."""
         call_params: dict[str, object] = dict(params) if params is not None else {}
@@ -102,7 +102,7 @@ class FlextQualityMcpClient:
                 )
             )
         try:
-            parsed: t.JsonValue = json.loads(output)
+            parsed: objecton.loads(output)
             match parsed:
                 case dict() as data_dict:
                     result_data: dict[str, str] = {

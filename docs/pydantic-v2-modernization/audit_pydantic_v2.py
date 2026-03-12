@@ -53,7 +53,7 @@ class AuditResult(BaseModel):
     recommendations: list[str] = Field(
         default_factory=list, description="Improvement recommendations"
     )
-    stats: dict[str, t.JsonValue] = Field(
+    stats: dict[str, objectield(
         default_factory=dict, description="Audit statistics"
     )
 

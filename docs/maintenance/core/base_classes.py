@@ -26,11 +26,11 @@ class Issue(BaseModel):
     line: int | None = Field(default=None, description="Line number of the issue")
     description: str = Field(default="", description="Detailed issue description")
     recommendation: str = Field(default="", description="Recommended fix for the issue")
-    context: t.ConfigurationMapping | None = Field(
+    context: object | None = Field(
         default=None, description="Additional context data"
     )
 
-    def to_dict(self) -> t.ConfigurationMapping:
+    def to_dict(self) -> object:
         """Convert issue to dictionary representation."""
         return {
             "type": self.type,
@@ -54,7 +54,7 @@ class ValidationResult(BaseModel):
     )
     warnings: list[str] = Field(default_factory=list, description="Warning messages")
     errors: list[str] = Field(default_factory=list, description="Error messages")
-    metadata: t.ConfigurationMapping = Field(
+    metadata: object = Field(
         default_factory=dict, description="Additional metadata"
     )
 
@@ -73,7 +73,7 @@ class ValidationResult(BaseModel):
         else:
             self.valid_items += 1
 
-    def to_dict(self) -> t.ConfigurationMapping:
+    def to_dict(self) -> object:
         """Convert result to dictionary representation."""
         return {
             "total_items": self.total_items,
@@ -133,7 +133,7 @@ class BaseAuditor(ABC):
     def audit(self, files: list[Path]) -> ValidationResult:
         """Perform the audit operation on given files."""
 
-    def get_summary(self) -> t.ConfigurationMapping:
+    def get_summary(self) -> object:
         """Get a summary of the audit results."""
         return {
             "auditor": self.name,
@@ -173,7 +173,7 @@ class BaseValidator(ABC):
     def _validate_items(self, items: list[object]) -> None:
         """Implementation-specific validation logic."""
 
-    def get_summary(self) -> t.ConfigurationMapping:
+    def get_summary(self) -> object:
         """Get a summary of validation results."""
         if not self.results:
             return {"validator": self.name, "status": "not_run"}
@@ -203,7 +203,7 @@ class BaseReporter(ABC):
 
     @abstractmethod
     def generate_report(
-        self, data: t.ConfigurationMapping, output_format: str = "html"
+        self, data: object, output_format: str = "html"
     ) -> str:
         """Generate a report from the given data."""
 
@@ -224,11 +224,11 @@ class BaseAnalyzer(ABC):
     def __init__(self, name: str) -> None:
         """Initialize the analyzer base class with a name."""
         self.name = name
-        self.metrics: t.ConfigurationMapping = {}
+        self.metrics: object = {}
 
     def analyze(
         self, content: str, filepath: Path | None = None
-    ) -> t.ConfigurationMapping:
+    ) -> object:
         """Analyze the given content and return metrics."""
         self.metrics = {
             "analyzer": self.name,
@@ -298,7 +298,7 @@ class FileMetadata:
             # If we can't read the file, keep defaults (file not accessible or not text)
             pass
 
-    def to_dict(self) -> t.ConfigurationMapping:
+    def to_dict(self) -> object:
         """Convert metadata to dictionary."""
         return {
             "path": str(self.path),

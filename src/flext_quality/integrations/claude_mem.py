@@ -34,7 +34,7 @@ class FlextQualityClaudeMemClient:
 
     def build_get_observations_call(self, ids: list[int]) -> r[McpToolCall]:
         """Build a get_observations tool call."""
-        params: t.ConfigurationMapping = {"ids": ids}
+        params: object = {"ids": ids}
         return self._mcp.build_tool_call(self.SERVER_NAME, "get_observations", params)
 
     def build_search_call(
@@ -42,7 +42,7 @@ class FlextQualityClaudeMemClient:
     ) -> r[McpToolCall]:
         """Build a search tool call."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
-        params: t.ConfigurationMapping = {"query": query, "limit": search_limit}
+        params: object = {"query": query, "limit": search_limit}
         return self._mcp.build_tool_call(self.SERVER_NAME, "search", params)
 
     def build_timeline_call(
@@ -55,7 +55,7 @@ class FlextQualityClaudeMemClient:
         """Build a timeline tool call."""
         before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
-        params: t.ConfigurationMapping = {
+        params: object = {
             "anchor": anchor,
             "depth_before": before,
             "depth_after": after,

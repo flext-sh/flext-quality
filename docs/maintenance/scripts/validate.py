@@ -33,10 +33,10 @@ class LinkValidatorResults(BaseModel):
     valid_links: int = Field(default=0, description="Number of valid links")
     broken_links: int = Field(default=0, description="Number of broken links")
     warnings: int = Field(default=0, description="Number of warnings")
-    errors: list[t.ConfigurationMapping] = Field(
+    errors: list[object] = Field(
         default_factory=list, description="List of errors"
     )
-    warnings_list: list[t.ConfigurationMapping] = Field(
+    warnings_list: list[object] = Field(
         default_factory=list, description="List of warnings"
     )
 
@@ -46,7 +46,7 @@ class ContentValidatorResults(BaseModel):
 
     timestamp: str = Field(description="ISO timestamp when validation ran")
     files_checked: int = Field(default=0, description="Number of files checked")
-    content_issues: list[t.ConfigurationMapping] = Field(
+    content_issues: list[object] = Field(
         default_factory=list, description="List of content issues"
     )
     quality_metrics: dict[str, object] = Field(
@@ -86,7 +86,7 @@ class LinkValidator:
             timestamp=datetime.now(UTC).isoformat(),
         )
 
-    def find_all_links(self, doc_files: list[Path]) -> list[t.ConfigurationMapping]:
+    def find_all_links(self, doc_files: list[Path]) -> list[object]:
         """Extract all links from documentation files."""
         all_links = []
         for file_path in doc_files:
@@ -163,7 +163,7 @@ class LinkValidator:
         return None
 
     def validate_external_links(
-        self, links: list[t.ConfigurationMapping], *, verbose: bool = False
+        self, links: list[object], *, verbose: bool = False
     ) -> _LinkValidatorResults:  # noqa: F821
         """Validate external links with concurrent checking."""
         external_links = [link for link in links if link["type"] == "external"]
@@ -188,13 +188,13 @@ class LinkValidator:
 
     def _create_link_result(
         self,
-        link: t.ConfigurationMapping,
+        link: object,
         *,
         valid: bool,
         url: str,
         status_code: int | None = None,
         error: str | None = None,
-    ) -> t.ConfigurationMapping:
+    ) -> object:
         """Create a standardized link validation result."""
         result = {
             "valid": valid,
@@ -224,7 +224,7 @@ class LinkValidator:
 
     def _handle_request_attempt(
         self, url: str, attempt: int
-    ) -> tuple[bool, t.ConfigurationMapping | None]:
+    ) -> tuple[bool, object | None]:
         """Handle a single request attempt."""
         try:
             response = self._make_http_request(url)
@@ -252,8 +252,8 @@ class LinkValidator:
         return (False, None)
 
     def _check_single_external_link(
-        self, link: t.ConfigurationMapping, *, verbose: bool = False
-    ) -> t.ConfigurationMapping:
+        self, link: object, *, verbose: bool = False
+    ) -> object:
         """Check a single external link."""
         _ = verbose
         url = link["url"]
@@ -266,7 +266,7 @@ class LinkValidator:
         )
 
     def validate_internal_links(
-        self, links: list[t.ConfigurationMapping], doc_files: list[Path]
+        self, links: list[object], doc_files: list[Path]
     ) -> _LinkValidatorResults:  # noqa: F821
         """Validate internal links and references."""
         internal_links = [
@@ -321,7 +321,7 @@ class LinkValidator:
         return Path(target)
 
     def validate_images(
-        self, links: list[t.ConfigurationMapping], project_root: Path
+        self, links: list[object], project_root: Path
     ) -> _LinkValidatorResults:  # noqa: F821
         """Validate image references."""
         images = [link for link in links if link["type"] == "image"]
@@ -351,7 +351,7 @@ class LinkValidator:
         return self.results
 
     def validate_anchors(
-        self, links: list[t.ConfigurationMapping], doc_files: list[Path]
+        self, links: list[object], doc_files: list[Path]
     ) -> _LinkValidatorResults:  # noqa: F821
         """Validate anchor links within documents."""
         anchor_links = [link for link in links if link["type"] == "anchor"]
@@ -398,7 +398,7 @@ class LinkValidator:
         return re.sub(r"\\s+", "-", anchor)
 
     def check_link_text_quality(
-        self, links: list[t.ConfigurationMapping]
+        self, links: list[object]
     ) -> _LinkValidatorResults:  # noqa: F821
         """Check quality of link text for accessibility and usability."""
         poor_link_texts = [
@@ -482,7 +482,7 @@ class ContentValidator:
                 })
         return self.results
 
-    def _check_markdown_issues(self, content: str) -> list[t.ConfigurationMapping]:
+    def _check_markdown_issues(self, content: str) -> list[object]:
         """Check for markdown syntax issues."""
         issues: list[dict[str, int | str]] = []
         lines = content.split("\n")
@@ -642,7 +642,7 @@ def _discover_validation_files() -> list[Path]:
 def _execute_validations(
     link_validator: LinkValidator,
     content_validator: ContentValidator,
-    all_links: list[t.ConfigurationMapping],
+    all_links: list[object],
     doc_files: list[Path],
     args: argparse.Namespace,
 ) -> bool:

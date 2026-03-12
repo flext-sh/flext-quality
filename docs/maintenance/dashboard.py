@@ -56,7 +56,7 @@ class DocumentationDashboard:
             limit = int(request.args.get("limit", 10))
             return jsonify(self.get_recent_reports(limit))
 
-    def get_current_metrics(self) -> t.ConfigurationMapping:
+    def get_current_metrics(self) -> object:
         """Get current quality metrics from latest audit."""
         latest_audit = self.reports_dir / "latest_audit.json"
 
@@ -94,11 +94,11 @@ class DocumentationDashboard:
                 "status": f"Error: {e!s}",
             }
 
-    def get_quality_trends(self, days: int = 30) -> t.ConfigurationMapping:
+    def get_quality_trends(self, days: int = 30) -> object:
         """Get quality trends over the specified number of days."""
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
 
-        trend_data: list[t.ConfigurationMapping] = []
+        trend_data: list[object] = []
         reports_dir = self.reports_dir
 
         # Find all audit reports
@@ -150,9 +150,9 @@ class DocumentationDashboard:
             "trends": trend_data,
         }
 
-    def get_recent_reports(self, limit: int = 10) -> list[t.ConfigurationMapping]:
+    def get_recent_reports(self, limit: int = 10) -> list[object]:
         """Get list of recent audit reports."""
-        reports: list[t.ConfigurationMapping] = []
+        reports: list[object] = []
 
         for report_file in self.reports_dir.glob("audit_report_*.json"):
             try:
