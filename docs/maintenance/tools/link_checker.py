@@ -18,7 +18,6 @@ from urllib.robotparser import RobotFileParser
 import requests
 import yaml
 from aiohttp import ClientError, ClientSession, ClientTimeout
-from flext_core import t
 
 _AsyncSession = ClientSession
 
@@ -37,10 +36,10 @@ class LinkChecker:
         config_path: str | None = "docs/maintenance/config/validation_config.yaml",
     ) -> None:
         """Initialize the link checker with configuration."""
-        self.config: dict[str, t.ContainerValue] = {}
+        self.config: dict[str, object] = {}
         self.load_config(config_path)
         self.session: _AsyncSession | None = None
-        self.cache: dict[str, t.ContainerValue] = {}
+        self.cache: dict[str, object] = {}
         self.results = {
             "total_links": 0,
             "valid_links": 0,
@@ -101,9 +100,7 @@ class LinkChecker:
                 ],
             }
 
-    def find_all_links(
-        self, file_paths: list[pathlib.Path]
-    ) -> list[dict[str, t.ContainerValue]]:
+    def find_all_links(self, file_paths: list[pathlib.Path]) -> list[dict[str, object]]:
         """Extract all links from the given files."""
         all_links = []
 
@@ -162,8 +159,8 @@ class LinkChecker:
     async def check_link_async(
         self,
         url: str,
-        context: dict[str, t.ContainerValue] | None = None,
-    ) -> dict[str, t.ContainerValue]:
+        context: dict[str, object] | None = None,
+    ) -> dict[str, object]:
         """Asynchronously check a single link."""
         start_time = time.time()
 
@@ -231,8 +228,8 @@ class LinkChecker:
     def check_link_sync(
         self,
         url: str,
-        context: dict[str, t.ContainerValue] | None = None,
-    ) -> dict[str, t.ContainerValue]:
+        context: dict[str, object] | None = None,
+    ) -> dict[str, object]:
         """Synchronously check a single link (fallback method)."""
         start_time = time.time()
 
@@ -247,7 +244,7 @@ class LinkChecker:
 
                 response_time = time.time() - start_time
 
-                result: dict[str, t.ContainerValue] = {
+                result: dict[str, object] = {
                     "url": url,
                     "status_code": response.status_code,
                     "response_time": response_time,
@@ -302,8 +299,8 @@ class LinkChecker:
         }
 
     async def check_links_batch_async(
-        self, links: list[dict[str, t.ContainerValue]]
-    ) -> list[dict[str, t.ContainerValue]]:
+        self, links: list[dict[str, object]]
+    ) -> list[dict[str, object]]:
         """Check multiple links asynchronously."""
         start_time = time.time()
 
@@ -311,8 +308,8 @@ class LinkChecker:
         semaphore = asyncio.Semaphore(10)  # Max 10 concurrent requests
 
         async def check_with_semaphore(
-            link_info: dict[str, t.ContainerValue],
-        ) -> dict[str, t.ContainerValue]:
+            link_info: dict[str, object],
+        ) -> dict[str, object]:
             async with semaphore:
                 await asyncio.sleep(0.1)  # Rate limiting
                 return await self.check_link_async(
@@ -327,7 +324,7 @@ class LinkChecker:
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
         # Handle exceptions
-        processed_results: list[dict[str, t.ContainerValue]] = []
+        processed_results: list[dict[str, object]] = []
         for result in results:
             if isinstance(result, BaseException):
                 processed_results.append({
@@ -353,14 +350,14 @@ class LinkChecker:
         return processed_results
 
     def check_links_batch_sync(
-        self, links: list[dict[str, t.ContainerValue]]
-    ) -> list[dict[str, t.ContainerValue]]:
+        self, links: list[dict[str, object]]
+    ) -> list[dict[str, object]]:
         """Check multiple links synchronously with thread pool."""
         start_time = time.time()
 
         def check_single(
-            link_info: dict[str, t.ContainerValue],
-        ) -> dict[str, t.ContainerValue]:
+            link_info: dict[str, object],
+        ) -> dict[str, object]:
             time.sleep(0.1)  # Rate limiting
             return self.check_link_sync(link_info["url"], link_info.get("context"))
 
@@ -384,10 +381,10 @@ class LinkChecker:
 
     async def validate_links(
         self,
-        links: list[dict[str, t.ContainerValue]],
+        links: list[dict[str, object]],
         *,
         use_async: bool = True,
-    ) -> dict[str, t.ContainerValue]:
+    ) -> dict[str, object]:
         """Main link validation method."""
         self.results["total_links"] = len(links)
 
@@ -434,8 +431,8 @@ class LinkChecker:
             return True
 
     def validate_github_links(
-        self, links: list[dict[str, t.ContainerValue]]
-    ) -> list[dict[str, t.ContainerValue]]:
+        self, links: list[dict[str, object]]
+    ) -> list[dict[str, object]]:
         """Special validation for GitHub links."""
         github_links = [link for link in links if "github.com" in link["url"]]
 
@@ -546,9 +543,9 @@ Broken Links:
 
 # Synchronous wrapper for easy usage
 def validate_links_sync(
-    links: list[dict[str, t.ContainerValue]],
+    links: list[dict[str, object]],
     config_path: str | None = None,
-) -> dict[str, t.ContainerValue]:
+) -> dict[str, object]:
     """Synchronous wrapper for link validation."""
     checker = LinkChecker(config_path)
     # Run async validation in new event loop

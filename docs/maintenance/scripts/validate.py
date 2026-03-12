@@ -49,7 +49,7 @@ class ContentValidatorResults(BaseModel):
     content_issues: list[t.ConfigurationMapping] = Field(
         default_factory=list, description="List of content issues"
     )
-    quality_metrics: dict[str, t.ContainerValue] = Field(
+    quality_metrics: dict[str, object] = Field(
         default_factory=dict, description="Quality metrics"
     )
 

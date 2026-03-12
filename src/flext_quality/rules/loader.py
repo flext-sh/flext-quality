@@ -8,7 +8,7 @@ from pathlib import Path
 import yaml
 from flext_core import r
 
-from flext_quality import c, m, t
+from flext_quality import c, m
 
 
 class FlextQualityRulesLoader:
@@ -22,7 +22,7 @@ class FlextQualityRulesLoader:
             )
         try:
             with path.open(encoding="utf-8") as f:
-                parsed: t.ContainerValue = yaml.safe_load(f)
+                parsed: object = yaml.safe_load(f)
         except (
             ValueError,
             TypeError,

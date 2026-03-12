@@ -12,7 +12,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import final
 
-from flext_core import r, t
+from flext_core import r
 
 from flext_quality import c
 from flext_quality.integrations.mcp_client import FlextQualityMcpClient, McpToolCall
@@ -34,7 +34,7 @@ class FlextQualityClaudeContextClient:
 
     def build_index_call(self, path: str | None = None) -> r[McpToolCall]:
         """Build an index_codebase tool call."""
-        params: dict[str, t.ContainerValue] = {}
+        params: dict[str, object] = {}
         if path:
             params["path"] = path
         return self._mcp.build_tool_call(self.SERVER_NAME, "index_codebase", params)

@@ -13,11 +13,9 @@ from __future__ import annotations
 
 from typing import TypeGuard
 
-from flext_core import t
 
-
-def assert_is_dict(value: object) -> TypeGuard[dict[str, t.ContainerValue]]:
-    """Type-safe dict[str, t.ContainerValue] assertion following Single Responsibility Principle.
+def assert_is_dict(value: object) -> TypeGuard[dict[str, object]]:
+    """Type-safe dict[str, object] assertion following Single Responsibility Principle.
 
     Args:
       value: Object to check
@@ -33,7 +31,7 @@ def assert_is_dict(value: object) -> TypeGuard[dict[str, t.ContainerValue]]:
     return True
 
 
-def assert_is_list(value: object) -> TypeGuard[list[t.ContainerValue]]:
+def assert_is_list(value: object) -> TypeGuard[list[object]]:
     """Type-safe list assertion following Single Responsibility Principle.
 
     Args:
@@ -50,7 +48,7 @@ def assert_is_list(value: object) -> TypeGuard[list[t.ContainerValue]]:
     return True
 
 
-def safe_dict_access(data: dict[str, t.ContainerValue], key: str) -> t.ContainerValue:
+def safe_dict_access(data: dict[str, object], key: str) -> object:
     """Type-safe dictionary access with proper error handling.
 
     Args:
@@ -61,14 +59,14 @@ def safe_dict_access(data: dict[str, t.ContainerValue], key: str) -> t.Container
       Value from dict
 
     Raises:
-      AssertionError: If data is not a dict[str, t.ContainerValue] or key missing
+      AssertionError: If data is not a dict[str, object] or key missing
 
     """
     assert key in data, f"Key '{key}' not found in dict"
     return data[key]
 
 
-def safe_list_access(data: list[t.ContainerValue], index: int) -> t.ContainerValue:
+def safe_list_access(data: list[object], index: int) -> object:
     """Type-safe list access with proper error handling.
 
     Args:
@@ -90,9 +88,9 @@ def safe_list_access(data: list[t.ContainerValue], index: int) -> t.ContainerVal
 
 
 def assert_dict_structure(
-    data: dict[str, t.ContainerValue], required_keys: list[str]
-) -> dict[str, t.ContainerValue]:
-    """Assert that object is dict[str, t.ContainerValue] with required keys - DRY pattern.
+    data: dict[str, object], required_keys: list[str]
+) -> dict[str, object]:
+    """Assert that object is dict[str, object] with required keys - DRY pattern.
 
     Args:
       data: Object to check
@@ -110,7 +108,7 @@ def assert_dict_structure(
     return data
 
 
-def assert_analysis_results_structure(results: object) -> dict[str, t.ContainerValue]:
+def assert_analysis_results_structure(results: object) -> dict[str, object]:
     """Assert analyzer results have expected structure - specialized helper.
 
     Args:
@@ -128,7 +126,7 @@ def assert_analysis_results_structure(results: object) -> dict[str, t.ContainerV
     return assert_dict_structure(results, ["metrics", "issues", "python_files"])
 
 
-def assert_metrics_structure(metrics: object) -> dict[str, t.ContainerValue]:
+def assert_metrics_structure(metrics: object) -> dict[str, object]:
     """Assert metrics have expected structure - specialized helper.
 
     Args:
@@ -146,7 +144,7 @@ def assert_metrics_structure(metrics: object) -> dict[str, t.ContainerValue]:
     return assert_dict_structure(metrics, ["total_files", "total_lines_of_code"])
 
 
-def assert_issues_structure(issues: object) -> dict[str, t.ContainerValue]:
+def assert_issues_structure(issues: object) -> dict[str, object]:
     """Assert issues have expected structure - specialized helper.
 
     Args:

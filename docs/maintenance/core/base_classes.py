@@ -160,7 +160,7 @@ class BaseValidator(ABC):
         self.name = name
         self.results: ValidationResult | None = None
 
-    def validate(self, items: list[t.ContainerValue]) -> ValidationResult:
+    def validate(self, items: list[object]) -> ValidationResult:
         """Perform validation on given items."""
         self.results = ValidationResult()
         self.results.total_items = len(items)
@@ -170,7 +170,7 @@ class BaseValidator(ABC):
         return self.results
 
     @abstractmethod
-    def _validate_items(self, items: list[t.ContainerValue]) -> None:
+    def _validate_items(self, items: list[object]) -> None:
         """Implementation-specific validation logic."""
 
     def get_summary(self) -> t.ConfigurationMapping:
@@ -263,13 +263,11 @@ class BaseAnalyzer(ABC):
 class ConfigProtocol(Protocol):
     """Protocol for configuration objects."""
 
-    def get(
-        self, key: str, default: t.ContainerValue | None = None
-    ) -> t.ContainerValue:
+    def get(self, key: str, default: object | None = None) -> object:
         """Get a configuration value."""
         ...
 
-    def __getitem__(self, key: str) -> t.ContainerValue:
+    def __getitem__(self, key: str) -> object:
         """Get a configuration value with bracket notation."""
         ...
 
