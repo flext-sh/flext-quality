@@ -42,10 +42,10 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
             """Load rules from YAML file."""
             try:
                 with path.open(encoding="utf-8") as f:
-                    parsed: objectml.safe_load(f)
+                    parsed = yaml.safe_load(f)
                 match parsed:
                     case dict() as parsed_dict:
-                        raw_rules: objectrsed_dict.get("rules", [])
+                        raw_rules = parsed_dict.get("rules", [])
                     case _:
                         return r[list[Mapping[str, object]]].fail("Expected YAML dict")
                 match raw_rules:
@@ -71,10 +71,10 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
         def parse_hook_input(raw: str) -> r[t.Quality.HookInput]:
             """Parse hook input JSON."""
             try:
-                parsed: objecton.loads(raw)
+                parsed = json.loads(raw)
                 match parsed:
                     case dict() as hook_input:
-                        coerced_items: dict[str, object}
+                        coerced_items: dict[str, str] = {}
                         for k, v in hook_input.items():
                             coerced_items[str(k)] = v
                         coerced_input: t.Quality.HookInput = coerced_items

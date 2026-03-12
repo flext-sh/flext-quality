@@ -102,7 +102,7 @@ class FlextQualityMcpClient:
                 )
             )
         try:
-            parsed: objecton.loads(output)
+            parsed = json.loads(output)
             match parsed:
                 case dict() as data_dict:
                     result_data: dict[str, str] = {

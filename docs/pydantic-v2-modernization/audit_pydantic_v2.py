@@ -21,7 +21,6 @@ import sys
 from pathlib import Path
 from typing import ClassVar, override
 
-from flext_core import t
 from pydantic import BaseModel, Field
 
 
@@ -53,9 +52,7 @@ class AuditResult(BaseModel):
     recommendations: list[str] = Field(
         default_factory=list, description="Improvement recommendations"
     )
-    stats: dict[str, objectield(
-        default_factory=dict, description="Audit statistics"
-    )
+    stats: dict[str, int] = Field(default_factory=dict, description="Audit statistics")
 
     @property
     def total_violations(self) -> int:
