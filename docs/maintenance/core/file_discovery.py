@@ -12,8 +12,6 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import t
-
 from .base_classes import FileMetadata
 
 

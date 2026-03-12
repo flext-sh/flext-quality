@@ -18,7 +18,6 @@ from pathlib import Path
 
 import requests
 import yaml
-from flext_core import t
 from pydantic import BaseModel, Field
 
 # Constants
@@ -328,14 +327,10 @@ Timestamp: {datetime.now(UTC).isoformat()}
         )
         response.raise_for_status()
 
-    def _format_critical_issues_message(
-        self, audit_data: object
-    ) -> str:
+    def _format_critical_issues_message(self, audit_data: object) -> str:
         """Format message for critical issues notification."""
         metrics: object = audit_data.get("metrics") or {}
-        severity_breakdown: object = (
-            metrics.get("severity_breakdown") or {}
-        )
+        severity_breakdown: object = metrics.get("severity_breakdown") or {}
 
         issues: list[object] = audit_data.get("issues") or []
         critical_issues = [i for i in issues if i.get("severity") == "critical"][:5]
@@ -369,9 +364,7 @@ Top Critical Issues:
 
         return message.strip()
 
-    def _format_broken_links_message(
-        self, broken_links: list[object]
-    ) -> str:
+    def _format_broken_links_message(self, broken_links: list[object]) -> str:
         """Format message for broken links notification."""
         message = f"""
 BROKEN LINKS DETECTED
@@ -397,17 +390,13 @@ Found {len(broken_links)} broken links that need attention:
 
         return message.strip()
 
-    def _format_weekly_report_message(
-        self, _report_data: object
-    ) -> str:
+    def _format_weekly_report_message(self, _report_data: object) -> str:
         """Format message for weekly report notification."""
         # Implementation would depend on weekly report data structure
         # For now, report_data is not used but reserved for future implementation
         return "Weekly documentation quality report is now available. Check the reports dashboard for detailed metrics and trends."
 
-    def _format_monthly_report_message(
-        self, _report_data: object
-    ) -> str:
+    def _format_monthly_report_message(self, _report_data: object) -> str:
         """Format message for monthly report notification."""
         # Implementation would depend on monthly report data structure
         return "Monthly comprehensive documentation quality report is now available. Review trends and plan improvements for the next month."

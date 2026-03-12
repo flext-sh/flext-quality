@@ -22,7 +22,6 @@ from typing import Any
 
 import requests
 import yaml
-from flext_core import t
 from pydantic import BaseModel, Field
 
 
@@ -34,9 +33,7 @@ class AuditorResults(BaseModel):
     issues: list[object] = Field(
         default_factory=list, description="List of issues found"
     )
-    metrics: object = Field(
-        default_factory=dict, description="Quality metrics"
-    )
+    metrics: object = Field(default_factory=dict, description="Quality metrics")
     recommendations: list[object] = Field(
         default_factory=list, description="List of recommendations"
     )
@@ -56,9 +53,7 @@ class DocumentationAuditor:
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.audit_rules: object = self.get_default_audit_rules()
         self.style_guide: object = self.get_default_style_guide()
-        self.validation_config: object = (
-            self.get_default_validation_config()
-        )
+        self.validation_config: object = self.get_default_validation_config()
         self.load_config()
         self.results: AuditorResults = AuditorResults(
             timestamp=datetime.now(UTC).isoformat(),

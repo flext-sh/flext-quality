@@ -13,7 +13,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from flask import Flask, Response, jsonify, render_template_string, request
-from flext_core import FlextLogger, t
+from flext_core import FlextLogger
 
 
 class DocumentationDashboard:

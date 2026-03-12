@@ -21,7 +21,6 @@ from pathlib import Path
 import pytest
 import schedule
 import yaml
-from flext_core import t
 from git import InvalidGitRepositoryError, Repo
 from pydantic import BaseModel, Field
 

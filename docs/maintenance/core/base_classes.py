@@ -11,7 +11,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol
 
-from flext_core import t
 from pydantic import BaseModel, Field
 
 
@@ -26,9 +25,7 @@ class Issue(BaseModel):
     line: int | None = Field(default=None, description="Line number of the issue")
     description: str = Field(default="", description="Detailed issue description")
     recommendation: str = Field(default="", description="Recommended fix for the issue")
-    context: object | None = Field(
-        default=None, description="Additional context data"
-    )
+    context: object | None = Field(default=None, description="Additional context data")
 
     def to_dict(self) -> object:
         """Convert issue to dictionary representation."""
@@ -54,9 +51,7 @@ class ValidationResult(BaseModel):
     )
     warnings: list[str] = Field(default_factory=list, description="Warning messages")
     errors: list[str] = Field(default_factory=list, description="Error messages")
-    metadata: object = Field(
-        default_factory=dict, description="Additional metadata"
-    )
+    metadata: object = Field(default_factory=dict, description="Additional metadata")
 
     @property
     def success_rate(self) -> float:
@@ -202,9 +197,7 @@ class BaseReporter(ABC):
         self.template_dir = template_dir or Path(__file__).parent.parent / "templates"
 
     @abstractmethod
-    def generate_report(
-        self, data: object, output_format: str = "html"
-    ) -> str:
+    def generate_report(self, data: object, output_format: str = "html") -> str:
         """Generate a report from the given data."""
 
     def save_report(self, content: str, filename: str, output_dir: Path) -> Path:
@@ -226,9 +219,7 @@ class BaseAnalyzer(ABC):
         self.name = name
         self.metrics: object = {}
 
-    def analyze(
-        self, content: str, filepath: Path | None = None
-    ) -> object:
+    def analyze(self, content: str, filepath: Path | None = None) -> object:
         """Analyze the given content and return metrics."""
         self.metrics = {
             "analyzer": self.name,

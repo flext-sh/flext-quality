@@ -14,7 +14,7 @@ import shutil
 from collections.abc import Mapping
 from typing import final
 
-from flext_core import r, t
+from flext_core import r
 from pydantic import BaseModel, Field
 
 from flext_quality import c

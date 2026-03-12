@@ -21,7 +21,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import requests
-from flext_core import t
 from pydantic import BaseModel, Field
 
 
@@ -33,9 +32,7 @@ class LinkValidatorResults(BaseModel):
     valid_links: int = Field(default=0, description="Number of valid links")
     broken_links: int = Field(default=0, description="Number of broken links")
     warnings: int = Field(default=0, description="Number of warnings")
-    errors: list[object] = Field(
-        default_factory=list, description="List of errors"
-    )
+    errors: list[object] = Field(default_factory=list, description="List of errors")
     warnings_list: list[object] = Field(
         default_factory=list, description="List of warnings"
     )
@@ -397,9 +394,7 @@ class LinkValidator:
         anchor = re.sub(r"[^\\w\\s-]", "", anchor)
         return re.sub(r"\\s+", "-", anchor)
 
-    def check_link_text_quality(
-        self, links: list[object]
-    ) -> _LinkValidatorResults:  # noqa: F821
+    def check_link_text_quality(self, links: list[object]) -> _LinkValidatorResults:  # noqa: F821
         """Check quality of link text for accessibility and usability."""
         poor_link_texts = [
             "here",
