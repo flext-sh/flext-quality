@@ -11,7 +11,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from pathlib import Path
-from typing import final
+from typing import Annotated, final
 
 from flext_core import r
 from pydantic import BaseModel, Field
@@ -24,7 +24,7 @@ class ExecutionRequest(BaseModel):
 
     script_path: Path
     runtime: str
-    args: list[str] = Field(default_factory=list)
+    args: Annotated[list[str], Field(default_factory=list)]
     timeout_ms: int
 
 

@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TypeAlias
+from typing import Annotated, TypeAlias
 
 from flext_cli import FlextCliModels
 from flext_web import FlextWebModels
@@ -21,15 +21,15 @@ class _HookConfig(BaseModel):
     event: c.Quality.HookEvent
     matcher: list[str] | None = None
     command: str
-    timeout_ms: int = Field(default=c.Quality.Defaults.HOOK_TIMEOUT_MS)
+    timeout_ms: Annotated[int, Field(default=c.Quality.Defaults.HOOK_TIMEOUT_MS)]
     enabled: bool = True
 
 
 class _HookResult(BaseModel):
     """Result from hook execution."""
 
-    continue_execution: bool = Field(alias="continue")
-    system_message: str | None = Field(default=None, alias="systemMessage")
+    continue_execution: Annotated[bool, Field(alias="continue")]
+    system_message: Annotated[str | None, Field(default=None, alias="systemMessage")]
     blocked_reason: str | None = None
 
     model_config = {"populate_by_name": True}
@@ -53,7 +53,7 @@ class _IntegrationConfig(BaseModel):
     enabled: bool = True
     host: str = "localhost"
     port: int
-    timeout_ms: int = Field(default=c.Quality.Defaults.INTEGRATION_TIMEOUT_MS)
+    timeout_ms: Annotated[int, Field(default=c.Quality.Defaults.INTEGRATION_TIMEOUT_MS)]
 
 
 class _MemoryObservation(BaseModel):
@@ -63,8 +63,8 @@ class _MemoryObservation(BaseModel):
     type: str
     title: str
     content: str
-    concepts: list[str] = Field(default_factory=list)
-    files: list[str] = Field(default_factory=list)
+    concepts: Annotated[list[str], Field(default_factory=list)]
+    files: Annotated[list[str], Field(default_factory=list)]
     timestamp: str
 
 

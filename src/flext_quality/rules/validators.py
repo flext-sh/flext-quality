@@ -4,10 +4,9 @@ from __future__ import annotations
 
 import contextlib
 import re
-from abc import ABC, abstractmethod
 from collections.abc import Mapping
 from pathlib import Path
-from typing import override
+from typing import Protocol, override, runtime_checkable
 
 from flext_core import r
 
@@ -17,16 +16,15 @@ from flext_quality import c
 class FlextQualityValidators:
     """Namespace for flext-quality validators (one class per module pattern)."""
 
-    class Base(ABC):
+    @runtime_checkable
+    class Base(Protocol):
         """Abstract base for rule validators."""
 
         @property
-        @abstractmethod
         def name(self) -> str:
             """Return validator name."""
             ...
 
-        @abstractmethod
         def validate(
             self, content: str, file_path: Path | None = None
         ) -> r[list[Mapping[str, object]]]:

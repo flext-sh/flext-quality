@@ -10,6 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Annotated
 
 from flext_core import FlextSettings, r
 from pydantic import Field
@@ -21,18 +22,18 @@ class FlextQualitySettings(FlextSettings):
 
     model_config = SettingsConfigDict(extra="ignore")
 
-    hook_timeout_ms: int = Field(default=5000, ge=100, le=60000)
-    rule_timeout_seconds: int = Field(default=30, ge=1, le=3600)
-    cache_enabled: bool = Field(default=True)
-    mcp_server_port: int = Field(default=8765, ge=1, le=65535)
-    rules_dir: str = Field(default="rules")
-    max_function_length: int = Field(default=50)
-    max_class_length: int = Field(default=200)
+    hook_timeout_ms: Annotated[int, Field(default=5000, ge=100, le=60000)]
+    rule_timeout_seconds: Annotated[int, Field(default=30, ge=1, le=3600)]
+    cache_enabled: Annotated[bool, Field(default=True)]
+    mcp_server_port: Annotated[int, Field(default=8765, ge=1, le=65535)]
+    rules_dir: Annotated[str, Field(default="rules")]
+    max_function_length: Annotated[int, Field(default=50)]
+    max_class_length: Annotated[int, Field(default=200)]
 
     @classmethod
     def get_instance(cls) -> FlextQualitySettings:
         """Create settings instance from current environment."""
-        return cls()
+        return cls.get_global()
 
     def get_rules_path(self) -> Path:
         """Resolve configured rules directory path."""

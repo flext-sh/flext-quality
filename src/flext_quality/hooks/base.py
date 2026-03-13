@@ -3,21 +3,20 @@
 from __future__ import annotations
 
 import fnmatch
-from abc import ABC, abstractmethod
-from typing import ClassVar
+from typing import ClassVar, Protocol, runtime_checkable
 
 from flext_core import r
 
 from flext_quality import c, t
 
 
-class BaseHookImpl(ABC):
+@runtime_checkable
+class BaseHookImpl(Protocol):
     """Abstract base for hook implementations."""
 
     event: ClassVar[c.Quality.HookEvent]
     matcher: ClassVar[list[str] | None]
 
-    @abstractmethod
     def execute(self, input_data: t.Quality.HookInput) -> r[t.Quality.HookOutput]:
         """Execute the hook logic."""
         ...

@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import shutil
 from collections.abc import Mapping
-from typing import final
+from typing import Annotated, final
 
 from flext_core import r
 from pydantic import BaseModel, Field, TypeAdapter
@@ -24,7 +24,7 @@ class McpToolCall(BaseModel):
 
     server: str
     tool: str
-    params: dict[str, object] = Field(default_factory=dict)
+    params: Annotated[dict[str, object], Field(default_factory=dict)]
 
 
 class McpToolResult(BaseModel):
@@ -68,9 +68,10 @@ class FlextQualityMcpClient:
         self, server: str, tool: str, params: object | None = None
     ) -> r[McpToolCall]:
         """Build an MCP tool call request."""
-        call_params: dict[str, object] = (
-            dict(params) if isinstance(params, dict) else {}
-        )
+        call_params: dict[str, object] = {}
+        if isinstance(params, Mapping):
+            validated_params = TypeAdapter(dict[str, object]).validate_python(params)
+            call_params = dict(validated_params)
         return r[McpToolCall].ok(
             McpToolCall(server=server, tool=tool, params=call_params)
         )
@@ -119,8 +120,14 @@ class FlextQualityMcpClient:
                 parsed_list = TypeAdapter(list[object]).validate_json(output)
                 coerced_data: list[dict[str, str]] = []
                 for item in parsed_list:
-                    if isinstance(item, dict):
-                        coerced_data.append({str(k): str(v) for k, v in item.items()})
+                    if isinstance(item, Mapping):
+                        validated_item = TypeAdapter(dict[str, object]).validate_python(
+                            item
+                        )
+                        coerced_data.append({
+                            str(key): str(value)
+                            for key, value in validated_item.items()
+                        })
                     else:
                         coerced_data.append({"value": str(item)})
                 return r[McpToolResult].ok(
