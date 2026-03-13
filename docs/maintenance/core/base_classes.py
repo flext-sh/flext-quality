@@ -251,7 +251,7 @@ class BaseAnalyzer(ABC):
         return float(val) if isinstance(val, (int, float)) else None
 
 
-class ConfigProtocol(Protocol):
+class Config(Protocol):
     """Protocol for configuration objects."""
 
     def get(self, key: str, default: object | None = None) -> object:

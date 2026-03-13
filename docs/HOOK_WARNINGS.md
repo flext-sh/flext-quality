@@ -298,7 +298,7 @@ ______________________________________________________________________
   - Problem: Type aliases scattered across codebase
   - Fix: Move to `src/*/typings.py`, import as `from flext_core import t`
 
-- **CQ003**: `Protocol` outside protocols.py
+- **CQ003**: `` outside protocols.py
 
   - Problem: Protocol definitions scattered
   - Fix: Move to `src/*/protocols.py`, import as `p.*`
@@ -311,7 +311,7 @@ ______________________________________________________________________
 - **CQ005**: Complex `Callable` (3+ parameters)
 
   - Problem: Unclear function signatures
-  - Fix: Use `Protocol` with `__call__` method for clarity
+  - Fix: Use `` with `__call__` method for clarity
 
 #### Data Structures (CQ006-007)
 
@@ -323,7 +323,7 @@ ______________________________________________________________________
 - **CQ007**: Excessive `isinstance()` checks
 
   - Problem: Indicates loose coupling
-  - Fix: Use `Protocol` for structural typing instead
+  - Fix: Use `` for structural typing instead
 
 #### FLEXT Patterns (CQ008-010)
 
