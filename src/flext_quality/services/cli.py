@@ -134,15 +134,15 @@ def _dispatch(service: FlextQualityCliService, command: str, args: list[str]) ->
     """Dispatch command to handler."""
     if command == "status":
         result = _CommandHandlers.handle_status(service)
-        return result.value_or(1)
+        return result.unwrap_or(1)
     if command == "check":
         target_path = Path(args[0]) if args else Path.cwd()
         result = _CommandHandlers.handle_check(service, target_path)
-        return result.value_or(1)
+        return result.unwrap_or(1)
     if command == "validate":
         target_path = Path(args[0]) if args else Path.cwd()
         result = _CommandHandlers.handle_validate(service, target_path)
-        return result.value_or(1)
+        return result.unwrap_or(1)
     service.output.display_message(f"Unknown command: {command}", message_type="error")
     service.output.display_message(
         "Commands: status, check, validate", message_type="info"
@@ -157,5 +157,5 @@ def main() -> int:
     args = sys.argv[1:]
     if not args:
         result = _CommandHandlers.handle_status(service)
-        return result.value_or(1)
+        return result.unwrap_or(1)
     return _dispatch(service, args[0], args[1:])

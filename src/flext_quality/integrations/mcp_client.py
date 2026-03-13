@@ -68,7 +68,9 @@ class FlextQualityMcpClient:
         self, server: str, tool: str, params: object | None = None
     ) -> r[McpToolCall]:
         """Build an MCP tool call request."""
-        call_params: dict[str, object] = dict(params) if params is not None else {}
+        call_params: dict[str, object] = (
+            dict(params) if isinstance(params, dict) else {}
+        )
         return r[McpToolCall].ok(
             McpToolCall(server=server, tool=tool, params=call_params)
         )

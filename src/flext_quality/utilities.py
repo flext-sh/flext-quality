@@ -75,7 +75,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
         def parse_hook_input(raw: str) -> r[t.Quality.HookInput]:
             """Parse hook input JSON."""
             try:
-                parsed = TypeAdapter(dict[str, str]).validate_json(raw)
+                parsed = TypeAdapter(dict[str, object]).validate_json(raw)
                 coerced_input: t.Quality.HookInput = parsed
                 return r[t.Quality.HookInput].ok(coerced_input)
             except ValueError as e:
