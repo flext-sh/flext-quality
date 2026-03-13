@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import subprocess
 import sys
 from collections.abc import Mapping
@@ -12,6 +11,7 @@ import yaml
 from flext_cli import FlextCliUtilities
 from flext_core import r
 from flext_web import FlextWebUtilities
+from pydantic import TypeAdapter
 
 from flext_quality import c, t
 
@@ -35,7 +35,11 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                 output["systemMessage"] = message
             if blocked_reason:
                 output["blockedReason"] = blocked_reason
-            return json.dumps(output)
+            return (
+                TypeAdapter(dict[str, str | bool | None])
+                .dump_json(output)
+                .decode("utf-8")
+            )
 
         @staticmethod
         def load_yaml_rules(path: Path) -> r[list[Mapping[str, object]]]:
@@ -71,17 +75,10 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
         def parse_hook_input(raw: str) -> r[t.Quality.HookInput]:
             """Parse hook input JSON."""
             try:
-                parsed = json.loads(raw)
-                match parsed:
-                    case dict() as hook_input:
-                        coerced_items: dict[str, str] = {}
-                        for k, v in hook_input.items():
-                            coerced_items[str(k)] = v
-                        coerced_input: t.Quality.HookInput = coerced_items
-                        return r[t.Quality.HookInput].ok(coerced_input)
-                    case _:
-                        return r[t.Quality.HookInput].fail("Expected JSON object")
-            except json.JSONDecodeError as e:
+                parsed = TypeAdapter(dict[str, str]).validate_json(raw)
+                coerced_input: t.Quality.HookInput = parsed
+                return r[t.Quality.HookInput].ok(coerced_input)
+            except ValueError as e:
                 return r[t.Quality.HookInput].fail(f"Invalid JSON: {e}")
 
         @staticmethod

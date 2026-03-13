@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import json
+from pydantic import TypeAdapter
 
 from flext_quality import c
 from flext_quality.hooks.manager import HookManager
@@ -17,7 +17,11 @@ def get_hooks_config() -> str:
     """Get current hooks configuration."""
     manager = HookManager()
     config = manager.get_config()
-    return json.dumps(config, indent=c.Quality.Defaults.JSON_INDENT)
+    return (
+        TypeAdapter(dict[str, object])
+        .dump_json(dict(config), indent=c.Quality.Defaults.JSON_INDENT)
+        .decode("utf-8")
+    )
 
 
 @mcp.resource("config://rules")
@@ -25,8 +29,12 @@ def get_rules_config() -> str:
     """Get current rules configuration."""
     engine = FlextQualityRulesEngine()
     rules = engine.get_rules()
-    return json.dumps(
-        [rule.model_dump() for rule in rules], indent=c.Quality.Defaults.JSON_INDENT
+    return (
+        TypeAdapter(list[dict[str, object]])
+        .dump_json(
+            [rule.model_dump() for rule in rules], indent=c.Quality.Defaults.JSON_INDENT
+        )
+        .decode("utf-8")
     )
 
 
@@ -44,4 +52,8 @@ def get_integrations_status() -> str:
     status["claude_context"] = (
         ctx_health.value if ctx_health.is_success else {"error": ctx_health.error}
     )
-    return json.dumps(status, indent=c.Quality.Defaults.JSON_INDENT)
+    return (
+        TypeAdapter(dict[str, object])
+        .dump_json(status, indent=c.Quality.Defaults.JSON_INDENT)
+        .decode("utf-8")
+    )

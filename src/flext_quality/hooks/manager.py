@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-import json
 from collections.abc import Mapping
 from pathlib import Path
 from typing import final
 
 from flext_core import r
+from pydantic import TypeAdapter
 
 from flext_quality import c, t
 from flext_quality.hooks.base import BaseHookImpl
@@ -51,7 +51,11 @@ class HookManager:
 
     def get_config_json(self) -> str:
         """Get hooks configuration as JSON."""
-        return json.dumps(self.get_config(), indent=c.Quality.Defaults.JSON_INDENT)
+        return (
+            TypeAdapter(dict[str, object])
+            .dump_json(dict(self.get_config()), indent=c.Quality.Defaults.JSON_INDENT)
+            .decode("utf-8")
+        )
 
     def register(self, hook: BaseHookImpl) -> r[bool]:
         """Register a hook."""

@@ -9,13 +9,12 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import json
 import shutil
 from collections.abc import Mapping
 from typing import final
 
 from flext_core import r
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, TypeAdapter
 
 from flext_quality import c
 
@@ -53,7 +52,9 @@ class FlextQualityMcpClient:
         if not self.is_mcp_cli_available():
             return r[list[str]].fail("mcp-cli not found in PATH")
         tool_path = f"{call.server}/{call.tool}"
-        params_json = json.dumps(call.params)
+        params_json = (
+            TypeAdapter(dict[str, object]).dump_json(call.params).decode("utf-8")
+        )
         return r[list[str]].ok(["mcp-cli", "call", tool_path, params_json])
 
     def build_info_command(self, server: str, tool: str) -> r[list[str]]:
@@ -102,42 +103,36 @@ class FlextQualityMcpClient:
                 )
             )
         try:
-            parsed = json.loads(output)
-            match parsed:
-                case dict() as data_dict:
-                    result_data: dict[str, str] = {
-                        str(k): str(v) for k, v in data_dict.items()
-                    }
-                    return r[McpToolResult].ok(
-                        McpToolResult(
-                            success=True,
-                            data=result_data,
-                            error=None,
-                        )
-                    )
-                case list() as data_list:
-                    coerced_data: list[dict[str, str]] = []
-                    for item in data_list:
-                        if isinstance(item, dict):
-                            coerced_data.append({
-                                str(k): str(v) for k, v in item.items()
-                            })
-                        else:
-                            coerced_data.append({"value": str(item)})
-                    return r[McpToolResult].ok(
-                        McpToolResult(
-                            success=True,
-                            data={"items": json.dumps(coerced_data)},
-                            error=None,
-                        )
-                    )
-                case _:
-                    return r[McpToolResult].ok(
-                        McpToolResult(
-                            success=True, data={"value": str(parsed)}, error=None
-                        )
-                    )
-        except json.JSONDecodeError:
+            parsed = TypeAdapter(dict[str, object]).validate_json(output)
+            result_data: dict[str, str] = {str(k): str(v) for k, v in parsed.items()}
             return r[McpToolResult].ok(
-                McpToolResult(success=True, data={"raw": output}, error=None)
+                McpToolResult(
+                    success=True,
+                    data=result_data,
+                    error=None,
+                )
             )
+        except ValueError:
+            try:
+                parsed_list = TypeAdapter(list[object]).validate_json(output)
+                coerced_data: list[dict[str, str]] = []
+                for item in parsed_list:
+                    if isinstance(item, dict):
+                        coerced_data.append({str(k): str(v) for k, v in item.items()})
+                    else:
+                        coerced_data.append({"value": str(item)})
+                return r[McpToolResult].ok(
+                    McpToolResult(
+                        success=True,
+                        data={
+                            "items": TypeAdapter(list[dict[str, str]])
+                            .dump_json(coerced_data)
+                            .decode("utf-8")
+                        },
+                        error=None,
+                    )
+                )
+            except ValueError:
+                return r[McpToolResult].ok(
+                    McpToolResult(success=True, data={"raw": output}, error=None)
+                )
