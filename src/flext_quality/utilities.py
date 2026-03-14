@@ -42,7 +42,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
             )
 
         @staticmethod
-        def load_yaml_rules(path: Path) -> r[list[Mapping[str, object]]]:
+        def load_yaml_rules(path: Path) -> r[list[Mapping[str, t.NormalizedValue]]]:
             """Load rules from YAML file."""
             try:
                 with path.open(encoding="utf-8") as f:
@@ -51,15 +51,19 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                     case dict() as parsed_dict:
                         raw_rules = parsed_dict.get("rules", [])
                     case _:
-                        return r[list[Mapping[str, object]]].fail("Expected YAML dict")
+                        return r[list[Mapping[str, t.NormalizedValue]]].fail(
+                            "Expected YAML dict"
+                        )
                 match raw_rules:
                     case list() as rules_list:
-                        rules: list[Mapping[str, object]] = [
+                        rules: list[Mapping[str, t.NormalizedValue]] = [
                             item for item in rules_list if isinstance(item, dict)
                         ]
                     case _:
-                        return r[list[Mapping[str, object]]].fail("Expected rules list")
-                return r[list[Mapping[str, object]]].ok(rules)
+                        return r[list[Mapping[str, t.NormalizedValue]]].fail(
+                            "Expected rules list"
+                        )
+                return r[list[Mapping[str, t.NormalizedValue]]].ok(rules)
             except (
                 ValueError,
                 TypeError,
@@ -69,13 +73,15 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                 RuntimeError,
                 ImportError,
             ) as e:
-                return r[list[Mapping[str, object]]].fail(f"Failed to load rules: {e}")
+                return r[list[Mapping[str, t.NormalizedValue]]].fail(
+                    f"Failed to load rules: {e}"
+                )
 
         @staticmethod
         def parse_hook_input(raw: str) -> r[t.Quality.HookInput]:
             """Parse hook input JSON."""
             try:
-                parsed = TypeAdapter(dict[str, object]).validate_json(raw)
+                parsed = TypeAdapter(dict[str, t.NormalizedValue]).validate_json(raw)
                 coerced_input: t.Quality.HookInput = parsed
                 return r[t.Quality.HookInput].ok(coerced_input)
             except ValueError as e:

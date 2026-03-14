@@ -40,7 +40,9 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
             rule_type: str
 
             def validate(
-                self, config: t.Quality.RuleConfig, context: Mapping[str, object]
+                self,
+                config: t.Quality.RuleConfig,
+                context: Mapping[str, t.NormalizedValue],
             ) -> r[t.Quality.RuleResult]:
                 """Validate according to rule."""
                 ...
@@ -66,7 +68,9 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
             name: str
             description: str
 
-            def execute(self, params: Mapping[str, object]) -> r[Mapping[str, object]]:
+            def execute(
+                self, params: Mapping[str, t.NormalizedValue]
+            ) -> r[Mapping[str, t.NormalizedValue]]:
                 """Execute MCP tool."""
                 ...
 
