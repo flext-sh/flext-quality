@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import TypeAlias
 
-from flext_core import t as core_t
 from flext_cli import FlextCliTypes
+from flext_core import t as core_t
 from flext_web import FlextWebTypes
 
 

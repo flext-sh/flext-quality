@@ -16,7 +16,7 @@ from typing import Annotated, final
 from flext_core import r
 from pydantic import BaseModel, Field
 
-from flext_quality import c
+from flext_quality import c, t
 
 
 class ExecutionRequest(BaseModel):
@@ -104,13 +104,13 @@ class FlextQualityCodeExecutionBridge:
             )
         )
 
-    def health_check(self) -> r[Mapping[str, object]]:
+    def health_check(self) -> r[Mapping[str, t.NormalizedValue]]:
         """Check availability of execution runtimes.
 
         Returns configuration status - actual runtime checks
         should be done via shell wrapper execution.
         """
-        return r[Mapping[str, object]].ok({
+        return r[Mapping[str, t.NormalizedValue]].ok({
             "status": c.Quality.IntegrationStatus.CONNECTED,
             "available": True,
             "working_dir": str(self._working_dir),

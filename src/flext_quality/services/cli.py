@@ -17,7 +17,7 @@ from typing import final
 from flext_cli import FlextCliOutput
 from flext_core import r
 
-from flext_quality import FlextQuality, c
+from flext_quality import FlextQuality, c, t
 from flext_quality.integrations.code_execution import FlextQualityCodeExecutionBridge
 
 
@@ -72,10 +72,10 @@ class FlextQualityCliService:
         ])
         return r[list[list[str]]].ok(commands)
 
-    def display_status(self) -> r[Mapping[str, object]]:
+    def display_status(self) -> r[Mapping[str, t.NormalizedValue]]:
         """Display quality service status."""
         status = self._quality.get_status()
-        return r[Mapping[str, object]].ok(status)
+        return r[Mapping[str, t.NormalizedValue]].ok(status)
 
 
 class _CommandHandlers:

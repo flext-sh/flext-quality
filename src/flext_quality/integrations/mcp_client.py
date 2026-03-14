@@ -16,7 +16,7 @@ from typing import Annotated, final
 from flext_core import r
 from pydantic import BaseModel, Field, TypeAdapter
 
-from flext_quality import c
+from flext_quality import c, t
 
 
 class McpToolCall(BaseModel):
@@ -24,7 +24,7 @@ class McpToolCall(BaseModel):
 
     server: str
     tool: str
-    params: Annotated[dict[str, object], Field(default_factory=dict)]
+    params: Annotated[dict[str, t.NormalizedValue], Field(default_factory=dict)]
 
 
 class McpToolResult(BaseModel):
@@ -53,7 +53,9 @@ class FlextQualityMcpClient:
             return r[list[str]].fail("mcp-cli not found in PATH")
         tool_path = f"{call.server}/{call.tool}"
         params_json = (
-            TypeAdapter(dict[str, object]).dump_json(call.params).decode("utf-8")
+            TypeAdapter(dict[str, t.NormalizedValue])
+            .dump_json(call.params)
+            .decode("utf-8")
         )
         return r[list[str]].ok(["mcp-cli", "call", tool_path, params_json])
 
@@ -65,18 +67,20 @@ class FlextQualityMcpClient:
         return r[list[str]].ok(["mcp-cli", "info", tool_path])
 
     def build_tool_call(
-        self, server: str, tool: str, params: object | None = None
+        self, server: str, tool: str, params: t.NormalizedValue | None = None
     ) -> r[McpToolCall]:
         """Build an MCP tool call request."""
-        call_params: dict[str, object] = {}
+        call_params: dict[str, t.NormalizedValue] = {}
         if isinstance(params, Mapping):
-            validated_params = TypeAdapter(dict[str, object]).validate_python(params)
+            validated_params = TypeAdapter(
+                dict[str, t.NormalizedValue]
+            ).validate_python(params)
             call_params = dict(validated_params)
         return r[McpToolCall].ok(
             McpToolCall(server=server, tool=tool, params=call_params)
         )
 
-    def health_check(self) -> r[Mapping[str, object]]:
+    def health_check(self) -> r[Mapping[str, t.NormalizedValue]]:
         """Check if MCP infrastructure is available."""
         available = self.is_mcp_cli_available()
         status = (
@@ -84,7 +88,7 @@ class FlextQualityMcpClient:
             if available
             else c.Quality.IntegrationStatus.DISCONNECTED
         )
-        return r[Mapping[str, object]].ok({
+        return r[Mapping[str, t.NormalizedValue]].ok({
             "status": status,
             "available": available,
             "mcp_cli": available,
@@ -106,7 +110,7 @@ class FlextQualityMcpClient:
                 )
             )
         try:
-            parsed = TypeAdapter(dict[str, object]).validate_json(output)
+            parsed = TypeAdapter(dict[str, t.NormalizedValue]).validate_json(output)
             result_data: dict[str, str] = {str(k): str(v) for k, v in parsed.items()}
             return r[McpToolResult].ok(
                 McpToolResult(
@@ -117,13 +121,13 @@ class FlextQualityMcpClient:
             )
         except ValueError:
             try:
-                parsed_list = TypeAdapter(list[object]).validate_json(output)
+                parsed_list = TypeAdapter(list[t.NormalizedValue]).validate_json(output)
                 coerced_data: list[dict[str, str]] = []
                 for item in parsed_list:
                     if isinstance(item, Mapping):
-                        validated_item = TypeAdapter(dict[str, object]).validate_python(
-                            item
-                        )
+                        validated_item = TypeAdapter(
+                            dict[str, t.NormalizedValue]
+                        ).validate_python(item)
                         coerced_data.append({
                             str(key): str(value)
                             for key, value in validated_item.items()

@@ -130,11 +130,11 @@ class FlextQuality:
         """Get hooks configuration as JSON string."""
         return self.hooks.get_config_json()
 
-    def get_status(self) -> Mapping[str, object]:
+    def get_status(self) -> Mapping[str, t.NormalizedValue]:
         """Get quality service status.
 
         Returns:
-            dict[str, object]: Status information
+            dict[str, t.NormalizedValue]: Status information
 
         """
         return {
