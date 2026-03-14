@@ -128,7 +128,7 @@ class BaseAuditor(ABC):
     def audit(self, files: list[Path]) -> ValidationResult:
         """Perform the audit operation on given files."""
 
-    def get_summary(self):
+    def get_summary(self) -> dict[str, dict[str, int] | float | int | str | None]:
         """Get a summary of the audit results."""
         return {
             "auditor": self.name,
@@ -168,7 +168,7 @@ class BaseValidator(ABC):
     def _validate_items(self, items: list) -> None:
         """Implementation-specific validation logic."""
 
-    def get_summary(self):
+    def get_summary(self) -> dict[str, float | int | str] | dict[str, str]:
         """Get a summary of validation results."""
         if not self.results:
             return {"validator": self.name, "status": "not_run"}
@@ -254,11 +254,11 @@ class BaseAnalyzer(ABC):
 class Config(Protocol):
     """Protocol for configuration objects."""
 
-    def get(self, key: str, default = None):
+    def get(self, key: str, default=None) -> None:
         """Get a configuration value."""
         ...
 
-    def __getitem__(self, key: str):
+    def __getitem__(self, key: str) -> None:
         """Get a configuration value with bracket notation."""
         ...
 
@@ -289,7 +289,7 @@ class FileMetadata:
             # If we can't read the file, keep defaults (file not accessible or not text)
             pass
 
-    def to_dict(self):
+    def to_dict(self) -> dict[str, bool | float | int | str]:
         """Convert metadata to dictionary."""
         return {
             "path": str(self.path),

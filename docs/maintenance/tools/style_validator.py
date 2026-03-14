@@ -214,7 +214,7 @@ class StyleValidator:
 
     def _check_list_consistency(self, content: str) -> list[dict[str, object]]:
         """Check list formatting consistency."""
-        violations = []
+        violations: list[dict[str, object]] = []
 
         # Find all list items
         list_items: list[tuple[str, str, int]] = []
@@ -395,7 +395,7 @@ class StyleValidator:
         """Generate improvement suggestions based on violations."""
         suggestions: list[str] = []
 
-        violation_types = {}
+        violation_types: dict[object, int] = {}
         for violation in violations:
             v_type = violation["type"]
             violation_types[v_type] = violation_types.get(v_type, 0) + 1
@@ -476,7 +476,7 @@ Top Issues:
 """
 
         # Count issue types
-        issue_types = {}
+        issue_types: dict[Materialization, int] = {}
         for violation in (
             self.results["style_violations"] + self.results["accessibility_issues"]
         ):

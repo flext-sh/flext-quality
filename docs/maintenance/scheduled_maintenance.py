@@ -84,7 +84,17 @@ class ScheduledMaintenance:
         except FileNotFoundError:
             self.config = self.get_default_config()
 
-    def get_default_config(self):
+    def get_default_config(
+        self,
+    ) -> dict[
+        str,
+        bool
+        | dict[str, bool | int]
+        | dict[str, bool | int | str]
+        | dict[str, dict[str, bool | list[str] | str]]
+        | dict[str, dict[str, int | str]]
+        | str,
+    ]:
         """Default maintenance configuration."""
         return {
             "enabled": True,
@@ -241,7 +251,9 @@ class ScheduledMaintenance:
 
         return success
 
-    def run_single_task(self, task_config) -> bool:
+    def run_single_task(
+        self, task_config: dict[str, bool | list[str] | str] | dict[str, int | str]
+    ) -> bool:
         """Run a single maintenance task using appropriate Python libraries."""
         try:
             command_raw = task_config.get("command")

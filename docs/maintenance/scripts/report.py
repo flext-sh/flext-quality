@@ -47,7 +47,7 @@ class DocumentationReporter:
         self.validation_data = self._load_json_report("latest_validation.json")
         self.optimization_data = self._load_json_report("latest_optimization.json")
 
-    def _load_json_report(self, filename: str) | None:
+    def _load_json_report(self, filename: str) -> None | None:
         """Load a JSON report file."""
         filepath = self.reports_dir / filename
         if filepath.exists():
@@ -81,7 +81,7 @@ class DocumentationReporter:
         msg = f"Unsupported format: {report_format}"
         raise ValueError(msg)
 
-    def _calculate_summary_metrics(self):
+    def _calculate_summary_metrics(self) -> dict[str, int | str]:
         """Calculate summary metrics from all available data."""
         summary = {
             "overall_score": 0,
@@ -125,7 +125,7 @@ class DocumentationReporter:
             summary["quality_trend"] = "critical"
         return summary
 
-    def _analyze_trends(self) | None:
+    def _analyze_trends(self) -> None | None:
         """Analyze quality trends over time."""
         return None
 
@@ -263,7 +263,7 @@ class DocumentationReporter:
                 md.append("")
         return "\n".join(md)
 
-    def _summarize_audit_data(self, audit_data) | None:
+    def _summarize_audit_data(self, audit_data) -> None | None:
         """Summarize audit data for reporting."""
         if not audit_data:
             return None
@@ -279,9 +279,7 @@ class DocumentationReporter:
             "low_issues": len([i for i in issues if i.get("severity") == "low"]),
         }
 
-    def _summarize_validation_data(
-        self, validation_data
-    ) | None:
+    def _summarize_validation_data(self, validation_data) -> None | None:
         """Summarize validation data for reporting."""
         if not validation_data:
             return None
@@ -293,9 +291,7 @@ class DocumentationReporter:
             "warnings": link_data.get("warnings", 0),
         }
 
-    def _summarize_optimization_data(
-        self, optimization_data
-    ) | None:
+    def _summarize_optimization_data(self, optimization_data) -> None | None:
         """Summarize optimization data for reporting."""
         if not optimization_data:
             return None

@@ -48,8 +48,8 @@ def assert_analysis_results_structure(results: Mapping[str, object]) -> None:
 def safe_dict_access(
     data: Mapping[str, object],
     key: str,
-    default = None,
-) | None:
+    default=None,
+) -> None | None:
     """Safely access a dict key with a default value."""
     return data.get(key, default)
 
@@ -57,8 +57,8 @@ def safe_dict_access(
 def safe_list_access(
     data: Sequence,
     index: int,
-    default = None,
-) | None:
+    default=None,
+) -> None | None:
     """Safely access a list index with a default value."""
     try:
         return data[index]

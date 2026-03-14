@@ -437,7 +437,7 @@ class LinkChecker:
         github_links = [link for link in links if "github.com" in link["url"]]
 
         # GitHub API has rate limits, so we use a more conservative approach
-        validated_links = []
+        validated_links: list[dict[str, bool | object]] = []
 
         for link in github_links:
             url = link["url"]

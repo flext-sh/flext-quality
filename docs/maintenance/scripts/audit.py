@@ -30,9 +30,7 @@ class AuditorResults(BaseModel):
 
     timestamp: str = Field(description="ISO timestamp when audit ran")
     files_analyzed: int = Field(default=0, description="Number of files analyzed")
-    issues: list = Field(
-        default_factory=list, description="List of issues found"
-    )
+    issues: list = Field(default_factory=list, description="List of issues found")
     metrics = Field(default_factory=dict, description="Quality metrics")
     recommendations: list = Field(
         default_factory=list, description="List of recommendations"
@@ -98,7 +96,9 @@ class DocumentationAuditor:
         except FileNotFoundError:
             self.validation_config = self.get_default_validation_config()
 
-    def get_default_audit_rules(self):
+    def get_default_audit_rules(
+        self,
+    ) -> dict[str, dict[str, float | int] | dict[str, bool] | dict[str, list[str]]]:
         """Default audit rules if config file not found."""
         return {
             "quality_thresholds": {
@@ -121,7 +121,9 @@ class DocumentationAuditor:
             },
         }
 
-    def get_default_style_guide(self):
+    def get_default_style_guide(
+        self,
+    ) -> dict[str, dict[str, bool | int] | dict[str, bool] | dict[str, str]]:
         """Default style guide if config file not found."""
         return {
             "markdown": {
@@ -142,7 +144,9 @@ class DocumentationAuditor:
             },
         }
 
-    def get_default_validation_config(self):
+    def get_default_validation_config(
+        self,
+    ) -> dict[str, dict[str, bool | int | list[str]] | dict[str, bool | int | str]]:
         """Default validation config if config file not found."""
         return {
             "link_validation": {
@@ -194,7 +198,7 @@ class DocumentationAuditor:
         ]
         return any(pattern in str(file_path) for pattern in ignored_patterns)
 
-    def run_comprehensive_audit(self):
+    def run_comprehensive_audit(self) -> AuditorResults:
         """Run complete documentation audit."""
         doc_files = self.find_documentation_files()
         self.results.files_analyzed = len(doc_files)

@@ -48,7 +48,7 @@ def assert_is_list(value) -> TypeGuard[list]:
     return True
 
 
-def safe_dict_access(data: dict[str, object], key: str):
+def safe_dict_access(data: dict[str, object], key: str) -> object:
     """Type-safe dictionary access with proper error handling.
 
     Args:

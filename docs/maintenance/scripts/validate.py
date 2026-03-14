@@ -33,9 +33,7 @@ class LinkValidatorResults(BaseModel):
     broken_links: int = Field(default=0, description="Number of broken links")
     warnings: int = Field(default=0, description="Number of warnings")
     errors: list = Field(default_factory=list, description="List of errors")
-    warnings_list: list = Field(
-        default_factory=list, description="List of warnings"
-    )
+    warnings_list: list = Field(default_factory=list, description="List of warnings")
 
 
 class ContentValidatorResults(BaseModel):
@@ -248,9 +246,7 @@ class LinkValidator:
             return (False, {"error": f"Unexpected error: {e!s}"})
         return (False, None)
 
-    def _check_single_external_link(
-        self, link, *, verbose: bool = False
-    ):
+    def _check_single_external_link(self, link, *, verbose: bool = False):
         """Check a single external link."""
         _ = verbose
         url = link["url"]
@@ -317,9 +313,7 @@ class LinkValidator:
             return base_dir.parent / target[3:]
         return Path(target)
 
-    def validate_images(
-        self, links: list, project_root: Path
-    ) -> LinkValidatorResults:
+    def validate_images(self, links: list, project_root: Path) -> LinkValidatorResults:
         """Validate image references."""
         images = [link for link in links if link["type"] == "image"]
         for image in images:

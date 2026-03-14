@@ -333,7 +333,7 @@ class DocumentationFinder:
 
         return categories
 
-    def get_statistics(self, files: list[Path] | None = None):
+    def get_statistics(self, files: list[Path] | None = None) -> dict[str, int]:
         """Get statistics about found files."""
         if files is None:
             files = self.find_files()
