@@ -21,7 +21,7 @@ class AuditRules:
         self.style_checks = data.get("style_checks", {})
         self.accessibility_checks = data.get("accessibility_checks", {})
 
-    def get_threshold(self, key: str, default: object | None = None) -> object | None:
+    def get_threshold(self, key: str, default = None) | None:
         """Get a quality threshold value."""
         return self.quality_thresholds.get(key, default)
 
@@ -43,16 +43,16 @@ class StyleGuide:
     def get_markdown_rule(
         self,
         rule: str,
-        default: object | None = None,
-    ) -> object | None:
+        default = None,
+    ) | None:
         """Get a markdown formatting rule."""
         return self.markdown.get(rule, default)
 
     def get_accessibility_rule(
         self,
         rule: str,
-        default: object | None = None,
-    ) -> object | None:
+        default = None,
+    ) | None:
         """Get an accessibility rule."""
         return self.accessibility.get(rule, default)
 
@@ -72,16 +72,16 @@ class ValidationConfig:
     def get_link_setting(
         self,
         setting: str,
-        default: object | None = None,
-    ) -> object | None:
+        default = None,
+    ) | None:
         """Get a link validation setting."""
         return self.link_validation.get(setting, default)
 
     def get_content_setting(
         self,
         setting: str,
-        default: object | None = None,
-    ) -> object | None:
+        default = None,
+    ) | None:
         """Get a content validation setting."""
         return self.content_validation.get(setting, default)
 

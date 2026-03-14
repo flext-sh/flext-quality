@@ -32,8 +32,8 @@ class LinkValidatorResults(BaseModel):
     valid_links: int = Field(default=0, description="Number of valid links")
     broken_links: int = Field(default=0, description="Number of broken links")
     warnings: int = Field(default=0, description="Number of warnings")
-    errors: list[object] = Field(default_factory=list, description="List of errors")
-    warnings_list: list[object] = Field(
+    errors: list = Field(default_factory=list, description="List of errors")
+    warnings_list: list = Field(
         default_factory=list, description="List of warnings"
     )
 
@@ -43,7 +43,7 @@ class ContentValidatorResults(BaseModel):
 
     timestamp: str = Field(description="ISO timestamp when validation ran")
     files_checked: int = Field(default=0, description="Number of files checked")
-    content_issues: list[object] = Field(
+    content_issues: list = Field(
         default_factory=list, description="List of content issues"
     )
     quality_metrics: dict[str, object] = Field(
@@ -83,7 +83,7 @@ class LinkValidator:
             timestamp=datetime.now(UTC).isoformat(),
         )
 
-    def find_all_links(self, doc_files: list[Path]) -> list[object]:
+    def find_all_links(self, doc_files: list[Path]) -> list:
         """Extract all links from documentation files."""
         all_links = []
         for file_path in doc_files:
@@ -160,7 +160,7 @@ class LinkValidator:
         return None
 
     def validate_external_links(
-        self, links: list[object], *, verbose: bool = False
+        self, links: list, *, verbose: bool = False
     ) -> LinkValidatorResults:
         """Validate external links with concurrent checking."""
         external_links = [link for link in links if link["type"] == "external"]
@@ -185,13 +185,13 @@ class LinkValidator:
 
     def _create_link_result(
         self,
-        link: object,
+        link,
         *,
         valid: bool,
         url: str,
         status_code: int | None = None,
         error: str | None = None,
-    ) -> object:
+    ):
         """Create a standardized link validation result."""
         result = {
             "valid": valid,
@@ -249,8 +249,8 @@ class LinkValidator:
         return (False, None)
 
     def _check_single_external_link(
-        self, link: object, *, verbose: bool = False
-    ) -> object:
+        self, link, *, verbose: bool = False
+    ):
         """Check a single external link."""
         _ = verbose
         url = link["url"]
@@ -263,7 +263,7 @@ class LinkValidator:
         )
 
     def validate_internal_links(
-        self, links: list[object], doc_files: list[Path]
+        self, links: list, doc_files: list[Path]
     ) -> LinkValidatorResults:
         """Validate internal links and references."""
         internal_links = [
@@ -318,7 +318,7 @@ class LinkValidator:
         return Path(target)
 
     def validate_images(
-        self, links: list[object], project_root: Path
+        self, links: list, project_root: Path
     ) -> LinkValidatorResults:
         """Validate image references."""
         images = [link for link in links if link["type"] == "image"]
@@ -348,7 +348,7 @@ class LinkValidator:
         return self.results
 
     def validate_anchors(
-        self, links: list[object], doc_files: list[Path]
+        self, links: list, doc_files: list[Path]
     ) -> LinkValidatorResults:
         """Validate anchor links within documents."""
         anchor_links = [link for link in links if link["type"] == "anchor"]
@@ -394,7 +394,7 @@ class LinkValidator:
         anchor = re.sub(r"[^\\w\\s-]", "", anchor)
         return re.sub(r"\\s+", "-", anchor)
 
-    def check_link_text_quality(self, links: list[object]) -> LinkValidatorResults:
+    def check_link_text_quality(self, links: list) -> LinkValidatorResults:
         """Check quality of link text for accessibility and usability."""
         poor_link_texts = [
             "here",
@@ -477,7 +477,7 @@ class ContentValidator:
                 })
         return self.results
 
-    def _check_markdown_issues(self, content: str) -> list[object]:
+    def _check_markdown_issues(self, content: str) -> list:
         """Check for markdown syntax issues."""
         issues: list[dict[str, int | str]] = []
         lines = content.split("\n")
@@ -637,7 +637,7 @@ def _discover_validation_files() -> list[Path]:
 def _execute_validations(
     link_validator: LinkValidator,
     content_validator: ContentValidator,
-    all_links: list[object],
+    all_links: list,
     doc_files: list[Path],
     args: argparse.Namespace,
 ) -> bool:

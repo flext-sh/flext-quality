@@ -14,7 +14,7 @@ from __future__ import annotations
 from typing import TypeGuard
 
 
-def assert_is_dict(value: object) -> TypeGuard[dict[str, object]]:
+def assert_is_dict(value) -> TypeGuard[dict[str, object]]:
     """Type-safe dict[str, object] assertion following Single Responsibility Principle.
 
     Args:
@@ -31,7 +31,7 @@ def assert_is_dict(value: object) -> TypeGuard[dict[str, object]]:
     return True
 
 
-def assert_is_list(value: object) -> TypeGuard[list[object]]:
+def assert_is_list(value) -> TypeGuard[list]:
     """Type-safe list assertion following Single Responsibility Principle.
 
     Args:
@@ -48,7 +48,7 @@ def assert_is_list(value: object) -> TypeGuard[list[object]]:
     return True
 
 
-def safe_dict_access(data: dict[str, object], key: str) -> object:
+def safe_dict_access(data: dict[str, object], key: str):
     """Type-safe dictionary access with proper error handling.
 
     Args:
@@ -66,7 +66,7 @@ def safe_dict_access(data: dict[str, object], key: str) -> object:
     return data[key]
 
 
-def safe_list_access(data: list[object], index: int) -> object:
+def safe_list_access(data: list, index: int):
     """Type-safe list access with proper error handling.
 
     Args:
@@ -108,7 +108,7 @@ def assert_dict_structure(
     return data
 
 
-def assert_analysis_results_structure(results: object) -> dict[str, object]:
+def assert_analysis_results_structure(results) -> dict[str, object]:
     """Assert analyzer results have expected structure - specialized helper.
 
     Args:
@@ -126,7 +126,7 @@ def assert_analysis_results_structure(results: object) -> dict[str, object]:
     return assert_dict_structure(results, ["metrics", "issues", "python_files"])
 
 
-def assert_metrics_structure(metrics: object) -> dict[str, object]:
+def assert_metrics_structure(metrics) -> dict[str, object]:
     """Assert metrics have expected structure - specialized helper.
 
     Args:
@@ -144,7 +144,7 @@ def assert_metrics_structure(metrics: object) -> dict[str, object]:
     return assert_dict_structure(metrics, ["total_files", "total_lines_of_code"])
 
 
-def assert_issues_structure(issues: object) -> dict[str, object]:
+def assert_issues_structure(issues) -> dict[str, object]:
     """Assert issues have expected structure - specialized helper.
 
     Args:

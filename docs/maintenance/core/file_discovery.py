@@ -333,7 +333,7 @@ class DocumentationFinder:
 
         return categories
 
-    def get_statistics(self, files: list[Path] | None = None) -> object:
+    def get_statistics(self, files: list[Path] | None = None):
         """Get statistics about found files."""
         if files is None:
             files = self.find_files()
@@ -344,7 +344,7 @@ class DocumentationFinder:
         metadata_list = self.get_files_metadata(files)
 
         # Basic statistics
-        stats: object = {
+        stats = {
             "total_files": len(files),
             "total_size": sum(meta.size for meta in metadata_list),
             "total_lines": sum(meta.lines for meta in metadata_list),

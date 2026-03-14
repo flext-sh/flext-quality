@@ -12,12 +12,12 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 
 
-def assert_is_dict(value: object, msg: str = "") -> None:
+def assert_is_dict(value, msg: str = "") -> None:
     """Assert that value is a dict."""
     assert isinstance(value, dict), msg or f"Expected dict, got {type(value).__name__}"
 
 
-def assert_is_list(value: object, msg: str = "") -> None:
+def assert_is_list(value, msg: str = "") -> None:
     """Assert that value is a list."""
     assert isinstance(value, list), msg or f"Expected list, got {type(value).__name__}"
 
@@ -35,7 +35,7 @@ def assert_metrics_structure(metrics: Mapping[str, object]) -> None:
     assert isinstance(metrics, dict), f"Expected dict, got {type(metrics).__name__}"
 
 
-def assert_issues_structure(issues: object) -> None:
+def assert_issues_structure(issues) -> None:
     """Assert that issues data has expected structure."""
     assert isinstance(issues, list), f"Expected list, got {type(issues).__name__}"
 
@@ -48,17 +48,17 @@ def assert_analysis_results_structure(results: Mapping[str, object]) -> None:
 def safe_dict_access(
     data: Mapping[str, object],
     key: str,
-    default: object | None = None,
-) -> object | None:
+    default = None,
+) | None:
     """Safely access a dict key with a default value."""
     return data.get(key, default)
 
 
 def safe_list_access(
-    data: Sequence[object],
+    data: Sequence,
     index: int,
-    default: object | None = None,
-) -> object | None:
+    default = None,
+) | None:
     """Safely access a list index with a default value."""
     try:
         return data[index]

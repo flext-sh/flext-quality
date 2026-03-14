@@ -30,11 +30,11 @@ class AuditorResults(BaseModel):
 
     timestamp: str = Field(description="ISO timestamp when audit ran")
     files_analyzed: int = Field(default=0, description="Number of files analyzed")
-    issues: list[object] = Field(
+    issues: list = Field(
         default_factory=list, description="List of issues found"
     )
-    metrics: object = Field(default_factory=dict, description="Quality metrics")
-    recommendations: list[object] = Field(
+    metrics = Field(default_factory=dict, description="Quality metrics")
+    recommendations: list = Field(
         default_factory=list, description="List of recommendations"
     )
 
@@ -51,9 +51,9 @@ class DocumentationAuditor:
         """
         self.config_path = Path(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
-        self.audit_rules: object = self.get_default_audit_rules()
-        self.style_guide: object = self.get_default_style_guide()
-        self.validation_config: object = self.get_default_validation_config()
+        self.audit_rules = self.get_default_audit_rules()
+        self.style_guide = self.get_default_style_guide()
+        self.validation_config = self.get_default_validation_config()
         self.load_config()
         self.results: AuditorResults = AuditorResults(
             timestamp=datetime.now(UTC).isoformat(),
@@ -98,7 +98,7 @@ class DocumentationAuditor:
         except FileNotFoundError:
             self.validation_config = self.get_default_validation_config()
 
-    def get_default_audit_rules(self) -> object:
+    def get_default_audit_rules(self):
         """Default audit rules if config file not found."""
         return {
             "quality_thresholds": {
@@ -121,7 +121,7 @@ class DocumentationAuditor:
             },
         }
 
-    def get_default_style_guide(self) -> object:
+    def get_default_style_guide(self):
         """Default style guide if config file not found."""
         return {
             "markdown": {
@@ -142,7 +142,7 @@ class DocumentationAuditor:
             },
         }
 
-    def get_default_validation_config(self) -> object:
+    def get_default_validation_config(self):
         """Default validation config if config file not found."""
         return {
             "link_validation": {
@@ -194,7 +194,7 @@ class DocumentationAuditor:
         ]
         return any(pattern in str(file_path) for pattern in ignored_patterns)
 
-    def run_comprehensive_audit(self) -> object:
+    def run_comprehensive_audit(self):
         """Run complete documentation audit."""
         doc_files = self.find_documentation_files()
         self.results.files_analyzed = len(doc_files)

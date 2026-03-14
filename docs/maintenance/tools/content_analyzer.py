@@ -53,7 +53,7 @@ class ContentAnalyzer:
         content_scores: dict[str, object] = {}
         readability_stats: dict[str, object] = {}
         completeness_checks: dict[str, object] = {}
-        recommendations: list[object] = []
+        recommendations: list = []
         self.results: dict[str, object] = {
             "files_analyzed": 0,
             "quality_metrics": quality_metrics,
@@ -101,8 +101,8 @@ class ContentAnalyzer:
         try:
             content = file_path.read_text(encoding="utf-8")
             filename = str(file_path.relative_to(file_path.parents[2]))
-            issues_list: list[object] = []
-            suggestions_list: list[object] = []
+            issues_list: list = []
+            suggestions_list: list = []
             analysis: dict[str, object] = {
                 "file": filename,
                 "metrics": self._calculate_content_metrics(content),
@@ -286,7 +286,7 @@ class ContentAnalyzer:
 
     def _analyze_structure(self, content: str) -> dict[str, object]:
         """Analyze document structure and organization."""
-        sections_list: list[object] = []
+        sections_list: list = []
         depth_analysis_dict: dict[str, object] = {}
         structure: dict[str, object] = {
             "has_table_of_contents": False,
@@ -347,9 +347,9 @@ class ContentAnalyzer:
         filename: str,
     ) -> dict[str, object]:
         """Check documentation completeness based on file type and content."""
-        missing_elems: list[object] = []
-        required_present: list[object] = []
-        optional_present: list[object] = []
+        missing_elems: list = []
+        required_present: list = []
+        optional_present: list = []
         completeness = {
             "score": 100,
             "missing_elements": missing_elems,
@@ -421,8 +421,8 @@ class ContentAnalyzer:
         required_sections: list[str],
     ) -> dict[str, object]:
         """Check for required sections in content."""
-        required_present: list[object] = []
-        missing_required: list[object] = []
+        required_present: list = []
+        missing_required: list = []
         result = {
             "required_sections_present": required_present,
             "missing_required_sections": missing_required,
@@ -444,7 +444,7 @@ class ContentAnalyzer:
 
             if not found:
                 result["missing_required_sections"].append(section_pattern)
-                recommendations = cast("list[object]", self.results["recommendations"])
+                recommendations = cast("list", self.results["recommendations"])
                 recommendations.append(f"Add '{section_pattern}' section")
 
         return result
@@ -489,9 +489,9 @@ class ContentAnalyzer:
 
         return max(0.0, min(100.0, score))
 
-    def _identify_issues(self, analysis: dict[str, object]) -> list[object]:
+    def _identify_issues(self, analysis: dict[str, object]) -> list:
         """Identify content issues that need attention."""
-        issues: list[object] = []
+        issues: list = []
 
         metrics = cast("_SubDict", analysis["metrics"])
         readability = cast("_SubDict", analysis["readability"])
@@ -541,9 +541,9 @@ class ContentAnalyzer:
 
         return issues
 
-    def _generate_suggestions(self, analysis: dict[str, object]) -> list[object]:
+    def _generate_suggestions(self, analysis: dict[str, object]) -> list:
         """Generate improvement suggestions based on analysis."""
-        suggestions: list[object] = []
+        suggestions: list = []
 
         metrics = cast("_SubDict", analysis["metrics"])
         readability = cast("_SubDict", analysis["readability"])
@@ -597,7 +597,7 @@ class ContentAnalyzer:
         score_values = [float(v) for v in content_scores.values()]
         avg_score = sum(score_values) / len(score_values)
 
-        recommendations = cast("list[object]", self.results["recommendations"])
+        recommendations = cast("list", self.results["recommendations"])
 
         if avg_score < self.GOOD_READABILITY_MIN:
             recommendations.append({
@@ -669,7 +669,7 @@ Top Recommendations:
 """
 
         # Show top recommendations
-        recommendations = cast("list[object]", self.results["recommendations"])
+        recommendations = cast("list", self.results["recommendations"])
         for rec in recommendations[:3]:
             if isinstance(rec, dict):
                 report += f"- {rec['message']}\n"
