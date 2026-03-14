@@ -72,7 +72,10 @@ Planned plugin interface for flext-quality:
 
 ```python
 from typing import Protocol
-from flext_core import FlextResult
+from collections.abc import Mapping, Sequence
+from flext_core import r
+from flext_core import t
+
 
 class QualityPlugin(Protocol):
     """Plugin interface for quality analyzers."""
@@ -90,8 +93,8 @@ class QualityPlugin(Protocol):
     def analyze(
         self,
         path: Path,
-        config: dict[str, Any] | None = None,
-    ) -> FlextResult[AnalysisResult]:
+        config: m.Quality.PluginConfigModel | None = None,
+    ) -> r[AnalysisResult]:
         """Run analysis on path."""
         ...
 
@@ -102,8 +105,8 @@ class QualityPlugin(Protocol):
     def fix(
         self,
         path: Path,
-        issues: list[Issue],
-    ) -> FlextResult[FixResult]:
+        issues: Sequence[Issue],
+    ) -> r[FixResult]:
         """Apply fixes for issues."""
         ...
 ```

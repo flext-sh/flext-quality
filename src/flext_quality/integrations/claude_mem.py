@@ -9,15 +9,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import final
 
-from flext_core import FlextResult as r
+from flext_core import r
 
-from flext_quality.constants import FlextQualityConstants as c
-from flext_quality.integrations.mcp_client import (
-    FlextQualityMcpClient,
-    McpToolCall,
-)
+from flext_quality import c
+from flext_quality.integrations.mcp_client import FlextQualityMcpClient, McpToolCall
 
 
 @final
@@ -30,117 +28,85 @@ class FlextQualityClaudeMemClient:
 
     SERVER_NAME = "claude-mem"
 
-    def __init__(
-        self,
-        *,
-        timeout_ms: int | None = None,
-    ) -> None:
+    def __init__(self, *, timeout_ms: int | None = None) -> None:
         """Initialize the Claude Mem client."""
         self._mcp = FlextQualityMcpClient(timeout_ms=timeout_ms)
 
+    def build_get_observations_call(self, ids: list[int]) -> r[McpToolCall]:
+        """Build a get_observations tool call."""
+        params: object = {"ids": ids}
+        return self._mcp.build_tool_call(self.SERVER_NAME, "get_observations", params)
+
     def build_search_call(
-        self,
-        query: str,
-        *,
-        limit: int = 10,
+        self, query: str, *, limit: int | None = None
     ) -> r[McpToolCall]:
         """Build a search tool call."""
-        return self._mcp.build_tool_call(
-            self.SERVER_NAME,
-            "search",
-            {
-                "query": query,
-                "limit": limit,
-            },
-        )
+        search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
+        params: object = {"query": query, "limit": search_limit}
+        return self._mcp.build_tool_call(self.SERVER_NAME, "search", params)
 
     def build_timeline_call(
         self,
         anchor: int,
         *,
-        depth_before: int = 5,
-        depth_after: int = 5,
+        depth_before: int | None = None,
+        depth_after: int | None = None,
     ) -> r[McpToolCall]:
         """Build a timeline tool call."""
+        before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
+        after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
+        params: object = {
+            "anchor": anchor,
+            "depth_before": before,
+            "depth_after": after,
+        }
         return self._mcp.build_tool_call(
             self.SERVER_NAME,
             "timeline",
-            {
-                "anchor": anchor,
-                "depth_before": depth_before,
-                "depth_after": depth_after,
-            },
+            params,
         )
 
-    def build_get_observations_call(
-        self,
-        ids: list[int],
-    ) -> r[McpToolCall]:
-        """Build a get_observations tool call."""
-        return self._mcp.build_tool_call(
-            self.SERVER_NAME,
-            "get_observations",
-            {
-                "ids": ids,
-            },
+    def get_observations_command(self, ids: list[int]) -> r[list[str]]:
+        """Get the mcp-cli command for fetching observations."""
+        return self.build_get_observations_call(ids).flat_map(
+            self._mcp.build_call_command
         )
 
     def get_search_command(
-        self,
-        query: str,
-        *,
-        limit: int = 10,
+        self, query: str, *, limit: int | None = None
     ) -> r[list[str]]:
         """Get the mcp-cli command for memory search."""
-        call_result = self.build_search_call(query, limit=limit)
-        if call_result.is_failure:
-            return r[list[str]].fail(call_result.error)
-
-        return self._mcp.build_call_command(call_result.value)
+        search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
+        return self.build_search_call(query, limit=search_limit).flat_map(
+            self._mcp.build_call_command
+        )
 
     def get_timeline_command(
         self,
         anchor: int,
         *,
-        depth_before: int = 5,
-        depth_after: int = 5,
+        depth_before: int | None = None,
+        depth_after: int | None = None,
     ) -> r[list[str]]:
         """Get the mcp-cli command for timeline query."""
-        call_result = self.build_timeline_call(
-            anchor,
-            depth_before=depth_before,
-            depth_after=depth_after,
-        )
-        if call_result.is_failure:
-            return r[list[str]].fail(call_result.error)
+        before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
+        after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
+        return self.build_timeline_call(
+            anchor, depth_before=before, depth_after=after
+        ).flat_map(self._mcp.build_call_command)
 
-        return self._mcp.build_call_command(call_result.value)
-
-    def get_observations_command(
-        self,
-        ids: list[int],
-    ) -> r[list[str]]:
-        """Get the mcp-cli command for fetching observations."""
-        call_result = self.build_get_observations_call(ids)
-        if call_result.is_failure:
-            return r[list[str]].fail(call_result.error)
-
-        return self._mcp.build_call_command(call_result.value)
-
-    def health_check(self) -> r[dict[str, object]]:
+    def health_check(self) -> r[Mapping[str, object]]:
         """Check if claude-mem is available."""
         mcp_health = self._mcp.health_check()
         if mcp_health.is_failure:
-            return r[dict[str, object]].fail(mcp_health.error)
-
+            return r[Mapping[str, object]].fail(mcp_health.error)
         health_data = mcp_health.value
         status = (
             c.Quality.IntegrationStatus.CONNECTED
             if health_data.get("available", False)
             else c.Quality.IntegrationStatus.DISCONNECTED
         )
-
-        return r[dict[str, object]].ok({
+        return r[Mapping[str, object]].ok({
             "server": self.SERVER_NAME,
             "status": status,
             "available": health_data.get("available", False),

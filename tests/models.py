@@ -9,8 +9,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_quality.models import FlextQualityModels
-from flext_tests.models import FlextTestsModels
+from flext_tests import FlextTestsModels
+
+from flext_quality import FlextQualityModels
 
 
 class TestsFlextQualityModels(FlextTestsModels, FlextQualityModels):
@@ -27,7 +28,7 @@ class TestsFlextQualityModels(FlextTestsModels, FlextQualityModels):
     - FlextTestsModels.Tests.* - Generic test utilities
     """
 
-    class Tests:
+    class Tests(FlextTestsModels.Tests):
         """Test fixtures namespace for flext-quality.
 
         Contains test-specific models and fixtures that should not

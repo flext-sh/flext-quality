@@ -40,8 +40,8 @@ link_validation:
   expected_content_types: ["text/html", "text/plain", "application/json"]
 
   # Domain restrictions
-  allowed_domains: []  # Empty means all domains allowed
-  blocked_domains: []  # Domains to skip
+  allowed_domains: [] # Empty means all domains allowed
+  blocked_domains: [] # Domains to skip
 
   # Link type specific settings
   github_links:
@@ -80,7 +80,7 @@ image_validation:
   allowed_image_extensions: [".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"]
 
   # External image validation
-  validate_external_images: false  # Can be slow
+  validate_external_images: false # Can be slow
   external_image_timeout: 5
 
   # Alt text requirements
@@ -103,7 +103,7 @@ content_analysis:
   min_word_count: 100
 
   # Content quality checks
-  check_readability: false  # Requires additional libraries
+  check_readability: false # Requires additional libraries
   readability_target_score: 60
 
   # TODO/FIXME checking
@@ -137,7 +137,7 @@ content_validation:
     "CHANGELOG.md": 20
 
   # Content quality checks
-  check_readability: false  # Requires additional libraries
+  check_readability: false # Requires additional libraries
   readability_target_score: 60
 
   # Code example validation
@@ -169,7 +169,7 @@ structure_validation:
   enabled: true
 
   # Table of contents
-  check_table_of_contents: false  # Only for long documents
+  check_table_of_contents: false # Only for long documents
   toc_min_headings: 5
 
   # Frontmatter validation
@@ -183,7 +183,7 @@ structure_validation:
 
 security_validation:
   # Security-focused checks
-  enabled: false  # Enable for security audits
+  enabled: false # Enable for security audits
 
   # Dangerous link patterns
   check_suspicious_links: true

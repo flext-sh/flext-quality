@@ -4,28 +4,30 @@ Common base classes and interfaces for all maintenance system components.
 Provides consistent interfaces and shared functionality.
 """
 
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Protocol
+from typing import Protocol
 
-from flext_core import FlextTypes as t
+from pydantic import BaseModel, Field
 
 
-@dataclass
-class Issue:
+class Issue(BaseModel):
     """Represents a documentation quality issue."""
 
-    type: str
-    severity: str  # 'critical', 'high', 'medium', 'low', 'info'
-    file: str
-    line: int | None = None
-    description: str = ""
-    recommendation: str = ""
-    context: dict[str, Any] | None = None
+    type: str = Field(description="Issue type identifier")
+    severity: str = Field(
+        description="Severity level: critical, high, medium, low, info"
+    )
+    file: str = Field(description="File path where issue was found")
+    line: int | None = Field(default=None, description="Line number of the issue")
+    description: str = Field(default="", description="Detailed issue description")
+    recommendation: str = Field(default="", description="Recommended fix for the issue")
+    context: object | None = Field(default=None, description="Additional context data")
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> object:
         """Convert issue to dictionary representation."""
         return {
             "type": self.type,
@@ -34,21 +36,22 @@ class Issue:
             "line": self.line,
             "description": self.description,
             "recommendation": self.recommendation,
-            "context": self.context or {},
+            "context": self.context if self.context is not None else {},
         }
 
 
-@dataclass
-class ValidationResult:
+class ValidationResult(BaseModel):
     """Result of a validation operation."""
 
-    total_items: int = 0
-    valid_items: int = 0
-    invalid_items: int = 0
-    issues: list[Issue] = field(default_factory=list)
-    warnings: list[str] = field(default_factory=list)
-    errors: list[str] = field(default_factory=list)
-    metadata: dict[str, Any] = field(default_factory=dict)
+    total_items: int = Field(default=0, description="Total items validated")
+    valid_items: int = Field(default=0, description="Number of valid items")
+    invalid_items: int = Field(default=0, description="Number of invalid items")
+    issues: list[Issue] = Field(
+        default_factory=list, description="List of issues found"
+    )
+    warnings: list[str] = Field(default_factory=list, description="Warning messages")
+    errors: list[str] = Field(default_factory=list, description="Error messages")
+    metadata: object = Field(default_factory=dict, description="Additional metadata")
 
     @property
     def success_rate(self) -> float:
@@ -65,7 +68,7 @@ class ValidationResult:
         else:
             self.valid_items += 1
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> object:
         """Convert result to dictionary representation."""
         return {
             "total_items": self.total_items,
@@ -125,7 +128,7 @@ class BaseAuditor(ABC):
     def audit(self, files: list[Path]) -> ValidationResult:
         """Perform the audit operation on given files."""
 
-    def get_summary(self) -> dict[str, Any]:
+    def get_summary(self) -> object:
         """Get a summary of the audit results."""
         return {
             "auditor": self.name,
@@ -152,7 +155,7 @@ class BaseValidator(ABC):
         self.name = name
         self.results: ValidationResult | None = None
 
-    def validate(self, items: list[t.GeneralValueType]) -> ValidationResult:
+    def validate(self, items: list[object]) -> ValidationResult:
         """Perform validation on given items."""
         self.results = ValidationResult()
         self.results.total_items = len(items)
@@ -162,10 +165,10 @@ class BaseValidator(ABC):
         return self.results
 
     @abstractmethod
-    def _validate_items(self, items: list[t.GeneralValueType]) -> None:
+    def _validate_items(self, items: list[object]) -> None:
         """Implementation-specific validation logic."""
 
-    def get_summary(self) -> dict[str, Any]:
+    def get_summary(self) -> object:
         """Get a summary of validation results."""
         if not self.results:
             return {"validator": self.name, "status": "not_run"}
@@ -194,14 +197,14 @@ class BaseReporter(ABC):
         self.template_dir = template_dir or Path(__file__).parent.parent / "templates"
 
     @abstractmethod
-    def generate_report(self, data: dict[str, Any], output_format: str = "html") -> str:
+    def generate_report(self, data: object, output_format: str = "html") -> str:
         """Generate a report from the given data."""
 
     def save_report(self, content: str, filename: str, output_dir: Path) -> Path:
         """Save report content to a file."""
         output_dir.mkdir(parents=True, exist_ok=True)
         filepath = output_dir / f"{filename}.html"
-        filepath.write_text(content, encoding="utf-8")
+        _ = filepath.write_text(content, encoding="utf-8")
         return filepath
 
 
@@ -214,9 +217,9 @@ class BaseAnalyzer(ABC):
     def __init__(self, name: str) -> None:
         """Initialize the analyzer base class with a name."""
         self.name = name
-        self.metrics: dict[str, Any] = {}
+        self.metrics: object = {}
 
-    def analyze(self, content: str, filepath: Path | None = None) -> dict[str, Any]:
+    def analyze(self, content: str, filepath: Path | None = None) -> object:
         """Analyze the given content and return metrics."""
         self.metrics = {
             "analyzer": self.name,
@@ -239,21 +242,23 @@ class BaseAnalyzer(ABC):
 
     def get_score(self) -> float | None:
         """Get a quality score from the analysis (0-100)."""
-        return self.metrics.get("quality_score")
+        val = self.metrics.get("quality_score")
+        return float(val) if isinstance(val, (int, float)) else None
 
     def get_readability_score(self) -> float | None:
         """Get a readability score from the analysis."""
-        return self.metrics.get("readability_score")
+        val = self.metrics.get("readability_score")
+        return float(val) if isinstance(val, (int, float)) else None
 
 
-class ConfigProtocol(Protocol):
+class Config(Protocol):
     """Protocol for configuration objects."""
 
-    def get(self, key: str, default: object | None = None) -> object | None:
+    def get(self, key: str, default: object | None = None) -> object:
         """Get a configuration value."""
         ...
 
-    def __getitem__(self, key: str) -> object | None:
+    def __getitem__(self, key: str) -> object:
         """Get a configuration value with bracket notation."""
         ...
 
@@ -284,7 +289,7 @@ class FileMetadata:
             # If we can't read the file, keep defaults (file not accessible or not text)
             pass
 
-    def to_dict(self) -> dict[str, Any]:
+    def to_dict(self) -> object:
         """Convert metadata to dictionary."""
         return {
             "path": str(self.path),

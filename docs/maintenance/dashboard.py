@@ -4,17 +4,16 @@ Real-time monitoring dashboard for documentation quality metrics.
 Provides web interface to view audit results, trends, and quality scores.
 """
 
+from __future__ import annotations
+
 import argparse
 import json
-import logging
 import operator
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
 
 from flask import Flask, Response, jsonify, render_template_string, request
-
-logger = logging.getLogger(__name__)
+from flext_core import FlextLogger
 
 
 class DocumentationDashboard:
@@ -24,13 +23,19 @@ class DocumentationDashboard:
         """Initialize documentation dashboard with reports directory."""
         self.reports_dir = Path(reports_dir)
         self.app = Flask(__name__)
+        self._logger_instance: FlextLogger = FlextLogger.create_module_logger(__name__)
         self.setup_routes()
+
+    @property
+    def logger(self) -> FlextLogger:
+        """Return the module logger."""
+        return self._logger_instance
 
     def setup_routes(self) -> None:
         """Setup Flask routes for the dashboard."""
 
         @self.app.route("/")
-        def index() -> Response:
+        def index() -> str:
             """Main dashboard page."""
             return render_template_string(self.get_dashboard_html())
 
@@ -51,7 +56,7 @@ class DocumentationDashboard:
             limit = int(request.args.get("limit", 10))
             return jsonify(self.get_recent_reports(limit))
 
-    def get_current_metrics(self) -> dict[str, Any]:
+    def get_current_metrics(self) -> object:
         """Get current quality metrics from latest audit."""
         latest_audit = self.reports_dir / "latest_audit.json"
 
@@ -89,11 +94,11 @@ class DocumentationDashboard:
                 "status": f"Error: {e!s}",
             }
 
-    def get_quality_trends(self, days: int = 30) -> dict[str, Any]:
+    def get_quality_trends(self, days: int = 30) -> object:
         """Get quality trends over the specified number of days."""
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
 
-        trend_data = []
+        trend_data: list[object] = []
         reports_dir = self.reports_dir
 
         # Find all audit reports
@@ -111,27 +116,29 @@ class DocumentationDashboard:
                 if report_date >= cutoff_date:
                     with Path(report_file).open(encoding="utf-8") as f:
                         data = json.load(f)
-                        trend_data.append({
-                            "date": report_date.isoformat(),
-                            "quality_score": data.get("metrics", {}).get(
-                                "quality_score",
-                                0,
-                            ),
-                            "total_issues": data.get("metrics", {}).get(
-                                "total_issues",
-                                0,
-                            ),
-                            "critical_issues": data
-                            .get("metrics", {})
-                            .get("severity_breakdown", {})
-                            .get("critical", 0),
-                            "high_issues": data
-                            .get("metrics", {})
-                            .get("severity_breakdown", {})
-                            .get("high", 0),
-                        })
+                    trend_data.append({
+                        "date": report_date.isoformat(),
+                        "quality_score": data.get("metrics", {}).get(
+                            "quality_score",
+                            0,
+                        ),
+                        "total_issues": data.get("metrics", {}).get(
+                            "total_issues",
+                            0,
+                        ),
+                        "critical_issues": data
+                        .get("metrics", {})
+                        .get("severity_breakdown", {})
+                        .get("critical", 0),
+                        "high_issues": data
+                        .get("metrics", {})
+                        .get("severity_breakdown", {})
+                        .get("high", 0),
+                    })
             except Exception as e:
-                logger.warning("Failed to process trend data: %s", e)
+                self._logger_instance.warning(
+                    "Failed to process trend data: %s", str(e)
+                )
                 continue
 
         # Sort by date
@@ -143,9 +150,9 @@ class DocumentationDashboard:
             "trends": trend_data,
         }
 
-    def get_recent_reports(self, limit: int = 10) -> list:
+    def get_recent_reports(self, limit: int = 10) -> list[object]:
         """Get list of recent audit reports."""
-        reports = []
+        reports: list[object] = []
 
         for report_file in self.reports_dir.glob("audit_report_*.json"):
             try:
@@ -168,7 +175,9 @@ class DocumentationDashboard:
                     "files_analyzed": data.get("files_analyzed", 0),
                 })
             except Exception as e:
-                logger.warning("Failed to process report file: %s", e)
+                self._logger_instance.warning(
+                    "Failed to process report file: %s", str(e)
+                )
                 continue
 
         # Sort by date descending and limit
@@ -510,10 +519,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="FLEXT Quality Documentation Dashboard",
     )
-    parser.add_argument("--host", default="localhost", help="Host to bind to")
-    parser.add_argument("--port", type=int, default=8080, help="Port to bind to")
-    parser.add_argument("--debug", action="store_true", help="Enable debug mode")
-    parser.add_argument(
+    _ = parser.add_argument("--host", default="localhost", help="Host to bind to")
+    _ = parser.add_argument("--port", type=int, default=8080, help="Port to bind to")
+    _ = parser.add_argument("--debug", action="store_true", help="Enable debug mode")
+    _ = parser.add_argument(
         "--reports-dir",
         default="docs/maintenance/reports/",
         help="Directory containing audit reports",

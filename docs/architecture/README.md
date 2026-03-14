@@ -100,7 +100,7 @@ enabling automated quality assessment, scoring, and reporting across enterprise 
 
 - **Clean Architecture**: Clear separation of concerns with domain-first design
 - **Domain-Driven Design (DDD)**: Rich domain model with entities, value objects, and domain services
-- **Railway-Oriented Programming**: Functional error handling with `FlextResult[T]` patterns
+- **Railway-Oriented Programming**: Functional error handling with `r[T]` patterns
 - **FLEXT Ecosystem Integration**: Native integration with flext-core, flext-cli, flext-web, and flext-observability
 
 ## 🏗️ Architecture Documentation Structure
@@ -140,7 +140,7 @@ Person(architect, "Software Architect", "Makes architectural decisions and revie
 
 System(flext_quality, "FLEXT Quality", "Code quality analysis and metrics collection library")
 
-System_Ext(flext_core, "FLEXT Core", "Foundation library providing FlextResult, FlextContainer, FlextModels")
+System_Ext(flext_core, "FLEXT Core", "Foundation library providing r, FlextContainer, FlextModels")
 System_Ext(flext_cli, "FLEXT CLI", "Command-line interface framework")
 System_Ext(flext_web, "FLEXT Web", "Web application framework")
 System_Ext(flext_observability, "FLEXT Observability", "Monitoring and metrics collection")

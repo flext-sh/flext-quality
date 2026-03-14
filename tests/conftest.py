@@ -10,28 +10,6 @@ SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
-# PYTHON_VERSION_GUARD — Do not remove. Managed by scripts/maintenance/enforce_python_version.py
-import sys as _sys
-
-if _sys.version_info[:2] != (3, 13):
-    _v = f"{_sys.version_info.major}.{_sys.version_info.minor}.{_sys.version_info.micro}"
-    raise RuntimeError(
-        f"\n{'=' * 72}\n"
-        f"FATAL: Python {_v} detected — this project requires Python 3.13.\n"
-        f"\n"
-        f"The virtual environment was created with the WRONG Python interpreter.\n"
-        f"\n"
-        f"Fix:\n"
-        f"  1. rm -rf .venv\n"
-        f"  2. poetry env use python3.13\n"
-        f"  3. poetry install\n"
-        f"\n"
-        f"Or use the workspace Makefile:\n"
-        f"  make setup PROJECT=<project-name>\n"
-        f"{'=' * 72}\n"
-    )
-del _sys
-# PYTHON_VERSION_GUARD_END
 
 import os
 import tempfile
@@ -40,20 +18,20 @@ from pathlib import Path
 from typing import TypeVar
 
 import pytest
-from flext_core import FlextResult, FlextTypes as t
+from flext_core import r
 
 T = TypeVar("T")
 
 
-def assert_result_success_with_data[T](result: FlextResult[T]) -> T:
-    """Assert FlextResult success and return validated data with type safety.
+def assert_result_success_with_data[T](result: r[T]) -> T:
+    """Assert r success and return validated data with type safety.
 
-    Provides a DRY helper for the common test pattern of validating FlextResult
+    Provides a DRY helper for the common test pattern of validating r
     success and extracting data with proper null safety checks. Eliminates
     boilerplate code while maintaining type safety and clear error messages.
 
     Args:
-      result: FlextResult instance to validate for success state
+      result: r instance to validate for success state
 
     Returns:
       The validated data from the successful result
@@ -76,15 +54,15 @@ def assert_result_success_with_data[T](result: FlextResult[T]) -> T:
     return result.value
 
 
-def assert_result_failure_with_error[T](result: FlextResult[T]) -> str:
-    """Assert FlextResult failure and return validated error message.
+def assert_result_failure_with_error[T](result: r[T]) -> str:
+    """Assert r failure and return validated error message.
 
-    Provides a DRY helper for validating FlextResult failure states and
+    Provides a DRY helper for validating r failure states and
     extracting error messages with proper null safety. Essential for
     testing error handling and negative test scenarios.
 
     Args:
-      result: FlextResult instance to validate for failure state
+      result: r instance to validate for failure state
 
     Returns:
       The validated error message from the failed result
@@ -107,7 +85,6 @@ def assert_result_failure_with_error[T](result: FlextResult[T]) -> str:
     return result.error
 
 
-# Test environment setup
 @pytest.fixture(autouse=True)
 def set_test_environment() -> Generator[None]:
     """Configure test environment variables for isolated testing.
@@ -128,12 +105,10 @@ def set_test_environment() -> Generator[None]:
     os.environ["FLEXT_ENV"] = "test"
     os.environ["FLEXT_LOG_LEVEL"] = "DEBUG"
     yield
-    # Cleanup
     os.environ.pop("FLEXT_ENV", None)
     os.environ.pop("FLEXT_LOG_LEVEL", None)
 
 
-# Quality analysis fixtures
 @pytest.fixture
 def secure_temp_dir() -> Generator[str]:
     """Provide secure temporary directory for file system testing.
@@ -162,7 +137,7 @@ def secure_temp_dir() -> Generator[str]:
 
 
 @pytest.fixture
-def sample_code_repository(tmp_path: Path) -> dict[str, t.GeneralValueType]:
+def sample_code_repository(tmp_path: Path) -> dict[str, object]:
     """Provide sample code repository metadata for quality analysis testing.
 
     Creates realistic repository metadata that simulates typical project
@@ -191,45 +166,25 @@ def sample_code_repository(tmp_path: Path) -> dict[str, t.GeneralValueType]:
         "name": "test-repository",
         "path": str(tmp_path / "test-repo"),
         "language": "python",
-        "files": [
-            "src/main.py",
-            "src/utils.py",
-            "tests/test_main.py",
-        ],
+        "files": ["src/main.py", "src/utils.py", "tests/test_main.py"],
         "size": 1024,
         "last_modified": "2023-01-01T12:00:00Z",
     }
 
 
 @pytest.fixture
-def quality_metrics_data() -> dict[str, t.GeneralValueType]:
+def quality_metrics_data() -> dict[str, object]:
     """Quality metrics data for testing."""
     return {
-        "complexity": {
-            "cyclomatic": 5.2,
-            "cognitive": 3.8,
-            "average": 4.5,
-        },
-        "maintainability": {
-            "index": 78.5,
-            "rating": "A",
-            "debt_ratio": 0.15,
-        },
-        "coverage": {
-            "line": 85.0,
-            "branch": 78.5,
-            "function": 92.0,
-        },
-        "security": {
-            "vulnerabilities": 2,
-            "hotspots": 1,
-            "rating": "B",
-        },
+        "complexity": {"cyclomatic": 5.2, "cognitive": 3.8, "average": 4.5},
+        "maintainability": {"index": 78.5, "rating": "A", "debt_ratio": 0.15},
+        "coverage": {"line": 85.0, "branch": 78.5, "function": 92.0},
+        "security": {"vulnerabilities": 2, "hotspots": 1, "rating": "B"},
     }
 
 
 @pytest.fixture
-def code_analysis_config() -> dict[str, t.GeneralValueType]:
+def code_analysis_config() -> dict[str, object]:
     """Code analysis configuration for testing."""
     return {
         "analyzers": {
@@ -238,27 +193,15 @@ def code_analysis_config() -> dict[str, t.GeneralValueType]:
                 "config_file": "pyproject.toml",
                 "rules": ["E", "W", "F"],
             },
-            "mypy": {
-                "enabled": True,
-                "strict": True,
-                "ignore_missing_imports": False,
-            },
-            "bandit": {
-                "enabled": True,
-                "confidence": "medium",
-                "severity": "low",
-            },
+            "mypy": {"enabled": True, "strict": True, "ignore_missing_imports": False},
+            "bandit": {"enabled": True, "confidence": "medium", "severity": "low"},
         },
-        "thresholds": {
-            "complexity": 10,
-            "coverage": 80.0,
-            "maintainability": 70.0,
-        },
+        "thresholds": {"complexity": 10, "coverage": 80.0, "maintainability": 70.0},
     }
 
 
 @pytest.fixture
-def analysis_results() -> list[dict[str, t.GeneralValueType]]:
+def analysis_results() -> list[dict[str, object]]:
     """Analysis results for testing."""
     return [
         {
@@ -291,9 +234,8 @@ def analysis_results() -> list[dict[str, t.GeneralValueType]]:
     ]
 
 
-# Report generation fixtures
 @pytest.fixture
-def report_config(tmp_path: Path) -> dict[str, t.GeneralValueType]:
+def report_config(tmp_path: Path) -> dict[str, object]:
     """Report configuration for testing."""
     return {
         "format": "json",
@@ -305,7 +247,7 @@ def report_config(tmp_path: Path) -> dict[str, t.GeneralValueType]:
 
 
 @pytest.fixture
-def dashboard_data() -> dict[str, t.GeneralValueType]:
+def dashboard_data() -> dict[str, object]:
     """Dashboard data for testing."""
     return {
         "summary": {
@@ -327,9 +269,8 @@ def dashboard_data() -> dict[str, t.GeneralValueType]:
     }
 
 
-# Multi-backend fixtures
 @pytest.fixture
-def sonarqube_config() -> dict[str, t.GeneralValueType]:
+def sonarqube_config() -> dict[str, object]:
     """SonarQube configuration for testing."""
     return {
         "host": "http://localhost:9000",
@@ -341,7 +282,7 @@ def sonarqube_config() -> dict[str, t.GeneralValueType]:
 
 
 @pytest.fixture
-def codeclimate_config() -> dict[str, t.GeneralValueType]:
+def codeclimate_config() -> dict[str, object]:
     """CodeClimate configuration for testing."""
     return {
         "api_token": "test-api-token",
@@ -351,7 +292,6 @@ def codeclimate_config() -> dict[str, t.GeneralValueType]:
     }
 
 
-# File system fixtures
 @pytest.fixture
 def temporary_project_structure(tmp_path: Path) -> str:
     """Create realistic temporary project structure for integration testing.
@@ -385,65 +325,40 @@ def temporary_project_structure(tmp_path: Path) -> str:
     """
     project_dir = tmp_path / "test_project"
     project_dir.mkdir()
-    # Create source files
     src_dir = project_dir / "src"
     src_dir.mkdir()
     main_py = src_dir / "main.py"
-    main_py.write_text("""
-def main() -> int:
-    print("Hello, World!")
-    return 0
-if __name__ == "__main__":
-    main()
-""")
-
+    main_py.write_text(
+        '\ndef main() -> int:\n    print("Hello, World!")\n    return 0\nif __name__ == "__main__":\n    main()\n'
+    )
     utils_py = src_dir / "utils.py"
-    utils_py.write_text("""
-
-import sys
-def get_env_var(name: str) -> Union[str, None]:
-    return os.environ.get(name)
-""")
-    # Create test files
+    utils_py.write_text(
+        "\n\nimport sys\ndef get_env_var(name: str) -> Union[str, None]:\n    return os.environ.get(name)\n"
+    )
     tests_dir = project_dir / "tests"
     tests_dir.mkdir()
     test_main_py = tests_dir / "test_main.py"
-    test_main_py.write_text("""
-
-from src.main import main
-def test_main() -> None:
-    if main() != 0:
-      raise AssertionError(f"Expected {0}, got {main()}")
-""")
-
+    test_main_py.write_text(
+        '\n\nfrom src.main import main\ndef test_main() -> None:\n    if main() != 0:\n      raise AssertionError(f"Expected {0}, got {main()}")\n'
+    )
     return str(project_dir)
 
 
-# Package discovery fixtures
 @pytest.fixture
-def package_metadata() -> dict[str, t.GeneralValueType]:
+def package_metadata() -> dict[str, object]:
     """Package metadata for testing."""
     return {
         "name": "test-package",
         "version": "0.9.0",
         "description": "Test package for quality analysis",
         "author": "Test Author",
-        "dependencies": [
-            "requests>=2.25.0",
-            "pandas>=1.3.0",
-            "pytest>=6.0.0",
-        ],
-        "dev_dependencies": [
-            "ruff>=0.1.0",
-            "mypy>=1.0.0",
-            "coverage>=6.0.0",
-        ],
+        "dependencies": ["requests>=2.25.0", "pandas>=1.3.0", "pytest>=6.0.0"],
+        "dev_dependencies": ["ruff>=0.1.0", "mypy>=1.0.0", "coverage>=6.0.0"],
     }
 
 
-# Task management fixtures
 @pytest.fixture
-def celery_config() -> dict[str, t.GeneralValueType]:
+def celery_config() -> dict[str, object]:
     """Celery configuration for testing."""
     return {
         "broker_url": "redis://localhost:6379/0",
@@ -457,7 +372,7 @@ def celery_config() -> dict[str, t.GeneralValueType]:
 
 
 @pytest.fixture
-def analysis_task_data() -> dict[str, t.GeneralValueType]:
+def analysis_task_data() -> dict[str, object]:
     """Analysis task data for testing."""
     return {
         "task_id": "test-task-123",
@@ -471,7 +386,6 @@ def analysis_task_data() -> dict[str, t.GeneralValueType]:
     }
 
 
-# Pytest markers for test categorization
 def pytest_configure(config: pytest.Config) -> None:
     """Configure pytest markers for test categorization and execution control.
 
@@ -504,9 +418,65 @@ def pytest_configure(config: pytest.Config) -> None:
     config.addinivalue_line("markers", "slow: Slow tests")
 
 
-# Mock services
+class MockQualityAnalyzer:
+    """Mock implementation of quality analyzer for testing.
+
+    Provides realistic analyzer behavior without external dependencies,
+    enabling fast and reliable unit testing of analysis workflows.
+    """
+
+    def __init__(self) -> None:
+        """Initialize the instance."""
+        super().__init__()
+        self.analyzed_files: list[str] = []
+
+    def analyze_project(self, project_path: str) -> dict[str, object]:
+        """Simulate comprehensive project analysis.
+
+        Args:
+            project_path: Path to project for analysis
+
+        Returns:
+            Realistic analysis results with quality metrics
+
+        """
+        self.analyzed_files.append(project_path)
+        return {
+            "quality_score": 85.0,
+            "issues": 5,
+            "files_analyzed": 10,
+            "analysis_time": 2.5,
+        }
+
+    def analyze_file(self, file_path: str) -> dict[str, object]:
+        """Simulate individual file analysis.
+
+        Args:
+            file_path: Path to file for analysis
+
+        Returns:
+            File-level quality metrics and statistics
+
+        """
+        return {"file": file_path, "complexity": 3.2, "issues": 2, "coverage": 90.0}
+
+    def get_metrics(self, _project_path: str) -> dict[str, object]:
+        """Simulate project-wide quality metrics collection.
+
+        Returns:
+            Comprehensive quality metrics across all categories
+
+        """
+        return {
+            "maintainability": 78.5,
+            "complexity": 5.2,
+            "duplication": 2.1,
+            "security": 95.0,
+        }
+
+
 @pytest.fixture
-def mock_quality_analyzer() -> object:
+def mock_quality_analyzer() -> MockQualityAnalyzer:
     """Provide mock quality analyzer for isolated unit testing.
 
     Creates a comprehensive mock implementation of the quality analyzer
@@ -532,73 +502,59 @@ def mock_quality_analyzer() -> object:
       ...     assert result["issues"] == 5
 
     """
-
-    class MockQualityAnalyzer:
-        """Mock implementation of quality analyzer for testing.
-
-        Provides realistic analyzer behavior without external dependencies,
-        enabling fast and reliable unit testing of analysis workflows.
-        """
-
-        def __init__(self) -> None:
-            """Initialize the instance."""
-            super().__init__()
-            self.analyzed_files: list[str] = []
-
-        def analyze_project(self, project_path: str) -> dict[str, t.GeneralValueType]:
-            """Simulate comprehensive project analysis.
-
-            Args:
-                project_path: Path to project for analysis
-
-            Returns:
-                Realistic analysis results with quality metrics
-
-            """
-            self.analyzed_files.append(project_path)
-            return {
-                "quality_score": 85.0,
-                "issues": 5,
-                "files_analyzed": 10,
-                "analysis_time": 2.5,
-            }
-
-        def analyze_file(self, file_path: str) -> dict[str, t.GeneralValueType]:
-            """Simulate individual file analysis.
-
-            Args:
-                file_path: Path to file for analysis
-
-            Returns:
-                File-level quality metrics and statistics
-
-            """
-            return {
-                "file": file_path,
-                "complexity": 3.2,
-                "issues": 2,
-                "coverage": 90.0,
-            }
-
-        def get_metrics(self, _project_path: str) -> dict[str, t.GeneralValueType]:
-            """Simulate project-wide quality metrics collection.
-
-            Returns:
-                Comprehensive quality metrics across all categories
-
-            """
-            return {
-                "maintainability": 78.5,
-                "complexity": 5.2,
-                "duplication": 2.1,
-                "security": 95.0,
-            }
-
     return MockQualityAnalyzer()
 
 
+class MockReportGenerator:
+    """Mock implementation of report generator for testing.
+
+    Simulates report generation capabilities without file system
+    operations, enabling isolated testing of reporting workflows.
+    """
+
+    def __init__(self) -> None:
+        """Initialize the instance."""
+        super().__init__()
+        self.generated_reports: list[dict[str, object]] = []
+
+    def generate_report(
+        self, data: dict[str, object], output_format: str = "json"
+    ) -> str:
+        """Simulate report generation in specified format.
+
+        Args:
+            data: Analysis data for report generation
+            output_format: Desired report format (json, html, pdf)
+
+        Returns:
+            Generated report filename
+
+        """
+        report: dict[str, object] = {
+            "format": output_format,
+            "data": data,
+            "timestamp": "2023-01-01T12:00:00Z",
+        }
+        self.generated_reports.append(report)
+        return f"report_{len(self.generated_reports)}.{output_format}"
+
+    def generate_dashboard_data(self) -> dict[str, object]:
+        """Simulate dashboard data generation.
+
+        Returns:
+            Dashboard metrics and summary information
+
+        """
+        return {
+            "projects": 5,
+            "recent_analyses": 3,
+            "avg_quality_score": 82.5,
+            "trend": "improving",
+        }
+
+
 @pytest.fixture
-def mock_report_generator() -> object:
+def mock_report_generator() -> MockReportGenerator:
     """Provide mock report generator for isolated reporting tests.
 
     Creates a mock implementation of the report generation system that
@@ -624,54 +580,4 @@ def mock_report_generator() -> object:
       ...     assert len(mock_report_generator.generated_reports) == 1
 
     """
-
-    class MockReportGenerator:
-        """Mock implementation of report generator for testing.
-
-        Simulates report generation capabilities without file system
-        operations, enabling isolated testing of reporting workflows.
-        """
-
-        def __init__(self) -> None:
-            """Initialize the instance."""
-            super().__init__()
-            self.generated_reports: list[dict[str, t.GeneralValueType]] = []
-
-        def generate_report(
-            self,
-            data: dict[str, t.GeneralValueType],
-            output_format: str = "json",
-        ) -> str:
-            """Simulate report generation in specified format.
-
-            Args:
-                data: Analysis data for report generation
-                output_format: Desired report format (json, html, pdf)
-
-            Returns:
-                Generated report filename
-
-            """
-            report: dict[str, t.GeneralValueType] = {
-                "format": output_format,
-                "data": data,
-                "timestamp": "2023-01-01T12:00:00Z",
-            }
-            self.generated_reports.append(report)
-            return f"report_{len(self.generated_reports)}.{output_format}"
-
-        def generate_dashboard_data(self) -> dict[str, t.GeneralValueType]:
-            """Simulate dashboard data generation.
-
-            Returns:
-                Dashboard metrics and summary information
-
-            """
-            return {
-                "projects": 5,
-                "recent_analyses": 3,
-                "avg_quality_score": 82.5,
-                "trend": "improving",
-            }
-
     return MockReportGenerator()

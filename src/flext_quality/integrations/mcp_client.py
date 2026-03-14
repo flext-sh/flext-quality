@@ -9,32 +9,30 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import json
 import shutil
-from dataclasses import dataclass
-from typing import final
+from collections.abc import Mapping
+from typing import Annotated, final
 
-from flext_core import FlextResult as r
+from flext_core import r
+from pydantic import BaseModel, Field, TypeAdapter
 
-from flext_quality.constants import FlextQualityConstants as c
+from flext_quality import c
 
 
-@dataclass(frozen=True)
-class McpToolCall:
-    """Represents a call to an MCP server tool."""
+class McpToolCall(BaseModel):
+    """MCP tool invocation request contract."""
 
     server: str
     tool: str
-    params: dict[str, object]
+    params: Annotated[dict[str, object], Field(default_factory=dict)]
 
 
-@dataclass(frozen=True)
-class McpToolResult:
-    """Result from an MCP tool call."""
+class McpToolResult(BaseModel):
+    """MCP tool invocation response contract."""
 
     success: bool
-    data: dict[str, object] | list[dict[str, object]] | None
-    error: str | None
+    data: dict[str, str] | None = None
+    error: str | None = None
 
 
 @final
@@ -45,63 +43,59 @@ class FlextQualityMcpClient:
     Provides unified error handling and result parsing.
     """
 
-    def __init__(
-        self,
-        *,
-        timeout_ms: int | None = None,
-    ) -> None:
+    def __init__(self, *, timeout_ms: int | None = None) -> None:
         """Initialize the MCP client."""
         self._timeout_ms = timeout_ms or c.Quality.Defaults.MCP_TIMEOUT_MS
+
+    def build_call_command(self, call: McpToolCall) -> r[list[str]]:
+        """Build the mcp-cli command for a tool call."""
+        if not self.is_mcp_cli_available():
+            return r[list[str]].fail("mcp-cli not found in PATH")
+        tool_path = f"{call.server}/{call.tool}"
+        params_json = (
+            TypeAdapter(dict[str, object]).dump_json(call.params).decode("utf-8")
+        )
+        return r[list[str]].ok(["mcp-cli", "call", tool_path, params_json])
+
+    def build_info_command(self, server: str, tool: str) -> r[list[str]]:
+        """Build the mcp-cli info command for a tool."""
+        if not self.is_mcp_cli_available():
+            return r[list[str]].fail("mcp-cli not found in PATH")
+        tool_path = f"{server}/{tool}"
+        return r[list[str]].ok(["mcp-cli", "info", tool_path])
+
+    def build_tool_call(
+        self, server: str, tool: str, params: object | None = None
+    ) -> r[McpToolCall]:
+        """Build an MCP tool call request."""
+        call_params: dict[str, object] = {}
+        if isinstance(params, Mapping):
+            validated_params = TypeAdapter(dict[str, object]).validate_python(params)
+            call_params = dict(validated_params)
+        return r[McpToolCall].ok(
+            McpToolCall(server=server, tool=tool, params=call_params)
+        )
+
+    def health_check(self) -> r[Mapping[str, object]]:
+        """Check if MCP infrastructure is available."""
+        available = self.is_mcp_cli_available()
+        status = (
+            c.Quality.IntegrationStatus.CONNECTED
+            if available
+            else c.Quality.IntegrationStatus.DISCONNECTED
+        )
+        return r[Mapping[str, object]].ok({
+            "status": status,
+            "available": available,
+            "mcp_cli": available,
+            "timeout_ms": self._timeout_ms,
+        })
 
     def is_mcp_cli_available(self) -> bool:
         """Check if mcp-cli is available in PATH."""
         return shutil.which("mcp-cli") is not None
 
-    def build_tool_call(
-        self,
-        server: str,
-        tool: str,
-        params: dict[str, object] | None = None,
-    ) -> r[McpToolCall]:
-        """Build an MCP tool call request."""
-        return r[McpToolCall].ok(
-            McpToolCall(
-                server=server,
-                tool=tool,
-                params=params or {},
-            )
-        )
-
-    def build_call_command(
-        self,
-        call: McpToolCall,
-    ) -> r[list[str]]:
-        """Build the mcp-cli command for a tool call."""
-        if not self.is_mcp_cli_available():
-            return r[list[str]].fail("mcp-cli not found in PATH")
-
-        tool_path = f"{call.server}/{call.tool}"
-        params_json = json.dumps(call.params)
-
-        return r[list[str]].ok(["mcp-cli", "call", tool_path, params_json])
-
-    def build_info_command(
-        self,
-        server: str,
-        tool: str,
-    ) -> r[list[str]]:
-        """Build the mcp-cli info command for a tool."""
-        if not self.is_mcp_cli_available():
-            return r[list[str]].fail("mcp-cli not found in PATH")
-
-        tool_path = f"{server}/{tool}"
-        return r[list[str]].ok(["mcp-cli", "info", tool_path])
-
-    def parse_result(
-        self,
-        output: str,
-        exit_code: int,
-    ) -> r[McpToolResult]:
+    def parse_result(self, output: str, exit_code: int) -> r[McpToolResult]:
         """Parse the output from an mcp-cli call."""
         if exit_code != 0:
             return r[McpToolResult].ok(
@@ -111,54 +105,43 @@ class FlextQualityMcpClient:
                     error=output or f"Command failed with exit code {exit_code}",
                 )
             )
-
         try:
-            data = json.loads(output)
-            if isinstance(data, dict):
-                return r[McpToolResult].ok(
-                    McpToolResult(
-                        success=True,
-                        data=data,
-                        error=None,
-                    )
-                )
-            if isinstance(data, list):
-                return r[McpToolResult].ok(
-                    McpToolResult(
-                        success=True,
-                        data=data,
-                        error=None,
-                    )
-                )
+            parsed = TypeAdapter(dict[str, object]).validate_json(output)
+            result_data: dict[str, str] = {str(k): str(v) for k, v in parsed.items()}
             return r[McpToolResult].ok(
                 McpToolResult(
                     success=True,
-                    data={"value": data},
+                    data=result_data,
                     error=None,
                 )
             )
-        except json.JSONDecodeError:
-            # Return raw output as data if not valid JSON
-            return r[McpToolResult].ok(
-                McpToolResult(
-                    success=True,
-                    data={"raw": output},
-                    error=None,
+        except ValueError:
+            try:
+                parsed_list = TypeAdapter(list[object]).validate_json(output)
+                coerced_data: list[dict[str, str]] = []
+                for item in parsed_list:
+                    if isinstance(item, Mapping):
+                        validated_item = TypeAdapter(dict[str, object]).validate_python(
+                            item
+                        )
+                        coerced_data.append({
+                            str(key): str(value)
+                            for key, value in validated_item.items()
+                        })
+                    else:
+                        coerced_data.append({"value": str(item)})
+                return r[McpToolResult].ok(
+                    McpToolResult(
+                        success=True,
+                        data={
+                            "items": TypeAdapter(list[dict[str, str]])
+                            .dump_json(coerced_data)
+                            .decode("utf-8")
+                        },
+                        error=None,
+                    )
                 )
-            )
-
-    def health_check(self) -> r[dict[str, object]]:
-        """Check if MCP infrastructure is available."""
-        available = self.is_mcp_cli_available()
-        status = (
-            c.Quality.IntegrationStatus.CONNECTED
-            if available
-            else c.Quality.IntegrationStatus.DISCONNECTED
-        )
-
-        return r[dict[str, object]].ok({
-            "status": status,
-            "available": available,
-            "mcp_cli": available,
-            "timeout_ms": self._timeout_ms,
-        })
+            except ValueError:
+                return r[McpToolResult].ok(
+                    McpToolResult(success=True, data={"raw": output}, error=None)
+                )

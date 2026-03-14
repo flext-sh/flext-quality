@@ -13,7 +13,7 @@ logs_dir: "docs/maintenance/logs/"
 schedules:
   daily_audit:
     enabled: true
-    time: "09:00"  # 9 AM daily
+    time: "09:00" # 9 AM daily
     description: "Daily quality audit for critical issues and basic validation"
     tasks:
       - "audit_quick"
@@ -22,7 +22,7 @@ schedules:
 
   daily_optimize:
     enabled: true
-    time: "02:00"  # 2 AM daily (off-peak hours)
+    time: "02:00" # 2 AM daily (off-peak hours)
     description: "Daily automatic optimization and formatting fixes"
     tasks:
       - "optimize_formatting"
@@ -31,7 +31,7 @@ schedules:
   weekly_comprehensive:
     enabled: true
     day: "monday"
-    time: "10:00"  # Monday 10 AM
+    time: "10:00" # Monday 10 AM
     description: "Weekly comprehensive audit with full validation and reporting"
     tasks:
       - "audit_comprehensive"
@@ -40,8 +40,8 @@ schedules:
 
   monthly_deep_clean:
     enabled: true
-    day: "1st"  # 1st of each month
-    time: "11:00"  # 11 AM on the 1st
+    day: "1st" # 1st of each month
+    time: "11:00" # 11 AM on the 1st
     description: "Monthly deep cleaning with comprehensive optimization and cleanup"
     tasks:
       - "audit_comprehensive"
@@ -114,7 +114,7 @@ tasks:
 
   cleanup_old_reports:
     description: "Clean up old report files older than 90 days"
-    command: "find docs/maintenance/reports/ -name \"*.json\" -mtime +90 -delete 2>/dev/null || true"
+    command: 'find docs/maintenance/reports/ -name "*.json" -mtime +90 -delete 2>/dev/null || true'
     timeout: 30
     critical: false
 
@@ -128,7 +128,7 @@ tasks:
 error_handling:
   max_retries: 3
   retry_delay_seconds: 60
-  fail_fast: false  # Continue with other tasks if one fails
+  fail_fast: false # Continue with other tasks if one fails
   notify_on_failure: true
   notification_channels: ["console", "slack"]
 
@@ -149,7 +149,7 @@ resource_limits:
 # Notification settings (integrates with notification_config.yaml)
 notifications:
   enabled: true
-  on_success: false  # Only notify on failures or critical issues
+  on_success: false # Only notify on failures or critical issues
   on_failure: true
   on_critical_issues: true
   summary_report: true
@@ -158,19 +158,19 @@ notifications:
 maintenance_windows:
   enabled: true
   allowed_days: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
-  allowed_hours_start: "01:00"  # 1 AM
-  allowed_hours_end: "06:00"    # 6 AM
-  skip_if_high_load: true       # Skip if system load is high
+  allowed_hours_start: "01:00" # 1 AM
+  allowed_hours_end: "06:00" # 6 AM
+  skip_if_high_load: true # Skip if system load is high
 
 # Health monitoring
 health_monitoring:
   enabled: true
   ping_interval_minutes: 60
-  alert_if_no_runs_for_hours: 25  # Alert if no maintenance runs for 25+ hours
+  alert_if_no_runs_for_hours: 25 # Alert if no maintenance runs for 25+ hours
   self_health_checks: true
 
 # Integration settings
 integrations:
-  systemd_service: false  # Set to true if running as systemd service
-  docker_container: false  # Set to true if running in Docker
-  kubernetes_cronjob: false  # Set to true if running as K8s CronJob
+  systemd_service: false # Set to true if running as systemd service
+  docker_container: false # Set to true if running in Docker
+  kubernetes_cronjob: false # Set to true if running as K8s CronJob

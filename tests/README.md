@@ -269,14 +269,13 @@ def test_should_do_something_when_condition():
 ### Test Data Management
 
 ```python
-
 # Test data builders for consistent test object creation
 class QualityProjectBuilder:
     def __init__(self):
         self._project = QualityProject(
             name="test-project",
             path="/test/path",
-            quality_thresholds={"min_score": 80.0}
+            quality_thresholds={"min_score": 80.0},
         )
 
     def with_name(self, name: str) -> "QualityProjectBuilder":
@@ -290,15 +289,12 @@ class QualityProjectBuilder:
 ### Mock Standards
 
 ```python
-
 # Consistent mocking patterns for external dependencies
 @pytest.fixture
 def mock_external_analyzer():
     """Mock external analysis tool for unit testing."""
     mock = Mock(spec=ExternalAnalyzerService)
-    mock.analyze_project.return_value = FlextResult[bool].ok(
-        create_test_analysis_result()
-    )
+    mock.analyze_project.return_value = r[bool].ok(create_test_analysis_result())
     return mock
 ```
 

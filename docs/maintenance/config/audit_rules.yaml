@@ -52,7 +52,7 @@ completeness_rules:
   # Required elements in documentation
   required_elements:
     - "code_examples": true
-    - "table_of_contents": false  # Only for files > 2000 words
+    - "table_of_contents": false # Only for files > 2000 words
     - "contact_information": false
 
 consistency_rules:

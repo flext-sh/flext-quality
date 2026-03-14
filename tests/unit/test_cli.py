@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from flext_quality.services.cli import FlextQualityCliService, main
+from flext_quality import FlextQualityCliService, main
 
 
 class TestFlextQualityCliService:
@@ -23,7 +23,7 @@ class TestFlextQualityCliService:
         assert service is not None
 
     def test_display_status_returns_result(self) -> None:
-        """Test display_status returns a FlextResult with dict."""
+        """Test display_status returns a r with dict."""
         service = FlextQualityCliService()
         result = service.display_status()
         assert result.is_success
@@ -63,7 +63,6 @@ class TestFlextQualityCliService:
         src_dir.mkdir()
         tests_dir = tmp_path / "tests"
         tests_dir.mkdir()
-
         service = FlextQualityCliService()
         result = service.build_validate_commands(tmp_path)
         assert result.is_success
@@ -79,7 +78,6 @@ class TestFlextQualityCliService:
         src_dir.mkdir()
         tests_dir = tmp_path / "tests"
         tests_dir.mkdir()
-
         service = FlextQualityCliService()
         result = service.build_validate_commands(tmp_path)
         assert result.is_success
@@ -93,7 +91,6 @@ class TestFlextQualityCliService:
         src_dir.mkdir()
         tests_dir = tmp_path / "tests"
         tests_dir.mkdir()
-
         service = FlextQualityCliService()
         result = service.build_validate_commands(tmp_path)
         assert result.is_success
@@ -132,7 +129,6 @@ class TestMainFunction:
         src_dir.mkdir()
         tests_dir = tmp_path / "tests"
         tests_dir.mkdir()
-
         sys.argv = ["flext-quality", "validate", str(tmp_path)]
         with pytest.raises(SystemExit) as exc_info:
             main()

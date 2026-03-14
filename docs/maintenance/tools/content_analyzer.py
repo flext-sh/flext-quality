@@ -5,15 +5,19 @@ Advanced content quality analysis including readability assessment,
 completeness checking, and structural validation for documentation.
 """
 
+from __future__ import annotations
+
 import json
 import re
 from collections import Counter
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import cast
 
 import yaml
-from flext_quality.typings import FlextQualityTypes
+
+_SubDict = Mapping[str, object]
 
 
 class ContentAnalyzer:
@@ -43,18 +47,38 @@ class ContentAnalyzer:
             config_path: Path to configuration file for content analysis rules.
 
         """
+        self.config: dict[str, object] = {}
         self.load_config(config_path)
-        self.results = {
+        quality_metrics: dict[str, object] = {}
+        content_scores: dict[str, object] = {}
+        readability_stats: dict[str, object] = {}
+        completeness_checks: dict[str, object] = {}
+        recommendations: list[object] = []
+        self.results: dict[str, object] = {
             "files_analyzed": 0,
-            "quality_metrics": {},
-            "content_scores": {},
-            "readability_stats": {},
-            "completeness_checks": {},
-            "recommendations": [],
+            "quality_metrics": quality_metrics,
+            "content_scores": content_scores,
+            "readability_stats": readability_stats,
+            "completeness_checks": completeness_checks,
+            "recommendations": recommendations,
         }
 
     def load_config(self, config_path: str | None) -> None:
         """Load content analysis configuration."""
+        if config_path is None:
+            self.config = {
+                "content_checks": {
+                    "check_freshness": True,
+                    "check_completeness": True,
+                    "check_readability": False,
+                },
+                "quality_thresholds": {
+                    "min_word_count": 100,
+                    "min_readability_score": 60,
+                    "max_age_days": 90,
+                },
+            }
+            return
         try:
             with Path(config_path).open(encoding="utf-8") as f:
                 self.config = yaml.safe_load(f)
@@ -72,21 +96,22 @@ class ContentAnalyzer:
                 },
             }
 
-    def analyze_file(self, file_path: Path) -> FlextQualityTypes.Core.AnalysisDict:
+    def analyze_file(self, file_path: Path) -> dict[str, object]:
         """Perform comprehensive content analysis on a single file."""
         try:
             content = file_path.read_text(encoding="utf-8")
             filename = str(file_path.relative_to(file_path.parents[2]))
-
-            analysis = {
+            issues_list: list[object] = []
+            suggestions_list: list[object] = []
+            analysis: dict[str, object] = {
                 "file": filename,
                 "metrics": self._calculate_content_metrics(content),
                 "readability": self._analyze_readability(content),
                 "structure": self._analyze_structure(content),
                 "completeness": self._check_completeness(content, filename),
-                "quality_score": 0,
-                "issues": [],
-                "suggestions": [],
+                "quality_score": 0.0,
+                "issues": issues_list,
+                "suggestions": suggestions_list,
             }
 
             # Calculate overall quality score
@@ -97,11 +122,16 @@ class ContentAnalyzer:
             analysis["suggestions"] = self._generate_suggestions(analysis)
 
             # Update global results
-            self.results["files_analyzed"] += 1
-            self.results["quality_metrics"][filename] = analysis["metrics"]
-            self.results["content_scores"][filename] = analysis["quality_score"]
-            self.results["readability_stats"][filename] = analysis["readability"]
-            self.results["completeness_checks"][filename] = analysis["completeness"]
+            files_count = int(self.results["files_analyzed"])
+            self.results["files_analyzed"] = files_count + 1
+            q_metrics = cast("dict[str, object]", self.results["quality_metrics"])
+            q_metrics[filename] = analysis["metrics"]
+            c_scores = cast("dict[str, object]", self.results["content_scores"])
+            c_scores[filename] = analysis["quality_score"]
+            r_stats = cast("dict[str, object]", self.results["readability_stats"])
+            r_stats[filename] = analysis["readability"]
+            c_checks = cast("dict[str, object]", self.results["completeness_checks"])
+            c_checks[filename] = analysis["completeness"]
 
             return analysis
 
@@ -117,7 +147,7 @@ class ContentAnalyzer:
     def _calculate_content_metrics(
         self,
         content: str,
-    ) -> FlextQualityTypes.Core.MetricsDict:
+    ) -> dict[str, object]:
         """Calculate basic content metrics."""
         # Word analysis
         words = re.findall(r"\b\w+\b", content)
@@ -182,7 +212,7 @@ class ContentAnalyzer:
             "code_to_content_ratio": code_lines / total_lines if total_lines > 0 else 0,
         }
 
-    def _analyze_readability(self, content: str) -> FlextQualityTypes.Core.MetricsDict:
+    def _analyze_readability(self, content: str) -> dict[str, object]:
         """Analyze content readability using various metrics."""
         words = re.findall(r"\b\w+\b", content)
         sentences = re.split(r"[.!?]+", content)
@@ -202,7 +232,7 @@ class ContentAnalyzer:
         reading_ease = (
             206.835 - (1.015 * avg_words_per_sentence) - (84.6 * avg_syllables_per_word)
         )
-        reading_ease = max(0, min(100, reading_ease))  # Clamp to 0-100
+        reading_ease = max(0.0, min(100.0, reading_ease))  # Clamp to 0-100
 
         # Automated Readability Index (simplified)
         grade_level = (
@@ -254,14 +284,16 @@ class ContentAnalyzer:
 
         return count
 
-    def _analyze_structure(self, content: str) -> FlextQualityTypes.Core.AnalysisDict:
+    def _analyze_structure(self, content: str) -> dict[str, object]:
         """Analyze document structure and organization."""
-        structure = {
+        sections_list: list[object] = []
+        depth_analysis_dict: dict[str, object] = {}
+        structure: dict[str, object] = {
             "has_table_of_contents": False,
-            "toc_position": None,
+            "toc_position": 0,
             "heading_hierarchy_valid": True,
-            "sections": [],
-            "depth_analysis": {},
+            "sections": sections_list,
+            "depth_analysis": depth_analysis_dict,
         }
 
         # Check for table of contents
@@ -275,11 +307,13 @@ class ContentAnalyzer:
             toc_match = re.search(pattern, content, re.MULTILINE)
             if toc_match:
                 structure["has_table_of_contents"] = True
-                structure["toc_position"] = content[: toc_match.start()].count("\n") + 1
+                structure["toc_position"] = (
+                    content[: toc_match.start()].count("\n")
+                ) + 1
                 break
 
         # Analyze heading hierarchy
-        headings = []
+        headings: list[dict[str, int | str]] = []
         for match in re.finditer(r"^(#{1,6})\s+(.+)$", content, re.MULTILINE):
             level = len(match.group(1))
             title = match.group(2).strip()
@@ -291,16 +325,18 @@ class ContentAnalyzer:
         # Check heading hierarchy
         if len(headings) > 1:
             for i in range(1, len(headings)):
-                if headings[i]["level"] > headings[i - 1]["level"] + 1:
+                cur_level = int(headings[i]["level"])
+                prev_level = int(headings[i - 1]["level"])
+                if cur_level > prev_level + 1:
                     structure["heading_hierarchy_valid"] = False
                     break
 
         # Analyze heading depth distribution
-        depths = [h["level"] for h in headings]
+        depths: list[int] = [int(h["level"]) for h in headings]
         structure["depth_analysis"] = {
             "max_depth": max(depths) if depths else 0,
-            "avg_depth": sum(depths) / len(depths) if depths else 0,
-            "depth_distribution": dict[str, Any](Counter(depths)),
+            "avg_depth": sum(int(x) for x in depths) / len(depths) if depths else 0,
+            "depth_distribution": dict(Counter(depths)),
         }
 
         return structure
@@ -309,19 +345,23 @@ class ContentAnalyzer:
         self,
         content: str,
         filename: str,
-    ) -> FlextQualityTypes.Core.AnalysisDict:
+    ) -> dict[str, object]:
         """Check documentation completeness based on file type and content."""
+        missing_elems: list[object] = []
+        required_present: list[object] = []
+        optional_present: list[object] = []
         completeness = {
             "score": 100,
-            "missing_elements": [],
-            "required_sections_present": [],
-            "optional_sections_present": [],
+            "missing_elements": missing_elems,
+            "required_sections_present": required_present,
+            "optional_sections_present": optional_present,
             "word_count_sufficient": True,
         }
 
         # Basic word count check
         word_count = len(re.findall(r"\b\w+\b", content))
-        min_words = self.config["quality_thresholds"]["min_word_count"]
+        thresholds = cast("_SubDict", self.config["quality_thresholds"])
+        min_words = int(thresholds["min_word_count"])
 
         if word_count < min_words:
             completeness["word_count_sufficient"] = False
@@ -379,9 +419,14 @@ class ContentAnalyzer:
         self,
         content: str,
         required_sections: list[str],
-    ) -> FlextQualityTypes.Core.AnalysisDict:
+    ) -> dict[str, object]:
         """Check for required sections in content."""
-        result = {"required_sections_present": [], "missing_required_sections": []}
+        required_present: list[object] = []
+        missing_required: list[object] = []
+        result = {
+            "required_sections_present": required_present,
+            "missing_required_sections": missing_required,
+        }
 
         for section_pattern in required_sections:
             patterns = section_pattern.split("|")
@@ -399,91 +444,95 @@ class ContentAnalyzer:
 
             if not found:
                 result["missing_required_sections"].append(section_pattern)
-                self.results["recommendations"].append(
-                    f"Add '{section_pattern}' section",
-                )
+                recommendations = cast("list[object]", self.results["recommendations"])
+                recommendations.append(f"Add '{section_pattern}' section")
 
         return result
 
     def _calculate_quality_score(
         self,
-        analysis: FlextQualityTypes.Core.AnalysisDict,
+        analysis: dict[str, object],
     ) -> float:
         """Calculate overall quality score for the content."""
         score = 100.0
 
-        metrics = analysis["metrics"]
-        readability = analysis["readability"]
-        completeness = analysis["completeness"]
+        metrics = cast("_SubDict", analysis["metrics"])
+        readability = cast("_SubDict", analysis["readability"])
+        completeness = cast("_SubDict", analysis["completeness"])
+        structure = cast("_SubDict", analysis["structure"])
 
         # Completeness score (major factor)
-        score -= (100 - completeness["score"]) * 0.5
+        score -= (100 - float(completeness["score"])) * 0.5
 
         # Readability score
-        if readability["readability_score"] < self.MIN_READABILITY_SCORE:
-            penalty = (
-                self.MIN_READABILITY_SCORE - readability["readability_score"]
-            ) * 0.3
+        readability_score = float(readability["readability_score"])
+        if readability_score < self.MIN_READABILITY_SCORE:
+            penalty = (self.MIN_READABILITY_SCORE - readability_score) * 0.3
             score -= min(penalty, 20)
 
         # Content metrics
-        if metrics["word_count"] < self.MIN_WORD_COUNT:
+        if int(metrics["word_count"]) < self.MIN_WORD_COUNT:
             score -= 10
 
-        if metrics["heading_count"] == 0:
+        if int(metrics["heading_count"]) == 0:
             score -= 15
 
-        if metrics["link_count"] == 0:
+        if int(metrics["link_count"]) == 0:
             score -= 5
 
         # Structure bonus
-        if analysis["structure"]["has_table_of_contents"]:
+        if structure["has_table_of_contents"]:
             score += 5
 
-        if analysis["structure"]["heading_hierarchy_valid"]:
+        if structure["heading_hierarchy_valid"]:
             score += 5
 
-        return max(0, min(100, score))
+        return max(0.0, min(100.0, score))
 
-    def _identify_issues(self, analysis: dict[str, Any]) -> list[dict[str, Any]]:
+    def _identify_issues(self, analysis: dict[str, object]) -> list[object]:
         """Identify content issues that need attention."""
-        issues = []
+        issues: list[object] = []
+
+        metrics = cast("_SubDict", analysis["metrics"])
+        readability = cast("_SubDict", analysis["readability"])
+        completeness = cast("_SubDict", analysis["completeness"])
+        structure = cast("_SubDict", analysis["structure"])
 
         # Completeness issues
-        if not analysis["completeness"]["word_count_sufficient"]:
+        if not completeness["word_count_sufficient"]:
             issues.append({
                 "type": "insufficient_content",
                 "severity": "medium",
-                "message": f"Content too short ({analysis['metrics']['word_count']} words)",
+                "message": f"Content too short ({metrics['word_count']} words)",
             })
 
-        if analysis["completeness"]["missing_elements"]:
+        missing = completeness["missing_elements"]
+        if missing:
+            missing_list = cast("list[str]", missing)
             issues.append({
                 "type": "missing_elements",
                 "severity": "high",
-                "message": f"Missing: {', '.join(analysis['completeness']['missing_elements'])}",
+                "message": f"Missing: {', '.join(missing_list)}",
             })
 
         # Readability issues
-        if (
-            analysis["readability"]["readability_score"]
-            < self.FAIRLY_DIFFICULT_READABILITY_MIN
-        ):
+        readability_score = float(readability["readability_score"])
+        if readability_score < self.FAIRLY_DIFFICULT_READABILITY_MIN:
             issues.append({
                 "type": "poor_readability",
                 "severity": "medium",
-                "message": f"Content difficult to read (score: {analysis['readability']['readability_score']})",
+                "message": f"Content difficult to read (score: {readability_score})",
             })
 
         # Structure issues
-        if not analysis["structure"]["heading_hierarchy_valid"]:
+        if not structure["heading_hierarchy_valid"]:
             issues.append({
                 "type": "heading_hierarchy",
                 "severity": "low",
                 "message": "Heading hierarchy is not logical",
             })
 
-        if analysis["metrics"]["heading_count"] == 0:
+        if int(metrics["heading_count"]) == 0:
             issues.append({
                 "type": "no_headings",
                 "severity": "high",
@@ -492,41 +541,44 @@ class ContentAnalyzer:
 
         return issues
 
-    def _generate_suggestions(self, analysis: dict[str, Any]) -> list[str]:
+    def _generate_suggestions(self, analysis: dict[str, object]) -> list[object]:
         """Generate improvement suggestions based on analysis."""
-        suggestions = []
+        suggestions: list[object] = []
 
-        metrics = analysis["metrics"]
-        readability = analysis["readability"]
-        structure = analysis["structure"]
+        metrics = cast("_SubDict", analysis["metrics"])
+        readability = cast("_SubDict", analysis["readability"])
+        structure = cast("_SubDict", analysis["structure"])
 
-        if metrics["word_count"] < 2 * self.MIN_WORD_COUNT:
+        if int(metrics["word_count"]) < 2 * self.MIN_WORD_COUNT:
             suggestions.append(
                 "Expand content with more detailed explanations and examples",
             )
 
-        if readability["readability_score"] < self.MIN_READABILITY_SCORE:
+        if float(readability["readability_score"]) < self.MIN_READABILITY_SCORE:
             suggestions.append(
                 "Simplify language and sentence structure for better readability",
             )
 
         if (
             not structure["has_table_of_contents"]
-            and metrics["heading_count"] > self.MIN_HEADINGS_FOR_TOC
+            and int(metrics["heading_count"]) > self.MIN_HEADINGS_FOR_TOC
         ):
             suggestions.append("Add a table of contents for better navigation")
 
-        if metrics["code_block_count"] == 0 and "tutorial" in analysis["file"].lower():
+        if (
+            int(metrics["code_block_count"]) == 0
+            and "tutorial" in str(analysis["file"]).lower()
+        ):
             suggestions.append("Add code examples to illustrate concepts")
 
-        if metrics["link_count"] == 0:
+        if int(metrics["link_count"]) == 0:
             suggestions.append(
                 "Add relevant links to related documentation or external resources",
             )
 
         return suggestions
 
-    def analyze_files_batch(self, file_paths: list[Path]) -> dict[str, Any]:
+    def analyze_files_batch(self, file_paths: list[Path]) -> dict[str, object]:
         """Analyze multiple files and aggregate results."""
         for file_path in file_paths:
             self.analyze_file(file_path)
@@ -538,15 +590,17 @@ class ContentAnalyzer:
 
     def _generate_overall_recommendations(self) -> None:
         """Generate overall recommendations based on batch analysis."""
-        if not self.results["content_scores"]:
+        content_scores = cast("dict[str, object]", self.results["content_scores"])
+        if not content_scores:
             return
 
-        avg_score = sum(self.results["content_scores"].values()) / len(
-            self.results["content_scores"],
-        )
+        score_values = [float(v) for v in content_scores.values()]
+        avg_score = sum(score_values) / len(score_values)
+
+        recommendations = cast("list[object]", self.results["recommendations"])
 
         if avg_score < self.GOOD_READABILITY_MIN:
-            self.results["recommendations"].append({
+            recommendations.append({
                 "priority": "high",
                 "type": "overall_quality",
                 "message": f"Overall documentation quality needs improvement (avg score: {avg_score:.1f})",
@@ -558,7 +612,7 @@ class ContentAnalyzer:
             })
 
         # Check for common issues across files
-        all_issues = []
+        all_issues: list[dict[str, object]] = []
         for file_issues in [
             analysis.get("issues", [])
             for analysis in self.results.values()
@@ -567,11 +621,11 @@ class ContentAnalyzer:
             all_issues.extend(file_issues)
 
         if all_issues:
-            issue_types = Counter(issue["type"] for issue in all_issues)
+            issue_types = Counter(str(issue["type"]) for issue in all_issues)
             most_common = issue_types.most_common(1)
             if most_common:
                 common_issue = most_common[0][0]
-                self.results["recommendations"].append({
+                recommendations.append({
                     "priority": "medium",
                     "type": "common_issue",
                     "message": f"Address common issue across files: {common_issue.replace('_', ' ')}",
@@ -591,10 +645,11 @@ class ContentAnalyzer:
 
     def _generate_summary_report(self) -> str:
         """Generate human-readable summary report."""
-        if not self.results["content_scores"]:
+        content_scores = cast("dict[str, object]", self.results["content_scores"])
+        if not content_scores:
             return "No content analysis results available."
 
-        scores = list(self.results["content_scores"].values())
+        scores = [float(v) for v in content_scores.values()]
         avg_score = sum(scores) / len(scores)
 
         report = f"""
@@ -614,7 +669,8 @@ Top Recommendations:
 """
 
         # Show top recommendations
-        for rec in self.results["recommendations"][:3]:
+        recommendations = cast("list[object]", self.results["recommendations"])
+        for rec in recommendations[:3]:
             if isinstance(rec, dict):
                 report += f"- {rec['message']}\n"
             else:
@@ -647,7 +703,7 @@ Top Recommendations:
 def analyze_file_content(
     file_path: str,
     config_path: str | None = None,
-) -> dict[str, Any]:
+) -> dict[str, object]:
     """Convenience function to analyze a single file."""
     analyzer = ContentAnalyzer(config_path)
     return analyzer.analyze_file(Path(file_path))
@@ -656,7 +712,7 @@ def analyze_file_content(
 def analyze_files_content(
     file_paths: list[str],
     config_path: str | None = None,
-) -> dict[str, Any]:
+) -> dict[str, object]:
     """Convenience function to analyze multiple files."""
     analyzer = ContentAnalyzer(config_path)
     paths = [Path(fp) for fp in file_paths]

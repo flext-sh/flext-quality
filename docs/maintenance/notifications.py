@@ -6,6 +6,8 @@ reports, and maintenance updates. Supports multiple notification channels
 including email, Slack, webhooks, and project management tools.
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import smtplib
@@ -13,13 +15,25 @@ from datetime import UTC, datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
-from typing import Any
 
 import requests
 import yaml
+from pydantic import BaseModel, Field
 
 # Constants
 MAX_BROKEN_LINKS_TO_SHOW = 10
+
+
+class NotifierResults(BaseModel):
+    """Results for DocumentationNotifier execution."""
+
+    notifications_sent: int = Field(
+        default=0, description="Number of notifications sent"
+    )
+    errors: list[str] = Field(
+        default_factory=list, description="List of error messages"
+    )
+    timestamp: str = Field(description="ISO timestamp when notifier ran")
 
 
 class DocumentationNotifier:
@@ -35,22 +49,24 @@ class DocumentationNotifier:
             config_path: Path to the notification configuration file.
 
         """
+        self.config: object = self.get_default_config()
         self.load_config(config_path)
-        self.results = {
-            "notifications_sent": 0,
-            "errors": [],
-            "timestamp": datetime.now(UTC).isoformat(),
-        }
+        self.results: NotifierResults = NotifierResults(
+            timestamp=datetime.now(UTC).isoformat(),
+        )
 
     def load_config(self, config_path: str) -> None:
         """Load notification configuration."""
         try:
             with Path(config_path).open(encoding="utf-8") as f:
-                self.config = yaml.safe_load(f)
+                loaded = yaml.safe_load(f)
+                self.config = (
+                    loaded if isinstance(loaded, dict) else self.get_default_config()
+                )
         except FileNotFoundError:
             self.config = self.get_default_config()
 
-    def get_default_config(self) -> dict[str, Any]:
+    def get_default_config(self) -> object:
         """Default notification configuration."""
         return {
             "enabled": True,
@@ -83,7 +99,7 @@ class DocumentationNotifier:
             "webhook": {"url": "", "headers": {}, "timeout": 10},
         }
 
-    def notify_critical_issues(self, audit_data: dict[str, Any]) -> bool:
+    def notify_critical_issues(self, audit_data: object) -> bool:
         """Send notification for critical documentation issues."""
         if not self.config["alerts"]["critical_issues"]["enabled"]:
             return True
@@ -123,7 +139,7 @@ Please review recent changes and address any identified issues.
 
         return True
 
-    def notify_broken_links(self, broken_links: list[dict[str, Any]]) -> bool:
+    def notify_broken_links(self, broken_links: list[object]) -> bool:
         """Send notification for broken links."""
         if not self.config["alerts"]["broken_links"]["enabled"]:
             return True
@@ -137,7 +153,7 @@ Please review recent changes and address any identified issues.
 
         return True
 
-    def notify_weekly_report(self, report_data: dict[str, Any]) -> bool:
+    def notify_weekly_report(self, report_data: object) -> bool:
         """Send weekly quality report notification."""
         if not self.config["alerts"]["weekly_report"]["enabled"]:
             return True
@@ -146,7 +162,7 @@ Please review recent changes and address any identified issues.
         message = self._format_weekly_report_message(report_data)
         return self.send_notification(title, message, "info")
 
-    def notify_monthly_report(self, report_data: dict[str, Any]) -> bool:
+    def notify_monthly_report(self, report_data: object) -> bool:
         """Send monthly comprehensive report notification."""
         if not self.config["alerts"]["monthly_report"]["enabled"]:
             return True
@@ -173,7 +189,7 @@ Please review recent changes and address any identified issues.
             try:
                 self._send_email_notification(title, message, priority)
             except Exception as e:
-                self.results["errors"].append(f"Email notification failed: {e}")
+                self.results.errors.append(f"Email notification failed: {e}")
                 success = False
 
         # Slack notification
@@ -181,7 +197,7 @@ Please review recent changes and address any identified issues.
             try:
                 self._send_slack_notification(title, message, priority)
             except Exception as e:
-                self.results["errors"].append(f"Slack notification failed: {e}")
+                self.results.errors.append(f"Slack notification failed: {e}")
                 success = False
 
         # Webhook notification
@@ -189,11 +205,11 @@ Please review recent changes and address any identified issues.
             try:
                 self._send_webhook_notification(title, message, priority)
             except Exception as e:
-                self.results["errors"].append(f"Webhook notification failed: {e}")
+                self.results.errors.append(f"Webhook notification failed: {e}")
                 success = False
 
         if success:
-            self.results["notifications_sent"] += 1
+            self.results.notifications_sent += 1
 
         return success
 
@@ -209,11 +225,11 @@ Please review recent changes and address any identified issues.
 
     def _send_email_notification(self, title: str, message: str, priority: str) -> None:
         """Send notification via email."""
-        email_config = self.config["email"]
+        email_config: object = self.config["email"]
 
         msg = MIMEMultipart()
-        msg["From"] = email_config["from_address"]
-        msg["To"] = ", ".join(email_config["to_addresses"])
+        msg["From"] = str(email_config["from_address"])
+        msg["To"] = ", ".join(str(x) for x in (email_config.get("to_addresses") or []))
         msg["Subject"] = f"[{priority.upper()}] {title}"
 
         body = f"""
@@ -230,27 +246,33 @@ Timestamp: {datetime.now(UTC).isoformat()}
 
         msg.attach(MIMEText(body, "plain"))
 
-        server = smtplib.SMTP(email_config["smtp_server"], email_config["smtp_port"])
+        server = smtplib.SMTP(
+            str(email_config["smtp_server"]),
+            int(email_config["smtp_port"]),
+        )
         server.starttls()
-        server.login(email_config["username"], email_config["password"])
+        server.login(
+            str(email_config["username"]),
+            str(email_config["password"]),
+        )
         text = msg.as_string()
         server.sendmail(
-            email_config["from_address"],
-            email_config["to_addresses"],
+            str(email_config["from_address"]),
+            list(email_config.get("to_addresses") or []),
             text,
         )
         server.quit()
 
     def _send_slack_notification(self, title: str, message: str, priority: str) -> None:
         """Send notification to Slack."""
-        slack_config = self.config["slack"]
+        slack_config: object = self.config["slack"]
 
         color = {"critical": "danger", "warning": "warning", "info": "good"}.get(
             priority,
             "good",
         )
 
-        payload = {
+        payload: object = {
             "channel": slack_config["channel"],
             "username": slack_config["username"],
             "attachments": [
@@ -264,7 +286,11 @@ Timestamp: {datetime.now(UTC).isoformat()}
             ],
         }
 
-        response = requests.post(slack_config["webhook_url"], json=payload, timeout=10)
+        response = requests.post(
+            str(slack_config["webhook_url"]),
+            json=payload,
+            timeout=10,
+        )
         response.raise_for_status()
 
     def _send_webhook_notification(
@@ -274,9 +300,9 @@ Timestamp: {datetime.now(UTC).isoformat()}
         priority: str,
     ) -> None:
         """Send notification via webhook."""
-        webhook_config = self.config["webhook"]
+        webhook_config: object = self.config["webhook"]
 
-        payload = {
+        payload: object = {
             "title": title,
             "message": message,
             "priority": priority,
@@ -284,23 +310,29 @@ Timestamp: {datetime.now(UTC).isoformat()}
             "source": "FLEXT Quality Documentation System",
         }
 
-        headers = webhook_config.get("headers", {})
+        headers_val = webhook_config.get("headers")
+        headers: dict[str, str] = (
+            dict(headers_val) if isinstance(headers_val, dict) else {}
+        )
         headers["Content-Type"] = "application/json"
 
+        timeout_val = webhook_config.get("timeout", 10)
+        timeout = int(timeout_val) if isinstance(timeout_val, (int, float)) else 10
+
         response = requests.post(
-            webhook_config["url"],
+            str(webhook_config["url"]),
             json=payload,
             headers=headers,
-            timeout=webhook_config["timeout"],
+            timeout=timeout,
         )
         response.raise_for_status()
 
-    def _format_critical_issues_message(self, audit_data: dict[str, Any]) -> str:
+    def _format_critical_issues_message(self, audit_data: object) -> str:
         """Format message for critical issues notification."""
-        metrics = audit_data.get("metrics", {})
-        severity_breakdown = metrics.get("severity_breakdown", {})
+        metrics: object = audit_data.get("metrics") or {}
+        severity_breakdown: object = metrics.get("severity_breakdown") or {}
 
-        issues = audit_data.get("issues", [])
+        issues: list[object] = audit_data.get("issues") or []
         critical_issues = [i for i in issues if i.get("severity") == "critical"][:5]
 
         message = f"""
@@ -321,7 +353,7 @@ Top Critical Issues:
 
         for i, issue in enumerate(critical_issues, 1):
             message += (
-                f"{i}. {issue.get('type', 'unknown').replace('_', ' ').title()}\n"
+                f"{i}. {str(issue.get('type', 'unknown')).replace('_', ' ').title()}\n"
             )
             message += f"   File: {issue.get('file', 'unknown')}\n"
             message += (
@@ -332,7 +364,7 @@ Top Critical Issues:
 
         return message.strip()
 
-    def _format_broken_links_message(self, broken_links: list[dict[str, Any]]) -> str:
+    def _format_broken_links_message(self, broken_links: list[object]) -> str:
         """Format message for broken links notification."""
         message = f"""
 BROKEN LINKS DETECTED
@@ -358,13 +390,13 @@ Found {len(broken_links)} broken links that need attention:
 
         return message.strip()
 
-    def _format_weekly_report_message(self, _report_data: dict[str, Any]) -> str:
+    def _format_weekly_report_message(self, _report_data: object) -> str:
         """Format message for weekly report notification."""
         # Implementation would depend on weekly report data structure
         # For now, report_data is not used but reserved for future implementation
         return "Weekly documentation quality report is now available. Check the reports dashboard for detailed metrics and trends."
 
-    def _format_monthly_report_message(self, _report_data: dict[str, Any]) -> str:
+    def _format_monthly_report_message(self, _report_data: object) -> str:
         """Format message for monthly report notification."""
         # Implementation would depend on monthly report data structure
         return "Monthly comprehensive documentation quality report is now available. Review trends and plan improvements for the next month."
@@ -375,66 +407,61 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description="FLEXT Quality Documentation Notifications",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--config",
         default="docs/maintenance/config/notification_config.yaml",
         help="Notification configuration file",
     )
-    parser.add_argument(
+    _ = parser.add_argument(
         "--test",
         action="store_true",
         help="Send test notification to verify configuration",
     )
-    parser.add_argument("--audit-data", help="Path to audit data JSON file")
-    parser.add_argument("--weekly-report", help="Path to weekly report JSON file")
-    parser.add_argument("--monthly-report", help="Path to monthly report JSON file")
+    _ = parser.add_argument("--audit-data", help="Path to audit data JSON file")
+    _ = parser.add_argument("--weekly-report", help="Path to weekly report JSON file")
+    _ = parser.add_argument("--monthly-report", help="Path to monthly report JSON file")
 
     args = parser.parse_args()
 
     notifier = DocumentationNotifier(args.config)
 
     if args.test:
-        # Send test notification
         success = notifier.send_notification(
             "Test Notification",
-            "This is a test notification from the FLEXT Quality Documentation System.\n\nIf you received this, the notification system is working correctly!",
+            "This is a test notification from the FLEXT Quality Documentation System.\n\nIf you received this, the notification system is working correctly.",
             "info",
         )
-        if success:
-            pass
-        else:
-            for _error in notifier.results["errors"]:
-                pass
-
+        if not success:
+            for err in notifier.results["errors"]:
+                _ = err  # consumed
     elif args.audit_data:
         # Process audit data and send appropriate notifications
         with Path(args.audit_data).open(encoding="utf-8") as f:
             audit_data = json.load(f)
 
         # Check for critical issues
-        notifier.notify_critical_issues(audit_data)
+        _ = notifier.notify_critical_issues(audit_data)
 
         # Check for broken links (would need to extract from audit data)
-        # This is a simplified example
         broken_links = [
             i
             for i in audit_data.get("issues", [])
-            if "broken" in i.get("type", "").lower()
+            if "broken" in str(i.get("type", "")).lower()
         ]
         if broken_links:
-            notifier.notify_broken_links(broken_links)
+            _ = notifier.notify_broken_links(broken_links)
 
     elif args.weekly_report:
         # Send weekly report notification
         with Path(args.weekly_report).open(encoding="utf-8") as f:
             report_data = json.load(f)
-        notifier.notify_weekly_report(report_data)
+        _ = notifier.notify_weekly_report(report_data)
 
     elif args.monthly_report:
         # Send monthly report notification
         with Path(args.monthly_report).open(encoding="utf-8") as f:
             report_data = json.load(f)
-        notifier.notify_monthly_report(report_data)
+        _ = notifier.notify_monthly_report(report_data)
 
     else:
         parser.print_help()

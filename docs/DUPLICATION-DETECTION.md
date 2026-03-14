@@ -47,7 +47,7 @@ This system prevents code duplication from accumulating while allowing intention
 A `FlextService[int]` that detects code clones using line-based similarity:
 
 ```python
-from flext_quality.plugins import FlextDuplicationPlugin
+from flext_quality import FlextDuplicationPlugin
 from pathlib import Path
 
 plugin = FlextDuplicationPlugin()
@@ -71,12 +71,12 @@ if result.is_success:
 
 **Methods**:
 
-- `check(files: list[Path], threshold: float | None) -> FlextResult[CheckResult]`
+- `check(files: list[Path], threshold: float | None) -> r[CheckResult]`
 
   - Analyze files for duplication
   - Returns duplication pairs exceeding threshold
 
-- `get_duplicate_count(directory: Path) -> FlextResult[int]`
+- `get_duplicate_count(directory: Path) -> r[int]`
 
   - Count duplicate pairs in a directory
   - Recursively scans for \*.py files
@@ -223,9 +223,7 @@ The plugin is integrated into the FlextQualityAnalyzer:
 from flext_quality import FlextQualityAnalyzer
 
 analyzer = FlextQualityAnalyzer(".")
-result = analyzer.analyze_project(
-    options=AnalysisOptions(include_duplicates=True)
-)
+result = analyzer.analyze_project(options=AnalysisOptions(include_duplicates=True))
 
 # Duplication issues are included in results
 for issue in result.value.issues:
@@ -317,9 +315,9 @@ make validate
 ```python
 class Quality:
     class Analysis:
-        SIMILARITY_THRESHOLD: float = 0.8          # 80% line overlap
+        SIMILARITY_THRESHOLD: float = 0.8  # 80% line overlap
         MIN_FILE_SIZE_FOR_DUPLICATION_CHECK: int = 100
-        MIN_FILES_FOR_PAIR_COMPARISON: int = 2     # Need ≥2 files
+        MIN_FILES_FOR_PAIR_COMPARISON: int = 2  # Need ≥2 files
 ```
 
 ## Hook Configuration

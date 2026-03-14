@@ -296,9 +296,9 @@ ______________________________________________________________________
 - **CQ002**: `TypeAlias` outside typings.py
 
   - Problem: Type aliases scattered across codebase
-  - Fix: Move to `src/*/typings.py`, import as `from flext_core import FlextTypes as t`
+  - Fix: Move to `src/*/typings.py`, import as `from flext_core import t`
 
-- **CQ003**: `Protocol` outside protocols.py
+- **CQ003**: `` outside protocols.py
 
   - Problem: Protocol definitions scattered
   - Fix: Move to `src/*/protocols.py`, import as `p.*`
@@ -311,7 +311,7 @@ ______________________________________________________________________
 - **CQ005**: Complex `Callable` (3+ parameters)
 
   - Problem: Unclear function signatures
-  - Fix: Use `Protocol` with `__call__` method for clarity
+  - Fix: Use `` with `__call__` method for clarity
 
 #### Data Structures (CQ006-007)
 
@@ -323,19 +323,19 @@ ______________________________________________________________________
 - **CQ007**: Excessive `isinstance()` checks
 
   - Problem: Indicates loose coupling
-  - Fix: Use `Protocol` for structural typing instead
+  - Fix: Use `` for structural typing instead
 
 #### FLEXT Patterns (CQ008-010)
 
-- **CQ008**: `FlextResult` returning None
+- **CQ008**: `r` returning None
 
-  - ⛔ CRITICAL: FlextResult never returns None
+  - ⛔ CRITICAL: r never returns None
   - Fix: Use `.ok(value)` for success, `.fail(error)` for failure
 
-- **CQ009**: `FlextResult` without type parameter
+- **CQ009**: `r` without type parameter
 
   - ⛔ CRITICAL: Must specify type parameter
-  - Fix: `FlextResult[T]` always, never bare `FlextResult`
+  - Fix: `r[T]` always, never bare `r`
 
 - **CQ010**: Uncentralized dict types
 
@@ -602,7 +602,7 @@ ______________________________________________________________________
 
 - **Rule Modification**: See `RULE_MODIFICATION.md` for detailed guide
 - **Dependencies**: See `../README.md` section on dependency rules
-- **Testing**: See `../CLAUDE.md` section on quality gates
+- **Testing**: See `../AGENTS.md` section on quality gates
 
 ______________________________________________________________________
 

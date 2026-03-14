@@ -4,37 +4,25 @@ from __future__ import annotations
 
 from typing import TypeAlias
 
-from flext_core import FlextTypes
+from flext_cli import FlextCliTypes
+from flext_web import FlextWebTypes
 
 
-class FlextQualityTypes(FlextTypes):
+class FlextQualityTypes(FlextWebTypes, FlextCliTypes):
     """Namespace for flext-quality type definitions."""
 
     class Quality:
         """Quality-specific types namespace."""
 
-        # Hook types
-        HookInput: TypeAlias = dict[str, FlextTypes.JsonValue]
-        HookOutput: TypeAlias = dict[str, FlextTypes.JsonValue]
+        HookInput: TypeAlias = dict[str, object]
+        HookOutput: TypeAlias = dict[str, object]
         HookMatcher: TypeAlias = list[str] | None
-
-        # Rule types
-        RuleConfig: TypeAlias = dict[str, FlextTypes.JsonValue]
+        RuleConfig: TypeAlias = dict[str, object]
         RuleResult: TypeAlias = tuple[bool, str | None]
-
-        # MCP types
-        McpToolResult: TypeAlias = dict[str, FlextTypes.JsonValue]
+        McpToolResult: TypeAlias = dict[str, object]
         McpResource: TypeAlias = dict[str, str]
-
-        # Integration types
         MemoryQuery: TypeAlias = dict[str, str | int | list[str]]
         ContextQuery: TypeAlias = dict[str, str | int]
 
 
-# Short alias for imports
 t = FlextQualityTypes
-
-# Convenience aliases for common types
-HookInput = FlextQualityTypes.Quality.HookInput
-HookOutput = FlextQualityTypes.Quality.HookOutput
-HookMatcher = FlextQualityTypes.Quality.HookMatcher

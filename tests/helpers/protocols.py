@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_quality.protocols import FlextQualityProtocols
+from flext_quality import FlextQualityProtocols
 
 
 class TestsProtocols(FlextQualityProtocols):
@@ -21,11 +21,6 @@ class TestsProtocols(FlextQualityProtocols):
     expose the full hierarchy without duplication.
     """
 
-    # Test-specific protocols can be added here as nested classes
-    # All parent protocols are accessible via inheritance
 
-
-# Standardized short name for use in tests (same pattern as flext-core)
 p = TestsProtocols
-
 __all__ = ["TestsProtocols", "p"]

@@ -10,17 +10,17 @@ from __future__ import annotations
 
 from typing import Final
 
-from flext_quality.constants import FlextQualityConstants
+from flext_quality import FlextQualityConstants
 
 
 class TestsFlextQualityConstants(FlextQualityConstants):
     """Constants for flext-quality tests.
 
     Access patterns:
-    - tc.Quality.* (domain constants from production)
-    - tc.Quality.Literals.* (type literals from production)
-    - tc.Paths.* (test path constants)
-    - tc.TestQuality.* (project-specific test data)
+    - c.Quality.* (domain constants from production)
+    - c.Quality.Literals.* (type literals from production)
+    - c.Paths.* (test path constants)
+    - c.TestQuality.* (project-specific test data)
     """
 
     class Paths:
@@ -38,12 +38,5 @@ class TestsFlextQualityConstants(FlextQualityConstants):
         TEST_WORKERS: Final[int] = 2
 
 
-# Short aliases per FLEXT convention
-tc = TestsFlextQualityConstants
 c = TestsFlextQualityConstants
-
-__all__ = [
-    "TestsFlextQualityConstants",
-    "c",
-    "tc",
-]
+__all__ = ["TestsFlextQualityConstants", "c"]

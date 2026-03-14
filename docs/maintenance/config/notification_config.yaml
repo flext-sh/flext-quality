@@ -15,40 +15,40 @@ channels:
     show_details: true
 
   email:
-    enabled: false  # Set to true and configure SMTP settings below
+    enabled: false # Set to true and configure SMTP settings below
     smtp_server: "smtp.gmail.com"
     smtp_port: 587
     use_tls: true
-    username: ""  # Your email username
-    password: ""  # Your email password or app password
+    username: "" # Your email username
+    password: "" # Your email password or app password
     from_address: "docs-quality@yourcompany.com"
     to_addresses:
       - "team@yourcompany.com"
       - "docs-maintainer@yourcompany.com"
 
   slack:
-    enabled: false  # Set to true and add webhook URL below
-    webhook_url: ""  # Slack webhook URL
+    enabled: false # Set to true and add webhook URL below
+    webhook_url: "" # Slack webhook URL
     channel: "#docs-quality"
     username: "FLEXT Quality Bot"
     icon_emoji: ":book:"
 
   webhook:
-    enabled: false  # Set to true and add webhook URL below
-    url: ""  # Generic webhook URL
+    enabled: false # Set to true and add webhook URL below
+    url: "" # Generic webhook URL
     method: "POST"
     headers:
       Content-Type: "application/json"
-      X-API-Key: ""  # Optional API key
+      X-API-Key: "" # Optional API key
     timeout: 10
 
   teams:
-    enabled: false  # Microsoft Teams webhook
-    webhook_url: ""  # Teams webhook URL
+    enabled: false # Microsoft Teams webhook
+    webhook_url: "" # Teams webhook URL
 
   discord:
-    enabled: false  # Discord webhook
-    webhook_url: ""  # Discord webhook URL
+    enabled: false # Discord webhook
+    webhook_url: "" # Discord webhook URL
     username: "FLEXT Quality Bot"
     avatar_url: ""
 
@@ -56,31 +56,31 @@ channels:
 alerts:
   critical_issues:
     enabled: true
-    threshold: 1  # Alert when 1+ critical issues found
+    threshold: 1 # Alert when 1+ critical issues found
     channels: ["console", "email", "slack"]
-    cooldown_minutes: 60  # Don't send repeated alerts within this time
+    cooldown_minutes: 60 # Don't send repeated alerts within this time
 
   quality_drop:
     enabled: true
-    threshold: 10  # Alert when quality score drops by 10+ points
+    threshold: 10 # Alert when quality score drops by 10+ points
     channels: ["console", "slack"]
-    cooldown_minutes: 1440  # 24 hours
+    cooldown_minutes: 1440 # 24 hours
 
   broken_links:
     enabled: true
-    threshold: 5  # Alert when 5+ broken links found
+    threshold: 5 # Alert when 5+ broken links found
     channels: ["console", "slack"]
-    cooldown_minutes: 360  # 6 hours
+    cooldown_minutes: 360 # 6 hours
 
   weekly_report:
     enabled: true
     channels: ["console", "email"]
-    schedule: "monday 09:00"  # Send weekly reports every Monday at 9 AM
+    schedule: "monday 09:00" # Send weekly reports every Monday at 9 AM
 
   monthly_report:
     enabled: true
     channels: ["console", "email", "slack"]
-    schedule: "1st 10:00"  # Send monthly reports on the 1st of each month at 10 AM
+    schedule: "1st 10:00" # Send monthly reports on the 1st of each month at 10 AM
 
   audit_failures:
     enabled: true
@@ -118,15 +118,15 @@ error_handling:
 integrations:
   github:
     enabled: false
-    repository: ""  # owner/repo format
-    token: ""  # GitHub personal access token
+    repository: "" # owner/repo format
+    token: "" # GitHub personal access token
     create_issues_for_critical: true
     label_critical_issues: "documentation-critical"
 
   gitlab:
     enabled: false
     project_id: ""
-    token: ""  # GitLab personal access token
+    token: "" # GitLab personal access token
     create_issues_for_critical: true
 
   jira:

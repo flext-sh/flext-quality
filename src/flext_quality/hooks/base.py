@@ -3,22 +3,25 @@
 from __future__ import annotations
 
 import fnmatch
-from abc import ABC, abstractmethod
-from typing import ClassVar
+from typing import ClassVar, Protocol, runtime_checkable
 
-from flext_core import FlextResult as r
+from flext_core import r
 
-from flext_quality.constants import FlextQualityConstants as c
-from flext_quality.typings import HookInput, HookOutput
+from flext_quality import c, t
 
 
-class BaseHookImpl(ABC):
+@runtime_checkable
+class BaseHookImpl(Protocol):
     """Abstract base for hook implementations."""
 
     event: ClassVar[c.Quality.HookEvent]
     matcher: ClassVar[list[str] | None]
 
-    def should_run(self, input_data: HookInput) -> bool:
+    def execute(self, input_data: t.Quality.HookInput) -> r[t.Quality.HookOutput]:
+        """Execute the hook logic."""
+        ...
+
+    def should_run(self, input_data: t.Quality.HookInput) -> bool:
         """Check if hook should run for this input."""
         if self.matcher is None:
             return True
@@ -28,8 +31,3 @@ class BaseHookImpl(ABC):
     def _match_pattern(self, pattern: str, value: str) -> bool:
         """Match pattern against value (supports wildcards)."""
         return fnmatch.fnmatch(value, pattern)
-
-    @abstractmethod
-    def execute(self, input_data: HookInput) -> r[HookOutput]:
-        """Execute the hook logic."""
-        ...

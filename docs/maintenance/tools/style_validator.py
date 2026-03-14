@@ -5,12 +5,13 @@ Comprehensive style checking and consistency validation for documentation.
 Enforces style guides, formatting standards, and accessibility requirements.
 """
 
+from __future__ import annotations
+
 import json
 import operator
 import re
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 import yaml
 
@@ -35,8 +36,9 @@ class StyleValidator:
             config_path: Path to style guide configuration file
 
         """
+        self.config: dict[str, object] = {}
         self.load_config(config_path)
-        self.results = {
+        self.results: dict[str, object] = {
             "files_checked": 0,
             "style_violations": [],
             "accessibility_issues": [],
@@ -52,6 +54,20 @@ class StyleValidator:
 
     def load_config(self, config_path: str | None) -> None:
         """Load style guide configuration."""
+        if config_path is None:
+            self.config = {
+                "markdown": {
+                    "heading_style": "atx",
+                    "list_style": "dash",
+                    "emphasis_style": "*",
+                },
+                "accessibility": {
+                    "require_alt_text": True,
+                    "descriptive_links": True,
+                    "heading_structure": True,
+                },
+            }
+            return
         try:
             with Path(config_path).open(encoding="utf-8") as f:
                 self.config = yaml.safe_load(f)
@@ -76,7 +92,7 @@ class StyleValidator:
                 },
             }
 
-    def validate_file(self, file_path: Path) -> dict[str, Any]:
+    def validate_file(self, file_path: Path) -> dict[str, object]:
         """Validate a single documentation file."""
         try:
             content = file_path.read_text(encoding="utf-8")
@@ -84,11 +100,14 @@ class StyleValidator:
                 file_path.relative_to(file_path.parents[2]),
             )  # Relative to project root
 
+            violations_list: list[dict[str, object]] = []
+            issues_list: list[dict[str, object]] = []
+            suggestions_list: list[str] = []
             file_results = {
                 "file": filename,
-                "violations": [],
-                "issues": [],
-                "suggestions": [],
+                "violations": violations_list,
+                "issues": issues_list,
+                "suggestions": suggestions_list,
             }
 
             # Run all validation checks
@@ -122,9 +141,9 @@ class StyleValidator:
                 "suggestions": [],
             }
 
-    def _check_markdown_formatting(self, content: str) -> list[dict[str, Any]]:
+    def _check_markdown_formatting(self, content: str) -> list[dict[str, object]]:
         """Check basic markdown formatting consistency."""
-        violations = []
+        violations: list[dict[str, int | str]] = []
 
         lines = content.split("\n")
 
@@ -155,12 +174,12 @@ class StyleValidator:
 
         return violations
 
-    def _check_heading_consistency(self, content: str) -> list[dict[str, Any]]:
+    def _check_heading_consistency(self, content: str) -> list[dict[str, object]]:
         """Check heading hierarchy and consistency."""
-        violations = []
+        violations: list[dict[str, int | str]] = []
 
         # Extract headings
-        headings = []
+        headings: list[tuple[int, str, int]] = []
         for match in re.finditer(r"^(#{1,6})\s+(.+)$", content, re.MULTILINE):
             level = len(match.group(1))
             text = match.group(2).strip()
@@ -193,12 +212,12 @@ class StyleValidator:
 
         return violations
 
-    def _check_list_consistency(self, content: str) -> list[dict[str, Any]]:
+    def _check_list_consistency(self, content: str) -> list[dict[str, object]]:
         """Check list formatting consistency."""
         violations = []
 
         # Find all list items
-        list_items = []
+        list_items: list[tuple[str, str, int]] = []
         for match in re.finditer(r"^(\s*)([-\*\+])\s+", content, re.MULTILINE):
             indent = match.group(1)
             marker = match.group(2)
@@ -227,7 +246,7 @@ class StyleValidator:
 
         return violations
 
-    def _check_code_formatting(self, content: str) -> list[dict[str, Any]]:
+    def _check_code_formatting(self, content: str) -> list[dict[str, object]]:
         """Check code block and inline code formatting."""
         violations = []
 
@@ -272,7 +291,7 @@ class StyleValidator:
 
         return violations
 
-    def _check_accessibility(self, content: str) -> list[dict[str, Any]]:
+    def _check_accessibility(self, content: str) -> list[dict[str, object]]:
         """Check accessibility compliance."""
         issues = []
 
@@ -309,11 +328,11 @@ class StyleValidator:
 
         return issues
 
-    def _check_line_length(self, content: str) -> list[dict[str, Any]]:
+    def _check_line_length(self, content: str) -> list[dict[str, object]]:
         """Check line length compliance."""
-        violations = []
+        violations: list[dict[str, int | str]] = []
 
-        max_length = self.config["formatting"]["max_line_length"]
+        max_length = int(self.config["formatting"]["max_line_length"])
         lines = content.split("\n")
 
         for i, line in enumerate(lines, 1):
@@ -337,9 +356,9 @@ class StyleValidator:
 
         return violations
 
-    def _check_whitespace(self, content: str) -> list[dict[str, Any]]:
+    def _check_whitespace(self, content: str) -> list[dict[str, object]]:
         """Check whitespace formatting."""
-        violations = []
+        violations: list[dict[str, int | str]] = []
 
         lines = content.split("\n")
 
@@ -372,9 +391,9 @@ class StyleValidator:
 
         return violations
 
-    def _generate_suggestions(self, violations: list[dict]) -> list[str]:
+    def _generate_suggestions(self, violations: list[dict[str, object]]) -> list[str]:
         """Generate improvement suggestions based on violations."""
-        suggestions = []
+        suggestions: list[str] = []
 
         violation_types = {}
         for violation in violations:
@@ -404,7 +423,7 @@ class StyleValidator:
 
         return suggestions
 
-    def validate_files_batch(self, file_paths: list[Path]) -> dict[str, Any]:
+    def validate_files_batch(self, file_paths: list[Path]) -> dict[str, object]:
         """Validate multiple files and aggregate results."""
         for file_path in file_paths:
             self.validate_file(file_path)
@@ -480,7 +499,7 @@ Top Issues:
 
         return report
 
-    def save_report(self, output_path: str = "docs/maintenance/reports/") -> None:
+    def save_report(self, output_path: str = "docs/maintenance/reports/") -> Path:
         """Save style validation report."""
         Path(output_path).mkdir(exist_ok=True, parents=True)
 
@@ -497,7 +516,7 @@ Top Issues:
 def validate_file_style(
     file_path: str,
     config_path: str | None = None,
-) -> dict[str, Any]:
+) -> dict[str, object]:
     """Convenience function to validate a single file."""
     validator = StyleValidator(config_path)
     return validator.validate_file(Path(file_path))
@@ -506,7 +525,7 @@ def validate_file_style(
 def validate_files_style(
     file_paths: list[str],
     config_path: str | None = None,
-) -> dict[str, Any]:
+) -> dict[str, object]:
     """Convenience function to validate multiple files."""
     validator = StyleValidator(config_path)
     paths = [Path(fp) for fp in file_paths]

@@ -6,13 +6,13 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from typing import Annotated, TypeAlias
+
+from flext_cli import FlextCliModels
+from flext_web import FlextWebModels
 from pydantic import BaseModel, Field
 
-from flext_quality.constants import FlextQualityConstants as c
-
-# =============================================================================
-# Module-level model definitions (following flext-core pattern)
-# =============================================================================
+from flext_quality import c
 
 
 class _HookConfig(BaseModel):
@@ -21,15 +21,15 @@ class _HookConfig(BaseModel):
     event: c.Quality.HookEvent
     matcher: list[str] | None = None
     command: str
-    timeout_ms: int = Field(default=c.Quality.Defaults.HOOK_TIMEOUT_MS)
+    timeout_ms: Annotated[int, Field(default=c.Quality.Defaults.HOOK_TIMEOUT_MS)]
     enabled: bool = True
 
 
 class _HookResult(BaseModel):
     """Result from hook execution."""
 
-    continue_execution: bool = Field(alias="continue")
-    system_message: str | None = Field(default=None, alias="systemMessage")
+    continue_execution: Annotated[bool, Field(alias="continue")]
+    system_message: Annotated[str | None, Field(default=None, alias="systemMessage")]
     blocked_reason: str | None = None
 
     model_config = {"populate_by_name": True}
@@ -53,7 +53,7 @@ class _IntegrationConfig(BaseModel):
     enabled: bool = True
     host: str = "localhost"
     port: int
-    timeout_ms: int = Field(default=c.Quality.Defaults.INTEGRATION_TIMEOUT_MS)
+    timeout_ms: Annotated[int, Field(default=c.Quality.Defaults.INTEGRATION_TIMEOUT_MS)]
 
 
 class _MemoryObservation(BaseModel):
@@ -63,8 +63,8 @@ class _MemoryObservation(BaseModel):
     type: str
     title: str
     content: str
-    concepts: list[str] = Field(default_factory=list)
-    files: list[str] = Field(default_factory=list)
+    concepts: Annotated[list[str], Field(default_factory=list)]
+    files: Annotated[list[str], Field(default_factory=list)]
     timestamp: str
 
 
@@ -77,16 +77,11 @@ class _ContextSearchResult(BaseModel):
     line_number: int | None = None
 
 
-# =============================================================================
-# Facade class with namespace (following flext-core pattern)
-# =============================================================================
-
-
-class FlextQualityModels:
+class FlextQualityModels(FlextWebModels, FlextCliModels):
     """Namespace for flext-quality models.
 
     Usage:
-        from flext_quality.models import m
+        from flext_quality import m
 
         config = m.Quality.HookConfig(event=c.Quality.HookEvent.PRE_TOOL_USE, command="...")
         rule = m.Quality.RuleDefinition(name="rule1", type=c.Quality.RuleType.BLOCKING, ...)
@@ -95,15 +90,14 @@ class FlextQualityModels:
     class Quality:
         """Quality-specific models namespace."""
 
-        HookConfig = _HookConfig
-        HookResult = _HookResult
-        RuleDefinition = _RuleDefinition
-        IntegrationConfig = _IntegrationConfig
-        MemoryObservation = _MemoryObservation
-        ContextSearchResult = _ContextSearchResult
+        HookConfig: TypeAlias = _HookConfig
+        HookResult: TypeAlias = _HookResult
+        RuleDefinition: TypeAlias = _RuleDefinition
+        IntegrationConfig: TypeAlias = _IntegrationConfig
+        MemoryObservation: TypeAlias = _MemoryObservation
+        ContextSearchResult: TypeAlias = _ContextSearchResult
 
 
-# Short alias for imports
 m = FlextQualityModels
 
 __all__ = ["FlextQualityModels", "m"]
