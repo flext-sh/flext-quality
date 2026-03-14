@@ -18,7 +18,6 @@ if TYPE_CHECKING:
         main,
     )
 
-# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextQualityCliService": ("flext_quality.services.cli", "FlextQualityCliService"),
     "main": ("flext_quality.services.cli", "main"),

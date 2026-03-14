@@ -15,7 +15,6 @@ if TYPE_CHECKING:
     from flext_quality.hooks.base import BaseHookImpl
     from flext_quality.hooks.manager import HookManager
 
-# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "BaseHookImpl": ("flext_quality.hooks.base", "BaseHookImpl"),
     "HookManager": ("flext_quality.hooks.manager", "HookManager"),

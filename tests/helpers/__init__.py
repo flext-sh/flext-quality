@@ -37,18 +37,26 @@ if TYPE_CHECKING:
     )
     from tests.helpers.typings import TestsTypings, t
 
-# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "TestsConstants": ("tests.helpers.constants", "TestsConstants"),
     "TestsModels": ("tests.helpers.models", "TestsModels"),
     "TestsProtocols": ("tests.helpers.protocols", "TestsProtocols"),
     "TestsTypings": ("tests.helpers.typings", "TestsTypings"),
-    "assert_analysis_results_structure": ("tests.helpers.typing_helpers", "assert_analysis_results_structure"),
+    "assert_analysis_results_structure": (
+        "tests.helpers.typing_helpers",
+        "assert_analysis_results_structure",
+    ),
     "assert_dict_structure": ("tests.helpers.typing_helpers", "assert_dict_structure"),
     "assert_is_dict": ("tests.helpers.typing_helpers", "assert_is_dict"),
     "assert_is_list": ("tests.helpers.typing_helpers", "assert_is_list"),
-    "assert_issues_structure": ("tests.helpers.typing_helpers", "assert_issues_structure"),
-    "assert_metrics_structure": ("tests.helpers.typing_helpers", "assert_metrics_structure"),
+    "assert_issues_structure": (
+        "tests.helpers.typing_helpers",
+        "assert_issues_structure",
+    ),
+    "assert_metrics_structure": (
+        "tests.helpers.typing_helpers",
+        "assert_metrics_structure",
+    ),
     "c": ("tests.helpers.constants", "c"),
     "m": ("tests.helpers.models", "m"),
     "p": ("tests.helpers.protocols", "p"),

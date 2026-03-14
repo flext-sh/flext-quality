@@ -27,14 +27,22 @@ if TYPE_CHECKING:
         TestMainFunction,
     )
 
-# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "TestFlextQualityAPI": ("tests.unit.test_api", "TestFlextQualityAPI"),
     "TestFlextQualityCliService": ("tests.unit.test_cli", "TestFlextQualityCliService"),
-    "TestFlextQualityHookExecution": ("tests.unit.test_api", "TestFlextQualityHookExecution"),
-    "TestFlextQualityRulesConfig": ("tests.unit.test_api", "TestFlextQualityRulesConfig"),
+    "TestFlextQualityHookExecution": (
+        "tests.unit.test_api",
+        "TestFlextQualityHookExecution",
+    ),
+    "TestFlextQualityRulesConfig": (
+        "tests.unit.test_api",
+        "TestFlextQualityRulesConfig",
+    ),
     "TestFlextQualitySingleton": ("tests.unit.test_api", "TestFlextQualitySingleton"),
-    "TestFlextQualityStdinProcessing": ("tests.unit.test_api", "TestFlextQualityStdinProcessing"),
+    "TestFlextQualityStdinProcessing": (
+        "tests.unit.test_api",
+        "TestFlextQualityStdinProcessing",
+    ),
     "TestFlextQualityValidation": ("tests.unit.test_api", "TestFlextQualityValidation"),
     "TestMainFunction": ("tests.unit.test_cli", "TestMainFunction"),
     "s": ("tests.unit.test_cli", "TestFlextQualityCliService"),

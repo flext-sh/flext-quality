@@ -79,17 +79,25 @@ if TYPE_CHECKING:
         TestsFlextQualityUtilities as u,
     )
 
-# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "MockQualityAnalyzer": ("tests.conftest", "MockQualityAnalyzer"),
     "MockReportGenerator": ("tests.conftest", "MockReportGenerator"),
     "T": ("tests.conftest", "T"),
     "TestFlextQualityAPI": ("tests.unit.test_api", "TestFlextQualityAPI"),
     "TestFlextQualityCliService": ("tests.unit.test_cli", "TestFlextQualityCliService"),
-    "TestFlextQualityHookExecution": ("tests.unit.test_api", "TestFlextQualityHookExecution"),
-    "TestFlextQualityRulesConfig": ("tests.unit.test_api", "TestFlextQualityRulesConfig"),
+    "TestFlextQualityHookExecution": (
+        "tests.unit.test_api",
+        "TestFlextQualityHookExecution",
+    ),
+    "TestFlextQualityRulesConfig": (
+        "tests.unit.test_api",
+        "TestFlextQualityRulesConfig",
+    ),
     "TestFlextQualitySingleton": ("tests.unit.test_api", "TestFlextQualitySingleton"),
-    "TestFlextQualityStdinProcessing": ("tests.unit.test_api", "TestFlextQualityStdinProcessing"),
+    "TestFlextQualityStdinProcessing": (
+        "tests.unit.test_api",
+        "TestFlextQualityStdinProcessing",
+    ),
     "TestFlextQualityValidation": ("tests.unit.test_api", "TestFlextQualityValidation"),
     "TestMainFunction": ("tests.unit.test_cli", "TestMainFunction"),
     "TestsConstants": ("tests.helpers.constants", "TestsConstants"),
@@ -103,14 +111,29 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "TestsTypings": ("tests.helpers.typings", "TestsTypings"),
     "analysis_results": ("tests.conftest", "analysis_results"),
     "analysis_task_data": ("tests.conftest", "analysis_task_data"),
-    "assert_analysis_results_structure": ("tests.helpers.typing_helpers", "assert_analysis_results_structure"),
+    "assert_analysis_results_structure": (
+        "tests.helpers.typing_helpers",
+        "assert_analysis_results_structure",
+    ),
     "assert_dict_structure": ("tests.helpers.typing_helpers", "assert_dict_structure"),
     "assert_is_dict": ("tests.helpers.typing_helpers", "assert_is_dict"),
     "assert_is_list": ("tests.helpers.typing_helpers", "assert_is_list"),
-    "assert_issues_structure": ("tests.helpers.typing_helpers", "assert_issues_structure"),
-    "assert_metrics_structure": ("tests.helpers.typing_helpers", "assert_metrics_structure"),
-    "assert_result_failure_with_error": ("tests.conftest", "assert_result_failure_with_error"),
-    "assert_result_success_with_data": ("tests.conftest", "assert_result_success_with_data"),
+    "assert_issues_structure": (
+        "tests.helpers.typing_helpers",
+        "assert_issues_structure",
+    ),
+    "assert_metrics_structure": (
+        "tests.helpers.typing_helpers",
+        "assert_metrics_structure",
+    ),
+    "assert_result_failure_with_error": (
+        "tests.conftest",
+        "assert_result_failure_with_error",
+    ),
+    "assert_result_success_with_data": (
+        "tests.conftest",
+        "assert_result_success_with_data",
+    ),
     "c": ("tests.constants", "c"),
     "celery_config": ("tests.conftest", "celery_config"),
     "code_analysis_config": ("tests.conftest", "code_analysis_config"),

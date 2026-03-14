@@ -64,33 +64,59 @@ if TYPE_CHECKING:
     from flext_quality.typings import FlextQualityTypes, t
     from flext_quality.utilities import FlextQualityUtilities, u
 
-# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "BaseHookImpl": ("flext_quality.hooks.base", "BaseHookImpl"),
-    "ExecutionRequest": ("flext_quality.integrations.code_execution", "ExecutionRequest"),
+    "ExecutionRequest": (
+        "flext_quality.integrations.code_execution",
+        "ExecutionRequest",
+    ),
     "ExecutionResult": ("flext_quality.integrations.code_execution", "ExecutionResult"),
     "FlextQuality": ("flext_quality.api", "FlextQuality"),
-    "FlextQualityClaudeContextClient": ("flext_quality.integrations.claude_context", "FlextQualityClaudeContextClient"),
-    "FlextQualityClaudeMemClient": ("flext_quality.integrations.claude_mem", "FlextQualityClaudeMemClient"),
+    "FlextQualityClaudeContextClient": (
+        "flext_quality.integrations.claude_context",
+        "FlextQualityClaudeContextClient",
+    ),
+    "FlextQualityClaudeMemClient": (
+        "flext_quality.integrations.claude_mem",
+        "FlextQualityClaudeMemClient",
+    ),
     "FlextQualityCliService": ("flext_quality.services.cli", "FlextQualityCliService"),
-    "FlextQualityCodeExecutionBridge": ("flext_quality.integrations.code_execution", "FlextQualityCodeExecutionBridge"),
+    "FlextQualityCodeExecutionBridge": (
+        "flext_quality.integrations.code_execution",
+        "FlextQualityCodeExecutionBridge",
+    ),
     "FlextQualityConstants": ("flext_quality.constants", "FlextQualityConstants"),
-    "FlextQualityMcpClient": ("flext_quality.integrations.mcp_client", "FlextQualityMcpClient"),
+    "FlextQualityMcpClient": (
+        "flext_quality.integrations.mcp_client",
+        "FlextQualityMcpClient",
+    ),
     "FlextQualityModels": ("flext_quality.models", "FlextQualityModels"),
     "FlextQualityProtocols": ("flext_quality.protocols", "FlextQualityProtocols"),
-    "FlextQualityRulesEngine": ("flext_quality.rules.engine", "FlextQualityRulesEngine"),
-    "FlextQualityRulesLoader": ("flext_quality.rules.loader", "FlextQualityRulesLoader"),
+    "FlextQualityRulesEngine": (
+        "flext_quality.rules.engine",
+        "FlextQualityRulesEngine",
+    ),
+    "FlextQualityRulesLoader": (
+        "flext_quality.rules.loader",
+        "FlextQualityRulesLoader",
+    ),
     "FlextQualitySettings": ("flext_quality.settings", "FlextQualitySettings"),
     "FlextQualityTypes": ("flext_quality.typings", "FlextQualityTypes"),
     "FlextQualityUtilities": ("flext_quality.utilities", "FlextQualityUtilities"),
-    "FlextQualityValidators": ("flext_quality.rules.validators", "FlextQualityValidators"),
+    "FlextQualityValidators": (
+        "flext_quality.rules.validators",
+        "FlextQualityValidators",
+    ),
     "HookManager": ("flext_quality.hooks.manager", "HookManager"),
     "McpToolCall": ("flext_quality.integrations.mcp_client", "McpToolCall"),
     "McpToolResult": ("flext_quality.integrations.mcp_client", "McpToolResult"),
     "c": ("flext_quality.constants", "c"),
     "execute_hook": ("flext_quality.mcp.tools", "execute_hook"),
     "get_hooks_config": ("flext_quality.mcp.resources", "get_hooks_config"),
-    "get_integrations_status": ("flext_quality.mcp.resources", "get_integrations_status"),
+    "get_integrations_status": (
+        "flext_quality.mcp.resources",
+        "get_integrations_status",
+    ),
     "get_rules_config": ("flext_quality.mcp.resources", "get_rules_config"),
     "get_server": ("flext_quality.mcp.server", "get_server"),
     "m": ("flext_quality.models", "m"),

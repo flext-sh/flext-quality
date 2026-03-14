@@ -35,14 +35,28 @@ if TYPE_CHECKING:
         McpToolResult,
     )
 
-# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
-    "ExecutionRequest": ("flext_quality.integrations.code_execution", "ExecutionRequest"),
+    "ExecutionRequest": (
+        "flext_quality.integrations.code_execution",
+        "ExecutionRequest",
+    ),
     "ExecutionResult": ("flext_quality.integrations.code_execution", "ExecutionResult"),
-    "FlextQualityClaudeContextClient": ("flext_quality.integrations.claude_context", "FlextQualityClaudeContextClient"),
-    "FlextQualityClaudeMemClient": ("flext_quality.integrations.claude_mem", "FlextQualityClaudeMemClient"),
-    "FlextQualityCodeExecutionBridge": ("flext_quality.integrations.code_execution", "FlextQualityCodeExecutionBridge"),
-    "FlextQualityMcpClient": ("flext_quality.integrations.mcp_client", "FlextQualityMcpClient"),
+    "FlextQualityClaudeContextClient": (
+        "flext_quality.integrations.claude_context",
+        "FlextQualityClaudeContextClient",
+    ),
+    "FlextQualityClaudeMemClient": (
+        "flext_quality.integrations.claude_mem",
+        "FlextQualityClaudeMemClient",
+    ),
+    "FlextQualityCodeExecutionBridge": (
+        "flext_quality.integrations.code_execution",
+        "FlextQualityCodeExecutionBridge",
+    ),
+    "FlextQualityMcpClient": (
+        "flext_quality.integrations.mcp_client",
+        "FlextQualityMcpClient",
+    ),
     "McpToolCall": ("flext_quality.integrations.mcp_client", "McpToolCall"),
     "McpToolResult": ("flext_quality.integrations.mcp_client", "McpToolResult"),
     "r": ("flext_quality.integrations.code_execution", "ExecutionResult"),
