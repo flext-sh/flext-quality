@@ -15,7 +15,7 @@ from flext_quality.rules.engine import FlextQualityRulesEngine
 @mcp.tool()
 def search_memory(
     query: str, *, search_type: str = "observations", limit: int | None = None
-) -> Mapping[str, object]:
+) -> Mapping[str, t.NormalizedValue]:
     """Build command to search cross-session memory via claude-mem.
 
     Returns the mcp-cli command that can be used to execute the search.
@@ -40,7 +40,9 @@ def search_memory(
 
 
 @mcp.tool()
-def search_code(query: str, *, limit: int | None = None) -> Mapping[str, object]:
+def search_code(
+    query: str, *, limit: int | None = None
+) -> Mapping[str, t.NormalizedValue]:
     """Build command for semantic code search via claude-context.
 
     Returns the mcp-cli command that can be used to execute the search.
@@ -76,8 +78,10 @@ def execute_hook(event: str, input_data: t.Quality.HookInput) -> t.Quality.HookO
 
 @mcp.tool()
 def validate_rules(
-    path: str, *, context: Mapping[str, object] | None = None
-) -> Mapping[str, object]:
+    path: str,
+    *,
+    context: Mapping[str, t.NormalizedValue] | None = None,
+) -> Mapping[str, t.NormalizedValue]:
     """Validate code against YAML rules."""
     engine = FlextQualityRulesEngine()
     result = engine.validate(path=path, context=context)

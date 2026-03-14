@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pydantic import TypeAdapter
 
-from flext_quality import c
+from flext_quality import c, t
 from flext_quality.hooks.manager import HookManager
 from flext_quality.integrations.claude_context import FlextQualityClaudeContextClient
 from flext_quality.integrations.claude_mem import FlextQualityClaudeMemClient
@@ -18,7 +18,7 @@ def get_hooks_config() -> str:
     manager = HookManager()
     config = manager.get_config()
     return (
-        TypeAdapter(dict[str, object])
+        TypeAdapter(dict[str, t.NormalizedValue])
         .dump_json(dict(config), indent=c.Quality.Defaults.JSON_INDENT)
         .decode("utf-8")
     )
@@ -30,7 +30,7 @@ def get_rules_config() -> str:
     engine = FlextQualityRulesEngine()
     rules = engine.get_rules()
     return (
-        TypeAdapter(list[dict[str, object]])
+        TypeAdapter(list[dict[str, t.NormalizedValue]])
         .dump_json(
             [rule.model_dump() for rule in rules], indent=c.Quality.Defaults.JSON_INDENT
         )
@@ -41,7 +41,7 @@ def get_rules_config() -> str:
 @mcp.resource("status://integrations")
 def get_integrations_status() -> str:
     """Get status of all integrations."""
-    status: dict[str, object] = {}
+    status: dict[str, t.NormalizedValue] = {}
     mem_client = FlextQualityClaudeMemClient()
     mem_health = mem_client.health_check()
     status["claude_mem"] = (
@@ -53,7 +53,7 @@ def get_integrations_status() -> str:
         ctx_health.value if ctx_health.is_success else {"error": ctx_health.error}
     )
     return (
-        TypeAdapter(dict[str, object])
+        TypeAdapter(dict[str, t.NormalizedValue])
         .dump_json(status, indent=c.Quality.Defaults.JSON_INDENT)
         .decode("utf-8")
     )

@@ -67,7 +67,10 @@ class FlextQualityMcpClient:
         return r[list[str]].ok(["mcp-cli", "info", tool_path])
 
     def build_tool_call(
-        self, server: str, tool: str, params: t.NormalizedValue | None = None
+        self,
+        server: str,
+        tool: str,
+        params: Mapping[str, t.NormalizedValue] | None = None,
     ) -> r[McpToolCall]:
         """Build an MCP tool call request."""
         call_params: dict[str, t.NormalizedValue] = {}

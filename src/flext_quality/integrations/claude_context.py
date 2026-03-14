@@ -14,7 +14,7 @@ from typing import final
 
 from flext_core import r
 
-from flext_quality import c
+from flext_quality import c, t
 from flext_quality.integrations.mcp_client import FlextQualityMcpClient, McpToolCall
 
 
@@ -34,7 +34,7 @@ class FlextQualityClaudeContextClient:
 
     def build_index_call(self, path: str | None = None) -> r[McpToolCall]:
         """Build an index_codebase tool call."""
-        params: dict[str, object] = {}
+        params: dict[str, t.NormalizedValue] = {}
         if path:
             params["path"] = path
         return self._mcp.build_tool_call(self.SERVER_NAME, "index_codebase", params)
@@ -65,18 +65,18 @@ class FlextQualityClaudeContextClient:
             self._mcp.build_call_command
         )
 
-    def health_check(self) -> r[Mapping[str, object]]:
+    def health_check(self) -> r[Mapping[str, t.NormalizedValue]]:
         """Check if claude-context is available."""
         mcp_health = self._mcp.health_check()
         if mcp_health.is_failure:
-            return r[Mapping[str, object]].fail(mcp_health.error)
+            return r[Mapping[str, t.NormalizedValue]].fail(mcp_health.error)
         health_data = mcp_health.value
         status = (
             c.Quality.IntegrationStatus.CONNECTED
             if health_data.get("available", False)
             else c.Quality.IntegrationStatus.DISCONNECTED
         )
-        return r[Mapping[str, object]].ok({
+        return r[Mapping[str, t.NormalizedValue]].ok({
             "server": self.SERVER_NAME,
             "status": status,
             "available": health_data.get("available", False),

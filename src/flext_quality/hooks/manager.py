@@ -42,7 +42,7 @@ class HookManager:
                 return result
         return r[t.Quality.HookOutput].ok({"continue": True})
 
-    def get_config(self) -> Mapping[str, list[Mapping[str, object]]]:
+    def get_config(self) -> Mapping[str, list[Mapping[str, t.NormalizedValue]]]:
         """Get hooks configuration as dict."""
         return {
             event.value: [{"matcher": h.matcher} for h in hooks]
@@ -52,7 +52,7 @@ class HookManager:
     def get_config_json(self) -> str:
         """Get hooks configuration as JSON."""
         return (
-            TypeAdapter(dict[str, object])
+            TypeAdapter(dict[str, t.NormalizedValue])
             .dump_json(dict(self.get_config()), indent=c.Quality.Defaults.JSON_INDENT)
             .decode("utf-8")
         )
