@@ -1,3 +1,6 @@
+# AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
+# Regenerate with: make codegen
+#
 """Integrations - External service clients (Claude Mem, Claude Context, etc.).
 
 Provides clients for MCP servers and code execution capabilities
@@ -21,6 +24,7 @@ if TYPE_CHECKING:
     from flext_quality.integrations.code_execution import (
         ExecutionRequest,
         ExecutionResult,
+        ExecutionResult as r,
         FlextQualityCodeExecutionBridge,
     )
     from flext_quality.integrations.mcp_client import (
@@ -54,6 +58,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     ),
     "McpToolCall": ("flext_quality.integrations.mcp_client", "McpToolCall"),
     "McpToolResult": ("flext_quality.integrations.mcp_client", "McpToolResult"),
+    "r": ("flext_quality.integrations.code_execution", "ExecutionResult"),
 }
 
 __all__ = [
@@ -65,12 +70,11 @@ __all__ = [
     "FlextQualityMcpClient",
     "McpToolCall",
     "McpToolResult",
+    "r",
 ]
 
 
-def __getattr__(
-    name: str,
-):  # JUSTIFIED: Ruff (any-type) with PEP 562 dynamic module exports — https://docs.astral.sh/ruff/rules/any-type/
+def __getattr__(name: str) -> t.ModuleExport:
     """Lazy-load module attributes on first access (PEP 562)."""
     return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
 

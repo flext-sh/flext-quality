@@ -1,3 +1,6 @@
+# AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
+# Regenerate with: make codegen
+#
 """Test helpers for flext-quality tests.
 
 Provides reusable test utilities and helpers for all test modules.
@@ -17,7 +20,10 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
 if TYPE_CHECKING:
-    from assertions import (
+    from tests.helpers.constants import TestsConstants, c
+    from tests.helpers.models import TestsModels, m
+    from tests.helpers.protocols import TestsProtocols, p
+    from tests.helpers.typing_helpers import (
         assert_analysis_results_structure,
         assert_dict_structure,
         assert_is_dict,
@@ -27,31 +33,37 @@ if TYPE_CHECKING:
         safe_dict_access,
         safe_list_access,
     )
-    from constants import TestsConstants, TestsConstants as c
-    from models import TestsModels, TestsModels as m
-    from protocols import TestsProtocols, TestsProtocols as p
-    from typings import TestsTypings, t
+    from tests.helpers.typings import TestsTypings, t
+
+# Lazy import mapping: export_name -> (module_path, attr_name)
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
-    "TestsConstants": ("constants", "TestsConstants"),
-    "TestsModels": ("models", "TestsModels"),
-    "TestsProtocols": ("protocols", "TestsProtocols"),
-    "TestsTypings": ("typings", "TestsTypings"),
+    "TestsConstants": ("tests.helpers.constants", "TestsConstants"),
+    "TestsModels": ("tests.helpers.models", "TestsModels"),
+    "TestsProtocols": ("tests.helpers.protocols", "TestsProtocols"),
+    "TestsTypings": ("tests.helpers.typings", "TestsTypings"),
     "assert_analysis_results_structure": (
-        "assertions",
+        "tests.helpers.typing_helpers",
         "assert_analysis_results_structure",
     ),
-    "assert_dict_structure": ("assertions", "assert_dict_structure"),
-    "assert_is_dict": ("assertions", "assert_is_dict"),
-    "assert_is_list": ("assertions", "assert_is_list"),
-    "assert_issues_structure": ("assertions", "assert_issues_structure"),
-    "assert_metrics_structure": ("assertions", "assert_metrics_structure"),
-    "c": ("constants", "TestsConstants"),
-    "m": ("models", "TestsModels"),
-    "p": ("protocols", "TestsProtocols"),
-    "safe_dict_access": ("assertions", "safe_dict_access"),
-    "safe_list_access": ("assertions", "safe_list_access"),
-    "t": ("typings", "t"),
+    "assert_dict_structure": ("tests.helpers.typing_helpers", "assert_dict_structure"),
+    "assert_is_dict": ("tests.helpers.typing_helpers", "assert_is_dict"),
+    "assert_is_list": ("tests.helpers.typing_helpers", "assert_is_list"),
+    "assert_issues_structure": (
+        "tests.helpers.typing_helpers",
+        "assert_issues_structure",
+    ),
+    "assert_metrics_structure": (
+        "tests.helpers.typing_helpers",
+        "assert_metrics_structure",
+    ),
+    "c": ("tests.helpers.constants", "c"),
+    "m": ("tests.helpers.models", "m"),
+    "p": ("tests.helpers.protocols", "p"),
+    "safe_dict_access": ("tests.helpers.typing_helpers", "safe_dict_access"),
+    "safe_list_access": ("tests.helpers.typing_helpers", "safe_list_access"),
+    "t": ("tests.helpers.typings", "t"),
 }
+
 __all__ = [
     "TestsConstants",
     "TestsModels",
@@ -72,7 +84,7 @@ __all__ = [
 ]
 
 
-def __getattr__(name: str):
+def __getattr__(name: str) -> t.ModuleExport:
     """Lazy-load module attributes on first access (PEP 562)."""
     return lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
 
