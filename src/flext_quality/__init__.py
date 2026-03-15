@@ -1,15 +1,7 @@
 # AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
 # Regenerate with: make codegen
 #
-"""FLEXT Quality - Unified orchestration platform for Claude Code tooling.
-
-Exposes `FlextQuality` as the main API facade, along with domain models,
-settings, and utilities. Uses flext-core patterns: `r[T]`
-railway pattern, `FlextSettings`.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
+"""Flext quality package."""
 
 from __future__ import annotations
 
@@ -20,6 +12,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
+    from flext_quality import hooks, integrations, mcp, rules, services
     from flext_quality.api import FlextQuality
     from flext_quality.constants import FlextQualityConstants, c
     from flext_quality.hooks.base import BaseHookImpl
@@ -44,7 +37,7 @@ if TYPE_CHECKING:
         get_integrations_status,
         get_rules_config,
     )
-    from flext_quality.mcp.server import get_server, mcp
+    from flext_quality.mcp.server import get_server
     from flext_quality.mcp.tools import (
         execute_hook,
         search_code,
@@ -119,13 +112,17 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     ),
     "get_rules_config": ("flext_quality.mcp.resources", "get_rules_config"),
     "get_server": ("flext_quality.mcp.server", "get_server"),
+    "hooks": ("flext_quality.hooks", ""),
+    "integrations": ("flext_quality.integrations", ""),
     "m": ("flext_quality.models", "m"),
-    "mcp": ("flext_quality.mcp.server", "mcp"),
+    "mcp": ("flext_quality.mcp", ""),
     "p": ("flext_quality.protocols", "p"),
     "r": ("flext_quality.integrations.code_execution", "ExecutionResult"),
+    "rules": ("flext_quality.rules", ""),
     "s": ("flext_quality.services.cli", "FlextQualityCliService"),
     "search_code": ("flext_quality.mcp.tools", "search_code"),
     "search_memory": ("flext_quality.mcp.tools", "search_memory"),
+    "services": ("flext_quality.services", ""),
     "t": ("flext_quality.typings", "t"),
     "u": ("flext_quality.utilities", "u"),
     "validate_rules": ("flext_quality.mcp.tools", "validate_rules"),
@@ -159,13 +156,17 @@ __all__ = [
     "get_integrations_status",
     "get_rules_config",
     "get_server",
+    "hooks",
+    "integrations",
     "m",
     "mcp",
     "p",
     "r",
+    "rules",
     "s",
     "search_code",
     "search_memory",
+    "services",
     "t",
     "u",
     "validate_rules",

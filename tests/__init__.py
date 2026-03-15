@@ -1,13 +1,7 @@
 # AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
 # Regenerate with: make codegen
 #
-"""FLEXT Quality Tests - Test infrastructure and utilities.
-
-Provides TestsFlextQuality classes extending FlextTests and FlextQuality for comprehensive testing.
-
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
-"""
+"""Tests package."""
 
 from __future__ import annotations
 
@@ -18,6 +12,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
+    from tests import helpers, unit
     from tests.conftest import (
         MockQualityAnalyzer,
         MockReportGenerator,
@@ -139,6 +134,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "code_analysis_config": ("tests.conftest", "code_analysis_config"),
     "codeclimate_config": ("tests.conftest", "codeclimate_config"),
     "dashboard_data": ("tests.conftest", "dashboard_data"),
+    "helpers": ("tests.helpers", ""),
     "m": ("tests.models", "m"),
     "mock_quality_analyzer": ("tests.conftest", "mock_quality_analyzer"),
     "mock_report_generator": ("tests.conftest", "mock_report_generator"),
@@ -159,6 +155,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "test_basic": ("tests.unit.test_basic", "test_basic"),
     "tm": ("tests.models", "tm"),
     "u": ("tests.utilities", "TestsFlextQualityUtilities"),
+    "unit": ("tests.unit", ""),
 }
 
 __all__ = [
@@ -197,6 +194,7 @@ __all__ = [
     "code_analysis_config",
     "codeclimate_config",
     "dashboard_data",
+    "helpers",
     "m",
     "mock_quality_analyzer",
     "mock_report_generator",
@@ -217,6 +215,7 @@ __all__ = [
     "test_basic",
     "tm",
     "u",
+    "unit",
 ]
 
 
