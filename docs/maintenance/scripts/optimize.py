@@ -9,6 +9,8 @@ Usage:
     python optimize.py --comprehensive --backup
 """
 
+from __future__ import annotations
+
 import argparse
 import json
 import logging

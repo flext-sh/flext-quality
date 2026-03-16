@@ -4,6 +4,8 @@ Centralized configuration management system for all maintenance components.
 Handles loading, validation, and access to configuration files.
 """
 
+from __future__ import annotations
+
 from pathlib import Path
 from typing import Any
 

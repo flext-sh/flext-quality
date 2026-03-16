@@ -5,6 +5,8 @@ Advanced link checking utility with retry logic, rate limiting,
 and comprehensive validation capabilities.
 """
 
+from __future__ import annotations
+
 import asyncio
 import json
 import pathlib
