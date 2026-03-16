@@ -1,0 +1,25 @@
+tests/helpers/assertions.py
+  a87c37bd85fd5adb 14,16-17,22,28,35,40,45,51,53-54,60,62-63
+tests/helpers/typing_helpers.py
+  a87c37bd85fd5adb 16,18,20-21,38,55,95-97,116-117,135,153
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.12",
+  "base_commit_sha": "23a7886844d92b62e21ec2c3745f9f000cd9cad4",
+  "prompts": {
+    "a87c37bd85fd5adb": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_308934a72ffeJ6x2A8RvY36ubD",
+        "model": "kimi-for-coding/k2p5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 34,
+      "total_deletions": 26,
+      "accepted_lines": 27,
+      "overriden_lines": 0
+    }
+  }
+}
