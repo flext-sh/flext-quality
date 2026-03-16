@@ -57,7 +57,7 @@ class FlextQuality:
     _lock: ClassVar[threading.Lock] = threading.Lock()
     _name: str
     _version: str
-    _container: FlextContainer
+    _container: p.Container
     logger: p.Log.StructlogLogger
     config: FlextQualitySettings
     hooks: HookManager
