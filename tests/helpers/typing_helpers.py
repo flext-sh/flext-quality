@@ -11,14 +11,14 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from typing import TypeGuard
+from typing import TypeIs
 
 from flext_core import t
 
 
 def assert_is_dict(
     value: t.Scalar | dict[str, t.Scalar],
-) -> TypeGuard[dict[str, t.Scalar]]:
+) -> TypeIs[dict[str, t.Scalar]]:
     """Type-safe dict[str, object] assertion following Single Responsibility Principle.
 
     Args:
@@ -35,7 +35,7 @@ def assert_is_dict(
     return True
 
 
-def assert_is_list(value: t.Scalar | list[t.Scalar]) -> TypeGuard[list[t.Scalar]]:
+def assert_is_list(value: t.Scalar | list[t.Scalar]) -> TypeIs[list[t.Scalar]]:
     """Type-safe list assertion following Single Responsibility Principle.
 
     Args:

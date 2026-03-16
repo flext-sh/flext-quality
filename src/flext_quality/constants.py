@@ -9,8 +9,8 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from enum import StrEnum
-from typing import Final, Literal, TypeAlias
+from enum import StrEnum, unique
+from typing import Final, Literal
 
 from flext_cli import FlextCliConstants
 from flext_web import FlextWebConstants
@@ -35,26 +35,27 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
         class Literals:
             """Literal type aliases for quality domain values."""
 
-            AnalysisStatusLiteral: TypeAlias = Literal[
+            type AnalysisStatusLiteral = Literal[
                 "pending", "running", "completed", "failed", "cancelled"
             ]
-            IssueSeverityLiteral: TypeAlias = Literal[
+            type IssueSeverityLiteral = Literal[
                 "critical", "error", "warning", "info", "hint"
             ]
-            IssueTypeLiteral: TypeAlias = Literal[
+            type IssueTypeLiteral = Literal[
                 "lint", "type", "security", "complexity", "style", "documentation"
             ]
-            ReportFormatLiteral: TypeAlias = Literal[
+            type ReportFormatLiteral = Literal[
                 "json", "html", "markdown", "text", "sarif"
             ]
-            BackendTypeLiteral: TypeAlias = Literal[
+            type BackendTypeLiteral = Literal[
                 "ruff", "mypy", "pyrefly", "bandit", "vulture", "radon"
             ]
-            LanguageLiteral: TypeAlias = Literal[
+            type LanguageLiteral = Literal[
                 "python", "typescript", "javascript", "go", "rust"
             ]
-            CheckStatusLiteral: TypeAlias = Literal["pass", "fail", "skip", "error"]
+            type CheckStatusLiteral = Literal["pass", "fail", "skip", "error"]
 
+        @unique
         class HookEvent(StrEnum):
             """Claude Code hook events."""
 
@@ -65,6 +66,7 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
             SESSION_START = "SessionStart"
             STOP = "Stop"
 
+        @unique
         class ToolName(StrEnum):
             """Tool names for hook filtering."""
 
@@ -75,6 +77,7 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
             GLOB = "Glob"
             GREP = "Grep"
 
+        @unique
         class RuleType(StrEnum):
             """Rule types for validation."""
 
@@ -82,6 +85,7 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
             WARNING = "warning"
             INFO = "info"
 
+        @unique
         class RuleCategory(StrEnum):
             """Rule categories for organization."""
 
@@ -92,6 +96,7 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
             SECURITY = "security"
             DOCUMENTATION = "documentation"
 
+        @unique
         class Severity(StrEnum):
             """Rule severity levels."""
 
@@ -99,6 +104,7 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
             WARNING = "warning"
             INFO = "info"
 
+        @unique
         class RuleResult(StrEnum):
             """Rule evaluation results."""
 
@@ -106,6 +112,7 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
             FAIL = "fail"
             SKIP = "skip"
 
+        @unique
         class IntegrationStatus(StrEnum):
             """External integration status."""
 
@@ -113,6 +120,7 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
             DISCONNECTED = "disconnected"
             ERROR = "error"
 
+        @unique
         class HookAction(StrEnum):
             """Hook response actions."""
 
