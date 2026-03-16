@@ -59,7 +59,7 @@ class DocumentationReporter:
         self.validation_data = self._load_json_report("latest_validation.json")
         self.optimization_data = self._load_json_report("latest_optimization.json")
 
-    def _load_json_report(self, filename: str) -> None | None:
+    def _load_json_report(self, filename: str) -> None:
         """Load a JSON report file."""
         filepath = self.reports_dir / filename
         if filepath.exists():
@@ -137,9 +137,9 @@ class DocumentationReporter:
             summary["quality_trend"] = "critical"
         return summary
 
-    def _analyze_trends(self) -> None | None:
+    def _analyze_trends(self) -> None:
         """Analyze quality trends over time."""
-        return None
+        return
 
     def _generate_recommendations(self) -> list:
         """Generate actionable recommendations based on current data."""
