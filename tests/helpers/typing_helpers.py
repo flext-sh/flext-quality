@@ -66,7 +66,7 @@ def safe_dict_access(data: dict[str, object], key: str) -> object:
     return data[key]
 
 
-def safe_list_access(data: list, index: int):
+def safe_list_access[T](data: list[T], index: int) -> T:
     """Type-safe list access with proper error handling.
 
     Args:

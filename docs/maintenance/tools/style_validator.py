@@ -476,7 +476,7 @@ Top Issues:
 """
 
         # Count issue types
-        issue_types: dict[Materialization, int] = {}
+        issue_types: dict[str, int] = {}
         for violation in (
             self.results["style_violations"] + self.results["accessibility_issues"]
         ):

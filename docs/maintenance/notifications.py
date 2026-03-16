@@ -120,7 +120,7 @@ class DocumentationNotifier:
             with Path(config_path).open(encoding="utf-8") as f:
                 loaded = yaml.safe_load(f)
                 if isinstance(loaded, dict):
-                    self.config = self._load_user_config(loaded)
+                    self.config = self._load_user_config({})
                 else:
                     self.config = self.get_default_config()
         except FileNotFoundError:
@@ -132,12 +132,13 @@ class DocumentationNotifier:
             str,
             int
             | str
+            | float
             | bool
             | list[str]
-            | dict[str, int | str | bool | list[str] | dict[str, str]],
+            | dict[str, int | str | float | bool | list[str] | dict[str, str]]
+            | None,
         ],
     ) -> _NotifierConfig:
-        """Load user config with safe fallback to defaults."""
         cfg = self.get_default_config()
 
         channels = loaded.get("channels")
@@ -254,7 +255,11 @@ class DocumentationNotifier:
         metrics_val = audit_data.get("metrics", {})
         metrics = metrics_val if isinstance(metrics_val, dict) else {}
         severity_val = metrics.get("severity_breakdown", {})
-        severity_breakdown = severity_val if isinstance(severity_val, dict) else {}
+        severity_breakdown: dict[str, int] = {}
+        if isinstance(severity_val, dict):
+            for key_name in ("critical", "high", "medium", "low"):
+                if key_name in severity_val and isinstance(severity_val[key_name], int):
+                    severity_breakdown[key_name] = severity_val[key_name]
         critical_raw = severity_breakdown.get("critical", 0)
         critical_count = int(critical_raw) if isinstance(critical_raw, int) else 0
         threshold = self.config["alerts"]["critical_issues"]["threshold"]
@@ -489,7 +494,11 @@ Timestamp: {datetime.now(UTC).isoformat()}
         metrics_val = audit_data.get("metrics")
         metrics = metrics_val if isinstance(metrics_val, dict) else {}
         severity_val = metrics.get("severity_breakdown")
-        severity_breakdown = severity_val if isinstance(severity_val, dict) else {}
+        severity_breakdown: dict[str, int] = {}
+        if isinstance(severity_val, dict):
+            for key_name in ("critical", "high", "medium", "low"):
+                if key_name in severity_val and isinstance(severity_val[key_name], int):
+                    severity_breakdown[key_name] = severity_val[key_name]
 
         issues_val = audit_data.get("issues")
         issues = issues_val if isinstance(issues_val, list) else []
@@ -601,7 +610,7 @@ def main() -> None:
             "info",
         )
         if not success:
-            for err in notifier.results["errors"]:
+            for err in notifier.results.errors:
                 _ = err  # consumed
     elif args.audit_data:
         # Process audit data and send appropriate notifications

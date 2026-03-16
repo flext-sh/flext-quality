@@ -183,13 +183,13 @@ class LinkValidator:
 
     def _create_link_result(
         self,
-        link,
+        link: dict[str, str | int | None],
         *,
         valid: bool,
         url: str,
         status_code: int | None = None,
         error: str | None = None,
-    ):
+    ) -> dict[str, str | int | bool | None]:
         """Create a standardized link validation result."""
         result = {
             "valid": valid,
@@ -246,10 +246,15 @@ class LinkValidator:
             return (False, {"error": f"Unexpected error: {e!s}"})
         return (False, None)
 
-    def _check_single_external_link(self, link, *, verbose: bool = False):
+    def _check_single_external_link(
+        self,
+        link: dict[str, str | int | None],
+        *,
+        verbose: bool = False,
+    ) -> dict[str, str | int | bool | None]:
         """Check a single external link."""
         _ = verbose
-        url = link["url"]
+        url = str(link["url"])
         for attempt in range(self.retries):
             success, result = self._handle_request_attempt(url, attempt)
             if result is not None:
