@@ -13,8 +13,12 @@ from __future__ import annotations
 
 from typing import TypeGuard
 
+from flext_core import t
 
-def assert_is_dict(value) -> TypeGuard[dict[str, object]]:
+
+def assert_is_dict(
+    value: t.Scalar | dict[str, t.Scalar],
+) -> TypeGuard[dict[str, t.Scalar]]:
     """Type-safe dict[str, object] assertion following Single Responsibility Principle.
 
     Args:
@@ -31,7 +35,7 @@ def assert_is_dict(value) -> TypeGuard[dict[str, object]]:
     return True
 
 
-def assert_is_list(value) -> TypeGuard[list]:
+def assert_is_list(value: t.Scalar | list[t.Scalar]) -> TypeGuard[list[t.Scalar]]:
     """Type-safe list assertion following Single Responsibility Principle.
 
     Args:
@@ -48,7 +52,7 @@ def assert_is_list(value) -> TypeGuard[list]:
     return True
 
 
-def safe_dict_access(data: dict[str, object], key: str) -> object:
+def safe_dict_access(data: dict[str, t.Scalar], key: str) -> t.Scalar:
     """Type-safe dictionary access with proper error handling.
 
     Args:
@@ -88,9 +92,9 @@ def safe_list_access[T](data: list[T], index: int) -> T:
 
 
 def assert_dict_structure(
-    data: dict[str, object], required_keys: list[str]
-) -> dict[str, object]:
-    """Assert that object is dict[str, object] with required keys - DRY pattern.
+    data: dict[str, t.Scalar], required_keys: list[str]
+) -> dict[str, t.Scalar]:
+    """Assert that object is dict with required keys - DRY pattern.
 
     Args:
       data: Object to check
@@ -108,7 +112,9 @@ def assert_dict_structure(
     return data
 
 
-def assert_analysis_results_structure(results) -> dict[str, object]:
+def assert_analysis_results_structure(
+    results: dict[str, t.Scalar],
+) -> dict[str, t.Scalar]:
     """Assert analyzer results have expected structure - specialized helper.
 
     Args:
@@ -126,7 +132,7 @@ def assert_analysis_results_structure(results) -> dict[str, object]:
     return assert_dict_structure(results, ["metrics", "issues", "python_files"])
 
 
-def assert_metrics_structure(metrics) -> dict[str, object]:
+def assert_metrics_structure(metrics: dict[str, t.Scalar]) -> dict[str, t.Scalar]:
     """Assert metrics have expected structure - specialized helper.
 
     Args:
@@ -144,7 +150,7 @@ def assert_metrics_structure(metrics) -> dict[str, object]:
     return assert_dict_structure(metrics, ["total_files", "total_lines_of_code"])
 
 
-def assert_issues_structure(issues) -> dict[str, object]:
+def assert_issues_structure(issues: dict[str, t.Scalar]) -> dict[str, t.Scalar]:
     """Assert issues have expected structure - specialized helper.
 
     Args:
