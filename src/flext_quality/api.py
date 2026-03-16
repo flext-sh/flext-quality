@@ -58,7 +58,7 @@ class FlextQuality:
     _name: str
     _version: str
     _container: p.Container
-    logger: p.Log.StructlogLogger
+    logger: p.Logger
     config: FlextQualitySettings
     hooks: HookManager
     rules_loader: FlextQualityRulesLoader
