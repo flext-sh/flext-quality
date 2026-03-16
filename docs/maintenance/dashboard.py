@@ -12,7 +12,7 @@ import operator
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
-from flask import Flask, Response, jsonify, render_template_string, request
+from flask import Flask, Response, render_template_string, request
 from flext_core import FlextLogger
 
 
@@ -39,24 +39,46 @@ class DocumentationDashboard:
             """Main dashboard page."""
             return render_template_string(self.get_dashboard_html())
 
+        _ = index
+
         @self.app.route("/api/metrics")
         def api_metrics() -> Response:
             """API endpoint for current metrics."""
-            return jsonify(self.get_current_metrics())
+            return Response(
+                json.dumps(self.get_current_metrics()),
+                mimetype="application/json",
+            )
+
+        _ = api_metrics
 
         @self.app.route("/api/trends")
         def api_trends() -> Response:
             """API endpoint for quality trends."""
             days = int(request.args.get("days", 30))
-            return jsonify(self.get_quality_trends(days))
+            return Response(
+                json.dumps(self.get_quality_trends(days)),
+                mimetype="application/json",
+            )
+
+        _ = api_trends
 
         @self.app.route("/api/reports")
         def api_reports() -> Response:
             """API endpoint for recent reports."""
             limit = int(request.args.get("limit", 10))
-            return jsonify(self.get_recent_reports(limit))
+            return Response(
+                json.dumps(self.get_recent_reports(limit)),
+                mimetype="application/json",
+            )
 
-    def get_current_metrics(self):
+        _ = api_reports
+
+    def get_current_metrics(
+        self,
+    ) -> dict[
+        str,
+        int | str | dict[str, int],
+    ]:
         """Get current quality metrics from latest audit."""
         latest_audit = self.reports_dir / "latest_audit.json"
 
@@ -94,11 +116,14 @@ class DocumentationDashboard:
                 "status": f"Error: {e!s}",
             }
 
-    def get_quality_trends(self, days: int = 30):
+    def get_quality_trends(
+        self,
+        days: int = 30,
+    ) -> dict[str, int | list[dict[str, int | str]]]:
         """Get quality trends over the specified number of days."""
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
 
-        trend_data: list = []
+        trend_data: list[dict[str, int | str]] = []
         reports_dir = self.reports_dir
 
         # Find all audit reports
@@ -150,9 +175,9 @@ class DocumentationDashboard:
             "trends": trend_data,
         }
 
-    def get_recent_reports(self, limit: int = 10) -> list:
+    def get_recent_reports(self, limit: int = 10) -> list[dict[str, int | str]]:
         """Get list of recent audit reports."""
-        reports: list = []
+        reports: list[dict[str, int | str]] = []
 
         for report_file in self.reports_dir.glob("audit_report_*.json"):
             try:

@@ -13,6 +13,10 @@ from typing import Protocol
 
 from pydantic import BaseModel, Field
 
+type GenericItem = (
+    str | int | float | bool | Path | dict[str, str | int | float | bool | None]
+)
+
 
 class Issue(BaseModel):
     """Represents a documentation quality issue."""
@@ -25,9 +29,14 @@ class Issue(BaseModel):
     line: int | None = Field(default=None, description="Line number of the issue")
     description: str = Field(default="", description="Detailed issue description")
     recommendation: str = Field(default="", description="Recommended fix for the issue")
-    context = Field(default=None, description="Additional context data")
+    context: dict[str, str | int | float | bool | None] | None = Field(
+        default=None,
+        description="Additional context data",
+    )
 
-    def to_dict(self):
+    def to_dict(
+        self,
+    ) -> dict[str, str | int | dict[str, str | int | float | bool | None] | None]:
         """Convert issue to dictionary representation."""
         return {
             "type": self.type,
@@ -46,12 +55,13 @@ class ValidationResult(BaseModel):
     total_items: int = Field(default=0, description="Total items validated")
     valid_items: int = Field(default=0, description="Number of valid items")
     invalid_items: int = Field(default=0, description="Number of invalid items")
-    issues: list[Issue] = Field(
-        default_factory=list, description="List of issues found"
-    )
+    issues: list[Issue] = []
     warnings: list[str] = Field(default_factory=list, description="Warning messages")
     errors: list[str] = Field(default_factory=list, description="Error messages")
-    metadata = Field(default_factory=dict, description="Additional metadata")
+    metadata: dict[str, str | int | float | bool] = Field(
+        default_factory=dict,
+        description="Additional metadata",
+    )
 
     @property
     def success_rate(self) -> float:
@@ -68,7 +78,16 @@ class ValidationResult(BaseModel):
         else:
             self.valid_items += 1
 
-    def to_dict(self):
+    def to_dict(
+        self,
+    ) -> dict[
+        str,
+        float
+        | int
+        | list[str]
+        | list[dict[str, str | int | dict[str, str | int | float | bool | None] | None]]
+        | dict[str, str | int | float | bool],
+    ]:
         """Convert result to dictionary representation."""
         return {
             "total_items": self.total_items,
@@ -155,7 +174,7 @@ class BaseValidator(ABC):
         self.name = name
         self.results: ValidationResult | None = None
 
-    def validate(self, items: list) -> ValidationResult:
+    def validate(self, items: list[GenericItem]) -> ValidationResult:
         """Perform validation on given items."""
         self.results = ValidationResult()
         self.results.total_items = len(items)
@@ -165,7 +184,7 @@ class BaseValidator(ABC):
         return self.results
 
     @abstractmethod
-    def _validate_items(self, items: list) -> None:
+    def _validate_items(self, items: list[GenericItem]) -> None:
         """Implementation-specific validation logic."""
 
     def get_summary(self) -> dict[str, float | int | str] | dict[str, str]:
@@ -197,7 +216,19 @@ class BaseReporter(ABC):
         self.template_dir = template_dir or Path(__file__).parent.parent / "templates"
 
     @abstractmethod
-    def generate_report(self, data, output_format: str = "html") -> str:
+    def generate_report(
+        self,
+        data: dict[
+            str,
+            str
+            | int
+            | float
+            | bool
+            | dict[str, str | int | float | bool | None]
+            | None,
+        ],
+        output_format: str = "html",
+    ) -> str:
         """Generate a report from the given data."""
 
     def save_report(self, content: str, filename: str, output_dir: Path) -> Path:
@@ -217,9 +248,11 @@ class BaseAnalyzer(ABC):
     def __init__(self, name: str) -> None:
         """Initialize the analyzer base class with a name."""
         self.name = name
-        self.metrics = {}
+        self.metrics: dict[str, str | int | float | bool | None] = {}
 
-    def analyze(self, content: str, filepath: Path | None = None):
+    def analyze(
+        self, content: str, filepath: Path | None = None
+    ) -> dict[str, str | int | float | bool | None]:
         """Analyze the given content and return metrics."""
         self.metrics = {
             "analyzer": self.name,
@@ -254,7 +287,7 @@ class BaseAnalyzer(ABC):
 class Config(Protocol):
     """Protocol for configuration objects."""
 
-    def get(self, key: str, default=None) -> None:
+    def get(self, key: str, default: str | float | bool | None = None) -> None:
         """Get a configuration value."""
         ...
 

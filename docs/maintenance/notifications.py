@@ -15,6 +15,7 @@ from datetime import UTC, datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
+from typing import TypedDict
 
 import requests
 import yaml
@@ -22,6 +23,64 @@ from pydantic import BaseModel, Field
 
 # Constants
 MAX_BROKEN_LINKS_TO_SHOW = 10
+
+
+class _ChannelConfig(TypedDict):
+    enabled: bool
+
+
+class _AlertThresholdConfig(TypedDict):
+    enabled: bool
+    threshold: int
+
+
+class _AlertToggleConfig(TypedDict):
+    enabled: bool
+
+
+class _AlertsConfig(TypedDict):
+    critical_issues: _AlertThresholdConfig
+    quality_drop: _AlertThresholdConfig
+    broken_links: _AlertThresholdConfig
+    weekly_report: _AlertToggleConfig
+    monthly_report: _AlertToggleConfig
+
+
+class _EmailConfig(TypedDict):
+    smtp_server: str
+    smtp_port: int
+    username: str
+    password: str
+    from_address: str
+    to_addresses: list[str]
+
+
+class _SlackConfig(TypedDict):
+    webhook_url: str
+    channel: str
+    username: str
+
+
+class _WebhookConfig(TypedDict):
+    url: str
+    headers: dict[str, str]
+    timeout: int
+
+
+class _ChannelsConfig(TypedDict):
+    console: _ChannelConfig
+    email: _ChannelConfig
+    slack: _ChannelConfig
+    webhook: _ChannelConfig
+
+
+class _NotifierConfig(TypedDict):
+    enabled: bool
+    channels: _ChannelsConfig
+    alerts: _AlertsConfig
+    email: _EmailConfig
+    slack: _SlackConfig
+    webhook: _WebhookConfig
 
 
 class NotifierResults(BaseModel):
@@ -49,7 +108,7 @@ class DocumentationNotifier:
             config_path: Path to the notification configuration file.
 
         """
-        self.config = self.get_default_config()
+        self.config: _NotifierConfig = self.get_default_config()
         self.load_config(config_path)
         self.results: NotifierResults = NotifierResults(
             timestamp=datetime.now(UTC).isoformat(),
@@ -60,13 +119,98 @@ class DocumentationNotifier:
         try:
             with Path(config_path).open(encoding="utf-8") as f:
                 loaded = yaml.safe_load(f)
-                self.config = (
-                    loaded if isinstance(loaded, dict) else self.get_default_config()
-                )
+                if isinstance(loaded, dict):
+                    self.config = self._load_user_config(loaded)
+                else:
+                    self.config = self.get_default_config()
         except FileNotFoundError:
             self.config = self.get_default_config()
 
-    def get_default_config(self):
+    def _load_user_config(
+        self,
+        loaded: dict[
+            str,
+            int
+            | str
+            | bool
+            | list[str]
+            | dict[str, int | str | bool | list[str] | dict[str, str]],
+        ],
+    ) -> _NotifierConfig:
+        """Load user config with safe fallback to defaults."""
+        cfg = self.get_default_config()
+
+        channels = loaded.get("channels")
+        if isinstance(channels, dict):
+            for key in ("console", "email", "slack", "webhook"):
+                value = channels.get(key)
+                if isinstance(value, dict):
+                    enabled = value.get("enabled")
+                    if isinstance(enabled, bool):
+                        cfg["channels"][key]["enabled"] = enabled
+
+        alerts = loaded.get("alerts")
+        if isinstance(alerts, dict):
+            for key in ("critical_issues", "quality_drop", "broken_links"):
+                value = alerts.get(key)
+                if isinstance(value, dict):
+                    enabled = value.get("enabled")
+                    threshold = value.get("threshold")
+                    if isinstance(enabled, bool):
+                        cfg["alerts"][key]["enabled"] = enabled
+                    if isinstance(threshold, int):
+                        cfg["alerts"][key]["threshold"] = threshold
+            for key in ("weekly_report", "monthly_report"):
+                value = alerts.get(key)
+                if isinstance(value, dict):
+                    enabled = value.get("enabled")
+                    if isinstance(enabled, bool):
+                        cfg["alerts"][key]["enabled"] = enabled
+
+        email = loaded.get("email")
+        if isinstance(email, dict):
+            for key in ("smtp_server", "username", "password", "from_address"):
+                value = email.get(key)
+                if isinstance(value, str):
+                    cfg["email"][key] = value
+            smtp_port = email.get("smtp_port")
+            if isinstance(smtp_port, int):
+                cfg["email"]["smtp_port"] = smtp_port
+            to_addresses = email.get("to_addresses")
+            if isinstance(to_addresses, list) and all(
+                isinstance(item, str) for item in to_addresses
+            ):
+                cfg["email"]["to_addresses"] = to_addresses
+
+        slack = loaded.get("slack")
+        if isinstance(slack, dict):
+            for key in ("webhook_url", "channel", "username"):
+                value = slack.get(key)
+                if isinstance(value, str):
+                    cfg["slack"][key] = value
+
+        webhook = loaded.get("webhook")
+        if isinstance(webhook, dict):
+            url_val = webhook.get("url")
+            timeout_val = webhook.get("timeout")
+            headers_val = webhook.get("headers")
+            if isinstance(url_val, str):
+                cfg["webhook"]["url"] = url_val
+            if isinstance(timeout_val, int):
+                cfg["webhook"]["timeout"] = timeout_val
+            if isinstance(headers_val, dict) and all(
+                isinstance(k, str) and isinstance(v, str)
+                for k, v in headers_val.items()
+            ):
+                cfg["webhook"]["headers"] = headers_val
+
+        enabled_val = loaded.get("enabled")
+        if isinstance(enabled_val, bool):
+            cfg["enabled"] = enabled_val
+
+        return cfg
+
+    def get_default_config(self) -> _NotifierConfig:
         """Default notification configuration."""
         return {
             "enabled": True,
@@ -99,13 +243,20 @@ class DocumentationNotifier:
             "webhook": {"url": "", "headers": {}, "timeout": 10},
         }
 
-    def notify_critical_issues(self, audit_data) -> bool:
+    def notify_critical_issues(
+        self,
+        audit_data: dict[str, dict[str, int] | list[dict[str, str | int]] | int | str],
+    ) -> bool:
         """Send notification for critical documentation issues."""
         if not self.config["alerts"]["critical_issues"]["enabled"]:
             return True
 
-        severity_breakdown = audit_data.get("metrics", {}).get("severity_breakdown", {})
-        critical_count = severity_breakdown.get("critical", 0)
+        metrics_val = audit_data.get("metrics", {})
+        metrics = metrics_val if isinstance(metrics_val, dict) else {}
+        severity_val = metrics.get("severity_breakdown", {})
+        severity_breakdown = severity_val if isinstance(severity_val, dict) else {}
+        critical_raw = severity_breakdown.get("critical", 0)
+        critical_count = int(critical_raw) if isinstance(critical_raw, int) else 0
         threshold = self.config["alerts"]["critical_issues"]["threshold"]
 
         if critical_count >= threshold:
@@ -139,7 +290,7 @@ Please review recent changes and address any identified issues.
 
         return True
 
-    def notify_broken_links(self, broken_links: list) -> bool:
+    def notify_broken_links(self, broken_links: list[dict[str, str | int]]) -> bool:
         """Send notification for broken links."""
         if not self.config["alerts"]["broken_links"]["enabled"]:
             return True
@@ -153,7 +304,7 @@ Please review recent changes and address any identified issues.
 
         return True
 
-    def notify_weekly_report(self, report_data) -> bool:
+    def notify_weekly_report(self, report_data: dict[str, str | int | float]) -> bool:
         """Send weekly quality report notification."""
         if not self.config["alerts"]["weekly_report"]["enabled"]:
             return True
@@ -162,7 +313,10 @@ Please review recent changes and address any identified issues.
         message = self._format_weekly_report_message(report_data)
         return self.send_notification(title, message, "info")
 
-    def notify_monthly_report(self, report_data) -> bool:
+    def notify_monthly_report(
+        self,
+        report_data: dict[str, str | int | float],
+    ) -> bool:
         """Send monthly comprehensive report notification."""
         if not self.config["alerts"]["monthly_report"]["enabled"]:
             return True
@@ -327,12 +481,18 @@ Timestamp: {datetime.now(UTC).isoformat()}
         )
         response.raise_for_status()
 
-    def _format_critical_issues_message(self, audit_data) -> str:
+    def _format_critical_issues_message(
+        self,
+        audit_data: dict[str, dict[str, int] | list[dict[str, str | int]] | int | str],
+    ) -> str:
         """Format message for critical issues notification."""
-        metrics = audit_data.get("metrics") or {}
-        severity_breakdown = metrics.get("severity_breakdown") or {}
+        metrics_val = audit_data.get("metrics")
+        metrics = metrics_val if isinstance(metrics_val, dict) else {}
+        severity_val = metrics.get("severity_breakdown")
+        severity_breakdown = severity_val if isinstance(severity_val, dict) else {}
 
-        issues: list = audit_data.get("issues") or []
+        issues_val = audit_data.get("issues")
+        issues = issues_val if isinstance(issues_val, list) else []
         critical_issues = [i for i in issues if i.get("severity") == "critical"][:5]
 
         message = f"""
@@ -364,7 +524,10 @@ Top Critical Issues:
 
         return message.strip()
 
-    def _format_broken_links_message(self, broken_links: list) -> str:
+    def _format_broken_links_message(
+        self,
+        broken_links: list[dict[str, str | int]],
+    ) -> str:
         """Format message for broken links notification."""
         message = f"""
 BROKEN LINKS DETECTED
@@ -390,13 +553,19 @@ Found {len(broken_links)} broken links that need attention:
 
         return message.strip()
 
-    def _format_weekly_report_message(self, _report_data) -> str:
+    def _format_weekly_report_message(
+        self,
+        _report_data: dict[str, str | int | float],
+    ) -> str:
         """Format message for weekly report notification."""
         # Implementation would depend on weekly report data structure
         # For now, report_data is not used but reserved for future implementation
         return "Weekly documentation quality report is now available. Check the reports dashboard for detailed metrics and trends."
 
-    def _format_monthly_report_message(self, _report_data) -> str:
+    def _format_monthly_report_message(
+        self,
+        _report_data: dict[str, str | int | float],
+    ) -> str:
         """Format message for monthly report notification."""
         # Implementation would depend on monthly report data structure
         return "Monthly comprehensive documentation quality report is now available. Review trends and plan improvements for the next month."
