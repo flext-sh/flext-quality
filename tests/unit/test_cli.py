@@ -9,9 +9,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-import pytest
-
-from flext_quality import FlextQualityCliService, main
+from flext_quality import FlextQualityCliService
+from flext_quality.services.cli import main
 
 
 class TestFlextQualityCliService:
@@ -103,40 +102,30 @@ class TestMainFunction:
     """Tests for main CLI entry point."""
 
     def test_main_with_no_args_exits_zero(self) -> None:
-        """Test main with no args exits with code 0."""
+        """Test main with no args returns code 0."""
         sys.argv = ["flext-quality"]
-        with pytest.raises(SystemExit) as exc_info:
-            main()
-        assert exc_info.value.code == 0
+        assert main() == 0
 
     def test_main_with_status_command_exits_zero(self) -> None:
-        """Test main with status command exits with code 0."""
+        """Test main with status command returns code 0."""
         sys.argv = ["flext-quality", "status"]
-        with pytest.raises(SystemExit) as exc_info:
-            main()
-        assert exc_info.value.code == 0
+        assert main() == 0
 
     def test_main_with_check_command_exits_zero(self, tmp_path: Path) -> None:
-        """Test main with check command exits with code 0."""
+        """Test main with check command returns code 0."""
         sys.argv = ["flext-quality", "check", str(tmp_path)]
-        with pytest.raises(SystemExit) as exc_info:
-            main()
-        assert exc_info.value.code == 0
+        assert main() == 0
 
     def test_main_with_validate_command_exits_zero(self, tmp_path: Path) -> None:
-        """Test main with validate command exits with code 0."""
+        """Test main with validate command returns code 0."""
         src_dir = tmp_path / "src"
         src_dir.mkdir()
         tests_dir = tmp_path / "tests"
         tests_dir.mkdir()
         sys.argv = ["flext-quality", "validate", str(tmp_path)]
-        with pytest.raises(SystemExit) as exc_info:
-            main()
-        assert exc_info.value.code == 0
+        assert main() == 0
 
     def test_main_with_unknown_command_exits_one(self) -> None:
-        """Test main with unknown command exits with code 1."""
+        """Test main with unknown command returns code 1."""
         sys.argv = ["flext-quality", "unknown"]
-        with pytest.raises(SystemExit) as exc_info:
-            main()
-        assert exc_info.value.code == 1
+        assert main() == 1
