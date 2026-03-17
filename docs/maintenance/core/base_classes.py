@@ -11,6 +11,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol
 
+from flext_core import t
 from pydantic import BaseModel, Field
 
 type GenericItem = t.Primitives | Path | dict[str, t.Primitives | None]
@@ -53,7 +54,7 @@ class ValidationResult(BaseModel):
     total_items: int = Field(default=0, description="Total items validated")
     valid_items: int = Field(default=0, description="Number of valid items")
     invalid_items: int = Field(default=0, description="Number of invalid items")
-    issues: list[Issue] = []
+    issues: list[Issue] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list, description="Warning messages")
     errors: list[str] = Field(default_factory=list, description="Error messages")
     metadata: dict[str, t.Primitives] = Field(
@@ -280,7 +281,12 @@ class BaseAnalyzer(ABC):
 class Config(Protocol):
     """Protocol for configuration objects."""
 
-    def get(self, key: str, default: str | float | bool | None = None) -> None:
+    def get(
+        self,
+        key: str,
+        *,
+        default: str | float | bool | None = None,
+    ) -> t.Primitives | None:
         """Get a configuration value."""
         ...
 

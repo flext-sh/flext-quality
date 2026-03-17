@@ -18,6 +18,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import TypedDict, Unpack
 
+from flext_core import t
 from jinja2 import Template
 
 
