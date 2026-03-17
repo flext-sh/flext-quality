@@ -33,8 +33,8 @@ type ReportValue = (
     | float
     | bool
     | list[str]
-    | list[dict[str, str | int | float | bool]]
-    | dict[str, str | int | float | bool]
+    | list[dict[str, t.Primitives]]
+    | dict[str, t.Primitives]
     | None
 )
 

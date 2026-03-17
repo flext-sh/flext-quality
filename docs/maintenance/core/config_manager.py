@@ -27,7 +27,7 @@ class AuditRules:
         self,
         key: str,
         default: str | float | bool | None = None,
-    ) -> str | int | float | bool | None:
+    ) -> t.Primitives | None:
         """Get a quality threshold value."""
         return self.quality_thresholds.get(key, default)
 
@@ -50,7 +50,7 @@ class StyleGuide:
         self,
         rule: str,
         default: str | float | bool | None = None,
-    ) -> str | int | float | bool | None:
+    ) -> t.Primitives | None:
         """Get a markdown formatting rule."""
         return self.markdown.get(rule, default)
 
@@ -58,7 +58,7 @@ class StyleGuide:
         self,
         rule: str,
         default: str | float | bool | None = None,
-    ) -> str | int | float | bool | None:
+    ) -> t.Primitives | None:
         """Get an accessibility rule."""
         return self.accessibility.get(rule, default)
 
@@ -79,7 +79,7 @@ class ValidationConfig:
         self,
         setting: str,
         default: str | float | bool | None = None,
-    ) -> str | int | float | bool | None:
+    ) -> t.Primitives | None:
         """Get a link validation setting."""
         return self.link_validation.get(setting, default)
 
@@ -87,7 +87,7 @@ class ValidationConfig:
         self,
         setting: str,
         default: str | float | bool | None = None,
-    ) -> str | int | float | bool | None:
+    ) -> t.Primitives | None:
         """Get a content validation setting."""
         return self.content_validation.get(setting, default)
 

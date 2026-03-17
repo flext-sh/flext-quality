@@ -13,9 +13,7 @@ from typing import Protocol
 
 from pydantic import BaseModel, Field
 
-type GenericItem = (
-    str | int | float | bool | Path | dict[str, str | int | float | bool | None]
-)
+type GenericItem = t.Primitives | Path | dict[str, t.Primitives | None]
 
 
 class Issue(BaseModel):
@@ -29,14 +27,14 @@ class Issue(BaseModel):
     line: int | None = Field(default=None, description="Line number of the issue")
     description: str = Field(default="", description="Detailed issue description")
     recommendation: str = Field(default="", description="Recommended fix for the issue")
-    context: dict[str, str | int | float | bool | None] | None = Field(
+    context: dict[str, t.Primitives | None] | None = Field(
         default=None,
         description="Additional context data",
     )
 
     def to_dict(
         self,
-    ) -> dict[str, str | int | dict[str, str | int | float | bool | None] | None]:
+    ) -> dict[str, str | int | dict[str, t.Primitives | None] | None]:
         """Convert issue to dictionary representation."""
         return {
             "type": self.type,
@@ -58,7 +56,7 @@ class ValidationResult(BaseModel):
     issues: list[Issue] = []
     warnings: list[str] = Field(default_factory=list, description="Warning messages")
     errors: list[str] = Field(default_factory=list, description="Error messages")
-    metadata: dict[str, str | int | float | bool] = Field(
+    metadata: dict[str, t.Primitives] = Field(
         default_factory=dict,
         description="Additional metadata",
     )
@@ -85,8 +83,8 @@ class ValidationResult(BaseModel):
         float
         | int
         | list[str]
-        | list[dict[str, str | int | dict[str, str | int | float | bool | None] | None]]
-        | dict[str, str | int | float | bool],
+        | list[dict[str, str | int | dict[str, t.Primitives | None] | None]]
+        | dict[str, t.Primitives],
     ]:
         """Convert result to dictionary representation."""
         return {
@@ -220,12 +218,7 @@ class BaseReporter(ABC):
         self,
         data: dict[
             str,
-            str
-            | int
-            | float
-            | bool
-            | dict[str, str | int | float | bool | None]
-            | None,
+            str | int | float | bool | dict[str, t.Primitives | None] | None,
         ],
         output_format: str = "html",
     ) -> str:
@@ -248,11 +241,11 @@ class BaseAnalyzer(ABC):
     def __init__(self, name: str) -> None:
         """Initialize the analyzer base class with a name."""
         self.name = name
-        self.metrics: dict[str, str | int | float | bool | None] = {}
+        self.metrics: dict[str, t.Primitives | None] = {}
 
     def analyze(
         self, content: str, filepath: Path | None = None
-    ) -> dict[str, str | int | float | bool | None]:
+    ) -> dict[str, t.Primitives | None]:
         """Analyze the given content and return metrics."""
         self.metrics = {
             "analyzer": self.name,
