@@ -12,8 +12,8 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
-    from tests import helpers, unit
-    from tests.conftest import (
+    from . import helpers as helpers, unit as unit
+    from .conftest import (
         MockQualityAnalyzer,
         MockReportGenerator,
         T,
@@ -37,11 +37,11 @@ if TYPE_CHECKING:
         sonarqube_config,
         temporary_project_structure,
     )
-    from tests.constants import TestsFlextQualityConstants, c
-    from tests.helpers.constants import TestsConstants
-    from tests.helpers.models import TestsModels
-    from tests.helpers.protocols import TestsProtocols
-    from tests.helpers.typing_helpers import (
+    from .constants import TestsFlextQualityConstants, c
+    from .helpers.constants import TestsConstants
+    from .helpers.models import TestsModels
+    from .helpers.protocols import TestsProtocols
+    from .helpers.typing_helpers import (
         assert_analysis_results_structure,
         assert_dict_structure,
         assert_is_dict,
@@ -51,11 +51,11 @@ if TYPE_CHECKING:
         safe_dict_access,
         safe_list_access,
     )
-    from tests.helpers.typings import TestsTypings, t
-    from tests.models import TestsFlextQualityModels, m, tm
-    from tests.protocols import TestsFlextQualityProtocols, p
-    from tests.typings import TestsFlextQualityTypes
-    from tests.unit.test_api import (
+    from .helpers.typings import TestsTypings, t
+    from .models import TestsFlextQualityModels, m, tm
+    from .protocols import TestsFlextQualityProtocols, p
+    from .typings import TestsFlextQualityTypes
+    from .unit.test_api import (
         TestFlextQualityAPI,
         TestFlextQualityHookExecution,
         TestFlextQualityRulesConfig,
@@ -63,16 +63,13 @@ if TYPE_CHECKING:
         TestFlextQualityStdinProcessing,
         TestFlextQualityValidation,
     )
-    from tests.unit.test_basic import test_basic
-    from tests.unit.test_cli import (
+    from .unit.test_basic import test_basic
+    from .unit.test_cli import (
         TestFlextQualityCliService,
         TestFlextQualityCliService as s,
         TestMainFunction,
     )
-    from tests.utilities import (
-        TestsFlextQualityUtilities,
-        TestsFlextQualityUtilities as u,
-    )
+    from .utilities import TestsFlextQualityUtilities, TestsFlextQualityUtilities as u
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "MockQualityAnalyzer": ("tests.conftest", "MockQualityAnalyzer"),
