@@ -153,13 +153,74 @@ class StyleValidator:
             return
         try:
             with Path(config_path).open(encoding="utf-8") as f:
-                loaded = yaml.safe_load(f)
-                if isinstance(loaded, dict):
-                    self.config = loaded  # type: ignore[assignment]
+                loaded_obj: object = yaml.safe_load(f)
+                if isinstance(loaded_obj, dict):
+                    self.config = self._normalize_config(loaded_obj)
                 else:
                     self._set_default_config()
         except (FileNotFoundError, KeyError, OSError):
             self._set_default_config()
+
+    def _normalize_config(self, raw: dict[object, object]) -> StyleConfig:
+        config: StyleConfig = {}
+
+        markdown_raw = raw.get("markdown")
+        if isinstance(markdown_raw, dict):
+            markdown: MarkdownConfig = {}
+            heading_style = markdown_raw.get("heading_style")
+            list_style = markdown_raw.get("list_style")
+            emphasis_style = markdown_raw.get("emphasis_style")
+            code_block_style = markdown_raw.get("code_block_style")
+            if isinstance(heading_style, str):
+                markdown["heading_style"] = heading_style
+            if isinstance(list_style, str):
+                markdown["list_style"] = list_style
+            if isinstance(emphasis_style, str):
+                markdown["emphasis_style"] = emphasis_style
+            if isinstance(code_block_style, str):
+                markdown["code_block_style"] = code_block_style
+            config["markdown"] = markdown
+
+        formatting_raw = raw.get("formatting")
+        if isinstance(formatting_raw, dict):
+            formatting: FormattingConfig = {}
+            max_line_length = formatting_raw.get("max_line_length")
+            trailing_spaces = formatting_raw.get("trailing_spaces")
+            consistent_indentation = formatting_raw.get("consistent_indentation")
+            if isinstance(max_line_length, int):
+                formatting["max_line_length"] = max_line_length
+            if isinstance(trailing_spaces, bool):
+                formatting["trailing_spaces"] = trailing_spaces
+            if isinstance(consistent_indentation, bool):
+                formatting["consistent_indentation"] = consistent_indentation
+            config["formatting"] = formatting
+
+        accessibility_raw = raw.get("accessibility")
+        if isinstance(accessibility_raw, dict):
+            accessibility: AccessibilityConfig = {}
+            require_alt_text = accessibility_raw.get("require_alt_text")
+            descriptive_links = accessibility_raw.get("descriptive_links")
+            heading_structure = accessibility_raw.get("heading_structure")
+            proper_headings = accessibility_raw.get("proper_headings")
+            if isinstance(require_alt_text, bool):
+                accessibility["require_alt_text"] = require_alt_text
+            if isinstance(descriptive_links, bool):
+                accessibility["descriptive_links"] = descriptive_links
+            if isinstance(heading_structure, bool):
+                accessibility["heading_structure"] = heading_structure
+            if isinstance(proper_headings, bool):
+                accessibility["proper_headings"] = proper_headings
+            config["accessibility"] = accessibility
+
+        headings_raw = raw.get("headings")
+        if isinstance(headings_raw, dict):
+            headings: HeadingsConfig = {}
+            enforce_hierarchy = headings_raw.get("enforce_hierarchy")
+            if isinstance(enforce_hierarchy, bool):
+                headings["enforce_hierarchy"] = enforce_hierarchy
+            config["headings"] = headings
+
+        return config
 
     def _set_default_config(self) -> None:
         """Set default configuration."""

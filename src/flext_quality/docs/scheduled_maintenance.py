@@ -473,12 +473,6 @@ class ScheduledMaintenance:
                     raise RuntimeError(error_msg)
 
             return self._run_with_timeout(run_tests, timeout, description)
-
-        except ImportError:
-            _ = self.results.warnings.append(
-                f"pytest not available for task: {description}. Install with: pip install pytest"
-            )
-            return False
         except Exception as e:
             _ = self.results.errors.append(
                 f"pytest command failed in {description}: {e!s}"
@@ -557,12 +551,6 @@ class ScheduledMaintenance:
                     raise RuntimeError(msg)
 
             return self._run_with_timeout(run_git_command, timeout, description)
-
-        except ImportError:
-            _ = self.results.warnings.append(
-                f"GitPython not available for task: {description}. Install with: pip install GitPython"
-            )
-            return False
         except InvalidGitRepositoryError:
             _ = self.results.warnings.append(
                 f"Not a git repository for task: {description}"

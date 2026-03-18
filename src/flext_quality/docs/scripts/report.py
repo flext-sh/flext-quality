@@ -281,12 +281,20 @@ class DocumentationReporter:
                     broken_links: list[dict[str, t.Primitives]] = []
                     for e in validation_errors:
                         if isinstance(e, dict):
-                            error_type = e.get("type")
+                            error_entry: dict[object, object] = e
+                            error_type = error_entry.get("type")
                             if error_type in {
                                 "broken_external_link",
                                 "broken_internal_link",
                             }:
-                                broken_links.append(e)  # type: ignore[arg-type]
+                                normalized: dict[str, t.Primitives] = {
+                                    key: value
+                                    for key, value in error_entry.items()
+                                    if isinstance(key, str)
+                                    and isinstance(value, (str, int, float, bool))
+                                }
+                                if normalized:
+                                    broken_links.append(normalized)
                     if broken_links:
                         recommendations.append({
                             "priority": "high",
@@ -351,7 +359,8 @@ class DocumentationReporter:
             "recommendations": data["recommendations"],
             "charts": self._generate_charts(data) if data.get("trends") else None,
         }
-        return template.render(**template_data)
+        rendered: str = template.render(**template_data)
+        return rendered
 
     def _get_html_template(self) -> Template:
         """Get HTML report template."""
@@ -392,12 +401,14 @@ class DocumentationReporter:
         """Summarize audit data for reporting."""
         if not audit_data or not isinstance(audit_data, dict):
             return None
-        issues_raw_val = audit_data.get("issues")
-        if not isinstance(issues_raw_val, list):
-            issues_raw_val = []  # type: ignore[assignment]
-        metrics_raw_val = audit_data.get("metrics")
-        if not isinstance(metrics_raw_val, dict):
-            metrics_raw_val = {}  # type: ignore[assignment]
+        issues_raw_obj = audit_data.get("issues")
+        issues_raw_val = (
+            list(issues_raw_obj) if isinstance(issues_raw_obj, list) else []
+        )
+        metrics_raw_obj = audit_data.get("metrics")
+        metrics_raw_val = (
+            dict(metrics_raw_obj) if isinstance(metrics_raw_obj, dict) else {}
+        )
         quality_score_raw = metrics_raw_val.get("quality_score", 0)
         if not isinstance(quality_score_raw, int):
             quality_score_raw = 0
@@ -437,10 +448,10 @@ class DocumentationReporter:
         """Summarize validation data for reporting."""
         if not validation_data or not isinstance(validation_data, dict):
             return None
-        link_data_raw_val = validation_data.get("link_validation")
-        if not isinstance(link_data_raw_val, dict):
-            link_data_raw_val = {}  # type: ignore[assignment]
-        link_data_raw = link_data_raw_val
+        link_data_raw_obj = validation_data.get("link_validation")
+        link_data_raw = (
+            dict(link_data_raw_obj) if isinstance(link_data_raw_obj, dict) else {}
+        )
         links_checked_raw = link_data_raw.get("links_checked", 0)
         valid_links_raw = link_data_raw.get("valid_links", 0)
         broken_links_raw = link_data_raw.get("broken_links", 0)
@@ -490,7 +501,7 @@ class DocumentationReporter:
     def generate_trend_report(self, days: int = 30) -> str:
         """Generate trend analysis report over specified time period."""
         report_files = list(self.reports_dir.glob("*.json"))
-        recent_reports: list[dict[str, ReportValue]] = []
+        recent_reports: list[dict[str, ReportValue | datetime]] = []
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
         for report_file in report_files:
             if "latest_" in report_file.name:
@@ -507,14 +518,14 @@ class DocumentationReporter:
                             **report_data_raw,
                             "date": report_date,
                         }
-                        recent_reports.append(report_data_dict)  # type: ignore[arg-type]
+                        recent_reports.append(report_data_dict)
             except (ValueError, json.JSONDecodeError, KeyError):
                 continue
         trend_data = self._analyze_trend_data(recent_reports)
         return self._generate_trend_report(trend_data, days)
 
     def _analyze_trend_data(
-        self, reports: list[dict[str, ReportValue]]
+        self, reports: list[dict[str, ReportValue | datetime]]
     ) -> TrendData | dict[str, str]:
         """Analyze trend data from historical reports."""
         if not reports:

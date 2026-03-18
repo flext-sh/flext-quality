@@ -471,8 +471,7 @@ class LinkChecker:
                 async with ClientSession() as session:
                     self.session = session
                     results = await self.check_links_batch_async(links)
-            except ImportError:
-                # Fallback to sync if aiohttp not available
+            except Exception:
                 results = self.check_links_batch_sync(links)
         else:
             results = self.check_links_batch_sync(links)

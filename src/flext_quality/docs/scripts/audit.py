@@ -16,7 +16,6 @@ import argparse
 import json
 import re
 import sys
-from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import TypedDict
@@ -252,10 +251,9 @@ class DocumentationAuditor:
         return {}
 
     def _to_str_object_dict(self, raw: dict[object, object]) -> dict[str, object]:
-        result: dict[str, object] = {}
-        for key, value in raw.items():
-            if isinstance(key, str):
-                result[key] = value
+        result: dict[str, object] = {
+            key: value for key, value in raw.items() if isinstance(key, str)
+        }
         return result
 
     def _get_bool(self, source: dict[str, object], key: str, default: bool, /) -> bool:  # noqa: FBT001
@@ -762,7 +760,7 @@ class DocumentationAuditor:
         broken_links = [
             i
             for i in issues
-            if "link" in (i["type"] if isinstance(i.get("type"), str) else "")
+            if "link" in str(i.get("type", ""))
             and i.get("severity") in {"critical", "high"}
         ]
         if broken_links:
@@ -824,10 +822,7 @@ class DocumentationAuditor:
     def _generate_html_report(self) -> str:
         """Generate HTML audit report."""
         metrics = self.results.metrics
-        severity_breakdown_raw = metrics.get("severity_breakdown", {})
-        severity_breakdown = (
-            severity_breakdown_raw if isinstance(severity_breakdown_raw, dict) else {}
-        )
+        severity_breakdown = self._get_section(metrics, "severity_breakdown")
         quality_score_raw = metrics.get("quality_score", 0)
         quality_score = (
             int(quality_score_raw) if isinstance(quality_score_raw, (int, float)) else 0
@@ -973,9 +968,13 @@ def _should_fail_on_results(
     should_fail = False
     if args.fail_on_errors:
         severity_breakdown_obj = metrics.get("severity_breakdown")
-        severity_breakdown = (
-            severity_breakdown_obj if isinstance(severity_breakdown_obj, dict) else {}
-        )
+        severity_breakdown: dict[str, object] = {}
+        if isinstance(severity_breakdown_obj, dict):
+            severity_breakdown.update({
+                key: value
+                for key, value in severity_breakdown_obj.items()
+                if isinstance(key, str)
+            })
         critical_raw = severity_breakdown.get("critical", 0)
         high_raw = severity_breakdown.get("high", 0)
         critical = critical_raw if isinstance(critical_raw, int) else 0
