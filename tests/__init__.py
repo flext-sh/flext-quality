@@ -51,10 +51,10 @@ if TYPE_CHECKING:
         safe_dict_access,
         safe_list_access,
     )
-    from .helpers.typings import TestsTypings, t
+    from .helpers.typings import TestsTypings
     from .models import TestsFlextQualityModels, m, tm
     from .protocols import TestsFlextQualityProtocols, p
-    from .typings import TestsFlextQualityTypes
+    from .typings import TestsFlextQualityTypes, t
     from .unit.test_api import (
         TestFlextQualityAPI,
         TestFlextQualityHookExecution,
@@ -69,7 +69,7 @@ if TYPE_CHECKING:
         TestFlextQualityCliService as s,
         TestMainFunction,
     )
-    from .utilities import TestsFlextQualityUtilities, TestsFlextQualityUtilities as u
+    from .utilities import TestsFlextQualityUtilities, u
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "MockQualityAnalyzer": ("tests.conftest", "MockQualityAnalyzer"),
@@ -147,11 +147,11 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "secure_temp_dir": ("tests.conftest", "secure_temp_dir"),
     "set_test_environment": ("tests.conftest", "set_test_environment"),
     "sonarqube_config": ("tests.conftest", "sonarqube_config"),
-    "t": ("tests.helpers.typings", "t"),
+    "t": ("tests.typings", "t"),
     "temporary_project_structure": ("tests.conftest", "temporary_project_structure"),
     "test_basic": ("tests.unit.test_basic", "test_basic"),
     "tm": ("tests.models", "tm"),
-    "u": ("tests.utilities", "TestsFlextQualityUtilities"),
+    "u": ("tests.utilities", "u"),
     "unit": ("tests.unit", ""),
 }
 
