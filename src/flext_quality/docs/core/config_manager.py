@@ -200,7 +200,8 @@ class ConfigManager:
             return self._get_default_config(filename)
         except yaml.YAMLError:
             return self._get_default_config(filename)
-        except Exception:
+        except (OSError, PermissionError, UnicodeDecodeError) as exc:
+            _ = exc
             return self._get_default_config(filename)
 
     def _get_default_config(self, filename: str) -> ConfigData:
@@ -295,7 +296,7 @@ class ConfigManager:
             audit_rules = self.get_audit_rules()
             if not audit_rules.quality_thresholds:
                 issues.append("Audit rules missing quality_thresholds section")
-        except Exception as e:
+        except (FileNotFoundError, yaml.YAMLError, KeyError, OSError) as e:
             issues.append(f"Invalid audit_rules.yaml: {e}")
 
         # Validate style guide structure
@@ -303,7 +304,7 @@ class ConfigManager:
             style_guide = self.get_style_guide()
             if not style_guide.markdown:
                 issues.append("Style guide missing markdown section")
-        except Exception as e:
+        except (FileNotFoundError, yaml.YAMLError, KeyError, OSError) as e:
             issues.append(f"Invalid style_guide.yaml: {e}")
 
         # Validate validation config structure
@@ -311,7 +312,7 @@ class ConfigManager:
             validation_config = self.get_validation_config()
             if not validation_config.link_validation:
                 issues.append("Validation config missing link_validation section")
-        except Exception as e:
+        except (FileNotFoundError, yaml.YAMLError, KeyError, OSError) as e:
             issues.append(f"Invalid validation_config.yaml: {e}")
 
         return issues
@@ -350,5 +351,5 @@ class ConfigManager:
                 self._validation_config = None
 
             return True
-        except Exception:
+        except (FileNotFoundError, PermissionError, yaml.YAMLError, OSError):
             return False

@@ -344,7 +344,7 @@ class LinkChecker:
                         valid=False,
                         context=context or {},
                     )
-            except Exception as e:
+            except (OSError, ValueError, RuntimeError) as e:
                 return LinkResultDict(
                     url=url,
                     error=f"unexpected_error: {e!s}",
@@ -471,7 +471,7 @@ class LinkChecker:
                 async with ClientSession() as session:
                     self.session = session
                     results = await self.check_links_batch_async(links)
-            except Exception:
+            except (OSError, ClientError, TimeoutError, RuntimeError):
                 results = self.check_links_batch_sync(links)
         else:
             results = self.check_links_batch_sync(links)
@@ -503,7 +503,7 @@ class LinkChecker:
             rp.read()
 
             return rp.can_fetch(self.config["user_agent"], "/")
-        except Exception:
+        except (OSError, ConnectionError, TimeoutError, UnicodeDecodeError):
             # If robots.txt can't be read, assume crawling is allowed
             return True
 

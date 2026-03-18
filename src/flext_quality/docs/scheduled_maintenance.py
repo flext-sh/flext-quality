@@ -449,7 +449,7 @@ class ScheduledMaintenance:
 
             return self._run_with_timeout(run_module, timeout, description)
 
-        except Exception as e:
+        except (ImportError, ModuleNotFoundError, RuntimeError, OSError) as e:
             _ = self.results.errors.append(
                 f"Python command failed in {description}: {e!s}"
             )
@@ -753,7 +753,7 @@ def main() -> None:
         if success:
             pass
         else:
-            sys.exit(1)
+            raise SystemExit(1)
 
     else:
         parser.print_help()

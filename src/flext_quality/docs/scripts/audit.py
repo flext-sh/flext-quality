@@ -15,14 +15,13 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import TypedDict
 
 import requests
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 type IssueDict = dict[str, object]
 
@@ -40,66 +39,83 @@ class MetricsDict(TypedDict):
 type RecommendationDict = dict[str, object]
 
 
-class QualityThresholdsDict(TypedDict):
-    """Type definition for quality thresholds."""
-
-    max_age_days: int
-    min_word_count: int
-    max_broken_links: int
-    min_completeness_score: float
+class QualityThresholdsConfig(BaseModel):
+    max_age_days: int = 90
+    min_word_count: int = 100
+    max_broken_links: int = 0
+    min_completeness_score: float = 0.8
 
 
-class ContentChecksDict(TypedDict):
-    """Type definition for content checks."""
-
-    check_freshness: bool
-    check_completeness: bool
-    check_consistency: bool
-    check_links: bool
+class ContentChecksConfig(BaseModel):
+    check_freshness: bool = True
+    check_completeness: bool = True
+    check_consistency: bool = True
+    check_links: bool = True
 
 
-class SeverityLevelsDict(TypedDict):
-    """Type definition for severity levels."""
-
-    critical: list[str]
-    high: list[str]
-    medium: list[str]
-    low: list[str]
+class SeverityLevelsConfig(BaseModel):
+    critical: list[str] = Field(default_factory=list)
+    high: list[str] = Field(default_factory=list)
+    medium: list[str] = Field(default_factory=list)
+    low: list[str] = Field(default_factory=list)
 
 
-class AuditRulesDict(TypedDict):
-    """Type definition for audit rules."""
-
-    quality_thresholds: QualityThresholdsDict
-    content_checks: ContentChecksDict
-    severity_levels: SeverityLevelsDict
-
-
-class LinkValidationDict(TypedDict):
-    """Type definition for link validation config."""
-
-    timeout: int
-    retry_attempts: int
-    user_agent: str
-    check_external: bool
-    check_internal: bool
-    check_images: bool
+class AuditRulesConfig(BaseModel):
+    quality_thresholds: QualityThresholdsConfig = Field(
+        default_factory=QualityThresholdsConfig
+    )
+    content_checks: ContentChecksConfig = Field(default_factory=ContentChecksConfig)
+    severity_levels: SeverityLevelsConfig = Field(default_factory=SeverityLevelsConfig)
 
 
-class ContentAnalysisDict(TypedDict):
-    """Type definition for content analysis config."""
-
-    min_section_depth: int
-    required_sections: list[str]
-    check_todos: bool
-    check_fixmes: bool
+class MarkdownStyleConfig(BaseModel):
+    heading_style: str = "atx"
+    list_style: str = "dash"
+    emphasis_style: str = "*"
+    code_block_style: str = "fenced"
 
 
-class ValidationConfigDict(TypedDict):
-    """Type definition for validation config."""
+class AccessibilityConfig(BaseModel):
+    require_alt_text: bool = True
+    descriptive_links: bool = True
+    heading_structure: bool = True
 
-    link_validation: LinkValidationDict
-    content_analysis: ContentAnalysisDict
+
+class FormattingConfig(BaseModel):
+    max_line_length: int = 88
+    consistent_indentation: bool = True
+    trailing_spaces: bool = False
+
+
+class StyleGuideConfig(BaseModel):
+    markdown: MarkdownStyleConfig = Field(default_factory=MarkdownStyleConfig)
+    accessibility: AccessibilityConfig = Field(default_factory=AccessibilityConfig)
+    formatting: FormattingConfig = Field(default_factory=FormattingConfig)
+
+
+class LinkValidationConfig(BaseModel):
+    timeout: int = 10
+    retry_attempts: int = 3
+    user_agent: str = "FLEXT-Quality-Doc-Auditor/1.0"
+    check_external: bool = True
+    check_internal: bool = True
+    check_images: bool = True
+
+
+class ContentAnalysisConfig(BaseModel):
+    min_section_depth: int = 2
+    required_sections: list[str] = Field(
+        default_factory=lambda: ["Overview", "Installation", "Usage"]
+    )
+    check_todos: bool = True
+    check_fixmes: bool = True
+
+
+class ValidationConfig(BaseModel):
+    link_validation: LinkValidationConfig = Field(default_factory=LinkValidationConfig)
+    content_analysis: ContentAnalysisConfig = Field(
+        default_factory=ContentAnalysisConfig
+    )
 
 
 def _empty_object_dict_list() -> list[dict[str, object]]:
@@ -136,9 +152,9 @@ class DocumentationAuditor:
         """
         self.config_path = Path(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
-        self.audit_rules: dict[str, object] = self.get_default_audit_rules()
-        self.style_guide: dict[str, object] = self.get_default_style_guide()
-        self.validation_config: dict[str, object] = self.get_default_validation_config()
+        self.audit_rules: AuditRulesConfig = self.get_default_audit_rules()
+        self.style_guide: StyleGuideConfig = self.get_default_style_guide()
+        self.validation_config: ValidationConfig = self.get_default_validation_config()
         self.load_config()
         self.results: AuditorResults = AuditorResults(
             timestamp=datetime.now(UTC).isoformat(),
@@ -150,39 +166,31 @@ class DocumentationAuditor:
             with Path(self.config_path / "audit_rules.yaml").open(
                 encoding="utf-8"
             ) as f:
-                loaded_obj: dict[object, object] | object = yaml.safe_load(f)
-                if isinstance(loaded_obj, dict):
-                    self.audit_rules = self._to_str_object_dict(loaded_obj)
-                else:
-                    self.audit_rules = self.get_default_audit_rules()
-        except FileNotFoundError:
+                self.audit_rules = AuditRulesConfig.model_validate(yaml.safe_load(f))
+        except (FileNotFoundError, ValidationError, yaml.YAMLError, TypeError):
             self.audit_rules = self.get_default_audit_rules()
+
         try:
             with Path(self.config_path / "style_guide.yaml").open(
                 encoding="utf-8"
             ) as f:
-                loaded_obj: dict[object, object] | object = yaml.safe_load(f)
-                if isinstance(loaded_obj, dict):
-                    self.style_guide = self._to_str_object_dict(loaded_obj)
-                else:
-                    self.style_guide = self.get_default_style_guide()
-        except FileNotFoundError:
+                self.style_guide = StyleGuideConfig.model_validate(yaml.safe_load(f))
+        except (FileNotFoundError, ValidationError, yaml.YAMLError, TypeError):
             self.style_guide = self.get_default_style_guide()
+
         try:
             with Path(self.config_path / "validation_config.yaml").open(
                 encoding="utf-8"
             ) as f:
-                loaded_obj: dict[object, object] | object = yaml.safe_load(f)
-                if isinstance(loaded_obj, dict):
-                    self.validation_config = self._to_str_object_dict(loaded_obj)
-                else:
-                    self.validation_config = self.get_default_validation_config()
-        except FileNotFoundError:
+                self.validation_config = ValidationConfig.model_validate(
+                    yaml.safe_load(f)
+                )
+        except (FileNotFoundError, ValidationError, yaml.YAMLError, TypeError):
             self.validation_config = self.get_default_validation_config()
 
-    def get_default_audit_rules(self) -> dict[str, object]:
+    def get_default_audit_rules(self) -> AuditRulesConfig:
         """Default audit rules if config file not found."""
-        return {
+        return AuditRulesConfig.model_validate({
             "quality_thresholds": {
                 "max_age_days": 90,
                 "min_word_count": 100,
@@ -201,11 +209,11 @@ class DocumentationAuditor:
                 "medium": ["style_inconsistency", "missing_alt_text"],
                 "low": ["formatting_issue", "readability_warning"],
             },
-        }
+        })
 
-    def get_default_style_guide(self) -> dict[str, object]:
+    def get_default_style_guide(self) -> StyleGuideConfig:
         """Default style guide if config file not found."""
-        return {
+        return StyleGuideConfig.model_validate({
             "markdown": {
                 "heading_style": "atx",
                 "list_style": "dash",
@@ -222,11 +230,11 @@ class DocumentationAuditor:
                 "consistent_indentation": True,
                 "trailing_spaces": False,
             },
-        }
+        })
 
-    def get_default_validation_config(self) -> dict[str, object]:
+    def get_default_validation_config(self) -> ValidationConfig:
         """Default validation config if config file not found."""
-        return {
+        return ValidationConfig.model_validate({
             "link_validation": {
                 "timeout": 10,
                 "retry_attempts": 3,
@@ -241,50 +249,7 @@ class DocumentationAuditor:
                 "check_todos": True,
                 "check_fixmes": True,
             },
-        }
-
-    def _get_section(self, source: dict[str, object], key: str) -> dict[str, object]:
-        raw = source.get(key)
-        if isinstance(raw, dict):
-            raw_dict: dict[object, object] = raw
-            return self._to_str_object_dict(raw_dict)
-        return {}
-
-    def _to_str_object_dict(self, raw: dict[object, object]) -> dict[str, object]:
-        result: dict[str, object] = {
-            key: value for key, value in raw.items() if isinstance(key, str)
-        }
-        return result
-
-    def _get_bool(self, source: dict[str, object], key: str, default: bool, /) -> bool:  # noqa: FBT001
-        value = source.get(key)
-        return value if isinstance(value, bool) else default
-
-    def _get_int(self, source: dict[str, object], key: str, default: int) -> int:
-        value = source.get(key)
-        if isinstance(value, bool):
-            return default
-        if isinstance(value, int):
-            return value
-        if isinstance(value, float):
-            return int(value)
-        return default
-
-    def _get_str(self, source: dict[str, object], key: str, default: str) -> str:
-        value = source.get(key)
-        return value if isinstance(value, str) else default
-
-    def _get_str_list(
-        self, source: dict[str, object], key: str, default: list[str]
-    ) -> list[str]:
-        value = source.get(key)
-        if not isinstance(value, list):
-            return default
-        values: list[object] = []
-        for raw_item in value:
-            item_obj: object = raw_item
-            values.append(item_obj)
-        return [item for item in values if isinstance(item, str)]
+        })
 
     def find_documentation_files(self) -> list[Path]:
         """Find all documentation files in the project."""
@@ -323,14 +288,14 @@ class DocumentationAuditor:
         """Run complete documentation audit."""
         doc_files = self.find_documentation_files()
         self.results.files_analyzed = len(doc_files)
-        content_checks = self._get_section(self.audit_rules, "content_checks")
-        if self._get_bool(content_checks, "check_freshness", True):
+        content_checks = self.audit_rules.content_checks
+        if content_checks.check_freshness:
             self.check_content_freshness(doc_files)
-        if self._get_bool(content_checks, "check_completeness", True):
+        if content_checks.check_completeness:
             self.check_content_completeness(doc_files)
-        if self._get_bool(content_checks, "check_consistency", True):
+        if content_checks.check_consistency:
             self.check_content_consistency(doc_files)
-        if self._get_bool(content_checks, "check_links", True):
+        if content_checks.check_links:
             self.check_links_and_references(doc_files)
         self.calculate_quality_metrics()
         self.generate_recommendations()
@@ -338,17 +303,7 @@ class DocumentationAuditor:
 
     def check_content_freshness(self, doc_files: list[Path]) -> None:
         """Check documentation freshness and identify outdated content."""
-        audit_rules_dict: dict[str, object] = dict(self.audit_rules)
-        quality_thresholds_obj = audit_rules_dict.get("quality_thresholds")
-        quality_thresholds = (
-            self._to_str_object_dict(quality_thresholds_obj)
-            if isinstance(quality_thresholds_obj, dict)
-            else {}
-        )
-        max_age_days_val = quality_thresholds.get("max_age_days", 90)
-        max_age_days = (
-            int(max_age_days_val) if isinstance(max_age_days_val, (int, float)) else 90
-        )
+        max_age_days = self.audit_rules.quality_thresholds.max_age_days
         cutoff_date = datetime.now(UTC) - timedelta(days=max_age_days)
         for file_path in doc_files:
             try:
@@ -367,7 +322,12 @@ class DocumentationAuditor:
                         "recommendation": f"Review and update content (last modified {age_days} days ago)",
                     }
                     _ = self.results.issues.append(issue)
-            except Exception as e:
+            except (
+                FileNotFoundError,
+                PermissionError,
+                UnicodeDecodeError,
+                OSError,
+            ) as e:
                 _ = self.results.issues.append({
                     "type": "file_access_error",
                     "severity": "medium",
@@ -394,13 +354,9 @@ class DocumentationAuditor:
 
     def check_content_completeness(self, doc_files: list[Path]) -> None:
         """Check documentation completeness and identify missing sections."""
-        quality_thresholds = self._get_section(self.audit_rules, "quality_thresholds")
-        min_word_count = self._get_int(quality_thresholds, "min_word_count", 100)
-        content_analysis = self._get_section(self.validation_config, "content_analysis")
-        required_sections = self._get_str_list(
-            content_analysis, "required_sections", []
-        )
-        check_todos = self._get_bool(content_analysis, "check_todos", True)
+        min_word_count = self.audit_rules.quality_thresholds.min_word_count
+        required_sections = self.validation_config.content_analysis.required_sections
+        check_todos = self.validation_config.content_analysis.check_todos
         for file_path in doc_files:
             try:
                 content = file_path.read_text(encoding="utf-8")
@@ -439,7 +395,12 @@ class DocumentationAuditor:
                             "todos": todos[:5],
                             "recommendation": f"Address {len(todos)} TODO/FIXME items",
                         })
-            except Exception as e:
+            except (
+                FileNotFoundError,
+                PermissionError,
+                UnicodeDecodeError,
+                OSError,
+            ) as e:
                 _ = self.results.issues.append({
                     "type": "content_analysis_error",
                     "severity": "medium",
@@ -460,7 +421,7 @@ class DocumentationAuditor:
 
     def check_content_consistency(self, doc_files: list[Path]) -> None:
         """Check style consistency and formatting issues."""
-        accessibility_cfg = self._get_section(self.style_guide, "accessibility")
+        accessibility_cfg = self.style_guide.accessibility
         for file_path in doc_files:
             try:
                 content = file_path.read_text(encoding="utf-8")
@@ -490,7 +451,7 @@ class DocumentationAuditor:
                         "issues": accessibility_issues,
                         "recommendation": f"Address {len(accessibility_issues)} accessibility issues",
                     })
-                if self._get_bool(accessibility_cfg, "heading_structure", True):
+                if accessibility_cfg.heading_structure:
                     heading_issues = self._check_heading_hierarchy(content)
                     if heading_issues:
                         _ = self.results.issues.append({
@@ -500,7 +461,12 @@ class DocumentationAuditor:
                             "issues": heading_issues,
                             "recommendation": "Fix heading hierarchy structure",
                         })
-            except Exception as e:
+            except (
+                FileNotFoundError,
+                PermissionError,
+                UnicodeDecodeError,
+                OSError,
+            ) as e:
                 _ = self.results.issues.append({
                     "type": "consistency_check_error",
                     "severity": "medium",
@@ -511,7 +477,7 @@ class DocumentationAuditor:
     def _check_markdown_formatting(self, content: str) -> list[str]:
         """Check for markdown formatting issues."""
         issues: list[str] = []
-        formatting_cfg = self._get_section(self.style_guide, "formatting")
+        formatting_cfg = self.style_guide.formatting
         unordered_lists = re.findall(r"^[\\s]*[-\\*\\+]", content, re.MULTILINE)
         if len(set(unordered_lists)) > 1:
             issues.append("mixed unordered list styles")
@@ -521,11 +487,11 @@ class DocumentationAuditor:
         ]
         if len(emphasis_usage) > 1:
             issues.append("mixed emphasis styles (* vs _)")
-        if self._get_bool(formatting_cfg, "trailing_spaces", False):
+        if formatting_cfg.trailing_spaces:
             trailing_spaces = re.findall(r"[ \\t]+$", content, re.MULTILINE)
             if trailing_spaces:
                 issues.append(f"{len(trailing_spaces)} lines with trailing spaces")
-        max_length = self._get_int(formatting_cfg, "max_line_length", 88)
+        max_length = formatting_cfg.max_line_length
         long_lines = [line for line in content.split("\n") if len(line) > max_length]
         if long_lines:
             issues.append(f"{len(long_lines)} lines exceed {max_length} characters")
@@ -534,8 +500,8 @@ class DocumentationAuditor:
     def _check_accessibility(self, content: str) -> list[dict[str, str]]:
         """Check accessibility compliance."""
         issues: list[dict[str, str]] = []
-        accessibility_cfg = self._get_section(self.style_guide, "accessibility")
-        if self._get_bool(accessibility_cfg, "require_alt_text", True):
+        accessibility_cfg = self.style_guide.accessibility
+        if accessibility_cfg.require_alt_text:
             images_without_alt = re.findall(r"!\\[\\]\\([^)]+\\)", content)
             if images_without_alt:
                 issues.extend([
@@ -545,7 +511,7 @@ class DocumentationAuditor:
                     }
                     for img in images_without_alt
                 ])
-        if self._get_bool(accessibility_cfg, "descriptive_links", True):
+        if accessibility_cfg.descriptive_links:
             generic_links = re.findall(
                 r"\\[here|click here|link|read more\\]\\([^)]+\\)",
                 content,
@@ -576,7 +542,7 @@ class DocumentationAuditor:
 
     def check_links_and_references(self, doc_files: list[Path]) -> None:
         """Check links and references for validity."""
-        link_validation = self._get_section(self.validation_config, "link_validation")
+        link_validation = self.validation_config.link_validation
         all_links: list[dict[str, str | int]] = []
         image_refs: list[dict[str, str]] = []
         for file_path in doc_files:
@@ -608,25 +574,30 @@ class DocumentationAuditor:
                         "alt": alt_text,
                         "file": str(file_path.relative_to(self.project_root)),
                     })
-            except Exception as e:
+            except (
+                FileNotFoundError,
+                PermissionError,
+                UnicodeDecodeError,
+                OSError,
+            ) as e:
                 _ = self.results.issues.append({
                     "type": "link_extraction_error",
                     "severity": "medium",
                     "file": str(file_path.relative_to(self.project_root)),
                     "error": str(e),
                 })
-        if self._get_bool(link_validation, "check_external", True):
+        if link_validation.check_external:
             self._validate_external_links(all_links)
-        if self._get_bool(link_validation, "check_internal", True):
+        if link_validation.check_internal:
             self._validate_internal_links(all_links, doc_files)
-        if self._get_bool(link_validation, "check_images", True):
+        if link_validation.check_images:
             self._validate_images(image_refs)
 
     def _validate_external_links(self, links: list[dict[str, str | int]]) -> None:
         """Validate external links."""
-        link_validation = self._get_section(self.validation_config, "link_validation")
-        timeout = self._get_int(link_validation, "timeout", 10)
-        user_agent = self._get_str(link_validation, "user_agent", "")
+        link_validation = self.validation_config.link_validation
+        timeout = link_validation.timeout
+        user_agent = link_validation.user_agent
         external_links = [link for link in links if link["type"] == "external"]
         for link in external_links:
             try:
@@ -822,7 +793,20 @@ class DocumentationAuditor:
     def _generate_html_report(self) -> str:
         """Generate HTML audit report."""
         metrics = self.results.metrics
-        severity_breakdown = self._get_section(metrics, "severity_breakdown")
+        severity_breakdown_obj = metrics.get("severity_breakdown")
+        critical_count = 0
+        high_count = 0
+        medium_count = 0
+        low_count = 0
+        if isinstance(severity_breakdown_obj, dict):
+            critical_raw = severity_breakdown_obj.get("critical", 0)
+            high_raw = severity_breakdown_obj.get("high", 0)
+            medium_raw = severity_breakdown_obj.get("medium", 0)
+            low_raw = severity_breakdown_obj.get("low", 0)
+            critical_count = critical_raw if isinstance(critical_raw, int) else 0
+            high_count = high_raw if isinstance(high_raw, int) else 0
+            medium_count = medium_raw if isinstance(medium_raw, int) else 0
+            low_count = low_raw if isinstance(low_raw, int) else 0
         quality_score_raw = metrics.get("quality_score", 0)
         quality_score = (
             int(quality_score_raw) if isinstance(quality_score_raw, (int, float)) else 0
@@ -843,7 +827,7 @@ class DocumentationAuditor:
             if isinstance(files_analyzed_raw, (int, float))
             else 0
         )
-        html = f"""\n<!DOCTYPE html>\n<html>\n<head>\n    <title>FLEXT Quality Documentation Audit Report</title>\n    <style>\n        body {{ font-family: Arial, sans-serif; margin: 40px; }}\n        .header {{ background: #f0f0f0; padding: 20px; border-radius: 5px; }}\n        .metrics {{ display: flex; gap: 20px; margin: 20px 0; }}\n        .metric {{ background: #e8f4fd; padding: 15px; border-radius: 5px; flex: 1; }}\n        .issues {{ margin: 20px 0; }}\n        .issue {{ border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; }}\n        .severity-critical {{ border-left: 5px solid #dc3545; }}\n        .severity-high {{ border-left: 5px solid #fd7e14; }}\n        .severity-medium {{ border-left: 5px solid #ffc107; }}\n        .severity-low {{ border-left: 5px solid #28a745; }}\n    </style>\n</head>\n<body>\n    <div class="header">\n        <h1>FLEXT Quality Documentation Audit Report</h1>\n        <p>Generated: {self.results.timestamp}</p>\n        <p>Files Analyzed: {files_analyzed}</p>\n    </div>\n\n    <div class="metrics">\n        <div class="metric">\n            <h3>Quality Score</h3>\n            <div style="font-size: 2em; font-weight: bold; color: {self._get_score_color(quality_score)};">\n                {quality_score}%\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Total Issues</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                {total_issues}\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Issues per File</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                {issues_per_file:.1f}\n            </div>\n        </div>\n    </div>\n\n    <h2>Issues by Severity</h2>\n    <ul>\n        <li>Critical: {severity_breakdown.get("critical", 0)}</li>\n        <li>High: {severity_breakdown.get("high", 0)}</li>\n        <li>Medium: {severity_breakdown.get("medium", 0)}</li>\n        <li>Low: {severity_breakdown.get("low", 0)}</li>\n    </ul>\n\n    <div class="issues">\n        <h2>Detailed Issues</h2>\n"""
+        html = f"""\n<!DOCTYPE html>\n<html>\n<head>\n    <title>FLEXT Quality Documentation Audit Report</title>\n    <style>\n        body {{ font-family: Arial, sans-serif; margin: 40px; }}\n        .header {{ background: #f0f0f0; padding: 20px; border-radius: 5px; }}\n        .metrics {{ display: flex; gap: 20px; margin: 20px 0; }}\n        .metric {{ background: #e8f4fd; padding: 15px; border-radius: 5px; flex: 1; }}\n        .issues {{ margin: 20px 0; }}\n        .issue {{ border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; }}\n        .severity-critical {{ border-left: 5px solid #dc3545; }}\n        .severity-high {{ border-left: 5px solid #fd7e14; }}\n        .severity-medium {{ border-left: 5px solid #ffc107; }}\n        .severity-low {{ border-left: 5px solid #28a745; }}\n    </style>\n</head>\n<body>\n    <div class="header">\n        <h1>FLEXT Quality Documentation Audit Report</h1>\n        <p>Generated: {self.results.timestamp}</p>\n        <p>Files Analyzed: {files_analyzed}</p>\n    </div>\n\n    <div class="metrics">\n        <div class="metric">\n            <h3>Quality Score</h3>\n            <div style="font-size: 2em; font-weight: bold; color: {self._get_score_color(quality_score)};">\n                {quality_score}%\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Total Issues</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                {total_issues}\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Issues per File</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                {issues_per_file:.1f}\n            </div>\n        </div>\n    </div>\n\n    <h2>Issues by Severity</h2>\n    <ul>\n        <li>Critical: {critical_count}</li>\n        <li>High: {high_count}</li>\n        <li>Medium: {medium_count}</li>\n        <li>Low: {low_count}</li>\n    </ul>\n\n    <div class="issues">\n        <h2>Detailed Issues</h2>\n"""
         for issue in self.results.issues:
             severity_class = f"severity-{issue.get('severity', 'info')}"
             type_str = str(issue.get("type", ""))
@@ -968,15 +952,11 @@ def _should_fail_on_results(
     should_fail = False
     if args.fail_on_errors:
         severity_breakdown_obj = metrics.get("severity_breakdown")
-        severity_breakdown: dict[str, object] = {}
+        critical_raw: object = 0
+        high_raw: object = 0
         if isinstance(severity_breakdown_obj, dict):
-            severity_breakdown.update({
-                key: value
-                for key, value in severity_breakdown_obj.items()
-                if isinstance(key, str)
-            })
-        critical_raw = severity_breakdown.get("critical", 0)
-        high_raw = severity_breakdown.get("high", 0)
+            critical_raw = severity_breakdown_obj.get("critical", 0)
+            high_raw = severity_breakdown_obj.get("high", 0)
         critical = critical_raw if isinstance(critical_raw, int) else 0
         high = high_raw if isinstance(high_raw, int) else 0
         critical_high_issues = critical + high
@@ -999,10 +979,17 @@ def main() -> None:
         auditor.save_report(args.format, args.output)
         metrics = results.metrics
         if _should_fail_on_results(args, metrics):
-            sys.exit(1)
-    except Exception:
+            raise SystemExit(1)
+    except (
+        FileNotFoundError,
+        PermissionError,
+        OSError,
+        yaml.YAMLError,
+        KeyError,
+        ValueError,
+    ):
         if args.ci_mode or args.fail_on_errors:
-            sys.exit(1)
+            raise SystemExit(1)
 
 
 if __name__ == "__main__":

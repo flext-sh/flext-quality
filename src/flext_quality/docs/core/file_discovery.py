@@ -120,7 +120,7 @@ class DocumentationFinder:
 
         try:
             self._load_ignore_patterns_from_file(ignore_path)
-        except Exception as e:
+        except (FileNotFoundError, PermissionError, UnicodeDecodeError, OSError) as e:
             # If we can't read the ignore file, just continue silently
             # This is acceptable as ignore files are optional
             logger = logging.getLogger(__name__)
@@ -189,7 +189,7 @@ class DocumentationFinder:
                     for match in matches
                     if match.is_file() and not self._is_ignored(match)
                 )
-            except Exception as e:
+            except (OSError, ValueError) as e:
                 # Skip patterns that cause errors during glob matching
                 # This prevents crashes from malformed glob patterns
                 logger = logging.getLogger(__name__)
@@ -242,7 +242,7 @@ class DocumentationFinder:
                 path_str,
                 pattern.rstrip("/"),
             )
-        except Exception:
+        except (OSError, ValueError):
             return False
 
     def find_markdown_files(self) -> list[Path]:
@@ -321,7 +321,7 @@ class DocumentationFinder:
         try:
             relative_path = file_path.relative_to(self.project_root)
             return relative_path.parts
-        except Exception:
+        except (ValueError, OSError):
             return None
 
     def categorize_files(

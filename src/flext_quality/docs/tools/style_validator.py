@@ -280,7 +280,13 @@ class StyleValidator:
 
             return file_results
 
-        except Exception:
+        except (
+            FileNotFoundError,
+            PermissionError,
+            UnicodeDecodeError,
+            OSError,
+            ValueError,
+        ):
             return {
                 "file": str(file_path),
                 "violations": [],
