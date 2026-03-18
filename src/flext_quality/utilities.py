@@ -102,6 +102,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
         ) -> r[str]:
             """Run a shell command with timeout."""
             try:
+                # Intentional subprocess usage: Quality validation command execution
                 result = subprocess.run(
                     cmd,
                     capture_output=True,
