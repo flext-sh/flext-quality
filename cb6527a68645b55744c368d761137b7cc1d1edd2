@@ -1,0 +1,23 @@
+docs/maintenance/scheduled_maintenance.py
+  af6716664f6ebcf8 98,164,166,169,188,190-191,194,229,233,242,245,695-698
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.15",
+  "base_commit_sha": "cb6527a68645b55744c368d761137b7cc1d1edd2",
+  "prompts": {
+    "af6716664f6ebcf8": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_2fdc92b12ffelvD8zSvF1iqKMa",
+        "model": "anthropic/claude-haiku-4-5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 41,
+      "total_deletions": 28,
+      "accepted_lines": 17,
+      "overriden_lines": 0
+    }
+  }
+}
