@@ -95,7 +95,7 @@ def _as_str(value: object, default: str) -> str:
     return value if isinstance(value, str) else default
 
 
-def _as_bool(value: object, default: bool) -> bool:
+def _as_bool(value: object, *, default: bool) -> bool:
     """Normalize unknown config values to bool."""
     return value if isinstance(value, bool) else default
 
@@ -161,9 +161,13 @@ class ScheduledMaintenance:
     ) -> MaintenanceConfig:
         """Merge external config mapping into default typed config."""
         merged: MaintenanceConfig = {
-            "enabled": _as_bool(overrides.get("enabled"), base["enabled"]),
-            "reports_dir": _as_str(overrides.get("reports_dir"), base["reports_dir"]),
-            "backup_dir": _as_str(overrides.get("backup_dir"), base["backup_dir"]),
+            "enabled": _as_bool(overrides.get("enabled"), default=base["enabled"]),
+            "reports_dir": _as_str(
+                overrides.get("reports_dir"), default=base["reports_dir"]
+            ),
+            "backup_dir": _as_str(
+                overrides.get("backup_dir"), default=base["backup_dir"]
+            ),
             "schedules": base["schedules"],
             "tasks": base["tasks"],
             "error_handling": base["error_handling"],
@@ -180,12 +184,14 @@ class ScheduledMaintenance:
                     continue
                 current = schedules[key]
                 updated: ScheduleEntry = {
-                    "enabled": _as_bool(value.get("enabled"), current["enabled"]),
-                    "time": _as_str(value.get("time"), current["time"]),
-                    "tasks": _as_str_list(value.get("tasks"), current["tasks"]),
+                    "enabled": _as_bool(
+                        value.get("enabled"), default=current["enabled"]
+                    ),
+                    "time": _as_str(value.get("time"), default=current["time"]),
+                    "tasks": _as_str_list(value.get("tasks"), default=current["tasks"]),
                 }
                 if "day" in current:
-                    updated["day"] = _as_str(value.get("day"), current["day"])
+                    updated["day"] = _as_str(value.get("day"), default=current["day"])
                 elif isinstance(value.get("day"), str):
                     updated["day"] = value["day"]
                 schedules[key] = updated
@@ -220,11 +226,11 @@ class ScheduledMaintenance:
                     error_handling_raw.get("retry_delay"), current["retry_delay"]
                 ),
                 "fail_fast": _as_bool(
-                    error_handling_raw.get("fail_fast"), current["fail_fast"]
+                    error_handling_raw.get("fail_fast"), default=current["fail_fast"]
                 ),
                 "notify_on_failure": _as_bool(
                     error_handling_raw.get("notify_on_failure"),
-                    current["notify_on_failure"],
+                    default=current["notify_on_failure"],
                 ),
             }
 
@@ -232,8 +238,12 @@ class ScheduledMaintenance:
         if isinstance(logging_raw, Mapping):
             current = base["logging"]
             merged["logging"] = {
-                "enabled": _as_bool(logging_raw.get("enabled"), current["enabled"]),
-                "log_file": _as_str(logging_raw.get("log_file"), current["log_file"]),
+                "enabled": _as_bool(
+                    logging_raw.get("enabled"), default=current["enabled"]
+                ),
+                "log_file": _as_str(
+                    logging_raw.get("log_file"), default=current["log_file"]
+                ),
                 "max_log_size": _as_str(
                     logging_raw.get("max_log_size"), current["max_log_size"]
                 ),
@@ -682,7 +692,10 @@ class ScheduledMaintenance:
             )
 
         # Weekly comprehensive
-        if schedules["weekly_comprehensive"]["enabled"]:
+        if schedules["weekly_comprehensive"]["enabled"] and (
+            "day" in schedules["weekly_comprehensive"]
+            and "time" in schedules["weekly_comprehensive"]
+        ):
             day = schedules["weekly_comprehensive"]["day"]
             time_str = schedules["weekly_comprehensive"]["time"]
 
