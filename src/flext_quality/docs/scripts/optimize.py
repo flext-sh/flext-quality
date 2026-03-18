@@ -18,11 +18,19 @@ import re
 import shutil
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 import yaml
+from pydantic import BaseModel, Field
 
 MIN_HEADINGS_FOR_TOC = 5
+
+
+class OptimizerResults(BaseModel):
+    timestamp: str
+    files_processed: int = 0
+    changes_made: int = 0
+    backups_created: list[str] = Field(default_factory=list)
+    optimizations: list[dict[str, str]] = Field(default_factory=list)
 
 
 class DocumentationOptimizer:
@@ -38,17 +46,9 @@ class DocumentationOptimizer:
         self.backup = backup
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.logger = logging.getLogger(self.__class__.__name__)
-        backups_created: list[str] = []
-        optimizations_list: list[dict[str, str]] = []
-        self.results = {
-            "timestamp": datetime.now(UTC).isoformat(),
-            "files_processed": 0,
-            "changes_made": 0,
-            "backups_created": backups_created,
-            "optimizations": optimizations_list,
-        }
+        self.results = OptimizerResults(timestamp=datetime.now(UTC).isoformat())
 
-    def optimize_formatting(self, doc_files: list[Path]) -> dict[str, Any]:
+    def optimize_formatting(self, doc_files: list[Path]) -> dict[str, object]:
         """Fix common formatting issues."""
         for file_path in doc_files:
             try:
@@ -60,16 +60,21 @@ class DocumentationOptimizer:
                 content = self._normalize_emphasis_style(content)
                 if content != original_content:
                     self._save_with_backup(file_path, content)
-                    self.results["changes_made"] += 1
-                    self.results["optimizations"].append({
+                    self.results.changes_made += 1
+                    self.results.optimizations.append({
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "formatting_fixes",
                         "description": "Fixed trailing spaces, list indentation, and emphasis consistency",
                     })
-                self.results["files_processed"] += 1
-            except Exception as e:
+                self.results.files_processed += 1
+            except (
+                FileNotFoundError,
+                PermissionError,
+                UnicodeDecodeError,
+                OSError,
+            ) as e:
                 self.logger.warning("Failed to optimize formatting in file: %s", e)
-        return self.results
+        return self.results.model_dump()
 
     def _fix_trailing_spaces(self, content: str) -> str:
         """Remove trailing spaces from lines."""
@@ -95,7 +100,7 @@ class DocumentationOptimizer:
         """Normalize emphasis style (prefer * over _ for consistency)."""
         return content
 
-    def update_table_of_contents(self, doc_files: list[Path]) -> dict[str, Any]:
+    def update_table_of_contents(self, doc_files: list[Path]) -> dict[str, object]:
         """Update or add table of contents for long documents."""
         for file_path in doc_files:
             try:
@@ -106,16 +111,21 @@ class DocumentationOptimizer:
                     content = self._add_or_update_toc(content)
                 if content != original_content:
                     self._save_with_backup(file_path, content)
-                    self.results["changes_made"] += 1
-                    self.results["optimizations"].append({
+                    self.results.changes_made += 1
+                    self.results.optimizations.append({
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "toc_update",
                         "description": "Added or updated table of contents",
                     })
-                self.results["files_processed"] += 1
-            except Exception as e:
+                self.results.files_processed += 1
+            except (
+                FileNotFoundError,
+                PermissionError,
+                UnicodeDecodeError,
+                OSError,
+            ) as e:
                 self.logger.warning("Failed to update TOC in file: %s", e)
-        return self.results
+        return self.results.model_dump()
 
     def _find_existing_toc(self, lines: list[str]) -> tuple[int, int]:
         """Find existing table of contents boundaries."""
@@ -180,7 +190,7 @@ class DocumentationOptimizer:
         anchor = re.sub(r"[^\\w\\s-]", "", anchor)
         return re.sub(r"\\s+", "-", anchor)
 
-    def enhance_accessibility(self, doc_files: list[Path]) -> dict[str, Any]:
+    def enhance_accessibility(self, doc_files: list[Path]) -> dict[str, object]:
         """Enhance accessibility of documentation."""
         for file_path in doc_files:
             try:
@@ -190,18 +200,23 @@ class DocumentationOptimizer:
                 content = self._improve_link_text(content)
                 if content != original_content:
                     self._save_with_backup(file_path, content)
-                    self.results["changes_made"] += 1
-                    self.results["optimizations"].append({
+                    self.results.changes_made += 1
+                    self.results.optimizations.append({
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "accessibility_enhancement",
                         "description": "Added alt text and improved link descriptions",
                     })
-                self.results["files_processed"] += 1
-            except Exception as e:
+                self.results.files_processed += 1
+            except (
+                FileNotFoundError,
+                PermissionError,
+                UnicodeDecodeError,
+                OSError,
+            ) as e:
                 self.logger.warning(
                     "Failed to enhance accessibility in %s: %s", file_path, e
                 )
-        return self.results
+        return self.results.model_dump()
 
     def _add_missing_alt_text(self, content: str) -> str:
         """Add descriptive alt text to images that lack it."""
@@ -227,7 +242,7 @@ class DocumentationOptimizer:
             content = re.sub(pattern, replacement, content, flags=re.IGNORECASE)
         return content
 
-    def optimize_content_structure(self, doc_files: list[Path]) -> dict[str, Any]:
+    def optimize_content_structure(self, doc_files: list[Path]) -> dict[str, object]:
         """Optimize content structure and readability."""
         for file_path in doc_files:
             try:
@@ -238,18 +253,23 @@ class DocumentationOptimizer:
                 content = self._add_section_breaks(content)
                 if content != original_content:
                     self._save_with_backup(file_path, content)
-                    self.results["changes_made"] += 1
-                    self.results["optimizations"].append({
+                    self.results.changes_made += 1
+                    self.results.optimizations.append({
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "structure_optimization",
                         "description": "Improved paragraph breaks and section organization",
                     })
-                self.results["files_processed"] += 1
-            except Exception as e:
+                self.results.files_processed += 1
+            except (
+                FileNotFoundError,
+                PermissionError,
+                UnicodeDecodeError,
+                OSError,
+            ) as e:
                 self.logger.warning(
                     "Failed to enhance accessibility in %s: %s", file_path, e
                 )
-        return self.results
+        return self.results.model_dump()
 
     def _break_long_paragraphs(self, content: str) -> str:
         """Break up paragraphs that are too long."""
@@ -274,7 +294,7 @@ class DocumentationOptimizer:
                 enhanced_lines.extend(("", "---", ""))
         return "\n".join(enhanced_lines)
 
-    def update_metadata(self, doc_files: list[Path]) -> dict[str, Any]:
+    def update_metadata(self, doc_files: list[Path]) -> dict[str, object]:
         """Update frontmatter metadata and timestamps."""
         for file_path in doc_files:
             try:
@@ -292,18 +312,24 @@ class DocumentationOptimizer:
                         content = "\n".join(lines)
                 if content != original_content:
                     self._save_with_backup(file_path, content)
-                    self.results["changes_made"] += 1
-                    self.results["optimizations"].append({
+                    self.results.changes_made += 1
+                    self.results.optimizations.append({
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "metadata_update",
                         "description": "Updated frontmatter and added modification timestamp",
                     })
-                self.results["files_processed"] += 1
-            except Exception as e:
+                self.results.files_processed += 1
+            except (
+                FileNotFoundError,
+                PermissionError,
+                UnicodeDecodeError,
+                OSError,
+                yaml.YAMLError,
+            ) as e:
                 self.logger.warning(
                     "Failed to enhance accessibility in %s: %s", file_path, e
                 )
-        return self.results
+        return self.results.model_dump()
 
     def _update_frontmatter(self, content: str) -> str:
         """Update YAML frontmatter with current metadata."""

@@ -227,7 +227,13 @@ class ContentAnalyzer:
 
             return analysis
 
-        except Exception as e:
+        except (
+            FileNotFoundError,
+            PermissionError,
+            UnicodeDecodeError,
+            OSError,
+            ValueError,
+        ) as e:
             return cast(
                 "AnalysisDict",
                 {

@@ -392,7 +392,7 @@ class ScheduledMaintenance:
             )
             return False
 
-        except Exception as e:
+        except (OSError, RuntimeError, ValueError, KeyError) as e:
             _ = self.results.errors.append(
                 f"Task error: {task_config.description} - {e!s}"
             )
@@ -473,7 +473,7 @@ class ScheduledMaintenance:
                     raise RuntimeError(error_msg)
 
             return self._run_with_timeout(run_tests, timeout, description)
-        except Exception as e:
+        except (RuntimeError, OSError, ImportError) as e:
             _ = self.results.errors.append(
                 f"pytest command failed in {description}: {e!s}"
             )
@@ -511,7 +511,7 @@ class ScheduledMaintenance:
             )
             return False
 
-        except Exception as e:
+        except (FileNotFoundError, OSError, RuntimeError) as e:
             _ = self.results.errors.append(
                 f"Make command failed in {description}: {e!s}"
             )
@@ -556,7 +556,7 @@ class ScheduledMaintenance:
                 f"Not a git repository for task: {description}"
             )
             return False
-        except Exception as e:
+        except (OSError, RuntimeError, ValueError) as e:
             _ = self.results.errors.append(
                 f"Git command failed in {description}: {e!s}"
             )
@@ -576,7 +576,7 @@ class ScheduledMaintenance:
             message = " ".join(cmd_parts[1:]) if len(cmd_parts) > 1 else ""
             print(message)
             return True
-        except Exception as e:
+        except (OSError, ValueError) as e:
             _ = self.results.errors.append(
                 f"Echo command failed in {description}: {e!s}"
             )
@@ -598,7 +598,7 @@ class ScheduledMaintenance:
                 try:
                     func()
                     success = True
-                except Exception as e:
+                except (OSError, RuntimeError, ValueError, KeyError, ImportError) as e:
                     exception = e
 
             thread = threading.Thread(target=run_with_result, daemon=False)
@@ -617,7 +617,7 @@ class ScheduledMaintenance:
 
             return success
 
-        except Exception as e:
+        except (OSError, RuntimeError, ValueError) as e:
             _ = self.results.errors.append(
                 f"Task execution error in {description}: {e!s}"
             )

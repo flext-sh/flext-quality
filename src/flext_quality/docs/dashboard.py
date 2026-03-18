@@ -106,7 +106,7 @@ class DocumentationDashboard:
                     "timestamp": data.get("timestamp", datetime.now(UTC).isoformat()),
                     "status": "Current",
                 }
-        except Exception as e:
+        except (FileNotFoundError, json.JSONDecodeError, KeyError, OSError) as e:
             return {
                 "quality_score": 0,
                 "files_analyzed": 0,
@@ -160,7 +160,13 @@ class DocumentationDashboard:
                         .get("severity_breakdown", {})
                         .get("high", 0),
                     })
-            except Exception as e:
+            except (
+                FileNotFoundError,
+                json.JSONDecodeError,
+                KeyError,
+                ValueError,
+                OSError,
+            ) as e:
                 self._logger_instance.warning(
                     "Failed to process trend data: %s", str(e)
                 )
@@ -199,7 +205,13 @@ class DocumentationDashboard:
                     "total_issues": data.get("metrics", {}).get("total_issues", 0),
                     "files_analyzed": data.get("files_analyzed", 0),
                 })
-            except Exception as e:
+            except (
+                FileNotFoundError,
+                json.JSONDecodeError,
+                KeyError,
+                ValueError,
+                OSError,
+            ) as e:
                 self._logger_instance.warning(
                     "Failed to process report file: %s", str(e)
                 )

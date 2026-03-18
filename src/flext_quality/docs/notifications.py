@@ -347,7 +347,7 @@ Please review recent changes and address any identified issues.
         if self.config["channels"]["email"]["enabled"]:
             try:
                 self._send_email_notification(title, message, priority)
-            except Exception as e:
+            except (smtplib.SMTPException, ConnectionError, OSError) as e:
                 self.results.errors.append(f"Email notification failed: {e}")
                 success = False
 
@@ -355,7 +355,7 @@ Please review recent changes and address any identified issues.
         if self.config["channels"]["slack"]["enabled"]:
             try:
                 self._send_slack_notification(title, message, priority)
-            except Exception as e:
+            except (requests.RequestException, ConnectionError, OSError) as e:
                 self.results.errors.append(f"Slack notification failed: {e}")
                 success = False
 
@@ -363,7 +363,7 @@ Please review recent changes and address any identified issues.
         if self.config["channels"]["webhook"]["enabled"]:
             try:
                 self._send_webhook_notification(title, message, priority)
-            except Exception as e:
+            except (requests.RequestException, ConnectionError, OSError) as e:
                 self.results.errors.append(f"Webhook notification failed: {e}")
                 success = False
 

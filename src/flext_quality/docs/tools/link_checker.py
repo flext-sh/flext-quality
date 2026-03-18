@@ -186,7 +186,12 @@ class LinkChecker:
                         )
                         all_links.append(link_info)
 
-            except Exception as e:
+            except (
+                FileNotFoundError,
+                PermissionError,
+                UnicodeDecodeError,
+                OSError,
+            ) as e:
                 print(f"Warning: Failed to extract links from {file_path}: {e}")
 
         return all_links
@@ -279,7 +284,7 @@ class LinkChecker:
                 valid=False,
                 context=context or {},
             )
-        except Exception as e:
+        except (OSError, ValueError, RuntimeError) as e:
             return LinkResultDict(
                 url=url,
                 error=f"unexpected_error: {e!s}",

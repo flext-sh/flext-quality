@@ -122,6 +122,21 @@ def _empty_object_dict_list() -> list[dict[str, object]]:
     return []
 
 
+def _empty_metrics_dict() -> MetricsDict:
+    return {
+        "total_issues": 0,
+        "severity_breakdown": {
+            "critical": 0,
+            "high": 0,
+            "medium": 0,
+            "low": 0,
+        },
+        "quality_score": 0,
+        "files_analyzed": 0,
+        "issues_per_file": 0.0,
+    }
+
+
 class AuditorResults(BaseModel):
     """Results for DocumentationAuditor execution."""
 
@@ -130,10 +145,7 @@ class AuditorResults(BaseModel):
     issues: list[dict[str, object]] = Field(
         default_factory=_empty_object_dict_list, description="List of issues found"
     )
-    metrics: dict[str, object] = Field(
-        default_factory=dict,
-        description="Quality metrics",
-    )
+    metrics: MetricsDict = Field(default_factory=_empty_metrics_dict)
     recommendations: list[dict[str, object]] = Field(
         default_factory=_empty_object_dict_list,
         description="List of recommendations",
@@ -702,10 +714,7 @@ class DocumentationAuditor:
         metrics = self.results.metrics
         issues = self.results.issues
         recommendations: list[dict[str, object]] = []
-        quality_score_raw = metrics.get("quality_score", 0)
-        quality_score = (
-            int(quality_score_raw) if isinstance(quality_score_raw, (int, float)) else 0
-        )
+        quality_score = metrics["quality_score"]
         if quality_score < 50:
             recommendations.append({
                 "priority": "critical",
@@ -793,40 +802,15 @@ class DocumentationAuditor:
     def _generate_html_report(self) -> str:
         """Generate HTML audit report."""
         metrics = self.results.metrics
-        severity_breakdown_obj = metrics.get("severity_breakdown")
-        critical_count = 0
-        high_count = 0
-        medium_count = 0
-        low_count = 0
-        if isinstance(severity_breakdown_obj, dict):
-            critical_raw = severity_breakdown_obj.get("critical", 0)
-            high_raw = severity_breakdown_obj.get("high", 0)
-            medium_raw = severity_breakdown_obj.get("medium", 0)
-            low_raw = severity_breakdown_obj.get("low", 0)
-            critical_count = critical_raw if isinstance(critical_raw, int) else 0
-            high_count = high_raw if isinstance(high_raw, int) else 0
-            medium_count = medium_raw if isinstance(medium_raw, int) else 0
-            low_count = low_raw if isinstance(low_raw, int) else 0
-        quality_score_raw = metrics.get("quality_score", 0)
-        quality_score = (
-            int(quality_score_raw) if isinstance(quality_score_raw, (int, float)) else 0
-        )
-        total_issues_raw = metrics.get("total_issues", 0)
-        total_issues = (
-            int(total_issues_raw) if isinstance(total_issues_raw, (int, float)) else 0
-        )
-        issues_per_file_raw = metrics.get("issues_per_file", 0)
-        issues_per_file = (
-            float(issues_per_file_raw)
-            if isinstance(issues_per_file_raw, (int, float))
-            else 0.0
-        )
-        files_analyzed_raw = metrics.get("files_analyzed", 0)
-        files_analyzed = (
-            int(files_analyzed_raw)
-            if isinstance(files_analyzed_raw, (int, float))
-            else 0
-        )
+        severity_breakdown = metrics["severity_breakdown"]
+        critical_count = severity_breakdown["critical"]
+        high_count = severity_breakdown["high"]
+        medium_count = severity_breakdown["medium"]
+        low_count = severity_breakdown["low"]
+        quality_score = metrics["quality_score"]
+        total_issues = metrics["total_issues"]
+        issues_per_file = metrics["issues_per_file"]
+        files_analyzed = metrics["files_analyzed"]
         html = f"""\n<!DOCTYPE html>\n<html>\n<head>\n    <title>FLEXT Quality Documentation Audit Report</title>\n    <style>\n        body {{ font-family: Arial, sans-serif; margin: 40px; }}\n        .header {{ background: #f0f0f0; padding: 20px; border-radius: 5px; }}\n        .metrics {{ display: flex; gap: 20px; margin: 20px 0; }}\n        .metric {{ background: #e8f4fd; padding: 15px; border-radius: 5px; flex: 1; }}\n        .issues {{ margin: 20px 0; }}\n        .issue {{ border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; }}\n        .severity-critical {{ border-left: 5px solid #dc3545; }}\n        .severity-high {{ border-left: 5px solid #fd7e14; }}\n        .severity-medium {{ border-left: 5px solid #ffc107; }}\n        .severity-low {{ border-left: 5px solid #28a745; }}\n    </style>\n</head>\n<body>\n    <div class="header">\n        <h1>FLEXT Quality Documentation Audit Report</h1>\n        <p>Generated: {self.results.timestamp}</p>\n        <p>Files Analyzed: {files_analyzed}</p>\n    </div>\n\n    <div class="metrics">\n        <div class="metric">\n            <h3>Quality Score</h3>\n            <div style="font-size: 2em; font-weight: bold; color: {self._get_score_color(quality_score)};">\n                {quality_score}%\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Total Issues</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                {total_issues}\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Issues per File</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                {issues_per_file:.1f}\n            </div>\n        </div>\n    </div>\n\n    <h2>Issues by Severity</h2>\n    <ul>\n        <li>Critical: {critical_count}</li>\n        <li>High: {high_count}</li>\n        <li>Medium: {medium_count}</li>\n        <li>Low: {low_count}</li>\n    </ul>\n\n    <div class="issues">\n        <h2>Detailed Issues</h2>\n"""
         for issue in self.results.issues:
             severity_class = f"severity-{issue.get('severity', 'info')}"
@@ -945,25 +929,17 @@ def _execute_audit_checks(
     return auditor.results
 
 
-def _should_fail_on_results(
-    args: argparse.Namespace, metrics: dict[str, object]
-) -> bool:
+def _should_fail_on_results(args: argparse.Namespace, metrics: MetricsDict) -> bool:
     """Determine if the process should fail based on results and arguments."""
     should_fail = False
     if args.fail_on_errors:
-        severity_breakdown_obj = metrics.get("severity_breakdown")
-        critical_raw: object = 0
-        high_raw: object = 0
-        if isinstance(severity_breakdown_obj, dict):
-            critical_raw = severity_breakdown_obj.get("critical", 0)
-            high_raw = severity_breakdown_obj.get("high", 0)
-        critical = critical_raw if isinstance(critical_raw, int) else 0
-        high = high_raw if isinstance(high_raw, int) else 0
+        severity_breakdown = metrics["severity_breakdown"]
+        critical = severity_breakdown["critical"]
+        high = severity_breakdown["high"]
         critical_high_issues = critical + high
         if critical_high_issues > 0:
             should_fail = True
-    quality_score_raw = metrics.get("quality_score", 0)
-    quality_score = quality_score_raw if isinstance(quality_score_raw, int) else 0
+    quality_score = metrics["quality_score"]
     if args.ci_mode and quality_score < 70:
         should_fail = True
     return should_fail

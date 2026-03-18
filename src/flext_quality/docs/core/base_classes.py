@@ -173,7 +173,13 @@ class BaseAnalyzer(ABC):
 
         try:
             self._analyze_content(content)
-        except Exception as e:
+        except (
+            FileNotFoundError,
+            PermissionError,
+            UnicodeDecodeError,
+            OSError,
+            ValueError,
+        ) as e:
             self.metrics["error"] = str(e)
             self.metrics["success"] = False
         else:

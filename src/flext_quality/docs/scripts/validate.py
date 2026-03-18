@@ -102,7 +102,12 @@ class LinkValidator:
                             ),
                         )
                     )
-            except Exception as e:
+            except (
+                FileNotFoundError,
+                PermissionError,
+                UnicodeDecodeError,
+                OSError,
+            ) as e:
                 _ = self.results.errors.append(
                     LinkCheckResult(
                         type="file_read_error",
@@ -216,7 +221,7 @@ class LinkValidator:
         except requests.exceptions.RequestException as e:
             if attempt == self.retries - 1:
                 return (False, {"error": str(e)})
-        except Exception as e:
+        except (OSError, ValueError, RuntimeError) as e:
             return (False, {"error": f"Unexpected error: {e!s}"})
         return (False, None)
 
@@ -354,7 +359,12 @@ class LinkValidator:
                 )
                 anchors.extend(explicit_anchors)
                 file_anchors[file_rel_path] = set(anchors)
-            except Exception as e:
+            except (
+                FileNotFoundError,
+                PermissionError,
+                UnicodeDecodeError,
+                OSError,
+            ) as e:
                 _ = self.results.warnings_list.append(
                     LinkCheckResult(
                         type="anchor_index_error",
@@ -466,7 +476,12 @@ class ContentValidator:
                         for issue in issues
                     ])
                 self.results.files_checked += 1
-            except Exception as e:
+            except (
+                FileNotFoundError,
+                PermissionError,
+                UnicodeDecodeError,
+                OSError,
+            ) as e:
                 _ = self.results.content_issues.append(
                     ContentIssue(
                         type="syntax_validation_error",
@@ -539,7 +554,12 @@ class ContentValidator:
                         )
                     )
                 self.results.files_checked += 1
-            except Exception as e:
+            except (
+                FileNotFoundError,
+                PermissionError,
+                UnicodeDecodeError,
+                OSError,
+            ) as e:
                 _ = self.results.content_issues.append(
                     ContentIssue(
                         type="quality_analysis_error",
