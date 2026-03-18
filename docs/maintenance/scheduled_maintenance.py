@@ -8,6 +8,7 @@ optimizations, and reporting. Designed to run as a cron job or scheduled task.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import runpy
 import shlex
@@ -19,11 +20,19 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import NotRequired, TypedDict
 
-import pytest
 import schedule
 import yaml
-from git import InvalidGitRepositoryError, Repo
 from pydantic import BaseModel, Field
+
+# Module-level feature detection flags
+HAS_PYTEST = importlib.util.find_spec("pytest") is not None
+HAS_GITPYTHON = importlib.util.find_spec("git") is not None
+
+# Conditional imports
+if HAS_PYTEST:
+    import pytest
+if HAS_GITPYTHON:
+    from git import InvalidGitRepositoryError, Repo
 
 
 class ScheduleResults(BaseModel):
@@ -502,8 +511,13 @@ class ScheduledMaintenance:
         description: str,
     ) -> bool:
         """Handle pytest commands."""
+        if not HAS_PYTEST:
+            _ = self.results.warnings.append(
+                f"pytest not available for task: {description}. Install with: pip install pytest"
+            )
+            return False
+
         try:
-            # Extract pytest arguments (skip 'pytest' itself)
             pytest_args = cmd_parts[1:] if cmd_parts[0] == "pytest" else cmd_parts
 
             def run_tests() -> None:
@@ -514,11 +528,6 @@ class ScheduledMaintenance:
 
             return self._run_with_timeout(run_tests, timeout, description)
 
-        except ImportError:
-            _ = self.results.warnings.append(
-                f"pytest not available for task: {description}. Install with: pip install pytest"
-            )
-            return False
         except Exception as e:
             _ = self.results.errors.append(
                 f"pytest command failed in {description}: {e!s}"
@@ -570,11 +579,16 @@ class ScheduledMaintenance:
         description: str,
     ) -> bool:
         """Handle git commands using GitPython."""
+        if not HAS_GITPYTHON:
+            _ = self.results.warnings.append(
+                f"GitPython not available for task: {description}. Install with: pip install GitPython"
+            )
+            return False
+
         try:
             repo = Repo(self.project_root)
             git = repo.git
 
-            # Extract git subcommand
             if len(cmd_parts) < self.MIN_GIT_ARGS:
                 _ = self.results.warnings.append(
                     f"Invalid git command format in task: {description}"
@@ -590,7 +604,6 @@ class ScheduledMaintenance:
             )
 
             def run_git_command() -> None:
-                # Use repo.git.execute() for arbitrary git commands
                 result = git.execute([subcommand] + args)
                 if not result:
                     msg = f"git {subcommand} returned empty result"
@@ -598,11 +611,6 @@ class ScheduledMaintenance:
 
             return self._run_with_timeout(run_git_command, timeout, description)
 
-        except ImportError:
-            _ = self.results.warnings.append(
-                f"GitPython not available for task: {description}. Install with: pip install GitPython"
-            )
-            return False
         except InvalidGitRepositoryError:
             _ = self.results.warnings.append(
                 f"Not a git repository for task: {description}"
