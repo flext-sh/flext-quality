@@ -392,34 +392,38 @@ class DocumentationReporter:
         """Summarize audit data for reporting."""
         if not audit_data or not isinstance(audit_data, dict):
             return None
-        issues_raw = audit_data.get("issues", [])
-        if not isinstance(issues_raw, list):
-            issues_raw = []
-        metrics_raw = audit_data.get("metrics", {})
-        if not isinstance(metrics_raw, dict):
-            metrics_raw = {}
-        quality_score_raw = metrics_raw.get("quality_score", 0)
+        issues_raw_val = audit_data.get("issues")
+        if not isinstance(issues_raw_val, list):
+            issues_raw_val = []  # type: ignore[assignment]
+        metrics_raw_val = audit_data.get("metrics")
+        if not isinstance(metrics_raw_val, dict):
+            metrics_raw_val = {}  # type: ignore[assignment]
+        quality_score_raw = metrics_raw_val.get("quality_score", 0)
         if not isinstance(quality_score_raw, int):
             quality_score_raw = 0
         critical_count = len([
             i
-            for i in issues_raw
+            for i in issues_raw_val
             if isinstance(i, dict) and i.get("severity") == "critical"
         ])
         high_count = len([
-            i for i in issues_raw if isinstance(i, dict) and i.get("severity") == "high"
+            i
+            for i in issues_raw_val
+            if isinstance(i, dict) and i.get("severity") == "high"
         ])
         medium_count = len([
             i
-            for i in issues_raw
+            for i in issues_raw_val
             if isinstance(i, dict) and i.get("severity") == "medium"
         ])
         low_count = len([
-            i for i in issues_raw if isinstance(i, dict) and i.get("severity") == "low"
+            i
+            for i in issues_raw_val
+            if isinstance(i, dict) and i.get("severity") == "low"
         ])
         return {
             "quality_score": quality_score_raw,
-            "total_issues": len(issues_raw),
+            "total_issues": len(issues_raw_val),
             "critical_issues": critical_count,
             "high_issues": high_count,
             "medium_issues": medium_count,
@@ -433,9 +437,10 @@ class DocumentationReporter:
         """Summarize validation data for reporting."""
         if not validation_data or not isinstance(validation_data, dict):
             return None
-        link_data_raw = validation_data.get("link_validation", {})
-        if not isinstance(link_data_raw, dict):
-            link_data_raw = {}
+        link_data_raw_val = validation_data.get("link_validation")
+        if not isinstance(link_data_raw_val, dict):
+            link_data_raw_val = {}  # type: ignore[assignment]
+        link_data_raw = link_data_raw_val
         links_checked_raw = link_data_raw.get("links_checked", 0)
         valid_links_raw = link_data_raw.get("valid_links", 0)
         broken_links_raw = link_data_raw.get("broken_links", 0)
