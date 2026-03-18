@@ -58,25 +58,26 @@ def _docs_logs_dir() -> Path:
     return _docs_root() / "logs"
 
 
-def _as_str(value: object, default: str) -> str:
+def _as_str(value: object | None, default: str) -> str:
     """Normalize unknown config values to string."""
     return value if isinstance(value, str) else default
 
 
-def _as_bool(value: object, default: bool, /) -> bool:  # noqa: FBT001
+def _as_bool(value: object | None, default: bool, /) -> bool:  # noqa: FBT001
     """Normalize unknown config values to bool."""
     return value if isinstance(value, bool) else default
 
 
-def _as_int(value: object, default: int) -> int:
+def _as_int(value: object | None, default: int) -> int:
     """Normalize unknown config values to int."""
     return value if isinstance(value, int) else default
 
 
-def _as_str_list(value: object, default: list[str]) -> list[str]:
+def _as_str_list(value: object | None, default: list[str]) -> list[str]:
     """Normalize unknown config values to list[str]."""
     if isinstance(value, list):
-        return [str(item) for item in value]
+        values: list[object] = value
+        return [str(item) for item in values]
     return default
 
 
@@ -119,8 +120,12 @@ class ScheduledMaintenance:
         )
         try:
             with resolved_config_path.open(encoding="utf-8") as f:
-                loaded = yaml.safe_load(f)
-                if isinstance(loaded, Mapping):
+                loaded_untyped = yaml.safe_load(f)
+                if isinstance(loaded_untyped, Mapping):
+                    loaded_map: Mapping[object, object] = loaded_untyped
+                    loaded: Mapping[str, object] = {
+                        str(key): value for key, value in loaded_map.items()
+                    }
                     self.config = self._merge_config(default_config, loaded)
                 else:
                     self.config = default_config
@@ -140,72 +145,99 @@ class ScheduledMaintenance:
 
         schedules_raw = overrides.get("schedules")
         if isinstance(schedules_raw, Mapping):
+            schedules_raw_map: Mapping[object, object] = schedules_raw
+            schedules_map: Mapping[str, object] = {
+                str(key): value for key, value in schedules_raw_map.items()
+            }
             schedules = {
                 key: value.model_dump() for key, value in base.schedules.items()
             }
-            for key, value in schedules_raw.items():
-                if not isinstance(key, str) or not isinstance(value, Mapping):
+            for key, value in schedules_map.items():
+                if not isinstance(value, Mapping):
                     continue
+                value_raw_map: Mapping[object, object] = value
+                value_map: Mapping[str, object] = {
+                    str(item_key): item_value
+                    for item_key, item_value in value_raw_map.items()
+                }
                 if key not in schedules:
                     continue
                 current = schedules[key]
                 updated = {
-                    "enabled": _as_bool(value.get("enabled"), current["enabled"]),
-                    "time": _as_str(value.get("time"), current["time"]),
-                    "tasks": _as_str_list(value.get("tasks"), current["tasks"]),
-                    "day": _as_str(value.get("day"), current.get("day") or "") or None,
+                    "enabled": _as_bool(value_map.get("enabled"), current["enabled"]),
+                    "time": _as_str(value_map.get("time"), current["time"]),
+                    "tasks": _as_str_list(value_map.get("tasks"), current["tasks"]),
+                    "day": _as_str(value_map.get("day"), current.get("day") or "")
+                    or None,
                 }
                 schedules[key] = updated
             merged["schedules"] = schedules
 
         tasks_raw = overrides.get("tasks")
         if isinstance(tasks_raw, Mapping):
+            tasks_raw_map: Mapping[object, object] = tasks_raw
+            tasks_map: Mapping[str, object] = {
+                str(key): value for key, value in tasks_raw_map.items()
+            }
             tasks = {key: value.model_dump() for key, value in base.tasks.items()}
-            for key, value in tasks_raw.items():
-                if not isinstance(key, str) or not isinstance(value, Mapping):
+            for key, value in tasks_map.items():
+                if not isinstance(value, Mapping):
                     continue
+                value_raw_map: Mapping[object, object] = value
+                value_map: Mapping[str, object] = {
+                    str(item_key): item_value
+                    for item_key, item_value in value_raw_map.items()
+                }
                 if key not in tasks:
                     continue
                 current = tasks[key]
                 tasks[key] = {
                     "description": _as_str(
-                        value.get("description"), current["description"]
+                        value_map.get("description"), current["description"]
                     ),
-                    "command": _as_str(value.get("command"), current["command"]),
-                    "timeout": _as_int(value.get("timeout"), current["timeout"]),
+                    "command": _as_str(value_map.get("command"), current["command"]),
+                    "timeout": _as_int(value_map.get("timeout"), current["timeout"]),
                 }
             merged["tasks"] = tasks
 
         error_handling_raw = overrides.get("error_handling")
         if isinstance(error_handling_raw, Mapping):
+            error_handling_raw_map: Mapping[object, object] = error_handling_raw
+            error_handling_map: Mapping[str, object] = {
+                str(key): value for key, value in error_handling_raw_map.items()
+            }
             current = base.error_handling
             merged["error_handling"] = {
                 "max_retries": _as_int(
-                    error_handling_raw.get("max_retries"), current.max_retries
+                    error_handling_map.get("max_retries"), current.max_retries
                 ),
                 "retry_delay": _as_int(
-                    error_handling_raw.get("retry_delay"), current.retry_delay
+                    error_handling_map.get("retry_delay"), current.retry_delay
                 ),
                 "fail_fast": _as_bool(
-                    error_handling_raw.get("fail_fast"), current.fail_fast
+                    error_handling_map.get("fail_fast"), current.fail_fast
                 ),
                 "notify_on_failure": _as_bool(
-                    error_handling_raw.get("notify_on_failure"),
+                    error_handling_map.get("notify_on_failure"),
                     current.notify_on_failure,
                 ),
             }
 
         logging_raw = overrides.get("logging")
         if isinstance(logging_raw, Mapping):
+            logging_raw_map: Mapping[object, object] = logging_raw
+            logging_map: Mapping[str, object] = {
+                str(key): value for key, value in logging_raw_map.items()
+            }
             current = base.logging
             merged["logging"] = {
-                "enabled": _as_bool(logging_raw.get("enabled"), current.enabled),
-                "log_file": _as_str(logging_raw.get("log_file"), current.log_file),
+                "enabled": _as_bool(logging_map.get("enabled"), current.enabled),
+                "log_file": _as_str(logging_map.get("log_file"), current.log_file),
                 "max_log_size": _as_str(
-                    logging_raw.get("max_log_size"), current.max_log_size
+                    logging_map.get("max_log_size"), current.max_log_size
                 ),
                 "retention_days": _as_int(
-                    logging_raw.get("retention_days"), current.retention_days
+                    logging_map.get("retention_days"), current.retention_days
                 ),
             }
 

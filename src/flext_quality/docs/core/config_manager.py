@@ -6,7 +6,7 @@ Handles loading, validation, and access to configuration files.
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 import yaml
@@ -15,9 +15,12 @@ type ConfigPrimitive = str | int | float | bool
 type ConfigValue = ConfigPrimitive | list[str]
 type ConfigSection = dict[str, ConfigValue]
 type ConfigData = dict[str, ConfigSection]
+type RawSectionValue = ConfigPrimitive | Sequence[ConfigPrimitive]
+type RawSectionMap = Mapping[str, RawSectionValue]
+type RawConfigMap = Mapping[str, RawSectionMap]
 
 
-def _as_section(value: object) -> ConfigSection:
+def _as_section(value: RawSectionMap | None) -> ConfigSection:
     """Normalize any value into a configuration section mapping."""
     if not isinstance(value, Mapping):
         return {}
@@ -32,7 +35,7 @@ def _as_section(value: object) -> ConfigSection:
     return section
 
 
-def _as_config_data(value: object) -> ConfigData:
+def _as_config_data(value: RawConfigMap | None) -> ConfigData:
     """Normalize loaded YAML content into typed config data."""
     if not isinstance(value, Mapping):
         return {}

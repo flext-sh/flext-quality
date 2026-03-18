@@ -428,16 +428,15 @@ class LinkChecker:
         start_time = time.time()
 
         def check_single(
-            link_info: dict[str, object],
+            link_info: LinkInfoDict,
         ) -> LinkResultDict:
             time.sleep(0.1)
             url = link_info.get("url", "")
-            context_obj: object = link_info.get("context")
+            raw_context = link_info.get("context")
+            context_obj = raw_context if isinstance(raw_context, dict) else None
             if not isinstance(url, str):
                 url = ""
-            ctx: dict[str, object] | None = None
-            if isinstance(context_obj, dict):
-                ctx = dict(context_obj)
+            ctx = context_obj
             return self.check_link_sync(url, ctx)
 
         with ThreadPoolExecutor(max_workers=5) as executor:
@@ -518,17 +517,18 @@ class LinkChecker:
         """Special validation for GitHub links."""
         github_links: list[dict[str, object]] = []
         for link in links:
-            url_obj: object = link.get("url")
+            url_raw = link.get("url")
+            url_obj: str | None = url_raw if isinstance(url_raw, str) else None
             if isinstance(url_obj, str) and "github.com" in url_obj:
                 github_links.append(link)
 
         validated_links: list[dict[str, bool | object]] = []
 
         for link in github_links:
-            url_obj = link.get("url")
-            if not isinstance(url_obj, str):
+            url_candidate = link.get("url")
+            if not isinstance(url_candidate, str):
                 continue
-            url = url_obj
+            url = url_candidate
 
             if self._validate_github_url_structure(url):
                 validated_links.append({
