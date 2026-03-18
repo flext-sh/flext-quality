@@ -12,8 +12,90 @@ import operator
 import re
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import TypedDict
 
 import yaml
+
+
+class StyleIssue(TypedDict):
+    """Represents a single style issue or violation."""
+
+    type: str
+    line: int
+    content: str
+    message: str
+    severity: str
+
+
+class FileResults(TypedDict):
+    """Results from validating a single file."""
+
+    file: str
+    violations: list[StyleIssue]
+    issues: list[StyleIssue]
+    suggestions: list[str]
+
+
+class MarkdownConfig(TypedDict, total=False):
+    """Markdown formatting configuration."""
+
+    heading_style: str
+    list_style: str
+    emphasis_style: str
+    code_block_style: str
+
+
+class FormattingConfig(TypedDict, total=False):
+    """Formatting configuration."""
+
+    max_line_length: int
+    trailing_spaces: bool
+    consistent_indentation: bool
+
+
+class AccessibilityConfig(TypedDict, total=False):
+    """Accessibility configuration."""
+
+    require_alt_text: bool
+    descriptive_links: bool
+    heading_structure: bool
+    proper_headings: bool
+
+
+class HeadingsConfig(TypedDict, total=False):
+    """Headings configuration."""
+
+    enforce_hierarchy: bool
+
+
+class StyleConfig(TypedDict, total=False):
+    """Complete style configuration."""
+
+    markdown: MarkdownConfig
+    formatting: FormattingConfig
+    accessibility: AccessibilityConfig
+    headings: HeadingsConfig
+
+
+class SummaryMetrics(TypedDict):
+    """Summary metrics for validation results."""
+
+    total_violations: int
+    critical_issues: int
+    warnings: int
+    suggestions_count: int
+    accessibility_issues: int
+
+
+class ValidationResults(TypedDict):
+    """Complete validation results."""
+
+    files_checked: int
+    style_violations: list[StyleIssue]
+    accessibility_issues: list[StyleIssue]
+    formatting_errors: list[StyleIssue]
+    suggestions: list[str]
+    summary: SummaryMetrics
 
 
 class StyleValidator:
@@ -36,9 +118,9 @@ class StyleValidator:
             config_path: Path to style guide configuration file
 
         """
-        self.config: dict[str, object] = {}
+        self.config: StyleConfig = {}
         self.load_config(config_path)
-        self.results: dict[str, object] = {
+        self.results: ValidationResults = {
             "files_checked": 0,
             "style_violations": [],
             "accessibility_issues": [],
@@ -49,6 +131,7 @@ class StyleValidator:
                 "critical_issues": 0,
                 "warnings": 0,
                 "suggestions_count": 0,
+                "accessibility_issues": 0,
             },
         }
 
@@ -70,47 +153,53 @@ class StyleValidator:
             return
         try:
             with Path(config_path).open(encoding="utf-8") as f:
-                self.config = yaml.safe_load(f)
-        except (FileNotFoundError, KeyError):
-            # Default configuration
-            self.config = {
-                "markdown": {
-                    "heading_style": "atx",
-                    "list_style": "dash",
-                    "emphasis_style": "*",
-                    "code_block_style": "fenced",
-                },
-                "formatting": {
-                    "max_line_length": 88,
-                    "trailing_spaces": False,
-                    "consistent_indentation": True,
-                },
-                "accessibility": {
-                    "require_alt_text": True,
-                    "descriptive_links": True,
-                    "proper_headings": True,
-                },
-            }
+                loaded = yaml.safe_load(f)
+                if isinstance(loaded, dict):
+                    self.config = loaded  # type: ignore[assignment]
+                else:
+                    self._set_default_config()
+        except (FileNotFoundError, KeyError, OSError):
+            self._set_default_config()
 
-    def validate_file(self, file_path: Path) -> dict[str, object]:
+    def _set_default_config(self) -> None:
+        """Set default configuration."""
+        self.config = {
+            "markdown": {
+                "heading_style": "atx",
+                "list_style": "dash",
+                "emphasis_style": "*",
+                "code_block_style": "fenced",
+            },
+            "formatting": {
+                "max_line_length": 88,
+                "trailing_spaces": False,
+                "consistent_indentation": True,
+            },
+            "accessibility": {
+                "require_alt_text": True,
+                "descriptive_links": True,
+                "proper_headings": True,
+            },
+        }
+
+    def validate_file(self, file_path: Path) -> FileResults:
         """Validate a single documentation file."""
         try:
             content = file_path.read_text(encoding="utf-8")
             filename = str(
                 file_path.relative_to(file_path.parents[2]),
-            )  # Relative to project root
+            )
 
-            violations_list: list[dict[str, object]] = []
-            issues_list: list[dict[str, object]] = []
+            violations_list: list[StyleIssue] = []
+            issues_list: list[StyleIssue] = []
             suggestions_list: list[str] = []
-            file_results = {
+            file_results: FileResults = {
                 "file": filename,
                 "violations": violations_list,
                 "issues": issues_list,
                 "suggestions": suggestions_list,
             }
 
-            # Run all validation checks
             file_results["violations"].extend(self._check_markdown_formatting(content))
             file_results["violations"].extend(self._check_heading_consistency(content))
             file_results["violations"].extend(self._check_list_consistency(content))
@@ -119,12 +208,10 @@ class StyleValidator:
             file_results["violations"].extend(self._check_line_length(content))
             file_results["violations"].extend(self._check_whitespace(content))
 
-            # Generate suggestions
             file_results["suggestions"] = self._generate_suggestions(
                 file_results["violations"],
             )
 
-            # Add to global results
             self.results["files_checked"] += 1
             self.results["style_violations"].extend(file_results["violations"])
             self.results["accessibility_issues"].extend(file_results["issues"])
@@ -132,28 +219,27 @@ class StyleValidator:
 
             return file_results
 
-        except Exception as e:
+        except Exception:
             return {
                 "file": str(file_path),
-                "error": str(e),
                 "violations": [],
                 "issues": [],
                 "suggestions": [],
             }
 
-    def _check_markdown_formatting(self, content: str) -> list[dict[str, object]]:
+    def _check_markdown_formatting(self, content: str) -> list[StyleIssue]:
         """Check basic markdown formatting consistency."""
-        violations: list[dict[str, int | str]] = []
+        violations: list[StyleIssue] = []
 
         lines = content.split("\n")
 
         for i, line in enumerate(lines, 1):
-            # Check for mixed emphasis styles
-            if self.config["markdown"]["emphasis_style"] == "*" and re.search(
+            markdown_config = self.config.get("markdown", {})
+            emphasis_style = markdown_config.get("emphasis_style", "*")
+            if emphasis_style == "*" and re.search(
                 r"(?<!\\)_[^_]+_(?!\\)",
                 line,
             ):
-                # Should not have _emphasis_ if * is preferred
                 violations.append({
                     "type": "emphasis_style",
                     "line": i,
@@ -162,7 +248,6 @@ class StyleValidator:
                     "severity": "low",
                 })
 
-            # Check heading formatting
             if line.startswith("#") and not re.match(r"^#{1,6}\s", line):
                 violations.append({
                     "type": "heading_format",
@@ -174,11 +259,10 @@ class StyleValidator:
 
         return violations
 
-    def _check_heading_consistency(self, content: str) -> list[dict[str, object]]:
+    def _check_heading_consistency(self, content: str) -> list[StyleIssue]:
         """Check heading hierarchy and consistency."""
-        violations: list[dict[str, int | str]] = []
+        violations: list[StyleIssue] = []
 
-        # Extract headings
         headings: list[tuple[int, str, int]] = []
         for match in re.finditer(r"^(#{1,6})\s+(.+)$", content, re.MULTILINE):
             level = len(match.group(1))
@@ -186,8 +270,9 @@ class StyleValidator:
             line_num = content[: match.start()].count("\n") + 1
             headings.append((level, text, line_num))
 
-        # Check hierarchy
-        if self.config.get("headings", {}).get("enforce_hierarchy", True):
+        headings_config = self.config.get("headings", {})
+        enforce_hierarchy = headings_config.get("enforce_hierarchy", True)
+        if enforce_hierarchy:
             expected_level = 1
             for level, text, line_num in headings:
                 if level > expected_level + 1:
@@ -200,7 +285,6 @@ class StyleValidator:
                     })
                 expected_level = level
 
-        # Check for H1 as first heading
         if headings and headings[0][0] != 1:
             violations.append({
                 "type": "first_heading_level",
@@ -212,11 +296,10 @@ class StyleValidator:
 
         return violations
 
-    def _check_list_consistency(self, content: str) -> list[dict[str, object]]:
+    def _check_list_consistency(self, content: str) -> list[StyleIssue]:
         """Check list formatting consistency."""
-        violations: list[dict[str, object]] = []
+        violations: list[StyleIssue] = []
 
-        # Find all list items
         list_items: list[tuple[str, str, int]] = []
         for match in re.finditer(r"^(\s*)([-\*\+])\s+", content, re.MULTILINE):
             indent = match.group(1)
@@ -227,9 +310,9 @@ class StyleValidator:
         if not list_items:
             return violations
 
-        # Check for consistent markers
         markers = [item[1] for item in list_items]
-        preferred_marker = self.config["markdown"]["list_style"]
+        markdown_config = self.config.get("markdown", {})
+        preferred_marker = markdown_config.get("list_style", "dash")
 
         marker_map = {"dash": "-", "asterisk": "*", "plus": "+"}
         preferred = marker_map.get(preferred_marker, "-")
@@ -238,7 +321,7 @@ class StyleValidator:
         if inconsistent_markers:
             violations.append({
                 "type": "list_marker_consistency",
-                "line": list_items[0][2],  # First occurrence
+                "line": list_items[0][2],
                 "content": f"List using {inconsistent_markers[0]}",
                 "message": f"Use {preferred} for list markers instead of mixed styles",
                 "severity": "low",
@@ -246,13 +329,13 @@ class StyleValidator:
 
         return violations
 
-    def _check_code_formatting(self, content: str) -> list[dict[str, object]]:
+    def _check_code_formatting(self, content: str) -> list[StyleIssue]:
         """Check code block and inline code formatting."""
-        violations = []
+        violations: list[StyleIssue] = []
 
-        # Check fenced code blocks
-        if self.config["markdown"]["code_block_style"] == "fenced":
-            # Find code blocks without language specifiers
+        markdown_config = self.config.get("markdown", {})
+        code_block_style = markdown_config.get("code_block_style", "fenced")
+        if code_block_style == "fenced":
             code_blocks = re.findall(r"```\n(.*?)\n```", content, re.DOTALL)
             violations.extend(
                 {
@@ -269,16 +352,13 @@ class StyleValidator:
                 )
             )
 
-        # Check inline code formatting
         inline_code = re.findall(r"`[^`]+`", content)
         if inline_code:
-            # Check for proper spacing around inline code
             lines = content.split("\n")
             for i, line in enumerate(lines, 1):
-                # Find inline code in this line
                 if (
                     "`" in line
-                    and re.search(r"[a-zA-Z0-9]`[^`]+`", line)  # Letter before code
+                    and re.search(r"[a-zA-Z0-9]`[^`]+`", line)
                     and not re.search(r"\s`[^`]+`", line)
                 ):
                     violations.append({
@@ -291,12 +371,13 @@ class StyleValidator:
 
         return violations
 
-    def _check_accessibility(self, content: str) -> list[dict[str, object]]:
+    def _check_accessibility(self, content: str) -> list[StyleIssue]:
         """Check accessibility compliance."""
-        issues = []
+        issues: list[StyleIssue] = []
 
-        # Check images for alt text
-        if self.config["accessibility"]["require_alt_text"]:
+        accessibility_config = self.config.get("accessibility", {})
+        require_alt_text = accessibility_config.get("require_alt_text", True)
+        if require_alt_text:
             images_without_alt = re.findall(r"!\[\]\([^)]+\)", content)
             if images_without_alt:
                 for img in images_without_alt:
@@ -309,8 +390,8 @@ class StyleValidator:
                         "severity": "high",
                     })
 
-        # Check for generic link text
-        if self.config["accessibility"]["descriptive_links"]:
+        descriptive_links = accessibility_config.get("descriptive_links", True)
+        if descriptive_links:
             generic_links = re.findall(
                 r"\[here|click here|link|read more\]\([^)]+\)",
                 content,
@@ -328,21 +409,20 @@ class StyleValidator:
 
         return issues
 
-    def _check_line_length(self, content: str) -> list[dict[str, object]]:
+    def _check_line_length(self, content: str) -> list[StyleIssue]:
         """Check line length compliance."""
-        violations: list[dict[str, int | str]] = []
+        violations: list[StyleIssue] = []
 
-        max_length = int(self.config["formatting"]["max_line_length"])
+        formatting_config = self.config.get("formatting", {})
+        max_length_val = formatting_config.get("max_line_length", 88)
+        max_length = int(max_length_val)
         lines = content.split("\n")
 
         for i, line in enumerate(lines, 1):
-            if (
-                len(line) > max_length
-                and not (
-                    line.strip().startswith(("```", "|", "http", "https"))
-                    or "|" in line  # Table rows
-                    or line.count("`") >= self.MIN_INLINE_CODE_BACKTICKS
-                )  # Code spans
+            if len(line) > max_length and not (
+                line.strip().startswith(("```", "|", "http", "https"))
+                or "|" in line
+                or line.count("`") >= self.MIN_INLINE_CODE_BACKTICKS
             ):
                 violations.append({
                     "type": "line_too_long",
@@ -356,18 +436,16 @@ class StyleValidator:
 
         return violations
 
-    def _check_whitespace(self, content: str) -> list[dict[str, object]]:
+    def _check_whitespace(self, content: str) -> list[StyleIssue]:
         """Check whitespace formatting."""
-        violations: list[dict[str, int | str]] = []
+        violations: list[StyleIssue] = []
 
         lines = content.split("\n")
 
         for i, line in enumerate(lines, 1):
-            # Check trailing spaces
-            if (
-                self.config["formatting"]["trailing_spaces"] is False
-                and line.rstrip() != line
-            ):
+            formatting_config = self.config.get("formatting", {})
+            trailing_spaces = formatting_config.get("trailing_spaces", False)
+            if trailing_spaces is False and line.rstrip() != line:
                 violations.append({
                     "type": "trailing_whitespace",
                     "line": i,
@@ -376,7 +454,6 @@ class StyleValidator:
                     "severity": "low",
                 })
 
-            # Check multiple consecutive blank lines
             if i < len(lines) - 1:
                 current_blank = not line.strip()
                 next_blank = not lines[i].strip()
@@ -391,16 +468,15 @@ class StyleValidator:
 
         return violations
 
-    def _generate_suggestions(self, violations: list[dict[str, object]]) -> list[str]:
+    def _generate_suggestions(self, violations: list[StyleIssue]) -> list[str]:
         """Generate improvement suggestions based on violations."""
         suggestions: list[str] = []
 
-        violation_types: dict[object, int] = {}
+        violation_types: dict[str, int] = {}
         for violation in violations:
             v_type = violation["type"]
             violation_types[v_type] = violation_types.get(v_type, 0) + 1
 
-        # Generate suggestions based on violation patterns
         if violation_types.get("emphasis_style", 0) > 0:
             suggestions.append(
                 "Standardize emphasis markers (*bold* and _italic_ vs mixed usage)",
@@ -410,7 +486,8 @@ class StyleValidator:
             suggestions.append("Fix heading hierarchy to avoid skipping levels")
 
         if violation_types.get("list_marker_consistency", 0) > 0:
-            preferred = self.config["markdown"]["list_style"]
+            markdown_config = self.config.get("markdown", {})
+            preferred = markdown_config.get("list_style", "dash")
             suggestions.append(f"Use consistent list markers ({preferred}) throughout")
 
         if violation_types.get("missing_alt_text", 0) > 0:
@@ -423,24 +500,24 @@ class StyleValidator:
 
         return suggestions
 
-    def validate_files_batch(self, file_paths: list[Path]) -> dict[str, object]:
+    def validate_files_batch(self, file_paths: list[Path]) -> ValidationResults:
         """Validate multiple files and aggregate results."""
         for file_path in file_paths:
             self.validate_file(file_path)
 
-        # Update summary
-        self.results["summary"]["total_violations"] = len(
-            self.results["style_violations"],
-        )
-        self.results["summary"]["accessibility_issues"] = len(
-            self.results["accessibility_issues"],
-        )
-        self.results["summary"]["suggestions_count"] = len(self.results["suggestions"])
+        style_violations = self.results["style_violations"]
+        accessibility_issues = self.results["accessibility_issues"]
+        suggestions = self.results["suggestions"]
 
-        # Count severity levels
-        for violation in (
-            self.results["style_violations"] + self.results["accessibility_issues"]
-        ):
+        self.results["summary"]["total_violations"] = len(style_violations)
+        self.results["summary"]["accessibility_issues"] = len(accessibility_issues)
+        self.results["summary"]["suggestions_count"] = len(suggestions)
+
+        all_violations: list[StyleIssue] = []
+        all_violations.extend(style_violations)
+        all_violations.extend(accessibility_issues)
+
+        for violation in all_violations:
             severity = violation.get("severity", "low")
             if severity == "critical":
                 self.results["summary"]["critical_issues"] += 1
@@ -516,7 +593,7 @@ Top Issues:
 def validate_file_style(
     file_path: str,
     config_path: str | None = None,
-) -> dict[str, object]:
+) -> FileResults:
     """Convenience function to validate a single file."""
     validator = StyleValidator(config_path)
     return validator.validate_file(Path(file_path))
@@ -525,7 +602,7 @@ def validate_file_style(
 def validate_files_style(
     file_paths: list[str],
     config_path: str | None = None,
-) -> dict[str, object]:
+) -> ValidationResults:
     """Convenience function to validate multiple files."""
     validator = StyleValidator(config_path)
     paths = [Path(fp) for fp in file_paths]
