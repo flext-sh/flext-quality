@@ -84,7 +84,7 @@ def safe_list_access[T](data: list[T], index: int) -> T:
       AssertionError: If data is not a list or index out of bounds
 
     """
-    assert_is_list(data)
+    assert isinstance(data, list), f"Expected list, got {type(data)}"
     assert 0 <= index < len(data), (
         f"Index {index} out of bounds for list of length {len(data)}"
     )
