@@ -21,48 +21,15 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import requests
-from pydantic import BaseModel, Field
 
+from flext_quality import m
 
-class LinkValidatorResults(BaseModel):
-    """Results for LinkValidator execution."""
-
-    timestamp: str = Field(description="ISO timestamp when validation ran")
-    links_checked: int = Field(default=0, description="Total links checked")
-    valid_links: int = Field(default=0, description="Number of valid links")
-    broken_links: int = Field(default=0, description="Number of broken links")
-    warnings: int = Field(default=0, description="Number of warnings")
-    errors: list = Field(default_factory=list, description="List of errors")
-    warnings_list: list = Field(default_factory=list, description="List of warnings")
-
-
-class ContentValidatorResults(BaseModel):
-    """Results for ContentValidator execution."""
-
-    timestamp: str = Field(description="ISO timestamp when validation ran")
-    files_checked: int = Field(default=0, description="Number of files checked")
-    content_issues: list = Field(
-        default_factory=list, description="List of content issues"
-    )
-    quality_metrics: dict[str, object] = Field(
-        default_factory=dict, description="Quality metrics"
-    )
-
-
-class ContentMetrics(BaseModel):
-    """Content quality metrics for a file."""
-
-    word_count: int = Field(default=0, description="Number of words")
-    sentence_count: int = Field(default=0, description="Number of sentences")
-    avg_words_per_sentence: float = Field(
-        default=0.0, description="Average words per sentence"
-    )
-    readability_score: float = Field(default=0.0, description="Readability score 0-100")
-    has_code_blocks: bool = Field(
-        default=False, description="Whether file has code blocks"
-    )
-    has_lists: bool = Field(default=False, description="Whether file has lists")
-    has_headers: bool = Field(default=False, description="Whether file has headers")
+LinkValidatorResults = m.Quality.LinkValidatorResults
+ContentValidatorResults = m.Quality.ContentValidatorResults
+ContentMetrics = m.Quality.ContentMetrics
+LinkRecord = m.Quality.LinkRecord
+LinkCheckResult = m.Quality.LinkCheckResult
+ContentIssue = m.Quality.ContentIssue
 
 
 class LinkValidator:
@@ -81,9 +48,9 @@ class LinkValidator:
             timestamp=datetime.now(UTC).isoformat(),
         )
 
-    def find_all_links(self, doc_files: list[Path]) -> list:
+    def find_all_links(self, doc_files: list[Path]) -> list[LinkRecord]:
         """Extract all links from documentation files."""
-        all_links = []
+        all_links: list[LinkRecord] = []
         for file_path in doc_files:
             file_rel_path = str(file_path)
             try:
@@ -93,46 +60,56 @@ class LinkValidator:
                 matches = re.findall(link_pattern, content)
                 for text, url in matches:
                     link_type = self._classify_link(url)
-                    all_links.append({
-                        "text": text,
-                        "url": url,
-                        "type": link_type,
-                        "file": file_rel_path,
-                        "line_number": self._find_line_number(
-                            content, f"[{text}]({url})"
-                        ),
-                    })
+                    all_links.append(
+                        LinkRecord(
+                            text=text,
+                            url=url,
+                            type=link_type,
+                            file=file_rel_path,
+                            line_number=self._find_line_number(
+                                content, f"[{text}]({url})"
+                            ),
+                        )
+                    )
                 html_link_pattern = (
                     "<a[^>]+href=[\"\\']([^\"\\']+)[\"\\'][^>]*>([^<]+)</a>"
                 )
                 html_matches = re.findall(html_link_pattern, content, re.IGNORECASE)
                 for url, text in html_matches:
                     link_type = self._classify_link(url)
-                    all_links.append({
-                        "text": text.strip(),
-                        "url": url,
-                        "type": link_type,
-                        "file": file_rel_path,
-                        "line_number": self._find_line_number(content, f'href="{url}"'),
-                    })
+                    all_links.append(
+                        LinkRecord(
+                            text=text.strip(),
+                            url=url,
+                            type=link_type,
+                            file=file_rel_path,
+                            line_number=self._find_line_number(
+                                content, f'href="{url}"'
+                            ),
+                        )
+                    )
                 image_pattern = "!\\[([^\\]]*)\\]\\(([^)]+)\\)"
                 image_matches = re.findall(image_pattern, content)
                 for alt_text, src in image_matches:
-                    all_links.append({
-                        "text": alt_text,
-                        "url": src,
-                        "type": "image",
-                        "file": file_rel_path,
-                        "line_number": self._find_line_number(
-                            content, f"![{alt_text}]({src})"
-                        ),
-                    })
+                    all_links.append(
+                        LinkRecord(
+                            text=alt_text,
+                            url=src,
+                            type="image",
+                            file=file_rel_path,
+                            line_number=self._find_line_number(
+                                content, f"![{alt_text}]({src})"
+                            ),
+                        )
+                    )
             except Exception as e:
-                _ = self.results.errors.append({
-                    "type": "file_read_error",
-                    "file": file_rel_path,
-                    "error": str(e),
-                })
+                _ = self.results.errors.append(
+                    LinkCheckResult(
+                        type="file_read_error",
+                        file=file_rel_path,
+                        error=str(e),
+                    )
+                )
         return all_links
 
     def _classify_link(self, url: str) -> str:
@@ -158,10 +135,10 @@ class LinkValidator:
         return None
 
     def validate_external_links(
-        self, links: list, *, verbose: bool = False
+        self, links: list[LinkRecord], *, verbose: bool = False
     ) -> LinkValidatorResults:
         """Validate external links with concurrent checking."""
-        external_links = [link for link in links if link["type"] == "external"]
+        external_links = [link for link in links if link.type == "external"]
         if not external_links:
             return self.results
         with concurrent.futures.ThreadPoolExecutor(
@@ -174,7 +151,7 @@ class LinkValidator:
             for future in concurrent.futures.as_completed(futures):
                 result = future.result()
                 self.results.links_checked += 1
-                if result["valid"]:
+                if result.valid:
                     self.results.valid_links += 1
                 else:
                     self.results.broken_links += 1
@@ -183,25 +160,22 @@ class LinkValidator:
 
     def _create_link_result(
         self,
-        link: dict[str, str | int | None],
+        link: LinkRecord,
         *,
         valid: bool,
         url: str,
         status_code: int | None = None,
         error: str | None = None,
-    ) -> dict[str, str | int | bool | None]:
+    ) -> LinkCheckResult:
         """Create a standardized link validation result."""
-        result = {
-            "valid": valid,
-            "url": url,
-            "file": link["file"],
-            "line": link.get("line_number"),
-        }
-        if status_code is not None:
-            result["status_code"] = status_code
-        if error is not None:
-            result["error"] = error
-        return result
+        return LinkCheckResult(
+            valid=valid,
+            url=url,
+            file=link.file,
+            line=link.line_number,
+            status_code=status_code,
+            error=error,
+        )
 
     def _make_http_request(self, url: str, method: str = "head") -> requests.Response:
         """Make an HTTP request with appropriate headers."""
@@ -219,7 +193,7 @@ class LinkValidator:
 
     def _handle_request_attempt(
         self, url: str, attempt: int
-    ) -> tuple[bool, object | None]:
+    ) -> tuple[bool, dict[str, int | str] | None]:
         """Handle a single request attempt."""
         try:
             response = self._make_http_request(url)
@@ -248,35 +222,45 @@ class LinkValidator:
 
     def _check_single_external_link(
         self,
-        link: dict[str, str | int | None],
+        link: LinkRecord,
         *,
         verbose: bool = False,
-    ) -> dict[str, str | int | bool | None]:
+    ) -> LinkCheckResult:
         """Check a single external link."""
         _ = verbose
-        url = str(link["url"])
+        url = link.url
         for attempt in range(self.retries):
             success, result = self._handle_request_attempt(url, attempt)
             if result is not None:
-                return self._create_link_result(link, valid=success, url=url, **result)
+                return self._create_link_result(
+                    link,
+                    valid=success,
+                    url=url,
+                    status_code=result.get("status_code")
+                    if isinstance(result.get("status_code"), int)
+                    else None,
+                    error=result.get("error")
+                    if isinstance(result.get("error"), str)
+                    else None,
+                )
         return self._create_link_result(
             link, valid=False, url=url, error="Max retries exceeded"
         )
 
     def validate_internal_links(
-        self, links: list, doc_files: list[Path]
+        self, links: list[LinkRecord], doc_files: list[Path]
     ) -> LinkValidatorResults:
         """Validate internal links and references."""
         internal_links = [
-            link for link in links if link["type"] in {"internal", "reference"}
+            link for link in links if link.type in {"internal", "reference"}
         ]
         doc_file_names = {str(f.relative_to(f.parents[2])) for f in doc_files}
         for link in internal_links:
-            target = link["url"].split("#")[0]
+            target = link.url.split("#")[0]
             if not target:
                 continue
             if target not in doc_file_names:
-                link_file_dir = Path(link["file"]).parent
+                link_file_dir = Path(link.file).parent
                 potential_targets = [
                     link_file_dir / target,
                     Path(target),
@@ -285,7 +269,7 @@ class LinkValidator:
                 target_exists = False
                 for potential_target in potential_targets:
                     resolved_path = (
-                        Path(link["file"]).parent.parent.parent / potential_target
+                        Path(link.file).parent.parent.parent / potential_target
                     )
                     if resolved_path.exists() and resolved_path.suffix in {
                         ".md",
@@ -294,14 +278,16 @@ class LinkValidator:
                         target_exists = True
                         break
                 if not target_exists:
-                    _ = self.results.errors.append({
-                        "type": "broken_internal_link",
-                        "url": link["url"],
-                        "target": target,
-                        "file": link["file"],
-                        "line": link.get("line_number"),
-                        "error": "Target file not found",
-                    })
+                    _ = self.results.errors.append(
+                        LinkCheckResult(
+                            type="broken_internal_link",
+                            url=link.url,
+                            target=target,
+                            file=link.file,
+                            line=link.line_number,
+                            error="Target file not found",
+                        )
+                    )
                     self.results.broken_links += 1
                 else:
                     self.results.valid_links += 1
@@ -318,39 +304,43 @@ class LinkValidator:
             return base_dir.parent / target[3:]
         return Path(target)
 
-    def validate_images(self, links: list, project_root: Path) -> LinkValidatorResults:
+    def validate_images(
+        self, links: list[LinkRecord], project_root: Path
+    ) -> LinkValidatorResults:
         """Validate image references."""
-        images = [link for link in links if link["type"] == "image"]
+        images = [link for link in links if link.type == "image"]
         for image in images:
-            src = image["url"]
+            src = image.url
             if src.startswith(("http://", "https://")):
                 self.results.valid_links += 1
                 continue
             image_path = Path(src)
             if not image_path.is_absolute():
-                file_dir = Path(image["file"]).parent
+                file_dir = Path(image.file).parent
                 full_path = (project_root / file_dir / image_path).resolve()
             else:
                 full_path = image_path
             if full_path.exists():
                 self.results.valid_links += 1
             else:
-                _ = self.results.errors.append({
-                    "type": "missing_image",
-                    "src": src,
-                    "file": image["file"],
-                    "line": image.get("line_number"),
-                    "error": f"Image file not found: {full_path}",
-                })
+                _ = self.results.errors.append(
+                    LinkCheckResult(
+                        type="missing_image",
+                        src=src,
+                        file=image.file,
+                        line=image.line_number,
+                        error=f"Image file not found: {full_path}",
+                    )
+                )
                 self.results.broken_links += 1
             self.results.links_checked += 1
         return self.results
 
     def validate_anchors(
-        self, links: list, doc_files: list[Path]
+        self, links: list[LinkRecord], doc_files: list[Path]
     ) -> LinkValidatorResults:
         """Validate anchor links within documents."""
-        anchor_links = [link for link in links if link["type"] == "anchor"]
+        anchor_links = [link for link in links if link.type == "anchor"]
         file_anchors: dict[str, set[str]] = {}
         for file_path in doc_files:
             file_rel_path = str(file_path)
@@ -365,24 +355,28 @@ class LinkValidator:
                 anchors.extend(explicit_anchors)
                 file_anchors[file_rel_path] = set(anchors)
             except Exception as e:
-                _ = self.results.warnings_list.append({
-                    "type": "anchor_index_error",
-                    "file": file_rel_path,
-                    "warning": f"Could not build anchor index: {e!s}",
-                })
+                _ = self.results.warnings_list.append(
+                    LinkCheckResult(
+                        type="anchor_index_error",
+                        file=file_rel_path,
+                        warning=f"Could not build anchor index: {e!s}",
+                    )
+                )
         for link in anchor_links:
-            anchor = link["url"][1:]
-            file_path = link["file"]
+            anchor = link.url[1:]
+            file_path = link.file
             if file_path in file_anchors and anchor in file_anchors[file_path]:
                 self.results.valid_links += 1
             else:
-                _ = self.results.errors.append({
-                    "type": "broken_anchor",
-                    "anchor": anchor,
-                    "file": file_path,
-                    "line": link.get("line_number"),
-                    "error": f"Anchor '{anchor}' not found in {file_path}",
-                })
+                _ = self.results.errors.append(
+                    LinkCheckResult(
+                        type="broken_anchor",
+                        anchor=anchor,
+                        file=file_path,
+                        line=link.line_number,
+                        error=f"Anchor '{anchor}' not found in {file_path}",
+                    )
+                )
                 self.results.broken_links += 1
             self.results.links_checked += 1
         return self.results
@@ -393,7 +387,7 @@ class LinkValidator:
         anchor = re.sub(r"[^\\w\\s-]", "", anchor)
         return re.sub(r"\\s+", "-", anchor)
 
-    def check_link_text_quality(self, links: list) -> LinkValidatorResults:
+    def check_link_text_quality(self, links: list[LinkRecord]) -> LinkValidatorResults:
         """Check quality of link text for accessibility and usability."""
         poor_link_texts = [
             "here",
@@ -410,24 +404,26 @@ class LinkValidator:
             "go",
         ]
         for link in links:
-            text = link["text"].lower().strip()
+            text = link.text.lower().strip()
             if text in poor_link_texts or len(text) < 3:
-                _ = self.results.warnings_list.append({
-                    "type": "poor_link_text",
-                    "text": link["text"],
-                    "url": link["url"],
-                    "file": link["file"],
-                    "line": link.get("line_number"),
-                    "warning": "Link text is not descriptive enough for accessibility",
-                })
+                _ = self.results.warnings_list.append(
+                    LinkCheckResult(
+                        type="poor_link_text",
+                        text=link.text,
+                        url=link.url,
+                        file=link.file,
+                        line=link.line_number,
+                        warning="Link text is not descriptive enough for accessibility",
+                    )
+                )
                 self.results.warnings += 1
         return self.results
 
     def generate_report(self, report_format: str = "json") -> str:
         """Generate validation report."""
         if report_format == "json":
-            return json.dumps(self.results, indent=2, default=str)
-        return json.dumps(self.results, default=str)
+            return self.results.model_dump_json(indent=2)
+        return self.results.model_dump_json()
 
     def save_report(self, output_path: str = "docs/maintenance/reports/") -> Path:
         """Save validation report."""
@@ -439,7 +435,8 @@ class LinkValidator:
         report_content = self.generate_report("json")
         _ = filepath.write_text(report_content, encoding="utf-8")
         latest_file = output_dir / "latest_validation.json"
-        json.dump(self.results, latest_file.open("w"), indent=2, default=str)
+        with latest_file.open("w", encoding="utf-8") as latest_handle:
+            json.dump(self.results.model_dump(mode="json"), latest_handle, indent=2)
         return filepath
 
 
@@ -465,45 +462,54 @@ class ContentValidator:
                 issues = self._check_markdown_issues(content)
                 if issues:
                     self.results.content_issues.extend([
-                        {**issue, "file": file_rel_path} for issue in issues
+                        issue.model_copy(update={"file": file_rel_path})
+                        for issue in issues
                     ])
                 self.results.files_checked += 1
             except Exception as e:
-                _ = self.results.content_issues.append({
-                    "type": "syntax_validation_error",
-                    "file": file_rel_path,
-                    "error": str(e),
-                })
+                _ = self.results.content_issues.append(
+                    ContentIssue(
+                        type="syntax_validation_error",
+                        file=file_rel_path,
+                        error=str(e),
+                    )
+                )
         return self.results
 
-    def _check_markdown_issues(self, content: str) -> list:
+    def _check_markdown_issues(self, content: str) -> list[ContentIssue]:
         """Check for markdown syntax issues."""
-        issues: list[dict[str, int | str]] = []
+        issues: list[ContentIssue] = []
         lines = content.split("\n")
         for i, line in enumerate(lines, 1):
             if "[" in line and "]" in line and ("(" in line) and (")" not in line):
-                issues.append({
-                    "type": "broken_link_syntax",
-                    "line": i,
-                    "content": line.strip(),
-                    "error": "Unclosed link syntax",
-                })
+                issues.append(
+                    ContentIssue(
+                        type="broken_link_syntax",
+                        line=i,
+                        content=line.strip(),
+                        error="Unclosed link syntax",
+                    )
+                )
             if "![" in line and "]" in line and ("(" in line) and (")" not in line):
-                issues.append({
-                    "type": "broken_image_syntax",
-                    "line": i,
-                    "content": line.strip(),
-                    "error": "Unclosed image syntax",
-                })
+                issues.append(
+                    ContentIssue(
+                        type="broken_image_syntax",
+                        line=i,
+                        content=line.strip(),
+                        error="Unclosed image syntax",
+                    )
+                )
             if line.strip().startswith(("- ", "* ", "+ ")):
                 pass
             if line.rstrip() != line:
-                issues.append({
-                    "type": "trailing_spaces",
-                    "line": i,
-                    "content": line,
-                    "error": "Line has trailing spaces",
-                })
+                issues.append(
+                    ContentIssue(
+                        type="trailing_spaces",
+                        line=i,
+                        content=line,
+                        error="Line has trailing spaces",
+                    )
+                )
         return issues
 
     def check_content_quality(self, doc_files: list[Path]) -> ContentValidatorResults:
@@ -514,27 +520,33 @@ class ContentValidator:
                 content = file_path.read_text(encoding="utf-8")
                 file_rel_path = str(file_path.relative_to(file_path.parents[2]))
                 metrics = self._calculate_content_metrics(content)
-                if metrics["word_count"] < 50:
-                    _ = self.results.content_issues.append({
-                        "type": "insufficient_content",
-                        "file": file_rel_path,
-                        "word_count": metrics["word_count"],
-                        "warning": "Document appears to be too short",
-                    })
-                if metrics["readability_score"] < 60:
-                    _ = self.results.content_issues.append({
-                        "type": "readability_issue",
-                        "file": file_rel_path,
-                        "readability_score": metrics["readability_score"],
-                        "warning": "Content may be difficult to read",
-                    })
+                if metrics.word_count < 50:
+                    _ = self.results.content_issues.append(
+                        ContentIssue(
+                            type="insufficient_content",
+                            file=file_rel_path,
+                            word_count=metrics.word_count,
+                            warning="Document appears to be too short",
+                        )
+                    )
+                if metrics.readability_score < 60:
+                    _ = self.results.content_issues.append(
+                        ContentIssue(
+                            type="readability_issue",
+                            file=file_rel_path,
+                            readability_score=metrics.readability_score,
+                            warning="Content may be difficult to read",
+                        )
+                    )
                 self.results.files_checked += 1
             except Exception as e:
-                _ = self.results.content_issues.append({
-                    "type": "quality_analysis_error",
-                    "file": file_rel_path,
-                    "error": str(e),
-                })
+                _ = self.results.content_issues.append(
+                    ContentIssue(
+                        type="quality_analysis_error",
+                        file=file_rel_path,
+                        error=str(e),
+                    )
+                )
         return self.results
 
     def _calculate_content_metrics(self, content: str) -> ContentMetrics:
@@ -550,15 +562,15 @@ class ContentValidator:
             )
         else:
             readability_score = 0.0
-        return {
-            "word_count": len(words),
-            "sentence_count": len(sentences),
-            "avg_words_per_sentence": avg_words_per_sentence,
-            "readability_score": readability_score,
-            "has_code_blocks": bool("```" in content),
-            "has_lists": bool(re.search(r"^[\\s]*[-\\*\\+]", content, re.MULTILINE)),
-            "has_headers": bool(re.search(r"^#{1,6}\\s", content, re.MULTILINE)),
-        }
+        return ContentMetrics(
+            word_count=len(words),
+            sentence_count=len(sentences),
+            avg_words_per_sentence=avg_words_per_sentence,
+            readability_score=readability_score,
+            has_code_blocks=bool("```" in content),
+            has_lists=bool(re.search(r"^[\\s]*[-\\*\\+]", content, re.MULTILINE)),
+            has_headers=bool(re.search(r"^#{1,6}\\s", content, re.MULTILINE)),
+        )
 
 
 def _create_validation_parser() -> argparse.ArgumentParser:
@@ -636,7 +648,7 @@ def _discover_validation_files() -> list[Path]:
 def _execute_validations(
     link_validator: LinkValidator,
     content_validator: ContentValidator,
-    all_links: list,
+    all_links: list[LinkRecord],
     doc_files: list[Path],
     args: argparse.Namespace,
 ) -> bool:

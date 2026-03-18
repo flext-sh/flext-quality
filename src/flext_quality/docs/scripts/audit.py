@@ -18,11 +18,115 @@ import re
 import sys
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any
+from typing import Any, TypedDict
 
 import requests
 import yaml
 from pydantic import BaseModel, Field
+
+
+class IssueDict(TypedDict, total=False):
+    """Type definition for issue dictionaries."""
+
+    type: str
+    severity: str
+    file: str
+    age_days: int
+    last_modified: str
+    outdated_indicators: list[str]
+    recommendation: str
+    error: str
+    word_count: int
+    minimum_required: int
+    missing_sections: list[str]
+    todo_count: int
+    todos: list[str]
+    issues: list[str]
+    status_code: int
+    url: str
+    target: str
+    image_src: str
+
+
+class MetricsDict(TypedDict):
+    """Type definition for metrics dictionary."""
+
+    total_issues: int
+    severity_breakdown: dict[str, int]
+    quality_score: int
+    files_analyzed: int
+    issues_per_file: float
+
+
+class RecommendationDict(TypedDict, total=False):
+    """Type definition for recommendation dictionaries."""
+
+    priority: str
+    category: str
+    recommendation: str
+    actions: list[str]
+
+
+class QualityThresholdsDict(TypedDict):
+    """Type definition for quality thresholds."""
+
+    max_age_days: int
+    min_word_count: int
+    max_broken_links: int
+    min_completeness_score: float
+
+
+class ContentChecksDict(TypedDict):
+    """Type definition for content checks."""
+
+    check_freshness: bool
+    check_completeness: bool
+    check_consistency: bool
+    check_links: bool
+
+
+class SeverityLevelsDict(TypedDict):
+    """Type definition for severity levels."""
+
+    critical: list[str]
+    high: list[str]
+    medium: list[str]
+    low: list[str]
+
+
+class AuditRulesDict(TypedDict):
+    """Type definition for audit rules."""
+
+    quality_thresholds: QualityThresholdsDict
+    content_checks: ContentChecksDict
+    severity_levels: SeverityLevelsDict
+
+
+class LinkValidationDict(TypedDict):
+    """Type definition for link validation config."""
+
+    timeout: int
+    retry_attempts: int
+    user_agent: str
+    check_external: bool
+    check_internal: bool
+    check_images: bool
+
+
+class ContentAnalysisDict(TypedDict):
+    """Type definition for content analysis config."""
+
+    min_section_depth: int
+    required_sections: list[str]
+    check_todos: bool
+    check_fixmes: bool
+
+
+class ValidationConfigDict(TypedDict):
+    """Type definition for validation config."""
+
+    link_validation: LinkValidationDict
+    content_analysis: ContentAnalysisDict
 
 
 class AuditorResults(BaseModel):
@@ -30,9 +134,14 @@ class AuditorResults(BaseModel):
 
     timestamp: str = Field(description="ISO timestamp when audit ran")
     files_analyzed: int = Field(default=0, description="Number of files analyzed")
-    issues: list = Field(default_factory=list, description="List of issues found")
-    metrics = Field(default_factory=dict, description="Quality metrics")
-    recommendations: list = Field(
+    issues: list[IssueDict] = Field(
+        default_factory=list, description="List of issues found"
+    )
+    metrics: MetricsDict = Field(
+        default_factory=dict,
+        description="Quality metrics",  # type: ignore[arg-type]
+    )
+    recommendations: list[RecommendationDict] = Field(
         default_factory=list, description="List of recommendations"
     )
 
@@ -49,9 +158,9 @@ class DocumentationAuditor:
         """
         self.config_path = Path(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
-        self.audit_rules = self.get_default_audit_rules()
-        self.style_guide = self.get_default_style_guide()
-        self.validation_config = self.get_default_validation_config()
+        self.audit_rules: dict[str, Any] = self.get_default_audit_rules()
+        self.style_guide: dict[str, Any] = self.get_default_style_guide()
+        self.validation_config: dict[str, Any] = self.get_default_validation_config()
         self.load_config()
         self.results: AuditorResults = AuditorResults(
             timestamp=datetime.now(UTC).isoformat(),
@@ -64,11 +173,10 @@ class DocumentationAuditor:
                 encoding="utf-8"
             ) as f:
                 loaded = yaml.safe_load(f)
-                self.audit_rules = (
-                    loaded
-                    if isinstance(loaded, dict)
-                    else self.get_default_audit_rules()
-                )
+                if isinstance(loaded, dict):
+                    self.audit_rules = loaded  # type: ignore[assignment]
+                else:
+                    self.audit_rules = self.get_default_audit_rules()
         except FileNotFoundError:
             self.audit_rules = self.get_default_audit_rules()
         try:
@@ -76,11 +184,10 @@ class DocumentationAuditor:
                 encoding="utf-8"
             ) as f:
                 loaded = yaml.safe_load(f)
-                self.style_guide = (
-                    loaded
-                    if isinstance(loaded, dict)
-                    else self.get_default_style_guide()
-                )
+                if isinstance(loaded, dict):
+                    self.style_guide = loaded  # type: ignore[assignment]
+                else:
+                    self.style_guide = self.get_default_style_guide()
         except FileNotFoundError:
             self.style_guide = self.get_default_style_guide()
         try:
@@ -88,17 +195,14 @@ class DocumentationAuditor:
                 encoding="utf-8"
             ) as f:
                 loaded = yaml.safe_load(f)
-                self.validation_config = (
-                    loaded
-                    if isinstance(loaded, dict)
-                    else self.get_default_validation_config()
-                )
+                if isinstance(loaded, dict):
+                    self.validation_config = loaded  # type: ignore[assignment]
+                else:
+                    self.validation_config = self.get_default_validation_config()
         except FileNotFoundError:
             self.validation_config = self.get_default_validation_config()
 
-    def get_default_audit_rules(
-        self,
-    ) -> dict[str, dict[str, float | int] | dict[str, bool] | dict[str, list[str]]]:
+    def get_default_audit_rules(self) -> dict[str, Any]:
         """Default audit rules if config file not found."""
         return {
             "quality_thresholds": {
@@ -121,9 +225,7 @@ class DocumentationAuditor:
             },
         }
 
-    def get_default_style_guide(
-        self,
-    ) -> dict[str, dict[str, bool | int] | dict[str, bool] | dict[str, str]]:
+    def get_default_style_guide(self) -> dict[str, Any]:
         """Default style guide if config file not found."""
         return {
             "markdown": {
@@ -144,9 +246,7 @@ class DocumentationAuditor:
             },
         }
 
-    def get_default_validation_config(
-        self,
-    ) -> dict[str, dict[str, bool | int | list[str]] | dict[str, bool | int | str]]:
+    def get_default_validation_config(self) -> dict[str, Any]:
         """Default validation config if config file not found."""
         return {
             "link_validation": {
@@ -163,7 +263,7 @@ class DocumentationAuditor:
                 "check_todos": True,
                 "check_fixmes": True,
             },
-        }
+        }  # type: ignore[return-value]
 
     def find_documentation_files(self) -> list[Path]:
         """Find all documentation files in the project."""
@@ -216,7 +316,17 @@ class DocumentationAuditor:
 
     def check_content_freshness(self, doc_files: list[Path]) -> None:
         """Check documentation freshness and identify outdated content."""
-        max_age_days = self.audit_rules["quality_thresholds"]["max_age_days"]
+        audit_rules_dict: dict[str, object] = dict(self.audit_rules)
+        quality_thresholds_obj = audit_rules_dict.get("quality_thresholds")
+        quality_thresholds: dict[str, object] = (
+            dict(quality_thresholds_obj)
+            if isinstance(quality_thresholds_obj, dict)
+            else {}
+        )
+        max_age_days_val = quality_thresholds.get("max_age_days", 90)
+        max_age_days = (
+            int(max_age_days_val) if isinstance(max_age_days_val, (int, float)) else 90
+        )
         cutoff_date = datetime.now(UTC) - timedelta(days=max_age_days)
         for file_path in doc_files:
             try:
@@ -565,7 +675,7 @@ class DocumentationAuditor:
 
     def calculate_quality_metrics(self) -> None:
         """Calculate overall quality metrics."""
-        issues = self.results["issues"]
+        issues = self.results.issues
         total_issues = len(issues)
         severity_counts = {
             "critical": len([i for i in issues if i.get("severity") == "critical"]),
@@ -679,9 +789,10 @@ class DocumentationAuditor:
 
     def _generate_html_report(self) -> str:
         """Generate HTML audit report."""
-        metrics = self.results["metrics"]
-        html = f"""\n<!DOCTYPE html>\n<html>\n<head>\n    <title>FLEXT Quality Documentation Audit Report</title>\n    <style>\n        body {{ font-family: Arial, sans-serif; margin: 40px; }}\n        .header {{ background: #f0f0f0; padding: 20px; border-radius: 5px; }}\n        .metrics {{ display: flex; gap: 20px; margin: 20px 0; }}\n        .metric {{ background: #e8f4fd; padding: 15px; border-radius: 5px; flex: 1; }}\n        .issues {{ margin: 20px 0; }}\n        .issue {{ border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; }}\n        .severity-critical {{ border-left: 5px solid #dc3545; }}\n        .severity-high {{ border-left: 5px solid #fd7e14; }}\n        .severity-medium {{ border-left: 5px solid #ffc107; }}\n        .severity-low {{ border-left: 5px solid #28a745; }}\n    </style>\n</head>\n<body>\n    <div class="header">\n        <h1>FLEXT Quality Documentation Audit Report</h1>\n        <p>Generated: {self.results["timestamp"]}</p>\n        <p>Files Analyzed: {metrics["files_analyzed"]}</p>\n    </div>\n\n    <div class="metrics">\n        <div class="metric">\n            <h3>Quality Score</h3>\n            <div style="font-size: 2em; font-weight: bold; color: {self._get_score_color(metrics["quality_score"])};">\n                {metrics["quality_score"]}%\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Total Issues</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                {metrics["total_issues"]}\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Issues per File</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                {metrics["issues_per_file"]:.1f}\n            </div>\n        </div>\n    </div>\n\n    <h2>Issues by Severity</h2>\n    <ul>\n        <li>Critical: {metrics["severity_breakdown"]["critical"]}</li>\n        <li>High: {metrics["severity_breakdown"]["high"]}</li>\n        <li>Medium: {metrics["severity_breakdown"]["medium"]}</li>\n        <li>Low: {metrics["severity_breakdown"]["low"]}</li>\n    </ul>\n\n    <div class="issues">\n        <h2>Detailed Issues</h2>\n"""
-        for issue in self.results["issues"]:
+        metrics = self.results.metrics
+        severity_breakdown = metrics.get("severity_breakdown", {})
+        html = f"""\n<!DOCTYPE html>\n<html>\n<head>\n    <title>FLEXT Quality Documentation Audit Report</title>\n    <style>\n        body {{ font-family: Arial, sans-serif; margin: 40px; }}\n        .header {{ background: #f0f0f0; padding: 20px; border-radius: 5px; }}\n        .metrics {{ display: flex; gap: 20px; margin: 20px 0; }}\n        .metric {{ background: #e8f4fd; padding: 15px; border-radius: 5px; flex: 1; }}\n        .issues {{ margin: 20px 0; }}\n        .issue {{ border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; }}\n        .severity-critical {{ border-left: 5px solid #dc3545; }}\n        .severity-high {{ border-left: 5px solid #fd7e14; }}\n        .severity-medium {{ border-left: 5px solid #ffc107; }}\n        .severity-low {{ border-left: 5px solid #28a745; }}\n    </style>\n</head>\n<body>\n    <div class="header">\n        <h1>FLEXT Quality Documentation Audit Report</h1>\n        <p>Generated: {self.results.timestamp}</p>\n        <p>Files Analyzed: {metrics.get("files_analyzed", 0)}</p>\n    </div>\n\n    <div class="metrics">\n        <div class="metric">\n            <h3>Quality Score</h3>\n            <div style="font-size: 2em; font-weight: bold; color: {self._get_score_color(int(metrics.get("quality_score", 0)))};">\n                {metrics.get("quality_score", 0)}%\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Total Issues</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                {metrics.get("total_issues", 0)}\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Issues per File</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                {metrics.get("issues_per_file", 0):.1f}\n            </div>\n        </div>\n    </div>\n\n    <h2>Issues by Severity</h2>\n    <ul>\n        <li>Critical: {severity_breakdown.get("critical", 0)}</li>\n        <li>High: {severity_breakdown.get("high", 0)}</li>\n        <li>Medium: {severity_breakdown.get("medium", 0)}</li>\n        <li>Low: {severity_breakdown.get("low", 0)}</li>\n    </ul>\n\n    <div class="issues">\n        <h2>Detailed Issues</h2>\n"""
+        for issue in self.results.issues:
             severity_class = f"severity-{issue.get('severity', 'info')}"
             type_str = str(issue.get("type", ""))
             sev_str = str(issue.get("severity", ""))
@@ -780,7 +891,7 @@ def _create_argument_parser() -> argparse.ArgumentParser:
 
 def _execute_audit_checks(
     auditor: DocumentationAuditor, args: argparse.Namespace
-) -> dict[str, Any]:
+) -> AuditorResults:
     """Execute the appropriate audit checks based on arguments."""
     if args.comprehensive:
         return auditor.run_comprehensive_audit()
@@ -821,7 +932,7 @@ def main() -> None:
     try:
         results = _execute_audit_checks(auditor, args)
         auditor.save_report(args.format, args.output)
-        metrics = results["metrics"]
+        metrics = results.metrics
         if _should_fail_on_results(args, metrics):
             sys.exit(1)
     except Exception:

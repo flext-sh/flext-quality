@@ -54,9 +54,7 @@ class AuditRules:
         self.content_checks: ConfigSection = data.get("content_checks", {})
         self.link_checks: ConfigSection = data.get("link_checks", {})
         self.style_checks: ConfigSection = data.get("style_checks", {})
-        self.accessibility_checks: ConfigSection = data.get(
-            "accessibility_checks", {}
-        )
+        self.accessibility_checks: ConfigSection = data.get("accessibility_checks", {})
 
     def get_threshold(
         self,

@@ -17,77 +17,45 @@ import time
 from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import NotRequired, TypedDict
 
 import pytest
 import schedule
 import yaml
 from git import InvalidGitRepositoryError, Repo
-from pydantic import BaseModel, Field
+
+from flext_quality import m
+
+ScheduleResults = m.Quality.ScheduleResults
+ScheduleTaskConfig = m.Quality.ScheduleTaskConfig
+ScheduleEntry = m.Quality.ScheduleEntry
+ErrorHandlingConfig = m.Quality.ErrorHandlingConfig
+LoggingConfig = m.Quality.LoggingConfig
+MaintenanceConfig = m.Quality.MaintenanceConfig
 
 
-class ScheduleResults(BaseModel):
-    """Results for ScheduledMaintenance execution."""
-
-    start_time: str = Field(description="ISO timestamp when maintenance started")
-    tasks_completed: int = Field(default=0, description="Number of tasks completed")
-    errors: list[str] = Field(
-        default_factory=list, description="List of error messages"
-    )
-    warnings: list[str] = Field(
-        default_factory=list, description="List of warning messages"
-    )
-    end_time: str = Field(
-        default="", description="ISO timestamp when maintenance ended"
-    )
-    duration_seconds: int = Field(default=0, description="Total duration in seconds")
+def _docs_root() -> Path:
+    """Return the package root for documentation tooling."""
+    return Path(__file__).resolve().parent
 
 
-class ScheduleTaskConfig(TypedDict):
-    """Task configuration for scheduled maintenance."""
-
-    description: str
-    command: str
-    timeout: int
+def _docs_config_file(filename: str) -> Path:
+    """Return the absolute path for a docs config file."""
+    return _docs_root() / "config" / filename
 
 
-class ScheduleEntry(TypedDict):
-    """Single schedule entry definition."""
-
-    enabled: bool
-    time: str
-    tasks: list[str]
-    day: NotRequired[str]
+def _docs_reports_dir() -> Path:
+    """Return the reports directory for documentation tooling."""
+    return _docs_root() / "reports"
 
 
-class ErrorHandlingConfig(TypedDict):
-    """Error handling settings for scheduler."""
-
-    max_retries: int
-    retry_delay: int
-    fail_fast: bool
-    notify_on_failure: bool
+def _docs_backups_dir() -> Path:
+    """Return the backups directory for documentation tooling."""
+    return _docs_root() / "backups"
 
 
-class LoggingConfig(TypedDict):
-    """Logging settings for scheduler."""
-
-    enabled: bool
-    log_file: str
-    max_log_size: str
-    retention_days: int
-
-
-class MaintenanceConfig(TypedDict):
-    """Root maintenance scheduler configuration."""
-
-    enabled: bool
-    reports_dir: str
-    backup_dir: str
-    schedules: dict[str, ScheduleEntry]
-    tasks: dict[str, ScheduleTaskConfig]
-    error_handling: ErrorHandlingConfig
-    logging: LoggingConfig
+def _docs_logs_dir() -> Path:
+    """Return the logs directory for documentation tooling."""
+    return _docs_root() / "logs"
 
 
 def _as_str(value: object, default: str) -> str:
@@ -122,7 +90,7 @@ class ScheduledMaintenance:
 
     def __init__(
         self,
-        config_path: str = "docs/maintenance/config/schedule_config.yaml",
+        config_path: str | None = None,
     ) -> None:
         """Initialize scheduled maintenance system.
 
@@ -133,7 +101,7 @@ class ScheduledMaintenance:
         self.config: MaintenanceConfig = self.get_default_config()
         self.load_config(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
-        self.reports_dir = Path(self.config["reports_dir"])
+        self.reports_dir = Path(self.config.reports_dir)
         self.reports_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize results tracking
@@ -141,11 +109,16 @@ class ScheduledMaintenance:
             start_time=datetime.now(UTC).isoformat(),
         )
 
-    def load_config(self, config_path: str) -> None:
+    def load_config(self, config_path: str | None) -> None:
         """Load maintenance schedule configuration."""
         default_config = self.get_default_config()
+        resolved_config_path = (
+            Path(config_path)
+            if config_path is not None
+            else _docs_config_file("schedule_config.yaml")
+        )
         try:
-            with Path(config_path).open(encoding="utf-8") as f:
+            with resolved_config_path.open(encoding="utf-8") as f:
                 loaded = yaml.safe_load(f)
                 if isinstance(loaded, Mapping):
                     self.config = self._merge_config(default_config, loaded)
@@ -160,40 +133,34 @@ class ScheduledMaintenance:
         overrides: Mapping[str, object],
     ) -> MaintenanceConfig:
         """Merge external config mapping into default typed config."""
-        merged: MaintenanceConfig = {
-            "enabled": _as_bool(overrides.get("enabled"), base["enabled"]),
-            "reports_dir": _as_str(overrides.get("reports_dir"), base["reports_dir"]),
-            "backup_dir": _as_str(overrides.get("backup_dir"), base["backup_dir"]),
-            "schedules": base["schedules"],
-            "tasks": base["tasks"],
-            "error_handling": base["error_handling"],
-            "logging": base["logging"],
-        }
+        merged = base.model_dump()
+        merged["enabled"] = _as_bool(overrides.get("enabled"), base.enabled)
+        merged["reports_dir"] = _as_str(overrides.get("reports_dir"), base.reports_dir)
+        merged["backup_dir"] = _as_str(overrides.get("backup_dir"), base.backup_dir)
 
         schedules_raw = overrides.get("schedules")
         if isinstance(schedules_raw, Mapping):
-            schedules = base["schedules"].copy()
+            schedules = {
+                key: value.model_dump() for key, value in base.schedules.items()
+            }
             for key, value in schedules_raw.items():
                 if not isinstance(key, str) or not isinstance(value, Mapping):
                     continue
                 if key not in schedules:
                     continue
                 current = schedules[key]
-                updated: ScheduleEntry = {
+                updated = {
                     "enabled": _as_bool(value.get("enabled"), current["enabled"]),
                     "time": _as_str(value.get("time"), current["time"]),
                     "tasks": _as_str_list(value.get("tasks"), current["tasks"]),
+                    "day": _as_str(value.get("day"), current.get("day") or "") or None,
                 }
-                if "day" in current:
-                    updated["day"] = _as_str(value.get("day"), current["day"])
-                elif isinstance(value.get("day"), str):
-                    updated["day"] = value["day"]
                 schedules[key] = updated
             merged["schedules"] = schedules
 
         tasks_raw = overrides.get("tasks")
         if isinstance(tasks_raw, Mapping):
-            tasks = base["tasks"].copy()
+            tasks = {key: value.model_dump() for key, value in base.tasks.items()}
             for key, value in tasks_raw.items():
                 if not isinstance(key, str) or not isinstance(value, Mapping):
                     continue
@@ -211,45 +178,48 @@ class ScheduledMaintenance:
 
         error_handling_raw = overrides.get("error_handling")
         if isinstance(error_handling_raw, Mapping):
-            current = base["error_handling"]
+            current = base.error_handling
             merged["error_handling"] = {
                 "max_retries": _as_int(
-                    error_handling_raw.get("max_retries"), current["max_retries"]
+                    error_handling_raw.get("max_retries"), current.max_retries
                 ),
                 "retry_delay": _as_int(
-                    error_handling_raw.get("retry_delay"), current["retry_delay"]
+                    error_handling_raw.get("retry_delay"), current.retry_delay
                 ),
                 "fail_fast": _as_bool(
-                    error_handling_raw.get("fail_fast"), current["fail_fast"]
+                    error_handling_raw.get("fail_fast"), current.fail_fast
                 ),
                 "notify_on_failure": _as_bool(
                     error_handling_raw.get("notify_on_failure"),
-                    current["notify_on_failure"],
+                    current.notify_on_failure,
                 ),
             }
 
         logging_raw = overrides.get("logging")
         if isinstance(logging_raw, Mapping):
-            current = base["logging"]
+            current = base.logging
             merged["logging"] = {
-                "enabled": _as_bool(logging_raw.get("enabled"), current["enabled"]),
-                "log_file": _as_str(logging_raw.get("log_file"), current["log_file"]),
+                "enabled": _as_bool(logging_raw.get("enabled"), current.enabled),
+                "log_file": _as_str(logging_raw.get("log_file"), current.log_file),
                 "max_log_size": _as_str(
-                    logging_raw.get("max_log_size"), current["max_log_size"]
+                    logging_raw.get("max_log_size"), current.max_log_size
                 ),
                 "retention_days": _as_int(
-                    logging_raw.get("retention_days"), current["retention_days"]
+                    logging_raw.get("retention_days"), current.retention_days
                 ),
             }
 
-        return merged
+        return MaintenanceConfig.model_validate(merged)
 
     def get_default_config(self) -> MaintenanceConfig:
         """Default maintenance configuration."""
-        return {
+        reports_dir = str(_docs_reports_dir())
+        backup_dir = str(_docs_backups_dir())
+        latest_audit_report = str(_docs_reports_dir() / "latest_audit.json")
+        return MaintenanceConfig.model_validate({
             "enabled": True,
-            "reports_dir": "docs/maintenance/reports/",
-            "backup_dir": "docs/maintenance/backups/",
+            "reports_dir": reports_dir,
+            "backup_dir": backup_dir,
             "schedules": {
                 "daily_audit": {
                     "enabled": True,
@@ -286,57 +256,57 @@ class ScheduledMaintenance:
             "tasks": {
                 "audit_quick": {
                     "description": "Quick daily audit for critical issues",
-                    "command": "python docs/maintenance/scripts/audit.py --check-freshness --check-completeness --output docs/maintenance/reports/",
+                    "command": f"python -m flext_quality.docs.scripts.audit --check-freshness --check-completeness --output {reports_dir}",
                     "timeout": 300,
                 },
                 "audit_comprehensive": {
                     "description": "Full comprehensive audit",
-                    "command": "python docs/maintenance/scripts/audit.py --comprehensive --output docs/maintenance/reports/",
+                    "command": f"python -m flext_quality.docs.scripts.audit --comprehensive --output {reports_dir}",
                     "timeout": 600,
                 },
                 "validate_links": {
                     "description": "Validate all links and references",
-                    "command": "python docs/maintenance/scripts/validate.py --external-links --internal-links --images --output docs/maintenance/reports/",
+                    "command": f"python -m flext_quality.docs.scripts.validate --external-links --internal-links --images --output {reports_dir}",
                     "timeout": 300,
                 },
                 "check_critical": {
                     "description": "Check for critical issues and send alerts",
-                    "command": "python docs/maintenance/notifications.py --audit-data docs/maintenance/reports/latest_audit.json",
+                    "command": f"python -m flext_quality.docs.notifications --audit-data {latest_audit_report}",
                     "timeout": 60,
                 },
                 "optimize_formatting": {
                     "description": "Auto-fix formatting issues",
-                    "command": "python docs/maintenance/scripts/optimize.py --fix-formatting --backup --output docs/maintenance/reports/",
+                    "command": f"python -m flext_quality.docs.scripts.optimize --fix-formatting --backup --output {reports_dir}",
                     "timeout": 300,
                 },
                 "optimize_full": {
                     "description": "Full optimization suite",
-                    "command": "python docs/maintenance/scripts/optimize.py --comprehensive --backup --output docs/maintenance/reports/",
+                    "command": f"python -m flext_quality.docs.scripts.optimize --comprehensive --backup --output {reports_dir}",
                     "timeout": 600,
                 },
                 "update_toc": {
                     "description": "Update table of contents",
-                    "command": "python docs/maintenance/scripts/optimize.py --update-toc --output docs/maintenance/reports/",
+                    "command": f"python -m flext_quality.docs.scripts.optimize --update-toc --output {reports_dir}",
                     "timeout": 180,
                 },
                 "generate_report": {
                     "description": "Generate quality report",
-                    "command": "python docs/maintenance/scripts/report.py --format html --output docs/maintenance/reports/",
+                    "command": f"python -m flext_quality.docs.scripts.report --format html --output {reports_dir}",
                     "timeout": 120,
                 },
                 "generate_monthly_report": {
                     "description": "Generate comprehensive monthly report",
-                    "command": "python docs/maintenance/scripts/report.py --monthly-trends --format html --output docs/maintenance/reports/",
+                    "command": f"python -m flext_quality.docs.scripts.report --monthly-trends --format html --output {reports_dir}",
                     "timeout": 180,
                 },
                 "notify_weekly": {
                     "description": "Send weekly notification",
-                    "command": "python docs/maintenance/notifications.py --weekly-report docs/maintenance/reports/latest_audit.json",
+                    "command": f"python -m flext_quality.docs.notifications --weekly-report {latest_audit_report}",
                     "timeout": 60,
                 },
                 "cleanup_old_reports": {
                     "description": "Clean up old report files",
-                    "command": 'find docs/maintenance/reports/ -name "*.json" -mtime +90 -delete',
+                    "command": f'find {reports_dir} -name "*.json" -mtime +90 -delete',
                     "timeout": 30,
                 },
             },
@@ -348,17 +318,17 @@ class ScheduledMaintenance:
             },
             "logging": {
                 "enabled": True,
-                "log_file": "docs/maintenance/logs/scheduled_maintenance.log",
+                "log_file": str(_docs_logs_dir() / "scheduled_maintenance.log"),
                 "max_log_size": "10MB",
                 "retention_days": 30,
             },
-        }
+        })
 
     def _get_task_names(self, schedule_key: str) -> list[str]:
         """Extract task name list from config for a schedule key."""
-        schedules = self.config["schedules"]
+        schedules = self.config.schedules
         schedule_entry = schedules.get(schedule_key)
-        return schedule_entry["tasks"] if schedule_entry else []
+        return schedule_entry.tasks if schedule_entry else []
 
     def run_daily_audit(self) -> bool:
         """Run daily audit tasks."""
@@ -381,7 +351,7 @@ class ScheduledMaintenance:
         success = True
 
         for task_name in task_names:
-            task_cfg = self.config["tasks"].get(task_name)
+            task_cfg = self.config.tasks.get(task_name)
             if task_cfg is not None:
                 if self.run_single_task(task_cfg):
                     self.results.tasks_completed += 1
@@ -389,7 +359,7 @@ class ScheduledMaintenance:
                     self.results.errors.append(f"Task {task_name} failed")
                     success = False
 
-                if self.config["error_handling"]["fail_fast"]:
+                if self.config.error_handling.fail_fast:
                     break
 
         return success
@@ -397,9 +367,9 @@ class ScheduledMaintenance:
     def run_single_task(self, task_config: ScheduleTaskConfig) -> bool:
         """Run a single maintenance task using appropriate Python libraries."""
         try:
-            command = task_config["command"]
-            description = task_config["description"]
-            timeout = task_config["timeout"]
+            command = task_config.command
+            description = task_config.description
+            timeout = task_config.timeout
 
             # Parse command to determine type
             cmd_parts: list[str] = shlex.split(command) if command else []
@@ -424,7 +394,7 @@ class ScheduledMaintenance:
 
         except Exception as e:
             _ = self.results.errors.append(
-                f"Task error: {task_config['description']} - {e!s}"
+                f"Task error: {task_config.description} - {e!s}"
             )
             return False
 
@@ -667,31 +637,32 @@ class ScheduledMaintenance:
 
     def schedule_tasks(self) -> None:
         """Schedule all maintenance tasks."""
-        schedules = self.config["schedules"]
+        schedules = self.config.schedules
 
         # Daily audit
-        if schedules["daily_audit"]["enabled"]:
-            schedule.every().day.at(schedules["daily_audit"]["time"]).do(
+        if schedules["daily_audit"].enabled:
+            schedule.every().day.at(schedules["daily_audit"].time).do(
                 self.run_daily_audit,
             )
 
         # Daily optimization
-        if schedules["daily_optimize"]["enabled"]:
-            schedule.every().day.at(schedules["daily_optimize"]["time"]).do(
+        if schedules["daily_optimize"].enabled:
+            schedule.every().day.at(schedules["daily_optimize"].time).do(
                 self.run_daily_optimize,
             )
 
         # Weekly comprehensive
-        if schedules["weekly_comprehensive"]["enabled"]:
-            day = schedules["weekly_comprehensive"]["day"]
-            time_str = schedules["weekly_comprehensive"]["time"]
+        if schedules["weekly_comprehensive"].enabled:
+            day = schedules["weekly_comprehensive"].day
+            time_str = schedules["weekly_comprehensive"].time
 
-            getattr(schedule.every(), day).at(time_str).do(
-                self.run_weekly_comprehensive,
-            )
+            if isinstance(day, str):
+                getattr(schedule.every(), day).at(time_str).do(
+                    self.run_weekly_comprehensive,
+                )
 
         # Monthly deep clean
-        if schedules["monthly_deep_clean"]["enabled"]:
+        if schedules["monthly_deep_clean"].enabled:
             # Schedule for the 1st of every month
             schedule.every(4).weeks.at("11:00").do(self.run_monthly_deep_clean)
 
@@ -758,7 +729,7 @@ def main() -> None:
     )
     _ = parser.add_argument(
         "--config",
-        default="docs/maintenance/config/schedule_config.yaml",
+        default=str(_docs_config_file("schedule_config.yaml")),
         help="Maintenance schedule configuration file",
     )
     _ = parser.add_argument(
@@ -782,8 +753,8 @@ def main() -> None:
     maintenance = ScheduledMaintenance(args.config)
 
     if args.list_schedules:
-        for schedule_config in maintenance.config["schedules"].values():
-            if schedule_config["enabled"]:
+        for schedule_config in maintenance.config.schedules.values():
+            if schedule_config.enabled:
                 pass
 
     elif args.daemon:

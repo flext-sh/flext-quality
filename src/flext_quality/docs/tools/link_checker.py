@@ -14,6 +14,7 @@ import re
 import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
+from typing import TypedDict
 from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
 
@@ -24,10 +25,76 @@ from aiohttp import ClientError, ClientSession, ClientTimeout
 _AsyncSession = ClientSession
 
 
+class LinkConfigDict(TypedDict):
+    """Configuration dictionary for link validation."""
+
+    external_timeout: int
+    retry_attempts: int
+    user_agent: str
+    follow_redirects: bool
+    max_redirects: int
+    acceptable_status_codes: list[int]
+
+
+class LinkInfoDictRequired(TypedDict):
+    """Required fields for link information."""
+
+    url: str
+    text: str
+    type: str
+    file: str
+
+
+class LinkInfoDict(LinkInfoDictRequired, total=False):
+    """Link information dictionary."""
+
+    line: int
+    reference: str
+    context: dict[str, object]
+
+
+class LinkResultDictRequired(TypedDict):
+    """Required fields for link check result."""
+
+    url: str
+    valid: bool
+    context: dict[str, object]
+
+
+class LinkResultDict(LinkResultDictRequired, total=False):
+    """Link check result dictionary."""
+
+    status_code: int
+    response_time: float
+    redirected: bool
+    final_url: str
+    content_type: str
+    error: str
+
+
+class PerformanceMetricsDict(TypedDict):
+    """Performance metrics dictionary."""
+
+    total_time: float
+    average_response_time: float
+    slowest_response: float
+
+
+class ResultsDict(TypedDict):
+    """Results dictionary."""
+
+    total_links: int
+    valid_links: int
+    broken_links: int
+    warnings: int
+    errors: list[LinkResultDict]
+    warnings_list: list[dict[str, object]]
+    performance: PerformanceMetricsDict
+
+
 class LinkChecker:
     """Advanced link validation and checking system."""
 
-    # Constants for URL validation
     MIN_PATH_PARTS_FOR_REPO = 2
     MIN_PATH_PARTS_FOR_DETAILED_REPO = 3
     MIN_PATH_PARTS_FOR_BRANCH = 3
@@ -38,11 +105,11 @@ class LinkChecker:
         config_path: str | None = "docs/maintenance/config/validation_config.yaml",
     ) -> None:
         """Initialize the link checker with configuration."""
-        self.config: dict[str, object] = {}
+        self.config: LinkConfigDict = self._get_default_config()
         self.load_config(config_path)
         self.session: _AsyncSession | None = None
         self.cache: dict[str, object] = {}
-        self.results = {
+        self.results: ResultsDict = {
             "total_links": 0,
             "valid_links": 0,
             "broken_links": 0,
@@ -56,74 +123,53 @@ class LinkChecker:
             },
         }
 
+    @staticmethod
+    def _get_default_config() -> LinkConfigDict:
+        """Get default configuration."""
+        return LinkConfigDict(
+            external_timeout=10,
+            retry_attempts=3,
+            user_agent="FLEXT-Quality-Link-Validator/1.0",
+            follow_redirects=True,
+            max_redirects=5,
+            acceptable_status_codes=[
+                200,
+                201,
+                202,
+                206,
+                301,
+                302,
+                303,
+                307,
+                308,
+            ],
+        )
+
     def load_config(self, config_path: str | None) -> None:
         """Load validation configuration."""
-        if config_path is None:
-            self.config = {
-                "external_timeout": 10,
-                "retry_attempts": 3,
-                "user_agent": "FLEXT-Quality-Link-Validator/1.0",
-                "follow_redirects": True,
-                "max_redirects": 5,
-                "acceptable_status_codes": [
-                    200,
-                    201,
-                    202,
-                    206,
-                    301,
-                    302,
-                    303,
-                    307,
-                    308,
-                ],
-            }
-            return
-        try:
-            with pathlib.Path(config_path).open(encoding="utf-8") as f:
-                self.config = yaml.safe_load(f)["link_validation"]
-        except (FileNotFoundError, KeyError):
-            # Default configuration
-            self.config = {
-                "external_timeout": 10,
-                "retry_attempts": 3,
-                "user_agent": "FLEXT-Quality-Link-Validator/1.0",
-                "follow_redirects": True,
-                "max_redirects": 5,
-                "acceptable_status_codes": [
-                    200,
-                    201,
-                    202,
-                    206,
-                    301,
-                    302,
-                    303,
-                    307,
-                    308,
-                ],
-            }
+        self.config = self._get_default_config()
 
-    def find_all_links(self, file_paths: list[pathlib.Path]) -> list[dict[str, object]]:
+    def find_all_links(self, file_paths: list[pathlib.Path]) -> list[LinkInfoDict]:
         """Extract all links from the given files."""
-        all_links = []
+        all_links: list[LinkInfoDict] = []
 
         for file_path in file_paths:
             try:
                 content = file_path.read_text(encoding="utf-8")
 
-                # Find markdown links [text](url)
                 md_links = re.findall(r"\[([^\]]+)\]\(([^)]+)\)", content)
                 for text, url in md_links:
                     link_type = self._classify_link(url)
-                    all_links.append({
+                    link_info: LinkInfoDict = {
                         "url": url,
                         "text": text,
                         "type": link_type,
                         "file": str(file_path),
                         "line": content.count("\n", 0, content.find(f"[{text}]({url})"))
                         + 1,
-                    })
+                    }
+                    all_links.append(link_info)
 
-                # Find reference-style links [text][ref] and [ref]: url
                 ref_links = re.findall(r"\[([^\]]+)\]\[([^\]]+)\]", content)
                 ref_defs = re.findall(r"\[([^\]]+)\]:\s*([^\s]+)", content)
 
@@ -132,16 +178,16 @@ class LinkChecker:
                     if ref in ref_dict:
                         url = ref_dict[ref]
                         link_type = self._classify_link(url)
-                        all_links.append({
-                            "url": url,
-                            "text": text,
-                            "type": link_type,
-                            "file": str(file_path),
-                            "reference": ref,
-                        })
+                        link_info = LinkInfoDict(
+                            url=url,
+                            text=text,
+                            type=link_type,
+                            file=str(file_path),
+                            reference=ref,
+                        )
+                        all_links.append(link_info)
 
             except Exception as e:
-                # Log the exception for debugging but continue processing
                 print(f"Warning: Failed to extract links from {file_path}: {e}")
 
         return all_links
@@ -162,39 +208,55 @@ class LinkChecker:
         self,
         url: str,
         context: dict[str, object] | None = None,
-    ) -> dict[str, object]:
+    ) -> LinkResultDict:
         """Asynchronously check a single link."""
         start_time = time.time()
 
         try:
             if self.session is None:
-                return {
-                    "url": url,
-                    "error": "session_not_initialized",
-                    "valid": False,
-                    "context": context or {},
-                }
+                return LinkResultDict(
+                    url=url,
+                    error="session_not_initialized",
+                    valid=False,
+                    context=context or {},
+                )
+            external_timeout = self.config.get("external_timeout", 10)
+            follow_redirects = self.config.get("follow_redirects", True)
+            max_redirects = self.config.get("max_redirects", 5)
+            user_agent = self.config.get("user_agent", "")
+            acceptable_codes = self.config.get("acceptable_status_codes", [])
+
+            if not isinstance(external_timeout, int):
+                external_timeout = 10
+            if not isinstance(follow_redirects, bool):
+                follow_redirects = True
+            if not isinstance(max_redirects, int):
+                max_redirects = 5
+            if not isinstance(user_agent, str):
+                user_agent = ""
+            if not isinstance(acceptable_codes, list):
+                acceptable_codes: list[int] = []
+
             async with self.session.head(
                 url,
-                timeout=ClientTimeout(total=self.config["external_timeout"]),
-                allow_redirects=self.config["follow_redirects"],
-                max_redirects=self.config["max_redirects"],
-                headers={"User-Agent": self.config["user_agent"]},
+                timeout=ClientTimeout(total=external_timeout),
+                allow_redirects=follow_redirects,
+                max_redirects=max_redirects,
+                headers={"User-Agent": user_agent},
             ) as response:
                 response_time = time.time() - start_time
 
-                result = {
-                    "url": url,
-                    "status_code": response.status,
-                    "response_time": response_time,
-                    "valid": response.status in self.config["acceptable_status_codes"],
-                    "redirected": len(response.history) > 0,
-                    "final_url": str(response.url),
-                    "content_type": response.headers.get("content-type", ""),
-                    "context": context or {},
-                }
+                result: LinkResultDict = LinkResultDict(
+                    url=url,
+                    status_code=response.status,
+                    response_time=response_time,
+                    valid=response.status in acceptable_codes,
+                    redirected=len(response.history) > 0,
+                    final_url=str(response.url),
+                    content_type=response.headers.get("content-type", ""),
+                    context=context or {},
+                )
 
-                # Update performance metrics
                 self.results["performance"]["slowest_response"] = max(
                     self.results["performance"]["slowest_response"],
                     response_time,
@@ -203,29 +265,29 @@ class LinkChecker:
                 return result
 
         except TimeoutError:
-            return {
-                "url": url,
-                "error": "timeout",
-                "response_time": self.config["external_timeout"],
-                "valid": False,
-                "context": context or {},
-            }
+            return LinkResultDict(
+                url=url,
+                error="timeout",
+                response_time=self.config.get("external_timeout", 10),
+                valid=False,
+                context=context or {},
+            )
         except ClientError as e:
-            return {
-                "url": url,
-                "error": str(e),
-                "response_time": time.time() - start_time,
-                "valid": False,
-                "context": context or {},
-            }
+            return LinkResultDict(
+                url=url,
+                error=str(e),
+                response_time=time.time() - start_time,
+                valid=False,
+                context=context or {},
+            )
         except Exception as e:
-            return {
-                "url": url,
-                "error": f"unexpected_error: {e!s}",
-                "response_time": time.time() - start_time,
-                "valid": False,
-                "context": context or {},
-            }
+            return LinkResultDict(
+                url=url,
+                error=f"unexpected_error: {e!s}",
+                response_time=time.time() - start_time,
+                valid=False,
+                context=context or {},
+            )
 
     def check_link_sync(
         self,
@@ -301,49 +363,53 @@ class LinkChecker:
         }
 
     async def check_links_batch_async(
-        self, links: list[dict[str, object]]
-    ) -> list[dict[str, object]]:
+        self, links: list[LinkInfoDict]
+    ) -> list[LinkResultDict]:
         """Check multiple links asynchronously."""
         start_time = time.time()
 
-        # Create semaphore for rate limiting
-        semaphore = asyncio.Semaphore(10)  # Max 10 concurrent requests
+        semaphore = asyncio.Semaphore(10)
 
         async def check_with_semaphore(
-            link_info: dict[str, object],
-        ) -> dict[str, object]:
+            link_info: LinkInfoDict,
+        ) -> LinkResultDict:
             async with semaphore:
-                await asyncio.sleep(0.1)  # Rate limiting
-                return await self.check_link_async(
-                    link_info["url"],
-                    link_info.get("context"),
-                )
+                await asyncio.sleep(0.1)
+                url = link_info.get("url", "")
+                context = link_info.get("context")
+                if not isinstance(url, str):
+                    url = ""
+                if context is not None and not isinstance(context, dict):
+                    context = None
+                return await self.check_link_async(url, context)
 
-        # Create tasks
         tasks = [check_with_semaphore(link) for link in links]
 
-        # Execute tasks
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        # Handle exceptions
-        processed_results: list[dict[str, object]] = []
+        processed_results: list[LinkResultDict] = []
         for result in results:
             if isinstance(result, BaseException):
-                processed_results.append({
-                    "error": f"task_exception: {result!s}",
-                    "valid": False,
-                })
+                processed_results.append(
+                    LinkResultDict(
+                        url="",
+                        error=f"task_exception: {result!s}",
+                        valid=False,
+                        context={},
+                    )
+                )
             else:
                 processed_results.append(result)
 
         self.results["performance"]["total_time"] = time.time() - start_time
 
-        # Calculate average response time
-        valid_times = [
-            r["response_time"]
-            for r in processed_results
-            if "response_time" in r and r.get("valid")
-        ]
+        valid_times: list[float] = []
+        for r in processed_results:
+            response_time = r.get("response_time")
+            if response_time is not None and isinstance(response_time, (int, float)):
+                if r.get("valid"):
+                    valid_times.append(float(response_time))
+
         if valid_times:
             self.results["performance"]["average_response_time"] = sum(
                 valid_times,
