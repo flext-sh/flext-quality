@@ -11,7 +11,7 @@ from __future__ import annotations
 from flext_tests import u
 
 
-class TestsFlextQualityUtilities(FlextTestsUtilities):
+class TestsFlextQualityUtilities(u):
     """Test utilities for flextquality."""
 
 

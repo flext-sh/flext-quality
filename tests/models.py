@@ -1,6 +1,6 @@
 """Test models for flext-quality.
 
-Provides test-specific models extending FlextTestsModels and FlextQualityModels
+Provides test-specific models extending m and FlextQualityModels
 with proper hierarchy composition.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -14,21 +14,21 @@ from flext_tests import m
 from flext_quality import FlextQualityModels
 
 
-class TestsFlextQualityModels(FlextTestsModels, FlextQualityModels):
-    """Test models - composition of FlextTestsModels + FlextQualityModels.
+class TestsFlextQualityModels(m, FlextQualityModels):
+    """Test models - composition of m + FlextQualityModels.
 
     Hierarchy:
-    - FlextTestsModels: Generic test utilities from flext-tests
+    - m: Generic test utilities from flext-tests
     - FlextQualityModels: Domain models from flext-quality
     - TestsFlextQualityModels: Composition + namespace .Tests
 
     Access patterns:
     - m.Tests.* - Project-specific test fixtures
     - m.Quality.* - Production domain models (inherited)
-    - FlextTestsModels.Tests.* - Generic test utilities
+    - m.Tests.* - Generic test utilities
     """
 
-    class Tests(FlextTestsModels.Tests):
+    class Tests(m.Tests):
         """Test fixtures namespace for flext-quality.
 
         Contains test-specific models and fixtures that should not

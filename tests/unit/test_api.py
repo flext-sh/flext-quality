@@ -8,6 +8,8 @@ import tempfile
 import threading
 from pathlib import Path
 
+from flext_tests import tm
+
 from flext_quality import FlextQuality
 
 
@@ -26,45 +28,45 @@ class TestFlextQualityAPI:
         """Test that get_instance returns same instance."""
         instance1 = FlextQuality.get_instance()
         instance2 = FlextQuality.get_instance()
-        assert instance1 is instance2
+        tm.that(instance1 is instance2, eq=True)
 
     def test_instance_has_required_attributes(self) -> None:
         """Test that instance has all required attributes."""
         quality = FlextQuality.get_instance()
-        assert hasattr(quality, "logger")
-        assert hasattr(quality, "config")
-        assert hasattr(quality, "hooks")
-        assert hasattr(quality, "rules_loader")
+        tm.that(hasattr(quality, "logger"), eq=True)
+        tm.that(hasattr(quality, "config"), eq=True)
+        tm.that(hasattr(quality, "hooks"), eq=True)
+        tm.that(hasattr(quality, "rules_loader"), eq=True)
 
     def test_get_status_returns_dict(self) -> None:
         """Test that get_status returns status dict."""
         quality = FlextQuality.get_instance()
         status = quality.get_status()
-        assert isinstance(status, dict)
-        assert "name" in status
-        assert "version" in status
-        assert "config" in status
-        assert "hooks_registered" in status
+        tm.that(isinstance(status, dict), eq=True)
+        tm.that("name" in status, eq=True)
+        tm.that("version" in status, eq=True)
+        tm.that("config" in status, eq=True)
+        tm.that("hooks_registered" in status, eq=True)
 
     def test_validate_configuration_succeeds(self) -> None:
         """Test that validate_configuration returns success."""
         quality = FlextQuality.get_instance()
         result = quality.validate_configuration()
-        assert result.is_success
-        assert result.value is True
+        tm.that(result.is_success, eq=True)
+        tm.that(result.value is True, eq=True)
 
     def test_format_hook_output_continue(self) -> None:
         """Test format_hook_output with continue=True."""
         quality = FlextQuality.get_instance()
         output = quality.format_hook_output(continue_exec=True)
-        assert '"continue": true' in output
+        tm.that('"continue": true' in output, eq=True)
 
     def test_format_hook_output_with_message(self) -> None:
         """Test format_hook_output with message."""
         quality = FlextQuality.get_instance()
         output = quality.format_hook_output(continue_exec=True, message="Test message")
-        assert '"continue": true' in output
-        assert "Test message" in output
+        tm.that('"continue": true' in output, eq=True)
+        tm.that("Test message" in output, eq=True)
 
     def test_format_hook_output_blocked(self) -> None:
         """Test format_hook_output with blocked reason."""
@@ -72,20 +74,20 @@ class TestFlextQualityAPI:
         output = quality.format_hook_output(
             continue_exec=False, blocked_reason="Blocked for testing"
         )
-        assert '"continue": false' in output
+        tm.that('"continue": false' in output, eq=True)
 
     def test_get_hook_config_json(self) -> None:
         """Test get_hook_config_json returns valid JSON."""
         quality = FlextQuality.get_instance()
         config_json = quality.get_hook_config_json()
-        assert isinstance(config_json, str)
-        assert config_json == "{}"
+        tm.that(isinstance(config_json, str), eq=True)
+        tm.that(config_json == "{}", eq=True)
 
     def test_load_rules_from_config_with_no_rules_dir(self) -> None:
         """Test load_rules_from_config when rules dir doesn't exist."""
         quality = FlextQuality.get_instance()
         result = quality.load_rules_from_config()
-        assert result.is_success or result.is_failure
+        tm.that(result.is_success or result.is_failure, eq=True)
 
     def test_load_rules_from_file(self) -> None:
         """Test load_rules from a YAML file."""
@@ -98,9 +100,9 @@ class TestFlextQualityAPI:
             rules_path = Path(f.name)
         try:
             result = quality.load_rules(rules_path)
-            assert result.is_success
-            assert len(result.value) == 1
-            assert result.value[0].name == "test-rule"
+            tm.that(result.is_success, eq=True)
+            tm.that(len(result.value) == 1, eq=True)
+            tm.that(result.value[0].name == "test-rule", eq=True)
         finally:
             rules_path.unlink()
 
@@ -108,8 +110,8 @@ class TestFlextQualityAPI:
         """Test load_rules fails for nonexistent file."""
         quality = FlextQuality.get_instance()
         result = quality.load_rules(Path("/nonexistent/rules.yaml"))
-        assert result.is_failure
-        assert "not found" in (result.error or "").lower()
+        tm.that(result.is_failure, eq=True)
+        tm.that("not found" in (result.error or "").lower(), eq=True)
 
 
 class TestFlextQualityHookExecution:
@@ -127,15 +129,15 @@ class TestFlextQualityHookExecution:
         """Test execute_hook fails for unknown event."""
         quality = FlextQuality.get_instance()
         result = quality.execute_hook("UnknownEvent", {})
-        assert result.is_failure
-        assert "Unknown event" in (result.error or "")
+        tm.that(result.is_failure, eq=True)
+        tm.that("Unknown event" in (result.error or ""), eq=True)
 
     def test_execute_hook_valid_event_no_hooks(self) -> None:
         """Test execute_hook succeeds with no registered hooks."""
         quality = FlextQuality.get_instance()
         result = quality.execute_hook("PreToolUse", {"tool_name": "Edit"})
-        assert result.is_success
-        assert result.value.get("continue") is True
+        tm.that(result.is_success, eq=True)
+        tm.that(result.value.get("continue") is True, eq=True)
 
 
 class TestFlextQualitySingleton:
@@ -166,9 +168,9 @@ class TestFlextQualitySingleton:
             t.start()
         for t in threads:
             t.join()
-        assert len(errors) == 0
-        assert len(instances) == 10
-        assert all(i is instances[0] for i in instances)
+        tm.that(len(errors) == 0, eq=True)
+        tm.that(len(instances) == 10, eq=True)
+        tm.that(all(i is instances[0] for i in instances), eq=True)
 
 
 class TestFlextQualityRulesConfig:
@@ -189,8 +191,8 @@ class TestFlextQualityRulesConfig:
         quality.config.rules_dir = "/nonexistent/rules/dir"
         result = quality.load_rules_from_config()
         quality.config.rules_dir = original_dir
-        assert result.is_failure
-        assert "not found" in (result.error or "").lower()
+        tm.that(result.is_failure, eq=True)
+        tm.that("not found" in (result.error or "").lower(), eq=True)
 
     def test_load_rules_from_config_with_multiple_files(self) -> None:
         """Test load_rules_from_config loads multiple YAML files."""
@@ -207,8 +209,8 @@ class TestFlextQualityRulesConfig:
             quality.config.rules_dir = str(rules_dir)
             result = quality.load_rules_from_config()
             quality.config.rules_dir = original_dir
-            assert result.is_success
-            assert len(result.value) == 2
+            tm.that(result.is_success, eq=True)
+            tm.that(len(result.value) == 2, eq=True)
 
 
 class TestFlextQualityStdinProcessing:
@@ -229,8 +231,8 @@ class TestFlextQualityStdinProcessing:
         sys.stdin = io.StringIO('{"event": "PreToolUse", "tool_name": "Edit"}')
         try:
             result = quality.process_stdin_hook()
-            assert result.is_success
-            assert result.value.get("continue") is True
+            tm.that(result.is_success, eq=True)
+            tm.that(result.value.get("continue") is True, eq=True)
         finally:
             sys.stdin = original_stdin
 
@@ -241,8 +243,8 @@ class TestFlextQualityStdinProcessing:
         sys.stdin = io.StringIO('{"tool_name": "Edit"}')
         try:
             result = quality.process_stdin_hook()
-            assert result.is_success
-            assert result.value.get("continue") is True
+            tm.that(result.is_success, eq=True)
+            tm.that(result.value.get("continue") is True, eq=True)
         finally:
             sys.stdin = original_stdin
 
@@ -253,10 +255,13 @@ class TestFlextQualityStdinProcessing:
         sys.stdin = io.StringIO("not valid json")
         try:
             result = quality.process_stdin_hook()
-            assert result.is_failure
-            assert (
-                "parse" in (result.error or "").lower()
-                or "invalid" in (result.error or "").lower()
+            tm.that(result.is_failure, eq=True)
+            tm.that(
+                (
+                    "parse" in (result.error or "").lower()
+                    or "invalid" in (result.error or "").lower()
+                ),
+                eq=True,
             )
         finally:
             sys.stdin = original_stdin
@@ -268,8 +273,8 @@ class TestFlextQualityStdinProcessing:
         sys.stdin = io.StringIO('{"event": "UnknownEvent"}')
         try:
             result = quality.process_stdin_hook()
-            assert result.is_failure
-            assert "Unknown event" in (result.error or "")
+            tm.that(result.is_failure, eq=True)
+            tm.that("Unknown event" in (result.error or ""), eq=True)
         finally:
             sys.stdin = original_stdin
 
@@ -295,5 +300,5 @@ class TestFlextQualityValidation:
         result = quality.validate_configuration()
         quality.config.max_function_length = original_function
         quality.config.max_class_length = original_class
-        assert result.is_failure
-        assert "max_function_length" in (result.error or "").lower()
+        tm.that(result.is_failure, eq=True)
+        tm.that("max_function_length" in (result.error or "").lower(), eq=True)

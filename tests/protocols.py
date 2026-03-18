@@ -1,6 +1,6 @@
 """Test protocol definitions for flext-quality.
 
-Provides TestsFlextQualityProtocols, combining FlextTestsProtocols with
+Provides TestsFlextQualityProtocols, combining p with
 FlextQualityProtocols for test-specific protocol definitions.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
@@ -14,12 +14,12 @@ from flext_tests import p
 from flext_quality import FlextQualityProtocols
 
 
-class TestsFlextQualityProtocols(FlextTestsProtocols, FlextQualityProtocols):
-    """Test protocols combining FlextTestsProtocols and FlextQualityProtocols.
+class TestsFlextQualityProtocols(p, FlextQualityProtocols):
+    """Test protocols combining p and FlextQualityProtocols.
 
     Provides access to:
-    - p.Tests.Docker.* (from FlextTestsProtocols)
-    - p.Tests.Factory.* (from FlextTestsProtocols)
+    - p.Tests.Docker.* (from p)
+    - p.Tests.Factory.* (from p)
     - p.Quality.* (from FlextQualityProtocols)
     """
 

@@ -15,6 +15,7 @@ from typing import final
 from flext_core import r
 
 from flext_quality import c, t
+from flext_quality.integrations._health import build_mcp_health_result
 from flext_quality.integrations.mcp_client import FlextQualityMcpClient, McpToolCall
 
 
@@ -67,18 +68,4 @@ class FlextQualityClaudeContextClient:
 
     def health_check(self) -> r[Mapping[str, t.NormalizedValue]]:
         """Check if claude-context is available."""
-        mcp_health = self._mcp.health_check()
-        if mcp_health.is_failure:
-            return r[Mapping[str, t.NormalizedValue]].fail(mcp_health.error)
-        health_data = mcp_health.value
-        status = (
-            c.Quality.IntegrationStatus.CONNECTED
-            if health_data.get("available", False)
-            else c.Quality.IntegrationStatus.DISCONNECTED
-        )
-        return r[Mapping[str, t.NormalizedValue]].ok({
-            "server": self.SERVER_NAME,
-            "status": status,
-            "available": health_data.get("available", False),
-            "mcp_cli": health_data.get("mcp_cli", False),
-        })
+        return build_mcp_health_result(self.SERVER_NAME, self._mcp)
