@@ -10,28 +10,63 @@ from collections.abc import Mapping
 from pathlib import Path
 
 import yaml
-from flext_core import t
+
+type ConfigPrimitive = str | int | float | bool
+type ConfigValue = ConfigPrimitive | list[str]
+type ConfigSection = dict[str, ConfigValue]
+type ConfigData = dict[str, ConfigSection]
+
+
+def _as_section(value: object) -> ConfigSection:
+    """Normalize any value into a configuration section mapping."""
+    if not isinstance(value, Mapping):
+        return {}
+
+    section: ConfigSection = {}
+    for key, item in value.items():
+        key_str = str(key)
+        if isinstance(item, (str, int, float, bool)):
+            section[key_str] = item
+        elif isinstance(item, list):
+            section[key_str] = [str(entry) for entry in item]
+    return section
+
+
+def _as_config_data(value: object) -> ConfigData:
+    """Normalize loaded YAML content into typed config data."""
+    if not isinstance(value, Mapping):
+        return {}
+
+    config: ConfigData = {}
+    for key, item in value.items():
+        section = _as_section(item)
+        if section:
+            config[str(key)] = section
+    return config
 
 
 class AuditRules:
     """Configuration for audit rules and thresholds."""
 
-    def __init__(self, data: dict[str, t.Container]) -> None:
+    def __init__(self, data: ConfigData) -> None:
         """Initialize audit rules configuration."""
-        self.quality_thresholds = data.get("quality_thresholds", {})
-        self.content_checks = data.get("content_checks", {})
-        self.link_checks = data.get("link_checks", {})
-        self.style_checks = data.get("style_checks", {})
-        self.accessibility_checks = data.get("accessibility_checks", {})
+        self.quality_thresholds: ConfigSection = data.get("quality_thresholds", {})
+        self.content_checks: ConfigSection = data.get("content_checks", {})
+        self.link_checks: ConfigSection = data.get("link_checks", {})
+        self.style_checks: ConfigSection = data.get("style_checks", {})
+        self.accessibility_checks: ConfigSection = data.get(
+            "accessibility_checks", {}
+        )
 
     def get_threshold(
         self,
         key: str,
         *,
-        default: str | float | bool | None = None,
-    ) -> t.Primitives | None:
+        default: ConfigPrimitive | None = None,
+    ) -> ConfigPrimitive | None:
         """Get a quality threshold value."""
-        return self.quality_thresholds.get(key, default)
+        threshold = self.quality_thresholds.get(key, default)
+        return threshold if isinstance(threshold, (str, int, float, bool)) else default
 
     def is_check_enabled(self, check_type: str, check_name: str) -> bool:
         """Check if a specific audit check is enabled."""
@@ -42,60 +77,68 @@ class AuditRules:
 class StyleGuide:
     """Configuration for style and formatting guidelines."""
 
-    def __init__(self, data: dict[str, t.Container]) -> None:
+    def __init__(self, data: ConfigData) -> None:
         """Initialize style guidelines configuration."""
-        self.markdown = data.get("markdown", {})
-        self.accessibility = data.get("accessibility", {})
-        self.formatting = data.get("formatting", {})
+        self.markdown: ConfigSection = data.get("markdown", {})
+        self.accessibility: ConfigSection = data.get("accessibility", {})
+        self.formatting: ConfigSection = data.get("formatting", {})
 
     def get_markdown_rule(
         self,
         rule: str,
         *,
-        default: str | float | bool | None = None,
-    ) -> t.Primitives | None:
+        default: ConfigPrimitive | None = None,
+    ) -> ConfigPrimitive | None:
         """Get a markdown formatting rule."""
-        return self.markdown.get(rule, default)
+        value = self.markdown.get(rule, default)
+        return value if isinstance(value, (str, int, float, bool)) else default
 
     def get_accessibility_rule(
         self,
         rule: str,
         *,
-        default: str | float | bool | None = None,
-    ) -> t.Primitives | None:
+        default: ConfigPrimitive | None = None,
+    ) -> ConfigPrimitive | None:
         """Get an accessibility rule."""
-        return self.accessibility.get(rule, default)
+        value = self.accessibility.get(rule, default)
+        return value if isinstance(value, (str, int, float, bool)) else default
 
 
 class ValidationConfig:
     """Configuration for validation operations."""
 
-    def __init__(self, data: dict[str, t.Container]) -> None:
+    def __init__(self, data: ConfigData) -> None:
         """Initialize validation configuration."""
-        self.link_validation = data.get("link_validation", {})
-        self.content_validation = data.get("content_validation", {})
-        self.image_validation = data.get("image_validation", {})
-        self.accessibility_validation = data.get("accessibility_validation", {})
-        self.security_validation = data.get("security_validation", {})
-        self.performance_validation = data.get("performance_validation", {})
+        self.link_validation: ConfigSection = data.get("link_validation", {})
+        self.content_validation: ConfigSection = data.get("content_validation", {})
+        self.image_validation: ConfigSection = data.get("image_validation", {})
+        self.accessibility_validation: ConfigSection = data.get(
+            "accessibility_validation", {}
+        )
+        self.security_validation: ConfigSection = data.get("security_validation", {})
+        self.performance_validation: ConfigSection = data.get(
+            "performance_validation", {}
+        )
 
     def get_link_setting(
         self,
         setting: str,
         *,
-        default: str | float | bool | None = None,
-    ) -> t.Primitives | None:
+        default: ConfigPrimitive | None = None,
+    ) -> ConfigPrimitive | None:
         """Get a link validation setting."""
-        return self.link_validation.get(setting, default)
+        value = self.link_validation.get(setting, default)
+        return value if isinstance(value, (str, int, float, bool)) else default
 
     def get_content_setting(
         self,
         setting: str,
         *,
-        default: str | float | bool | None = None,
-    ) -> t.Primitives | None:
+        default: ConfigPrimitive | None = None,
+    ) -> ConfigPrimitive | None:
         """Get a content validation setting."""
-        return self.content_validation.get(setting, default)
+        value = self.content_validation.get(setting, default)
+        return value if isinstance(value, (str, int, float, bool)) else default
 
 
 class ConfigManager:
@@ -115,7 +158,7 @@ class ConfigManager:
         else:
             self.config_dir = Path(config_dir)
 
-        self._cache: dict[str, dict[str, t.Container]] = {}
+        self._cache: dict[str, ConfigData] = {}
         self._audit_rules: AuditRules | None = None
         self._style_guide: StyleGuide | None = None
         self._validation_config: ValidationConfig | None = None
@@ -141,22 +184,20 @@ class ConfigManager:
             self._validation_config = ValidationConfig(data)
         return self._validation_config
 
-    def get_config(self, name: str) -> dict[str, t.Container]:
+    def get_config(self, name: str) -> ConfigData:
         """Get a configuration file by name."""
         if name not in self._cache:
             self._cache[name] = self._load_config_file(f"{name}.yaml")
         return self._cache[name]
 
-    def _load_config_file(self, filename: str) -> dict[str, t.Container]:
+    def _load_config_file(self, filename: str) -> ConfigData:
         """Load a YAML configuration file."""
         config_path = self.config_dir / filename
 
         try:
             with config_path.open("r", encoding="utf-8") as f:
                 raw = yaml.safe_load(f)
-                if isinstance(raw, Mapping):
-                    return dict(raw)
-                return {}
+                return _as_config_data(raw)
         except FileNotFoundError:
             return self._get_default_config(filename)
         except yaml.YAMLError:
@@ -164,7 +205,7 @@ class ConfigManager:
         except Exception:
             return self._get_default_config(filename)
 
-    def _get_default_config(self, filename: str) -> dict[str, t.Container]:
+    def _get_default_config(self, filename: str) -> ConfigData:
         """Get default configuration for a file."""
         defaults = {
             "audit_rules.yaml": {
@@ -227,7 +268,8 @@ class ConfigManager:
             },
         }
 
-        return defaults.get(filename, {})
+        default_value = defaults.get(filename, {})
+        return _as_config_data(default_value)
 
     def reload_configs(self) -> None:
         """Reload all configurations from disk."""
@@ -276,7 +318,7 @@ class ConfigManager:
 
         return issues
 
-    def get_all_configs(self) -> dict[str, dict[str, t.Container]]:
+    def get_all_configs(self) -> dict[str, ConfigData | dict[str, ConfigData]]:
         """Get all configurations as a single dictionary."""
         return {
             "audit_rules": self.get_audit_rules().__dict__,
@@ -288,7 +330,7 @@ class ConfigManager:
             },
         }
 
-    def save_config(self, name: str, data: dict[str, t.Container]) -> bool:
+    def save_config(self, name: str, data: ConfigData) -> bool:
         """Save a configuration to file."""
         try:
             config_path = self.config_dir / f"{name}.yaml"

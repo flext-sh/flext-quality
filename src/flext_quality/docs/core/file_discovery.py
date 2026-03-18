@@ -10,9 +10,25 @@ import fnmatch
 import logging
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import ClassVar
+from typing import ClassVar, NotRequired, TypedDict
 
 from .base_classes import FileMetadata
+
+
+class FileStatistics(TypedDict):
+    """Statistics payload for discovered documentation files."""
+
+    total_files: int
+    total_size: NotRequired[int]
+    total_lines: NotRequired[int]
+    total_words: NotRequired[int]
+    markdown_files: NotRequired[int]
+    other_files: NotRequired[int]
+    size_distribution: NotRequired[dict[str, int]]
+    categories: NotRequired[dict[str, int]]
+    avg_file_size: NotRequired[float]
+    avg_lines_per_file: NotRequired[float]
+    avg_words_per_file: NotRequired[float]
 
 
 class DocumentationFinder:
@@ -333,7 +349,7 @@ class DocumentationFinder:
 
         return categories
 
-    def get_statistics(self, files: list[Path] | None = None) -> dict[str, int]:
+    def get_statistics(self, files: list[Path] | None = None) -> FileStatistics:
         """Get statistics about found files."""
         if files is None:
             files = self.find_files()
@@ -344,7 +360,7 @@ class DocumentationFinder:
         metadata_list = self.get_files_metadata(files)
 
         # Basic statistics
-        stats = {
+        stats: FileStatistics = {
             "total_files": len(files),
             "total_size": sum(meta.size for meta in metadata_list),
             "total_lines": sum(meta.lines for meta in metadata_list),
