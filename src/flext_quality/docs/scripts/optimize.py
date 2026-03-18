@@ -20,17 +20,25 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
 MIN_HEADINGS_FOR_TOC = 5
+
+
+def _empty_optimizations() -> list[dict[str, str]]:
+    return []
+
+
+def _empty_backups() -> list[str]:
+    return []
 
 
 class OptimizerResults(BaseModel):
     timestamp: str
     files_processed: int = 0
     changes_made: int = 0
-    backups_created: list[str] = Field(default_factory=list)
-    optimizations: list[dict[str, str]] = Field(default_factory=list)
+    backups_created: list[str] = Field(default_factory=_empty_backups)
+    optimizations: list[dict[str, str]] = Field(default_factory=_empty_optimizations)
 
 
 class DocumentationOptimizer:
@@ -344,7 +352,9 @@ class DocumentationOptimizer:
                 try:
                     frontmatter_lines = lines[1 : end_idx - 1]
                     frontmatter_content = "\n".join(frontmatter_lines)
-                    metadata = yaml.safe_load(frontmatter_content) or {}
+                    metadata = TypeAdapter(dict[str, object]).validate_python(
+                        yaml.safe_load(frontmatter_content) or {}
+                    )
                     metadata["updated"] = datetime.now(UTC).strftime("%Y-%m-%d")
                     new_frontmatter = yaml.dump(
                         metadata, default_flow_style=False
@@ -353,7 +363,7 @@ class DocumentationOptimizer:
                         ["---"] + new_frontmatter.split("\n") + ["---"]
                     )
                     lines = new_frontmatter_lines + lines[end_idx:]
-                except yaml.YAMLError:
+                except (yaml.YAMLError, ValidationError):
                     pass
         return "\n".join(lines)
 
@@ -362,16 +372,17 @@ class DocumentationOptimizer:
         if self.backup:
             backup_path = file_path.with_suffix(f"{file_path.suffix}.backup")
             shutil.copy2(file_path, backup_path)
-            _ = self.results["backups_created"].append(
+            _ = self.results.backups_created.append(
                 str(backup_path.relative_to(self.project_root))
             )
         _ = file_path.write_text(content, encoding="utf-8")
 
     def generate_report(self, report_format: str = "json") -> str:
         """Generate optimization report."""
+        payload = self.results.model_dump()
         if report_format == "json":
-            return json.dumps(self.results, indent=2, default=str)
-        return json.dumps(self.results, default=str)
+            return json.dumps(payload, indent=2, default=str)
+        return json.dumps(payload, default=str)
 
     def save_report(self, output_path: str = "docs/maintenance/reports/") -> str:
         """Save optimization report."""
@@ -383,7 +394,9 @@ class DocumentationOptimizer:
         report_content = self.generate_report("json")
         _ = filepath.write_text(report_content, encoding="utf-8")
         latest_file = output_dir / "latest_optimization.json"
-        json.dump(self.results, latest_file.open("w"), indent=2, default=str)
+        json.dump(
+            self.results.model_dump(), latest_file.open("w"), indent=2, default=str
+        )
         return str(filepath)
 
 
@@ -469,26 +482,21 @@ def _execute_optimizations(
 ) -> bool:
     """Execute the requested optimizations and return if any were run."""
     run_any_optimization = False
+    doc_files = _discover_documentation_files(args)
     if args.fix_formatting or args.comprehensive:
-        optimizer.optimize_formatting(list(optimizer.project_root.glob("docs/**/*.md")))
+        optimizer.optimize_formatting(doc_files)
         run_any_optimization = True
     if args.update_toc or args.comprehensive:
-        optimizer.update_table_of_contents(
-            list(optimizer.project_root.glob("docs/**/*.md"))
-        )
+        optimizer.update_table_of_contents(doc_files)
         run_any_optimization = True
     if args.add_alt_text or args.improve_accessibility or args.comprehensive:
-        optimizer.enhance_accessibility(
-            list(optimizer.project_root.glob("docs/**/*.md"))
-        )
+        optimizer.enhance_accessibility(doc_files)
         run_any_optimization = True
     if args.optimize_structure or args.comprehensive:
-        optimizer.optimize_content_structure(
-            list(optimizer.project_root.glob("docs/**/*.md"))
-        )
+        optimizer.optimize_content_structure(doc_files)
         run_any_optimization = True
     if args.update_metadata or args.comprehensive:
-        optimizer.update_metadata(list(optimizer.project_root.glob("docs/**/*.md")))
+        optimizer.update_metadata(doc_files)
         run_any_optimization = True
     return run_any_optimization
 
