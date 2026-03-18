@@ -6,29 +6,19 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Annotated
 
 from flext_cli import FlextCliModels
+from flext_core import t
 from flext_web import FlextWebModels
 from pydantic import BaseModel, Field
 
 from flext_quality import c
-from flext_quality.docs.core.base_classes import (
-    FileMetadata as _DocsFileMetadata,
-    Issue as _DocsIssue,
-    ValidationResult as _DocsValidationResult,
-)
 
 
 class FlextQualityModels(FlextWebModels, FlextCliModels):
-    """Namespace for flext-quality models.
-
-    Usage:
-        from flext_quality import m
-
-        config = m.Quality.HookConfig(event=c.Quality.HookEvent.PRE_TOOL_USE, command="...")
-        rule = m.Quality.RuleDefinition(name="rule1", type=c.Quality.RuleType.BLOCKING, ...)
-    """
+    """Namespace for flext-quality models."""
 
     class Quality:
         """Quality-specific models namespace."""
@@ -95,14 +85,93 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             score: float
             line_number: int | None = None
 
-        class Issue(_DocsIssue):
-            """Canonical issue model exposed through flext-quality namespace."""
+        class Issue(BaseModel):
+            """Canonical issue model for documentation tooling."""
 
-        class ValidationResult(_DocsValidationResult):
-            """Canonical validation result model exposed through flext-quality."""
+            type: str = Field(description="Issue type identifier")
+            severity: str = Field(description="Severity level identifier")
+            file: str = Field(description="File path where issue was found")
+            line: int | None = Field(default=None, description="Issue line number")
+            description: str = Field(default="", description="Issue description")
+            recommendation: str = Field(default="", description="Recommended fix")
+            context: dict[str, t.Primitives | None] | None = Field(default=None)
 
-        class FileMetadata(_DocsFileMetadata):
-            """Canonical file metadata model exposed through flext-quality."""
+            def to_dict(
+                self,
+            ) -> dict[str, str | int | dict[str, t.Primitives | None] | None]:
+                """Convert issue to dictionary representation."""
+                return {
+                    "type": self.type,
+                    "severity": self.severity,
+                    "file": self.file,
+                    "line": self.line,
+                    "description": self.description,
+                    "recommendation": self.recommendation,
+                    "context": self.context if self.context is not None else {},
+                }
+
+        class ValidationResult(BaseModel):
+            """Canonical validation result for documentation tooling."""
+
+            total_items: int = Field(default=0)
+            valid_items: int = Field(default=0)
+            invalid_items: int = Field(default=0)
+            issues: list[FlextQualityModels.Quality.Issue] = Field(default_factory=list)
+            warnings: list[str] = Field(default_factory=list)
+            errors: list[str] = Field(default_factory=list)
+            metadata: dict[str, t.Primitives] = Field(default_factory=dict)
+
+            @property
+            def success_rate(self) -> float:
+                """Calculate success rate as a percentage."""
+                if self.total_items == 0:
+                    return 100.0
+                return (self.valid_items / self.total_items) * 100.0
+
+            def add_issue(self, issue: FlextQualityModels.Quality.Issue) -> None:
+                """Add an issue to the validation result."""
+                self.issues.append(issue)
+                if issue.severity == "critical":
+                    self.invalid_items += 1
+                else:
+                    self.valid_items += 1
+
+        class FileMetadata(BaseModel):
+            """Metadata about a documentation file."""
+
+            path: str
+            size: int = 0
+            modified_time: float = 0.0
+            extension: str = ""
+            is_markdown: bool = False
+            lines: int = 0
+            words: int = 0
+
+            @classmethod
+            def from_path(cls, path: Path) -> FlextQualityModels.Quality.FileMetadata:
+                """Build metadata from a filesystem path."""
+                size = path.stat().st_size if path.exists() else 0
+                modified_time = path.stat().st_mtime if path.exists() else 0.0
+                extension = path.suffix.lower()
+                is_markdown = extension in {".md", ".mdx"}
+                lines = 0
+                words = 0
+                if path.exists():
+                    try:
+                        content = path.read_text(encoding="utf-8")
+                        lines = content.count("\n") + 1
+                        words = len(content.split())
+                    except (OSError, UnicodeDecodeError):
+                        pass
+                return cls(
+                    path=str(path),
+                    size=size,
+                    modified_time=modified_time,
+                    extension=extension,
+                    is_markdown=is_markdown,
+                    lines=lines,
+                    words=words,
+                )
 
         class ScheduleTaskConfig(BaseModel):
             """Task configuration for scheduled documentation maintenance."""
@@ -160,8 +229,19 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             end_time: str = ""
             duration_seconds: int = 0
 
+        class AuditorResults(BaseModel):
+            """Results for documentation audit execution."""
+
+            timestamp: str
+            files_analyzed: int = 0
+            issues: list[dict[str, t.Primitives | list[str] | None]] = Field(
+                default_factory=list
+            )
+            metrics: dict[str, t.Primitives] = Field(default_factory=dict)
+            recommendations: list[str] = Field(default_factory=list)
+
         class LinkRecord(BaseModel):
-            """Canonical representation of a discovered documentation link."""
+            """Record of a link found in documentation."""
 
             text: str
             url: str
@@ -170,32 +250,25 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             line_number: int | None = None
 
         class LinkCheckResult(BaseModel):
-            """Canonical result model for link validation outcomes."""
+            """Result of checking a single link."""
 
-            valid: bool = False
-            url: str = ""
-            file: str = ""
+            valid: bool | None = None
+            url: str | None = None
+            file: str | None = None
             line: int | None = None
             status_code: int | None = None
             error: str | None = None
             type: str | None = None
             target: str | None = None
-            src: str | None = None
-            anchor: str | None = None
-            warning: str | None = None
-            text: str | None = None
 
         class ContentIssue(BaseModel):
-            """Canonical issue model for content validation operations."""
+            """Issue found in documentation content."""
 
             type: str
-            file: str = ""
+            file: str | None = None
             line: int | None = None
             content: str | None = None
             error: str | None = None
-            warning: str | None = None
-            word_count: int | None = None
-            readability_score: float | None = None
 
         class LinkValidatorResults(BaseModel):
             """Results for documentation link validation."""
@@ -220,7 +293,9 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             content_issues: list[FlextQualityModels.Quality.ContentIssue] = Field(
                 default_factory=list
             )
-            quality_metrics: dict[str, int | float | bool] = Field(default_factory=dict)
+            quality_metrics: dict[str, str | int | float | bool] = Field(
+                default_factory=dict
+            )
 
         class ContentMetrics(BaseModel):
             """Content quality metrics for a documentation file."""
@@ -247,6 +322,73 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             avg_file_size: float | None = None
             avg_lines_per_file: float | None = None
             avg_words_per_file: float | None = None
+
+        class ChannelConfig(BaseModel):
+            """Notification channel toggle configuration."""
+
+            enabled: bool = True
+
+        class AlertThresholdConfig(BaseModel):
+            """Threshold-based alert configuration."""
+
+            enabled: bool = True
+            threshold: int = Field(default=0, ge=0)
+
+        class AlertToggleConfig(BaseModel):
+            """Simple on/off alert configuration."""
+
+            enabled: bool = True
+
+        class AlertsConfig(BaseModel):
+            """All alert toggles for documentation notifications."""
+
+            critical_issues: FlextQualityModels.Quality.AlertThresholdConfig
+            quality_drop: FlextQualityModels.Quality.AlertThresholdConfig
+            broken_links: FlextQualityModels.Quality.AlertThresholdConfig
+            weekly_report: FlextQualityModels.Quality.AlertToggleConfig
+            monthly_report: FlextQualityModels.Quality.AlertToggleConfig
+
+        class EmailConfig(BaseModel):
+            """SMTP notification configuration."""
+
+            smtp_server: str
+            smtp_port: int
+            username: str
+            password: str
+            from_address: str
+            to_addresses: list[str] = Field(default_factory=list)
+
+        class SlackConfig(BaseModel):
+            """Slack notification configuration."""
+
+            webhook_url: str
+            channel: str
+            username: str
+
+        class WebhookConfig(BaseModel):
+            """Generic webhook configuration."""
+
+            url: str
+            headers: dict[str, str] = Field(default_factory=dict)
+            timeout: int = Field(default=30, ge=1)
+
+        class ChannelsConfig(BaseModel):
+            """Enabled channels for documentation notifications."""
+
+            console: FlextQualityModels.Quality.ChannelConfig
+            email: FlextQualityModels.Quality.ChannelConfig
+            slack: FlextQualityModels.Quality.ChannelConfig
+            webhook: FlextQualityModels.Quality.ChannelConfig
+
+        class NotifierConfig(BaseModel):
+            """Root notification configuration."""
+
+            enabled: bool = True
+            channels: FlextQualityModels.Quality.ChannelsConfig
+            alerts: FlextQualityModels.Quality.AlertsConfig
+            email: FlextQualityModels.Quality.EmailConfig
+            slack: FlextQualityModels.Quality.SlackConfig
+            webhook: FlextQualityModels.Quality.WebhookConfig
 
         class NotifierResults(BaseModel):
             """Results for documentation notification runs."""

@@ -694,8 +694,8 @@ def main() -> None:
     )
     if not run_any_check:
         sys.exit(1)
-    link_errors = link_validator.results.get("errors", [])
-    content_issues = content_validator.results.get("content_issues", [])
+    link_errors = link_validator.results.errors
+    content_issues = content_validator.results.content_issues
     total_errors = len(link_errors) + len(content_issues)
     _ = link_validator.save_report(args.output)
     if total_errors > 0:

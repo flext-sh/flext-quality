@@ -19,7 +19,6 @@ from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
 
 import requests
-import yaml
 from aiohttp import ClientError, ClientSession, ClientTimeout
 
 _AsyncSession = ClientSession
@@ -145,7 +144,7 @@ class LinkChecker:
             ],
         )
 
-    def load_config(self, config_path: str | None) -> None:
+    def load_config(self, _config_path: str | None) -> None:
         """Load validation configuration."""
         self.config = self._get_default_config()
 
@@ -293,7 +292,7 @@ class LinkChecker:
         self,
         url: str,
         context: dict[str, object] | None = None,
-    ) -> dict[str, object]:
+    ) -> LinkResultDict:
         """Synchronously check a single link (fallback method)."""
         start_time = time.time()
 
@@ -308,19 +307,18 @@ class LinkChecker:
 
                 response_time = time.time() - start_time
 
-                result: dict[str, object] = {
-                    "url": url,
-                    "status_code": response.status_code,
-                    "response_time": response_time,
-                    "valid": response.status_code
+                result: LinkResultDict = LinkResultDict(
+                    url=url,
+                    status_code=response.status_code,
+                    response_time=response_time,
+                    valid=response.status_code
                     in self.config["acceptable_status_codes"],
-                    "redirected": len(response.history) > 0,
-                    "final_url": response.url,
-                    "content_type": response.headers.get("content-type", ""),
-                    "context": context or {},
-                }
+                    redirected=len(response.history) > 0,
+                    final_url=response.url,
+                    content_type=response.headers.get("content-type", ""),
+                    context=context or {},
+                )
 
-                # Update performance metrics
                 self.results["performance"]["slowest_response"] = max(
                     self.results["performance"]["slowest_response"],
                     response_time,
@@ -330,37 +328,37 @@ class LinkChecker:
 
             except requests.exceptions.Timeout:
                 if attempt == self.config["retry_attempts"] - 1:
-                    return {
-                        "url": url,
-                        "error": "timeout",
-                        "response_time": self.config["external_timeout"],
-                        "valid": False,
-                        "context": context or {},
-                    }
+                    return LinkResultDict(
+                        url=url,
+                        error="timeout",
+                        response_time=self.config["external_timeout"],
+                        valid=False,
+                        context=context or {},
+                    )
             except requests.exceptions.RequestException as e:
                 if attempt == self.config["retry_attempts"] - 1:
-                    return {
-                        "url": url,
-                        "error": str(e),
-                        "response_time": time.time() - start_time,
-                        "valid": False,
-                        "context": context or {},
-                    }
+                    return LinkResultDict(
+                        url=url,
+                        error=str(e),
+                        response_time=time.time() - start_time,
+                        valid=False,
+                        context=context or {},
+                    )
             except Exception as e:
-                return {
-                    "url": url,
-                    "error": f"unexpected_error: {e!s}",
-                    "response_time": time.time() - start_time,
-                    "valid": False,
-                    "context": context or {},
-                }
+                return LinkResultDict(
+                    url=url,
+                    error=f"unexpected_error: {e!s}",
+                    response_time=time.time() - start_time,
+                    valid=False,
+                    context=context or {},
+                )
 
-        return {
-            "url": url,
-            "error": "max_retries_exceeded",
-            "valid": False,
-            "context": context or {},
-        }
+        return LinkResultDict(
+            url=url,
+            error="max_retries_exceeded",
+            valid=False,
+            context=context or {},
+        )
 
     async def check_links_batch_async(
         self, links: list[LinkInfoDict]
@@ -406,9 +404,12 @@ class LinkChecker:
         valid_times: list[float] = []
         for r in processed_results:
             response_time = r.get("response_time")
-            if response_time is not None and isinstance(response_time, (int, float)):
-                if r.get("valid"):
-                    valid_times.append(float(response_time))
+            if (
+                response_time is not None
+                and isinstance(response_time, (int, float))
+                and r.get("valid")
+            ):
+                valid_times.append(float(response_time))
 
         if valid_times:
             self.results["performance"]["average_response_time"] = sum(
@@ -417,29 +418,38 @@ class LinkChecker:
 
         return processed_results
 
-    def check_links_batch_sync(
-        self, links: list[dict[str, object]]
-    ) -> list[dict[str, object]]:
+    def check_links_batch_sync(self, links: list[LinkInfoDict]) -> list[LinkResultDict]:
         """Check multiple links synchronously with thread pool."""
         start_time = time.time()
 
         def check_single(
             link_info: dict[str, object],
-        ) -> dict[str, object]:
-            time.sleep(0.1)  # Rate limiting
-            return self.check_link_sync(link_info["url"], link_info.get("context"))
+        ) -> LinkResultDict:
+            time.sleep(0.1)
+            url = link_info.get("url", "")
+            context_obj: object = link_info.get("context")
+            if not isinstance(url, str):
+                url = ""
+            ctx: dict[str, object] | None = None
+            if isinstance(context_obj, dict):
+                ctx = dict(context_obj)
+            return self.check_link_sync(url, ctx)
 
         with ThreadPoolExecutor(max_workers=5) as executor:
             results = list(executor.map(check_single, links))
 
         self.results["performance"]["total_time"] = time.time() - start_time
 
-        # Calculate average response time
-        valid_times = [
-            r["response_time"]
-            for r in results
-            if "response_time" in r and r.get("valid")
-        ]
+        valid_times: list[float] = []
+        for r in results:
+            response_time = r.get("response_time")
+            if (
+                response_time is not None
+                and isinstance(response_time, (int, float))
+                and r.get("valid")
+            ):
+                valid_times.append(float(response_time))
+
         if valid_times:
             self.results["performance"]["average_response_time"] = sum(
                 valid_times,
@@ -449,10 +459,10 @@ class LinkChecker:
 
     async def validate_links(
         self,
-        links: list[dict[str, object]],
+        links: list[LinkInfoDict],
         *,
         use_async: bool = True,
-    ) -> dict[str, object]:
+    ) -> ResultsDict:
         """Main link validation method."""
         self.results["total_links"] = len(links)
 
@@ -502,15 +512,20 @@ class LinkChecker:
         self, links: list[dict[str, object]]
     ) -> list[dict[str, object]]:
         """Special validation for GitHub links."""
-        github_links = [link for link in links if "github.com" in link["url"]]
+        github_links: list[dict[str, object]] = []
+        for link in links:
+            url_obj: object = link.get("url")
+            if isinstance(url_obj, str) and "github.com" in url_obj:
+                github_links.append(link)
 
-        # GitHub API has rate limits, so we use a more conservative approach
         validated_links: list[dict[str, bool | object]] = []
 
         for link in github_links:
-            url = link["url"]
+            url_obj = link.get("url")
+            if not isinstance(url_obj, str):
+                continue
+            url = url_obj
 
-            # Basic URL structure validation for GitHub
             if self._validate_github_url_structure(url):
                 validated_links.append({
                     **link,
@@ -609,30 +624,38 @@ Broken Links:
         return filepath
 
 
-# Synchronous wrapper for easy usage
 def validate_links_sync(
-    links: list[dict[str, object]],
+    links: list[LinkInfoDict],
     config_path: str | None = None,
-) -> dict[str, object]:
+) -> ResultsDict:
     """Synchronous wrapper for link validation."""
     checker = LinkChecker(config_path)
-    # Run async validation in new event loop
-
     return asyncio.run(checker.validate_links(links, use_async=True))
 
 
 if __name__ == "__main__":
-    # Example usage
-    test_links = [
-        {
-            "url": "https://github.com/microsoft/vscode",
-            "context": {"file": "README.md"},
-        },
-        {"url": "https://httpbin.org/status/200", "context": {"file": "docs/setup.md"}},
-        {
-            "url": "https://httpbin.org/status/404",
-            "context": {"file": "docs/broken.md"},
-        },
+    test_links: list[LinkInfoDict] = [
+        LinkInfoDict(
+            url="https://github.com/microsoft/vscode",
+            text="VSCode",
+            type="external",
+            file="README.md",
+            context={"file": "README.md"},
+        ),
+        LinkInfoDict(
+            url="https://httpbin.org/status/200",
+            text="httpbin",
+            type="external",
+            file="docs/setup.md",
+            context={"file": "docs/setup.md"},
+        ),
+        LinkInfoDict(
+            url="https://httpbin.org/status/404",
+            text="broken",
+            type="external",
+            file="docs/broken.md",
+            context={"file": "docs/broken.md"},
+        ),
     ]
 
     import asyncio

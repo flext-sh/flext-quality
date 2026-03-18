@@ -63,7 +63,7 @@ def _as_str(value: object, default: str) -> str:
     return value if isinstance(value, str) else default
 
 
-def _as_bool(value: object, default: bool) -> bool:
+def _as_bool(value: object, default: bool, /) -> bool:  # noqa: FBT001
     """Normalize unknown config values to bool."""
     return value if isinstance(value, bool) else default
 

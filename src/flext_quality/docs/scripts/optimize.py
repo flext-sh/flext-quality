@@ -21,7 +21,6 @@ from pathlib import Path
 from typing import Any
 
 import yaml
-from fix_tests import filepath
 
 MIN_HEADINGS_FOR_TOC = 5
 
@@ -340,7 +339,7 @@ class DocumentationOptimizer:
             _ = self.results["backups_created"].append(
                 str(backup_path.relative_to(self.project_root))
             )
-        _ = filepath.write_text(content, encoding="utf-8")
+        _ = file_path.write_text(content, encoding="utf-8")
 
     def generate_report(self, report_format: str = "json") -> str:
         """Generate optimization report."""

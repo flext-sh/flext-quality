@@ -134,14 +134,14 @@ class AuditorResults(BaseModel):
 
     timestamp: str = Field(description="ISO timestamp when audit ran")
     files_analyzed: int = Field(default=0, description="Number of files analyzed")
-    issues: list[IssueDict] = Field(
+    issues: list[dict[str, Any]] = Field(
         default_factory=list, description="List of issues found"
     )
-    metrics: MetricsDict = Field(
+    metrics: dict[str, Any] = Field(
         default_factory=dict,
-        description="Quality metrics",  # type: ignore[arg-type]
+        description="Quality metrics",
     )
-    recommendations: list[RecommendationDict] = Field(
+    recommendations: list[dict[str, Any]] = Field(
         default_factory=list, description="List of recommendations"
     )
 

@@ -12,7 +12,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import ClassVar, NotRequired, TypedDict
 
-from .base_classes import FileMetadata
+from flext_quality import m
 
 
 class FileStatistics(TypedDict):
@@ -110,7 +110,7 @@ class DocumentationFinder:
 
         # Cache for found files
         self._file_cache: list[Path] | None = None
-        self._metadata_cache: dict[str, FileMetadata] = {}
+        self._metadata_cache: dict[str, m.Quality.FileMetadata] = {}
 
     def _load_ignore_file(self) -> None:
         """Load ignore patterns from .gitignore or similar file."""
@@ -261,14 +261,16 @@ class DocumentationFinder:
         extensions = [ext.lower().lstrip(".") for ext in extensions]
         return [f for f in all_files if f.suffix.lower().lstrip(".") in extensions]
 
-    def get_file_metadata(self, file_path: Path) -> FileMetadata:
+    def get_file_metadata(self, file_path: Path) -> m.Quality.FileMetadata:
         """Get metadata for a specific file."""
         path_str = str(file_path)
         if path_str not in self._metadata_cache:
-            self._metadata_cache[path_str] = FileMetadata(file_path)
+            self._metadata_cache[path_str] = m.Quality.FileMetadata.from_path(file_path)
         return self._metadata_cache[path_str]
 
-    def get_files_metadata(self, files: list[Path] | None = None) -> list[FileMetadata]:
+    def get_files_metadata(
+        self, files: list[Path] | None = None
+    ) -> list[m.Quality.FileMetadata]:
         """Get metadata for multiple files."""
         if files is None:
             files = self.find_files()
@@ -396,9 +398,13 @@ class DocumentationFinder:
 
         # Average metrics
         if stats["total_files"] > 0:
-            stats["avg_file_size"] = stats["total_size"] / stats["total_files"]
-            stats["avg_lines_per_file"] = stats["total_lines"] / stats["total_files"]
-            stats["avg_words_per_file"] = stats["total_words"] / stats["total_files"]
+            stats["avg_file_size"] = stats.get("total_size", 0) / stats["total_files"]
+            stats["avg_lines_per_file"] = (
+                stats.get("total_lines", 0) / stats["total_files"]
+            )
+            stats["avg_words_per_file"] = (
+                stats.get("total_words", 0) / stats["total_files"]
+            )
 
         return stats
 
