@@ -23,7 +23,9 @@ class HookManager:
         self._config_path = config_path
 
     def execute(
-        self, event: str, input_data: t.Quality.HookInput
+        self,
+        event: str,
+        input_data: t.Quality.HookInput,
     ) -> r[t.Quality.HookOutput]:
         """Execute all hooks for an event."""
         try:

@@ -26,7 +26,9 @@ class FlextQualityValidators:
             ...
 
         def validate(
-            self, content: str, file_path: Path | None = None
+            self,
+            content: str,
+            file_path: Path | None = None,
         ) -> r[list[Mapping[str, object]]]:
             """Validate content and return violations."""
             ...
@@ -50,7 +52,9 @@ class FlextQualityValidators:
 
         @override
         def validate(
-            self, content: str, file_path: Path | None = None
+            self,
+            content: str,
+            file_path: Path | None = None,
         ) -> r[list[Mapping[str, object]]]:
             """Validate content against patterns."""
             violations: list[Mapping[str, object]] = []
@@ -100,7 +104,9 @@ class FlextQualityValidators:
 
         @override
         def validate(
-            self, content: str, file_path: Path | None = None
+            self,
+            content: str,
+            file_path: Path | None = None,
         ) -> r[list[Mapping[str, object]]]:
             """Validate tier violations."""
             violations: list[Mapping[str, object]] = []
@@ -157,7 +163,9 @@ class FlextQualityValidators:
             self._validators[validator.name] = validator
 
         def validate_all(
-            self, content: str, file_path: Path | None = None
+            self,
+            content: str,
+            file_path: Path | None = None,
         ) -> r[list[Mapping[str, object]]]:
             """Run all validators."""
             all_violations: list[Mapping[str, object]] = []

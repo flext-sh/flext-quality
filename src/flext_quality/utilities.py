@@ -52,7 +52,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                         raw_rules = parsed_dict.get("rules", [])
                     case _:
                         return r[list[Mapping[str, t.NormalizedValue]]].fail(
-                            "Expected YAML dict"
+                            "Expected YAML dict",
                         )
                 match raw_rules:
                     case list() as rules_list:
@@ -61,7 +61,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                         ]
                     case _:
                         return r[list[Mapping[str, t.NormalizedValue]]].fail(
-                            "Expected rules list"
+                            "Expected rules list",
                         )
                 return r[list[Mapping[str, t.NormalizedValue]]].ok(rules)
             except (
@@ -74,7 +74,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                 ImportError,
             ) as e:
                 return r[list[Mapping[str, t.NormalizedValue]]].fail(
-                    f"Failed to load rules: {e}"
+                    f"Failed to load rules: {e}",
                 )
 
         @staticmethod
@@ -97,7 +97,8 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
 
         @staticmethod
         def run_shell_command(
-            cmd: list[str], timeout_ms: int = c.Quality.Defaults.HOOK_TIMEOUT_MS
+            cmd: list[str],
+            timeout_ms: int = c.Quality.Defaults.HOOK_TIMEOUT_MS,
         ) -> r[str]:
             """Run a shell command with timeout."""
             try:

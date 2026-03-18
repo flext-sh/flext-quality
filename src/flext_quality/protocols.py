@@ -25,7 +25,8 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
             matcher: list[str] | None
 
             def execute(
-                self, input_data: t.Quality.HookInput
+                self,
+                input_data: t.Quality.HookInput,
             ) -> r[t.Quality.HookOutput]:
                 """Execute the hook logic."""
                 ...
@@ -69,7 +70,8 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
             description: str
 
             def execute(
-                self, params: Mapping[str, t.NormalizedValue]
+                self,
+                params: Mapping[str, t.NormalizedValue],
             ) -> r[Mapping[str, t.NormalizedValue]]:
                 """Execute MCP tool."""
                 ...

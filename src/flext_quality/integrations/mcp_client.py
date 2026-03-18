@@ -76,11 +76,11 @@ class FlextQualityMcpClient:
         call_params: dict[str, t.NormalizedValue] = {}
         if isinstance(params, Mapping):
             validated_params = TypeAdapter(
-                dict[str, t.NormalizedValue]
+                dict[str, t.NormalizedValue],
             ).validate_python(params)
             call_params = dict(validated_params)
         return r[McpToolCall].ok(
-            McpToolCall(server=server, tool=tool, params=call_params)
+            McpToolCall(server=server, tool=tool, params=call_params),
         )
 
     def health_check(self) -> r[Mapping[str, t.NormalizedValue]]:
@@ -110,7 +110,7 @@ class FlextQualityMcpClient:
                     success=False,
                     data=None,
                     error=output or f"Command failed with exit code {exit_code}",
-                )
+                ),
             )
         try:
             parsed = TypeAdapter(dict[str, t.NormalizedValue]).validate_json(output)
@@ -120,7 +120,7 @@ class FlextQualityMcpClient:
                     success=True,
                     data=result_data,
                     error=None,
-                )
+                ),
             )
         except ValueError:
             try:
@@ -129,7 +129,7 @@ class FlextQualityMcpClient:
                 for item in parsed_list:
                     if isinstance(item, Mapping):
                         validated_item = TypeAdapter(
-                            dict[str, t.NormalizedValue]
+                            dict[str, t.NormalizedValue],
                         ).validate_python(item)
                         coerced_data.append({
                             str(key): str(value)
@@ -143,12 +143,12 @@ class FlextQualityMcpClient:
                         data={
                             "items": TypeAdapter(list[dict[str, str]])
                             .dump_json(coerced_data)
-                            .decode("utf-8")
+                            .decode("utf-8"),
                         },
                         error=None,
-                    )
+                    ),
                 )
             except ValueError:
                 return r[McpToolResult].ok(
-                    McpToolResult(success=True, data={"raw": output}, error=None)
+                    McpToolResult(success=True, data={"raw": output}, error=None),
                 )

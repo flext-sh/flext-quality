@@ -39,7 +39,9 @@ class FlextQualityRulesEngine:
         return r[int].ok(len(self._rules))
 
     def validate(
-        self, path: str, context: Mapping[str, object] | None = None
+        self,
+        path: str,
+        context: Mapping[str, object] | None = None,
     ) -> r[list[Mapping[str, object]]]:
         """Validate code against loaded rules."""
         if not self._loaded:
@@ -57,7 +59,9 @@ class FlextQualityRulesEngine:
         return r[list[Mapping[str, object]]].ok(violations)
 
     def validate_content(
-        self, content: str, filename: str = "<string>"
+        self,
+        content: str,
+        filename: str = "<string>",
     ) -> r[list[Mapping[str, object]]]:
         """Validate content string against loaded rules."""
         if not self._loaded:
@@ -73,7 +77,10 @@ class FlextQualityRulesEngine:
         return r[list[Mapping[str, object]]].ok(violations)
 
     def _check_rule(
-        self, rule: m.Quality.RuleDefinition, content: str, filename: str
+        self,
+        rule: m.Quality.RuleDefinition,
+        content: str,
+        filename: str,
     ) -> list[Mapping[str, object]]:
         """Check a single rule against content."""
         violations: list[Mapping[str, object]] = []
@@ -119,7 +126,9 @@ class FlextQualityRulesEngine:
         return mapping.get(rule_type, c.Quality.Severity.INFO)
 
     def _validate_file(
-        self, file_path: Path, _context: Mapping[str, object]
+        self,
+        file_path: Path,
+        _context: Mapping[str, object],
     ) -> list[Mapping[str, object]]:
         """Validate a single file against rules."""
         try:
@@ -139,7 +148,7 @@ class FlextQualityRulesEngine:
                     "file": str(file_path),
                     "message": f"Failed to read file: {e}",
                     "severity": c.Quality.Severity.ERROR,
-                }
+                },
             ]
         violations: list[Mapping[str, object]] = []
         for rule in self._rules:

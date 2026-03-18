@@ -14,7 +14,10 @@ from flext_quality.rules.engine import FlextQualityRulesEngine
 
 @mcp.tool()
 def search_memory(
-    query: str, *, search_type: str = "observations", limit: int | None = None
+    query: str,
+    *,
+    search_type: str = "observations",
+    limit: int | None = None,
 ) -> Mapping[str, t.NormalizedValue]:
     """Build command to search cross-session memory via claude-mem.
 
@@ -41,7 +44,9 @@ def search_memory(
 
 @mcp.tool()
 def search_code(
-    query: str, *, limit: int | None = None
+    query: str,
+    *,
+    limit: int | None = None,
 ) -> Mapping[str, t.NormalizedValue]:
     """Build command for semantic code search via claude-context.
 

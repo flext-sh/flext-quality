@@ -41,12 +41,17 @@ class FlextQualityClaudeContextClient:
         return self._mcp.build_tool_call(self.SERVER_NAME, "index_codebase", params)
 
     def build_search_call(
-        self, query: str, *, limit: int | None = None
+        self,
+        query: str,
+        *,
+        limit: int | None = None,
     ) -> r[McpToolCall]:
         """Build a search_code tool call."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_SEARCH_LIMIT
         return self._mcp.build_tool_call(
-            self.SERVER_NAME, "search_code", {"query": query, "limit": search_limit}
+            self.SERVER_NAME,
+            "search_code",
+            {"query": query, "limit": search_limit},
         )
 
     def build_status_call(self) -> r[McpToolCall]:
@@ -58,12 +63,15 @@ class FlextQualityClaudeContextClient:
         return self.build_index_call(path).flat_map(self._mcp.build_call_command)
 
     def get_search_command(
-        self, query: str, *, limit: int | None = None
+        self,
+        query: str,
+        *,
+        limit: int | None = None,
     ) -> r[list[str]]:
         """Get the mcp-cli command for code search."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_SEARCH_LIMIT
         return self.build_search_call(query, limit=search_limit).flat_map(
-            self._mcp.build_call_command
+            self._mcp.build_call_command,
         )
 
     def health_check(self) -> r[Mapping[str, t.NormalizedValue]]:

@@ -32,7 +32,8 @@ def get_rules_config() -> str:
     return (
         TypeAdapter(list[dict[str, t.NormalizedValue]])
         .dump_json(
-            [rule.model_dump() for rule in rules], indent=c.Quality.Defaults.JSON_INDENT
+            [rule.model_dump() for rule in rules],
+            indent=c.Quality.Defaults.JSON_INDENT,
         )
         .decode("utf-8")
     )

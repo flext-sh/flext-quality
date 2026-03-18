@@ -18,7 +18,7 @@ class FlextQualityRulesLoader:
         """Load rules from YAML file."""
         if not path.exists():
             return r[list[m.Quality.RuleDefinition]].fail(
-                f"Rules file not found: {path}"
+                f"Rules file not found: {path}",
             )
         try:
             with path.open(encoding="utf-8") as f:
@@ -38,14 +38,14 @@ class FlextQualityRulesLoader:
                 rules_data = parsed_dict.get("rules", [])
             case _:
                 return r[list[m.Quality.RuleDefinition]].fail(
-                    "Invalid YAML: expected dict at root"
+                    "Invalid YAML: expected dict at root",
                 )
         match rules_data:
             case list() as rules_list:
                 pass
             case _:
                 return r[list[m.Quality.RuleDefinition]].fail(
-                    "Invalid YAML: 'rules' must be a list"
+                    "Invalid YAML: 'rules' must be a list",
                 )
         rules: list[m.Quality.RuleDefinition] = []
         for idx, rule_data in enumerate(rules_list):
@@ -54,7 +54,7 @@ class FlextQualityRulesLoader:
                     pass
                 case _:
                     return r[list[m.Quality.RuleDefinition]].fail(
-                        f"Rule {idx}: expected dict"
+                        f"Rule {idx}: expected dict",
                     )
             result = self._parse_rule(rule_dict, idx)
             if result.is_failure:
@@ -69,13 +69,15 @@ class FlextQualityRulesLoader:
             result = self.load(path)
             if result.is_failure:
                 return r[list[m.Quality.RuleDefinition]].fail(
-                    f"Error loading {path}: {result.error}"
+                    f"Error loading {path}: {result.error}",
                 )
             all_rules.extend(result.value)
         return r[list[m.Quality.RuleDefinition]].ok(all_rules)
 
     def _parse_rule(
-        self, data: Mapping[str, object], index: int
+        self,
+        data: Mapping[str, object],
+        index: int,
     ) -> r[m.Quality.RuleDefinition]:
         """Parse a single rule from dict."""
         name = data.get("name")
@@ -89,7 +91,7 @@ class FlextQualityRulesLoader:
         except ValueError:
             valid_types = [m.value for m in c.Quality.RuleType.__members__.values()]
             return r[m.Quality.RuleDefinition].fail(
-                f"Rule {index}: invalid type '{rule_type_str}'. Valid: {valid_types}"
+                f"Rule {index}: invalid type '{rule_type_str}'. Valid: {valid_types}",
             )
         description = data.get("description", "")
         action = data.get("action", "warn")

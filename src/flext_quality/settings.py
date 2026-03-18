@@ -44,7 +44,7 @@ class FlextQualitySettings(FlextSettings):
         if self.max_function_length > self.max_class_length:
             return r[bool].fail(
                 f"max_function_length ({self.max_function_length}) must be <= "
-                f"max_class_length ({self.max_class_length})"
+                f"max_class_length ({self.max_class_length})",
             )
         return r[bool].ok(True)
 
