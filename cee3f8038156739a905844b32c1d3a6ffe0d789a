@@ -1,0 +1,23 @@
+src/flext_quality/docs/scripts/optimize.py
+  7b00d79ef8e2013c 37-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.15",
+  "base_commit_sha": "cee3f8038156739a905844b32c1d3a6ffe0d789a",
+  "prompts": {
+    "7b00d79ef8e2013c": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_2fe4f524cffe2P0ZrkPayKFWfS",
+        "model": "anthropic/claude-opus-4-6"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 2,
+      "total_deletions": 0,
+      "accepted_lines": 2,
+      "overriden_lines": 0
+    }
+  }
+}
