@@ -34,6 +34,8 @@ def _empty_backups() -> list[str]:
 
 
 class OptimizerResults(BaseModel):
+    """Results of a documentation optimization run."""
+
     timestamp: str
     files_processed: int = 0
     changes_made: int = 0
