@@ -230,17 +230,6 @@ class LinkChecker:
             user_agent = self.config.get("user_agent", "")
             acceptable_codes = self.config.get("acceptable_status_codes", [])
 
-            if not isinstance(external_timeout, int):
-                external_timeout = 10
-            if not isinstance(follow_redirects, bool):
-                follow_redirects = True
-            if not isinstance(max_redirects, int):
-                max_redirects = 5
-            if not isinstance(user_agent, str):
-                user_agent = ""
-            if not isinstance(acceptable_codes, list):
-                acceptable_codes: list[int] = []
-
             async with self.session.head(
                 url,
                 timeout=ClientTimeout(total=external_timeout),
@@ -380,10 +369,6 @@ class LinkChecker:
                 await asyncio.sleep(0.1)
                 url = link_info.get("url", "")
                 context = link_info.get("context")
-                if not isinstance(url, str):
-                    url = ""
-                if context is not None and not isinstance(context, dict):
-                    context = None
                 return await self.check_link_async(url, context)
 
         tasks = [check_with_semaphore(link) for link in links]
@@ -409,11 +394,7 @@ class LinkChecker:
         valid_times: list[float] = []
         for r in processed_results:
             response_time = r.get("response_time")
-            if (
-                response_time is not None
-                and isinstance(response_time, (int, float))
-                and r.get("valid")
-            ):
+            if response_time is not None and r.get("valid"):
                 valid_times.append(float(response_time))
 
         if valid_times:
@@ -434,8 +415,6 @@ class LinkChecker:
             url = link_info.get("url", "")
             raw_context = link_info.get("context")
             context_obj = raw_context if isinstance(raw_context, dict) else None
-            if not isinstance(url, str):
-                url = ""
             ctx = context_obj
             return self.check_link_sync(url, ctx)
 
@@ -447,11 +426,7 @@ class LinkChecker:
         valid_times: list[float] = []
         for r in results:
             response_time = r.get("response_time")
-            if (
-                response_time is not None
-                and isinstance(response_time, (int, float))
-                and r.get("valid")
-            ):
+            if response_time is not None and r.get("valid"):
                 valid_times.append(float(response_time))
 
         if valid_times:

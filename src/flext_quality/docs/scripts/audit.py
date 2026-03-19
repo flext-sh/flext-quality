@@ -40,6 +40,8 @@ type RecommendationDict = dict[str, object]
 
 
 class QualityThresholdsConfig(BaseModel):
+    """Configuration for quality threshold limits."""
+
     max_age_days: int = 90
     min_word_count: int = 100
     max_broken_links: int = 0
@@ -47,6 +49,8 @@ class QualityThresholdsConfig(BaseModel):
 
 
 class ContentChecksConfig(BaseModel):
+    """Configuration for content validation checks."""
+
     check_freshness: bool = True
     check_completeness: bool = True
     check_consistency: bool = True
@@ -54,6 +58,8 @@ class ContentChecksConfig(BaseModel):
 
 
 class SeverityLevelsConfig(BaseModel):
+    """Configuration for severity level categorization."""
+
     critical: list[str] = Field(default_factory=list)
     high: list[str] = Field(default_factory=list)
     medium: list[str] = Field(default_factory=list)
@@ -61,6 +67,8 @@ class SeverityLevelsConfig(BaseModel):
 
 
 class AuditRulesConfig(BaseModel):
+    """Configuration for audit rules and thresholds."""
+
     quality_thresholds: QualityThresholdsConfig = Field(
         default_factory=QualityThresholdsConfig
     )
@@ -69,6 +77,8 @@ class AuditRulesConfig(BaseModel):
 
 
 class MarkdownStyleConfig(BaseModel):
+    """Configuration for Markdown style preferences."""
+
     heading_style: str = "atx"
     list_style: str = "dash"
     emphasis_style: str = "*"
@@ -76,24 +86,32 @@ class MarkdownStyleConfig(BaseModel):
 
 
 class AccessibilityConfig(BaseModel):
+    """Configuration for accessibility requirements."""
+
     require_alt_text: bool = True
     descriptive_links: bool = True
     heading_structure: bool = True
 
 
 class FormattingConfig(BaseModel):
+    """Configuration for formatting standards."""
+
     max_line_length: int = 88
     consistent_indentation: bool = True
     trailing_spaces: bool = False
 
 
 class StyleGuideConfig(BaseModel):
+    """Configuration for style guide rules."""
+
     markdown: MarkdownStyleConfig = Field(default_factory=MarkdownStyleConfig)
     accessibility: AccessibilityConfig = Field(default_factory=AccessibilityConfig)
     formatting: FormattingConfig = Field(default_factory=FormattingConfig)
 
 
 class LinkValidationConfig(BaseModel):
+    """Configuration for link validation settings."""
+
     timeout: int = 10
     retry_attempts: int = 3
     user_agent: str = "FLEXT-Quality-Doc-Auditor/1.0"
@@ -103,6 +121,8 @@ class LinkValidationConfig(BaseModel):
 
 
 class ContentAnalysisConfig(BaseModel):
+    """Configuration for content analysis parameters."""
+
     min_section_depth: int = 2
     required_sections: list[str] = Field(
         default_factory=lambda: ["Overview", "Installation", "Usage"]
@@ -112,6 +132,8 @@ class ContentAnalysisConfig(BaseModel):
 
 
 class ValidationConfig(BaseModel):
+    """Configuration for validation settings."""
+
     link_validation: LinkValidationConfig = Field(default_factory=LinkValidationConfig)
     content_analysis: ContentAnalysisConfig = Field(
         default_factory=ContentAnalysisConfig
@@ -965,7 +987,7 @@ def main() -> None:
         ValueError,
     ):
         if args.ci_mode or args.fail_on_errors:
-            raise SystemExit(1)
+            raise SystemExit(1) from None
 
 
 if __name__ == "__main__":

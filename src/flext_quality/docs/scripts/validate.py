@@ -16,7 +16,6 @@ import argparse
 import concurrent.futures
 import json
 import re
-import sys
 from datetime import UTC, datetime
 from pathlib import Path
 
