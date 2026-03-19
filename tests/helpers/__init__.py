@@ -22,6 +22,14 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
+    from flext_quality.decorators import d
+    from flext_quality.exceptions import e
+    from flext_quality.handlers import h
+    from flext_quality.mixins import x
+    from flext_quality.result import r
+    from flext_quality.service import s
+    from flext_quality.utilities import u
+
     from .constants import TestsConstants, c
     from .models import TestsModels, m
     from .protocols import TestsProtocols, p
@@ -58,11 +66,18 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "assert_metrics_structure",
     ),
     "c": ("tests.helpers.constants", "c"),
+    "d": ("flext_quality.decorators", "d"),
+    "e": ("flext_quality.exceptions", "e"),
+    "h": ("flext_quality.handlers", "h"),
     "m": ("tests.helpers.models", "m"),
     "p": ("tests.helpers.protocols", "p"),
+    "r": ("flext_quality.result", "r"),
+    "s": ("flext_quality.service", "s"),
     "safe_dict_access": ("tests.helpers.typing_helpers", "safe_dict_access"),
     "safe_list_access": ("tests.helpers.typing_helpers", "safe_list_access"),
     "t": ("tests.helpers.typings", "t"),
+    "u": ("flext_quality.utilities", "u"),
+    "x": ("flext_quality.mixins", "x"),
 }
 
 __all__ = [
@@ -77,11 +92,18 @@ __all__ = [
     "assert_issues_structure",
     "assert_metrics_structure",
     "c",
+    "d",
+    "e",
+    "h",
     "m",
     "p",
+    "r",
+    "s",
     "safe_dict_access",
     "safe_list_access",
     "t",
+    "u",
+    "x",
 ]
 
 

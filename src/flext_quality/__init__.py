@@ -10,6 +10,12 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
 if TYPE_CHECKING:
+    from flext_cli.decorators import d
+    from flext_cli.exceptions import e
+    from flext_cli.handlers import h
+    from flext_cli.mixins import x
+    from flext_cli.result import r
+    from flext_cli.service import s
     from flext_core.typings import FlextTypes
 
     from flext_quality import docs, hooks, integrations, mcp, rules, services
@@ -80,7 +86,6 @@ if TYPE_CHECKING:
         ContentValidator,
         ContentValidatorResults,
         LinkCheckResult,
-        LinkCheckResult as r,
         LinkRecord,
         LinkValidator,
         LinkValidatorResults,
@@ -152,10 +157,7 @@ if TYPE_CHECKING:
     from flext_quality.rules.engine import FlextQualityRulesEngine
     from flext_quality.rules.loader import FlextQualityRulesLoader
     from flext_quality.rules.validators import FlextQualityValidators
-    from flext_quality.services.cli import (
-        FlextQualityCliService,
-        FlextQualityCliService as s,
-    )
+    from flext_quality.services.cli import FlextQualityCliService
     from flext_quality.settings import FlextQualitySettings
     from flext_quality.typings import FlextQualityTypes, t
     from flext_quality.utilities import FlextQualityUtilities, u
@@ -358,7 +360,9 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     ),
     "c": ("flext_quality.constants", "c"),
     "core": ("flext_quality.docs.core", ""),
+    "d": ("flext_cli.decorators", "d"),
     "docs": ("flext_quality.docs", ""),
+    "e": ("flext_cli.exceptions", "e"),
     "execute_hook": ("flext_quality.mcp.tools", "execute_hook"),
     "get_hooks_config": ("flext_quality.mcp.resources", "get_hooks_config"),
     "get_integrations_status": (
@@ -367,14 +371,15 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     ),
     "get_rules_config": ("flext_quality.mcp.resources", "get_rules_config"),
     "get_server": ("flext_quality.mcp.server", "get_server"),
+    "h": ("flext_cli.handlers", "h"),
     "hooks": ("flext_quality.hooks", ""),
     "integrations": ("flext_quality.integrations", ""),
     "m": ("flext_quality.models", "m"),
     "mcp": ("flext_quality.mcp", ""),
     "p": ("flext_quality.protocols", "p"),
-    "r": ("flext_quality.docs.scripts.validate", "LinkCheckResult"),
+    "r": ("flext_cli.result", "r"),
     "rules": ("flext_quality.rules", ""),
-    "s": ("flext_quality.services.cli", "FlextQualityCliService"),
+    "s": ("flext_cli.service", "s"),
     "scripts": ("flext_quality.docs.scripts", ""),
     "search_code": ("flext_quality.mcp.tools", "search_code"),
     "search_memory": ("flext_quality.mcp.tools", "search_memory"),
@@ -395,6 +400,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "validate_links_sync",
     ),
     "validate_rules": ("flext_quality.mcp.tools", "validate_rules"),
+    "x": ("flext_cli.mixins", "x"),
 }
 
 __all__ = [
@@ -499,12 +505,15 @@ __all__ = [
     "analyze_files_content",
     "c",
     "core",
+    "d",
     "docs",
+    "e",
     "execute_hook",
     "get_hooks_config",
     "get_integrations_status",
     "get_rules_config",
     "get_server",
+    "h",
     "hooks",
     "integrations",
     "m",
@@ -524,6 +533,7 @@ __all__ = [
     "validate_files_style",
     "validate_links_sync",
     "validate_rules",
+    "x",
 ]
 
 

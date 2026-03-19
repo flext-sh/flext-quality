@@ -12,22 +12,16 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
-    from flext_quality.services.cli import (
-        FlextQualityCliService,
-        FlextQualityCliService as s,
-        main,
-    )
+    from flext_quality.services.cli import FlextQualityCliService, main
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextQualityCliService": ("flext_quality.services.cli", "FlextQualityCliService"),
     "main": ("flext_quality.services.cli", "main"),
-    "s": ("flext_quality.services.cli", "FlextQualityCliService"),
 }
 
 __all__ = [
     "FlextQualityCliService",
     "main",
-    "s",
 ]
 
 

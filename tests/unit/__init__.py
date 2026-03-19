@@ -21,11 +21,7 @@ if TYPE_CHECKING:
         TestFlextQualityValidation,
     )
     from .test_basic import test_basic
-    from .test_cli import (
-        TestFlextQualityCliService,
-        TestFlextQualityCliService as s,
-        TestMainFunction,
-    )
+    from .test_cli import TestFlextQualityCliService, TestMainFunction
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "TestFlextQualityAPI": ("tests.unit.test_api", "TestFlextQualityAPI"),
@@ -45,7 +41,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     ),
     "TestFlextQualityValidation": ("tests.unit.test_api", "TestFlextQualityValidation"),
     "TestMainFunction": ("tests.unit.test_cli", "TestMainFunction"),
-    "s": ("tests.unit.test_cli", "TestFlextQualityCliService"),
     "test_basic": ("tests.unit.test_basic", "test_basic"),
 }
 
@@ -58,7 +53,6 @@ __all__ = [
     "TestFlextQualityStdinProcessing",
     "TestFlextQualityValidation",
     "TestMainFunction",
-    "s",
     "test_basic",
 ]
 

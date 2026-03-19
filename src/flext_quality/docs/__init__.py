@@ -86,7 +86,6 @@ if TYPE_CHECKING:
         ContentValidator,
         ContentValidatorResults,
         LinkCheckResult,
-        LinkCheckResult as r,
         LinkRecord,
         LinkValidator,
         LinkValidatorResults,
@@ -283,7 +282,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     ),
     "core": ("flext_quality.docs.core", ""),
     "main": ("flext_quality.docs.scheduled_maintenance", "main"),
-    "r": ("flext_quality.docs.scripts.validate", "LinkCheckResult"),
     "scripts": ("flext_quality.docs.scripts", ""),
     "tools": ("flext_quality.docs.tools", ""),
     "validate_file_style": (
@@ -382,7 +380,6 @@ __all__ = [
     "analyze_files_content",
     "core",
     "main",
-    "r",
     "scripts",
     "tools",
     "validate_file_style",

@@ -26,7 +26,6 @@ if TYPE_CHECKING:
     from flext_quality.integrations.code_execution import (
         ExecutionRequest,
         ExecutionResult,
-        ExecutionResult as r,
         FlextQualityCodeExecutionBridge,
     )
     from flext_quality.integrations.mcp_client import (
@@ -59,7 +58,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     ),
     "McpToolCall": ("flext_quality.integrations.mcp_client", "McpToolCall"),
     "McpToolResult": ("flext_quality.integrations.mcp_client", "McpToolResult"),
-    "r": ("flext_quality.integrations.code_execution", "ExecutionResult"),
 }
 
 __all__ = [
@@ -71,7 +69,6 @@ __all__ = [
     "FlextQualityMcpClient",
     "McpToolCall",
     "McpToolResult",
-    "r",
 ]
 
 

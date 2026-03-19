@@ -12,6 +12,13 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
+    from flext_quality.decorators import d
+    from flext_quality.exceptions import e
+    from flext_quality.handlers import h
+    from flext_quality.mixins import x
+    from flext_quality.result import r
+    from flext_quality.service import s
+
     from . import helpers as helpers, unit as unit
     from .conftest import (
         MockQualityAnalyzer,
@@ -64,11 +71,7 @@ if TYPE_CHECKING:
         TestFlextQualityValidation,
     )
     from .unit.test_basic import test_basic
-    from .unit.test_cli import (
-        TestFlextQualityCliService,
-        TestFlextQualityCliService as s,
-        TestMainFunction,
-    )
+    from .unit.test_cli import TestFlextQualityCliService, TestMainFunction
     from .utilities import TestsFlextQualityUtilities, u
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
@@ -130,7 +133,10 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "celery_config": ("tests.conftest", "celery_config"),
     "code_analysis_config": ("tests.conftest", "code_analysis_config"),
     "codeclimate_config": ("tests.conftest", "codeclimate_config"),
+    "d": ("flext_quality.decorators", "d"),
     "dashboard_data": ("tests.conftest", "dashboard_data"),
+    "e": ("flext_quality.exceptions", "e"),
+    "h": ("flext_quality.handlers", "h"),
     "helpers": ("tests.helpers", ""),
     "m": ("tests.models", "m"),
     "mock_quality_analyzer": ("tests.conftest", "mock_quality_analyzer"),
@@ -139,8 +145,9 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "package_metadata": ("tests.conftest", "package_metadata"),
     "pytest_configure": ("tests.conftest", "pytest_configure"),
     "quality_metrics_data": ("tests.conftest", "quality_metrics_data"),
+    "r": ("flext_quality.result", "r"),
     "report_config": ("tests.conftest", "report_config"),
-    "s": ("tests.unit.test_cli", "TestFlextQualityCliService"),
+    "s": ("flext_quality.service", "s"),
     "safe_dict_access": ("tests.helpers.typing_helpers", "safe_dict_access"),
     "safe_list_access": ("tests.helpers.typing_helpers", "safe_list_access"),
     "sample_code_repository": ("tests.conftest", "sample_code_repository"),
@@ -153,6 +160,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "tm": ("tests.models", "tm"),
     "u": ("tests.utilities", "u"),
     "unit": ("tests.unit", ""),
+    "x": ("flext_quality.mixins", "x"),
 }
 
 __all__ = [
@@ -190,7 +198,10 @@ __all__ = [
     "celery_config",
     "code_analysis_config",
     "codeclimate_config",
+    "d",
     "dashboard_data",
+    "e",
+    "h",
     "helpers",
     "m",
     "mock_quality_analyzer",
@@ -199,6 +210,7 @@ __all__ = [
     "package_metadata",
     "pytest_configure",
     "quality_metrics_data",
+    "r",
     "report_config",
     "s",
     "safe_dict_access",
@@ -213,6 +225,7 @@ __all__ = [
     "tm",
     "u",
     "unit",
+    "x",
 ]
 
 
