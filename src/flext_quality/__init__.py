@@ -10,12 +10,7 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
 if TYPE_CHECKING:
-    from flext_cli.decorators import d
-    from flext_cli.exceptions import e
-    from flext_cli.handlers import h
-    from flext_cli.mixins import x
-    from flext_cli.result import r
-    from flext_cli.service import s
+    from flext_cli import d, e, h, r, s, x
     from flext_core.typings import FlextTypes
 
     from flext_quality import docs, hooks, integrations, mcp, rules, services
@@ -360,9 +355,9 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     ),
     "c": ("flext_quality.constants", "c"),
     "core": ("flext_quality.docs.core", ""),
-    "d": ("flext_cli.decorators", "d"),
+    "d": ("flext_cli", "d"),
     "docs": ("flext_quality.docs", ""),
-    "e": ("flext_cli.exceptions", "e"),
+    "e": ("flext_cli", "e"),
     "execute_hook": ("flext_quality.mcp.tools", "execute_hook"),
     "get_hooks_config": ("flext_quality.mcp.resources", "get_hooks_config"),
     "get_integrations_status": (
@@ -371,15 +366,15 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     ),
     "get_rules_config": ("flext_quality.mcp.resources", "get_rules_config"),
     "get_server": ("flext_quality.mcp.server", "get_server"),
-    "h": ("flext_cli.handlers", "h"),
+    "h": ("flext_cli", "h"),
     "hooks": ("flext_quality.hooks", ""),
     "integrations": ("flext_quality.integrations", ""),
     "m": ("flext_quality.models", "m"),
     "mcp": ("flext_quality.mcp", ""),
     "p": ("flext_quality.protocols", "p"),
-    "r": ("flext_cli.result", "r"),
+    "r": ("flext_cli", "r"),
     "rules": ("flext_quality.rules", ""),
-    "s": ("flext_cli.service", "s"),
+    "s": ("flext_cli", "s"),
     "scripts": ("flext_quality.docs.scripts", ""),
     "search_code": ("flext_quality.mcp.tools", "search_code"),
     "search_memory": ("flext_quality.mcp.tools", "search_memory"),
@@ -400,7 +395,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "validate_links_sync",
     ),
     "validate_rules": ("flext_quality.mcp.tools", "validate_rules"),
-    "x": ("flext_cli.mixins", "x"),
+    "x": ("flext_cli", "x"),
 }
 
 __all__ = [

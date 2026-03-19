@@ -12,12 +12,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
-    from flext_quality.decorators import d
-    from flext_quality.exceptions import e
-    from flext_quality.handlers import h
-    from flext_quality.mixins import x
-    from flext_quality.result import r
-    from flext_quality.service import s
+    from flext_quality import d, e, h, r, s, x
 
     from . import helpers as helpers, unit as unit
     from .conftest import (
@@ -133,10 +128,10 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "celery_config": ("tests.conftest", "celery_config"),
     "code_analysis_config": ("tests.conftest", "code_analysis_config"),
     "codeclimate_config": ("tests.conftest", "codeclimate_config"),
-    "d": ("flext_quality.decorators", "d"),
+    "d": ("flext_quality", "d"),
     "dashboard_data": ("tests.conftest", "dashboard_data"),
-    "e": ("flext_quality.exceptions", "e"),
-    "h": ("flext_quality.handlers", "h"),
+    "e": ("flext_quality", "e"),
+    "h": ("flext_quality", "h"),
     "helpers": ("tests.helpers", ""),
     "m": ("tests.models", "m"),
     "mock_quality_analyzer": ("tests.conftest", "mock_quality_analyzer"),
@@ -145,9 +140,9 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "package_metadata": ("tests.conftest", "package_metadata"),
     "pytest_configure": ("tests.conftest", "pytest_configure"),
     "quality_metrics_data": ("tests.conftest", "quality_metrics_data"),
-    "r": ("flext_quality.result", "r"),
+    "r": ("flext_quality", "r"),
     "report_config": ("tests.conftest", "report_config"),
-    "s": ("flext_quality.service", "s"),
+    "s": ("flext_quality", "s"),
     "safe_dict_access": ("tests.helpers.typing_helpers", "safe_dict_access"),
     "safe_list_access": ("tests.helpers.typing_helpers", "safe_list_access"),
     "sample_code_repository": ("tests.conftest", "sample_code_repository"),
@@ -160,7 +155,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "tm": ("tests.models", "tm"),
     "u": ("tests.utilities", "u"),
     "unit": ("tests.unit", ""),
-    "x": ("flext_quality.mixins", "x"),
+    "x": ("flext_quality", "x"),
 }
 
 __all__ = [

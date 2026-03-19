@@ -22,13 +22,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
-    from flext_quality.decorators import d
-    from flext_quality.exceptions import e
-    from flext_quality.handlers import h
-    from flext_quality.mixins import x
-    from flext_quality.result import r
-    from flext_quality.service import s
-    from flext_quality.utilities import u
+    from flext_quality import d, e, h, r, s, u, x
 
     from .constants import TestsConstants, c
     from .models import TestsModels, m
@@ -66,18 +60,18 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "assert_metrics_structure",
     ),
     "c": ("tests.helpers.constants", "c"),
-    "d": ("flext_quality.decorators", "d"),
-    "e": ("flext_quality.exceptions", "e"),
-    "h": ("flext_quality.handlers", "h"),
+    "d": ("flext_quality", "d"),
+    "e": ("flext_quality", "e"),
+    "h": ("flext_quality", "h"),
     "m": ("tests.helpers.models", "m"),
     "p": ("tests.helpers.protocols", "p"),
-    "r": ("flext_quality.result", "r"),
-    "s": ("flext_quality.service", "s"),
+    "r": ("flext_quality", "r"),
+    "s": ("flext_quality", "s"),
     "safe_dict_access": ("tests.helpers.typing_helpers", "safe_dict_access"),
     "safe_list_access": ("tests.helpers.typing_helpers", "safe_list_access"),
     "t": ("tests.helpers.typings", "t"),
-    "u": ("flext_quality.utilities", "u"),
-    "x": ("flext_quality.mixins", "x"),
+    "u": ("flext_quality", "u"),
+    "x": ("flext_quality", "x"),
 }
 
 __all__ = [
