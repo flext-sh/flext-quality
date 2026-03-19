@@ -1,0 +1,23 @@
+src/flext_quality/docs/scripts/audit.py
+  473ecd7bf9f636b8 43-44,52-53,61-62,70-71,80-81,89-90,97-98,105-106,113-114,124-125,135-136,990
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.1.15",
+  "base_commit_sha": "906ec9ba9bf1f44cd69c57b3518268288140a458",
+  "prompts": {
+    "473ecd7bf9f636b8": {
+      "agent_id": {
+        "tool": "opencode",
+        "id": "ses_2f9359946ffefJnNtBqklXkCm6",
+        "model": "anthropic/claude-haiku-4-5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>",
+      "messages": [],
+      "total_additions": 23,
+      "total_deletions": 1,
+      "accepted_lines": 23,
+      "overriden_lines": 0
+    }
+  }
+}
