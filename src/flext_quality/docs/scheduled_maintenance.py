@@ -21,6 +21,7 @@ from typing import TypeGuard
 import pytest
 import schedule
 import yaml
+from flext_core import t
 from git import InvalidGitRepositoryError, Repo
 
 from flext_quality import m
@@ -58,29 +59,31 @@ def _docs_logs_dir() -> Path:
     return _docs_root() / "logs"
 
 
-def _as_str(value: object | None, default: str) -> str:
+def _as_str(value: t.ContainerValue | None, default: str) -> str:
     """Normalize unknown config values to string."""
     return value if isinstance(value, str) else default
 
 
-def _as_bool(value: object | None, default: bool, /) -> bool:  # noqa: FBT001
+def _as_bool(value: t.ContainerValue | None, default: bool, /) -> bool:  # noqa: FBT001
     """Normalize unknown config values to bool."""
     return value if isinstance(value, bool) else default
 
 
-def _as_int(value: object | None, default: int) -> int:
+def _as_int(value: t.ContainerValue | None, default: int) -> int:
     """Normalize unknown config values to int."""
     return value if isinstance(value, int) else default
 
 
-def _as_str_list(value: object | None, default: list[str]) -> list[str]:
+def _as_str_list(value: t.ContainerValue | None, default: list[str]) -> list[str]:
     """Normalize unknown config values to list[str]."""
     if isinstance(value, list):
         return default
     return default
 
 
-def _is_str_mapping(value: object | None) -> TypeGuard[Mapping[str, object]]:
+def _is_str_mapping(
+    value: t.ContainerValue | None,
+) -> TypeGuard[Mapping[str, t.ContainerValue]]:
     return isinstance(value, Mapping)
 
 
