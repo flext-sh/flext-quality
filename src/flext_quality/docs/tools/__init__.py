@@ -52,77 +52,38 @@ if TYPE_CHECKING:
     )
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
-    "AccessibilityConfig": (
-        "flext_quality.docs.tools.style_validator",
-        "AccessibilityConfig",
-    ),
+    "AccessibilityConfig": ("flext_quality.docs.tools.style_validator", "AccessibilityConfig"),
     "AnalysisDict": ("flext_quality.docs.tools.content_analyzer", "AnalysisDict"),
-    "CompletenessDict": (
-        "flext_quality.docs.tools.content_analyzer",
-        "CompletenessDict",
-    ),
+    "CompletenessDict": ("flext_quality.docs.tools.content_analyzer", "CompletenessDict"),
     "ConfigDict": ("flext_quality.docs.tools.content_analyzer", "ConfigDict"),
     "ContentAnalyzer": ("flext_quality.docs.tools.content_analyzer", "ContentAnalyzer"),
     "FileResults": ("flext_quality.docs.tools.style_validator", "FileResults"),
-    "FormattingConfig": (
-        "flext_quality.docs.tools.style_validator",
-        "FormattingConfig",
-    ),
+    "FormattingConfig": ("flext_quality.docs.tools.style_validator", "FormattingConfig"),
     "HeadingsConfig": ("flext_quality.docs.tools.style_validator", "HeadingsConfig"),
     "IssueDict": ("flext_quality.docs.tools.content_analyzer", "IssueDict"),
     "LinkChecker": ("flext_quality.docs.tools.link_checker", "LinkChecker"),
     "LinkConfigDict": ("flext_quality.docs.tools.link_checker", "LinkConfigDict"),
     "LinkInfoDict": ("flext_quality.docs.tools.link_checker", "LinkInfoDict"),
-    "LinkInfoDictRequired": (
-        "flext_quality.docs.tools.link_checker",
-        "LinkInfoDictRequired",
-    ),
+    "LinkInfoDictRequired": ("flext_quality.docs.tools.link_checker", "LinkInfoDictRequired"),
     "LinkResultDict": ("flext_quality.docs.tools.link_checker", "LinkResultDict"),
-    "LinkResultDictRequired": (
-        "flext_quality.docs.tools.link_checker",
-        "LinkResultDictRequired",
-    ),
+    "LinkResultDictRequired": ("flext_quality.docs.tools.link_checker", "LinkResultDictRequired"),
     "MarkdownConfig": ("flext_quality.docs.tools.style_validator", "MarkdownConfig"),
     "MetricsDict": ("flext_quality.docs.tools.content_analyzer", "MetricsDict"),
-    "PerformanceMetricsDict": (
-        "flext_quality.docs.tools.link_checker",
-        "PerformanceMetricsDict",
-    ),
+    "PerformanceMetricsDict": ("flext_quality.docs.tools.link_checker", "PerformanceMetricsDict"),
     "ReadabilityDict": ("flext_quality.docs.tools.content_analyzer", "ReadabilityDict"),
-    "RecommendationDict": (
-        "flext_quality.docs.tools.content_analyzer",
-        "RecommendationDict",
-    ),
+    "RecommendationDict": ("flext_quality.docs.tools.content_analyzer", "RecommendationDict"),
     "ResultsDict": ("flext_quality.docs.tools.link_checker", "ResultsDict"),
     "StructureDict": ("flext_quality.docs.tools.content_analyzer", "StructureDict"),
     "StyleConfig": ("flext_quality.docs.tools.style_validator", "StyleConfig"),
     "StyleIssue": ("flext_quality.docs.tools.style_validator", "StyleIssue"),
     "StyleValidator": ("flext_quality.docs.tools.style_validator", "StyleValidator"),
     "SummaryMetrics": ("flext_quality.docs.tools.style_validator", "SummaryMetrics"),
-    "ValidationResults": (
-        "flext_quality.docs.tools.style_validator",
-        "ValidationResults",
-    ),
-    "analyze_file_content": (
-        "flext_quality.docs.tools.content_analyzer",
-        "analyze_file_content",
-    ),
-    "analyze_files_content": (
-        "flext_quality.docs.tools.content_analyzer",
-        "analyze_files_content",
-    ),
-    "validate_file_style": (
-        "flext_quality.docs.tools.style_validator",
-        "validate_file_style",
-    ),
-    "validate_files_style": (
-        "flext_quality.docs.tools.style_validator",
-        "validate_files_style",
-    ),
-    "validate_links_sync": (
-        "flext_quality.docs.tools.link_checker",
-        "validate_links_sync",
-    ),
+    "ValidationResults": ("flext_quality.docs.tools.style_validator", "ValidationResults"),
+    "analyze_file_content": ("flext_quality.docs.tools.content_analyzer", "analyze_file_content"),
+    "analyze_files_content": ("flext_quality.docs.tools.content_analyzer", "analyze_files_content"),
+    "validate_file_style": ("flext_quality.docs.tools.style_validator", "validate_file_style"),
+    "validate_files_style": ("flext_quality.docs.tools.style_validator", "validate_files_style"),
+    "validate_links_sync": ("flext_quality.docs.tools.link_checker", "validate_links_sync"),
 }
 
 __all__ = [

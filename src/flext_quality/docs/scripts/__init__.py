@@ -50,7 +50,6 @@ if TYPE_CHECKING:
         ContentValidator,
         ContentValidatorResults,
         LinkCheckResult,
-        LinkCheckResult as r,
         LinkRecord,
         LinkValidator,
         LinkValidatorResults,
@@ -62,60 +61,30 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "AuditRulesConfig": ("flext_quality.docs.scripts.audit", "AuditRulesConfig"),
     "AuditSummary": ("flext_quality.docs.scripts.report", "AuditSummary"),
     "AuditorResults": ("flext_quality.docs.scripts.audit", "AuditorResults"),
-    "ContentAnalysisConfig": (
-        "flext_quality.docs.scripts.audit",
-        "ContentAnalysisConfig",
-    ),
+    "ContentAnalysisConfig": ("flext_quality.docs.scripts.audit", "ContentAnalysisConfig"),
     "ContentChecksConfig": ("flext_quality.docs.scripts.audit", "ContentChecksConfig"),
     "ContentIssue": ("flext_quality.docs.scripts.validate", "ContentIssue"),
     "ContentMetrics": ("flext_quality.docs.scripts.validate", "ContentMetrics"),
     "ContentValidator": ("flext_quality.docs.scripts.validate", "ContentValidator"),
-    "ContentValidatorResults": (
-        "flext_quality.docs.scripts.validate",
-        "ContentValidatorResults",
-    ),
-    "DocumentationAuditor": (
-        "flext_quality.docs.scripts.audit",
-        "DocumentationAuditor",
-    ),
-    "DocumentationOptimizer": (
-        "flext_quality.docs.scripts.optimize",
-        "DocumentationOptimizer",
-    ),
-    "DocumentationReporter": (
-        "flext_quality.docs.scripts.report",
-        "DocumentationReporter",
-    ),
+    "ContentValidatorResults": ("flext_quality.docs.scripts.validate", "ContentValidatorResults"),
+    "DocumentationAuditor": ("flext_quality.docs.scripts.audit", "DocumentationAuditor"),
+    "DocumentationOptimizer": ("flext_quality.docs.scripts.optimize", "DocumentationOptimizer"),
+    "DocumentationReporter": ("flext_quality.docs.scripts.report", "DocumentationReporter"),
     "FormattingConfig": ("flext_quality.docs.scripts.audit", "FormattingConfig"),
     "LinkCheckResult": ("flext_quality.docs.scripts.validate", "LinkCheckResult"),
     "LinkRecord": ("flext_quality.docs.scripts.validate", "LinkRecord"),
-    "LinkValidationConfig": (
-        "flext_quality.docs.scripts.audit",
-        "LinkValidationConfig",
-    ),
+    "LinkValidationConfig": ("flext_quality.docs.scripts.audit", "LinkValidationConfig"),
     "LinkValidator": ("flext_quality.docs.scripts.validate", "LinkValidator"),
-    "LinkValidatorResults": (
-        "flext_quality.docs.scripts.validate",
-        "LinkValidatorResults",
-    ),
-    "MIN_HEADINGS_FOR_TOC": (
-        "flext_quality.docs.scripts.optimize",
-        "MIN_HEADINGS_FOR_TOC",
-    ),
+    "LinkValidatorResults": ("flext_quality.docs.scripts.validate", "LinkValidatorResults"),
+    "MIN_HEADINGS_FOR_TOC": ("flext_quality.docs.scripts.optimize", "MIN_HEADINGS_FOR_TOC"),
     "MarkdownStyleConfig": ("flext_quality.docs.scripts.audit", "MarkdownStyleConfig"),
     "MetricsDict": ("flext_quality.docs.scripts.audit", "MetricsDict"),
     "OptimizationSummary": ("flext_quality.docs.scripts.report", "OptimizationSummary"),
     "OptimizerResults": ("flext_quality.docs.scripts.optimize", "OptimizerResults"),
-    "QualityThresholdsConfig": (
-        "flext_quality.docs.scripts.audit",
-        "QualityThresholdsConfig",
-    ),
+    "QualityThresholdsConfig": ("flext_quality.docs.scripts.audit", "QualityThresholdsConfig"),
     "Recommendation": ("flext_quality.docs.scripts.report", "Recommendation"),
     "ReportData": ("flext_quality.docs.scripts.report", "ReportData"),
-    "SeverityLevelsConfig": (
-        "flext_quality.docs.scripts.audit",
-        "SeverityLevelsConfig",
-    ),
+    "SeverityLevelsConfig": ("flext_quality.docs.scripts.audit", "SeverityLevelsConfig"),
     "StyleGuideConfig": ("flext_quality.docs.scripts.audit", "StyleGuideConfig"),
     "SummaryMetrics": ("flext_quality.docs.scripts.report", "SummaryMetrics"),
     "TrendData": ("flext_quality.docs.scripts.report", "TrendData"),
@@ -123,7 +92,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "ValidationConfig": ("flext_quality.docs.scripts.audit", "ValidationConfig"),
     "ValidationSummary": ("flext_quality.docs.scripts.report", "ValidationSummary"),
     "main": ("flext_quality.docs.scripts.validate", "main"),
-    "r": ("flext_quality.docs.scripts.validate", "LinkCheckResult"),
 }
 
 __all__ = [
@@ -162,7 +130,6 @@ __all__ = [
     "ValidationConfig",
     "ValidationSummary",
     "main",
-    "r",
 ]
 
 
