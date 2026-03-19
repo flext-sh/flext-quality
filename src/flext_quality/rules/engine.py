@@ -6,9 +6,7 @@ import re
 from collections.abc import Mapping
 from pathlib import Path
 
-from flext_core import r
-
-from flext_quality import c, m
+from flext_quality import c, m, r
 from flext_quality.rules.loader import FlextQualityRulesLoader
 
 

@@ -11,9 +11,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Protocol
 
-from flext_core import t
-
-from flext_quality import m
+from flext_quality import m, t
 
 type GenericItem = t.Primitives | Path | dict[str, t.Primitives | None]
 

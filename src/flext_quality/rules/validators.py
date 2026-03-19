@@ -8,9 +8,7 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Protocol, override, runtime_checkable
 
-from flext_core import r
-
-from flext_quality import c
+from flext_quality import c, r
 
 
 class FlextQualityValidators:

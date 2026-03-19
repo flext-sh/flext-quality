@@ -13,10 +13,9 @@ import shutil
 from collections.abc import Mapping
 from typing import Annotated, final
 
-from flext_core import r
 from pydantic import BaseModel, Field, TypeAdapter
 
-from flext_quality import c, t
+from flext_quality import c, r, t
 
 
 class McpToolCall(BaseModel):

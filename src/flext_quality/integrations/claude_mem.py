@@ -12,9 +12,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import final
 
-from flext_core import r
-
-from flext_quality import c, t
+from flext_quality import c, r, t
 from flext_quality.integrations._health import build_mcp_health_result
 from flext_quality.integrations.mcp_client import FlextQualityMcpClient, McpToolCall
 

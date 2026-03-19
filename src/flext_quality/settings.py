@@ -12,9 +12,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Annotated
 
-from flext_core import FlextSettings, r
+from flext_core import FlextSettings
 from pydantic import Field
 from pydantic_settings import SettingsConfigDict
+
+from flext_quality import r
 
 
 class FlextQualitySettings(FlextSettings):

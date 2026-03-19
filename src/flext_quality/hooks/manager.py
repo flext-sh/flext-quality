@@ -6,10 +6,9 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import final
 
-from flext_core import r
 from pydantic import TypeAdapter
 
-from flext_quality import c, t
+from flext_quality import c, r, t
 from flext_quality.hooks.base import BaseHookImpl
 
 

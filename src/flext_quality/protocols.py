@@ -6,8 +6,9 @@ from collections.abc import Mapping
 from typing import Protocol
 
 from flext_cli import FlextCliProtocols
-from flext_core import r
 from flext_web import FlextWebProtocols
+
+from flext_quality import r
 
 from .typings import t
 

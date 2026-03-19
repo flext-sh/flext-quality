@@ -15,9 +15,9 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextContainer, FlextLogger, p, r
+from flext_core import FlextContainer, FlextLogger
 
-from flext_quality import FlextQualitySettings, c, m, t, u
+from flext_quality import FlextQualitySettings, c, m, p, r, t, u
 from flext_quality.hooks.manager import HookManager
 from flext_quality.rules.loader import FlextQualityRulesLoader
 
