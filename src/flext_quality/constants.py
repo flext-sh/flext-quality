@@ -185,7 +185,7 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
             HOOK_TIMEOUT_MS: Final[int] = 5000
             MCP_TIMEOUT_MS: Final[int] = 30000
             INTEGRATION_TIMEOUT_MS: Final[int] = 10000
-            RULE_TIMEOUT_SECONDS: Final[int] = FlextCliConstants.Network.DEFAULT_TIMEOUT
+            RULE_TIMEOUT_SECONDS: Final[int] = FlextCliConstants.DEFAULT_TIMEOUT_SECONDS
             BATCH_SIZE: Final[int] = 100
             MAX_PARALLEL_RULES: Final[int] = 4
             CACHE_TTL_SECONDS: Final[int] = 300
