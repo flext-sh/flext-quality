@@ -15,7 +15,10 @@ if TYPE_CHECKING:
 
     from flext_quality import docs, hooks, integrations, mcp, rules, services
     from flext_quality.api import FlextQuality
-    from flext_quality.constants import FlextQualityConstants, c
+    from flext_quality.constants import (
+        FlextQualityConstants,
+        FlextQualityConstants as c,
+    )
     from flext_quality.docs import core, scripts, tools
     from flext_quality.docs.core.base_classes import (
         BaseAnalyzer,
@@ -147,15 +150,21 @@ if TYPE_CHECKING:
         search_memory,
         validate_rules,
     )
-    from flext_quality.models import FlextQualityModels, m
-    from flext_quality.protocols import FlextQualityProtocols, p
+    from flext_quality.models import FlextQualityModels, FlextQualityModels as m
+    from flext_quality.protocols import (
+        FlextQualityProtocols,
+        FlextQualityProtocols as p,
+    )
     from flext_quality.rules.engine import FlextQualityRulesEngine
     from flext_quality.rules.loader import FlextQualityRulesLoader
     from flext_quality.rules.validators import FlextQualityValidators
     from flext_quality.services.cli import FlextQualityCliService
     from flext_quality.settings import FlextQualitySettings
-    from flext_quality.typings import FlextQualityTypes, t
-    from flext_quality.utilities import FlextQualityUtilities, u
+    from flext_quality.typings import FlextQualityTypes, FlextQualityTypes as t
+    from flext_quality.utilities import (
+        FlextQualityUtilities,
+        FlextQualityUtilities as u,
+    )
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "AccessibilityConfig": ("flext_quality.docs.scripts.audit", "AccessibilityConfig"),
@@ -353,7 +362,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "flext_quality.docs.tools.content_analyzer",
         "analyze_files_content",
     ),
-    "c": ("flext_quality.constants", "c"),
+    "c": ("flext_quality.constants", "FlextQualityConstants"),
     "core": ("flext_quality.docs.core", ""),
     "d": ("flext_cli", "d"),
     "docs": ("flext_quality.docs", ""),
@@ -369,9 +378,9 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "h": ("flext_cli", "h"),
     "hooks": ("flext_quality.hooks", ""),
     "integrations": ("flext_quality.integrations", ""),
-    "m": ("flext_quality.models", "m"),
+    "m": ("flext_quality.models", "FlextQualityModels"),
     "mcp": ("flext_quality.mcp", ""),
-    "p": ("flext_quality.protocols", "p"),
+    "p": ("flext_quality.protocols", "FlextQualityProtocols"),
     "r": ("flext_cli", "r"),
     "rules": ("flext_quality.rules", ""),
     "s": ("flext_cli", "s"),
@@ -379,9 +388,9 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "search_code": ("flext_quality.mcp.tools", "search_code"),
     "search_memory": ("flext_quality.mcp.tools", "search_memory"),
     "services": ("flext_quality.services", ""),
-    "t": ("flext_quality.typings", "t"),
+    "t": ("flext_quality.typings", "FlextQualityTypes"),
     "tools": ("flext_quality.docs.tools", ""),
-    "u": ("flext_quality.utilities", "u"),
+    "u": ("flext_quality.utilities", "FlextQualityUtilities"),
     "validate_file_style": (
         "flext_quality.docs.tools.style_validator",
         "validate_file_style",

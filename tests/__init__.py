@@ -12,7 +12,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
-    from flext_quality import d, e, h, r, s, x
+    from flext_quality import c, d, e, h, m, p, r, s, t, u, x
 
     from . import helpers as helpers, unit as unit
     from .conftest import (
@@ -39,7 +39,7 @@ if TYPE_CHECKING:
         sonarqube_config,
         temporary_project_structure,
     )
-    from .constants import TestsFlextQualityConstants, c
+    from .constants import TestsFlextQualityConstants
     from .helpers.constants import TestsConstants
     from .helpers.models import TestsModels
     from .helpers.protocols import TestsProtocols
@@ -54,9 +54,9 @@ if TYPE_CHECKING:
         safe_list_access,
     )
     from .helpers.typings import TestsTypings
-    from .models import TestsFlextQualityModels, m, tm
-    from .protocols import TestsFlextQualityProtocols, p
-    from .typings import TestsFlextQualityTypes, t
+    from .models import TestsFlextQualityModels, tm
+    from .protocols import TestsFlextQualityProtocols
+    from .typings import TestsFlextQualityTypes
     from .unit.test_api import (
         TestFlextQualityAPI,
         TestFlextQualityHookExecution,
@@ -67,7 +67,7 @@ if TYPE_CHECKING:
     )
     from .unit.test_basic import test_basic
     from .unit.test_cli import TestFlextQualityCliService, TestMainFunction
-    from .utilities import TestsFlextQualityUtilities, u
+    from .utilities import TestsFlextQualityUtilities
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "MockQualityAnalyzer": ("tests.conftest", "MockQualityAnalyzer"),
@@ -124,7 +124,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "tests.conftest",
         "assert_result_success_with_data",
     ),
-    "c": ("tests.constants", "c"),
+    "c": ("flext_quality", "c"),
     "celery_config": ("tests.conftest", "celery_config"),
     "code_analysis_config": ("tests.conftest", "code_analysis_config"),
     "codeclimate_config": ("tests.conftest", "codeclimate_config"),
@@ -133,10 +133,10 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "e": ("flext_quality", "e"),
     "h": ("flext_quality", "h"),
     "helpers": ("tests.helpers", ""),
-    "m": ("tests.models", "m"),
+    "m": ("flext_quality", "m"),
     "mock_quality_analyzer": ("tests.conftest", "mock_quality_analyzer"),
     "mock_report_generator": ("tests.conftest", "mock_report_generator"),
-    "p": ("tests.protocols", "p"),
+    "p": ("flext_quality", "p"),
     "package_metadata": ("tests.conftest", "package_metadata"),
     "pytest_configure": ("tests.conftest", "pytest_configure"),
     "quality_metrics_data": ("tests.conftest", "quality_metrics_data"),
@@ -149,11 +149,11 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "secure_temp_dir": ("tests.conftest", "secure_temp_dir"),
     "set_test_environment": ("tests.conftest", "set_test_environment"),
     "sonarqube_config": ("tests.conftest", "sonarqube_config"),
-    "t": ("tests.typings", "t"),
+    "t": ("flext_quality", "t"),
     "temporary_project_structure": ("tests.conftest", "temporary_project_structure"),
     "test_basic": ("tests.unit.test_basic", "test_basic"),
     "tm": ("tests.models", "tm"),
-    "u": ("tests.utilities", "u"),
+    "u": ("flext_quality", "u"),
     "unit": ("tests.unit", ""),
     "x": ("flext_quality", "x"),
 }

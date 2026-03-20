@@ -22,11 +22,11 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
 
-    from flext_quality import d, e, h, r, s, u, x
+    from flext_quality import c, d, e, h, m, p, r, s, t, u, x
 
-    from .constants import TestsConstants, c
-    from .models import TestsModels, m
-    from .protocols import TestsProtocols, p
+    from .constants import TestsConstants
+    from .models import TestsModels
+    from .protocols import TestsProtocols
     from .typing_helpers import (
         assert_analysis_results_structure,
         assert_dict_structure,
@@ -37,7 +37,7 @@ if TYPE_CHECKING:
         safe_dict_access,
         safe_list_access,
     )
-    from .typings import TestsTypings, t
+    from .typings import TestsTypings
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "TestsConstants": ("tests.helpers.constants", "TestsConstants"),
@@ -59,17 +59,17 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "tests.helpers.typing_helpers",
         "assert_metrics_structure",
     ),
-    "c": ("tests.helpers.constants", "c"),
+    "c": ("flext_quality", "c"),
     "d": ("flext_quality", "d"),
     "e": ("flext_quality", "e"),
     "h": ("flext_quality", "h"),
-    "m": ("tests.helpers.models", "m"),
-    "p": ("tests.helpers.protocols", "p"),
+    "m": ("flext_quality", "m"),
+    "p": ("flext_quality", "p"),
     "r": ("flext_quality", "r"),
     "s": ("flext_quality", "s"),
     "safe_dict_access": ("tests.helpers.typing_helpers", "safe_dict_access"),
     "safe_list_access": ("tests.helpers.typing_helpers", "safe_list_access"),
-    "t": ("tests.helpers.typings", "t"),
+    "t": ("flext_quality", "t"),
     "u": ("flext_quality", "u"),
     "x": ("flext_quality", "x"),
 }
