@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from flext_quality import c, r, t
+from flext_core import r
+
+from flext_quality import c, t
 from flext_quality.integrations.mcp_client import FlextQualityMcpClient
 
 
