@@ -40,10 +40,11 @@ if TYPE_CHECKING:
         temporary_project_structure,
     )
     from .constants import TestsFlextQualityConstants, TestsFlextQualityConstants as c
-    from .helpers.constants import TestsConstants
-    from .helpers.models import TestsModels
-    from .helpers.protocols import TestsProtocols
-    from .helpers.typing_helpers import (
+    from .helpers import (
+        TestsConstants,
+        TestsModels,
+        TestsProtocols,
+        TestsTypings,
         assert_analysis_results_structure,
         assert_dict_structure,
         assert_is_dict,
@@ -53,69 +54,57 @@ if TYPE_CHECKING:
         safe_dict_access,
         safe_list_access,
     )
-    from .helpers.typings import TestsTypings
     from .models import TestsFlextQualityModels, TestsFlextQualityModels as m, tm
     from .protocols import TestsFlextQualityProtocols, TestsFlextQualityProtocols as p
     from .typings import TestsFlextQualityTypes, TestsFlextQualityTypes as t
-    from .unit.test_api import (
+    from .unit import (
         TestFlextQualityAPI,
+        TestFlextQualityCliService,
         TestFlextQualityHookExecution,
         TestFlextQualityRulesConfig,
         TestFlextQualitySingleton,
         TestFlextQualityStdinProcessing,
         TestFlextQualityValidation,
+        TestMainFunction,
+        test_basic,
     )
-    from .unit.test_basic import test_basic
-    from .unit.test_cli import TestFlextQualityCliService, TestMainFunction
     from .utilities import TestsFlextQualityUtilities, TestsFlextQualityUtilities as u
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "MockQualityAnalyzer": ("tests.conftest", "MockQualityAnalyzer"),
     "MockReportGenerator": ("tests.conftest", "MockReportGenerator"),
     "T": ("tests.conftest", "T"),
-    "TestFlextQualityAPI": ("tests.unit.test_api", "TestFlextQualityAPI"),
-    "TestFlextQualityCliService": ("tests.unit.test_cli", "TestFlextQualityCliService"),
-    "TestFlextQualityHookExecution": (
-        "tests.unit.test_api",
-        "TestFlextQualityHookExecution",
-    ),
-    "TestFlextQualityRulesConfig": (
-        "tests.unit.test_api",
-        "TestFlextQualityRulesConfig",
-    ),
-    "TestFlextQualitySingleton": ("tests.unit.test_api", "TestFlextQualitySingleton"),
+    "TestFlextQualityAPI": ("tests.unit", "TestFlextQualityAPI"),
+    "TestFlextQualityCliService": ("tests.unit", "TestFlextQualityCliService"),
+    "TestFlextQualityHookExecution": ("tests.unit", "TestFlextQualityHookExecution"),
+    "TestFlextQualityRulesConfig": ("tests.unit", "TestFlextQualityRulesConfig"),
+    "TestFlextQualitySingleton": ("tests.unit", "TestFlextQualitySingleton"),
     "TestFlextQualityStdinProcessing": (
-        "tests.unit.test_api",
+        "tests.unit",
         "TestFlextQualityStdinProcessing",
     ),
-    "TestFlextQualityValidation": ("tests.unit.test_api", "TestFlextQualityValidation"),
-    "TestMainFunction": ("tests.unit.test_cli", "TestMainFunction"),
-    "TestsConstants": ("tests.helpers.constants", "TestsConstants"),
+    "TestFlextQualityValidation": ("tests.unit", "TestFlextQualityValidation"),
+    "TestMainFunction": ("tests.unit", "TestMainFunction"),
+    "TestsConstants": ("tests.helpers", "TestsConstants"),
     "TestsFlextQualityConstants": ("tests.constants", "TestsFlextQualityConstants"),
     "TestsFlextQualityModels": ("tests.models", "TestsFlextQualityModels"),
     "TestsFlextQualityProtocols": ("tests.protocols", "TestsFlextQualityProtocols"),
     "TestsFlextQualityTypes": ("tests.typings", "TestsFlextQualityTypes"),
     "TestsFlextQualityUtilities": ("tests.utilities", "TestsFlextQualityUtilities"),
-    "TestsModels": ("tests.helpers.models", "TestsModels"),
-    "TestsProtocols": ("tests.helpers.protocols", "TestsProtocols"),
-    "TestsTypings": ("tests.helpers.typings", "TestsTypings"),
+    "TestsModels": ("tests.helpers", "TestsModels"),
+    "TestsProtocols": ("tests.helpers", "TestsProtocols"),
+    "TestsTypings": ("tests.helpers", "TestsTypings"),
     "analysis_results": ("tests.conftest", "analysis_results"),
     "analysis_task_data": ("tests.conftest", "analysis_task_data"),
     "assert_analysis_results_structure": (
-        "tests.helpers.typing_helpers",
+        "tests.helpers",
         "assert_analysis_results_structure",
     ),
-    "assert_dict_structure": ("tests.helpers.typing_helpers", "assert_dict_structure"),
-    "assert_is_dict": ("tests.helpers.typing_helpers", "assert_is_dict"),
-    "assert_is_list": ("tests.helpers.typing_helpers", "assert_is_list"),
-    "assert_issues_structure": (
-        "tests.helpers.typing_helpers",
-        "assert_issues_structure",
-    ),
-    "assert_metrics_structure": (
-        "tests.helpers.typing_helpers",
-        "assert_metrics_structure",
-    ),
+    "assert_dict_structure": ("tests.helpers", "assert_dict_structure"),
+    "assert_is_dict": ("tests.helpers", "assert_is_dict"),
+    "assert_is_list": ("tests.helpers", "assert_is_list"),
+    "assert_issues_structure": ("tests.helpers", "assert_issues_structure"),
+    "assert_metrics_structure": ("tests.helpers", "assert_metrics_structure"),
     "assert_result_failure_with_error": (
         "tests.conftest",
         "assert_result_failure_with_error",
@@ -143,15 +132,15 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "r": ("flext_quality", "r"),
     "report_config": ("tests.conftest", "report_config"),
     "s": ("flext_quality", "s"),
-    "safe_dict_access": ("tests.helpers.typing_helpers", "safe_dict_access"),
-    "safe_list_access": ("tests.helpers.typing_helpers", "safe_list_access"),
+    "safe_dict_access": ("tests.helpers", "safe_dict_access"),
+    "safe_list_access": ("tests.helpers", "safe_list_access"),
     "sample_code_repository": ("tests.conftest", "sample_code_repository"),
     "secure_temp_dir": ("tests.conftest", "secure_temp_dir"),
     "set_test_environment": ("tests.conftest", "set_test_environment"),
     "sonarqube_config": ("tests.conftest", "sonarqube_config"),
     "t": ("tests.typings", "TestsFlextQualityTypes"),
     "temporary_project_structure": ("tests.conftest", "temporary_project_structure"),
-    "test_basic": ("tests.unit.test_basic", "test_basic"),
+    "test_basic": ("tests.unit", "test_basic"),
     "tm": ("tests.models", "tm"),
     "u": ("tests.utilities", "TestsFlextQualityUtilities"),
     "unit": ("tests.unit", ""),
