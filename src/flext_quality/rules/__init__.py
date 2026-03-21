@@ -17,9 +17,18 @@ if TYPE_CHECKING:
     from flext_quality.rules.validators import FlextQualityValidators
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
-    "FlextQualityRulesEngine": ("flext_quality.rules.engine", "FlextQualityRulesEngine"),
-    "FlextQualityRulesLoader": ("flext_quality.rules.loader", "FlextQualityRulesLoader"),
-    "FlextQualityValidators": ("flext_quality.rules.validators", "FlextQualityValidators"),
+    "FlextQualityRulesEngine": (
+        "flext_quality.rules.engine",
+        "FlextQualityRulesEngine",
+    ),
+    "FlextQualityRulesLoader": (
+        "flext_quality.rules.loader",
+        "FlextQualityRulesLoader",
+    ),
+    "FlextQualityValidators": (
+        "flext_quality.rules.validators",
+        "FlextQualityValidators",
+    ),
 }
 
 __all__ = [

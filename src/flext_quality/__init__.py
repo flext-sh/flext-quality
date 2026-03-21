@@ -129,6 +129,7 @@ if TYPE_CHECKING:
     )
     from flext_quality.hooks.base import BaseHookImpl
     from flext_quality.hooks.manager import HookManager
+    from flext_quality.integrations._health import build_mcp_health_result
     from flext_quality.integrations.claude_context import (
         FlextQualityClaudeContextClient,
     )
@@ -381,6 +382,10 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "flext_quality.docs.tools.content_analyzer",
         "analyze_files_content",
     ),
+    "build_mcp_health_result": (
+        "flext_quality.integrations._health",
+        "build_mcp_health_result",
+    ),
     "c": ("flext_quality.constants", "FlextQualityConstants"),
     "core": ("flext_quality.docs.core", ""),
     "d": ("flext_cli", "d"),
@@ -529,6 +534,7 @@ __all__ = [
     "ValidationSummary",
     "analyze_file_content",
     "analyze_files_content",
+    "build_mcp_health_result",
     "c",
     "core",
     "d",
