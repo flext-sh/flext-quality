@@ -10,10 +10,11 @@ from pathlib import Path
 from typing import Annotated
 
 from flext_cli import FlextCliModels
-from flext_core.constants import c
-from flext_core.typings import t
 from flext_web import FlextWebModels
 from pydantic import BaseModel, Field
+
+from flext_quality.constants import c
+from flext_quality.typings import t
 
 
 class FlextQualityModels(FlextWebModels, FlextCliModels):

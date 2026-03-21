@@ -5,9 +5,10 @@ from __future__ import annotations
 import fnmatch
 from typing import ClassVar, Protocol, runtime_checkable
 
-from flext_core.constants import c
 from flext_core.result import r
-from flext_core.typings import t
+
+from flext_quality.constants import c
+from flext_quality.typings import t
 
 
 @runtime_checkable

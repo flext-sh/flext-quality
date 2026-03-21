@@ -12,7 +12,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import ClassVar, NotRequired, TypedDict
 
-from flext_core.models import m
+from flext_quality.models import m
 
 
 class FileStatistics(TypedDict):

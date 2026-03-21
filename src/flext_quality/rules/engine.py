@@ -6,10 +6,10 @@ import re
 from collections.abc import Mapping
 from pathlib import Path
 
-from flext_core.constants import c
-from flext_core.models import m
 from flext_core.result import r
 
+from flext_quality.constants import c
+from flext_quality.models import m
 from flext_quality.rules.loader import FlextQualityRulesLoader
 
 

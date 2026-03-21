@@ -9,10 +9,9 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-from flext_tests import u
-
 from flext_quality import FlextQualityCliService
 from flext_quality.services.cli import main
+from tests.utilities import u
 
 
 class TestFlextQualityCliService:

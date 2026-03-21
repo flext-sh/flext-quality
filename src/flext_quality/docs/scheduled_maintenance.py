@@ -21,9 +21,10 @@ from typing import TypeGuard
 import pytest
 import schedule
 import yaml
-from flext_core.models import m
-from flext_core.typings import t
 from git import InvalidGitRepositoryError, Repo
+
+from flext_quality.models import m
+from flext_quality.typings import t
 
 ScheduleResults = m.Quality.ScheduleResults
 ScheduleTaskConfig = m.Quality.ScheduleTaskConfig
@@ -63,7 +64,7 @@ def _as_str(value: t.ContainerValue | None, default: str) -> str:
     return value if isinstance(value, str) else default
 
 
-def _as_bool(value: t.ContainerValue | None, default: bool, /) -> bool:
+def _as_bool(value: t.ContainerValue | None, /, *, default: bool) -> bool:
     """Normalize unknown config values to bool."""
     return value if isinstance(value, bool) else default
 
@@ -140,7 +141,7 @@ class ScheduledMaintenance:
     ) -> MaintenanceConfig:
         """Merge external config mapping into default typed config."""
         merged = base.model_dump()
-        merged["enabled"] = _as_bool(overrides.get("enabled"), base.enabled)
+        merged["enabled"] = _as_bool(overrides.get("enabled"), default=base.enabled)
         merged["reports_dir"] = _as_str(overrides.get("reports_dir"), base.reports_dir)
         merged["backup_dir"] = _as_str(overrides.get("backup_dir"), base.backup_dir)
 
@@ -156,7 +157,9 @@ class ScheduledMaintenance:
                     continue
                 current = schedules[key]
                 updated = {
-                    "enabled": _as_bool(value.get("enabled"), current["enabled"]),
+                    "enabled": _as_bool(
+                        value.get("enabled"), default=current["enabled"]
+                    ),
                     "time": _as_str(value.get("time"), current["time"]),
                     "tasks": _as_str_list(value.get("tasks"), current["tasks"]),
                     "day": _as_str(value.get("day"), current.get("day") or "") or None,
@@ -193,11 +196,11 @@ class ScheduledMaintenance:
                     error_handling_raw.get("retry_delay"), current.retry_delay
                 ),
                 "fail_fast": _as_bool(
-                    error_handling_raw.get("fail_fast"), current.fail_fast
+                    error_handling_raw.get("fail_fast"), default=current.fail_fast
                 ),
                 "notify_on_failure": _as_bool(
                     error_handling_raw.get("notify_on_failure"),
-                    current.notify_on_failure,
+                    default=current.notify_on_failure,
                 ),
             }
 
@@ -205,7 +208,9 @@ class ScheduledMaintenance:
         if _is_str_mapping(logging_raw):
             current = base.logging
             merged["logging"] = {
-                "enabled": _as_bool(logging_raw.get("enabled"), current.enabled),
+                "enabled": _as_bool(
+                    logging_raw.get("enabled"), default=current.enabled
+                ),
                 "log_file": _as_str(logging_raw.get("log_file"), current.log_file),
                 "max_log_size": _as_str(
                     logging_raw.get("max_log_size"), current.max_log_size

@@ -8,9 +8,8 @@ import tempfile
 import threading
 from pathlib import Path
 
-from flext_tests import u
-
 from flext_quality import FlextQuality
+from tests.utilities import u
 
 
 class TestFlextQualityAPI:

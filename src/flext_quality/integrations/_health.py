@@ -3,10 +3,10 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from flext_core import r
-from flext_core.constants import c
-from flext_core.typings import t
 
+from flext_quality.constants import c
 from flext_quality.integrations.mcp_client import FlextQualityMcpClient
+from flext_quality.typings import t
 
 
 def build_mcp_health_result(

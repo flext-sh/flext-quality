@@ -18,8 +18,9 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import NotRequired, TypedDict, Unpack
 
-from flext_core.typings import t
 from jinja2 import Template
+
+from flext_quality.typings import t
 
 
 class _ReportOptions(TypedDict, total=False):

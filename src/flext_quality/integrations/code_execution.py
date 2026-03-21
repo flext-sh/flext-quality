@@ -13,10 +13,11 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import Annotated, final
 
-from flext_core.constants import c
 from flext_core.result import r
-from flext_core.typings import t
 from pydantic import BaseModel, Field
+
+from flext_quality.constants import c
+from flext_quality.typings import t
 
 
 class ExecutionRequest(BaseModel):

@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_tests import u
+from tests.utilities import u
 
 
 def test_basic() -> None:

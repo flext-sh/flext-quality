@@ -16,16 +16,16 @@ from pathlib import Path
 from typing import ClassVar
 
 from flext_core import FlextContainer, FlextLogger
-from flext_core.constants import c
-from flext_core.models import m
 from flext_core.protocols import FlextProtocols as p
 from flext_core.result import r
-from flext_core.typings import t
-from flext_core.utilities import u
 
+from flext_quality.constants import c
 from flext_quality.hooks.manager import HookManager
+from flext_quality.models import m
 from flext_quality.rules.loader import FlextQualityRulesLoader
 from flext_quality.settings import FlextQualitySettings
+from flext_quality.typings import t
+from flext_quality.utilities import u
 
 
 class FlextQuality:

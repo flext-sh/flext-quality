@@ -4,14 +4,13 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
-from flext_core.constants import c
-from flext_core.typings import t
-
+from flext_quality.constants import c
 from flext_quality.hooks.manager import HookManager
 from flext_quality.integrations.claude_context import FlextQualityClaudeContextClient
 from flext_quality.integrations.claude_mem import FlextQualityClaudeMemClient
 from flext_quality.mcp.server import mcp
 from flext_quality.rules.engine import FlextQualityRulesEngine
+from flext_quality.typings import t
 
 
 @mcp.tool()
