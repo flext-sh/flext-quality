@@ -63,7 +63,7 @@ def _as_str(value: t.ContainerValue | None, default: str) -> str:
     return value if isinstance(value, str) else default
 
 
-def _as_bool(value: t.ContainerValue | None, default: bool, /) -> bool:  # noqa: FBT001
+def _as_bool(value: t.ContainerValue | None, default: bool, /) -> bool:
     """Normalize unknown config values to bool."""
     return value if isinstance(value, bool) else default
 
