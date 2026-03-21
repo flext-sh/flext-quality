@@ -23,7 +23,7 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
     rule engines, validation, and quality enforcement.
 
     Usage:
-        from flext_quality import c
+        from flext_core.constants import c
 
         event = c.Quality.HookEvent.PRE_TOOL_USE
         threshold = c.Quality.Threshold.DEFAULT_LINES

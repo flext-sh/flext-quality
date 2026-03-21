@@ -20,8 +20,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import requests
-
-from flext_quality import m
+from flext_core.models import m
 
 LinkValidatorResults = m.Quality.LinkValidatorResults
 ContentValidatorResults = m.Quality.ContentValidatorResults

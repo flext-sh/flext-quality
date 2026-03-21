@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
+from flext_core.constants import c
+from flext_core.typings import t
 from pydantic import TypeAdapter
 
-from flext_quality import c, t
 from flext_quality.hooks.manager import HookManager
 from flext_quality.integrations.claude_context import FlextQualityClaudeContextClient
 from flext_quality.integrations.claude_mem import FlextQualityClaudeMemClient

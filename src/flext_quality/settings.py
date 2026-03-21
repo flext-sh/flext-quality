@@ -13,10 +13,9 @@ from pathlib import Path
 from typing import Annotated
 
 from flext_core import FlextSettings
+from flext_core.result import r
 from pydantic import Field
 from pydantic_settings import SettingsConfigDict
-
-from flext_quality import r
 
 
 class FlextQualitySettings(FlextSettings):

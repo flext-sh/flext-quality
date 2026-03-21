@@ -6,8 +6,9 @@ from collections.abc import Mapping
 from pathlib import Path
 
 import yaml
-
-from flext_quality import c, m, r
+from flext_core.constants import c
+from flext_core.models import m
+from flext_core.result import r
 
 
 class FlextQualityRulesLoader:

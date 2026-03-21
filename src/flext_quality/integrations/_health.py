@@ -3,8 +3,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from flext_core import r
+from flext_core.constants import c
+from flext_core.typings import t
 
-from flext_quality import c, t
 from flext_quality.integrations.mcp_client import FlextQualityMcpClient
 
 

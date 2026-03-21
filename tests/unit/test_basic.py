@@ -7,9 +7,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_tests import tm
+from flext_tests import u
 
 
 def test_basic() -> None:
     """Test that basic functionality works."""
-    tm.that(True, eq=True)
+    u.Tests.Matchers.that(True, eq=True)

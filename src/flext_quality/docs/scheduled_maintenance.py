@@ -21,9 +21,9 @@ from typing import TypeGuard
 import pytest
 import schedule
 import yaml
+from flext_core.models import m
+from flext_core.typings import t
 from git import InvalidGitRepositoryError, Repo
-
-from flext_quality import m, t
 
 ScheduleResults = m.Quality.ScheduleResults
 ScheduleTaskConfig = m.Quality.ScheduleTaskConfig

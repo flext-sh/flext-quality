@@ -16,10 +16,16 @@ from pathlib import Path
 from typing import ClassVar
 
 from flext_core import FlextContainer, FlextLogger
+from flext_core.constants import c
+from flext_core.models import m
+from flext_core.protocols import FlextProtocols as p
+from flext_core.result import r
+from flext_core.typings import t
+from flext_core.utilities import u
 
-from flext_quality import FlextQualitySettings, c, m, p, r, t, u
 from flext_quality.hooks.manager import HookManager
 from flext_quality.rules.loader import FlextQualityRulesLoader
+from flext_quality.settings import FlextQualitySettings
 
 
 class FlextQuality:
@@ -41,7 +47,7 @@ class FlextQuality:
     - FlextSettings provides auto self.config and self.logger
 
     Usage:
-        from flext_quality import FlextQuality
+        from flext_quality.api import FlextQuality
 
         quality = FlextQuality.get_instance()
         result = quality.load_rules(Path("rules.yaml"))

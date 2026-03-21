@@ -9,10 +9,11 @@ from pathlib import Path
 
 import yaml
 from flext_cli import FlextCliUtilities
+from flext_core.constants import c
+from flext_core.result import r
+from flext_core.typings import t
 from flext_web import FlextWebUtilities
 from pydantic import TypeAdapter
-
-from flext_quality import c, r, t
 
 
 class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
