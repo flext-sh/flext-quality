@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     from flext_cli import d, e, h, r, s, x
     from flext_core.typings import FlextTypes
 
-    from flext_quality import docs, hooks, integrations, mcp, rules, services
+    from flext_quality import docs, hooks, integrations, rules, services
     from flext_quality.api import FlextQuality
     from flext_quality.constants import (
         FlextQualityConstants,
@@ -31,14 +31,17 @@ if TYPE_CHECKING:
         AuditRules,
         ConfigManager,
         StyleGuide,
-        ValidationConfig,
     )
     from flext_quality.docs.core.file_discovery import (
         DocumentationFinder,
         FileStatistics,
     )
     from flext_quality.docs.dashboard import DocumentationDashboard
-    from flext_quality.docs.notifications import DocumentationNotifier, NotifierResults
+    from flext_quality.docs.notifications import (
+        MAX_BROKEN_LINKS_TO_SHOW,
+        DocumentationNotifier,
+        NotifierResults,
+    )
     from flext_quality.docs.scheduled_maintenance import (
         ErrorHandlingConfig,
         LoggingConfig,
@@ -49,21 +52,20 @@ if TYPE_CHECKING:
         ScheduleTaskConfig,
     )
     from flext_quality.docs.scripts.audit import (
-        AccessibilityConfig,
         AuditorResults,
         AuditRulesConfig,
         ContentAnalysisConfig,
         ContentChecksConfig,
         DocumentationAuditor,
-        FormattingConfig,
         LinkValidationConfig,
         MarkdownStyleConfig,
-        MetricsDict,
         QualityThresholdsConfig,
         SeverityLevelsConfig,
         StyleGuideConfig,
+        ValidationConfig,
     )
     from flext_quality.docs.scripts.optimize import (
+        MIN_HEADINGS_FOR_TOC,
         DocumentationOptimizer,
         OptimizerResults,
     )
@@ -73,7 +75,6 @@ if TYPE_CHECKING:
         OptimizationSummary,
         Recommendation,
         ReportData,
-        SummaryMetrics,
         TrendData,
         TrendEntry,
         ValidationSummary,
@@ -94,6 +95,7 @@ if TYPE_CHECKING:
         ConfigDict,
         ContentAnalyzer,
         IssueDict,
+        MetricsDict,
         ReadabilityDict,
         RecommendationDict,
         StructureDict,
@@ -112,12 +114,15 @@ if TYPE_CHECKING:
         validate_links_sync,
     )
     from flext_quality.docs.tools.style_validator import (
+        AccessibilityConfig,
         FileResults,
+        FormattingConfig,
         HeadingsConfig,
         MarkdownConfig,
         StyleConfig,
         StyleIssue,
         StyleValidator,
+        SummaryMetrics,
         ValidationResults,
         validate_file_style,
         validate_files_style,
@@ -143,7 +148,7 @@ if TYPE_CHECKING:
         get_integrations_status,
         get_rules_config,
     )
-    from flext_quality.mcp.server import get_server
+    from flext_quality.mcp.server import get_server, mcp
     from flext_quality.mcp.tools import (
         execute_hook,
         search_code,
@@ -158,7 +163,7 @@ if TYPE_CHECKING:
     from flext_quality.rules.engine import FlextQualityRulesEngine
     from flext_quality.rules.loader import FlextQualityRulesLoader
     from flext_quality.rules.validators import FlextQualityValidators
-    from flext_quality.services.cli import FlextQualityCliService
+    from flext_quality.services.cli import FlextQualityCliService, main
     from flext_quality.settings import FlextQualitySettings
     from flext_quality.typings import FlextQualityTypes, FlextQualityTypes as t
     from flext_quality.utilities import (
@@ -167,7 +172,10 @@ if TYPE_CHECKING:
     )
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
-    "AccessibilityConfig": ("flext_quality.docs.scripts.audit", "AccessibilityConfig"),
+    "AccessibilityConfig": (
+        "flext_quality.docs.tools.style_validator",
+        "AccessibilityConfig",
+    ),
     "AnalysisDict": ("flext_quality.docs.tools.content_analyzer", "AnalysisDict"),
     "AuditRules": ("flext_quality.docs.core.config_manager", "AuditRules"),
     "AuditRulesConfig": ("flext_quality.docs.scripts.audit", "AuditRulesConfig"),
@@ -269,7 +277,10 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "flext_quality.rules.validators",
         "FlextQualityValidators",
     ),
-    "FormattingConfig": ("flext_quality.docs.scripts.audit", "FormattingConfig"),
+    "FormattingConfig": (
+        "flext_quality.docs.tools.style_validator",
+        "FormattingConfig",
+    ),
     "HeadingsConfig": ("flext_quality.docs.tools.style_validator", "HeadingsConfig"),
     "HookManager": ("flext_quality.hooks.manager", "HookManager"),
     "IssueDict": ("flext_quality.docs.tools.content_analyzer", "IssueDict"),
@@ -297,6 +308,14 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "LinkValidatorResults",
     ),
     "LoggingConfig": ("flext_quality.docs.scheduled_maintenance", "LoggingConfig"),
+    "MAX_BROKEN_LINKS_TO_SHOW": (
+        "flext_quality.docs.notifications",
+        "MAX_BROKEN_LINKS_TO_SHOW",
+    ),
+    "MIN_HEADINGS_FOR_TOC": (
+        "flext_quality.docs.scripts.optimize",
+        "MIN_HEADINGS_FOR_TOC",
+    ),
     "MaintenanceConfig": (
         "flext_quality.docs.scheduled_maintenance",
         "MaintenanceConfig",
@@ -305,7 +324,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "MarkdownStyleConfig": ("flext_quality.docs.scripts.audit", "MarkdownStyleConfig"),
     "McpToolCall": ("flext_quality.integrations.mcp_client", "McpToolCall"),
     "McpToolResult": ("flext_quality.integrations.mcp_client", "McpToolResult"),
-    "MetricsDict": ("flext_quality.docs.scripts.audit", "MetricsDict"),
+    "MetricsDict": ("flext_quality.docs.tools.content_analyzer", "MetricsDict"),
     "NotifierResults": ("flext_quality.docs.notifications", "NotifierResults"),
     "OptimizationSummary": ("flext_quality.docs.scripts.report", "OptimizationSummary"),
     "OptimizerResults": ("flext_quality.docs.scripts.optimize", "OptimizerResults"),
@@ -345,10 +364,10 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "StyleGuideConfig": ("flext_quality.docs.scripts.audit", "StyleGuideConfig"),
     "StyleIssue": ("flext_quality.docs.tools.style_validator", "StyleIssue"),
     "StyleValidator": ("flext_quality.docs.tools.style_validator", "StyleValidator"),
-    "SummaryMetrics": ("flext_quality.docs.scripts.report", "SummaryMetrics"),
+    "SummaryMetrics": ("flext_quality.docs.tools.style_validator", "SummaryMetrics"),
     "TrendData": ("flext_quality.docs.scripts.report", "TrendData"),
     "TrendEntry": ("flext_quality.docs.scripts.report", "TrendEntry"),
-    "ValidationConfig": ("flext_quality.docs.core.config_manager", "ValidationConfig"),
+    "ValidationConfig": ("flext_quality.docs.scripts.audit", "ValidationConfig"),
     "ValidationResults": (
         "flext_quality.docs.tools.style_validator",
         "ValidationResults",
@@ -379,7 +398,8 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "hooks": ("flext_quality.hooks", ""),
     "integrations": ("flext_quality.integrations", ""),
     "m": ("flext_quality.models", "FlextQualityModels"),
-    "mcp": ("flext_quality.mcp", ""),
+    "main": ("flext_quality.services.cli", "main"),
+    "mcp": ("flext_quality.mcp.server", "mcp"),
     "p": ("flext_quality.protocols", "FlextQualityProtocols"),
     "r": ("flext_cli", "r"),
     "rules": ("flext_quality.rules", ""),
@@ -408,6 +428,8 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
 }
 
 __all__ = [
+    "MAX_BROKEN_LINKS_TO_SHOW",
+    "MIN_HEADINGS_FOR_TOC",
     "AccessibilityConfig",
     "AnalysisDict",
     "AuditRules",
@@ -521,6 +543,7 @@ __all__ = [
     "hooks",
     "integrations",
     "m",
+    "main",
     "mcp",
     "p",
     "r",

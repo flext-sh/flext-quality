@@ -43,10 +43,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "BaseValidator": ("flext_quality.docs.core.base_classes", "BaseValidator"),
     "Config": ("flext_quality.docs.core.base_classes", "Config"),
     "ConfigManager": ("flext_quality.docs.core.config_manager", "ConfigManager"),
-    "DocumentationFinder": (
-        "flext_quality.docs.core.file_discovery",
-        "DocumentationFinder",
-    ),
+    "DocumentationFinder": ("flext_quality.docs.core.file_discovery", "DocumentationFinder"),
     "FileStatistics": ("flext_quality.docs.core.file_discovery", "FileStatistics"),
     "StyleGuide": ("flext_quality.docs.core.config_manager", "StyleGuide"),
     "ValidationConfig": ("flext_quality.docs.core.config_manager", "ValidationConfig"),
