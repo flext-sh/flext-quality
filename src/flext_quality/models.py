@@ -177,7 +177,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             description: str
             command: str
-            timeout: int = Field(default=300, ge=1)
+            timeout: t.PositiveInt = Field(default=300)
 
         class ScheduleEntry(BaseModel):
             """Single schedule entry definition."""
@@ -190,8 +190,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
         class ErrorHandlingConfig(BaseModel):
             """Error handling settings for scheduled maintenance."""
 
-            max_retries: int = Field(default=3, ge=0)
-            retry_delay: int = Field(default=60, ge=0)
+            max_retries: t.NonNegativeInt = Field(default=3)
+            retry_delay: t.NonNegativeInt = Field(default=60)
             fail_fast: bool = False
             notify_on_failure: bool = True
 
@@ -201,7 +201,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             enabled: bool = True
             log_file: str
             max_log_size: str = "10MB"
-            retention_days: int = Field(default=30, ge=1)
+            retention_days: t.PositiveInt = Field(default=30)
 
         class MaintenanceConfig(BaseModel):
             """Root configuration for scheduled documentation maintenance."""
@@ -331,7 +331,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Threshold-based alert configuration."""
 
             enabled: bool = True
-            threshold: int = Field(default=0, ge=0)
+            threshold: t.NonNegativeInt = Field(default=0)
 
         class AlertToggleConfig(BaseModel):
             """Simple on/off alert configuration."""
@@ -369,7 +369,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             url: str
             headers: dict[str, str] = Field(default_factory=dict)
-            timeout: int = Field(default=30, ge=1)
+            timeout: t.PositiveInt = Field(default=30)
 
         class ChannelsConfig(BaseModel):
             """Enabled channels for documentation notifications."""
