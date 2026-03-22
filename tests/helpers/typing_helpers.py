@@ -19,7 +19,7 @@ from flext_core import t
 def assert_is_dict(
     value: t.Scalar | dict[str, t.Scalar],
 ) -> TypeIs[dict[str, t.Scalar]]:
-    """Type-safe dict[str, object] assertion following Single Responsibility Principle.
+    """Type-safe dict[str, t.NormalizedValue] assertion following Single Responsibility Principle.
 
     Args:
       value: Object to check
@@ -63,7 +63,7 @@ def safe_dict_access(data: dict[str, t.Scalar], key: str) -> t.Scalar:
       Value from dict
 
     Raises:
-      AssertionError: If data is not a dict[str, object] or key missing
+      AssertionError: If data is not a dict[str, t.NormalizedValue] or key missing
 
     """
     assert key in data, f"Key '{key}' not found in dict"
@@ -94,7 +94,7 @@ def safe_list_access[T](data: list[T], index: int) -> T:
 def assert_dict_structure(
     data: dict[str, t.Scalar], required_keys: list[str]
 ) -> dict[str, t.Scalar]:
-    """Assert that object is dict with required keys - DRY pattern.
+    """Assert that t.NormalizedValue is dict with required keys - DRY pattern.
 
     Args:
       data: Object to check

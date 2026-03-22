@@ -1138,7 +1138,7 @@ yaml = ["pyyaml (>=6.0.1)"]
 [[package]]
 name = "deepdiff"
 version = "8.6.2"
-description = "Deep Difference and Search of any Python object/data. Recreate objects by adding adding deltas to each other."
+description = "Deep Difference and Search of any Python t.NormalizedValue/data. Recreate objects by adding adding deltas to each other."
 optional = true
 python-versions = ">=3.9"
 groups = ["main"]
@@ -2280,7 +2280,7 @@ format-nongpl = ["fqdn", "idna", "isoduration", "jsonpointer (>1.13)", "rfc3339-
 [[package]]
 name = "jsonschema-path"
 version = "0.4.5"
-description = "JSONSchema Spec with object-oriented paths"
+description = "JSONSchema Spec with t.NormalizedValue-oriented paths"
 optional = false
 python-versions = "<4.0.0,>=3.10"
 groups = ["main"]
@@ -6725,7 +6725,7 @@ propcache = ">=0.2.1"
 [[package]]
 name = "zipp"
 version = "3.23.0"
-description = "Backport of pathlib-compatible object wrapper for zip files"
+description = "Backport of pathlib-compatible t.NormalizedValue wrapper for zip files"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]

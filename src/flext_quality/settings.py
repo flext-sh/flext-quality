@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, ClassVar
 
 from flext_core import FlextSettings
 from flext_core.result import r
@@ -21,7 +21,7 @@ from pydantic_settings import SettingsConfigDict
 class FlextQualitySettings(FlextSettings):
     """Runtime configuration for flext-quality services."""
 
-    model_config = SettingsConfigDict(extra="ignore")
+    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(extra="ignore")
 
     hook_timeout_ms: Annotated[int, Field(default=5000, ge=100, le=60000)]
     rule_timeout_seconds: Annotated[int, Field(default=30, ge=1, le=3600)]

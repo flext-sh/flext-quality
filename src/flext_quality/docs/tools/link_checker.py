@@ -502,7 +502,7 @@ class LinkChecker:
             if isinstance(url_obj, str) and "github.com" in url_obj:
                 github_links.append(link)
 
-        validated_links: list[dict[str, bool | object]] = []
+        validated_links: list[dict[str, bool | t.NormalizedValue]] = []
 
         for link in github_links:
             url_candidate = link.get("url")

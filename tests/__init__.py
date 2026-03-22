@@ -17,7 +17,6 @@ if TYPE_CHECKING:
     from .conftest import (
         MockQualityAnalyzer,
         MockReportGenerator,
-        T,
         analysis_results,
         analysis_task_data,
         assert_result_failure_with_error,
@@ -76,7 +75,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextQualityTestUtilities": ("tests.utilities", "FlextQualityTestUtilities"),
     "MockQualityAnalyzer": ("tests.conftest", "MockQualityAnalyzer"),
     "MockReportGenerator": ("tests.conftest", "MockReportGenerator"),
-    "T": ("tests.conftest", "T"),
     "TestFlextQualityAPI": ("tests.unit.test_api", "TestFlextQualityAPI"),
     "TestFlextQualityCliService": ("tests.unit.test_cli", "TestFlextQualityCliService"),
     "TestFlextQualityHookExecution": (
@@ -164,7 +162,6 @@ __all__ = [
     "FlextQualityTestUtilities",
     "MockQualityAnalyzer",
     "MockReportGenerator",
-    "T",
     "TestFlextQualityAPI",
     "TestFlextQualityCliService",
     "TestFlextQualityHookExecution",

@@ -23,6 +23,8 @@ import schedule
 import yaml
 from pydantic import BaseModel, Field
 
+from flext_quality import t
+
 # Module-level feature detection flags
 HAS_PYTEST = importlib.util.find_spec("pytest") is not None
 HAS_GITPYTHON = importlib.util.find_spec("git") is not None
@@ -98,22 +100,22 @@ class MaintenanceConfig(TypedDict):
     logging: LoggingConfig
 
 
-def _as_str(value: object, default: str) -> str:
+def _as_str(value: t.NormalizedValue, default: str) -> str:
     """Normalize unknown config values to string."""
     return value if isinstance(value, str) else default
 
 
-def _as_bool(value: object, *, default: bool) -> bool:
+def _as_bool(value: t.NormalizedValue, *, default: bool) -> bool:
     """Normalize unknown config values to bool."""
     return value if isinstance(value, bool) else default
 
 
-def _as_int(value: object, default: int) -> int:
+def _as_int(value: t.NormalizedValue, default: int) -> int:
     """Normalize unknown config values to int."""
     return value if isinstance(value, int) else default
 
 
-def _as_str_list(value: object, default: list[str]) -> list[str]:
+def _as_str_list(value: t.NormalizedValue, default: list[str]) -> list[str]:
     """Normalize unknown config values to list[str]."""
     if isinstance(value, list):
         return [str(item) for item in value]
@@ -165,7 +167,7 @@ class ScheduledMaintenance:
     def _merge_config(
         self,
         base: MaintenanceConfig,
-        overrides: Mapping[str, object],
+        overrides: Mapping[str, t.NormalizedValue],
     ) -> MaintenanceConfig:
         """Merge external config mapping into default typed config."""
         merged: MaintenanceConfig = {

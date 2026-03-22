@@ -15,12 +15,11 @@ import os
 import tempfile
 from collections.abc import Generator
 from pathlib import Path
-from typing import TypeVar
 
 import pytest
-from flext_core import r
+from flext_core import T, r
 
-T = TypeVar("T")
+from tests import t
 
 
 def assert_result_success_with_data[T](result: r[T]) -> T:
@@ -137,7 +136,7 @@ def secure_temp_dir() -> Generator[str]:
 
 
 @pytest.fixture
-def sample_code_repository(tmp_path: Path) -> dict[str, object]:
+def sample_code_repository(tmp_path: Path) -> dict[str, t.NormalizedValue]:
     """Provide sample code repository metadata for quality analysis testing.
 
     Creates realistic repository metadata that simulates typical project
@@ -173,7 +172,7 @@ def sample_code_repository(tmp_path: Path) -> dict[str, object]:
 
 
 @pytest.fixture
-def quality_metrics_data() -> dict[str, object]:
+def quality_metrics_data() -> dict[str, t.NormalizedValue]:
     """Quality metrics data for testing."""
     return {
         "complexity": {"cyclomatic": 5.2, "cognitive": 3.8, "average": 4.5},
@@ -184,7 +183,7 @@ def quality_metrics_data() -> dict[str, object]:
 
 
 @pytest.fixture
-def code_analysis_config() -> dict[str, object]:
+def code_analysis_config() -> dict[str, t.NormalizedValue]:
     """Code analysis configuration for testing."""
     return {
         "analyzers": {
@@ -201,7 +200,7 @@ def code_analysis_config() -> dict[str, object]:
 
 
 @pytest.fixture
-def analysis_results() -> list[dict[str, object]]:
+def analysis_results() -> list[dict[str, t.NormalizedValue]]:
     """Analysis results for testing."""
     return [
         {
@@ -235,7 +234,7 @@ def analysis_results() -> list[dict[str, object]]:
 
 
 @pytest.fixture
-def report_config(tmp_path: Path) -> dict[str, object]:
+def report_config(tmp_path: Path) -> dict[str, t.NormalizedValue]:
     """Report configuration for testing."""
     return {
         "format": "json",
@@ -247,7 +246,7 @@ def report_config(tmp_path: Path) -> dict[str, object]:
 
 
 @pytest.fixture
-def dashboard_data() -> dict[str, object]:
+def dashboard_data() -> dict[str, t.NormalizedValue]:
     """Dashboard data for testing."""
     return {
         "summary": {
@@ -270,7 +269,7 @@ def dashboard_data() -> dict[str, object]:
 
 
 @pytest.fixture
-def sonarqube_config() -> dict[str, object]:
+def sonarqube_config() -> dict[str, t.NormalizedValue]:
     """SonarQube configuration for testing."""
     return {
         "host": "http://localhost:9000",
@@ -282,7 +281,7 @@ def sonarqube_config() -> dict[str, object]:
 
 
 @pytest.fixture
-def codeclimate_config() -> dict[str, object]:
+def codeclimate_config() -> dict[str, t.NormalizedValue]:
     """CodeClimate configuration for testing."""
     return {
         "api_token": "test-api-token",
@@ -345,7 +344,7 @@ def temporary_project_structure(tmp_path: Path) -> str:
 
 
 @pytest.fixture
-def package_metadata() -> dict[str, object]:
+def package_metadata() -> dict[str, t.NormalizedValue]:
     """Package metadata for testing."""
     return {
         "name": "test-package",
@@ -358,7 +357,7 @@ def package_metadata() -> dict[str, object]:
 
 
 @pytest.fixture
-def celery_config() -> dict[str, object]:
+def celery_config() -> dict[str, t.NormalizedValue]:
     """Celery configuration for testing."""
     return {
         "broker_url": "redis://localhost:6379/0",
@@ -372,7 +371,7 @@ def celery_config() -> dict[str, object]:
 
 
 @pytest.fixture
-def analysis_task_data() -> dict[str, object]:
+def analysis_task_data() -> dict[str, t.NormalizedValue]:
     """Analysis task data for testing."""
     return {
         "task_id": "test-task-123",
@@ -393,7 +392,7 @@ def pytest_configure(config: pytest.Config) -> None:
     categorization, and CI/CD pipeline optimization through targeted testing.
 
     Args:
-      config: pytest configuration object for marker registration
+      config: pytest configuration t.NormalizedValue for marker registration
 
     Markers:
       - unit: Fast, isolated tests with mocking
@@ -430,7 +429,7 @@ class MockQualityAnalyzer:
         super().__init__()
         self.analyzed_files: list[str] = []
 
-    def analyze_project(self, project_path: str) -> dict[str, object]:
+    def analyze_project(self, project_path: str) -> dict[str, t.NormalizedValue]:
         """Simulate comprehensive project analysis.
 
         Args:
@@ -448,7 +447,7 @@ class MockQualityAnalyzer:
             "analysis_time": 2.5,
         }
 
-    def analyze_file(self, file_path: str) -> dict[str, object]:
+    def analyze_file(self, file_path: str) -> dict[str, t.NormalizedValue]:
         """Simulate individual file analysis.
 
         Args:
@@ -460,7 +459,7 @@ class MockQualityAnalyzer:
         """
         return {"file": file_path, "complexity": 3.2, "issues": 2, "coverage": 90.0}
 
-    def get_metrics(self, _project_path: str) -> dict[str, object]:
+    def get_metrics(self, _project_path: str) -> dict[str, t.NormalizedValue]:
         """Simulate project-wide quality metrics collection.
 
         Returns:
@@ -515,10 +514,10 @@ class MockReportGenerator:
     def __init__(self) -> None:
         """Initialize the instance."""
         super().__init__()
-        self.generated_reports: list[dict[str, object]] = []
+        self.generated_reports: list[dict[str, t.NormalizedValue]] = []
 
     def generate_report(
-        self, data: dict[str, object], output_format: str = "json"
+        self, data: dict[str, t.NormalizedValue], output_format: str = "json"
     ) -> str:
         """Simulate report generation in specified format.
 
@@ -530,7 +529,7 @@ class MockReportGenerator:
             Generated report filename
 
         """
-        report: dict[str, object] = {
+        report: dict[str, t.NormalizedValue] = {
             "format": output_format,
             "data": data,
             "timestamp": "2023-01-01T12:00:00Z",
@@ -538,7 +537,7 @@ class MockReportGenerator:
         self.generated_reports.append(report)
         return f"report_{len(self.generated_reports)}.{output_format}"
 
-    def generate_dashboard_data(self) -> dict[str, object]:
+    def generate_dashboard_data(self) -> dict[str, t.NormalizedValue]:
         """Simulate dashboard data generation.
 
         Returns:

@@ -287,7 +287,7 @@ class DocumentationReporter:
                     broken_links: list[dict[str, t.Primitives]] = []
                     for e in validation_errors:
                         if isinstance(e, dict):
-                            error_entry: dict[object, object] = e
+                            error_entry: dict[t.NormalizedValue, t.NormalizedValue] = e
                             error_type = error_entry.get("type")
                             if error_type in {
                                 "broken_external_link",

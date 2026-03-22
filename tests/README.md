@@ -94,7 +94,7 @@ Complete user journey testing with full system integration:
 ### Domain Layer Testing
 
 - **`test_domain_entities.py`**: Business entity behavior and validation
-- **`test_value_objects.py`**: Immutable value object testing
+- **`test_value_objects.py`**: Immutable value t.NormalizedValue testing
 - **`test_handlers.py`**: Command and query handler testing
 
 ### Application Layer Testing
@@ -269,7 +269,7 @@ def test_should_do_something_when_condition():
 ### Test Data Management
 
 ```python
-# Test data builders for consistent test object creation
+# Test data builders for consistent test t.NormalizedValue creation
 class QualityProjectBuilder:
     def __init__(self):
         self._project = QualityProject(

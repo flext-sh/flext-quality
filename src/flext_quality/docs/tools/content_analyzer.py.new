@@ -119,7 +119,7 @@ class _ResultsDict(TypedDict):
     recommendations: list[_RecommendationDict | str]
 
 
-_SubDict = Mapping[str, object]
+_SubDict = Mapping[str, t.NormalizedValue]
 
 
 class ContentAnalyzer:
@@ -253,7 +253,7 @@ class ContentAnalyzer:
     def _calculate_content_metrics(
         self,
         content: str,
-    ) -> dict[str, object]:
+    ) -> dict[str, t.NormalizedValue]:
         """Calculate basic content metrics."""
         # Word analysis
         words = re.findall(r"\b\w+\b", content)
@@ -318,7 +318,7 @@ class ContentAnalyzer:
             "code_to_content_ratio": code_lines / total_lines if total_lines > 0 else 0,
         }
 
-    def _analyze_readability(self, content: str) -> dict[str, object]:
+    def _analyze_readability(self, content: str) -> dict[str, t.NormalizedValue]:
         """Analyze content readability using various metrics."""
         words = re.findall(r"\b\w+\b", content)
         sentences = re.split(r"[.!?]+", content)
@@ -390,11 +390,11 @@ class ContentAnalyzer:
 
         return count
 
-    def _analyze_structure(self, content: str) -> dict[str, object]:
+    def _analyze_structure(self, content: str) -> dict[str, t.NormalizedValue]:
         """Analyze document structure and organization."""
         sections_list: list[dict[str, int | str]] = []
-        depth_analysis_dict: dict[str, object] = {}
-        structure: dict[str, object] = {
+        depth_analysis_dict: dict[str, t.NormalizedValue] = {}
+        structure: dict[str, t.NormalizedValue] = {
             "has_table_of_contents": False,
             "toc_position": 0,
             "heading_hierarchy_valid": True,
@@ -451,7 +451,7 @@ class ContentAnalyzer:
         self,
         content: str,
         filename: str,
-    ) -> dict[str, object]:
+    ) -> dict[str, t.NormalizedValue]:
         """Check documentation completeness based on file type and content."""
         missing_elems: list[str] = []
         required_present: list[str] = []
@@ -525,7 +525,7 @@ class ContentAnalyzer:
         self,
         content: str,
         required_sections: list[str],
-    ) -> dict[str, object]:
+    ) -> dict[str, t.NormalizedValue]:
         """Check for required sections in content."""
         required_present: list[str] = []
         missing_required: list = []
@@ -557,7 +557,7 @@ class ContentAnalyzer:
 
     def _calculate_quality_score(
         self,
-        analysis: dict[str, object],
+        analysis: dict[str, t.NormalizedValue],
     ) -> float:
         """Calculate overall quality score for the content."""
         score = 100.0
@@ -595,7 +595,7 @@ class ContentAnalyzer:
 
         return max(0.0, min(100.0, score))
 
-    def _identify_issues(self, analysis: dict[str, object]) -> list:
+    def _identify_issues(self, analysis: dict[str, t.NormalizedValue]) -> list:
         """Identify content issues that need attention."""
         issues: list[dict[str, str]] = []
 
@@ -647,7 +647,7 @@ class ContentAnalyzer:
 
         return issues
 
-    def _generate_suggestions(self, analysis: dict[str, object]) -> list:
+    def _generate_suggestions(self, analysis: dict[str, t.NormalizedValue]) -> list:
         """Generate improvement suggestions based on analysis."""
         suggestions: list[str] = []
 
@@ -684,7 +684,7 @@ class ContentAnalyzer:
 
         return suggestions
 
-    def analyze_files_batch(self, file_paths: list[Path]) -> dict[str, object]:
+    def analyze_files_batch(self, file_paths: list[Path]) -> dict[str, t.NormalizedValue]:
         """Analyze multiple files and aggregate results."""
         for file_path in file_paths:
             self.analyze_file(file_path)
@@ -696,7 +696,7 @@ class ContentAnalyzer:
 
     def _generate_overall_recommendations(self) -> None:
         """Generate overall recommendations based on batch analysis."""
-        content_scores = cast("dict[str, object]", self.results["content_scores"])
+        content_scores = cast("dict[str, t.NormalizedValue]", self.results["content_scores"])
         if not content_scores:
             return
 
@@ -751,7 +751,7 @@ class ContentAnalyzer:
 
     def _generate_summary_report(self) -> str:
         """Generate human-readable summary report."""
-        content_scores = cast("dict[str, object]", self.results["content_scores"])
+        content_scores = cast("dict[str, t.NormalizedValue]", self.results["content_scores"])
         if not content_scores:
             return "No content analysis results available."
 
@@ -809,7 +809,7 @@ Top Recommendations:
 def analyze_file_content(
     file_path: str,
     config_path: str | None = None,
-) -> dict[str, object]:
+) -> dict[str, t.NormalizedValue]:
     """Convenience function to analyze a single file."""
     analyzer = ContentAnalyzer(config_path)
     return analyzer.analyze_file(Path(file_path))
@@ -818,7 +818,7 @@ def analyze_file_content(
 def analyze_files_content(
     file_paths: list[str],
     config_path: str | None = None,
-) -> dict[str, object]:
+) -> dict[str, t.NormalizedValue]:
     """Convenience function to analyze multiple files."""
     analyzer = ContentAnalyzer(config_path)
     paths = [Path(fp) for fp in file_paths]
