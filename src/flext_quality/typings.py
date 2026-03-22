@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from flext_cli import FlextCliTypes
 from flext_core import t as core_t
 from flext_web import FlextWebTypes
@@ -22,6 +24,9 @@ class FlextQualityTypes(FlextWebTypes, FlextCliTypes):
         type McpResource = dict[str, str]
         type MemoryQuery = dict[str, str | int | list[str]]
         type ContextQuery = dict[str, str | int]
+        type GenericItem = (
+            core_t.Primitives | Path | dict[str, core_t.Primitives | None]
+        )
 
 
 t = FlextQualityTypes

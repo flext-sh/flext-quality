@@ -9,12 +9,13 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Protocol
 
 from flext_quality.models import m
+from flext_quality.protocols import p
 from flext_quality.typings import t
 
-type GenericItem = t.Primitives | Path | dict[str, t.Primitives | None]
+# Use canonical type alias from typings namespace
+type GenericItem = t.Quality.GenericItem
 
 
 class BaseAuditor(ABC):
@@ -201,18 +202,5 @@ class BaseAnalyzer(ABC):
         return float(val) if isinstance(val, (int, float)) else None
 
 
-class Config(Protocol):
-    """Protocol for configuration objects."""
-
-    def get(
-        self,
-        key: str,
-        *,
-        default: str | float | bool | None = None,
-    ) -> t.Primitives | None:
-        """Get a configuration value."""
-        ...
-
-    def __getitem__(self, key: str) -> None:
-        """Get a configuration value with bracket notation."""
-        ...
+# Re-export canonical protocol from protocols namespace for backward compatibility
+Config = p.Quality.DocsConfig

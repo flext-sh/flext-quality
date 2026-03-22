@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from typing import Protocol
+from pathlib import Path
+from typing import ClassVar, Protocol, runtime_checkable
 
 from flext_cli import FlextCliProtocols
 from flext_core.result import r
@@ -17,6 +18,57 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
 
     class Quality:
         """Quality-specific protocols namespace."""
+
+        @runtime_checkable
+        class ValidatorBase(Protocol):
+            """Abstract base protocol for rule validators."""
+
+            @property
+            def name(self) -> str:
+                """Return validator name."""
+                ...
+
+            def validate(
+                self,
+                content: str,
+                file_path: Path | None = None,
+            ) -> r[list[Mapping[str, object]]]:
+                """Validate content and return violations."""
+                ...
+
+        @runtime_checkable
+        class HookImpl(Protocol):
+            """Abstract base protocol for hook implementations."""
+
+            event: ClassVar[object]
+            matcher: ClassVar[list[str] | None]
+
+            def execute(
+                self,
+                input_data: t.Quality.HookInput,
+            ) -> r[t.Quality.HookOutput]:
+                """Execute the hook logic."""
+                ...
+
+            def should_run(self, input_data: t.Quality.HookInput) -> bool:
+                """Check if hook should run for this input."""
+                ...
+
+        class DocsConfig(Protocol):
+            """Protocol for documentation configuration objects."""
+
+            def get(
+                self,
+                key: str,
+                *,
+                default: str | float | bool | None = None,
+            ) -> t.Primitives | None:
+                """Get a configuration value."""
+                ...
+
+            def __getitem__(self, key: str) -> None:
+                """Get a configuration value with bracket notation."""
+                ...
 
         class BaseHook(Protocol):
             """Protocol for hook implementations."""

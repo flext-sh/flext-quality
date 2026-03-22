@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import fnmatch
-from typing import ClassVar, Protocol, runtime_checkable
+from typing import ClassVar
 
 from flext_core.result import r
 
@@ -11,16 +11,15 @@ from flext_quality.constants import c
 from flext_quality.typings import t
 
 
-@runtime_checkable
-class BaseHookImpl(Protocol):
-    """Abstract base for hook implementations."""
+class BaseHookImpl:
+    """Concrete base for hook implementations satisfying p.Quality.HookImpl."""
 
     event: ClassVar[c.Quality.HookEvent]
-    matcher: ClassVar[list[str] | None]
+    matcher: ClassVar[list[str] | None] = None
 
     def execute(self, input_data: t.Quality.HookInput) -> r[t.Quality.HookOutput]:
         """Execute the hook logic."""
-        ...
+        raise NotImplementedError
 
     def should_run(self, input_data: t.Quality.HookInput) -> bool:
         """Check if hook should run for this input."""

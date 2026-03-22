@@ -6,34 +6,20 @@ import contextlib
 import re
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Protocol, override, runtime_checkable
+from typing import override
 
 from flext_core.result import r
 
 from flext_quality.constants import c
+from flext_quality.protocols import p
 
 
 class FlextQualityValidators:
     """Namespace for flext-quality validators (one class per module pattern)."""
 
-    @runtime_checkable
-    class Base(Protocol):
-        """Abstract base for rule validators."""
+    Base = p.Quality.ValidatorBase
 
-        @property
-        def name(self) -> str:
-            """Return validator name."""
-            ...
-
-        def validate(
-            self,
-            content: str,
-            file_path: Path | None = None,
-        ) -> r[list[Mapping[str, object]]]:
-            """Validate content and return violations."""
-            ...
-
-    class Pattern(Base):
+    class Pattern(p.Quality.ValidatorBase):
         """Validates content against regex patterns."""
 
         def __init__(self, patterns: Mapping[str, str]) -> None:
@@ -93,7 +79,7 @@ class FlextQualityValidators:
             """Return validator name."""
             return "forbidden-patterns"
 
-    class Tier(Base):
+    class Tier(p.Quality.ValidatorBase):
         """Validates architecture tier violations."""
 
         @property
@@ -147,18 +133,18 @@ class FlextQualityValidators:
 
         def __init__(self) -> None:
             """Initialize with default validators."""
-            self._validators: dict[str, FlextQualityValidators.Base] = {}
+            self._validators: dict[str, p.Quality.ValidatorBase] = {}
             self._register_defaults()
 
-        def all(self) -> list[FlextQualityValidators.Base]:
+        def all(self) -> list[p.Quality.ValidatorBase]:
             """Get all registered validators."""
             return list(self._validators.values())
 
-        def get(self, name: str) -> FlextQualityValidators.Base | None:
+        def get(self, name: str) -> p.Quality.ValidatorBase | None:
             """Get validator by name."""
             return self._validators.get(name)
 
-        def register(self, validator: FlextQualityValidators.Base) -> None:
+        def register(self, validator: p.Quality.ValidatorBase) -> None:
             """Register a validator."""
             self._validators[validator.name] = validator
 
