@@ -58,13 +58,13 @@ class TestFlextQualityAPI:
         """Test format_hook_output with continue=True."""
         quality = FlextQuality.get_instance()
         output = quality.format_hook_output(continue_exec=True)
-        u.Tests.Matchers.that('"continue": true' in output, eq=True)
+        u.Tests.Matchers.that('"continue":true' in output, eq=True)
 
     def test_format_hook_output_with_message(self) -> None:
         """Test format_hook_output with message."""
         quality = FlextQuality.get_instance()
         output = quality.format_hook_output(continue_exec=True, message="Test message")
-        u.Tests.Matchers.that('"continue": true' in output, eq=True)
+        u.Tests.Matchers.that('"continue":true' in output, eq=True)
         u.Tests.Matchers.that("Test message" in output, eq=True)
 
     def test_format_hook_output_blocked(self) -> None:
@@ -73,7 +73,7 @@ class TestFlextQualityAPI:
         output = quality.format_hook_output(
             continue_exec=False, blocked_reason="Blocked for testing"
         )
-        u.Tests.Matchers.that('"continue": false' in output, eq=True)
+        u.Tests.Matchers.that('"continue":false' in output, eq=True)
 
     def test_get_hook_config_json(self) -> None:
         """Test get_hook_config_json returns valid JSON."""
