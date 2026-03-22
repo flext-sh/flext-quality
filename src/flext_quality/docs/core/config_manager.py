@@ -8,16 +8,23 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from pathlib import Path
+from typing import TypeAlias
 
 import yaml
 
-type ConfigPrimitive = str | int | float | bool
-type ConfigValue = ConfigPrimitive | list[str]
-type ConfigSection = dict[str, ConfigValue]
-type ConfigData = dict[str, ConfigSection]
-type RawSectionValue = ConfigPrimitive | Sequence[ConfigPrimitive]
-type RawSectionMap = Mapping[str, RawSectionValue]
-type RawConfigMap = Mapping[str, RawSectionMap]
+ConfigPrimitive: TypeAlias = str | int | float | bool
+ConfigValue: TypeAlias = str | int | float | bool | list[str]
+ConfigSection: TypeAlias = dict[str, str | int | float | bool | list[str]]
+ConfigData: TypeAlias = dict[str, dict[str, str | int | float | bool | list[str]]]
+RawSectionValue: TypeAlias = (
+    str | int | float | bool | Sequence[str | int | float | bool]
+)
+RawSectionMap: TypeAlias = Mapping[
+    str, str | int | float | bool | Sequence[str | int | float | bool]
+]
+RawConfigMap: TypeAlias = Mapping[
+    str, Mapping[str, str | int | float | bool | Sequence[str | int | float | bool]]
+]
 
 
 def _as_section(value: RawSectionMap | None) -> ConfigSection:

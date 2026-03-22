@@ -17,23 +17,12 @@ import json
 import re
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import TypedDict
 
 import requests
 import yaml
 from pydantic import ValidationError
 
 from flext_quality.models import m
-
-
-class MetricsDict(TypedDict):
-    """Type definition for metrics dictionary."""
-
-    total_issues: int
-    severity_breakdown: dict[str, int]
-    quality_score: int
-    files_analyzed: int
-    issues_per_file: float
 
 
 QualityThresholdsConfig = m.Quality.QualityThresholdsConfig
@@ -48,25 +37,8 @@ LinkValidationConfig = m.Quality.LinkValidationConfig
 ContentAnalysisConfig = m.Quality.ContentAnalysisConfig
 ValidationConfig = m.Quality.ValidationConfig
 AuditorResults = m.Quality.AuditorResults
-
-
-def _empty_object_dict_list() -> list[dict[str, object]]:
-    return []
-
-
-def _empty_metrics_dict() -> MetricsDict:
-    return {
-        "total_issues": 0,
-        "severity_breakdown": {
-            "critical": 0,
-            "high": 0,
-            "medium": 0,
-            "low": 0,
-        },
-        "quality_score": 0,
-        "files_analyzed": 0,
-        "issues_per_file": 0.0,
-    }
+AuditMetrics = m.Quality.AuditMetrics
+AuditRecommendation = m.Quality.AuditRecommendation
 
 
 class DocumentationAuditor:
@@ -241,7 +213,7 @@ class DocumentationAuditor:
                     age_days = (datetime.now(UTC) - mtime).days
                     content = file_path.read_text(encoding="utf-8")
                     outdated_indicators = self._check_outdated_indicators(content)
-                    issue: dict[str, object] = {
+                    issue: dict[str, str | int | float | bool | list[str] | list[dict[str, str]] | None] = {
                         "type": "outdated_content",
                         "severity": "high" if age_days > 180 else "medium",
                         "file": str(file_path.relative_to(self.project_root)),
@@ -616,44 +588,44 @@ class DocumentationAuditor:
             severity_counts[level] * weights[level] for level in severity_counts
         )
         quality_score = max(0, 100 - weighted_score)
-        self.results.metrics = {
-            "total_issues": total_issues,
-            "severity_breakdown": severity_counts,
-            "quality_score": quality_score,
-            "files_analyzed": self.results.files_analyzed,
-            "issues_per_file": total_issues / self.results.files_analyzed
+        self.results.metrics = AuditMetrics(
+            total_issues=total_issues,
+            severity_breakdown=severity_counts,
+            quality_score=quality_score,
+            files_analyzed=self.results.files_analyzed,
+            issues_per_file=total_issues / self.results.files_analyzed
             if self.results.files_analyzed > 0
             else 0,
-        }
+        )
 
     def generate_recommendations(self) -> None:
         """Generate actionable recommendations based on audit results."""
         metrics = self.results.metrics
         issues = self.results.issues
-        recommendations: list[dict[str, object]] = []
-        quality_score = metrics["quality_score"]
+        recommendations: list[AuditRecommendation] = []
+        quality_score = metrics.quality_score
         if quality_score < 50:
-            recommendations.append({
-                "priority": "critical",
-                "category": "overall_quality",
-                "recommendation": "Immediate attention required - documentation quality is poor",
-                "actions": [
+            recommendations.append(AuditRecommendation(
+                priority="critical",
+                category="overall_quality",
+                recommendation="Immediate attention required - documentation quality is poor",
+                actions=[
                     "Address all critical and high-severity issues immediately",
                     "Implement automated quality gates in CI/CD",
                     "Schedule regular maintenance reviews",
                 ],
-            })
+            ))
         elif quality_score < 75:
-            recommendations.append({
-                "priority": "high",
-                "category": "quality_improvement",
-                "recommendation": "Documentation quality needs improvement",
-                "actions": [
+            recommendations.append(AuditRecommendation(
+                priority="high",
+                category="quality_improvement",
+                recommendation="Documentation quality needs improvement",
+                actions=[
                     "Focus on fixing high-severity issues",
                     "Implement regular audit schedule",
                     "Consider documentation training for team",
                 ],
-            })
+            ))
         broken_links = [
             i
             for i in issues
@@ -661,42 +633,42 @@ class DocumentationAuditor:
             and i.get("severity") in {"critical", "high"}
         ]
         if broken_links:
-            recommendations.append({
-                "priority": "high",
-                "category": "link_maintenance",
-                "recommendation": f"Fix {len(broken_links)} broken links",
-                "actions": [
+            recommendations.append(AuditRecommendation(
+                priority="high",
+                category="link_maintenance",
+                recommendation=f"Fix {len(broken_links)} broken links",
+                actions=[
                     "Update or remove broken external links",
                     "Fix internal reference paths",
                     "Implement automated link checking in CI/CD",
                 ],
-            })
+            ))
         outdated_content = [i for i in issues if i["type"] == "outdated_content"]
         if outdated_content:
-            recommendations.append({
-                "priority": "medium",
-                "category": "content_freshness",
-                "recommendation": f"Update {len(outdated_content)} outdated documents",
-                "actions": [
+            recommendations.append(AuditRecommendation(
+                priority="medium",
+                category="content_freshness",
+                recommendation=f"Update {len(outdated_content)} outdated documents",
+                actions=[
                     "Review content for accuracy",
                     "Update version numbers and dates",
                     "Implement content freshness monitoring",
                 ],
-            })
+            ))
         accessibility_issues = [
             i for i in issues if i["type"] == "accessibility_issues"
         ]
         if accessibility_issues:
-            recommendations.append({
-                "priority": "medium",
-                "category": "accessibility",
-                "recommendation": "Improve documentation accessibility",
-                "actions": [
+            recommendations.append(AuditRecommendation(
+                priority="medium",
+                category="accessibility",
+                recommendation="Improve documentation accessibility",
+                actions=[
                     "Add alt text to all images",
                     "Use descriptive link text",
                     "Ensure proper heading hierarchy",
                 ],
-            })
+            ))
         self.results.recommendations = recommendations
 
     def generate_report(
@@ -719,15 +691,15 @@ class DocumentationAuditor:
     def _generate_html_report(self) -> str:
         """Generate HTML audit report."""
         metrics = self.results.metrics
-        severity_breakdown = metrics["severity_breakdown"]
+        severity_breakdown = metrics.severity_breakdown
         critical_count = severity_breakdown["critical"]
         high_count = severity_breakdown["high"]
         medium_count = severity_breakdown["medium"]
         low_count = severity_breakdown["low"]
-        quality_score = metrics["quality_score"]
-        total_issues = metrics["total_issues"]
-        issues_per_file = metrics["issues_per_file"]
-        files_analyzed = metrics["files_analyzed"]
+        quality_score = metrics.quality_score
+        total_issues = metrics.total_issues
+        issues_per_file = metrics.issues_per_file
+        files_analyzed = metrics.files_analyzed
         html = f"""\n<!DOCTYPE html>\n<html>\n<head>\n    <title>FLEXT Quality Documentation Audit Report</title>\n    <style>\n        body {{ font-family: Arial, sans-serif; margin: 40px; }}\n        .header {{ background: #f0f0f0; padding: 20px; border-radius: 5px; }}\n        .metrics {{ display: flex; gap: 20px; margin: 20px 0; }}\n        .metric {{ background: #e8f4fd; padding: 15px; border-radius: 5px; flex: 1; }}\n        .issues {{ margin: 20px 0; }}\n        .issue {{ border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; }}\n        .severity-critical {{ border-left: 5px solid #dc3545; }}\n        .severity-high {{ border-left: 5px solid #fd7e14; }}\n        .severity-medium {{ border-left: 5px solid #ffc107; }}\n        .severity-low {{ border-left: 5px solid #28a745; }}\n    </style>\n</head>\n<body>\n    <div class="header">\n        <h1>FLEXT Quality Documentation Audit Report</h1>\n        <p>Generated: {self.results.timestamp}</p>\n        <p>Files Analyzed: {files_analyzed}</p>\n    </div>\n\n    <div class="metrics">\n        <div class="metric">\n            <h3>Quality Score</h3>\n            <div style="font-size: 2em; font-weight: bold; color: {self._get_score_color(quality_score)};">\n                {quality_score}%\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Total Issues</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                {total_issues}\n            </div>\n        </div>\n        <div class="metric">\n            <h3>Issues per File</h3>\n            <div style="font-size: 2em; font-weight: bold;">\n                {issues_per_file:.1f}\n            </div>\n        </div>\n    </div>\n\n    <h2>Issues by Severity</h2>\n    <ul>\n        <li>Critical: {critical_count}</li>\n        <li>High: {high_count}</li>\n        <li>Medium: {medium_count}</li>\n        <li>Low: {low_count}</li>\n    </ul>\n\n    <div class="issues">\n        <h2>Detailed Issues</h2>\n"""
         for issue in self.results.issues:
             severity_class = f"severity-{issue.get('severity', 'info')}"
@@ -846,17 +818,17 @@ def _execute_audit_checks(
     return auditor.results
 
 
-def _should_fail_on_results(args: argparse.Namespace, metrics: MetricsDict) -> bool:
+def _should_fail_on_results(args: argparse.Namespace, metrics: AuditMetrics) -> bool:
     """Determine if the process should fail based on results and arguments."""
     should_fail = False
     if args.fail_on_errors:
-        severity_breakdown = metrics["severity_breakdown"]
+        severity_breakdown = metrics.severity_breakdown
         critical = severity_breakdown["critical"]
         high = severity_breakdown["high"]
         critical_high_issues = critical + high
         if critical_high_issues > 0:
             should_fail = True
-    quality_score = metrics["quality_score"]
+    quality_score = metrics.quality_score
     if args.ci_mode and quality_score < 70:
         should_fail = True
     return should_fail

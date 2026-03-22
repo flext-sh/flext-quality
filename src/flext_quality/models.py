@@ -241,16 +241,37 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             end_time: str = ""
             duration_seconds: int = 0
 
+        class AuditMetrics(BaseModel):
+            """Typed metrics for documentation audit results."""
+
+            total_issues: int = 0
+            severity_breakdown: dict[str, int] = Field(default_factory=dict)
+            quality_score: int = 0
+            files_analyzed: int = 0
+            issues_per_file: float = 0.0
+
+        class AuditRecommendation(BaseModel):
+            """Typed recommendation from documentation audit."""
+
+            priority: str
+            category: str
+            recommendation: str
+            actions: list[str] = Field(default_factory=list)
+
         class AuditorResults(BaseModel):
             """Results for documentation audit execution."""
 
             timestamp: str
             files_analyzed: int = 0
-            issues: list[dict[str, t.Primitives | list[str] | None]] = Field(
-                default_factory=list
+            issues: list[
+                dict[str, t.Primitives | list[str] | list[dict[str, str]] | None]
+            ] = Field(default_factory=list)
+            metrics: FlextQualityModels.Quality.AuditMetrics = Field(
+                default_factory=lambda: FlextQualityModels.Quality.AuditMetrics()
             )
-            metrics: dict[str, t.Primitives] = Field(default_factory=dict)
-            recommendations: list[str] = Field(default_factory=list)
+            recommendations: list[
+                FlextQualityModels.Quality.AuditRecommendation
+            ] = Field(default_factory=list)
 
         class LinkRecord(BaseModel):
             """Record of a link found in documentation."""

@@ -14,6 +14,8 @@ if TYPE_CHECKING:
 
     from flext_quality.docs.scripts.audit import (
         AccessibilityConfig,
+        AuditMetrics,
+        AuditRecommendation,
         AuditorResults,
         AuditRulesConfig,
         ContentAnalysisConfig,
@@ -22,7 +24,6 @@ if TYPE_CHECKING:
         FormattingConfig,
         LinkValidationConfig,
         MarkdownStyleConfig,
-        MetricsDict,
         QualityThresholdsConfig,
         SeverityLevelsConfig,
         StyleGuideConfig,
@@ -103,7 +104,8 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "MIN_HEADINGS_FOR_TOC",
     ),
     "MarkdownStyleConfig": ("flext_quality.docs.scripts.audit", "MarkdownStyleConfig"),
-    "MetricsDict": ("flext_quality.docs.scripts.audit", "MetricsDict"),
+    "AuditMetrics": ("flext_quality.docs.scripts.audit", "AuditMetrics"),
+    "AuditRecommendation": ("flext_quality.docs.scripts.audit", "AuditRecommendation"),
     "OptimizationSummary": ("flext_quality.docs.scripts.report", "OptimizationSummary"),
     "OptimizerResults": ("flext_quality.docs.scripts.optimize", "OptimizerResults"),
     "QualityThresholdsConfig": (
@@ -148,7 +150,8 @@ __all__ = [
     "LinkValidator",
     "LinkValidatorResults",
     "MarkdownStyleConfig",
-    "MetricsDict",
+    "AuditMetrics",
+    "AuditRecommendation",
     "OptimizationSummary",
     "OptimizerResults",
     "QualityThresholdsConfig",
