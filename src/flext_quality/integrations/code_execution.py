@@ -11,31 +11,16 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from pathlib import Path
-from typing import Annotated, final
+from typing import final
 
 from flext_core.result import r
-from pydantic import BaseModel, Field
 
 from flext_quality.constants import c
+from flext_quality.models import m
 from flext_quality.typings import t
 
-
-class ExecutionRequest(BaseModel):
-    """Request payload for a deferred command execution."""
-
-    script_path: Path
-    runtime: str
-    args: Annotated[list[str], Field(default_factory=list)]
-    timeout_ms: int
-
-
-class ExecutionResult(BaseModel):
-    """Structured result payload from a command execution."""
-
-    success: bool
-    exit_code: int
-    stdout: str = ""
-    stderr: str = ""
+ExecutionRequest = m.Quality.ExecutionRequest
+ExecutionResult = m.Quality.ExecutionResult
 
 
 @final

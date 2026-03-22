@@ -39,6 +39,7 @@ if TYPE_CHECKING:
         OptimizationSummary,
         Recommendation,
         ReportData,
+        ReportValue,
         SummaryMetrics,
         TrendData,
         TrendEntry,
@@ -111,6 +112,7 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     ),
     "Recommendation": ("flext_quality.docs.scripts.report", "Recommendation"),
     "ReportData": ("flext_quality.docs.scripts.report", "ReportData"),
+    "ReportValue": ("flext_quality.docs.scripts.report", "ReportValue"),
     "SeverityLevelsConfig": (
         "flext_quality.docs.scripts.audit",
         "SeverityLevelsConfig",
@@ -152,6 +154,7 @@ __all__ = [
     "QualityThresholdsConfig",
     "Recommendation",
     "ReportData",
+    "ReportValue",
     "SeverityLevelsConfig",
     "StyleGuideConfig",
     "SummaryMetrics",

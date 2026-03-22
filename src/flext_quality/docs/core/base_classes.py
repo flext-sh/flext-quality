@@ -14,9 +14,6 @@ from flext_quality.models import m
 from flext_quality.protocols import p
 from flext_quality.typings import t
 
-# Use canonical type alias from typings namespace
-type GenericItem = t.Quality.GenericItem
-
 
 class BaseAuditor(ABC):
     """Base class for all audit operations.
@@ -91,7 +88,9 @@ class BaseValidator(ABC):
         self.name = name
         self.results: m.Quality.ValidationResult | None = None
 
-    def validate(self, items: list[GenericItem]) -> m.Quality.ValidationResult:
+    def validate(
+        self, items: list[t.Quality.GenericItem]
+    ) -> m.Quality.ValidationResult:
         """Perform validation on given items."""
         self.results = m.Quality.ValidationResult()
         self.results.total_items = len(items)
@@ -101,7 +100,7 @@ class BaseValidator(ABC):
         return self.results
 
     @abstractmethod
-    def _validate_items(self, items: list[GenericItem]) -> None:
+    def _validate_items(self, items: list[t.Quality.GenericItem]) -> None:
         """Implementation-specific validation logic."""
 
     def get_summary(self) -> dict[str, float | int | str] | dict[str, str]:

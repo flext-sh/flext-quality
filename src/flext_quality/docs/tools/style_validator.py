@@ -98,11 +98,6 @@ class ValidationResults(TypedDict):
     summary: SummaryMetrics
 
 
-type RawStyleScalar = str | int | bool
-type RawStyleSection = dict[str, RawStyleScalar]
-type RawStyleConfig = dict[str, RawStyleSection]
-
-
 class StyleValidator:
     """Documentation style validation and consistency checking system."""
 
@@ -158,7 +153,9 @@ class StyleValidator:
             return
         try:
             with Path(config_path).open(encoding="utf-8") as f:
-                loaded_obj: RawStyleConfig | None = yaml.safe_load(f)
+                loaded_obj: dict[str, dict[str, str | int | bool]] | None = (
+                    yaml.safe_load(f)
+                )
                 if isinstance(loaded_obj, dict):
                     self.config = self._normalize_config(loaded_obj)
                 else:
@@ -166,7 +163,9 @@ class StyleValidator:
         except (FileNotFoundError, KeyError, OSError):
             self._set_default_config()
 
-    def _normalize_config(self, raw: RawStyleConfig) -> StyleConfig:
+    def _normalize_config(
+        self, raw: dict[str, dict[str, str | int | bool]]
+    ) -> StyleConfig:
         config: StyleConfig = {}
 
         markdown_raw = raw.get("markdown")

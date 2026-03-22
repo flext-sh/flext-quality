@@ -19,7 +19,8 @@ from typing import TypedDict
 
 import requests
 import yaml
-from pydantic import BaseModel, Field
+
+from flext_quality.models import m
 
 # Constants
 MAX_BROKEN_LINKS_TO_SHOW = 10
@@ -83,16 +84,7 @@ class _NotifierConfig(TypedDict):
     webhook: _WebhookConfig
 
 
-class NotifierResults(BaseModel):
-    """Results for DocumentationNotifier execution."""
-
-    notifications_sent: int = Field(
-        default=0, description="Number of notifications sent"
-    )
-    errors: list[str] = Field(
-        default_factory=list, description="List of error messages"
-    )
-    timestamp: str = Field(description="ISO timestamp when notifier ran")
+NotifierResults = m.Quality.NotifierResults
 
 
 class DocumentationNotifier:

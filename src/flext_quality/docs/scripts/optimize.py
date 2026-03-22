@@ -20,27 +20,14 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
-from pydantic import BaseModel, Field, TypeAdapter, ValidationError
+from pydantic import TypeAdapter, ValidationError
+
+from flext_quality.models import m
 
 MIN_HEADINGS_FOR_TOC = 5
 
 
-def _empty_optimizations() -> list[dict[str, str]]:
-    return []
-
-
-def _empty_backups() -> list[str]:
-    return []
-
-
-class OptimizerResults(BaseModel):
-    """Results of a documentation optimization run."""
-
-    timestamp: str
-    files_processed: int = 0
-    changes_made: int = 0
-    backups_created: list[str] = Field(default_factory=_empty_backups)
-    optimizations: list[dict[str, str]] = Field(default_factory=_empty_optimizations)
+OptimizerResults = m.Quality.OptimizerResults
 
 
 class DocumentationOptimizer:

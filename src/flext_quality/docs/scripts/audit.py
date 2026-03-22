@@ -21,9 +21,9 @@ from typing import TypedDict
 
 import requests
 import yaml
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import ValidationError
 
-type IssueDict = dict[str, object]
+from flext_quality.models import m
 
 
 class MetricsDict(TypedDict):
@@ -36,108 +36,18 @@ class MetricsDict(TypedDict):
     issues_per_file: float
 
 
-type RecommendationDict = dict[str, object]
-
-
-class QualityThresholdsConfig(BaseModel):
-    """Configuration for quality threshold limits."""
-
-    max_age_days: int = 90
-    min_word_count: int = 100
-    max_broken_links: int = 0
-    min_completeness_score: float = 0.8
-
-
-class ContentChecksConfig(BaseModel):
-    """Configuration for content validation checks."""
-
-    check_freshness: bool = True
-    check_completeness: bool = True
-    check_consistency: bool = True
-    check_links: bool = True
-
-
-class SeverityLevelsConfig(BaseModel):
-    """Configuration for severity level categorization."""
-
-    critical: list[str] = Field(default_factory=list)
-    high: list[str] = Field(default_factory=list)
-    medium: list[str] = Field(default_factory=list)
-    low: list[str] = Field(default_factory=list)
-
-
-class AuditRulesConfig(BaseModel):
-    """Configuration for audit rules and thresholds."""
-
-    quality_thresholds: QualityThresholdsConfig = Field(
-        default_factory=QualityThresholdsConfig
-    )
-    content_checks: ContentChecksConfig = Field(default_factory=ContentChecksConfig)
-    severity_levels: SeverityLevelsConfig = Field(default_factory=SeverityLevelsConfig)
-
-
-class MarkdownStyleConfig(BaseModel):
-    """Configuration for Markdown style preferences."""
-
-    heading_style: str = "atx"
-    list_style: str = "dash"
-    emphasis_style: str = "*"
-    code_block_style: str = "fenced"
-
-
-class AccessibilityConfig(BaseModel):
-    """Configuration for accessibility requirements."""
-
-    require_alt_text: bool = True
-    descriptive_links: bool = True
-    heading_structure: bool = True
-
-
-class FormattingConfig(BaseModel):
-    """Configuration for formatting standards."""
-
-    max_line_length: int = 88
-    consistent_indentation: bool = True
-    trailing_spaces: bool = False
-
-
-class StyleGuideConfig(BaseModel):
-    """Configuration for style guide rules."""
-
-    markdown: MarkdownStyleConfig = Field(default_factory=MarkdownStyleConfig)
-    accessibility: AccessibilityConfig = Field(default_factory=AccessibilityConfig)
-    formatting: FormattingConfig = Field(default_factory=FormattingConfig)
-
-
-class LinkValidationConfig(BaseModel):
-    """Configuration for link validation settings."""
-
-    timeout: int = 10
-    retry_attempts: int = 3
-    user_agent: str = "FLEXT-Quality-Doc-Auditor/1.0"
-    check_external: bool = True
-    check_internal: bool = True
-    check_images: bool = True
-
-
-class ContentAnalysisConfig(BaseModel):
-    """Configuration for content analysis parameters."""
-
-    min_section_depth: int = 2
-    required_sections: list[str] = Field(
-        default_factory=lambda: ["Overview", "Installation", "Usage"]
-    )
-    check_todos: bool = True
-    check_fixmes: bool = True
-
-
-class ValidationConfig(BaseModel):
-    """Configuration for validation settings."""
-
-    link_validation: LinkValidationConfig = Field(default_factory=LinkValidationConfig)
-    content_analysis: ContentAnalysisConfig = Field(
-        default_factory=ContentAnalysisConfig
-    )
+QualityThresholdsConfig = m.Quality.QualityThresholdsConfig
+ContentChecksConfig = m.Quality.ContentChecksConfig
+SeverityLevelsConfig = m.Quality.SeverityLevelsConfig
+AuditRulesConfig = m.Quality.AuditRulesConfig
+MarkdownStyleConfig = m.Quality.MarkdownStyleConfig
+AccessibilityConfig = m.Quality.AccessibilityConfig
+FormattingConfig = m.Quality.FormattingConfig
+StyleGuideConfig = m.Quality.StyleGuideConfig
+LinkValidationConfig = m.Quality.LinkValidationConfig
+ContentAnalysisConfig = m.Quality.ContentAnalysisConfig
+ValidationConfig = m.Quality.ValidationConfig
+AuditorResults = m.Quality.AuditorResults
 
 
 def _empty_object_dict_list() -> list[dict[str, object]]:
@@ -157,21 +67,6 @@ def _empty_metrics_dict() -> MetricsDict:
         "files_analyzed": 0,
         "issues_per_file": 0.0,
     }
-
-
-class AuditorResults(BaseModel):
-    """Results for DocumentationAuditor execution."""
-
-    timestamp: str = Field(description="ISO timestamp when audit ran")
-    files_analyzed: int = Field(default=0, description="Number of files analyzed")
-    issues: list[dict[str, object]] = Field(
-        default_factory=_empty_object_dict_list, description="List of issues found"
-    )
-    metrics: MetricsDict = Field(default_factory=_empty_metrics_dict)
-    recommendations: list[dict[str, object]] = Field(
-        default_factory=_empty_object_dict_list,
-        description="List of recommendations",
-    )
 
 
 class DocumentationAuditor:

@@ -29,7 +29,7 @@ class _ReportOptions(TypedDict, total=False):
     include_trends: bool
 
 
-type ReportValue = (
+ReportValue = (
     str
     | int
     | float

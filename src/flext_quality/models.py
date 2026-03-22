@@ -17,6 +17,18 @@ from flext_quality.constants import c
 from flext_quality.typings import t
 
 
+def _empty_list_str() -> list[str]:
+    return []
+
+
+def _empty_dict_str_str() -> dict[str, str]:
+    return {}
+
+
+def _empty_list_dict_str_str() -> list[dict[str, str]]:
+    return []
+
+
 class FlextQualityModels(FlextWebModels, FlextCliModels):
     """Namespace for flext-quality models."""
 
@@ -396,6 +408,162 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             notifications_sent: int = 0
             errors: list[str] = Field(default_factory=list)
             timestamp: str
+
+        class QualityThresholdsConfig(BaseModel):
+            """Configuration for quality threshold limits."""
+
+            max_age_days: int = 90
+            min_word_count: int = 100
+            max_broken_links: int = 0
+            min_completeness_score: float = 0.8
+
+        class ContentChecksConfig(BaseModel):
+            """Configuration for content validation checks."""
+
+            check_freshness: bool = True
+            check_completeness: bool = True
+            check_consistency: bool = True
+            check_links: bool = True
+
+        class SeverityLevelsConfig(BaseModel):
+            """Configuration for severity level categorization."""
+
+            critical: list[str] = Field(default_factory=list)
+            high: list[str] = Field(default_factory=list)
+            medium: list[str] = Field(default_factory=list)
+            low: list[str] = Field(default_factory=list)
+
+        class AuditRulesConfig(BaseModel):
+            """Configuration for audit rules and thresholds."""
+
+            quality_thresholds: FlextQualityModels.Quality.QualityThresholdsConfig = (
+                Field(
+                    default_factory=lambda: (
+                        FlextQualityModels.Quality.QualityThresholdsConfig()
+                    )
+                )
+            )
+            content_checks: FlextQualityModels.Quality.ContentChecksConfig = Field(
+                default_factory=lambda: FlextQualityModels.Quality.ContentChecksConfig()
+            )
+            severity_levels: FlextQualityModels.Quality.SeverityLevelsConfig = Field(
+                default_factory=lambda: (
+                    FlextQualityModels.Quality.SeverityLevelsConfig()
+                )
+            )
+
+        class MarkdownStyleConfig(BaseModel):
+            """Configuration for Markdown style preferences."""
+
+            heading_style: str = "atx"
+            list_style: str = "dash"
+            emphasis_style: str = "*"
+            code_block_style: str = "fenced"
+
+        class AccessibilityConfig(BaseModel):
+            """Configuration for accessibility requirements."""
+
+            require_alt_text: bool = True
+            descriptive_links: bool = True
+            heading_structure: bool = True
+
+        class FormattingConfig(BaseModel):
+            """Configuration for formatting standards."""
+
+            max_line_length: int = 88
+            consistent_indentation: bool = True
+            trailing_spaces: bool = False
+
+        class StyleGuideConfig(BaseModel):
+            """Configuration for style guide rules."""
+
+            markdown: FlextQualityModels.Quality.MarkdownStyleConfig = Field(
+                default_factory=lambda: FlextQualityModels.Quality.MarkdownStyleConfig()
+            )
+            accessibility: FlextQualityModels.Quality.AccessibilityConfig = Field(
+                default_factory=lambda: FlextQualityModels.Quality.AccessibilityConfig()
+            )
+            formatting: FlextQualityModels.Quality.FormattingConfig = Field(
+                default_factory=lambda: FlextQualityModels.Quality.FormattingConfig()
+            )
+
+        class LinkValidationConfig(BaseModel):
+            """Configuration for link validation settings."""
+
+            timeout: int = 10
+            retry_attempts: int = 3
+            user_agent: str = "FLEXT-Quality-Doc-Auditor/1.0"
+            check_external: bool = True
+            check_internal: bool = True
+            check_images: bool = True
+
+        class ContentAnalysisConfig(BaseModel):
+            """Configuration for content analysis parameters."""
+
+            min_section_depth: int = 2
+            required_sections: list[str] = Field(
+                default_factory=lambda: ["Overview", "Installation", "Usage"]
+            )
+            check_todos: bool = True
+            check_fixmes: bool = True
+
+        class ValidationConfig(BaseModel):
+            """Configuration for validation settings."""
+
+            link_validation: FlextQualityModels.Quality.LinkValidationConfig = Field(
+                default_factory=lambda: (
+                    FlextQualityModels.Quality.LinkValidationConfig()
+                )
+            )
+            content_analysis: FlextQualityModels.Quality.ContentAnalysisConfig = Field(
+                default_factory=lambda: (
+                    FlextQualityModels.Quality.ContentAnalysisConfig()
+                )
+            )
+
+        class OptimizerResults(BaseModel):
+            """Results of a documentation optimization run."""
+
+            timestamp: str
+            files_processed: int = 0
+            changes_made: int = 0
+            backups_created: list[str] = Field(default_factory=_empty_list_str)
+            optimizations: list[dict[str, str]] = Field(
+                default_factory=_empty_list_dict_str_str
+            )
+
+        class ExecutionRequest(BaseModel):
+            """Request payload for a deferred command execution."""
+
+            script_path: Path
+            runtime: str
+            args: Annotated[list[str], Field(default_factory=_empty_list_str)]
+            timeout_ms: int
+
+        class ExecutionResult(BaseModel):
+            """Structured result payload from a command execution."""
+
+            success: bool
+            exit_code: int
+            stdout: str = ""
+            stderr: str = ""
+
+        class McpToolCall(BaseModel):
+            """MCP tool invocation request contract."""
+
+            server: str
+            tool: str
+            params: Annotated[
+                dict[str, t.NormalizedValue],
+                Field(default_factory=_empty_dict_str_str),
+            ]
+
+        class McpToolResult(BaseModel):
+            """MCP tool invocation response contract."""
+
+            success: bool
+            data: dict[str, str] | None = None
+            error: str | None = None
 
 
 m = FlextQualityModels

@@ -11,29 +11,17 @@ from __future__ import annotations
 
 import shutil
 from collections.abc import Mapping
-from typing import Annotated, final
+from typing import final
 
 from flext_core.result import r
-from pydantic import BaseModel, Field, TypeAdapter
+from pydantic import TypeAdapter
 
 from flext_quality.constants import c
+from flext_quality.models import m
 from flext_quality.typings import t
 
-
-class McpToolCall(BaseModel):
-    """MCP tool invocation request contract."""
-
-    server: str
-    tool: str
-    params: Annotated[dict[str, t.NormalizedValue], Field(default_factory=dict)]
-
-
-class McpToolResult(BaseModel):
-    """MCP tool invocation response contract."""
-
-    success: bool
-    data: dict[str, str] | None = None
-    error: str | None = None
+McpToolCall = m.Quality.McpToolCall
+McpToolResult = m.Quality.McpToolResult
 
 
 @final
