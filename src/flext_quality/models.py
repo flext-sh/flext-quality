@@ -269,9 +269,9 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             metrics: FlextQualityModels.Quality.AuditMetrics = Field(
                 default_factory=lambda: FlextQualityModels.Quality.AuditMetrics()
             )
-            recommendations: list[
-                FlextQualityModels.Quality.AuditRecommendation
-            ] = Field(default_factory=list)
+            recommendations: list[FlextQualityModels.Quality.AuditRecommendation] = (
+                Field(default_factory=list)
+            )
 
         class LinkRecord(BaseModel):
             """Record of a link found in documentation."""

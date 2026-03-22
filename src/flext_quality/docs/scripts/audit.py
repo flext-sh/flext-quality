@@ -24,7 +24,6 @@ from pydantic import ValidationError
 
 from flext_quality.models import m
 
-
 QualityThresholdsConfig = m.Quality.QualityThresholdsConfig
 ContentChecksConfig = m.Quality.ContentChecksConfig
 SeverityLevelsConfig = m.Quality.SeverityLevelsConfig
@@ -213,7 +212,16 @@ class DocumentationAuditor:
                     age_days = (datetime.now(UTC) - mtime).days
                     content = file_path.read_text(encoding="utf-8")
                     outdated_indicators = self._check_outdated_indicators(content)
-                    issue: dict[str, str | int | float | bool | list[str] | list[dict[str, str]] | None] = {
+                    issue: dict[
+                        str,
+                        str
+                        | int
+                        | float
+                        | bool
+                        | list[str]
+                        | list[dict[str, str]]
+                        | None,
+                    ] = {
                         "type": "outdated_content",
                         "severity": "high" if age_days > 180 else "medium",
                         "file": str(file_path.relative_to(self.project_root)),
@@ -605,27 +613,31 @@ class DocumentationAuditor:
         recommendations: list[AuditRecommendation] = []
         quality_score = metrics.quality_score
         if quality_score < 50:
-            recommendations.append(AuditRecommendation(
-                priority="critical",
-                category="overall_quality",
-                recommendation="Immediate attention required - documentation quality is poor",
-                actions=[
-                    "Address all critical and high-severity issues immediately",
-                    "Implement automated quality gates in CI/CD",
-                    "Schedule regular maintenance reviews",
-                ],
-            ))
+            recommendations.append(
+                AuditRecommendation(
+                    priority="critical",
+                    category="overall_quality",
+                    recommendation="Immediate attention required - documentation quality is poor",
+                    actions=[
+                        "Address all critical and high-severity issues immediately",
+                        "Implement automated quality gates in CI/CD",
+                        "Schedule regular maintenance reviews",
+                    ],
+                )
+            )
         elif quality_score < 75:
-            recommendations.append(AuditRecommendation(
-                priority="high",
-                category="quality_improvement",
-                recommendation="Documentation quality needs improvement",
-                actions=[
-                    "Focus on fixing high-severity issues",
-                    "Implement regular audit schedule",
-                    "Consider documentation training for team",
-                ],
-            ))
+            recommendations.append(
+                AuditRecommendation(
+                    priority="high",
+                    category="quality_improvement",
+                    recommendation="Documentation quality needs improvement",
+                    actions=[
+                        "Focus on fixing high-severity issues",
+                        "Implement regular audit schedule",
+                        "Consider documentation training for team",
+                    ],
+                )
+            )
         broken_links = [
             i
             for i in issues
@@ -633,42 +645,48 @@ class DocumentationAuditor:
             and i.get("severity") in {"critical", "high"}
         ]
         if broken_links:
-            recommendations.append(AuditRecommendation(
-                priority="high",
-                category="link_maintenance",
-                recommendation=f"Fix {len(broken_links)} broken links",
-                actions=[
-                    "Update or remove broken external links",
-                    "Fix internal reference paths",
-                    "Implement automated link checking in CI/CD",
-                ],
-            ))
+            recommendations.append(
+                AuditRecommendation(
+                    priority="high",
+                    category="link_maintenance",
+                    recommendation=f"Fix {len(broken_links)} broken links",
+                    actions=[
+                        "Update or remove broken external links",
+                        "Fix internal reference paths",
+                        "Implement automated link checking in CI/CD",
+                    ],
+                )
+            )
         outdated_content = [i for i in issues if i["type"] == "outdated_content"]
         if outdated_content:
-            recommendations.append(AuditRecommendation(
-                priority="medium",
-                category="content_freshness",
-                recommendation=f"Update {len(outdated_content)} outdated documents",
-                actions=[
-                    "Review content for accuracy",
-                    "Update version numbers and dates",
-                    "Implement content freshness monitoring",
-                ],
-            ))
+            recommendations.append(
+                AuditRecommendation(
+                    priority="medium",
+                    category="content_freshness",
+                    recommendation=f"Update {len(outdated_content)} outdated documents",
+                    actions=[
+                        "Review content for accuracy",
+                        "Update version numbers and dates",
+                        "Implement content freshness monitoring",
+                    ],
+                )
+            )
         accessibility_issues = [
             i for i in issues if i["type"] == "accessibility_issues"
         ]
         if accessibility_issues:
-            recommendations.append(AuditRecommendation(
-                priority="medium",
-                category="accessibility",
-                recommendation="Improve documentation accessibility",
-                actions=[
-                    "Add alt text to all images",
-                    "Use descriptive link text",
-                    "Ensure proper heading hierarchy",
-                ],
-            ))
+            recommendations.append(
+                AuditRecommendation(
+                    priority="medium",
+                    category="accessibility",
+                    recommendation="Improve documentation accessibility",
+                    actions=[
+                        "Add alt text to all images",
+                        "Use descriptive link text",
+                        "Ensure proper heading hierarchy",
+                    ],
+                )
+            )
         self.results.recommendations = recommendations
 
     def generate_report(

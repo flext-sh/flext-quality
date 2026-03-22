@@ -12,7 +12,7 @@ import re
 from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TypedDict, cast
+from typing import TypedDict
 
 import yaml
 
@@ -144,7 +144,7 @@ class ContentAnalyzer:
             config_path: Path to configuration file for content analysis rules.
 
         """
-        self.config: dict[str, object] = {}
+        self.config: dict[str, dict[str, bool] | dict[str, int] | str] = {}
         self.load_config(config_path)
         quality_metrics: dict[str, MetricsDict] = {}
         content_scores: dict[str, float] = {}
@@ -162,7 +162,7 @@ class ContentAnalyzer:
 
     def load_config(self, config_path: str | None) -> None:
         """Load content analysis configuration."""
-        default_config: dict[str, object] = {
+        default_config: dict[str, dict[str, bool] | dict[str, int] | str] = {
             "content_checks": {
                 "check_freshness": True,
                 "check_completeness": True,
@@ -179,8 +179,16 @@ class ContentAnalyzer:
             return
         try:
             with Path(config_path).open(encoding="utf-8") as f:
-                loaded = cast("dict[str, object]", yaml.safe_load(f))
-                self.config = loaded
+                loaded: dict[str, object] | list[object] | str | None = yaml.safe_load(
+                    f
+                )
+                if isinstance(loaded, dict):
+                    config_loaded: dict[str, dict[str, bool] | dict[str, int] | str] = {
+                        k: v for k, v in loaded.items() if isinstance(v, (dict, str))
+                    }
+                    self.config = config_loaded
+                else:
+                    self.config = default_config
         except (FileNotFoundError, KeyError):
             self.config = default_config
 
@@ -191,19 +199,16 @@ class ContentAnalyzer:
             filename = str(file_path.relative_to(file_path.parents[2]))
             issues_list: list[IssueDict] = []
             suggestions_list: list[str] = []
-            analysis: AnalysisDict = cast(
-                "AnalysisDict",
-                {
-                    "file": filename,
-                    "metrics": self._calculate_content_metrics(content),
-                    "readability": self._analyze_readability(content),
-                    "structure": self._analyze_structure(content),
-                    "completeness": self._check_completeness(content, filename),
-                    "quality_score": 0.0,
-                    "issues": issues_list,
-                    "suggestions": suggestions_list,
-                },
-            )
+            analysis: AnalysisDict = {
+                "file": filename,
+                "metrics": self._calculate_content_metrics(content),
+                "readability": self._analyze_readability(content),
+                "structure": self._analyze_structure(content),
+                "completeness": self._check_completeness(content, filename),
+                "quality_score": 0.0,
+                "issues": issues_list,
+                "suggestions": suggestions_list,
+            }
 
             analysis["quality_score"] = self._calculate_quality_score(analysis)
 
@@ -234,16 +239,14 @@ class ContentAnalyzer:
             OSError,
             ValueError,
         ) as e:
-            return cast(
-                "AnalysisDict",
-                {
-                    "file": str(file_path),
-                    "error": str(e),
-                    "quality_score": 0,
-                    "issues": [{"type": "analysis_error", "message": str(e)}],
-                    "suggestions": [],
-                },
-            )
+            error_result: AnalysisDict = {
+                "file": str(file_path),
+                "error": str(e),
+                "quality_score": 0,
+                "issues": [{"type": "analysis_error", "message": str(e)}],
+                "suggestions": [],
+            }
+            return error_result
 
     def _calculate_content_metrics(
         self,
@@ -437,23 +440,19 @@ class ContentAnalyzer:
         missing_elems: list[str] = []
         required_present: list[str] = []
         optional_present: list[str] = []
-        completeness: CompletenessDict = cast(
-            "CompletenessDict",
-            {
-                "score": 100,
-                "missing_elements": missing_elems,
-                "required_sections_present": required_present,
-                "optional_sections_present": optional_present,
-                "word_count_sufficient": True,
-                "missing_required_sections": [],
-            },
-        )
+        completeness: CompletenessDict = {
+            "score": 100,
+            "missing_elements": missing_elems,
+            "required_sections_present": required_present,
+            "optional_sections_present": optional_present,
+            "word_count_sufficient": True,
+            "missing_required_sections": list[str](),
+        }
 
         word_count = len(re.findall(r"\b\w+\b", content))
         thresholds_val = self.config.get("quality_thresholds")
-        thresholds = cast(
-            "dict[str, object]",
-            thresholds_val if isinstance(thresholds_val, dict) else {},
+        thresholds: dict[str, bool | int | str] = (
+            dict(thresholds_val) if isinstance(thresholds_val, dict) else {}
         )
         min_words_val = thresholds.get("min_word_count", 100)
         min_words = 100
@@ -742,7 +741,7 @@ class ContentAnalyzer:
         all_issues: list[dict[str, str]] = []
         for result_value in self.results.values():
             if isinstance(result_value, dict):
-                issues_val = cast("object", result_value.get("issues"))
+                issues_val: list[dict[str, str]] | None = result_value.get("issues")
                 if isinstance(issues_val, list):
                     all_issues.extend(issues_val)
 

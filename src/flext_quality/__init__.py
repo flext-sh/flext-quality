@@ -59,7 +59,9 @@ if TYPE_CHECKING:
         ScheduleTaskConfig,
     )
     from flext_quality.docs.scripts.audit import (
+        AuditMetrics,
         AuditorResults,
+        AuditRecommendation,
         AuditRulesConfig,
         ContentAnalysisConfig,
         ContentChecksConfig,
@@ -186,6 +188,8 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "AccessibilityConfig",
     ),
     "AnalysisDict": ("flext_quality.docs.tools.content_analyzer", "AnalysisDict"),
+    "AuditMetrics": ("flext_quality.docs.scripts.audit", "AuditMetrics"),
+    "AuditRecommendation": ("flext_quality.docs.scripts.audit", "AuditRecommendation"),
     "AuditRules": ("flext_quality.docs.core.config_manager", "AuditRules"),
     "AuditRulesConfig": ("flext_quality.docs.scripts.audit", "AuditRulesConfig"),
     "AuditSummary": ("flext_quality.docs.scripts.report", "AuditSummary"),
@@ -453,6 +457,8 @@ __all__ = [
     "MIN_HEADINGS_FOR_TOC",
     "AccessibilityConfig",
     "AnalysisDict",
+    "AuditMetrics",
+    "AuditRecommendation",
     "AuditRules",
     "AuditRulesConfig",
     "AuditSummary",

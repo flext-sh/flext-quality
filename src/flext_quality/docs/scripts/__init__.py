@@ -15,8 +15,8 @@ if TYPE_CHECKING:
     from flext_quality.docs.scripts.audit import (
         AccessibilityConfig,
         AuditMetrics,
-        AuditRecommendation,
         AuditorResults,
+        AuditRecommendation,
         AuditRulesConfig,
         ContentAnalysisConfig,
         ContentChecksConfig,
@@ -60,6 +60,8 @@ if TYPE_CHECKING:
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "AccessibilityConfig": ("flext_quality.docs.scripts.audit", "AccessibilityConfig"),
+    "AuditMetrics": ("flext_quality.docs.scripts.audit", "AuditMetrics"),
+    "AuditRecommendation": ("flext_quality.docs.scripts.audit", "AuditRecommendation"),
     "AuditRulesConfig": ("flext_quality.docs.scripts.audit", "AuditRulesConfig"),
     "AuditSummary": ("flext_quality.docs.scripts.report", "AuditSummary"),
     "AuditorResults": ("flext_quality.docs.scripts.audit", "AuditorResults"),
@@ -104,8 +106,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "MIN_HEADINGS_FOR_TOC",
     ),
     "MarkdownStyleConfig": ("flext_quality.docs.scripts.audit", "MarkdownStyleConfig"),
-    "AuditMetrics": ("flext_quality.docs.scripts.audit", "AuditMetrics"),
-    "AuditRecommendation": ("flext_quality.docs.scripts.audit", "AuditRecommendation"),
     "OptimizationSummary": ("flext_quality.docs.scripts.report", "OptimizationSummary"),
     "OptimizerResults": ("flext_quality.docs.scripts.optimize", "OptimizerResults"),
     "QualityThresholdsConfig": (
@@ -131,6 +131,8 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
 __all__ = [
     "MIN_HEADINGS_FOR_TOC",
     "AccessibilityConfig",
+    "AuditMetrics",
+    "AuditRecommendation",
     "AuditRulesConfig",
     "AuditSummary",
     "AuditorResults",
@@ -150,8 +152,6 @@ __all__ = [
     "LinkValidator",
     "LinkValidatorResults",
     "MarkdownStyleConfig",
-    "AuditMetrics",
-    "AuditRecommendation",
     "OptimizationSummary",
     "OptimizerResults",
     "QualityThresholdsConfig",
