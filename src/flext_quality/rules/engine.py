@@ -7,6 +7,7 @@ from collections.abc import Mapping
 from pathlib import Path
 
 from flext_core.result import r
+from flext_core.typings import t
 
 from flext_quality.constants import c
 from flext_quality.models import m
@@ -42,49 +43,51 @@ class FlextQualityRulesEngine:
     def validate(
         self,
         path: str,
-        context: Mapping[str, object] | None = None,
-    ) -> r[list[Mapping[str, object]]]:
+        context: Mapping[str, t.NormalizedValue] | None = None,
+    ) -> r[list[Mapping[str, t.NormalizedValue]]]:
         """Validate code against loaded rules."""
         if not self._loaded:
             load_result = self.load_rules()
             if load_result.is_failure:
-                return r[list[Mapping[str, object]]].fail(load_result.error)
+                return r[list[Mapping[str, t.NormalizedValue]]].fail(load_result.error)
         target_path = Path(path)
         if not target_path.exists():
-            return r[list[Mapping[str, object]]].fail(f"Path does not exist: {path}")
-        violations: list[Mapping[str, object]] = []
+            return r[list[Mapping[str, t.NormalizedValue]]].fail(
+                f"Path does not exist: {path}"
+            )
+        violations: list[Mapping[str, t.NormalizedValue]] = []
         files = self._get_files(target_path)
         for file_path in files:
             file_violations = self._validate_file(file_path, context or {})
             violations.extend(file_violations)
-        return r[list[Mapping[str, object]]].ok(violations)
+        return r[list[Mapping[str, t.NormalizedValue]]].ok(violations)
 
     def validate_content(
         self,
         content: str,
         filename: str = "<string>",
-    ) -> r[list[Mapping[str, object]]]:
+    ) -> r[list[Mapping[str, t.NormalizedValue]]]:
         """Validate content string against loaded rules."""
         if not self._loaded:
             load_result = self.load_rules()
             if load_result.is_failure:
-                return r[list[Mapping[str, object]]].fail(load_result.error)
-        violations: list[Mapping[str, object]] = []
+                return r[list[Mapping[str, t.NormalizedValue]]].fail(load_result.error)
+        violations: list[Mapping[str, t.NormalizedValue]] = []
         for rule in self._rules:
             if not rule.enabled:
                 continue
             rule_violations = self._check_rule(rule, content, filename)
             violations.extend(rule_violations)
-        return r[list[Mapping[str, object]]].ok(violations)
+        return r[list[Mapping[str, t.NormalizedValue]]].ok(violations)
 
     def _check_rule(
         self,
         rule: m.Quality.RuleDefinition,
         content: str,
         filename: str,
-    ) -> list[Mapping[str, object]]:
+    ) -> list[Mapping[str, t.NormalizedValue]]:
         """Check a single rule against content."""
-        violations: list[Mapping[str, object]] = []
+        violations: list[Mapping[str, t.NormalizedValue]] = []
         if rule.pattern is None:
             return violations
         try:
@@ -129,8 +132,8 @@ class FlextQualityRulesEngine:
     def _validate_file(
         self,
         file_path: Path,
-        _context: Mapping[str, object],
-    ) -> list[Mapping[str, object]]:
+        _context: Mapping[str, t.NormalizedValue],
+    ) -> list[Mapping[str, t.NormalizedValue]]:
         """Validate a single file against rules."""
         try:
             content = file_path.read_text(encoding="utf-8")
@@ -151,7 +154,7 @@ class FlextQualityRulesEngine:
                     "severity": c.Quality.Severity.ERROR,
                 },
             ]
-        violations: list[Mapping[str, object]] = []
+        violations: list[Mapping[str, t.NormalizedValue]] = []
         for rule in self._rules:
             if not rule.enabled:
                 continue

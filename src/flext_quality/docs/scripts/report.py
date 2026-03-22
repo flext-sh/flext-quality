@@ -12,13 +12,13 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import json
 import operator
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import NotRequired, TypedDict, Unpack
 
 from jinja2 import Template
+from pydantic import TypeAdapter
 
 from flext_quality.typings import t
 
@@ -124,6 +124,12 @@ class ReportData(TypedDict):
     recommendations: list[Recommendation]
 
 
+_REPORT_LOAD_ADAPTER: TypeAdapter[dict[str, ReportValue]] = TypeAdapter(
+    dict[str, ReportValue],
+)
+_REPORT_DATA_ADAPTER: TypeAdapter[ReportData] = TypeAdapter(ReportData)
+
+
 class DocumentationReporter:
     """Documentation quality reporting and analytics system."""
 
@@ -149,9 +155,8 @@ class DocumentationReporter:
         filepath = self.reports_dir / filename
         if filepath.exists():
             try:
-                with Path(filepath).open(encoding="utf-8") as f:
-                    return json.load(f)
-            except (OSError, json.JSONDecodeError):
+                return _REPORT_LOAD_ADAPTER.validate_json(Path(filepath).read_bytes())
+            except (OSError, ValueError):
                 pass
         return None
 
@@ -172,7 +177,7 @@ class DocumentationReporter:
         if report_format == "html":
             return self._generate_html_report(report_data)
         if report_format == "json":
-            return json.dumps(report_data, indent=2, default=str)
+            return _REPORT_DATA_ADAPTER.dump_json(report_data, indent=2).decode()
         if report_format == "markdown":
             return self._generate_markdown_report(report_data)
         msg = f"Unsupported format: {report_format}"
@@ -513,14 +518,17 @@ class DocumentationReporter:
                     tzinfo=UTC
                 )
                 if report_date >= cutoff_date:
-                    with Path(report_file).open(encoding="utf-8") as f:
-                        report_data_raw: dict[str, ReportValue] = json.load(f)
-                        report_data_dict: dict[str, ReportValue | datetime] = {
-                            **report_data_raw,
-                            "date": report_date,
-                        }
-                        recent_reports.append(report_data_dict)
-            except (ValueError, json.JSONDecodeError, KeyError):
+                    report_data_raw: dict[str, ReportValue] = (
+                        _REPORT_LOAD_ADAPTER.validate_json(
+                            Path(report_file).read_bytes()
+                        )
+                    )
+                    report_data_dict: dict[str, ReportValue | datetime] = {
+                        **report_data_raw,
+                        "date": report_date,
+                    }
+                    recent_reports.append(report_data_dict)
+            except (ValueError, KeyError):
                 continue
         trend_data = self._analyze_trend_data(recent_reports)
         return self._generate_trend_report(trend_data, days)

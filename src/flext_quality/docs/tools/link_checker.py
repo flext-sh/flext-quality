@@ -8,7 +8,6 @@ and comprehensive validation capabilities.
 from __future__ import annotations
 
 import asyncio
-import json
 import pathlib
 import re
 import time
@@ -20,6 +19,9 @@ from urllib.robotparser import RobotFileParser
 
 import requests
 from aiohttp import ClientError, ClientSession, ClientTimeout
+from pydantic import TypeAdapter
+
+from flext_quality.typings import t
 
 _AsyncSession = ClientSession
 
@@ -49,7 +51,7 @@ class LinkInfoDict(LinkInfoDictRequired, total=False):
 
     line: int
     reference: str
-    context: dict[str, object]
+    context: dict[str, t.NormalizedValue]
 
 
 class LinkResultDictRequired(TypedDict):
@@ -57,7 +59,7 @@ class LinkResultDictRequired(TypedDict):
 
     url: str
     valid: bool
-    context: dict[str, object]
+    context: dict[str, t.NormalizedValue]
 
 
 class LinkResultDict(LinkResultDictRequired, total=False):
@@ -87,8 +89,11 @@ class ResultsDict(TypedDict):
     broken_links: int
     warnings: int
     errors: list[LinkResultDict]
-    warnings_list: list[dict[str, object]]
+    warnings_list: list[dict[str, t.NormalizedValue]]
     performance: PerformanceMetricsDict
+
+
+_RESULTS_ADAPTER: TypeAdapter[ResultsDict] = TypeAdapter(ResultsDict)
 
 
 class LinkChecker:
@@ -107,7 +112,7 @@ class LinkChecker:
         self.config: LinkConfigDict = self._get_default_config()
         self.load_config(config_path)
         self.session: _AsyncSession | None = None
-        self.cache: dict[str, object] = {}
+        self.cache: dict[str, t.NormalizedValue] = {}
         self.results: ResultsDict = {
             "total_links": 0,
             "valid_links": 0,
@@ -211,7 +216,7 @@ class LinkChecker:
     async def check_link_async(
         self,
         url: str,
-        context: dict[str, object] | None = None,
+        context: dict[str, t.NormalizedValue] | None = None,
     ) -> LinkResultDict:
         """Asynchronously check a single link."""
         start_time = time.time()
@@ -285,7 +290,7 @@ class LinkChecker:
     def check_link_sync(
         self,
         url: str,
-        context: dict[str, object] | None = None,
+        context: dict[str, t.NormalizedValue] | None = None,
     ) -> LinkResultDict:
         """Synchronously check a single link (fallback method)."""
         start_time = time.time()
@@ -487,10 +492,10 @@ class LinkChecker:
             return True
 
     def validate_github_links(
-        self, links: list[dict[str, object]]
-    ) -> list[dict[str, object]]:
+        self, links: list[dict[str, t.NormalizedValue]]
+    ) -> list[dict[str, t.NormalizedValue]]:
         """Special validation for GitHub links."""
-        github_links: list[dict[str, object]] = []
+        github_links: list[dict[str, t.NormalizedValue]] = []
         for link in links:
             url_raw = link.get("url")
             url_obj: str | None = url_raw if isinstance(url_raw, str) else None
@@ -544,10 +549,10 @@ class LinkChecker:
     def generate_report(self, report_format: str = "json") -> str:
         """Generate validation report."""
         if report_format == "json":
-            return json.dumps(self.results, indent=2, default=str)
+            return _RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
         if report_format == "summary":
             return self._generate_summary_report()
-        return json.dumps(self.results, default=str)
+        return _RESULTS_ADAPTER.dump_json(self.results).decode()
 
     def _generate_summary_report(self) -> str:
         """Generate a human-readable summary report."""
@@ -597,8 +602,9 @@ Broken Links:
         filename = f"link_validation_{timestamp}.json"
         filepath = pathlib.Path(output_path) / filename
 
-        with pathlib.Path(filepath).open("w", encoding="utf-8") as f:
-            json.dump(self.results, f, indent=2, default=str)
+        pathlib.Path(filepath).write_bytes(
+            _RESULTS_ADAPTER.dump_json(self.results, indent=2)
+        )
 
         return filepath
 

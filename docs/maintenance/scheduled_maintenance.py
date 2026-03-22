@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import argparse
 import importlib.util
-import json
 import runpy
 import shlex
 import sys
@@ -768,8 +767,7 @@ class ScheduledMaintenance:
             / f"maintenance_results_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}.json"
         )
 
-        with Path(results_file).open("w", encoding="utf-8") as f:
-            json.dump(self.results.model_dump(), f, indent=2, default=str)
+        Path(results_file).write_bytes(self.results.model_dump_json(indent=2))
 
 
 def main() -> None:

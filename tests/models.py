@@ -1,43 +1,25 @@
 """Test models for flext-quality.
 
-Provides test-specific models extending m and FlextQualityModels
-with proper hierarchy composition.
-
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
 """
 
 from __future__ import annotations
 
-from flext_tests import m
+from flext_tests import FlextTestsModels
 
 from flext_quality import FlextQualityModels
 
 
-class TestsFlextQualityModels(m, FlextQualityModels):
-    """Test models - composition of m + FlextQualityModels.
+class FlextQualityTestModels(FlextTestsModels, FlextQualityModels):
+    """Test models for flext-quality."""
 
-    Hierarchy:
-    - m: Generic test utilities from flext-tests
-    - FlextQualityModels: Domain models from flext-quality
-    - TestsFlextQualityModels: Composition + namespace .Tests
+    class Quality(FlextQualityModels.Quality):
+        """Quality domain test models."""
 
-    Access patterns:
-    - m.Tests.* - Project-specific test fixtures
-    - m.Quality.* - Production domain models (inherited)
-    - m.Tests.* - Generic test utilities
-    """
-
-    class Tests(m.Tests):
-        """Test fixtures namespace for flext-quality.
-
-        Contains test-specific models and fixtures that should not
-        be part of production code.
-        """
+        class Tests:
+            """Test-specific models."""
 
 
-# Short aliases for tests
-tm = TestsFlextQualityModels
-m = TestsFlextQualityModels
-
-__all__ = ["TestsFlextQualityModels", "m", "tm"]
+m = FlextQualityTestModels
+__all__ = ["FlextQualityTestModels", "m"]

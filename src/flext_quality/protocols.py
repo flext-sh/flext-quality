@@ -32,7 +32,7 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
                 self,
                 content: str,
                 file_path: Path | None = None,
-            ) -> r[list[Mapping[str, object]]]:
+            ) -> r[list[Mapping[str, t.NormalizedValue]]]:
                 """Validate content and return violations."""
                 ...
 
@@ -40,7 +40,7 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
         class HookImpl(Protocol):
             """Abstract base protocol for hook implementations."""
 
-            event: ClassVar[object]
+            event: ClassVar[type]
             matcher: ClassVar[list[str] | None]
 
             def execute(

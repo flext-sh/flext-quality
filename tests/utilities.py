@@ -1,6 +1,4 @@
-"""Module skeleton for TestsFlextQualityUtilities.
-
-Test utilities for flextquality.
+"""Test utilities for flext-quality.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -8,18 +6,20 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_tests import u as _base_u
-from flext_tests._utilities.matchers import FlextTestsMatchersUtilities
+from flext_tests import FlextTestsUtilities
 
-from flext_quality.utilities import FlextQualityUtilities
-
-
-class TestsFlextQualityUtilities(FlextQualityUtilities):
-    """Test utilities for flextquality."""
-
-    class Tests(FlextTestsMatchersUtilities.Tests, _base_u.Tests):
-        """Merged Tests namespace with Matchers from FlextTestsMatchersUtilities."""
+from flext_quality import FlextQualityUtilities
 
 
-u = TestsFlextQualityUtilities
-__all__ = ["TestsFlextQualityUtilities", "u"]
+class FlextQualityTestUtilities(FlextTestsUtilities, FlextQualityUtilities):
+    """Test utilities for flext-quality."""
+
+    class Quality(FlextQualityUtilities.Quality):
+        """Quality domain test utilities."""
+
+        class Tests:
+            """Test-specific utilities."""
+
+
+u = FlextQualityTestUtilities
+__all__ = ["FlextQualityTestUtilities", "u"]

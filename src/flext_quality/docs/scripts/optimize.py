@@ -12,7 +12,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import json
 import logging
 import re
 import shutil
@@ -23,6 +22,7 @@ import yaml
 from pydantic import TypeAdapter, ValidationError
 
 from flext_quality.models import m
+from flext_quality.typings import t
 
 MIN_HEADINGS_FOR_TOC = 5
 
@@ -45,7 +45,9 @@ class DocumentationOptimizer:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.results = OptimizerResults(timestamp=datetime.now(UTC).isoformat())
 
-    def optimize_formatting(self, doc_files: list[Path]) -> dict[str, object]:
+    def optimize_formatting(
+        self, doc_files: list[Path]
+    ) -> dict[str, t.NormalizedValue]:
         """Fix common formatting issues."""
         for file_path in doc_files:
             try:
@@ -97,7 +99,9 @@ class DocumentationOptimizer:
         """Normalize emphasis style (prefer * over _ for consistency)."""
         return content
 
-    def update_table_of_contents(self, doc_files: list[Path]) -> dict[str, object]:
+    def update_table_of_contents(
+        self, doc_files: list[Path]
+    ) -> dict[str, t.NormalizedValue]:
         """Update or add table of contents for long documents."""
         for file_path in doc_files:
             try:
@@ -187,7 +191,9 @@ class DocumentationOptimizer:
         anchor = re.sub(r"[^\\w\\s-]", "", anchor)
         return re.sub(r"\\s+", "-", anchor)
 
-    def enhance_accessibility(self, doc_files: list[Path]) -> dict[str, object]:
+    def enhance_accessibility(
+        self, doc_files: list[Path]
+    ) -> dict[str, t.NormalizedValue]:
         """Enhance accessibility of documentation."""
         for file_path in doc_files:
             try:
@@ -239,7 +245,9 @@ class DocumentationOptimizer:
             content = re.sub(pattern, replacement, content, flags=re.IGNORECASE)
         return content
 
-    def optimize_content_structure(self, doc_files: list[Path]) -> dict[str, object]:
+    def optimize_content_structure(
+        self, doc_files: list[Path]
+    ) -> dict[str, t.NormalizedValue]:
         """Optimize content structure and readability."""
         for file_path in doc_files:
             try:
@@ -291,7 +299,7 @@ class DocumentationOptimizer:
                 enhanced_lines.extend(("", "---", ""))
         return "\n".join(enhanced_lines)
 
-    def update_metadata(self, doc_files: list[Path]) -> dict[str, object]:
+    def update_metadata(self, doc_files: list[Path]) -> dict[str, t.NormalizedValue]:
         """Update frontmatter metadata and timestamps."""
         for file_path in doc_files:
             try:
@@ -341,9 +349,9 @@ class DocumentationOptimizer:
                 try:
                     frontmatter_lines = lines[1 : end_idx - 1]
                     frontmatter_content = "\n".join(frontmatter_lines)
-                    metadata = TypeAdapter(dict[str, object]).validate_python(
-                        yaml.safe_load(frontmatter_content) or {}
-                    )
+                    metadata = TypeAdapter(
+                        dict[str, t.NormalizedValue]
+                    ).validate_python(yaml.safe_load(frontmatter_content) or {})
                     metadata["updated"] = datetime.now(UTC).strftime("%Y-%m-%d")
                     new_frontmatter = yaml.dump(
                         metadata, default_flow_style=False
@@ -368,10 +376,9 @@ class DocumentationOptimizer:
 
     def generate_report(self, report_format: str = "json") -> str:
         """Generate optimization report."""
-        payload = self.results.model_dump()
         if report_format == "json":
-            return json.dumps(payload, indent=2, default=str)
-        return json.dumps(payload, default=str)
+            return self.results.model_dump_json(indent=2)
+        return self.results.model_dump_json()
 
     def save_report(self, output_path: str = "docs/maintenance/reports/") -> str:
         """Save optimization report."""
@@ -383,9 +390,7 @@ class DocumentationOptimizer:
         report_content = self.generate_report("json")
         _ = filepath.write_text(report_content, encoding="utf-8")
         latest_file = output_dir / "latest_optimization.json"
-        json.dump(
-            self.results.model_dump(), latest_file.open("w"), indent=2, default=str
-        )
+        latest_file.write_text(self.results.model_dump_json(indent=2), encoding="utf-8")
         return str(filepath)
 
 

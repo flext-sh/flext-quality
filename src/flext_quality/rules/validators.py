@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import override
 
 from flext_core.result import r
+from flext_core.typings import t
 
 from flext_quality.constants import c
 from flext_quality.protocols import p
@@ -41,9 +42,9 @@ class FlextQualityValidators:
             self,
             content: str,
             file_path: Path | None = None,
-        ) -> r[list[Mapping[str, object]]]:
+        ) -> r[list[Mapping[str, t.NormalizedValue]]]:
             """Validate content against patterns."""
-            violations: list[Mapping[str, object]] = []
+            violations: list[Mapping[str, t.NormalizedValue]] = []
             filename = str(file_path) if file_path else "<string>"
             lines = content.splitlines()
             for line_num, line in enumerate(lines, start=1):
@@ -56,7 +57,7 @@ class FlextQualityValidators:
                             "message": f"Pattern violation: {pattern_name}",
                             "severity": c.Quality.Severity.ERROR,
                         })
-            return r[list[Mapping[str, object]]].ok(violations)
+            return r[list[Mapping[str, t.NormalizedValue]]].ok(violations)
 
     class ForbiddenPattern(Pattern):
         """Validates against FLEXT forbidden patterns."""
@@ -93,15 +94,15 @@ class FlextQualityValidators:
             self,
             content: str,
             file_path: Path | None = None,
-        ) -> r[list[Mapping[str, object]]]:
+        ) -> r[list[Mapping[str, t.NormalizedValue]]]:
             """Validate tier violations."""
-            violations: list[Mapping[str, object]] = []
+            violations: list[Mapping[str, t.NormalizedValue]] = []
             filename = str(file_path) if file_path else "<string>"
             if file_path is None:
-                return r[list[Mapping[str, object]]].ok(violations)
+                return r[list[Mapping[str, t.NormalizedValue]]].ok(violations)
             file_tier = self._get_file_tier(file_path)
             if file_tier is None:
-                return r[list[Mapping[str, object]]].ok(violations)
+                return r[list[Mapping[str, t.NormalizedValue]]].ok(violations)
             tier_pattern = re.compile(c.Quality.Patterns.TIER_VIOLATION)
             lines = content.splitlines()
             for line_num, line in enumerate(lines, start=1):
@@ -113,7 +114,7 @@ class FlextQualityValidators:
                         "message": "Tier 0/1 modules cannot import from services/api",
                         "severity": c.Quality.Severity.ERROR,
                     })
-            return r[list[Mapping[str, object]]].ok(violations)
+            return r[list[Mapping[str, t.NormalizedValue]]].ok(violations)
 
         def _get_file_tier(self, path: Path) -> int | None:
             """Determine file tier from path."""
@@ -152,14 +153,14 @@ class FlextQualityValidators:
             self,
             content: str,
             file_path: Path | None = None,
-        ) -> r[list[Mapping[str, object]]]:
+        ) -> r[list[Mapping[str, t.NormalizedValue]]]:
             """Run all validators."""
-            all_violations: list[Mapping[str, object]] = []
+            all_violations: list[Mapping[str, t.NormalizedValue]] = []
             for validator in self._validators.values():
                 result = validator.validate(content, file_path)
                 if result.is_success:
                     all_violations.extend(result.value)
-            return r[list[Mapping[str, object]]].ok(all_violations)
+            return r[list[Mapping[str, t.NormalizedValue]]].ok(all_violations)
 
         def _register_defaults(self) -> None:
             """Register default validators."""

@@ -13,7 +13,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import json
 import re
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -701,10 +700,10 @@ class DocumentationAuditor:
         """
         _ = output_path
         if output_format == "json":
-            return json.dumps(self.results, indent=2, default=str)
+            return self.results.model_dump_json(indent=2)
         if output_format == "html":
             return self._generate_html_report()
-        return json.dumps(self.results, default=str)
+        return self.results.model_dump_json()
 
     def _generate_html_report(self) -> str:
         """Generate HTML audit report."""
@@ -758,7 +757,7 @@ class DocumentationAuditor:
         report_content = self.generate_report(output_format)
         _ = filepath.write_text(report_content, encoding="utf-8")
         latest_file = output_dir / "latest_audit.json"
-        json.dump(self.results, latest_file.open("w"), indent=2, default=str)
+        latest_file.write_text(self.results.model_dump_json(indent=2), encoding="utf-8")
         return str(filepath)
 
 

@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures
-import json
 import re
 from datetime import UTC, datetime
 from pathlib import Path
@@ -444,8 +443,7 @@ class LinkValidator:
         report_content = self.generate_report("json")
         _ = filepath.write_text(report_content, encoding="utf-8")
         latest_file = output_dir / "latest_validation.json"
-        with latest_file.open("w", encoding="utf-8") as latest_handle:
-            json.dump(self.results.model_dump(mode="json"), latest_handle, indent=2)
+        latest_file.write_text(self.results.model_dump_json(indent=2), encoding="utf-8")
         return filepath
 
 

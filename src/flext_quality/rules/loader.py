@@ -7,6 +7,7 @@ from pathlib import Path
 
 import yaml
 from flext_core.result import r
+from flext_core.typings import t
 
 from flext_quality.constants import c
 from flext_quality.models import m
@@ -77,7 +78,7 @@ class FlextQualityRulesLoader:
 
     def _parse_rule(
         self,
-        data: Mapping[str, object],
+        data: Mapping[str, t.NormalizedValue],
         index: int,
     ) -> r[m.Quality.RuleDefinition]:
         """Parse a single rule from dict."""

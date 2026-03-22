@@ -7,7 +7,6 @@ completeness checking, and structural validation for documentation.
 
 from __future__ import annotations
 
-import json
 import re
 from collections import Counter
 from datetime import UTC, datetime
@@ -15,6 +14,9 @@ from pathlib import Path
 from typing import TypedDict
 
 import yaml
+from pydantic import TypeAdapter
+
+from flext_quality.typings import t
 
 
 class ConfigDict(TypedDict, total=False):
@@ -118,6 +120,9 @@ class ResultsDict(TypedDict):
     recommendations: list[RecommendationDict | str]
 
 
+_RESULTS_ADAPTER: TypeAdapter[ResultsDict] = TypeAdapter(ResultsDict)
+
+
 class ContentAnalyzer:
     """Advanced content quality analysis system."""
 
@@ -179,9 +184,9 @@ class ContentAnalyzer:
             return
         try:
             with Path(config_path).open(encoding="utf-8") as f:
-                loaded: dict[str, object] | list[object] | str | None = yaml.safe_load(
-                    f
-                )
+                loaded: (
+                    dict[str, t.NormalizedValue] | list[t.NormalizedValue] | str | None
+                ) = yaml.safe_load(f)
                 if isinstance(loaded, dict):
                     config_loaded: dict[str, dict[str, bool] | dict[str, int] | str] = {
                         k: v for k, v in loaded.items() if isinstance(v, (dict, str))
@@ -763,10 +768,10 @@ class ContentAnalyzer:
     def generate_report(self, output_format: str = "json") -> str:
         """Generate content analysis report."""
         if output_format == "json":
-            return json.dumps(self.results, indent=2, default=str)
+            return _RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
         if output_format == "summary":
             return self._generate_summary_report()
-        return json.dumps(self.results, default=str)
+        return _RESULTS_ADAPTER.dump_json(self.results).decode()
 
     def _generate_summary_report(self) -> str:
         """Generate human-readable summary report."""
@@ -818,8 +823,7 @@ Top Recommendations:
         filename = f"content_analysis_{timestamp}.json"
         filepath = Path(output_path) / filename
 
-        with Path(filepath).open("w", encoding="utf-8") as f:
-            json.dump(self.results, f, indent=2, default=str)
+        Path(filepath).write_bytes(_RESULTS_ADAPTER.dump_json(self.results, indent=2))
 
         return str(filepath)
 

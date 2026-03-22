@@ -7,13 +7,22 @@ Provides web interface to view audit results, trends, and quality scores.
 from __future__ import annotations
 
 import argparse
-import json
 import operator
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from flask import Flask, Response, render_template_string, request
-from flext_core import FlextLogger
+from flext_core import FlextLogger, t
+from pydantic import ConfigDict, TypeAdapter
+
+_DICT_ADAPTER: TypeAdapter[dict[str, t.NormalizedValue]] = TypeAdapter(
+    dict[str, t.NormalizedValue],
+    config=ConfigDict(strict=False),
+)
+_LIST_ADAPTER: TypeAdapter[list[dict[str, t.NormalizedValue]]] = TypeAdapter(
+    list[dict[str, t.NormalizedValue]],
+    config=ConfigDict(strict=False),
+)
 
 
 class DocumentationDashboard:
@@ -45,7 +54,7 @@ class DocumentationDashboard:
         def api_metrics() -> Response:
             """API endpoint for current metrics."""
             return Response(
-                json.dumps(self.get_current_metrics()),
+                _DICT_ADAPTER.dump_json(self.get_current_metrics()).decode(),
                 mimetype="application/json",
             )
 
@@ -56,7 +65,7 @@ class DocumentationDashboard:
             """API endpoint for quality trends."""
             days = int(request.args.get("days", 30))
             return Response(
-                json.dumps(self.get_quality_trends(days)),
+                _DICT_ADAPTER.dump_json(self.get_quality_trends(days)).decode(),
                 mimetype="application/json",
             )
 
@@ -67,7 +76,7 @@ class DocumentationDashboard:
             """API endpoint for recent reports."""
             limit = int(request.args.get("limit", 10))
             return Response(
-                json.dumps(self.get_recent_reports(limit)),
+                _LIST_ADAPTER.dump_json(self.get_recent_reports(limit)).decode(),
                 mimetype="application/json",
             )
 
@@ -93,20 +102,19 @@ class DocumentationDashboard:
             }
 
         try:
-            with Path(latest_audit).open(encoding="utf-8") as f:
-                data = json.load(f)
-                return {
-                    "quality_score": data.get("metrics", {}).get("quality_score", 0),
-                    "files_analyzed": data.get("files_analyzed", 0),
-                    "total_issues": data.get("metrics", {}).get("total_issues", 0),
-                    "severity_breakdown": data.get("metrics", {}).get(
-                        "severity_breakdown",
-                        {},
-                    ),
-                    "timestamp": data.get("timestamp", datetime.now(UTC).isoformat()),
-                    "status": "Current",
-                }
-        except (FileNotFoundError, json.JSONDecodeError, KeyError, OSError) as e:
+            data = _DICT_ADAPTER.validate_json(Path(latest_audit).read_bytes())
+            return {
+                "quality_score": data.get("metrics", {}).get("quality_score", 0),
+                "files_analyzed": data.get("files_analyzed", 0),
+                "total_issues": data.get("metrics", {}).get("total_issues", 0),
+                "severity_breakdown": data.get("metrics", {}).get(
+                    "severity_breakdown",
+                    {},
+                ),
+                "timestamp": data.get("timestamp", datetime.now(UTC).isoformat()),
+                "status": "Current",
+            }
+        except (FileNotFoundError, ValueError, KeyError, OSError) as e:
             return {
                 "quality_score": 0,
                 "files_analyzed": 0,
@@ -139,8 +147,7 @@ class DocumentationDashboard:
                 )
 
                 if report_date >= cutoff_date:
-                    with Path(report_file).open(encoding="utf-8") as f:
-                        data = json.load(f)
+                    data = _DICT_ADAPTER.validate_json(Path(report_file).read_bytes())
                     trend_data.append({
                         "date": report_date.isoformat(),
                         "quality_score": data.get("metrics", {}).get(
@@ -162,9 +169,8 @@ class DocumentationDashboard:
                     })
             except (
                 FileNotFoundError,
-                json.JSONDecodeError,
-                KeyError,
                 ValueError,
+                KeyError,
                 OSError,
             ) as e:
                 self._logger_instance.warning(
@@ -195,8 +201,7 @@ class DocumentationDashboard:
                     tzinfo=UTC,
                 )
 
-                with Path(report_file).open(encoding="utf-8") as f:
-                    data = json.load(f)
+                data = _DICT_ADAPTER.validate_json(Path(report_file).read_bytes())
 
                 reports.append({
                     "filename": report_file.name,
@@ -207,9 +212,8 @@ class DocumentationDashboard:
                 })
             except (
                 FileNotFoundError,
-                json.JSONDecodeError,
-                KeyError,
                 ValueError,
+                KeyError,
                 OSError,
             ) as e:
                 self._logger_instance.warning(

@@ -9,7 +9,6 @@ including email, Slack, webhooks, and project management tools.
 from __future__ import annotations
 
 import argparse
-import json
 import smtplib
 from datetime import UTC, datetime
 from email.mime.multipart import MIMEMultipart
@@ -19,8 +18,15 @@ from typing import TypedDict
 
 import requests
 import yaml
+from flext_core import t
+from pydantic import ConfigDict, TypeAdapter
 
 from flext_quality.models import m
+
+_AUDIT_DATA_ADAPTER: TypeAdapter[dict[str, t.NormalizedValue]] = TypeAdapter(
+    dict[str, t.NormalizedValue],
+    config=ConfigDict(strict=False),
+)
 
 # Constants
 MAX_BROKEN_LINKS_TO_SHOW = 10
@@ -606,8 +612,9 @@ def main() -> None:
                 _ = err  # consumed
     elif args.audit_data:
         # Process audit data and send appropriate notifications
-        with Path(args.audit_data).open(encoding="utf-8") as f:
-            audit_data = json.load(f)
+        audit_data = _AUDIT_DATA_ADAPTER.validate_json(
+            Path(args.audit_data).read_bytes()
+        )
 
         # Check for critical issues
         _ = notifier.notify_critical_issues(audit_data)
@@ -623,14 +630,16 @@ def main() -> None:
 
     elif args.weekly_report:
         # Send weekly report notification
-        with Path(args.weekly_report).open(encoding="utf-8") as f:
-            report_data = json.load(f)
+        report_data = _AUDIT_DATA_ADAPTER.validate_json(
+            Path(args.weekly_report).read_bytes()
+        )
         _ = notifier.notify_weekly_report(report_data)
 
     elif args.monthly_report:
         # Send monthly report notification
-        with Path(args.monthly_report).open(encoding="utf-8") as f:
-            report_data = json.load(f)
+        report_data = _AUDIT_DATA_ADAPTER.validate_json(
+            Path(args.monthly_report).read_bytes()
+        )
         _ = notifier.notify_monthly_report(report_data)
 
     else:

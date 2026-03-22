@@ -42,9 +42,7 @@ class AuditResult(BaseModel):
 
     project: str = Field(description="Project name being audited")
     status: str = Field(description="Audit status: PASS, FAIL, WARNING")
-    critical: list[AuditViolation] = Field(
-        default_factory=list, description="Critical violations"
-    )
+    critical: list[AuditViolation] = []  # Pydantic v2 copies mutable defaults
     high: list[AuditViolation] = Field(
         default_factory=list, description="High severity violations"
     )

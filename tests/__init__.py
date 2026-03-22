@@ -11,8 +11,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
 if TYPE_CHECKING:
     from flext_core.typings import FlextTypes
-
-    from flext_quality import d, e, h, r, s, x
+    from flext_tests import d, e, h, r, s, x
 
     from . import helpers as helpers, unit as unit
     from .conftest import (
@@ -39,7 +38,7 @@ if TYPE_CHECKING:
         sonarqube_config,
         temporary_project_structure,
     )
-    from .constants import TestsFlextQualityConstants, TestsFlextQualityConstants as c
+    from .constants import FlextQualityTestConstants, FlextQualityTestConstants as c
     from .helpers.constants import TestsConstants
     from .helpers.models import TestsModels
     from .helpers.protocols import TestsProtocols
@@ -54,9 +53,9 @@ if TYPE_CHECKING:
         safe_list_access,
     )
     from .helpers.typings import TestsTypings
-    from .models import TestsFlextQualityModels, TestsFlextQualityModels as m, tm
-    from .protocols import TestsFlextQualityProtocols, TestsFlextQualityProtocols as p
-    from .typings import TestsFlextQualityTypes, TestsFlextQualityTypes as t
+    from .models import FlextQualityTestModels, FlextQualityTestModels as m
+    from .protocols import FlextQualityTestProtocols, FlextQualityTestProtocols as p
+    from .typings import FlextQualityTestTypes, FlextQualityTestTypes as t
     from .unit.test_api import (
         TestFlextQualityAPI,
         TestFlextQualityHookExecution,
@@ -67,9 +66,14 @@ if TYPE_CHECKING:
     )
     from .unit.test_basic import test_basic
     from .unit.test_cli import TestFlextQualityCliService, TestMainFunction
-    from .utilities import TestsFlextQualityUtilities, TestsFlextQualityUtilities as u
+    from .utilities import FlextQualityTestUtilities, FlextQualityTestUtilities as u
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
+    "FlextQualityTestConstants": ("tests.constants", "FlextQualityTestConstants"),
+    "FlextQualityTestModels": ("tests.models", "FlextQualityTestModels"),
+    "FlextQualityTestProtocols": ("tests.protocols", "FlextQualityTestProtocols"),
+    "FlextQualityTestTypes": ("tests.typings", "FlextQualityTestTypes"),
+    "FlextQualityTestUtilities": ("tests.utilities", "FlextQualityTestUtilities"),
     "MockQualityAnalyzer": ("tests.conftest", "MockQualityAnalyzer"),
     "MockReportGenerator": ("tests.conftest", "MockReportGenerator"),
     "T": ("tests.conftest", "T"),
@@ -91,11 +95,6 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "TestFlextQualityValidation": ("tests.unit.test_api", "TestFlextQualityValidation"),
     "TestMainFunction": ("tests.unit.test_cli", "TestMainFunction"),
     "TestsConstants": ("tests.helpers.constants", "TestsConstants"),
-    "TestsFlextQualityConstants": ("tests.constants", "TestsFlextQualityConstants"),
-    "TestsFlextQualityModels": ("tests.models", "TestsFlextQualityModels"),
-    "TestsFlextQualityProtocols": ("tests.protocols", "TestsFlextQualityProtocols"),
-    "TestsFlextQualityTypes": ("tests.typings", "TestsFlextQualityTypes"),
-    "TestsFlextQualityUtilities": ("tests.utilities", "TestsFlextQualityUtilities"),
     "TestsModels": ("tests.helpers.models", "TestsModels"),
     "TestsProtocols": ("tests.helpers.protocols", "TestsProtocols"),
     "TestsTypings": ("tests.helpers.typings", "TestsTypings"),
@@ -124,41 +123,45 @@ _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
         "tests.conftest",
         "assert_result_success_with_data",
     ),
-    "c": ("tests.constants", "TestsFlextQualityConstants"),
+    "c": ("tests.constants", "FlextQualityTestConstants"),
     "celery_config": ("tests.conftest", "celery_config"),
     "code_analysis_config": ("tests.conftest", "code_analysis_config"),
     "codeclimate_config": ("tests.conftest", "codeclimate_config"),
-    "d": ("flext_quality", "d"),
+    "d": ("flext_tests", "d"),
     "dashboard_data": ("tests.conftest", "dashboard_data"),
-    "e": ("flext_quality", "e"),
-    "h": ("flext_quality", "h"),
+    "e": ("flext_tests", "e"),
+    "h": ("flext_tests", "h"),
     "helpers": ("tests.helpers", ""),
-    "m": ("tests.models", "TestsFlextQualityModels"),
+    "m": ("tests.models", "FlextQualityTestModels"),
     "mock_quality_analyzer": ("tests.conftest", "mock_quality_analyzer"),
     "mock_report_generator": ("tests.conftest", "mock_report_generator"),
-    "p": ("tests.protocols", "TestsFlextQualityProtocols"),
+    "p": ("tests.protocols", "FlextQualityTestProtocols"),
     "package_metadata": ("tests.conftest", "package_metadata"),
     "pytest_configure": ("tests.conftest", "pytest_configure"),
     "quality_metrics_data": ("tests.conftest", "quality_metrics_data"),
-    "r": ("flext_quality", "r"),
+    "r": ("flext_tests", "r"),
     "report_config": ("tests.conftest", "report_config"),
-    "s": ("flext_quality", "s"),
+    "s": ("flext_tests", "s"),
     "safe_dict_access": ("tests.helpers.typing_helpers", "safe_dict_access"),
     "safe_list_access": ("tests.helpers.typing_helpers", "safe_list_access"),
     "sample_code_repository": ("tests.conftest", "sample_code_repository"),
     "secure_temp_dir": ("tests.conftest", "secure_temp_dir"),
     "set_test_environment": ("tests.conftest", "set_test_environment"),
     "sonarqube_config": ("tests.conftest", "sonarqube_config"),
-    "t": ("tests.typings", "TestsFlextQualityTypes"),
+    "t": ("tests.typings", "FlextQualityTestTypes"),
     "temporary_project_structure": ("tests.conftest", "temporary_project_structure"),
     "test_basic": ("tests.unit.test_basic", "test_basic"),
-    "tm": ("tests.models", "tm"),
-    "u": ("tests.utilities", "TestsFlextQualityUtilities"),
+    "u": ("tests.utilities", "FlextQualityTestUtilities"),
     "unit": ("tests.unit", ""),
-    "x": ("flext_quality", "x"),
+    "x": ("flext_tests", "x"),
 }
 
 __all__ = [
+    "FlextQualityTestConstants",
+    "FlextQualityTestModels",
+    "FlextQualityTestProtocols",
+    "FlextQualityTestTypes",
+    "FlextQualityTestUtilities",
     "MockQualityAnalyzer",
     "MockReportGenerator",
     "T",
@@ -171,11 +174,6 @@ __all__ = [
     "TestFlextQualityValidation",
     "TestMainFunction",
     "TestsConstants",
-    "TestsFlextQualityConstants",
-    "TestsFlextQualityModels",
-    "TestsFlextQualityProtocols",
-    "TestsFlextQualityTypes",
-    "TestsFlextQualityUtilities",
     "TestsModels",
     "TestsProtocols",
     "TestsTypings",
@@ -217,7 +215,6 @@ __all__ = [
     "t",
     "temporary_project_structure",
     "test_basic",
-    "tm",
     "u",
     "unit",
     "x",

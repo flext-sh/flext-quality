@@ -8,7 +8,6 @@ optimizations, and reporting. Designed to run as a cron job or scheduled task.
 from __future__ import annotations
 
 import argparse
-import json
 import runpy
 import shlex
 import threading
@@ -137,7 +136,7 @@ class ScheduledMaintenance:
     def _merge_config(
         self,
         base: MaintenanceConfig,
-        overrides: Mapping[str, object],
+        overrides: Mapping[str, t.NormalizedValue],
     ) -> MaintenanceConfig:
         """Merge external config mapping into default typed config."""
         merged = base.model_dump()
@@ -723,8 +722,9 @@ class ScheduledMaintenance:
             / f"maintenance_results_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}.json"
         )
 
-        with Path(results_file).open("w", encoding="utf-8") as f:
-            json.dump(self.results.model_dump(), f, indent=2, default=str)
+        Path(results_file).write_text(
+            self.results.model_dump_json(indent=2), encoding="utf-8"
+        )
 
 
 def main() -> None:

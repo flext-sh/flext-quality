@@ -7,7 +7,6 @@ Enforces style guides, formatting standards, and accessibility requirements.
 
 from __future__ import annotations
 
-import json
 import operator
 import re
 from datetime import UTC, datetime
@@ -15,6 +14,7 @@ from pathlib import Path
 from typing import TypedDict
 
 import yaml
+from pydantic import TypeAdapter
 
 
 class StyleIssue(TypedDict):
@@ -96,6 +96,9 @@ class ValidationResults(TypedDict):
     formatting_errors: list[StyleIssue]
     suggestions: list[str]
     summary: SummaryMetrics
+
+
+_RESULTS_ADAPTER: TypeAdapter[ValidationResults] = TypeAdapter(ValidationResults)
 
 
 class StyleValidator:
@@ -600,10 +603,10 @@ class StyleValidator:
     def generate_report(self, output_format: str = "json") -> str:
         """Generate style validation report."""
         if output_format == "json":
-            return json.dumps(self.results, indent=2, default=str)
+            return _RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
         if output_format == "summary":
             return self._generate_summary_report()
-        return json.dumps(self.results, default=str)
+        return _RESULTS_ADAPTER.dump_json(self.results).decode()
 
     def _generate_summary_report(self) -> str:
         """Generate human-readable summary."""
@@ -655,8 +658,7 @@ Top Issues:
         filename = f"style_validation_{timestamp}.json"
         filepath = Path(output_path) / filename
 
-        with filepath.open("w", encoding="utf-8") as f:
-            json.dump(self.results, f, indent=2, default=str)
+        filepath.write_bytes(_RESULTS_ADAPTER.dump_json(self.results, indent=2))
 
         return filepath
 
