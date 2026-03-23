@@ -1,7 +1,6 @@
 # Hook Warning Reference Guide
 
 <!-- TOC START -->
-
 - [⚠️ How Warning-Only Mode Works](#how-warning-only-mode-works)
 - [📂 Warning Categories](#warning-categories)
   - [1. Security Warnings (16 rules)](#1-security-warnings-16-rules)
@@ -15,7 +14,6 @@
   - [Option 3: Disable Rule Temporarily (For Testing)](#option-3-disable-rule-temporarily-for-testing)
 - [📖 Documentation References](#documentation-references)
 - [🎯 Summary](#summary)
-
 <!-- TOC END -->
 
 **Status**: ⚠️ **WARNING-ONLY MODE** - All warnings allow execution to proceed

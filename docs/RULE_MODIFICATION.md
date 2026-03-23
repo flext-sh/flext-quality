@@ -1,7 +1,6 @@
 # Rule Modification Quick Reference
 
 <!-- TOC START -->
-
 - [🚀 Quick Start](#quick-start)
   - [Find Rule Files](#find-rule-files)
   - [Reload Rules Automatically](#reload-rules-automatically)
@@ -29,7 +28,6 @@
   - [❌ Mistake 3: Breaking YAML structure](#mistake-3-breaking-yaml-structure)
 - [📋 Rule Modification Checklist](#rule-modification-checklist)
 - [🔗 Related Documentation](#related-documentation)
-
 <!-- TOC END -->
 
 **How to customize validation rules during testing and development**

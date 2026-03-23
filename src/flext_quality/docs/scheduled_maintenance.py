@@ -15,7 +15,7 @@ import time
 from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TypeGuard
+from typing import TypeIs
 
 import pytest
 import schedule
@@ -83,7 +83,7 @@ def _as_str_list(
 
 def _is_str_mapping(
     value: t.ContainerValue | None,
-) -> TypeGuard[Mapping[str, t.ContainerValue]]:
+) -> TypeIs[Mapping[str, t.ContainerValue]]:
     return isinstance(value, Mapping)
 
 
