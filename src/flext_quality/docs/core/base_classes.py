@@ -10,9 +10,7 @@ from abc import ABC, abstractmethod
 from datetime import UTC, datetime
 from pathlib import Path
 
-from flext_quality.models import m
-from flext_quality.protocols import p
-from flext_quality.typings import t
+from flext_quality import m, p, t
 
 
 class BaseAuditor(ABC):

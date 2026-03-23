@@ -21,7 +21,7 @@ import requests
 import yaml
 from pydantic import ValidationError
 
-from flext_quality.models import m
+from flext_quality import m
 
 QualityThresholdsConfig = m.Quality.QualityThresholdsConfig
 ContentChecksConfig = m.Quality.ContentChecksConfig

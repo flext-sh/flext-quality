@@ -20,7 +20,7 @@ from pathlib import Path
 
 import requests
 
-from flext_quality.models import m
+from flext_quality import m
 
 LinkValidatorResults = m.Quality.LinkValidatorResults
 ContentValidatorResults = m.Quality.ContentValidatorResults

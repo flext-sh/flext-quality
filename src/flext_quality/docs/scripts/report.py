@@ -20,7 +20,7 @@ from typing import NotRequired, TypedDict, Unpack
 from jinja2 import Template
 from pydantic import TypeAdapter
 
-from flext_quality.typings import t
+from flext_quality import t
 
 
 class _ReportOptions(TypedDict, total=False):

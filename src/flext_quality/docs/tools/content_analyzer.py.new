@@ -229,15 +229,15 @@ class ContentAnalyzer:
             q_metrics = self.results["quality_metrics"]
             if isinstance(q_metrics, dict):
                 q_metrics[filename] = analysis["metrics"]
-            c_scores = self.results["content_scores"]
+            c = self.results["content_scores"]
             if isinstance(c_scores, dict):
-                c_scores[filename] = analysis["quality_score"]
+                c[filename] = analysis["quality_score"]
             r_stats = self.results["readability_stats"]
             if isinstance(r_stats, dict):
                 r_stats[filename] = analysis["readability"]
-            c_checks = self.results["completeness_checks"]
+            c = self.results["completeness_checks"]
             if isinstance(c_checks, dict):
-                c_checks[filename] = analysis["completeness"]
+                c[filename] = analysis["completeness"]
 
             return analysis
 

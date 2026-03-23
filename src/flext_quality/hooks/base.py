@@ -5,10 +5,9 @@ from __future__ import annotations
 import fnmatch
 from typing import ClassVar
 
-from flext_core.result import r
+from flext_core import r
 
-from flext_quality.constants import c
-from flext_quality.typings import t
+from flext_quality import c, t
 
 
 class BaseHookImpl:

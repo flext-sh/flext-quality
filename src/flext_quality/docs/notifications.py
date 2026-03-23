@@ -21,7 +21,7 @@ import yaml
 from flext_core import t
 from pydantic import ConfigDict, TypeAdapter
 
-from flext_quality.models import m
+from flext_quality import m
 
 _AUDIT_DATA_ADAPTER: TypeAdapter[dict[str, t.NormalizedValue]] = TypeAdapter(
     dict[str, t.NormalizedValue],

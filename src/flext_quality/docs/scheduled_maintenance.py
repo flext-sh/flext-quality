@@ -22,8 +22,7 @@ import schedule
 import yaml
 from git import InvalidGitRepositoryError, Repo
 
-from flext_quality.models import m
-from flext_quality.typings import t
+from flext_quality import m, t
 
 ScheduleResults = m.Quality.ScheduleResults
 ScheduleTaskConfig = m.Quality.ScheduleTaskConfig

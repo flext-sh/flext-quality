@@ -4,9 +4,7 @@ from collections.abc import Mapping
 
 from flext_core import r
 
-from flext_quality.constants import c
-from flext_quality.integrations.mcp_client import FlextQualityMcpClient
-from flext_quality.typings import t
+from flext_quality import FlextQualityMcpClient, c, t
 
 
 def build_mcp_health_result(

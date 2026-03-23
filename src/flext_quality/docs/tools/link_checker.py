@@ -21,7 +21,7 @@ import requests
 from aiohttp import ClientError, ClientSession, ClientTimeout
 from pydantic import TypeAdapter
 
-from flext_quality.typings import t
+from flext_quality import t
 
 _AsyncSession = ClientSession
 

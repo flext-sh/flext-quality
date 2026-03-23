@@ -15,17 +15,17 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextContainer, FlextLogger
-from flext_core.protocols import FlextProtocols as p
-from flext_core.result import r
+from flext_core import FlextContainer, FlextLogger, p, r
 
-from flext_quality.constants import c
-from flext_quality.hooks.manager import HookManager
-from flext_quality.models import m
-from flext_quality.rules.loader import FlextQualityRulesLoader
-from flext_quality.settings import FlextQualitySettings
-from flext_quality.typings import t
-from flext_quality.utilities import u
+from flext_quality import (
+    FlextQualityRulesLoader,
+    FlextQualitySettings,
+    HookManager,
+    c,
+    m,
+    t,
+    u,
+)
 
 
 class FlextQuality:
@@ -47,7 +47,7 @@ class FlextQuality:
     - FlextSettings provides auto self.config and self.logger
 
     Usage:
-        from flext_quality.api import FlextQuality
+        from flext_quality import FlextQuality
 
         quality = FlextQuality.get_instance()
         result = quality.load_rules(Path("rules.yaml"))

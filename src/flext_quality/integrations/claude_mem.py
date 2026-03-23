@@ -12,12 +12,15 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import final
 
-from flext_core.result import r
+from flext_core import r
 
-from flext_quality.constants import c
-from flext_quality.integrations._health import build_mcp_health_result
-from flext_quality.integrations.mcp_client import FlextQualityMcpClient, McpToolCall
-from flext_quality.typings import t
+from flext_quality import (
+    FlextQualityMcpClient,
+    McpToolCall,
+    build_mcp_health_result,
+    c,
+    t,
+)
 
 
 @final

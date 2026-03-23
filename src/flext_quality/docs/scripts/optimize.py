@@ -21,8 +21,7 @@ from pathlib import Path
 import yaml
 from pydantic import TypeAdapter, ValidationError
 
-from flext_quality.models import m
-from flext_quality.typings import t
+from flext_quality import m, t
 
 MIN_HEADINGS_FOR_TOC = 5
 

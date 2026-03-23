@@ -15,12 +15,9 @@ from pathlib import Path
 from typing import final
 
 from flext_cli import FlextCliOutput
-from flext_core.result import r
+from flext_core import r
 
-from flext_quality.api import FlextQuality
-from flext_quality.constants import c
-from flext_quality.integrations.code_execution import FlextQualityCodeExecutionBridge
-from flext_quality.typings import t
+from flext_quality import FlextQuality, FlextQualityCodeExecutionBridge, c, t
 
 
 @final

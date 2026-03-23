@@ -13,12 +13,10 @@ import shutil
 from collections.abc import Mapping
 from typing import final
 
-from flext_core.result import r
+from flext_core import r
 from pydantic import TypeAdapter
 
-from flext_quality.constants import c
-from flext_quality.models import m
-from flext_quality.typings import t
+from flext_quality import c, m, t
 
 McpToolCall = m.Quality.McpToolCall
 McpToolResult = m.Quality.McpToolResult

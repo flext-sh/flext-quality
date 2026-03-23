@@ -16,7 +16,7 @@ from typing import TypedDict
 import yaml
 from pydantic import TypeAdapter
 
-from flext_quality.typings import t
+from flext_quality import t
 
 
 class ConfigDict(TypedDict, total=False):

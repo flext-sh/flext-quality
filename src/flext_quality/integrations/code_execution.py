@@ -13,11 +13,9 @@ from collections.abc import Mapping
 from pathlib import Path
 from typing import final
 
-from flext_core.result import r
+from flext_core import r
 
-from flext_quality.constants import c
-from flext_quality.models import m
-from flext_quality.typings import t
+from flext_quality import c, m, t
 
 ExecutionRequest = m.Quality.ExecutionRequest
 ExecutionResult = m.Quality.ExecutionResult
