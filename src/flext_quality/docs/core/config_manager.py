@@ -13,9 +13,11 @@ from typing import TypeAlias
 import yaml
 
 ConfigPrimitive: TypeAlias = str | int | float | bool
-ConfigValue: TypeAlias = str | int | float | bool | list[str]
-ConfigSection: TypeAlias = dict[str, str | int | float | bool | list[str]]
-ConfigData: TypeAlias = dict[str, dict[str, str | int | float | bool | list[str]]]
+ConfigValue: TypeAlias = str | int | float | bool | Sequence[str]
+ConfigSection: TypeAlias = Mapping[str, str | int | float | bool | Sequence[str]]
+ConfigData: TypeAlias = Mapping[
+    str, Mapping[str, str | int | float | bool | Sequence[str]]
+]
 RawSectionValue: TypeAlias = (
     str | int | float | bool | Sequence[str | int | float | bool]
 )
@@ -166,7 +168,7 @@ class ConfigManager:
         else:
             self.config_dir = Path(config_dir)
 
-        self._cache: dict[str, ConfigData] = {}
+        self._cache: Mapping[str, ConfigData] = {}
         self._audit_rules: AuditRules | None = None
         self._style_guide: StyleGuide | None = None
         self._validation_config: ValidationConfig | None = None
@@ -287,7 +289,7 @@ class ConfigManager:
         self._style_guide = None
         self._validation_config = None
 
-    def validate_configs(self) -> list[str]:
+    def validate_configs(self) -> Sequence[str]:
         """Validate all configuration files and return any issues."""
         # Check required config files exist
         required_files = [
@@ -327,7 +329,7 @@ class ConfigManager:
 
         return issues
 
-    def get_all_configs(self) -> dict[str, ConfigData | dict[str, ConfigData]]:
+    def get_all_configs(self) -> Mapping[str, ConfigData | Mapping[str, ConfigData]]:
         """Get all configurations as a single dictionary."""
         return {
             "audit_rules": self.get_audit_rules().__dict__,

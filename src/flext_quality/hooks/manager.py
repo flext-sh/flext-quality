@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import final
 
@@ -18,7 +18,7 @@ class HookManager:
 
     def __init__(self, config_path: Path | None = None) -> None:
         """Initialize hook manager with optional config path."""
-        self._hooks: dict[c.Quality.HookEvent, list[BaseHookImpl]] = {}
+        self._hooks: Mapping[c.Quality.HookEvent, Sequence[BaseHookImpl]] = {}
         self._config_path = config_path
 
     def execute(
@@ -43,7 +43,7 @@ class HookManager:
                 return result
         return r[t.Quality.HookOutput].ok({"continue": True})
 
-    def get_config(self) -> Mapping[str, list[Mapping[str, t.NormalizedValue]]]:
+    def get_config(self) -> Mapping[str, Sequence[Mapping[str, t.NormalizedValue]]]:
         """Get hooks configuration as dict."""
         return {
             event.value: [{"matcher": h.matcher} for h in hooks]
@@ -53,7 +53,7 @@ class HookManager:
     def get_config_json(self) -> str:
         """Get hooks configuration as JSON."""
         return (
-            TypeAdapter(dict[str, t.NormalizedValue])
+            TypeAdapter(Mapping[str, t.NormalizedValue])
             .dump_json(dict(self.get_config()), indent=c.Quality.Defaults.JSON_INDENT)
             .decode("utf-8")
         )

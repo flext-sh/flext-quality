@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import fnmatch
+from collections.abc import Sequence
 from typing import ClassVar
 
 from flext_core import r
@@ -14,7 +15,7 @@ class BaseHookImpl:
     """Concrete base for hook implementations satisfying p.Quality.HookImpl."""
 
     event: ClassVar[c.Quality.HookEvent]
-    matcher: ClassVar[list[str] | None] = None
+    matcher: ClassVar[Sequence[str] | None] = None
 
     def execute(self, input_data: t.Quality.HookInput) -> r[t.Quality.HookOutput]:
         """Execute the hook logic."""

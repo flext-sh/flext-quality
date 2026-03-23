@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import re
+from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -150,9 +151,9 @@ class DocumentationAuditor:
             },
         })
 
-    def find_documentation_files(self) -> list[Path]:
+    def find_documentation_files(self) -> Sequence[Path]:
         """Find all documentation files in the project."""
-        doc_files: list[Path] = []
+        doc_files: Sequence[Path] = []
         patterns = [
             "**/*.md",
             "**/*.mdx",
@@ -200,7 +201,7 @@ class DocumentationAuditor:
         self.generate_recommendations()
         return self.results
 
-    def check_content_freshness(self, doc_files: list[Path]) -> None:
+    def check_content_freshness(self, doc_files: Sequence[Path]) -> None:
         """Check documentation freshness and identify outdated content."""
         max_age_days = self.audit_rules.quality_thresholds.max_age_days
         cutoff_date = datetime.now(UTC) - timedelta(days=max_age_days)
@@ -211,14 +212,14 @@ class DocumentationAuditor:
                     age_days = (datetime.now(UTC) - mtime).days
                     content = file_path.read_text(encoding="utf-8")
                     outdated_indicators = self._check_outdated_indicators(content)
-                    issue: dict[
+                    issue: Mapping[
                         str,
                         str
                         | int
                         | float
                         | bool
-                        | list[str]
-                        | list[dict[str, str]]
+                        | Sequence[str]
+                        | Sequence[Mapping[str, str]]
                         | None,
                     ] = {
                         "type": "outdated_content",
@@ -243,9 +244,9 @@ class DocumentationAuditor:
                     "error": str(e),
                 })
 
-    def _check_outdated_indicators(self, content: str) -> list[str]:
+    def _check_outdated_indicators(self, content: str) -> Sequence[str]:
         """Check for indicators of outdated content."""
-        indicators: list[str] = []
+        indicators: Sequence[str] = []
         if re.search(
             r"\\b\\d+\\.\\d+\\.\\d+.*TODO|FIXME|placeholder", content, re.IGNORECASE
         ):
@@ -260,7 +261,7 @@ class DocumentationAuditor:
             indicators.append("potentially inconsistent status")
         return indicators
 
-    def check_content_completeness(self, doc_files: list[Path]) -> None:
+    def check_content_completeness(self, doc_files: Sequence[Path]) -> None:
         """Check documentation completeness and identify missing sections."""
         min_word_count = self.audit_rules.quality_thresholds.min_word_count
         required_sections = self.validation_config.content_analysis.required_sections
@@ -317,17 +318,17 @@ class DocumentationAuditor:
                 })
 
     def _check_required_sections(
-        self, content: str, required_sections: list[str]
-    ) -> list[str]:
+        self, content: str, required_sections: Sequence[str]
+    ) -> Sequence[str]:
         """Check for required sections in documentation."""
-        missing: list[str] = []
+        missing: Sequence[str] = []
         for section in required_sections:
             pattern = f"^#+\\s.*{re.escape(section)}.*$"
             if not re.search(pattern, content, re.MULTILINE | re.IGNORECASE):
                 missing.append(section)
         return missing
 
-    def check_content_consistency(self, doc_files: list[Path]) -> None:
+    def check_content_consistency(self, doc_files: Sequence[Path]) -> None:
         """Check style consistency and formatting issues."""
         accessibility_cfg = self.style_guide.accessibility
         for file_path in doc_files:
@@ -382,9 +383,9 @@ class DocumentationAuditor:
                     "error": str(e),
                 })
 
-    def _check_markdown_formatting(self, content: str) -> list[str]:
+    def _check_markdown_formatting(self, content: str) -> Sequence[str]:
         """Check for markdown formatting issues."""
-        issues: list[str] = []
+        issues: Sequence[str] = []
         formatting_cfg = self.style_guide.formatting
         unordered_lists = re.findall(r"^[\\s]*[-\\*\\+]", content, re.MULTILINE)
         if len(set(unordered_lists)) > 1:
@@ -405,9 +406,9 @@ class DocumentationAuditor:
             issues.append(f"{len(long_lines)} lines exceed {max_length} characters")
         return issues
 
-    def _check_accessibility(self, content: str) -> list[dict[str, str]]:
+    def _check_accessibility(self, content: str) -> Sequence[Mapping[str, str]]:
         """Check accessibility compliance."""
-        issues: list[dict[str, str]] = []
+        issues: Sequence[Mapping[str, str]] = []
         accessibility_cfg = self.style_guide.accessibility
         if accessibility_cfg.require_alt_text:
             images_without_alt = re.findall(r"!\\[\\]\\([^)]+\\)", content)
@@ -435,7 +436,7 @@ class DocumentationAuditor:
                 ])
         return issues
 
-    def _check_heading_hierarchy(self, content: str) -> list[str]:
+    def _check_heading_hierarchy(self, content: str) -> Sequence[str]:
         """Check heading hierarchy for logical structure."""
         headings = re.findall(r"^(#+)\\s+(.+)$", content, re.MULTILINE)
         heading_levels = [len(level) for level, _ in headings]
@@ -448,11 +449,11 @@ class DocumentationAuditor:
             issues.append("Document should start with H1")
         return issues
 
-    def check_links_and_references(self, doc_files: list[Path]) -> None:
+    def check_links_and_references(self, doc_files: Sequence[Path]) -> None:
         """Check links and references for validity."""
         link_validation = self.validation_config.link_validation
-        all_links: list[dict[str, str | int]] = []
-        image_refs: list[dict[str, str]] = []
+        all_links: Sequence[Mapping[str, str | int]] = []
+        image_refs: Sequence[Mapping[str, str]] = []
         for file_path in doc_files:
             try:
                 content = file_path.read_text(encoding="utf-8")
@@ -501,7 +502,9 @@ class DocumentationAuditor:
         if link_validation.check_images:
             self._validate_images(image_refs)
 
-    def _validate_external_links(self, links: list[dict[str, str | int]]) -> None:
+    def _validate_external_links(
+        self, links: Sequence[Mapping[str, str | int]]
+    ) -> None:
         """Validate external links."""
         link_validation = self.validation_config.link_validation
         timeout = link_validation.timeout
@@ -535,7 +538,7 @@ class DocumentationAuditor:
                 })
 
     def _validate_internal_links(
-        self, links: list[dict[str, str | int]], doc_files: list[Path]
+        self, links: Sequence[Mapping[str, str | int]], doc_files: Sequence[Path]
     ) -> None:
         """Validate internal links."""
         internal_links = [link for link in links if link["type"] == "internal"]
@@ -560,7 +563,7 @@ class DocumentationAuditor:
                         "recommendation": f"Fix broken internal link to '{link['url']}'",
                     })
 
-    def _validate_images(self, images: list[dict[str, str]]) -> None:
+    def _validate_images(self, images: Sequence[Mapping[str, str]]) -> None:
         """Validate image references."""
         for image in images:
             if image["src"].startswith(("http://", "https://")):
@@ -609,7 +612,7 @@ class DocumentationAuditor:
         """Generate actionable recommendations based on audit results."""
         metrics = self.results.metrics
         issues = self.results.issues
-        recommendations: list[AuditRecommendation] = []
+        recommendations: Sequence[AuditRecommendation] = []
         quality_score = metrics.quality_score
         if quality_score < 50:
             recommendations.append(

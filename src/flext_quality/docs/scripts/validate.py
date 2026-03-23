@@ -15,6 +15,7 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import re
+from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -46,9 +47,9 @@ class LinkValidator:
             timestamp=datetime.now(UTC).isoformat(),
         )
 
-    def find_all_links(self, doc_files: list[Path]) -> list[LinkRecord]:
+    def find_all_links(self, doc_files: Sequence[Path]) -> Sequence[LinkRecord]:
         """Extract all links from documentation files."""
-        all_links: list[LinkRecord] = []
+        all_links: Sequence[LinkRecord] = []
         for file_path in doc_files:
             file_rel_path = str(file_path)
             try:
@@ -138,7 +139,7 @@ class LinkValidator:
         return None
 
     def validate_external_links(
-        self, links: list[LinkRecord], *, verbose: bool = False
+        self, links: Sequence[LinkRecord], *, verbose: bool = False
     ) -> LinkValidatorResults:
         """Validate external links with concurrent checking."""
         external_links = [link for link in links if link.type == "external"]
@@ -196,7 +197,7 @@ class LinkValidator:
 
     def _handle_request_attempt(
         self, url: str, attempt: int
-    ) -> tuple[bool, dict[str, int | str] | None]:
+    ) -> tuple[bool, Mapping[str, int | str] | None]:
         """Handle a single request attempt."""
         try:
             response = self._make_http_request(url)
@@ -251,7 +252,7 @@ class LinkValidator:
         )
 
     def validate_internal_links(
-        self, links: list[LinkRecord], doc_files: list[Path]
+        self, links: Sequence[LinkRecord], doc_files: Sequence[Path]
     ) -> LinkValidatorResults:
         """Validate internal links and references."""
         internal_links = [
@@ -308,7 +309,7 @@ class LinkValidator:
         return Path(target)
 
     def validate_images(
-        self, links: list[LinkRecord], project_root: Path
+        self, links: Sequence[LinkRecord], project_root: Path
     ) -> LinkValidatorResults:
         """Validate image references."""
         images = [link for link in links if link.type == "image"]
@@ -340,11 +341,11 @@ class LinkValidator:
         return self.results
 
     def validate_anchors(
-        self, links: list[LinkRecord], doc_files: list[Path]
+        self, links: Sequence[LinkRecord], doc_files: Sequence[Path]
     ) -> LinkValidatorResults:
         """Validate anchor links within documents."""
         anchor_links = [link for link in links if link.type == "anchor"]
-        file_anchors: dict[str, set[str]] = {}
+        file_anchors: Mapping[str, set[str]] = {}
         for file_path in doc_files:
             file_rel_path = str(file_path)
             try:
@@ -395,7 +396,9 @@ class LinkValidator:
         anchor = re.sub(r"[^\\w\\s-]", "", anchor)
         return re.sub(r"\\s+", "-", anchor)
 
-    def check_link_text_quality(self, links: list[LinkRecord]) -> LinkValidatorResults:
+    def check_link_text_quality(
+        self, links: Sequence[LinkRecord]
+    ) -> LinkValidatorResults:
         """Check quality of link text for accessibility and usability."""
         poor_link_texts = [
             "here",
@@ -458,7 +461,7 @@ class ContentValidator:
         )
 
     def validate_markdown_syntax(
-        self, doc_files: list[Path]
+        self, doc_files: Sequence[Path]
     ) -> ContentValidatorResults:
         """Validate markdown syntax and formatting."""
         for file_path in doc_files:
@@ -488,9 +491,9 @@ class ContentValidator:
                 )
         return self.results
 
-    def _check_markdown_issues(self, content: str) -> list[ContentIssue]:
+    def _check_markdown_issues(self, content: str) -> Sequence[ContentIssue]:
         """Check for markdown syntax issues."""
-        issues: list[ContentIssue] = []
+        issues: Sequence[ContentIssue] = []
         lines = content.split("\n")
         for i, line in enumerate(lines, 1):
             if "[" in line and "]" in line and ("(" in line) and (")" not in line):
@@ -524,7 +527,9 @@ class ContentValidator:
                 )
         return issues
 
-    def check_content_quality(self, doc_files: list[Path]) -> ContentValidatorResults:
+    def check_content_quality(
+        self, doc_files: Sequence[Path]
+    ) -> ContentValidatorResults:
         """Check content quality metrics."""
         for file_path in doc_files:
             file_rel_path = str(file_path)
@@ -638,10 +643,10 @@ def _create_validation_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _discover_validation_files() -> list[Path]:
+def _discover_validation_files() -> Sequence[Path]:
     """Discover documentation files for validation."""
     project_root = Path(__file__).parent.parent.parent.parent
-    doc_files: list[Path] = []
+    doc_files: Sequence[Path] = []
     for pattern in [
         "**/*.md",
         "**/*.mdx",
@@ -651,7 +656,7 @@ def _discover_validation_files() -> list[Path]:
     ]:
         doc_files.extend(project_root.glob(pattern))
     seen: set[Path] = set()
-    unique: list[Path] = []
+    unique: Sequence[Path] = []
     for f in doc_files:
         if f not in seen:
             seen.add(f)
@@ -665,8 +670,8 @@ def _discover_validation_files() -> list[Path]:
 def _execute_validations(
     link_validator: LinkValidator,
     content_validator: ContentValidator,
-    all_links: list[LinkRecord],
-    doc_files: list[Path],
+    all_links: Sequence[LinkRecord],
+    doc_files: Sequence[Path],
     args: argparse.Namespace,
 ) -> bool:
     """Execute the requested validations and return if any were run."""

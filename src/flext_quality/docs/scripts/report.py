@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import argparse
 import operator
+from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import NotRequired, TypedDict, Unpack
@@ -34,9 +35,9 @@ ReportValue = (
     | int
     | float
     | bool
-    | list[str]
-    | list[dict[str, t.Primitives]]
-    | dict[str, t.Primitives]
+    | Sequence[str]
+    | Sequence[Mapping[str, t.Primitives]]
+    | Mapping[str, t.Primitives]
     | None
 )
 
@@ -88,7 +89,7 @@ class Recommendation(TypedDict):
     category: str
     title: str
     description: str
-    actions: list[str]
+    actions: Sequence[str]
 
 
 class TrendEntry(TypedDict):
@@ -106,9 +107,9 @@ class TrendEntry(TypedDict):
 class TrendData(TypedDict):
     """Trend data structure."""
 
-    audit_trends: list[TrendEntry]
-    validation_trends: list[TrendEntry]
-    optimization_trends: list[TrendEntry]
+    audit_trends: Sequence[TrendEntry]
+    validation_trends: Sequence[TrendEntry]
+    optimization_trends: Sequence[TrendEntry]
 
 
 class ReportData(TypedDict):
@@ -116,16 +117,16 @@ class ReportData(TypedDict):
 
     timestamp: str
     title: str
-    audit: dict[str, ReportValue] | None
-    validation: dict[str, ReportValue] | None
-    optimization: dict[str, ReportValue] | None
+    audit: Mapping[str, ReportValue] | None
+    validation: Mapping[str, ReportValue] | None
+    optimization: Mapping[str, ReportValue] | None
     summary: SummaryMetrics
     trends: TrendData | None
-    recommendations: list[Recommendation]
+    recommendations: Sequence[Recommendation]
 
 
-_REPORT_LOAD_ADAPTER: TypeAdapter[dict[str, ReportValue]] = TypeAdapter(
-    dict[str, ReportValue],
+_REPORT_LOAD_ADAPTER: TypeAdapter[Mapping[str, ReportValue]] = TypeAdapter(
+    Mapping[str, ReportValue],
 )
 _REPORT_DATA_ADAPTER: TypeAdapter[ReportData] = TypeAdapter(ReportData)
 
@@ -138,9 +139,9 @@ class DocumentationReporter:
         self.reports_dir = Path(reports_dir)
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.template_dir = Path(__file__).parent / "templates"
-        self.audit_data: dict[str, ReportValue] | None = None
-        self.validation_data: dict[str, ReportValue] | None = None
-        self.optimization_data: dict[str, ReportValue] | None = None
+        self.audit_data: Mapping[str, ReportValue] | None = None
+        self.validation_data: Mapping[str, ReportValue] | None = None
+        self.optimization_data: Mapping[str, ReportValue] | None = None
         self.reports_dir.mkdir(parents=True, exist_ok=True)
         self.load_latest_reports()
 
@@ -150,7 +151,7 @@ class DocumentationReporter:
         self.validation_data = self._load_json_report("latest_validation.json")
         self.optimization_data = self._load_json_report("latest_optimization.json")
 
-    def _load_json_report(self, filename: str) -> dict[str, ReportValue] | None:
+    def _load_json_report(self, filename: str) -> Mapping[str, ReportValue] | None:
         """Load a JSON report file."""
         filepath = self.reports_dir / filename
         if filepath.exists():
@@ -239,13 +240,13 @@ class DocumentationReporter:
         """Analyze quality trends over time."""
         return None
 
-    def _generate_recommendations(self) -> list[Recommendation]:
+    def _generate_recommendations(self) -> Sequence[Recommendation]:
         """Generate actionable recommendations based on current data."""
-        recommendations: list[Recommendation] = []
+        recommendations: Sequence[Recommendation] = []
         if self.audit_data and isinstance(self.audit_data, dict):
             audit_issues = self.audit_data.get("issues")
             if isinstance(audit_issues, list):
-                critical_issues: list[dict[str, t.Primitives]] = [
+                critical_issues: Sequence[Mapping[str, t.Primitives]] = [
                     i
                     for i in audit_issues
                     if isinstance(i, dict) and i.get("severity") == "critical"
@@ -262,7 +263,7 @@ class DocumentationReporter:
                             "Re-run audit after fixes",
                         ],
                     })
-                outdated: list[dict[str, t.Primitives]] = [
+                outdated: Sequence[Mapping[str, t.Primitives]] = [
                     i
                     for i in audit_issues
                     if isinstance(i, dict) and i.get("type") == "outdated_content"
@@ -284,16 +285,18 @@ class DocumentationReporter:
             if isinstance(link_validation, dict):
                 validation_errors = link_validation.get("errors")
                 if isinstance(validation_errors, list):
-                    broken_links: list[dict[str, t.Primitives]] = []
+                    broken_links: Sequence[Mapping[str, t.Primitives]] = []
                     for e in validation_errors:
                         if isinstance(e, dict):
-                            error_entry: dict[t.NormalizedValue, t.NormalizedValue] = e
+                            error_entry: Mapping[
+                                t.NormalizedValue, t.NormalizedValue
+                            ] = e
                             error_type = error_entry.get("type")
                             if error_type in {
                                 "broken_external_link",
                                 "broken_internal_link",
                             }:
-                                normalized: dict[str, t.Primitives] = {
+                                normalized: Mapping[str, t.Primitives] = {
                                     key: value
                                     for key, value in error_entry.items()
                                     if isinstance(key, str)
@@ -402,7 +405,7 @@ class DocumentationReporter:
 
     def _summarize_audit_data(
         self,
-        audit_data: dict[str, ReportValue] | None,
+        audit_data: Mapping[str, ReportValue] | None,
     ) -> AuditSummary | None:
         """Summarize audit data for reporting."""
         if not audit_data or not isinstance(audit_data, dict):
@@ -449,7 +452,7 @@ class DocumentationReporter:
 
     def _summarize_validation_data(
         self,
-        validation_data: dict[str, ReportValue] | None,
+        validation_data: Mapping[str, ReportValue] | None,
     ) -> ValidationSummary | None:
         """Summarize validation data for reporting."""
         if not validation_data or not isinstance(validation_data, dict):
@@ -475,7 +478,7 @@ class DocumentationReporter:
 
     def _summarize_optimization_data(
         self,
-        optimization_data: dict[str, ReportValue] | None,
+        optimization_data: Mapping[str, ReportValue] | None,
     ) -> OptimizationSummary | None:
         """Summarize optimization data for reporting."""
         if not optimization_data or not isinstance(optimization_data, dict):
@@ -499,7 +502,7 @@ class DocumentationReporter:
             else 0,
         }
 
-    def _generate_charts(self, data: ReportData) -> dict[str, str] | None:
+    def _generate_charts(self, data: ReportData) -> Mapping[str, str] | None:
         """Generate charts for the report (placeholder for future implementation)."""
         _ = data
         return None
@@ -507,7 +510,7 @@ class DocumentationReporter:
     def generate_trend_report(self, days: int = 30) -> str:
         """Generate trend analysis report over specified time period."""
         report_files = list(self.reports_dir.glob("*.json"))
-        recent_reports: list[dict[str, ReportValue | datetime]] = []
+        recent_reports: Sequence[Mapping[str, ReportValue | datetime]] = []
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
         for report_file in report_files:
             if "latest_" in report_file.name:
@@ -518,12 +521,12 @@ class DocumentationReporter:
                     tzinfo=UTC
                 )
                 if report_date >= cutoff_date:
-                    report_data_raw: dict[str, ReportValue] = (
+                    report_data_raw: Mapping[str, ReportValue] = (
                         _REPORT_LOAD_ADAPTER.validate_json(
                             Path(report_file).read_bytes()
                         )
                     )
-                    report_data_dict: dict[str, ReportValue | datetime] = {
+                    report_data_dict: Mapping[str, ReportValue | datetime] = {
                         **report_data_raw,
                         "date": report_date,
                     }
@@ -534,14 +537,14 @@ class DocumentationReporter:
         return self._generate_trend_report(trend_data, days)
 
     def _analyze_trend_data(
-        self, reports: list[dict[str, ReportValue | datetime]]
-    ) -> TrendData | dict[str, str]:
+        self, reports: Sequence[Mapping[str, ReportValue | datetime]]
+    ) -> TrendData | Mapping[str, str]:
         """Analyze trend data from historical reports."""
         if not reports:
             return {"error": "No historical data available"}
-        audit_trends: list[TrendEntry] = []
-        validation_trends: list[TrendEntry] = []
-        optimization_trends: list[TrendEntry] = []
+        audit_trends: Sequence[TrendEntry] = []
+        validation_trends: Sequence[TrendEntry] = []
+        optimization_trends: Sequence[TrendEntry] = []
         for report in reports:
             date_val_raw = report.get("date")
             if date_val_raw is None:
@@ -593,7 +596,7 @@ class DocumentationReporter:
 
     def _generate_trend_report(
         self,
-        trend_data: TrendData | dict[str, str],
+        trend_data: TrendData | Mapping[str, str],
         days: int,
     ) -> str:
         """Generate trend analysis report."""

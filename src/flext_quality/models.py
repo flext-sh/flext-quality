@@ -6,6 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Annotated
 
@@ -16,15 +17,15 @@ from pydantic import BaseModel, Field
 from flext_quality import c, t
 
 
-def _empty_list_str() -> list[str]:
+def _empty_list_str() -> Sequence[str]:
     return []
 
 
-def _empty_dict_str_str() -> dict[str, str]:
+def _empty_dict_str_str() -> Mapping[str, str]:
     return {}
 
 
-def _empty_list_dict_str_str() -> list[dict[str, str]]:
+def _empty_list_dict_str_str() -> Sequence[Mapping[str, str]]:
     return []
 
 
@@ -38,7 +39,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Configuration for a hook."""
 
             event: c.Quality.HookEvent
-            matcher: list[str] | None = None
+            matcher: Sequence[str] | None = None
             command: str
             timeout_ms: Annotated[
                 int, Field(default=c.Quality.Defaults.HOOK_TIMEOUT_MS)
@@ -84,8 +85,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             type: str
             title: str
             content: str
-            concepts: Annotated[list[str], Field(default_factory=list)]
-            files: Annotated[list[str], Field(default_factory=list)]
+            concepts: Annotated[Sequence[str], Field(default_factory=list)]
+            files: Annotated[Sequence[str], Field(default_factory=list)]
             timestamp: str
 
         class ContextSearchResult(BaseModel):
@@ -105,11 +106,11 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             line: int | None = Field(default=None, description="Issue line number")
             description: str = Field(default="", description="Issue description")
             recommendation: str = Field(default="", description="Recommended fix")
-            context: dict[str, t.Primitives | None] | None = Field(default=None)
+            context: Mapping[str, t.Primitives | None] | None = Field(default=None)
 
             def to_dict(
                 self,
-            ) -> dict[str, str | int | dict[str, t.Primitives | None] | None]:
+            ) -> Mapping[str, str | int | Mapping[str, t.Primitives | None] | None]:
                 """Convert issue to dictionary representation."""
                 return {
                     "type": self.type,
@@ -127,10 +128,12 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             total_items: int = Field(default=0)
             valid_items: int = Field(default=0)
             invalid_items: int = Field(default=0)
-            issues: list[FlextQualityModels.Quality.Issue] = Field(default_factory=list)
-            warnings: list[str] = Field(default_factory=list)
-            errors: list[str] = Field(default_factory=list)
-            metadata: dict[str, t.Primitives] = Field(default_factory=dict)
+            issues: Sequence[FlextQualityModels.Quality.Issue] = Field(
+                default_factory=list
+            )
+            warnings: Sequence[str] = Field(default_factory=list)
+            errors: Sequence[str] = Field(default_factory=list)
+            metadata: Mapping[str, t.Primitives] = Field(default_factory=dict)
 
             @property
             def success_rate(self) -> float:
@@ -196,7 +199,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             enabled: bool = True
             time: str
-            tasks: list[str] = Field(default_factory=list)
+            tasks: Sequence[str] = Field(default_factory=list)
             day: str | None = None
 
         class ErrorHandlingConfig(BaseModel):
@@ -221,10 +224,10 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             enabled: bool = True
             reports_dir: str
             backup_dir: str
-            schedules: dict[str, FlextQualityModels.Quality.ScheduleEntry] = Field(
+            schedules: Mapping[str, FlextQualityModels.Quality.ScheduleEntry] = Field(
                 default_factory=dict
             )
-            tasks: dict[str, FlextQualityModels.Quality.ScheduleTaskConfig] = Field(
+            tasks: Mapping[str, FlextQualityModels.Quality.ScheduleTaskConfig] = Field(
                 default_factory=dict
             )
             error_handling: FlextQualityModels.Quality.ErrorHandlingConfig
@@ -235,8 +238,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             start_time: str
             tasks_completed: int = 0
-            errors: list[str] = Field(default_factory=list)
-            warnings: list[str] = Field(default_factory=list)
+            errors: Sequence[str] = Field(default_factory=list)
+            warnings: Sequence[str] = Field(default_factory=list)
             end_time: str = ""
             duration_seconds: int = 0
 
@@ -244,7 +247,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Typed metrics for documentation audit results."""
 
             total_issues: int = 0
-            severity_breakdown: dict[str, int] = Field(default_factory=dict)
+            severity_breakdown: Mapping[str, int] = Field(default_factory=dict)
             quality_score: int = 0
             files_analyzed: int = 0
             issues_per_file: float = 0.0
@@ -255,22 +258,25 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             priority: str
             category: str
             recommendation: str
-            actions: list[str] = Field(default_factory=list)
+            actions: Sequence[str] = Field(default_factory=list)
 
         class AuditorResults(BaseModel):
             """Results for documentation audit execution."""
 
             timestamp: str
             files_analyzed: int = 0
-            issues: list[
-                dict[str, t.Primitives | list[str] | list[dict[str, str]] | None]
+            issues: Sequence[
+                Mapping[
+                    str,
+                    t.Primitives | Sequence[str] | Sequence[Mapping[str, str]] | None,
+                ]
             ] = Field(default_factory=list)
             metrics: FlextQualityModels.Quality.AuditMetrics = Field(
                 default_factory=lambda: FlextQualityModels.Quality.AuditMetrics()
             )
-            recommendations: list[FlextQualityModels.Quality.AuditRecommendation] = (
-                Field(default_factory=list)
-            )
+            recommendations: Sequence[
+                FlextQualityModels.Quality.AuditRecommendation
+            ] = Field(default_factory=list)
 
         class LinkRecord(BaseModel):
             """Record of a link found in documentation."""
@@ -310,10 +316,10 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             valid_links: int = 0
             broken_links: int = 0
             warnings: int = 0
-            errors: list[FlextQualityModels.Quality.LinkCheckResult] = Field(
+            errors: Sequence[FlextQualityModels.Quality.LinkCheckResult] = Field(
                 default_factory=list
             )
-            warnings_list: list[FlextQualityModels.Quality.LinkCheckResult] = Field(
+            warnings_list: Sequence[FlextQualityModels.Quality.LinkCheckResult] = Field(
                 default_factory=list
             )
 
@@ -322,10 +328,10 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             timestamp: str
             files_checked: int = 0
-            content_issues: list[FlextQualityModels.Quality.ContentIssue] = Field(
+            content_issues: Sequence[FlextQualityModels.Quality.ContentIssue] = Field(
                 default_factory=list
             )
-            quality_metrics: dict[str, str | int | float | bool] = Field(
+            quality_metrics: Mapping[str, str | int | float | bool] = Field(
                 default_factory=dict
             )
 
@@ -349,8 +355,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             total_words: int | None = None
             markdown_files: int | None = None
             other_files: int | None = None
-            size_distribution: dict[str, int] | None = None
-            categories: dict[str, int] | None = None
+            size_distribution: Mapping[str, int] | None = None
+            categories: Mapping[str, int] | None = None
             avg_file_size: float | None = None
             avg_lines_per_file: float | None = None
             avg_words_per_file: float | None = None
@@ -388,7 +394,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             username: str
             password: str
             from_address: str
-            to_addresses: list[str] = Field(default_factory=list)
+            to_addresses: Sequence[str] = Field(default_factory=list)
 
         class SlackConfig(BaseModel):
             """Slack notification configuration."""
@@ -401,7 +407,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Generic webhook configuration."""
 
             url: str
-            headers: dict[str, str] = Field(default_factory=dict)
+            headers: Mapping[str, str] = Field(default_factory=dict)
             timeout: t.PositiveInt = Field(default=30)
 
         class ChannelsConfig(BaseModel):
@@ -426,7 +432,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Results for documentation notification runs."""
 
             notifications_sent: int = 0
-            errors: list[str] = Field(default_factory=list)
+            errors: Sequence[str] = Field(default_factory=list)
             timestamp: str
 
         class QualityThresholdsConfig(BaseModel):
@@ -448,10 +454,10 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
         class SeverityLevelsConfig(BaseModel):
             """Configuration for severity level categorization."""
 
-            critical: list[str] = Field(default_factory=list)
-            high: list[str] = Field(default_factory=list)
-            medium: list[str] = Field(default_factory=list)
-            low: list[str] = Field(default_factory=list)
+            critical: Sequence[str] = Field(default_factory=list)
+            high: Sequence[str] = Field(default_factory=list)
+            medium: Sequence[str] = Field(default_factory=list)
+            low: Sequence[str] = Field(default_factory=list)
 
         class AuditRulesConfig(BaseModel):
             """Configuration for audit rules and thresholds."""
@@ -521,7 +527,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Configuration for content analysis parameters."""
 
             min_section_depth: int = 2
-            required_sections: list[str] = Field(
+            required_sections: Sequence[str] = Field(
                 default_factory=lambda: ["Overview", "Installation", "Usage"]
             )
             check_todos: bool = True
@@ -547,8 +553,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             timestamp: str
             files_processed: int = 0
             changes_made: int = 0
-            backups_created: list[str] = Field(default_factory=_empty_list_str)
-            optimizations: list[dict[str, str]] = Field(
+            backups_created: Sequence[str] = Field(default_factory=_empty_list_str)
+            optimizations: Sequence[Mapping[str, str]] = Field(
                 default_factory=_empty_list_dict_str_str
             )
 
@@ -557,7 +563,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             script_path: Path
             runtime: str
-            args: Annotated[list[str], Field(default_factory=_empty_list_str)]
+            args: Annotated[Sequence[str], Field(default_factory=_empty_list_str)]
             timeout_ms: int
 
         class ExecutionResult(BaseModel):
@@ -574,7 +580,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             server: str
             tool: str
             params: Annotated[
-                dict[str, t.NormalizedValue],
+                Mapping[str, t.NormalizedValue],
                 Field(default_factory=_empty_dict_str_str),
             ]
 
@@ -582,7 +588,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """MCP tool invocation response contract."""
 
             success: bool
-            data: dict[str, str] | None = None
+            data: Mapping[str, str] | None = None
             error: str | None = None
 
 

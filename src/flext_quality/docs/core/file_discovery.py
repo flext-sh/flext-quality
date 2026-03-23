@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import fnmatch
 import logging
+from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import ClassVar, NotRequired, TypedDict
@@ -24,8 +25,8 @@ class FileStatistics(TypedDict):
     total_words: NotRequired[int]
     markdown_files: NotRequired[int]
     other_files: NotRequired[int]
-    size_distribution: NotRequired[dict[str, int]]
-    categories: NotRequired[dict[str, int]]
+    size_distribution: NotRequired[Mapping[str, int]]
+    categories: NotRequired[Mapping[str, int]]
     avg_file_size: NotRequired[float]
     avg_lines_per_file: NotRequired[float]
     avg_words_per_file: NotRequired[float]
@@ -35,7 +36,7 @@ class DocumentationFinder:
     """Documentation file discovery and filtering system."""
 
     # Common documentation file patterns
-    DEFAULT_PATTERNS: ClassVar[list[str]] = [
+    DEFAULT_PATTERNS: ClassVar[Sequence[str]] = [
         "**/*.md",
         "**/*.mdx",
         "**/*.rst",
@@ -60,7 +61,7 @@ class DocumentationFinder:
     DOCS_ROOT_DEPTH: int = 2
 
     # Default ignore patterns
-    DEFAULT_IGNORE_PATTERNS: ClassVar[list[str]] = [
+    DEFAULT_IGNORE_PATTERNS: ClassVar[Sequence[str]] = [
         "**/node_modules/**",
         "**/build/**",
         "**/dist/**",
@@ -87,8 +88,8 @@ class DocumentationFinder:
     def __init__(
         self,
         project_root: Path,
-        patterns: list[str] | None = None,
-        ignore_patterns: list[str] | None = None,
+        patterns: Sequence[str] | None = None,
+        ignore_patterns: Sequence[str] | None = None,
         ignore_file: str | None = None,
     ) -> None:
         """Initialize the documentation finder.
@@ -109,8 +110,8 @@ class DocumentationFinder:
         self._load_ignore_file()
 
         # Cache for found files
-        self._file_cache: list[Path] | None = None
-        self._metadata_cache: dict[str, m.Quality.FileMetadata] = {}
+        self._file_cache: Sequence[Path] | None = None
+        self._metadata_cache: Mapping[str, m.Quality.FileMetadata] = {}
 
     def _load_ignore_file(self) -> None:
         """Load ignore patterns from .gitignore or similar file."""
@@ -165,7 +166,7 @@ class DocumentationFinder:
             line = f"{line}/**"
         return line
 
-    def find_files(self, *, use_cache: bool = True) -> list[Path]:
+    def find_files(self, *, use_cache: bool = True) -> Sequence[Path]:
         """Find all documentation files in the project.
 
         Args:
@@ -178,7 +179,7 @@ class DocumentationFinder:
         if use_cache and self._file_cache is not None:
             return self._file_cache.copy()
 
-        found_files: list[Path] = []
+        found_files: Sequence[Path] = []
 
         for pattern in self.patterns:
             try:
@@ -201,7 +202,7 @@ class DocumentationFinder:
 
         # Remove duplicates while preserving order
         seen: set[str] = set()
-        unique_files: list[Path] = []
+        unique_files: Sequence[Path] = []
         for file_path in found_files:
             file_str = str(file_path)
             if file_str not in seen:
@@ -245,17 +246,17 @@ class DocumentationFinder:
         except (OSError, ValueError):
             return False
 
-    def find_markdown_files(self) -> list[Path]:
+    def find_markdown_files(self) -> Sequence[Path]:
         """Find specifically markdown files."""
         all_files = self.find_files()
         return [f for f in all_files if f.suffix.lower() in {".md", ".mdx"}]
 
-    def find_readme_files(self) -> list[Path]:
+    def find_readme_files(self) -> Sequence[Path]:
         """Find README files."""
         all_files = self.find_files()
         return [f for f in all_files if f.name.lower().startswith("readme")]
 
-    def find_by_extension(self, extensions: list[str]) -> list[Path]:
+    def find_by_extension(self, extensions: Sequence[str]) -> Sequence[Path]:
         """Find files by their extensions."""
         all_files = self.find_files()
         extensions = [ext.lower().lstrip(".") for ext in extensions]
@@ -269,15 +270,15 @@ class DocumentationFinder:
         return self._metadata_cache[path_str]
 
     def get_files_metadata(
-        self, files: list[Path] | None = None
-    ) -> list[m.Quality.FileMetadata]:
+        self, files: Sequence[Path] | None = None
+    ) -> Sequence[m.Quality.FileMetadata]:
         """Get metadata for multiple files."""
         if files is None:
             files = self.find_files()
 
         return [self.get_file_metadata(f) for f in files]
 
-    def _initialize_categories(self) -> dict[str, list[Path]]:
+    def _initialize_categories(self) -> Mapping[str, Sequence[Path]]:
         """Initialize empty category dictionaries."""
         return {
             "readme": [],
@@ -326,8 +327,8 @@ class DocumentationFinder:
 
     def categorize_files(
         self,
-        files: list[Path] | None = None,
-    ) -> dict[str, list[Path]]:
+        files: Sequence[Path] | None = None,
+    ) -> Mapping[str, Sequence[Path]]:
         """Categorize files by type and location."""
         if files is None:
             files = self.find_files()
@@ -351,7 +352,7 @@ class DocumentationFinder:
 
         return categories
 
-    def get_statistics(self, files: list[Path] | None = None) -> FileStatistics:
+    def get_statistics(self, files: Sequence[Path] | None = None) -> FileStatistics:
         """Get statistics about found files."""
         if files is None:
             files = self.find_files()
@@ -425,7 +426,7 @@ class DocumentationFinder:
             self.ignore_patterns.append(pattern)
             self.invalidate_cache()
 
-    def filter_by_age(self, files: list[Path], max_age_days: int) -> list[Path]:
+    def filter_by_age(self, files: Sequence[Path], max_age_days: int) -> Sequence[Path]:
         """Filter files by maximum age in days."""
         cutoff_time = (datetime.now(UTC) - timedelta(days=max_age_days)).timestamp()
 
@@ -433,16 +434,16 @@ class DocumentationFinder:
 
     def filter_by_size(
         self,
-        files: list[Path],
+        files: Sequence[Path],
         min_size: int = 0,
         max_size: int | None = None,
-    ) -> list[Path]:
+    ) -> Sequence[Path]:
         """Filter files by size range."""
         filtered = [f for f in files if f.stat().st_size >= min_size]
         if max_size is not None:
             filtered = [f for f in filtered if f.stat().st_size <= max_size]
         return filtered
 
-    def find_recently_modified(self, days: int = 7) -> list[Path]:
+    def find_recently_modified(self, days: int = 7) -> Sequence[Path]:
         """Find files modified within the last N days."""
         return self.filter_by_age(self.find_files(), days)

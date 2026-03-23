@@ -7,6 +7,7 @@ Provides consistent interfaces and shared functionality.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
+from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -22,7 +23,7 @@ class BaseAuditor(ABC):
     def __init__(self, name: str) -> None:
         """Initialize the audit base class with a name."""
         self.name = name
-        self.issues: list[m.Quality.Issue] = []
+        self.issues: Sequence[m.Quality.Issue] = []
         self.start_time: datetime | None = None
         self.end_time: datetime | None = None
 
@@ -51,15 +52,15 @@ class BaseAuditor(ABC):
         """Get the total number of issues found."""
         return len(self.issues)
 
-    def get_issues_by_severity(self, severity: str) -> list[m.Quality.Issue]:
+    def get_issues_by_severity(self, severity: str) -> Sequence[m.Quality.Issue]:
         """Get issues filtered by severity level."""
         return [issue for issue in self.issues if issue.severity == severity]
 
     @abstractmethod
-    def audit(self, files: list[Path]) -> m.Quality.ValidationResult:
+    def audit(self, files: Sequence[Path]) -> m.Quality.ValidationResult:
         """Perform the audit operation on given files."""
 
-    def get_summary(self) -> dict[str, dict[str, int] | float | int | str | None]:
+    def get_summary(self) -> Mapping[str, Mapping[str, int] | float | int | str | None]:
         """Get a summary of the audit results."""
         return {
             "auditor": self.name,
@@ -87,7 +88,7 @@ class BaseValidator(ABC):
         self.results: m.Quality.ValidationResult | None = None
 
     def validate(
-        self, items: list[t.Quality.GenericItem]
+        self, items: Sequence[t.Quality.GenericItem]
     ) -> m.Quality.ValidationResult:
         """Perform validation on given items."""
         self.results = m.Quality.ValidationResult()
@@ -98,10 +99,10 @@ class BaseValidator(ABC):
         return self.results
 
     @abstractmethod
-    def _validate_items(self, items: list[t.Quality.GenericItem]) -> None:
+    def _validate_items(self, items: Sequence[t.Quality.GenericItem]) -> None:
         """Implementation-specific validation logic."""
 
-    def get_summary(self) -> dict[str, float | int | str] | dict[str, str]:
+    def get_summary(self) -> Mapping[str, float | int | str] | Mapping[str, str]:
         """Get a summary of validation results."""
         if not self.results:
             return {"validator": self.name, "status": "not_run"}
@@ -132,9 +133,9 @@ class BaseReporter(ABC):
     @abstractmethod
     def generate_report(
         self,
-        data: dict[
+        data: Mapping[
             str,
-            str | int | float | bool | dict[str, t.Primitives | None] | None,
+            str | int | float | bool | Mapping[str, t.Primitives | None] | None,
         ],
         output_format: str = "html",
     ) -> str:
@@ -157,11 +158,11 @@ class BaseAnalyzer(ABC):
     def __init__(self, name: str) -> None:
         """Initialize the analyzer base class with a name."""
         self.name = name
-        self.metrics: dict[str, t.Primitives | None] = {}
+        self.metrics: Mapping[str, t.Primitives | None] = {}
 
     def analyze(
         self, content: str, filepath: Path | None = None
-    ) -> dict[str, t.Primitives | None]:
+    ) -> Mapping[str, t.Primitives | None]:
         """Analyze the given content and return metrics."""
         self.metrics = {
             "analyzer": self.name,

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from flext_core import r, t
@@ -17,10 +17,10 @@ class FlextQualityRulesEngine:
     def __init__(self, rules_path: Path | None = None) -> None:
         """Initialize rules engine."""
         self._rules_path: Path | None = rules_path
-        self._rules: list[m.Quality.RuleDefinition] = []
+        self._rules: Sequence[m.Quality.RuleDefinition] = []
         self._loaded: bool = False
 
-    def get_rules(self) -> list[m.Quality.RuleDefinition]:
+    def get_rules(self) -> Sequence[m.Quality.RuleDefinition]:
         """Get loaded rules."""
         return self._rules.copy()
 
@@ -41,50 +41,54 @@ class FlextQualityRulesEngine:
         self,
         path: str,
         context: Mapping[str, t.NormalizedValue] | None = None,
-    ) -> r[list[Mapping[str, t.NormalizedValue]]]:
+    ) -> r[Sequence[Mapping[str, t.NormalizedValue]]]:
         """Validate code against loaded rules."""
         if not self._loaded:
             load_result = self.load_rules()
             if load_result.is_failure:
-                return r[list[Mapping[str, t.NormalizedValue]]].fail(load_result.error)
+                return r[Sequence[Mapping[str, t.NormalizedValue]]].fail(
+                    load_result.error
+                )
         target_path = Path(path)
         if not target_path.exists():
-            return r[list[Mapping[str, t.NormalizedValue]]].fail(
+            return r[Sequence[Mapping[str, t.NormalizedValue]]].fail(
                 f"Path does not exist: {path}"
             )
-        violations: list[Mapping[str, t.NormalizedValue]] = []
+        violations: Sequence[Mapping[str, t.NormalizedValue]] = []
         files = self._get_files(target_path)
         for file_path in files:
             file_violations = self._validate_file(file_path, context or {})
             violations.extend(file_violations)
-        return r[list[Mapping[str, t.NormalizedValue]]].ok(violations)
+        return r[Sequence[Mapping[str, t.NormalizedValue]]].ok(violations)
 
     def validate_content(
         self,
         content: str,
         filename: str = "<string>",
-    ) -> r[list[Mapping[str, t.NormalizedValue]]]:
+    ) -> r[Sequence[Mapping[str, t.NormalizedValue]]]:
         """Validate content string against loaded rules."""
         if not self._loaded:
             load_result = self.load_rules()
             if load_result.is_failure:
-                return r[list[Mapping[str, t.NormalizedValue]]].fail(load_result.error)
-        violations: list[Mapping[str, t.NormalizedValue]] = []
+                return r[Sequence[Mapping[str, t.NormalizedValue]]].fail(
+                    load_result.error
+                )
+        violations: Sequence[Mapping[str, t.NormalizedValue]] = []
         for rule in self._rules:
             if not rule.enabled:
                 continue
             rule_violations = self._check_rule(rule, content, filename)
             violations.extend(rule_violations)
-        return r[list[Mapping[str, t.NormalizedValue]]].ok(violations)
+        return r[Sequence[Mapping[str, t.NormalizedValue]]].ok(violations)
 
     def _check_rule(
         self,
         rule: m.Quality.RuleDefinition,
         content: str,
         filename: str,
-    ) -> list[Mapping[str, t.NormalizedValue]]:
+    ) -> Sequence[Mapping[str, t.NormalizedValue]]:
         """Check a single rule against content."""
-        violations: list[Mapping[str, t.NormalizedValue]] = []
+        violations: Sequence[Mapping[str, t.NormalizedValue]] = []
         if rule.pattern is None:
             return violations
         try:
@@ -111,7 +115,7 @@ class FlextQualityRulesEngine:
                 })
         return violations
 
-    def _get_files(self, path: Path) -> list[Path]:
+    def _get_files(self, path: Path) -> Sequence[Path]:
         """Get Python files from path."""
         if path.is_file():
             return [path] if path.suffix == ".py" else []
@@ -130,7 +134,7 @@ class FlextQualityRulesEngine:
         self,
         file_path: Path,
         _context: Mapping[str, t.NormalizedValue],
-    ) -> list[Mapping[str, t.NormalizedValue]]:
+    ) -> Sequence[Mapping[str, t.NormalizedValue]]:
         """Validate a single file against rules."""
         try:
             content = file_path.read_text(encoding="utf-8")
@@ -151,7 +155,7 @@ class FlextQualityRulesEngine:
                     "severity": c.Quality.Severity.ERROR,
                 },
             ]
-        violations: list[Mapping[str, t.NormalizedValue]] = []
+        violations: Sequence[Mapping[str, t.NormalizedValue]] = []
         for rule in self._rules:
             if not rule.enabled:
                 continue

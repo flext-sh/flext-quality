@@ -6,6 +6,7 @@ import io
 import sys
 import tempfile
 import threading
+from collections.abc import Sequence
 from pathlib import Path
 
 from flext_tests import tm
@@ -153,8 +154,8 @@ class TestFlextQualitySingleton:
 
     def test_double_check_locking_concurrent(self) -> None:
         """Test singleton creation with concurrent threads."""
-        instances: list[FlextQuality] = []
-        errors: list[Exception] = []
+        instances: Sequence[FlextQuality] = []
+        errors: Sequence[Exception] = []
 
         def get_instance() -> None:
             try:

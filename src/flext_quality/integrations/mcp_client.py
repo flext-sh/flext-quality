@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import shutil
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import final
 
 from flext_core import r
@@ -34,24 +34,24 @@ class FlextQualityMcpClient:
         """Initialize the MCP client."""
         self._timeout_ms = timeout_ms or c.Quality.Defaults.MCP_TIMEOUT_MS
 
-    def build_call_command(self, call: McpToolCall) -> r[list[str]]:
+    def build_call_command(self, call: McpToolCall) -> r[Sequence[str]]:
         """Build the mcp-cli command for a tool call."""
         if not self.is_mcp_cli_available():
-            return r[list[str]].fail("mcp-cli not found in PATH")
+            return r[Sequence[str]].fail("mcp-cli not found in PATH")
         tool_path = f"{call.server}/{call.tool}"
         params_json = (
-            TypeAdapter(dict[str, t.NormalizedValue])
+            TypeAdapter(Mapping[str, t.NormalizedValue])
             .dump_json(call.params)
             .decode("utf-8")
         )
-        return r[list[str]].ok(["mcp-cli", "call", tool_path, params_json])
+        return r[Sequence[str]].ok(["mcp-cli", "call", tool_path, params_json])
 
-    def build_info_command(self, server: str, tool: str) -> r[list[str]]:
+    def build_info_command(self, server: str, tool: str) -> r[Sequence[str]]:
         """Build the mcp-cli info command for a tool."""
         if not self.is_mcp_cli_available():
-            return r[list[str]].fail("mcp-cli not found in PATH")
+            return r[Sequence[str]].fail("mcp-cli not found in PATH")
         tool_path = f"{server}/{tool}"
-        return r[list[str]].ok(["mcp-cli", "info", tool_path])
+        return r[Sequence[str]].ok(["mcp-cli", "info", tool_path])
 
     def build_tool_call(
         self,
@@ -60,10 +60,10 @@ class FlextQualityMcpClient:
         params: Mapping[str, t.NormalizedValue] | None = None,
     ) -> r[McpToolCall]:
         """Build an MCP tool call request."""
-        call_params: dict[str, t.NormalizedValue] = {}
+        call_params: Mapping[str, t.NormalizedValue] = {}
         if isinstance(params, Mapping):
             validated_params = TypeAdapter(
-                dict[str, t.NormalizedValue],
+                Mapping[str, t.NormalizedValue],
             ).validate_python(params)
             call_params = dict(validated_params)
         return r[McpToolCall].ok(
@@ -100,8 +100,8 @@ class FlextQualityMcpClient:
                 ),
             )
         try:
-            parsed = TypeAdapter(dict[str, t.NormalizedValue]).validate_json(output)
-            result_data: dict[str, str] = {str(k): str(v) for k, v in parsed.items()}
+            parsed = TypeAdapter(Mapping[str, t.NormalizedValue]).validate_json(output)
+            result_data: Mapping[str, str] = {str(k): str(v) for k, v in parsed.items()}
             return r[McpToolResult].ok(
                 McpToolResult(
                     success=True,
@@ -111,12 +111,14 @@ class FlextQualityMcpClient:
             )
         except ValueError:
             try:
-                parsed_list = TypeAdapter(list[t.NormalizedValue]).validate_json(output)
-                coerced_data: list[dict[str, str]] = []
+                parsed_list = TypeAdapter(Sequence[t.NormalizedValue]).validate_json(
+                    output
+                )
+                coerced_data: Sequence[Mapping[str, str]] = []
                 for item in parsed_list:
                     if isinstance(item, Mapping):
                         validated_item = TypeAdapter(
-                            dict[str, t.NormalizedValue],
+                            Mapping[str, t.NormalizedValue],
                         ).validate_python(item)
                         coerced_data.append({
                             str(key): str(value)
@@ -128,7 +130,7 @@ class FlextQualityMcpClient:
                     McpToolResult(
                         success=True,
                         data={
-                            "items": TypeAdapter(list[dict[str, str]])
+                            "items": TypeAdapter(Sequence[Mapping[str, str]])
                             .dump_json(coerced_data)
                             .decode("utf-8"),
                         },

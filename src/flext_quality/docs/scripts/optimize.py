@@ -15,6 +15,7 @@ import argparse
 import logging
 import re
 import shutil
+from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -45,8 +46,8 @@ class DocumentationOptimizer:
         self.results = OptimizerResults(timestamp=datetime.now(UTC).isoformat())
 
     def optimize_formatting(
-        self, doc_files: list[Path]
-    ) -> dict[str, t.NormalizedValue]:
+        self, doc_files: Sequence[Path]
+    ) -> Mapping[str, t.NormalizedValue]:
         """Fix common formatting issues."""
         for file_path in doc_files:
             try:
@@ -87,7 +88,7 @@ class DocumentationOptimizer:
     def _fix_heading_spacing(self, content: str) -> str:
         """Ensure proper spacing around headings."""
         lines = content.split("\n")
-        fixed_lines: list[str] = []
+        fixed_lines: Sequence[str] = []
         for i, line in enumerate(lines):
             if re.match(r"^#{1,6}\\s", line) and i > 0 and lines[i - 1].strip():
                 fixed_lines.append("")
@@ -99,8 +100,8 @@ class DocumentationOptimizer:
         return content
 
     def update_table_of_contents(
-        self, doc_files: list[Path]
-    ) -> dict[str, t.NormalizedValue]:
+        self, doc_files: Sequence[Path]
+    ) -> Mapping[str, t.NormalizedValue]:
         """Update or add table of contents for long documents."""
         for file_path in doc_files:
             try:
@@ -127,7 +128,7 @@ class DocumentationOptimizer:
                 self.logger.warning("Failed to update TOC in file: %s", e)
         return self.results.model_dump()
 
-    def _find_existing_toc(self, lines: list[str]) -> tuple[int, int]:
+    def _find_existing_toc(self, lines: Sequence[str]) -> tuple[int, int]:
         """Find existing table of contents boundaries."""
         toc_start = -1
         toc_end = -1
@@ -141,9 +142,9 @@ class DocumentationOptimizer:
                 break
         return (toc_start, toc_end)
 
-    def _extract_toc_headings(self, lines: list[str]) -> list[str]:
+    def _extract_toc_headings(self, lines: Sequence[str]) -> Sequence[str]:
         """Extract headings for table of contents."""
-        toc_lines: list[str] = []
+        toc_lines: Sequence[str] = []
         for line in lines:
             match = re.match(r"^(#{1,6})\\s+(.+)$", line)
             if match:
@@ -155,11 +156,11 @@ class DocumentationOptimizer:
                     toc_lines.append(f"{indent}- [{title}](#{anchor})")
         return toc_lines
 
-    def _generate_toc_content(self, headings: list[str]) -> list[str]:
+    def _generate_toc_content(self, headings: Sequence[str]) -> Sequence[str]:
         """Generate the complete table of contents content."""
         return ["## Table of Contents", "", *headings, "", "---", ""]
 
-    def _find_toc_insertion_point(self, lines: list[str]) -> int:
+    def _find_toc_insertion_point(self, lines: Sequence[str]) -> int:
         """Find the best position to insert table of contents."""
         insert_pos = 0
         for i, line in enumerate(lines):
@@ -191,8 +192,8 @@ class DocumentationOptimizer:
         return re.sub(r"\\s+", "-", anchor)
 
     def enhance_accessibility(
-        self, doc_files: list[Path]
-    ) -> dict[str, t.NormalizedValue]:
+        self, doc_files: Sequence[Path]
+    ) -> Mapping[str, t.NormalizedValue]:
         """Enhance accessibility of documentation."""
         for file_path in doc_files:
             try:
@@ -245,8 +246,8 @@ class DocumentationOptimizer:
         return content
 
     def optimize_content_structure(
-        self, doc_files: list[Path]
-    ) -> dict[str, t.NormalizedValue]:
+        self, doc_files: Sequence[Path]
+    ) -> Mapping[str, t.NormalizedValue]:
         """Optimize content structure and readability."""
         for file_path in doc_files:
             try:
@@ -286,7 +287,7 @@ class DocumentationOptimizer:
     def _add_section_breaks(self, content: str) -> str:
         """Add horizontal rules between major sections."""
         lines = content.split("\n")
-        enhanced_lines: list[str] = []
+        enhanced_lines: Sequence[str] = []
         for i, line in enumerate(lines):
             enhanced_lines.append(line)
             if (
@@ -298,7 +299,9 @@ class DocumentationOptimizer:
                 enhanced_lines.extend(("", "---", ""))
         return "\n".join(enhanced_lines)
 
-    def update_metadata(self, doc_files: list[Path]) -> dict[str, t.NormalizedValue]:
+    def update_metadata(
+        self, doc_files: Sequence[Path]
+    ) -> Mapping[str, t.NormalizedValue]:
         """Update frontmatter metadata and timestamps."""
         for file_path in doc_files:
             try:
@@ -349,7 +352,7 @@ class DocumentationOptimizer:
                     frontmatter_lines = lines[1 : end_idx - 1]
                     frontmatter_content = "\n".join(frontmatter_lines)
                     metadata = TypeAdapter(
-                        dict[str, t.NormalizedValue]
+                        Mapping[str, t.NormalizedValue]
                     ).validate_python(yaml.safe_load(frontmatter_content) or {})
                     metadata["updated"] = datetime.now(UTC).strftime("%Y-%m-%d")
                     new_frontmatter = yaml.dump(
@@ -447,12 +450,12 @@ def _create_argument_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def _discover_documentation_files(args: argparse.Namespace) -> list[Path]:
+def _discover_documentation_files(args: argparse.Namespace) -> Sequence[Path]:
     """Discover documentation files to optimize."""
     project_root = Path(__file__).parent.parent.parent.parent
     if args.files:
         return [project_root / f for f in args.files]
-    doc_files: list[Path] = []
+    doc_files: Sequence[Path] = []
     for pattern in [
         "**/*.md",
         "**/*.mdx",

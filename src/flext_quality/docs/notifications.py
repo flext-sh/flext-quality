@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import smtplib
+from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -23,8 +24,8 @@ from pydantic import ConfigDict, TypeAdapter
 
 from flext_quality import m
 
-_AUDIT_DATA_ADAPTER: TypeAdapter[dict[str, t.NormalizedValue]] = TypeAdapter(
-    dict[str, t.NormalizedValue],
+_AUDIT_DATA_ADAPTER: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
+    Mapping[str, t.NormalizedValue],
     config=ConfigDict(strict=False),
 )
 
@@ -59,7 +60,7 @@ class _EmailConfig(TypedDict):
     username: str
     password: str
     from_address: str
-    to_addresses: list[str]
+    to_addresses: Sequence[str]
 
 
 class _SlackConfig(TypedDict):
@@ -70,7 +71,7 @@ class _SlackConfig(TypedDict):
 
 class _WebhookConfig(TypedDict):
     url: str
-    headers: dict[str, str]
+    headers: Mapping[str, str]
     timeout: int
 
 
@@ -126,14 +127,14 @@ class DocumentationNotifier:
 
     def _load_user_config(
         self,
-        loaded: dict[
+        loaded: Mapping[
             str,
             int
             | str
             | float
             | bool
-            | list[str]
-            | dict[str, int | str | float | bool | list[str] | dict[str, str]]
+            | Sequence[str]
+            | Mapping[str, int | str | float | bool | Sequence[str] | Mapping[str, str]]
             | None,
         ],
     ) -> _NotifierConfig:
@@ -244,7 +245,9 @@ class DocumentationNotifier:
 
     def notify_critical_issues(
         self,
-        audit_data: dict[str, dict[str, int] | list[dict[str, str | int]] | int | str],
+        audit_data: Mapping[
+            str, Mapping[str, int] | Sequence[Mapping[str, str | int]] | int | str
+        ],
     ) -> bool:
         """Send notification for critical documentation issues."""
         if not self.config["alerts"]["critical_issues"]["enabled"]:
@@ -253,7 +256,7 @@ class DocumentationNotifier:
         metrics_val = audit_data.get("metrics", {})
         metrics = metrics_val if isinstance(metrics_val, dict) else {}
         severity_val = metrics.get("severity_breakdown", {})
-        severity_breakdown: dict[str, int] = {}
+        severity_breakdown: Mapping[str, int] = {}
         if isinstance(severity_val, dict):
             for key_name in ("critical", "high", "medium", "low"):
                 if key_name in severity_val and isinstance(severity_val[key_name], int):
@@ -293,7 +296,9 @@ Please review recent changes and address any identified issues.
 
         return True
 
-    def notify_broken_links(self, broken_links: list[dict[str, str | int]]) -> bool:
+    def notify_broken_links(
+        self, broken_links: Sequence[Mapping[str, str | int]]
+    ) -> bool:
         """Send notification for broken links."""
         if not self.config["alerts"]["broken_links"]["enabled"]:
             return True
@@ -307,7 +312,9 @@ Please review recent changes and address any identified issues.
 
         return True
 
-    def notify_weekly_report(self, report_data: dict[str, str | int | float]) -> bool:
+    def notify_weekly_report(
+        self, report_data: Mapping[str, str | int | float]
+    ) -> bool:
         """Send weekly quality report notification."""
         if not self.config["alerts"]["weekly_report"]["enabled"]:
             return True
@@ -318,7 +325,7 @@ Please review recent changes and address any identified issues.
 
     def notify_monthly_report(
         self,
-        report_data: dict[str, str | int | float],
+        report_data: Mapping[str, str | int | float],
     ) -> bool:
         """Send monthly comprehensive report notification."""
         if not self.config["alerts"]["monthly_report"]["enabled"]:
@@ -468,7 +475,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
         }
 
         headers_val = webhook_config.get("headers")
-        headers: dict[str, str] = (
+        headers: Mapping[str, str] = (
             dict(headers_val) if isinstance(headers_val, dict) else {}
         )
         headers["Content-Type"] = "application/json"
@@ -486,13 +493,15 @@ Timestamp: {datetime.now(UTC).isoformat()}
 
     def _format_critical_issues_message(
         self,
-        audit_data: dict[str, dict[str, int] | list[dict[str, str | int]] | int | str],
+        audit_data: Mapping[
+            str, Mapping[str, int] | Sequence[Mapping[str, str | int]] | int | str
+        ],
     ) -> str:
         """Format message for critical issues notification."""
         metrics_val = audit_data.get("metrics")
         metrics = metrics_val if isinstance(metrics_val, dict) else {}
         severity_val = metrics.get("severity_breakdown")
-        severity_breakdown: dict[str, int] = {}
+        severity_breakdown: Mapping[str, int] = {}
         if isinstance(severity_val, dict):
             for key_name in ("critical", "high", "medium", "low"):
                 if key_name in severity_val and isinstance(severity_val[key_name], int):
@@ -533,7 +542,7 @@ Top Critical Issues:
 
     def _format_broken_links_message(
         self,
-        broken_links: list[dict[str, str | int]],
+        broken_links: Sequence[Mapping[str, str | int]],
     ) -> str:
         """Format message for broken links notification."""
         message = f"""
@@ -562,7 +571,7 @@ Found {len(broken_links)} broken links that need attention:
 
     def _format_weekly_report_message(
         self,
-        _report_data: dict[str, str | int | float],
+        _report_data: Mapping[str, str | int | float],
     ) -> str:
         """Format message for weekly report notification."""
         # Implementation would depend on weekly report data structure
@@ -571,7 +580,7 @@ Found {len(broken_links)} broken links that need attention:
 
     def _format_monthly_report_message(
         self,
-        _report_data: dict[str, str | int | float],
+        _report_data: Mapping[str, str | int | float],
     ) -> str:
         """Format message for monthly report notification."""
         # Implementation would depend on monthly report data structure

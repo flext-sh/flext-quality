@@ -11,15 +11,16 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from typing import TypeIs
 
 from flext_core import t
 
 
 def assert_is_dict(
-    value: t.Scalar | dict[str, t.Scalar],
-) -> TypeIs[dict[str, t.Scalar]]:
-    """Type-safe dict[str, t.NormalizedValue] assertion following Single Responsibility Principle.
+    value: t.Scalar | Mapping[str, t.Scalar],
+) -> TypeIs[Mapping[str, t.Scalar]]:
+    """Type-safe Mapping[str, t.NormalizedValue] assertion following Single Responsibility Principle.
 
     Args:
       value: Object to check
@@ -35,7 +36,7 @@ def assert_is_dict(
     return True
 
 
-def assert_is_list(value: t.Scalar | list[t.Scalar]) -> TypeIs[list[t.Scalar]]:
+def assert_is_list(value: t.Scalar | Sequence[t.Scalar]) -> TypeIs[Sequence[t.Scalar]]:
     """Type-safe list assertion following Single Responsibility Principle.
 
     Args:
@@ -52,7 +53,7 @@ def assert_is_list(value: t.Scalar | list[t.Scalar]) -> TypeIs[list[t.Scalar]]:
     return True
 
 
-def safe_dict_access(data: dict[str, t.Scalar], key: str) -> t.Scalar:
+def safe_dict_access(data: Mapping[str, t.Scalar], key: str) -> t.Scalar:
     """Type-safe dictionary access with proper error handling.
 
     Args:
@@ -63,14 +64,14 @@ def safe_dict_access(data: dict[str, t.Scalar], key: str) -> t.Scalar:
       Value from dict
 
     Raises:
-      AssertionError: If data is not a dict[str, t.NormalizedValue] or key missing
+      AssertionError: If data is not a Mapping[str, t.NormalizedValue] or key missing
 
     """
     assert key in data, f"Key '{key}' not found in dict"
     return data[key]
 
 
-def safe_list_access[T](data: list[T], index: int) -> T:
+def safe_list_access[T](data: Sequence[T], index: int) -> T:
     """Type-safe list access with proper error handling.
 
     Args:
@@ -92,8 +93,8 @@ def safe_list_access[T](data: list[T], index: int) -> T:
 
 
 def assert_dict_structure(
-    data: dict[str, t.Scalar], required_keys: list[str]
-) -> dict[str, t.Scalar]:
+    data: Mapping[str, t.Scalar], required_keys: Sequence[str]
+) -> Mapping[str, t.Scalar]:
     """Assert that t.NormalizedValue is dict with required keys - DRY pattern.
 
     Args:
@@ -113,8 +114,8 @@ def assert_dict_structure(
 
 
 def assert_analysis_results_structure(
-    results: dict[str, t.Scalar],
-) -> dict[str, t.Scalar]:
+    results: Mapping[str, t.Scalar],
+) -> Mapping[str, t.Scalar]:
     """Assert analyzer results have expected structure - specialized helper.
 
     Args:
@@ -132,7 +133,7 @@ def assert_analysis_results_structure(
     return assert_dict_structure(results, ["metrics", "issues", "python_files"])
 
 
-def assert_metrics_structure(metrics: dict[str, t.Scalar]) -> dict[str, t.Scalar]:
+def assert_metrics_structure(metrics: Mapping[str, t.Scalar]) -> Mapping[str, t.Scalar]:
     """Assert metrics have expected structure - specialized helper.
 
     Args:
@@ -150,7 +151,7 @@ def assert_metrics_structure(metrics: dict[str, t.Scalar]) -> dict[str, t.Scalar
     return assert_dict_structure(metrics, ["total_files", "total_lines_of_code"])
 
 
-def assert_issues_structure(issues: dict[str, t.Scalar]) -> dict[str, t.Scalar]:
+def assert_issues_structure(issues: Mapping[str, t.Scalar]) -> Mapping[str, t.Scalar]:
     """Assert issues have expected structure - specialized helper.
 
     Args:

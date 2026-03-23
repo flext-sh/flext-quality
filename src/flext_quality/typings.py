@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from flext_cli import FlextCliTypes
@@ -15,17 +16,17 @@ class FlextQualityTypes(FlextWebTypes, FlextCliTypes):
     class Quality:
         """Quality-specific types namespace."""
 
-        type HookInput = dict[str, core_t.NormalizedValue]
-        type HookOutput = dict[str, core_t.NormalizedValue]
-        type HookMatcher = list[str] | None
-        type RuleConfig = dict[str, core_t.NormalizedValue]
+        type HookInput = Mapping[str, core_t.NormalizedValue]
+        type HookOutput = Mapping[str, core_t.NormalizedValue]
+        type HookMatcher = Sequence[str] | None
+        type RuleConfig = Mapping[str, core_t.NormalizedValue]
         type RuleResult = tuple[bool, str | None]
-        type McpToolResult = dict[str, core_t.NormalizedValue]
-        type McpResource = dict[str, str]
-        type MemoryQuery = dict[str, str | int | list[str]]
-        type ContextQuery = dict[str, str | int]
+        type McpToolResult = Mapping[str, core_t.NormalizedValue]
+        type McpResource = Mapping[str, str]
+        type MemoryQuery = Mapping[str, str | int | Sequence[str]]
+        type ContextQuery = Mapping[str, str | int]
         type GenericItem = (
-            core_t.Primitives | Path | dict[str, core_t.Primitives | None]
+            core_t.Primitives | Path | Mapping[str, core_t.Primitives | None]
         )
 
 

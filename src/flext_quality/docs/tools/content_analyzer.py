@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import re
 from collections import Counter
+from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TypedDict
@@ -22,8 +23,8 @@ from flext_quality import t
 class ConfigDict(TypedDict, total=False):
     """Configuration dictionary structure."""
 
-    content_checks: dict[str, bool]
-    quality_thresholds: dict[str, int]
+    content_checks: Mapping[str, bool]
+    quality_thresholds: Mapping[str, int]
 
 
 class MetricsDict(TypedDict, total=False):
@@ -63,19 +64,19 @@ class StructureDict(TypedDict, total=False):
     has_table_of_contents: bool
     toc_position: int
     heading_hierarchy_valid: bool
-    sections: list[dict[str, int | str]]
-    depth_analysis: dict[str, int | float]
+    sections: Sequence[Mapping[str, int | str]]
+    depth_analysis: Mapping[str, int | float]
 
 
 class CompletenessDict(TypedDict, total=False):
     """Completeness check dictionary structure."""
 
     score: int
-    missing_elements: list[str]
-    required_sections_present: list[str]
-    optional_sections_present: list[str]
+    missing_elements: Sequence[str]
+    required_sections_present: Sequence[str]
+    optional_sections_present: Sequence[str]
     word_count_sufficient: bool
-    missing_required_sections: list[str]
+    missing_required_sections: Sequence[str]
 
 
 class IssueDict(TypedDict, total=False):
@@ -95,8 +96,8 @@ class AnalysisDict(TypedDict, total=False):
     structure: StructureDict
     completeness: CompletenessDict
     quality_score: float
-    issues: list[IssueDict]
-    suggestions: list[str]
+    issues: Sequence[IssueDict]
+    suggestions: Sequence[str]
     error: str
 
 
@@ -106,18 +107,18 @@ class RecommendationDict(TypedDict, total=False):
     priority: str
     type: str
     message: str
-    actions: list[str]
+    actions: Sequence[str]
 
 
 class ResultsDict(TypedDict):
     """Results dictionary structure."""
 
     files_analyzed: int
-    quality_metrics: dict[str, MetricsDict]
-    content_scores: dict[str, float]
-    readability_stats: dict[str, ReadabilityDict]
-    completeness_checks: dict[str, CompletenessDict]
-    recommendations: list[RecommendationDict | str]
+    quality_metrics: Mapping[str, MetricsDict]
+    content_scores: Mapping[str, float]
+    readability_stats: Mapping[str, ReadabilityDict]
+    completeness_checks: Mapping[str, CompletenessDict]
+    recommendations: Sequence[RecommendationDict | str]
 
 
 _RESULTS_ADAPTER: TypeAdapter[ResultsDict] = TypeAdapter(ResultsDict)
@@ -149,13 +150,13 @@ class ContentAnalyzer:
             config_path: Path to configuration file for content analysis rules.
 
         """
-        self.config: dict[str, dict[str, bool] | dict[str, int] | str] = {}
+        self.config: Mapping[str, Mapping[str, bool] | Mapping[str, int] | str] = {}
         self.load_config(config_path)
-        quality_metrics: dict[str, MetricsDict] = {}
-        content_scores: dict[str, float] = {}
-        readability_stats: dict[str, ReadabilityDict] = {}
-        completeness_checks: dict[str, CompletenessDict] = {}
-        recommendations: list[RecommendationDict | str] = []
+        quality_metrics: Mapping[str, MetricsDict] = {}
+        content_scores: Mapping[str, float] = {}
+        readability_stats: Mapping[str, ReadabilityDict] = {}
+        completeness_checks: Mapping[str, CompletenessDict] = {}
+        recommendations: Sequence[RecommendationDict | str] = []
         self.results: ResultsDict = {
             "files_analyzed": 0,
             "quality_metrics": quality_metrics,
@@ -167,7 +168,7 @@ class ContentAnalyzer:
 
     def load_config(self, config_path: str | None) -> None:
         """Load content analysis configuration."""
-        default_config: dict[str, dict[str, bool] | dict[str, int] | str] = {
+        default_config: Mapping[str, Mapping[str, bool] | Mapping[str, int] | str] = {
             "content_checks": {
                 "check_freshness": True,
                 "check_completeness": True,
@@ -185,12 +186,15 @@ class ContentAnalyzer:
         try:
             with Path(config_path).open(encoding="utf-8") as f:
                 loaded: (
-                    dict[str, t.NormalizedValue] | list[t.NormalizedValue] | str | None
+                    Mapping[str, t.NormalizedValue]
+                    | Sequence[t.NormalizedValue]
+                    | str
+                    | None
                 ) = yaml.safe_load(f)
                 if isinstance(loaded, dict):
-                    config_loaded: dict[str, dict[str, bool] | dict[str, int] | str] = {
-                        k: v for k, v in loaded.items() if isinstance(v, (dict, str))
-                    }
+                    config_loaded: Mapping[
+                        str, Mapping[str, bool] | Mapping[str, int] | str
+                    ] = {k: v for k, v in loaded.items() if isinstance(v, (dict, str))}
                     self.config = config_loaded
                 else:
                     self.config = default_config
@@ -202,8 +206,8 @@ class ContentAnalyzer:
         try:
             content = file_path.read_text(encoding="utf-8")
             filename = str(file_path.relative_to(file_path.parents[2]))
-            issues_list: list[IssueDict] = []
-            suggestions_list: list[str] = []
+            issues_list: Sequence[IssueDict] = []
+            suggestions_list: Sequence[str] = []
             analysis: AnalysisDict = {
                 "file": filename,
                 "metrics": self._calculate_content_metrics(content),
@@ -381,8 +385,8 @@ class ContentAnalyzer:
 
     def _analyze_structure(self, content: str) -> StructureDict:
         """Analyze document structure and organization."""
-        sections_list: list[dict[str, int | str]] = []
-        depth_analysis_dict: dict[str, int | float] = {}
+        sections_list: Sequence[Mapping[str, int | str]] = []
+        depth_analysis_dict: Mapping[str, int | float] = {}
         structure: StructureDict = {
             "has_table_of_contents": False,
             "toc_position": 0,
@@ -406,7 +410,7 @@ class ContentAnalyzer:
                 ) + 1
                 break
 
-        headings: list[dict[str, int | str]] = []
+        headings: Sequence[Mapping[str, int | str]] = []
         for match in re.finditer(r"^(#{1,6})\s+(.+)$", content, re.MULTILINE):
             level = len(match.group(1))
             title = match.group(2).strip()
@@ -423,10 +427,10 @@ class ContentAnalyzer:
                     structure["heading_hierarchy_valid"] = False
                     break
 
-        depths: list[int] = [int(h["level"]) for h in headings]
+        depths: Sequence[int] = [int(h["level"]) for h in headings]
         max_depth = max(depths) if depths else 0
         avg_depth = sum(int(x) for x in depths) / len(depths) if depths else 0.0
-        depth_dist: dict[int, int] = dict(Counter(depths))
+        depth_dist: Mapping[int, int] = dict(Counter(depths))
         structure["depth_analysis"] = {
             "max_depth": max_depth,
             "avg_depth": avg_depth,
@@ -442,21 +446,21 @@ class ContentAnalyzer:
         filename: str,
     ) -> CompletenessDict:
         """Check documentation completeness based on file type and content."""
-        missing_elems: list[str] = []
-        required_present: list[str] = []
-        optional_present: list[str] = []
+        missing_elems: Sequence[str] = []
+        required_present: Sequence[str] = []
+        optional_present: Sequence[str] = []
         completeness: CompletenessDict = {
             "score": 100,
             "missing_elements": missing_elems,
             "required_sections_present": required_present,
             "optional_sections_present": optional_present,
             "word_count_sufficient": True,
-            "missing_required_sections": list[str](),
+            "missing_required_sections": Sequence[str](),
         }
 
         word_count = len(re.findall(r"\b\w+\b", content))
         thresholds_val = self.config.get("quality_thresholds")
-        thresholds: dict[str, bool | int | str] = (
+        thresholds: Mapping[str, bool | int | str] = (
             dict(thresholds_val) if isinstance(thresholds_val, dict) else {}
         )
         min_words_val = thresholds.get("min_word_count", 100)
@@ -535,12 +539,12 @@ class ContentAnalyzer:
     def _check_required_sections(
         self,
         content: str,
-        required_sections: list[str],
-    ) -> dict[str, list[str]]:
+        required_sections: Sequence[str],
+    ) -> Mapping[str, Sequence[str]]:
         """Check for required sections in content."""
-        required_present: list[str] = []
-        missing_required: list[str] = []
-        result: dict[str, list[str]] = {
+        required_present: Sequence[str] = []
+        missing_required: Sequence[str] = []
+        result: Mapping[str, Sequence[str]] = {
             "required_sections_present": required_present,
             "missing_required_sections": missing_required,
         }
@@ -610,9 +614,9 @@ class ContentAnalyzer:
 
         return max(0.0, min(100.0, score))
 
-    def _identify_issues(self, analysis: AnalysisDict) -> list[IssueDict]:
+    def _identify_issues(self, analysis: AnalysisDict) -> Sequence[IssueDict]:
         """Identify content issues that need attention."""
-        issues: list[IssueDict] = []
+        issues: Sequence[IssueDict] = []
 
         metrics = analysis.get("metrics", {})
         readability = analysis.get("readability", {})
@@ -663,9 +667,9 @@ class ContentAnalyzer:
 
         return issues
 
-    def _generate_suggestions(self, analysis: AnalysisDict) -> list[str]:
+    def _generate_suggestions(self, analysis: AnalysisDict) -> Sequence[str]:
         """Generate improvement suggestions based on analysis."""
-        suggestions: list[str] = []
+        suggestions: Sequence[str] = []
 
         metrics = analysis.get("metrics", {})
         readability = analysis.get("readability", {})
@@ -711,7 +715,7 @@ class ContentAnalyzer:
 
         return suggestions
 
-    def analyze_files_batch(self, file_paths: list[Path]) -> ResultsDict:
+    def analyze_files_batch(self, file_paths: Sequence[Path]) -> ResultsDict:
         """Analyze multiple files and aggregate results."""
         for file_path in file_paths:
             self.analyze_file(file_path)
@@ -743,10 +747,12 @@ class ContentAnalyzer:
                 ],
             })
 
-        all_issues: list[dict[str, str]] = []
+        all_issues: Sequence[Mapping[str, str]] = []
         for result_value in self.results.values():
             if isinstance(result_value, dict):
-                issues_val: list[dict[str, str]] | None = result_value.get("issues")
+                issues_val: Sequence[Mapping[str, str]] | None = result_value.get(
+                    "issues"
+                )
                 if isinstance(issues_val, list):
                     all_issues.extend(issues_val)
 
@@ -838,7 +844,7 @@ def analyze_file_content(
 
 
 def analyze_files_content(
-    file_paths: list[str],
+    file_paths: Sequence[str],
     config_path: str | None = None,
 ) -> ResultsDict:
     """Convenience function to analyze multiple files."""

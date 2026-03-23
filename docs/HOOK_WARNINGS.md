@@ -339,7 +339,7 @@ ______________________________________________________________________
 
 - **CQ010**: Uncentralized dict types
 
-  - Problem: Repeated `dict[str, str]` patterns
+  - Problem: Repeated `Mapping[str, str]` patterns
   - Fix: Use centralized types like `t.StringDict` from typings.py
 
 #### Testing (CQ011)

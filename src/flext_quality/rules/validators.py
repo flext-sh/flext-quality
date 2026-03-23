@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import contextlib
 import re
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import override
 
@@ -24,7 +24,7 @@ class FlextQualityValidators:
         def __init__(self, patterns: Mapping[str, str]) -> None:
             """Initialize with patterns."""
             self._patterns = patterns
-            self._compiled: dict[str, re.Pattern[str]] = {}
+            self._compiled: Mapping[str, re.Pattern[str]] = {}
             for pname, pattern in patterns.items():
                 with contextlib.suppress(re.error):
                     self._compiled[pname] = re.compile(pattern)
@@ -40,9 +40,9 @@ class FlextQualityValidators:
             self,
             content: str,
             file_path: Path | None = None,
-        ) -> r[list[Mapping[str, t.NormalizedValue]]]:
+        ) -> r[Sequence[Mapping[str, t.NormalizedValue]]]:
             """Validate content against patterns."""
-            violations: list[Mapping[str, t.NormalizedValue]] = []
+            violations: Sequence[Mapping[str, t.NormalizedValue]] = []
             filename = str(file_path) if file_path else "<string>"
             lines = content.splitlines()
             for line_num, line in enumerate(lines, start=1):
@@ -55,7 +55,7 @@ class FlextQualityValidators:
                             "message": f"Pattern violation: {pattern_name}",
                             "severity": c.Quality.Severity.ERROR,
                         })
-            return r[list[Mapping[str, t.NormalizedValue]]].ok(violations)
+            return r[Sequence[Mapping[str, t.NormalizedValue]]].ok(violations)
 
     class ForbiddenPattern(Pattern):
         """Validates against FLEXT forbidden patterns."""
@@ -92,15 +92,15 @@ class FlextQualityValidators:
             self,
             content: str,
             file_path: Path | None = None,
-        ) -> r[list[Mapping[str, t.NormalizedValue]]]:
+        ) -> r[Sequence[Mapping[str, t.NormalizedValue]]]:
             """Validate tier violations."""
-            violations: list[Mapping[str, t.NormalizedValue]] = []
+            violations: Sequence[Mapping[str, t.NormalizedValue]] = []
             filename = str(file_path) if file_path else "<string>"
             if file_path is None:
-                return r[list[Mapping[str, t.NormalizedValue]]].ok(violations)
+                return r[Sequence[Mapping[str, t.NormalizedValue]]].ok(violations)
             file_tier = self._get_file_tier(file_path)
             if file_tier is None:
-                return r[list[Mapping[str, t.NormalizedValue]]].ok(violations)
+                return r[Sequence[Mapping[str, t.NormalizedValue]]].ok(violations)
             tier_pattern = re.compile(c.Quality.Patterns.TIER_VIOLATION)
             lines = content.splitlines()
             for line_num, line in enumerate(lines, start=1):
@@ -112,7 +112,7 @@ class FlextQualityValidators:
                         "message": "Tier 0/1 modules cannot import from services/api",
                         "severity": c.Quality.Severity.ERROR,
                     })
-            return r[list[Mapping[str, t.NormalizedValue]]].ok(violations)
+            return r[Sequence[Mapping[str, t.NormalizedValue]]].ok(violations)
 
         def _get_file_tier(self, path: Path) -> int | None:
             """Determine file tier from path."""
@@ -132,10 +132,10 @@ class FlextQualityValidators:
 
         def __init__(self) -> None:
             """Initialize with default validators."""
-            self._validators: dict[str, p.Quality.ValidatorBase] = {}
+            self._validators: Mapping[str, p.Quality.ValidatorBase] = {}
             self._register_defaults()
 
-        def all(self) -> list[p.Quality.ValidatorBase]:
+        def all(self) -> Sequence[p.Quality.ValidatorBase]:
             """Get all registered validators."""
             return list(self._validators.values())
 
@@ -151,14 +151,14 @@ class FlextQualityValidators:
             self,
             content: str,
             file_path: Path | None = None,
-        ) -> r[list[Mapping[str, t.NormalizedValue]]]:
+        ) -> r[Sequence[Mapping[str, t.NormalizedValue]]]:
             """Run all validators."""
-            all_violations: list[Mapping[str, t.NormalizedValue]] = []
+            all_violations: Sequence[Mapping[str, t.NormalizedValue]] = []
             for validator in self._validators.values():
                 result = validator.validate(content, file_path)
                 if result.is_success:
                     all_violations.extend(result.value)
-            return r[list[Mapping[str, t.NormalizedValue]]].ok(all_violations)
+            return r[Sequence[Mapping[str, t.NormalizedValue]]].ok(all_violations)
 
         def _register_defaults(self) -> None:
             """Register default validators."""

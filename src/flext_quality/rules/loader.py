@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 import yaml
@@ -14,10 +14,10 @@ from flext_quality import c, m
 class FlextQualityRulesLoader:
     """Loads rules from YAML files."""
 
-    def load(self, path: Path) -> r[list[m.Quality.RuleDefinition]]:
+    def load(self, path: Path) -> r[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from YAML file."""
         if not path.exists():
-            return r[list[m.Quality.RuleDefinition]].fail(
+            return r[Sequence[m.Quality.RuleDefinition]].fail(
                 f"Rules file not found: {path}",
             )
         try:
@@ -32,47 +32,51 @@ class FlextQualityRulesLoader:
             RuntimeError,
             ImportError,
         ) as e:
-            return r[list[m.Quality.RuleDefinition]].fail(f"Failed to parse YAML: {e}")
+            return r[Sequence[m.Quality.RuleDefinition]].fail(
+                f"Failed to parse YAML: {e}"
+            )
         match parsed:
             case dict() as parsed_dict:
                 rules_data = parsed_dict.get("rules", [])
             case _:
-                return r[list[m.Quality.RuleDefinition]].fail(
+                return r[Sequence[m.Quality.RuleDefinition]].fail(
                     "Invalid YAML: expected dict at root",
                 )
         match rules_data:
             case list() as rules_list:
                 pass
             case _:
-                return r[list[m.Quality.RuleDefinition]].fail(
+                return r[Sequence[m.Quality.RuleDefinition]].fail(
                     "Invalid YAML: 'rules' must be a list",
                 )
-        rules: list[m.Quality.RuleDefinition] = []
+        rules: Sequence[m.Quality.RuleDefinition] = []
         for idx, rule_data in enumerate(rules_list):
             match rule_data:
                 case dict() as rule_dict:
                     pass
                 case _:
-                    return r[list[m.Quality.RuleDefinition]].fail(
+                    return r[Sequence[m.Quality.RuleDefinition]].fail(
                         f"Rule {idx}: expected dict",
                     )
             result = self._parse_rule(rule_dict, idx)
             if result.is_failure:
-                return r[list[m.Quality.RuleDefinition]].fail(result.error)
+                return r[Sequence[m.Quality.RuleDefinition]].fail(result.error)
             rules.append(result.value)
-        return r[list[m.Quality.RuleDefinition]].ok(rules)
+        return r[Sequence[m.Quality.RuleDefinition]].ok(rules)
 
-    def load_multiple(self, paths: list[Path]) -> r[list[m.Quality.RuleDefinition]]:
+    def load_multiple(
+        self, paths: Sequence[Path]
+    ) -> r[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from multiple YAML files."""
-        all_rules: list[m.Quality.RuleDefinition] = []
+        all_rules: Sequence[m.Quality.RuleDefinition] = []
         for path in paths:
             result = self.load(path)
             if result.is_failure:
-                return r[list[m.Quality.RuleDefinition]].fail(
+                return r[Sequence[m.Quality.RuleDefinition]].fail(
                     f"Error loading {path}: {result.error}",
                 )
             all_rules.extend(result.value)
-        return r[list[m.Quality.RuleDefinition]].ok(all_rules)
+        return r[Sequence[m.Quality.RuleDefinition]].ok(all_rules)
 
     def _parse_rule(
         self,

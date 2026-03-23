@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import threading
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import ClassVar
 
@@ -144,7 +144,7 @@ class FlextQuality:
         """Get quality service status.
 
         Returns:
-            dict[str, t.NormalizedValue]: Status information
+            Mapping[str, t.NormalizedValue]: Status information
 
         """
         return {
@@ -159,33 +159,33 @@ class FlextQuality:
             "hooks_registered": len(self.hooks.get_config()),
         }
 
-    def load_rules(self, path: Path) -> r[list[m.Quality.RuleDefinition]]:
+    def load_rules(self, path: Path) -> r[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from a YAML file.
 
         Args:
             path: Path to rules YAML file
 
         Returns:
-            r[list[m.Quality.RuleDefinition]]: List of rule definitions or error
+            r[Sequence[m.Quality.RuleDefinition]]: List of rule definitions or error
 
         """
         return self.rules_loader.load(path)
 
-    def load_rules_from_config(self) -> r[list[m.Quality.RuleDefinition]]:
+    def load_rules_from_config(self) -> r[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from configured rules directory.
 
         Returns:
-            r[list[m.Quality.RuleDefinition]]: List of rule definitions or error
+            r[Sequence[m.Quality.RuleDefinition]]: List of rule definitions or error
 
         """
         rules_path = self.config.get_rules_path()
         if not rules_path.exists():
-            return r[list[m.Quality.RuleDefinition]].fail(
+            return r[Sequence[m.Quality.RuleDefinition]].fail(
                 f"Rules directory not found: {rules_path}",
             )
         yaml_files = list(rules_path.glob("*.yaml")) + list(rules_path.glob("*.yml"))
         if not yaml_files:
-            return r[list[m.Quality.RuleDefinition]].ok([])
+            return r[Sequence[m.Quality.RuleDefinition]].ok([])
         return self.rules_loader.load_multiple(yaml_files)
 
     def process_stdin_hook(self) -> r[t.Quality.HookOutput]:

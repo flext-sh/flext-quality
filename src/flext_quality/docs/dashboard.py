@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import operator
+from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -15,12 +16,12 @@ from flask import Flask, Response, render_template_string, request
 from flext_core import FlextLogger, t
 from pydantic import ConfigDict, TypeAdapter
 
-_DICT_ADAPTER: TypeAdapter[dict[str, t.NormalizedValue]] = TypeAdapter(
-    dict[str, t.NormalizedValue],
+_DICT_ADAPTER: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
+    Mapping[str, t.NormalizedValue],
     config=ConfigDict(strict=False),
 )
-_LIST_ADAPTER: TypeAdapter[list[dict[str, t.NormalizedValue]]] = TypeAdapter(
-    list[dict[str, t.NormalizedValue]],
+_LIST_ADAPTER: TypeAdapter[Sequence[Mapping[str, t.NormalizedValue]]] = TypeAdapter(
+    Sequence[Mapping[str, t.NormalizedValue]],
     config=ConfigDict(strict=False),
 )
 
@@ -84,9 +85,9 @@ class DocumentationDashboard:
 
     def get_current_metrics(
         self,
-    ) -> dict[
+    ) -> Mapping[
         str,
-        int | str | dict[str, int],
+        int | str | Mapping[str, int],
     ]:
         """Get current quality metrics from latest audit."""
         latest_audit = self.reports_dir / "latest_audit.json"
@@ -127,11 +128,11 @@ class DocumentationDashboard:
     def get_quality_trends(
         self,
         days: int = 30,
-    ) -> dict[str, int | list[dict[str, int | str]]]:
+    ) -> Mapping[str, int | Sequence[Mapping[str, int | str]]]:
         """Get quality trends over the specified number of days."""
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
 
-        trend_data: list[dict[str, int | str]] = []
+        trend_data: Sequence[Mapping[str, int | str]] = []
         reports_dir = self.reports_dir
 
         # Find all audit reports
@@ -187,9 +188,9 @@ class DocumentationDashboard:
             "trends": trend_data,
         }
 
-    def get_recent_reports(self, limit: int = 10) -> list[dict[str, int | str]]:
+    def get_recent_reports(self, limit: int = 10) -> Sequence[Mapping[str, int | str]]:
         """Get list of recent audit reports."""
-        reports: list[dict[str, int | str]] = []
+        reports: Sequence[Mapping[str, int | str]] = []
 
         for report_file in self.reports_dir.glob("audit_report_*.json"):
             try:

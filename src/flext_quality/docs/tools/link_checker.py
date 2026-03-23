@@ -11,6 +11,7 @@ import asyncio
 import pathlib
 import re
 import time
+from collections.abc import Mapping, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
 from typing import TypedDict
@@ -34,7 +35,7 @@ class LinkConfigDict(TypedDict):
     user_agent: str
     follow_redirects: bool
     max_redirects: int
-    acceptable_status_codes: list[int]
+    acceptable_status_codes: Sequence[int]
 
 
 class LinkInfoDictRequired(TypedDict):
@@ -51,7 +52,7 @@ class LinkInfoDict(LinkInfoDictRequired, total=False):
 
     line: int
     reference: str
-    context: dict[str, t.NormalizedValue]
+    context: Mapping[str, t.NormalizedValue]
 
 
 class LinkResultDictRequired(TypedDict):
@@ -59,7 +60,7 @@ class LinkResultDictRequired(TypedDict):
 
     url: str
     valid: bool
-    context: dict[str, t.NormalizedValue]
+    context: Mapping[str, t.NormalizedValue]
 
 
 class LinkResultDict(LinkResultDictRequired, total=False):
@@ -88,8 +89,8 @@ class ResultsDict(TypedDict):
     valid_links: int
     broken_links: int
     warnings: int
-    errors: list[LinkResultDict]
-    warnings_list: list[dict[str, t.NormalizedValue]]
+    errors: Sequence[LinkResultDict]
+    warnings_list: Sequence[Mapping[str, t.NormalizedValue]]
     performance: PerformanceMetricsDict
 
 
@@ -112,7 +113,7 @@ class LinkChecker:
         self.config: LinkConfigDict = self._get_default_config()
         self.load_config(config_path)
         self.session: _AsyncSession | None = None
-        self.cache: dict[str, t.NormalizedValue] = {}
+        self.cache: Mapping[str, t.NormalizedValue] = {}
         self.results: ResultsDict = {
             "total_links": 0,
             "valid_links": 0,
@@ -153,9 +154,11 @@ class LinkChecker:
         """Load validation configuration."""
         self.config = self._get_default_config()
 
-    def find_all_links(self, file_paths: list[pathlib.Path]) -> list[LinkInfoDict]:
+    def find_all_links(
+        self, file_paths: Sequence[pathlib.Path]
+    ) -> Sequence[LinkInfoDict]:
         """Extract all links from the given files."""
-        all_links: list[LinkInfoDict] = []
+        all_links: Sequence[LinkInfoDict] = []
 
         for file_path in file_paths:
             try:
@@ -177,7 +180,7 @@ class LinkChecker:
                 ref_links = re.findall(r"\[([^\]]+)\]\[([^\]]+)\]", content)
                 ref_defs = re.findall(r"\[([^\]]+)\]:\s*([^\s]+)", content)
 
-                ref_dict: dict[str, str] = dict(ref_defs)
+                ref_dict: Mapping[str, str] = dict(ref_defs)
                 for text, ref in ref_links:
                     if ref in ref_dict:
                         url = ref_dict[ref]
@@ -216,7 +219,7 @@ class LinkChecker:
     async def check_link_async(
         self,
         url: str,
-        context: dict[str, t.NormalizedValue] | None = None,
+        context: Mapping[str, t.NormalizedValue] | None = None,
     ) -> LinkResultDict:
         """Asynchronously check a single link."""
         start_time = time.time()
@@ -290,7 +293,7 @@ class LinkChecker:
     def check_link_sync(
         self,
         url: str,
-        context: dict[str, t.NormalizedValue] | None = None,
+        context: Mapping[str, t.NormalizedValue] | None = None,
     ) -> LinkResultDict:
         """Synchronously check a single link (fallback method)."""
         start_time = time.time()
@@ -360,8 +363,8 @@ class LinkChecker:
         )
 
     async def check_links_batch_async(
-        self, links: list[LinkInfoDict]
-    ) -> list[LinkResultDict]:
+        self, links: Sequence[LinkInfoDict]
+    ) -> Sequence[LinkResultDict]:
         """Check multiple links asynchronously."""
         start_time = time.time()
 
@@ -380,7 +383,7 @@ class LinkChecker:
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        processed_results: list[LinkResultDict] = []
+        processed_results: Sequence[LinkResultDict] = []
         for result in results:
             if isinstance(result, BaseException):
                 processed_results.append(
@@ -396,7 +399,7 @@ class LinkChecker:
 
         self.results["performance"]["total_time"] = time.time() - start_time
 
-        valid_times: list[float] = []
+        valid_times: Sequence[float] = []
         for r in processed_results:
             response_time = r.get("response_time")
             if response_time is not None and r.get("valid"):
@@ -409,7 +412,9 @@ class LinkChecker:
 
         return processed_results
 
-    def check_links_batch_sync(self, links: list[LinkInfoDict]) -> list[LinkResultDict]:
+    def check_links_batch_sync(
+        self, links: Sequence[LinkInfoDict]
+    ) -> Sequence[LinkResultDict]:
         """Check multiple links synchronously with thread pool."""
         start_time = time.time()
 
@@ -428,7 +433,7 @@ class LinkChecker:
 
         self.results["performance"]["total_time"] = time.time() - start_time
 
-        valid_times: list[float] = []
+        valid_times: Sequence[float] = []
         for r in results:
             response_time = r.get("response_time")
             if response_time is not None and r.get("valid"):
@@ -443,7 +448,7 @@ class LinkChecker:
 
     async def validate_links(
         self,
-        links: list[LinkInfoDict],
+        links: Sequence[LinkInfoDict],
         *,
         use_async: bool = True,
     ) -> ResultsDict:
@@ -492,17 +497,17 @@ class LinkChecker:
             return True
 
     def validate_github_links(
-        self, links: list[dict[str, t.NormalizedValue]]
-    ) -> list[dict[str, t.NormalizedValue]]:
+        self, links: Sequence[Mapping[str, t.NormalizedValue]]
+    ) -> Sequence[Mapping[str, t.NormalizedValue]]:
         """Special validation for GitHub links."""
-        github_links: list[dict[str, t.NormalizedValue]] = []
+        github_links: Sequence[Mapping[str, t.NormalizedValue]] = []
         for link in links:
             url_raw = link.get("url")
             url_obj: str | None = url_raw if isinstance(url_raw, str) else None
             if isinstance(url_obj, str) and "github.com" in url_obj:
                 github_links.append(link)
 
-        validated_links: list[dict[str, bool | t.NormalizedValue]] = []
+        validated_links: Sequence[Mapping[str, bool | t.NormalizedValue]] = []
 
         for link in github_links:
             url_candidate = link.get("url")
@@ -610,7 +615,7 @@ Broken Links:
 
 
 def validate_links_sync(
-    links: list[LinkInfoDict],
+    links: Sequence[LinkInfoDict],
     config_path: str | None = None,
 ) -> ResultsDict:
     """Synchronous wrapper for link validation."""
@@ -619,7 +624,7 @@ def validate_links_sync(
 
 
 if __name__ == "__main__":
-    test_links: list[LinkInfoDict] = [
+    test_links: Sequence[LinkInfoDict] = [
         LinkInfoDict(
             url="https://github.com/microsoft/vscode",
             text="VSCode",

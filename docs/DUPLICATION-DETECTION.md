@@ -71,7 +71,7 @@ if result.is_success:
 
 **Methods**:
 
-- `check(files: list[Path], threshold: float | None) -> r[CheckResult]`
+- `check(files: Sequence[Path], threshold: float | None) -> r[CheckResult]`
 
   - Analyze files for duplication
   - Returns duplication pairs exceeding threshold

@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from typing import final
 
 from flext_core import r
@@ -37,10 +37,10 @@ class FlextQualityClaudeMemClient:
         """Initialize the Claude Mem client."""
         self._mcp = FlextQualityMcpClient(timeout_ms=timeout_ms)
 
-    def build_get_observations_call(self, ids: list[int]) -> r[McpToolCall]:
+    def build_get_observations_call(self, ids: Sequence[int]) -> r[McpToolCall]:
         """Build a get_observations tool call."""
-        normalized_ids: list[t.NormalizedValue] = list(ids)
-        params: dict[str, t.NormalizedValue] = {"ids": normalized_ids}
+        normalized_ids: Sequence[t.NormalizedValue] = list(ids)
+        params: Mapping[str, t.NormalizedValue] = {"ids": normalized_ids}
         return self._mcp.build_tool_call(self.SERVER_NAME, "get_observations", params)
 
     def build_search_call(
@@ -51,7 +51,7 @@ class FlextQualityClaudeMemClient:
     ) -> r[McpToolCall]:
         """Build a search tool call."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
-        params: dict[str, t.NormalizedValue] = {
+        params: Mapping[str, t.NormalizedValue] = {
             "query": query,
             "limit": search_limit,
         }
@@ -67,7 +67,7 @@ class FlextQualityClaudeMemClient:
         """Build a timeline tool call."""
         before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
-        params: dict[str, t.NormalizedValue] = {
+        params: Mapping[str, t.NormalizedValue] = {
             "anchor": anchor,
             "depth_before": before,
             "depth_after": after,
@@ -78,7 +78,7 @@ class FlextQualityClaudeMemClient:
             params,
         )
 
-    def get_observations_command(self, ids: list[int]) -> r[list[str]]:
+    def get_observations_command(self, ids: Sequence[int]) -> r[Sequence[str]]:
         """Get the mcp-cli command for fetching observations."""
         return self.build_get_observations_call(ids).flat_map(
             self._mcp.build_call_command,
@@ -89,7 +89,7 @@ class FlextQualityClaudeMemClient:
         query: str,
         *,
         limit: int | None = None,
-    ) -> r[list[str]]:
+    ) -> r[Sequence[str]]:
         """Get the mcp-cli command for memory search."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
         return self.build_search_call(query, limit=search_limit).flat_map(
@@ -102,7 +102,7 @@ class FlextQualityClaudeMemClient:
         *,
         depth_before: int | None = None,
         depth_after: int | None = None,
-    ) -> r[list[str]]:
+    ) -> r[Sequence[str]]:
         """Get the mcp-cli command for timeline query."""
         before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH

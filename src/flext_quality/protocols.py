@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import ClassVar, Protocol, runtime_checkable
 
@@ -32,7 +32,7 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
                 self,
                 content: str,
                 file_path: Path | None = None,
-            ) -> r[list[Mapping[str, t.NormalizedValue]]]:
+            ) -> r[Sequence[Mapping[str, t.NormalizedValue]]]:
                 """Validate content and return violations."""
                 ...
 
@@ -41,7 +41,7 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
             """Abstract base protocol for hook implementations."""
 
             event: ClassVar[type]
-            matcher: ClassVar[list[str] | None]
+            matcher: ClassVar[Sequence[str] | None]
 
             def execute(
                 self,
@@ -74,7 +74,7 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
             """Protocol for hook implementations."""
 
             event: str
-            matcher: list[str] | None
+            matcher: Sequence[str] | None
 
             def execute(
                 self,
