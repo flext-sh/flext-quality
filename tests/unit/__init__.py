@@ -12,7 +12,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from .test_api import (
+    from tests.unit.test_api import (
         TestFlextQualityAPI,
         TestFlextQualityHookExecution,
         TestFlextQualityRulesConfig,
@@ -20,8 +20,8 @@ if TYPE_CHECKING:
         TestFlextQualityStdinProcessing,
         TestFlextQualityValidation,
     )
-    from .test_basic import test_basic
-    from .test_cli import TestFlextQualityCliService, TestMainFunction
+    from tests.unit.test_basic import test_basic
+    from tests.unit.test_cli import TestFlextQualityCliService, TestMainFunction
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "TestFlextQualityAPI": ("tests.unit.test_api", "TestFlextQualityAPI"),

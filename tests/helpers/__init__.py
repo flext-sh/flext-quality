@@ -23,11 +23,10 @@ if TYPE_CHECKING:
     from flext_core import FlextTypes
 
     from flext_quality import c, d, e, h, m, p, r, s, t, u, x
-
-    from .constants import TestsConstants
-    from .models import TestsModels
-    from .protocols import TestsProtocols
-    from .typing_helpers import (
+    from tests.helpers.constants import TestsConstants
+    from tests.helpers.models import TestsModels
+    from tests.helpers.protocols import TestsProtocols
+    from tests.helpers.typing_helpers import (
         assert_analysis_results_structure,
         assert_dict_structure,
         assert_is_dict,
@@ -37,7 +36,7 @@ if TYPE_CHECKING:
         safe_dict_access,
         safe_list_access,
     )
-    from .typings import TestsTypings
+    from tests.helpers.typings import TestsTypings
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "TestsConstants": ("tests.helpers.constants", "TestsConstants"),

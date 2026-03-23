@@ -13,8 +13,8 @@ if TYPE_CHECKING:
     from flext_core import FlextTypes
     from flext_tests import d, e, h, r, s, x
 
-    from . import helpers as helpers, unit as unit
-    from .conftest import (
+    from tests import helpers, unit
+    from tests.conftest import (
         MockQualityAnalyzer,
         MockReportGenerator,
         analysis_results,
@@ -37,11 +37,14 @@ if TYPE_CHECKING:
         sonarqube_config,
         temporary_project_structure,
     )
-    from .constants import FlextQualityTestConstants, FlextQualityTestConstants as c
-    from .helpers.constants import TestsConstants
-    from .helpers.models import TestsModels
-    from .helpers.protocols import TestsProtocols
-    from .helpers.typing_helpers import (
+    from tests.constants import (
+        FlextQualityTestConstants,
+        FlextQualityTestConstants as c,
+    )
+    from tests.helpers.constants import TestsConstants
+    from tests.helpers.models import TestsModels
+    from tests.helpers.protocols import TestsProtocols
+    from tests.helpers.typing_helpers import (
         assert_analysis_results_structure,
         assert_dict_structure,
         assert_is_dict,
@@ -51,11 +54,14 @@ if TYPE_CHECKING:
         safe_dict_access,
         safe_list_access,
     )
-    from .helpers.typings import TestsTypings
-    from .models import FlextQualityTestModels, FlextQualityTestModels as m
-    from .protocols import FlextQualityTestProtocols, FlextQualityTestProtocols as p
-    from .typings import FlextQualityTestTypes, FlextQualityTestTypes as t
-    from .unit.test_api import (
+    from tests.helpers.typings import TestsTypings
+    from tests.models import FlextQualityTestModels, FlextQualityTestModels as m
+    from tests.protocols import (
+        FlextQualityTestProtocols,
+        FlextQualityTestProtocols as p,
+    )
+    from tests.typings import FlextQualityTestTypes, FlextQualityTestTypes as t
+    from tests.unit.test_api import (
         TestFlextQualityAPI,
         TestFlextQualityHookExecution,
         TestFlextQualityRulesConfig,
@@ -63,9 +69,12 @@ if TYPE_CHECKING:
         TestFlextQualityStdinProcessing,
         TestFlextQualityValidation,
     )
-    from .unit.test_basic import test_basic
-    from .unit.test_cli import TestFlextQualityCliService, TestMainFunction
-    from .utilities import FlextQualityTestUtilities, FlextQualityTestUtilities as u
+    from tests.unit.test_basic import test_basic
+    from tests.unit.test_cli import TestFlextQualityCliService, TestMainFunction
+    from tests.utilities import (
+        FlextQualityTestUtilities,
+        FlextQualityTestUtilities as u,
+    )
 
 _LAZY_IMPORTS: dict[str, tuple[str, str]] = {
     "FlextQualityTestConstants": ("tests.constants", "FlextQualityTestConstants"),
