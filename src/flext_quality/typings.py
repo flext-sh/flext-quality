@@ -18,12 +18,12 @@ class FlextQualityTypes(FlextWebTypes, FlextCliTypes):
 
         type HookInput = Mapping[str, core_t.NormalizedValue]
         type HookOutput = Mapping[str, core_t.NormalizedValue]
-        type HookMatcher = t.StrSequence | None
+        type HookMatcher = FlextWebTypes.StrSequence | None
         type RuleConfig = Mapping[str, core_t.NormalizedValue]
         type RuleResult = tuple[bool, str | None]
         type McpToolResult = Mapping[str, core_t.NormalizedValue]
-        type McpResource = t.StrMapping
-        type MemoryQuery = Mapping[str, str | int | t.StrSequence]
+        type McpResource = FlextWebTypes.StrMapping
+        type MemoryQuery = Mapping[str, str | int | FlextWebTypes.StrSequence]
         type ContextQuery = Mapping[str, str | int]
         type GenericItem = (
             core_t.Primitives | Path | Mapping[str, core_t.Primitives | None]

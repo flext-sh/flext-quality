@@ -17,23 +17,23 @@ from pydantic import BaseModel, Field
 from flext_quality import c, t
 
 
-def _empty_list_str() -> t.StrSequence:
-    return []
-
-
-def _empty_dict_str_str() -> t.StrMapping:
-    return {}
-
-
-def _empty_list_dict_str_str() -> Sequence[t.StrMapping]:
-    return []
-
-
 class FlextQualityModels(FlextWebModels, FlextCliModels):
     """Namespace for flext-quality models."""
 
     class Quality:
         """Quality-specific models namespace."""
+
+        @staticmethod
+        def _empty_list_str() -> t.StrSequence:
+            return []
+
+        @staticmethod
+        def _empty_dict_str_str() -> t.StrMapping:
+            return {}
+
+        @staticmethod
+        def _empty_list_dict_str_str() -> Sequence[t.StrMapping]:
+            return []
 
         class HookConfig(BaseModel):
             """Configuration for a hook."""
@@ -551,9 +551,11 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             timestamp: str
             files_processed: int = 0
             changes_made: int = 0
-            backups_created: t.StrSequence = Field(default_factory=_empty_list_str)
+            backups_created: t.StrSequence = Field(
+                default_factory=FlextQualityModels.Quality._empty_list_str
+            )
             optimizations: Sequence[t.StrMapping] = Field(
-                default_factory=_empty_list_dict_str_str
+                default_factory=FlextQualityModels.Quality._empty_list_dict_str_str
             )
 
         class ExecutionRequest(BaseModel):
@@ -561,7 +563,10 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             script_path: Path
             runtime: str
-            args: Annotated[t.StrSequence, Field(default_factory=_empty_list_str)]
+            args: Annotated[
+                t.StrSequence,
+                Field(default_factory=FlextQualityModels.Quality._empty_list_str),
+            ]
             timeout_ms: int
 
         class ExecutionResult(BaseModel):
@@ -579,7 +584,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             tool: str
             params: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=_empty_dict_str_str),
+                Field(default_factory=FlextQualityModels.Quality._empty_dict_str_str),
             ]
 
         class McpToolResult(BaseModel):
