@@ -30,3 +30,7 @@ class FlextQualityBaseHook:
     def _match_pattern(self, pattern: str, value: str) -> bool:
         """Match pattern against value (supports wildcards)."""
         return fnmatch.fnmatch(value, pattern)
+
+
+# Module-level alias for pyrefly compatibility
+BaseHookImpl = FlextQualityBaseHook
