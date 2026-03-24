@@ -661,3 +661,7 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+# Module-level alias for pyrefly compatibility
+DocumentationNotifier = FlextQualityDocumentationNotifier

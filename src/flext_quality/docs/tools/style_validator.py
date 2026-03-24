@@ -707,3 +707,7 @@ if __name__ == "__main__":
 
     for _violation in results["violations"][:3]:  # Show first 3
         pass
+
+
+# Module-level alias for pyrefly compatibility
+StyleValidator = FlextQualityStyleValidator

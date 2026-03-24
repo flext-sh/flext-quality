@@ -870,3 +870,7 @@ if __name__ == "__main__":
     if suggestions:
         for _suggestion in suggestions[:2]:
             pass
+
+
+# Module-level alias for pyrefly compatibility
+ContentAnalyzer = FlextQualityContentAnalyzer

@@ -773,3 +773,9 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+
+# Module-level aliases for pyrefly compatibility
+DocumentationReporter = FlextQualityDocumentationReporter
+ReportData = FlextQualityReportData
+TrendData = FlextQualityTrendData

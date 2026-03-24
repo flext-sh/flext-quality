@@ -205,3 +205,9 @@ class FlextQualityBaseAnalyzer(ABC):
 
 # Re-export canonical protocol from protocols namespace for backward compatibility
 Config = p.Quality.DocsConfig
+
+# Module-level aliases for pyrefly compatibility
+BaseAuditor = FlextQualityBaseAuditor
+BaseValidator = FlextQualityBaseValidator
+BaseReporter = FlextQualityBaseReporter
+BaseAnalyzer = FlextQualityBaseAnalyzer

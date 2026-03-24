@@ -372,3 +372,10 @@ class FlextQualityConfigManager:
             return True
         except (FileNotFoundError, PermissionError, yaml.YAMLError, OSError):
             return False
+
+
+# Module-level aliases for pyrefly compatibility
+AuditRules = FlextQualityAuditRules
+StyleGuide = FlextQualityStyleGuide
+ValidationConfig = FlextQualityValidationConfig
+ConfigManager = FlextQualityConfigManager
