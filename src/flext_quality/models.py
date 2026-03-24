@@ -17,15 +17,15 @@ from pydantic import BaseModel, Field
 from flext_quality import c, t
 
 
-def _empty_list_str() -> Sequence[str]:
+def _empty_list_str() -> t.StrSequence:
     return []
 
 
-def _empty_dict_str_str() -> Mapping[str, str]:
+def _empty_dict_str_str() -> t.StrMapping:
     return {}
 
 
-def _empty_list_dict_str_str() -> Sequence[Mapping[str, str]]:
+def _empty_list_dict_str_str() -> Sequence[t.StrMapping]:
     return []
 
 
@@ -39,7 +39,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Configuration for a hook."""
 
             event: c.Quality.HookEvent
-            matcher: Sequence[str] | None = None
+            matcher: t.StrSequence | None = None
             command: str
             timeout_ms: Annotated[
                 int, Field(default=c.Quality.Defaults.HOOK_TIMEOUT_MS)
@@ -85,8 +85,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             type: str
             title: str
             content: str
-            concepts: Annotated[Sequence[str], Field(default_factory=list)]
-            files: Annotated[Sequence[str], Field(default_factory=list)]
+            concepts: Annotated[t.StrSequence, Field(default_factory=list)]
+            files: Annotated[t.StrSequence, Field(default_factory=list)]
             timestamp: str
 
         class ContextSearchResult(BaseModel):
@@ -131,8 +131,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             issues: Sequence[FlextQualityModels.Quality.Issue] = Field(
                 default_factory=list
             )
-            warnings: Sequence[str] = Field(default_factory=list)
-            errors: Sequence[str] = Field(default_factory=list)
+            warnings: t.StrSequence = Field(default_factory=list)
+            errors: t.StrSequence = Field(default_factory=list)
             metadata: Mapping[str, t.Primitives] = Field(default_factory=dict)
 
             @property
@@ -199,7 +199,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             enabled: bool = True
             time: str
-            tasks: Sequence[str] = Field(default_factory=list)
+            tasks: t.StrSequence = Field(default_factory=list)
             day: str | None = None
 
         class ErrorHandlingConfig(BaseModel):
@@ -238,8 +238,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             start_time: str
             tasks_completed: int = 0
-            errors: Sequence[str] = Field(default_factory=list)
-            warnings: Sequence[str] = Field(default_factory=list)
+            errors: t.StrSequence = Field(default_factory=list)
+            warnings: t.StrSequence = Field(default_factory=list)
             end_time: str = ""
             duration_seconds: int = 0
 
@@ -258,7 +258,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             priority: str
             category: str
             recommendation: str
-            actions: Sequence[str] = Field(default_factory=list)
+            actions: t.StrSequence = Field(default_factory=list)
 
         class AuditorResults(BaseModel):
             """Results for documentation audit execution."""
@@ -268,7 +268,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             issues: Sequence[
                 Mapping[
                     str,
-                    t.Primitives | Sequence[str] | Sequence[Mapping[str, str]] | None,
+                    t.Primitives | t.StrSequence | Sequence[t.StrMapping] | None,
                 ]
             ] = Field(default_factory=list)
             metrics: FlextQualityModels.Quality.AuditMetrics = Field(
@@ -392,7 +392,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             username: str
             password: str
             from_address: str
-            to_addresses: Sequence[str] = Field(default_factory=list)
+            to_addresses: t.StrSequence = Field(default_factory=list)
 
         class SlackConfig(BaseModel):
             """Slack notification configuration."""
@@ -405,7 +405,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Generic webhook configuration."""
 
             url: str
-            headers: Mapping[str, str] = Field(default_factory=dict)
+            headers: t.StrMapping = Field(default_factory=dict)
             timeout: t.PositiveInt = Field(default=30)
 
         class ChannelsConfig(BaseModel):
@@ -430,7 +430,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Results for documentation notification runs."""
 
             notifications_sent: int = 0
-            errors: Sequence[str] = Field(default_factory=list)
+            errors: t.StrSequence = Field(default_factory=list)
             timestamp: str
 
         class QualityThresholdsConfig(BaseModel):
@@ -452,10 +452,10 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
         class SeverityLevelsConfig(BaseModel):
             """Configuration for severity level categorization."""
 
-            critical: Sequence[str] = Field(default_factory=list)
-            high: Sequence[str] = Field(default_factory=list)
-            medium: Sequence[str] = Field(default_factory=list)
-            low: Sequence[str] = Field(default_factory=list)
+            critical: t.StrSequence = Field(default_factory=list)
+            high: t.StrSequence = Field(default_factory=list)
+            medium: t.StrSequence = Field(default_factory=list)
+            low: t.StrSequence = Field(default_factory=list)
 
         class AuditRulesConfig(BaseModel):
             """Configuration for audit rules and thresholds."""
@@ -525,7 +525,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Configuration for content analysis parameters."""
 
             min_section_depth: int = 2
-            required_sections: Sequence[str] = Field(
+            required_sections: t.StrSequence = Field(
                 default_factory=lambda: ["Overview", "Installation", "Usage"]
             )
             check_todos: bool = True
@@ -551,8 +551,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             timestamp: str
             files_processed: int = 0
             changes_made: int = 0
-            backups_created: Sequence[str] = Field(default_factory=_empty_list_str)
-            optimizations: Sequence[Mapping[str, str]] = Field(
+            backups_created: t.StrSequence = Field(default_factory=_empty_list_str)
+            optimizations: Sequence[t.StrMapping] = Field(
                 default_factory=_empty_list_dict_str_str
             )
 
@@ -561,7 +561,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             script_path: Path
             runtime: str
-            args: Annotated[Sequence[str], Field(default_factory=_empty_list_str)]
+            args: Annotated[t.StrSequence, Field(default_factory=_empty_list_str)]
             timeout_ms: int
 
         class ExecutionResult(BaseModel):
@@ -586,7 +586,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """MCP tool invocation response contract."""
 
             success: bool
-            data: Mapping[str, str] | None = None
+            data: t.StrMapping | None = None
             error: str | None = None
 
 

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-
 import fnmatch
 from typing import ClassVar
 
@@ -16,7 +14,7 @@ class BaseHookImpl:
     """Concrete base for hook implementations satisfying p.Quality.HookImpl."""
 
     event: ClassVar[c.Quality.HookEvent]
-    matcher: ClassVar[Sequence[str] | None] = None
+    matcher: ClassVar[t.StrSequence | None] = None
 
     def execute(self, input_data: t.Quality.HookInput) -> r[t.Quality.HookOutput]:
         """Execute the hook logic."""

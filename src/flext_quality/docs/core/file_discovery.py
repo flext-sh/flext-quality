@@ -13,7 +13,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import ClassVar, NotRequired, TypedDict
 
-from flext_quality import m
+from flext_quality import m, t
 
 
 class FileStatistics(TypedDict):
@@ -36,7 +36,7 @@ class DocumentationFinder:
     """Documentation file discovery and filtering system."""
 
     # Common documentation file patterns
-    DEFAULT_PATTERNS: ClassVar[Sequence[str]] = [
+    DEFAULT_PATTERNS: ClassVar[t.StrSequence] = [
         "**/*.md",
         "**/*.mdx",
         "**/*.rst",
@@ -61,7 +61,7 @@ class DocumentationFinder:
     DOCS_ROOT_DEPTH: int = 2
 
     # Default ignore patterns
-    DEFAULT_IGNORE_PATTERNS: ClassVar[Sequence[str]] = [
+    DEFAULT_IGNORE_PATTERNS: ClassVar[t.StrSequence] = [
         "**/node_modules/**",
         "**/build/**",
         "**/dist/**",
@@ -88,8 +88,8 @@ class DocumentationFinder:
     def __init__(
         self,
         project_root: Path,
-        patterns: Sequence[str] | None = None,
-        ignore_patterns: Sequence[str] | None = None,
+        patterns: t.StrSequence | None = None,
+        ignore_patterns: t.StrSequence | None = None,
         ignore_file: str | None = None,
     ) -> None:
         """Initialize the documentation finder.
@@ -256,7 +256,7 @@ class DocumentationFinder:
         all_files = self.find_files()
         return [f for f in all_files if f.name.lower().startswith("readme")]
 
-    def find_by_extension(self, extensions: Sequence[str]) -> Sequence[Path]:
+    def find_by_extension(self, extensions: t.StrSequence) -> Sequence[Path]:
         """Find files by their extensions."""
         all_files = self.find_files()
         extensions = [ext.lower().lstrip(".") for ext in extensions]

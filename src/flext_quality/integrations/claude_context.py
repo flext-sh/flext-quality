@@ -9,8 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-
 from typing import final
 
 from flext_core import r
@@ -63,7 +61,7 @@ class FlextQualityClaudeContextClient:
         """Build a get_indexing_status tool call."""
         return self._mcp.build_tool_call(self.SERVER_NAME, "get_indexing_status", {})
 
-    def get_index_command(self, path: str | None = None) -> r[Sequence[str]]:
+    def get_index_command(self, path: str | None = None) -> r[t.StrSequence]:
         """Get the mcp-cli command for codebase indexing."""
         return self.build_index_call(path).flat_map(self._mcp.build_call_command)
 
@@ -72,7 +70,7 @@ class FlextQualityClaudeContextClient:
         query: str,
         *,
         limit: int | None = None,
-    ) -> r[Sequence[str]]:
+    ) -> r[t.StrSequence]:
         """Get the mcp-cli command for code search."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_SEARCH_LIMIT
         return self.build_search_call(query, limit=search_limit).flat_map(

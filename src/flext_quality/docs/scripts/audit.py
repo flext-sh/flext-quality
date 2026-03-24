@@ -22,7 +22,7 @@ import requests
 import yaml
 from pydantic import ValidationError
 
-from flext_quality import m
+from flext_quality import m, t
 
 QualityThresholdsConfig = m.Quality.QualityThresholdsConfig
 ContentChecksConfig = m.Quality.ContentChecksConfig
@@ -218,8 +218,8 @@ class DocumentationAuditor:
                         | int
                         | float
                         | bool
-                        | Sequence[str]
-                        | Sequence[Mapping[str, str]]
+                        | t.StrSequence
+                        | Sequence[t.StrMapping]
                         | None,
                     ] = {
                         "type": "outdated_content",
@@ -244,9 +244,9 @@ class DocumentationAuditor:
                     "error": str(e),
                 })
 
-    def _check_outdated_indicators(self, content: str) -> Sequence[str]:
+    def _check_outdated_indicators(self, content: str) -> t.StrSequence:
         """Check for indicators of outdated content."""
-        indicators: Sequence[str] = []
+        indicators: t.StrSequence = []
         if re.search(
             r"\\b\\d+\\.\\d+\\.\\d+.*TODO|FIXME|placeholder", content, re.IGNORECASE
         ):
@@ -318,10 +318,10 @@ class DocumentationAuditor:
                 })
 
     def _check_required_sections(
-        self, content: str, required_sections: Sequence[str]
-    ) -> Sequence[str]:
+        self, content: str, required_sections: t.StrSequence
+    ) -> t.StrSequence:
         """Check for required sections in documentation."""
-        missing: Sequence[str] = []
+        missing: t.StrSequence = []
         for section in required_sections:
             pattern = f"^#+\\s.*{re.escape(section)}.*$"
             if not re.search(pattern, content, re.MULTILINE | re.IGNORECASE):
@@ -383,9 +383,9 @@ class DocumentationAuditor:
                     "error": str(e),
                 })
 
-    def _check_markdown_formatting(self, content: str) -> Sequence[str]:
+    def _check_markdown_formatting(self, content: str) -> t.StrSequence:
         """Check for markdown formatting issues."""
-        issues: Sequence[str] = []
+        issues: t.StrSequence = []
         formatting_cfg = self.style_guide.formatting
         unordered_lists = re.findall(r"^[\\s]*[-\\*\\+]", content, re.MULTILINE)
         if len(set(unordered_lists)) > 1:
@@ -406,9 +406,9 @@ class DocumentationAuditor:
             issues.append(f"{len(long_lines)} lines exceed {max_length} characters")
         return issues
 
-    def _check_accessibility(self, content: str) -> Sequence[Mapping[str, str]]:
+    def _check_accessibility(self, content: str) -> Sequence[t.StrMapping]:
         """Check accessibility compliance."""
-        issues: Sequence[Mapping[str, str]] = []
+        issues: Sequence[t.StrMapping] = []
         accessibility_cfg = self.style_guide.accessibility
         if accessibility_cfg.require_alt_text:
             images_without_alt = re.findall(r"!\\[\\]\\([^)]+\\)", content)
@@ -436,7 +436,7 @@ class DocumentationAuditor:
                 ])
         return issues
 
-    def _check_heading_hierarchy(self, content: str) -> Sequence[str]:
+    def _check_heading_hierarchy(self, content: str) -> t.StrSequence:
         """Check heading hierarchy for logical structure."""
         headings = re.findall(r"^(#+)\\s+(.+)$", content, re.MULTILINE)
         heading_levels = [len(level) for level, _ in headings]
@@ -453,7 +453,7 @@ class DocumentationAuditor:
         """Check links and references for validity."""
         link_validation = self.validation_config.link_validation
         all_links: Sequence[Mapping[str, str | int]] = []
-        image_refs: Sequence[Mapping[str, str]] = []
+        image_refs: Sequence[t.StrMapping] = []
         for file_path in doc_files:
             try:
                 content = file_path.read_text(encoding="utf-8")
@@ -563,7 +563,7 @@ class DocumentationAuditor:
                         "recommendation": f"Fix broken internal link to '{link['url']}'",
                     })
 
-    def _validate_images(self, images: Sequence[Mapping[str, str]]) -> None:
+    def _validate_images(self, images: Sequence[t.StrMapping]) -> None:
         """Validate image references."""
         for image in images:
             if image["src"].startswith(("http://", "https://")):

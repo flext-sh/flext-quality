@@ -97,7 +97,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
 
         @staticmethod
         def run_shell_command(
-            cmd: Sequence[str],
+            cmd: t.StrSequence,
             timeout_ms: int = c.Quality.Defaults.HOOK_TIMEOUT_MS,
         ) -> r[str]:
             """Run a shell command with timeout."""

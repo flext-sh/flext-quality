@@ -12,11 +12,13 @@ from typing import TypeAlias
 
 import yaml
 
+from flext_quality import t
+
 ConfigPrimitive: TypeAlias = str | int | float | bool
-ConfigValue: TypeAlias = str | int | float | bool | Sequence[str]
-ConfigSection: TypeAlias = Mapping[str, str | int | float | bool | Sequence[str]]
+ConfigValue: TypeAlias = str | int | float | bool | t.StrSequence
+ConfigSection: TypeAlias = Mapping[str, str | int | float | bool | t.StrSequence]
 ConfigData: TypeAlias = Mapping[
-    str, Mapping[str, str | int | float | bool | Sequence[str]]
+    str, Mapping[str, str | int | float | bool | t.StrSequence]
 ]
 RawSectionValue: TypeAlias = (
     str | int | float | bool | Sequence[str | int | float | bool]
@@ -289,7 +291,7 @@ class ConfigManager:
         self._style_guide = None
         self._validation_config = None
 
-    def validate_configs(self) -> Sequence[str]:
+    def validate_configs(self) -> t.StrSequence:
         """Validate all configuration files and return any issues."""
         # Check required config files exist
         required_files = [

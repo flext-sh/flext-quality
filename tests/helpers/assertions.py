@@ -9,8 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
-
 from flext_core import t
 
 
@@ -19,36 +17,36 @@ def assert_is_dict(value: t.Scalar | t.ScalarMapping, msg: str = "") -> None:
     assert isinstance(value, dict), msg or f"Expected dict, got {type(value).__name__}"
 
 
-def assert_is_list(value: t.Scalar | Sequence[t.Scalar], msg: str = "") -> None:
+def assert_is_list(value: t.Scalar | t.ScalarList, msg: str = "") -> None:
     """Assert that value is a list."""
     assert isinstance(value, list), msg or f"Expected list, got {type(value).__name__}"
 
 
 def assert_dict_structure(
-    data: Mapping[str, t.Scalar], required_keys: Sequence[str], msg: str = ""
+    data: t.ScalarMapping, required_keys: t.StrSequence, msg: str = ""
 ) -> None:
     """Assert that a dict contains all required keys."""
     missing = [k for k in required_keys if k not in data]
     assert not missing, msg or f"Missing keys: {missing}"
 
 
-def assert_metrics_structure(metrics: Mapping[str, t.Scalar]) -> None:
+def assert_metrics_structure(metrics: t.ScalarMapping) -> None:
     """Assert that metrics dict has expected structure."""
     assert isinstance(metrics, dict), f"Expected dict, got {type(metrics).__name__}"
 
 
-def assert_issues_structure(issues: Sequence[t.Scalar]) -> None:
+def assert_issues_structure(issues: t.ScalarList) -> None:
     """Assert that issues data has expected structure."""
     assert isinstance(issues, list), f"Expected list, got {type(issues).__name__}"
 
 
-def assert_analysis_results_structure(results: Mapping[str, t.Scalar]) -> None:
+def assert_analysis_results_structure(results: t.ScalarMapping) -> None:
     """Assert that analysis results have expected structure."""
     assert isinstance(results, dict), f"Expected dict, got {type(results).__name__}"
 
 
 def safe_dict_access(
-    data: Mapping[str, t.Scalar],
+    data: t.ScalarMapping,
     key: str,
     default: t.Scalar | None = None,
 ) -> t.Scalar | None:
@@ -57,7 +55,7 @@ def safe_dict_access(
 
 
 def safe_list_access(
-    data: Sequence[t.Scalar],
+    data: t.ScalarList,
     index: int,
     default: t.Scalar | None = None,
 ) -> t.Scalar | None:
