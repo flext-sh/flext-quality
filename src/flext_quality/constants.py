@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from enum import StrEnum, unique
-from typing import Final, Literal
+from typing import Final
 
 from flext_cli import FlextCliConstants
 from flext_web import FlextWebConstants
@@ -31,55 +31,6 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
 
     class Quality:
         """Quality-specific constants namespace."""
-
-        class Literals:
-            """Literal type aliases for quality domain values."""
-
-            type AnalysisStatusLiteral = Literal[
-                "pending",
-                "running",
-                "completed",
-                "failed",
-                "cancelled",
-            ]
-            type IssueSeverityLiteral = Literal[
-                "critical",
-                "error",
-                "warning",
-                "info",
-                "hint",
-            ]
-            type IssueTypeLiteral = Literal[
-                "lint",
-                "type",
-                "security",
-                "complexity",
-                "style",
-                "documentation",
-            ]
-            type ReportFormatLiteral = Literal[
-                "json",
-                "html",
-                "markdown",
-                "text",
-                "sarif",
-            ]
-            type BackendTypeLiteral = Literal[
-                "ruff",
-                "mypy",
-                "pyrefly",
-                "bandit",
-                "vulture",
-                "radon",
-            ]
-            type LanguageLiteral = Literal[
-                "python",
-                "typescript",
-                "javascript",
-                "go",
-                "rust",
-            ]
-            type CheckStatusLiteral = Literal["pass", "fail", "skip", "error"]
 
         @unique
         class HookEvent(StrEnum):
