@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import MutableSequence, Sequence
 from pathlib import Path
 
 import yaml
@@ -49,7 +49,7 @@ class FlextQualityRulesLoader:
                 return r[Sequence[m.Quality.RuleDefinition]].fail(
                     "Invalid YAML: 'rules' must be a list",
                 )
-        rules: Sequence[m.Quality.RuleDefinition] = []
+        rules: MutableSequence[m.Quality.RuleDefinition] = []
         for idx, rule_data in enumerate(rules_list):
             match rule_data:
                 case dict() as rule_dict:
@@ -68,7 +68,7 @@ class FlextQualityRulesLoader:
         self, paths: Sequence[Path]
     ) -> r[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from multiple YAML files."""
-        all_rules: Sequence[m.Quality.RuleDefinition] = []
+        all_rules: MutableSequence[m.Quality.RuleDefinition] = []
         for path in paths:
             result = self.load(path)
             if result.is_failure:

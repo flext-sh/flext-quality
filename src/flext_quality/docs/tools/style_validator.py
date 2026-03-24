@@ -279,8 +279,10 @@ class StyleValidator:
             file_results["violations"].extend(self._check_line_length(content))
             file_results["violations"].extend(self._check_whitespace(content))
 
-            file_results["suggestions"] = self._generate_suggestions(
-                file_results["violations"],
+            file_results["suggestions"] = list(
+                self._generate_suggestions(
+                    file_results["violations"],
+                )
             )
 
             self.results["files_checked"] += 1
@@ -631,9 +633,10 @@ Top Issues:
 
         # Count issue types
         issue_types: MutableMapping[str, int] = {}
-        for violation in (
-            self.results["style_violations"] + self.results["accessibility_issues"]
-        ):
+        for violation in [
+            *self.results["style_violations"],
+            *self.results["accessibility_issues"],
+        ]:
             v_type = violation["type"]
             issue_types[v_type] = issue_types.get(v_type, 0) + 1
 

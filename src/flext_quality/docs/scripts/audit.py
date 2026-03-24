@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import argparse
 import re
-from collections.abc import Mapping, MutableSequence, Sequence
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -212,7 +212,7 @@ class DocumentationAuditor:
                     age_days = (datetime.now(UTC) - mtime).days
                     content = file_path.read_text(encoding="utf-8")
                     outdated_indicators = self._check_outdated_indicators(content)
-                    issue: Mapping[
+                    issue: MutableMapping[
                         str,
                         str
                         | int

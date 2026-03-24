@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import MutableMapping, Sequence
 
 from pydantic import TypeAdapter
 
@@ -47,7 +47,7 @@ def get_rules_config() -> str:
 @mcp.resource("status://integrations")
 def get_integrations_status() -> str:
     """Get status of all integrations."""
-    status: t.ContainerMapping = {}
+    status: MutableMapping[str, t.Container | t.ContainerMapping] = {}
     mem_client = FlextQualityClaudeMemClient()
     mem_health = mem_client.health_check()
     status["claude_mem"] = (

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from collections.abc import Sequence
+from collections.abc import MutableSequence, Sequence
 from pathlib import Path
 
 from flext_core import r, t
@@ -17,12 +17,12 @@ class FlextQualityRulesEngine:
     def __init__(self, rules_path: Path | None = None) -> None:
         """Initialize rules engine."""
         self._rules_path: Path | None = rules_path
-        self._rules: Sequence[m.Quality.RuleDefinition] = []
+        self._rules: MutableSequence[m.Quality.RuleDefinition] = []
         self._loaded: bool = False
 
-    def get_rules(self) -> Sequence[m.Quality.RuleDefinition]:
+    def get_rules(self) -> MutableSequence[m.Quality.RuleDefinition]:
         """Get loaded rules."""
-        return self._rules.copy()
+        return list(self._rules)
 
     def load_rules(self, rules_path: Path | None = None) -> r[int]:
         """Load rules from YAML file."""
@@ -33,7 +33,7 @@ class FlextQualityRulesEngine:
         result = loader.load(path)
         if result.is_failure:
             return r[int].fail(result.error)
-        self._rules = result.value
+        self._rules = list(result.value)
         self._loaded = True
         return r[int].ok(len(self._rules))
 
@@ -50,7 +50,7 @@ class FlextQualityRulesEngine:
         target_path = Path(path)
         if not target_path.exists():
             return r[Sequence[t.ContainerMapping]].fail(f"Path does not exist: {path}")
-        violations: Sequence[t.ContainerMapping] = []
+        violations: MutableSequence[t.ContainerMapping] = []
         files = self._get_files(target_path)
         for file_path in files:
             file_violations = self._validate_file(file_path, context or {})
@@ -67,7 +67,7 @@ class FlextQualityRulesEngine:
             load_result = self.load_rules()
             if load_result.is_failure:
                 return r[Sequence[t.ContainerMapping]].fail(load_result.error)
-        violations: Sequence[t.ContainerMapping] = []
+        violations: MutableSequence[t.ContainerMapping] = []
         for rule in self._rules:
             if not rule.enabled:
                 continue
@@ -82,7 +82,7 @@ class FlextQualityRulesEngine:
         filename: str,
     ) -> Sequence[t.ContainerMapping]:
         """Check a single rule against content."""
-        violations: Sequence[t.ContainerMapping] = []
+        violations: MutableSequence[t.ContainerMapping] = []
         if rule.pattern is None:
             return violations
         try:
@@ -149,7 +149,7 @@ class FlextQualityRulesEngine:
                     "severity": c.Quality.Severity.ERROR,
                 },
             ]
-        violations: Sequence[t.ContainerMapping] = []
+        violations: MutableSequence[t.ContainerMapping] = []
         for rule in self._rules:
             if not rule.enabled:
                 continue

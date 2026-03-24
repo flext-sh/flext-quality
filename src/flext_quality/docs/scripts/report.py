@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import argparse
 import operator
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableSequence, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import NotRequired, TypedDict, Unpack
@@ -240,13 +240,13 @@ class DocumentationReporter:
         """Analyze quality trends over time."""
         return None
 
-    def _generate_recommendations(self) -> Sequence[Recommendation]:
+    def _generate_recommendations(self) -> MutableSequence[Recommendation]:
         """Generate actionable recommendations based on current data."""
-        recommendations: Sequence[Recommendation] = []
+        recommendations: MutableSequence[Recommendation] = []
         if self.audit_data and isinstance(self.audit_data, dict):
             audit_issues = self.audit_data.get("issues")
             if isinstance(audit_issues, list):
-                critical_issues: Sequence[Mapping[str, t.Primitives]] = [
+                critical_issues: MutableSequence[Mapping[str, t.Primitives]] = [
                     i
                     for i in audit_issues
                     if isinstance(i, dict) and i.get("severity") == "critical"
@@ -263,7 +263,7 @@ class DocumentationReporter:
                             "Re-run audit after fixes",
                         ],
                     })
-                outdated: Sequence[Mapping[str, t.Primitives]] = [
+                outdated: MutableSequence[Mapping[str, t.Primitives]] = [
                     i
                     for i in audit_issues
                     if isinstance(i, dict) and i.get("type") == "outdated_content"
@@ -285,7 +285,7 @@ class DocumentationReporter:
             if isinstance(link_validation, dict):
                 validation_errors = link_validation.get("errors")
                 if isinstance(validation_errors, list):
-                    broken_links: Sequence[Mapping[str, t.Primitives]] = []
+                    broken_links: MutableSequence[Mapping[str, t.Primitives]] = []
                     for e in validation_errors:
                         if isinstance(e, dict):
                             error_entry: Mapping[
@@ -510,7 +510,7 @@ class DocumentationReporter:
     def generate_trend_report(self, days: int = 30) -> str:
         """Generate trend analysis report over specified time period."""
         report_files = list(self.reports_dir.glob("*.json"))
-        recent_reports: Sequence[Mapping[str, ReportValue | datetime]] = []
+        recent_reports: MutableSequence[Mapping[str, ReportValue | datetime]] = []
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
         for report_file in report_files:
             if "latest_" in report_file.name:
@@ -542,9 +542,9 @@ class DocumentationReporter:
         """Analyze trend data from historical reports."""
         if not reports:
             return {"error": "No historical data available"}
-        audit_trends: Sequence[TrendEntry] = []
-        validation_trends: Sequence[TrendEntry] = []
-        optimization_trends: Sequence[TrendEntry] = []
+        audit_trends: MutableSequence[TrendEntry] = []
+        validation_trends: MutableSequence[TrendEntry] = []
+        optimization_trends: MutableSequence[TrendEntry] = []
         for report in reports:
             date_val_raw = report.get("date")
             if date_val_raw is None:

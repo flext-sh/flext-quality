@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import contextlib
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import MutableMapping, MutableSequence, Sequence
 from pathlib import Path
 from typing import override
 
@@ -24,7 +24,7 @@ class FlextQualityValidators:
         def __init__(self, patterns: t.StrMapping) -> None:
             """Initialize with patterns."""
             self._patterns = patterns
-            self._compiled: Mapping[str, re.Pattern[str]] = {}
+            self._compiled: MutableMapping[str, re.Pattern[str]] = {}
             for pname, pattern in patterns.items():
                 with contextlib.suppress(re.error):
                     self._compiled[pname] = re.compile(pattern)
@@ -42,7 +42,7 @@ class FlextQualityValidators:
             file_path: Path | None = None,
         ) -> r[Sequence[t.ContainerMapping]]:
             """Validate content against patterns."""
-            violations: Sequence[t.ContainerMapping] = []
+            violations: MutableSequence[t.ContainerMapping] = []
             filename = str(file_path) if file_path else "<string>"
             lines = content.splitlines()
             for line_num, line in enumerate(lines, start=1):
@@ -94,7 +94,7 @@ class FlextQualityValidators:
             file_path: Path | None = None,
         ) -> r[Sequence[t.ContainerMapping]]:
             """Validate tier violations."""
-            violations: Sequence[t.ContainerMapping] = []
+            violations: MutableSequence[t.ContainerMapping] = []
             filename = str(file_path) if file_path else "<string>"
             if file_path is None:
                 return r[Sequence[t.ContainerMapping]].ok(violations)
@@ -132,7 +132,7 @@ class FlextQualityValidators:
 
         def __init__(self) -> None:
             """Initialize with default validators."""
-            self._validators: Mapping[str, p.Quality.ValidatorBase] = {}
+            self._validators: MutableMapping[str, p.Quality.ValidatorBase] = {}
             self._register_defaults()
 
         def all(self) -> Sequence[p.Quality.ValidatorBase]:
@@ -153,7 +153,7 @@ class FlextQualityValidators:
             file_path: Path | None = None,
         ) -> r[Sequence[t.ContainerMapping]]:
             """Run all validators."""
-            all_violations: Sequence[t.ContainerMapping] = []
+            all_violations: MutableSequence[t.ContainerMapping] = []
             for validator in self._validators.values():
                 result = validator.validate(content, file_path)
                 if result.is_success:

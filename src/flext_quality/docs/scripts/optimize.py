@@ -15,7 +15,7 @@ import argparse
 import logging
 import re
 import shutil
-from collections.abc import Sequence
+from collections.abc import MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -86,7 +86,7 @@ class DocumentationOptimizer:
     def _fix_heading_spacing(self, content: str) -> str:
         """Ensure proper spacing around headings."""
         lines = content.split("\n")
-        fixed_lines: t.StrSequence = []
+        fixed_lines: MutableSequence[str] = []
         for i, line in enumerate(lines):
             if re.match(r"^#{1,6}\\s", line) and i > 0 and lines[i - 1].strip():
                 fixed_lines.append("")
@@ -138,9 +138,9 @@ class DocumentationOptimizer:
                 break
         return (toc_start, toc_end)
 
-    def _extract_toc_headings(self, lines: t.StrSequence) -> t.StrSequence:
+    def _extract_toc_headings(self, lines: t.StrSequence) -> MutableSequence[str]:
         """Extract headings for table of contents."""
-        toc_lines: t.StrSequence = []
+        toc_lines: MutableSequence[str] = []
         for line in lines:
             match = re.match(r"^(#{1,6})\\s+(.+)$", line)
             if match:
@@ -175,10 +175,10 @@ class DocumentationOptimizer:
         toc_headings = self._extract_toc_headings(lines)
         new_toc = self._generate_toc_content(toc_headings)
         if toc_start != -1 and toc_end != -1:
-            lines = lines[:toc_start] + new_toc + lines[toc_end:]
+            lines = lines[:toc_start] + list(new_toc) + lines[toc_end:]
         else:
             insert_pos = self._find_toc_insertion_point(lines)
-            lines = lines[:insert_pos] + [""] + new_toc + lines[insert_pos:]
+            lines = lines[:insert_pos] + [""] + list(new_toc) + lines[insert_pos:]
         return "\n".join(lines)
 
     def _heading_to_anchor(self, heading: str) -> str:
@@ -281,7 +281,7 @@ class DocumentationOptimizer:
     def _add_section_breaks(self, content: str) -> str:
         """Add horizontal rules between major sections."""
         lines = content.split("\n")
-        enhanced_lines: t.StrSequence = []
+        enhanced_lines: MutableSequence[str] = []
         for i, line in enumerate(lines):
             enhanced_lines.append(line)
             if (
@@ -447,7 +447,7 @@ def _discover_documentation_files(args: argparse.Namespace) -> Sequence[Path]:
     project_root = Path(__file__).parent.parent.parent.parent
     if args.files:
         return [project_root / f for f in args.files]
-    doc_files: Sequence[Path] = []
+    doc_files: MutableSequence[Path] = []
     for pattern in [
         "**/*.md",
         "**/*.mdx",

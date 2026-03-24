@@ -38,7 +38,7 @@ class FlextQualityClaudeContextClient:
 
     def build_index_call(self, path: str | None = None) -> r[McpToolCall]:
         """Build an index_codebase tool call."""
-        params: t.ContainerMapping = {}
+        params: t.MutableContainerMapping = {}
         if path:
             params["path"] = path
         return self._mcp.build_tool_call(self.SERVER_NAME, "index_codebase", params)

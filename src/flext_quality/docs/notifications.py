@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import argparse
 import smtplib
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableMapping, Sequence
 from datetime import UTC, datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -256,7 +256,7 @@ class DocumentationNotifier:
         metrics_val = audit_data.get("metrics", {})
         metrics = metrics_val if isinstance(metrics_val, dict) else {}
         severity_val = metrics.get("severity_breakdown", {})
-        severity_breakdown: Mapping[str, int] = {}
+        severity_breakdown: MutableMapping[str, int] = {}
         if isinstance(severity_val, dict):
             for key_name in ("critical", "high", "medium", "low"):
                 if key_name in severity_val and isinstance(severity_val[key_name], int):
@@ -475,7 +475,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
         }
 
         headers_val = webhook_config.get("headers")
-        headers: t.StrMapping = (
+        headers: MutableMapping[str, str] = (
             dict(headers_val) if isinstance(headers_val, dict) else {}
         )
         headers["Content-Type"] = "application/json"
@@ -501,7 +501,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
         metrics_val = audit_data.get("metrics")
         metrics = metrics_val if isinstance(metrics_val, dict) else {}
         severity_val = metrics.get("severity_breakdown")
-        severity_breakdown: Mapping[str, int] = {}
+        severity_breakdown: MutableMapping[str, int] = {}
         if isinstance(severity_val, dict):
             for key_name in ("critical", "high", "medium", "low"):
                 if key_name in severity_val and isinstance(severity_val[key_name], int):

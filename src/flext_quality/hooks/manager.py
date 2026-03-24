@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
 from typing import final
 
@@ -18,7 +18,9 @@ class HookManager:
 
     def __init__(self, config_path: Path | None = None) -> None:
         """Initialize hook manager with optional config path."""
-        self._hooks: Mapping[c.Quality.HookEvent, Sequence[BaseHookImpl]] = {}
+        self._hooks: MutableMapping[
+            c.Quality.HookEvent, MutableSequence[BaseHookImpl]
+        ] = {}
         self._config_path = config_path
 
     def execute(

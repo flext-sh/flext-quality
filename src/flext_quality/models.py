@@ -24,7 +24,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
         """Quality-specific models namespace."""
 
         @staticmethod
-        def _empty_list_str() -> t.StrSequence:
+        def _empty_list_str() -> MutableSequence[str]:
             return []
 
         @staticmethod
@@ -32,7 +32,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             return {}
 
         @staticmethod
-        def _empty_list_dict_str_str() -> Sequence[t.StrMapping]:
+        def _empty_list_dict_str_str() -> MutableSequence[MutableMapping[str, str]]:
             return []
 
         class HookConfig(BaseModel):
@@ -224,12 +224,12 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             enabled: bool = True
             reports_dir: str
             backup_dir: str
-            schedules: MutableMapping[str, FlextQualityModels.Quality.ScheduleEntry] = Field(
-                default_factory=dict
+            schedules: MutableMapping[str, FlextQualityModels.Quality.ScheduleEntry] = (
+                Field(default_factory=dict)
             )
-            tasks: MutableMapping[str, FlextQualityModels.Quality.ScheduleTaskConfig] = Field(
-                default_factory=dict
-            )
+            tasks: MutableMapping[
+                str, FlextQualityModels.Quality.ScheduleTaskConfig
+            ] = Field(default_factory=dict)
             error_handling: FlextQualityModels.Quality.ErrorHandlingConfig
             logging: FlextQualityModels.Quality.LoggingConfig
 
@@ -319,17 +319,17 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             errors: MutableSequence[FlextQualityModels.Quality.LinkCheckResult] = Field(
                 default_factory=list
             )
-            warnings_list: MutableSequence[FlextQualityModels.Quality.LinkCheckResult] = Field(
-                default_factory=list
-            )
+            warnings_list: MutableSequence[
+                FlextQualityModels.Quality.LinkCheckResult
+            ] = Field(default_factory=list)
 
         class ContentValidatorResults(BaseModel):
             """Results for documentation content validation."""
 
             timestamp: str
             files_checked: int = 0
-            content_issues: MutableSequence[FlextQualityModels.Quality.ContentIssue] = Field(
-                default_factory=list
+            content_issues: MutableSequence[FlextQualityModels.Quality.ContentIssue] = (
+                Field(default_factory=list)
             )
             quality_metrics: MutableMapping[str, t.Scalar] = Field(default_factory=dict)
 
@@ -551,11 +551,9 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             timestamp: str
             files_processed: int = 0
             changes_made: int = 0
-            backups_created: MutableSequence[str] = Field(
-                default_factory=FlextQualityModels.Quality._empty_list_str
-            )
+            backups_created: MutableSequence[str] = Field(default_factory=list)
             optimizations: MutableSequence[MutableMapping[str, str]] = Field(
-                default_factory=FlextQualityModels.Quality._empty_list_dict_str_str
+                default_factory=list
             )
 
         class ExecutionRequest(BaseModel):
@@ -565,7 +563,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             runtime: str
             args: Annotated[
                 t.StrSequence,
-                Field(default_factory=FlextQualityModels.Quality._empty_list_str),
+                Field(default_factory=list),
             ]
             timeout_ms: int
 

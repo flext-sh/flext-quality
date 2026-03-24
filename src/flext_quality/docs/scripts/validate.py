@@ -15,7 +15,7 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -49,7 +49,7 @@ class LinkValidator:
 
     def find_all_links(self, doc_files: Sequence[Path]) -> Sequence[LinkRecord]:
         """Extract all links from documentation files."""
-        all_links: Sequence[LinkRecord] = []
+        all_links: MutableSequence[LinkRecord] = []
         for file_path in doc_files:
             file_rel_path = str(file_path)
             try:
@@ -345,7 +345,7 @@ class LinkValidator:
     ) -> LinkValidatorResults:
         """Validate anchor links within documents."""
         anchor_links = [link for link in links if link.type == "anchor"]
-        file_anchors: Mapping[str, set[str]] = {}
+        file_anchors: MutableMapping[str, set[str]] = {}
         for file_path in doc_files:
             file_rel_path = str(file_path)
             try:
@@ -493,7 +493,7 @@ class ContentValidator:
 
     def _check_markdown_issues(self, content: str) -> Sequence[ContentIssue]:
         """Check for markdown syntax issues."""
-        issues: Sequence[ContentIssue] = []
+        issues: MutableSequence[ContentIssue] = []
         lines = content.split("\n")
         for i, line in enumerate(lines, 1):
             if "[" in line and "]" in line and ("(" in line) and (")" not in line):
@@ -646,7 +646,7 @@ def _create_validation_parser() -> argparse.ArgumentParser:
 def _discover_validation_files() -> Sequence[Path]:
     """Discover documentation files for validation."""
     project_root = Path(__file__).parent.parent.parent.parent
-    doc_files: Sequence[Path] = []
+    doc_files: MutableSequence[Path] = []
     for pattern in [
         "**/*.md",
         "**/*.mdx",
@@ -656,7 +656,7 @@ def _discover_validation_files() -> Sequence[Path]:
     ]:
         doc_files.extend(project_root.glob(pattern))
     seen: set[Path] = set()
-    unique: Sequence[Path] = []
+    unique: MutableSequence[Path] = []
     for f in doc_files:
         if f not in seen:
             seen.add(f)

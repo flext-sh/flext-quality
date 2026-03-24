@@ -102,8 +102,14 @@ class DocumentationFinder:
 
         """
         self.project_root = project_root.resolve()
-        self.patterns: MutableSequence[str] = [v for v in patterns] if patterns else [v for v in self.DEFAULT_PATTERNS]
-        self.ignore_patterns: MutableSequence[str] = [v for v in ignore_patterns] if ignore_patterns else [v for v in self.DEFAULT_IGNORE_PATTERNS]
+        self.patterns: MutableSequence[str] = (
+            list(patterns) if patterns else list(self.DEFAULT_PATTERNS)
+        )
+        self.ignore_patterns: MutableSequence[str] = (
+            list(ignore_patterns)
+            if ignore_patterns
+            else list(self.DEFAULT_IGNORE_PATTERNS)
+        )
         self.ignore_file = ignore_file or ".gitignore"
 
         # Load ignore patterns from file if it exists
@@ -177,7 +183,7 @@ class DocumentationFinder:
 
         """
         if use_cache and self._file_cache is not None:
-            return [v for v in self._file_cache]
+            return list(self._file_cache)
 
         found_files: MutableSequence[Path] = []
 
@@ -210,10 +216,10 @@ class DocumentationFinder:
                 unique_files.append(file_path)
 
         # Sort by path for consistent ordering
-        unique_files.sort(key=str)
+        unique_files = sorted(unique_files, key=str)
 
         if use_cache:
-            self._file_cache = [v for v in unique_files]
+            self._file_cache = list(unique_files)
 
         return unique_files
 

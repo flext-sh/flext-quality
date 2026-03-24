@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import argparse
 import operator
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableSequence, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -132,7 +132,7 @@ class DocumentationDashboard:
         """Get quality trends over the specified number of days."""
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
 
-        trend_data: Sequence[Mapping[str, int | str]] = []
+        trend_data: MutableSequence[Mapping[str, int | str]] = []
         reports_dir = self.reports_dir
 
         # Find all audit reports
@@ -180,7 +180,7 @@ class DocumentationDashboard:
                 continue
 
         # Sort by date
-        trend_data.sort(key=operator.itemgetter("date"))
+        trend_data = sorted(trend_data, key=operator.itemgetter("date"))
 
         return {
             "period_days": days,
@@ -190,7 +190,7 @@ class DocumentationDashboard:
 
     def get_recent_reports(self, limit: int = 10) -> Sequence[Mapping[str, int | str]]:
         """Get list of recent audit reports."""
-        reports: Sequence[Mapping[str, int | str]] = []
+        reports: MutableSequence[Mapping[str, int | str]] = []
 
         for report_file in self.reports_dir.glob("audit_report_*.json"):
             try:
@@ -223,7 +223,7 @@ class DocumentationDashboard:
                 continue
 
         # Sort by date descending and limit
-        reports.sort(key=operator.itemgetter("date"), reverse=True)
+        reports = sorted(reports, key=operator.itemgetter("date"), reverse=True)
         return reports[:limit]
 
     def get_dashboard_html(self) -> str:

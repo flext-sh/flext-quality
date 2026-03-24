@@ -11,7 +11,7 @@ import asyncio
 import pathlib
 import re
 import time
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableSequence, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
 from typing import TypedDict
@@ -89,8 +89,8 @@ class ResultsDict(TypedDict):
     valid_links: int
     broken_links: int
     warnings: int
-    errors: Sequence[LinkResultDict]
-    warnings_list: Sequence[t.ContainerMapping]
+    errors: MutableSequence[LinkResultDict]
+    warnings_list: MutableSequence[t.ContainerMapping]
     performance: PerformanceMetricsDict
 
 
@@ -158,7 +158,7 @@ class LinkChecker:
         self, file_paths: Sequence[pathlib.Path]
     ) -> Sequence[LinkInfoDict]:
         """Extract all links from the given files."""
-        all_links: Sequence[LinkInfoDict] = []
+        all_links: MutableSequence[LinkInfoDict] = []
 
         for file_path in file_paths:
             try:
@@ -383,7 +383,7 @@ class LinkChecker:
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        processed_results: Sequence[LinkResultDict] = []
+        processed_results: MutableSequence[LinkResultDict] = []
         for result in results:
             if isinstance(result, BaseException):
                 processed_results.append(
@@ -399,7 +399,7 @@ class LinkChecker:
 
         self.results["performance"]["total_time"] = time.time() - start_time
 
-        valid_times: Sequence[float] = []
+        valid_times: MutableSequence[float] = []
         for r in processed_results:
             response_time = r.get("response_time")
             if response_time is not None and r.get("valid"):
@@ -433,7 +433,7 @@ class LinkChecker:
 
         self.results["performance"]["total_time"] = time.time() - start_time
 
-        valid_times: Sequence[float] = []
+        valid_times: MutableSequence[float] = []
         for r in results:
             response_time = r.get("response_time")
             if response_time is not None and r.get("valid"):
@@ -500,14 +500,14 @@ class LinkChecker:
         self, links: Sequence[t.ContainerMapping]
     ) -> Sequence[t.ContainerMapping]:
         """Special validation for GitHub links."""
-        github_links: Sequence[t.ContainerMapping] = []
+        github_links: MutableSequence[t.ContainerMapping] = []
         for link in links:
             url_raw = link.get("url")
             url_obj: str | None = url_raw if isinstance(url_raw, str) else None
             if isinstance(url_obj, str) and "github.com" in url_obj:
                 github_links.append(link)
 
-        validated_links: Sequence[Mapping[str, bool | t.NormalizedValue]] = []
+        validated_links: MutableSequence[Mapping[str, bool | t.NormalizedValue]] = []
 
         for link in github_links:
             url_candidate = link.get("url")

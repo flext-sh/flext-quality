@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import shutil
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableSequence, Sequence
 from typing import final
 
 from flext_core import r
@@ -110,7 +110,7 @@ class FlextQualityMcpClient:
         except ValueError:
             try:
                 parsed_list = TypeAdapter(t.ContainerList).validate_json(output)
-                coerced_data: Sequence[t.StrMapping] = []
+                coerced_data: MutableSequence[t.StrMapping] = []
                 for item in parsed_list:
                     if isinstance(item, Mapping):
                         validated_item = TypeAdapter(

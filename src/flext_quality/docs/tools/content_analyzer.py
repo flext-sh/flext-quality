@@ -64,8 +64,8 @@ class StructureDict(TypedDict, total=False):
     has_table_of_contents: bool
     toc_position: int
     heading_hierarchy_valid: bool
-    sections: Sequence[Mapping[str, int | str]]
-    depth_analysis: Mapping[str, int | float]
+    sections: MutableSequence[Mapping[str, int | str]]
+    depth_analysis: MutableMapping[str, int | float]
 
 
 class CompletenessDict(TypedDict, total=False):
@@ -537,11 +537,11 @@ class ContentAnalyzer:
         self,
         content: str,
         required_sections: t.StrSequence,
-    ) -> Mapping[str, t.StrSequence]:
+    ) -> MutableMapping[str, MutableSequence[str]]:
         """Check for required sections in content."""
-        required_present: t.StrSequence = []
-        missing_required: t.StrSequence = []
-        result: Mapping[str, t.StrSequence] = {
+        required_present: MutableSequence[str] = []
+        missing_required: MutableSequence[str] = []
+        result: MutableMapping[str, MutableSequence[str]] = {
             "required_sections_present": required_present,
             "missing_required_sections": missing_required,
         }
@@ -611,9 +611,9 @@ class ContentAnalyzer:
 
         return max(0.0, min(100.0, score))
 
-    def _identify_issues(self, analysis: AnalysisDict) -> Sequence[IssueDict]:
+    def _identify_issues(self, analysis: AnalysisDict) -> MutableSequence[IssueDict]:
         """Identify content issues that need attention."""
-        issues: Sequence[IssueDict] = []
+        issues: MutableSequence[IssueDict] = []
 
         metrics = analysis.get("metrics", {})
         readability = analysis.get("readability", {})
@@ -664,9 +664,9 @@ class ContentAnalyzer:
 
         return issues
 
-    def _generate_suggestions(self, analysis: AnalysisDict) -> t.StrSequence:
+    def _generate_suggestions(self, analysis: AnalysisDict) -> MutableSequence[str]:
         """Generate improvement suggestions based on analysis."""
-        suggestions: t.StrSequence = []
+        suggestions: MutableSequence[str] = []
 
         metrics = analysis.get("metrics", {})
         readability = analysis.get("readability", {})
@@ -744,7 +744,7 @@ class ContentAnalyzer:
                 ],
             })
 
-        all_issues: Sequence[t.StrMapping] = []
+        all_issues: MutableSequence[t.StrMapping] = []
         for result_value in self.results.values():
             if isinstance(result_value, dict):
                 issues_val: Sequence[t.StrMapping] | None = result_value.get("issues")

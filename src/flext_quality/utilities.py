@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
-from collections.abc import Mapping, Sequence
+from collections.abc import MutableMapping, Sequence
 from pathlib import Path
 
 import yaml
@@ -30,13 +30,13 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
             blocked_reason: str | None = None,
         ) -> str:
             """Format hook output JSON."""
-            output: Mapping[str, str | bool | None] = {"continue": continue_exec}
+            output: MutableMapping[str, str | bool | None] = {"continue": continue_exec}
             if message:
                 output["systemMessage"] = message
             if blocked_reason:
                 output["blockedReason"] = blocked_reason
             return (
-                TypeAdapter(Mapping[str, str | bool | None])
+                TypeAdapter(MutableMapping[str, str | bool | None])
                 .dump_json(output)
                 .decode("utf-8")
             )

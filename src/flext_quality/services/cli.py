@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from collections.abc import Sequence
+from collections.abc import MutableSequence
 from pathlib import Path
 from typing import final
 
@@ -30,29 +30,33 @@ class FlextQualityCliService:
         self._quality = FlextQuality.get_instance()
         self._executor = FlextQualityCodeExecutionBridge()
 
-    def build_check_commands(self, target_path: Path) -> r[Sequence[t.StrSequence]]:
+    def build_check_commands(
+        self, target_path: Path
+    ) -> r[MutableSequence[t.StrSequence]]:
         """Build commands for quick check (lint + type)."""
-        commands: Sequence[t.StrSequence] = []
+        commands: MutableSequence[t.StrSequence] = []
         lint_result = self._executor.build_ruff_command(target_path)
         if lint_result.is_failure:
-            return r[Sequence[t.StrSequence]].fail(lint_result.error)
+            return r[MutableSequence[t.StrSequence]].fail(lint_result.error)
         commands.append(lint_result.value)
         type_result = self._executor.build_basedpyright_command(target_path)
         if type_result.is_failure:
-            return r[Sequence[t.StrSequence]].fail(type_result.error)
+            return r[MutableSequence[t.StrSequence]].fail(type_result.error)
         commands.append(type_result.value)
-        return r[Sequence[t.StrSequence]].ok(commands)
+        return r[MutableSequence[t.StrSequence]].ok(commands)
 
-    def build_validate_commands(self, target_path: Path) -> r[Sequence[t.StrSequence]]:
+    def build_validate_commands(
+        self, target_path: Path
+    ) -> r[MutableSequence[t.StrSequence]]:
         """Build commands for full validation."""
-        commands: Sequence[t.StrSequence] = []
+        commands: MutableSequence[t.StrSequence] = []
         lint_result = self._executor.build_ruff_command(target_path)
         if lint_result.is_failure:
-            return r[Sequence[t.StrSequence]].fail(lint_result.error)
+            return r[MutableSequence[t.StrSequence]].fail(lint_result.error)
         commands.append(lint_result.value)
         type_result = self._executor.build_basedpyright_command(target_path)
         if type_result.is_failure:
-            return r[Sequence[t.StrSequence]].fail(type_result.error)
+            return r[MutableSequence[t.StrSequence]].fail(type_result.error)
         commands.append(type_result.value)
         src_path = (
             target_path / "src" if (target_path / "src").exists() else target_path
@@ -69,7 +73,7 @@ class FlextQualityCliService:
             ],
             ["python", "-m", "coverage", "report"],
         ])
-        return r[Sequence[t.StrSequence]].ok(commands)
+        return r[MutableSequence[t.StrSequence]].ok(commands)
 
     def display_status(self) -> r[t.ContainerMapping]:
         """Display quality service status."""
