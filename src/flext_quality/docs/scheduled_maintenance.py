@@ -587,7 +587,7 @@ class FlextQualityScheduledMaintenance:
 
         try:
             message = " ".join(cmd_parts[1:]) if len(cmd_parts) > 1 else ""
-            print(message)
+            print(message)  # CLI output
             return True
         except (OSError, ValueError) as e:
             _ = self.results.errors.append(

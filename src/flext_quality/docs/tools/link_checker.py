@@ -18,6 +18,7 @@ from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
 
 import requests
+import structlog
 from aiohttp import ClientError, ClientSession, ClientTimeout
 from pydantic import BaseModel, TypeAdapter
 
@@ -182,7 +183,7 @@ class FlextQualityLinkChecker:
                 UnicodeDecodeError,
                 OSError,
             ) as e:
-                print(f"Warning: Failed to extract links from {file_path}: {e}")
+                structlog.get_logger().warning("failed_to_extract_links", file_path=str(file_path), error=str(e))
 
         return all_links
 
