@@ -44,10 +44,10 @@ class TestFlextQualityAPI:
         quality = FlextQuality.get_instance()
         status = quality.get_status()
         tm.that(isinstance(status, dict), eq=True)
-        tm.that("name" in status, eq=True)
-        tm.that("version" in status, eq=True)
-        tm.that("config" in status, eq=True)
-        tm.that("hooks_registered" in status, eq=True)
+        tm.that(status, has="name")
+        tm.that(status, has="version")
+        tm.that(status, has="config")
+        tm.that(status, has="hooks_registered")
 
     def test_validate_configuration_succeeds(self) -> None:
         """Test that validate_configuration returns success."""
@@ -60,14 +60,14 @@ class TestFlextQualityAPI:
         """Test format_hook_output with continue=True."""
         quality = FlextQuality.get_instance()
         output = quality.format_hook_output(continue_exec=True)
-        tm.that('"continue":true' in output, eq=True)
+        tm.that(output, has='"continue":true')
 
     def test_format_hook_output_with_message(self) -> None:
         """Test format_hook_output with message."""
         quality = FlextQuality.get_instance()
         output = quality.format_hook_output(continue_exec=True, message="Test message")
-        tm.that('"continue":true' in output, eq=True)
-        tm.that("Test message" in output, eq=True)
+        tm.that(output, has='"continue":true')
+        tm.that(output, has="Test message")
 
     def test_format_hook_output_blocked(self) -> None:
         """Test format_hook_output with blocked reason."""
@@ -75,14 +75,14 @@ class TestFlextQualityAPI:
         output = quality.format_hook_output(
             continue_exec=False, blocked_reason="Blocked for testing"
         )
-        tm.that('"continue":false' in output, eq=True)
+        tm.that(output, has='"continue":false')
 
     def test_get_hook_config_json(self) -> None:
         """Test get_hook_config_json returns valid JSON."""
         quality = FlextQuality.get_instance()
         config_json = quality.get_hook_config_json()
         tm.that(isinstance(config_json, str), eq=True)
-        tm.that(config_json == "{}", eq=True)
+        tm.that(config_json, eq="{}")
 
     def test_load_rules_from_config_with_no_rules_dir(self) -> None:
         """Test load_rules_from_config when rules dir doesn't exist."""
@@ -102,8 +102,8 @@ class TestFlextQualityAPI:
         try:
             result = quality.load_rules(rules_path)
             tm.that(result.is_success, eq=True)
-            tm.that(len(result.value) == 1, eq=True)
-            tm.that(result.value[0].name == "test-rule", eq=True)
+            tm.that(len(result.value), eq=1)
+            tm.that(result.value[0].name, eq="test-rule")
         finally:
             rules_path.unlink()
 
@@ -112,7 +112,7 @@ class TestFlextQualityAPI:
         quality = FlextQuality.get_instance()
         result = quality.load_rules(Path("/nonexistent/rules.yaml"))
         tm.that(result.is_failure, eq=True)
-        tm.that("not found" in (result.error or "").lower(), eq=True)
+        tm.that((result.error or "").lower(), has="not found")
 
 
 class TestFlextQualityHookExecution:
@@ -131,7 +131,7 @@ class TestFlextQualityHookExecution:
         quality = FlextQuality.get_instance()
         result = quality.execute_hook("UnknownEvent", {})
         tm.that(result.is_failure, eq=True)
-        tm.that("Unknown event" in (result.error or ""), eq=True)
+        tm.that((result.error or ""), has="Unknown event")
 
     def test_execute_hook_valid_event_no_hooks(self) -> None:
         """Test execute_hook succeeds with no registered hooks."""
@@ -169,8 +169,8 @@ class TestFlextQualitySingleton:
             t.start()
         for t in threads:
             t.join()
-        tm.that(not errors, eq=True)
-        tm.that(len(instances) == 10, eq=True)
+        tm.that(errors, eq=False)
+        tm.that(len(instances), eq=10)
         tm.that(all(i is instances[0] for i in instances), eq=True)
 
 
@@ -193,7 +193,7 @@ class TestFlextQualityRulesConfig:
         result = quality.load_rules_from_config()
         quality.config.rules_dir = original_dir
         tm.that(result.is_failure, eq=True)
-        tm.that("not found" in (result.error or "").lower(), eq=True)
+        tm.that((result.error or "").lower(), has="not found")
 
     def test_load_rules_from_config_with_multiple_files(self) -> None:
         """Test load_rules_from_config loads multiple YAML files."""
@@ -211,7 +211,7 @@ class TestFlextQualityRulesConfig:
             result = quality.load_rules_from_config()
             quality.config.rules_dir = original_dir
             tm.that(result.is_success, eq=True)
-            tm.that(len(result.value) == 2, eq=True)
+            tm.that(len(result.value), eq=2)
 
 
 class TestFlextQualityStdinProcessing:
@@ -275,7 +275,7 @@ class TestFlextQualityStdinProcessing:
         try:
             result = quality.process_stdin_hook()
             tm.that(result.is_failure, eq=True)
-            tm.that("Unknown event" in (result.error or ""), eq=True)
+            tm.that((result.error or ""), has="Unknown event")
         finally:
             sys.stdin = original_stdin
 
@@ -302,4 +302,4 @@ class TestFlextQualityValidation:
         quality.config.max_function_length = original_function
         quality.config.max_class_length = original_class
         tm.that(result.is_failure, eq=True)
-        tm.that("max_function_length" in (result.error or "").lower(), eq=True)
+        tm.that((result.error or "").lower(), has="max_function_length")
