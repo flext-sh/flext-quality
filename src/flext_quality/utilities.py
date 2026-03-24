@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import subprocess
 import sys
 from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
@@ -10,6 +9,7 @@ from pathlib import Path
 import yaml
 from flext_cli import FlextCliUtilities
 from flext_core import r
+from flext_infra import FlextInfraUtilitiesSubprocess
 from flext_web import FlextWebUtilities
 from pydantic import TypeAdapter
 
@@ -109,30 +109,17 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
             timeout_ms: int = c.Quality.Defaults.HOOK_TIMEOUT_MS,
         ) -> r[str]:
             """Run a shell command with timeout."""
-            try:
-                # Intentional subprocess usage: Quality validation command execution
-                result = subprocess.run(
-                    cmd,
-                    capture_output=True,
-                    text=True,
-                    timeout=timeout_ms / c.Quality.Defaults.MS_TO_SECONDS_DIVISOR,
-                    check=False,
-                )
-                if result.returncode != 0:
-                    return r[str].fail(f"Command failed: {result.stderr}")
-                return r[str].ok(result.stdout)
-            except subprocess.TimeoutExpired:
-                return r[str].fail(f"Command timed out after {timeout_ms}ms")
-            except (
-                ValueError,
-                TypeError,
-                KeyError,
-                AttributeError,
-                OSError,
-                RuntimeError,
-                ImportError,
-            ) as e:
-                return r[str].fail(f"Command error: {e}")
+            timeout_secs = int(timeout_ms / c.Quality.Defaults.MS_TO_SECONDS_DIVISOR)
+            cmd_result = FlextInfraUtilitiesSubprocess.run_raw(
+                list(cmd),
+                timeout=timeout_secs,
+            )
+            if cmd_result.is_failure:
+                return r[str].fail(str(cmd_result.failure()))
+            out = cmd_result.value
+            if out.exit_code != 0:
+                return r[str].fail(f"Command failed: {out.stderr}")
+            return r[str].ok(out.stdout)
 
 
 u = FlextQualityUtilities
