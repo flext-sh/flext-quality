@@ -15,7 +15,7 @@ import argparse
 import logging
 import re
 import shutil
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -45,9 +45,7 @@ class DocumentationOptimizer:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.results = OptimizerResults(timestamp=datetime.now(UTC).isoformat())
 
-    def optimize_formatting(
-        self, doc_files: Sequence[Path]
-    ) -> Mapping[str, t.NormalizedValue]:
+    def optimize_formatting(self, doc_files: Sequence[Path]) -> t.ContainerMapping:
         """Fix common formatting issues."""
         for file_path in doc_files:
             try:
@@ -99,9 +97,7 @@ class DocumentationOptimizer:
         """Normalize emphasis style (prefer * over _ for consistency)."""
         return content
 
-    def update_table_of_contents(
-        self, doc_files: Sequence[Path]
-    ) -> Mapping[str, t.NormalizedValue]:
+    def update_table_of_contents(self, doc_files: Sequence[Path]) -> t.ContainerMapping:
         """Update or add table of contents for long documents."""
         for file_path in doc_files:
             try:
@@ -191,9 +187,7 @@ class DocumentationOptimizer:
         anchor = re.sub(r"[^\\w\\s-]", "", anchor)
         return re.sub(r"\\s+", "-", anchor)
 
-    def enhance_accessibility(
-        self, doc_files: Sequence[Path]
-    ) -> Mapping[str, t.NormalizedValue]:
+    def enhance_accessibility(self, doc_files: Sequence[Path]) -> t.ContainerMapping:
         """Enhance accessibility of documentation."""
         for file_path in doc_files:
             try:
@@ -247,7 +241,7 @@ class DocumentationOptimizer:
 
     def optimize_content_structure(
         self, doc_files: Sequence[Path]
-    ) -> Mapping[str, t.NormalizedValue]:
+    ) -> t.ContainerMapping:
         """Optimize content structure and readability."""
         for file_path in doc_files:
             try:
@@ -299,9 +293,7 @@ class DocumentationOptimizer:
                 enhanced_lines.extend(("", "---", ""))
         return "\n".join(enhanced_lines)
 
-    def update_metadata(
-        self, doc_files: Sequence[Path]
-    ) -> Mapping[str, t.NormalizedValue]:
+    def update_metadata(self, doc_files: Sequence[Path]) -> t.ContainerMapping:
         """Update frontmatter metadata and timestamps."""
         for file_path in doc_files:
             try:
@@ -351,9 +343,9 @@ class DocumentationOptimizer:
                 try:
                     frontmatter_lines = lines[1 : end_idx - 1]
                     frontmatter_content = "\n".join(frontmatter_lines)
-                    metadata = TypeAdapter(
-                        Mapping[str, t.NormalizedValue]
-                    ).validate_python(yaml.safe_load(frontmatter_content) or {})
+                    metadata = TypeAdapter(t.ContainerMapping).validate_python(
+                        yaml.safe_load(frontmatter_content) or {}
+                    )
                     metadata["updated"] = datetime.now(UTC).strftime("%Y-%m-%d")
                     new_frontmatter = yaml.dump(
                         metadata, default_flow_style=False

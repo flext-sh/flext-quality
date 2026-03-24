@@ -42,7 +42,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
             )
 
         @staticmethod
-        def load_yaml_rules(path: Path) -> r[Sequence[Mapping[str, t.NormalizedValue]]]:
+        def load_yaml_rules(path: Path) -> r[Sequence[t.ContainerMapping]]:
             """Load rules from YAML file."""
             try:
                 with path.open(encoding="utf-8") as f:
@@ -51,19 +51,19 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                     case dict() as parsed_dict:
                         raw_rules = parsed_dict.get("rules", [])
                     case _:
-                        return r[Sequence[Mapping[str, t.NormalizedValue]]].fail(
+                        return r[Sequence[t.ContainerMapping]].fail(
                             "Expected YAML dict",
                         )
                 match raw_rules:
                     case list() as rules_list:
-                        rules: Sequence[Mapping[str, t.NormalizedValue]] = [
+                        rules: Sequence[t.ContainerMapping] = [
                             item for item in rules_list if isinstance(item, dict)
                         ]
                     case _:
-                        return r[Sequence[Mapping[str, t.NormalizedValue]]].fail(
+                        return r[Sequence[t.ContainerMapping]].fail(
                             "Expected rules list",
                         )
-                return r[Sequence[Mapping[str, t.NormalizedValue]]].ok(rules)
+                return r[Sequence[t.ContainerMapping]].ok(rules)
             except (
                 ValueError,
                 TypeError,
@@ -73,7 +73,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                 RuntimeError,
                 ImportError,
             ) as e:
-                return r[Sequence[Mapping[str, t.NormalizedValue]]].fail(
+                return r[Sequence[t.ContainerMapping]].fail(
                     f"Failed to load rules: {e}",
                 )
 
@@ -81,7 +81,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
         def parse_hook_input(raw: str) -> r[t.Quality.HookInput]:
             """Parse hook input JSON."""
             try:
-                parsed = TypeAdapter(Mapping[str, t.NormalizedValue]).validate_json(raw)
+                parsed = TypeAdapter(t.ContainerMapping).validate_json(raw)
                 coerced_input: t.Quality.HookInput = parsed
                 return r[t.Quality.HookInput].ok(coerced_input)
             except ValueError as e:

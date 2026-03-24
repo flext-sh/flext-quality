@@ -169,7 +169,7 @@ class TestFlextQualitySingleton:
             t.start()
         for t in threads:
             t.join()
-        tm.that(errors, eq=False)
+        tm.that(not errors, eq=True)
         tm.that(len(instances), eq=10)
         tm.that(all(i is instances[0] for i in instances), eq=True)
 

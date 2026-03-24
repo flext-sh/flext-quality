@@ -16,12 +16,12 @@ from flask import Flask, Response, render_template_string, request
 from flext_core import FlextLogger, t
 from pydantic import ConfigDict, TypeAdapter
 
-_DICT_ADAPTER: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
-    Mapping[str, t.NormalizedValue],
+_DICT_ADAPTER: TypeAdapter[t.ContainerMapping] = TypeAdapter(
+    t.ContainerMapping,
     config=ConfigDict(strict=False),
 )
-_LIST_ADAPTER: TypeAdapter[Sequence[Mapping[str, t.NormalizedValue]]] = TypeAdapter(
-    Sequence[Mapping[str, t.NormalizedValue]],
+_LIST_ADAPTER: TypeAdapter[Sequence[t.ContainerMapping]] = TypeAdapter(
+    Sequence[t.ContainerMapping],
     config=ConfigDict(strict=False),
 )
 

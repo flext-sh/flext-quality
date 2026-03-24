@@ -137,7 +137,7 @@ class ScheduledMaintenance:
     def _merge_config(
         self,
         base: MaintenanceConfig,
-        overrides: Mapping[str, t.NormalizedValue],
+        overrides: t.ContainerMapping,
     ) -> MaintenanceConfig:
         """Merge external config mapping into default typed config."""
         merged = base.model_dump()

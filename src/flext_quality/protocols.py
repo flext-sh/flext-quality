@@ -32,7 +32,7 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
                 self,
                 content: str,
                 file_path: Path | None = None,
-            ) -> r[Sequence[Mapping[str, t.NormalizedValue]]]:
+            ) -> r[Sequence[t.ContainerMapping]]:
                 """Validate content and return violations."""
                 ...
 
@@ -95,7 +95,7 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
             def validate(
                 self,
                 config: t.Quality.RuleConfig,
-                context: Mapping[str, t.NormalizedValue],
+                context: t.ContainerMapping,
             ) -> r[t.Quality.RuleResult]:
                 """Validate according to rule."""
                 ...
@@ -123,8 +123,8 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
 
             def execute(
                 self,
-                params: Mapping[str, t.NormalizedValue],
-            ) -> r[Mapping[str, t.NormalizedValue]]:
+                params: t.ContainerMapping,
+            ) -> r[t.ContainerMapping]:
                 """Execute MCP tool."""
                 ...
 

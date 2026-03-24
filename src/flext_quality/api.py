@@ -11,7 +11,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import threading
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 from typing import ClassVar
 
@@ -140,11 +140,11 @@ class FlextQuality:
         """Get hooks configuration as JSON string."""
         return self.hooks.get_config_json()
 
-    def get_status(self) -> Mapping[str, t.NormalizedValue]:
+    def get_status(self) -> t.ContainerMapping:
         """Get quality service status.
 
         Returns:
-            Mapping[str, t.NormalizedValue]: Status information
+            t.ContainerMapping: Status information
 
         """
         return {

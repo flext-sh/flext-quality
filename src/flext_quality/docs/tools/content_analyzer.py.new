@@ -121,7 +121,7 @@ class _ResultsDict(TypedDict):
     recommendations: Sequence[_RecommendationDict | str]
 
 
-_SubDict = Mapping[str, t.NormalizedValue]
+_SubDict = t.ContainerMapping
 
 
 class ContentAnalyzer:
@@ -255,7 +255,7 @@ class ContentAnalyzer:
     def _calculate_content_metrics(
         self,
         content: str,
-    ) -> Mapping[str, t.NormalizedValue]:
+    ) -> t.ContainerMapping:
         """Calculate basic content metrics."""
         # Word analysis
         words = re.findall(r"\b\w+\b", content)
@@ -320,7 +320,7 @@ class ContentAnalyzer:
             "code_to_content_ratio": code_lines / total_lines if total_lines > 0 else 0,
         }
 
-    def _analyze_readability(self, content: str) -> Mapping[str, t.NormalizedValue]:
+    def _analyze_readability(self, content: str) -> t.ContainerMapping:
         """Analyze content readability using various metrics."""
         words = re.findall(r"\b\w+\b", content)
         sentences = re.split(r"[.!?]+", content)
@@ -392,11 +392,11 @@ class ContentAnalyzer:
 
         return count
 
-    def _analyze_structure(self, content: str) -> Mapping[str, t.NormalizedValue]:
+    def _analyze_structure(self, content: str) -> t.ContainerMapping:
         """Analyze document structure and organization."""
         sections_list: Sequence[Mapping[str, int | str]] = []
-        depth_analysis_dict: Mapping[str, t.NormalizedValue] = {}
-        structure: Mapping[str, t.NormalizedValue] = {
+        depth_analysis_dict: t.ContainerMapping = {}
+        structure: t.ContainerMapping = {
             "has_table_of_contents": False,
             "toc_position": 0,
             "heading_hierarchy_valid": True,
@@ -453,7 +453,7 @@ class ContentAnalyzer:
         self,
         content: str,
         filename: str,
-    ) -> Mapping[str, t.NormalizedValue]:
+    ) -> t.ContainerMapping:
         """Check documentation completeness based on file type and content."""
         missing_elems: Sequence[str] = []
         required_present: Sequence[str] = []
@@ -527,7 +527,7 @@ class ContentAnalyzer:
         self,
         content: str,
         required_sections: Sequence[str],
-    ) -> Mapping[str, t.NormalizedValue]:
+    ) -> t.ContainerMapping:
         """Check for required sections in content."""
         required_present: Sequence[str] = []
         missing_required: list = []
@@ -559,7 +559,7 @@ class ContentAnalyzer:
 
     def _calculate_quality_score(
         self,
-        analysis: Mapping[str, t.NormalizedValue],
+        analysis: t.ContainerMapping,
     ) -> float:
         """Calculate overall quality score for the content."""
         score = 100.0
@@ -597,7 +597,7 @@ class ContentAnalyzer:
 
         return max(0.0, min(100.0, score))
 
-    def _identify_issues(self, analysis: Mapping[str, t.NormalizedValue]) -> list:
+    def _identify_issues(self, analysis: t.ContainerMapping) -> list:
         """Identify content issues that need attention."""
         issues: Sequence[Mapping[str, str]] = []
 
@@ -649,7 +649,7 @@ class ContentAnalyzer:
 
         return issues
 
-    def _generate_suggestions(self, analysis: Mapping[str, t.NormalizedValue]) -> list:
+    def _generate_suggestions(self, analysis: t.ContainerMapping) -> list:
         """Generate improvement suggestions based on analysis."""
         suggestions: Sequence[str] = []
 
@@ -686,7 +686,7 @@ class ContentAnalyzer:
 
         return suggestions
 
-    def analyze_files_batch(self, file_paths: Sequence[Path]) -> Mapping[str, t.NormalizedValue]:
+    def analyze_files_batch(self, file_paths: Sequence[Path]) -> t.ContainerMapping:
         """Analyze multiple files and aggregate results."""
         for file_path in file_paths:
             self.analyze_file(file_path)
@@ -698,7 +698,7 @@ class ContentAnalyzer:
 
     def _generate_overall_recommendations(self) -> None:
         """Generate overall recommendations based on batch analysis."""
-        content_scores = cast("Mapping[str, t.NormalizedValue]", self.results["content_scores"])
+        content_scores = cast("t.ContainerMapping", self.results["content_scores"])
         if not content_scores:
             return
 
@@ -753,7 +753,7 @@ class ContentAnalyzer:
 
     def _generate_summary_report(self) -> str:
         """Generate human-readable summary report."""
-        content_scores = cast("Mapping[str, t.NormalizedValue]", self.results["content_scores"])
+        content_scores = cast("t.ContainerMapping", self.results["content_scores"])
         if not content_scores:
             return "No content analysis results available."
 
@@ -811,7 +811,7 @@ Top Recommendations:
 def analyze_file_content(
     file_path: str,
     config_path: str | None = None,
-) -> Mapping[str, t.NormalizedValue]:
+) -> t.ContainerMapping:
     """Convenience function to analyze a single file."""
     analyzer = ContentAnalyzer(config_path)
     return analyzer.analyze_file(Path(file_path))
@@ -820,7 +820,7 @@ def analyze_file_content(
 def analyze_files_content(
     file_paths: Sequence[str],
     config_path: str | None = None,
-) -> Mapping[str, t.NormalizedValue]:
+) -> t.ContainerMapping:
     """Convenience function to analyze multiple files."""
     analyzer = ContentAnalyzer(config_path)
     paths = [Path(fp) for fp in file_paths]

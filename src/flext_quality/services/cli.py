@@ -10,7 +10,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 from typing import final
 
@@ -71,10 +71,10 @@ class FlextQualityCliService:
         ])
         return r[Sequence[Sequence[str]]].ok(commands)
 
-    def display_status(self) -> r[Mapping[str, t.NormalizedValue]]:
+    def display_status(self) -> r[t.ContainerMapping]:
         """Display quality service status."""
         status = self._quality.get_status()
-        return r[Mapping[str, t.NormalizedValue]].ok(status)
+        return r[t.ContainerMapping].ok(status)
 
 
 class _CommandHandlers:

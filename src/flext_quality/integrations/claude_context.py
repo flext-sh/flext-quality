@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from typing import final
 
 from flext_core import r
@@ -39,7 +39,7 @@ class FlextQualityClaudeContextClient:
 
     def build_index_call(self, path: str | None = None) -> r[McpToolCall]:
         """Build an index_codebase tool call."""
-        params: Mapping[str, t.NormalizedValue] = {}
+        params: t.ContainerMapping = {}
         if path:
             params["path"] = path
         return self._mcp.build_tool_call(self.SERVER_NAME, "index_codebase", params)
@@ -78,6 +78,6 @@ class FlextQualityClaudeContextClient:
             self._mcp.build_call_command,
         )
 
-    def health_check(self) -> r[Mapping[str, t.NormalizedValue]]:
+    def health_check(self) -> r[t.ContainerMapping]:
         """Check if claude-context is available."""
         return build_mcp_health_result(self.SERVER_NAME, self._mcp)

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 
 import yaml
@@ -80,7 +80,7 @@ class FlextQualityRulesLoader:
 
     def _parse_rule(
         self,
-        data: Mapping[str, t.NormalizedValue],
+        data: t.ContainerMapping,
         index: int,
     ) -> r[m.Quality.RuleDefinition]:
         """Parse a single rule from dict."""

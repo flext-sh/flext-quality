@@ -185,12 +185,9 @@ class ContentAnalyzer:
             return
         try:
             with Path(config_path).open(encoding="utf-8") as f:
-                loaded: (
-                    Mapping[str, t.NormalizedValue]
-                    | Sequence[t.NormalizedValue]
-                    | str
-                    | None
-                ) = yaml.safe_load(f)
+                loaded: t.ContainerMapping | t.ContainerList | str | None = (
+                    yaml.safe_load(f)
+                )
                 if isinstance(loaded, dict):
                     config_loaded: Mapping[
                         str, Mapping[str, bool] | Mapping[str, int] | str

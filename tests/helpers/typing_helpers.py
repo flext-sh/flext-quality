@@ -20,7 +20,7 @@ from flext_core import t
 def assert_is_dict(
     value: t.Scalar | Mapping[str, t.Scalar],
 ) -> TypeIs[Mapping[str, t.Scalar]]:
-    """Type-safe Mapping[str, t.NormalizedValue] assertion following Single Responsibility Principle.
+    """Type-safe t.ContainerMapping assertion following Single Responsibility Principle.
 
     Args:
       value: Object to check
@@ -64,7 +64,7 @@ def safe_dict_access(data: Mapping[str, t.Scalar], key: str) -> t.Scalar:
       Value from dict
 
     Raises:
-      AssertionError: If data is not a Mapping[str, t.NormalizedValue] or key missing
+      AssertionError: If data is not a t.ContainerMapping or key missing
 
     """
     assert key in data, f"Key '{key}' not found in dict"

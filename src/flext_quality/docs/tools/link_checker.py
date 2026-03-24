@@ -52,7 +52,7 @@ class LinkInfoDict(LinkInfoDictRequired, total=False):
 
     line: int
     reference: str
-    context: Mapping[str, t.NormalizedValue]
+    context: t.ContainerMapping
 
 
 class LinkResultDictRequired(TypedDict):
@@ -60,7 +60,7 @@ class LinkResultDictRequired(TypedDict):
 
     url: str
     valid: bool
-    context: Mapping[str, t.NormalizedValue]
+    context: t.ContainerMapping
 
 
 class LinkResultDict(LinkResultDictRequired, total=False):
@@ -90,7 +90,7 @@ class ResultsDict(TypedDict):
     broken_links: int
     warnings: int
     errors: Sequence[LinkResultDict]
-    warnings_list: Sequence[Mapping[str, t.NormalizedValue]]
+    warnings_list: Sequence[t.ContainerMapping]
     performance: PerformanceMetricsDict
 
 
@@ -113,7 +113,7 @@ class LinkChecker:
         self.config: LinkConfigDict = self._get_default_config()
         self.load_config(config_path)
         self.session: _AsyncSession | None = None
-        self.cache: Mapping[str, t.NormalizedValue] = {}
+        self.cache: t.ContainerMapping = {}
         self.results: ResultsDict = {
             "total_links": 0,
             "valid_links": 0,
@@ -219,7 +219,7 @@ class LinkChecker:
     async def check_link_async(
         self,
         url: str,
-        context: Mapping[str, t.NormalizedValue] | None = None,
+        context: t.ContainerMapping | None = None,
     ) -> LinkResultDict:
         """Asynchronously check a single link."""
         start_time = time.time()
@@ -293,7 +293,7 @@ class LinkChecker:
     def check_link_sync(
         self,
         url: str,
-        context: Mapping[str, t.NormalizedValue] | None = None,
+        context: t.ContainerMapping | None = None,
     ) -> LinkResultDict:
         """Synchronously check a single link (fallback method)."""
         start_time = time.time()
@@ -497,10 +497,10 @@ class LinkChecker:
             return True
 
     def validate_github_links(
-        self, links: Sequence[Mapping[str, t.NormalizedValue]]
-    ) -> Sequence[Mapping[str, t.NormalizedValue]]:
+        self, links: Sequence[t.ContainerMapping]
+    ) -> Sequence[t.ContainerMapping]:
         """Special validation for GitHub links."""
-        github_links: Sequence[Mapping[str, t.NormalizedValue]] = []
+        github_links: Sequence[t.ContainerMapping] = []
         for link in links:
             url_raw = link.get("url")
             url_obj: str | None = url_raw if isinstance(url_raw, str) else None

@@ -580,7 +580,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             server: str
             tool: str
             params: Annotated[
-                Mapping[str, t.NormalizedValue],
+                t.ContainerMapping,
                 Field(default_factory=_empty_dict_str_str),
             ]
 

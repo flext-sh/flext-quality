@@ -24,8 +24,8 @@ from pydantic import ConfigDict, TypeAdapter
 
 from flext_quality import m
 
-_AUDIT_DATA_ADAPTER: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
-    Mapping[str, t.NormalizedValue],
+_AUDIT_DATA_ADAPTER: TypeAdapter[t.ContainerMapping] = TypeAdapter(
+    t.ContainerMapping,
     config=ConfigDict(strict=False),
 )
 
