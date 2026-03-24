@@ -17,6 +17,8 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import TypedDict, Unpack
 
+from collections.abc import Callable
+
 from jinja2 import Template
 from pydantic import BaseModel, TypeAdapter
 
@@ -295,35 +297,36 @@ class FlextQualityDocumentationReporter:
             link_validation = self.validation_data.get("link_validation")
             if isinstance(link_validation, dict):
                 validation_errors_raw = link_validation.get("errors")
-                validation_errors: Sequence[t.NormalizedValue] = (
-                    validation_errors_raw
-                    if isinstance(validation_errors_raw, list)
-                    else []
+                if not isinstance(validation_errors_raw, list):
+                    return recommendations
+                validation_errors_list: list[t.NormalizedValue] = list(
+                    validation_errors_raw,
                 )
-                if validation_errors:
+                if validation_errors_list:
                     broken_links: MutableSequence[Mapping[str, t.Primitives]] = []
                     _e_adapter: TypeAdapter[dict[str, t.NormalizedValue]] = TypeAdapter(
                         dict[str, t.NormalizedValue],
                     )
-                    for e_raw in validation_errors:
-                        if not isinstance(e_raw, Mapping):
+                    for e_raw in validation_errors_list:
+                        try:
+                            error_entry: dict[str, t.NormalizedValue] = (
+                                _e_adapter.validate_python(e_raw)
+                            )
+                        except (ValueError, TypeError):
                             continue
-                        error_entry: dict[str, t.NormalizedValue] = (
-                            _e_adapter.validate_python(dict(e_raw))
-                        )
-                            error_type = error_entry.get("type")
-                            if error_type in {
-                                "broken_external_link",
-                                "broken_internal_link",
-                            }:
-                                normalized: Mapping[str, t.Primitives] = {
-                                    key: value
-                                    for key, value in error_entry.items()
-                                    if isinstance(key, str)
-                                    and isinstance(value, (str, int, float, bool))
-                                }
-                                if normalized:
-                                    broken_links.append(normalized)
+                        error_type = error_entry.get("type")
+                        if error_type in {
+                            "broken_external_link",
+                            "broken_internal_link",
+                        }:
+                            normalized: Mapping[str, t.Primitives] = {
+                                key: value
+                                for key, value in error_entry.items()
+                                if isinstance(key, str)
+                                and isinstance(value, (str, int, float, bool))
+                            }
+                            if normalized:
+                                broken_links.append(normalized)
                     if broken_links:
                         recommendations.append(
                             FlextQualityDocumentationReporter.Recommendation(
@@ -397,7 +400,8 @@ class FlextQualityDocumentationReporter:
             "recommendations": data.recommendations,
             "charts": self._generate_charts(data) if data.trends else None,
         }
-        rendered: str = str(template.render(**template_data))
+        _render: Callable[..., str] = getattr(template, "render")
+        rendered: str = str(_render(**template_data))
         return rendered
 
     def _get_html_template(self) -> Template:
@@ -652,6 +656,8 @@ class FlextQualityDocumentationReporter:
         if isinstance(trend_data, dict):
             return "\n".join(md)
         # trend_data is TrendData BaseModel
+        if not isinstance(trend_data, FlextQualityDocumentationReporter.TrendData):
+            return "\n".join(md)
         typed_trend_data: FlextQualityDocumentationReporter.TrendData = trend_data
         if typed_trend_data.audit_trends:
             md.extend(["## Quality Score Trends", ""])

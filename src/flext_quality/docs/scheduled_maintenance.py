@@ -57,23 +57,23 @@ def _docs_logs_dir() -> Path:
     return _docs_root() / "logs"
 
 
-def _as_str(value: t.ContainerValue | None, default: str) -> str:
+def _as_str(value: t.NormalizedValue | None, default: str) -> str:
     """Normalize unknown config values to string."""
     return value if isinstance(value, str) else default
 
 
-def _as_bool(value: t.ContainerValue | None, /, *, default: bool) -> bool:
+def _as_bool(value: t.NormalizedValue | None, /, *, default: bool) -> bool:
     """Normalize unknown config values to bool."""
     return value if isinstance(value, bool) else default
 
 
-def _as_int(value: t.ContainerValue | None, default: int) -> int:
+def _as_int(value: t.NormalizedValue | None, default: int) -> int:
     """Normalize unknown config values to int."""
     return value if isinstance(value, int) else default
 
 
 def _as_str_list(
-    value: t.ContainerValue | None,
+    value: t.NormalizedValue | None,
     default: t.StrSequence,
 ) -> t.StrSequence:
     """Normalize unknown config values to t.StrSequence."""
@@ -83,8 +83,8 @@ def _as_str_list(
 
 
 def _is_str_mapping(
-    value: t.ContainerValue | None,
-) -> TypeIs[Mapping[str, t.ContainerValue]]:
+    value: t.NormalizedValue | None,
+) -> TypeIs[Mapping[str, t.NormalizedValue]]:
     return isinstance(value, Mapping)
 
 

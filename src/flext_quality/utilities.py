@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
-from collections.abc import MutableMapping, Sequence
+from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
 
 import yaml
@@ -47,22 +47,25 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
             try:
                 with path.open(encoding="utf-8") as f:
                     parsed = yaml.safe_load(f)
-                match parsed:
-                    case dict() as parsed_dict:
-                        raw_rules = parsed_dict.get("rules", [])
-                    case _:
-                        return r[Sequence[t.ContainerMapping]].fail(
-                            "Expected YAML dict",
-                        )
-                match raw_rules:
-                    case list() as rules_list:
-                        rules: Sequence[t.ContainerMapping] = [
-                            item for item in rules_list if isinstance(item, dict)
-                        ]
-                    case _:
-                        return r[Sequence[t.ContainerMapping]].fail(
-                            "Expected rules list",
-                        )
+                if not isinstance(parsed, dict):
+                    return r[Sequence[t.ContainerMapping]].fail(
+                        "Expected YAML dict",
+                    )
+                parsed_dict: Mapping[str, t.NormalizedValue] = TypeAdapter(
+                    Mapping[str, t.NormalizedValue],
+                ).validate_python(parsed)
+                raw_rules_val = parsed_dict.get("rules", [])
+                if not isinstance(raw_rules_val, list):
+                    return r[Sequence[t.ContainerMapping]].fail(
+                        "Expected rules list",
+                    )
+                _item_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
+                    Mapping[str, t.NormalizedValue],
+                )
+                rules: list[Mapping[str, t.NormalizedValue]] = []
+                for item in raw_rules_val:
+                    if isinstance(item, dict):
+                        rules.append(_item_adapter.validate_python(item))
                 return r[Sequence[t.ContainerMapping]].ok(rules)
             except (
                 ValueError,
@@ -81,8 +84,10 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
         def parse_hook_input(raw: str) -> r[t.Quality.HookInput]:
             """Parse hook input JSON."""
             try:
-                parsed = TypeAdapter(t.ContainerMapping).validate_json(raw)
-                coerced_input: t.Quality.HookInput = parsed
+                parsed: Mapping[str, t.NormalizedValue] = TypeAdapter(
+                    Mapping[str, t.NormalizedValue],
+                ).validate_json(raw)
+                coerced_input: Mapping[str, t.NormalizedValue] = parsed
                 return r[t.Quality.HookInput].ok(coerced_input)
             except ValueError as e:
                 return r[t.Quality.HookInput].fail(f"Invalid JSON: {e}")

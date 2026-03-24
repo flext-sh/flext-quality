@@ -367,9 +367,10 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             timestamp: str
             files_checked: int = 0
-            content_issues: MutableSequence[FlextQualityModels.Quality.ContentIssue] = (
-                Field(default_factory=list)
-            )
+            content_issues: Annotated[
+                MutableSequence[FlextQualityModels.Quality.ContentIssue],
+                Field(default_factory=list),
+            ]
             quality_metrics: Annotated[
                 MutableMapping[str, t.Scalar],
                 Field(default_factory=dict),
@@ -662,7 +663,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             tool: str
             params: Annotated[
                 t.ContainerMapping,
-                Field(default_factory=FlextQualityModels.Quality._empty_dict_str_str),
+                Field(default_factory=dict),
             ]
 
         class McpToolResult(BaseModel):

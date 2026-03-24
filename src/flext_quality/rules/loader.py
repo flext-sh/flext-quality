@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from collections.abc import MutableSequence, Sequence
+from collections.abc import Mapping, MutableSequence, Sequence
 from pathlib import Path
 
 import yaml
 from flext_core import r, t
+from pydantic import TypeAdapter
 
 from flext_quality import c, m
 
@@ -35,29 +36,28 @@ class FlextQualityRulesLoader:
             return r[Sequence[m.Quality.RuleDefinition]].fail(
                 f"Failed to parse YAML: {e}",
             )
-        match parsed:
-            case dict() as parsed_dict:
-                rules_data = parsed_dict.get("rules", [])
-            case _:
-                return r[Sequence[m.Quality.RuleDefinition]].fail(
-                    "Invalid YAML: expected dict at root",
-                )
-        match rules_data:
-            case list() as rules_list:
-                pass
-            case _:
-                return r[Sequence[m.Quality.RuleDefinition]].fail(
-                    "Invalid YAML: 'rules' must be a list",
-                )
+        if not isinstance(parsed, dict):
+            return r[Sequence[m.Quality.RuleDefinition]].fail(
+                "Invalid YAML: expected dict at root",
+            )
+        _adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
+            Mapping[str, t.NormalizedValue],
+        )
+        parsed_dict: Mapping[str, t.NormalizedValue] = _adapter.validate_python(parsed)
+        rules_data_val = parsed_dict.get("rules", [])
+        if not isinstance(rules_data_val, list):
+            return r[Sequence[m.Quality.RuleDefinition]].fail(
+                "Invalid YAML: 'rules' must be a list",
+            )
         rules: MutableSequence[m.Quality.RuleDefinition] = []
-        for idx, rule_data in enumerate(rules_list):
-            match rule_data:
-                case dict() as rule_dict:
-                    pass
-                case _:
-                    return r[Sequence[m.Quality.RuleDefinition]].fail(
-                        f"Rule {idx}: expected dict",
-                    )
+        for idx, rule_data in enumerate(rules_data_val):
+            if not isinstance(rule_data, dict):
+                return r[Sequence[m.Quality.RuleDefinition]].fail(
+                    f"Rule {idx}: expected dict",
+                )
+            rule_dict: Mapping[str, t.NormalizedValue] = _adapter.validate_python(
+                rule_data,
+            )
             result = self._parse_rule(rule_dict, idx)
             if result.is_failure:
                 return r[Sequence[m.Quality.RuleDefinition]].fail(result.error)

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import MutableMapping, Sequence
+from collections.abc import Mapping, MutableMapping, Sequence
 
 from pydantic import TypeAdapter
 
@@ -23,7 +23,7 @@ def get_hooks_config() -> str:
     manager = FlextQualityHookManager()
     config = manager.get_config()
     return (
-        TypeAdapter(t.ContainerMapping)
+        TypeAdapter(Mapping[str, t.NormalizedValue])
         .dump_json(dict(config), indent=c.Quality.Defaults.JSON_INDENT)
         .decode("utf-8")
     )
@@ -59,7 +59,7 @@ def get_integrations_status() -> str:
         ctx_health.value if ctx_health.is_success else {"error": ctx_health.error}
     )
     return (
-        TypeAdapter(t.ContainerMapping)
+        TypeAdapter(Mapping[str, t.NormalizedValue])
         .dump_json(status, indent=c.Quality.Defaults.JSON_INDENT)
         .decode("utf-8")
     )

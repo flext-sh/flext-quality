@@ -141,7 +141,7 @@ class FlextQualityContentAnalyzer:
             config_path: Path to configuration file for content analysis rules.
 
         """
-        self.config: Mapping[str, Mapping[str, bool] | Mapping[str, int] | str] = {}
+        self.config: Mapping[str, t.NormalizedValue] = {}
         self.load_config(config_path)
         self.results: FlextQualityContentAnalyzer.Results = (
             FlextQualityContentAnalyzer.Results(
@@ -177,11 +177,9 @@ class FlextQualityContentAnalyzer:
                     yaml.safe_load(f)
                 )
                 if isinstance(loaded, dict):
-                    config_loaded: Mapping[
-                        str,
-                        Mapping[str, bool] | Mapping[str, int] | str,
-                    ] = {k: v for k, v in loaded.items() if isinstance(v, (dict, str))}
-                    self.config = config_loaded
+                    self.config = {
+                        k: v for k, v in loaded.items() if isinstance(v, (dict, str))
+                    }
                 else:
                     self.config = default_config
         except (FileNotFoundError, KeyError):
@@ -460,8 +458,8 @@ class FlextQualityContentAnalyzer:
 
         word_count = len(re.findall(r"\b\w+\b", content))
         thresholds_val = self.config.get("quality_thresholds")
-        thresholds: Mapping[str, bool | int | str] = (
-            dict(thresholds_val) if isinstance(thresholds_val, dict) else {}
+        thresholds: Mapping[str, t.NormalizedValue] = (
+            dict(thresholds_val) if isinstance(thresholds_val, Mapping) else {}
         )
         min_words_val = thresholds.get("min_word_count", 100)
         min_words = 100
@@ -639,7 +637,8 @@ class FlextQualityContentAnalyzer:
                 )
             )
 
-        missing = completeness.missing_elements if completeness else []
+        missing_raw = completeness.missing_elements if completeness else None
+        missing: list[str] = list(missing_raw) if isinstance(missing_raw, list) else []
         if missing:
             issues.append(
                 FlextQualityContentAnalyzer.Issue(
@@ -775,11 +774,23 @@ class FlextQualityContentAnalyzer:
             )
 
         all_issues: MutableSequence[t.StrMapping] = []
-        for result_value in self.results.model_dump().values():
-            if isinstance(result_value, dict):
-                issues_val: Sequence[t.StrMapping] | None = result_value.get("issues")
-                if isinstance(issues_val, list):
-                    all_issues.extend(issues_val)
+        _rv_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
+            Mapping[str, t.NormalizedValue],
+        )
+        for result_value_raw in self.results.model_dump().values():
+            if not isinstance(result_value_raw, dict):
+                continue
+            result_value: Mapping[str, t.NormalizedValue] = (
+                _rv_adapter.validate_python(result_value_raw)
+            )
+            issues_list_raw = result_value.get("issues")
+            if not isinstance(issues_list_raw, list):
+                continue
+            for issue_item_raw in issues_list_raw:
+                if isinstance(issue_item_raw, Mapping):
+                    all_issues.append({
+                        str(ik): str(iv) for ik, iv in issue_item_raw.items()
+                    })
 
         if all_issues:
             issue_types = Counter(str(issue.get("type", "")) for issue in all_issues)

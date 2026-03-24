@@ -40,7 +40,9 @@ class FlextQualityMcpClient:
             return r[t.StrSequence].fail("mcp-cli not found in PATH")
         tool_path = f"{call.server}/{call.tool}"
         params_json = (
-            TypeAdapter(t.ContainerMapping).dump_json(call.params).decode("utf-8")
+            TypeAdapter(Mapping[str, t.NormalizedValue])
+            .dump_json(call.params)
+            .decode("utf-8")
         )
         return r[t.StrSequence].ok(["mcp-cli", "call", tool_path, params_json])
 
@@ -60,9 +62,12 @@ class FlextQualityMcpClient:
         """Build an MCP tool call request."""
         call_params: t.ContainerMapping = {}
         if isinstance(params, Mapping):
-            validated_params = TypeAdapter(
-                t.ContainerMapping,
-            ).validate_python(params)
+            _vp_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
+                Mapping[str, t.NormalizedValue],
+            )
+            validated_params: Mapping[str, t.NormalizedValue] = (
+                _vp_adapter.validate_python(params)
+            )
             call_params = dict(validated_params)
         return r[McpToolCall].ok(
             McpToolCall.model_validate({
@@ -102,7 +107,10 @@ class FlextQualityMcpClient:
                 ),
             )
         try:
-            parsed = TypeAdapter(t.ContainerMapping).validate_json(output)
+            _p_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
+                Mapping[str, t.NormalizedValue],
+            )
+            parsed: Mapping[str, t.NormalizedValue] = _p_adapter.validate_json(output)
             result_data: t.StrMapping = {str(k): str(v) for k, v in parsed.items()}
             return r[McpToolResult].ok(
                 McpToolResult.model_validate({
@@ -113,13 +121,21 @@ class FlextQualityMcpClient:
             )
         except ValueError:
             try:
-                parsed_list = TypeAdapter(t.ContainerList).validate_json(output)
+                _list_adapter: TypeAdapter[Sequence[t.NormalizedValue]] = TypeAdapter(
+                    Sequence[t.NormalizedValue],
+                )
+                parsed_list: Sequence[t.NormalizedValue] = (
+                    _list_adapter.validate_json(output)
+                )
+                _vi_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
+                    Mapping[str, t.NormalizedValue],
+                )
                 coerced_data: MutableSequence[t.StrMapping] = []
                 for item in parsed_list:
                     if isinstance(item, Mapping):
-                        validated_item = TypeAdapter(
-                            t.ContainerMapping,
-                        ).validate_python(item)
+                        validated_item: Mapping[str, t.NormalizedValue] = (
+                            _vi_adapter.validate_python(item)
+                        )
                         coerced_data.append({
                             str(key): str(value)
                             for key, value in validated_item.items()
