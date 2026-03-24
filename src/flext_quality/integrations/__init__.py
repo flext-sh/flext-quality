@@ -25,22 +25,11 @@ if TYPE_CHECKING:
     )
     from flext_quality.integrations.claude_mem import FlextQualityClaudeMemClient
     from flext_quality.integrations.code_execution import (
-        ExecutionRequest,
-        ExecutionResult,
         FlextQualityCodeExecutionBridge,
     )
-    from flext_quality.integrations.mcp_client import (
-        FlextQualityMcpClient,
-        McpToolCall,
-        McpToolResult,
-    )
+    from flext_quality.integrations.mcp_client import FlextQualityMcpClient
 
 _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
-    "ExecutionRequest": (
-        "flext_quality.integrations.code_execution",
-        "ExecutionRequest",
-    ),
-    "ExecutionResult": ("flext_quality.integrations.code_execution", "ExecutionResult"),
     "FlextQualityClaudeContextClient": (
         "flext_quality.integrations.claude_context",
         "FlextQualityClaudeContextClient",
@@ -57,19 +46,13 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
         "flext_quality.integrations.mcp_client",
         "FlextQualityMcpClient",
     ),
-    "McpToolCall": ("flext_quality.integrations.mcp_client", "McpToolCall"),
-    "McpToolResult": ("flext_quality.integrations.mcp_client", "McpToolResult"),
 }
 
 __all__ = [
-    "ExecutionRequest",
-    "ExecutionResult",
     "FlextQualityClaudeContextClient",
     "FlextQualityClaudeMemClient",
     "FlextQualityCodeExecutionBridge",
     "FlextQualityMcpClient",
-    "McpToolCall",
-    "McpToolResult",
 ]
 
 

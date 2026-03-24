@@ -16,9 +16,6 @@ from flext_core import r
 
 from flext_quality import c, m, t
 
-ExecutionRequest = m.Quality.ExecutionRequest
-ExecutionResult = m.Quality.ExecutionResult
-
 
 @final
 class FlextQualityCodeExecutionBridge:
@@ -91,12 +88,12 @@ class FlextQualityCodeExecutionBridge:
         runtime: str,
         *,
         args: t.StrSequence | None = None,
-    ) -> r[ExecutionRequest]:
+    ) -> r[m.Quality.ExecutionRequest]:
         """Create an execution request for later processing."""
         if runtime not in {"python", "typescript", "ruff", "basedpyright"}:
-            return r[ExecutionRequest].fail(f"Unknown runtime: {runtime}")
-        return r[ExecutionRequest].ok(
-            ExecutionRequest(
+            return r[m.Quality.ExecutionRequest].fail(f"Unknown runtime: {runtime}")
+        return r[m.Quality.ExecutionRequest].ok(
+            m.Quality.ExecutionRequest(
                 script_path=script_path,
                 runtime=runtime,
                 args=args or [],

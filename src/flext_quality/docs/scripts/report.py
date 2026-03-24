@@ -15,18 +15,19 @@ import argparse
 from collections.abc import Callable, Mapping, MutableSequence, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import TypedDict, Unpack
 
 from jinja2 import Template
-from pydantic import BaseModel, TypeAdapter
+from pydantic import BaseModel, ConfigDict, TypeAdapter
 
 from flext_quality import t
 
 
-class _ReportOptions(TypedDict, total=False):
+class _ReportOptions(BaseModel):
     """Optional keyword arguments for generate_quality_report."""
 
-    include_trends: bool
+    model_config = ConfigDict(extra="forbid")
+
+    include_trends: bool = False
 
 
 ReportValue = (
@@ -153,7 +154,8 @@ class FlextQualityDocumentationReporter:
     def generate_quality_report(
         self,
         report_format: str = "html",
-        **kwargs: Unpack[_ReportOptions],
+        *,
+        include_trends: bool = False,
     ) -> str:
         """Generate comprehensive quality report."""
         report_data_adapter: TypeAdapter[
@@ -166,7 +168,7 @@ class FlextQualityDocumentationReporter:
             validation=self.validation_data,
             optimization=self.optimization_data,
             summary=self._calculate_summary_metrics(),
-            trends=self._analyze_trends() if kwargs.get("include_trends") else None,
+            trends=self._analyze_trends() if include_trends else None,
             recommendations=self._generate_recommendations(),
         )
         if report_format == "html":
@@ -775,8 +777,9 @@ def main() -> None:
         )
         reporter.save_report(trend_report, filename, "md")
     else:
-        kwargs = {"include_trends": args.include_trends}
-        report_content = reporter.generate_quality_report(args.format, **kwargs)
+        report_content = reporter.generate_quality_report(
+            args.format, include_trends=args.include_trends
+        )
         filename = (
             args.filename
             or f"quality_report_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}"

@@ -111,15 +111,9 @@ if TYPE_CHECKING:
     )
     from flext_quality.integrations.claude_mem import FlextQualityClaudeMemClient
     from flext_quality.integrations.code_execution import (
-        ExecutionRequest,
-        ExecutionResult,
         FlextQualityCodeExecutionBridge,
     )
-    from flext_quality.integrations.mcp_client import (
-        FlextQualityMcpClient,
-        McpToolCall,
-        McpToolResult,
-    )
+    from flext_quality.integrations.mcp_client import FlextQualityMcpClient
     from flext_quality.mcp.resources import (
         get_hooks_config,
         get_integrations_status,
@@ -170,11 +164,6 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
         "flext_quality.docs.scheduled_maintenance",
         "ErrorHandlingConfig",
     ),
-    "ExecutionRequest": (
-        "flext_quality.integrations.code_execution",
-        "ExecutionRequest",
-    ),
-    "ExecutionResult": ("flext_quality.integrations.code_execution", "ExecutionResult"),
     "FlextQuality": ("flext_quality.api", "FlextQuality"),
     "FlextQualityAuditRules": (
         "flext_quality.docs.core.config_manager",
@@ -325,8 +314,6 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
         "MaintenanceConfig",
     ),
     "MarkdownStyleConfig": ("flext_quality.docs.scripts.audit", "MarkdownStyleConfig"),
-    "McpToolCall": ("flext_quality.integrations.mcp_client", "McpToolCall"),
-    "McpToolResult": ("flext_quality.integrations.mcp_client", "McpToolResult"),
     "NotifierResults": ("flext_quality.docs.notifications", "NotifierResults"),
     "OptimizerResults": ("flext_quality.docs.scripts.optimize", "OptimizerResults"),
     "QualityThresholdsConfig": (
@@ -419,8 +406,6 @@ __all__ = [
     "ContentMetrics",
     "ContentValidatorResults",
     "ErrorHandlingConfig",
-    "ExecutionRequest",
-    "ExecutionResult",
     "FlextQuality",
     "FlextQualityAuditRules",
     "FlextQualityBaseAnalyzer",
@@ -467,8 +452,6 @@ __all__ = [
     "LoggingConfig",
     "MaintenanceConfig",
     "MarkdownStyleConfig",
-    "McpToolCall",
-    "McpToolResult",
     "NotifierResults",
     "OptimizerResults",
     "QualityThresholdsConfig",

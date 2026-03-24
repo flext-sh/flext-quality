@@ -18,9 +18,6 @@ from pydantic import TypeAdapter
 
 from flext_quality import c, m, t
 
-McpToolCall = m.Quality.McpToolCall
-McpToolResult = m.Quality.McpToolResult
-
 
 @final
 class FlextQualityMcpClient:
@@ -34,7 +31,7 @@ class FlextQualityMcpClient:
         """Initialize the MCP client."""
         self._timeout_ms = timeout_ms or c.Quality.Defaults.MCP_TIMEOUT_MS
 
-    def build_call_command(self, call: McpToolCall) -> r[t.StrSequence]:
+    def build_call_command(self, call: m.Quality.McpToolCall) -> r[t.StrSequence]:
         """Build the mcp-cli command for a tool call."""
         if not self.is_mcp_cli_available():
             return r[t.StrSequence].fail("mcp-cli not found in PATH")
@@ -58,7 +55,7 @@ class FlextQualityMcpClient:
         server: str,
         tool: str,
         params: t.ContainerMapping | None = None,
-    ) -> r[McpToolCall]:
+    ) -> r[m.Quality.McpToolCall]:
         """Build an MCP tool call request."""
         call_params: t.ContainerMapping = {}
         if isinstance(params, Mapping):
@@ -69,8 +66,8 @@ class FlextQualityMcpClient:
                 vp_adapter.validate_python(params)
             )
             call_params = dict(validated_params)
-        return r[McpToolCall].ok(
-            McpToolCall.model_validate({
+        return r[m.Quality.McpToolCall].ok(
+            m.Quality.McpToolCall.model_validate({
                 "server": server,
                 "tool": tool,
                 "params": call_params,
@@ -96,11 +93,11 @@ class FlextQualityMcpClient:
         """Check if mcp-cli is available in PATH."""
         return shutil.which("mcp-cli") is not None
 
-    def parse_result(self, output: str, exit_code: int) -> r[McpToolResult]:
+    def parse_result(self, output: str, exit_code: int) -> r[m.Quality.McpToolResult]:
         """Parse the output from an mcp-cli call."""
         if exit_code != 0:
-            return r[McpToolResult].ok(
-                McpToolResult(
+            return r[m.Quality.McpToolResult].ok(
+                m.Quality.McpToolResult(
                     success=False,
                     data=None,
                     error=output or f"Command failed with exit code {exit_code}",
@@ -112,8 +109,8 @@ class FlextQualityMcpClient:
             )
             parsed: Mapping[str, t.NormalizedValue] = p_adapter.validate_json(output)
             result_data: t.StrMapping = {str(k): str(v) for k, v in parsed.items()}
-            return r[McpToolResult].ok(
-                McpToolResult.model_validate({
+            return r[m.Quality.McpToolResult].ok(
+                m.Quality.McpToolResult.model_validate({
                     "success": True,
                     "data": result_data,
                     "error": None,
@@ -142,8 +139,8 @@ class FlextQualityMcpClient:
                         })
                     else:
                         coerced_data.append({"value": str(item)})
-                return r[McpToolResult].ok(
-                    McpToolResult(
+                return r[m.Quality.McpToolResult].ok(
+                    m.Quality.McpToolResult(
                         success=True,
                         data={
                             "items": TypeAdapter(Sequence[t.StrMapping])
@@ -154,6 +151,8 @@ class FlextQualityMcpClient:
                     ),
                 )
             except ValueError:
-                return r[McpToolResult].ok(
-                    McpToolResult(success=True, data={"raw": output}, error=None),
+                return r[m.Quality.McpToolResult].ok(
+                    m.Quality.McpToolResult(
+                        success=True, data={"raw": output}, error=None
+                    ),
                 )
