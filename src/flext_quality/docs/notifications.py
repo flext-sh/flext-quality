@@ -15,12 +15,11 @@ from datetime import UTC, datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
-from typing import TypedDict
 
 import requests
 import yaml
 from flext_core import t
-from pydantic import ConfigDict, TypeAdapter
+from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
 from flext_quality import m
 
@@ -33,69 +32,60 @@ _AUDIT_DATA_ADAPTER: TypeAdapter[t.ContainerMapping] = TypeAdapter(
 MAX_BROKEN_LINKS_TO_SHOW = 10
 
 
-class _ChannelConfig(TypedDict):
-    enabled: bool
-
-
-class _AlertThresholdConfig(TypedDict):
-    enabled: bool
-    threshold: int
-
-
-class _AlertToggleConfig(TypedDict):
-    enabled: bool
-
-
-class _AlertsConfig(TypedDict):
-    critical_issues: _AlertThresholdConfig
-    quality_drop: _AlertThresholdConfig
-    broken_links: _AlertThresholdConfig
-    weekly_report: _AlertToggleConfig
-    monthly_report: _AlertToggleConfig
-
-
-class _EmailConfig(TypedDict):
-    smtp_server: str
-    smtp_port: int
-    username: str
-    password: str
-    from_address: str
-    to_addresses: t.StrSequence
-
-
-class _SlackConfig(TypedDict):
-    webhook_url: str
-    channel: str
-    username: str
-
-
-class _WebhookConfig(TypedDict):
-    url: str
-    headers: t.StrMapping
-    timeout: int
-
-
-class _ChannelsConfig(TypedDict):
-    console: _ChannelConfig
-    email: _ChannelConfig
-    slack: _ChannelConfig
-    webhook: _ChannelConfig
-
-
-class _NotifierConfig(TypedDict):
-    enabled: bool
-    channels: _ChannelsConfig
-    alerts: _AlertsConfig
-    email: _EmailConfig
-    slack: _SlackConfig
-    webhook: _WebhookConfig
-
-
 NotifierResults = m.Quality.NotifierResults
 
 
 class FlextQualityDocumentationNotifier:
     """Automated notification system for documentation quality alerts."""
+
+    class _ChannelConfig(BaseModel):
+        enabled: bool
+
+    class _AlertThresholdConfig(BaseModel):
+        enabled: bool
+        threshold: int
+
+    class _AlertToggleConfig(BaseModel):
+        enabled: bool
+
+    class _AlertsConfig(BaseModel):
+        critical_issues: "FlextQualityDocumentationNotifier._AlertThresholdConfig"
+        quality_drop: "FlextQualityDocumentationNotifier._AlertThresholdConfig"
+        broken_links: "FlextQualityDocumentationNotifier._AlertThresholdConfig"
+        weekly_report: "FlextQualityDocumentationNotifier._AlertToggleConfig"
+        monthly_report: "FlextQualityDocumentationNotifier._AlertToggleConfig"
+
+    class _EmailConfig(BaseModel):
+        smtp_server: str
+        smtp_port: int
+        username: str
+        password: str
+        from_address: str
+        to_addresses: t.StrSequence = Field(default_factory=list)
+
+    class _SlackConfig(BaseModel):
+        webhook_url: str
+        channel: str
+        username: str
+
+    class _WebhookConfig(BaseModel):
+        url: str
+        headers: t.StrMapping = Field(default_factory=dict)
+        timeout: int
+
+    class _ChannelsConfig(BaseModel):
+        console: "FlextQualityDocumentationNotifier._ChannelConfig"
+        email: "FlextQualityDocumentationNotifier._ChannelConfig"
+        slack: "FlextQualityDocumentationNotifier._ChannelConfig"
+        webhook: "FlextQualityDocumentationNotifier._ChannelConfig"
+
+    class _NotifierConfig(BaseModel):
+        enabled: bool
+        channels: "FlextQualityDocumentationNotifier._ChannelsConfig"
+        alerts: "FlextQualityDocumentationNotifier._AlertsConfig"
+        email: "FlextQualityDocumentationNotifier._EmailConfig"
+        slack: "FlextQualityDocumentationNotifier._SlackConfig"
+        webhook: "FlextQualityDocumentationNotifier._WebhookConfig"
 
     def __init__(
         self,
@@ -107,7 +97,9 @@ class FlextQualityDocumentationNotifier:
             config_path: Path to the notification configuration file.
 
         """
-        self.config: _NotifierConfig = self.get_default_config()
+        self.config: FlextQualityDocumentationNotifier._NotifierConfig = (
+            self.get_default_config()
+        )
         self.load_config(config_path)
         self.results: NotifierResults = NotifierResults(
             timestamp=datetime.now(UTC).isoformat(),
@@ -147,7 +139,8 @@ class FlextQualityDocumentationNotifier:
                 if isinstance(value, dict):
                     enabled = value.get("enabled")
                     if isinstance(enabled, bool):
-                        cfg["channels"][key]["enabled"] = enabled
+                        channel_cfg = getattr(cfg.channels, key)
+                        object.__setattr__(channel_cfg, "enabled", enabled)
 
         alerts = loaded.get("alerts")
         if isinstance(alerts, dict):
@@ -156,38 +149,40 @@ class FlextQualityDocumentationNotifier:
                 if isinstance(value, dict):
                     enabled = value.get("enabled")
                     threshold = value.get("threshold")
+                    alert_cfg = getattr(cfg.alerts, key)
                     if isinstance(enabled, bool):
-                        cfg["alerts"][key]["enabled"] = enabled
+                        object.__setattr__(alert_cfg, "enabled", enabled)
                     if isinstance(threshold, int):
-                        cfg["alerts"][key]["threshold"] = threshold
+                        object.__setattr__(alert_cfg, "threshold", threshold)
             for key in ("weekly_report", "monthly_report"):
                 value = alerts.get(key)
                 if isinstance(value, dict):
                     enabled = value.get("enabled")
                     if isinstance(enabled, bool):
-                        cfg["alerts"][key]["enabled"] = enabled
+                        toggle_cfg = getattr(cfg.alerts, key)
+                        object.__setattr__(toggle_cfg, "enabled", enabled)
 
         email = loaded.get("email")
         if isinstance(email, dict):
             for key in ("smtp_server", "username", "password", "from_address"):
                 value = email.get(key)
                 if isinstance(value, str):
-                    cfg["email"][key] = value
+                    object.__setattr__(cfg.email, key, value)
             smtp_port = email.get("smtp_port")
             if isinstance(smtp_port, int):
-                cfg["email"]["smtp_port"] = smtp_port
+                object.__setattr__(cfg.email, "smtp_port", smtp_port)
             to_addresses = email.get("to_addresses")
             if isinstance(to_addresses, list) and all(
                 isinstance(item, str) for item in to_addresses
             ):
-                cfg["email"]["to_addresses"] = to_addresses
+                object.__setattr__(cfg.email, "to_addresses", to_addresses)
 
         slack = loaded.get("slack")
         if isinstance(slack, dict):
             for key in ("webhook_url", "channel", "username"):
                 value = slack.get(key)
                 if isinstance(value, str):
-                    cfg["slack"][key] = value
+                    object.__setattr__(cfg.slack, key, value)
 
         webhook = loaded.get("webhook")
         if isinstance(webhook, dict):
@@ -195,53 +190,70 @@ class FlextQualityDocumentationNotifier:
             timeout_val = webhook.get("timeout")
             headers_val = webhook.get("headers")
             if isinstance(url_val, str):
-                cfg["webhook"]["url"] = url_val
+                object.__setattr__(cfg.webhook, "url", url_val)
             if isinstance(timeout_val, int):
-                cfg["webhook"]["timeout"] = timeout_val
+                object.__setattr__(cfg.webhook, "timeout", timeout_val)
             if isinstance(headers_val, dict) and all(
                 isinstance(k, str) and isinstance(v, str)
                 for k, v in headers_val.items()
             ):
-                cfg["webhook"]["headers"] = headers_val
+                object.__setattr__(cfg.webhook, "headers", headers_val)
 
         enabled_val = loaded.get("enabled")
         if isinstance(enabled_val, bool):
-            cfg["enabled"] = enabled_val
+            object.__setattr__(cfg, "enabled", enabled_val)
 
         return cfg
 
     def get_default_config(self) -> _NotifierConfig:
         """Default notification configuration."""
-        return {
-            "enabled": True,
-            "channels": {
-                "console": {"enabled": True},
-                "email": {"enabled": False},
-                "slack": {"enabled": False},
-                "webhook": {"enabled": False},
-            },
-            "alerts": {
-                "critical_issues": {"enabled": True, "threshold": 1},
-                "quality_drop": {"enabled": True, "threshold": 10},
-                "broken_links": {"enabled": True, "threshold": 5},
-                "weekly_report": {"enabled": True},
-                "monthly_report": {"enabled": True},
-            },
-            "email": {
-                "smtp_server": "smtp.gmail.com",
-                "smtp_port": 587,
-                "username": "",
-                "password": "",
-                "from_address": "",
-                "to_addresses": [],
-            },
-            "slack": {
-                "webhook_url": "",
-                "channel": "#docs-quality",
-                "username": "FLEXT Quality Bot",
-            },
-            "webhook": {"url": "", "headers": {}, "timeout": 10},
-        }
+        return FlextQualityDocumentationNotifier._NotifierConfig(
+            enabled=True,
+            channels=FlextQualityDocumentationNotifier._ChannelsConfig(
+                console=FlextQualityDocumentationNotifier._ChannelConfig(enabled=True),
+                email=FlextQualityDocumentationNotifier._ChannelConfig(enabled=False),
+                slack=FlextQualityDocumentationNotifier._ChannelConfig(enabled=False),
+                webhook=FlextQualityDocumentationNotifier._ChannelConfig(enabled=False),
+            ),
+            alerts=FlextQualityDocumentationNotifier._AlertsConfig(
+                critical_issues=FlextQualityDocumentationNotifier._AlertThresholdConfig(
+                    enabled=True,
+                    threshold=1,
+                ),
+                quality_drop=FlextQualityDocumentationNotifier._AlertThresholdConfig(
+                    enabled=True,
+                    threshold=10,
+                ),
+                broken_links=FlextQualityDocumentationNotifier._AlertThresholdConfig(
+                    enabled=True,
+                    threshold=5,
+                ),
+                weekly_report=FlextQualityDocumentationNotifier._AlertToggleConfig(
+                    enabled=True,
+                ),
+                monthly_report=FlextQualityDocumentationNotifier._AlertToggleConfig(
+                    enabled=True,
+                ),
+            ),
+            email=FlextQualityDocumentationNotifier._EmailConfig(
+                smtp_server="smtp.gmail.com",
+                smtp_port=587,
+                username="",
+                password="",
+                from_address="",
+                to_addresses=[],
+            ),
+            slack=FlextQualityDocumentationNotifier._SlackConfig(
+                webhook_url="",
+                channel="#docs-quality",
+                username="FLEXT Quality Bot",
+            ),
+            webhook=FlextQualityDocumentationNotifier._WebhookConfig(
+                url="",
+                headers={},
+                timeout=10,
+            ),
+        )
 
     def notify_critical_issues(
         self,
@@ -251,7 +263,7 @@ class FlextQualityDocumentationNotifier:
         ],
     ) -> bool:
         """Send notification for critical documentation issues."""
-        if not self.config["alerts"]["critical_issues"]["enabled"]:
+        if not self.config.alerts.critical_issues.enabled:
             return True
 
         metrics_val = audit_data.get("metrics", {})
@@ -264,7 +276,7 @@ class FlextQualityDocumentationNotifier:
                     severity_breakdown[key_name] = severity_val[key_name]
         critical_raw = severity_breakdown.get("critical", 0)
         critical_count = int(critical_raw) if isinstance(critical_raw, int) else 0
-        threshold = self.config["alerts"]["critical_issues"]["threshold"]
+        threshold = self.config.alerts.critical_issues.threshold
 
         if critical_count >= threshold:
             title = f"🚨 CRITICAL: {critical_count} Critical Documentation Issues Found"
@@ -275,10 +287,10 @@ class FlextQualityDocumentationNotifier:
 
     def notify_quality_drop(self, current_score: float, previous_score: float) -> bool:
         """Send notification for significant quality score drops."""
-        if not self.config["alerts"]["quality_drop"]["enabled"]:
+        if not self.config.alerts.quality_drop.enabled:
             return True
 
-        threshold = self.config["alerts"]["quality_drop"]["threshold"]
+        threshold = self.config.alerts.quality_drop.threshold
         drop = previous_score - current_score
 
         if drop >= threshold:
@@ -302,10 +314,10 @@ Please review recent changes and address any identified issues.
         broken_links: Sequence[Mapping[str, str | int]],
     ) -> bool:
         """Send notification for broken links."""
-        if not self.config["alerts"]["broken_links"]["enabled"]:
+        if not self.config.alerts.broken_links.enabled:
             return True
 
-        threshold = self.config["alerts"]["broken_links"]["threshold"]
+        threshold = self.config.alerts.broken_links.threshold
 
         if len(broken_links) >= threshold:
             title = f"🔗 Link Alert: {len(broken_links)} Broken Links Detected"
@@ -319,7 +331,7 @@ Please review recent changes and address any identified issues.
         report_data: Mapping[str, str | int | float],
     ) -> bool:
         """Send weekly quality report notification."""
-        if not self.config["alerts"]["weekly_report"]["enabled"]:
+        if not self.config.alerts.weekly_report.enabled:
             return True
 
         title = "📊 Weekly Documentation Quality Report"
@@ -331,7 +343,7 @@ Please review recent changes and address any identified issues.
         report_data: Mapping[str, str | int | float],
     ) -> bool:
         """Send monthly comprehensive report notification."""
-        if not self.config["alerts"]["monthly_report"]["enabled"]:
+        if not self.config.alerts.monthly_report.enabled:
             return True
 
         title = "📈 Monthly Documentation Quality Report"
@@ -348,11 +360,11 @@ Please review recent changes and address any identified issues.
         success = True
 
         # Console notification (always enabled)
-        if self.config["channels"]["console"]["enabled"]:
+        if self.config.channels.console.enabled:
             self._send_console_notification(title, message, priority)
 
         # Email notification
-        if self.config["channels"]["email"]["enabled"]:
+        if self.config.channels.email.enabled:
             try:
                 self._send_email_notification(title, message, priority)
             except (smtplib.SMTPException, ConnectionError, OSError) as e:
@@ -360,7 +372,7 @@ Please review recent changes and address any identified issues.
                 success = False
 
         # Slack notification
-        if self.config["channels"]["slack"]["enabled"]:
+        if self.config.channels.slack.enabled:
             try:
                 self._send_slack_notification(title, message, priority)
             except (requests.RequestException, ConnectionError, OSError) as e:
@@ -368,7 +380,7 @@ Please review recent changes and address any identified issues.
                 success = False
 
         # Webhook notification
-        if self.config["channels"]["webhook"]["enabled"]:
+        if self.config.channels.webhook.enabled:
             try:
                 self._send_webhook_notification(title, message, priority)
             except (requests.RequestException, ConnectionError, OSError) as e:
@@ -392,11 +404,11 @@ Please review recent changes and address any identified issues.
 
     def _send_email_notification(self, title: str, message: str, priority: str) -> None:
         """Send notification via email."""
-        email_config = self.config["email"]
+        email_config = self.config.email
 
         msg = MIMEMultipart()
-        msg["From"] = str(email_config["from_address"])
-        msg["To"] = ", ".join(str(x) for x in (email_config.get("to_addresses") or []))
+        msg["From"] = str(email_config.from_address)
+        msg["To"] = ", ".join(str(x) for x in (email_config.to_addresses or []))
         msg["Subject"] = f"[{priority.upper()}] {title}"
 
         body = f"""
@@ -414,25 +426,25 @@ Timestamp: {datetime.now(UTC).isoformat()}
         msg.attach(MIMEText(body, "plain"))
 
         server = smtplib.SMTP(
-            str(email_config["smtp_server"]),
-            int(email_config["smtp_port"]),
+            str(email_config.smtp_server),
+            int(email_config.smtp_port),
         )
         server.starttls()
         server.login(
-            str(email_config["username"]),
-            str(email_config["password"]),
+            str(email_config.username),
+            str(email_config.password),
         )
         text = msg.as_string()
         server.sendmail(
-            str(email_config["from_address"]),
-            list(email_config.get("to_addresses") or []),
+            str(email_config.from_address),
+            list(email_config.to_addresses or []),
             text,
         )
         server.quit()
 
     def _send_slack_notification(self, title: str, message: str, priority: str) -> None:
         """Send notification to Slack."""
-        slack_config = self.config["slack"]
+        slack_config = self.config.slack
 
         color = {"critical": "danger", "warning": "warning", "info": "good"}.get(
             priority,
@@ -440,8 +452,8 @@ Timestamp: {datetime.now(UTC).isoformat()}
         )
 
         payload = {
-            "channel": slack_config["channel"],
-            "username": slack_config["username"],
+            "channel": slack_config.channel,
+            "username": slack_config.username,
             "attachments": [
                 {
                     "color": color,
@@ -454,7 +466,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
         }
 
         response = requests.post(
-            str(slack_config["webhook_url"]),
+            str(slack_config.webhook_url),
             json=payload,
             timeout=10,
         )
@@ -467,7 +479,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
         priority: str,
     ) -> None:
         """Send notification via webhook."""
-        webhook_config = self.config["webhook"]
+        webhook_config = self.config.webhook
 
         payload = {
             "title": title,
@@ -477,17 +489,16 @@ Timestamp: {datetime.now(UTC).isoformat()}
             "source": "FLEXT Quality Documentation System",
         }
 
-        headers_val = webhook_config.get("headers")
+        headers_val = webhook_config.headers
         headers: MutableMapping[str, str] = (
             dict(headers_val) if isinstance(headers_val, dict) else {}
         )
         headers["Content-Type"] = "application/json"
 
-        timeout_val = webhook_config.get("timeout", 10)
-        timeout = int(timeout_val) if isinstance(timeout_val, (int, float)) else 10
+        timeout = webhook_config.timeout
 
         response = requests.post(
-            str(webhook_config["url"]),
+            str(webhook_config.url),
             json=payload,
             headers=headers,
             timeout=timeout,
