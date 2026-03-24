@@ -39,39 +39,39 @@ if TYPE_CHECKING:
     )
     from tests.helpers.typings import TestsTypings
 
-_LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
-    "TestsConstants": ("tests.helpers.constants", "TestsConstants"),
-    "TestsModels": ("tests.helpers.models", "TestsModels"),
-    "TestsProtocols": ("tests.helpers.protocols", "TestsProtocols"),
-    "TestsTypings": ("tests.helpers.typings", "TestsTypings"),
-    "assert_analysis_results_structure": (
+_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
+    "TestsConstants": ["tests.helpers.constants", "TestsConstants"],
+    "TestsModels": ["tests.helpers.models", "TestsModels"],
+    "TestsProtocols": ["tests.helpers.protocols", "TestsProtocols"],
+    "TestsTypings": ["tests.helpers.typings", "TestsTypings"],
+    "assert_analysis_results_structure": [
         "tests.helpers.typing_helpers",
         "assert_analysis_results_structure",
-    ),
-    "assert_dict_structure": ("tests.helpers.typing_helpers", "assert_dict_structure"),
-    "assert_is_dict": ("tests.helpers.typing_helpers", "assert_is_dict"),
-    "assert_is_list": ("tests.helpers.typing_helpers", "assert_is_list"),
-    "assert_issues_structure": (
+    ],
+    "assert_dict_structure": ["tests.helpers.typing_helpers", "assert_dict_structure"],
+    "assert_is_dict": ["tests.helpers.typing_helpers", "assert_is_dict"],
+    "assert_is_list": ["tests.helpers.typing_helpers", "assert_is_list"],
+    "assert_issues_structure": [
         "tests.helpers.typing_helpers",
         "assert_issues_structure",
-    ),
-    "assert_metrics_structure": (
+    ],
+    "assert_metrics_structure": [
         "tests.helpers.typing_helpers",
         "assert_metrics_structure",
-    ),
-    "c": ("flext_quality", "c"),
-    "d": ("flext_quality", "d"),
-    "e": ("flext_quality", "e"),
-    "h": ("flext_quality", "h"),
-    "m": ("flext_quality", "m"),
-    "p": ("flext_quality", "p"),
-    "r": ("flext_quality", "r"),
-    "s": ("flext_quality", "s"),
-    "safe_dict_access": ("tests.helpers.typing_helpers", "safe_dict_access"),
-    "safe_list_access": ("tests.helpers.typing_helpers", "safe_list_access"),
-    "t": ("flext_quality", "t"),
-    "u": ("flext_quality", "u"),
-    "x": ("flext_quality", "x"),
+    ],
+    "c": ["flext_quality", "c"],
+    "d": ["flext_quality", "d"],
+    "e": ["flext_quality", "e"],
+    "h": ["flext_quality", "h"],
+    "m": ["flext_quality", "m"],
+    "p": ["flext_quality", "p"],
+    "r": ["flext_quality", "r"],
+    "s": ["flext_quality", "s"],
+    "safe_dict_access": ["tests.helpers.typing_helpers", "safe_dict_access"],
+    "safe_list_access": ["tests.helpers.typing_helpers", "safe_list_access"],
+    "t": ["flext_quality", "t"],
+    "u": ["flext_quality", "u"],
+    "x": ["flext_quality", "x"],
 }
 
 __all__ = [

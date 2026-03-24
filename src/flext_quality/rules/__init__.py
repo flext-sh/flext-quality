@@ -17,19 +17,19 @@ if TYPE_CHECKING:
     from flext_quality.rules.loader import FlextQualityRulesLoader
     from flext_quality.rules.validators import FlextQualityValidators
 
-_LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
-    "FlextQualityRulesEngine": (
+_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
+    "FlextQualityRulesEngine": [
         "flext_quality.rules.engine",
         "FlextQualityRulesEngine",
-    ),
-    "FlextQualityRulesLoader": (
+    ],
+    "FlextQualityRulesLoader": [
         "flext_quality.rules.loader",
         "FlextQualityRulesLoader",
-    ),
-    "FlextQualityValidators": (
+    ],
+    "FlextQualityValidators": [
         "flext_quality.rules.validators",
         "FlextQualityValidators",
-    ),
+    ],
 }
 
 __all__ = [

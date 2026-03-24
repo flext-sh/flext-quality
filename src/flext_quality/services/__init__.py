@@ -15,9 +15,9 @@ if TYPE_CHECKING:
 
     from flext_quality.services.cli import FlextQualityCliService, main
 
-_LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
-    "FlextQualityCliService": ("flext_quality.services.cli", "FlextQualityCliService"),
-    "main": ("flext_quality.services.cli", "main"),
+_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
+    "FlextQualityCliService": ["flext_quality.services.cli", "FlextQualityCliService"],
+    "main": ["flext_quality.services.cli", "main"],
 }
 
 __all__ = [

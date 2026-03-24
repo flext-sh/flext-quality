@@ -16,12 +16,12 @@ if TYPE_CHECKING:
     from flext_quality.hooks.base import FlextQualityBaseHook
     from flext_quality.hooks.manager import FlextQualityHookManager
 
-_LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
-    "FlextQualityBaseHook": ("flext_quality.hooks.base", "FlextQualityBaseHook"),
-    "FlextQualityHookManager": (
+_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
+    "FlextQualityBaseHook": ["flext_quality.hooks.base", "FlextQualityBaseHook"],
+    "FlextQualityHookManager": [
         "flext_quality.hooks.manager",
         "FlextQualityHookManager",
-    ),
+    ],
 }
 
 __all__ = [

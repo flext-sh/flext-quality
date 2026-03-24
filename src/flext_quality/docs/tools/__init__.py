@@ -28,39 +28,39 @@ if TYPE_CHECKING:
         validate_files_style,
     )
 
-_LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
-    "FlextQualityContentAnalyzer": (
+_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
+    "FlextQualityContentAnalyzer": [
         "flext_quality.docs.tools.content_analyzer",
         "FlextQualityContentAnalyzer",
-    ),
-    "FlextQualityLinkChecker": (
+    ],
+    "FlextQualityLinkChecker": [
         "flext_quality.docs.tools.link_checker",
         "FlextQualityLinkChecker",
-    ),
-    "FlextQualityStyleValidator": (
+    ],
+    "FlextQualityStyleValidator": [
         "flext_quality.docs.tools.style_validator",
         "FlextQualityStyleValidator",
-    ),
-    "analyze_file_content": (
+    ],
+    "analyze_file_content": [
         "flext_quality.docs.tools.content_analyzer",
         "analyze_file_content",
-    ),
-    "analyze_files_content": (
+    ],
+    "analyze_files_content": [
         "flext_quality.docs.tools.content_analyzer",
         "analyze_files_content",
-    ),
-    "validate_file_style": (
+    ],
+    "validate_file_style": [
         "flext_quality.docs.tools.style_validator",
         "validate_file_style",
-    ),
-    "validate_files_style": (
+    ],
+    "validate_files_style": [
         "flext_quality.docs.tools.style_validator",
         "validate_files_style",
-    ),
-    "validate_links_sync": (
+    ],
+    "validate_links_sync": [
         "flext_quality.docs.tools.link_checker",
         "validate_links_sync",
-    ),
+    ],
 }
 
 __all__ = [

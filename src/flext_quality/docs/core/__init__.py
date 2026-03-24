@@ -35,47 +35,47 @@ if TYPE_CHECKING:
         FlextQualityFileStatistics,
     )
 
-_LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
-    "FlextQualityAuditRules": (
+_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
+    "FlextQualityAuditRules": [
         "flext_quality.docs.core.config_manager",
         "FlextQualityAuditRules",
-    ),
-    "FlextQualityBaseAnalyzer": (
+    ],
+    "FlextQualityBaseAnalyzer": [
         "flext_quality.docs.core.base_classes",
         "FlextQualityBaseAnalyzer",
-    ),
-    "FlextQualityBaseAuditor": (
+    ],
+    "FlextQualityBaseAuditor": [
         "flext_quality.docs.core.base_classes",
         "FlextQualityBaseAuditor",
-    ),
-    "FlextQualityBaseReporter": (
+    ],
+    "FlextQualityBaseReporter": [
         "flext_quality.docs.core.base_classes",
         "FlextQualityBaseReporter",
-    ),
-    "FlextQualityBaseValidator": (
+    ],
+    "FlextQualityBaseValidator": [
         "flext_quality.docs.core.base_classes",
         "FlextQualityBaseValidator",
-    ),
-    "FlextQualityConfigManager": (
+    ],
+    "FlextQualityConfigManager": [
         "flext_quality.docs.core.config_manager",
         "FlextQualityConfigManager",
-    ),
-    "FlextQualityDocumentationFinder": (
+    ],
+    "FlextQualityDocumentationFinder": [
         "flext_quality.docs.core.file_discovery",
         "FlextQualityDocumentationFinder",
-    ),
-    "FlextQualityFileStatistics": (
+    ],
+    "FlextQualityFileStatistics": [
         "flext_quality.docs.core.file_discovery",
         "FlextQualityFileStatistics",
-    ),
-    "FlextQualityStyleGuide": (
+    ],
+    "FlextQualityStyleGuide": [
         "flext_quality.docs.core.config_manager",
         "FlextQualityStyleGuide",
-    ),
-    "FlextQualityValidationConfig": (
+    ],
+    "FlextQualityValidationConfig": [
         "flext_quality.docs.core.config_manager",
         "FlextQualityValidationConfig",
-    ),
+    ],
 }
 
 __all__ = [

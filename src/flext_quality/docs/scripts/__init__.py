@@ -28,33 +28,33 @@ if TYPE_CHECKING:
         main,
     )
 
-_LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
-    "FlextQualityContentValidator": (
+_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
+    "FlextQualityContentValidator": [
         "flext_quality.docs.scripts.validate",
         "FlextQualityContentValidator",
-    ),
-    "FlextQualityDocumentationAuditor": (
+    ],
+    "FlextQualityDocumentationAuditor": [
         "flext_quality.docs.scripts.audit",
         "FlextQualityDocumentationAuditor",
-    ),
-    "FlextQualityDocumentationOptimizer": (
+    ],
+    "FlextQualityDocumentationOptimizer": [
         "flext_quality.docs.scripts.optimize",
         "FlextQualityDocumentationOptimizer",
-    ),
-    "FlextQualityDocumentationReporter": (
+    ],
+    "FlextQualityDocumentationReporter": [
         "flext_quality.docs.scripts.report",
         "FlextQualityDocumentationReporter",
-    ),
-    "FlextQualityLinkValidator": (
+    ],
+    "FlextQualityLinkValidator": [
         "flext_quality.docs.scripts.validate",
         "FlextQualityLinkValidator",
-    ),
-    "MIN_HEADINGS_FOR_TOC": (
+    ],
+    "MIN_HEADINGS_FOR_TOC": [
         "flext_quality.docs.scripts.optimize",
         "MIN_HEADINGS_FOR_TOC",
-    ),
-    "ReportValue": ("flext_quality.docs.scripts.report", "ReportValue"),
-    "main": ("flext_quality.docs.scripts.validate", "main"),
+    ],
+    "ReportValue": ["flext_quality.docs.scripts.report", "ReportValue"],
+    "main": ["flext_quality.docs.scripts.validate", "main"],
 }
 
 __all__ = [

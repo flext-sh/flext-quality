@@ -32,24 +32,24 @@ if TYPE_CHECKING:
     )
     from flext_quality.integrations.mcp_client import FlextQualityMcpClient
 
-_LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
-    "FlextQualityClaudeContextClient": (
+_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
+    "FlextQualityClaudeContextClient": [
         "flext_quality.integrations.claude_context",
         "FlextQualityClaudeContextClient",
-    ),
-    "FlextQualityClaudeMemClient": (
+    ],
+    "FlextQualityClaudeMemClient": [
         "flext_quality.integrations.claude_mem",
         "FlextQualityClaudeMemClient",
-    ),
-    "FlextQualityCodeExecutionBridge": (
+    ],
+    "FlextQualityCodeExecutionBridge": [
         "flext_quality.integrations.code_execution",
         "FlextQualityCodeExecutionBridge",
-    ),
-    "FlextQualityMcpClient": (
+    ],
+    "FlextQualityMcpClient": [
         "flext_quality.integrations.mcp_client",
         "FlextQualityMcpClient",
-    ),
-    "McpToolCall": ("flext_quality.integrations.claude_mem", "McpToolCall"),
+    ],
+    "McpToolCall": ["flext_quality.integrations.claude_mem", "McpToolCall"],
 }
 
 __all__ = [
