@@ -14,91 +14,72 @@ import time
 from collections.abc import Mapping, MutableSequence, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
-from typing import TypedDict
 from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
 
 import requests
 from aiohttp import ClientError, ClientSession, ClientTimeout
-from pydantic import TypeAdapter
+from pydantic import BaseModel, TypeAdapter
 
 from flext_quality import t
 
 _AsyncSession = ClientSession
 
 
-class LinkConfigDict(TypedDict):
-    """Configuration dictionary for link validation."""
-
-    external_timeout: int
-    retry_attempts: int
-    user_agent: str
-    follow_redirects: bool
-    max_redirects: int
-    acceptable_status_codes: Sequence[int]
-
-
-class LinkInfoDictRequired(TypedDict):
-    """Required fields for link information."""
-
-    url: str
-    text: str
-    type: str
-    file: str
-
-
-class LinkInfoDict(LinkInfoDictRequired, total=False):
-    """Link information dictionary."""
-
-    line: int
-    reference: str
-    context: t.ContainerMapping
-
-
-class LinkResultDictRequired(TypedDict):
-    """Required fields for link check result."""
-
-    url: str
-    valid: bool
-    context: t.ContainerMapping
-
-
-class LinkResultDict(LinkResultDictRequired, total=False):
-    """Link check result dictionary."""
-
-    status_code: int
-    response_time: float
-    redirected: bool
-    final_url: str
-    content_type: str
-    error: str
-
-
-class PerformanceMetricsDict(TypedDict):
-    """Performance metrics dictionary."""
-
-    total_time: float
-    average_response_time: float
-    slowest_response: float
-
-
-class ResultsDict(TypedDict):
-    """Results dictionary."""
-
-    total_links: int
-    valid_links: int
-    broken_links: int
-    warnings: int
-    errors: MutableSequence[LinkResultDict]
-    warnings_list: MutableSequence[t.ContainerMapping]
-    performance: PerformanceMetricsDict
-
-
-_RESULTS_ADAPTER: TypeAdapter[ResultsDict] = TypeAdapter(ResultsDict)
-
-
 class FlextQualityLinkChecker:
     """Advanced link validation and checking system."""
+
+    class LinkConfig(BaseModel):
+        """Configuration dictionary for link validation."""
+
+        external_timeout: int
+        retry_attempts: int
+        user_agent: str
+        follow_redirects: bool
+        max_redirects: int
+        acceptable_status_codes: Sequence[int]
+
+    class LinkInfo(BaseModel):
+        """Link information dictionary."""
+
+        url: str
+        text: str
+        type: str
+        file: str
+        line: int | None = None
+        reference: str | None = None
+        context: t.ContainerMapping | None = None
+
+    class LinkResult(BaseModel):
+        """Link check result dictionary."""
+
+        url: str
+        valid: bool
+        context: t.ContainerMapping
+        status_code: int | None = None
+        response_time: float | None = None
+        redirected: bool | None = None
+        final_url: str | None = None
+        content_type: str | None = None
+        error: str | None = None
+
+    class PerformanceMetrics(BaseModel):
+        """Performance metrics dictionary."""
+
+        total_time: float
+        average_response_time: float
+        slowest_response: float
+
+    class Results(BaseModel):
+        """Results dictionary."""
+
+        total_links: int
+        valid_links: int
+        broken_links: int
+        warnings: int
+        errors: MutableSequence[FlextQualityLinkChecker.LinkResult]
+        warnings_list: MutableSequence[t.ContainerMapping]
+        performance: FlextQualityLinkChecker.PerformanceMetrics
 
     MIN_PATH_PARTS_FOR_REPO = 2
     MIN_PATH_PARTS_FOR_DETAILED_REPO = 3
@@ -110,28 +91,28 @@ class FlextQualityLinkChecker:
         config_path: str | None = "docs/maintenance/config/validation_config.yaml",
     ) -> None:
         """Initialize the link checker with configuration."""
-        self.config: LinkConfigDict = self._get_default_config()
+        self.config: FlextQualityLinkChecker.LinkConfig = self._get_default_config()
         self.load_config(config_path)
         self.session: _AsyncSession | None = None
         self.cache: t.MutableContainerMapping = {}
-        self.results: ResultsDict = {
-            "total_links": 0,
-            "valid_links": 0,
-            "broken_links": 0,
-            "warnings": 0,
-            "errors": [],
-            "warnings_list": [],
-            "performance": {
-                "total_time": 0.0,
-                "average_response_time": 0.0,
-                "slowest_response": 0.0,
-            },
-        }
+        self.results: FlextQualityLinkChecker.Results = FlextQualityLinkChecker.Results(
+            total_links=0,
+            valid_links=0,
+            broken_links=0,
+            warnings=0,
+            errors=[],
+            warnings_list=[],
+            performance=FlextQualityLinkChecker.PerformanceMetrics(
+                total_time=0.0,
+                average_response_time=0.0,
+                slowest_response=0.0,
+            ),
+        )
 
     @staticmethod
-    def _get_default_config() -> LinkConfigDict:
+    def _get_default_config() -> FlextQualityLinkChecker.LinkConfig:
         """Get default configuration."""
-        return LinkConfigDict(
+        return FlextQualityLinkChecker.LinkConfig(
             external_timeout=10,
             retry_attempts=3,
             user_agent="FLEXT-Quality-Link-Validator/1.0",
@@ -157,9 +138,9 @@ class FlextQualityLinkChecker:
     def find_all_links(
         self,
         file_paths: Sequence[pathlib.Path],
-    ) -> Sequence[LinkInfoDict]:
+    ) -> Sequence[FlextQualityLinkChecker.LinkInfo]:
         """Extract all links from the given files."""
-        all_links: MutableSequence[LinkInfoDict] = []
+        all_links: MutableSequence[FlextQualityLinkChecker.LinkInfo] = []
 
         for file_path in file_paths:
             try:
@@ -168,14 +149,14 @@ class FlextQualityLinkChecker:
                 md_links = re.findall(r"\[([^\]]+)\]\(([^)]+)\)", content)
                 for text, url in md_links:
                     link_type = self._classify_link(url)
-                    link_info: LinkInfoDict = {
-                        "url": url,
-                        "text": text,
-                        "type": link_type,
-                        "file": str(file_path),
-                        "line": content.count("\n", 0, content.find(f"[{text}]({url})"))
+                    link_info = FlextQualityLinkChecker.LinkInfo(
+                        url=url,
+                        text=text,
+                        type=link_type,
+                        file=str(file_path),
+                        line=content.count("\n", 0, content.find(f"[{text}]({url})"))
                         + 1,
-                    }
+                    )
                     all_links.append(link_info)
 
                 ref_links = re.findall(r"\[([^\]]+)\]\[([^\]]+)\]", content)
@@ -186,7 +167,7 @@ class FlextQualityLinkChecker:
                     if ref in ref_dict:
                         url = ref_dict[ref]
                         link_type = self._classify_link(url)
-                        link_info = LinkInfoDict(
+                        link_info = FlextQualityLinkChecker.LinkInfo(
                             url=url,
                             text=text,
                             type=link_type,
@@ -221,23 +202,23 @@ class FlextQualityLinkChecker:
         self,
         url: str,
         context: t.ContainerMapping | None = None,
-    ) -> LinkResultDict:
+    ) -> FlextQualityLinkChecker.LinkResult:
         """Asynchronously check a single link."""
         start_time = time.time()
 
         try:
             if self.session is None:
-                return LinkResultDict(
+                return FlextQualityLinkChecker.LinkResult(
                     url=url,
                     error="session_not_initialized",
                     valid=False,
                     context=context or {},
                 )
-            external_timeout = self.config.get("external_timeout", 10)
-            follow_redirects = self.config.get("follow_redirects", True)
-            max_redirects = self.config.get("max_redirects", 5)
-            user_agent = self.config.get("user_agent", "")
-            acceptable_codes = self.config.get("acceptable_status_codes", [])
+            external_timeout = self.config.external_timeout
+            follow_redirects = self.config.follow_redirects
+            max_redirects = self.config.max_redirects
+            user_agent = self.config.user_agent
+            acceptable_codes = self.config.acceptable_status_codes
 
             async with self.session.head(
                 url,
@@ -248,7 +229,7 @@ class FlextQualityLinkChecker:
             ) as response:
                 response_time = time.time() - start_time
 
-                result: LinkResultDict = LinkResultDict(
+                result = FlextQualityLinkChecker.LinkResult(
                     url=url,
                     status_code=response.status,
                     response_time=response_time,
@@ -259,23 +240,23 @@ class FlextQualityLinkChecker:
                     context=context or {},
                 )
 
-                self.results["performance"]["slowest_response"] = max(
-                    self.results["performance"]["slowest_response"],
+                self.results.performance.slowest_response = max(
+                    self.results.performance.slowest_response,
                     response_time,
                 )
 
                 return result
 
         except TimeoutError:
-            return LinkResultDict(
+            return FlextQualityLinkChecker.LinkResult(
                 url=url,
                 error="timeout",
-                response_time=self.config.get("external_timeout", 10),
+                response_time=self.config.external_timeout,
                 valid=False,
                 context=context or {},
             )
         except ClientError as e:
-            return LinkResultDict(
+            return FlextQualityLinkChecker.LinkResult(
                 url=url,
                 error=str(e),
                 response_time=time.time() - start_time,
@@ -283,7 +264,7 @@ class FlextQualityLinkChecker:
                 context=context or {},
             )
         except (OSError, ValueError, RuntimeError) as e:
-            return LinkResultDict(
+            return FlextQualityLinkChecker.LinkResult(
                 url=url,
                 error=f"unexpected_error: {e!s}",
                 response_time=time.time() - start_time,
@@ -295,52 +276,51 @@ class FlextQualityLinkChecker:
         self,
         url: str,
         context: t.ContainerMapping | None = None,
-    ) -> LinkResultDict:
+    ) -> FlextQualityLinkChecker.LinkResult:
         """Synchronously check a single link (fallback method)."""
         start_time = time.time()
 
-        for attempt in range(self.config["retry_attempts"]):
+        for attempt in range(self.config.retry_attempts):
             try:
                 response = requests.head(
                     url,
-                    timeout=self.config["external_timeout"],
-                    headers={"User-Agent": self.config["user_agent"]},
-                    allow_redirects=self.config["follow_redirects"],
+                    timeout=self.config.external_timeout,
+                    headers={"User-Agent": self.config.user_agent},
+                    allow_redirects=self.config.follow_redirects,
                 )
 
                 response_time = time.time() - start_time
 
-                result: LinkResultDict = LinkResultDict(
+                result = FlextQualityLinkChecker.LinkResult(
                     url=url,
                     status_code=response.status_code,
                     response_time=response_time,
-                    valid=response.status_code
-                    in self.config["acceptable_status_codes"],
+                    valid=response.status_code in self.config.acceptable_status_codes,
                     redirected=bool(response.history),
                     final_url=response.url,
                     content_type=response.headers.get("content-type", ""),
                     context=context or {},
                 )
 
-                self.results["performance"]["slowest_response"] = max(
-                    self.results["performance"]["slowest_response"],
+                self.results.performance.slowest_response = max(
+                    self.results.performance.slowest_response,
                     response_time,
                 )
 
                 return result
 
             except requests.exceptions.Timeout:
-                if attempt == self.config["retry_attempts"] - 1:
-                    return LinkResultDict(
+                if attempt == self.config.retry_attempts - 1:
+                    return FlextQualityLinkChecker.LinkResult(
                         url=url,
                         error="timeout",
-                        response_time=self.config["external_timeout"],
+                        response_time=self.config.external_timeout,
                         valid=False,
                         context=context or {},
                     )
             except requests.exceptions.RequestException as e:
-                if attempt == self.config["retry_attempts"] - 1:
-                    return LinkResultDict(
+                if attempt == self.config.retry_attempts - 1:
+                    return FlextQualityLinkChecker.LinkResult(
                         url=url,
                         error=str(e),
                         response_time=time.time() - start_time,
@@ -348,7 +328,7 @@ class FlextQualityLinkChecker:
                         context=context or {},
                     )
             except (OSError, ValueError, RuntimeError) as e:
-                return LinkResultDict(
+                return FlextQualityLinkChecker.LinkResult(
                     url=url,
                     error=f"unexpected_error: {e!s}",
                     response_time=time.time() - start_time,
@@ -356,40 +336,40 @@ class FlextQualityLinkChecker:
                     context=context or {},
                 )
 
-        return LinkResultDict(
+        return FlextQualityLinkChecker.LinkResult(
             url=url,
             error="max_retries_exceeded",
             valid=False,
-            context=context or {},
+            context={},
         )
 
     async def check_links_batch_async(
         self,
-        links: Sequence[LinkInfoDict],
-    ) -> Sequence[LinkResultDict]:
+        links: Sequence[FlextQualityLinkChecker.LinkInfo],
+    ) -> Sequence[FlextQualityLinkChecker.LinkResult]:
         """Check multiple links asynchronously."""
         start_time = time.time()
 
         semaphore = asyncio.Semaphore(10)
 
         async def check_with_semaphore(
-            link_info: LinkInfoDict,
-        ) -> LinkResultDict:
+            link_info: FlextQualityLinkChecker.LinkInfo,
+        ) -> FlextQualityLinkChecker.LinkResult:
             async with semaphore:
                 await asyncio.sleep(0.1)
-                url = link_info.get("url", "")
-                context = link_info.get("context")
+                url = link_info.url
+                context = link_info.context
                 return await self.check_link_async(url, context)
 
         tasks = [check_with_semaphore(link) for link in links]
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        processed_results: MutableSequence[LinkResultDict] = []
+        processed_results: MutableSequence[FlextQualityLinkChecker.LinkResult] = []
         for result in results:
             if isinstance(result, BaseException):
                 processed_results.append(
-                    LinkResultDict(
+                    FlextQualityLinkChecker.LinkResult(
                         url="",
                         error=f"task_exception: {result!s}",
                         valid=False,
@@ -399,16 +379,15 @@ class FlextQualityLinkChecker:
             else:
                 processed_results.append(result)
 
-        self.results["performance"]["total_time"] = time.time() - start_time
+        self.results.performance.total_time = time.time() - start_time
 
         valid_times: MutableSequence[float] = []
         for r in processed_results:
-            response_time = r.get("response_time")
-            if response_time is not None and r.get("valid"):
-                valid_times.append(float(response_time))
+            if r.response_time is not None and r.valid:
+                valid_times.append(float(r.response_time))
 
         if valid_times:
-            self.results["performance"]["average_response_time"] = sum(
+            self.results.performance.average_response_time = sum(
                 valid_times,
             ) / len(valid_times)
 
@@ -416,34 +395,31 @@ class FlextQualityLinkChecker:
 
     def check_links_batch_sync(
         self,
-        links: Sequence[LinkInfoDict],
-    ) -> Sequence[LinkResultDict]:
+        links: Sequence[FlextQualityLinkChecker.LinkInfo],
+    ) -> Sequence[FlextQualityLinkChecker.LinkResult]:
         """Check multiple links synchronously with thread pool."""
         start_time = time.time()
 
         def check_single(
-            link_info: LinkInfoDict,
-        ) -> LinkResultDict:
+            link_info: FlextQualityLinkChecker.LinkInfo,
+        ) -> FlextQualityLinkChecker.LinkResult:
             time.sleep(0.1)
-            url = link_info.get("url", "")
-            raw_context = link_info.get("context")
-            context_obj = raw_context if isinstance(raw_context, dict) else None
-            ctx = context_obj
+            url = link_info.url
+            ctx = link_info.context
             return self.check_link_sync(url, ctx)
 
         with ThreadPoolExecutor(max_workers=5) as executor:
             results = list(executor.map(check_single, links))
 
-        self.results["performance"]["total_time"] = time.time() - start_time
+        self.results.performance.total_time = time.time() - start_time
 
         valid_times: MutableSequence[float] = []
         for r in results:
-            response_time = r.get("response_time")
-            if response_time is not None and r.get("valid"):
-                valid_times.append(float(response_time))
+            if r.response_time is not None and r.valid:
+                valid_times.append(float(r.response_time))
 
         if valid_times:
-            self.results["performance"]["average_response_time"] = sum(
+            self.results.performance.average_response_time = sum(
                 valid_times,
             ) / len(valid_times)
 
@@ -451,12 +427,12 @@ class FlextQualityLinkChecker:
 
     async def validate_links(
         self,
-        links: Sequence[LinkInfoDict],
+        links: Sequence[FlextQualityLinkChecker.LinkInfo],
         *,
         use_async: bool = True,
-    ) -> ResultsDict:
+    ) -> FlextQualityLinkChecker.Results:
         """Main link validation method."""
-        self.results["total_links"] = len(links)
+        self.results.total_links = len(links)
 
         if use_async:
             try:
@@ -470,19 +446,19 @@ class FlextQualityLinkChecker:
 
         # Process results
         for result in results:
-            if result.get("valid"):
-                self.results["valid_links"] += 1
+            if result.valid:
+                self.results.valid_links += 1
             else:
-                self.results["broken_links"] += 1
-                self.results["errors"].append(result)
+                self.results.broken_links += 1
+                self.results.errors.append(result)
 
                 # Add warnings for specific cases
-                if result.get("error") == "timeout":
-                    self.results["warnings"] += 1
-                    self.results["warnings_list"].append({
+                if result.error == "timeout":
+                    self.results.warnings += 1
+                    self.results.warnings_list.append({
                         "type": "slow_response",
-                        "url": result["url"],
-                        "message": f"Link timed out after {self.config['external_timeout']}s",
+                        "url": result.url,
+                        "message": f"Link timed out after {self.config.external_timeout}s",
                     })
 
         return self.results
@@ -494,7 +470,7 @@ class FlextQualityLinkChecker:
             rp.set_url(f"https://{domain}/robots.txt")
             rp.read()
 
-            return rp.can_fetch(self.config["user_agent"], "/")
+            return rp.can_fetch(self.config.user_agent, "/")
         except (OSError, ConnectionError, TimeoutError, UnicodeDecodeError):
             # If robots.txt can't be read, assume crawling is allowed
             return True
@@ -557,11 +533,14 @@ class FlextQualityLinkChecker:
 
     def generate_report(self, report_format: str = "json") -> str:
         """Generate validation report."""
+        results_adapter: TypeAdapter[FlextQualityLinkChecker.Results] = TypeAdapter(
+            FlextQualityLinkChecker.Results
+        )
         if report_format == "json":
-            return _RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
+            return results_adapter.dump_json(self.results, indent=2).decode()
         if report_format == "summary":
             return self._generate_summary_report()
-        return _RESULTS_ADAPTER.dump_json(self.results).decode()
+        return results_adapter.dump_json(self.results).decode()
 
     def _generate_summary_report(self) -> str:
         """Generate a human-readable summary report."""
@@ -571,31 +550,31 @@ class FlextQualityLinkChecker:
 Link Validation Summary Report
 ==============================
 
-Total Links Checked: {r["total_links"]}
-Valid Links: {r["valid_links"]}
-Broken Links: {r["broken_links"]}
-Warnings: {r["warnings"]}
+Total Links Checked: {r.total_links}
+Valid Links: {r.valid_links}
+Broken Links: {r.broken_links}
+Warnings: {r.warnings}
 
 Performance Metrics:
-- Total Time: {r["performance"]["total_time"]:.2f}s
-- Average Response Time: {r["performance"]["average_response_time"]:.2f}s
-- Slowest Response: {r["performance"]["slowest_response"]:.2f}s
+- Total Time: {r.performance.total_time:.2f}s
+- Average Response Time: {r.performance.average_response_time:.2f}s
+- Slowest Response: {r.performance.slowest_response:.2f}s
 
 Broken Links:
 """
 
-        for error in r["errors"][:10]:  # Show first 10 broken links
-            url = error.get("url", "Unknown")
-            status = error.get("status_code", "N/A")
-            error_msg = error.get("error", "Unknown error")
+        for error in r.errors[:10]:  # Show first 10 broken links
+            url = error.url
+            status = error.status_code or "N/A"
+            error_msg = error.error or "Unknown error"
             report += f"- {url} (Status: {status}, Error: {error_msg})\n"
 
-        if len(r["errors"]) > self.MAX_BROKEN_LINKS_TO_SHOW:
-            report += f"... and {len(r['errors']) - self.MAX_BROKEN_LINKS_TO_SHOW} more broken links\n"
+        if len(r.errors) > self.MAX_BROKEN_LINKS_TO_SHOW:
+            report += f"... and {len(r.errors) - self.MAX_BROKEN_LINKS_TO_SHOW} more broken links\n"
 
-        if r["warnings_list"]:
+        if r.warnings_list:
             report += "\nWarnings:\n"
-            for warning in r["warnings_list"][:5]:
+            for warning in r.warnings_list[:5]:
                 report += f"- {warning['url']}: {warning['message']}\n"
 
         return report
@@ -605,6 +584,9 @@ Broken Links:
         output_path: str = "docs/maintenance/reports/",
     ) -> pathlib.Path:
         """Save validation report."""
+        results_adapter: TypeAdapter[FlextQualityLinkChecker.Results] = TypeAdapter(
+            FlextQualityLinkChecker.Results
+        )
         pathlib.Path(output_path).mkdir(exist_ok=True, parents=True)
 
         timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
@@ -612,38 +594,38 @@ Broken Links:
         filepath = pathlib.Path(output_path) / filename
 
         pathlib.Path(filepath).write_bytes(
-            _RESULTS_ADAPTER.dump_json(self.results, indent=2),
+            results_adapter.dump_json(self.results, indent=2),
         )
 
         return filepath
 
 
 def validate_links_sync(
-    links: Sequence[LinkInfoDict],
+    links: Sequence[FlextQualityLinkChecker.LinkInfo],
     config_path: str | None = None,
-) -> ResultsDict:
+) -> FlextQualityLinkChecker.Results:
     """Synchronous wrapper for link validation."""
     checker = FlextQualityLinkChecker(config_path)
     return asyncio.run(checker.validate_links(links, use_async=True))
 
 
 if __name__ == "__main__":
-    test_links: Sequence[LinkInfoDict] = [
-        LinkInfoDict(
+    test_links: Sequence[FlextQualityLinkChecker.LinkInfo] = [
+        FlextQualityLinkChecker.LinkInfo(
             url="https://github.com/microsoft/vscode",
             text="VSCode",
             type="external",
             file="README.md",
             context={"file": "README.md"},
         ),
-        LinkInfoDict(
+        FlextQualityLinkChecker.LinkInfo(
             url="https://httpbin.org/status/200",
             text="httpbin",
             type="external",
             file="docs/setup.md",
             context={"file": "docs/setup.md"},
         ),
-        LinkInfoDict(
+        FlextQualityLinkChecker.LinkInfo(
             url="https://httpbin.org/status/404",
             text="broken",
             type="external",

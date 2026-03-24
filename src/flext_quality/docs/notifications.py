@@ -49,11 +49,11 @@ class FlextQualityDocumentationNotifier:
         enabled: bool
 
     class _AlertsConfig(BaseModel):
-        critical_issues: "FlextQualityDocumentationNotifier._AlertThresholdConfig"
-        quality_drop: "FlextQualityDocumentationNotifier._AlertThresholdConfig"
-        broken_links: "FlextQualityDocumentationNotifier._AlertThresholdConfig"
-        weekly_report: "FlextQualityDocumentationNotifier._AlertToggleConfig"
-        monthly_report: "FlextQualityDocumentationNotifier._AlertToggleConfig"
+        critical_issues: FlextQualityDocumentationNotifier._AlertThresholdConfig
+        quality_drop: FlextQualityDocumentationNotifier._AlertThresholdConfig
+        broken_links: FlextQualityDocumentationNotifier._AlertThresholdConfig
+        weekly_report: FlextQualityDocumentationNotifier._AlertToggleConfig
+        monthly_report: FlextQualityDocumentationNotifier._AlertToggleConfig
 
     class _EmailConfig(BaseModel):
         smtp_server: str
@@ -74,18 +74,18 @@ class FlextQualityDocumentationNotifier:
         timeout: int
 
     class _ChannelsConfig(BaseModel):
-        console: "FlextQualityDocumentationNotifier._ChannelConfig"
-        email: "FlextQualityDocumentationNotifier._ChannelConfig"
-        slack: "FlextQualityDocumentationNotifier._ChannelConfig"
-        webhook: "FlextQualityDocumentationNotifier._ChannelConfig"
+        console: FlextQualityDocumentationNotifier._ChannelConfig
+        email: FlextQualityDocumentationNotifier._ChannelConfig
+        slack: FlextQualityDocumentationNotifier._ChannelConfig
+        webhook: FlextQualityDocumentationNotifier._ChannelConfig
 
     class _NotifierConfig(BaseModel):
         enabled: bool
-        channels: "FlextQualityDocumentationNotifier._ChannelsConfig"
-        alerts: "FlextQualityDocumentationNotifier._AlertsConfig"
-        email: "FlextQualityDocumentationNotifier._EmailConfig"
-        slack: "FlextQualityDocumentationNotifier._SlackConfig"
-        webhook: "FlextQualityDocumentationNotifier._WebhookConfig"
+        channels: FlextQualityDocumentationNotifier._ChannelsConfig
+        alerts: FlextQualityDocumentationNotifier._AlertsConfig
+        email: FlextQualityDocumentationNotifier._EmailConfig
+        slack: FlextQualityDocumentationNotifier._SlackConfig
+        webhook: FlextQualityDocumentationNotifier._WebhookConfig
 
     def __init__(
         self,

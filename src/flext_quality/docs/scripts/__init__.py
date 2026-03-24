@@ -38,19 +38,11 @@ if TYPE_CHECKING:
         OptimizerResults,
     )
     from flext_quality.docs.scripts.report import (
-        AuditSummary,
         DocumentationReporter,
         FlextQualityDocumentationReporter,
-        FlextQualityReportData,
-        FlextQualityTrendData,
-        OptimizationSummary,
-        Recommendation,
         ReportData,
         ReportValue,
-        SummaryMetrics,
         TrendData,
-        TrendEntry,
-        ValidationSummary,
     )
     from flext_quality.docs.scripts.validate import (
         ContentIssue,
@@ -69,7 +61,6 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
     "AuditMetrics": ("flext_quality.docs.scripts.audit", "AuditMetrics"),
     "AuditRecommendation": ("flext_quality.docs.scripts.audit", "AuditRecommendation"),
     "AuditRulesConfig": ("flext_quality.docs.scripts.audit", "AuditRulesConfig"),
-    "AuditSummary": ("flext_quality.docs.scripts.report", "AuditSummary"),
     "AuditorResults": ("flext_quality.docs.scripts.audit", "AuditorResults"),
     "ContentAnalysisConfig": (
         "flext_quality.docs.scripts.audit",
@@ -107,14 +98,6 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
         "flext_quality.docs.scripts.report",
         "FlextQualityDocumentationReporter",
     ),
-    "FlextQualityReportData": (
-        "flext_quality.docs.scripts.report",
-        "FlextQualityReportData",
-    ),
-    "FlextQualityTrendData": (
-        "flext_quality.docs.scripts.report",
-        "FlextQualityTrendData",
-    ),
     "FormattingConfig": ("flext_quality.docs.scripts.audit", "FormattingConfig"),
     "LinkCheckResult": ("flext_quality.docs.scripts.validate", "LinkCheckResult"),
     "LinkRecord": ("flext_quality.docs.scripts.validate", "LinkRecord"),
@@ -132,13 +115,11 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
         "MIN_HEADINGS_FOR_TOC",
     ),
     "MarkdownStyleConfig": ("flext_quality.docs.scripts.audit", "MarkdownStyleConfig"),
-    "OptimizationSummary": ("flext_quality.docs.scripts.report", "OptimizationSummary"),
     "OptimizerResults": ("flext_quality.docs.scripts.optimize", "OptimizerResults"),
     "QualityThresholdsConfig": (
         "flext_quality.docs.scripts.audit",
         "QualityThresholdsConfig",
     ),
-    "Recommendation": ("flext_quality.docs.scripts.report", "Recommendation"),
     "ReportData": ("flext_quality.docs.scripts.report", "ReportData"),
     "ReportValue": ("flext_quality.docs.scripts.report", "ReportValue"),
     "SeverityLevelsConfig": (
@@ -146,11 +127,8 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
         "SeverityLevelsConfig",
     ),
     "StyleGuideConfig": ("flext_quality.docs.scripts.audit", "StyleGuideConfig"),
-    "SummaryMetrics": ("flext_quality.docs.scripts.report", "SummaryMetrics"),
     "TrendData": ("flext_quality.docs.scripts.report", "TrendData"),
-    "TrendEntry": ("flext_quality.docs.scripts.report", "TrendEntry"),
     "ValidationConfig": ("flext_quality.docs.scripts.audit", "ValidationConfig"),
-    "ValidationSummary": ("flext_quality.docs.scripts.report", "ValidationSummary"),
     "main": ("flext_quality.docs.scripts.validate", "main"),
 }
 
@@ -160,7 +138,6 @@ __all__ = [
     "AuditMetrics",
     "AuditRecommendation",
     "AuditRulesConfig",
-    "AuditSummary",
     "AuditorResults",
     "ContentAnalysisConfig",
     "ContentChecksConfig",
@@ -174,8 +151,6 @@ __all__ = [
     "FlextQualityDocumentationAuditor",
     "FlextQualityDocumentationOptimizer",
     "FlextQualityDocumentationReporter",
-    "FlextQualityReportData",
-    "FlextQualityTrendData",
     "FormattingConfig",
     "LinkCheckResult",
     "LinkRecord",
@@ -183,19 +158,14 @@ __all__ = [
     "LinkValidator",
     "LinkValidatorResults",
     "MarkdownStyleConfig",
-    "OptimizationSummary",
     "OptimizerResults",
     "QualityThresholdsConfig",
-    "Recommendation",
     "ReportData",
     "ReportValue",
     "SeverityLevelsConfig",
     "StyleGuideConfig",
-    "SummaryMetrics",
     "TrendData",
-    "TrendEntry",
     "ValidationConfig",
-    "ValidationSummary",
     "main",
 ]
 

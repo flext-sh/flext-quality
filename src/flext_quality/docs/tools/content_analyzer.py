@@ -12,120 +12,111 @@ from collections import Counter
 from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TypedDict
 
 import yaml
-from pydantic import TypeAdapter
+from pydantic import BaseModel, TypeAdapter
 
 from flext_quality import t
 
 
-class ConfigDict(TypedDict, total=False):
-    """Configuration dictionary structure."""
-
-    content_checks: Mapping[str, bool]
-    quality_thresholds: Mapping[str, int]
-
-
-class MetricsDict(TypedDict, total=False):
-    """Metrics dictionary structure."""
-
-    word_count: int
-    sentence_count: int
-    character_count: int
-    character_count_no_spaces: int
-    line_count: int
-    code_lines: int
-    empty_lines: int
-    heading_count: int
-    list_count: int
-    link_count: int
-    image_count: int
-    code_block_count: int
-    avg_words_per_sentence: float
-    avg_sentence_length: float
-    code_to_content_ratio: float
-
-
-class ReadabilityDict(TypedDict, total=False):
-    """Readability analysis dictionary structure."""
-
-    readability_score: float
-    grade_level: float | str
-    reading_level: str
-    reading_ease: float
-    avg_words_per_sentence: float
-    avg_syllables_per_word: float
-
-
-class StructureDict(TypedDict, total=False):
-    """Structure analysis dictionary structure."""
-
-    has_table_of_contents: bool
-    toc_position: int
-    heading_hierarchy_valid: bool
-    sections: MutableSequence[Mapping[str, int | str]]
-    depth_analysis: MutableMapping[str, int | float]
-
-
-class CompletenessDict(TypedDict, total=False):
-    """Completeness check dictionary structure."""
-
-    score: int
-    missing_elements: MutableSequence[str]
-    required_sections_present: MutableSequence[str]
-    optional_sections_present: MutableSequence[str]
-    word_count_sufficient: bool
-    missing_required_sections: MutableSequence[str]
-
-
-class IssueDict(TypedDict, total=False):
-    """Issue dictionary structure."""
-
-    type: str
-    severity: str
-    message: str
-
-
-class AnalysisDict(TypedDict, total=False):
-    """Analysis result dictionary structure."""
-
-    file: str
-    metrics: MetricsDict
-    readability: ReadabilityDict
-    structure: StructureDict
-    completeness: CompletenessDict
-    quality_score: float
-    issues: MutableSequence[IssueDict]
-    suggestions: MutableSequence[str]
-    error: str
-
-
-class RecommendationDict(TypedDict, total=False):
-    """Recommendation dictionary structure."""
-
-    priority: str
-    type: str
-    message: str
-    actions: MutableSequence[str]
-
-
-class ResultsDict(TypedDict):
-    """Results dictionary structure."""
-
-    files_analyzed: int
-    quality_metrics: MutableMapping[str, MetricsDict]
-    content_scores: MutableMapping[str, float]
-    readability_stats: MutableMapping[str, ReadabilityDict]
-    completeness_checks: MutableMapping[str, CompletenessDict]
-    recommendations: MutableSequence[RecommendationDict | str]
-
-
-_RESULTS_ADAPTER: TypeAdapter[ResultsDict] = TypeAdapter(ResultsDict)
-
-
 class FlextQualityContentAnalyzer:
     """Advanced content quality analysis system."""
+
+    class AnalyzerConfig(BaseModel, total=False):  # type: ignore[call-arg]
+        """Configuration dictionary structure."""
+
+        content_checks: Mapping[str, bool] | None = None
+        quality_thresholds: Mapping[str, int] | None = None
+
+    class Metrics(BaseModel):
+        """Metrics dictionary structure."""
+
+        word_count: int | None = None
+        sentence_count: int | None = None
+        character_count: int | None = None
+        character_count_no_spaces: int | None = None
+        line_count: int | None = None
+        code_lines: int | None = None
+        empty_lines: int | None = None
+        heading_count: int | None = None
+        list_count: int | None = None
+        link_count: int | None = None
+        image_count: int | None = None
+        code_block_count: int | None = None
+        avg_words_per_sentence: float | None = None
+        avg_sentence_length: float | None = None
+        code_to_content_ratio: float | None = None
+
+    class Readability(BaseModel):
+        """Readability analysis dictionary structure."""
+
+        readability_score: float | None = None
+        grade_level: float | str | None = None
+        reading_level: str | None = None
+        reading_ease: float | None = None
+        avg_words_per_sentence: float | None = None
+        avg_syllables_per_word: float | None = None
+
+    class Structure(BaseModel):
+        """Structure analysis dictionary structure."""
+
+        has_table_of_contents: bool | None = None
+        toc_position: int | None = None
+        heading_hierarchy_valid: bool | None = None
+        sections: MutableSequence[Mapping[str, int | str]] | None = None
+        depth_analysis: MutableMapping[str, int | float] | None = None
+
+    class Completeness(BaseModel):
+        """Completeness check dictionary structure."""
+
+        score: int | None = None
+        missing_elements: MutableSequence[str] | None = None
+        required_sections_present: MutableSequence[str] | None = None
+        optional_sections_present: MutableSequence[str] | None = None
+        word_count_sufficient: bool | None = None
+        missing_required_sections: MutableSequence[str] | None = None
+
+    class Issue(BaseModel):
+        """Issue dictionary structure."""
+
+        type: str | None = None
+        severity: str | None = None
+        message: str | None = None
+
+    class Analysis(BaseModel):
+        """Analysis result dictionary structure."""
+
+        file: str | None = None
+        metrics: FlextQualityContentAnalyzer.Metrics | None = None
+        readability: FlextQualityContentAnalyzer.Readability | None = None
+        structure: FlextQualityContentAnalyzer.Structure | None = None
+        completeness: FlextQualityContentAnalyzer.Completeness | None = None
+        quality_score: float | None = None
+        issues: MutableSequence[FlextQualityContentAnalyzer.Issue] | None = None
+        suggestions: MutableSequence[str] | None = None
+        error: str | None = None
+
+    class AnalyzerRecommendation(BaseModel):
+        """Recommendation dictionary structure."""
+
+        priority: str | None = None
+        type: str | None = None
+        message: str | None = None
+        actions: MutableSequence[str] | None = None
+
+    class Results(BaseModel):
+        """Results dictionary structure."""
+
+        files_analyzed: int
+        quality_metrics: MutableMapping[str, FlextQualityContentAnalyzer.Metrics]
+        content_scores: MutableMapping[str, float]
+        readability_stats: MutableMapping[str, FlextQualityContentAnalyzer.Readability]
+        completeness_checks: MutableMapping[
+            str, FlextQualityContentAnalyzer.Completeness
+        ]
+        recommendations: MutableSequence[
+            FlextQualityContentAnalyzer.AnalyzerRecommendation | str
+        ]
 
     EXCELLENT_READABILITY_MIN = 90
     GOOD_READABILITY_MIN = 80
@@ -152,19 +143,16 @@ class FlextQualityContentAnalyzer:
         """
         self.config: Mapping[str, Mapping[str, bool] | Mapping[str, int] | str] = {}
         self.load_config(config_path)
-        quality_metrics: MutableMapping[str, MetricsDict] = {}
-        content_scores: MutableMapping[str, float] = {}
-        readability_stats: MutableMapping[str, ReadabilityDict] = {}
-        completeness_checks: MutableMapping[str, CompletenessDict] = {}
-        recommendations: MutableSequence[RecommendationDict | str] = []
-        self.results: ResultsDict = {
-            "files_analyzed": 0,
-            "quality_metrics": quality_metrics,
-            "content_scores": content_scores,
-            "readability_stats": readability_stats,
-            "completeness_checks": completeness_checks,
-            "recommendations": recommendations,
-        }
+        self.results: FlextQualityContentAnalyzer.Results = (
+            FlextQualityContentAnalyzer.Results(
+                files_analyzed=0,
+                quality_metrics={},
+                content_scores={},
+                readability_stats={},
+                completeness_checks={},
+                recommendations=[],
+            )
+        )
 
     def load_config(self, config_path: str | None) -> None:
         """Load content analysis configuration."""
@@ -199,43 +187,45 @@ class FlextQualityContentAnalyzer:
         except (FileNotFoundError, KeyError):
             self.config = default_config
 
-    def analyze_file(self, file_path: Path) -> AnalysisDict:
+    def analyze_file(
+        self,
+        file_path: Path,
+    ) -> FlextQualityContentAnalyzer.Analysis:
         """Perform comprehensive content analysis on a single file."""
         try:
             content = file_path.read_text(encoding="utf-8")
             filename = str(file_path.relative_to(file_path.parents[2]))
-            issues_list: MutableSequence[IssueDict] = []
+            issues_list: MutableSequence[FlextQualityContentAnalyzer.Issue] = []
             suggestions_list: MutableSequence[str] = []
-            analysis: AnalysisDict = {
-                "file": filename,
-                "metrics": self._calculate_content_metrics(content),
-                "readability": self._analyze_readability(content),
-                "structure": self._analyze_structure(content),
-                "completeness": self._check_completeness(content, filename),
-                "quality_score": 0.0,
-                "issues": issues_list,
-                "suggestions": suggestions_list,
-            }
+            analysis = FlextQualityContentAnalyzer.Analysis(
+                file=filename,
+                metrics=self._calculate_content_metrics(content),
+                readability=self._analyze_readability(content),
+                structure=self._analyze_structure(content),
+                completeness=self._check_completeness(content, filename),
+                quality_score=0.0,
+                issues=issues_list,
+                suggestions=suggestions_list,
+            )
 
-            analysis["quality_score"] = self._calculate_quality_score(analysis)
+            analysis.quality_score = self._calculate_quality_score(analysis)
 
-            analysis["issues"] = self._identify_issues(analysis)
-            analysis["suggestions"] = self._generate_suggestions(analysis)
+            analysis.issues = self._identify_issues(analysis)
+            analysis.suggestions = self._generate_suggestions(analysis)
 
-            files_count = self.results["files_analyzed"]
-            self.results["files_analyzed"] = files_count + 1
-            metrics = analysis.get("metrics")
+            self.results.files_analyzed += 1
+            metrics = analysis.metrics
             if metrics:
-                self.results["quality_metrics"][filename] = metrics
-            readability = analysis.get("readability")
+                self.results.quality_metrics[filename] = metrics
+            readability = analysis.readability
             if readability:
-                self.results["readability_stats"][filename] = readability
-            completeness = analysis.get("completeness")
+                self.results.readability_stats[filename] = readability
+            completeness = analysis.completeness
             if completeness:
-                self.results["completeness_checks"][filename] = completeness
-            quality_score = analysis.get("quality_score", 0)
+                self.results.completeness_checks[filename] = completeness
+            quality_score = analysis.quality_score
             if isinstance(quality_score, (int, float)):
-                self.results["content_scores"][filename] = quality_score
+                self.results.content_scores[filename] = quality_score
 
             return analysis
 
@@ -246,19 +236,23 @@ class FlextQualityContentAnalyzer:
             OSError,
             ValueError,
         ) as e:
-            error_result: AnalysisDict = {
-                "file": str(file_path),
-                "error": str(e),
-                "quality_score": 0,
-                "issues": [{"type": "analysis_error", "message": str(e)}],
-                "suggestions": [],
-            }
-            return error_result
+            return FlextQualityContentAnalyzer.Analysis(
+                file=str(file_path),
+                error=str(e),
+                quality_score=0,
+                issues=[
+                    FlextQualityContentAnalyzer.Issue(
+                        type="analysis_error",
+                        message=str(e),
+                    )
+                ],
+                suggestions=[],
+            )
 
     def _calculate_content_metrics(
         self,
         content: str,
-    ) -> MetricsDict:
+    ) -> FlextQualityContentAnalyzer.Metrics:
         """Calculate basic content metrics."""
         words = re.findall(r"\b\w+\b", content)
         word_count = len(words)
@@ -292,36 +286,43 @@ class FlextQualityContentAnalyzer:
         code_blocks = re.findall(r"```[\s\S]*?```", content)
         code_block_count = len(code_blocks)
 
-        return {
-            "word_count": word_count,
-            "sentence_count": sentence_count,
-            "character_count": char_count,
-            "character_count_no_spaces": char_count_no_spaces,
-            "line_count": total_lines,
-            "code_lines": code_lines,
-            "empty_lines": empty_lines,
-            "heading_count": heading_count,
-            "list_count": list_count,
-            "link_count": link_count,
-            "image_count": image_count,
-            "code_block_count": code_block_count,
-            "avg_words_per_sentence": word_count / sentence_count
+        return FlextQualityContentAnalyzer.Metrics(
+            word_count=word_count,
+            sentence_count=sentence_count,
+            character_count=char_count,
+            character_count_no_spaces=char_count_no_spaces,
+            line_count=total_lines,
+            code_lines=code_lines,
+            empty_lines=empty_lines,
+            heading_count=heading_count,
+            list_count=list_count,
+            link_count=link_count,
+            image_count=image_count,
+            code_block_count=code_block_count,
+            avg_words_per_sentence=word_count / sentence_count
             if sentence_count > 0
             else 0,
-            "avg_sentence_length": char_count / sentence_count
+            avg_sentence_length=char_count / sentence_count
             if sentence_count > 0
             else 0,
-            "code_to_content_ratio": code_lines / total_lines if total_lines > 0 else 0,
-        }
+            code_to_content_ratio=code_lines / total_lines if total_lines > 0 else 0,
+        )
 
-    def _analyze_readability(self, content: str) -> ReadabilityDict:
+    def _analyze_readability(
+        self,
+        content: str,
+    ) -> FlextQualityContentAnalyzer.Readability:
         """Analyze content readability using various metrics."""
         words = re.findall(r"\b\w+\b", content)
         sentences = re.split(r"[.!?]+", content)
         sentences = [s.strip() for s in sentences if s.strip()]
 
         if not words or not sentences:
-            return {"readability_score": 0, "grade_level": "N/A", "reading_ease": 0}
+            return FlextQualityContentAnalyzer.Readability(
+                readability_score=0,
+                grade_level="N/A",
+                reading_ease=0,
+            )
 
         avg_words_per_sentence = len(words) / len(sentences)
 
@@ -352,13 +353,13 @@ class FlextQualityContentAnalyzer:
         else:
             level = "Very Difficult"
 
-        return {
-            "readability_score": round(reading_ease, 1),
-            "grade_level": round(grade_level, 1),
-            "reading_level": level,
-            "avg_words_per_sentence": round(avg_words_per_sentence, 1),
-            "avg_syllables_per_word": round(avg_syllables_per_word, 2),
-        }
+        return FlextQualityContentAnalyzer.Readability(
+            readability_score=round(reading_ease, 1),
+            grade_level=round(grade_level, 1),
+            reading_level=level,
+            avg_words_per_sentence=round(avg_words_per_sentence, 1),
+            avg_syllables_per_word=round(avg_syllables_per_word, 2),
+        )
 
     def _count_syllables(self, word: str) -> int:
         """Count syllables in a word (simplified algorithm)."""
@@ -381,17 +382,20 @@ class FlextQualityContentAnalyzer:
 
         return count
 
-    def _analyze_structure(self, content: str) -> StructureDict:
+    def _analyze_structure(
+        self,
+        content: str,
+    ) -> FlextQualityContentAnalyzer.Structure:
         """Analyze document structure and organization."""
         sections_list: MutableSequence[Mapping[str, int | str]] = []
         depth_analysis_dict: MutableMapping[str, int | float] = {}
-        structure: StructureDict = {
-            "has_table_of_contents": False,
-            "toc_position": 0,
-            "heading_hierarchy_valid": True,
-            "sections": sections_list,
-            "depth_analysis": depth_analysis_dict,
-        }
+        structure = FlextQualityContentAnalyzer.Structure(
+            has_table_of_contents=False,
+            toc_position=0,
+            heading_hierarchy_valid=True,
+            sections=sections_list,
+            depth_analysis=depth_analysis_dict,
+        )
 
         toc_patterns = [
             r"^#{1,6}.*\b[tT]able of [cC]ontents\b",
@@ -402,10 +406,8 @@ class FlextQualityContentAnalyzer:
         for pattern in toc_patterns:
             toc_match = re.search(pattern, content, re.MULTILINE)
             if toc_match:
-                structure["has_table_of_contents"] = True
-                structure["toc_position"] = (
-                    content[: toc_match.start()].count("\n")
-                ) + 1
+                structure.has_table_of_contents = True
+                structure.toc_position = (content[: toc_match.start()].count("\n")) + 1
                 break
 
         headings: MutableSequence[Mapping[str, int | str]] = []
@@ -415,26 +417,26 @@ class FlextQualityContentAnalyzer:
             line_num = content[: match.start()].count("\n") + 1
             headings.append({"level": level, "title": title, "line": line_num})
 
-        structure["sections"] = headings
+        structure.sections = headings
 
         if len(headings) > 1:
             for i in range(1, len(headings)):
                 cur_level = int(headings[i]["level"])
                 prev_level = int(headings[i - 1]["level"])
                 if cur_level > prev_level + 1:
-                    structure["heading_hierarchy_valid"] = False
+                    structure.heading_hierarchy_valid = False
                     break
 
         depths: Sequence[int] = [int(h["level"]) for h in headings]
         max_depth = max(depths) if depths else 0
         avg_depth = sum(int(x) for x in depths) / len(depths) if depths else 0.0
         depth_dist: Mapping[int, int] = dict(Counter(depths))
-        structure["depth_analysis"] = {
+        structure.depth_analysis = {
             "max_depth": max_depth,
             "avg_depth": avg_depth,
         }
         for key, val in depth_dist.items():
-            structure["depth_analysis"][str(key)] = val
+            structure.depth_analysis[str(key)] = val
 
         return structure
 
@@ -442,19 +444,19 @@ class FlextQualityContentAnalyzer:
         self,
         content: str,
         filename: str,
-    ) -> CompletenessDict:
+    ) -> FlextQualityContentAnalyzer.Completeness:
         """Check documentation completeness based on file type and content."""
         missing_elems: MutableSequence[str] = []
         required_present: MutableSequence[str] = []
         optional_present: MutableSequence[str] = []
-        completeness: CompletenessDict = {
-            "score": 100,
-            "missing_elements": missing_elems,
-            "required_sections_present": required_present,
-            "optional_sections_present": optional_present,
-            "word_count_sufficient": True,
-            "missing_required_sections": list[str](),
-        }
+        completeness = FlextQualityContentAnalyzer.Completeness(
+            score=100,
+            missing_elements=missing_elems,
+            required_sections_present=required_present,
+            optional_sections_present=optional_present,
+            word_count_sufficient=True,
+            missing_required_sections=list[str](),
+        )
 
         word_count = len(re.findall(r"\b\w+\b", content))
         thresholds_val = self.config.get("quality_thresholds")
@@ -467,13 +469,13 @@ class FlextQualityContentAnalyzer:
             min_words = min_words_val
 
         if word_count < min_words:
-            completeness["word_count_sufficient"] = False
-            if "missing_elements" in completeness:
-                completeness["missing_elements"].append(
+            completeness.word_count_sufficient = False
+            if completeness.missing_elements is not None:
+                completeness.missing_elements.append(
                     f"Minimum word count ({min_words})",
                 )
-            if "score" in completeness:
-                completeness["score"] -= 20
+            if completeness.score is not None:
+                completeness.score -= 20
 
         if filename.endswith("README.md"):
             required_sections = [
@@ -482,24 +484,24 @@ class FlextQualityContentAnalyzer:
                 "Usage",
             ]
             result = self._check_required_sections(content, required_sections)
-            if "required_sections_present" in completeness:
-                completeness["required_sections_present"].extend(
+            if completeness.required_sections_present is not None:
+                completeness.required_sections_present.extend(
                     result.get("required_sections_present", []),
                 )
-            if "missing_elements" in completeness:
-                completeness["missing_elements"].extend(
+            if completeness.missing_elements is not None:
+                completeness.missing_elements.extend(
                     result.get("missing_required_sections", []),
                 )
 
         elif filename.startswith("docs/"):
             required_sections = ["Overview|Introduction"]
             result = self._check_required_sections(content, required_sections)
-            if "required_sections_present" in completeness:
-                completeness["required_sections_present"].extend(
+            if completeness.required_sections_present is not None:
+                completeness.required_sections_present.extend(
                     result.get("required_sections_present", []),
                 )
-            if "missing_elements" in completeness:
-                completeness["missing_elements"].extend(
+            if completeness.missing_elements is not None:
+                completeness.missing_elements.extend(
                     result.get("missing_required_sections", []),
                 )
 
@@ -524,13 +526,13 @@ class FlextQualityContentAnalyzer:
 
         for _check_name, present, description in checks:
             if not present:
-                if "missing_elements" in completeness:
-                    completeness["missing_elements"].append(description)
-                if "score" in completeness:
-                    completeness["score"] -= 5
+                if completeness.missing_elements is not None:
+                    completeness.missing_elements.append(description)
+                if completeness.score is not None:
+                    completeness.score -= 5
 
-        if "score" in completeness:
-            completeness["score"] = max(0, completeness["score"])
+        if completeness.score is not None:
+            completeness.score = max(0, completeness.score)
 
         return completeness
 
@@ -563,28 +565,28 @@ class FlextQualityContentAnalyzer:
 
             if not found:
                 result["missing_required_sections"].append(section_pattern)
-                recommendations = self.results["recommendations"]
+                recommendations = self.results.recommendations
                 recommendations.append(f"Add '{section_pattern}' section")
 
         return result
 
     def _calculate_quality_score(
         self,
-        analysis: AnalysisDict,
+        analysis: FlextQualityContentAnalyzer.Analysis,
     ) -> float:
         """Calculate overall quality score for the content."""
         score = 100.0
 
-        metrics = analysis.get("metrics", {})
-        readability = analysis.get("readability", {})
-        completeness = analysis.get("completeness", {})
-        structure = analysis.get("structure", {})
+        metrics = analysis.metrics
+        readability = analysis.readability
+        completeness = analysis.completeness
+        structure = analysis.structure
 
-        completeness_score = completeness.get("score", 100)
+        completeness_score = completeness.score if completeness else None
         if isinstance(completeness_score, int):
             score -= (100 - completeness_score) * 0.5
 
-        readability_score = readability.get("readability_score", 0)
+        readability_score = readability.readability_score if readability else None
         if (
             isinstance(readability_score, (int, float))
             and readability_score < self.MIN_READABILITY_SCORE
@@ -592,94 +594,116 @@ class FlextQualityContentAnalyzer:
             penalty = (self.MIN_READABILITY_SCORE - readability_score) * 0.3
             score -= min(penalty, 20)
 
-        word_count = metrics.get("word_count", 0)
+        word_count = metrics.word_count if metrics else None
         if isinstance(word_count, int) and word_count < self.MIN_WORD_COUNT:
             score -= 10
 
-        heading_count = metrics.get("heading_count", 0)
+        heading_count = metrics.heading_count if metrics else None
         if isinstance(heading_count, int) and heading_count == 0:
             score -= 15
 
-        link_count = metrics.get("link_count", 0)
+        link_count = metrics.link_count if metrics else None
         if isinstance(link_count, int) and link_count == 0:
             score -= 5
 
-        if structure.get("has_table_of_contents"):
+        if structure and structure.has_table_of_contents:
             score += 5
 
-        if structure.get("heading_hierarchy_valid"):
+        if structure and structure.heading_hierarchy_valid:
             score += 5
 
         return max(0.0, min(100.0, score))
 
-    def _identify_issues(self, analysis: AnalysisDict) -> MutableSequence[IssueDict]:
+    def _identify_issues(
+        self,
+        analysis: FlextQualityContentAnalyzer.Analysis,
+    ) -> MutableSequence[FlextQualityContentAnalyzer.Issue]:
         """Identify content issues that need attention."""
-        issues: MutableSequence[IssueDict] = []
+        issues: MutableSequence[FlextQualityContentAnalyzer.Issue] = []
 
-        metrics = analysis.get("metrics", {})
-        readability = analysis.get("readability", {})
-        completeness = analysis.get("completeness", {})
-        structure = analysis.get("structure", {})
+        metrics = analysis.metrics
+        readability = analysis.readability
+        completeness = analysis.completeness
+        structure = analysis.structure
 
-        if not completeness.get("word_count_sufficient"):
-            word_count = metrics.get("word_count", 0)
-            issues.append({
-                "type": "insufficient_content",
-                "severity": "medium",
-                "message": f"Content too short ({word_count} words)",
-            })
+        word_count_sufficient = (
+            completeness.word_count_sufficient if completeness else None
+        )
+        if not word_count_sufficient:
+            word_count = metrics.word_count if metrics else 0
+            issues.append(
+                FlextQualityContentAnalyzer.Issue(
+                    type="insufficient_content",
+                    severity="medium",
+                    message=f"Content too short ({word_count} words)",
+                )
+            )
 
-        missing = completeness.get("missing_elements", [])
+        missing = completeness.missing_elements if completeness else []
         if missing:
-            issues.append({
-                "type": "missing_elements",
-                "severity": "high",
-                "message": f"Missing: {', '.join(missing)}",
-            })
+            issues.append(
+                FlextQualityContentAnalyzer.Issue(
+                    type="missing_elements",
+                    severity="high",
+                    message=f"Missing: {', '.join(missing)}",
+                )
+            )
 
-        readability_score = readability.get("readability_score", 0)
+        readability_score = readability.readability_score if readability else 0
         if (
             isinstance(readability_score, (int, float))
             and readability_score < self.FAIRLY_DIFFICULT_READABILITY_MIN
         ):
-            issues.append({
-                "type": "poor_readability",
-                "severity": "medium",
-                "message": f"Content difficult to read (score: {readability_score})",
-            })
+            issues.append(
+                FlextQualityContentAnalyzer.Issue(
+                    type="poor_readability",
+                    severity="medium",
+                    message=f"Content difficult to read (score: {readability_score})",
+                )
+            )
 
-        if not structure.get("heading_hierarchy_valid"):
-            issues.append({
-                "type": "heading_hierarchy",
-                "severity": "low",
-                "message": "Heading hierarchy is not logical",
-            })
+        heading_hierarchy_valid = (
+            structure.heading_hierarchy_valid if structure else None
+        )
+        if heading_hierarchy_valid is False:
+            issues.append(
+                FlextQualityContentAnalyzer.Issue(
+                    type="heading_hierarchy",
+                    severity="low",
+                    message="Heading hierarchy is not logical",
+                )
+            )
 
-        heading_count = metrics.get("heading_count", 0)
+        heading_count = metrics.heading_count if metrics else 0
         if isinstance(heading_count, int) and heading_count == 0:
-            issues.append({
-                "type": "no_headings",
-                "severity": "high",
-                "message": "Document has no section headings",
-            })
+            issues.append(
+                FlextQualityContentAnalyzer.Issue(
+                    type="no_headings",
+                    severity="high",
+                    message="Document has no section headings",
+                )
+            )
 
         return issues
 
-    def _generate_suggestions(self, analysis: AnalysisDict) -> MutableSequence[str]:
+    def _generate_suggestions(
+        self,
+        analysis: FlextQualityContentAnalyzer.Analysis,
+    ) -> MutableSequence[str]:
         """Generate improvement suggestions based on analysis."""
         suggestions: MutableSequence[str] = []
 
-        metrics = analysis.get("metrics", {})
-        readability = analysis.get("readability", {})
-        structure = analysis.get("structure", {})
+        metrics = analysis.metrics
+        readability = analysis.readability
+        structure = analysis.structure
 
-        word_count = metrics.get("word_count", 0)
+        word_count = metrics.word_count if metrics else 0
         if isinstance(word_count, int) and word_count < 2 * self.MIN_WORD_COUNT:
             suggestions.append(
                 "Expand content with more detailed explanations and examples",
             )
 
-        readability_score = readability.get("readability_score", 0)
+        readability_score = readability.readability_score if readability else 0
         if (
             isinstance(readability_score, (int, float))
             and readability_score < self.MIN_READABILITY_SCORE
@@ -688,15 +712,15 @@ class FlextQualityContentAnalyzer:
                 "Simplify language and sentence structure for better readability",
             )
 
-        heading_count = metrics.get("heading_count", 0)
+        heading_count = metrics.heading_count if metrics else 0
+        has_toc = structure.has_table_of_contents if structure else False
         if isinstance(heading_count, int) and (
-            not structure.get("has_table_of_contents")
-            and heading_count > self.MIN_HEADINGS_FOR_TOC
+            not has_toc and heading_count > self.MIN_HEADINGS_FOR_TOC
         ):
             suggestions.append("Add a table of contents for better navigation")
 
-        code_block_count = metrics.get("code_block_count", 0)
-        file_name = analysis.get("file", "")
+        code_block_count = metrics.code_block_count if metrics else 0
+        file_name = analysis.file or ""
         if (
             isinstance(code_block_count, int)
             and isinstance(file_name, str)
@@ -705,7 +729,7 @@ class FlextQualityContentAnalyzer:
         ):
             suggestions.append("Add code examples to illustrate concepts")
 
-        link_count = metrics.get("link_count", 0)
+        link_count = metrics.link_count if metrics else 0
         if isinstance(link_count, int) and link_count == 0:
             suggestions.append(
                 "Add relevant links to related documentation or external resources",
@@ -713,7 +737,10 @@ class FlextQualityContentAnalyzer:
 
         return suggestions
 
-    def analyze_files_batch(self, file_paths: Sequence[Path]) -> ResultsDict:
+    def analyze_files_batch(
+        self,
+        file_paths: Sequence[Path],
+    ) -> FlextQualityContentAnalyzer.Results:
         """Analyze multiple files and aggregate results."""
         for file_path in file_paths:
             self.analyze_file(file_path)
@@ -724,29 +751,31 @@ class FlextQualityContentAnalyzer:
 
     def _generate_overall_recommendations(self) -> None:
         """Generate overall recommendations based on batch analysis."""
-        content_scores = self.results["content_scores"]
+        content_scores = self.results.content_scores
         if not content_scores:
             return
 
         score_values = [float(v) for v in content_scores.values()]
         avg_score = sum(score_values) / len(score_values)
 
-        recommendations = self.results["recommendations"]
+        recommendations = self.results.recommendations
 
         if avg_score < self.GOOD_READABILITY_MIN:
-            recommendations.append({
-                "priority": "high",
-                "type": "overall_quality",
-                "message": f"Overall documentation quality needs improvement (avg score: {avg_score:.1f})",
-                "actions": [
-                    "Focus on adding missing content and sections",
-                    "Improve readability and structure",
-                    "Add more examples and practical guidance",
-                ],
-            })
+            recommendations.append(
+                FlextQualityContentAnalyzer.AnalyzerRecommendation(
+                    priority="high",
+                    type="overall_quality",
+                    message=f"Overall documentation quality needs improvement (avg score: {avg_score:.1f})",
+                    actions=[
+                        "Focus on adding missing content and sections",
+                        "Improve readability and structure",
+                        "Add more examples and practical guidance",
+                    ],
+                )
+            )
 
         all_issues: MutableSequence[t.StrMapping] = []
-        for result_value in self.results.values():
+        for result_value in self.results.model_dump().values():
             if isinstance(result_value, dict):
                 issues_val: Sequence[t.StrMapping] | None = result_value.get("issues")
                 if isinstance(issues_val, list):
@@ -757,27 +786,32 @@ class FlextQualityContentAnalyzer:
             most_common = issue_types.most_common(1)
             if most_common:
                 common_issue = most_common[0][0]
-                recommendations.append({
-                    "priority": "medium",
-                    "type": "common_issue",
-                    "message": f"Address common issue across files: {common_issue.replace('_', ' ')}",
-                    "actions": [
-                        "Implement consistent fixes",
-                        "Update style guidelines",
-                    ],
-                })
+                recommendations.append(
+                    FlextQualityContentAnalyzer.AnalyzerRecommendation(
+                        priority="medium",
+                        type="common_issue",
+                        message=f"Address common issue across files: {common_issue.replace('_', ' ')}",
+                        actions=[
+                            "Implement consistent fixes",
+                            "Update style guidelines",
+                        ],
+                    )
+                )
 
     def generate_report(self, output_format: str = "json") -> str:
         """Generate content analysis report."""
+        results_adapter: TypeAdapter[FlextQualityContentAnalyzer.Results] = TypeAdapter(
+            FlextQualityContentAnalyzer.Results
+        )
         if output_format == "json":
-            return _RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
+            return results_adapter.dump_json(self.results, indent=2).decode()
         if output_format == "summary":
             return self._generate_summary_report()
-        return _RESULTS_ADAPTER.dump_json(self.results).decode()
+        return results_adapter.dump_json(self.results).decode()
 
     def _generate_summary_report(self) -> str:
         """Generate human-readable summary report."""
-        content_scores = self.results["content_scores"]
+        content_scores = self.results.content_scores
         if not content_scores:
             return "No content analysis results available."
 
@@ -788,7 +822,7 @@ class FlextQualityContentAnalyzer:
 Content Quality Analysis Summary
 =================================
 
-Files Analyzed: {self.results["files_analyzed"]}
+Files Analyzed: {self.results.files_analyzed}
 Average Quality Score: {avg_score:.1f}/100
 
 Score Distribution:
@@ -800,10 +834,10 @@ Score Distribution:
 Top Recommendations:
 """
 
-        recommendations = self.results["recommendations"]
+        recommendations = self.results.recommendations
         for rec in recommendations[:3]:
-            if isinstance(rec, dict):
-                report += f"- {rec.get('message', '')}\n"
+            if isinstance(rec, FlextQualityContentAnalyzer.AnalyzerRecommendation):
+                report += f"- {rec.message or ''}\n"
             else:
                 report += f"- {rec}\n"
 
@@ -819,13 +853,16 @@ Top Recommendations:
             File path of the saved report.
 
         """
+        results_adapter: TypeAdapter[FlextQualityContentAnalyzer.Results] = TypeAdapter(
+            FlextQualityContentAnalyzer.Results
+        )
         Path(output_path).mkdir(exist_ok=True, parents=True)
 
         timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         filename = f"content_analysis_{timestamp}.json"
         filepath = Path(output_path) / filename
 
-        Path(filepath).write_bytes(_RESULTS_ADAPTER.dump_json(self.results, indent=2))
+        Path(filepath).write_bytes(results_adapter.dump_json(self.results, indent=2))
 
         return str(filepath)
 
@@ -833,7 +870,7 @@ Top Recommendations:
 def analyze_file_content(
     file_path: str,
     config_path: str | None = None,
-) -> AnalysisDict:
+) -> FlextQualityContentAnalyzer.Analysis:
     """Convenience function to analyze a single file."""
     analyzer = FlextQualityContentAnalyzer(config_path)
     return analyzer.analyze_file(Path(file_path))
@@ -842,7 +879,7 @@ def analyze_file_content(
 def analyze_files_content(
     file_paths: t.StrSequence,
     config_path: str | None = None,
-) -> ResultsDict:
+) -> FlextQualityContentAnalyzer.Results:
     """Convenience function to analyze multiple files."""
     analyzer = FlextQualityContentAnalyzer(config_path)
     paths = [Path(fp) for fp in file_paths]
@@ -861,12 +898,12 @@ if __name__ == "__main__":
 
     results = analyze_file_content(file_path, config_path)
 
-    issues = results.get("issues")
+    issues = results.issues
     if issues:
         for _issue in issues[:2]:
             pass
 
-    suggestions = results.get("suggestions")
+    suggestions = results.suggestions
     if suggestions:
         for _suggestion in suggestions[:2]:
             pass
