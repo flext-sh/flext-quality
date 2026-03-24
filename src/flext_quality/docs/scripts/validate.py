@@ -779,8 +779,3 @@ def main() -> None:
     _ = link_validator.save_report(args.output)
     if total_errors > 0:
         raise SystemExit(1)
-
-
-# Module-level aliases for pyright compatibility
-LinkValidator = FlextQualityLinkValidator
-ContentValidator = FlextQualityContentValidator

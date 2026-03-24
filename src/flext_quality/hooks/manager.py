@@ -69,7 +69,3 @@ class FlextQualityHookManager:
             self._hooks[event] = []
         self._hooks[event].append(hook)
         return r[bool].ok(value=True)
-
-
-# Module-level alias for pyright compatibility
-HookManager = FlextQualityHookManager

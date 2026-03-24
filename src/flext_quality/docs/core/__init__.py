@@ -19,10 +19,6 @@ if TYPE_CHECKING:
     from flext_core import FlextTypes
 
     from flext_quality.docs.core.base_classes import (
-        BaseAnalyzer,
-        BaseAuditor,
-        BaseReporter,
-        BaseValidator,
         Config,
         FlextQualityBaseAnalyzer,
         FlextQualityBaseAuditor,
@@ -30,56 +26,62 @@ if TYPE_CHECKING:
         FlextQualityBaseValidator,
     )
     from flext_quality.docs.core.config_manager import (
-        AuditRules,
-        ConfigManager,
         FlextQualityAuditRules,
         FlextQualityConfigManager,
         FlextQualityStyleGuide,
         FlextQualityValidationConfig,
-        StyleGuide,
-        ValidationConfig,
     )
     from flext_quality.docs.core.file_discovery import (
-        DocumentationFinder,
-        FileStatistics,
         FlextQualityDocumentationFinder,
         FlextQualityFileStatistics,
     )
 
 _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
-    "AuditRules": ("flext_quality.docs.core.config_manager", "AuditRules"),
-    "BaseAnalyzer": ("flext_quality.docs.core.base_classes", "BaseAnalyzer"),
-    "BaseAuditor": ("flext_quality.docs.core.base_classes", "BaseAuditor"),
-    "BaseReporter": ("flext_quality.docs.core.base_classes", "BaseReporter"),
-    "BaseValidator": ("flext_quality.docs.core.base_classes", "BaseValidator"),
     "Config": ("flext_quality.docs.core.base_classes", "Config"),
-    "ConfigManager": ("flext_quality.docs.core.config_manager", "ConfigManager"),
-    "DocumentationFinder": ("flext_quality.docs.core.file_discovery", "DocumentationFinder"),
-    "FileStatistics": ("flext_quality.docs.core.file_discovery", "FileStatistics"),
-    "FlextQualityAuditRules": ("flext_quality.docs.core.config_manager", "FlextQualityAuditRules"),
-    "FlextQualityBaseAnalyzer": ("flext_quality.docs.core.base_classes", "FlextQualityBaseAnalyzer"),
-    "FlextQualityBaseAuditor": ("flext_quality.docs.core.base_classes", "FlextQualityBaseAuditor"),
-    "FlextQualityBaseReporter": ("flext_quality.docs.core.base_classes", "FlextQualityBaseReporter"),
-    "FlextQualityBaseValidator": ("flext_quality.docs.core.base_classes", "FlextQualityBaseValidator"),
-    "FlextQualityConfigManager": ("flext_quality.docs.core.config_manager", "FlextQualityConfigManager"),
-    "FlextQualityDocumentationFinder": ("flext_quality.docs.core.file_discovery", "FlextQualityDocumentationFinder"),
-    "FlextQualityFileStatistics": ("flext_quality.docs.core.file_discovery", "FlextQualityFileStatistics"),
-    "FlextQualityStyleGuide": ("flext_quality.docs.core.config_manager", "FlextQualityStyleGuide"),
-    "FlextQualityValidationConfig": ("flext_quality.docs.core.config_manager", "FlextQualityValidationConfig"),
-    "StyleGuide": ("flext_quality.docs.core.config_manager", "StyleGuide"),
-    "ValidationConfig": ("flext_quality.docs.core.config_manager", "ValidationConfig"),
+    "FlextQualityAuditRules": (
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityAuditRules",
+    ),
+    "FlextQualityBaseAnalyzer": (
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseAnalyzer",
+    ),
+    "FlextQualityBaseAuditor": (
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseAuditor",
+    ),
+    "FlextQualityBaseReporter": (
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseReporter",
+    ),
+    "FlextQualityBaseValidator": (
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseValidator",
+    ),
+    "FlextQualityConfigManager": (
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityConfigManager",
+    ),
+    "FlextQualityDocumentationFinder": (
+        "flext_quality.docs.core.file_discovery",
+        "FlextQualityDocumentationFinder",
+    ),
+    "FlextQualityFileStatistics": (
+        "flext_quality.docs.core.file_discovery",
+        "FlextQualityFileStatistics",
+    ),
+    "FlextQualityStyleGuide": (
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityStyleGuide",
+    ),
+    "FlextQualityValidationConfig": (
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityValidationConfig",
+    ),
 }
 
 __all__ = [
-    "AuditRules",
-    "BaseAnalyzer",
-    "BaseAuditor",
-    "BaseReporter",
-    "BaseValidator",
     "Config",
-    "ConfigManager",
-    "DocumentationFinder",
-    "FileStatistics",
     "FlextQualityAuditRules",
     "FlextQualityBaseAnalyzer",
     "FlextQualityBaseAuditor",
@@ -90,8 +92,6 @@ __all__ = [
     "FlextQualityFileStatistics",
     "FlextQualityStyleGuide",
     "FlextQualityValidationConfig",
-    "StyleGuide",
-    "ValidationConfig",
 ]
 
 

@@ -350,9 +350,9 @@ class FlextQualityDocumentationOptimizer:
                 try:
                     frontmatter_lines = lines[1 : end_idx - 1]
                     frontmatter_content = "\n".join(frontmatter_lines)
-                    meta_adapter: TypeAdapter[
-                        Mapping[str, t.NormalizedValue]
-                    ] = TypeAdapter(Mapping[str, t.NormalizedValue])
+                    meta_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = (
+                        TypeAdapter(Mapping[str, t.NormalizedValue])
+                    )
                     metadata: dict[str, t.NormalizedValue] = dict(
                         meta_adapter.validate_python(
                             yaml.safe_load(frontmatter_content) or {},
@@ -530,7 +530,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
-
-# Module-level alias for pyrefly compatibility
-DocumentationOptimizer = FlextQualityDocumentationOptimizer

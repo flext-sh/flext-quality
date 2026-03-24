@@ -59,8 +59,10 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                     return r[Sequence[t.ContainerMapping]].fail(
                         "Expected rules list",
                     )
-                item_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
-                    Mapping[str, t.NormalizedValue],
+                item_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = (
+                    TypeAdapter(
+                        Mapping[str, t.NormalizedValue],
+                    )
                 )
                 rules: list[Mapping[str, t.NormalizedValue]] = [
                     item_adapter.validate_python(item)

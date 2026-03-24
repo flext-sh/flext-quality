@@ -456,8 +456,3 @@ class FlextQualityDocumentationFinder:
     def find_recently_modified(self, days: int = 7) -> Sequence[Path]:
         """Find files modified within the last N days."""
         return self.filter_by_age(self.find_files(), days)
-
-
-# Module-level aliases for pyrefly compatibility
-FileStatistics = FlextQualityFileStatistics
-DocumentationFinder = FlextQualityDocumentationFinder

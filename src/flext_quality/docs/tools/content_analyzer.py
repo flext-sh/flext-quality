@@ -780,8 +780,8 @@ class FlextQualityContentAnalyzer:
         for result_value_raw in self.results.model_dump().values():
             if not isinstance(result_value_raw, dict):
                 continue
-            result_value: Mapping[str, t.NormalizedValue] = (
-                rv_adapter.validate_python(result_value_raw)
+            result_value: Mapping[str, t.NormalizedValue] = rv_adapter.validate_python(
+                result_value_raw
             )
             issues_list_raw = result_value.get("issues")
             if not isinstance(issues_list_raw, list):
@@ -918,7 +918,3 @@ if __name__ == "__main__":
     if suggestions:
         for _suggestion in suggestions[:2]:
             pass
-
-
-# Module-level alias for pyrefly compatibility
-ContentAnalyzer = FlextQualityContentAnalyzer

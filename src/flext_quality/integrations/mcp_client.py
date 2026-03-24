@@ -124,8 +124,8 @@ class FlextQualityMcpClient:
                 list_adapter: TypeAdapter[Sequence[t.NormalizedValue]] = TypeAdapter(
                     Sequence[t.NormalizedValue],
                 )
-                parsed_list: Sequence[t.NormalizedValue] = (
-                    list_adapter.validate_json(output)
+                parsed_list: Sequence[t.NormalizedValue] = list_adapter.validate_json(
+                    output
                 )
                 vi_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
                     Mapping[str, t.NormalizedValue],

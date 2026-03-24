@@ -788,16 +788,3 @@ if __name__ == "__main__":
 
     for _violation in results.violations[:3]:  # Show first 3
         pass
-
-
-# Module-level aliases for pyright compatibility
-StyleValidator = FlextQualityStyleValidator
-StyleIssue = FlextQualityStyleValidator.StyleIssue
-FileResults = FlextQualityStyleValidator.FileResults
-MarkdownConfig = FlextQualityStyleValidator.MarkdownConfig
-FormattingConfig = FlextQualityStyleValidator.FormattingConfig
-AccessibilityConfig = FlextQualityStyleValidator.AccessibilityConfig
-HeadingsConfig = FlextQualityStyleValidator.HeadingsConfig
-StyleConfig = FlextQualityStyleValidator.StyleConfig
-SummaryMetrics = FlextQualityStyleValidator.SummaryMetrics
-ValidationResults = FlextQualityStyleValidator.ValidationResults

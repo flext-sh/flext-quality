@@ -643,7 +643,3 @@ if __name__ == "__main__":
         checker.save_report()
 
     asyncio.run(main())
-
-
-# Module-level alias for pyrefly compatibility
-LinkChecker = FlextQualityLinkChecker
