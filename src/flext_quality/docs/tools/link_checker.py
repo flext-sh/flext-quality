@@ -183,7 +183,9 @@ class FlextQualityLinkChecker:
                 UnicodeDecodeError,
                 OSError,
             ) as e:
-                structlog.get_logger().warning("failed_to_extract_links", file_path=str(file_path), error=str(e))
+                structlog.get_logger().warning(
+                    "failed_to_extract_links", file_path=str(file_path), error=str(e)
+                )
 
         return all_links
 
