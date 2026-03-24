@@ -11,25 +11,27 @@ import logging
 from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import ClassVar, NotRequired, TypedDict
+from typing import Annotated, ClassVar
+
+from pydantic import BaseModel, Field
 
 from flext_quality import m, t
 
 
-class FlextQualityFileStatistics(TypedDict):
+class FlextQualityFileStatistics(BaseModel):
     """Statistics payload for discovered documentation files."""
 
-    total_files: int
-    total_size: NotRequired[int]
-    total_lines: NotRequired[int]
-    total_words: NotRequired[int]
-    markdown_files: NotRequired[int]
-    other_files: NotRequired[int]
-    size_distribution: NotRequired[Mapping[str, int]]
-    categories: NotRequired[Mapping[str, int]]
-    avg_file_size: NotRequired[float]
-    avg_lines_per_file: NotRequired[float]
-    avg_words_per_file: NotRequired[float]
+    total_files: Annotated[int, Field(default=0)]
+    total_size: Annotated[int, Field(default=0)]
+    total_lines: Annotated[int, Field(default=0)]
+    total_words: Annotated[int, Field(default=0)]
+    markdown_files: Annotated[int, Field(default=0)]
+    other_files: Annotated[int, Field(default=0)]
+    size_distribution: Annotated[Mapping[str, int], Field(default_factory=dict)]
+    categories: Annotated[Mapping[str, int], Field(default_factory=dict)]
+    avg_file_size: Annotated[float, Field(default=0.0)]
+    avg_lines_per_file: Annotated[float, Field(default=0.0)]
+    avg_words_per_file: Annotated[float, Field(default=0.0)]
 
 
 class FlextQualityDocumentationFinder:
@@ -367,56 +369,60 @@ class FlextQualityDocumentationFinder:
             files = self.find_files()
 
         if not files:
-            return {"total_files": 0}
+            return FlextQualityFileStatistics()
 
         metadata_list = self.get_files_metadata(files)
 
-        # Basic statistics
-        stats: FlextQualityFileStatistics = {
-            "total_files": len(files),
-            "total_size": sum(meta.size for meta in metadata_list),
-            "total_lines": sum(meta.lines for meta in metadata_list),
-            "total_words": sum(meta.words for meta in metadata_list),
-            "markdown_files": len([
-                f for f in files if f.suffix.lower() in {".md", ".mdx"}
-            ]),
-            "other_files": len([
-                f for f in files if f.suffix.lower() not in {".md", ".mdx"}
-            ]),
-        }
+        total_files = len(files)
+        total_size = sum(meta.size for meta in metadata_list)
+        total_lines = sum(meta.lines for meta in metadata_list)
+        total_words = sum(meta.words for meta in metadata_list)
+        markdown_files = len([f for f in files if f.suffix.lower() in {".md", ".mdx"}])
+        other_files = len([f for f in files if f.suffix.lower() not in {".md", ".mdx"}])
 
         # File size distribution
-        size_ranges = {
+        size_distribution: Mapping[str, int] = {
             "small": len([
-                m for m in metadata_list if m.size < self.SIZE_SMALL
-            ]),  # < 1KB
+                meta for meta in metadata_list if meta.size < self.SIZE_SMALL
+            ]),
             "medium": len([
-                m for m in metadata_list if self.SIZE_SMALL <= m.size < self.SIZE_MEDIUM
-            ]),  # 1-10KB
+                meta
+                for meta in metadata_list
+                if self.SIZE_SMALL <= meta.size < self.SIZE_MEDIUM
+            ]),
             "large": len([
-                m for m in metadata_list if self.SIZE_MEDIUM <= m.size < self.SIZE_LARGE
-            ]),  # 10-100KB
+                meta
+                for meta in metadata_list
+                if self.SIZE_MEDIUM <= meta.size < self.SIZE_LARGE
+            ]),
             "huge": len([
-                m for m in metadata_list if m.size >= self.SIZE_LARGE
-            ]),  # > 100KB
+                meta for meta in metadata_list if meta.size >= self.SIZE_LARGE
+            ]),
         }
-        stats["size_distribution"] = size_ranges
 
         # Categories
-        categories = self.categorize_files(files)
-        stats["categories"] = {cat: len(files) for cat, files in categories.items()}
+        file_categories = self.categorize_files(files)
+        categories: Mapping[str, int] = {
+            cat: len(cat_files) for cat, cat_files in file_categories.items()
+        }
 
-        # Average metrics
-        if stats["total_files"] > 0:
-            stats["avg_file_size"] = stats.get("total_size", 0) / stats["total_files"]
-            stats["avg_lines_per_file"] = (
-                stats.get("total_lines", 0) / stats["total_files"]
-            )
-            stats["avg_words_per_file"] = (
-                stats.get("total_words", 0) / stats["total_files"]
-            )
+        avg_file_size = total_size / total_files if total_files > 0 else 0.0
+        avg_lines_per_file = total_lines / total_files if total_files > 0 else 0.0
+        avg_words_per_file = total_words / total_files if total_files > 0 else 0.0
 
-        return stats
+        return FlextQualityFileStatistics(
+            total_files=total_files,
+            total_size=total_size,
+            total_lines=total_lines,
+            total_words=total_words,
+            markdown_files=markdown_files,
+            other_files=other_files,
+            size_distribution=size_distribution,
+            categories=categories,
+            avg_file_size=avg_file_size,
+            avg_lines_per_file=avg_lines_per_file,
+            avg_words_per_file=avg_words_per_file,
+        )
 
     def invalidate_cache(self) -> None:
         """Invalidate the file cache."""
