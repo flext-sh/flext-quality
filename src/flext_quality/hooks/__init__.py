@@ -13,16 +13,18 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_quality.hooks.base import BaseHookImpl
+    from flext_quality.hooks.base import BaseHookImpl, FlextQualityBaseHook
     from flext_quality.hooks.manager import HookManager
 
 _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
     "BaseHookImpl": ("flext_quality.hooks.base", "BaseHookImpl"),
+    "FlextQualityBaseHook": ("flext_quality.hooks.base", "FlextQualityBaseHook"),
     "HookManager": ("flext_quality.hooks.manager", "HookManager"),
 }
 
 __all__ = [
     "BaseHookImpl",
+    "FlextQualityBaseHook",
     "HookManager",
 ]
 

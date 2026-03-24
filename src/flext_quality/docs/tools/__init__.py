@@ -18,6 +18,7 @@ if TYPE_CHECKING:
         CompletenessDict,
         ConfigDict,
         ContentAnalyzer,
+        FlextQualityContentAnalyzer,
         IssueDict,
         MetricsDict,
         ReadabilityDict,
@@ -27,6 +28,7 @@ if TYPE_CHECKING:
         analyze_files_content,
     )
     from flext_quality.docs.tools.link_checker import (
+        FlextQualityLinkChecker,
         LinkChecker,
         LinkConfigDict,
         LinkInfoDict,
@@ -40,6 +42,7 @@ if TYPE_CHECKING:
     from flext_quality.docs.tools.style_validator import (
         AccessibilityConfig,
         FileResults,
+        FlextQualityStyleValidator,
         FormattingConfig,
         HeadingsConfig,
         MarkdownConfig,
@@ -65,6 +68,18 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
     "ConfigDict": ("flext_quality.docs.tools.content_analyzer", "ConfigDict"),
     "ContentAnalyzer": ("flext_quality.docs.tools.content_analyzer", "ContentAnalyzer"),
     "FileResults": ("flext_quality.docs.tools.style_validator", "FileResults"),
+    "FlextQualityContentAnalyzer": (
+        "flext_quality.docs.tools.content_analyzer",
+        "FlextQualityContentAnalyzer",
+    ),
+    "FlextQualityLinkChecker": (
+        "flext_quality.docs.tools.link_checker",
+        "FlextQualityLinkChecker",
+    ),
+    "FlextQualityStyleValidator": (
+        "flext_quality.docs.tools.style_validator",
+        "FlextQualityStyleValidator",
+    ),
     "FormattingConfig": (
         "flext_quality.docs.tools.style_validator",
         "FormattingConfig",
@@ -133,6 +148,9 @@ __all__ = [
     "ConfigDict",
     "ContentAnalyzer",
     "FileResults",
+    "FlextQualityContentAnalyzer",
+    "FlextQualityLinkChecker",
+    "FlextQualityStyleValidator",
     "FormattingConfig",
     "HeadingsConfig",
     "IssueDict",

@@ -24,6 +24,10 @@ if TYPE_CHECKING:
         BaseReporter,
         BaseValidator,
         Config,
+        FlextQualityBaseAnalyzer,
+        FlextQualityBaseAuditor,
+        FlextQualityBaseReporter,
+        FlextQualityBaseValidator,
     )
     from flext_quality.docs.core.config_manager import (
         AuditRules,
@@ -32,6 +36,10 @@ if TYPE_CHECKING:
         ConfigPrimitive,
         ConfigSection,
         ConfigValue,
+        FlextQualityAuditRules,
+        FlextQualityConfigManager,
+        FlextQualityStyleGuide,
+        FlextQualityValidationConfig,
         RawConfigMap,
         RawSectionMap,
         RawSectionValue,
@@ -41,6 +49,8 @@ if TYPE_CHECKING:
     from flext_quality.docs.core.file_discovery import (
         DocumentationFinder,
         FileStatistics,
+        FlextQualityDocumentationFinder,
+        FlextQualityFileStatistics,
     )
 
 _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
@@ -60,6 +70,46 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
         "DocumentationFinder",
     ),
     "FileStatistics": ("flext_quality.docs.core.file_discovery", "FileStatistics"),
+    "FlextQualityAuditRules": (
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityAuditRules",
+    ),
+    "FlextQualityBaseAnalyzer": (
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseAnalyzer",
+    ),
+    "FlextQualityBaseAuditor": (
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseAuditor",
+    ),
+    "FlextQualityBaseReporter": (
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseReporter",
+    ),
+    "FlextQualityBaseValidator": (
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseValidator",
+    ),
+    "FlextQualityConfigManager": (
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityConfigManager",
+    ),
+    "FlextQualityDocumentationFinder": (
+        "flext_quality.docs.core.file_discovery",
+        "FlextQualityDocumentationFinder",
+    ),
+    "FlextQualityFileStatistics": (
+        "flext_quality.docs.core.file_discovery",
+        "FlextQualityFileStatistics",
+    ),
+    "FlextQualityStyleGuide": (
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityStyleGuide",
+    ),
+    "FlextQualityValidationConfig": (
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityValidationConfig",
+    ),
     "RawConfigMap": ("flext_quality.docs.core.config_manager", "RawConfigMap"),
     "RawSectionMap": ("flext_quality.docs.core.config_manager", "RawSectionMap"),
     "RawSectionValue": ("flext_quality.docs.core.config_manager", "RawSectionValue"),
@@ -81,6 +131,16 @@ __all__ = [
     "ConfigValue",
     "DocumentationFinder",
     "FileStatistics",
+    "FlextQualityAuditRules",
+    "FlextQualityBaseAnalyzer",
+    "FlextQualityBaseAuditor",
+    "FlextQualityBaseReporter",
+    "FlextQualityBaseValidator",
+    "FlextQualityConfigManager",
+    "FlextQualityDocumentationFinder",
+    "FlextQualityFileStatistics",
+    "FlextQualityStyleGuide",
+    "FlextQualityValidationConfig",
     "RawConfigMap",
     "RawSectionMap",
     "RawSectionValue",

@@ -24,6 +24,10 @@ if TYPE_CHECKING:
         BaseReporter,
         BaseValidator,
         Config,
+        FlextQualityBaseAnalyzer,
+        FlextQualityBaseAuditor,
+        FlextQualityBaseReporter,
+        FlextQualityBaseValidator,
     )
     from flext_quality.docs.core.config_manager import (
         AuditRules,
@@ -32,6 +36,10 @@ if TYPE_CHECKING:
         ConfigPrimitive,
         ConfigSection,
         ConfigValue,
+        FlextQualityAuditRules,
+        FlextQualityConfigManager,
+        FlextQualityStyleGuide,
+        FlextQualityValidationConfig,
         RawConfigMap,
         RawSectionMap,
         RawSectionValue,
@@ -40,15 +48,22 @@ if TYPE_CHECKING:
     from flext_quality.docs.core.file_discovery import (
         DocumentationFinder,
         FileStatistics,
+        FlextQualityDocumentationFinder,
+        FlextQualityFileStatistics,
     )
-    from flext_quality.docs.dashboard import DocumentationDashboard
+    from flext_quality.docs.dashboard import (
+        DocumentationDashboard,
+        FlextQualityDocumentationDashboard,
+    )
     from flext_quality.docs.notifications import (
         MAX_BROKEN_LINKS_TO_SHOW,
         DocumentationNotifier,
+        FlextQualityDocumentationNotifier,
         NotifierResults,
     )
     from flext_quality.docs.scheduled_maintenance import (
         ErrorHandlingConfig,
+        FlextQualityScheduledMaintenance,
         LoggingConfig,
         MaintenanceConfig,
         ScheduledMaintenance,
@@ -64,6 +79,7 @@ if TYPE_CHECKING:
         ContentAnalysisConfig,
         ContentChecksConfig,
         DocumentationAuditor,
+        FlextQualityDocumentationAuditor,
         LinkValidationConfig,
         MarkdownStyleConfig,
         QualityThresholdsConfig,
@@ -74,11 +90,15 @@ if TYPE_CHECKING:
     from flext_quality.docs.scripts.optimize import (
         MIN_HEADINGS_FOR_TOC,
         DocumentationOptimizer,
+        FlextQualityDocumentationOptimizer,
         OptimizerResults,
     )
     from flext_quality.docs.scripts.report import (
         AuditSummary,
         DocumentationReporter,
+        FlextQualityDocumentationReporter,
+        FlextQualityReportData,
+        FlextQualityTrendData,
         OptimizationSummary,
         Recommendation,
         ReportData,
@@ -103,6 +123,7 @@ if TYPE_CHECKING:
         CompletenessDict,
         ConfigDict,
         ContentAnalyzer,
+        FlextQualityContentAnalyzer,
         IssueDict,
         MetricsDict,
         ReadabilityDict,
@@ -112,6 +133,7 @@ if TYPE_CHECKING:
         analyze_files_content,
     )
     from flext_quality.docs.tools.link_checker import (
+        FlextQualityLinkChecker,
         LinkChecker,
         LinkConfigDict,
         LinkInfoDict,
@@ -125,6 +147,7 @@ if TYPE_CHECKING:
     from flext_quality.docs.tools.style_validator import (
         AccessibilityConfig,
         FileResults,
+        FlextQualityStyleValidator,
         FormattingConfig,
         HeadingsConfig,
         MarkdownConfig,
@@ -207,6 +230,90 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
     ),
     "FileResults": ("flext_quality.docs.tools.style_validator", "FileResults"),
     "FileStatistics": ("flext_quality.docs.core.file_discovery", "FileStatistics"),
+    "FlextQualityAuditRules": (
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityAuditRules",
+    ),
+    "FlextQualityBaseAnalyzer": (
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseAnalyzer",
+    ),
+    "FlextQualityBaseAuditor": (
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseAuditor",
+    ),
+    "FlextQualityBaseReporter": (
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseReporter",
+    ),
+    "FlextQualityBaseValidator": (
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseValidator",
+    ),
+    "FlextQualityConfigManager": (
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityConfigManager",
+    ),
+    "FlextQualityContentAnalyzer": (
+        "flext_quality.docs.tools.content_analyzer",
+        "FlextQualityContentAnalyzer",
+    ),
+    "FlextQualityDocumentationAuditor": (
+        "flext_quality.docs.scripts.audit",
+        "FlextQualityDocumentationAuditor",
+    ),
+    "FlextQualityDocumentationDashboard": (
+        "flext_quality.docs.dashboard",
+        "FlextQualityDocumentationDashboard",
+    ),
+    "FlextQualityDocumentationFinder": (
+        "flext_quality.docs.core.file_discovery",
+        "FlextQualityDocumentationFinder",
+    ),
+    "FlextQualityDocumentationNotifier": (
+        "flext_quality.docs.notifications",
+        "FlextQualityDocumentationNotifier",
+    ),
+    "FlextQualityDocumentationOptimizer": (
+        "flext_quality.docs.scripts.optimize",
+        "FlextQualityDocumentationOptimizer",
+    ),
+    "FlextQualityDocumentationReporter": (
+        "flext_quality.docs.scripts.report",
+        "FlextQualityDocumentationReporter",
+    ),
+    "FlextQualityFileStatistics": (
+        "flext_quality.docs.core.file_discovery",
+        "FlextQualityFileStatistics",
+    ),
+    "FlextQualityLinkChecker": (
+        "flext_quality.docs.tools.link_checker",
+        "FlextQualityLinkChecker",
+    ),
+    "FlextQualityReportData": (
+        "flext_quality.docs.scripts.report",
+        "FlextQualityReportData",
+    ),
+    "FlextQualityScheduledMaintenance": (
+        "flext_quality.docs.scheduled_maintenance",
+        "FlextQualityScheduledMaintenance",
+    ),
+    "FlextQualityStyleGuide": (
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityStyleGuide",
+    ),
+    "FlextQualityStyleValidator": (
+        "flext_quality.docs.tools.style_validator",
+        "FlextQualityStyleValidator",
+    ),
+    "FlextQualityTrendData": (
+        "flext_quality.docs.scripts.report",
+        "FlextQualityTrendData",
+    ),
+    "FlextQualityValidationConfig": (
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityValidationConfig",
+    ),
     "FormattingConfig": (
         "flext_quality.docs.tools.style_validator",
         "FormattingConfig",
@@ -369,6 +476,27 @@ __all__ = [
     "ErrorHandlingConfig",
     "FileResults",
     "FileStatistics",
+    "FlextQualityAuditRules",
+    "FlextQualityBaseAnalyzer",
+    "FlextQualityBaseAuditor",
+    "FlextQualityBaseReporter",
+    "FlextQualityBaseValidator",
+    "FlextQualityConfigManager",
+    "FlextQualityContentAnalyzer",
+    "FlextQualityDocumentationAuditor",
+    "FlextQualityDocumentationDashboard",
+    "FlextQualityDocumentationFinder",
+    "FlextQualityDocumentationNotifier",
+    "FlextQualityDocumentationOptimizer",
+    "FlextQualityDocumentationReporter",
+    "FlextQualityFileStatistics",
+    "FlextQualityLinkChecker",
+    "FlextQualityReportData",
+    "FlextQualityScheduledMaintenance",
+    "FlextQualityStyleGuide",
+    "FlextQualityStyleValidator",
+    "FlextQualityTrendData",
+    "FlextQualityValidationConfig",
     "FormattingConfig",
     "HeadingsConfig",
     "IssueDict",

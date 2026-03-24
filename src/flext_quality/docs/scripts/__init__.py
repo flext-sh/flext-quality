@@ -22,6 +22,7 @@ if TYPE_CHECKING:
         ContentAnalysisConfig,
         ContentChecksConfig,
         DocumentationAuditor,
+        FlextQualityDocumentationAuditor,
         FormattingConfig,
         LinkValidationConfig,
         MarkdownStyleConfig,
@@ -33,11 +34,15 @@ if TYPE_CHECKING:
     from flext_quality.docs.scripts.optimize import (
         MIN_HEADINGS_FOR_TOC,
         DocumentationOptimizer,
+        FlextQualityDocumentationOptimizer,
         OptimizerResults,
     )
     from flext_quality.docs.scripts.report import (
         AuditSummary,
         DocumentationReporter,
+        FlextQualityDocumentationReporter,
+        FlextQualityReportData,
+        FlextQualityTrendData,
         OptimizationSummary,
         Recommendation,
         ReportData,
@@ -89,6 +94,26 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
     "DocumentationReporter": (
         "flext_quality.docs.scripts.report",
         "DocumentationReporter",
+    ),
+    "FlextQualityDocumentationAuditor": (
+        "flext_quality.docs.scripts.audit",
+        "FlextQualityDocumentationAuditor",
+    ),
+    "FlextQualityDocumentationOptimizer": (
+        "flext_quality.docs.scripts.optimize",
+        "FlextQualityDocumentationOptimizer",
+    ),
+    "FlextQualityDocumentationReporter": (
+        "flext_quality.docs.scripts.report",
+        "FlextQualityDocumentationReporter",
+    ),
+    "FlextQualityReportData": (
+        "flext_quality.docs.scripts.report",
+        "FlextQualityReportData",
+    ),
+    "FlextQualityTrendData": (
+        "flext_quality.docs.scripts.report",
+        "FlextQualityTrendData",
     ),
     "FormattingConfig": ("flext_quality.docs.scripts.audit", "FormattingConfig"),
     "LinkCheckResult": ("flext_quality.docs.scripts.validate", "LinkCheckResult"),
@@ -146,6 +171,11 @@ __all__ = [
     "DocumentationAuditor",
     "DocumentationOptimizer",
     "DocumentationReporter",
+    "FlextQualityDocumentationAuditor",
+    "FlextQualityDocumentationOptimizer",
+    "FlextQualityDocumentationReporter",
+    "FlextQualityReportData",
+    "FlextQualityTrendData",
     "FormattingConfig",
     "LinkCheckResult",
     "LinkRecord",
