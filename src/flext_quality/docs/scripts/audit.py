@@ -219,7 +219,7 @@ class DocumentationAuditor:
                         | float
                         | bool
                         | Sequence[str]
-                        | Sequence[Mapping[str, str]]
+                        | Sequence[t.StrMapping]
                         | None,
                     ] = {
                         "type": "outdated_content",
@@ -406,9 +406,9 @@ class DocumentationAuditor:
             issues.append(f"{len(long_lines)} lines exceed {max_length} characters")
         return issues
 
-    def _check_accessibility(self, content: str) -> Sequence[Mapping[str, str]]:
+    def _check_accessibility(self, content: str) -> Sequence[t.StrMapping]:
         """Check accessibility compliance."""
-        issues: Sequence[Mapping[str, str]] = []
+        issues: Sequence[t.StrMapping] = []
         accessibility_cfg = self.style_guide.accessibility
         if accessibility_cfg.require_alt_text:
             images_without_alt = re.findall(r"!\\[\\]\\([^)]+\\)", content)
@@ -453,7 +453,7 @@ class DocumentationAuditor:
         """Check links and references for validity."""
         link_validation = self.validation_config.link_validation
         all_links: Sequence[Mapping[str, str | int]] = []
-        image_refs: Sequence[Mapping[str, str]] = []
+        image_refs: Sequence[t.StrMapping] = []
         for file_path in doc_files:
             try:
                 content = file_path.read_text(encoding="utf-8")
@@ -563,7 +563,7 @@ class DocumentationAuditor:
                         "recommendation": f"Fix broken internal link to '{link['url']}'",
                     })
 
-    def _validate_images(self, images: Sequence[Mapping[str, str]]) -> None:
+    def _validate_images(self, images: Sequence[t.StrMapping]) -> None:
         """Validate image references."""
         for image in images:
             if image["src"].startswith(("http://", "https://")):

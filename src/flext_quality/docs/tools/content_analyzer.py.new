@@ -72,11 +72,11 @@ class _CompletenessDict(TypedDict, total=False):
     """Completeness check dictionary structure."""
 
     score: int
-    missing_elements: Sequence[str]
-    required_sections_present: Sequence[str]
-    optional_sections_present: Sequence[str]
+    missing_elements: t.StrSequence
+    required_sections_present: t.StrSequence
+    optional_sections_present: t.StrSequence
     word_count_sufficient: bool
-    missing_required_sections: Sequence[str]
+    missing_required_sections: t.StrSequence
 
 
 class _IssueDict(TypedDict, total=False):
@@ -97,7 +97,7 @@ class _AnalysisDict(TypedDict, total=False):
     completeness: _CompletenessDict
     quality_score: float
     issues: Sequence[_IssueDict]
-    suggestions: Sequence[str]
+    suggestions: t.StrSequence
     error: str
 
 
@@ -107,7 +107,7 @@ class _RecommendationDict(TypedDict, total=False):
     priority: str
     type: str
     message: str
-    actions: Sequence[str]
+    actions: t.StrSequence
 
 
 class _ResultsDict(TypedDict):
@@ -208,7 +208,7 @@ class ContentAnalyzer:
             content = file_path.read_text(encoding="utf-8")
             filename = str(file_path.relative_to(file_path.parents[2]))
             issues_list: Sequence[_IssueDict] = []
-            suggestions_list: Sequence[str] = []
+            suggestions_list: t.StrSequence = []
             analysis: _AnalysisDict = {
                 "file": filename,
                 "metrics": self._calculate_content_metrics(content),
@@ -455,9 +455,9 @@ class ContentAnalyzer:
         filename: str,
     ) -> t.ContainerMapping:
         """Check documentation completeness based on file type and content."""
-        missing_elems: Sequence[str] = []
-        required_present: Sequence[str] = []
-        optional_present: Sequence[str] = []
+        missing_elems: t.StrSequence = []
+        required_present: t.StrSequence = []
+        optional_present: t.StrSequence = []
         completeness = {
             "score": 100,
             "missing_elements": missing_elems,
@@ -526,10 +526,10 @@ class ContentAnalyzer:
     def _check_required_sections(
         self,
         content: str,
-        required_sections: Sequence[str],
+        required_sections: t.StrSequence,
     ) -> t.ContainerMapping:
         """Check for required sections in content."""
-        required_present: Sequence[str] = []
+        required_present: t.StrSequence = []
         missing_required: list = []
         result = {
             "required_sections_present": required_present,
@@ -599,7 +599,7 @@ class ContentAnalyzer:
 
     def _identify_issues(self, analysis: t.ContainerMapping) -> list:
         """Identify content issues that need attention."""
-        issues: Sequence[Mapping[str, str]] = []
+        issues: Sequence[t.StrMapping] = []
 
         metrics = cast("_SubDict", analysis["metrics"])
         readability = cast("_SubDict", analysis["readability"])
@@ -616,7 +616,7 @@ class ContentAnalyzer:
 
         missing = completeness["missing_elements"]
         if missing:
-            missing_list = cast("Sequence[str]", missing)
+            missing_list = cast("t.StrSequence", missing)
             issues.append({
                 "type": "missing_elements",
                 "severity": "high",
@@ -651,7 +651,7 @@ class ContentAnalyzer:
 
     def _generate_suggestions(self, analysis: t.ContainerMapping) -> list:
         """Generate improvement suggestions based on analysis."""
-        suggestions: Sequence[str] = []
+        suggestions: t.StrSequence = []
 
         metrics = cast("_SubDict", analysis["metrics"])
         readability = cast("_SubDict", analysis["readability"])
@@ -720,7 +720,7 @@ class ContentAnalyzer:
             })
 
         # Check for common issues across files
-        all_issues: Sequence[Mapping[str, str]] = []
+        all_issues: Sequence[t.StrMapping] = []
         for file_issues in [
             analysis.get("issues", [])
             for analysis in self.results.values()
@@ -818,7 +818,7 @@ def analyze_file_content(
 
 
 def analyze_files_content(
-    file_paths: Sequence[str],
+    file_paths: t.StrSequence,
     config_path: str | None = None,
 ) -> t.ContainerMapping:
     """Convenience function to analyze multiple files."""

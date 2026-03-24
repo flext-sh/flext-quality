@@ -427,7 +427,7 @@ class MockQualityAnalyzer:
     def __init__(self) -> None:
         """Initialize the instance."""
         super().__init__()
-        self.analyzed_files: Sequence[str] = []
+        self.analyzed_files: t.StrSequence = []
 
     def analyze_project(self, project_path: str) -> t.ContainerMapping:
         """Simulate comprehensive project analysis.

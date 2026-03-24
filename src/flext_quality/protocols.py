@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 from typing import ClassVar, Protocol, runtime_checkable
 
@@ -41,7 +41,7 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
             """Abstract base protocol for hook implementations."""
 
             event: ClassVar[type]
-            matcher: ClassVar[Sequence[str] | None]
+            matcher: ClassVar[t.StrSequence | None]
 
             def execute(
                 self,
@@ -74,7 +74,7 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
             """Protocol for hook implementations."""
 
             event: str
-            matcher: Sequence[str] | None
+            matcher: t.StrSequence | None
 
             def execute(
                 self,
@@ -111,7 +111,7 @@ class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
                 """Disconnect from external service."""
                 ...
 
-            def health_check(self) -> r[Mapping[str, str]]:
+            def health_check(self) -> r[t.StrMapping]:
                 """Check integration health."""
                 ...
 

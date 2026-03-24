@@ -21,11 +21,11 @@ def _empty_list_str() -> Sequence[str]:
     return []
 
 
-def _empty_dict_str_str() -> Mapping[str, str]:
+def _empty_dict_str_str() -> t.StrMapping:
     return {}
 
 
-def _empty_list_dict_str_str() -> Sequence[Mapping[str, str]]:
+def _empty_list_dict_str_str() -> Sequence[t.StrMapping]:
     return []
 
 
@@ -268,7 +268,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             issues: Sequence[
                 Mapping[
                     str,
-                    t.Primitives | Sequence[str] | Sequence[Mapping[str, str]] | None,
+                    t.Primitives | Sequence[str] | Sequence[t.StrMapping] | None,
                 ]
             ] = Field(default_factory=list)
             metrics: FlextQualityModels.Quality.AuditMetrics = Field(
@@ -331,7 +331,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             content_issues: Sequence[FlextQualityModels.Quality.ContentIssue] = Field(
                 default_factory=list
             )
-            quality_metrics: Mapping[str, t.Scalar] = Field(default_factory=dict)
+            quality_metrics: t.ConfigurationMapping = Field(default_factory=dict)
 
         class ContentMetrics(BaseModel):
             """Content quality metrics for a documentation file."""
@@ -405,7 +405,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Generic webhook configuration."""
 
             url: str
-            headers: Mapping[str, str] = Field(default_factory=dict)
+            headers: t.StrMapping = Field(default_factory=dict)
             timeout: t.PositiveInt = Field(default=30)
 
         class ChannelsConfig(BaseModel):
@@ -552,7 +552,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             files_processed: int = 0
             changes_made: int = 0
             backups_created: Sequence[str] = Field(default_factory=_empty_list_str)
-            optimizations: Sequence[Mapping[str, str]] = Field(
+            optimizations: Sequence[t.StrMapping] = Field(
                 default_factory=_empty_list_dict_str_str
             )
 
@@ -586,7 +586,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """MCP tool invocation response contract."""
 
             success: bool
-            data: Mapping[str, str] | None = None
+            data: t.StrMapping | None = None
             error: str | None = None
 
 

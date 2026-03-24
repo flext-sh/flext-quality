@@ -180,7 +180,7 @@ class LinkChecker:
                 ref_links = re.findall(r"\[([^\]]+)\]\[([^\]]+)\]", content)
                 ref_defs = re.findall(r"\[([^\]]+)\]:\s*([^\s]+)", content)
 
-                ref_dict: Mapping[str, str] = dict(ref_defs)
+                ref_dict: t.StrMapping = dict(ref_defs)
                 for text, ref in ref_links:
                     if ref in ref_dict:
                         url = ref_dict[ref]

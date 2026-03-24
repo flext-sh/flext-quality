@@ -35,7 +35,7 @@ ReportValue = (
     | int
     | float
     | bool
-    | Sequence[str]
+    | t.StrSequence
     | Sequence[Mapping[str, t.Primitives]]
     | Mapping[str, t.Primitives]
     | None
@@ -89,7 +89,7 @@ class Recommendation(TypedDict):
     category: str
     title: str
     description: str
-    actions: Sequence[str]
+    actions: t.StrSequence
 
 
 class TrendEntry(TypedDict):
@@ -502,7 +502,7 @@ class DocumentationReporter:
             else 0,
         }
 
-    def _generate_charts(self, data: ReportData) -> Mapping[str, str] | None:
+    def _generate_charts(self, data: ReportData) -> t.StrMapping | None:
         """Generate charts for the report (placeholder for future implementation)."""
         _ = data
         return None
@@ -538,7 +538,7 @@ class DocumentationReporter:
 
     def _analyze_trend_data(
         self, reports: Sequence[Mapping[str, ReportValue | datetime]]
-    ) -> TrendData | Mapping[str, str]:
+    ) -> TrendData | t.StrMapping:
         """Analyze trend data from historical reports."""
         if not reports:
             return {"error": "No historical data available"}
@@ -596,7 +596,7 @@ class DocumentationReporter:
 
     def _generate_trend_report(
         self,
-        trend_data: TrendData | Mapping[str, str],
+        trend_data: TrendData | t.StrMapping,
         days: int,
     ) -> str:
         """Generate trend analysis report."""

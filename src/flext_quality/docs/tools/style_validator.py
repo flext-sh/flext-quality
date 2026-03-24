@@ -36,7 +36,7 @@ class FileResults(TypedDict):
     file: str
     violations: Sequence[StyleIssue]
     issues: Sequence[StyleIssue]
-    suggestions: Sequence[str]
+    suggestions: t.StrSequence
 
 
 class MarkdownConfig(TypedDict, total=False):
@@ -97,7 +97,7 @@ class ValidationResults(TypedDict):
     style_violations: Sequence[StyleIssue]
     accessibility_issues: Sequence[StyleIssue]
     formatting_errors: Sequence[StyleIssue]
-    suggestions: Sequence[str]
+    suggestions: t.StrSequence
     summary: SummaryMetrics
 
 
@@ -159,7 +159,7 @@ class StyleValidator:
             return
         try:
             with Path(config_path).open(encoding="utf-8") as f:
-                loaded_obj: Mapping[str, Mapping[str, t.Scalar]] | None = (
+                loaded_obj: Mapping[str, t.ConfigurationMapping] | None = (
                     yaml.safe_load(f)
                 )
                 if isinstance(loaded_obj, dict):
@@ -170,7 +170,7 @@ class StyleValidator:
             self._set_default_config()
 
     def _normalize_config(
-        self, raw: Mapping[str, Mapping[str, t.Scalar]]
+        self, raw: Mapping[str, t.ConfigurationMapping]
     ) -> StyleConfig:
         config: StyleConfig = {}
 
@@ -263,7 +263,7 @@ class StyleValidator:
 
             violations_list: Sequence[StyleIssue] = []
             issues_list: Sequence[StyleIssue] = []
-            suggestions_list: Sequence[str] = []
+            suggestions_list: t.StrSequence = []
             file_results: FileResults = {
                 "file": filename,
                 "violations": violations_list,
@@ -545,9 +545,9 @@ class StyleValidator:
 
         return violations
 
-    def _generate_suggestions(self, violations: Sequence[StyleIssue]) -> Sequence[str]:
+    def _generate_suggestions(self, violations: Sequence[StyleIssue]) -> t.StrSequence:
         """Generate improvement suggestions based on violations."""
-        suggestions: Sequence[str] = []
+        suggestions: t.StrSequence = []
 
         violation_types: Mapping[str, int] = {}
         for violation in violations:
@@ -676,7 +676,7 @@ def validate_file_style(
 
 
 def validate_files_style(
-    file_paths: Sequence[str],
+    file_paths: t.StrSequence,
     config_path: str | None = None,
 ) -> ValidationResults:
     """Convenience function to validate multiple files."""

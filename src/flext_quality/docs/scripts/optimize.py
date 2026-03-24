@@ -86,7 +86,7 @@ class DocumentationOptimizer:
     def _fix_heading_spacing(self, content: str) -> str:
         """Ensure proper spacing around headings."""
         lines = content.split("\n")
-        fixed_lines: Sequence[str] = []
+        fixed_lines: t.StrSequence = []
         for i, line in enumerate(lines):
             if re.match(r"^#{1,6}\\s", line) and i > 0 and lines[i - 1].strip():
                 fixed_lines.append("")
@@ -124,7 +124,7 @@ class DocumentationOptimizer:
                 self.logger.warning("Failed to update TOC in file: %s", e)
         return self.results.model_dump()
 
-    def _find_existing_toc(self, lines: Sequence[str]) -> tuple[int, int]:
+    def _find_existing_toc(self, lines: t.StrSequence) -> tuple[int, int]:
         """Find existing table of contents boundaries."""
         toc_start = -1
         toc_end = -1
@@ -138,9 +138,9 @@ class DocumentationOptimizer:
                 break
         return (toc_start, toc_end)
 
-    def _extract_toc_headings(self, lines: Sequence[str]) -> Sequence[str]:
+    def _extract_toc_headings(self, lines: t.StrSequence) -> t.StrSequence:
         """Extract headings for table of contents."""
-        toc_lines: Sequence[str] = []
+        toc_lines: t.StrSequence = []
         for line in lines:
             match = re.match(r"^(#{1,6})\\s+(.+)$", line)
             if match:
@@ -152,11 +152,11 @@ class DocumentationOptimizer:
                     toc_lines.append(f"{indent}- [{title}](#{anchor})")
         return toc_lines
 
-    def _generate_toc_content(self, headings: Sequence[str]) -> Sequence[str]:
+    def _generate_toc_content(self, headings: t.StrSequence) -> t.StrSequence:
         """Generate the complete table of contents content."""
         return ["## Table of Contents", "", *headings, "", "---", ""]
 
-    def _find_toc_insertion_point(self, lines: Sequence[str]) -> int:
+    def _find_toc_insertion_point(self, lines: t.StrSequence) -> int:
         """Find the best position to insert table of contents."""
         insert_pos = 0
         for i, line in enumerate(lines):
@@ -281,7 +281,7 @@ class DocumentationOptimizer:
     def _add_section_breaks(self, content: str) -> str:
         """Add horizontal rules between major sections."""
         lines = content.split("\n")
-        enhanced_lines: Sequence[str] = []
+        enhanced_lines: t.StrSequence = []
         for i, line in enumerate(lines):
             enhanced_lines.append(line)
             if (

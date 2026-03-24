@@ -30,29 +30,29 @@ class FlextQualityCliService:
         self._quality = FlextQuality.get_instance()
         self._executor = FlextQualityCodeExecutionBridge()
 
-    def build_check_commands(self, target_path: Path) -> r[Sequence[Sequence[str]]]:
+    def build_check_commands(self, target_path: Path) -> r[Sequence[t.StrSequence]]:
         """Build commands for quick check (lint + type)."""
-        commands: Sequence[Sequence[str]] = []
+        commands: Sequence[t.StrSequence] = []
         lint_result = self._executor.build_ruff_command(target_path)
         if lint_result.is_failure:
-            return r[Sequence[Sequence[str]]].fail(lint_result.error)
+            return r[Sequence[t.StrSequence]].fail(lint_result.error)
         commands.append(lint_result.value)
         type_result = self._executor.build_basedpyright_command(target_path)
         if type_result.is_failure:
-            return r[Sequence[Sequence[str]]].fail(type_result.error)
+            return r[Sequence[t.StrSequence]].fail(type_result.error)
         commands.append(type_result.value)
-        return r[Sequence[Sequence[str]]].ok(commands)
+        return r[Sequence[t.StrSequence]].ok(commands)
 
-    def build_validate_commands(self, target_path: Path) -> r[Sequence[Sequence[str]]]:
+    def build_validate_commands(self, target_path: Path) -> r[Sequence[t.StrSequence]]:
         """Build commands for full validation."""
-        commands: Sequence[Sequence[str]] = []
+        commands: Sequence[t.StrSequence] = []
         lint_result = self._executor.build_ruff_command(target_path)
         if lint_result.is_failure:
-            return r[Sequence[Sequence[str]]].fail(lint_result.error)
+            return r[Sequence[t.StrSequence]].fail(lint_result.error)
         commands.append(lint_result.value)
         type_result = self._executor.build_basedpyright_command(target_path)
         if type_result.is_failure:
-            return r[Sequence[Sequence[str]]].fail(type_result.error)
+            return r[Sequence[t.StrSequence]].fail(type_result.error)
         commands.append(type_result.value)
         src_path = (
             target_path / "src" if (target_path / "src").exists() else target_path
@@ -69,7 +69,7 @@ class FlextQualityCliService:
             ],
             ["python", "-m", "coverage", "report"],
         ])
-        return r[Sequence[Sequence[str]]].ok(commands)
+        return r[Sequence[t.StrSequence]].ok(commands)
 
     def display_status(self) -> r[t.ContainerMapping]:
         """Display quality service status."""
@@ -136,7 +136,7 @@ class _CommandHandlers:
 
 
 def _dispatch(
-    service: FlextQualityCliService, command: str, args: Sequence[str]
+    service: FlextQualityCliService, command: str, args: t.StrSequence
 ) -> int:
     """Dispatch command to handler."""
     if command == "status":

@@ -60,7 +60,7 @@ class _EmailConfig(TypedDict):
     username: str
     password: str
     from_address: str
-    to_addresses: Sequence[str]
+    to_addresses: t.StrSequence
 
 
 class _SlackConfig(TypedDict):
@@ -71,7 +71,7 @@ class _SlackConfig(TypedDict):
 
 class _WebhookConfig(TypedDict):
     url: str
-    headers: Mapping[str, str]
+    headers: t.StrMapping
     timeout: int
 
 
@@ -133,8 +133,8 @@ class DocumentationNotifier:
             | str
             | float
             | bool
-            | Sequence[str]
-            | Mapping[str, int | str | float | bool | Sequence[str] | Mapping[str, str]]
+            | t.StrSequence
+            | Mapping[str, int | str | float | bool | t.StrSequence | t.StrMapping]
             | None,
         ],
     ) -> _NotifierConfig:
@@ -475,7 +475,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
         }
 
         headers_val = webhook_config.get("headers")
-        headers: Mapping[str, str] = (
+        headers: t.StrMapping = (
             dict(headers_val) if isinstance(headers_val, dict) else {}
         )
         headers["Content-Type"] = "application/json"
