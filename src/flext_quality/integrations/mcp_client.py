@@ -122,7 +122,7 @@ class FlextQualityMcpClient:
                     Sequence[t.NormalizedValue],
                 )
                 parsed_list: Sequence[t.NormalizedValue] = list_adapter.validate_json(
-                    output
+                    output,
                 )
                 vi_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
                     Mapping[str, t.NormalizedValue],
@@ -153,6 +153,6 @@ class FlextQualityMcpClient:
             except ValueError:
                 return r[m.Quality.McpToolResult].ok(
                     m.Quality.McpToolResult(
-                        success=True, data={"raw": output}, error=None
+                        success=True, data={"raw": output}, error=None,
                     ),
                 )

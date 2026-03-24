@@ -44,7 +44,7 @@ class FlextQualityLinkValidator:
         )
 
     def find_all_links(
-        self, doc_files: Sequence[Path]
+        self, doc_files: Sequence[Path],
     ) -> Sequence[m.Quality.LinkRecord]:
         """Extract all links from documentation files."""
         all_links: MutableSequence[m.Quality.LinkRecord] = []

@@ -341,7 +341,7 @@ class FlextQualityStyleValidator:
                         content=line.strip(),
                         message="Use * for emphasis instead of _",
                         severity="low",
-                    )
+                    ),
                 )
 
             if line.startswith("#") and not re.match(r"^#{1,6}\s", line):
@@ -352,7 +352,7 @@ class FlextQualityStyleValidator:
                         content=line.strip(),
                         message="Headings should have a space after #",
                         severity="medium",
-                    )
+                    ),
                 )
 
         return violations
@@ -385,7 +385,7 @@ class FlextQualityStyleValidator:
                             content=f"{'#' * level} {text}",
                             message=f"Heading skips level (expected H{expected_level} or H{expected_level + 1}, got H{level})",
                             severity="medium",
-                        )
+                        ),
                     )
                 expected_level = level
 
@@ -397,7 +397,7 @@ class FlextQualityStyleValidator:
                     content=f"{'#' * headings[0][0]} {headings[0][1]}",
                     message="Document should start with H1 heading",
                     severity="low",
-                )
+                ),
             )
 
         return violations
@@ -436,7 +436,7 @@ class FlextQualityStyleValidator:
                     content=f"List using {inconsistent_markers[0]}",
                     message=f"Use {preferred} for list markers instead of mixed styles",
                     severity="low",
-                )
+                ),
             )
 
         return violations
@@ -484,7 +484,7 @@ class FlextQualityStyleValidator:
                             content=line.strip(),
                             message="Add space before inline code",
                             severity="low",
-                        )
+                        ),
                     )
 
         return violations
@@ -513,7 +513,7 @@ class FlextQualityStyleValidator:
                             content=img,
                             message="Images must have descriptive alt text",
                             severity="high",
-                        )
+                        ),
                     )
 
         descriptive_links = (
@@ -536,7 +536,7 @@ class FlextQualityStyleValidator:
                         content=link,
                         message="Use descriptive link text instead of generic terms",
                         severity="medium",
-                    )
+                    ),
                 )
 
         return issues
@@ -569,7 +569,7 @@ class FlextQualityStyleValidator:
                         else line,
                         message=f"Line exceeds {max_length} characters ({len(line)} chars)",
                         severity="low",
-                    )
+                    ),
                 )
 
         return violations
@@ -597,7 +597,7 @@ class FlextQualityStyleValidator:
                         content=line,
                         message="Remove trailing whitespace",
                         severity="low",
-                    )
+                    ),
                 )
 
             if i < len(lines) - 1:
@@ -611,7 +611,7 @@ class FlextQualityStyleValidator:
                             content="",
                             message="Multiple consecutive blank lines",
                             severity="low",
-                        )
+                        ),
                     )
 
         return violations

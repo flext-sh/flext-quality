@@ -184,7 +184,7 @@ class FlextQualityLinkChecker:
                 OSError,
             ) as e:
                 structlog.get_logger().warning(
-                    "failed_to_extract_links", file_path=str(file_path), error=str(e)
+                    "failed_to_extract_links", file_path=str(file_path), error=str(e),
                 )
 
         return all_links
@@ -537,7 +537,7 @@ class FlextQualityLinkChecker:
     def generate_report(self, report_format: str = "json") -> str:
         """Generate validation report."""
         results_adapter: TypeAdapter[FlextQualityLinkChecker.Results] = TypeAdapter(
-            FlextQualityLinkChecker.Results
+            FlextQualityLinkChecker.Results,
         )
         if report_format == "json":
             return results_adapter.dump_json(self.results, indent=2).decode()
@@ -588,7 +588,7 @@ Broken Links:
     ) -> pathlib.Path:
         """Save validation report."""
         results_adapter: TypeAdapter[FlextQualityLinkChecker.Results] = TypeAdapter(
-            FlextQualityLinkChecker.Results
+            FlextQualityLinkChecker.Results,
         )
         pathlib.Path(output_path).mkdir(exist_ok=True, parents=True)
 

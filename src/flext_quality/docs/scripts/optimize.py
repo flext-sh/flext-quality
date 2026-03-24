@@ -41,7 +41,7 @@ class FlextQualityDocumentationOptimizer:
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.logger = logging.getLogger(self.__class__.__name__)
         self.results = m.Quality.OptimizerResults(
-            timestamp=datetime.now(UTC).isoformat()
+            timestamp=datetime.now(UTC).isoformat(),
         )
 
     def optimize_formatting(self, doc_files: Sequence[Path]) -> t.ContainerMapping:

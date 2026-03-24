@@ -112,7 +112,7 @@ class FlextQualityContentAnalyzer:
         content_scores: MutableMapping[str, float]
         readability_stats: MutableMapping[str, FlextQualityContentAnalyzer.Readability]
         completeness_checks: MutableMapping[
-            str, FlextQualityContentAnalyzer.Completeness
+            str, FlextQualityContentAnalyzer.Completeness,
         ]
         recommendations: MutableSequence[
             FlextQualityContentAnalyzer.AnalyzerRecommendation | str
@@ -242,7 +242,7 @@ class FlextQualityContentAnalyzer:
                     FlextQualityContentAnalyzer.Issue(
                         type="analysis_error",
                         message=str(e),
-                    )
+                    ),
                 ],
                 suggestions=[],
             )
@@ -634,7 +634,7 @@ class FlextQualityContentAnalyzer:
                     type="insufficient_content",
                     severity="medium",
                     message=f"Content too short ({word_count} words)",
-                )
+                ),
             )
 
         missing_raw = completeness.missing_elements if completeness else None
@@ -645,7 +645,7 @@ class FlextQualityContentAnalyzer:
                     type="missing_elements",
                     severity="high",
                     message=f"Missing: {', '.join(missing)}",
-                )
+                ),
             )
 
         readability_score = readability.readability_score if readability else 0
@@ -658,7 +658,7 @@ class FlextQualityContentAnalyzer:
                     type="poor_readability",
                     severity="medium",
                     message=f"Content difficult to read (score: {readability_score})",
-                )
+                ),
             )
 
         heading_hierarchy_valid = (
@@ -670,7 +670,7 @@ class FlextQualityContentAnalyzer:
                     type="heading_hierarchy",
                     severity="low",
                     message="Heading hierarchy is not logical",
-                )
+                ),
             )
 
         heading_count = metrics.heading_count if metrics else 0
@@ -680,7 +680,7 @@ class FlextQualityContentAnalyzer:
                     type="no_headings",
                     severity="high",
                     message="Document has no section headings",
-                )
+                ),
             )
 
         return issues
@@ -770,7 +770,7 @@ class FlextQualityContentAnalyzer:
                         "Improve readability and structure",
                         "Add more examples and practical guidance",
                     ],
-                )
+                ),
             )
 
         all_issues: MutableSequence[t.StrMapping] = []
@@ -781,7 +781,7 @@ class FlextQualityContentAnalyzer:
             if not isinstance(result_value_raw, dict):
                 continue
             result_value: Mapping[str, t.NormalizedValue] = rv_adapter.validate_python(
-                result_value_raw
+                result_value_raw,
             )
             issues_list_raw = result_value.get("issues")
             if not isinstance(issues_list_raw, list):
@@ -806,13 +806,13 @@ class FlextQualityContentAnalyzer:
                             "Implement consistent fixes",
                             "Update style guidelines",
                         ],
-                    )
+                    ),
                 )
 
     def generate_report(self, output_format: str = "json") -> str:
         """Generate content analysis report."""
         results_adapter: TypeAdapter[FlextQualityContentAnalyzer.Results] = TypeAdapter(
-            FlextQualityContentAnalyzer.Results
+            FlextQualityContentAnalyzer.Results,
         )
         if output_format == "json":
             return results_adapter.dump_json(self.results, indent=2).decode()
@@ -865,7 +865,7 @@ Top Recommendations:
 
         """
         results_adapter: TypeAdapter[FlextQualityContentAnalyzer.Results] = TypeAdapter(
-            FlextQualityContentAnalyzer.Results
+            FlextQualityContentAnalyzer.Results,
         )
         Path(output_path).mkdir(exist_ok=True, parents=True)
 

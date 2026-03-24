@@ -54,7 +54,7 @@ class FlextQualityDocumentationAuditor:
                 encoding="utf-8",
             ) as f:
                 self.audit_rules = m.Quality.AuditRulesConfig.model_validate(
-                    yaml.safe_load(f)
+                    yaml.safe_load(f),
                 )
         except (FileNotFoundError, ValidationError, yaml.YAMLError, TypeError):
             self.audit_rules = self.get_default_audit_rules()
@@ -64,7 +64,7 @@ class FlextQualityDocumentationAuditor:
                 encoding="utf-8",
             ) as f:
                 self.style_guide = m.Quality.StyleGuideConfig.model_validate(
-                    yaml.safe_load(f)
+                    yaml.safe_load(f),
                 )
         except (FileNotFoundError, ValidationError, yaml.YAMLError, TypeError):
             self.style_guide = self.get_default_style_guide()
@@ -851,7 +851,7 @@ def _execute_audit_checks(
 
 
 def _should_fail_on_results(
-    args: argparse.Namespace, metrics: m.Quality.AuditMetrics
+    args: argparse.Namespace, metrics: m.Quality.AuditMetrics,
 ) -> bool:
     """Determine if the process should fail based on results and arguments."""
     should_fail = False

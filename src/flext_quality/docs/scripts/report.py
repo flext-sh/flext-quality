@@ -263,7 +263,7 @@ class FlextQualityDocumentationReporter:
                                 "Prioritize fixes",
                                 "Re-run audit after fixes",
                             ],
-                        )
+                        ),
                     )
                 outdated: MutableSequence[Mapping[str, t.Primitives]] = [
                     i
@@ -282,7 +282,7 @@ class FlextQualityDocumentationReporter:
                                 "Review content accuracy",
                                 "Update timestamps and version info",
                             ],
-                        )
+                        ),
                     )
         if self.validation_data and isinstance(self.validation_data, dict):
             link_validation = self.validation_data.get("link_validation")
@@ -330,7 +330,7 @@ class FlextQualityDocumentationReporter:
                                     "Update or remove invalid URLs",
                                     "Test links after fixes",
                                 ],
-                            )
+                            ),
                         )
         if self.optimization_data and isinstance(self.optimization_data, dict):
             optimizations = self.optimization_data.get("optimizations")
@@ -348,7 +348,7 @@ class FlextQualityDocumentationReporter:
                             "Configure CI/CD optimization",
                             "Schedule regular optimization runs",
                         ],
-                    )
+                    ),
                 )
         if not recommendations:
             recommendations.append(
@@ -362,7 +362,7 @@ class FlextQualityDocumentationReporter:
                         "Configure automated reporting",
                         "Set up team notifications",
                     ],
-                )
+                ),
             )
         return recommendations
 
@@ -391,7 +391,7 @@ class FlextQualityDocumentationReporter:
             "recommendations": data.recommendations,
             "charts": self._generate_charts(data) if data.trends else None,
         }
-        render_fn: Callable[..., str] = getattr(template, "render")
+        render_fn: Callable[..., str] = template.render
         rendered: str = str(render_fn(**template_data))
         return rendered
 
@@ -595,7 +595,7 @@ class FlextQualityDocumentationReporter:
                                 date=date_val,
                                 quality_score=quality_score,
                                 total_issues=len(issues),
-                            )
+                            ),
                         )
             if "link_validation" in report:
                 link_validation = report.get("link_validation")
@@ -608,7 +608,7 @@ class FlextQualityDocumentationReporter:
                                 date=date_val,
                                 links_checked=links_checked,
                                 broken_links=broken_links,
-                            )
+                            ),
                         )
             if "changes_made" in report:
                 changes_made = report.get("changes_made")
@@ -619,7 +619,7 @@ class FlextQualityDocumentationReporter:
                             date=date_val,
                             changes_made=changes_made,
                             files_processed=files_processed,
-                        )
+                        ),
                     )
         return FlextQualityDocumentationReporter.TrendData(
             audit_trends=sorted(audit_trends, key=lambda e: e.date),
@@ -659,7 +659,7 @@ class FlextQualityDocumentationReporter:
             for trend in typed_trend_data.audit_trends[-10:]:
                 date_str = trend.date.strftime("%Y-%m-%d")
                 md.append(
-                    f"| {date_str} | {trend.quality_score}% | {trend.total_issues} |"
+                    f"| {date_str} | {trend.quality_score}% | {trend.total_issues} |",
                 )
             md.append("")
         if typed_trend_data.validation_trends:
@@ -671,7 +671,7 @@ class FlextQualityDocumentationReporter:
             for trend in typed_trend_data.validation_trends[-10:]:
                 date_str = trend.date.strftime("%Y-%m-%d")
                 md.append(
-                    f"| {date_str} | {trend.links_checked} | {trend.broken_links} |"
+                    f"| {date_str} | {trend.links_checked} | {trend.broken_links} |",
                 )
             md.append("")
         if typed_trend_data.optimization_trends:
@@ -683,7 +683,7 @@ class FlextQualityDocumentationReporter:
             for trend in typed_trend_data.optimization_trends[-10:]:
                 date_str = trend.date.strftime("%Y-%m-%d")
                 md.append(
-                    f"| {date_str} | {trend.files_processed} | {trend.changes_made} |"
+                    f"| {date_str} | {trend.files_processed} | {trend.changes_made} |",
                 )
             md.append("")
         return "\n".join(md)
@@ -769,7 +769,7 @@ def main() -> None:
         reporter.save_report(trend_report, filename, "md")
     else:
         report_content = reporter.generate_quality_report(
-            args.format, include_trends=args.include_trends
+            args.format, include_trends=args.include_trends,
         )
         filename = (
             args.filename
