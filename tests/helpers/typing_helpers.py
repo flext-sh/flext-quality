@@ -18,7 +18,7 @@ from flext_core import t
 
 
 def assert_is_dict(
-    value: t.Scalar | Mapping[str, t.Scalar],
+    value: t.Scalar | t.ScalarMapping,
 ) -> TypeIs[Mapping[str, t.Scalar]]:
     """Type-safe t.ContainerMapping assertion following Single Responsibility Principle.
 

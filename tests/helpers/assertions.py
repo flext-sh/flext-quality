@@ -14,7 +14,7 @@ from collections.abc import Mapping, Sequence
 from flext_core import t
 
 
-def assert_is_dict(value: t.Scalar | Mapping[str, t.Scalar], msg: str = "") -> None:
+def assert_is_dict(value: t.Scalar | t.ScalarMapping, msg: str = "") -> None:
     """Assert that value is a dict."""
     assert isinstance(value, dict), msg or f"Expected dict, got {type(value).__name__}"
 
