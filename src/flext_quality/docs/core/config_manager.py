@@ -8,27 +8,26 @@ from __future__ import annotations
 
 from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
-from typing import TypeAlias
 
 import yaml
 
 from flext_quality import t
 
-ConfigPrimitive: TypeAlias = str | int | float | bool
-ConfigValue: TypeAlias = str | int | float | bool | t.StrSequence
-ConfigSection: TypeAlias = MutableMapping[str, str | int | float | bool | t.StrSequence]
-ConfigData: TypeAlias = MutableMapping[
+ConfigPrimitive = str | int | float | bool
+ConfigValue = str | int | float | bool | t.StrSequence
+ConfigSection = MutableMapping[str, str | int | float | bool | t.StrSequence]
+ConfigData = MutableMapping[
     str,
     MutableMapping[str, str | int | float | bool | t.StrSequence],
 ]
-RawSectionValue: TypeAlias = (
+RawSectionValue = (
     str | int | float | bool | Sequence[str | int | float | bool]
 )
-RawSectionMap: TypeAlias = Mapping[
+RawSectionMap = Mapping[
     str,
     str | int | float | bool | Sequence[str | int | float | bool],
 ]
-RawConfigMap: TypeAlias = Mapping[
+RawConfigMap = Mapping[
     str,
     Mapping[str, str | int | float | bool | Sequence[str | int | float | bool]],
 ]
@@ -160,6 +159,15 @@ class FlextQualityValidationConfig:
 
 class FlextQualityConfigManager:
     """Centralized configuration management for the documentation maintenance system."""
+
+    # Type aliases as class-level annotations
+    ConfigPrimitive = ConfigPrimitive
+    ConfigValue = ConfigValue
+    ConfigSection = ConfigSection
+    ConfigData = ConfigData
+    RawSectionValue = RawSectionValue
+    RawSectionMap = RawSectionMap
+    RawConfigMap = RawConfigMap
 
     def __init__(self, config_dir: str | Path | None = None) -> None:
         """Initialize the configuration manager.
