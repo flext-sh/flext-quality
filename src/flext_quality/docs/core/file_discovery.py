@@ -362,7 +362,8 @@ class FlextQualityDocumentationFinder:
         return categories
 
     def get_statistics(
-        self, files: Sequence[Path] | None = None,
+        self,
+        files: Sequence[Path] | None = None,
     ) -> FlextQualityFileStatistics:
         """Get statistics about found files."""
         if files is None:

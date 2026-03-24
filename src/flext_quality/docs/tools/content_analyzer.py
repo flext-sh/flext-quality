@@ -112,7 +112,8 @@ class FlextQualityContentAnalyzer:
         content_scores: MutableMapping[str, float]
         readability_stats: MutableMapping[str, FlextQualityContentAnalyzer.Readability]
         completeness_checks: MutableMapping[
-            str, FlextQualityContentAnalyzer.Completeness,
+            str,
+            FlextQualityContentAnalyzer.Completeness,
         ]
         recommendations: MutableSequence[
             FlextQualityContentAnalyzer.AnalyzerRecommendation | str

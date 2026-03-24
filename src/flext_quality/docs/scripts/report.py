@@ -769,7 +769,8 @@ def main() -> None:
         reporter.save_report(trend_report, filename, "md")
     else:
         report_content = reporter.generate_quality_report(
-            args.format, include_trends=args.include_trends,
+            args.format,
+            include_trends=args.include_trends,
         )
         filename = (
             args.filename

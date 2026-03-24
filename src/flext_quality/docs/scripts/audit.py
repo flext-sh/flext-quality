@@ -851,7 +851,8 @@ def _execute_audit_checks(
 
 
 def _should_fail_on_results(
-    args: argparse.Namespace, metrics: m.Quality.AuditMetrics,
+    args: argparse.Namespace,
+    metrics: m.Quality.AuditMetrics,
 ) -> bool:
     """Determine if the process should fail based on results and arguments."""
     should_fail = False
