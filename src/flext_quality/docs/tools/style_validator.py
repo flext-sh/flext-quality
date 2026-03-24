@@ -17,6 +17,8 @@ from typing import TypedDict
 import yaml
 from pydantic import TypeAdapter
 
+from flext_quality import t
+
 
 class StyleIssue(TypedDict):
     """Represents a single style issue or violation."""
@@ -157,7 +159,7 @@ class StyleValidator:
             return
         try:
             with Path(config_path).open(encoding="utf-8") as f:
-                loaded_obj: Mapping[str, Mapping[str, str | int | bool]] | None = (
+                loaded_obj: Mapping[str, Mapping[str, t.Scalar]] | None = (
                     yaml.safe_load(f)
                 )
                 if isinstance(loaded_obj, dict):
@@ -168,7 +170,7 @@ class StyleValidator:
             self._set_default_config()
 
     def _normalize_config(
-        self, raw: Mapping[str, Mapping[str, str | int | bool]]
+        self, raw: Mapping[str, Mapping[str, t.Scalar]]
     ) -> StyleConfig:
         config: StyleConfig = {}
 

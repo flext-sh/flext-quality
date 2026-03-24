@@ -331,7 +331,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             content_issues: Sequence[FlextQualityModels.Quality.ContentIssue] = Field(
                 default_factory=list
             )
-            quality_metrics: Mapping[str, str | int | float | bool] = Field(
+            quality_metrics: Mapping[str, t.Scalar] = Field(
                 default_factory=dict
             )
 

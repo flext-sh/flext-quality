@@ -135,7 +135,7 @@ class BaseReporter(ABC):
         self,
         data: Mapping[
             str,
-            str | int | float | bool | Mapping[str, t.Primitives | None] | None,
+            t.Scalar | Mapping[str, t.Primitives | None] | None,
         ],
         output_format: str = "html",
     ) -> str:
