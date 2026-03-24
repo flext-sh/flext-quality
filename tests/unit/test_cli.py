@@ -20,7 +20,7 @@ class TestFlextQualityCliService:
     def test_init_creates_service(self) -> None:
         """Test service initializes successfully."""
         service = FlextQualityCliService()
-        tm.that(service, none=False)
+        assert service is not None
 
     def test_display_status_returns_result(self) -> None:
         """Test display_status returns a r with dict."""

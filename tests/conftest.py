@@ -17,7 +17,7 @@ from collections.abc import Generator, Sequence
 from pathlib import Path
 
 import pytest
-from flext_core import T, r
+from flext_core import r
 
 from tests import t
 
@@ -427,7 +427,7 @@ class MockQualityAnalyzer:
     def __init__(self) -> None:
         """Initialize the instance."""
         super().__init__()
-        self.analyzed_files: t.StrSequence = []
+        self.analyzed_files: list[str] = []
 
     def analyze_project(self, project_path: str) -> t.ContainerMapping:
         """Simulate comprehensive project analysis.
@@ -514,7 +514,7 @@ class MockReportGenerator:
     def __init__(self) -> None:
         """Initialize the instance."""
         super().__init__()
-        self.generated_reports: Sequence[t.ContainerMapping] = []
+        self.generated_reports: list[t.ContainerMapping] = []
 
     def generate_report(
         self,
