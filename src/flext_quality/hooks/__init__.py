@@ -14,17 +14,22 @@ if TYPE_CHECKING:
     from flext_core import FlextTypes
 
     from flext_quality.hooks.base import BaseHookImpl, FlextQualityBaseHook
-    from flext_quality.hooks.manager import HookManager
+    from flext_quality.hooks.manager import FlextQualityHookManager, HookManager
 
 _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
     "BaseHookImpl": ("flext_quality.hooks.base", "BaseHookImpl"),
     "FlextQualityBaseHook": ("flext_quality.hooks.base", "FlextQualityBaseHook"),
+    "FlextQualityHookManager": (
+        "flext_quality.hooks.manager",
+        "FlextQualityHookManager",
+    ),
     "HookManager": ("flext_quality.hooks.manager", "HookManager"),
 }
 
 __all__ = [
     "BaseHookImpl",
     "FlextQualityBaseHook",
+    "FlextQualityHookManager",
     "HookManager",
 ]
 

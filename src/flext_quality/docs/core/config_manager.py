@@ -13,50 +13,22 @@ import yaml
 
 from flext_quality import t
 
-ConfigPrimitive = str | int | float | bool
-ConfigValue = str | int | float | bool | t.StrSequence
-ConfigSection = MutableMapping[str, str | int | float | bool | t.StrSequence]
-ConfigData = MutableMapping[
+type ConfigPrimitive = str | int | float | bool
+type ConfigValue = str | int | float | bool | t.StrSequence
+type ConfigSection = MutableMapping[str, str | int | float | bool | t.StrSequence]
+type ConfigData = MutableMapping[
     str,
     MutableMapping[str, str | int | float | bool | t.StrSequence],
 ]
-RawSectionValue = str | int | float | bool | Sequence[str | int | float | bool]
-RawSectionMap = Mapping[
+type RawSectionValue = str | int | float | bool | Sequence[str | int | float | bool]
+type RawSectionMap = Mapping[
     str,
     str | int | float | bool | Sequence[str | int | float | bool],
 ]
-RawConfigMap = Mapping[
+type RawConfigMap = Mapping[
     str,
     Mapping[str, str | int | float | bool | Sequence[str | int | float | bool]],
 ]
-
-
-def _as_section(value: RawSectionMap | None) -> ConfigSection:
-    """Normalize any value into a configuration section mapping."""
-    if not isinstance(value, Mapping):
-        return {}
-
-    section: ConfigSection = {}
-    for key, item in value.items():
-        key_str = str(key)
-        if isinstance(item, (str, int, float, bool)):
-            section[key_str] = item
-        elif isinstance(item, list):
-            section[key_str] = [str(entry) for entry in item]
-    return section
-
-
-def _as_config_data(value: RawConfigMap | None) -> ConfigData:
-    """Normalize loaded YAML content into typed config data."""
-    if not isinstance(value, Mapping):
-        return {}
-
-    config: ConfigData = {}
-    for key, item in value.items():
-        section = _as_section(item)
-        if section:
-            config[str(key)] = section
-    return config
 
 
 class FlextQualityAuditRules:
@@ -158,14 +130,31 @@ class FlextQualityValidationConfig:
 class FlextQualityConfigManager:
     """Centralized configuration management for the documentation maintenance system."""
 
-    # Type aliases as class-level annotations
-    ConfigPrimitive = ConfigPrimitive
-    ConfigValue = ConfigValue
-    ConfigSection = ConfigSection
-    ConfigData = ConfigData
-    RawSectionValue = RawSectionValue
-    RawSectionMap = RawSectionMap
-    RawConfigMap = RawConfigMap
+    @staticmethod
+    def _as_section(value: RawSectionMap | None) -> ConfigSection:
+        """Normalize any value into a configuration section mapping."""
+        if not isinstance(value, Mapping):
+            return {}
+        section: ConfigSection = {}
+        for key, item in value.items():
+            key_str = str(key)
+            if isinstance(item, (str, int, float, bool)):
+                section[key_str] = item
+            elif isinstance(item, list):
+                section[key_str] = [str(entry) for entry in item]
+        return section
+
+    @staticmethod
+    def _as_config_data(value: RawConfigMap | None) -> ConfigData:
+        """Normalize loaded YAML content into typed config data."""
+        if not isinstance(value, Mapping):
+            return {}
+        config: ConfigData = {}
+        for key, item in value.items():
+            section = FlextQualityConfigManager._as_section(item)
+            if section:
+                config[str(key)] = section
+        return config
 
     def __init__(self, config_dir: str | Path | None = None) -> None:
         """Initialize the configuration manager.
@@ -220,7 +209,7 @@ class FlextQualityConfigManager:
         try:
             with config_path.open("r", encoding="utf-8") as f:
                 raw = yaml.safe_load(f)
-                return _as_config_data(raw)
+                return self._as_config_data(raw)
         except FileNotFoundError:
             return self._get_default_config(filename)
         except yaml.YAMLError:
@@ -293,7 +282,7 @@ class FlextQualityConfigManager:
         }
 
         default_value = defaults.get(filename, {})
-        return _as_config_data(default_value)
+        return self._as_config_data(default_value)
 
     def reload_configs(self) -> None:
         """Reload all configurations from disk."""

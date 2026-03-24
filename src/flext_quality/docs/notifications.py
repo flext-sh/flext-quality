@@ -141,7 +141,7 @@ class FlextQualityDocumentationNotifier:
                     enabled = value.get("enabled")
                     if isinstance(enabled, bool):
                         channel_cfg = getattr(cfg.channels, key)
-                        object.__setattr__(channel_cfg, "enabled", enabled)
+                        setattr(channel_cfg, "enabled", enabled)
 
         alerts = loaded.get("alerts")
         if isinstance(alerts, dict):
@@ -152,38 +152,38 @@ class FlextQualityDocumentationNotifier:
                     threshold = value.get("threshold")
                     alert_cfg = getattr(cfg.alerts, key)
                     if isinstance(enabled, bool):
-                        object.__setattr__(alert_cfg, "enabled", enabled)
+                        setattr(alert_cfg, "enabled", enabled)
                     if isinstance(threshold, int):
-                        object.__setattr__(alert_cfg, "threshold", threshold)
+                        setattr(alert_cfg, "threshold", threshold)
             for key in ("weekly_report", "monthly_report"):
                 value = alerts.get(key)
                 if isinstance(value, dict):
                     enabled = value.get("enabled")
                     if isinstance(enabled, bool):
                         toggle_cfg = getattr(cfg.alerts, key)
-                        object.__setattr__(toggle_cfg, "enabled", enabled)
+                        setattr(toggle_cfg, "enabled", enabled)
 
         email = loaded.get("email")
         if isinstance(email, dict):
             for key in ("smtp_server", "username", "password", "from_address"):
                 value = email.get(key)
                 if isinstance(value, str):
-                    object.__setattr__(cfg.email, key, value)
+                    setattr(cfg.email, key, value)
             smtp_port = email.get("smtp_port")
             if isinstance(smtp_port, int):
-                object.__setattr__(cfg.email, "smtp_port", smtp_port)
+                setattr(cfg.email, "smtp_port", smtp_port)
             to_addresses = email.get("to_addresses")
             if isinstance(to_addresses, list) and all(
                 isinstance(item, str) for item in to_addresses
             ):
-                object.__setattr__(cfg.email, "to_addresses", to_addresses)
+                setattr(cfg.email, "to_addresses", to_addresses)
 
         slack = loaded.get("slack")
         if isinstance(slack, dict):
             for key in ("webhook_url", "channel", "username"):
                 value = slack.get(key)
                 if isinstance(value, str):
-                    object.__setattr__(cfg.slack, key, value)
+                    setattr(cfg.slack, key, value)
 
         webhook = loaded.get("webhook")
         if isinstance(webhook, dict):
@@ -191,18 +191,18 @@ class FlextQualityDocumentationNotifier:
             timeout_val = webhook.get("timeout")
             headers_val = webhook.get("headers")
             if isinstance(url_val, str):
-                object.__setattr__(cfg.webhook, "url", url_val)
+                setattr(cfg.webhook, "url", url_val)
             if isinstance(timeout_val, int):
-                object.__setattr__(cfg.webhook, "timeout", timeout_val)
+                setattr(cfg.webhook, "timeout", timeout_val)
             if isinstance(headers_val, dict) and all(
                 isinstance(k, str) and isinstance(v, str)
                 for k, v in headers_val.items()
             ):
-                object.__setattr__(cfg.webhook, "headers", headers_val)
+                setattr(cfg.webhook, "headers", headers_val)
 
         enabled_val = loaded.get("enabled")
         if isinstance(enabled_val, bool):
-            object.__setattr__(cfg, "enabled", enabled_val)
+            setattr(cfg, "enabled", enabled_val)
 
         return cfg
 

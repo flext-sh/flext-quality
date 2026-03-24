@@ -20,12 +20,12 @@ from flext_core import FlextContainer, FlextLogger, p, r
 from flext_quality import (
     FlextQualityRulesLoader,
     FlextQualitySettings,
-    HookManager,
     c,
     m,
     t,
     u,
 )
+from flext_quality.hooks.manager import FlextQualityHookManager
 
 
 class FlextQuality:
@@ -66,7 +66,7 @@ class FlextQuality:
     _container: p.Container
     logger: p.Logger
     config: FlextQualitySettings
-    hooks: HookManager
+    hooks: FlextQualityHookManager
     rules_loader: FlextQualityRulesLoader
 
     def __init__(self) -> None:
@@ -78,7 +78,7 @@ class FlextQuality:
         self._container = FlextContainer.get_global()
         if not self._container.has_service("flext_quality"):
             _ = self._container.register("flext_quality", "flext_quality")
-        self.hooks = HookManager()
+        self.hooks = FlextQualityHookManager()
         self.rules_loader = FlextQualityRulesLoader()
 
     @classmethod

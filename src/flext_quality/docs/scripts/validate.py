@@ -31,7 +31,7 @@ LinkCheckResult = m.Quality.LinkCheckResult
 ContentIssue = m.Quality.ContentIssue
 
 
-class LinkValidator:
+class FlextQualityLinkValidator:
     """Advanced link validation and checking system."""
 
     def __init__(
@@ -473,7 +473,7 @@ class LinkValidator:
         return filepath
 
 
-class ContentValidator:
+class FlextQualityContentValidator:
     """Content validation and quality checking system."""
 
     def __init__(self) -> None:
@@ -719,8 +719,8 @@ def _discover_validation_files() -> Sequence[Path]:
 
 
 def _execute_validations(
-    link_validator: LinkValidator,
-    content_validator: ContentValidator,
+    link_validator: FlextQualityLinkValidator,
+    content_validator: FlextQualityContentValidator,
     all_links: Sequence[LinkRecord],
     doc_files: Sequence[Path],
     args: argparse.Namespace,
@@ -757,12 +757,12 @@ def main() -> None:
     parser = _create_validation_parser()
     args = parser.parse_args()
     doc_files = _discover_validation_files()
-    link_validator = LinkValidator(
+    link_validator = FlextQualityLinkValidator(
         timeout=args.timeout,
         retries=args.retries,
         max_workers=args.workers,
     )
-    content_validator = ContentValidator()
+    content_validator = FlextQualityContentValidator()
     all_links = link_validator.find_all_links(doc_files)
     run_any_check = _execute_validations(
         link_validator,
@@ -779,3 +779,8 @@ def main() -> None:
     _ = link_validator.save_report(args.output)
     if total_errors > 0:
         raise SystemExit(1)
+
+
+# Module-level aliases for pyright compatibility
+LinkValidator = FlextQualityLinkValidator
+ContentValidator = FlextQualityContentValidator

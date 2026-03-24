@@ -49,6 +49,8 @@ if TYPE_CHECKING:
         ContentMetrics,
         ContentValidator,
         ContentValidatorResults,
+        FlextQualityContentValidator,
+        FlextQualityLinkValidator,
         LinkCheckResult,
         LinkRecord,
         LinkValidator,
@@ -86,6 +88,10 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
         "flext_quality.docs.scripts.report",
         "DocumentationReporter",
     ),
+    "FlextQualityContentValidator": (
+        "flext_quality.docs.scripts.validate",
+        "FlextQualityContentValidator",
+    ),
     "FlextQualityDocumentationAuditor": (
         "flext_quality.docs.scripts.audit",
         "FlextQualityDocumentationAuditor",
@@ -97,6 +103,10 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
     "FlextQualityDocumentationReporter": (
         "flext_quality.docs.scripts.report",
         "FlextQualityDocumentationReporter",
+    ),
+    "FlextQualityLinkValidator": (
+        "flext_quality.docs.scripts.validate",
+        "FlextQualityLinkValidator",
     ),
     "FormattingConfig": ("flext_quality.docs.scripts.audit", "FormattingConfig"),
     "LinkCheckResult": ("flext_quality.docs.scripts.validate", "LinkCheckResult"),
@@ -148,9 +158,11 @@ __all__ = [
     "DocumentationAuditor",
     "DocumentationOptimizer",
     "DocumentationReporter",
+    "FlextQualityContentValidator",
     "FlextQualityDocumentationAuditor",
     "FlextQualityDocumentationOptimizer",
     "FlextQualityDocumentationReporter",
+    "FlextQualityLinkValidator",
     "FormattingConfig",
     "LinkCheckResult",
     "LinkRecord",

@@ -790,5 +790,14 @@ if __name__ == "__main__":
         pass
 
 
-# Module-level alias for pyrefly compatibility
+# Module-level aliases for pyright compatibility
 StyleValidator = FlextQualityStyleValidator
+StyleIssue = FlextQualityStyleValidator.StyleIssue
+FileResults = FlextQualityStyleValidator.FileResults
+MarkdownConfig = FlextQualityStyleValidator.MarkdownConfig
+FormattingConfig = FlextQualityStyleValidator.FormattingConfig
+AccessibilityConfig = FlextQualityStyleValidator.AccessibilityConfig
+HeadingsConfig = FlextQualityStyleValidator.HeadingsConfig
+StyleConfig = FlextQualityStyleValidator.StyleConfig
+SummaryMetrics = FlextQualityStyleValidator.SummaryMetrics
+ValidationResults = FlextQualityStyleValidator.ValidationResults

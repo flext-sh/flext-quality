@@ -294,15 +294,23 @@ class FlextQualityDocumentationReporter:
         if self.validation_data and isinstance(self.validation_data, dict):
             link_validation = self.validation_data.get("link_validation")
             if isinstance(link_validation, dict):
-                validation_errors = link_validation.get("errors")
-                if isinstance(validation_errors, list):
+                validation_errors_raw = link_validation.get("errors")
+                validation_errors: Sequence[t.NormalizedValue] = (
+                    validation_errors_raw
+                    if isinstance(validation_errors_raw, list)
+                    else []
+                )
+                if validation_errors:
                     broken_links: MutableSequence[Mapping[str, t.Primitives]] = []
-                    for e in validation_errors:
-                        if isinstance(e, dict):
-                            error_entry: Mapping[
-                                t.NormalizedValue,
-                                t.NormalizedValue,
-                            ] = e
+                    _e_adapter: TypeAdapter[dict[str, t.NormalizedValue]] = TypeAdapter(
+                        dict[str, t.NormalizedValue],
+                    )
+                    for e_raw in validation_errors:
+                        if not isinstance(e_raw, Mapping):
+                            continue
+                        error_entry: dict[str, t.NormalizedValue] = (
+                            _e_adapter.validate_python(dict(e_raw))
+                        )
                             error_type = error_entry.get("type")
                             if error_type in {
                                 "broken_external_link",
@@ -389,7 +397,7 @@ class FlextQualityDocumentationReporter:
             "recommendations": data.recommendations,
             "charts": self._generate_charts(data) if data.trends else None,
         }
-        rendered: str = template.render(**template_data)
+        rendered: str = str(template.render(**template_data))
         return rendered
 
     def _get_html_template(self) -> Template:
@@ -644,37 +652,38 @@ class FlextQualityDocumentationReporter:
         if isinstance(trend_data, dict):
             return "\n".join(md)
         # trend_data is TrendData BaseModel
-        if trend_data.audit_trends:
+        typed_trend_data: FlextQualityDocumentationReporter.TrendData = trend_data
+        if typed_trend_data.audit_trends:
             md.extend(["## Quality Score Trends", ""])
             md.extend((
                 "| Date | Quality Score | Issues |",
                 "|------|---------------|--------|",
             ))
-            for trend in trend_data.audit_trends[-10:]:
+            for trend in typed_trend_data.audit_trends[-10:]:
                 date_str = trend.date.strftime("%Y-%m-%d")
                 md.append(
                     f"| {date_str} | {trend.quality_score}% | {trend.total_issues} |"
                 )
             md.append("")
-        if trend_data.validation_trends:
+        if typed_trend_data.validation_trends:
             md.extend(["## Link Validation Trends", ""])
             md.extend((
                 "| Date | Links Checked | Broken Links |",
                 "|------|---------------|--------------|",
             ))
-            for trend in trend_data.validation_trends[-10:]:
+            for trend in typed_trend_data.validation_trends[-10:]:
                 date_str = trend.date.strftime("%Y-%m-%d")
                 md.append(
                     f"| {date_str} | {trend.links_checked} | {trend.broken_links} |"
                 )
             md.append("")
-        if trend_data.optimization_trends:
+        if typed_trend_data.optimization_trends:
             md.extend(["## Optimization Trends", ""])
             md.extend((
                 "| Date | Files Processed | Changes Made |",
                 "|------|-----------------|--------------|",
             ))
-            for trend in trend_data.optimization_trends[-10:]:
+            for trend in typed_trend_data.optimization_trends[-10:]:
                 date_str = trend.date.strftime("%Y-%m-%d")
                 md.append(
                     f"| {date_str} | {trend.files_processed} | {trend.changes_made} |"

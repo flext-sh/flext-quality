@@ -85,10 +85,7 @@ class FlextQualityDocumentationDashboard:
 
     def get_current_metrics(
         self,
-    ) -> Mapping[
-        str,
-        int | str | Mapping[str, int],
-    ]:
+    ) -> Mapping[str, t.NormalizedValue]:
         """Get current quality metrics from latest audit."""
         latest_audit = self.reports_dir / "latest_audit.json"
 
@@ -105,25 +102,25 @@ class FlextQualityDocumentationDashboard:
         try:
             data = _DICT_ADAPTER.validate_json(Path(latest_audit).read_bytes())
             metrics_raw = data.get("metrics")
-            metrics: Mapping[str, int] = (
+            metrics: Mapping[str, t.NormalizedValue] = (
                 metrics_raw if isinstance(metrics_raw, Mapping) else {}
             )
-            severity_raw = (
-                metrics.get("severity_breakdown")
-                if isinstance(metrics, Mapping)
-                else None
-            )
-            severity: Mapping[str, int] = (
+            severity_raw = metrics.get("severity_breakdown")
+            severity: Mapping[str, t.NormalizedValue] = (
                 severity_raw if isinstance(severity_raw, Mapping) else {}
             )
             files_analyzed_raw = data.get("files_analyzed")
             timestamp_raw = data.get("timestamp")
+            qs_raw = metrics.get("quality_score", 0)
+            quality_score_int: int = qs_raw if isinstance(qs_raw, int) else 0
+            ti_raw = metrics.get("total_issues", 0)
+            total_issues_int: int = ti_raw if isinstance(ti_raw, int) else 0
             return {
-                "quality_score": metrics.get("quality_score", 0),
+                "quality_score": quality_score_int,
                 "files_analyzed": (
                     files_analyzed_raw if isinstance(files_analyzed_raw, int) else 0
                 ),
-                "total_issues": metrics.get("total_issues", 0),
+                "total_issues": total_issues_int,
                 "severity_breakdown": severity,
                 "timestamp": (
                     timestamp_raw
@@ -145,11 +142,11 @@ class FlextQualityDocumentationDashboard:
     def get_quality_trends(
         self,
         days: int = 30,
-    ) -> Mapping[str, int | Sequence[Mapping[str, int | str]]]:
+    ) -> Mapping[str, t.NormalizedValue]:
         """Get quality trends over the specified number of days."""
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
 
-        trend_data: MutableSequence[Mapping[str, int | str]] = []
+        trend_data: MutableSequence[t.ContainerMapping] = []
         reports_dir = self.reports_dir
 
         # Find all audit reports
@@ -166,24 +163,28 @@ class FlextQualityDocumentationDashboard:
 
                 if report_date >= cutoff_date:
                     data = _DICT_ADAPTER.validate_json(Path(report_file).read_bytes())
+                    metrics_v = data.get("metrics")
+                    metrics_m: Mapping[str, t.NormalizedValue] = (
+                        metrics_v if isinstance(metrics_v, Mapping) else {}
+                    )
+                    sev_v = metrics_m.get("severity_breakdown")
+                    sev_m: Mapping[str, t.NormalizedValue] = (
+                        sev_v if isinstance(sev_v, Mapping) else {}
+                    )
+                    qs_v = metrics_m.get("quality_score", 0)
+                    quality_score: int = qs_v if isinstance(qs_v, int) else 0
+                    ti_v = metrics_m.get("total_issues", 0)
+                    total_issues: int = ti_v if isinstance(ti_v, int) else 0
+                    crit_v = sev_m.get("critical", 0)
+                    critical_issues: int = crit_v if isinstance(crit_v, int) else 0
+                    high_v = sev_m.get("high", 0)
+                    high_issues: int = high_v if isinstance(high_v, int) else 0
                     trend_data.append({
                         "date": report_date.isoformat(),
-                        "quality_score": data.get("metrics", {}).get(
-                            "quality_score",
-                            0,
-                        ),
-                        "total_issues": data.get("metrics", {}).get(
-                            "total_issues",
-                            0,
-                        ),
-                        "critical_issues": data
-                        .get("metrics", {})
-                        .get("severity_breakdown", {})
-                        .get("critical", 0),
-                        "high_issues": data
-                        .get("metrics", {})
-                        .get("severity_breakdown", {})
-                        .get("high", 0),
+                        "quality_score": quality_score,
+                        "total_issues": total_issues,
+                        "critical_issues": critical_issues,
+                        "high_issues": high_issues,
                     })
             except (
                 FileNotFoundError,
@@ -206,9 +207,9 @@ class FlextQualityDocumentationDashboard:
             "trends": trend_data,
         }
 
-    def get_recent_reports(self, limit: int = 10) -> Sequence[Mapping[str, int | str]]:
+    def get_recent_reports(self, limit: int = 10) -> Sequence[t.ContainerMapping]:
         """Get list of recent audit reports."""
-        reports: MutableSequence[Mapping[str, int | str]] = []
+        reports: MutableSequence[t.ContainerMapping] = []
 
         for report_file in self.reports_dir.glob("audit_report_*.json"):
             try:
@@ -222,12 +223,22 @@ class FlextQualityDocumentationDashboard:
 
                 data = _DICT_ADAPTER.validate_json(Path(report_file).read_bytes())
 
+                metrics_rv = data.get("metrics")
+                metrics_rm: Mapping[str, t.NormalizedValue] = (
+                    metrics_rv if isinstance(metrics_rv, Mapping) else {}
+                )
+                qs_rv = metrics_rm.get("quality_score", 0)
+                r_quality_score: int = qs_rv if isinstance(qs_rv, int) else 0
+                ti_rv = metrics_rm.get("total_issues", 0)
+                r_total_issues: int = ti_rv if isinstance(ti_rv, int) else 0
+                fa_rv = data.get("files_analyzed", 0)
+                r_files_analyzed: int = fa_rv if isinstance(fa_rv, int) else 0
                 reports.append({
                     "filename": report_file.name,
                     "date": report_date.isoformat(),
-                    "quality_score": data.get("metrics", {}).get("quality_score", 0),
-                    "total_issues": data.get("metrics", {}).get("total_issues", 0),
-                    "files_analyzed": data.get("files_analyzed", 0),
+                    "quality_score": r_quality_score,
+                    "total_issues": r_total_issues,
+                    "files_analyzed": r_files_analyzed,
                 })
             except (
                 FileNotFoundError,

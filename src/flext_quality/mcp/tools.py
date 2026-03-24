@@ -6,11 +6,11 @@ from flext_quality import (
     FlextQualityClaudeContextClient,
     FlextQualityClaudeMemClient,
     FlextQualityRulesEngine,
-    HookManager,
     c,
     mcp,
     t,
 )
+from flext_quality.hooks.manager import FlextQualityHookManager
 
 
 @mcp.tool()
@@ -73,7 +73,7 @@ def search_code(
 @mcp.tool()
 def execute_hook(event: str, input_data: t.Quality.HookInput) -> t.Quality.HookOutput:
     """Execute a hook manually."""
-    manager = HookManager()
+    manager = FlextQualityHookManager()
     result = manager.execute(event=event, input_data=input_data)
     if result.is_failure:
         error_msg = result.error if result.error is not None else "Unknown error"

@@ -14,7 +14,7 @@ from flext_quality.hooks.base import FlextQualityBaseHook
 
 
 @final
-class HookManager:
+class FlextQualityHookManager:
     """Manages hook lifecycle and execution."""
 
     def __init__(self, config_path: Path | None = None) -> None:
@@ -69,3 +69,7 @@ class HookManager:
             self._hooks[event] = []
         self._hooks[event].append(hook)
         return r[bool].ok(value=True)
+
+
+# Module-level alias for pyright compatibility
+HookManager = FlextQualityHookManager

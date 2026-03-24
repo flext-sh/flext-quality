@@ -34,18 +34,11 @@ if TYPE_CHECKING:
     )
     from flext_quality.docs.core.config_manager import (
         AuditRules,
-        ConfigData,
         ConfigManager,
-        ConfigPrimitive,
-        ConfigSection,
-        ConfigValue,
         FlextQualityAuditRules,
         FlextQualityConfigManager,
         FlextQualityStyleGuide,
         FlextQualityValidationConfig,
-        RawConfigMap,
-        RawSectionMap,
-        RawSectionValue,
         StyleGuide,
     )
     from flext_quality.docs.core.file_discovery import (
@@ -108,6 +101,8 @@ if TYPE_CHECKING:
         ContentMetrics,
         ContentValidator,
         ContentValidatorResults,
+        FlextQualityContentValidator,
+        FlextQualityLinkValidator,
         LinkCheckResult,
         LinkRecord,
         LinkValidator,
@@ -140,7 +135,7 @@ if TYPE_CHECKING:
         validate_files_style,
     )
     from flext_quality.hooks.base import BaseHookImpl, FlextQualityBaseHook
-    from flext_quality.hooks.manager import HookManager
+    from flext_quality.hooks.manager import FlextQualityHookManager, HookManager
     from flext_quality.integrations._health import build_mcp_health_result
     from flext_quality.integrations.claude_context import (
         FlextQualityClaudeContextClient,
@@ -200,11 +195,7 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
     "BaseReporter": ("flext_quality.docs.core.base_classes", "BaseReporter"),
     "BaseValidator": ("flext_quality.docs.core.base_classes", "BaseValidator"),
     "Config": ("flext_quality.docs.core.base_classes", "Config"),
-    "ConfigData": ("flext_quality.docs.core.config_manager", "ConfigData"),
     "ConfigManager": ("flext_quality.docs.core.config_manager", "ConfigManager"),
-    "ConfigPrimitive": ("flext_quality.docs.core.config_manager", "ConfigPrimitive"),
-    "ConfigSection": ("flext_quality.docs.core.config_manager", "ConfigSection"),
-    "ConfigValue": ("flext_quality.docs.core.config_manager", "ConfigValue"),
     "ContentAnalysisConfig": (
         "flext_quality.docs.scripts.audit",
         "ContentAnalysisConfig",
@@ -297,6 +288,10 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
         "flext_quality.docs.tools.content_analyzer",
         "FlextQualityContentAnalyzer",
     ),
+    "FlextQualityContentValidator": (
+        "flext_quality.docs.scripts.validate",
+        "FlextQualityContentValidator",
+    ),
     "FlextQualityDocumentationAuditor": (
         "flext_quality.docs.scripts.audit",
         "FlextQualityDocumentationAuditor",
@@ -325,9 +320,17 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
         "flext_quality.docs.core.file_discovery",
         "FlextQualityFileStatistics",
     ),
+    "FlextQualityHookManager": (
+        "flext_quality.hooks.manager",
+        "FlextQualityHookManager",
+    ),
     "FlextQualityLinkChecker": (
         "flext_quality.docs.tools.link_checker",
         "FlextQualityLinkChecker",
+    ),
+    "FlextQualityLinkValidator": (
+        "flext_quality.docs.scripts.validate",
+        "FlextQualityLinkValidator",
     ),
     "FlextQualityMcpClient": (
         "flext_quality.integrations.mcp_client",
@@ -407,9 +410,6 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
         "flext_quality.docs.scripts.audit",
         "QualityThresholdsConfig",
     ),
-    "RawConfigMap": ("flext_quality.docs.core.config_manager", "RawConfigMap"),
-    "RawSectionMap": ("flext_quality.docs.core.config_manager", "RawSectionMap"),
-    "RawSectionValue": ("flext_quality.docs.core.config_manager", "RawSectionValue"),
     "ReportData": ("flext_quality.docs.scripts.report", "ReportData"),
     "ReportValue": ("flext_quality.docs.scripts.report", "ReportValue"),
     "ScheduleEntry": ("flext_quality.docs.scheduled_maintenance", "ScheduleEntry"),
@@ -511,11 +511,7 @@ __all__ = [
     "BaseReporter",
     "BaseValidator",
     "Config",
-    "ConfigData",
     "ConfigManager",
-    "ConfigPrimitive",
-    "ConfigSection",
-    "ConfigValue",
     "ContentAnalysisConfig",
     "ContentAnalyzer",
     "ContentChecksConfig",
@@ -548,6 +544,7 @@ __all__ = [
     "FlextQualityConfigManager",
     "FlextQualityConstants",
     "FlextQualityContentAnalyzer",
+    "FlextQualityContentValidator",
     "FlextQualityDocumentationAuditor",
     "FlextQualityDocumentationDashboard",
     "FlextQualityDocumentationFinder",
@@ -555,7 +552,9 @@ __all__ = [
     "FlextQualityDocumentationOptimizer",
     "FlextQualityDocumentationReporter",
     "FlextQualityFileStatistics",
+    "FlextQualityHookManager",
     "FlextQualityLinkChecker",
+    "FlextQualityLinkValidator",
     "FlextQualityMcpClient",
     "FlextQualityModels",
     "FlextQualityProtocols",
@@ -587,9 +586,6 @@ __all__ = [
     "NotifierResults",
     "OptimizerResults",
     "QualityThresholdsConfig",
-    "RawConfigMap",
-    "RawSectionMap",
-    "RawSectionValue",
     "ReportData",
     "ReportValue",
     "ScheduleEntry",

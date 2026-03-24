@@ -10,17 +10,17 @@ from flext_quality import (
     FlextQualityClaudeContextClient,
     FlextQualityClaudeMemClient,
     FlextQualityRulesEngine,
-    HookManager,
     c,
     mcp,
     t,
 )
+from flext_quality.hooks.manager import FlextQualityHookManager
 
 
 @mcp.resource("config://hooks")
 def get_hooks_config() -> str:
     """Get current hooks configuration."""
-    manager = HookManager()
+    manager = FlextQualityHookManager()
     config = manager.get_config()
     return (
         TypeAdapter(t.ContainerMapping)
