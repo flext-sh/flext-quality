@@ -43,7 +43,7 @@ class TestFlextQualityAPI:
         """Test that get_status returns status dict."""
         quality = FlextQuality.get_instance()
         status = quality.get_status()
-        tm.that(isinstance(status, dict), eq=True)
+        tm.that(status, is_=dict)
         tm.that(status, has="name")
         tm.that(status, has="version")
         tm.that(status, has="config")
@@ -81,7 +81,7 @@ class TestFlextQualityAPI:
         """Test get_hook_config_json returns valid JSON."""
         quality = FlextQuality.get_instance()
         config_json = quality.get_hook_config_json()
-        tm.that(isinstance(config_json, str), eq=True)
+        tm.that(config_json, is_=str)
         tm.that(config_json, eq="{}")
 
     def test_load_rules_from_config_with_no_rules_dir(self) -> None:

@@ -27,7 +27,7 @@ class TestFlextQualityCliService:
         service = FlextQualityCliService()
         result = service.display_status()
         tm.that(result.is_success, eq=True)
-        tm.that(isinstance(result.value, dict), eq=True)
+        tm.that(result.value, is_=dict)
 
     def test_build_check_commands_returns_commands(self, tmp_path: Path) -> None:
         """Test build_check_commands returns list of commands."""
@@ -35,7 +35,7 @@ class TestFlextQualityCliService:
         result = service.build_check_commands(tmp_path)
         tm.that(result.is_success, eq=True)
         commands = result.value
-        tm.that(isinstance(commands, list), eq=True)
+        tm.that(commands, is_=list)
         tm.that(len(commands), eq=2)
 
     def test_build_check_commands_includes_ruff(self, tmp_path: Path) -> None:
@@ -67,7 +67,7 @@ class TestFlextQualityCliService:
         result = service.build_validate_commands(tmp_path)
         tm.that(result.is_success, eq=True)
         commands = result.value
-        tm.that(isinstance(commands, list), eq=True)
+        tm.that(commands, is_=list)
         tm.that(len(commands), eq=5)
 
     def test_build_validate_commands_includes_coverage_report(
