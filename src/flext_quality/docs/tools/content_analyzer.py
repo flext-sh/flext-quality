@@ -22,7 +22,7 @@ from flext_quality import t
 class FlextQualityContentAnalyzer:
     """Advanced content quality analysis system."""
 
-    class AnalyzerConfig(BaseModel, total=False):  # type: ignore[call-arg]
+    class AnalyzerConfig(BaseModel, total=False):
         """Configuration dictionary structure."""
 
         content_checks: Mapping[str, bool] | None = None

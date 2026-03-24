@@ -108,9 +108,9 @@ class FlextQualityDocumentationReporter:
 
         timestamp: str
         title: str
-        audit: Mapping[str, ReportValue] | None  # type: ignore[type-arg]
-        validation: Mapping[str, ReportValue] | None  # type: ignore[type-arg]
-        optimization: Mapping[str, ReportValue] | None  # type: ignore[type-arg]
+        audit: Mapping[str, ReportValue] | None
+        validation: Mapping[str, ReportValue] | None
+        optimization: Mapping[str, ReportValue] | None
         summary: FlextQualityDocumentationReporter.SummaryMetrics
         trends: FlextQualityDocumentationReporter.TrendData | None
         recommendations: Sequence[FlextQualityDocumentationReporter.Recommendation]
