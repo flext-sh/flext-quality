@@ -331,9 +331,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             content_issues: Sequence[FlextQualityModels.Quality.ContentIssue] = Field(
                 default_factory=list
             )
-            quality_metrics: Mapping[str, t.Scalar] = Field(
-                default_factory=dict
-            )
+            quality_metrics: Mapping[str, t.Scalar] = Field(default_factory=dict)
 
         class ContentMetrics(BaseModel):
             """Content quality metrics for a documentation file."""
