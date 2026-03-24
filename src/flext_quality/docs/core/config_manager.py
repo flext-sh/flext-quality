@@ -176,29 +176,29 @@ class FlextQualityConfigManager:
             self.config_dir = Path(config_dir)
 
         self._cache: MutableMapping[str, ConfigData] = {}
-        self._audit_rules: AuditRules | None = None
-        self._style_guide: StyleGuide | None = None
-        self._validation_config: ValidationConfig | None = None
+        self._audit_rules: FlextQualityAuditRules | None = None
+        self._style_guide: FlextQualityStyleGuide | None = None
+        self._validation_config: FlextQualityValidationConfig | None = None
 
-    def get_audit_rules(self) -> AuditRules:
+    def get_audit_rules(self) -> FlextQualityAuditRules:
         """Get audit rules configuration."""
         if self._audit_rules is None:
             data = self._load_config_file("audit_rules.yaml")
-            self._audit_rules = AuditRules(data)
+            self._audit_rules = FlextQualityAuditRules(data)
         return self._audit_rules
 
-    def get_style_guide(self) -> StyleGuide:
+    def get_style_guide(self) -> FlextQualityStyleGuide:
         """Get style guide configuration."""
         if self._style_guide is None:
             data = self._load_config_file("style_guide.yaml")
-            self._style_guide = StyleGuide(data)
+            self._style_guide = FlextQualityStyleGuide(data)
         return self._style_guide
 
-    def get_validation_config(self) -> ValidationConfig:
+    def get_validation_config(self) -> FlextQualityValidationConfig:
         """Get validation configuration."""
         if self._validation_config is None:
             data = self._load_config_file("validation_config.yaml")
-            self._validation_config = ValidationConfig(data)
+            self._validation_config = FlextQualityValidationConfig(data)
         return self._validation_config
 
     def get_config(self, name: str) -> ConfigData:

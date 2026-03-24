@@ -94,7 +94,7 @@ class _NotifierConfig(TypedDict):
 NotifierResults = m.Quality.NotifierResults
 
 
-class DocumentationNotifier:
+class FlextQualityDocumentationNotifier:
     """Automated notification system for documentation quality alerts."""
 
     def __init__(
@@ -612,7 +612,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    notifier = DocumentationNotifier(args.config)
+    notifier = FlextQualityDocumentationNotifier(args.config)
 
     if args.test:
         success = notifier.send_notification(

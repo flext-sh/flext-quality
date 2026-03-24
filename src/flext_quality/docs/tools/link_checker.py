@@ -97,7 +97,7 @@ class ResultsDict(TypedDict):
 _RESULTS_ADAPTER: TypeAdapter[ResultsDict] = TypeAdapter(ResultsDict)
 
 
-class LinkChecker:
+class FlextQualityLinkChecker:
     """Advanced link validation and checking system."""
 
     MIN_PATH_PARTS_FOR_REPO = 2
@@ -623,7 +623,7 @@ def validate_links_sync(
     config_path: str | None = None,
 ) -> ResultsDict:
     """Synchronous wrapper for link validation."""
-    checker = LinkChecker(config_path)
+    checker = FlextQualityLinkChecker(config_path)
     return asyncio.run(checker.validate_links(links, use_async=True))
 
 
@@ -656,7 +656,7 @@ if __name__ == "__main__":
 
     async def main() -> None:
         """Run example link validation."""
-        checker = LinkChecker()
+        checker = FlextQualityLinkChecker()
         await checker.validate_links(test_links)
         checker.save_report()
 

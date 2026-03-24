@@ -88,7 +88,7 @@ def _is_str_mapping(
     return isinstance(value, Mapping)
 
 
-class ScheduledMaintenance:
+class FlextQualityScheduledMaintenance:
     """Scheduled documentation maintenance system."""
 
     # Command parsing constants
@@ -766,7 +766,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    maintenance = ScheduledMaintenance(args.config)
+    maintenance = FlextQualityScheduledMaintenance(args.config)
 
     if args.list_schedules:
         for schedule_config in maintenance.config.schedules.values():

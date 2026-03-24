@@ -16,7 +16,7 @@ from typing import ClassVar, NotRequired, TypedDict
 from flext_quality import m, t
 
 
-class FileStatistics(TypedDict):
+class FlextQualityFileStatistics(TypedDict):
     """Statistics payload for discovered documentation files."""
 
     total_files: int
@@ -32,7 +32,7 @@ class FileStatistics(TypedDict):
     avg_words_per_file: NotRequired[float]
 
 
-class DocumentationFinder:
+class FlextQualityDocumentationFinder:
     """Documentation file discovery and filtering system."""
 
     # Common documentation file patterns
@@ -359,7 +359,9 @@ class DocumentationFinder:
 
         return categories
 
-    def get_statistics(self, files: Sequence[Path] | None = None) -> FileStatistics:
+    def get_statistics(
+        self, files: Sequence[Path] | None = None
+    ) -> FlextQualityFileStatistics:
         """Get statistics about found files."""
         if files is None:
             files = self.find_files()
@@ -370,7 +372,7 @@ class DocumentationFinder:
         metadata_list = self.get_files_metadata(files)
 
         # Basic statistics
-        stats: FileStatistics = {
+        stats: FlextQualityFileStatistics = {
             "total_files": len(files),
             "total_size": sum(meta.size for meta in metadata_list),
             "total_lines": sum(meta.lines for meta in metadata_list),

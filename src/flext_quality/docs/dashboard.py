@@ -26,7 +26,7 @@ _LIST_ADAPTER: TypeAdapter[Sequence[t.ContainerMapping]] = TypeAdapter(
 )
 
 
-class DocumentationDashboard:
+class FlextQualityDocumentationDashboard:
     """Documentation health monitoring dashboard."""
 
     def __init__(self, reports_dir: str = "docs/maintenance/reports/") -> None:
@@ -574,7 +574,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    dashboard = DocumentationDashboard(args.reports_dir)
+    dashboard = FlextQualityDocumentationDashboard(args.reports_dir)
     dashboard.run(host=args.host, port=args.port, debug=args.debug)
 
 

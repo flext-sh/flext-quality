@@ -124,7 +124,7 @@ class ResultsDict(TypedDict):
 _RESULTS_ADAPTER: TypeAdapter[ResultsDict] = TypeAdapter(ResultsDict)
 
 
-class ContentAnalyzer:
+class FlextQualityContentAnalyzer:
     """Advanced content quality analysis system."""
 
     EXCELLENT_READABILITY_MIN = 90
@@ -835,7 +835,7 @@ def analyze_file_content(
     config_path: str | None = None,
 ) -> AnalysisDict:
     """Convenience function to analyze a single file."""
-    analyzer = ContentAnalyzer(config_path)
+    analyzer = FlextQualityContentAnalyzer(config_path)
     return analyzer.analyze_file(Path(file_path))
 
 
@@ -844,7 +844,7 @@ def analyze_files_content(
     config_path: str | None = None,
 ) -> ResultsDict:
     """Convenience function to analyze multiple files."""
-    analyzer = ContentAnalyzer(config_path)
+    analyzer = FlextQualityContentAnalyzer(config_path)
     paths = [Path(fp) for fp in file_paths]
     return analyzer.analyze_files_batch(paths)
 

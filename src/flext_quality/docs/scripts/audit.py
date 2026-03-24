@@ -40,7 +40,7 @@ AuditMetrics = m.Quality.AuditMetrics
 AuditRecommendation = m.Quality.AuditRecommendation
 
 
-class DocumentationAuditor:
+class FlextQualityDocumentationAuditor:
     """Main documentation audit and quality assurance system."""
 
     def __init__(self, config_path: str = "docs/maintenance/config/") -> None:
@@ -839,7 +839,7 @@ def _create_argument_parser() -> argparse.ArgumentParser:
 
 
 def _execute_audit_checks(
-    auditor: DocumentationAuditor,
+    auditor: FlextQualityDocumentationAuditor,
     args: argparse.Namespace,
 ) -> AuditorResults:
     """Execute the appropriate audit checks based on arguments."""
@@ -879,7 +879,7 @@ def main() -> None:
     """Main entry point for documentation audit."""
     parser = _create_argument_parser()
     args = parser.parse_args()
-    auditor = DocumentationAuditor(args.config)
+    auditor = FlextQualityDocumentationAuditor(args.config)
     try:
         results = _execute_audit_checks(auditor, args)
         auditor.save_report(args.format, args.output)

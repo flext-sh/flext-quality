@@ -30,7 +30,7 @@ MIN_HEADINGS_FOR_TOC = 5
 OptimizerResults = m.Quality.OptimizerResults
 
 
-class DocumentationOptimizer:
+class FlextQualityDocumentationOptimizer:
     """Documentation optimization and enhancement system."""
 
     def __init__(self, *, backup: bool = True) -> None:
@@ -487,7 +487,7 @@ def _discover_documentation_files(args: argparse.Namespace) -> Sequence[Path]:
 
 
 def _execute_optimizations(
-    optimizer: DocumentationOptimizer,
+    optimizer: FlextQualityDocumentationOptimizer,
     args: argparse.Namespace,
 ) -> bool:
     """Execute the requested optimizations and return if any were run."""
@@ -515,7 +515,7 @@ def main() -> None:
     """Main entry point for optimization system."""
     parser = _create_argument_parser()
     args = parser.parse_args()
-    optimizer = DocumentationOptimizer(backup=args.backup)
+    optimizer = FlextQualityDocumentationOptimizer(backup=args.backup)
     run_any_optimization = _execute_optimizations(optimizer, args)
     if not run_any_optimization:
         parser.print_help()

@@ -104,7 +104,7 @@ class TrendEntry(TypedDict):
     files_processed: NotRequired[int]
 
 
-class TrendData(TypedDict):
+class FlextQualityTrendData(TypedDict):
     """Trend data structure."""
 
     audit_trends: Sequence[TrendEntry]
@@ -112,7 +112,7 @@ class TrendData(TypedDict):
     optimization_trends: Sequence[TrendEntry]
 
 
-class ReportData(TypedDict):
+class FlextQualityReportData(TypedDict):
     """Report data structure."""
 
     timestamp: str
@@ -121,17 +121,19 @@ class ReportData(TypedDict):
     validation: Mapping[str, ReportValue] | None
     optimization: Mapping[str, ReportValue] | None
     summary: SummaryMetrics
-    trends: TrendData | None
+    trends: FlextQualityTrendData | None
     recommendations: Sequence[Recommendation]
 
 
 _REPORT_LOAD_ADAPTER: TypeAdapter[Mapping[str, ReportValue]] = TypeAdapter(
     Mapping[str, ReportValue],
 )
-_REPORT_DATA_ADAPTER: TypeAdapter[ReportData] = TypeAdapter(ReportData)
+_REPORT_DATA_ADAPTER: TypeAdapter[FlextQualityReportData] = TypeAdapter(
+    FlextQualityReportData
+)
 
 
-class DocumentationReporter:
+class FlextQualityDocumentationReporter:
     """Documentation quality reporting and analytics system."""
 
     def __init__(self, reports_dir: str = "docs/maintenance/reports/") -> None:
@@ -167,7 +169,7 @@ class DocumentationReporter:
         **kwargs: Unpack[_ReportOptions],
     ) -> str:
         """Generate comprehensive quality report."""
-        report_data: ReportData = {
+        report_data: FlextQualityReportData = {
             "timestamp": datetime.now(UTC).isoformat(),
             "title": "FLEXT Quality Documentation Report",
             "audit": self.audit_data,
@@ -239,7 +241,7 @@ class DocumentationReporter:
             summary["quality_trend"] = "critical"
         return summary
 
-    def _analyze_trends(self) -> TrendData | None:
+    def _analyze_trends(self) -> FlextQualityTrendData | None:
         """Analyze quality trends over time."""
         return None
 
@@ -350,7 +352,7 @@ class DocumentationReporter:
             })
         return recommendations
 
-    def _generate_html_report(self, data: ReportData) -> str:
+    def _generate_html_report(self, data: FlextQualityReportData) -> str:
         """Generate HTML quality report."""
         template = self._get_html_template()
         timestamp_str = data["timestamp"]
@@ -380,7 +382,7 @@ class DocumentationReporter:
         template_content = '\n<!DOCTYPE html>\n<html>\n<head>\n    <title>{{ title }}</title>\n    <style>\n        body { font-family: \'Segoe UI\', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }\n        .container { max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }\n        .header { text-align: center; border-bottom: 2px solid #007acc; padding-bottom: 20px; margin-bottom: 30px; }\n        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0; }\n        .metric-card { background: #f8f9fa; padding: 20px; border-radius: 8px; text-align: center; border-left: 4px solid #007acc; }\n        .metric-value { font-size: 2.5em; font-weight: bold; color: #007acc; margin: 10px 0; }\n        .metric-label { color: #666; font-size: 0.9em; text-transform: uppercase; letter-spacing: 1px; }\n        .section { margin: 40px 0; }\n        .section h2 { color: #333; border-bottom: 1px solid #ddd; padding-bottom: 10px; }\n        .recommendations { display: grid; gap: 15px; }\n        .recommendation { background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px; padding: 15px; }\n        .priority-critical { border-left: 4px solid #dc3545; background: #f8d7da; }\n        .priority-high { border-left: 4px solid #fd7e14; background: #fff3cd; }\n        .priority-medium { border-left: 4px solid #ffc107; background: #fff3cd; }\n        .priority-low { border-left: 4px solid #28a745; background: #d4edda; }\n        .issue-list { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0; max-height: 300px; overflow-y: auto; }\n        .issue-item { background: white; margin: 5px 0; padding: 8px; border-radius: 3px; border-left: 3px solid #dc3545; }\n        .timestamp { color: #666; font-size: 0.9em; text-align: center; margin-top: 30px; }\n    </style>\n</head>\n<body>\n    <div class="container">\n        <div class="header">\n            <h1>{{ title }}</h1>\n            <p>Generated: {{ timestamp }}</p>\n        </div>\n\n        <div class="summary-grid">\n            <div class="metric-card">\n                <div class="metric-label">Overall Quality Score</div>\n                <div class="metric-value">{{ summary.overall_score }}%</div>\n                <div>Trend: {{ summary.quality_trend|title }}</div>\n            </div>\n            <div class="metric-card">\n                <div class="metric-label">Files Analyzed</div>\n                <div class="metric-value">{{ summary.files_analyzed }}</div>\n            </div>\n            <div class="metric-card">\n                <div class="metric-label">Total Issues</div>\n                <div class="metric-value">{{ summary.total_issues }}</div>\n            </div>\n            <div class="metric-card">\n                <div class="metric-label">Links Checked</div>\n                <div class="metric-value">{{ summary.links_checked }}</div>\n            </div>\n        </div>\n\n        {% if audit_summary %}\n        <div class="section">\n            <h2>Content Audit Results</h2>\n            <p>Quality Score: {{ audit_summary.quality_score }}%</p>\n            <p>Issues Found: {{ audit_summary.total_issues }}</p>\n            <p>Critical: {{ audit_summary.critical_issues }}, High: {{ audit_summary.high_issues }}</p>\n        </div>\n        {% endif %}\n\n        {% if validation_summary %}\n        <div class="section">\n            <h2>Link Validation Results</h2>\n            <p>Links Checked: {{ validation_summary.links_checked }}</p>\n            <p>Valid: {{ validation_summary.valid_links }}, Broken: {{ validation_summary.broken_links }}</p>\n        </div>\n        {% endif %}\n\n        {% if optimization_summary %}\n        <div class="section">\n            <h2>Optimization Results</h2>\n            <p>Files Processed: {{ optimization_summary.files_processed }}</p>\n            <p>Changes Made: {{ optimization_summary.changes_made }}</p>\n            <p>Backups Created: {{ optimization_summary.backups_created }}</p>\n        </div>\n        {% endif %}\n\n        <div class="section">\n            <h2>Recommendations</h2>\n            <div class="recommendations">\n                {% for rec in recommendations %}\n                <div class="recommendation priority-{{ rec.priority }}">\n                    <h3>{{ rec.title }}</h3>\n                    <p>{{ rec.description }}</p>\n                    <ul>\n                        {% for action in rec.actions %}\n                        <li>{{ action }}</li>\n                        {% endfor %}\n                    </ul>\n                </div>\n                {% endfor %}\n            </div>\n        </div>\n\n        <div class="timestamp">\n            Report generated by FLEXT Quality Documentation Maintenance System\n        </div>\n    </div>\n</body>\n</html>\n        '
         return Template(template_content)
 
-    def _generate_markdown_report(self, data: ReportData) -> str:
+    def _generate_markdown_report(self, data: FlextQualityReportData) -> str:
         """Generate markdown quality report."""
         md = [f"# {data['title']}", "", f"**Generated:** {data['timestamp']}", ""]
         summary = data["summary"]
@@ -506,7 +508,7 @@ class DocumentationReporter:
             else 0,
         }
 
-    def _generate_charts(self, data: ReportData) -> t.StrMapping | None:
+    def _generate_charts(self, data: FlextQualityReportData) -> t.StrMapping | None:
         """Generate charts for the report (placeholder for future implementation)."""
         _ = data
         return None
@@ -543,7 +545,7 @@ class DocumentationReporter:
     def _analyze_trend_data(
         self,
         reports: Sequence[Mapping[str, ReportValue | datetime]],
-    ) -> TrendData | t.StrMapping:
+    ) -> FlextQualityTrendData | t.StrMapping:
         """Analyze trend data from historical reports."""
         if not reports:
             return {"error": "No historical data available"}
@@ -603,7 +605,7 @@ class DocumentationReporter:
 
     def _generate_trend_report(
         self,
-        trend_data: TrendData | t.StrMapping,
+        trend_data: FlextQualityTrendData | t.StrMapping,
         days: int,
     ) -> str:
         """Generate trend analysis report."""
@@ -742,7 +744,7 @@ def main() -> None:
         help="Serve dashboard (not implemented yet)",
     )
     args = parser.parse_args()
-    reporter = DocumentationReporter(args.output)
+    reporter = FlextQualityDocumentationReporter(args.output)
     if args.monthly_trends:
         trend_report = reporter.generate_trend_report(days=30)
         filename = (

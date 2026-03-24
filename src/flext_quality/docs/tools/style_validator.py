@@ -104,7 +104,7 @@ class ValidationResults(TypedDict):
 _RESULTS_ADAPTER: TypeAdapter[ValidationResults] = TypeAdapter(ValidationResults)
 
 
-class StyleValidator:
+class FlextQualityStyleValidator:
     """Documentation style validation and consistency checking system."""
 
     # Constants for magic numbers
@@ -675,7 +675,7 @@ def validate_file_style(
     config_path: str | None = None,
 ) -> FileResults:
     """Convenience function to validate a single file."""
-    validator = StyleValidator(config_path)
+    validator = FlextQualityStyleValidator(config_path)
     return validator.validate_file(Path(file_path))
 
 
@@ -684,7 +684,7 @@ def validate_files_style(
     config_path: str | None = None,
 ) -> ValidationResults:
     """Convenience function to validate multiple files."""
-    validator = StyleValidator(config_path)
+    validator = FlextQualityStyleValidator(config_path)
     paths = [Path(fp) for fp in file_paths]
     return validator.validate_files_batch(paths)
 
@@ -693,13 +693,13 @@ if __name__ == "__main__":
     # Example usage
     import sys
 
-    if len(sys.argv) < StyleValidator.MIN_COMMAND_LINE_ARGS:
+    if len(sys.argv) < FlextQualityStyleValidator.MIN_COMMAND_LINE_ARGS:
         sys.exit(1)
 
     file_path = sys.argv[1]
     config_path = (
-        sys.argv[StyleValidator.CONFIG_ARG_INDEX]
-        if len(sys.argv) > StyleValidator.CONFIG_ARG_INDEX
+        sys.argv[FlextQualityStyleValidator.CONFIG_ARG_INDEX]
+        if len(sys.argv) > FlextQualityStyleValidator.CONFIG_ARG_INDEX
         else None
     )
 
