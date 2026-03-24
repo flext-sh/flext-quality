@@ -774,14 +774,14 @@ class FlextQualityContentAnalyzer:
             )
 
         all_issues: MutableSequence[t.StrMapping] = []
-        _rv_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
+        rv_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
             Mapping[str, t.NormalizedValue],
         )
         for result_value_raw in self.results.model_dump().values():
             if not isinstance(result_value_raw, dict):
                 continue
             result_value: Mapping[str, t.NormalizedValue] = (
-                _rv_adapter.validate_python(result_value_raw)
+                rv_adapter.validate_python(result_value_raw)
             )
             issues_list_raw = result_value.get("issues")
             if not isinstance(issues_list_raw, list):

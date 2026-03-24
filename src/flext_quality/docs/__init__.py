@@ -134,10 +134,7 @@ if TYPE_CHECKING:
     )
 
 _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
-    "AccessibilityConfig": (
-        "flext_quality.docs.tools.style_validator",
-        "AccessibilityConfig",
-    ),
+    "AccessibilityConfig": ("flext_quality.docs.tools.style_validator", "AccessibilityConfig"),
     "AuditMetrics": ("flext_quality.docs.scripts.audit", "AuditMetrics"),
     "AuditRecommendation": ("flext_quality.docs.scripts.audit", "AuditRecommendation"),
     "AuditRules": ("flext_quality.docs.core.config_manager", "AuditRules"),
@@ -149,187 +146,67 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
     "BaseValidator": ("flext_quality.docs.core.base_classes", "BaseValidator"),
     "Config": ("flext_quality.docs.core.base_classes", "Config"),
     "ConfigManager": ("flext_quality.docs.core.config_manager", "ConfigManager"),
-    "ContentAnalysisConfig": (
-        "flext_quality.docs.scripts.audit",
-        "ContentAnalysisConfig",
-    ),
+    "ContentAnalysisConfig": ("flext_quality.docs.scripts.audit", "ContentAnalysisConfig"),
     "ContentAnalyzer": ("flext_quality.docs.tools.content_analyzer", "ContentAnalyzer"),
     "ContentChecksConfig": ("flext_quality.docs.scripts.audit", "ContentChecksConfig"),
     "ContentIssue": ("flext_quality.docs.scripts.validate", "ContentIssue"),
     "ContentMetrics": ("flext_quality.docs.scripts.validate", "ContentMetrics"),
     "ContentValidator": ("flext_quality.docs.scripts.validate", "ContentValidator"),
-    "ContentValidatorResults": (
-        "flext_quality.docs.scripts.validate",
-        "ContentValidatorResults",
-    ),
-    "DocumentationAuditor": (
-        "flext_quality.docs.scripts.audit",
-        "DocumentationAuditor",
-    ),
-    "DocumentationDashboard": (
-        "flext_quality.docs.dashboard",
-        "DocumentationDashboard",
-    ),
-    "DocumentationFinder": (
-        "flext_quality.docs.core.file_discovery",
-        "DocumentationFinder",
-    ),
-    "DocumentationNotifier": (
-        "flext_quality.docs.notifications",
-        "DocumentationNotifier",
-    ),
-    "DocumentationOptimizer": (
-        "flext_quality.docs.scripts.optimize",
-        "DocumentationOptimizer",
-    ),
-    "DocumentationReporter": (
-        "flext_quality.docs.scripts.report",
-        "DocumentationReporter",
-    ),
-    "ErrorHandlingConfig": (
-        "flext_quality.docs.scheduled_maintenance",
-        "ErrorHandlingConfig",
-    ),
+    "ContentValidatorResults": ("flext_quality.docs.scripts.validate", "ContentValidatorResults"),
+    "DocumentationAuditor": ("flext_quality.docs.scripts.audit", "DocumentationAuditor"),
+    "DocumentationDashboard": ("flext_quality.docs.dashboard", "DocumentationDashboard"),
+    "DocumentationFinder": ("flext_quality.docs.core.file_discovery", "DocumentationFinder"),
+    "DocumentationNotifier": ("flext_quality.docs.notifications", "DocumentationNotifier"),
+    "DocumentationOptimizer": ("flext_quality.docs.scripts.optimize", "DocumentationOptimizer"),
+    "DocumentationReporter": ("flext_quality.docs.scripts.report", "DocumentationReporter"),
+    "ErrorHandlingConfig": ("flext_quality.docs.scheduled_maintenance", "ErrorHandlingConfig"),
     "FileResults": ("flext_quality.docs.tools.style_validator", "FileResults"),
     "FileStatistics": ("flext_quality.docs.core.file_discovery", "FileStatistics"),
-    "FlextQualityAuditRules": (
-        "flext_quality.docs.core.config_manager",
-        "FlextQualityAuditRules",
-    ),
-    "FlextQualityBaseAnalyzer": (
-        "flext_quality.docs.core.base_classes",
-        "FlextQualityBaseAnalyzer",
-    ),
-    "FlextQualityBaseAuditor": (
-        "flext_quality.docs.core.base_classes",
-        "FlextQualityBaseAuditor",
-    ),
-    "FlextQualityBaseReporter": (
-        "flext_quality.docs.core.base_classes",
-        "FlextQualityBaseReporter",
-    ),
-    "FlextQualityBaseValidator": (
-        "flext_quality.docs.core.base_classes",
-        "FlextQualityBaseValidator",
-    ),
-    "FlextQualityConfigManager": (
-        "flext_quality.docs.core.config_manager",
-        "FlextQualityConfigManager",
-    ),
-    "FlextQualityContentAnalyzer": (
-        "flext_quality.docs.tools.content_analyzer",
-        "FlextQualityContentAnalyzer",
-    ),
-    "FlextQualityContentValidator": (
-        "flext_quality.docs.scripts.validate",
-        "FlextQualityContentValidator",
-    ),
-    "FlextQualityDocumentationAuditor": (
-        "flext_quality.docs.scripts.audit",
-        "FlextQualityDocumentationAuditor",
-    ),
-    "FlextQualityDocumentationDashboard": (
-        "flext_quality.docs.dashboard",
-        "FlextQualityDocumentationDashboard",
-    ),
-    "FlextQualityDocumentationFinder": (
-        "flext_quality.docs.core.file_discovery",
-        "FlextQualityDocumentationFinder",
-    ),
-    "FlextQualityDocumentationNotifier": (
-        "flext_quality.docs.notifications",
-        "FlextQualityDocumentationNotifier",
-    ),
-    "FlextQualityDocumentationOptimizer": (
-        "flext_quality.docs.scripts.optimize",
-        "FlextQualityDocumentationOptimizer",
-    ),
-    "FlextQualityDocumentationReporter": (
-        "flext_quality.docs.scripts.report",
-        "FlextQualityDocumentationReporter",
-    ),
-    "FlextQualityFileStatistics": (
-        "flext_quality.docs.core.file_discovery",
-        "FlextQualityFileStatistics",
-    ),
-    "FlextQualityLinkChecker": (
-        "flext_quality.docs.tools.link_checker",
-        "FlextQualityLinkChecker",
-    ),
-    "FlextQualityLinkValidator": (
-        "flext_quality.docs.scripts.validate",
-        "FlextQualityLinkValidator",
-    ),
-    "FlextQualityScheduledMaintenance": (
-        "flext_quality.docs.scheduled_maintenance",
-        "FlextQualityScheduledMaintenance",
-    ),
-    "FlextQualityStyleGuide": (
-        "flext_quality.docs.core.config_manager",
-        "FlextQualityStyleGuide",
-    ),
-    "FlextQualityStyleValidator": (
-        "flext_quality.docs.tools.style_validator",
-        "FlextQualityStyleValidator",
-    ),
-    "FlextQualityValidationConfig": (
-        "flext_quality.docs.core.config_manager",
-        "FlextQualityValidationConfig",
-    ),
-    "FormattingConfig": (
-        "flext_quality.docs.tools.style_validator",
-        "FormattingConfig",
-    ),
+    "FlextQualityAuditRules": ("flext_quality.docs.core.config_manager", "FlextQualityAuditRules"),
+    "FlextQualityBaseAnalyzer": ("flext_quality.docs.core.base_classes", "FlextQualityBaseAnalyzer"),
+    "FlextQualityBaseAuditor": ("flext_quality.docs.core.base_classes", "FlextQualityBaseAuditor"),
+    "FlextQualityBaseReporter": ("flext_quality.docs.core.base_classes", "FlextQualityBaseReporter"),
+    "FlextQualityBaseValidator": ("flext_quality.docs.core.base_classes", "FlextQualityBaseValidator"),
+    "FlextQualityConfigManager": ("flext_quality.docs.core.config_manager", "FlextQualityConfigManager"),
+    "FlextQualityContentAnalyzer": ("flext_quality.docs.tools.content_analyzer", "FlextQualityContentAnalyzer"),
+    "FlextQualityContentValidator": ("flext_quality.docs.scripts.validate", "FlextQualityContentValidator"),
+    "FlextQualityDocumentationAuditor": ("flext_quality.docs.scripts.audit", "FlextQualityDocumentationAuditor"),
+    "FlextQualityDocumentationDashboard": ("flext_quality.docs.dashboard", "FlextQualityDocumentationDashboard"),
+    "FlextQualityDocumentationFinder": ("flext_quality.docs.core.file_discovery", "FlextQualityDocumentationFinder"),
+    "FlextQualityDocumentationNotifier": ("flext_quality.docs.notifications", "FlextQualityDocumentationNotifier"),
+    "FlextQualityDocumentationOptimizer": ("flext_quality.docs.scripts.optimize", "FlextQualityDocumentationOptimizer"),
+    "FlextQualityDocumentationReporter": ("flext_quality.docs.scripts.report", "FlextQualityDocumentationReporter"),
+    "FlextQualityFileStatistics": ("flext_quality.docs.core.file_discovery", "FlextQualityFileStatistics"),
+    "FlextQualityLinkChecker": ("flext_quality.docs.tools.link_checker", "FlextQualityLinkChecker"),
+    "FlextQualityLinkValidator": ("flext_quality.docs.scripts.validate", "FlextQualityLinkValidator"),
+    "FlextQualityScheduledMaintenance": ("flext_quality.docs.scheduled_maintenance", "FlextQualityScheduledMaintenance"),
+    "FlextQualityStyleGuide": ("flext_quality.docs.core.config_manager", "FlextQualityStyleGuide"),
+    "FlextQualityStyleValidator": ("flext_quality.docs.tools.style_validator", "FlextQualityStyleValidator"),
+    "FlextQualityValidationConfig": ("flext_quality.docs.core.config_manager", "FlextQualityValidationConfig"),
+    "FormattingConfig": ("flext_quality.docs.tools.style_validator", "FormattingConfig"),
     "HeadingsConfig": ("flext_quality.docs.tools.style_validator", "HeadingsConfig"),
     "LinkCheckResult": ("flext_quality.docs.scripts.validate", "LinkCheckResult"),
     "LinkChecker": ("flext_quality.docs.tools.link_checker", "LinkChecker"),
     "LinkRecord": ("flext_quality.docs.scripts.validate", "LinkRecord"),
-    "LinkValidationConfig": (
-        "flext_quality.docs.scripts.audit",
-        "LinkValidationConfig",
-    ),
+    "LinkValidationConfig": ("flext_quality.docs.scripts.audit", "LinkValidationConfig"),
     "LinkValidator": ("flext_quality.docs.scripts.validate", "LinkValidator"),
-    "LinkValidatorResults": (
-        "flext_quality.docs.scripts.validate",
-        "LinkValidatorResults",
-    ),
+    "LinkValidatorResults": ("flext_quality.docs.scripts.validate", "LinkValidatorResults"),
     "LoggingConfig": ("flext_quality.docs.scheduled_maintenance", "LoggingConfig"),
-    "MAX_BROKEN_LINKS_TO_SHOW": (
-        "flext_quality.docs.notifications",
-        "MAX_BROKEN_LINKS_TO_SHOW",
-    ),
-    "MIN_HEADINGS_FOR_TOC": (
-        "flext_quality.docs.scripts.optimize",
-        "MIN_HEADINGS_FOR_TOC",
-    ),
-    "MaintenanceConfig": (
-        "flext_quality.docs.scheduled_maintenance",
-        "MaintenanceConfig",
-    ),
+    "MAX_BROKEN_LINKS_TO_SHOW": ("flext_quality.docs.notifications", "MAX_BROKEN_LINKS_TO_SHOW"),
+    "MIN_HEADINGS_FOR_TOC": ("flext_quality.docs.scripts.optimize", "MIN_HEADINGS_FOR_TOC"),
+    "MaintenanceConfig": ("flext_quality.docs.scheduled_maintenance", "MaintenanceConfig"),
     "MarkdownConfig": ("flext_quality.docs.tools.style_validator", "MarkdownConfig"),
     "MarkdownStyleConfig": ("flext_quality.docs.scripts.audit", "MarkdownStyleConfig"),
     "NotifierResults": ("flext_quality.docs.notifications", "NotifierResults"),
     "OptimizerResults": ("flext_quality.docs.scripts.optimize", "OptimizerResults"),
-    "QualityThresholdsConfig": (
-        "flext_quality.docs.scripts.audit",
-        "QualityThresholdsConfig",
-    ),
+    "QualityThresholdsConfig": ("flext_quality.docs.scripts.audit", "QualityThresholdsConfig"),
     "ReportData": ("flext_quality.docs.scripts.report", "ReportData"),
     "ReportValue": ("flext_quality.docs.scripts.report", "ReportValue"),
     "ScheduleEntry": ("flext_quality.docs.scheduled_maintenance", "ScheduleEntry"),
     "ScheduleResults": ("flext_quality.docs.scheduled_maintenance", "ScheduleResults"),
-    "ScheduleTaskConfig": (
-        "flext_quality.docs.scheduled_maintenance",
-        "ScheduleTaskConfig",
-    ),
-    "ScheduledMaintenance": (
-        "flext_quality.docs.scheduled_maintenance",
-        "ScheduledMaintenance",
-    ),
-    "SeverityLevelsConfig": (
-        "flext_quality.docs.scripts.audit",
-        "SeverityLevelsConfig",
-    ),
+    "ScheduleTaskConfig": ("flext_quality.docs.scheduled_maintenance", "ScheduleTaskConfig"),
+    "ScheduledMaintenance": ("flext_quality.docs.scheduled_maintenance", "ScheduledMaintenance"),
+    "SeverityLevelsConfig": ("flext_quality.docs.scripts.audit", "SeverityLevelsConfig"),
     "StyleConfig": ("flext_quality.docs.tools.style_validator", "StyleConfig"),
     "StyleGuide": ("flext_quality.docs.core.config_manager", "StyleGuide"),
     "StyleGuideConfig": ("flext_quality.docs.scripts.audit", "StyleGuideConfig"),
@@ -338,34 +215,16 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
     "SummaryMetrics": ("flext_quality.docs.tools.style_validator", "SummaryMetrics"),
     "TrendData": ("flext_quality.docs.scripts.report", "TrendData"),
     "ValidationConfig": ("flext_quality.docs.scripts.audit", "ValidationConfig"),
-    "ValidationResults": (
-        "flext_quality.docs.tools.style_validator",
-        "ValidationResults",
-    ),
-    "analyze_file_content": (
-        "flext_quality.docs.tools.content_analyzer",
-        "analyze_file_content",
-    ),
-    "analyze_files_content": (
-        "flext_quality.docs.tools.content_analyzer",
-        "analyze_files_content",
-    ),
+    "ValidationResults": ("flext_quality.docs.tools.style_validator", "ValidationResults"),
+    "analyze_file_content": ("flext_quality.docs.tools.content_analyzer", "analyze_file_content"),
+    "analyze_files_content": ("flext_quality.docs.tools.content_analyzer", "analyze_files_content"),
     "core": ("flext_quality.docs.core", ""),
     "main": ("flext_quality.docs.scripts.validate", "main"),
     "scripts": ("flext_quality.docs.scripts", ""),
     "tools": ("flext_quality.docs.tools", ""),
-    "validate_file_style": (
-        "flext_quality.docs.tools.style_validator",
-        "validate_file_style",
-    ),
-    "validate_files_style": (
-        "flext_quality.docs.tools.style_validator",
-        "validate_files_style",
-    ),
-    "validate_links_sync": (
-        "flext_quality.docs.tools.link_checker",
-        "validate_links_sync",
-    ),
+    "validate_file_style": ("flext_quality.docs.tools.style_validator", "validate_file_style"),
+    "validate_files_style": ("flext_quality.docs.tools.style_validator", "validate_files_style"),
+    "validate_links_sync": ("flext_quality.docs.tools.link_checker", "validate_links_sync"),
 }
 
 __all__ = [

@@ -12,12 +12,10 @@ Usage:
 from __future__ import annotations
 
 import argparse
-from collections.abc import Mapping, MutableSequence, Sequence
+from collections.abc import Callable, Mapping, MutableSequence, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import TypedDict, Unpack
-
-from collections.abc import Callable
 
 from jinja2 import Template
 from pydantic import BaseModel, TypeAdapter
@@ -304,13 +302,13 @@ class FlextQualityDocumentationReporter:
                 )
                 if validation_errors_list:
                     broken_links: MutableSequence[Mapping[str, t.Primitives]] = []
-                    _e_adapter: TypeAdapter[dict[str, t.NormalizedValue]] = TypeAdapter(
+                    e_adapter: TypeAdapter[dict[str, t.NormalizedValue]] = TypeAdapter(
                         dict[str, t.NormalizedValue],
                     )
                     for e_raw in validation_errors_list:
                         try:
                             error_entry: dict[str, t.NormalizedValue] = (
-                                _e_adapter.validate_python(e_raw)
+                                e_adapter.validate_python(e_raw)
                             )
                         except (ValueError, TypeError):
                             continue
@@ -400,8 +398,8 @@ class FlextQualityDocumentationReporter:
             "recommendations": data.recommendations,
             "charts": self._generate_charts(data) if data.trends else None,
         }
-        _render: Callable[..., str] = getattr(template, "render")
-        rendered: str = str(_render(**template_data))
+        render_fn: Callable[..., str] = getattr(template, "render")
+        rendered: str = str(render_fn(**template_data))
         return rendered
 
     def _get_html_template(self) -> Template:

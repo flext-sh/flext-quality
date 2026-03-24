@@ -40,10 +40,10 @@ class FlextQualityRulesLoader:
             return r[Sequence[m.Quality.RuleDefinition]].fail(
                 "Invalid YAML: expected dict at root",
             )
-        _adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
+        adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
             Mapping[str, t.NormalizedValue],
         )
-        parsed_dict: Mapping[str, t.NormalizedValue] = _adapter.validate_python(parsed)
+        parsed_dict: Mapping[str, t.NormalizedValue] = adapter.validate_python(parsed)
         rules_data_val = parsed_dict.get("rules", [])
         if not isinstance(rules_data_val, list):
             return r[Sequence[m.Quality.RuleDefinition]].fail(
@@ -55,7 +55,7 @@ class FlextQualityRulesLoader:
                 return r[Sequence[m.Quality.RuleDefinition]].fail(
                     f"Rule {idx}: expected dict",
                 )
-            rule_dict: Mapping[str, t.NormalizedValue] = _adapter.validate_python(
+            rule_dict: Mapping[str, t.NormalizedValue] = adapter.validate_python(
                 rule_data,
             )
             result = self._parse_rule(rule_dict, idx)

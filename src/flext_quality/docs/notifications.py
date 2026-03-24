@@ -264,16 +264,16 @@ class FlextQualityDocumentationNotifier:
         if not self.config.alerts.critical_issues.enabled:
             return True
 
-        _sev_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(t.ContainerMapping)
+        sev_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(t.ContainerMapping)
         metrics_val = audit_data.get("metrics")
         metrics: t.ContainerMapping = (
-            _sev_adapter.validate_python(metrics_val)
+            sev_adapter.validate_python(metrics_val)
             if isinstance(metrics_val, Mapping)
             else {}
         )
         severity_val = metrics.get("severity_breakdown")
         severity_m: t.ContainerMapping = (
-            _sev_adapter.validate_python(severity_val)
+            sev_adapter.validate_python(severity_val)
             if isinstance(severity_val, Mapping)
             else {}
         )
@@ -516,16 +516,16 @@ Timestamp: {datetime.now(UTC).isoformat()}
         audit_data: t.ContainerMapping,
     ) -> str:
         """Format message for critical issues notification."""
-        _m_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(t.ContainerMapping)
+        m_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(t.ContainerMapping)
         metrics_val = audit_data.get("metrics")
         metrics: t.ContainerMapping = (
-            _m_adapter.validate_python(metrics_val)
+            m_adapter.validate_python(metrics_val)
             if isinstance(metrics_val, Mapping)
             else {}
         )
         severity_val = metrics.get("severity_breakdown")
         severity: t.ContainerMapping = (
-            _m_adapter.validate_python(severity_val)
+            m_adapter.validate_python(severity_val)
             if isinstance(severity_val, Mapping)
             else {}
         )
@@ -539,11 +539,12 @@ Timestamp: {datetime.now(UTC).isoformat()}
         if isinstance(issues_val, (list, tuple)):
             for i_v in issues_val:
                 if isinstance(i_v, Mapping):
-                    i_m: t.ContainerMapping = _m_adapter.validate_python(i_v)
+                    i_m: t.ContainerMapping = m_adapter.validate_python(i_v)
                     sev = i_m.get("severity")
                     if sev == "critical":
                         critical_issues.append(i_m)
-                        if len(critical_issues) >= 5:
+                        max_critical_issues = 5
+                        if len(critical_issues) >= max_critical_issues:
                             break
 
         qs_v = metrics.get("quality_score", 0)

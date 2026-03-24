@@ -59,13 +59,14 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                     return r[Sequence[t.ContainerMapping]].fail(
                         "Expected rules list",
                     )
-                _item_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
+                item_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
                     Mapping[str, t.NormalizedValue],
                 )
-                rules: list[Mapping[str, t.NormalizedValue]] = []
-                for item in raw_rules_val:
-                    if isinstance(item, dict):
-                        rules.append(_item_adapter.validate_python(item))
+                rules: list[Mapping[str, t.NormalizedValue]] = [
+                    item_adapter.validate_python(item)
+                    for item in raw_rules_val
+                    if isinstance(item, dict)
+                ]
                 return r[Sequence[t.ContainerMapping]].ok(rules)
             except (
                 ValueError,

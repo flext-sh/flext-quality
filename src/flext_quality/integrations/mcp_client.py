@@ -62,11 +62,11 @@ class FlextQualityMcpClient:
         """Build an MCP tool call request."""
         call_params: t.ContainerMapping = {}
         if isinstance(params, Mapping):
-            _vp_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
+            vp_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
                 Mapping[str, t.NormalizedValue],
             )
             validated_params: Mapping[str, t.NormalizedValue] = (
-                _vp_adapter.validate_python(params)
+                vp_adapter.validate_python(params)
             )
             call_params = dict(validated_params)
         return r[McpToolCall].ok(
@@ -107,10 +107,10 @@ class FlextQualityMcpClient:
                 ),
             )
         try:
-            _p_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
+            p_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
                 Mapping[str, t.NormalizedValue],
             )
-            parsed: Mapping[str, t.NormalizedValue] = _p_adapter.validate_json(output)
+            parsed: Mapping[str, t.NormalizedValue] = p_adapter.validate_json(output)
             result_data: t.StrMapping = {str(k): str(v) for k, v in parsed.items()}
             return r[McpToolResult].ok(
                 McpToolResult.model_validate({
@@ -121,20 +121,20 @@ class FlextQualityMcpClient:
             )
         except ValueError:
             try:
-                _list_adapter: TypeAdapter[Sequence[t.NormalizedValue]] = TypeAdapter(
+                list_adapter: TypeAdapter[Sequence[t.NormalizedValue]] = TypeAdapter(
                     Sequence[t.NormalizedValue],
                 )
                 parsed_list: Sequence[t.NormalizedValue] = (
-                    _list_adapter.validate_json(output)
+                    list_adapter.validate_json(output)
                 )
-                _vi_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
+                vi_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
                     Mapping[str, t.NormalizedValue],
                 )
                 coerced_data: MutableSequence[t.StrMapping] = []
                 for item in parsed_list:
                     if isinstance(item, Mapping):
                         validated_item: Mapping[str, t.NormalizedValue] = (
-                            _vi_adapter.validate_python(item)
+                            vi_adapter.validate_python(item)
                         )
                         coerced_data.append({
                             str(key): str(value)

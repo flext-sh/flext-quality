@@ -9,7 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from flext_core import t
+from tests import t
 
 
 def assert_is_dict(value: t.Scalar | t.ScalarMapping, msg: str = "") -> None:

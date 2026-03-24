@@ -14,7 +14,7 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import TypeIs
 
-from flext_core import t
+from tests import t
 
 
 def assert_is_dict(

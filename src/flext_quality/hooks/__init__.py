@@ -19,10 +19,7 @@ if TYPE_CHECKING:
 _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
     "BaseHookImpl": ("flext_quality.hooks.base", "BaseHookImpl"),
     "FlextQualityBaseHook": ("flext_quality.hooks.base", "FlextQualityBaseHook"),
-    "FlextQualityHookManager": (
-        "flext_quality.hooks.manager",
-        "FlextQualityHookManager",
-    ),
+    "FlextQualityHookManager": ("flext_quality.hooks.manager", "FlextQualityHookManager"),
     "HookManager": ("flext_quality.hooks.manager", "HookManager"),
 }
 
