@@ -252,7 +252,7 @@ class LinkChecker:
                     status_code=response.status,
                     response_time=response_time,
                     valid=response.status in acceptable_codes,
-                    redirected=response.history,
+                    redirected=bool(response.history),
                     final_url=str(response.url),
                     content_type=response.headers.get("content-type", ""),
                     context=context or {},
@@ -315,7 +315,7 @@ class LinkChecker:
                     response_time=response_time,
                     valid=response.status_code
                     in self.config["acceptable_status_codes"],
-                    redirected=response.history,
+                    redirected=bool(response.history),
                     final_url=response.url,
                     content_type=response.headers.get("content-type", ""),
                     context=context or {},

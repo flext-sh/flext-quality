@@ -452,7 +452,7 @@ class ContentAnalyzer:
             "required_sections_present": required_present,
             "optional_sections_present": optional_present,
             "word_count_sufficient": True,
-            "missing_required_sections": [],
+            "missing_required_sections": list[str](),
         }
 
         word_count = len(re.findall(r"\b\w+\b", content))

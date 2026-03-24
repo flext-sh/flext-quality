@@ -236,16 +236,14 @@ class LinkValidator:
         for attempt in range(self.retries):
             success, result = self._handle_request_attempt(url, attempt)
             if result is not None:
+                raw_status = result.get("status_code")
+                raw_error = result.get("error")
                 return self._create_link_result(
                     link,
                     valid=success,
                     url=url,
-                    status_code=result.get("status_code")
-                    if isinstance(result.get("status_code"), int)
-                    else None,
-                    error=result.get("error")
-                    if isinstance(result.get("error"), str)
-                    else None,
+                    status_code=raw_status if isinstance(raw_status, int) else None,
+                    error=raw_error if isinstance(raw_error, str) else None,
                 )
         return self._create_link_result(
             link, valid=False, url=url, error="Max retries exceeded"

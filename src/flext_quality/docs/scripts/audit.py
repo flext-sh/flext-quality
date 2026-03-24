@@ -598,15 +598,15 @@ class DocumentationAuditor:
             severity_counts[level] * weights[level] for level in severity_counts
         )
         quality_score = max(0, 100 - weighted_score)
-        self.results.metrics = AuditMetrics(
-            total_issues=total_issues,
-            severity_breakdown=severity_counts,
-            quality_score=quality_score,
-            files_analyzed=self.results.files_analyzed,
-            issues_per_file=total_issues / self.results.files_analyzed
+        self.results.metrics = AuditMetrics.model_validate({
+            "total_issues": total_issues,
+            "severity_breakdown": severity_counts,
+            "quality_score": quality_score,
+            "files_analyzed": self.results.files_analyzed,
+            "issues_per_file": total_issues / self.results.files_analyzed
             if self.results.files_analyzed > 0
             else 0,
-        )
+        })
 
     def generate_recommendations(self) -> None:
         """Generate actionable recommendations based on audit results."""

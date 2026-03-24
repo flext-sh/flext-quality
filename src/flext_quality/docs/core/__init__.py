@@ -55,10 +55,7 @@ _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
     "ConfigPrimitive": ("flext_quality.docs.core.config_manager", "ConfigPrimitive"),
     "ConfigSection": ("flext_quality.docs.core.config_manager", "ConfigSection"),
     "ConfigValue": ("flext_quality.docs.core.config_manager", "ConfigValue"),
-    "DocumentationFinder": (
-        "flext_quality.docs.core.file_discovery",
-        "DocumentationFinder",
-    ),
+    "DocumentationFinder": ("flext_quality.docs.core.file_discovery", "DocumentationFinder"),
     "FileStatistics": ("flext_quality.docs.core.file_discovery", "FileStatistics"),
     "RawConfigMap": ("flext_quality.docs.core.config_manager", "RawConfigMap"),
     "RawSectionMap": ("flext_quality.docs.core.config_manager", "RawSectionMap"),

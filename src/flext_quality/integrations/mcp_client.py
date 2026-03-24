@@ -65,7 +65,7 @@ class FlextQualityMcpClient:
             ).validate_python(params)
             call_params = dict(validated_params)
         return r[McpToolCall].ok(
-            McpToolCall(server=server, tool=tool, params=call_params),
+            McpToolCall.model_validate({"server": server, "tool": tool, "params": call_params}),
         )
 
     def health_check(self) -> r[t.ContainerMapping]:
@@ -101,11 +101,11 @@ class FlextQualityMcpClient:
             parsed = TypeAdapter(t.ContainerMapping).validate_json(output)
             result_data: t.StrMapping = {str(k): str(v) for k, v in parsed.items()}
             return r[McpToolResult].ok(
-                McpToolResult(
-                    success=True,
-                    data=result_data,
-                    error=None,
-                ),
+                McpToolResult.model_validate({
+                    "success": True,
+                    "data": result_data,
+                    "error": None,
+                }),
             )
         except ValueError:
             try:

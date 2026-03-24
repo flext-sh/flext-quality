@@ -478,7 +478,7 @@ class ScheduledMaintenance:
             pytest_args = cmd_parts[1:] if cmd_parts[0] == "pytest" else cmd_parts
 
             def run_tests() -> None:
-                exit_code = pytest.main(pytest_args)
+                exit_code = pytest.main(list(pytest_args))
                 if exit_code != 0:
                     error_msg = f"pytest exited with code {exit_code}"
                     raise RuntimeError(error_msg)
@@ -556,7 +556,7 @@ class ScheduledMaintenance:
 
             def run_git_command() -> None:
                 # Use repo.git.execute() for arbitrary git commands
-                result = git.execute([subcommand] + args)
+                result = git.execute([subcommand, *args])
                 if not result:
                     msg = f"git {subcommand} returned empty result"
                     raise RuntimeError(msg)
