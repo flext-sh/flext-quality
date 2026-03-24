@@ -13,7 +13,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from flask import Flask, Response, render_template_string, request
-from flext_core import FlextLogger, t
+from flext_core import FlextLogger, p, t
 from pydantic import ConfigDict, TypeAdapter
 
 _DICT_ADAPTER: TypeAdapter[t.ContainerMapping] = TypeAdapter(
@@ -33,11 +33,11 @@ class FlextQualityDocumentationDashboard:
         """Initialize documentation dashboard with reports directory."""
         self.reports_dir = Path(reports_dir)
         self.app = Flask(__name__)
-        self._logger_instance: FlextLogger = FlextLogger.create_module_logger(__name__)
+        self._logger_instance: p.Logger = FlextLogger.create_module_logger(__name__)
         self.setup_routes()
 
     @property
-    def logger(self) -> FlextLogger:
+    def logger(self) -> p.Logger:
         """Return the module logger."""
         return self._logger_instance
 
