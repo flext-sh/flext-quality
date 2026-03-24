@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 from flext_cli import FlextCliTypes
@@ -18,12 +18,12 @@ class FlextQualityTypes(FlextWebTypes, FlextCliTypes):
 
         type HookInput = Mapping[str, core_t.NormalizedValue]
         type HookOutput = Mapping[str, core_t.NormalizedValue]
-        type HookMatcher = t.StrSequence | None
+        type HookMatcher = Sequence[str] | None
         type RuleConfig = Mapping[str, core_t.NormalizedValue]
         type RuleResult = tuple[bool, str | None]
         type McpToolResult = Mapping[str, core_t.NormalizedValue]
         type McpResource = t.StrMapping
-        type MemoryQuery = Mapping[str, str | int | t.StrSequence]
+        type MemoryQuery = Mapping[str, str | int | Sequence[str]]
         type ContextQuery = Mapping[str, str | int]
         type GenericItem = (
             core_t.Primitives | Path | Mapping[str, core_t.Primitives | None]

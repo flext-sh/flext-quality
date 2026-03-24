@@ -72,11 +72,11 @@ class CompletenessDict(TypedDict, total=False):
     """Completeness check dictionary structure."""
 
     score: int
-    missing_elements: t.StrSequence
-    required_sections_present: t.StrSequence
-    optional_sections_present: t.StrSequence
+    missing_elements: Sequence[str]
+    required_sections_present: Sequence[str]
+    optional_sections_present: Sequence[str]
     word_count_sufficient: bool
-    missing_required_sections: t.StrSequence
+    missing_required_sections: Sequence[str]
 
 
 class IssueDict(TypedDict, total=False):
@@ -97,7 +97,7 @@ class AnalysisDict(TypedDict, total=False):
     completeness: CompletenessDict
     quality_score: float
     issues: Sequence[IssueDict]
-    suggestions: t.StrSequence
+    suggestions: Sequence[str]
     error: str
 
 
@@ -107,7 +107,7 @@ class RecommendationDict(TypedDict, total=False):
     priority: str
     type: str
     message: str
-    actions: t.StrSequence
+    actions: Sequence[str]
 
 
 class ResultsDict(TypedDict):
@@ -204,7 +204,7 @@ class ContentAnalyzer:
             content = file_path.read_text(encoding="utf-8")
             filename = str(file_path.relative_to(file_path.parents[2]))
             issues_list: Sequence[IssueDict] = []
-            suggestions_list: t.StrSequence = []
+            suggestions_list: Sequence[str] = []
             analysis: AnalysisDict = {
                 "file": filename,
                 "metrics": self._calculate_content_metrics(content),
@@ -443,16 +443,16 @@ class ContentAnalyzer:
         filename: str,
     ) -> CompletenessDict:
         """Check documentation completeness based on file type and content."""
-        missing_elems: t.StrSequence = []
-        required_present: t.StrSequence = []
-        optional_present: t.StrSequence = []
+        missing_elems: Sequence[str] = []
+        required_present: Sequence[str] = []
+        optional_present: Sequence[str] = []
         completeness: CompletenessDict = {
             "score": 100,
             "missing_elements": missing_elems,
             "required_sections_present": required_present,
             "optional_sections_present": optional_present,
             "word_count_sufficient": True,
-            "missing_required_sections": t.StrSequence(),
+            "missing_required_sections": Sequence[str](),
         }
 
         word_count = len(re.findall(r"\b\w+\b", content))
@@ -536,12 +536,12 @@ class ContentAnalyzer:
     def _check_required_sections(
         self,
         content: str,
-        required_sections: t.StrSequence,
-    ) -> Mapping[str, t.StrSequence]:
+        required_sections: Sequence[str],
+    ) -> Mapping[str, Sequence[str]]:
         """Check for required sections in content."""
-        required_present: t.StrSequence = []
-        missing_required: t.StrSequence = []
-        result: Mapping[str, t.StrSequence] = {
+        required_present: Sequence[str] = []
+        missing_required: Sequence[str] = []
+        result: Mapping[str, Sequence[str]] = {
             "required_sections_present": required_present,
             "missing_required_sections": missing_required,
         }
@@ -664,9 +664,9 @@ class ContentAnalyzer:
 
         return issues
 
-    def _generate_suggestions(self, analysis: AnalysisDict) -> t.StrSequence:
+    def _generate_suggestions(self, analysis: AnalysisDict) -> Sequence[str]:
         """Generate improvement suggestions based on analysis."""
-        suggestions: t.StrSequence = []
+        suggestions: Sequence[str] = []
 
         metrics = analysis.get("metrics", {})
         readability = analysis.get("readability", {})
@@ -744,10 +744,12 @@ class ContentAnalyzer:
                 ],
             })
 
-        all_issues: Sequence[t.StrMapping] = []
+        all_issues: Sequence[Mapping[str, str]] = []
         for result_value in self.results.values():
             if isinstance(result_value, dict):
-                issues_val: Sequence[t.StrMapping] | None = result_value.get("issues")
+                issues_val: Sequence[Mapping[str, str]] | None = result_value.get(
+                    "issues"
+                )
                 if isinstance(issues_val, list):
                     all_issues.extend(issues_val)
 
@@ -839,7 +841,7 @@ def analyze_file_content(
 
 
 def analyze_files_content(
-    file_paths: t.StrSequence,
+    file_paths: Sequence[str],
     config_path: str | None = None,
 ) -> ResultsDict:
     """Convenience function to analyze multiple files."""

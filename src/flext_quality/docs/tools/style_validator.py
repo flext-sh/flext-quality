@@ -36,7 +36,7 @@ class FileResults(TypedDict):
     file: str
     violations: Sequence[StyleIssue]
     issues: Sequence[StyleIssue]
-    suggestions: t.StrSequence
+    suggestions: Sequence[str]
 
 
 class MarkdownConfig(TypedDict, total=False):
@@ -97,7 +97,7 @@ class ValidationResults(TypedDict):
     style_violations: Sequence[StyleIssue]
     accessibility_issues: Sequence[StyleIssue]
     formatting_errors: Sequence[StyleIssue]
-    suggestions: t.StrSequence
+    suggestions: Sequence[str]
     summary: SummaryMetrics
 
 
@@ -263,7 +263,7 @@ class StyleValidator:
 
             violations_list: Sequence[StyleIssue] = []
             issues_list: Sequence[StyleIssue] = []
-            suggestions_list: t.StrSequence = []
+            suggestions_list: Sequence[str] = []
             file_results: FileResults = {
                 "file": filename,
                 "violations": violations_list,
@@ -545,9 +545,9 @@ class StyleValidator:
 
         return violations
 
-    def _generate_suggestions(self, violations: Sequence[StyleIssue]) -> t.StrSequence:
+    def _generate_suggestions(self, violations: Sequence[StyleIssue]) -> Sequence[str]:
         """Generate improvement suggestions based on violations."""
-        suggestions: t.StrSequence = []
+        suggestions: Sequence[str] = []
 
         violation_types: Mapping[str, int] = {}
         for violation in violations:
@@ -676,7 +676,7 @@ def validate_file_style(
 
 
 def validate_files_style(
-    file_paths: t.StrSequence,
+    file_paths: Sequence[str],
     config_path: str | None = None,
 ) -> ValidationResults:
     """Convenience function to validate multiple files."""

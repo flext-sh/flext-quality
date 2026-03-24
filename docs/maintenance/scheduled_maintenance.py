@@ -14,7 +14,7 @@ import shlex
 import sys
 import threading
 import time
-from collections.abc import Callable, Mapping
+from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import NotRequired, TypedDict
@@ -41,10 +41,10 @@ class ScheduleResults(BaseModel):
 
     start_time: str = Field(description="ISO timestamp when maintenance started")
     tasks_completed: int = Field(default=0, description="Number of tasks completed")
-    errors: t.StrSequence = Field(
+    errors: Sequence[str] = Field(
         default_factory=list, description="List of error messages"
     )
-    warnings: t.StrSequence = Field(
+    warnings: Sequence[str] = Field(
         default_factory=list, description="List of warning messages"
     )
     end_time: str = Field(
@@ -66,7 +66,7 @@ class ScheduleEntry(TypedDict):
 
     enabled: bool
     time: str
-    tasks: t.StrSequence
+    tasks: Sequence[str]
     day: NotRequired[str]
 
 
@@ -115,8 +115,8 @@ def _as_int(value: t.NormalizedValue, default: int) -> int:
     return value if isinstance(value, int) else default
 
 
-def _as_str_list(value: t.NormalizedValue, default: t.StrSequence) -> t.StrSequence:
-    """Normalize unknown config values to t.StrSequence."""
+def _as_str_list(value: t.NormalizedValue, default: Sequence[str]) -> Sequence[str]:
+    """Normalize unknown config values to Sequence[str]."""
     if isinstance(value, list):
         return [str(item) for item in value]
     return default
@@ -374,7 +374,7 @@ class ScheduledMaintenance:
             },
         }
 
-    def _get_task_names(self, schedule_key: str) -> t.StrSequence:
+    def _get_task_names(self, schedule_key: str) -> Sequence[str]:
         """Extract task name list from config for a schedule key."""
         schedules = self.config["schedules"]
         schedule_entry = schedules.get(schedule_key)
@@ -396,7 +396,7 @@ class ScheduledMaintenance:
         """Run monthly deep cleaning maintenance."""
         return self.run_tasks(self._get_task_names("monthly_deep_clean"))
 
-    def run_tasks(self, task_names: t.StrSequence) -> bool:
+    def run_tasks(self, task_names: Sequence[str]) -> bool:
         """Run a list of maintenance tasks."""
         success = True
 
@@ -422,7 +422,7 @@ class ScheduledMaintenance:
             timeout = task_config["timeout"]
 
             # Parse command to determine type
-            cmd_parts: t.StrSequence = shlex.split(command) if command else []
+            cmd_parts: Sequence[str] = shlex.split(command) if command else []
 
             if not cmd_parts:
                 self.results.errors.append(f"Empty command in task: {description}")
@@ -451,9 +451,9 @@ class ScheduledMaintenance:
     def _get_command_handler(
         self,
         cmd_name: str,
-    ) -> Callable[[t.StrSequence, int, str], bool] | None:
+    ) -> Callable[[Sequence[str], int, str], bool] | None:
         """Get handler for command type."""
-        handlers: Mapping[str, Callable[[t.StrSequence, int, str], bool]] = {
+        handlers: Mapping[str, Callable[[Sequence[str], int, str], bool]] = {
             "python": self._handle_python_command,
             "pytest": self._handle_pytest_command,
             "make": self._handle_make_command,
@@ -464,7 +464,7 @@ class ScheduledMaintenance:
 
     def _handle_python_command(
         self,
-        cmd_parts: t.StrSequence,
+        cmd_parts: Sequence[str],
         timeout: int,
         description: str,
     ) -> bool:
@@ -507,7 +507,7 @@ class ScheduledMaintenance:
 
     def _handle_pytest_command(
         self,
-        cmd_parts: t.StrSequence,
+        cmd_parts: Sequence[str],
         timeout: int,
         description: str,
     ) -> bool:
@@ -537,7 +537,7 @@ class ScheduledMaintenance:
 
     def _handle_make_command(
         self,
-        cmd_parts: t.StrSequence,
+        cmd_parts: Sequence[str],
         timeout: int,
         description: str,
     ) -> bool:
@@ -554,7 +554,7 @@ class ScheduledMaintenance:
                 return False
 
             # Parse make command
-            empty_targets: t.StrSequence = []
+            empty_targets: Sequence[str] = []
             targets = cmd_parts[1:] if len(cmd_parts) > 1 else empty_targets
 
             # Execute make target by reading Makefile and running corresponding command
@@ -575,7 +575,7 @@ class ScheduledMaintenance:
 
     def _handle_git_command(
         self,
-        cmd_parts: t.StrSequence,
+        cmd_parts: Sequence[str],
         timeout: int,
         description: str,
     ) -> bool:
@@ -597,7 +597,7 @@ class ScheduledMaintenance:
                 return False
 
             subcommand = cmd_parts[1]
-            empty_args: t.StrSequence = []
+            empty_args: Sequence[str] = []
             args = (
                 cmd_parts[self.MIN_GIT_ARGS :]
                 if len(cmd_parts) > self.MIN_GIT_ARGS
@@ -625,7 +625,7 @@ class ScheduledMaintenance:
 
     def _handle_echo_command(
         self,
-        cmd_parts: t.StrSequence,
+        cmd_parts: Sequence[str],
         timeout: int,
         description: str,
     ) -> bool:

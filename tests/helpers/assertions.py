@@ -25,7 +25,7 @@ def assert_is_list(value: t.Scalar | Sequence[t.Scalar], msg: str = "") -> None:
 
 
 def assert_dict_structure(
-    data: Mapping[str, t.Scalar], required_keys: t.StrSequence, msg: str = ""
+    data: Mapping[str, t.Scalar], required_keys: Sequence[str], msg: str = ""
 ) -> None:
     """Assert that a dict contains all required keys."""
     missing = [k for k in required_keys if k not in data]

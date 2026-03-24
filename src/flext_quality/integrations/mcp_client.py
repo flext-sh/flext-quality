@@ -34,22 +34,22 @@ class FlextQualityMcpClient:
         """Initialize the MCP client."""
         self._timeout_ms = timeout_ms or c.Quality.Defaults.MCP_TIMEOUT_MS
 
-    def build_call_command(self, call: McpToolCall) -> r[t.StrSequence]:
+    def build_call_command(self, call: McpToolCall) -> r[Sequence[str]]:
         """Build the mcp-cli command for a tool call."""
         if not self.is_mcp_cli_available():
-            return r[t.StrSequence].fail("mcp-cli not found in PATH")
+            return r[Sequence[str]].fail("mcp-cli not found in PATH")
         tool_path = f"{call.server}/{call.tool}"
         params_json = (
             TypeAdapter(t.ContainerMapping).dump_json(call.params).decode("utf-8")
         )
-        return r[t.StrSequence].ok(["mcp-cli", "call", tool_path, params_json])
+        return r[Sequence[str]].ok(["mcp-cli", "call", tool_path, params_json])
 
-    def build_info_command(self, server: str, tool: str) -> r[t.StrSequence]:
+    def build_info_command(self, server: str, tool: str) -> r[Sequence[str]]:
         """Build the mcp-cli info command for a tool."""
         if not self.is_mcp_cli_available():
-            return r[t.StrSequence].fail("mcp-cli not found in PATH")
+            return r[Sequence[str]].fail("mcp-cli not found in PATH")
         tool_path = f"{server}/{tool}"
-        return r[t.StrSequence].ok(["mcp-cli", "info", tool_path])
+        return r[Sequence[str]].ok(["mcp-cli", "info", tool_path])
 
     def build_tool_call(
         self,
@@ -99,7 +99,7 @@ class FlextQualityMcpClient:
             )
         try:
             parsed = TypeAdapter(t.ContainerMapping).validate_json(output)
-            result_data: t.StrMapping = {str(k): str(v) for k, v in parsed.items()}
+            result_data: Mapping[str, str] = {str(k): str(v) for k, v in parsed.items()}
             return r[McpToolResult].ok(
                 McpToolResult(
                     success=True,
@@ -110,7 +110,7 @@ class FlextQualityMcpClient:
         except ValueError:
             try:
                 parsed_list = TypeAdapter(t.ContainerList).validate_json(output)
-                coerced_data: Sequence[t.StrMapping] = []
+                coerced_data: Sequence[Mapping[str, str]] = []
                 for item in parsed_list:
                     if isinstance(item, Mapping):
                         validated_item = TypeAdapter(
@@ -126,7 +126,7 @@ class FlextQualityMcpClient:
                     McpToolResult(
                         success=True,
                         data={
-                            "items": TypeAdapter(Sequence[t.StrMapping])
+                            "items": TypeAdapter(Sequence[Mapping[str, str]])
                             .dump_json(coerced_data)
                             .decode("utf-8"),
                         },

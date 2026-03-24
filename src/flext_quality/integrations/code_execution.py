@@ -9,6 +9,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from pathlib import Path
 from typing import final
 
@@ -39,24 +40,24 @@ class FlextQualityCodeExecutionBridge:
         self._timeout_ms = timeout_ms or c.Quality.Defaults.INTEGRATION_TIMEOUT_MS
         self._working_dir = working_dir or Path.cwd()
 
-    def build_basedpyright_command(self, target_path: Path) -> r[t.StrSequence]:
+    def build_basedpyright_command(self, target_path: Path) -> r[Sequence[str]]:
         """Build command for basedpyright type checker."""
         cmd = ["basedpyright", "--outputjson", str(target_path.resolve())]
-        return r[t.StrSequence].ok(cmd)
+        return r[Sequence[str]].ok(cmd)
 
     def build_python_command(
         self,
         script_path: Path,
         *,
-        args: t.StrSequence | None = None,
-    ) -> r[t.StrSequence]:
+        args: Sequence[str] | None = None,
+    ) -> r[Sequence[str]]:
         """Build command for Python execution."""
         if not script_path.exists():
-            return r[t.StrSequence].fail(f"Script not found: {script_path}")
+            return r[Sequence[str]].fail(f"Script not found: {script_path}")
         cmd = ["python", str(script_path)]
         if args:
             cmd.extend(args)
-        return r[t.StrSequence].ok(cmd)
+        return r[Sequence[str]].ok(cmd)
 
     def build_ruff_command(
         self,
@@ -64,33 +65,33 @@ class FlextQualityCodeExecutionBridge:
         *,
         fix: bool = False,
         output_format: str = "json",
-    ) -> r[t.StrSequence]:
+    ) -> r[Sequence[str]]:
         """Build command for ruff linter."""
         cmd = ["ruff", "check", str(target_path), f"--output-format={output_format}"]
         if fix:
             cmd.append("--fix")
-        return r[t.StrSequence].ok(cmd)
+        return r[Sequence[str]].ok(cmd)
 
     def build_typescript_command(
         self,
         script_path: Path,
         *,
-        args: t.StrSequence | None = None,
-    ) -> r[t.StrSequence]:
+        args: Sequence[str] | None = None,
+    ) -> r[Sequence[str]]:
         """Build command for TypeScript execution via npx tsx."""
         if not script_path.exists():
-            return r[t.StrSequence].fail(f"Script not found: {script_path}")
+            return r[Sequence[str]].fail(f"Script not found: {script_path}")
         cmd = ["npx", "tsx", str(script_path)]
         if args:
             cmd.extend(args)
-        return r[t.StrSequence].ok(cmd)
+        return r[Sequence[str]].ok(cmd)
 
     def create_execution_request(
         self,
         script_path: Path,
         runtime: str,
         *,
-        args: t.StrSequence | None = None,
+        args: Sequence[str] | None = None,
     ) -> r[ExecutionRequest]:
         """Create an execution request for later processing."""
         if runtime not in {"python", "typescript", "ruff", "basedpyright"}:

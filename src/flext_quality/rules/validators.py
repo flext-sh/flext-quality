@@ -21,7 +21,7 @@ class FlextQualityValidators:
     class Pattern(p.Quality.ValidatorBase):
         """Validates content against regex patterns."""
 
-        def __init__(self, patterns: t.StrMapping) -> None:
+        def __init__(self, patterns: Mapping[str, str]) -> None:
             """Initialize with patterns."""
             self._patterns = patterns
             self._compiled: Mapping[str, re.Pattern[str]] = {}

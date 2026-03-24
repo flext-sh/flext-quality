@@ -93,7 +93,7 @@ def safe_list_access[T](data: Sequence[T], index: int) -> T:
 
 
 def assert_dict_structure(
-    data: Mapping[str, t.Scalar], required_keys: t.StrSequence
+    data: Mapping[str, t.Scalar], required_keys: Sequence[str]
 ) -> Mapping[str, t.Scalar]:
     """Assert that t.NormalizedValue is dict with required keys - DRY pattern.
 
