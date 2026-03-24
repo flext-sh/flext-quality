@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import argparse
 import smtplib
-from collections.abc import Mapping, MutableMapping, Sequence
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -532,7 +532,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
             severity_breakdown[key_name] = kv if isinstance(kv, int) else 0
 
         issues_val = audit_data.get("issues")
-        critical_issues: list[t.ContainerMapping] = []
+        critical_issues: MutableSequence[t.ContainerMapping] = []
         if isinstance(issues_val, (list, tuple)):
             for i_v in issues_val:
                 if isinstance(i_v, Mapping):
@@ -675,7 +675,7 @@ def main() -> None:
 
         # Check for broken links (would need to extract from audit data)
         issues_raw = audit_data.get("issues")
-        broken_links: list[t.NormalizedValue] = []
+        broken_links: MutableSequence[t.NormalizedValue] = []
         if isinstance(issues_raw, (list, tuple)):
             for i_raw in issues_raw:
                 if isinstance(i_raw, Mapping):

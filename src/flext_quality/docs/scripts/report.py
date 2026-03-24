@@ -300,7 +300,7 @@ class FlextQualityDocumentationReporter:
                     )
                     for e_raw in validation_errors_list:
                         try:
-                            error_entry: dict[str, t.NormalizedValue] = (
+                            error_entry: Mapping[str, t.NormalizedValue] = (
                                 e_adapter.validate_python(e_raw)
                             )
                         except (ValueError, TypeError):

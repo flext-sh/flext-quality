@@ -15,7 +15,7 @@ import argparse
 import logging
 import re
 import shutil
-from collections.abc import Mapping, MutableSequence, Sequence
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -352,7 +352,7 @@ class FlextQualityDocumentationOptimizer:
                     meta_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = (
                         TypeAdapter(Mapping[str, t.NormalizedValue])
                     )
-                    metadata: dict[str, t.NormalizedValue] = dict(
+                    metadata: MutableMapping[str, t.NormalizedValue] = dict(
                         meta_adapter.validate_python(
                             yaml.safe_load(frontmatter_content) or {},
                         ),
