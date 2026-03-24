@@ -65,7 +65,11 @@ class FlextQualityMcpClient:
             ).validate_python(params)
             call_params = dict(validated_params)
         return r[McpToolCall].ok(
-            McpToolCall.model_validate({"server": server, "tool": tool, "params": call_params}),
+            McpToolCall.model_validate({
+                "server": server,
+                "tool": tool,
+                "params": call_params,
+            }),
         )
 
     def health_check(self) -> r[t.ContainerMapping]:
