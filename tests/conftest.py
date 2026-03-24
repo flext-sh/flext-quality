@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import os
 import tempfile
-from collections.abc import Generator, Sequence
+from collections.abc import Generator, MutableSequence, Sequence
 from pathlib import Path
 
 import pytest
@@ -427,7 +427,7 @@ class MockQualityAnalyzer:
     def __init__(self) -> None:
         """Initialize the instance."""
         super().__init__()
-        self.analyzed_files: list[str] = []
+        self.analyzed_files: MutableSequence[str] = []
 
     def analyze_project(self, project_path: str) -> t.ContainerMapping:
         """Simulate comprehensive project analysis.
@@ -514,7 +514,7 @@ class MockReportGenerator:
     def __init__(self) -> None:
         """Initialize the instance."""
         super().__init__()
-        self.generated_reports: list[t.ContainerMapping] = []
+        self.generated_reports: MutableSequence[t.ContainerMapping] = []
 
     def generate_report(
         self,

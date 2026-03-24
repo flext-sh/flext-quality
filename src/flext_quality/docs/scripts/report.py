@@ -290,7 +290,7 @@ class FlextQualityDocumentationReporter:
                 validation_errors_raw = link_validation.get("errors")
                 if not isinstance(validation_errors_raw, list):
                     return recommendations
-                validation_errors_list: list[t.NormalizedValue] = list(
+                validation_errors_list: Sequence[t.NormalizedValue] = list(
                     validation_errors_raw,
                 )
                 if validation_errors_list:

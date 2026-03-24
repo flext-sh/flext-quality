@@ -64,7 +64,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                         Mapping[str, t.NormalizedValue],
                     )
                 )
-                rules: list[Mapping[str, t.NormalizedValue]] = [
+                rules: Sequence[Mapping[str, t.NormalizedValue]] = [
                     item_adapter.validate_python(item)
                     for item in raw_rules_val
                     if isinstance(item, dict)

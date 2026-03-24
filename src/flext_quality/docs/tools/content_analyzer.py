@@ -639,7 +639,9 @@ class FlextQualityContentAnalyzer:
             )
 
         missing_raw = completeness.missing_elements if completeness else None
-        missing: list[str] = list(missing_raw) if isinstance(missing_raw, list) else []
+        missing: Sequence[str] = (
+            list(missing_raw) if isinstance(missing_raw, list) else []
+        )
         if missing:
             issues.append(
                 FlextQualityContentAnalyzer.Issue(
