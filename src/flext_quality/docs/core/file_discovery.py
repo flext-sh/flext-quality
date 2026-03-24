@@ -428,7 +428,7 @@ class FlextQualityDocumentationFinder:
     def invalidate_cache(self) -> None:
         """Invalidate the file cache."""
         self._file_cache = None
-        self._metadata_cache = {}
+        self._metadata_cache = dict[str, m.Quality.FileMetadata]()
 
     def add_pattern(self, pattern: str) -> None:
         """Add a custom search pattern."""

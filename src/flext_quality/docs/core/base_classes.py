@@ -30,7 +30,7 @@ class FlextQualityBaseAuditor(ABC):
     def start_audit(self) -> None:
         """Mark the start of an audit operation."""
         self.start_time = datetime.now(UTC)
-        self.issues = []
+        self.issues = list[m.Quality.Issue]()
 
     def end_audit(self) -> None:
         """Mark the end of an audit operation."""

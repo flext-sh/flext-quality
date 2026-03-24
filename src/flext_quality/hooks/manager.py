@@ -66,6 +66,6 @@ class FlextQualityHookManager:
         """Register a hook."""
         event = hook.event
         if event not in self._hooks:
-            self._hooks[event] = []
+            self._hooks[event] = list[FlextQualityBaseHook]()
         self._hooks[event].append(hook)
         return r[bool].ok(value=True)
