@@ -24,21 +24,6 @@ from pydantic import ValidationError
 
 from flext_quality import m, t
 
-QualityThresholdsConfig = m.Quality.QualityThresholdsConfig
-ContentChecksConfig = m.Quality.ContentChecksConfig
-SeverityLevelsConfig = m.Quality.SeverityLevelsConfig
-AuditRulesConfig = m.Quality.AuditRulesConfig
-MarkdownStyleConfig = m.Quality.MarkdownStyleConfig
-AccessibilityConfig = m.Quality.AccessibilityConfig
-FormattingConfig = m.Quality.FormattingConfig
-StyleGuideConfig = m.Quality.StyleGuideConfig
-LinkValidationConfig = m.Quality.LinkValidationConfig
-ContentAnalysisConfig = m.Quality.ContentAnalysisConfig
-ValidationConfig = m.Quality.ValidationConfig
-AuditorResults = m.Quality.AuditorResults
-AuditMetrics = m.Quality.AuditMetrics
-AuditRecommendation = m.Quality.AuditRecommendation
-
 
 class FlextQualityDocumentationAuditor:
     """Main documentation audit and quality assurance system."""
@@ -52,11 +37,13 @@ class FlextQualityDocumentationAuditor:
         """
         self.config_path = Path(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
-        self.audit_rules: AuditRulesConfig = self.get_default_audit_rules()
-        self.style_guide: StyleGuideConfig = self.get_default_style_guide()
-        self.validation_config: ValidationConfig = self.get_default_validation_config()
+        self.audit_rules: m.Quality.AuditRulesConfig = self.get_default_audit_rules()
+        self.style_guide: m.Quality.StyleGuideConfig = self.get_default_style_guide()
+        self.validation_config: m.Quality.ValidationConfig = (
+            self.get_default_validation_config()
+        )
         self.load_config()
-        self.results: AuditorResults = AuditorResults(
+        self.results: m.Quality.AuditorResults = m.Quality.AuditorResults(
             timestamp=datetime.now(UTC).isoformat(),
         )
 
@@ -66,7 +53,9 @@ class FlextQualityDocumentationAuditor:
             with Path(self.config_path / "audit_rules.yaml").open(
                 encoding="utf-8",
             ) as f:
-                self.audit_rules = AuditRulesConfig.model_validate(yaml.safe_load(f))
+                self.audit_rules = m.Quality.AuditRulesConfig.model_validate(
+                    yaml.safe_load(f)
+                )
         except (FileNotFoundError, ValidationError, yaml.YAMLError, TypeError):
             self.audit_rules = self.get_default_audit_rules()
 
@@ -74,7 +63,9 @@ class FlextQualityDocumentationAuditor:
             with Path(self.config_path / "style_guide.yaml").open(
                 encoding="utf-8",
             ) as f:
-                self.style_guide = StyleGuideConfig.model_validate(yaml.safe_load(f))
+                self.style_guide = m.Quality.StyleGuideConfig.model_validate(
+                    yaml.safe_load(f)
+                )
         except (FileNotFoundError, ValidationError, yaml.YAMLError, TypeError):
             self.style_guide = self.get_default_style_guide()
 
@@ -82,15 +73,15 @@ class FlextQualityDocumentationAuditor:
             with Path(self.config_path / "validation_config.yaml").open(
                 encoding="utf-8",
             ) as f:
-                self.validation_config = ValidationConfig.model_validate(
+                self.validation_config = m.Quality.ValidationConfig.model_validate(
                     yaml.safe_load(f),
                 )
         except (FileNotFoundError, ValidationError, yaml.YAMLError, TypeError):
             self.validation_config = self.get_default_validation_config()
 
-    def get_default_audit_rules(self) -> AuditRulesConfig:
+    def get_default_audit_rules(self) -> m.Quality.AuditRulesConfig:
         """Default audit rules if config file not found."""
-        return AuditRulesConfig.model_validate({
+        return m.Quality.AuditRulesConfig.model_validate({
             "quality_thresholds": {
                 "max_age_days": 90,
                 "min_word_count": 100,
@@ -111,9 +102,9 @@ class FlextQualityDocumentationAuditor:
             },
         })
 
-    def get_default_style_guide(self) -> StyleGuideConfig:
+    def get_default_style_guide(self) -> m.Quality.StyleGuideConfig:
         """Default style guide if config file not found."""
-        return StyleGuideConfig.model_validate({
+        return m.Quality.StyleGuideConfig.model_validate({
             "markdown": {
                 "heading_style": "atx",
                 "list_style": "dash",
@@ -132,9 +123,9 @@ class FlextQualityDocumentationAuditor:
             },
         })
 
-    def get_default_validation_config(self) -> ValidationConfig:
+    def get_default_validation_config(self) -> m.Quality.ValidationConfig:
         """Default validation config if config file not found."""
-        return ValidationConfig.model_validate({
+        return m.Quality.ValidationConfig.model_validate({
             "link_validation": {
                 "timeout": 10,
                 "retry_attempts": 3,
@@ -184,7 +175,7 @@ class FlextQualityDocumentationAuditor:
         ]
         return any(pattern in str(file_path) for pattern in ignored_patterns)
 
-    def run_comprehensive_audit(self) -> AuditorResults:
+    def run_comprehensive_audit(self) -> m.Quality.AuditorResults:
         """Run complete documentation audit."""
         doc_files = self.find_documentation_files()
         self.results.files_analyzed = len(doc_files)
@@ -610,7 +601,7 @@ class FlextQualityDocumentationAuditor:
             severity_counts[level] * weights[level] for level in severity_counts
         )
         quality_score = max(0, 100 - weighted_score)
-        self.results.metrics = AuditMetrics.model_validate({
+        self.results.metrics = m.Quality.AuditMetrics.model_validate({
             "total_issues": total_issues,
             "severity_breakdown": severity_counts,
             "quality_score": quality_score,
@@ -624,11 +615,11 @@ class FlextQualityDocumentationAuditor:
         """Generate actionable recommendations based on audit results."""
         metrics = self.results.metrics
         issues = self.results.issues
-        recommendations: MutableSequence[AuditRecommendation] = []
+        recommendations: MutableSequence[m.Quality.AuditRecommendation] = []
         quality_score = metrics.quality_score
         if quality_score < 50:
             recommendations.append(
-                AuditRecommendation(
+                m.Quality.AuditRecommendation(
                     priority="critical",
                     category="overall_quality",
                     recommendation="Immediate attention required - documentation quality is poor",
@@ -641,7 +632,7 @@ class FlextQualityDocumentationAuditor:
             )
         elif quality_score < 75:
             recommendations.append(
-                AuditRecommendation(
+                m.Quality.AuditRecommendation(
                     priority="high",
                     category="quality_improvement",
                     recommendation="Documentation quality needs improvement",
@@ -660,7 +651,7 @@ class FlextQualityDocumentationAuditor:
         ]
         if broken_links:
             recommendations.append(
-                AuditRecommendation(
+                m.Quality.AuditRecommendation(
                     priority="high",
                     category="link_maintenance",
                     recommendation=f"Fix {len(broken_links)} broken links",
@@ -674,7 +665,7 @@ class FlextQualityDocumentationAuditor:
         outdated_content = [i for i in issues if i["type"] == "outdated_content"]
         if outdated_content:
             recommendations.append(
-                AuditRecommendation(
+                m.Quality.AuditRecommendation(
                     priority="medium",
                     category="content_freshness",
                     recommendation=f"Update {len(outdated_content)} outdated documents",
@@ -690,7 +681,7 @@ class FlextQualityDocumentationAuditor:
         ]
         if accessibility_issues:
             recommendations.append(
-                AuditRecommendation(
+                m.Quality.AuditRecommendation(
                     priority="medium",
                     category="accessibility",
                     recommendation="Improve documentation accessibility",
@@ -841,7 +832,7 @@ def _create_argument_parser() -> argparse.ArgumentParser:
 def _execute_audit_checks(
     auditor: FlextQualityDocumentationAuditor,
     args: argparse.Namespace,
-) -> AuditorResults:
+) -> m.Quality.AuditorResults:
     """Execute the appropriate audit checks based on arguments."""
     if args.comprehensive:
         return auditor.run_comprehensive_audit()
@@ -859,7 +850,9 @@ def _execute_audit_checks(
     return auditor.results
 
 
-def _should_fail_on_results(args: argparse.Namespace, metrics: AuditMetrics) -> bool:
+def _should_fail_on_results(
+    args: argparse.Namespace, metrics: m.Quality.AuditMetrics
+) -> bool:
     """Determine if the process should fail based on results and arguments."""
     should_fail = False
     if args.fail_on_errors:

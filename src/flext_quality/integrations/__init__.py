@@ -23,29 +23,21 @@ if TYPE_CHECKING:
     from flext_quality.integrations.claude_context import (
         FlextQualityClaudeContextClient,
     )
-    from flext_quality.integrations.claude_mem import FlextQualityClaudeMemClient
+    from flext_quality.integrations.claude_mem import (
+        FlextQualityClaudeMemClient,
+        McpToolCall,
+    )
     from flext_quality.integrations.code_execution import (
         FlextQualityCodeExecutionBridge,
     )
     from flext_quality.integrations.mcp_client import FlextQualityMcpClient
 
 _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
-    "FlextQualityClaudeContextClient": (
-        "flext_quality.integrations.claude_context",
-        "FlextQualityClaudeContextClient",
-    ),
-    "FlextQualityClaudeMemClient": (
-        "flext_quality.integrations.claude_mem",
-        "FlextQualityClaudeMemClient",
-    ),
-    "FlextQualityCodeExecutionBridge": (
-        "flext_quality.integrations.code_execution",
-        "FlextQualityCodeExecutionBridge",
-    ),
-    "FlextQualityMcpClient": (
-        "flext_quality.integrations.mcp_client",
-        "FlextQualityMcpClient",
-    ),
+    "FlextQualityClaudeContextClient": ("flext_quality.integrations.claude_context", "FlextQualityClaudeContextClient"),
+    "FlextQualityClaudeMemClient": ("flext_quality.integrations.claude_mem", "FlextQualityClaudeMemClient"),
+    "FlextQualityCodeExecutionBridge": ("flext_quality.integrations.code_execution", "FlextQualityCodeExecutionBridge"),
+    "FlextQualityMcpClient": ("flext_quality.integrations.mcp_client", "FlextQualityMcpClient"),
+    "McpToolCall": ("flext_quality.integrations.claude_mem", "McpToolCall"),
 }
 
 __all__ = [
@@ -53,6 +45,7 @@ __all__ = [
     "FlextQualityClaudeMemClient",
     "FlextQualityCodeExecutionBridge",
     "FlextQualityMcpClient",
+    "McpToolCall",
 ]
 
 

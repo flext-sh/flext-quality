@@ -27,9 +27,6 @@ from flext_quality import m, t
 MIN_HEADINGS_FOR_TOC = 5
 
 
-OptimizerResults = m.Quality.OptimizerResults
-
-
 class FlextQualityDocumentationOptimizer:
     """Documentation optimization and enhancement system."""
 
@@ -43,7 +40,9 @@ class FlextQualityDocumentationOptimizer:
         self.backup = backup
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.results = OptimizerResults(timestamp=datetime.now(UTC).isoformat())
+        self.results = m.Quality.OptimizerResults(
+            timestamp=datetime.now(UTC).isoformat()
+        )
 
     def optimize_formatting(self, doc_files: Sequence[Path]) -> t.ContainerMapping:
         """Fix common formatting issues."""

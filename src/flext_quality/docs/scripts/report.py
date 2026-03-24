@@ -17,18 +17,9 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from jinja2 import Template
-from pydantic import BaseModel, ConfigDict, TypeAdapter
+from pydantic import BaseModel, TypeAdapter
 
 from flext_quality import t
-
-
-class _ReportOptions(BaseModel):
-    """Optional keyword arguments for generate_quality_report."""
-
-    model_config = ConfigDict(extra="forbid")
-
-    include_trends: bool = False
-
 
 ReportValue = (
     str

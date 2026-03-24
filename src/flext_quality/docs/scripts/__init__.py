@@ -13,141 +13,40 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_quality.docs.scripts.audit import (
-        AccessibilityConfig,
-        AuditMetrics,
-        AuditorResults,
-        AuditRecommendation,
-        AuditRulesConfig,
-        ContentAnalysisConfig,
-        ContentChecksConfig,
-        FlextQualityDocumentationAuditor,
-        FormattingConfig,
-        LinkValidationConfig,
-        MarkdownStyleConfig,
-        QualityThresholdsConfig,
-        SeverityLevelsConfig,
-        StyleGuideConfig,
-        ValidationConfig,
-    )
+    from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
     from flext_quality.docs.scripts.optimize import (
         MIN_HEADINGS_FOR_TOC,
         FlextQualityDocumentationOptimizer,
-        OptimizerResults,
     )
     from flext_quality.docs.scripts.report import (
         FlextQualityDocumentationReporter,
         ReportValue,
     )
     from flext_quality.docs.scripts.validate import (
-        ContentIssue,
-        ContentMetrics,
-        ContentValidatorResults,
         FlextQualityContentValidator,
         FlextQualityLinkValidator,
-        LinkCheckResult,
-        LinkRecord,
-        LinkValidatorResults,
         main,
     )
 
 _LAZY_IMPORTS: Mapping[str, tuple[str, str]] = {
-    "AccessibilityConfig": ("flext_quality.docs.scripts.audit", "AccessibilityConfig"),
-    "AuditMetrics": ("flext_quality.docs.scripts.audit", "AuditMetrics"),
-    "AuditRecommendation": ("flext_quality.docs.scripts.audit", "AuditRecommendation"),
-    "AuditRulesConfig": ("flext_quality.docs.scripts.audit", "AuditRulesConfig"),
-    "AuditorResults": ("flext_quality.docs.scripts.audit", "AuditorResults"),
-    "ContentAnalysisConfig": (
-        "flext_quality.docs.scripts.audit",
-        "ContentAnalysisConfig",
-    ),
-    "ContentChecksConfig": ("flext_quality.docs.scripts.audit", "ContentChecksConfig"),
-    "ContentIssue": ("flext_quality.docs.scripts.validate", "ContentIssue"),
-    "ContentMetrics": ("flext_quality.docs.scripts.validate", "ContentMetrics"),
-    "ContentValidatorResults": (
-        "flext_quality.docs.scripts.validate",
-        "ContentValidatorResults",
-    ),
-    "FlextQualityContentValidator": (
-        "flext_quality.docs.scripts.validate",
-        "FlextQualityContentValidator",
-    ),
-    "FlextQualityDocumentationAuditor": (
-        "flext_quality.docs.scripts.audit",
-        "FlextQualityDocumentationAuditor",
-    ),
-    "FlextQualityDocumentationOptimizer": (
-        "flext_quality.docs.scripts.optimize",
-        "FlextQualityDocumentationOptimizer",
-    ),
-    "FlextQualityDocumentationReporter": (
-        "flext_quality.docs.scripts.report",
-        "FlextQualityDocumentationReporter",
-    ),
-    "FlextQualityLinkValidator": (
-        "flext_quality.docs.scripts.validate",
-        "FlextQualityLinkValidator",
-    ),
-    "FormattingConfig": ("flext_quality.docs.scripts.audit", "FormattingConfig"),
-    "LinkCheckResult": ("flext_quality.docs.scripts.validate", "LinkCheckResult"),
-    "LinkRecord": ("flext_quality.docs.scripts.validate", "LinkRecord"),
-    "LinkValidationConfig": (
-        "flext_quality.docs.scripts.audit",
-        "LinkValidationConfig",
-    ),
-    "LinkValidatorResults": (
-        "flext_quality.docs.scripts.validate",
-        "LinkValidatorResults",
-    ),
-    "MIN_HEADINGS_FOR_TOC": (
-        "flext_quality.docs.scripts.optimize",
-        "MIN_HEADINGS_FOR_TOC",
-    ),
-    "MarkdownStyleConfig": ("flext_quality.docs.scripts.audit", "MarkdownStyleConfig"),
-    "OptimizerResults": ("flext_quality.docs.scripts.optimize", "OptimizerResults"),
-    "QualityThresholdsConfig": (
-        "flext_quality.docs.scripts.audit",
-        "QualityThresholdsConfig",
-    ),
+    "FlextQualityContentValidator": ("flext_quality.docs.scripts.validate", "FlextQualityContentValidator"),
+    "FlextQualityDocumentationAuditor": ("flext_quality.docs.scripts.audit", "FlextQualityDocumentationAuditor"),
+    "FlextQualityDocumentationOptimizer": ("flext_quality.docs.scripts.optimize", "FlextQualityDocumentationOptimizer"),
+    "FlextQualityDocumentationReporter": ("flext_quality.docs.scripts.report", "FlextQualityDocumentationReporter"),
+    "FlextQualityLinkValidator": ("flext_quality.docs.scripts.validate", "FlextQualityLinkValidator"),
+    "MIN_HEADINGS_FOR_TOC": ("flext_quality.docs.scripts.optimize", "MIN_HEADINGS_FOR_TOC"),
     "ReportValue": ("flext_quality.docs.scripts.report", "ReportValue"),
-    "SeverityLevelsConfig": (
-        "flext_quality.docs.scripts.audit",
-        "SeverityLevelsConfig",
-    ),
-    "StyleGuideConfig": ("flext_quality.docs.scripts.audit", "StyleGuideConfig"),
-    "ValidationConfig": ("flext_quality.docs.scripts.audit", "ValidationConfig"),
     "main": ("flext_quality.docs.scripts.validate", "main"),
 }
 
 __all__ = [
     "MIN_HEADINGS_FOR_TOC",
-    "AccessibilityConfig",
-    "AuditMetrics",
-    "AuditRecommendation",
-    "AuditRulesConfig",
-    "AuditorResults",
-    "ContentAnalysisConfig",
-    "ContentChecksConfig",
-    "ContentIssue",
-    "ContentMetrics",
-    "ContentValidatorResults",
     "FlextQualityContentValidator",
     "FlextQualityDocumentationAuditor",
     "FlextQualityDocumentationOptimizer",
     "FlextQualityDocumentationReporter",
     "FlextQualityLinkValidator",
-    "FormattingConfig",
-    "LinkCheckResult",
-    "LinkRecord",
-    "LinkValidationConfig",
-    "LinkValidatorResults",
-    "MarkdownStyleConfig",
-    "OptimizerResults",
-    "QualityThresholdsConfig",
     "ReportValue",
-    "SeverityLevelsConfig",
-    "StyleGuideConfig",
-    "ValidationConfig",
     "main",
 ]
 

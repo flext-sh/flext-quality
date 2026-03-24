@@ -15,11 +15,13 @@ from flext_core import r
 
 from flext_quality import (
     FlextQualityMcpClient,
-    McpToolCall,
     build_mcp_health_result,
     c,
     t,
 )
+from flext_quality.models import FlextQualityModels as _QualityModels
+
+McpToolCall = _QualityModels.Quality.McpToolCall
 
 
 @final

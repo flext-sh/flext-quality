@@ -24,13 +24,6 @@ from git import InvalidGitRepositoryError, Repo
 
 from flext_quality import m, t
 
-ScheduleResults = m.Quality.ScheduleResults
-ScheduleTaskConfig = m.Quality.ScheduleTaskConfig
-ScheduleEntry = m.Quality.ScheduleEntry
-ErrorHandlingConfig = m.Quality.ErrorHandlingConfig
-LoggingConfig = m.Quality.LoggingConfig
-MaintenanceConfig = m.Quality.MaintenanceConfig
-
 
 def _docs_root() -> Path:
     """Return the package root for documentation tooling."""
@@ -106,14 +99,14 @@ class FlextQualityScheduledMaintenance:
             config_path: Path to configuration file for maintenance schedule.
 
         """
-        self.config: MaintenanceConfig = self.get_default_config()
+        self.config: m.Quality.MaintenanceConfig = self.get_default_config()
         self.load_config(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
         self.reports_dir = Path(self.config.reports_dir)
         self.reports_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize results tracking
-        self.results: ScheduleResults = ScheduleResults(
+        self.results: m.Quality.ScheduleResults = m.Quality.ScheduleResults(
             start_time=datetime.now(UTC).isoformat(),
         )
 
@@ -137,9 +130,9 @@ class FlextQualityScheduledMaintenance:
 
     def _merge_config(
         self,
-        base: MaintenanceConfig,
+        base: m.Quality.MaintenanceConfig,
         overrides: t.ContainerMapping,
-    ) -> MaintenanceConfig:
+    ) -> m.Quality.MaintenanceConfig:
         """Merge external config mapping into default typed config."""
         merged = base.model_dump()
         merged["enabled"] = _as_bool(overrides.get("enabled"), default=base.enabled)
@@ -229,14 +222,14 @@ class FlextQualityScheduledMaintenance:
                 ),
             }
 
-        return MaintenanceConfig.model_validate(merged)
+        return m.Quality.MaintenanceConfig.model_validate(merged)
 
-    def get_default_config(self) -> MaintenanceConfig:
+    def get_default_config(self) -> m.Quality.MaintenanceConfig:
         """Default maintenance configuration."""
         reports_dir = str(_docs_reports_dir())
         backup_dir = str(_docs_backups_dir())
         latest_audit_report = str(_docs_reports_dir() / "latest_audit.json")
-        return MaintenanceConfig.model_validate({
+        return m.Quality.MaintenanceConfig.model_validate({
             "enabled": True,
             "reports_dir": reports_dir,
             "backup_dir": backup_dir,
@@ -384,7 +377,7 @@ class FlextQualityScheduledMaintenance:
 
         return success
 
-    def run_single_task(self, task_config: ScheduleTaskConfig) -> bool:
+    def run_single_task(self, task_config: m.Quality.ScheduleTaskConfig) -> bool:
         """Run a single maintenance task using appropriate Python libraries."""
         try:
             command = task_config.command

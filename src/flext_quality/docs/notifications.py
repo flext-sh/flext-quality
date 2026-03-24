@@ -33,9 +33,6 @@ _AUDIT_DATA_ADAPTER: TypeAdapter[t.ContainerMapping] = TypeAdapter(
 MAX_BROKEN_LINKS_TO_SHOW = 10
 
 
-NotifierResults = m.Quality.NotifierResults
-
-
 class FlextQualityDocumentationNotifier:
     """Automated notification system for documentation quality alerts."""
 
@@ -102,7 +99,7 @@ class FlextQualityDocumentationNotifier:
             self.get_default_config()
         )
         self.load_config(config_path)
-        self.results: NotifierResults = NotifierResults(
+        self.results: m.Quality.NotifierResults = m.Quality.NotifierResults(
             timestamp=datetime.now(UTC).isoformat(),
         )
 

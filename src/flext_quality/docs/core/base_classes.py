@@ -11,7 +11,7 @@ from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
-from flext_quality import m, p, t
+from flext_quality import m, t
 
 
 class FlextQualityBaseAuditor(ABC):
@@ -201,7 +201,3 @@ class FlextQualityBaseAnalyzer(ABC):
         """Get a readability score from the analysis."""
         val = self.metrics.get("readability_score")
         return float(val) if isinstance(val, (int, float)) else None
-
-
-# Re-export canonical protocol from protocols namespace for backward compatibility
-Config = p.Quality.DocsConfig
