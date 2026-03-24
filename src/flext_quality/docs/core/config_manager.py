@@ -6,7 +6,7 @@ Handles loading, validation, and access to configuration files.
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
 from typing import TypeAlias
 
@@ -16,9 +16,9 @@ from flext_quality import t
 
 ConfigPrimitive: TypeAlias = str | int | float | bool
 ConfigValue: TypeAlias = str | int | float | bool | t.StrSequence
-ConfigSection: TypeAlias = Mapping[str, str | int | float | bool | t.StrSequence]
-ConfigData: TypeAlias = Mapping[
-    str, Mapping[str, str | int | float | bool | t.StrSequence]
+ConfigSection: TypeAlias = MutableMapping[str, str | int | float | bool | t.StrSequence]
+ConfigData: TypeAlias = MutableMapping[
+    str, MutableMapping[str, str | int | float | bool | t.StrSequence]
 ]
 RawSectionValue: TypeAlias = (
     str | int | float | bool | Sequence[str | int | float | bool]
@@ -170,7 +170,7 @@ class ConfigManager:
         else:
             self.config_dir = Path(config_dir)
 
-        self._cache: Mapping[str, ConfigData] = {}
+        self._cache: MutableMapping[str, ConfigData] = {}
         self._audit_rules: AuditRules | None = None
         self._style_guide: StyleGuide | None = None
         self._validation_config: ValidationConfig | None = None

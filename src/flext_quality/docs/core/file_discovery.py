@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import fnmatch
 import logging
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import ClassVar, NotRequired, TypedDict
@@ -36,7 +36,7 @@ class DocumentationFinder:
     """Documentation file discovery and filtering system."""
 
     # Common documentation file patterns
-    DEFAULT_PATTERNS: ClassVar[t.StrSequence] = [
+    DEFAULT_PATTERNS: ClassVar[MutableSequence[str]] = [
         "**/*.md",
         "**/*.mdx",
         "**/*.rst",
@@ -61,7 +61,7 @@ class DocumentationFinder:
     DOCS_ROOT_DEPTH: int = 2
 
     # Default ignore patterns
-    DEFAULT_IGNORE_PATTERNS: ClassVar[t.StrSequence] = [
+    DEFAULT_IGNORE_PATTERNS: ClassVar[MutableSequence[str]] = [
         "**/node_modules/**",
         "**/build/**",
         "**/dist/**",
@@ -102,16 +102,16 @@ class DocumentationFinder:
 
         """
         self.project_root = project_root.resolve()
-        self.patterns = patterns or self.DEFAULT_PATTERNS.copy()
-        self.ignore_patterns = ignore_patterns or self.DEFAULT_IGNORE_PATTERNS.copy()
+        self.patterns: MutableSequence[str] = [v for v in patterns] if patterns else [v for v in self.DEFAULT_PATTERNS]
+        self.ignore_patterns: MutableSequence[str] = [v for v in ignore_patterns] if ignore_patterns else [v for v in self.DEFAULT_IGNORE_PATTERNS]
         self.ignore_file = ignore_file or ".gitignore"
 
         # Load ignore patterns from file if it exists
         self._load_ignore_file()
 
         # Cache for found files
-        self._file_cache: Sequence[Path] | None = None
-        self._metadata_cache: Mapping[str, m.Quality.FileMetadata] = {}
+        self._file_cache: MutableSequence[Path] | None = None
+        self._metadata_cache: MutableMapping[str, m.Quality.FileMetadata] = {}
 
     def _load_ignore_file(self) -> None:
         """Load ignore patterns from .gitignore or similar file."""
@@ -177,9 +177,9 @@ class DocumentationFinder:
 
         """
         if use_cache and self._file_cache is not None:
-            return self._file_cache.copy()
+            return [v for v in self._file_cache]
 
-        found_files: Sequence[Path] = []
+        found_files: MutableSequence[Path] = []
 
         for pattern in self.patterns:
             try:
@@ -202,7 +202,7 @@ class DocumentationFinder:
 
         # Remove duplicates while preserving order
         seen: set[str] = set()
-        unique_files: Sequence[Path] = []
+        unique_files: MutableSequence[Path] = []
         for file_path in found_files:
             file_str = str(file_path)
             if file_str not in seen:
@@ -213,7 +213,7 @@ class DocumentationFinder:
         unique_files.sort(key=str)
 
         if use_cache:
-            self._file_cache = unique_files.copy()
+            self._file_cache = [v for v in unique_files]
 
         return unique_files
 
@@ -278,7 +278,7 @@ class DocumentationFinder:
 
         return [self.get_file_metadata(f) for f in files]
 
-    def _initialize_categories(self) -> Mapping[str, Sequence[Path]]:
+    def _initialize_categories(self) -> MutableMapping[str, MutableSequence[Path]]:
         """Initialize empty category dictionaries."""
         return {
             "readme": [],
@@ -328,7 +328,7 @@ class DocumentationFinder:
     def categorize_files(
         self,
         files: Sequence[Path] | None = None,
-    ) -> Mapping[str, Sequence[Path]]:
+    ) -> MutableMapping[str, MutableSequence[Path]]:
         """Categorize files by type and location."""
         if files is None:
             files = self.find_files()
@@ -412,7 +412,7 @@ class DocumentationFinder:
     def invalidate_cache(self) -> None:
         """Invalidate the file cache."""
         self._file_cache = None
-        self._metadata_cache.clear()
+        self._metadata_cache = {}
 
     def add_pattern(self, pattern: str) -> None:
         """Add a custom search pattern."""

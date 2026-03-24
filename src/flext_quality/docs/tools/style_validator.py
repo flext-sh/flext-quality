@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import operator
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TypedDict
@@ -34,9 +34,9 @@ class FileResults(TypedDict):
     """Results from validating a single file."""
 
     file: str
-    violations: Sequence[StyleIssue]
-    issues: Sequence[StyleIssue]
-    suggestions: t.StrSequence
+    violations: MutableSequence[StyleIssue]
+    issues: MutableSequence[StyleIssue]
+    suggestions: MutableSequence[str]
 
 
 class MarkdownConfig(TypedDict, total=False):
@@ -94,10 +94,10 @@ class ValidationResults(TypedDict):
     """Complete validation results."""
 
     files_checked: int
-    style_violations: Sequence[StyleIssue]
-    accessibility_issues: Sequence[StyleIssue]
-    formatting_errors: Sequence[StyleIssue]
-    suggestions: t.StrSequence
+    style_violations: MutableSequence[StyleIssue]
+    accessibility_issues: MutableSequence[StyleIssue]
+    formatting_errors: MutableSequence[StyleIssue]
+    suggestions: MutableSequence[str]
     summary: SummaryMetrics
 
 
@@ -261,9 +261,9 @@ class StyleValidator:
                 file_path.relative_to(file_path.parents[2]),
             )
 
-            violations_list: Sequence[StyleIssue] = []
-            issues_list: Sequence[StyleIssue] = []
-            suggestions_list: t.StrSequence = []
+            violations_list: MutableSequence[StyleIssue] = []
+            issues_list: MutableSequence[StyleIssue] = []
+            suggestions_list: MutableSequence[str] = []
             file_results: FileResults = {
                 "file": filename,
                 "violations": violations_list,
@@ -306,7 +306,7 @@ class StyleValidator:
 
     def _check_markdown_formatting(self, content: str) -> Sequence[StyleIssue]:
         """Check basic markdown formatting consistency."""
-        violations: Sequence[StyleIssue] = []
+        violations: MutableSequence[StyleIssue] = []
 
         lines = content.split("\n")
 
@@ -338,9 +338,9 @@ class StyleValidator:
 
     def _check_heading_consistency(self, content: str) -> Sequence[StyleIssue]:
         """Check heading hierarchy and consistency."""
-        violations: Sequence[StyleIssue] = []
+        violations: MutableSequence[StyleIssue] = []
 
-        headings: Sequence[tuple[int, str, int]] = []
+        headings: MutableSequence[tuple[int, str, int]] = []
         for match in re.finditer(r"^(#{1,6})\s+(.+)$", content, re.MULTILINE):
             level = len(match.group(1))
             text = match.group(2).strip()
@@ -375,9 +375,9 @@ class StyleValidator:
 
     def _check_list_consistency(self, content: str) -> Sequence[StyleIssue]:
         """Check list formatting consistency."""
-        violations: Sequence[StyleIssue] = []
+        violations: MutableSequence[StyleIssue] = []
 
-        list_items: Sequence[tuple[str, str, int]] = []
+        list_items: MutableSequence[tuple[str, str, int]] = []
         for match in re.finditer(r"^(\s*)([-\*\+])\s+", content, re.MULTILINE):
             indent = match.group(1)
             marker = match.group(2)
@@ -408,7 +408,7 @@ class StyleValidator:
 
     def _check_code_formatting(self, content: str) -> Sequence[StyleIssue]:
         """Check code block and inline code formatting."""
-        violations: Sequence[StyleIssue] = []
+        violations: MutableSequence[StyleIssue] = []
 
         markdown_config = self.config.get("markdown", {})
         code_block_style = markdown_config.get("code_block_style", "fenced")
@@ -450,7 +450,7 @@ class StyleValidator:
 
     def _check_accessibility(self, content: str) -> Sequence[StyleIssue]:
         """Check accessibility compliance."""
-        issues: Sequence[StyleIssue] = []
+        issues: MutableSequence[StyleIssue] = []
 
         accessibility_config = self.config.get("accessibility", {})
         require_alt_text = accessibility_config.get("require_alt_text", True)
@@ -488,7 +488,7 @@ class StyleValidator:
 
     def _check_line_length(self, content: str) -> Sequence[StyleIssue]:
         """Check line length compliance."""
-        violations: Sequence[StyleIssue] = []
+        violations: MutableSequence[StyleIssue] = []
 
         formatting_config = self.config.get("formatting", {})
         max_length_val = formatting_config.get("max_line_length", 88)
@@ -515,7 +515,7 @@ class StyleValidator:
 
     def _check_whitespace(self, content: str) -> Sequence[StyleIssue]:
         """Check whitespace formatting."""
-        violations: Sequence[StyleIssue] = []
+        violations: MutableSequence[StyleIssue] = []
 
         lines = content.split("\n")
 
@@ -547,9 +547,9 @@ class StyleValidator:
 
     def _generate_suggestions(self, violations: Sequence[StyleIssue]) -> t.StrSequence:
         """Generate improvement suggestions based on violations."""
-        suggestions: t.StrSequence = []
+        suggestions: MutableSequence[str] = []
 
-        violation_types: Mapping[str, int] = {}
+        violation_types: MutableMapping[str, int] = {}
         for violation in violations:
             v_type = violation["type"]
             violation_types[v_type] = violation_types.get(v_type, 0) + 1
@@ -590,7 +590,7 @@ class StyleValidator:
         self.results["summary"]["accessibility_issues"] = len(accessibility_issues)
         self.results["summary"]["suggestions_count"] = len(suggestions)
 
-        all_violations: Sequence[StyleIssue] = []
+        all_violations: MutableSequence[StyleIssue] = []
         all_violations.extend(style_violations)
         all_violations.extend(accessibility_issues)
 
@@ -630,7 +630,7 @@ Top Issues:
 """
 
         # Count issue types
-        issue_types: Mapping[str, int] = {}
+        issue_types: MutableMapping[str, int] = {}
         for violation in (
             self.results["style_violations"] + self.results["accessibility_issues"]
         ):

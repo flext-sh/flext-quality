@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import argparse
 import re
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableSequence, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -153,7 +153,7 @@ class DocumentationAuditor:
 
     def find_documentation_files(self) -> Sequence[Path]:
         """Find all documentation files in the project."""
-        doc_files: Sequence[Path] = []
+        doc_files: MutableSequence[Path] = []
         patterns = [
             "**/*.md",
             "**/*.mdx",
@@ -244,9 +244,9 @@ class DocumentationAuditor:
                     "error": str(e),
                 })
 
-    def _check_outdated_indicators(self, content: str) -> t.StrSequence:
+    def _check_outdated_indicators(self, content: str) -> MutableSequence[str]:
         """Check for indicators of outdated content."""
-        indicators: t.StrSequence = []
+        indicators: MutableSequence[str] = []
         if re.search(
             r"\\b\\d+\\.\\d+\\.\\d+.*TODO|FIXME|placeholder", content, re.IGNORECASE
         ):
@@ -319,9 +319,9 @@ class DocumentationAuditor:
 
     def _check_required_sections(
         self, content: str, required_sections: t.StrSequence
-    ) -> t.StrSequence:
+    ) -> MutableSequence[str]:
         """Check for required sections in documentation."""
-        missing: t.StrSequence = []
+        missing: MutableSequence[str] = []
         for section in required_sections:
             pattern = f"^#+\\s.*{re.escape(section)}.*$"
             if not re.search(pattern, content, re.MULTILINE | re.IGNORECASE):
@@ -383,9 +383,9 @@ class DocumentationAuditor:
                     "error": str(e),
                 })
 
-    def _check_markdown_formatting(self, content: str) -> t.StrSequence:
+    def _check_markdown_formatting(self, content: str) -> MutableSequence[str]:
         """Check for markdown formatting issues."""
-        issues: t.StrSequence = []
+        issues: MutableSequence[str] = []
         formatting_cfg = self.style_guide.formatting
         unordered_lists = re.findall(r"^[\\s]*[-\\*\\+]", content, re.MULTILINE)
         if len(set(unordered_lists)) > 1:
@@ -406,9 +406,9 @@ class DocumentationAuditor:
             issues.append(f"{len(long_lines)} lines exceed {max_length} characters")
         return issues
 
-    def _check_accessibility(self, content: str) -> Sequence[t.StrMapping]:
+    def _check_accessibility(self, content: str) -> MutableSequence[t.StrMapping]:
         """Check accessibility compliance."""
-        issues: Sequence[t.StrMapping] = []
+        issues: MutableSequence[t.StrMapping] = []
         accessibility_cfg = self.style_guide.accessibility
         if accessibility_cfg.require_alt_text:
             images_without_alt = re.findall(r"!\\[\\]\\([^)]+\\)", content)
@@ -452,8 +452,8 @@ class DocumentationAuditor:
     def check_links_and_references(self, doc_files: Sequence[Path]) -> None:
         """Check links and references for validity."""
         link_validation = self.validation_config.link_validation
-        all_links: Sequence[Mapping[str, str | int]] = []
-        image_refs: Sequence[t.StrMapping] = []
+        all_links: MutableSequence[Mapping[str, str | int]] = []
+        image_refs: MutableSequence[t.StrMapping] = []
         for file_path in doc_files:
             try:
                 content = file_path.read_text(encoding="utf-8")
@@ -612,7 +612,7 @@ class DocumentationAuditor:
         """Generate actionable recommendations based on audit results."""
         metrics = self.results.metrics
         issues = self.results.issues
-        recommendations: Sequence[AuditRecommendation] = []
+        recommendations: MutableSequence[AuditRecommendation] = []
         quality_score = metrics.quality_score
         if quality_score < 50:
             recommendations.append(

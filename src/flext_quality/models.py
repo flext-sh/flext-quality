@@ -6,7 +6,7 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
 from typing import Annotated
 
@@ -128,12 +128,12 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             total_items: int = Field(default=0)
             valid_items: int = Field(default=0)
             invalid_items: int = Field(default=0)
-            issues: Sequence[FlextQualityModels.Quality.Issue] = Field(
+            issues: MutableSequence[FlextQualityModels.Quality.Issue] = Field(
                 default_factory=list
             )
-            warnings: t.StrSequence = Field(default_factory=list)
-            errors: t.StrSequence = Field(default_factory=list)
-            metadata: Mapping[str, t.Primitives] = Field(default_factory=dict)
+            warnings: MutableSequence[str] = Field(default_factory=list)
+            errors: MutableSequence[str] = Field(default_factory=list)
+            metadata: MutableMapping[str, t.Primitives] = Field(default_factory=dict)
 
             @property
             def success_rate(self) -> float:
@@ -224,10 +224,10 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             enabled: bool = True
             reports_dir: str
             backup_dir: str
-            schedules: Mapping[str, FlextQualityModels.Quality.ScheduleEntry] = Field(
+            schedules: MutableMapping[str, FlextQualityModels.Quality.ScheduleEntry] = Field(
                 default_factory=dict
             )
-            tasks: Mapping[str, FlextQualityModels.Quality.ScheduleTaskConfig] = Field(
+            tasks: MutableMapping[str, FlextQualityModels.Quality.ScheduleTaskConfig] = Field(
                 default_factory=dict
             )
             error_handling: FlextQualityModels.Quality.ErrorHandlingConfig
@@ -238,8 +238,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             start_time: str
             tasks_completed: int = 0
-            errors: t.StrSequence = Field(default_factory=list)
-            warnings: t.StrSequence = Field(default_factory=list)
+            errors: MutableSequence[str] = Field(default_factory=list)
+            warnings: MutableSequence[str] = Field(default_factory=list)
             end_time: str = ""
             duration_seconds: int = 0
 
@@ -247,7 +247,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Typed metrics for documentation audit results."""
 
             total_issues: int = 0
-            severity_breakdown: Mapping[str, int] = Field(default_factory=dict)
+            severity_breakdown: MutableMapping[str, int] = Field(default_factory=dict)
             quality_score: int = 0
             files_analyzed: int = 0
             issues_per_file: float = 0.0
@@ -265,8 +265,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             timestamp: str
             files_analyzed: int = 0
-            issues: Sequence[
-                Mapping[
+            issues: MutableSequence[
+                MutableMapping[
                     str,
                     t.Primitives | t.StrSequence | Sequence[t.StrMapping] | None,
                 ]
@@ -274,7 +274,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             metrics: FlextQualityModels.Quality.AuditMetrics = Field(
                 default_factory=lambda: FlextQualityModels.Quality.AuditMetrics()
             )
-            recommendations: Sequence[
+            recommendations: MutableSequence[
                 FlextQualityModels.Quality.AuditRecommendation
             ] = Field(default_factory=list)
 
@@ -316,10 +316,10 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             valid_links: int = 0
             broken_links: int = 0
             warnings: int = 0
-            errors: Sequence[FlextQualityModels.Quality.LinkCheckResult] = Field(
+            errors: MutableSequence[FlextQualityModels.Quality.LinkCheckResult] = Field(
                 default_factory=list
             )
-            warnings_list: Sequence[FlextQualityModels.Quality.LinkCheckResult] = Field(
+            warnings_list: MutableSequence[FlextQualityModels.Quality.LinkCheckResult] = Field(
                 default_factory=list
             )
 
@@ -328,10 +328,10 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             timestamp: str
             files_checked: int = 0
-            content_issues: Sequence[FlextQualityModels.Quality.ContentIssue] = Field(
+            content_issues: MutableSequence[FlextQualityModels.Quality.ContentIssue] = Field(
                 default_factory=list
             )
-            quality_metrics: t.ConfigurationMapping = Field(default_factory=dict)
+            quality_metrics: MutableMapping[str, t.Scalar] = Field(default_factory=dict)
 
         class ContentMetrics(BaseModel):
             """Content quality metrics for a documentation file."""
@@ -430,7 +430,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Results for documentation notification runs."""
 
             notifications_sent: int = 0
-            errors: t.StrSequence = Field(default_factory=list)
+            errors: MutableSequence[str] = Field(default_factory=list)
             timestamp: str
 
         class QualityThresholdsConfig(BaseModel):
@@ -551,10 +551,10 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             timestamp: str
             files_processed: int = 0
             changes_made: int = 0
-            backups_created: t.StrSequence = Field(
+            backups_created: MutableSequence[str] = Field(
                 default_factory=FlextQualityModels.Quality._empty_list_str
             )
-            optimizations: Sequence[t.StrMapping] = Field(
+            optimizations: MutableSequence[MutableMapping[str, str]] = Field(
                 default_factory=FlextQualityModels.Quality._empty_list_dict_str_str
             )
 

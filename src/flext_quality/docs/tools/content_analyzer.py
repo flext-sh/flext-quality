@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import re
 from collections import Counter
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TypedDict
@@ -72,11 +72,11 @@ class CompletenessDict(TypedDict, total=False):
     """Completeness check dictionary structure."""
 
     score: int
-    missing_elements: t.StrSequence
-    required_sections_present: t.StrSequence
-    optional_sections_present: t.StrSequence
+    missing_elements: MutableSequence[str]
+    required_sections_present: MutableSequence[str]
+    optional_sections_present: MutableSequence[str]
     word_count_sufficient: bool
-    missing_required_sections: t.StrSequence
+    missing_required_sections: MutableSequence[str]
 
 
 class IssueDict(TypedDict, total=False):
@@ -96,8 +96,8 @@ class AnalysisDict(TypedDict, total=False):
     structure: StructureDict
     completeness: CompletenessDict
     quality_score: float
-    issues: Sequence[IssueDict]
-    suggestions: t.StrSequence
+    issues: MutableSequence[IssueDict]
+    suggestions: MutableSequence[str]
     error: str
 
 
@@ -107,18 +107,18 @@ class RecommendationDict(TypedDict, total=False):
     priority: str
     type: str
     message: str
-    actions: t.StrSequence
+    actions: MutableSequence[str]
 
 
 class ResultsDict(TypedDict):
     """Results dictionary structure."""
 
     files_analyzed: int
-    quality_metrics: Mapping[str, MetricsDict]
-    content_scores: Mapping[str, float]
-    readability_stats: Mapping[str, ReadabilityDict]
-    completeness_checks: Mapping[str, CompletenessDict]
-    recommendations: Sequence[RecommendationDict | str]
+    quality_metrics: MutableMapping[str, MetricsDict]
+    content_scores: MutableMapping[str, float]
+    readability_stats: MutableMapping[str, ReadabilityDict]
+    completeness_checks: MutableMapping[str, CompletenessDict]
+    recommendations: MutableSequence[RecommendationDict | str]
 
 
 _RESULTS_ADAPTER: TypeAdapter[ResultsDict] = TypeAdapter(ResultsDict)
@@ -152,11 +152,11 @@ class ContentAnalyzer:
         """
         self.config: Mapping[str, Mapping[str, bool] | Mapping[str, int] | str] = {}
         self.load_config(config_path)
-        quality_metrics: Mapping[str, MetricsDict] = {}
-        content_scores: Mapping[str, float] = {}
-        readability_stats: Mapping[str, ReadabilityDict] = {}
-        completeness_checks: Mapping[str, CompletenessDict] = {}
-        recommendations: Sequence[RecommendationDict | str] = []
+        quality_metrics: MutableMapping[str, MetricsDict] = {}
+        content_scores: MutableMapping[str, float] = {}
+        readability_stats: MutableMapping[str, ReadabilityDict] = {}
+        completeness_checks: MutableMapping[str, CompletenessDict] = {}
+        recommendations: MutableSequence[RecommendationDict | str] = []
         self.results: ResultsDict = {
             "files_analyzed": 0,
             "quality_metrics": quality_metrics,
@@ -203,8 +203,8 @@ class ContentAnalyzer:
         try:
             content = file_path.read_text(encoding="utf-8")
             filename = str(file_path.relative_to(file_path.parents[2]))
-            issues_list: Sequence[IssueDict] = []
-            suggestions_list: t.StrSequence = []
+            issues_list: MutableSequence[IssueDict] = []
+            suggestions_list: MutableSequence[str] = []
             analysis: AnalysisDict = {
                 "file": filename,
                 "metrics": self._calculate_content_metrics(content),
@@ -382,8 +382,8 @@ class ContentAnalyzer:
 
     def _analyze_structure(self, content: str) -> StructureDict:
         """Analyze document structure and organization."""
-        sections_list: Sequence[Mapping[str, int | str]] = []
-        depth_analysis_dict: Mapping[str, int | float] = {}
+        sections_list: MutableSequence[Mapping[str, int | str]] = []
+        depth_analysis_dict: MutableMapping[str, int | float] = {}
         structure: StructureDict = {
             "has_table_of_contents": False,
             "toc_position": 0,
@@ -407,7 +407,7 @@ class ContentAnalyzer:
                 ) + 1
                 break
 
-        headings: Sequence[Mapping[str, int | str]] = []
+        headings: MutableSequence[Mapping[str, int | str]] = []
         for match in re.finditer(r"^(#{1,6})\s+(.+)$", content, re.MULTILINE):
             level = len(match.group(1))
             title = match.group(2).strip()
@@ -443,16 +443,16 @@ class ContentAnalyzer:
         filename: str,
     ) -> CompletenessDict:
         """Check documentation completeness based on file type and content."""
-        missing_elems: t.StrSequence = []
-        required_present: t.StrSequence = []
-        optional_present: t.StrSequence = []
+        missing_elems: MutableSequence[str] = []
+        required_present: MutableSequence[str] = []
+        optional_present: MutableSequence[str] = []
         completeness: CompletenessDict = {
             "score": 100,
             "missing_elements": missing_elems,
             "required_sections_present": required_present,
             "optional_sections_present": optional_present,
             "word_count_sufficient": True,
-            "missing_required_sections": t.StrSequence(),
+            "missing_required_sections": [],
         }
 
         word_count = len(re.findall(r"\b\w+\b", content))

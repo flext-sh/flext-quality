@@ -7,7 +7,7 @@ Provides consistent interfaces and shared functionality.
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from collections.abc import Mapping, Sequence
+from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -23,7 +23,7 @@ class BaseAuditor(ABC):
     def __init__(self, name: str) -> None:
         """Initialize the audit base class with a name."""
         self.name = name
-        self.issues: Sequence[m.Quality.Issue] = []
+        self.issues: MutableSequence[m.Quality.Issue] = []
         self.start_time: datetime | None = None
         self.end_time: datetime | None = None
 
@@ -158,7 +158,7 @@ class BaseAnalyzer(ABC):
     def __init__(self, name: str) -> None:
         """Initialize the analyzer base class with a name."""
         self.name = name
-        self.metrics: Mapping[str, t.Primitives | None] = {}
+        self.metrics: MutableMapping[str, t.Primitives | None] = {}
 
     def analyze(
         self, content: str, filepath: Path | None = None
