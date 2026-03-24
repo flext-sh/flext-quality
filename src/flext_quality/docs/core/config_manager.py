@@ -20,9 +20,7 @@ ConfigData = MutableMapping[
     str,
     MutableMapping[str, str | int | float | bool | t.StrSequence],
 ]
-RawSectionValue = (
-    str | int | float | bool | Sequence[str | int | float | bool]
-)
+RawSectionValue = str | int | float | bool | Sequence[str | int | float | bool]
 RawSectionMap = Mapping[
     str,
     str | int | float | bool | Sequence[str | int | float | bool],

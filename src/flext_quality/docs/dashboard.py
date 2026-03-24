@@ -104,15 +104,32 @@ class FlextQualityDocumentationDashboard:
 
         try:
             data = _DICT_ADAPTER.validate_json(Path(latest_audit).read_bytes())
+            metrics_raw = data.get("metrics")
+            metrics: Mapping[str, int] = (
+                metrics_raw if isinstance(metrics_raw, Mapping) else {}
+            )
+            severity_raw = (
+                metrics.get("severity_breakdown")
+                if isinstance(metrics, Mapping)
+                else None
+            )
+            severity: Mapping[str, int] = (
+                severity_raw if isinstance(severity_raw, Mapping) else {}
+            )
+            files_analyzed_raw = data.get("files_analyzed")
+            timestamp_raw = data.get("timestamp")
             return {
-                "quality_score": data.get("metrics", {}).get("quality_score", 0),
-                "files_analyzed": data.get("files_analyzed", 0),
-                "total_issues": data.get("metrics", {}).get("total_issues", 0),
-                "severity_breakdown": data.get("metrics", {}).get(
-                    "severity_breakdown",
-                    {},
+                "quality_score": metrics.get("quality_score", 0),
+                "files_analyzed": (
+                    files_analyzed_raw if isinstance(files_analyzed_raw, int) else 0
                 ),
-                "timestamp": data.get("timestamp", datetime.now(UTC).isoformat()),
+                "total_issues": metrics.get("total_issues", 0),
+                "severity_breakdown": severity,
+                "timestamp": (
+                    timestamp_raw
+                    if isinstance(timestamp_raw, str)
+                    else datetime.now(UTC).isoformat()
+                ),
                 "status": "Current",
             }
         except (FileNotFoundError, ValueError, KeyError, OSError) as e:

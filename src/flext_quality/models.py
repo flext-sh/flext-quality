@@ -103,13 +103,25 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
         class Issue(BaseModel):
             """Canonical issue model for documentation tooling."""
 
-            type: str = Field(description="Issue type identifier")
-            severity: str = Field(description="Severity level identifier")
-            file: str = Field(description="File path where issue was found")
-            line: int | None = Field(default=None, description="Issue line number")
-            description: str = Field(default="", description="Issue description")
-            recommendation: str = Field(default="", description="Recommended fix")
-            context: Mapping[str, t.Primitives | None] | None = Field(default=None)
+            type: Annotated[str, Field(description="Issue type identifier")]
+            severity: Annotated[str, Field(description="Severity level identifier")]
+            file: Annotated[str, Field(description="File path where issue was found")]
+            line: Annotated[
+                int | None,
+                Field(default=None, description="Issue line number"),
+            ]
+            description: Annotated[
+                str,
+                Field(default="", description="Issue description"),
+            ]
+            recommendation: Annotated[
+                str,
+                Field(default="", description="Recommended fix"),
+            ]
+            context: Annotated[
+                Mapping[str, t.Primitives | None] | None,
+                Field(default=None),
+            ]
 
             def to_dict(
                 self,
@@ -128,15 +140,21 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
         class ValidationResult(BaseModel):
             """Canonical validation result for documentation tooling."""
 
-            total_items: int = Field(default=0)
-            valid_items: int = Field(default=0)
-            invalid_items: int = Field(default=0)
-            issues: MutableSequence[FlextQualityModels.Quality.Issue] = Field(
-                default_factory=list,
-            )
-            warnings: MutableSequence[str] = Field(default_factory=list)
-            errors: MutableSequence[str] = Field(default_factory=list)
-            metadata: MutableMapping[str, t.Primitives] = Field(default_factory=dict)
+            total_items: Annotated[int, Field(default=0)]
+            valid_items: Annotated[int, Field(default=0)]
+            invalid_items: Annotated[int, Field(default=0)]
+            issues: Annotated[
+                MutableSequence[FlextQualityModels.Quality.Issue],
+                Field(
+                    default_factory=list,
+                ),
+            ]
+            warnings: Annotated[MutableSequence[str], Field(default_factory=list)]
+            errors: Annotated[MutableSequence[str], Field(default_factory=list)]
+            metadata: Annotated[
+                MutableMapping[str, t.Primitives],
+                Field(default_factory=dict),
+            ]
 
             @property
             def success_rate(self) -> float:
@@ -195,21 +213,21 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             description: str
             command: str
-            timeout: t.PositiveInt = Field(default=300)
+            timeout: Annotated[t.PositiveInt, Field(default=300)]
 
         class ScheduleEntry(BaseModel):
             """Single schedule entry definition."""
 
             enabled: bool = True
             time: str
-            tasks: t.StrSequence = Field(default_factory=list)
+            tasks: Annotated[t.StrSequence, Field(default_factory=list)]
             day: str | None = None
 
         class ErrorHandlingConfig(BaseModel):
             """Error handling settings for scheduled maintenance."""
 
-            max_retries: t.NonNegativeInt = Field(default=3)
-            retry_delay: t.NonNegativeInt = Field(default=60)
+            max_retries: Annotated[t.NonNegativeInt, Field(default=3)]
+            retry_delay: Annotated[t.NonNegativeInt, Field(default=60)]
             fail_fast: bool = False
             notify_on_failure: bool = True
 
@@ -219,7 +237,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             enabled: bool = True
             log_file: str
             max_log_size: str = "10MB"
-            retention_days: t.PositiveInt = Field(default=30)
+            retention_days: Annotated[t.PositiveInt, Field(default=30)]
 
         class MaintenanceConfig(BaseModel):
             """Root configuration for scheduled documentation maintenance."""
@@ -230,10 +248,13 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             schedules: MutableMapping[str, FlextQualityModels.Quality.ScheduleEntry] = (
                 Field(default_factory=dict)
             )
-            tasks: MutableMapping[
-                str,
-                FlextQualityModels.Quality.ScheduleTaskConfig,
-            ] = Field(default_factory=dict)
+            tasks: Annotated[
+                MutableMapping[
+                    str,
+                    FlextQualityModels.Quality.ScheduleTaskConfig,
+                ],
+                Field(default_factory=dict),
+            ]
             error_handling: FlextQualityModels.Quality.ErrorHandlingConfig
             logging: FlextQualityModels.Quality.LoggingConfig
 
@@ -242,8 +263,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             start_time: str
             tasks_completed: int = 0
-            errors: MutableSequence[str] = Field(default_factory=list)
-            warnings: MutableSequence[str] = Field(default_factory=list)
+            errors: Annotated[MutableSequence[str], Field(default_factory=list)]
+            warnings: Annotated[MutableSequence[str], Field(default_factory=list)]
             end_time: str = ""
             duration_seconds: int = 0
 
@@ -251,7 +272,10 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Typed metrics for documentation audit results."""
 
             total_issues: int = 0
-            severity_breakdown: MutableMapping[str, int] = Field(default_factory=dict)
+            severity_breakdown: Annotated[
+                MutableMapping[str, int],
+                Field(default_factory=dict),
+            ]
             quality_score: int = 0
             files_analyzed: int = 0
             issues_per_file: float = 0.0
@@ -262,25 +286,32 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             priority: str
             category: str
             recommendation: str
-            actions: t.StrSequence = Field(default_factory=list)
+            actions: Annotated[t.StrSequence, Field(default_factory=list)]
 
         class AuditorResults(BaseModel):
             """Results for documentation audit execution."""
 
             timestamp: str
             files_analyzed: int = 0
-            issues: MutableSequence[
-                MutableMapping[
-                    str,
-                    t.Primitives | t.StrSequence | Sequence[t.StrMapping] | None,
-                ]
-            ] = Field(default_factory=list)
-            metrics: FlextQualityModels.Quality.AuditMetrics = Field(
-                default_factory=lambda: FlextQualityModels.Quality.AuditMetrics(),
-            )
-            recommendations: MutableSequence[
-                FlextQualityModels.Quality.AuditRecommendation
-            ] = Field(default_factory=list)
+            issues: Annotated[
+                MutableSequence[
+                    MutableMapping[
+                        str,
+                        t.Primitives | t.StrSequence | Sequence[t.StrMapping] | None,
+                    ]
+                ],
+                Field(default_factory=list),
+            ]
+            metrics: Annotated[
+                FlextQualityModels.Quality.AuditMetrics,
+                Field(
+                    default_factory=lambda: FlextQualityModels.Quality.AuditMetrics(),
+                ),
+            ]
+            recommendations: Annotated[
+                MutableSequence[FlextQualityModels.Quality.AuditRecommendation],
+                Field(default_factory=list),
+            ]
 
         class LinkRecord(BaseModel):
             """Record of a link found in documentation."""
@@ -320,12 +351,16 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             valid_links: int = 0
             broken_links: int = 0
             warnings: int = 0
-            errors: MutableSequence[FlextQualityModels.Quality.LinkCheckResult] = Field(
-                default_factory=list,
-            )
-            warnings_list: MutableSequence[
-                FlextQualityModels.Quality.LinkCheckResult
-            ] = Field(default_factory=list)
+            errors: Annotated[
+                MutableSequence[FlextQualityModels.Quality.LinkCheckResult],
+                Field(
+                    default_factory=list,
+                ),
+            ]
+            warnings_list: Annotated[
+                MutableSequence[FlextQualityModels.Quality.LinkCheckResult],
+                Field(default_factory=list),
+            ]
 
         class ContentValidatorResults(BaseModel):
             """Results for documentation content validation."""
@@ -335,7 +370,10 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             content_issues: MutableSequence[FlextQualityModels.Quality.ContentIssue] = (
                 Field(default_factory=list)
             )
-            quality_metrics: MutableMapping[str, t.Scalar] = Field(default_factory=dict)
+            quality_metrics: Annotated[
+                MutableMapping[str, t.Scalar],
+                Field(default_factory=dict),
+            ]
 
         class ContentMetrics(BaseModel):
             """Content quality metrics for a documentation file."""
@@ -372,7 +410,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Threshold-based alert configuration."""
 
             enabled: bool = True
-            threshold: t.NonNegativeInt = Field(default=0)
+            threshold: Annotated[t.NonNegativeInt, Field(default=0)]
 
         class AlertToggleConfig(BaseModel):
             """Simple on/off alert configuration."""
@@ -396,7 +434,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             username: str
             password: str
             from_address: str
-            to_addresses: t.StrSequence = Field(default_factory=list)
+            to_addresses: Annotated[t.StrSequence, Field(default_factory=list)]
 
         class SlackConfig(BaseModel):
             """Slack notification configuration."""
@@ -409,8 +447,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Generic webhook configuration."""
 
             url: str
-            headers: t.StrMapping = Field(default_factory=dict)
-            timeout: t.PositiveInt = Field(default=30)
+            headers: Annotated[t.StrMapping, Field(default_factory=dict)]
+            timeout: Annotated[t.PositiveInt, Field(default=30)]
 
         class ChannelsConfig(BaseModel):
             """Enabled channels for documentation notifications."""
@@ -434,7 +472,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Results for documentation notification runs."""
 
             notifications_sent: int = 0
-            errors: MutableSequence[str] = Field(default_factory=list)
+            errors: Annotated[MutableSequence[str], Field(default_factory=list)]
             timestamp: str
 
         class QualityThresholdsConfig(BaseModel):
@@ -456,10 +494,10 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
         class SeverityLevelsConfig(BaseModel):
             """Configuration for severity level categorization."""
 
-            critical: t.StrSequence = Field(default_factory=list)
-            high: t.StrSequence = Field(default_factory=list)
-            medium: t.StrSequence = Field(default_factory=list)
-            low: t.StrSequence = Field(default_factory=list)
+            critical: Annotated[t.StrSequence, Field(default_factory=list)]
+            high: Annotated[t.StrSequence, Field(default_factory=list)]
+            medium: Annotated[t.StrSequence, Field(default_factory=list)]
+            low: Annotated[t.StrSequence, Field(default_factory=list)]
 
         class AuditRulesConfig(BaseModel):
             """Configuration for audit rules and thresholds."""
@@ -471,16 +509,22 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
                     ),
                 )
             )
-            content_checks: FlextQualityModels.Quality.ContentChecksConfig = Field(
-                default_factory=lambda: (
-                    FlextQualityModels.Quality.ContentChecksConfig()
+            content_checks: Annotated[
+                FlextQualityModels.Quality.ContentChecksConfig,
+                Field(
+                    default_factory=lambda: (
+                        FlextQualityModels.Quality.ContentChecksConfig()
+                    ),
                 ),
-            )
-            severity_levels: FlextQualityModels.Quality.SeverityLevelsConfig = Field(
-                default_factory=lambda: (
-                    FlextQualityModels.Quality.SeverityLevelsConfig()
+            ]
+            severity_levels: Annotated[
+                FlextQualityModels.Quality.SeverityLevelsConfig,
+                Field(
+                    default_factory=lambda: (
+                        FlextQualityModels.Quality.SeverityLevelsConfig()
+                    ),
                 ),
-            )
+            ]
 
         class MarkdownStyleConfig(BaseModel):
             """Configuration for Markdown style preferences."""
@@ -507,19 +551,30 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
         class StyleGuideConfig(BaseModel):
             """Configuration for style guide rules."""
 
-            markdown: FlextQualityModels.Quality.MarkdownStyleConfig = Field(
-                default_factory=lambda: (
-                    FlextQualityModels.Quality.MarkdownStyleConfig()
+            markdown: Annotated[
+                FlextQualityModels.Quality.MarkdownStyleConfig,
+                Field(
+                    default_factory=lambda: (
+                        FlextQualityModels.Quality.MarkdownStyleConfig()
+                    ),
                 ),
-            )
-            accessibility: FlextQualityModels.Quality.AccessibilityConfig = Field(
-                default_factory=lambda: (
-                    FlextQualityModels.Quality.AccessibilityConfig()
+            ]
+            accessibility: Annotated[
+                FlextQualityModels.Quality.AccessibilityConfig,
+                Field(
+                    default_factory=lambda: (
+                        FlextQualityModels.Quality.AccessibilityConfig()
+                    ),
                 ),
-            )
-            formatting: FlextQualityModels.Quality.FormattingConfig = Field(
-                default_factory=lambda: FlextQualityModels.Quality.FormattingConfig(),
-            )
+            ]
+            formatting: Annotated[
+                FlextQualityModels.Quality.FormattingConfig,
+                Field(
+                    default_factory=lambda: (
+                        FlextQualityModels.Quality.FormattingConfig()
+                    ),
+                ),
+            ]
 
         class LinkValidationConfig(BaseModel):
             """Configuration for link validation settings."""
@@ -535,25 +590,34 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Configuration for content analysis parameters."""
 
             min_section_depth: int = 2
-            required_sections: t.StrSequence = Field(
-                default_factory=lambda: ["Overview", "Installation", "Usage"],
-            )
+            required_sections: Annotated[
+                t.StrSequence,
+                Field(
+                    default_factory=lambda: ["Overview", "Installation", "Usage"],
+                ),
+            ]
             check_todos: bool = True
             check_fixmes: bool = True
 
         class ValidationConfig(BaseModel):
             """Configuration for validation settings."""
 
-            link_validation: FlextQualityModels.Quality.LinkValidationConfig = Field(
-                default_factory=lambda: (
-                    FlextQualityModels.Quality.LinkValidationConfig()
+            link_validation: Annotated[
+                FlextQualityModels.Quality.LinkValidationConfig,
+                Field(
+                    default_factory=lambda: (
+                        FlextQualityModels.Quality.LinkValidationConfig()
+                    ),
                 ),
-            )
-            content_analysis: FlextQualityModels.Quality.ContentAnalysisConfig = Field(
-                default_factory=lambda: (
-                    FlextQualityModels.Quality.ContentAnalysisConfig()
+            ]
+            content_analysis: Annotated[
+                FlextQualityModels.Quality.ContentAnalysisConfig,
+                Field(
+                    default_factory=lambda: (
+                        FlextQualityModels.Quality.ContentAnalysisConfig()
+                    ),
                 ),
-            )
+            ]
 
         class OptimizerResults(BaseModel):
             """Results of a documentation optimization run."""
@@ -561,10 +625,16 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             timestamp: str
             files_processed: int = 0
             changes_made: int = 0
-            backups_created: MutableSequence[str] = Field(default_factory=list)
-            optimizations: MutableSequence[MutableMapping[str, str]] = Field(
-                default_factory=list,
-            )
+            backups_created: Annotated[
+                MutableSequence[str],
+                Field(default_factory=list),
+            ]
+            optimizations: Annotated[
+                MutableSequence[MutableMapping[str, str]],
+                Field(
+                    default_factory=list,
+                ),
+            ]
 
         class ExecutionRequest(BaseModel):
             """Request payload for a deferred command execution."""
