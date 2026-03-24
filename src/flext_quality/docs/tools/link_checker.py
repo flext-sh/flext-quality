@@ -113,7 +113,7 @@ class LinkChecker:
         self.config: LinkConfigDict = self._get_default_config()
         self.load_config(config_path)
         self.session: _AsyncSession | None = None
-        self.cache: t.ContainerMapping = {}
+        self.cache: t.MutableContainerMapping = {}
         self.results: ResultsDict = {
             "total_links": 0,
             "valid_links": 0,
