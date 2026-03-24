@@ -18,16 +18,19 @@ ConfigPrimitive: TypeAlias = str | int | float | bool
 ConfigValue: TypeAlias = str | int | float | bool | t.StrSequence
 ConfigSection: TypeAlias = MutableMapping[str, str | int | float | bool | t.StrSequence]
 ConfigData: TypeAlias = MutableMapping[
-    str, MutableMapping[str, str | int | float | bool | t.StrSequence]
+    str,
+    MutableMapping[str, str | int | float | bool | t.StrSequence],
 ]
 RawSectionValue: TypeAlias = (
     str | int | float | bool | Sequence[str | int | float | bool]
 )
 RawSectionMap: TypeAlias = Mapping[
-    str, str | int | float | bool | Sequence[str | int | float | bool]
+    str,
+    str | int | float | bool | Sequence[str | int | float | bool],
 ]
 RawConfigMap: TypeAlias = Mapping[
-    str, Mapping[str, str | int | float | bool | Sequence[str | int | float | bool]]
+    str,
+    Mapping[str, str | int | float | bool | Sequence[str | int | float | bool]],
 ]
 
 
@@ -59,7 +62,7 @@ def _as_config_data(value: RawConfigMap | None) -> ConfigData:
     return config
 
 
-class AuditRules:
+class FlextQualityAuditRules:
     """Configuration for audit rules and thresholds."""
 
     def __init__(self, data: ConfigData) -> None:
@@ -86,7 +89,7 @@ class AuditRules:
         return checks.get(check_name, False)
 
 
-class StyleGuide:
+class FlextQualityStyleGuide:
     """Configuration for style and formatting guidelines."""
 
     def __init__(self, data: ConfigData) -> None:
@@ -116,7 +119,7 @@ class StyleGuide:
         return value if isinstance(value, (str, int, float, bool)) else default
 
 
-class ValidationConfig:
+class FlextQualityValidationConfig:
     """Configuration for validation operations."""
 
     def __init__(self, data: ConfigData) -> None:
@@ -125,11 +128,13 @@ class ValidationConfig:
         self.content_validation: ConfigSection = data.get("content_validation", {})
         self.image_validation: ConfigSection = data.get("image_validation", {})
         self.accessibility_validation: ConfigSection = data.get(
-            "accessibility_validation", {}
+            "accessibility_validation",
+            {},
         )
         self.security_validation: ConfigSection = data.get("security_validation", {})
         self.performance_validation: ConfigSection = data.get(
-            "performance_validation", {}
+            "performance_validation",
+            {},
         )
 
     def get_link_setting(
@@ -153,7 +158,7 @@ class ValidationConfig:
         return value if isinstance(value, (str, int, float, bool)) else default
 
 
-class ConfigManager:
+class FlextQualityConfigManager:
     """Centralized configuration management for the documentation maintenance system."""
 
     def __init__(self, config_dir: str | Path | None = None) -> None:

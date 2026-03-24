@@ -42,7 +42,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             matcher: t.StrSequence | None = None
             command: str
             timeout_ms: Annotated[
-                int, Field(default=c.Quality.Defaults.HOOK_TIMEOUT_MS)
+                int,
+                Field(default=c.Quality.Defaults.HOOK_TIMEOUT_MS),
             ]
             enabled: bool = True
 
@@ -51,7 +52,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             continue_execution: Annotated[bool, Field(alias="continue")]
             system_message: Annotated[
-                str | None, Field(default=None, alias="systemMessage")
+                str | None,
+                Field(default=None, alias="systemMessage"),
             ]
             blocked_reason: str | None = None
 
@@ -75,7 +77,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             host: str = "localhost"
             port: int
             timeout_ms: Annotated[
-                int, Field(default=c.Quality.Defaults.INTEGRATION_TIMEOUT_MS)
+                int,
+                Field(default=c.Quality.Defaults.INTEGRATION_TIMEOUT_MS),
             ]
 
         class MemoryObservation(BaseModel):
@@ -129,7 +132,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             valid_items: int = Field(default=0)
             invalid_items: int = Field(default=0)
             issues: MutableSequence[FlextQualityModels.Quality.Issue] = Field(
-                default_factory=list
+                default_factory=list,
             )
             warnings: MutableSequence[str] = Field(default_factory=list)
             errors: MutableSequence[str] = Field(default_factory=list)
@@ -228,7 +231,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
                 Field(default_factory=dict)
             )
             tasks: MutableMapping[
-                str, FlextQualityModels.Quality.ScheduleTaskConfig
+                str,
+                FlextQualityModels.Quality.ScheduleTaskConfig,
             ] = Field(default_factory=dict)
             error_handling: FlextQualityModels.Quality.ErrorHandlingConfig
             logging: FlextQualityModels.Quality.LoggingConfig
@@ -272,7 +276,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
                 ]
             ] = Field(default_factory=list)
             metrics: FlextQualityModels.Quality.AuditMetrics = Field(
-                default_factory=lambda: FlextQualityModels.Quality.AuditMetrics()
+                default_factory=lambda: FlextQualityModels.Quality.AuditMetrics(),
             )
             recommendations: MutableSequence[
                 FlextQualityModels.Quality.AuditRecommendation
@@ -317,7 +321,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             broken_links: int = 0
             warnings: int = 0
             errors: MutableSequence[FlextQualityModels.Quality.LinkCheckResult] = Field(
-                default_factory=list
+                default_factory=list,
             )
             warnings_list: MutableSequence[
                 FlextQualityModels.Quality.LinkCheckResult
@@ -464,16 +468,18 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
                 Field(
                     default_factory=lambda: (
                         FlextQualityModels.Quality.QualityThresholdsConfig()
-                    )
+                    ),
                 )
             )
             content_checks: FlextQualityModels.Quality.ContentChecksConfig = Field(
-                default_factory=lambda: FlextQualityModels.Quality.ContentChecksConfig()
+                default_factory=lambda: (
+                    FlextQualityModels.Quality.ContentChecksConfig()
+                ),
             )
             severity_levels: FlextQualityModels.Quality.SeverityLevelsConfig = Field(
                 default_factory=lambda: (
                     FlextQualityModels.Quality.SeverityLevelsConfig()
-                )
+                ),
             )
 
         class MarkdownStyleConfig(BaseModel):
@@ -502,13 +508,17 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Configuration for style guide rules."""
 
             markdown: FlextQualityModels.Quality.MarkdownStyleConfig = Field(
-                default_factory=lambda: FlextQualityModels.Quality.MarkdownStyleConfig()
+                default_factory=lambda: (
+                    FlextQualityModels.Quality.MarkdownStyleConfig()
+                ),
             )
             accessibility: FlextQualityModels.Quality.AccessibilityConfig = Field(
-                default_factory=lambda: FlextQualityModels.Quality.AccessibilityConfig()
+                default_factory=lambda: (
+                    FlextQualityModels.Quality.AccessibilityConfig()
+                ),
             )
             formatting: FlextQualityModels.Quality.FormattingConfig = Field(
-                default_factory=lambda: FlextQualityModels.Quality.FormattingConfig()
+                default_factory=lambda: FlextQualityModels.Quality.FormattingConfig(),
             )
 
         class LinkValidationConfig(BaseModel):
@@ -526,7 +536,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
 
             min_section_depth: int = 2
             required_sections: t.StrSequence = Field(
-                default_factory=lambda: ["Overview", "Installation", "Usage"]
+                default_factory=lambda: ["Overview", "Installation", "Usage"],
             )
             check_todos: bool = True
             check_fixmes: bool = True
@@ -537,12 +547,12 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             link_validation: FlextQualityModels.Quality.LinkValidationConfig = Field(
                 default_factory=lambda: (
                     FlextQualityModels.Quality.LinkValidationConfig()
-                )
+                ),
             )
             content_analysis: FlextQualityModels.Quality.ContentAnalysisConfig = Field(
                 default_factory=lambda: (
                     FlextQualityModels.Quality.ContentAnalysisConfig()
-                )
+                ),
             )
 
         class OptimizerResults(BaseModel):
@@ -553,7 +563,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             changes_made: int = 0
             backups_created: MutableSequence[str] = Field(default_factory=list)
             optimizations: MutableSequence[MutableMapping[str, str]] = Field(
-                default_factory=list
+                default_factory=list,
             )
 
         class ExecutionRequest(BaseModel):

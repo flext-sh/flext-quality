@@ -33,7 +33,7 @@ class FlextQualityRulesLoader:
             ImportError,
         ) as e:
             return r[Sequence[m.Quality.RuleDefinition]].fail(
-                f"Failed to parse YAML: {e}"
+                f"Failed to parse YAML: {e}",
             )
         match parsed:
             case dict() as parsed_dict:
@@ -65,7 +65,8 @@ class FlextQualityRulesLoader:
         return r[Sequence[m.Quality.RuleDefinition]].ok(rules)
 
     def load_multiple(
-        self, paths: Sequence[Path]
+        self,
+        paths: Sequence[Path],
     ) -> r[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from multiple YAML files."""
         all_rules: MutableSequence[m.Quality.RuleDefinition] = []

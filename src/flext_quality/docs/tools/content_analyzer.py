@@ -190,7 +190,8 @@ class ContentAnalyzer:
                 )
                 if isinstance(loaded, dict):
                     config_loaded: Mapping[
-                        str, Mapping[str, bool] | Mapping[str, int] | str
+                        str,
+                        Mapping[str, bool] | Mapping[str, int] | str,
                     ] = {k: v for k, v in loaded.items() if isinstance(v, (dict, str))}
                     self.config = config_loaded
                 else:
@@ -469,7 +470,7 @@ class ContentAnalyzer:
             completeness["word_count_sufficient"] = False
             if "missing_elements" in completeness:
                 completeness["missing_elements"].append(
-                    f"Minimum word count ({min_words})"
+                    f"Minimum word count ({min_words})",
                 )
             if "score" in completeness:
                 completeness["score"] -= 20
@@ -483,11 +484,11 @@ class ContentAnalyzer:
             result = self._check_required_sections(content, required_sections)
             if "required_sections_present" in completeness:
                 completeness["required_sections_present"].extend(
-                    result.get("required_sections_present", [])
+                    result.get("required_sections_present", []),
                 )
             if "missing_elements" in completeness:
                 completeness["missing_elements"].extend(
-                    result.get("missing_required_sections", [])
+                    result.get("missing_required_sections", []),
                 )
 
         elif filename.startswith("docs/"):
@@ -495,11 +496,11 @@ class ContentAnalyzer:
             result = self._check_required_sections(content, required_sections)
             if "required_sections_present" in completeness:
                 completeness["required_sections_present"].extend(
-                    result.get("required_sections_present", [])
+                    result.get("required_sections_present", []),
                 )
             if "missing_elements" in completeness:
                 completeness["missing_elements"].extend(
-                    result.get("missing_required_sections", [])
+                    result.get("missing_required_sections", []),
                 )
 
         checks = [

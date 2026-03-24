@@ -73,7 +73,8 @@ def _as_int(value: t.ContainerValue | None, default: int) -> int:
 
 
 def _as_str_list(
-    value: t.ContainerValue | None, default: t.StrSequence
+    value: t.ContainerValue | None,
+    default: t.StrSequence,
 ) -> t.StrSequence:
     """Normalize unknown config values to t.StrSequence."""
     if isinstance(value, list):
@@ -158,7 +159,8 @@ class ScheduledMaintenance:
                 current = schedules[key]
                 updated = {
                     "enabled": _as_bool(
-                        value.get("enabled"), default=current["enabled"]
+                        value.get("enabled"),
+                        default=current["enabled"],
                     ),
                     "time": _as_str(value.get("time"), current["time"]),
                     "tasks": _as_str_list(value.get("tasks"), current["tasks"]),
@@ -178,7 +180,8 @@ class ScheduledMaintenance:
                 current = tasks[key]
                 tasks[key] = {
                     "description": _as_str(
-                        value.get("description"), current["description"]
+                        value.get("description"),
+                        current["description"],
                     ),
                     "command": _as_str(value.get("command"), current["command"]),
                     "timeout": _as_int(value.get("timeout"), current["timeout"]),
@@ -190,13 +193,16 @@ class ScheduledMaintenance:
             current = base.error_handling
             merged["error_handling"] = {
                 "max_retries": _as_int(
-                    error_handling_raw.get("max_retries"), current.max_retries
+                    error_handling_raw.get("max_retries"),
+                    current.max_retries,
                 ),
                 "retry_delay": _as_int(
-                    error_handling_raw.get("retry_delay"), current.retry_delay
+                    error_handling_raw.get("retry_delay"),
+                    current.retry_delay,
                 ),
                 "fail_fast": _as_bool(
-                    error_handling_raw.get("fail_fast"), default=current.fail_fast
+                    error_handling_raw.get("fail_fast"),
+                    default=current.fail_fast,
                 ),
                 "notify_on_failure": _as_bool(
                     error_handling_raw.get("notify_on_failure"),
@@ -209,14 +215,17 @@ class ScheduledMaintenance:
             current = base.logging
             merged["logging"] = {
                 "enabled": _as_bool(
-                    logging_raw.get("enabled"), default=current.enabled
+                    logging_raw.get("enabled"),
+                    default=current.enabled,
                 ),
                 "log_file": _as_str(logging_raw.get("log_file"), current.log_file),
                 "max_log_size": _as_str(
-                    logging_raw.get("max_log_size"), current.max_log_size
+                    logging_raw.get("max_log_size"),
+                    current.max_log_size,
                 ),
                 "retention_days": _as_int(
-                    logging_raw.get("retention_days"), current.retention_days
+                    logging_raw.get("retention_days"),
+                    current.retention_days,
                 ),
             }
 
@@ -399,13 +408,13 @@ class ScheduledMaintenance:
             # If no specific handler, log unsupported command
             _ = self.results.warnings.append(
                 f"Unsupported command: {cmd_name} in task: {description}. "
-                "Please install appropriate Python libraries or configure supported commands."
+                "Please install appropriate Python libraries or configure supported commands.",
             )
             return False
 
         except (OSError, RuntimeError, ValueError, KeyError) as e:
             _ = self.results.errors.append(
-                f"Task error: {task_config.description} - {e!s}"
+                f"Task error: {task_config.description} - {e!s}",
             )
             return False
 
@@ -433,7 +442,7 @@ class ScheduledMaintenance:
         try:
             if len(cmd_parts) < self.MIN_PYTHON_ARGS or cmd_parts[1] != "-m":
                 _ = self.results.warnings.append(
-                    f"Invalid python command format in task: {description}"
+                    f"Invalid python command format in task: {description}",
                 )
                 return False
 
@@ -444,7 +453,7 @@ class ScheduledMaintenance:
             )
             if module_name is None:
                 _ = self.results.warnings.append(
-                    f"No module specified in task: {description}"
+                    f"No module specified in task: {description}",
                 )
                 return False
 
@@ -462,7 +471,7 @@ class ScheduledMaintenance:
 
         except (ImportError, ModuleNotFoundError, RuntimeError, OSError) as e:
             _ = self.results.errors.append(
-                f"Python command failed in {description}: {e!s}"
+                f"Python command failed in {description}: {e!s}",
             )
             return False
 
@@ -486,7 +495,7 @@ class ScheduledMaintenance:
             return self._run_with_timeout(run_tests, timeout, description)
         except (RuntimeError, OSError, ImportError) as e:
             _ = self.results.errors.append(
-                f"pytest command failed in {description}: {e!s}"
+                f"pytest command failed in {description}: {e!s}",
             )
             return False
 
@@ -504,7 +513,7 @@ class ScheduledMaintenance:
             makefile = self.project_root / "Makefile"
             if not makefile.exists():
                 _ = self.results.warnings.append(
-                    f"Makefile not found for task: {description}"
+                    f"Makefile not found for task: {description}",
                 )
                 return False
 
@@ -518,13 +527,13 @@ class ScheduledMaintenance:
             # For now, log a warning suggesting direct command execution
             _ = self.results.warnings.append(
                 f"Make command '{' '.join(cmd_parts)}' requires make tool. "
-                f"For task: {description}, consider specifying the actual command directly."
+                f"For task: {description}, consider specifying the actual command directly.",
             )
             return False
 
         except (FileNotFoundError, OSError, RuntimeError) as e:
             _ = self.results.errors.append(
-                f"Make command failed in {description}: {e!s}"
+                f"Make command failed in {description}: {e!s}",
             )
             return False
 
@@ -542,7 +551,7 @@ class ScheduledMaintenance:
             # Extract git subcommand
             if len(cmd_parts) < self.MIN_GIT_ARGS:
                 _ = self.results.warnings.append(
-                    f"Invalid git command format in task: {description}"
+                    f"Invalid git command format in task: {description}",
                 )
                 return False
 
@@ -564,12 +573,12 @@ class ScheduledMaintenance:
             return self._run_with_timeout(run_git_command, timeout, description)
         except InvalidGitRepositoryError:
             _ = self.results.warnings.append(
-                f"Not a git repository for task: {description}"
+                f"Not a git repository for task: {description}",
             )
             return False
         except (OSError, RuntimeError, ValueError) as e:
             _ = self.results.errors.append(
-                f"Git command failed in {description}: {e!s}"
+                f"Git command failed in {description}: {e!s}",
             )
             return False
 
@@ -589,7 +598,7 @@ class ScheduledMaintenance:
             return True
         except (OSError, ValueError) as e:
             _ = self.results.errors.append(
-                f"Echo command failed in {description}: {e!s}"
+                f"Echo command failed in {description}: {e!s}",
             )
             return False
 
@@ -627,7 +636,7 @@ class ScheduledMaintenance:
 
         except (OSError, RuntimeError, ValueError) as e:
             _ = self.results.errors.append(
-                f"Task execution error in {description}: {e!s}"
+                f"Task execution error in {description}: {e!s}",
             )
             return False
 
@@ -638,7 +647,7 @@ class ScheduledMaintenance:
         # Daily audit
         if schedules["daily_audit"].enabled:
             daily_audit_job: schedule.Job = schedule.every().day.at(
-                schedules["daily_audit"].time
+                schedules["daily_audit"].time,
             )
             daily_audit_do = getattr(daily_audit_job, "do", None)
             if callable(daily_audit_do):
@@ -647,7 +656,7 @@ class ScheduledMaintenance:
         # Daily optimization
         if schedules["daily_optimize"].enabled:
             daily_optimize_job: schedule.Job = schedule.every().day.at(
-                schedules["daily_optimize"].time
+                schedules["daily_optimize"].time,
             )
             daily_optimize_do = getattr(daily_optimize_job, "do", None)
             if callable(daily_optimize_do):
@@ -724,7 +733,8 @@ class ScheduledMaintenance:
         )
 
         Path(results_file).write_text(
-            self.results.model_dump_json(indent=2), encoding="utf-8"
+            self.results.model_dump_json(indent=2),
+            encoding="utf-8",
         )
 
 

@@ -9,7 +9,8 @@ from typing import final
 from flext_core import r
 from pydantic import TypeAdapter
 
-from flext_quality import BaseHookImpl, c, t
+from flext_quality import c, t
+from flext_quality.hooks.base import FlextQualityBaseHook
 
 
 @final
@@ -19,7 +20,8 @@ class HookManager:
     def __init__(self, config_path: Path | None = None) -> None:
         """Initialize hook manager with optional config path."""
         self._hooks: MutableMapping[
-            c.Quality.HookEvent, MutableSequence[BaseHookImpl]
+            c.Quality.HookEvent,
+            MutableSequence[FlextQualityBaseHook],
         ] = {}
         self._config_path = config_path
 
@@ -60,7 +62,7 @@ class HookManager:
             .decode("utf-8")
         )
 
-    def register(self, hook: BaseHookImpl) -> r[bool]:
+    def register(self, hook: FlextQualityBaseHook) -> r[bool]:
         """Register a hook."""
         event = hook.event
         if event not in self._hooks:

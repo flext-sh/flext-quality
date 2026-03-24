@@ -73,7 +73,8 @@ class TestFlextQualityAPI:
         """Test format_hook_output with blocked reason."""
         quality = FlextQuality.get_instance()
         output = quality.format_hook_output(
-            continue_exec=False, blocked_reason="Blocked for testing"
+            continue_exec=False,
+            blocked_reason="Blocked for testing",
         )
         tm.that(output, has='"continue":false')
 
@@ -95,7 +96,10 @@ class TestFlextQualityAPI:
         quality = FlextQuality.get_instance()
         rules_yaml = '\nrules:\n  - name: test-rule\n    type: warning\n    description: Test rule\n    pattern: "test"\n    enabled: true\n'
         with tempfile.NamedTemporaryFile(
-            encoding="utf-8", mode="w", suffix=".yaml", delete=False
+            encoding="utf-8",
+            mode="w",
+            suffix=".yaml",
+            delete=False,
         ) as f:
             f.write(rules_yaml)
             rules_path = Path(f.name)
@@ -201,10 +205,10 @@ class TestFlextQualityRulesConfig:
         with tempfile.TemporaryDirectory() as tmpdir:
             rules_dir = Path(tmpdir)
             (rules_dir / "rules1.yaml").write_text(
-                '\nrules:\n  - name: rule-one\n    type: warning\n    description: First rule\n    pattern: "one"\n    enabled: true\n'
+                '\nrules:\n  - name: rule-one\n    type: warning\n    description: First rule\n    pattern: "one"\n    enabled: true\n',
             )
             (rules_dir / "rules2.yml").write_text(
-                '\nrules:\n  - name: rule-two\n    type: blocking\n    description: Second rule\n    pattern: "two"\n    enabled: true\n'
+                '\nrules:\n  - name: rule-two\n    type: blocking\n    description: Second rule\n    pattern: "two"\n    enabled: true\n',
             )
             original_dir = quality.config.rules_dir
             quality.config.rules_dir = str(rules_dir)

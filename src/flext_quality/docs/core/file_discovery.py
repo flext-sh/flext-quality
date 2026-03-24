@@ -276,7 +276,8 @@ class DocumentationFinder:
         return self._metadata_cache[path_str]
 
     def get_files_metadata(
-        self, files: Sequence[Path] | None = None
+        self,
+        files: Sequence[Path] | None = None,
     ) -> Sequence[m.Quality.FileMetadata]:
         """Get metadata for multiple files."""
         if files is None:

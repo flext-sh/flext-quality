@@ -14,7 +14,7 @@ from pathlib import Path
 from flext_quality import m, p, t
 
 
-class BaseAuditor(ABC):
+class FlextQualityBaseAuditor(ABC):
     """Base class for all audit operations.
 
     Provides common functionality and interface for audit components.
@@ -76,7 +76,7 @@ class BaseAuditor(ABC):
         }
 
 
-class BaseValidator(ABC):
+class FlextQualityBaseValidator(ABC):
     """Base class for all validation operations.
 
     Provides common functionality and interface for validation components.
@@ -88,7 +88,8 @@ class BaseValidator(ABC):
         self.results: m.Quality.ValidationResult | None = None
 
     def validate(
-        self, items: Sequence[t.Quality.GenericItem]
+        self,
+        items: Sequence[t.Quality.GenericItem],
     ) -> m.Quality.ValidationResult:
         """Perform validation on given items."""
         self.results = m.Quality.ValidationResult()
@@ -119,7 +120,7 @@ class BaseValidator(ABC):
         }
 
 
-class BaseReporter(ABC):
+class FlextQualityBaseReporter(ABC):
     """Base class for all reporting operations.
 
     Provides common functionality and interface for report generation.
@@ -149,7 +150,7 @@ class BaseReporter(ABC):
         return filepath
 
 
-class BaseAnalyzer(ABC):
+class FlextQualityBaseAnalyzer(ABC):
     """Base class for all analysis operations.
 
     Provides common functionality and interface for content analysis.
@@ -161,7 +162,9 @@ class BaseAnalyzer(ABC):
         self.metrics: MutableMapping[str, t.Primitives | None] = {}
 
     def analyze(
-        self, content: str, filepath: Path | None = None
+        self,
+        content: str,
+        filepath: Path | None = None,
     ) -> Mapping[str, t.Primitives | None]:
         """Analyze the given content and return metrics."""
         self.metrics = {

@@ -64,7 +64,7 @@ class DocumentationAuditor:
         """Load audit configuration files."""
         try:
             with Path(self.config_path / "audit_rules.yaml").open(
-                encoding="utf-8"
+                encoding="utf-8",
             ) as f:
                 self.audit_rules = AuditRulesConfig.model_validate(yaml.safe_load(f))
         except (FileNotFoundError, ValidationError, yaml.YAMLError, TypeError):
@@ -72,7 +72,7 @@ class DocumentationAuditor:
 
         try:
             with Path(self.config_path / "style_guide.yaml").open(
-                encoding="utf-8"
+                encoding="utf-8",
             ) as f:
                 self.style_guide = StyleGuideConfig.model_validate(yaml.safe_load(f))
         except (FileNotFoundError, ValidationError, yaml.YAMLError, TypeError):
@@ -80,10 +80,10 @@ class DocumentationAuditor:
 
         try:
             with Path(self.config_path / "validation_config.yaml").open(
-                encoding="utf-8"
+                encoding="utf-8",
             ) as f:
                 self.validation_config = ValidationConfig.model_validate(
-                    yaml.safe_load(f)
+                    yaml.safe_load(f),
                 )
         except (FileNotFoundError, ValidationError, yaml.YAMLError, TypeError):
             self.validation_config = self.get_default_validation_config()
@@ -248,13 +248,17 @@ class DocumentationAuditor:
         """Check for indicators of outdated content."""
         indicators: MutableSequence[str] = []
         if re.search(
-            r"\\b\\d+\\.\\d+\\.\\d+.*TODO|FIXME|placeholder", content, re.IGNORECASE
+            r"\\b\\d+\\.\\d+\\.\\d+.*TODO|FIXME|placeholder",
+            content,
+            re.IGNORECASE,
         ):
             indicators.append("version placeholders")
         if re.search(r"\\b202\\d.*TODO|FIXME|update.*date", content, re.IGNORECASE):
             indicators.append("date placeholders")
         if re.search(
-            r"#+\\s*(TODO|FIXME|Coming Soon|Work in Progress)", content, re.IGNORECASE
+            r"#+\\s*(TODO|FIXME|Coming Soon|Work in Progress)",
+            content,
+            re.IGNORECASE,
         ):
             indicators.append("incomplete sections")
         if re.search(r"❌.*working|✅.*broken|⚠️.*complete", content, re.IGNORECASE):
@@ -281,7 +285,8 @@ class DocumentationAuditor:
                     })
                 if "README.md" in str(file_path) or "docs/" in str(file_path):
                     missing_sections = self._check_required_sections(
-                        content, required_sections
+                        content,
+                        required_sections,
                     )
                     if missing_sections:
                         _ = self.results.issues.append({
@@ -293,7 +298,8 @@ class DocumentationAuditor:
                         })
                 if check_todos:
                     todos = re.findall(
-                        r"(?i)(?:TODO|FIXME|XXX):\\s*(.+?)(?:\\n|$)", content
+                        r"(?i)(?:TODO|FIXME|XXX):\\s*(.+?)(?:\\n|$)",
+                        content,
                     )
                     if todos:
                         _ = self.results.issues.append({
@@ -318,7 +324,9 @@ class DocumentationAuditor:
                 })
 
     def _check_required_sections(
-        self, content: str, required_sections: t.StrSequence
+        self,
+        content: str,
+        required_sections: t.StrSequence,
     ) -> MutableSequence[str]:
         """Check for required sections in documentation."""
         missing: MutableSequence[str] = []
@@ -458,7 +466,8 @@ class DocumentationAuditor:
             try:
                 content = file_path.read_text(encoding="utf-8")
                 external_links = re.findall(
-                    r"\\[([^\\]]+)\\]\\((https?://[^)]+)\\)", content
+                    r"\\[([^\\]]+)\\]\\((https?://[^)]+)\\)",
+                    content,
                 )
                 for text, url in external_links:
                     all_links.append({
@@ -503,7 +512,8 @@ class DocumentationAuditor:
             self._validate_images(image_refs)
 
     def _validate_external_links(
-        self, links: Sequence[Mapping[str, str | int]]
+        self,
+        links: Sequence[Mapping[str, str | int]],
     ) -> None:
         """Validate external links."""
         link_validation = self.validation_config.link_validation
@@ -538,7 +548,9 @@ class DocumentationAuditor:
                 })
 
     def _validate_internal_links(
-        self, links: Sequence[Mapping[str, str | int]], doc_files: Sequence[Path]
+        self,
+        links: Sequence[Mapping[str, str | int]],
+        doc_files: Sequence[Path],
     ) -> None:
         """Validate internal links."""
         internal_links = [link for link in links if link["type"] == "internal"]
@@ -625,7 +637,7 @@ class DocumentationAuditor:
                         "Implement automated quality gates in CI/CD",
                         "Schedule regular maintenance reviews",
                     ],
-                )
+                ),
             )
         elif quality_score < 75:
             recommendations.append(
@@ -638,7 +650,7 @@ class DocumentationAuditor:
                         "Implement regular audit schedule",
                         "Consider documentation training for team",
                     ],
-                )
+                ),
             )
         broken_links = [
             i
@@ -657,7 +669,7 @@ class DocumentationAuditor:
                         "Fix internal reference paths",
                         "Implement automated link checking in CI/CD",
                     ],
-                )
+                ),
             )
         outdated_content = [i for i in issues if i["type"] == "outdated_content"]
         if outdated_content:
@@ -671,7 +683,7 @@ class DocumentationAuditor:
                         "Update version numbers and dates",
                         "Implement content freshness monitoring",
                     ],
-                )
+                ),
             )
         accessibility_issues = [
             i for i in issues if i["type"] == "accessibility_issues"
@@ -687,12 +699,14 @@ class DocumentationAuditor:
                         "Use descriptive link text",
                         "Ensure proper heading hierarchy",
                     ],
-                )
+                ),
             )
         self.results.recommendations = recommendations
 
     def generate_report(
-        self, output_format: str = "json", output_path: str | None = None
+        self,
+        output_format: str = "json",
+        output_path: str | None = None,
     ) -> str:
         """Generate audit report in specified format.
 
@@ -773,7 +787,9 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         help="Run complete audit with all checks",
     )
     _ = parser.add_argument(
-        "--check-freshness", action="store_true", help="Check content freshness only"
+        "--check-freshness",
+        action="store_true",
+        help="Check content freshness only",
     )
     _ = parser.add_argument(
         "--check-completeness",
@@ -781,10 +797,14 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         help="Check content completeness only",
     )
     _ = parser.add_argument(
-        "--check-consistency", action="store_true", help="Check style consistency only"
+        "--check-consistency",
+        action="store_true",
+        help="Check style consistency only",
     )
     _ = parser.add_argument(
-        "--check-links", action="store_true", help="Check links and references only"
+        "--check-links",
+        action="store_true",
+        help="Check links and references only",
     )
     _ = parser.add_argument(
         "--ci-mode",
@@ -819,7 +839,8 @@ def _create_argument_parser() -> argparse.ArgumentParser:
 
 
 def _execute_audit_checks(
-    auditor: DocumentationAuditor, args: argparse.Namespace
+    auditor: DocumentationAuditor,
+    args: argparse.Namespace,
 ) -> AuditorResults:
     """Execute the appropriate audit checks based on arguments."""
     if args.comprehensive:

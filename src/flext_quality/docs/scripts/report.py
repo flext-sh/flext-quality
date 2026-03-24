@@ -162,7 +162,9 @@ class DocumentationReporter:
         return None
 
     def generate_quality_report(
-        self, report_format: str = "html", **kwargs: Unpack[_ReportOptions]
+        self,
+        report_format: str = "html",
+        **kwargs: Unpack[_ReportOptions],
     ) -> str:
         """Generate comprehensive quality report."""
         report_data: ReportData = {
@@ -206,7 +208,8 @@ class DocumentationReporter:
             files_analyzed = self.audit_data.get("files_analyzed", 0)
             if isinstance(files_analyzed, int):
                 summary["files_analyzed"] = max(
-                    summary["files_analyzed"], files_analyzed
+                    summary["files_analyzed"],
+                    files_analyzed,
                 )
         if self.validation_data and isinstance(self.validation_data, dict):
             link_validation = self.validation_data.get("link_validation")
@@ -289,7 +292,8 @@ class DocumentationReporter:
                     for e in validation_errors:
                         if isinstance(e, dict):
                             error_entry: Mapping[
-                                t.NormalizedValue, t.NormalizedValue
+                                t.NormalizedValue,
+                                t.NormalizedValue,
                             ] = e
                             error_type = error_entry.get("type")
                             if error_type in {
@@ -352,7 +356,7 @@ class DocumentationReporter:
         timestamp_str = data["timestamp"]
         if isinstance(timestamp_str, str):
             timestamp = datetime.fromisoformat(timestamp_str).strftime(
-                "%Y-%m-%d %H:%M:%S"
+                "%Y-%m-%d %H:%M:%S",
             )
         else:
             timestamp = ""
@@ -363,7 +367,7 @@ class DocumentationReporter:
             "audit_summary": self._summarize_audit_data(data["audit"]),
             "validation_summary": self._summarize_validation_data(data["validation"]),
             "optimization_summary": self._summarize_optimization_data(
-                data["optimization"]
+                data["optimization"],
             ),
             "recommendations": data["recommendations"],
             "charts": self._generate_charts(data) if data.get("trends") else None,
@@ -518,12 +522,12 @@ class DocumentationReporter:
             try:
                 date_str = report_file.name.split("_")[1]
                 report_date = datetime.strptime(date_str[:8], "%Y%m%d").replace(
-                    tzinfo=UTC
+                    tzinfo=UTC,
                 )
                 if report_date >= cutoff_date:
                     report_data_raw: Mapping[str, ReportValue] = (
                         _REPORT_LOAD_ADAPTER.validate_json(
-                            Path(report_file).read_bytes()
+                            Path(report_file).read_bytes(),
                         )
                     )
                     report_data_dict: Mapping[str, ReportValue | datetime] = {
@@ -537,7 +541,8 @@ class DocumentationReporter:
         return self._generate_trend_report(trend_data, days)
 
     def _analyze_trend_data(
-        self, reports: Sequence[Mapping[str, ReportValue | datetime]]
+        self,
+        reports: Sequence[Mapping[str, ReportValue | datetime]],
     ) -> TrendData | t.StrMapping:
         """Analyze trend data from historical reports."""
         if not reports:
@@ -587,10 +592,12 @@ class DocumentationReporter:
         return {
             "audit_trends": sorted(audit_trends, key=operator.itemgetter("date")),
             "validation_trends": sorted(
-                validation_trends, key=operator.itemgetter("date")
+                validation_trends,
+                key=operator.itemgetter("date"),
             ),
             "optimization_trends": sorted(
-                optimization_trends, key=operator.itemgetter("date")
+                optimization_trends,
+                key=operator.itemgetter("date"),
             ),
         }
 
@@ -670,7 +677,10 @@ class DocumentationReporter:
         return "\n".join(md)
 
     def save_report(
-        self, content: str, filename: str, report_format: str = "html"
+        self,
+        content: str,
+        filename: str,
+        report_format: str = "html",
     ) -> Path:
         """Save report to file."""
         filepath = self.reports_dir / f"{filename}.{report_format}"
@@ -681,7 +691,7 @@ class DocumentationReporter:
 def main() -> None:
     """Main entry point for reporting system."""
     parser = argparse.ArgumentParser(
-        description="FLEXT Quality Documentation Reporting"
+        description="FLEXT Quality Documentation Reporting",
     )
     _ = parser.add_argument(
         "--format",
@@ -697,13 +707,19 @@ def main() -> None:
         help="Output directory for reports",
     )
     _ = parser.add_argument(
-        "--filename", type=str, help="Custom filename for the report"
+        "--filename",
+        type=str,
+        help="Custom filename for the report",
     )
     _ = parser.add_argument(
-        "--monthly-trends", action="store_true", help="Generate monthly trend analysis"
+        "--monthly-trends",
+        action="store_true",
+        help="Generate monthly trend analysis",
     )
     _ = parser.add_argument(
-        "--weekly-trends", action="store_true", help="Generate weekly trend analysis"
+        "--weekly-trends",
+        action="store_true",
+        help="Generate weekly trend analysis",
     )
     _ = parser.add_argument(
         "--include-trends",
@@ -716,10 +732,14 @@ def main() -> None:
         help="Send notifications (requires webhook URL)",
     )
     _ = parser.add_argument(
-        "--webhook-url", type=str, help="Webhook URL for notifications"
+        "--webhook-url",
+        type=str,
+        help="Webhook URL for notifications",
     )
     _ = parser.add_argument(
-        "--serve", action="store_true", help="Serve dashboard (not implemented yet)"
+        "--serve",
+        action="store_true",
+        help="Serve dashboard (not implemented yet)",
     )
     args = parser.parse_args()
     reporter = DocumentationReporter(args.output)

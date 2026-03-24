@@ -211,7 +211,9 @@ class DocumentationOptimizer:
                 OSError,
             ) as e:
                 self.logger.warning(
-                    "Failed to enhance accessibility in %s: %s", file_path, e
+                    "Failed to enhance accessibility in %s: %s",
+                    file_path,
+                    e,
                 )
         return self.results.model_dump()
 
@@ -240,7 +242,8 @@ class DocumentationOptimizer:
         return content
 
     def optimize_content_structure(
-        self, doc_files: Sequence[Path]
+        self,
+        doc_files: Sequence[Path],
     ) -> t.ContainerMapping:
         """Optimize content structure and readability."""
         for file_path in doc_files:
@@ -266,7 +269,9 @@ class DocumentationOptimizer:
                 OSError,
             ) as e:
                 self.logger.warning(
-                    "Failed to enhance accessibility in %s: %s", file_path, e
+                    "Failed to enhance accessibility in %s: %s",
+                    file_path,
+                    e,
                 )
         return self.results.model_dump()
 
@@ -326,7 +331,9 @@ class DocumentationOptimizer:
                 yaml.YAMLError,
             ) as e:
                 self.logger.warning(
-                    "Failed to enhance accessibility in %s: %s", file_path, e
+                    "Failed to enhance accessibility in %s: %s",
+                    file_path,
+                    e,
                 )
         return self.results.model_dump()
 
@@ -344,11 +351,12 @@ class DocumentationOptimizer:
                     frontmatter_lines = lines[1 : end_idx - 1]
                     frontmatter_content = "\n".join(frontmatter_lines)
                     metadata = TypeAdapter(t.ContainerMapping).validate_python(
-                        yaml.safe_load(frontmatter_content) or {}
+                        yaml.safe_load(frontmatter_content) or {},
                     )
                     metadata["updated"] = datetime.now(UTC).strftime("%Y-%m-%d")
                     new_frontmatter = yaml.dump(
-                        metadata, default_flow_style=False
+                        metadata,
+                        default_flow_style=False,
                     ).strip()
                     new_frontmatter_lines = (
                         ["---"] + new_frontmatter.split("\n") + ["---"]
@@ -364,7 +372,7 @@ class DocumentationOptimizer:
             backup_path = file_path.with_suffix(f"{file_path.suffix}.backup")
             shutil.copy2(file_path, backup_path)
             _ = self.results.backups_created.append(
-                str(backup_path.relative_to(self.project_root))
+                str(backup_path.relative_to(self.project_root)),
             )
         _ = file_path.write_text(content, encoding="utf-8")
 
@@ -391,16 +399,22 @@ class DocumentationOptimizer:
 def _create_argument_parser() -> argparse.ArgumentParser:
     """Create and configure the argument parser."""
     parser = argparse.ArgumentParser(
-        description="FLEXT Quality Documentation Optimization"
+        description="FLEXT Quality Documentation Optimization",
     )
     _ = parser.add_argument(
-        "--fix-formatting", action="store_true", help="Fix common formatting issues"
+        "--fix-formatting",
+        action="store_true",
+        help="Fix common formatting issues",
     )
     _ = parser.add_argument(
-        "--update-toc", action="store_true", help="Update table of contents"
+        "--update-toc",
+        action="store_true",
+        help="Update table of contents",
     )
     _ = parser.add_argument(
-        "--add-alt-text", action="store_true", help="Add missing alt text to images"
+        "--add-alt-text",
+        action="store_true",
+        help="Add missing alt text to images",
     )
     _ = parser.add_argument(
         "--improve-accessibility",
@@ -413,10 +427,14 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         help="Optimize content structure and readability",
     )
     _ = parser.add_argument(
-        "--update-metadata", action="store_true", help="Update frontmatter and metadata"
+        "--update-metadata",
+        action="store_true",
+        help="Update frontmatter and metadata",
     )
     _ = parser.add_argument(
-        "--comprehensive", action="store_true", help="Run all optimization checks"
+        "--comprehensive",
+        action="store_true",
+        help="Run all optimization checks",
     )
     _ = parser.add_argument(
         "--backup",
@@ -425,7 +443,10 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         help="Create backups before making changes",
     )
     _ = parser.add_argument(
-        "--no-backup", action="store_false", dest="backup", help="Don't create backups"
+        "--no-backup",
+        action="store_false",
+        dest="backup",
+        help="Don't create backups",
     )
     _ = parser.add_argument(
         "--output",
@@ -466,7 +487,8 @@ def _discover_documentation_files(args: argparse.Namespace) -> Sequence[Path]:
 
 
 def _execute_optimizations(
-    optimizer: DocumentationOptimizer, args: argparse.Namespace
+    optimizer: DocumentationOptimizer,
+    args: argparse.Namespace,
 ) -> bool:
     """Execute the requested optimizations and return if any were run."""
     run_any_optimization = False

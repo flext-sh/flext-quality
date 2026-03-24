@@ -155,7 +155,8 @@ class LinkChecker:
         self.config = self._get_default_config()
 
     def find_all_links(
-        self, file_paths: Sequence[pathlib.Path]
+        self,
+        file_paths: Sequence[pathlib.Path],
     ) -> Sequence[LinkInfoDict]:
         """Extract all links from the given files."""
         all_links: MutableSequence[LinkInfoDict] = []
@@ -363,7 +364,8 @@ class LinkChecker:
         )
 
     async def check_links_batch_async(
-        self, links: Sequence[LinkInfoDict]
+        self,
+        links: Sequence[LinkInfoDict],
     ) -> Sequence[LinkResultDict]:
         """Check multiple links asynchronously."""
         start_time = time.time()
@@ -392,7 +394,7 @@ class LinkChecker:
                         error=f"task_exception: {result!s}",
                         valid=False,
                         context={},
-                    )
+                    ),
                 )
             else:
                 processed_results.append(result)
@@ -413,7 +415,8 @@ class LinkChecker:
         return processed_results
 
     def check_links_batch_sync(
-        self, links: Sequence[LinkInfoDict]
+        self,
+        links: Sequence[LinkInfoDict],
     ) -> Sequence[LinkResultDict]:
         """Check multiple links synchronously with thread pool."""
         start_time = time.time()
@@ -497,7 +500,8 @@ class LinkChecker:
             return True
 
     def validate_github_links(
-        self, links: Sequence[t.ContainerMapping]
+        self,
+        links: Sequence[t.ContainerMapping],
     ) -> Sequence[t.ContainerMapping]:
         """Special validation for GitHub links."""
         github_links: MutableSequence[t.ContainerMapping] = []
@@ -608,7 +612,7 @@ Broken Links:
         filepath = pathlib.Path(output_path) / filename
 
         pathlib.Path(filepath).write_bytes(
-            _RESULTS_ADAPTER.dump_json(self.results, indent=2)
+            _RESULTS_ADAPTER.dump_json(self.results, indent=2),
         )
 
         return filepath

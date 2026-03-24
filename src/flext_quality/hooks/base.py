@@ -10,7 +10,7 @@ from flext_core import r
 from flext_quality import c, t
 
 
-class BaseHookImpl:
+class FlextQualityBaseHook:
     """Concrete base for hook implementations satisfying p.Quality.HookImpl."""
 
     event: ClassVar[c.Quality.HookEvent]

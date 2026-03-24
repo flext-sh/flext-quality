@@ -93,7 +93,8 @@ def safe_list_access[T](data: Sequence[T], index: int) -> T:
 
 
 def assert_dict_structure(
-    data: t.ScalarMapping, required_keys: t.StrSequence
+    data: t.ScalarMapping,
+    required_keys: t.StrSequence,
 ) -> t.ScalarMapping:
     """Assert that t.NormalizedValue is dict with required keys - DRY pattern.
 
@@ -167,5 +168,6 @@ def assert_issues_structure(issues: t.ScalarMapping) -> t.ScalarMapping:
     if not assert_is_dict(issues):
         raise AssertionError(f"Expected dict, got {type(issues)}")
     return assert_dict_structure(
-        issues, ["security", "complexity", "dead_code", "duplicates"]
+        issues,
+        ["security", "complexity", "dead_code", "duplicates"],
     )

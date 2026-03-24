@@ -175,7 +175,8 @@ class DocumentationDashboard:
                 OSError,
             ) as e:
                 self._logger_instance.warning(
-                    "Failed to process trend data: %s", str(e)
+                    "Failed to process trend data: %s",
+                    str(e),
                 )
                 continue
 
@@ -218,7 +219,8 @@ class DocumentationDashboard:
                 OSError,
             ) as e:
                 self._logger_instance.warning(
-                    "Failed to process report file: %s", str(e)
+                    "Failed to process report file: %s",
+                    str(e),
                 )
                 continue
 

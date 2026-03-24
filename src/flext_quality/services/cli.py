@@ -31,7 +31,8 @@ class FlextQualityCliService:
         self._executor = FlextQualityCodeExecutionBridge()
 
     def build_check_commands(
-        self, target_path: Path
+        self,
+        target_path: Path,
     ) -> r[MutableSequence[t.StrSequence]]:
         """Build commands for quick check (lint + type)."""
         commands: MutableSequence[t.StrSequence] = []
@@ -46,7 +47,8 @@ class FlextQualityCliService:
         return r[MutableSequence[t.StrSequence]].ok(commands)
 
     def build_validate_commands(
-        self, target_path: Path
+        self,
+        target_path: Path,
     ) -> r[MutableSequence[t.StrSequence]]:
         """Build commands for full validation."""
         commands: MutableSequence[t.StrSequence] = []
@@ -140,7 +142,9 @@ class _CommandHandlers:
 
 
 def _dispatch(
-    service: FlextQualityCliService, command: str, args: t.StrSequence
+    service: FlextQualityCliService,
+    command: str,
+    args: t.StrSequence,
 ) -> int:
     """Dispatch command to handler."""
     if command == "status":

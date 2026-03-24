@@ -47,16 +47,20 @@ class AuditResult(BaseModel):
     status: str = Field(description="Audit status: PASS, FAIL, WARNING")
     critical: Sequence[AuditViolation] = []  # Pydantic v2 copies mutable defaults
     high: Sequence[AuditViolation] = Field(
-        default_factory=list, description="High severity violations"
+        default_factory=list,
+        description="High severity violations",
     )
     medium: Sequence[AuditViolation] = Field(
-        default_factory=list, description="Medium severity violations"
+        default_factory=list,
+        description="Medium severity violations",
     )
     recommendations: t.StrSequence = Field(
-        default_factory=list, description="Improvement recommendations"
+        default_factory=list,
+        description="Improvement recommendations",
     )
     stats: Mapping[str, int] = Field(
-        default_factory=dict, description="Audit statistics"
+        default_factory=dict,
+        description="Audit statistics",
     )
 
     @property

@@ -246,7 +246,8 @@ class DocumentationNotifier:
     def notify_critical_issues(
         self,
         audit_data: Mapping[
-            str, Mapping[str, int] | Sequence[Mapping[str, str | int]] | int | str
+            str,
+            Mapping[str, int] | Sequence[Mapping[str, str | int]] | int | str,
         ],
     ) -> bool:
         """Send notification for critical documentation issues."""
@@ -297,7 +298,8 @@ Please review recent changes and address any identified issues.
         return True
 
     def notify_broken_links(
-        self, broken_links: Sequence[Mapping[str, str | int]]
+        self,
+        broken_links: Sequence[Mapping[str, str | int]],
     ) -> bool:
         """Send notification for broken links."""
         if not self.config["alerts"]["broken_links"]["enabled"]:
@@ -313,7 +315,8 @@ Please review recent changes and address any identified issues.
         return True
 
     def notify_weekly_report(
-        self, report_data: Mapping[str, str | int | float]
+        self,
+        report_data: Mapping[str, str | int | float],
     ) -> bool:
         """Send weekly quality report notification."""
         if not self.config["alerts"]["weekly_report"]["enabled"]:
@@ -494,7 +497,8 @@ Timestamp: {datetime.now(UTC).isoformat()}
     def _format_critical_issues_message(
         self,
         audit_data: Mapping[
-            str, Mapping[str, int] | Sequence[Mapping[str, str | int]] | int | str
+            str,
+            Mapping[str, int] | Sequence[Mapping[str, str | int]] | int | str,
         ],
     ) -> str:
         """Format message for critical issues notification."""
@@ -622,7 +626,7 @@ def main() -> None:
     elif args.audit_data:
         # Process audit data and send appropriate notifications
         audit_data = _AUDIT_DATA_ADAPTER.validate_json(
-            Path(args.audit_data).read_bytes()
+            Path(args.audit_data).read_bytes(),
         )
 
         # Check for critical issues
@@ -640,14 +644,14 @@ def main() -> None:
     elif args.weekly_report:
         # Send weekly report notification
         report_data = _AUDIT_DATA_ADAPTER.validate_json(
-            Path(args.weekly_report).read_bytes()
+            Path(args.weekly_report).read_bytes(),
         )
         _ = notifier.notify_weekly_report(report_data)
 
     elif args.monthly_report:
         # Send monthly report notification
         report_data = _AUDIT_DATA_ADAPTER.validate_json(
-            Path(args.monthly_report).read_bytes()
+            Path(args.monthly_report).read_bytes(),
         )
         _ = notifier.notify_monthly_report(report_data)
 

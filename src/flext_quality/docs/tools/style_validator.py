@@ -170,7 +170,8 @@ class StyleValidator:
             self._set_default_config()
 
     def _normalize_config(
-        self, raw: Mapping[str, t.ConfigurationMapping]
+        self,
+        raw: Mapping[str, t.ConfigurationMapping],
     ) -> StyleConfig:
         config: StyleConfig = {}
 
@@ -282,7 +283,7 @@ class StyleValidator:
             file_results["suggestions"] = list(
                 self._generate_suggestions(
                     file_results["violations"],
-                )
+                ),
             )
 
             self.results["files_checked"] += 1

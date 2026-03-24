@@ -328,17 +328,17 @@ def temporary_project_structure(tmp_path: Path) -> str:
     src_dir.mkdir()
     main_py = src_dir / "main.py"
     main_py.write_text(
-        '\ndef main() -> int:\n    print("Hello, World!")\n    return 0\nif __name__ == "__main__":\n    main()\n'
+        '\ndef main() -> int:\n    print("Hello, World!")\n    return 0\nif __name__ == "__main__":\n    main()\n',
     )
     utils_py = src_dir / "utils.py"
     utils_py.write_text(
-        "\n\nimport sys\ndef get_env_var(name: str) -> Union[str, None]:\n    return os.environ.get(name)\n"
+        "\n\nimport sys\ndef get_env_var(name: str) -> Union[str, None]:\n    return os.environ.get(name)\n",
     )
     tests_dir = project_dir / "tests"
     tests_dir.mkdir()
     test_main_py = tests_dir / "test_main.py"
     test_main_py.write_text(
-        '\n\nfrom src.main import main\ndef test_main() -> None:\n    if main() != 0:\n      raise AssertionError(f"Expected {0}, got {main()}")\n'
+        '\n\nfrom src.main import main\ndef test_main() -> None:\n    if main() != 0:\n      raise AssertionError(f"Expected {0}, got {main()}")\n',
     )
     return str(project_dir)
 
@@ -517,7 +517,9 @@ class MockReportGenerator:
         self.generated_reports: Sequence[t.ContainerMapping] = []
 
     def generate_report(
-        self, data: t.ContainerMapping, output_format: str = "json"
+        self,
+        data: t.ContainerMapping,
+        output_format: str = "json",
     ) -> str:
         """Simulate report generation in specified format.
 
