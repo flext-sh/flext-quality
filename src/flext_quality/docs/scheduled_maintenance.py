@@ -12,7 +12,7 @@ import runpy
 import shlex
 import threading
 import time
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Sequence, Callable, Mapping
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import TypeIs

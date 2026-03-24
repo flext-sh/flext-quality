@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-import fnmatch
 from collections.abc import Sequence
+
+import fnmatch
 from typing import ClassVar
 
 from flext_core import r

@@ -102,7 +102,7 @@ class BaseValidator(ABC):
     def _validate_items(self, items: Sequence[t.Quality.GenericItem]) -> None:
         """Implementation-specific validation logic."""
 
-    def get_summary(self) -> Mapping[str, float | int | str] | Mapping[str, str]:
+    def get_summary(self) -> Mapping[str, float | int | str] | t.StrMapping:
         """Get a summary of validation results."""
         if not self.results:
             return {"validator": self.name, "status": "not_run"}
@@ -135,7 +135,7 @@ class BaseReporter(ABC):
         self,
         data: Mapping[
             str,
-            t.Scalar | Mapping[str, t.Primitives | None] | None,
+            str | int | float | bool | Mapping[str, t.Primitives | None] | None,
         ],
         output_format: str = "html",
     ) -> str:
