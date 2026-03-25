@@ -144,7 +144,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             valid_items: int = 0
             invalid_items: int = 0
             issues: MutableSequence[FlextQualityModels.Quality.Issue] = Field(
-                default_factory=list
+                default_factory=lambda: list[FlextQualityModels.Quality.Issue]()
             )
             warnings: MutableSequence[str] = Field(default_factory=list)
             errors: MutableSequence[str] = Field(default_factory=list)
@@ -286,13 +286,24 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
                     str,
                     t.Primitives | t.StrSequence | Sequence[t.StrMapping] | None,
                 ]
-            ] = Field(default_factory=list)
+            ] = Field(
+                default_factory=lambda: list[
+                    MutableMapping[
+                        str,
+                        t.Primitives | t.StrSequence | Sequence[t.StrMapping] | None,
+                    ]
+                ]()
+            )
             metrics: FlextQualityModels.Quality.AuditMetrics = Field(
                 default_factory=lambda: FlextQualityModels.Quality.AuditMetrics()
             )
             recommendations: MutableSequence[
                 FlextQualityModels.Quality.AuditRecommendation
-            ] = Field(default_factory=list)
+            ] = Field(
+                default_factory=lambda: list[
+                    FlextQualityModels.Quality.AuditRecommendation
+                ]()
+            )
 
         class LinkRecord(BaseModel):
             """Record of a link found in documentation."""
@@ -340,11 +351,17 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             broken_links: int = 0
             warnings: int = 0
             errors: MutableSequence[FlextQualityModels.Quality.LinkCheckResult] = Field(
-                default_factory=list
+                default_factory=lambda: list[
+                    FlextQualityModels.Quality.LinkCheckResult
+                ]()
             )
             warnings_list: MutableSequence[
                 FlextQualityModels.Quality.LinkCheckResult
-            ] = Field(default_factory=list)
+            ] = Field(
+                default_factory=lambda: list[
+                    FlextQualityModels.Quality.LinkCheckResult
+                ]()
+            )
 
         class ContentValidatorResults(BaseModel):
             """Results for documentation content validation."""
@@ -352,7 +369,11 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             timestamp: str
             files_checked: int = 0
             content_issues: MutableSequence[FlextQualityModels.Quality.ContentIssue] = (
-                Field(default_factory=list)
+                Field(
+                    default_factory=lambda: list[
+                        FlextQualityModels.Quality.ContentIssue
+                    ]()
+                )
             )
             quality_metrics: MutableMapping[str, t.Scalar] = Field(default_factory=dict)
 
@@ -576,7 +597,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             changes_made: int = 0
             backups_created: MutableSequence[str] = Field(default_factory=list)
             optimizations: MutableSequence[MutableMapping[str, str]] = Field(
-                default_factory=list
+                default_factory=lambda: list[MutableMapping[str, str]]()
             )
 
         class ExecutionRequest(BaseModel):

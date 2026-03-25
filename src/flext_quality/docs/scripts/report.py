@@ -314,8 +314,7 @@ class FlextQualityDocumentationReporter:
                             normalized: Mapping[str, t.Primitives] = {
                                 key: value
                                 for key, value in error_entry.items()
-                                if isinstance(key, str)
-                                and isinstance(value, (str, int, float, bool))
+                                if isinstance(value, (str, int, float, bool))
                             }
                             if normalized:
                                 broken_links.append(normalized)
@@ -373,13 +372,9 @@ class FlextQualityDocumentationReporter:
     ) -> str:
         """Generate HTML quality report."""
         template = self._get_html_template()
-        timestamp_str = data.timestamp
-        if isinstance(timestamp_str, str):
-            timestamp = datetime.fromisoformat(timestamp_str).strftime(
-                "%Y-%m-%d %H:%M:%S",
-            )
-        else:
-            timestamp = ""
+        timestamp = datetime.fromisoformat(data.timestamp).strftime(
+            "%Y-%m-%d %H:%M:%S",
+        )
         template_data = {
             "title": data.title,
             "timestamp": timestamp,
@@ -392,8 +387,8 @@ class FlextQualityDocumentationReporter:
             "recommendations": data.recommendations,
             "charts": self._generate_charts(data) if data.trends else None,
         }
-        render_fn: Callable[..., str] = template.render
-        rendered: str = str(render_fn(**template_data))
+        render_method: Callable[..., str] = getattr(template, "render")
+        rendered: str = str(render_method(**template_data))
         return rendered
 
     def _get_html_template(self) -> Template:

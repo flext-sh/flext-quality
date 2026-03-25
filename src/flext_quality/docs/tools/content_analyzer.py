@@ -222,9 +222,7 @@ class FlextQualityContentAnalyzer:
             completeness = analysis.completeness
             if completeness:
                 self.results.completeness_checks[filename] = completeness
-            quality_score = analysis.quality_score
-            if isinstance(quality_score, (int, float)):
-                self.results.content_scores[filename] = quality_score
+            self.results.content_scores[filename] = analysis.quality_score
 
             return analysis
 
@@ -725,12 +723,7 @@ class FlextQualityContentAnalyzer:
 
         code_block_count = metrics.code_block_count if metrics else 0
         file_name = analysis.file or ""
-        if (
-            isinstance(code_block_count, int)
-            and isinstance(file_name, str)
-            and code_block_count == 0
-            and "tutorial" in file_name.lower()
-        ):
+        if code_block_count == 0 and "tutorial" in file_name.lower():
             suggestions.append("Add code examples to illustrate concepts")
 
         link_count = metrics.link_count if metrics else 0

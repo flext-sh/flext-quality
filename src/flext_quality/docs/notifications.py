@@ -122,7 +122,15 @@ class FlextQualityDocumentationNotifier:
             | float
             | bool
             | t.StrSequence
-            | Mapping[str, int | str | float | bool | t.StrSequence | t.StrMapping]
+            | Mapping[
+                str,
+                int
+                | str
+                | float
+                | bool
+                | t.StrSequence
+                | Mapping[str, str | int | bool],
+            ]
             | None,
         ],
     ) -> _NotifierConfig:
@@ -168,9 +176,7 @@ class FlextQualityDocumentationNotifier:
             if isinstance(smtp_port, int):
                 cfg.email.smtp_port = smtp_port
             to_addresses = email.get("to_addresses")
-            if isinstance(to_addresses, list) and all(
-                isinstance(item, str) for item in to_addresses
-            ):
+            if isinstance(to_addresses, list):
                 cfg.email.to_addresses = to_addresses
 
         slack = loaded.get("slack")
@@ -189,11 +195,11 @@ class FlextQualityDocumentationNotifier:
                 cfg.webhook.url = url_val
             if isinstance(timeout_val, int):
                 cfg.webhook.timeout = timeout_val
-            if isinstance(headers_val, dict) and all(
-                isinstance(k, str) and isinstance(v, str)
-                for k, v in headers_val.items()
-            ):
-                cfg.webhook.headers = headers_val
+            if isinstance(headers_val, dict):
+                str_headers: Mapping[str, str] = {
+                    k: str(v) for k, v in headers_val.items()
+                }
+                cfg.webhook.headers = str_headers
 
         enabled_val = loaded.get("enabled")
         if isinstance(enabled_val, bool):
