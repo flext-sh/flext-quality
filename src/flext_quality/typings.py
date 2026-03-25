@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from pathlib import Path
 
 from flext_cli import FlextCliTypes
-from flext_core import t as core_t
+from flext_core import FlextTypes
 from flext_web import FlextWebTypes
 
 
@@ -16,17 +16,17 @@ class FlextQualityTypes(FlextWebTypes, FlextCliTypes):
     class Quality:
         """Quality-specific types namespace."""
 
-        type HookInput = Mapping[str, core_t.NormalizedValue]
-        type HookOutput = Mapping[str, core_t.NormalizedValue]
+        type HookInput = Mapping[str, FlextTypes.NormalizedValue]
+        type HookOutput = Mapping[str, FlextTypes.NormalizedValue]
         type HookMatcher = FlextWebTypes.StrSequence | None
-        type RuleConfig = Mapping[str, core_t.NormalizedValue]
+        type RuleConfig = Mapping[str, FlextTypes.NormalizedValue]
         type RuleResult = tuple[bool, str | None]
-        type McpToolResult = Mapping[str, core_t.NormalizedValue]
+        type McpToolResult = Mapping[str, FlextTypes.NormalizedValue]
         type McpResource = FlextWebTypes.StrMapping
         type MemoryQuery = Mapping[str, str | int | FlextWebTypes.StrSequence]
         type ContextQuery = Mapping[str, str | int]
         type GenericItem = (
-            core_t.Primitives | Path | Mapping[str, core_t.Primitives | None]
+            FlextTypes.Primitives | Path | Mapping[str, FlextTypes.Primitives | None]
         )
 
 

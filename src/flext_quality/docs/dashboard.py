@@ -13,8 +13,10 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from flask import Flask, Response, render_template_string, request
-from flext_core import FlextLogger, p, t
+from flext_core import FlextLogger, p
 from pydantic import ConfigDict, TypeAdapter
+
+from flext_quality import t
 
 _DICT_ADAPTER: TypeAdapter[t.ContainerMapping] = TypeAdapter(
     t.ContainerMapping,

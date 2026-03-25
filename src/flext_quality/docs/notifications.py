@@ -18,10 +18,9 @@ from pathlib import Path
 
 import requests
 import yaml
-from flext_core import t
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
 
-from flext_quality import m
+from flext_quality import m, t
 
 _AUDIT_DATA_ADAPTER: TypeAdapter[t.ContainerMapping] = TypeAdapter(
     t.ContainerMapping,
