@@ -1,5 +1,5 @@
 # AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
-# Regenerate with: make codegen
+# Regenerate with: make gen
 #
 """MCP Server module - FastMCP-based server for Claude Code integration."""
 
@@ -29,10 +29,7 @@ if TYPE_CHECKING:
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "execute_hook": ["flext_quality.mcp.tools", "execute_hook"],
     "get_hooks_config": ["flext_quality.mcp.resources", "get_hooks_config"],
-    "get_integrations_status": [
-        "flext_quality.mcp.resources",
-        "get_integrations_status",
-    ],
+    "get_integrations_status": ["flext_quality.mcp.resources", "get_integrations_status"],
     "get_rules_config": ["flext_quality.mcp.resources", "get_rules_config"],
     "get_server": ["flext_quality.mcp.server", "get_server"],
     "mcp": ["flext_quality.mcp.server", "mcp"],

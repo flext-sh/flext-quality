@@ -1,5 +1,5 @@
 # AUTO-GENERATED FILE — DO NOT EDIT MANUALLY.
-# Regenerate with: make codegen
+# Regenerate with: make gen
 #
 """Hooks system - Protocol-based hook lifecycle management."""
 
@@ -18,10 +18,7 @@ if TYPE_CHECKING:
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "FlextQualityBaseHook": ["flext_quality.hooks.base", "FlextQualityBaseHook"],
-    "FlextQualityHookManager": [
-        "flext_quality.hooks.manager",
-        "FlextQualityHookManager",
-    ],
+    "FlextQualityHookManager": ["flext_quality.hooks.manager", "FlextQualityHookManager"],
 }
 
 __all__ = [
