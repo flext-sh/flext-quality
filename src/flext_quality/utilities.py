@@ -35,11 +35,10 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                 output["systemMessage"] = message
             if blocked_reason:
                 output["blockedReason"] = blocked_reason
-            return (
-                TypeAdapter(MutableMapping[str, str | bool | None])
-                .dump_json(output)
-                .decode("utf-8")
+            adapter: TypeAdapter[MutableMapping[str, str | bool | None]] = TypeAdapter(
+                MutableMapping[str, str | bool | None],
             )
+            return adapter.dump_json(output).decode("utf-8")
 
         @staticmethod
         def load_yaml_rules(path: Path) -> r[Sequence[t.ContainerMapping]]:
@@ -115,7 +114,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                 timeout=timeout_secs,
             )
             if cmd_result.is_failure:
-                return r[str].fail(str(cmd_result.failure()))
+                return r[str].fail(str(cmd_result.error))
             out = cmd_result.value
             if out.exit_code != 0:
                 return r[str].fail(f"Command failed: {out.stderr}")

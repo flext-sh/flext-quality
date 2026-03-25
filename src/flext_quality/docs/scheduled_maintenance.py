@@ -186,42 +186,42 @@ class FlextQualityScheduledMaintenance:
 
         error_handling_raw = overrides.get("error_handling")
         if _is_str_mapping(error_handling_raw):
-            current = base.error_handling
+            err_cfg = base.error_handling
             merged["error_handling"] = {
                 "max_retries": _as_int(
                     error_handling_raw.get("max_retries"),
-                    current.max_retries,
+                    err_cfg.max_retries,
                 ),
                 "retry_delay": _as_int(
                     error_handling_raw.get("retry_delay"),
-                    current.retry_delay,
+                    err_cfg.retry_delay,
                 ),
                 "fail_fast": _as_bool(
                     error_handling_raw.get("fail_fast"),
-                    default=current.fail_fast,
+                    default=err_cfg.fail_fast,
                 ),
                 "notify_on_failure": _as_bool(
                     error_handling_raw.get("notify_on_failure"),
-                    default=current.notify_on_failure,
+                    default=err_cfg.notify_on_failure,
                 ),
             }
 
         logging_raw = overrides.get("logging")
         if _is_str_mapping(logging_raw):
-            current = base.logging
+            log_cfg = base.logging
             merged["logging"] = {
                 "enabled": _as_bool(
                     logging_raw.get("enabled"),
-                    default=current.enabled,
+                    default=log_cfg.enabled,
                 ),
-                "log_file": _as_str(logging_raw.get("log_file"), current.log_file),
+                "log_file": _as_str(logging_raw.get("log_file"), log_cfg.log_file),
                 "max_log_size": _as_str(
                     logging_raw.get("max_log_size"),
-                    current.max_log_size,
+                    log_cfg.max_log_size,
                 ),
                 "retention_days": _as_int(
                     logging_raw.get("retention_days"),
-                    current.retention_days,
+                    log_cfg.retention_days,
                 ),
             }
 
@@ -402,14 +402,14 @@ class FlextQualityScheduledMaintenance:
                 return handler(cmd_parts, timeout, description)
 
             # If no specific handler, log unsupported command
-            _ = self.results.warnings.append(
+            self.results.warnings.append(
                 f"Unsupported command: {cmd_name} in task: {description}. "
                 "Please install appropriate Python libraries or configure supported commands.",
             )
             return False
 
         except (OSError, RuntimeError, ValueError, KeyError) as e:
-            _ = self.results.errors.append(
+            self.results.errors.append(
                 f"Task error: {task_config.description} - {e!s}",
             )
             return False
@@ -437,7 +437,7 @@ class FlextQualityScheduledMaintenance:
         """Handle python -m commands."""
         try:
             if len(cmd_parts) < self.MIN_PYTHON_ARGS or cmd_parts[1] != "-m":
-                _ = self.results.warnings.append(
+                self.results.warnings.append(
                     f"Invalid python command format in task: {description}",
                 )
                 return False
@@ -448,7 +448,7 @@ class FlextQualityScheduledMaintenance:
                 else None
             )
             if module_name is None:
-                _ = self.results.warnings.append(
+                self.results.warnings.append(
                     f"No module specified in task: {description}",
                 )
                 return False
@@ -466,7 +466,7 @@ class FlextQualityScheduledMaintenance:
             return self._run_with_timeout(run_module, timeout, description)
 
         except (ImportError, ModuleNotFoundError, RuntimeError, OSError) as e:
-            _ = self.results.errors.append(
+            self.results.errors.append(
                 f"Python command failed in {description}: {e!s}",
             )
             return False
@@ -490,7 +490,7 @@ class FlextQualityScheduledMaintenance:
 
             return self._run_with_timeout(run_tests, timeout, description)
         except (RuntimeError, OSError, ImportError) as e:
-            _ = self.results.errors.append(
+            self.results.errors.append(
                 f"pytest command failed in {description}: {e!s}",
             )
             return False
@@ -508,7 +508,7 @@ class FlextQualityScheduledMaintenance:
         try:
             makefile = self.project_root / "Makefile"
             if not makefile.exists():
-                _ = self.results.warnings.append(
+                self.results.warnings.append(
                     f"Makefile not found for task: {description}",
                 )
                 return False
@@ -521,14 +521,14 @@ class FlextQualityScheduledMaintenance:
             if not targets:
                 targets = ["default"]  # Use default target if none specified
             # For now, log a warning suggesting direct command execution
-            _ = self.results.warnings.append(
+            self.results.warnings.append(
                 f"Make command '{' '.join(cmd_parts)}' requires make tool. "
                 f"For task: {description}, consider specifying the actual command directly.",
             )
             return False
 
         except (FileNotFoundError, OSError, RuntimeError) as e:
-            _ = self.results.errors.append(
+            self.results.errors.append(
                 f"Make command failed in {description}: {e!s}",
             )
             return False
@@ -546,7 +546,7 @@ class FlextQualityScheduledMaintenance:
 
             # Extract git subcommand
             if len(cmd_parts) < self.MIN_GIT_ARGS:
-                _ = self.results.warnings.append(
+                self.results.warnings.append(
                     f"Invalid git command format in task: {description}",
                 )
                 return False
@@ -568,12 +568,12 @@ class FlextQualityScheduledMaintenance:
 
             return self._run_with_timeout(run_git_command, timeout, description)
         except InvalidGitRepositoryError:
-            _ = self.results.warnings.append(
+            self.results.warnings.append(
                 f"Not a git repository for task: {description}",
             )
             return False
         except (OSError, RuntimeError, ValueError) as e:
-            _ = self.results.errors.append(
+            self.results.errors.append(
                 f"Git command failed in {description}: {e!s}",
             )
             return False
@@ -593,7 +593,7 @@ class FlextQualityScheduledMaintenance:
             logger.info(message)
             return True
         except (OSError, ValueError) as e:
-            _ = self.results.errors.append(
+            self.results.errors.append(
                 f"Echo command failed in {description}: {e!s}",
             )
             return False
@@ -621,17 +621,17 @@ class FlextQualityScheduledMaintenance:
             thread.join(timeout=timeout)
 
             if thread.is_alive():
-                _ = self.results.errors.append(f"Task timeout: {description}")
+                self.results.errors.append(f"Task timeout: {description}")
                 return False
 
             if not success:
-                _ = self.results.errors.append(f"Task failed: {description}")
+                self.results.errors.append(f"Task failed: {description}")
                 return False
 
             return success
 
         except (OSError, RuntimeError, ValueError) as e:
-            _ = self.results.errors.append(
+            self.results.errors.append(
                 f"Task execution error in {description}: {e!s}",
             )
             return False

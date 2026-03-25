@@ -282,6 +282,8 @@ class FlextQualityConfigManager:
         }
 
         default_value = defaults.get(filename, {})
+        if not isinstance(default_value, Mapping):
+            return self._as_config_data(None)
         return self._as_config_data(default_value)
 
     def reload_configs(self) -> None:

@@ -109,7 +109,7 @@ class FlextQualityLinkValidator:
                 UnicodeDecodeError,
                 OSError,
             ) as e:
-                _ = self.results.errors.append(
+                self.results.errors.append(
                     m.Quality.LinkCheckResult(
                         type="file_read_error",
                         file=file_rel_path,
@@ -164,7 +164,7 @@ class FlextQualityLinkValidator:
                     self.results.valid_links += 1
                 else:
                     self.results.broken_links += 1
-                    _ = self.results.errors.append(result)
+                    self.results.errors.append(result)
         return self.results
 
     def _create_link_result(
@@ -295,7 +295,7 @@ class FlextQualityLinkValidator:
                         target_exists = True
                         break
                 if not target_exists:
-                    _ = self.results.errors.append(
+                    self.results.errors.append(
                         m.Quality.LinkCheckResult(
                             type="broken_internal_link",
                             url=link.url,
@@ -342,7 +342,7 @@ class FlextQualityLinkValidator:
             if full_path.exists():
                 self.results.valid_links += 1
             else:
-                _ = self.results.errors.append(
+                self.results.errors.append(
                     m.Quality.LinkCheckResult(
                         type="missing_image",
                         src=src,
@@ -382,7 +382,7 @@ class FlextQualityLinkValidator:
                 UnicodeDecodeError,
                 OSError,
             ) as e:
-                _ = self.results.warnings_list.append(
+                self.results.warnings_list.append(
                     m.Quality.LinkCheckResult(
                         type="anchor_index_error",
                         file=file_rel_path,
@@ -391,17 +391,17 @@ class FlextQualityLinkValidator:
                 )
         for link in anchor_links:
             anchor = link.url[1:]
-            file_path = link.file
-            if file_path in file_anchors and anchor in file_anchors[file_path]:
+            link_file = link.file
+            if link_file in file_anchors and anchor in file_anchors[link_file]:
                 self.results.valid_links += 1
             else:
-                _ = self.results.errors.append(
+                self.results.errors.append(
                     m.Quality.LinkCheckResult(
                         type="broken_anchor",
                         anchor=anchor,
-                        file=file_path,
+                        file=link_file,
                         line=link.line_number,
-                        error=f"Anchor '{anchor}' not found in {file_path}",
+                        error=f"Anchor '{anchor}' not found in {link_file}",
                     ),
                 )
                 self.results.broken_links += 1
@@ -436,7 +436,7 @@ class FlextQualityLinkValidator:
         for link in links:
             text = link.text.lower().strip()
             if text in poor_link_texts or len(text) < 3:
-                _ = self.results.warnings_list.append(
+                self.results.warnings_list.append(
                     m.Quality.LinkCheckResult(
                         type="poor_link_text",
                         text=link.text,
@@ -504,7 +504,7 @@ class FlextQualityContentValidator:
                 UnicodeDecodeError,
                 OSError,
             ) as e:
-                _ = self.results.content_issues.append(
+                self.results.content_issues.append(
                     m.Quality.ContentIssue(
                         type="syntax_validation_error",
                         file=file_rel_path,
@@ -561,7 +561,7 @@ class FlextQualityContentValidator:
                 file_rel_path = str(file_path.relative_to(file_path.parents[2]))
                 metrics = self._calculate_content_metrics(content)
                 if metrics.word_count < 50:
-                    _ = self.results.content_issues.append(
+                    self.results.content_issues.append(
                         m.Quality.ContentIssue(
                             type="insufficient_content",
                             file=file_rel_path,
@@ -570,7 +570,7 @@ class FlextQualityContentValidator:
                         ),
                     )
                 if metrics.readability_score < 60:
-                    _ = self.results.content_issues.append(
+                    self.results.content_issues.append(
                         m.Quality.ContentIssue(
                             type="readability_issue",
                             file=file_rel_path,
@@ -585,7 +585,7 @@ class FlextQualityContentValidator:
                 UnicodeDecodeError,
                 OSError,
             ) as e:
-                _ = self.results.content_issues.append(
+                self.results.content_issues.append(
                     m.Quality.ContentIssue(
                         type="quality_analysis_error",
                         file=file_rel_path,

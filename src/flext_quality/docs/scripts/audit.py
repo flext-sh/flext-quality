@@ -221,14 +221,14 @@ class FlextQualityDocumentationAuditor:
                         "outdated_indicators": outdated_indicators,
                         "recommendation": f"Review and update content (last modified {age_days} days ago)",
                     }
-                    _ = self.results.issues.append(issue)
+                    self.results.issues.append(issue)
             except (
                 FileNotFoundError,
                 PermissionError,
                 UnicodeDecodeError,
                 OSError,
             ) as e:
-                _ = self.results.issues.append({
+                self.results.issues.append({
                     "type": "file_access_error",
                     "severity": "medium",
                     "file": str(file_path.relative_to(self.project_root)),
@@ -266,7 +266,7 @@ class FlextQualityDocumentationAuditor:
                 content = file_path.read_text(encoding="utf-8")
                 word_count = len(content.split())
                 if word_count < min_word_count:
-                    _ = self.results.issues.append({
+                    self.results.issues.append({
                         "type": "insufficient_content",
                         "severity": "low",
                         "file": str(file_path.relative_to(self.project_root)),
@@ -280,7 +280,7 @@ class FlextQualityDocumentationAuditor:
                         required_sections,
                     )
                     if missing_sections:
-                        _ = self.results.issues.append({
+                        self.results.issues.append({
                             "type": "missing_sections",
                             "severity": "medium",
                             "file": str(file_path.relative_to(self.project_root)),
@@ -293,7 +293,7 @@ class FlextQualityDocumentationAuditor:
                         content,
                     )
                     if todos:
-                        _ = self.results.issues.append({
+                        self.results.issues.append({
                             "type": "todo_markers",
                             "severity": "low",
                             "file": str(file_path.relative_to(self.project_root)),
@@ -307,7 +307,7 @@ class FlextQualityDocumentationAuditor:
                 UnicodeDecodeError,
                 OSError,
             ) as e:
-                _ = self.results.issues.append({
+                self.results.issues.append({
                     "type": "content_analysis_error",
                     "severity": "medium",
                     "file": str(file_path.relative_to(self.project_root)),
@@ -339,7 +339,7 @@ class FlextQualityDocumentationAuditor:
                 content = file_path.read_text(encoding="utf-8")
                 formatting_issues = self._check_markdown_formatting(content)
                 if formatting_issues:
-                    _ = self.results.issues.append({
+                    self.results.issues.append({
                         "type": "formatting_issues",
                         "severity": "low",
                         "file": str(file_path.relative_to(self.project_root)),
@@ -356,7 +356,7 @@ class FlextQualityDocumentationAuditor:
                         )
                         else "medium"
                     )
-                    _ = self.results.issues.append({
+                    self.results.issues.append({
                         "type": "accessibility_issues",
                         "severity": severity,
                         "file": str(file_path.relative_to(self.project_root)),
@@ -366,7 +366,7 @@ class FlextQualityDocumentationAuditor:
                 if accessibility_cfg.heading_structure:
                     heading_issues = self._check_heading_hierarchy(content)
                     if heading_issues:
-                        _ = self.results.issues.append({
+                        self.results.issues.append({
                             "type": "heading_hierarchy",
                             "severity": "medium",
                             "file": str(file_path.relative_to(self.project_root)),
@@ -379,7 +379,7 @@ class FlextQualityDocumentationAuditor:
                 UnicodeDecodeError,
                 OSError,
             ) as e:
-                _ = self.results.issues.append({
+                self.results.issues.append({
                     "type": "consistency_check_error",
                     "severity": "medium",
                     "file": str(file_path.relative_to(self.project_root)),
@@ -493,7 +493,7 @@ class FlextQualityDocumentationAuditor:
                 UnicodeDecodeError,
                 OSError,
             ) as e:
-                _ = self.results.issues.append({
+                self.results.issues.append({
                     "type": "link_extraction_error",
                     "severity": "medium",
                     "file": str(file_path.relative_to(self.project_root)),
@@ -524,7 +524,7 @@ class FlextQualityDocumentationAuditor:
                     allow_redirects=True,
                 )
                 if response.status_code >= 400:
-                    _ = self.results.issues.append({
+                    self.results.issues.append({
                         "type": "broken_external_link",
                         "severity": "high",
                         "file": link["file"],
@@ -533,7 +533,7 @@ class FlextQualityDocumentationAuditor:
                         "recommendation": f"Fix or remove broken link (HTTP {response.status_code})",
                     })
             except requests.RequestException as e:
-                _ = self.results.issues.append({
+                self.results.issues.append({
                     "type": "unreachable_external_link",
                     "severity": "high",
                     "file": link["file"],
@@ -562,7 +562,7 @@ class FlextQualityDocumentationAuditor:
                 )
                 potential_target = (link_file_dir / target_file).resolve()
                 if not potential_target.exists():
-                    _ = self.results.issues.append({
+                    self.results.issues.append({
                         "type": "broken_internal_link",
                         "severity": "high",
                         "file": link["file"],
@@ -582,7 +582,7 @@ class FlextQualityDocumentationAuditor:
             else:
                 full_path = image_path
             if not full_path.exists():
-                _ = self.results.issues.append({
+                self.results.issues.append({
                     "type": "missing_image",
                     "severity": "medium",
                     "file": image["file"],

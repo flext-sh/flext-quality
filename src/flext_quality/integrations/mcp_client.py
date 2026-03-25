@@ -36,11 +36,10 @@ class FlextQualityMcpClient:
         if not self.is_mcp_cli_available():
             return r[t.StrSequence].fail("mcp-cli not found in PATH")
         tool_path = f"{call.server}/{call.tool}"
-        params_json = (
-            TypeAdapter(Mapping[str, t.NormalizedValue])
-            .dump_json(call.params)
-            .decode("utf-8")
+        adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
+            Mapping[str, t.NormalizedValue],
         )
+        params_json = adapter.dump_json(call.params).decode("utf-8")
         return r[t.StrSequence].ok(["mcp-cli", "call", tool_path, params_json])
 
     def build_info_command(self, server: str, tool: str) -> r[t.StrSequence]:
@@ -143,7 +142,9 @@ class FlextQualityMcpClient:
                     m.Quality.McpToolResult(
                         success=True,
                         data={
-                            "items": TypeAdapter(Sequence[t.StrMapping])
+                            "items": TypeAdapter[MutableSequence[t.StrMapping]](
+                            MutableSequence[t.StrMapping],
+                        )
                             .dump_json(coerced_data)
                             .decode("utf-8"),
                         },

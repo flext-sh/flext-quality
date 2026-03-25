@@ -15,13 +15,14 @@ import argparse
 from collections.abc import Callable, Mapping, MutableSequence, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import TypeAlias
 
 from jinja2 import Template
 from pydantic import BaseModel, TypeAdapter
 
 from flext_quality import t
 
-ReportValue = (
+ReportValue: TypeAlias = (
     str
     | int
     | float

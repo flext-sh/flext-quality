@@ -375,7 +375,7 @@ class FlextQualityDocumentationOptimizer:
         if self.backup:
             backup_path = file_path.with_suffix(f"{file_path.suffix}.backup")
             shutil.copy2(file_path, backup_path)
-            _ = self.results.backups_created.append(
+            self.results.backups_created.append(
                 str(backup_path.relative_to(self.project_root)),
             )
         _ = file_path.write_text(content, encoding="utf-8")

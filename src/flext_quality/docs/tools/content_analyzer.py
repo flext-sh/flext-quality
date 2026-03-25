@@ -409,7 +409,7 @@ class FlextQualityContentAnalyzer:
                 structure.toc_position = (content[: toc_match.start()].count("\n")) + 1
                 break
 
-        headings: Sequence[Mapping[str, int | str]] = [
+        headings: MutableSequence[Mapping[str, int | str]] = [
             {
                 "level": len(match.group(1)),
                 "title": match.group(2).strip(),

@@ -11,7 +11,7 @@ import logging
 from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Annotated, ClassVar
+from typing import ClassVar
 
 from pydantic import BaseModel, Field
 
@@ -21,17 +21,17 @@ from flext_quality import m, t
 class FlextQualityFileStatistics(BaseModel):
     """Statistics payload for discovered documentation files."""
 
-    total_files: Annotated[int, Field(default=0)]
-    total_size: Annotated[int, Field(default=0)]
-    total_lines: Annotated[int, Field(default=0)]
-    total_words: Annotated[int, Field(default=0)]
-    markdown_files: Annotated[int, Field(default=0)]
-    other_files: Annotated[int, Field(default=0)]
-    size_distribution: Annotated[Mapping[str, int]] = Field(default_factory=dict)
-    categories: Annotated[Mapping[str, int]] = Field(default_factory=dict)
-    avg_file_size: Annotated[float, Field(default=0.0)]
-    avg_lines_per_file: Annotated[float, Field(default=0.0)]
-    avg_words_per_file: Annotated[float, Field(default=0.0)]
+    total_files: int = 0
+    total_size: int = 0
+    total_lines: int = 0
+    total_words: int = 0
+    markdown_files: int = 0
+    other_files: int = 0
+    size_distribution: Mapping[str, int] = Field(default_factory=dict)
+    categories: Mapping[str, int] = Field(default_factory=dict)
+    avg_file_size: float = 0.0
+    avg_lines_per_file: float = 0.0
+    avg_words_per_file: float = 0.0
 
 
 class FlextQualityDocumentationFinder:
