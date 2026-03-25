@@ -44,6 +44,7 @@ if TYPE_CHECKING:
     )
     from flext_quality.docs.scheduled_maintenance import (
         FlextQualityScheduledMaintenance,
+        logger,
     )
     from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
     from flext_quality.docs.scripts.optimize import (
@@ -278,6 +279,7 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "h": ["flext_cli", "h"],
     "hooks": ["flext_quality.hooks", ""],
     "integrations": ["flext_quality.integrations", ""],
+    "logger": ["flext_quality.docs.scheduled_maintenance", "logger"],
     "m": ["flext_quality.models", "FlextQualityModels"],
     "main": ["flext_quality.services.cli", "main"],
     "mcp": ["flext_quality.mcp.server", "mcp"],
@@ -367,6 +369,7 @@ __all__ = [
     "h",
     "hooks",
     "integrations",
+    "logger",
     "m",
     "main",
     "mcp",

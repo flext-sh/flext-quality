@@ -41,6 +41,7 @@ if TYPE_CHECKING:
     )
     from flext_quality.docs.scheduled_maintenance import (
         FlextQualityScheduledMaintenance,
+        logger,
     )
     from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
     from flext_quality.docs.scripts.optimize import (
@@ -174,6 +175,7 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "analyze_files_content",
     ],
     "core": ["flext_quality.docs.core", ""],
+    "logger": ["flext_quality.docs.scheduled_maintenance", "logger"],
     "main": ["flext_quality.docs.scripts.validate", "main"],
     "scripts": ["flext_quality.docs.scripts", ""],
     "tools": ["flext_quality.docs.tools", ""],
@@ -219,6 +221,7 @@ __all__ = [
     "analyze_file_content",
     "analyze_files_content",
     "core",
+    "logger",
     "main",
     "scripts",
     "tools",
