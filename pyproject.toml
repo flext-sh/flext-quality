@@ -12,8 +12,6 @@ requires = [ "hatchling" ]
 [project]
 
 
-
-
 authors = [ {email = "team@flext.sh", name = "FLEXT Team"} ]
 classifiers = [
   "Development Status :: 4 - Beta",
@@ -122,18 +120,12 @@ dev = [
 
 
 
-
-
-
-
 # [MANAGED] coverage
 [tool.coverage.report]
 fail_under = 15
 precision = 2
 show_missing = true
 skip_covered = false
-
-
 
 
 # [MANAGED] deptry
@@ -147,11 +139,8 @@ pep621_dev_dependency_groups = [
 ]
 
 
-
 [tool.hatch.metadata]
 allow-direct-references = true
-
-
 
 
 # [MANAGED] mypy
@@ -171,15 +160,11 @@ python_version = "3.13"
 [tool.poetry]
 
 
-
-
 # [MANAGED] pydantic-mypy
 [tool.pydantic-mypy]
 init_forbid_extra = true
 init_typed = true
 warn_required_dynamic_aliases = true
-
-
 
 
 # [MANAGED] pyrefly
@@ -229,8 +214,6 @@ redundant-cast = true
 unannotated-attribute = true
 unannotated-parameter = true
 unannotated-return = true
-
-
 
 
 # [MANAGED] pyright
@@ -324,8 +307,6 @@ python_files = [
   "*_tests.py",
   "test_*.py",
 ]
-
-
 
 
 # [MANAGED] ruff
@@ -723,8 +704,6 @@ split-on-trailing-comma = true
   "S607",
 ]
 
-
-
 # [MANAGED] tomlsort
 [tool.tomlsort]
 all = true
@@ -738,8 +717,6 @@ sort_first = [
 
 [tool.uv.sources.flext-core]
 workspace = true
-
-
 
 
 # [MANAGED] yamlfix
