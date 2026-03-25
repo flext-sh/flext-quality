@@ -364,12 +364,14 @@ class FlextQualityStyleValidator:
         """Check heading hierarchy and consistency."""
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
-        headings: MutableSequence[tuple[int, str, int]] = []
-        for match in re.finditer(r"^(#{1,6})\s+(.+)$", content, re.MULTILINE):
-            level = len(match.group(1))
-            text = match.group(2).strip()
-            line_num = content[: match.start()].count("\n") + 1
-            headings.append((level, text, line_num))
+        headings: Sequence[tuple[int, str, int]] = [
+            (
+                len(match.group(1)),
+                match.group(2).strip(),
+                content[: match.start()].count("\n") + 1,
+            )
+            for match in re.finditer(r"^(#{1,6})\s+(.+)$", content, re.MULTILINE)
+        ]
 
         enforce_hierarchy = (
             self.config.headings.enforce_hierarchy if self.config.headings else True
@@ -409,12 +411,14 @@ class FlextQualityStyleValidator:
         """Check list formatting consistency."""
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
-        list_items: MutableSequence[tuple[str, str, int]] = []
-        for match in re.finditer(r"^(\s*)([-\*\+])\s+", content, re.MULTILINE):
-            indent = match.group(1)
-            marker = match.group(2)
-            line_num = content[: match.start()].count("\n") + 1
-            list_items.append((indent, marker, line_num))
+        list_items: Sequence[tuple[str, str, int]] = [
+            (
+                match.group(1),
+                match.group(2),
+                content[: match.start()].count("\n") + 1,
+            )
+            for match in re.finditer(r"^(\s*)([-\*\+])\s+", content, re.MULTILINE)
+        ]
 
         if not list_items:
             return violations

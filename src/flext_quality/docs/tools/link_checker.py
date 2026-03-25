@@ -370,26 +370,25 @@ class FlextQualityLinkChecker:
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        processed_results: MutableSequence[FlextQualityLinkChecker.LinkResult] = []
-        for result in results:
-            if isinstance(result, BaseException):
-                processed_results.append(
-                    FlextQualityLinkChecker.LinkResult(
-                        url="",
-                        error=f"task_exception: {result!s}",
-                        valid=False,
-                        context={},
-                    ),
-                )
-            else:
-                processed_results.append(result)
+        processed_results: Sequence[FlextQualityLinkChecker.LinkResult] = [
+            FlextQualityLinkChecker.LinkResult(
+                url="",
+                error=f"task_exception: {result!s}",
+                valid=False,
+                context={},
+            )
+            if isinstance(result, BaseException)
+            else result
+            for result in results
+        ]
 
         self.results.performance.total_time = time.time() - start_time
 
-        valid_times: MutableSequence[float] = []
-        for r in processed_results:
-            if r.response_time is not None and r.valid:
-                valid_times.append(float(r.response_time))
+        valid_times: Sequence[float] = [
+            float(r.response_time)
+            for r in processed_results
+            if r.response_time is not None and r.valid
+        ]
 
         if valid_times:
             self.results.performance.average_response_time = sum(
@@ -418,10 +417,11 @@ class FlextQualityLinkChecker:
 
         self.results.performance.total_time = time.time() - start_time
 
-        valid_times: MutableSequence[float] = []
-        for r in results:
-            if r.response_time is not None and r.valid:
-                valid_times.append(float(r.response_time))
+        valid_times: Sequence[float] = [
+            float(r.response_time)
+            for r in results
+            if r.response_time is not None and r.valid
+        ]
 
         if valid_times:
             self.results.performance.average_response_time = sum(
@@ -485,33 +485,27 @@ class FlextQualityLinkChecker:
         links: Sequence[t.ContainerMapping],
     ) -> Sequence[t.ContainerMapping]:
         """Special validation for GitHub links."""
-        github_links: MutableSequence[t.ContainerMapping] = []
-        for link in links:
-            url_raw = link.get("url")
-            url_obj: str | None = url_raw if isinstance(url_raw, str) else None
-            if isinstance(url_obj, str) and "github.com" in url_obj:
-                github_links.append(link)
+        github_links: Sequence[t.ContainerMapping] = [
+            link
+            for link in links
+            if isinstance(link.get("url"), str) and "github.com" in str(link.get("url"))
+        ]
 
-        validated_links: MutableSequence[Mapping[str, bool | t.NormalizedValue]] = []
-
-        for link in github_links:
-            url_candidate = link.get("url")
-            if not isinstance(url_candidate, str):
-                continue
-            url = url_candidate
-
-            if self._validate_github_url_structure(url):
-                validated_links.append({
-                    **link,
-                    "valid": True,
-                    "github_validated": True,
-                })
-            else:
-                validated_links.append({
-                    **link,
-                    "valid": False,
-                    "error": "invalid_github_url_structure",
-                })
+        validated_links: Sequence[Mapping[str, bool | t.NormalizedValue]] = [
+            {
+                **link,
+                "valid": True,
+                "github_validated": True,
+            }
+            if self._validate_github_url_structure(str(link.get("url")))
+            else {
+                **link,
+                "valid": False,
+                "error": "invalid_github_url_structure",
+            }
+            for link in github_links
+            if isinstance(link.get("url"), str)
+        ]
 
         return validated_links
 

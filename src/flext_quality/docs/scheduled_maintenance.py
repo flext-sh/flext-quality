@@ -19,10 +19,13 @@ from typing import TypeIs
 
 import pytest
 import schedule
+import structlog
 import yaml
 from git import InvalidGitRepositoryError, Repo
 
 from flext_quality import m, t
+
+logger = structlog.get_logger(__name__)
 
 
 def _docs_root() -> Path:
@@ -587,7 +590,7 @@ class FlextQualityScheduledMaintenance:
 
         try:
             message = " ".join(cmd_parts[1:]) if len(cmd_parts) > 1 else ""
-            print(message)  # CLI output
+            logger.info(message)
             return True
         except (OSError, ValueError) as e:
             _ = self.results.errors.append(

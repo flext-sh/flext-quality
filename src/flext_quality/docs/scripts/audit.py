@@ -318,13 +318,17 @@ class FlextQualityDocumentationAuditor:
         self,
         content: str,
         required_sections: t.StrSequence,
-    ) -> MutableSequence[str]:
+    ) -> Sequence[str]:
         """Check for required sections in documentation."""
-        missing: MutableSequence[str] = []
-        for section in required_sections:
-            pattern = f"^#+\\s.*{re.escape(section)}.*$"
-            if not re.search(pattern, content, re.MULTILINE | re.IGNORECASE):
-                missing.append(section)
+        missing: Sequence[str] = [
+            section
+            for section in required_sections
+            if not re.search(
+                f"^#+\\s.*{re.escape(section)}.*$",
+                content,
+                re.MULTILINE | re.IGNORECASE,
+            )
+        ]
         return missing
 
     def check_content_consistency(self, doc_files: Sequence[Path]) -> None:

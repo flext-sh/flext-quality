@@ -20,10 +20,13 @@ from pathlib import Path
 from typing import NotRequired, TypedDict
 
 import schedule
+import structlog
 import yaml
 from pydantic import BaseModel, Field
 
 from flext_quality import t
+
+logger = structlog.get_logger(__name__)
 
 # Module-level feature detection flags
 HAS_PYTEST = importlib.util.find_spec("pytest") is not None
@@ -649,9 +652,9 @@ class ScheduledMaintenance:
 
         try:
             message = " ".join(cmd_parts[1:]) if len(cmd_parts) > 1 else ""
-            print(message)
+            logger.info(message)
             return True
-        except Exception as e:
+        except (OSError, ValueError) as e:
             _ = self.results.errors.append(
                 f"Echo command failed in {description}: {e!s}",
             )

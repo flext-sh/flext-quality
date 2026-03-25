@@ -72,39 +72,123 @@ if TYPE_CHECKING:
     )
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextQualityAuditRules": ["flext_quality.docs.core.config_manager", "FlextQualityAuditRules"],
-    "FlextQualityBaseAnalyzer": ["flext_quality.docs.core.base_classes", "FlextQualityBaseAnalyzer"],
-    "FlextQualityBaseAuditor": ["flext_quality.docs.core.base_classes", "FlextQualityBaseAuditor"],
-    "FlextQualityBaseReporter": ["flext_quality.docs.core.base_classes", "FlextQualityBaseReporter"],
-    "FlextQualityBaseValidator": ["flext_quality.docs.core.base_classes", "FlextQualityBaseValidator"],
-    "FlextQualityConfigManager": ["flext_quality.docs.core.config_manager", "FlextQualityConfigManager"],
-    "FlextQualityContentAnalyzer": ["flext_quality.docs.tools.content_analyzer", "FlextQualityContentAnalyzer"],
-    "FlextQualityContentValidator": ["flext_quality.docs.scripts.validate", "FlextQualityContentValidator"],
-    "FlextQualityDocumentationAuditor": ["flext_quality.docs.scripts.audit", "FlextQualityDocumentationAuditor"],
-    "FlextQualityDocumentationDashboard": ["flext_quality.docs.dashboard", "FlextQualityDocumentationDashboard"],
-    "FlextQualityDocumentationFinder": ["flext_quality.docs.core.file_discovery", "FlextQualityDocumentationFinder"],
-    "FlextQualityDocumentationNotifier": ["flext_quality.docs.notifications", "FlextQualityDocumentationNotifier"],
-    "FlextQualityDocumentationOptimizer": ["flext_quality.docs.scripts.optimize", "FlextQualityDocumentationOptimizer"],
-    "FlextQualityDocumentationReporter": ["flext_quality.docs.scripts.report", "FlextQualityDocumentationReporter"],
-    "FlextQualityFileStatistics": ["flext_quality.docs.core.file_discovery", "FlextQualityFileStatistics"],
-    "FlextQualityLinkChecker": ["flext_quality.docs.tools.link_checker", "FlextQualityLinkChecker"],
-    "FlextQualityLinkValidator": ["flext_quality.docs.scripts.validate", "FlextQualityLinkValidator"],
-    "FlextQualityScheduledMaintenance": ["flext_quality.docs.scheduled_maintenance", "FlextQualityScheduledMaintenance"],
-    "FlextQualityStyleGuide": ["flext_quality.docs.core.config_manager", "FlextQualityStyleGuide"],
-    "FlextQualityStyleValidator": ["flext_quality.docs.tools.style_validator", "FlextQualityStyleValidator"],
-    "FlextQualityValidationConfig": ["flext_quality.docs.core.config_manager", "FlextQualityValidationConfig"],
-    "MAX_BROKEN_LINKS_TO_SHOW": ["flext_quality.docs.notifications", "MAX_BROKEN_LINKS_TO_SHOW"],
-    "MIN_HEADINGS_FOR_TOC": ["flext_quality.docs.scripts.optimize", "MIN_HEADINGS_FOR_TOC"],
+    "FlextQualityAuditRules": [
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityAuditRules",
+    ],
+    "FlextQualityBaseAnalyzer": [
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseAnalyzer",
+    ],
+    "FlextQualityBaseAuditor": [
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseAuditor",
+    ],
+    "FlextQualityBaseReporter": [
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseReporter",
+    ],
+    "FlextQualityBaseValidator": [
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseValidator",
+    ],
+    "FlextQualityConfigManager": [
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityConfigManager",
+    ],
+    "FlextQualityContentAnalyzer": [
+        "flext_quality.docs.tools.content_analyzer",
+        "FlextQualityContentAnalyzer",
+    ],
+    "FlextQualityContentValidator": [
+        "flext_quality.docs.scripts.validate",
+        "FlextQualityContentValidator",
+    ],
+    "FlextQualityDocumentationAuditor": [
+        "flext_quality.docs.scripts.audit",
+        "FlextQualityDocumentationAuditor",
+    ],
+    "FlextQualityDocumentationDashboard": [
+        "flext_quality.docs.dashboard",
+        "FlextQualityDocumentationDashboard",
+    ],
+    "FlextQualityDocumentationFinder": [
+        "flext_quality.docs.core.file_discovery",
+        "FlextQualityDocumentationFinder",
+    ],
+    "FlextQualityDocumentationNotifier": [
+        "flext_quality.docs.notifications",
+        "FlextQualityDocumentationNotifier",
+    ],
+    "FlextQualityDocumentationOptimizer": [
+        "flext_quality.docs.scripts.optimize",
+        "FlextQualityDocumentationOptimizer",
+    ],
+    "FlextQualityDocumentationReporter": [
+        "flext_quality.docs.scripts.report",
+        "FlextQualityDocumentationReporter",
+    ],
+    "FlextQualityFileStatistics": [
+        "flext_quality.docs.core.file_discovery",
+        "FlextQualityFileStatistics",
+    ],
+    "FlextQualityLinkChecker": [
+        "flext_quality.docs.tools.link_checker",
+        "FlextQualityLinkChecker",
+    ],
+    "FlextQualityLinkValidator": [
+        "flext_quality.docs.scripts.validate",
+        "FlextQualityLinkValidator",
+    ],
+    "FlextQualityScheduledMaintenance": [
+        "flext_quality.docs.scheduled_maintenance",
+        "FlextQualityScheduledMaintenance",
+    ],
+    "FlextQualityStyleGuide": [
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityStyleGuide",
+    ],
+    "FlextQualityStyleValidator": [
+        "flext_quality.docs.tools.style_validator",
+        "FlextQualityStyleValidator",
+    ],
+    "FlextQualityValidationConfig": [
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityValidationConfig",
+    ],
+    "MAX_BROKEN_LINKS_TO_SHOW": [
+        "flext_quality.docs.notifications",
+        "MAX_BROKEN_LINKS_TO_SHOW",
+    ],
+    "MIN_HEADINGS_FOR_TOC": [
+        "flext_quality.docs.scripts.optimize",
+        "MIN_HEADINGS_FOR_TOC",
+    ],
     "ReportValue": ["flext_quality.docs.scripts.report", "ReportValue"],
-    "analyze_file_content": ["flext_quality.docs.tools.content_analyzer", "analyze_file_content"],
-    "analyze_files_content": ["flext_quality.docs.tools.content_analyzer", "analyze_files_content"],
+    "analyze_file_content": [
+        "flext_quality.docs.tools.content_analyzer",
+        "analyze_file_content",
+    ],
+    "analyze_files_content": [
+        "flext_quality.docs.tools.content_analyzer",
+        "analyze_files_content",
+    ],
     "core": ["flext_quality.docs.core", ""],
     "main": ["flext_quality.docs.scripts.validate", "main"],
     "scripts": ["flext_quality.docs.scripts", ""],
     "tools": ["flext_quality.docs.tools", ""],
-    "validate_file_style": ["flext_quality.docs.tools.style_validator", "validate_file_style"],
-    "validate_files_style": ["flext_quality.docs.tools.style_validator", "validate_files_style"],
-    "validate_links_sync": ["flext_quality.docs.tools.link_checker", "validate_links_sync"],
+    "validate_file_style": [
+        "flext_quality.docs.tools.style_validator",
+        "validate_file_style",
+    ],
+    "validate_files_style": [
+        "flext_quality.docs.tools.style_validator",
+        "validate_files_style",
+    ],
+    "validate_links_sync": [
+        "flext_quality.docs.tools.link_checker",
+        "validate_links_sync",
+    ],
 }
 
 __all__ = [

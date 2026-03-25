@@ -27,8 +27,8 @@ class FlextQualityFileStatistics(BaseModel):
     total_words: Annotated[int, Field(default=0)]
     markdown_files: Annotated[int, Field(default=0)]
     other_files: Annotated[int, Field(default=0)]
-    size_distribution: Annotated[Mapping[str, int], Field(default_factory=dict)]
-    categories: Annotated[Mapping[str, int], Field(default_factory=dict)]
+    size_distribution: Annotated[Mapping[str, int]] = Field(default_factory=dict)
+    categories: Annotated[Mapping[str, int]] = Field(default_factory=dict)
     avg_file_size: Annotated[float, Field(default=0.0)]
     avg_lines_per_file: Annotated[float, Field(default=0.0)]
     avg_words_per_file: Annotated[float, Field(default=0.0)]

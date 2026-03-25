@@ -409,12 +409,14 @@ class FlextQualityContentAnalyzer:
                 structure.toc_position = (content[: toc_match.start()].count("\n")) + 1
                 break
 
-        headings: MutableSequence[Mapping[str, int | str]] = []
-        for match in re.finditer(r"^(#{1,6})\s+(.+)$", content, re.MULTILINE):
-            level = len(match.group(1))
-            title = match.group(2).strip()
-            line_num = content[: match.start()].count("\n") + 1
-            headings.append({"level": level, "title": title, "line": line_num})
+        headings: Sequence[Mapping[str, int | str]] = [
+            {
+                "level": len(match.group(1)),
+                "title": match.group(2).strip(),
+                "line": content[: match.start()].count("\n") + 1,
+            }
+            for match in re.finditer(r"^(#{1,6})\s+(.+)$", content, re.MULTILINE)
+        ]
 
         structure.sections = headings
 

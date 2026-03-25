@@ -15,7 +15,6 @@ from datetime import UTC, datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
-from typing import Annotated
 
 import requests
 import yaml
@@ -59,7 +58,7 @@ class FlextQualityDocumentationNotifier:
         username: str
         password: str
         from_address: str
-        to_addresses: Annotated[t.StrSequence, Field(default_factory=list)]
+        to_addresses: t.StrSequence = Field(default_factory=list)
 
     class _SlackConfig(BaseModel):
         webhook_url: str
@@ -68,7 +67,7 @@ class FlextQualityDocumentationNotifier:
 
     class _WebhookConfig(BaseModel):
         url: str
-        headers: Annotated[t.StrMapping, Field(default_factory=dict)]
+        headers: t.StrMapping = Field(default_factory=dict)
         timeout: int
 
     class _ChannelsConfig(BaseModel):
