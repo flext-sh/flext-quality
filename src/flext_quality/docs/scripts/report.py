@@ -434,7 +434,7 @@ class FlextQualityDocumentationReporter:
         if not audit_data or not isinstance(audit_data, dict):
             return None
         issues_raw_obj = audit_data.get("issues")
-        issues_raw_val = (
+        issues_raw_val: list[ReportValue] = (
             list(issues_raw_obj) if isinstance(issues_raw_obj, list) else []
         )
         metrics_raw_obj = audit_data.get("metrics")

@@ -196,16 +196,16 @@ class FlextQualityContentAnalyzer:
             filename = str(file_path.relative_to(file_path.parents[2]))
             issues_list: MutableSequence[FlextQualityContentAnalyzer.Issue] = []
             suggestions_list: MutableSequence[str] = []
-            analysis = FlextQualityContentAnalyzer.Analysis(
-                file=filename,
-                metrics=self._calculate_content_metrics(content),
-                readability=self._analyze_readability(content),
-                structure=self._analyze_structure(content),
-                completeness=self._check_completeness(content, filename),
-                quality_score=0.0,
-                issues=issues_list,
-                suggestions=suggestions_list,
-            )
+            analysis = FlextQualityContentAnalyzer.Analysis.model_validate({
+                "file": filename,
+                "metrics": self._calculate_content_metrics(content),
+                "readability": self._analyze_readability(content),
+                "structure": self._analyze_structure(content),
+                "completeness": self._check_completeness(content, filename),
+                "quality_score": 0.0,
+                "issues": issues_list,
+                "suggestions": suggestions_list,
+            })
 
             analysis.quality_score = self._calculate_quality_score(analysis)
 
@@ -386,13 +386,13 @@ class FlextQualityContentAnalyzer:
         """Analyze document structure and organization."""
         sections_list: MutableSequence[Mapping[str, int | str]] = []
         depth_analysis_dict: MutableMapping[str, int | float] = {}
-        structure = FlextQualityContentAnalyzer.Structure(
-            has_table_of_contents=False,
-            toc_position=0,
-            heading_hierarchy_valid=True,
-            sections=sections_list,
-            depth_analysis=depth_analysis_dict,
-        )
+        structure = FlextQualityContentAnalyzer.Structure.model_validate({
+            "has_table_of_contents": False,
+            "toc_position": 0,
+            "heading_hierarchy_valid": True,
+            "sections": sections_list,
+            "depth_analysis": depth_analysis_dict,
+        })
 
         toc_patterns = [
             r"^#{1,6}.*\b[tT]able of [cC]ontents\b",
@@ -448,14 +448,14 @@ class FlextQualityContentAnalyzer:
         missing_elems: MutableSequence[str] = []
         required_present: MutableSequence[str] = []
         optional_present: MutableSequence[str] = []
-        completeness = FlextQualityContentAnalyzer.Completeness(
-            score=100,
-            missing_elements=missing_elems,
-            required_sections_present=required_present,
-            optional_sections_present=optional_present,
-            word_count_sufficient=True,
-            missing_required_sections=list[str](),
-        )
+        completeness = FlextQualityContentAnalyzer.Completeness.model_validate({
+            "score": 100,
+            "missing_elements": missing_elems,
+            "required_sections_present": required_present,
+            "optional_sections_present": optional_present,
+            "word_count_sufficient": True,
+            "missing_required_sections": [],
+        })
 
         word_count = len(re.findall(r"\b\w+\b", content))
         thresholds_val = self.config.get("quality_thresholds")

@@ -275,12 +275,12 @@ class FlextQualityStyleValidator:
             violations_list: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
             issues_list: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
             suggestions_list: MutableSequence[str] = []
-            file_results = FlextQualityStyleValidator.FileResults(
-                file=filename,
-                violations=violations_list,
-                issues=issues_list,
-                suggestions=suggestions_list,
-            )
+            file_results = FlextQualityStyleValidator.FileResults.model_validate({
+                "file": filename,
+                "violations": violations_list,
+                "issues": issues_list,
+                "suggestions": suggestions_list,
+            })
 
             file_results.violations.extend(self._check_markdown_formatting(content))
             file_results.violations.extend(self._check_heading_consistency(content))
