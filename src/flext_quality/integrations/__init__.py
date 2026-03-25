@@ -17,9 +17,9 @@ from typing import TYPE_CHECKING
 
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
-
 if TYPE_CHECKING:
     from flext_core import FlextTypes
+
     from flext_quality.integrations.claude_context import (
         FlextQualityClaudeContextClient,
     )
@@ -33,10 +33,22 @@ if TYPE_CHECKING:
     from flext_quality.integrations.mcp_client import FlextQualityMcpClient
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextQualityClaudeContextClient": ["flext_quality.integrations.claude_context", "FlextQualityClaudeContextClient"],
-    "FlextQualityClaudeMemClient": ["flext_quality.integrations.claude_mem", "FlextQualityClaudeMemClient"],
-    "FlextQualityCodeExecutionBridge": ["flext_quality.integrations.code_execution", "FlextQualityCodeExecutionBridge"],
-    "FlextQualityMcpClient": ["flext_quality.integrations.mcp_client", "FlextQualityMcpClient"],
+    "FlextQualityClaudeContextClient": [
+        "flext_quality.integrations.claude_context",
+        "FlextQualityClaudeContextClient",
+    ],
+    "FlextQualityClaudeMemClient": [
+        "flext_quality.integrations.claude_mem",
+        "FlextQualityClaudeMemClient",
+    ],
+    "FlextQualityCodeExecutionBridge": [
+        "flext_quality.integrations.code_execution",
+        "FlextQualityCodeExecutionBridge",
+    ],
+    "FlextQualityMcpClient": [
+        "flext_quality.integrations.mcp_client",
+        "FlextQualityMcpClient",
+    ],
     "McpToolCall": ["flext_quality.integrations.claude_mem", "McpToolCall"],
 }
 
@@ -66,6 +78,7 @@ def __getattr__(name: str) -> FlextTypes.ModuleExport:
 
     Raises:
         AttributeError: If attribute not registered.
+
     """
     if name in _LAZY_CACHE:
         return _LAZY_CACHE[name]
@@ -80,6 +93,7 @@ def __dir__() -> Sequence[str]:
 
     Returns:
         List of public names from module exports.
+
     """
     return sorted(__all__)
 

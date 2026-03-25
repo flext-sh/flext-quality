@@ -10,11 +10,11 @@ from typing import TYPE_CHECKING
 
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
-
 if TYPE_CHECKING:
     from flext_core import FlextTypes
     from flext_tests import d, e, h, r, s, x
 
+    from tests import helpers, unit
     from tests.conftest import (
         MockQualityAnalyzer,
         MockReportGenerator,
@@ -42,7 +42,6 @@ if TYPE_CHECKING:
         FlextQualityTestConstants,
         FlextQualityTestConstants as c,
     )
-    import tests.helpers as helpers
     from tests.helpers.constants import TestsConstants
     from tests.helpers.models import TestsModels
     from tests.helpers.protocols import TestsProtocols
@@ -63,7 +62,6 @@ if TYPE_CHECKING:
         FlextQualityTestProtocols as p,
     )
     from tests.typings import FlextQualityTestTypes, FlextQualityTestTypes as t
-    import tests.unit as unit
     from tests.unit.test_api import (
         TestFlextQualityAPI,
         TestFlextQualityHookExecution,
@@ -89,10 +87,19 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "MockReportGenerator": ["tests.conftest", "MockReportGenerator"],
     "TestFlextQualityAPI": ["tests.unit.test_api", "TestFlextQualityAPI"],
     "TestFlextQualityCliService": ["tests.unit.test_cli", "TestFlextQualityCliService"],
-    "TestFlextQualityHookExecution": ["tests.unit.test_api", "TestFlextQualityHookExecution"],
-    "TestFlextQualityRulesConfig": ["tests.unit.test_api", "TestFlextQualityRulesConfig"],
+    "TestFlextQualityHookExecution": [
+        "tests.unit.test_api",
+        "TestFlextQualityHookExecution",
+    ],
+    "TestFlextQualityRulesConfig": [
+        "tests.unit.test_api",
+        "TestFlextQualityRulesConfig",
+    ],
     "TestFlextQualitySingleton": ["tests.unit.test_api", "TestFlextQualitySingleton"],
-    "TestFlextQualityStdinProcessing": ["tests.unit.test_api", "TestFlextQualityStdinProcessing"],
+    "TestFlextQualityStdinProcessing": [
+        "tests.unit.test_api",
+        "TestFlextQualityStdinProcessing",
+    ],
     "TestFlextQualityValidation": ["tests.unit.test_api", "TestFlextQualityValidation"],
     "TestMainFunction": ["tests.unit.test_cli", "TestMainFunction"],
     "TestsConstants": ["tests.helpers.constants", "TestsConstants"],
@@ -101,14 +108,29 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "TestsTypings": ["tests.helpers.typings", "TestsTypings"],
     "analysis_results": ["tests.conftest", "analysis_results"],
     "analysis_task_data": ["tests.conftest", "analysis_task_data"],
-    "assert_analysis_results_structure": ["tests.helpers.typing_helpers", "assert_analysis_results_structure"],
+    "assert_analysis_results_structure": [
+        "tests.helpers.typing_helpers",
+        "assert_analysis_results_structure",
+    ],
     "assert_dict_structure": ["tests.helpers.typing_helpers", "assert_dict_structure"],
     "assert_is_dict": ["tests.helpers.typing_helpers", "assert_is_dict"],
     "assert_is_list": ["tests.helpers.typing_helpers", "assert_is_list"],
-    "assert_issues_structure": ["tests.helpers.typing_helpers", "assert_issues_structure"],
-    "assert_metrics_structure": ["tests.helpers.typing_helpers", "assert_metrics_structure"],
-    "assert_result_failure_with_error": ["tests.conftest", "assert_result_failure_with_error"],
-    "assert_result_success_with_data": ["tests.conftest", "assert_result_success_with_data"],
+    "assert_issues_structure": [
+        "tests.helpers.typing_helpers",
+        "assert_issues_structure",
+    ],
+    "assert_metrics_structure": [
+        "tests.helpers.typing_helpers",
+        "assert_metrics_structure",
+    ],
+    "assert_result_failure_with_error": [
+        "tests.conftest",
+        "assert_result_failure_with_error",
+    ],
+    "assert_result_success_with_data": [
+        "tests.conftest",
+        "assert_result_success_with_data",
+    ],
     "c": ["tests.constants", "FlextQualityTestConstants"],
     "celery_config": ["tests.conftest", "celery_config"],
     "code_analysis_config": ["tests.conftest", "code_analysis_config"],
@@ -223,6 +245,7 @@ def __getattr__(name: str) -> FlextTypes.ModuleExport:
 
     Raises:
         AttributeError: If attribute not registered.
+
     """
     if name in _LAZY_CACHE:
         return _LAZY_CACHE[name]
@@ -237,6 +260,7 @@ def __dir__() -> Sequence[str]:
 
     Returns:
         List of public names from module exports.
+
     """
     return sorted(__all__)
 

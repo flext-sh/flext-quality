@@ -269,11 +269,7 @@ def test_should_do_something_when_condition():
 ### Test Data Management
 
 ```python
-<<<<<<< Updated upstream
 # Test data builders for consistent test t.NormalizedValue creation
-=======
-# Test data builders for consistent test object creation
->>>>>>> Stashed changes
 class QualityProjectBuilder:
     def __init__(self):
         self._project = QualityProject(

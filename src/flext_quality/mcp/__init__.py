@@ -10,9 +10,9 @@ from typing import TYPE_CHECKING
 
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
-
 if TYPE_CHECKING:
     from flext_core import FlextTypes
+
     from flext_quality.mcp.resources import (
         get_hooks_config,
         get_integrations_status,
@@ -29,7 +29,10 @@ if TYPE_CHECKING:
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "execute_hook": ["flext_quality.mcp.tools", "execute_hook"],
     "get_hooks_config": ["flext_quality.mcp.resources", "get_hooks_config"],
-    "get_integrations_status": ["flext_quality.mcp.resources", "get_integrations_status"],
+    "get_integrations_status": [
+        "flext_quality.mcp.resources",
+        "get_integrations_status",
+    ],
     "get_rules_config": ["flext_quality.mcp.resources", "get_rules_config"],
     "get_server": ["flext_quality.mcp.server", "get_server"],
     "mcp": ["flext_quality.mcp.server", "mcp"],
@@ -68,6 +71,7 @@ def __getattr__(name: str) -> FlextTypes.ModuleExport:
 
     Raises:
         AttributeError: If attribute not registered.
+
     """
     if name in _LAZY_CACHE:
         return _LAZY_CACHE[name]
@@ -82,6 +86,7 @@ def __dir__() -> Sequence[str]:
 
     Returns:
         List of public names from module exports.
+
     """
     return sorted(__all__)
 

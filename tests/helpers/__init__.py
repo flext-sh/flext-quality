@@ -20,11 +20,10 @@ from typing import TYPE_CHECKING
 
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
-
 if TYPE_CHECKING:
     from flext_core import FlextTypes
-    from flext_quality import c, d, e, h, m, p, r, s, t, u, x
 
+    from flext_quality import c, d, e, h, m, p, r, s, t, u, x
     from tests.helpers.constants import TestsConstants
     from tests.helpers.models import TestsModels
     from tests.helpers.protocols import TestsProtocols
@@ -45,12 +44,21 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "TestsModels": ["tests.helpers.models", "TestsModels"],
     "TestsProtocols": ["tests.helpers.protocols", "TestsProtocols"],
     "TestsTypings": ["tests.helpers.typings", "TestsTypings"],
-    "assert_analysis_results_structure": ["tests.helpers.typing_helpers", "assert_analysis_results_structure"],
+    "assert_analysis_results_structure": [
+        "tests.helpers.typing_helpers",
+        "assert_analysis_results_structure",
+    ],
     "assert_dict_structure": ["tests.helpers.typing_helpers", "assert_dict_structure"],
     "assert_is_dict": ["tests.helpers.typing_helpers", "assert_is_dict"],
     "assert_is_list": ["tests.helpers.typing_helpers", "assert_is_list"],
-    "assert_issues_structure": ["tests.helpers.typing_helpers", "assert_issues_structure"],
-    "assert_metrics_structure": ["tests.helpers.typing_helpers", "assert_metrics_structure"],
+    "assert_issues_structure": [
+        "tests.helpers.typing_helpers",
+        "assert_issues_structure",
+    ],
+    "assert_metrics_structure": [
+        "tests.helpers.typing_helpers",
+        "assert_metrics_structure",
+    ],
     "c": ["flext_quality", "c"],
     "d": ["flext_quality", "d"],
     "e": ["flext_quality", "e"],
@@ -110,6 +118,7 @@ def __getattr__(name: str) -> FlextTypes.ModuleExport:
 
     Raises:
         AttributeError: If attribute not registered.
+
     """
     if name in _LAZY_CACHE:
         return _LAZY_CACHE[name]
@@ -124,6 +133,7 @@ def __dir__() -> Sequence[str]:
 
     Returns:
         List of public names from module exports.
+
     """
     return sorted(__all__)
 

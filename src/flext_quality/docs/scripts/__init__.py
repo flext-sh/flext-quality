@@ -10,13 +10,13 @@ from typing import TYPE_CHECKING
 
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
-
 if TYPE_CHECKING:
     from flext_core import FlextTypes
+
     from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
     from flext_quality.docs.scripts.optimize import (
-        FlextQualityDocumentationOptimizer,
         MIN_HEADINGS_FOR_TOC,
+        FlextQualityDocumentationOptimizer,
     )
     from flext_quality.docs.scripts.report import (
         FlextQualityDocumentationReporter,
@@ -29,23 +29,41 @@ if TYPE_CHECKING:
     )
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextQualityContentValidator": ["flext_quality.docs.scripts.validate", "FlextQualityContentValidator"],
-    "FlextQualityDocumentationAuditor": ["flext_quality.docs.scripts.audit", "FlextQualityDocumentationAuditor"],
-    "FlextQualityDocumentationOptimizer": ["flext_quality.docs.scripts.optimize", "FlextQualityDocumentationOptimizer"],
-    "FlextQualityDocumentationReporter": ["flext_quality.docs.scripts.report", "FlextQualityDocumentationReporter"],
-    "FlextQualityLinkValidator": ["flext_quality.docs.scripts.validate", "FlextQualityLinkValidator"],
-    "MIN_HEADINGS_FOR_TOC": ["flext_quality.docs.scripts.optimize", "MIN_HEADINGS_FOR_TOC"],
+    "FlextQualityContentValidator": [
+        "flext_quality.docs.scripts.validate",
+        "FlextQualityContentValidator",
+    ],
+    "FlextQualityDocumentationAuditor": [
+        "flext_quality.docs.scripts.audit",
+        "FlextQualityDocumentationAuditor",
+    ],
+    "FlextQualityDocumentationOptimizer": [
+        "flext_quality.docs.scripts.optimize",
+        "FlextQualityDocumentationOptimizer",
+    ],
+    "FlextQualityDocumentationReporter": [
+        "flext_quality.docs.scripts.report",
+        "FlextQualityDocumentationReporter",
+    ],
+    "FlextQualityLinkValidator": [
+        "flext_quality.docs.scripts.validate",
+        "FlextQualityLinkValidator",
+    ],
+    "MIN_HEADINGS_FOR_TOC": [
+        "flext_quality.docs.scripts.optimize",
+        "MIN_HEADINGS_FOR_TOC",
+    ],
     "ReportValue": ["flext_quality.docs.scripts.report", "ReportValue"],
     "main": ["flext_quality.docs.scripts.validate", "main"],
 }
 
 __all__ = [
+    "MIN_HEADINGS_FOR_TOC",
     "FlextQualityContentValidator",
     "FlextQualityDocumentationAuditor",
     "FlextQualityDocumentationOptimizer",
     "FlextQualityDocumentationReporter",
     "FlextQualityLinkValidator",
-    "MIN_HEADINGS_FOR_TOC",
     "ReportValue",
     "main",
 ]
@@ -68,6 +86,7 @@ def __getattr__(name: str) -> FlextTypes.ModuleExport:
 
     Raises:
         AttributeError: If attribute not registered.
+
     """
     if name in _LAZY_CACHE:
         return _LAZY_CACHE[name]
@@ -82,6 +101,7 @@ def __dir__() -> Sequence[str]:
 
     Returns:
         List of public names from module exports.
+
     """
     return sorted(__all__)
 
