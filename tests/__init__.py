@@ -12,8 +12,8 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
 if TYPE_CHECKING:
     from flext_core import FlextTypes
-    from flext_tests import d, e, h, r, s, x
 
+    from flext_quality import d, e, h, r, s, x
     from tests import helpers, unit
     from tests.conftest import (
         MockQualityAnalyzer,
@@ -135,10 +135,10 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "celery_config": ["tests.conftest", "celery_config"],
     "code_analysis_config": ["tests.conftest", "code_analysis_config"],
     "codeclimate_config": ["tests.conftest", "codeclimate_config"],
-    "d": ["flext_tests", "d"],
+    "d": ["flext_quality", "d"],
     "dashboard_data": ["tests.conftest", "dashboard_data"],
-    "e": ["flext_tests", "e"],
-    "h": ["flext_tests", "h"],
+    "e": ["flext_quality", "e"],
+    "h": ["flext_quality", "h"],
     "helpers": ["tests.helpers", ""],
     "m": ["tests.models", "FlextQualityTestModels"],
     "mock_quality_analyzer": ["tests.conftest", "mock_quality_analyzer"],
@@ -147,9 +147,9 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "package_metadata": ["tests.conftest", "package_metadata"],
     "pytest_configure": ["tests.conftest", "pytest_configure"],
     "quality_metrics_data": ["tests.conftest", "quality_metrics_data"],
-    "r": ["flext_tests", "r"],
+    "r": ["flext_quality", "r"],
     "report_config": ["tests.conftest", "report_config"],
-    "s": ["flext_tests", "s"],
+    "s": ["flext_quality", "s"],
     "safe_dict_access": ["tests.helpers.typing_helpers", "safe_dict_access"],
     "safe_list_access": ["tests.helpers.typing_helpers", "safe_list_access"],
     "sample_code_repository": ["tests.conftest", "sample_code_repository"],
@@ -161,7 +161,7 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "test_basic": ["tests.unit.test_basic", "test_basic"],
     "u": ["tests.utilities", "FlextQualityTestUtilities"],
     "unit": ["tests.unit", ""],
-    "x": ["flext_tests", "x"],
+    "x": ["flext_quality", "x"],
 }
 
 __all__ = [

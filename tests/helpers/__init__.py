@@ -23,10 +23,10 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_quality import c, d, e, h, m, p, r, s, t, u, x
-    from tests.helpers.constants import TestsConstants
-    from tests.helpers.models import TestsModels
-    from tests.helpers.protocols import TestsProtocols
+    from flext_quality import d, e, h, r, s, u, x
+    from tests.helpers.constants import TestsConstants, c
+    from tests.helpers.models import TestsModels, m
+    from tests.helpers.protocols import TestsProtocols, p
     from tests.helpers.typing_helpers import (
         assert_analysis_results_structure,
         assert_dict_structure,
@@ -37,7 +37,7 @@ if TYPE_CHECKING:
         safe_dict_access,
         safe_list_access,
     )
-    from tests.helpers.typings import TestsTypings
+    from tests.helpers.typings import TestsTypings, t
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "TestsConstants": ["tests.helpers.constants", "TestsConstants"],
@@ -59,17 +59,17 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "tests.helpers.typing_helpers",
         "assert_metrics_structure",
     ],
-    "c": ["flext_quality", "c"],
+    "c": ["tests.helpers.constants", "c"],
     "d": ["flext_quality", "d"],
     "e": ["flext_quality", "e"],
     "h": ["flext_quality", "h"],
-    "m": ["flext_quality", "m"],
-    "p": ["flext_quality", "p"],
+    "m": ["tests.helpers.models", "m"],
+    "p": ["tests.helpers.protocols", "p"],
     "r": ["flext_quality", "r"],
     "s": ["flext_quality", "s"],
     "safe_dict_access": ["tests.helpers.typing_helpers", "safe_dict_access"],
     "safe_list_access": ["tests.helpers.typing_helpers", "safe_list_access"],
-    "t": ["flext_quality", "t"],
+    "t": ["tests.helpers.typings", "t"],
     "u": ["flext_quality", "u"],
     "x": ["flext_quality", "x"],
 }
