@@ -75,6 +75,7 @@ from flext_core import r
 from flext_core import t
 
 
+
 class QualityPlugin(Protocol):
     """Plugin interface for quality analyzers."""
 

@@ -153,6 +153,7 @@ from flext_quality import FlextQualityService
 from flext_quality import FlextQualityCodeAnalyzer
 
 
+
 # Option 1: Service Layer Approach
 def service_analysis():
     service = FlextQualityService()

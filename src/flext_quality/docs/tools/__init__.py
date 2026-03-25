@@ -10,9 +10,9 @@ from typing import TYPE_CHECKING
 
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
+
 if TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_quality.docs.tools.content_analyzer import (
         FlextQualityContentAnalyzer,
         analyze_file_content,
@@ -29,38 +29,14 @@ if TYPE_CHECKING:
     )
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextQualityContentAnalyzer": [
-        "flext_quality.docs.tools.content_analyzer",
-        "FlextQualityContentAnalyzer",
-    ],
-    "FlextQualityLinkChecker": [
-        "flext_quality.docs.tools.link_checker",
-        "FlextQualityLinkChecker",
-    ],
-    "FlextQualityStyleValidator": [
-        "flext_quality.docs.tools.style_validator",
-        "FlextQualityStyleValidator",
-    ],
-    "analyze_file_content": [
-        "flext_quality.docs.tools.content_analyzer",
-        "analyze_file_content",
-    ],
-    "analyze_files_content": [
-        "flext_quality.docs.tools.content_analyzer",
-        "analyze_files_content",
-    ],
-    "validate_file_style": [
-        "flext_quality.docs.tools.style_validator",
-        "validate_file_style",
-    ],
-    "validate_files_style": [
-        "flext_quality.docs.tools.style_validator",
-        "validate_files_style",
-    ],
-    "validate_links_sync": [
-        "flext_quality.docs.tools.link_checker",
-        "validate_links_sync",
-    ],
+    "FlextQualityContentAnalyzer": ["flext_quality.docs.tools.content_analyzer", "FlextQualityContentAnalyzer"],
+    "FlextQualityLinkChecker": ["flext_quality.docs.tools.link_checker", "FlextQualityLinkChecker"],
+    "FlextQualityStyleValidator": ["flext_quality.docs.tools.style_validator", "FlextQualityStyleValidator"],
+    "analyze_file_content": ["flext_quality.docs.tools.content_analyzer", "analyze_file_content"],
+    "analyze_files_content": ["flext_quality.docs.tools.content_analyzer", "analyze_files_content"],
+    "validate_file_style": ["flext_quality.docs.tools.style_validator", "validate_file_style"],
+    "validate_files_style": ["flext_quality.docs.tools.style_validator", "validate_files_style"],
+    "validate_links_sync": ["flext_quality.docs.tools.link_checker", "validate_links_sync"],
 }
 
 __all__ = [
@@ -92,7 +68,6 @@ def __getattr__(name: str) -> FlextTypes.ModuleExport:
 
     Raises:
         AttributeError: If attribute not registered.
-
     """
     if name in _LAZY_CACHE:
         return _LAZY_CACHE[name]
@@ -107,7 +82,6 @@ def __dir__() -> Sequence[str]:
 
     Returns:
         List of public names from module exports.
-
     """
     return sorted(__all__)
 

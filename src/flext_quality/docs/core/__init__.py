@@ -15,9 +15,9 @@ from typing import TYPE_CHECKING
 
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
+
 if TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_quality.docs.core.base_classes import (
         FlextQualityBaseAnalyzer,
         FlextQualityBaseAuditor,
@@ -36,46 +36,16 @@ if TYPE_CHECKING:
     )
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextQualityAuditRules": [
-        "flext_quality.docs.core.config_manager",
-        "FlextQualityAuditRules",
-    ],
-    "FlextQualityBaseAnalyzer": [
-        "flext_quality.docs.core.base_classes",
-        "FlextQualityBaseAnalyzer",
-    ],
-    "FlextQualityBaseAuditor": [
-        "flext_quality.docs.core.base_classes",
-        "FlextQualityBaseAuditor",
-    ],
-    "FlextQualityBaseReporter": [
-        "flext_quality.docs.core.base_classes",
-        "FlextQualityBaseReporter",
-    ],
-    "FlextQualityBaseValidator": [
-        "flext_quality.docs.core.base_classes",
-        "FlextQualityBaseValidator",
-    ],
-    "FlextQualityConfigManager": [
-        "flext_quality.docs.core.config_manager",
-        "FlextQualityConfigManager",
-    ],
-    "FlextQualityDocumentationFinder": [
-        "flext_quality.docs.core.file_discovery",
-        "FlextQualityDocumentationFinder",
-    ],
-    "FlextQualityFileStatistics": [
-        "flext_quality.docs.core.file_discovery",
-        "FlextQualityFileStatistics",
-    ],
-    "FlextQualityStyleGuide": [
-        "flext_quality.docs.core.config_manager",
-        "FlextQualityStyleGuide",
-    ],
-    "FlextQualityValidationConfig": [
-        "flext_quality.docs.core.config_manager",
-        "FlextQualityValidationConfig",
-    ],
+    "FlextQualityAuditRules": ["flext_quality.docs.core.config_manager", "FlextQualityAuditRules"],
+    "FlextQualityBaseAnalyzer": ["flext_quality.docs.core.base_classes", "FlextQualityBaseAnalyzer"],
+    "FlextQualityBaseAuditor": ["flext_quality.docs.core.base_classes", "FlextQualityBaseAuditor"],
+    "FlextQualityBaseReporter": ["flext_quality.docs.core.base_classes", "FlextQualityBaseReporter"],
+    "FlextQualityBaseValidator": ["flext_quality.docs.core.base_classes", "FlextQualityBaseValidator"],
+    "FlextQualityConfigManager": ["flext_quality.docs.core.config_manager", "FlextQualityConfigManager"],
+    "FlextQualityDocumentationFinder": ["flext_quality.docs.core.file_discovery", "FlextQualityDocumentationFinder"],
+    "FlextQualityFileStatistics": ["flext_quality.docs.core.file_discovery", "FlextQualityFileStatistics"],
+    "FlextQualityStyleGuide": ["flext_quality.docs.core.config_manager", "FlextQualityStyleGuide"],
+    "FlextQualityValidationConfig": ["flext_quality.docs.core.config_manager", "FlextQualityValidationConfig"],
 }
 
 __all__ = [
@@ -109,7 +79,6 @@ def __getattr__(name: str) -> FlextTypes.ModuleExport:
 
     Raises:
         AttributeError: If attribute not registered.
-
     """
     if name in _LAZY_CACHE:
         return _LAZY_CACHE[name]
@@ -124,7 +93,6 @@ def __dir__() -> Sequence[str]:
 
     Returns:
         List of public names from module exports.
-
     """
     return sorted(__all__)
 

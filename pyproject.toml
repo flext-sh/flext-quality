@@ -5,6 +5,7 @@
 
 # [MANAGED] build system
 [build-system]
+<<<<<<< Updated upstream
 build-backend = "hatchling.build"
 requires = [ "hatchling" ]
 
@@ -12,6 +13,22 @@ requires = [ "hatchling" ]
 [project]
 
 authors = [ {email = "team@flext.sh", name = "FLEXT Team"} ]
+=======
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=2"]
+
+# [CUSTOM] project metadata
+[project]
+name = "flext-quality"
+version = "0.12.0-dev"
+description = "FLEXT Quality - Unified orchestration platform for Claude Code tooling"
+readme = "README.md"
+keywords = ["adapter", "enterprise", "flext", "integration", "typed"]
+license = "MIT"
+maintainers = [{ email = "team@flext.sh", name = "FLEXT Team" }]
+authors = [{ email = "team@flext.sh", name = "FLEXT Team" }]
+requires-python = ">=3.13,<3.14"
+>>>>>>> Stashed changes
 classifiers = [
   "Development Status :: 4 - Beta",
   "Development Status :: 5 - Production/Stable",
@@ -43,6 +60,7 @@ dependencies = [
   "uvicorn>=0.30",
   "wrapt>=1.17",
 ]
+<<<<<<< Updated upstream
 description = "FLEXT Quality - Unified orchestration platform for Claude Code tooling"
 keywords = [ "adapter", "enterprise", "flext", "integration", "typed" ]
 license = "MIT"
@@ -57,6 +75,12 @@ version = "0.12.0-dev"
 # [MANAGED] consolidated development dependencies
 [project.optional-dependencies]
 dev = [
+=======
+# [CUSTOM] poetry dev extensions
+# [MANAGED] consolidated development dependencies
+# [AUTO] merged from dev/docs/security/test/typings
+optional-dependencies.dev = [
+>>>>>>> Stashed changes
   "autoflake>=2.3.1",
   "bandit>=1.8",
   "black>=25.1",
@@ -126,12 +150,16 @@ skip_covered = false
 
 # [MANAGED] deptry
 [tool.deptry]
+<<<<<<< Updated upstream
 known_first_party = [
   "flext_quality",
 ]
 pep621_dev_dependency_groups = [
   "dev",
 ]
+=======
+pep621_dev_dependency_groups = ["dev"]
+>>>>>>> Stashed changes
 
 [tool.hatch.metadata]
 allow-direct-references = true
@@ -269,6 +297,7 @@ root = "tests"
 
 # [MANAGED] pytest
 [tool.pytest.ini_options]
+<<<<<<< Updated upstream
 addopts = [
   "--strict-markers",
 ]
@@ -708,3 +737,24 @@ line_length = 88
 preserve_quotes = true
 section_whitelines = 1
 whitelines = 1
+=======
+minversion = "8.0"
+python_classes = ["Test*"]
+python_files = ["*_test.py", "*_tests.py", "test_*.py"]
+addopts = ["--strict-markers"]
+markers = [
+  "unit: unit tests",
+  "integration: integration tests",
+  "performance: performance and benchmark tests",
+  "slow: slow-running tests",
+  "docker: tests requiring Docker",
+  "e2e: end-to-end integration tests",
+  "edge_cases: edge case tests",
+  "stress: stress tests",
+  "resilience: resilience tests",
+]
+
+# [MANAGED] ruff
+
+[tool.poetry.group.dev.dependencies]
+>>>>>>> Stashed changes

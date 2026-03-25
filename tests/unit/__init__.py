@@ -10,9 +10,9 @@ from typing import TYPE_CHECKING
 
 from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 
+
 if TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from tests.unit.test_api import (
         TestFlextQualityAPI,
         TestFlextQualityHookExecution,
@@ -27,19 +27,10 @@ if TYPE_CHECKING:
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "TestFlextQualityAPI": ["tests.unit.test_api", "TestFlextQualityAPI"],
     "TestFlextQualityCliService": ["tests.unit.test_cli", "TestFlextQualityCliService"],
-    "TestFlextQualityHookExecution": [
-        "tests.unit.test_api",
-        "TestFlextQualityHookExecution",
-    ],
-    "TestFlextQualityRulesConfig": [
-        "tests.unit.test_api",
-        "TestFlextQualityRulesConfig",
-    ],
+    "TestFlextQualityHookExecution": ["tests.unit.test_api", "TestFlextQualityHookExecution"],
+    "TestFlextQualityRulesConfig": ["tests.unit.test_api", "TestFlextQualityRulesConfig"],
     "TestFlextQualitySingleton": ["tests.unit.test_api", "TestFlextQualitySingleton"],
-    "TestFlextQualityStdinProcessing": [
-        "tests.unit.test_api",
-        "TestFlextQualityStdinProcessing",
-    ],
+    "TestFlextQualityStdinProcessing": ["tests.unit.test_api", "TestFlextQualityStdinProcessing"],
     "TestFlextQualityValidation": ["tests.unit.test_api", "TestFlextQualityValidation"],
     "TestMainFunction": ["tests.unit.test_cli", "TestMainFunction"],
     "test_basic": ["tests.unit.test_basic", "test_basic"],
@@ -75,7 +66,6 @@ def __getattr__(name: str) -> FlextTypes.ModuleExport:
 
     Raises:
         AttributeError: If attribute not registered.
-
     """
     if name in _LAZY_CACHE:
         return _LAZY_CACHE[name]
@@ -90,7 +80,6 @@ def __dir__() -> Sequence[str]:
 
     Returns:
         List of public names from module exports.
-
     """
     return sorted(__all__)
 
