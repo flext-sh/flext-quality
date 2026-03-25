@@ -15,13 +15,14 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextContainer, FlextLogger, p, r
+from flext_core import FlextContainer, FlextLogger, r
 
 from flext_quality import (
     FlextQualityRulesLoader,
     FlextQualitySettings,
     c,
     m,
+    p,
     t,
     u,
 )
