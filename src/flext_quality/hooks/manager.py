@@ -60,7 +60,8 @@ class FlextQualityHookManager:
             Mapping[str, t.NormalizedValue],
         )
         return adapter.dump_json(
-            dict(self.get_config()), indent=c.Quality.Defaults.JSON_INDENT,
+            dict(self.get_config()),
+            indent=c.Quality.Defaults.JSON_INDENT,
         ).decode("utf-8")
 
     def register(self, hook: FlextQualityBaseHook) -> r[bool]:

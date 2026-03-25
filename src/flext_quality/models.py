@@ -148,9 +148,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             )
             warnings: MutableSequence[str] = Field(default_factory=list)
             errors: MutableSequence[str] = Field(default_factory=list)
-            metadata: MutableMapping[str, t.Primitives] = Field(
-                default_factory=dict
-            )
+            metadata: MutableMapping[str, t.Primitives] = Field(default_factory=dict)
 
             @property
             def success_rate(self) -> float:
@@ -265,9 +263,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Typed metrics for documentation audit results."""
 
             total_issues: int = 0
-            severity_breakdown: MutableMapping[str, int] = Field(
-                default_factory=dict
-            )
+            severity_breakdown: MutableMapping[str, int] = Field(default_factory=dict)
             quality_score: int = 0
             files_analyzed: int = 0
             issues_per_file: float = 0.0
@@ -358,9 +354,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             content_issues: MutableSequence[FlextQualityModels.Quality.ContentIssue] = (
                 Field(default_factory=list)
             )
-            quality_metrics: MutableMapping[str, t.Scalar] = Field(
-                default_factory=dict
-            )
+            quality_metrics: MutableMapping[str, t.Scalar] = Field(default_factory=dict)
 
         class ContentMetrics(BaseModel):
             """Content quality metrics for a documentation file."""

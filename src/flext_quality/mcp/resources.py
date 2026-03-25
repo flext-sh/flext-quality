@@ -30,7 +30,8 @@ def get_hooks_config() -> str:
     manager = FlextQualityHookManager()
     config = manager.get_config()
     return _norm_adapter.dump_json(
-        dict(config), indent=c.Quality.Defaults.JSON_INDENT,
+        dict(config),
+        indent=c.Quality.Defaults.JSON_INDENT,
     ).decode("utf-8")
 
 
@@ -60,5 +61,6 @@ def get_integrations_status() -> str:
         ctx_health.value if ctx_health.is_success else {"error": ctx_health.error}
     )
     return _norm_adapter.dump_json(
-        status, indent=c.Quality.Defaults.JSON_INDENT,
+        status,
+        indent=c.Quality.Defaults.JSON_INDENT,
     ).decode("utf-8")

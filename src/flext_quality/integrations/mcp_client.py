@@ -143,8 +143,8 @@ class FlextQualityMcpClient:
                         success=True,
                         data={
                             "items": TypeAdapter[MutableSequence[t.StrMapping]](
-                            MutableSequence[t.StrMapping],
-                        )
+                                MutableSequence[t.StrMapping],
+                            )
                             .dump_json(coerced_data)
                             .decode("utf-8"),
                         },
