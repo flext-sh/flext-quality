@@ -14,7 +14,7 @@ from collections.abc import MutableSequence
 from pathlib import Path
 from typing import final
 
-from flext_cli import FlextCliOutput
+from flext_cli import FlextCli
 from flext_core import r
 
 from flext_quality import FlextQuality, FlextQualityCodeExecutionBridge, c, t
@@ -26,7 +26,7 @@ class FlextQualityCliService:
 
     def __init__(self) -> None:
         """Initialize the CLI service."""
-        self.output = FlextCliOutput()
+        self.output = FlextCli()
         self._quality = FlextQuality.get_instance()
         self._executor = FlextQualityCodeExecutionBridge()
 
