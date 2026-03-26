@@ -29,12 +29,30 @@ if TYPE_CHECKING:
     )
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextQualityContentValidator": ["flext_quality.docs.scripts.validate", "FlextQualityContentValidator"],
-    "FlextQualityDocumentationAuditor": ["flext_quality.docs.scripts.audit", "FlextQualityDocumentationAuditor"],
-    "FlextQualityDocumentationOptimizer": ["flext_quality.docs.scripts.optimize", "FlextQualityDocumentationOptimizer"],
-    "FlextQualityDocumentationReporter": ["flext_quality.docs.scripts.report", "FlextQualityDocumentationReporter"],
-    "FlextQualityLinkValidator": ["flext_quality.docs.scripts.validate", "FlextQualityLinkValidator"],
-    "MIN_HEADINGS_FOR_TOC": ["flext_quality.docs.scripts.optimize", "MIN_HEADINGS_FOR_TOC"],
+    "FlextQualityContentValidator": [
+        "flext_quality.docs.scripts.validate",
+        "FlextQualityContentValidator",
+    ],
+    "FlextQualityDocumentationAuditor": [
+        "flext_quality.docs.scripts.audit",
+        "FlextQualityDocumentationAuditor",
+    ],
+    "FlextQualityDocumentationOptimizer": [
+        "flext_quality.docs.scripts.optimize",
+        "FlextQualityDocumentationOptimizer",
+    ],
+    "FlextQualityDocumentationReporter": [
+        "flext_quality.docs.scripts.report",
+        "FlextQualityDocumentationReporter",
+    ],
+    "FlextQualityLinkValidator": [
+        "flext_quality.docs.scripts.validate",
+        "FlextQualityLinkValidator",
+    ],
+    "MIN_HEADINGS_FOR_TOC": [
+        "flext_quality.docs.scripts.optimize",
+        "MIN_HEADINGS_FOR_TOC",
+    ],
     "ReportValue": ["flext_quality.docs.scripts.report", "ReportValue"],
     "main": ["flext_quality.docs.scripts.validate", "main"],
 }
