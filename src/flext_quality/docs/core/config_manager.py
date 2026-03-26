@@ -220,7 +220,7 @@ class FlextQualityConfigManager:
 
     def _get_default_config(self, filename: str) -> ConfigData:
         """Get default configuration for a file."""
-        defaults = {
+        defaults: Mapping[str, RawConfigMap] = {
             "audit_rules.yaml": {
                 "quality_thresholds": {
                     "max_age_days": 90,
@@ -281,7 +281,7 @@ class FlextQualityConfigManager:
             },
         }
 
-        default_value = defaults.get(filename, {})
+        default_value = defaults.get(filename)
         return self._as_config_data(default_value)
 
     def reload_configs(self) -> None:
