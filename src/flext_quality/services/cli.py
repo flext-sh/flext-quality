@@ -26,7 +26,7 @@ class FlextQualityCliService:
 
     def __init__(self) -> None:
         """Initialize the CLI service."""
-        self.output = cli()
+        self.output = cli
         self._quality = FlextQuality.get_instance()
         self._executor = FlextQualityCodeExecutionBridge()
 
