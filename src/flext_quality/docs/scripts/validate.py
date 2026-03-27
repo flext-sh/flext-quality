@@ -536,8 +536,7 @@ class FlextQualityContentValidator:
                         error="Unclosed image syntax",
                     ),
                 )
-            if line.strip().startswith(("- ", "* ", "+ ")):
-                pass
+            line.strip().startswith(("- ", "* ", "+ "))
             if line.rstrip() != line:
                 issues.append(
                     m.Quality.ContentIssue(

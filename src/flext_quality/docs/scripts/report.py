@@ -773,10 +773,6 @@ def main() -> None:
             or f"quality_report_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}"
         )
         reporter.save_report(report_content, filename, args.format)
-        if args.notify and args.webhook_url:
-            pass
-    if args.serve:
-        pass
 
 
 if __name__ == "__main__":

@@ -765,9 +765,8 @@ def main() -> None:
     maintenance = FlextQualityScheduledMaintenance(args.config)
 
     if args.list_schedules:
-        for schedule_config in maintenance.config.schedules.values():
-            if schedule_config.enabled:
-                pass
+        for _schedule_config in maintenance.config.schedules.values():
+            pass
 
     elif args.daemon:
         maintenance.run_daemon()
