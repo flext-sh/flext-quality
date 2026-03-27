@@ -18,10 +18,7 @@ if TYPE_CHECKING:
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "FlextQualityBaseHook": ["flext_quality.hooks.base", "FlextQualityBaseHook"],
-    "FlextQualityHookManager": [
-        "flext_quality.hooks.manager",
-        "FlextQualityHookManager",
-    ],
+    "FlextQualityHookManager": ["flext_quality.hooks.manager", "FlextQualityHookManager"],
 }
 
 __all__ = [
