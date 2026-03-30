@@ -8,14 +8,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING
 
-from flext_core.lazy import install_lazy_exports
-
-from flext_quality.docs import _LAZY_IMPORTS as _CHILD_LAZY_0
-from flext_quality.hooks import _LAZY_IMPORTS as _CHILD_LAZY_1
-from flext_quality.integrations import _LAZY_IMPORTS as _CHILD_LAZY_2
-from flext_quality.mcp import _LAZY_IMPORTS as _CHILD_LAZY_3
-from flext_quality.rules import _LAZY_IMPORTS as _CHILD_LAZY_4
-from flext_quality.services import _LAZY_IMPORTS as _CHILD_LAZY_5
+from flext_core.lazy import install_lazy_exports, merge_lazy_imports
 
 if TYPE_CHECKING:
     from flext_quality.api import *
@@ -35,44 +28,48 @@ if TYPE_CHECKING:
     from flext_quality.typings import *
     from flext_quality.utilities import *
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
-    **_CHILD_LAZY_0,
-    **_CHILD_LAZY_1,
-    **_CHILD_LAZY_2,
-    **_CHILD_LAZY_3,
-    **_CHILD_LAZY_4,
-    **_CHILD_LAZY_5,
-    "FlextQuality": "flext_quality.api",
-    "FlextQualityConstants": "flext_quality.constants",
-    "FlextQualityModels": "flext_quality.models",
-    "FlextQualityProtocols": "flext_quality.protocols",
-    "FlextQualitySettings": "flext_quality.settings",
-    "FlextQualityTypes": "flext_quality.typings",
-    "FlextQualityUtilities": "flext_quality.utilities",
-    "api": "flext_quality.api",
-    "c": ["flext_quality.constants", "FlextQualityConstants"],
-    "constants": "flext_quality.constants",
-    "d": "flext_cli",
-    "docs": "flext_quality.docs",
-    "e": "flext_cli",
-    "h": "flext_cli",
-    "hooks": "flext_quality.hooks",
-    "integrations": "flext_quality.integrations",
-    "m": ["flext_quality.models", "FlextQualityModels"],
-    "models": "flext_quality.models",
-    "p": ["flext_quality.protocols", "FlextQualityProtocols"],
-    "protocols": "flext_quality.protocols",
-    "r": "flext_cli",
-    "rules": "flext_quality.rules",
-    "s": "flext_cli",
-    "services": "flext_quality.services",
-    "settings": "flext_quality.settings",
-    "t": ["flext_quality.typings", "FlextQualityTypes"],
-    "typings": "flext_quality.typings",
-    "u": ["flext_quality.utilities", "FlextQualityUtilities"],
-    "utilities": "flext_quality.utilities",
-    "x": "flext_cli",
-}
+_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = merge_lazy_imports(
+    (
+        "flext_quality.docs",
+        "flext_quality.hooks",
+        "flext_quality.integrations",
+        "flext_quality.mcp",
+        "flext_quality.rules",
+        "flext_quality.services",
+    ),
+    {
+        "FlextQuality": "flext_quality.api",
+        "FlextQualityConstants": "flext_quality.constants",
+        "FlextQualityModels": "flext_quality.models",
+        "FlextQualityProtocols": "flext_quality.protocols",
+        "FlextQualitySettings": "flext_quality.settings",
+        "FlextQualityTypes": "flext_quality.typings",
+        "FlextQualityUtilities": "flext_quality.utilities",
+        "api": "flext_quality.api",
+        "c": ("flext_quality.constants", "FlextQualityConstants"),
+        "constants": "flext_quality.constants",
+        "d": "flext_cli",
+        "docs": "flext_quality.docs",
+        "e": "flext_cli",
+        "h": "flext_cli",
+        "hooks": "flext_quality.hooks",
+        "integrations": "flext_quality.integrations",
+        "m": ("flext_quality.models", "FlextQualityModels"),
+        "models": "flext_quality.models",
+        "p": ("flext_quality.protocols", "FlextQualityProtocols"),
+        "protocols": "flext_quality.protocols",
+        "r": "flext_cli",
+        "rules": "flext_quality.rules",
+        "s": "flext_cli",
+        "services": "flext_quality.services",
+        "settings": "flext_quality.settings",
+        "t": ("flext_quality.typings", "FlextQualityTypes"),
+        "typings": "flext_quality.typings",
+        "u": ("flext_quality.utilities", "FlextQualityUtilities"),
+        "utilities": "flext_quality.utilities",
+        "x": "flext_cli",
+    },
+)
 
 
 install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
