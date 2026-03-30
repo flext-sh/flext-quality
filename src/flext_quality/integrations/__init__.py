@@ -18,12 +18,7 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_quality.integrations import (
-        claude_context,
-        claude_mem,
-        code_execution,
-        mcp_client,
-    )
+    from flext_quality.integrations._health import *
     from flext_quality.integrations.claude_context import *
     from flext_quality.integrations.claude_mem import *
     from flext_quality.integrations.code_execution import *
@@ -35,6 +30,8 @@ _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
     "FlextQualityCodeExecutionBridge": "flext_quality.integrations.code_execution",
     "FlextQualityMcpClient": "flext_quality.integrations.mcp_client",
     "McpToolCall": "flext_quality.integrations.claude_mem",
+    "_health": "flext_quality.integrations._health",
+    "build_mcp_health_result": "flext_quality.integrations._health",
     "claude_context": "flext_quality.integrations.claude_context",
     "claude_mem": "flext_quality.integrations.claude_mem",
     "code_execution": "flext_quality.integrations.code_execution",
@@ -42,4 +39,4 @@ _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
 }
 
 
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, sorted(_LAZY_IMPORTS))
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)

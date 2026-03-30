@@ -11,7 +11,6 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_quality.docs.tools import content_analyzer, link_checker, style_validator
     from flext_quality.docs.tools.content_analyzer import *
     from flext_quality.docs.tools.link_checker import *
     from flext_quality.docs.tools.style_validator import *
@@ -31,4 +30,4 @@ _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
 }
 
 
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, sorted(_LAZY_IMPORTS))
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
