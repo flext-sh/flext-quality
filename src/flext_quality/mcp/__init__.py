@@ -13,6 +13,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
+    from flext_quality.mcp import resources, server, tools
     from flext_quality.mcp.resources import (
         get_hooks_config,
         get_integrations_status,
@@ -36,8 +37,11 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "get_rules_config": ["flext_quality.mcp.resources", "get_rules_config"],
     "get_server": ["flext_quality.mcp.server", "get_server"],
     "mcp": ["flext_quality.mcp.server", "mcp"],
+    "resources": ["flext_quality.mcp.resources", ""],
     "search_code": ["flext_quality.mcp.tools", "search_code"],
     "search_memory": ["flext_quality.mcp.tools", "search_memory"],
+    "server": ["flext_quality.mcp.server", ""],
+    "tools": ["flext_quality.mcp.tools", ""],
     "validate_rules": ["flext_quality.mcp.tools", "validate_rules"],
 }
 
@@ -48,8 +52,11 @@ __all__ = [
     "get_rules_config",
     "get_server",
     "mcp",
+    "resources",
     "search_code",
     "search_memory",
+    "server",
+    "tools",
     "validate_rules",
 ]
 

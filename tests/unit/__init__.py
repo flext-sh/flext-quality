@@ -13,6 +13,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
+    from tests.unit import test_api, test_cli
     from tests.unit.test_api import (
         TestFlextQualityAPI,
         TestFlextQualityHookExecution,
@@ -42,7 +43,9 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     ],
     "TestFlextQualityValidation": ["tests.unit.test_api", "TestFlextQualityValidation"],
     "TestMainFunction": ["tests.unit.test_cli", "TestMainFunction"],
+    "test_api": ["tests.unit.test_api", ""],
     "test_basic": ["tests.unit.test_basic", "test_basic"],
+    "test_cli": ["tests.unit.test_cli", ""],
 }
 
 __all__ = [
@@ -54,7 +57,9 @@ __all__ = [
     "TestFlextQualityStdinProcessing",
     "TestFlextQualityValidation",
     "TestMainFunction",
+    "test_api",
     "test_basic",
+    "test_cli",
 ]
 
 

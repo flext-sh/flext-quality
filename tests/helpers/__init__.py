@@ -24,6 +24,14 @@ if TYPE_CHECKING:
     from flext_core import FlextTypes
 
     from flext_quality import d, e, h, r, s, u, x
+    from tests.helpers import (
+        assertions,
+        constants,
+        models,
+        protocols,
+        typing_helpers,
+        typings,
+    )
     from tests.helpers.constants import TestsConstants, c
     from tests.helpers.models import TestsModels, m
     from tests.helpers.protocols import TestsProtocols, p
@@ -59,17 +67,23 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "tests.helpers.typing_helpers",
         "assert_metrics_structure",
     ],
+    "assertions": ["tests.helpers.assertions", ""],
     "c": ["tests.helpers.constants", "c"],
+    "constants": ["tests.helpers.constants", ""],
     "d": ["flext_quality", "d"],
     "e": ["flext_quality", "e"],
     "h": ["flext_quality", "h"],
     "m": ["tests.helpers.models", "m"],
+    "models": ["tests.helpers.models", ""],
     "p": ["tests.helpers.protocols", "p"],
+    "protocols": ["tests.helpers.protocols", ""],
     "r": ["flext_quality", "r"],
     "s": ["flext_quality", "s"],
     "safe_dict_access": ["tests.helpers.typing_helpers", "safe_dict_access"],
     "safe_list_access": ["tests.helpers.typing_helpers", "safe_list_access"],
     "t": ["tests.helpers.typings", "t"],
+    "typing_helpers": ["tests.helpers.typing_helpers", ""],
+    "typings": ["tests.helpers.typings", ""],
     "u": ["flext_quality", "u"],
     "x": ["flext_quality", "x"],
 }
@@ -85,17 +99,23 @@ __all__ = [
     "assert_is_list",
     "assert_issues_structure",
     "assert_metrics_structure",
+    "assertions",
     "c",
+    "constants",
     "d",
     "e",
     "h",
     "m",
+    "models",
     "p",
+    "protocols",
     "r",
     "s",
     "safe_dict_access",
     "safe_list_access",
     "t",
+    "typing_helpers",
+    "typings",
     "u",
     "x",
 ]

@@ -13,15 +13,18 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
+    from flext_quality.services import cli
     from flext_quality.services.cli import FlextQualityCliService, main
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "FlextQualityCliService": ["flext_quality.services.cli", "FlextQualityCliService"],
+    "cli": ["flext_quality.services.cli", ""],
     "main": ["flext_quality.services.cli", "main"],
 }
 
 __all__ = [
     "FlextQualityCliService",
+    "cli",
     "main",
 ]
 

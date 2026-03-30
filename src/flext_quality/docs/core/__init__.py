@@ -18,6 +18,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
+    from flext_quality.docs.core import base_classes, config_manager, file_discovery
     from flext_quality.docs.core.base_classes import (
         FlextQualityBaseAnalyzer,
         FlextQualityBaseAuditor,
@@ -76,6 +77,9 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "flext_quality.docs.core.config_manager",
         "FlextQualityValidationConfig",
     ],
+    "base_classes": ["flext_quality.docs.core.base_classes", ""],
+    "config_manager": ["flext_quality.docs.core.config_manager", ""],
+    "file_discovery": ["flext_quality.docs.core.file_discovery", ""],
 }
 
 __all__ = [
@@ -89,6 +93,9 @@ __all__ = [
     "FlextQualityFileStatistics",
     "FlextQualityStyleGuide",
     "FlextQualityValidationConfig",
+    "base_classes",
+    "config_manager",
+    "file_discovery",
 ]
 
 

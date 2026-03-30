@@ -13,6 +13,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
+    from flext_quality.docs.scripts import audit, optimize, report, validate
     from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
     from flext_quality.docs.scripts.optimize import (
         MIN_HEADINGS_FOR_TOC,
@@ -54,7 +55,11 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "MIN_HEADINGS_FOR_TOC",
     ],
     "ReportValue": ["flext_quality.docs.scripts.report", "ReportValue"],
+    "audit": ["flext_quality.docs.scripts.audit", ""],
     "main": ["flext_quality.docs.scripts.validate", "main"],
+    "optimize": ["flext_quality.docs.scripts.optimize", ""],
+    "report": ["flext_quality.docs.scripts.report", ""],
+    "validate": ["flext_quality.docs.scripts.validate", ""],
 }
 
 __all__ = [
@@ -65,7 +70,11 @@ __all__ = [
     "FlextQualityDocumentationReporter",
     "FlextQualityLinkValidator",
     "ReportValue",
+    "audit",
     "main",
+    "optimize",
+    "report",
+    "validate",
 ]
 
 

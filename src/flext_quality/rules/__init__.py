@@ -13,6 +13,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
+    from flext_quality.rules import engine, loader, validators
     from flext_quality.rules.engine import FlextQualityRulesEngine
     from flext_quality.rules.loader import FlextQualityRulesLoader
     from flext_quality.rules.validators import FlextQualityValidators
@@ -30,12 +31,18 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "flext_quality.rules.validators",
         "FlextQualityValidators",
     ],
+    "engine": ["flext_quality.rules.engine", ""],
+    "loader": ["flext_quality.rules.loader", ""],
+    "validators": ["flext_quality.rules.validators", ""],
 }
 
 __all__ = [
     "FlextQualityRulesEngine",
     "FlextQualityRulesLoader",
     "FlextQualityValidators",
+    "engine",
+    "loader",
+    "validators",
 ]
 
 

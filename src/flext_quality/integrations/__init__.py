@@ -20,6 +20,12 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
+    from flext_quality.integrations import (
+        claude_context,
+        claude_mem,
+        code_execution,
+        mcp_client,
+    )
     from flext_quality.integrations.claude_context import (
         FlextQualityClaudeContextClient,
     )
@@ -50,6 +56,10 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "FlextQualityMcpClient",
     ],
     "McpToolCall": ["flext_quality.integrations.claude_mem", "McpToolCall"],
+    "claude_context": ["flext_quality.integrations.claude_context", ""],
+    "claude_mem": ["flext_quality.integrations.claude_mem", ""],
+    "code_execution": ["flext_quality.integrations.code_execution", ""],
+    "mcp_client": ["flext_quality.integrations.mcp_client", ""],
 }
 
 __all__ = [
@@ -58,6 +68,10 @@ __all__ = [
     "FlextQualityCodeExecutionBridge",
     "FlextQualityMcpClient",
     "McpToolCall",
+    "claude_context",
+    "claude_mem",
+    "code_execution",
+    "mcp_client",
 ]
 
 

@@ -17,7 +17,15 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_quality.docs import core, scripts, tools
+    from flext_quality.docs import (
+        core,
+        dashboard,
+        notifications,
+        scheduled_maintenance,
+        scripts,
+        tools,
+    )
+    from flext_quality.docs.core import base_classes, config_manager, file_discovery
     from flext_quality.docs.core.base_classes import (
         FlextQualityBaseAnalyzer,
         FlextQualityBaseAuditor,
@@ -43,6 +51,7 @@ if TYPE_CHECKING:
         FlextQualityScheduledMaintenance,
         logger,
     )
+    from flext_quality.docs.scripts import audit, optimize, report, validate
     from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
     from flext_quality.docs.scripts.optimize import (
         MIN_HEADINGS_FOR_TOC,
@@ -57,6 +66,7 @@ if TYPE_CHECKING:
         FlextQualityLinkValidator,
         main,
     )
+    from flext_quality.docs.tools import content_analyzer, link_checker, style_validator
     from flext_quality.docs.tools.content_analyzer import (
         FlextQualityContentAnalyzer,
         analyze_file_content,
@@ -174,11 +184,24 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "flext_quality.docs.tools.content_analyzer",
         "analyze_files_content",
     ],
+    "audit": ["flext_quality.docs.scripts.audit", ""],
+    "base_classes": ["flext_quality.docs.core.base_classes", ""],
+    "config_manager": ["flext_quality.docs.core.config_manager", ""],
+    "content_analyzer": ["flext_quality.docs.tools.content_analyzer", ""],
     "core": ["flext_quality.docs.core", ""],
+    "dashboard": ["flext_quality.docs.dashboard", ""],
+    "file_discovery": ["flext_quality.docs.core.file_discovery", ""],
+    "link_checker": ["flext_quality.docs.tools.link_checker", ""],
     "logger": ["flext_quality.docs.scheduled_maintenance", "logger"],
     "main": ["flext_quality.docs.scripts.validate", "main"],
+    "notifications": ["flext_quality.docs.notifications", ""],
+    "optimize": ["flext_quality.docs.scripts.optimize", ""],
+    "report": ["flext_quality.docs.scripts.report", ""],
+    "scheduled_maintenance": ["flext_quality.docs.scheduled_maintenance", ""],
     "scripts": ["flext_quality.docs.scripts", ""],
+    "style_validator": ["flext_quality.docs.tools.style_validator", ""],
     "tools": ["flext_quality.docs.tools", ""],
+    "validate": ["flext_quality.docs.scripts.validate", ""],
     "validate_file_style": [
         "flext_quality.docs.tools.style_validator",
         "validate_file_style",
@@ -220,11 +243,24 @@ __all__ = [
     "ReportValue",
     "analyze_file_content",
     "analyze_files_content",
+    "audit",
+    "base_classes",
+    "config_manager",
+    "content_analyzer",
     "core",
+    "dashboard",
+    "file_discovery",
+    "link_checker",
     "logger",
     "main",
+    "notifications",
+    "optimize",
+    "report",
+    "scheduled_maintenance",
     "scripts",
+    "style_validator",
     "tools",
+    "validate",
     "validate_file_style",
     "validate_files_style",
     "validate_links_sync",

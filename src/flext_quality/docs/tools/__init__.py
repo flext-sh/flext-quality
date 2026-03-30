@@ -13,6 +13,7 @@ from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
 if TYPE_CHECKING:
     from flext_core import FlextTypes
 
+    from flext_quality.docs.tools import content_analyzer, link_checker, style_validator
     from flext_quality.docs.tools.content_analyzer import (
         FlextQualityContentAnalyzer,
         analyze_file_content,
@@ -49,6 +50,9 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "flext_quality.docs.tools.content_analyzer",
         "analyze_files_content",
     ],
+    "content_analyzer": ["flext_quality.docs.tools.content_analyzer", ""],
+    "link_checker": ["flext_quality.docs.tools.link_checker", ""],
+    "style_validator": ["flext_quality.docs.tools.style_validator", ""],
     "validate_file_style": [
         "flext_quality.docs.tools.style_validator",
         "validate_file_style",
@@ -69,6 +73,9 @@ __all__ = [
     "FlextQualityStyleValidator",
     "analyze_file_content",
     "analyze_files_content",
+    "content_analyzer",
+    "link_checker",
+    "style_validator",
     "validate_file_style",
     "validate_files_style",
     "validate_links_sync",

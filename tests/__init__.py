@@ -14,7 +14,16 @@ if TYPE_CHECKING:
     from flext_core import FlextTypes
 
     from flext_quality import d, e, h, r, s, x
-    from tests import helpers, unit
+    from tests import (
+        conftest,
+        constants,
+        helpers,
+        models,
+        protocols,
+        typings,
+        unit,
+        utilities,
+    )
     from tests.conftest import (
         MockQualityAnalyzer,
         MockReportGenerator,
@@ -42,6 +51,7 @@ if TYPE_CHECKING:
         FlextQualityTestConstants,
         FlextQualityTestConstants as c,
     )
+    from tests.helpers import assertions, typing_helpers
     from tests.helpers.constants import TestsConstants
     from tests.helpers.models import TestsModels
     from tests.helpers.protocols import TestsProtocols
@@ -62,6 +72,7 @@ if TYPE_CHECKING:
         FlextQualityTestProtocols as p,
     )
     from tests.typings import FlextQualityTestTypes, FlextQualityTestTypes as t
+    from tests.unit import test_api, test_cli
     from tests.unit.test_api import (
         TestFlextQualityAPI,
         TestFlextQualityHookExecution,
@@ -131,10 +142,13 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
         "tests.conftest",
         "assert_result_success_with_data",
     ],
+    "assertions": ["tests.helpers.assertions", ""],
     "c": ["tests.constants", "FlextQualityTestConstants"],
     "celery_config": ["tests.conftest", "celery_config"],
     "code_analysis_config": ["tests.conftest", "code_analysis_config"],
     "codeclimate_config": ["tests.conftest", "codeclimate_config"],
+    "conftest": ["tests.conftest", ""],
+    "constants": ["tests.constants", ""],
     "d": ["flext_quality", "d"],
     "dashboard_data": ["tests.conftest", "dashboard_data"],
     "e": ["flext_quality", "e"],
@@ -143,8 +157,10 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "m": ["tests.models", "FlextQualityTestModels"],
     "mock_quality_analyzer": ["tests.conftest", "mock_quality_analyzer"],
     "mock_report_generator": ["tests.conftest", "mock_report_generator"],
+    "models": ["tests.models", ""],
     "p": ["tests.protocols", "FlextQualityTestProtocols"],
     "package_metadata": ["tests.conftest", "package_metadata"],
+    "protocols": ["tests.protocols", ""],
     "pytest_configure": ["tests.conftest", "pytest_configure"],
     "quality_metrics_data": ["tests.conftest", "quality_metrics_data"],
     "r": ["flext_quality", "r"],
@@ -158,9 +174,14 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "sonarqube_config": ["tests.conftest", "sonarqube_config"],
     "t": ["tests.typings", "FlextQualityTestTypes"],
     "temporary_project_structure": ["tests.conftest", "temporary_project_structure"],
+    "test_api": ["tests.unit.test_api", ""],
     "test_basic": ["tests.unit.test_basic", "test_basic"],
+    "test_cli": ["tests.unit.test_cli", ""],
+    "typing_helpers": ["tests.helpers.typing_helpers", ""],
+    "typings": ["tests.typings", ""],
     "u": ["tests.utilities", "FlextQualityTestUtilities"],
     "unit": ["tests.unit", ""],
+    "utilities": ["tests.utilities", ""],
     "x": ["flext_quality", "x"],
 }
 
@@ -194,10 +215,13 @@ __all__ = [
     "assert_metrics_structure",
     "assert_result_failure_with_error",
     "assert_result_success_with_data",
+    "assertions",
     "c",
     "celery_config",
     "code_analysis_config",
     "codeclimate_config",
+    "conftest",
+    "constants",
     "d",
     "dashboard_data",
     "e",
@@ -206,8 +230,10 @@ __all__ = [
     "m",
     "mock_quality_analyzer",
     "mock_report_generator",
+    "models",
     "p",
     "package_metadata",
+    "protocols",
     "pytest_configure",
     "quality_metrics_data",
     "r",
@@ -221,9 +247,14 @@ __all__ = [
     "sonarqube_config",
     "t",
     "temporary_project_structure",
+    "test_api",
     "test_basic",
+    "test_cli",
+    "typing_helpers",
+    "typings",
     "u",
     "unit",
+    "utilities",
     "x",
 ]
 
