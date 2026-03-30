@@ -11,47 +11,19 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_quality.rules import (
-        engine as engine,
-        loader as loader,
-        validators as validators,
-    )
-    from flext_quality.rules.engine import (
-        FlextQualityRulesEngine as FlextQualityRulesEngine,
-    )
-    from flext_quality.rules.loader import (
-        FlextQualityRulesLoader as FlextQualityRulesLoader,
-    )
-    from flext_quality.rules.validators import (
-        FlextQualityValidators as FlextQualityValidators,
-    )
+    from flext_quality.rules import engine, loader, validators
+    from flext_quality.rules.engine import *
+    from flext_quality.rules.loader import *
+    from flext_quality.rules.validators import *
 
-_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextQualityRulesEngine": [
-        "flext_quality.rules.engine",
-        "FlextQualityRulesEngine",
-    ],
-    "FlextQualityRulesLoader": [
-        "flext_quality.rules.loader",
-        "FlextQualityRulesLoader",
-    ],
-    "FlextQualityValidators": [
-        "flext_quality.rules.validators",
-        "FlextQualityValidators",
-    ],
-    "engine": ["flext_quality.rules.engine", ""],
-    "loader": ["flext_quality.rules.loader", ""],
-    "validators": ["flext_quality.rules.validators", ""],
+_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+    "FlextQualityRulesEngine": "flext_quality.rules.engine",
+    "FlextQualityRulesLoader": "flext_quality.rules.loader",
+    "FlextQualityValidators": "flext_quality.rules.validators",
+    "engine": "flext_quality.rules.engine",
+    "loader": "flext_quality.rules.loader",
+    "validators": "flext_quality.rules.validators",
 }
 
-_EXPORTS: Sequence[str] = [
-    "FlextQualityRulesEngine",
-    "FlextQualityRulesLoader",
-    "FlextQualityValidators",
-    "engine",
-    "loader",
-    "validators",
-]
 
-
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, _EXPORTS)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, sorted(_LAZY_IMPORTS))

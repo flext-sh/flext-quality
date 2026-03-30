@@ -19,60 +19,27 @@ from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
     from flext_quality.integrations import (
-        claude_context as claude_context,
-        claude_mem as claude_mem,
-        code_execution as code_execution,
-        mcp_client as mcp_client,
+        claude_context,
+        claude_mem,
+        code_execution,
+        mcp_client,
     )
-    from flext_quality.integrations.claude_context import (
-        FlextQualityClaudeContextClient as FlextQualityClaudeContextClient,
-    )
-    from flext_quality.integrations.claude_mem import (
-        FlextQualityClaudeMemClient as FlextQualityClaudeMemClient,
-        McpToolCall as McpToolCall,
-    )
-    from flext_quality.integrations.code_execution import (
-        FlextQualityCodeExecutionBridge as FlextQualityCodeExecutionBridge,
-    )
-    from flext_quality.integrations.mcp_client import (
-        FlextQualityMcpClient as FlextQualityMcpClient,
-    )
+    from flext_quality.integrations.claude_context import *
+    from flext_quality.integrations.claude_mem import *
+    from flext_quality.integrations.code_execution import *
+    from flext_quality.integrations.mcp_client import *
 
-_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextQualityClaudeContextClient": [
-        "flext_quality.integrations.claude_context",
-        "FlextQualityClaudeContextClient",
-    ],
-    "FlextQualityClaudeMemClient": [
-        "flext_quality.integrations.claude_mem",
-        "FlextQualityClaudeMemClient",
-    ],
-    "FlextQualityCodeExecutionBridge": [
-        "flext_quality.integrations.code_execution",
-        "FlextQualityCodeExecutionBridge",
-    ],
-    "FlextQualityMcpClient": [
-        "flext_quality.integrations.mcp_client",
-        "FlextQualityMcpClient",
-    ],
-    "McpToolCall": ["flext_quality.integrations.claude_mem", "McpToolCall"],
-    "claude_context": ["flext_quality.integrations.claude_context", ""],
-    "claude_mem": ["flext_quality.integrations.claude_mem", ""],
-    "code_execution": ["flext_quality.integrations.code_execution", ""],
-    "mcp_client": ["flext_quality.integrations.mcp_client", ""],
+_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+    "FlextQualityClaudeContextClient": "flext_quality.integrations.claude_context",
+    "FlextQualityClaudeMemClient": "flext_quality.integrations.claude_mem",
+    "FlextQualityCodeExecutionBridge": "flext_quality.integrations.code_execution",
+    "FlextQualityMcpClient": "flext_quality.integrations.mcp_client",
+    "McpToolCall": "flext_quality.integrations.claude_mem",
+    "claude_context": "flext_quality.integrations.claude_context",
+    "claude_mem": "flext_quality.integrations.claude_mem",
+    "code_execution": "flext_quality.integrations.code_execution",
+    "mcp_client": "flext_quality.integrations.mcp_client",
 }
 
-_EXPORTS: Sequence[str] = [
-    "FlextQualityClaudeContextClient",
-    "FlextQualityClaudeMemClient",
-    "FlextQualityCodeExecutionBridge",
-    "FlextQualityMcpClient",
-    "McpToolCall",
-    "claude_context",
-    "claude_mem",
-    "code_execution",
-    "mcp_client",
-]
 
-
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, _EXPORTS)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, sorted(_LAZY_IMPORTS))

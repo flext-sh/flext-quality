@@ -11,28 +11,16 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_quality.hooks import base as base, manager as manager
-    from flext_quality.hooks.base import FlextQualityBaseHook as FlextQualityBaseHook
-    from flext_quality.hooks.manager import (
-        FlextQualityHookManager as FlextQualityHookManager,
-    )
+    from flext_quality.hooks import base, manager
+    from flext_quality.hooks.base import *
+    from flext_quality.hooks.manager import *
 
-_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextQualityBaseHook": ["flext_quality.hooks.base", "FlextQualityBaseHook"],
-    "FlextQualityHookManager": [
-        "flext_quality.hooks.manager",
-        "FlextQualityHookManager",
-    ],
-    "base": ["flext_quality.hooks.base", ""],
-    "manager": ["flext_quality.hooks.manager", ""],
+_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+    "FlextQualityBaseHook": "flext_quality.hooks.base",
+    "FlextQualityHookManager": "flext_quality.hooks.manager",
+    "base": "flext_quality.hooks.base",
+    "manager": "flext_quality.hooks.manager",
 }
 
-_EXPORTS: Sequence[str] = [
-    "FlextQualityBaseHook",
-    "FlextQualityHookManager",
-    "base",
-    "manager",
-]
 
-
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, _EXPORTS)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, sorted(_LAZY_IMPORTS))

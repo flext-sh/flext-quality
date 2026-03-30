@@ -16,89 +16,26 @@ from typing import TYPE_CHECKING
 from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_quality.docs.core import (
-        base_classes as base_classes,
-        config_manager as config_manager,
-        file_discovery as file_discovery,
-    )
-    from flext_quality.docs.core.base_classes import (
-        FlextQualityBaseAnalyzer as FlextQualityBaseAnalyzer,
-        FlextQualityBaseAuditor as FlextQualityBaseAuditor,
-        FlextQualityBaseReporter as FlextQualityBaseReporter,
-        FlextQualityBaseValidator as FlextQualityBaseValidator,
-    )
-    from flext_quality.docs.core.config_manager import (
-        FlextQualityAuditRules as FlextQualityAuditRules,
-        FlextQualityConfigManager as FlextQualityConfigManager,
-        FlextQualityStyleGuide as FlextQualityStyleGuide,
-        FlextQualityValidationConfig as FlextQualityValidationConfig,
-    )
-    from flext_quality.docs.core.file_discovery import (
-        FlextQualityDocumentationFinder as FlextQualityDocumentationFinder,
-        FlextQualityFileStatistics as FlextQualityFileStatistics,
-    )
+    from flext_quality.docs.core import base_classes, config_manager, file_discovery
+    from flext_quality.docs.core.base_classes import *
+    from flext_quality.docs.core.config_manager import *
+    from flext_quality.docs.core.file_discovery import *
 
-_LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
-    "FlextQualityAuditRules": [
-        "flext_quality.docs.core.config_manager",
-        "FlextQualityAuditRules",
-    ],
-    "FlextQualityBaseAnalyzer": [
-        "flext_quality.docs.core.base_classes",
-        "FlextQualityBaseAnalyzer",
-    ],
-    "FlextQualityBaseAuditor": [
-        "flext_quality.docs.core.base_classes",
-        "FlextQualityBaseAuditor",
-    ],
-    "FlextQualityBaseReporter": [
-        "flext_quality.docs.core.base_classes",
-        "FlextQualityBaseReporter",
-    ],
-    "FlextQualityBaseValidator": [
-        "flext_quality.docs.core.base_classes",
-        "FlextQualityBaseValidator",
-    ],
-    "FlextQualityConfigManager": [
-        "flext_quality.docs.core.config_manager",
-        "FlextQualityConfigManager",
-    ],
-    "FlextQualityDocumentationFinder": [
-        "flext_quality.docs.core.file_discovery",
-        "FlextQualityDocumentationFinder",
-    ],
-    "FlextQualityFileStatistics": [
-        "flext_quality.docs.core.file_discovery",
-        "FlextQualityFileStatistics",
-    ],
-    "FlextQualityStyleGuide": [
-        "flext_quality.docs.core.config_manager",
-        "FlextQualityStyleGuide",
-    ],
-    "FlextQualityValidationConfig": [
-        "flext_quality.docs.core.config_manager",
-        "FlextQualityValidationConfig",
-    ],
-    "base_classes": ["flext_quality.docs.core.base_classes", ""],
-    "config_manager": ["flext_quality.docs.core.config_manager", ""],
-    "file_discovery": ["flext_quality.docs.core.file_discovery", ""],
+_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+    "FlextQualityAuditRules": "flext_quality.docs.core.config_manager",
+    "FlextQualityBaseAnalyzer": "flext_quality.docs.core.base_classes",
+    "FlextQualityBaseAuditor": "flext_quality.docs.core.base_classes",
+    "FlextQualityBaseReporter": "flext_quality.docs.core.base_classes",
+    "FlextQualityBaseValidator": "flext_quality.docs.core.base_classes",
+    "FlextQualityConfigManager": "flext_quality.docs.core.config_manager",
+    "FlextQualityDocumentationFinder": "flext_quality.docs.core.file_discovery",
+    "FlextQualityFileStatistics": "flext_quality.docs.core.file_discovery",
+    "FlextQualityStyleGuide": "flext_quality.docs.core.config_manager",
+    "FlextQualityValidationConfig": "flext_quality.docs.core.config_manager",
+    "base_classes": "flext_quality.docs.core.base_classes",
+    "config_manager": "flext_quality.docs.core.config_manager",
+    "file_discovery": "flext_quality.docs.core.file_discovery",
 }
 
-_EXPORTS: Sequence[str] = [
-    "FlextQualityAuditRules",
-    "FlextQualityBaseAnalyzer",
-    "FlextQualityBaseAuditor",
-    "FlextQualityBaseReporter",
-    "FlextQualityBaseValidator",
-    "FlextQualityConfigManager",
-    "FlextQualityDocumentationFinder",
-    "FlextQualityFileStatistics",
-    "FlextQualityStyleGuide",
-    "FlextQualityValidationConfig",
-    "base_classes",
-    "config_manager",
-    "file_discovery",
-]
 
-
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, _EXPORTS)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, sorted(_LAZY_IMPORTS))
