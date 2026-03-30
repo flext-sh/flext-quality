@@ -9,8 +9,7 @@ from typing import final
 from flext_core import r
 from pydantic import TypeAdapter
 
-from flext_quality import c, t
-from flext_quality.hooks.base import FlextQualityBaseHook
+from flext_quality import FlextQualityBaseHook, c, t
 
 
 @final

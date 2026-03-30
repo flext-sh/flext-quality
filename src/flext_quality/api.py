@@ -18,6 +18,7 @@ from typing import ClassVar
 from flext_core import FlextContainer, FlextLogger, r
 
 from flext_quality import (
+    FlextQualityHookManager,
     FlextQualityRulesLoader,
     FlextQualitySettings,
     c,
@@ -26,7 +27,6 @@ from flext_quality import (
     t,
     u,
 )
-from flext_quality.hooks.manager import FlextQualityHookManager
 
 
 class FlextQuality:

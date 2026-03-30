@@ -9,12 +9,12 @@ from pydantic import TypeAdapter
 from flext_quality import (
     FlextQualityClaudeContextClient,
     FlextQualityClaudeMemClient,
+    FlextQualityHookManager,
     FlextQualityRulesEngine,
     c,
     mcp,
     t,
 )
-from flext_quality.hooks.manager import FlextQualityHookManager
 
 _norm_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
     Mapping[str, t.NormalizedValue],

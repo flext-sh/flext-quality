@@ -5,12 +5,12 @@ from __future__ import annotations
 from flext_quality import (
     FlextQualityClaudeContextClient,
     FlextQualityClaudeMemClient,
+    FlextQualityHookManager,
     FlextQualityRulesEngine,
     c,
     mcp,
     t,
 )
-from flext_quality.hooks.manager import FlextQualityHookManager
 
 
 @mcp.tool()
