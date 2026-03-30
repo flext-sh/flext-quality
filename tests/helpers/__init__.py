@@ -15,37 +15,35 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import Mapping, MutableMapping, Sequence
+from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING
 
-from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
+from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_core import FlextTypes
-
-    from flext_quality import d, e, h, r, s, u, x
+    from flext_quality import d as d, e as e, h as h, r as r, s as s, u as u, x as x
     from tests.helpers import (
-        assertions,
-        constants,
-        models,
-        protocols,
-        typing_helpers,
-        typings,
+        assertions as assertions,
+        constants as constants,
+        models as models,
+        protocols as protocols,
+        typing_helpers as typing_helpers,
+        typings as typings,
     )
-    from tests.helpers.constants import TestsConstants, c
-    from tests.helpers.models import TestsModels, m
-    from tests.helpers.protocols import TestsProtocols, p
+    from tests.helpers.constants import TestsConstants as TestsConstants, c as c
+    from tests.helpers.models import TestsModels as TestsModels, m as m
+    from tests.helpers.protocols import TestsProtocols as TestsProtocols, p as p
     from tests.helpers.typing_helpers import (
-        assert_analysis_results_structure,
-        assert_dict_structure,
-        assert_is_dict,
-        assert_is_list,
-        assert_issues_structure,
-        assert_metrics_structure,
-        safe_dict_access,
-        safe_list_access,
+        assert_analysis_results_structure as assert_analysis_results_structure,
+        assert_dict_structure as assert_dict_structure,
+        assert_is_dict as assert_is_dict,
+        assert_is_list as assert_is_list,
+        assert_issues_structure as assert_issues_structure,
+        assert_metrics_structure as assert_metrics_structure,
+        safe_dict_access as safe_dict_access,
+        safe_list_access as safe_list_access,
     )
-    from tests.helpers.typings import TestsTypings, t
+    from tests.helpers.typings import TestsTypings as TestsTypings, t as t
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "TestsConstants": ["tests.helpers.constants", "TestsConstants"],
@@ -88,7 +86,7 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "x": ["flext_quality", "x"],
 }
 
-__all__ = [
+_EXPORTS: Sequence[str] = [
     "TestsConstants",
     "TestsModels",
     "TestsProtocols",
@@ -121,41 +119,4 @@ __all__ = [
 ]
 
 
-_LAZY_CACHE: MutableMapping[str, FlextTypes.ModuleExport] = {}
-
-
-def __getattr__(name: str) -> FlextTypes.ModuleExport:
-    """Lazy-load module attributes on first access (PEP 562).
-
-    A local cache ``_LAZY_CACHE`` persists resolved objects across repeated
-    accesses during process lifetime.
-
-    Args:
-        name: Attribute name requested by dir()/import.
-
-    Returns:
-        Lazy-loaded module export type.
-
-    Raises:
-        AttributeError: If attribute not registered.
-
-    """
-    if name in _LAZY_CACHE:
-        return _LAZY_CACHE[name]
-
-    value = lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
-    _LAZY_CACHE[name] = value
-    return value
-
-
-def __dir__() -> Sequence[str]:
-    """Return list of available attributes for dir() and autocomplete.
-
-    Returns:
-        List of public names from module exports.
-
-    """
-    return sorted(__all__)
-
-
-cleanup_submodule_namespace(__name__, _LAZY_IMPORTS)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, _EXPORTS)

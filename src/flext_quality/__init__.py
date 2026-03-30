@@ -5,146 +5,185 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, MutableMapping, Sequence
+from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING
 
-from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
+from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_cli import d, e, h, r, s, x
-    from flext_core import FlextTypes
-
     from flext_quality import (
-        api,
-        constants,
-        docs,
-        hooks,
-        integrations,
-        models,
-        protocols,
-        rules,
-        services,
-        settings,
-        typings,
-        utilities,
+        api as api,
+        constants as constants,
+        docs as docs,
+        hooks as hooks,
+        integrations as integrations,
+        models as models,
+        protocols as protocols,
+        rules as rules,
+        services as services,
+        settings as settings,
+        typings as typings,
+        utilities as utilities,
     )
-    from flext_quality.api import FlextQuality
+    from flext_quality.api import FlextQuality as FlextQuality
     from flext_quality.constants import (
-        FlextQualityConstants,
+        FlextQualityConstants as FlextQualityConstants,
         FlextQualityConstants as c,
     )
     from flext_quality.docs import (
-        core,
-        dashboard,
-        notifications,
-        scheduled_maintenance,
-        scripts,
-        tools,
+        core as core,
+        dashboard as dashboard,
+        notifications as notifications,
+        scheduled_maintenance as scheduled_maintenance,
+        scripts as scripts,
+        tools as tools,
     )
-    from flext_quality.docs.core import base_classes, config_manager, file_discovery
+    from flext_quality.docs.core import (
+        base_classes as base_classes,
+        config_manager as config_manager,
+        file_discovery as file_discovery,
+    )
     from flext_quality.docs.core.base_classes import (
-        FlextQualityBaseAnalyzer,
-        FlextQualityBaseAuditor,
-        FlextQualityBaseReporter,
-        FlextQualityBaseValidator,
+        FlextQualityBaseAnalyzer as FlextQualityBaseAnalyzer,
+        FlextQualityBaseAuditor as FlextQualityBaseAuditor,
+        FlextQualityBaseReporter as FlextQualityBaseReporter,
+        FlextQualityBaseValidator as FlextQualityBaseValidator,
     )
     from flext_quality.docs.core.config_manager import (
-        FlextQualityAuditRules,
-        FlextQualityConfigManager,
-        FlextQualityStyleGuide,
-        FlextQualityValidationConfig,
+        FlextQualityAuditRules as FlextQualityAuditRules,
+        FlextQualityConfigManager as FlextQualityConfigManager,
+        FlextQualityStyleGuide as FlextQualityStyleGuide,
+        FlextQualityValidationConfig as FlextQualityValidationConfig,
     )
     from flext_quality.docs.core.file_discovery import (
-        FlextQualityDocumentationFinder,
-        FlextQualityFileStatistics,
+        FlextQualityDocumentationFinder as FlextQualityDocumentationFinder,
+        FlextQualityFileStatistics as FlextQualityFileStatistics,
     )
-    from flext_quality.docs.dashboard import FlextQualityDocumentationDashboard
+    from flext_quality.docs.dashboard import (
+        FlextQualityDocumentationDashboard as FlextQualityDocumentationDashboard,
+    )
     from flext_quality.docs.notifications import (
-        MAX_BROKEN_LINKS_TO_SHOW,
-        FlextQualityDocumentationNotifier,
+        MAX_BROKEN_LINKS_TO_SHOW as MAX_BROKEN_LINKS_TO_SHOW,
+        FlextQualityDocumentationNotifier as FlextQualityDocumentationNotifier,
     )
     from flext_quality.docs.scheduled_maintenance import (
-        FlextQualityScheduledMaintenance,
-        logger,
+        FlextQualityScheduledMaintenance as FlextQualityScheduledMaintenance,
+        logger as logger,
     )
-    from flext_quality.docs.scripts import audit, optimize, report, validate
-    from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
+    from flext_quality.docs.scripts import (
+        audit as audit,
+        optimize as optimize,
+        report as report,
+        validate as validate,
+    )
+    from flext_quality.docs.scripts.audit import (
+        FlextQualityDocumentationAuditor as FlextQualityDocumentationAuditor,
+    )
     from flext_quality.docs.scripts.optimize import (
-        MIN_HEADINGS_FOR_TOC,
-        FlextQualityDocumentationOptimizer,
+        MIN_HEADINGS_FOR_TOC as MIN_HEADINGS_FOR_TOC,
+        FlextQualityDocumentationOptimizer as FlextQualityDocumentationOptimizer,
     )
     from flext_quality.docs.scripts.report import (
-        FlextQualityDocumentationReporter,
-        ReportValue,
+        FlextQualityDocumentationReporter as FlextQualityDocumentationReporter,
+        ReportValue as ReportValue,
     )
     from flext_quality.docs.scripts.validate import (
-        FlextQualityContentValidator,
-        FlextQualityLinkValidator,
+        FlextQualityContentValidator as FlextQualityContentValidator,
+        FlextQualityLinkValidator as FlextQualityLinkValidator,
     )
-    from flext_quality.docs.tools import content_analyzer, link_checker, style_validator
+    from flext_quality.docs.tools import (
+        content_analyzer as content_analyzer,
+        link_checker as link_checker,
+        style_validator as style_validator,
+    )
     from flext_quality.docs.tools.content_analyzer import (
-        FlextQualityContentAnalyzer,
-        analyze_file_content,
-        analyze_files_content,
+        FlextQualityContentAnalyzer as FlextQualityContentAnalyzer,
+        analyze_file_content as analyze_file_content,
+        analyze_files_content as analyze_files_content,
     )
     from flext_quality.docs.tools.link_checker import (
-        FlextQualityLinkChecker,
-        validate_links_sync,
+        FlextQualityLinkChecker as FlextQualityLinkChecker,
+        validate_links_sync as validate_links_sync,
     )
     from flext_quality.docs.tools.style_validator import (
-        FlextQualityStyleValidator,
-        validate_file_style,
-        validate_files_style,
+        FlextQualityStyleValidator as FlextQualityStyleValidator,
+        validate_file_style as validate_file_style,
+        validate_files_style as validate_files_style,
     )
-    from flext_quality.hooks import base, manager
-    from flext_quality.hooks.base import FlextQualityBaseHook
-    from flext_quality.hooks.manager import FlextQualityHookManager
+    from flext_quality.hooks import base as base, manager as manager
+    from flext_quality.hooks.base import FlextQualityBaseHook as FlextQualityBaseHook
+    from flext_quality.hooks.manager import (
+        FlextQualityHookManager as FlextQualityHookManager,
+    )
     from flext_quality.integrations import (
-        claude_context,
-        claude_mem,
-        code_execution,
-        mcp_client,
+        claude_context as claude_context,
+        claude_mem as claude_mem,
+        code_execution as code_execution,
+        mcp_client as mcp_client,
     )
-    from flext_quality.integrations._health import build_mcp_health_result
+    from flext_quality.integrations._health import (
+        build_mcp_health_result as build_mcp_health_result,
+    )
     from flext_quality.integrations.claude_context import (
-        FlextQualityClaudeContextClient,
+        FlextQualityClaudeContextClient as FlextQualityClaudeContextClient,
     )
     from flext_quality.integrations.claude_mem import (
-        FlextQualityClaudeMemClient,
-        McpToolCall,
+        FlextQualityClaudeMemClient as FlextQualityClaudeMemClient,
+        McpToolCall as McpToolCall,
     )
     from flext_quality.integrations.code_execution import (
-        FlextQualityCodeExecutionBridge,
+        FlextQualityCodeExecutionBridge as FlextQualityCodeExecutionBridge,
     )
-    from flext_quality.integrations.mcp_client import FlextQualityMcpClient
-    from flext_quality.mcp import resources, server
+    from flext_quality.integrations.mcp_client import (
+        FlextQualityMcpClient as FlextQualityMcpClient,
+    )
+    from flext_quality.mcp import resources as resources, server as server
     from flext_quality.mcp.resources import (
-        get_hooks_config,
-        get_integrations_status,
-        get_rules_config,
+        get_hooks_config as get_hooks_config,
+        get_integrations_status as get_integrations_status,
+        get_rules_config as get_rules_config,
     )
-    from flext_quality.mcp.server import get_server, mcp
+    from flext_quality.mcp.server import get_server as get_server, mcp as mcp
     from flext_quality.mcp.tools import (
-        execute_hook,
-        search_code,
-        search_memory,
-        validate_rules,
+        execute_hook as execute_hook,
+        search_code as search_code,
+        search_memory as search_memory,
+        validate_rules as validate_rules,
     )
-    from flext_quality.models import FlextQualityModels, FlextQualityModels as m
+    from flext_quality.models import (
+        FlextQualityModels as FlextQualityModels,
+        FlextQualityModels as m,
+    )
     from flext_quality.protocols import (
-        FlextQualityProtocols,
+        FlextQualityProtocols as FlextQualityProtocols,
         FlextQualityProtocols as p,
     )
-    from flext_quality.rules import engine, loader, validators
-    from flext_quality.rules.engine import FlextQualityRulesEngine
-    from flext_quality.rules.loader import FlextQualityRulesLoader
-    from flext_quality.rules.validators import FlextQualityValidators
-    from flext_quality.services import cli
-    from flext_quality.services.cli import FlextQualityCliService, main
-    from flext_quality.settings import FlextQualitySettings
-    from flext_quality.typings import FlextQualityTypes, FlextQualityTypes as t
+    from flext_quality.rules import (
+        engine as engine,
+        loader as loader,
+        validators as validators,
+    )
+    from flext_quality.rules.engine import (
+        FlextQualityRulesEngine as FlextQualityRulesEngine,
+    )
+    from flext_quality.rules.loader import (
+        FlextQualityRulesLoader as FlextQualityRulesLoader,
+    )
+    from flext_quality.rules.validators import (
+        FlextQualityValidators as FlextQualityValidators,
+    )
+    from flext_quality.services import cli as cli
+    from flext_quality.services.cli import (
+        FlextQualityCliService as FlextQualityCliService,
+        main as main,
+    )
+    from flext_quality.settings import FlextQualitySettings as FlextQualitySettings
+    from flext_quality.typings import (
+        FlextQualityTypes as FlextQualityTypes,
+        FlextQualityTypes as t,
+    )
     from flext_quality.utilities import (
-        FlextQualityUtilities,
+        FlextQualityUtilities as FlextQualityUtilities,
         FlextQualityUtilities as u,
     )
 
@@ -375,9 +414,7 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "x": ["flext_cli", "x"],
 }
 
-__all__ = [
-    "MAX_BROKEN_LINKS_TO_SHOW",
-    "MIN_HEADINGS_FOR_TOC",
+_EXPORTS: Sequence[str] = [
     "FlextQuality",
     "FlextQualityAuditRules",
     "FlextQualityBaseAnalyzer",
@@ -416,6 +453,8 @@ __all__ = [
     "FlextQualityUtilities",
     "FlextQualityValidationConfig",
     "FlextQualityValidators",
+    "MAX_BROKEN_LINKS_TO_SHOW",
+    "MIN_HEADINGS_FOR_TOC",
     "McpToolCall",
     "ReportValue",
     "analyze_file_content",
@@ -489,41 +528,4 @@ __all__ = [
 ]
 
 
-_LAZY_CACHE: MutableMapping[str, FlextTypes.ModuleExport] = {}
-
-
-def __getattr__(name: str) -> FlextTypes.ModuleExport:
-    """Lazy-load module attributes on first access (PEP 562).
-
-    A local cache ``_LAZY_CACHE`` persists resolved objects across repeated
-    accesses during process lifetime.
-
-    Args:
-        name: Attribute name requested by dir()/import.
-
-    Returns:
-        Lazy-loaded module export type.
-
-    Raises:
-        AttributeError: If attribute not registered.
-
-    """
-    if name in _LAZY_CACHE:
-        return _LAZY_CACHE[name]
-
-    value = lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
-    _LAZY_CACHE[name] = value
-    return value
-
-
-def __dir__() -> Sequence[str]:
-    """Return list of available attributes for dir() and autocomplete.
-
-    Returns:
-        List of public names from module exports.
-
-    """
-    return sorted(__all__)
-
-
-cleanup_submodule_namespace(__name__, _LAZY_IMPORTS)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, _EXPORTS)

@@ -5,86 +5,93 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, MutableMapping, Sequence
+from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING
 
-from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
+from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_core import FlextTypes
-
-    from flext_quality import d, e, h, r, s, x
+    from flext_quality import d as d, e as e, h as h, r as r, s as s, x as x
     from tests import (
-        conftest,
-        constants,
-        helpers,
-        models,
-        protocols,
-        typings,
-        unit,
-        utilities,
+        conftest as conftest,
+        constants as constants,
+        helpers as helpers,
+        models as models,
+        protocols as protocols,
+        typings as typings,
+        unit as unit,
+        utilities as utilities,
     )
     from tests.conftest import (
-        MockQualityAnalyzer,
-        MockReportGenerator,
-        analysis_results,
-        analysis_task_data,
-        assert_result_failure_with_error,
-        assert_result_success_with_data,
-        celery_config,
-        code_analysis_config,
-        codeclimate_config,
-        dashboard_data,
-        mock_quality_analyzer,
-        mock_report_generator,
-        package_metadata,
-        pytest_configure,
-        quality_metrics_data,
-        report_config,
-        sample_code_repository,
-        secure_temp_dir,
-        set_test_environment,
-        sonarqube_config,
-        temporary_project_structure,
+        MockQualityAnalyzer as MockQualityAnalyzer,
+        MockReportGenerator as MockReportGenerator,
+        analysis_results as analysis_results,
+        analysis_task_data as analysis_task_data,
+        assert_result_failure_with_error as assert_result_failure_with_error,
+        assert_result_success_with_data as assert_result_success_with_data,
+        celery_config as celery_config,
+        code_analysis_config as code_analysis_config,
+        codeclimate_config as codeclimate_config,
+        dashboard_data as dashboard_data,
+        mock_quality_analyzer as mock_quality_analyzer,
+        mock_report_generator as mock_report_generator,
+        package_metadata as package_metadata,
+        pytest_configure as pytest_configure,
+        quality_metrics_data as quality_metrics_data,
+        report_config as report_config,
+        sample_code_repository as sample_code_repository,
+        secure_temp_dir as secure_temp_dir,
+        set_test_environment as set_test_environment,
+        sonarqube_config as sonarqube_config,
+        temporary_project_structure as temporary_project_structure,
     )
     from tests.constants import (
-        FlextQualityTestConstants,
+        FlextQualityTestConstants as FlextQualityTestConstants,
         FlextQualityTestConstants as c,
     )
-    from tests.helpers import assertions, typing_helpers
-    from tests.helpers.constants import TestsConstants
-    from tests.helpers.models import TestsModels
-    from tests.helpers.protocols import TestsProtocols
+    from tests.helpers import assertions as assertions, typing_helpers as typing_helpers
+    from tests.helpers.constants import TestsConstants as TestsConstants
+    from tests.helpers.models import TestsModels as TestsModels
+    from tests.helpers.protocols import TestsProtocols as TestsProtocols
     from tests.helpers.typing_helpers import (
-        assert_analysis_results_structure,
-        assert_dict_structure,
-        assert_is_dict,
-        assert_is_list,
-        assert_issues_structure,
-        assert_metrics_structure,
-        safe_dict_access,
-        safe_list_access,
+        assert_analysis_results_structure as assert_analysis_results_structure,
+        assert_dict_structure as assert_dict_structure,
+        assert_is_dict as assert_is_dict,
+        assert_is_list as assert_is_list,
+        assert_issues_structure as assert_issues_structure,
+        assert_metrics_structure as assert_metrics_structure,
+        safe_dict_access as safe_dict_access,
+        safe_list_access as safe_list_access,
     )
-    from tests.helpers.typings import TestsTypings
-    from tests.models import FlextQualityTestModels, FlextQualityTestModels as m
+    from tests.helpers.typings import TestsTypings as TestsTypings
+    from tests.models import (
+        FlextQualityTestModels as FlextQualityTestModels,
+        FlextQualityTestModels as m,
+    )
     from tests.protocols import (
-        FlextQualityTestProtocols,
+        FlextQualityTestProtocols as FlextQualityTestProtocols,
         FlextQualityTestProtocols as p,
     )
-    from tests.typings import FlextQualityTestTypes, FlextQualityTestTypes as t
-    from tests.unit import test_api, test_cli
-    from tests.unit.test_api import (
-        TestFlextQualityAPI,
-        TestFlextQualityHookExecution,
-        TestFlextQualityRulesConfig,
-        TestFlextQualitySingleton,
-        TestFlextQualityStdinProcessing,
-        TestFlextQualityValidation,
+    from tests.typings import (
+        FlextQualityTestTypes as FlextQualityTestTypes,
+        FlextQualityTestTypes as t,
     )
-    from tests.unit.test_basic import test_basic
-    from tests.unit.test_cli import TestFlextQualityCliService, TestMainFunction
+    from tests.unit import test_api as test_api, test_cli as test_cli
+    from tests.unit.test_api import (
+        TestFlextQualityAPI as TestFlextQualityAPI,
+        TestFlextQualityHookExecution as TestFlextQualityHookExecution,
+        TestFlextQualityRulesConfig as TestFlextQualityRulesConfig,
+        TestFlextQualitySingleton as TestFlextQualitySingleton,
+        TestFlextQualityStdinProcessing as TestFlextQualityStdinProcessing,
+        TestFlextQualityValidation as TestFlextQualityValidation,
+    )
+    from tests.unit.test_basic import test_basic as test_basic
+    from tests.unit.test_cli import (
+        TestFlextQualityCliService as TestFlextQualityCliService,
+        TestMainFunction as TestMainFunction,
+    )
     from tests.utilities import (
-        FlextQualityTestUtilities,
+        FlextQualityTestUtilities as FlextQualityTestUtilities,
         FlextQualityTestUtilities as u,
     )
 
@@ -185,7 +192,7 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "x": ["flext_quality", "x"],
 }
 
-__all__ = [
+_EXPORTS: Sequence[str] = [
     "FlextQualityTestConstants",
     "FlextQualityTestModels",
     "FlextQualityTestProtocols",
@@ -259,41 +266,4 @@ __all__ = [
 ]
 
 
-_LAZY_CACHE: MutableMapping[str, FlextTypes.ModuleExport] = {}
-
-
-def __getattr__(name: str) -> FlextTypes.ModuleExport:
-    """Lazy-load module attributes on first access (PEP 562).
-
-    A local cache ``_LAZY_CACHE`` persists resolved objects across repeated
-    accesses during process lifetime.
-
-    Args:
-        name: Attribute name requested by dir()/import.
-
-    Returns:
-        Lazy-loaded module export type.
-
-    Raises:
-        AttributeError: If attribute not registered.
-
-    """
-    if name in _LAZY_CACHE:
-        return _LAZY_CACHE[name]
-
-    value = lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
-    _LAZY_CACHE[name] = value
-    return value
-
-
-def __dir__() -> Sequence[str]:
-    """Return list of available attributes for dir() and autocomplete.
-
-    Returns:
-        List of public names from module exports.
-
-    """
-    return sorted(__all__)
-
-
-cleanup_submodule_namespace(__name__, _LAZY_IMPORTS)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, _EXPORTS)

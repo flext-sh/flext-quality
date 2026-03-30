@@ -5,28 +5,33 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, MutableMapping, Sequence
+from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING
 
-from flext_core.lazy import cleanup_submodule_namespace, lazy_getattr
+from flext_core.lazy import install_lazy_exports
 
 if TYPE_CHECKING:
-    from flext_core import FlextTypes
-
-    from flext_quality.docs.scripts import audit, optimize, report, validate
-    from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
+    from flext_quality.docs.scripts import (
+        audit as audit,
+        optimize as optimize,
+        report as report,
+        validate as validate,
+    )
+    from flext_quality.docs.scripts.audit import (
+        FlextQualityDocumentationAuditor as FlextQualityDocumentationAuditor,
+    )
     from flext_quality.docs.scripts.optimize import (
-        MIN_HEADINGS_FOR_TOC,
-        FlextQualityDocumentationOptimizer,
+        MIN_HEADINGS_FOR_TOC as MIN_HEADINGS_FOR_TOC,
+        FlextQualityDocumentationOptimizer as FlextQualityDocumentationOptimizer,
     )
     from flext_quality.docs.scripts.report import (
-        FlextQualityDocumentationReporter,
-        ReportValue,
+        FlextQualityDocumentationReporter as FlextQualityDocumentationReporter,
+        ReportValue as ReportValue,
     )
     from flext_quality.docs.scripts.validate import (
-        FlextQualityContentValidator,
-        FlextQualityLinkValidator,
-        main,
+        FlextQualityContentValidator as FlextQualityContentValidator,
+        FlextQualityLinkValidator as FlextQualityLinkValidator,
+        main as main,
     )
 
 _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
@@ -62,13 +67,13 @@ _LAZY_IMPORTS: Mapping[str, Sequence[str]] = {
     "validate": ["flext_quality.docs.scripts.validate", ""],
 }
 
-__all__ = [
-    "MIN_HEADINGS_FOR_TOC",
+_EXPORTS: Sequence[str] = [
     "FlextQualityContentValidator",
     "FlextQualityDocumentationAuditor",
     "FlextQualityDocumentationOptimizer",
     "FlextQualityDocumentationReporter",
     "FlextQualityLinkValidator",
+    "MIN_HEADINGS_FOR_TOC",
     "ReportValue",
     "audit",
     "main",
@@ -78,41 +83,4 @@ __all__ = [
 ]
 
 
-_LAZY_CACHE: MutableMapping[str, FlextTypes.ModuleExport] = {}
-
-
-def __getattr__(name: str) -> FlextTypes.ModuleExport:
-    """Lazy-load module attributes on first access (PEP 562).
-
-    A local cache ``_LAZY_CACHE`` persists resolved objects across repeated
-    accesses during process lifetime.
-
-    Args:
-        name: Attribute name requested by dir()/import.
-
-    Returns:
-        Lazy-loaded module export type.
-
-    Raises:
-        AttributeError: If attribute not registered.
-
-    """
-    if name in _LAZY_CACHE:
-        return _LAZY_CACHE[name]
-
-    value = lazy_getattr(name, _LAZY_IMPORTS, globals(), __name__)
-    _LAZY_CACHE[name] = value
-    return value
-
-
-def __dir__() -> Sequence[str]:
-    """Return list of available attributes for dir() and autocomplete.
-
-    Returns:
-        List of public names from module exports.
-
-    """
-    return sorted(__all__)
-
-
-cleanup_submodule_namespace(__name__, _LAZY_IMPORTS)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, _EXPORTS)
