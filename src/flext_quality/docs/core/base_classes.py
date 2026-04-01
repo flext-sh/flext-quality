@@ -11,7 +11,7 @@ from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
-from flext_quality import m, t
+from flext_quality import m, t, u
 
 
 class FlextQualityBaseAuditor(ABC):
@@ -195,9 +195,9 @@ class FlextQualityBaseAnalyzer(ABC):
     def get_score(self) -> float | None:
         """Get a quality score from the analysis (0-100)."""
         val = self.metrics.get("quality_score")
-        return float(val) if isinstance(val, (int, float)) else None
+        return u.to_float(val) if val is not None else None
 
     def get_readability_score(self) -> float | None:
         """Get a readability score from the analysis."""
         val = self.metrics.get("readability_score")
-        return float(val) if isinstance(val, (int, float)) else None
+        return u.to_float(val) if val is not None else None
