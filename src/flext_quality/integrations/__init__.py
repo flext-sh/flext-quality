@@ -20,11 +20,25 @@ from flext_core.lazy import install_lazy_exports
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_quality.integrations._health import *
-    from flext_quality.integrations.claude_context import *
-    from flext_quality.integrations.claude_mem import *
-    from flext_quality.integrations.code_execution import *
-    from flext_quality.integrations.mcp_client import *
+    from flext_quality.integrations import (
+        _health,
+        claude_context,
+        claude_mem,
+        code_execution,
+        mcp_client,
+    )
+    from flext_quality.integrations._health import build_mcp_health_result
+    from flext_quality.integrations.claude_context import (
+        FlextQualityClaudeContextClient,
+    )
+    from flext_quality.integrations.claude_mem import (
+        FlextQualityClaudeMemClient,
+        McpToolCall,
+    )
+    from flext_quality.integrations.code_execution import (
+        FlextQualityCodeExecutionBridge,
+    )
+    from flext_quality.integrations.mcp_client import FlextQualityMcpClient
 
 _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
     "FlextQualityClaudeContextClient": "flext_quality.integrations.claude_context",

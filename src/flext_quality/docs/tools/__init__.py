@@ -13,9 +13,21 @@ from flext_core.lazy import install_lazy_exports
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_quality.docs.tools.content_analyzer import *
-    from flext_quality.docs.tools.link_checker import *
-    from flext_quality.docs.tools.style_validator import *
+    from flext_quality.docs.tools import content_analyzer, link_checker, style_validator
+    from flext_quality.docs.tools.content_analyzer import (
+        FlextQualityContentAnalyzer,
+        analyze_file_content,
+        analyze_files_content,
+    )
+    from flext_quality.docs.tools.link_checker import (
+        FlextQualityLinkChecker,
+        validate_links_sync,
+    )
+    from flext_quality.docs.tools.style_validator import (
+        FlextQualityStyleValidator,
+        validate_file_style,
+        validate_files_style,
+    )
 
 _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
     "FlextQualityContentAnalyzer": "flext_quality.docs.tools.content_analyzer",

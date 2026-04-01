@@ -13,8 +13,9 @@ from flext_core.lazy import install_lazy_exports
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_quality.hooks.base import *
-    from flext_quality.hooks.manager import *
+    from flext_quality.hooks import base, manager
+    from flext_quality.hooks.base import FlextQualityBaseHook
+    from flext_quality.hooks.manager import FlextQualityHookManager
 
 _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
     "FlextQualityBaseHook": "flext_quality.hooks.base",

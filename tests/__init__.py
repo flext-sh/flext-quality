@@ -14,14 +14,82 @@ if _TYPE_CHECKING:
     from flext_core import FlextTypes
 
     from flext_quality import d, e, h, r, s, x
-    from tests.conftest import *
-    from tests.constants import *
-    from tests.helpers import *
-    from tests.models import *
-    from tests.protocols import *
-    from tests.typings import *
-    from tests.unit import *
-    from tests.utilities import *
+    from tests import (
+        conftest,
+        constants,
+        helpers,
+        models,
+        protocols,
+        typings,
+        unit,
+        utilities,
+    )
+    from tests.conftest import (
+        MockQualityAnalyzer,
+        MockReportGenerator,
+        analysis_results,
+        analysis_task_data,
+        assert_result_failure_with_error,
+        assert_result_success_with_data,
+        celery_config,
+        code_analysis_config,
+        codeclimate_config,
+        dashboard_data,
+        mock_quality_analyzer,
+        mock_report_generator,
+        package_metadata,
+        pytest_configure,
+        quality_metrics_data,
+        report_config,
+        sample_code_repository,
+        secure_temp_dir,
+        set_test_environment,
+        sonarqube_config,
+        temporary_project_structure,
+    )
+    from tests.constants import (
+        FlextQualityTestConstants,
+        FlextQualityTestConstants as c,
+    )
+    from tests.helpers import (
+        TestsConstants,
+        TestsModels,
+        TestsProtocols,
+        TestsTypings,
+        assert_analysis_results_structure,
+        assert_dict_structure,
+        assert_is_dict,
+        assert_is_list,
+        assert_issues_structure,
+        assert_metrics_structure,
+        assertions,
+        safe_dict_access,
+        safe_list_access,
+        typing_helpers,
+    )
+    from tests.models import FlextQualityTestModels, FlextQualityTestModels as m
+    from tests.protocols import (
+        FlextQualityTestProtocols,
+        FlextQualityTestProtocols as p,
+    )
+    from tests.typings import FlextQualityTestTypes, FlextQualityTestTypes as t
+    from tests.unit import (
+        TestFlextQualityAPI,
+        TestFlextQualityCliService,
+        TestFlextQualityHookExecution,
+        TestFlextQualityRulesConfig,
+        TestFlextQualitySingleton,
+        TestFlextQualityStdinProcessing,
+        TestFlextQualityValidation,
+        TestMainFunction,
+        test_api,
+        test_basic,
+        test_cli,
+    )
+    from tests.utilities import (
+        FlextQualityTestUtilities,
+        FlextQualityTestUtilities as u,
+    )
 
 _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = merge_lazy_imports(
     (

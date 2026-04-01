@@ -18,9 +18,23 @@ from flext_core.lazy import install_lazy_exports
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_quality.docs.core.base_classes import *
-    from flext_quality.docs.core.config_manager import *
-    from flext_quality.docs.core.file_discovery import *
+    from flext_quality.docs.core import base_classes, config_manager, file_discovery
+    from flext_quality.docs.core.base_classes import (
+        FlextQualityBaseAnalyzer,
+        FlextQualityBaseAuditor,
+        FlextQualityBaseReporter,
+        FlextQualityBaseValidator,
+    )
+    from flext_quality.docs.core.config_manager import (
+        FlextQualityAuditRules,
+        FlextQualityConfigManager,
+        FlextQualityStyleGuide,
+        FlextQualityValidationConfig,
+    )
+    from flext_quality.docs.core.file_discovery import (
+        FlextQualityDocumentationFinder,
+        FlextQualityFileStatistics,
+    )
 
 _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
     "FlextQualityAuditRules": "flext_quality.docs.core.config_manager",

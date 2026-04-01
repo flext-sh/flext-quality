@@ -24,11 +24,28 @@ if _TYPE_CHECKING:
     from flext_core import FlextTypes
 
     from flext_quality import d, e, h, r, s, u, x
-    from tests.helpers.constants import *
-    from tests.helpers.models import *
-    from tests.helpers.protocols import *
-    from tests.helpers.typing_helpers import *
-    from tests.helpers.typings import *
+    from tests.helpers import (
+        assertions,
+        constants,
+        models,
+        protocols,
+        typing_helpers,
+        typings,
+    )
+    from tests.helpers.constants import TestsConstants, c
+    from tests.helpers.models import TestsModels, m
+    from tests.helpers.protocols import TestsProtocols, p
+    from tests.helpers.typing_helpers import (
+        assert_analysis_results_structure,
+        assert_dict_structure,
+        assert_is_dict,
+        assert_is_list,
+        assert_issues_structure,
+        assert_metrics_structure,
+        safe_dict_access,
+        safe_list_access,
+    )
+    from tests.helpers.typings import TestsTypings, t
 
 _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
     "TestsConstants": "tests.helpers.constants",

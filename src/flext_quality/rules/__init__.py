@@ -13,9 +13,10 @@ from flext_core.lazy import install_lazy_exports
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_quality.rules.engine import *
-    from flext_quality.rules.loader import *
-    from flext_quality.rules.validators import *
+    from flext_quality.rules import engine, loader, validators
+    from flext_quality.rules.engine import FlextQualityRulesEngine
+    from flext_quality.rules.loader import FlextQualityRulesLoader
+    from flext_quality.rules.validators import FlextQualityValidators
 
 _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
     "FlextQualityRulesEngine": "flext_quality.rules.engine",

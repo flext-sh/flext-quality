@@ -13,10 +13,21 @@ from flext_core.lazy import install_lazy_exports
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from flext_quality.docs.scripts.audit import *
-    from flext_quality.docs.scripts.optimize import *
-    from flext_quality.docs.scripts.report import *
-    from flext_quality.docs.scripts.validate import *
+    from flext_quality.docs.scripts import audit, optimize, report, validate
+    from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
+    from flext_quality.docs.scripts.optimize import (
+        MIN_HEADINGS_FOR_TOC,
+        FlextQualityDocumentationOptimizer,
+    )
+    from flext_quality.docs.scripts.report import (
+        FlextQualityDocumentationReporter,
+        ReportValue,
+    )
+    from flext_quality.docs.scripts.validate import (
+        FlextQualityContentValidator,
+        FlextQualityLinkValidator,
+        main,
+    )
 
 _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
     "FlextQualityContentValidator": "flext_quality.docs.scripts.validate",
