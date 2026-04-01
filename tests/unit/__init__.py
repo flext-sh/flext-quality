@@ -13,9 +13,16 @@ from flext_core.lazy import install_lazy_exports
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
 
-    from tests.unit.test_api import *
-    from tests.unit.test_basic import *
-    from tests.unit.test_cli import *
+    from tests.unit.test_api import (
+        TestFlextQualityAPI,
+        TestFlextQualityHookExecution,
+        TestFlextQualityRulesConfig,
+        TestFlextQualitySingleton,
+        TestFlextQualityStdinProcessing,
+        TestFlextQualityValidation,
+    )
+    from tests.unit.test_basic import test_basic
+    from tests.unit.test_cli import TestFlextQualityCliService, TestMainFunction
 
 _LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
     "TestFlextQualityAPI": "tests.unit.test_api",
