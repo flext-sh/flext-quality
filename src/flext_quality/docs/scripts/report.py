@@ -301,8 +301,8 @@ class FlextQualityDocumentationReporter:
                     )
                     for e_raw in validation_errors_list:
                         try:
-                            error_entry: Mapping[str, t.NormalizedValue] = (
-                                e_adapter.validate_python(e_raw)
+                            error_entry: t.ContainerMapping = e_adapter.validate_python(
+                                e_raw
                             )
                         except (ValueError, TypeError):
                             continue

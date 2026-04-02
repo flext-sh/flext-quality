@@ -60,7 +60,7 @@ class FlextQualityBaseAuditor(ABC):
     def audit(self, files: Sequence[Path]) -> m.Quality.ValidationResult:
         """Perform the audit operation on given files."""
 
-    def get_summary(self) -> Mapping[str, Mapping[str, int] | float | int | str | None]:
+    def get_summary(self) -> Mapping[str, t.IntMapping | float | int | str | None]:
         """Get a summary of the audit results."""
         return {
             "auditor": self.name,
@@ -136,7 +136,7 @@ class FlextQualityBaseReporter(ABC):
         self,
         data: Mapping[
             str,
-            str | int | float | bool | Mapping[str, t.Primitives | None] | None,
+            t.Primitives | Mapping[str, t.Primitives | None] | None,
         ],
         output_format: str = "html",
     ) -> str:

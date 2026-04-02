@@ -13,21 +13,21 @@ import yaml
 
 from flext_quality import t
 
-type ConfigPrimitive = str | int | float | bool
-type ConfigValue = str | int | float | bool | t.StrSequence
-type ConfigSection = MutableMapping[str, str | int | float | bool | t.StrSequence]
+type ConfigPrimitive = t.Primitives
+type ConfigValue = t.Primitives | t.StrSequence
+type ConfigSection = MutableMapping[str, t.Primitives | t.StrSequence]
 type ConfigData = MutableMapping[
     str,
-    MutableMapping[str, str | int | float | bool | t.StrSequence],
+    MutableMapping[str, t.Primitives | t.StrSequence],
 ]
-type RawSectionValue = str | int | float | bool | Sequence[str | int | float | bool]
+type RawSectionValue = t.Primitives | Sequence[t.Primitives]
 type RawSectionMap = Mapping[
     str,
-    str | int | float | bool | Sequence[str | int | float | bool],
+    t.Primitives | Sequence[t.Primitives],
 ]
 type RawConfigMap = Mapping[
     str,
-    Mapping[str, str | int | float | bool | Sequence[str | int | float | bool]],
+    Mapping[str, t.Primitives | Sequence[t.Primitives]],
 ]
 
 

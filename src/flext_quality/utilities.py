@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import sys
-from collections.abc import Mapping, Sequence
+from collections.abc import Sequence
 from pathlib import Path
 
 import yaml
@@ -50,20 +50,18 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                     return r[Sequence[t.ContainerMapping]].fail(
                         "Expected YAML dict",
                     )
-                parsed_dict: Mapping[str, t.NormalizedValue] = TypeAdapter(
-                    Mapping[str, t.NormalizedValue],
+                parsed_dict: t.ContainerMapping = TypeAdapter(
+                    t.ContainerMapping,
                 ).validate_python(parsed)
                 raw_rules_val = parsed_dict.get("rules", [])
                 if not isinstance(raw_rules_val, list):
                     return r[Sequence[t.ContainerMapping]].fail(
                         "Expected rules list",
                     )
-                item_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = (
-                    TypeAdapter(
-                        Mapping[str, t.NormalizedValue],
-                    )
+                item_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
+                    t.ContainerMapping,
                 )
-                rules: Sequence[Mapping[str, t.NormalizedValue]] = [
+                rules: Sequence[t.ContainerMapping] = [
                     item_adapter.validate_python(item)
                     for item in raw_rules_val
                     if isinstance(item, dict)
@@ -86,10 +84,10 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
         def parse_hook_input(raw: str) -> r[t.Quality.HookInput]:
             """Parse hook input JSON."""
             try:
-                parsed: Mapping[str, t.NormalizedValue] = TypeAdapter(
-                    Mapping[str, t.NormalizedValue],
+                parsed: t.ContainerMapping = TypeAdapter(
+                    t.ContainerMapping,
                 ).validate_json(raw)
-                coerced_input: Mapping[str, t.NormalizedValue] = parsed
+                coerced_input: t.ContainerMapping = parsed
                 return r[t.Quality.HookInput].ok(coerced_input)
             except ValueError as e:
                 return r[t.Quality.HookInput].fail(f"Invalid JSON: {e}")

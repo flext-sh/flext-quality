@@ -87,7 +87,7 @@ class FlextQualityDocumentationDashboard:
 
     def get_current_metrics(
         self,
-    ) -> Mapping[str, t.NormalizedValue]:
+    ) -> t.ContainerMapping:
         """Get current quality metrics from latest audit."""
         latest_audit = self.reports_dir / "latest_audit.json"
 
@@ -104,11 +104,11 @@ class FlextQualityDocumentationDashboard:
         try:
             data = _DICT_ADAPTER.validate_json(Path(latest_audit).read_bytes())
             metrics_raw = data.get("metrics")
-            metrics: Mapping[str, t.NormalizedValue] = (
+            metrics: t.ContainerMapping = (
                 metrics_raw if isinstance(metrics_raw, Mapping) else {}
             )
             severity_raw = metrics.get("severity_breakdown")
-            severity: Mapping[str, t.NormalizedValue] = (
+            severity: t.ContainerMapping = (
                 severity_raw if isinstance(severity_raw, Mapping) else {}
             )
             files_analyzed_raw = data.get("files_analyzed")
@@ -144,7 +144,7 @@ class FlextQualityDocumentationDashboard:
     def get_quality_trends(
         self,
         days: int = 30,
-    ) -> Mapping[str, t.NormalizedValue]:
+    ) -> t.ContainerMapping:
         """Get quality trends over the specified number of days."""
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
 
@@ -166,11 +166,11 @@ class FlextQualityDocumentationDashboard:
                 if report_date >= cutoff_date:
                     data = _DICT_ADAPTER.validate_json(Path(report_file).read_bytes())
                     metrics_v = data.get("metrics")
-                    metrics_m: Mapping[str, t.NormalizedValue] = (
+                    metrics_m: t.ContainerMapping = (
                         metrics_v if isinstance(metrics_v, Mapping) else {}
                     )
                     sev_v = metrics_m.get("severity_breakdown")
-                    sev_m: Mapping[str, t.NormalizedValue] = (
+                    sev_m: t.ContainerMapping = (
                         sev_v if isinstance(sev_v, Mapping) else {}
                     )
                     qs_v = metrics_m.get("quality_score", 0)
@@ -226,7 +226,7 @@ class FlextQualityDocumentationDashboard:
                 data = _DICT_ADAPTER.validate_json(Path(report_file).read_bytes())
 
                 metrics_rv = data.get("metrics")
-                metrics_rm: Mapping[str, t.NormalizedValue] = (
+                metrics_rm: t.ContainerMapping = (
                     metrics_rv if isinstance(metrics_rv, Mapping) else {}
                 )
                 qs_rv = metrics_rm.get("quality_score", 0)

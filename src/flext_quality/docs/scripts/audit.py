@@ -318,9 +318,9 @@ class FlextQualityDocumentationAuditor:
         self,
         content: str,
         required_sections: t.StrSequence,
-    ) -> Sequence[str]:
+    ) -> t.StrSequence:
         """Check for required sections in documentation."""
-        missing: Sequence[str] = [
+        missing: t.StrSequence = [
             section
             for section in required_sections
             if not re.search(

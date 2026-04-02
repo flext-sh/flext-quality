@@ -80,7 +80,7 @@ def _as_str_list(
 
 def _is_str_mapping(
     value: t.NormalizedValue | None,
-) -> TypeIs[Mapping[str, t.NormalizedValue]]:
+) -> TypeIs[t.ContainerMapping]:
     return isinstance(value, Mapping)
 
 

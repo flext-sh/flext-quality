@@ -25,8 +25,8 @@ class FlextQualityContentAnalyzer:
     class AnalyzerConfig(BaseModel, total=False):
         """Configuration dictionary structure."""
 
-        content_checks: Mapping[str, bool] | None = None
-        quality_thresholds: Mapping[str, int] | None = None
+        content_checks: t.BoolMapping | None = None
+        quality_thresholds: t.IntMapping | None = None
 
     class Metrics(BaseModel):
         """Metrics dictionary structure."""
@@ -64,7 +64,7 @@ class FlextQualityContentAnalyzer:
         toc_position: int | None = None
         heading_hierarchy_valid: bool | None = None
         sections: MutableSequence[t.HeaderMapping] | None = None
-        depth_analysis: MutableMapping[str, int | float] | None = None
+        depth_analysis: MutableMapping[str, t.Numeric] | None = None
 
     class Completeness(BaseModel):
         """Completeness check dictionary structure."""
@@ -142,7 +142,7 @@ class FlextQualityContentAnalyzer:
             config_path: Path to configuration file for content analysis rules.
 
         """
-        self.config: Mapping[str, t.NormalizedValue] = {}
+        self.config: t.ContainerMapping = {}
         self.load_config(config_path)
         self.results: FlextQualityContentAnalyzer.Results = (
             FlextQualityContentAnalyzer.Results(
@@ -157,7 +157,7 @@ class FlextQualityContentAnalyzer:
 
     def load_config(self, config_path: str | None) -> None:
         """Load content analysis configuration."""
-        default_config: Mapping[str, Mapping[str, bool] | Mapping[str, int] | str] = {
+        default_config: Mapping[str, t.BoolMapping | t.IntMapping | str] = {
             "content_checks": {
                 "check_freshness": True,
                 "check_completeness": True,
@@ -385,7 +385,7 @@ class FlextQualityContentAnalyzer:
     ) -> FlextQualityContentAnalyzer.Structure:
         """Analyze document structure and organization."""
         sections_list: MutableSequence[t.HeaderMapping] = []
-        depth_analysis_dict: MutableMapping[str, int | float] = {}
+        depth_analysis_dict: MutableMapping[str, t.Numeric] = {}
         structure = FlextQualityContentAnalyzer.Structure.model_validate({
             "has_table_of_contents": False,
             "toc_position": 0,
@@ -459,7 +459,7 @@ class FlextQualityContentAnalyzer:
 
         word_count = len(re.findall(r"\b\w+\b", content))
         thresholds_val = self.config.get("quality_thresholds")
-        thresholds: Mapping[str, t.NormalizedValue] = (
+        thresholds: t.ContainerMapping = (
             dict(thresholds_val) if isinstance(thresholds_val, Mapping) else {}
         )
         min_words_val = thresholds.get("min_word_count", 100)
@@ -539,11 +539,11 @@ class FlextQualityContentAnalyzer:
         self,
         content: str,
         required_sections: t.StrSequence,
-    ) -> MutableMapping[str, MutableSequence[str]]:
+    ) -> t.MutableStrSequenceMapping:
         """Check for required sections in content."""
         required_present: MutableSequence[str] = []
         missing_required: MutableSequence[str] = []
-        result: MutableMapping[str, MutableSequence[str]] = {
+        result: t.MutableStrSequenceMapping = {
             "required_sections_present": required_present,
             "missing_required_sections": missing_required,
         }
@@ -639,7 +639,7 @@ class FlextQualityContentAnalyzer:
             )
 
         missing_raw = completeness.missing_elements if completeness else None
-        missing: Sequence[str] = (
+        missing: t.StrSequence = (
             list(missing_raw) if isinstance(missing_raw, list) else []
         )
         if missing:
@@ -772,13 +772,13 @@ class FlextQualityContentAnalyzer:
             )
 
         all_issues: MutableSequence[t.StrMapping] = []
-        rv_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
-            Mapping[str, t.NormalizedValue],
+        rv_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
+            t.ContainerMapping,
         )
         for result_value_raw in self.results.model_dump().values():
             if not isinstance(result_value_raw, dict):
                 continue
-            result_value: Mapping[str, t.NormalizedValue] = rv_adapter.validate_python(
+            result_value: t.ContainerMapping = rv_adapter.validate_python(
                 result_value_raw,
             )
             issues_list_raw = result_value.get("issues")

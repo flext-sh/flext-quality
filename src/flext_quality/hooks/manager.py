@@ -55,8 +55,8 @@ class FlextQualityHookManager:
 
     def get_config_json(self) -> str:
         """Get hooks configuration as JSON."""
-        adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
-            Mapping[str, t.NormalizedValue],
+        adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
+            t.ContainerMapping,
         )
         return adapter.dump_json(
             dict(self.get_config()),

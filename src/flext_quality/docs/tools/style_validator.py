@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import operator
 import re
-from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
+from collections.abc import Mapping, MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -627,7 +627,7 @@ class FlextQualityStyleValidator:
         """Generate improvement suggestions based on violations."""
         suggestions: MutableSequence[str] = []
 
-        violation_types: MutableMapping[str, int] = {}
+        violation_types: t.MutableIntMapping = {}
         for violation in violations:
             v_type = violation.type
             violation_types[v_type] = violation_types.get(v_type, 0) + 1
@@ -715,7 +715,7 @@ Top Issues:
 """
 
         # Count issue types
-        issue_types: MutableMapping[str, int] = {}
+        issue_types: t.MutableIntMapping = {}
         for violation in [
             *self.results.style_violations,
             *self.results.accessibility_issues,

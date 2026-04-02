@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import argparse
 import smtplib
-from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
+from collections.abc import Mapping, MutableSequence, Sequence
 from datetime import UTC, datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -196,9 +196,7 @@ class FlextQualityDocumentationNotifier:
             if isinstance(timeout_val, int):
                 cfg.webhook.timeout = timeout_val
             if isinstance(headers_val, dict):
-                str_headers: Mapping[str, str] = {
-                    k: str(v) for k, v in headers_val.items()
-                }
+                str_headers: t.StrMapping = {k: str(v) for k, v in headers_val.items()}
                 cfg.webhook.headers = str_headers
 
         enabled_val = loaded.get("enabled")
@@ -278,7 +276,7 @@ class FlextQualityDocumentationNotifier:
             if isinstance(severity_val, Mapping)
             else {}
         )
-        severity_breakdown: MutableMapping[str, int] = {}
+        severity_breakdown: t.MutableIntMapping = {}
         for key_name in ("critical", "high", "medium", "low"):
             kv = severity_m.get(key_name, 0)
             severity_breakdown[key_name] = kv if isinstance(kv, int) else 0
@@ -497,7 +495,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
         }
 
         headers_val = webhook_config.headers
-        headers: MutableMapping[str, str] = (
+        headers: t.MutableStrMapping = (
             dict(headers_val) if isinstance(headers_val, dict) else {}
         )
         headers["Content-Type"] = "application/json"
@@ -530,7 +528,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
             if isinstance(severity_val, Mapping)
             else {}
         )
-        severity_breakdown: MutableMapping[str, int] = {}
+        severity_breakdown: t.MutableIntMapping = {}
         for key_name in ("critical", "high", "medium", "low"):
             kv = severity.get(key_name, 0)
             severity_breakdown[key_name] = kv if isinstance(kv, int) else 0

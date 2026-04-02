@@ -32,7 +32,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             return {}
 
         @staticmethod
-        def _empty_list_dict_str_str() -> MutableSequence[MutableMapping[str, str]]:
+        def _empty_list_dict_str_str() -> MutableSequence[t.MutableStrMapping]:
             return []
 
         class HookConfig(BaseModel):
@@ -263,7 +263,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             """Typed metrics for documentation audit results."""
 
             total_issues: int = 0
-            severity_breakdown: MutableMapping[str, int] = Field(default_factory=dict)
+            severity_breakdown: t.MutableIntMapping = Field(default_factory=dict)
             quality_score: int = 0
             files_analyzed: int = 0
             issues_per_file: float = 0.0
@@ -375,7 +375,7 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
                     ]()
                 )
             )
-            quality_metrics: MutableMapping[str, t.Scalar] = Field(default_factory=dict)
+            quality_metrics: t.MutableScalarMapping = Field(default_factory=dict)
 
         class ContentMetrics(BaseModel):
             """Content quality metrics for a documentation file."""
@@ -397,8 +397,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             total_words: int | None = None
             markdown_files: int | None = None
             other_files: int | None = None
-            size_distribution: Mapping[str, int] | None = None
-            categories: Mapping[str, int] | None = None
+            size_distribution: t.IntMapping | None = None
+            categories: t.IntMapping | None = None
             avg_file_size: float | None = None
             avg_lines_per_file: float | None = None
             avg_words_per_file: float | None = None
@@ -596,8 +596,8 @@ class FlextQualityModels(FlextWebModels, FlextCliModels):
             files_processed: int = 0
             changes_made: int = 0
             backups_created: MutableSequence[str] = Field(default_factory=list)
-            optimizations: MutableSequence[MutableMapping[str, str]] = Field(
-                default_factory=lambda: list[MutableMapping[str, str]]()
+            optimizations: MutableSequence[t.MutableStrMapping] = Field(
+                default_factory=lambda: list[t.MutableStrMapping]()
             )
 
         class ExecutionRequest(BaseModel):

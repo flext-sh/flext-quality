@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, MutableMapping, Sequence
+from collections.abc import MutableMapping, Sequence
 
 from pydantic import TypeAdapter
 
@@ -16,8 +16,8 @@ from flext_quality import (
     t,
 )
 
-_norm_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
-    Mapping[str, t.NormalizedValue],
+_norm_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
+    t.ContainerMapping,
 )
 _seq_adapter: TypeAdapter[Sequence[t.ContainerMapping]] = TypeAdapter(
     Sequence[t.ContainerMapping],

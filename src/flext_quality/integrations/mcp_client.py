@@ -36,8 +36,8 @@ class FlextQualityMcpClient:
         if not self.is_mcp_cli_available():
             return r[t.StrSequence].fail("mcp-cli not found in PATH")
         tool_path = f"{call.server}/{call.tool}"
-        adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
-            Mapping[str, t.NormalizedValue],
+        adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
+            t.ContainerMapping,
         )
         params_json = adapter.dump_json(call.params).decode("utf-8")
         return r[t.StrSequence].ok(["mcp-cli", "call", tool_path, params_json])
@@ -58,12 +58,10 @@ class FlextQualityMcpClient:
         """Build an MCP tool call request."""
         call_params: t.ContainerMapping = {}
         if isinstance(params, Mapping):
-            vp_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
-                Mapping[str, t.NormalizedValue],
+            vp_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
+                t.ContainerMapping,
             )
-            validated_params: Mapping[str, t.NormalizedValue] = (
-                vp_adapter.validate_python(params)
-            )
+            validated_params: t.ContainerMapping = vp_adapter.validate_python(params)
             call_params = dict(validated_params)
         return r[m.Quality.McpToolCall].ok(
             m.Quality.McpToolCall.model_validate({
@@ -103,10 +101,10 @@ class FlextQualityMcpClient:
                 ),
             )
         try:
-            p_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
-                Mapping[str, t.NormalizedValue],
+            p_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
+                t.ContainerMapping,
             )
-            parsed: Mapping[str, t.NormalizedValue] = p_adapter.validate_json(output)
+            parsed: t.ContainerMapping = p_adapter.validate_json(output)
             result_data: t.StrMapping = {str(k): str(v) for k, v in parsed.items()}
             return r[m.Quality.McpToolResult].ok(
                 m.Quality.McpToolResult.model_validate({
@@ -123,14 +121,14 @@ class FlextQualityMcpClient:
                 parsed_list: Sequence[t.NormalizedValue] = list_adapter.validate_json(
                     output,
                 )
-                vi_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = TypeAdapter(
-                    Mapping[str, t.NormalizedValue],
+                vi_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
+                    t.ContainerMapping,
                 )
                 coerced_data: MutableSequence[t.StrMapping] = []
                 for item in parsed_list:
                     if isinstance(item, Mapping):
-                        validated_item: Mapping[str, t.NormalizedValue] = (
-                            vi_adapter.validate_python(item)
+                        validated_item: t.ContainerMapping = vi_adapter.validate_python(
+                            item
                         )
                         coerced_data.append({
                             str(key): str(value)

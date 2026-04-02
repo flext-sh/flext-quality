@@ -23,8 +23,8 @@ import yaml
 class _ConfigDict(TypedDict, total=False):
     """Configuration dictionary structure."""
 
-    content_checks: Mapping[str, bool]
-    quality_thresholds: Mapping[str, int]
+    content_checks: t.BoolMapping
+    quality_thresholds: t.IntMapping
 
 
 class _MetricsDict(TypedDict, total=False):
@@ -64,8 +64,8 @@ class _StructureDict(TypedDict, total=False):
     has_table_of_contents: bool
     toc_position: int
     heading_hierarchy_valid: bool
-    sections: Sequence[Mapping[str, int | str]]
-    depth_analysis: Mapping[str, int | float]
+    sections: Sequence[t.HeaderMapping]
+    depth_analysis: Mapping[str, t.Numeric]
 
 
 class _CompletenessDict(TypedDict, total=False):
@@ -394,7 +394,7 @@ class ContentAnalyzer:
 
     def _analyze_structure(self, content: str) -> t.ContainerMapping:
         """Analyze document structure and organization."""
-        sections_list: Sequence[Mapping[str, int | str]] = []
+        sections_list: Sequence[t.HeaderMapping] = []
         depth_analysis_dict: t.ContainerMapping = {}
         structure: t.ContainerMapping = {
             "has_table_of_contents": False,
@@ -421,7 +421,7 @@ class ContentAnalyzer:
                 break
 
         # Analyze heading hierarchy
-        headings: Sequence[Mapping[str, int | str]] = []
+        headings: Sequence[t.HeaderMapping] = []
         for match in re.finditer(r"^(#{1,6})\s+(.+)$", content, re.MULTILINE):
             level = len(match.group(1))
             title = match.group(2).strip()

@@ -15,7 +15,7 @@ import argparse
 import logging
 import re
 import shutil
-from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
+from collections.abc import MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -349,10 +349,10 @@ class FlextQualityDocumentationOptimizer:
                 try:
                     frontmatter_lines = lines[1 : end_idx - 1]
                     frontmatter_content = "\n".join(frontmatter_lines)
-                    meta_adapter: TypeAdapter[Mapping[str, t.NormalizedValue]] = (
-                        TypeAdapter(Mapping[str, t.NormalizedValue])
+                    meta_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
+                        t.ContainerMapping
                     )
-                    metadata: MutableMapping[str, t.NormalizedValue] = dict(
+                    metadata: t.MutableContainerMapping = dict(
                         meta_adapter.validate_python(
                             yaml.safe_load(frontmatter_content) or {},
                         ),
