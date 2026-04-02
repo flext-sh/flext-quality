@@ -22,7 +22,13 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-    from flext_quality import d, e, h, r, s, u, x
+    from flext_core.decorators import FlextDecorators as d
+    from flext_core.exceptions import FlextExceptions as e
+    from flext_core.handlers import FlextHandlers as h
+    from flext_core.mixins import FlextMixins as x
+    from flext_core.result import FlextResult as r
+    from flext_core.service import FlextService as s
+    from flext_quality.utilities import FlextQualityUtilities as u
     from tests.helpers import (
         assertions,
         constants,
@@ -60,22 +66,22 @@ _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "assertions": "tests.helpers.assertions",
     "c": "tests.helpers.constants",
     "constants": "tests.helpers.constants",
-    "d": "flext_quality",
-    "e": "flext_quality",
-    "h": "flext_quality",
+    "d": ("flext_core.decorators", "FlextDecorators"),
+    "e": ("flext_core.exceptions", "FlextExceptions"),
+    "h": ("flext_core.handlers", "FlextHandlers"),
     "m": "tests.helpers.models",
     "models": "tests.helpers.models",
     "p": "tests.helpers.protocols",
     "protocols": "tests.helpers.protocols",
-    "r": "flext_quality",
-    "s": "flext_quality",
+    "r": ("flext_core.result", "FlextResult"),
+    "s": ("flext_core.service", "FlextService"),
     "safe_dict_access": "tests.helpers.typing_helpers",
     "safe_list_access": "tests.helpers.typing_helpers",
     "t": "tests.helpers.typings",
     "typing_helpers": "tests.helpers.typing_helpers",
     "typings": "tests.helpers.typings",
-    "u": "flext_quality",
-    "x": "flext_quality",
+    "u": ("flext_quality.utilities", "FlextQualityUtilities"),
+    "x": ("flext_core.mixins", "FlextMixins"),
 }
 
 

@@ -13,19 +13,9 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 from flask import Flask, Response, render_template_string, request
-from pydantic import ConfigDict, TypeAdapter
 
 from flext_core import FlextLogger, p
 from flext_quality import t
-
-_DICT_ADAPTER: TypeAdapter[t.ContainerMapping] = TypeAdapter(
-    t.ContainerMapping,
-    config=ConfigDict(strict=False),
-)
-_LIST_ADAPTER: TypeAdapter[Sequence[t.ContainerMapping]] = TypeAdapter(
-    Sequence[t.ContainerMapping],
-    config=ConfigDict(strict=False),
-)
 
 
 class FlextQualityDocumentationDashboard:
@@ -57,7 +47,9 @@ class FlextQualityDocumentationDashboard:
         def api_metrics() -> Response:
             """API endpoint for current metrics."""
             return Response(
-                _DICT_ADAPTER.dump_json(self.get_current_metrics()).decode(),
+                t.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
+                    self.get_current_metrics()
+                ).decode(),
                 mimetype="application/json",
             )
 
@@ -68,7 +60,9 @@ class FlextQualityDocumentationDashboard:
             """API endpoint for quality trends."""
             days = int(request.args.get("days", 30))
             return Response(
-                _DICT_ADAPTER.dump_json(self.get_quality_trends(days)).decode(),
+                t.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
+                    self.get_quality_trends(days)
+                ).decode(),
                 mimetype="application/json",
             )
 
@@ -79,7 +73,9 @@ class FlextQualityDocumentationDashboard:
             """API endpoint for recent reports."""
             limit = int(request.args.get("limit", 10))
             return Response(
-                _LIST_ADAPTER.dump_json(self.get_recent_reports(limit)).decode(),
+                t.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.dump_json(
+                    self.get_recent_reports(limit)
+                ).decode(),
                 mimetype="application/json",
             )
 
@@ -102,7 +98,9 @@ class FlextQualityDocumentationDashboard:
             }
 
         try:
-            data = _DICT_ADAPTER.validate_json(Path(latest_audit).read_bytes())
+            data = t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
+                Path(latest_audit).read_bytes()
+            )
             metrics_raw = data.get("metrics")
             metrics: t.ContainerMapping = (
                 metrics_raw if isinstance(metrics_raw, Mapping) else {}
@@ -164,7 +162,9 @@ class FlextQualityDocumentationDashboard:
                 )
 
                 if report_date >= cutoff_date:
-                    data = _DICT_ADAPTER.validate_json(Path(report_file).read_bytes())
+                    data = t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
+                        Path(report_file).read_bytes()
+                    )
                     metrics_v = data.get("metrics")
                     metrics_m: t.ContainerMapping = (
                         metrics_v if isinstance(metrics_v, Mapping) else {}
@@ -223,7 +223,9 @@ class FlextQualityDocumentationDashboard:
                     tzinfo=UTC,
                 )
 
-                data = _DICT_ADAPTER.validate_json(Path(report_file).read_bytes())
+                data = t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
+                    Path(report_file).read_bytes()
+                )
 
                 metrics_rv = data.get("metrics")
                 metrics_rm: t.ContainerMapping = (

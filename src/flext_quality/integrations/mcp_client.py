@@ -13,8 +13,6 @@ import shutil
 from collections.abc import Mapping, MutableSequence, Sequence
 from typing import final
 
-from pydantic import TypeAdapter
-
 from flext_core import r
 from flext_quality import c, m, t
 
@@ -36,10 +34,7 @@ class FlextQualityMcpClient:
         if not self.is_mcp_cli_available():
             return r[t.StrSequence].fail("mcp-cli not found in PATH")
         tool_path = f"{call.server}/{call.tool}"
-        adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
-            t.ContainerMapping,
-        )
-        params_json = adapter.dump_json(call.params).decode("utf-8")
+        params_json = t.CONTAINER_MAPPING_ADAPTER.dump_json(call.params).decode("utf-8")
         return r[t.StrSequence].ok(["mcp-cli", "call", tool_path, params_json])
 
     def build_info_command(self, server: str, tool: str) -> r[t.StrSequence]:
@@ -58,10 +53,9 @@ class FlextQualityMcpClient:
         """Build an MCP tool call request."""
         call_params: t.ContainerMapping = {}
         if isinstance(params, Mapping):
-            vp_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
-                t.ContainerMapping,
+            validated_params: t.ContainerMapping = (
+                t.CONTAINER_MAPPING_ADAPTER.validate_python(params)
             )
-            validated_params: t.ContainerMapping = vp_adapter.validate_python(params)
             call_params = dict(validated_params)
         return r[m.Quality.McpToolCall].ok(
             m.Quality.McpToolCall.model_validate({
@@ -101,10 +95,9 @@ class FlextQualityMcpClient:
                 ),
             )
         try:
-            p_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
-                t.ContainerMapping,
+            parsed: t.ContainerMapping = t.CONTAINER_MAPPING_ADAPTER.validate_json(
+                output
             )
-            parsed: t.ContainerMapping = p_adapter.validate_json(output)
             result_data: t.StrMapping = {str(k): str(v) for k, v in parsed.items()}
             return r[m.Quality.McpToolResult].ok(
                 m.Quality.McpToolResult.model_validate({
@@ -115,20 +108,16 @@ class FlextQualityMcpClient:
             )
         except ValueError:
             try:
-                list_adapter: TypeAdapter[Sequence[t.NormalizedValue]] = TypeAdapter(
-                    Sequence[t.NormalizedValue],
-                )
-                parsed_list: Sequence[t.NormalizedValue] = list_adapter.validate_json(
-                    output,
-                )
-                vi_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
-                    t.ContainerMapping,
+                parsed_list: Sequence[t.NormalizedValue] = (
+                    t.NORMALIZED_VALUE_SEQUENCE_ADAPTER.validate_json(
+                        output,
+                    )
                 )
                 coerced_data: MutableSequence[t.StrMapping] = []
                 for item in parsed_list:
                     if isinstance(item, Mapping):
-                        validated_item: t.ContainerMapping = vi_adapter.validate_python(
-                            item
+                        validated_item: t.ContainerMapping = (
+                            t.CONTAINER_MAPPING_ADAPTER.validate_python(item)
                         )
                         coerced_data.append({
                             str(key): str(value)
@@ -140,11 +129,9 @@ class FlextQualityMcpClient:
                     m.Quality.McpToolResult(
                         success=True,
                         data={
-                            "items": TypeAdapter[MutableSequence[t.StrMapping]](
-                                MutableSequence[t.StrMapping],
-                            )
-                            .dump_json(coerced_data)
-                            .decode("utf-8"),
+                            "items": t.STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER.dump_json(
+                                coerced_data
+                            ).decode("utf-8"),
                         },
                         error=None,
                     ),

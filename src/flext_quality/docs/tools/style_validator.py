@@ -12,6 +12,7 @@ import re
 from collections.abc import Mapping, MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import ClassVar
 
 import yaml
 from pydantic import BaseModel, TypeAdapter
@@ -93,6 +94,10 @@ class FlextQualityStyleValidator:
         formatting_errors: MutableSequence[FlextQualityStyleValidator.StyleIssue]
         suggestions: MutableSequence[str]
         summary: FlextQualityStyleValidator.SummaryMetrics
+
+    RESULTS_ADAPTER: ClassVar[TypeAdapter[ValidationResults]] = TypeAdapter(
+        ValidationResults
+    )
 
     # Constants for magic numbers
     MIN_INLINE_CODE_BACKTICKS: int = 2
@@ -687,14 +692,11 @@ class FlextQualityStyleValidator:
 
     def generate_report(self, output_format: str = "json") -> str:
         """Generate style validation report."""
-        results_adapter: TypeAdapter[FlextQualityStyleValidator.ValidationResults] = (
-            TypeAdapter(FlextQualityStyleValidator.ValidationResults)
-        )
         if output_format == "json":
-            return results_adapter.dump_json(self.results, indent=2).decode()
+            return self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
         if output_format == "summary":
             return self._generate_summary_report()
-        return results_adapter.dump_json(self.results).decode()
+        return self.RESULTS_ADAPTER.dump_json(self.results).decode()
 
     def _generate_summary_report(self) -> str:
         """Generate human-readable summary."""
@@ -741,16 +743,13 @@ Top Issues:
 
     def save_report(self, output_path: str = "docs/maintenance/reports/") -> Path:
         """Save style validation report."""
-        results_adapter: TypeAdapter[FlextQualityStyleValidator.ValidationResults] = (
-            TypeAdapter(FlextQualityStyleValidator.ValidationResults)
-        )
         Path(output_path).mkdir(exist_ok=True, parents=True)
 
         timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         filename = f"style_validation_{timestamp}.json"
         filepath = Path(output_path) / filename
 
-        filepath.write_bytes(results_adapter.dump_json(self.results, indent=2))
+        filepath.write_bytes(self.RESULTS_ADAPTER.dump_json(self.results, indent=2))
 
         return filepath
 

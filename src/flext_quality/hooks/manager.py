@@ -6,8 +6,6 @@ from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
 from typing import final
 
-from pydantic import TypeAdapter
-
 from flext_core import r
 from flext_quality import FlextQualityBaseHook, c, t
 
@@ -55,10 +53,7 @@ class FlextQualityHookManager:
 
     def get_config_json(self) -> str:
         """Get hooks configuration as JSON."""
-        adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
-            t.ContainerMapping,
-        )
-        return adapter.dump_json(
+        return t.CONTAINER_MAPPING_ADAPTER.dump_json(
             dict(self.get_config()),
             indent=c.Quality.Defaults.JSON_INDENT,
         ).decode("utf-8")

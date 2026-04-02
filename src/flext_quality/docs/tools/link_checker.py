@@ -14,6 +14,7 @@ import time
 from collections.abc import Mapping, MutableSequence, Sequence
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
+from typing import ClassVar
 from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
 
@@ -81,6 +82,8 @@ class FlextQualityLinkChecker:
         errors: MutableSequence[FlextQualityLinkChecker.LinkResult]
         warnings_list: MutableSequence[t.ContainerMapping]
         performance: FlextQualityLinkChecker.PerformanceMetrics
+
+    RESULTS_ADAPTER: ClassVar[TypeAdapter[Results]] = TypeAdapter(Results)
 
     MIN_PATH_PARTS_FOR_REPO = 2
     MIN_PATH_PARTS_FOR_DETAILED_REPO = 3
@@ -532,14 +535,11 @@ class FlextQualityLinkChecker:
 
     def generate_report(self, report_format: str = "json") -> str:
         """Generate validation report."""
-        results_adapter: TypeAdapter[FlextQualityLinkChecker.Results] = TypeAdapter(
-            FlextQualityLinkChecker.Results,
-        )
         if report_format == "json":
-            return results_adapter.dump_json(self.results, indent=2).decode()
+            return self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
         if report_format == "summary":
             return self._generate_summary_report()
-        return results_adapter.dump_json(self.results).decode()
+        return self.RESULTS_ADAPTER.dump_json(self.results).decode()
 
     def _generate_summary_report(self) -> str:
         """Generate a human-readable summary report."""
@@ -583,9 +583,6 @@ Broken Links:
         output_path: str = "docs/maintenance/reports/",
     ) -> pathlib.Path:
         """Save validation report."""
-        results_adapter: TypeAdapter[FlextQualityLinkChecker.Results] = TypeAdapter(
-            FlextQualityLinkChecker.Results,
-        )
         pathlib.Path(output_path).mkdir(exist_ok=True, parents=True)
 
         timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
@@ -593,7 +590,7 @@ Broken Links:
         filepath = pathlib.Path(output_path) / filename
 
         pathlib.Path(filepath).write_bytes(
-            results_adapter.dump_json(self.results, indent=2),
+            self.RESULTS_ADAPTER.dump_json(self.results, indent=2),
         )
 
         return filepath

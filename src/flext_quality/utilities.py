@@ -10,7 +10,6 @@ import yaml
 from flext_cli import FlextCliUtilities
 from flext_infra import FlextInfraUtilitiesSubprocess
 from flext_web import FlextWebUtilities
-from pydantic import TypeAdapter
 
 from flext_core import r
 from flext_quality import c, t
@@ -35,10 +34,9 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                 output["systemMessage"] = message
             if blocked_reason:
                 output["blockedReason"] = blocked_reason
-            adapter: TypeAdapter[t.MutableOptionalFeatureFlagMapping] = TypeAdapter(
-                t.MutableOptionalFeatureFlagMapping,
-            )
-            return adapter.dump_json(output).decode("utf-8")
+            return t.MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER.dump_json(
+                output
+            ).decode("utf-8")
 
         @staticmethod
         def load_yaml_rules(path: Path) -> r[Sequence[t.ContainerMapping]]:
@@ -50,19 +48,16 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
                     return r[Sequence[t.ContainerMapping]].fail(
                         "Expected YAML dict",
                     )
-                parsed_dict: t.ContainerMapping = TypeAdapter(
-                    t.ContainerMapping,
-                ).validate_python(parsed)
+                parsed_dict: t.ContainerMapping = (
+                    t.CONTAINER_MAPPING_ADAPTER.validate_python(parsed)
+                )
                 raw_rules_val = parsed_dict.get("rules", [])
                 if not isinstance(raw_rules_val, list):
                     return r[Sequence[t.ContainerMapping]].fail(
                         "Expected rules list",
                     )
-                item_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
-                    t.ContainerMapping,
-                )
                 rules: Sequence[t.ContainerMapping] = [
-                    item_adapter.validate_python(item)
+                    t.CONTAINER_MAPPING_ADAPTER.validate_python(item)
                     for item in raw_rules_val
                     if isinstance(item, dict)
                 ]
@@ -84,9 +79,9 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
         def parse_hook_input(raw: str) -> r[t.Quality.HookInput]:
             """Parse hook input JSON."""
             try:
-                parsed: t.ContainerMapping = TypeAdapter(
-                    t.ContainerMapping,
-                ).validate_json(raw)
+                parsed: t.ContainerMapping = t.CONTAINER_MAPPING_ADAPTER.validate_json(
+                    raw
+                )
                 coerced_input: t.ContainerMapping = parsed
                 return r[t.Quality.HookInput].ok(coerced_input)
             except ValueError as e:

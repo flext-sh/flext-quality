@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import MutableMapping, Sequence
-
-from pydantic import TypeAdapter
+from collections.abc import MutableMapping
 
 from flext_quality import (
     FlextQualityClaudeContextClient,
@@ -16,20 +14,13 @@ from flext_quality import (
     t,
 )
 
-_norm_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
-    t.ContainerMapping,
-)
-_seq_adapter: TypeAdapter[Sequence[t.ContainerMapping]] = TypeAdapter(
-    Sequence[t.ContainerMapping],
-)
-
 
 @mcp.resource("config://hooks")
 def get_hooks_config() -> str:
     """Get current hooks configuration."""
     manager = FlextQualityHookManager()
     config = manager.get_config()
-    return _norm_adapter.dump_json(
+    return t.CONTAINER_MAPPING_ADAPTER.dump_json(
         dict(config),
         indent=c.Quality.Defaults.JSON_INDENT,
     ).decode("utf-8")
@@ -40,7 +31,7 @@ def get_rules_config() -> str:
     """Get current rules configuration."""
     engine = FlextQualityRulesEngine()
     rules = engine.get_rules()
-    return _seq_adapter.dump_json(
+    return t.CONTAINER_MAPPING_SEQUENCE_ADAPTER.dump_json(
         [rule.model_dump() for rule in rules],
         indent=c.Quality.Defaults.JSON_INDENT,
     ).decode("utf-8")
@@ -60,7 +51,7 @@ def get_integrations_status() -> str:
     status["claude_context"] = (
         ctx_health.value if ctx_health.is_success else {"error": ctx_health.error}
     )
-    return _norm_adapter.dump_json(
+    return t.CONTAINER_MAPPING_ADAPTER.dump_json(
         status,
         indent=c.Quality.Defaults.JSON_INDENT,
     ).decode("utf-8")

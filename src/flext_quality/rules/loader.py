@@ -6,7 +6,6 @@ from collections.abc import MutableSequence, Sequence
 from pathlib import Path
 
 import yaml
-from pydantic import TypeAdapter
 
 from flext_core import r
 from flext_quality import c, m, t
@@ -40,10 +39,9 @@ class FlextQualityRulesLoader:
             return r[Sequence[m.Quality.RuleDefinition]].fail(
                 "Invalid YAML: expected dict at root",
             )
-        adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
-            t.ContainerMapping,
+        parsed_dict: t.ContainerMapping = t.CONTAINER_MAPPING_ADAPTER.validate_python(
+            parsed
         )
-        parsed_dict: t.ContainerMapping = adapter.validate_python(parsed)
         rules_data_val = parsed_dict.get("rules", [])
         if not isinstance(rules_data_val, list):
             return r[Sequence[m.Quality.RuleDefinition]].fail(
@@ -55,7 +53,7 @@ class FlextQualityRulesLoader:
                 return r[Sequence[m.Quality.RuleDefinition]].fail(
                     f"Rule {idx}: expected dict",
                 )
-            rule_dict: t.ContainerMapping = adapter.validate_python(
+            rule_dict: t.ContainerMapping = t.CONTAINER_MAPPING_ADAPTER.validate_python(
                 rule_data,
             )
             result = self._parse_rule(rule_dict, idx)

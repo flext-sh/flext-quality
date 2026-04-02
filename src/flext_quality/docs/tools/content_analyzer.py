@@ -12,6 +12,7 @@ from collections import Counter
 from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import ClassVar
 
 import yaml
 from pydantic import BaseModel, TypeAdapter
@@ -118,6 +119,8 @@ class FlextQualityContentAnalyzer:
         recommendations: MutableSequence[
             FlextQualityContentAnalyzer.AnalyzerRecommendation | str
         ]
+
+    RESULTS_ADAPTER: ClassVar[TypeAdapter[Results]] = TypeAdapter(Results)
 
     EXCELLENT_READABILITY_MIN = 90
     GOOD_READABILITY_MIN = 80
@@ -772,14 +775,13 @@ class FlextQualityContentAnalyzer:
             )
 
         all_issues: MutableSequence[t.StrMapping] = []
-        rv_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
-            t.ContainerMapping,
-        )
         for result_value_raw in self.results.model_dump().values():
             if not isinstance(result_value_raw, dict):
                 continue
-            result_value: t.ContainerMapping = rv_adapter.validate_python(
-                result_value_raw,
+            result_value: t.ContainerMapping = (
+                t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
+                    result_value_raw,
+                )
             )
             issues_list_raw = result_value.get("issues")
             if not isinstance(issues_list_raw, list):
@@ -809,14 +811,11 @@ class FlextQualityContentAnalyzer:
 
     def generate_report(self, output_format: str = "json") -> str:
         """Generate content analysis report."""
-        results_adapter: TypeAdapter[FlextQualityContentAnalyzer.Results] = TypeAdapter(
-            FlextQualityContentAnalyzer.Results,
-        )
         if output_format == "json":
-            return results_adapter.dump_json(self.results, indent=2).decode()
+            return self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
         if output_format == "summary":
             return self._generate_summary_report()
-        return results_adapter.dump_json(self.results).decode()
+        return self.RESULTS_ADAPTER.dump_json(self.results).decode()
 
     def _generate_summary_report(self) -> str:
         """Generate human-readable summary report."""
@@ -862,16 +861,15 @@ Top Recommendations:
             File path of the saved report.
 
         """
-        results_adapter: TypeAdapter[FlextQualityContentAnalyzer.Results] = TypeAdapter(
-            FlextQualityContentAnalyzer.Results,
-        )
         Path(output_path).mkdir(exist_ok=True, parents=True)
 
         timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         filename = f"content_analysis_{timestamp}.json"
         filepath = Path(output_path) / filename
 
-        Path(filepath).write_bytes(results_adapter.dump_json(self.results, indent=2))
+        Path(filepath).write_bytes(
+            self.RESULTS_ADAPTER.dump_json(self.results, indent=2)
+        )
 
         return str(filepath)
 

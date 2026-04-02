@@ -18,14 +18,9 @@ from pathlib import Path
 
 import requests
 import yaml
-from pydantic import BaseModel, ConfigDict, Field, TypeAdapter
+from pydantic import BaseModel, Field
 
 from flext_quality import m, t
-
-_AUDIT_DATA_ADAPTER: TypeAdapter[t.ContainerMapping] = TypeAdapter(
-    t.ContainerMapping,
-    config=ConfigDict(strict=False),
-)
 
 # Constants
 MAX_BROKEN_LINKS_TO_SHOW = 10
@@ -263,16 +258,15 @@ class FlextQualityDocumentationNotifier:
         if not self.config.alerts.critical_issues.enabled:
             return True
 
-        sev_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(t.ContainerMapping)
         metrics_val = audit_data.get("metrics")
         metrics: t.ContainerMapping = (
-            sev_adapter.validate_python(metrics_val)
+            t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_val)
             if isinstance(metrics_val, Mapping)
             else {}
         )
         severity_val = metrics.get("severity_breakdown")
         severity_m: t.ContainerMapping = (
-            sev_adapter.validate_python(severity_val)
+            t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(severity_val)
             if isinstance(severity_val, Mapping)
             else {}
         )
@@ -515,16 +509,15 @@ Timestamp: {datetime.now(UTC).isoformat()}
         audit_data: t.ContainerMapping,
     ) -> str:
         """Format message for critical issues notification."""
-        m_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(t.ContainerMapping)
         metrics_val = audit_data.get("metrics")
         metrics: t.ContainerMapping = (
-            m_adapter.validate_python(metrics_val)
+            t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_val)
             if isinstance(metrics_val, Mapping)
             else {}
         )
         severity_val = metrics.get("severity_breakdown")
         severity: t.ContainerMapping = (
-            m_adapter.validate_python(severity_val)
+            t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(severity_val)
             if isinstance(severity_val, Mapping)
             else {}
         )
@@ -538,7 +531,9 @@ Timestamp: {datetime.now(UTC).isoformat()}
         if isinstance(issues_val, (list, tuple)):
             for i_v in issues_val:
                 if isinstance(i_v, Mapping):
-                    i_m: t.ContainerMapping = m_adapter.validate_python(i_v)
+                    i_m: t.ContainerMapping = (
+                        t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(i_v)
+                    )
                     sev = i_m.get("severity")
                     if sev == "critical":
                         critical_issues.append(i_m)
@@ -668,7 +663,7 @@ def main() -> None:
                 _ = err  # consumed
     elif args.audit_data:
         # Process audit data and send appropriate notifications
-        audit_data = _AUDIT_DATA_ADAPTER.validate_json(
+        audit_data = t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
             Path(args.audit_data).read_bytes(),
         )
 
@@ -689,14 +684,14 @@ def main() -> None:
 
     elif args.weekly_report:
         # Send weekly report notification
-        report_data = _AUDIT_DATA_ADAPTER.validate_json(
+        report_data = t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
             Path(args.weekly_report).read_bytes(),
         )
         _ = notifier.notify_weekly_report(report_data)
 
     elif args.monthly_report:
         # Send monthly report notification
-        report_data = _AUDIT_DATA_ADAPTER.validate_json(
+        report_data = t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
             Path(args.monthly_report).read_bytes(),
         )
         _ = notifier.notify_monthly_report(report_data)

@@ -20,7 +20,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import yaml
-from pydantic import TypeAdapter, ValidationError
+from pydantic import ValidationError
 
 from flext_quality import m, t
 
@@ -349,11 +349,8 @@ class FlextQualityDocumentationOptimizer:
                 try:
                     frontmatter_lines = lines[1 : end_idx - 1]
                     frontmatter_content = "\n".join(frontmatter_lines)
-                    meta_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
-                        t.ContainerMapping
-                    )
                     metadata: t.MutableContainerMapping = dict(
-                        meta_adapter.validate_python(
+                        t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
                             yaml.safe_load(frontmatter_content) or {},
                         ),
                     )
