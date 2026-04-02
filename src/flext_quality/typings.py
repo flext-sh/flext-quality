@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
-from pathlib import Path
 
 from flext_cli import FlextCliTypes
 from flext_core import FlextTypes
@@ -16,17 +15,17 @@ class FlextQualityTypes(FlextWebTypes, FlextCliTypes):
     class Quality:
         """Quality-specific types namespace."""
 
-        type HookInput = Mapping[str, FlextTypes.NormalizedValue]
-        type HookOutput = Mapping[str, FlextTypes.NormalizedValue]
+        type HookInput = FlextTypes.ContainerValueMapping
+        type HookOutput = FlextTypes.ContainerValueMapping
         type HookMatcher = FlextWebTypes.StrSequence | None
-        type RuleConfig = Mapping[str, FlextTypes.NormalizedValue]
+        type RuleConfig = FlextTypes.ContainerValueMapping
         type RuleResult = tuple[bool, str | None]
-        type McpToolResult = Mapping[str, FlextTypes.NormalizedValue]
+        type McpToolResult = FlextTypes.ContainerValueMapping
         type McpResource = FlextWebTypes.StrMapping
         type MemoryQuery = Mapping[str, str | int | FlextWebTypes.StrSequence]
         type ContextQuery = Mapping[str, str | int]
         type GenericItem = (
-            FlextTypes.Primitives | Path | Mapping[str, FlextTypes.Primitives | None]
+            FlextTypes.Container | Mapping[str, FlextTypes.Primitives | None]
         )
 
 

@@ -296,8 +296,8 @@ class FlextQualityDocumentationReporter:
                 )
                 if validation_errors_list:
                     broken_links: MutableSequence[Mapping[str, t.Primitives]] = []
-                    e_adapter: TypeAdapter[dict[str, t.NormalizedValue]] = TypeAdapter(
-                        dict[str, t.NormalizedValue],
+                    e_adapter: TypeAdapter[t.ContainerMapping] = TypeAdapter(
+                        t.ContainerMapping,
                     )
                     for e_raw in validation_errors_list:
                         try:
