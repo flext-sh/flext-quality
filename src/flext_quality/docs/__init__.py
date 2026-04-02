@@ -16,7 +16,6 @@ from flext_core.lazy import install_lazy_exports, merge_lazy_imports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_quality.docs import (
         core,
         dashboard,
@@ -77,7 +76,7 @@ if _TYPE_CHECKING:
         validate_links_sync,
     )
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = merge_lazy_imports(
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = merge_lazy_imports(
     (
         "flext_quality.docs.core",
         "flext_quality.docs.scripts",

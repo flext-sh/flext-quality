@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import argparse
 import re
-from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
+from collections.abc import MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -455,7 +455,7 @@ class FlextQualityDocumentationAuditor:
     def check_links_and_references(self, doc_files: Sequence[Path]) -> None:
         """Check links and references for validity."""
         link_validation = self.validation_config.link_validation
-        all_links: MutableSequence[Mapping[str, str | int]] = []
+        all_links: MutableSequence[t.HeaderMapping] = []
         image_refs: MutableSequence[t.StrMapping] = []
         for file_path in doc_files:
             try:
@@ -508,7 +508,7 @@ class FlextQualityDocumentationAuditor:
 
     def _validate_external_links(
         self,
-        links: Sequence[Mapping[str, str | int]],
+        links: Sequence[t.HeaderMapping],
     ) -> None:
         """Validate external links."""
         link_validation = self.validation_config.link_validation
@@ -544,7 +544,7 @@ class FlextQualityDocumentationAuditor:
 
     def _validate_internal_links(
         self,
-        links: Sequence[Mapping[str, str | int]],
+        links: Sequence[t.HeaderMapping],
         doc_files: Sequence[Path],
     ) -> None:
         """Validate internal links."""

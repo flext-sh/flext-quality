@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from flext_core import r
-
 from flext_quality import FlextQualityMcpClient, c, t
 
 

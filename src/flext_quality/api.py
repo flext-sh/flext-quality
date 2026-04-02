@@ -16,7 +16,6 @@ from pathlib import Path
 from typing import ClassVar
 
 from flext_core import FlextContainer, FlextLogger, r
-
 from flext_quality import (
     FlextQualityHookManager,
     FlextQualityRulesLoader,

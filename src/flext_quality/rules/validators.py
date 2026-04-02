@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import override
 
 from flext_core import r
-
 from flext_quality import c, p, t
 
 

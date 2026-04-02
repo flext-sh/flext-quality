@@ -12,8 +12,8 @@ from flext_core.lazy import install_lazy_exports, merge_lazy_imports
 
 if _TYPE_CHECKING:
     from flext_cli import d, e, h, r, s, x
-    from flext_core import FlextTypes
 
+    from flext_core import FlextTypes
     from flext_quality import (
         api,
         constants,
@@ -139,7 +139,7 @@ if _TYPE_CHECKING:
         FlextQualityUtilities as u,
     )
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = merge_lazy_imports(
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = merge_lazy_imports(
     (
         "flext_quality.docs",
         "flext_quality.hooks",

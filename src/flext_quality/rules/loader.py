@@ -6,9 +6,9 @@ from collections.abc import Mapping, MutableSequence, Sequence
 from pathlib import Path
 
 import yaml
-from flext_core import r
 from pydantic import TypeAdapter
 
+from flext_core import r
 from flext_quality import c, m, t
 
 

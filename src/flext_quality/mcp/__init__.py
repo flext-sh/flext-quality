@@ -12,7 +12,6 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_quality.mcp import resources, server, tools
     from flext_quality.mcp.resources import (
         get_hooks_config,
@@ -27,7 +26,7 @@ if _TYPE_CHECKING:
         validate_rules,
     )
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "execute_hook": "flext_quality.mcp.tools",
     "get_hooks_config": "flext_quality.mcp.resources",
     "get_integrations_status": "flext_quality.mcp.resources",

@@ -22,7 +22,6 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_quality import d, e, h, r, s, u, x
     from tests.helpers import (
         assertions,
@@ -47,7 +46,7 @@ if _TYPE_CHECKING:
     )
     from tests.helpers.typings import TestsTypings, t
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "TestsConstants": "tests.helpers.constants",
     "TestsModels": "tests.helpers.models",
     "TestsProtocols": "tests.helpers.protocols",

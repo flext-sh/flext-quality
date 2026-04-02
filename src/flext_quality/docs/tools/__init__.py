@@ -12,7 +12,6 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_quality.docs.tools import content_analyzer, link_checker, style_validator
     from flext_quality.docs.tools.content_analyzer import (
         FlextQualityContentAnalyzer,
@@ -29,7 +28,7 @@ if _TYPE_CHECKING:
         validate_files_style,
     )
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "FlextQualityContentAnalyzer": "flext_quality.docs.tools.content_analyzer",
     "FlextQualityLinkChecker": "flext_quality.docs.tools.link_checker",
     "FlextQualityStyleValidator": "flext_quality.docs.tools.style_validator",

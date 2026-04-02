@@ -7,8 +7,9 @@ from pathlib import Path
 from typing import ClassVar, Protocol, runtime_checkable
 
 from flext_cli import FlextCliProtocols
-from flext_core import r
 from flext_web import FlextWebProtocols
+
+from flext_core import r
 
 from .typings import t
 

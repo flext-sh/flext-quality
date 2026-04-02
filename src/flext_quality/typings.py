@@ -5,8 +5,9 @@ from __future__ import annotations
 from collections.abc import Mapping
 
 from flext_cli import FlextCliTypes
-from flext_core import FlextTypes
 from flext_web import FlextWebTypes
+
+from flext_core import FlextTypes
 
 
 class FlextQualityTypes(FlextWebTypes, FlextCliTypes):
@@ -23,7 +24,7 @@ class FlextQualityTypes(FlextWebTypes, FlextCliTypes):
         type McpToolResult = FlextTypes.ContainerValueMapping
         type McpResource = FlextWebTypes.StrMapping
         type MemoryQuery = Mapping[str, str | int | FlextWebTypes.StrSequence]
-        type ContextQuery = Mapping[str, str | int]
+        type ContextQuery = FlextTypes.HeaderMapping
         type GenericItem = (
             FlextTypes.Container | Mapping[str, FlextTypes.Primitives | None]
         )

@@ -7,7 +7,6 @@ from collections.abc import MutableSequence, Sequence
 from pathlib import Path
 
 from flext_core import r
-
 from flext_quality import FlextQualityRulesLoader, c, m, t
 
 

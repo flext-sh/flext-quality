@@ -12,13 +12,12 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_quality.rules import engine, loader, validators
     from flext_quality.rules.engine import FlextQualityRulesEngine
     from flext_quality.rules.loader import FlextQualityRulesLoader
     from flext_quality.rules.validators import FlextQualityValidators
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "FlextQualityRulesEngine": "flext_quality.rules.engine",
     "FlextQualityRulesLoader": "flext_quality.rules.loader",
     "FlextQualityValidators": "flext_quality.rules.validators",

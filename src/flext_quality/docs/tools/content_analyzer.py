@@ -63,7 +63,7 @@ class FlextQualityContentAnalyzer:
         has_table_of_contents: bool | None = None
         toc_position: int | None = None
         heading_hierarchy_valid: bool | None = None
-        sections: MutableSequence[Mapping[str, int | str]] | None = None
+        sections: MutableSequence[t.HeaderMapping] | None = None
         depth_analysis: MutableMapping[str, int | float] | None = None
 
     class Completeness(BaseModel):
@@ -384,7 +384,7 @@ class FlextQualityContentAnalyzer:
         content: str,
     ) -> FlextQualityContentAnalyzer.Structure:
         """Analyze document structure and organization."""
-        sections_list: MutableSequence[Mapping[str, int | str]] = []
+        sections_list: MutableSequence[t.HeaderMapping] = []
         depth_analysis_dict: MutableMapping[str, int | float] = {}
         structure = FlextQualityContentAnalyzer.Structure.model_validate({
             "has_table_of_contents": False,
@@ -407,7 +407,7 @@ class FlextQualityContentAnalyzer:
                 structure.toc_position = (content[: toc_match.start()].count("\n")) + 1
                 break
 
-        headings: MutableSequence[Mapping[str, int | str]] = [
+        headings: MutableSequence[t.HeaderMapping] = [
             {
                 "level": len(match.group(1)),
                 "title": match.group(2).strip(),

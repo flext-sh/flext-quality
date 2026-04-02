@@ -19,7 +19,6 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_quality.integrations import (
         _health,
         claude_context,
@@ -40,7 +39,7 @@ if _TYPE_CHECKING:
     )
     from flext_quality.integrations.mcp_client import FlextQualityMcpClient
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "FlextQualityClaudeContextClient": "flext_quality.integrations.claude_context",
     "FlextQualityClaudeMemClient": "flext_quality.integrations.claude_mem",
     "FlextQualityCodeExecutionBridge": "flext_quality.integrations.code_execution",

@@ -12,7 +12,6 @@ from __future__ import annotations
 from typing import final
 
 from flext_core import r
-
 from flext_quality import (
     FlextQualityMcpClient,
     FlextQualityModels as _QualityModels,

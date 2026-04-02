@@ -12,11 +12,10 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_quality.services import cli
     from flext_quality.services.cli import FlextQualityCliService, main
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "FlextQualityCliService": "flext_quality.services.cli",
     "cli": "flext_quality.services.cli",
     "main": "flext_quality.services.cli",

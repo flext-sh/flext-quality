@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import final
 
 from flext_core import r
-
 from flext_quality import c, m, t
 
 

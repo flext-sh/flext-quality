@@ -12,7 +12,6 @@ from flext_core.lazy import install_lazy_exports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_quality.docs.scripts import audit, optimize, report, validate
     from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
     from flext_quality.docs.scripts.optimize import (
@@ -29,7 +28,7 @@ if _TYPE_CHECKING:
         main,
     )
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = {
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "FlextQualityContentValidator": "flext_quality.docs.scripts.validate",
     "FlextQualityDocumentationAuditor": "flext_quality.docs.scripts.audit",
     "FlextQualityDocumentationOptimizer": "flext_quality.docs.scripts.optimize",

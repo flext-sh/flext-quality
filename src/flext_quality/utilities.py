@@ -3,16 +3,16 @@
 from __future__ import annotations
 
 import sys
-from collections.abc import Mapping, MutableMapping, Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 import yaml
 from flext_cli import FlextCliUtilities
-from flext_core import r
 from flext_infra import FlextInfraUtilitiesSubprocess
 from flext_web import FlextWebUtilities
 from pydantic import TypeAdapter
 
+from flext_core import r
 from flext_quality import c, t
 
 
@@ -30,13 +30,13 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
             blocked_reason: str | None = None,
         ) -> str:
             """Format hook output JSON."""
-            output: MutableMapping[str, str | bool | None] = {"continue": continue_exec}
+            output: t.MutableOptionalFeatureFlagMapping = {"continue": continue_exec}
             if message:
                 output["systemMessage"] = message
             if blocked_reason:
                 output["blockedReason"] = blocked_reason
-            adapter: TypeAdapter[MutableMapping[str, str | bool | None]] = TypeAdapter(
-                MutableMapping[str, str | bool | None],
+            adapter: TypeAdapter[t.MutableOptionalFeatureFlagMapping] = TypeAdapter(
+                t.MutableOptionalFeatureFlagMapping,
             )
             return adapter.dump_json(output).decode("utf-8")
 

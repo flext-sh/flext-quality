@@ -6,7 +6,6 @@ import fnmatch
 from typing import ClassVar
 
 from flext_core import r
-
 from flext_quality import c, t
 
 

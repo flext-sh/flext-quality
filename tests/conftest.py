@@ -17,8 +17,8 @@ from collections.abc import Generator, MutableSequence, Sequence
 from pathlib import Path
 
 import pytest
-from flext_core import r
 
+from flext_core import r
 from tests import t
 
 

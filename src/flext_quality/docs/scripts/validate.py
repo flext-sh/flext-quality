@@ -15,13 +15,13 @@ from __future__ import annotations
 import argparse
 import concurrent.futures
 import re
-from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
+from collections.abc import MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
 import requests
 
-from flext_quality import m
+from flext_quality import m, t
 
 
 class FlextQualityLinkValidator:
@@ -207,7 +207,7 @@ class FlextQualityLinkValidator:
         self,
         url: str,
         attempt: int,
-    ) -> tuple[bool, Mapping[str, int | str] | None]:
+    ) -> tuple[bool, t.HeaderMapping | None]:
         """Handle a single request attempt."""
         try:
             response = self._make_http_request(url)

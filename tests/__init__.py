@@ -12,7 +12,6 @@ from flext_core.lazy import install_lazy_exports, merge_lazy_imports
 
 if _TYPE_CHECKING:
     from flext_core import FlextTypes
-
     from flext_quality import d, e, h, r, s, x
     from tests import (
         conftest,
@@ -91,7 +90,7 @@ if _TYPE_CHECKING:
         FlextQualityTestUtilities as u,
     )
 
-_LAZY_IMPORTS: Mapping[str, str | Sequence[str]] = merge_lazy_imports(
+_LAZY_IMPORTS: FlextTypes.LazyImportIndex = merge_lazy_imports(
     (
         "tests.helpers",
         "tests.unit",

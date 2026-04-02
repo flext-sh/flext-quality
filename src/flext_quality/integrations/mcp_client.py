@@ -13,9 +13,9 @@ import shutil
 from collections.abc import Mapping, MutableSequence, Sequence
 from typing import final
 
-from flext_core import r
 from pydantic import TypeAdapter
 
+from flext_core import r
 from flext_quality import c, m, t
 
 
