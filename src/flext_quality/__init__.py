@@ -72,7 +72,6 @@ if _TYPE_CHECKING:
         FlextQualityDocumentationOptimizer,
         FlextQualityDocumentationReporter,
         FlextQualityLinkValidator,
-        ReportValue,
         audit,
         optimize,
         report,

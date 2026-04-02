@@ -18,10 +18,7 @@ if _TYPE_CHECKING:
         MIN_HEADINGS_FOR_TOC,
         FlextQualityDocumentationOptimizer,
     )
-    from flext_quality.docs.scripts.report import (
-        FlextQualityDocumentationReporter,
-        ReportValue,
-    )
+    from flext_quality.docs.scripts.report import FlextQualityDocumentationReporter
     from flext_quality.docs.scripts.validate import (
         FlextQualityContentValidator,
         FlextQualityLinkValidator,
@@ -35,7 +32,6 @@ _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "FlextQualityDocumentationReporter": "flext_quality.docs.scripts.report",
     "FlextQualityLinkValidator": "flext_quality.docs.scripts.validate",
     "MIN_HEADINGS_FOR_TOC": "flext_quality.docs.scripts.optimize",
-    "ReportValue": "flext_quality.docs.scripts.report",
     "audit": "flext_quality.docs.scripts.audit",
     "main": "flext_quality.docs.scripts.validate",
     "optimize": "flext_quality.docs.scripts.optimize",
