@@ -7,18 +7,7 @@ from __future__ import annotations
 
 import typing as _t
 
-from flext_core.constants import FlextConstants as c
-from flext_core.decorators import FlextDecorators as d
-from flext_core.exceptions import FlextExceptions as e
-from flext_core.handlers import FlextHandlers as h
 from flext_core.lazy import install_lazy_exports, merge_lazy_imports
-from flext_core.mixins import FlextMixins as x
-from flext_core.models import FlextModels as m
-from flext_core.protocols import FlextProtocols as p
-from flext_core.result import FlextResult as r
-from flext_core.service import FlextService as s
-from flext_core.typings import FlextTypes as t
-from flext_core.utilities import FlextUtilities as u
 
 if _t.TYPE_CHECKING:
     import flext_quality.docs.core as _flext_quality_docs_core
@@ -28,106 +17,107 @@ if _t.TYPE_CHECKING:
 
     base_classes = _flext_quality_docs_core_base_classes
     import flext_quality.docs.core.config_manager as _flext_quality_docs_core_config_manager
+    from flext_quality.docs.core.base_classes import (
+        FlextQualityBaseAnalyzer,
+        FlextQualityBaseAuditor,
+        FlextQualityBaseReporter,
+        FlextQualityBaseValidator,
+    )
 
     config_manager = _flext_quality_docs_core_config_manager
     import flext_quality.docs.core.file_discovery as _flext_quality_docs_core_file_discovery
+    from flext_quality.docs.core.config_manager import (
+        FlextQualityAuditRules,
+        FlextQualityConfigManager,
+        FlextQualityStyleGuide,
+        FlextQualityValidationConfig,
+    )
 
     file_discovery = _flext_quality_docs_core_file_discovery
     import flext_quality.docs.dashboard as _flext_quality_docs_dashboard
+    from flext_quality.docs.core.file_discovery import (
+        FlextQualityDocumentationFinder,
+        FlextQualityFileStatistics,
+    )
 
     dashboard = _flext_quality_docs_dashboard
     import flext_quality.docs.notifications as _flext_quality_docs_notifications
+    from flext_quality.docs.dashboard import FlextQualityDocumentationDashboard
 
     notifications = _flext_quality_docs_notifications
     import flext_quality.docs.scheduled_maintenance as _flext_quality_docs_scheduled_maintenance
+    from flext_quality.docs.notifications import (
+        MAX_BROKEN_LINKS_TO_SHOW,
+        FlextQualityDocumentationNotifier,
+    )
 
     scheduled_maintenance = _flext_quality_docs_scheduled_maintenance
     import flext_quality.docs.scripts as _flext_quality_docs_scripts
+    from flext_quality.docs.scheduled_maintenance import (
+        FlextQualityScheduledMaintenance,
+        logger,
+    )
 
     scripts = _flext_quality_docs_scripts
     import flext_quality.docs.scripts.audit as _flext_quality_docs_scripts_audit
 
     audit = _flext_quality_docs_scripts_audit
     import flext_quality.docs.scripts.optimize as _flext_quality_docs_scripts_optimize
+    from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
 
     optimize = _flext_quality_docs_scripts_optimize
     import flext_quality.docs.scripts.report as _flext_quality_docs_scripts_report
+    from flext_quality.docs.scripts.optimize import (
+        MIN_HEADINGS_FOR_TOC,
+        FlextQualityDocumentationOptimizer,
+    )
 
     report = _flext_quality_docs_scripts_report
     import flext_quality.docs.scripts.validate as _flext_quality_docs_scripts_validate
+    from flext_quality.docs.scripts.report import FlextQualityDocumentationReporter
 
     validate = _flext_quality_docs_scripts_validate
     import flext_quality.docs.tools as _flext_quality_docs_tools
+    from flext_quality.docs.scripts.validate import (
+        FlextQualityContentValidator,
+        FlextQualityLinkValidator,
+        main,
+    )
 
     tools = _flext_quality_docs_tools
     import flext_quality.docs.tools.content_analyzer as _flext_quality_docs_tools_content_analyzer
 
     content_analyzer = _flext_quality_docs_tools_content_analyzer
     import flext_quality.docs.tools.link_checker as _flext_quality_docs_tools_link_checker
+    from flext_quality.docs.tools.content_analyzer import (
+        FlextQualityContentAnalyzer,
+        analyze_file_content,
+        analyze_files_content,
+    )
 
     link_checker = _flext_quality_docs_tools_link_checker
     import flext_quality.docs.tools.style_validator as _flext_quality_docs_tools_style_validator
+    from flext_quality.docs.tools.link_checker import (
+        FlextQualityLinkChecker,
+        validate_links_sync,
+    )
 
     style_validator = _flext_quality_docs_tools_style_validator
-
-    _ = (
-        FlextQualityAuditRules,
-        FlextQualityBaseAnalyzer,
-        FlextQualityBaseAuditor,
-        FlextQualityBaseReporter,
-        FlextQualityBaseValidator,
-        FlextQualityConfigManager,
-        FlextQualityContentAnalyzer,
-        FlextQualityContentValidator,
-        FlextQualityDocumentationAuditor,
-        FlextQualityDocumentationDashboard,
-        FlextQualityDocumentationFinder,
-        FlextQualityDocumentationNotifier,
-        FlextQualityDocumentationOptimizer,
-        FlextQualityDocumentationReporter,
-        FlextQualityFileStatistics,
-        FlextQualityLinkChecker,
-        FlextQualityLinkValidator,
-        FlextQualityScheduledMaintenance,
-        FlextQualityStyleGuide,
+    from flext_core.constants import FlextConstants as c
+    from flext_core.decorators import FlextDecorators as d
+    from flext_core.exceptions import FlextExceptions as e
+    from flext_core.handlers import FlextHandlers as h
+    from flext_core.mixins import FlextMixins as x
+    from flext_core.models import FlextModels as m
+    from flext_core.protocols import FlextProtocols as p
+    from flext_core.result import FlextResult as r
+    from flext_core.service import FlextService as s
+    from flext_core.typings import FlextTypes as t
+    from flext_core.utilities import FlextUtilities as u
+    from flext_quality.docs.tools.style_validator import (
         FlextQualityStyleValidator,
-        FlextQualityValidationConfig,
-        MAX_BROKEN_LINKS_TO_SHOW,
-        MIN_HEADINGS_FOR_TOC,
-        analyze_file_content,
-        analyze_files_content,
-        audit,
-        base_classes,
-        c,
-        config_manager,
-        content_analyzer,
-        core,
-        d,
-        dashboard,
-        e,
-        file_discovery,
-        h,
-        link_checker,
-        logger,
-        m,
-        main,
-        notifications,
-        optimize,
-        p,
-        r,
-        report,
-        s,
-        scheduled_maintenance,
-        scripts,
-        style_validator,
-        t,
-        tools,
-        u,
-        validate,
         validate_file_style,
         validate_files_style,
-        validate_links_sync,
-        x,
     )
 _LAZY_IMPORTS = merge_lazy_imports(
     (
