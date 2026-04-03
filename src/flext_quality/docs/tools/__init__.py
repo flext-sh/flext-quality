@@ -43,7 +43,7 @@ if _TYPE_CHECKING:
         status,
         test_links,
         text,
-        type,
+        type as type_,
         url,
     )
     from flext_quality.style_validator import (

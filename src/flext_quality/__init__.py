@@ -127,7 +127,7 @@ if _TYPE_CHECKING:
         suggestions,
         test_links,
         text,
-        type,
+        type as type_,
         url,
         v_type,
         validate_files_style,
