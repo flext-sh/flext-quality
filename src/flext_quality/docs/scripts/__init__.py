@@ -5,38 +5,60 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
-from typing import TYPE_CHECKING as _TYPE_CHECKING
+import typing as _t
 
+from flext_core.constants import FlextConstants as c
+from flext_core.decorators import FlextDecorators as d
+from flext_core.exceptions import FlextExceptions as e
+from flext_core.handlers import FlextHandlers as h
 from flext_core.lazy import install_lazy_exports
+from flext_core.mixins import FlextMixins as x
+from flext_core.models import FlextModels as m
+from flext_core.protocols import FlextProtocols as p
+from flext_core.result import FlextResult as r
+from flext_core.service import FlextService as s
+from flext_core.typings import FlextTypes as t
+from flext_core.utilities import FlextUtilities as u
 
-if _TYPE_CHECKING:
-    from flext_core import FlextTypes
-    from flext_core.constants import FlextConstants as c
-    from flext_core.decorators import FlextDecorators as d
-    from flext_core.exceptions import FlextExceptions as e
-    from flext_core.handlers import FlextHandlers as h
-    from flext_core.mixins import FlextMixins as x
-    from flext_core.models import FlextModels as m
-    from flext_core.protocols import FlextProtocols as p
-    from flext_core.result import FlextResult as r
-    from flext_core.service import FlextService as s
-    from flext_core.typings import FlextTypes as t
-    from flext_core.utilities import FlextUtilities as u
-    from flext_quality.docs.scripts import audit, optimize, report, validate
-    from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
-    from flext_quality.docs.scripts.optimize import (
-        MIN_HEADINGS_FOR_TOC,
-        FlextQualityDocumentationOptimizer,
-    )
-    from flext_quality.docs.scripts.report import FlextQualityDocumentationReporter
-    from flext_quality.docs.scripts.validate import (
+if _t.TYPE_CHECKING:
+    import flext_quality.docs.scripts.audit as _flext_quality_docs_scripts_audit
+
+    audit = _flext_quality_docs_scripts_audit
+    import flext_quality.docs.scripts.optimize as _flext_quality_docs_scripts_optimize
+
+    optimize = _flext_quality_docs_scripts_optimize
+    import flext_quality.docs.scripts.report as _flext_quality_docs_scripts_report
+
+    report = _flext_quality_docs_scripts_report
+    import flext_quality.docs.scripts.validate as _flext_quality_docs_scripts_validate
+
+    validate = _flext_quality_docs_scripts_validate
+
+    _ = (
         FlextQualityContentValidator,
+        FlextQualityDocumentationAuditor,
+        FlextQualityDocumentationOptimizer,
+        FlextQualityDocumentationReporter,
         FlextQualityLinkValidator,
+        MIN_HEADINGS_FOR_TOC,
+        audit,
+        c,
+        d,
+        e,
+        h,
+        m,
         main,
+        optimize,
+        p,
+        r,
+        report,
+        s,
+        t,
+        u,
+        validate,
+        x,
     )
-
-_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
+_LAZY_IMPORTS = {
     "FlextQualityContentValidator": "flext_quality.docs.scripts.validate",
     "FlextQualityDocumentationAuditor": "flext_quality.docs.scripts.audit",
     "FlextQualityDocumentationOptimizer": "flext_quality.docs.scripts.optimize",
@@ -60,6 +82,31 @@ _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "validate": "flext_quality.docs.scripts.validate",
     "x": ("flext_core.mixins", "FlextMixins"),
 }
+
+__all__ = [
+    "MIN_HEADINGS_FOR_TOC",
+    "FlextQualityContentValidator",
+    "FlextQualityDocumentationAuditor",
+    "FlextQualityDocumentationOptimizer",
+    "FlextQualityDocumentationReporter",
+    "FlextQualityLinkValidator",
+    "audit",
+    "c",
+    "d",
+    "e",
+    "h",
+    "m",
+    "main",
+    "optimize",
+    "p",
+    "r",
+    "report",
+    "s",
+    "t",
+    "u",
+    "validate",
+    "x",
+]
 
 
 install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)

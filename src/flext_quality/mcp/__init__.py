@@ -5,39 +5,58 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, Sequence
-from typing import TYPE_CHECKING as _TYPE_CHECKING
+import typing as _t
 
+from flext_core.constants import FlextConstants as c
+from flext_core.decorators import FlextDecorators as d
+from flext_core.exceptions import FlextExceptions as e
+from flext_core.handlers import FlextHandlers as h
 from flext_core.lazy import install_lazy_exports
+from flext_core.mixins import FlextMixins as x
+from flext_core.models import FlextModels as m
+from flext_core.protocols import FlextProtocols as p
+from flext_core.result import FlextResult as r
+from flext_core.service import FlextService as s
+from flext_core.typings import FlextTypes as t
+from flext_core.utilities import FlextUtilities as u
 
-if _TYPE_CHECKING:
-    from flext_core import FlextTypes
-    from flext_core.constants import FlextConstants as c
-    from flext_core.decorators import FlextDecorators as d
-    from flext_core.exceptions import FlextExceptions as e
-    from flext_core.handlers import FlextHandlers as h
-    from flext_core.mixins import FlextMixins as x
-    from flext_core.models import FlextModels as m
-    from flext_core.protocols import FlextProtocols as p
-    from flext_core.result import FlextResult as r
-    from flext_core.service import FlextService as s
-    from flext_core.typings import FlextTypes as t
-    from flext_core.utilities import FlextUtilities as u
-    from flext_quality.mcp import resources, server, tools
-    from flext_quality.mcp.resources import (
+if _t.TYPE_CHECKING:
+    import flext_quality.mcp.resources as _flext_quality_mcp_resources
+
+    resources = _flext_quality_mcp_resources
+    import flext_quality.mcp.server as _flext_quality_mcp_server
+
+    server = _flext_quality_mcp_server
+    import flext_quality.mcp.tools as _flext_quality_mcp_tools
+
+    tools = _flext_quality_mcp_tools
+
+    _ = (
+        c,
+        d,
+        e,
+        execute_hook,
         get_hooks_config,
         get_integrations_status,
         get_rules_config,
-    )
-    from flext_quality.mcp.server import get_server, mcp
-    from flext_quality.mcp.tools import (
-        execute_hook,
+        get_server,
+        h,
+        m,
+        mcp,
+        p,
+        r,
+        resources,
+        s,
         search_code,
         search_memory,
+        server,
+        t,
+        tools,
+        u,
         validate_rules,
+        x,
     )
-
-_LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
+_LAZY_IMPORTS = {
     "c": ("flext_core.constants", "FlextConstants"),
     "d": ("flext_core.decorators", "FlextDecorators"),
     "e": ("flext_core.exceptions", "FlextExceptions"),
@@ -62,6 +81,32 @@ _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "validate_rules": "flext_quality.mcp.tools",
     "x": ("flext_core.mixins", "FlextMixins"),
 }
+
+__all__ = [
+    "c",
+    "d",
+    "e",
+    "execute_hook",
+    "get_hooks_config",
+    "get_integrations_status",
+    "get_rules_config",
+    "get_server",
+    "h",
+    "m",
+    "mcp",
+    "p",
+    "r",
+    "resources",
+    "s",
+    "search_code",
+    "search_memory",
+    "server",
+    "t",
+    "tools",
+    "u",
+    "validate_rules",
+    "x",
+]
 
 
 install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
