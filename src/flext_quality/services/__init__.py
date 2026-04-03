@@ -23,31 +23,22 @@ if _TYPE_CHECKING:
     from flext_core.service import FlextService as s
     from flext_core.typings import FlextTypes as t
     from flext_core.utilities import FlextUtilities as u
-    from flext_quality import cli
-    from flext_quality.cli import (
-        FlextQualityCliService,
-        main,
-        message_type,
-        result,
-        target_path,
-    )
+    from flext_quality.services import cli
+    from flext_quality.services.cli import FlextQualityCliService, main
 
 _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
-    "FlextQualityCliService": "flext_quality.cli",
+    "FlextQualityCliService": "flext_quality.services.cli",
     "c": ("flext_core.constants", "FlextConstants"),
-    "cli": "flext_quality.cli",
+    "cli": "flext_quality.services.cli",
     "d": ("flext_core.decorators", "FlextDecorators"),
     "e": ("flext_core.exceptions", "FlextExceptions"),
     "h": ("flext_core.handlers", "FlextHandlers"),
     "m": ("flext_core.models", "FlextModels"),
-    "main": "flext_quality.cli",
-    "message_type": "flext_quality.cli",
+    "main": "flext_quality.services.cli",
     "p": ("flext_core.protocols", "FlextProtocols"),
     "r": ("flext_core.result", "FlextResult"),
-    "result": "flext_quality.cli",
     "s": ("flext_core.service", "FlextService"),
     "t": ("flext_core.typings", "FlextTypes"),
-    "target_path": "flext_quality.cli",
     "u": ("flext_core.utilities", "FlextUtilities"),
     "x": ("flext_core.mixins", "FlextMixins"),
 }

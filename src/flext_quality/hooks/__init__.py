@@ -23,20 +23,20 @@ if _TYPE_CHECKING:
     from flext_core.service import FlextService as s
     from flext_core.typings import FlextTypes as t
     from flext_core.utilities import FlextUtilities as u
-    from flext_quality import base, manager
-    from flext_quality.base import FlextQualityBaseHook
-    from flext_quality.manager import FlextQualityHookManager
+    from flext_quality.hooks import base, manager
+    from flext_quality.hooks.base import FlextQualityBaseHook
+    from flext_quality.hooks.manager import FlextQualityHookManager
 
 _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
-    "FlextQualityBaseHook": "flext_quality.base",
-    "FlextQualityHookManager": "flext_quality.manager",
-    "base": "flext_quality.base",
+    "FlextQualityBaseHook": "flext_quality.hooks.base",
+    "FlextQualityHookManager": "flext_quality.hooks.manager",
+    "base": "flext_quality.hooks.base",
     "c": ("flext_core.constants", "FlextConstants"),
     "d": ("flext_core.decorators", "FlextDecorators"),
     "e": ("flext_core.exceptions", "FlextExceptions"),
     "h": ("flext_core.handlers", "FlextHandlers"),
     "m": ("flext_core.models", "FlextModels"),
-    "manager": "flext_quality.manager",
+    "manager": "flext_quality.hooks.manager",
     "p": ("flext_core.protocols", "FlextProtocols"),
     "r": ("flext_core.result", "FlextResult"),
     "s": ("flext_core.service", "FlextService"),

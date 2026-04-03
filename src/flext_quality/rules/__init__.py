@@ -23,28 +23,28 @@ if _TYPE_CHECKING:
     from flext_core.service import FlextService as s
     from flext_core.typings import FlextTypes as t
     from flext_core.utilities import FlextUtilities as u
-    from flext_quality import engine, loader, validators
-    from flext_quality.engine import FlextQualityRulesEngine
-    from flext_quality.loader import FlextQualityRulesLoader
-    from flext_quality.validators import FlextQualityValidators
+    from flext_quality.rules import engine, loader, validators
+    from flext_quality.rules.engine import FlextQualityRulesEngine
+    from flext_quality.rules.loader import FlextQualityRulesLoader
+    from flext_quality.rules.validators import FlextQualityValidators
 
 _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
-    "FlextQualityRulesEngine": "flext_quality.engine",
-    "FlextQualityRulesLoader": "flext_quality.loader",
-    "FlextQualityValidators": "flext_quality.validators",
+    "FlextQualityRulesEngine": "flext_quality.rules.engine",
+    "FlextQualityRulesLoader": "flext_quality.rules.loader",
+    "FlextQualityValidators": "flext_quality.rules.validators",
     "c": ("flext_core.constants", "FlextConstants"),
     "d": ("flext_core.decorators", "FlextDecorators"),
     "e": ("flext_core.exceptions", "FlextExceptions"),
-    "engine": "flext_quality.engine",
+    "engine": "flext_quality.rules.engine",
     "h": ("flext_core.handlers", "FlextHandlers"),
-    "loader": "flext_quality.loader",
+    "loader": "flext_quality.rules.loader",
     "m": ("flext_core.models", "FlextModels"),
     "p": ("flext_core.protocols", "FlextProtocols"),
     "r": ("flext_core.result", "FlextResult"),
     "s": ("flext_core.service", "FlextService"),
     "t": ("flext_core.typings", "FlextTypes"),
     "u": ("flext_core.utilities", "FlextUtilities"),
-    "validators": "flext_quality.validators",
+    "validators": "flext_quality.rules.validators",
     "x": ("flext_core.mixins", "FlextMixins"),
 }
 

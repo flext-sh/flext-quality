@@ -23,61 +23,41 @@ if _TYPE_CHECKING:
     from flext_core.service import FlextService as s
     from flext_core.typings import FlextTypes as t
     from flext_core.utilities import FlextUtilities as u
-    from flext_quality import audit, optimize, report, validate
-    from flext_quality.audit import (
-        FlextQualityDocumentationAuditor,
-        critical,
-        critical_high_issues,
-        high,
-        quality_score,
-        severity_breakdown,
-        should_fail,
-    )
-    from flext_quality.optimize import (
+    from flext_quality.docs.scripts import audit, optimize, report, validate
+    from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
+    from flext_quality.docs.scripts.optimize import (
         MIN_HEADINGS_FOR_TOC,
         FlextQualityDocumentationOptimizer,
-        doc_files,
-        run_any_optimization,
     )
-    from flext_quality.report import FlextQualityDocumentationReporter
-    from flext_quality.validate import (
+    from flext_quality.docs.scripts.report import FlextQualityDocumentationReporter
+    from flext_quality.docs.scripts.validate import (
+        FlextQualityContentValidator,
         FlextQualityLinkValidator,
         main,
-        project_root,
-        run_any_check,
     )
 
 _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
-    "FlextQualityDocumentationAuditor": "flext_quality.audit",
-    "FlextQualityDocumentationOptimizer": "flext_quality.optimize",
-    "FlextQualityDocumentationReporter": "flext_quality.report",
-    "FlextQualityLinkValidator": "flext_quality.validate",
-    "MIN_HEADINGS_FOR_TOC": "flext_quality.optimize",
-    "audit": "flext_quality.audit",
+    "FlextQualityContentValidator": "flext_quality.docs.scripts.validate",
+    "FlextQualityDocumentationAuditor": "flext_quality.docs.scripts.audit",
+    "FlextQualityDocumentationOptimizer": "flext_quality.docs.scripts.optimize",
+    "FlextQualityDocumentationReporter": "flext_quality.docs.scripts.report",
+    "FlextQualityLinkValidator": "flext_quality.docs.scripts.validate",
+    "MIN_HEADINGS_FOR_TOC": "flext_quality.docs.scripts.optimize",
+    "audit": "flext_quality.docs.scripts.audit",
     "c": ("flext_core.constants", "FlextConstants"),
-    "critical": "flext_quality.audit",
-    "critical_high_issues": "flext_quality.audit",
     "d": ("flext_core.decorators", "FlextDecorators"),
-    "doc_files": "flext_quality.optimize",
     "e": ("flext_core.exceptions", "FlextExceptions"),
     "h": ("flext_core.handlers", "FlextHandlers"),
-    "high": "flext_quality.audit",
     "m": ("flext_core.models", "FlextModels"),
-    "main": "flext_quality.validate",
-    "optimize": "flext_quality.optimize",
+    "main": "flext_quality.docs.scripts.validate",
+    "optimize": "flext_quality.docs.scripts.optimize",
     "p": ("flext_core.protocols", "FlextProtocols"),
-    "project_root": "flext_quality.validate",
-    "quality_score": "flext_quality.audit",
     "r": ("flext_core.result", "FlextResult"),
-    "report": "flext_quality.report",
-    "run_any_check": "flext_quality.validate",
-    "run_any_optimization": "flext_quality.optimize",
+    "report": "flext_quality.docs.scripts.report",
     "s": ("flext_core.service", "FlextService"),
-    "severity_breakdown": "flext_quality.audit",
-    "should_fail": "flext_quality.audit",
     "t": ("flext_core.typings", "FlextTypes"),
     "u": ("flext_core.utilities", "FlextUtilities"),
-    "validate": "flext_quality.validate",
+    "validate": "flext_quality.docs.scripts.validate",
     "x": ("flext_core.mixins", "FlextMixins"),
 }
 

@@ -18,7 +18,8 @@ if _TYPE_CHECKING:
     from flext_core.mixins import FlextMixins as x
     from flext_core.result import FlextResult as r
     from flext_core.service import FlextService as s
-    from flext_quality import (
+    from flext_quality.utilities import FlextQualityUtilities as u
+    from tests.helpers import (
         assertions,
         constants,
         models,
@@ -26,45 +27,49 @@ if _TYPE_CHECKING:
         typing_helpers,
         typings,
     )
-    from flext_quality.assertions import missing, safe_list_access
-    from flext_quality.constants import TestsConstants, TestsConstants as c
-    from flext_quality.models import TestsModels, TestsModels as m
-    from flext_quality.protocols import TestsProtocols, TestsProtocols as p
-    from flext_quality.typing_helpers import (
+    from tests.helpers.constants import TestsConstants, c
+    from tests.helpers.models import TestsModels, m
+    from tests.helpers.protocols import TestsProtocols, p
+    from tests.helpers.typing_helpers import (
         assert_analysis_results_structure,
+        assert_dict_structure,
         assert_is_dict,
         assert_is_list,
+        assert_issues_structure,
         assert_metrics_structure,
+        safe_dict_access,
+        safe_list_access,
     )
-    from flext_quality.typings import TestsTypings, t
-    from flext_quality.utilities import FlextQualityUtilities as u
+    from tests.helpers.typings import TestsTypings, t
 
 _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
-    "TestsConstants": "flext_quality.constants",
-    "TestsModels": "flext_quality.models",
-    "TestsProtocols": "flext_quality.protocols",
-    "TestsTypings": "flext_quality.typings",
-    "assert_analysis_results_structure": "flext_quality.typing_helpers",
-    "assert_is_dict": "flext_quality.typing_helpers",
-    "assert_is_list": "flext_quality.typing_helpers",
-    "assert_metrics_structure": "flext_quality.typing_helpers",
-    "assertions": "flext_quality.assertions",
-    "c": ("flext_quality.constants", "TestsConstants"),
-    "constants": "flext_quality.constants",
+    "TestsConstants": "tests.helpers.constants",
+    "TestsModels": "tests.helpers.models",
+    "TestsProtocols": "tests.helpers.protocols",
+    "TestsTypings": "tests.helpers.typings",
+    "assert_analysis_results_structure": "tests.helpers.typing_helpers",
+    "assert_dict_structure": "tests.helpers.typing_helpers",
+    "assert_is_dict": "tests.helpers.typing_helpers",
+    "assert_is_list": "tests.helpers.typing_helpers",
+    "assert_issues_structure": "tests.helpers.typing_helpers",
+    "assert_metrics_structure": "tests.helpers.typing_helpers",
+    "assertions": "tests.helpers.assertions",
+    "c": "tests.helpers.constants",
+    "constants": "tests.helpers.constants",
     "d": ("flext_core.decorators", "FlextDecorators"),
     "e": ("flext_core.exceptions", "FlextExceptions"),
     "h": ("flext_core.handlers", "FlextHandlers"),
-    "m": ("flext_quality.models", "TestsModels"),
-    "missing": "flext_quality.assertions",
-    "models": "flext_quality.models",
-    "p": ("flext_quality.protocols", "TestsProtocols"),
-    "protocols": "flext_quality.protocols",
+    "m": "tests.helpers.models",
+    "models": "tests.helpers.models",
+    "p": "tests.helpers.protocols",
+    "protocols": "tests.helpers.protocols",
     "r": ("flext_core.result", "FlextResult"),
     "s": ("flext_core.service", "FlextService"),
-    "safe_list_access": "flext_quality.assertions",
-    "t": "flext_quality.typings",
-    "typing_helpers": "flext_quality.typing_helpers",
-    "typings": "flext_quality.typings",
+    "safe_dict_access": "tests.helpers.typing_helpers",
+    "safe_list_access": "tests.helpers.typing_helpers",
+    "t": "tests.helpers.typings",
+    "typing_helpers": "tests.helpers.typing_helpers",
+    "typings": "tests.helpers.typings",
     "u": ("flext_quality.utilities", "FlextQualityUtilities"),
     "x": ("flext_core.mixins", "FlextMixins"),
 }

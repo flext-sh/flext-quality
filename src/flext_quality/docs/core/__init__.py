@@ -23,21 +23,41 @@ if _TYPE_CHECKING:
     from flext_core.service import FlextService as s
     from flext_core.typings import FlextTypes as t
     from flext_core.utilities import FlextUtilities as u
-    from flext_quality import base_classes, config_manager, file_discovery
-    from flext_quality.base_classes import FlextQualityBaseAuditor
-    from flext_quality.config_manager import FlextQualityAuditRules
-    from flext_quality.file_discovery import FlextQualityFileStatistics
+    from flext_quality.docs.core import base_classes, config_manager, file_discovery
+    from flext_quality.docs.core.base_classes import (
+        FlextQualityBaseAnalyzer,
+        FlextQualityBaseAuditor,
+        FlextQualityBaseReporter,
+        FlextQualityBaseValidator,
+    )
+    from flext_quality.docs.core.config_manager import (
+        FlextQualityAuditRules,
+        FlextQualityConfigManager,
+        FlextQualityStyleGuide,
+        FlextQualityValidationConfig,
+    )
+    from flext_quality.docs.core.file_discovery import (
+        FlextQualityDocumentationFinder,
+        FlextQualityFileStatistics,
+    )
 
 _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
-    "FlextQualityAuditRules": "flext_quality.config_manager",
-    "FlextQualityBaseAuditor": "flext_quality.base_classes",
-    "FlextQualityFileStatistics": "flext_quality.file_discovery",
-    "base_classes": "flext_quality.base_classes",
+    "FlextQualityAuditRules": "flext_quality.docs.core.config_manager",
+    "FlextQualityBaseAnalyzer": "flext_quality.docs.core.base_classes",
+    "FlextQualityBaseAuditor": "flext_quality.docs.core.base_classes",
+    "FlextQualityBaseReporter": "flext_quality.docs.core.base_classes",
+    "FlextQualityBaseValidator": "flext_quality.docs.core.base_classes",
+    "FlextQualityConfigManager": "flext_quality.docs.core.config_manager",
+    "FlextQualityDocumentationFinder": "flext_quality.docs.core.file_discovery",
+    "FlextQualityFileStatistics": "flext_quality.docs.core.file_discovery",
+    "FlextQualityStyleGuide": "flext_quality.docs.core.config_manager",
+    "FlextQualityValidationConfig": "flext_quality.docs.core.config_manager",
+    "base_classes": "flext_quality.docs.core.base_classes",
     "c": ("flext_core.constants", "FlextConstants"),
-    "config_manager": "flext_quality.config_manager",
+    "config_manager": "flext_quality.docs.core.config_manager",
     "d": ("flext_core.decorators", "FlextDecorators"),
     "e": ("flext_core.exceptions", "FlextExceptions"),
-    "file_discovery": "flext_quality.file_discovery",
+    "file_discovery": "flext_quality.docs.core.file_discovery",
     "h": ("flext_core.handlers", "FlextHandlers"),
     "m": ("flext_core.models", "FlextModels"),
     "p": ("flext_core.protocols", "FlextProtocols"),

@@ -23,55 +23,43 @@ if _TYPE_CHECKING:
     from flext_core.service import FlextService as s
     from flext_core.typings import FlextTypes as t
     from flext_core.utilities import FlextUtilities as u
-    from flext_quality import resources, server, tools
-    from flext_quality.resources import (
+    from flext_quality.mcp import resources, server, tools
+    from flext_quality.mcp.resources import (
         get_hooks_config,
         get_integrations_status,
         get_rules_config,
     )
-    from flext_quality.server import get_server, mcp
-    from flext_quality.tools import (
-        client,
-        command_result,
-        engine,
+    from flext_quality.mcp.server import get_server, mcp
+    from flext_quality.mcp.tools import (
         execute_hook,
-        params,
-        result,
         search_code,
-        search_limit,
         search_memory,
         validate_rules,
     )
 
 _LAZY_IMPORTS: FlextTypes.LazyImportIndex = {
     "c": ("flext_core.constants", "FlextConstants"),
-    "client": "flext_quality.tools",
-    "command_result": "flext_quality.tools",
     "d": ("flext_core.decorators", "FlextDecorators"),
     "e": ("flext_core.exceptions", "FlextExceptions"),
-    "engine": "flext_quality.tools",
-    "execute_hook": "flext_quality.tools",
-    "get_hooks_config": "flext_quality.resources",
-    "get_integrations_status": "flext_quality.resources",
-    "get_rules_config": "flext_quality.resources",
-    "get_server": "flext_quality.server",
+    "execute_hook": "flext_quality.mcp.tools",
+    "get_hooks_config": "flext_quality.mcp.resources",
+    "get_integrations_status": "flext_quality.mcp.resources",
+    "get_rules_config": "flext_quality.mcp.resources",
+    "get_server": "flext_quality.mcp.server",
     "h": ("flext_core.handlers", "FlextHandlers"),
     "m": ("flext_core.models", "FlextModels"),
-    "mcp": "flext_quality.server",
+    "mcp": "flext_quality.mcp.server",
     "p": ("flext_core.protocols", "FlextProtocols"),
-    "params": "flext_quality.tools",
     "r": ("flext_core.result", "FlextResult"),
-    "resources": "flext_quality.resources",
-    "result": "flext_quality.tools",
+    "resources": "flext_quality.mcp.resources",
     "s": ("flext_core.service", "FlextService"),
-    "search_code": "flext_quality.tools",
-    "search_limit": "flext_quality.tools",
-    "search_memory": "flext_quality.tools",
-    "server": "flext_quality.server",
+    "search_code": "flext_quality.mcp.tools",
+    "search_memory": "flext_quality.mcp.tools",
+    "server": "flext_quality.mcp.server",
     "t": ("flext_core.typings", "FlextTypes"),
-    "tools": "flext_quality.tools",
+    "tools": "flext_quality.mcp.tools",
     "u": ("flext_core.utilities", "FlextUtilities"),
-    "validate_rules": "flext_quality.tools",
+    "validate_rules": "flext_quality.mcp.tools",
     "x": ("flext_core.mixins", "FlextMixins"),
 }
 
