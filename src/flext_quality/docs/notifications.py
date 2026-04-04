@@ -17,7 +17,7 @@ from email.mime.text import MIMEText
 from pathlib import Path
 
 import requests
-import yaml
+from flext_cli import FlextCliUtilities
 from pydantic import BaseModel, Field
 
 from flext_quality import m, t
@@ -99,12 +99,11 @@ class FlextQualityDocumentationNotifier:
     def load_config(self, config_path: str) -> None:
         """Load notification configuration."""
         try:
-            with Path(config_path).open(encoding="utf-8") as f:
-                loaded = yaml.safe_load(f)
-                if isinstance(loaded, dict):
-                    self.config = self._load_user_config({})
-                else:
-                    self.config = self.get_default_config()
+            loaded = FlextCliUtilities.Cli.yaml_load_mapping(Path(config_path))
+            if loaded:
+                self.config = self._load_user_config({})
+            else:
+                self.config = self.get_default_config()
         except FileNotFoundError:
             self.config = self.get_default_config()
 

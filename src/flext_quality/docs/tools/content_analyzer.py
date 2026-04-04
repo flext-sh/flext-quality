@@ -14,7 +14,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import ClassVar
 
-import yaml
+from flext_cli import FlextCliUtilities
 from pydantic import BaseModel, TypeAdapter
 
 from flext_quality import t
@@ -176,16 +176,13 @@ class FlextQualityContentAnalyzer:
             self.config = default_config
             return
         try:
-            with Path(config_path).open(encoding="utf-8") as f:
-                loaded: t.ContainerMapping | t.ContainerList | str | None = (
-                    yaml.safe_load(f)
-                )
-                if isinstance(loaded, dict):
-                    self.config = {
-                        k: v for k, v in loaded.items() if isinstance(v, (dict, str))
-                    }
-                else:
-                    self.config = default_config
+            loaded = FlextCliUtilities.Cli.yaml_load_mapping(Path(config_path))
+            if loaded:
+                self.config = {
+                    k: v for k, v in loaded.items() if isinstance(v, (dict, str))
+                }
+            else:
+                self.config = default_config
         except (FileNotFoundError, KeyError):
             self.config = default_config
 

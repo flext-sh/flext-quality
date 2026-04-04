@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import MutableSequence, Sequence
 from pathlib import Path
 
-import yaml
+from flext_cli import FlextCliUtilities
 
 from flext_core import r
 from flext_quality import c, m, t
@@ -20,21 +20,12 @@ class FlextQualityRulesLoader:
             return r[Sequence[m.Quality.RuleDefinition]].fail(
                 f"Rules file not found: {path}",
             )
-        try:
-            with path.open(encoding="utf-8") as f:
-                parsed = yaml.safe_load(f)
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        yaml_result = FlextCliUtilities.Cli.yaml_safe_load(path)
+        if yaml_result.is_failure:
             return r[Sequence[m.Quality.RuleDefinition]].fail(
-                f"Failed to parse YAML: {e}",
+                f"Failed to parse YAML: {yaml_result.error}",
             )
+        parsed = yaml_result.value
         if not isinstance(parsed, dict):
             return r[Sequence[m.Quality.RuleDefinition]].fail(
                 "Invalid YAML: expected dict at root",

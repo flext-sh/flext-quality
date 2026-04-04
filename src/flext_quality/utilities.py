@@ -6,7 +6,6 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
-import yaml
 from flext_cli import FlextCliUtilities
 from flext_infra import FlextInfraUtilitiesSubprocess
 from flext_web import FlextWebUtilities
@@ -42,8 +41,12 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
         def load_yaml_rules(path: Path) -> r[Sequence[t.ContainerMapping]]:
             """Load rules from YAML file."""
             try:
-                with path.open(encoding="utf-8") as f:
-                    parsed = yaml.safe_load(f)
+                yaml_result = FlextCliUtilities.Cli.yaml_safe_load(path)
+                if yaml_result.is_failure:
+                    return r[Sequence[t.ContainerMapping]].fail(
+                        f"Failed to load YAML: {yaml_result.error}",
+                    )
+                parsed = yaml_result.value
                 if not isinstance(parsed, dict):
                     return r[Sequence[t.ContainerMapping]].fail(
                         "Expected YAML dict",

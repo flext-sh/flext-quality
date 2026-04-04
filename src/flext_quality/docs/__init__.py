@@ -13,31 +13,21 @@ if _t.TYPE_CHECKING:
     import flext_quality.docs.core as _flext_quality_docs_core
 
     core = _flext_quality_docs_core
-    import flext_quality.docs.core.base_classes as _flext_quality_docs_core_base_classes
-
-    base_classes = _flext_quality_docs_core_base_classes
-    import flext_quality.docs.core.config_manager as _flext_quality_docs_core_config_manager
-    from flext_quality.docs.core.base_classes import (
+    import flext_quality.docs.dashboard as _flext_quality_docs_dashboard
+    from flext_quality.docs.core import (
+        FlextQualityAuditRules,
         FlextQualityBaseAnalyzer,
         FlextQualityBaseAuditor,
         FlextQualityBaseReporter,
         FlextQualityBaseValidator,
-    )
-
-    config_manager = _flext_quality_docs_core_config_manager
-    import flext_quality.docs.core.file_discovery as _flext_quality_docs_core_file_discovery
-    from flext_quality.docs.core.config_manager import (
-        FlextQualityAuditRules,
         FlextQualityConfigManager,
-        FlextQualityStyleGuide,
-        FlextQualityValidationConfig,
-    )
-
-    file_discovery = _flext_quality_docs_core_file_discovery
-    import flext_quality.docs.dashboard as _flext_quality_docs_dashboard
-    from flext_quality.docs.core.file_discovery import (
         FlextQualityDocumentationFinder,
         FlextQualityFileStatistics,
+        FlextQualityStyleGuide,
+        FlextQualityValidationConfig,
+        base_classes,
+        config_manager,
+        file_discovery,
     )
 
     dashboard = _flext_quality_docs_dashboard
@@ -59,50 +49,22 @@ if _t.TYPE_CHECKING:
     )
 
     scripts = _flext_quality_docs_scripts
-    import flext_quality.docs.scripts.audit as _flext_quality_docs_scripts_audit
-
-    audit = _flext_quality_docs_scripts_audit
-    import flext_quality.docs.scripts.optimize as _flext_quality_docs_scripts_optimize
-    from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
-
-    optimize = _flext_quality_docs_scripts_optimize
-    import flext_quality.docs.scripts.report as _flext_quality_docs_scripts_report
-    from flext_quality.docs.scripts.optimize import (
-        MIN_HEADINGS_FOR_TOC,
-        FlextQualityDocumentationOptimizer,
-    )
-
-    report = _flext_quality_docs_scripts_report
-    import flext_quality.docs.scripts.validate as _flext_quality_docs_scripts_validate
-    from flext_quality.docs.scripts.report import FlextQualityDocumentationReporter
-
-    validate = _flext_quality_docs_scripts_validate
     import flext_quality.docs.tools as _flext_quality_docs_tools
-    from flext_quality.docs.scripts.validate import (
+    from flext_quality.docs.scripts import (
+        MIN_HEADINGS_FOR_TOC,
         FlextQualityContentValidator,
+        FlextQualityDocumentationAuditor,
+        FlextQualityDocumentationOptimizer,
+        FlextQualityDocumentationReporter,
         FlextQualityLinkValidator,
+        audit,
         main,
+        optimize,
+        report,
+        validate,
     )
 
     tools = _flext_quality_docs_tools
-    import flext_quality.docs.tools.content_analyzer as _flext_quality_docs_tools_content_analyzer
-
-    content_analyzer = _flext_quality_docs_tools_content_analyzer
-    import flext_quality.docs.tools.link_checker as _flext_quality_docs_tools_link_checker
-    from flext_quality.docs.tools.content_analyzer import (
-        FlextQualityContentAnalyzer,
-        analyze_file_content,
-        analyze_files_content,
-    )
-
-    link_checker = _flext_quality_docs_tools_link_checker
-    import flext_quality.docs.tools.style_validator as _flext_quality_docs_tools_style_validator
-    from flext_quality.docs.tools.link_checker import (
-        FlextQualityLinkChecker,
-        validate_links_sync,
-    )
-
-    style_validator = _flext_quality_docs_tools_style_validator
     from flext_core.constants import FlextConstants as c
     from flext_core.decorators import FlextDecorators as d
     from flext_core.exceptions import FlextExceptions as e
@@ -114,10 +76,18 @@ if _t.TYPE_CHECKING:
     from flext_core.service import FlextService as s
     from flext_core.typings import FlextTypes as t
     from flext_core.utilities import FlextUtilities as u
-    from flext_quality.docs.tools.style_validator import (
+    from flext_quality.docs.tools import (
+        FlextQualityContentAnalyzer,
+        FlextQualityLinkChecker,
         FlextQualityStyleValidator,
+        analyze_file_content,
+        analyze_files_content,
+        content_analyzer,
+        link_checker,
+        style_validator,
         validate_file_style,
         validate_files_style,
+        validate_links_sync,
     )
 _LAZY_IMPORTS = merge_lazy_imports(
     (

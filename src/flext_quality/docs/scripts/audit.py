@@ -19,7 +19,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import requests
-import yaml
+from flext_cli import FlextCliUtilities
 from pydantic import ValidationError
 
 from flext_quality import m, t
@@ -50,33 +50,36 @@ class FlextQualityDocumentationAuditor:
     def load_config(self) -> None:
         """Load audit configuration files."""
         try:
-            with Path(self.config_path / "audit_rules.yaml").open(
-                encoding="utf-8",
-            ) as f:
+            audit_data = FlextCliUtilities.Cli.yaml_load_mapping(
+                self.config_path / "audit_rules.yaml",
+            )
+            if audit_data:
                 self.audit_rules = m.Quality.AuditRulesConfig.model_validate(
-                    yaml.safe_load(f),
+                    audit_data,
                 )
-        except (FileNotFoundError, ValidationError, yaml.YAMLError, TypeError):
+        except (FileNotFoundError, ValidationError, ValueError, TypeError):
             self.audit_rules = self.get_default_audit_rules()
 
         try:
-            with Path(self.config_path / "style_guide.yaml").open(
-                encoding="utf-8",
-            ) as f:
+            style_data = FlextCliUtilities.Cli.yaml_load_mapping(
+                self.config_path / "style_guide.yaml",
+            )
+            if style_data:
                 self.style_guide = m.Quality.StyleGuideConfig.model_validate(
-                    yaml.safe_load(f),
+                    style_data,
                 )
-        except (FileNotFoundError, ValidationError, yaml.YAMLError, TypeError):
+        except (FileNotFoundError, ValidationError, ValueError, TypeError):
             self.style_guide = self.get_default_style_guide()
 
         try:
-            with Path(self.config_path / "validation_config.yaml").open(
-                encoding="utf-8",
-            ) as f:
+            validation_data = FlextCliUtilities.Cli.yaml_load_mapping(
+                self.config_path / "validation_config.yaml",
+            )
+            if validation_data:
                 self.validation_config = m.Quality.ValidationConfig.model_validate(
-                    yaml.safe_load(f),
+                    validation_data,
                 )
-        except (FileNotFoundError, ValidationError, yaml.YAMLError, TypeError):
+        except (FileNotFoundError, ValidationError, ValueError, TypeError):
             self.validation_config = self.get_default_validation_config()
 
     def get_default_audit_rules(self) -> m.Quality.AuditRulesConfig:
@@ -888,7 +891,6 @@ def main() -> None:
         FileNotFoundError,
         PermissionError,
         OSError,
-        yaml.YAMLError,
         KeyError,
         ValueError,
     ):

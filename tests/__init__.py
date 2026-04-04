@@ -46,27 +46,23 @@ if _t.TYPE_CHECKING:
     )
 
     helpers = _tests_helpers
-    import tests.helpers.assertions as _tests_helpers_assertions
-
-    assertions = _tests_helpers_assertions
-    import tests.helpers.typing_helpers as _tests_helpers_typing_helpers
-    from tests.helpers.constants import TestsConstants
-    from tests.helpers.models import TestsModels
-    from tests.helpers.protocols import TestsProtocols
-
-    typing_helpers = _tests_helpers_typing_helpers
     import tests.models as _tests_models
-    from tests.helpers.typing_helpers import (
+    from tests.helpers import (
+        TestsConstants,
+        TestsModels,
+        TestsProtocols,
+        TestsTypings,
         assert_analysis_results_structure,
         assert_dict_structure,
         assert_is_dict,
         assert_is_list,
         assert_issues_structure,
         assert_metrics_structure,
+        assertions,
         safe_dict_access,
         safe_list_access,
+        typing_helpers,
     )
-    from tests.helpers.typings import TestsTypings
 
     models = _tests_models
     import tests.protocols as _tests_protocols
@@ -84,23 +80,20 @@ if _t.TYPE_CHECKING:
     from tests.typings import FlextQualityTestTypes, FlextQualityTestTypes as t
 
     unit = _tests_unit
-    import tests.unit.test_api as _tests_unit_test_api
-
-    test_api = _tests_unit_test_api
-    import tests.unit.test_cli as _tests_unit_test_cli
-    from tests.unit.test_api import (
+    import tests.utilities as _tests_utilities
+    from tests.unit import (
         TestFlextQualityAPI,
+        TestFlextQualityCliService,
         TestFlextQualityHookExecution,
         TestFlextQualityRulesConfig,
         TestFlextQualitySingleton,
         TestFlextQualityStdinProcessing,
         TestFlextQualityValidation,
+        TestMainFunction,
+        test_api,
+        test_basic,
+        test_cli,
     )
-    from tests.unit.test_basic import test_basic
-
-    test_cli = _tests_unit_test_cli
-    import tests.utilities as _tests_utilities
-    from tests.unit.test_cli import TestFlextQualityCliService, TestMainFunction
 
     utilities = _tests_utilities
     from flext_core.decorators import FlextDecorators as d

@@ -20,7 +20,7 @@ from typing import TypeIs
 import pytest
 import schedule
 import structlog
-import yaml
+from flext_cli import FlextCliUtilities
 from git import InvalidGitRepositoryError, Repo
 
 from flext_quality import m, t
@@ -122,12 +122,13 @@ class FlextQualityScheduledMaintenance:
             else _docs_config_file("schedule_config.yaml")
         )
         try:
-            with resolved_config_path.open(encoding="utf-8") as f:
-                loaded_untyped = yaml.safe_load(f)
-                if _is_str_mapping(loaded_untyped):
-                    self.config = self._merge_config(default_config, loaded_untyped)
-                else:
-                    self.config = default_config
+            loaded_untyped = FlextCliUtilities.Cli.yaml_load_mapping(
+                resolved_config_path,
+            )
+            if _is_str_mapping(loaded_untyped) and loaded_untyped:
+                self.config = self._merge_config(default_config, loaded_untyped)
+            else:
+                self.config = default_config
         except FileNotFoundError:
             self.config = default_config
 

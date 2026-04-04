@@ -9,12 +9,12 @@ from __future__ import annotations
 
 import operator
 import re
-from collections.abc import Mapping, MutableSequence, Sequence
+from collections.abc import MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import ClassVar
 
-import yaml
+from flext_cli import FlextCliUtilities
 from pydantic import BaseModel, TypeAdapter
 
 from flext_quality import t
@@ -154,20 +154,17 @@ class FlextQualityStyleValidator:
             )
             return
         try:
-            with Path(config_path).open(encoding="utf-8") as f:
-                loaded_obj: Mapping[str, t.ConfigurationMapping] | None = (
-                    yaml.safe_load(f)
-                )
-                if isinstance(loaded_obj, dict):
-                    self.config = self._normalize_config(loaded_obj)
-                else:
-                    self._set_default_config()
+            loaded_obj = FlextCliUtilities.Cli.yaml_load_mapping(Path(config_path))
+            if loaded_obj:
+                self.config = self._normalize_config(loaded_obj)
+            else:
+                self._set_default_config()
         except (FileNotFoundError, KeyError, OSError):
             self._set_default_config()
 
     def _normalize_config(
         self,
-        raw: Mapping[str, t.ConfigurationMapping],
+        raw: t.ContainerMapping,
     ) -> FlextQualityStyleValidator.StyleConfig:
         markdown: FlextQualityStyleValidator.MarkdownConfig | None = None
         formatting: FlextQualityStyleValidator.FormattingConfig | None = None

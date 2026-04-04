@@ -9,7 +9,7 @@ from __future__ import annotations
 from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
 
-import yaml
+from flext_cli import FlextCliUtilities
 
 from flext_quality import t
 
@@ -131,7 +131,7 @@ class FlextQualityConfigManager:
     """Centralized configuration management for the documentation maintenance system."""
 
     @staticmethod
-    def _as_section(value: RawSectionMap | None) -> ConfigSection:
+    def _as_section(value: RawSectionMap | t.NormalizedValue) -> ConfigSection:
         """Normalize any value into a configuration section mapping."""
         if not isinstance(value, Mapping):
             return {}
@@ -145,7 +145,7 @@ class FlextQualityConfigManager:
         return section
 
     @staticmethod
-    def _as_config_data(value: RawConfigMap | None) -> ConfigData:
+    def _as_config_data(value: RawConfigMap | t.ContainerMapping | None) -> ConfigData:
         """Normalize loaded YAML content into typed config data."""
         if not isinstance(value, Mapping):
             return {}
@@ -207,12 +207,11 @@ class FlextQualityConfigManager:
         config_path = self.config_dir / filename
 
         try:
-            with config_path.open("r", encoding="utf-8") as f:
-                raw = yaml.safe_load(f)
-                return self._as_config_data(raw)
+            raw = FlextCliUtilities.Cli.yaml_load_mapping(config_path)
+            return (
+                self._as_config_data(raw) if raw else self._get_default_config(filename)
+            )
         except FileNotFoundError:
-            return self._get_default_config(filename)
-        except yaml.YAMLError:
             return self._get_default_config(filename)
         except (OSError, PermissionError, UnicodeDecodeError) as exc:
             _ = exc
@@ -310,7 +309,7 @@ class FlextQualityConfigManager:
             audit_rules = self.get_audit_rules()
             if not audit_rules.quality_thresholds:
                 issues.append("Audit rules missing quality_thresholds section")
-        except (FileNotFoundError, yaml.YAMLError, KeyError, OSError) as e:
+        except (FileNotFoundError, ValueError, KeyError, OSError) as e:
             issues.append(f"Invalid audit_rules.yaml: {e}")
 
         # Validate style guide structure
@@ -318,7 +317,7 @@ class FlextQualityConfigManager:
             style_guide = self.get_style_guide()
             if not style_guide.markdown:
                 issues.append("Style guide missing markdown section")
-        except (FileNotFoundError, yaml.YAMLError, KeyError, OSError) as e:
+        except (FileNotFoundError, ValueError, KeyError, OSError) as e:
             issues.append(f"Invalid style_guide.yaml: {e}")
 
         # Validate validation config structure
@@ -326,7 +325,7 @@ class FlextQualityConfigManager:
             validation_config = self.get_validation_config()
             if not validation_config.link_validation:
                 issues.append("Validation config missing link_validation section")
-        except (FileNotFoundError, yaml.YAMLError, KeyError, OSError) as e:
+        except (FileNotFoundError, ValueError, KeyError, OSError) as e:
             issues.append(f"Invalid validation_config.yaml: {e}")
 
         return issues
@@ -349,8 +348,9 @@ class FlextQualityConfigManager:
             config_path = self.config_dir / f"{name}.yaml"
             self.config_dir.mkdir(parents=True, exist_ok=True)
 
-            with config_path.open("w", encoding="utf-8") as f:
-                yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+            result = FlextCliUtilities.Cli.yaml_dump(config_path, data)
+            if result.is_failure:
+                return False
 
             # Clear cache for this config
             if name in self._cache:
@@ -365,5 +365,5 @@ class FlextQualityConfigManager:
                 self._validation_config = None
 
             return True
-        except (FileNotFoundError, PermissionError, yaml.YAMLError, OSError):
+        except (FileNotFoundError, PermissionError, ValueError, OSError):
             return False

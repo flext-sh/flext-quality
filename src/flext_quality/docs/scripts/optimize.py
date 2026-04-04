@@ -19,7 +19,7 @@ from collections.abc import MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
-import yaml
+from flext_cli import FlextCliUtilities
 from pydantic import ValidationError
 
 from flext_quality import m, t
@@ -327,7 +327,7 @@ class FlextQualityDocumentationOptimizer:
                 PermissionError,
                 UnicodeDecodeError,
                 OSError,
-                yaml.YAMLError,
+                ValueError,
             ) as e:
                 self.logger.warning(
                     "Failed to enhance accessibility in %s: %s",
@@ -349,21 +349,23 @@ class FlextQualityDocumentationOptimizer:
                 try:
                     frontmatter_lines = lines[1 : end_idx - 1]
                     frontmatter_content = "\n".join(frontmatter_lines)
-                    metadata: t.MutableContainerMapping = dict(
-                        t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
-                            yaml.safe_load(frontmatter_content) or {},
-                        ),
-                    )
+                    parsed_fm = FlextCliUtilities.Cli.yaml_parse(
+                        frontmatter_content,
+                    ).unwrap_or({})
+                    metadata: t.MutableContainerValueMapping = {
+                        str(k): v
+                        for k, v in (parsed_fm or {}).items()
+                        if isinstance(v, (str, int, float, bool))
+                    }
                     metadata["updated"] = datetime.now(UTC).strftime("%Y-%m-%d")
-                    new_frontmatter = yaml.dump(
+                    new_frontmatter = FlextCliUtilities.Cli.yaml_dump_str(
                         metadata,
-                        default_flow_style=False,
                     ).strip()
                     new_frontmatter_lines = (
                         ["---"] + new_frontmatter.split("\n") + ["---"]
                     )
                     lines = new_frontmatter_lines + lines[end_idx:]
-                except (yaml.YAMLError, ValidationError):
+                except (ValueError, ValidationError):
                     pass
         return "\n".join(lines)
 

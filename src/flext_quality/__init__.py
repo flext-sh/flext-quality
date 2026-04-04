@@ -25,157 +25,100 @@ if _t.TYPE_CHECKING:
 
     docs = _flext_quality_docs
     import flext_quality.docs.core as _flext_quality_docs_core
+    from flext_quality.docs import (
+        MAX_BROKEN_LINKS_TO_SHOW,
+        FlextQualityDocumentationDashboard,
+        FlextQualityDocumentationNotifier,
+        FlextQualityScheduledMaintenance,
+        dashboard,
+        logger,
+        notifications,
+        scheduled_maintenance,
+    )
 
     core = _flext_quality_docs_core
-    import flext_quality.docs.core.base_classes as _flext_quality_docs_core_base_classes
-
-    base_classes = _flext_quality_docs_core_base_classes
-    import flext_quality.docs.core.config_manager as _flext_quality_docs_core_config_manager
-    from flext_quality.docs.core.base_classes import (
+    import flext_quality.docs.scripts as _flext_quality_docs_scripts
+    from flext_quality.docs.core import (
+        FlextQualityAuditRules,
         FlextQualityBaseAnalyzer,
         FlextQualityBaseAuditor,
         FlextQualityBaseReporter,
         FlextQualityBaseValidator,
-    )
-
-    config_manager = _flext_quality_docs_core_config_manager
-    import flext_quality.docs.core.file_discovery as _flext_quality_docs_core_file_discovery
-    from flext_quality.docs.core.config_manager import (
-        FlextQualityAuditRules,
         FlextQualityConfigManager,
-        FlextQualityStyleGuide,
-        FlextQualityValidationConfig,
-    )
-
-    file_discovery = _flext_quality_docs_core_file_discovery
-    import flext_quality.docs.dashboard as _flext_quality_docs_dashboard
-    from flext_quality.docs.core.file_discovery import (
         FlextQualityDocumentationFinder,
         FlextQualityFileStatistics,
-    )
-
-    dashboard = _flext_quality_docs_dashboard
-    import flext_quality.docs.notifications as _flext_quality_docs_notifications
-    from flext_quality.docs.dashboard import FlextQualityDocumentationDashboard
-
-    notifications = _flext_quality_docs_notifications
-    import flext_quality.docs.scheduled_maintenance as _flext_quality_docs_scheduled_maintenance
-    from flext_quality.docs.notifications import (
-        MAX_BROKEN_LINKS_TO_SHOW,
-        FlextQualityDocumentationNotifier,
-    )
-
-    scheduled_maintenance = _flext_quality_docs_scheduled_maintenance
-    import flext_quality.docs.scripts as _flext_quality_docs_scripts
-    from flext_quality.docs.scheduled_maintenance import (
-        FlextQualityScheduledMaintenance,
-        logger,
+        FlextQualityStyleGuide,
+        FlextQualityValidationConfig,
+        base_classes,
+        config_manager,
+        file_discovery,
     )
 
     scripts = _flext_quality_docs_scripts
-    import flext_quality.docs.scripts.audit as _flext_quality_docs_scripts_audit
-
-    audit = _flext_quality_docs_scripts_audit
-    import flext_quality.docs.scripts.optimize as _flext_quality_docs_scripts_optimize
-    from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
-
-    optimize = _flext_quality_docs_scripts_optimize
-    import flext_quality.docs.scripts.report as _flext_quality_docs_scripts_report
-    from flext_quality.docs.scripts.optimize import (
-        MIN_HEADINGS_FOR_TOC,
-        FlextQualityDocumentationOptimizer,
-    )
-
-    report = _flext_quality_docs_scripts_report
-    import flext_quality.docs.scripts.validate as _flext_quality_docs_scripts_validate
-    from flext_quality.docs.scripts.report import FlextQualityDocumentationReporter
-
-    validate = _flext_quality_docs_scripts_validate
     import flext_quality.docs.tools as _flext_quality_docs_tools
-    from flext_quality.docs.scripts.validate import (
+    from flext_quality.docs.scripts import (
+        MIN_HEADINGS_FOR_TOC,
         FlextQualityContentValidator,
+        FlextQualityDocumentationAuditor,
+        FlextQualityDocumentationOptimizer,
+        FlextQualityDocumentationReporter,
         FlextQualityLinkValidator,
+        audit,
+        optimize,
+        report,
+        validate,
     )
 
     tools = _flext_quality_docs_tools
-    import flext_quality.docs.tools.content_analyzer as _flext_quality_docs_tools_content_analyzer
-
-    content_analyzer = _flext_quality_docs_tools_content_analyzer
-    import flext_quality.docs.tools.link_checker as _flext_quality_docs_tools_link_checker
-    from flext_quality.docs.tools.content_analyzer import (
+    import flext_quality.hooks as _flext_quality_hooks
+    from flext_quality.docs.tools import (
         FlextQualityContentAnalyzer,
+        FlextQualityLinkChecker,
+        FlextQualityStyleValidator,
         analyze_file_content,
         analyze_files_content,
-    )
-
-    link_checker = _flext_quality_docs_tools_link_checker
-    import flext_quality.docs.tools.style_validator as _flext_quality_docs_tools_style_validator
-    from flext_quality.docs.tools.link_checker import (
-        FlextQualityLinkChecker,
+        content_analyzer,
+        link_checker,
+        style_validator,
+        validate_file_style,
+        validate_files_style,
         validate_links_sync,
     )
 
-    style_validator = _flext_quality_docs_tools_style_validator
-    import flext_quality.hooks as _flext_quality_hooks
-    from flext_quality.docs.tools.style_validator import (
-        FlextQualityStyleValidator,
-        validate_file_style,
-        validate_files_style,
-    )
-
     hooks = _flext_quality_hooks
-    import flext_quality.hooks.base as _flext_quality_hooks_base
-
-    base = _flext_quality_hooks_base
-    import flext_quality.hooks.manager as _flext_quality_hooks_manager
-    from flext_quality.hooks.base import FlextQualityBaseHook
-
-    manager = _flext_quality_hooks_manager
     import flext_quality.integrations as _flext_quality_integrations
-    from flext_quality.hooks.manager import FlextQualityHookManager
+    from flext_quality.hooks import (
+        FlextQualityBaseHook,
+        FlextQualityHookManager,
+        base,
+        manager,
+    )
 
     integrations = _flext_quality_integrations
-    import flext_quality.integrations.claude_context as _flext_quality_integrations_claude_context
-    from flext_quality.integrations._health import build_mcp_health_result
-
-    claude_context = _flext_quality_integrations_claude_context
-    import flext_quality.integrations.claude_mem as _flext_quality_integrations_claude_mem
-    from flext_quality.integrations.claude_context import (
+    import flext_quality.models as _flext_quality_models
+    from flext_quality.integrations import (
         FlextQualityClaudeContextClient,
-    )
-
-    claude_mem = _flext_quality_integrations_claude_mem
-    import flext_quality.integrations.code_execution as _flext_quality_integrations_code_execution
-    from flext_quality.integrations.claude_mem import (
         FlextQualityClaudeMemClient,
-        McpToolCall,
-    )
-
-    code_execution = _flext_quality_integrations_code_execution
-    import flext_quality.integrations.mcp_client as _flext_quality_integrations_mcp_client
-    from flext_quality.integrations.code_execution import (
         FlextQualityCodeExecutionBridge,
+        FlextQualityMcpClient,
+        McpToolCall,
+        build_mcp_health_result,
+        claude_context,
+        claude_mem,
+        code_execution,
+        mcp_client,
     )
-
-    mcp_client = _flext_quality_integrations_mcp_client
-    import flext_quality.mcp.resources as _flext_quality_mcp_resources
-    from flext_quality.integrations.mcp_client import FlextQualityMcpClient
-
-    resources = _flext_quality_mcp_resources
-    import flext_quality.mcp.server as _flext_quality_mcp_server
-    from flext_quality.mcp.resources import (
+    from flext_quality.mcp import (
+        execute_hook,
         get_hooks_config,
         get_integrations_status,
         get_rules_config,
-    )
-
-    server = _flext_quality_mcp_server
-    import flext_quality.models as _flext_quality_models
-    from flext_quality.mcp.server import get_server, mcp
-    from flext_quality.mcp.tools import (
-        execute_hook,
+        get_server,
+        mcp,
+        resources,
         search_code,
         search_memory,
+        server,
         validate_rules,
     )
 
@@ -191,26 +134,19 @@ if _t.TYPE_CHECKING:
     )
 
     rules = _flext_quality_rules
-    import flext_quality.rules.engine as _flext_quality_rules_engine
-
-    engine = _flext_quality_rules_engine
-    import flext_quality.rules.loader as _flext_quality_rules_loader
-    from flext_quality.rules.engine import FlextQualityRulesEngine
-
-    loader = _flext_quality_rules_loader
-    import flext_quality.rules.validators as _flext_quality_rules_validators
-    from flext_quality.rules.loader import FlextQualityRulesLoader
-
-    validators = _flext_quality_rules_validators
     import flext_quality.services as _flext_quality_services
-    from flext_quality.rules.validators import FlextQualityValidators
+    from flext_quality.rules import (
+        FlextQualityRulesEngine,
+        FlextQualityRulesLoader,
+        FlextQualityValidators,
+        engine,
+        loader,
+        validators,
+    )
 
     services = _flext_quality_services
-    import flext_quality.services.cli as _flext_quality_services_cli
-
-    cli = _flext_quality_services_cli
     import flext_quality.settings as _flext_quality_settings
-    from flext_quality.services.cli import FlextQualityCliService, main
+    from flext_quality.services import FlextQualityCliService, cli, main
 
     settings = _flext_quality_settings
     import flext_quality.typings as _flext_quality_typings
