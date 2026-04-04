@@ -11,16 +11,16 @@ from __future__ import annotations
 
 from typing import final
 
-from flext_core import r
 from flext_quality import (
     FlextQualityMcpClient,
-    FlextQualityModels as _QualityModels,
     build_mcp_health_result,
     c,
+    m,
+    r,
     t,
 )
 
-McpToolCall = _QualityModels.Quality.McpToolCall
+McpToolCall = m.Quality.McpToolCall
 
 
 @final
