@@ -17,7 +17,8 @@ from .typings import t
 class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
     """Namespace for flext-quality protocols."""
 
-    class Quality:
+    @runtime_checkable
+    class Quality(Protocol):
         """Quality-specific protocols namespace."""
 
         @runtime_checkable
