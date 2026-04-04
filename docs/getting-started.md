@@ -205,7 +205,7 @@ direct_analysis()
 ```bash
 
 # Comprehensive project analysis
-flext-quality analyze --project ./src --format html --output quality-report.html
+flext-quality analyze --projects ./src --format html --output quality-report.html
 
 # Quality gate validation with thresholds
 flext-quality validate --thresholds quality-config.toml
@@ -214,10 +214,10 @@ flext-quality validate --thresholds quality-config.toml
 flext-quality workspace-analyze --parallel --security-scan
 
 # Quality metrics collection
-flext-quality metrics --project ./src --export json
+flext-quality metrics --projects ./src --export json
 
 # Code fixing automation (absorbing gradual_lint_fixer.py)
-flext-quality fix --project ./src --auto-approve --backup
+flext-quality fix --projects ./src --auto-approve --backup
 ```
 
 ### **Enterprise Dashboard** (PLANNED - FLEXT-WEB)
