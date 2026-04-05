@@ -16,18 +16,29 @@ from pydantic import Field
 from pydantic_settings import SettingsConfigDict
 
 from flext_core import FlextSettings, r
+from flext_quality import c
 
 
+@FlextSettings.auto_register("quality")
 class FlextQualitySettings(FlextSettings):
     """Runtime configuration for flext-quality services."""
 
-    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(extra="ignore")
+    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
+        env_prefix="FLEXT_QUALITY_",
+        extra="ignore",
+    )
 
-    hook_timeout_ms: Annotated[int, Field(default=5000, ge=100, le=60000)]
-    rule_timeout_seconds: Annotated[int, Field(default=30, ge=1, le=3600)]
+    hook_timeout_ms: Annotated[
+        int, Field(default=c.Quality.Defaults.HOOK_TIMEOUT_MS, ge=100, le=60000)
+    ]
+    rule_timeout_seconds: Annotated[
+        int, Field(default=c.Quality.Defaults.RULE_TIMEOUT_SECONDS, ge=1, le=3600)
+    ]
     cache_enabled: Annotated[bool, Field(default=True)]
-    mcp_server_port: Annotated[int, Field(default=8765, ge=1, le=65535)]
-    rules_dir: Annotated[str, Field(default="rules")]
+    mcp_server_port: Annotated[
+        int, Field(default=c.Quality.Mcp.DEFAULT_PORT, ge=1, le=65535)
+    ]
+    rules_dir: Annotated[str, Field(default=c.Quality.Paths.RULES_DIR)]
     max_function_length: Annotated[int, Field(default=50)]
     max_class_length: Annotated[int, Field(default=200)]
 
