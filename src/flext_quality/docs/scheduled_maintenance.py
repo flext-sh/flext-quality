@@ -20,10 +20,9 @@ from typing import TypeIs
 import pytest
 import schedule
 import structlog
-from flext_cli import FlextCliUtilities
 from git import InvalidGitRepositoryError, Repo
 
-from flext_quality import m, t
+from flext_quality import m, t, u
 
 logger = structlog.get_logger(__name__)
 
@@ -122,7 +121,7 @@ class FlextQualityScheduledMaintenance:
             else _docs_config_file("schedule_config.yaml")
         )
         try:
-            loaded_untyped = FlextCliUtilities.Cli.yaml_load_mapping(
+            loaded_untyped = u.Cli.yaml_load_mapping(
                 resolved_config_path,
             )
             if _is_str_mapping(loaded_untyped) and loaded_untyped:

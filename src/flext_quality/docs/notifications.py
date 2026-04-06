@@ -17,10 +17,9 @@ from email.mime.text import MIMEText
 from pathlib import Path
 
 import requests
-from flext_cli import FlextCliUtilities
 from pydantic import BaseModel, Field
 
-from flext_quality import m, t
+from flext_quality import m, t, u
 
 # Constants
 MAX_BROKEN_LINKS_TO_SHOW = 10
@@ -99,7 +98,7 @@ class FlextQualityDocumentationNotifier:
     def load_config(self, config_path: str) -> None:
         """Load notification configuration."""
         try:
-            loaded = FlextCliUtilities.Cli.yaml_load_mapping(Path(config_path))
+            loaded = u.Cli.yaml_load_mapping(Path(config_path))
             if loaded:
                 self.config = self._load_user_config({})
             else:

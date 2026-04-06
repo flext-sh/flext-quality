@@ -9,9 +9,7 @@ from __future__ import annotations
 from collections.abc import Mapping, MutableMapping, Sequence
 from pathlib import Path
 
-from flext_cli import FlextCliUtilities
-
-from flext_quality import t
+from flext_quality import t, u
 
 type ConfigPrimitive = t.Primitives
 type ConfigValue = t.Primitives | t.StrSequence
@@ -207,7 +205,7 @@ class FlextQualityConfigManager:
         config_path = self.config_dir / filename
 
         try:
-            raw = FlextCliUtilities.Cli.yaml_load_mapping(config_path)
+            raw = u.Cli.yaml_load_mapping(config_path)
             return (
                 self._as_config_data(raw) if raw else self._get_default_config(filename)
             )
@@ -348,7 +346,7 @@ class FlextQualityConfigManager:
             config_path = self.config_dir / f"{name}.yaml"
             self.config_dir.mkdir(parents=True, exist_ok=True)
 
-            result = FlextCliUtilities.Cli.yaml_dump(config_path, data)
+            result = u.Cli.yaml_dump(config_path, data)
             if result.is_failure:
                 return False
 

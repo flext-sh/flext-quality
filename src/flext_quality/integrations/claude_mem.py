@@ -21,8 +21,6 @@ from flext_quality import (
     t,
 )
 
-McpToolCall = m.Quality.McpToolCall
-
 
 @final
 class FlextQualityClaudeMemClient:
@@ -38,7 +36,9 @@ class FlextQualityClaudeMemClient:
         """Initialize the Claude Mem client."""
         self._mcp = FlextQualityMcpClient(timeout_ms=timeout_ms)
 
-    def build_get_observations_call(self, ids: Sequence[int]) -> r[McpToolCall]:
+    def build_get_observations_call(
+        self, ids: Sequence[int]
+    ) -> r[m.Quality.McpToolCall]:
         """Build a get_observations tool call."""
         normalized_ids: t.ContainerList = list(ids)
         params: t.ContainerMapping = {"ids": normalized_ids}
@@ -49,7 +49,7 @@ class FlextQualityClaudeMemClient:
         query: str,
         *,
         limit: int | None = None,
-    ) -> r[McpToolCall]:
+    ) -> r[m.Quality.McpToolCall]:
         """Build a search tool call."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
         params: t.ContainerMapping = {
@@ -64,7 +64,7 @@ class FlextQualityClaudeMemClient:
         *,
         depth_before: int | None = None,
         depth_after: int | None = None,
-    ) -> r[McpToolCall]:
+    ) -> r[m.Quality.McpToolCall]:
         """Build a timeline tool call."""
         before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH

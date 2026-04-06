@@ -19,10 +19,9 @@ from collections.abc import MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
-from flext_cli import FlextCliUtilities
 from pydantic import ValidationError
 
-from flext_quality import m, t
+from flext_quality import m, t, u
 
 MIN_HEADINGS_FOR_TOC = 5
 
@@ -349,7 +348,7 @@ class FlextQualityDocumentationOptimizer:
                 try:
                     frontmatter_lines = lines[1 : end_idx - 1]
                     frontmatter_content = "\n".join(frontmatter_lines)
-                    parsed_fm = FlextCliUtilities.Cli.yaml_parse(
+                    parsed_fm = u.Cli.yaml_parse(
                         frontmatter_content,
                     ).unwrap_or({})
                     metadata: t.MutableContainerValueMapping = {
@@ -358,7 +357,7 @@ class FlextQualityDocumentationOptimizer:
                         if isinstance(v, (str, int, float, bool))
                     }
                     metadata["updated"] = datetime.now(UTC).strftime("%Y-%m-%d")
-                    new_frontmatter = FlextCliUtilities.Cli.yaml_dump_str(
+                    new_frontmatter = u.Cli.yaml_dump_str(
                         metadata,
                     ).strip()
                     new_frontmatter_lines = (

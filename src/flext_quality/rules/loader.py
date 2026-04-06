@@ -5,10 +5,8 @@ from __future__ import annotations
 from collections.abc import MutableSequence, Sequence
 from pathlib import Path
 
-from flext_cli import u
-
 from flext_core import r
-from flext_quality import c, m, t
+from flext_quality import c, m, t, u
 
 
 class FlextQualityRulesLoader:

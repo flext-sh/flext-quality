@@ -19,10 +19,9 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import requests
-from flext_cli import FlextCliUtilities
 from pydantic import ValidationError
 
-from flext_quality import m, t
+from flext_quality import m, t, u
 
 
 class FlextQualityDocumentationAuditor:
@@ -50,7 +49,7 @@ class FlextQualityDocumentationAuditor:
     def load_config(self) -> None:
         """Load audit configuration files."""
         try:
-            audit_data = FlextCliUtilities.Cli.yaml_load_mapping(
+            audit_data = u.Cli.yaml_load_mapping(
                 self.config_path / "audit_rules.yaml",
             )
             if audit_data:
@@ -61,7 +60,7 @@ class FlextQualityDocumentationAuditor:
             self.audit_rules = self.get_default_audit_rules()
 
         try:
-            style_data = FlextCliUtilities.Cli.yaml_load_mapping(
+            style_data = u.Cli.yaml_load_mapping(
                 self.config_path / "style_guide.yaml",
             )
             if style_data:
@@ -72,7 +71,7 @@ class FlextQualityDocumentationAuditor:
             self.style_guide = self.get_default_style_guide()
 
         try:
-            validation_data = FlextCliUtilities.Cli.yaml_load_mapping(
+            validation_data = u.Cli.yaml_load_mapping(
                 self.config_path / "validation_config.yaml",
             )
             if validation_data:

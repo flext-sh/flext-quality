@@ -14,10 +14,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import ClassVar
 
-from flext_cli import FlextCliUtilities
 from pydantic import BaseModel, TypeAdapter
 
-from flext_quality import t
+from flext_quality import t, u
 
 
 class FlextQualityContentAnalyzer:
@@ -176,7 +175,7 @@ class FlextQualityContentAnalyzer:
             self.config = default_config
             return
         try:
-            loaded = FlextCliUtilities.Cli.yaml_load_mapping(Path(config_path))
+            loaded = u.Cli.yaml_load_mapping(Path(config_path))
             if loaded:
                 self.config = {
                     k: v for k, v in loaded.items() if isinstance(v, (dict, str))

@@ -40,7 +40,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
         def load_yaml_rules(path: Path) -> r[Sequence[t.ContainerMapping]]:
             """Load rules from YAML file."""
             try:
-                yaml_result = FlextCliUtilities.Cli.yaml_safe_load(path)
+                yaml_result = FlextQualityUtilities.Cli.yaml_safe_load(path)
                 if yaml_result.is_failure:
                     return r[Sequence[t.ContainerMapping]].fail(
                         f"Failed to load YAML: {yaml_result.error}",

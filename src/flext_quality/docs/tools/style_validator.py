@@ -16,7 +16,7 @@ from typing import ClassVar
 
 from pydantic import BaseModel, TypeAdapter
 
-from flext_quality import t
+from flext_quality import t, u
 
 
 class FlextQualityStyleValidator:
@@ -153,7 +153,7 @@ class FlextQualityStyleValidator:
             )
             return
         try:
-            loaded_obj = FlextCliUtilities.Cli.yaml_load_mapping(Path(config_path))
+            loaded_obj = u.Cli.yaml_load_mapping(Path(config_path))
             if loaded_obj:
                 self.config = self._normalize_config(loaded_obj)
             else:

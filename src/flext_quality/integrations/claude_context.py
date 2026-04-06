@@ -20,8 +20,6 @@ from flext_quality import (
     t,
 )
 
-McpToolCall = m.Quality.McpToolCall
-
 
 @final
 class FlextQualityClaudeContextClient:
@@ -37,7 +35,7 @@ class FlextQualityClaudeContextClient:
         """Initialize the Claude Context client."""
         self._mcp = FlextQualityMcpClient(timeout_ms=timeout_ms)
 
-    def build_index_call(self, path: str | None = None) -> r[McpToolCall]:
+    def build_index_call(self, path: str | None = None) -> r[m.Quality.McpToolCall]:
         """Build an index_codebase tool call."""
         params: t.MutableContainerMapping = {}
         if path:
@@ -49,7 +47,7 @@ class FlextQualityClaudeContextClient:
         query: str,
         *,
         limit: int | None = None,
-    ) -> r[McpToolCall]:
+    ) -> r[m.Quality.McpToolCall]:
         """Build a search_code tool call."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_SEARCH_LIMIT
         return self._mcp.build_tool_call(
@@ -58,7 +56,7 @@ class FlextQualityClaudeContextClient:
             {"query": query, "limit": search_limit},
         )
 
-    def build_status_call(self) -> r[McpToolCall]:
+    def build_status_call(self) -> r[m.Quality.McpToolCall]:
         """Build a get_indexing_status tool call."""
         return self._mcp.build_tool_call(self.SERVER_NAME, "get_indexing_status", {})
 
