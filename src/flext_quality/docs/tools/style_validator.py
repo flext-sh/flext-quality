@@ -14,7 +14,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import ClassVar
 
-from flext_cli import FlextCliUtilities
 from pydantic import BaseModel, TypeAdapter
 
 from flext_quality import t

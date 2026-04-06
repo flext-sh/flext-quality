@@ -7,7 +7,6 @@ from collections.abc import Sequence
 from pathlib import Path
 
 from flext_cli import FlextCliUtilities
-from flext_infra import FlextInfraUtilitiesSubprocess
 from flext_web import FlextWebUtilities
 
 from flext_core import r
@@ -105,10 +104,7 @@ class FlextQualityUtilities(FlextWebUtilities, FlextCliUtilities):
         ) -> r[str]:
             """Run a shell command with timeout."""
             timeout_secs = int(timeout_ms / c.Quality.Defaults.MS_TO_SECONDS_DIVISOR)
-            cmd_result = FlextInfraUtilitiesSubprocess.run_raw(
-                list(cmd),
-                timeout=timeout_secs,
-            )
+            cmd_result = u.Cli.run_raw(list(cmd), timeout=timeout_secs)
             if cmd_result.is_failure:
                 return r[str].fail(str(cmd_result.error))
             out = cmd_result.value
