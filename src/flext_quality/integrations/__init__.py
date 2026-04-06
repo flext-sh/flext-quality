@@ -24,10 +24,7 @@ if _t.TYPE_CHECKING:
 
     claude_mem = _flext_quality_integrations_claude_mem
     import flext_quality.integrations.code_execution as _flext_quality_integrations_code_execution
-    from flext_quality.integrations.claude_mem import (
-        FlextQualityClaudeMemClient,
-        McpToolCall,
-    )
+    from flext_quality.integrations.claude_mem import FlextQualityClaudeMemClient
 
     code_execution = _flext_quality_integrations_code_execution
     import flext_quality.integrations.mcp_client as _flext_quality_integrations_mcp_client
@@ -65,7 +62,6 @@ _LAZY_IMPORTS = {
         "flext_quality.integrations.mcp_client",
         "FlextQualityMcpClient",
     ),
-    "McpToolCall": ("flext_quality.integrations.claude_mem", "McpToolCall"),
     "_health": "flext_quality.integrations._health",
     "build_mcp_health_result": (
         "flext_quality.integrations._health",
@@ -93,7 +89,6 @@ __all__ = [
     "FlextQualityClaudeMemClient",
     "FlextQualityCodeExecutionBridge",
     "FlextQualityMcpClient",
-    "McpToolCall",
     "_health",
     "build_mcp_health_result",
     "c",
