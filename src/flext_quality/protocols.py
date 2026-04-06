@@ -6,7 +6,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import ClassVar, Protocol, runtime_checkable
 
-from flext_cli import FlextCliProtocols
+from flext_cli import p as _cli_p
 from flext_web import FlextWebProtocols
 
 from flext_core import r
@@ -14,7 +14,7 @@ from flext_core import r
 from .typings import t
 
 
-class FlextQualityProtocols(FlextWebProtocols, FlextCliProtocols):
+class FlextQualityProtocols(FlextWebProtocols, _cli_p):
     """Namespace for flext-quality protocols."""
 
     @runtime_checkable

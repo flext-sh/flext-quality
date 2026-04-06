@@ -4,14 +4,14 @@ from __future__ import annotations
 
 from collections.abc import Mapping, MutableSequence, Sequence
 
-from flext_cli import FlextCliTypes
+from flext_cli import t as _cli_t
 from flext_web import FlextWebTypes
 from pydantic import ConfigDict, TypeAdapter
 
 from flext_core import FlextTypes
 
 
-class FlextQualityTypes(FlextWebTypes, FlextCliTypes):
+class FlextQualityTypes(FlextWebTypes, _cli_t):
     """Namespace for flext-quality type definitions."""
 
     CONTAINER_MAPPING_ADAPTER: TypeAdapter[FlextTypes.ContainerMapping] = TypeAdapter(

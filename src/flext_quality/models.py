@@ -10,14 +10,14 @@ from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
 from typing import Annotated
 
-from flext_cli import FlextCliModels
+from flext_cli import m as _cli_m
 from flext_web import FlextWebModels
 from pydantic import BaseModel, Field
 
 from flext_quality import c, t
 
 
-class FlextQualityModels(FlextWebModels, FlextCliModels):
+class FlextQualityModels(FlextWebModels, _cli_m):
     """Namespace for flext-quality models."""
 
     class Quality:
