@@ -45,11 +45,26 @@ if _t.TYPE_CHECKING:
         validate_files_style,
     )
 _LAZY_IMPORTS = {
-    "FlextQualityContentAnalyzer": "flext_quality.docs.tools.content_analyzer",
-    "FlextQualityLinkChecker": "flext_quality.docs.tools.link_checker",
-    "FlextQualityStyleValidator": "flext_quality.docs.tools.style_validator",
-    "analyze_file_content": "flext_quality.docs.tools.content_analyzer",
-    "analyze_files_content": "flext_quality.docs.tools.content_analyzer",
+    "FlextQualityContentAnalyzer": (
+        "flext_quality.docs.tools.content_analyzer",
+        "FlextQualityContentAnalyzer",
+    ),
+    "FlextQualityLinkChecker": (
+        "flext_quality.docs.tools.link_checker",
+        "FlextQualityLinkChecker",
+    ),
+    "FlextQualityStyleValidator": (
+        "flext_quality.docs.tools.style_validator",
+        "FlextQualityStyleValidator",
+    ),
+    "analyze_file_content": (
+        "flext_quality.docs.tools.content_analyzer",
+        "analyze_file_content",
+    ),
+    "analyze_files_content": (
+        "flext_quality.docs.tools.content_analyzer",
+        "analyze_files_content",
+    ),
     "c": ("flext_core.constants", "FlextConstants"),
     "content_analyzer": "flext_quality.docs.tools.content_analyzer",
     "d": ("flext_core.decorators", "FlextDecorators"),
@@ -63,9 +78,18 @@ _LAZY_IMPORTS = {
     "style_validator": "flext_quality.docs.tools.style_validator",
     "t": ("flext_core.typings", "FlextTypes"),
     "u": ("flext_core.utilities", "FlextUtilities"),
-    "validate_file_style": "flext_quality.docs.tools.style_validator",
-    "validate_files_style": "flext_quality.docs.tools.style_validator",
-    "validate_links_sync": "flext_quality.docs.tools.link_checker",
+    "validate_file_style": (
+        "flext_quality.docs.tools.style_validator",
+        "validate_file_style",
+    ),
+    "validate_files_style": (
+        "flext_quality.docs.tools.style_validator",
+        "validate_files_style",
+    ),
+    "validate_links_sync": (
+        "flext_quality.docs.tools.link_checker",
+        "validate_links_sync",
+    ),
     "x": ("flext_core.mixins", "FlextMixins"),
 }
 

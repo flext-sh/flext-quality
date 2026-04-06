@@ -30,8 +30,11 @@ if _t.TYPE_CHECKING:
     from flext_core.utilities import FlextUtilities as u
     from flext_quality.hooks.manager import FlextQualityHookManager
 _LAZY_IMPORTS = {
-    "FlextQualityBaseHook": "flext_quality.hooks.base",
-    "FlextQualityHookManager": "flext_quality.hooks.manager",
+    "FlextQualityBaseHook": ("flext_quality.hooks.base", "FlextQualityBaseHook"),
+    "FlextQualityHookManager": (
+        "flext_quality.hooks.manager",
+        "FlextQualityHookManager",
+    ),
     "base": "flext_quality.hooks.base",
     "c": ("flext_core.constants", "FlextConstants"),
     "d": ("flext_core.decorators", "FlextDecorators"),

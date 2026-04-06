@@ -47,16 +47,46 @@ if _t.TYPE_CHECKING:
         FlextQualityFileStatistics,
     )
 _LAZY_IMPORTS = {
-    "FlextQualityAuditRules": "flext_quality.docs.core.config_manager",
-    "FlextQualityBaseAnalyzer": "flext_quality.docs.core.base_classes",
-    "FlextQualityBaseAuditor": "flext_quality.docs.core.base_classes",
-    "FlextQualityBaseReporter": "flext_quality.docs.core.base_classes",
-    "FlextQualityBaseValidator": "flext_quality.docs.core.base_classes",
-    "FlextQualityConfigManager": "flext_quality.docs.core.config_manager",
-    "FlextQualityDocumentationFinder": "flext_quality.docs.core.file_discovery",
-    "FlextQualityFileStatistics": "flext_quality.docs.core.file_discovery",
-    "FlextQualityStyleGuide": "flext_quality.docs.core.config_manager",
-    "FlextQualityValidationConfig": "flext_quality.docs.core.config_manager",
+    "FlextQualityAuditRules": (
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityAuditRules",
+    ),
+    "FlextQualityBaseAnalyzer": (
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseAnalyzer",
+    ),
+    "FlextQualityBaseAuditor": (
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseAuditor",
+    ),
+    "FlextQualityBaseReporter": (
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseReporter",
+    ),
+    "FlextQualityBaseValidator": (
+        "flext_quality.docs.core.base_classes",
+        "FlextQualityBaseValidator",
+    ),
+    "FlextQualityConfigManager": (
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityConfigManager",
+    ),
+    "FlextQualityDocumentationFinder": (
+        "flext_quality.docs.core.file_discovery",
+        "FlextQualityDocumentationFinder",
+    ),
+    "FlextQualityFileStatistics": (
+        "flext_quality.docs.core.file_discovery",
+        "FlextQualityFileStatistics",
+    ),
+    "FlextQualityStyleGuide": (
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityStyleGuide",
+    ),
+    "FlextQualityValidationConfig": (
+        "flext_quality.docs.core.config_manager",
+        "FlextQualityValidationConfig",
+    ),
     "base_classes": "flext_quality.docs.core.base_classes",
     "c": ("flext_core.constants", "FlextConstants"),
     "config_manager": "flext_quality.docs.core.config_manager",

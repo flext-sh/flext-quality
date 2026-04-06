@@ -34,9 +34,18 @@ if _t.TYPE_CHECKING:
     from flext_core.utilities import FlextUtilities as u
     from flext_quality.rules.validators import FlextQualityValidators
 _LAZY_IMPORTS = {
-    "FlextQualityRulesEngine": "flext_quality.rules.engine",
-    "FlextQualityRulesLoader": "flext_quality.rules.loader",
-    "FlextQualityValidators": "flext_quality.rules.validators",
+    "FlextQualityRulesEngine": (
+        "flext_quality.rules.engine",
+        "FlextQualityRulesEngine",
+    ),
+    "FlextQualityRulesLoader": (
+        "flext_quality.rules.loader",
+        "FlextQualityRulesLoader",
+    ),
+    "FlextQualityValidators": (
+        "flext_quality.rules.validators",
+        "FlextQualityValidators",
+    ),
     "c": ("flext_core.constants", "FlextConstants"),
     "d": ("flext_core.decorators", "FlextDecorators"),
     "e": ("flext_core.exceptions", "FlextExceptions"),

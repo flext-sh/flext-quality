@@ -26,14 +26,14 @@ if _t.TYPE_CHECKING:
     from flext_core.utilities import FlextUtilities as u
     from flext_quality.services.cli import FlextQualityCliService, main
 _LAZY_IMPORTS = {
-    "FlextQualityCliService": "flext_quality.services.cli",
+    "FlextQualityCliService": ("flext_quality.services.cli", "FlextQualityCliService"),
     "c": ("flext_core.constants", "FlextConstants"),
     "cli": "flext_quality.services.cli",
     "d": ("flext_core.decorators", "FlextDecorators"),
     "e": ("flext_core.exceptions", "FlextExceptions"),
     "h": ("flext_core.handlers", "FlextHandlers"),
     "m": ("flext_core.models", "FlextModels"),
-    "main": "flext_quality.services.cli",
+    "main": ("flext_quality.services.cli", "main"),
     "p": ("flext_core.protocols", "FlextProtocols"),
     "r": ("flext_core.result", "FlextResult"),
     "s": ("flext_core.service", "FlextService"),

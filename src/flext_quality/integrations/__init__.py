@@ -49,13 +49,28 @@ if _t.TYPE_CHECKING:
     from flext_core.utilities import FlextUtilities as u
     from flext_quality.integrations.mcp_client import FlextQualityMcpClient
 _LAZY_IMPORTS = {
-    "FlextQualityClaudeContextClient": "flext_quality.integrations.claude_context",
-    "FlextQualityClaudeMemClient": "flext_quality.integrations.claude_mem",
-    "FlextQualityCodeExecutionBridge": "flext_quality.integrations.code_execution",
-    "FlextQualityMcpClient": "flext_quality.integrations.mcp_client",
-    "McpToolCall": "flext_quality.integrations.claude_mem",
+    "FlextQualityClaudeContextClient": (
+        "flext_quality.integrations.claude_context",
+        "FlextQualityClaudeContextClient",
+    ),
+    "FlextQualityClaudeMemClient": (
+        "flext_quality.integrations.claude_mem",
+        "FlextQualityClaudeMemClient",
+    ),
+    "FlextQualityCodeExecutionBridge": (
+        "flext_quality.integrations.code_execution",
+        "FlextQualityCodeExecutionBridge",
+    ),
+    "FlextQualityMcpClient": (
+        "flext_quality.integrations.mcp_client",
+        "FlextQualityMcpClient",
+    ),
+    "McpToolCall": ("flext_quality.integrations.claude_mem", "McpToolCall"),
     "_health": "flext_quality.integrations._health",
-    "build_mcp_health_result": "flext_quality.integrations._health",
+    "build_mcp_health_result": (
+        "flext_quality.integrations._health",
+        "build_mcp_health_result",
+    ),
     "c": ("flext_core.constants", "FlextConstants"),
     "claude_context": "flext_quality.integrations.claude_context",
     "claude_mem": "flext_quality.integrations.claude_mem",
