@@ -8,9 +8,9 @@ from flext_quality import (
     FlextQualityHookManager,
     FlextQualityRulesEngine,
     c,
+    mcp,
     t,
 )
-from flext_quality.mcp.server import mcp
 
 
 @mcp.tool()
