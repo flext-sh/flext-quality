@@ -3,7 +3,11 @@
 
 from __future__ import annotations
 
-from flext_core.lazy import install_lazy_exports, merge_lazy_imports
+from flext_core.lazy import (
+    build_lazy_import_map,
+    install_lazy_exports,
+    merge_lazy_imports,
+)
 
 _LAZY_IMPORTS = merge_lazy_imports(
     (
@@ -11,12 +15,16 @@ _LAZY_IMPORTS = merge_lazy_imports(
         ".scripts",
         ".tools",
     ),
-    {
-        "FlextQualityDocumentationDashboard": ".dashboard",
-        "FlextQualityDocumentationNotifier": ".notifications",
-        "FlextQualityScheduledMaintenance": ".scheduled_maintenance",
-        "MAX_BROKEN_LINKS_TO_SHOW": ".notifications",
-    },
+    build_lazy_import_map(
+        {
+            ".dashboard": ("FlextQualityDocumentationDashboard",),
+            ".notifications": (
+                "FlextQualityDocumentationNotifier",
+                "MAX_BROKEN_LINKS_TO_SHOW",
+            ),
+            ".scheduled_maintenance": ("FlextQualityScheduledMaintenance",),
+        },
+    ),
     exclude_names=(
         "cleanup_submodule_namespace",
         "install_lazy_exports",

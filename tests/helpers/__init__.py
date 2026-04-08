@@ -3,18 +3,28 @@
 
 from __future__ import annotations
 
-from flext_core.lazy import install_lazy_exports
+from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
-_LAZY_IMPORTS = {
-    "TestsConstants": ".constants",
-    "TestsModels": ".models",
-    "TestsProtocols": ".protocols",
-    "TestsTypings": ".typings",
-    "c": ".constants",
-    "m": ".models",
-    "p": ".protocols",
-    "t": ".typings",
-}
+_LAZY_IMPORTS = build_lazy_import_map(
+    {
+        ".constants": (
+            "TestsConstants",
+            "c",
+        ),
+        ".models": (
+            "TestsModels",
+            "m",
+        ),
+        ".protocols": (
+            "TestsProtocols",
+            "p",
+        ),
+        ".typings": (
+            "TestsTypings",
+            "t",
+        ),
+    },
+)
 
 
 install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)
