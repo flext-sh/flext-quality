@@ -10,120 +10,108 @@ import typing as _t
 from flext_core.lazy import install_lazy_exports, merge_lazy_imports
 
 if _t.TYPE_CHECKING:
-    import flext_quality.api as _flext_quality_api
-
-    api = _flext_quality_api
-    import flext_quality.constants as _flext_quality_constants
-    from flext_quality.api import FlextQuality
-
-    constants = _flext_quality_constants
-    import flext_quality.docs as _flext_quality_docs
-    from flext_quality.constants import (
-        FlextQualityConstants,
-        FlextQualityConstants as c,
-    )
-
-    docs = _flext_quality_docs
-    import flext_quality.hooks as _flext_quality_hooks
-    from flext_quality.docs import (
-        FlextQualityDocumentationDashboard,
-        FlextQualityDocumentationNotifier,
-        FlextQualityScheduledMaintenance,
-    )
-    from flext_quality.docs.core import (
-        FlextQualityAuditRules,
-        FlextQualityBaseAnalyzer,
-        FlextQualityBaseAuditor,
-        FlextQualityBaseReporter,
-        FlextQualityBaseValidator,
-        FlextQualityConfigManager,
-        FlextQualityDocumentationFinder,
-        FlextQualityFileStatistics,
-        FlextQualityStyleGuide,
-        FlextQualityValidationConfig,
-    )
-    from flext_quality.docs.scripts import (
-        FlextQualityContentValidator,
-        FlextQualityDocumentationAuditor,
-        FlextQualityDocumentationOptimizer,
-        FlextQualityDocumentationReporter,
-        FlextQualityLinkValidator,
-    )
-    from flext_quality.docs.tools import (
-        FlextQualityContentAnalyzer,
-        FlextQualityLinkChecker,
-        FlextQualityStyleValidator,
-        analyze_file_content,
-        analyze_files_content,
-        validate_file_style,
-        validate_files_style,
-        validate_links_sync,
-    )
-
-    hooks = _flext_quality_hooks
-    import flext_quality.integrations as _flext_quality_integrations
-    from flext_quality.hooks import FlextQualityBaseHook, FlextQualityHookManager
-
-    integrations = _flext_quality_integrations
-    import flext_quality.mcp as _flext_quality_mcp
-    from flext_quality.integrations import (
-        FlextQualityClaudeContextClient,
-        FlextQualityClaudeMemClient,
-        FlextQualityCodeExecutionBridge,
-        FlextQualityMcpClient,
-    )
-
-    mcp = _flext_quality_mcp
-    import flext_quality.models as _flext_quality_models
-    from flext_quality.mcp import (
-        execute_hook,
-        get_hooks_config,
-        get_integrations_status,
-        get_rules_config,
-        get_server,
-        search_code,
-        search_memory,
-        validate_rules,
-    )
-
-    models = _flext_quality_models
-    import flext_quality.protocols as _flext_quality_protocols
-    from flext_quality.models import FlextQualityModels, FlextQualityModels as m
-
-    protocols = _flext_quality_protocols
-    import flext_quality.rules as _flext_quality_rules
-    from flext_quality.protocols import (
-        FlextQualityProtocols,
-        FlextQualityProtocols as p,
-    )
-
-    rules = _flext_quality_rules
-    import flext_quality.services as _flext_quality_services
-    from flext_quality.rules import (
-        FlextQualityRulesEngine,
-        FlextQualityRulesLoader,
-        FlextQualityValidators,
-    )
-
-    services = _flext_quality_services
-    import flext_quality.settings as _flext_quality_settings
-    from flext_quality.services import FlextQualityCliService
-
-    settings = _flext_quality_settings
-    import flext_quality.typings as _flext_quality_typings
-    from flext_quality.settings import FlextQualitySettings
-
-    typings = _flext_quality_typings
-    import flext_quality.utilities as _flext_quality_utilities
-    from flext_quality.typings import FlextQualityTypes, FlextQualityTypes as t
-
-    utilities = _flext_quality_utilities
     from flext_core.decorators import FlextDecorators as d
     from flext_core.exceptions import FlextExceptions as e
     from flext_core.handlers import FlextHandlers as h
     from flext_core.mixins import FlextMixins as x
     from flext_core.result import FlextResult as r
     from flext_core.service import FlextService as s
+    from flext_quality import (
+        api,
+        constants,
+        docs,
+        hooks,
+        integrations,
+        mcp,
+        models,
+        protocols,
+        rules,
+        services,
+        settings,
+        typings,
+        utilities,
+    )
+    from flext_quality.api import FlextQuality
+    from flext_quality.constants import (
+        FlextQualityConstants,
+        FlextQualityConstants as c,
+    )
+    from flext_quality.docs.core.base_classes import (
+        FlextQualityBaseAnalyzer,
+        FlextQualityBaseAuditor,
+        FlextQualityBaseReporter,
+        FlextQualityBaseValidator,
+    )
+    from flext_quality.docs.core.config_manager import (
+        FlextQualityAuditRules,
+        FlextQualityConfigManager,
+        FlextQualityStyleGuide,
+        FlextQualityValidationConfig,
+    )
+    from flext_quality.docs.core.file_discovery import (
+        FlextQualityDocumentationFinder,
+        FlextQualityFileStatistics,
+    )
+    from flext_quality.docs.dashboard import FlextQualityDocumentationDashboard
+    from flext_quality.docs.notifications import FlextQualityDocumentationNotifier
+    from flext_quality.docs.scheduled_maintenance import (
+        FlextQualityScheduledMaintenance,
+    )
+    from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
+    from flext_quality.docs.scripts.optimize import FlextQualityDocumentationOptimizer
+    from flext_quality.docs.scripts.report import FlextQualityDocumentationReporter
+    from flext_quality.docs.scripts.validate import (
+        FlextQualityContentValidator,
+        FlextQualityLinkValidator,
+    )
+    from flext_quality.docs.tools.content_analyzer import (
+        FlextQualityContentAnalyzer,
+        analyze_file_content,
+        analyze_files_content,
+    )
+    from flext_quality.docs.tools.link_checker import (
+        FlextQualityLinkChecker,
+        validate_links_sync,
+    )
+    from flext_quality.docs.tools.style_validator import (
+        FlextQualityStyleValidator,
+        validate_file_style,
+        validate_files_style,
+    )
+    from flext_quality.hooks.base import FlextQualityBaseHook
+    from flext_quality.hooks.manager import FlextQualityHookManager
+    from flext_quality.integrations._health import build_mcp_health_result
+    from flext_quality.integrations.claude_context import (
+        FlextQualityClaudeContextClient,
+    )
+    from flext_quality.integrations.claude_mem import FlextQualityClaudeMemClient
+    from flext_quality.integrations.code_execution import (
+        FlextQualityCodeExecutionBridge,
+    )
+    from flext_quality.integrations.mcp_client import FlextQualityMcpClient
+    from flext_quality.mcp.resources import (
+        get_hooks_config,
+        get_integrations_status,
+        get_rules_config,
+    )
+    from flext_quality.mcp.server import get_server
+    from flext_quality.mcp.tools import (
+        execute_hook,
+        search_code,
+        search_memory,
+        validate_rules,
+    )
+    from flext_quality.models import FlextQualityModels, FlextQualityModels as m
+    from flext_quality.protocols import (
+        FlextQualityProtocols,
+        FlextQualityProtocols as p,
+    )
+    from flext_quality.rules.engine import FlextQualityRulesEngine
+    from flext_quality.rules.loader import FlextQualityRulesLoader
+    from flext_quality.rules.validators import FlextQualityValidators
+    from flext_quality.services.cli import FlextQualityCliService
+    from flext_quality.settings import FlextQualitySettings
+    from flext_quality.typings import FlextQualityTypes, FlextQualityTypes as t
     from flext_quality.utilities import (
         FlextQualityUtilities,
         FlextQualityUtilities as u,
@@ -221,6 +209,7 @@ __all__ = [
     "analyze_file_content",
     "analyze_files_content",
     "api",
+    "build_mcp_health_result",
     "c",
     "constants",
     "d",

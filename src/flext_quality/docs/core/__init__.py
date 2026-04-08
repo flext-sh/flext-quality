@@ -5,47 +5,8 @@
 
 from __future__ import annotations
 
-import typing as _t
-
 from flext_core.lazy import install_lazy_exports
 
-if _t.TYPE_CHECKING:
-    import flext_quality.docs.core.base_classes as _flext_quality_docs_core_base_classes
-
-    base_classes = _flext_quality_docs_core_base_classes
-    import flext_quality.docs.core.config_manager as _flext_quality_docs_core_config_manager
-    from flext_quality.docs.core.base_classes import (
-        FlextQualityBaseAnalyzer,
-        FlextQualityBaseAuditor,
-        FlextQualityBaseReporter,
-        FlextQualityBaseValidator,
-    )
-
-    config_manager = _flext_quality_docs_core_config_manager
-    import flext_quality.docs.core.file_discovery as _flext_quality_docs_core_file_discovery
-    from flext_quality.docs.core.config_manager import (
-        FlextQualityAuditRules,
-        FlextQualityConfigManager,
-        FlextQualityStyleGuide,
-        FlextQualityValidationConfig,
-    )
-
-    file_discovery = _flext_quality_docs_core_file_discovery
-    from flext_core.constants import FlextConstants as c
-    from flext_core.decorators import FlextDecorators as d
-    from flext_core.exceptions import FlextExceptions as e
-    from flext_core.handlers import FlextHandlers as h
-    from flext_core.mixins import FlextMixins as x
-    from flext_core.models import FlextModels as m
-    from flext_core.protocols import FlextProtocols as p
-    from flext_core.result import FlextResult as r
-    from flext_core.service import FlextService as s
-    from flext_core.typings import FlextTypes as t
-    from flext_core.utilities import FlextUtilities as u
-    from flext_quality.docs.core.file_discovery import (
-        FlextQualityDocumentationFinder,
-        FlextQualityFileStatistics,
-    )
 _LAZY_IMPORTS = {
     "FlextQualityAuditRules": (
         "flext_quality.docs.core.config_manager",
@@ -103,32 +64,5 @@ _LAZY_IMPORTS = {
     "x": ("flext_core.mixins", "FlextMixins"),
 }
 
-__all__ = [
-    "FlextQualityAuditRules",
-    "FlextQualityBaseAnalyzer",
-    "FlextQualityBaseAuditor",
-    "FlextQualityBaseReporter",
-    "FlextQualityBaseValidator",
-    "FlextQualityConfigManager",
-    "FlextQualityDocumentationFinder",
-    "FlextQualityFileStatistics",
-    "FlextQualityStyleGuide",
-    "FlextQualityValidationConfig",
-    "base_classes",
-    "c",
-    "config_manager",
-    "d",
-    "e",
-    "file_discovery",
-    "h",
-    "m",
-    "p",
-    "r",
-    "s",
-    "t",
-    "u",
-    "x",
-]
 
-
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)
