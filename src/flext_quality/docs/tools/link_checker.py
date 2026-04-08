@@ -25,8 +25,6 @@ from pydantic import BaseModel, TypeAdapter
 
 from flext_quality import t
 
-_AsyncSession = ClientSession
-
 
 class FlextQualityLinkChecker:
     """Advanced link validation and checking system."""
@@ -97,7 +95,7 @@ class FlextQualityLinkChecker:
         """Initialize the link checker with configuration."""
         self.config: FlextQualityLinkChecker.LinkConfig = self._get_default_config()
         self.load_config(config_path)
-        self.session: _AsyncSession | None = None
+        self.session: ClientSession | None = None
         self.cache: t.MutableContainerMapping = {}
         self.results: FlextQualityLinkChecker.Results = FlextQualityLinkChecker.Results(
             total_links=0,
