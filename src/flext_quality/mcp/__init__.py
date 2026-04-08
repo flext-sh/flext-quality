@@ -22,7 +22,7 @@ if _t.TYPE_CHECKING:
 
     server = _flext_quality_mcp_server
     import flext_quality.mcp.tools as _flext_quality_mcp_tools
-    from flext_quality.mcp.server import get_server, mcp
+    from flext_quality.mcp.server import get_server
 
     tools = _flext_quality_mcp_tools
     from flext_core.constants import FlextConstants as c
@@ -56,7 +56,6 @@ _LAZY_IMPORTS = {
     "get_server": ("flext_quality.mcp.server", "get_server"),
     "h": ("flext_core.handlers", "FlextHandlers"),
     "m": ("flext_core.models", "FlextModels"),
-    "mcp": ("flext_quality.mcp.server", "mcp"),
     "p": ("flext_core.protocols", "FlextProtocols"),
     "r": ("flext_core.result", "FlextResult"),
     "resources": "flext_quality.mcp.resources",
@@ -82,7 +81,6 @@ __all__ = [
     "get_server",
     "h",
     "m",
-    "mcp",
     "p",
     "r",
     "resources",

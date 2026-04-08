@@ -29,16 +29,6 @@ if _t.TYPE_CHECKING:
 
     typing_helpers = _tests_helpers_typing_helpers
     import tests.helpers.typings as _tests_helpers_typings
-    from tests.helpers.typing_helpers import (
-        assert_analysis_results_structure,
-        assert_dict_structure,
-        assert_is_dict,
-        assert_is_list,
-        assert_issues_structure,
-        assert_metrics_structure,
-        safe_dict_access,
-        safe_list_access,
-    )
 
     typings = _tests_helpers_typings
     from flext_core.decorators import FlextDecorators as d
@@ -54,21 +44,6 @@ _LAZY_IMPORTS = {
     "TestsModels": ("tests.helpers.models", "TestsModels"),
     "TestsProtocols": ("tests.helpers.protocols", "TestsProtocols"),
     "TestsTypings": ("tests.helpers.typings", "TestsTypings"),
-    "assert_analysis_results_structure": (
-        "tests.helpers.typing_helpers",
-        "assert_analysis_results_structure",
-    ),
-    "assert_dict_structure": ("tests.helpers.typing_helpers", "assert_dict_structure"),
-    "assert_is_dict": ("tests.helpers.typing_helpers", "assert_is_dict"),
-    "assert_is_list": ("tests.helpers.typing_helpers", "assert_is_list"),
-    "assert_issues_structure": (
-        "tests.helpers.typing_helpers",
-        "assert_issues_structure",
-    ),
-    "assert_metrics_structure": (
-        "tests.helpers.typing_helpers",
-        "assert_metrics_structure",
-    ),
     "assertions": "tests.helpers.assertions",
     "c": ("tests.helpers.constants", "TestsConstants"),
     "constants": "tests.helpers.constants",
@@ -81,8 +56,6 @@ _LAZY_IMPORTS = {
     "protocols": "tests.helpers.protocols",
     "r": ("flext_core.result", "FlextResult"),
     "s": ("flext_core.service", "FlextService"),
-    "safe_dict_access": ("tests.helpers.typing_helpers", "safe_dict_access"),
-    "safe_list_access": ("tests.helpers.typing_helpers", "safe_list_access"),
     "t": ("tests.helpers.typings", "t"),
     "typing_helpers": "tests.helpers.typing_helpers",
     "typings": "tests.helpers.typings",
@@ -95,12 +68,6 @@ __all__ = [
     "TestsModels",
     "TestsProtocols",
     "TestsTypings",
-    "assert_analysis_results_structure",
-    "assert_dict_structure",
-    "assert_is_dict",
-    "assert_is_list",
-    "assert_issues_structure",
-    "assert_metrics_structure",
     "assertions",
     "c",
     "constants",
@@ -113,8 +80,6 @@ __all__ = [
     "protocols",
     "r",
     "s",
-    "safe_dict_access",
-    "safe_list_access",
     "t",
     "typing_helpers",
     "typings",

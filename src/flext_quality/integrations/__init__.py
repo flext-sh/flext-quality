@@ -10,11 +10,7 @@ import typing as _t
 from flext_core.lazy import install_lazy_exports
 
 if _t.TYPE_CHECKING:
-    import flext_quality.integrations._health as _flext_quality_integrations__health
-
-    _health = _flext_quality_integrations__health
     import flext_quality.integrations.claude_context as _flext_quality_integrations_claude_context
-    from flext_quality.integrations._health import build_mcp_health_result
 
     claude_context = _flext_quality_integrations_claude_context
     import flext_quality.integrations.claude_mem as _flext_quality_integrations_claude_mem
@@ -62,11 +58,6 @@ _LAZY_IMPORTS = {
         "flext_quality.integrations.mcp_client",
         "FlextQualityMcpClient",
     ),
-    "_health": "flext_quality.integrations._health",
-    "build_mcp_health_result": (
-        "flext_quality.integrations._health",
-        "build_mcp_health_result",
-    ),
     "c": ("flext_core.constants", "FlextConstants"),
     "claude_context": "flext_quality.integrations.claude_context",
     "claude_mem": "flext_quality.integrations.claude_mem",
@@ -89,8 +80,6 @@ __all__ = [
     "FlextQualityClaudeMemClient",
     "FlextQualityCodeExecutionBridge",
     "FlextQualityMcpClient",
-    "_health",
-    "build_mcp_health_result",
     "c",
     "claude_context",
     "claude_mem",

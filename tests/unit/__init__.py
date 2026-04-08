@@ -13,16 +13,10 @@ if _t.TYPE_CHECKING:
     import tests.unit.test_api as _tests_unit_test_api
 
     test_api = _tests_unit_test_api
+    import tests.unit.test_basic as _tests_unit_test_basic
+
+    test_basic = _tests_unit_test_basic
     import tests.unit.test_cli as _tests_unit_test_cli
-    from tests.unit.test_api import (
-        TestFlextQualityAPI,
-        TestFlextQualityHookExecution,
-        TestFlextQualityRulesConfig,
-        TestFlextQualitySingleton,
-        TestFlextQualityStdinProcessing,
-        TestFlextQualityValidation,
-    )
-    from tests.unit.test_basic import test_basic
 
     test_cli = _tests_unit_test_cli
     from flext_core.constants import FlextConstants as c
@@ -36,25 +30,7 @@ if _t.TYPE_CHECKING:
     from flext_core.service import FlextService as s
     from flext_core.typings import FlextTypes as t
     from flext_core.utilities import FlextUtilities as u
-    from tests.unit.test_cli import TestFlextQualityCliService, TestMainFunction
 _LAZY_IMPORTS = {
-    "TestFlextQualityAPI": ("tests.unit.test_api", "TestFlextQualityAPI"),
-    "TestFlextQualityCliService": ("tests.unit.test_cli", "TestFlextQualityCliService"),
-    "TestFlextQualityHookExecution": (
-        "tests.unit.test_api",
-        "TestFlextQualityHookExecution",
-    ),
-    "TestFlextQualityRulesConfig": (
-        "tests.unit.test_api",
-        "TestFlextQualityRulesConfig",
-    ),
-    "TestFlextQualitySingleton": ("tests.unit.test_api", "TestFlextQualitySingleton"),
-    "TestFlextQualityStdinProcessing": (
-        "tests.unit.test_api",
-        "TestFlextQualityStdinProcessing",
-    ),
-    "TestFlextQualityValidation": ("tests.unit.test_api", "TestFlextQualityValidation"),
-    "TestMainFunction": ("tests.unit.test_cli", "TestMainFunction"),
     "c": ("flext_core.constants", "FlextConstants"),
     "d": ("flext_core.decorators", "FlextDecorators"),
     "e": ("flext_core.exceptions", "FlextExceptions"),
@@ -65,21 +41,13 @@ _LAZY_IMPORTS = {
     "s": ("flext_core.service", "FlextService"),
     "t": ("flext_core.typings", "FlextTypes"),
     "test_api": "tests.unit.test_api",
-    "test_basic": ("tests.unit.test_basic", "test_basic"),
+    "test_basic": "tests.unit.test_basic",
     "test_cli": "tests.unit.test_cli",
     "u": ("flext_core.utilities", "FlextUtilities"),
     "x": ("flext_core.mixins", "FlextMixins"),
 }
 
 __all__ = [
-    "TestFlextQualityAPI",
-    "TestFlextQualityCliService",
-    "TestFlextQualityHookExecution",
-    "TestFlextQualityRulesConfig",
-    "TestFlextQualitySingleton",
-    "TestFlextQualityStdinProcessing",
-    "TestFlextQualityValidation",
-    "TestMainFunction",
     "c",
     "d",
     "e",

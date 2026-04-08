@@ -24,7 +24,7 @@ if _t.TYPE_CHECKING:
     from flext_core.service import FlextService as s
     from flext_core.typings import FlextTypes as t
     from flext_core.utilities import FlextUtilities as u
-    from flext_quality.services.cli import FlextQualityCliService, main
+    from flext_quality.services.cli import FlextQualityCliService
 _LAZY_IMPORTS = {
     "FlextQualityCliService": ("flext_quality.services.cli", "FlextQualityCliService"),
     "c": ("flext_core.constants", "FlextConstants"),
@@ -33,7 +33,6 @@ _LAZY_IMPORTS = {
     "e": ("flext_core.exceptions", "FlextExceptions"),
     "h": ("flext_core.handlers", "FlextHandlers"),
     "m": ("flext_core.models", "FlextModels"),
-    "main": ("flext_quality.services.cli", "main"),
     "p": ("flext_core.protocols", "FlextProtocols"),
     "r": ("flext_core.result", "FlextResult"),
     "s": ("flext_core.service", "FlextService"),
@@ -50,7 +49,6 @@ __all__ = [
     "e",
     "h",
     "m",
-    "main",
     "p",
     "r",
     "s",

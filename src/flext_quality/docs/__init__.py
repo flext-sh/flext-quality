@@ -25,9 +25,6 @@ if _t.TYPE_CHECKING:
         FlextQualityFileStatistics,
         FlextQualityStyleGuide,
         FlextQualityValidationConfig,
-        base_classes,
-        config_manager,
-        file_discovery,
     )
 
     dashboard = _flext_quality_docs_dashboard
@@ -45,23 +42,16 @@ if _t.TYPE_CHECKING:
     import flext_quality.docs.scripts as _flext_quality_docs_scripts
     from flext_quality.docs.scheduled_maintenance import (
         FlextQualityScheduledMaintenance,
-        logger,
     )
 
     scripts = _flext_quality_docs_scripts
     import flext_quality.docs.tools as _flext_quality_docs_tools
     from flext_quality.docs.scripts import (
-        MIN_HEADINGS_FOR_TOC,
         FlextQualityContentValidator,
         FlextQualityDocumentationAuditor,
         FlextQualityDocumentationOptimizer,
         FlextQualityDocumentationReporter,
         FlextQualityLinkValidator,
-        audit,
-        main,
-        optimize,
-        report,
-        validate,
     )
 
     tools = _flext_quality_docs_tools
@@ -82,9 +72,6 @@ if _t.TYPE_CHECKING:
         FlextQualityStyleValidator,
         analyze_file_content,
         analyze_files_content,
-        content_analyzer,
-        link_checker,
-        style_validator,
         validate_file_style,
         validate_files_style,
         validate_links_sync,
@@ -118,7 +105,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
         "dashboard": "flext_quality.docs.dashboard",
         "e": ("flext_core.exceptions", "FlextExceptions"),
         "h": ("flext_core.handlers", "FlextHandlers"),
-        "logger": ("flext_quality.docs.scheduled_maintenance", "logger"),
         "m": ("flext_core.models", "FlextModels"),
         "notifications": "flext_quality.docs.notifications",
         "p": ("flext_core.protocols", "FlextProtocols"),
@@ -135,13 +121,13 @@ _LAZY_IMPORTS = merge_lazy_imports(
 _ = _LAZY_IMPORTS.pop("cleanup_submodule_namespace", None)
 _ = _LAZY_IMPORTS.pop("install_lazy_exports", None)
 _ = _LAZY_IMPORTS.pop("lazy_getattr", None)
+_ = _LAZY_IMPORTS.pop("logger", None)
 _ = _LAZY_IMPORTS.pop("merge_lazy_imports", None)
 _ = _LAZY_IMPORTS.pop("output", None)
 _ = _LAZY_IMPORTS.pop("output_reporting", None)
 
 __all__ = [
     "MAX_BROKEN_LINKS_TO_SHOW",
-    "MIN_HEADINGS_FOR_TOC",
     "FlextQualityAuditRules",
     "FlextQualityBaseAnalyzer",
     "FlextQualityBaseAuditor",
@@ -165,34 +151,22 @@ __all__ = [
     "FlextQualityValidationConfig",
     "analyze_file_content",
     "analyze_files_content",
-    "audit",
-    "base_classes",
     "c",
-    "config_manager",
-    "content_analyzer",
     "core",
     "d",
     "dashboard",
     "e",
-    "file_discovery",
     "h",
-    "link_checker",
-    "logger",
     "m",
-    "main",
     "notifications",
-    "optimize",
     "p",
     "r",
-    "report",
     "s",
     "scheduled_maintenance",
     "scripts",
-    "style_validator",
     "t",
     "tools",
     "u",
-    "validate",
     "validate_file_style",
     "validate_files_style",
     "validate_links_sync",

@@ -14,87 +14,35 @@ if _t.TYPE_CHECKING:
 
     conftest = _tests_conftest
     import tests.constants as _tests_constants
-    from tests.conftest import (
-        MockQualityAnalyzer,
-        MockReportGenerator,
-        analysis_results,
-        analysis_task_data,
-        assert_result_failure_with_error,
-        assert_result_success_with_data,
-        celery_config,
-        code_analysis_config,
-        codeclimate_config,
-        dashboard_data,
-        mock_quality_analyzer,
-        mock_report_generator,
-        package_metadata,
-        pytest_configure,
-        pytest_plugins,
-        quality_metrics_data,
-        report_config,
-        sample_code_repository,
-        secure_temp_dir,
-        set_test_environment,
-        sonarqube_config,
-        temporary_project_structure,
-    )
 
     constants = _tests_constants
     import tests.helpers as _tests_helpers
     from tests.constants import (
-        FlextQualityTestConstants,
-        FlextQualityTestConstants as c,
+        TestsFlextQualityConstants,
+        TestsFlextQualityConstants as c,
     )
 
     helpers = _tests_helpers
     import tests.models as _tests_models
-    from tests.helpers import (
-        TestsConstants,
-        TestsModels,
-        TestsProtocols,
-        TestsTypings,
-        assert_analysis_results_structure,
-        assert_dict_structure,
-        assert_is_dict,
-        assert_is_list,
-        assert_issues_structure,
-        assert_metrics_structure,
-        assertions,
-        safe_dict_access,
-        safe_list_access,
-        typing_helpers,
-    )
+    from tests.helpers import TestsConstants, TestsModels, TestsProtocols, TestsTypings
 
     models = _tests_models
     import tests.protocols as _tests_protocols
-    from tests.models import FlextQualityTestModels, FlextQualityTestModels as m
+    from tests.models import TestsFlextQualityModels, TestsFlextQualityModels as m
 
     protocols = _tests_protocols
     import tests.typings as _tests_typings
     from tests.protocols import (
-        FlextQualityTestProtocols,
-        FlextQualityTestProtocols as p,
+        TestsFlextQualityProtocols,
+        TestsFlextQualityProtocols as p,
     )
 
     typings = _tests_typings
     import tests.unit as _tests_unit
-    from tests.typings import FlextQualityTestTypes, FlextQualityTestTypes as t
+    from tests.typings import TestsFlextQualityTypes, TestsFlextQualityTypes as t
 
     unit = _tests_unit
     import tests.utilities as _tests_utilities
-    from tests.unit import (
-        TestFlextQualityAPI,
-        TestFlextQualityCliService,
-        TestFlextQualityHookExecution,
-        TestFlextQualityRulesConfig,
-        TestFlextQualitySingleton,
-        TestFlextQualityStdinProcessing,
-        TestFlextQualityValidation,
-        TestMainFunction,
-        test_api,
-        test_basic,
-        test_cli,
-    )
 
     utilities = _tests_utilities
     from flext_core.decorators import FlextDecorators as d
@@ -104,8 +52,8 @@ if _t.TYPE_CHECKING:
     from flext_core.result import FlextResult as r
     from flext_core.service import FlextService as s
     from tests.utilities import (
-        FlextQualityTestUtilities,
-        FlextQualityTestUtilities as u,
+        TestsFlextQualityUtilities,
+        TestsFlextQualityUtilities as u,
     )
 _LAZY_IMPORTS = merge_lazy_imports(
     (
@@ -113,58 +61,27 @@ _LAZY_IMPORTS = merge_lazy_imports(
         "tests.unit",
     ),
     {
-        "FlextQualityTestConstants": ("tests.constants", "FlextQualityTestConstants"),
-        "FlextQualityTestModels": ("tests.models", "FlextQualityTestModels"),
-        "FlextQualityTestProtocols": ("tests.protocols", "FlextQualityTestProtocols"),
-        "FlextQualityTestTypes": ("tests.typings", "FlextQualityTestTypes"),
-        "FlextQualityTestUtilities": ("tests.utilities", "FlextQualityTestUtilities"),
-        "MockQualityAnalyzer": ("tests.conftest", "MockQualityAnalyzer"),
-        "MockReportGenerator": ("tests.conftest", "MockReportGenerator"),
-        "analysis_results": ("tests.conftest", "analysis_results"),
-        "analysis_task_data": ("tests.conftest", "analysis_task_data"),
-        "assert_result_failure_with_error": (
-            "tests.conftest",
-            "assert_result_failure_with_error",
-        ),
-        "assert_result_success_with_data": (
-            "tests.conftest",
-            "assert_result_success_with_data",
-        ),
-        "c": ("tests.constants", "FlextQualityTestConstants"),
-        "celery_config": ("tests.conftest", "celery_config"),
-        "code_analysis_config": ("tests.conftest", "code_analysis_config"),
-        "codeclimate_config": ("tests.conftest", "codeclimate_config"),
+        "TestsFlextQualityConstants": ("tests.constants", "TestsFlextQualityConstants"),
+        "TestsFlextQualityModels": ("tests.models", "TestsFlextQualityModels"),
+        "TestsFlextQualityProtocols": ("tests.protocols", "TestsFlextQualityProtocols"),
+        "TestsFlextQualityTypes": ("tests.typings", "TestsFlextQualityTypes"),
+        "TestsFlextQualityUtilities": ("tests.utilities", "TestsFlextQualityUtilities"),
+        "c": ("tests.constants", "TestsFlextQualityConstants"),
         "conftest": "tests.conftest",
         "constants": "tests.constants",
         "d": ("flext_core.decorators", "FlextDecorators"),
-        "dashboard_data": ("tests.conftest", "dashboard_data"),
         "e": ("flext_core.exceptions", "FlextExceptions"),
         "h": ("flext_core.handlers", "FlextHandlers"),
         "helpers": "tests.helpers",
-        "m": ("tests.models", "FlextQualityTestModels"),
-        "mock_quality_analyzer": ("tests.conftest", "mock_quality_analyzer"),
-        "mock_report_generator": ("tests.conftest", "mock_report_generator"),
+        "m": ("tests.models", "TestsFlextQualityModels"),
         "models": "tests.models",
-        "p": ("tests.protocols", "FlextQualityTestProtocols"),
-        "package_metadata": ("tests.conftest", "package_metadata"),
+        "p": ("tests.protocols", "TestsFlextQualityProtocols"),
         "protocols": "tests.protocols",
-        "pytest_configure": ("tests.conftest", "pytest_configure"),
-        "pytest_plugins": ("tests.conftest", "pytest_plugins"),
-        "quality_metrics_data": ("tests.conftest", "quality_metrics_data"),
         "r": ("flext_core.result", "FlextResult"),
-        "report_config": ("tests.conftest", "report_config"),
         "s": ("flext_core.service", "FlextService"),
-        "sample_code_repository": ("tests.conftest", "sample_code_repository"),
-        "secure_temp_dir": ("tests.conftest", "secure_temp_dir"),
-        "set_test_environment": ("tests.conftest", "set_test_environment"),
-        "sonarqube_config": ("tests.conftest", "sonarqube_config"),
-        "t": ("tests.typings", "FlextQualityTestTypes"),
-        "temporary_project_structure": (
-            "tests.conftest",
-            "temporary_project_structure",
-        ),
+        "t": ("tests.typings", "TestsFlextQualityTypes"),
         "typings": "tests.typings",
-        "u": ("tests.utilities", "FlextQualityTestUtilities"),
+        "u": ("tests.utilities", "TestsFlextQualityUtilities"),
         "unit": "tests.unit",
         "utilities": "tests.utilities",
         "x": ("flext_core.mixins", "FlextMixins"),
@@ -173,77 +90,35 @@ _LAZY_IMPORTS = merge_lazy_imports(
 _ = _LAZY_IMPORTS.pop("cleanup_submodule_namespace", None)
 _ = _LAZY_IMPORTS.pop("install_lazy_exports", None)
 _ = _LAZY_IMPORTS.pop("lazy_getattr", None)
+_ = _LAZY_IMPORTS.pop("logger", None)
 _ = _LAZY_IMPORTS.pop("merge_lazy_imports", None)
 _ = _LAZY_IMPORTS.pop("output", None)
 _ = _LAZY_IMPORTS.pop("output_reporting", None)
 
 __all__ = [
-    "FlextQualityTestConstants",
-    "FlextQualityTestModels",
-    "FlextQualityTestProtocols",
-    "FlextQualityTestTypes",
-    "FlextQualityTestUtilities",
-    "MockQualityAnalyzer",
-    "MockReportGenerator",
-    "TestFlextQualityAPI",
-    "TestFlextQualityCliService",
-    "TestFlextQualityHookExecution",
-    "TestFlextQualityRulesConfig",
-    "TestFlextQualitySingleton",
-    "TestFlextQualityStdinProcessing",
-    "TestFlextQualityValidation",
-    "TestMainFunction",
     "TestsConstants",
+    "TestsFlextQualityConstants",
+    "TestsFlextQualityModels",
+    "TestsFlextQualityProtocols",
+    "TestsFlextQualityTypes",
+    "TestsFlextQualityUtilities",
     "TestsModels",
     "TestsProtocols",
     "TestsTypings",
-    "analysis_results",
-    "analysis_task_data",
-    "assert_analysis_results_structure",
-    "assert_dict_structure",
-    "assert_is_dict",
-    "assert_is_list",
-    "assert_issues_structure",
-    "assert_metrics_structure",
-    "assert_result_failure_with_error",
-    "assert_result_success_with_data",
-    "assertions",
     "c",
-    "celery_config",
-    "code_analysis_config",
-    "codeclimate_config",
     "conftest",
     "constants",
     "d",
-    "dashboard_data",
     "e",
     "h",
     "helpers",
     "m",
-    "mock_quality_analyzer",
-    "mock_report_generator",
     "models",
     "p",
-    "package_metadata",
     "protocols",
-    "pytest_configure",
-    "pytest_plugins",
-    "quality_metrics_data",
     "r",
-    "report_config",
     "s",
-    "safe_dict_access",
-    "safe_list_access",
-    "sample_code_repository",
-    "secure_temp_dir",
-    "set_test_environment",
-    "sonarqube_config",
     "t",
-    "temporary_project_structure",
-    "test_api",
-    "test_basic",
-    "test_cli",
-    "typing_helpers",
     "typings",
     "u",
     "unit",

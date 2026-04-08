@@ -11,7 +11,7 @@ from flext_tests import FlextTestsUtilities
 from flext_quality import FlextQualityUtilities
 
 
-class FlextQualityTestUtilities(FlextTestsUtilities, FlextQualityUtilities):
+class TestsFlextQualityUtilities(FlextTestsUtilities, FlextQualityUtilities):
     """Test utilities for flext-quality."""
 
     class Quality(FlextQualityUtilities.Quality):
@@ -21,5 +21,5 @@ class FlextQualityTestUtilities(FlextTestsUtilities, FlextQualityUtilities):
             """Test-specific utilities."""
 
 
-u = FlextQualityTestUtilities
-__all__ = ["FlextQualityTestUtilities", "u"]
+u = TestsFlextQualityUtilities
+__all__ = ["TestsFlextQualityUtilities", "u"]

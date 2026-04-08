@@ -24,20 +24,12 @@ if _t.TYPE_CHECKING:
     )
 
     docs = _flext_quality_docs
-    import flext_quality.docs.core as _flext_quality_docs_core
+    import flext_quality.hooks as _flext_quality_hooks
     from flext_quality.docs import (
-        MAX_BROKEN_LINKS_TO_SHOW,
         FlextQualityDocumentationDashboard,
         FlextQualityDocumentationNotifier,
         FlextQualityScheduledMaintenance,
-        dashboard,
-        logger,
-        notifications,
-        scheduled_maintenance,
     )
-
-    core = _flext_quality_docs_core
-    import flext_quality.docs.scripts as _flext_quality_docs_scripts
     from flext_quality.docs.core import (
         FlextQualityAuditRules,
         FlextQualityBaseAnalyzer,
@@ -49,37 +41,20 @@ if _t.TYPE_CHECKING:
         FlextQualityFileStatistics,
         FlextQualityStyleGuide,
         FlextQualityValidationConfig,
-        base_classes,
-        config_manager,
-        file_discovery,
     )
-
-    scripts = _flext_quality_docs_scripts
-    import flext_quality.docs.tools as _flext_quality_docs_tools
     from flext_quality.docs.scripts import (
-        MIN_HEADINGS_FOR_TOC,
         FlextQualityContentValidator,
         FlextQualityDocumentationAuditor,
         FlextQualityDocumentationOptimizer,
         FlextQualityDocumentationReporter,
         FlextQualityLinkValidator,
-        audit,
-        optimize,
-        report,
-        validate,
     )
-
-    tools = _flext_quality_docs_tools
-    import flext_quality.hooks as _flext_quality_hooks
     from flext_quality.docs.tools import (
         FlextQualityContentAnalyzer,
         FlextQualityLinkChecker,
         FlextQualityStyleValidator,
         analyze_file_content,
         analyze_files_content,
-        content_analyzer,
-        link_checker,
-        style_validator,
         validate_file_style,
         validate_files_style,
         validate_links_sync,
@@ -87,37 +62,27 @@ if _t.TYPE_CHECKING:
 
     hooks = _flext_quality_hooks
     import flext_quality.integrations as _flext_quality_integrations
-    from flext_quality.hooks import (
-        FlextQualityBaseHook,
-        FlextQualityHookManager,
-        base,
-        manager,
-    )
+    from flext_quality.hooks import FlextQualityBaseHook, FlextQualityHookManager
 
     integrations = _flext_quality_integrations
-    import flext_quality.models as _flext_quality_models
+    import flext_quality.mcp as _flext_quality_mcp
     from flext_quality.integrations import (
         FlextQualityClaudeContextClient,
         FlextQualityClaudeMemClient,
         FlextQualityCodeExecutionBridge,
         FlextQualityMcpClient,
-        build_mcp_health_result,
-        claude_context,
-        claude_mem,
-        code_execution,
-        mcp_client,
     )
+
+    mcp = _flext_quality_mcp
+    import flext_quality.models as _flext_quality_models
     from flext_quality.mcp import (
         execute_hook,
         get_hooks_config,
         get_integrations_status,
         get_rules_config,
         get_server,
-        mcp,
-        resources,
         search_code,
         search_memory,
-        server,
         validate_rules,
     )
 
@@ -138,14 +103,11 @@ if _t.TYPE_CHECKING:
         FlextQualityRulesEngine,
         FlextQualityRulesLoader,
         FlextQualityValidators,
-        engine,
-        loader,
-        validators,
     )
 
     services = _flext_quality_services
     import flext_quality.settings as _flext_quality_settings
-    from flext_quality.services import FlextQualityCliService, cli, main
+    from flext_quality.services import FlextQualityCliService
 
     settings = _flext_quality_settings
     import flext_quality.typings as _flext_quality_typings
@@ -193,6 +155,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
         "hooks": "flext_quality.hooks",
         "integrations": "flext_quality.integrations",
         "m": ("flext_quality.models", "FlextQualityModels"),
+        "mcp": "flext_quality.mcp",
         "models": "flext_quality.models",
         "p": ("flext_quality.protocols", "FlextQualityProtocols"),
         "protocols": "flext_quality.protocols",
@@ -211,13 +174,12 @@ _LAZY_IMPORTS = merge_lazy_imports(
 _ = _LAZY_IMPORTS.pop("cleanup_submodule_namespace", None)
 _ = _LAZY_IMPORTS.pop("install_lazy_exports", None)
 _ = _LAZY_IMPORTS.pop("lazy_getattr", None)
+_ = _LAZY_IMPORTS.pop("logger", None)
 _ = _LAZY_IMPORTS.pop("merge_lazy_imports", None)
 _ = _LAZY_IMPORTS.pop("output", None)
 _ = _LAZY_IMPORTS.pop("output_reporting", None)
 
 __all__ = [
-    "MAX_BROKEN_LINKS_TO_SHOW",
-    "MIN_HEADINGS_FOR_TOC",
     "FlextQuality",
     "FlextQualityAuditRules",
     "FlextQualityBaseAnalyzer",
@@ -259,26 +221,12 @@ __all__ = [
     "analyze_file_content",
     "analyze_files_content",
     "api",
-    "audit",
-    "base",
-    "base_classes",
-    "build_mcp_health_result",
     "c",
-    "claude_context",
-    "claude_mem",
-    "cli",
-    "code_execution",
-    "config_manager",
     "constants",
-    "content_analyzer",
-    "core",
     "d",
-    "dashboard",
     "docs",
     "e",
-    "engine",
     "execute_hook",
-    "file_discovery",
     "get_hooks_config",
     "get_integrations_status",
     "get_rules_config",
@@ -286,43 +234,26 @@ __all__ = [
     "h",
     "hooks",
     "integrations",
-    "link_checker",
-    "loader",
-    "logger",
     "m",
-    "main",
-    "manager",
     "mcp",
-    "mcp_client",
     "models",
-    "notifications",
-    "optimize",
     "p",
     "protocols",
     "r",
-    "report",
-    "resources",
     "rules",
     "s",
-    "scheduled_maintenance",
-    "scripts",
     "search_code",
     "search_memory",
-    "server",
     "services",
     "settings",
-    "style_validator",
     "t",
-    "tools",
     "typings",
     "u",
     "utilities",
-    "validate",
     "validate_file_style",
     "validate_files_style",
     "validate_links_sync",
     "validate_rules",
-    "validators",
     "x",
 ]
 

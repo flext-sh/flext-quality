@@ -11,7 +11,7 @@ from flext_tests import FlextTestsTypes
 from flext_quality import FlextQualityTypes
 
 
-class FlextQualityTestTypes(FlextTestsTypes, FlextQualityTypes):
+class TestsFlextQualityTypes(FlextTestsTypes, FlextQualityTypes):
     """Test type aliases for flext-quality."""
 
     class Quality(FlextQualityTypes.Quality):
@@ -21,5 +21,5 @@ class FlextQualityTestTypes(FlextTestsTypes, FlextQualityTypes):
             """Test-specific type aliases."""
 
 
-t = FlextQualityTestTypes
-__all__ = ["FlextQualityTestTypes", "t"]
+t = TestsFlextQualityTypes
+__all__ = ["TestsFlextQualityTypes", "t"]

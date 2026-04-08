@@ -11,7 +11,7 @@ from flext_tests import FlextTestsModels
 from flext_quality import FlextQualityModels
 
 
-class FlextQualityTestModels(FlextTestsModels, FlextQualityModels):
+class TestsFlextQualityModels(FlextTestsModels, FlextQualityModels):
     """Test models for flext-quality."""
 
     class Quality(FlextQualityModels.Quality):
@@ -21,5 +21,5 @@ class FlextQualityTestModels(FlextTestsModels, FlextQualityModels):
             """Test-specific models."""
 
 
-m = FlextQualityTestModels
-__all__ = ["FlextQualityTestModels", "m"]
+m = TestsFlextQualityModels
+__all__ = ["TestsFlextQualityModels", "m"]

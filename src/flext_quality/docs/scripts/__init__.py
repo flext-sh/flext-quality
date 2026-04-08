@@ -42,7 +42,6 @@ if _t.TYPE_CHECKING:
     from flext_quality.docs.scripts.validate import (
         FlextQualityContentValidator,
         FlextQualityLinkValidator,
-        main,
     )
 _LAZY_IMPORTS = {
     "FlextQualityContentValidator": (
@@ -75,7 +74,6 @@ _LAZY_IMPORTS = {
     "e": ("flext_core.exceptions", "FlextExceptions"),
     "h": ("flext_core.handlers", "FlextHandlers"),
     "m": ("flext_core.models", "FlextModels"),
-    "main": ("flext_quality.docs.scripts.validate", "main"),
     "optimize": "flext_quality.docs.scripts.optimize",
     "p": ("flext_core.protocols", "FlextProtocols"),
     "r": ("flext_core.result", "FlextResult"),
@@ -100,7 +98,6 @@ __all__ = [
     "e",
     "h",
     "m",
-    "main",
     "optimize",
     "p",
     "r",

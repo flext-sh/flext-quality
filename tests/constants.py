@@ -13,7 +13,7 @@ from flext_tests import FlextTestsConstants
 from flext_quality import FlextQualityConstants
 
 
-class FlextQualityTestConstants(FlextTestsConstants, FlextQualityConstants):
+class TestsFlextQualityConstants(FlextTestsConstants, FlextQualityConstants):
     """Test constants for flext-quality."""
 
     class Quality(FlextQualityConstants.Quality):
@@ -37,5 +37,5 @@ class FlextQualityTestConstants(FlextTestsConstants, FlextQualityConstants):
                 TEST_WORKERS: Final[int] = 2
 
 
-c = FlextQualityTestConstants
-__all__ = ["FlextQualityTestConstants", "c"]
+c = TestsFlextQualityConstants
+__all__ = ["TestsFlextQualityConstants", "c"]

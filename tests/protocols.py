@@ -11,7 +11,7 @@ from flext_tests import FlextTestsProtocols
 from flext_quality import FlextQualityProtocols
 
 
-class FlextQualityTestProtocols(FlextTestsProtocols, FlextQualityProtocols):
+class TestsFlextQualityProtocols(FlextTestsProtocols, FlextQualityProtocols):
     """Test protocols for flext-quality."""
 
     class Quality(FlextQualityProtocols.Quality):
@@ -21,5 +21,5 @@ class FlextQualityTestProtocols(FlextTestsProtocols, FlextQualityProtocols):
             """Test-specific protocols."""
 
 
-p = FlextQualityTestProtocols
-__all__ = ["FlextQualityTestProtocols", "p"]
+p = TestsFlextQualityProtocols
+__all__ = ["TestsFlextQualityProtocols", "p"]
