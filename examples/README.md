@@ -54,7 +54,7 @@ Fundamental quality analysis operations and simple API usage:
 - **Simple Analysis**: Basic project analysis with default settings
 - **Custom Configuration**: Analysis with custom thresholds and settings
 - **Result Processing**: Working with analysis results and quality metrics
-- **Error Handling**: Proper error handling with FlextResult patterns
+- **Error Handling**: Proper error handling with r patterns
 
 ### **Advanced Analysis** (`advanced/`)
 
@@ -136,9 +136,9 @@ from flext_core import FlextSettings
 from flext_core import FlextConstants
 from flext_core import FlextContainer
 from flext_core import FlextContext
-from flext_core import FlextDecorators
+from flext_core import d
 from flext_core import FlextDispatcher
-from flext_core import FlextExceptions
+from flext_core import e
 from flext_core import h
 from flext_core import FlextLogger
 from flext_core import x
@@ -146,9 +146,9 @@ from flext_core import FlextModels
 from flext_core import FlextProcessors
 from flext_core import p
 from flext_core import FlextRegistry
-from flext_core import FlextResult
+from flext_core import r
 from flext_core import u
-from flext_core import FlextService
+from flext_core import s
 from flext_core import t
 from flext_core import u
 from flext_observability import create_metric
@@ -287,7 +287,7 @@ docker-compose exec quality-analysis cat /app/reports/analysis_results.json
 | **simple_analysis**   | Basic project analysis        | Beginner     | None        |
 | **custom_config**     | Custom analysis configuration | Beginner     | flext-core  |
 | **result_processing** | Working with analysis results | Intermediate | flext-core  |
-| **error_handling**    | FlextResult error patterns    | Intermediate | flext-core  |
+| **error_handling**    | r error patterns    | Intermediate | flext-core  |
 
 ### Advanced Examples
 
@@ -312,7 +312,7 @@ docker-compose exec quality-analysis cat /app/reports/analysis_results.json
 ### Code Quality
 
 - **Type Safety**: Comprehensive type hints and MyPy validation
-- **Error Handling**: Consistent FlextResult patterns throughout
+- **Error Handling**: Consistent r patterns throughout
 - **Documentation**: Enterprise-grade docstrings and code comments
 - **Testing**: Unit tests and integration test examples
 

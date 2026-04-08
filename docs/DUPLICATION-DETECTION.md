@@ -42,7 +42,7 @@ This system prevents code duplication from accumulating while allowing intention
 
 **Location**: `flext-quality/src/flext_quality/plugins/duplication_plugin.py`
 
-A `FlextService[int]` that detects code clones using line-based similarity:
+A `s[int]` that detects code clones using line-based similarity:
 
 ```python
 from flext_quality import FlextDuplicationPlugin

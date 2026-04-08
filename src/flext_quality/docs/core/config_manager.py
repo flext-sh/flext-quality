@@ -86,7 +86,7 @@ class FlextQualityStyleGuide:
         return value if isinstance(value, (str, int, float, bool)) else default
 
 
-class FlextQualityValidationConfig:
+class FlextQualityValidationSettings:
     """Configuration for validation operations."""
 
     def __init__(self, data: ConfigData) -> None:
@@ -171,7 +171,7 @@ class FlextQualityConfigManager:
         self._cache: MutableMapping[str, ConfigData] = {}
         self._audit_rules: FlextQualityAuditRules | None = None
         self._style_guide: FlextQualityStyleGuide | None = None
-        self._validation_config: FlextQualityValidationConfig | None = None
+        self._validation_config: FlextQualityValidationSettings | None = None
 
     def get_audit_rules(self) -> FlextQualityAuditRules:
         """Get audit rules configuration."""
@@ -187,11 +187,11 @@ class FlextQualityConfigManager:
             self._style_guide = FlextQualityStyleGuide(data)
         return self._style_guide
 
-    def get_validation_config(self) -> FlextQualityValidationConfig:
+    def get_validation_config(self) -> FlextQualityValidationSettings:
         """Get validation configuration."""
         if self._validation_config is None:
             data = self._load_config_file("validation_config.yaml")
-            self._validation_config = FlextQualityValidationConfig(data)
+            self._validation_config = FlextQualityValidationSettings(data)
         return self._validation_config
 
     def get_config(self, name: str) -> ConfigData:

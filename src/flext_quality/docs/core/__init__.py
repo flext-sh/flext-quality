@@ -17,7 +17,7 @@ _LAZY_IMPORTS = build_lazy_import_map(
             "FlextQualityAuditRules",
             "FlextQualityConfigManager",
             "FlextQualityStyleGuide",
-            "FlextQualityValidationConfig",
+            "FlextQualityValidationSettings",
         ),
         ".file_discovery": (
             "FlextQualityDocumentationFinder",
