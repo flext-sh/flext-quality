@@ -8,18 +8,9 @@ from __future__ import annotations
 from flext_core.lazy import install_lazy_exports
 
 _LAZY_IMPORTS = {
-    "FlextQualityRulesEngine": (
-        "flext_quality.rules.engine",
-        "FlextQualityRulesEngine",
-    ),
-    "FlextQualityRulesLoader": (
-        "flext_quality.rules.loader",
-        "FlextQualityRulesLoader",
-    ),
-    "FlextQualityValidators": (
-        "flext_quality.rules.validators",
-        "FlextQualityValidators",
-    ),
+    "FlextQualityRulesEngine": ".engine",
+    "FlextQualityRulesLoader": ".loader",
+    "FlextQualityValidators": ".validators",
 }
 
 

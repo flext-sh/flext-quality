@@ -35,33 +35,36 @@ if _t.TYPE_CHECKING:
         TestsFlextQualityUtilities as u,
     )
 _LAZY_IMPORTS = merge_lazy_imports(
-    ("tests.helpers",),
+    (".helpers",),
     {
-        "TestsFlextQualityConstants": ("tests.constants", "TestsFlextQualityConstants"),
-        "TestsFlextQualityModels": ("tests.models", "TestsFlextQualityModels"),
-        "TestsFlextQualityProtocols": ("tests.protocols", "TestsFlextQualityProtocols"),
-        "TestsFlextQualityTypes": ("tests.typings", "TestsFlextQualityTypes"),
-        "TestsFlextQualityUtilities": ("tests.utilities", "TestsFlextQualityUtilities"),
-        "c": ("tests.constants", "TestsFlextQualityConstants"),
+        "TestsFlextQualityConstants": ".constants",
+        "TestsFlextQualityModels": ".models",
+        "TestsFlextQualityProtocols": ".protocols",
+        "TestsFlextQualityTypes": ".typings",
+        "TestsFlextQualityUtilities": ".utilities",
+        "c": (".constants", "TestsFlextQualityConstants"),
         "d": ("flext_core.decorators", "FlextDecorators"),
         "e": ("flext_core.exceptions", "FlextExceptions"),
         "h": ("flext_core.handlers", "FlextHandlers"),
-        "m": ("tests.models", "TestsFlextQualityModels"),
-        "p": ("tests.protocols", "TestsFlextQualityProtocols"),
+        "m": (".models", "TestsFlextQualityModels"),
+        "p": (".protocols", "TestsFlextQualityProtocols"),
         "r": ("flext_core.result", "FlextResult"),
         "s": ("flext_core.service", "FlextService"),
-        "t": ("tests.typings", "TestsFlextQualityTypes"),
-        "u": ("tests.utilities", "TestsFlextQualityUtilities"),
+        "t": (".typings", "TestsFlextQualityTypes"),
+        "u": (".utilities", "TestsFlextQualityUtilities"),
         "x": ("flext_core.mixins", "FlextMixins"),
     },
+    exclude_names=(
+        "cleanup_submodule_namespace",
+        "install_lazy_exports",
+        "lazy_getattr",
+        "logger",
+        "merge_lazy_imports",
+        "output",
+        "output_reporting",
+    ),
+    module_name=__name__,
 )
-_ = _LAZY_IMPORTS.pop("cleanup_submodule_namespace", None)
-_ = _LAZY_IMPORTS.pop("install_lazy_exports", None)
-_ = _LAZY_IMPORTS.pop("lazy_getattr", None)
-_ = _LAZY_IMPORTS.pop("logger", None)
-_ = _LAZY_IMPORTS.pop("merge_lazy_imports", None)
-_ = _LAZY_IMPORTS.pop("output", None)
-_ = _LAZY_IMPORTS.pop("output_reporting", None)
 
 __all__ = [
     "TestsConstants",

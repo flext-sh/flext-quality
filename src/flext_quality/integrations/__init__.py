@@ -8,26 +8,11 @@ from __future__ import annotations
 from flext_core.lazy import install_lazy_exports
 
 _LAZY_IMPORTS = {
-    "FlextQualityClaudeContextClient": (
-        "flext_quality.integrations.claude_context",
-        "FlextQualityClaudeContextClient",
-    ),
-    "FlextQualityClaudeMemClient": (
-        "flext_quality.integrations.claude_mem",
-        "FlextQualityClaudeMemClient",
-    ),
-    "FlextQualityCodeExecutionBridge": (
-        "flext_quality.integrations.code_execution",
-        "FlextQualityCodeExecutionBridge",
-    ),
-    "FlextQualityMcpClient": (
-        "flext_quality.integrations.mcp_client",
-        "FlextQualityMcpClient",
-    ),
-    "build_mcp_health_result": (
-        "flext_quality.integrations._health",
-        "build_mcp_health_result",
-    ),
+    "FlextQualityClaudeContextClient": ".claude_context",
+    "FlextQualityClaudeMemClient": ".claude_mem",
+    "FlextQualityCodeExecutionBridge": ".code_execution",
+    "FlextQualityMcpClient": ".mcp_client",
+    "build_mcp_health_result": "._health",
 }
 
 

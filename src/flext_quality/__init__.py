@@ -103,41 +103,44 @@ if _t.TYPE_CHECKING:
     )
 _LAZY_IMPORTS = merge_lazy_imports(
     (
-        "flext_quality.docs",
-        "flext_quality.hooks",
-        "flext_quality.integrations",
-        "flext_quality.mcp",
-        "flext_quality.rules",
-        "flext_quality.services",
+        ".docs",
+        ".hooks",
+        ".integrations",
+        ".mcp",
+        ".rules",
+        ".services",
     ),
     {
-        "FlextQuality": ("flext_quality.api", "FlextQuality"),
-        "FlextQualityConstants": ("flext_quality.constants", "FlextQualityConstants"),
-        "FlextQualityModels": ("flext_quality.models", "FlextQualityModels"),
-        "FlextQualityProtocols": ("flext_quality.protocols", "FlextQualityProtocols"),
-        "FlextQualitySettings": ("flext_quality.settings", "FlextQualitySettings"),
-        "FlextQualityTypes": ("flext_quality.typings", "FlextQualityTypes"),
-        "FlextQualityUtilities": ("flext_quality.utilities", "FlextQualityUtilities"),
-        "c": ("flext_quality.constants", "FlextQualityConstants"),
+        "FlextQuality": ".api",
+        "FlextQualityConstants": ".constants",
+        "FlextQualityModels": ".models",
+        "FlextQualityProtocols": ".protocols",
+        "FlextQualitySettings": ".settings",
+        "FlextQualityTypes": ".typings",
+        "FlextQualityUtilities": ".utilities",
+        "c": (".constants", "FlextQualityConstants"),
         "d": ("flext_core.decorators", "FlextDecorators"),
         "e": ("flext_core.exceptions", "FlextExceptions"),
         "h": ("flext_core.handlers", "FlextHandlers"),
-        "m": ("flext_quality.models", "FlextQualityModels"),
-        "p": ("flext_quality.protocols", "FlextQualityProtocols"),
+        "m": (".models", "FlextQualityModels"),
+        "p": (".protocols", "FlextQualityProtocols"),
         "r": ("flext_core.result", "FlextResult"),
         "s": ("flext_core.service", "FlextService"),
-        "t": ("flext_quality.typings", "FlextQualityTypes"),
-        "u": ("flext_quality.utilities", "FlextQualityUtilities"),
+        "t": (".typings", "FlextQualityTypes"),
+        "u": (".utilities", "FlextQualityUtilities"),
         "x": ("flext_core.mixins", "FlextMixins"),
     },
+    exclude_names=(
+        "cleanup_submodule_namespace",
+        "install_lazy_exports",
+        "lazy_getattr",
+        "logger",
+        "merge_lazy_imports",
+        "output",
+        "output_reporting",
+    ),
+    module_name=__name__,
 )
-_ = _LAZY_IMPORTS.pop("cleanup_submodule_namespace", None)
-_ = _LAZY_IMPORTS.pop("install_lazy_exports", None)
-_ = _LAZY_IMPORTS.pop("lazy_getattr", None)
-_ = _LAZY_IMPORTS.pop("logger", None)
-_ = _LAZY_IMPORTS.pop("merge_lazy_imports", None)
-_ = _LAZY_IMPORTS.pop("output", None)
-_ = _LAZY_IMPORTS.pop("output_reporting", None)
 
 __all__ = [
     "FlextQuality",
