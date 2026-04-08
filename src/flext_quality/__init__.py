@@ -16,21 +16,6 @@ if _t.TYPE_CHECKING:
     from flext_core.mixins import FlextMixins as x
     from flext_core.result import FlextResult as r
     from flext_core.service import FlextService as s
-    from flext_quality import (
-        api,
-        constants,
-        docs,
-        hooks,
-        integrations,
-        mcp,
-        models,
-        protocols,
-        rules,
-        services,
-        settings,
-        typings,
-        utilities,
-    )
     from flext_quality.api import FlextQuality
     from flext_quality.constants import (
         FlextQualityConstants,

@@ -28,21 +28,6 @@ _LAZY_IMPORTS = {
         "flext_quality.integrations._health",
         "build_mcp_health_result",
     ),
-    "c": ("flext_core.constants", "FlextConstants"),
-    "claude_context": "flext_quality.integrations.claude_context",
-    "claude_mem": "flext_quality.integrations.claude_mem",
-    "code_execution": "flext_quality.integrations.code_execution",
-    "d": ("flext_core.decorators", "FlextDecorators"),
-    "e": ("flext_core.exceptions", "FlextExceptions"),
-    "h": ("flext_core.handlers", "FlextHandlers"),
-    "m": ("flext_core.models", "FlextModels"),
-    "mcp_client": "flext_quality.integrations.mcp_client",
-    "p": ("flext_core.protocols", "FlextProtocols"),
-    "r": ("flext_core.result", "FlextResult"),
-    "s": ("flext_core.service", "FlextService"),
-    "t": ("flext_core.typings", "FlextTypes"),
-    "u": ("flext_core.utilities", "FlextUtilities"),
-    "x": ("flext_core.mixins", "FlextMixins"),
 }
 
 

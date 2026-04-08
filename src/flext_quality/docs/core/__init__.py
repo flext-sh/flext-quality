@@ -48,20 +48,6 @@ _LAZY_IMPORTS = {
         "flext_quality.docs.core.config_manager",
         "FlextQualityValidationConfig",
     ),
-    "base_classes": "flext_quality.docs.core.base_classes",
-    "c": ("flext_core.constants", "FlextConstants"),
-    "config_manager": "flext_quality.docs.core.config_manager",
-    "d": ("flext_core.decorators", "FlextDecorators"),
-    "e": ("flext_core.exceptions", "FlextExceptions"),
-    "file_discovery": "flext_quality.docs.core.file_discovery",
-    "h": ("flext_core.handlers", "FlextHandlers"),
-    "m": ("flext_core.models", "FlextModels"),
-    "p": ("flext_core.protocols", "FlextProtocols"),
-    "r": ("flext_core.result", "FlextResult"),
-    "s": ("flext_core.service", "FlextService"),
-    "t": ("flext_core.typings", "FlextTypes"),
-    "u": ("flext_core.utilities", "FlextUtilities"),
-    "x": ("flext_core.mixins", "FlextMixins"),
 }
 
 

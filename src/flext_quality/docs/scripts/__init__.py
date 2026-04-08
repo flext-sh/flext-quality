@@ -32,21 +32,6 @@ _LAZY_IMPORTS = {
         "flext_quality.docs.scripts.optimize",
         "MIN_HEADINGS_FOR_TOC",
     ),
-    "audit": "flext_quality.docs.scripts.audit",
-    "c": ("flext_core.constants", "FlextConstants"),
-    "d": ("flext_core.decorators", "FlextDecorators"),
-    "e": ("flext_core.exceptions", "FlextExceptions"),
-    "h": ("flext_core.handlers", "FlextHandlers"),
-    "m": ("flext_core.models", "FlextModels"),
-    "optimize": "flext_quality.docs.scripts.optimize",
-    "p": ("flext_core.protocols", "FlextProtocols"),
-    "r": ("flext_core.result", "FlextResult"),
-    "report": "flext_quality.docs.scripts.report",
-    "s": ("flext_core.service", "FlextService"),
-    "t": ("flext_core.typings", "FlextTypes"),
-    "u": ("flext_core.utilities", "FlextUtilities"),
-    "validate": "flext_quality.docs.scripts.validate",
-    "x": ("flext_core.mixins", "FlextMixins"),
 }
 
 

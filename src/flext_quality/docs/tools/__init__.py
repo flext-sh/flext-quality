@@ -28,19 +28,6 @@ _LAZY_IMPORTS = {
         "flext_quality.docs.tools.content_analyzer",
         "analyze_files_content",
     ),
-    "c": ("flext_core.constants", "FlextConstants"),
-    "content_analyzer": "flext_quality.docs.tools.content_analyzer",
-    "d": ("flext_core.decorators", "FlextDecorators"),
-    "e": ("flext_core.exceptions", "FlextExceptions"),
-    "h": ("flext_core.handlers", "FlextHandlers"),
-    "link_checker": "flext_quality.docs.tools.link_checker",
-    "m": ("flext_core.models", "FlextModels"),
-    "p": ("flext_core.protocols", "FlextProtocols"),
-    "r": ("flext_core.result", "FlextResult"),
-    "s": ("flext_core.service", "FlextService"),
-    "style_validator": "flext_quality.docs.tools.style_validator",
-    "t": ("flext_core.typings", "FlextTypes"),
-    "u": ("flext_core.utilities", "FlextUtilities"),
     "validate_file_style": (
         "flext_quality.docs.tools.style_validator",
         "validate_file_style",
@@ -53,7 +40,6 @@ _LAZY_IMPORTS = {
         "flext_quality.docs.tools.link_checker",
         "validate_links_sync",
     ),
-    "x": ("flext_core.mixins", "FlextMixins"),
 }
 
 

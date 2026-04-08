@@ -20,20 +20,6 @@ _LAZY_IMPORTS = {
         "flext_quality.rules.validators",
         "FlextQualityValidators",
     ),
-    "c": ("flext_core.constants", "FlextConstants"),
-    "d": ("flext_core.decorators", "FlextDecorators"),
-    "e": ("flext_core.exceptions", "FlextExceptions"),
-    "engine": "flext_quality.rules.engine",
-    "h": ("flext_core.handlers", "FlextHandlers"),
-    "loader": "flext_quality.rules.loader",
-    "m": ("flext_core.models", "FlextModels"),
-    "p": ("flext_core.protocols", "FlextProtocols"),
-    "r": ("flext_core.result", "FlextResult"),
-    "s": ("flext_core.service", "FlextService"),
-    "t": ("flext_core.typings", "FlextTypes"),
-    "u": ("flext_core.utilities", "FlextUtilities"),
-    "validators": "flext_quality.rules.validators",
-    "x": ("flext_core.mixins", "FlextMixins"),
 }
 
 
