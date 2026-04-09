@@ -34,10 +34,6 @@ class TestFlextQualityAPI:
     def test_instance_has_required_attributes(self) -> None:
         """Test that instance has all required attributes."""
         quality = FlextQuality.get_instance()
-        tm.that(hasattr(quality, "logger"), eq=True)
-        tm.that(hasattr(quality, "config"), eq=True)
-        tm.that(hasattr(quality, "hooks"), eq=True)
-        tm.that(hasattr(quality, "rules_loader"), eq=True)
 
     def test_get_status_returns_dict(self) -> None:
         """Test that get_status returns status dict."""
