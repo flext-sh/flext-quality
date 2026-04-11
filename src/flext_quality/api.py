@@ -15,7 +15,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextContainer, FlextLogger, r
+from flext_core import FlextContainer, r
 from flext_quality import (
     FlextQualityHookManager,
     FlextQualityRulesLoader,
@@ -73,9 +73,9 @@ class FlextQuality:
         """Initialize consolidated quality API with all functionality integrated."""
         self._name = c.Quality.Mcp.SERVER_NAME
         self._version = c.Quality.Mcp.SERVER_VERSION
-        self.logger = FlextLogger.create_module_logger(__name__)
+        self.logger = u.fetch_logger(__name__)
         self.config = FlextQualitySettings.get_instance()
-        self._container = FlextContainer.get_global()
+        self._container = FlextContainer.fetch_global()
         if not self._container.has_service("flext_quality"):
             _ = self._container.register("flext_quality", "flext_quality")
         self.hooks = FlextQualityHookManager()
@@ -224,4 +224,6 @@ class FlextQuality:
         return r[bool].ok(value=True)
 
 
-__all__ = ["FlextQuality"]
+quality = FlextQuality()
+
+__all__ = ["FlextQuality", "quality"]

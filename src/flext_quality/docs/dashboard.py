@@ -14,8 +14,7 @@ from pathlib import Path
 
 from flask import Flask, Response, render_template_string, request
 
-from flext_core import FlextLogger, p
-from flext_quality import t
+from flext_quality import p, t, u
 
 
 class FlextQualityDocumentationDashboard:
@@ -25,7 +24,7 @@ class FlextQualityDocumentationDashboard:
         """Initialize documentation dashboard with reports directory."""
         self.reports_dir = Path(reports_dir)
         self.app = Flask(__name__)
-        self._logger_instance: p.Logger = FlextLogger.create_module_logger(__name__)
+        self._logger_instance: p.Logger = u.fetch_logger(__name__)
         self.setup_routes()
 
     @property

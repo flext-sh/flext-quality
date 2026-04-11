@@ -14,7 +14,7 @@ from flext_core.lazy import (
 if _t.TYPE_CHECKING:
     from flext_web import d, e, h, r, s, x
 
-    from flext_quality.api import FlextQuality
+    from flext_quality.api import FlextQuality, quality
     from flext_quality.constants import FlextQualityConstants, c
     from flext_quality.docs.core.base_classes import (
         FlextQualityBaseAnalyzer,
@@ -77,7 +77,10 @@ _LAZY_IMPORTS = merge_lazy_imports(
     ),
     build_lazy_import_map(
         {
-            ".api": ("FlextQuality",),
+            ".api": (
+                "FlextQuality",
+                "quality",
+            ),
             ".constants": (
                 "FlextQualityConstants",
                 "c",
@@ -169,6 +172,7 @@ __all__ = [
     "h",
     "m",
     "p",
+    "quality",
     "r",
     "s",
     "t",

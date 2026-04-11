@@ -45,7 +45,7 @@ class FlextQualitySettings(FlextSettings):
     @classmethod
     def get_instance(cls) -> FlextQualitySettings:
         """Create settings instance from current environment."""
-        return cls.get_global()
+        return cls.fetch_global()
 
     def get_rules_path(self) -> Path:
         """Resolve configured rules directory path."""
