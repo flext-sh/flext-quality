@@ -13,7 +13,6 @@ from typing import final
 
 from flext_quality import (
     FlextQualityMcpClient,
-    build_mcp_health_result,
     c,
     m,
     r,
@@ -78,4 +77,4 @@ class FlextQualityClaudeContextClient:
 
     def health_check(self) -> r[t.ContainerMapping]:
         """Check if claude-context is available."""
-        return build_mcp_health_result(self.SERVER_NAME, self._mcp)
+        return self._mcp.build_server_health_result(self.SERVER_NAME)

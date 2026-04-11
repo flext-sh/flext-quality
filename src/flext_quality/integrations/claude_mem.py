@@ -15,7 +15,6 @@ from typing import final
 from flext_core import r
 from flext_quality import (
     FlextQualityMcpClient,
-    build_mcp_health_result,
     c,
     m,
     t,
@@ -115,4 +114,4 @@ class FlextQualityClaudeMemClient:
 
     def health_check(self) -> r[t.ContainerMapping]:
         """Check if claude-mem is available."""
-        return build_mcp_health_result(self.SERVER_NAME, self._mcp)
+        return self._mcp.build_server_health_result(self.SERVER_NAME)

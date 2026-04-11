@@ -347,7 +347,7 @@ class FlextQualityConfigManager:
             self.config_dir.mkdir(parents=True, exist_ok=True)
 
             result = u.Cli.yaml_dump(config_path, data)
-            if result.is_failure:
+            if result.failure:
                 return False
 
             # Clear cache for this config

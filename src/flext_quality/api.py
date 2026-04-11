@@ -196,12 +196,12 @@ class FlextQuality:
 
         """
         stdin_result = u.Quality.read_stdin()
-        if stdin_result.is_failure:
+        if stdin_result.failure:
             return r[t.Quality.HookOutput].fail(
                 stdin_result.error or "Failed to read stdin",
             )
         parse_result = u.Quality.parse_hook_input(stdin_result.value)
-        if parse_result.is_failure:
+        if parse_result.failure:
             return r[t.Quality.HookOutput].fail(
                 parse_result.error or "Failed to parse input",
             )
@@ -219,7 +219,7 @@ class FlextQuality:
 
         """
         threshold_result = self.config.validate_thresholds()
-        if threshold_result.is_failure:
+        if threshold_result.failure:
             return r[bool].fail(threshold_result.error or "Threshold validation failed")
         return r[bool].ok(value=True)
 

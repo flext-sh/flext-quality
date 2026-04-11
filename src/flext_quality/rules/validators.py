@@ -155,7 +155,7 @@ class FlextQualityValidators:
             all_violations: MutableSequence[t.ContainerMapping] = []
             for validator in self._validators.values():
                 result = validator.validate(content, file_path)
-                if result.is_success:
+                if result.success:
                     all_violations.extend(result.value)
             return r[Sequence[t.ContainerMapping]].ok(all_violations)
 

@@ -50,7 +50,7 @@ def assert_result_success_with_data[T](result: r[T]) -> T:
       messages for test debugging and failure analysis.
 
     """
-    assert result.is_success, f"Expected success but got failure: {result.error}"
+    assert result.success, f"Expected success but got failure: {result.error}"
     assert result.value is not None, "Expected data but got None"
     return result.value
 
@@ -81,7 +81,7 @@ def assert_result_failure_with_error[T](result: r[T]) -> str:
       the test suite and provides clear debugging information.
 
     """
-    assert result.is_failure, "Expected failure but got success"
+    assert result.failure, "Expected failure but got success"
     assert result.error is not None, "Expected error message but got None"
     return result.error
 

@@ -26,14 +26,14 @@ class TestFlextQualityCliService:
         """Test display_status returns a r with dict."""
         service = FlextQualityCliService()
         result = service.display_status()
-        tm.that(result.is_success, eq=True)
+        tm.that(result.success, eq=True)
         tm.that(result.value, is_=dict)
 
     def test_build_check_commands_returns_commands(self, tmp_path: Path) -> None:
         """Test build_check_commands returns list of commands."""
         service = FlextQualityCliService()
         result = service.build_check_commands(tmp_path)
-        tm.that(result.is_success, eq=True)
+        tm.that(result.success, eq=True)
         commands = result.value
         tm.that(commands, is_=list)
         tm.that(len(commands), eq=2)
@@ -42,7 +42,7 @@ class TestFlextQualityCliService:
         """Test build_check_commands includes ruff command."""
         service = FlextQualityCliService()
         result = service.build_check_commands(tmp_path)
-        tm.that(result.is_success, eq=True)
+        tm.that(result.success, eq=True)
         commands = result.value
         ruff_cmd = commands[0]
         tm.that(ruff_cmd, has="ruff")
@@ -52,7 +52,7 @@ class TestFlextQualityCliService:
         """Test build_check_commands includes basedpyright command."""
         service = FlextQualityCliService()
         result = service.build_check_commands(tmp_path)
-        tm.that(result.is_success, eq=True)
+        tm.that(result.success, eq=True)
         commands = result.value
         pyright_cmd = commands[1]
         tm.that(pyright_cmd, has="basedpyright")
@@ -65,7 +65,7 @@ class TestFlextQualityCliService:
         tests_dir.mkdir()
         service = FlextQualityCliService()
         result = service.build_validate_commands(tmp_path)
-        tm.that(result.is_success, eq=True)
+        tm.that(result.success, eq=True)
         commands = result.value
         tm.that(commands, is_=list)
         tm.that(len(commands), eq=5)
@@ -81,7 +81,7 @@ class TestFlextQualityCliService:
         tests_dir.mkdir()
         service = FlextQualityCliService()
         result = service.build_validate_commands(tmp_path)
-        tm.that(result.is_success, eq=True)
+        tm.that(result.success, eq=True)
         commands = result.value
         coverage_report_cmd = commands[4]
         tm.that(coverage_report_cmd, eq=["python", "-m", "coverage", "report"])
@@ -94,7 +94,7 @@ class TestFlextQualityCliService:
         tests_dir.mkdir()
         service = FlextQualityCliService()
         result = service.build_validate_commands(tmp_path)
-        tm.that(result.is_success, eq=True)
+        tm.that(result.success, eq=True)
         commands = result.value
         bandit_cmd = commands[2]
         tm.that(bandit_cmd, has="bandit")

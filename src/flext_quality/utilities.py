@@ -41,7 +41,7 @@ class FlextQualityUtilities(FlextWebUtilities, u):
             """Load rules from YAML file."""
             try:
                 yaml_result = FlextQualityUtilities.Cli.yaml_safe_load(path)
-                if yaml_result.is_failure:
+                if yaml_result.failure:
                     return r[Sequence[t.ContainerMapping]].fail(
                         f"Failed to load YAML: {yaml_result.error}",
                     )
@@ -105,7 +105,7 @@ class FlextQualityUtilities(FlextWebUtilities, u):
             """Run a shell command with timeout."""
             timeout_secs = int(timeout_ms / c.Quality.Defaults.MS_TO_SECONDS_DIVISOR)
             cmd_result = u.Cli.run_raw(list(cmd), timeout=timeout_secs)
-            if cmd_result.is_failure:
+            if cmd_result.failure:
                 return r[str].fail(str(cmd_result.error))
             out = cmd_result.value
             if out.exit_code != 0:

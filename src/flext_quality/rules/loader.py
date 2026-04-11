@@ -19,7 +19,7 @@ class FlextQualityRulesLoader:
                 f"Rules file not found: {path}",
             )
         yaml_result = u.Cli.yaml_safe_load(path)
-        if yaml_result.is_failure:
+        if yaml_result.failure:
             return r[Sequence[m.Quality.RuleDefinition]].fail(
                 f"Failed to parse YAML: {yaml_result.error}",
             )
@@ -46,7 +46,7 @@ class FlextQualityRulesLoader:
                 rule_data,
             )
             result = self._parse_rule(rule_dict, idx)
-            if result.is_failure:
+            if result.failure:
                 return r[Sequence[m.Quality.RuleDefinition]].fail(result.error)
             rules.append(result.value)
         return r[Sequence[m.Quality.RuleDefinition]].ok(rules)
@@ -59,7 +59,7 @@ class FlextQualityRulesLoader:
         all_rules: MutableSequence[m.Quality.RuleDefinition] = []
         for path in paths:
             result = self.load(path)
-            if result.is_failure:
+            if result.failure:
                 return r[Sequence[m.Quality.RuleDefinition]].fail(
                     f"Error loading {path}: {result.error}",
                 )

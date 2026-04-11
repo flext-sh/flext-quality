@@ -80,6 +80,24 @@ class FlextQualityMcpClient:
             "timeout_ms": self._timeout_ms,
         })
 
+    def build_server_health_result(self, server_name: str) -> r[t.ContainerMapping]:
+        """Build a normalized health result for a named MCP server."""
+        mcp_health = self.health_check()
+        if mcp_health.failure:
+            return r[t.ContainerMapping].fail(mcp_health.error)
+        health_data = mcp_health.value
+        status = (
+            c.Quality.IntegrationStatus.CONNECTED
+            if health_data.get("available", False)
+            else c.Quality.IntegrationStatus.DISCONNECTED
+        )
+        return r[t.ContainerMapping].ok({
+            "server": server_name,
+            "status": status,
+            "available": health_data.get("available", False),
+            "mcp_cli": health_data.get("mcp_cli", False),
+        })
+
     def is_mcp_cli_available(self) -> bool:
         """Check if mcp-cli is available in PATH."""
         return shutil.which("mcp-cli") is not None

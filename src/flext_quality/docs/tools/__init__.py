@@ -7,20 +7,9 @@ from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 _LAZY_IMPORTS = build_lazy_import_map(
     {
-        ".content_analyzer": (
-            "FlextQualityContentAnalyzer",
-            "analyze_file_content",
-            "analyze_files_content",
-        ),
-        ".link_checker": (
-            "FlextQualityLinkChecker",
-            "validate_links_sync",
-        ),
-        ".style_validator": (
-            "FlextQualityStyleValidator",
-            "validate_file_style",
-            "validate_files_style",
-        ),
+        ".content_analyzer": ("FlextQualityContentAnalyzer",),
+        ".link_checker": ("FlextQualityLinkChecker",),
+        ".style_validator": ("FlextQualityStyleValidator",),
     },
 )
 

@@ -18,10 +18,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
     build_lazy_import_map(
         {
             ".dashboard": ("FlextQualityDocumentationDashboard",),
-            ".notifications": (
-                "FlextQualityDocumentationNotifier",
-                "MAX_BROKEN_LINKS_TO_SHOW",
-            ),
+            ".notifications": ("FlextQualityDocumentationNotifier",),
             ".scheduled_maintenance": ("FlextQualityScheduledMaintenance",),
         },
     ),

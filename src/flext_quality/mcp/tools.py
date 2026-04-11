@@ -30,10 +30,10 @@ def search_memory(
     client = FlextQualityClaudeMemClient()
     search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
     result = client.build_search_call(query=query, limit=search_limit)
-    if result.is_failure:
+    if result.failure:
         return {"error": result.error}
     command_result = client.get_search_command(query=query, limit=search_limit)
-    if command_result.is_failure:
+    if command_result.failure:
         return {"error": command_result.error}
     params = dict(result.value.params)
     params["search_type"] = search_type
@@ -59,10 +59,10 @@ def search_code(
     client = FlextQualityClaudeContextClient()
     search_limit = limit or c.Quality.Defaults.DEFAULT_SEARCH_LIMIT
     result = client.build_search_call(query=query, limit=search_limit)
-    if result.is_failure:
+    if result.failure:
         return {"error": result.error}
     command_result = client.get_search_command(query=query, limit=search_limit)
-    if command_result.is_failure:
+    if command_result.failure:
         return {"error": command_result.error}
     return {
         "server": result.value.server,
@@ -77,7 +77,7 @@ def execute_hook(event: str, input_data: t.Quality.HookInput) -> t.Quality.HookO
     """Execute a hook manually."""
     manager = FlextQualityHookManager()
     result = manager.execute(event=event, input_data=input_data)
-    if result.is_failure:
+    if result.failure:
         error_msg = result.error if result.error is not None else "Unknown error"
         output: t.Quality.HookOutput = {"error": error_msg}
         return output
@@ -93,6 +93,6 @@ def validate_rules(
     """Validate code against YAML rules."""
     engine = FlextQualityRulesEngine()
     result = engine.validate(path=path, context=context)
-    if result.is_failure:
+    if result.failure:
         return {"error": result.error}
     return {"violations": result.value}

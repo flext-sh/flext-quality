@@ -37,7 +37,7 @@ class FlextQualityHookManager:
             if not hook.should_run(input_data):
                 continue
             result = hook.execute(input_data)
-            if result.is_failure:
+            if result.failure:
                 return result
             output = result.value
             if not output.get("continue", True):

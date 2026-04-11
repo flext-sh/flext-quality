@@ -37,11 +37,11 @@ class FlextQualityCliService:
         """Build commands for quick check (lint + type)."""
         commands: MutableSequence[t.StrSequence] = []
         lint_result = self._executor.build_ruff_command(target_path)
-        if lint_result.is_failure:
+        if lint_result.failure:
             return r[MutableSequence[t.StrSequence]].fail(lint_result.error)
         commands.append(lint_result.value)
         type_result = self._executor.build_basedpyright_command(target_path)
-        if type_result.is_failure:
+        if type_result.failure:
             return r[MutableSequence[t.StrSequence]].fail(type_result.error)
         commands.append(type_result.value)
         return r[MutableSequence[t.StrSequence]].ok(commands)
@@ -53,11 +53,11 @@ class FlextQualityCliService:
         """Build commands for full validation."""
         commands: MutableSequence[t.StrSequence] = []
         lint_result = self._executor.build_ruff_command(target_path)
-        if lint_result.is_failure:
+        if lint_result.failure:
             return r[MutableSequence[t.StrSequence]].fail(lint_result.error)
         commands.append(lint_result.value)
         type_result = self._executor.build_basedpyright_command(target_path)
-        if type_result.is_failure:
+        if type_result.failure:
             return r[MutableSequence[t.StrSequence]].fail(type_result.error)
         commands.append(type_result.value)
         src_path = (
@@ -90,7 +90,7 @@ class _CommandHandlers:
     def handle_check(service: FlextQualityCliService, target_path: Path) -> r[int]:
         """Handle check command."""
         result = service.build_check_commands(target_path)
-        if result.is_failure:
+        if result.failure:
             service.output.display_message(
                 f"Failed: {result.error}",
                 message_type="error",
@@ -108,7 +108,7 @@ class _CommandHandlers:
     def handle_status(service: FlextQualityCliService) -> r[int]:
         """Handle status command."""
         result = service.display_status()
-        if result.is_failure:
+        if result.failure:
             service.output.display_message(
                 f"Status failed: {result.error}",
                 message_type="error",
@@ -126,7 +126,7 @@ class _CommandHandlers:
     def handle_validate(service: FlextQualityCliService, target_path: Path) -> r[int]:
         """Handle validate command."""
         result = service.build_validate_commands(target_path)
-        if result.is_failure:
+        if result.failure:
             service.output.display_message(
                 f"Failed: {result.error}",
                 message_type="error",

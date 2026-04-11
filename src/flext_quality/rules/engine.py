@@ -30,7 +30,7 @@ class FlextQualityRulesEngine:
             path = Path(__file__).parent.parent.parent.parent / "rules" / "default.yaml"
         loader = FlextQualityRulesLoader()
         result = loader.load(path)
-        if result.is_failure:
+        if result.failure:
             return r[int].fail(result.error)
         self._rules = list(result.value)
         self._loaded = True
@@ -44,7 +44,7 @@ class FlextQualityRulesEngine:
         """Validate code against loaded rules."""
         if not self._loaded:
             load_result = self.load_rules()
-            if load_result.is_failure:
+            if load_result.failure:
                 return r[Sequence[t.ContainerMapping]].fail(load_result.error)
         target_path = Path(path)
         if not target_path.exists():
@@ -64,7 +64,7 @@ class FlextQualityRulesEngine:
         """Validate content string against loaded rules."""
         if not self._loaded:
             load_result = self.load_rules()
-            if load_result.is_failure:
+            if load_result.failure:
                 return r[Sequence[t.ContainerMapping]].fail(load_result.error)
         violations: MutableSequence[t.ContainerMapping] = []
         for rule in self._rules:

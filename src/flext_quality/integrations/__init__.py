@@ -7,7 +7,6 @@ from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 _LAZY_IMPORTS = build_lazy_import_map(
     {
-        "._health": ("build_mcp_health_result",),
         ".claude_context": ("FlextQualityClaudeContextClient",),
         ".claude_mem": ("FlextQualityClaudeMemClient",),
         ".code_execution": ("FlextQualityCodeExecutionBridge",),

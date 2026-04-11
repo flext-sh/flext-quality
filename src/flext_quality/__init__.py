@@ -12,12 +12,8 @@ from flext_core.lazy import (
 )
 
 if _t.TYPE_CHECKING:
-    from flext_core.decorators import d
-    from flext_core.exceptions import e
-    from flext_core.handlers import h
-    from flext_core.mixins import x
-    from flext_core.result import r
-    from flext_core.service import s
+    from flext_web import d, e, h, r, s, x
+
     from flext_quality.api import FlextQuality
     from flext_quality.constants import FlextQualityConstants, c
     from flext_quality.docs.core.base_classes import (
@@ -48,23 +44,11 @@ if _t.TYPE_CHECKING:
         FlextQualityContentValidator,
         FlextQualityLinkValidator,
     )
-    from flext_quality.docs.tools.content_analyzer import (
-        FlextQualityContentAnalyzer,
-        analyze_file_content,
-        analyze_files_content,
-    )
-    from flext_quality.docs.tools.link_checker import (
-        FlextQualityLinkChecker,
-        validate_links_sync,
-    )
-    from flext_quality.docs.tools.style_validator import (
-        FlextQualityStyleValidator,
-        validate_file_style,
-        validate_files_style,
-    )
+    from flext_quality.docs.tools.content_analyzer import FlextQualityContentAnalyzer
+    from flext_quality.docs.tools.link_checker import FlextQualityLinkChecker
+    from flext_quality.docs.tools.style_validator import FlextQualityStyleValidator
     from flext_quality.hooks.base import FlextQualityBaseHook
     from flext_quality.hooks.manager import FlextQualityHookManager
-    from flext_quality.integrations._health import build_mcp_health_result
     from flext_quality.integrations.claude_context import (
         FlextQualityClaudeContextClient,
     )
@@ -73,18 +57,6 @@ if _t.TYPE_CHECKING:
         FlextQualityCodeExecutionBridge,
     )
     from flext_quality.integrations.mcp_client import FlextQualityMcpClient
-    from flext_quality.mcp.resources import (
-        get_hooks_config,
-        get_integrations_status,
-        get_rules_config,
-    )
-    from flext_quality.mcp.server import get_server
-    from flext_quality.mcp.tools import (
-        execute_hook,
-        search_code,
-        search_memory,
-        validate_rules,
-    )
     from flext_quality.models import FlextQualityModels, m
     from flext_quality.protocols import FlextQualityProtocols, p
     from flext_quality.rules.engine import FlextQualityRulesEngine
@@ -127,12 +99,14 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "FlextQualityUtilities",
                 "u",
             ),
-            "flext_core.decorators": ("d",),
-            "flext_core.exceptions": ("e",),
-            "flext_core.handlers": ("h",),
-            "flext_core.mixins": ("x",),
-            "flext_core.result": ("r",),
-            "flext_core.service": ("s",),
+            "flext_web": (
+                "d",
+                "e",
+                "h",
+                "r",
+                "s",
+                "x",
+            ),
         },
     ),
     exclude_names=(
@@ -189,29 +163,15 @@ __all__ = [
     "FlextQualityUtilities",
     "FlextQualityValidationSettings",
     "FlextQualityValidators",
-    "analyze_file_content",
-    "analyze_files_content",
-    "build_mcp_health_result",
     "c",
     "d",
     "e",
-    "execute_hook",
-    "get_hooks_config",
-    "get_integrations_status",
-    "get_rules_config",
-    "get_server",
     "h",
     "m",
     "p",
     "r",
     "s",
-    "search_code",
-    "search_memory",
     "t",
     "u",
-    "validate_file_style",
-    "validate_files_style",
-    "validate_links_sync",
-    "validate_rules",
     "x",
 ]
