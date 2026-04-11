@@ -19,10 +19,7 @@ if _t.TYPE_CHECKING:
     from flext_core.result import r
     from flext_core.service import s
     from flext_quality.api import FlextQuality
-    from flext_quality.constants import (
-        FlextQualityConstants,
-        FlextQualityConstants as c,
-    )
+    from flext_quality.constants import FlextQualityConstants, c
     from flext_quality.docs.core.base_classes import (
         FlextQualityBaseAnalyzer,
         FlextQualityBaseAuditor,
@@ -88,21 +85,15 @@ if _t.TYPE_CHECKING:
         search_memory,
         validate_rules,
     )
-    from flext_quality.models import FlextQualityModels, FlextQualityModels as m
-    from flext_quality.protocols import (
-        FlextQualityProtocols,
-        FlextQualityProtocols as p,
-    )
+    from flext_quality.models import FlextQualityModels, m
+    from flext_quality.protocols import FlextQualityProtocols, p
     from flext_quality.rules.engine import FlextQualityRulesEngine
     from flext_quality.rules.loader import FlextQualityRulesLoader
     from flext_quality.rules.validators import FlextQualityValidators
     from flext_quality.services.cli import FlextQualityCliService
     from flext_quality.settings import FlextQualitySettings
-    from flext_quality.typings import FlextQualityTypes, FlextQualityTypes as t
-    from flext_quality.utilities import (
-        FlextQualityUtilities,
-        FlextQualityUtilities as u,
-    )
+    from flext_quality.typings import FlextQualityTypes, t
+    from flext_quality.utilities import FlextQualityUtilities, u
 _LAZY_IMPORTS = merge_lazy_imports(
     (
         ".docs",
@@ -115,25 +106,33 @@ _LAZY_IMPORTS = merge_lazy_imports(
     build_lazy_import_map(
         {
             ".api": ("FlextQuality",),
-            ".constants": ("FlextQualityConstants",),
-            ".models": ("FlextQualityModels",),
-            ".protocols": ("FlextQualityProtocols",),
+            ".constants": (
+                "FlextQualityConstants",
+                "c",
+            ),
+            ".models": (
+                "FlextQualityModels",
+                "m",
+            ),
+            ".protocols": (
+                "FlextQualityProtocols",
+                "p",
+            ),
             ".settings": ("FlextQualitySettings",),
-            ".typings": ("FlextQualityTypes",),
-            ".utilities": ("FlextQualityUtilities",),
+            ".typings": (
+                "FlextQualityTypes",
+                "t",
+            ),
+            ".utilities": (
+                "FlextQualityUtilities",
+                "u",
+            ),
             "flext_core.decorators": ("d",),
             "flext_core.exceptions": ("e",),
             "flext_core.handlers": ("h",),
             "flext_core.mixins": ("x",),
             "flext_core.result": ("r",),
             "flext_core.service": ("s",),
-        },
-        alias_groups={
-            ".constants": (("c", "FlextQualityConstants"),),
-            ".models": (("m", "FlextQualityModels"),),
-            ".protocols": (("p", "FlextQualityProtocols"),),
-            ".typings": (("t", "FlextQualityTypes"),),
-            ".utilities": (("u", "FlextQualityUtilities"),),
         },
     ),
     exclude_names=(
@@ -147,6 +146,9 @@ _LAZY_IMPORTS = merge_lazy_imports(
     ),
     module_name=__name__,
 )
+
+
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
 
 __all__ = [
     "FlextQuality",
@@ -213,6 +215,3 @@ __all__ = [
     "validate_rules",
     "x",
 ]
-
-
-install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)

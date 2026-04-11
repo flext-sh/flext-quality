@@ -10,12 +10,14 @@ from flext_quality import (
     FlextQualityHookManager,
     FlextQualityRulesEngine,
     c,
-    mcp,
     t,
 )
+from flext_quality.mcp.server import get_server as _get_server
+
+_mcp = _get_server()
 
 
-@mcp.resource("config://hooks")
+@_mcp.resource("config://hooks")
 def get_hooks_config() -> str:
     """Get current hooks configuration."""
     manager = FlextQualityHookManager()
@@ -26,7 +28,7 @@ def get_hooks_config() -> str:
     ).decode("utf-8")
 
 
-@mcp.resource("config://rules")
+@_mcp.resource("config://rules")
 def get_rules_config() -> str:
     """Get current rules configuration."""
     engine = FlextQualityRulesEngine()
@@ -37,7 +39,7 @@ def get_rules_config() -> str:
     ).decode("utf-8")
 
 
-@mcp.resource("status://integrations")
+@_mcp.resource("status://integrations")
 def get_integrations_status() -> str:
     """Get status of all integrations."""
     status: MutableMapping[str, t.Container | t.ContainerMapping] = {}

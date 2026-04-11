@@ -8,6 +8,7 @@ completeness checking, and structural validation for documentation.
 from __future__ import annotations
 
 import re
+import sys
 from collections import Counter
 from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from datetime import UTC, datetime
@@ -889,15 +890,14 @@ def analyze_files_content(
     return analyzer.analyze_files_batch(paths)
 
 
-if __name__ == "__main__":
-    import sys
-
-    MIN_ARGS = 2
-    if len(sys.argv) < MIN_ARGS:
-        sys.exit(1)
+def _main() -> int:
+    """Run the CLI entrypoint without leaking temporary names as exports."""
+    min_args = 2
+    if len(sys.argv) < min_args:
+        return 1
 
     file_path = sys.argv[1]
-    config_path = sys.argv[2] if len(sys.argv) > MIN_ARGS else None
+    config_path = sys.argv[2] if len(sys.argv) > min_args else None
 
     results = analyze_file_content(file_path, config_path)
 
@@ -910,3 +910,8 @@ if __name__ == "__main__":
     if suggestions:
         for _suggestion in suggestions[:2]:
             pass
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(_main())

@@ -603,7 +603,8 @@ def validate_links_sync(
     return asyncio.run(checker.validate_links(links, use_async=True))
 
 
-if __name__ == "__main__":
+async def _run_demo() -> None:
+    """Run the example validation without leaking module-level test data."""
     test_links: Sequence[FlextQualityLinkChecker.LinkInfo] = [
         FlextQualityLinkChecker.LinkInfo(
             url="https://github.com/microsoft/vscode",
@@ -627,13 +628,16 @@ if __name__ == "__main__":
             context={"file": "docs/broken.md"},
         ),
     ]
+    checker = FlextQualityLinkChecker()
+    await checker.validate_links(test_links)
+    checker.save_report()
 
-    import asyncio
 
-    async def main() -> None:
-        """Run example link validation."""
-        checker = FlextQualityLinkChecker()
-        await checker.validate_links(test_links)
-        checker.save_report()
+def _main() -> int:
+    """Run the example CLI entrypoint."""
+    asyncio.run(_run_demo())
+    return 0
 
-    asyncio.run(main())
+
+if __name__ == "__main__":
+    raise SystemExit(_main())

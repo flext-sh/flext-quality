@@ -8,12 +8,14 @@ from flext_quality import (
     FlextQualityHookManager,
     FlextQualityRulesEngine,
     c,
-    mcp,
     t,
 )
+from flext_quality.mcp.server import get_server as _get_server
+
+_mcp = _get_server()
 
 
-@mcp.tool()
+@_mcp.tool()
 def search_memory(
     query: str,
     *,
@@ -43,7 +45,7 @@ def search_memory(
     }
 
 
-@mcp.tool()
+@_mcp.tool()
 def search_code(
     query: str,
     *,
@@ -70,7 +72,7 @@ def search_code(
     }
 
 
-@mcp.tool()
+@_mcp.tool()
 def execute_hook(event: str, input_data: t.Quality.HookInput) -> t.Quality.HookOutput:
     """Execute a hook manually."""
     manager = FlextQualityHookManager()
@@ -82,7 +84,7 @@ def execute_hook(event: str, input_data: t.Quality.HookInput) -> t.Quality.HookO
     return result.value
 
 
-@mcp.tool()
+@_mcp.tool()
 def validate_rules(
     path: str,
     *,

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import operator
 import re
+import sys
 from collections.abc import MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
@@ -769,12 +770,10 @@ def validate_files_style(
     return validator.validate_files_batch(paths)
 
 
-if __name__ == "__main__":
-    # Example usage
-    import sys
-
+def _main() -> int:
+    """Run the CLI entrypoint without exporting temporary module names."""
     if len(sys.argv) < FlextQualityStyleValidator.MIN_COMMAND_LINE_ARGS:
-        sys.exit(1)
+        return 1
 
     file_path = sys.argv[1]
     config_path = (
@@ -785,5 +784,10 @@ if __name__ == "__main__":
 
     results = validate_file_style(file_path, config_path)
 
-    for _violation in results.violations[:3]:  # Show first 3
+    for _violation in results.violations[:3]:
         pass
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(_main())

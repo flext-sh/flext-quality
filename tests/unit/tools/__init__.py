@@ -1,6 +1,13 @@
-"""Tests for flext-quality tools package.
+# AUTO-GENERATED FILE — Regenerate with: make gen
+"""Tools package."""
 
-Copyright (c) 2025 FLEXT Team. All rights reserved.
-SPDX-License-Identifier: MIT
+from __future__ import annotations
 
-"""
+from flext_core.lazy import build_lazy_import_map, install_lazy_exports
+
+_LAZY_IMPORTS = build_lazy_import_map(
+    {},
+)
+
+
+install_lazy_exports(__name__, globals(), _LAZY_IMPORTS, publish_all=False)
