@@ -768,7 +768,7 @@ ______________________________________________________________________
 ### Additional Resources
 
 - **System Documentation**: `docs/maintenance/README.md`
-- **Configuration Examples**: `docs/maintenance/config/`
+- **Configuration Examples**: `docs/maintenance/settings/`
 - **Troubleshooting Guide**: `docs/maintenance/TROUBLESHOOTING.md`
 - **Team Wiki**: Internal documentation resources
 - **Training Materials**: Onboarding and advanced training resources

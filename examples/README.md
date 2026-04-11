@@ -221,7 +221,7 @@ Each example directory contains:
 
 - **`README.md`**: Detailed explanation and usage instructions
 - **`example.py`**: Main example code with comprehensive comments
-- **`config.yaml`**: Configuration file demonstrating customization options
+- **`settings.yaml`**: Configuration file demonstrating customization options
 - **`expected_output.json`**: Sample output showing expected results
 - **`requirements.txt`**: Python dependencies for the example
 
@@ -368,7 +368,7 @@ python -c "import flext_quality; print(flext_quality.__version__)"
 ```bash
 
 # Validate configuration file
-flext-quality validate-config config.yaml
+flext-quality validate-settings settings.yaml
 
 # Check environment variables
 flext-quality check-env

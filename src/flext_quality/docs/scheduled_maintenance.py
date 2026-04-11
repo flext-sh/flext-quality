@@ -33,8 +33,8 @@ def _docs_root() -> Path:
 
 
 def _docs_config_file(filename: str) -> Path:
-    """Return the absolute path for a docs config file."""
-    return _docs_root() / "config" / filename
+    """Return the absolute path for a docs settings file."""
+    return _docs_root() / "settings" / filename
 
 
 def _docs_reports_dir() -> Path:
@@ -53,17 +53,17 @@ def _docs_logs_dir() -> Path:
 
 
 def _as_str(value: t.NormalizedValue | None, default: str) -> str:
-    """Normalize unknown config values to string."""
+    """Normalize unknown settings values to string."""
     return value if isinstance(value, str) else default
 
 
 def _as_bool(value: t.NormalizedValue | None, /, *, default: bool) -> bool:
-    """Normalize unknown config values to bool."""
+    """Normalize unknown settings values to bool."""
     return value if isinstance(value, bool) else default
 
 
 def _as_int(value: t.NormalizedValue | None, default: int) -> int:
-    """Normalize unknown config values to int."""
+    """Normalize unknown settings values to int."""
     return value if isinstance(value, int) else default
 
 
@@ -71,7 +71,7 @@ def _as_str_list(
     value: t.NormalizedValue | None,
     default: t.StrSequence,
 ) -> t.StrSequence:
-    """Normalize unknown config values to t.StrSequence."""
+    """Normalize unknown settings values to t.StrSequence."""
     if isinstance(value, list):
         return default
     return default
@@ -101,10 +101,10 @@ class FlextQualityScheduledMaintenance:
             config_path: Path to configuration file for maintenance schedule.
 
         """
-        self.config: m.Quality.MaintenanceConfig = self.get_default_config()
+        self.settings: m.Quality.MaintenanceConfig = self.get_default_config()
         self.load_config(config_path)
         self.project_root = Path(__file__).parent.parent.parent.parent
-        self.reports_dir = Path(self.config.reports_dir)
+        self.reports_dir = Path(self.settings.reports_dir)
         self.reports_dir.mkdir(parents=True, exist_ok=True)
 
         # Initialize results tracking
@@ -125,18 +125,18 @@ class FlextQualityScheduledMaintenance:
                 resolved_config_path,
             )
             if _is_str_mapping(loaded_untyped) and loaded_untyped:
-                self.config = self._merge_config(default_config, loaded_untyped)
+                self.settings = self._merge_config(default_config, loaded_untyped)
             else:
-                self.config = default_config
+                self.settings = default_config
         except FileNotFoundError:
-            self.config = default_config
+            self.settings = default_config
 
     def _merge_config(
         self,
         base: m.Quality.MaintenanceConfig,
         overrides: t.ContainerMapping,
     ) -> m.Quality.MaintenanceConfig:
-        """Merge external config mapping into default typed config."""
+        """Merge external settings mapping into default typed settings."""
         merged = base.model_dump()
         merged["enabled"] = _as_bool(overrides.get("enabled"), default=base.enabled)
         merged["reports_dir"] = _as_str(overrides.get("reports_dir"), base.reports_dir)
@@ -341,8 +341,8 @@ class FlextQualityScheduledMaintenance:
         })
 
     def _get_task_names(self, schedule_key: str) -> t.StrSequence:
-        """Extract task name list from config for a schedule key."""
-        schedules = self.config.schedules
+        """Extract task name list from settings for a schedule key."""
+        schedules = self.settings.schedules
         schedule_entry = schedules.get(schedule_key)
         return schedule_entry.tasks if schedule_entry else []
 
@@ -367,7 +367,7 @@ class FlextQualityScheduledMaintenance:
         success = True
 
         for task_name in task_names:
-            task_cfg = self.config.tasks.get(task_name)
+            task_cfg = self.settings.tasks.get(task_name)
             if task_cfg is not None:
                 if self.run_single_task(task_cfg):
                     self.results.tasks_completed += 1
@@ -375,7 +375,7 @@ class FlextQualityScheduledMaintenance:
                     self.results.errors.append(f"Task {task_name} failed")
                     success = False
 
-                if self.config.error_handling.fail_fast:
+                if self.settings.error_handling.fail_fast:
                     break
 
         return success
@@ -638,7 +638,7 @@ class FlextQualityScheduledMaintenance:
 
     def schedule_tasks(self) -> None:
         """Schedule all maintenance tasks."""
-        schedules = self.config.schedules
+        schedules = self.settings.schedules
 
         # Daily audit
         if schedules["daily_audit"].enabled:
@@ -740,7 +740,7 @@ def main() -> None:
         description="FLEXT Quality Scheduled Documentation Maintenance",
     )
     _ = parser.add_argument(
-        "--config",
+        "--settings",
         default=str(_docs_config_file("schedule_config.yaml")),
         help="Maintenance schedule configuration file",
     )
@@ -762,10 +762,10 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    maintenance = FlextQualityScheduledMaintenance(args.config)
+    maintenance = FlextQualityScheduledMaintenance(args.settings)
 
     if args.list_schedules:
-        for _schedule_config in maintenance.config.schedules.values():
+        for _schedule_config in maintenance.settings.schedules.values():
             pass
 
     elif args.daemon:

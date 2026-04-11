@@ -31,7 +31,7 @@
 ## Guiding Principles
 
 - **Centralize capabilities** in `flext-quality`, exposing profile-based APIs so individual projects remain thin wrappers.
-- **Configuration over code**: project-specific behavior is driven entirely through metadata (`docs/maintenance/config.*`,
+- **Configuration over code**: project-specific behavior is driven entirely through metadata (`docs/maintenance/settings.*`,
   schedules, notifications).
 - **Automation first**: every task produce machine-readable output (JSON) and human-friendly Markdown; HTML and dashboards extend the same data.
 - **Iterative rollout**: ship in slices (pilot repos → full portfolio) with validation gates at every stage.
@@ -40,7 +40,7 @@
 
 1. **Metadata Inventory**
    - Scan all repositories for existing `docs/maintenance/` assets.
-   - Normalize config schemas (audit, style, validation, schedule).
+   - Normalize settings schemas (audit, style, validation, schedule).
    - Catalogue current artifacts (Markdown, HTML, JSON, dashboards) and consumers.
 1. **Shared API Enhancements**
    - Extend profile orchestrator to accept `output_formats=["markdown"]` with future-proof hooks for HTML.
@@ -120,9 +120,9 @@ ______________________________________________________________________
   - Detected active maintenance directories in `flext-grpc`, `flext-ldap`, `flext-observability`, `flext-quality`,
     and `flext-meltano-native`.
   - Collected configuration files for shared tooling:
-    - `flext-grpc/docs/maintenance/config.json`
-    - `flext-ldap/docs/maintenance/config.yaml`
-    - `flext-quality/docs/maintenance/config/{audit_rules,style_guide,validation_config,schedule_config,notification_config}.yaml`
+    - `flext-grpc/docs/maintenance/settings.json`
+    - `flext-ldap/docs/maintenance/settings.yaml`
+    - `flext-quality/docs/maintenance/settings/{audit_rules,style_guide,validation_config,schedule_config,notification_config}.yaml`
   - No additional maintenance metadata discovered in other repositories within current depth scan.
   - Next: expand search depth, document artifacts (Markdown/HTML/JSON) per repo, and align schema comparisons.
 
@@ -131,7 +131,7 @@ ______________________________________________________________________
   - `flext-grpc`: maintenance scripts (`audit.py`, `validation.py`, `optimization.py`, `reporting.py`, `sync.py`),
     user documentation (`README.md`, `user-guide.md`, `troubleshooting.md`, `api-reference.md`), `Makefile`,
     and `requirements.txt`.
-  - `flext-ldap`: wrappers for shared tooling, configuration (`config.yaml`), legacy scripts (`run_maintenance.sh`),
+  - `flext-ldap`: wrappers for shared tooling, configuration (`settings.yaml`), legacy scripts (`run_maintenance.sh`),
     documentation (`README.md`, `user-guide.md`, `troubleshooting.md`), and cache artifacts (`.link_cache.json`).
   - `flext-observability`: standalone Audit script (`audit/content-audit.py`) with associated reports (`dead_code_analysis.md`,
     `dead_code_cleanup_summary.md`, `README.md`).
@@ -144,18 +144,18 @@ ______________________________________________________________________
   | Repository             | Audit                           | Validation               | Optimization                                            | Reporting                  | Sync                                                                           | Config Format                               | Notes                                                        |
   | ---------------------- | ------------------------------- | ------------------------ | ------------------------------------------------------- | -------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------- | ------------------------------------------------------------ |
   | `flext-grpc`           | ✅ (`audit.py`)                 | ✅ (`validation.py`)     | ✅ (`optimization.py`)                                  | ✅ (`reporting.py`,        |                                                                                |                                             |                                                              |
-  | HTML/CSV dashboards)   | ✅ (`sync.py`)                  | `config.json`            | Full standalone toolchain with Makefile + requirements. |                            |                                                                                |                                             |                                                              |
+  | HTML/CSV dashboards)   | ✅ (`sync.py`)                  | `settings.json`            | Full standalone toolchain with Makefile + requirements. |                            |                                                                                |                                             |                                                              |
   | `flext-ldap`           | ✅ (wrappers to shared profile) | ✅ (`validate_links.py`, |                                                         |                            |                                                                                |                                             |                                                              |
-  | `validate_style.py`)   | ✅ (`optimize.py`)              | ✅ (`report.py`)         | ✅ (`sync.py`)                                          | `config.yaml`              | Uses shared infrastructure plus legacy shell runner; includes cache artifacts. |                                             |                                                              |
-  | `flext-observability`  | ✅ (`audit/content-audit.py`)   | ❌                       | ❌                                                      | ⚠️ Markdown summaries only | ❌                                                                             | config embedded in script (`yaml` optional) | Lightweight audit only; no automation scripts detected.      |
+  | `validate_style.py`)   | ✅ (`optimize.py`)              | ✅ (`report.py`)         | ✅ (`sync.py`)                                          | `settings.yaml`              | Uses shared infrastructure plus legacy shell runner; includes cache artifacts. |                                             |                                                              |
+  | `flext-observability`  | ✅ (`audit/content-audit.py`)   | ❌                       | ❌                                                      | ⚠️ Markdown summaries only | ❌                                                                             | settings embedded in script (`yaml` optional) | Lightweight audit only; no automation scripts detected.      |
   | `flext-meltano-native` | ❌                              | ❌                       | ❌                                                      | ❌                         | ❌                                                                             | None                                        | Documentation guidance only; no executable maintenance code. |
 
-  - Observed schema divergence: JSON-based config (`flext-grpc`) vs YAML (`flext-ldap`) vs inline defaults (`flext-observability`).
-  - Next: draft normalization checklist (config schema conversion, capability gaps,
+  - Observed schema divergence: JSON-based settings (`flext-grpc`) vs YAML (`flext-ldap`) vs inline defaults (`flext-observability`).
+  - Next: draft normalization checklist (settings schema conversion, capability gaps,
     wrapper migration plan) and define acceptance tests per capability pillar.
 
 - **2025-10-16** – Published detailed metadata inventory (`docs/maintenance/metadata-inventory.md`) summarizing directories,
-  config formats, markdown deliverables,
+  settings formats, markdown deliverables,
   and automation scripts per repository. Established normalization checklist covering schema conversion,
   capability gap closure, report naming, and automation mapping.
 

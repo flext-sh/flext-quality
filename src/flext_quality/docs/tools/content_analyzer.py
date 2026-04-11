@@ -137,7 +137,7 @@ class FlextQualityContentAnalyzer:
 
     def __init__(
         self,
-        config_path: str | None = "docs/maintenance/config/audit_rules.yaml",
+        config_path: str | None = "docs/maintenance/settings/audit_rules.yaml",
     ) -> None:
         """Initialize content analyzer with configuration.
 
@@ -145,7 +145,7 @@ class FlextQualityContentAnalyzer:
             config_path: Path to configuration file for content analysis rules.
 
         """
-        self.config: t.ContainerMapping = {}
+        self.settings: t.ContainerMapping = {}
         self.load_config(config_path)
         self.results: FlextQualityContentAnalyzer.Results = (
             FlextQualityContentAnalyzer.Results(
@@ -173,18 +173,18 @@ class FlextQualityContentAnalyzer:
             },
         }
         if config_path is None:
-            self.config = default_config
+            self.settings = default_config
             return
         try:
             loaded = u.Cli.yaml_load_mapping(Path(config_path))
             if loaded:
-                self.config = {
+                self.settings = {
                     k: v for k, v in loaded.items() if isinstance(v, (dict, str))
                 }
             else:
-                self.config = default_config
+                self.settings = default_config
         except (FileNotFoundError, KeyError):
-            self.config = default_config
+            self.settings = default_config
 
     def analyze_file(
         self,
@@ -458,7 +458,7 @@ class FlextQualityContentAnalyzer:
         })
 
         word_count = len(re.findall(r"\b\w+\b", content))
-        thresholds_val = self.config.get("quality_thresholds")
+        thresholds_val = self.settings.get("quality_thresholds")
         thresholds: t.ContainerMapping = (
             dict(thresholds_val) if isinstance(thresholds_val, Mapping) else {}
         )

@@ -12,7 +12,7 @@ from flext_core.lazy import (
 )
 
 if _t.TYPE_CHECKING:
-    from flext_web import d, e, h, r, s, x
+    from flext_cli import d, e, h, r, s, x
 
     from flext_quality.api import FlextQuality, quality
     from flext_quality.constants import FlextQualityConstants, c
@@ -102,7 +102,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "FlextQualityUtilities",
                 "u",
             ),
-            "flext_web": (
+            "flext_cli": (
                 "d",
                 "e",
                 "h",

@@ -88,11 +88,11 @@ def assert_result_failure_with_error[T](result: r[T]) -> str:
 
 @pytest.fixture(autouse=True)
 def set_test_environment() -> Generator[None]:
-    """Configure test environment variables for isolated testing.
+    """Settingsure test environment variables for isolated testing.
 
     Automatically sets up the test environment for all tests, ensuring
     proper isolation from development and production environments.
-    Configures logging and FLEXT-specific variables.
+    Settingsures logging and FLEXT-specific variables.
 
     Environment Variables:
       FLEXT_ENV: Set to 'test' for test-specific behavior
@@ -387,14 +387,14 @@ def analysis_task_data() -> t.ContainerMapping:
     }
 
 
-def pytest_configure(config: pytest.Config) -> None:
-    """Configure pytest markers for test categorization and execution control.
+def pytest_configure(settings: pytest.Settings) -> None:
+    """Settingsure pytest markers for test categorization and execution control.
 
     Defines test markers that enable selective test execution, proper test
     categorization, and CI/CD pipeline optimization through targeted testing.
 
     Args:
-      config: pytest configuration t.NormalizedValue for marker registration
+      settings: pytest configuration t.NormalizedValue for marker registration
 
     Markers:
       - unit: Fast, isolated tests with mocking
@@ -410,13 +410,13 @@ def pytest_configure(config: pytest.Config) -> None:
       >>> pytest -m integration  # Run integration tests only
 
     """
-    config.addinivalue_line("markers", "unit: Unit tests")
-    config.addinivalue_line("markers", "integration: Integration tests")
-    config.addinivalue_line("markers", "e2e: End-to-end tests")
-    config.addinivalue_line("markers", "quality: Quality analysis tests")
-    config.addinivalue_line("markers", "backend: Backend integration tests")
-    config.addinivalue_line("markers", "celery: Celery task tests")
-    config.addinivalue_line("markers", "slow: Slow tests")
+    settings.addinivalue_line("markers", "unit: Unit tests")
+    settings.addinivalue_line("markers", "integration: Integration tests")
+    settings.addinivalue_line("markers", "e2e: End-to-end tests")
+    settings.addinivalue_line("markers", "quality: Quality analysis tests")
+    settings.addinivalue_line("markers", "backend: Backend integration tests")
+    settings.addinivalue_line("markers", "celery: Celery task tests")
+    settings.addinivalue_line("markers", "slow: Slow tests")
 
 
 class MockQualityAnalyzer:

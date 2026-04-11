@@ -530,10 +530,10 @@ ______________________________________________________________________
   - ⛔ CRITICAL: Encryption keys
   - Fix: Never modify key files
 
-- **PF012**: `.git/config` modifications
+- **PF012**: `.git/settings` modifications
 
   - Problem: Git configuration is user-controlled
-  - Fix: User manages with `git config` commands
+  - Fix: User manages with `git settings` commands
 
 - **PF013**: `.git/index` modifications
 

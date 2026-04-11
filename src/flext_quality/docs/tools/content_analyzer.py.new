@@ -143,7 +143,7 @@ class ContentAnalyzer:
 
     def __init__(
         self,
-        config_path: str | None = "docs/maintenance/config/audit_rules.yaml",
+        config_path: str | None = "docs/maintenance/settings/audit_rules.yaml",
     ) -> None:
         """Initialize content analyzer with configuration.
 
@@ -151,7 +151,7 @@ class ContentAnalyzer:
             config_path: Path to configuration file for content analysis rules.
 
         """
-        self.config: _ConfigDict = {}
+        self.settings: _ConfigDict = {}
         self.load_config(config_path)
         quality_metrics: Mapping[str, _MetricsDict] = {}
         content_scores: Mapping[str, float] = {}
@@ -170,7 +170,7 @@ class ContentAnalyzer:
     def load_config(self, config_path: str | None) -> None:
         """Load content analysis configuration."""
         if config_path is None:
-            self.config = _ConfigDict(
+            self.settings = _ConfigDict(
                 content_checks={
                     "check_freshness": True,
                     "check_completeness": True,
@@ -187,9 +187,9 @@ class ContentAnalyzer:
             with Path(config_path).open(encoding="utf-8") as f:
                 loaded = yaml.safe_load(f)
                 if isinstance(loaded, dict):
-                    self.config = loaded
+                    self.settings = loaded
         except (FileNotFoundError, KeyError):
-            self.config = _ConfigDict(
+            self.settings = _ConfigDict(
                 content_checks={
                     "check_freshness": True,
                     "check_completeness": True,
@@ -468,7 +468,7 @@ class ContentAnalyzer:
 
         # Basic word count check
         word_count = len(re.findall(r"\b\w+\b", content))
-        thresholds = cast("_SubDict", self.config["quality_thresholds"])
+        thresholds = cast("_SubDict", self.settings["quality_thresholds"])
         min_words = int(thresholds["min_word_count"])
 
         if word_count < min_words:

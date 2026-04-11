@@ -42,7 +42,7 @@ class TestFlextQualityAPI:
         tm.that(status, is_=dict)
         tm.that(status, has="name")
         tm.that(status, has="version")
-        tm.that(status, has="config")
+        tm.that(status, has="settings")
         tm.that(status, has="hooks_registered")
 
     def test_validate_configuration_succeeds(self) -> None:
@@ -175,7 +175,7 @@ class TestFlextQualitySingleton:
 
 
 class TestFlextQualityRulesConfig:
-    """Tests for rules loading from config."""
+    """Tests for rules loading from settings."""
 
     def setup_method(self) -> None:
         """Reset singleton before each test."""
@@ -188,10 +188,10 @@ class TestFlextQualityRulesConfig:
     def test_load_rules_from_config_nonexistent_dir(self) -> None:
         """Test load_rules_from_config fails when rules dir doesn't exist."""
         quality = FlextQuality.get_instance()
-        original_dir = quality.config.rules_dir
-        quality.config.rules_dir = "/nonexistent/rules/dir"
+        original_dir = quality.settings.rules_dir
+        quality.settings.rules_dir = "/nonexistent/rules/dir"
         result = quality.load_rules_from_config()
-        quality.config.rules_dir = original_dir
+        quality.settings.rules_dir = original_dir
         tm.that(result.failure, eq=True)
         tm.that((result.error or "").lower(), has="not found")
 
@@ -206,10 +206,10 @@ class TestFlextQualityRulesConfig:
             (rules_dir / "rules2.yml").write_text(
                 '\nrules:\n  - name: rule-two\n    type: blocking\n    description: Second rule\n    pattern: "two"\n    enabled: true\n',
             )
-            original_dir = quality.config.rules_dir
-            quality.config.rules_dir = str(rules_dir)
+            original_dir = quality.settings.rules_dir
+            quality.settings.rules_dir = str(rules_dir)
             result = quality.load_rules_from_config()
-            quality.config.rules_dir = original_dir
+            quality.settings.rules_dir = original_dir
             tm.that(result.success, eq=True)
             tm.that(len(result.value), eq=2)
 
@@ -294,12 +294,12 @@ class TestFlextQualityValidation:
     def test_validate_configuration_threshold_failure(self) -> None:
         """Test validate_configuration fails when thresholds are invalid."""
         quality = FlextQuality.get_instance()
-        original_function = quality.config.max_function_length
-        original_class = quality.config.max_class_length
-        quality.config.max_function_length = 500
-        quality.config.max_class_length = 100
+        original_function = quality.settings.max_function_length
+        original_class = quality.settings.max_class_length
+        quality.settings.max_function_length = 500
+        quality.settings.max_class_length = 100
         result = quality.validate_configuration()
-        quality.config.max_function_length = original_function
-        quality.config.max_class_length = original_class
+        quality.settings.max_function_length = original_function
+        quality.settings.max_class_length = original_class
         tm.that(result.failure, eq=True)
         tm.that((result.error or "").lower(), has="max_function_length")

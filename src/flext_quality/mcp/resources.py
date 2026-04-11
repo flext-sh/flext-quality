@@ -17,18 +17,18 @@ from flext_quality.mcp.server import get_server as _get_server
 _mcp = _get_server()
 
 
-@_mcp.resource("config://hooks")
+@_mcp.resource("settings://hooks")
 def get_hooks_config() -> str:
     """Get current hooks configuration."""
     manager = FlextQualityHookManager()
-    config = manager.get_config()
+    settings = manager.get_config()
     return t.CONTAINER_MAPPING_ADAPTER.dump_json(
-        dict(config),
+        dict(settings),
         indent=c.Quality.Defaults.JSON_INDENT,
     ).decode("utf-8")
 
 
-@_mcp.resource("config://rules")
+@_mcp.resource("settings://rules")
 def get_rules_config() -> str:
     """Get current rules configuration."""
     engine = FlextQualityRulesEngine()

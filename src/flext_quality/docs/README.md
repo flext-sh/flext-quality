@@ -28,8 +28,8 @@
   - [Link & Reference Validation](#link-reference-validation)
   - [Style & Accessibility](#style-accessibility)
 - [⚙️ Configuration](#configuration)
-  - [Audit Rules (`config/audit_rules.yaml`)](#audit-rules-configauditrulesyaml)
-  - [Style Guide (`config/style_guide.yaml`)](#style-guide-configstyleguideyaml)
+  - [Audit Rules (`settings/audit_rules.yaml`)](#audit-rules-configauditrulesyaml)
+  - [Style Guide (`settings/style_guide.yaml`)](#style-guide-configstyleguideyaml)
 - [🔧 Maintenance Scripts](#maintenance-scripts)
   - [Comprehensive Audit (`scripts/audit.py`)](#comprehensive-audit-scriptsauditpy)
   - [Link Validation (`scripts/validate.py`)](#link-validation-scriptsvalidatepy)
@@ -105,7 +105,7 @@
   - Directory Structure Setup
 - Ensure you're in the project root
 - The maintenance system should be properly set up at:
-- README.md demo.py scripts/ config/ tools/ reports/
+- README.md demo.py scripts/ settings/ tools/ reports/
   - Configuration Validation
 - Verify configuration files exist
 - audit_rules.YAML style_guide.YAML validation_config.YAML
@@ -126,7 +126,7 @@
 - .gitlab-ci.yml (partial)
 - Scheduled pipeline for regular maintenance
   - Pre-commit Hooks
-- .pre-commit-config.YAML
+- .pre-commit-settings.YAML
   - Scheduled Maintenance
 - Add to crontab for regular maintenance
 - Daily quality checks
@@ -137,8 +137,8 @@
     - Link & Reference Validation
     - Style & Accessibility
   - ⚙️ Configuration
-    - Audit Rules (`config/audit_rules.yaml`)
-    - Style Guide (`config/style_guide.yaml`)
+    - Audit Rules (`settings/audit_rules.yaml`)
+    - Style Guide (`settings/style_guide.yaml`)
   - 🔧 Maintenance Scripts
     - Comprehensive Audit (`scripts/audit.py`)
 - Full documentation quality assessment
@@ -181,7 +181,7 @@
 - Check Python dependencies
 - Verify file permissions
 - Check configuration files
-- Update timeout in config/validation_config.YAML
+- Update timeout in settings/validation_config.YAML
 - Review style guide configuration
 - Run with verbose output
   - 📚 API Reference
@@ -250,7 +250,7 @@ docs/maintenance/
 │   ├── validate.py          # Link and reference validation engine
 │   ├── optimize.py          # Content optimization and enhancement tools
 │   └── report.py            # Quality assurance reporting and analytics
-├── config/                   # Configuration files (customizable)
+├── settings/                   # Configuration files (customizable)
 │   ├── audit_rules.yaml     # Quality audit rules and severity thresholds
 │   ├── style_guide.yaml     # Style and formatting guidelines
 │   └── validation_config.yaml # Validation settings and timeouts
@@ -316,7 +316,7 @@ cd /path/to/flext-quality
 # The maintenance system should be properly set up at:
 ls docs/maintenance/
 
-# README.md  demo.py  scripts/  config/  tools/  reports/
+# README.md  demo.py  scripts/  settings/  tools/  reports/
 ```
 
 ### Configuration Validation
@@ -324,7 +324,7 @@ ls docs/maintenance/
 ```bash
 
 # Verify configuration files exist
-ls docs/maintenance/config/
+ls docs/maintenance/settings/
 
 # audit_rules.yaml  style_guide.yaml  validation_config.yaml
 
@@ -498,7 +498,7 @@ docs_daily_audit:
 
 ```bash
 
-# .pre-commit-config.yaml
+# .pre-commit-settings.yaml
 repos:
   - repo: local
     hooks:
@@ -559,7 +559,7 @@ repos:
 
 ## ⚙️ Configuration
 
-### Audit Rules (`config/audit_rules.yaml`)
+### Audit Rules (`settings/audit_rules.yaml`)
 
 ```yaml
 quality_thresholds:
@@ -578,7 +578,7 @@ validation_rules:
   check_images: true
 ```
 
-### Style Guide (`config/style_guide.yaml`)
+### Style Guide (`settings/style_guide.yaml`)
 
 ```yaml
 markdown:
@@ -786,13 +786,13 @@ pip install pyyaml requests beautifulsoup4
 chmod +x docs/maintenance/scripts/*.py
 
 # Check configuration files
-python -c "import yaml; yaml.safe_load(open('docs/maintenance/config/audit_rules.yaml'))"
+python -c "import yaml; yaml.safe_load(open('docs/maintenance/settings/audit_rules.yaml'))"
 ```
 
 **Link Validation Timeout**
 
 ```yaml
-# Update timeout in config/validation_config.yaml
+# Update timeout in settings/validation_config.yaml
 validation:
   link_timeout: 30 # Increase from default 10 seconds
   retry_attempts: 5 # Increase retry attempts
@@ -803,7 +803,7 @@ validation:
 ```bash
 
 # Review style guide configuration
-cat docs/maintenance/config/style_guide.yaml
+cat docs/maintenance/settings/style_guide.yaml
 
 # Run with verbose output
 python scripts/audit.py --style-check --verbose
@@ -816,7 +816,7 @@ python scripts/audit.py --style-check --verbose
 ```python
 from docs.maintenance.scripts.audit import DocumentationAuditor
 
-auditor = DocumentationAuditor(config_path="docs/maintenance/config/")
+auditor = DocumentationAuditor(config_path="docs/maintenance/settings/")
 results = auditor.run_comprehensive_audit()
 report = auditor.generate_report(format="json")
 ```
@@ -844,7 +844,7 @@ broken_links = validator.get_broken_links()
 ### Adding New Checks
 
 1. Create new validator in `tools/` directory
-1. Add configuration options to appropriate config file
+1. Add configuration options to appropriate settings file
 1. Integrate with main audit script
 1. Add tests and documentation
 1. Update CI/CD pipeline if needed
@@ -1011,7 +1011,7 @@ ______________________________________________________________________
 
 ### ✅ Configuration Ready
 
-- [ ] Configuration files present (`ls docs/maintenance/config/`)
+- [ ] Configuration files present (`ls docs/maintenance/settings/`)
 - [ ] Rules customized for project needs
 - [ ] Output directories created (`mkdir -p docs/reports`)
 

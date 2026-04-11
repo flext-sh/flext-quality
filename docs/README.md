@@ -190,9 +190,9 @@ This documentation follows FLEXT ecosystem standards:
 ## Documentation Maintenance Baseline
 
 - Shared automation resides in [`docs/maintenance`](maintenance/) and is exposed via profile-based runners in `flext_quality.docs_maintenance`.
-- Project-level configurations are normalized to YAML (see [`maintenance/config`](maintenance/config/)) with defaults documented in [`docs-maintenance-roadmap.md`](maintenance/docs-maintenance-roadmap.md) and [`metadata-inventory.md`](maintenance/metadata-inventory.md).
-- Report generation now emits Markdown by default (timestamped artifacts plus `latest_report.*` pointers) with optional JSON/HTML outputs controlled through the `reporting.output_formats` config.
-- All repositories tethering to this tooling should keep metadata in `docs/maintenance/` (config, scripts,
+- Project-level configurations are normalized to YAML (see [`maintenance/settings`](maintenance/settings/)) with defaults documented in [`docs-maintenance-roadmap.md`](maintenance/docs-maintenance-roadmap.md) and [`metadata-inventory.md`](maintenance/metadata-inventory.md).
+- Report generation now emits Markdown by default (timestamped artifacts plus `latest_report.*` pointers) with optional JSON/HTML outputs controlled through the `reporting.output_formats` settings.
+- All repositories tethering to this tooling should keep metadata in `docs/maintenance/` (settings, scripts,
   reports) to benefit from shared audits, validation, optimization, and synchronization flows.
 
 ## Contributing to Documentation

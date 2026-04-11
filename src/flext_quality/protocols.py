@@ -96,7 +96,7 @@ class FlextQualityProtocols(FlextWebProtocols, p):
 
             def validate(
                 self,
-                config: t.Quality.RuleConfig,
+                settings: t.Quality.RuleConfig,
                 context: t.ContainerMapping,
             ) -> r[t.Quality.RuleResult]:
                 """Validate according to rule."""

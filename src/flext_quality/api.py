@@ -44,7 +44,7 @@ class FlextQuality:
     - Singleton pattern with thread-safe locking prevents race conditions
     - Service instances are created on-demand (lazy initialization)
     - Railway-Oriented Programming via r for composable errors
-    - FlextSettings provides auto self.config and self.logger
+    - FlextSettings provides auto self.settings and self.logger
 
     Usage:
         from flext_quality import FlextQuality
@@ -65,7 +65,7 @@ class FlextQuality:
     _version: str
     _container: p.Container
     logger: p.Logger
-    config: FlextQualitySettings
+    settings: FlextQualitySettings
     hooks: FlextQualityHookManager
     rules_loader: FlextQualityRulesLoader
 
@@ -74,7 +74,7 @@ class FlextQuality:
         self._name = c.Quality.Mcp.SERVER_NAME
         self._version = c.Quality.Mcp.SERVER_VERSION
         self.logger = u.fetch_logger(__name__)
-        self.config = FlextQualitySettings.get_instance()
+        self.settings = FlextQualitySettings.get_instance()
         self._container = FlextContainer.fetch_global()
         if not self._container.has_service("flext_quality"):
             _ = self._container.register("flext_quality", "flext_quality")
@@ -150,11 +150,11 @@ class FlextQuality:
         return {
             "name": self._name,
             "version": self._version,
-            "config": {
-                "hook_timeout_ms": self.config.hook_timeout_ms,
-                "rule_timeout_seconds": self.config.rule_timeout_seconds,
-                "cache_enabled": self.config.cache_enabled,
-                "mcp_server_port": self.config.mcp_server_port,
+            "settings": {
+                "hook_timeout_ms": self.settings.hook_timeout_ms,
+                "rule_timeout_seconds": self.settings.rule_timeout_seconds,
+                "cache_enabled": self.settings.cache_enabled,
+                "mcp_server_port": self.settings.mcp_server_port,
             },
             "hooks_registered": len(self.hooks.get_config()),
         }
@@ -178,7 +178,7 @@ class FlextQuality:
             r[Sequence[m.Quality.RuleDefinition]]: List of rule definitions or error
 
         """
-        rules_path = self.config.get_rules_path()
+        rules_path = self.settings.get_rules_path()
         if not rules_path.exists():
             return r[Sequence[m.Quality.RuleDefinition]].fail(
                 f"Rules directory not found: {rules_path}",
@@ -218,7 +218,7 @@ class FlextQuality:
             r[bool]: Success or validation error
 
         """
-        threshold_result = self.config.validate_thresholds()
+        threshold_result = self.settings.validate_thresholds()
         if threshold_result.failure:
             return r[bool].fail(threshold_result.error or "Threshold validation failed")
         return r[bool].ok(value=True)

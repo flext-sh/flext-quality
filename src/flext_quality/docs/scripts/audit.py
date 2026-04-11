@@ -27,7 +27,7 @@ from flext_quality import m, t, u
 class FlextQualityDocumentationAuditor:
     """Main documentation audit and quality assurance system."""
 
-    def __init__(self, config_path: str = "docs/maintenance/config/") -> None:
+    def __init__(self, config_path: str = "docs/maintenance/settings/") -> None:
         """Initialize documentation audit system.
 
         Args:
@@ -82,7 +82,7 @@ class FlextQualityDocumentationAuditor:
             self.validation_config = self.get_default_validation_config()
 
     def get_default_audit_rules(self) -> m.Quality.AuditRulesConfig:
-        """Default audit rules if config file not found."""
+        """Default audit rules if settings file not found."""
         return m.Quality.AuditRulesConfig.model_validate({
             "quality_thresholds": {
                 "max_age_days": 90,
@@ -105,7 +105,7 @@ class FlextQualityDocumentationAuditor:
         })
 
     def get_default_style_guide(self) -> m.Quality.StyleGuideConfig:
-        """Default style guide if config file not found."""
+        """Default style guide if settings file not found."""
         return m.Quality.StyleGuideConfig.model_validate({
             "markdown": {
                 "heading_style": "atx",
@@ -126,7 +126,7 @@ class FlextQualityDocumentationAuditor:
         })
 
     def get_default_validation_config(self) -> m.Quality.ValidationConfig:
-        """Default validation config if config file not found."""
+        """Default validation settings if settings file not found."""
         return m.Quality.ValidationConfig.model_validate({
             "link_validation": {
                 "timeout": 10,
@@ -827,9 +827,9 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         help="Report format",
     )
     _ = parser.add_argument(
-        "--config",
+        "--settings",
         type=str,
-        default="docs/maintenance/config/",
+        default="docs/maintenance/settings/",
         help="Configuration directory path",
     )
     return parser
@@ -879,7 +879,7 @@ def main() -> None:
     """Main entry point for documentation audit."""
     parser = _create_argument_parser()
     args = parser.parse_args()
-    auditor = FlextQualityDocumentationAuditor(args.config)
+    auditor = FlextQualityDocumentationAuditor(args.settings)
     try:
         results = _execute_audit_checks(auditor, args)
         auditor.save_report(args.format, args.output)

@@ -79,7 +79,7 @@ class FlextQualityDocumentationNotifier:
 
     def __init__(
         self,
-        config_path: str = "docs/maintenance/config/notification_config.yaml",
+        config_path: str = "docs/maintenance/settings/notification_config.yaml",
     ) -> None:
         """Initialize the documentation notifier with configuration.
 
@@ -87,7 +87,7 @@ class FlextQualityDocumentationNotifier:
             config_path: Path to the notification configuration file.
 
         """
-        self.config: FlextQualityDocumentationNotifier._NotifierConfig = (
+        self.settings: FlextQualityDocumentationNotifier._NotifierConfig = (
             self.get_default_config()
         )
         self.load_config(config_path)
@@ -100,11 +100,11 @@ class FlextQualityDocumentationNotifier:
         try:
             loaded = u.Cli.yaml_load_mapping(Path(config_path))
             if loaded:
-                self.config = self._load_user_config({})
+                self.settings = self._load_user_config({})
             else:
-                self.config = self.get_default_config()
+                self.settings = self.get_default_config()
         except FileNotFoundError:
-            self.config = self.get_default_config()
+            self.settings = self.get_default_config()
 
     def _load_user_config(
         self,
@@ -253,7 +253,7 @@ class FlextQualityDocumentationNotifier:
         audit_data: t.ContainerMapping,
     ) -> bool:
         """Send notification for critical documentation issues."""
-        if not self.config.alerts.critical_issues.enabled:
+        if not self.settings.alerts.critical_issues.enabled:
             return True
 
         metrics_val = audit_data.get("metrics")
@@ -273,7 +273,7 @@ class FlextQualityDocumentationNotifier:
             kv = severity_m.get(key_name, 0)
             severity_breakdown[key_name] = kv if isinstance(kv, int) else 0
         critical_count: int = severity_breakdown.get("critical", 0)
-        threshold = self.config.alerts.critical_issues.threshold
+        threshold = self.settings.alerts.critical_issues.threshold
 
         if critical_count >= threshold:
             title = f"🚨 CRITICAL: {critical_count} Critical Documentation Issues Found"
@@ -284,10 +284,10 @@ class FlextQualityDocumentationNotifier:
 
     def notify_quality_drop(self, current_score: float, previous_score: float) -> bool:
         """Send notification for significant quality score drops."""
-        if not self.config.alerts.quality_drop.enabled:
+        if not self.settings.alerts.quality_drop.enabled:
             return True
 
-        threshold = self.config.alerts.quality_drop.threshold
+        threshold = self.settings.alerts.quality_drop.threshold
         drop = previous_score - current_score
 
         if drop >= threshold:
@@ -311,10 +311,10 @@ Please review recent changes and address any identified issues.
         broken_links: Sequence[t.NormalizedValue],
     ) -> bool:
         """Send notification for broken links."""
-        if not self.config.alerts.broken_links.enabled:
+        if not self.settings.alerts.broken_links.enabled:
             return True
 
-        threshold = self.config.alerts.broken_links.threshold
+        threshold = self.settings.alerts.broken_links.threshold
 
         if len(broken_links) >= threshold:
             title = f"🔗 Link Alert: {len(broken_links)} Broken Links Detected"
@@ -328,7 +328,7 @@ Please review recent changes and address any identified issues.
         report_data: t.ContainerMapping,
     ) -> bool:
         """Send weekly quality report notification."""
-        if not self.config.alerts.weekly_report.enabled:
+        if not self.settings.alerts.weekly_report.enabled:
             return True
 
         title = "📊 Weekly Documentation Quality Report"
@@ -340,7 +340,7 @@ Please review recent changes and address any identified issues.
         report_data: t.ContainerMapping,
     ) -> bool:
         """Send monthly comprehensive report notification."""
-        if not self.config.alerts.monthly_report.enabled:
+        if not self.settings.alerts.monthly_report.enabled:
             return True
 
         title = "📈 Monthly Documentation Quality Report"
@@ -357,11 +357,11 @@ Please review recent changes and address any identified issues.
         success = True
 
         # Console notification (always enabled)
-        if self.config.channels.console.enabled:
+        if self.settings.channels.console.enabled:
             self._send_console_notification(title, message, priority)
 
         # Email notification
-        if self.config.channels.email.enabled:
+        if self.settings.channels.email.enabled:
             try:
                 self._send_email_notification(title, message, priority)
             except (smtplib.SMTPException, ConnectionError, OSError) as e:
@@ -369,7 +369,7 @@ Please review recent changes and address any identified issues.
                 success = False
 
         # Slack notification
-        if self.config.channels.slack.enabled:
+        if self.settings.channels.slack.enabled:
             try:
                 self._send_slack_notification(title, message, priority)
             except (requests.RequestException, ConnectionError, OSError) as e:
@@ -377,7 +377,7 @@ Please review recent changes and address any identified issues.
                 success = False
 
         # Webhook notification
-        if self.config.channels.webhook.enabled:
+        if self.settings.channels.webhook.enabled:
             try:
                 self._send_webhook_notification(title, message, priority)
             except (requests.RequestException, ConnectionError, OSError) as e:
@@ -401,7 +401,7 @@ Please review recent changes and address any identified issues.
 
     def _send_email_notification(self, title: str, message: str, priority: str) -> None:
         """Send notification via email."""
-        email_config = self.config.email
+        email_config = self.settings.email
 
         msg = MIMEMultipart()
         msg["From"] = str(email_config.from_address)
@@ -441,7 +441,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
 
     def _send_slack_notification(self, title: str, message: str, priority: str) -> None:
         """Send notification to Slack."""
-        slack_config = self.config.slack
+        slack_config = self.settings.slack
 
         color = {"critical": "danger", "warning": "warning", "info": "good"}.get(
             priority,
@@ -476,7 +476,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
         priority: str,
     ) -> None:
         """Send notification via webhook."""
-        webhook_config = self.config.webhook
+        webhook_config = self.settings.webhook
 
         payload = {
             "title": title,
@@ -633,8 +633,8 @@ def main() -> None:
         description="FLEXT Quality Documentation Notifications",
     )
     _ = parser.add_argument(
-        "--config",
-        default="docs/maintenance/config/notification_config.yaml",
+        "--settings",
+        default="docs/maintenance/settings/notification_config.yaml",
         help="Notification configuration file",
     )
     _ = parser.add_argument(
@@ -648,7 +648,7 @@ def main() -> None:
 
     args = parser.parse_args()
 
-    notifier = FlextQualityDocumentationNotifier(args.config)
+    notifier = FlextQualityDocumentationNotifier(args.settings)
 
     if args.test:
         success = notifier.send_notification(

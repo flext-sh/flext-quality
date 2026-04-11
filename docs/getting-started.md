@@ -208,7 +208,7 @@ direct_analysis()
 flext-quality analyze --projects ./src --format html --output quality-report.html
 
 # Quality gate validation with thresholds
-flext-quality validate --thresholds quality-config.toml
+flext-quality validate --thresholds quality-settings.toml
 
 # Workspace-wide quality analysis (absorbing workspace scripts)
 flext-quality workspace-analyze --parallel --security-scan
@@ -288,7 +288,7 @@ WORKSPACE_INTEGRATION = {
 ENTERPRISE_TOOLS = {
     "ruff": {
         "description": "Rust-based linting, 3453+ patterns, extremely fast",
-        "features": "TOML config, hierarchical overrides, pre-commit integration",
+        "features": "TOML settings, hierarchical overrides, pre-commit integration",
     },
     "mypy": {
         "description": "Industry standard type checking with plugin system",
@@ -309,7 +309,7 @@ ENTERPRISE_TOOLS = {
 
 ```toml
 
-# quality-config.toml (PLANNED)
+# quality-settings.toml (PLANNED)
 [tool.flext_quality]
 project_name = "my-enterprise-project"
 python_version = "3.13"

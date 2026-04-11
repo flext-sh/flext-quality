@@ -144,27 +144,27 @@ class FlextQualityConfigManager:
 
     @staticmethod
     def _as_config_data(value: RawConfigMap | t.ContainerMapping | None) -> ConfigData:
-        """Normalize loaded YAML content into typed config data."""
+        """Normalize loaded YAML content into typed settings data."""
         if not isinstance(value, Mapping):
             return {}
-        config: ConfigData = {}
+        settings: ConfigData = {}
         for key, item in value.items():
             section = FlextQualityConfigManager._as_section(item)
             if section:
-                config[str(key)] = section
-        return config
+                settings[str(key)] = section
+        return settings
 
     def __init__(self, config_dir: str | Path | None = None) -> None:
         """Initialize the configuration manager.
 
         Args:
             config_dir: Directory containing configuration files. If None,
-                       uses the default config directory.
+                       uses the default settings directory.
 
         """
         if config_dir is None:
-            # Find config directory relative to this file
-            self.config_dir = Path(__file__).parent.parent / "config"
+            # Find settings directory relative to this file
+            self.config_dir = Path(__file__).parent.parent / "settings"
         else:
             self.config_dir = Path(config_dir)
 
@@ -290,14 +290,14 @@ class FlextQualityConfigManager:
 
     def validate_configs(self) -> t.StrSequence:
         """Validate all configuration files and return any issues."""
-        # Check required config files exist
+        # Check required settings files exist
         required_files = [
             "audit_rules.yaml",
             "style_guide.yaml",
             "validation_config.yaml",
         ]
         issues = [
-            f"Missing required config file: {filename}"
+            f"Missing required settings file: {filename}"
             for filename in required_files
             if not (self.config_dir / filename).exists()
         ]
@@ -318,11 +318,11 @@ class FlextQualityConfigManager:
         except (FileNotFoundError, ValueError, KeyError, OSError) as e:
             issues.append(f"Invalid style_guide.yaml: {e}")
 
-        # Validate validation config structure
+        # Validate validation settings structure
         try:
             validation_config = self.get_validation_config()
             if not validation_config.link_validation:
-                issues.append("Validation config missing link_validation section")
+                issues.append("Validation settings missing link_validation section")
         except (FileNotFoundError, ValueError, KeyError, OSError) as e:
             issues.append(f"Invalid validation_config.yaml: {e}")
 
@@ -350,11 +350,11 @@ class FlextQualityConfigManager:
             if result.failure:
                 return False
 
-            # Clear cache for this config
+            # Clear cache for this settings
             if name in self._cache:
                 del self._cache[name]
 
-            # Reset specific config objects
+            # Reset specific settings objects
             if name == "audit_rules":
                 self._audit_rules = None
             elif name == "style_guide":

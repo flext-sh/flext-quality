@@ -41,10 +41,10 @@ repos: [] # DISABLED BY SCRIPT - All hooks disabled
 #   #     - id: lychee
 #   #       name: Check for broken links
 #   #       description: Check URLs for liveness
-#   #       args: [--config docs/maintenance/config/lychee.toml]
+#   #       args: [--settings docs/maintenance/settings/lychee.toml]
 #   #       pass_filenames: false
 #
-#   # YAML validation for config files
+#   # YAML validation for settings files
 #   - repo: https://github.com/pre-commit/pre-commit-hooks
 #     rev: v4.5.0
 #     hooks:
@@ -87,7 +87,7 @@ repos: [] # DISABLED BY SCRIPT - All hooks disabled
 #         files: docs/maintenance/.*\.py$
 #         args: [--max-line-length=88, --extend-ignore=E203, W503]
 # Custom configuration for lychee (link checker)
-# This would be in docs/maintenance/config/lychee.toml
+# This would be in docs/maintenance/settings/lychee.toml
 # [repo.toml]
 # base = "https://github.com/yamadashy/flext-quality"
 # exclude = [
