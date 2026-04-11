@@ -14,7 +14,7 @@ from collections.abc import MutableSequence
 from pathlib import Path
 from typing import final
 
-from flext_cli import cli
+from flext_cli import FlextCliConstants, cli
 
 from flext_core import r
 from flext_quality import FlextQuality, FlextQualityCodeExecutionBridge, c, t
@@ -93,15 +93,18 @@ class _CommandHandlers:
         if result.failure:
             service.output.display_message(
                 f"Failed: {result.error}",
-                message_type="error",
+                message_type=FlextCliConstants.Cli.MessageTypes.ERROR,
             )
             return r[int].ok(1)
         service.output.display_message(
             f"Running check on {target_path}...",
-            message_type="info",
+            message_type=FlextCliConstants.Cli.MessageTypes.INFO,
         )
         for cmd in result.value:
-            service.output.display_message(f"  {' '.join(cmd)}", message_type="info")
+            service.output.display_message(
+                f"  {' '.join(cmd)}",
+                message_type=FlextCliConstants.Cli.MessageTypes.INFO,
+            )
         return r[int].ok(0)
 
     @staticmethod
@@ -111,13 +114,16 @@ class _CommandHandlers:
         if result.failure:
             service.output.display_message(
                 f"Status failed: {result.error}",
-                message_type="error",
+                message_type=FlextCliConstants.Cli.MessageTypes.ERROR,
             )
             return r[int].ok(1)
-        service.output.display_message("flext-quality status", message_type="success")
+        service.output.display_message(
+            "flext-quality status",
+            message_type=FlextCliConstants.Cli.MessageTypes.SUCCESS,
+        )
         service.output.display_message(
             f"Version: {c.Quality.Mcp.SERVER_VERSION}",
-            message_type="info",
+            message_type=FlextCliConstants.Cli.MessageTypes.INFO,
         )
         service.output.print_message(f"Version: {c.Quality.Mcp.SERVER_VERSION}")
         return r[int].ok(0)
@@ -129,15 +135,18 @@ class _CommandHandlers:
         if result.failure:
             service.output.display_message(
                 f"Failed: {result.error}",
-                message_type="error",
+                message_type=FlextCliConstants.Cli.MessageTypes.ERROR,
             )
             return r[int].ok(1)
         service.output.display_message(
             f"Running validation on {target_path}...",
-            message_type="info",
+            message_type=FlextCliConstants.Cli.MessageTypes.INFO,
         )
         for cmd in result.value:
-            service.output.display_message(f"  {' '.join(cmd)}", message_type="info")
+            service.output.display_message(
+                f"  {' '.join(cmd)}",
+                message_type=FlextCliConstants.Cli.MessageTypes.INFO,
+            )
         return r[int].ok(0)
 
 
@@ -158,10 +167,13 @@ def _dispatch(
         target_path = Path(args[0]) if args else Path.cwd()
         result = _CommandHandlers.handle_validate(service, target_path)
         return result.unwrap_or(1)
-    service.output.display_message(f"Unknown command: {command}", message_type="error")
+    service.output.display_message(
+        f"Unknown command: {command}",
+        message_type=FlextCliConstants.Cli.MessageTypes.ERROR,
+    )
     service.output.display_message(
         "Commands: status, check, validate",
-        message_type="info",
+        message_type=FlextCliConstants.Cli.MessageTypes.INFO,
     )
     service.output.print_message("Commands: status, check, validate")
     return 1
