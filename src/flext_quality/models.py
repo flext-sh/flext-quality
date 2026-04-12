@@ -633,4 +633,4 @@ class FlextQualityModels(FlextWebModels, m):
 
 m = FlextQualityModels
 
-__all__ = ["FlextQualityModels", "m"]
+__all__: list[str] = ["FlextQualityModels", "m"]

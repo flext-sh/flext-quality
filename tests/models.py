@@ -22,4 +22,4 @@ class TestsFlextQualityModels(FlextTestsModels, FlextQualityModels):
 
 
 m = TestsFlextQualityModels
-__all__ = ["TestsFlextQualityModels", "m"]
+__all__: list[str] = ["TestsFlextQualityModels", "m"]

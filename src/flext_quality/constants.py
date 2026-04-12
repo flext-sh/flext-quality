@@ -175,4 +175,4 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
 
 
 c = FlextQualityConstants
-__all__ = ["FlextQualityConstants", "c"]
+__all__: list[str] = ["FlextQualityConstants", "c"]

@@ -22,4 +22,4 @@ class TestsConstants(FlextQualityConstants):
 
 
 c = TestsConstants
-__all__ = ["TestsConstants", "c"]
+__all__: list[str] = ["TestsConstants", "c"]

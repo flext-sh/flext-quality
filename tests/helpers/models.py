@@ -27,4 +27,4 @@ class TestsModels(FlextQualityModels):
 # Standardized short name for use in tests (same pattern as flext-core)
 m = TestsModels
 
-__all__ = ["TestsModels", "m"]
+__all__: list[str] = ["TestsModels", "m"]

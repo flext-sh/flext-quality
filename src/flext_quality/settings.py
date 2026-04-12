@@ -60,4 +60,4 @@ class FlextQualitySettings(FlextSettings):
         return r[bool].ok(True)
 
 
-__all__ = ["FlextQualitySettings"]
+__all__: list[str] = ["FlextQualitySettings"]

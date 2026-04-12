@@ -30,4 +30,4 @@ class FlextQualityIntegrationsHealth:
         })
 
 
-__all__ = ["FlextQualityIntegrationsHealth"]
+__all__: list[str] = ["FlextQualityIntegrationsHealth"]

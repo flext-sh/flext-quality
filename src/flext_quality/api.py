@@ -226,4 +226,4 @@ class FlextQuality:
 
 quality = FlextQuality()
 
-__all__ = ["FlextQuality", "quality"]
+__all__: list[str] = ["FlextQuality", "quality"]

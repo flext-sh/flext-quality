@@ -68,7 +68,7 @@ def safe_list_access(
         return default
 
 
-__all__ = [
+__all__: list[str] = [
     "assert_analysis_results_structure",
     "assert_dict_structure",
     "assert_is_dict",
