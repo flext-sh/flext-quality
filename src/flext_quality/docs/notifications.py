@@ -633,7 +633,7 @@ def main() -> None:
         description="FLEXT Quality Documentation Notifications",
     )
     _ = parser.add_argument(
-        "--settings",
+        "--config",
         default="docs/maintenance/settings/notification_config.yaml",
         help="Notification configuration file",
     )

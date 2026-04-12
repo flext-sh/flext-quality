@@ -740,7 +740,7 @@ def main() -> None:
         description="FLEXT Quality Scheduled Documentation Maintenance",
     )
     _ = parser.add_argument(
-        "--settings",
+        "--config",
         default=str(_docs_config_file("schedule_config.yaml")),
         help="Maintenance schedule configuration file",
     )

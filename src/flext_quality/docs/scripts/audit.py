@@ -827,7 +827,7 @@ def _create_argument_parser() -> argparse.ArgumentParser:
         help="Report format",
     )
     _ = parser.add_argument(
-        "--settings",
+        "--config",
         type=str,
         default="docs/maintenance/settings/",
         help="Configuration directory path",

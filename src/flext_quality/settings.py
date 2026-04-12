@@ -24,8 +24,7 @@ class FlextQualitySettings(FlextSettings):
     """Runtime configuration for flext-quality services."""
 
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(
-        env_prefix="FLEXT_QUALITY_",
-        extra="ignore",
+        env_prefix="FLEXT_QUALITY_", extra="ignore"
     )
 
     hook_timeout_ms: Annotated[
