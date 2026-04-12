@@ -48,14 +48,14 @@ class FlextQualityLinkChecker:
         file: str
         line: int | None = None
         reference: str | None = None
-        context: t.ContainerMapping | None = None
+        context: t.RecursiveContainerMapping | None = None
 
     class LinkResult(BaseModel):
         """Link check result dictionary."""
 
         url: str
         valid: bool
-        context: t.ContainerMapping
+        context: t.RecursiveContainerMapping
         status_code: int | None = None
         response_time: float | None = None
         redirected: bool | None = None
@@ -78,7 +78,7 @@ class FlextQualityLinkChecker:
         broken_links: int
         warnings: int
         errors: MutableSequence[FlextQualityLinkChecker.LinkResult]
-        warnings_list: MutableSequence[t.ContainerMapping]
+        warnings_list: MutableSequence[t.RecursiveContainerMapping]
         performance: FlextQualityLinkChecker.PerformanceMetrics
 
     RESULTS_ADAPTER: ClassVar[TypeAdapter[Results]] = TypeAdapter(Results)
@@ -96,7 +96,7 @@ class FlextQualityLinkChecker:
         self.settings: FlextQualityLinkChecker.LinkConfig = self._get_default_config()
         self.load_config(config_path)
         self.session: ClientSession | None = None
-        self.cache: t.MutableContainerMapping = {}
+        self.cache: t.MutableRecursiveContainerMapping = {}
         self.results: FlextQualityLinkChecker.Results = FlextQualityLinkChecker.Results(
             total_links=0,
             valid_links=0,
@@ -207,7 +207,7 @@ class FlextQualityLinkChecker:
     async def check_link_async(
         self,
         url: str,
-        context: t.ContainerMapping | None = None,
+        context: t.RecursiveContainerMapping | None = None,
     ) -> FlextQualityLinkChecker.LinkResult:
         """Asynchronously check a single link."""
         start_time = time.time()
@@ -281,7 +281,7 @@ class FlextQualityLinkChecker:
     def check_link_sync(
         self,
         url: str,
-        context: t.ContainerMapping | None = None,
+        context: t.RecursiveContainerMapping | None = None,
     ) -> FlextQualityLinkChecker.LinkResult:
         """Synchronously check a single link (fallback method)."""
         start_time = time.time()
@@ -483,16 +483,16 @@ class FlextQualityLinkChecker:
 
     def validate_github_links(
         self,
-        links: Sequence[t.ContainerMapping],
-    ) -> Sequence[t.ContainerMapping]:
+        links: Sequence[t.RecursiveContainerMapping],
+    ) -> Sequence[t.RecursiveContainerMapping]:
         """Special validation for GitHub links."""
-        github_links: Sequence[t.ContainerMapping] = [
+        github_links: Sequence[t.RecursiveContainerMapping] = [
             link
             for link in links
             if isinstance(link.get("url"), str) and "github.com" in str(link.get("url"))
         ]
 
-        validated_links: Sequence[Mapping[str, bool | t.NormalizedValue]] = [
+        validated_links: Sequence[Mapping[str, bool | t.RecursiveContainer]] = [
             {
                 **link,
                 "valid": True,

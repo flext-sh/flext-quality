@@ -36,7 +36,7 @@ class FlextQualityClaudeContextClient:
 
     def build_index_call(self, path: str | None = None) -> r[m.Quality.McpToolCall]:
         """Build an index_codebase tool call."""
-        params: t.MutableContainerMapping = {}
+        params: t.MutableRecursiveContainerMapping = {}
         if path:
             params["path"] = path
         return self._mcp.build_tool_call(self.SERVER_NAME, "index_codebase", params)
@@ -75,6 +75,6 @@ class FlextQualityClaudeContextClient:
             self._mcp.build_call_command,
         )
 
-    def health_check(self) -> r[t.ContainerMapping]:
+    def health_check(self) -> r[t.RecursiveContainerMapping]:
         """Check if claude-context is available."""
         return self._mcp.build_server_health_result(self.SERVER_NAME)

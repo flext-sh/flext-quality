@@ -43,7 +43,9 @@ class FlextQualityDocumentationOptimizer:
             timestamp=datetime.now(UTC).isoformat(),
         )
 
-    def optimize_formatting(self, doc_files: Sequence[Path]) -> t.ContainerMapping:
+    def optimize_formatting(
+        self, doc_files: Sequence[Path]
+    ) -> t.RecursiveContainerMapping:
         """Fix common formatting issues."""
         for file_path in doc_files:
             try:
@@ -95,7 +97,9 @@ class FlextQualityDocumentationOptimizer:
         """Normalize emphasis style (prefer * over _ for consistency)."""
         return content
 
-    def update_table_of_contents(self, doc_files: Sequence[Path]) -> t.ContainerMapping:
+    def update_table_of_contents(
+        self, doc_files: Sequence[Path]
+    ) -> t.RecursiveContainerMapping:
         """Update or add table of contents for long documents."""
         for file_path in doc_files:
             try:
@@ -185,7 +189,9 @@ class FlextQualityDocumentationOptimizer:
         anchor = re.sub(r"[^\\w\\s-]", "", anchor)
         return re.sub(r"\\s+", "-", anchor)
 
-    def enhance_accessibility(self, doc_files: Sequence[Path]) -> t.ContainerMapping:
+    def enhance_accessibility(
+        self, doc_files: Sequence[Path]
+    ) -> t.RecursiveContainerMapping:
         """Enhance accessibility of documentation."""
         for file_path in doc_files:
             try:
@@ -242,7 +248,7 @@ class FlextQualityDocumentationOptimizer:
     def optimize_content_structure(
         self,
         doc_files: Sequence[Path],
-    ) -> t.ContainerMapping:
+    ) -> t.RecursiveContainerMapping:
         """Optimize content structure and readability."""
         for file_path in doc_files:
             try:
@@ -296,7 +302,7 @@ class FlextQualityDocumentationOptimizer:
                 enhanced_lines.extend(("", "---", ""))
         return "\n".join(enhanced_lines)
 
-    def update_metadata(self, doc_files: Sequence[Path]) -> t.ContainerMapping:
+    def update_metadata(self, doc_files: Sequence[Path]) -> t.RecursiveContainerMapping:
         """Update frontmatter metadata and timestamps."""
         for file_path in doc_files:
             try:

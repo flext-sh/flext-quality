@@ -42,7 +42,7 @@ def get_rules_config() -> str:
 @_mcp.resource("status://integrations")
 def get_integrations_status() -> str:
     """Get status of all integrations."""
-    status: MutableMapping[str, t.Container | t.ContainerMapping] = {}
+    status: MutableMapping[str, t.Container | t.RecursiveContainerMapping] = {}
     mem_client = FlextQualityClaudeMemClient()
     mem_health = mem_client.health_check()
     status["claude_mem"] = (

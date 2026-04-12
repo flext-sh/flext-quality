@@ -621,7 +621,7 @@ class FlextQualityModels(FlextWebModels, m):
 
             server: str
             tool: str
-            params: t.ContainerMapping = Field(default_factory=dict)
+            params: t.RecursiveContainerMapping = Field(default_factory=dict)
 
         class McpToolResult(BaseModel):
             """MCP tool invocation response contract."""

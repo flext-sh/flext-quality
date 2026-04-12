@@ -37,33 +37,33 @@ class FlextQualityUtilities(FlextWebUtilities, u):
             ).decode("utf-8")
 
         @staticmethod
-        def load_yaml_rules(path: Path) -> r[Sequence[t.ContainerMapping]]:
+        def load_yaml_rules(path: Path) -> r[Sequence[t.RecursiveContainerMapping]]:
             """Load rules from YAML file."""
             try:
                 yaml_result = FlextQualityUtilities.Cli.yaml_safe_load(path)
                 if yaml_result.failure:
-                    return r[Sequence[t.ContainerMapping]].fail(
+                    return r[Sequence[t.RecursiveContainerMapping]].fail(
                         f"Failed to load YAML: {yaml_result.error}",
                     )
                 parsed = yaml_result.value
                 if not isinstance(parsed, dict):
-                    return r[Sequence[t.ContainerMapping]].fail(
+                    return r[Sequence[t.RecursiveContainerMapping]].fail(
                         "Expected YAML dict",
                     )
-                parsed_dict: t.ContainerMapping = (
+                parsed_dict: t.RecursiveContainerMapping = (
                     t.CONTAINER_MAPPING_ADAPTER.validate_python(parsed)
                 )
                 raw_rules_val = parsed_dict.get("rules", [])
                 if not isinstance(raw_rules_val, list):
-                    return r[Sequence[t.ContainerMapping]].fail(
+                    return r[Sequence[t.RecursiveContainerMapping]].fail(
                         "Expected rules list",
                     )
-                rules: Sequence[t.ContainerMapping] = [
+                rules: Sequence[t.RecursiveContainerMapping] = [
                     t.CONTAINER_MAPPING_ADAPTER.validate_python(item)
                     for item in raw_rules_val
                     if isinstance(item, dict)
                 ]
-                return r[Sequence[t.ContainerMapping]].ok(rules)
+                return r[Sequence[t.RecursiveContainerMapping]].ok(rules)
             except (
                 ValueError,
                 TypeError,
@@ -73,7 +73,7 @@ class FlextQualityUtilities(FlextWebUtilities, u):
                 RuntimeError,
                 ImportError,
             ) as e:
-                return r[Sequence[t.ContainerMapping]].fail(
+                return r[Sequence[t.RecursiveContainerMapping]].fail(
                     f"Failed to load rules: {e}",
                 )
 
@@ -81,10 +81,10 @@ class FlextQualityUtilities(FlextWebUtilities, u):
         def parse_hook_input(raw: str) -> r[t.Quality.HookInput]:
             """Parse hook input JSON."""
             try:
-                parsed: t.ContainerMapping = t.CONTAINER_MAPPING_ADAPTER.validate_json(
-                    raw
+                parsed: t.RecursiveContainerMapping = (
+                    t.CONTAINER_MAPPING_ADAPTER.validate_json(raw)
                 )
-                coerced_input: t.ContainerMapping = parsed
+                coerced_input: t.RecursiveContainerMapping = parsed
                 return r[t.Quality.HookInput].ok(coerced_input)
             except ValueError as e:
                 return r[t.Quality.HookInput].fail(f"Invalid JSON: {e}")

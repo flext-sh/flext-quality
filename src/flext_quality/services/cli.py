@@ -77,10 +77,10 @@ class FlextQualityCliService:
         ])
         return r[MutableSequence[t.StrSequence]].ok(commands)
 
-    def display_status(self) -> r[t.ContainerMapping]:
+    def display_status(self) -> r[t.RecursiveContainerMapping]:
         """Display quality service status."""
         status = self._quality.get_status()
-        return r[t.ContainerMapping].ok(status)
+        return r[t.RecursiveContainerMapping].ok(status)
 
 
 class _CommandHandlers:

@@ -34,7 +34,7 @@ class FlextQualityProtocols(FlextWebProtocols, p):
                 self,
                 content: str,
                 file_path: Path | None = None,
-            ) -> r[Sequence[t.ContainerMapping]]:
+            ) -> r[Sequence[t.RecursiveContainerMapping]]:
                 """Validate content and return violations."""
                 ...
 
@@ -97,7 +97,7 @@ class FlextQualityProtocols(FlextWebProtocols, p):
             def validate(
                 self,
                 settings: t.Quality.RuleConfig,
-                context: t.ContainerMapping,
+                context: t.RecursiveContainerMapping,
             ) -> r[t.Quality.RuleResult]:
                 """Validate according to rule."""
                 ...
@@ -125,8 +125,8 @@ class FlextQualityProtocols(FlextWebProtocols, p):
 
             def execute(
                 self,
-                params: t.ContainerMapping,
-            ) -> r[t.ContainerMapping]:
+                params: t.RecursiveContainerMapping,
+            ) -> r[t.RecursiveContainerMapping]:
                 """Execute MCP tool."""
                 ...
 

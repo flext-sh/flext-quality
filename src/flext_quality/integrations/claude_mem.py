@@ -39,8 +39,8 @@ class FlextQualityClaudeMemClient:
         self, ids: Sequence[int]
     ) -> r[m.Quality.McpToolCall]:
         """Build a get_observations tool call."""
-        normalized_ids: t.ContainerList = list(ids)
-        params: t.ContainerMapping = {"ids": normalized_ids}
+        normalized_ids: t.RecursiveContainerList = list(ids)
+        params: t.RecursiveContainerMapping = {"ids": normalized_ids}
         return self._mcp.build_tool_call(self.SERVER_NAME, "get_observations", params)
 
     def build_search_call(
@@ -51,7 +51,7 @@ class FlextQualityClaudeMemClient:
     ) -> r[m.Quality.McpToolCall]:
         """Build a search tool call."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
-        params: t.ContainerMapping = {
+        params: t.RecursiveContainerMapping = {
             "query": query,
             "limit": search_limit,
         }
@@ -67,7 +67,7 @@ class FlextQualityClaudeMemClient:
         """Build a timeline tool call."""
         before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
-        params: t.ContainerMapping = {
+        params: t.RecursiveContainerMapping = {
             "anchor": anchor,
             "depth_before": before,
             "depth_after": after,
@@ -112,6 +112,6 @@ class FlextQualityClaudeMemClient:
             depth_after=after,
         ).flat_map(self._mcp.build_call_command)
 
-    def health_check(self) -> r[t.ContainerMapping]:
+    def health_check(self) -> r[t.RecursiveContainerMapping]:
         """Check if claude-mem is available."""
         return self._mcp.build_server_health_result(self.SERVER_NAME)

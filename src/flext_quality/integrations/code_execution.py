@@ -100,13 +100,13 @@ class FlextQualityCodeExecutionBridge:
             ),
         )
 
-    def health_check(self) -> r[t.ContainerMapping]:
+    def health_check(self) -> r[t.RecursiveContainerMapping]:
         """Check availability of execution runtimes.
 
         Returns configuration status - actual runtime checks
         should be done via shell wrapper execution.
         """
-        return r[t.ContainerMapping].ok({
+        return r[t.RecursiveContainerMapping].ok({
             "status": c.Quality.IntegrationStatus.CONNECTED,
             "available": True,
             "working_dir": str(self._working_dir),

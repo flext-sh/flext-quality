@@ -28,8 +28,8 @@ class FlextQualityRulesLoader:
             return r[Sequence[m.Quality.RuleDefinition]].fail(
                 "Invalid YAML: expected dict at root",
             )
-        parsed_dict: t.ContainerMapping = t.CONTAINER_MAPPING_ADAPTER.validate_python(
-            parsed
+        parsed_dict: t.RecursiveContainerMapping = (
+            t.CONTAINER_MAPPING_ADAPTER.validate_python(parsed)
         )
         rules_data_val = parsed_dict.get("rules", [])
         if not isinstance(rules_data_val, list):
@@ -42,8 +42,10 @@ class FlextQualityRulesLoader:
                 return r[Sequence[m.Quality.RuleDefinition]].fail(
                     f"Rule {idx}: expected dict",
                 )
-            rule_dict: t.ContainerMapping = t.CONTAINER_MAPPING_ADAPTER.validate_python(
-                rule_data,
+            rule_dict: t.RecursiveContainerMapping = (
+                t.CONTAINER_MAPPING_ADAPTER.validate_python(
+                    rule_data,
+                )
             )
             result = self._parse_rule(rule_dict, idx)
             if result.failure:
@@ -68,7 +70,7 @@ class FlextQualityRulesLoader:
 
     def _parse_rule(
         self,
-        data: t.ContainerMapping,
+        data: t.RecursiveContainerMapping,
         index: int,
     ) -> r[m.Quality.RuleDefinition]:
         """Parse a single rule from dict."""

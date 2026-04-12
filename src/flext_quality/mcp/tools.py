@@ -21,7 +21,7 @@ def search_memory(
     *,
     search_type: str = "observations",
     limit: int | None = None,
-) -> t.ContainerMapping:
+) -> t.RecursiveContainerMapping:
     """Build command to search cross-session memory via claude-mem.
 
     Returns the mcp-cli command that can be used to execute the search.
@@ -50,7 +50,7 @@ def search_code(
     query: str,
     *,
     limit: int | None = None,
-) -> t.ContainerMapping:
+) -> t.RecursiveContainerMapping:
     """Build command for semantic code search via claude-context.
 
     Returns the mcp-cli command that can be used to execute the search.
@@ -88,8 +88,8 @@ def execute_hook(event: str, input_data: t.Quality.HookInput) -> t.Quality.HookO
 def validate_rules(
     path: str,
     *,
-    context: t.ContainerMapping | None = None,
-) -> t.ContainerMapping:
+    context: t.RecursiveContainerMapping | None = None,
+) -> t.RecursiveContainerMapping:
     """Validate code against YAML rules."""
     engine = FlextQualityRulesEngine()
     result = engine.validate(path=path, context=context)

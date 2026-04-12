@@ -140,11 +140,11 @@ class FlextQuality:
         """Get hooks configuration as JSON string."""
         return self.hooks.get_config_json()
 
-    def get_status(self) -> t.ContainerMapping:
+    def get_status(self) -> t.RecursiveContainerMapping:
         """Get quality service status.
 
         Returns:
-            t.ContainerMapping: Status information
+            t.RecursiveContainerMapping: Status information
 
         """
         return {

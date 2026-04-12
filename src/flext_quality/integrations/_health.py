@@ -11,18 +11,18 @@ class FlextQualityIntegrationsHealth:
     def build_mcp_health_result(
         server_name: str,
         mcp_client: FlextQualityMcpClient,
-    ) -> r[t.ContainerMapping]:
+    ) -> r[t.RecursiveContainerMapping]:
         """Build a normalized health result for a named MCP server."""
         mcp_health = mcp_client.health_check()
         if mcp_health.failure:
-            return r[t.ContainerMapping].fail(mcp_health.error)
+            return r[t.RecursiveContainerMapping].fail(mcp_health.error)
         health_data = mcp_health.value
         status = (
             c.Quality.IntegrationStatus.CONNECTED
             if health_data.get("available", False)
             else c.Quality.IntegrationStatus.DISCONNECTED
         )
-        return r[t.ContainerMapping].ok({
+        return r[t.RecursiveContainerMapping].ok({
             "server": server_name,
             "status": status,
             "available": health_data.get("available", False),

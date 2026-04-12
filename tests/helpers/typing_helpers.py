@@ -20,7 +20,7 @@ from tests import t
 def assert_is_dict(
     value: t.Scalar | t.ScalarMapping,
 ) -> TypeIs[t.ScalarMapping]:
-    """Type-safe t.ContainerMapping assertion following Single Responsibility Principle.
+    """Type-safe t.RecursiveContainerMapping assertion following Single Responsibility Principle.
 
     Args:
       value: Object to check
@@ -64,7 +64,7 @@ def safe_dict_access(data: t.ScalarMapping, key: str) -> t.Scalar:
       Value from dict
 
     Raises:
-      AssertionError: If data is not a t.ContainerMapping or key missing
+      AssertionError: If data is not a t.RecursiveContainerMapping or key missing
 
     """
     assert key in data, f"Key '{key}' not found in dict"
@@ -96,7 +96,7 @@ def assert_dict_structure(
     data: t.ScalarMapping,
     required_keys: t.StrSequence,
 ) -> t.ScalarMapping:
-    """Assert that t.NormalizedValue is dict with required keys - DRY pattern.
+    """Assert that t.RecursiveContainer is dict with required keys - DRY pattern.
 
     Args:
       data: Object to check

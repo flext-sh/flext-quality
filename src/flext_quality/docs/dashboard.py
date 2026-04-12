@@ -82,7 +82,7 @@ class FlextQualityDocumentationDashboard:
 
     def get_current_metrics(
         self,
-    ) -> t.ContainerMapping:
+    ) -> t.RecursiveContainerMapping:
         """Get current quality metrics from latest audit."""
         latest_audit = self.reports_dir / "latest_audit.json"
 
@@ -101,11 +101,11 @@ class FlextQualityDocumentationDashboard:
                 Path(latest_audit).read_bytes()
             )
             metrics_raw = data.get("metrics")
-            metrics: t.ContainerMapping = (
+            metrics: t.RecursiveContainerMapping = (
                 metrics_raw if isinstance(metrics_raw, Mapping) else {}
             )
             severity_raw = metrics.get("severity_breakdown")
-            severity: t.ContainerMapping = (
+            severity: t.RecursiveContainerMapping = (
                 severity_raw if isinstance(severity_raw, Mapping) else {}
             )
             files_analyzed_raw = data.get("files_analyzed")
@@ -141,11 +141,11 @@ class FlextQualityDocumentationDashboard:
     def get_quality_trends(
         self,
         days: int = 30,
-    ) -> t.ContainerMapping:
+    ) -> t.RecursiveContainerMapping:
         """Get quality trends over the specified number of days."""
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
 
-        trend_data: MutableSequence[t.ContainerMapping] = []
+        trend_data: MutableSequence[t.RecursiveContainerMapping] = []
         reports_dir = self.reports_dir
 
         # Find all audit reports
@@ -165,11 +165,11 @@ class FlextQualityDocumentationDashboard:
                         Path(report_file).read_bytes()
                     )
                     metrics_v = data.get("metrics")
-                    metrics_m: t.ContainerMapping = (
+                    metrics_m: t.RecursiveContainerMapping = (
                         metrics_v if isinstance(metrics_v, Mapping) else {}
                     )
                     sev_v = metrics_m.get("severity_breakdown")
-                    sev_m: t.ContainerMapping = (
+                    sev_m: t.RecursiveContainerMapping = (
                         sev_v if isinstance(sev_v, Mapping) else {}
                     )
                     qs_v = metrics_m.get("quality_score", 0)
@@ -208,9 +208,11 @@ class FlextQualityDocumentationDashboard:
             "trends": trend_data,
         }
 
-    def get_recent_reports(self, limit: int = 10) -> Sequence[t.ContainerMapping]:
+    def get_recent_reports(
+        self, limit: int = 10
+    ) -> Sequence[t.RecursiveContainerMapping]:
         """Get list of recent audit reports."""
-        reports: MutableSequence[t.ContainerMapping] = []
+        reports: MutableSequence[t.RecursiveContainerMapping] = []
 
         for report_file in self.reports_dir.glob("audit_report_*.json"):
             try:
@@ -227,7 +229,7 @@ class FlextQualityDocumentationDashboard:
                 )
 
                 metrics_rv = data.get("metrics")
-                metrics_rm: t.ContainerMapping = (
+                metrics_rm: t.RecursiveContainerMapping = (
                     metrics_rv if isinstance(metrics_rv, Mapping) else {}
                 )
                 qs_rv = metrics_rm.get("quality_score", 0)

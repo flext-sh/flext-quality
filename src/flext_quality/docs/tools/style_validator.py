@@ -164,7 +164,7 @@ class FlextQualityStyleValidator:
 
     def _normalize_config(
         self,
-        raw: t.ContainerMapping,
+        raw: t.RecursiveContainerMapping,
     ) -> FlextQualityStyleValidator.StyleConfig:
         markdown: FlextQualityStyleValidator.MarkdownConfig | None = None
         formatting: FlextQualityStyleValidator.FormattingConfig | None = None
