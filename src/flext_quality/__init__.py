@@ -37,13 +37,6 @@ if _t.TYPE_CHECKING:
     from flext_quality.docs.scheduled_maintenance import (
         FlextQualityScheduledMaintenance,
     )
-    from flext_quality.docs.scripts.audit import FlextQualityDocumentationAuditor
-    from flext_quality.docs.scripts.optimize import FlextQualityDocumentationOptimizer
-    from flext_quality.docs.scripts.report import FlextQualityDocumentationReporter
-    from flext_quality.docs.scripts.validate import (
-        FlextQualityContentValidator,
-        FlextQualityLinkValidator,
-    )
     from flext_quality.docs.tools.content_analyzer import FlextQualityContentAnalyzer
     from flext_quality.docs.tools.link_checker import FlextQualityLinkChecker
     from flext_quality.docs.tools.style_validator import FlextQualityStyleValidator
@@ -113,6 +106,10 @@ _LAZY_IMPORTS = merge_lazy_imports(
         },
     ),
     exclude_names=(
+        "FlextDispatcher",
+        "FlextLogger",
+        "FlextRegistry",
+        "FlextRuntime",
         "cleanup_submodule_namespace",
         "install_lazy_exports",
         "lazy_getattr",
@@ -142,17 +139,12 @@ __all__: list[str] = [
     "FlextQualityConfigManager",
     "FlextQualityConstants",
     "FlextQualityContentAnalyzer",
-    "FlextQualityContentValidator",
-    "FlextQualityDocumentationAuditor",
     "FlextQualityDocumentationDashboard",
     "FlextQualityDocumentationFinder",
     "FlextQualityDocumentationNotifier",
-    "FlextQualityDocumentationOptimizer",
-    "FlextQualityDocumentationReporter",
     "FlextQualityFileStatistics",
     "FlextQualityHookManager",
     "FlextQualityLinkChecker",
-    "FlextQualityLinkValidator",
     "FlextQualityMcpClient",
     "FlextQualityModels",
     "FlextQualityProtocols",

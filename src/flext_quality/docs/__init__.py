@@ -12,8 +12,8 @@ from flext_core.lazy import (
 _LAZY_IMPORTS = merge_lazy_imports(
     (
         ".core",
-        ".scripts",
         ".tools",
+        "scripts",
     ),
     build_lazy_import_map(
         {
@@ -23,6 +23,10 @@ _LAZY_IMPORTS = merge_lazy_imports(
         },
     ),
     exclude_names=(
+        "FlextDispatcher",
+        "FlextLogger",
+        "FlextRegistry",
+        "FlextRuntime",
         "cleanup_submodule_namespace",
         "install_lazy_exports",
         "lazy_getattr",
