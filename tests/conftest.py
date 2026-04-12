@@ -21,8 +21,6 @@ import pytest
 from flext_core import r
 from tests import t
 
-pytest_plugins = ["flext_tests.conftest_plugin"]
-
 
 def assert_result_success_with_data[T](result: r[T]) -> T:
     """Assert r success and return validated data with type safety.
