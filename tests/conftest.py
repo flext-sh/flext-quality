@@ -387,14 +387,14 @@ def analysis_task_data() -> t.ContainerMapping:
     }
 
 
-def pytest_configure(settings: pytest.Settings) -> None:
+def pytest_configure(config: pytest.Config) -> None:
     """Settingsure pytest markers for test categorization and execution control.
 
     Defines test markers that enable selective test execution, proper test
     categorization, and CI/CD pipeline optimization through targeted testing.
 
     Args:
-      settings: pytest configuration t.NormalizedValue for marker registration
+      config: pytest configuration object for marker registration
 
     Markers:
       - unit: Fast, isolated tests with mocking
@@ -410,13 +410,13 @@ def pytest_configure(settings: pytest.Settings) -> None:
       >>> pytest -m integration  # Run integration tests only
 
     """
-    settings.addinivalue_line("markers", "unit: Unit tests")
-    settings.addinivalue_line("markers", "integration: Integration tests")
-    settings.addinivalue_line("markers", "e2e: End-to-end tests")
-    settings.addinivalue_line("markers", "quality: Quality analysis tests")
-    settings.addinivalue_line("markers", "backend: Backend integration tests")
-    settings.addinivalue_line("markers", "celery: Celery task tests")
-    settings.addinivalue_line("markers", "slow: Slow tests")
+    config.addinivalue_line("markers", "unit: Unit tests")
+    config.addinivalue_line("markers", "integration: Integration tests")
+    config.addinivalue_line("markers", "e2e: End-to-end tests")
+    config.addinivalue_line("markers", "quality: Quality analysis tests")
+    config.addinivalue_line("markers", "backend: Backend integration tests")
+    config.addinivalue_line("markers", "celery: Celery task tests")
+    config.addinivalue_line("markers", "slow: Slow tests")
 
 
 class MockQualityAnalyzer:
