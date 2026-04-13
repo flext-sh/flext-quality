@@ -15,7 +15,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import ClassVar
 
-from flext_core import FlextContainer, r
+from flext_core import FlextContainer
 from flext_quality import (
     FlextQualityHookManager,
     FlextQualityRulesLoader,
@@ -23,6 +23,7 @@ from flext_quality import (
     c,
     m,
     p,
+    r,
     t,
     u,
 )

@@ -16,8 +16,7 @@ from typing import final
 
 from flext_cli import FlextCliConstants, cli
 
-from flext_core import p, r
-from flext_quality import FlextQuality, FlextQualityCodeExecutionBridge, c, t
+from flext_quality import FlextQuality, FlextQualityCodeExecutionBridge, c, p, r, t
 
 
 @final

@@ -12,8 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import final
 
-from flext_core import p, r
-from flext_quality import c, m, t
+from flext_quality import c, m, p, r, t
 
 
 @final

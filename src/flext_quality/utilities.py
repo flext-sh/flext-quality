@@ -9,8 +9,7 @@ from pathlib import Path
 from flext_cli import u
 from flext_web import FlextWebUtilities
 
-from flext_core import p, r
-from flext_quality import c, t
+from flext_quality import c, p, r, t
 
 
 class FlextQualityUtilities(FlextWebUtilities, u):
