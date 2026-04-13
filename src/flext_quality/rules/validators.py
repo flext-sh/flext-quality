@@ -8,8 +8,7 @@ from collections.abc import MutableMapping, MutableSequence, Sequence
 from pathlib import Path
 from typing import override
 
-from flext_core import p, r
-from flext_quality import c, p, t
+from flext_quality import c, p, r, t
 
 
 class FlextQualityValidators:
