@@ -5,7 +5,7 @@ from __future__ import annotations
 import fnmatch
 from typing import ClassVar
 
-from flext_quality import c, t
+from flext_quality import c, p, t
 
 
 class FlextQualityBaseHook:

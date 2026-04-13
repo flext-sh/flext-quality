@@ -15,8 +15,8 @@ from typing import Annotated, ClassVar
 from pydantic import Field
 from pydantic_settings import SettingsConfigDict
 
-from flext_core import FlextSettings, r
-from flext_quality import c
+from flext_core import FlextSettings
+from flext_quality import c, p, r
 
 
 @FlextSettings.auto_register("quality")
