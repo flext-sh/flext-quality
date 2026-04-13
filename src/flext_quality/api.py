@@ -75,9 +75,9 @@ class FlextQuality:
         self._version = c.Quality.Mcp.SERVER_VERSION
         self.logger = u.fetch_logger(__name__)
         self.settings = FlextQualitySettings.get_instance()
-        self._container = FlextContainer.fetch_global()
-        if not self._container.has_service("flext_quality"):
-            _ = self._container.register("flext_quality", "flext_quality")
+        self._container = FlextContainer.shared()
+        if not self._container.has("flext_quality"):
+            _ = self._container.bind("flext_quality", "flext_quality")
         self.hooks = FlextQualityHookManager()
         self.rules_loader = FlextQualityRulesLoader()
 
