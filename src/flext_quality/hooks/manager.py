@@ -6,7 +6,7 @@ from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
 from typing import final
 
-from flext_core import r
+from flext_core import p, r
 from flext_quality import FlextQualityBaseHook, c, t
 
 
@@ -26,7 +26,7 @@ class FlextQualityHookManager:
         self,
         event: str,
         input_data: t.Quality.HookInput,
-    ) -> r[t.Quality.HookOutput]:
+    ) -> p.Result[t.Quality.HookOutput]:
         """Execute all hooks for an event."""
         try:
             hook_event = c.Quality.HookEvent(event)
@@ -58,7 +58,7 @@ class FlextQualityHookManager:
             indent=c.Quality.Defaults.JSON_INDENT,
         ).decode("utf-8")
 
-    def register(self, hook: FlextQualityBaseHook) -> r[bool]:
+    def register(self, hook: FlextQualityBaseHook) -> p.Result[bool]:
         """Register a hook."""
         event = hook.event
         if event not in self._hooks:

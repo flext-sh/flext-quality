@@ -9,8 +9,6 @@ from typing import ClassVar, Protocol, runtime_checkable
 from flext_cli import p
 from flext_web import FlextWebProtocols
 
-from flext_core import r
-
 from .typings import t
 
 
@@ -34,7 +32,7 @@ class FlextQualityProtocols(FlextWebProtocols, p):
                 self,
                 content: str,
                 file_path: Path | None = None,
-            ) -> r[Sequence[t.RecursiveContainerMapping]]:
+            ) -> p.Result[Sequence[t.RecursiveContainerMapping]]:
                 """Validate content and return violations."""
                 ...
 
@@ -48,7 +46,7 @@ class FlextQualityProtocols(FlextWebProtocols, p):
             def execute(
                 self,
                 input_data: t.Quality.HookInput,
-            ) -> r[t.Quality.HookOutput]:
+            ) -> p.Result[t.Quality.HookOutput]:
                 """Execute the hook logic."""
                 ...
 
@@ -81,7 +79,7 @@ class FlextQualityProtocols(FlextWebProtocols, p):
             def execute(
                 self,
                 input_data: t.Quality.HookInput,
-            ) -> r[t.Quality.HookOutput]:
+            ) -> p.Result[t.Quality.HookOutput]:
                 """Execute the hook logic."""
                 ...
 
@@ -98,22 +96,22 @@ class FlextQualityProtocols(FlextWebProtocols, p):
                 self,
                 settings: t.Quality.RuleConfig,
                 context: t.RecursiveContainerMapping,
-            ) -> r[t.Quality.RuleResult]:
+            ) -> p.Result[t.Quality.RuleResult]:
                 """Validate according to rule."""
                 ...
 
         class IntegrationClient(Protocol):
             """Protocol for external integrations."""
 
-            def connect(self) -> r[bool]:
+            def connect(self) -> p.Result[bool]:
                 """Connect to external service."""
                 ...
 
-            def disconnect(self) -> r[bool]:
+            def disconnect(self) -> p.Result[bool]:
                 """Disconnect from external service."""
                 ...
 
-            def health_check(self) -> r[t.StrMapping]:
+            def health_check(self) -> p.Result[t.StrMapping]:
                 """Check integration health."""
                 ...
 
@@ -126,7 +124,7 @@ class FlextQualityProtocols(FlextWebProtocols, p):
             def execute(
                 self,
                 params: t.RecursiveContainerMapping,
-            ) -> r[t.RecursiveContainerMapping]:
+            ) -> p.Result[t.RecursiveContainerMapping]:
                 """Execute MCP tool."""
                 ...
 

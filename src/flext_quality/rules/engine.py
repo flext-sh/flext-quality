@@ -6,7 +6,7 @@ import re
 from collections.abc import MutableSequence, Sequence
 from pathlib import Path
 
-from flext_core import r
+from flext_core import p, r
 from flext_quality import FlextQualityRulesLoader, c, m, t
 
 
@@ -23,7 +23,7 @@ class FlextQualityRulesEngine:
         """Get loaded rules."""
         return list(self._rules)
 
-    def load_rules(self, rules_path: Path | None = None) -> r[int]:
+    def load_rules(self, rules_path: Path | None = None) -> p.Result[int]:
         """Load rules from YAML file."""
         path = rules_path or self._rules_path
         if path is None:
@@ -40,7 +40,7 @@ class FlextQualityRulesEngine:
         self,
         path: str,
         context: t.RecursiveContainerMapping | None = None,
-    ) -> r[Sequence[t.RecursiveContainerMapping]]:
+    ) -> p.Result[Sequence[t.RecursiveContainerMapping]]:
         """Validate code against loaded rules."""
         if not self._loaded:
             load_result = self.load_rules()
@@ -62,7 +62,7 @@ class FlextQualityRulesEngine:
         self,
         content: str,
         filename: str = "<string>",
-    ) -> r[Sequence[t.RecursiveContainerMapping]]:
+    ) -> p.Result[Sequence[t.RecursiveContainerMapping]]:
         """Validate content string against loaded rules."""
         if not self._loaded:
             load_result = self.load_rules()

@@ -155,7 +155,7 @@ Update guidance for clarity:
       - Never return bare None
 
     Example:
-      def get_user(id: int) -> r[User]:
+      def get_user(id: int) -> p.Result[User]:
           user = db.find(id)
           if not user:
               return r.fail(UserNotFound(id))

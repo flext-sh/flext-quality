@@ -16,7 +16,7 @@ from typing import final
 
 from flext_cli import FlextCliConstants, cli
 
-from flext_core import r
+from flext_core import p, r
 from flext_quality import FlextQuality, FlextQualityCodeExecutionBridge, c, t
 
 
@@ -33,7 +33,7 @@ class FlextQualityCliService:
     def build_check_commands(
         self,
         target_path: Path,
-    ) -> r[MutableSequence[t.StrSequence]]:
+    ) -> p.Result[MutableSequence[t.StrSequence]]:
         """Build commands for quick check (lint + type)."""
         commands: MutableSequence[t.StrSequence] = []
         lint_result = self._executor.build_ruff_command(target_path)
@@ -49,7 +49,7 @@ class FlextQualityCliService:
     def build_validate_commands(
         self,
         target_path: Path,
-    ) -> r[MutableSequence[t.StrSequence]]:
+    ) -> p.Result[MutableSequence[t.StrSequence]]:
         """Build commands for full validation."""
         commands: MutableSequence[t.StrSequence] = []
         lint_result = self._executor.build_ruff_command(target_path)
@@ -77,7 +77,7 @@ class FlextQualityCliService:
         ])
         return r[MutableSequence[t.StrSequence]].ok(commands)
 
-    def display_status(self) -> r[t.RecursiveContainerMapping]:
+    def display_status(self) -> p.Result[t.RecursiveContainerMapping]:
         """Display quality service status."""
         status = self._quality.get_status()
         return r[t.RecursiveContainerMapping].ok(status)
@@ -87,7 +87,9 @@ class _CommandHandlers:
     """Command handlers for CLI operations."""
 
     @staticmethod
-    def handle_check(service: FlextQualityCliService, target_path: Path) -> r[int]:
+    def handle_check(
+        service: FlextQualityCliService, target_path: Path
+    ) -> p.Result[int]:
         """Handle check command."""
         result = service.build_check_commands(target_path)
         if result.failure:
@@ -108,7 +110,7 @@ class _CommandHandlers:
         return r[int].ok(0)
 
     @staticmethod
-    def handle_status(service: FlextQualityCliService) -> r[int]:
+    def handle_status(service: FlextQualityCliService) -> p.Result[int]:
         """Handle status command."""
         result = service.display_status()
         if result.failure:
@@ -129,7 +131,9 @@ class _CommandHandlers:
         return r[int].ok(0)
 
     @staticmethod
-    def handle_validate(service: FlextQualityCliService, target_path: Path) -> r[int]:
+    def handle_validate(
+        service: FlextQualityCliService, target_path: Path
+    ) -> p.Result[int]:
         """Handle validate command."""
         result = service.build_validate_commands(target_path)
         if result.failure:

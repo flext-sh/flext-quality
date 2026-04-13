@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from flext_core import r
+from flext_core import p, r
 from flext_quality import FlextQualityMcpClient, c, t
 
 
@@ -11,7 +11,7 @@ class FlextQualityIntegrationsHealth:
     def build_mcp_health_result(
         server_name: str,
         mcp_client: FlextQualityMcpClient,
-    ) -> r[t.RecursiveContainerMapping]:
+    ) -> p.Result[t.RecursiveContainerMapping]:
         """Build a normalized health result for a named MCP server."""
         mcp_health = mcp_client.health_check()
         if mcp_health.failure:

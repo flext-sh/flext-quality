@@ -8,7 +8,7 @@ from collections.abc import MutableMapping, MutableSequence, Sequence
 from pathlib import Path
 from typing import override
 
-from flext_core import r
+from flext_core import p, r
 from flext_quality import c, p, t
 
 
@@ -39,7 +39,7 @@ class FlextQualityValidators:
             self,
             content: str,
             file_path: Path | None = None,
-        ) -> r[Sequence[t.RecursiveContainerMapping]]:
+        ) -> p.Result[Sequence[t.RecursiveContainerMapping]]:
             """Validate content against patterns."""
             violations: MutableSequence[t.RecursiveContainerMapping] = []
             filename = str(file_path) if file_path else "<string>"
@@ -91,7 +91,7 @@ class FlextQualityValidators:
             self,
             content: str,
             file_path: Path | None = None,
-        ) -> r[Sequence[t.RecursiveContainerMapping]]:
+        ) -> p.Result[Sequence[t.RecursiveContainerMapping]]:
             """Validate tier violations."""
             violations: MutableSequence[t.RecursiveContainerMapping] = []
             filename = str(file_path) if file_path else "<string>"
@@ -150,7 +150,7 @@ class FlextQualityValidators:
             self,
             content: str,
             file_path: Path | None = None,
-        ) -> r[Sequence[t.RecursiveContainerMapping]]:
+        ) -> p.Result[Sequence[t.RecursiveContainerMapping]]:
             """Run all validators."""
             all_violations: MutableSequence[t.RecursiveContainerMapping] = []
             for validator in self._validators.values():

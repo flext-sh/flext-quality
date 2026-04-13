@@ -69,12 +69,12 @@ if result.is_success:
 
 **Methods**:
 
-- `check(files: Sequence[Path], threshold: float | None) -> r[CheckResult]`
+- `check(files: Sequence[Path], threshold: float | None) -> p.Result[CheckResult]`
 
   - Analyze files for duplication
   - Returns duplication pairs exceeding threshold
 
-- `get_duplicate_count(directory: Path) -> r[int]`
+- `get_duplicate_count(directory: Path) -> p.Result[int]`
 
   - Count duplicate pairs in a directory
   - Recursively scans for \*.py files

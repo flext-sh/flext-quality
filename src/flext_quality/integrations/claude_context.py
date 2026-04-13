@@ -15,7 +15,6 @@ from flext_quality import (
     FlextQualityMcpClient,
     c,
     m,
-    r,
     t,
 )
 
@@ -34,7 +33,9 @@ class FlextQualityClaudeContextClient:
         """Initialize the Claude Context client."""
         self._mcp = FlextQualityMcpClient(timeout_ms=timeout_ms)
 
-    def build_index_call(self, path: str | None = None) -> r[m.Quality.McpToolCall]:
+    def build_index_call(
+        self, path: str | None = None
+    ) -> p.Result[m.Quality.McpToolCall]:
         """Build an index_codebase tool call."""
         params: t.MutableRecursiveContainerMapping = {}
         if path:
@@ -46,7 +47,7 @@ class FlextQualityClaudeContextClient:
         query: str,
         *,
         limit: int | None = None,
-    ) -> r[m.Quality.McpToolCall]:
+    ) -> p.Result[m.Quality.McpToolCall]:
         """Build a search_code tool call."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_SEARCH_LIMIT
         return self._mcp.build_tool_call(
@@ -55,11 +56,11 @@ class FlextQualityClaudeContextClient:
             {"query": query, "limit": search_limit},
         )
 
-    def build_status_call(self) -> r[m.Quality.McpToolCall]:
+    def build_status_call(self) -> p.Result[m.Quality.McpToolCall]:
         """Build a get_indexing_status tool call."""
         return self._mcp.build_tool_call(self.SERVER_NAME, "get_indexing_status", {})
 
-    def get_index_command(self, path: str | None = None) -> r[t.StrSequence]:
+    def get_index_command(self, path: str | None = None) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for codebase indexing."""
         return self.build_index_call(path).flat_map(self._mcp.build_call_command)
 
@@ -68,13 +69,13 @@ class FlextQualityClaudeContextClient:
         query: str,
         *,
         limit: int | None = None,
-    ) -> r[t.StrSequence]:
+    ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for code search."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_SEARCH_LIMIT
         return self.build_search_call(query, limit=search_limit).flat_map(
             self._mcp.build_call_command,
         )
 
-    def health_check(self) -> r[t.RecursiveContainerMapping]:
+    def health_check(self) -> p.Result[t.RecursiveContainerMapping]:
         """Check if claude-context is available."""
         return self._mcp.build_server_health_result(self.SERVER_NAME)

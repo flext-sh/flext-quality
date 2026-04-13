@@ -12,7 +12,6 @@ from __future__ import annotations
 from collections.abc import Sequence
 from typing import final
 
-from flext_core import r
 from flext_quality import (
     FlextQualityMcpClient,
     c,
@@ -37,7 +36,7 @@ class FlextQualityClaudeMemClient:
 
     def build_get_observations_call(
         self, ids: Sequence[int]
-    ) -> r[m.Quality.McpToolCall]:
+    ) -> p.Result[m.Quality.McpToolCall]:
         """Build a get_observations tool call."""
         normalized_ids: t.RecursiveContainerList = list(ids)
         params: t.RecursiveContainerMapping = {"ids": normalized_ids}
@@ -48,7 +47,7 @@ class FlextQualityClaudeMemClient:
         query: str,
         *,
         limit: int | None = None,
-    ) -> r[m.Quality.McpToolCall]:
+    ) -> p.Result[m.Quality.McpToolCall]:
         """Build a search tool call."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
         params: t.RecursiveContainerMapping = {
@@ -63,7 +62,7 @@ class FlextQualityClaudeMemClient:
         *,
         depth_before: int | None = None,
         depth_after: int | None = None,
-    ) -> r[m.Quality.McpToolCall]:
+    ) -> p.Result[m.Quality.McpToolCall]:
         """Build a timeline tool call."""
         before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
@@ -78,7 +77,7 @@ class FlextQualityClaudeMemClient:
             params,
         )
 
-    def get_observations_command(self, ids: Sequence[int]) -> r[t.StrSequence]:
+    def get_observations_command(self, ids: Sequence[int]) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for fetching observations."""
         return self.build_get_observations_call(ids).flat_map(
             self._mcp.build_call_command,
@@ -89,7 +88,7 @@ class FlextQualityClaudeMemClient:
         query: str,
         *,
         limit: int | None = None,
-    ) -> r[t.StrSequence]:
+    ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for memory search."""
         search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
         return self.build_search_call(query, limit=search_limit).flat_map(
@@ -102,7 +101,7 @@ class FlextQualityClaudeMemClient:
         *,
         depth_before: int | None = None,
         depth_after: int | None = None,
-    ) -> r[t.StrSequence]:
+    ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for timeline query."""
         before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
         after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
@@ -112,6 +111,6 @@ class FlextQualityClaudeMemClient:
             depth_after=after,
         ).flat_map(self._mcp.build_call_command)
 
-    def health_check(self) -> r[t.RecursiveContainerMapping]:
+    def health_check(self) -> p.Result[t.RecursiveContainerMapping]:
         """Check if claude-mem is available."""
         return self._mcp.build_server_health_result(self.SERVER_NAME)

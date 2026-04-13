@@ -13,7 +13,7 @@ import shutil
 from collections.abc import Mapping, MutableSequence, Sequence
 from typing import final
 
-from flext_core import r
+from flext_core import p, r
 from flext_quality import c, m, t
 
 
@@ -29,7 +29,9 @@ class FlextQualityMcpClient:
         """Initialize the MCP client."""
         self._timeout_ms = timeout_ms or c.Quality.Defaults.MCP_TIMEOUT_MS
 
-    def build_call_command(self, call: m.Quality.McpToolCall) -> r[t.StrSequence]:
+    def build_call_command(
+        self, call: m.Quality.McpToolCall
+    ) -> p.Result[t.StrSequence]:
         """Build the mcp-cli command for a tool call."""
         if not self.is_mcp_cli_available():
             return r[t.StrSequence].fail("mcp-cli not found in PATH")
@@ -37,7 +39,7 @@ class FlextQualityMcpClient:
         params_json = t.CONTAINER_MAPPING_ADAPTER.dump_json(call.params).decode("utf-8")
         return r[t.StrSequence].ok(["mcp-cli", "call", tool_path, params_json])
 
-    def build_info_command(self, server: str, tool: str) -> r[t.StrSequence]:
+    def build_info_command(self, server: str, tool: str) -> p.Result[t.StrSequence]:
         """Build the mcp-cli info command for a tool."""
         if not self.is_mcp_cli_available():
             return r[t.StrSequence].fail("mcp-cli not found in PATH")
@@ -49,7 +51,7 @@ class FlextQualityMcpClient:
         server: str,
         tool: str,
         params: t.RecursiveContainerMapping | None = None,
-    ) -> r[m.Quality.McpToolCall]:
+    ) -> p.Result[m.Quality.McpToolCall]:
         """Build an MCP tool call request."""
         call_params: t.RecursiveContainerMapping = {}
         if isinstance(params, Mapping):
@@ -65,7 +67,7 @@ class FlextQualityMcpClient:
             }),
         )
 
-    def health_check(self) -> r[t.RecursiveContainerMapping]:
+    def health_check(self) -> p.Result[t.RecursiveContainerMapping]:
         """Check if MCP infrastructure is available."""
         available = self.is_mcp_cli_available()
         status = (
@@ -82,7 +84,7 @@ class FlextQualityMcpClient:
 
     def build_server_health_result(
         self, server_name: str
-    ) -> r[t.RecursiveContainerMapping]:
+    ) -> p.Result[t.RecursiveContainerMapping]:
         """Build a normalized health result for a named MCP server."""
         mcp_health = self.health_check()
         if mcp_health.failure:
@@ -104,7 +106,9 @@ class FlextQualityMcpClient:
         """Check if mcp-cli is available in PATH."""
         return shutil.which("mcp-cli") is not None
 
-    def parse_result(self, output: str, exit_code: int) -> r[m.Quality.McpToolResult]:
+    def parse_result(
+        self, output: str, exit_code: int
+    ) -> p.Result[m.Quality.McpToolResult]:
         """Parse the output from an mcp-cli call."""
         if exit_code != 0:
             return r[m.Quality.McpToolResult].ok(

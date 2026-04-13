@@ -5,14 +5,14 @@ from __future__ import annotations
 from collections.abc import MutableSequence, Sequence
 from pathlib import Path
 
-from flext_core import r
+from flext_core import p, r
 from flext_quality import c, m, t, u
 
 
 class FlextQualityRulesLoader:
     """Loads rules from YAML files."""
 
-    def load(self, path: Path) -> r[Sequence[m.Quality.RuleDefinition]]:
+    def load(self, path: Path) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from YAML file."""
         if not path.exists():
             return r[Sequence[m.Quality.RuleDefinition]].fail(
@@ -56,7 +56,7 @@ class FlextQualityRulesLoader:
     def load_multiple(
         self,
         paths: Sequence[Path],
-    ) -> r[Sequence[m.Quality.RuleDefinition]]:
+    ) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from multiple YAML files."""
         all_rules: MutableSequence[m.Quality.RuleDefinition] = []
         for path in paths:
@@ -72,7 +72,7 @@ class FlextQualityRulesLoader:
         self,
         data: t.RecursiveContainerMapping,
         index: int,
-    ) -> r[m.Quality.RuleDefinition]:
+    ) -> p.Result[m.Quality.RuleDefinition]:
         """Parse a single rule from dict."""
         name = data.get("name")
         if not name:

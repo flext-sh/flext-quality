@@ -12,7 +12,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import final
 
-from flext_core import r
+from flext_core import p, r
 from flext_quality import c, m, t
 
 
@@ -35,7 +35,7 @@ class FlextQualityCodeExecutionBridge:
         self._timeout_ms = timeout_ms or c.Quality.Defaults.INTEGRATION_TIMEOUT_MS
         self._working_dir = working_dir or Path.cwd()
 
-    def build_basedpyright_command(self, target_path: Path) -> r[t.StrSequence]:
+    def build_basedpyright_command(self, target_path: Path) -> p.Result[t.StrSequence]:
         """Build command for basedpyright type checker."""
         cmd = ["basedpyright", "--outputjson", str(target_path.resolve())]
         return r[t.StrSequence].ok(cmd)
@@ -45,7 +45,7 @@ class FlextQualityCodeExecutionBridge:
         script_path: Path,
         *,
         args: t.StrSequence | None = None,
-    ) -> r[t.StrSequence]:
+    ) -> p.Result[t.StrSequence]:
         """Build command for Python execution."""
         if not script_path.exists():
             return r[t.StrSequence].fail(f"Script not found: {script_path}")
@@ -60,7 +60,7 @@ class FlextQualityCodeExecutionBridge:
         *,
         fix: bool = False,
         output_format: str = "json",
-    ) -> r[t.StrSequence]:
+    ) -> p.Result[t.StrSequence]:
         """Build command for ruff linter."""
         cmd = ["ruff", "check", str(target_path), f"--output-format={output_format}"]
         if fix:
@@ -72,7 +72,7 @@ class FlextQualityCodeExecutionBridge:
         script_path: Path,
         *,
         args: t.StrSequence | None = None,
-    ) -> r[t.StrSequence]:
+    ) -> p.Result[t.StrSequence]:
         """Build command for TypeScript execution via npx tsx."""
         if not script_path.exists():
             return r[t.StrSequence].fail(f"Script not found: {script_path}")
@@ -87,7 +87,7 @@ class FlextQualityCodeExecutionBridge:
         runtime: str,
         *,
         args: t.StrSequence | None = None,
-    ) -> r[m.Quality.ExecutionRequest]:
+    ) -> p.Result[m.Quality.ExecutionRequest]:
         """Create an execution request for later processing."""
         if runtime not in {"python", "typescript", "ruff", "basedpyright"}:
             return r[m.Quality.ExecutionRequest].fail(f"Unknown runtime: {runtime}")
@@ -100,7 +100,7 @@ class FlextQualityCodeExecutionBridge:
             ),
         )
 
-    def health_check(self) -> r[t.RecursiveContainerMapping]:
+    def health_check(self) -> p.Result[t.RecursiveContainerMapping]:
         """Check availability of execution runtimes.
 
         Returns configuration status - actual runtime checks

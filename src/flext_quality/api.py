@@ -99,7 +99,7 @@ class FlextQuality:
         self,
         event: str,
         input_data: t.Quality.HookInput,
-    ) -> r[t.Quality.HookOutput]:
+    ) -> p.Result[t.Quality.HookOutput]:
         """Execute hooks for an event.
 
         Args:
@@ -159,7 +159,7 @@ class FlextQuality:
             "hooks_registered": len(self.hooks.get_config()),
         }
 
-    def load_rules(self, path: Path) -> r[Sequence[m.Quality.RuleDefinition]]:
+    def load_rules(self, path: Path) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from a YAML file.
 
         Args:
@@ -171,7 +171,7 @@ class FlextQuality:
         """
         return self.rules_loader.load(path)
 
-    def load_rules_from_config(self) -> r[Sequence[m.Quality.RuleDefinition]]:
+    def load_rules_from_config(self) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from configured rules directory.
 
         Returns:
@@ -188,7 +188,7 @@ class FlextQuality:
             return r[Sequence[m.Quality.RuleDefinition]].ok([])
         return self.rules_loader.load_multiple(yaml_files)
 
-    def process_stdin_hook(self) -> r[t.Quality.HookOutput]:
+    def process_stdin_hook(self) -> p.Result[t.Quality.HookOutput]:
         """Process hook input from stdin (for Claude Code hooks).
 
         Returns:
@@ -211,7 +211,7 @@ class FlextQuality:
             return r[t.Quality.HookOutput].ok({"continue": True})
         return self.execute_hook(event, input_data)
 
-    def validate_configuration(self) -> r[bool]:
+    def validate_configuration(self) -> p.Result[bool]:
         """Validate the current configuration.
 
         Returns:

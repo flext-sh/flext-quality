@@ -5,7 +5,6 @@ from __future__ import annotations
 import fnmatch
 from typing import ClassVar
 
-from flext_core import r
 from flext_quality import c, t
 
 
@@ -15,7 +14,9 @@ class FlextQualityBaseHook:
     event: ClassVar[c.Quality.HookEvent]
     matcher: ClassVar[t.StrSequence | None] = None
 
-    def execute(self, input_data: t.Quality.HookInput) -> r[t.Quality.HookOutput]:
+    def execute(
+        self, input_data: t.Quality.HookInput
+    ) -> p.Result[t.Quality.HookOutput]:
         """Execute the hook logic."""
         raise NotImplementedError
 

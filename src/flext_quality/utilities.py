@@ -9,7 +9,7 @@ from pathlib import Path
 from flext_cli import u
 from flext_web import FlextWebUtilities
 
-from flext_core import r
+from flext_core import p, r
 from flext_quality import c, t
 
 
@@ -37,7 +37,9 @@ class FlextQualityUtilities(FlextWebUtilities, u):
             ).decode("utf-8")
 
         @staticmethod
-        def load_yaml_rules(path: Path) -> r[Sequence[t.RecursiveContainerMapping]]:
+        def load_yaml_rules(
+            path: Path,
+        ) -> p.Result[Sequence[t.RecursiveContainerMapping]]:
             """Load rules from YAML file."""
             try:
                 yaml_result = FlextQualityUtilities.Cli.yaml_safe_load(path)
@@ -78,7 +80,7 @@ class FlextQualityUtilities(FlextWebUtilities, u):
                 )
 
         @staticmethod
-        def parse_hook_input(raw: str) -> r[t.Quality.HookInput]:
+        def parse_hook_input(raw: str) -> p.Result[t.Quality.HookInput]:
             """Parse hook input JSON."""
             try:
                 parsed: t.RecursiveContainerMapping = (
@@ -90,7 +92,7 @@ class FlextQualityUtilities(FlextWebUtilities, u):
                 return r[t.Quality.HookInput].fail(f"Invalid JSON: {e}")
 
         @staticmethod
-        def read_stdin() -> r[str]:
+        def read_stdin() -> p.Result[str]:
             """Read JSON from stdin (for hooks)."""
             return u.try_(
                 sys.stdin.read,
@@ -101,7 +103,7 @@ class FlextQualityUtilities(FlextWebUtilities, u):
         def run_shell_command(
             cmd: t.StrSequence,
             timeout_ms: int = c.Quality.Defaults.HOOK_TIMEOUT_MS,
-        ) -> r[str]:
+        ) -> p.Result[str]:
             """Run a shell command with timeout."""
             timeout_secs = int(timeout_ms / c.Quality.Defaults.MS_TO_SECONDS_DIVISOR)
             cmd_result = u.Cli.run_raw(list(cmd), timeout=timeout_secs)

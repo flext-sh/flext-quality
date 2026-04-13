@@ -50,7 +50,7 @@ class FlextQualitySettings(FlextSettings):
         """Resolve configured rules directory path."""
         return Path(self.rules_dir)
 
-    def validate_thresholds(self) -> r[bool]:
+    def validate_thresholds(self) -> p.Result[bool]:
         """Validate numeric thresholds and feature toggles."""
         if self.max_function_length > self.max_class_length:
             return r[bool].fail(
