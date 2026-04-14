@@ -18,11 +18,10 @@ from pathlib import Path
 
 import pytest
 
-from flext_core import r
-from tests import t
+from tests import p, t
 
 
-def assert_result_success_with_data[T](result: r[T]) -> T:
+def assert_result_success_with_data[T](result: p.Result[T]) -> T:
     """Assert r success and return validated data with type safety.
 
     Provides a DRY helper for the common test pattern of validating r
@@ -53,7 +52,7 @@ def assert_result_success_with_data[T](result: r[T]) -> T:
     return result.value
 
 
-def assert_result_failure_with_error[T](result: r[T]) -> str:
+def assert_result_failure_with_error[T](result: p.Result[T]) -> str:
     """Assert r failure and return validated error message.
 
     Provides a DRY helper for validating r failure states and
