@@ -62,7 +62,7 @@
     - [**For Enterprise Teams**](#for-enterprise-teams)
   - [Support During Transformation](#support-during-transformation)
 
-**Version**: 0.9.9 RC | **Status**: Accessibility Improvements Needed · 1.0.0 Release Preparation | **Updated**: 2025-09-17
+**Version**: 0.12.0-dev | **Status**: Accessibility Improvements Needed · 1.0.0 Current | **Updated**: 2026-04-14
 
 ______________________________________________________________________
 

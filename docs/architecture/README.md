@@ -82,7 +82,7 @@
     - [For Architects & Technical Leads](#for-architects--technical-leads)
     - [For Developers](#for-developers)
 
-**Version**: 1.0.0 | **Status**: Production Architecture | **Updated**: 2025-10-10
+**Version**: 1.0.0 | **Status**: Production Architecture | **Updated**: 2026-04-14
 
 Comprehensive architecture documentation for FLEXT Quality - Enterprise-grade code quality analysis library with Clean Architecture,
 Domain-Driven Design, and FLEXT ecosystem integration.
@@ -197,13 +197,13 @@ Rel(flext_quality, pytest, "Integrates with test coverage")
 
 | ADR     | Title                    | Status   | Date       |
 | ------- | ------------------------ | -------- | ---------- |
-| ADR-001 | Adopt Clean Architecture | Accepted | 2025-10-10 |
+| ADR-001 | Adopt Clean Architecture | Accepted | 2026-04-14 |
 
 ### Technology Decisions
 
 | ADR     | Title                | Status   | Date       |
 | ------- | -------------------- | -------- | ---------- |
-| ADR-009 | MyPy for Type Safety | Accepted | 2025-10-10 |
+| ADR-009 | MyPy for Type Safety | Accepted | 2026-04-14 |
 
 ## 📋 Quality Attributes & Architectural Characteristics
 
