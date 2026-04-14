@@ -105,6 +105,14 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
             BLOCK = "block"
             MODIFY = "modify"
 
+        @unique
+        class NotificationPriority(StrEnum):
+            """Notification priority levels for quality alerts."""
+
+            CRITICAL = "critical"
+            WARNING = "warning"
+            INFO = "info"
+
         class Threshold:
             """Quality thresholds for validation."""
 

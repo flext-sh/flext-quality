@@ -19,7 +19,7 @@ from pathlib import Path
 import requests
 from pydantic import BaseModel, Field
 
-from flext_quality import m, t, u
+from flext_quality import c, m, t, u
 
 # Constants
 MAX_BROKEN_LINKS_TO_SHOW = 10
@@ -278,7 +278,9 @@ class FlextQualityDocumentationNotifier:
         if critical_count >= threshold:
             title = f"🚨 CRITICAL: {critical_count} Critical Documentation Issues Found"
             message = self._format_critical_issues_message(audit_data)
-            return self.send_notification(title, message, "critical")
+            return self.send_notification(
+                title, message, c.Quality.NotificationPriority.CRITICAL.value
+            )
 
         return True
 
@@ -302,7 +304,9 @@ Quality Score Drop Detected
 This represents a significant degradation in documentation quality.
 Please review recent changes and address any identified issues.
             """.strip()
-            return self.send_notification(title, message, "warning")
+            return self.send_notification(
+                title, message, c.Quality.NotificationPriority.WARNING.value
+            )
 
         return True
 
@@ -319,7 +323,9 @@ Please review recent changes and address any identified issues.
         if len(broken_links) >= threshold:
             title = f"🔗 Link Alert: {len(broken_links)} Broken Links Detected"
             message = self._format_broken_links_message(broken_links)
-            return self.send_notification(title, message, "warning")
+            return self.send_notification(
+                title, message, c.Quality.NotificationPriority.WARNING.value
+            )
 
         return True
 
@@ -333,7 +339,9 @@ Please review recent changes and address any identified issues.
 
         title = "📊 Weekly Documentation Quality Report"
         message = self._format_weekly_report_message(report_data)
-        return self.send_notification(title, message, "info")
+        return self.send_notification(
+            title, message, c.Quality.NotificationPriority.INFO.value
+        )
 
     def notify_monthly_report(
         self,
@@ -345,13 +353,15 @@ Please review recent changes and address any identified issues.
 
         title = "📈 Monthly Documentation Quality Report"
         message = self._format_monthly_report_message(report_data)
-        return self.send_notification(title, message, "info")
+        return self.send_notification(
+            title, message, c.Quality.NotificationPriority.INFO.value
+        )
 
     def send_notification(
         self,
         title: str,
         message: str,
-        priority: str = "info",
+        priority: str = c.Quality.NotificationPriority.INFO.value,
     ) -> bool:
         """Send notification through all enabled channels."""
         success = True
@@ -443,7 +453,11 @@ Timestamp: {datetime.now(UTC).isoformat()}
         """Send notification to Slack."""
         slack_config = self.settings.slack
 
-        color = {"critical": "danger", "warning": "warning", "info": "good"}.get(
+        color = {
+            c.Quality.NotificationPriority.CRITICAL.value: "danger",
+            c.Quality.NotificationPriority.WARNING.value: "warning",
+            c.Quality.NotificationPriority.INFO.value: "good",
+        }.get(
             priority,
             "good",
         )
@@ -533,7 +547,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
                         t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(i_v)
                     )
                     sev = i_m.get("severity")
-                    if sev == "critical":
+                    if sev == c.Quality.NotificationPriority.CRITICAL.value:
                         critical_issues.append(i_m)
                         max_critical_issues = 5
                         if len(critical_issues) >= max_critical_issues:
@@ -654,7 +668,7 @@ def main() -> None:
         success = notifier.send_notification(
             "Test Notification",
             "This is a test notification from the FLEXT Quality Documentation System.\n\nIf you received this, the notification system is working correctly.",
-            "info",
+            c.Quality.NotificationPriority.INFO.value,
         )
         if not success:
             for err in notifier.results.errors:

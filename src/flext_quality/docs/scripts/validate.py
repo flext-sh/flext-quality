@@ -20,6 +20,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import requests
+from flext_api import FlextApiConstants
 
 from flext_quality import m, t
 
@@ -186,12 +187,18 @@ class FlextQualityLinkValidator:
             error=error,
         )
 
-    def _make_http_request(self, url: str, method: str = "head") -> requests.Response:
+    def _make_http_request(
+        self, url: str, method: str = FlextApiConstants.Api.MethodLiterals.HEAD_LOWER
+    ) -> requests.Response:
         """Make an HTTP request with appropriate headers."""
         headers = {"User-Agent": self.user_agent}
-        if method == "head":
+        if method == FlextApiConstants.Api.MethodLiterals.HEAD_LOWER:
             headers["Accept"] = "*/*"
-        request_func = requests.head if method == "head" else requests.get
+        request_func = (
+            requests.head
+            if method == FlextApiConstants.Api.MethodLiterals.HEAD_LOWER
+            else requests.get
+        )
         return request_func(
             url,
             timeout=self.timeout,
