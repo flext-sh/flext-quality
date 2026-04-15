@@ -12,7 +12,7 @@ from flext_core.lazy import (
 )
 
 if _t.TYPE_CHECKING:
-    from flext_cli import d, e, h, r, s, x
+    from flext_web import d, e, h, r, s, t, u, x
 
     from flext_quality.api import FlextQuality, quality
     from flext_quality.constants import FlextQualityConstants, c
@@ -57,8 +57,6 @@ if _t.TYPE_CHECKING:
     from flext_quality.rules.validators import FlextQualityValidators
     from flext_quality.services.cli import FlextQualityCliService
     from flext_quality.settings import FlextQualitySettings
-    from flext_quality.typings import FlextQualityTypes, t
-    from flext_quality.utilities import FlextQualityUtilities, u
 _LAZY_IMPORTS = merge_lazy_imports(
     (
         ".docs",
@@ -87,29 +85,19 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "p",
             ),
             ".settings": ("FlextQualitySettings",),
-            ".typings": (
-                "FlextQualityTypes",
-                "t",
-            ),
-            ".utilities": (
-                "FlextQualityUtilities",
-                "u",
-            ),
-            "flext_cli": (
+            "flext_web": (
                 "d",
                 "e",
                 "h",
                 "r",
                 "s",
+                "t",
+                "u",
                 "x",
             ),
         },
     ),
     exclude_names=(
-        "FlextDispatcher",
-        "FlextLogger",
-        "FlextRegistry",
-        "FlextRuntime",
         "cleanup_submodule_namespace",
         "install_lazy_exports",
         "lazy_getattr",
@@ -154,8 +142,6 @@ __all__: list[str] = [
     "FlextQualitySettings",
     "FlextQualityStyleGuide",
     "FlextQualityStyleValidator",
-    "FlextQualityTypes",
-    "FlextQualityUtilities",
     "FlextQualityValidationSettings",
     "FlextQualityValidators",
     "c",

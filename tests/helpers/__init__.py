@@ -25,6 +25,15 @@ _LAZY_IMPORTS = build_lazy_import_map(
             "TestsTypings",
             "t",
         ),
+        "flext_quality": (
+            "d",
+            "e",
+            "h",
+            "r",
+            "s",
+            "u",
+            "x",
+        ),
     },
 )
 

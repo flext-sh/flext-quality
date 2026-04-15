@@ -10,6 +10,19 @@ _LAZY_IMPORTS = build_lazy_import_map(
         ".test_api": ("test_api",),
         ".test_basic": ("test_basic",),
         ".test_cli": ("test_cli",),
+        "flext_quality": (
+            "c",
+            "d",
+            "e",
+            "h",
+            "m",
+            "p",
+            "r",
+            "s",
+            "t",
+            "u",
+            "x",
+        ),
     },
 )
 

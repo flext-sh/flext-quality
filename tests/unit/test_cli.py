@@ -11,8 +11,7 @@ from pathlib import Path
 
 from flext_tests import tm
 
-from flext_quality import FlextQualityCliService
-from flext_quality.services.cli import main
+from flext_quality import FlextQualityCliService, main
 
 
 class TestFlextQualityCliService:
