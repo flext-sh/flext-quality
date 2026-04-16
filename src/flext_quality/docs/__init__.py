@@ -17,9 +17,28 @@ _LAZY_IMPORTS = merge_lazy_imports(
     ),
     build_lazy_import_map(
         {
+            ".core.base_classes": (
+                "FlextQualityBaseAnalyzer",
+                "FlextQualityBaseAuditor",
+                "FlextQualityBaseReporter",
+                "FlextQualityBaseValidator",
+            ),
+            ".core.config_manager": (
+                "FlextQualityAuditRules",
+                "FlextQualityConfigManager",
+                "FlextQualityStyleGuide",
+                "FlextQualityValidationSettings",
+            ),
+            ".core.file_discovery": (
+                "FlextQualityDocumentationFinder",
+                "FlextQualityFileStatistics",
+            ),
             ".dashboard": ("FlextQualityDocumentationDashboard",),
             ".notifications": ("FlextQualityDocumentationNotifier",),
             ".scheduled_maintenance": ("FlextQualityScheduledMaintenance",),
+            ".tools.content_analyzer": ("FlextQualityContentAnalyzer",),
+            ".tools.link_checker": ("FlextQualityLinkChecker",),
+            ".tools.style_validator": ("FlextQualityStyleValidator",),
         },
     ),
     exclude_names=(

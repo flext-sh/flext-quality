@@ -74,3 +74,5 @@ class FlextQualityTypes(FlextWebTypes, t):
 
 
 t = FlextQualityTypes
+
+__all__: list[str] = ["FlextQualityTypes", "t"]

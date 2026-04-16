@@ -64,7 +64,7 @@ def safe_dict_access(data: t.ScalarMapping, key: str) -> t.Scalar:
       Value from dict
 
     Raises:
-      AssertionError: If data is not a t.RecursiveContainerMapping or key missing
+      AssertionError: If data is not a mapping or key missing
 
     """
     assert key in data, f"Key '{key}' not found in dict"

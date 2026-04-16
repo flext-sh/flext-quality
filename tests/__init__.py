@@ -35,6 +35,10 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "TestsFlextQualityConstants",
                 "c",
             ),
+            ".helpers.constants": ("TestsConstants",),
+            ".helpers.models": ("TestsModels",),
+            ".helpers.protocols": ("TestsProtocols",),
+            ".helpers.typings": ("TestsTypings",),
             ".models": (
                 "TestsFlextQualityModels",
                 "m",

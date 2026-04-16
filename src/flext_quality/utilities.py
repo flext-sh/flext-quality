@@ -115,3 +115,5 @@ class FlextQualityUtilities(FlextWebUtilities, u):
 
 
 u = FlextQualityUtilities
+
+__all__: list[str] = ["FlextQualityUtilities", "u"]

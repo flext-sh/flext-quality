@@ -12,7 +12,7 @@ from flext_core.lazy import (
 )
 
 if _t.TYPE_CHECKING:
-    from flext_web import d, e, h, r, s, t, u, x
+    from flext_cli import d, e, h, r, s, x
 
     from flext_quality.api import FlextQuality, quality
     from flext_quality.constants import FlextQualityConstants, c
@@ -57,6 +57,8 @@ if _t.TYPE_CHECKING:
     from flext_quality.rules.validators import FlextQualityValidators
     from flext_quality.services.cli import FlextQualityCliService
     from flext_quality.settings import FlextQualitySettings
+    from flext_quality.typings import FlextQualityTypes, t
+    from flext_quality.utilities import FlextQualityUtilities, u
 _LAZY_IMPORTS = merge_lazy_imports(
     (
         ".docs",
@@ -76,6 +78,34 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "FlextQualityConstants",
                 "c",
             ),
+            ".docs.core.base_classes": (
+                "FlextQualityBaseAnalyzer",
+                "FlextQualityBaseAuditor",
+                "FlextQualityBaseReporter",
+                "FlextQualityBaseValidator",
+            ),
+            ".docs.core.config_manager": (
+                "FlextQualityAuditRules",
+                "FlextQualityConfigManager",
+                "FlextQualityStyleGuide",
+                "FlextQualityValidationSettings",
+            ),
+            ".docs.core.file_discovery": (
+                "FlextQualityDocumentationFinder",
+                "FlextQualityFileStatistics",
+            ),
+            ".docs.dashboard": ("FlextQualityDocumentationDashboard",),
+            ".docs.notifications": ("FlextQualityDocumentationNotifier",),
+            ".docs.scheduled_maintenance": ("FlextQualityScheduledMaintenance",),
+            ".docs.tools.content_analyzer": ("FlextQualityContentAnalyzer",),
+            ".docs.tools.link_checker": ("FlextQualityLinkChecker",),
+            ".docs.tools.style_validator": ("FlextQualityStyleValidator",),
+            ".hooks.base": ("FlextQualityBaseHook",),
+            ".hooks.manager": ("FlextQualityHookManager",),
+            ".integrations.claude_context": ("FlextQualityClaudeContextClient",),
+            ".integrations.claude_mem": ("FlextQualityClaudeMemClient",),
+            ".integrations.code_execution": ("FlextQualityCodeExecutionBridge",),
+            ".integrations.mcp_client": ("FlextQualityMcpClient",),
             ".models": (
                 "FlextQualityModels",
                 "m",
@@ -84,15 +114,25 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "FlextQualityProtocols",
                 "p",
             ),
+            ".rules.engine": ("FlextQualityRulesEngine",),
+            ".rules.loader": ("FlextQualityRulesLoader",),
+            ".rules.validators": ("FlextQualityValidators",),
+            ".services.cli": ("FlextQualityCliService",),
             ".settings": ("FlextQualitySettings",),
-            "flext_web": (
+            ".typings": (
+                "FlextQualityTypes",
+                "t",
+            ),
+            ".utilities": (
+                "FlextQualityUtilities",
+                "u",
+            ),
+            "flext_cli": (
                 "d",
                 "e",
                 "h",
                 "r",
                 "s",
-                "t",
-                "u",
                 "x",
             ),
         },
@@ -142,6 +182,8 @@ __all__: list[str] = [
     "FlextQualitySettings",
     "FlextQualityStyleGuide",
     "FlextQualityStyleValidator",
+    "FlextQualityTypes",
+    "FlextQualityUtilities",
     "FlextQualityValidationSettings",
     "FlextQualityValidators",
     "c",
