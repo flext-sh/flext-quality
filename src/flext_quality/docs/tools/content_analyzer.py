@@ -15,21 +15,21 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import ClassVar
 
-from pydantic import BaseModel, TypeAdapter
+from pydantic import TypeAdapter
 
-from flext_quality import t, u
+from flext_quality import m, t, u
 
 
 class FlextQualityContentAnalyzer:
     """Advanced content quality analysis system."""
 
-    class AnalyzerConfig(BaseModel, total=False):
+    class AnalyzerConfig(m.BaseModel, total=False):
         """Configuration dictionary structure."""
 
         content_checks: t.BoolMapping | None = None
         quality_thresholds: t.IntMapping | None = None
 
-    class Metrics(BaseModel):
+    class Metrics(m.BaseModel):
         """Metrics dictionary structure."""
 
         word_count: int | None = None
@@ -48,7 +48,7 @@ class FlextQualityContentAnalyzer:
         avg_sentence_length: float | None = None
         code_to_content_ratio: float | None = None
 
-    class Readability(BaseModel):
+    class Readability(m.BaseModel):
         """Readability analysis dictionary structure."""
 
         readability_score: float | None = None
@@ -58,7 +58,7 @@ class FlextQualityContentAnalyzer:
         avg_words_per_sentence: float | None = None
         avg_syllables_per_word: float | None = None
 
-    class Structure(BaseModel):
+    class Structure(m.BaseModel):
         """Structure analysis dictionary structure."""
 
         has_table_of_contents: bool | None = None
@@ -67,7 +67,7 @@ class FlextQualityContentAnalyzer:
         sections: MutableSequence[t.HeaderMapping] | None = None
         depth_analysis: MutableMapping[str, t.Numeric] | None = None
 
-    class Completeness(BaseModel):
+    class Completeness(m.BaseModel):
         """Completeness check dictionary structure."""
 
         score: int | None = None
@@ -77,14 +77,14 @@ class FlextQualityContentAnalyzer:
         word_count_sufficient: bool | None = None
         missing_required_sections: MutableSequence[str] | None = None
 
-    class Issue(BaseModel):
+    class Issue(m.BaseModel):
         """Issue dictionary structure."""
 
         type: str | None = None
         severity: str | None = None
         message: str | None = None
 
-    class Analysis(BaseModel):
+    class Analysis(m.BaseModel):
         """Analysis result dictionary structure."""
 
         file: str | None = None
@@ -97,7 +97,7 @@ class FlextQualityContentAnalyzer:
         suggestions: MutableSequence[str] | None = None
         error: str | None = None
 
-    class AnalyzerRecommendation(BaseModel):
+    class AnalyzerRecommendation(m.BaseModel):
         """Recommendation dictionary structure."""
 
         priority: str | None = None
@@ -105,7 +105,7 @@ class FlextQualityContentAnalyzer:
         message: str | None = None
         actions: MutableSequence[str] | None = None
 
-    class Results(BaseModel):
+    class Results(m.BaseModel):
         """Results dictionary structure."""
 
         files_analyzed: int
@@ -120,7 +120,7 @@ class FlextQualityContentAnalyzer:
             FlextQualityContentAnalyzer.AnalyzerRecommendation | str
         ]
 
-    RESULTS_ADAPTER: ClassVar[TypeAdapter[Results]] = TypeAdapter(Results)
+    RESULTS_ADAPTER: ClassVar[m.TypeAdapter[Results]] = TypeAdapter(Results)
 
     EXCELLENT_READABILITY_MIN = 90
     GOOD_READABILITY_MIN = 80

@@ -15,15 +15,15 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import ClassVar
 
-from pydantic import BaseModel, TypeAdapter
+from pydantic import TypeAdapter
 
-from flext_quality import t, u
+from flext_quality import m, t, u
 
 
 class FlextQualityStyleValidator:
     """Documentation style validation and consistency checking system."""
 
-    class StyleIssue(BaseModel):
+    class StyleIssue(m.BaseModel):
         """Represents a single style issue or violation."""
 
         type: str
@@ -32,7 +32,7 @@ class FlextQualityStyleValidator:
         message: str
         severity: str
 
-    class FileResults(BaseModel):
+    class FileResults(m.BaseModel):
         """Results from validating a single file."""
 
         file: str
@@ -40,7 +40,7 @@ class FlextQualityStyleValidator:
         issues: MutableSequence[FlextQualityStyleValidator.StyleIssue]
         suggestions: MutableSequence[str]
 
-    class MarkdownConfig(BaseModel):
+    class MarkdownConfig(m.BaseModel):
         """Markdown formatting configuration."""
 
         heading_style: str | None = None
@@ -48,14 +48,14 @@ class FlextQualityStyleValidator:
         emphasis_style: str | None = None
         code_block_style: str | None = None
 
-    class FormattingConfig(BaseModel):
+    class FormattingConfig(m.BaseModel):
         """Formatting configuration."""
 
         max_line_length: int | None = None
         trailing_spaces: bool | None = None
         consistent_indentation: bool | None = None
 
-    class AccessibilityConfig(BaseModel):
+    class AccessibilityConfig(m.BaseModel):
         """Accessibility configuration."""
 
         require_alt_text: bool | None = None
@@ -63,12 +63,12 @@ class FlextQualityStyleValidator:
         heading_structure: bool | None = None
         proper_headings: bool | None = None
 
-    class HeadingsConfig(BaseModel):
+    class HeadingsConfig(m.BaseModel):
         """Headings configuration."""
 
         enforce_hierarchy: bool | None = None
 
-    class StyleConfig(BaseModel):
+    class StyleConfig(m.BaseModel):
         """Complete style configuration."""
 
         markdown: FlextQualityStyleValidator.MarkdownConfig | None = None
@@ -76,7 +76,7 @@ class FlextQualityStyleValidator:
         accessibility: FlextQualityStyleValidator.AccessibilityConfig | None = None
         headings: FlextQualityStyleValidator.HeadingsConfig | None = None
 
-    class SummaryMetrics(BaseModel):
+    class SummaryMetrics(m.BaseModel):
         """Summary metrics for validation results."""
 
         total_violations: int
@@ -85,7 +85,7 @@ class FlextQualityStyleValidator:
         suggestions_count: int
         accessibility_issues: int
 
-    class ValidationResults(BaseModel):
+    class ValidationResults(m.BaseModel):
         """Complete validation results."""
 
         files_checked: int
@@ -95,7 +95,7 @@ class FlextQualityStyleValidator:
         suggestions: MutableSequence[str]
         summary: FlextQualityStyleValidator.SummaryMetrics
 
-    RESULTS_ADAPTER: ClassVar[TypeAdapter[ValidationResults]] = TypeAdapter(
+    RESULTS_ADAPTER: ClassVar[m.TypeAdapter[ValidationResults]] = TypeAdapter(
         ValidationResults
     )
 

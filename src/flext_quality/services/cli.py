@@ -16,7 +16,15 @@ from typing import final
 
 from flext_cli import FlextCliConstants, cli
 
-from flext_quality import FlextQuality, FlextQualityCodeExecutionBridge, c, p, r, t
+from flext_core import r
+from flext_quality import (
+    FlextQualityCodeExecutionBridge,
+    FlextQualityHookManager,
+    FlextQualitySettings,
+    c,
+    p,
+    t,
+)
 
 
 @final
@@ -26,7 +34,8 @@ class FlextQualityCliService:
     def __init__(self) -> None:
         """Initialize the CLI service."""
         self.output = cli
-        self._quality = FlextQuality.get_instance()
+        self._settings = FlextQualitySettings.get_instance()
+        self._hooks = FlextQualityHookManager()
         self._executor = FlextQualityCodeExecutionBridge()
 
     def build_check_commands(
@@ -78,7 +87,17 @@ class FlextQualityCliService:
 
     def display_status(self) -> p.Result[t.RecursiveContainerMapping]:
         """Display quality service status."""
-        status = self._quality.get_status()
+        status: t.RecursiveContainerMapping = {
+            "name": c.Quality.Mcp.SERVER_NAME,
+            "version": c.Quality.Mcp.SERVER_VERSION,
+            "settings": {
+                "hook_timeout_ms": self._settings.hook_timeout_ms,
+                "rule_timeout_seconds": self._settings.rule_timeout_seconds,
+                "cache_enabled": self._settings.cache_enabled,
+                "mcp_server_port": self._settings.mcp_server_port,
+            },
+            "hooks_registered": len(self._hooks.get_config()),
+        }
         return r[t.RecursiveContainerMapping].ok(status)
 
 
@@ -190,3 +209,6 @@ def main() -> int:
         result = _CommandHandlers.handle_status(service)
         return result.unwrap_or(1)
     return _dispatch(service, args[0], args[1:])
+
+
+__all__: list[str] = ["FlextQualityCliService", "main"]

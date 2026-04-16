@@ -8,11 +8,10 @@ from __future__ import annotations
 
 from collections.abc import Mapping, MutableMapping, MutableSequence, Sequence
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, ClassVar
 
 from flext_cli import m
 from flext_web import FlextWebModels
-from pydantic import BaseModel, Field
 
 from flext_quality import c, t
 
@@ -35,7 +34,7 @@ class FlextQualityModels(FlextWebModels, m):
         def _empty_list_dict_str_str() -> MutableSequence[t.MutableStrMapping]:
             return []
 
-        class HookConfig(BaseModel):
+        class HookConfig(m.BaseModel):
             """Configuration for a hook."""
 
             event: c.Quality.HookEvent
@@ -43,23 +42,20 @@ class FlextQualityModels(FlextWebModels, m):
             command: str
             timeout_ms: Annotated[
                 int,
-                Field(default=c.Quality.Defaults.HOOK_TIMEOUT_MS),
+                m.Field(default=c.Quality.Defaults.HOOK_TIMEOUT_MS),
             ]
             enabled: bool = True
 
-        class HookResult(BaseModel):
+        class HookResult(m.BaseModel):
             """Result from hook execution."""
 
-            continue_execution: Annotated[bool, Field(alias="continue")]
-            system_message: Annotated[
-                str | None,
-                Field(default=None, alias="systemMessage"),
-            ]
+            continue_execution: Annotated[bool, m.Field(alias="continue")]
+            system_message: Annotated[str | None, m.Field(alias="systemMessage")] = None
             blocked_reason: str | None = None
 
-            model_config = {"populate_by_name": True}
+            model_config: ClassVar[dict[str, bool]] = {"populate_by_name": True}
 
-        class RuleDefinition(BaseModel):
+        class RuleDefinition(m.BaseModel):
             """A rule definition from YAML."""
 
             name: str
@@ -69,7 +65,7 @@ class FlextQualityModels(FlextWebModels, m):
             action: str
             enabled: bool = True
 
-        class IntegrationConfig(BaseModel):
+        class IntegrationConfig(m.BaseModel):
             """Configuration for an integration."""
 
             name: str
@@ -78,21 +74,21 @@ class FlextQualityModels(FlextWebModels, m):
             port: int
             timeout_ms: Annotated[
                 int,
-                Field(default=c.Quality.Defaults.INTEGRATION_TIMEOUT_MS),
+                m.Field(default=c.Quality.Defaults.INTEGRATION_TIMEOUT_MS),
             ]
 
-        class MemoryObservation(BaseModel):
+        class MemoryObservation(m.BaseModel):
             """An observation from claude-mem."""
 
             id: str
             type: str
             title: str
             content: str
-            concepts: t.StrSequence = Field(default_factory=list)
-            files: t.StrSequence = Field(default_factory=list)
+            concepts: t.StrSequence = m.Field(default_factory=list)
+            files: t.StrSequence = m.Field(default_factory=list)
             timestamp: str
 
-        class ContextSearchResult(BaseModel):
+        class ContextSearchResult(m.BaseModel):
             """A search result from claude-context."""
 
             file_path: str
@@ -100,27 +96,18 @@ class FlextQualityModels(FlextWebModels, m):
             score: float
             line_number: int | None = None
 
-        class Issue(BaseModel):
+        class Issue(m.BaseModel):
             """Canonical issue model for documentation tooling."""
 
-            type: Annotated[str, Field(description="Issue type identifier")]
-            severity: Annotated[str, Field(description="Severity level identifier")]
-            file: Annotated[str, Field(description="File path where issue was found")]
-            line: Annotated[
-                int | None,
-                Field(default=None, description="Issue line number"),
-            ]
-            description: Annotated[
-                str,
-                Field(default="", description="Issue description"),
-            ]
-            recommendation: Annotated[
-                str,
-                Field(default="", description="Recommended fix"),
-            ]
+            type: Annotated[str, m.Field(description="Issue type identifier")]
+            severity: Annotated[str, m.Field(description="Severity level identifier")]
+            file: Annotated[str, m.Field(description="File path where issue was found")]
+            line: Annotated[int | None, m.Field(description="Issue line number")] = None
+            description: Annotated[str, m.Field(description="Issue description")] = ""
+            recommendation: Annotated[str, m.Field(description="Recommended fix")] = ""
             context: Annotated[
                 Mapping[str, t.Primitives | None] | None,
-                Field(default=None),
+                m.Field(default=None),
             ]
 
             def to_dict(
@@ -137,18 +124,18 @@ class FlextQualityModels(FlextWebModels, m):
                     "context": self.context if self.context is not None else {},
                 }
 
-        class ValidationResult(BaseModel):
+        class ValidationResult(m.BaseModel):
             """Canonical validation result for documentation tooling."""
 
             total_items: int = 0
             valid_items: int = 0
             invalid_items: int = 0
-            issues: MutableSequence[FlextQualityModels.Quality.Issue] = Field(
+            issues: MutableSequence[FlextQualityModels.Quality.Issue] = m.Field(
                 default_factory=lambda: list[FlextQualityModels.Quality.Issue]()
             )
-            warnings: MutableSequence[str] = Field(default_factory=list)
-            errors: MutableSequence[str] = Field(default_factory=list)
-            metadata: MutableMapping[str, t.Primitives] = Field(default_factory=dict)
+            warnings: MutableSequence[str] = m.Field(default_factory=list)
+            errors: MutableSequence[str] = m.Field(default_factory=list)
+            metadata: MutableMapping[str, t.Primitives] = m.Field(default_factory=dict)
 
             @property
             def success_rate(self) -> float:
@@ -165,7 +152,7 @@ class FlextQualityModels(FlextWebModels, m):
                 else:
                     self.valid_items += 1
 
-        class FileMetadata(BaseModel):
+        class FileMetadata(m.BaseModel):
             """Metadata about a documentation file."""
 
             path: str
@@ -202,81 +189,81 @@ class FlextQualityModels(FlextWebModels, m):
                     words=words,
                 )
 
-        class ScheduleTaskConfig(BaseModel):
+        class ScheduleTaskConfig(m.BaseModel):
             """Task configuration for scheduled documentation maintenance."""
 
             description: str
             command: str
-            timeout: Annotated[t.PositiveInt, Field(default=300)]
+            timeout: Annotated[t.PositiveInt, m.Field(default=300)]
 
-        class ScheduleEntry(BaseModel):
+        class ScheduleEntry(m.BaseModel):
             """Single schedule entry definition."""
 
             enabled: bool = True
             time: str
-            tasks: t.StrSequence = Field(default_factory=list)
+            tasks: t.StrSequence = m.Field(default_factory=list)
             day: str | None = None
 
-        class ErrorHandlingConfig(BaseModel):
+        class ErrorHandlingConfig(m.BaseModel):
             """Error handling settings for scheduled maintenance."""
 
-            max_retries: Annotated[t.NonNegativeInt, Field(default=3)]
-            retry_delay: Annotated[t.NonNegativeInt, Field(default=60)]
+            max_retries: Annotated[t.NonNegativeInt, m.Field(default=3)]
+            retry_delay: Annotated[t.NonNegativeInt, m.Field(default=60)]
             fail_fast: bool = False
             notify_on_failure: bool = True
 
-        class LoggingConfig(BaseModel):
+        class LoggingConfig(m.BaseModel):
             """Logging configuration for scheduled maintenance."""
 
             enabled: bool = True
             log_file: str
             max_log_size: str = "10MB"
-            retention_days: Annotated[t.PositiveInt, Field(default=30)]
+            retention_days: Annotated[t.PositiveInt, m.Field(default=30)]
 
-        class MaintenanceConfig(BaseModel):
+        class MaintenanceConfig(m.BaseModel):
             """Root configuration for scheduled documentation maintenance."""
 
             enabled: bool = True
             reports_dir: str
             backup_dir: str
             schedules: MutableMapping[str, FlextQualityModels.Quality.ScheduleEntry] = (
-                Field(default_factory=dict)
+                m.Field(default_factory=dict)
             )
             tasks: MutableMapping[
                 str,
                 FlextQualityModels.Quality.ScheduleTaskConfig,
-            ] = Field(default_factory=dict)
+            ] = m.Field(default_factory=dict)
             error_handling: FlextQualityModels.Quality.ErrorHandlingConfig
             logging: FlextQualityModels.Quality.LoggingConfig
 
-        class ScheduleResults(BaseModel):
+        class ScheduleResults(m.BaseModel):
             """Execution summary for scheduled maintenance runs."""
 
             start_time: str
             tasks_completed: int = 0
-            errors: MutableSequence[str] = Field(default_factory=list)
-            warnings: MutableSequence[str] = Field(default_factory=list)
+            errors: MutableSequence[str] = m.Field(default_factory=list)
+            warnings: MutableSequence[str] = m.Field(default_factory=list)
             end_time: str = ""
             duration_seconds: int = 0
 
-        class AuditMetrics(BaseModel):
+        class AuditMetrics(m.BaseModel):
             """Typed metrics for documentation audit results."""
 
             total_issues: int = 0
-            severity_breakdown: t.MutableIntMapping = Field(default_factory=dict)
+            severity_breakdown: t.MutableIntMapping = m.Field(default_factory=dict)
             quality_score: int = 0
             files_analyzed: int = 0
             issues_per_file: float = 0.0
 
-        class AuditRecommendation(BaseModel):
+        class AuditRecommendation(m.BaseModel):
             """Typed recommendation from documentation audit."""
 
             priority: str
             category: str
             recommendation: str
-            actions: t.StrSequence = Field(default_factory=list)
+            actions: t.StrSequence = m.Field(default_factory=list)
 
-        class AuditorResults(BaseModel):
+        class AuditorResults(m.BaseModel):
             """Results for documentation audit execution."""
 
             timestamp: str
@@ -286,7 +273,7 @@ class FlextQualityModels(FlextWebModels, m):
                     str,
                     t.Primitives | t.StrSequence | Sequence[t.StrMapping] | None,
                 ]
-            ] = Field(
+            ] = m.Field(
                 default_factory=lambda: list[
                     MutableMapping[
                         str,
@@ -294,18 +281,18 @@ class FlextQualityModels(FlextWebModels, m):
                     ]
                 ]()
             )
-            metrics: FlextQualityModels.Quality.AuditMetrics = Field(
+            metrics: FlextQualityModels.Quality.AuditMetrics = m.Field(
                 default_factory=lambda: FlextQualityModels.Quality.AuditMetrics()
             )
             recommendations: MutableSequence[
                 FlextQualityModels.Quality.AuditRecommendation
-            ] = Field(
+            ] = m.Field(
                 default_factory=lambda: list[
                     FlextQualityModels.Quality.AuditRecommendation
                 ]()
             )
 
-        class LinkRecord(BaseModel):
+        class LinkRecord(m.BaseModel):
             """Record of a link found in documentation."""
 
             text: str
@@ -314,7 +301,7 @@ class FlextQualityModels(FlextWebModels, m):
             file: str
             line_number: int | None = None
 
-        class LinkCheckResult(BaseModel):
+        class LinkCheckResult(m.BaseModel):
             """Result of checking a single link."""
 
             valid: bool | None = None
@@ -330,7 +317,7 @@ class FlextQualityModels(FlextWebModels, m):
             anchor: str | None = None
             warning: str | None = None
 
-        class ContentIssue(BaseModel):
+        class ContentIssue(m.BaseModel):
             """Issue found in documentation content."""
 
             type: str
@@ -342,7 +329,7 @@ class FlextQualityModels(FlextWebModels, m):
             readability_score: float | None = None
             warning: str | None = None
 
-        class LinkValidatorResults(BaseModel):
+        class LinkValidatorResults(m.BaseModel):
             """Results for documentation link validation."""
 
             timestamp: str
@@ -350,34 +337,36 @@ class FlextQualityModels(FlextWebModels, m):
             valid_links: int = 0
             broken_links: int = 0
             warnings: int = 0
-            errors: MutableSequence[FlextQualityModels.Quality.LinkCheckResult] = Field(
-                default_factory=lambda: list[
-                    FlextQualityModels.Quality.LinkCheckResult
-                ]()
+            errors: MutableSequence[FlextQualityModels.Quality.LinkCheckResult] = (
+                m.Field(
+                    default_factory=lambda: list[
+                        FlextQualityModels.Quality.LinkCheckResult
+                    ]()
+                )
             )
             warnings_list: MutableSequence[
                 FlextQualityModels.Quality.LinkCheckResult
-            ] = Field(
+            ] = m.Field(
                 default_factory=lambda: list[
                     FlextQualityModels.Quality.LinkCheckResult
                 ]()
             )
 
-        class ContentValidatorResults(BaseModel):
+        class ContentValidatorResults(m.BaseModel):
             """Results for documentation content validation."""
 
             timestamp: str
             files_checked: int = 0
             content_issues: MutableSequence[FlextQualityModels.Quality.ContentIssue] = (
-                Field(
+                m.Field(
                     default_factory=lambda: list[
                         FlextQualityModels.Quality.ContentIssue
                     ]()
                 )
             )
-            quality_metrics: t.MutableScalarMapping = Field(default_factory=dict)
+            quality_metrics: t.MutableScalarMapping = m.Field(default_factory=dict)
 
-        class ContentMetrics(BaseModel):
+        class ContentMetrics(m.BaseModel):
             """Content quality metrics for a documentation file."""
 
             word_count: int = 0
@@ -388,7 +377,7 @@ class FlextQualityModels(FlextWebModels, m):
             has_lists: bool = False
             has_headers: bool = False
 
-        class FileStatistics(BaseModel):
+        class FileStatistics(m.BaseModel):
             """Statistics payload for discovered documentation files."""
 
             total_files: int
@@ -403,23 +392,23 @@ class FlextQualityModels(FlextWebModels, m):
             avg_lines_per_file: float | None = None
             avg_words_per_file: float | None = None
 
-        class ChannelConfig(BaseModel):
+        class ChannelConfig(m.BaseModel):
             """Notification channel toggle configuration."""
 
             enabled: bool = True
 
-        class AlertThresholdConfig(BaseModel):
+        class AlertThresholdConfig(m.BaseModel):
             """Threshold-based alert configuration."""
 
             enabled: bool = True
-            threshold: Annotated[t.NonNegativeInt, Field(default=0)]
+            threshold: Annotated[t.NonNegativeInt, m.Field(default=0)]
 
-        class AlertToggleConfig(BaseModel):
+        class AlertToggleConfig(m.BaseModel):
             """Simple on/off alert configuration."""
 
             enabled: bool = True
 
-        class AlertsConfig(BaseModel):
+        class AlertsConfig(m.BaseModel):
             """All alert toggles for documentation notifications."""
 
             critical_issues: FlextQualityModels.Quality.AlertThresholdConfig
@@ -428,7 +417,7 @@ class FlextQualityModels(FlextWebModels, m):
             weekly_report: FlextQualityModels.Quality.AlertToggleConfig
             monthly_report: FlextQualityModels.Quality.AlertToggleConfig
 
-        class EmailConfig(BaseModel):
+        class EmailConfig(m.BaseModel):
             """SMTP notification configuration."""
 
             smtp_server: str
@@ -436,23 +425,23 @@ class FlextQualityModels(FlextWebModels, m):
             username: str
             password: str
             from_address: str
-            to_addresses: t.StrSequence = Field(default_factory=list)
+            to_addresses: t.StrSequence = m.Field(default_factory=list)
 
-        class SlackConfig(BaseModel):
+        class SlackConfig(m.BaseModel):
             """Slack notification configuration."""
 
             webhook_url: str
             channel: str
             username: str
 
-        class WebhookConfig(BaseModel):
+        class WebhookConfig(m.BaseModel):
             """Generic webhook configuration."""
 
             url: str
-            headers: t.StrMapping = Field(default_factory=dict)
-            timeout: Annotated[t.PositiveInt, Field(default=30)]
+            headers: t.StrMapping = m.Field(default_factory=dict)
+            timeout: Annotated[t.PositiveInt, m.Field(default=30)]
 
-        class ChannelsConfig(BaseModel):
+        class ChannelsConfig(m.BaseModel):
             """Enabled channels for documentation notifications."""
 
             console: FlextQualityModels.Quality.ChannelConfig
@@ -460,7 +449,7 @@ class FlextQualityModels(FlextWebModels, m):
             slack: FlextQualityModels.Quality.ChannelConfig
             webhook: FlextQualityModels.Quality.ChannelConfig
 
-        class NotifierConfig(BaseModel):
+        class NotifierConfig(m.BaseModel):
             """Root notification configuration."""
 
             enabled: bool = True
@@ -470,14 +459,14 @@ class FlextQualityModels(FlextWebModels, m):
             slack: FlextQualityModels.Quality.SlackConfig
             webhook: FlextQualityModels.Quality.WebhookConfig
 
-        class NotifierResults(BaseModel):
+        class NotifierResults(m.BaseModel):
             """Results for documentation notification runs."""
 
             notifications_sent: int = 0
-            errors: MutableSequence[str] = Field(default_factory=list)
+            errors: MutableSequence[str] = m.Field(default_factory=list)
             timestamp: str
 
-        class QualityThresholdsConfig(BaseModel):
+        class QualityThresholdsConfig(m.BaseModel):
             """Configuration for quality threshold limits."""
 
             max_age_days: int = 90
@@ -485,7 +474,7 @@ class FlextQualityModels(FlextWebModels, m):
             max_broken_links: int = 0
             min_completeness_score: float = 0.8
 
-        class ContentChecksConfig(BaseModel):
+        class ContentChecksConfig(m.BaseModel):
             """Configuration for content validation checks."""
 
             check_freshness: bool = True
@@ -493,34 +482,34 @@ class FlextQualityModels(FlextWebModels, m):
             check_consistency: bool = True
             check_links: bool = True
 
-        class SeverityLevelsConfig(BaseModel):
+        class SeverityLevelsConfig(m.BaseModel):
             """Configuration for severity level categorization."""
 
-            critical: t.StrSequence = Field(default_factory=list)
-            high: t.StrSequence = Field(default_factory=list)
-            medium: t.StrSequence = Field(default_factory=list)
-            low: t.StrSequence = Field(default_factory=list)
+            critical: t.StrSequence = m.Field(default_factory=list)
+            high: t.StrSequence = m.Field(default_factory=list)
+            medium: t.StrSequence = m.Field(default_factory=list)
+            low: t.StrSequence = m.Field(default_factory=list)
 
-        class AuditRulesConfig(BaseModel):
+        class AuditRulesConfig(m.BaseModel):
             """Configuration for audit rules and thresholds."""
 
             quality_thresholds: FlextQualityModels.Quality.QualityThresholdsConfig = (
-                Field(
+                m.Field(
                     default_factory=lambda: (
                         FlextQualityModels.Quality.QualityThresholdsConfig()
                     ),
                 )
             )
-            content_checks: FlextQualityModels.Quality.ContentChecksConfig = Field(
+            content_checks: FlextQualityModels.Quality.ContentChecksConfig = m.Field(
                 default_factory=lambda: FlextQualityModels.Quality.ContentChecksConfig()
             )
-            severity_levels: FlextQualityModels.Quality.SeverityLevelsConfig = Field(
+            severity_levels: FlextQualityModels.Quality.SeverityLevelsConfig = m.Field(
                 default_factory=lambda: (
                     FlextQualityModels.Quality.SeverityLevelsConfig()
                 )
             )
 
-        class MarkdownStyleConfig(BaseModel):
+        class MarkdownStyleConfig(m.BaseModel):
             """Configuration for Markdown style preferences."""
 
             heading_style: str = "atx"
@@ -528,34 +517,34 @@ class FlextQualityModels(FlextWebModels, m):
             emphasis_style: str = "*"
             code_block_style: str = "fenced"
 
-        class AccessibilityConfig(BaseModel):
+        class AccessibilityConfig(m.BaseModel):
             """Configuration for accessibility requirements."""
 
             require_alt_text: bool = True
             descriptive_links: bool = True
             heading_structure: bool = True
 
-        class FormattingConfig(BaseModel):
+        class FormattingConfig(m.BaseModel):
             """Configuration for formatting standards."""
 
             max_line_length: int = 88
             consistent_indentation: bool = True
             trailing_spaces: bool = False
 
-        class StyleGuideConfig(BaseModel):
+        class StyleGuideConfig(m.BaseModel):
             """Configuration for style guide rules."""
 
-            markdown: FlextQualityModels.Quality.MarkdownStyleConfig = Field(
+            markdown: FlextQualityModels.Quality.MarkdownStyleConfig = m.Field(
                 default_factory=lambda: FlextQualityModels.Quality.MarkdownStyleConfig()
             )
-            accessibility: FlextQualityModels.Quality.AccessibilityConfig = Field(
+            accessibility: FlextQualityModels.Quality.AccessibilityConfig = m.Field(
                 default_factory=lambda: FlextQualityModels.Quality.AccessibilityConfig()
             )
-            formatting: FlextQualityModels.Quality.FormattingConfig = Field(
+            formatting: FlextQualityModels.Quality.FormattingConfig = m.Field(
                 default_factory=lambda: FlextQualityModels.Quality.FormattingConfig()
             )
 
-        class LinkValidationConfig(BaseModel):
+        class LinkValidationConfig(m.BaseModel):
             """Configuration for link validation settings."""
 
             timeout: int = 10
@@ -565,50 +554,52 @@ class FlextQualityModels(FlextWebModels, m):
             check_internal: bool = True
             check_images: bool = True
 
-        class ContentAnalysisConfig(BaseModel):
+        class ContentAnalysisConfig(m.BaseModel):
             """Configuration for content analysis parameters."""
 
             min_section_depth: int = 2
-            required_sections: t.StrSequence = Field(
+            required_sections: t.StrSequence = m.Field(
                 default_factory=lambda: ["Overview", "Installation", "Usage"]
             )
             check_todos: bool = True
             check_fixmes: bool = True
 
-        class ValidationConfig(BaseModel):
+        class ValidationConfig(m.BaseModel):
             """Configuration for validation settings."""
 
-            link_validation: FlextQualityModels.Quality.LinkValidationConfig = Field(
+            link_validation: FlextQualityModels.Quality.LinkValidationConfig = m.Field(
                 default_factory=lambda: (
                     FlextQualityModels.Quality.LinkValidationConfig()
                 )
             )
-            content_analysis: FlextQualityModels.Quality.ContentAnalysisConfig = Field(
-                default_factory=lambda: (
-                    FlextQualityModels.Quality.ContentAnalysisConfig()
+            content_analysis: FlextQualityModels.Quality.ContentAnalysisConfig = (
+                m.Field(
+                    default_factory=lambda: (
+                        FlextQualityModels.Quality.ContentAnalysisConfig()
+                    )
                 )
             )
 
-        class OptimizerResults(BaseModel):
+        class OptimizerResults(m.BaseModel):
             """Results of a documentation optimization run."""
 
             timestamp: str
             files_processed: int = 0
             changes_made: int = 0
-            backups_created: MutableSequence[str] = Field(default_factory=list)
-            optimizations: MutableSequence[t.MutableStrMapping] = Field(
+            backups_created: MutableSequence[str] = m.Field(default_factory=list)
+            optimizations: MutableSequence[t.MutableStrMapping] = m.Field(
                 default_factory=lambda: list[t.MutableStrMapping]()
             )
 
-        class ExecutionRequest(BaseModel):
+        class ExecutionRequest(m.BaseModel):
             """Request payload for a deferred command execution."""
 
             script_path: Path
             runtime: str
-            args: t.StrSequence = Field(default_factory=list)
+            args: t.StrSequence = m.Field(default_factory=list)
             timeout_ms: int
 
-        class ExecutionResult(BaseModel):
+        class ExecutionResult(m.BaseModel):
             """Structured result payload from a command execution."""
 
             success: bool
@@ -616,14 +607,14 @@ class FlextQualityModels(FlextWebModels, m):
             stdout: str = ""
             stderr: str = ""
 
-        class McpToolCall(BaseModel):
+        class McpToolCall(m.BaseModel):
             """MCP tool invocation request contract."""
 
             server: str
             tool: str
-            params: t.RecursiveContainerMapping = Field(default_factory=dict)
+            params: t.RecursiveContainerMapping = m.Field(default_factory=dict)
 
-        class McpToolResult(BaseModel):
+        class McpToolResult(m.BaseModel):
             """MCP tool invocation response contract."""
 
             success: bool

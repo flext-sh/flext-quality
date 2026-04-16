@@ -17,7 +17,6 @@ from email.mime.text import MIMEText
 from pathlib import Path
 
 import requests
-from pydantic import BaseModel, Field
 
 from flext_quality import c, m, t, u
 
@@ -28,48 +27,48 @@ MAX_BROKEN_LINKS_TO_SHOW = 10
 class FlextQualityDocumentationNotifier:
     """Automated notification system for documentation quality alerts."""
 
-    class _ChannelConfig(BaseModel):
+    class _ChannelConfig(m.BaseModel):
         enabled: bool
 
-    class _AlertThresholdConfig(BaseModel):
+    class _AlertThresholdConfig(m.BaseModel):
         enabled: bool
         threshold: int
 
-    class _AlertToggleConfig(BaseModel):
+    class _AlertToggleConfig(m.BaseModel):
         enabled: bool
 
-    class _AlertsConfig(BaseModel):
+    class _AlertsConfig(m.BaseModel):
         critical_issues: FlextQualityDocumentationNotifier._AlertThresholdConfig
         quality_drop: FlextQualityDocumentationNotifier._AlertThresholdConfig
         broken_links: FlextQualityDocumentationNotifier._AlertThresholdConfig
         weekly_report: FlextQualityDocumentationNotifier._AlertToggleConfig
         monthly_report: FlextQualityDocumentationNotifier._AlertToggleConfig
 
-    class _EmailConfig(BaseModel):
+    class _EmailConfig(m.BaseModel):
         smtp_server: str
         smtp_port: int
         username: str
         password: str
         from_address: str
-        to_addresses: t.StrSequence = Field(default_factory=list)
+        to_addresses: t.StrSequence = m.Field(default_factory=list)
 
-    class _SlackConfig(BaseModel):
+    class _SlackConfig(m.BaseModel):
         webhook_url: str
         channel: str
         username: str
 
-    class _WebhookConfig(BaseModel):
+    class _WebhookConfig(m.BaseModel):
         url: str
-        headers: t.StrMapping = Field(default_factory=dict)
+        headers: t.StrMapping = m.Field(default_factory=dict)
         timeout: int
 
-    class _ChannelsConfig(BaseModel):
+    class _ChannelsConfig(m.BaseModel):
         console: FlextQualityDocumentationNotifier._ChannelConfig
         email: FlextQualityDocumentationNotifier._ChannelConfig
         slack: FlextQualityDocumentationNotifier._ChannelConfig
         webhook: FlextQualityDocumentationNotifier._ChannelConfig
 
-    class _NotifierConfig(BaseModel):
+    class _NotifierConfig(m.BaseModel):
         enabled: bool
         channels: FlextQualityDocumentationNotifier._ChannelsConfig
         alerts: FlextQualityDocumentationNotifier._AlertsConfig

@@ -21,15 +21,15 @@ from urllib.robotparser import RobotFileParser
 import requests
 import structlog
 from aiohttp import ClientError, ClientSession, ClientTimeout
-from pydantic import BaseModel, TypeAdapter
+from pydantic import TypeAdapter
 
-from flext_quality import t
+from flext_quality import m, t
 
 
 class FlextQualityLinkChecker:
     """Advanced link validation and checking system."""
 
-    class LinkConfig(BaseModel):
+    class LinkConfig(m.BaseModel):
         """Configuration dictionary for link validation."""
 
         external_timeout: int
@@ -39,7 +39,7 @@ class FlextQualityLinkChecker:
         max_redirects: int
         acceptable_status_codes: Sequence[int]
 
-    class LinkInfo(BaseModel):
+    class LinkInfo(m.BaseModel):
         """Link information dictionary."""
 
         url: str
@@ -50,7 +50,7 @@ class FlextQualityLinkChecker:
         reference: str | None = None
         context: t.RecursiveContainerMapping | None = None
 
-    class LinkResult(BaseModel):
+    class LinkResult(m.BaseModel):
         """Link check result dictionary."""
 
         url: str
@@ -63,14 +63,14 @@ class FlextQualityLinkChecker:
         content_type: str | None = None
         error: str | None = None
 
-    class PerformanceMetrics(BaseModel):
+    class PerformanceMetrics(m.BaseModel):
         """Performance metrics dictionary."""
 
         total_time: float
         average_response_time: float
         slowest_response: float
 
-    class Results(BaseModel):
+    class Results(m.BaseModel):
         """Results dictionary."""
 
         total_links: int
@@ -81,7 +81,7 @@ class FlextQualityLinkChecker:
         warnings_list: MutableSequence[t.RecursiveContainerMapping]
         performance: FlextQualityLinkChecker.PerformanceMetrics
 
-    RESULTS_ADAPTER: ClassVar[TypeAdapter[Results]] = TypeAdapter(Results)
+    RESULTS_ADAPTER: ClassVar[m.TypeAdapter[Results]] = TypeAdapter(Results)
 
     MIN_PATH_PARTS_FOR_REPO = 2
     MIN_PATH_PARTS_FOR_DETAILED_REPO = 3

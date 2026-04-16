@@ -22,6 +22,7 @@ from flext_quality import (
     FlextQualitySettings,
     c,
     m,
+    main,
     p,
     r,
     t,
@@ -227,4 +228,4 @@ class FlextQuality:
 
 quality = FlextQuality()
 
-__all__: list[str] = ["FlextQuality", "quality"]
+__all__: list[str] = ["FlextQuality", "main", "quality"]

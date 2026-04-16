@@ -18,15 +18,15 @@ from pathlib import Path
 from typing import ClassVar
 
 from jinja2 import Template
-from pydantic import BaseModel, TypeAdapter
+from pydantic import TypeAdapter
 
-from flext_quality import t
+from flext_quality import m, t
 
 
 class FlextQualityDocumentationReporter:
     """Documentation quality reporting and analytics system."""
 
-    class AuditSummary(BaseModel):
+    class AuditSummary(m.BaseModel):
         """Audit data summary structure."""
 
         quality_score: int
@@ -36,7 +36,7 @@ class FlextQualityDocumentationReporter:
         medium_issues: int
         low_issues: int
 
-    class ValidationSummary(BaseModel):
+    class ValidationSummary(m.BaseModel):
         """Validation data summary structure."""
 
         links_checked: int
@@ -44,7 +44,7 @@ class FlextQualityDocumentationReporter:
         broken_links: int
         warnings: int
 
-    class OptimizationSummary(BaseModel):
+    class OptimizationSummary(m.BaseModel):
         """Optimization data summary structure."""
 
         files_processed: int
@@ -52,7 +52,7 @@ class FlextQualityDocumentationReporter:
         backups_created: int
         optimizations_applied: int
 
-    class SummaryMetrics(BaseModel):
+    class SummaryMetrics(m.BaseModel):
         """Summary metrics structure."""
 
         overall_score: int
@@ -62,7 +62,7 @@ class FlextQualityDocumentationReporter:
         optimizations_applied: int
         quality_trend: str
 
-    class Recommendation(BaseModel):
+    class Recommendation(m.BaseModel):
         """Recommendation structure."""
 
         priority: str
@@ -71,7 +71,7 @@ class FlextQualityDocumentationReporter:
         description: str
         actions: t.StrSequence
 
-    class TrendEntry(BaseModel):
+    class TrendEntry(m.BaseModel):
         """Trend entry structure."""
 
         date: datetime
@@ -82,14 +82,14 @@ class FlextQualityDocumentationReporter:
         changes_made: int | None = None
         files_processed: int | None = None
 
-    class TrendData(BaseModel):
+    class TrendData(m.BaseModel):
         """Trend data structure."""
 
         audit_trends: Sequence[FlextQualityDocumentationReporter.TrendEntry]
         validation_trends: Sequence[FlextQualityDocumentationReporter.TrendEntry]
         optimization_trends: Sequence[FlextQualityDocumentationReporter.TrendEntry]
 
-    class ReportData(BaseModel):
+    class ReportData(m.BaseModel):
         """Report data structure."""
 
         timestamp: str
@@ -101,7 +101,7 @@ class FlextQualityDocumentationReporter:
         trends: FlextQualityDocumentationReporter.TrendData | None
         recommendations: Sequence[FlextQualityDocumentationReporter.Recommendation]
 
-    REPORT_DATA_ADAPTER: ClassVar[TypeAdapter[ReportData]] = TypeAdapter(ReportData)
+    REPORT_DATA_ADAPTER: ClassVar[m.TypeAdapter[ReportData]] = TypeAdapter(ReportData)
 
     def __init__(self, reports_dir: str = "docs/maintenance/reports/") -> None:
         """Initialize the documentation reporter with reports directory."""

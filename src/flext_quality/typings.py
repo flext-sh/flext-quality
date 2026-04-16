@@ -9,36 +9,37 @@ from flext_web import FlextWebTypes
 from pydantic import ConfigDict, TypeAdapter
 
 from flext_core import FlextTypes
+from flext_quality import m
 
 
 class FlextQualityTypes(FlextWebTypes, t):
     """Namespace for flext-quality type definitions."""
 
-    CONTAINER_MAPPING_ADAPTER: TypeAdapter[FlextTypes.ContainerMapping] = TypeAdapter(
+    CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[FlextTypes.ContainerMapping] = TypeAdapter(
         FlextTypes.ContainerMapping,
     )
-    RELAXED_CONTAINER_MAPPING_ADAPTER: TypeAdapter[FlextTypes.ContainerMapping] = (
+    RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[FlextTypes.ContainerMapping] = (
         TypeAdapter(
             FlextTypes.ContainerMapping,
             config=ConfigDict(strict=False),
         )
     )
-    CONTAINER_MAPPING_SEQUENCE_ADAPTER: TypeAdapter[
+    CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
         Sequence[FlextTypes.ContainerMapping]
     ] = TypeAdapter(Sequence[FlextTypes.ContainerMapping])
-    RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: TypeAdapter[
+    RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
         Sequence[FlextTypes.ContainerMapping]
     ] = TypeAdapter(
         Sequence[FlextTypes.ContainerMapping],
         config=ConfigDict(strict=False),
     )
-    MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: TypeAdapter[
+    MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: m.TypeAdapter[
         FlextWebTypes.MutableOptionalFeatureFlagMapping
     ] = TypeAdapter(FlextWebTypes.MutableOptionalFeatureFlagMapping)
-    NORMALIZED_VALUE_SEQUENCE_ADAPTER: TypeAdapter[
+    NORMALIZED_VALUE_SEQUENCE_ADAPTER: m.TypeAdapter[
         Sequence[FlextTypes.NormalizedValue]
     ] = TypeAdapter(Sequence[FlextTypes.NormalizedValue])
-    STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: TypeAdapter[
+    STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: m.TypeAdapter[
         MutableSequence[FlextWebTypes.StrMapping]
     ] = TypeAdapter(MutableSequence[FlextWebTypes.StrMapping])
 
@@ -68,7 +69,7 @@ class FlextQualityTypes(FlextWebTypes, t):
             | None
         )
 
-    REPORT_VALUE_MAPPING_ADAPTER: TypeAdapter[
+    REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[
         Mapping[str, Quality.DocumentationReportValue]
     ] = TypeAdapter(Mapping[str, Quality.DocumentationReportValue])
 
