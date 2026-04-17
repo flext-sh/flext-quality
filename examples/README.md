@@ -286,7 +286,7 @@ docker-compose exec quality-analysis cat /app/reports/analysis_results.json
 | **simple_analysis**   | Basic project analysis        | Beginner     | None        |
 | **custom_config**     | Custom analysis configuration | Beginner     | flext-core  |
 | **result_processing** | Working with analysis results | Intermediate | flext-core  |
-| **error_handling**    | r error patterns    | Intermediate | flext-core  |
+| **error_handling**    | r error patterns              | Intermediate | flext-core  |
 
 ### Advanced Examples
 

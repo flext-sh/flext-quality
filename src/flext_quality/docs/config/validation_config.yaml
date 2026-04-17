@@ -33,11 +33,11 @@ link_validation:
   max_redirects: 5
 
   # Status code validation
-  acceptable_status_codes: [200, 201, 202, 206, 301, 302, 303, 307, 308]
+  acceptable_status_codes: [ 200, 201, 202, 206, 301, 302, 303, 307, 308 ]
 
   # Content type validation
   validate_content_type: false
-  expected_content_types: ["text/html", "text/plain", "application/json"]
+  expected_content_types: [ "text/html", "text/plain", "application/json" ]
 
   # Domain restrictions
   allowed_domains: [] # Empty means all domains allowed
@@ -61,7 +61,7 @@ internal_validation:
   validate_file_extensions: true
 
   # Supported file extensions
-  valid_extensions: [".md", ".mdx", ".txt", ".rst", ".html"]
+  valid_extensions: [ ".md", ".mdx", ".txt", ".rst", ".html" ]
 
   # Path resolution
   resolve_relative_paths: true
@@ -77,7 +77,7 @@ image_validation:
 
   # Local image validation
   validate_local_images: true
-  allowed_image_extensions: [".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"]
+  allowed_image_extensions: [ ".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp" ]
 
   # External image validation
   validate_external_images: false # Can be slow
@@ -95,9 +95,9 @@ content_analysis:
 
   # Required sections for completeness checking
   required_sections:
-    - "Overview|Introduction|Purpose"
-    - "Installation|Setup|Getting Started"
-    - "Usage|Examples"
+  - "Overview|Introduction|Purpose"
+  - "Installation|Setup|Getting Started"
+  - "Usage|Examples"
 
   # Minimum content requirements
   min_word_count: 100
@@ -117,18 +117,18 @@ content_validation:
   # Required sections (by file pattern)
   required_sections:
     "README.md":
-      - "Purpose|Overview|Introduction"
-      - "Installation|Setup|Getting Started"
-      - "Usage|Examples"
+    - "Purpose|Overview|Introduction"
+    - "Installation|Setup|Getting Started"
+    - "Usage|Examples"
 
     "docs/**/*.md":
-      - "Overview|Introduction"
+    - "Overview|Introduction"
 
     "CHANGELOG.md":
-      - "Version|Changes|History"
+    - "Version|Changes|History"
 
     "CONTRIBUTING.md":
-      - "Development|Contributing|Guidelines"
+    - "Development|Contributing|Guidelines"
 
   # Minimum content requirements
   min_word_count:
@@ -188,17 +188,17 @@ security_validation:
   # Dangerous link patterns
   check_suspicious_links: true
   blocked_url_patterns:
-    - "javascript:"
-    - "data:"
-    - "vbscript:"
+  - "javascript:"
+  - "data:"
+  - "vbscript:"
 
   # File inclusion risks
   check_file_inclusion: true
   blocked_file_patterns:
-    - "../"
-    - "..\\"
-    - "/etc/"
-    - "C:\\"
+  - "../"
+  - "..\\"
+  - "/etc/"
+  - "C:\\"
 
 performance_validation:
   # Performance checks
@@ -220,7 +220,7 @@ reporting:
 
   # Issue categorization
   categorize_issues: true
-  severity_levels: ["critical", "high", "medium", "low", "info"]
+  severity_levels: [ "critical", "high", "medium", "low", "info" ]
 
   # Output settings
   include_raw_data: false

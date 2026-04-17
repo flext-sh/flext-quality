@@ -69,14 +69,13 @@ code:
   # Code block requirements
   require_language_specifier: false
   preferred_languages:
-    - "python"
-    - "bash"
-    - "json"
-    - "yaml"
-    - "sql"
-    - "javascript"
-    - "html"
-
+  - "python"
+  - "bash"
+  - "json"
+  - "yaml"
+  - "sql"
+  - "javascript"
+  - "html"
   # Inline code formatting
   inline_code_style: "backticks" # Only backticks supported
 
@@ -186,9 +185,9 @@ spelling:
 
   # Ignore patterns
   ignore_patterns:
-    - "\\b[A-Z]{2,}\\b" # Acronyms
-    - "\\d+" # Numbers
-    - "[a-zA-Z]+_[a-zA-Z]+" # Snake_case identifiers
+  - "\\b[A-Z]{2,}\\b" # Acronyms
+  - "\\d+" # Numbers
+  - "[a-zA-Z]+_[a-zA-Z]+" # Snake_case identifiers
 
 grammar:
   # Grammar check settings

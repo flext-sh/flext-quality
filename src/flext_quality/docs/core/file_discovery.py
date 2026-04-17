@@ -13,7 +13,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import ClassVar
 
-from flext_quality import m, t
+from flext_quality import m, t, u
 
 
 class FlextQualityFileStatistics(m.BaseModel):
@@ -25,8 +25,8 @@ class FlextQualityFileStatistics(m.BaseModel):
     total_words: int = 0
     markdown_files: int = 0
     other_files: int = 0
-    size_distribution: t.IntMapping = m.Field(default_factory=dict)
-    categories: t.IntMapping = m.Field(default_factory=dict)
+    size_distribution: t.IntMapping = u.Field(default_factory=dict)
+    categories: t.IntMapping = u.Field(default_factory=dict)
     avg_file_size: float = 0.0
     avg_lines_per_file: float = 0.0
     avg_words_per_file: float = 0.0

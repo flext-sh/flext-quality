@@ -22,12 +22,12 @@ from flext_quality import (
     FlextQualitySettings,
     c,
     m,
-    main,
     p,
     r,
     t,
     u,
 )
+from flext_quality.services import main
 
 
 class FlextQuality:

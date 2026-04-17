@@ -15,7 +15,7 @@ from typing import Annotated, ClassVar
 from pydantic_settings import SettingsConfigDict
 
 from flext_core import FlextSettings
-from flext_quality import c, m, p, r
+from flext_quality import c, m, p, r, u
 
 
 @FlextSettings.auto_register("quality")
@@ -26,19 +26,19 @@ class FlextQualitySettings(FlextSettings):
         env_prefix="FLEXT_QUALITY_", extra="ignore"
     )
 
-    hook_timeout_ms: Annotated[int, m.Field(ge=100, le=60000)] = (
+    hook_timeout_ms: Annotated[int, u.Field(ge=100, le=60000)] = (
         c.Quality.Defaults.HOOK_TIMEOUT_MS
     )
-    rule_timeout_seconds: Annotated[int, m.Field(ge=1, le=3600)] = (
+    rule_timeout_seconds: Annotated[int, u.Field(ge=1, le=3600)] = (
         c.Quality.Defaults.RULE_TIMEOUT_SECONDS
     )
-    cache_enabled: Annotated[bool, m.Field(default=True)]
-    mcp_server_port: Annotated[int, m.Field(ge=1, le=65535)] = (
+    cache_enabled: Annotated[bool, u.Field(default=True)]
+    mcp_server_port: Annotated[int, u.Field(ge=1, le=65535)] = (
         c.Quality.Mcp.DEFAULT_PORT
     )
-    rules_dir: Annotated[str, m.Field(default=c.Quality.Paths.RULES_DIR)]
-    max_function_length: Annotated[int, m.Field(default=50)]
-    max_class_length: Annotated[int, m.Field(default=200)]
+    rules_dir: Annotated[str, u.Field(default=c.Quality.Paths.RULES_DIR)]
+    max_function_length: Annotated[int, u.Field(default=50)]
+    max_class_length: Annotated[int, u.Field(default=200)]
 
     @classmethod
     def get_instance(cls) -> FlextQualitySettings:

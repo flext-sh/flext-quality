@@ -6,8 +6,8 @@
 
 <!-- TOC END -->
 
-| Repository | Maintenance Directory         | Config Files  | Markdown Assets                                                        | Automation Scripts                     | Notes                                                           |
-| ---------- | ----------------------------- | ------------- | ---------------------------------------------------------------------- | -------------------------------------- | --------------------------------------------------------------- |
+| Repository | Maintenance Directory         | Config Files    | Markdown Assets                                                        | Automation Scripts                     | Notes                                                           |
+| ---------- | ----------------------------- | --------------- | ---------------------------------------------------------------------- | -------------------------------------- | --------------------------------------------------------------- |
 | flext-grpc | `flext-grpc/docs/maintenance` | `settings.yaml` | `README.md`, `user-guide.md`, `troubleshooting.md`, `api-reference.md` | _(shared runner invoked via Makefile)_ | Migrated to shared `flext-quality` CLI; legacy scripts removed. |
 
 | flext-ldap | `flext-ldap/docs/maintenance` | `settings.yaml` | `README.md`,
