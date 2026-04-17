@@ -9,10 +9,10 @@ from typing import ClassVar, Protocol, runtime_checkable
 from flext_cli import p
 from flext_web import FlextWebProtocols
 
-from .typings import t
+from flext_quality import t
 
 
-class FlextQualityProtocols(FlextWebProtocols, p):
+class FlextQualityProtocols(p, FlextWebProtocols):
     """Namespace for flext-quality protocols."""
 
     @runtime_checkable

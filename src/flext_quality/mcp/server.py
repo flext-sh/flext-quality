@@ -12,3 +12,6 @@ _mcp = FastMCP(name=c.Quality.Mcp.SERVER_NAME, version=c.Quality.Mcp.SERVER_VERS
 def get_server() -> FastMCP:
     """Get the MCP server instance."""
     return _mcp
+
+
+__all__: list[str] = ["get_server"]

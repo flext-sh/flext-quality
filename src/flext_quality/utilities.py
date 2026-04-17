@@ -12,7 +12,7 @@ from flext_web import FlextWebUtilities
 from flext_quality import c, p, r, t
 
 
-class FlextQualityUtilities(FlextWebUtilities, u):
+class FlextQualityUtilities(u, FlextWebUtilities):
     """Namespace for flext-quality utilities."""
 
     class Quality:

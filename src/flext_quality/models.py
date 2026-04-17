@@ -16,7 +16,7 @@ from flext_web import FlextWebModels
 from flext_quality import c, t
 
 
-class FlextQualityModels(FlextWebModels, m):
+class FlextQualityModels(m, FlextWebModels):
     """Namespace for flext-quality models."""
 
     class Quality:

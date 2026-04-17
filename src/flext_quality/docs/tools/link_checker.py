@@ -21,7 +21,6 @@ from urllib.robotparser import RobotFileParser
 import requests
 import structlog
 from aiohttp import ClientError, ClientSession, ClientTimeout
-from pydantic import TypeAdapter
 
 from flext_quality import m, t
 
@@ -81,7 +80,7 @@ class FlextQualityLinkChecker:
         warnings_list: MutableSequence[t.RecursiveContainerMapping]
         performance: FlextQualityLinkChecker.PerformanceMetrics
 
-    RESULTS_ADAPTER: ClassVar[m.TypeAdapter[Results]] = TypeAdapter(Results)
+    RESULTS_ADAPTER: ClassVar[m.TypeAdapter[Results]] = m.TypeAdapter(Results)
 
     MIN_PATH_PARTS_FOR_REPO = 2
     MIN_PATH_PARTS_FOR_DETAILED_REPO = 3

@@ -12,11 +12,11 @@ from __future__ import annotations
 from enum import StrEnum, unique
 from typing import Final
 
-from flext_cli import FlextCliConstants
+from flext_cli import c
 from flext_web import FlextWebConstants
 
 
-class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
+class FlextQualityConstants(c, FlextWebConstants):
     """Centralized constants for flext-quality (Layer 0).
 
     Provides immutable, namespace-organized constants for hook processing,
@@ -144,7 +144,7 @@ class FlextQualityConstants(FlextWebConstants, FlextCliConstants):
             HOOK_TIMEOUT_MS: Final[int] = 5000
             MCP_TIMEOUT_MS: Final[int] = 30000
             INTEGRATION_TIMEOUT_MS: Final[int] = 10000
-            RULE_TIMEOUT_SECONDS: Final[int] = FlextCliConstants.DEFAULT_TIMEOUT_SECONDS
+            RULE_TIMEOUT_SECONDS: Final[int] = c.DEFAULT_TIMEOUT_SECONDS
             BATCH_SIZE: Final[int] = 100
             MAX_PARALLEL_RULES: Final[int] = 4
             CACHE_TTL_SECONDS: Final[int] = 300

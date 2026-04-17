@@ -51,6 +51,7 @@ if _t.TYPE_CHECKING:
         FlextQualityCodeExecutionBridge,
     )
     from flext_quality.integrations.mcp_client import FlextQualityMcpClient
+    from flext_quality.mcp.server import get_server
     from flext_quality.models import FlextQualityModels, m
     from flext_quality.protocols import FlextQualityProtocols, p
     from flext_quality.rules.engine import FlextQualityRulesEngine
@@ -109,6 +110,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".integrations.claude_mem": ("FlextQualityClaudeMemClient",),
             ".integrations.code_execution": ("FlextQualityCodeExecutionBridge",),
             ".integrations.mcp_client": ("FlextQualityMcpClient",),
+            ".mcp.server": ("get_server",),
             ".models": (
                 "FlextQualityModels",
                 "m",
@@ -191,6 +193,7 @@ __all__: list[str] = [
     "c",
     "d",
     "e",
+    "get_server",
     "h",
     "m",
     "main",
