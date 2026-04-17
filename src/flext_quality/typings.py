@@ -4,74 +4,68 @@ from __future__ import annotations
 
 from collections.abc import Mapping, MutableSequence, Sequence
 
-from flext_cli import t
+from flext_cli import m, t
 from flext_web import FlextWebTypes
-from pydantic import ConfigDict, TypeAdapter
-
-from flext_core import FlextTypes
-from flext_quality import m
 
 
-class FlextQualityTypes(FlextWebTypes, t):
+class FlextQualityTypes(t, FlextWebTypes):
     """Namespace for flext-quality type definitions."""
 
-    CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[FlextTypes.ContainerMapping] = TypeAdapter(
-        FlextTypes.ContainerMapping,
+    CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.ContainerMapping] = m.TypeAdapter(
+        t.ContainerMapping,
     )
-    RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[FlextTypes.ContainerMapping] = (
-        TypeAdapter(
-            FlextTypes.ContainerMapping,
-            config=ConfigDict(strict=False),
+    RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.ContainerMapping] = (
+        m.TypeAdapter(
+            t.ContainerMapping,
+            config=m.ConfigDict(strict=False),
         )
     )
-    CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
-        Sequence[FlextTypes.ContainerMapping]
-    ] = TypeAdapter(Sequence[FlextTypes.ContainerMapping])
+    CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[Sequence[t.ContainerMapping]] = (
+        m.TypeAdapter(Sequence[t.ContainerMapping])
+    )
     RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
-        Sequence[FlextTypes.ContainerMapping]
-    ] = TypeAdapter(
-        Sequence[FlextTypes.ContainerMapping],
-        config=ConfigDict(strict=False),
+        Sequence[t.ContainerMapping]
+    ] = m.TypeAdapter(
+        Sequence[t.ContainerMapping],
+        config=m.ConfigDict(strict=False),
     )
     MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: m.TypeAdapter[
-        FlextWebTypes.MutableOptionalFeatureFlagMapping
-    ] = TypeAdapter(FlextWebTypes.MutableOptionalFeatureFlagMapping)
-    NORMALIZED_VALUE_SEQUENCE_ADAPTER: m.TypeAdapter[
-        Sequence[FlextTypes.NormalizedValue]
-    ] = TypeAdapter(Sequence[FlextTypes.NormalizedValue])
+        t.MutableOptionalFeatureFlagMapping
+    ] = m.TypeAdapter(t.MutableOptionalFeatureFlagMapping)
+    NORMALIZED_VALUE_SEQUENCE_ADAPTER: m.TypeAdapter[Sequence[t.NormalizedValue]] = (
+        m.TypeAdapter(Sequence[t.NormalizedValue])
+    )
     STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: m.TypeAdapter[
-        MutableSequence[FlextWebTypes.StrMapping]
-    ] = TypeAdapter(MutableSequence[FlextWebTypes.StrMapping])
+        MutableSequence[t.StrMapping]
+    ] = m.TypeAdapter(MutableSequence[t.StrMapping])
 
     class Quality:
         """Quality-specific types namespace."""
 
-        type HookInput = FlextTypes.ContainerMapping
-        type HookOutput = FlextTypes.ContainerMapping
-        type HookMatcher = FlextWebTypes.StrSequence | None
-        type RuleConfig = FlextTypes.ContainerMapping
+        type HookInput = t.ContainerMapping
+        type HookOutput = t.ContainerMapping
+        type HookMatcher = t.StrSequence | None
+        type RuleConfig = t.ContainerMapping
         type RuleResult = tuple[bool, str | None]
-        type McpToolResult = FlextTypes.ContainerMapping
-        type McpResource = FlextWebTypes.StrMapping
-        type MemoryQuery = Mapping[str, str | int | FlextWebTypes.StrSequence]
-        type ContextQuery = FlextTypes.HeaderMapping
-        type GenericItem = (
-            FlextTypes.Container | Mapping[str, FlextTypes.Primitives | None]
-        )
+        type McpToolResult = t.ContainerMapping
+        type McpResource = t.StrMapping
+        type MemoryQuery = Mapping[str, str | int | t.StrSequence]
+        type ContextQuery = t.HeaderMapping
+        type GenericItem = t.Container | Mapping[str, t.Primitives | None]
         type DocumentationReportValue = (
             str
             | int
             | float
             | bool
-            | FlextWebTypes.StrSequence
-            | Sequence[Mapping[str, FlextTypes.Primitives]]
-            | Mapping[str, FlextTypes.Primitives]
+            | t.StrSequence
+            | Sequence[Mapping[str, t.Primitives]]
+            | Mapping[str, t.Primitives]
             | None
         )
 
     REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[
         Mapping[str, Quality.DocumentationReportValue]
-    ] = TypeAdapter(Mapping[str, Quality.DocumentationReportValue])
+    ] = m.TypeAdapter(Mapping[str, Quality.DocumentationReportValue])
 
 
 t = FlextQualityTypes

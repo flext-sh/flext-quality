@@ -54,6 +54,7 @@ class FlextQualityProtocols(FlextWebProtocols, p):
                 """Check if hook should run for this input."""
                 ...
 
+        @runtime_checkable
         class DocsConfig(Protocol):
             """Protocol for documentation configuration objects."""
 
@@ -70,6 +71,7 @@ class FlextQualityProtocols(FlextWebProtocols, p):
                 """Get a configuration value with bracket notation."""
                 ...
 
+        @runtime_checkable
         class BaseHook(Protocol):
             """Protocol for hook implementations."""
 
@@ -87,6 +89,7 @@ class FlextQualityProtocols(FlextWebProtocols, p):
                 """Check if hook should run for this input."""
                 ...
 
+        @runtime_checkable
         class RuleValidator(Protocol):
             """Protocol for rule validators."""
 
@@ -100,6 +103,7 @@ class FlextQualityProtocols(FlextWebProtocols, p):
                 """Validate according to rule."""
                 ...
 
+        @runtime_checkable
         class IntegrationClient(Protocol):
             """Protocol for external integrations."""
 
@@ -115,6 +119,7 @@ class FlextQualityProtocols(FlextWebProtocols, p):
                 """Check integration health."""
                 ...
 
+        @runtime_checkable
         class McpTool(Protocol):
             """Protocol for MCP tools."""
 

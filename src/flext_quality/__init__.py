@@ -15,6 +15,7 @@ if _t.TYPE_CHECKING:
     from flext_cli import d, e, h, r, s, x
 
     from flext_quality.api import FlextQuality, quality
+    from flext_quality.cli import FlextQualityCli, main
     from flext_quality.constants import FlextQualityConstants, c
     from flext_quality.docs.core.base_classes import (
         FlextQualityBaseAnalyzer,
@@ -55,7 +56,6 @@ if _t.TYPE_CHECKING:
     from flext_quality.rules.engine import FlextQualityRulesEngine
     from flext_quality.rules.loader import FlextQualityRulesLoader
     from flext_quality.rules.validators import FlextQualityValidators
-    from flext_quality.services.cli import FlextQualityCliService
     from flext_quality.settings import FlextQualitySettings
     from flext_quality.typings import FlextQualityTypes, t
     from flext_quality.utilities import FlextQualityUtilities, u
@@ -66,13 +66,16 @@ _LAZY_IMPORTS = merge_lazy_imports(
         ".integrations",
         ".mcp",
         ".rules",
-        ".services",
     ),
     build_lazy_import_map(
         {
             ".api": (
                 "FlextQuality",
                 "quality",
+            ),
+            ".cli": (
+                "FlextQualityCli",
+                "main",
             ),
             ".constants": (
                 "FlextQualityConstants",
@@ -117,7 +120,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".rules.engine": ("FlextQualityRulesEngine",),
             ".rules.loader": ("FlextQualityRulesLoader",),
             ".rules.validators": ("FlextQualityValidators",),
-            ".services.cli": ("FlextQualityCliService",),
             ".settings": ("FlextQualitySettings",),
             ".typings": (
                 "FlextQualityTypes",
@@ -162,7 +164,7 @@ __all__: list[str] = [
     "FlextQualityBaseValidator",
     "FlextQualityClaudeContextClient",
     "FlextQualityClaudeMemClient",
-    "FlextQualityCliService",
+    "FlextQualityCli",
     "FlextQualityCodeExecutionBridge",
     "FlextQualityConfigManager",
     "FlextQualityConstants",
@@ -191,6 +193,7 @@ __all__: list[str] = [
     "e",
     "h",
     "m",
+    "main",
     "p",
     "quality",
     "r",
