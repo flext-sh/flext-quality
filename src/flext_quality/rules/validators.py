@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import contextlib
 import re
 from collections.abc import MutableMapping, MutableSequence, Sequence
 from pathlib import Path
@@ -24,8 +23,7 @@ class FlextQualityValidators:
             self._patterns = patterns
             self._compiled: MutableMapping[str, re.Pattern[str]] = {}
             for pname, pattern in patterns.items():
-                with contextlib.suppress(re.error):
-                    self._compiled[pname] = re.compile(pattern)
+                self._compiled[pname] = re.compile(pattern)
 
         @property
         @override
