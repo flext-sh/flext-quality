@@ -12,8 +12,8 @@ from flext_core.lazy import (
 _LAZY_IMPORTS = merge_lazy_imports(
     (
         ".core",
+        ".scripts",
         ".tools",
-        "scripts",
     ),
     build_lazy_import_map(
         {
@@ -36,16 +36,16 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".dashboard": ("FlextQualityDocumentationDashboard",),
             ".notifications": ("FlextQualityDocumentationNotifier",),
             ".scheduled_maintenance": ("FlextQualityScheduledMaintenance",),
-            ".tools.content_analyzer": ("FlextQualityContentAnalyzer",),
-            ".tools.link_checker": ("FlextQualityLinkChecker",),
-            ".tools.style_validator": ("FlextQualityStyleValidator",),
-            "scripts.audit": ("FlextQualityDocumentationAuditor",),
-            "scripts.optimize": ("FlextQualityDocumentationOptimizer",),
-            "scripts.report": ("FlextQualityDocumentationReporter",),
-            "scripts.validate": (
+            ".scripts.audit": ("FlextQualityDocumentationAuditor",),
+            ".scripts.optimize": ("FlextQualityDocumentationOptimizer",),
+            ".scripts.report": ("FlextQualityDocumentationReporter",),
+            ".scripts.validate": (
                 "FlextQualityContentValidator",
                 "FlextQualityLinkValidator",
             ),
+            ".tools.content_analyzer": ("FlextQualityContentAnalyzer",),
+            ".tools.link_checker": ("FlextQualityLinkChecker",),
+            ".tools.style_validator": ("FlextQualityStyleValidator",),
         },
     ),
     exclude_names=(
