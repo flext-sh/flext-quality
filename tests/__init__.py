@@ -15,7 +15,18 @@ if _t.TYPE_CHECKING:
     from flext_tests import td, tf, tk, tm, tv
 
     from flext_quality import d, e, h, r, s, x
+    from tests.conftest import MockQualityAnalyzer, MockReportGenerator
     from tests.constants import TestsFlextQualityConstants, c
+    from tests.helpers.assertions import (
+        assert_analysis_results_structure,
+        assert_dict_structure,
+        assert_is_dict,
+        assert_is_list,
+        assert_issues_structure,
+        assert_metrics_structure,
+        safe_dict_access,
+        safe_list_access,
+    )
     from tests.helpers.constants import TestsConstants
     from tests.helpers.models import TestsModels
     from tests.helpers.protocols import TestsProtocols
@@ -23,6 +34,15 @@ if _t.TYPE_CHECKING:
     from tests.models import TestsFlextQualityModels, m
     from tests.protocols import TestsFlextQualityProtocols, p
     from tests.typings import TestsFlextQualityTypes, t
+    from tests.unit.test_api import (
+        TestFlextQualityAPI,
+        TestFlextQualityHookExecution,
+        TestFlextQualityRulesConfig,
+        TestFlextQualitySingleton,
+        TestFlextQualityStdinProcessing,
+        TestFlextQualityValidation,
+    )
+    from tests.unit.test_cli import TestCommandServices, TestMain
     from tests.utilities import TestsFlextQualityUtilities, u
 _LAZY_IMPORTS = merge_lazy_imports(
     (
@@ -31,9 +51,23 @@ _LAZY_IMPORTS = merge_lazy_imports(
     ),
     build_lazy_import_map(
         {
+            ".conftest": (
+                "MockQualityAnalyzer",
+                "MockReportGenerator",
+            ),
             ".constants": (
                 "TestsFlextQualityConstants",
                 "c",
+            ),
+            ".helpers.assertions": (
+                "assert_analysis_results_structure",
+                "assert_dict_structure",
+                "assert_is_dict",
+                "assert_is_list",
+                "assert_issues_structure",
+                "assert_metrics_structure",
+                "safe_dict_access",
+                "safe_list_access",
             ),
             ".helpers.constants": ("TestsConstants",),
             ".helpers.models": ("TestsModels",),
@@ -50,6 +84,18 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".typings": (
                 "TestsFlextQualityTypes",
                 "t",
+            ),
+            ".unit.test_api": (
+                "TestFlextQualityAPI",
+                "TestFlextQualityHookExecution",
+                "TestFlextQualityRulesConfig",
+                "TestFlextQualitySingleton",
+                "TestFlextQualityStdinProcessing",
+                "TestFlextQualityValidation",
+            ),
+            ".unit.test_cli": (
+                "TestCommandServices",
+                "TestMain",
             ),
             ".utilities": (
                 "TestsFlextQualityUtilities",
@@ -88,6 +134,16 @@ _LAZY_IMPORTS = merge_lazy_imports(
 install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
 
 __all__: list[str] = [
+    "MockQualityAnalyzer",
+    "MockReportGenerator",
+    "TestCommandServices",
+    "TestFlextQualityAPI",
+    "TestFlextQualityHookExecution",
+    "TestFlextQualityRulesConfig",
+    "TestFlextQualitySingleton",
+    "TestFlextQualityStdinProcessing",
+    "TestFlextQualityValidation",
+    "TestMain",
     "TestsConstants",
     "TestsFlextQualityConstants",
     "TestsFlextQualityModels",
@@ -97,6 +153,12 @@ __all__: list[str] = [
     "TestsModels",
     "TestsProtocols",
     "TestsTypings",
+    "assert_analysis_results_structure",
+    "assert_dict_structure",
+    "assert_is_dict",
+    "assert_is_list",
+    "assert_issues_structure",
+    "assert_metrics_structure",
     "c",
     "d",
     "e",
@@ -105,6 +167,8 @@ __all__: list[str] = [
     "p",
     "r",
     "s",
+    "safe_dict_access",
+    "safe_list_access",
     "t",
     "td",
     "tf",

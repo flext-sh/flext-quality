@@ -16,7 +16,7 @@
 | flext-observability | `flext-observability/docs/maintenance` | `settings.yaml` | `README.md`,
 `dead_code_analysis.md`,
 `dead_code_cleanup_summary.md` | _(shared runner invoked via Makefile)_ | Converted inline audit settings to YAML; scripts removed. |
-| flext-meltano-native | `flext-meltano-native/docs/maintenance` | `settings.yaml` | `README.md` | _(shared runner invoked via Makefile)_ | Added first-class settings + Makefile target powered by shared runner. |
+| gruponos-meltano-native | `gruponos-meltano-native/docs/maintenance` | `settings.yaml` | `README.md` | _(shared runner invoked via Makefile)_ | Added first-class settings + Makefile target powered by shared runner. |
 | flext-quality | `flext-quality/docs/maintenance` | `settings/audit_rules.yaml`,
 `settings/style_guide.yaml`, `settings/validation_config.yaml`, `settings/schedule_config.yaml`,
 `settings/notification_config.yaml`, `settings/lychee.toml` | `README.md`, `maintenance-procedures.md`,

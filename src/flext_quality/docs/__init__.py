@@ -39,6 +39,13 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".tools.content_analyzer": ("FlextQualityContentAnalyzer",),
             ".tools.link_checker": ("FlextQualityLinkChecker",),
             ".tools.style_validator": ("FlextQualityStyleValidator",),
+            "scripts.audit": ("FlextQualityDocumentationAuditor",),
+            "scripts.optimize": ("FlextQualityDocumentationOptimizer",),
+            "scripts.report": ("FlextQualityDocumentationReporter",),
+            "scripts.validate": (
+                "FlextQualityContentValidator",
+                "FlextQualityLinkValidator",
+            ),
         },
     ),
     exclude_names=(

@@ -118,7 +118,7 @@ ______________________________________________________________________
 - **2025-10-16** – Initiated Phase 1 metadata inventory. Current findings:
 
   - Detected active maintenance directories in `flext-grpc`, `flext-ldap`, `flext-observability`, `flext-quality`,
-    and `flext-meltano-native`.
+    and `gruponos-meltano-native`.
   - Collected configuration files for shared tooling:
     - `flext-grpc/docs/maintenance/settings.json`
     - `flext-ldap/docs/maintenance/settings.yaml`
@@ -135,7 +135,7 @@ ______________________________________________________________________
     documentation (`README.md`, `user-guide.md`, `troubleshooting.md`), and cache artifacts (`.link_cache.json`).
   - `flext-observability`: standalone Audit script (`audit/content-audit.py`) with associated reports (`dead_code_analysis.md`,
     `dead_code_cleanup_summary.md`, `README.md`).
-  - `flext-meltano-native`: single maintenance `README.md` identified; no automation scripts present yet.
+  - `gruponos-meltano-native`: single maintenance `README.md` identified; no automation scripts present yet.
   - Next: map each artifact to the shared capabilities matrix (audit/validation/optimization/reporting),
     evaluate gaps against target schema, and prepare normalization checklist.
 
@@ -148,7 +148,7 @@ ______________________________________________________________________
 | `flext-ldap`           | ✅ (wrappers to shared profile) | ✅ (`validate_links.py`, |                                                         |                            |                                                                                |                                               |                                                              |
 | `validate_style.py`)   | ✅ (`optimize.py`)              | ✅ (`report.py`)         | ✅ (`sync.py`)                                           | `settings.yaml`            | Uses shared infrastructure plus legacy shell runner; includes cache artifacts. |                                               |                                                              |
 | `flext-observability`  | ✅ (`audit/content-audit.py`)   | ❌                       | ❌                                                       | ⚠️ Markdown summaries only | ❌                                                                              | settings embedded in script (`yaml` optional) | Lightweight audit only; no automation scripts detected.      |
-| `flext-meltano-native` | ❌                              | ❌                       | ❌                                                       | ❌                          | ❌                                                                              | None                                          | Documentation guidance only; no executable maintenance code. |
+| `gruponos-meltano-native` | ❌                              | ❌                       | ❌                                                       | ❌                          | ❌                                                                              | None                                          | Documentation guidance only; no executable maintenance code. |
 
 - Observed schema divergence: JSON-based settings (`flext-grpc`) vs YAML (`flext-ldap`) vs inline defaults (`flext-observability`).
 - Next: draft normalization checklist (settings schema conversion, capability gaps,
@@ -169,7 +169,7 @@ ______________________________________________________________________
 
 - **2025-10-16** – Completed Phase 1 standardization wave: introduced the shared Typer CLI (`src/flext_quality/docs_maintenance/cli.py`) and extended the orchestrator to support programmatic handlers; removed legacy project-side scripts in `flext-ldap`,
   `flext-grpc`, `flext-observability`,
-  and `flext-meltano-native`; converted per-project configs to the normalized YAML schema; and wired new `docs-maintenance` Makefile targets that invoke the shared runner with Markdown-only output.
+  and `gruponos-meltano-native`; converted per-project configs to the normalized YAML schema; and wired new `docs-maintenance` Makefile targets that invoke the shared runner with Markdown-only output.
 
   - **2025-10-16** – Unified profile layout: removed the dedicated `grpc` maintenance profile in favour of the shared advanced toolkit,
   mapped legacy profile slugs to the consolidated module,

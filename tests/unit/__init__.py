@@ -7,21 +7,18 @@ from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 
 _LAZY_IMPORTS = build_lazy_import_map(
     {
-        ".test_api": ("test_api",),
+        ".test_api": (
+            "TestFlextQualityAPI",
+            "TestFlextQualityHookExecution",
+            "TestFlextQualityRulesConfig",
+            "TestFlextQualitySingleton",
+            "TestFlextQualityStdinProcessing",
+            "TestFlextQualityValidation",
+        ),
         ".test_basic": ("test_basic",),
-        ".test_cli": ("test_cli",),
-        "flext_quality": (
-            "c",
-            "d",
-            "e",
-            "h",
-            "m",
-            "p",
-            "r",
-            "s",
-            "t",
-            "u",
-            "x",
+        ".test_cli": (
+            "TestCommandServices",
+            "TestMain",
         ),
     },
 )
