@@ -6,13 +6,13 @@ import sys
 from collections.abc import Sequence
 from pathlib import Path
 
-from flext_cli import u
+from flext_cli import FlextCliUtilities
 from flext_web import FlextWebUtilities
 
-from flext_quality import c, p, r, t
+from flext_quality import c, p, r, t, u
 
 
-class FlextQualityUtilities(u, FlextWebUtilities):
+class FlextQualityUtilities(FlextCliUtilities, FlextWebUtilities):
     """Namespace for flext-quality utilities."""
 
     class Quality:
