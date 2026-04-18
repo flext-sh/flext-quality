@@ -11,29 +11,31 @@ from flext_web import FlextWebTypes
 class FlextQualityTypes(t, FlextWebTypes):
     """Namespace for flext-quality type definitions."""
 
-    CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.ContainerMapping] = m.TypeAdapter(
-        t.ContainerMapping,
-    )
-    RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.ContainerMapping] = (
+    CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.RecursiveContainerMapping] = (
         m.TypeAdapter(
-            t.ContainerMapping,
+            t.RecursiveContainerMapping,
+        )
+    )
+    RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.RecursiveContainerMapping] = (
+        m.TypeAdapter(
+            t.RecursiveContainerMapping,
             config=m.ConfigDict(strict=False),
         )
     )
-    CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[Sequence[t.ContainerMapping]] = (
-        m.TypeAdapter(Sequence[t.ContainerMapping])
-    )
+    CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
+        Sequence[t.RecursiveContainerMapping]
+    ] = m.TypeAdapter(Sequence[t.RecursiveContainerMapping])
     RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
-        Sequence[t.ContainerMapping]
+        Sequence[t.RecursiveContainerMapping]
     ] = m.TypeAdapter(
-        Sequence[t.ContainerMapping],
+        Sequence[t.RecursiveContainerMapping],
         config=m.ConfigDict(strict=False),
     )
     MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: m.TypeAdapter[
         t.MutableOptionalFeatureFlagMapping
     ] = m.TypeAdapter(t.MutableOptionalFeatureFlagMapping)
-    NORMALIZED_VALUE_SEQUENCE_ADAPTER: m.TypeAdapter[Sequence[t.NormalizedValue]] = (
-        m.TypeAdapter(Sequence[t.NormalizedValue])
+    NORMALIZED_VALUE_SEQUENCE_ADAPTER: m.TypeAdapter[Sequence[t.RecursiveValue]] = (
+        m.TypeAdapter(Sequence[t.RecursiveValue])
     )
     STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: m.TypeAdapter[
         MutableSequence[t.StrMapping]
@@ -42,12 +44,12 @@ class FlextQualityTypes(t, FlextWebTypes):
     class Quality:
         """Quality-specific types namespace."""
 
-        type HookInput = t.ContainerMapping
-        type HookOutput = t.ContainerMapping
+        type HookInput = t.RecursiveContainerMapping
+        type HookOutput = t.RecursiveContainerMapping
         type HookMatcher = t.StrSequence | None
-        type RuleConfig = t.ContainerMapping
+        type RuleConfig = t.RecursiveContainerMapping
         type RuleResult = tuple[bool, str | None]
-        type McpToolResult = t.ContainerMapping
+        type McpToolResult = t.RecursiveContainerMapping
         type McpResource = t.StrMapping
         type MemoryQuery = Mapping[str, str | int | t.StrSequence]
         type ContextQuery = t.HeaderMapping
