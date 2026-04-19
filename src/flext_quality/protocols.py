@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import ClassVar, Protocol, runtime_checkable
 
@@ -32,7 +32,7 @@ class FlextQualityProtocols(p, FlextWebProtocols):
                 self,
                 content: str,
                 file_path: Path | None = None,
-            ) -> p.Result[Sequence[t.RecursiveContainerMapping]]:
+            ) -> p.Result[Sequence[Mapping[str, t.Container]]]:
                 """Validate content and return violations."""
                 ...
 
@@ -98,7 +98,7 @@ class FlextQualityProtocols(p, FlextWebProtocols):
             def validate(
                 self,
                 settings: t.Quality.RuleConfig,
-                context: t.RecursiveContainerMapping,
+                context: Mapping[str, t.Container],
             ) -> p.Result[t.Quality.RuleResult]:
                 """Validate according to rule."""
                 ...
@@ -128,8 +128,8 @@ class FlextQualityProtocols(p, FlextWebProtocols):
 
             def execute(
                 self,
-                params: t.RecursiveContainerMapping,
-            ) -> p.Result[t.RecursiveContainerMapping]:
+                params: Mapping[str, t.Container],
+            ) -> p.Result[Mapping[str, t.Container]]:
                 """Execute MCP tool."""
                 ...
 

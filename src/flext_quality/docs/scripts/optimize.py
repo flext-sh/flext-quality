@@ -15,7 +15,7 @@ import argparse
 import logging
 import re
 import shutil
-from collections.abc import MutableSequence, Sequence
+from collections.abc import Mapping, MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -43,7 +43,7 @@ class FlextQualityDocumentationOptimizer:
 
     def optimize_formatting(
         self, doc_files: Sequence[Path]
-    ) -> t.RecursiveContainerMapping:
+    ) -> Mapping[str, t.Container]:
         """Fix common formatting issues."""
         for file_path in doc_files:
             try:
@@ -97,7 +97,7 @@ class FlextQualityDocumentationOptimizer:
 
     def update_table_of_contents(
         self, doc_files: Sequence[Path]
-    ) -> t.RecursiveContainerMapping:
+    ) -> Mapping[str, t.Container]:
         """Update or add table of contents for long documents."""
         for file_path in doc_files:
             try:
@@ -189,7 +189,7 @@ class FlextQualityDocumentationOptimizer:
 
     def enhance_accessibility(
         self, doc_files: Sequence[Path]
-    ) -> t.RecursiveContainerMapping:
+    ) -> Mapping[str, t.Container]:
         """Enhance accessibility of documentation."""
         for file_path in doc_files:
             try:
@@ -246,7 +246,7 @@ class FlextQualityDocumentationOptimizer:
     def optimize_content_structure(
         self,
         doc_files: Sequence[Path],
-    ) -> t.RecursiveContainerMapping:
+    ) -> Mapping[str, t.Container]:
         """Optimize content structure and readability."""
         for file_path in doc_files:
             try:
@@ -300,7 +300,7 @@ class FlextQualityDocumentationOptimizer:
                 enhanced_lines.extend(("", "---", ""))
         return "\n".join(enhanced_lines)
 
-    def update_metadata(self, doc_files: Sequence[Path]) -> t.RecursiveContainerMapping:
+    def update_metadata(self, doc_files: Sequence[Path]) -> Mapping[str, t.Container]:
         """Update frontmatter metadata and timestamps."""
         for file_path in doc_files:
             try:

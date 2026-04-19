@@ -11,24 +11,22 @@ from flext_web import FlextWebTypes
 class FlextQualityTypes(t, FlextWebTypes):
     """Namespace for flext-quality type definitions."""
 
-    CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.RecursiveContainerMapping] = (
-        m.TypeAdapter(
-            t.RecursiveContainerMapping,
-        )
+    CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[Mapping[str, t.Container]] = m.TypeAdapter(
+        Mapping[str, t.Container],
     )
-    RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.RecursiveContainerMapping] = (
+    RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[Mapping[str, t.Container]] = (
         m.TypeAdapter(
-            t.RecursiveContainerMapping,
+            Mapping[str, t.Container],
             config=m.ConfigDict(strict=False),
         )
     )
     CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
-        Sequence[t.RecursiveContainerMapping]
-    ] = m.TypeAdapter(Sequence[t.RecursiveContainerMapping])
+        Sequence[Mapping[str, t.Container]]
+    ] = m.TypeAdapter(Sequence[Mapping[str, t.Container]])
     RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
-        Sequence[t.RecursiveContainerMapping]
+        Sequence[Mapping[str, t.Container]]
     ] = m.TypeAdapter(
-        Sequence[t.RecursiveContainerMapping],
+        Sequence[Mapping[str, t.Container]],
         config=m.ConfigDict(strict=False),
     )
     MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: m.TypeAdapter[
@@ -44,12 +42,12 @@ class FlextQualityTypes(t, FlextWebTypes):
     class Quality:
         """Quality-specific types namespace."""
 
-        type HookInput = t.RecursiveContainerMapping
-        type HookOutput = t.RecursiveContainerMapping
+        type HookInput = Mapping[str, t.Container]
+        type HookOutput = Mapping[str, t.Container]
         type HookMatcher = t.StrSequence | None
-        type RuleConfig = t.RecursiveContainerMapping
+        type RuleConfig = Mapping[str, t.Container]
         type RuleResult = tuple[bool, str | None]
-        type McpToolResult = t.RecursiveContainerMapping
+        type McpToolResult = Mapping[str, t.Container]
         type McpResource = t.StrMapping
         type MemoryQuery = Mapping[str, str | int | t.StrSequence]
         type ContextQuery = t.HeaderMapping

@@ -10,7 +10,7 @@ from __future__ import annotations
 import operator
 import re
 import sys
-from collections.abc import MutableSequence, Sequence
+from collections.abc import Mapping, MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import ClassVar
@@ -162,7 +162,7 @@ class FlextQualityStyleValidator:
 
     def _normalize_config(
         self,
-        raw: t.RecursiveContainerMapping,
+        raw: Mapping[str, t.Container],
     ) -> FlextQualityStyleValidator.StyleConfig:
         markdown: FlextQualityStyleValidator.MarkdownConfig | None = None
         formatting: FlextQualityStyleValidator.FormattingConfig | None = None

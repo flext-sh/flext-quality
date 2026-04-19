@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from collections.abc import MutableSequence, Sequence
+from collections.abc import Mapping, MutableSequence, Sequence
 from pathlib import Path
 
 from flext_quality import FlextQualityRulesLoader, c, m, p, r, t
@@ -38,51 +38,51 @@ class FlextQualityRulesEngine:
     def validate(
         self,
         path: str,
-        context: t.RecursiveContainerMapping | None = None,
-    ) -> p.Result[Sequence[t.RecursiveContainerMapping]]:
+        context: Mapping[str, t.Container] | None = None,
+    ) -> p.Result[Sequence[Mapping[str, t.Container]]]:
         """Validate code against loaded rules."""
         if not self._loaded:
             load_result = self.load_rules()
             if load_result.failure:
-                return r[Sequence[t.RecursiveContainerMapping]].fail(load_result.error)
+                return r[Sequence[Mapping[str, t.Container]]].fail(load_result.error)
         target_path = Path(path)
         if not target_path.exists():
-            return r[Sequence[t.RecursiveContainerMapping]].fail(
+            return r[Sequence[Mapping[str, t.Container]]].fail(
                 f"Path does not exist: {path}"
             )
-        violations: MutableSequence[t.RecursiveContainerMapping] = []
+        violations: MutableSequence[Mapping[str, t.Container]] = []
         files = self._get_files(target_path)
         for file_path in files:
             file_violations = self._validate_file(file_path, context or {})
             violations.extend(file_violations)
-        return r[Sequence[t.RecursiveContainerMapping]].ok(violations)
+        return r[Sequence[Mapping[str, t.Container]]].ok(violations)
 
     def validate_content(
         self,
         content: str,
         filename: str = "<string>",
-    ) -> p.Result[Sequence[t.RecursiveContainerMapping]]:
+    ) -> p.Result[Sequence[Mapping[str, t.Container]]]:
         """Validate content string against loaded rules."""
         if not self._loaded:
             load_result = self.load_rules()
             if load_result.failure:
-                return r[Sequence[t.RecursiveContainerMapping]].fail(load_result.error)
-        violations: MutableSequence[t.RecursiveContainerMapping] = []
+                return r[Sequence[Mapping[str, t.Container]]].fail(load_result.error)
+        violations: MutableSequence[Mapping[str, t.Container]] = []
         for rule in self._rules:
             if not rule.enabled:
                 continue
             rule_violations = self._check_rule(rule, content, filename)
             violations.extend(rule_violations)
-        return r[Sequence[t.RecursiveContainerMapping]].ok(violations)
+        return r[Sequence[Mapping[str, t.Container]]].ok(violations)
 
     def _check_rule(
         self,
         rule: m.Quality.RuleDefinition,
         content: str,
         filename: str,
-    ) -> Sequence[t.RecursiveContainerMapping]:
+    ) -> Sequence[Mapping[str, t.Container]]:
         """Check a single rule against content."""
-        violations: MutableSequence[t.RecursiveContainerMapping] = []
+        violations: MutableSequence[Mapping[str, t.Container]] = []
         if rule.pattern is None:
             return violations
         try:
@@ -127,8 +127,8 @@ class FlextQualityRulesEngine:
     def _validate_file(
         self,
         file_path: Path,
-        _context: t.RecursiveContainerMapping,
-    ) -> Sequence[t.RecursiveContainerMapping]:
+        _context: Mapping[str, t.Container],
+    ) -> Sequence[Mapping[str, t.Container]]:
         """Validate a single file against rules."""
         try:
             content = file_path.read_text(encoding="utf-8")
@@ -149,7 +149,7 @@ class FlextQualityRulesEngine:
                     "severity": c.Quality.Severity.ERROR,
                 },
             ]
-        violations: MutableSequence[t.RecursiveContainerMapping] = []
+        violations: MutableSequence[Mapping[str, t.Container]] = []
         for rule in self._rules:
             if not rule.enabled:
                 continue

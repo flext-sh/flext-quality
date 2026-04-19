@@ -48,14 +48,14 @@ class FlextQualityLinkChecker:
         file: str
         line: int | None = None
         reference: str | None = None
-        context: t.RecursiveContainerMapping | None = None
+        context: Mapping[str, t.Container] | None = None
 
     class LinkResult(m.BaseModel):
         """Link check result dictionary."""
 
         url: str
         valid: bool
-        context: t.RecursiveContainerMapping
+        context: Mapping[str, t.Container]
         status_code: int | None = None
         response_time: float | None = None
         redirected: bool | None = None
@@ -78,7 +78,7 @@ class FlextQualityLinkChecker:
         broken_links: int
         warnings: int
         errors: MutableSequence[FlextQualityLinkChecker.LinkResult]
-        warnings_list: MutableSequence[t.RecursiveContainerMapping]
+        warnings_list: MutableSequence[Mapping[str, t.Container]]
         performance: FlextQualityLinkChecker.PerformanceMetrics
 
     RESULTS_ADAPTER: ClassVar[m.TypeAdapter[Results]] = m.TypeAdapter(Results)
@@ -207,7 +207,7 @@ class FlextQualityLinkChecker:
     async def check_link_async(
         self,
         url: str,
-        context: t.RecursiveContainerMapping | None = None,
+        context: Mapping[str, t.Container] | None = None,
     ) -> FlextQualityLinkChecker.LinkResult:
         """Asynchronously check a single link."""
         start_time = time.time()
@@ -281,7 +281,7 @@ class FlextQualityLinkChecker:
     def check_link_sync(
         self,
         url: str,
-        context: t.RecursiveContainerMapping | None = None,
+        context: Mapping[str, t.Container] | None = None,
     ) -> FlextQualityLinkChecker.LinkResult:
         """Synchronously check a single link (fallback method)."""
         start_time = time.time()
@@ -483,16 +483,16 @@ class FlextQualityLinkChecker:
 
     def validate_github_links(
         self,
-        links: Sequence[t.RecursiveContainerMapping],
-    ) -> Sequence[t.RecursiveContainerMapping]:
+        links: Sequence[Mapping[str, t.Container]],
+    ) -> Sequence[Mapping[str, t.Container]]:
         """Special validation for GitHub links."""
-        github_links: Sequence[t.RecursiveContainerMapping] = [
+        github_links: Sequence[Mapping[str, t.Container]] = [
             link
             for link in links
             if isinstance(link.get("url"), str) and "github.com" in str(link.get("url"))
         ]
 
-        validated_links: Sequence[Mapping[str, bool | t.RecursiveContainer]] = [
+        validated_links: Sequence[Mapping[str, bool | t.Container]] = [
             {
                 **link,
                 "valid": True,

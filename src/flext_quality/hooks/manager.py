@@ -43,7 +43,7 @@ class FlextQualityHookManager:
                 return result
         return r[t.Quality.HookOutput].ok({"continue": True})
 
-    def get_config(self) -> Mapping[str, Sequence[t.RecursiveContainerMapping]]:
+    def get_config(self) -> Mapping[str, Sequence[Mapping[str, t.Container]]]:
         """Get hooks configuration as dict."""
         return {
             event.value: [{"matcher": h.matcher} for h in hooks]

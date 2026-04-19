@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import MutableMapping
+from collections.abc import Mapping, MutableMapping
 
 from flext_quality import (
     FlextQualityClaudeContextClient,
@@ -42,7 +42,7 @@ def get_rules_config() -> str:
 @_mcp.resource("status://integrations")
 def get_integrations_status() -> str:
     """Get status of all integrations."""
-    status: MutableMapping[str, t.Container | t.RecursiveContainerMapping] = {}
+    status: MutableMapping[str, t.Container | Mapping[str, t.Container]] = {}
     mem_client = FlextQualityClaudeMemClient()
     mem_health = mem_client.health_check()
     status["claude_mem"] = (

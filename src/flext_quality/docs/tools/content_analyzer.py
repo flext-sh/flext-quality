@@ -143,7 +143,7 @@ class FlextQualityContentAnalyzer:
             config_path: Path to configuration file for content analysis rules.
 
         """
-        self.settings: t.RecursiveContainerMapping = {}
+        self.settings: Mapping[str, t.Container] = {}
         self.load_config(config_path)
         self.results: FlextQualityContentAnalyzer.Results = (
             FlextQualityContentAnalyzer.Results(
@@ -457,7 +457,7 @@ class FlextQualityContentAnalyzer:
 
         word_count = len(re.findall(r"\b\w+\b", content))
         thresholds_val = self.settings.get("quality_thresholds")
-        thresholds: t.RecursiveContainerMapping = (
+        thresholds: Mapping[str, t.Container] = (
             dict(thresholds_val) if isinstance(thresholds_val, Mapping) else {}
         )
         min_words_val = thresholds.get("min_word_count", 100)
@@ -773,7 +773,7 @@ class FlextQualityContentAnalyzer:
         for result_value_raw in self.results.model_dump().values():
             if not isinstance(result_value_raw, dict):
                 continue
-            result_value: t.RecursiveContainerMapping = (
+            result_value: Mapping[str, t.Container] = (
                 t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
                     result_value_raw,
                 )

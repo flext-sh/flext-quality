@@ -77,6 +77,6 @@ class FlextQualityClaudeContextClient:
             self._mcp.build_call_command,
         )
 
-    def health_check(self) -> p.Result[t.RecursiveContainerMapping]:
+    def health_check(self) -> p.Result[Mapping[str, t.Container]]:
         """Check if claude-context is available."""
         return self._mcp.build_server_health_result(self.SERVER_NAME)

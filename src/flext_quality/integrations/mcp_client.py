@@ -49,12 +49,12 @@ class FlextQualityMcpClient:
         self,
         server: str,
         tool: str,
-        params: t.RecursiveContainerMapping | None = None,
+        params: Mapping[str, t.Container] | None = None,
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build an MCP tool call request."""
-        call_params: t.RecursiveContainerMapping = {}
+        call_params: Mapping[str, t.Container] = {}
         if isinstance(params, Mapping):
-            validated_params: t.RecursiveContainerMapping = (
+            validated_params: Mapping[str, t.Container] = (
                 t.CONTAINER_MAPPING_ADAPTER.validate_python(params)
             )
             call_params = dict(validated_params)
@@ -66,7 +66,7 @@ class FlextQualityMcpClient:
             }),
         )
 
-    def health_check(self) -> p.Result[t.RecursiveContainerMapping]:
+    def health_check(self) -> p.Result[Mapping[str, t.Container]]:
         """Check if MCP infrastructure is available."""
         available = self.is_mcp_cli_available()
         status = (
@@ -74,7 +74,7 @@ class FlextQualityMcpClient:
             if available
             else c.Quality.IntegrationStatus.DISCONNECTED
         )
-        return r[t.RecursiveContainerMapping].ok({
+        return r[Mapping[str, t.Container]].ok({
             "status": status,
             "available": available,
             "mcp_cli": available,
@@ -83,18 +83,18 @@ class FlextQualityMcpClient:
 
     def build_server_health_result(
         self, server_name: str
-    ) -> p.Result[t.RecursiveContainerMapping]:
+    ) -> p.Result[Mapping[str, t.Container]]:
         """Build a normalized health result for a named MCP server."""
         mcp_health = self.health_check()
         if mcp_health.failure:
-            return r[t.RecursiveContainerMapping].fail(mcp_health.error)
+            return r[Mapping[str, t.Container]].fail(mcp_health.error)
         health_data = mcp_health.value
         status = (
             c.Quality.IntegrationStatus.CONNECTED
             if health_data.get("available", False)
             else c.Quality.IntegrationStatus.DISCONNECTED
         )
-        return r[t.RecursiveContainerMapping].ok({
+        return r[Mapping[str, t.Container]].ok({
             "server": server_name,
             "status": status,
             "available": health_data.get("available", False),
@@ -118,7 +118,7 @@ class FlextQualityMcpClient:
                 ),
             )
         try:
-            parsed: t.RecursiveContainerMapping = (
+            parsed: Mapping[str, t.Container] = (
                 t.CONTAINER_MAPPING_ADAPTER.validate_json(output)
             )
             result_data: t.StrMapping = {str(k): str(v) for k, v in parsed.items()}
@@ -131,7 +131,7 @@ class FlextQualityMcpClient:
             )
         except ValueError:
             try:
-                parsed_list: Sequence[t.RecursiveContainer] = (
+                parsed_list: Sequence[t.Container] = (
                     t.NORMALIZED_VALUE_SEQUENCE_ADAPTER.validate_json(
                         output,
                     )
@@ -139,7 +139,7 @@ class FlextQualityMcpClient:
                 coerced_data: MutableSequence[t.StrMapping] = []
                 for item in parsed_list:
                     if isinstance(item, Mapping):
-                        validated_item: t.RecursiveContainerMapping = (
+                        validated_item: Mapping[str, t.Container] = (
                             t.CONTAINER_MAPPING_ADAPTER.validate_python(item)
                         )
                         coerced_data.append({

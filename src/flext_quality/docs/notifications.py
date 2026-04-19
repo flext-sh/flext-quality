@@ -249,20 +249,20 @@ class FlextQualityDocumentationNotifier:
 
     def notify_critical_issues(
         self,
-        audit_data: t.RecursiveContainerMapping,
+        audit_data: Mapping[str, t.Container],
     ) -> bool:
         """Send notification for critical documentation issues."""
         if not self.settings.alerts.critical_issues.enabled:
             return True
 
         metrics_val = audit_data.get("metrics")
-        metrics: t.RecursiveContainerMapping = (
+        metrics: Mapping[str, t.Container] = (
             t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_val)
             if isinstance(metrics_val, Mapping)
             else {}
         )
         severity_val = metrics.get("severity_breakdown")
-        severity_m: t.RecursiveContainerMapping = (
+        severity_m: Mapping[str, t.Container] = (
             t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(severity_val)
             if isinstance(severity_val, Mapping)
             else {}
@@ -311,7 +311,7 @@ Please review recent changes and address any identified issues.
 
     def notify_broken_links(
         self,
-        broken_links: Sequence[t.RecursiveContainer],
+        broken_links: Sequence[t.Container],
     ) -> bool:
         """Send notification for broken links."""
         if not self.settings.alerts.broken_links.enabled:
@@ -330,7 +330,7 @@ Please review recent changes and address any identified issues.
 
     def notify_weekly_report(
         self,
-        report_data: t.RecursiveContainerMapping,
+        report_data: Mapping[str, t.Container],
     ) -> bool:
         """Send weekly quality report notification."""
         if not self.settings.alerts.weekly_report.enabled:
@@ -344,7 +344,7 @@ Please review recent changes and address any identified issues.
 
     def notify_monthly_report(
         self,
-        report_data: t.RecursiveContainerMapping,
+        report_data: Mapping[str, t.Container],
     ) -> bool:
         """Send monthly comprehensive report notification."""
         if not self.settings.alerts.monthly_report.enabled:
@@ -517,17 +517,17 @@ Timestamp: {datetime.now(UTC).isoformat()}
 
     def _format_critical_issues_message(
         self,
-        audit_data: t.RecursiveContainerMapping,
+        audit_data: Mapping[str, t.Container],
     ) -> str:
         """Format message for critical issues notification."""
         metrics_val = audit_data.get("metrics")
-        metrics: t.RecursiveContainerMapping = (
+        metrics: Mapping[str, t.Container] = (
             t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_val)
             if isinstance(metrics_val, Mapping)
             else {}
         )
         severity_val = metrics.get("severity_breakdown")
-        severity: t.RecursiveContainerMapping = (
+        severity: Mapping[str, t.Container] = (
             t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(severity_val)
             if isinstance(severity_val, Mapping)
             else {}
@@ -538,11 +538,11 @@ Timestamp: {datetime.now(UTC).isoformat()}
             severity_breakdown[key_name] = kv if isinstance(kv, int) else 0
 
         issues_val = audit_data.get("issues")
-        critical_issues: MutableSequence[t.RecursiveContainerMapping] = []
+        critical_issues: MutableSequence[Mapping[str, t.Container]] = []
         if isinstance(issues_val, (list, tuple)):
             for i_v in issues_val:
                 if isinstance(i_v, Mapping):
-                    i_m: t.RecursiveContainerMapping = (
+                    i_m: Mapping[str, t.Container] = (
                         t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(i_v)
                     )
                     sev = i_m.get("severity")
@@ -589,7 +589,7 @@ Top Critical Issues:
 
     def _format_broken_links_message(
         self,
-        broken_links: Sequence[t.RecursiveContainer],
+        broken_links: Sequence[t.Container],
     ) -> str:
         """Format message for broken links notification."""
         message = f"""
@@ -624,7 +624,7 @@ Found {len(broken_links)} broken links that need attention:
 
     def _format_weekly_report_message(
         self,
-        _report_data: t.RecursiveContainerMapping,
+        _report_data: Mapping[str, t.Container],
     ) -> str:
         """Format message for weekly report notification."""
         # Implementation would depend on weekly report data structure
@@ -633,7 +633,7 @@ Found {len(broken_links)} broken links that need attention:
 
     def _format_monthly_report_message(
         self,
-        _report_data: t.RecursiveContainerMapping,
+        _report_data: Mapping[str, t.Container],
     ) -> str:
         """Format message for monthly report notification."""
         # Implementation would depend on monthly report data structure
@@ -683,7 +683,7 @@ def main() -> None:
 
         # Check for broken links (would need to extract from audit data)
         issues_raw = audit_data.get("issues")
-        broken_links: MutableSequence[t.RecursiveContainer] = []
+        broken_links: MutableSequence[t.Container] = []
         if isinstance(issues_raw, (list, tuple)):
             for i_raw in issues_raw:
                 if isinstance(i_raw, Mapping):

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import MutableSequence, Sequence
+from collections.abc import Mapping, MutableSequence, Sequence
 from pathlib import Path
 
 from flext_quality import c, m, p, r, t, u
@@ -27,7 +27,7 @@ class FlextQualityRulesLoader:
             return r[Sequence[m.Quality.RuleDefinition]].fail(
                 "Invalid YAML: expected dict at root",
             )
-        parsed_dict: t.RecursiveContainerMapping = (
+        parsed_dict: Mapping[str, t.Container] = (
             t.CONTAINER_MAPPING_ADAPTER.validate_python(parsed)
         )
         rules_data_val = parsed_dict.get("rules", [])
@@ -41,7 +41,7 @@ class FlextQualityRulesLoader:
                 return r[Sequence[m.Quality.RuleDefinition]].fail(
                     f"Rule {idx}: expected dict",
                 )
-            rule_dict: t.RecursiveContainerMapping = (
+            rule_dict: Mapping[str, t.Container] = (
                 t.CONTAINER_MAPPING_ADAPTER.validate_python(
                     rule_data,
                 )
@@ -69,7 +69,7 @@ class FlextQualityRulesLoader:
 
     def _parse_rule(
         self,
-        data: t.RecursiveContainerMapping,
+        data: Mapping[str, t.Container],
         index: int,
     ) -> p.Result[m.Quality.RuleDefinition]:
         """Parse a single rule from dict."""

@@ -13,7 +13,12 @@ from __future__ import annotations
 
 import os
 import tempfile
-from collections.abc import Generator, MutableSequence, Sequence
+from collections.abc import (
+    Generator,
+    Mapping,
+    MutableSequence,
+    Sequence,
+)
 from pathlib import Path
 
 import pytest
@@ -135,7 +140,7 @@ def secure_temp_dir() -> Generator[str]:
 
 
 @pytest.fixture
-def sample_code_repository(tmp_path: Path) -> t.RecursiveContainerMapping:
+def sample_code_repository(tmp_path: Path) -> Mapping[str, t.Container]:
     """Provide sample code repository metadata for quality analysis testing.
 
     Creates realistic repository metadata that simulates typical project
@@ -171,7 +176,7 @@ def sample_code_repository(tmp_path: Path) -> t.RecursiveContainerMapping:
 
 
 @pytest.fixture
-def quality_metrics_data() -> t.RecursiveContainerMapping:
+def quality_metrics_data() -> Mapping[str, t.Container]:
     """Quality metrics data for testing."""
     return {
         "complexity": {"cyclomatic": 5.2, "cognitive": 3.8, "average": 4.5},
@@ -182,7 +187,7 @@ def quality_metrics_data() -> t.RecursiveContainerMapping:
 
 
 @pytest.fixture
-def code_analysis_config() -> t.RecursiveContainerMapping:
+def code_analysis_config() -> Mapping[str, t.Container]:
     """Code analysis configuration for testing."""
     return {
         "analyzers": {
@@ -199,7 +204,7 @@ def code_analysis_config() -> t.RecursiveContainerMapping:
 
 
 @pytest.fixture
-def analysis_results() -> Sequence[t.RecursiveContainerMapping]:
+def analysis_results() -> Sequence[Mapping[str, t.Container]]:
     """Analysis results for testing."""
     return [
         {
@@ -233,7 +238,7 @@ def analysis_results() -> Sequence[t.RecursiveContainerMapping]:
 
 
 @pytest.fixture
-def report_config(tmp_path: Path) -> t.RecursiveContainerMapping:
+def report_config(tmp_path: Path) -> Mapping[str, t.Container]:
     """Report configuration for testing."""
     return {
         "format": "json",
@@ -245,7 +250,7 @@ def report_config(tmp_path: Path) -> t.RecursiveContainerMapping:
 
 
 @pytest.fixture
-def dashboard_data() -> t.RecursiveContainerMapping:
+def dashboard_data() -> Mapping[str, t.Container]:
     """Dashboard data for testing."""
     return {
         "summary": {
@@ -268,7 +273,7 @@ def dashboard_data() -> t.RecursiveContainerMapping:
 
 
 @pytest.fixture
-def sonarqube_config() -> t.RecursiveContainerMapping:
+def sonarqube_config() -> Mapping[str, t.Container]:
     """SonarQube configuration for testing."""
     return {
         "host": "http://localhost:9000",
@@ -280,7 +285,7 @@ def sonarqube_config() -> t.RecursiveContainerMapping:
 
 
 @pytest.fixture
-def codeclimate_config() -> t.RecursiveContainerMapping:
+def codeclimate_config() -> Mapping[str, t.Container]:
     """CodeClimate configuration for testing."""
     return {
         "api_token": "test-api-token",
@@ -343,7 +348,7 @@ def temporary_project_structure(tmp_path: Path) -> str:
 
 
 @pytest.fixture
-def package_metadata() -> t.RecursiveContainerMapping:
+def package_metadata() -> Mapping[str, t.Container]:
     """Package metadata for testing."""
     return {
         "name": "test-package",
@@ -356,7 +361,7 @@ def package_metadata() -> t.RecursiveContainerMapping:
 
 
 @pytest.fixture
-def celery_config() -> t.RecursiveContainerMapping:
+def celery_config() -> Mapping[str, t.Container]:
     """Celery configuration for testing."""
     return {
         "broker_url": "redis://localhost:6379/0",
@@ -370,7 +375,7 @@ def celery_config() -> t.RecursiveContainerMapping:
 
 
 @pytest.fixture
-def analysis_task_data() -> t.RecursiveContainerMapping:
+def analysis_task_data() -> Mapping[str, t.Container]:
     """Analysis task data for testing."""
     return {
         "task_id": "test-task-123",
@@ -428,7 +433,7 @@ class MockQualityAnalyzer:
         super().__init__()
         self.analyzed_files: MutableSequence[str] = []
 
-    def analyze_project(self, project_path: str) -> t.RecursiveContainerMapping:
+    def analyze_project(self, project_path: str) -> Mapping[str, t.Container]:
         """Simulate comprehensive project analysis.
 
         Args:
@@ -446,7 +451,7 @@ class MockQualityAnalyzer:
             "analysis_time": 2.5,
         }
 
-    def analyze_file(self, file_path: str) -> t.RecursiveContainerMapping:
+    def analyze_file(self, file_path: str) -> Mapping[str, t.Container]:
         """Simulate individual file analysis.
 
         Args:
@@ -458,7 +463,7 @@ class MockQualityAnalyzer:
         """
         return {"file": file_path, "complexity": 3.2, "issues": 2, "coverage": 90.0}
 
-    def get_metrics(self, _project_path: str) -> t.RecursiveContainerMapping:
+    def get_metrics(self, _project_path: str) -> Mapping[str, t.Container]:
         """Simulate project-wide quality metrics collection.
 
         Returns:
@@ -513,11 +518,11 @@ class MockReportGenerator:
     def __init__(self) -> None:
         """Initialize the instance."""
         super().__init__()
-        self.generated_reports: MutableSequence[t.RecursiveContainerMapping] = []
+        self.generated_reports: MutableSequence[Mapping[str, t.Container]] = []
 
     def generate_report(
         self,
-        data: t.RecursiveContainerMapping,
+        data: Mapping[str, t.Container],
         output_format: str = "json",
     ) -> str:
         """Simulate report generation in specified format.
@@ -530,7 +535,7 @@ class MockReportGenerator:
             Generated report filename
 
         """
-        report: t.RecursiveContainerMapping = {
+        report: Mapping[str, t.Container] = {
             "format": output_format,
             "data": data,
             "timestamp": "2023-01-01T12:00:00Z",
@@ -538,7 +543,7 @@ class MockReportGenerator:
         self.generated_reports.append(report)
         return f"report_{len(self.generated_reports)}.{output_format}"
 
-    def generate_dashboard_data(self) -> t.RecursiveContainerMapping:
+    def generate_dashboard_data(self) -> Mapping[str, t.Container]:
         """Simulate dashboard data generation.
 
         Returns:

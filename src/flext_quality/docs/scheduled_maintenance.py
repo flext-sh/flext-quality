@@ -51,23 +51,23 @@ def _docs_logs_dir() -> Path:
     return _docs_root() / "logs"
 
 
-def _as_str(value: t.RecursiveContainer | None, default: str) -> str:
+def _as_str(value: t.Container | None, default: str) -> str:
     """Normalize unknown settings values to string."""
     return value if isinstance(value, str) else default
 
 
-def _as_bool(value: t.RecursiveContainer | None, /, *, default: bool) -> bool:
+def _as_bool(value: t.Container | None, /, *, default: bool) -> bool:
     """Normalize unknown settings values to bool."""
     return value if isinstance(value, bool) else default
 
 
-def _as_int(value: t.RecursiveContainer | None, default: int) -> int:
+def _as_int(value: t.Container | None, default: int) -> int:
     """Normalize unknown settings values to int."""
     return value if isinstance(value, int) else default
 
 
 def _as_str_list(
-    value: t.RecursiveContainer | None,
+    value: t.Container | None,
     default: t.StrSequence,
 ) -> t.StrSequence:
     """Normalize unknown settings values to t.StrSequence."""
@@ -77,8 +77,8 @@ def _as_str_list(
 
 
 def _is_str_mapping(
-    value: t.RecursiveContainer | None,
-) -> TypeIs[t.RecursiveContainerMapping]:
+    value: t.Container | None,
+) -> TypeIs[Mapping[str, t.Container]]:
     return isinstance(value, Mapping)
 
 
@@ -133,7 +133,7 @@ class FlextQualityScheduledMaintenance:
     def _merge_config(
         self,
         base: m.Quality.MaintenanceConfig,
-        overrides: t.RecursiveContainerMapping,
+        overrides: Mapping[str, t.Container],
     ) -> m.Quality.MaintenanceConfig:
         """Merge external settings mapping into default typed settings."""
         merged = base.model_dump()

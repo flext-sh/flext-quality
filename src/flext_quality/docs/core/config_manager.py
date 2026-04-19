@@ -129,7 +129,7 @@ class FlextQualityConfigManager:
     """Centralized configuration management for the documentation maintenance system."""
 
     @staticmethod
-    def _as_section(value: RawSectionMap | t.RecursiveContainer) -> ConfigSection:
+    def _as_section(value: RawSectionMap | t.Container) -> ConfigSection:
         """Normalize any value into a configuration section mapping."""
         if not isinstance(value, Mapping):
             return {}
@@ -144,7 +144,7 @@ class FlextQualityConfigManager:
 
     @staticmethod
     def _as_config_data(
-        value: RawConfigMap | t.RecursiveContainerMapping | None,
+        value: RawConfigMap | Mapping[str, t.Container] | None,
     ) -> ConfigData:
         """Normalize loaded YAML content into typed settings data."""
         if not isinstance(value, Mapping):

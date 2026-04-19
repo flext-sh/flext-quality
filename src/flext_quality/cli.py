@@ -7,7 +7,7 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 import sys
-from collections.abc import MutableSequence, Sequence
+from collections.abc import Mapping, MutableSequence, Sequence
 from pathlib import Path
 from typing import Annotated, ClassVar, Self, override
 
@@ -22,12 +22,12 @@ class FlextQualityCli(s[bool]):
 
     app_name: ClassVar[str] = "flext-quality"
 
-    class Status(s[t.RecursiveContainerMapping]):
+    class Status(s[Mapping[str, t.Container]]):
         """Display quality service status."""
 
         @override
-        def execute(self) -> p.Result[t.RecursiveContainerMapping]:
-            return r[t.RecursiveContainerMapping].ok(
+        def execute(self) -> p.Result[Mapping[str, t.Container]]:
+            return r[Mapping[str, t.Container]].ok(
                 FlextQuality.get_instance().get_status(),
             )
 
