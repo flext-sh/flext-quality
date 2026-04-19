@@ -19,10 +19,11 @@ from urllib.parse import urlparse
 from urllib.robotparser import RobotFileParser
 
 import requests
-import structlog
 from aiohttp import ClientError, ClientSession, ClientTimeout
 
-from flext_quality import m, t
+from flext_quality import m, t, u
+
+logger = u.fetch_logger(__name__)
 
 
 class FlextQualityLinkChecker:
@@ -183,7 +184,7 @@ class FlextQualityLinkChecker:
                 UnicodeDecodeError,
                 OSError,
             ) as e:
-                structlog.get_logger().warning(
+                logger.warning(
                     "failed_to_extract_links",
                     file_path=str(file_path),
                     error=str(e),

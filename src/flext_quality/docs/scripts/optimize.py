@@ -19,9 +19,7 @@ from collections.abc import MutableSequence, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
 
-from pydantic import ValidationError
-
-from flext_quality import m, t, u
+from flext_quality import e, m, t, u
 
 MIN_HEADINGS_FOR_TOC = 5
 
@@ -370,7 +368,7 @@ class FlextQualityDocumentationOptimizer:
                         ["---"] + new_frontmatter.split("\n") + ["---"]
                     )
                     lines = new_frontmatter_lines + lines[end_idx:]
-                except (ValueError, ValidationError):
+                except (ValueError, e.ValidationError):
                     pass
         return "\n".join(lines)
 

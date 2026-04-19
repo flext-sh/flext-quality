@@ -15,8 +15,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import ClassVar
 
-from pydantic import TypeAdapter
-
 from flext_quality import m, t, u
 
 
@@ -95,7 +93,7 @@ class FlextQualityStyleValidator:
         suggestions: MutableSequence[str]
         summary: FlextQualityStyleValidator.SummaryMetrics
 
-    RESULTS_ADAPTER: ClassVar[m.TypeAdapter[ValidationResults]] = TypeAdapter(
+    RESULTS_ADAPTER: ClassVar[m.TypeAdapter[ValidationResults]] = m.TypeAdapter(
         ValidationResults
     )
 

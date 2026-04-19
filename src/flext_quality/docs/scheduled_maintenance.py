@@ -19,12 +19,11 @@ from typing import TypeIs
 
 import pytest
 import schedule
-import structlog
 from git import InvalidGitRepositoryError, Repo
 
 from flext_quality import m, t, u
 
-logger = structlog.get_logger(__name__)
+logger = u.fetch_logger(__name__)
 
 
 def _docs_root() -> Path:

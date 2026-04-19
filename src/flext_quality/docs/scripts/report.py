@@ -18,7 +18,6 @@ from pathlib import Path
 from typing import ClassVar
 
 from jinja2 import Template
-from pydantic import TypeAdapter
 
 from flext_quality import m, t
 
@@ -101,7 +100,7 @@ class FlextQualityDocumentationReporter:
         trends: FlextQualityDocumentationReporter.TrendData | None
         recommendations: Sequence[FlextQualityDocumentationReporter.Recommendation]
 
-    REPORT_DATA_ADAPTER: ClassVar[m.TypeAdapter[ReportData]] = TypeAdapter(ReportData)
+    REPORT_DATA_ADAPTER: ClassVar[m.TypeAdapter[ReportData]] = m.TypeAdapter(ReportData)
 
     def __init__(self, reports_dir: str = "docs/maintenance/reports/") -> None:
         """Initialize the documentation reporter with reports directory."""

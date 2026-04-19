@@ -19,9 +19,8 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import requests
-from pydantic import ValidationError
 
-from flext_quality import m, t, u
+from flext_quality import e, m, t, u
 
 
 class FlextQualityDocumentationAuditor:
@@ -56,7 +55,7 @@ class FlextQualityDocumentationAuditor:
                 self.audit_rules = m.Quality.AuditRulesConfig.model_validate(
                     audit_data,
                 )
-        except (FileNotFoundError, ValidationError, ValueError, TypeError):
+        except (FileNotFoundError, e.ValidationError, ValueError, TypeError):
             self.audit_rules = self.get_default_audit_rules()
 
         try:
@@ -67,7 +66,7 @@ class FlextQualityDocumentationAuditor:
                 self.style_guide = m.Quality.StyleGuideConfig.model_validate(
                     style_data,
                 )
-        except (FileNotFoundError, ValidationError, ValueError, TypeError):
+        except (FileNotFoundError, e.ValidationError, ValueError, TypeError):
             self.style_guide = self.get_default_style_guide()
 
         try:
@@ -78,7 +77,7 @@ class FlextQualityDocumentationAuditor:
                 self.validation_config = m.Quality.ValidationConfig.model_validate(
                     validation_data,
                 )
-        except (FileNotFoundError, ValidationError, ValueError, TypeError):
+        except (FileNotFoundError, e.ValidationError, ValueError, TypeError):
             self.validation_config = self.get_default_validation_config()
 
     def get_default_audit_rules(self) -> m.Quality.AuditRulesConfig:

@@ -15,8 +15,6 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import ClassVar
 
-from pydantic import TypeAdapter
-
 from flext_quality import m, t, u
 
 
@@ -120,7 +118,7 @@ class FlextQualityContentAnalyzer:
             FlextQualityContentAnalyzer.AnalyzerRecommendation | str
         ]
 
-    RESULTS_ADAPTER: ClassVar[m.TypeAdapter[Results]] = TypeAdapter(Results)
+    RESULTS_ADAPTER: ClassVar[m.TypeAdapter[Results]] = m.TypeAdapter(Results)
 
     EXCELLENT_READABILITY_MIN = 90
     GOOD_READABILITY_MIN = 80

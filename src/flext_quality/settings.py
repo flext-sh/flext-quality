@@ -12,8 +12,6 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Annotated, ClassVar
 
-from pydantic_settings import SettingsConfigDict
-
 from flext_core import FlextSettings
 from flext_quality import c, m, p, r, u
 
@@ -22,7 +20,7 @@ from flext_quality import c, m, p, r, u
 class FlextQualitySettings(FlextSettings):
     """Runtime configuration for flext-quality services."""
 
-    model_config: ClassVar[SettingsConfigDict] = m.SettingsConfigDict(
+    model_config: ClassVar[m.SettingsConfigDict] = m.SettingsConfigDict(
         env_prefix="FLEXT_QUALITY_", extra="ignore"
     )
 
