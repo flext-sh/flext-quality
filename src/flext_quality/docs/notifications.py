@@ -50,7 +50,7 @@ class FlextQualityDocumentationNotifier:
         username: str
         password: str
         from_address: str
-        to_addresses: t.StrSequence = u.Field(default_factory=list)
+        to_addresses: t.StrSequence = u.Field(default_factory=tuple)
 
     class _SlackConfig(m.BaseModel):
         webhook_url: str
