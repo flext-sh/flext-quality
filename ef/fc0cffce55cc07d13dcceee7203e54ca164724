@@ -1,0 +1,18 @@
+src/flext_quality/integrations/claude_mem.py
+  h_9db9d35f50cf33 45
+src/flext_quality/integrations/claude_context.py
+  h_9db9d35f50cf33 44
+src/flext_quality/docs/tools/link_checker.py
+  h_9db9d35f50cf33 103
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.0",
+  "base_commit_sha": "effc0cffce55cc07d13dcceee7203e54ca164724",
+  "prompts": {},
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
