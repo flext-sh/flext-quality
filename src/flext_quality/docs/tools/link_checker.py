@@ -100,7 +100,7 @@ class FlextQualityLinkChecker:
         self.settings: FlextQualityLinkChecker.LinkConfig = self._get_default_config()
         self.load_config(config_path)
         self.session: ClientSession | None = None
-        self.cache: t.MutableRecursiveContainerMapping = {}
+        self.cache: t.MutableFlatContainerMapping = {}
         self.results: FlextQualityLinkChecker.Results = FlextQualityLinkChecker.Results(
             total_links=0,
             valid_links=0,

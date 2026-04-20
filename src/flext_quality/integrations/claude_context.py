@@ -41,7 +41,7 @@ class FlextQualityClaudeContextClient:
         self, path: str | None = None
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build an index_codebase tool call."""
-        params: t.MutableRecursiveContainerMapping = {}
+        params: t.MutableFlatContainerMapping = {}
         if path:
             params["path"] = path
         return self._mcp.build_tool_call(self.SERVER_NAME, "index_codebase", params)

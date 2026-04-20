@@ -42,7 +42,7 @@ class FlextQualityClaudeMemClient:
         self, ids: Sequence[int]
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a get_observations tool call."""
-        normalized_ids: t.RecursiveContainerList = list(ids)
+        normalized_ids: t.FlatContainerList = list(ids)
         params: Mapping[str, t.Container] = {"ids": normalized_ids}
         return self._mcp.build_tool_call(self.SERVER_NAME, "get_observations", params)
 
