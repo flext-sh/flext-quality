@@ -18,7 +18,6 @@ from collections.abc import (
 )
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TypeIs
 
 import pytest
 import schedule
@@ -79,12 +78,6 @@ def _as_str_list(
     return default
 
 
-def _is_str_mapping(
-    value: t.Container | None,
-) -> TypeIs[Mapping[str, t.Container]]:
-    return isinstance(value, Mapping)
-
-
 class FlextQualityScheduledMaintenance:
     """Scheduled documentation maintenance system."""
 
@@ -126,7 +119,7 @@ class FlextQualityScheduledMaintenance:
             loaded_untyped = u.Cli.yaml_load_mapping(
                 resolved_config_path,
             )
-            if _is_str_mapping(loaded_untyped) and loaded_untyped:
+            if u.mapping(loaded_untyped) and loaded_untyped:
                 self.settings = self._merge_config(default_config, loaded_untyped)
             else:
                 self.settings = default_config
@@ -145,12 +138,12 @@ class FlextQualityScheduledMaintenance:
         merged["backup_dir"] = _as_str(overrides.get("backup_dir"), base.backup_dir)
 
         schedules_raw = overrides.get("schedules")
-        if _is_str_mapping(schedules_raw):
+        if u.mapping(schedules_raw):
             schedules = {
                 key: value.model_dump() for key, value in base.schedules.items()
             }
             for key, value in schedules_raw.items():
-                if not _is_str_mapping(value):
+                if not u.mapping(value):
                     continue
                 if key not in schedules:
                     continue
@@ -168,10 +161,10 @@ class FlextQualityScheduledMaintenance:
             merged["schedules"] = schedules
 
         tasks_raw = overrides.get("tasks")
-        if _is_str_mapping(tasks_raw):
+        if u.mapping(tasks_raw):
             tasks = {key: value.model_dump() for key, value in base.tasks.items()}
             for key, value in tasks_raw.items():
-                if not _is_str_mapping(value):
+                if not u.mapping(value):
                     continue
                 if key not in tasks:
                     continue
@@ -187,7 +180,7 @@ class FlextQualityScheduledMaintenance:
             merged["tasks"] = tasks
 
         error_handling_raw = overrides.get("error_handling")
-        if _is_str_mapping(error_handling_raw):
+        if u.mapping(error_handling_raw):
             err_cfg = base.error_handling
             merged["error_handling"] = {
                 "max_retries": _as_int(
@@ -209,7 +202,7 @@ class FlextQualityScheduledMaintenance:
             }
 
         logging_raw = overrides.get("logging")
-        if _is_str_mapping(logging_raw):
+        if u.mapping(logging_raw):
             log_cfg = base.logging
             merged["logging"] = {
                 "enabled": _as_bool(

@@ -2,11 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-    MutableMapping,
-)
-
 from flext_quality import (
     FlextQualityClaudeContextClient,
     FlextQualityClaudeMemClient,
@@ -15,6 +10,7 @@ from flext_quality import (
     c,
     get_server as _get_server,
     t,
+    u,
 )
 
 _mcp = _get_server()
@@ -45,17 +41,23 @@ def get_rules_config() -> str:
 @_mcp.resource("status://integrations")
 def get_integrations_status() -> str:
     """Get status of all integrations."""
-    status: MutableMapping[str, t.Container | Mapping[str, t.Container]] = {}
+    status: dict[str, t.JsonValue] = {}
     mem_client = FlextQualityClaudeMemClient()
     mem_health = mem_client.health_check()
-    status["claude_mem"] = (
-        mem_health.value if mem_health.success else {"error": mem_health.error}
+    mem_status: t.JsonValue = (
+        u.Cli.normalize_json_value(mem_health.value)
+        if mem_health.success
+        else {"error": mem_health.error}
     )
+    status["claude_mem"] = mem_status
     ctx_client = FlextQualityClaudeContextClient()
     ctx_health = ctx_client.health_check()
-    status["claude_context"] = (
-        ctx_health.value if ctx_health.success else {"error": ctx_health.error}
+    ctx_status: t.JsonValue = (
+        u.Cli.normalize_json_value(ctx_health.value)
+        if ctx_health.success
+        else {"error": ctx_health.error}
     )
+    status["claude_context"] = ctx_status
     return t.CONTAINER_MAPPING_ADAPTER.dump_json(
         status,
         indent=c.Quality.Defaults.JSON_INDENT,

@@ -39,15 +39,16 @@ class FlextQualityRulesLoader:
             return r[Sequence[m.Quality.RuleDefinition]].fail(
                 "Invalid YAML: 'rules' must be a list",
             )
+        rules_data: Sequence[Mapping[str, t.Container]] = (
+            t.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.validate_python(
+                rules_data_val,
+            )
+        )
         rules: MutableSequence[m.Quality.RuleDefinition] = []
-        for idx, rule_data in enumerate(rules_data_val):
-            if not isinstance(rule_data, dict):
-                return r[Sequence[m.Quality.RuleDefinition]].fail(
-                    f"Rule {idx}: expected dict",
-                )
+        for idx, rule_data in enumerate(rules_data):
             rule_dict: Mapping[str, t.Container] = (
                 t.CONTAINER_MAPPING_ADAPTER.validate_python(
-                    rule_data,
+                    dict(rule_data),
                 )
             )
             result = self._parse_rule(rule_dict, idx)

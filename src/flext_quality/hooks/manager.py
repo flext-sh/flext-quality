@@ -48,12 +48,21 @@ class FlextQualityHookManager:
                 return result
         return r[t.Quality.HookOutput].ok({"continue": True})
 
-    def get_config(self) -> Mapping[str, Sequence[Mapping[str, t.Container]]]:
+    def get_config(self) -> Mapping[str, t.Container]:
         """Get hooks configuration as dict."""
-        return {
-            event.value: [{"matcher": h.matcher} for h in hooks]
-            for event, hooks in self._hooks.items()
-        }
+        config: dict[str, t.Container] = {}
+        for event, hooks in self._hooks.items():
+            hook_entries: list[t.JsonValue] = []
+            for hook in hooks:
+                matcher = hook.matcher
+                matcher_value: t.JsonValue
+                if isinstance(matcher, Sequence) and not isinstance(matcher, str):
+                    matcher_value = [str(item) for item in matcher]
+                else:
+                    matcher_value = matcher
+                hook_entries.append({"matcher": matcher_value})
+            config[event.value] = hook_entries
+        return config
 
     def get_config_json(self) -> str:
         """Get hooks configuration as JSON."""

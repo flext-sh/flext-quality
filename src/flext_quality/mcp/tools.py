@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
+from collections.abc import Mapping
 
 from flext_quality import (
     FlextQualityClaudeContextClient,
@@ -14,6 +12,7 @@ from flext_quality import (
     c,
     get_server as _get_server,
     t,
+    u,
 )
 
 _mcp = _get_server()
@@ -25,7 +24,7 @@ def search_memory(
     *,
     search_type: str = "observations",
     limit: int | None = None,
-) -> Mapping[str, t.Container]:
+) -> Mapping[str, t.JsonValue]:
     """Build command to search cross-session memory via claude-mem.
 
     Returns the mcp-cli command that can be used to execute the search.
@@ -39,13 +38,15 @@ def search_memory(
     command_result = client.get_search_command(query=query, limit=search_limit)
     if command_result.failure:
         return {"error": command_result.error}
-    params = dict(result.value.params)
-    params["search_type"] = search_type
+    params = u.Cli.normalize_json_value(result.value.params)
+    command = u.Cli.normalize_json_value(command_result.value)
     return {
         "server": result.value.server,
         "tool": result.value.tool,
-        "params": params,
-        "command": command_result.value,
+        "params": {**params, "search_type": search_type}
+        if isinstance(params, Mapping)
+        else {"search_type": search_type},
+        "command": command,
     }
 
 
@@ -54,7 +55,7 @@ def search_code(
     query: str,
     *,
     limit: int | None = None,
-) -> Mapping[str, t.Container]:
+) -> Mapping[str, t.JsonValue]:
     """Build command for semantic code search via claude-context.
 
     Returns the mcp-cli command that can be used to execute the search.
@@ -68,11 +69,13 @@ def search_code(
     command_result = client.get_search_command(query=query, limit=search_limit)
     if command_result.failure:
         return {"error": command_result.error}
+    params = u.Cli.normalize_json_value(result.value.params)
+    command = u.Cli.normalize_json_value(command_result.value)
     return {
         "server": result.value.server,
         "tool": result.value.tool,
-        "params": result.value.params,
-        "command": command_result.value,
+        "params": params if isinstance(params, Mapping) else {},
+        "command": command,
     }
 
 
@@ -93,10 +96,10 @@ def validate_rules(
     path: str,
     *,
     context: Mapping[str, t.Container] | None = None,
-) -> Mapping[str, t.Container]:
+) -> Mapping[str, t.JsonValue]:
     """Validate code against YAML rules."""
     engine = FlextQualityRulesEngine()
     result = engine.validate(path=path, context=context)
     if result.failure:
         return {"error": result.error}
-    return {"violations": result.value}
+    return {"violations": u.Cli.normalize_json_value(result.value)}

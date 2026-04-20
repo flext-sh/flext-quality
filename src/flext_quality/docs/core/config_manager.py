@@ -352,7 +352,19 @@ class FlextQualityConfigManager:
             config_path = self.config_dir / f"{name}.yaml"
             self.config_dir.mkdir(parents=True, exist_ok=True)
 
-            result = u.Cli.yaml_dump(config_path, data)
+            normalized_data: dict[str, t.Container] = {}
+            for section_name, section in data.items():
+                normalized_section: dict[str, t.JsonValue] = {}
+                for key, value in section.items():
+                    if isinstance(value, Sequence) and not isinstance(
+                        value, (str, bytes)
+                    ):
+                        normalized_section[key] = [str(item) for item in value]
+                    else:
+                        normalized_section[key] = value
+                normalized_data[section_name] = normalized_section
+
+            result = u.Cli.yaml_dump(config_path, normalized_data)
             if result.failure:
                 return False
 

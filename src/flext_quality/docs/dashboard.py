@@ -109,9 +109,10 @@ class FlextQualityDocumentationDashboard:
                 metrics_raw if isinstance(metrics_raw, Mapping) else {}
             )
             severity_raw = metrics.get("severity_breakdown")
-            severity: Mapping[str, t.Container] = (
-                severity_raw if isinstance(severity_raw, Mapping) else {}
-            )
+            severity: dict[str, t.JsonValue] = {}
+            if isinstance(severity_raw, Mapping):
+                for key, value in severity_raw.items():
+                    severity[str(key)] = value if isinstance(value, int) else 0
             files_analyzed_raw = data.get("files_analyzed")
             timestamp_raw = data.get("timestamp")
             qs_raw = metrics.get("quality_score", 0)
@@ -149,7 +150,7 @@ class FlextQualityDocumentationDashboard:
         """Get quality trends over the specified number of days."""
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
 
-        trend_data: MutableSequence[Mapping[str, t.Container]] = []
+        trend_data: MutableSequence[dict[str, t.JsonValue]] = []
         reports_dir = self.reports_dir
 
         # Find all audit reports
@@ -184,13 +185,14 @@ class FlextQualityDocumentationDashboard:
                     critical_issues: int = crit_v if isinstance(crit_v, int) else 0
                     high_v = sev_m.get("high", 0)
                     high_issues: int = high_v if isinstance(high_v, int) else 0
-                    trend_data.append({
+                    trend_entry: dict[str, t.JsonValue] = {
                         "date": report_date.isoformat(),
                         "quality_score": quality_score,
                         "total_issues": total_issues,
                         "critical_issues": critical_issues,
                         "high_issues": high_issues,
-                    })
+                    }
+                    trend_data.append(trend_entry)
             except (
                 FileNotFoundError,
                 ValueError,
@@ -205,18 +207,17 @@ class FlextQualityDocumentationDashboard:
 
         # Sort by date
         trend_data = sorted(trend_data, key=operator.itemgetter("date"))
+        trend_values: list[t.JsonValue] = list(trend_data)
 
         return {
             "period_days": days,
             "data_points": len(trend_data),
-            "trends": trend_data,
+            "trends": trend_values,
         }
 
-    def get_recent_reports(
-        self, limit: int = 10
-    ) -> Sequence[Mapping[str, t.Container]]:
+    def get_recent_reports(self, limit: int = 10) -> Sequence[dict[str, t.JsonValue]]:
         """Get list of recent audit reports."""
-        reports: MutableSequence[Mapping[str, t.Container]] = []
+        reports: MutableSequence[dict[str, t.JsonValue]] = []
 
         for report_file in self.reports_dir.glob("audit_report_*.json"):
             try:
