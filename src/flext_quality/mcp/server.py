@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from fastmcp import FastMCP
-
 from flext_quality import c
 
 _mcp = FastMCP(name=c.Quality.Mcp.SERVER_NAME, version=c.Quality.Mcp.SERVER_VERSION)

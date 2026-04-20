@@ -16,8 +16,8 @@ from pathlib import Path
 from typing import Annotated, ClassVar, Self, override
 
 from flext_cli import FlextCliSettings, cli, m, u
-
 from flext_core import FlextSettings, s
+
 from flext_quality import FlextQuality, FlextQualityCodeExecutionBridge, p, r, t
 
 

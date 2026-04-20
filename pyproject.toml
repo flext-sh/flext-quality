@@ -157,7 +157,29 @@ omit = [ "*/dependency_injector/providers.pyx" ]
 
 # [MANAGED] deptry
 [tool.deptry]
-known_first_party = [ "flext_core", "flext_quality" ]
+known_first_party = [
+  "aiohttp (",
+  "click",
+  "fastapi",
+  "fastmcp",
+  "flext-core",
+  "flext_quality",
+  "gitpython",
+  "httpx",
+  "libcst",
+  "mypy",
+  "pydantic",
+  "pydantic-core",
+  "pydantic-settings",
+  "pyright",
+  "pyyaml",
+  "referencing",
+  "rich",
+  "schedule",
+  "typer",
+  "uvicorn",
+  "wrapt",
+]
 pep621_dev_dependency_groups = [ "dev" ]
 
 [tool.flext.docs]
@@ -482,7 +504,29 @@ select = [ "ALL" ]
 [tool.ruff.lint.isort]
 combine-as-imports = true
 force-single-line = false
-known-first-party = [ "flext_core", "flext_quality" ]
+known-first-party = [
+  "aiohttp (",
+  "click",
+  "fastapi",
+  "fastmcp",
+  "flext-core",
+  "flext_quality",
+  "gitpython",
+  "httpx",
+  "libcst",
+  "mypy",
+  "pydantic",
+  "pydantic-core",
+  "pydantic-settings",
+  "pyright",
+  "pyyaml",
+  "referencing",
+  "rich",
+  "schedule",
+  "typer",
+  "uvicorn",
+  "wrapt",
+]
 split-on-trailing-comma = true
 
 [tool.ruff.lint.per-file-ignores]
