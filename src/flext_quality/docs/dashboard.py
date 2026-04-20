@@ -8,7 +8,11 @@ from __future__ import annotations
 
 import argparse
 import operator
-from collections.abc import Mapping, MutableSequence, Sequence
+from collections.abc import (
+    Mapping,
+    MutableSequence,
+    Sequence,
+)
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 

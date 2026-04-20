@@ -6,7 +6,9 @@ import io
 import sys
 import tempfile
 import threading
-from collections.abc import MutableSequence
+from collections.abc import (
+    MutableSequence,
+)
 from pathlib import Path
 
 from flext_tests import tm

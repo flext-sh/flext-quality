@@ -8,7 +8,11 @@ from __future__ import annotations
 
 import fnmatch
 import logging
-from collections.abc import MutableMapping, MutableSequence, Sequence
+from collections.abc import (
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import ClassVar

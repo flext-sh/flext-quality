@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, MutableSequence, Sequence
+from collections.abc import (
+    Mapping,
+    MutableSequence,
+    Sequence,
+)
 
 from flext_cli import m, t
 from flext_web import FlextWebTypes

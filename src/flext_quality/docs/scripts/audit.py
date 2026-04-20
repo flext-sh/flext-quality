@@ -14,7 +14,11 @@ from __future__ import annotations
 
 import argparse
 import re
-from collections.abc import MutableMapping, MutableSequence, Sequence
+from collections.abc import (
+    MutableMapping,
+    MutableSequence,
+    Sequence,
+)
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 

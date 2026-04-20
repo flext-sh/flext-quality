@@ -15,7 +15,11 @@ import argparse
 import logging
 import re
 import shutil
-from collections.abc import Mapping, MutableSequence, Sequence
+from collections.abc import (
+    Mapping,
+    MutableSequence,
+    Sequence,
+)
 from datetime import UTC, datetime
 from pathlib import Path
 

@@ -6,7 +6,11 @@ Handles loading, validation, and access to configuration files.
 
 from __future__ import annotations
 
-from collections.abc import Mapping, MutableMapping, Sequence
+from collections.abc import (
+    Mapping,
+    MutableMapping,
+    Sequence,
+)
 from pathlib import Path
 
 from flext_quality import t, u

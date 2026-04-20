@@ -11,7 +11,11 @@ import asyncio
 import pathlib
 import re
 import time
-from collections.abc import Mapping, MutableSequence, Sequence
+from collections.abc import (
+    Mapping,
+    MutableSequence,
+    Sequence,
+)
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
 from typing import ClassVar
