@@ -330,7 +330,7 @@ ls docs/maintenance/settings/
 
 # Test configuration loading
 python -c "
-from docs.maintenance.scripts.audit import DocumentationAuditor
+from docs import  DocumentationAuditor
 auditor = DocumentationAuditor()
 print('✅ Configuration loaded successfully')
 "
@@ -814,7 +814,7 @@ python scripts/audit.py --style-check --verbose
 ### Audit Script API
 
 ```python
-from docs.maintenance.scripts.audit import DocumentationAuditor
+from docs import DocumentationAuditor
 
 auditor = DocumentationAuditor(config_path="docs/maintenance/settings/")
 results = auditor.run_comprehensive_audit()
@@ -824,7 +824,7 @@ report = auditor.generate_report(format="json")
 ### Validation Tools
 
 ```python
-from docs.maintenance.tools.link_checker import LinkValidator
+from docs import LinkValidator
 
 validator = LinkValidator(timeout=10, retries=3)
 results = validator.check_external_links(doc_files)
@@ -910,7 +910,7 @@ custom_checks:
     message: "Use approved company terminology"
 
 # Create custom validator
-from docs.maintenance.tools.base_validator import BaseValidator
+from docs import  BaseValidator
 
 class CustomValidator(BaseValidator):
     def validate(self, content: str, file_path: Path) -> List[Dict]:
@@ -922,7 +922,7 @@ class CustomValidator(BaseValidator):
 
 ```python
 # Add new validation tools to the pipeline
-from docs.maintenance.scripts.audit import DocumentationAuditor
+from docs import DocumentationAuditor
 
 
 class ExtendedAuditor(DocumentationAuditor):
@@ -936,7 +936,7 @@ class ExtendedAuditor(DocumentationAuditor):
 
 ```python
 # REST API for external integrations
-from docs.maintenance.api.server import MaintenanceAPI
+from docs import MaintenanceAPI
 
 api = MaintenanceAPI()
 api.add_route("/audit", audit_endpoint)

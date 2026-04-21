@@ -148,7 +148,7 @@ class FlextQualityContentAnalyzer:
             config_path: Path to configuration file for content analysis rules.
 
         """
-        self.settings: Mapping[str, t.Container] = {}
+        self.settings: Mapping[str, t.JsonMapping | str] = {}
         self.load_config(config_path)
         self.results: FlextQualityContentAnalyzer.Results = (
             FlextQualityContentAnalyzer.Results(
