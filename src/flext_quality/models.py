@@ -13,7 +13,7 @@ from collections.abc import (
     Sequence,
 )
 from pathlib import Path
-from typing import Annotated, ClassVar
+from typing import Annotated
 
 from flext_web import m, u
 
@@ -130,8 +130,6 @@ class FlextQualityModels(m):
 
         class ValidationResult(m.BaseModel):
             """Canonical validation result for documentation tooling."""
-
-            _flext_enforcement_exempt: ClassVar[bool] = True
 
             total_items: int = 0
             valid_items: int = 0
@@ -607,8 +605,6 @@ class FlextQualityModels(m):
 
         class ExecutionResult(m.BaseModel):
             """Structured result payload from a command execution."""
-
-            _flext_enforcement_exempt: ClassVar[bool] = True
 
             success: bool
             exit_code: int
