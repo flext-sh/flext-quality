@@ -9,13 +9,12 @@ from collections.abc import (
 )
 from pathlib import Path
 
-from flext_cli import FlextCliUtilities
-from flext_web import FlextWebUtilities
+from flext_web import u
 
 from flext_quality import c, p, r, t
 
 
-class FlextQualityUtilities(FlextCliUtilities, FlextWebUtilities):
+class FlextQualityUtilities(u):
     """Namespace for flext-quality utilities."""
 
     class Quality:

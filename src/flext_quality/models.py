@@ -15,13 +15,12 @@ from collections.abc import (
 from pathlib import Path
 from typing import Annotated, ClassVar
 
-from flext_cli import m, u
-from flext_web import FlextWebModels
+from flext_web import m, u
 
 from flext_quality import c, t
 
 
-class FlextQualityModels(m, FlextWebModels):
+class FlextQualityModels(m):
     """Namespace for flext-quality models."""
 
     class Quality:
@@ -58,7 +57,7 @@ class FlextQualityModels(m, FlextWebModels):
             system_message: Annotated[str | None, u.Field(alias="systemMessage")] = None
             blocked_reason: str | None = None
 
-            model_config: ClassVar[dict[str, bool]] = {"populate_by_name": True}
+            model_config = m.ConfigDict(populate_by_name=True)
 
         class RuleDefinition(m.BaseModel):
             """A rule definition from YAML."""

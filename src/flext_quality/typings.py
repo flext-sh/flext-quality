@@ -8,11 +8,10 @@ from collections.abc import (
     Sequence,
 )
 
-from flext_cli import m, t
-from flext_web import FlextWebTypes
+from flext_web import m, t
 
 
-class FlextQualityTypes(t, FlextWebTypes):
+class FlextQualityTypes(t):
     """Namespace for flext-quality type definitions."""
 
     CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[Mapping[str, t.Container]] = m.TypeAdapter(

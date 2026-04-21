@@ -9,13 +9,12 @@ from collections.abc import (
 from pathlib import Path
 from typing import ClassVar, Protocol, runtime_checkable
 
-from flext_cli import p
-from flext_web import FlextWebProtocols
+from flext_web import p
 
 from flext_quality import t
 
 
-class FlextQualityProtocols(p, FlextWebProtocols):
+class FlextQualityProtocols(p):
     """Namespace for flext-quality protocols."""
 
     @runtime_checkable
@@ -138,4 +137,5 @@ class FlextQualityProtocols(p, FlextWebProtocols):
 
 
 p = FlextQualityProtocols
+
 __all__: list[str] = ["FlextQualityProtocols", "p"]
