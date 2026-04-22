@@ -20,9 +20,9 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+import schedule
 from git import InvalidGitRepositoryError, Repo
 
-import schedule
 from flext_quality import m, t, u
 
 logger = u.fetch_logger(__name__)
