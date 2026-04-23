@@ -26,7 +26,7 @@ from flext_quality import m, t, u
 class FlextQualityContentAnalyzer:
     """Advanced content quality analysis system."""
 
-    class AnalyzerConfig(m.BaseModel, total=False):
+    class AnalyzerConfig(m.BaseModel):
         """Configuration dictionary structure."""
 
         content_checks: t.BoolMapping | None = None

@@ -534,9 +534,9 @@ class MockReportGenerator:
             Generated report filename
 
         """
-        report = {
+        report: t.JsonMapping = {
             "format": output_format,
-            "data": data,
+            "data": dict(data),
             "timestamp": "2023-01-01T12:00:00Z",
         }
         self.generated_reports.append(report)

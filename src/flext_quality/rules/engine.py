@@ -131,7 +131,7 @@ class FlextQualityRulesEngine:
         context: t.JsonMapping,
     ) -> Sequence[t.JsonMapping]:
         """Validate a single file against rules."""
-        validation_context = (
+        validation_context: dict[str, t.JsonValue] = (
             {str(key): value for key, value in context.items()} if context else {}
         )
         try:
