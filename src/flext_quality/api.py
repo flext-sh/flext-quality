@@ -65,7 +65,7 @@ class FlextQuality:
 
     _instance: ClassVar[FlextQuality | None] = None
     _lock: ClassVar[threading.Lock] = threading.Lock()
-    _name: str
+    name: str
     _version: str
     _container: p.Container
     logger: p.Logger
@@ -75,7 +75,7 @@ class FlextQuality:
 
     def __init__(self) -> None:
         """Initialize consolidated quality API with all functionality integrated."""
-        self._name = c.Quality.Mcp.SERVER_NAME
+        self.name = c.Quality.Mcp.SERVER_NAME
         self._version = c.Quality.Mcp.SERVER_VERSION
         self.logger = u.fetch_logger(__name__)
         self.settings = FlextQualitySettings.get_instance()
@@ -152,7 +152,7 @@ class FlextQuality:
 
         """
         return {
-            "name": self._name,
+            "name": self.name,
             "version": self._version,
             "settings": {
                 "hook_timeout_ms": self.settings.hook_timeout_ms,

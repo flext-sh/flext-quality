@@ -128,9 +128,12 @@ class FlextQualityRulesEngine:
     def _validate_file(
         self,
         file_path: Path,
-        _context: t.JsonMapping,
+        context: t.JsonMapping,
     ) -> Sequence[t.JsonMapping]:
         """Validate a single file against rules."""
+        validation_context = (
+            {str(key): value for key, value in context.items()} if context else {}
+        )
         try:
             content = file_path.read_text(encoding="utf-8")
         except (
@@ -148,6 +151,7 @@ class FlextQualityRulesEngine:
                     "file": str(file_path),
                     "message": f"Failed to read file: {e}",
                     "severity": c.Quality.Severity.ERROR,
+                    "context": validation_context,
                 },
             ]
         violations: MutableSequence[t.JsonMapping] = []
@@ -155,5 +159,10 @@ class FlextQualityRulesEngine:
             if not rule.enabled:
                 continue
             rule_violations = self._check_rule(rule, content, str(file_path))
+            if validation_context:
+                rule_violations = [
+                    {**violation, "context": validation_context}
+                    for violation in rule_violations
+                ]
             violations.extend(rule_violations)
         return violations
