@@ -86,7 +86,7 @@ class FlextQualityDocumentationDashboard:
 
     def get_current_metrics(
         self,
-    ) -> Mapping[str, t.Container]:
+    ) -> t.JsonMapping:
         """Get current quality metrics from latest audit."""
         latest_audit = self.reports_dir / "latest_audit.json"
 
@@ -105,11 +105,11 @@ class FlextQualityDocumentationDashboard:
                 Path(latest_audit).read_bytes()
             )
             metrics_raw = data.get("metrics")
-            metrics: Mapping[str, t.Container] = (
+            metrics: t.JsonMapping = (
                 metrics_raw if isinstance(metrics_raw, Mapping) else {}
             )
             severity_raw = metrics.get("severity_breakdown")
-            severity: dict[str, t.JsonValue] = {}
+            severity: t.JsonMapping = {}
             if isinstance(severity_raw, Mapping):
                 for key, value in severity_raw.items():
                     severity[str(key)] = value if isinstance(value, int) else 0
@@ -146,11 +146,11 @@ class FlextQualityDocumentationDashboard:
     def get_quality_trends(
         self,
         days: int = 30,
-    ) -> Mapping[str, t.Container]:
+    ) -> t.JsonMapping:
         """Get quality trends over the specified number of days."""
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
 
-        trend_data: MutableSequence[dict[str, t.JsonValue]] = []
+        trend_data: MutableSequence[t.JsonMapping] = []
         reports_dir = self.reports_dir
 
         # Find all audit reports
@@ -170,13 +170,11 @@ class FlextQualityDocumentationDashboard:
                         Path(report_file).read_bytes()
                     )
                     metrics_v = data.get("metrics")
-                    metrics_m: Mapping[str, t.Container] = (
+                    metrics_m: t.JsonMapping = (
                         metrics_v if isinstance(metrics_v, Mapping) else {}
                     )
                     sev_v = metrics_m.get("severity_breakdown")
-                    sev_m: Mapping[str, t.Container] = (
-                        sev_v if isinstance(sev_v, Mapping) else {}
-                    )
+                    sev_m: t.JsonMapping = sev_v if isinstance(sev_v, Mapping) else {}
                     qs_v = metrics_m.get("quality_score", 0)
                     quality_score: int = qs_v if isinstance(qs_v, int) else 0
                     ti_v = metrics_m.get("total_issues", 0)
@@ -185,7 +183,7 @@ class FlextQualityDocumentationDashboard:
                     critical_issues: int = crit_v if isinstance(crit_v, int) else 0
                     high_v = sev_m.get("high", 0)
                     high_issues: int = high_v if isinstance(high_v, int) else 0
-                    trend_entry: dict[str, t.JsonValue] = {
+                    trend_entry: t.JsonMapping = {
                         "date": report_date.isoformat(),
                         "quality_score": quality_score,
                         "total_issues": total_issues,
@@ -215,9 +213,9 @@ class FlextQualityDocumentationDashboard:
             "trends": trend_values,
         }
 
-    def get_recent_reports(self, limit: int = 10) -> Sequence[dict[str, t.JsonValue]]:
+    def get_recent_reports(self, limit: int = 10) -> Sequence[t.JsonMapping]:
         """Get list of recent audit reports."""
-        reports: MutableSequence[dict[str, t.JsonValue]] = []
+        reports: MutableSequence[t.JsonMapping] = []
 
         for report_file in self.reports_dir.glob("audit_report_*.json"):
             try:
@@ -234,7 +232,7 @@ class FlextQualityDocumentationDashboard:
                 )
 
                 metrics_rv = data.get("metrics")
-                metrics_rm: Mapping[str, t.Container] = (
+                metrics_rm: t.JsonMapping = (
                     metrics_rv if isinstance(metrics_rv, Mapping) else {}
                 )
                 qs_rv = metrics_rm.get("quality_score", 0)

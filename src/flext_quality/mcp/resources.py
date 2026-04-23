@@ -41,7 +41,7 @@ def get_rules_config() -> str:
 @_mcp.resource("status://integrations")
 def get_integrations_status() -> str:
     """Get status of all integrations."""
-    status: dict[str, t.JsonValue] = {}
+    status: t.JsonMapping = {}
     mem_client = FlextQualityClaudeMemClient()
     mem_health = mem_client.health_check()
     mem_status: t.JsonValue = (

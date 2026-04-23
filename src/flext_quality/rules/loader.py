@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import (
-    Mapping,
     MutableSequence,
     Sequence,
 )
@@ -31,25 +30,21 @@ class FlextQualityRulesLoader:
             return r[Sequence[m.Quality.RuleDefinition]].fail(
                 "Invalid YAML: expected dict at root",
             )
-        parsed_dict: Mapping[str, t.Container] = (
-            t.CONTAINER_MAPPING_ADAPTER.validate_python(parsed)
-        )
+        parsed_dict: t.JsonMapping = t.CONTAINER_MAPPING_ADAPTER.validate_python(parsed)
         rules_data_val = parsed_dict.get("rules", [])
         if not isinstance(rules_data_val, list):
             return r[Sequence[m.Quality.RuleDefinition]].fail(
                 "Invalid YAML: 'rules' must be a list",
             )
-        rules_data: Sequence[Mapping[str, t.Container]] = (
+        rules_data: Sequence[t.JsonMapping] = (
             t.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.validate_python(
                 rules_data_val,
             )
         )
         rules: MutableSequence[m.Quality.RuleDefinition] = []
         for idx, rule_data in enumerate(rules_data):
-            rule_dict: Mapping[str, t.Container] = (
-                t.CONTAINER_MAPPING_ADAPTER.validate_python(
-                    dict(rule_data),
-                )
+            rule_dict: t.JsonMapping = t.CONTAINER_MAPPING_ADAPTER.validate_python(
+                dict(rule_data),
             )
             result = self._parse_rule(rule_dict, idx)
             if result.failure:
@@ -74,7 +69,7 @@ class FlextQualityRulesLoader:
 
     def _parse_rule(
         self,
-        data: Mapping[str, t.Container],
+        data: t.JsonMapping,
         index: int,
     ) -> p.Result[m.Quality.RuleDefinition]:
         """Parse a single rule from dict."""

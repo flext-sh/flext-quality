@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import sys
 from collections.abc import (
-    Mapping,
     Sequence,
 )
 from pathlib import Path
@@ -40,33 +39,33 @@ class FlextQualityUtilities(u):
         @staticmethod
         def load_yaml_rules(
             path: Path,
-        ) -> p.Result[Sequence[Mapping[str, t.Container]]]:
+        ) -> p.Result[Sequence[t.JsonMapping]]:
             """Load rules from YAML file."""
             try:
                 yaml_result = FlextQualityUtilities.Cli.yaml_safe_load(path)
                 if yaml_result.failure:
-                    return r[Sequence[Mapping[str, t.Container]]].fail(
+                    return r[Sequence[t.JsonMapping]].fail(
                         f"Failed to load YAML: {yaml_result.error}",
                     )
                 parsed = yaml_result.value
                 if not isinstance(parsed, dict):
-                    return r[Sequence[Mapping[str, t.Container]]].fail(
+                    return r[Sequence[t.JsonMapping]].fail(
                         "Expected YAML dict",
                     )
-                parsed_dict: Mapping[str, t.Container] = (
+                parsed_dict: t.JsonMapping = (
                     t.CONTAINER_MAPPING_ADAPTER.validate_python(parsed)
                 )
                 raw_rules_val = parsed_dict.get("rules", [])
                 if not isinstance(raw_rules_val, list):
-                    return r[Sequence[Mapping[str, t.Container]]].fail(
+                    return r[Sequence[t.JsonMapping]].fail(
                         "Expected rules list",
                     )
-                rules: Sequence[Mapping[str, t.Container]] = [
+                rules: Sequence[t.JsonMapping] = [
                     t.CONTAINER_MAPPING_ADAPTER.validate_python(item)
                     for item in raw_rules_val
                     if isinstance(item, dict)
                 ]
-                return r[Sequence[Mapping[str, t.Container]]].ok(rules)
+                return r[Sequence[t.JsonMapping]].ok(rules)
             except (
                 ValueError,
                 TypeError,
@@ -76,7 +75,7 @@ class FlextQualityUtilities(u):
                 RuntimeError,
                 ImportError,
             ) as e:
-                return r[Sequence[Mapping[str, t.Container]]].fail(
+                return r[Sequence[t.JsonMapping]].fail(
                     f"Failed to load rules: {e}",
                 )
 
@@ -84,10 +83,8 @@ class FlextQualityUtilities(u):
         def parse_hook_input(raw: str) -> p.Result[t.Quality.HookInput]:
             """Parse hook input JSON."""
             try:
-                parsed: Mapping[str, t.Container] = (
-                    t.CONTAINER_MAPPING_ADAPTER.validate_json(raw)
-                )
-                coerced_input: Mapping[str, t.Container] = parsed
+                parsed: t.JsonMapping = t.CONTAINER_MAPPING_ADAPTER.validate_json(raw)
+                coerced_input: t.JsonMapping = parsed
                 return r[t.Quality.HookInput].ok(coerced_input)
             except ValueError as e:
                 return r[t.Quality.HookInput].fail(f"Invalid JSON: {e}")

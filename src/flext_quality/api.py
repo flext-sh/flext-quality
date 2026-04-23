@@ -12,7 +12,6 @@ from __future__ import annotations
 
 import threading
 from collections.abc import (
-    Mapping,
     Sequence,
 )
 from pathlib import Path
@@ -145,11 +144,11 @@ class FlextQuality:
         """Get hooks configuration as JSON string."""
         return self.hooks.get_config_json()
 
-    def get_status(self) -> Mapping[str, t.Container]:
+    def get_status(self) -> t.JsonMapping:
         """Get quality service status.
 
         Returns:
-            Mapping[str, t.Container]: Status information
+            t.JsonMapping: Status information
 
         """
         return {

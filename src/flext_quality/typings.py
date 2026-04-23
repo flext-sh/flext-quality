@@ -14,29 +14,27 @@ from flext_web import m, t
 class FlextQualityTypes(t):
     """Namespace for flext-quality type definitions."""
 
-    CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[Mapping[str, t.Container]] = m.TypeAdapter(
-        Mapping[str, t.Container],
+    CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.JsonMapping] = m.TypeAdapter(
+        t.JsonMapping,
     )
-    RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[Mapping[str, t.Container]] = (
-        m.TypeAdapter(
-            Mapping[str, t.Container],
-            config=m.ConfigDict(strict=False),
-        )
+    RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.JsonMapping] = m.TypeAdapter(
+        t.JsonMapping,
+        config=m.ConfigDict(strict=False),
     )
-    CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
-        Sequence[Mapping[str, t.Container]]
-    ] = m.TypeAdapter(Sequence[Mapping[str, t.Container]])
+    CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[Sequence[t.JsonMapping]] = (
+        m.TypeAdapter(Sequence[t.JsonMapping])
+    )
     RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
-        Sequence[Mapping[str, t.Container]]
+        Sequence[t.JsonMapping]
     ] = m.TypeAdapter(
-        Sequence[Mapping[str, t.Container]],
+        Sequence[t.JsonMapping],
         config=m.ConfigDict(strict=False),
     )
     MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: m.TypeAdapter[
         t.MutableOptionalFeatureFlagMapping
     ] = m.TypeAdapter(t.MutableOptionalFeatureFlagMapping)
-    NORMALIZED_VALUE_SEQUENCE_ADAPTER: m.TypeAdapter[Sequence[t.RecursiveValue]] = (
-        m.TypeAdapter(Sequence[t.RecursiveValue])
+    NORMALIZED_VALUE_SEQUENCE_ADAPTER: m.TypeAdapter[t.JsonList] = m.TypeAdapter(
+        t.JsonList
     )
     STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: m.TypeAdapter[
         MutableSequence[t.StrMapping]
@@ -45,16 +43,16 @@ class FlextQualityTypes(t):
     class Quality:
         """Quality-specific types namespace."""
 
-        type HookInput = Mapping[str, t.Container]
-        type HookOutput = Mapping[str, t.Container]
+        type HookInput = t.JsonMapping
+        type HookOutput = t.JsonMapping
         type HookMatcher = t.StrSequence | None
-        type RuleConfig = Mapping[str, t.Container]
+        type RuleConfig = t.JsonMapping
         type RuleResult = tuple[bool, str | None]
-        type McpToolResult = Mapping[str, t.Container]
+        type McpToolResult = t.JsonMapping
         type McpResource = t.StrMapping
         type MemoryQuery = Mapping[str, str | int | t.StrSequence]
         type ContextQuery = t.HeaderMapping
-        type GenericItem = t.Container | Mapping[str, t.Primitives | None]
+        type GenericItem = t.JsonValue | Mapping[str, t.Primitives | None]
         type DocumentationReportValue = (
             str
             | int

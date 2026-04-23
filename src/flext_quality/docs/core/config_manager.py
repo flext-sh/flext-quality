@@ -133,7 +133,7 @@ class FlextQualityConfigManager:
     """Centralized configuration management for the documentation maintenance system."""
 
     @staticmethod
-    def _as_section(value: RawSectionMap | t.Container) -> ConfigSection:
+    def _as_section(value: RawSectionMap | t.JsonValue) -> ConfigSection:
         """Normalize any value into a configuration section mapping."""
         if not isinstance(value, Mapping):
             return {}
@@ -148,7 +148,7 @@ class FlextQualityConfigManager:
 
     @staticmethod
     def _as_config_data(
-        value: RawConfigMap | Mapping[str, t.Container] | None,
+        value: RawConfigMap | t.JsonMapping | None,
     ) -> ConfigData:
         """Normalize loaded YAML content into typed settings data."""
         if not isinstance(value, Mapping):
@@ -352,9 +352,9 @@ class FlextQualityConfigManager:
             config_path = self.config_dir / f"{name}.yaml"
             self.config_dir.mkdir(parents=True, exist_ok=True)
 
-            normalized_data: dict[str, t.Container] = {}
+            normalized_data: dict[str, t.JsonValue] = {}
             for section_name, section in data.items():
-                normalized_section: dict[str, t.JsonValue] = {}
+                normalized_section: t.JsonMapping = {}
                 for key, value in section.items():
                     if isinstance(value, Sequence) and not isinstance(
                         value, (str, bytes)

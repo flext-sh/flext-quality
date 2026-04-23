@@ -1,9 +1,5 @@
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
-
 from flext_quality import FlextQualityMcpClient, c, p, r, t
 
 
@@ -14,18 +10,18 @@ class FlextQualityIntegrationsHealth:
     def build_mcp_health_result(
         server_name: str,
         mcp_client: FlextQualityMcpClient,
-    ) -> p.Result[Mapping[str, t.Container]]:
+    ) -> p.Result[t.JsonMapping]:
         """Build a normalized health result for a named MCP server."""
         mcp_health = mcp_client.health_check()
         if mcp_health.failure:
-            return r[Mapping[str, t.Container]].fail(mcp_health.error)
+            return r[t.JsonMapping].fail(mcp_health.error)
         health_data = mcp_health.value
         status = (
             c.Quality.IntegrationStatus.CONNECTED
             if health_data.get("available", False)
             else c.Quality.IntegrationStatus.DISCONNECTED
         )
-        return r[Mapping[str, t.Container]].ok({
+        return r[t.JsonMapping].ok({
             "server": server_name,
             "status": status,
             "available": health_data.get("available", False),

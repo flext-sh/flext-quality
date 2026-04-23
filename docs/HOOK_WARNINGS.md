@@ -533,7 +533,7 @@ ______________________________________________________________________
 - **PF012**: `.git/settings` modifications
 
   - Problem: Git configuration is user-controlled
-  - Fix: User manages with `git settings` commands
+  - Fix: User manages with `git config` commands
 
 - **PF013**: `.git/index` modifications
 

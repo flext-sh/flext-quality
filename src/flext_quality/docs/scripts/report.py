@@ -288,14 +288,14 @@ class FlextQualityDocumentationReporter:
                 validation_errors_raw = link_validation.get("errors")
                 if not isinstance(validation_errors_raw, list):
                     return recommendations
-                validation_errors_list: Sequence[t.Container] = list(
+                validation_errors_list: t.JsonList = list(
                     validation_errors_raw,
                 )
                 if validation_errors_list:
                     broken_links: MutableSequence[Mapping[str, t.Primitives]] = []
                     for e_raw in validation_errors_list:
                         try:
-                            error_entry: Mapping[str, t.Container] = (
+                            error_entry: t.JsonMapping = (
                                 t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
                                     e_raw
                                 )

@@ -9,9 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Mapping,
-)
 from typing import final
 
 from flext_quality import (
@@ -41,7 +38,7 @@ class FlextQualityClaudeContextClient:
         self, path: str | None = None
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build an index_codebase tool call."""
-        params: t.MutableFlatContainerMapping = {}
+        params: t.MutableJsonMapping = {}
         if path:
             params["path"] = path
         return self._mcp.build_tool_call(self.SERVER_NAME, "index_codebase", params)
@@ -80,6 +77,6 @@ class FlextQualityClaudeContextClient:
             self._mcp.build_call_command,
         )
 
-    def health_check(self) -> p.Result[Mapping[str, t.Container]]:
+    def health_check(self) -> p.Result[t.JsonMapping]:
         """Check if claude-context is available."""
         return self._mcp.build_server_health_result(self.SERVER_NAME)

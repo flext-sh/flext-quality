@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
+from collections.abc import (
+    Mapping,
+)
 
 from flext_quality import (
     FlextQualityClaudeContextClient,
@@ -24,7 +26,7 @@ def search_memory(
     *,
     search_type: str = "observations",
     limit: int | None = None,
-) -> Mapping[str, t.JsonValue]:
+) -> t.JsonMapping:
     """Build command to search cross-session memory via claude-mem.
 
     Returns the mcp-cli command that can be used to execute the search.
@@ -55,7 +57,7 @@ def search_code(
     query: str,
     *,
     limit: int | None = None,
-) -> Mapping[str, t.JsonValue]:
+) -> t.JsonMapping:
     """Build command for semantic code search via claude-context.
 
     Returns the mcp-cli command that can be used to execute the search.
@@ -95,8 +97,8 @@ def execute_hook(event: str, input_data: t.Quality.HookInput) -> t.Quality.HookO
 def validate_rules(
     path: str,
     *,
-    context: Mapping[str, t.Container] | None = None,
-) -> Mapping[str, t.JsonValue]:
+    context: t.JsonMapping | None = None,
+) -> t.JsonMapping:
     """Validate code against YAML rules."""
     engine = FlextQualityRulesEngine()
     result = engine.validate(path=path, context=context)

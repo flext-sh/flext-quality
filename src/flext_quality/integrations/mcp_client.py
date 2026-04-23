@@ -13,7 +13,6 @@ import shutil
 from collections.abc import (
     Mapping,
     MutableSequence,
-    Sequence,
 )
 from typing import final
 
@@ -53,12 +52,12 @@ class FlextQualityMcpClient:
         self,
         server: str,
         tool: str,
-        params: Mapping[str, t.Container] | None = None,
+        params: t.JsonMapping | None = None,
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build an MCP tool call request."""
-        call_params: Mapping[str, t.Container] = {}
+        call_params = {}
         if isinstance(params, Mapping):
-            validated_params: Mapping[str, t.Container] = (
+            validated_params: t.JsonMapping = (
                 t.CONTAINER_MAPPING_ADAPTER.validate_python(params)
             )
             call_params = dict(validated_params)
@@ -70,7 +69,7 @@ class FlextQualityMcpClient:
             }),
         )
 
-    def health_check(self) -> p.Result[Mapping[str, t.Container]]:
+    def health_check(self) -> p.Result[t.JsonMapping]:
         """Check if MCP infrastructure is available."""
         available = self.is_mcp_cli_available()
         status = (
@@ -78,27 +77,25 @@ class FlextQualityMcpClient:
             if available
             else c.Quality.IntegrationStatus.DISCONNECTED
         )
-        return r[Mapping[str, t.Container]].ok({
+        return r[t.JsonMapping].ok({
             "status": status,
             "available": available,
             "mcp_cli": available,
             "timeout_ms": self._timeout_ms,
         })
 
-    def build_server_health_result(
-        self, server_name: str
-    ) -> p.Result[Mapping[str, t.Container]]:
+    def build_server_health_result(self, server_name: str) -> p.Result[t.JsonMapping]:
         """Build a normalized health result for a named MCP server."""
         mcp_health = self.health_check()
         if mcp_health.failure:
-            return r[Mapping[str, t.Container]].fail(mcp_health.error)
+            return r[t.JsonMapping].fail(mcp_health.error)
         health_data = mcp_health.value
         status = (
             c.Quality.IntegrationStatus.CONNECTED
             if health_data.get("available", False)
             else c.Quality.IntegrationStatus.DISCONNECTED
         )
-        return r[Mapping[str, t.Container]].ok({
+        return r[t.JsonMapping].ok({
             "server": server_name,
             "status": status,
             "available": health_data.get("available", False),
@@ -122,9 +119,7 @@ class FlextQualityMcpClient:
                 ),
             )
         try:
-            parsed: Mapping[str, t.Container] = (
-                t.CONTAINER_MAPPING_ADAPTER.validate_json(output)
-            )
+            parsed: t.JsonMapping = t.CONTAINER_MAPPING_ADAPTER.validate_json(output)
             result_data: t.StrMapping = {str(k): str(v) for k, v in parsed.items()}
             return r[m.Quality.McpToolResult].ok(
                 m.Quality.McpToolResult.model_validate({
@@ -135,7 +130,7 @@ class FlextQualityMcpClient:
             )
         except ValueError:
             try:
-                parsed_list: Sequence[t.Container] = (
+                parsed_list: t.JsonList = (
                     t.NORMALIZED_VALUE_SEQUENCE_ADAPTER.validate_json(
                         output,
                     )
@@ -143,7 +138,7 @@ class FlextQualityMcpClient:
                 coerced_data: MutableSequence[t.StrMapping] = []
                 for item in parsed_list:
                     if isinstance(item, Mapping):
-                        validated_item: Mapping[str, t.Container] = (
+                        validated_item: t.JsonMapping = (
                             t.CONTAINER_MAPPING_ADAPTER.validate_python(item)
                         )
                         coerced_data.append({

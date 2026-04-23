@@ -8,7 +8,6 @@ from __future__ import annotations
 
 import sys
 from collections.abc import (
-    Mapping,
     MutableSequence,
     Sequence,
 )
@@ -26,12 +25,12 @@ class FlextQualityCli(s[bool]):
 
     app_name: ClassVar[str] = "flext-quality"
 
-    class Status(s[Mapping[str, t.Container]]):
+    class Status(s[t.JsonMapping]):
         """Display quality service status."""
 
         @override
-        def execute(self) -> p.Result[Mapping[str, t.Container]]:
-            return r[Mapping[str, t.Container]].ok(
+        def execute(self) -> p.Result[t.JsonMapping]:
+            return r[t.JsonMapping].ok(
                 FlextQuality.get_instance().get_status(),
             )
 

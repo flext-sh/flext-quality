@@ -11,7 +11,6 @@ import operator
 import re
 import sys
 from collections.abc import (
-    Mapping,
     MutableSequence,
     Sequence,
 )
@@ -166,7 +165,7 @@ class FlextQualityStyleValidator:
 
     def _normalize_config(
         self,
-        raw: Mapping[str, t.Container],
+        raw: t.JsonMapping,
     ) -> FlextQualityStyleValidator.StyleConfig:
         markdown: FlextQualityStyleValidator.MarkdownConfig | None = None
         formatting: FlextQualityStyleValidator.FormattingConfig | None = None

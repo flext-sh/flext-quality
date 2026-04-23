@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import re
 from collections.abc import (
-    Mapping,
     MutableSequence,
     Sequence,
 )
@@ -42,51 +41,49 @@ class FlextQualityRulesEngine:
     def validate(
         self,
         path: str,
-        context: Mapping[str, t.Container] | None = None,
-    ) -> p.Result[Sequence[Mapping[str, t.Container]]]:
+        context: t.JsonMapping | None = None,
+    ) -> p.Result[Sequence[t.JsonMapping]]:
         """Validate code against loaded rules."""
         if not self._loaded:
             load_result = self.load_rules()
             if load_result.failure:
-                return r[Sequence[Mapping[str, t.Container]]].fail(load_result.error)
+                return r[Sequence[t.JsonMapping]].fail(load_result.error)
         target_path = Path(path)
         if not target_path.exists():
-            return r[Sequence[Mapping[str, t.Container]]].fail(
-                f"Path does not exist: {path}"
-            )
-        violations: MutableSequence[Mapping[str, t.Container]] = []
+            return r[Sequence[t.JsonMapping]].fail(f"Path does not exist: {path}")
+        violations: MutableSequence[t.JsonMapping] = []
         files = self._get_files(target_path)
         for file_path in files:
             file_violations = self._validate_file(file_path, context or {})
             violations.extend(file_violations)
-        return r[Sequence[Mapping[str, t.Container]]].ok(violations)
+        return r[Sequence[t.JsonMapping]].ok(violations)
 
     def validate_content(
         self,
         content: str,
         filename: str = "<string>",
-    ) -> p.Result[Sequence[Mapping[str, t.Container]]]:
+    ) -> p.Result[Sequence[t.JsonMapping]]:
         """Validate content string against loaded rules."""
         if not self._loaded:
             load_result = self.load_rules()
             if load_result.failure:
-                return r[Sequence[Mapping[str, t.Container]]].fail(load_result.error)
-        violations: MutableSequence[Mapping[str, t.Container]] = []
+                return r[Sequence[t.JsonMapping]].fail(load_result.error)
+        violations: MutableSequence[t.JsonMapping] = []
         for rule in self._rules:
             if not rule.enabled:
                 continue
             rule_violations = self._check_rule(rule, content, filename)
             violations.extend(rule_violations)
-        return r[Sequence[Mapping[str, t.Container]]].ok(violations)
+        return r[Sequence[t.JsonMapping]].ok(violations)
 
     def _check_rule(
         self,
         rule: m.Quality.RuleDefinition,
         content: str,
         filename: str,
-    ) -> Sequence[Mapping[str, t.Container]]:
+    ) -> Sequence[t.JsonMapping]:
         """Check a single rule against content."""
-        violations: MutableSequence[Mapping[str, t.Container]] = []
+        violations: MutableSequence[t.JsonMapping] = []
         if rule.pattern is None:
             return violations
         try:
@@ -131,8 +128,8 @@ class FlextQualityRulesEngine:
     def _validate_file(
         self,
         file_path: Path,
-        _context: Mapping[str, t.Container],
-    ) -> Sequence[Mapping[str, t.Container]]:
+        _context: t.JsonMapping,
+    ) -> Sequence[t.JsonMapping]:
         """Validate a single file against rules."""
         try:
             content = file_path.read_text(encoding="utf-8")
@@ -153,7 +150,7 @@ class FlextQualityRulesEngine:
                     "severity": c.Quality.Severity.ERROR,
                 },
             ]
-        violations: MutableSequence[Mapping[str, t.Container]] = []
+        violations: MutableSequence[t.JsonMapping] = []
         for rule in self._rules:
             if not rule.enabled:
                 continue

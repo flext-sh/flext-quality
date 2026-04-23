@@ -15,7 +15,6 @@ import os
 import tempfile
 from collections.abc import (
     Generator,
-    Mapping,
     MutableSequence,
     Sequence,
 )
@@ -140,7 +139,7 @@ def secure_temp_dir() -> Generator[str]:
 
 
 @pytest.fixture
-def sample_code_repository(tmp_path: Path) -> Mapping[str, t.Container]:
+def sample_code_repository(tmp_path: Path) -> t.JsonMapping:
     """Provide sample code repository metadata for quality analysis testing.
 
     Creates realistic repository metadata that simulates typical project
@@ -176,7 +175,7 @@ def sample_code_repository(tmp_path: Path) -> Mapping[str, t.Container]:
 
 
 @pytest.fixture
-def quality_metrics_data() -> Mapping[str, t.Container]:
+def quality_metrics_data() -> t.JsonMapping:
     """Quality metrics data for testing."""
     return {
         "complexity": {"cyclomatic": 5.2, "cognitive": 3.8, "average": 4.5},
@@ -187,7 +186,7 @@ def quality_metrics_data() -> Mapping[str, t.Container]:
 
 
 @pytest.fixture
-def code_analysis_config() -> Mapping[str, t.Container]:
+def code_analysis_config() -> t.JsonMapping:
     """Code analysis configuration for testing."""
     return {
         "analyzers": {
@@ -204,7 +203,7 @@ def code_analysis_config() -> Mapping[str, t.Container]:
 
 
 @pytest.fixture
-def analysis_results() -> Sequence[Mapping[str, t.Container]]:
+def analysis_results() -> Sequence[t.JsonMapping]:
     """Analysis results for testing."""
     return [
         {
@@ -238,7 +237,7 @@ def analysis_results() -> Sequence[Mapping[str, t.Container]]:
 
 
 @pytest.fixture
-def report_config(tmp_path: Path) -> Mapping[str, t.Container]:
+def report_config(tmp_path: Path) -> t.JsonMapping:
     """Report configuration for testing."""
     return {
         "format": "json",
@@ -250,7 +249,7 @@ def report_config(tmp_path: Path) -> Mapping[str, t.Container]:
 
 
 @pytest.fixture
-def dashboard_data() -> Mapping[str, t.Container]:
+def dashboard_data() -> t.JsonMapping:
     """Dashboard data for testing."""
     return {
         "summary": {
@@ -273,7 +272,7 @@ def dashboard_data() -> Mapping[str, t.Container]:
 
 
 @pytest.fixture
-def sonarqube_config() -> Mapping[str, t.Container]:
+def sonarqube_config() -> t.JsonMapping:
     """SonarQube configuration for testing."""
     return {
         "host": "http://localhost:9000",
@@ -285,7 +284,7 @@ def sonarqube_config() -> Mapping[str, t.Container]:
 
 
 @pytest.fixture
-def codeclimate_config() -> Mapping[str, t.Container]:
+def codeclimate_config() -> t.JsonMapping:
     """CodeClimate configuration for testing."""
     return {
         "api_token": "test-api-token",
@@ -348,7 +347,7 @@ def temporary_project_structure(tmp_path: Path) -> str:
 
 
 @pytest.fixture
-def package_metadata() -> Mapping[str, t.Container]:
+def package_metadata() -> t.JsonMapping:
     """Package metadata for testing."""
     return {
         "name": "test-package",
@@ -361,7 +360,7 @@ def package_metadata() -> Mapping[str, t.Container]:
 
 
 @pytest.fixture
-def celery_config() -> Mapping[str, t.Container]:
+def celery_config() -> t.JsonMapping:
     """Celery configuration for testing."""
     return {
         "broker_url": "redis://localhost:6379/0",
@@ -375,7 +374,7 @@ def celery_config() -> Mapping[str, t.Container]:
 
 
 @pytest.fixture
-def analysis_task_data() -> Mapping[str, t.Container]:
+def analysis_task_data() -> t.JsonMapping:
     """Analysis task data for testing."""
     return {
         "task_id": "test-task-123",
@@ -433,7 +432,7 @@ class MockQualityAnalyzer:
         super().__init__()
         self.analyzed_files: MutableSequence[str] = []
 
-    def analyze_project(self, project_path: str) -> Mapping[str, t.Container]:
+    def analyze_project(self, project_path: str) -> t.JsonMapping:
         """Simulate comprehensive project analysis.
 
         Args:
@@ -451,7 +450,7 @@ class MockQualityAnalyzer:
             "analysis_time": 2.5,
         }
 
-    def analyze_file(self, file_path: str) -> Mapping[str, t.Container]:
+    def analyze_file(self, file_path: str) -> t.JsonMapping:
         """Simulate individual file analysis.
 
         Args:
@@ -463,7 +462,7 @@ class MockQualityAnalyzer:
         """
         return {"file": file_path, "complexity": 3.2, "issues": 2, "coverage": 90.0}
 
-    def get_metrics(self, _project_path: str) -> Mapping[str, t.Container]:
+    def get_metrics(self, _project_path: str) -> t.JsonMapping:
         """Simulate project-wide quality metrics collection.
 
         Returns:
@@ -518,11 +517,11 @@ class MockReportGenerator:
     def __init__(self) -> None:
         """Initialize the instance."""
         super().__init__()
-        self.generated_reports: MutableSequence[Mapping[str, t.Container]] = []
+        self.generated_reports: MutableSequence[t.JsonMapping] = []
 
     def generate_report(
         self,
-        data: Mapping[str, t.Container],
+        data: t.JsonMapping,
         output_format: str = "json",
     ) -> str:
         """Simulate report generation in specified format.
@@ -535,7 +534,7 @@ class MockReportGenerator:
             Generated report filename
 
         """
-        report: Mapping[str, t.Container] = {
+        report = {
             "format": output_format,
             "data": data,
             "timestamp": "2023-01-01T12:00:00Z",
@@ -543,7 +542,7 @@ class MockReportGenerator:
         self.generated_reports.append(report)
         return f"report_{len(self.generated_reports)}.{output_format}"
 
-    def generate_dashboard_data(self) -> Mapping[str, t.Container]:
+    def generate_dashboard_data(self) -> t.JsonMapping:
         """Simulate dashboard data generation.
 
         Returns:

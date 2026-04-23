@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import (
-    Mapping,
     Sequence,
 )
 from pathlib import Path
@@ -34,7 +33,7 @@ class FlextQualityProtocols(p):
                 self,
                 content: str,
                 file_path: Path | None = None,
-            ) -> p.Result[Sequence[Mapping[str, t.Container]]]:
+            ) -> p.Result[Sequence[t.JsonMapping]]:
                 """Validate content and return violations."""
                 ...
 
@@ -100,7 +99,7 @@ class FlextQualityProtocols(p):
             def validate(
                 self,
                 settings: t.Quality.RuleConfig,
-                context: Mapping[str, t.Container],
+                context: t.JsonMapping,
             ) -> p.Result[t.Quality.RuleResult]:
                 """Validate according to rule."""
                 ...
@@ -130,8 +129,8 @@ class FlextQualityProtocols(p):
 
             def execute(
                 self,
-                params: Mapping[str, t.Container],
-            ) -> p.Result[Mapping[str, t.Container]]:
+                params: t.JsonMapping,
+            ) -> p.Result[t.JsonMapping]:
                 """Execute MCP tool."""
                 ...
 

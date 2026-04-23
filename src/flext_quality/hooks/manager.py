@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections.abc import (
-    Mapping,
     MutableMapping,
     MutableSequence,
     Sequence,
@@ -48,9 +47,9 @@ class FlextQualityHookManager:
                 return result
         return r[t.Quality.HookOutput].ok({"continue": True})
 
-    def get_config(self) -> Mapping[str, t.Container]:
+    def get_config(self) -> t.JsonMapping:
         """Get hooks configuration as dict."""
-        config: dict[str, t.Container] = {}
+        config: dict[str, t.JsonValue] = {}
         for event, hooks in self._hooks.items():
             hook_entries: list[t.JsonValue] = []
             for hook in hooks:

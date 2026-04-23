@@ -462,7 +462,7 @@ class FlextQualityContentAnalyzer:
 
         word_count = len(re.findall(r"\b\w+\b", content))
         thresholds_val = self.settings.get("quality_thresholds")
-        thresholds: Mapping[str, t.Container] = (
+        thresholds: t.JsonMapping = (
             dict(thresholds_val) if isinstance(thresholds_val, Mapping) else {}
         )
         min_words_val = thresholds.get("min_word_count", 100)
@@ -778,7 +778,7 @@ class FlextQualityContentAnalyzer:
         for result_value_raw in self.results.model_dump().values():
             if not isinstance(result_value_raw, dict):
                 continue
-            result_value: Mapping[str, t.Container] = (
+            result_value: t.JsonMapping = (
                 t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
                     result_value_raw,
                 )
