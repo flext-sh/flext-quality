@@ -268,7 +268,7 @@ def test_should_do_something_when_condition():
 
 ### Test Data Management
 
-```python
+```text
 # Test data builders for consistent test object creation
 class QualityProjectBuilder:
     def __init__(self):
@@ -288,7 +288,7 @@ class QualityProjectBuilder:
 
 ### Mock Standards
 
-```python
+```text
 # Consistent mocking patterns for external dependencies
 @pytest.fixture
 def mock_external_analyzer():
@@ -302,7 +302,7 @@ def mock_external_analyzer():
 
 ### Benchmarking Tests
 
-```python
+```text
 @pytest.mark.performance
 def test_analyzer_performance_benchmarks():
     """Validate analysis performance meets requirements."""
@@ -321,7 +321,7 @@ def test_analyzer_performance_benchmarks():
 
 ### Resource Usage Testing
 
-```python
+```text
 @pytest.mark.performance
 def test_memory_usage_within_limits():
     """Ensure analysis stays within memory limits."""

@@ -105,7 +105,6 @@ def main(args: t.StrSequence | None = None) -> int:
                 help_text=svc.__doc__ or "",
                 model_cls=svc,
                 handler=lambda params: params.execute(),
-                failure_message=f"{svc.__name__.lower()} failed",
             )
             for svc in FlextQualityCli.COMMANDS
         ],
