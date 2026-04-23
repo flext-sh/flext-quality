@@ -354,15 +354,23 @@ class FlextQualityConfigManager:
 
             normalized_data: dict[str, t.JsonValue] = {}
             for section_name, section in data.items():
-                normalized_section: t.JsonMapping = {}
+                normalized_section: dict[str, t.JsonValue] = {}
                 for key, value in section.items():
+                    normalized_value: t.JsonValue
                     if isinstance(value, Sequence) and not isinstance(
                         value, (str, bytes)
                     ):
-                        normalized_section[key] = [str(item) for item in value]
+                        normalized_value = t.json_value_adapter().validate_python(
+                            [str(item) for item in value],
+                        )
                     else:
-                        normalized_section[key] = value
-                normalized_data[section_name] = normalized_section
+                        normalized_value = t.json_value_adapter().validate_python(
+                            value,
+                        )
+                    normalized_section[key] = normalized_value
+                normalized_data[section_name] = t.json_value_adapter().validate_python(
+                    normalized_section,
+                )
 
             result = u.Cli.yaml_dump(config_path, normalized_data)
             if result.failure:

@@ -109,7 +109,7 @@ class FlextQualityDocumentationDashboard:
                 metrics_raw if isinstance(metrics_raw, Mapping) else {}
             )
             severity_raw = metrics.get("severity_breakdown")
-            severity: t.JsonMapping = {}
+            severity: dict[str, t.JsonValue] = {}
             if isinstance(severity_raw, Mapping):
                 for key, value in severity_raw.items():
                     severity[str(key)] = value if isinstance(value, int) else 0
@@ -150,7 +150,7 @@ class FlextQualityDocumentationDashboard:
         """Get quality trends over the specified number of days."""
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
 
-        trend_data: MutableSequence[t.JsonMapping] = []
+        trend_data: MutableSequence[dict[str, t.JsonValue]] = []
         reports_dir = self.reports_dir
 
         # Find all audit reports
@@ -183,7 +183,7 @@ class FlextQualityDocumentationDashboard:
                     critical_issues: int = crit_v if isinstance(crit_v, int) else 0
                     high_v = sev_m.get("high", 0)
                     high_issues: int = high_v if isinstance(high_v, int) else 0
-                    trend_entry: t.JsonMapping = {
+                    trend_entry: dict[str, t.JsonValue] = {
                         "date": report_date.isoformat(),
                         "quality_score": quality_score,
                         "total_issues": total_issues,
@@ -205,7 +205,9 @@ class FlextQualityDocumentationDashboard:
 
         # Sort by date
         trend_data = sorted(trend_data, key=operator.itemgetter("date"))
-        trend_values: list[t.JsonValue] = list(trend_data)
+        trend_values: list[t.JsonValue] = [
+            t.json_value_adapter().validate_python(entry) for entry in trend_data
+        ]
 
         return {
             "period_days": days,
