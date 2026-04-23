@@ -1,0 +1,28 @@
+src/flext_quality/docs/tools/content_analyzer.py
+  02db55bf620bbdf2 29
+tests/conftest.py
+  02db55bf620bbdf2 537,539
+src/flext_quality/rules/engine.py
+  02db55bf620bbdf2 134
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.2",
+  "base_commit_sha": "4f152ab102d995f4980575c2fa3efd41e1eff738",
+  "prompts": {
+    "02db55bf620bbdf2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dd88b7e6-5715-4a2d-af33-58b483877723",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "FLEXT Bot",
+      "messages": [],
+      "total_additions": 7,
+      "total_deletions": 5,
+      "accepted_lines": 5,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/552bc37294f0fc01ea8c022b47d26c992dbec812530c9c3b17fdda51462d8874"
+    }
+  }
+}
