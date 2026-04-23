@@ -97,12 +97,13 @@ class FlextQualityBaseValidator(ABC):
         items: Sequence[t.Quality.GenericItem],
     ) -> m.Quality.ValidationResult:
         """Perform validation on given items."""
-        self.results = m.Quality.ValidationResult()
-        self.results.total_items = len(items)
+        results = m.Quality.ValidationResult()
+        results.total_items = len(items)
+        self.results = results
 
         self._validate_items(items)
 
-        return self.results
+        return results
 
     @abstractmethod
     def _validate_items(self, items: Sequence[t.Quality.GenericItem]) -> None:
