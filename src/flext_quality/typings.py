@@ -45,13 +45,9 @@ class FlextQualityTypes(t):
 
         type HookInput = t.JsonMapping
         type HookOutput = t.JsonMapping
-        type HookMatcher = t.StrSequence | None
         type RuleConfig = t.JsonMapping
         type RuleResult = tuple[bool, str | None]
         type McpToolResult = t.JsonMapping
-        type McpResource = t.StrMapping
-        type MemoryQuery = Mapping[str, str | int | t.StrSequence]
-        type ContextQuery = t.HeaderMapping
         type GenericItem = t.JsonValue | Mapping[str, t.Primitives | None]
         type DocumentationReportValue = (
             str
