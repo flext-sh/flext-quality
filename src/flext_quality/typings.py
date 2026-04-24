@@ -14,34 +14,8 @@ from flext_web import m, t
 class FlextQualityTypes(t):
     """Namespace for flext-quality type definitions."""
 
-    CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.JsonMapping] = m.TypeAdapter(
-        t.JsonMapping,
-    )
-    RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.JsonMapping] = m.TypeAdapter(
-        t.JsonMapping,
-        config=m.ConfigDict(strict=False),
-    )
-    CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[Sequence[t.JsonMapping]] = (
-        m.TypeAdapter(Sequence[t.JsonMapping])
-    )
-    RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
-        Sequence[t.JsonMapping]
-    ] = m.TypeAdapter(
-        Sequence[t.JsonMapping],
-        config=m.ConfigDict(strict=False),
-    )
-    MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: m.TypeAdapter[
-        t.MutableOptionalFeatureFlagMapping
-    ] = m.TypeAdapter(t.MutableOptionalFeatureFlagMapping)
-    NORMALIZED_VALUE_SEQUENCE_ADAPTER: m.TypeAdapter[t.JsonList] = m.TypeAdapter(
-        t.JsonList
-    )
-    STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: m.TypeAdapter[
-        MutableSequence[t.StrMapping]
-    ] = m.TypeAdapter(MutableSequence[t.StrMapping])
-
     class Quality:
-        """Quality-specific types namespace."""
+        """Quality-specific types namespace (project slot)."""
 
         type HookInput = t.JsonMapping
         type HookOutput = t.JsonMapping
@@ -60,9 +34,36 @@ class FlextQualityTypes(t):
             | None
         )
 
-    REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[
-        Mapping[str, Quality.DocumentationReportValue]
-    ] = m.TypeAdapter(Mapping[str, Quality.DocumentationReportValue])
+        CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.JsonMapping] = m.TypeAdapter(
+            t.JsonMapping,
+        )
+        RELAXED_CONTAINER_MAPPING_ADAPTER: m.TypeAdapter[t.JsonMapping] = m.TypeAdapter(
+            t.JsonMapping,
+            config=m.ConfigDict(strict=False),
+        )
+        CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[Sequence[t.JsonMapping]] = (
+            m.TypeAdapter(Sequence[t.JsonMapping])
+        )
+        RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
+            Sequence[t.JsonMapping]
+        ] = m.TypeAdapter(
+            Sequence[t.JsonMapping],
+            config=m.ConfigDict(strict=False),
+        )
+        MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: m.TypeAdapter[
+            t.MutableOptionalFeatureFlagMapping
+        ] = m.TypeAdapter(t.MutableOptionalFeatureFlagMapping)
+        NORMALIZED_VALUE_SEQUENCE_ADAPTER: m.TypeAdapter[t.JsonList] = m.TypeAdapter(
+            t.JsonList
+        )
+        STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: m.TypeAdapter[
+            MutableSequence[t.StrMapping]
+        ] = m.TypeAdapter(MutableSequence[t.StrMapping])
+        REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[
+            Mapping[str, DocumentationReportValue]
+        ] = m.TypeAdapter(
+            Mapping[str, DocumentationReportValue],
+        )
 
 
 t = FlextQualityTypes

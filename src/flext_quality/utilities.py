@@ -33,7 +33,7 @@ class FlextQualityUtilities(u):
             if blocked_reason:
                 output["blockedReason"] = blocked_reason
             return str(
-                t.MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER.dump_json(
+                t.Quality.MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER.dump_json(
                     output
                 ).decode("utf-8")
             )
@@ -55,7 +55,7 @@ class FlextQualityUtilities(u):
                         "Expected YAML dict",
                     )
                 parsed_dict: t.JsonMapping = (
-                    t.CONTAINER_MAPPING_ADAPTER.validate_python(parsed)
+                    t.Quality.CONTAINER_MAPPING_ADAPTER.validate_python(parsed)
                 )
                 raw_rules_val = parsed_dict.get("rules", [])
                 if not isinstance(raw_rules_val, list):
@@ -63,7 +63,7 @@ class FlextQualityUtilities(u):
                         "Expected rules list",
                     )
                 rules: Sequence[t.JsonMapping] = [
-                    t.CONTAINER_MAPPING_ADAPTER.validate_python(item)
+                    t.Quality.CONTAINER_MAPPING_ADAPTER.validate_python(item)
                     for item in raw_rules_val
                     if isinstance(item, dict)
                 ]
@@ -85,7 +85,9 @@ class FlextQualityUtilities(u):
         def parse_hook_input(raw: str) -> p.Result[t.Quality.HookInput]:
             """Parse hook input JSON."""
             try:
-                parsed: t.JsonMapping = t.CONTAINER_MAPPING_ADAPTER.validate_json(raw)
+                parsed: t.JsonMapping = (
+                    t.Quality.CONTAINER_MAPPING_ADAPTER.validate_json(raw)
+                )
                 coerced_input: t.JsonMapping = parsed
                 return r[t.Quality.HookInput].ok(coerced_input)
             except ValueError as e:
