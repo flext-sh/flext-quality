@@ -137,7 +137,7 @@ class FlextQualityDocumentationReporter:
         if filepath.exists():
             try:
                 result: Mapping[str, t.Quality.DocumentationReportValue] = (
-                    t.REPORT_VALUE_MAPPING_ADAPTER.validate_json(
+                    t.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(
                         Path(filepath).read_bytes()
                     )
                 )
@@ -300,10 +300,8 @@ class FlextQualityDocumentationReporter:
                     broken_links: MutableSequence[Mapping[str, t.Primitives]] = []
                     for e_raw in validation_errors_list:
                         try:
-                            error_entry: t.JsonMapping = (
-                                t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
-                                    e_raw
-                                )
+                            error_entry: t.JsonMapping = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
+                                e_raw
                             )
                         except (ValueError, TypeError):
                             continue
@@ -548,7 +546,7 @@ class FlextQualityDocumentationReporter:
                 if report_date >= cutoff_date:
                     report_data_raw: Mapping[
                         str, t.Quality.DocumentationReportValue
-                    ] = t.REPORT_VALUE_MAPPING_ADAPTER.validate_json(
+                    ] = t.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(
                         Path(report_file).read_bytes(),
                     )
                     report_data_dict: Mapping[

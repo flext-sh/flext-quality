@@ -260,13 +260,13 @@ class FlextQualityDocumentationNotifier:
 
         metrics_val = audit_data.get("metrics")
         metrics: t.JsonMapping = (
-            t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_val)
+            t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_val)
             if isinstance(metrics_val, Mapping)
             else {}
         )
         severity_val = metrics.get("severity_breakdown")
         severity_m: t.JsonMapping = (
-            t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(severity_val)
+            t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(severity_val)
             if isinstance(severity_val, Mapping)
             else {}
         )
@@ -525,13 +525,13 @@ Timestamp: {datetime.now(UTC).isoformat()}
         """Format message for critical issues notification."""
         metrics_val = audit_data.get("metrics")
         metrics: t.JsonMapping = (
-            t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_val)
+            t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(metrics_val)
             if isinstance(metrics_val, Mapping)
             else {}
         )
         severity_val = metrics.get("severity_breakdown")
         severity: t.JsonMapping = (
-            t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(severity_val)
+            t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(severity_val)
             if isinstance(severity_val, Mapping)
             else {}
         )
@@ -546,7 +546,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
             for i_v in issues_val:
                 if isinstance(i_v, Mapping):
                     i_m: t.JsonMapping = (
-                        t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(i_v)
+                        t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(i_v)
                     )
                     sev = i_m.get("severity")
                     if sev == c.Quality.NotificationPriority.CRITICAL.value:
@@ -677,7 +677,7 @@ def main() -> None:
                 _ = err  # consumed
     elif args.audit_data:
         # Process audit data and send appropriate notifications
-        audit_data = t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
+        audit_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
             Path(args.audit_data).read_bytes(),
         )
 
@@ -698,14 +698,14 @@ def main() -> None:
 
     elif args.weekly_report:
         # Send weekly report notification
-        report_data = t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
+        report_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
             Path(args.weekly_report).read_bytes(),
         )
         _ = notifier.notify_weekly_report(report_data)
 
     elif args.monthly_report:
         # Send monthly report notification
-        report_data = t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
+        report_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
             Path(args.monthly_report).read_bytes(),
         )
         _ = notifier.notify_monthly_report(report_data)

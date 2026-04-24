@@ -50,7 +50,7 @@ class FlextQualityDocumentationDashboard:
         def api_metrics() -> Response:
             """API endpoint for current metrics."""
             return Response(
-                t.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
+                t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
                     self.get_current_metrics()
                 ).decode(),
                 mimetype="application/json",
@@ -63,7 +63,7 @@ class FlextQualityDocumentationDashboard:
             """API endpoint for quality trends."""
             days = int(request.args.get("days", 30))
             return Response(
-                t.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
+                t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.dump_json(
                     self.get_quality_trends(days)
                 ).decode(),
                 mimetype="application/json",
@@ -76,7 +76,7 @@ class FlextQualityDocumentationDashboard:
             """API endpoint for recent reports."""
             limit = int(request.args.get("limit", 10))
             return Response(
-                t.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.dump_json(
+                t.Quality.RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER.dump_json(
                     self.get_recent_reports(limit)
                 ).decode(),
                 mimetype="application/json",
@@ -101,7 +101,7 @@ class FlextQualityDocumentationDashboard:
             }
 
         try:
-            data = t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
+            data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
                 Path(latest_audit).read_bytes()
             )
             metrics_raw = data.get("metrics")
@@ -166,7 +166,7 @@ class FlextQualityDocumentationDashboard:
                 )
 
                 if report_date >= cutoff_date:
-                    data = t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
+                    data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
                         Path(report_file).read_bytes()
                     )
                     metrics_v = data.get("metrics")
@@ -229,7 +229,7 @@ class FlextQualityDocumentationDashboard:
                     tzinfo=UTC,
                 )
 
-                data = t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
+                data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
                     Path(report_file).read_bytes()
                 )
 

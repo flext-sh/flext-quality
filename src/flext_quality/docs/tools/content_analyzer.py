@@ -785,7 +785,7 @@ class FlextQualityContentAnalyzer:
             if not isinstance(result_value_raw, dict):
                 continue
             result_value: t.JsonMapping = (
-                t.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
+                t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
                     result_value_raw,
                 )
             )
