@@ -74,7 +74,7 @@ class FlextQualityModels(m):
 
             name: str
             enabled: bool = True
-            host: str = "localhost"
+            host: str = c.LOCALHOST
             port: int
             timeout_ms: Annotated[
                 int,
