@@ -199,16 +199,18 @@ class FlextQualityContentAnalyzer:
             filename = str(file_path.relative_to(file_path.parents[2]))
             issues_list: MutableSequence[FlextQualityContentAnalyzer.Issue] = []
             suggestions_list: MutableSequence[str] = []
-            analysis = FlextQualityContentAnalyzer.Analysis.model_validate({
-                "file": filename,
-                "metrics": self._calculate_content_metrics(content),
-                "readability": self._analyze_readability(content),
-                "structure": self._analyze_structure(content),
-                "completeness": self._check_completeness(content, filename),
-                "quality_score": 0.0,
-                "issues": issues_list,
-                "suggestions": suggestions_list,
-            })
+            analysis: FlextQualityContentAnalyzer.Analysis = (
+                FlextQualityContentAnalyzer.Analysis.model_validate({
+                    "file": filename,
+                    "metrics": self._calculate_content_metrics(content),
+                    "readability": self._analyze_readability(content),
+                    "structure": self._analyze_structure(content),
+                    "completeness": self._check_completeness(content, filename),
+                    "quality_score": 0.0,
+                    "issues": issues_list,
+                    "suggestions": suggestions_list,
+                })
+            )
 
             analysis.quality_score = self._calculate_quality_score(analysis)
 
@@ -389,13 +391,15 @@ class FlextQualityContentAnalyzer:
         """Analyze document structure and organization."""
         sections_list: MutableSequence[t.HeaderMapping] = []
         depth_analysis_dict: MutableMapping[str, t.Numeric] = {}
-        structure = FlextQualityContentAnalyzer.Structure.model_validate({
-            "has_table_of_contents": False,
-            "toc_position": 0,
-            "heading_hierarchy_valid": True,
-            "sections": sections_list,
-            "depth_analysis": depth_analysis_dict,
-        })
+        structure: FlextQualityContentAnalyzer.Structure = (
+            FlextQualityContentAnalyzer.Structure.model_validate({
+                "has_table_of_contents": False,
+                "toc_position": 0,
+                "heading_hierarchy_valid": True,
+                "sections": sections_list,
+                "depth_analysis": depth_analysis_dict,
+            })
+        )
 
         toc_patterns = [
             r"^#{1,6}.*\b[tT]able of [cC]ontents\b",
@@ -451,14 +455,16 @@ class FlextQualityContentAnalyzer:
         missing_elems: MutableSequence[str] = []
         required_present: MutableSequence[str] = []
         optional_present: MutableSequence[str] = []
-        completeness = FlextQualityContentAnalyzer.Completeness.model_validate({
-            "score": 100,
-            "missing_elements": missing_elems,
-            "required_sections_present": required_present,
-            "optional_sections_present": optional_present,
-            "word_count_sufficient": True,
-            "missing_required_sections": [],
-        })
+        completeness: FlextQualityContentAnalyzer.Completeness = (
+            FlextQualityContentAnalyzer.Completeness.model_validate({
+                "score": 100,
+                "missing_elements": missing_elems,
+                "required_sections_present": required_present,
+                "optional_sections_present": optional_present,
+                "word_count_sufficient": True,
+                "missing_required_sections": [],
+            })
+        )
 
         word_count = len(re.findall(r"\b\w+\b", content))
         thresholds_val = self.settings.get("quality_thresholds")
@@ -812,10 +818,10 @@ class FlextQualityContentAnalyzer:
     def generate_report(self, output_format: str = "json") -> str:
         """Generate content analysis report."""
         if output_format == "json":
-            return self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
+            return str(self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode())
         if output_format == "summary":
             return self._generate_summary_report()
-        return self.RESULTS_ADAPTER.dump_json(self.results).decode()
+        return str(self.RESULTS_ADAPTER.dump_json(self.results).decode())
 
     def _generate_summary_report(self) -> str:
         """Generate human-readable summary report."""

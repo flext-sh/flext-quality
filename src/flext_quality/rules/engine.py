@@ -123,7 +123,7 @@ class FlextQualityRulesEngine:
             c.Quality.RuleType.WARNING: c.Quality.Severity.WARNING,
             c.Quality.RuleType.INFO: c.Quality.Severity.INFO,
         }
-        return mapping.get(rule_type, c.Quality.Severity.INFO)
+        return str(mapping.get(rule_type, c.Quality.Severity.INFO))
 
     def _validate_file(
         self,

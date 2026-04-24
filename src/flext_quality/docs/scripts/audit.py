@@ -717,10 +717,10 @@ class FlextQualityDocumentationAuditor:
         """
         _ = output_path
         if output_format == "json":
-            return self.results.model_dump_json(indent=2)
+            return str(self.results.model_dump_json(indent=2))
         if output_format == "html":
             return self._generate_html_report()
-        return self.results.model_dump_json()
+        return str(self.results.model_dump_json())
 
     def _generate_html_report(self) -> str:
         """Generate HTML audit report."""

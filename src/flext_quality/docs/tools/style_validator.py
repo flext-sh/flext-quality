@@ -278,12 +278,14 @@ class FlextQualityStyleValidator:
             violations_list: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
             issues_list: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
             suggestions_list: MutableSequence[str] = []
-            file_results = FlextQualityStyleValidator.FileResults.model_validate({
-                "file": filename,
-                "violations": violations_list,
-                "issues": issues_list,
-                "suggestions": suggestions_list,
-            })
+            file_results: FlextQualityStyleValidator.FileResults = (
+                FlextQualityStyleValidator.FileResults.model_validate({
+                    "file": filename,
+                    "violations": violations_list,
+                    "issues": issues_list,
+                    "suggestions": suggestions_list,
+                })
+            )
 
             file_results.violations.extend(self._check_markdown_formatting(content))
             file_results.violations.extend(self._check_heading_consistency(content))
@@ -695,10 +697,10 @@ class FlextQualityStyleValidator:
     def generate_report(self, output_format: str = "json") -> str:
         """Generate style validation report."""
         if output_format == "json":
-            return self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
+            return str(self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode())
         if output_format == "summary":
             return self._generate_summary_report()
-        return self.RESULTS_ADAPTER.dump_json(self.results).decode()
+        return str(self.RESULTS_ADAPTER.dump_json(self.results).decode())
 
     def _generate_summary_report(self) -> str:
         """Generate human-readable summary."""

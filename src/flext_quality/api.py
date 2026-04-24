@@ -134,10 +134,12 @@ class FlextQuality:
             str: JSON-formatted hook output
 
         """
-        return u.Quality.format_hook_output(
-            continue_exec=continue_exec,
-            message=message,
-            blocked_reason=blocked_reason,
+        return str(
+            u.Quality.format_hook_output(
+                continue_exec=continue_exec,
+                message=message,
+                blocked_reason=blocked_reason,
+            ),
         )
 
     def get_hook_config_json(self) -> str:

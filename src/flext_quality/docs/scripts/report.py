@@ -136,9 +136,12 @@ class FlextQualityDocumentationReporter:
         filepath = self.reports_dir / filename
         if filepath.exists():
             try:
-                return t.REPORT_VALUE_MAPPING_ADAPTER.validate_json(
-                    Path(filepath).read_bytes()
+                result: Mapping[str, t.Quality.DocumentationReportValue] = (
+                    t.REPORT_VALUE_MAPPING_ADAPTER.validate_json(
+                        Path(filepath).read_bytes()
+                    )
                 )
+                return result
             except (OSError, ValueError):
                 pass
         return None
@@ -163,7 +166,9 @@ class FlextQualityDocumentationReporter:
         if report_format == "html":
             return self._generate_html_report(report_data)
         if report_format == "json":
-            return self.REPORT_DATA_ADAPTER.dump_json(report_data, indent=2).decode()
+            return str(
+                self.REPORT_DATA_ADAPTER.dump_json(report_data, indent=2).decode()
+            )
         if report_format == "markdown":
             return self._generate_markdown_report(report_data)
         msg = f"Unsupported format: {report_format}"

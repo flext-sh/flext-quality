@@ -463,8 +463,8 @@ class FlextQualityLinkValidator:
     def generate_report(self, report_format: str = "json") -> str:
         """Generate validation report."""
         if report_format == "json":
-            return self.results.model_dump_json(indent=2)
-        return self.results.model_dump_json()
+            return str(self.results.model_dump_json(indent=2))
+        return str(self.results.model_dump_json())
 
     def save_report(self, output_path: str = "docs/maintenance/reports/") -> Path:
         """Save validation report."""

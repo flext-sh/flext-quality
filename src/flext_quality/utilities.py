@@ -32,9 +32,11 @@ class FlextQualityUtilities(u):
                 output["systemMessage"] = message
             if blocked_reason:
                 output["blockedReason"] = blocked_reason
-            return t.MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER.dump_json(
-                output
-            ).decode("utf-8")
+            return str(
+                t.MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER.dump_json(
+                    output
+                ).decode("utf-8")
+            )
 
         @staticmethod
         def load_yaml_rules(

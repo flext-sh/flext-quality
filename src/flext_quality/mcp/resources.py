@@ -21,10 +21,12 @@ def get_hooks_config() -> str:
     """Get current hooks configuration."""
     manager = FlextQualityHookManager()
     settings = manager.get_config()
-    return t.CONTAINER_MAPPING_ADAPTER.dump_json(
-        dict(settings),
-        indent=c.Quality.Defaults.JSON_INDENT,
-    ).decode("utf-8")
+    return str(
+        t.CONTAINER_MAPPING_ADAPTER.dump_json(
+            dict(settings),
+            indent=c.Quality.Defaults.JSON_INDENT,
+        ).decode("utf-8")
+    )
 
 
 @_mcp.resource("settings://rules")
@@ -32,10 +34,12 @@ def get_rules_config() -> str:
     """Get current rules configuration."""
     engine = FlextQualityRulesEngine()
     rules = engine.get_rules()
-    return t.CONTAINER_MAPPING_SEQUENCE_ADAPTER.dump_json(
-        [rule.model_dump() for rule in rules],
-        indent=c.Quality.Defaults.JSON_INDENT,
-    ).decode("utf-8")
+    return str(
+        t.CONTAINER_MAPPING_SEQUENCE_ADAPTER.dump_json(
+            [rule.model_dump() for rule in rules],
+            indent=c.Quality.Defaults.JSON_INDENT,
+        ).decode("utf-8")
+    )
 
 
 @_mcp.resource("status://integrations")
@@ -59,7 +63,9 @@ def get_integrations_status() -> str:
         "claude_mem": mem_status,
         "claude_context": ctx_status,
     }
-    return t.CONTAINER_MAPPING_ADAPTER.dump_json(
-        status,
-        indent=c.Quality.Defaults.JSON_INDENT,
-    ).decode("utf-8")
+    return str(
+        t.CONTAINER_MAPPING_ADAPTER.dump_json(
+            status,
+            indent=c.Quality.Defaults.JSON_INDENT,
+        ).decode("utf-8")
+    )

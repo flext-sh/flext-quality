@@ -57,7 +57,7 @@ class FlextQualityAuditRules:
     def is_check_enabled(self, check_type: str, check_name: str) -> bool:
         """Check if a specific audit check is enabled."""
         checks = getattr(self, f"{check_type}_checks", {})
-        return checks.get(check_name, False)
+        return bool(checks.get(check_name, False))
 
 
 class FlextQualityStyleGuide:

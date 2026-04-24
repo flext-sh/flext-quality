@@ -65,10 +65,12 @@ class FlextQualityHookManager:
 
     def get_config_json(self) -> str:
         """Get hooks configuration as JSON."""
-        return t.CONTAINER_MAPPING_ADAPTER.dump_json(
-            dict(self.get_config()),
-            indent=c.Quality.Defaults.JSON_INDENT,
-        ).decode("utf-8")
+        return str(
+            t.CONTAINER_MAPPING_ADAPTER.dump_json(
+                dict(self.get_config()),
+                indent=c.Quality.Defaults.JSON_INDENT,
+            ).decode("utf-8")
+        )
 
     def register(self, hook: FlextQualityBaseHook) -> p.Result[bool]:
         """Register a hook."""
