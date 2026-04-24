@@ -178,7 +178,7 @@ class FlextQualityModels(m):
                 words = 0
                 if path.exists():
                     try:
-                        content = path.read_text(encoding="utf-8")
+                        content = path.read_text(encoding=c.DEFAULT_ENCODING)
                         lines = content.count("\n") + 1
                         words = len(content.split())
                     except (OSError, UnicodeDecodeError):

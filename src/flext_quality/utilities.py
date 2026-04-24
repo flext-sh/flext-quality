@@ -35,7 +35,7 @@ class FlextQualityUtilities(u):
             return str(
                 t.Quality.MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER.dump_json(
                     output
-                ).decode("utf-8")
+                ).decode(c.DEFAULT_ENCODING)
             )
 
         @staticmethod

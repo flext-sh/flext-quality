@@ -13,7 +13,7 @@ from flext_tests import tm
 from flext_quality import FlextQualityCli, main
 
 
-class TestCommandServices:
+class TestsFlextQualityCli:
     """Direct unit tests against the nested Pydantic service classes."""
 
     def test_status(self) -> None:
@@ -36,10 +36,6 @@ class TestCommandServices:
         tm.that(len(result.value), eq=5)
         tm.that(result.value[2], has="bandit")
         tm.that(result.value[4], eq=["python", "-m", "coverage", "report"])
-
-
-class TestMain:
-    """Tests for the `main` entry point exercising full CLI dispatch."""
 
     def test_status_ok(self) -> None:
         tm.that(main(["status"]), eq=0)

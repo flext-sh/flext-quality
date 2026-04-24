@@ -16,7 +16,7 @@ from flext_tests import tm
 from flext_quality import FlextQuality
 
 
-class TestFlextQualityAPI:
+class TestsFlextQualityApi:
     """Tests for FlextQuality API."""
 
     def setup_method(self) -> None:
@@ -116,18 +116,6 @@ class TestFlextQualityAPI:
         tm.that(result.failure, eq=True)
         tm.that((result.error or "").lower(), has="not found")
 
-
-class TestFlextQualityHookExecution:
-    """Tests for hook execution via FlextQuality."""
-
-    def setup_method(self) -> None:
-        """Reset singleton before each test."""
-        FlextQuality._reset_instance()
-
-    def teardown_method(self) -> None:
-        """Reset singleton after each test."""
-        FlextQuality._reset_instance()
-
     def test_execute_hook_unknown_event(self) -> None:
         """Test execute_hook fails for unknown event."""
         quality = FlextQuality.get_instance()
@@ -141,18 +129,6 @@ class TestFlextQualityHookExecution:
         result = quality.execute_hook("PreToolUse", {"tool_name": "Edit"})
         tm.that(result.success, eq=True)
         tm.that(result.value.get("continue") is True, eq=True)
-
-
-class TestFlextQualitySingleton:
-    """Tests for singleton behavior with threading."""
-
-    def setup_method(self) -> None:
-        """Reset singleton before each test."""
-        FlextQuality._reset_instance()
-
-    def teardown_method(self) -> None:
-        """Reset singleton after each test."""
-        FlextQuality._reset_instance()
 
     def test_double_check_locking_concurrent(self) -> None:
         """Test singleton creation with concurrent threads."""
@@ -174,18 +150,6 @@ class TestFlextQualitySingleton:
         tm.that(not errors, eq=True)
         tm.that(len(instances), eq=10)
         tm.that(all(i is instances[0] for i in instances), eq=True)
-
-
-class TestFlextQualityRulesConfig:
-    """Tests for rules loading from settings."""
-
-    def setup_method(self) -> None:
-        """Reset singleton before each test."""
-        FlextQuality._reset_instance()
-
-    def teardown_method(self) -> None:
-        """Reset singleton after each test."""
-        FlextQuality._reset_instance()
 
     def test_load_rules_from_config_nonexistent_dir(self) -> None:
         """Test load_rules_from_config fails when rules dir doesn't exist."""
@@ -214,18 +178,6 @@ class TestFlextQualityRulesConfig:
             quality.settings.rules_dir = original_dir
             tm.that(result.success, eq=True)
             tm.that(len(result.value), eq=2)
-
-
-class TestFlextQualityStdinProcessing:
-    """Tests for stdin hook processing."""
-
-    def setup_method(self) -> None:
-        """Reset singleton before each test."""
-        FlextQuality._reset_instance()
-
-    def teardown_method(self) -> None:
-        """Reset singleton after each test."""
-        FlextQuality._reset_instance()
 
     def test_process_stdin_hook_success(self) -> None:
         """Test process_stdin_hook with valid input."""
@@ -280,18 +232,6 @@ class TestFlextQualityStdinProcessing:
             tm.that((result.error or ""), has="Unknown event")
         finally:
             sys.stdin = original_stdin
-
-
-class TestFlextQualityValidation:
-    """Tests for configuration validation."""
-
-    def setup_method(self) -> None:
-        """Reset singleton before each test."""
-        FlextQuality._reset_instance()
-
-    def teardown_method(self) -> None:
-        """Reset singleton after each test."""
-        FlextQuality._reset_instance()
 
     def test_validate_configuration_threshold_failure(self) -> None:
         """Test validate_configuration fails when thresholds are invalid."""
