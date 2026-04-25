@@ -1,3 +1,11 @@
+<!-- TOC START -->
+- [Start Here](#start-here)
+- [Public Surface Summary](#public-surface-summary)
+- [Collection Rules (regras de coletas)](#collection-rules-regras-de-coletas)
+- [Quality Gates](#quality-gates)
+- [Governance Pointer](#governance-pointer)
+<!-- TOC END -->
+
 <!-- AUTO-GENERATED — DO NOT EDIT MANUALLY -->
 
 # flext-quality Documentation
@@ -18,7 +26,7 @@ This project portal is generated from `pyproject.toml`, package exports, and rea
 
 ## Public Surface Summary
 
-- Primary facades: `FlextQualityClaudeContextClient`, `FlextQualityScheduledMaintenance`, `FlextQualityModels`, `FlextQualityStyleValidator`, `FlextQualityContentAnalyzer`, `FlextQualityDocumentationDashboard` (+32 more)
+- Primary facades: `FlextQualityFileStatistics`, `FlextQualityMcpClient`, `FlextQualityUtilities`, `FlextQualityDocumentationAuditor`, `FlextQualityValidationSettings`, `FlextQualityBaseValidator` (+32 more)
 - Alias namespaces: `c`, `d`, `e`, `h`, `m`, `p`, `r`, `s`, `t`, `u`, `x`
 - Public symbol exports: `41`
 - Exported module shortcuts: _none_

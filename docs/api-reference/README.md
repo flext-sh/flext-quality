@@ -1,3 +1,9 @@
+<!-- TOC START -->
+- [Source of Truth](#source-of-truth)
+- [Generated Pages](#generated-pages)
+- [Surface Summary](#surface-summary)
+<!-- TOC END -->
+
 <!-- AUTO-GENERATED — DO NOT EDIT MANUALLY -->
 
 # flext-quality API Reference
@@ -19,7 +25,7 @@ This section is generated from public exports and real docstrings.
 
 ## Surface Summary
 
-- Primary facades: `FlextQualityClaudeContextClient`, `FlextQualityScheduledMaintenance`, `FlextQualityModels`, `FlextQualityStyleValidator`, `FlextQualityContentAnalyzer`, `FlextQualityDocumentationDashboard` (+32 more)
+- Primary facades: `FlextQualityFileStatistics`, `FlextQualityMcpClient`, `FlextQualityUtilities`, `FlextQualityDocumentationAuditor`, `FlextQualityValidationSettings`, `FlextQualityBaseValidator` (+32 more)
 - Generated module pages: `32`
 
 - [Back to project docs](../index.md)
