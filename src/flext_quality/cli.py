@@ -31,7 +31,7 @@ class FlextQualityCli(s[bool]):
         def execute(self) -> p.Result[t.JsonMapping]:
             """Return the canonical quality service status payload."""
             return r[t.JsonMapping].ok(
-                FlextQuality.get_instance().get_status(),
+                FlextQuality.fetch_instance().fetch_status(),
             )
 
     class Check(s[Sequence[t.StrSequence]]):

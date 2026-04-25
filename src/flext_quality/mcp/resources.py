@@ -20,7 +20,7 @@ _mcp = _get_server()
 def get_hooks_config() -> str:
     """Get current hooks configuration."""
     manager = FlextQualityHookManager()
-    settings = manager.get_config()
+    settings = manager.fetch_config()
     return str(
         t.Quality.CONTAINER_MAPPING_ADAPTER.dump_json(
             dict(settings),

@@ -39,12 +39,7 @@ class FlextQualitySettings(FlextSettings):
     max_function_length: Annotated[int, u.Field(default=50)]
     max_class_length: Annotated[int, u.Field(default=200)]
 
-    @classmethod
-    def get_instance(cls) -> FlextQualitySettings:
-        """Create settings instance from current environment."""
-        return cls.fetch_global()
-
-    def get_rules_path(self) -> Path:
+    def resolve_rules_path(self) -> Path:
         """Resolve configured rules directory path."""
         return Path(self.rules_dir)
 

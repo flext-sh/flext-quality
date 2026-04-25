@@ -78,7 +78,7 @@ class FlextQuality:
         self.name = c.Quality.Mcp.SERVER_NAME
         self._version = c.Quality.Mcp.SERVER_VERSION
         self.logger = u.fetch_logger(__name__)
-        self.settings = FlextQualitySettings.get_instance()
+        self.settings = FlextQualitySettings.fetch_global()
         self._container = FlextContainer.shared()
         if not self._container.has("flext_quality"):
             _ = self._container.bind("flext_quality", "flext_quality")
@@ -91,8 +91,8 @@ class FlextQuality:
         cls._instance = None
 
     @classmethod
-    def get_instance(cls) -> FlextQuality:
-        """Get singleton FlextQuality instance."""
+    def fetch_instance(cls) -> FlextQuality:
+        """Return the singleton FlextQuality instance, creating it on first call."""
         if cls._instance is None:
             with cls._lock:
                 if cls._instance is None:
@@ -142,17 +142,12 @@ class FlextQuality:
             ),
         )
 
-    def get_hook_config_json(self) -> str:
-        """Get hooks configuration as JSON string."""
-        return self.hooks.get_config_json()
+    def fetch_hook_config_json(self) -> str:
+        """Return hooks configuration as JSON string."""
+        return self.hooks.fetch_config_json()
 
-    def get_status(self) -> t.JsonMapping:
-        """Get quality service status.
-
-        Returns:
-            t.JsonMapping: Status information
-
-        """
+    def fetch_status(self) -> t.JsonMapping:
+        """Return quality service status snapshot."""
         return {
             "name": self.name,
             "version": self._version,
@@ -162,7 +157,7 @@ class FlextQuality:
                 "cache_enabled": self.settings.cache_enabled,
                 "mcp_server_port": self.settings.mcp_server_port,
             },
-            "hooks_registered": len(self.hooks.get_config()),
+            "hooks_registered": len(self.hooks.fetch_config()),
         }
 
     def load_rules(self, path: Path) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
@@ -184,7 +179,7 @@ class FlextQuality:
             r[Sequence[m.Quality.RuleDefinition]]: List of rule definitions or error
 
         """
-        rules_path = self.settings.get_rules_path()
+        rules_path = self.settings.resolve_rules_path()
         if not rules_path.exists():
             return r[Sequence[m.Quality.RuleDefinition]].fail(
                 f"Rules directory not found: {rules_path}",
