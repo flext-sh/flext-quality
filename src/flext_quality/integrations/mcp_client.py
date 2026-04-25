@@ -16,7 +16,7 @@ from collections.abc import (
 )
 from typing import final
 
-from flext_quality import c, m, p, r, t
+from flext_quality import c, e, m, p, r, t
 
 
 @final
@@ -36,7 +36,7 @@ class FlextQualityMcpClient:
     ) -> p.Result[t.StrSequence]:
         """Build the mcp-cli command for a tool call."""
         if not self.is_mcp_cli_available():
-            return r[t.StrSequence].fail("mcp-cli not found in PATH")
+            return e.fail_not_found("executable", "mcp-cli")
         tool_path = f"{call.server}/{call.tool}"
         params_json = t.Quality.CONTAINER_MAPPING_ADAPTER.dump_json(call.params).decode(
             "utf-8"
@@ -46,7 +46,7 @@ class FlextQualityMcpClient:
     def build_info_command(self, server: str, tool: str) -> p.Result[t.StrSequence]:
         """Build the mcp-cli info command for a tool."""
         if not self.is_mcp_cli_available():
-            return r[t.StrSequence].fail("mcp-cli not found in PATH")
+            return e.fail_not_found("executable", "mcp-cli")
         tool_path = f"{server}/{tool}"
         return r[t.StrSequence].ok(["mcp-cli", "info", tool_path])
 
