@@ -35,6 +35,7 @@ if _t.TYPE_CHECKING:
     from tests.protocols import TestsFlextQualityProtocols, p
     from tests.typings import TestsFlextQualityTypes, t
     from tests.unit.test_api import TestsFlextQualityApi
+    from tests.unit.test_basic import TestsFlextQualityBasic
     from tests.unit.test_cli import TestsFlextQualityCli
     from tests.utilities import TestsFlextQualityUtilities, u
 _LAZY_IMPORTS = merge_lazy_imports(
@@ -79,6 +80,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "t",
             ),
             ".unit.test_api": ("TestsFlextQualityApi",),
+            ".unit.test_basic": ("TestsFlextQualityBasic",),
             ".unit.test_cli": ("TestsFlextQualityCli",),
             ".utilities": (
                 "TestsFlextQualityUtilities",
@@ -131,6 +133,7 @@ __all__: list[str] = [
     "MockReportGenerator",
     "TestsConstants",
     "TestsFlextQualityApi",
+    "TestsFlextQualityBasic",
     "TestsFlextQualityCli",
     "TestsFlextQualityConstants",
     "TestsFlextQualityModels",
