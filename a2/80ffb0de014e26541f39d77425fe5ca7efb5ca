@@ -1,0 +1,24 @@
+src/flext_quality/integrations/mcp_client.py
+  aec9caac96eafd79 19,39,49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "a280ffb0de014e26541f39d77425fe5ca7efb5ca",
+  "prompts": {
+    "aec9caac96eafd79": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "21e4e011-4151-4ada-8005-28dfb082479f",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "FLEXT Bot",
+      "messages": [],
+      "total_additions": 3,
+      "total_deletions": 3,
+      "accepted_lines": 3,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/2d6d85876d9da537ecf4c4faef6922ed0a2b0bdda2cae9d8beb52bec5b89a403"
+    }
+  }
+}
