@@ -14,8 +14,6 @@ _LAZY_IMPORTS = build_lazy_import_map(
             "assert_is_list",
             "assert_issues_structure",
             "assert_metrics_structure",
-            "safe_dict_access",
-            "safe_list_access",
         ),
         ".constants": (
             "TestsConstants",

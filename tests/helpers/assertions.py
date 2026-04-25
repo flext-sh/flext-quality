@@ -47,27 +47,6 @@ def assert_analysis_results_structure(results: t.ScalarMapping) -> None:
     assert isinstance(results, dict), f"Expected dict, got {type(results).__name__}"
 
 
-def safe_dict_access(
-    data: t.ScalarMapping,
-    key: str,
-    default: t.Scalar | None = None,
-) -> t.Scalar | None:
-    """Safely access a dict key with a default value."""
-    return data.get(key, default)
-
-
-def safe_list_access(
-    data: t.ScalarList,
-    index: int,
-    default: t.Scalar | None = None,
-) -> t.Scalar | None:
-    """Safely access a list index with a default value."""
-    try:
-        return data[index]
-    except IndexError:
-        return default
-
-
 __all__: list[str] = [
     "assert_analysis_results_structure",
     "assert_dict_structure",
@@ -75,6 +54,4 @@ __all__: list[str] = [
     "assert_is_list",
     "assert_issues_structure",
     "assert_metrics_structure",
-    "safe_dict_access",
-    "safe_list_access",
 ]

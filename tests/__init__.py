@@ -24,8 +24,6 @@ if _t.TYPE_CHECKING:
         assert_is_list,
         assert_issues_structure,
         assert_metrics_structure,
-        safe_dict_access,
-        safe_list_access,
     )
     from tests.helpers.constants import TestsConstants
     from tests.helpers.models import TestsModels
@@ -60,8 +58,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "assert_is_list",
                 "assert_issues_structure",
                 "assert_metrics_structure",
-                "safe_dict_access",
-                "safe_list_access",
             ),
             ".helpers.constants": ("TestsConstants",),
             ".helpers.models": ("TestsModels",),
@@ -157,8 +153,6 @@ __all__: list[str] = [
     "p",
     "r",
     "s",
-    "safe_dict_access",
-    "safe_list_access",
     "t",
     "td",
     "tf",

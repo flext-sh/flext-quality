@@ -11,9 +11,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Sequence,
-)
 from typing import TypeIs
 
 from tests import t
@@ -53,45 +50,6 @@ def assert_is_list(value: t.Scalar | t.ScalarList) -> TypeIs[t.ScalarList]:
     """
     assert isinstance(value, list), f"Expected list, got {type(value)}"
     return True
-
-
-def safe_dict_access(data: t.ScalarMapping, key: str) -> t.Scalar:
-    """Type-safe dictionary access with proper error handling.
-
-    Args:
-      data: Object to access (must be a dict)
-      key: Key to access
-
-    Returns:
-      Value from dict
-
-    Raises:
-      AssertionError: If data is not a mapping or key missing
-
-    """
-    assert key in data, f"Key '{key}' not found in dict"
-    return data[key]
-
-
-def safe_list_access[T](data: Sequence[T], index: int) -> T:
-    """Type-safe list access with proper error handling.
-
-    Args:
-      data: Object to access (must be a list)
-      index: Index to access
-
-    Returns:
-      Value from list
-
-    Raises:
-      AssertionError: If data is not a list or index out of bounds
-
-    """
-    assert isinstance(data, list), f"Expected list, got {type(data)}"
-    assert 0 <= index < len(data), (
-        f"Index {index} out of bounds for list of length {len(data)}"
-    )
-    return data[index]
 
 
 def assert_dict_structure(
