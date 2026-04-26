@@ -7,9 +7,9 @@
 - Description: FLEXT Quality - Unified orchestration platform for Claude Code tooling
 - Project class: `platform`
 - Keywords: `adapter`, `enterprise`, `flext`, `integration`, `typed`
-- Main facades: `FlextQualityBaseReporter`, `FlextQualityDocumentationDashboard`, `FlextQualityValidationSettings`, `FlextQualityDocumentationOptimizer`, `FlextQualityRulesEngine`, `FlextQualityTypes`, `FlextQualityRulesLoader`, `FlextQualityStyleGuide` (+30 more)
+- Main facades: `FlextQualityMcpClient`, `FlextQualityRulesEngine`, `FlextQualityBaseHook`, `FlextQualityDocumentationNotifier`, `FlextQualityStyleValidator`, `FlextQualityBaseReporter`, `FlextQualityClaudeContextClient`, `FlextQualityRulesLoader` (+30 more)
 - Alias exports: `c`, `d`, `e`, `h`, `m`, `p`, `r`, `s`, `t`, `u`, `x`
-- Public symbol exports: `main`, `FlextQualityBaseReporter`, `FlextQualityDocumentationDashboard`, `FlextQualityValidationSettings`, `FlextQualityDocumentationOptimizer`, `FlextQualityRulesEngine`, `FlextQualityTypes`, `FlextQualityRulesLoader`, `FlextQualityStyleGuide`, `FlextQualityModels` (+31 more)
+- Public symbol exports: `FlextQualityMcpClient`, `main`, `FlextQualityRulesEngine`, `FlextQualityBaseHook`, `FlextQualityDocumentationNotifier`, `FlextQualityStyleValidator`, `FlextQualityBaseReporter`, `FlextQualityClaudeContextClient`, `FlextQualityRulesLoader`, `FlextQualityContentAnalyzer` (+31 more)
 - Exported module shortcuts: _none_
 - Generated module pages: `32`
 
