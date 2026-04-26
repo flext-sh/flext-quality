@@ -167,74 +167,35 @@ class FlextQualityStyleValidator:
         self,
         raw: t.JsonMapping,
     ) -> FlextQualityStyleValidator.StyleConfig:
-        markdown: FlextQualityStyleValidator.MarkdownConfig | None = None
-        formatting: FlextQualityStyleValidator.FormattingConfig | None = None
-        accessibility: FlextQualityStyleValidator.AccessibilityConfig | None = None
-        headings: FlextQualityStyleValidator.HeadingsConfig | None = None
-
         markdown_raw = raw.get("markdown")
-        if isinstance(markdown_raw, dict):
-            heading_style = markdown_raw.get("heading_style")
-            list_style = markdown_raw.get("list_style")
-            emphasis_style = markdown_raw.get("emphasis_style")
-            code_block_style = markdown_raw.get("code_block_style")
-            markdown = FlextQualityStyleValidator.MarkdownConfig(
-                heading_style=heading_style if isinstance(heading_style, str) else None,
-                list_style=list_style if isinstance(list_style, str) else None,
-                emphasis_style=emphasis_style
-                if isinstance(emphasis_style, str)
-                else None,
-                code_block_style=code_block_style
-                if isinstance(code_block_style, str)
-                else None,
-            )
+        markdown = (
+            FlextQualityStyleValidator.MarkdownConfig.model_validate(markdown_raw)
+            if isinstance(markdown_raw, dict)
+            else None
+        )
 
         formatting_raw = raw.get("formatting")
-        if isinstance(formatting_raw, dict):
-            max_line_length = formatting_raw.get("max_line_length")
-            trailing_spaces = formatting_raw.get("trailing_spaces")
-            consistent_indentation = formatting_raw.get("consistent_indentation")
-            formatting = FlextQualityStyleValidator.FormattingConfig(
-                max_line_length=max_line_length
-                if isinstance(max_line_length, int)
-                else None,
-                trailing_spaces=trailing_spaces
-                if isinstance(trailing_spaces, bool)
-                else None,
-                consistent_indentation=consistent_indentation
-                if isinstance(consistent_indentation, bool)
-                else None,
-            )
+        formatting = (
+            FlextQualityStyleValidator.FormattingConfig.model_validate(formatting_raw)
+            if isinstance(formatting_raw, dict)
+            else None
+        )
 
         accessibility_raw = raw.get("accessibility")
-        if isinstance(accessibility_raw, dict):
-            require_alt_text = accessibility_raw.get("require_alt_text")
-            descriptive_links = accessibility_raw.get("descriptive_links")
-            heading_structure = accessibility_raw.get("heading_structure")
-            proper_headings = accessibility_raw.get("proper_headings")
-            accessibility = FlextQualityStyleValidator.AccessibilityConfig(
-                require_alt_text=require_alt_text
-                if isinstance(require_alt_text, bool)
-                else None,
-                descriptive_links=descriptive_links
-                if isinstance(descriptive_links, bool)
-                else None,
-                heading_structure=heading_structure
-                if isinstance(heading_structure, bool)
-                else None,
-                proper_headings=proper_headings
-                if isinstance(proper_headings, bool)
-                else None,
+        accessibility = (
+            FlextQualityStyleValidator.AccessibilityConfig.model_validate(
+                accessibility_raw,
             )
+            if isinstance(accessibility_raw, dict)
+            else None
+        )
 
         headings_raw = raw.get("headings")
-        if isinstance(headings_raw, dict):
-            enforce_hierarchy = headings_raw.get("enforce_hierarchy")
-            headings = FlextQualityStyleValidator.HeadingsConfig(
-                enforce_hierarchy=enforce_hierarchy
-                if isinstance(enforce_hierarchy, bool)
-                else None,
-            )
+        headings = (
+            FlextQualityStyleValidator.HeadingsConfig.model_validate(headings_raw)
+            if isinstance(headings_raw, dict)
+            else None
+        )
 
         return FlextQualityStyleValidator.StyleConfig(
             markdown=markdown,

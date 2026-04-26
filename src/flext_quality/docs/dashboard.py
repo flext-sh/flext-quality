@@ -18,7 +18,7 @@ from pathlib import Path
 
 from flask import Flask, Response, render_template_string, request
 
-from flext_quality import p, t, u
+from flext_quality import m, p, t, u
 
 
 class FlextQualityDocumentationDashboard:
@@ -171,24 +171,25 @@ class FlextQualityDocumentationDashboard:
                     )
                     metrics_v = data.get("metrics")
                     metrics_m: t.JsonMapping = (
-                        metrics_v if isinstance(metrics_v, Mapping) else {}
+                        t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
+                            metrics_v
+                        )
+                        if isinstance(metrics_v, Mapping)
+                        else {}
                     )
-                    sev_v = metrics_m.get("severity_breakdown")
-                    sev_m: t.JsonMapping = sev_v if isinstance(sev_v, Mapping) else {}
-                    qs_v = metrics_m.get("quality_score", 0)
-                    quality_score: int = qs_v if isinstance(qs_v, int) else 0
-                    ti_v = metrics_m.get("total_issues", 0)
-                    total_issues: int = ti_v if isinstance(ti_v, int) else 0
-                    crit_v = sev_m.get("critical", 0)
-                    critical_issues: int = crit_v if isinstance(crit_v, int) else 0
-                    high_v = sev_m.get("high", 0)
-                    high_issues: int = high_v if isinstance(high_v, int) else 0
+                    audit_metrics = m.Quality.AuditMetrics.model_validate(metrics_m)
                     trend_entry: dict[str, t.JsonValue] = {
                         "date": report_date.isoformat(),
-                        "quality_score": quality_score,
-                        "total_issues": total_issues,
-                        "critical_issues": critical_issues,
-                        "high_issues": high_issues,
+                        "quality_score": audit_metrics.quality_score,
+                        "total_issues": audit_metrics.total_issues,
+                        "critical_issues": audit_metrics.severity_breakdown.get(
+                            "critical",
+                            0,
+                        ),
+                        "high_issues": audit_metrics.severity_breakdown.get(
+                            "high",
+                            0,
+                        ),
                     }
                     trend_data.append(trend_entry)
             except (
