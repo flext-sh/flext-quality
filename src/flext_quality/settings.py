@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import Annotated, ClassVar
 
 from flext_core import FlextSettings
-
 from flext_quality import c, m, p, r, u
 
 

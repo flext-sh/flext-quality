@@ -7,7 +7,6 @@ Finds, categorizes, and filters documentation files in a project.
 from __future__ import annotations
 
 import fnmatch
-import logging
 from collections.abc import (
     MutableMapping,
     MutableSequence,
@@ -18,6 +17,8 @@ from pathlib import Path
 from typing import ClassVar
 
 from flext_quality import m, t, u
+
+logger = u.fetch_logger(__name__)
 
 
 class FlextQualityFileStatistics(m.BaseModel):
@@ -134,7 +135,6 @@ class FlextQualityDocumentationFinder:
         except (FileNotFoundError, PermissionError, UnicodeDecodeError, OSError) as e:
             # If we can't read the ignore file, just continue silently
             # This is acceptable as ignore files are optional
-            logger = logging.getLogger(__name__)
             logger.debug(f"Could not read ignore file {self.ignore_file}: {e}")
 
     def _load_ignore_patterns_from_file(self, ignore_path: Path) -> None:
@@ -203,7 +203,6 @@ class FlextQualityDocumentationFinder:
             except (OSError, ValueError) as e:
                 # Skip patterns that cause errors during glob matching
                 # This prevents crashes from malformed glob patterns
-                logger = logging.getLogger(__name__)
                 logger.debug(
                     "Error during glob matching for pattern '%s': %s",
                     pattern,
@@ -255,22 +254,6 @@ class FlextQualityDocumentationFinder:
             )
         except (OSError, ValueError):
             return False
-
-    def find_markdown_files(self) -> Sequence[Path]:
-        """Find specifically markdown files."""
-        all_files = self.find_files()
-        return [f for f in all_files if f.suffix.lower() in {".md", ".mdx"}]
-
-    def find_readme_files(self) -> Sequence[Path]:
-        """Find README files."""
-        all_files = self.find_files()
-        return [f for f in all_files if f.name.lower().startswith("readme")]
-
-    def find_by_extension(self, extensions: t.StrSequence) -> Sequence[Path]:
-        """Find files by their extensions."""
-        all_files = self.find_files()
-        extensions = [ext.lower().lstrip(".") for ext in extensions]
-        return [f for f in all_files if f.suffix.lower().lstrip(".") in extensions]
 
     def get_file_metadata(self, file_path: Path) -> m.Quality.FileMetadata:
         """Get metadata for a specific file."""
