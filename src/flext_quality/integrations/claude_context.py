@@ -50,7 +50,7 @@ class FlextQualityClaudeContextClient:
         limit: int | None = None,
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a search_code tool call."""
-        search_limit = limit or c.Quality.Defaults.DEFAULT_SEARCH_LIMIT
+        search_limit = limit or c.Quality.DEFAULT_SEARCH_LIMIT
         return self._mcp.build_tool_call(
             self.SERVER_NAME,
             "search_code",
@@ -72,7 +72,7 @@ class FlextQualityClaudeContextClient:
         limit: int | None = None,
     ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for code search."""
-        search_limit = limit or c.Quality.Defaults.DEFAULT_SEARCH_LIMIT
+        search_limit = limit or c.Quality.DEFAULT_SEARCH_LIMIT
         return self.build_search_call(query, limit=search_limit).flat_map(
             self._mcp.build_call_command,
         )

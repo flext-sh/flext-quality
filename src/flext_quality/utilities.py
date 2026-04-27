@@ -104,10 +104,10 @@ class FlextQualityUtilities(u):
         @staticmethod
         def run_shell_command(
             cmd: t.StrSequence,
-            timeout_ms: int = c.Quality.Defaults.HOOK_TIMEOUT_MS,
+            timeout_ms: int = c.Quality.HOOK_TIMEOUT_MS,
         ) -> p.Result[str]:
             """Run a shell command with timeout."""
-            timeout_secs = int(timeout_ms / c.Quality.Defaults.MS_TO_SECONDS_DIVISOR)
+            timeout_secs = int(timeout_ms / c.Quality.MS_TO_SECONDS_DIVISOR)
             cmd_result = u.Cli.run_raw(list(cmd), timeout=timeout_secs)
             if cmd_result.failure:
                 return r[str].fail(str(cmd_result.error))

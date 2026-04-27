@@ -46,7 +46,7 @@ class FlextQualityModels(m):
             command: str
             timeout_ms: Annotated[
                 int,
-                u.Field(default=c.Quality.Defaults.HOOK_TIMEOUT_MS),
+                u.Field(default=c.Quality.HOOK_TIMEOUT_MS),
             ]
             enabled: bool = True
 
@@ -78,7 +78,7 @@ class FlextQualityModels(m):
             port: int
             timeout_ms: Annotated[
                 int,
-                u.Field(default=c.Quality.Defaults.INTEGRATION_TIMEOUT_MS),
+                u.Field(default=c.Quality.INTEGRATION_TIMEOUT_MS),
             ]
 
         class MemoryObservation(m.BaseModel):

@@ -25,10 +25,10 @@ class FlextQualitySettings(FlextSettings):
     )
 
     hook_timeout_ms: Annotated[int, u.Field(ge=100, le=60000)] = (
-        c.Quality.Defaults.HOOK_TIMEOUT_MS
+        c.Quality.HOOK_TIMEOUT_MS
     )
     rule_timeout_seconds: Annotated[int, u.Field(ge=1, le=3600)] = (
-        c.Quality.Defaults.RULE_TIMEOUT_SECONDS
+        c.Quality.RULE_TIMEOUT_SECONDS
     )
     cache_enabled: Annotated[bool, u.Field(default=True)]
     mcp_server_port: Annotated[int, u.Field(ge=1, le=65535)] = (

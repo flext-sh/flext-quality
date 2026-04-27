@@ -24,7 +24,7 @@ def get_hooks_config() -> str:
     return str(
         t.Quality.CONTAINER_MAPPING_ADAPTER.dump_json(
             dict(settings),
-            indent=c.Quality.Defaults.JSON_INDENT,
+            indent=c.Quality.JSON_INDENT,
         ).decode("utf-8")
     )
 
@@ -37,7 +37,7 @@ def get_rules_config() -> str:
     return str(
         t.Quality.CONTAINER_MAPPING_SEQUENCE_ADAPTER.dump_json(
             [rule.model_dump() for rule in rules],
-            indent=c.Quality.Defaults.JSON_INDENT,
+            indent=c.Quality.JSON_INDENT,
         ).decode("utf-8")
     )
 
@@ -66,6 +66,6 @@ def get_integrations_status() -> str:
     return str(
         t.Quality.CONTAINER_MAPPING_ADAPTER.dump_json(
             status,
-            indent=c.Quality.Defaults.JSON_INDENT,
+            indent=c.Quality.JSON_INDENT,
         ).decode("utf-8")
     )

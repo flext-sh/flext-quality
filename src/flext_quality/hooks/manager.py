@@ -68,7 +68,7 @@ class FlextQualityHookManager:
         return str(
             t.Quality.CONTAINER_MAPPING_ADAPTER.dump_json(
                 dict(self.fetch_config()),
-                indent=c.Quality.Defaults.JSON_INDENT,
+                indent=c.Quality.JSON_INDENT,
             ).decode("utf-8")
         )
 

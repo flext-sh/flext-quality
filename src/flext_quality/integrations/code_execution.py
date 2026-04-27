@@ -31,7 +31,7 @@ class FlextQualityCodeExecutionBridge:
         working_dir: Path | None = None,
     ) -> None:
         """Initialize the code execution bridge."""
-        self._timeout_ms = timeout_ms or c.Quality.Defaults.INTEGRATION_TIMEOUT_MS
+        self._timeout_ms = timeout_ms or c.Quality.INTEGRATION_TIMEOUT_MS
         self._working_dir = working_dir or Path.cwd()
 
     def build_basedpyright_command(self, target_path: Path) -> p.Result[t.StrSequence]:

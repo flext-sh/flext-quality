@@ -33,7 +33,7 @@ def search_memory(
     The actual execution is left to the caller for security.
     """
     client = FlextQualityClaudeMemClient()
-    search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
+    search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
     result = client.build_search_call(query=query, limit=search_limit)
     if result.failure:
         return {"error": result.error}
@@ -64,7 +64,7 @@ def search_code(
     The actual execution is left to the caller for security.
     """
     client = FlextQualityClaudeContextClient()
-    search_limit = limit or c.Quality.Defaults.DEFAULT_SEARCH_LIMIT
+    search_limit = limit or c.Quality.DEFAULT_SEARCH_LIMIT
     result = client.build_search_call(query=query, limit=search_limit)
     if result.failure:
         return {"error": result.error}

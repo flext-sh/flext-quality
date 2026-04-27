@@ -29,7 +29,7 @@ class FlextQualityMcpClient:
 
     def __init__(self, *, timeout_ms: int | None = None) -> None:
         """Initialize the MCP client."""
-        self._timeout_ms = timeout_ms or c.Quality.Defaults.MCP_TIMEOUT_MS
+        self._timeout_ms = timeout_ms or c.Quality.MCP_TIMEOUT_MS
 
     def build_call_command(
         self, call: m.Quality.McpToolCall

@@ -52,7 +52,7 @@ class FlextQualityClaudeMemClient:
         limit: int | None = None,
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a search tool call."""
-        search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
+        search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
         params = {
             "query": query,
             "limit": search_limit,
@@ -67,8 +67,8 @@ class FlextQualityClaudeMemClient:
         depth_after: int | None = None,
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a timeline tool call."""
-        before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
-        after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
+        before = depth_before or c.Quality.DEFAULT_TIMELINE_DEPTH
+        after = depth_after or c.Quality.DEFAULT_TIMELINE_DEPTH
         params = {
             "anchor": anchor,
             "depth_before": before,
@@ -93,7 +93,7 @@ class FlextQualityClaudeMemClient:
         limit: int | None = None,
     ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for memory search."""
-        search_limit = limit or c.Quality.Defaults.DEFAULT_MEMORY_SEARCH_LIMIT
+        search_limit = limit or c.Quality.DEFAULT_MEMORY_SEARCH_LIMIT
         return self.build_search_call(query, limit=search_limit).flat_map(
             self._mcp.build_call_command,
         )
@@ -106,8 +106,8 @@ class FlextQualityClaudeMemClient:
         depth_after: int | None = None,
     ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for timeline query."""
-        before = depth_before or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
-        after = depth_after or c.Quality.Defaults.DEFAULT_TIMELINE_DEPTH
+        before = depth_before or c.Quality.DEFAULT_TIMELINE_DEPTH
+        after = depth_after or c.Quality.DEFAULT_TIMELINE_DEPTH
         return self.build_timeline_call(
             anchor,
             depth_before=before,
