@@ -13,7 +13,7 @@ from collections.abc import (
 )
 from pathlib import Path
 
-from flext_quality import t, u
+from flext_quality import m, t, u
 
 type ConfigPrimitive = t.Primitives
 type ConfigValue = t.Primitives | t.StrSequence
@@ -267,20 +267,7 @@ class FlextQualityConfigManager:
                 },
             },
             "validation_config.yaml": {
-                "link_validation": {
-                    "timeout": 10,
-                    "retry_attempts": 3,
-                    "user_agent": "FLEXT-Quality-Doc-Validator/1.0",
-                    "check_external": True,
-                    "check_internal": True,
-                    "check_images": True,
-                },
-                "content_analysis": {
-                    "min_section_depth": 2,
-                    "required_sections": ["Overview", "Installation", "Usage"],
-                    "check_todos": True,
-                    "check_fixmes": True,
-                },
+                **m.Quality.ValidationConfig().model_dump(),
             },
         }
 
@@ -308,29 +295,33 @@ class FlextQualityConfigManager:
             if not (self.config_dir / filename).exists()
         ]
 
-        # Validate audit rules structure
-        try:
-            audit_rules = self.get_audit_rules()
-            if not audit_rules.quality_thresholds:
-                issues.append("Audit rules missing quality_thresholds section")
-        except (FileNotFoundError, ValueError, KeyError, OSError) as e:
-            issues.append(f"Invalid audit_rules.yaml: {e}")
-
-        # Validate style guide structure
-        try:
-            style_guide = self.get_style_guide()
-            if not style_guide.markdown:
-                issues.append("Style guide missing markdown section")
-        except (FileNotFoundError, ValueError, KeyError, OSError) as e:
-            issues.append(f"Invalid style_guide.yaml: {e}")
-
-        # Validate validation settings structure
-        try:
-            validation_config = self.get_validation_config()
-            if not validation_config.link_validation:
-                issues.append("Validation settings missing link_validation section")
-        except (FileNotFoundError, ValueError, KeyError, OSError) as e:
-            issues.append(f"Invalid validation_config.yaml: {e}")
+        validations = (
+            (
+                self.get_audit_rules,
+                "quality_thresholds",
+                "Audit rules missing quality_thresholds section",
+                "audit_rules.yaml",
+            ),
+            (
+                self.get_style_guide,
+                "markdown",
+                "Style guide missing markdown section",
+                "style_guide.yaml",
+            ),
+            (
+                self.get_validation_config,
+                "link_validation",
+                "Validation settings missing link_validation section",
+                "validation_config.yaml",
+            ),
+        )
+        for getter, required_attr, missing_message, filename in validations:
+            try:
+                config = getter()
+                if not getattr(config, required_attr):
+                    issues.append(missing_message)
+            except (FileNotFoundError, ValueError, KeyError, OSError) as exc:
+                issues.append(f"Invalid {filename}: {exc}")
 
         return issues
 

@@ -130,22 +130,7 @@ class FlextQualityDocumentationAuditor:
 
     def get_default_validation_config(self) -> m.Quality.ValidationConfig:
         """Default validation settings if settings file not found."""
-        return m.Quality.ValidationConfig.model_validate({
-            "link_validation": {
-                "timeout": 10,
-                "retry_attempts": 3,
-                "user_agent": "FLEXT-Quality-Doc-Auditor/1.0",
-                "check_external": True,
-                "check_internal": True,
-                "check_images": True,
-            },
-            "content_analysis": {
-                "min_section_depth": 2,
-                "required_sections": ["Overview", "Installation", "Usage"],
-                "check_todos": True,
-                "check_fixmes": True,
-            },
-        })
+        return m.Quality.ValidationConfig()
 
     def find_documentation_files(self) -> Sequence[Path]:
         """Find all documentation files in the project."""
