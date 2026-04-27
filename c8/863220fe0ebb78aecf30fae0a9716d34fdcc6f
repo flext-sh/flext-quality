@@ -1,0 +1,18 @@
+src/flext_quality/constants.py
+  h_9db9d35f50cf33 129-130,184
+src/flext_quality/docs/scripts/optimize.py
+  h_9db9d35f50cf33 25,104
+src/flext_quality/docs/notifications.py
+  h_9db9d35f50cf33 619
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "c8863220fe0ebb78aecf30fae0a9716d34fdcc6f",
+  "prompts": {},
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
