@@ -1,0 +1,16 @@
+src/flext_quality/docs/core/config_manager.py
+  h_9db9d35f50cf33 16,270,298-299,301-304,306-310,312-316,318,320-324
+src/flext_quality/docs/scripts/audit.py
+  h_9db9d35f50cf33 133
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "1b0bfeb3cf4dc6480c6cb88c9bdf40b077bd5e3a",
+  "prompts": {},
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
