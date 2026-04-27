@@ -13,7 +13,7 @@ from collections.abc import (
     Sequence,
 )
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, ClassVar
 
 from flext_web import m, u
 
@@ -57,7 +57,7 @@ class FlextQualityModels(m):
             system_message: Annotated[str | None, u.Field(alias="systemMessage")] = None
             blocked_reason: str | None = None
 
-            model_config = m.ConfigDict(populate_by_name=True)
+            model_config: ClassVar[m.ConfigDict] = m.ConfigDict(populate_by_name=True)
 
         class RuleDefinition(m.BaseModel):
             """A rule definition from YAML."""
