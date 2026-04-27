@@ -28,7 +28,7 @@ from flext_quality import c, m, t, u
 class FlextQualityDocumentationNotifier:
     """Automated notification system for documentation quality alerts."""
 
-    MAX_BROKEN_LINKS: Final[int] = c.Quality.Threshold.MAX_BROKEN_LINKS_TO_SHOW
+    MAX_BROKEN_LINKS: Final[int] = c.Quality.THRESHOLD_MAX_BROKEN_LINKS_TO_SHOW
 
     class _ChannelConfig(m.BaseModel):
         enabled: bool

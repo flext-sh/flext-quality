@@ -192,15 +192,15 @@ class FlextQualityLinkValidator:
         )
 
     def _make_http_request(
-        self, url: str, method: str = FlextApiConstants.Api.MethodLiterals.HEAD_LOWER
+        self, url: str, method: str = FlextApiConstants.Api.METHOD_LITERALS_HEAD_LOWER
     ) -> requests.Response:
         """Make an HTTP request with appropriate headers."""
         headers = {"User-Agent": self.user_agent}
-        if method == FlextApiConstants.Api.MethodLiterals.HEAD_LOWER:
+        if method == FlextApiConstants.Api.METHOD_LITERALS_HEAD_LOWER:
             headers["Accept"] = "*/*"
         request_func = (
             requests.head
-            if method == FlextApiConstants.Api.MethodLiterals.HEAD_LOWER
+            if method == FlextApiConstants.Api.METHOD_LITERALS_HEAD_LOWER
             else requests.get
         )
         return request_func(

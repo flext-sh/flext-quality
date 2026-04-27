@@ -6,7 +6,7 @@ from fastmcp import FastMCP
 
 from flext_quality import c
 
-_mcp = FastMCP(name=c.Quality.Mcp.SERVER_NAME, version=c.Quality.Mcp.SERVER_VERSION)
+_mcp = FastMCP(name=c.Quality.MCP_SERVER_NAME, version=c.Quality.MCP_SERVER_VERSION)
 
 
 def get_server() -> FastMCP:

@@ -74,8 +74,8 @@ class FlextQuality:
 
     def __init__(self) -> None:
         """Initialize consolidated quality API with all functionality integrated."""
-        self.name = c.Quality.Mcp.SERVER_NAME
-        self._version = c.Quality.Mcp.SERVER_VERSION
+        self.name = c.Quality.MCP_SERVER_NAME
+        self._version = c.Quality.MCP_SERVER_VERSION
         self.logger = u.fetch_logger(__name__)
         self.settings = FlextQualitySettings.fetch_global()
         self._container = FlextContainer.shared()

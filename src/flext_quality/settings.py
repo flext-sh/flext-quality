@@ -32,9 +32,9 @@ class FlextQualitySettings(FlextSettings):
     )
     cache_enabled: Annotated[bool, u.Field(default=True)]
     mcp_server_port: Annotated[int, u.Field(ge=1, le=65535)] = (
-        c.Quality.Mcp.DEFAULT_PORT
+        c.Quality.MCP_DEFAULT_PORT
     )
-    rules_dir: Annotated[str, u.Field(default=c.Quality.Paths.RULES_DIR)]
+    rules_dir: Annotated[str, u.Field(default=c.Quality.PATHS_RULES_DIR)]
     max_function_length: Annotated[int, u.Field(default=50)]
     max_class_length: Annotated[int, u.Field(default=200)]
 

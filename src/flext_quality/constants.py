@@ -25,7 +25,7 @@ class FlextQualityConstants(c):
         from flext_core import c
 
         event = c.Quality.HookEvent.PRE_TOOL_USE
-        threshold = c.Quality.Threshold.DEFAULT_LINES
+        threshold = c.Quality.THRESHOLD_DEFAULT_LINES
     """
 
     class Quality:
@@ -112,32 +112,47 @@ class FlextQualityConstants(c):
             WARNING = "warning"
             INFO = "info"
 
-        class Threshold:
-            """Quality thresholds for validation."""
+        # ===== Quality Thresholds =====
+        THRESHOLD_DEFAULT_LINES: Final[int] = 500
+        "Default lines threshold."
+        THRESHOLD_MAX_LINES: Final[int] = 1000
+        "Maximum lines threshold."
+        THRESHOLD_MIN_LINES: Final[int] = 1
+        "Minimum lines threshold."
+        THRESHOLD_MAX_CYCLOMATIC_COMPLEXITY: Final[int] = 10
+        "Maximum cyclomatic complexity."
+        THRESHOLD_MAX_COGNITIVE_COMPLEXITY: Final[int] = 15
+        "Maximum cognitive complexity."
+        THRESHOLD_MAX_FUNCTION_LENGTH: Final[int] = 50
+        "Maximum function length."
+        THRESHOLD_MAX_CLASS_LENGTH: Final[int] = 300
+        "Maximum class length."
+        THRESHOLD_MIN_TEST_COVERAGE: Final[float] = 80.0
+        "Minimum test coverage percentage."
+        THRESHOLD_MIN_DOCSTRING_COVERAGE: Final[float] = 80.0
+        "Minimum docstring coverage percentage."
+        THRESHOLD_MAX_LINE_LENGTH: Final[int] = 88
+        "Maximum line length."
+        THRESHOLD_FLEXT_CORE_LINE_LENGTH: Final[int] = 79
+        "FLEXT core maximum line length."
+        THRESHOLD_MAX_BROKEN_LINKS_TO_SHOW: Final[int] = 10
+        "Maximum broken links to show."
+        THRESHOLD_MIN_HEADINGS_FOR_TOC: Final[int] = 5
+        "Minimum headings for table of contents."
 
-            DEFAULT_LINES: Final[int] = 500
-            MAX_LINES: Final[int] = 1000
-            MIN_LINES: Final[int] = 1
-            MAX_CYCLOMATIC_COMPLEXITY: Final[int] = 10
-            MAX_COGNITIVE_COMPLEXITY: Final[int] = 15
-            MAX_FUNCTION_LENGTH: Final[int] = 50
-            MAX_CLASS_LENGTH: Final[int] = 300
-            MIN_TEST_COVERAGE: Final[float] = 80.0
-            MIN_DOCSTRING_COVERAGE: Final[float] = 80.0
-            MAX_LINE_LENGTH: Final[int] = 88
-            FLEXT_CORE_LINE_LENGTH: Final[int] = 79
-            MAX_BROKEN_LINKS_TO_SHOW: Final[int] = 10
-            MIN_HEADINGS_FOR_TOC: Final[int] = 5
-
-        class Errors:
-            """Quality-specific error codes."""
-
-            RULE_FAILED: Final[str] = "QUALITY_RULE_FAILED"
-            THRESHOLD_EXCEEDED: Final[str] = "QUALITY_THRESHOLD_EXCEEDED"
-            PATTERN_VIOLATION: Final[str] = "QUALITY_PATTERN_VIOLATION"
-            ARCHITECTURE_VIOLATION: Final[str] = "QUALITY_ARCHITECTURE_VIOLATION"
-            TYPE_ERROR: Final[str] = "QUALITY_TYPE_ERROR"
-            LINT_ERROR: Final[str] = "QUALITY_LINT_ERROR"
+        # ===== Quality Errors =====
+        ERRORS_RULE_FAILED: Final[str] = "QUALITY_RULE_FAILED"
+        "Quality rule failed error code."
+        ERRORS_THRESHOLD_EXCEEDED: Final[str] = "QUALITY_THRESHOLD_EXCEEDED"
+        "Quality threshold exceeded error code."
+        ERRORS_PATTERN_VIOLATION: Final[str] = "QUALITY_PATTERN_VIOLATION"
+        "Quality pattern violation error code."
+        ERRORS_ARCHITECTURE_VIOLATION: Final[str] = "QUALITY_ARCHITECTURE_VIOLATION"
+        "Quality architecture violation error code."
+        ERRORS_TYPE_ERROR: Final[str] = "QUALITY_TYPE_ERROR"
+        "Quality type error code."
+        ERRORS_LINT_ERROR: Final[str] = "QUALITY_LINT_ERROR"
+        "Quality lint error code."
 
         HOOK_TIMEOUT_MS: Final[int] = 5000
         MCP_TIMEOUT_MS: Final[int] = 30000
@@ -153,31 +168,39 @@ class FlextQualityConstants(c):
         JSON_INDENT: Final[int] = 2
         MS_TO_SECONDS_DIVISOR: Final[int] = 1000
 
-        class Mcp:
-            """MCP Server configuration."""
+        # ===== MCP Configuration =====
+        MCP_SERVER_NAME: Final[str] = "flext-quality"
+        "MCP server name."
+        MCP_SERVER_VERSION: Final[str] = "1.0.0"
+        "MCP server version."
+        MCP_DEFAULT_PORT: Final[int] = 3100
+        "MCP default port."
 
-            SERVER_NAME: Final[str] = "flext-quality"
-            SERVER_VERSION: Final[str] = "1.0.0"
-            DEFAULT_PORT: Final[int] = 3100
+        # ===== Standard Paths =====
+        PATHS_RULES_DIR: Final[str] = "rules"
+        "Rules directory path."
+        PATHS_CONFIG_FILE: Final[str] = "quality.yaml"
+        "Configuration file path."
+        PATHS_CACHE_DIR: Final[str] = ".quality_cache"
+        "Cache directory path."
+        PATHS_REPORTS_DIR: Final[str] = "reports"
+        "Reports directory path."
 
-        class Paths:
-            """Standard paths for quality artifacts."""
-
-            RULES_DIR: Final[str] = "rules"
-            CONFIG_FILE: Final[str] = "quality.yaml"
-            CACHE_DIR: Final[str] = ".quality_cache"
-            REPORTS_DIR: Final[str] = "reports"
-
-        class Patterns:
-            """Regex patterns for validation."""
-
-            TYPE_IGNORE: Final[str] = "#\\s*type:\\s*ignore"
-            CAST_USAGE: Final[str] = "cast\\s*\\("
-            ANY_TYPE: Final[str] = ":\\s*Any\\b"
-            TYPE_CHECKING: Final[str] = "if\\s+TYPE_CHECKING\\s*:"
-            TIER_VIOLATION: Final[str] = "from flext_.*\\.(services|api) import"
-            OPTIONAL_PATTERN: Final[str] = "Optional\\["
-            UNION_PATTERN: Final[str] = "Union\\["
+        # ===== Validation Patterns =====
+        PATTERNS_TYPE_IGNORE: Final[str] = "#\\s*type:\\s*ignore"
+        "Type ignore comment pattern."
+        PATTERNS_CAST_USAGE: Final[str] = "cast\\s*\\("
+        "Cast function usage pattern."
+        PATTERNS_ANY_TYPE: Final[str] = ":\\s*Any\\b"
+        "Any type annotation pattern."
+        PATTERNS_TYPE_CHECKING: Final[str] = "if\\s+TYPE_CHECKING\\s*:"
+        "TYPE_CHECKING guard pattern."
+        PATTERNS_TIER_VIOLATION: Final[str] = "from flext_.*\\.(services|api) import"
+        "Tier violation import pattern."
+        PATTERNS_OPTIONAL_PATTERN: Final[str] = "Optional\\["
+        "Optional type pattern."
+        PATTERNS_UNION_PATTERN: Final[str] = "Union\\["
+        "Union type pattern."
 
 
 c = FlextQualityConstants

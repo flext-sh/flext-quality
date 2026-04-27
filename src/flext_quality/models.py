@@ -443,7 +443,9 @@ class FlextQualityModels(m):
 
             url: str
             headers: t.StrMapping = u.Field(default_factory=dict)
-            timeout: Annotated[t.PositiveInt, u.Field(default=30)]
+            timeout: Annotated[
+                t.PositiveInt, u.Field(default=c.DEFAULT_TIMEOUT_SECONDS)
+            ]
 
         class ChannelsConfig(m.BaseModel):
             """Enabled channels for documentation notifications."""

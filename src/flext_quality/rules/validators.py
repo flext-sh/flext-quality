@@ -63,12 +63,12 @@ class FlextQualityValidators:
         def __init__(self) -> None:
             """Initialize with FLEXT forbidden patterns."""
             patterns = {
-                "type-ignore": c.Quality.Patterns.TYPE_IGNORE,
-                "cast-usage": c.Quality.Patterns.CAST_USAGE,
-                "any-type": c.Quality.Patterns.ANY_TYPE,
-                "type-checking": c.Quality.Patterns.TYPE_CHECKING,
-                "optional-pattern": c.Quality.Patterns.OPTIONAL_PATTERN,
-                "union-pattern": c.Quality.Patterns.UNION_PATTERN,
+                "type-ignore": c.Quality.PATTERNS_TYPE_IGNORE,
+                "cast-usage": c.Quality.PATTERNS_CAST_USAGE,
+                "any-type": c.Quality.PATTERNS_ANY_TYPE,
+                "type-checking": c.Quality.PATTERNS_TYPE_CHECKING,
+                "optional-pattern": c.Quality.PATTERNS_OPTIONAL_PATTERN,
+                "union-pattern": c.Quality.PATTERNS_UNION_PATTERN,
             }
             super().__init__(patterns)
 
@@ -101,7 +101,7 @@ class FlextQualityValidators:
             file_tier = self._get_file_tier(file_path)
             if file_tier is None:
                 return r[Sequence[t.JsonMapping]].ok(violations)
-            tier_pattern = re.compile(c.Quality.Patterns.TIER_VIOLATION)
+            tier_pattern = re.compile(c.Quality.PATTERNS_TIER_VIOLATION)
             lines = content.splitlines()
             for line_num, line in enumerate(lines, start=1):
                 if tier_pattern.search(line):
