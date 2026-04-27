@@ -22,9 +22,7 @@ from collections.abc import (
 from datetime import UTC, datetime
 from pathlib import Path
 
-from flext_quality import e, m, t, u
-
-MIN_HEADINGS_FOR_TOC = 5
+from flext_quality import c, e, m, t, u
 
 
 class FlextQualityDocumentationOptimizer:
@@ -103,7 +101,7 @@ class FlextQualityDocumentationOptimizer:
                 content = file_path.read_text(encoding="utf-8")
                 original_content = content
                 headings = re.findall(r"^(#{1,6})\\s+(.+)$", content, re.MULTILINE)
-                if len(headings) > MIN_HEADINGS_FOR_TOC:
+                if len(headings) > c.Quality.Threshold.MIN_HEADINGS_FOR_TOC:
                     content = self._add_or_update_toc(content)
                 if content != original_content:
                     self._save_with_backup(file_path, content)

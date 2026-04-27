@@ -126,6 +126,8 @@ class FlextQualityConstants(c):
             MIN_DOCSTRING_COVERAGE: Final[float] = 80.0
             MAX_LINE_LENGTH: Final[int] = 88
             FLEXT_CORE_LINE_LENGTH: Final[int] = 79
+            MAX_BROKEN_LINKS_TO_SHOW: Final[int] = 10
+            MIN_HEADINGS_FOR_TOC: Final[int] = 5
 
         class Errors:
             """Quality-specific error codes."""
@@ -179,4 +181,4 @@ class FlextQualityConstants(c):
 
 
 c = FlextQualityConstants
-__all__: list[str] = ["FlextQualityConstants", "c"]
+__all__: tuple[str, ...] = ("FlextQualityConstants", "c")

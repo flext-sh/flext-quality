@@ -18,17 +18,17 @@ from datetime import UTC, datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
+from typing import Final
 
 import requests
 
 from flext_quality import c, m, t, u
 
-# Constants
-MAX_BROKEN_LINKS_TO_SHOW = 10
-
 
 class FlextQualityDocumentationNotifier:
     """Automated notification system for documentation quality alerts."""
+
+    MAX_BROKEN_LINKS: Final[int] = c.Quality.Threshold.MAX_BROKEN_LINKS_TO_SHOW
 
     class _ChannelConfig(m.BaseModel):
         enabled: bool
@@ -603,9 +603,9 @@ Found {len(broken_links)} broken links that need attention:
 """
 
         for i, link in enumerate(
-            broken_links[:MAX_BROKEN_LINKS_TO_SHOW],
+            broken_links[:self.MAX_BROKEN_LINKS],
             1,
-        ):  # Show first MAX_BROKEN_LINKS_TO_SHOW
+        ):  # Show first MAX_BROKEN_LINKS
             if isinstance(link, Mapping):
                 url_v = link.get("url", "unknown")
                 file_v = link.get("file", "unknown")
@@ -616,8 +616,8 @@ Found {len(broken_links)} broken links that need attention:
             message += f"   File: {file_v}\n"
             message += f"   Error: {err_v}\n\n"
 
-        if len(broken_links) > MAX_BROKEN_LINKS_TO_SHOW:
-            message += f"... and {len(broken_links) - MAX_BROKEN_LINKS_TO_SHOW} more broken links.\n\n"
+        if len(broken_links) > self.MAX_BROKEN_LINKS:
+            message += f"... and {len(broken_links) - self.MAX_BROKEN_LINKS} more broken links.\n\n"
 
         message += (
             "Please update or fix these broken links to maintain documentation quality."
