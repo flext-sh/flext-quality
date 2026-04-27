@@ -1,0 +1,30 @@
+src/flext_quality/models.py
+  7f8dabdbc28465a6 16
+  h_9db9d35f50cf33 60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "6340a02fe5907cdd0d74e5ba07490debc1b7a655",
+  "prompts": {
+    "7f8dabdbc28465a6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6be116e4-c6d0-4712-993e-5282bb50c991",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "FLEXT Bot",
+      "messages": [],
+      "total_additions": 1,
+      "total_deletions": 2,
+      "accepted_lines": 1,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/a5476dca86e7e6aa2484c6b14e41d156cbfc95ce7dffc6ec7d057a06bba66187"
+    }
+  },
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
