@@ -603,7 +603,7 @@ Found {len(broken_links)} broken links that need attention:
 """
 
         for i, link in enumerate(
-            broken_links[:self.MAX_BROKEN_LINKS],
+            broken_links[: self.MAX_BROKEN_LINKS],
             1,
         ):  # Show first MAX_BROKEN_LINKS
             if isinstance(link, Mapping):
