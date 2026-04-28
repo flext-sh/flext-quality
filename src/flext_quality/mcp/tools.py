@@ -40,8 +40,8 @@ def search_memory(
     command_result = client.get_search_command(query=query, limit=search_limit)
     if command_result.failure:
         return {"error": command_result.error}
-    params = u.Cli.normalize_json_value(result.value.params)
-    command = u.Cli.normalize_json_value(command_result.value)
+    params = u.normalize_to_json_value(result.value.params)
+    command = u.normalize_to_json_value(command_result.value)
     return {
         "server": result.value.server,
         "tool": result.value.tool,
@@ -71,8 +71,8 @@ def search_code(
     command_result = client.get_search_command(query=query, limit=search_limit)
     if command_result.failure:
         return {"error": command_result.error}
-    params = u.Cli.normalize_json_value(result.value.params)
-    command = u.Cli.normalize_json_value(command_result.value)
+    params = u.normalize_to_json_value(result.value.params)
+    command = u.normalize_to_json_value(command_result.value)
     return {
         "server": result.value.server,
         "tool": result.value.tool,
@@ -104,4 +104,4 @@ def validate_rules(
     result = engine.validate(path=path, context=context)
     if result.failure:
         return {"error": result.error}
-    return {"violations": u.Cli.normalize_json_value(result.value)}
+    return {"violations": u.normalize_to_json_value(result.value)}

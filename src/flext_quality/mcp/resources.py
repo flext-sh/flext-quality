@@ -48,16 +48,16 @@ def get_integrations_status() -> str:
     mem_client = FlextQualityClaudeMemClient()
     mem_health = mem_client.health_check()
     mem_status = (
-        u.Cli.normalize_json_value(mem_health.value)
+        u.normalize_to_json_value(mem_health.value)
         if mem_health.success
-        else u.Cli.normalize_json_value({"error": mem_health.error})
+        else u.normalize_to_json_value({"error": mem_health.error})
     )
     ctx_client = FlextQualityClaudeContextClient()
     ctx_health = ctx_client.health_check()
     ctx_status = (
-        u.Cli.normalize_json_value(ctx_health.value)
+        u.normalize_to_json_value(ctx_health.value)
         if ctx_health.success
-        else u.Cli.normalize_json_value({"error": ctx_health.error})
+        else u.normalize_to_json_value({"error": ctx_health.error})
     )
     status = {
         "claude_mem": mem_status,
