@@ -143,40 +143,38 @@ class FlextQualityScheduledMaintenance:
                 key: value.model_dump() for key, value in base.schedules.items()
             }
             for key, value in schedules_raw.items():
-                if not u.mapping(value):
-                    continue
-                if key not in schedules:
-                    continue
-                current = schedules[key]
-                updated = {
-                    "enabled": _as_bool(
-                        value.get("enabled"),
-                        default=current["enabled"],
-                    ),
-                    "time": _as_str(value.get("time"), current["time"]),
-                    "tasks": _as_str_list(value.get("tasks"), current["tasks"]),
-                    "day": _as_str(value.get("day"), current.get("day") or "") or None,
-                }
-                schedules[key] = updated
+                if u.mapping(value) and key in schedules:
+                    current = schedules[key]
+                    updated = {
+                        "enabled": _as_bool(
+                            value.get("enabled"),
+                            default=current["enabled"],
+                        ),
+                        "time": _as_str(value.get("time"), current["time"]),
+                        "tasks": _as_str_list(value.get("tasks"), current["tasks"]),
+                        "day": _as_str(value.get("day"), current.get("day") or "")
+                        or None,
+                    }
+                    schedules[key] = updated
             merged["schedules"] = schedules
 
         tasks_raw = overrides.get("tasks")
         if u.mapping(tasks_raw):
             tasks = {key: value.model_dump() for key, value in base.tasks.items()}
             for key, value in tasks_raw.items():
-                if not u.mapping(value):
-                    continue
-                if key not in tasks:
-                    continue
-                current = tasks[key]
-                tasks[key] = {
-                    "description": _as_str(
-                        value.get("description"),
-                        current["description"],
-                    ),
-                    "command": _as_str(value.get("command"), current["command"]),
-                    "timeout": _as_int(value.get("timeout"), current["timeout"]),
-                }
+                if u.mapping(value) and key in tasks:
+                    current = tasks[key]
+                    tasks[key] = {
+                        "description": _as_str(
+                            value.get("description"),
+                            current["description"],
+                        ),
+                        "command": _as_str(
+                            value.get("command"),
+                            current["command"],
+                        ),
+                        "timeout": _as_int(value.get("timeout"), current["timeout"]),
+                    }
             merged["tasks"] = tasks
 
         error_handling_raw = overrides.get("error_handling")

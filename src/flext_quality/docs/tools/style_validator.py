@@ -655,11 +655,14 @@ class FlextQualityStyleValidator:
 
     def generate_report(self, output_format: str = "json") -> str:
         """Generate style validation report."""
-        if output_format == "json":
-            return self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
         if output_format == "summary":
             return self._generate_summary_report()
-        return self.RESULTS_ADAPTER.dump_json(self.results).decode()
+        report_text: str = (
+            self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
+            if output_format == "json"
+            else self.RESULTS_ADAPTER.dump_json(self.results).decode()
+        )
+        return report_text
 
     def _generate_summary_report(self) -> str:
         """Generate human-readable summary."""

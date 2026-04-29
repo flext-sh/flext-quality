@@ -535,11 +535,14 @@ class FlextQualityLinkChecker:
 
     def generate_report(self, report_format: str = "json") -> str:
         """Generate validation report."""
-        if report_format == "json":
-            return self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
         if report_format == "summary":
             return self._generate_summary_report()
-        return self.RESULTS_ADAPTER.dump_json(self.results).decode()
+        report_text: str = (
+            self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
+            if report_format == "json"
+            else self.RESULTS_ADAPTER.dump_json(self.results).decode()
+        )
+        return report_text
 
     def _generate_summary_report(self) -> str:
         """Generate a human-readable summary report."""

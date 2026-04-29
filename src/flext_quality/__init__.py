@@ -12,7 +12,7 @@ from flext_core.lazy import (
 )
 
 if _t.TYPE_CHECKING:
-    from flext_web import d, e, h, r, s, x
+    from flext_web import d, e, h, r, x
 
     from flext_quality.__version__ import (
         __author__,
@@ -25,6 +25,7 @@ if _t.TYPE_CHECKING:
         __version_info__,
     )
     from flext_quality.api import FlextQuality, quality
+    from flext_quality.base import FlextQualityServiceBase, s
     from flext_quality.cli import FlextQualityCli, main
     from flext_quality.constants import FlextQualityConstants, c
     from flext_quality.docs.core.base_classes import (
@@ -101,6 +102,10 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "FlextQuality",
                 "quality",
             ),
+            ".base": (
+                "FlextQualityServiceBase",
+                "s",
+            ),
             ".cli": (
                 "FlextQualityCli",
                 "main",
@@ -170,7 +175,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "e",
                 "h",
                 "r",
-                "s",
                 "x",
             ),
         },
@@ -232,6 +236,7 @@ __all__: list[str] = [
     "FlextQualityRulesEngine",
     "FlextQualityRulesLoader",
     "FlextQualityScheduledMaintenance",
+    "FlextQualityServiceBase",
     "FlextQualitySettings",
     "FlextQualityStyleGuide",
     "FlextQualityStyleValidator",

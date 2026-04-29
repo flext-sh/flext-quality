@@ -25,10 +25,6 @@ if _t.TYPE_CHECKING:
         assert_issues_structure,
         assert_metrics_structure,
     )
-    from tests.helpers.constants import TestsConstants
-    from tests.helpers.models import TestsModels
-    from tests.helpers.protocols import TestsProtocols
-    from tests.helpers.typings import TestsTypings
     from tests.models import TestsFlextQualityModels, m
     from tests.protocols import TestsFlextQualityProtocols, p
     from tests.typings import TestsFlextQualityTypes, t
@@ -59,10 +55,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "assert_issues_structure",
                 "assert_metrics_structure",
             ),
-            ".helpers.constants": ("TestsConstants",),
-            ".helpers.models": ("TestsModels",),
-            ".helpers.protocols": ("TestsProtocols",),
-            ".helpers.typings": ("TestsTypings",),
             ".models": (
                 "TestsFlextQualityModels",
                 "m",
@@ -127,7 +119,6 @@ install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
 __all__: list[str] = [
     "MockQualityAnalyzer",
     "MockReportGenerator",
-    "TestsConstants",
     "TestsFlextQualityApi",
     "TestsFlextQualityBasic",
     "TestsFlextQualityCli",
@@ -136,9 +127,6 @@ __all__: list[str] = [
     "TestsFlextQualityProtocols",
     "TestsFlextQualityTypes",
     "TestsFlextQualityUtilities",
-    "TestsModels",
-    "TestsProtocols",
-    "TestsTypings",
     "assert_analysis_results_structure",
     "assert_dict_structure",
     "assert_is_dict",

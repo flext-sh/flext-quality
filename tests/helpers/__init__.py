@@ -15,23 +15,7 @@ _LAZY_IMPORTS = build_lazy_import_map(
             "assert_issues_structure",
             "assert_metrics_structure",
         ),
-        ".constants": (
-            "TestsConstants",
-            "c",
-        ),
-        ".models": (
-            "TestsModels",
-            "m",
-        ),
-        ".protocols": (
-            "TestsProtocols",
-            "p",
-        ),
         ".typing_helpers": ("typing_helpers",),
-        ".typings": (
-            "TestsTypings",
-            "t",
-        ),
     },
 )
 
