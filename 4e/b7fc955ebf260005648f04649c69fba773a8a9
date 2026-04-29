@@ -1,0 +1,26 @@
+src/flext_quality/mcp/resources.py
+  h_9db9d35f50cf33 38,65
+src/flext_quality/hooks/manager.py
+  h_9db9d35f50cf33 13,59
+src/flext_quality/api.py
+  h_9db9d35f50cf33 136,139
+src/flext_quality/integrations/mcp_client.py
+  h_9db9d35f50cf33 126,148
+src/flext_quality/cli.py
+  h_9db9d35f50cf33 31,46,89
+pyproject.toml
+  h_9db9d35f50cf33 320
+src/flext_quality/utilities.py
+  h_9db9d35f50cf33 35,38,40-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "4eb7fc955ebf260005648f04649c69fba773a8a9",
+  "prompts": {},
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
