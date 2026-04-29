@@ -1,0 +1,26 @@
+src/flext_quality/docs/tools/link_checker.py
+  h_9db9d35f50cf33 540-545
+src/flext_quality/docs/tools/style_validator.py
+  h_9db9d35f50cf33 660-665
+src/flext_quality/docs/scheduled_maintenance.py
+  h_9db9d35f50cf33 146,165,174
+src/flext_quality/docs/tools/content_analyzer.py
+  h_9db9d35f50cf33 822-827
+src/flext_quality/mcp/resources.py
+  h_9db9d35f50cf33 24,28,36,40,64,68
+src/flext_quality/hooks/manager.py
+  h_9db9d35f50cf33 68,72
+src/flext_quality/docs/scripts/report.py
+  h_9db9d35f50cf33 169,171,173
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "cf23e34f0c768e10b2dadefa1f8478f6406f1cd8",
+  "prompts": {},
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
