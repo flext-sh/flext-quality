@@ -390,7 +390,7 @@ class FlextQualityLinkChecker:
         self.results.performance.total_time = time.time() - start_time
 
         valid_times: Sequence[float] = [
-            float(r.response_time)
+            r.response_time
             for r in processed_results
             if r.response_time is not None and r.valid
         ]
@@ -423,9 +423,7 @@ class FlextQualityLinkChecker:
         self.results.performance.total_time = time.time() - start_time
 
         valid_times: Sequence[float] = [
-            float(r.response_time)
-            for r in results
-            if r.response_time is not None and r.valid
+            r.response_time for r in results if r.response_time is not None and r.valid
         ]
 
         if valid_times:
@@ -538,10 +536,10 @@ class FlextQualityLinkChecker:
     def generate_report(self, report_format: str = "json") -> str:
         """Generate validation report."""
         if report_format == "json":
-            return str(self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode())
+            return self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
         if report_format == "summary":
             return self._generate_summary_report()
-        return str(self.RESULTS_ADAPTER.dump_json(self.results).decode())
+        return self.RESULTS_ADAPTER.dump_json(self.results).decode()
 
     def _generate_summary_report(self) -> str:
         """Generate a human-readable summary report."""

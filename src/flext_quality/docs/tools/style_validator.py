@@ -232,9 +232,7 @@ class FlextQualityStyleValidator:
         """Validate a single documentation file."""
         try:
             content = file_path.read_text(encoding="utf-8")
-            filename = str(
-                file_path.relative_to(file_path.parents[2]),
-            )
+            filename = (file_path.relative_to(file_path.parents[2]),)
 
             violations_list: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
             issues_list: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
@@ -525,7 +523,7 @@ class FlextQualityStyleValidator:
         max_length_val = (
             self.settings.formatting.max_line_length if self.settings.formatting else 88
         )
-        max_length = int(max_length_val or 88)
+        max_length = max_length_val or 88
         lines = content.split("\n")
 
         for i, line in enumerate(lines, 1):
@@ -658,10 +656,10 @@ class FlextQualityStyleValidator:
     def generate_report(self, output_format: str = "json") -> str:
         """Generate style validation report."""
         if output_format == "json":
-            return str(self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode())
+            return self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
         if output_format == "summary":
             return self._generate_summary_report()
-        return str(self.RESULTS_ADAPTER.dump_json(self.results).decode())
+        return self.RESULTS_ADAPTER.dump_json(self.results).decode()
 
     def _generate_summary_report(self) -> str:
         """Generate human-readable summary."""

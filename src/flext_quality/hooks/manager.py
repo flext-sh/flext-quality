@@ -10,7 +10,7 @@ from collections.abc import (
 from pathlib import Path
 from typing import final
 
-from flext_quality import FlextQualityBaseHook, c, p, r, t
+from flext_quality import FlextQualityBaseHook, c, p, r, t, u
 
 
 @final
@@ -56,7 +56,7 @@ class FlextQualityHookManager:
                 matcher = hook.matcher
                 matcher_value: t.JsonValue
                 if isinstance(matcher, Sequence) and not isinstance(matcher, str):
-                    matcher_value = [str(item) for item in matcher]
+                    matcher_value = u.normalize_to_json_value(list(matcher))
                 else:
                     matcher_value = matcher
                 hook_entries.append({"matcher": matcher_value})
@@ -65,12 +65,10 @@ class FlextQualityHookManager:
 
     def fetch_config_json(self) -> str:
         """Get hooks configuration as JSON."""
-        return str(
-            t.Quality.CONTAINER_MAPPING_ADAPTER.dump_json(
-                dict(self.fetch_config()),
-                indent=c.Quality.JSON_INDENT,
-            ).decode("utf-8")
-        )
+        return t.Quality.CONTAINER_MAPPING_ADAPTER.dump_json(
+            dict(self.fetch_config()),
+            indent=c.Quality.JSON_INDENT,
+        ).decode("utf-8")
 
     def register(self, hook: FlextQualityBaseHook) -> p.Result[bool]:
         """Register a hook."""

@@ -123,7 +123,7 @@ class FlextQualityMcpClient:
             parsed: t.JsonMapping = t.Quality.CONTAINER_MAPPING_ADAPTER.validate_json(
                 output
             )
-            result_data: t.StrMapping = {str(k): str(v) for k, v in parsed.items()}
+            result_data: t.StrMapping = {k: str(v) for k, v in parsed.items()}
             return r[m.Quality.McpToolResult].ok(
                 m.Quality.McpToolResult.model_validate({
                     "success": True,
@@ -145,8 +145,7 @@ class FlextQualityMcpClient:
                             t.Quality.CONTAINER_MAPPING_ADAPTER.validate_python(item)
                         )
                         coerced_data.append({
-                            str(key): str(value)
-                            for key, value in validated_item.items()
+                            key: str(value) for key, value in validated_item.items()
                         })
                     else:
                         coerced_data.append({"value": str(item)})

@@ -463,8 +463,8 @@ class FlextQualityLinkValidator:
     def generate_report(self, report_format: str = "json") -> str:
         """Generate validation report."""
         if report_format == "json":
-            return str(self.results.model_dump_json(indent=2))
-        return str(self.results.model_dump_json())
+            return self.results.model_dump_json(indent=2)
+        return self.results.model_dump_json()
 
     def save_report(self, output_path: str = "docs/maintenance/reports/") -> Path:
         """Save validation report."""
@@ -623,7 +623,7 @@ class FlextQualityContentValidator:
             sentence_count=len(sentences),
             avg_words_per_sentence=avg_words_per_sentence,
             readability_score=readability_score,
-            has_code_blocks=bool("```" in content),
+            has_code_blocks="```" in content,
             has_lists=bool(re.search(r"^[\\s]*[-\\*\\+]", content, re.MULTILINE)),
             has_headers=bool(re.search(r"^#{1,6}\\s", content, re.MULTILINE)),
         )

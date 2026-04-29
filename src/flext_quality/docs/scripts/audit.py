@@ -542,13 +542,11 @@ class FlextQualityDocumentationAuditor:
         doc_file_names = {str(f.relative_to(self.project_root)) for f in doc_files}
         for link in internal_links:
             url_val = link["url"]
-            target_file = (
-                (str(url_val).split("#")[0]) if isinstance(url_val, str) else ""
-            )
+            target_file = (url_val.split("#")[0]) if isinstance(url_val, str) else ""
             if target_file and target_file not in doc_file_names:
                 file_val = link["file"]
                 link_file_dir = (
-                    Path(str(file_val)).parent if isinstance(file_val, str) else Path()
+                    Path(file_val).parent if isinstance(file_val, str) else Path()
                 )
                 potential_target = (link_file_dir / target_file).resolve()
                 if not potential_target.exists():
@@ -702,10 +700,10 @@ class FlextQualityDocumentationAuditor:
         """
         _ = output_path
         if output_format == "json":
-            return str(self.results.model_dump_json(indent=2))
+            return self.results.model_dump_json(indent=2)
         if output_format == "html":
             return self._generate_html_report()
-        return str(self.results.model_dump_json())
+        return self.results.model_dump_json()
 
     def _generate_html_report(self) -> str:
         """Generate HTML audit report."""

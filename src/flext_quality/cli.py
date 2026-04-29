@@ -28,6 +28,7 @@ class FlextQualityCli(s[bool]):
     class Status(s[t.JsonMapping]):
         """Display quality service status."""
 
+        @override
         def execute(self) -> p.Result[t.JsonMapping]:
             """Return the canonical quality service status payload."""
             return r[t.JsonMapping].ok(
@@ -42,6 +43,7 @@ class FlextQualityCli(s[bool]):
             u.Field(default_factory=Path.cwd, description="Target path"),
         ]
 
+        @override
         def execute(self) -> p.Result[Sequence[t.StrSequence]]:
             """Build the canonical quality check command sequence."""
             bridge = FlextQualityCodeExecutionBridge()
@@ -84,6 +86,7 @@ class FlextQualityCli(s[bool]):
 
     COMMANDS: ClassVar[Sequence[type[m.BaseModel]]] = (Status, Check, Validate)
 
+    @override
     def execute(self) -> p.Result[bool]:
         """Lifecycle entrypoint for parity with FLEXT services."""
         return r[bool].ok(value=True)

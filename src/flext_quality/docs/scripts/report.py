@@ -166,9 +166,7 @@ class FlextQualityDocumentationReporter:
         if report_format == "html":
             return self._generate_html_report(report_data)
         if report_format == "json":
-            return str(
-                self.REPORT_DATA_ADAPTER.dump_json(report_data, indent=2).decode()
-            )
+            return self.REPORT_DATA_ADAPTER.dump_json(report_data, indent=2).decode()
         if report_format == "markdown":
             return self._generate_markdown_report(report_data)
         msg = f"Unsupported format: {report_format}"
@@ -387,7 +385,7 @@ class FlextQualityDocumentationReporter:
             "charts": self._generate_charts(data) if data.trends else None,
         }
         render_method: Callable[..., str] = getattr(template, "render")
-        rendered: str = str(render_method(**template_data))
+        rendered: str = render_method(**template_data)
         return rendered
 
     def _get_html_template(self) -> Template:

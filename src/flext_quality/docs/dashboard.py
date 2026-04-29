@@ -112,7 +112,7 @@ class FlextQualityDocumentationDashboard:
             severity: dict[str, t.JsonValue] = {}
             if isinstance(severity_raw, Mapping):
                 for key, value in severity_raw.items():
-                    severity[str(key)] = value if isinstance(value, int) else 0
+                    severity[key] = value if isinstance(value, int) else 0
             files_analyzed_raw = data.get("files_analyzed")
             timestamp_raw = data.get("timestamp")
             qs_raw = metrics.get("quality_score", 0)

@@ -132,7 +132,7 @@ class FlextQualityRulesEngine:
     ) -> Sequence[t.JsonMapping]:
         """Validate a single file against rules."""
         validation_context: dict[str, t.JsonValue] = (
-            {str(key): value for key, value in context.items()} if context else {}
+            dict(context.items()) if context else {}
         )
         try:
             content = file_path.read_text(encoding="utf-8")

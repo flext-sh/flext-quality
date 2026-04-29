@@ -416,8 +416,8 @@ Please review recent changes and address any identified issues.
         email_config = self.settings.email
 
         msg = MIMEMultipart()
-        msg["From"] = str(email_config.from_address)
-        msg["To"] = ", ".join(str(x) for x in (email_config.to_addresses or []))
+        msg["From"] = email_config.from_address
+        msg["To"] = ", ".join(x for x in (email_config.to_addresses or []))
         msg["Subject"] = f"[{priority.upper()}] {title}"
 
         body = f"""
@@ -435,17 +435,17 @@ Timestamp: {datetime.now(UTC).isoformat()}
         msg.attach(MIMEText(body, "plain"))
 
         server = smtplib.SMTP(
-            str(email_config.smtp_server),
-            int(email_config.smtp_port),
+            email_config.smtp_server,
+            email_config.smtp_port,
         )
         server.starttls()
         server.login(
-            str(email_config.username),
-            str(email_config.password),
+            email_config.username,
+            email_config.password,
         )
         text = msg.as_string()
         server.sendmail(
-            str(email_config.from_address),
+            email_config.from_address,
             list(email_config.to_addresses or []),
             text,
         )
@@ -479,7 +479,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
         }
 
         response = requests.post(
-            str(slack_config.webhook_url),
+            slack_config.webhook_url,
             json=payload,
             timeout=10,
         )
@@ -511,7 +511,7 @@ Timestamp: {datetime.now(UTC).isoformat()}
         timeout = webhook_config.timeout
 
         response = requests.post(
-            str(webhook_config.url),
+            webhook_config.url,
             json=payload,
             headers=headers,
             timeout=timeout,

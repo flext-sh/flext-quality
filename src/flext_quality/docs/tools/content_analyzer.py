@@ -435,7 +435,7 @@ class FlextQualityContentAnalyzer:
 
         depths: Sequence[int] = [int(h["level"]) for h in headings]
         max_depth = max(depths) if depths else 0
-        avg_depth = sum(int(x) for x in depths) / len(depths) if depths else 0.0
+        avg_depth = sum(x for x in depths) / len(depths) if depths else 0.0
         depth_dist: Mapping[int, int] = dict(Counter(depths))
         structure.depth_analysis = {
             "max_depth": max_depth,
@@ -514,7 +514,7 @@ class FlextQualityContentAnalyzer:
                 )
 
         checks = [
-            ("code_examples", bool(r"```" in content), "Code examples"),
+            ("code_examples", r"```" in content, "Code examples"),
             (
                 "has_lists",
                 bool(re.search(r"^[\s]*[-\*\+]", content, re.MULTILINE)),
@@ -761,7 +761,7 @@ class FlextQualityContentAnalyzer:
         if not content_scores:
             return
 
-        score_values = [float(v) for v in content_scores.values()]
+        score_values = list(content_scores.values())
         avg_score = sum(score_values) / len(score_values)
 
         recommendations = self.results.recommendations
@@ -799,7 +799,7 @@ class FlextQualityContentAnalyzer:
                     })
 
         if all_issues:
-            issue_types = Counter(str(issue.get("type", "")) for issue in all_issues)
+            issue_types = Counter(issue.get("type", "") for issue in all_issues)
             most_common = issue_types.most_common(1)
             if most_common:
                 common_issue = most_common[0][0]
@@ -818,10 +818,10 @@ class FlextQualityContentAnalyzer:
     def generate_report(self, output_format: str = "json") -> str:
         """Generate content analysis report."""
         if output_format == "json":
-            return str(self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode())
+            return self.RESULTS_ADAPTER.dump_json(self.results, indent=2).decode()
         if output_format == "summary":
             return self._generate_summary_report()
-        return str(self.RESULTS_ADAPTER.dump_json(self.results).decode())
+        return self.RESULTS_ADAPTER.dump_json(self.results).decode()
 
     def _generate_summary_report(self) -> str:
         """Generate human-readable summary report."""
@@ -829,7 +829,7 @@ class FlextQualityContentAnalyzer:
         if not content_scores:
             return "No content analysis results available."
 
-        scores = [float(v) for v in content_scores.values()]
+        scores = list(content_scores.values())
         avg_score = sum(scores) / len(scores)
 
         report = f"""

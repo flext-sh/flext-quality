@@ -139,7 +139,7 @@ class FlextQualityConfigManager:
             return {}
         section: ConfigSection = {}
         for key, item in value.items():
-            key_str = str(key)
+            key_str = key
             if isinstance(item, (str, int, float, bool)):
                 section[key_str] = item
             elif isinstance(item, list):
@@ -157,7 +157,7 @@ class FlextQualityConfigManager:
         for key, item in value.items():
             section = FlextQualityConfigManager._as_section(item)
             if section:
-                settings[str(key)] = section
+                settings[key] = section
         return settings
 
     def __init__(self, config_dir: str | Path | None = None) -> None:
@@ -352,7 +352,7 @@ class FlextQualityConfigManager:
                         value, (str, bytes)
                     ):
                         normalized_value = t.json_value_adapter().validate_python(
-                            [str(item) for item in value],
+                            list(value),
                         )
                     else:
                         normalized_value = t.json_value_adapter().validate_python(
