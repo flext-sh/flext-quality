@@ -379,9 +379,12 @@ class FlextQualityDocumentationOptimizer:
 
     def generate_report(self, report_format: str = "json") -> str:
         """Generate optimization report."""
-        if report_format == "json":
-            return self.results.model_dump_json(indent=2)
-        return self.results.model_dump_json()
+        report_text: str = (
+            self.results.model_dump_json(indent=2)
+            if report_format == "json"
+            else self.results.model_dump_json()
+        )
+        return report_text
 
     def save_report(self, output_path: str = "docs/maintenance/reports/") -> str:
         """Save optimization report."""
@@ -395,73 +398,6 @@ class FlextQualityDocumentationOptimizer:
         latest_file = output_dir / "latest_optimization.json"
         latest_file.write_text(self.results.model_dump_json(indent=2), encoding="utf-8")
         return str(filepath)
-
-
-def _create_argument_parser() -> argparse.ArgumentParser:
-    """Create and configure the argument parser."""
-    parser = argparse.ArgumentParser(
-        description="FLEXT Quality Documentation Optimization",
-    )
-    _ = parser.add_argument(
-        "--fix-formatting",
-        action="store_true",
-        help="Fix common formatting issues",
-    )
-    _ = parser.add_argument(
-        "--update-toc",
-        action="store_true",
-        help="Update table of contents",
-    )
-    _ = parser.add_argument(
-        "--add-alt-text",
-        action="store_true",
-        help="Add missing alt text to images",
-    )
-    _ = parser.add_argument(
-        "--improve-accessibility",
-        action="store_true",
-        help="Enhance accessibility features",
-    )
-    _ = parser.add_argument(
-        "--optimize-structure",
-        action="store_true",
-        help="Optimize content structure and readability",
-    )
-    _ = parser.add_argument(
-        "--update-metadata",
-        action="store_true",
-        help="Update frontmatter and metadata",
-    )
-    _ = parser.add_argument(
-        "--comprehensive",
-        action="store_true",
-        help="Run all optimization checks",
-    )
-    _ = parser.add_argument(
-        "--backup",
-        action="store_true",
-        default=True,
-        help="Create backups before making changes",
-    )
-    _ = parser.add_argument(
-        "--no-backup",
-        action="store_false",
-        dest="backup",
-        help="Don't create backups",
-    )
-    _ = parser.add_argument(
-        "--output",
-        type=str,
-        default="docs/maintenance/reports/",
-        help="Output directory for reports",
-    )
-    _ = parser.add_argument(
-        "--files",
-        nargs="*",
-        default=[],
-        help="Specific files to optimize (default: all docs)",
-    )
-    return parser
 
 
 def _discover_documentation_files(args: argparse.Namespace) -> Sequence[Path]:
@@ -514,7 +450,72 @@ def _execute_optimizations(
 
 def main() -> None:
     """Main entry point for optimization system."""
-    parser = _create_argument_parser()
+    parser = u.Quality.build_argument_parser(
+        m.Quality.ArgumentParserSpec(
+            description="FLEXT Quality Documentation Optimization",
+            options=[
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--fix-formatting",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Fix common formatting issues",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--update-toc",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Update table of contents",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--add-alt-text",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Add missing alt text to images",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--improve-accessibility",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Enhance accessibility features",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--optimize-structure",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Optimize content structure and readability",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--update-metadata",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Update frontmatter and metadata",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--comprehensive",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Run all optimization checks",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--backup",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    default=True,
+                    help="Create backups before making changes",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--no-backup",),
+                    action=c.Quality.ArgumentAction.STORE_FALSE,
+                    dest="backup",
+                    help="Don't create backups",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--output",),
+                    default=c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
+                    value_type=c.Quality.ArgumentValueType.STRING,
+                    help="Output directory for reports",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--files",),
+                    nargs="*",
+                    default=[],
+                    help="Specific files to optimize (default: all docs)",
+                ),
+            ],
+        )
+    )
     args = parser.parse_args()
     optimizer = FlextQualityDocumentationOptimizer(backup=args.backup)
     run_any_optimization = _execute_optimizations(optimizer, args)

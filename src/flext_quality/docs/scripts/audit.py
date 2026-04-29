@@ -24,7 +24,7 @@ from pathlib import Path
 
 import requests
 
-from flext_quality import e, m, t, u
+from flext_quality import c, e, m, t, u
 
 
 class FlextQualityDocumentationAuditor:
@@ -699,11 +699,14 @@ class FlextQualityDocumentationAuditor:
 
         """
         _ = output_path
-        if output_format == "json":
-            return self.results.model_dump_json(indent=2)
         if output_format == "html":
             return self._generate_html_report()
-        return self.results.model_dump_json()
+        report_text: str = (
+            self.results.model_dump_json(indent=2)
+            if output_format == "json"
+            else self.results.model_dump_json()
+        )
+        return report_text
 
     def _generate_html_report(self) -> str:
         """Generate HTML audit report."""
@@ -761,66 +764,6 @@ class FlextQualityDocumentationAuditor:
         return str(filepath)
 
 
-def _create_argument_parser() -> argparse.ArgumentParser:
-    """Create and configure the argument parser."""
-    parser = argparse.ArgumentParser(description="FLEXT Quality Documentation Audit")
-    _ = parser.add_argument(
-        "--comprehensive",
-        action="store_true",
-        help="Run complete audit with all checks",
-    )
-    _ = parser.add_argument(
-        "--check-freshness",
-        action="store_true",
-        help="Check content freshness only",
-    )
-    _ = parser.add_argument(
-        "--check-completeness",
-        action="store_true",
-        help="Check content completeness only",
-    )
-    _ = parser.add_argument(
-        "--check-consistency",
-        action="store_true",
-        help="Check style consistency only",
-    )
-    _ = parser.add_argument(
-        "--check-links",
-        action="store_true",
-        help="Check links and references only",
-    )
-    _ = parser.add_argument(
-        "--ci-mode",
-        action="store_true",
-        help="CI/CD mode - exit with error code on failures",
-    )
-    _ = parser.add_argument(
-        "--fail-on-errors",
-        action="store_true",
-        help="Exit with error code if critical/high severity issues found",
-    )
-    _ = parser.add_argument(
-        "--output",
-        type=str,
-        default="docs/maintenance/reports/",
-        help="Output directory for reports",
-    )
-    _ = parser.add_argument(
-        "--format",
-        type=str,
-        choices=["json", "html"],
-        default="json",
-        help="Report format",
-    )
-    _ = parser.add_argument(
-        "--config",
-        type=str,
-        default="docs/maintenance/settings/",
-        help="Configuration directory path",
-    )
-    return parser
-
-
 def _execute_audit_checks(
     auditor: FlextQualityDocumentationAuditor,
     args: argparse.Namespace,
@@ -863,7 +806,68 @@ def _should_fail_on_results(
 
 def main() -> None:
     """Main entry point for documentation audit."""
-    parser = _create_argument_parser()
+    parser = u.Quality.build_argument_parser(
+        m.Quality.ArgumentParserSpec(
+            description="FLEXT Quality Documentation Audit",
+            options=[
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--comprehensive",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Run complete audit with all checks",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--check-freshness",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Check content freshness only",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--check-completeness",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Check content completeness only",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--check-consistency",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Check style consistency only",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--check-links",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Check links and references only",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--ci-mode",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="CI/CD mode - exit with error code on failures",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--fail-on-errors",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Exit with error code if critical/high severity issues found",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--output",),
+                    default=c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
+                    value_type=c.Quality.ArgumentValueType.STRING,
+                    help="Output directory for reports",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--format",),
+                    default="json",
+                    value_type=c.Quality.ArgumentValueType.STRING,
+                    choices=("json", "html"),
+                    help="Report format",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--config",),
+                    dest="settings",
+                    default=c.Quality.PATHS_DOCS_MAINTENANCE_SETTINGS_DIR,
+                    value_type=c.Quality.ArgumentValueType.STRING,
+                    help="Configuration directory path",
+                ),
+            ],
+        )
+    )
     args = parser.parse_args()
     auditor = FlextQualityDocumentationAuditor(args.settings)
     try:

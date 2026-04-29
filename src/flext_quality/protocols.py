@@ -8,17 +8,38 @@ from collections.abc import (
 from pathlib import Path
 from typing import ClassVar, Protocol, runtime_checkable
 
-from flext_web import p
+from flext_infra import p
+from flext_web import p as web_p
 
-from flext_quality import t
+from flext_quality import c, t
 
 
-class FlextQualityProtocols(p):
+class FlextQualityProtocols(p, web_p):
     """Namespace for flext-quality protocols."""
 
     @runtime_checkable
     class Quality(Protocol):
         """Quality-specific protocols namespace."""
+
+        @runtime_checkable
+        class ArgumentOptionSpec(Protocol):
+            """Structural contract for quality argparse option specs."""
+
+            flags: t.StrSequence
+            help: str
+            action: c.Quality.ArgumentAction | None
+            default: t.JsonValue | None
+            value_type: c.Quality.ArgumentValueType | None
+            nargs: int | str | None
+            choices: t.StrSequence | None
+            dest: str | None
+
+        @runtime_checkable
+        class ArgumentParserSpec(Protocol):
+            """Structural contract for quality argparse parser specs."""
+
+            description: str
+            options: Sequence[FlextQualityProtocols.Quality.ArgumentOptionSpec]
 
         @runtime_checkable
         class ValidatorBase(Protocol):

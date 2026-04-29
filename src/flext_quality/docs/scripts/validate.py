@@ -26,7 +26,7 @@ from pathlib import Path
 import requests
 from flext_api import FlextApiConstants
 
-from flext_quality import m, t
+from flext_quality import c, m, t, u
 
 
 class FlextQualityLinkValidator:
@@ -462,9 +462,12 @@ class FlextQualityLinkValidator:
 
     def generate_report(self, report_format: str = "json") -> str:
         """Generate validation report."""
-        if report_format == "json":
-            return self.results.model_dump_json(indent=2)
-        return self.results.model_dump_json()
+        report_text: str = (
+            self.results.model_dump_json(indent=2)
+            if report_format == "json"
+            else self.results.model_dump_json()
+        )
+        return report_text
 
     def save_report(self, output_path: str = "docs/maintenance/reports/") -> Path:
         """Save validation report."""
@@ -629,79 +632,6 @@ class FlextQualityContentValidator:
         )
 
 
-def _create_validation_parser() -> argparse.ArgumentParser:
-    """Create and configure the validation argument parser."""
-    parser = argparse.ArgumentParser(
-        description="FLEXT Quality Documentation Validation",
-    )
-    _ = parser.add_argument(
-        "--external-links",
-        action="store_true",
-        help="Validate external links",
-    )
-    _ = parser.add_argument(
-        "--internal-links",
-        action="store_true",
-        help="Validate internal links",
-    )
-    _ = parser.add_argument(
-        "--images",
-        action="store_true",
-        help="Validate image references",
-    )
-    _ = parser.add_argument(
-        "--anchors",
-        action="store_true",
-        help="Validate anchor links",
-    )
-    _ = parser.add_argument(
-        "--link-text",
-        action="store_true",
-        help="Check link text quality",
-    )
-    _ = parser.add_argument(
-        "--markdown-syntax",
-        action="store_true",
-        help="Validate markdown syntax",
-    )
-    _ = parser.add_argument(
-        "--content-quality",
-        action="store_true",
-        help="Analyze content quality",
-    )
-    _ = parser.add_argument(
-        "--all",
-        action="store_true",
-        help="Run all validation checks",
-    )
-    _ = parser.add_argument("--verbose", action="store_true", help="Verbose output")
-    _ = parser.add_argument(
-        "--output",
-        type=str,
-        default="docs/maintenance/reports/",
-        help="Output directory for reports",
-    )
-    _ = parser.add_argument(
-        "--timeout",
-        type=int,
-        default=10,
-        help="Timeout for external link checks",
-    )
-    _ = parser.add_argument(
-        "--retries",
-        type=int,
-        default=3,
-        help="Retry attempts for external links",
-    )
-    _ = parser.add_argument(
-        "--workers",
-        type=int,
-        default=5,
-        help="Max concurrent workers",
-    )
-    return parser
-
-
 def _discover_validation_files() -> Sequence[Path]:
     """Discover documentation files for validation."""
     project_root = Path(__file__).parent.parent.parent.parent
@@ -762,7 +692,82 @@ def _execute_validations(
 
 def main() -> None:
     """Main entry point for documentation validation."""
-    parser = _create_validation_parser()
+    parser = u.Quality.build_argument_parser(
+        m.Quality.ArgumentParserSpec(
+            description="FLEXT Quality Documentation Validation",
+            options=[
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--external-links",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Validate external links",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--internal-links",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Validate internal links",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--images",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Validate image references",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--anchors",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Validate anchor links",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--link-text",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Check link text quality",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--markdown-syntax",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Validate markdown syntax",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--content-quality",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Analyze content quality",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--all",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Run all validation checks",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--verbose",),
+                    action=c.Quality.ArgumentAction.STORE_TRUE,
+                    help="Verbose output",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--output",),
+                    default=c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
+                    value_type=c.Quality.ArgumentValueType.STRING,
+                    help="Output directory for reports",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--timeout",),
+                    default=10,
+                    value_type=c.Quality.ArgumentValueType.INTEGER,
+                    help="Timeout for external link checks",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--retries",),
+                    default=3,
+                    value_type=c.Quality.ArgumentValueType.INTEGER,
+                    help="Retry attempts for external links",
+                ),
+                m.Quality.ArgumentOptionSpec(
+                    flags=("--workers",),
+                    default=5,
+                    value_type=c.Quality.ArgumentValueType.INTEGER,
+                    help="Max concurrent workers",
+                ),
+            ],
+        )
+    )
     args = parser.parse_args()
     doc_files = _discover_validation_files()
     link_validator = FlextQualityLinkValidator(

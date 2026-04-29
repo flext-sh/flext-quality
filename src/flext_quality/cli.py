@@ -17,7 +17,7 @@ from typing import Annotated, ClassVar, Self, override
 from flext_cli import FlextCliSettings, cli, m, u
 
 from flext_core import FlextSettings, s
-from flext_quality import FlextQuality, FlextQualityCodeExecutionBridge, p, r, t
+from flext_quality import FlextQualityCodeExecutionBridge, p, quality, r, t
 
 
 class FlextQualityCli(s[bool]):
@@ -31,9 +31,7 @@ class FlextQualityCli(s[bool]):
         @override
         def execute(self) -> p.Result[t.JsonMapping]:
             """Return the canonical quality service status payload."""
-            return r[t.JsonMapping].ok(
-                FlextQuality.fetch_instance().fetch_status(),
-            )
+            return r[t.JsonMapping].ok(quality.fetch_status())
 
     class Check(s[Sequence[t.StrSequence]]):
         """Run lint + type check on --target-path."""

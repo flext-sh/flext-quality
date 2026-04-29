@@ -8,10 +8,11 @@ from collections.abc import (
     Sequence,
 )
 
-from flext_web import m, t
+from flext_infra import m, t
+from flext_web import t as web_t
 
 
-class FlextQualityTypes(t):
+class FlextQualityTypes(t, web_t):
     """Namespace for flext-quality type definitions."""
 
     class Quality:

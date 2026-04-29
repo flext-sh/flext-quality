@@ -22,69 +22,7 @@ from pathlib import Path
 
 import pytest
 
-from tests import p, t
-
-
-def assert_result_success_with_data[T](result: p.Result[T]) -> T:
-    """Assert r success and return validated data with type safety.
-
-    Provides a DRY helper for the common test pattern of validating r
-    success and extracting data with proper null safety checks. Eliminates
-    boilerplate code while maintaining type safety and clear error messages.
-
-    Args:
-      result: r instance to validate for success state
-
-    Returns:
-      The validated data from the successful result
-
-    Raises:
-      AssertionError: If result indicates failure or data is None
-
-    Example:
-      >>> result = service.perform_operation()
-      >>> data = assert_result_success_with_data(result)
-      >>> assert data.expected_property == expected_value
-
-    Note:
-      This helper follows flext-core patterns and provides clear error
-      messages for test debugging and failure analysis.
-
-    """
-    assert result.success, f"Expected success but got failure: {result.error}"
-    assert result.value is not None, "Expected data but got None"
-    return result.value
-
-
-def assert_result_failure_with_error[T](result: p.Result[T]) -> str:
-    """Assert r failure and return validated error message.
-
-    Provides a DRY helper for validating r failure states and
-    extracting error messages with proper null safety. Essential for
-    testing error handling and negative test scenarios.
-
-    Args:
-      result: r instance to validate for failure state
-
-    Returns:
-      The validated error message from the failed result
-
-    Raises:
-      AssertionError: If result indicates success or error message is None
-
-    Example:
-      >>> result = service.perform_invalid_operation()
-      >>> error = assert_result_failure_with_error(result)
-      >>> assert "validation failed" in error.lower()
-
-    Note:
-      This helper ensures consistent error handling validation across
-      the test suite and provides clear debugging information.
-
-    """
-    assert result.failure, "Expected failure but got success"
-    assert result.error is not None, "Expected error message but got None"
-    return result.error
+from tests import t
 
 
 @pytest.fixture(autouse=True)

@@ -12,10 +12,11 @@ from __future__ import annotations
 from enum import StrEnum, unique
 from typing import Final
 
-from flext_web import c
+from flext_infra import c
+from flext_web import c as web_c
 
 
-class FlextQualityConstants(c):
+class FlextQualityConstants(c, web_c):
     """Centralized constants for flext-quality (Layer 0).
 
     Provides immutable, namespace-organized constants for hook processing,
@@ -112,6 +113,20 @@ class FlextQualityConstants(c):
             WARNING = "warning"
             INFO = "info"
 
+        @unique
+        class ArgumentAction(StrEnum):
+            """Supported argparse actions for quality tooling."""
+
+            STORE_TRUE = "store_true"
+            STORE_FALSE = "store_false"
+
+        @unique
+        class ArgumentValueType(StrEnum):
+            """Supported argparse value coercions for quality tooling."""
+
+            STRING = "str"
+            INTEGER = "int"
+
         # ===== Quality Thresholds =====
         THRESHOLD_DEFAULT_LINES: Final[int] = 500
         "Default lines threshold."
@@ -185,6 +200,10 @@ class FlextQualityConstants(c):
         "Cache directory path."
         PATHS_REPORTS_DIR: Final[str] = "reports"
         "Reports directory path."
+        PATHS_DOCS_MAINTENANCE_REPORTS_DIR: Final[str] = "docs/maintenance/reports/"
+        "Documentation maintenance reports directory path."
+        PATHS_DOCS_MAINTENANCE_SETTINGS_DIR: Final[str] = "docs/maintenance/settings/"
+        "Documentation maintenance settings directory path."
 
         # ===== Validation Patterns =====
         PATTERNS_TYPE_IGNORE: Final[str] = "#\\s*type:\\s*ignore"

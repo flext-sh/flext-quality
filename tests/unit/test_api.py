@@ -5,42 +5,27 @@ from __future__ import annotations
 import io
 import sys
 import tempfile
-import threading
-from collections.abc import (
-    MutableSequence,
-)
 from pathlib import Path
 
 from flext_tests import tm
 
-from flext_quality import FlextQuality
+from flext_quality import FlextQuality, quality
 
 
 class TestsFlextQualityApi:
     """Tests for FlextQuality API."""
 
-    def setup_method(self) -> None:
-        """Reset singleton before each test."""
-        FlextQuality._reset_instance()
-
-    def teardown_method(self) -> None:
-        """Reset singleton after each test."""
-        FlextQuality._reset_instance()
-
-    def test_fetch_instance_returns_singleton(self) -> None:
-        """Test that get_instance returns same instance."""
-        instance1 = FlextQuality.fetch_instance()
-        instance2 = FlextQuality.fetch_instance()
-        tm.that(instance1 is instance2, eq=True)
+    def test_quality_alias_exposes_facade_instance(self) -> None:
+        """Test that the runtime alias exposes the public facade instance."""
+        tm.that(quality.fetch_status(), has="name")
 
     def test_instance_has_required_attributes(self) -> None:
-        """Test that instance has all required attributes."""
-        FlextQuality.fetch_instance()
+        """Test that the facade instantiates without constructor arguments."""
+        tm.that(FlextQuality().fetch_status(), has="name")
 
     def test_fetch_status_returns_dict(self) -> None:
-        """Test that get_status returns status dict."""
-        quality = FlextQuality.fetch_instance()
-        status = quality.fetch_status()
+        """Test that fetch_status returns status dict."""
+        status = FlextQuality().fetch_status()
         tm.that(status, is_=dict)
         tm.that(status, has="name")
         tm.that(status, has="version")
@@ -49,28 +34,27 @@ class TestsFlextQualityApi:
 
     def test_validate_configuration_succeeds(self) -> None:
         """Test that validate_configuration returns success."""
-        quality = FlextQuality.fetch_instance()
-        result = quality.validate_configuration()
+        result = FlextQuality().validate_configuration()
         tm.that(result.success, eq=True)
         tm.that(result.value is True, eq=True)
 
     def test_format_hook_output_continue(self) -> None:
         """Test format_hook_output with continue=True."""
-        quality = FlextQuality.fetch_instance()
-        output = quality.format_hook_output(continue_exec=True)
+        output = FlextQuality().format_hook_output(continue_exec=True)
         tm.that(output, has='"continue":true')
 
     def test_format_hook_output_with_message(self) -> None:
         """Test format_hook_output with message."""
-        quality = FlextQuality.fetch_instance()
-        output = quality.format_hook_output(continue_exec=True, message="Test message")
+        output = FlextQuality().format_hook_output(
+            continue_exec=True,
+            message="Test message",
+        )
         tm.that(output, has='"continue":true')
         tm.that(output, has="Test message")
 
     def test_format_hook_output_blocked(self) -> None:
         """Test format_hook_output with blocked reason."""
-        quality = FlextQuality.fetch_instance()
-        output = quality.format_hook_output(
+        output = FlextQuality().format_hook_output(
             continue_exec=False,
             blocked_reason="Blocked for testing",
         )
@@ -78,20 +62,18 @@ class TestsFlextQualityApi:
 
     def test_fetch_hook_config_json(self) -> None:
         """Test get_hook_config_json returns valid JSON."""
-        quality = FlextQuality.fetch_instance()
-        config_json = quality.fetch_hook_config_json()
+        config_json = FlextQuality().fetch_hook_config_json()
         tm.that(config_json, is_=str)
         tm.that(config_json, eq="{}")
 
     def test_load_rules_from_config_with_no_rules_dir(self) -> None:
         """Test load_rules_from_config when rules dir doesn't exist."""
-        quality = FlextQuality.fetch_instance()
-        result = quality.load_rules_from_config()
+        result = FlextQuality().load_rules_from_config()
         tm.that(result.success or result.failure, eq=True)
 
     def test_load_rules_from_file(self) -> None:
         """Test load_rules from a YAML file."""
-        quality = FlextQuality.fetch_instance()
+        quality_service = FlextQuality()
         rules_yaml = '\nrules:\n  - name: test-rule\n    type: warning\n    description: Test rule\n    pattern: "test"\n    enabled: true\n'
         with tempfile.NamedTemporaryFile(
             encoding="utf-8",
@@ -102,7 +84,7 @@ class TestsFlextQualityApi:
             f.write(rules_yaml)
             rules_path = Path(f.name)
         try:
-            result = quality.load_rules(rules_path)
+            result = quality_service.load_rules(rules_path)
             tm.that(result.success, eq=True)
             tm.that(len(result.value), eq=1)
             tm.that(result.value[0].name, eq="test-rule")
@@ -111,59 +93,35 @@ class TestsFlextQualityApi:
 
     def test_load_rules_from_nonexistent_file(self) -> None:
         """Test load_rules fails for nonexistent file."""
-        quality = FlextQuality.fetch_instance()
-        result = quality.load_rules(Path("/nonexistent/rules.yaml"))
+        result = FlextQuality().load_rules(Path("/nonexistent/rules.yaml"))
         tm.that(result.failure, eq=True)
         tm.that((result.error or "").lower(), has="not found")
 
     def test_execute_hook_unknown_event(self) -> None:
         """Test execute_hook fails for unknown event."""
-        quality = FlextQuality.fetch_instance()
-        result = quality.execute_hook("UnknownEvent", {})
+        result = FlextQuality().execute_hook("UnknownEvent", {})
         tm.that(result.failure, eq=True)
         tm.that((result.error or ""), has="Unknown event")
 
     def test_execute_hook_valid_event_no_hooks(self) -> None:
         """Test execute_hook succeeds with no registered hooks."""
-        quality = FlextQuality.fetch_instance()
-        result = quality.execute_hook("PreToolUse", {"tool_name": "Edit"})
+        result = FlextQuality().execute_hook("PreToolUse", {"tool_name": "Edit"})
         tm.that(result.success, eq=True)
         tm.that(result.value.get("continue") is True, eq=True)
 
-    def test_double_check_locking_concurrent(self) -> None:
-        """Test singleton creation with concurrent threads."""
-        instances: MutableSequence[FlextQuality] = []
-        errors: MutableSequence[Exception] = []
-
-        def get_instance() -> None:
-            try:
-                instance = FlextQuality.fetch_instance()
-                instances.append(instance)
-            except Exception as e:
-                errors.append(e)
-
-        threads = [threading.Thread(target=get_instance) for _ in range(10)]
-        for t in threads:
-            t.start()
-        for t in threads:
-            t.join()
-        tm.that(not errors, eq=True)
-        tm.that(len(instances), eq=10)
-        tm.that(all(i is instances[0] for i in instances), eq=True)
-
     def test_load_rules_from_config_nonexistent_dir(self) -> None:
         """Test load_rules_from_config fails when rules dir doesn't exist."""
-        quality = FlextQuality.fetch_instance()
-        original_dir = quality.settings.rules_dir
-        quality.settings.rules_dir = "/nonexistent/rules/dir"
-        result = quality.load_rules_from_config()
-        quality.settings.rules_dir = original_dir
+        quality_service = FlextQuality()
+        original_dir = quality_service.settings.rules_dir
+        quality_service.settings.rules_dir = "/nonexistent/rules/dir"
+        result = quality_service.load_rules_from_config()
+        quality_service.settings.rules_dir = original_dir
         tm.that(result.failure, eq=True)
         tm.that((result.error or "").lower(), has="not found")
 
     def test_load_rules_from_config_with_multiple_files(self) -> None:
         """Test load_rules_from_config loads multiple YAML files."""
-        quality = FlextQuality.fetch_instance()
+        quality_service = FlextQuality()
         with tempfile.TemporaryDirectory() as tmpdir:
             rules_dir = Path(tmpdir)
             (rules_dir / "rules1.yaml").write_text(
@@ -172,20 +130,20 @@ class TestsFlextQualityApi:
             (rules_dir / "rules2.yml").write_text(
                 '\nrules:\n  - name: rule-two\n    type: blocking\n    description: Second rule\n    pattern: "two"\n    enabled: true\n',
             )
-            original_dir = quality.settings.rules_dir
-            quality.settings.rules_dir = str(rules_dir)
-            result = quality.load_rules_from_config()
-            quality.settings.rules_dir = original_dir
+            original_dir = quality_service.settings.rules_dir
+            quality_service.settings.rules_dir = str(rules_dir)
+            result = quality_service.load_rules_from_config()
+            quality_service.settings.rules_dir = original_dir
             tm.that(result.success, eq=True)
             tm.that(len(result.value), eq=2)
 
     def test_process_stdin_hook_success(self) -> None:
         """Test process_stdin_hook with valid input."""
-        quality = FlextQuality.fetch_instance()
+        quality_service = FlextQuality()
         original_stdin = sys.stdin
         sys.stdin = io.StringIO('{"event": "PreToolUse", "tool_name": "Edit"}')
         try:
-            result = quality.process_stdin_hook()
+            result = quality_service.process_stdin_hook()
             tm.that(result.success, eq=True)
             tm.that(result.value.get("continue") is True, eq=True)
         finally:
@@ -193,11 +151,11 @@ class TestsFlextQualityApi:
 
     def test_process_stdin_hook_empty_event(self) -> None:
         """Test process_stdin_hook with empty event returns continue."""
-        quality = FlextQuality.fetch_instance()
+        quality_service = FlextQuality()
         original_stdin = sys.stdin
         sys.stdin = io.StringIO('{"tool_name": "Edit"}')
         try:
-            result = quality.process_stdin_hook()
+            result = quality_service.process_stdin_hook()
             tm.that(result.success, eq=True)
             tm.that(result.value.get("continue") is True, eq=True)
         finally:
@@ -205,11 +163,11 @@ class TestsFlextQualityApi:
 
     def test_process_stdin_hook_invalid_json(self) -> None:
         """Test process_stdin_hook with invalid JSON fails."""
-        quality = FlextQuality.fetch_instance()
+        quality_service = FlextQuality()
         original_stdin = sys.stdin
         sys.stdin = io.StringIO("not valid json")
         try:
-            result = quality.process_stdin_hook()
+            result = quality_service.process_stdin_hook()
             tm.that(result.failure, eq=True)
             tm.that(
                 (
@@ -223,11 +181,11 @@ class TestsFlextQualityApi:
 
     def test_process_stdin_hook_with_unknown_event(self) -> None:
         """Test process_stdin_hook with unknown event fails."""
-        quality = FlextQuality.fetch_instance()
+        quality_service = FlextQuality()
         original_stdin = sys.stdin
         sys.stdin = io.StringIO('{"event": "UnknownEvent"}')
         try:
-            result = quality.process_stdin_hook()
+            result = quality_service.process_stdin_hook()
             tm.that(result.failure, eq=True)
             tm.that((result.error or ""), has="Unknown event")
         finally:
@@ -235,13 +193,13 @@ class TestsFlextQualityApi:
 
     def test_validate_configuration_threshold_failure(self) -> None:
         """Test validate_configuration fails when thresholds are invalid."""
-        quality = FlextQuality.fetch_instance()
-        original_function = quality.settings.max_function_length
-        original_class = quality.settings.max_class_length
-        quality.settings.max_function_length = 500
-        quality.settings.max_class_length = 100
-        result = quality.validate_configuration()
-        quality.settings.max_function_length = original_function
-        quality.settings.max_class_length = original_class
+        quality_service = FlextQuality()
+        original_function = quality_service.settings.max_function_length
+        original_class = quality_service.settings.max_class_length
+        quality_service.settings.max_function_length = 500
+        quality_service.settings.max_class_length = 100
+        result = quality_service.validate_configuration()
+        quality_service.settings.max_function_length = original_function
+        quality_service.settings.max_class_length = original_class
         tm.that(result.failure, eq=True)
         tm.that((result.error or "").lower(), has="max_function_length")

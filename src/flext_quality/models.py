@@ -15,12 +15,13 @@ from collections.abc import (
 from pathlib import Path
 from typing import Annotated, ClassVar
 
-from flext_web import m, u
+from flext_infra import m, u
+from flext_web import m as web_m
 
 from flext_quality import c, t
 
 
-class FlextQualityModels(m):
+class FlextQualityModels(m, web_m):
     """Namespace for flext-quality models."""
 
     class Quality:
@@ -249,6 +250,24 @@ class FlextQualityModels(m):
             warnings: MutableSequence[str] = u.Field(default_factory=list)
             end_time: str = ""
             duration_seconds: int = 0
+
+        class ArgumentOptionSpec(m.BaseModel):
+            """Typed argparse option spec for quality tooling."""
+
+            flags: t.StrSequence
+            help: str
+            action: c.Quality.ArgumentAction | None = None
+            default: t.JsonValue | None = None
+            value_type: c.Quality.ArgumentValueType | None = None
+            nargs: int | str | None = None
+            choices: t.StrSequence | None = None
+            dest: str | None = None
+
+        class ArgumentParserSpec(m.BaseModel):
+            """Typed parser spec consumed by canonical quality utilities."""
+
+            description: str
+            options: Sequence[FlextQualityModels.Quality.ArgumentOptionSpec]
 
         class AuditMetrics(m.BaseModel):
             """Typed metrics for documentation audit results."""
