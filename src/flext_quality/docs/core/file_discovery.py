@@ -10,7 +10,6 @@ import fnmatch
 from collections.abc import (
     MutableMapping,
     MutableSequence,
-    Sequence,
 )
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -176,7 +175,7 @@ class FlextQualityDocumentationFinder:
             line = f"{line}/**"
         return line
 
-    def find_files(self, *, use_cache: bool = True) -> Sequence[Path]:
+    def find_files(self, *, use_cache: bool = True) -> t.SequenceOf[Path]:
         """Find all documentation files in the project.
 
         Args:
@@ -264,8 +263,8 @@ class FlextQualityDocumentationFinder:
 
     def get_files_metadata(
         self,
-        files: Sequence[Path] | None = None,
-    ) -> Sequence[m.Quality.FileMetadata]:
+        files: t.SequenceOf[Path] | None = None,
+    ) -> t.SequenceOf[m.Quality.FileMetadata]:
         """Get metadata for multiple files."""
         if files is None:
             files = self.find_files()
@@ -321,7 +320,7 @@ class FlextQualityDocumentationFinder:
 
     def categorize_files(
         self,
-        files: Sequence[Path] | None = None,
+        files: t.SequenceOf[Path] | None = None,
     ) -> MutableMapping[str, MutableSequence[Path]]:
         """Categorize files by type and location."""
         if files is None:
@@ -348,7 +347,7 @@ class FlextQualityDocumentationFinder:
 
     def get_statistics(
         self,
-        files: Sequence[Path] | None = None,
+        files: t.SequenceOf[Path] | None = None,
     ) -> FlextQualityFileStatistics:
         """Get statistics about found files."""
         if files is None:
@@ -427,7 +426,9 @@ class FlextQualityDocumentationFinder:
             self.ignore_patterns.append(pattern)
             self.invalidate_cache()
 
-    def filter_by_age(self, files: Sequence[Path], max_age_days: int) -> Sequence[Path]:
+    def filter_by_age(
+        self, files: t.SequenceOf[Path], max_age_days: int
+    ) -> t.SequenceOf[Path]:
         """Filter files by maximum age in days."""
         cutoff_time = (datetime.now(UTC) - timedelta(days=max_age_days)).timestamp()
 
@@ -435,16 +436,16 @@ class FlextQualityDocumentationFinder:
 
     def filter_by_size(
         self,
-        files: Sequence[Path],
+        files: t.SequenceOf[Path],
         min_size: int = 0,
         max_size: int | None = None,
-    ) -> Sequence[Path]:
+    ) -> t.SequenceOf[Path]:
         """Filter files by size range."""
         filtered = [f for f in files if f.stat().st_size >= min_size]
         if max_size is not None:
             filtered = [f for f in filtered if f.stat().st_size <= max_size]
         return filtered
 
-    def find_recently_modified(self, days: int = 7) -> Sequence[Path]:
+    def find_recently_modified(self, days: int = 7) -> t.SequenceOf[Path]:
         """Find files modified within the last N days."""
         return self.filter_by_age(self.find_files(), days)

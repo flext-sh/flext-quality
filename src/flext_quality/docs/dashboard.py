@@ -11,7 +11,6 @@ import operator
 from collections.abc import (
     Mapping,
     MutableSequence,
-    Sequence,
 )
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -216,7 +215,7 @@ class FlextQualityDocumentationDashboard:
             "trends": trend_values,
         }
 
-    def get_recent_reports(self, limit: int = 10) -> Sequence[t.JsonMapping]:
+    def get_recent_reports(self, limit: int = 10) -> t.SequenceOf[t.JsonMapping]:
         """Get list of recent audit reports."""
         reports: MutableSequence[t.JsonMapping] = []
 

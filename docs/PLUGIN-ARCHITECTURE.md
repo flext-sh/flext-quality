@@ -103,7 +103,7 @@ class QualityPlugin(Protocol):
     def fix(
         self,
         path: Path,
-        issues: Sequence[Issue],
+        issues: t.SequenceOf[Issue],
     ) -> p.Result[FixResult]:
         """Apply fixes for issues."""
         ...

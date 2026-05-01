@@ -14,7 +14,6 @@ from collections.abc import (
     Mapping,
     MutableMapping,
     MutableSequence,
-    Sequence,
 )
 from datetime import UTC, datetime
 from pathlib import Path
@@ -148,7 +147,7 @@ class FlextQualityContentAnalyzer:
             config_path: Path to configuration file for content analysis rules.
 
         """
-        self.settings: Mapping[str, t.JsonMapping | str] = {}
+        self.settings: t.MappingKV[str, t.JsonMapping | str] = {}
         self.load_config(config_path)
         self.results: FlextQualityContentAnalyzer.Results = (
             FlextQualityContentAnalyzer.Results(
@@ -163,7 +162,7 @@ class FlextQualityContentAnalyzer:
 
     def load_config(self, config_path: str | None) -> None:
         """Load content analysis configuration."""
-        default_config: Mapping[str, t.BoolMapping | t.IntMapping | str] = {
+        default_config: t.MappingKV[str, t.BoolMapping | t.IntMapping | str] = {
             "content_checks": {
                 "check_freshness": True,
                 "check_completeness": True,
@@ -433,10 +432,10 @@ class FlextQualityContentAnalyzer:
                     structure.heading_hierarchy_valid = False
                     break
 
-        depths: Sequence[int] = [int(h["level"]) for h in headings]
+        depths: t.SequenceOf[int] = [int(h["level"]) for h in headings]
         max_depth = max(depths) if depths else 0
         avg_depth = sum(x for x in depths) / len(depths) if depths else 0.0
-        depth_dist: Mapping[int, int] = dict(Counter(depths))
+        depth_dist: t.MappingKV[int, int] = dict(Counter(depths))
         structure.depth_analysis = {
             "max_depth": max_depth,
             "avg_depth": avg_depth,
@@ -745,7 +744,7 @@ class FlextQualityContentAnalyzer:
 
     def analyze_files_batch(
         self,
-        file_paths: Sequence[Path],
+        file_paths: t.SequenceOf[Path],
     ) -> FlextQualityContentAnalyzer.Results:
         """Analyze multiple files and aggregate results."""
         for file_path in file_paths:

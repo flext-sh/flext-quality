@@ -71,7 +71,7 @@ class FlextQualityUtilities(u, web_u):
                     return r[Sequence[t.JsonMapping]].fail(
                         "Expected rules list",
                     )
-                rules: Sequence[t.JsonMapping] = [
+                rules: t.SequenceOf[t.JsonMapping] = [
                     t.Quality.CONTAINER_MAPPING_ADAPTER.validate_python(item)
                     for item in raw_rules_val
                     if isinstance(item, dict)

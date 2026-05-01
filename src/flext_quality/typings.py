@@ -23,15 +23,15 @@ class FlextQualityTypes(t, web_t):
         type RuleConfig = t.JsonMapping
         type RuleResult = tuple[bool, str | None]
         type McpToolResult = t.JsonMapping
-        type GenericItem = t.JsonValue | Mapping[str, t.Primitives | None]
+        type GenericItem = t.JsonValue | t.MappingKV[str, t.Primitives | None]
         type DocumentationReportValue = (
             str
             | int
             | float
             | bool
             | t.StrSequence
-            | Sequence[Mapping[str, t.Primitives]]
-            | Mapping[str, t.Primitives]
+            | t.SequenceOf[Mapping[str, t.Primitives]]
+            | t.MappingKV[str, t.Primitives]
             | None
         )
 
@@ -46,9 +46,9 @@ class FlextQualityTypes(t, web_t):
             m.TypeAdapter(Sequence[t.JsonMapping])
         )
         RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
-            Sequence[t.JsonMapping]
+            t.SequenceOf[t.JsonMapping]
         ] = m.TypeAdapter(
-            Sequence[t.JsonMapping],
+            t.SequenceOf[t.JsonMapping],
             config=m.ConfigDict(strict=False),
         )
         MUTABLE_OPTIONAL_FEATURE_FLAG_MAPPING_ADAPTER: m.TypeAdapter[
@@ -61,9 +61,9 @@ class FlextQualityTypes(t, web_t):
             MutableSequence[t.StrMapping]
         ] = m.TypeAdapter(MutableSequence[t.StrMapping])
         REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[
-            Mapping[str, DocumentationReportValue]
+            t.MappingKV[str, DocumentationReportValue]
         ] = m.TypeAdapter(
-            Mapping[str, DocumentationReportValue],
+            t.MappingKV[str, DocumentationReportValue],
         )
 
 

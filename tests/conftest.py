@@ -16,7 +16,6 @@ import tempfile
 from collections.abc import (
     Generator,
     MutableSequence,
-    Sequence,
 )
 from pathlib import Path
 
@@ -141,7 +140,7 @@ def code_analysis_config() -> t.JsonMapping:
 
 
 @pytest.fixture
-def analysis_results() -> Sequence[t.JsonMapping]:
+def analysis_results() -> t.SequenceOf[t.JsonMapping]:
     """Analysis results for testing."""
     return [
         {

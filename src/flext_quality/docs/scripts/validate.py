@@ -18,7 +18,6 @@ import re
 from collections.abc import (
     MutableMapping,
     MutableSequence,
-    Sequence,
 )
 from datetime import UTC, datetime
 from pathlib import Path
@@ -50,8 +49,8 @@ class FlextQualityLinkValidator:
 
     def find_all_links(
         self,
-        doc_files: Sequence[Path],
-    ) -> Sequence[m.Quality.LinkRecord]:
+        doc_files: t.SequenceOf[Path],
+    ) -> t.SequenceOf[m.Quality.LinkRecord]:
         """Extract all links from documentation files."""
         all_links: MutableSequence[m.Quality.LinkRecord] = []
         for file_path in doc_files:
@@ -147,7 +146,7 @@ class FlextQualityLinkValidator:
 
     def validate_external_links(
         self,
-        links: Sequence[m.Quality.LinkRecord],
+        links: t.SequenceOf[m.Quality.LinkRecord],
         *,
         verbose: bool = False,
     ) -> m.Quality.LinkValidatorResults:
@@ -275,8 +274,8 @@ class FlextQualityLinkValidator:
 
     def validate_internal_links(
         self,
-        links: Sequence[m.Quality.LinkRecord],
-        doc_files: Sequence[Path],
+        links: t.SequenceOf[m.Quality.LinkRecord],
+        doc_files: t.SequenceOf[Path],
     ) -> m.Quality.LinkValidatorResults:
         """Validate internal links and references."""
         internal_links = [
@@ -334,7 +333,7 @@ class FlextQualityLinkValidator:
 
     def validate_images(
         self,
-        links: Sequence[m.Quality.LinkRecord],
+        links: t.SequenceOf[m.Quality.LinkRecord],
         project_root: Path,
     ) -> m.Quality.LinkValidatorResults:
         """Validate image references."""
@@ -368,8 +367,8 @@ class FlextQualityLinkValidator:
 
     def validate_anchors(
         self,
-        links: Sequence[m.Quality.LinkRecord],
-        doc_files: Sequence[Path],
+        links: t.SequenceOf[m.Quality.LinkRecord],
+        doc_files: t.SequenceOf[Path],
     ) -> m.Quality.LinkValidatorResults:
         """Validate anchor links within documents."""
         anchor_links = [link for link in links if link.type == "anchor"]
@@ -427,7 +426,7 @@ class FlextQualityLinkValidator:
 
     def check_link_text_quality(
         self,
-        links: Sequence[m.Quality.LinkRecord],
+        links: t.SequenceOf[m.Quality.LinkRecord],
     ) -> m.Quality.LinkValidatorResults:
         """Check quality of link text for accessibility and usability."""
         poor_link_texts = [
@@ -497,7 +496,7 @@ class FlextQualityContentValidator:
 
     def validate_markdown_syntax(
         self,
-        doc_files: Sequence[Path],
+        doc_files: t.SequenceOf[Path],
     ) -> m.Quality.ContentValidatorResults:
         """Validate markdown syntax and formatting."""
         for file_path in doc_files:
@@ -527,7 +526,9 @@ class FlextQualityContentValidator:
                 )
         return self.results
 
-    def _check_markdown_issues(self, content: str) -> Sequence[m.Quality.ContentIssue]:
+    def _check_markdown_issues(
+        self, content: str
+    ) -> t.SequenceOf[m.Quality.ContentIssue]:
         """Check for markdown syntax issues."""
         issues: MutableSequence[m.Quality.ContentIssue] = []
         lines = content.split("\n")
@@ -564,7 +565,7 @@ class FlextQualityContentValidator:
 
     def check_content_quality(
         self,
-        doc_files: Sequence[Path],
+        doc_files: t.SequenceOf[Path],
     ) -> m.Quality.ContentValidatorResults:
         """Check content quality metrics."""
         for file_path in doc_files:
@@ -632,7 +633,7 @@ class FlextQualityContentValidator:
         )
 
 
-def _discover_validation_files() -> Sequence[Path]:
+def _discover_validation_files() -> t.SequenceOf[Path]:
     """Discover documentation files for validation."""
     project_root = Path(__file__).parent.parent.parent.parent
     doc_files: MutableSequence[Path] = []
@@ -659,8 +660,8 @@ def _discover_validation_files() -> Sequence[Path]:
 def _execute_validations(
     link_validator: FlextQualityLinkValidator,
     content_validator: FlextQualityContentValidator,
-    all_links: Sequence[m.Quality.LinkRecord],
-    doc_files: Sequence[Path],
+    all_links: t.SequenceOf[m.Quality.LinkRecord],
+    doc_files: t.SequenceOf[Path],
     args: argparse.Namespace,
 ) -> bool:
     """Execute the requested validations and return if any were run."""

@@ -7,10 +7,8 @@ SPDX-License-Identifier: MIT
 from __future__ import annotations
 
 from collections.abc import (
-    Mapping,
     MutableMapping,
     MutableSequence,
-    Sequence,
 )
 from pathlib import Path
 from typing import Annotated, ClassVar
@@ -111,13 +109,15 @@ class FlextQualityModels(m, web_m):
             description: Annotated[str, u.Field(description="Issue description")] = ""
             recommendation: Annotated[str, u.Field(description="Recommended fix")] = ""
             context: Annotated[
-                Mapping[str, t.Primitives | None] | None,
+                t.MappingKV[str, t.Primitives | None] | None,
                 u.Field(default=None),
             ]
 
             def to_dict(
                 self,
-            ) -> Mapping[str, str | int | Mapping[str, t.Primitives | None] | None]:
+            ) -> t.MappingKV[
+                str, str | int | t.MappingKV[str, t.Primitives | None] | None
+            ]:
                 """Convert issue to dictionary representation."""
                 return {
                     "type": self.type,
@@ -267,7 +267,7 @@ class FlextQualityModels(m, web_m):
             """Typed parser spec consumed by canonical quality utilities."""
 
             description: str
-            options: Sequence[FlextQualityModels.Quality.ArgumentOptionSpec]
+            options: t.SequenceOf[FlextQualityModels.Quality.ArgumentOptionSpec]
 
         class AuditMetrics(m.BaseModel):
             """Typed metrics for documentation audit results."""
@@ -294,13 +294,16 @@ class FlextQualityModels(m, web_m):
             issues: MutableSequence[
                 MutableMapping[
                     str,
-                    t.Primitives | t.StrSequence | Sequence[t.StrMapping] | None,
+                    t.Primitives | t.StrSequence | t.SequenceOf[t.StrMapping] | None,
                 ]
             ] = u.Field(
                 default_factory=lambda: list[
                     MutableMapping[
                         str,
-                        t.Primitives | t.StrSequence | Sequence[t.StrMapping] | None,
+                        t.Primitives
+                        | t.StrSequence
+                        | t.SequenceOf[t.StrMapping]
+                        | None,
                     ]
                 ]()
             )

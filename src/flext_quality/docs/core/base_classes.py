@@ -8,10 +8,8 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import (
-    Mapping,
     MutableMapping,
     MutableSequence,
-    Sequence,
 )
 from datetime import UTC, datetime
 from pathlib import Path
@@ -57,15 +55,15 @@ class FlextQualityBaseAuditor(ABC):
         """Get the total number of issues found."""
         return len(self.issues)
 
-    def get_issues_by_severity(self, severity: str) -> Sequence[m.Quality.Issue]:
+    def get_issues_by_severity(self, severity: str) -> t.SequenceOf[m.Quality.Issue]:
         """Get issues filtered by severity level."""
         return [issue for issue in self.issues if issue.severity == severity]
 
     @abstractmethod
-    def audit(self, files: Sequence[Path]) -> m.Quality.ValidationResult:
+    def audit(self, files: t.SequenceOf[Path]) -> m.Quality.ValidationResult:
         """Perform the audit operation on given files."""
 
-    def get_summary(self) -> Mapping[str, t.IntMapping | float | int | str | None]:
+    def get_summary(self) -> t.MappingKV[str, t.IntMapping | float | int | str | None]:
         """Get a summary of the audit results."""
         return {
             "auditor": self.name,
@@ -94,7 +92,7 @@ class FlextQualityBaseValidator(ABC):
 
     def validate(
         self,
-        items: Sequence[t.Quality.GenericItem],
+        items: t.SequenceOf[t.Quality.GenericItem],
     ) -> m.Quality.ValidationResult:
         """Perform validation on given items."""
         results = m.Quality.ValidationResult()
@@ -106,10 +104,10 @@ class FlextQualityBaseValidator(ABC):
         return results
 
     @abstractmethod
-    def _validate_items(self, items: Sequence[t.Quality.GenericItem]) -> None:
+    def _validate_items(self, items: t.SequenceOf[t.Quality.GenericItem]) -> None:
         """Implementation-specific validation logic."""
 
-    def get_summary(self) -> Mapping[str, float | int | str] | t.StrMapping:
+    def get_summary(self) -> t.MappingKV[str, float | int | str] | t.StrMapping:
         """Get a summary of validation results."""
         if not self.results:
             return {"validator": self.name, "status": "not_run"}
@@ -140,9 +138,9 @@ class FlextQualityBaseReporter(ABC):
     @abstractmethod
     def generate_report(
         self,
-        data: Mapping[
+        data: t.MappingKV[
             str,
-            t.Primitives | Mapping[str, t.Primitives | None] | None,
+            t.Primitives | t.MappingKV[str, t.Primitives | None] | None,
         ],
         output_format: str = "html",
     ) -> str:
@@ -171,7 +169,7 @@ class FlextQualityBaseAnalyzer(ABC):
         self,
         content: str,
         filepath: Path | None = None,
-    ) -> Mapping[str, t.Primitives | None]:
+    ) -> t.MappingKV[str, t.Primitives | None]:
         """Analyze the given content and return metrics."""
         self.metrics = {
             "analyzer": self.name,

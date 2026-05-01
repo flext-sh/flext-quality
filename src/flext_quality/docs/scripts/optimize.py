@@ -17,7 +17,6 @@ import re
 import shutil
 from collections.abc import (
     MutableSequence,
-    Sequence,
 )
 from datetime import UTC, datetime
 from pathlib import Path
@@ -42,7 +41,7 @@ class FlextQualityDocumentationOptimizer:
             timestamp=datetime.now(UTC).isoformat(),
         )
 
-    def optimize_formatting(self, doc_files: Sequence[Path]) -> t.JsonMapping:
+    def optimize_formatting(self, doc_files: t.SequenceOf[Path]) -> t.JsonMapping:
         """Fix common formatting issues."""
         for file_path in doc_files:
             try:
@@ -94,7 +93,7 @@ class FlextQualityDocumentationOptimizer:
         """Normalize emphasis style (prefer * over _ for consistency)."""
         return content
 
-    def update_table_of_contents(self, doc_files: Sequence[Path]) -> t.JsonMapping:
+    def update_table_of_contents(self, doc_files: t.SequenceOf[Path]) -> t.JsonMapping:
         """Update or add table of contents for long documents."""
         for file_path in doc_files:
             try:
@@ -184,7 +183,7 @@ class FlextQualityDocumentationOptimizer:
         anchor = re.sub(r"[^\\w\\s-]", "", anchor)
         return re.sub(r"\\s+", "-", anchor)
 
-    def enhance_accessibility(self, doc_files: Sequence[Path]) -> t.JsonMapping:
+    def enhance_accessibility(self, doc_files: t.SequenceOf[Path]) -> t.JsonMapping:
         """Enhance accessibility of documentation."""
         for file_path in doc_files:
             try:
@@ -240,7 +239,7 @@ class FlextQualityDocumentationOptimizer:
 
     def optimize_content_structure(
         self,
-        doc_files: Sequence[Path],
+        doc_files: t.SequenceOf[Path],
     ) -> t.JsonMapping:
         """Optimize content structure and readability."""
         for file_path in doc_files:
@@ -295,7 +294,7 @@ class FlextQualityDocumentationOptimizer:
                 enhanced_lines.extend(("", "---", ""))
         return "\n".join(enhanced_lines)
 
-    def update_metadata(self, doc_files: Sequence[Path]) -> t.JsonMapping:
+    def update_metadata(self, doc_files: t.SequenceOf[Path]) -> t.JsonMapping:
         """Update frontmatter metadata and timestamps."""
         for file_path in doc_files:
             try:
@@ -400,7 +399,7 @@ class FlextQualityDocumentationOptimizer:
         return str(filepath)
 
 
-def _discover_documentation_files(args: argparse.Namespace) -> Sequence[Path]:
+def _discover_documentation_files(args: argparse.Namespace) -> t.SequenceOf[Path]:
     """Discover documentation files to optimize."""
     project_root = Path(__file__).parent.parent.parent.parent
     if args.files:

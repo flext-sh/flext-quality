@@ -110,21 +110,21 @@ class FlextQualityDocumentationNotifier:
 
     def _load_user_config(
         self,
-        loaded: Mapping[
+        loaded: t.MappingKV[
             str,
             int
             | str
             | float
             | bool
             | t.StrSequence
-            | Mapping[
+            | t.MappingKV[
                 str,
                 int
                 | str
                 | float
                 | bool
                 | t.StrSequence
-                | Mapping[str, str | int | bool],
+                | t.MappingKV[str, str | int | bool],
             ]
             | None,
         ],

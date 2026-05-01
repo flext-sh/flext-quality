@@ -69,7 +69,7 @@ if result.success:
 
 **Methods**:
 
-- `check(files: Sequence[Path], threshold: float | None) -> p.Result[CheckResult]`
+- `check(files: t.SequenceOf[Path], threshold: float | None) -> p.Result[CheckResult]`
 
   - Analyze files for duplication
   - Returns duplication pairs exceeding threshold

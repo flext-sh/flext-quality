@@ -17,7 +17,6 @@ import re
 from collections.abc import (
     MutableMapping,
     MutableSequence,
-    Sequence,
 )
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
@@ -132,7 +131,7 @@ class FlextQualityDocumentationAuditor:
         """Default validation settings if settings file not found."""
         return m.Quality.ValidationConfig()
 
-    def find_documentation_files(self) -> Sequence[Path]:
+    def find_documentation_files(self) -> t.SequenceOf[Path]:
         """Find all documentation files in the project."""
         doc_files: MutableSequence[Path] = []
         patterns = [
@@ -182,7 +181,7 @@ class FlextQualityDocumentationAuditor:
         self.generate_recommendations()
         return self.results
 
-    def check_content_freshness(self, doc_files: Sequence[Path]) -> None:
+    def check_content_freshness(self, doc_files: t.SequenceOf[Path]) -> None:
         """Check documentation freshness and identify outdated content."""
         max_age_days = self.audit_rules.quality_thresholds.max_age_days
         cutoff_date = datetime.now(UTC) - timedelta(days=max_age_days)
@@ -200,7 +199,7 @@ class FlextQualityDocumentationAuditor:
                         | float
                         | bool
                         | t.StrSequence
-                        | Sequence[t.StrMapping]
+                        | t.SequenceOf[t.StrMapping]
                         | None,
                     ] = {
                         "type": "outdated_content",
@@ -246,7 +245,7 @@ class FlextQualityDocumentationAuditor:
             indicators.append("potentially inconsistent status")
         return indicators
 
-    def check_content_completeness(self, doc_files: Sequence[Path]) -> None:
+    def check_content_completeness(self, doc_files: t.SequenceOf[Path]) -> None:
         """Check documentation completeness and identify missing sections."""
         min_word_count = self.audit_rules.quality_thresholds.min_word_count
         required_sections = self.validation_config.content_analysis.required_sections
@@ -321,7 +320,7 @@ class FlextQualityDocumentationAuditor:
         ]
         return missing
 
-    def check_content_consistency(self, doc_files: Sequence[Path]) -> None:
+    def check_content_consistency(self, doc_files: t.SequenceOf[Path]) -> None:
         """Check style consistency and formatting issues."""
         accessibility_cfg = self.style_guide.accessibility
         for file_path in doc_files:
@@ -442,7 +441,7 @@ class FlextQualityDocumentationAuditor:
             issues.append("Document should start with H1")
         return issues
 
-    def check_links_and_references(self, doc_files: Sequence[Path]) -> None:
+    def check_links_and_references(self, doc_files: t.SequenceOf[Path]) -> None:
         """Check links and references for validity."""
         link_validation = self.validation_config.link_validation
         all_links: MutableSequence[t.HeaderMapping] = []
@@ -498,7 +497,7 @@ class FlextQualityDocumentationAuditor:
 
     def _validate_external_links(
         self,
-        links: Sequence[t.HeaderMapping],
+        links: t.SequenceOf[t.HeaderMapping],
     ) -> None:
         """Validate external links."""
         link_validation = self.validation_config.link_validation
@@ -534,8 +533,8 @@ class FlextQualityDocumentationAuditor:
 
     def _validate_internal_links(
         self,
-        links: Sequence[t.HeaderMapping],
-        doc_files: Sequence[Path],
+        links: t.SequenceOf[t.HeaderMapping],
+        doc_files: t.SequenceOf[Path],
     ) -> None:
         """Validate internal links."""
         internal_links = [link for link in links if link["type"] == "internal"]
@@ -558,7 +557,7 @@ class FlextQualityDocumentationAuditor:
                         "recommendation": f"Fix broken internal link to '{link['url']}'",
                     })
 
-    def _validate_images(self, images: Sequence[t.StrMapping]) -> None:
+    def _validate_images(self, images: t.SequenceOf[t.StrMapping]) -> None:
         """Validate image references."""
         for image in images:
             if image["src"].startswith(("http://", "https://")):

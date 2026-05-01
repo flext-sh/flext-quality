@@ -135,7 +135,7 @@ class FlextQualityValidators:
             self._validators: MutableMapping[str, p.Quality.ValidatorBase] = {}
             self._register_defaults()
 
-        def all(self) -> Sequence[p.Quality.ValidatorBase]:
+        def all(self) -> t.SequenceOf[p.Quality.ValidatorBase]:
             """Get all registered validators."""
             return list(self._validators.values())
 

@@ -22,14 +22,14 @@ type ConfigData = MutableMapping[
     str,
     MutableMapping[str, t.Primitives | t.StrSequence],
 ]
-type RawSectionValue = t.Primitives | Sequence[t.Primitives]
-type RawSectionMap = Mapping[
+type RawSectionValue = t.Primitives | t.SequenceOf[t.Primitives]
+type RawSectionMap = t.MappingKV[
     str,
-    t.Primitives | Sequence[t.Primitives],
+    t.Primitives | t.SequenceOf[t.Primitives],
 ]
-type RawConfigMap = Mapping[
+type RawConfigMap = t.MappingKV[
     str,
-    Mapping[str, t.Primitives | Sequence[t.Primitives]],
+    t.MappingKV[str, t.Primitives | t.SequenceOf[t.Primitives]],
 ]
 
 
@@ -223,7 +223,7 @@ class FlextQualityConfigManager:
 
     def _get_default_config(self, filename: str) -> ConfigData:
         """Get default configuration for a file."""
-        defaults: Mapping[str, RawConfigMap] = {
+        defaults: t.MappingKV[str, RawConfigMap] = {
             "audit_rules.yaml": {
                 "quality_thresholds": {
                     "max_age_days": 90,
@@ -325,7 +325,9 @@ class FlextQualityConfigManager:
 
         return issues
 
-    def get_all_configs(self) -> Mapping[str, ConfigData | Mapping[str, ConfigData]]:
+    def get_all_configs(
+        self,
+    ) -> t.MappingKV[str, ConfigData | t.MappingKV[str, ConfigData]]:
         """Get all configurations as a single dictionary."""
         return {
             "audit_rules": self.get_audit_rules().__dict__,

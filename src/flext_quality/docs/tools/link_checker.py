@@ -14,7 +14,6 @@ import time
 from collections.abc import (
     Mapping,
     MutableSequence,
-    Sequence,
 )
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, datetime
@@ -41,7 +40,7 @@ class FlextQualityLinkChecker:
         user_agent: str
         follow_redirects: bool
         max_redirects: int
-        acceptable_status_codes: Sequence[int]
+        acceptable_status_codes: t.SequenceOf[int]
 
     class LinkInfo(m.BaseModel):
         """Link information dictionary."""
@@ -143,8 +142,8 @@ class FlextQualityLinkChecker:
 
     def find_all_links(
         self,
-        file_paths: Sequence[pathlib.Path],
-    ) -> Sequence[FlextQualityLinkChecker.LinkInfo]:
+        file_paths: t.SequenceOf[pathlib.Path],
+    ) -> t.SequenceOf[FlextQualityLinkChecker.LinkInfo]:
         """Extract all links from the given files."""
         all_links: MutableSequence[FlextQualityLinkChecker.LinkInfo] = []
 
@@ -355,8 +354,8 @@ class FlextQualityLinkChecker:
 
     async def check_links_batch_async(
         self,
-        links: Sequence[FlextQualityLinkChecker.LinkInfo],
-    ) -> Sequence[FlextQualityLinkChecker.LinkResult]:
+        links: t.SequenceOf[FlextQualityLinkChecker.LinkInfo],
+    ) -> t.SequenceOf[FlextQualityLinkChecker.LinkResult]:
         """Check multiple links asynchronously."""
         start_time = time.time()
 
@@ -375,7 +374,7 @@ class FlextQualityLinkChecker:
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        processed_results: Sequence[FlextQualityLinkChecker.LinkResult] = [
+        processed_results: t.SequenceOf[FlextQualityLinkChecker.LinkResult] = [
             FlextQualityLinkChecker.LinkResult(
                 url="",
                 error=f"task_exception: {result!s}",
@@ -389,7 +388,7 @@ class FlextQualityLinkChecker:
 
         self.results.performance.total_time = time.time() - start_time
 
-        valid_times: Sequence[float] = [
+        valid_times: t.SequenceOf[float] = [
             r.response_time
             for r in processed_results
             if r.response_time is not None and r.valid
@@ -404,8 +403,8 @@ class FlextQualityLinkChecker:
 
     def check_links_batch_sync(
         self,
-        links: Sequence[FlextQualityLinkChecker.LinkInfo],
-    ) -> Sequence[FlextQualityLinkChecker.LinkResult]:
+        links: t.SequenceOf[FlextQualityLinkChecker.LinkInfo],
+    ) -> t.SequenceOf[FlextQualityLinkChecker.LinkResult]:
         """Check multiple links synchronously with thread pool."""
         start_time = time.time()
 
@@ -422,7 +421,7 @@ class FlextQualityLinkChecker:
 
         self.results.performance.total_time = time.time() - start_time
 
-        valid_times: Sequence[float] = [
+        valid_times: t.SequenceOf[float] = [
             r.response_time for r in results if r.response_time is not None and r.valid
         ]
 
@@ -435,7 +434,7 @@ class FlextQualityLinkChecker:
 
     async def validate_links(
         self,
-        links: Sequence[FlextQualityLinkChecker.LinkInfo],
+        links: t.SequenceOf[FlextQualityLinkChecker.LinkInfo],
         *,
         use_async: bool = True,
     ) -> FlextQualityLinkChecker.Results:
@@ -485,16 +484,16 @@ class FlextQualityLinkChecker:
 
     def validate_github_links(
         self,
-        links: Sequence[t.JsonMapping],
-    ) -> Sequence[t.JsonMapping]:
+        links: t.SequenceOf[t.JsonMapping],
+    ) -> t.SequenceOf[t.JsonMapping]:
         """Special validation for GitHub links."""
-        github_links: Sequence[t.JsonMapping] = [
+        github_links: t.SequenceOf[t.JsonMapping] = [
             link
             for link in links
             if isinstance(link.get("url"), str) and "github.com" in str(link.get("url"))
         ]
 
-        validated_links: Sequence[Mapping[str, bool | t.JsonValue]] = [
+        validated_links: t.SequenceOf[Mapping[str, bool | t.JsonValue]] = [
             {
                 **link,
                 "valid": True,
@@ -600,7 +599,7 @@ Broken Links:
 
 
 def validate_links_sync(
-    links: Sequence[FlextQualityLinkChecker.LinkInfo],
+    links: t.SequenceOf[FlextQualityLinkChecker.LinkInfo],
     config_path: str | None = None,
 ) -> FlextQualityLinkChecker.Results:
     """Synchronous wrapper for link validation."""
@@ -610,7 +609,7 @@ def validate_links_sync(
 
 async def _run_demo() -> None:
     """Run the example validation without leaking module-level test data."""
-    test_links: Sequence[FlextQualityLinkChecker.LinkInfo] = [
+    test_links: t.SequenceOf[FlextQualityLinkChecker.LinkInfo] = [
         FlextQualityLinkChecker.LinkInfo(
             url="https://github.com/microsoft/vscode",
             text="VSCode",

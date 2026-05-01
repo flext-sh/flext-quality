@@ -39,7 +39,7 @@ class FlextQualityProtocols(p, web_p):
             """Structural contract for quality argparse parser specs."""
 
             description: str
-            options: Sequence[FlextQualityProtocols.Quality.ArgumentOptionSpec]
+            options: t.SequenceOf[FlextQualityProtocols.Quality.ArgumentOptionSpec]
 
         @runtime_checkable
         class ValidatorBase(Protocol):

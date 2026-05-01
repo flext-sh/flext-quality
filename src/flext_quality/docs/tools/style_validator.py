@@ -12,7 +12,6 @@ import re
 import sys
 from collections.abc import (
     MutableSequence,
-    Sequence,
 )
 from datetime import UTC, datetime
 from pathlib import Path
@@ -284,7 +283,7 @@ class FlextQualityStyleValidator:
     def _check_markdown_formatting(
         self,
         content: str,
-    ) -> Sequence[FlextQualityStyleValidator.StyleIssue]:
+    ) -> t.SequenceOf[FlextQualityStyleValidator.StyleIssue]:
         """Check basic markdown formatting consistency."""
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
@@ -326,11 +325,11 @@ class FlextQualityStyleValidator:
     def _check_heading_consistency(
         self,
         content: str,
-    ) -> Sequence[FlextQualityStyleValidator.StyleIssue]:
+    ) -> t.SequenceOf[FlextQualityStyleValidator.StyleIssue]:
         """Check heading hierarchy and consistency."""
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
-        headings: Sequence[tuple[int, str, int]] = [
+        headings: t.SequenceOf[tuple[int, str, int]] = [
             (
                 len(match.group(1)),
                 match.group(2).strip(),
@@ -373,11 +372,11 @@ class FlextQualityStyleValidator:
     def _check_list_consistency(
         self,
         content: str,
-    ) -> Sequence[FlextQualityStyleValidator.StyleIssue]:
+    ) -> t.SequenceOf[FlextQualityStyleValidator.StyleIssue]:
         """Check list formatting consistency."""
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
-        list_items: Sequence[tuple[str, str, int]] = [
+        list_items: t.SequenceOf[tuple[str, str, int]] = [
             (
                 match.group(1),
                 match.group(2),
@@ -414,7 +413,7 @@ class FlextQualityStyleValidator:
     def _check_code_formatting(
         self,
         content: str,
-    ) -> Sequence[FlextQualityStyleValidator.StyleIssue]:
+    ) -> t.SequenceOf[FlextQualityStyleValidator.StyleIssue]:
         """Check code block and inline code formatting."""
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
@@ -464,7 +463,7 @@ class FlextQualityStyleValidator:
     def _check_accessibility(
         self,
         content: str,
-    ) -> Sequence[FlextQualityStyleValidator.StyleIssue]:
+    ) -> t.SequenceOf[FlextQualityStyleValidator.StyleIssue]:
         """Check accessibility compliance."""
         issues: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
@@ -516,7 +515,7 @@ class FlextQualityStyleValidator:
     def _check_line_length(
         self,
         content: str,
-    ) -> Sequence[FlextQualityStyleValidator.StyleIssue]:
+    ) -> t.SequenceOf[FlextQualityStyleValidator.StyleIssue]:
         """Check line length compliance."""
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
@@ -549,7 +548,7 @@ class FlextQualityStyleValidator:
     def _check_whitespace(
         self,
         content: str,
-    ) -> Sequence[FlextQualityStyleValidator.StyleIssue]:
+    ) -> t.SequenceOf[FlextQualityStyleValidator.StyleIssue]:
         """Check whitespace formatting."""
         violations: MutableSequence[FlextQualityStyleValidator.StyleIssue] = []
 
@@ -590,7 +589,7 @@ class FlextQualityStyleValidator:
 
     def _generate_suggestions(
         self,
-        violations: Sequence[FlextQualityStyleValidator.StyleIssue],
+        violations: t.SequenceOf[FlextQualityStyleValidator.StyleIssue],
     ) -> t.StrSequence:
         """Generate improvement suggestions based on violations."""
         suggestions: MutableSequence[str] = []
@@ -626,7 +625,7 @@ class FlextQualityStyleValidator:
 
     def validate_files_batch(
         self,
-        file_paths: Sequence[Path],
+        file_paths: t.SequenceOf[Path],
     ) -> FlextQualityStyleValidator.ValidationResults:
         """Validate multiple files and aggregate results."""
         for file_path in file_paths:

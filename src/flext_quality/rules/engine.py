@@ -81,7 +81,7 @@ class FlextQualityRulesEngine:
         rule: m.Quality.RuleDefinition,
         content: str,
         filename: str,
-    ) -> Sequence[t.JsonMapping]:
+    ) -> t.SequenceOf[t.JsonMapping]:
         """Check a single rule against content."""
         violations: MutableSequence[t.JsonMapping] = []
         if rule.pattern is None:
@@ -110,7 +110,7 @@ class FlextQualityRulesEngine:
                 })
         return violations
 
-    def _get_files(self, path: Path) -> Sequence[Path]:
+    def _get_files(self, path: Path) -> t.SequenceOf[Path]:
         """Get Python files from path."""
         if path.is_file():
             return [path] if path.suffix == ".py" else []
@@ -129,7 +129,7 @@ class FlextQualityRulesEngine:
         self,
         file_path: Path,
         context: t.JsonMapping,
-    ) -> Sequence[t.JsonMapping]:
+    ) -> t.SequenceOf[t.JsonMapping]:
         """Validate a single file against rules."""
         validation_context: dict[str, t.JsonValue] = (
             dict(context.items()) if context else {}

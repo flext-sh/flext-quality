@@ -14,7 +14,6 @@ import threading
 import time
 from collections.abc import (
     Callable,
-    Mapping,
 )
 from datetime import UTC, datetime
 from pathlib import Path
@@ -412,7 +411,7 @@ class FlextQualityScheduledMaintenance:
         cmd_name: str,
     ) -> Callable[[t.StrSequence, int, str], bool] | None:
         """Get handler for command type."""
-        handlers: Mapping[str, Callable[[t.StrSequence, int, str], bool]] = {
+        handlers: t.MappingKV[str, Callable[[t.StrSequence, int, str], bool]] = {
             "python": self._handle_python_command,
             "pytest": self._handle_pytest_command,
             "make": self._handle_make_command,

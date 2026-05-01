@@ -9,9 +9,6 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-from collections.abc import (
-    Sequence,
-)
 from typing import final
 
 from flext_quality import (
@@ -38,7 +35,7 @@ class FlextQualityClaudeMemClient:
         self._mcp = FlextQualityMcpClient(timeout_ms=timeout_ms)
 
     def build_get_observations_call(
-        self, ids: Sequence[int]
+        self, ids: t.SequenceOf[int]
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a get_observations tool call."""
         normalized_ids: list[t.JsonValue] = list(ids)
@@ -80,7 +77,9 @@ class FlextQualityClaudeMemClient:
             params,
         )
 
-    def get_observations_command(self, ids: Sequence[int]) -> p.Result[t.StrSequence]:
+    def get_observations_command(
+        self, ids: t.SequenceOf[int]
+    ) -> p.Result[t.StrSequence]:
         """Get the mcp-cli command for fetching observations."""
         return self.build_get_observations_call(ids).flat_map(
             self._mcp.build_call_command,
