@@ -1,0 +1,48 @@
+src/flext_quality/rules/validators.py
+  h_9db9d35f50cf33 138
+docs/DUPLICATION-DETECTION.md
+  h_9db9d35f50cf33 72
+src/flext_quality/docs/scripts/report.py
+  h_9db9d35f50cf33 92-93,101-102,115
+src/flext_quality/models.py
+  h_9db9d35f50cf33 120,270,297,303
+src/flext_quality/docs/core/config_manager.py
+  h_9db9d35f50cf33 25-26,28,30,32,226,328
+src/flext_quality/docs/scripts/audit.py
+  h_9db9d35f50cf33 537
+src/flext_quality/rules/engine.py
+  h_9db9d35f50cf33 84,113,132
+src/flext_quality/rules/loader.py
+  h_9db9d35f50cf33 41,61
+docs/PLUGIN-ARCHITECTURE.md
+  h_9db9d35f50cf33 106
+src/flext_quality/typings.py
+  h_9db9d35f50cf33 26,33-34,49,51,64,66
+src/flext_quality/protocols.py
+  h_9db9d35f50cf33 42
+src/flext_quality/docs/core/base_classes.py
+  h_9db9d35f50cf33 143
+src/flext_quality/docs/core/file_discovery.py
+  h_9db9d35f50cf33 267,430
+docs/guides/troubleshooting.md
+  h_9db9d35f50cf33 797
+src/flext_quality/docs/tools/link_checker.py
+  h_9db9d35f50cf33 146,358,407,488
+src/flext_quality/docs/scripts/validate.py
+  h_9db9d35f50cf33 53,278,371,530,663
+src/flext_quality/utilities.py
+  h_9db9d35f50cf33 74
+src/flext_quality/docs/notifications.py
+  h_9db9d35f50cf33 113,120,127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "1ed1860c5c56d70f66e853874944a9f6cd01fdc1",
+  "prompts": {},
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
