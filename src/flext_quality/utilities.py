@@ -9,7 +9,7 @@ from collections.abc import (
     Sequence,
 )
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from flext_infra import u
 from flext_web import u as web_u
@@ -21,7 +21,16 @@ if TYPE_CHECKING:
 
 
 class FlextQualityUtilities(u, web_u):
-    """Namespace for flext-quality utilities."""
+    """Namespace for flext-quality utilities.
+
+    Marked as Pattern-B: this facade legitimately composes multiple parent
+    utilities namespaces and references ``u`` in nested methods. The flext-core
+    beartype self-reference check honours this marker via
+    ``getattr(target, "__flext_pattern_b__", False)`` instead of a hand-curated
+    package whitelist.
+    """
+
+    __flext_pattern_b__: ClassVar[bool] = True
 
     class Quality:
         """Quality-specific utilities namespace."""
