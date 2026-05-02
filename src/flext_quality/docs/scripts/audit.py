@@ -352,12 +352,7 @@ class FlextQualityDocumentationAuditor:
                             "issues": heading_issues,
                             "recommendation": "Fix heading hierarchy structure",
                         })
-            except (
-                FileNotFoundError,
-                PermissionError,
-                UnicodeDecodeError,
-                OSError,
-            ) as e:
+            except c.EXC_FS_DECODING as e:
                 self.results.issues.append({
                     "type": "consistency_check_error",
                     "severity": "medium",

@@ -182,7 +182,7 @@ class FlextQualityModels(m, web_m):
                         content = path.read_text(encoding=c.DEFAULT_ENCODING)
                         lines = content.count("\n") + 1
                         words = len(content.split())
-                    except (OSError, UnicodeDecodeError):
+                    except c.EXC_OS_DECODING:
                         pass
                 return cls(
                     path=str(path),

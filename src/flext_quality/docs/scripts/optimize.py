@@ -190,12 +190,7 @@ class FlextQualityDocumentationOptimizer:
                         "description": "Added alt text and improved link descriptions",
                     })
                 self.results.files_processed += 1
-            except (
-                FileNotFoundError,
-                PermissionError,
-                UnicodeDecodeError,
-                OSError,
-            ) as e:
+            except c.EXC_FS_DECODING as e:
                 self.logger.warning(
                     "Failed to enhance accessibility in %s: %s",
                     file_path,

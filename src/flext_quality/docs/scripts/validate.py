@@ -501,12 +501,7 @@ class FlextQualityContentValidator:
                         for issue in issues
                     ])
                 self.results.files_checked += 1
-            except (
-                FileNotFoundError,
-                PermissionError,
-                UnicodeDecodeError,
-                OSError,
-            ) as e:
+            except c.EXC_FS_DECODING as e:
                 self.results.content_issues.append(
                     m.Quality.ContentIssue(
                         type="syntax_validation_error",
