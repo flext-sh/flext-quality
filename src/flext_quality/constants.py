@@ -155,20 +155,6 @@ class FlextQualityConstants(c, web_c):
         THRESHOLD_MIN_HEADINGS_FOR_TOC: Final[int] = 5
         "Minimum headings for table of contents."
 
-        # ===== Quality Errors =====
-        ERRORS_RULE_FAILED: Final[str] = "QUALITY_RULE_FAILED"
-        "Quality rule failed error code."
-        ERRORS_THRESHOLD_EXCEEDED: Final[str] = "QUALITY_THRESHOLD_EXCEEDED"
-        "Quality threshold exceeded error code."
-        ERRORS_PATTERN_VIOLATION: Final[str] = "QUALITY_PATTERN_VIOLATION"
-        "Quality pattern violation error code."
-        ERRORS_ARCHITECTURE_VIOLATION: Final[str] = "QUALITY_ARCHITECTURE_VIOLATION"
-        "Quality architecture violation error code."
-        ERRORS_TYPE_ERROR: Final[str] = "QUALITY_TYPE_ERROR"
-        "Quality type error code."
-        ERRORS_LINT_ERROR: Final[str] = "QUALITY_LINT_ERROR"
-        "Quality lint error code."
-
         HOOK_TIMEOUT_MS: Final[int] = 5000
         MCP_TIMEOUT_MS: Final[int] = 30000
         INTEGRATION_TIMEOUT_MS: Final[int] = 10000
