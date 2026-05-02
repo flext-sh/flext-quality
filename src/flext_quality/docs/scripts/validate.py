@@ -381,12 +381,7 @@ class FlextQualityLinkValidator:
                 )
                 anchors.extend(explicit_anchors)
                 file_anchors[file_rel_path] = set(anchors)
-            except (
-                FileNotFoundError,
-                PermissionError,
-                UnicodeDecodeError,
-                OSError,
-            ) as e:
+            except c.EXC_FS_DECODING as e:
                 self.results.warnings_list.append(
                     m.Quality.LinkCheckResult(
                         type="anchor_index_error",

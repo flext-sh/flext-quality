@@ -285,12 +285,7 @@ class FlextQualityDocumentationAuditor:
                             "todos": todos[:5],
                             "recommendation": f"Address {len(todos)} TODO/FIXME items",
                         })
-            except (
-                FileNotFoundError,
-                PermissionError,
-                UnicodeDecodeError,
-                OSError,
-            ) as e:
+            except c.EXC_FS_DECODING as e:
                 self.results.issues.append({
                     "type": "content_analysis_error",
                     "severity": "medium",

@@ -251,7 +251,7 @@ class FlextQualityDocumentationFinder:
                 path_str,
                 pattern.rstrip("/"),
             )
-        except (OSError, ValueError):
+        except c.EXC_OS_VALUE:
             return False
 
     def get_file_metadata(self, file_path: Path) -> m.Quality.FileMetadata:
