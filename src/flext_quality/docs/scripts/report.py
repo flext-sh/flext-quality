@@ -23,7 +23,7 @@ from typing import ClassVar
 
 from jinja2 import Template
 
-from flext_quality import m, t
+from flext_quality import c, m, t
 
 
 class FlextQualityDocumentationReporter:
@@ -306,7 +306,7 @@ class FlextQualityDocumentationReporter:
                             error_entry: t.JsonMapping = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_python(
                                 e_raw
                             )
-                        except (ValueError, TypeError):
+                        except c.EXC_TYPE_VALIDATION:
                             continue
                         error_type = error_entry.get("type")
                         if error_type in {
