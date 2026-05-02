@@ -243,12 +243,7 @@ class FlextQualityDocumentationOptimizer:
                         "description": "Improved paragraph breaks and section organization",
                     })
                 self.results.files_processed += 1
-            except (
-                FileNotFoundError,
-                PermissionError,
-                UnicodeDecodeError,
-                OSError,
-            ) as e:
+            except c.EXC_FS_DECODING as e:
                 self.logger.warning(
                     "Failed to enhance accessibility in %s: %s",
                     file_path,

@@ -461,12 +461,7 @@ class FlextQualityDocumentationAuditor:
                         "alt": alt_text,
                         "file": str(file_path.relative_to(self.project_root)),
                     })
-            except (
-                FileNotFoundError,
-                PermissionError,
-                UnicodeDecodeError,
-                OSError,
-            ) as e:
+            except c.EXC_FS_DECODING as e:
                 self.results.issues.append({
                     "type": "link_extraction_error",
                     "severity": "medium",
