@@ -136,15 +136,7 @@ class FlextQualityRulesEngine:
         )
         try:
             content = file_path.read_text(encoding="utf-8")
-        except (
-            ValueError,
-            TypeError,
-            KeyError,
-            AttributeError,
-            OSError,
-            RuntimeError,
-            ImportError,
-        ) as e:
+        except c.EXC_BROAD_IO_TYPE as e:
             return [
                 {
                     "rule": "file-read-error",

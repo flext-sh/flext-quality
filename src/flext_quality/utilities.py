@@ -77,15 +77,7 @@ class FlextQualityUtilities(u, web_u):
                     if isinstance(item, dict)
                 ]
                 return r[Sequence[t.JsonMapping]].ok(rules)
-            except (
-                ValueError,
-                TypeError,
-                KeyError,
-                AttributeError,
-                OSError,
-                RuntimeError,
-                ImportError,
-            ) as e:
+            except c.EXC_BROAD_IO_TYPE as e:
                 return r[Sequence[t.JsonMapping]].fail(
                     f"Failed to load rules: {e}",
                 )
