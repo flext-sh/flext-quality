@@ -1,0 +1,33 @@
+src/flext_quality/docs/scripts/validate.py
+  473c59be621cc5d5 581
+src/flext_quality/docs/scripts/optimize.py
+  473c59be621cc5d5 246
+src/flext_quality/docs/scripts/audit.py
+  473c59be621cc5d5 464
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "1fc7a644297281de876d9b4b3184c6c51de0e20d",
+  "prompts": {
+    "473c59be621cc5d5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f6001f8b-afdd-4757-8812-9bff0bfd46d9",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "FLEXT Bot",
+      "messages": [],
+      "total_additions": 3,
+      "total_deletions": 18,
+      "accepted_lines": 3,
+      "overriden_lines": 0,
+      "messages_url": "https://usegitai.com/cas/cc0340b04c06469c4752497d9ba40351a75038598cf1af81bee2f42397650436"
+    }
+  },
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  }
+}
