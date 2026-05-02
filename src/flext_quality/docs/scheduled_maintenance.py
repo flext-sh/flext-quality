@@ -564,7 +564,7 @@ class FlextQualityScheduledMaintenance:
                 f"Not a git repository for task: {description}",
             )
             return False
-        except (OSError, RuntimeError, ValueError) as e:
+        except c.EXC_OS_RUNTIME_VALUE as e:
             self.results.errors.append(
                 f"Git command failed in {description}: {e!s}",
             )
@@ -622,7 +622,7 @@ class FlextQualityScheduledMaintenance:
 
             return success
 
-        except (OSError, RuntimeError, ValueError) as e:
+        except c.EXC_OS_RUNTIME_VALUE as e:
             self.results.errors.append(
                 f"Task execution error in {description}: {e!s}",
             )

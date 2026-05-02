@@ -235,7 +235,7 @@ class FlextQualityLinkValidator:
         except requests.exceptions.RequestException as e:
             if attempt == self.retries - 1:
                 return (False, {"error": str(e)})
-        except (OSError, ValueError, RuntimeError) as e:
+        except c.EXC_OS_RUNTIME_VALUE as e:
             return (False, {"error": f"Unexpected error: {e!s}"})
         return (False, None)
 

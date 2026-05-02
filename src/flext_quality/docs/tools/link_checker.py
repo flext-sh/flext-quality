@@ -267,7 +267,7 @@ class FlextQualityLinkChecker:
                 valid=False,
                 context=context or {},
             )
-        except (OSError, ValueError, RuntimeError) as e:
+        except c.EXC_OS_RUNTIME_VALUE as e:
             return FlextQualityLinkChecker.LinkResult(
                 url=url,
                 error=f"unexpected_error: {e!s}",
@@ -331,7 +331,7 @@ class FlextQualityLinkChecker:
                         valid=False,
                         context=context or {},
                     )
-            except (OSError, ValueError, RuntimeError) as e:
+            except c.EXC_OS_RUNTIME_VALUE as e:
                 return FlextQualityLinkChecker.LinkResult(
                     url=url,
                     error=f"unexpected_error: {e!s}",
