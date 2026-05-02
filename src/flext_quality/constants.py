@@ -175,7 +175,6 @@ class FlextQualityConstants(c, web_c):
         RULE_TIMEOUT_SECONDS: Final[int] = c.DEFAULT_TIMEOUT_SECONDS
         BATCH_SIZE: Final[int] = 100
         MAX_PARALLEL_RULES: Final[int] = 4
-        CACHE_TTL_SECONDS: Final[int] = 300
         MAX_CACHE_ENTRIES: Final[int] = 1000
         DEFAULT_SEARCH_LIMIT: Final[int] = 20
         DEFAULT_MEMORY_SEARCH_LIMIT: Final[int] = 10
