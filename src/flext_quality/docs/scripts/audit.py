@@ -23,7 +23,7 @@ from pathlib import Path
 
 import requests
 
-from flext_quality import c, e, m, t, u
+from flext_quality import c, m, t, u
 
 
 class FlextQualityDocumentationAuditor:
@@ -58,7 +58,7 @@ class FlextQualityDocumentationAuditor:
                 self.audit_rules = m.Quality.AuditRulesConfig.model_validate(
                     audit_data,
                 )
-        except (FileNotFoundError, e.ValidationError, ValueError, TypeError):
+        except c.EXC_FS_TYPE_VALIDATION:
             self.audit_rules = self.get_default_audit_rules()
 
         try:
@@ -69,7 +69,7 @@ class FlextQualityDocumentationAuditor:
                 self.style_guide = m.Quality.StyleGuideConfig.model_validate(
                     style_data,
                 )
-        except (FileNotFoundError, e.ValidationError, ValueError, TypeError):
+        except c.EXC_FS_TYPE_VALIDATION:
             self.style_guide = self.get_default_style_guide()
 
         try:
@@ -80,7 +80,7 @@ class FlextQualityDocumentationAuditor:
                 self.validation_config = m.Quality.ValidationConfig.model_validate(
                     validation_data,
                 )
-        except (FileNotFoundError, e.ValidationError, ValueError, TypeError):
+        except c.EXC_FS_TYPE_VALIDATION:
             self.validation_config = self.get_default_validation_config()
 
     def get_default_audit_rules(self) -> m.Quality.AuditRulesConfig:
