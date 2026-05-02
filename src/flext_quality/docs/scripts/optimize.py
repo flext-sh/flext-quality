@@ -299,13 +299,7 @@ class FlextQualityDocumentationOptimizer:
                         "description": "Updated frontmatter and added modification timestamp",
                     })
                 self.results.files_processed += 1
-            except (
-                FileNotFoundError,
-                PermissionError,
-                UnicodeDecodeError,
-                OSError,
-                ValueError,
-            ) as e:
+            except c.EXC_FS_FULL_DECODE as e:
                 self.logger.warning(
                     "Failed to enhance accessibility in %s: %s",
                     file_path,

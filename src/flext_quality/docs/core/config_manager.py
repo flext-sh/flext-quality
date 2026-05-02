@@ -13,7 +13,7 @@ from collections.abc import (
 )
 from pathlib import Path
 
-from flext_quality import m, t, u
+from flext_quality import c, m, t, u
 
 type ConfigPrimitive = t.Primitives
 type ConfigValue = t.Primitives | t.StrSequence
@@ -320,7 +320,7 @@ class FlextQualityConfigManager:
                 config = getter()
                 if not getattr(config, required_attr):
                     issues.append(missing_message)
-            except (FileNotFoundError, ValueError, KeyError, OSError) as exc:
+            except c.EXC_FS_KEY_VALUE as exc:
                 issues.append(f"Invalid {filename}: {exc}")
 
         return issues

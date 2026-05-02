@@ -17,7 +17,7 @@ from pathlib import Path
 
 from flask import Flask, Response, render_template_string, request
 
-from flext_quality import m, p, t, u
+from flext_quality import c, m, p, t, u
 
 
 class FlextQualityDocumentationDashboard:
@@ -132,7 +132,7 @@ class FlextQualityDocumentationDashboard:
                 ),
                 "status": "Current",
             }
-        except (FileNotFoundError, ValueError, KeyError, OSError) as e:
+        except c.EXC_FS_KEY_VALUE as e:
             return {
                 "quality_score": 0,
                 "files_analyzed": 0,
@@ -191,12 +191,7 @@ class FlextQualityDocumentationDashboard:
                         ),
                     }
                     trend_data.append(trend_entry)
-            except (
-                FileNotFoundError,
-                ValueError,
-                KeyError,
-                OSError,
-            ) as e:
+            except c.EXC_FS_KEY_VALUE as e:
                 self._logger_instance.warning(
                     "Failed to process trend data: %s",
                     str(e),
@@ -250,12 +245,7 @@ class FlextQualityDocumentationDashboard:
                     "total_issues": r_total_issues,
                     "files_analyzed": r_files_analyzed,
                 })
-            except (
-                FileNotFoundError,
-                ValueError,
-                KeyError,
-                OSError,
-            ) as e:
+            except c.EXC_FS_KEY_VALUE as e:
                 self._logger_instance.warning(
                     "Failed to process report file: %s",
                     str(e),

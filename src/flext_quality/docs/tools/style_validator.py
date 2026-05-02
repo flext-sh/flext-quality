@@ -17,7 +17,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import ClassVar
 
-from flext_quality import m, t, u
+from flext_quality import c, m, t, u
 
 
 class FlextQualityStyleValidator:
@@ -266,13 +266,7 @@ class FlextQualityStyleValidator:
 
             return file_results
 
-        except (
-            FileNotFoundError,
-            PermissionError,
-            UnicodeDecodeError,
-            OSError,
-            ValueError,
-        ):
+        except c.EXC_FS_FULL_DECODE:
             return FlextQualityStyleValidator.FileResults(
                 file=str(file_path),
                 violations=[],

@@ -14,7 +14,7 @@ from collections.abc import (
 from datetime import UTC, datetime
 from pathlib import Path
 
-from flext_quality import m, t, u
+from flext_quality import c, m, t, u
 
 
 class FlextQualityBaseAuditor(ABC):
@@ -178,13 +178,7 @@ class FlextQualityBaseAnalyzer(ABC):
 
         try:
             self._analyze_content(content)
-        except (
-            FileNotFoundError,
-            PermissionError,
-            UnicodeDecodeError,
-            OSError,
-            ValueError,
-        ) as e:
+        except c.EXC_FS_FULL_DECODE as e:
             self.metrics["error"] = str(e)
             self.metrics["success"] = False
         else:

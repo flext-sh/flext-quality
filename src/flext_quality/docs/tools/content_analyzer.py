@@ -19,7 +19,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import ClassVar
 
-from flext_quality import m, t, u
+from flext_quality import c, m, t, u
 
 
 class FlextQualityContentAnalyzer:
@@ -230,13 +230,7 @@ class FlextQualityContentAnalyzer:
 
             return analysis
 
-        except (
-            FileNotFoundError,
-            PermissionError,
-            UnicodeDecodeError,
-            OSError,
-            ValueError,
-        ) as e:
+        except c.EXC_FS_FULL_DECODE as e:
             return FlextQualityContentAnalyzer.Analysis(
                 file=str(file_path),
                 error=str(e),
