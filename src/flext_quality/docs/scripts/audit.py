@@ -211,12 +211,7 @@ class FlextQualityDocumentationAuditor:
                         "recommendation": f"Review and update content (last modified {age_days} days ago)",
                     }
                     self.results.issues.append(issue)
-            except (
-                FileNotFoundError,
-                PermissionError,
-                UnicodeDecodeError,
-                OSError,
-            ) as e:
+            except c.EXC_FS_DECODING as e:
                 self.results.issues.append({
                     "type": "file_access_error",
                     "severity": "medium",

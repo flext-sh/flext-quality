@@ -15,7 +15,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import ClassVar
 
-from flext_quality import m, t, u
+from flext_quality import c, m, t, u
 
 logger = u.fetch_logger(__name__)
 
@@ -131,7 +131,7 @@ class FlextQualityDocumentationFinder:
 
         try:
             self._load_ignore_patterns_from_file(ignore_path)
-        except (FileNotFoundError, PermissionError, UnicodeDecodeError, OSError) as e:
+        except c.EXC_FS_DECODING as e:
             # If we can't read the ignore file, just continue silently
             # This is acceptable as ignore files are optional
             logger.debug(f"Could not read ignore file {self.ignore_file}: {e}")
@@ -199,7 +199,7 @@ class FlextQualityDocumentationFinder:
                     for match in matches
                     if match.is_file() and not self._is_ignored(match)
                 )
-            except (OSError, ValueError) as e:
+            except c.EXC_OS_VALUE as e:
                 # Skip patterns that cause errors during glob matching
                 # This prevents crashes from malformed glob patterns
                 logger.debug(
@@ -315,7 +315,7 @@ class FlextQualityDocumentationFinder:
         try:
             relative_path = file_path.relative_to(self.project_root)
             return relative_path.parts
-        except (ValueError, OSError):
+        except c.EXC_OS_VALUE:
             return None
 
     def categorize_files(

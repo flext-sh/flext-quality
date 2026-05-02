@@ -22,7 +22,7 @@ import pytest
 import schedule
 from git import InvalidGitRepositoryError, Repo
 
-from flext_quality import m, t, u
+from flext_quality import c, m, t, u
 
 logger = u.fetch_logger(__name__)
 
@@ -584,7 +584,7 @@ class FlextQualityScheduledMaintenance:
             message = " ".join(cmd_parts[1:]) if len(cmd_parts) > 1 else ""
             logger.info(message)
             return True
-        except (OSError, ValueError) as e:
+        except c.EXC_OS_VALUE as e:
             self.results.errors.append(
                 f"Echo command failed in {description}: {e!s}",
             )

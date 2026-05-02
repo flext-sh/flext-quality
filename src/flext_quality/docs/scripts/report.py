@@ -143,7 +143,7 @@ class FlextQualityDocumentationReporter:
                     )
                 )
                 return result
-            except (OSError, ValueError):
+            except c.EXC_OS_VALUE:
                 pass
         return None
 

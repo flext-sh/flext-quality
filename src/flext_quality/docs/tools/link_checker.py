@@ -24,7 +24,7 @@ from urllib.robotparser import RobotFileParser
 import requests
 from aiohttp import ClientError, ClientSession, ClientTimeout
 
-from flext_quality import m, t, u
+from flext_quality import c, m, t, u
 
 logger = u.fetch_logger(__name__)
 
@@ -181,12 +181,7 @@ class FlextQualityLinkChecker:
                         )
                         all_links.append(link_info)
 
-            except (
-                FileNotFoundError,
-                PermissionError,
-                UnicodeDecodeError,
-                OSError,
-            ) as e:
+            except c.EXC_FS_DECODING as e:
                 logger.warning(
                     "failed_to_extract_links",
                     file_path=str(file_path),

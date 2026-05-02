@@ -107,12 +107,7 @@ class FlextQualityLinkValidator:
                             ),
                         ),
                     )
-            except (
-                FileNotFoundError,
-                PermissionError,
-                UnicodeDecodeError,
-                OSError,
-            ) as e:
+            except c.EXC_FS_DECODING as e:
                 self.results.errors.append(
                     m.Quality.LinkCheckResult(
                         type="file_read_error",

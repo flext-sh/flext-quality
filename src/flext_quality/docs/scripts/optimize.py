@@ -60,12 +60,7 @@ class FlextQualityDocumentationOptimizer:
                         "description": "Fixed trailing spaces, list indentation, and emphasis consistency",
                     })
                 self.results.files_processed += 1
-            except (
-                FileNotFoundError,
-                PermissionError,
-                UnicodeDecodeError,
-                OSError,
-            ) as e:
+            except c.EXC_FS_DECODING as e:
                 self.logger.warning("Failed to optimize formatting in file: %s", e)
         return self.results.model_dump()
 
