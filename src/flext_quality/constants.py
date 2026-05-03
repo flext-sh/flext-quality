@@ -44,34 +44,12 @@ class FlextQualityConstants(c, web_c):
             STOP = "Stop"
 
         @unique
-        class ToolName(StrEnum):
-            """Tool names for hook filtering."""
-
-            EDIT = "Edit"
-            WRITE = "Write"
-            BASH = "Bash"
-            READ = "Read"
-            GLOB = "Glob"
-            GREP = "Grep"
-
-        @unique
         class RuleType(StrEnum):
             """Rule types for validation."""
 
             BLOCKING = "blocking"
             WARNING = "warning"
             INFO = "info"
-
-        @unique
-        class RuleCategory(StrEnum):
-            """Rule categories for organization."""
-
-            LINT = "lint"
-            TYPE = "type"
-            PATTERN = "pattern"
-            ARCHITECTURE = "architecture"
-            SECURITY = "security"
-            DOCUMENTATION = "documentation"
 
         @unique
         class Severity(StrEnum):
@@ -96,14 +74,6 @@ class FlextQualityConstants(c, web_c):
             CONNECTED = "connected"
             DISCONNECTED = "disconnected"
             ERROR = "error"
-
-        @unique
-        class HookAction(StrEnum):
-            """Hook response actions."""
-
-            CONTINUE = "continue"
-            BLOCK = "block"
-            MODIFY = "modify"
 
         @unique
         class NotificationPriority(StrEnum):

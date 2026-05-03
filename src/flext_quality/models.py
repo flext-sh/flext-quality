@@ -11,7 +11,7 @@ from collections.abc import (
     MutableSequence,
 )
 from pathlib import Path
-from typing import Annotated, ClassVar
+from typing import Annotated
 
 from flext_infra import m, u
 from flext_web import m as web_m
@@ -37,27 +37,6 @@ class FlextQualityModels(m, web_m):
         def _empty_list_dict_str_str() -> MutableSequence[t.MutableStrMapping]:
             return []
 
-        class HookConfig(m.BaseModel):
-            """Configuration for a hook."""
-
-            event: c.Quality.HookEvent
-            matcher: t.StrSequence | None = None
-            command: str
-            timeout_ms: Annotated[
-                int,
-                u.Field(default=c.Quality.HOOK_TIMEOUT_MS),
-            ]
-            enabled: bool = True
-
-        class HookResult(m.BaseModel):
-            """Result from hook execution."""
-
-            continue_execution: Annotated[bool, u.Field(alias="continue")]
-            system_message: Annotated[str | None, u.Field(alias="systemMessage")] = None
-            blocked_reason: str | None = None
-
-            model_config: ClassVar[m.ConfigDict] = m.ConfigDict(populate_by_name=True)
-
         class RuleDefinition(m.BaseModel):
             """A rule definition from YAML."""
 
@@ -67,37 +46,6 @@ class FlextQualityModels(m, web_m):
             pattern: str | None = None
             action: str
             enabled: bool = True
-
-        class IntegrationConfig(m.BaseModel):
-            """Configuration for an integration."""
-
-            name: str
-            enabled: bool = True
-            host: str = c.LOCALHOST
-            port: int
-            timeout_ms: Annotated[
-                int,
-                u.Field(default=c.Quality.INTEGRATION_TIMEOUT_MS),
-            ]
-
-        class MemoryObservation(m.BaseModel):
-            """An observation from claude-mem."""
-
-            id: str
-            type: str
-            title: str
-            content: str
-            concepts: t.StrSequence = u.Field(default_factory=list)
-            files: t.StrSequence = u.Field(default_factory=list)
-            timestamp: str
-
-        class ContextSearchResult(m.BaseModel):
-            """A search result from claude-context."""
-
-            file_path: str
-            snippet: str
-            score: float
-            line_number: int | None = None
 
         class Issue(m.BaseModel):
             """Canonical issue model for documentation tooling."""
@@ -476,16 +424,6 @@ class FlextQualityModels(m, web_m):
             email: FlextQualityModels.Quality.ChannelConfig
             slack: FlextQualityModels.Quality.ChannelConfig
             webhook: FlextQualityModels.Quality.ChannelConfig
-
-        class NotifierConfig(m.BaseModel):
-            """Root notification configuration."""
-
-            enabled: bool = True
-            channels: FlextQualityModels.Quality.ChannelsConfig
-            alerts: FlextQualityModels.Quality.AlertsConfig
-            email: FlextQualityModels.Quality.EmailConfig
-            slack: FlextQualityModels.Quality.SlackConfig
-            webhook: FlextQualityModels.Quality.WebhookConfig
 
         class NotifierResults(m.BaseModel):
             """Results for documentation notification runs."""

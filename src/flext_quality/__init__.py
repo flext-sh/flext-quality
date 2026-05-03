@@ -28,21 +28,11 @@ if _t.TYPE_CHECKING:
     from flext_quality.base import FlextQualityServiceBase, s
     from flext_quality.cli import FlextQualityCli, main
     from flext_quality.constants import FlextQualityConstants, c
-    from flext_quality.docs.core.base_classes import (
-        FlextQualityBaseAnalyzer,
-        FlextQualityBaseAuditor,
-        FlextQualityBaseReporter,
-        FlextQualityBaseValidator,
-    )
     from flext_quality.docs.core.config_manager import (
         FlextQualityAuditRules,
         FlextQualityConfigManager,
         FlextQualityStyleGuide,
         FlextQualityValidationSettings,
-    )
-    from flext_quality.docs.core.file_discovery import (
-        FlextQualityDocumentationFinder,
-        FlextQualityFileStatistics,
     )
     from flext_quality.docs.dashboard import FlextQualityDocumentationDashboard
     from flext_quality.docs.notifications import FlextQualityDocumentationNotifier
@@ -56,7 +46,6 @@ if _t.TYPE_CHECKING:
         FlextQualityContentValidator,
         FlextQualityLinkValidator,
     )
-    from flext_quality.docs.tools.content_analyzer import FlextQualityContentAnalyzer
     from flext_quality.docs.tools.link_checker import FlextQualityLinkChecker
     from flext_quality.docs.tools.style_validator import FlextQualityStyleValidator
     from flext_quality.hooks.base import FlextQualityBaseHook
@@ -115,10 +104,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "c",
             ),
             ".docs.core.base_classes": (
-                "FlextQualityBaseAnalyzer",
-                "FlextQualityBaseAuditor",
-                "FlextQualityBaseReporter",
-                "FlextQualityBaseValidator",
             ),
             ".docs.core.config_manager": (
                 "FlextQualityAuditRules",
@@ -127,8 +112,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "FlextQualityValidationSettings",
             ),
             ".docs.core.file_discovery": (
-                "FlextQualityDocumentationFinder",
-                "FlextQualityFileStatistics",
             ),
             ".docs.dashboard": ("FlextQualityDocumentationDashboard",),
             ".docs.notifications": ("FlextQualityDocumentationNotifier",),
@@ -140,7 +123,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "FlextQualityContentValidator",
                 "FlextQualityLinkValidator",
             ),
-            ".docs.tools.content_analyzer": ("FlextQualityContentAnalyzer",),
             ".docs.tools.link_checker": ("FlextQualityLinkChecker",),
             ".docs.tools.style_validator": ("FlextQualityStyleValidator",),
             ".hooks.base": ("FlextQualityBaseHook",),
@@ -207,26 +189,19 @@ install_lazy_exports(__name__, globals(), _LAZY_IMPORTS)
 __all__: list[str] = [
     "FlextQuality",
     "FlextQualityAuditRules",
-    "FlextQualityBaseAnalyzer",
-    "FlextQualityBaseAuditor",
     "FlextQualityBaseHook",
-    "FlextQualityBaseReporter",
-    "FlextQualityBaseValidator",
     "FlextQualityClaudeContextClient",
     "FlextQualityClaudeMemClient",
     "FlextQualityCli",
     "FlextQualityCodeExecutionBridge",
     "FlextQualityConfigManager",
     "FlextQualityConstants",
-    "FlextQualityContentAnalyzer",
     "FlextQualityContentValidator",
     "FlextQualityDocumentationAuditor",
     "FlextQualityDocumentationDashboard",
-    "FlextQualityDocumentationFinder",
     "FlextQualityDocumentationNotifier",
     "FlextQualityDocumentationOptimizer",
     "FlextQualityDocumentationReporter",
-    "FlextQualityFileStatistics",
     "FlextQualityHookManager",
     "FlextQualityLinkChecker",
     "FlextQualityLinkValidator",

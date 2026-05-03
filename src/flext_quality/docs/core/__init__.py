@@ -8,10 +8,6 @@ from flext_core.lazy import build_lazy_import_map, install_lazy_exports
 _LAZY_IMPORTS = build_lazy_import_map(
     {
         ".base_classes": (
-            "FlextQualityBaseAnalyzer",
-            "FlextQualityBaseAuditor",
-            "FlextQualityBaseReporter",
-            "FlextQualityBaseValidator",
         ),
         ".config_manager": (
             "FlextQualityAuditRules",
@@ -20,8 +16,6 @@ _LAZY_IMPORTS = build_lazy_import_map(
             "FlextQualityValidationSettings",
         ),
         ".file_discovery": (
-            "FlextQualityDocumentationFinder",
-            "FlextQualityFileStatistics",
         ),
     },
 )
