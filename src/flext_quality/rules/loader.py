@@ -26,10 +26,12 @@ class FlextQualityRulesLoader:
                 f"Failed to parse YAML: {yaml_result.error}",
             )
         parsed = yaml_result.value
-        if not isinstance(parsed, dict):
-            return r[Sequence[m.Quality.RuleDefinition]].fail(
-                "Invalid YAML: expected dict at root",
-            )
+        validations: list[tuple[bool, str]] = [
+            (not isinstance(parsed, dict), "Invalid YAML: expected dict at root"),
+        ]
+        for failed, msg in validations:
+            if failed:
+                return r[Sequence[m.Quality.RuleDefinition]].fail(msg)
         parsed_dict: t.JsonMapping = (
             t.Quality.CONTAINER_MAPPING_ADAPTER.validate_python(parsed)
         )
@@ -78,11 +80,14 @@ class FlextQualityRulesLoader:
     ) -> p.Result[m.Quality.RuleDefinition]:
         """Parse a single rule from dict."""
         name = data.get("name")
-        if not name:
-            return r[m.Quality.RuleDefinition].fail(f"Rule {index}: missing 'name'")
         rule_type_str = data.get("type")
-        if not rule_type_str:
-            return r[m.Quality.RuleDefinition].fail(f"Rule {index}: missing 'type'")
+        validations: list[tuple[bool, str]] = [
+            (not name, f"Rule {index}: missing 'name'"),
+            (not rule_type_str, f"Rule {index}: missing 'type'"),
+        ]
+        for failed, msg in validations:
+            if failed:
+                return r[m.Quality.RuleDefinition].fail(msg)
         try:
             rule_type = c.Quality.RuleType(str(rule_type_str))
         except ValueError:

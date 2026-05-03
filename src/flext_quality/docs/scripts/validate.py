@@ -119,17 +119,19 @@ class FlextQualityLinkValidator:
 
     def _classify_link(self, url: str) -> str:
         """Classify link type based on URL pattern."""
-        if url.startswith(("http://", "https://")):
-            return "external"
-        if url.startswith("mailto:"):
-            return "email"
-        if url.startswith("#"):
-            return "anchor"
-        if url.endswith((".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp")):
-            return "image"
-        if url.startswith(("./", "../")) or url.endswith((".md", ".mdx")):
-            return "internal"
-        return "reference"
+        match url:
+            case _ if url.startswith(("http://", "https://")):
+                return "external"
+            case _ if url.startswith("mailto:"):
+                return "email"
+            case _ if url.startswith("#"):
+                return "anchor"
+            case _ if url.endswith((".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp")):
+                return "image"
+            case _ if url.startswith(("./", "../")) or url.endswith((".md", ".mdx")):
+                return "internal"
+            case _:
+                return "reference"
 
     def _find_line_number(self, content: str, search_text: str) -> int | None:
         """Find line number of specific text in content."""
@@ -214,30 +216,40 @@ class FlextQualityLinkValidator:
         attempt: int,
     ) -> tuple[bool, t.HeaderMapping | None]:
         """Handle a single request attempt."""
+        result: tuple[bool, t.HeaderMapping | None] = (False, None)
         try:
             response = self._make_http_request(url)
             if response.status_code < 400:
-                return (True, {"status_code": response.status_code})
-            if self._should_retry_with_get(response.status_code):
+                result = (True, {"status_code": response.status_code})
+            elif self._should_retry_with_get(response.status_code):
                 response = self._make_http_request(url, "get")
                 if response.status_code < 400:
-                    return (True, {"status_code": response.status_code})
-            return (
-                False,
-                {
-                    "status_code": response.status_code,
-                    "error": f"HTTP {response.status_code}",
-                },
-            )
+                    result = (True, {"status_code": response.status_code})
+                else:
+                    result = (
+                        False,
+                        {
+                            "status_code": response.status_code,
+                            "error": f"HTTP {response.status_code}",
+                        },
+                    )
+            else:
+                result = (
+                    False,
+                    {
+                        "status_code": response.status_code,
+                        "error": f"HTTP {response.status_code}",
+                    },
+                )
         except requests.exceptions.Timeout:
             if attempt == self.retries - 1:
-                return (False, {"error": f"Timeout after {self.timeout}s"})
+                result = (False, {"error": f"Timeout after {self.timeout}s"})
         except requests.exceptions.RequestException as e:
             if attempt == self.retries - 1:
-                return (False, {"error": str(e)})
+                result = (False, {"error": str(e)})
         except c.EXC_OS_RUNTIME_VALUE as e:
-            return (False, {"error": f"Unexpected error: {e!s}"})
-        return (False, None)
+            result = (False, {"error": f"Unexpected error: {e!s}"})
+        return result
 
     def _check_single_external_link(
         self,
