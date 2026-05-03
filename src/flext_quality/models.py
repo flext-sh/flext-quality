@@ -351,21 +351,6 @@ class FlextQualityModels(m, web_m):
             has_lists: bool = False
             has_headers: bool = False
 
-        class FileStatistics(m.BaseModel):
-            """Statistics payload for discovered documentation files."""
-
-            total_files: int
-            total_size: int | None = None
-            total_lines: int | None = None
-            total_words: int | None = None
-            markdown_files: int | None = None
-            other_files: int | None = None
-            size_distribution: t.IntMapping | None = None
-            categories: t.IntMapping | None = None
-            avg_file_size: float | None = None
-            avg_lines_per_file: float | None = None
-            avg_words_per_file: float | None = None
-
         class ChannelConfig(m.BaseModel):
             """Notification channel toggle configuration."""
 
@@ -381,49 +366,6 @@ class FlextQualityModels(m, web_m):
             """Simple on/off alert configuration."""
 
             enabled: bool = True
-
-        class AlertsConfig(m.BaseModel):
-            """All alert toggles for documentation notifications."""
-
-            critical_issues: FlextQualityModels.Quality.AlertThresholdConfig
-            quality_drop: FlextQualityModels.Quality.AlertThresholdConfig
-            broken_links: FlextQualityModels.Quality.AlertThresholdConfig
-            weekly_report: FlextQualityModels.Quality.AlertToggleConfig
-            monthly_report: FlextQualityModels.Quality.AlertToggleConfig
-
-        class EmailConfig(m.BaseModel):
-            """SMTP notification configuration."""
-
-            smtp_server: str
-            smtp_port: int
-            username: str
-            password: str
-            from_address: str
-            to_addresses: t.StrSequence = u.Field(default_factory=list)
-
-        class SlackConfig(m.BaseModel):
-            """Slack notification configuration."""
-
-            webhook_url: str
-            channel: str
-            username: str
-
-        class WebhookConfig(m.BaseModel):
-            """Generic webhook configuration."""
-
-            url: str
-            headers: t.StrMapping = u.Field(default_factory=dict)
-            timeout: Annotated[
-                t.PositiveInt, u.Field(default=c.DEFAULT_TIMEOUT_SECONDS)
-            ]
-
-        class ChannelsConfig(m.BaseModel):
-            """Enabled channels for documentation notifications."""
-
-            console: FlextQualityModels.Quality.ChannelConfig
-            email: FlextQualityModels.Quality.ChannelConfig
-            slack: FlextQualityModels.Quality.ChannelConfig
-            webhook: FlextQualityModels.Quality.ChannelConfig
 
         class NotifierResults(m.BaseModel):
             """Results for documentation notification runs."""
