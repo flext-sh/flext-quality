@@ -36,11 +36,6 @@ class FlextQualityConstants(c, web_c):
         class HookEvent(StrEnum):
             """Claude Code hook events."""
 
-            PRE_TOOL_USE = "PreToolUse"
-            POST_TOOL_USE = "PostToolUse"
-            USER_PROMPT_SUBMIT = "UserPromptSubmit"
-            PRE_COMPACT = "PreCompact"
-            SESSION_START = "SessionStart"
             STOP = "Stop"
 
         @unique
