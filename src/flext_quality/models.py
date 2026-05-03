@@ -356,17 +356,6 @@ class FlextQualityModels(m, web_m):
 
             enabled: bool = True
 
-        class AlertThresholdConfig(m.BaseModel):
-            """Threshold-based alert configuration."""
-
-            enabled: bool = True
-            threshold: Annotated[t.NonNegativeInt, u.Field(default=0)]
-
-        class AlertToggleConfig(m.BaseModel):
-            """Simple on/off alert configuration."""
-
-            enabled: bool = True
-
         class NotifierResults(m.BaseModel):
             """Results for documentation notification runs."""
 
