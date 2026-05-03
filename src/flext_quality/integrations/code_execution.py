@@ -47,7 +47,9 @@ class FlextQualityCodeExecutionBridge:
     ) -> p.Result[t.StrSequence]:
         """Build command for Python execution."""
         if not script_path.exists():
-            return e.fail_not_found("Script", str(script_path), result_type=r[t.StrSequence])
+            return e.fail_not_found(
+                "Script", str(script_path), result_type=r[t.StrSequence]
+            )
         cmd = ["python", str(script_path)]
         if args:
             cmd.extend(args)
@@ -74,7 +76,9 @@ class FlextQualityCodeExecutionBridge:
     ) -> p.Result[t.StrSequence]:
         """Build command for TypeScript execution via npx tsx."""
         if not script_path.exists():
-            return e.fail_not_found("Script", str(script_path), result_type=r[t.StrSequence])
+            return e.fail_not_found(
+                "Script", str(script_path), result_type=r[t.StrSequence]
+            )
         cmd = ["npx", "tsx", str(script_path)]
         if args:
             cmd.extend(args)
