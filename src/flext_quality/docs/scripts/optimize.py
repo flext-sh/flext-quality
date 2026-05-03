@@ -325,7 +325,7 @@ class FlextQualityDocumentationOptimizer:
                         frontmatter_content,
                     ).unwrap_or(empty_frontmatter)
                     metadata: t.MutableJsonMapping = {
-                        str(k): v
+                        k: v
                         for k, v in (parsed_fm or {}).items()
                         if isinstance(v, (str, int, float, bool))
                     }
