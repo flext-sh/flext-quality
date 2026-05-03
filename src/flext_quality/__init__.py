@@ -103,15 +103,11 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "FlextQualityConstants",
                 "c",
             ),
-            ".docs.core.base_classes": (
-            ),
             ".docs.core.config_manager": (
                 "FlextQualityAuditRules",
                 "FlextQualityConfigManager",
                 "FlextQualityStyleGuide",
                 "FlextQualityValidationSettings",
-            ),
-            ".docs.core.file_discovery": (
             ),
             ".docs.dashboard": ("FlextQualityDocumentationDashboard",),
             ".docs.notifications": ("FlextQualityDocumentationNotifier",),

@@ -17,15 +17,11 @@ _LAZY_IMPORTS = merge_lazy_imports(
     ),
     build_lazy_import_map(
         {
-            ".core.base_classes": (
-            ),
             ".core.config_manager": (
                 "FlextQualityAuditRules",
                 "FlextQualityConfigManager",
                 "FlextQualityStyleGuide",
                 "FlextQualityValidationSettings",
-            ),
-            ".core.file_discovery": (
             ),
             ".dashboard": ("FlextQualityDocumentationDashboard",),
             ".notifications": ("FlextQualityDocumentationNotifier",),
