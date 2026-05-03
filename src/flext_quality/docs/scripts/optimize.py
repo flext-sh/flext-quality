@@ -320,9 +320,10 @@ class FlextQualityDocumentationOptimizer:
                 try:
                     frontmatter_lines = lines[1 : end_idx - 1]
                     frontmatter_content = "\n".join(frontmatter_lines)
+                    empty_frontmatter: t.JsonMapping = {}
                     parsed_fm = u.Cli.yaml_parse(
                         frontmatter_content,
-                    ).unwrap_or({})
+                    ).unwrap_or(empty_frontmatter)
                     metadata: t.MutableJsonMapping = {
                         str(k): v
                         for k, v in (parsed_fm or {}).items()
