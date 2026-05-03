@@ -98,28 +98,6 @@ class FlextQualityConstants(c, web_c):
             INTEGER = "int"
 
         # ===== Quality Thresholds =====
-        THRESHOLD_DEFAULT_LINES: Final[int] = 500
-        "Default lines threshold."
-        THRESHOLD_MAX_LINES: Final[int] = 1000
-        "Maximum lines threshold."
-        THRESHOLD_MIN_LINES: Final[int] = 1
-        "Minimum lines threshold."
-        THRESHOLD_MAX_CYCLOMATIC_COMPLEXITY: Final[int] = 10
-        "Maximum cyclomatic complexity."
-        THRESHOLD_MAX_COGNITIVE_COMPLEXITY: Final[int] = 15
-        "Maximum cognitive complexity."
-        THRESHOLD_MAX_FUNCTION_LENGTH: Final[int] = 50
-        "Maximum function length."
-        THRESHOLD_MAX_CLASS_LENGTH: Final[int] = 300
-        "Maximum class length."
-        THRESHOLD_MIN_TEST_COVERAGE: Final[float] = 80.0
-        "Minimum test coverage percentage."
-        THRESHOLD_MIN_DOCSTRING_COVERAGE: Final[float] = 80.0
-        "Minimum docstring coverage percentage."
-        THRESHOLD_MAX_LINE_LENGTH: Final[int] = 88
-        "Maximum line length."
-        THRESHOLD_FLEXT_CORE_LINE_LENGTH: Final[int] = 79
-        "FLEXT core maximum line length."
         THRESHOLD_MAX_BROKEN_LINKS_TO_SHOW: Final[int] = 10
         "Maximum broken links to show."
         THRESHOLD_MIN_HEADINGS_FOR_TOC: Final[int] = 5
@@ -130,8 +108,6 @@ class FlextQualityConstants(c, web_c):
         INTEGRATION_TIMEOUT_MS: Final[int] = 10000
         RULE_TIMEOUT_SECONDS: Final[int] = c.DEFAULT_TIMEOUT_SECONDS
         BATCH_SIZE: Final[int] = 100
-        MAX_PARALLEL_RULES: Final[int] = 4
-        MAX_CACHE_ENTRIES: Final[int] = 1000
         DEFAULT_SEARCH_LIMIT: Final[int] = 20
         DEFAULT_MEMORY_SEARCH_LIMIT: Final[int] = 10
         DEFAULT_TIMELINE_DEPTH: Final[int] = 5
@@ -149,12 +125,6 @@ class FlextQualityConstants(c, web_c):
         # ===== Standard Paths =====
         PATHS_RULES_DIR: Final[str] = "rules"
         "Rules directory path."
-        PATHS_CONFIG_FILE: Final[str] = "quality.yaml"
-        "Configuration file path."
-        PATHS_CACHE_DIR: Final[str] = ".quality_cache"
-        "Cache directory path."
-        PATHS_REPORTS_DIR: Final[str] = "reports"
-        "Reports directory path."
         PATHS_DOCS_MAINTENANCE_REPORTS_DIR: Final[str] = "docs/maintenance/reports/"
         "Documentation maintenance reports directory path."
         PATHS_DOCS_MAINTENANCE_SETTINGS_DIR: Final[str] = "docs/maintenance/settings/"
