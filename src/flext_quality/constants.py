@@ -2,6 +2,9 @@
 
 Centralized, immutable constants for the flext-quality project providing
 hook events, rule types, validation thresholds, and runtime enumerations.
+Owns every compiled ``re.Pattern`` for the Quality domain — consumer
+modules import the pre-compiled ``*_RE`` constants directly; ``import re``
+outside this module is forbidden.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -9,8 +12,9 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
+import re
 from enum import StrEnum, unique
-from typing import Final
+from typing import ClassVar, Final
 
 from flext_infra import c
 from flext_web import c as web_c
@@ -140,6 +144,55 @@ class FlextQualityConstants(c, web_c):
         "Optional type pattern."
         PATTERNS_UNION_PATTERN: Final[str] = "Union\\["
         "Union type pattern."
+
+        # === Pre-compiled regex authorities ===
+        PATTERNS_TYPE_IGNORE_RE: ClassVar[re.Pattern[str]] = re.compile(
+            PATTERNS_TYPE_IGNORE
+        )
+        PATTERNS_CAST_USAGE_RE: ClassVar[re.Pattern[str]] = re.compile(
+            PATTERNS_CAST_USAGE
+        )
+        PATTERNS_ANY_TYPE_RE: ClassVar[re.Pattern[str]] = re.compile(PATTERNS_ANY_TYPE)
+        PATTERNS_TYPE_CHECKING_RE: ClassVar[re.Pattern[str]] = re.compile(
+            PATTERNS_TYPE_CHECKING
+        )
+        PATTERNS_TIER_VIOLATION_RE: ClassVar[re.Pattern[str]] = re.compile(
+            PATTERNS_TIER_VIOLATION
+        )
+        PATTERNS_OPTIONAL_RE: ClassVar[re.Pattern[str]] = re.compile(
+            PATTERNS_OPTIONAL_PATTERN
+        )
+        PATTERNS_UNION_RE: ClassVar[re.Pattern[str]] = re.compile(PATTERNS_UNION_PATTERN)
+        FORBIDDEN_PATTERN_RE_MAP: ClassVar[dict[str, re.Pattern[str]]] = {
+            "type-ignore": PATTERNS_TYPE_IGNORE_RE,
+            "cast-usage": PATTERNS_CAST_USAGE_RE,
+            "any-type": PATTERNS_ANY_TYPE_RE,
+            "type-checking": PATTERNS_TYPE_CHECKING_RE,
+            "optional-pattern": PATTERNS_OPTIONAL_RE,
+            "union-pattern": PATTERNS_UNION_RE,
+        }
+
+        @staticmethod
+        def compile_pattern(
+            pattern: str,
+            *,
+            ignorecase: bool = False,
+            multiline: bool = False,
+            dotall: bool = False,
+        ) -> re.Pattern[str]:
+            """Compile a runtime-supplied regex pattern.
+
+            Sole sanctioned ``re.compile`` entry-point for non-constant
+            Quality patterns (rule definitions loaded from YAML/etc.).
+            """
+            flags = 0
+            if ignorecase:
+                flags |= re.IGNORECASE
+            if multiline:
+                flags |= re.MULTILINE
+            if dotall:
+                flags |= re.DOTALL
+            return re.compile(pattern, flags=flags)
 
 
 c = FlextQualityConstants

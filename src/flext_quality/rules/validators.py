@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from collections.abc import (
     MutableMapping,
     MutableSequence,
@@ -25,9 +24,10 @@ class FlextQualityValidators:
         def __init__(self, patterns: t.StrMapping) -> None:
             """Initialize with patterns."""
             self._patterns = patterns
-            self._compiled: MutableMapping[str, re.Pattern[str]] = {}
-            for pname, pattern in patterns.items():
-                self._compiled[pname] = re.compile(pattern)
+            self._compiled: MutableMapping[str, t.RegexPattern] = {
+                pname: c.Quality.compile_pattern(pattern)
+                for pname, pattern in patterns.items()
+            }
 
         @property
         @override
@@ -101,10 +101,9 @@ class FlextQualityValidators:
             file_tier = self._get_file_tier(file_path)
             if file_tier is None:
                 return r[Sequence[t.JsonMapping]].ok(violations)
-            tier_pattern = re.compile(c.Quality.PATTERNS_TIER_VIOLATION)
             lines = content.splitlines()
             for line_num, line in enumerate(lines, start=1):
-                if tier_pattern.search(line):
+                if c.Quality.PATTERNS_TIER_VIOLATION_RE.search(line):
                     violations.append({
                         "rule": "tier-violation",
                         "file": filename,

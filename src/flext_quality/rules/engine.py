@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from collections.abc import (
     MutableSequence,
     Sequence,
@@ -87,8 +86,8 @@ class FlextQualityRulesEngine:
         if rule.pattern is None:
             return violations
         try:
-            pattern = re.compile(rule.pattern)
-        except re.error:
+            pattern = c.Quality.compile_pattern(rule.pattern)
+        except c.EXC_VALIDATION_VALUE:
             pattern = None
         lines = content.splitlines()
         for line_num, line in enumerate(lines, start=1):
