@@ -13,7 +13,6 @@ Usage:
 from __future__ import annotations
 
 import argparse
-import re
 from collections.abc import (
     MutableMapping,
     MutableSequence,
@@ -25,6 +24,21 @@ from string import Template
 import requests
 
 from flext_quality import c, m, t, u
+
+
+def _compiled_pattern(
+    pattern: str,
+    *,
+    ignorecase: bool = False,
+    multiline: bool = False,
+    dotall: bool = False,
+) -> t.RegexPattern:
+    return u.Quality.compile_pattern(
+        pattern,
+        ignorecase=ignorecase,
+        multiline=multiline,
+        dotall=dotall,
+    )
 
 
 class FlextQualityDocumentationAuditor:
@@ -223,21 +237,25 @@ class FlextQualityDocumentationAuditor:
     def _check_outdated_indicators(self, content: str) -> MutableSequence[str]:
         """Check for indicators of outdated content."""
         indicators: MutableSequence[str] = []
-        if re.search(
+        if _compiled_pattern(
             r"\\b\\d+\\.\\d+\\.\\d+.*TODO|FIXME|placeholder",
-            content,
-            re.IGNORECASE,
-        ):
+            ignorecase=True,
+        ).search(content):
             indicators.append("version placeholders")
-        if re.search(r"\\b202\\d.*TODO|FIXME|update.*date", content, re.IGNORECASE):
+        if _compiled_pattern(
+            r"\\b202\\d.*TODO|FIXME|update.*date",
+            ignorecase=True,
+        ).search(content):
             indicators.append("date placeholders")
-        if re.search(
+        if _compiled_pattern(
             r"#+\\s*(TODO|FIXME|Coming Soon|Work in Progress)",
-            content,
-            re.IGNORECASE,
-        ):
+            ignorecase=True,
+        ).search(content):
             indicators.append("incomplete sections")
-        if re.search(r"❌.*working|✅.*broken|⚠️.*complete", content, re.IGNORECASE):
+        if _compiled_pattern(
+            r"❌.*working|✅.*broken|⚠️.*complete",
+            ignorecase=True,
+        ).search(content):
             indicators.append("potentially inconsistent status")
         return indicators
 
@@ -273,10 +291,10 @@ class FlextQualityDocumentationAuditor:
                             "recommendation": f"Add missing sections: {', '.join(missing_sections)}",
                         })
                 if check_todos:
-                    todos = re.findall(
-                        r"(?i)(?:TODO|FIXME|XXX):\\s*(.+?)(?:\\n|$)",
-                        content,
-                    )
+                    todos = _compiled_pattern(
+                        r"(?:TODO|FIXME|XXX):\\s*(.+?)(?:\\n|$)",
+                        ignorecase=True,
+                    ).findall(content)
                     if todos:
                         self.results.issues.append({
                             "type": "todo_markers",
@@ -303,11 +321,11 @@ class FlextQualityDocumentationAuditor:
         missing: t.StrSequence = [
             section
             for section in required_sections
-            if not re.search(
-                f"^#+\\s.*{re.escape(section)}.*$",
-                content,
-                re.MULTILINE | re.IGNORECASE,
-            )
+            if not _compiled_pattern(
+                f"^#+\\s.*{u.Quality.escape_pattern(section)}.*$",
+                multiline=True,
+                ignorecase=True,
+            ).search(content)
         ]
         return missing
 
@@ -365,17 +383,25 @@ class FlextQualityDocumentationAuditor:
         """Check for markdown formatting issues."""
         issues: MutableSequence[str] = []
         formatting_cfg = self.style_guide.formatting
-        unordered_lists = re.findall(r"^[\\s]*[-\\*\\+]", content, re.MULTILINE)
+        unordered_lists = _compiled_pattern(
+            r"^[\\s]*[-\\*\\+]",
+            multiline=True,
+        ).findall(content)
         if len(set(unordered_lists)) > 1:
             issues.append("mixed unordered list styles")
         emphasis_patterns = ["\\*[^*]+\\*", "_[^_]+_"]
         emphasis_usage = [
-            pattern for pattern in emphasis_patterns if re.search(pattern, content)
+            pattern
+            for pattern in emphasis_patterns
+            if _compiled_pattern(pattern).search(content)
         ]
         if len(emphasis_usage) > 1:
             issues.append("mixed emphasis styles (* vs _)")
         if formatting_cfg.trailing_spaces:
-            trailing_spaces = re.findall(r"[ \\t]+$", content, re.MULTILINE)
+            trailing_spaces = _compiled_pattern(
+                r"[ \\t]+$",
+                multiline=True,
+            ).findall(content)
             if trailing_spaces:
                 issues.append(f"{len(trailing_spaces)} lines with trailing spaces")
         max_length = formatting_cfg.max_line_length
@@ -389,7 +415,9 @@ class FlextQualityDocumentationAuditor:
         issues: MutableSequence[t.StrMapping] = []
         accessibility_cfg = self.style_guide.accessibility
         if accessibility_cfg.require_alt_text:
-            images_without_alt = re.findall(r"!\\[\\]\\([^)]+\\)", content)
+            images_without_alt = _compiled_pattern(
+                r"!\\[\\]\\([^)]+\\)",
+            ).findall(content)
             if images_without_alt:
                 issues.extend([
                     {
@@ -399,11 +427,10 @@ class FlextQualityDocumentationAuditor:
                     for img in images_without_alt
                 ])
         if accessibility_cfg.descriptive_links:
-            generic_links = re.findall(
+            generic_links = _compiled_pattern(
                 r"\\[here|click here|link|read more\\]\\([^)]+\\)",
-                content,
-                re.IGNORECASE,
-            )
+                ignorecase=True,
+            ).findall(content)
             if generic_links:
                 issues.extend([
                     {
@@ -416,7 +443,10 @@ class FlextQualityDocumentationAuditor:
 
     def _check_heading_hierarchy(self, content: str) -> t.StrSequence:
         """Check heading hierarchy for logical structure."""
-        headings = re.findall(r"^(#+)\\s+(.+)$", content, re.MULTILINE)
+        headings = _compiled_pattern(
+            r"^(#+)\\s+(.+)$",
+            multiline=True,
+        ).findall(content)
         heading_levels = [len(level) for level, _ in headings]
         issues = [
             f"Skipped heading level at line with H{heading_levels[i]}"
@@ -435,10 +465,9 @@ class FlextQualityDocumentationAuditor:
         for file_path in doc_files:
             try:
                 content = file_path.read_text(encoding="utf-8")
-                external_links = re.findall(
+                external_links = _compiled_pattern(
                     r"\\[([^\\]]+)\\]\\((https?://[^)]+)\\)",
-                    content,
-                )
+                ).findall(content)
                 for text, url in external_links:
                     all_links.append({
                         "url": url,
@@ -446,7 +475,9 @@ class FlextQualityDocumentationAuditor:
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "external",
                     })
-                internal_links = re.findall(r"\\[([^\\]]+)\\]\\(([^)]+)\\)", content)
+                internal_links = _compiled_pattern(
+                    r"\\[([^\\]]+)\\]\\(([^)]+)\\)",
+                ).findall(content)
                 for text, link in internal_links:
                     if not link.startswith(("http://", "https://", "#", "mailto:")):
                         all_links.append({
@@ -455,7 +486,9 @@ class FlextQualityDocumentationAuditor:
                             "file": str(file_path.relative_to(self.project_root)),
                             "type": "internal",
                         })
-                images = re.findall(r"!\\[([^\\]]*)\\]\\(([^)]+)\\)", content)
+                images = _compiled_pattern(
+                    r"!\\[([^\\]]*)\\]\\(([^)]+)\\)",
+                ).findall(content)
                 for alt_text, src in images:
                     image_refs.append({
                         "src": src,

@@ -14,7 +14,6 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures
-import re
 from collections.abc import (
     MutableMapping,
     MutableSequence,
@@ -26,6 +25,21 @@ import requests
 from flext_api import FlextApiConstants
 
 from flext_quality import c, m, t, u
+
+
+def _compiled_pattern(
+    pattern: str,
+    *,
+    ignorecase: bool = False,
+    multiline: bool = False,
+    dotall: bool = False,
+) -> t.RegexPattern:
+    return u.Quality.compile_pattern(
+        pattern,
+        ignorecase=ignorecase,
+        multiline=multiline,
+        dotall=dotall,
+    )
 
 
 class FlextQualityLinkValidator:
@@ -59,7 +73,7 @@ class FlextQualityLinkValidator:
                 content = file_path.read_text(encoding="utf-8")
                 file_rel_path = str(file_path.relative_to(file_path.parents[2]))
                 link_pattern = "\\[([^\\]]+)\\]\\(([^)]+)\\)"
-                matches = re.findall(link_pattern, content)
+                matches = _compiled_pattern(link_pattern).findall(content)
                 for text, url in matches:
                     link_type = self._classify_link(url)
                     all_links.append(
@@ -77,7 +91,10 @@ class FlextQualityLinkValidator:
                 html_link_pattern = (
                     "<a[^>]+href=[\"\\']([^\"\\']+)[\"\\'][^>]*>([^<]+)</a>"
                 )
-                html_matches = re.findall(html_link_pattern, content, re.IGNORECASE)
+                html_matches = _compiled_pattern(
+                    html_link_pattern,
+                    ignorecase=True,
+                ).findall(content)
                 for url, text in html_matches:
                     link_type = self._classify_link(url)
                     all_links.append(
@@ -93,7 +110,7 @@ class FlextQualityLinkValidator:
                         ),
                     )
                 image_pattern = "!\\[([^\\]]*)\\]\\(([^)]+)\\)"
-                image_matches = re.findall(image_pattern, content)
+                image_matches = _compiled_pattern(image_pattern).findall(content)
                 for alt_text, src in image_matches:
                     all_links.append(
                         m.Quality.LinkRecord(
@@ -385,12 +402,14 @@ class FlextQualityLinkValidator:
             try:
                 content = file_path.read_text(encoding="utf-8")
                 file_rel_path = str(file_path.relative_to(file_path.parents[2]))
-                headings = re.findall(r"^#{1,6}\\s+(.+)$", content, re.MULTILINE)
+                headings = _compiled_pattern(
+                    r"^#{1,6}\\s+(.+)$",
+                    multiline=True,
+                ).findall(content)
                 anchors = [self._heading_to_anchor(heading) for heading in headings]
-                explicit_anchors = re.findall(
+                explicit_anchors = _compiled_pattern(
                     r"<a[^>]+id=[\"\\']([^\"\\']+)[\"\\'][^>]*>",
-                    content,
-                )
+                ).findall(content)
                 anchors.extend(explicit_anchors)
                 file_anchors[file_rel_path] = set(anchors)
             except c.EXC_FS_DECODING as e:
@@ -423,8 +442,8 @@ class FlextQualityLinkValidator:
     def _heading_to_anchor(self, heading: str) -> str:
         """Convert heading text to anchor format."""
         anchor = heading.lower()
-        anchor = re.sub(r"[^\\w\\s-]", "", anchor)
-        return re.sub(r"\\s+", "-", anchor)
+        anchor = _compiled_pattern(r"[^\\w\\s-]").sub("", anchor)
+        return _compiled_pattern(r"\\s+").sub("-", anchor)
 
     def check_link_text_quality(
         self,
@@ -602,8 +621,8 @@ class FlextQualityContentValidator:
 
     def _calculate_content_metrics(self, content: str) -> m.Quality.ContentMetrics:
         """Calculate basic content quality metrics."""
-        words = re.findall(r"\\b\\w+\\b", content)
-        sentences = re.split(r"[.!?]+", content)
+        words = _compiled_pattern(r"\\b\\w+\\b").findall(content)
+        sentences = _compiled_pattern(r"[.!?]+").split(content)
         sentences = [s.strip() for s in sentences if s.strip()]
         avg_words_per_sentence: float = 0.0
         if sentences:
@@ -620,8 +639,14 @@ class FlextQualityContentValidator:
             avg_words_per_sentence=avg_words_per_sentence,
             readability_score=readability_score,
             has_code_blocks="```" in content,
-            has_lists=bool(re.search(r"^[\\s]*[-\\*\\+]", content, re.MULTILINE)),
-            has_headers=bool(re.search(r"^#{1,6}\\s", content, re.MULTILINE)),
+            has_lists=bool(
+                _compiled_pattern(r"^[\\s]*[-\\*\\+]", multiline=True).search(
+                    content,
+                )
+            ),
+            has_headers=bool(
+                _compiled_pattern(r"^#{1,6}\\s", multiline=True).search(content)
+            ),
         )
 
 

@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import asyncio
 import pathlib
-import re
 import time
 from collections.abc import (
     Mapping,
@@ -27,6 +26,21 @@ from aiohttp import ClientError, ClientSession, ClientTimeout
 from flext_quality import c, m, t, u
 
 logger = u.fetch_logger(__name__)
+
+
+def _compiled_pattern(
+    pattern: str,
+    *,
+    ignorecase: bool = False,
+    multiline: bool = False,
+    dotall: bool = False,
+) -> t.RegexPattern:
+    return u.Quality.compile_pattern(
+        pattern,
+        ignorecase=ignorecase,
+        multiline=multiline,
+        dotall=dotall,
+    )
 
 
 class FlextQualityLinkChecker:
@@ -151,7 +165,9 @@ class FlextQualityLinkChecker:
             try:
                 content = file_path.read_text(encoding="utf-8")
 
-                md_links = re.findall(r"\[([^\]]+)\]\(([^)]+)\)", content)
+                md_links = _compiled_pattern(r"\[([^\]]+)\]\(([^)]+)\)").findall(
+                    content
+                )
                 for text, url in md_links:
                     link_type = self._classify_link(url)
                     link_info = FlextQualityLinkChecker.LinkInfo(
@@ -164,8 +180,12 @@ class FlextQualityLinkChecker:
                     )
                     all_links.append(link_info)
 
-                ref_links = re.findall(r"\[([^\]]+)\]\[([^\]]+)\]", content)
-                ref_defs = re.findall(r"\[([^\]]+)\]:\s*([^\s]+)", content)
+                ref_links = _compiled_pattern(r"\[([^\]]+)\]\[([^\]]+)\]").findall(
+                    content
+                )
+                ref_defs = _compiled_pattern(r"\[([^\]]+)\]:\s*([^\s]+)").findall(
+                    content
+                )
 
                 ref_dict: t.StrMapping = dict(ref_defs)
                 for text, ref in ref_links:

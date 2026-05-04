@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import argparse
 import logging
-import re
 import shutil
 from collections.abc import (
     MutableSequence,
@@ -22,6 +21,21 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from flext_quality import c, e, m, t, u
+
+
+def _compiled_pattern(
+    pattern: str,
+    *,
+    ignorecase: bool = False,
+    multiline: bool = False,
+    dotall: bool = False,
+) -> t.RegexPattern:
+    return u.Quality.compile_pattern(
+        pattern,
+        ignorecase=ignorecase,
+        multiline=multiline,
+        dotall=dotall,
+    )
 
 
 class FlextQualityDocumentationOptimizer:
@@ -79,7 +93,11 @@ class FlextQualityDocumentationOptimizer:
         lines = content.split("\n")
         fixed_lines: MutableSequence[str] = []
         for i, line in enumerate(lines):
-            if re.match(r"^#{1,6}\\s", line) and i > 0 and lines[i - 1].strip():
+            if (
+                _compiled_pattern(r"^#{1,6}\\s").match(line)
+                and i > 0
+                and lines[i - 1].strip()
+            ):
                 fixed_lines.append("")
             fixed_lines.append(line)
         return "\n".join(fixed_lines)
@@ -94,7 +112,10 @@ class FlextQualityDocumentationOptimizer:
             try:
                 content = file_path.read_text(encoding="utf-8")
                 original_content = content
-                headings = re.findall(r"^(#{1,6})\\s+(.+)$", content, re.MULTILINE)
+                headings = _compiled_pattern(
+                    r"^(#{1,6})\\s+(.+)$",
+                    multiline=True,
+                ).findall(content)
                 if len(headings) > c.Quality.THRESHOLD_MIN_HEADINGS_FOR_TOC:
                     content = self._add_or_update_toc(content)
                 if content != original_content:
@@ -115,10 +136,13 @@ class FlextQualityDocumentationOptimizer:
         toc_start = -1
         toc_end = -1
         for i, line in enumerate(lines):
-            if re.match(r"^##+\\s+Table of Contents", line, re.IGNORECASE):
+            if _compiled_pattern(
+                r"^##+\\s+Table of Contents",
+                ignorecase=True,
+            ).match(line):
                 toc_start = i
             elif toc_start != -1 and (
-                not line.strip() or re.match(r"^#{1,6}\\s", line)
+                not line.strip() or _compiled_pattern(r"^#{1,6}\\s").match(line)
             ):
                 toc_end = i
                 break
@@ -128,7 +152,7 @@ class FlextQualityDocumentationOptimizer:
         """Extract headings for table of contents."""
         toc_lines: MutableSequence[str] = []
         for line in lines:
-            match = re.match(r"^(#{1,6})\\s+(.+)$", line)
+            match = _compiled_pattern(r"^(#{1,6})\\s+(.+)$").match(line)
             if match:
                 level = len(match.group(1))
                 title = match.group(2)
@@ -146,11 +170,11 @@ class FlextQualityDocumentationOptimizer:
         """Find the best position to insert table of contents."""
         insert_pos = 0
         for i, line in enumerate(lines):
-            if re.match(r"^##\\s", line):
+            if _compiled_pattern(r"^##\\s").match(line):
                 return i
-            if re.match(r"^#{1,6}\\s", line):
+            if _compiled_pattern(r"^#{1,6}\\s").match(line):
                 continue
-            if line.strip() and (not re.match(r"^#{1,6}\\s", line)):
+            if line.strip() and (not _compiled_pattern(r"^#{1,6}\\s").match(line)):
                 insert_pos = i + 1
         return insert_pos
 
@@ -170,8 +194,8 @@ class FlextQualityDocumentationOptimizer:
     def _heading_to_anchor(self, heading: str) -> str:
         """Convert heading to anchor link."""
         anchor = heading.lower()
-        anchor = re.sub(r"[^\\w\\s-]", "", anchor)
-        return re.sub(r"\\s+", "-", anchor)
+        anchor = _compiled_pattern(r"[^\\w\\s-]").sub("", anchor)
+        return _compiled_pattern(r"\\s+").sub("-", anchor)
 
     def enhance_accessibility(self, doc_files: t.SequenceOf[Path]) -> t.JsonMapping:
         """Enhance accessibility of documentation."""
@@ -201,13 +225,13 @@ class FlextQualityDocumentationOptimizer:
     def _add_missing_alt_text(self, content: str) -> str:
         """Add descriptive alt text to images that lack it."""
         pattern = "!\\[\\]\\(([^)]+)\\)"
-        matches = re.findall(pattern, content)
+        matches = _compiled_pattern(pattern).findall(content)
         for url in matches:
             filename = Path(url.split("/")[-1]).stem
             alt_text = filename.replace("-", " ").replace("_", " ").title()
-            old_pattern = f"![\\]\\({re.escape(url)}\\)"
+            old_pattern = f"![\\]\\({u.Quality.escape_pattern(url)}\\)"
             new_pattern = f"![{alt_text}]\\({url}\\)"
-            content = re.sub(old_pattern, new_pattern, content)
+            content = _compiled_pattern(old_pattern).sub(new_pattern, content)
         return content
 
     def _improve_link_text(self, content: str) -> str:
@@ -219,7 +243,10 @@ class FlextQualityDocumentationOptimizer:
             "\\[read more\\]\\(([^)]+)\\)": "[continue reading](\\1)",
         }
         for pattern, replacement in improvements.items():
-            content = re.sub(pattern, replacement, content, flags=re.IGNORECASE)
+            content = _compiled_pattern(pattern, ignorecase=True).sub(
+                replacement,
+                content,
+            )
         return content
 
     def optimize_content_structure(
@@ -266,9 +293,9 @@ class FlextQualityDocumentationOptimizer:
         for i, line in enumerate(lines):
             enhanced_lines.append(line)
             if (
-                re.match(r"^##\\s", line)
+                _compiled_pattern(r"^##\\s").match(line)
                 and i > 0
-                and (not re.match(r"^#\\s", lines[i - 1]))
+                and (not _compiled_pattern(r"^#\\s").match(lines[i - 1]))
                 and lines[i - 1].strip()
             ):
                 enhanced_lines.extend(("", "---", ""))
@@ -282,7 +309,10 @@ class FlextQualityDocumentationOptimizer:
                 original_content = content
                 if content.startswith("---"):
                     content = self._update_frontmatter(content)
-                if not re.search(r"<!--.*updated.*-->", content, re.IGNORECASE):
+                if not _compiled_pattern(
+                    r"<!--.*updated.*-->",
+                    ignorecase=True,
+                ).search(content):
                     lines = content.split("\n")
                     if lines and lines[0].strip():
                         lines.insert(

@@ -10,7 +10,7 @@ from collections.abc import (
 from pathlib import Path
 from typing import override
 
-from flext_quality import c, p, r, t
+from flext_quality import c, p, r, t, u
 
 
 class FlextQualityValidators:
@@ -25,7 +25,7 @@ class FlextQualityValidators:
             """Initialize with patterns."""
             self._patterns = patterns
             self._compiled: MutableMapping[str, t.RegexPattern] = {
-                pname: c.Quality.compile_pattern(pattern)
+                pname: u.Quality.compile_pattern(pattern)
                 for pname, pattern in patterns.items()
             }
 

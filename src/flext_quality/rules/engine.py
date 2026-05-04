@@ -8,7 +8,7 @@ from collections.abc import (
 )
 from pathlib import Path
 
-from flext_quality import FlextQualityRulesLoader, c, m, p, r, t
+from flext_quality import FlextQualityRulesLoader, c, m, p, r, t, u
 
 
 class FlextQualityRulesEngine:
@@ -86,7 +86,7 @@ class FlextQualityRulesEngine:
         if rule.pattern is None:
             return violations
         try:
-            pattern = c.Quality.compile_pattern(rule.pattern)
+            pattern = u.Quality.compile_pattern(rule.pattern)
         except c.EXC_VALIDATION_VALUE:
             pattern = None
         lines = content.splitlines()

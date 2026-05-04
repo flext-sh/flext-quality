@@ -2,9 +2,9 @@
 
 Centralized, immutable constants for the flext-quality project providing
 hook events, rule types, validation thresholds, and runtime enumerations.
-Owns every compiled ``re.Pattern`` for the Quality domain — consumer
-modules import the pre-compiled ``*_RE`` constants directly; ``import re``
-outside this module is forbidden.
+Owns every fixed compiled ``re.Pattern`` for the Quality domain; runtime-
+supplied regex construction lives in ``u.Quality`` instead of this constants
+surface.
 
 Copyright (c) 2025 FLEXT Team. All rights reserved.
 SPDX-License-Identifier: MIT
@@ -162,7 +162,9 @@ class FlextQualityConstants(c, web_c):
         PATTERNS_OPTIONAL_RE: ClassVar[re.Pattern[str]] = re.compile(
             PATTERNS_OPTIONAL_PATTERN
         )
-        PATTERNS_UNION_RE: ClassVar[re.Pattern[str]] = re.compile(PATTERNS_UNION_PATTERN)
+        PATTERNS_UNION_RE: ClassVar[re.Pattern[str]] = re.compile(
+            PATTERNS_UNION_PATTERN
+        )
         FORBIDDEN_PATTERN_RE_MAP: ClassVar[dict[str, re.Pattern[str]]] = {
             "type-ignore": PATTERNS_TYPE_IGNORE_RE,
             "cast-usage": PATTERNS_CAST_USAGE_RE,
@@ -171,28 +173,6 @@ class FlextQualityConstants(c, web_c):
             "optional-pattern": PATTERNS_OPTIONAL_RE,
             "union-pattern": PATTERNS_UNION_RE,
         }
-
-        @staticmethod
-        def compile_pattern(
-            pattern: str,
-            *,
-            ignorecase: bool = False,
-            multiline: bool = False,
-            dotall: bool = False,
-        ) -> re.Pattern[str]:
-            """Compile a runtime-supplied regex pattern.
-
-            Sole sanctioned ``re.compile`` entry-point for non-constant
-            Quality patterns (rule definitions loaded from YAML/etc.).
-            """
-            flags = 0
-            if ignorecase:
-                flags |= re.IGNORECASE
-            if multiline:
-                flags |= re.MULTILINE
-            if dotall:
-                flags |= re.DOTALL
-            return re.compile(pattern, flags=flags)
 
 
 c = FlextQualityConstants

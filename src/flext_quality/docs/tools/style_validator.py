@@ -8,7 +8,6 @@ Enforces style guides, formatting standards, and accessibility requirements.
 from __future__ import annotations
 
 import operator
-import re
 import sys
 from collections.abc import (
     MutableSequence,
@@ -18,6 +17,21 @@ from pathlib import Path
 from typing import ClassVar
 
 from flext_quality import c, m, t, u
+
+
+def _compiled_pattern(
+    pattern: str,
+    *,
+    ignorecase: bool = False,
+    multiline: bool = False,
+    dotall: bool = False,
+) -> t.RegexPattern:
+    return u.Quality.compile_pattern(
+        pattern,
+        ignorecase=ignorecase,
+        multiline=multiline,
+        dotall=dotall,
+    )
 
 
 class FlextQualityStyleValidator:
@@ -289,10 +303,9 @@ class FlextQualityStyleValidator:
                 if self.settings.markdown
                 else None
             )
-            if emphasis_style == "*" and re.search(
+            if emphasis_style == "*" and _compiled_pattern(
                 r"(?<!\\)_[^_]+_(?!\\)",
-                line,
-            ):
+            ).search(line):
                 violations.append(
                     FlextQualityStyleValidator.StyleIssue(
                         type="emphasis_style",
@@ -303,7 +316,7 @@ class FlextQualityStyleValidator:
                     ),
                 )
 
-            if line.startswith("#") and not re.match(r"^#{1,6}\s", line):
+            if line.startswith("#") and not _compiled_pattern(r"^#{1,6}\s").match(line):
                 violations.append(
                     FlextQualityStyleValidator.StyleIssue(
                         type="heading_format",
@@ -329,7 +342,10 @@ class FlextQualityStyleValidator:
                 match.group(2).strip(),
                 content[: match.start()].count("\n") + 1,
             )
-            for match in re.finditer(r"^(#{1,6})\s+(.+)$", content, re.MULTILINE)
+            for match in _compiled_pattern(
+                r"^(#{1,6})\s+(.+)$",
+                multiline=True,
+            ).finditer(content)
         ]
 
         enforce_hierarchy = (
@@ -376,7 +392,10 @@ class FlextQualityStyleValidator:
                 match.group(2),
                 content[: match.start()].count("\n") + 1,
             )
-            for match in re.finditer(r"^(\s*)([-\*\+])\s+", content, re.MULTILINE)
+            for match in _compiled_pattern(
+                r"^(\s*)([-\*\+])\s+",
+                multiline=True,
+            ).finditer(content)
         ]
 
         if not list_items:
@@ -417,7 +436,10 @@ class FlextQualityStyleValidator:
             else "fenced"
         )
         if code_block_style == "fenced":
-            code_blocks = re.findall(r"```\n(.*?)\n```", content, re.DOTALL)
+            code_blocks = _compiled_pattern(
+                r"```\n(.*?)\n```",
+                dotall=True,
+            ).findall(content)
             violations.extend(
                 FlextQualityStyleValidator.StyleIssue(
                     type="code_block_language",
@@ -427,20 +449,19 @@ class FlextQualityStyleValidator:
                     severity="low",
                 )
                 for block in code_blocks
-                if not re.match(
-                    r"```\w+",
+                if not _compiled_pattern(r"```\w+").match(
                     content[content.find(block) - 10 : content.find(block)],
                 )
             )
 
-        inline_code = re.findall(r"`[^`]+`", content)
+        inline_code = _compiled_pattern(r"`[^`]+`").findall(content)
         if inline_code:
             lines = content.split("\n")
             for i, line in enumerate(lines, 1):
                 if (
                     "`" in line
-                    and re.search(r"[a-zA-Z0-9]`[^`]+`", line)
-                    and not re.search(r"\s`[^`]+`", line)
+                    and _compiled_pattern(r"[a-zA-Z0-9]`[^`]+`").search(line)
+                    and not _compiled_pattern(r"\s`[^`]+`").search(line)
                 ):
                     violations.append(
                         FlextQualityStyleValidator.StyleIssue(
@@ -467,7 +488,7 @@ class FlextQualityStyleValidator:
             else True
         )
         if require_alt_text is not False:
-            images_without_alt = re.findall(r"!\[\]\([^)]+\)", content)
+            images_without_alt = _compiled_pattern(r"!\[\]\([^)]+\)").findall(content)
             if images_without_alt:
                 for img in images_without_alt:
                     line_num = content[: content.find(img)].count("\n") + 1
@@ -487,11 +508,10 @@ class FlextQualityStyleValidator:
             else True
         )
         if descriptive_links is not False:
-            generic_links = re.findall(
+            generic_links = _compiled_pattern(
                 r"\[here|click here|link|read more\]\([^)]+\)",
-                content,
-                re.IGNORECASE,
-            )
+                ignorecase=True,
+            ).findall(content)
             for link in generic_links:
                 line_num = content[: content.find(link)].count("\n") + 1
                 issues.append(

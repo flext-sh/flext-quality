@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from collections.abc import (
     Callable,
@@ -34,6 +35,29 @@ class FlextQualityUtilities(u, web_u):
 
     class Quality:
         """Quality-specific utilities namespace."""
+
+        @staticmethod
+        def compile_pattern(
+            pattern: str,
+            *,
+            ignorecase: bool = False,
+            multiline: bool = False,
+            dotall: bool = False,
+        ) -> t.RegexPattern:
+            """Compile a runtime-supplied regex pattern for quality tooling."""
+            flags = 0
+            if ignorecase:
+                flags |= re.IGNORECASE
+            if multiline:
+                flags |= re.MULTILINE
+            if dotall:
+                flags |= re.DOTALL
+            return re.compile(pattern, flags=flags)
+
+        @staticmethod
+        def escape_pattern(text: str) -> str:
+            """Escape literal text for safe regex interpolation."""
+            return re.escape(text)
 
         @staticmethod
         def format_hook_output(
