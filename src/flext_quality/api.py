@@ -34,7 +34,7 @@ class FlextQuality(FlextQualityServiceBase):
     @override
     def execute(self) -> p.Result[t.JsonMapping]:
         """Execute the default quality runtime operation."""
-        return r[t.JsonMapping].ok(self.fetch_status())
+        return self.fetch_status()
 
     def execute_hook(
         self,
@@ -59,33 +59,23 @@ class FlextQuality(FlextQualityServiceBase):
         continue_exec: bool = True,
         message: str | None = None,
         blocked_reason: str | None = None,
-    ) -> str:
-        """Format hook output for Claude Code.
-
-        Args:
-            continue_exec: Whether to continue execution
-            message: Optional system message
-            blocked_reason: Optional reason for blocking
-
-        Returns:
-            str: JSON-formatted hook output
-
-        """
-        formatted_output: str = u.Quality.format_hook_output(
-            continue_exec=continue_exec,
-            message=message,
-            blocked_reason=blocked_reason,
+    ) -> p.Result[str]:
+        """Format hook output for Claude Code as JSON string."""
+        return r[str].ok(
+            u.Quality.format_hook_output(
+                continue_exec=continue_exec,
+                message=message,
+                blocked_reason=blocked_reason,
+            ),
         )
-        return formatted_output
 
-    def fetch_hook_config_json(self) -> str:
+    def fetch_hook_config_json(self) -> p.Result[str]:
         """Return hooks configuration as JSON string."""
-        config_json: str = self._hooks.fetch_config_json()
-        return config_json
+        return r[str].ok(self._hooks.fetch_config_json())
 
-    def fetch_status(self) -> t.JsonMapping:
+    def fetch_status(self) -> p.Result[t.JsonMapping]:
         """Return quality service status snapshot."""
-        return {
+        return r[t.JsonMapping].ok({
             "name": c.Quality.MCP_SERVER_NAME,
             "version": c.Quality.MCP_SERVER_VERSION,
             "settings": {
@@ -95,7 +85,7 @@ class FlextQuality(FlextQualityServiceBase):
                 "mcp_server_port": self.settings.mcp_server_port,
             },
             "hooks_registered": len(self._hooks.fetch_config()),
-        }
+        })
 
     def load_rules(self, path: Path) -> p.Result[Sequence[m.Quality.RuleDefinition]]:
         """Load rules from a YAML file.
@@ -162,6 +152,6 @@ class FlextQuality(FlextQualityServiceBase):
         return r[bool].ok(value=True)
 
 
-quality = FlextQuality()
+quality = FlextQuality.fetch_global()
 
 __all__: list[str] = ["FlextQuality", "quality"]

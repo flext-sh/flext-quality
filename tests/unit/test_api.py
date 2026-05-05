@@ -29,15 +29,15 @@ class TestsFlextQualityApi:
 
     def test_quality_alias_exposes_facade_instance(self) -> None:
         """Test that the runtime alias exposes the public facade instance."""
-        tm.that(quality.fetch_status(), has="name")
+        tm.that(quality.fetch_status().value, has="name")
 
     def test_instance_has_required_attributes(self) -> None:
         """Test that the facade instantiates without constructor arguments."""
-        tm.that(FlextQuality().fetch_status(), has="name")
+        tm.that(FlextQuality().fetch_status().value, has="name")
 
     def test_fetch_status_returns_dict(self) -> None:
         """Test that fetch_status returns status dict."""
-        status = FlextQuality().fetch_status()
+        status = FlextQuality().fetch_status().value
         tm.that(status, is_=dict)
         tm.that(status, has="name")
         tm.that(status, has="version")
@@ -52,7 +52,7 @@ class TestsFlextQualityApi:
 
     def test_format_hook_output_continue(self) -> None:
         """Test format_hook_output with continue=True."""
-        output = FlextQuality().format_hook_output(continue_exec=True)
+        output = FlextQuality().format_hook_output(continue_exec=True).value
         tm.that(output, has='"continue":true')
 
     def test_format_hook_output_with_message(self) -> None:
@@ -60,7 +60,7 @@ class TestsFlextQualityApi:
         output = FlextQuality().format_hook_output(
             continue_exec=True,
             message="Test message",
-        )
+        ).value
         tm.that(output, has='"continue":true')
         tm.that(output, has="Test message")
 
@@ -69,12 +69,12 @@ class TestsFlextQualityApi:
         output = FlextQuality().format_hook_output(
             continue_exec=False,
             blocked_reason="Blocked for testing",
-        )
+        ).value
         tm.that(output, has='"continue":false')
 
     def test_fetch_hook_config_json(self) -> None:
         """Test get_hook_config_json returns valid JSON."""
-        config_json = FlextQuality().fetch_hook_config_json()
+        config_json = FlextQuality().fetch_hook_config_json().value
         tm.that(config_json, is_=str)
         tm.that(config_json, eq="{}")
 
