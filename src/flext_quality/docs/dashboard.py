@@ -6,17 +6,20 @@ Provides web interface to view audit results, trends, and quality scores.
 
 from __future__ import annotations
 
-import argparse
 import operator
+import sys
 from collections.abc import (
     Mapping,
     MutableSequence,
 )
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
+from typing import Annotated, override
 
 from flask import Flask, Response, render_template_string, request
+from flext_cli import cli, m as cli_m, u as cli_u
 
+from flext_core import r, s
 from flext_quality import c, m, p, t, u
 
 
@@ -586,25 +589,48 @@ class FlextQualityDocumentationDashboard:
         self.app.run(host=host, port=port, debug=debug)
 
 
-def main() -> None:
-    """Main entry point for the dashboard."""
-    parser = argparse.ArgumentParser(
-        description="FLEXT Quality Documentation Dashboard",
-    )
-    _ = parser.add_argument("--host", default="localhost", help="Host to bind to")
-    _ = parser.add_argument("--port", type=int, default=8080, help="Port to bind to")
-    _ = parser.add_argument("--debug", action="store_true", help="Enable debug mode")
-    _ = parser.add_argument(
-        "--reports-dir",
-        default="docs/maintenance/reports/",
-        help="Directory containing audit reports",
+class _DashboardCommand(s[bool]):
+    """CLI command for the FLEXT Quality Documentation Dashboard."""
+
+    host: Annotated[str, cli_u.Field(default="localhost")] = "localhost"
+    port: Annotated[int, cli_u.Field(default=8080)] = 8080
+    debug: Annotated[bool, cli_u.Field(default=False)] = False
+    reports_dir: Annotated[str, cli_u.Field(default="docs/maintenance/reports/")] = (
+        "docs/maintenance/reports/"
     )
 
-    args = parser.parse_args()
+    @override
+    def execute(self) -> p.Result[bool]:
+        """Run the dashboard server."""
+        dashboard = FlextQualityDocumentationDashboard(self.reports_dir)
+        dashboard.run(host=self.host, port=self.port, debug=self.debug)
+        return r[bool].ok(value=True)
 
-    dashboard = FlextQualityDocumentationDashboard(args.reports_dir)
-    dashboard.run(host=args.host, port=args.port, debug=args.debug)
+
+def main(args: t.StrSequence | None = None) -> int:
+    """Main entry point for the dashboard via the canonical cli facade."""
+    app = cli.create_app_with_common_params(
+        name="flext-quality-dashboard",
+        help_text="FLEXT Quality Documentation Dashboard",
+    )
+    cli.register_result_routes(
+        app,
+        [
+            cli_m.Cli.ResultCommandRoute(
+                name="run",
+                help_text="Start the dashboard server",
+                model_cls=_DashboardCommand,
+                handler=lambda params: params.execute(),
+            ),
+        ],
+    )
+    outcome = cli.execute_app(
+        app,
+        prog_name="flext-quality-dashboard",
+        args=list(args) if args is not None else sys.argv[1:],
+    )
+    return 0 if outcome.success else 1
 
 
 if __name__ == "__main__":
-    main()
+    cli.exit(main())

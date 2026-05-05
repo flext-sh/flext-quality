@@ -2,23 +2,18 @@
 
 from __future__ import annotations
 
-import argparse
 import re
 import sys
 from collections.abc import (
-    Callable,
     Sequence,
 )
 from pathlib import Path
-from typing import TYPE_CHECKING, ClassVar
+from typing import ClassVar
 
 from flext_infra import u
 from flext_web import u as web_u
 
 from flext_quality import c, p, r, t
-
-if TYPE_CHECKING:
-    from flext_quality.models import FlextQualityModels
 
 
 class FlextQualityUtilities(u, web_u):
@@ -149,62 +144,6 @@ class FlextQualityUtilities(u, web_u):
             if out.exit_code != 0:
                 return r[str].fail_op("Command", out.stderr)
             return r[str].ok(out.stdout)
-
-        @staticmethod
-        def build_argument_parser(
-            spec: FlextQualityModels.Quality.ArgumentParserSpec,
-        ) -> argparse.ArgumentParser:
-            """Build an argparse parser from a typed quality tooling spec."""
-            parser = argparse.ArgumentParser(description=spec.description)
-            for option in spec.options:
-                value_parser: Callable[[str], int | str] | None = None
-                if option.value_type == c.Quality.ArgumentValueType.INTEGER:
-                    value_parser = int
-                elif option.value_type == c.Quality.ArgumentValueType.STRING:
-                    value_parser = str
-                if option.action is not None and value_parser is not None:
-                    _ = parser.add_argument(
-                        *option.flags,
-                        action=str(option.action),
-                        default=option.default,
-                        type=value_parser,
-                        nargs=option.nargs,
-                        choices=option.choices,
-                        dest=option.dest,
-                        help=option.help,
-                    )
-                    continue
-                if option.action is not None:
-                    _ = parser.add_argument(
-                        *option.flags,
-                        action=str(option.action),
-                        default=option.default,
-                        nargs=option.nargs,
-                        choices=option.choices,
-                        dest=option.dest,
-                        help=option.help,
-                    )
-                    continue
-                if value_parser is not None:
-                    _ = parser.add_argument(
-                        *option.flags,
-                        default=option.default,
-                        type=value_parser,
-                        nargs=option.nargs,
-                        choices=option.choices,
-                        dest=option.dest,
-                        help=option.help,
-                    )
-                    continue
-                _ = parser.add_argument(
-                    *option.flags,
-                    default=option.default,
-                    nargs=option.nargs,
-                    choices=option.choices,
-                    dest=option.dest,
-                    help=option.help,
-                )
-            return parser
 
 
 u = FlextQualityUtilities

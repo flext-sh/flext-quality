@@ -11,15 +11,19 @@ Usage:
 
 from __future__ import annotations
 
-import argparse
 import logging
 import shutil
+import sys
 from collections.abc import (
     MutableSequence,
 )
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Annotated, override
 
+from flext_cli import cli, m as cli_m, u as cli_u
+
+from flext_core import p, r, s
 from flext_quality import c, e, m, t, u
 
 
@@ -404,130 +408,92 @@ class FlextQualityDocumentationOptimizer:
         return str(filepath)
 
 
-def _discover_documentation_files(args: argparse.Namespace) -> t.SequenceOf[Path]:
-    """Discover documentation files to optimize."""
-    project_root = Path(__file__).parent.parent.parent.parent
-    if args.files:
-        return [project_root / f for f in args.files]
-    doc_files: MutableSequence[Path] = []
-    for pattern in [
-        "**/*.md",
-        "**/*.mdx",
-        "**/README*",
-        "**/docs/**/*.md",
-        "**/docs/**/*.mdx",
-    ]:
-        doc_files.extend(project_root.glob(pattern))
-    doc_files = list(set(doc_files))
-    ignored_patterns = [".git", "__pycache__", "node_modules", ".serena/memories"]
-    return [
-        f
-        for f in doc_files
-        if not any(pattern in str(f) for pattern in ignored_patterns)
-    ]
+class _OptimizeCommand(s[bool]):
+    """CLI command for FLEXT Quality documentation optimization."""
+
+    fix_formatting: Annotated[bool, cli_u.Field(default=False)] = False
+    update_toc: Annotated[bool, cli_u.Field(default=False)] = False
+    add_alt_text: Annotated[bool, cli_u.Field(default=False)] = False
+    improve_accessibility: Annotated[bool, cli_u.Field(default=False)] = False
+    optimize_structure: Annotated[bool, cli_u.Field(default=False)] = False
+    update_metadata: Annotated[bool, cli_u.Field(default=False)] = False
+    comprehensive: Annotated[bool, cli_u.Field(default=False)] = False
+    backup: Annotated[bool, cli_u.Field(default=True)] = True
+    output: Annotated[
+        str,
+        cli_u.Field(default=c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR),
+    ] = c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR
+    files: Annotated[list[str], cli_u.Field(default_factory=list)] = []  # noqa: RUF012
+
+    def discover_files(self) -> t.SequenceOf[Path]:
+        """Discover documentation files to optimize."""
+        project_root = Path(__file__).parent.parent.parent.parent
+        if self.files:
+            return [project_root / f for f in self.files]
+        doc_files: MutableSequence[Path] = []
+        for pattern in [
+            "**/*.md",
+            "**/*.mdx",
+            "**/README*",
+            "**/docs/**/*.md",
+            "**/docs/**/*.mdx",
+        ]:
+            doc_files.extend(project_root.glob(pattern))
+        doc_files = list(set(doc_files))
+        ignored = [".git", "__pycache__", "node_modules", ".serena/memories"]
+        return [f for f in doc_files if not any(pat in str(f) for pat in ignored)]
+
+    @override
+    def execute(self) -> p.Result[bool]:
+        """Run the requested optimizations."""
+        optimizer = FlextQualityDocumentationOptimizer(backup=self.backup)
+        run_any = False
+        doc_files = self.discover_files()
+        if self.fix_formatting or self.comprehensive:
+            optimizer.optimize_formatting(doc_files)
+            run_any = True
+        if self.update_toc or self.comprehensive:
+            optimizer.update_table_of_contents(doc_files)
+            run_any = True
+        if self.add_alt_text or self.improve_accessibility or self.comprehensive:
+            optimizer.enhance_accessibility(doc_files)
+            run_any = True
+        if self.optimize_structure or self.comprehensive:
+            optimizer.optimize_content_structure(doc_files)
+            run_any = True
+        if self.update_metadata or self.comprehensive:
+            optimizer.update_metadata(doc_files)
+            run_any = True
+        if not run_any:
+            return r[bool].fail("No optimization selected")
+        optimizer.save_report(self.output)
+        return r[bool].ok(value=True)
 
 
-def _execute_optimizations(
-    optimizer: FlextQualityDocumentationOptimizer,
-    args: argparse.Namespace,
-) -> bool:
-    """Execute the requested optimizations and return if any were run."""
-    run_any_optimization = False
-    doc_files = _discover_documentation_files(args)
-    if args.fix_formatting or args.comprehensive:
-        optimizer.optimize_formatting(doc_files)
-        run_any_optimization = True
-    if args.update_toc or args.comprehensive:
-        optimizer.update_table_of_contents(doc_files)
-        run_any_optimization = True
-    if args.add_alt_text or args.improve_accessibility or args.comprehensive:
-        optimizer.enhance_accessibility(doc_files)
-        run_any_optimization = True
-    if args.optimize_structure or args.comprehensive:
-        optimizer.optimize_content_structure(doc_files)
-        run_any_optimization = True
-    if args.update_metadata or args.comprehensive:
-        optimizer.update_metadata(doc_files)
-        run_any_optimization = True
-    return run_any_optimization
-
-
-def main() -> None:
-    """Main entry point for optimization system."""
-    parser = u.Quality.build_argument_parser(
-        m.Quality.ArgumentParserSpec(
-            description="FLEXT Quality Documentation Optimization",
-            options=[
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--fix-formatting",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Fix common formatting issues",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--update-toc",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Update table of contents",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--add-alt-text",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Add missing alt text to images",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--improve-accessibility",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Enhance accessibility features",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--optimize-structure",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Optimize content structure and readability",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--update-metadata",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Update frontmatter and metadata",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--comprehensive",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Run all optimization checks",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--backup",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    default=True,
-                    help="Create backups before making changes",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--no-backup",),
-                    action=c.Quality.ArgumentAction.STORE_FALSE,
-                    dest="backup",
-                    help="Don't create backups",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--output",),
-                    default=c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
-                    value_type=c.Quality.ArgumentValueType.STRING,
-                    help="Output directory for reports",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--files",),
-                    nargs="*",
-                    default=[],
-                    help="Specific files to optimize (default: all docs)",
-                ),
-            ],
-        )
+def main(args: t.StrSequence | None = None) -> int:
+    """Main entry point for optimization system via the canonical cli facade."""
+    app = cli.create_app_with_common_params(
+        name="flext-quality-docs-optimize",
+        help_text="FLEXT Quality Documentation Optimization",
     )
-    args = parser.parse_args()
-    optimizer = FlextQualityDocumentationOptimizer(backup=args.backup)
-    run_any_optimization = _execute_optimizations(optimizer, args)
-    if not run_any_optimization:
-        parser.print_help()
-        return
-    optimizer.save_report(args.output)
+    cli.register_result_routes(
+        app,
+        [
+            cli_m.Cli.ResultCommandRoute(
+                name="run",
+                help_text="Run documentation optimizations",
+                model_cls=_OptimizeCommand,
+                handler=lambda params: params.execute(),
+            ),
+        ],
+    )
+    outcome = cli.execute_app(
+        app,
+        prog_name="flext-quality-docs-optimize",
+        args=list(args) if args is not None else sys.argv[1:],
+    )
+    return 0 if outcome.success else 1
 
 
 if __name__ == "__main__":
-    main()
+    cli.exit(main())

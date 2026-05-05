@@ -12,7 +12,7 @@ Usage:
 
 from __future__ import annotations
 
-import argparse
+import sys
 from collections.abc import (
     MutableMapping,
     MutableSequence,
@@ -20,10 +20,12 @@ from collections.abc import (
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from string import Template
+from typing import Annotated, override
 
 import requests
+from flext_cli import cli
 
-from flext_quality import c, m, t, u
+from flext_quality import c, m, p, r, s, t, u
 
 
 def _compiled_pattern(
@@ -792,128 +794,139 @@ class FlextQualityDocumentationAuditor:
         return str(filepath)
 
 
-def _execute_audit_checks(
-    auditor: FlextQualityDocumentationAuditor,
-    args: argparse.Namespace,
-) -> m.Quality.AuditorResults:
-    """Execute the appropriate audit checks based on arguments."""
-    if args.comprehensive:
-        return auditor.run_comprehensive_audit()
-    doc_files = auditor.find_documentation_files()
-    if args.check_freshness:
-        auditor.check_content_freshness(doc_files)
-    if args.check_completeness:
-        auditor.check_content_completeness(doc_files)
-    if args.check_consistency:
-        auditor.check_content_consistency(doc_files)
-    if args.check_links:
-        auditor.check_links_and_references(doc_files)
-    auditor.calculate_quality_metrics()
-    auditor.generate_recommendations()
-    return auditor.results
+class _AuditCommand(s[bool]):
+    """CLI command for FLEXT Quality documentation audit."""
+
+    comprehensive: Annotated[
+        bool,
+        u.Field(default=False, description="Run complete audit"),
+    ] = False
+    check_freshness: Annotated[
+        bool,
+        u.Field(default=False, description="Check content freshness only"),
+    ] = False
+    check_completeness: Annotated[
+        bool,
+        u.Field(default=False, description="Check content completeness only"),
+    ] = False
+    check_consistency: Annotated[
+        bool,
+        u.Field(default=False, description="Check style consistency only"),
+    ] = False
+    check_links: Annotated[
+        bool,
+        u.Field(default=False, description="Check links and references only"),
+    ] = False
+    ci_mode: Annotated[
+        bool,
+        u.Field(default=False, description="CI/CD mode"),
+    ] = False
+    fail_on_errors: Annotated[
+        bool,
+        u.Field(
+            default=False,
+            description="Exit with error code if critical/high issues found",
+        ),
+    ] = False
+    output: Annotated[
+        str,
+        u.Field(
+            default=c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
+            description="Output directory for reports",
+        ),
+    ] = c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR
+    output_format: Annotated[
+        str,
+        u.Field(
+            default="json",
+            alias="format",
+            description="Report format (json|html)",
+        ),
+    ] = "json"
+    settings: Annotated[
+        str,
+        u.Field(
+            default=c.Quality.PATHS_DOCS_MAINTENANCE_SETTINGS_DIR,
+            alias="config",
+            description="Configuration directory path",
+        ),
+    ] = c.Quality.PATHS_DOCS_MAINTENANCE_SETTINGS_DIR
+
+    @override
+    def execute(self) -> p.Result[bool]:
+        """Run audit checks per the parsed CLI arguments."""
+        auditor = FlextQualityDocumentationAuditor(self.settings)
+        try:
+            results = self._execute_checks(auditor)
+            auditor.save_report(self.output_format, self.output)
+            metrics = results.metrics
+            if self._should_fail(metrics):
+                return r[bool].fail("Audit failed quality threshold")
+        except (
+            FileNotFoundError,
+            PermissionError,
+            OSError,
+            KeyError,
+            ValueError,
+        ) as exc:
+            if self.ci_mode or self.fail_on_errors:
+                return r[bool].fail_op("Audit", exc)
+        return r[bool].ok(value=True)
+
+    def _execute_checks(
+        self,
+        auditor: FlextQualityDocumentationAuditor,
+    ) -> m.Quality.AuditorResults:
+        if self.comprehensive:
+            return auditor.run_comprehensive_audit()
+        doc_files = auditor.find_documentation_files()
+        if self.check_freshness:
+            auditor.check_content_freshness(doc_files)
+        if self.check_completeness:
+            auditor.check_content_completeness(doc_files)
+        if self.check_consistency:
+            auditor.check_content_consistency(doc_files)
+        if self.check_links:
+            auditor.check_links_and_references(doc_files)
+        auditor.calculate_quality_metrics()
+        auditor.generate_recommendations()
+        return auditor.results
+
+    def _should_fail(self, metrics: m.Quality.AuditMetrics) -> bool:
+        if self.fail_on_errors:
+            severity_breakdown = metrics.severity_breakdown
+            critical = severity_breakdown["critical"]
+            high = severity_breakdown["high"]
+            if critical + high > 0:
+                return True
+        quality_score = metrics.quality_score
+        return self.ci_mode and quality_score < 70
 
 
-def _should_fail_on_results(
-    args: argparse.Namespace,
-    metrics: m.Quality.AuditMetrics,
-) -> bool:
-    """Determine if the process should fail based on results and arguments."""
-    should_fail = False
-    if args.fail_on_errors:
-        severity_breakdown = metrics.severity_breakdown
-        critical = severity_breakdown["critical"]
-        high = severity_breakdown["high"]
-        critical_high_issues = critical + high
-        if critical_high_issues > 0:
-            should_fail = True
-    quality_score = metrics.quality_score
-    if args.ci_mode and quality_score < 70:
-        should_fail = True
-    return should_fail
-
-
-def main() -> None:
-    """Main entry point for documentation audit."""
-    parser = u.Quality.build_argument_parser(
-        m.Quality.ArgumentParserSpec(
-            description="FLEXT Quality Documentation Audit",
-            options=[
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--comprehensive",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Run complete audit with all checks",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--check-freshness",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Check content freshness only",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--check-completeness",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Check content completeness only",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--check-consistency",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Check style consistency only",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--check-links",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Check links and references only",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--ci-mode",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="CI/CD mode - exit with error code on failures",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--fail-on-errors",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Exit with error code if critical/high severity issues found",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--output",),
-                    default=c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
-                    value_type=c.Quality.ArgumentValueType.STRING,
-                    help="Output directory for reports",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--format",),
-                    default="json",
-                    value_type=c.Quality.ArgumentValueType.STRING,
-                    choices=("json", "html"),
-                    help="Report format",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--config",),
-                    dest="settings",
-                    default=c.Quality.PATHS_DOCS_MAINTENANCE_SETTINGS_DIR,
-                    value_type=c.Quality.ArgumentValueType.STRING,
-                    help="Configuration directory path",
-                ),
-            ],
-        )
+def main(args: t.StrSequence | None = None) -> int:
+    """Main entry point for documentation audit via the canonical cli facade."""
+    app = cli.create_app_with_common_params(
+        name="flext-quality-docs-audit",
+        help_text="FLEXT Quality Documentation Audit",
     )
-    args = parser.parse_args()
-    auditor = FlextQualityDocumentationAuditor(args.settings)
-    try:
-        results = _execute_audit_checks(auditor, args)
-        auditor.save_report(args.format, args.output)
-        metrics = results.metrics
-        if _should_fail_on_results(args, metrics):
-            raise SystemExit(1)
-    except (
-        FileNotFoundError,
-        PermissionError,
-        OSError,
-        KeyError,
-        ValueError,
-    ):
-        if args.ci_mode or args.fail_on_errors:
-            raise SystemExit(1) from None
+    cli.register_result_routes(
+        app,
+        [
+            m.Cli.ResultCommandRoute(
+                name="run",
+                help_text="Run documentation audit checks",
+                model_cls=_AuditCommand,
+                handler=lambda params: params.execute(),
+            ),
+        ],
+    )
+    outcome = cli.execute_app(
+        app,
+        prog_name="flext-quality-docs-audit",
+        args=list(args) if args is not None else sys.argv[1:],
+    )
+    return 0 if outcome.success else 1
 
 
 if __name__ == "__main__":
-    main()
+    cli.exit(main())

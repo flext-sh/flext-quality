@@ -57,19 +57,27 @@ class TestsFlextQualityApi:
 
     def test_format_hook_output_with_message(self) -> None:
         """Test format_hook_output with message."""
-        output = FlextQuality().format_hook_output(
-            continue_exec=True,
-            message="Test message",
-        ).value
+        output = (
+            FlextQuality()
+            .format_hook_output(
+                continue_exec=True,
+                message="Test message",
+            )
+            .value
+        )
         tm.that(output, has='"continue":true')
         tm.that(output, has="Test message")
 
     def test_format_hook_output_blocked(self) -> None:
         """Test format_hook_output with blocked reason."""
-        output = FlextQuality().format_hook_output(
-            continue_exec=False,
-            blocked_reason="Blocked for testing",
-        ).value
+        output = (
+            FlextQuality()
+            .format_hook_output(
+                continue_exec=False,
+                blocked_reason="Blocked for testing",
+            )
+            .value
+        )
         tm.that(output, has='"continue":false')
 
     def test_fetch_hook_config_json(self) -> None:

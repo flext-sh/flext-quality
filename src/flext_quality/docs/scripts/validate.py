@@ -12,18 +12,21 @@ Usage:
 
 from __future__ import annotations
 
-import argparse
 import concurrent.futures
+import sys
 from collections.abc import (
     MutableMapping,
     MutableSequence,
 )
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Annotated, override
 
 import requests
 from flext_api import FlextApiConstants
+from flext_cli import cli, m as cli_m, u as cli_u
 
+from flext_core import p, r, s
 from flext_quality import c, m, t, u
 
 
@@ -674,139 +677,109 @@ def _discover_validation_files() -> t.SequenceOf[Path]:
     ]
 
 
-def _execute_validations(
-    link_validator: FlextQualityLinkValidator,
-    content_validator: FlextQualityContentValidator,
-    all_links: t.SequenceOf[m.Quality.LinkRecord],
-    doc_files: t.SequenceOf[Path],
-    args: argparse.Namespace,
-) -> bool:
-    """Execute the requested validations and return if any were run."""
-    run_any_check = False
-    if args.external_links or args.all:
-        _ = link_validator.validate_external_links(all_links, verbose=args.verbose)
-        run_any_check = True
-    if args.internal_links or args.all:
-        _ = link_validator.validate_internal_links(all_links, doc_files)
-        run_any_check = True
-    if args.images or args.all:
-        project_root = Path(__file__).parent.parent.parent.parent
-        _ = link_validator.validate_images(all_links, project_root)
-        run_any_check = True
-    if args.anchors or args.all:
-        _ = link_validator.validate_anchors(all_links, doc_files)
-        run_any_check = True
-    if args.link_text or args.all:
-        _ = link_validator.check_link_text_quality(all_links)
-        run_any_check = True
-    if args.markdown_syntax or args.all:
-        _ = content_validator.validate_markdown_syntax(doc_files)
-        run_any_check = True
-    if args.content_quality or args.all:
-        _ = content_validator.check_content_quality(doc_files)
-        run_any_check = True
-    return run_any_check
+class _ValidateCommand(s[bool]):
+    """CLI command for FLEXT Quality documentation validation."""
 
+    external_links: Annotated[bool, cli_u.Field(default=False)] = False
+    internal_links: Annotated[bool, cli_u.Field(default=False)] = False
+    images: Annotated[bool, cli_u.Field(default=False)] = False
+    anchors: Annotated[bool, cli_u.Field(default=False)] = False
+    link_text: Annotated[bool, cli_u.Field(default=False)] = False
+    markdown_syntax: Annotated[bool, cli_u.Field(default=False)] = False
+    content_quality: Annotated[bool, cli_u.Field(default=False)] = False
+    all: Annotated[bool, cli_u.Field(default=False)] = False
+    verbose: Annotated[bool, cli_u.Field(default=False)] = False
+    output: Annotated[
+        str,
+        cli_u.Field(default=c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR),
+    ] = c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR
+    timeout: Annotated[int, cli_u.Field(default=10)] = 10
+    retries: Annotated[int, cli_u.Field(default=3)] = 3
+    workers: Annotated[int, cli_u.Field(default=5)] = 5
 
-def main() -> None:
-    """Main entry point for documentation validation."""
-    parser = u.Quality.build_argument_parser(
-        m.Quality.ArgumentParserSpec(
-            description="FLEXT Quality Documentation Validation",
-            options=[
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--external-links",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Validate external links",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--internal-links",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Validate internal links",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--images",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Validate image references",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--anchors",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Validate anchor links",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--link-text",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Check link text quality",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--markdown-syntax",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Validate markdown syntax",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--content-quality",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Analyze content quality",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--all",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Run all validation checks",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--verbose",),
-                    action=c.Quality.ArgumentAction.STORE_TRUE,
-                    help="Verbose output",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--output",),
-                    default=c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
-                    value_type=c.Quality.ArgumentValueType.STRING,
-                    help="Output directory for reports",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--timeout",),
-                    default=10,
-                    value_type=c.Quality.ArgumentValueType.INTEGER,
-                    help="Timeout for external link checks",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--retries",),
-                    default=3,
-                    value_type=c.Quality.ArgumentValueType.INTEGER,
-                    help="Retry attempts for external links",
-                ),
-                m.Quality.ArgumentOptionSpec(
-                    flags=("--workers",),
-                    default=5,
-                    value_type=c.Quality.ArgumentValueType.INTEGER,
-                    help="Max concurrent workers",
-                ),
-            ],
+    def _execute_checks(
+        self,
+        link_validator: FlextQualityLinkValidator,
+        content_validator: FlextQualityContentValidator,
+        all_links: t.SequenceOf[m.Quality.LinkRecord],
+        doc_files: t.SequenceOf[Path],
+    ) -> bool:
+        run_any = False
+        if self.external_links or self.all:
+            _ = link_validator.validate_external_links(all_links, verbose=self.verbose)
+            run_any = True
+        if self.internal_links or self.all:
+            _ = link_validator.validate_internal_links(all_links, doc_files)
+            run_any = True
+        if self.images or self.all:
+            project_root = Path(__file__).parent.parent.parent.parent
+            _ = link_validator.validate_images(all_links, project_root)
+            run_any = True
+        if self.anchors or self.all:
+            _ = link_validator.validate_anchors(all_links, doc_files)
+            run_any = True
+        if self.link_text or self.all:
+            _ = link_validator.check_link_text_quality(all_links)
+            run_any = True
+        if self.markdown_syntax or self.all:
+            _ = content_validator.validate_markdown_syntax(doc_files)
+            run_any = True
+        if self.content_quality or self.all:
+            _ = content_validator.check_content_quality(doc_files)
+            run_any = True
+        return run_any
+
+    @override
+    def execute(self) -> p.Result[bool]:
+        """Run the requested validations."""
+        doc_files = _discover_validation_files()
+        link_validator = FlextQualityLinkValidator(
+            timeout=self.timeout,
+            retries=self.retries,
+            max_workers=self.workers,
         )
+        content_validator = FlextQualityContentValidator()
+        all_links = link_validator.find_all_links(doc_files)
+        if not self._execute_checks(
+            link_validator,
+            content_validator,
+            all_links,
+            doc_files,
+        ):
+            return r[bool].fail("No validation selected")
+        link_errors = link_validator.results.errors
+        content_issues = content_validator.results.content_issues
+        total_errors = len(link_errors) + len(content_issues)
+        _ = link_validator.save_report(self.output)
+        if total_errors > 0:
+            return r[bool].fail(f"Validation found {total_errors} errors")
+        return r[bool].ok(value=True)
+
+
+def main(args: t.StrSequence | None = None) -> int:
+    """Main entry point for documentation validation via the canonical cli facade."""
+    app = cli.create_app_with_common_params(
+        name="flext-quality-docs-validate",
+        help_text="FLEXT Quality Documentation Validation",
     )
-    args = parser.parse_args()
-    doc_files = _discover_validation_files()
-    link_validator = FlextQualityLinkValidator(
-        timeout=args.timeout,
-        retries=args.retries,
-        max_workers=args.workers,
+    cli.register_result_routes(
+        app,
+        [
+            cli_m.Cli.ResultCommandRoute(
+                name="run",
+                help_text="Run documentation validation checks",
+                model_cls=_ValidateCommand,
+                handler=lambda params: params.execute(),
+            ),
+        ],
     )
-    content_validator = FlextQualityContentValidator()
-    all_links = link_validator.find_all_links(doc_files)
-    run_any_check = _execute_validations(
-        link_validator,
-        content_validator,
-        all_links,
-        doc_files,
-        args,
+    outcome = cli.execute_app(
+        app,
+        prog_name="flext-quality-docs-validate",
+        args=list(args) if args is not None else sys.argv[1:],
     )
-    if not run_any_check:
-        raise SystemExit(1)
-    link_errors = link_validator.results.errors
-    content_issues = content_validator.results.content_issues
-    total_errors = len(link_errors) + len(content_issues)
-    _ = link_validator.save_report(args.output)
-    if total_errors > 0:
-        raise SystemExit(1)
+    return 0 if outcome.success else 1
+
+
+if __name__ == "__main__":
+    cli.exit(main())

@@ -11,7 +11,7 @@ Usage:
 
 from __future__ import annotations
 
-import argparse
+import sys
 from collections.abc import (
     Callable,
     Mapping,
@@ -19,11 +19,12 @@ from collections.abc import (
 )
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import ClassVar
+from typing import Annotated, ClassVar, override
 
+from flext_cli import cli
 from jinja2 import Template
 
-from flext_quality import c, m, t
+from flext_quality import c, m, p, r, s, t, u
 
 
 class FlextQualityDocumentationReporter:
@@ -704,84 +705,107 @@ class FlextQualityDocumentationReporter:
         return filepath
 
 
-def main() -> None:
-    """Main entry point for reporting system."""
-    parser = argparse.ArgumentParser(
-        description="FLEXT Quality Documentation Reporting",
+class _ReportCommand(s[bool]):
+    """CLI command for FLEXT Quality documentation reporting."""
+
+    output_format: Annotated[
+        str,
+        u.Field(
+            default="html",
+            alias="format",
+            description="Report format (html|json|markdown)",
+        ),
+    ] = "html"
+    output: Annotated[
+        str,
+        u.Field(
+            default="docs/maintenance/reports/",
+            description="Output directory for reports",
+        ),
+    ] = "docs/maintenance/reports/"
+    filename: Annotated[
+        str | None,
+        u.Field(default=None, description="Custom filename for the report"),
+    ] = None
+    monthly_trends: Annotated[
+        bool,
+        u.Field(default=False, description="Generate monthly trend analysis"),
+    ] = False
+    weekly_trends: Annotated[
+        bool,
+        u.Field(default=False, description="Generate weekly trend analysis"),
+    ] = False
+    include_trends: Annotated[
+        bool,
+        u.Field(default=False, description="Include trend analysis in quality report"),
+    ] = False
+    notify: Annotated[
+        bool,
+        u.Field(default=False, description="Send notifications"),
+    ] = False
+    webhook_url: Annotated[
+        str | None,
+        u.Field(default=None, description="Webhook URL for notifications"),
+    ] = None
+    serve: Annotated[
+        bool,
+        u.Field(default=False, description="Serve dashboard (not implemented yet)"),
+    ] = False
+
+    @override
+    def execute(self) -> p.Result[bool]:
+        """Generate the requested report."""
+        reporter = FlextQualityDocumentationReporter(self.output)
+        if self.monthly_trends:
+            trend_report = reporter.generate_trend_report(days=30)
+            filename = (
+                self.filename
+                or f"monthly_trends_{datetime.now(UTC).strftime('%Y%m%d')}"
+            )
+            reporter.save_report(trend_report, filename, "md")
+        elif self.weekly_trends:
+            trend_report = reporter.generate_trend_report(days=7)
+            filename = (
+                self.filename or f"weekly_trends_{datetime.now(UTC).strftime('%Y%m%d')}"
+            )
+            reporter.save_report(trend_report, filename, "md")
+        else:
+            report_content = reporter.generate_quality_report(
+                self.output_format,
+                include_trends=self.include_trends,
+            )
+            filename = (
+                self.filename
+                or f"quality_report_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}"
+            )
+            reporter.save_report(report_content, filename, self.output_format)
+        return r[bool].ok(value=True)
+
+
+def main(args: t.StrSequence | None = None) -> int:
+    """Main entry point for reporting system via the canonical cli facade."""
+    app = cli.create_app_with_common_params(
+        name="flext-quality-docs-report",
+        help_text="FLEXT Quality Documentation Reporting",
     )
-    _ = parser.add_argument(
-        "--format",
-        type=str,
-        choices=["html", "json", "markdown"],
-        default="html",
-        help="Report format",
+    cli.register_result_routes(
+        app,
+        [
+            m.Cli.ResultCommandRoute(
+                name="run",
+                help_text="Generate a documentation quality report",
+                model_cls=_ReportCommand,
+                handler=lambda params: params.execute(),
+            ),
+        ],
     )
-    _ = parser.add_argument(
-        "--output",
-        type=str,
-        default="docs/maintenance/reports/",
-        help="Output directory for reports",
+    outcome = cli.execute_app(
+        app,
+        prog_name="flext-quality-docs-report",
+        args=list(args) if args is not None else sys.argv[1:],
     )
-    _ = parser.add_argument(
-        "--filename",
-        type=str,
-        help="Custom filename for the report",
-    )
-    _ = parser.add_argument(
-        "--monthly-trends",
-        action="store_true",
-        help="Generate monthly trend analysis",
-    )
-    _ = parser.add_argument(
-        "--weekly-trends",
-        action="store_true",
-        help="Generate weekly trend analysis",
-    )
-    _ = parser.add_argument(
-        "--include-trends",
-        action="store_true",
-        help="Include trend analysis in quality report",
-    )
-    _ = parser.add_argument(
-        "--notify",
-        action="store_true",
-        help="Send notifications (requires webhook URL)",
-    )
-    _ = parser.add_argument(
-        "--webhook-url",
-        type=str,
-        help="Webhook URL for notifications",
-    )
-    _ = parser.add_argument(
-        "--serve",
-        action="store_true",
-        help="Serve dashboard (not implemented yet)",
-    )
-    args = parser.parse_args()
-    reporter = FlextQualityDocumentationReporter(args.output)
-    if args.monthly_trends:
-        trend_report = reporter.generate_trend_report(days=30)
-        filename = (
-            args.filename or f"monthly_trends_{datetime.now(UTC).strftime('%Y%m%d')}"
-        )
-        reporter.save_report(trend_report, filename, "md")
-    elif args.weekly_trends:
-        trend_report = reporter.generate_trend_report(days=7)
-        filename = (
-            args.filename or f"weekly_trends_{datetime.now(UTC).strftime('%Y%m%d')}"
-        )
-        reporter.save_report(trend_report, filename, "md")
-    else:
-        report_content = reporter.generate_quality_report(
-            args.format,
-            include_trends=args.include_trends,
-        )
-        filename = (
-            args.filename
-            or f"quality_report_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}"
-        )
-        reporter.save_report(report_content, filename, args.format)
+    return 0 if outcome.success else 1
 
 
 if __name__ == "__main__":
-    main()
+    cli.exit(main())

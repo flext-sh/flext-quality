@@ -8,8 +8,8 @@ including email, Slack, webhooks, and project management tools.
 
 from __future__ import annotations
 
-import argparse
 import smtplib
+import sys
 from collections.abc import (
     Mapping,
     MutableSequence,
@@ -18,10 +18,12 @@ from datetime import UTC, datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from pathlib import Path
-from typing import Final
+from typing import Annotated, Final, override
 
 import requests
+from flext_cli import cli, m as cli_m, u as cli_u
 
+from flext_core import p, r, s
 from flext_quality import c, m, t, u
 
 
@@ -643,76 +645,105 @@ Found {len(broken_links)} broken links that need attention:
         return "Monthly comprehensive documentation quality report is now available. Review trends and plan improvements for the next month."
 
 
-def main() -> None:
-    """Main entry point for notification system."""
-    parser = argparse.ArgumentParser(
-        description="FLEXT Quality Documentation Notifications",
+class _NotificationCommand(s[bool]):
+    """CLI command for FLEXT Quality documentation notifications."""
+
+    settings: Annotated[
+        str,
+        cli_u.Field(
+            default="docs/maintenance/settings/notification_config.yaml",
+            description="Notification configuration file",
+        ),
+    ] = "docs/maintenance/settings/notification_config.yaml"
+    test: Annotated[
+        bool,
+        cli_u.Field(default=False, description="Send test notification"),
+    ] = False
+    audit_data: Annotated[
+        str | None,
+        cli_u.Field(default=None, description="Path to audit data JSON file"),
+    ] = None
+    weekly_report: Annotated[
+        str | None,
+        cli_u.Field(default=None, description="Path to weekly report JSON file"),
+    ] = None
+    monthly_report: Annotated[
+        str | None,
+        cli_u.Field(default=None, description="Path to monthly report JSON file"),
+    ] = None
+
+    @override
+    def execute(self) -> p.Result[bool]:
+        """Dispatch to the appropriate notification action."""
+        notifier = FlextQualityDocumentationNotifier(self.settings)
+        if self.test:
+            notifier.send_notification(
+                "Test Notification",
+                (
+                    "This is a test notification from the FLEXT Quality "
+                    "Documentation System.\n\nIf you received this, the "
+                    "notification system is working correctly."
+                ),
+                c.Quality.NotificationPriority.INFO.value,
+            )
+            return r[bool].ok(value=True)
+        if self.audit_data:
+            audit_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
+                Path(self.audit_data).read_bytes(),
+            )
+            _ = notifier.notify_critical_issues(audit_data)
+            issues_raw = audit_data.get("issues")
+            broken_links: MutableSequence[t.JsonValue] = []
+            if isinstance(issues_raw, (list, tuple)):
+                for i_raw in issues_raw:
+                    if isinstance(i_raw, Mapping):
+                        type_val = i_raw.get("type", "")
+                        if "broken" in str(type_val).lower():
+                            broken_links.append(i_raw)
+            if broken_links:
+                _ = notifier.notify_broken_links(broken_links)
+            return r[bool].ok(value=True)
+        if self.weekly_report:
+            report_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
+                Path(self.weekly_report).read_bytes(),
+            )
+            _ = notifier.notify_weekly_report(report_data)
+            return r[bool].ok(value=True)
+        if self.monthly_report:
+            report_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
+                Path(self.monthly_report).read_bytes(),
+            )
+            _ = notifier.notify_monthly_report(report_data)
+            return r[bool].ok(value=True)
+        return r[bool].fail(
+            "No action selected (use --test, --audit-data, --weekly-report or --monthly-report)",
+        )
+
+
+def main(args: t.StrSequence | None = None) -> int:
+    """Main entry point for notification system via the canonical cli facade."""
+    app = cli.create_app_with_common_params(
+        name="flext-quality-notifications",
+        help_text="FLEXT Quality Documentation Notifications",
     )
-    _ = parser.add_argument(
-        "--config",
-        default="docs/maintenance/settings/notification_config.yaml",
-        help="Notification configuration file",
+    cli.register_result_routes(
+        app,
+        [
+            cli_m.Cli.ResultCommandRoute(
+                name="run",
+                help_text="Send a documentation notification",
+                model_cls=_NotificationCommand,
+                handler=lambda params: params.execute(),
+            ),
+        ],
     )
-    _ = parser.add_argument(
-        "--test",
-        action="store_true",
-        help="Send test notification to verify configuration",
+    outcome = cli.execute_app(
+        app,
+        prog_name="flext-quality-notifications",
+        args=list(args) if args is not None else sys.argv[1:],
     )
-    _ = parser.add_argument("--audit-data", help="Path to audit data JSON file")
-    _ = parser.add_argument("--weekly-report", help="Path to weekly report JSON file")
-    _ = parser.add_argument("--monthly-report", help="Path to monthly report JSON file")
-
-    args = parser.parse_args()
-
-    notifier = FlextQualityDocumentationNotifier(args.settings)
-
-    if args.test:
-        success = notifier.send_notification(
-            "Test Notification",
-            "This is a test notification from the FLEXT Quality Documentation System.\n\nIf you received this, the notification system is working correctly.",
-            c.Quality.NotificationPriority.INFO.value,
-        )
-        if not success:
-            for err in notifier.results.errors:
-                _ = err  # consumed
-    elif args.audit_data:
-        # Process audit data and send appropriate notifications
-        audit_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-            Path(args.audit_data).read_bytes(),
-        )
-
-        # Check for critical issues
-        _ = notifier.notify_critical_issues(audit_data)
-
-        # Check for broken links (would need to extract from audit data)
-        issues_raw = audit_data.get("issues")
-        broken_links: MutableSequence[t.JsonValue] = []
-        if isinstance(issues_raw, (list, tuple)):
-            for i_raw in issues_raw:
-                if isinstance(i_raw, Mapping):
-                    type_val = i_raw.get("type", "")
-                    if "broken" in str(type_val).lower():
-                        broken_links.append(i_raw)
-        if broken_links:
-            _ = notifier.notify_broken_links(broken_links)
-
-    elif args.weekly_report:
-        # Send weekly report notification
-        report_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-            Path(args.weekly_report).read_bytes(),
-        )
-        _ = notifier.notify_weekly_report(report_data)
-
-    elif args.monthly_report:
-        # Send monthly report notification
-        report_data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-            Path(args.monthly_report).read_bytes(),
-        )
-        _ = notifier.notify_monthly_report(report_data)
-
-    else:
-        parser.print_help()
+    return 0 if outcome.success else 1
 
 
 if __name__ == "__main__":
-    main()
+    cli.exit(main())

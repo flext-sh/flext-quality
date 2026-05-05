@@ -15,7 +15,6 @@ from pathlib import Path
 
 from flext_quality import c, m, t, u
 
-type ConfigPrimitive = t.Primitives
 type ConfigValue = t.Primitives | t.StrSequence
 type ConfigSection = MutableMapping[str, t.Primitives | t.StrSequence]
 type ConfigData = MutableMapping[
@@ -48,8 +47,8 @@ class FlextQualityAuditRules:
         self,
         key: str,
         *,
-        default: ConfigPrimitive | None = None,
-    ) -> ConfigPrimitive | None:
+        default: t.Primitives | None = None,
+    ) -> t.Primitives | None:
         """Get a quality threshold value."""
         threshold = self.quality_thresholds.get(key, default)
         return threshold if isinstance(threshold, (str, int, float, bool)) else default
@@ -73,8 +72,8 @@ class FlextQualityStyleGuide:
         self,
         rule: str,
         *,
-        default: ConfigPrimitive | None = None,
-    ) -> ConfigPrimitive | None:
+        default: t.Primitives | None = None,
+    ) -> t.Primitives | None:
         """Get a markdown formatting rule."""
         value = self.markdown.get(rule, default)
         return value if isinstance(value, (str, int, float, bool)) else default
@@ -83,8 +82,8 @@ class FlextQualityStyleGuide:
         self,
         rule: str,
         *,
-        default: ConfigPrimitive | None = None,
-    ) -> ConfigPrimitive | None:
+        default: t.Primitives | None = None,
+    ) -> t.Primitives | None:
         """Get an accessibility rule."""
         value = self.accessibility.get(rule, default)
         return value if isinstance(value, (str, int, float, bool)) else default
@@ -112,8 +111,8 @@ class FlextQualityValidationSettings:
         self,
         setting: str,
         *,
-        default: ConfigPrimitive | None = None,
-    ) -> ConfigPrimitive | None:
+        default: t.Primitives | None = None,
+    ) -> t.Primitives | None:
         """Get a link validation setting."""
         value = self.link_validation.get(setting, default)
         return value if isinstance(value, (str, int, float, bool)) else default
@@ -122,8 +121,8 @@ class FlextQualityValidationSettings:
         self,
         setting: str,
         *,
-        default: ConfigPrimitive | None = None,
-    ) -> ConfigPrimitive | None:
+        default: t.Primitives | None = None,
+    ) -> t.Primitives | None:
         """Get a content validation setting."""
         value = self.content_validation.get(setting, default)
         return value if isinstance(value, (str, int, float, bool)) else default

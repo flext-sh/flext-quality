@@ -7,9 +7,9 @@ optimizations, and reporting. Designed to run as a cron job or scheduled task.
 
 from __future__ import annotations
 
-import argparse
 import runpy
 import shlex
+import sys
 import threading
 import time
 from collections.abc import (
@@ -17,11 +17,14 @@ from collections.abc import (
 )
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Annotated, ClassVar, override
 
 import pytest
 import schedule
+from flext_cli import cli, m as cli_m, u as cli_u
 from git import InvalidGitRepositoryError, Repo
 
+from flext_core import p, r, s
 from flext_quality import c, m, t, u
 
 logger = u.fetch_logger(__name__)
@@ -726,53 +729,83 @@ class FlextQualityScheduledMaintenance:
         )
 
 
-def main() -> None:
-    """Main entry point for scheduled maintenance."""
-    parser = argparse.ArgumentParser(
-        description="FLEXT Quality Scheduled Documentation Maintenance",
+class _ScheduledMaintenanceCommand(s[bool]):
+    """CLI command for FLEXT Quality scheduled documentation maintenance."""
+
+    DEFAULT_CONFIG: ClassVar[str] = str(_docs_config_file("schedule_config.yaml"))
+
+    settings: Annotated[
+        str,
+        cli_u.Field(
+            default_factory=lambda: _ScheduledMaintenanceCommand.DEFAULT_CONFIG,
+            description="Maintenance schedule configuration file",
+        ),
+    ]
+    daemon: Annotated[
+        bool,
+        cli_u.Field(default=False, description="Run as daemon with scheduled tasks"),
+    ] = False
+    manual: Annotated[
+        str | None,
+        cli_u.Field(
+            default=None,
+            description="Run specific manual task: daily|optimize|weekly|monthly|all",
+        ),
+    ] = None
+    list_schedules: Annotated[
+        bool,
+        cli_u.Field(default=False, description="List all configured schedules"),
+    ] = False
+
+    @override
+    def execute(self) -> p.Result[bool]:
+        """Dispatch to the appropriate maintenance action."""
+        maintenance = FlextQualityScheduledMaintenance(self.settings)
+        if self.list_schedules:
+            for _schedule_config in maintenance.settings.schedules.values():
+                pass
+            return r[bool].ok(value=True)
+        if self.daemon:
+            maintenance.run_daemon()
+            return r[bool].ok(value=True)
+        if self.manual:
+            return (
+                r[bool].ok(value=True)
+                if maintenance.run_manual(self.manual)
+                else r[bool].fail(f"Manual task '{self.manual}' failed")
+            )
+        return r[bool].fail(
+            "No action selected (use --daemon, --manual or --list-schedules)"
+        )
+
+
+def main(args: t.StrSequence | None = None) -> int:
+    """Main entry point for scheduled maintenance via the canonical cli facade."""
+    app = cli.create_app_with_common_params(
+        name="flext-quality-scheduled-maintenance",
+        help_text="FLEXT Quality Scheduled Documentation Maintenance",
     )
-    _ = parser.add_argument(
-        "--config",
-        default=str(_docs_config_file("schedule_config.yaml")),
-        help="Maintenance schedule configuration file",
+    cli.register_result_routes(
+        app,
+        [
+            cli_m.Cli.ResultCommandRoute(
+                name="run",
+                help_text=(
+                    "Run scheduled maintenance (use --daemon, --manual or "
+                    "--list-schedules)"
+                ),
+                model_cls=_ScheduledMaintenanceCommand,
+                handler=lambda params: params.execute(),
+            ),
+        ],
     )
-    _ = parser.add_argument(
-        "--daemon",
-        action="store_true",
-        help="Run as daemon with scheduled tasks",
+    outcome = cli.execute_app(
+        app,
+        prog_name="flext-quality-scheduled-maintenance",
+        args=list(args) if args is not None else sys.argv[1:],
     )
-    _ = parser.add_argument(
-        "--manual",
-        choices=["daily", "optimize", "weekly", "monthly", "all"],
-        help="Run specific maintenance tasks manually",
-    )
-    _ = parser.add_argument(
-        "--list-schedules",
-        action="store_true",
-        help="List all configured schedules",
-    )
-
-    args = parser.parse_args()
-
-    maintenance = FlextQualityScheduledMaintenance(args.settings)
-
-    if args.list_schedules:
-        for _schedule_config in maintenance.settings.schedules.values():
-            pass
-
-    elif args.daemon:
-        maintenance.run_daemon()
-
-    elif args.manual:
-        success = maintenance.run_manual(args.manual)
-        if success:
-            pass
-        else:
-            raise SystemExit(1)
-
-    else:
-        parser.print_help()
+    return 0 if outcome.success else 1
 
 
 if __name__ == "__main__":
-    main()
+    cli.exit(main())
