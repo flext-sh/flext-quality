@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import re
 from collections.abc import (
     Mapping,
     MutableSequence,
@@ -16,8 +15,8 @@ from flext_web import t as web_t
 class FlextQualityTypes(t, web_t):
     """Namespace for flext-quality type definitions."""
 
-    type RegexPattern = re.Pattern[str]
-    type RegexMatch = re.Match[str]
+    type RegexPattern = t.RegexPattern
+    type RegexMatch = t.RegexMatch
 
     class Quality:
         """Quality-specific types namespace (project slot)."""

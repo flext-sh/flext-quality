@@ -14,10 +14,14 @@ from __future__ import annotations
 
 import re
 from enum import StrEnum, unique
-from typing import ClassVar, Final
+from types import MappingProxyType
+from typing import TYPE_CHECKING, ClassVar, Final
 
 from flext_infra import c
 from flext_web import c as web_c
+
+if TYPE_CHECKING:
+    from flext_quality import t
 
 
 class FlextQualityConstants(c, web_c):
@@ -146,33 +150,33 @@ class FlextQualityConstants(c, web_c):
         "Union type pattern."
 
         # === Pre-compiled regex authorities ===
-        PATTERNS_TYPE_IGNORE_RE: ClassVar[re.Pattern[str]] = re.compile(
+        PATTERNS_TYPE_IGNORE_RE: ClassVar[t.RegexPattern] = re.compile(
             PATTERNS_TYPE_IGNORE
         )
-        PATTERNS_CAST_USAGE_RE: ClassVar[re.Pattern[str]] = re.compile(
+        PATTERNS_CAST_USAGE_RE: ClassVar[t.RegexPattern] = re.compile(
             PATTERNS_CAST_USAGE
         )
-        PATTERNS_ANY_TYPE_RE: ClassVar[re.Pattern[str]] = re.compile(PATTERNS_ANY_TYPE)
-        PATTERNS_TYPE_CHECKING_RE: ClassVar[re.Pattern[str]] = re.compile(
+        PATTERNS_ANY_TYPE_RE: ClassVar[t.RegexPattern] = re.compile(PATTERNS_ANY_TYPE)
+        PATTERNS_TYPE_CHECKING_RE: ClassVar[t.RegexPattern] = re.compile(
             PATTERNS_TYPE_CHECKING
         )
-        PATTERNS_TIER_VIOLATION_RE: ClassVar[re.Pattern[str]] = re.compile(
+        PATTERNS_TIER_VIOLATION_RE: ClassVar[t.RegexPattern] = re.compile(
             PATTERNS_TIER_VIOLATION
         )
-        PATTERNS_OPTIONAL_RE: ClassVar[re.Pattern[str]] = re.compile(
+        PATTERNS_OPTIONAL_RE: ClassVar[t.RegexPattern] = re.compile(
             PATTERNS_OPTIONAL_PATTERN
         )
-        PATTERNS_UNION_RE: ClassVar[re.Pattern[str]] = re.compile(
-            PATTERNS_UNION_PATTERN
+        PATTERNS_UNION_RE: ClassVar[t.RegexPattern] = re.compile(PATTERNS_UNION_PATTERN)
+        FORBIDDEN_PATTERN_RE_MAP: ClassVar[t.MappingKV[str, t.RegexPattern]] = (
+            MappingProxyType({
+                "type-ignore": PATTERNS_TYPE_IGNORE_RE,
+                "cast-usage": PATTERNS_CAST_USAGE_RE,
+                "any-type": PATTERNS_ANY_TYPE_RE,
+                "type-checking": PATTERNS_TYPE_CHECKING_RE,
+                "optional-pattern": PATTERNS_OPTIONAL_RE,
+                "union-pattern": PATTERNS_UNION_RE,
+            })
         )
-        FORBIDDEN_PATTERN_RE_MAP: ClassVar[dict[str, re.Pattern[str]]] = {
-            "type-ignore": PATTERNS_TYPE_IGNORE_RE,
-            "cast-usage": PATTERNS_CAST_USAGE_RE,
-            "any-type": PATTERNS_ANY_TYPE_RE,
-            "type-checking": PATTERNS_TYPE_CHECKING_RE,
-            "optional-pattern": PATTERNS_OPTIONAL_RE,
-            "union-pattern": PATTERNS_UNION_RE,
-        }
 
 
 c = FlextQualityConstants
