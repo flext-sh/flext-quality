@@ -12,12 +12,11 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Annotated, ClassVar
 
-from flext_core import FlextSettings
+from flext_core import FlextSettingsBase
 from flext_quality import c, m, p, r, u
 
 
-@FlextSettings.auto_register("quality")
-class FlextQualitySettings(FlextSettings):
+class FlextQualitySettings(FlextSettingsBase):
     """Runtime configuration for flext-quality services."""
 
     model_config: ClassVar[m.SettingsConfigDict] = m.SettingsConfigDict(

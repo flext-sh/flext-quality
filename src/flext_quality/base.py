@@ -5,20 +5,24 @@ from __future__ import annotations
 from abc import ABC
 from typing import override
 
-from flext_core import FlextSettings, s
+from flext_core import s
 from flext_quality import FlextQualitySettings, t
 
 
-class FlextQualityServiceBase(s[t.JsonMapping], ABC):
-    """Base class for flext-quality services with typed settings access."""
+class FlextQualityServiceBase[TResult: t.JsonValue = dict[str, t.JsonValue]](
+    s[TResult], ABC
+):
+    """Base class for flext-quality services with typed settings access.
+
+    Generic over the service result type so consumers can specialize:
+    ``FlextQualityServiceBase[bool]`` for boolean-returning commands etc.
+    """
 
     @property
     @override
     def settings(self) -> FlextQualitySettings:
-        """Return the typed quality settings namespace."""
-        return FlextSettings.fetch_global().fetch_namespace(
-            "quality", FlextQualitySettings
-        )
+        """Return the typed quality settings singleton (rule 1, propagating)."""
+        return FlextQualitySettings.fetch_global()
 
 
 s = FlextQualityServiceBase
