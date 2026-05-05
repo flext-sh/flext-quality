@@ -446,7 +446,8 @@ class FlextQualityLinkValidator:
         """Convert heading text to anchor format."""
         anchor = heading.lower()
         anchor = _compiled_pattern(r"[^\\w\\s-]").sub("", anchor)
-        return _compiled_pattern(r"\\s+").sub("-", anchor)
+        slug: str = _compiled_pattern(r"\\s+").sub("-", anchor)
+        return slug
 
     def check_link_text_quality(
         self,

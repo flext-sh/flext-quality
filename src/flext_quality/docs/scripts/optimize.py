@@ -199,7 +199,8 @@ class FlextQualityDocumentationOptimizer:
         """Convert heading to anchor link."""
         anchor = heading.lower()
         anchor = _compiled_pattern(r"[^\\w\\s-]").sub("", anchor)
-        return _compiled_pattern(r"\\s+").sub("-", anchor)
+        slug: str = _compiled_pattern(r"\\s+").sub("-", anchor)
+        return slug
 
     def enhance_accessibility(self, doc_files: t.SequenceOf[Path]) -> t.JsonMapping:
         """Enhance accessibility of documentation."""

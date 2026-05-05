@@ -421,7 +421,10 @@ class FlextQualityScheduledMaintenance:
             "git": self._handle_git_command,
             "echo": self._handle_echo_command,
         }
-        return handlers.get(cmd_name)
+        handler: Callable[[t.StrSequence, int, str], bool] | None = handlers.get(
+            cmd_name,
+        )
+        return handler
 
     def _handle_python_command(
         self,
