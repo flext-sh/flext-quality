@@ -1,0 +1,68 @@
+pyproject.toml
+  s_5a9c2b140a8456::t_72edf826f5993e 161,531-572,576
+src/flext_quality/docs/scripts/report.py
+  s_b15aa8dbf80823::t_bb2790ffe08f29 26
+src/flext_quality/docs/core/config_manager.py
+  s_552d8e4891a938::t_7a5a1c5d26b16c 347,349
+src/flext_quality/docs/scripts/validate.py
+  s_b15aa8dbf80823::t_bb2790ffe08f29 28
+src/flext_quality/hooks/manager.py
+  s_552d8e4891a938::t_7a5a1c5d26b16c 52
+src/flext_quality/docs/notifications.py
+  s_b15aa8dbf80823::t_bb2790ffe08f29 25
+  s_ec4ebdfbc2ce20::t_f34f38ec5aecf9 651,655,679
+src/flext_quality/docs/scripts/audit.py
+  s_ec4ebdfbc2ce20::t_f34f38ec5aecf9 846,858
+  s_b15aa8dbf80823::t_bb2790ffe08f29 27
+src/flext_quality/docs/scheduled_maintenance.py
+  s_ec4ebdfbc2ce20::t_f34f38ec5aecf9 740,744,767
+  s_b15aa8dbf80823::t_bb2790ffe08f29 26
+src/flext_quality/docs/dashboard.py
+  s_552d8e4891a938::t_7a5a1c5d26b16c 114,183
+  s_b15aa8dbf80823::t_bb2790ffe08f29 21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.1",
+  "base_commit_sha": "c7df7244e9640aa6b33cb0f31e65ad4e5d2312e7",
+  "prompts": {},
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  },
+  "sessions": {
+    "s_552d8e4891a938": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "35c0040b-2ae9-466e-90aa-7721509e1e19",
+        "model": "unknown"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>"
+    },
+    "s_5a9c2b140a8456": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019dfddc-86ee-79a0-b5bf-0433a8110b6a",
+        "model": "gpt-5.5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>"
+    },
+    "s_b15aa8dbf80823": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d896ab0f-dd16-4dca-9ad4-b3d924a501e7",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>"
+    },
+    "s_ec4ebdfbc2ce20": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "f049bcd6-badc-46dd-b4ad-1eeed823f908",
+        "model": "unknown"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>"
+    }
+  }
+}
