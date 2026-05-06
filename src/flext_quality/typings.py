@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from collections.abc import (
     Mapping,
-    MutableSequence,
-    Sequence,
 )
 
 from flext_infra import m, t
@@ -42,9 +40,9 @@ class FlextQualityTypes(t, web_t):
             t.JsonMapping,
             config=m.ConfigDict(strict=False),
         )
-        CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[Sequence[t.JsonMapping]] = (
-            m.TypeAdapter(Sequence[t.JsonMapping])
-        )
+        CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
+            t.SequenceOf[t.JsonMapping]
+        ] = m.TypeAdapter(t.SequenceOf[t.JsonMapping])
         RELAXED_CONTAINER_MAPPING_SEQUENCE_ADAPTER: m.TypeAdapter[
             t.SequenceOf[t.JsonMapping]
         ] = m.TypeAdapter(
@@ -58,8 +56,8 @@ class FlextQualityTypes(t, web_t):
             t.JsonList
         )
         STR_MAPPING_MUTABLE_SEQUENCE_ADAPTER: m.TypeAdapter[
-            MutableSequence[t.StrMapping]
-        ] = m.TypeAdapter(MutableSequence[t.StrMapping])
+            t.MutableSequenceOf[t.StrMapping]
+        ] = m.TypeAdapter(t.MutableSequenceOf[t.StrMapping])
         REPORT_VALUE_MAPPING_ADAPTER: m.TypeAdapter[
             t.MappingKV[str, DocumentationReportValue]
         ] = m.TypeAdapter(

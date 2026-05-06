@@ -51,7 +51,7 @@ class FlextQualityAuditRules:
     ) -> t.Primitives | None:
         """Get a quality threshold value."""
         threshold = self.quality_thresholds.get(key, default)
-        return threshold if isinstance(threshold, (str, int, float, bool)) else default
+        return threshold if isinstance(threshold, t.PRIMITIVES_TYPES) else default
 
     def is_check_enabled(self, check_type: str, check_name: str) -> bool:
         """Check if a specific audit check is enabled."""
@@ -76,7 +76,7 @@ class FlextQualityStyleGuide:
     ) -> t.Primitives | None:
         """Get a markdown formatting rule."""
         value = self.markdown.get(rule, default)
-        return value if isinstance(value, (str, int, float, bool)) else default
+        return value if isinstance(value, t.PRIMITIVES_TYPES) else default
 
     def get_accessibility_rule(
         self,
@@ -86,7 +86,7 @@ class FlextQualityStyleGuide:
     ) -> t.Primitives | None:
         """Get an accessibility rule."""
         value = self.accessibility.get(rule, default)
-        return value if isinstance(value, (str, int, float, bool)) else default
+        return value if isinstance(value, t.PRIMITIVES_TYPES) else default
 
 
 class FlextQualityValidationSettings:
@@ -115,7 +115,7 @@ class FlextQualityValidationSettings:
     ) -> t.Primitives | None:
         """Get a link validation setting."""
         value = self.link_validation.get(setting, default)
-        return value if isinstance(value, (str, int, float, bool)) else default
+        return value if isinstance(value, t.PRIMITIVES_TYPES) else default
 
     def get_content_setting(
         self,
@@ -125,7 +125,7 @@ class FlextQualityValidationSettings:
     ) -> t.Primitives | None:
         """Get a content validation setting."""
         value = self.content_validation.get(setting, default)
-        return value if isinstance(value, (str, int, float, bool)) else default
+        return value if isinstance(value, t.PRIMITIVES_TYPES) else default
 
 
 class FlextQualityConfigManager:
@@ -139,7 +139,7 @@ class FlextQualityConfigManager:
         section: ConfigSection = {}
         for key, item in value.items():
             key_str = key
-            if isinstance(item, (str, int, float, bool)):
+            if isinstance(item, t.PRIMITIVES_TYPES):
                 section[key_str] = item
             elif isinstance(item, list):
                 section[key_str] = [str(entry) for entry in item]

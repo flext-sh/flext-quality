@@ -32,7 +32,7 @@ class FlextQualityCli(s[bool]):
             """Return the canonical quality service status payload."""
             return quality.fetch_status()
 
-    class Check(s[Sequence[t.StrSequence]]):
+    class Check(s[t.SequenceOf[t.StrSequence]]):
         """Run lint + type check on --target-path."""
 
         target_path: Annotated[
@@ -41,22 +41,22 @@ class FlextQualityCli(s[bool]):
         ]
 
         @override
-        def execute(self) -> p.Result[Sequence[t.StrSequence]]:
+        def execute(self) -> p.Result[t.SequenceOf[t.StrSequence]]:
             """Build the canonical quality check command sequence."""
             bridge = FlextQualityCodeExecutionBridge()
             cmds: MutableSequence[t.StrSequence] = []
             for build in (bridge.build_ruff_command, bridge.build_basedpyright_command):
                 sub = build(self.target_path)
                 if sub.failure:
-                    return r[Sequence[t.StrSequence]].fail(sub.error)
+                    return r[t.SequenceOf[t.StrSequence]].fail(sub.error)
                 cmds.append(sub.value)
             return self._extend(cmds)
 
         def _extend(
             self: Self,
             cmds: MutableSequence[t.StrSequence],
-        ) -> p.Result[Sequence[t.StrSequence]]:
-            return r[Sequence[t.StrSequence]].ok(cmds)
+        ) -> p.Result[t.SequenceOf[t.StrSequence]]:
+            return r[t.SequenceOf[t.StrSequence]].ok(cmds)
 
     class Validate(Check):
         """Run full validation (lint + type + security + tests) on --target."""
@@ -65,7 +65,7 @@ class FlextQualityCli(s[bool]):
         def _extend(
             self: Self,
             cmds: MutableSequence[t.StrSequence],
-        ) -> p.Result[Sequence[t.StrSequence]]:
+        ) -> p.Result[t.SequenceOf[t.StrSequence]]:
             src = (
                 self.target_path / "src"
                 if (self.target_path / "src").exists()
@@ -79,7 +79,7 @@ class FlextQualityCli(s[bool]):
                 "--cov-report=term-missing",
             ])
             cmds.append(["python", "-m", "coverage", "report"])
-            return r[Sequence[t.StrSequence]].ok(cmds)
+            return r[t.SequenceOf[t.StrSequence]].ok(cmds)
 
     COMMANDS: ClassVar[Sequence[type[m.BaseModel]]] = (Status, Check, Validate)
 

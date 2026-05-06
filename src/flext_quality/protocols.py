@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import (
-    Sequence,
-)
 from pathlib import Path
 from typing import ClassVar, Protocol, runtime_checkable
 
@@ -54,7 +51,7 @@ class FlextQualityProtocols(p, web_p):
                 self,
                 content: str,
                 file_path: Path | None = None,
-            ) -> p.Result[Sequence[t.JsonMapping]]:
+            ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
                 """Validate content and return violations."""
                 ...
 

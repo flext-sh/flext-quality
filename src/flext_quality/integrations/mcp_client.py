@@ -57,11 +57,7 @@ class FlextQualityMcpClient:
         params: t.JsonMapping | None = None,
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build an MCP tool call request."""
-        call_params = (
-            dict(t.Quality.CONTAINER_MAPPING_ADAPTER.validate_python(params))
-            if isinstance(params, Mapping)
-            else dict(t.Quality.CONTAINER_MAPPING_ADAPTER.validate_python({}))
-        )
+        call_params = t.json_dict_adapter().validate_python(params or {})
         return r[m.Quality.McpToolCall].ok(
             m.Quality.McpToolCall.model_validate({
                 "server": server,

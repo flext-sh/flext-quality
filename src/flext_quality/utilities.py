@@ -4,9 +4,6 @@ from __future__ import annotations
 
 import re
 import sys
-from collections.abc import (
-    Sequence,
-)
 from pathlib import Path
 from typing import ClassVar
 
@@ -78,17 +75,17 @@ class FlextQualityUtilities(u, web_u):
         @staticmethod
         def load_yaml_rules(
             path: Path,
-        ) -> p.Result[Sequence[t.JsonMapping]]:
+        ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Load rules from YAML file."""
             try:
                 yaml_result = FlextQualityUtilities.Cli.yaml_safe_load(path)
                 if yaml_result.failure:
-                    return r[Sequence[t.JsonMapping]].fail(
+                    return r[t.SequenceOf[t.JsonMapping]].fail(
                         f"Failed to load YAML: {yaml_result.error}",
                     )
                 parsed = yaml_result.value
                 if not isinstance(parsed, dict):
-                    return r[Sequence[t.JsonMapping]].fail(
+                    return r[t.SequenceOf[t.JsonMapping]].fail(
                         "Expected YAML dict",
                     )
                 parsed_dict: t.JsonMapping = (
@@ -96,7 +93,7 @@ class FlextQualityUtilities(u, web_u):
                 )
                 raw_rules_val = parsed_dict.get("rules", [])
                 if not isinstance(raw_rules_val, list):
-                    return r[Sequence[t.JsonMapping]].fail(
+                    return r[t.SequenceOf[t.JsonMapping]].fail(
                         "Expected rules list",
                     )
                 rules: t.SequenceOf[t.JsonMapping] = [
@@ -104,9 +101,9 @@ class FlextQualityUtilities(u, web_u):
                     for item in raw_rules_val
                     if isinstance(item, dict)
                 ]
-                return r[Sequence[t.JsonMapping]].ok(rules)
+                return r[t.SequenceOf[t.JsonMapping]].ok(rules)
             except c.EXC_BROAD_IO_TYPE as e:
-                return r[Sequence[t.JsonMapping]].fail(
+                return r[t.SequenceOf[t.JsonMapping]].fail(
                     f"Failed to load rules: {e}",
                 )
 

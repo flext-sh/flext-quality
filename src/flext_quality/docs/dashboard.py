@@ -152,7 +152,7 @@ class FlextQualityDocumentationDashboard:
         """Get quality trends over the specified number of days."""
         cutoff_date = datetime.now(UTC) - timedelta(days=days)
 
-        trend_data: MutableSequence[dict[str, t.JsonValue]] = []
+        trend_data: t.MutableSequenceOf[t.JsonDict] = []
         reports_dir = self.reports_dir
 
         # Find all audit reports

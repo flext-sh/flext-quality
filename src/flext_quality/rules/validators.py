@@ -5,7 +5,6 @@ from __future__ import annotations
 from collections.abc import (
     MutableMapping,
     MutableSequence,
-    Sequence,
 )
 from pathlib import Path
 from typing import override
@@ -40,7 +39,7 @@ class FlextQualityValidators:
             self,
             content: str,
             file_path: Path | None = None,
-        ) -> p.Result[Sequence[t.JsonMapping]]:
+        ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Validate content against patterns."""
             violations: MutableSequence[t.JsonMapping] = []
             filename = str(file_path) if file_path else "<string>"
@@ -55,7 +54,7 @@ class FlextQualityValidators:
                             "message": f"Pattern violation: {pattern_name}",
                             "severity": c.Quality.Severity.ERROR,
                         })
-            return r[Sequence[t.JsonMapping]].ok(violations)
+            return r[t.SequenceOf[t.JsonMapping]].ok(violations)
 
     class ForbiddenPattern(Pattern):
         """Validates against FLEXT forbidden patterns."""
@@ -92,15 +91,15 @@ class FlextQualityValidators:
             self,
             content: str,
             file_path: Path | None = None,
-        ) -> p.Result[Sequence[t.JsonMapping]]:
+        ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Validate tier violations."""
             violations: MutableSequence[t.JsonMapping] = []
             filename = str(file_path) if file_path else "<string>"
             if file_path is None:
-                return r[Sequence[t.JsonMapping]].ok(violations)
+                return r[t.SequenceOf[t.JsonMapping]].ok(violations)
             file_tier = self._get_file_tier(file_path)
             if file_tier is None:
-                return r[Sequence[t.JsonMapping]].ok(violations)
+                return r[t.SequenceOf[t.JsonMapping]].ok(violations)
             lines = content.splitlines()
             for line_num, line in enumerate(lines, start=1):
                 if c.Quality.PATTERNS_TIER_VIOLATION_RE.search(line):
@@ -111,7 +110,7 @@ class FlextQualityValidators:
                         "message": "Tier 0/1 modules cannot import from services/api",
                         "severity": c.Quality.Severity.ERROR,
                     })
-            return r[Sequence[t.JsonMapping]].ok(violations)
+            return r[t.SequenceOf[t.JsonMapping]].ok(violations)
 
         def _get_file_tier(self, path: Path) -> int | None:
             """Determine file tier from path."""
@@ -150,14 +149,14 @@ class FlextQualityValidators:
             self,
             content: str,
             file_path: Path | None = None,
-        ) -> p.Result[Sequence[t.JsonMapping]]:
+        ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
             """Run all validators."""
             all_violations: MutableSequence[t.JsonMapping] = []
             for validator in self._validators.values():
                 result = validator.validate(content, file_path)
                 if result.success:
                     all_violations.extend(result.value)
-            return r[Sequence[t.JsonMapping]].ok(all_violations)
+            return r[t.SequenceOf[t.JsonMapping]].ok(all_violations)
 
         def _register_defaults(self) -> None:
             """Register default validators."""

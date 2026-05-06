@@ -180,4 +180,4 @@ class FlextQualityConstants(c, web_c):
 
 
 c = FlextQualityConstants
-__all__: tuple[str, ...] = ("FlextQualityConstants", "c")
+__all__: t.StrSequence = ("FlextQualityConstants", "c")

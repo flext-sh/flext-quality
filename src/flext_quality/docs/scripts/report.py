@@ -317,7 +317,7 @@ class FlextQualityDocumentationReporter:
                             normalized: t.MappingKV[str, t.Primitives] = {
                                 key: value
                                 for key, value in error_entry.items()
-                                if isinstance(value, (str, int, float, bool))
+                                if isinstance(value, t.PRIMITIVES_TYPES)
                             }
                             if normalized:
                                 broken_links.append(normalized)
