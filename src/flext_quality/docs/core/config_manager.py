@@ -344,9 +344,9 @@ class FlextQualityConfigManager:
             config_path = self.config_dir / f"{name}.yaml"
             self.config_dir.mkdir(parents=True, exist_ok=True)
 
-            normalized_data: dict[str, t.JsonValue] = {}
+            normalized_data: t.JsonDict = {}
             for section_name, section in data.items():
-                normalized_section: dict[str, t.JsonValue] = {}
+                normalized_section: t.JsonDict = {}
                 for key, value in section.items():
                     normalized_value: t.JsonValue
                     if isinstance(value, Sequence) and not isinstance(

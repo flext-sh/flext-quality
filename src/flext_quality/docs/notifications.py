@@ -21,8 +21,8 @@ from pathlib import Path
 from typing import Annotated, Final, override
 
 import requests
-from flext_cli import cli, m as cli_m, u as cli_u
 
+from flext_cli import cli, m as cli_m, u as cli_u
 from flext_core import p, r, s
 from flext_quality import c, m, t, u
 
@@ -648,10 +648,11 @@ Found {len(broken_links)} broken links that need attention:
 class _NotificationCommand(s[bool]):
     """CLI command for FLEXT Quality documentation notifications."""
 
-    settings: Annotated[
+    settings_path: Annotated[
         str,
         cli_u.Field(
             default="docs/maintenance/settings/notification_config.yaml",
+            alias="settings",
             description="Notification configuration file",
         ),
     ] = "docs/maintenance/settings/notification_config.yaml"
@@ -675,7 +676,7 @@ class _NotificationCommand(s[bool]):
     @override
     def execute(self) -> p.Result[bool]:
         """Dispatch to the appropriate notification action."""
-        notifier = FlextQualityDocumentationNotifier(self.settings)
+        notifier = FlextQualityDocumentationNotifier(self.settings_path)
         if self.test:
             notifier.send_notification(
                 "Test Notification",

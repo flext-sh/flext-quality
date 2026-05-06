@@ -24,8 +24,8 @@ from typing import Annotated, override
 
 import requests
 from flext_api import FlextApiConstants
-from flext_cli import cli, m as cli_m, u as cli_u
 
+from flext_cli import cli, m as cli_m, u as cli_u
 from flext_core import p, r, s
 from flext_quality import c, m, t, u
 

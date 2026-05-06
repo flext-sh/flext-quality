@@ -23,8 +23,8 @@ from string import Template
 from typing import Annotated, override
 
 import requests
-from flext_cli import cli
 
+from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
 
 
@@ -843,7 +843,7 @@ class _AuditCommand(s[bool]):
             description="Report format (json|html)",
         ),
     ] = "json"
-    settings: Annotated[
+    config_dir: Annotated[
         str,
         u.Field(
             default=c.Quality.PATHS_DOCS_MAINTENANCE_SETTINGS_DIR,
@@ -855,7 +855,7 @@ class _AuditCommand(s[bool]):
     @override
     def execute(self) -> p.Result[bool]:
         """Run audit checks per the parsed CLI arguments."""
-        auditor = FlextQualityDocumentationAuditor(self.settings)
+        auditor = FlextQualityDocumentationAuditor(self.config_dir)
         try:
             results = self._execute_checks(auditor)
             auditor.save_report(self.output_format, self.output)

@@ -21,9 +21,9 @@ from typing import Annotated, ClassVar, override
 
 import pytest
 import schedule
-from flext_cli import cli, m as cli_m, u as cli_u
 from git import InvalidGitRepositoryError, Repo
 
+from flext_cli import cli, m as cli_m, u as cli_u
 from flext_core import p, r, s
 from flext_quality import c, m, t, u
 
@@ -737,10 +737,11 @@ class _ScheduledMaintenanceCommand(s[bool]):
 
     DEFAULT_CONFIG: ClassVar[str] = str(_docs_config_file("schedule_config.yaml"))
 
-    settings: Annotated[
+    settings_path: Annotated[
         str,
         cli_u.Field(
             default_factory=lambda: _ScheduledMaintenanceCommand.DEFAULT_CONFIG,
+            alias="settings",
             description="Maintenance schedule configuration file",
         ),
     ]
@@ -763,7 +764,7 @@ class _ScheduledMaintenanceCommand(s[bool]):
     @override
     def execute(self) -> p.Result[bool]:
         """Dispatch to the appropriate maintenance action."""
-        maintenance = FlextQualityScheduledMaintenance(self.settings)
+        maintenance = FlextQualityScheduledMaintenance(self.settings_path)
         if self.list_schedules:
             for _schedule_config in maintenance.settings.schedules.values():
                 pass

@@ -21,9 +21,9 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Annotated, ClassVar, override
 
-from flext_cli import cli
 from jinja2 import Template
 
+from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
 
 

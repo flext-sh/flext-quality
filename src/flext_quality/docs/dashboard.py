@@ -17,8 +17,8 @@ from pathlib import Path
 from typing import Annotated, override
 
 from flask import Flask, Response, render_template_string, request
-from flext_cli import cli, m as cli_m, u as cli_u
 
+from flext_cli import cli, m as cli_m, u as cli_u
 from flext_core import r, s
 from flext_quality import c, m, p, t, u
 
@@ -111,7 +111,7 @@ class FlextQualityDocumentationDashboard:
                 metrics_raw if isinstance(metrics_raw, Mapping) else {}
             )
             severity_raw = metrics.get("severity_breakdown")
-            severity: dict[str, t.JsonValue] = {}
+            severity: t.JsonDict = {}
             if isinstance(severity_raw, Mapping):
                 for key, value in severity_raw.items():
                     severity[key] = value if isinstance(value, int) else 0
@@ -180,7 +180,7 @@ class FlextQualityDocumentationDashboard:
                         else {}
                     )
                     audit_metrics = m.Quality.AuditMetrics.model_validate(metrics_m)
-                    trend_entry: dict[str, t.JsonValue] = {
+                    trend_entry: t.JsonDict = {
                         "date": report_date.isoformat(),
                         "quality_score": audit_metrics.quality_score,
                         "total_issues": audit_metrics.total_issues,

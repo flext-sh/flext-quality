@@ -130,9 +130,7 @@ class FlextQualityRulesEngine:
         context: t.JsonMapping,
     ) -> t.SequenceOf[t.JsonMapping]:
         """Validate a single file against rules."""
-        validation_context: dict[str, t.JsonValue] = (
-            dict(context.items()) if context else {}
-        )
+        validation_context: t.JsonDict = dict(context.items()) if context else {}
         try:
             content = file_path.read_text(encoding="utf-8")
         except c.EXC_BROAD_IO_TYPE as e:

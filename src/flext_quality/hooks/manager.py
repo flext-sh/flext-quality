@@ -49,7 +49,7 @@ class FlextQualityHookManager:
 
     def fetch_config(self) -> t.JsonMapping:
         """Get hooks configuration as dict."""
-        config: dict[str, t.JsonValue] = {}
+        config: t.JsonDict = {}
         for event, hooks in self._hooks.items():
             hook_entries: list[t.JsonValue] = []
             for hook in hooks:
