@@ -1,0 +1,61 @@
+src/flext_quality/docs/dashboard.py
+  h_5cf852cc46bf92 155
+src/flext_quality/protocols.py
+  s_b15aa8dbf80823::t_e48493c66bfaf9 54
+src/flext_quality/rules/validators.py
+  s_b15aa8dbf80823::t_e48493c66bfaf9 42,57,94,99,102,113,152,159
+src/flext_quality/rules/engine.py
+  h_5cf852cc46bf92 132
+  s_b15aa8dbf80823::t_e48493c66bfaf9 43,48,51,57,63,68,75
+src/flext_quality/integrations/mcp_client.py
+  h_5cf852cc46bf92 60
+src/flext_quality/cli.py
+  s_b15aa8dbf80823::t_a1e1cf355d9adf 35,44,51,58-59,68,82
+src/flext_quality/base.py
+  s_552d8e4891a938::t_39d6dad27e4827 12
+src/flext_quality/typings.py
+  s_b15aa8dbf80823::t_47f5e7c7680638 59-60
+  s_b15aa8dbf80823::t_e48493c66bfaf9 43-44
+src/flext_quality/docs/core/config_manager.py
+  s_b15aa8dbf80823::t_220900289a4ce6 54,79,89,118,128,142
+src/flext_quality/docs/scripts/optimize.py
+  s_b15aa8dbf80823::t_220900289a4ce6 364
+src/flext_quality/docs/scripts/report.py
+  s_b15aa8dbf80823::t_220900289a4ce6 320
+src/flext_quality/utilities.py
+  s_b15aa8dbf80823::t_e48493c66bfaf9 78,83,88,96,104,106
+src/flext_quality/constants.py
+  h_5cf852cc46bf92 183
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.1",
+  "base_commit_sha": "06756e8e2209d904819163cc10d1ee15fcebbea3",
+  "prompts": {},
+  "humans": {
+    "h_5cf852cc46bf92": {
+      "author": "FLEXT Bot <team@flext.sh>"
+    },
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  },
+  "sessions": {
+    "s_552d8e4891a938": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "35c0040b-2ae9-466e-90aa-7721509e1e19",
+        "model": "unknown"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>"
+    },
+    "s_b15aa8dbf80823": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d896ab0f-dd16-4dca-9ad4-b3d924a501e7",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>"
+    }
+  }
+}
