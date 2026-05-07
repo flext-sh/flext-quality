@@ -38,7 +38,7 @@ class FlextQualityClaudeMemClient:
         self, ids: t.SequenceOf[int]
     ) -> p.Result[m.Quality.McpToolCall]:
         """Build a get_observations tool call."""
-        normalized_ids: list[t.JsonValue] = list(ids)
+        normalized_ids: t.JsonValueList = list(ids)
         params = {"ids": normalized_ids}
         return self._mcp.build_tool_call(self.SERVER_NAME, "get_observations", params)
 

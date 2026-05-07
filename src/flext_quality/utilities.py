@@ -10,6 +10,7 @@ from typing import ClassVar
 from flext_infra import u
 from flext_web import u as web_u
 
+from flext_cli import cli
 from flext_quality import c, p, r, t
 
 
@@ -37,19 +38,44 @@ class FlextQualityUtilities(u, web_u):
             dotall: bool = False,
         ) -> t.RegexPattern:
             """Compile a runtime-supplied regex pattern for quality tooling."""
-            flags = 0
-            if ignorecase:
-                flags |= re.IGNORECASE
-            if multiline:
-                flags |= re.MULTILINE
-            if dotall:
-                flags |= re.DOTALL
+            flags = re.NOFLAG
+            for enabled, flag in (
+                (ignorecase, re.IGNORECASE),
+                (multiline, re.MULTILINE),
+                (dotall, re.DOTALL),
+            ):
+                if enabled:
+                    flags |= flag
             return re.compile(pattern, flags=flags)
 
         @staticmethod
         def escape_pattern(text: str) -> str:
             """Escape literal text for safe regex interpolation."""
             return re.escape(text)
+
+        @staticmethod
+        def execute_result_command(
+            *,
+            args: t.StrSequence | None,
+            app_name: str,
+            app_help: str,
+            route: p.Cli.ResultCommandRoute,
+        ) -> int:
+            """Execute a single result-command Typer application."""
+            app = cli.create_app_with_common_params(
+                name=app_name,
+                help_text=app_help,
+            )
+            cli.register_result_routes(
+                app,
+                [route],
+            )
+            outcome = cli.execute_app(
+                app,
+                prog_name=app_name,
+                args=list(args) if args is not None else sys.argv[1:],
+            )
+            return 0 if outcome.success else 1
 
         @staticmethod
         def format_hook_output(
@@ -88,8 +114,8 @@ class FlextQualityUtilities(u, web_u):
                     return r[t.SequenceOf[t.JsonMapping]].fail(
                         "Expected YAML dict",
                     )
-                parsed_dict: t.JsonMapping = (
-                    t.Quality.CONTAINER_MAPPING_ADAPTER.validate_python(parsed)
+                parsed_dict: t.JsonMapping = t.json_mapping_adapter().validate_python(
+                    parsed
                 )
                 raw_rules_val = parsed_dict.get("rules", [])
                 if not isinstance(raw_rules_val, list):
@@ -97,7 +123,7 @@ class FlextQualityUtilities(u, web_u):
                         "Expected rules list",
                     )
                 rules: t.SequenceOf[t.JsonMapping] = [
-                    t.Quality.CONTAINER_MAPPING_ADAPTER.validate_python(item)
+                    t.json_mapping_adapter().validate_python(item)
                     for item in raw_rules_val
                     if isinstance(item, dict)
                 ]
@@ -108,16 +134,14 @@ class FlextQualityUtilities(u, web_u):
                 )
 
         @staticmethod
-        def parse_hook_input(raw: str) -> p.Result[t.Quality.HookInput]:
+        def parse_hook_input(raw: str) -> p.Result[t.JsonMapping]:
             """Parse hook input JSON."""
             try:
-                parsed: t.JsonMapping = (
-                    t.Quality.CONTAINER_MAPPING_ADAPTER.validate_json(raw)
-                )
+                parsed: t.JsonMapping = t.json_mapping_adapter().validate_json(raw)
                 coerced_input: t.JsonMapping = parsed
-                return r[t.Quality.HookInput].ok(coerced_input)
+                return r[t.JsonMapping].ok(coerced_input)
             except ValueError as e:
-                return r[t.Quality.HookInput].fail(f"Invalid JSON: {e}")
+                return r[t.JsonMapping].fail(f"Invalid JSON: {e}")
 
         @staticmethod
         def read_stdin() -> p.Result[str]:

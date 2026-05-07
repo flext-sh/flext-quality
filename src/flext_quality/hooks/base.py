@@ -14,13 +14,11 @@ class FlextQualityBaseHook:
     event: ClassVar[c.Quality.HookEvent]
     matcher: ClassVar[t.StrSequence | None] = None
 
-    def execute(
-        self, input_data: t.Quality.HookInput
-    ) -> p.Result[t.Quality.HookOutput]:
+    def execute(self, input_data: t.JsonMapping) -> p.Result[t.JsonMapping]:
         """Execute the hook logic."""
         raise NotImplementedError
 
-    def should_run(self, input_data: t.Quality.HookInput) -> bool:
+    def should_run(self, input_data: t.JsonMapping) -> bool:
         """Check if hook should run for this input."""
         if self.matcher is None:
             return True

@@ -82,13 +82,13 @@ def search_code(
 
 
 @_mcp.tool()
-def execute_hook(event: str, input_data: t.Quality.HookInput) -> t.Quality.HookOutput:
+def execute_hook(event: str, input_data: t.JsonMapping) -> t.JsonMapping:
     """Execute a hook manually."""
     manager = FlextQualityHookManager()
     result = manager.execute(event=event, input_data=input_data)
     if result.failure:
         error_msg = result.error if result.error is not None else "Unknown error"
-        output: t.Quality.HookOutput = {"error": error_msg}
+        output: t.JsonMapping = {"error": error_msg}
         return output
     return result.value
 

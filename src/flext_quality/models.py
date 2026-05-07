@@ -370,6 +370,7 @@ class FlextQualityModels(m, web_m):
             min_word_count: int = 100
             max_broken_links: int = 0
             min_completeness_score: float = 0.8
+            max_file_size_mb: int = 10
 
         class ContentChecksConfig(m.BaseModel):
             """Configuration for content validation checks."""
@@ -378,6 +379,8 @@ class FlextQualityModels(m, web_m):
             check_completeness: bool = True
             check_consistency: bool = True
             check_links: bool = True
+            check_structure: bool = True
+            check_accessibility: bool = True
 
         class SeverityLevelsConfig(m.BaseModel):
             """Configuration for severity level categorization."""
@@ -413,6 +416,7 @@ class FlextQualityModels(m, web_m):
             list_style: str = "dash"
             emphasis_style: str = "*"
             code_block_style: str = "fenced"
+            link_style: str = "inline"
 
         class AccessibilityConfig(m.BaseModel):
             """Configuration for accessibility requirements."""
@@ -420,13 +424,27 @@ class FlextQualityModels(m, web_m):
             require_alt_text: bool = True
             descriptive_links: bool = True
             heading_structure: bool = True
+            descriptive_link_text: bool = True
+            proper_heading_hierarchy: bool = True
+            min_alt_text_length: int = 5
+            max_alt_text_length: int = 100
+            check_color_contrast: bool = False
+            minimum_contrast_ratio: float = 4.5
 
         class FormattingConfig(m.BaseModel):
             """Configuration for formatting standards."""
 
             max_line_length: int = 88
+            soft_line_limit: int = 80
             consistent_indentation: bool = True
             trailing_spaces: bool = False
+            trailing_newlines: bool = True
+            indentation_type: str = "spaces"
+            indentation_size: int = 4
+            blank_lines_before_headings: bool = True
+            blank_lines_after_headings: bool = False
+            blank_lines_around_lists: bool = True
+            blank_lines_around_code_blocks: bool = True
 
         class StyleGuideConfig(m.BaseModel):
             """Configuration for style guide rules."""
@@ -450,6 +468,17 @@ class FlextQualityModels(m, web_m):
             check_external: bool = True
             check_internal: bool = True
             check_images: bool = True
+            follow_redirects: bool = True
+            max_redirects: int = 5
+            acceptable_status_codes: t.SequenceOf[int] = u.Field(
+                default_factory=lambda: [200, 201, 202, 206, 301, 302, 303, 307, 308]
+            )
+            validate_content_type: bool = False
+            expected_content_types: t.StrSequence = u.Field(
+                default_factory=lambda: ["text/html", "text/plain", "application/json"]
+            )
+            allowed_domains: t.StrSequence = u.Field(default_factory=list)
+            blocked_domains: t.StrSequence = u.Field(default_factory=list)
 
         class ContentAnalysisConfig(m.BaseModel):
             """Configuration for content analysis parameters."""
@@ -458,6 +487,9 @@ class FlextQualityModels(m, web_m):
             required_sections: t.StrSequence = u.Field(
                 default_factory=lambda: ["Overview", "Installation", "Usage"]
             )
+            min_word_count: int = 100
+            check_readability: bool = False
+            readability_target_score: int = 60
             check_todos: bool = True
             check_fixmes: bool = True
 

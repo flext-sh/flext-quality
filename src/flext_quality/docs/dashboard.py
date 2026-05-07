@@ -7,20 +7,18 @@ Provides web interface to view audit results, trends, and quality scores.
 from __future__ import annotations
 
 import operator
-import sys
 from collections.abc import (
     Mapping,
     MutableSequence,
 )
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Annotated, override
+from typing import override
 
 from flask import Flask, Response, render_template_string, request
 
-from flext_cli import cli, m as cli_m, u as cli_u
-from flext_core import r, s
-from flext_quality import c, m, p, t, u
+from flext_cli import cli
+from flext_quality import c, m, p, r, s, t, u
 
 
 class FlextQualityDocumentationDashboard:
@@ -203,7 +201,7 @@ class FlextQualityDocumentationDashboard:
 
         # Sort by date
         trend_data = sorted(trend_data, key=operator.itemgetter("date"))
-        trend_values: list[t.JsonValue] = [
+        trend_values: t.JsonValueList = [
             t.json_value_adapter().validate_python(entry) for entry in trend_data
         ]
 
@@ -588,48 +586,46 @@ class FlextQualityDocumentationDashboard:
         """Run the dashboard server."""
         self.app.run(host=host, port=port, debug=debug)
 
+    class Run(s[bool]):
+        """CLI command for the FLEXT Quality Documentation Dashboard."""
 
-class _DashboardCommand(s[bool]):
-    """CLI command for the FLEXT Quality Documentation Dashboard."""
+        host: str = u.Field(
+            "localhost", description="Dashboard bind host", validate_default=True
+        )
+        port: int = u.Field(
+            8080, description="Dashboard bind port", validate_default=True
+        )
+        debug: bool = u.Field(
+            False, description="Enable dashboard debug mode", validate_default=True
+        )
+        reports_dir: str = u.Field(
+            "docs/maintenance/reports/",
+            description="Documentation reports directory",
+            validate_default=True,
+        )
 
-    host: Annotated[str, cli_u.Field(default="localhost")] = "localhost"
-    port: Annotated[int, cli_u.Field(default=8080)] = 8080
-    debug: Annotated[bool, cli_u.Field(default=False)] = False
-    reports_dir: Annotated[str, cli_u.Field(default="docs/maintenance/reports/")] = (
-        "docs/maintenance/reports/"
-    )
-
-    @override
-    def execute(self) -> p.Result[bool]:
-        """Run the dashboard server."""
-        dashboard = FlextQualityDocumentationDashboard(self.reports_dir)
-        dashboard.run(host=self.host, port=self.port, debug=self.debug)
-        return r[bool].ok(value=True)
+        @override
+        def execute(self) -> p.Result[bool]:
+            """Run the dashboard server."""
+            dashboard = FlextQualityDocumentationDashboard(self.reports_dir)
+            dashboard.run(host=self.host, port=self.port, debug=self.debug)
+            return r[bool].ok(value=True)
 
 
 def main(args: t.StrSequence | None = None) -> int:
     """Main entry point for the dashboard via the canonical cli facade."""
-    app = cli.create_app_with_common_params(
-        name="flext-quality-dashboard",
-        help_text="FLEXT Quality Documentation Dashboard",
+    exit_code: int = u.Quality.execute_result_command(
+        args=args,
+        app_name="flext-quality-dashboard",
+        app_help="FLEXT Quality Documentation Dashboard",
+        route=m.Cli.ResultCommandRoute(
+            name="run",
+            help_text="Start the dashboard server",
+            model_cls=FlextQualityDocumentationDashboard.Run,
+            handler=lambda params: params.execute(),
+        ),
     )
-    cli.register_result_routes(
-        app,
-        [
-            cli_m.Cli.ResultCommandRoute(
-                name="run",
-                help_text="Start the dashboard server",
-                model_cls=_DashboardCommand,
-                handler=lambda params: params.execute(),
-            ),
-        ],
-    )
-    outcome = cli.execute_app(
-        app,
-        prog_name="flext-quality-dashboard",
-        args=list(args) if args is not None else sys.argv[1:],
-    )
-    return 0 if outcome.success else 1
+    return exit_code
 
 
 if __name__ == "__main__":

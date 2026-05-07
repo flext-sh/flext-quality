@@ -32,9 +32,7 @@ class FlextQualityRulesLoader:
         for failed, msg in validations:
             if failed:
                 return r[Sequence[m.Quality.RuleDefinition]].fail(msg)
-        parsed_dict: t.JsonMapping = (
-            t.Quality.CONTAINER_MAPPING_ADAPTER.validate_python(parsed)
-        )
+        parsed_dict: t.JsonMapping = t.json_mapping_adapter().validate_python(parsed)
         rules_data_val = parsed_dict.get("rules", [])
         if not isinstance(rules_data_val, list):
             return r[Sequence[m.Quality.RuleDefinition]].fail(
@@ -47,10 +45,8 @@ class FlextQualityRulesLoader:
         )
         rules: MutableSequence[m.Quality.RuleDefinition] = []
         for idx, rule_data in enumerate(rules_data):
-            rule_dict: t.JsonMapping = (
-                t.Quality.CONTAINER_MAPPING_ADAPTER.validate_python(
-                    dict(rule_data),
-                )
+            rule_dict: t.JsonMapping = t.json_mapping_adapter().validate_python(
+                dict(rule_data),
             )
             result = self._parse_rule(rule_dict, idx)
             if result.failure:

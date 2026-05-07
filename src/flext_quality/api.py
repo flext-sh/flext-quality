@@ -39,8 +39,8 @@ class FlextQuality(FlextQualityServiceBase):
     def execute_hook(
         self,
         event: str,
-        input_data: t.Quality.HookInput,
-    ) -> p.Result[t.Quality.HookOutput]:
+        input_data: t.JsonMapping,
+    ) -> p.Result[t.JsonMapping]:
         """Execute hooks for an event.
 
         Args:
@@ -48,7 +48,7 @@ class FlextQuality(FlextQualityServiceBase):
             input_data: Hook input data
 
         Returns:
-            r[t.Quality.HookOutput]: Hook execution result or error
+            r[t.JsonMapping]: Hook execution result or error
 
         """
         return self._hooks.execute(event, input_data)
@@ -116,27 +116,27 @@ class FlextQuality(FlextQualityServiceBase):
             return r[Sequence[m.Quality.RuleDefinition]].ok([])
         return self._rules_loader.load_multiple(yaml_files)
 
-    def process_stdin_hook(self) -> p.Result[t.Quality.HookOutput]:
+    def process_stdin_hook(self) -> p.Result[t.JsonMapping]:
         """Process hook input from stdin (for Claude Code hooks).
 
         Returns:
-            r[t.Quality.HookOutput]: Hook execution result or error
+            r[t.JsonMapping]: Hook execution result or error
 
         """
         stdin_result = u.Quality.read_stdin()
         if stdin_result.failure:
-            return r[t.Quality.HookOutput].fail(
+            return r[t.JsonMapping].fail(
                 stdin_result.error or "Failed to read stdin",
             )
         parse_result = u.Quality.parse_hook_input(stdin_result.value)
         if parse_result.failure:
-            return r[t.Quality.HookOutput].fail(
+            return r[t.JsonMapping].fail(
                 parse_result.error or "Failed to parse input",
             )
         input_data = parse_result.value
         event = str(input_data.get("event", ""))
         if not event:
-            return r[t.Quality.HookOutput].ok({"continue": True})
+            return r[t.JsonMapping].ok({"continue": True})
         return self.execute_hook(event, input_data)
 
     def validate_configuration(self) -> p.Result[bool]:

@@ -64,12 +64,12 @@ class FlextQualityProtocols(p, web_p):
 
             def execute(
                 self,
-                input_data: t.Quality.HookInput,
-            ) -> p.Result[t.Quality.HookOutput]:
+                input_data: t.JsonMapping,
+            ) -> p.Result[t.JsonMapping]:
                 """Execute the hook logic."""
                 ...
 
-            def should_run(self, input_data: t.Quality.HookInput) -> bool:
+            def should_run(self, input_data: t.JsonMapping) -> bool:
                 """Check if hook should run for this input."""
                 ...
 
@@ -99,12 +99,12 @@ class FlextQualityProtocols(p, web_p):
 
             def execute(
                 self,
-                input_data: t.Quality.HookInput,
-            ) -> p.Result[t.Quality.HookOutput]:
+                input_data: t.JsonMapping,
+            ) -> p.Result[t.JsonMapping]:
                 """Execute the hook logic."""
                 ...
 
-            def should_run(self, input_data: t.Quality.HookInput) -> bool:
+            def should_run(self, input_data: t.JsonMapping) -> bool:
                 """Check if hook should run for this input."""
                 ...
 
@@ -116,7 +116,7 @@ class FlextQualityProtocols(p, web_p):
 
             def validate(
                 self,
-                settings: t.Quality.RuleConfig,
+                settings: t.JsonMapping,
                 context: t.JsonMapping,
             ) -> p.Result[t.Quality.RuleResult]:
                 """Validate according to rule."""

@@ -28,21 +28,6 @@ from flext_quality import c, m, t, u
 logger = u.fetch_logger(__name__)
 
 
-def _compiled_pattern(
-    pattern: str,
-    *,
-    ignorecase: bool = False,
-    multiline: bool = False,
-    dotall: bool = False,
-) -> t.RegexPattern:
-    return u.Quality.compile_pattern(
-        pattern,
-        ignorecase=ignorecase,
-        multiline=multiline,
-        dotall=dotall,
-    )
-
-
 class FlextQualityLinkChecker:
     """Advanced link validation and checking system."""
 
@@ -165,9 +150,9 @@ class FlextQualityLinkChecker:
             try:
                 content = file_path.read_text(encoding="utf-8")
 
-                md_links = _compiled_pattern(r"\[([^\]]+)\]\(([^)]+)\)").findall(
-                    content
-                )
+                md_links = u.Quality.compile_pattern(
+                    r"\[([^\]]+)\]\(([^)]+)\)"
+                ).findall(content)
                 for text, url in md_links:
                     link_type = self._classify_link(url)
                     link_info = FlextQualityLinkChecker.LinkInfo(
@@ -180,12 +165,12 @@ class FlextQualityLinkChecker:
                     )
                     all_links.append(link_info)
 
-                ref_links = _compiled_pattern(r"\[([^\]]+)\]\[([^\]]+)\]").findall(
-                    content
-                )
-                ref_defs = _compiled_pattern(r"\[([^\]]+)\]:\s*([^\s]+)").findall(
-                    content
-                )
+                ref_links = u.Quality.compile_pattern(
+                    r"\[([^\]]+)\]\[([^\]]+)\]"
+                ).findall(content)
+                ref_defs = u.Quality.compile_pattern(
+                    r"\[([^\]]+)\]:\s*([^\s]+)"
+                ).findall(content)
 
                 ref_dict: t.StrMapping = dict(ref_defs)
                 for text, ref in ref_links:

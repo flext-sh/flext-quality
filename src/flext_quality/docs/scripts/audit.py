@@ -12,7 +12,6 @@ Usage:
 
 from __future__ import annotations
 
-import sys
 from collections.abc import (
     MutableMapping,
     MutableSequence,
@@ -26,21 +25,6 @@ import requests
 
 from flext_cli import cli
 from flext_quality import c, m, p, r, s, t, u
-
-
-def _compiled_pattern(
-    pattern: str,
-    *,
-    ignorecase: bool = False,
-    multiline: bool = False,
-    dotall: bool = False,
-) -> t.RegexPattern:
-    return u.Quality.compile_pattern(
-        pattern,
-        ignorecase=ignorecase,
-        multiline=multiline,
-        dotall=dotall,
-    )
 
 
 class FlextQualityDocumentationAuditor:
@@ -239,22 +223,22 @@ class FlextQualityDocumentationAuditor:
     def _check_outdated_indicators(self, content: str) -> MutableSequence[str]:
         """Check for indicators of outdated content."""
         indicators: MutableSequence[str] = []
-        if _compiled_pattern(
+        if u.Quality.compile_pattern(
             r"\\b\\d+\\.\\d+\\.\\d+.*TODO|FIXME|placeholder",
             ignorecase=True,
         ).search(content):
             indicators.append("version placeholders")
-        if _compiled_pattern(
+        if u.Quality.compile_pattern(
             r"\\b202\\d.*TODO|FIXME|update.*date",
             ignorecase=True,
         ).search(content):
             indicators.append("date placeholders")
-        if _compiled_pattern(
+        if u.Quality.compile_pattern(
             r"#+\\s*(TODO|FIXME|Coming Soon|Work in Progress)",
             ignorecase=True,
         ).search(content):
             indicators.append("incomplete sections")
-        if _compiled_pattern(
+        if u.Quality.compile_pattern(
             r"❌.*working|✅.*broken|⚠️.*complete",
             ignorecase=True,
         ).search(content):
@@ -293,7 +277,7 @@ class FlextQualityDocumentationAuditor:
                             "recommendation": f"Add missing sections: {', '.join(missing_sections)}",
                         })
                 if check_todos:
-                    todos = _compiled_pattern(
+                    todos = u.Quality.compile_pattern(
                         r"(?:TODO|FIXME|XXX):\\s*(.+?)(?:\\n|$)",
                         ignorecase=True,
                     ).findall(content)
@@ -323,7 +307,7 @@ class FlextQualityDocumentationAuditor:
         missing: t.StrSequence = [
             section
             for section in required_sections
-            if not _compiled_pattern(
+            if not u.Quality.compile_pattern(
                 f"^#+\\s.*{u.Quality.escape_pattern(section)}.*$",
                 multiline=True,
                 ignorecase=True,
@@ -385,7 +369,7 @@ class FlextQualityDocumentationAuditor:
         """Check for markdown formatting issues."""
         issues: MutableSequence[str] = []
         formatting_cfg = self.style_guide.formatting
-        unordered_lists = _compiled_pattern(
+        unordered_lists = u.Quality.compile_pattern(
             r"^[\\s]*[-\\*\\+]",
             multiline=True,
         ).findall(content)
@@ -395,12 +379,12 @@ class FlextQualityDocumentationAuditor:
         emphasis_usage = [
             pattern
             for pattern in emphasis_patterns
-            if _compiled_pattern(pattern).search(content)
+            if u.Quality.compile_pattern(pattern).search(content)
         ]
         if len(emphasis_usage) > 1:
             issues.append("mixed emphasis styles (* vs _)")
         if formatting_cfg.trailing_spaces:
-            trailing_spaces = _compiled_pattern(
+            trailing_spaces = u.Quality.compile_pattern(
                 r"[ \\t]+$",
                 multiline=True,
             ).findall(content)
@@ -417,7 +401,7 @@ class FlextQualityDocumentationAuditor:
         issues: MutableSequence[t.StrMapping] = []
         accessibility_cfg = self.style_guide.accessibility
         if accessibility_cfg.require_alt_text:
-            images_without_alt = _compiled_pattern(
+            images_without_alt = u.Quality.compile_pattern(
                 r"!\\[\\]\\([^)]+\\)",
             ).findall(content)
             if images_without_alt:
@@ -429,7 +413,7 @@ class FlextQualityDocumentationAuditor:
                     for img in images_without_alt
                 ])
         if accessibility_cfg.descriptive_links:
-            generic_links = _compiled_pattern(
+            generic_links = u.Quality.compile_pattern(
                 r"\\[here|click here|link|read more\\]\\([^)]+\\)",
                 ignorecase=True,
             ).findall(content)
@@ -445,7 +429,7 @@ class FlextQualityDocumentationAuditor:
 
     def _check_heading_hierarchy(self, content: str) -> t.StrSequence:
         """Check heading hierarchy for logical structure."""
-        headings = _compiled_pattern(
+        headings = u.Quality.compile_pattern(
             r"^(#+)\\s+(.+)$",
             multiline=True,
         ).findall(content)
@@ -467,7 +451,7 @@ class FlextQualityDocumentationAuditor:
         for file_path in doc_files:
             try:
                 content = file_path.read_text(encoding="utf-8")
-                external_links = _compiled_pattern(
+                external_links = u.Quality.compile_pattern(
                     r"\\[([^\\]]+)\\]\\((https?://[^)]+)\\)",
                 ).findall(content)
                 for text, url in external_links:
@@ -477,7 +461,7 @@ class FlextQualityDocumentationAuditor:
                         "file": str(file_path.relative_to(self.project_root)),
                         "type": "external",
                     })
-                internal_links = _compiled_pattern(
+                internal_links = u.Quality.compile_pattern(
                     r"\\[([^\\]]+)\\]\\(([^)]+)\\)",
                 ).findall(content)
                 for text, link in internal_links:
@@ -488,7 +472,7 @@ class FlextQualityDocumentationAuditor:
                             "file": str(file_path.relative_to(self.project_root)),
                             "type": "internal",
                         })
-                images = _compiled_pattern(
+                images = u.Quality.compile_pattern(
                     r"!\\[([^\\]]*)\\]\\(([^)]+)\\)",
                 ).findall(content)
                 for alt_text, src in images:
@@ -793,139 +777,114 @@ class FlextQualityDocumentationAuditor:
         latest_file.write_text(self.results.model_dump_json(indent=2), encoding="utf-8")
         return str(filepath)
 
+    class Run(s[bool]):
+        """CLI command for FLEXT Quality documentation audit."""
 
-class _AuditCommand(s[bool]):
-    """CLI command for FLEXT Quality documentation audit."""
+        comprehensive: bool = u.Field(
+            False, description="Run all audit checks", validate_default=True
+        )
+        check_freshness: bool = u.Field(
+            False, description="Check content freshness", validate_default=True
+        )
+        check_completeness: bool = u.Field(
+            False, description="Check documentation completeness", validate_default=True
+        )
+        check_consistency: bool = u.Field(
+            False, description="Check content consistency", validate_default=True
+        )
+        check_links: bool = u.Field(
+            False, description="Check documentation links", validate_default=True
+        )
+        ci_mode: bool = u.Field(
+            False, description="Enable CI mode", validate_default=True
+        )
+        fail_on_errors: bool = u.Field(
+            False,
+            description="Fail when audit errors are present",
+            validate_default=True,
+        )
+        output: str = u.Field(
+            c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
+            description="Audit report output directory",
+            validate_default=True,
+        )
+        output_format: Annotated[
+            str,
+            u.Field(
+                alias="format", description="Audit report format", validate_default=True
+            ),
+        ] = "json"
+        config_dir: Annotated[
+            str,
+            u.Field(
+                alias="config",
+                description="Audit configuration directory",
+                validate_default=True,
+            ),
+        ] = c.Quality.PATHS_DOCS_MAINTENANCE_SETTINGS_DIR
 
-    comprehensive: Annotated[
-        bool,
-        u.Field(default=False, description="Run complete audit"),
-    ] = False
-    check_freshness: Annotated[
-        bool,
-        u.Field(default=False, description="Check content freshness only"),
-    ] = False
-    check_completeness: Annotated[
-        bool,
-        u.Field(default=False, description="Check content completeness only"),
-    ] = False
-    check_consistency: Annotated[
-        bool,
-        u.Field(default=False, description="Check style consistency only"),
-    ] = False
-    check_links: Annotated[
-        bool,
-        u.Field(default=False, description="Check links and references only"),
-    ] = False
-    ci_mode: Annotated[
-        bool,
-        u.Field(default=False, description="CI/CD mode"),
-    ] = False
-    fail_on_errors: Annotated[
-        bool,
-        u.Field(
-            default=False,
-            description="Exit with error code if critical/high issues found",
-        ),
-    ] = False
-    output: Annotated[
-        str,
-        u.Field(
-            default=c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR,
-            description="Output directory for reports",
-        ),
-    ] = c.Quality.PATHS_DOCS_MAINTENANCE_REPORTS_DIR
-    output_format: Annotated[
-        str,
-        u.Field(
-            default="json",
-            alias="format",
-            description="Report format (json|html)",
-        ),
-    ] = "json"
-    config_dir: Annotated[
-        str,
-        u.Field(
-            default=c.Quality.PATHS_DOCS_MAINTENANCE_SETTINGS_DIR,
-            alias="config",
-            description="Configuration directory path",
-        ),
-    ] = c.Quality.PATHS_DOCS_MAINTENANCE_SETTINGS_DIR
+        @override
+        def execute(self) -> p.Result[bool]:
+            """Run audit checks per the parsed CLI arguments."""
+            auditor = FlextQualityDocumentationAuditor(self.config_dir)
+            try:
+                results = self._execute_checks(auditor)
+                auditor.save_report(self.output_format, self.output)
+                metrics = results.metrics
+                if self._should_fail(metrics):
+                    return r[bool].fail("Audit failed quality threshold")
+            except (
+                FileNotFoundError,
+                PermissionError,
+                OSError,
+                KeyError,
+                ValueError,
+            ) as exc:
+                if self.ci_mode or self.fail_on_errors:
+                    return r[bool].fail_op("Audit", exc)
+            return r[bool].ok(value=True)
 
-    @override
-    def execute(self) -> p.Result[bool]:
-        """Run audit checks per the parsed CLI arguments."""
-        auditor = FlextQualityDocumentationAuditor(self.config_dir)
-        try:
-            results = self._execute_checks(auditor)
-            auditor.save_report(self.output_format, self.output)
-            metrics = results.metrics
-            if self._should_fail(metrics):
-                return r[bool].fail("Audit failed quality threshold")
-        except (
-            FileNotFoundError,
-            PermissionError,
-            OSError,
-            KeyError,
-            ValueError,
-        ) as exc:
-            if self.ci_mode or self.fail_on_errors:
-                return r[bool].fail_op("Audit", exc)
-        return r[bool].ok(value=True)
+        def _execute_checks(
+            self,
+            auditor: FlextQualityDocumentationAuditor,
+        ) -> m.Quality.AuditorResults:
+            if self.comprehensive:
+                return auditor.run_comprehensive_audit()
+            doc_files = auditor.find_documentation_files()
+            if self.check_freshness:
+                auditor.check_content_freshness(doc_files)
+            if self.check_completeness:
+                auditor.check_content_completeness(doc_files)
+            if self.check_consistency:
+                auditor.check_content_consistency(doc_files)
+            if self.check_links:
+                auditor.check_links_and_references(doc_files)
+            auditor.calculate_quality_metrics()
+            auditor.generate_recommendations()
+            return auditor.results
 
-    def _execute_checks(
-        self,
-        auditor: FlextQualityDocumentationAuditor,
-    ) -> m.Quality.AuditorResults:
-        if self.comprehensive:
-            return auditor.run_comprehensive_audit()
-        doc_files = auditor.find_documentation_files()
-        if self.check_freshness:
-            auditor.check_content_freshness(doc_files)
-        if self.check_completeness:
-            auditor.check_content_completeness(doc_files)
-        if self.check_consistency:
-            auditor.check_content_consistency(doc_files)
-        if self.check_links:
-            auditor.check_links_and_references(doc_files)
-        auditor.calculate_quality_metrics()
-        auditor.generate_recommendations()
-        return auditor.results
-
-    def _should_fail(self, metrics: m.Quality.AuditMetrics) -> bool:
-        if self.fail_on_errors:
-            severity_breakdown = metrics.severity_breakdown
-            critical = severity_breakdown["critical"]
-            high = severity_breakdown["high"]
-            if critical + high > 0:
-                return True
-        quality_score = metrics.quality_score
-        return self.ci_mode and quality_score < 70
+        def _should_fail(self, metrics: m.Quality.AuditMetrics) -> bool:
+            if self.fail_on_errors:
+                severity_breakdown = metrics.severity_breakdown
+                if severity_breakdown["critical"] + severity_breakdown["high"] > 0:
+                    return True
+            return self.ci_mode and metrics.quality_score < 70
 
 
 def main(args: t.StrSequence | None = None) -> int:
     """Main entry point for documentation audit via the canonical cli facade."""
-    app = cli.create_app_with_common_params(
-        name="flext-quality-docs-audit",
-        help_text="FLEXT Quality Documentation Audit",
+    exit_code: int = u.Quality.execute_result_command(
+        args=args,
+        app_name="flext-quality-docs-audit",
+        app_help="FLEXT Quality Documentation Audit",
+        route=m.Cli.ResultCommandRoute(
+            name="run",
+            help_text="Run documentation audit checks",
+            model_cls=FlextQualityDocumentationAuditor.Run,
+            handler=lambda params: params.execute(),
+        ),
     )
-    cli.register_result_routes(
-        app,
-        [
-            m.Cli.ResultCommandRoute(
-                name="run",
-                help_text="Run documentation audit checks",
-                model_cls=_AuditCommand,
-                handler=lambda params: params.execute(),
-            ),
-        ],
-    )
-    outcome = cli.execute_app(
-        app,
-        prog_name="flext-quality-docs-audit",
-        args=list(args) if args is not None else sys.argv[1:],
-    )
-    return 0 if outcome.success else 1
+    return exit_code
 
 
 if __name__ == "__main__":

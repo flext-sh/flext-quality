@@ -38,9 +38,7 @@ class FlextQualityMcpClient:
         if not self.is_mcp_cli_available():
             return e.fail_not_found("executable", "mcp-cli")
         tool_path = f"{call.server}/{call.tool}"
-        params_json = t.Quality.CONTAINER_MAPPING_ADAPTER.dump_json(call.params).decode(
-            "utf-8"
-        )
+        params_json = t.json_mapping_adapter().dump_json(call.params).decode("utf-8")
         return r[t.StrSequence].ok(["mcp-cli", "call", tool_path, params_json])
 
     def build_info_command(self, server: str, tool: str) -> p.Result[t.StrSequence]:
@@ -116,9 +114,7 @@ class FlextQualityMcpClient:
                 ),
             )
         try:
-            parsed: t.JsonMapping = t.Quality.CONTAINER_MAPPING_ADAPTER.validate_json(
-                output
-            )
+            parsed: t.JsonMapping = t.json_mapping_adapter().validate_json(output)
             result_data: t.StrMapping = {k: str(v) for k, v in parsed.items()}
             return r[m.Quality.McpToolResult].ok(
                 m.Quality.McpToolResult.model_validate({
@@ -129,16 +125,14 @@ class FlextQualityMcpClient:
             )
         except ValueError:
             try:
-                parsed_list: t.JsonList = (
-                    t.Quality.NORMALIZED_VALUE_SEQUENCE_ADAPTER.validate_json(
-                        output,
-                    )
+                parsed_list: t.JsonList = t.json_list_adapter().validate_json(
+                    output,
                 )
                 coerced_data: MutableSequence[t.StrMapping] = []
                 for item in parsed_list:
                     if isinstance(item, Mapping):
                         validated_item: t.JsonMapping = (
-                            t.Quality.CONTAINER_MAPPING_ADAPTER.validate_python(item)
+                            t.json_mapping_adapter().validate_python(item)
                         )
                         coerced_data.append({
                             key: str(value) for key, value in validated_item.items()

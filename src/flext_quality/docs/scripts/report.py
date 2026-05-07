@@ -11,7 +11,6 @@ Usage:
 
 from __future__ import annotations
 
-import sys
 from collections.abc import (
     Callable,
     Mapping,
@@ -704,107 +703,89 @@ class FlextQualityDocumentationReporter:
         _ = filepath.write_text(content, encoding="utf-8")
         return filepath
 
+    class Run(s[bool]):
+        """CLI command for FLEXT Quality documentation reporting."""
 
-class _ReportCommand(s[bool]):
-    """CLI command for FLEXT Quality documentation reporting."""
+        output_format: Annotated[
+            str,
+            u.Field(
+                alias="format",
+                description="Report output format",
+                validate_default=True,
+            ),
+        ] = "html"
+        output: str = u.Field(
+            "docs/maintenance/reports/",
+            description="Report output directory",
+            validate_default=True,
+        )
+        filename: str | None = u.Field(
+            None, description="Optional report filename", validate_default=True
+        )
+        monthly_trends: bool = u.Field(
+            False, description="Generate monthly trend report", validate_default=True
+        )
+        weekly_trends: bool = u.Field(
+            False, description="Generate weekly trend report", validate_default=True
+        )
+        include_trends: bool = u.Field(
+            False, description="Include trend data", validate_default=True
+        )
+        notify: bool = u.Field(
+            False, description="Send report notification", validate_default=True
+        )
+        webhook_url: str | None = u.Field(
+            None, description="Notification webhook URL", validate_default=True
+        )
+        serve: bool = u.Field(
+            False, description="Serve the report dashboard", validate_default=True
+        )
 
-    output_format: Annotated[
-        str,
-        u.Field(
-            default="html",
-            alias="format",
-            description="Report format (html|json|markdown)",
-        ),
-    ] = "html"
-    output: Annotated[
-        str,
-        u.Field(
-            default="docs/maintenance/reports/",
-            description="Output directory for reports",
-        ),
-    ] = "docs/maintenance/reports/"
-    filename: Annotated[
-        str | None,
-        u.Field(default=None, description="Custom filename for the report"),
-    ] = None
-    monthly_trends: Annotated[
-        bool,
-        u.Field(default=False, description="Generate monthly trend analysis"),
-    ] = False
-    weekly_trends: Annotated[
-        bool,
-        u.Field(default=False, description="Generate weekly trend analysis"),
-    ] = False
-    include_trends: Annotated[
-        bool,
-        u.Field(default=False, description="Include trend analysis in quality report"),
-    ] = False
-    notify: Annotated[
-        bool,
-        u.Field(default=False, description="Send notifications"),
-    ] = False
-    webhook_url: Annotated[
-        str | None,
-        u.Field(default=None, description="Webhook URL for notifications"),
-    ] = None
-    serve: Annotated[
-        bool,
-        u.Field(default=False, description="Serve dashboard (not implemented yet)"),
-    ] = False
-
-    @override
-    def execute(self) -> p.Result[bool]:
-        """Generate the requested report."""
-        reporter = FlextQualityDocumentationReporter(self.output)
-        if self.monthly_trends:
-            trend_report = reporter.generate_trend_report(days=30)
-            filename = (
-                self.filename
-                or f"monthly_trends_{datetime.now(UTC).strftime('%Y%m%d')}"
-            )
-            reporter.save_report(trend_report, filename, "md")
-        elif self.weekly_trends:
-            trend_report = reporter.generate_trend_report(days=7)
-            filename = (
-                self.filename or f"weekly_trends_{datetime.now(UTC).strftime('%Y%m%d')}"
-            )
-            reporter.save_report(trend_report, filename, "md")
-        else:
-            report_content = reporter.generate_quality_report(
-                self.output_format,
-                include_trends=self.include_trends,
-            )
-            filename = (
-                self.filename
-                or f"quality_report_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}"
-            )
-            reporter.save_report(report_content, filename, self.output_format)
-        return r[bool].ok(value=True)
+        @override
+        def execute(self) -> p.Result[bool]:
+            """Generate the requested report."""
+            reporter = FlextQualityDocumentationReporter(self.output)
+            if self.monthly_trends:
+                trend_report = reporter.generate_trend_report(days=30)
+                filename = (
+                    self.filename
+                    or f"monthly_trends_{datetime.now(UTC).strftime('%Y%m%d')}"
+                )
+                reporter.save_report(trend_report, filename, "md")
+            elif self.weekly_trends:
+                trend_report = reporter.generate_trend_report(days=7)
+                filename = (
+                    self.filename
+                    or f"weekly_trends_{datetime.now(UTC).strftime('%Y%m%d')}"
+                )
+                reporter.save_report(trend_report, filename, "md")
+            else:
+                report_content = reporter.generate_quality_report(
+                    self.output_format,
+                    include_trends=self.include_trends,
+                )
+                filename = (
+                    self.filename
+                    or f"quality_report_{datetime.now(UTC).strftime('%Y%m%d_%H%M%S')}"
+                )
+                reporter.save_report(report_content, filename, self.output_format)
+            return r[bool].ok(value=True)
 
 
 def main(args: t.StrSequence | None = None) -> int:
     """Main entry point for reporting system via the canonical cli facade."""
-    app = cli.create_app_with_common_params(
-        name="flext-quality-docs-report",
-        help_text="FLEXT Quality Documentation Reporting",
+    exit_code: int = u.Quality.execute_result_command(
+        args=args,
+        app_name="flext-quality-docs-report",
+        app_help="FLEXT Quality Documentation Reporting",
+        route=m.Cli.ResultCommandRoute(
+            name="run",
+            help_text="Generate a documentation quality report",
+            model_cls=FlextQualityDocumentationReporter.Run,
+            handler=lambda params: params.execute(),
+        ),
     )
-    cli.register_result_routes(
-        app,
-        [
-            m.Cli.ResultCommandRoute(
-                name="run",
-                help_text="Generate a documentation quality report",
-                model_cls=_ReportCommand,
-                handler=lambda params: params.execute(),
-            ),
-        ],
-    )
-    outcome = cli.execute_app(
-        app,
-        prog_name="flext-quality-docs-report",
-        args=list(args) if args is not None else sys.argv[1:],
-    )
-    return 0 if outcome.success else 1
+    return exit_code
 
 
 if __name__ == "__main__":

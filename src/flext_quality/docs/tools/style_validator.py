@@ -19,21 +19,6 @@ from typing import ClassVar
 from flext_quality import c, m, t, u
 
 
-def _compiled_pattern(
-    pattern: str,
-    *,
-    ignorecase: bool = False,
-    multiline: bool = False,
-    dotall: bool = False,
-) -> t.RegexPattern:
-    return u.Quality.compile_pattern(
-        pattern,
-        ignorecase=ignorecase,
-        multiline=multiline,
-        dotall=dotall,
-    )
-
-
 class FlextQualityStyleValidator:
     """Documentation style validation and consistency checking system."""
 
@@ -303,7 +288,7 @@ class FlextQualityStyleValidator:
                 if self.settings.markdown
                 else None
             )
-            if emphasis_style == "*" and _compiled_pattern(
+            if emphasis_style == "*" and u.Quality.compile_pattern(
                 r"(?<!\\)_[^_]+_(?!\\)",
             ).search(line):
                 violations.append(
@@ -316,7 +301,9 @@ class FlextQualityStyleValidator:
                     ),
                 )
 
-            if line.startswith("#") and not _compiled_pattern(r"^#{1,6}\s").match(line):
+            if line.startswith("#") and not u.Quality.compile_pattern(
+                r"^#{1,6}\s"
+            ).match(line):
                 violations.append(
                     FlextQualityStyleValidator.StyleIssue(
                         type="heading_format",
@@ -342,7 +329,7 @@ class FlextQualityStyleValidator:
                 match.group(2).strip(),
                 content[: match.start()].count("\n") + 1,
             )
-            for match in _compiled_pattern(
+            for match in u.Quality.compile_pattern(
                 r"^(#{1,6})\s+(.+)$",
                 multiline=True,
             ).finditer(content)
@@ -392,7 +379,7 @@ class FlextQualityStyleValidator:
                 match.group(2),
                 content[: match.start()].count("\n") + 1,
             )
-            for match in _compiled_pattern(
+            for match in u.Quality.compile_pattern(
                 r"^(\s*)([-\*\+])\s+",
                 multiline=True,
             ).finditer(content)
@@ -436,7 +423,7 @@ class FlextQualityStyleValidator:
             else "fenced"
         )
         if code_block_style == "fenced":
-            code_blocks = _compiled_pattern(
+            code_blocks = u.Quality.compile_pattern(
                 r"```\n(.*?)\n```",
                 dotall=True,
             ).findall(content)
@@ -449,19 +436,19 @@ class FlextQualityStyleValidator:
                     severity="low",
                 )
                 for block in code_blocks
-                if not _compiled_pattern(r"```\w+").match(
+                if not u.Quality.compile_pattern(r"```\w+").match(
                     content[content.find(block) - 10 : content.find(block)],
                 )
             )
 
-        inline_code = _compiled_pattern(r"`[^`]+`").findall(content)
+        inline_code = u.Quality.compile_pattern(r"`[^`]+`").findall(content)
         if inline_code:
             lines = content.split("\n")
             for i, line in enumerate(lines, 1):
                 if (
                     "`" in line
-                    and _compiled_pattern(r"[a-zA-Z0-9]`[^`]+`").search(line)
-                    and not _compiled_pattern(r"\s`[^`]+`").search(line)
+                    and u.Quality.compile_pattern(r"[a-zA-Z0-9]`[^`]+`").search(line)
+                    and not u.Quality.compile_pattern(r"\s`[^`]+`").search(line)
                 ):
                     violations.append(
                         FlextQualityStyleValidator.StyleIssue(
@@ -488,7 +475,9 @@ class FlextQualityStyleValidator:
             else True
         )
         if require_alt_text is not False:
-            images_without_alt = _compiled_pattern(r"!\[\]\([^)]+\)").findall(content)
+            images_without_alt = u.Quality.compile_pattern(r"!\[\]\([^)]+\)").findall(
+                content
+            )
             if images_without_alt:
                 for img in images_without_alt:
                     line_num = content[: content.find(img)].count("\n") + 1
@@ -508,7 +497,7 @@ class FlextQualityStyleValidator:
             else True
         )
         if descriptive_links is not False:
-            generic_links = _compiled_pattern(
+            generic_links = u.Quality.compile_pattern(
                 r"\[here|click here|link|read more\]\([^)]+\)",
                 ignorecase=True,
             ).findall(content)

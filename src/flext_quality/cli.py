@@ -14,9 +14,8 @@ from collections.abc import (
 from pathlib import Path
 from typing import Annotated, ClassVar, Self, override
 
-from flext_cli import cli, m, u
-from flext_core import s
-from flext_quality import FlextQualityCodeExecutionBridge, p, quality, r, t
+from flext_cli import cli
+from flext_quality import FlextQualityCodeExecutionBridge, m, p, quality, r, s, t, u
 
 
 class FlextQualityCli(s[bool]):

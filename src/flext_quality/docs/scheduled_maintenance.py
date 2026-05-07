@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import runpy
 import shlex
-import sys
 import threading
 import time
 from collections.abc import (
@@ -23,9 +22,8 @@ import pytest
 import schedule
 from git import InvalidGitRepositoryError, Repo
 
-from flext_cli import cli, m as cli_m, u as cli_u
-from flext_core import p, r, s
-from flext_quality import c, m, t, u
+from flext_cli import cli
+from flext_quality import c, m, p, r, s, t, u
 
 logger = u.fetch_logger(__name__)
 
@@ -731,84 +729,69 @@ class FlextQualityScheduledMaintenance:
             encoding="utf-8",
         )
 
+    class Run(s[bool]):
+        """CLI command for FLEXT Quality scheduled documentation maintenance."""
 
-class _ScheduledMaintenanceCommand(s[bool]):
-    """CLI command for FLEXT Quality scheduled documentation maintenance."""
+        DEFAULT_CONFIG: ClassVar[str] = str(_docs_config_file("schedule_config.yaml"))
 
-    DEFAULT_CONFIG: ClassVar[str] = str(_docs_config_file("schedule_config.yaml"))
-
-    settings_path: Annotated[
-        str,
-        cli_u.Field(
-            default_factory=lambda: _ScheduledMaintenanceCommand.DEFAULT_CONFIG,
-            alias="settings",
-            description="Maintenance schedule configuration file",
-        ),
-    ]
-    daemon: Annotated[
-        bool,
-        cli_u.Field(default=False, description="Run as daemon with scheduled tasks"),
-    ] = False
-    manual: Annotated[
-        str | None,
-        cli_u.Field(
-            default=None,
-            description="Run specific manual task: daily|optimize|weekly|monthly|all",
-        ),
-    ] = None
-    list_schedules: Annotated[
-        bool,
-        cli_u.Field(default=False, description="List all configured schedules"),
-    ] = False
-
-    @override
-    def execute(self) -> p.Result[bool]:
-        """Dispatch to the appropriate maintenance action."""
-        maintenance = FlextQualityScheduledMaintenance(self.settings_path)
-        if self.list_schedules:
-            for _schedule_config in maintenance.settings.schedules.values():
-                pass
-            return r[bool].ok(value=True)
-        if self.daemon:
-            maintenance.run_daemon()
-            return r[bool].ok(value=True)
-        if self.manual:
-            return (
-                r[bool].ok(value=True)
-                if maintenance.run_manual(self.manual)
-                else r[bool].fail(f"Manual task '{self.manual}' failed")
-            )
-        return r[bool].fail(
-            "No action selected (use --daemon, --manual or --list-schedules)"
+        settings_path: Annotated[
+            str,
+            u.Field(
+                default_factory=lambda: (
+                    FlextQualityScheduledMaintenance.Run.DEFAULT_CONFIG
+                ),
+                alias="settings",
+                description="Scheduled maintenance settings file",
+            ),
+        ]
+        daemon: bool = u.Field(
+            False, description="Run scheduler daemon", validate_default=True
         )
+        manual: str | None = u.Field(
+            None, description="Run one maintenance task", validate_default=True
+        )
+        list_schedules: bool = u.Field(
+            False, description="List configured schedules", validate_default=True
+        )
+
+        @override
+        def execute(self) -> p.Result[bool]:
+            """Dispatch to the appropriate maintenance action."""
+            maintenance = FlextQualityScheduledMaintenance(self.settings_path)
+            if self.list_schedules:
+                for _schedule_config in maintenance.settings.schedules.values():
+                    pass
+                return r[bool].ok(value=True)
+            if self.daemon:
+                maintenance.run_daemon()
+                return r[bool].ok(value=True)
+            if self.manual:
+                return (
+                    r[bool].ok(value=True)
+                    if maintenance.run_manual(self.manual)
+                    else r[bool].fail(f"Manual task '{self.manual}' failed")
+                )
+            return r[bool].fail(
+                "No action selected (use --daemon, --manual or --list-schedules)"
+            )
 
 
 def main(args: t.StrSequence | None = None) -> int:
     """Main entry point for scheduled maintenance via the canonical cli facade."""
-    app = cli.create_app_with_common_params(
-        name="flext-quality-scheduled-maintenance",
-        help_text="FLEXT Quality Scheduled Documentation Maintenance",
-    )
-    cli.register_result_routes(
-        app,
-        [
-            cli_m.Cli.ResultCommandRoute(
-                name="run",
-                help_text=(
-                    "Run scheduled maintenance (use --daemon, --manual or "
-                    "--list-schedules)"
-                ),
-                model_cls=_ScheduledMaintenanceCommand,
-                handler=lambda params: params.execute(),
+    exit_code: int = u.Quality.execute_result_command(
+        args=args,
+        app_name="flext-quality-scheduled-maintenance",
+        app_help="FLEXT Quality Scheduled Documentation Maintenance",
+        route=m.Cli.ResultCommandRoute(
+            name="run",
+            help_text=(
+                "Run scheduled maintenance (use --daemon, --manual or --list-schedules)"
             ),
-        ],
+            model_cls=FlextQualityScheduledMaintenance.Run,
+            handler=lambda params: params.execute(),
+        ),
     )
-    outcome = cli.execute_app(
-        app,
-        prog_name="flext-quality-scheduled-maintenance",
-        args=list(args) if args is not None else sys.argv[1:],
-    )
-    return 0 if outcome.success else 1
+    return exit_code
 
 
 if __name__ == "__main__":

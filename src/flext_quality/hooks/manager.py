@@ -28,13 +28,13 @@ class FlextQualityHookManager:
     def execute(
         self,
         event: str,
-        input_data: t.Quality.HookInput,
-    ) -> p.Result[t.Quality.HookOutput]:
+        input_data: t.JsonMapping,
+    ) -> p.Result[t.JsonMapping]:
         """Execute all hooks for an event."""
         try:
             hook_event = c.Quality.HookEvent(event)
         except ValueError:
-            return r[t.Quality.HookOutput].fail(f"Unknown event: {event}")
+            return r[t.JsonMapping].fail(f"Unknown event: {event}")
         hooks = self._hooks.get(hook_event, [])
         for hook in hooks:
             if not hook.should_run(input_data):
@@ -45,13 +45,13 @@ class FlextQualityHookManager:
             output = result.value
             if not output.get("continue", True):
                 return result
-        return r[t.Quality.HookOutput].ok({"continue": True})
+        return r[t.JsonMapping].ok({"continue": True})
 
     def fetch_config(self) -> t.JsonMapping:
         """Get hooks configuration as dict."""
         config: t.JsonDict = {}
         for event, hooks in self._hooks.items():
-            hook_entries: list[t.JsonValue] = []
+            hook_entries: t.JsonValueList = []
             for hook in hooks:
                 matcher = hook.matcher
                 matcher_value: t.JsonValue
@@ -65,10 +65,15 @@ class FlextQualityHookManager:
 
     def fetch_config_json(self) -> str:
         """Get hooks configuration as JSON."""
-        config_json: str = t.Quality.CONTAINER_MAPPING_ADAPTER.dump_json(
-            dict(self.fetch_config()),
-            indent=c.Quality.JSON_INDENT,
-        ).decode("utf-8")
+        config_json: str = (
+            t
+            .json_mapping_adapter()
+            .dump_json(
+                dict(self.fetch_config()),
+                indent=c.Quality.JSON_INDENT,
+            )
+            .decode("utf-8")
+        )
         return config_json
 
     def register(self, hook: FlextQualityBaseHook) -> p.Result[bool]:
