@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from typing import ClassVar, Protocol, runtime_checkable
 
 from flext_infra import p
@@ -50,7 +49,7 @@ class FlextQualityProtocols(p, web_p):
             def validate(
                 self,
                 content: str,
-                file_path: Path | None = None,
+                file_path: t.Cli.TextPath | None = None,
             ) -> p.Result[t.SequenceOf[t.JsonMapping]]:
                 """Validate content and return violations."""
                 ...
