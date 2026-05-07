@@ -1,0 +1,24 @@
+src/flext_quality/base.py
+  s_31d7c7c0188113::t_6cfcf495915bb6 8,12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.1",
+  "base_commit_sha": "b50d5643c31df4557c82dbc4d5ed85a1cfc4fc98",
+  "prompts": {},
+  "humans": {
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  },
+  "sessions": {
+    "s_31d7c7c0188113": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c577bfd3-b7be-40e8-bd0d-3b1daf0191d0",
+        "model": "claude-sonnet-4-6"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>"
+    }
+  }
+}
