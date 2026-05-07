@@ -1,0 +1,167 @@
+src/flext_quality/docs/notifications.py
+  s_5a9c2b140a8456::t_eac949b683070c 652-653,660,663,666
+  s_5a9c2b140a8456::t_272a9fbdc7862c 723-728
+  s_b15aa8dbf80823::t_fd3a98b1d3bde8 25
+  s_5a9c2b140a8456::t_bf300a3818a37a 648-651,654
+  s_b15aa8dbf80823::t_e3e595f58b6fb6 645-646,658,669-684,687-700,703-706,709-713
+  s_b15aa8dbf80823::t_ccc4143839474a 545
+  s_5a9c2b140a8456::t_6caef606ff015b 659,661-662,664-665,667
+  s_5a9c2b140a8456::t_b83acbd458bb65 720-722
+  s_0290f35b98ef0c::t_d016145e5787b7 719,730
+src/flext_quality/docs/dashboard.py
+  s_5a9c2b140a8456::t_c891e2a41758b3 21
+  s_5a9c2b140a8456::t_bfffd6cdd324ba 601,605
+  s_5a9c2b140a8456::t_32c1889ecd3f7f 621-626
+  s_b15aa8dbf80823::t_342e4f2aede19a 20
+  s_5a9c2b140a8456::t_a59b453e54d07e 204
+  s_b15aa8dbf80823::t_8e9a77f91ae685 589-590,607-612
+  s_5a9c2b140a8456::t_eac949b683070c 592-600,603-604
+  s_5a9c2b140a8456::t_e29b14daea7a99 602
+  s_b15aa8dbf80823::t_8a8eb2dd5942b5 16
+  s_0290f35b98ef0c::t_d016145e5787b7 617,628
+  s_5a9c2b140a8456::t_2d5a73b03dfe11 618-620
+src/flext_quality/hooks/manager.py
+  h_5cf852cc46bf92 31-32,37,48
+  s_5a9c2b140a8456::t_a59b453e54d07e 54
+  s_552d8e4891a938::t_b1d772e93cab2e 69-71
+src/flext_quality/protocols.py
+  h_5cf852cc46bf92 67-68,72,102-103,107,119
+src/flext_quality/base.py
+  s_5a9c2b140a8456::t_f07a3ed8876942 12
+src/flext_quality/docs/core/config_manager.py
+  s_b15aa8dbf80823::t_20b924e619b827 140,142
+  s_b15aa8dbf80823::t_c98367f89601cf 158,162,183,211,217,232,354
+  s_b15aa8dbf80823::t_5f4e2e0d21f6af 157,234
+  s_b15aa8dbf80823::t_447da505a1de38 17-21,24-27,29-31,33-35
+  s_b15aa8dbf80823::t_88123b880ab3d4 22-23,28,32
+  s_5a9c2b140a8456::t_3132d77c6bba7f 38,54,59,69-72,82,92,96,122,192,199,206-208,338,340-347,350,352,360
+  s_5a9c2b140a8456::t_728cab36e1a2a9 41-45,60-68,99-113,348-349
+  s_b15aa8dbf80823::t_89ca4525a52b59 146
+src/flext_quality/mcp/resources.py
+  s_552d8e4891a938::t_b1d772e93cab2e 25-27,42-44,75-77
+src/flext_quality/docs/tools/link_checker.py
+  h_5cf852cc46bf92 153,168,171
+src/flext_quality/cli.py
+  s_5a9c2b140a8456::t_d18b3949bf443c 18
+src/flext_quality/models.py
+  s_5a9c2b140a8456::t_800b1f8be1ad3a 373,382-383,419,427-432,438,441-447,471-481,490-492
+src/flext_quality/utilities.py
+  s_5a9c2b140a8456::t_8072c50b5947f6 41-48
+  s_552d8e4891a938::t_b1d772e93cab2e 126
+  s_5a9c2b140a8456::t_c891e2a41758b3 13
+  s_5a9c2b140a8456::t_e8dd267e0317a0 75
+  s_5a9c2b140a8456::t_46af8bd84c9118 56-61,63-70,72-74,76-78
+  h_5cf852cc46bf92 137,142,144
+  s_5a9c2b140a8456::t_460622df8104cb 62,71
+src/flext_quality/docs/scripts/validate.py
+  s_b15aa8dbf80823::t_b0b9e46b7c78e1 659-663,707-766
+  s_5a9c2b140a8456::t_5e09a87189ea9e 693
+  s_5a9c2b140a8456::t_8410b85cad636c 176,179,183,187,203,205,207-212,214,216-218,220-223,225-227,229-231,237-239,246-251,254-256,258-260,272,274-282
+  s_0290f35b98ef0c::t_d016145e5787b7 771,782
+  s_5a9c2b140a8456::t_6e1e3a954a2710 127,130,132,134,136,138-139
+  h_5cf852cc46bf92 62,80,99,386,391,426-427,606-607,625,630
+  s_b15aa8dbf80823::t_e50fa9137fb70b 22,27
+  s_5a9c2b140a8456::t_d170a56d8ef6ec 296,299-300,302-310,313-320,322-335
+  s_5a9c2b140a8456::t_e57011621e66b7 665,667-668,680,682-683,685,692
+  s_5a9c2b140a8456::t_eac949b683070c 666,669-672,674-679,681,684,686-691,694-705
+  s_5a9c2b140a8456::t_2ee18234cc1568 772-774
+  s_5a9c2b140a8456::t_148fd554a0a869 775-780
+src/flext_quality/docs/scripts/audit.py
+  s_b15aa8dbf80823::t_63dc7a81ac2c25 780-781,826-871
+  s_5a9c2b140a8456::t_0a4ea492b3bb16 880-885
+  s_5a9c2b140a8456::t_f5a31ef1dbb48f 807
+  s_5a9c2b140a8456::t_eac949b683070c 783-785,787,790,793,802-803,808-809,813-815,821-822
+  h_5cf852cc46bf92 226,231,236,241,280,310,372,382,387,404,416,432,454,464,475
+  s_0290f35b98ef0c::t_d016145e5787b7 876,887
+  s_5a9c2b140a8456::t_c506f6b822dc39 786,788-789,791-792,800-801,805-806,810-812,816-820,823
+  s_5a9c2b140a8456::t_1f0548c64fe545 877-879
+src/flext_quality/docs/scheduled_maintenance.py
+  s_0290f35b98ef0c::t_d016145e5787b7 781,794
+  h_5cf852cc46bf92 739
+  s_5a9c2b140a8456::t_eac949b683070c 747-749,751,754
+  s_b15aa8dbf80823::t_41bdad9cb326e3 732-733,735,737-738,740-743,745-746,757-775
+  s_5a9c2b140a8456::t_93b9ba4b3b19e3 785-788,790-791
+  s_b15aa8dbf80823::t_20245f697a827f 26
+  s_5a9c2b140a8456::t_e536274af303b2 782-784,792
+  s_5a9c2b140a8456::t_fbc9638ad2066f 744,750,752-753,755
+src/flext_quality/docs/scripts/report.py
+  s_5a9c2b140a8456::t_e16b94fab2c6cf 781-786
+  s_5a9c2b140a8456::t_999a3b6001bce4 778-780
+  s_5a9c2b140a8456::t_81b13f796640a5 709-710,716-717,721-722,724-725,727-728,730-731,733,737,742
+  s_0290f35b98ef0c::t_d016145e5787b7 777,788
+  s_5a9c2b140a8456::t_eac949b683070c 711-713,715,719-720,723,726,729,732,734-736,738
+  s_b15aa8dbf80823::t_401d43a4328ea9 706-707,744-772
+  s_5a9c2b140a8456::t_582af0059e818c 718
+src/flext_quality/docs/scripts/optimize.py
+  s_5a9c2b140a8456::t_d82a235d10fc51 496-501
+  s_5a9c2b140a8456::t_26fec5cbabe10e 493-495
+  s_5a9c2b140a8456::t_eac949b683070c 410-418,420,423,429,431-433,436-437
+  s_5a9c2b140a8456::t_1428420944219a 40,44-47,68,98-101,124,195-198,221,253,277,302-305,339
+  h_5cf852cc46bf92 86,107,131,137,147,165,167,170,191-192,226,232,244,294,296,313
+  s_b15aa8dbf80823::t_484c0a014126a5 407-409,445-487
+  s_5a9c2b140a8456::t_a5b092ff41cadf 419,421-422,427-428,430,434,438-439,443
+  s_5a9c2b140a8456::t_1dab15dd2f6cf0 23
+  s_5a9c2b140a8456::t_1547700c3b0360 435
+  s_0290f35b98ef0c::t_d016145e5787b7 492,503
+  s_b15aa8dbf80823::t_e50fa9137fb70b 21
+  s_5a9c2b140a8456::t_f04740e86d3c56 24
+  s_5a9c2b140a8456::t_3ab102287a59ef 440-442
+src/flext_quality/api.py
+  h_5cf852cc46bf92 42-43,51,119,123,128,133,139
+src/flext_quality/integrations/mcp_client.py
+  s_552d8e4891a938::t_b1d772e93cab2e 41,117,135
+src/flext_quality/docs/tools/style_validator.py
+  h_5cf852cc46bf92 291,304
+src/flext_quality/integrations/claude_mem.py
+  s_5a9c2b140a8456::t_a59b453e54d07e 41
+src/flext_quality/mcp/tools.py
+  h_5cf852cc46bf92 85,91
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.1",
+  "base_commit_sha": "6a6e72a335d0c84dabf18e41babe779a5b1bfb12",
+  "prompts": {},
+  "humans": {
+    "h_5cf852cc46bf92": {
+      "author": "FLEXT Bot <team@flext.sh>"
+    },
+    "h_9db9d35f50cf33": {
+      "author": "FLEXT Bot"
+    }
+  },
+  "sessions": {
+    "s_0290f35b98ef0c": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "0c4cc853-563f-48ad-a39a-f49b587090b8",
+        "model": "unknown"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>"
+    },
+    "s_552d8e4891a938": {
+      "agent_id": {
+        "tool": "github-copilot",
+        "id": "35c0040b-2ae9-466e-90aa-7721509e1e19",
+        "model": "unknown"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>"
+    },
+    "s_5a9c2b140a8456": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019dfddc-86ee-79a0-b5bf-0433a8110b6a",
+        "model": "gpt-5.5"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>"
+    },
+    "s_b15aa8dbf80823": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d896ab0f-dd16-4dca-9ad4-b3d924a501e7",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "FLEXT Bot <team@flext.sh>"
+    }
+  }
+}
