@@ -5,11 +5,11 @@ from __future__ import annotations
 from abc import ABC
 from typing import override
 
-from flext_core import s
+from flext_core import p, s
 from flext_quality import FlextQualitySettings, t
 
 
-class FlextQualityServiceBase[TResult: t.JsonPayload = t.JsonDict](s[TResult], ABC):
+class FlextQualityServiceBase[TResult: p.Base = t.JsonDict](s[TResult], ABC):
     """Base class for flext-quality services with typed settings access.
 
     Generic over the service result type so consumers can specialize:
