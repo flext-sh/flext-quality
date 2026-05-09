@@ -12,6 +12,7 @@ _LAZY_IMPORTS = build_lazy_import_map(
         ".report": ("FlextQualityDocumentationReporter",),
         ".validate": (
             "FlextQualityContentValidator",
+            "FlextQualityDocumentationValidator",
             "FlextQualityLinkValidator",
         ),
     },

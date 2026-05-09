@@ -20,6 +20,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".core.config_manager": (
                 "FlextQualityAuditRules",
                 "FlextQualityConfigManager",
+                "FlextQualityConfigTypes",
                 "FlextQualityStyleGuide",
                 "FlextQualityValidationSettings",
             ),
@@ -31,6 +32,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".scripts.report": ("FlextQualityDocumentationReporter",),
             ".scripts.validate": (
                 "FlextQualityContentValidator",
+                "FlextQualityDocumentationValidator",
                 "FlextQualityLinkValidator",
             ),
             ".tools.link_checker": ("FlextQualityLinkChecker",),

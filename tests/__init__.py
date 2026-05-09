@@ -14,7 +14,8 @@ from flext_core.lazy import (
 if _t.TYPE_CHECKING:
     from flext_tests import td, tf, tk, tm, tv
 
-    from flext_quality import d, e, h, r, s, x
+    from flext_quality import d, e, h, r, x
+    from tests.base import TestsFlextQualityServiceBase, s
     from tests.constants import TestsFlextQualityConstants, c
     from tests.helpers.assertions import (
         assert_analysis_results_structure,
@@ -26,6 +27,7 @@ if _t.TYPE_CHECKING:
     )
     from tests.models import TestsFlextQualityModels, m
     from tests.protocols import TestsFlextQualityProtocols, p
+    from tests.settings import TestsFlextQualitySettings
     from tests.typings import TestsFlextQualityTypes, t
     from tests.unit.test_api import TestsFlextQualityApi
     from tests.unit.test_basic import TestsFlextQualityBasic
@@ -38,6 +40,10 @@ _LAZY_IMPORTS = merge_lazy_imports(
     ),
     build_lazy_import_map(
         {
+            ".base": (
+                "TestsFlextQualityServiceBase",
+                "s",
+            ),
             ".constants": (
                 "TestsFlextQualityConstants",
                 "c",
@@ -58,6 +64,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "TestsFlextQualityProtocols",
                 "p",
             ),
+            ".settings": ("TestsFlextQualitySettings",),
             ".typings": (
                 "TestsFlextQualityTypes",
                 "t",
@@ -74,7 +81,6 @@ _LAZY_IMPORTS = merge_lazy_imports(
                 "e",
                 "h",
                 "r",
-                "s",
                 "x",
             ),
             "flext_tests": (
@@ -118,6 +124,8 @@ __all__: list[str] = [
     "TestsFlextQualityConstants",
     "TestsFlextQualityModels",
     "TestsFlextQualityProtocols",
+    "TestsFlextQualityServiceBase",
+    "TestsFlextQualitySettings",
     "TestsFlextQualityTypes",
     "TestsFlextQualityUtilities",
     "assert_analysis_results_structure",

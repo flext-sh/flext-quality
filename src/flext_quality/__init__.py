@@ -31,6 +31,7 @@ if _t.TYPE_CHECKING:
     from flext_quality.docs.core.config_manager import (
         FlextQualityAuditRules,
         FlextQualityConfigManager,
+        FlextQualityConfigTypes,
         FlextQualityStyleGuide,
         FlextQualityValidationSettings,
     )
@@ -44,6 +45,7 @@ if _t.TYPE_CHECKING:
     from flext_quality.docs.scripts.report import FlextQualityDocumentationReporter
     from flext_quality.docs.scripts.validate import (
         FlextQualityContentValidator,
+        FlextQualityDocumentationValidator,
         FlextQualityLinkValidator,
     )
     from flext_quality.docs.tools.link_checker import FlextQualityLinkChecker
@@ -96,6 +98,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".docs.core.config_manager": (
                 "FlextQualityAuditRules",
                 "FlextQualityConfigManager",
+                "FlextQualityConfigTypes",
                 "FlextQualityStyleGuide",
                 "FlextQualityValidationSettings",
             ),
@@ -107,6 +110,7 @@ _LAZY_IMPORTS = merge_lazy_imports(
             ".docs.scripts.report": ("FlextQualityDocumentationReporter",),
             ".docs.scripts.validate": (
                 "FlextQualityContentValidator",
+                "FlextQualityDocumentationValidator",
                 "FlextQualityLinkValidator",
             ),
             ".docs.tools.link_checker": ("FlextQualityLinkChecker",),
@@ -195,6 +199,7 @@ __all__: list[str] = [
     "FlextQualityCli",
     "FlextQualityCodeExecutionBridge",
     "FlextQualityConfigManager",
+    "FlextQualityConfigTypes",
     "FlextQualityConstants",
     "FlextQualityContentValidator",
     "FlextQualityDocumentationAuditor",
@@ -202,6 +207,7 @@ __all__: list[str] = [
     "FlextQualityDocumentationNotifier",
     "FlextQualityDocumentationOptimizer",
     "FlextQualityDocumentationReporter",
+    "FlextQualityDocumentationValidator",
     "FlextQualityHookManager",
     "FlextQualityLinkChecker",
     "FlextQualityLinkValidator",

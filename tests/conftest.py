@@ -7,17 +7,27 @@ SPDX-License-Identifier: MIT
 
 from __future__ import annotations
 
-import os
 from collections.abc import Generator
 
 import pytest
+from flext_tests import reset_settings as _shared_reset_settings
+
+from flext_quality.settings import FlextQualitySettings
+from tests import u
+
+reset_settings = _shared_reset_settings
 
 
 @pytest.fixture(autouse=True)
-def set_test_environment() -> Generator[None]:
+def set_test_environment(reset_settings: None) -> Generator[None]:
     """Configure isolated test environment variables."""
-    os.environ["FLEXT_ENV"] = "test"
-    os.environ["FLEXT_LOG_LEVEL"] = "DEBUG"
-    yield
-    os.environ.pop("FLEXT_ENV", None)
-    os.environ.pop("FLEXT_LOG_LEVEL", None)
+    _ = reset_settings
+    FlextQualitySettings.reset_for_testing()
+    try:
+        with u.Tests.env_vars_context({
+            "FLEXT_ENV": "test",
+            "FLEXT_LOG_LEVEL": "DEBUG",
+        }):
+            yield
+    finally:
+        FlextQualitySettings.reset_for_testing()

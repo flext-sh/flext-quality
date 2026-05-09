@@ -5,27 +5,15 @@ from __future__ import annotations
 import io
 import sys
 import tempfile
-from collections.abc import Generator
 from pathlib import Path
 
-import pytest
 from flext_tests import tm
 
 from flext_quality import FlextQuality, quality
-from flext_quality.settings import FlextQualitySettings
 
 
 class TestsFlextQualityApi:
     """Tests for FlextQuality API."""
-
-    @pytest.fixture(autouse=True)
-    def _reset_settings(self) -> Generator[None]:
-        """Isolate singleton state across API tests."""
-        FlextQualitySettings.reset_for_testing()
-        try:
-            yield
-        finally:
-            FlextQualitySettings.reset_for_testing()
 
     def test_quality_alias_exposes_facade_instance(self) -> None:
         """Test that the runtime alias exposes the public facade instance."""
