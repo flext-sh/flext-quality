@@ -583,16 +583,14 @@ Broken Links:
         output_path: str = "docs/maintenance/reports/",
     ) -> pathlib.Path:
         """Save validation report."""
-        pathlib.Path(output_path).mkdir(exist_ok=True, parents=True)
-
         timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         filename = f"link_validation_{timestamp}.json"
         filepath = pathlib.Path(output_path) / filename
-
-        pathlib.Path(filepath).write_bytes(
-            self.RESULTS_ADAPTER.dump_json(self.results, indent=2),
-        )
-
+        _ = u.Cli.json_write(
+            filepath,
+            self.results,
+            options=m.Cli.JsonWriteOptions(indent=2),
+        ).unwrap()
         return filepath
 
 
