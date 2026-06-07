@@ -100,9 +100,19 @@ class FlextQualityDocumentationDashboard:
                 "status": "No audit data available",
             }
 
+        read = u.Cli.files_read_text(Path(latest_audit))
+        if read.failure:
+            return {
+                "quality_score": 0,
+                "files_analyzed": 0,
+                "total_issues": 0,
+                "severity_breakdown": {"critical": 0, "high": 0, "medium": 0, "low": 0},
+                "timestamp": datetime.now(UTC).isoformat(),
+                "status": f"Error: {read.error}",
+            }
         try:
             data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-                Path(latest_audit).read_bytes()
+                read.value
             )
             metrics_raw = data.get("metrics")
             metrics: t.JsonMapping = (
@@ -166,8 +176,14 @@ class FlextQualityDocumentationDashboard:
                 )
 
                 if report_date >= cutoff_date:
+                    read = u.Cli.files_read_text(report_file)
+                    if read.failure:
+                        self._logger_instance.warning(
+                            "Skipping unreadable report", file=str(report_file)
+                        )
+                        continue
                     data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-                        Path(report_file).read_bytes()
+                        read.value
                     )
                     metrics_v = data.get("metrics")
                     metrics_m: t.JsonMapping = (
@@ -225,8 +241,14 @@ class FlextQualityDocumentationDashboard:
                     tzinfo=UTC,
                 )
 
+                read = u.Cli.files_read_text(report_file)
+                if read.failure:
+                    self._logger_instance.warning(
+                        "Skipping unreadable report", file=str(report_file)
+                    )
+                    continue
                 data = t.Quality.RELAXED_CONTAINER_MAPPING_ADAPTER.validate_json(
-                    Path(report_file).read_bytes()
+                    read.value
                 )
 
                 metrics_rv = data.get("metrics")
