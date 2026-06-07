@@ -191,7 +191,16 @@ class FlextQualityDocumentationAuditor:
                 mtime = datetime.fromtimestamp(file_path.stat().st_mtime, tz=UTC)
                 if mtime < cutoff_date:
                     age_days = (datetime.now(UTC) - mtime).days
-                    content = file_path.read_text(encoding="utf-8")
+                    read = u.Cli.files_read_text(file_path)
+                    if read.failure:
+                        self.results.issues.append({
+                            "type": "file_access_error",
+                            "severity": "medium",
+                            "file": str(file_path.relative_to(self.project_root)),
+                            "error": read.error,
+                        })
+                        continue
+                    content = read.value
                     outdated_indicators = self._check_outdated_indicators(content)
                     issue: MutableMapping[
                         str,
@@ -251,52 +260,53 @@ class FlextQualityDocumentationAuditor:
         required_sections = self.validation_config.content_analysis.required_sections
         check_todos = self.validation_config.content_analysis.check_todos
         for file_path in doc_files:
-            try:
-                content = file_path.read_text(encoding="utf-8")
-                word_count = len(content.split())
-                if word_count < min_word_count:
-                    self.results.issues.append({
-                        "type": "insufficient_content",
-                        "severity": "low",
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "word_count": word_count,
-                        "minimum_required": min_word_count,
-                        "recommendation": f"Expand content (currently {word_count} words, minimum {min_word_count})",
-                    })
-                if "README.md" in str(file_path) or "docs/" in str(file_path):
-                    missing_sections = self._check_required_sections(
-                        content,
-                        required_sections,
-                    )
-                    if missing_sections:
-                        self.results.issues.append({
-                            "type": "missing_sections",
-                            "severity": "medium",
-                            "file": str(file_path.relative_to(self.project_root)),
-                            "missing_sections": missing_sections,
-                            "recommendation": f"Add missing sections: {', '.join(missing_sections)}",
-                        })
-                if check_todos:
-                    todos = u.Quality.compile_pattern(
-                        r"(?:TODO|FIXME|XXX):\\s*(.+?)(?:\\n|$)",
-                        ignorecase=True,
-                    ).findall(content)
-                    if todos:
-                        self.results.issues.append({
-                            "type": "todo_markers",
-                            "severity": "low",
-                            "file": str(file_path.relative_to(self.project_root)),
-                            "todo_count": len(todos),
-                            "todos": todos[:5],
-                            "recommendation": f"Address {len(todos)} TODO/FIXME items",
-                        })
-            except c.EXC_FS_DECODING as e:
+            read = u.Cli.files_read_text(file_path)
+            if read.failure:
                 self.results.issues.append({
                     "type": "content_analysis_error",
                     "severity": "medium",
                     "file": str(file_path.relative_to(self.project_root)),
-                    "error": str(e),
+                    "error": read.error,
                 })
+                continue
+            content = read.value
+            word_count = len(content.split())
+            if word_count < min_word_count:
+                self.results.issues.append({
+                    "type": "insufficient_content",
+                    "severity": "low",
+                    "file": str(file_path.relative_to(self.project_root)),
+                    "word_count": word_count,
+                    "minimum_required": min_word_count,
+                    "recommendation": f"Expand content (currently {word_count} words, minimum {min_word_count})",
+                })
+            if "README.md" in str(file_path) or "docs/" in str(file_path):
+                missing_sections = self._check_required_sections(
+                    content,
+                    required_sections,
+                )
+                if missing_sections:
+                    self.results.issues.append({
+                        "type": "missing_sections",
+                        "severity": "medium",
+                        "file": str(file_path.relative_to(self.project_root)),
+                        "missing_sections": missing_sections,
+                        "recommendation": f"Add missing sections: {', '.join(missing_sections)}",
+                    })
+            if check_todos:
+                todos = u.Quality.compile_pattern(
+                    r"(?:TODO|FIXME|XXX):\\s*(.+?)(?:\\n|$)",
+                    ignorecase=True,
+                ).findall(content)
+                if todos:
+                    self.results.issues.append({
+                        "type": "todo_markers",
+                        "severity": "low",
+                        "file": str(file_path.relative_to(self.project_root)),
+                        "todo_count": len(todos),
+                        "todos": todos[:5],
+                        "recommendation": f"Address {len(todos)} TODO/FIXME items",
+                    })
 
     def _check_required_sections(
         self,
@@ -319,51 +329,52 @@ class FlextQualityDocumentationAuditor:
         """Check style consistency and formatting issues."""
         accessibility_cfg = self.style_guide.accessibility
         for file_path in doc_files:
-            try:
-                content = file_path.read_text(encoding="utf-8")
-                formatting_issues = self._check_markdown_formatting(content)
-                if formatting_issues:
-                    self.results.issues.append({
-                        "type": "formatting_issues",
-                        "severity": "low",
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "issues": formatting_issues,
-                        "recommendation": f"Fix {len(formatting_issues)} formatting issues",
-                    })
-                accessibility_issues = self._check_accessibility(content)
-                if accessibility_issues:
-                    severity = (
-                        "high"
-                        if any(
-                            i["type"] == "missing_alt_text"
-                            for i in accessibility_issues
-                        )
-                        else "medium"
-                    )
-                    self.results.issues.append({
-                        "type": "accessibility_issues",
-                        "severity": severity,
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "issues": accessibility_issues,
-                        "recommendation": f"Address {len(accessibility_issues)} accessibility issues",
-                    })
-                if accessibility_cfg.heading_structure:
-                    heading_issues = self._check_heading_hierarchy(content)
-                    if heading_issues:
-                        self.results.issues.append({
-                            "type": "heading_hierarchy",
-                            "severity": "medium",
-                            "file": str(file_path.relative_to(self.project_root)),
-                            "issues": heading_issues,
-                            "recommendation": "Fix heading hierarchy structure",
-                        })
-            except c.EXC_FS_DECODING as e:
+            read = u.Cli.files_read_text(file_path)
+            if read.failure:
                 self.results.issues.append({
                     "type": "consistency_check_error",
                     "severity": "medium",
                     "file": str(file_path.relative_to(self.project_root)),
-                    "error": str(e),
+                    "error": read.error,
                 })
+                continue
+            content = read.value
+            formatting_issues = self._check_markdown_formatting(content)
+            if formatting_issues:
+                self.results.issues.append({
+                    "type": "formatting_issues",
+                    "severity": "low",
+                    "file": str(file_path.relative_to(self.project_root)),
+                    "issues": formatting_issues,
+                    "recommendation": f"Fix {len(formatting_issues)} formatting issues",
+                })
+            accessibility_issues = self._check_accessibility(content)
+            if accessibility_issues:
+                severity = (
+                    "high"
+                    if any(
+                        i["type"] == "missing_alt_text"
+                        for i in accessibility_issues
+                    )
+                    else "medium"
+                )
+                self.results.issues.append({
+                    "type": "accessibility_issues",
+                    "severity": severity,
+                    "file": str(file_path.relative_to(self.project_root)),
+                    "issues": accessibility_issues,
+                    "recommendation": f"Address {len(accessibility_issues)} accessibility issues",
+                })
+            if accessibility_cfg.heading_structure:
+                heading_issues = self._check_heading_hierarchy(content)
+                if heading_issues:
+                    self.results.issues.append({
+                        "type": "heading_hierarchy",
+                        "severity": "medium",
+                        "file": str(file_path.relative_to(self.project_root)),
+                        "issues": heading_issues,
+                        "recommendation": "Fix heading hierarchy structure",
+                    })
 
     def _check_markdown_formatting(self, content: str) -> MutableSequence[str]:
         """Check for markdown formatting issues."""
@@ -449,44 +460,45 @@ class FlextQualityDocumentationAuditor:
         all_links: MutableSequence[t.HeaderMapping] = []
         image_refs: MutableSequence[t.StrMapping] = []
         for file_path in doc_files:
-            try:
-                content = file_path.read_text(encoding="utf-8")
-                external_links = u.Quality.compile_pattern(
-                    r"\\[([^\\]]+)\\]\\((https?://[^)]+)\\)",
-                ).findall(content)
-                for text, url in external_links:
-                    all_links.append({
-                        "url": url,
-                        "text": text,
-                        "file": str(file_path.relative_to(self.project_root)),
-                        "type": "external",
-                    })
-                internal_links = u.Quality.compile_pattern(
-                    r"\\[([^\\]]+)\\]\\(([^)]+)\\)",
-                ).findall(content)
-                for text, link in internal_links:
-                    if not link.startswith(("http://", "https://", "#", "mailto:")):
-                        all_links.append({
-                            "url": link,
-                            "text": text,
-                            "file": str(file_path.relative_to(self.project_root)),
-                            "type": "internal",
-                        })
-                images = u.Quality.compile_pattern(
-                    r"!\\[([^\\]]*)\\]\\(([^)]+)\\)",
-                ).findall(content)
-                for alt_text, src in images:
-                    image_refs.append({
-                        "src": src,
-                        "alt": alt_text,
-                        "file": str(file_path.relative_to(self.project_root)),
-                    })
-            except c.EXC_FS_DECODING as e:
+            read = u.Cli.files_read_text(file_path)
+            if read.failure:
                 self.results.issues.append({
                     "type": "link_extraction_error",
                     "severity": "medium",
                     "file": str(file_path.relative_to(self.project_root)),
-                    "error": str(e),
+                    "error": read.error,
+                })
+                continue
+            content = read.value
+            external_links = u.Quality.compile_pattern(
+                r"\\[([^\\]]+)\\]\\((https?://[^)]+)\\)",
+            ).findall(content)
+            for text, url in external_links:
+                all_links.append({
+                    "url": url,
+                    "text": text,
+                    "file": str(file_path.relative_to(self.project_root)),
+                    "type": "external",
+                })
+            internal_links = u.Quality.compile_pattern(
+                r"\\[([^\\]]+)\\]\\(([^)]+)\\)",
+            ).findall(content)
+            for text, link in internal_links:
+                if not link.startswith(("http://", "https://", "#", "mailto:")):
+                    all_links.append({
+                        "url": link,
+                        "text": text,
+                        "file": str(file_path.relative_to(self.project_root)),
+                        "type": "internal",
+                    })
+            images = u.Quality.compile_pattern(
+                r"!\\[([^\\]]*)\\]\\(([^)]+)\\)",
+            ).findall(content)
+            for alt_text, src in images:
+                image_refs.append({
+                    "src": src,
+                    "alt": alt_text,
+                    "file": str(file_path.relative_to(self.project_root)),
                 })
         if link_validation.check_external:
             self._validate_external_links(all_links)
@@ -764,18 +776,25 @@ class FlextQualityDocumentationAuditor:
         self,
         output_format: str = "json",
         output_path: str = "docs/maintenance/reports/",
-    ) -> str:
+    ) -> p.Result[str]:
         """Save audit report to file."""
         output_dir = Path(output_path)
-        output_dir.mkdir(parents=True, exist_ok=True)
         timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
         filename = f"audit_report_{timestamp}.{output_format}"
         filepath = output_dir / filename
         report_content = self.generate_report(output_format)
-        _ = filepath.write_text(report_content, encoding="utf-8")
+        report_write = u.Cli.atomic_write_text_file(filepath, report_content)
+        if report_write.failure:
+            return r[str].fail(report_write.error or f"cannot write {filepath}")
         latest_file = output_dir / "latest_audit.json"
-        latest_file.write_text(self.results.model_dump_json(indent=2), encoding="utf-8")
-        return str(filepath)
+        latest_write = u.Cli.json_write(
+            latest_file,
+            self.results,
+            options=m.Cli.JsonWriteOptions(indent=2),
+        )
+        if latest_write.failure:
+            return r[str].fail(latest_write.error or f"cannot write {latest_file}")
+        return r[str].ok(str(filepath))
 
     class Run(s[bool]):
         """CLI command for FLEXT Quality documentation audit."""
@@ -829,7 +848,11 @@ class FlextQualityDocumentationAuditor:
             auditor = FlextQualityDocumentationAuditor(self.config_dir)
             try:
                 results = self._execute_checks(auditor)
-                auditor.save_report(self.output_format, self.output)
+                save_result = auditor.save_report(self.output_format, self.output)
+                if save_result.failure:
+                    return r[bool].fail(
+                        save_result.error or "audit report write failed"
+                    )
                 metrics = results.metrics
                 if self._should_fail(metrics):
                     return r[bool].fail("Audit failed quality threshold")
