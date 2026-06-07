@@ -11,7 +11,7 @@ from collections.abc import (
     Mapping,
     MutableSequence,
 )
-from datetime import UTC, datetime, timedelta
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import override
 
@@ -96,7 +96,7 @@ class FlextQualityDocumentationDashboard:
                 "files_analyzed": 0,
                 "total_issues": 0,
                 "severity_breakdown": {"critical": 0, "high": 0, "medium": 0, "low": 0},
-                "timestamp": datetime.now(UTC).isoformat(),
+                "timestamp": u.now().isoformat(),
                 "status": "No audit data available",
             }
 
@@ -107,7 +107,7 @@ class FlextQualityDocumentationDashboard:
                 "files_analyzed": 0,
                 "total_issues": 0,
                 "severity_breakdown": {"critical": 0, "high": 0, "medium": 0, "low": 0},
-                "timestamp": datetime.now(UTC).isoformat(),
+                "timestamp": u.now().isoformat(),
                 "status": f"Error: {read.error}",
             }
         try:
@@ -139,7 +139,7 @@ class FlextQualityDocumentationDashboard:
                 "timestamp": (
                     timestamp_raw
                     if isinstance(timestamp_raw, str)
-                    else datetime.now(UTC).isoformat()
+                    else u.now().isoformat()
                 ),
                 "status": "Current",
             }
@@ -149,7 +149,7 @@ class FlextQualityDocumentationDashboard:
                 "files_analyzed": 0,
                 "total_issues": 0,
                 "severity_breakdown": {"critical": 0, "high": 0, "medium": 0, "low": 0},
-                "timestamp": datetime.now(UTC).isoformat(),
+                "timestamp": u.now().isoformat(),
                 "status": f"Error: {e!s}",
             }
 
@@ -158,7 +158,7 @@ class FlextQualityDocumentationDashboard:
         days: int = 30,
     ) -> t.JsonMapping:
         """Get quality trends over the specified number of days."""
-        cutoff_date = datetime.now(UTC) - timedelta(days=days)
+        cutoff_date = u.now() - timedelta(days=days)
 
         trend_data: t.MutableSequenceOf[t.JsonDict] = []
         reports_dir = self.reports_dir
@@ -172,8 +172,8 @@ class FlextQualityDocumentationDashboard:
                     " ",
                 )
                 report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
-                    tzinfo=UTC,
-                )
+                                    tzinfo=u.configured_timezone(),
+                                )
 
                 if report_date >= cutoff_date:
                     read = u.Cli.files_read_text(report_file)
@@ -238,8 +238,8 @@ class FlextQualityDocumentationDashboard:
                     " ",
                 )
                 report_date = datetime.strptime(date_str, "%Y%m%d %H%M%S").replace(
-                    tzinfo=UTC,
-                )
+                                    tzinfo=u.configured_timezone(),
+                                )
 
                 read = u.Cli.files_read_text(report_file)
                 if read.failure:
