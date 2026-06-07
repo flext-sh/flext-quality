@@ -16,7 +16,7 @@ from collections.abc import (
     MutableMapping,
     MutableSequence,
 )
-from datetime import UTC, datetime, timedelta
+from datetime import timedelta
 from pathlib import Path
 from string import Template
 from typing import Annotated, override
@@ -46,7 +46,7 @@ class FlextQualityDocumentationAuditor:
         )
         self.load_config()
         self.results: m.Quality.AuditorResults = m.Quality.AuditorResults(
-            timestamp=datetime.now(UTC).isoformat(),
+            timestamp=u.now().isoformat(),
         )
 
     def load_config(self) -> None:
@@ -185,12 +185,12 @@ class FlextQualityDocumentationAuditor:
     def check_content_freshness(self, doc_files: t.SequenceOf[Path]) -> None:
         """Check documentation freshness and identify outdated content."""
         max_age_days = self.audit_rules.quality_thresholds.max_age_days
-        cutoff_date = datetime.now(UTC) - timedelta(days=max_age_days)
+        cutoff_date = u.now() - timedelta(days=max_age_days)
         for file_path in doc_files:
             try:
-                mtime = datetime.fromtimestamp(file_path.stat().st_mtime, tz=UTC)
+                mtime = u.from_timestamp(file_path.stat().st_mtime)
                 if mtime < cutoff_date:
-                    age_days = (datetime.now(UTC) - mtime).days
+                    age_days = (u.now() - mtime).days
                     read = u.Cli.files_read_text(file_path)
                     if read.failure:
                         self.results.issues.append({
@@ -779,7 +779,7 @@ class FlextQualityDocumentationAuditor:
     ) -> p.Result[str]:
         """Save audit report to file."""
         output_dir = Path(output_path)
-        timestamp = datetime.now(UTC).strftime("%Y%m%d_%H%M%S")
+        timestamp = u.now().strftime("%Y%m%d_%H%M%S")
         filename = f"audit_report_{timestamp}.{output_format}"
         filepath = output_dir / filename
         report_content = self.generate_report(output_format)
