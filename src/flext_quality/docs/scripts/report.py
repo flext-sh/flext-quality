@@ -135,17 +135,13 @@ class FlextQualityDocumentationReporter:
     ) -> t.MappingKV[str, t.Quality.DocumentationReportValue] | None:
         """Load a JSON report file."""
         filepath = self.reports_dir / filename
-        if filepath.exists():
-            try:
-                result: t.MappingKV[str, t.Quality.DocumentationReportValue] = (
-                    t.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(
-                        Path(filepath).read_bytes()
-                    )
-                )
-                return result
-            except c.EXC_OS_VALUE:
-                pass
-        return None
+        read = u.Cli.files_read_text(filepath)
+        if read.failure:
+            return None
+        try:
+            return t.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(read.value)
+        except c.EXC_OS_VALUE:
+            return None
 
     def generate_quality_report(
         self,
@@ -547,10 +543,13 @@ class FlextQualityDocumentationReporter:
                     tzinfo=UTC,
                 )
                 if report_date >= cutoff_date:
+                    read = u.Cli.files_read_text(report_file)
+                    if read.failure:
+                        continue
                     report_data_raw: t.MappingKV[
                         str, t.Quality.DocumentationReportValue
                     ] = t.Quality.REPORT_VALUE_MAPPING_ADAPTER.validate_json(
-                        Path(report_file).read_bytes(),
+                        read.value,
                     )
                     report_data_dict: t.MappingKV[
                         str, t.Quality.DocumentationReportValue | datetime
