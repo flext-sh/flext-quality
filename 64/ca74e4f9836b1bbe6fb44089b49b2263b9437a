@@ -1,0 +1,24 @@
+src/flext_quality/docs/scripts/validate.py
+  s_9942ef7a89ba9a::t_14bf2e6ce58622 583-584,589-611,614
+  s_9942ef7a89ba9a::t_23320d8cdec221 776-780
+  s_9942ef7a89ba9a::t_f2d113e5c2b929 58-65,67-82,84,86-103,105-116,118-121
+  s_9942ef7a89ba9a::t_31156eda75ae69 476-478,485-487,489-496
+  s_9942ef7a89ba9a::t_874f36fbeab720 384-385,390,393-405
+  s_9942ef7a89ba9a::t_2900dfb849401d 518-519,524,527-536
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "64ca74e4f9836b1bbe6fb44089b49b2263b9437a",
+  "prompts": {},
+  "sessions": {
+    "s_9942ef7a89ba9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84fb5cb9-a1bd-4654-9339-7a49b63e96d1",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <hi@zed.dev>"
+    }
+  }
+}
