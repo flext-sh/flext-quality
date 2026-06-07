@@ -1,0 +1,21 @@
+src/flext_quality/docs/scripts/report.py
+  s_9942ef7a89ba9a::t_76427727ffc116 586
+  s_9942ef7a89ba9a::t_e0dc44a384a480 154,536,543-544,585,639,750,759,771
+  s_9942ef7a89ba9a::t_62453b7da65afe 19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "0ec43b62aa70b4c9ca3ddf768b4e3451646dd525",
+  "prompts": {},
+  "sessions": {
+    "s_9942ef7a89ba9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84fb5cb9-a1bd-4654-9339-7a49b63e96d1",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <hi@zed.dev>"
+    }
+  }
+}
