@@ -1,0 +1,19 @@
+src/flext_quality/docs/scheduled_maintenance.py
+  s_9942ef7a89ba9a::t_6edce60d2294ad 727-731
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "2ba84806d27872f3479979fc90261287b07c37ce",
+  "prompts": {},
+  "sessions": {
+    "s_9942ef7a89ba9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "84fb5cb9-a1bd-4654-9339-7a49b63e96d1",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "Zed <hi@zed.dev>"
+    }
+  }
+}
