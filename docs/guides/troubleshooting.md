@@ -115,7 +115,7 @@ poetry install
 
 ### r
 
-```python notest
+```python
 # Debug import issues
 import sys
 
@@ -312,7 +312,7 @@ if result.failure:
 
 **Enable debug logging:**
 
-```python notest
+```python
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
@@ -394,7 +394,7 @@ else:
 
 #### Problem: Slow processing
 
-```python notest
+```python
 # Symptoms
 # - High memory usage
 # - Slow response times

@@ -269,7 +269,7 @@ ______________________________________________________________________
 
 FLEXT Quality will absorb and modernize all workspace quality functionality:
 
-```python notest
+```python
 # Absorbing workspace scripts into unified architecture:
 WORKSPACE_INTEGRATION = {
     "quality_gateway.py": "FlextQualityGateway - Enterprise quality gates",
@@ -283,7 +283,7 @@ WORKSPACE_INTEGRATION = {
 
 ### **Modern Tool Stack** (Research-Based)
 
-```python notest
+```python
 # 2025 Enterprise Quality Stack Integration
 ENTERPRISE_TOOLS = {
     "ruff": {
